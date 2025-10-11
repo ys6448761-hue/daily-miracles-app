@@ -18,6 +18,14 @@ const app = express();
 // 환경변수 검증 실행
 validateEnvironment();
 
+// 환경변수 로깅 (Render 배포 확인용)
+console.log('📋 환경변수 확인:', {
+  PORT: process.env.PORT || '5000 (기본값)',
+  NODE_ENV: process.env.NODE_ENV || 'development',
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY ? '✅ 설정됨' : '❌ 없음',
+  DATABASE_URL: process.env.DATABASE_URL || 'file:./data/miracle.db (기본값)'
+});
+
 // 전역 에러 핸들링 초기화
 initializeErrorHandling();
 
