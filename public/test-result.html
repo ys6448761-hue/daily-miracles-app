@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>결과 페이지 테스트</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f0;
+        }
+        .test-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        h2 {
+            margin-bottom: 20px;
+            color: #2c2c2c;
+        }
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .info {
+            background: #f0f0ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            color: #555;
+            line-height: 1.6;
+        }
+        code {
+            background: #e8e8e8;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-section">
+        <h2>📊 기적 결과 페이지 테스트</h2>
+
+        <p><strong>테스트 방법:</strong></p>
+        <ol>
+            <li>먼저 대화를 생성하고 conversationId를 받으세요</li>
+            <li>아래 버튼으로 테스트 conversationId를 생성할 수 있습니다</li>
+            <li>결과 페이지로 이동해서 확인하세요</li>
+        </ol>
+
+        <button onclick="createTestConversation()">1. 테스트 대화 생성</button>
+        <button onclick="viewResult()">2. 결과 페이지 보기</button>
+        <button onclick="createAndView()">3. 생성 + 결과 보기 (한번에)</button>
+
+        <div class="info" id="info" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 수동 테스트</h2>
+        <p>직접 conversationId를 입력하여 테스트:</p>
+        <input type="text" id="manualId" placeholder="conversationId 입력"
+               style="width: 100%; padding: 10px; border: 2px solid #e8e8e8; border-radius: 8px; margin-bottom: 10px;">
+        <button onclick="viewManualResult()">결과 보기</button>
+
+        <div class="info" style="display: block; margin-top: 20px;">
+            <strong>API 엔드포인트:</strong><br>
+            <code>POST /api/select-mode</code> - 대화 시작<br>
+            <code>POST /api/conversation/answer</code> - 답변 제출<br>
+            <code>POST /api/miracle/calculate</code> - 결과 계산<br><br>
+
+            <strong>결과 페이지 URL:</strong><br>
+            <code>/result.html?id={conversationId}</code>
+        </div>
+    </div>
+
+    <script>
+    const API_URL = 'http://localhost:3000';
+    let currentConversationId = null;
+
+    // 테스트 대화 생성
+    async function createTestConversation() {
+        const info = document.getElementById('info');
+        info.style.display = 'block';
+        info.innerHTML = '⏳ 테스트 대화 생성 중...';
+
+        try {
+            // 1. 모드 선택 (wish 모드)
+            const selectResponse = await fetch(`${API_URL}/api/select-mode`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mode: 'wish' })
+            });
+            const selectResult = await selectResponse.json();
+            currentConversationId = selectResult.data.conversationId;
+
+            // 2. 3개 답변 제출
+            const answers = [
+                '직장에서 인정받고 싶어요',
+                '팀원들이 제 의견을 존중하고 리더로 인정받는 모습이에요',
+                '매일 아침 긍정적인 마인드로 출근하고 적극적으로 의견을 제시하겠습니다'
+            ];
+
+            for (let i = 0; i < answers.length; i++) {
+                await fetch(`${API_URL}/api/conversation/answer`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        conversationId: currentConversationId,
+                        answer: answers[i],
+                        step: i + 1
+                    })
+                });
+            }
+
+            info.innerHTML = `
+                ✅ 테스트 대화 생성 완료!<br><br>
+                <strong>ConversationId:</strong><br>
+                <code>${currentConversationId}</code><br><br>
+                이제 "2. 결과 페이지 보기" 버튼을 클릭하세요!
+            `;
+        } catch (error) {
+            info.innerHTML = `❌ 오류: ${error.message}`;
+        }
+    }
+
+    // 결과 페이지 보기
+    function viewResult() {
+        if (!currentConversationId) {
+            alert('먼저 "1. 테스트 대화 생성" 버튼을 클릭하세요!');
+            return;
+        }
+        window.location.href = `/result.html?id=${currentConversationId}`;
+    }
+
+    // 생성 + 결과 보기 (한번에)
+    async function createAndView() {
+        const info = document.getElementById('info');
+        info.style.display = 'block';
+        info.innerHTML = '⏳ 테스트 대화 생성 및 결과 페이지로 이동 중...';
+
+        try {
+            // 1. 모드 선택
+            const selectResponse = await fetch(`${API_URL}/api/select-mode`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mode: 'wish' })
+            });
+            const selectResult = await selectResponse.json();
+            const convId = selectResult.data.conversationId;
+
+            // 2. 3개 답변 제출
+            const answers = [
+                '건강하고 행복한 삶을 살고 싶어요',
+                '매일 아침 활력이 넘치고 사랑하는 사람들과 즐거운 시간을 보내는 모습이에요',
+                '규칙적인 운동과 건강한 식습관을 실천하겠습니다'
+            ];
+
+            for (let i = 0; i < answers.length; i++) {
+                await fetch(`${API_URL}/api/conversation/answer`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        conversationId: convId,
+                        answer: answers[i],
+                        step: i + 1
+                    })
+                });
+            }
+
+            // 3. 결과 페이지로 이동
+            window.location.href = `/result.html?id=${convId}`;
+        } catch (error) {
+            info.innerHTML = `❌ 오류: ${error.message}`;
+        }
+    }
+
+    // 수동 입력으로 결과 보기
+    function viewManualResult() {
+        const manualId = document.getElementById('manualId').value.trim();
+        if (!manualId) {
+            alert('conversationId를 입력하세요!');
+            return;
+        }
+        window.location.href = `/result.html?id=${manualId}`;
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>기적 결과 - 하루하루의 기적</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+            background: #f5f5f0;
+            min-height: 100vh;
+            padding: 20px;
+            color: #2c2c2c;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* 섹션 공통 스타일 */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        /* 헤더 */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            color: #2c2c2c;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        /* 기적지수 */
+        .miracle-score {
+            text-align: center;
+        }
+
+        .miracle-score h2 {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            color: #2c2c2c;
+        }
+
+        .score-circle {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            position: relative;
+        }
+
+        .score-circle::before {
+            content: '';
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            background: white;
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        #miracleScore {
+            font-size: 4rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            z-index: 1;
+        }
+
+        .score-label {
+            font-size: 1.2rem;
+            color: #888;
+            margin-left: 5px;
+            z-index: 1;
+        }
+
+        #scoreMessage {
+            font-size: 1.1rem;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        /* 종합 분석 */
+        .analysis h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #2c2c2c;
+        }
+
+        #analysisText {
+            line-height: 1.8;
+            color: #555;
+            white-space: pre-wrap;
+        }
+
+        /* 예측 카드 */
+        .predictions h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #2c2c2c;
+        }
+
+        #predictionCards {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .prediction-card {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .prediction-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .prediction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .prediction-timeframe {
+            font-weight: 600;
+            color: #2c2c2c;
+            font-size: 1rem;
+        }
+
+        .prediction-probability {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .prediction-text {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .prediction-action {
+            color: #667eea;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 8px 12px;
+            background: #f0f0ff;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+
+        /* 액션 버튼 */
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        button {
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        #shareBtn {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        #shareBtn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        #premiumBtn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        #premiumBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+        }
+
+        #newMiracleBtn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        #newMiracleBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* 로딩 */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #888;
+            font-size: 1rem;
+        }
+
+        /* 에러 */
+        .error {
+            background: #fff5f5;
+            border: 2px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            color: #c92a2a;
+        }
+
+        /* 반응형 */
+        @media (max-width: 640px) {
+            body {
+                padding: 10px;
+            }
+
+            .section {
+                padding: 20px;
+            }
+
+            .score-circle {
+                width: 150px;
+                height: 150px;
+            }
+
+            .score-circle::before {
+                width: 130px;
+                height: 130px;
+            }
+
+            #miracleScore {
+                font-size: 3rem;
+            }
+        }
+
+        /* 복사 토스트 */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2c2c2c;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <div class="header">
+            <h1>🌟 하루하루의 기적</h1>
+            <p>당신의 기적 분석 결과</p>
+        </div>
+
+        <!-- 로딩 상태 -->
+        <div id="loadingSection" class="section loading">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">기적을 분석하고 있습니다...</div>
+        </div>
+
+        <!-- 에러 상태 -->
+        <div id="errorSection" class="section error" style="display: none;">
+            <h3>⚠️ 오류가 발생했습니다</h3>
+            <p id="errorMessage"></p>
+        </div>
+
+        <!-- 결과 섹션 -->
+        <div id="resultSection" style="display: none;">
+            <!-- 1. 기적지수 -->
+            <div class="section miracle-score">
+                <h2>🌟 당신의 기적지수</h2>
+                <div class="score-circle">
+                    <span id="miracleScore">0</span>
+                    <span class="score-label">점</span>
+                </div>
+                <p id="scoreMessage">분석 중...</p>
+            </div>
+
+            <!-- 2. 종합 분석 -->
+            <div class="section analysis">
+                <h3>💭 종합 분석</h3>
+                <p id="analysisText">분석 결과를 불러오는 중...</p>
+            </div>
+
+            <!-- 3. 5가지 예측 -->
+            <div class="section predictions">
+                <h3>📊 5가지 예측</h3>
+                <div id="predictionCards"></div>
+            </div>
+
+            <!-- 4. 액션 버튼 -->
+            <div class="section actions">
+                <button id="shareBtn">🔗 결과 공유하기</button>
+                <button id="premiumBtn" class="premium">✨ 프리미엄으로 업그레이드</button>
+                <button id="newMiracleBtn">🎯 새로운 기적 시작하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 토스트 메시지 -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+    const API_URL = 'http://localhost:3000';
+
+    // URL에서 conversationId 가져오기
+    const urlParams = new URLSearchParams(window.location.search);
+    const conversationId = urlParams.get('id');
+
+    if (!conversationId) {
+        showError('대화 ID가 없습니다. 처음부터 다시 시작해주세요.');
+    } else {
+        loadResults();
+    }
+
+    // 결과 불러오기
+    async function loadResults() {
+        try {
+            const response = await fetch(`${API_URL}/api/miracle/calculate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ conversationId })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                displayResults(result.data);
+            } else {
+                showError(result.error || '결과를 불러올 수 없습니다.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showError('네트워크 오류가 발생했습니다.');
+        }
+    }
+
+    // 결과 표시
+    function displayResults(data) {
+        document.getElementById('loadingSection').style.display = 'none';
+        document.getElementById('resultSection').style.display = 'block';
+
+        // 기적지수 애니메이션
+        animateScore(data.miracleIndex);
+
+        // 점수 메시지
+        const scoreMessage = getScoreMessage(data.miracleIndex);
+        document.getElementById('scoreMessage').textContent = scoreMessage;
+
+        // 종합 분석
+        document.getElementById('analysisText').textContent = data.analysis;
+
+        // 예측 카드 생성
+        renderPredictions(data.predictions);
+    }
+
+    // 점수 애니메이션
+    function animateScore(targetScore) {
+        const scoreElement = document.getElementById('miracleScore');
+        let currentScore = 0;
+        const duration = 2000; // 2초
+        const increment = targetScore / (duration / 16); // 60fps
+
+        const timer = setInterval(() => {
+            currentScore += increment;
+            if (currentScore >= targetScore) {
+                currentScore = targetScore;
+                clearInterval(timer);
+            }
+            scoreElement.textContent = Math.round(currentScore);
+        }, 16);
+    }
+
+    // 점수 메시지
+    function getScoreMessage(score) {
+        if (score >= 80) return '매우 높은 실현 가능성! 🎉';
+        if (score >= 60) return '높은 실현 가능성! ✨';
+        if (score >= 40) return '좋은 실현 가능성 💫';
+        if (score >= 20) return '실현 가능성 있음 🌟';
+        return '노력이 필요해요 💪';
+    }
+
+    // 예측 카드 렌더링
+    function renderPredictions(predictions) {
+        const container = document.getElementById('predictionCards');
+        container.innerHTML = '';
+
+        predictions.forEach((pred, index) => {
+            const card = document.createElement('div');
+            card.className = 'prediction-card';
+            card.style.opacity = '0';
+            card.innerHTML = `
+                <div class="prediction-header">
+                    <div class="prediction-timeframe">${pred.timeframe}</div>
+                    <div class="prediction-probability">${pred.probability}%</div>
+                </div>
+                <div class="prediction-text">${pred.prediction}</div>
+                <div class="prediction-action">💡 ${pred.action}</div>
+            `;
+            container.appendChild(card);
+
+            // 순차 애니메이션
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.5s, transform 0.5s';
+                card.style.opacity = '1';
+            }, index * 100);
+        });
+    }
+
+    // 에러 표시
+    function showError(message) {
+        document.getElementById('loadingSection').style.display = 'none';
+        document.getElementById('errorSection').style.display = 'block';
+        document.getElementById('errorMessage').textContent = message;
+    }
+
+    // 토스트 메시지
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2000);
+    }
+
+    // 공유 버튼
+    document.getElementById('shareBtn').addEventListener('click', () => {
+        const url = window.location.href;
+        navigator.clipboard.writeText(url).then(() => {
+            showToast('링크가 복사되었습니다! 🔗');
+        }).catch(() => {
+            showToast('복사에 실패했습니다.');
+        });
+    });
+
+    // 프리미엄 버튼
+    document.getElementById('premiumBtn').addEventListener('click', () => {
+        alert('프리미엄 서비스는 곧 출시될 예정입니다! ✨');
+    });
+
+    // 새로운 기적 시작
+    document.getElementById('newMiracleBtn').addEventListener('click', () => {
+        window.location.href = '/';
+    });
+    </script>
+</body>
+</html>

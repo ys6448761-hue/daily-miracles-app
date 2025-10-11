@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>하루하루의 기적</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .title {
+            font-size: 2rem;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            font-size: 1rem;
+            color: #7f8c8d;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e8f4fd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #74b9ff;
+        }
+        textarea {
+            resize: vertical;
+            height: 60px;
+        }
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .submit-btn:hover {
+            opacity: 0.9;
+        }
+        .submit-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+            color: #74b9ff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">하루하루의 기적</h1>
+        <p class="subtitle">11페이지 개인 스토리북 생성</p>
+        
+        <form id="storyForm">
+            <div class="form-group">
+                <label>이름 *</label>
+                <input type="text" name="name" required>
+            </div>
+            <div class="form-group">
+                <label>나이 *</label>
+                <input type="number" name="age" required min="1" max="100">
+            </div>
+            <div class="form-group">
+                <label>성격 *</label>
+                <input type="text" name="personality" required>
+            </div>
+            <div class="form-group">
+                <label>취미 *</label>
+                <input type="text" name="hobby" required>
+            </div>
+            <div class="form-group">
+                <label>꿈/목표 *</label>
+                <input type="text" name="dreamJob" required>
+            </div>
+            <div class="form-group">
+                <label>좋아하는 색깔 *</label>
+                <input type="text" name="favoriteColor" required>
+            </div>
+            <div class="form-group">
+                <label>좋아하는 동물 *</label>
+                <input type="text" name="favoriteAnimal" required>
+            </div>
+            <div class="form-group">
+                <label>특별한 기억</label>
+                <textarea name="specialMemory"></textarea>
+            </div>
+            
+            <button type="submit" class="submit-btn" id="submitBtn">나만의 기적 만들기</button>
+            
+            <div class="loading" id="loading">
+                스토리북 생성 중... (약 3분 소요)
+            </div>
+        </form>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('storyForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = '생성 중...';
+            loading.style.display = 'block';
+            
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+            
+            fetch('/api/create-story', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    window.location.href = result.redirectUrl;
+                } else {
+                    alert('오류: ' + result.error);
+                    resetForm();
+                }
+            })
+            .catch(error => {
+                alert('네트워크 오류: ' + error.message);
+                resetForm();
+            });
+        });
+        
+        function resetForm() {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '나만의 기적 만들기';
+            loading.style.display = 'none';
+        }
+    });
+    </script>
+</body>
+</html>
