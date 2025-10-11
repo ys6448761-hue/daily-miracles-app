@@ -11,7 +11,8 @@ const { globalErrorHandler, notFoundHandler, initializeErrorHandling } = require
 // 라우터 불러오기
 const storyRoutes = require('./routes/storyRoutes');
 const viewRoutes = require('./routes/viewRoutes');
-const problemRoutes = require('./routes/problemRoutes'); // ✨ 추가!
+const problemRoutes = require('./routes/problemRoutes');
+const miracleRoutes = require('./routes/miracleRoutes'); // ✨ 기적지수 계산
 
 const app = express();
 
@@ -44,7 +45,8 @@ app.use('/generated-images', express.static('generated-images'));
 
 // 라우터 설정
 app.use('/api', storyRoutes);
-app.use('/api/problem', problemRoutes); // ✨ 추가!
+app.use('/api/problem', problemRoutes);
+app.use('/api/miracle', miracleRoutes); // ✨ 기적지수 계산
 app.use('/', viewRoutes);
 
 // 404 에러 핸들러 (라우터 다음에 위치)
