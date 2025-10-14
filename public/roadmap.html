@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>30일 기적 로드맵 - 하루하루의 기적</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 100%;
+      padding: 40px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      color: #666;
+      font-size: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    .btn-submit:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* 로딩 상태 */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loading-overlay.active {
+      display: flex;
+    }
+
+    .loading-content {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .countdown {
+      font-size: 48px;
+      font-weight: bold;
+      color: #667eea;
+      margin: 20px 0;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #f3f3f3;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    /* 성공 메시지 */
+    .success-message {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      background: #d4edda;
+      border: 2px solid #c3e6cb;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    .success-message.active {
+      display: block;
+    }
+
+    .success-message h3 {
+      color: #155724;
+      margin-bottom: 10px;
+    }
+
+    .success-message p {
+      color: #155724;
+    }
+
+    .btn-download {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 12px 24px;
+      background: #28a745;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+
+    /* 에러 메시지 */
+    .error-message {
+      display: none;
+      padding: 15px;
+      background: #f8d7da;
+      border: 2px solid #f5c6cb;
+      border-radius: 10px;
+      color: #721c24;
+      margin-top: 15px;
+    }
+
+    .error-message.active {
+      display: block;
+    }
+
+    /* 사업자 정보 푸터 */
+    .business-info {
+      background: #F8F9FA;
+      margin-top: 30px;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 12px;
+      color: #6c757d;
+      line-height: 1.8;
+    }
+    .business-info .line {
+      margin: 3px 0;
+    }
+    .business-info .separator {
+      margin: 0 8px;
+      color: #dee2e6;
+    }
+
+    /* 모바일 최적화 */
+    @media (max-width: 600px) {
+      .container {
+        padding: 30px 20px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .header p {
+        font-size: 14px;
+      }
+
+      .countdown {
+        font-size: 36px;
+      }
+
+      .business-info {
+        font-size: 11px;
+        padding: 15px;
+      }
+      .business-info .separator {
+        margin: 0 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>✨ 30일 기적 로드맵</h1>
+      <p>AI가 당신만의 로드맵을 만들어드립니다</p>
+    </div>
+
+    <form id="roadmapForm">
+      <div class="form-group">
+        <label for="name">이름 *</label>
+        <input type="text" id="name" name="name" required placeholder="예: 김지수">
+      </div>
+
+      <div class="form-group">
+        <label for="wish">30일 후 이루고 싶은 것 *</label>
+        <textarea id="wish" name="wish" required placeholder="예: 10kg 감량하기"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="category">카테고리 *</label>
+        <select id="category" name="category" required>
+          <option value="">선택하세요</option>
+          <option value="건강">건강</option>
+          <option value="커리어">커리어</option>
+          <option value="관계">관계</option>
+          <option value="금전">금전</option>
+          <option value="자기계발">자기계발</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">전화번호 (선택)</label>
+        <input type="tel" id="phone" name="phone" placeholder="010-1234-5678">
+        <small style="color: #666; font-size: 12px;">카카오톡으로 PDF를 받으시려면 입력하세요</small>
+      </div>
+
+      <button type="submit" class="btn-submit">
+        🎯 30일 로드맵 받기
+      </button>
+
+      <div class="error-message" id="errorMessage"></div>
+      <div class="success-message" id="successMessage"></div>
+    </form>
+
+    <!-- 사업자 정보 -->
+    <div class="business-info">
+      <div class="line">
+        (주)어수여행센터<span class="separator">|</span>대표: 이세진<span class="separator">|</span>사업자등록번호: 409-87-00585
+      </div>
+      <div class="line">
+        전라남도 여수시 박람회길 1, C동 CD-305호 (덕충동)<span class="separator">|</span>통신판매업: 2016-전라남도-0146호<span class="separator">|</span>전화: 1899-6117
+      </div>
+    </div>
+  </div>
+
+  <!-- 로딩 오버레이 -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <div class="loading-text">AI가 당신만의 로드맵을 만들고 있어요...</div>
+      <div class="countdown" id="countdown">30</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('roadmapForm');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const countdown = document.getElementById('countdown');
+    const progressFill = document.getElementById('progressFill');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+    const submitButton = form.querySelector('.btn-submit');
+
+    let countdownInterval;
+    let progressInterval;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // 에러/성공 메시지 숨기기
+      errorMessage.classList.remove('active');
+      successMessage.classList.remove('active');
+
+      // 폼 데이터 수집
+      const formData = {
+        user: {
+          name: document.getElementById('name').value.trim(),
+          wish: document.getElementById('wish').value.trim(),
+          category: document.getElementById('category').value,
+          phone: document.getElementById('phone').value.trim() || undefined
+        }
+      };
+
+      // 유효성 검사
+      if (!formData.user.name || !formData.user.wish || !formData.user.category) {
+        showError('모든 필수 항목을 입력해주세요.');
+        return;
+      }
+
+      // 로딩 시작
+      startLoading();
+
+      try {
+        // API 호출
+        const response = await fetch('/api/roadmap/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+
+        // 로딩 종료
+        stopLoading();
+
+        if (result.success) {
+          showSuccess(result.data.pdfUrl, formData.user.name);
+        } else {
+          showError(result.error || '로드맵 생성에 실패했습니다. 다시 시도해주세요.');
+        }
+
+      } catch (error) {
+        stopLoading();
+        showError('서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
+        console.error('Error:', error);
+      }
+    });
+
+    function startLoading() {
+      loadingOverlay.classList.add('active');
+      submitButton.disabled = true;
+
+      // 카운트다운 시작
+      let seconds = 30;
+      countdown.textContent = seconds;
+
+      countdownInterval = setInterval(() => {
+        seconds--;
+        countdown.textContent = seconds;
+
+        if (seconds <= 0) {
+          clearInterval(countdownInterval);
+        }
+      }, 1000);
+
+      // 프로그레스 바
+      let progress = 0;
+      progressFill.style.width = '0%';
+
+      progressInterval = setInterval(() => {
+        progress += 0.5;
+        progressFill.style.width = Math.min(progress, 100) + '%';
+
+        if (progress >= 100) {
+          clearInterval(progressInterval);
+        }
+      }, 150);
+    }
+
+    function stopLoading() {
+      loadingOverlay.classList.remove('active');
+      submitButton.disabled = false;
+      clearInterval(countdownInterval);
+      clearInterval(progressInterval);
+    }
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.classList.add('active');
+      setTimeout(() => {
+        errorMessage.classList.remove('active');
+      }, 5000);
+    }
+
+    function showSuccess(pdfUrl, userName) {
+      successMessage.innerHTML = `
+        <h3>🎉 완성됐어요!</h3>
+        <p>${userName}님의 30일 기적 로드맵이 준비되었습니다.</p>
+        <a href="${pdfUrl}" class="btn-download" download>📥 PDF 다운로드</a>
+        ${document.getElementById('phone').value ? '<p style="margin-top: 10px; font-size: 14px;">카카오톡으로도 전송되었습니다! 📱</p>' : ''}
+      `;
+      successMessage.classList.add('active');
+
+      // 폼 초기화
+      form.reset();
+    }
+  </script>
+</body>
+</html>

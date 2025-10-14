@@ -84,6 +84,34 @@
             color: #74b9ff;
             font-weight: bold;
         }
+
+        /* 사업자 정보 푸터 */
+        .business-info {
+            background: #F8F9FA;
+            margin-top: 40px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 12px;
+            color: #6c757d;
+            line-height: 1.8;
+        }
+        .business-info .line {
+            margin: 3px 0;
+        }
+        .business-info .separator {
+            margin: 0 8px;
+            color: #dee2e6;
+        }
+        @media (max-width: 600px) {
+            .business-info {
+                font-size: 11px;
+                padding: 15px;
+            }
+            .business-info .separator {
+                margin: 0 5px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -131,6 +159,16 @@
                 스토리북 생성 중... (약 3분 소요)
             </div>
         </form>
+
+        <!-- 사업자 정보 -->
+        <div class="business-info">
+            <div class="line">
+                (주)어수여행센터<span class="separator">|</span>대표: 이세진<span class="separator">|</span>사업자등록번호: 409-87-00585
+            </div>
+            <div class="line">
+                전라남도 여수시 박람회길 1, C동 CD-305호 (덕충동)<span class="separator">|</span>통신판매업: 2016-전라남도-0146호<span class="separator">|</span>전화: 1899-6117
+            </div>
+        </div>
     </div>
 
     <script>
