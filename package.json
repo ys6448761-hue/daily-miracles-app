@@ -1,22 +1,21 @@
 {
   "name": "daily-miracles-mvp",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "dotenv": "^17.2.2",
-    "express": "^5.1.0",
-    "multer": "^2.0.2",
-    "openai": "^5.23.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
+    "handlebars": "^4.7.8",
+    "openai": "^6.3.0",
+    "puppeteer": "^24.24.1",
     "sqlite3": "^5.1.7",
     "uuid": "^13.0.0",
-    "winston": "^3.17.0",
+    "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0"
   }
 }

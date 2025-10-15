@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>30일 기적 로드맵 - {{userName}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/professional.css">
+</head>
+<body>
+  <!-- Page 1: Cover -->
+  <div class="page cover-page">
+    <div class="cover-header">
+      <div class="header-logo">AURORA 5</div>
+      <div class="header-date">2025</div>
+    </div>
+
+    <div class="cover-content">
+      <div class="cover-label">PERSONAL DEVELOPMENT PLAN</div>
+      <h1 class="cover-title">30일 기적 로드맵</h1>
+      <div class="cover-subtitle">전략적 목표 달성 프로그램</div>
+
+      <div class="cover-info">
+        <div class="info-row">
+          <span class="info-label">참여자</span>
+          <span class="info-value">{{userName}}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">목표</span>
+          <span class="info-value">{{userWish}}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">기간</span>
+          <span class="info-value">30일 (4주)</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">카테고리</span>
+          <span class="info-value">{{wishCategory}}</span>
+        </div>
+      </div>
+
+      <div class="cover-seal">
+        <div class="seal-inner">CERTIFIED</div>
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      <p>본 문서는 Aurora 5 AI 시스템에 의해 개인화되었습니다</p>
+    </div>
+  </div>
+
+  <!-- Page 2: Executive Summary -->
+  <div class="page">
+    <div class="page-header">
+      <h2 class="page-title">Executive Summary</h2>
+      <div class="page-number">02</div>
+    </div>
+
+    <div class="content-section">
+      <div class="summary-box">
+        <h3 class="box-title">프로그램 개요</h3>
+        <p class="box-content">
+          본 로드맵은 {{userName}}님의 목표 "{{userWish}}" 달성을 위해
+          Aurora 5 AI 시스템이 설계한 30일 체계적 실행 계획입니다.
+          과학적 방법론과 검증된 성공 패턴을 기반으로 구성되었습니다.
+        </p>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-label">MIRACLE INDEX</div>
+          <div class="metric-value">{{miracleScore}}</div>
+          <div class="metric-desc">성공 가능성 지수</div>
+          <div class="metric-bar">
+            <div class="bar-fill" style="width: {{miracleScore}}%"></div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">DURATION</div>
+          <div class="metric-value">30</div>
+          <div class="metric-desc">실행 일수</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">MILESTONES</div>
+          <div class="metric-value">4</div>
+          <div class="metric-desc">주요 단계</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-label">CHECKPOINTS</div>
+          <div class="metric-value">12</div>
+          <div class="metric-desc">목표 지점</div>
+        </div>
+      </div>
+
+      <div class="approach-box">
+        <h3 class="box-title">실행 방법론</h3>
+        <div class="approach-grid">
+          <div class="approach-item">
+            <div class="approach-number">01</div>
+            <div class="approach-content">
+              <h4>체계적 계획</h4>
+              <p>주차별 명확한 목표 설정</p>
+            </div>
+          </div>
+          <div class="approach-item">
+            <div class="approach-number">02</div>
+            <div class="approach-content">
+              <h4>일일 실행</h4>
+              <p>구체적인 행동 지침 제공</p>
+            </div>
+          </div>
+          <div class="approach-item">
+            <div class="approach-number">03</div>
+            <div class="approach-content">
+              <h4>지속적 점검</h4>
+              <p>진행 상황 모니터링</p>
+            </div>
+          </div>
+          <div class="approach-item">
+            <div class="approach-number">04</div>
+            <div class="approach-content">
+              <h4>피드백 반영</h4>
+              <p>실시간 조정 및 최적화</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pages 3-6: Weekly Implementation Plans -->
+  {{#each weeks}}
+  <div class="page">
+    <div class="page-header">
+      <h2 class="page-title">Week {{weekNumber}}: {{weekTitle}}</h2>
+      <div class="page-number">0{{add weekNumber 2}}</div>
+    </div>
+
+    <div class="content-section">
+      <div class="week-status-bar">
+        <div class="status-label">Progress Milestone</div>
+        <div class="status-indicator">
+          <div class="indicator-fill" style="width: {{multiply weekNumber 25}}%"></div>
+          <span class="indicator-text">{{multiply weekNumber 25}}%</span>
+        </div>
+      </div>
+
+      <div class="objectives-section">
+        <h3 class="section-heading">주요 목표 (Key Objectives)</h3>
+        <div class="objectives-list">
+          <div class="objective-item">
+            <div class="objective-marker">
+              <span class="marker-letter">A</span>
+            </div>
+            <div class="objective-content">
+              <p class="objective-text">{{goal1}}</p>
+            </div>
+          </div>
+          <div class="objective-item">
+            <div class="objective-marker">
+              <span class="marker-letter">B</span>
+            </div>
+            <div class="objective-content">
+              <p class="objective-text">{{goal2}}</p>
+            </div>
+          </div>
+          <div class="objective-item">
+            <div class="objective-marker">
+              <span class="marker-letter">C</span>
+            </div>
+            <div class="objective-content">
+              <p class="objective-text">{{goal3}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="strategy-box">
+        <h3 class="section-heading">전략적 조언 (Strategic Advice)</h3>
+        <div class="strategy-content">
+          <div class="strategy-icon">📊</div>
+          <p class="strategy-text">{{customAdvice}}</p>
+        </div>
+      </div>
+
+      <div class="schedule-section">
+        <h3 class="section-heading">주간 일정 (Weekly Schedule)</h3>
+        <table class="schedule-table">
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>Action Items</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="day-cell">월요일</td>
+              <td class="action-cell">{{mon}}</td>
+            </tr>
+            <tr>
+              <td class="day-cell">화요일</td>
+              <td class="action-cell">{{tue}}</td>
+            </tr>
+            <tr>
+              <td class="day-cell">수요일</td>
+              <td class="action-cell">{{wed}}</td>
+            </tr>
+            <tr>
+              <td class="day-cell">목요일</td>
+              <td class="action-cell">{{thu}}</td>
+            </tr>
+            <tr>
+              <td class="day-cell">금요일</td>
+              <td class="action-cell">{{fri}}</td>
+            </tr>
+            <tr class="weekend-row">
+              <td class="day-cell">주말</td>
+              <td class="action-cell">{{weekend}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {{/each}}
+
+  <!-- Page 7: Daily Operations Manual -->
+  <div class="page">
+    <div class="page-header">
+      <h2 class="page-title">Daily Operations Manual</h2>
+      <div class="page-number">07</div>
+    </div>
+
+    <div class="content-section">
+      <div class="manual-section">
+        <h3 class="section-heading">아침 루틴 프로토콜 (Morning Protocol)</h3>
+        <div class="protocol-box">
+          <div class="protocol-header">
+            <span class="protocol-icon">⏰</span>
+            <span class="protocol-time">07:00 - 08:00</span>
+          </div>
+          <p class="protocol-content">{{morningRoutine}}</p>
+        </div>
+      </div>
+
+      <div class="manual-section">
+        <h3 class="section-heading">저녁 점검 프로토콜 (Evening Review)</h3>
+        <div class="protocol-box">
+          <div class="protocol-header">
+            <span class="protocol-icon">📝</span>
+            <span class="protocol-time">21:00 - 22:00</span>
+          </div>
+          <p class="protocol-content">{{eveningReview}}</p>
+        </div>
+      </div>
+
+      <div class="guidelines-section">
+        <h3 class="section-heading">실행 지침 (Implementation Guidelines)</h3>
+        <div class="guidelines-grid">
+          <div class="guideline-card">
+            <div class="guideline-number">01</div>
+            <p class="guideline-text">일관성을 최우선으로 합니다</p>
+          </div>
+          <div class="guideline-card">
+            <div class="guideline-number">02</div>
+            <p class="guideline-text">진행 상황을 정기적으로 기록합니다</p>
+          </div>
+          <div class="guideline-card">
+            <div class="guideline-number">03</div>
+            <p class="guideline-text">장애물 발생 시 즉시 대응합니다</p>
+          </div>
+          <div class="guideline-card">
+            <div class="guideline-number">04</div>
+            <p class="guideline-text">주간 검토를 반드시 수행합니다</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page 8: Case Studies -->
+  <div class="page">
+    <div class="page-header">
+      <h2 class="page-title">Success Case Studies</h2>
+      <div class="page-number">08</div>
+    </div>
+
+    <div class="content-section">
+      <div class="intro-box">
+        <p>유사한 목표를 달성한 참여자들의 검증된 성공 사례입니다.</p>
+      </div>
+
+      <div class="case-study">
+        <div class="case-header">
+          <span class="case-label">CASE STUDY #1</span>
+          <h4 class="case-title">{{story1Title}}</h4>
+        </div>
+        <div class="case-content">
+          <p>{{story1Content}}</p>
+        </div>
+        <div class="case-footer">
+          <span class="case-status">✓ ACHIEVED</span>
+        </div>
+      </div>
+
+      <div class="case-study">
+        <div class="case-header">
+          <span class="case-label">CASE STUDY #2</span>
+          <h4 class="case-title">{{story2Title}}</h4>
+        </div>
+        <div class="case-content">
+          <p>{{story2Content}}</p>
+        </div>
+        <div class="case-footer">
+          <span class="case-status">✓ ACHIEVED</span>
+        </div>
+      </div>
+
+      <div class="case-study">
+        <div class="case-header">
+          <span class="case-label">CASE STUDY #3</span>
+          <h4 class="case-title">{{story3Title}}</h4>
+        </div>
+        <div class="case-content">
+          <p>{{story3Content}}</p>
+        </div>
+        <div class="case-footer">
+          <span class="case-status">✓ ACHIEVED</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page 9: Support Infrastructure -->
+  <div class="page">
+    <div class="page-header">
+      <h2 class="page-title">Support Infrastructure</h2>
+      <div class="page-number">09</div>
+    </div>
+
+    <div class="content-section">
+      <div class="support-section">
+        <h3 class="section-heading">일일 커뮤니케이션 (Daily Communication)</h3>
+        <div class="support-card">
+          <div class="card-header">
+            <div class="card-icon">📱</div>
+            <h4>자동 메시지 서비스</h4>
+          </div>
+          <p class="card-desc">
+            매일 오전 7시, Aurora 5가 동기부여 메시지와<br>
+            일일 목표를 카카오톡으로 전송합니다.
+          </p>
+          <div class="card-details">
+            <div class="detail-row">
+              <span class="detail-label">연락처</span>
+              <span class="detail-value">{{userPhone}}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">발송 시간</span>
+              <span class="detail-value">매일 07:00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="support-section">
+        <h3 class="section-heading">커뮤니티 네트워크 (Community Network)</h3>
+        <div class="support-card">
+          <div class="card-header">
+            <div class="card-icon">👥</div>
+            <h4>참여자 커뮤니티</h4>
+          </div>
+          <p class="card-desc">
+            같은 목표를 가진 참여자들과 경험을 공유하고<br>
+            서로 격려할 수 있는 플랫폼입니다.
+          </p>
+          <div class="card-details">
+            <div class="detail-row">
+              <span class="detail-label">플랫폼</span>
+              <span class="detail-value">{{communityLink}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="support-section">
+        <h3 class="section-heading">기술 지원 (Technical Support)</h3>
+        <div class="support-card">
+          <div class="card-header">
+            <div class="card-icon">💼</div>
+            <h4>전문가 상담</h4>
+          </div>
+          <p class="card-desc">
+            프로그램 진행 중 발생하는 문제나 질문에 대해<br>
+            24시간 이내 전문가 답변을 제공합니다.
+          </p>
+          <div class="card-details">
+            <div class="detail-row">
+              <span class="detail-label">이메일</span>
+              <span class="detail-value">support@aurora5.com</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">응답 시간</span>
+              <span class="detail-value">24시간 이내</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page 10: Conclusion & Next Steps -->
+  <div class="page closing-page">
+    <div class="page-header">
+      <h2 class="page-title">Conclusion & Next Steps</h2>
+      <div class="page-number">10</div>
+    </div>
+
+    <div class="content-section">
+      <div class="conclusion-box">
+        <h3 class="box-title">결론 (Conclusion)</h3>
+        <p class="box-content">
+          {{userName}}님,<br><br>
+
+          본 로드맵은 과학적 방법론과 AI 분석을 기반으로<br>
+          귀하의 목표 달성을 위해 최적화된 실행 계획입니다.<br><br>
+
+          체계적인 실행과 지속적인 노력을 통해<br>
+          30일 후 원하시는 결과를 달성하실 수 있습니다.<br><br>
+
+          Aurora 5는 전 과정에서 귀하를 지원합니다.
+        </p>
+      </div>
+
+      <div class="action-plan">
+        <h3 class="box-title">실행 계획 (Action Plan)</h3>
+        <div class="plan-timeline">
+          <div class="timeline-item">
+            <div class="timeline-marker">
+              <span class="marker-num">1</span>
+            </div>
+            <div class="timeline-content">
+              <h4>즉시 시작</h4>
+              <p>오늘부터 1주차 목표 실행</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker">
+              <span class="marker-num">2</span>
+            </div>
+            <div class="timeline-content">
+              <h4>일일 점검</h4>
+              <p>매일 Aurora 5 메시지 확인 및 실행</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker">
+              <span class="marker-num">3</span>
+            </div>
+            <div class="timeline-content">
+              <h4>주간 리뷰</h4>
+              <p>매주 일요일 진행 상황 평가</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker">
+              <span class="marker-num">4</span>
+            </div>
+            <div class="timeline-content">
+              <h4>목표 달성</h4>
+              <p>30일 후 성과 공유 및 인증</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="closing-statement">
+        <p class="statement-text">
+          성공적인 30일 여정을 기원합니다.
+        </p>
+        <div class="signature-section">
+          <p class="signature-line">Powered by</p>
+          <p class="signature-brand">AURORA 5 AI System</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <div class="footer-line"></div>
+      <p class="footer-text">© 2025 Aurora 5. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>

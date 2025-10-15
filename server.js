@@ -1,120 +1,373 @@
-const express = require('express');
+// ═══════════════════════════════════════════════════════════
+// Daily Miracles MVP - Server
+// Aurora 5 Orchestrator 통합 버전
+// ═══════════════════════════════════════════════════════════
+
 require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
 
-// 유틸리티와 설정 불러오기
-const { validateEnvironment } = require('./utils/validation');
-const { MAX_CONCURRENT_REQUESTS } = require('./config/constants');
-const { cleanup } = require('./services/dataService');
-const { requestLogger, info: logInfo } = require('./config/logger');
-const { globalErrorHandler, notFoundHandler, initializeErrorHandling } = require('./middleware/errorHandler');
+// ⚡ Aurora 5 Orchestrator
+const orchestrator = require('./orchestrator');
 
-// 라우터 불러오기
-const storyRoutes = require('./routes/storyRoutes');
-const viewRoutes = require('./routes/viewRoutes');
-const problemRoutes = require('./routes/problemRoutes');
-const miracleRoutes = require('./routes/miracleRoutes'); // ✨ 기적지수 계산
+// 📄 Roadmap Routes
+const roadmapRoutes = require('./src/routes/roadmap/roadmapRoutes');
 
 const app = express();
 
-// 환경변수 검증 실행
-validateEnvironment();
+// ═══════════════════════════════════════════════════════════
+// Middleware
+// ═══════════════════════════════════════════════════════════
 
-// 환경변수 로깅 (Render 배포 확인용)
-console.log('📋 환경변수 확인:', {
-  PORT: process.env.PORT || '5000 (기본값)',
-  NODE_ENV: process.env.NODE_ENV || 'development',
-  OPENAI_API_KEY: process.env.OPENAI_API_KEY ? '✅ 설정됨' : '❌ 없음',
-  DATABASE_URL: process.env.DATABASE_URL || 'file:./data/miracle.db (기본값)'
-});
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// 전역 에러 핸들링 초기화
-initializeErrorHandling();
-
-const port = process.env.PORT || 5000;
-
-// 미들웨어 설정
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// 요청 로깅 미들웨어
-app.use(requestLogger);
-
-// 정적 파일 서빙
+// Static files
 app.use(express.static('public'));
-app.use('/generated-images', express.static('generated-images'));
+app.use('/pdfs', express.static('generated-pdfs'));
 
-// 라우터 설정
-app.use('/api', storyRoutes);
-app.use('/api/problem', problemRoutes);
-app.use('/api/miracle', miracleRoutes); // ✨ 기적지수 계산
-app.use('/', viewRoutes);
+// ═══════════════════════════════════════════════════════════
+// Orchestrator State
+// ═══════════════════════════════════════════════════════════
 
-// 404 에러 핸들러 (라우터 다음에 위치)
-app.use(notFoundHandler);
+let isOrchReady = false;
 
-// 전역 에러 핸들러 (마지막에 위치)
-app.use(globalErrorHandler);
+async function initializeOrchestrator() {
+  try {
+    console.log('🚀 Aurora 5 Orchestrator 초기화 중...');
 
-// 서버 시작 및 Graceful shutdown
-const server = app.listen(port, () => {
-  logInfo('Server started', {
-    port,
-    environment: process.env.NODE_ENV || 'development',
-    nodeVersion: process.version
-  });
-  console.log('🌟 하루하루의 기적 서버가 시작되었습니다!');
-  console.log(`📍 서버 주소: http://localhost:${port}`);
-  console.log(`🎯 API 엔드포인트: /api/create-story`);
-  console.log(`📊 상태 확인: /api/status`);
-  console.log(`🖼️ 이미지 저장 경로: ./generated-images/`);
-  console.log('');
-  console.log('🚀 성능 최적화 적용됨:');
-  console.log(`   • 병렬 이미지 생성 (최대 ${MAX_CONCURRENT_REQUESTS}개 동시 처리)`);
-  console.log('   • 예상 처리 시간: 5분 → 1-2분으로 단축');
-  console.log('   • 실시간 진행률 추적');
-  console.log('   • 오류 복구 및 부분 실패 허용');
-  console.log('');
-  console.log('📁 모듈 구조 개선됨:');
-  console.log('   • routes/ - 라우터 모듈 분리');
-  console.log('   • services/ - 비즈니스 로직 분리');
-  console.log('   • utils/ - 유틸리티 함수 분리');
-  console.log('   • config/ - 설정 및 상수 관리');
-  console.log('');
-  console.log('🗄️  데이터베이스:');
-  console.log('   • SQLite 데이터베이스 (영구 저장)');
-  console.log('   • 데이터 디렉토리: ./data/');
-  console.log('   • 트랜잭션 지원으로 데이터 무결성 보장');
-  console.log('');
-  console.log('📊 로깅 및 에러 처리:');
-  console.log('   • Winston 구조화된 로깅');
-  console.log('   • 로그 디렉토리: ./logs/');
-  console.log('   • 중앙화된 에러 핸들링');
-  console.log('   • 사용자 친화적 에러 메시지');
-  console.log('');
-  console.log('💡 테스트 방법:');
-  console.log('1. 브라우저에서 http://localhost:5000 접속');
-  console.log('2. 개인정보 입력하여 스토리 생성 테스트');
-  console.log('3. 완성된 스토리북과 이미지 확인');
-  console.log('4. 콘솔에서 병렬 처리 성능 확인');
-  console.log('');
-  console.log('⚠️  서버 종료: Ctrl + C');
+    await orchestrator.initialize();
+    isOrchReady = true;
+
+    console.log('✅ Orchestrator 준비 완료!');
+
+    // Health check
+    try {
+      const health = await orchestrator.checkHealth();
+      console.log('💓 시스템 상태:', health.status);
+    } catch (e) {
+      console.log('⚠️  헬스체크 스킵:', e.message);
+    }
+
+  } catch (error) {
+    console.error('❌ Orchestrator 초기화 실패:', error.message);
+    console.error('Stack:', error.stack);
+    isOrchReady = false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// API Routes
+// ═══════════════════════════════════════════════════════════
+
+// Health Check
+app.get('/api/health', async (req, res) => {
+  if (!isOrchReady) {
+    return res.status(503).json({ 
+      status: 'initializing',
+      message: 'Orchestrator is still initializing...' 
+    });
+  }
+  
+  try {
+    const health = await orchestrator.checkHealth();
+    res.json(health);
+  } catch (error) {
+    res.status(500).json({ 
+      status: 'error',
+      message: error.message 
+    });
+  }
 });
 
-// Graceful shutdown
-process.on('SIGTERM', async () => {
-  console.log('서버 종료 중...');
-  await cleanup();
-  server.close(() => {
-    console.log('서버가 정상적으로 종료되었습니다.');
-    process.exit(0);
+// Dashboard
+app.get('/api/dashboard', async (req, res) => {
+  if (!isOrchReady) {
+    return res.status(503).json({
+      status: 'initializing'
+    });
+  }
+
+  try {
+    const health = await orchestrator.checkHealth();
+    const metrics = await orchestrator.getMetrics();
+
+    res.json({
+      health: health,
+      metrics: metrics,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: error.message
+    });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+// Story Routes
+// ═══════════════════════════════════════════════════════════
+
+app.post('/api/story/create', async (req, res) => {
+  if (!isOrchReady) {
+    return res.status(503).json({ 
+      error: 'Server is still initializing' 
+    });
+  }
+  
+  try {
+    const { userInput } = req.body;
+    
+    // Input validation
+    if (!userInput || !userInput.wish) {
+      return res.status(400).json({ 
+        error: 'Missing required field: wish' 
+      });
+    }
+    
+    console.log('📖 스토리 생성 요청:', userInput.wish);
+    
+    // ⚡ Execute workflow via Orchestrator
+    const result = await orchestrator.execute('create-story', {
+      input: userInput
+    });
+    
+    console.log('✅ 스토리 생성 완료:', result.workflowId);
+    
+    res.json({
+      success: true,
+      story: result.story,
+      images: result.images,
+      executionTime: result.executionTime,
+      workflowId: result.workflowId
+    });
+    
+  } catch (error) {
+    console.error('❌ 스토리 생성 실패:', error);
+    
+    res.status(500).json({ 
+      success: false,
+      error: error.message,
+      retries: error.retries || 0
+    });
+  }
+});
+
+// Story Progress (실시간 진행 상황)
+app.get('/api/story/progress/:workflowId', async (req, res) => {
+  if (!isOrchReady) {
+    return res.status(503).json({ 
+      error: 'Server is still initializing' 
+    });
+  }
+  
+  try {
+    const { workflowId } = req.params;
+    
+    // Get progress from orchestrator
+    const progress = orchestrator.getWorkflowProgress(workflowId);
+    
+    res.json(progress);
+    
+  } catch (error) {
+    res.status(404).json({ 
+      error: 'Workflow not found' 
+    });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+// Miracle Index Routes
+// ═══════════════════════════════════════════════════════════
+
+app.post('/api/miracle/calculate', async (req, res) => {
+  if (!isOrchReady) {
+    return res.status(503).json({ 
+      error: 'Server is still initializing' 
+    });
+  }
+  
+  try {
+    const { activityData } = req.body;
+    
+    console.log('✨ 기적지수 계산 요청');
+    
+    // ⚡ Execute workflow via Orchestrator
+    const result = await orchestrator.execute('calculate-miracle', {
+      activityData: activityData
+    });
+    
+    console.log('✅ 기적지수 계산 완료:', result.miracleIndex);
+    
+    res.json({
+      success: true,
+      miracleIndex: result.miracleIndex,
+      predictions: result.predictions,
+      executionTime: result.executionTime
+    });
+    
+  } catch (error) {
+    console.error('❌ 기적지수 계산 실패:', error);
+    
+    res.status(500).json({ 
+      success: false,
+      error: error.message 
+    });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+// Roadmap Routes
+// ═══════════════════════════════════════════════════════════
+
+app.use('/api/roadmap', roadmapRoutes);
+
+// ═══════════════════════════════════════════════════════════
+// Problem Analysis Routes
+// ═══════════════════════════════════════════════════════════
+
+app.post('/api/problem/analyze', async (req, res) => {
+  if (!isOrchReady) {
+    return res.status(503).json({ 
+      error: 'Server is still initializing' 
+    });
+  }
+  
+  try {
+    const { problemInput } = req.body;
+    
+    console.log('🔍 문제 분석 요청');
+    
+    // ⚡ Execute workflow via Orchestrator
+    const result = await orchestrator.execute('analyze-problem', {
+      input: problemInput
+    });
+    
+    console.log('✅ 문제 분석 완료');
+    
+    res.json({
+      success: true,
+      analysis: result.analysis,
+      solutions: result.solutions,
+      executionTime: result.executionTime
+    });
+    
+  } catch (error) {
+    console.error('❌ 문제 분석 실패:', error);
+    
+    res.status(500).json({ 
+      success: false,
+      error: error.message 
+    });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+// Fallback Routes
+// ═══════════════════════════════════════════════════════════
+
+// Root - Roadmap Page
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'roadmap.html'));
+});
+
+// API Info
+app.get('/api', (req, res) => {
+  res.json({
+    service: 'Daily Miracles MVP',
+    version: '1.0.0',
+    status: isOrchReady ? 'ready' : 'initializing',
+    endpoints: {
+      health: '/api/health',
+      dashboard: '/api/dashboard',
+      story: '/api/story/create',
+      miracle: '/api/miracle/calculate',
+      problem: '/api/problem/analyze',
+      roadmap: '/api/roadmap/generate',
+      roadmapTest: '/api/roadmap/test/samples'
+    }
   });
 });
 
-process.on('SIGINT', async () => {
-  console.log('\n서버 종료 중...');
-  await cleanup();
-  server.close(() => {
-    console.log('서버가 정상적으로 종료되었습니다.');
-    process.exit(0);
+// 404 Handler
+app.use((req, res) => {
+  res.status(404).json({ 
+    error: 'Endpoint not found',
+    path: req.path 
   });
 });
+
+// Error Handler
+app.use((err, req, res, next) => {
+  console.error('💥 Unhandled Error:', err);
+  
+  res.status(500).json({ 
+    error: 'Internal server error',
+    message: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+// Server Start
+// ═══════════════════════════════════════════════════════════
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, async () => {
+  console.log('');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('🌟 Daily Miracles MVP Server');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log(`📡 Port: ${PORT}`);
+  console.log(`🌐 URL: http://localhost:${PORT}`);
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('');
+  
+  // ⚡ Initialize Orchestrator
+  await initializeOrchestrator();
+
+  if (!isOrchReady) {
+    console.log('⚠️ Orchestrator 초기화 실패 - 서버는 계속 실행됩니다');
+  }
+  
+  console.log('');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('✅ Server ready! Aurora 5 activated! ⚡');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('');
+});
+
+// ═══════════════════════════════════════════════════════════
+// Graceful Shutdown
+// ═══════════════════════════════════════════════════════════
+
+async function gracefulShutdown(signal) {
+  console.log('');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log(`🛑 ${signal} 신호 수신`);
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  
+  if (isOrchReady) {
+    console.log('⚡ Orchestrator 종료 중...');
+    await orchestrator.shutdown();
+    console.log('✅ Orchestrator 종료 완료');
+  }
+  
+  console.log('👋 서버 종료 완료');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('');
+  
+  process.exit(0);
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// ═══════════════════════════════════════════════════════════
+// Export (for testing)
+// ═══════════════════════════════════════════════════════════
+
+module.exports = app;
