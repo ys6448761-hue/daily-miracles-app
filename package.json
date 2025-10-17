@@ -7,10 +7,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "handlebars": "^4.7.8",
+    "node-cron": "^4.2.1",
     "openai": "^6.3.0",
     "puppeteer": "^24.24.1",
     "sqlite3": "^5.1.7",

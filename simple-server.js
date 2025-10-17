@@ -10,6 +10,10 @@ const path = require('path');
 
 const app = express();
 
+// 이메일 서비스 로드
+const { sendWelcomeEmail } = require('./services/emailService');
+const { startScheduler } = require('./services/emailScheduler');
+
 // ═══════════════════════════════════════════════════════════
 // Middleware
 // ═══════════════════════════════════════════════════════════
@@ -251,6 +255,17 @@ app.post('/api/beta/apply', async (req, res) => {
     applications.push(application);
     fs.writeFileSync(logPath, JSON.stringify(applications, null, 2));
 
+    // 환영 이메일 발송 (비동기, 실패해도 신청은 완료)
+    sendWelcomeEmail(application.email, application.name)
+      .then(result => {
+        if (result.success) {
+          console.log(`📧 환영 이메일 발송 성공: ${application.email}`);
+        }
+      })
+      .catch(err => {
+        console.error(`❌ 환영 이메일 발송 실패:`, err.message);
+      });
+
     res.json({
       success: true,
       message: '베타 테스터 신청이 완료되었습니다.',
@@ -395,6 +410,14 @@ app.listen(PORT, () => {
   console.log('');
   console.log('✅ Server ready! (No Orchestrator)');
   console.log('');
+
+  // 이메일 스케줄러 시작
+  if (process.env.SENDGRID_API_KEY) {
+    startScheduler();
+    console.log('📧 이메일 스케줄러 활성화');
+  } else {
+    console.log('⚠️  SENDGRID_API_KEY가 설정되지 않아 이메일 기능이 비활성화되었습니다.');
+  }
 });
 
 // ═══════════════════════════════════════════════════════════
