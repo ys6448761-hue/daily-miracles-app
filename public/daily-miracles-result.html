@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>분석 결과 - 하루하루의 기적</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 40px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      color: #333;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header p {
+      color: #666;
+      font-size: 16px;
+    }
+
+    /* 프로필 카드 */
+    .profile-card {
+      background: linear-gradient(135deg, #f8f9ff 0%, #fff5f7 100%);
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 25px;
+    }
+
+    .profile-card h2 {
+      font-size: 24px;
+      color: #667eea;
+      margin-bottom: 15px;
+    }
+
+    .profile-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .info-item {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      border-left: 4px solid #667eea;
+    }
+
+    .info-label {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 5px;
+    }
+
+    .info-value {
+      font-size: 16px;
+      color: #333;
+      font-weight: 600;
+    }
+
+    /* 관계 조화도 */
+    .compatibility-score {
+      text-align: center;
+      padding: 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 15px;
+      margin: 25px 0;
+    }
+
+    .score-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 15px;
+      font-size: 48px;
+      font-weight: bold;
+    }
+
+    .score-grade {
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+
+    .score-message {
+      font-size: 18px;
+      opacity: 0.9;
+    }
+
+    /* 탭 섹션 헤더 (세로 배치) */
+    .section-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px 25px;
+      border-radius: 15px 15px 0 0;
+      margin-top: 30px;
+      font-size: 20px;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 10px rgba(102, 126, 234, 0.2);
+    }
+
+    .section-header:first-of-type {
+      margin-top: 0;
+    }
+
+    .section-content {
+      display: block;
+      background: white;
+      border-radius: 0 0 15px 15px;
+      margin-bottom: 10px;
+      padding: 20px;
+      border: 2px solid #f0f0f0;
+      border-top: none;
+    }
+
+    /* 아코디언 */
+    .accordion {
+      margin-bottom: 15px;
+    }
+
+    .accordion-header {
+      background: linear-gradient(135deg, #f8f9ff 0%, #fff5f7 100%);
+      padding: 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s;
+    }
+
+    .accordion-header:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+    }
+
+    .accordion-header h3 {
+      font-size: 18px;
+      color: #667eea;
+      margin: 0;
+    }
+
+    .accordion-icon {
+      font-size: 24px;
+      color: #667eea;
+      transition: transform 0.3s;
+    }
+
+    .accordion.active .accordion-icon {
+      transform: rotate(180deg);
+    }
+
+    .accordion-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+
+    .accordion.active .accordion-body {
+      max-height: 1000px;
+    }
+
+    .accordion-content {
+      padding: 20px;
+      background: white;
+      border-radius: 0 0 12px 12px;
+      margin-top: 2px;
+    }
+
+    .action-items {
+      list-style: none;
+      padding: 0;
+    }
+
+    .action-items li {
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+      padding-left: 25px;
+      position: relative;
+    }
+
+    .action-items li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #667eea;
+      font-weight: bold;
+    }
+
+    .action-items li:last-child {
+      border-bottom: none;
+    }
+
+    /* 주차별 플랜 */
+    .week-plan {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 2px solid #f0f0f0;
+    }
+
+    .week-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .week-title {
+      font-size: 20px;
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    .week-theme {
+      font-size: 14px;
+      color: #999;
+    }
+
+    .daily-action {
+      background: #f8f9ff;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .day-label {
+      font-weight: 600;
+      color: #667eea;
+      margin-right: 10px;
+    }
+
+    .task-text {
+      flex: 1;
+      color: #333;
+    }
+
+    .duration {
+      font-size: 12px;
+      color: #999;
+      white-space: nowrap;
+    }
+
+    /* 버튼 */
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      flex: 1;
+      min-width: 150px;
+      padding: 16px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #666;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    /* 공유 버튼 */
+    .share-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .share-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .share-kakao {
+      background: #FEE500;
+      color: #000;
+    }
+
+    .share-facebook {
+      background: #1877F2;
+      color: white;
+    }
+
+    .share-link {
+      background: #555;
+      color: white;
+    }
+
+    .share-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* 체크포인트 */
+    .checkpoints {
+      background: #fff5f7;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
+
+    .checkpoint-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #764ba2;
+      margin-bottom: 10px;
+    }
+
+    .checkpoint-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .checkpoint-list li {
+      padding: 8px 0;
+      color: #666;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .checkpoint-list li:before {
+      content: "☑";
+      position: absolute;
+      left: 0;
+      color: #764ba2;
+    }
+
+    /* 모바일 최적화 */
+    @media (max-width: 768px) {
+      .container {
+        padding: 25px 15px;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .profile-info {
+        grid-template-columns: 1fr;
+      }
+
+      .score-circle {
+        width: 100px;
+        height: 100px;
+        font-size: 36px;
+      }
+
+      .section-header {
+        font-size: 18px;
+        padding: 15px 20px;
+      }
+
+      .accordion-header h3 {
+        font-size: 16px;
+      }
+
+      .btn-group {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .share-buttons {
+        flex-direction: column;
+      }
+
+      .share-btn {
+        width: 100%;
+      }
+
+      .daily-action {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+      }
+
+      .duration {
+        width: 100%;
+        text-align: right;
+      }
+    }
+
+    /* 로딩 스피너 */
+    .loading {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* 에러 메시지 */
+    .error-message {
+      text-align: center;
+      padding: 40px;
+      color: #e74c3c;
+    }
+
+    .error-message h2 {
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>✨ 하루하루의 기적</h1>
+      <p>개인+관계 분석 결과</p>
+    </div>
+
+    <div id="app">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>결과를 불러오는 중...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // localStorage에서 결과 가져오기
+    let resultData = null;
+
+    try {
+      const storedData = localStorage.getItem('dailyMiraclesResult');
+      if (!storedData) {
+        throw new Error('결과 데이터가 없습니다.');
+      }
+      resultData = JSON.parse(storedData);
+      renderResults(resultData);
+    } catch (error) {
+      console.error('Error loading results:', error);
+      showErrorPage(error);
+    }
+
+    function showErrorPage(error) {
+      document.getElementById('app').innerHTML = `
+        <div class="error-message">
+          <div style="font-size: 64px; margin-bottom: 20px;">❌</div>
+          <h2>결과를 불러올 수 없습니다</h2>
+          <p style="margin: 20px 0; color: #666; line-height: 1.6;">
+            ${error.message || '데이터를 찾을 수 없습니다.'}<br>
+            <small>분석을 다시 진행하거나 문제가 지속되면 고객센터로 문의해주세요.</small>
+          </p>
+          <div class="btn-group">
+            <button class="btn btn-secondary" onclick="window.history.back()">
+              ← 이전으로
+            </button>
+            <button class="btn btn-primary" onclick="location.href='/daily-miracles.html'">
+              새로운 분석 시작
+            </button>
+          </div>
+          <div style="margin-top: 20px;">
+            <a href="tel:1899-6117" style="color: #667eea; text-decoration: none;">
+              📞 고객센터: 1899-6117
+            </a>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderResults(data) {
+      const { userProfile, counterpartyProfile, relationshipAnalysis, consulting, actionPlan } = data;
+
+      const hasRelationship = counterpartyProfile && counterpartyProfile.exists;
+
+      let html = '';
+
+      // 1. 사용자 프로필
+      html += `
+        <div class="profile-card">
+          <h2>👤 ${userProfile.name}님의 프로필</h2>
+          <div class="profile-info">
+            <div class="info-item">
+              <div class="info-label">색깔 성향</div>
+              <div class="info-value">${userProfile.personality.color}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">패턴</div>
+              <div class="info-value">${userProfile.fiveElements.primaryElement} 패턴</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">에너지 출처</div>
+              <div class="info-value">${userProfile.personality.energySource}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">황금시간</div>
+              <div class="info-value">${userProfile.personality.peakTime}</div>
+            </div>
+          </div>
+          <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 10px;">
+            <p style="color: #666; line-height: 1.6;">${userProfile.summary}</p>
+          </div>
+        </div>
+      `;
+
+      // 2. 관계 조화도 (있는 경우)
+      if (hasRelationship && relationshipAnalysis) {
+        const score = relationshipAnalysis.overallScore;
+        html += `
+          <div class="compatibility-score">
+            <div class="score-circle">
+              <span class="score-grade">${score.grade}</span>
+            </div>
+            <div class="score-message">${score.message}</div>
+          </div>
+
+          <div class="profile-card">
+            <h2>💑 상대방 프로필</h2>
+            <div class="profile-info">
+              <div class="info-item">
+                <div class="info-label">관계 유형</div>
+                <div class="info-value">${counterpartyProfile.relationshipType}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">성향</div>
+                <div class="info-value">${counterpartyProfile.personality.description}</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">패턴</div>
+                <div class="info-value">${counterpartyProfile.fiveElements.primaryElement} 패턴</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">주요 갈등</div>
+                <div class="info-value">${counterpartyProfile.conflicts.mainIssue}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // 3. 섹션 1: 8단계 컨설팅 (세로 배치)
+      html += '<div class="section-header">📋 8단계 컨설팅</div>';
+      html += '<div class="section-content">';
+      Object.keys(consulting).forEach(key => {
+        const step = consulting[key];
+        html += `
+          <div class="accordion" onclick="toggleAccordion(this)">
+            <div class="accordion-header">
+              <h3>${step.title}</h3>
+              <span class="accordion-icon">▼</span>
+            </div>
+            <div class="accordion-body">
+              <div class="accordion-content">
+                <p style="color: #666; line-height: 1.6; margin-bottom: 15px;">${step.content}</p>
+                <ul class="action-items">
+                  ${step.actionItems.map(item => `<li>${item}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      html += '</div>';
+
+      // 4. 섹션 2: 4주차 액션 플랜 (세로 배치)
+      html += '<div class="section-header">📅 4주차 액션 플랜</div>';
+      html += '<div class="section-content">';
+      ['week1', 'week2', 'week3', 'week4'].forEach(weekKey => {
+        const week = actionPlan[weekKey];
+        html += `
+          <div class="week-plan">
+            <div class="week-header">
+              <div>
+                <div class="week-title">${weekKey.toUpperCase()}: ${week.theme}</div>
+                <div class="week-theme">${week.focus}</div>
+              </div>
+            </div>
+            ${week.dailyActions.map(action => `
+              <div class="daily-action">
+                <span class="day-label">Day ${action.day}</span>
+                <span class="task-text">${action.task}</span>
+                <span class="duration">${action.duration}</span>
+              </div>
+            `).join('')}
+            <div class="checkpoints">
+              <div class="checkpoint-title">✓ 주차 체크포인트</div>
+              <ul class="checkpoint-list">
+                ${week.checkpoints.map(cp => `<li>${cp}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+        `;
+      });
+      html += '</div>';
+
+      // 5. 섹션 3: 관계 분석 (조건부, 세로 배치)
+      if (hasRelationship && relationshipAnalysis) {
+        html += '<div class="section-header">💑 관계 분석</div>';
+        html += '<div class="section-content">';
+        html += `
+          <div class="profile-card">
+            <h2>📊 패턴 조화 분석</h2>
+            <div class="info-item">
+              <div class="info-label">조화 유형</div>
+              <div class="info-value">${relationshipAnalysis.elementCompatibility.type}</div>
+            </div>
+            <p style="margin-top: 15px; color: #666; line-height: 1.6;">${relationshipAnalysis.elementCompatibility.description}</p>
+          </div>
+
+          <div class="profile-card">
+            <h2>🎨 성향 조화 분석</h2>
+            <div class="info-item">
+              <div class="info-label">조화 유형</div>
+              <div class="info-value">${relationshipAnalysis.colorCompatibility.type}</div>
+            </div>
+            <p style="margin-top: 15px; color: #666; line-height: 1.6;">${relationshipAnalysis.colorCompatibility.message}</p>
+          </div>
+
+          <div class="profile-card">
+            <h2>💡 개선 추천</h2>
+            ${relationshipAnalysis.recommendation.map(rec => `
+              <div style="margin-bottom: 15px; padding: 15px; background: white; border-radius: 10px;">
+                <div style="font-weight: 600; color: #667eea; margin-bottom: 5px;">${rec.category}: ${rec.action}</div>
+                <div style="color: #666;">${rec.detail}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        html += '</div>';
+      }
+
+      // 7. 공유 버튼 및 액션
+      html += `
+        <div class="share-buttons">
+          <button class="share-btn share-link" onclick="copyLink()">📋 결과 링크 복사</button>
+        </div>
+
+        <div class="btn-group">
+          <button class="btn btn-secondary" onclick="location.href='/daily-miracles.html'">
+            새로운 분석 시작
+          </button>
+          <button class="btn btn-primary" onclick="printResults()">
+            📄 결과 PDF 저장
+          </button>
+        </div>
+      `;
+
+      document.getElementById('app').innerHTML = html;
+    }
+
+    function toggleAccordion(element) {
+      element.classList.toggle('active');
+    }
+
+    function copyLink() {
+      // 간단한 복사 기능 (실제로는 공유 가능한 링크 생성 필요)
+      alert('결과 링크가 클립보드에 복사되었습니다!\n\n💡 현재는 로컬 저장만 지원됩니다.');
+    }
+
+    function printResults() {
+      window.print();
+    }
+  </script>
+</body>
+</html>

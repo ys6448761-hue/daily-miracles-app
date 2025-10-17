@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>베타 테스터 신청 - 하루하루의 기적</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 100%;
+      padding: 40px;
+      animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      color: #333;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header p {
+      color: #666;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .beta-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .form-label .required {
+      color: #e74c3c;
+      margin-left: 3px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-input::placeholder {
+      color: #aaa;
+    }
+
+    textarea.form-input {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .form-help {
+      font-size: 12px;
+      color: #999;
+      margin-top: 5px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 10px;
+    }
+
+    .submit-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .benefits {
+      background: linear-gradient(135deg, #f8f9ff 0%, #fff5f7 100%);
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+    }
+
+    .benefits h3 {
+      font-size: 18px;
+      color: #667eea;
+      margin-bottom: 15px;
+    }
+
+    .benefits ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .benefits li {
+      padding: 8px 0;
+      color: #666;
+      padding-left: 25px;
+      position: relative;
+    }
+
+    .benefits li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #667eea;
+      font-weight: bold;
+    }
+
+    /* 성공 화면 */
+    .success-screen {
+      display: none;
+      text-align: center;
+    }
+
+    .success-screen.active {
+      display: block;
+    }
+
+    .success-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      animation: scaleIn 0.5s ease-out;
+    }
+
+    @keyframes scaleIn {
+      from {
+        transform: scale(0);
+      }
+      to {
+        transform: scale(1);
+      }
+    }
+
+    .success-title {
+      font-size: 28px;
+      color: #333;
+      margin-bottom: 15px;
+    }
+
+    .success-message {
+      font-size: 16px;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .home-btn {
+      display: inline-block;
+      padding: 15px 40px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .home-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    /* 에러 메시지 */
+    .error-message {
+      background: #fee;
+      color: #c33;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .error-message.active {
+      display: block;
+    }
+
+    /* 로딩 상태 */
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top: 3px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* 모바일 최적화 */
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+
+      .container {
+        padding: 30px 20px;
+      }
+
+      .header h1 {
+        font-size: 26px;
+      }
+
+      .header p {
+        font-size: 14px;
+      }
+
+      .success-icon {
+        font-size: 60px;
+      }
+
+      .success-title {
+        font-size: 24px;
+      }
+
+      .success-message {
+        font-size: 14px;
+      }
+    }
+
+    /* 푸터 */
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #f0f0f0;
+      font-size: 12px;
+      color: #999;
+    }
+
+    .footer a {
+      color: #667eea;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 신청 폼 -->
+    <div id="form-screen">
+      <div class="header">
+        <div class="beta-badge">BETA</div>
+        <h1>✨ 하루하루의 기적</h1>
+        <p>베타 테스터 신청</p>
+      </div>
+
+      <div class="benefits">
+        <h3>🎁 베타 테스터 혜택</h3>
+        <ul>
+          <li>무료 프리미엄 분석 제공</li>
+          <li>정식 출시 시 평생 할인</li>
+          <li>우선 신기능 체험 기회</li>
+          <li>피드백 반영 시 특별 리워드</li>
+        </ul>
+      </div>
+
+      <div id="error-message" class="error-message"></div>
+
+      <form id="beta-form">
+        <div class="form-group">
+          <label class="form-label">
+            이름<span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            name="name"
+            class="form-input"
+            placeholder="홍길동"
+            required
+            autocomplete="name"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            카카오톡 ID<span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            name="kakaoId"
+            class="form-input"
+            placeholder="kakaotalk123"
+            required
+          >
+          <div class="form-help">분석 결과 전송 및 피드백 수집에 사용됩니다</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            이메일<span class="required">*</span>
+          </label>
+          <input
+            type="email"
+            name="email"
+            class="form-input"
+            placeholder="example@email.com"
+            required
+            autocomplete="email"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            한줄소개 (선택)
+          </label>
+          <textarea
+            name="introduction"
+            class="form-input"
+            placeholder="하루하루의 기적에 관심을 갖게 된 이유나 기대하는 점을 자유롭게 작성해주세요."
+          ></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submit-btn">
+          신청하기
+        </button>
+      </form>
+
+      <div class="footer">
+        <p>문의: <a href="tel:1899-6117">1899-6117</a></p>
+        <p style="margin-top: 10px;">
+          <a href="/">홈으로</a> |
+          <a href="/daily-miracles">분석 체험</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- 성공 화면 -->
+    <div id="success-screen" class="success-screen">
+      <div class="success-icon">🎉</div>
+      <h2 class="success-title">신청 완료!</h2>
+      <p class="success-message">
+        베타 테스터 신청이 완료되었습니다.<br>
+        곧 카카오톡으로 연락드리겠습니다.<br><br>
+        <strong>감사합니다!</strong>
+      </p>
+      <a href="/" class="home-btn">홈으로 돌아가기</a>
+      <div class="footer" style="border-top: none;">
+        <p>문의: <a href="tel:1899-6117">1899-6117</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('beta-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const errorMessage = document.getElementById('error-message');
+    const formScreen = document.getElementById('form-screen');
+    const successScreen = document.getElementById('success-screen');
+
+    // 폼 제출 처리
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // 에러 메시지 숨김
+      errorMessage.classList.remove('active');
+
+      // 버튼 비활성화 및 로딩 표시
+      submitBtn.disabled = true;
+      const originalText = submitBtn.textContent;
+      submitBtn.innerHTML = '<span class="loading-spinner"></span>제출 중...';
+
+      // 폼 데이터 수집
+      const formData = {
+        name: form.name.value.trim(),
+        kakaoId: form.kakaoId.value.trim(),
+        email: form.email.value.trim(),
+        introduction: form.introduction.value.trim(),
+        submittedAt: new Date().toISOString()
+      };
+
+      try {
+        // API 호출
+        const response = await fetch('/api/beta/apply', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          // 성공 화면 표시
+          formScreen.style.display = 'none';
+          successScreen.classList.add('active');
+
+          // 구글 애널리틱스 이벤트 (있는 경우)
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'beta_signup', {
+              'event_category': 'signup',
+              'event_label': 'beta_tester'
+            });
+          }
+        } else {
+          throw new Error(result.error || '신청 처리 중 오류가 발생했습니다.');
+        }
+      } catch (error) {
+        console.error('Beta signup error:', error);
+
+        // 에러 메시지 표시
+        errorMessage.textContent = error.message || '신청 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+        errorMessage.classList.add('active');
+
+        // 버튼 복구
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    });
+
+    // 입력 필드 포커스 시 에러 메시지 숨김
+    form.querySelectorAll('.form-input').forEach(input => {
+      input.addEventListener('focus', () => {
+        errorMessage.classList.remove('active');
+      });
+    });
+  </script>
+</body>
+</html>
