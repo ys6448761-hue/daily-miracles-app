@@ -200,10 +200,10 @@ app.get('/feedback', (req, res) => {
 // Beta Application API
 app.post('/api/beta/apply', async (req, res) => {
   try {
-    const { name, kakaoId, email, introduction } = req.body;
+    const { name, email, introduction } = req.body;
 
     // Input validation
-    if (!name || !kakaoId || !email) {
+    if (!name || !email) {
       return res.status(400).json({
         success: false,
         error: '필수 정보를 모두 입력해주세요.'
@@ -221,7 +221,6 @@ app.post('/api/beta/apply', async (req, res) => {
 
     const application = {
       name: name.trim(),
-      kakaoId: kakaoId.trim(),
       email: email.trim(),
       introduction: introduction?.trim() || '',
       submittedAt: new Date().toISOString(),
@@ -232,7 +231,6 @@ app.post('/api/beta/apply', async (req, res) => {
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('🎉 베타 테스터 신청');
     console.log(`   이름: ${application.name}`);
-    console.log(`   카톡ID: ${application.kakaoId}`);
     console.log(`   이메일: ${application.email}`);
     console.log(`   한줄소개: ${application.introduction || '(없음)'}`);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');

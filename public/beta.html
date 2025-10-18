@@ -357,20 +357,6 @@
 
         <div class="form-group">
           <label class="form-label">
-            카카오톡 ID<span class="required">*</span>
-          </label>
-          <input
-            type="text"
-            name="kakaoId"
-            class="form-input"
-            placeholder="kakaotalk123"
-            required
-          >
-          <div class="form-help">분석 결과 전송 및 피드백 수집에 사용됩니다</div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">
             이메일<span class="required">*</span>
           </label>
           <input
@@ -381,6 +367,7 @@
             required
             autocomplete="email"
           >
+          <div class="form-help">7일간 응원 메시지를 받으실 이메일 주소입니다</div>
         </div>
 
         <div class="form-group">
@@ -413,8 +400,8 @@
       <div class="success-icon">🎉</div>
       <h2 class="success-title">신청 완료!</h2>
       <p class="success-message">
-        베타 테스터 신청이 완료되었습니다.<br>
-        곧 카카오톡으로 연락드리겠습니다.<br><br>
+        신청이 완료되었습니다!<br>
+        이메일로 7일 응원 메시지를 받으실 수 있습니다.<br><br>
         <strong>감사합니다!</strong>
       </p>
       <a href="/" class="home-btn">홈으로 돌아가기</a>
@@ -446,10 +433,8 @@
       // 폼 데이터 수집
       const formData = {
         name: form.name.value.trim(),
-        kakaoId: form.kakaoId.value.trim(),
         email: form.email.value.trim(),
-        introduction: form.introduction.value.trim(),
-        submittedAt: new Date().toISOString()
+        introduction: form.introduction.value.trim()
       };
 
       try {
