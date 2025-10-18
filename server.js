@@ -1,7 +1,7 @@
-// ═══════════════════════════════════════════════════════════
+// ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
 // Daily Miracles MVP - Simple Server (No Orchestrator)
-// Orchestrator 없이 직접 workflow 실행
-// ═══════════════════════════════════════════════════════════
+// Orchestrator ?�이 직접 workflow ?�행
+// ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
 
 require('dotenv').config();
 const express = require('express');
@@ -10,13 +10,13 @@ const path = require('path');
 
 const app = express();
 
-// 이메일 서비스 로드
+// ?�메???�비??로드
 const { sendWelcomeEmail } = require('./services/emailService');
 const { startScheduler } = require('./services/emailScheduler');
 
-// ═══════════════════════════════════════════════════════════
+// ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
 // Middleware
-// ═══════════════════════════════════════════════════════════
+// ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
 
 app.use(cors());
 app.use(express.json());
@@ -26,16 +26,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use('/pdfs', express.static('generated-pdfs'));
 
-// ═══════════════════════════════════════════════════════════
+// ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
 // Mock Context Manager (간단 버전)
-// ═══════════════════════════════════════════════════════════
+// ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
 
 class SimpleContext {
   constructor(initialData = {}) {
     this.id = `ctx-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     this.data = new Map();
 
-    // 초기 데이터 저장
+    // 초기 ?�이???�??
     if (initialData) {
       Object.entries(initialData).forEach(([key, value]) => {
         this.data.set(key, value);
@@ -59,22 +59,22 @@ class SimpleContext {
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-// Workflow 실행 함수
-// ═══════════════════════════════════════════════════════════
+// ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
+// Workflow ?�행 ?�수
+// ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
 
 async function executeDailyMiraclesWorkflow(input) {
   const startTime = Date.now();
 
-  // Lazy load workflow (서버 시작 시 로드하지 않음)
+  // Lazy load workflow (?�버 ?�작 ??로드?��? ?�음)
   const dailyMiraclesWorkflow = require('./orchestrator/workflows/dailyMiraclesWorkflow');
 
-  // Context 생성
+  // Context ?�성
   const context = new SimpleContext({ input });
 
-  console.log('🚀 Daily Miracles 워크플로우 시작:', input.user?.name);
+  console.log('?? Daily Miracles ?�크?�로???�작:', input.user?.name);
 
-  // 각 단계 순차 실행
+  // �??�계 ?�차 ?�행
   for (let i = 0; i < dailyMiraclesWorkflow.steps.length; i++) {
     const step = dailyMiraclesWorkflow.steps[i];
 
@@ -84,15 +84,15 @@ async function executeDailyMiraclesWorkflow(input) {
       const result = await step.handler(context);
       await context.set(step.name, result);
     } catch (error) {
-      console.error(`   ❌ 단계 실패: ${step.name}`, error.message);
+      console.error(`   ???�계 ?�패: ${step.name}`, error.message);
       throw error;
     }
   }
 
   const duration = Date.now() - startTime;
-  console.log(`✅ 워크플로우 완료 (${duration}ms)`);
+  console.log(`???�크?�로???�료 (${duration}ms)`);
 
-  // 최종 결과 가져오기
+  // 최종 결과 가?�오�?
   const finalResult = await context.get('finalize-result');
 
   return {
@@ -102,9 +102,9 @@ async function executeDailyMiraclesWorkflow(input) {
   };
 }
 
-// ═══════════════════════════════════════════════════════════
+// ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
 // API Routes
-// ═══════════════════════════════════════════════════════════
+// ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
 
 // Health Check
 app.get('/api/health', (req, res) => {
@@ -137,20 +137,20 @@ app.post('/api/daily-miracles/analyze', async (req, res) => {
     }
 
     console.log('');
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('✨ Daily Miracles 분석 요청');
-    console.log(`   사용자: ${user.name}`);
-    console.log(`   관계: ${responses.q6}`);
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━');
+    console.log('??Daily Miracles 분석 ?�청');
+    console.log(`   ?�용?? ${user.name}`);
+    console.log(`   관�? ${responses.q6}`);
+    console.log('?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━');
 
-    // Workflow 실행
+    // Workflow ?�행
     const result = await executeDailyMiraclesWorkflow({
       user,
       responses,
       counterparty
     });
 
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━');
     console.log('');
 
     res.json({
@@ -167,7 +167,7 @@ app.post('/api/daily-miracles/analyze', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Daily Miracles 분석 실패:', error);
+    console.error('??Daily Miracles 분석 ?�패:', error);
     console.error(error.stack);
 
     res.status(500).json({
@@ -206,16 +206,16 @@ app.post('/api/beta/apply', async (req, res) => {
     if (!name || !email) {
       return res.status(400).json({
         success: false,
-        error: '필수 정보를 모두 입력해주세요.'
+        error: '?�수 ?�보�?모두 ?�력?�주?�요.'
       });
     }
 
-    // 이메일 형식 검증
+    // ?�메???�식 검�?
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({
         success: false,
-        error: '올바른 이메일 형식이 아닙니다.'
+        error: '?�바�??�메???�식???�닙?�다.'
       });
     }
 
@@ -228,16 +228,16 @@ app.post('/api/beta/apply', async (req, res) => {
     };
 
     console.log('');
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('🎉 베타 테스터 신청');
-    console.log(`   이름: ${application.name}`);
-    console.log(`   이메일: ${application.email}`);
-    console.log(`   한줄소개: ${application.introduction || '(없음)'}`);
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━');
+    console.log('?�� 베�? ?�스???�청');
+    console.log(`   ?�름: ${application.name}`);
+    console.log(`   ?�메?? ${application.email}`);
+    console.log(`   ?�줄?�개: ${application.introduction || '(?�음)'}`);
+    console.log('?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━');
     console.log('');
 
-    // TODO: 실제 배포 시 데이터베이스에 저장
-    // 현재는 파일 시스템에 로깅
+    // TODO: ?�제 배포 ???�이?�베?�스???�??
+    // ?�재???�일 ?�스?�에 로깅
     const fs = require('fs');
     const logPath = path.join(__dirname, 'beta-applications.json');
 
@@ -253,29 +253,29 @@ app.post('/api/beta/apply', async (req, res) => {
     applications.push(application);
     fs.writeFileSync(logPath, JSON.stringify(applications, null, 2));
 
-    // 환영 이메일 발송 (비동기, 실패해도 신청은 완료)
+    // ?�영 ?�메??발송 (비동�? ?�패?�도 ?�청?� ?�료)
     sendWelcomeEmail(application.email, application.name)
       .then(result => {
         if (result.success) {
-          console.log(`📧 환영 이메일 발송 성공: ${application.email}`);
+          console.log(`?�� ?�영 ?�메??발송 ?�공: ${application.email}`);
         }
       })
       .catch(err => {
-        console.error(`❌ 환영 이메일 발송 실패:`, err.message);
+        console.error(`???�영 ?�메??발송 ?�패:`, err.message);
       });
 
     res.json({
       success: true,
-      message: '베타 테스터 신청이 완료되었습니다.',
+      message: '베�? ?�스???�청???�료?�었?�니??',
       applicationId: `BETA-${Date.now()}`
     });
 
   } catch (error) {
-    console.error('❌ 베타 신청 처리 실패:', error);
+    console.error('??베�? ?�청 처리 ?�패:', error);
 
     res.status(500).json({
       success: false,
-      error: '신청 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+      error: '?�청 처리 �??�류가 발생?�습?�다. ?�시 ???�시 ?�도?�주?�요.'
     });
   }
 });
@@ -289,15 +289,15 @@ app.post('/api/feedback/submit', async (req, res) => {
     if (!name || !satisfaction || !goodPoints || !recommend) {
       return res.status(400).json({
         success: false,
-        error: '필수 정보를 모두 입력해주세요.'
+        error: '?�수 ?�보�?모두 ?�력?�주?�요.'
       });
     }
 
-    // 만족도 범위 검증
+    // 만족??범위 검�?
     if (satisfaction < 1 || satisfaction > 10) {
       return res.status(400).json({
         success: false,
-        error: '만족도는 1-10 사이의 값이어야 합니다.'
+        error: '만족?�는 1-10 ?�이??값이?�야 ?�니??'
       });
     }
 
@@ -313,17 +313,17 @@ app.post('/api/feedback/submit', async (req, res) => {
     };
 
     console.log('');
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('💬 소감 피드백 제출');
-    console.log(`   이름: ${feedback.name}`);
-    console.log(`   만족도: ${feedback.satisfaction}/10`);
-    console.log(`   추천: ${feedback.recommend === 'yes' ? '예' : '아니오'}`);
-    console.log(`   초대 의향: ${feedback.inviteWillingness}`);
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━');
+    console.log('?�� ?�감 ?�드�??�출');
+    console.log(`   ?�름: ${feedback.name}`);
+    console.log(`   만족?? ${feedback.satisfaction}/10`);
+    console.log(`   추천: ${feedback.recommend === 'yes' ? '?? : '?�니??}`);
+    console.log(`   초�? ?�향: ${feedback.inviteWillingness}`);
+    console.log('?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━');
     console.log('');
 
-    // TODO: 실제 배포 시 데이터베이스에 저장
-    // 현재는 파일 시스템에 로깅
+    // TODO: ?�제 배포 ???�이?�베?�스???�??
+    // ?�재???�일 ?�스?�에 로깅
     const fs = require('fs');
     const logPath = path.join(__dirname, 'feedback-submissions.json');
 
@@ -339,21 +339,21 @@ app.post('/api/feedback/submit', async (req, res) => {
     feedbacks.push(feedback);
     fs.writeFileSync(logPath, JSON.stringify(feedbacks, null, 2));
 
-    // TODO: 카카오톡 자동 발송 (Task 3)
-    // 만족도가 8점 이상이고 추천 의향이 있는 경우 특별 메시지 발송
+    // TODO: 카카?�톡 ?�동 발송 (Task 3)
+    // 만족?��? 8???�상?�고 추천 ?�향???�는 경우 ?�별 메시지 발송
 
     res.json({
       success: true,
-      message: '소감을 전달해주셔서 감사합니다!',
+      message: '?�감???�달?�주?�서 감사?�니??',
       feedbackId: `FEEDBACK-${Date.now()}`
     });
 
   } catch (error) {
-    console.error('❌ 피드백 제출 실패:', error);
+    console.error('???�드�??�출 ?�패:', error);
 
     res.status(500).json({
       success: false,
-      error: '제출 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+      error: '?�출 �??�류가 발생?�습?�다. ?�시 ???�시 ?�도?�주?�요.'
     });
   }
 });
@@ -382,7 +382,7 @@ app.use((req, res) => {
 
 // Error Handler
 app.use((err, req, res, next) => {
-  console.error('💥 Unhandled Error:', err);
+  console.error('?�� Unhandled Error:', err);
 
   res.status(500).json({
     error: 'Internal server error',
@@ -390,44 +390,44 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ═══════════════════════════════════════════════════════════
+// ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
 // Server Start
-// ═══════════════════════════════════════════════════════════
+// ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
 
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
   console.log('');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('🌟 Daily Miracles Simple Server');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log(`📡 Port: ${PORT}`);
-  console.log(`🌐 URL: http://localhost:${PORT}`);
-  console.log(`📝 Test: http://localhost:${PORT}/daily-miracles`);
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━');
+  console.log('?�� Daily Miracles Simple Server');
+  console.log('?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━');
+  console.log(`?�� Port: ${PORT}`);
+  console.log(`?�� URL: http://localhost:${PORT}`);
+  console.log(`?�� Test: http://localhost:${PORT}/daily-miracles`);
+  console.log('?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━');
   console.log('');
-  console.log('✅ Server ready! (No Orchestrator)');
+  console.log('??Server ready! (No Orchestrator)');
   console.log('');
 
-  // 이메일 스케줄러 시작
+  // ?�메???��?줄러 ?�작
   if (process.env.SENDGRID_API_KEY) {
     startScheduler();
-    console.log('📧 이메일 스케줄러 활성화');
+    console.log('?�� ?�메???��?줄러 ?�성??);
   } else {
-    console.log('⚠️  SENDGRID_API_KEY가 설정되지 않아 이메일 기능이 비활성화되었습니다.');
+    console.log('?�️  SENDGRID_API_KEY가 ?�정?��? ?�아 ?�메??기능??비활?�화?�었?�니??');
   }
 });
 
-// ═══════════════════════════════════════════════════════════
+// ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
 // Graceful Shutdown
-// ═══════════════════════════════════════════════════════════
+// ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
 
 function gracefulShutdown(signal) {
   console.log('');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log(`🛑 ${signal} 신호 수신`);
-  console.log('👋 서버 종료');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━');
+  console.log(`?�� ${signal} ?�호 ?�신`);
+  console.log('?�� ?�버 종료');
+  console.log('?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━?�━');
   console.log('');
   process.exit(0);
 }
@@ -435,8 +435,8 @@ function gracefulShutdown(signal) {
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
-// ═══════════════════════════════════════════════════════════
+// ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
 // Export (for testing)
-// ═══════════════════════════════════════════════════════════
+// ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═??
 
 module.exports = app;
