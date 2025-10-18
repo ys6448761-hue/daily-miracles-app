@@ -82,7 +82,8 @@ class Orchestrator {
     const workflows = [
       require('./workflows/storyWorkflow'),
       require('./workflows/problemWorkflow'),
-      require('./workflows/miracleWorkflow')
+      require('./workflows/miracleWorkflow'),
+      require('./workflows/dailyMiraclesWorkflow')
     ];
 
     for (const workflow of workflows) {

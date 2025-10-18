@@ -11,7 +11,20 @@
       "Read(//c/Users/세진/OneDrive/**)",
       "Bash(git add:*)",
       "Bash(git commit -m \"$(cat <<''EOF''\n사업자 정보 푸터 추가 (index.html, roadmap.html)\n\n카카오 채널 승인을 위한 사업자 정보 표시:\n- 상호: (주)어수여행센터\n- 대표: 이세진  \n- 사업자등록번호: 409-87-00585\n- 주소: 전라남도 여수시 박람회길 1, C동 CD-305호\n- 전화: 1899-6117\n- 통신판매업: 2016-전라남도-0146호\n\n디자인:\n- 회색 배경 (#F8F9FA)\n- 중앙 정렬, 12px 폰트\n- 모바일 반응형 (11px)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git commit:*)",
+      "Bash(find:*)",
+      "Bash(npx create-next-app:*)",
+      "Bash(npm run dev)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(tasklist)",
+      "Bash(kill:*)",
+      "Bash(PORT=8081 node:*)",
+      "Bash(PORT=8082 node:*)",
+      "Bash(git tag:*)",
+      "Bash(git rm:*)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []

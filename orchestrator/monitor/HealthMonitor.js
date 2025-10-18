@@ -18,7 +18,7 @@ class HealthMonitor {
     this.config = {
       interval: config.interval || 30000, // 30초
       alerts: {
-        notion: config.alerts?.notion !== false,
+        notion: false, // ✅ Notion 알림 비활성화 (테스트 모드)
         console: config.alerts?.console !== false
       },
       enabled: config.enabled !== false,
@@ -371,7 +371,9 @@ class HealthMonitor {
       console.warn('⚠️  헬스체크 경고:', message);
     }
 
-    // Notion 알림
+    // Notion 알림 (비활성화 - 테스트 모드)
+    // ❌ Notion 연결 제거됨
+    /*
     if (this.config.alerts.notion) {
       try {
         const notionService = require('../../automation/notion/send-success-message');
@@ -381,6 +383,7 @@ class HealthMonitor {
         logError('Notion 알림 실패', { error: error.message });
       }
     }
+    */
   }
 
   /**
