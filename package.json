@@ -17,10 +17,12 @@
     "handlebars": "^4.7.8",
     "node-cron": "^4.2.1",
     "openai": "^6.3.0",
-    "puppeteer": "^24.24.1",
-    "sqlite3": "^5.1.7",
     "uuid": "^10.0.0",
     "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0"
+  },
+  "optionalDependencies": {
+    "puppeteer": "^24.24.1",
+    "sqlite3": "^5.1.7"
   }
 }
