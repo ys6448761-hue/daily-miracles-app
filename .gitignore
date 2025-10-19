@@ -73,3 +73,6 @@ pids
 
 # Yarn Integrity file
 .yarn-integrity
+# Backup files
+*-backup.js
+*.backup.*
