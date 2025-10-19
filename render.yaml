@@ -1,6 +1,0 @@
-services:
-  - type: web
-    name: miracle-of-each-day
-    runtime: node
-    buildCommand: npm install
-    startCommand: npm start
