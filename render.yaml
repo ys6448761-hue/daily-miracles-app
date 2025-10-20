@@ -2,6 +2,7 @@ services:
   - type: web
     name: miracle-of-each-day
     runtime: node
+    rootDir: daily-miracles-mvp
     buildCommand: npm install --no-audit --no-fund
     startCommand: npm start
     envVars:
