@@ -2,7 +2,6 @@ services:
   - type: web
     name: miracle-of-each-day
     runtime: node
-    rootDir: daily-miracles-mvp
     buildCommand: npm install --no-audit --no-fund
     startCommand: npm start
     envVars:
@@ -11,7 +10,7 @@ services:
       - key: PORT
         value: "5000"
       - key: NODE_VERSION
-        value: "18"
+        value: "20"
       - key: ORCHESTRATOR_ENABLED
         value: "false"
       - key: PUPPETEER_SKIP_DOWNLOAD
