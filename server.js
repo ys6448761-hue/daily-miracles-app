@@ -19,6 +19,15 @@ const ORCHESTRATOR_ENABLED = String(process.env.ORCHESTRATOR_ENABLED || 'false')
 let orchestrator = null;
 let isOrchReady = false;
 
+// ───────────────────────────────────────────────────────────
+// Memory Storage for Latest Results (DB 없이 최근 결과 임시 저장)
+// ───────────────────────────────────────────────────────────
+const latestStore = {
+  story: null,
+  miracle: null,
+  problem: null
+};
+
 async function safeLoadOrchestrator() {
   if (!ORCHESTRATOR_ENABLED) {
     console.log('⚠️ Orchestrator 비활성화(ORCHESTRATOR_ENABLED=false).');
@@ -128,8 +137,17 @@ app.post('/api/story/create', async (req, res) => {
       return res.status(400).json({ error: 'Missing required field: wish' });
     }
     const result = await orchestrator.execute('create-story', { input: userInput });
+
+    // 최근 결과 저장 (메모리)
+    latestStore.story = {
+      at: new Date().toISOString(),
+      input: userInput,
+      result: result
+    };
+
     res.json({
       success: true,
+      redirectUrl: '/daily-miracles-result.html#latest',
       story: result.story,
       images: result.images,
       executionTime: result.executionTime,
@@ -162,8 +180,17 @@ app.post('/api/miracle/calculate', async (req, res) => {
   try {
     const { activityData } = req.body || {};
     const result = await orchestrator.execute('calculate-miracle', { activityData });
+
+    // 최근 결과 저장 (메모리)
+    latestStore.miracle = {
+      at: new Date().toISOString(),
+      input: activityData,
+      result: result
+    };
+
     res.json({
       success: true,
+      redirectUrl: '/daily-miracles-result.html#latest',
       miracleIndex: result.miracleIndex,
       predictions: result.predictions,
       executionTime: result.executionTime
@@ -183,8 +210,17 @@ app.post('/api/problem/analyze', async (req, res) => {
   try {
     const { problemInput } = req.body || {};
     const result = await orchestrator.execute('analyze-problem', { input: problemInput });
+
+    // 최근 결과 저장 (메모리)
+    latestStore.problem = {
+      at: new Date().toISOString(),
+      input: problemInput,
+      result: result
+    };
+
     res.json({
       success: true,
+      redirectUrl: '/daily-miracles-result.html#latest',
       analysis: result.analysis,
       solutions: result.solutions,
       executionTime: result.executionTime
@@ -195,9 +231,56 @@ app.post('/api/problem/analyze', async (req, res) => {
 });
 
 // ───────────────────────────────────────────────────────────
+// Latest Results Retrieval API (결과 조회)
+// ───────────────────────────────────────────────────────────
+app.get('/api/story/latest', (req, res) => {
+  if (!latestStore.story) {
+    return res.status(404).json({ error: 'no_story', message: 'No recent story found' });
+  }
+  res.json(latestStore.story);
+});
+
+app.get('/api/miracle/latest', (req, res) => {
+  if (!latestStore.miracle) {
+    return res.status(404).json({ error: 'no_miracle', message: 'No recent miracle calculation found' });
+  }
+  res.json(latestStore.miracle);
+});
+
+app.get('/api/problem/latest', (req, res) => {
+  if (!latestStore.problem) {
+    return res.status(404).json({ error: 'no_problem', message: 'No recent problem analysis found' });
+  }
+  res.json(latestStore.problem);
+});
+
+// ───────────────────────────────────────────────────────────
+// Compatibility Alias Routes (프론트엔드 호환용 별칭)
+// ───────────────────────────────────────────────────────────
+// 기존 구현이 /api/story/create 라면, 프론트가 /api/create-story 호출 시 연결
+app.post('/api/create-story', (req, res, next) => {
+  req.url = '/api/story/create';
+  next('route');
+});
+
+// 관계/문제 분석 호환: 프론트가 /api/relationship/analyze 또는 /api/relation/analyze 를 호출할 때
+app.post(['/api/relationship/analyze', '/api/relation/analyze'], (req, res, next) => {
+  // 실제 구현이 /api/problem/analyze 인 케이스를 기본으로 연결
+  req.url = '/api/problem/analyze';
+  next('route');
+});
+
+// 기적지수 계산 호환: /api/miracle/calc 등 변형이 들어오면 /api/miracle/calculate 로 연결
+app.post(['/api/miracle/calc', '/api/miracle/run'], (req, res, next) => {
+  req.url = '/api/miracle/calculate';
+  next('route');
+});
+
+// ───────────────────────────────────────────────────────────
 // 404 & Error
 // ───────────────────────────────────────────────────────────
 app.use((req, res) => {
+  console.log(`⚠️ 404 Not Found: ${req.method} ${req.path}`);
   res.status(404).json({ error: 'Endpoint not found', path: req.path });
 });
 

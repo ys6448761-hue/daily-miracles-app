@@ -20,4 +20,4 @@ services:
       - key: npm_config_build_from_source
         value: "false"
       - key: ALLOWED_ORIGINS
-        sync: false
+        value: "https://daily-miracles-app.onrender.com,http://localhost:3000,http://localhost:5000"
