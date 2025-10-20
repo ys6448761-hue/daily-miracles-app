@@ -6,8 +6,12 @@ services:
     buildCommand: npm install --no-audit --no-fund
     startCommand: npm start
     envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "5000"
       - key: NODE_VERSION
-        value: "20"
+        value: "18"
       - key: ORCHESTRATOR_ENABLED
         value: "false"
       - key: PUPPETEER_SKIP_DOWNLOAD
