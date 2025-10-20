@@ -41,7 +41,26 @@ async function safeLoadOrchestrator() {
 // ───────────────────────────────────────────────────────────
 // Middleware
 // ───────────────────────────────────────────────────────────
-app.use(cors());
+// CORS Configuration (환경변수 기반)
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : ['http://localhost:3000', 'http://localhost:5000'];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log(`⚠️ CORS blocked origin: ${origin}`);
+      callback(null, false);
+    }
+  },
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

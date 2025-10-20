@@ -76,3 +76,6 @@ pids
 # Backup files
 *-backup.js
 *.backup.*
+
+# Windows command output files
+nul
