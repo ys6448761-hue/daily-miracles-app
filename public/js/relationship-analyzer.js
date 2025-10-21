@@ -620,3 +620,159 @@ if (typeof window !== 'undefined') {
   window.COLOR_PERSONALITY_MAP = COLOR_PERSONALITY_MAP;
   window.COLOR_ELEMENT_MAP = COLOR_ELEMENT_MAP;
 }
+/* =========================================================
+ * Daily Miracles – 제출/전송(Submit) 유틸
+ * - 서버: POST /api/daily-miracles/analyze
+ * - 필수: userInput.wish (문자열)
+ * - 성공 시: redirectUrl로 이동
+ * =======================================================*/
+
+// ✅ 1) 폼 → 최소 입력값 수집
+function collectBasicForm() {
+  const $ = id => document.getElementById(id);
+
+  // ✅ 실제 HTML id에 맞춰 수정 (daily-miracles.html 기준)
+  const name = ($('userName')?.value || '').trim();
+  const birth = ($('userBirth')?.value || '').trim();        // YYYY-MM-DD
+  const concern = ($('userConcern')?.value || '').trim();    // 현재 고민 (자유서술)
+
+  console.log('[DM] collectBasicForm:', { name, birth, concern: concern ? '(있음)' : '(없음)' });
+
+  return { name, birth, concern };
+}
+
+// ✅ 2) Step2 설문 응답 수집 (있으면)
+function collectStep2() {
+  // 이미 페이지 어딘가에서 responses를 구성했다면 그대로 사용해도 됩니다.
+  // 여기서는 안전하게 DOM에서 읽어오는 예시를 남깁니다.
+  // (라디오/체크박스 name 속성 기준 예시)
+  const getCheckedValue = (name) => {
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : null;
+  };
+  const getCheckedValues = (name) => {
+    return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(el => el.value);
+  };
+
+  // 실제 설문 name 키에 맞춰 바꿔주세요.
+  const q6  = getCheckedValue('q6');          // 관계 타입
+  const q7  = getCheckedValue('q7');          // 상대 생일 정확/대략
+  const q7Exact    = document.getElementById('q7Exact')?.value || null;   // YYYY-MM-DD
+  const q7Estimate = document.getElementById('q7Estimate')?.value || null;
+  const q8  = getCheckedValue('q8');          // 성격 설명(선택지)
+  const q9  = getCheckedValues('q9');         // 갈등 패턴(다중)
+  const q10 = getCheckedValue('q10');         // 관계 목표
+  const q11 = getCheckedValue('q11');         // 대화 스타일
+  const q12 = getCheckedValue('q12');         // 개선 의지
+
+  // 상대 정보(옵션)
+  const counterparty = {
+    birth: q7Exact || null,
+    estimate: q7Estimate || null
+  };
+
+  return {
+    responses: { q6, q7, q7Exact, q7Estimate, q8, q9, q10, q11, q12 },
+    counterparty
+  };
+}
+
+// ✅ 3) 서버 요구사항에 맞는 wish 생성기
+function buildWish(basic, step2) {
+  // “현재 고민”이 있으면 그걸 최우선으로 사용
+  if (basic.concern) return basic.concern;
+
+  // 설문으로 문장 자동 생성 (fallback)
+  const r = step2?.responses || {};
+  const parts = [];
+  if (r.q6) parts.push(`[관계] ${r.q6}`);
+  if (r.q8) parts.push(`[성향] ${r.q8}`);
+  if (r.q9?.length) parts.push(`[갈등] ${r.q9.join(', ')}`);
+  if (r.q10) parts.push(`[목표] ${r.q10}`);
+  return parts.length ? parts.join(' / ') : '관계 분석을 요청합니다';
+}
+
+// ✅ 4) 제출(POST) – 로딩표시/오류표시 포함
+async function submitAnalysis() {
+  console.log('[DM] Step 2 제출 시작...');
+
+  try {
+    // 1) 수집
+    const basic = collectBasicForm();
+    const step2 = collectStep2(); // 없으면 비워둬도 됨
+
+    // 2) wish 생성 (필수)
+    const wish = buildWish(basic, step2);
+    console.log('[DM] buildWish 결과:', wish);
+
+    if (!wish || !wish.trim()) {
+      console.warn('[DM] wish가 비어있음!');
+      alert('현재 고민(또는 자동 생성된 분석 문장)이 비어 있습니다. 내용을 입력해 주세요.');
+      return;
+    }
+
+    // (선택) 최신 입력을 저장 → 결과페이지에서 fallback 용
+    const latestPayload = { basic, step2, wish, ts: Date.now() };
+    try { localStorage.setItem('dm_latest_input', JSON.stringify(latestPayload)); } catch (_) {}
+
+    // 3) 로딩 표시 (페이지에 overlay가 있다면 토글)
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) overlay.style.display = 'flex';
+
+    // 4) 서버 호출용 payload 준비
+    const payload = {
+      userInput: {
+        wish,
+        name: basic.name || undefined,
+        birth: basic.birth || undefined,
+        form: step2 || undefined
+      }
+    };
+
+    console.log('[DM] Step 2 제출 - Payload:', payload);
+
+    // 5) 서버 호출 (상대경로!)
+    const res = await fetch('/api/daily-miracles/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json().catch(() => ({}));
+    console.log('[DM] API 응답 - Status:', res.status, 'Data:', data);
+
+    if (!res.ok) {
+      // 400 등 클라이언트 오류도 친근하게 안내
+      const msg = data?.error || data?.message || `요청이 실패했습니다 (${res.status})`;
+      console.error('[DM] API 에러:', { status: res.status, error: data });
+      alert(`분석 중 오류가 발생했습니다: ${msg}`);
+      return;
+    }
+
+    // 6) 성공 처리: redirectUrl 우선 → 없으면 결과 페이지 기본값
+    const target = data.redirectUrl || '/daily-miracles-result.html#latest';
+    console.log('[DM] 리다이렉트:', target);
+    window.location.href = target;
+
+  } catch (err) {
+    console.error('[DM] submitAnalysis error:', err);
+    alert('분석 요청 중 예기치 못한 오류가 발생했습니다.');
+  } finally {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) overlay.style.display = 'none';
+  }
+}
+
+// ✅ 5) 버튼 연결 (HTML에 버튼 id가 있다면 즉시 연결)
+(function wireupSubmit() {
+  const btn = document.getElementById('analyze-btn')    // “분석 시작” 버튼 id
+           || document.querySelector('[data-action="analyze"]');
+  if (btn) {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      submitAnalysis();
+    });
+  }
+  // 콘솔에서도 직접 테스트 가능하도록 노출
+  if (typeof window !== 'undefined') window.dmSubmit = submitAnalysis;
+})();
