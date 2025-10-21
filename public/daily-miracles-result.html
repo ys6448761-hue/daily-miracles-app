@@ -509,11 +509,15 @@
         const response = await fetch('/api/story/latest');
 
         if (response.ok) {
-          const data = await response.json();
-          console.log('✅ API에서 최신 결과 로드:', data);
+          let data = await response.json();
+          console.log('[DM] Raw API response:', data);
 
-          // API 응답 구조 변환 (필요시)
-          if (data.result) {
+          // ✅ API 응답 구조 변환: { success, story } → { userProfile, ... }
+          if (data.story || data.success) {
+            const transformedData = transformApiResponse(data);
+            console.log('[DM] Transformed data:', transformedData);
+            resultData = transformedData;
+          } else if (data.result) {
             resultData = data.result;
           } else {
             resultData = data;
@@ -531,10 +535,88 @@
           renderResults(resultData);
         }
       } catch (error) {
-        console.error('❌ Error loading results:', error);
+        console.error('[DM-ERROR] Error loading results:', error);
         showErrorPage(error);
       }
     })();
+
+    // ✅ API 응답 구조 변환 함수
+    function transformApiResponse(data) {
+      console.log('[DM] Transforming API response...');
+
+      // 기본 구조 생성
+      const result = {
+        userProfile: {
+          name: 'Guest',
+          birth: '',
+          concern: '',
+          personality: {
+            color: '알 수 없음',
+            energySource: '알 수 없음',
+            peakTime: '알 수 없음'
+          },
+          fiveElements: {
+            primaryElement: '알 수 없음'
+          },
+          summary: ''
+        },
+        counterpartyProfile: null,
+        relationshipAnalysis: null,
+        consulting: {},
+        actionPlan: {},
+        story: '',
+        images: [],
+        executionTime: 0,
+        workflowId: ''
+      };
+
+      // story.input에서 사용자 정보 추출
+      if (data.story?.input) {
+        result.userProfile.name = data.story.input.name || data.userInput?.name || 'Guest';
+        result.userProfile.birth = data.story.input.birth || data.userInput?.birth || '';
+        result.userProfile.concern = data.story.input.wish || data.userInput?.wish || '';
+      }
+
+      // userInput에서 직접 추출 (폴백)
+      if (data.userInput) {
+        result.userProfile.name = data.userInput.name || result.userProfile.name;
+        result.userProfile.birth = data.userInput.birth || result.userProfile.birth;
+        result.userProfile.concern = data.userInput.wish || result.userProfile.concern;
+      }
+
+      // story 정보
+      if (data.story) {
+        result.story = data.story.summary || data.story.fullStory || JSON.stringify(data.story);
+        result.images = data.story.images || data.images || [];
+        result.executionTime = data.story.executionTime || data.executionTime || 0;
+        result.workflowId = data.story.workflowId || data.workflowId || '';
+
+        // 기본 summary 설정
+        result.userProfile.summary = data.story.summary || result.userProfile.concern || '';
+      }
+
+      // 상대방 정보 (있는 경우)
+      if (data.story?.counterparty || data.userInput?.counterparty) {
+        const counterparty = data.story?.counterparty || data.userInput?.counterparty;
+        result.counterpartyProfile = {
+          exists: true,
+          birth: counterparty.birth || counterparty.estimate || '',
+          relationshipType: '알 수 없음',
+          personality: {
+            description: '알 수 없음'
+          },
+          fiveElements: {
+            primaryElement: '알 수 없음'
+          },
+          conflicts: {
+            mainIssue: '정보 없음'
+          }
+        };
+      }
+
+      console.log('[DM] Transformation complete:', result);
+      return result;
+    }
 
     function showErrorPage(error) {
       document.getElementById('app').innerHTML = `
@@ -563,36 +645,55 @@
     }
 
     function renderResults(data) {
-      const { userProfile, counterpartyProfile, relationshipAnalysis, consulting, actionPlan } = data;
+      console.log('[DM] renderResults called with:', data);
+
+      // ✅ 방어 코드 추가
+      if (!data) {
+        throw new Error('렌더링할 데이터가 없습니다');
+      }
+
+      const userProfile = data.userProfile || {};
+      const counterpartyProfile = data.counterpartyProfile;
+      const relationshipAnalysis = data.relationshipAnalysis;
+      const consulting = data.consulting || {};
+      const actionPlan = data.actionPlan || {};
 
       const hasRelationship = counterpartyProfile && counterpartyProfile.exists;
+
+      // 안전한 값 추출
+      const name = userProfile.name || 'Guest';
+      const personality = userProfile.personality || {};
+      const fiveElements = userProfile.fiveElements || {};
+      const summary = userProfile.summary || userProfile.concern || data.story || '분석 결과';
+
+      console.log('[DM] Extracted values:', { name, personality, fiveElements, summary });
 
       let html = '';
 
       // 1. 사용자 프로필
       html += `
         <div class="profile-card">
-          <h2>👤 ${userProfile.name}님의 프로필</h2>
+          <h2>👤 ${name}님의 프로필</h2>
           <div class="profile-info">
             <div class="info-item">
               <div class="info-label">색깔 성향</div>
-              <div class="info-value">${userProfile.personality.color}</div>
+              <div class="info-value">${personality.color || '알 수 없음'}</div>
             </div>
             <div class="info-item">
               <div class="info-label">패턴</div>
-              <div class="info-value">${userProfile.fiveElements.primaryElement} 패턴</div>
+              <div class="info-value">${fiveElements.primaryElement || '알 수 없음'} 패턴</div>
             </div>
             <div class="info-item">
               <div class="info-label">에너지 출처</div>
-              <div class="info-value">${userProfile.personality.energySource}</div>
+              <div class="info-value">${personality.energySource || '알 수 없음'}</div>
             </div>
             <div class="info-item">
               <div class="info-label">황금시간</div>
-              <div class="info-value">${userProfile.personality.peakTime}</div>
+              <div class="info-value">${personality.peakTime || '알 수 없음'}</div>
             </div>
           </div>
           <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 10px;">
-            <p style="color: #666; line-height: 1.6;">${userProfile.summary}</p>
+            <p style="color: #666; line-height: 1.6;">${summary}</p>
           </div>
         </div>
       `;
@@ -633,59 +734,80 @@
       }
 
       // 3. 섹션 1: 8단계 컨설팅 (세로 배치)
-      html += '<div class="section-header">📋 8단계 컨설팅</div>';
-      html += '<div class="section-content">';
-      Object.keys(consulting).forEach(key => {
-        const step = consulting[key];
-        html += `
-          <div class="accordion" onclick="toggleAccordion(this)">
-            <div class="accordion-header">
-              <h3>${step.title}</h3>
-              <span class="accordion-icon">▼</span>
-            </div>
-            <div class="accordion-body">
-              <div class="accordion-content">
-                <p style="color: #666; line-height: 1.6; margin-bottom: 15px;">${step.content}</p>
-                <ul class="action-items">
-                  ${step.actionItems.map(item => `<li>${item}</li>`).join('')}
-                </ul>
+      if (consulting && Object.keys(consulting).length > 0) {
+        html += '<div class="section-header">📋 8단계 컨설팅</div>';
+        html += '<div class="section-content">';
+        Object.keys(consulting).forEach(key => {
+          const step = consulting[key] || {};
+          html += `
+            <div class="accordion" onclick="toggleAccordion(this)">
+              <div class="accordion-header">
+                <h3>${step.title || '단계 ' + key}</h3>
+                <span class="accordion-icon">▼</span>
               </div>
+              <div class="accordion-body">
+                <div class="accordion-content">
+                  <p style="color: #666; line-height: 1.6; margin-bottom: 15px;">${step.content || ''}</p>
+                  <ul class="action-items">
+                    ${(step.actionItems || []).map(item => `<li>${item}</li>`).join('')}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+      } else {
+        // ✅ 컨설팅 데이터가 없는 경우 기본 메시지
+        html += `
+          <div class="section-header">📋 분석 결과</div>
+          <div class="section-content">
+            <div class="profile-card">
+              <p style="color: #666; line-height: 1.6;">
+                ${summary}
+              </p>
+              <p style="color: #999; margin-top: 15px; font-size: 14px;">
+                상세 분석 결과는 현재 준비 중입니다.
+              </p>
             </div>
           </div>
         `;
-      });
-      html += '</div>';
+      }
 
       // 4. 섹션 2: 4주차 액션 플랜 (세로 배치)
-      html += '<div class="section-header">📅 4주차 액션 플랜</div>';
-      html += '<div class="section-content">';
-      ['week1', 'week2', 'week3', 'week4'].forEach(weekKey => {
-        const week = actionPlan[weekKey];
-        html += `
-          <div class="week-plan">
-            <div class="week-header">
-              <div>
-                <div class="week-title">${weekKey.toUpperCase()}: ${week.theme}</div>
-                <div class="week-theme">${week.focus}</div>
+      if (actionPlan && Object.keys(actionPlan).length > 0) {
+        html += '<div class="section-header">📅 4주차 액션 플랜</div>';
+        html += '<div class="section-content">';
+        ['week1', 'week2', 'week3', 'week4'].forEach(weekKey => {
+          const week = actionPlan[weekKey];
+          if (week) {
+            html += `
+              <div class="week-plan">
+                <div class="week-header">
+                  <div>
+                    <div class="week-title">${weekKey.toUpperCase()}: ${week.theme || '주차 계획'}</div>
+                    <div class="week-theme">${week.focus || ''}</div>
+                  </div>
+                </div>
+                ${(week.dailyActions || []).map(action => `
+                  <div class="daily-action">
+                    <span class="day-label">Day ${action.day || '?'}</span>
+                    <span class="task-text">${action.task || ''}</span>
+                    <span class="duration">${action.duration || ''}</span>
+                  </div>
+                `).join('')}
+                <div class="checkpoints">
+                  <div class="checkpoint-title">✓ 주차 체크포인트</div>
+                  <ul class="checkpoint-list">
+                    ${(week.checkpoints || []).map(cp => `<li>${cp}</li>`).join('')}
+                  </ul>
+                </div>
               </div>
-            </div>
-            ${week.dailyActions.map(action => `
-              <div class="daily-action">
-                <span class="day-label">Day ${action.day}</span>
-                <span class="task-text">${action.task}</span>
-                <span class="duration">${action.duration}</span>
-              </div>
-            `).join('')}
-            <div class="checkpoints">
-              <div class="checkpoint-title">✓ 주차 체크포인트</div>
-              <ul class="checkpoint-list">
-                ${week.checkpoints.map(cp => `<li>${cp}</li>`).join('')}
-              </ul>
-            </div>
-          </div>
-        `;
-      });
-      html += '</div>';
+            `;
+          }
+        });
+        html += '</div>';
+      }
 
       // 5. 섹션 3: 관계 분석 (조건부, 세로 배치)
       if (hasRelationship && relationshipAnalysis) {
