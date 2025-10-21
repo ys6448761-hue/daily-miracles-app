@@ -6,6 +6,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const analysisEngine = require("./services/analysisEngine");
 
 const app = express();
 
@@ -106,6 +107,8 @@ function extractUserInput(body) {
 
 // ---------- Core handler (analyze/create 공용) ----------
 async function coreAnalyzeHandler(req, res) {
+  const startTime = Date.now();
+
   try {
     const { data, wish } = extractUserInput(req.body);
 
@@ -121,18 +124,54 @@ async function coreAnalyzeHandler(req, res) {
 
     console.log("🎯 analyze called via:", req.path);
     console.log("📥 wish:", wish);
+    console.log("🔍 Starting analysis engine...");
 
-    // (오케스트레이터 비활성화 상태) – 목업 응답
+    // ✅ 실제 분석 엔진 호출
+    const userProfile = analysisEngine.analyzeUserProfile(data);
+    console.log("✅ User profile analyzed - miracleIndex:", userProfile.miracleIndex);
+
+    const counterpartyProfile = analysisEngine.generateCounterpartyProfile(req.body);
+    console.log("✅ Counterparty profile:", counterpartyProfile ? "generated" : "skipped (no counterparty)");
+
+    const relationshipAnalysis = counterpartyProfile
+      ? analysisEngine.analyzeRelationship(userProfile, counterpartyProfile)
+      : null;
+    console.log("✅ Relationship analysis:", relationshipAnalysis ? "completed" : "skipped");
+
+    const consulting8Steps = analysisEngine.generate8StepsConsulting(userProfile, relationshipAnalysis);
+    console.log("✅ 8-step consulting generated");
+
+    const actionPlan = analysisEngine.generateActionPlan(userProfile);
+    console.log("✅ 4-week action plan generated");
+
+    const warningSignals = relationshipAnalysis
+      ? analysisEngine.detectWarningSignals(relationshipAnalysis)
+      : [];
+    console.log("✅ Warning signals detected:", warningSignals.length);
+
+    const executionTime = Date.now() - startTime;
+
     const result = {
       success: true,
       redirectUrl: "/daily-miracles-result.html#latest",
-      story: { summary: `분석 완료: ${wish}`, input: data },
+      story: {
+        summary: `${userProfile.name}님의 분석이 완료되었습니다`,
+        input: data,
+        userProfile,
+        counterpartyProfile,
+        relationshipAnalysis,
+        consulting8Steps,
+        actionPlan,
+        warningSignals
+      },
       images: [],
-      executionTime: 0,
-      workflowId: "mock-" + Date.now()
+      executionTime,
+      workflowId: "analysis-" + Date.now()
     };
 
     global.latestStore.story = result;
+    console.log(`✅ Analysis completed in ${executionTime}ms`);
+
     return res.status(200).json(result);
   } catch (err) {
     console.error("💥 coreAnalyzeHandler error:", err);
