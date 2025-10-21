@@ -1,0 +1,44 @@
+name: Deploy Health Check
+
+on:
+  # Run after push to main (assuming this triggers Render deploy)
+  push:
+    branches: [ main ]
+
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      render_url:
+        description: 'Render service URL to test'
+        required: true
+        default: 'https://miracle-of-each-day.onrender.com'
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Wait for Render deployment
+        run: |
+          echo "⏳ Waiting 120 seconds for Render deployment to complete..."
+          sleep 120
+
+      - name: Run health check
+        env:
+          RENDER_EXTERNAL_URL: ${{ github.event.inputs.render_url || 'https://miracle-of-each-day.onrender.com' }}
+        run: |
+          node scripts/health-check.js "$RENDER_EXTERNAL_URL"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Deployment health check failed!"
+          echo "Please check Render logs at https://dashboard.render.com"
