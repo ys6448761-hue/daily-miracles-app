@@ -939,6 +939,8 @@
 
     // 폼 제출
     async function submitForm() {
+      console.log('[DM-CRITICAL] Step 2 Submit Started');
+
       // Section 1 검증
       if (!validateSection1()) {
         alert('기본 정보를 먼저 입력해주세요.');
@@ -976,38 +978,45 @@
 
       // 데이터 수집
       const formData = collectFormData();
+      console.log('[DM] Payload to send:', JSON.stringify(formData));
 
       // 로딩 표시
       document.getElementById('loadingOverlay').classList.add('active');
 
       try {
-        // API 호출 (TODO: 실제 API 엔드포인트 연결)
+        // API 호출
         const response = await fetch('/api/daily-miracles/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
         });
 
+        console.log('[DM] Response status:', response.status);
+
         const result = await response.json();
+        console.log('[DM] Response data:', result);
 
         // 로딩 숨김
         document.getElementById('loadingOverlay').classList.remove('active');
 
-        if (result.success) {
+        if (response.ok && result.success) {
           // 결과를 localStorage에 저장
-          localStorage.setItem('dailyMiraclesResult', JSON.stringify(result.data));
+          localStorage.setItem('dailyMiraclesResult', JSON.stringify(result));
           // 결과 페이지로 리디렉션
-          window.location.href = '/daily-miracles-result.html';
+          const redirectUrl = result.redirectUrl || '/daily-miracles-result.html';
+          console.log('[DM] Redirecting to:', redirectUrl);
+          window.location.href = redirectUrl;
         } else {
-          alert('분석 중 오류가 발생했습니다: ' + (result.error || '알 수 없는 오류'));
+          console.error('[DM-ERROR] API Error:', result);
+          alert('분석 중 오류가 발생했습니다: ' + (result.error || result.message || '알 수 없는 오류'));
         }
 
       } catch (error) {
+        console.error('[DM-ERROR] Fetch failed:', error);
         document.getElementById('loadingOverlay').classList.remove('active');
 
         // 에러 유형에 따른 메시지 표시
         showErrorDialog(error);
-        console.error('Error:', error);
       }
     }
 
@@ -1083,53 +1092,65 @@
 
     // 폼 데이터 수집
     function collectFormData() {
+      // ✅ Step 1 데이터 수집
+      const name = document.getElementById('userName').value.trim();
+      const birth = document.getElementById('userBirth').value;
+      const concern = document.getElementById('userConcern').value.trim();
+
+      console.log('[DM-CRITICAL] collectFormData - concern:', concern);
+
+      // ✅ Step 2 응답 수집
+      const responses = {
+        q1: document.querySelector('input[name="q1"]:checked').value,
+        q2: document.querySelector('input[name="q2"]:checked').value,
+        q3: document.querySelector('input[name="q3"]:checked').value,
+        q4: document.querySelector('input[name="q4"]:checked').value,
+        q5: document.querySelector('input[name="q5"]:checked').value,
+        q6: document.querySelector('input[name="q6"]:checked').value
+      };
+
+      // ✅ 서버가 요구하는 형식으로 변환: { userInput: { wish: ... } }
       const data = {
-        user: {
-          name: document.getElementById('userName').value.trim(),
-          birth: document.getElementById('userBirth').value,
-          concern: document.getElementById('userConcern').value.trim()
-        },
-        responses: {
-          q1: document.querySelector('input[name="q1"]:checked').value,
-          q2: document.querySelector('input[name="q2"]:checked').value,
-          q3: document.querySelector('input[name="q3"]:checked').value,
-          q4: document.querySelector('input[name="q4"]:checked').value,
-          q5: document.querySelector('input[name="q5"]:checked').value,
-          q6: document.querySelector('input[name="q6"]:checked').value
+        userInput: {
+          wish: concern,  // ← concern → wish 변환!
+          name: name,
+          birth: birth,
+          responses: responses
         }
       };
 
       // Q6가 "혼자만의 문제"가 아니면 Q7-Q12 추가
-      if (data.responses.q6 !== '혼자만의 문제') {
+      if (data.userInput.responses.q6 !== '혼자만의 문제') {
         const q7 = document.querySelector('input[name="q7"]:checked');
-        data.responses.q7 = q7 ? q7.value : null;
+        data.userInput.responses.q7 = q7 ? q7.value : null;
 
         if (q7 && q7.value === '정확히 알고 있다') {
-          data.counterparty = {
+          data.userInput.counterparty = {
             birth: document.getElementById('counterpartyBirth').value
           };
         } else if (q7 && q7.value === '대략 알고 있다') {
-          data.counterparty = {
+          data.userInput.counterparty = {
             estimate: document.getElementById('counterpartyEstimate').value.trim()
           };
         }
 
         const q8 = document.querySelector('input[name="q8"]:checked');
-        data.responses.q8 = q8 ? q8.value : null;
+        data.userInput.responses.q8 = q8 ? q8.value : null;
 
         const q9 = Array.from(document.querySelectorAll('input[name="q9"]:checked')).map(cb => cb.value);
-        data.responses.q9 = q9;
+        data.userInput.responses.q9 = q9;
 
         const q10 = document.querySelector('input[name="q10"]:checked');
-        data.responses.q10 = q10 ? q10.value : null;
+        data.userInput.responses.q10 = q10 ? q10.value : null;
 
         const q11 = document.querySelector('input[name="q11"]:checked');
-        data.responses.q11 = q11 ? q11.value : null;
+        data.userInput.responses.q11 = q11 ? q11.value : null;
 
         const q12 = document.querySelector('input[name="q12"]:checked');
-        data.responses.q12 = q12 ? q12.value : null;
+        data.userInput.responses.q12 = q12 ? q12.value : null;
       }
 
+      console.log('[DM] Final data structure:', JSON.stringify(data, null, 2));
       return data;
     }
 
