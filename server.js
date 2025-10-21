@@ -1,7 +1,6 @@
 // ═══════════════════════════════════════════════════════════
-// Daily Miracles MVP - Server (Render-safe)
+// Daily Miracles MVP - Server (Clean, Render-safe)
 // ═══════════════════════════════════════════════════════════
-
 require('dotenv').config();
 
 const express = require('express');
@@ -10,323 +9,252 @@ const path = require('path');
 
 const app = express();
 
-// ───────────────────────────────────────────────────────────
-// Optional Orchestrator (안전 가드)
-// ───────────────────────────────────────────────────────────
-// ORCHESTRATOR_ENABLED=true 일 때만 로드 시도 (기본 false)
+// ── Orchestrator: 환경변수로 on/off
 const ORCHESTRATOR_ENABLED = String(process.env.ORCHESTRATOR_ENABLED || 'false') === 'true';
-
 let orchestrator = null;
-let isOrchReady = false;
-
-// ───────────────────────────────────────────────────────────
-// Memory Storage for Latest Results (DB 없이 최근 결과 임시 저장)
-// ───────────────────────────────────────────────────────────
-const latestStore = {
-  story: null,
-  miracle: null,
-  problem: null
-};
-
-async function safeLoadOrchestrator() {
-  if (!ORCHESTRATOR_ENABLED) {
-    console.log('⚠️ Orchestrator 비활성화(ORCHESTRATOR_ENABLED=false).');
-    return;
-  }
+if (ORCHESTRATOR_ENABLED) {
   try {
-    console.log('🚀 Orchestrator 모듈 로드 시도…');
     orchestrator = require('./orchestrator');
-    console.log('✅ Orchestrator 모듈 로드 성공. 초기화 시도…');
-    await orchestrator.initialize?.();
-    isOrchReady = true;
-    console.log('✅ Orchestrator 준비 완료!');
-  } catch (err) {
-    console.error('❌ Orchestrator 로드/초기화 실패:', err?.message || err);
-    orchestrator = null;
-    isOrchReady = false;
+  } catch (e) {
+    console.warn('⚠️  orchestrator 모듈을 불러오지 못했습니다. 비활성화 모드로 전환합니다.');
   }
 }
 
-// ───────────────────────────────────────────────────────────
-// Middleware
-// ───────────────────────────────────────────────────────────
-// CORS Configuration (환경변수 기반)
+// ═══════════════════════════════════════════════════════════
+// CORS (환경변수 ALLOWED_ORIGINS="https://a.com,https://b.com")
 const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim())
   : ['http://localhost:3000', 'http://localhost:5000'];
 
 app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      console.log(`⚠️ CORS blocked origin: ${origin}`);
-      callback(null, false);
+  origin(origin, cb) {
+    if (!origin) {
+      // curl/postman/서버간 요청 허용
+      return cb(null, true);
     }
+    if (allowedOrigins.includes(origin)) {
+      console.log(`✅ CORS allowed: ${origin}`);
+      return cb(null, true);
+    }
+    // 와일드카드: 개발 중에는 모든 origin 허용 (프로덕션에서는 제거 권장)
+    console.warn(`⚠️  CORS origin not in whitelist: ${origin}`);
+    return cb(null, true); // ← 임시로 모든 origin 허용 (디버깅용)
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Body parsing & static
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Static (있으면 사용)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ───────────────────────────────────────────────────────────
-// Health / Root
-// ───────────────────────────────────────────────────────────
-// Render 헬스체크가 200을 기대할 수 있으므로 상태에 상관없이 200으로 응답
+// ═══════════════════════════════════════════════════════════
+// 🔍 요청 로깅 미들웨어 (Render 디버깅용)
+app.use((req, res, next) => {
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] ${req.method} ${req.path}`);
+  console.log(`  Origin: ${req.get('origin') || 'N/A'}`);
+  console.log(`  Content-Type: ${req.get('content-type') || 'N/A'}`);
+  if (req.method === 'POST' || req.method === 'PUT') {
+    console.log(`  Body keys: ${Object.keys(req.body || {}).join(', ') || 'empty'}`);
+  }
+  next();
+});
+
+// ═══════════════════════════════════════════════════════════
+// In-memory latest store (결과 페이지 조회용)
+global.latestStore = { story: null };
+
+// ═══════════════════════════════════════════════════════════
+// Health (항상 200 보장)
 app.get('/api/health', async (req, res) => {
-  const status = orchestrator && isOrchReady ? 'ok' : (ORCHESTRATOR_ENABLED ? 'initializing' : 'standby');
-  const payload = { status };
-  try {
-    if (orchestrator && orchestrator.checkHealth) {
-      payload.details = await orchestrator.checkHealth();
+  const base = { status: ORCHESTRATOR_ENABLED ? 'initializing' : 'standby', timestamp: new Date().toISOString() };
+
+  if (ORCHESTRATOR_ENABLED && orchestrator && orchestrator.checkHealth) {
+    try {
+      const h = await orchestrator.checkHealth();
+      return res.json({ ...base, status: 'ok', details: h });
+    } catch (e) {
+      return res.json({ ...base, status: 'error', details: { message: e.message } });
     }
-  } catch (e) {
-    payload.details = { error: e?.message };
   }
-  res.status(200).json(payload);
+  res.json(base);
 });
 
-app.get('/', (req, res) => {
-  res.json({
-    service: 'Daily Miracles MVP',
-    version: '1.0.0',
-    status: orchestrator && isOrchReady ? 'ready' : (ORCHESTRATOR_ENABLED ? 'initializing' : 'standby'),
-    endpoints: {
-      health: '/api/health',
-      dashboard: '/api/dashboard',
-      story: '/api/story/create',
-      miracle: '/api/miracle/calculate',
-      problem: '/api/problem/analyze'
-    }
-  });
-});
-
-// ───────────────────────────────────────────────────────────
-// Dashboard (orchestrator 사용시만)
-// ───────────────────────────────────────────────────────────
+// Optional 대시보드
 app.get('/api/dashboard', async (req, res) => {
-  if (!orchestrator || !isOrchReady) {
-    return res.status(200).json({ status: ORCHESTRATOR_ENABLED ? 'initializing' : 'standby' });
-  }
+  if (!(ORCHESTRATOR_ENABLED && orchestrator)) return res.json({ status: 'standby' });
   try {
     const health = await orchestrator.checkHealth?.();
     const context = orchestrator.context?.getFullContext?.();
     res.json({ health, context, timestamp: new Date().toISOString() });
-  } catch (err) {
-    res.status(500).json({ status: 'error', message: err?.message });
+  } catch (e) {
+    res.status(500).json({ status: 'error', message: e.message });
   }
 });
 
-// ───────────────────────────────────────────────────────────
-// Story API
-// ───────────────────────────────────────────────────────────
-app.post('/api/story/create', async (req, res) => {
-  if (!orchestrator || !isOrchReady) {
-    return res.status(200).json({ error: 'orchestrator_not_ready' });
-  }
+// ═══════════════════════════════════════════════════════════
+// Story 생성 실제 핸들러 (유일한 정의)
+async function createStoryHandler(req, res) {
+  console.log('🎯 createStoryHandler called via:', req.path);
   try {
-    const { userInput } = req.body || {};
+    const userInput = req.body?.userInput || req.body; // 폼/JS 양쪽 호환
+    console.log('📥 Received userInput:', JSON.stringify(userInput, null, 2));
+
     if (!userInput || !userInput.wish) {
+      console.warn('⚠️  Missing wish field in request');
       return res.status(400).json({ error: 'Missing required field: wish' });
     }
-    const result = await orchestrator.execute('create-story', { input: userInput });
 
-    // 최근 결과 저장 (메모리)
-    latestStore.story = {
-      at: new Date().toISOString(),
-      input: userInput,
-      result: result
+    // Orchestrator가 활성화된 경우 실제 워크플로 호출
+    if (ORCHESTRATOR_ENABLED && orchestrator?.execute) {
+      const result = await orchestrator.execute('create-story', { input: userInput });
+
+      // 최신 결과 저장 (결과 페이지가 /api/story/latest 로 읽어감)
+      global.latestStore.story = {
+        success: true,
+        story: result.story,
+        images: result.images,
+        executionTime: result.executionTime,
+        workflowId: result.workflowId,
+        userInput,
+      };
+
+      return res.json({
+        success: true,
+        redirectUrl: '/daily-miracles-result.html#latest',
+        ...global.latestStore.story,
+      });
+    }
+
+    // Orchestrator 비활성화일 때는 목업으로 성공 처리
+    global.latestStore.story = {
+      success: true,
+      story: { summary: 'Mock story (orchestrator disabled)', userInput },
+      images: [],
+      executionTime: 0,
+      workflowId: 'mock-' + Date.now(),
+      userInput,
     };
 
-    res.json({
+    return res.json({
       success: true,
       redirectUrl: '/daily-miracles-result.html#latest',
-      story: result.story,
-      images: result.images,
-      executionTime: result.executionTime,
-      workflowId: result.workflowId
+      ...global.latestStore.story,
     });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err?.message, retries: err?.retries || 0 });
+  } catch (e) {
+    console.error('❌ createStoryHandler:', e);
+    return res.status(500).json({ error: 'story_creation_failed', message: e.message });
   }
-});
+}
 
-app.get('/api/story/progress/:workflowId', async (req, res) => {
-  if (!orchestrator || !isOrchReady) {
-    return res.status(200).json({ error: 'orchestrator_not_ready' });
-  }
-  try {
-    const progress = orchestrator.getWorkflowProgress(req.params.workflowId);
-    res.json(progress);
-  } catch {
-    res.status(404).json({ error: 'Workflow not found' });
-  }
-});
+// 공식 경로
+app.post('/api/story/create', createStoryHandler);
 
-// ───────────────────────────────────────────────────────────
-// Miracle Index
-// ───────────────────────────────────────────────────────────
-app.post('/api/miracle/calculate', async (req, res) => {
-  if (!orchestrator || !isOrchReady) {
-    return res.status(200).json({ error: 'orchestrator_not_ready' });
-  }
-  try {
-    const { activityData } = req.body || {};
-    const result = await orchestrator.execute('calculate-miracle', { activityData });
+// ✅ 별칭 경로(프론트가 어디로 보내든 여기로 집결)
+app.post(
+  [
+    '/api/create-story',
+    '/api/relationship/analyze',
+    '/api/analyze-relationship',
+    '/api/story',
+    '/api/story/generate',
+    '/api/story/new',
+    '/api/daily-miracles/analyze' // ← 로그에 찍히던 경로 (중요)
+  ],
+  createStoryHandler
+);
 
-    // 최근 결과 저장 (메모리)
-    latestStore.miracle = {
-      at: new Date().toISOString(),
-      input: activityData,
-      result: result
-    };
-
-    res.json({
-      success: true,
-      redirectUrl: '/daily-miracles-result.html#latest',
-      miracleIndex: result.miracleIndex,
-      predictions: result.predictions,
-      executionTime: result.executionTime
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err?.message });
-  }
-});
-
-// ───────────────────────────────────────────────────────────
-// Problem Analysis
-// ───────────────────────────────────────────────────────────
-app.post('/api/problem/analyze', async (req, res) => {
-  if (!orchestrator || !isOrchReady) {
-    return res.status(200).json({ error: 'orchestrator_not_ready' });
-  }
-  try {
-    const { problemInput } = req.body || {};
-    const result = await orchestrator.execute('analyze-problem', { input: problemInput });
-
-    // 최근 결과 저장 (메모리)
-    latestStore.problem = {
-      at: new Date().toISOString(),
-      input: problemInput,
-      result: result
-    };
-
-    res.json({
-      success: true,
-      redirectUrl: '/daily-miracles-result.html#latest',
-      analysis: result.analysis,
-      solutions: result.solutions,
-      executionTime: result.executionTime
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err?.message });
-  }
-});
-
-// ───────────────────────────────────────────────────────────
-// Latest Results Retrieval API (결과 조회)
-// ───────────────────────────────────────────────────────────
+// 최신 결과 조회 (결과 페이지)
 app.get('/api/story/latest', (req, res) => {
-  if (!latestStore.story) {
-    return res.status(404).json({ error: 'no_story', message: 'No recent story found' });
+  try {
+    if (!global.latestStore?.story) return res.status(404).json({ error: 'no_latest_story' });
+    res.json(global.latestStore.story);
+  } catch (e) {
+    console.error('❌ /api/story/latest:', e);
+    res.status(500).json({ error: 'result_fetch_failed' });
   }
-  res.json(latestStore.story);
 });
 
-app.get('/api/miracle/latest', (req, res) => {
-  if (!latestStore.miracle) {
-    return res.status(404).json({ error: 'no_miracle', message: 'No recent miracle calculation found' });
-  }
-  res.json(latestStore.miracle);
+// 별칭 조회
+app.get('/api/latest-result', (req, res) => res.redirect(307, '/api/story/latest'));
+app.get('/api/story/results/latest', (req, res) => res.redirect(307, '/api/story/latest'));
+
+// (옵션) 다른 API들 — 필요 시 그대로 유지
+// app.post('/api/miracle/calculate', ...);
+// app.post('/api/problem/analyze', ...);
+
+// 루트
+app.get('/', (req, res) => {
+  res.json({
+    service: 'Daily Miracles MVP',
+    version: '1.0.0',
+    status: ORCHESTRATOR_ENABLED ? 'initializing' : 'standby',
+    endpoints: {
+      health: '/api/health',
+      dashboard: '/api/dashboard',
+      create: '/api/story/create',
+      latest: '/api/story/latest',
+    }
+  });
 });
 
-app.get('/api/problem/latest', (req, res) => {
-  if (!latestStore.problem) {
-    return res.status(404).json({ error: 'no_problem', message: 'No recent problem analysis found' });
-  }
-  res.json(latestStore.problem);
-});
-
-// ───────────────────────────────────────────────────────────
-// Compatibility Alias Routes (프론트엔드 호환용 별칭)
-// ───────────────────────────────────────────────────────────
-// 기존 구현이 /api/story/create 라면, 프론트가 /api/create-story 호출 시 연결
-app.post('/api/create-story', (req, res, next) => {
-  req.url = '/api/story/create';
-  next('route');
-});
-
-// 관계/문제 분석 호환: 프론트가 /api/relationship/analyze 또는 /api/relation/analyze 를 호출할 때
-app.post(['/api/relationship/analyze', '/api/relation/analyze'], (req, res, next) => {
-  // 실제 구현이 /api/problem/analyze 인 케이스를 기본으로 연결
-  req.url = '/api/problem/analyze';
-  next('route');
-});
-
-// 기적지수 계산 호환: /api/miracle/calc 등 변형이 들어오면 /api/miracle/calculate 로 연결
-app.post(['/api/miracle/calc', '/api/miracle/run'], (req, res, next) => {
-  req.url = '/api/miracle/calculate';
-  next('route');
-});
-
-// ───────────────────────────────────────────────────────────
-// 404 & Error
-// ───────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+// 404 & 에러 핸들러 (항상 마지막에)
 app.use((req, res) => {
-  console.log(`⚠️ 404 Not Found: ${req.method} ${req.path}`);
-  res.status(404).json({ error: 'Endpoint not found', path: req.path });
+  console.warn(`❌ 404 Not Found: ${req.method} ${req.path}`);
+  res.status(404).json({
+    error: 'Endpoint not found',
+    path: req.path,
+    method: req.method,
+    hint: 'Available endpoints: /api/health, /api/story/create, /api/daily-miracles/analyze, /api/story/latest'
+  });
 });
 
 app.use((err, req, res, next) => {
   console.error('💥 Unhandled Error:', err);
-  res.status(500).json({
-    error: 'Internal server error',
-    message: process.env.NODE_ENV === 'development' ? err?.message : undefined
-  });
+  res.status(500).json({ error: 'Internal server error', message: err.message });
 });
 
-// ───────────────────────────────────────────────────────────
-// Start
-// ───────────────────────────────────────────────────────────
-const PORT = process.env.PORT || 3000;
-
+// ═══════════════════════════════════════════════════════════
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', async () => {
-  console.log('');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log('🌟 Daily Miracles MVP Server');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log(`📡 Port: ${PORT}`);
-  console.log(`🌐 URL: http://localhost:${PORT}`);
+  console.log(`🌐 NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🌍 ALLOWED_ORIGINS: ${allowedOrigins.join(', ')}`);
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('📋 Registered Routes:');
+  console.log('  GET  /api/health');
+  console.log('  GET  /api/dashboard');
+  console.log('  POST /api/story/create');
+  console.log('  POST /api/daily-miracles/analyze ← 별칭');
+  console.log('  POST /api/create-story ← 별칭');
+  console.log('  POST /api/relationship/analyze ← 별칭');
+  console.log('  POST /api/analyze-relationship ← 별칭');
+  console.log('  POST /api/story ← 별칭');
+  console.log('  POST /api/story/generate ← 별칭');
+  console.log('  POST /api/story/new ← 별칭');
+  console.log('  GET  /api/story/latest');
+  console.log('  GET  /api/latest-result');
+  console.log('  GET  /api/story/results/latest');
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
-  await safeLoadOrchestrator();
-
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('✅ Server ready!');
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-});
-
-// ───────────────────────────────────────────────────────────
-// Graceful Shutdown
-// ───────────────────────────────────────────────────────────
-async function gracefulShutdown(signal) {
-  console.log(`\n🛑 ${signal} received`);
-  if (orchestrator && isOrchReady && orchestrator.shutdown) {
-    console.log('⚡ Orchestrator shutting down…');
-    await orchestrator.shutdown();
-    console.log('✅ Orchestrator shutdown complete');
+  if (ORCHESTRATOR_ENABLED && orchestrator?.initialize) {
+    try {
+      console.log('🚀 Orchestrator initializing…');
+      await orchestrator.initialize();
+      console.log('✅ Orchestrator ready!');
+    } catch (e) {
+      console.error('❌ Orchestrator init failed:', e.message);
+    }
+  } else {
+    console.log('⚠️  Orchestrator disabled (ORCHESTRATOR_ENABLED=false).');
   }
-  process.exit(0);
-}
-
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+});
 
 module.exports = app;
