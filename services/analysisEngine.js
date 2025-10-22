@@ -605,6 +605,25 @@ function generateInsights(personality, concerns, miracleIndex) {
 }
 
 // ---------- 프로필 상세 설명 생성 ----------
+/**
+ * 🔥 CRITICAL: 사용자 프로필 상세 설명 생성
+ *
+ * 이 함수는 결과 페이지(daily-miracles-result.html)에서 사용자에게 보여지는
+ * 프로필 상세 설명을 생성합니다.
+ *
+ * 반드시 포함되어야 할 요소:
+ * - 색깔 특성 (예: "빨강색 성향으로 열정적, 활동적, 추진력한")
+ * - 오행 패턴 (예: "토 패턴 그룹에 속하며")
+ * - 에너지 소스 (예: "사람들과의 만남에서 에너지를 얻는 편입니다")
+ *
+ * ⚠️ 이 함수를 제거하거나 반환값을 변경하면 사용자는 "알 수 없음"만 보게 됩니다.
+ *
+ * @param {string} name - 사용자 이름
+ * @param {string[]} colors - 색깔 배열 (예: ["빨강"])
+ * @param {string} elementKey - 오행 키 (fire/water/wood/earth/metal)
+ * @param {string} personality - 성격 설명
+ * @returns {string} 프로필 상세 설명 텍스트
+ */
 function generateProfileDescription(name, colors, elementKey, personality) {
   const colorName = colors[0] || '알 수 없음';
   const elementName = FIVE_ELEMENTS[elementKey]?.name || '알 수 없음';
@@ -722,6 +741,23 @@ function extractCounterpartyChallenges(characteristics) {
 }
 
 // ---------- 오행 상성 계산 ----------
+/**
+ * 🔥 CRITICAL: 오행 궁합 계산 (관계 분석)
+ *
+ * 이 함수는 두 사람의 오행 패턴을 비교하여 관계 궁합을 분석합니다.
+ *
+ * 반드시 포함되어야 할 요소:
+ * - type: 관계 유형 (동일 패턴, 상생 관계, 상극 관계 등)
+ * - score: 궁합 점수 (0-100)
+ * - description: 간단한 설명
+ * - detailedDescription: 통계 정보를 포함한 상세 설명 🔥 필수!
+ *
+ * ⚠️ detailedDescription이 없으면 결과 페이지에서 통계 정보가 표시되지 않습니다.
+ *
+ * @param {string} element1 - 첫 번째 사람의 오행 (fire/water/wood/earth/metal)
+ * @param {string} element2 - 두 번째 사람의 오행 (fire/water/wood/earth/metal)
+ * @returns {Object} { type, score, description, detailedDescription }
+ */
 function calculateElementCompatibility(element1, element2) {
   if (element1 === element2) {
     return {
@@ -776,6 +812,21 @@ function calculateElementCompatibility(element1, element2) {
 }
 
 // ---------- 색상 조화도 계산 ----------
+/**
+ * 🔥 CRITICAL: 색깔 궁합 계산 (관계 분석)
+ *
+ * 이 함수는 두 사람의 색깔 성향을 비교하여 관계 궁합을 분석합니다.
+ *
+ * 반드시 포함되어야 할 요소:
+ * - type: 관계 유형 (동일 성향, 보색 관계, 유사 성향 등)
+ * - message: 궁합에 대한 설명 메시지 🔥 필수!
+ *
+ * ⚠️ message가 없으면 결과 페이지에서 색깔 궁합 설명이 표시되지 않습니다.
+ *
+ * @param {string[]} colors1 - 첫 번째 사람의 색깔 배열 (예: ["빨강"])
+ * @param {string[]} colors2 - 두 번째 사람의 색깔 배열 (예: ["파랑"])
+ * @returns {Object} { type, message }
+ */
 function calculateColorCompatibility(colors1, colors2) {
   // 공통 색상 있으면 높은 점수
   const commonColors = colors1.filter(c => colors2.includes(c));
