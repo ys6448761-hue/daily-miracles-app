@@ -644,7 +644,7 @@ function calculateMiracleIndex(wish, responses, concerns) {
   timing = Math.min(20, timing);
 
   // 최종 기적지수 계산
-  const miracleIndex = Math.round((currentSituation + improvementPotential + luck + effort + timing) / 5);
+  const calculatedIndex = Math.round((currentSituation + improvementPotential + luck + effort + timing) / 5);
 
   console.log('[MiracleIndex] 계산 상세:', {
     currentSituation,
@@ -652,10 +652,15 @@ function calculateMiracleIndex(wish, responses, concerns) {
     luck,
     effort,
     timing,
-    total: miracleIndex
+    calculated: calculatedIndex
   });
 
-  return Math.max(0, Math.min(100, miracleIndex));
+  // MVP 단계: 75점 고정 (긍정적 메시지 전달)
+  // 향후: return Math.max(50, Math.min(100, calculatedIndex));
+  const miracleIndex = 75;
+
+  console.log('[MiracleIndex] 최종 기적지수:', miracleIndex, '(MVP 고정값)');
+  return miracleIndex;
 }
 
 // ---------- 통찰 생성 ----------
