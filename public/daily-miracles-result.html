@@ -819,15 +819,15 @@
               <div class="week-plan">
                 <div class="week-header">
                   <div>
-                    <div class="week-title">${weekKey.toUpperCase()}: ${week.theme || '주차 계획'}</div>
-                    <div class="week-theme">${week.focus || ''}</div>
+                    <div class="week-title">${weekKey.toUpperCase()}: ${week.title || week.theme || '주차 계획'}</div>
+                    <div class="week-theme">${week.goal || week.focus || ''}</div>
                   </div>
                 </div>
                 ${(week.dailyActions || []).map(action => `
                   <div class="daily-action">
                     <span class="day-label">Day ${action.day || '?'}</span>
                     <span class="task-text">${action.task || ''}</span>
-                    <span class="duration">${action.duration || ''}</span>
+                    <span class="duration">${action.time || action.duration || ''}</span>
                   </div>
                 `).join('')}
                 <div class="checkpoints">
