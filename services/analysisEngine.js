@@ -131,28 +131,27 @@ function generateCounterpartyProfile(data) {
 
   const responses = data.userInput?.responses || data.responses || {};
 
-  // 상대방 이름 추출 (여러 필드 확인)
+  // Q6: 관계 유형 확인 (필수)
+  const relationshipType = responses.q6;
+
+  // "혼자만의 문제" 선택 시 상대방 프로필 생성 안 함
+  if (!relationshipType || relationshipType === '혼자만의 문제') {
+    console.log('[AnalysisEngine] No relationship type or solo problem - skipping counterparty profile');
+    return null;
+  }
+
+  console.log('[AnalysisEngine] generateCounterpartyProfile - relationshipType:', relationshipType);
+
+  // 상대방 이름 추출 (없으면 관계 유형 기반 기본값)
   const counterpartyName =
     data.counterpartyName ||
     data.userInput?.counterpartyName ||
     responses.partnerName ||
     responses.counterpartyName ||
-    null;
+    getDefaultCounterpartyName(relationshipType);
 
-  if (!counterpartyName) {
-    console.log('[AnalysisEngine] No counterparty name found - skipping profile');
-    return null;
-  }
-
-  console.log('[AnalysisEngine] generateCounterpartyProfile - name:', counterpartyName);
-
-  // 관계 유형 추출
-  const relationship =
-    data.relationship ||
-    data.userInput?.relationship ||
-    responses.relationship ||
-    responses.relationType ||
-    '관계';
+  // 관계 유형
+  const relationship = relationshipType;
 
   // 상대방 특성 추출 (응답 기반)
   const characteristics = extractCounterpartyCharacteristics(responses);
@@ -160,9 +159,24 @@ function generateCounterpartyProfile(data) {
   // 상대방 성격 유추
   const personality = inferCounterpartyPersonality(characteristics, responses);
 
-  // 상대방 오행 결정
-  const element = determineCounterpartyElement(personality);
-  const colors = FIVE_ELEMENTS[element].colors;
+  // 상대방 패턴 결정
+  const element = determineCounterpartyElement(personality, responses);
+
+  // 상대방 색상 분석 (Q8 보석 선택 우선, 없으면 패턴 기반)
+  let colors = FIVE_ELEMENTS[element].colors;
+  if (responses.q8) {
+    // Q8에서 선택한 설명에서 보석 이름 추출
+    // 예: "💎 루비 - 매우 활동적이고 빠르다" → "루비"
+    const gemstoneMatch = responses.q8.match(/(루비|코랄|시트린|에메랄드|사파이어|탄자나이트|자수정|다이아몬드|진주|오닉스)/);
+    if (gemstoneMatch) {
+      const gemstone = gemstoneMatch[1];
+      if (GEMSTONE_TO_COLOR[gemstone]) {
+        const selectedColor = GEMSTONE_TO_COLOR[gemstone];
+        colors = [selectedColor];
+        console.log('[AnalysisEngine] Counterparty gemstone:', gemstone, '→', selectedColor);
+      }
+    }
+  }
 
   const profile = {
     name: counterpartyName,
@@ -680,6 +694,18 @@ function generateProfileDescription(name, colors, elementKey, personality) {
   const energy = energySource[elementKey] || '다양한 활동';
 
   return `${name}님은 ${colorName} 보석 성향으로 ${traits} 특성을 보입니다. 유사 사례 분석 결과 ${elementName} 그룹에 속하며, ${energy}에서 에너지를 얻는 경향이 있습니다.`;
+}
+
+// ---------- 관계 유형별 기본 이름 ----------
+function getDefaultCounterpartyName(relationshipType) {
+  const nameMap = {
+    '상사/동료': '동료',
+    '배우자/연인': '상대방',
+    '부모/자녀': '가족',
+    '친구': '친구',
+    '이웃/기타': '상대방'
+  };
+  return nameMap[relationshipType] || '상대방';
 }
 
 // ---------- 상대방 특성 추출 ----------
