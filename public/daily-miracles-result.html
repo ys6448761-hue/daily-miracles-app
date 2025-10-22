@@ -710,6 +710,12 @@
             </div>
           ` : ''}
 
+          ${userProfile.description ? `
+            <div style="margin-top: 15px; padding: 15px; background: #f8f9ff; border-radius: 10px; border-left: 4px solid #667eea;">
+              <p style="color: #333; line-height: 1.6; font-weight: 500;">${userProfile.description}</p>
+            </div>
+          ` : ''}
+
           ${summary ? `
             <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 10px;">
               <p style="color: #666; line-height: 1.6;">${summary}</p>
@@ -845,6 +851,9 @@
 
       // 5. 섹션 3: 관계 분석 (조건부, 세로 배치)
       if (hasRelationship && relationshipAnalysis) {
+        const elemCompat = relationshipAnalysis.elementCompatibility || {};
+        const colorCompat = relationshipAnalysis.colorCompatibility || {};
+
         html += '<div class="section-header">💑 관계 분석</div>';
         html += '<div class="section-content">';
         html += `
@@ -852,18 +861,18 @@
             <h2>📊 패턴 조화 분석</h2>
             <div class="info-item">
               <div class="info-label">조화 유형</div>
-              <div class="info-value">${relationshipAnalysis.elementCompatibility.type}</div>
+              <div class="info-value">${elemCompat.type || '알 수 없음'}</div>
             </div>
-            <p style="margin-top: 15px; color: #666; line-height: 1.6;">${relationshipAnalysis.elementCompatibility.description}</p>
+            <p style="margin-top: 15px; color: #666; line-height: 1.6;">${elemCompat.detailedDescription || elemCompat.description || ''}</p>
           </div>
 
           <div class="profile-card">
             <h2>🎨 성향 조화 분석</h2>
             <div class="info-item">
               <div class="info-label">조화 유형</div>
-              <div class="info-value">${relationshipAnalysis.colorCompatibility.type}</div>
+              <div class="info-value">${colorCompat.type || '알 수 없음'}</div>
             </div>
-            <p style="margin-top: 15px; color: #666; line-height: 1.6;">${relationshipAnalysis.colorCompatibility.message}</p>
+            <p style="margin-top: 15px; color: #666; line-height: 1.6;">${colorCompat.message || ''}</p>
           </div>
 
           <div class="profile-card">
