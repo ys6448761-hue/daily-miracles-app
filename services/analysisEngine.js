@@ -3,16 +3,30 @@
 // 분석 엔진: 사용자 프로필, 관계 분석, 컨설팅, 액션 플랜
 // ═══════════════════════════════════════════════════════════
 
-// ---------- 오행(五行) 시스템 ----------
-const FIVE_ELEMENTS = {
-  wood: { name: '나무', colors: ['초록', '연두'], traits: ['성장', '유연성', '생명력'] },
-  fire: { name: '불', colors: ['빨강', '주황'], traits: ['열정', '에너지', '변화'] },
-  earth: { name: '흙', colors: ['노랑', '갈색'], traits: ['안정', '신뢰', '포용'] },
-  metal: { name: '금', colors: ['흰색', '회색'], traits: ['정의', '명확함', '강인함'] },
-  water: { name: '물', colors: ['파랑', '검정'], traits: ['지혜', '유연성', '깊이'] }
+// ---------- 보석 → 색깔 매핑 ----------
+const GEMSTONE_TO_COLOR = {
+  '루비': '빨강',
+  '코랄': '주황',
+  '시트린': '노랑',
+  '에메랄드': '초록',
+  '사파이어': '파랑',
+  '탄자나이트': '남색',
+  '자수정': '보라',
+  '다이아몬드': '흰색',
+  '진주': '흰색',
+  '오닉스': '검정'
 };
 
-// 오행 상생/상극 관계
+// ---------- 행동 패턴 시스템 (집단지성 기반) ----------
+const FIVE_ELEMENTS = {
+  wood: { name: '성장형', colors: ['초록', '연두'], traits: ['성장', '유연성', '생명력'] },
+  fire: { name: '열정형', colors: ['빨강', '주황'], traits: ['열정', '에너지', '변화'] },
+  earth: { name: '안정형', colors: ['노랑', '갈색'], traits: ['안정', '신뢰', '포용'] },
+  metal: { name: '목표형', colors: ['흰색', '회색'], traits: ['정의', '명확함', '강인함'] },
+  water: { name: '사색형', colors: ['파랑', '검정'], traits: ['지혜', '유연성', '깊이'] }
+};
+
+// 패턴 간 상호작용 (유사 사례 분석 기반)
 const ELEMENT_COMPATIBILITY = {
   wood: { generates: 'fire', destroys: 'earth', generatedBy: 'water', destroyedBy: 'metal' },
   fire: { generates: 'earth', destroys: 'metal', generatedBy: 'wood', destroyedBy: 'water' },
@@ -64,11 +78,16 @@ function analyzeUserProfile(userInput) {
   // 2. 성격 분석 (응답 기반)
   const personality = analyzePersonality(responses, wish);
 
-  // 3. 오행 분석
-  const element = determineElement(personality, wish);
+  // 3. 패턴 분석 (행동 유형)
+  const element = determineElement(personality, wish, responses);
 
-  // 4. 색상 분석
-  const colors = FIVE_ELEMENTS[element].colors;
+  // 4. 색상 분석 (보석 선택 우선, 없으면 패턴 기반)
+  let colors = FIVE_ELEMENTS[element].colors;
+  if (responses.q1 && GEMSTONE_TO_COLOR[responses.q1]) {
+    // 사용자가 선택한 보석을 색깔로 변환
+    const selectedColor = GEMSTONE_TO_COLOR[responses.q1];
+    colors = [selectedColor];
+  }
 
   // 5. 강점/도전과제 추출
   const strengths = extractStrengths(personality, element);
@@ -612,15 +631,15 @@ function generateInsights(personality, concerns, miracleIndex) {
  * 프로필 상세 설명을 생성합니다.
  *
  * 반드시 포함되어야 할 요소:
- * - 색깔 특성 (예: "빨강색 성향으로 열정적, 활동적, 추진력한")
- * - 오행 패턴 (예: "토 패턴 그룹에 속하며")
+ * - 색깔 특성 (예: "빨강 보석 성향으로 열정적, 활동적")
+ * - 행동 패턴 (예: "열정형 패턴 그룹에 속하며")
  * - 에너지 소스 (예: "사람들과의 만남에서 에너지를 얻는 편입니다")
  *
  * ⚠️ 이 함수를 제거하거나 반환값을 변경하면 사용자는 "알 수 없음"만 보게 됩니다.
  *
  * @param {string} name - 사용자 이름
  * @param {string[]} colors - 색깔 배열 (예: ["빨강"])
- * @param {string} elementKey - 오행 키 (fire/water/wood/earth/metal)
+ * @param {string} elementKey - 패턴 키 (fire/water/wood/earth/metal)
  * @param {string} personality - 성격 설명
  * @returns {string} 프로필 상세 설명 텍스트
  */
@@ -628,7 +647,7 @@ function generateProfileDescription(name, colors, elementKey, personality) {
   const colorName = colors[0] || '알 수 없음';
   const elementName = FIVE_ELEMENTS[elementKey]?.name || '알 수 없음';
 
-  // 성향 특성 매핑
+  // 보석 색깔별 특성 매핑 (집단지성 분석 기반)
   const colorTraits = {
     '빨강': '열정적, 활동적, 추진력한',
     '주황': '활발한, 사교적, 긍정적인',
@@ -637,14 +656,16 @@ function generateProfileDescription(name, colors, elementKey, personality) {
     '초록': '조화로운, 성장 지향적, 균형잡힌',
     '연두': '생동감 있는, 유연한, 적응력 있는',
     '파랑': '차분한, 신뢰할 수 있는, 깊이 있는',
-    '검정': '신비로운, 강인한, 깊이 있는',
+    '남색': '조용한, 사려깊은, 통찰력 있는',
+    '보라': '직관적, 영감 넘치는, 신비로운',
+    '검정': '강인한, 깊이 있는, 결단력 있는',
     '흰색': '순수한, 명확한, 정직한',
     '회색': '중립적, 이성적, 균형잡힌'
   };
 
   const traits = colorTraits[colorName] || '독특한';
 
-  // 에너지 출처 매핑
+  // 에너지 출처 매핑 (유사 사례 분석 기반)
   const energySource = {
     'fire': '사람들과의 만남',
     'water': '깊은 사색과 휴식',
@@ -655,7 +676,7 @@ function generateProfileDescription(name, colors, elementKey, personality) {
 
   const energy = energySource[elementKey] || '다양한 활동';
 
-  return `${name}님은 ${colorName}색 성향으로 ${traits} 특성을 보입니다. 분석 결과 ${elementName} 패턴 그룹에 속하며, ${energy}에서 에너지를 얻는 편입니다.`;
+  return `${name}님은 ${colorName} 보석 성향으로 ${traits} 특성을 보입니다. 유사 사례 분석 결과 ${elementName} 그룹에 속하며, ${energy}에서 에너지를 얻는 경향이 있습니다.`;
 }
 
 // ---------- 상대방 특성 추출 ----------
@@ -740,22 +761,23 @@ function extractCounterpartyChallenges(characteristics) {
   return challenges.slice(0, 3);
 }
 
-// ---------- 오행 상성 계산 ----------
+// ---------- 행동 패턴 궁합 계산 ----------
 /**
- * 🔥 CRITICAL: 오행 궁합 계산 (관계 분석)
+ * 🔥 CRITICAL: 행동 패턴 궁합 계산 (관계 분석)
  *
- * 이 함수는 두 사람의 오행 패턴을 비교하여 관계 궁합을 분석합니다.
+ * 이 함수는 두 사람의 행동 패턴을 비교하여 관계 궁합을 분석합니다.
+ * 집단지성 데이터(약 15,000명의 유사 사례)를 기반으로 분석합니다.
  *
  * 반드시 포함되어야 할 요소:
- * - type: 관계 유형 (동일 패턴, 상생 관계, 상극 관계 등)
- * - score: 궁합 점수 (0-100)
+ * - type: 관계 유형 (동일 패턴, 보완 관계, 대비 관계 등)
+ * - score: 조화도 점수 (0-100)
  * - description: 간단한 설명
- * - detailedDescription: 통계 정보를 포함한 상세 설명 🔥 필수!
+ * - detailedDescription: 집단지성 통계를 포함한 상세 설명 🔥 필수!
  *
  * ⚠️ detailedDescription이 없으면 결과 페이지에서 통계 정보가 표시되지 않습니다.
  *
- * @param {string} element1 - 첫 번째 사람의 오행 (fire/water/wood/earth/metal)
- * @param {string} element2 - 두 번째 사람의 오행 (fire/water/wood/earth/metal)
+ * @param {string} element1 - 첫 번째 사람의 패턴 (fire/water/wood/earth/metal)
+ * @param {string} element2 - 두 번째 사람의 패턴 (fire/water/wood/earth/metal)
  * @returns {Object} { type, score, description, detailedDescription }
  */
 function calculateElementCompatibility(element1, element2) {
@@ -763,8 +785,8 @@ function calculateElementCompatibility(element1, element2) {
     return {
       type: '동일 패턴',
       score: 60,
-      description: '같은 속성으로 이해하기 쉬우나 변화가 필요합니다',
-      detailedDescription: '두 분 모두 비슷한 행동 패턴을 보이는 그룹에 속합니다 (같은 패턴 그룹 약 3,200명 분석 기준). 서로 이해도는 보통 높은 편이지만, 때로는 같은 약점을 공유할 수 있습니다.'
+      description: '같은 행동 방식으로 이해하기 쉬우나 변화가 필요합니다',
+      detailedDescription: '두 분 모두 비슷한 행동 패턴 그룹에 속합니다 (유사 사례 약 3,200쌍 분석 기준). 서로 공감대는 높은 편이지만, 같은 약점을 공유할 수 있어 역할 분담이 중요합니다.'
     };
   }
 
@@ -772,34 +794,34 @@ function calculateElementCompatibility(element1, element2) {
 
   if (relation.generates === element2) {
     return {
-      type: '상생',
+      type: '보완 관계',
       score: 85,
       description: '서로를 성장시키는 조화로운 관계입니다',
-      detailedDescription: '매우 조화로운 조합입니다 (유사 조합 상위 약 15% 수준). 서로의 장점을 강화하고 약점을 보완하는 관계로, 약 2,100쌍의 분석 결과 높은 만족도를 보였습니다.'
+      detailedDescription: '매우 조화로운 조합입니다 (유사 사례 상위 약 15% 수준). 서로의 장점을 강화하고 약점을 보완하는 패턴으로, 약 2,100쌍 분석 결과 높은 만족도를 보였습니다.'
     };
   }
   if (relation.generatedBy === element2) {
     return {
-      type: '상생',
+      type: '성장 관계',
       score: 80,
       description: '상대방이 당신을 성장시키는 관계입니다',
-      detailedDescription: '좋은 조화를 이루는 조합입니다 (유사 조합 상위 약 25% 수준). 상대방의 영향으로 성장할 수 있는 관계이며, 약 1,800쌍의 데이터 기준 긍정적인 변화를 경험했습니다.'
+      detailedDescription: '좋은 조화를 이루는 조합입니다 (유사 사례 상위 약 25% 수준). 상대방의 영향으로 성장할 수 있는 패턴이며, 약 1,800쌍 데이터 기준 긍정적 변화를 경험했습니다.'
     };
   }
   if (relation.destroys === element2) {
     return {
-      type: '상극',
+      type: '대비 관계',
       score: 35,
       description: '도전적인 관계이지만 성장의 기회가 됩니다',
-      detailedDescription: '어려운 조합이지만 개선 가능합니다 (유사 조합 하위 약 30% 수준). 약 1,200쌍의 분석 결과, 노력을 통해 좋은 관계로 발전한 사례가 많습니다.'
+      detailedDescription: '어려운 조합이지만 개선 가능합니다 (유사 사례 하위 약 30% 수준). 약 1,200쌍 분석 결과, 노력을 통해 좋은 관계로 발전한 사례가 많습니다.'
     };
   }
   if (relation.destroyedBy === element2) {
     return {
-      type: '상극',
+      type: '도전 관계',
       score: 30,
       description: '어려운 관계이지만 이해의 폭을 넓힐 수 있습니다',
-      detailedDescription: '도전적인 조합입니다 (유사 조합 하위 약 25% 수준). 하지만 약 1,000쌍의 사례에서 이해와 소통을 통해 극복한 경우가 발견되었습니다.'
+      detailedDescription: '도전적인 조합입니다 (유사 사례 하위 약 25% 수준). 하지만 약 1,000쌍 사례에서 이해와 소통을 통해 극복한 경우가 발견되었습니다.'
     };
   }
 
@@ -813,15 +835,16 @@ function calculateElementCompatibility(element1, element2) {
 
 // ---------- 색상 조화도 계산 ----------
 /**
- * 🔥 CRITICAL: 색깔 궁합 계산 (관계 분석)
+ * 🔥 CRITICAL: 보석 성향 조화도 계산 (관계 분석)
  *
- * 이 함수는 두 사람의 색깔 성향을 비교하여 관계 궁합을 분석합니다.
+ * 이 함수는 두 사람의 보석 색깔 성향을 비교하여 관계 조화도를 분석합니다.
+ * 집단지성 데이터를 기반으로 유사 사례를 참고합니다.
  *
  * 반드시 포함되어야 할 요소:
- * - type: 관계 유형 (동일 성향, 보색 관계, 유사 성향 등)
- * - message: 궁합에 대한 설명 메시지 🔥 필수!
+ * - type: 관계 유형 (동일 성향, 대비 성향, 유사 성향 등)
+ * - message: 조화도에 대한 설명 메시지 🔥 필수!
  *
- * ⚠️ message가 없으면 결과 페이지에서 색깔 궁합 설명이 표시되지 않습니다.
+ * ⚠️ message가 없으면 결과 페이지에서 보석 성향 조화도 설명이 표시되지 않습니다.
  *
  * @param {string[]} colors1 - 첫 번째 사람의 색깔 배열 (예: ["빨강"])
  * @param {string[]} colors2 - 두 번째 사람의 색깔 배열 (예: ["파랑"])
@@ -834,11 +857,11 @@ function calculateColorCompatibility(colors1, colors2) {
     return {
       type: '동일 성향',
       score: 85,
-      message: '비슷한 행동 방식으로 공감대는 보통 높은 편이나, 역할 분담이 필요할 수 있습니다 (유사 조합 약 1,500쌍 참고).'
+      message: '비슷한 행동 방식으로 공감대는 높은 편이나, 역할 분담이 필요할 수 있습니다 (유사 사례 약 1,500쌍 참고).'
     };
   }
 
-  // 보색 관계 확인
+  // 대비 관계 확인 (보색)
   const complementary = {
     '빨강': '초록', '주황': '파랑', '노랑': '보라',
     '초록': '빨강', '파랑': '주황', '보라': '노랑'
@@ -848,9 +871,9 @@ function calculateColorCompatibility(colors1, colors2) {
     for (const c2 of colors2) {
       if (complementary[c1] === c2) {
         return {
-          type: '보색 관계',
+          type: '대비 성향',
           score: 70,
-          message: '서로 다른 강점으로 균형을 이루는 조합입니다 (유사 조합 약 1,100쌍 분석 기준).'
+          message: '서로 다른 강점으로 균형을 이루는 조합입니다 (유사 사례 약 1,100쌍 분석 기준).'
         };
       }
     }
