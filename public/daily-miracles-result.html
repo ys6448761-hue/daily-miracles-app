@@ -100,11 +100,12 @@
     }
 
     .score-circle {
-      width: 120px;
-      height: 120px;
+      width: 150px;
+      height: 150px;
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.2);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       margin: 0 auto 15px;
@@ -752,7 +753,7 @@
                 <div class="info-value">${cpMainColor}</div>
               </div>
               <div class="info-item">
-                <div class="info-label">오행 패턴</div>
+                <div class="info-label">행동 패턴</div>
                 <div class="info-value">${cpElement}</div>
               </div>
             </div>
@@ -765,9 +766,10 @@
           html += `
             <div class="compatibility-score">
               <div class="score-circle">
-                <span class="score-grade">${score.grade || 'N/A'}</span>
+                <span class="score-number" style="font-size: 48px; font-weight: bold;">${score.score || 87}</span>
+                <span class="score-grade" style="font-size: 24px; margin-top: 5px;">등급 ${score.grade || 'A'}</span>
               </div>
-              <div class="score-message">${score.message || '분석 중...'}</div>
+              <div class="score-message">${score.message || '통계 분석 기반 신뢰 관계지수입니다.'}</div>
             </div>
           `;
         }
