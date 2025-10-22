@@ -731,8 +731,8 @@ async function submitAnalysis() {
 
     console.log('[DM] Step 2 제출 - Payload:', payload);
 
-    // 5) 서버 호출 (상대경로!)
-    const res = await fetch('/api/daily-miracles/analyze', {
+    // 5) 서버 호출 (절대경로)
+    const res = await fetch('https://daily-miracles-app.onrender.com/api/daily-miracles/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

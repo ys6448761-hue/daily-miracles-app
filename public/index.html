@@ -186,8 +186,8 @@
             
             const formData = new FormData(form);
             const data = Object.fromEntries(formData);
-            
-            fetch('/api/create-story', {
+
+            fetch('https://daily-miracles-app.onrender.com/api/create-story', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
