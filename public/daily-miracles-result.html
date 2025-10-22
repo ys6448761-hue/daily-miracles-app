@@ -542,80 +542,55 @@
 
     // ✅ API 응답 구조 변환 함수
     function transformApiResponse(data) {
-      console.log('[DM] Transforming API response...');
+      console.log('[DM] Transforming API response...', data);
 
-      // 기본 구조 생성
-      const result = {
-        userProfile: {
-          name: 'Guest',
-          birth: '',
-          concern: '',
-          personality: {
-            color: '알 수 없음',
-            energySource: '알 수 없음',
-            peakTime: '알 수 없음'
-          },
-          fiveElements: {
-            primaryElement: '알 수 없음'
-          },
-          summary: ''
-        },
-        counterpartyProfile: null,
-        relationshipAnalysis: null,
-        consulting: {},
-        actionPlan: {},
-        story: '',
-        images: [],
-        executionTime: 0,
-        workflowId: ''
-      };
-
-      // story.input에서 사용자 정보 추출
-      if (data.story?.input) {
-        result.userProfile.name = data.story.input.name || data.userInput?.name || 'Guest';
-        result.userProfile.birth = data.story.input.birth || data.userInput?.birth || '';
-        result.userProfile.concern = data.story.input.wish || data.userInput?.wish || '';
-      }
-
-      // userInput에서 직접 추출 (폴백)
-      if (data.userInput) {
-        result.userProfile.name = data.userInput.name || result.userProfile.name;
-        result.userProfile.birth = data.userInput.birth || result.userProfile.birth;
-        result.userProfile.concern = data.userInput.wish || result.userProfile.concern;
-      }
-
-      // story 정보
+      // ✅ story 객체가 있으면 직접 추출 (분석 엔진 결과)
       if (data.story) {
-        result.story = data.story.summary || data.story.fullStory || JSON.stringify(data.story);
-        result.images = data.story.images || data.images || [];
-        result.executionTime = data.story.executionTime || data.executionTime || 0;
-        result.workflowId = data.story.workflowId || data.workflowId || '';
-
-        // 기본 summary 설정
-        result.userProfile.summary = data.story.summary || result.userProfile.concern || '';
-      }
-
-      // 상대방 정보 (있는 경우)
-      if (data.story?.counterparty || data.userInput?.counterparty) {
-        const counterparty = data.story?.counterparty || data.userInput?.counterparty;
-        result.counterpartyProfile = {
-          exists: true,
-          birth: counterparty.birth || counterparty.estimate || '',
-          relationshipType: '알 수 없음',
-          personality: {
-            description: '알 수 없음'
+        const result = {
+          // ✅ 분석 엔진이 생성한 전체 userProfile 사용
+          userProfile: data.story.userProfile || {
+            name: 'Guest',
+            miracleIndex: 0,
+            personality: {},
+            element: '알 수 없음',
+            strengths: [],
+            challenges: [],
+            insights: ''
           },
-          fiveElements: {
-            primaryElement: '알 수 없음'
-          },
-          conflicts: {
-            mainIssue: '정보 없음'
-          }
+
+          // ✅ 상대방 프로필
+          counterpartyProfile: data.story.counterpartyProfile || null,
+
+          // ✅ 관계 분석
+          relationshipAnalysis: data.story.relationshipAnalysis || null,
+
+          // ✅ 8단계 컨설팅 (consulting8Steps → consulting)
+          consulting: data.story.consulting8Steps || {},
+
+          // ✅ 4주 실행계획
+          actionPlan: data.story.actionPlan || {},
+
+          // ✅ 경고 신호
+          warningSignals: data.story.warningSignals || [],
+
+          // 메타 정보
+          story: data.story.summary || '',
+          images: data.images || [],
+          executionTime: data.executionTime || 0,
+          workflowId: data.workflowId || ''
         };
+
+        console.log('[DM] ✅ Transformation complete:', result);
+        console.log('[DM] - userProfile:', result.userProfile);
+        console.log('[DM] - consulting steps:', Object.keys(result.consulting).length);
+        console.log('[DM] - actionPlan weeks:', Object.keys(result.actionPlan).length);
+
+        return result;
       }
 
-      console.log('[DM] Transformation complete:', result);
-      return result;
+      // 폴백: 이미 변환된 데이터 (localStorage에서 직접 온 경우)
+      console.log('[DM] ⚠️ No story object, returning data as-is');
+      return data;
     }
 
     function showErrorPage(error) {
@@ -657,16 +632,33 @@
       const relationshipAnalysis = data.relationshipAnalysis;
       const consulting = data.consulting || {};
       const actionPlan = data.actionPlan || {};
+      const warningSignals = data.warningSignals || [];
 
-      const hasRelationship = counterpartyProfile && counterpartyProfile.exists;
+      const hasRelationship = counterpartyProfile && counterpartyProfile.name;
 
-      // 안전한 값 추출
+      // ✅ 분석 엔진 실제 구조에 맞게 값 추출
       const name = userProfile.name || 'Guest';
-      const personality = userProfile.personality || {};
-      const fiveElements = userProfile.fiveElements || {};
-      const summary = userProfile.summary || userProfile.concern || data.story || '분석 결과';
+      const miracleIndex = userProfile.miracleIndex || 0;
+      const personalityText = typeof userProfile.personality === 'string'
+        ? userProfile.personality
+        : (userProfile.personality?.description || '알 수 없음');
+      const element = userProfile.element || '알 수 없음';
+      const colors = userProfile.colors || [];
+      const mainColor = colors[0] || '알 수 없음';
+      const strengths = userProfile.strengths || [];
+      const challenges = userProfile.challenges || [];
+      const insights = userProfile.insights || '';
+      const summary = insights || userProfile.summary || data.story || '분석 결과';
 
-      console.log('[DM] Extracted values:', { name, personality, fiveElements, summary });
+      console.log('[DM] ✅ Extracted values:', {
+        name,
+        miracleIndex,
+        personalityText,
+        element,
+        colors,
+        consulting: Object.keys(consulting).length,
+        actionPlan: Object.keys(actionPlan).length
+      });
 
       let html = '';
 
@@ -674,63 +666,105 @@
       html += `
         <div class="profile-card">
           <h2>👤 ${name}님의 프로필</h2>
+
+          ${miracleIndex > 0 ? `
+            <div style="text-align: center; margin-bottom: 20px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white;">
+              <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">기적지수</div>
+              <div style="font-size: 48px; font-weight: bold;">${miracleIndex}</div>
+              <div style="font-size: 14px; opacity: 0.9; margin-top: 8px;">
+                ${miracleIndex >= 75 ? '✨ 매우 높음' : miracleIndex >= 50 ? '🌱 중간' : '🤝 개선 가능'}
+              </div>
+            </div>
+          ` : ''}
+
           <div class="profile-info">
             <div class="info-item">
-              <div class="info-label">색깔 성향</div>
-              <div class="info-value">${personality.color || '알 수 없음'}</div>
+              <div class="info-label">성격</div>
+              <div class="info-value">${personalityText}</div>
             </div>
             <div class="info-item">
-              <div class="info-label">패턴</div>
-              <div class="info-value">${fiveElements.primaryElement || '알 수 없음'} 패턴</div>
+              <div class="info-label">주요 색상</div>
+              <div class="info-value">${mainColor}</div>
             </div>
             <div class="info-item">
-              <div class="info-label">에너지 출처</div>
-              <div class="info-value">${personality.energySource || '알 수 없음'}</div>
-            </div>
-            <div class="info-item">
-              <div class="info-label">황금시간</div>
-              <div class="info-value">${personality.peakTime || '알 수 없음'}</div>
+              <div class="info-label">오행 패턴</div>
+              <div class="info-value">${element}</div>
             </div>
           </div>
-          <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 10px;">
-            <p style="color: #666; line-height: 1.6;">${summary}</p>
-          </div>
+
+          ${strengths.length > 0 ? `
+            <div style="margin-top: 15px; padding: 15px; background: #e8f5e9; border-radius: 10px;">
+              <div style="font-weight: 600; color: #2e7d32; margin-bottom: 8px;">💪 강점</div>
+              <ul style="margin: 0; padding-left: 20px; color: #2e7d32;">
+                ${strengths.map(s => `<li>${s}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+
+          ${challenges.length > 0 ? `
+            <div style="margin-top: 10px; padding: 15px; background: #fff3e0; border-radius: 10px;">
+              <div style="font-weight: 600; color: #e65100; margin-bottom: 8px;">🎯 도전과제</div>
+              <ul style="margin: 0; padding-left: 20px; color: #e65100;">
+                ${challenges.map(c => `<li>${c}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+
+          ${summary ? `
+            <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 10px;">
+              <p style="color: #666; line-height: 1.6;">${summary}</p>
+            </div>
+          ` : ''}
         </div>
       `;
 
       // 2. 관계 조화도 (있는 경우)
-      if (hasRelationship && relationshipAnalysis) {
-        const score = relationshipAnalysis.overallScore;
-        html += `
-          <div class="compatibility-score">
-            <div class="score-circle">
-              <span class="score-grade">${score.grade}</span>
-            </div>
-            <div class="score-message">${score.message}</div>
-          </div>
+      if (hasRelationship) {
+        const cpName = counterpartyProfile.name || '상대방';
+        const cpRelationship = counterpartyProfile.relationship || '관계';
+        const cpPersonality = typeof counterpartyProfile.personality === 'string'
+          ? counterpartyProfile.personality
+          : '알 수 없음';
+        const cpElement = counterpartyProfile.element || '알 수 없음';
+        const cpColors = counterpartyProfile.colors || [];
+        const cpMainColor = cpColors[0] || '알 수 없음';
 
+        html += `
           <div class="profile-card">
-            <h2>💑 상대방 프로필</h2>
+            <h2>💑 ${cpName}님의 프로필</h2>
             <div class="profile-info">
               <div class="info-item">
-                <div class="info-label">관계 유형</div>
-                <div class="info-value">${counterpartyProfile.relationshipType}</div>
+                <div class="info-label">관계</div>
+                <div class="info-value">${cpRelationship}</div>
               </div>
               <div class="info-item">
-                <div class="info-label">성향</div>
-                <div class="info-value">${counterpartyProfile.personality.description}</div>
+                <div class="info-label">성격</div>
+                <div class="info-value">${cpPersonality}</div>
               </div>
               <div class="info-item">
-                <div class="info-label">패턴</div>
-                <div class="info-value">${counterpartyProfile.fiveElements.primaryElement} 패턴</div>
+                <div class="info-label">주요 색상</div>
+                <div class="info-value">${cpMainColor}</div>
               </div>
               <div class="info-item">
-                <div class="info-label">주요 갈등</div>
-                <div class="info-value">${counterpartyProfile.conflicts.mainIssue}</div>
+                <div class="info-label">오행 패턴</div>
+                <div class="info-value">${cpElement}</div>
               </div>
             </div>
           </div>
         `;
+
+        // 관계 조화도
+        if (relationshipAnalysis) {
+          const score = relationshipAnalysis.overallScore || {};
+          html += `
+            <div class="compatibility-score">
+              <div class="score-circle">
+                <span class="score-grade">${score.grade || 'N/A'}</span>
+              </div>
+              <div class="score-message">${score.message || '분석 중...'}</div>
+            </div>
+          `;
+        }
       }
 
       // 3. 섹션 1: 8단계 컨설팅 (세로 배치)
@@ -842,6 +876,36 @@
             `).join('')}
           </div>
         `;
+        html += '</div>';
+      }
+
+      // 6. 섹션 4: 경고 신호 (조건부)
+      if (warningSignals && warningSignals.length > 0) {
+        html += '<div class="section-header">⚠️ 경고 신호</div>';
+        html += '<div class="section-content">';
+        warningSignals.forEach(signal => {
+          const severityColor = signal.severity === 'high' ? '#d32f2f' : signal.severity === 'medium' ? '#f57c00' : '#fbc02d';
+          const severityLabel = signal.severity === 'high' ? '높음' : signal.severity === 'medium' ? '중간' : '낮음';
+          html += `
+            <div class="profile-card" style="border-left: 4px solid ${severityColor};">
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                <h3 style="color: ${severityColor}; margin: 0;">${signal.signal || '경고'}</h3>
+                <span style="background: ${severityColor}; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                  심각도: ${severityLabel}
+                </span>
+              </div>
+              <p style="color: #666; line-height: 1.6; margin: 10px 0;">
+                ${signal.description || ''}
+              </p>
+              ${signal.action ? `
+                <div style="margin-top: 12px; padding: 12px; background: #f5f5f5; border-radius: 8px;">
+                  <div style="font-weight: 600; color: #333; margin-bottom: 6px;">💡 권장 행동</div>
+                  <div style="color: #666;">${signal.action}</div>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        });
         html += '</div>';
       }
 
