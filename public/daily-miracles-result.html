@@ -483,6 +483,169 @@
     .error-message h2 {
       margin-bottom: 15px;
     }
+
+    /* 피드백 섹션 */
+    .feedback-section {
+      margin-top: 40px;
+      background: #f8f9ff;
+      border-radius: 15px;
+      overflow: hidden;
+    }
+
+    .feedback-header {
+      padding: 25px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .feedback-header h3 {
+      margin: 0 0 5px 0;
+      font-size: 20px;
+    }
+
+    .feedback-toggle-btn {
+      position: absolute;
+      top: 25px;
+      right: 25px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .feedback-toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .feedback-form {
+      padding: 25px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .rating-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .rating-group input[type="radio"] {
+      display: none;
+    }
+
+    .rating-group label {
+      padding: 8px 16px;
+      background: white;
+      border: 2px solid #ddd;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: normal;
+    }
+
+    .rating-group input[type="radio"]:checked + label {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+
+    .rating-group label:hover {
+      border-color: #667eea;
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: normal;
+    }
+
+    .checkbox-group label:hover {
+      background: #f0f0f0;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      margin-right: 10px;
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .form-group textarea,
+    .form-group input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.3s;
+    }
+
+    .form-group textarea:focus,
+    .form-group input[type="text"]:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .feedback-success {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .feedback-success h3 {
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .feedback-header {
+        padding: 20px;
+      }
+
+      .feedback-toggle-btn {
+        position: static;
+        margin-top: 15px;
+        width: 100%;
+      }
+
+      .feedback-form {
+        padding: 20px;
+      }
+
+      .rating-group {
+        flex-direction: column;
+      }
+
+      .rating-group label {
+        width: 100%;
+        text-align: center;
+      }
+    }
   </style>
 </head>
 <body>
@@ -934,6 +1097,65 @@
             📄 결과 PDF 저장
           </button>
         </div>
+
+        <!-- 베타 테스터 피드백 폼 -->
+        <div class="feedback-section">
+          <div class="feedback-header" onclick="toggleFeedbackForm()">
+            <h3>💬 베타 테스터 피드백 남기기</h3>
+            <p style="font-size: 14px; color: #666; margin-top: 5px;">
+              소중한 의견을 남겨주시면 더 나은 서비스를 만드는 데 큰 도움이 됩니다 🙏
+            </p>
+            <button class="feedback-toggle-btn" id="feedbackToggleBtn">
+              ▼ 펼치기
+            </button>
+          </div>
+
+          <div class="feedback-form" id="feedbackForm" style="display: none;">
+            <form onsubmit="submitFeedback(event)">
+              <!-- 간단한 만족도 조사 -->
+              <div class="form-group">
+                <label>전체적인 분석 결과에 얼마나 만족하시나요? ⭐</label>
+                <div class="rating-group">
+                  <input type="radio" name="satisfaction" value="1" id="sat1"><label for="sat1">1점</label>
+                  <input type="radio" name="satisfaction" value="2" id="sat2"><label for="sat2">2점</label>
+                  <input type="radio" name="satisfaction" value="3" id="sat3"><label for="sat3">3점</label>
+                  <input type="radio" name="satisfaction" value="4" id="sat4"><label for="sat4">4점</label>
+                  <input type="radio" name="satisfaction" value="5" id="sat5"><label for="sat5">5점</label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>가장 도움이 된 부분은? (복수 선택 가능) 💡</label>
+                <div class="checkbox-group">
+                  <label><input type="checkbox" name="helpful" value="개인 프로필 분석"> 개인 프로필 분석</label>
+                  <label><input type="checkbox" name="helpful" value="관계 분석"> 관계 분석</label>
+                  <label><input type="checkbox" name="helpful" value="8단계 컨설팅"> 8단계 컨설팅</label>
+                  <label><input type="checkbox" name="helpful" value="4주 액션플랜"> 4주 액션플랜</label>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 15px;">
+                ✉️ 간단 피드백 제출
+              </button>
+            </form>
+
+            <!-- Wix 상세 피드백 링크 -->
+            <div style="text-align: center; padding: 20px; background: white; border-radius: 10px; border: 2px dashed #667eea;">
+              <h4 style="color: #667eea; margin-bottom: 10px;">💬 더 자세한 의견이 있으신가요?</h4>
+              <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+                개선 제안, 문제 제보, 기능 요청 등 상세한 피드백을 남겨주세요
+              </p>
+              <a href="https://dailymiracles.kr/feedback" target="_blank" class="btn btn-secondary" style="display: inline-block; text-decoration: none;">
+                🌐 홈페이지에서 상세 피드백 남기기
+              </a>
+            </div>
+
+            <div class="feedback-success" id="feedbackSuccess" style="display: none;">
+              <h3 style="color: #4caf50;">✅ 피드백이 성공적으로 제출되었습니다!</h3>
+              <p>소중한 의견 감사합니다. 더 나은 서비스를 만들겠습니다 💙</p>
+            </div>
+          </div>
+        </div>
       `;
 
       document.getElementById('app').innerHTML = html;
@@ -950,6 +1172,73 @@
 
     function printResults() {
       window.print();
+    }
+
+    // 피드백 폼 토글
+    function toggleFeedbackForm() {
+      const form = document.getElementById('feedbackForm');
+      const btn = document.getElementById('feedbackToggleBtn');
+
+      if (form.style.display === 'none') {
+        form.style.display = 'block';
+        btn.textContent = '▲ 접기';
+      } else {
+        form.style.display = 'none';
+        btn.textContent = '▼ 펼치기';
+      }
+    }
+
+    // 피드백 제출
+    async function submitFeedback(event) {
+      event.preventDefault();
+
+      const form = event.target;
+      const formData = new FormData(form);
+
+      // 데이터 수집
+      const feedback = {
+        satisfaction: formData.get('satisfaction') ? parseInt(formData.get('satisfaction')) : null,
+        helpful: formData.getAll('helpful'),
+        improvements: formData.get('improvements') || '',
+        accuracy: formData.get('accuracy') ? parseInt(formData.get('accuracy')) : null,
+        suggestions: formData.get('suggestions') || '',
+        recommendation: formData.get('recommendation') ? parseInt(formData.get('recommendation')) : null,
+        contact: formData.get('contact') || ''
+      };
+
+      console.log('Submitting feedback:', feedback);
+
+      try {
+        const response = await fetch('/api/feedback', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(feedback)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          // 성공 메시지 표시
+          form.style.display = 'none';
+          document.getElementById('feedbackSuccess').style.display = 'block';
+
+          // 3초 후 폼 초기화 및 접기
+          setTimeout(() => {
+            document.getElementById('feedbackSuccess').style.display = 'none';
+            form.reset();
+            toggleFeedbackForm();
+          }, 3000);
+
+          console.log('Feedback submitted successfully:', result);
+        } else {
+          alert('피드백 제출 중 오류가 발생했습니다: ' + result.message);
+        }
+      } catch (error) {
+        console.error('Feedback submission error:', error);
+        alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+      }
     }
   </script>
 </body>

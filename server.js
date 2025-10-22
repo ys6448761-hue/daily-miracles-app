@@ -208,6 +208,84 @@ app.get("/api/story/latest", (_req, res) => {
   return res.status(404).json({ error: "no_latest_story" });
 });
 
+// ---------- Feedback System ----------
+const fs = require("fs");
+const FEEDBACK_FILE = path.join(__dirname, "feedback.json");
+
+// 피드백 저장
+app.post("/api/feedback", (req, res) => {
+  try {
+    const feedback = {
+      timestamp: new Date().toISOString(),
+      satisfaction: req.body.satisfaction || null,
+      helpful: req.body.helpful || [],
+      improvements: req.body.improvements || "",
+      accuracy: req.body.accuracy || null,
+      suggestions: req.body.suggestions || "",
+      recommendation: req.body.recommendation || null,
+      contact: req.body.contact || "",
+      userAgent: req.headers['user-agent'] || ""
+    };
+
+    console.log("📝 Feedback received:", JSON.stringify(feedback, null, 2));
+
+    // 기존 피드백 로드 (없으면 빈 배열)
+    let feedbacks = [];
+    if (fs.existsSync(FEEDBACK_FILE)) {
+      const content = fs.readFileSync(FEEDBACK_FILE, "utf-8");
+      feedbacks = JSON.parse(content);
+    }
+
+    // 새 피드백 추가
+    feedbacks.push(feedback);
+
+    // 파일에 저장
+    fs.writeFileSync(FEEDBACK_FILE, JSON.stringify(feedbacks, null, 2), "utf-8");
+
+    console.log(`✅ Feedback saved (total: ${feedbacks.length})`);
+
+    return res.status(200).json({
+      success: true,
+      message: "소중한 피드백 감사합니다!",
+      totalFeedbacks: feedbacks.length
+    });
+  } catch (err) {
+    console.error("💥 Feedback save error:", err);
+    return res.status(500).json({ error: "Failed to save feedback", message: err.message });
+  }
+});
+
+// 피드백 조회 (관리자용)
+app.get("/api/feedback", (req, res) => {
+  try {
+    if (!fs.existsSync(FEEDBACK_FILE)) {
+      return res.json({ feedbacks: [], count: 0 });
+    }
+
+    const content = fs.readFileSync(FEEDBACK_FILE, "utf-8");
+    const feedbacks = JSON.parse(content);
+
+    // 통계 생성
+    const stats = {
+      count: feedbacks.length,
+      avgSatisfaction: feedbacks.filter(f => f.satisfaction).length > 0
+        ? (feedbacks.reduce((sum, f) => sum + (f.satisfaction || 0), 0) / feedbacks.filter(f => f.satisfaction).length).toFixed(1)
+        : 0,
+      avgAccuracy: feedbacks.filter(f => f.accuracy).length > 0
+        ? (feedbacks.reduce((sum, f) => sum + (f.accuracy || 0), 0) / feedbacks.filter(f => f.accuracy).length).toFixed(1)
+        : 0,
+      avgRecommendation: feedbacks.filter(f => f.recommendation).length > 0
+        ? (feedbacks.reduce((sum, f) => sum + (f.recommendation || 0), 0) / feedbacks.filter(f => f.recommendation).length).toFixed(1)
+        : 0
+    };
+
+    return res.json({ feedbacks, stats });
+  } catch (err) {
+    console.error("💥 Feedback load error:", err);
+    return res.status(500).json({ error: "Failed to load feedback", message: err.message });
+  }
+});
+
 // ---------- Root ----------
 app.get("/", (_req, res) => {
   res.json({

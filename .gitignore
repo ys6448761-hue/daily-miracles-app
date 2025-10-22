@@ -8,6 +8,9 @@ data/
 *.db
 *.db-journal
 
+# Feedback data (contains user information)
+feedback.json
+
 # Log files
 logs/
 
