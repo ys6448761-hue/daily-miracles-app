@@ -104,7 +104,12 @@ app.get("/api/health", async (_req, res) => {
     success: true,
     message: "여수 기적여행 API 서버가 정상 작동 중입니다",
     timestamp: new Date().toISOString(),
-    database: dbStatus
+    database: dbStatus,
+    version: "v3.0-debug",
+    modules: {
+      yeosuRoutes: yeosuRoutes !== null,
+      db: db !== null
+    }
   });
 });
 
