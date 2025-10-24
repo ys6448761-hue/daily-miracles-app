@@ -1,0 +1,14 @@
+node_modules
+.env
+*.log
+.DS_Store
+.vscode
+.idea
+*.test.js
+test/
+coverage/
+.git
+analysis_result*.json
+test_questions_data.json
+token_response.json
+user_token.txt
