@@ -35,7 +35,11 @@
       "Bash(git init:*)",
       "Bash(git remote add:*)",
       "Bash(git branch:*)",
-      "Bash(set PGPASSWORD=XEVFpHtXr7CsYZSYYmDhogjbXzo32hCR:*)"
+      "Bash(set PGPASSWORD=XEVFpHtXr7CsYZSYYmDhogjbXzo32hCR:*)",
+      "Bash(PORT=8084 node server.js:*)",
+      "Bash(PORT=8085 node:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(PORT=5001 node:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>하루하루의 기적 - 12가지 질문</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 32px;
+            padding: 20px 0;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            height: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: white;
+            height: 100%;
+            border-radius: 12px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: white;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .questions-container {
+            background: white;
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .question-section {
+            margin-bottom: 36px;
+            display: none;
+        }
+
+        .question-section.active {
+            display: block;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .question-number {
+            color: #667eea;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .question-title {
+            color: #374151;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .question-description {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        textarea, input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            outline: none;
+            resize: vertical;
+        }
+
+        textarea {
+            min-height: 120px;
+        }
+
+        textarea:focus, input:focus, select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .radio-group, .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .radio-option, .checkbox-option {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .radio-option:hover, .checkbox-option:hover {
+            border-color: #667eea;
+            background: #f9fafb;
+        }
+
+        .radio-option input, .checkbox-option input {
+            width: auto;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .radio-option.selected, .checkbox-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .slider-container {
+            padding: 20px 0;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #e5e7eb;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .slider-value {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            text-align: center;
+        }
+
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #374151;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .questions-container {
+                padding: 32px 24px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .question-title {
+                font-size: 18px;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>당신의 기적 여정</h1>
+            <p>12가지 질문으로 당신만의 기적 지수를 발견하세요</p>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">질문 0 / 12</div>
+        </div>
+
+        <div class="questions-container">
+            <form id="questionsForm">
+                <!-- Question 1: 가장 절실한 바람 -->
+                <div class="question-section active" data-question="1">
+                    <div class="question-number">질문 1/12</div>
+                    <h2 class="question-title">지금 가장 절실한 바람이 있다면 무엇인가요?</h2>
+                    <p class="question-description">당신이 진심으로 이루고 싶은 것, 해결하고 싶은 문제를 자유롭게 적어주세요.</p>
+                    <textarea name="wish" id="wish" placeholder="예: 가족과의 관계를 회복하고 싶어요, 새로운 일을 시작하고 싶어요..." required></textarea>
+                </div>
+
+                <!-- Question 2: 관계 대상 -->
+                <div class="question-section" data-question="2">
+                    <div class="question-number">질문 2/12</div>
+                    <h2 class="question-title">이 바람과 관련된 특정한 사람이나 관계가 있나요?</h2>
+                    <p class="question-description">있다면 그 사람과의 관계를 알려주세요. (없다면 "없음"을 선택해주세요)</p>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="hasRelationship" value="no" onchange="toggleRelationshipQuestions(false)">
+                            <span>없음 - 나 자신과 관련된 목표예요</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="hasRelationship" value="yes" onchange="toggleRelationshipQuestions(true)">
+                            <span>있음 - 특정한 사람/관계와 관련되어 있어요</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 3: 관계 유형 (조건부) -->
+                <div class="question-section relationship-question" data-question="3" style="display: none;">
+                    <div class="question-number">질문 3/12</div>
+                    <h2 class="question-title">그 사람과의 관계는 무엇인가요?</h2>
+                    <select name="relationshipType">
+                        <option value="">선택해주세요</option>
+                        <option value="spouse">배우자</option>
+                        <option value="partner">연인</option>
+                        <option value="parent">부모님</option>
+                        <option value="child">자녀</option>
+                        <option value="sibling">형제/자매</option>
+                        <option value="friend">친구</option>
+                        <option value="colleague">직장 동료</option>
+                        <option value="boss">상사</option>
+                        <option value="other">기타</option>
+                    </select>
+                </div>
+
+                <!-- Question 4: 상대방 이름 (조건부) -->
+                <div class="question-section relationship-question" data-question="4" style="display: none;">
+                    <div class="question-number">질문 4/12</div>
+                    <h2 class="question-title">그 사람을 뭐라고 부를까요?</h2>
+                    <p class="question-description">이름, 별명, 또는 호칭 등 편한 대로 적어주세요.</p>
+                    <input type="text" name="counterpartyName" placeholder="예: 민수, 엄마, 김 과장님...">
+                </div>
+
+                <!-- Question 5: 현재 감정 상태 -->
+                <div class="question-section" data-question="5">
+                    <div class="question-number">질문 5/12</div>
+                    <h2 class="question-title">요즘 당신의 마음 상태는 어떤가요?</h2>
+                    <div class="checkbox-group">
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="emotions" value="hopeful">
+                            <span>희망적이고 긍정적이에요</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="emotions" value="anxious">
+                            <span>불안하고 걱정이 많아요</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="emotions" value="frustrated">
+                            <span>답답하고 막막해요</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="emotions" value="peaceful">
+                            <span>평온하고 차분해요</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="emotions" value="confused">
+                            <span>혼란스럽고 정리가 안 돼요</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 6: 변화 준비도 -->
+                <div class="question-section" data-question="6">
+                    <div class="question-number">질문 6/12</div>
+                    <h2 class="question-title">변화를 위해 얼마나 준비되어 있나요?</h2>
+                    <div class="slider-container">
+                        <input type="range" name="readiness" min="0" max="100" value="50" oninput="updateSliderValue(this, 'readinessValue')">
+                        <div class="slider-value" id="readinessValue">50점</div>
+                    </div>
+                </div>
+
+                <!-- Question 7: 현재 노력 -->
+                <div class="question-section" data-question="7">
+                    <div class="question-number">질문 7/12</div>
+                    <h2 class="question-title">이미 시도해본 것들이 있나요?</h2>
+                    <p class="question-description">문제 해결을 위해 노력했던 것들을 적어주세요.</p>
+                    <textarea name="efforts" placeholder="예: 대화를 시도했지만 잘 안 됐어요, 책을 읽어봤어요, 혼자 고민했어요..."></textarea>
+                </div>
+
+                <!-- Question 8: 이상적인 미래 -->
+                <div class="question-section" data-question="8">
+                    <div class="question-number">질문 8/12</div>
+                    <h2 class="question-title">문제가 해결된 미래의 모습을 상상해볼까요?</h2>
+                    <p class="question-description">6개월 후, 모든 것이 잘 풀렸다면 어떤 모습일까요?</p>
+                    <textarea name="idealFuture" placeholder="예: 가족들과 편하게 대화하고 있어요, 새 직장에서 즐겁게 일하고 있어요..."></textarea>
+                </div>
+
+                <!-- Question 9: 강점 -->
+                <div class="question-section" data-question="9">
+                    <div class="question-number">질문 9/12</div>
+                    <h2 class="question-title">당신의 강점은 무엇인가요?</h2>
+                    <div class="checkbox-group">
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="strengths" value="persistence">
+                            <span>끈기 있게 노력해요</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="strengths" value="empathy">
+                            <span>공감 능력이 좋아요</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="strengths" value="communication">
+                            <span>대화를 잘해요</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="strengths" value="creativity">
+                            <span>창의적이에요</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="strengths" value="patience">
+                            <span>인내심이 강해요</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 10: 걱정거리 -->
+                <div class="question-section" data-question="10">
+                    <div class="question-number">질문 10/12</div>
+                    <h2 class="question-title">가장 걱정되는 것은 무엇인가요?</h2>
+                    <textarea name="concerns" placeholder="예: 관계가 더 나빠질까봐, 실패할까봐, 혼자가 될까봐..."></textarea>
+                </div>
+
+                <!-- Question 11: 지원 시스템 -->
+                <div class="question-section" data-question="11">
+                    <div class="question-number">질문 11/12</div>
+                    <h2 class="question-title">당신을 응원하고 지지해주는 사람이 있나요?</h2>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="support" value="많음">
+                            <span>네, 여러 명 있어요</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="support" value="조금">
+                            <span>한두 명 정도 있어요</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="support" value="없음">
+                            <span>거의 없어요</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 12: 기대 -->
+                <div class="question-section" data-question="12">
+                    <div class="question-number">질문 12/12</div>
+                    <h2 class="question-title">이 분석을 통해 무엇을 얻고 싶으신가요?</h2>
+                    <div class="checkbox-group">
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="expectations" value="clarity">
+                            <span>상황을 명확히 이해하고 싶어요</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="expectations" value="action">
+                            <span>구체적인 행동 방법을 알고 싶어요</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="expectations" value="hope">
+                            <span>희망과 위로를 받고 싶어요</span>
+                        </label>
+                        <label class="checkbox-option">
+                            <input type="checkbox" name="expectations" value="perspective">
+                            <span>새로운 관점을 얻고 싶어요</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="error-message" id="errorMessage"></div>
+
+                <div class="buttons">
+                    <button type="button" class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()" style="display: none;">이전</button>
+                    <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">다음</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">분석 시작하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div class="loading-text">당신의 기적 지수를 분석하고 있습니다...</div>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 1;
+        const totalQuestions = 12;
+        let hasRelationship = false;
+
+        // 페이지 로드 시 인증 확인
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+            }
+        });
+
+        // 관계 질문 토글
+        function toggleRelationshipQuestions(show) {
+            hasRelationship = show;
+            const relationshipQuestions = document.querySelectorAll('.relationship-question');
+            relationshipQuestions.forEach(q => {
+                if (show) {
+                    q.style.display = '';
+                    const inputs = q.querySelectorAll('input, select, textarea');
+                    inputs.forEach(input => input.setAttribute('required', 'required'));
+                } else {
+                    q.style.display = 'none';
+                    const inputs = q.querySelectorAll('input, select, textarea');
+                    inputs.forEach(input => {
+                        input.removeAttribute('required');
+                        input.value = '';
+                    });
+                }
+            });
+        }
+
+        // 슬라이더 값 업데이트
+        function updateSliderValue(slider, valueId) {
+            document.getElementById(valueId).textContent = slider.value + '점';
+        }
+
+        // 라디오/체크박스 시각적 선택 표시
+        document.addEventListener('change', (e) => {
+            if (e.target.type === 'radio') {
+                const name = e.target.name;
+                document.querySelectorAll(`input[name="${name}"]`).forEach(input => {
+                    input.closest('.radio-option').classList.remove('selected');
+                });
+                e.target.closest('.radio-option').classList.add('selected');
+            } else if (e.target.type === 'checkbox') {
+                if (e.target.checked) {
+                    e.target.closest('.checkbox-option').classList.add('selected');
+                } else {
+                    e.target.closest('.checkbox-option').classList.remove('selected');
+                }
+            }
+        });
+
+        // 다음 질문
+        function nextQuestion() {
+            const currentSection = document.querySelector(`.question-section[data-question="${currentQuestion}"]`);
+            const inputs = currentSection.querySelectorAll('input[required], select[required], textarea[required]');
+
+            // 현재 질문 검증
+            let isValid = true;
+            inputs.forEach(input => {
+                if (input.type === 'radio') {
+                    const name = input.name;
+                    const checked = document.querySelector(`input[name="${name}"]:checked`);
+                    if (!checked) isValid = false;
+                } else if (input.type === 'checkbox') {
+                    const name = input.name;
+                    const checked = document.querySelectorAll(`input[name="${name}"]:checked`);
+                    if (checked.length === 0) isValid = false;
+                } else {
+                    if (!input.value.trim()) isValid = false;
+                }
+            });
+
+            if (!isValid) {
+                showError('모든 필수 항목을 입력해주세요');
+                return;
+            }
+
+            // 다음 질문으로 이동
+            currentSection.classList.remove('active');
+
+            // 관계가 없는 경우 3-4번 질문 건너뛰기
+            if (currentQuestion === 2 && !hasRelationship) {
+                currentQuestion = 5;
+            } else if (currentQuestion < totalQuestions) {
+                currentQuestion++;
+            }
+
+            const nextSection = document.querySelector(`.question-section[data-question="${currentQuestion}"]`);
+            if (nextSection) {
+                nextSection.classList.add('active');
+            }
+
+            updateProgress();
+            updateButtons();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 이전 질문
+        function previousQuestion() {
+            document.querySelector(`.question-section[data-question="${currentQuestion}"]`).classList.remove('active');
+
+            // 관계가 없는 경우 역방향도 건너뛰기
+            if (currentQuestion === 5 && !hasRelationship) {
+                currentQuestion = 2;
+            } else if (currentQuestion > 1) {
+                currentQuestion--;
+            }
+
+            document.querySelector(`.question-section[data-question="${currentQuestion}"]`).classList.add('active');
+
+            updateProgress();
+            updateButtons();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 진행률 업데이트
+        function updateProgress() {
+            const progress = (currentQuestion / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `질문 ${currentQuestion} / ${totalQuestions}`;
+        }
+
+        // 버튼 상태 업데이트
+        function updateButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+
+            prevBtn.style.display = currentQuestion > 1 ? 'block' : 'none';
+
+            if (currentQuestion === totalQuestions) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'block';
+            } else {
+                nextBtn.style.display = 'block';
+                submitBtn.style.display = 'none';
+            }
+        }
+
+        // 폼 제출
+        document.getElementById('questionsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const data = {};
+
+            // 기본 필드 수집
+            for (let [key, value] of formData.entries()) {
+                if (key === 'emotions' || key === 'strengths' || key === 'expectations') {
+                    if (!data[key]) data[key] = [];
+                    data[key].push(value);
+                } else {
+                    data[key] = value;
+                }
+            }
+
+            // 관계가 없는 경우 정리
+            if (!hasRelationship) {
+                delete data.relationshipType;
+                delete data.counterpartyName;
+            }
+
+            console.log('Submitting data:', data);
+
+            // 로딩 표시
+            document.getElementById('loadingOverlay').classList.add('show');
+
+            try {
+                // API 호출
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/daily-miracles/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ userInput: data })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // 분석 결과를 localStorage에 저장
+                    localStorage.setItem('latestAnalysis', JSON.stringify(result));
+
+                    // 결과 페이지로 이동
+                    window.location.href = result.redirectUrl || '/daily-miracles-result.html';
+                } else {
+                    showError(result.message || '분석 중 오류가 발생했습니다');
+                    document.getElementById('loadingOverlay').classList.remove('show');
+                }
+            } catch (error) {
+                console.error('Submit error:', error);
+                showError('서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요');
+                document.getElementById('loadingOverlay').classList.remove('show');
+            }
+        });
+
+        // 에러 메시지 표시
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+            }, 5000);
+        }
+
+        // 초기 상태 설정
+        updateProgress();
+        updateButtons();
+    </script>
+</body>
+</html>

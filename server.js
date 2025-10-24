@@ -10,6 +10,15 @@ const analysisEngine = require("./services/analysisEngine");
 
 const app = express();
 
+// 인증 라우터 로딩
+let authRoutes = null;
+try {
+  authRoutes = require("./routes/authRoutes");
+  console.log("✅ 인증 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 인증 라우터 로드 실패:", error.message);
+}
+
 // 여수 라우터 로딩 (에러 처리)
 let yeosuRoutes = null;
 try {
@@ -156,6 +165,14 @@ app.get("/diag/files", (req, res) => {
     res.status(500).json({ error: error.message, stack: error.stack });
   }
 });
+
+// ---------- 인증 API Routes ----------
+if (authRoutes) {
+  app.use("/api/auth", authRoutes);
+  console.log("✅ 인증 API 라우터 등록 완료");
+} else {
+  console.warn("⚠️ 인증 API 라우터 로드 실패 - 라우트 미등록");
+}
 
 // ---------- 여수 기적여행 API Routes ----------
 if (yeosuRoutes) {
