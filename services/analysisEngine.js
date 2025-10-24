@@ -68,9 +68,11 @@ function analyzeUserProfile(userInput) {
 
   const wish = userInput.wish || userInput.concern || userInput.problem || '';
   const name = userInput.name || '사용자';
-  const responses = userInput.responses || {};
+  // 🔥 새 질문 폼: userInput 자체가 responses (이전 구조와 호환)
+  const responses = userInput.responses || userInput;
 
   console.log('[AnalysisEngine] analyzeUserProfile - wish:', wish);
+  console.log('[AnalysisEngine] responses:', JSON.stringify(responses, null, 2));
 
   // 1. 키워드 기반 관심사 추출
   const concerns = extractConcerns(wish);
@@ -93,7 +95,7 @@ function analyzeUserProfile(userInput) {
   const strengths = extractStrengths(personality, element);
   const challenges = extractChallenges(concerns, wish);
 
-  // 6. 기적지수 계산
+  // 6. 기적지수 계산 (userInput 전체 전달)
   const miracleIndex = calculateMiracleIndex(wish, responses, concerns);
 
   // 7. 통찰 생성
@@ -644,8 +646,52 @@ function calculateMiracleIndex(wish, responses, concerns) {
   }
   timing = Math.min(20, timing);
 
-  // 최종 기적지수 계산
-  const calculatedIndex = Math.round((currentSituation + improvementPotential + luck + effort + timing) / 5);
+  // 🔥 새 질문 폼 필드 추가 반영
+  // readiness (준비도 슬라이더 0-100)
+  if (responses.readiness) {
+    const readinessScore = parseInt(responses.readiness) || 50;
+    // 준비도가 높을수록 개선가능성과 노력도 증가
+    improvementPotential = Math.min(20, improvementPotential + Math.floor((readinessScore - 50) / 10));
+    effort = Math.min(20, effort + Math.floor((readinessScore - 50) / 15));
+  }
+
+  // emotions (감정 상태) - 긍정적 감정이 많을수록 현재상황 점수 증가
+  if (Array.isArray(responses.emotions)) {
+    const positiveEmotions = ['hopeful', 'peaceful'];
+    const negativeEmotions = ['anxious', 'frustrated', 'confused'];
+
+    const positiveCount = responses.emotions.filter(e => positiveEmotions.includes(e)).length;
+    const negativeCount = responses.emotions.filter(e => negativeEmotions.includes(e)).length;
+
+    currentSituation = Math.max(5, Math.min(20, currentSituation + (positiveCount * 2) - negativeCount));
+  }
+
+  // strengths (강점) - 강점이 많을수록 노력도 증가
+  if (Array.isArray(responses.strengths)) {
+    const strengthBonus = Math.min(5, responses.strengths.length);
+    effort = Math.min(20, effort + strengthBonus);
+  }
+
+  // support (지원 시스템) - 지원이 많을수록 행운도 증가
+  if (responses.support) {
+    if (responses.support === '많음') {
+      luck = Math.min(20, luck + 5);
+    } else if (responses.support === '조금') {
+      luck = Math.min(20, luck + 2);
+    }
+    // '없음'은 변화 없음
+  }
+
+  // expectations (기대사항) - 다양한 기대가 있으면 타이밍 점수 증가
+  if (Array.isArray(responses.expectations) && responses.expectations.length > 0) {
+    timing = Math.min(20, timing + responses.expectations.length);
+  }
+
+  // 최종 기적지수 계산 (각 요소는 0-20, 합계 0-100)
+  let calculatedIndex = currentSituation + improvementPotential + luck + effort + timing;
+
+  // 50-100 범위로 보정
+  calculatedIndex = Math.max(50, Math.min(100, calculatedIndex));
 
   console.log('[MiracleIndex] 계산 상세:', {
     currentSituation,
@@ -656,12 +702,8 @@ function calculateMiracleIndex(wish, responses, concerns) {
     calculated: calculatedIndex
   });
 
-  // MVP 단계: 75점 고정 (긍정적 메시지 전달)
-  // 향후: return Math.max(50, Math.min(100, calculatedIndex));
-  const miracleIndex = 75;
-
-  console.log('[MiracleIndex] 최종 기적지수:', miracleIndex, '(MVP 고정값)');
-  return miracleIndex;
+  console.log('[MiracleIndex] 최종 기적지수:', calculatedIndex, '(동적 계산)');
+  return calculatedIndex;
 }
 
 // ---------- 통찰 생성 ----------
