@@ -7,10 +7,25 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const analysisEngine = require("./services/analysisEngine");
-const yeosuRoutes = require("./routes/yeosuRoutes");
-const db = require("./database/db");
 
 const app = express();
+
+// 여수 라우터 로딩 (에러 처리)
+let yeosuRoutes = null;
+try {
+  yeosuRoutes = require("./routes/yeosuRoutes");
+  console.log("✅ 여수 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 여수 라우터 로드 실패:", error.message);
+}
+
+// DB 모듈 (선택적 로딩)
+let db = null;
+try {
+  db = require("./database/db");
+} catch (error) {
+  console.error("⚠️ DB 모듈 로드 실패:", error.message);
+}
 
 // ---------- CORS (관용 + 화이트리스트 + 프리플라이트) ----------
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
@@ -75,12 +90,15 @@ global.latestStore = global.latestStore || { story: null };
 
 // ---------- Health ----------
 app.get("/api/health", async (_req, res) => {
-  let dbStatus = "연결됨";
-  try {
-    await db.query('SELECT 1');
-  } catch (error) {
-    dbStatus = "연결 실패";
-    console.error("DB 연결 오류:", error);
+  let dbStatus = "DB 모듈 없음";
+  if (db) {
+    try {
+      await db.query('SELECT 1');
+      dbStatus = "연결됨";
+    } catch (error) {
+      dbStatus = "연결 실패";
+      console.error("DB 연결 오류:", error);
+    }
   }
   res.json({
     success: true,
@@ -102,7 +120,12 @@ app.all("/diag/echo", (req, res) => {
 });
 
 // ---------- 여수 기적여행 API Routes ----------
-app.use("/api", yeosuRoutes);
+if (yeosuRoutes) {
+  app.use("/api", yeosuRoutes);
+  console.log("✅ 여수 API 라우터 등록 완료");
+} else {
+  console.warn("⚠️ 여수 API 라우터 로드 실패 - 라우트 미등록");
+}
 
 // ---------- Tolerant extractor ----------
 function extractUserInput(body) {
