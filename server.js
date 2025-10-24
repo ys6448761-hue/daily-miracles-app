@@ -7,6 +7,8 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const analysisEngine = require("./services/analysisEngine");
+const yeosuRoutes = require("./routes/yeosuRoutes");
+const db = require("./database/db");
 
 const app = express();
 
@@ -72,8 +74,20 @@ if (String(process.env.REQUEST_LOG || "1") === "1") {
 global.latestStore = global.latestStore || { story: null };
 
 // ---------- Health ----------
-app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+app.get("/api/health", async (_req, res) => {
+  let dbStatus = "연결됨";
+  try {
+    await db.query('SELECT 1');
+  } catch (error) {
+    dbStatus = "연결 실패";
+    console.error("DB 연결 오류:", error);
+  }
+  res.json({
+    success: true,
+    message: "여수 기적여행 API 서버가 정상 작동 중입니다",
+    timestamp: new Date().toISOString(),
+    database: dbStatus
+  });
 });
 
 // ---------- Diag (서버가 실제로 받은 것 그대로 보여줌) ----------
@@ -86,6 +100,9 @@ app.all("/diag/echo", (req, res) => {
     ts: new Date().toISOString()
   });
 });
+
+// ---------- 여수 기적여행 API Routes ----------
+app.use("/api", yeosuRoutes);
 
 // ---------- Tolerant extractor ----------
 function extractUserInput(body) {
@@ -303,7 +320,12 @@ app.get("/", (_req, res) => {
 // ---------- 404 & Error ----------
 app.use((req, res) => {
   console.warn(`❌ 404 Not Found: ${req.method} ${req.originalUrl}`);
-  res.status(404).json({ error: "Endpoint not found", path: req.originalUrl });
+  res.status(404).json({
+    success: false,
+    error: "route_not_found",
+    message: "요청하신 API 경로를 찾을 수 없습니다",
+    path: req.originalUrl
+  });
 });
 
 app.use((err, _req, res, _next) => {
