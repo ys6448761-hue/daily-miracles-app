@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7일 응원 메시지 - 하루하루의 기적</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        /* 메인 메시지 카드 */
+        .message-card {
+            background: white;
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: fadeInUp 0.6s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .day-number {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .message-icon {
+            font-size: 72px;
+            margin: 24px 0;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .message-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+
+        .message-text {
+            font-size: 18px;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 32px;
+        }
+
+        .message-quote {
+            background: linear-gradient(135deg, #f8f9ff 0%, #fff5f7 100%);
+            padding: 24px;
+            border-radius: 16px;
+            font-style: italic;
+            color: #667eea;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 32px;
+            border-left: 4px solid #667eea;
+        }
+
+        /* 진행률 표시 */
+        .progress-section {
+            background: white;
+            border-radius: 24px;
+            padding: 32px;
+            margin-top: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .progress-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .day-circle {
+            aspect-ratio: 1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            border: 3px solid #e5e7eb;
+            color: #9ca3af;
+            transition: all 0.3s ease;
+        }
+
+        .day-circle.completed {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            color: white;
+        }
+
+        .day-circle.current {
+            border-color: #667eea;
+            color: #667eea;
+            font-weight: 700;
+            animation: pulse2 2s infinite;
+        }
+
+        @keyframes pulse2 {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
+            }
+        }
+
+        .progress-bar-container {
+            height: 12px;
+            background: #e5e7eb;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 1s ease;
+            border-radius: 6px;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #667eea;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* 액션 버튼 */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9ff;
+        }
+
+        /* 일일 과제 */
+        .daily-challenge {
+            background: linear-gradient(135deg, #f8f9ff 0%, #fff5f7 100%);
+            padding: 24px;
+            border-radius: 16px;
+            margin-top: 24px;
+        }
+
+        .challenge-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .challenge-list {
+            list-style: none;
+        }
+
+        .challenge-item {
+            padding: 12px 16px;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .challenge-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .challenge-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        .challenge-item.completed .challenge-checkbox {
+            background: #667eea;
+        }
+
+        .challenge-text {
+            flex: 1;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .challenge-item.completed .challenge-text {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+
+        /* 반응형 */
+        @media (max-width: 480px) {
+            .message-card {
+                padding: 32px 24px;
+            }
+
+            .message-title {
+                font-size: 24px;
+            }
+
+            .message-text {
+                font-size: 16px;
+            }
+
+            .days-grid {
+                gap: 8px;
+            }
+
+            .day-circle {
+                font-size: 14px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 오늘의 메시지 -->
+        <div class="message-card">
+            <div class="day-number" id="dayNumber">Day 1</div>
+            <div class="message-icon" id="messageIcon">✨</div>
+            <h1 class="message-title" id="messageTitle">새로운 시작을 환영합니다</h1>
+            <p class="message-text" id="messageText">
+                오늘부터 7일간, 당신의 작은 변화를 응원합니다.
+                매일 한 걸음씩 나아가다 보면 어느새 큰 기적을 만나게 될 거예요.
+            </p>
+            <div class="message-quote" id="messageQuote">
+                "천 리 길도 한 걸음부터"<br>
+                작은 시작이 큰 변화를 만듭니다.
+            </div>
+
+            <!-- 일일 과제 -->
+            <div class="daily-challenge">
+                <div class="challenge-title">
+                    <span>📝</span>
+                    <span>오늘의 작은 실천</span>
+                </div>
+                <ul class="challenge-list" id="challengeList">
+                    <!-- JavaScript로 동적 생성 -->
+                </ul>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="nextDay()">다음 날 보기</button>
+                <button class="btn btn-secondary" onclick="shareMessage()">공유하기</button>
+            </div>
+        </div>
+
+        <!-- 진행률 -->
+        <div class="progress-section">
+            <h2 class="progress-title">7일 기적 여정</h2>
+
+            <div class="days-grid" id="daysGrid">
+                <!-- JavaScript로 동적 생성 -->
+            </div>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progressBarFill" style="width: 0%;"></div>
+            </div>
+            <p class="progress-text" id="progressText">1/7일 완료</p>
+        </div>
+    </div>
+
+    <script>
+        // 7일 메시지 데이터
+        const messages = [
+            {
+                day: 1,
+                icon: '✨',
+                title: '새로운 시작을 환영합니다',
+                text: '오늘부터 7일간, 당신의 작은 변화를 응원합니다. 매일 한 걸음씩 나아가다 보면 어느새 큰 기적을 만나게 될 거예요.',
+                quote: '"천 리 길도 한 걸음부터"<br>작은 시작이 큰 변화를 만듭니다.',
+                challenges: ['아침에 일어나서 감사한 것 3가지 적기', '오늘의 목표 하나 정하기', '긍정적인 생각으로 하루 시작하기']
+            },
+            {
+                day: 2,
+                icon: '💪',
+                title: '작은 변화가 쌓여갑니다',
+                text: '어제의 당신보다 오늘의 당신이 더 나아졌습니다. 작은 실천 하나하나가 모여 큰 변화를 만들고 있어요.',
+                quote: '"완벽하지 않아도 괜찮습니다"<br>중요한 건 꾸준함입니다.',
+                challenges: ['어제의 성취 하나 칭찬하기', '오늘 하루 친절한 말 3번 하기', '15분 산책하며 생각 정리하기']
+            },
+            {
+                day: 3,
+                icon: '🌱',
+                title: '성장의 싹이 트고 있어요',
+                text: '벌써 3일째! 당신은 해내고 있습니다. 지금 느껴지지 않아도, 내면에서는 분명한 변화가 일어나고 있어요.',
+                quote: '"성장은 조용히 일어납니다"<br>보이지 않아도 자라고 있습니다.',
+                challenges: ['자신에게 격려의 편지 쓰기', '좋은 습관 하나 만들기', '과거의 나와 현재의 나 비교하기']
+            },
+            {
+                day: 4,
+                icon: '⭐',
+                title: '절반을 넘어섰습니다',
+                text: '이미 절반 이상 왔어요! 여기까지 온 자신을 자랑스러워하세요. 당신은 충분히 잘하고 있습니다.',
+                quote: '"포기하지 않는 것이 성공입니다"<br>계속 가는 것만으로도 훌륭합니다.',
+                challenges: ['스스로에게 보상하기 (작은 것이라도)', '긍정적인 변화 3가지 적기', '내일의 나에게 응원 메시지 남기기']
+            },
+            {
+                day: 5,
+                icon: '🎯',
+                title: '목표가 더 선명해집니다',
+                text: '5일간의 여정을 통해 당신은 이미 많은 것을 배웠습니다. 처음보다 훨씬 강해진 당신을 느끼시나요?',
+                quote: '"우리는 우리가 반복하는 것입니다"<br>당신은 이미 새로운 당신이 되고 있습니다.',
+                challenges: ['이번 주의 성장 기록하기', '감사한 사람에게 연락하기', '작은 도전 하나 더 시도하기']
+            },
+            {
+                day: 6,
+                icon: '🌟',
+                title: '거의 다 왔습니다!',
+                text: '놀라운 인내심입니다! 이제 하루만 더 가면 완주예요. 여기까지 온 당신은 진짜 기적을 만들고 있습니다.',
+                quote: '"마지막까지 가는 사람이 진짜 승자입니다"<br>거의 다 왔습니다!',
+                challenges: ['이번 주 배운 것 정리하기', '다음 주 계획 세우기', '자신에게 칭찬 10가지 하기']
+            },
+            {
+                day: 7,
+                icon: '🎉',
+                title: '축하합니다! 7일을 완주했어요!',
+                text: '정말 대단합니다! 7일을 완주한 당신은 이미 기적을 만들었어요. 이 작은 성취가 더 큰 변화의 시작이 될 거예요.',
+                quote: '"끝은 또 다른 시작입니다"<br>이제 당신은 무엇이든 할 수 있습니다!',
+                challenges: ['7일간의 여정 돌아보기', '가장 큰 변화 기록하기', '다음 목표 설정하기', '자신에게 선물하기']
+            }
+        ];
+
+        let currentDay = 1;
+        let completedDays = [];
+
+        // 페이지 로드 시
+        window.addEventListener('load', () => {
+            // localStorage에서 진행상황 불러오기
+            const saved = localStorage.getItem('dailyMessagesProgress');
+            if (saved) {
+                const data = JSON.parse(saved);
+                currentDay = data.currentDay || 1;
+                completedDays = data.completedDays || [];
+            }
+
+            renderMessage(currentDay);
+            renderProgress();
+        });
+
+        function renderMessage(day) {
+            const msg = messages[day - 1];
+            if (!msg) return;
+
+            document.getElementById('dayNumber').textContent = `Day ${msg.day}`;
+            document.getElementById('messageIcon').textContent = msg.icon;
+            document.getElementById('messageTitle').textContent = msg.title;
+            document.getElementById('messageText').textContent = msg.text;
+            document.getElementById('messageQuote').innerHTML = msg.quote;
+
+            // 일일 과제 렌더링
+            const challengeList = document.getElementById('challengeList');
+            challengeList.innerHTML = msg.challenges.map((challenge, index) => `
+                <li class="challenge-item" onclick="toggleChallenge(${index})">
+                    <div class="challenge-checkbox" id="checkbox-${index}">✓</div>
+                    <div class="challenge-text">${challenge}</div>
+                </li>
+            `).join('');
+        }
+
+        function renderProgress() {
+            // 일차별 원 렌더링
+            const daysGrid = document.getElementById('daysGrid');
+            daysGrid.innerHTML = Array.from({ length: 7 }, (_, i) => {
+                const dayNum = i + 1;
+                let className = 'day-circle';
+                if (completedDays.includes(dayNum)) className += ' completed';
+                if (dayNum === currentDay) className += ' current';
+
+                return `<div class="${className}">${dayNum}</div>`;
+            }).join('');
+
+            // 진행률 바
+            const progress = (completedDays.length / 7) * 100;
+            document.getElementById('progressBarFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent =
+                `${completedDays.length}/7일 완료`;
+        }
+
+        function toggleChallenge(index) {
+            const item = document.querySelector(`.challenge-item:nth-child(${index + 1})`);
+            item.classList.toggle('completed');
+        }
+
+        function nextDay() {
+            if (currentDay < 7) {
+                // 현재 날짜를 완료 목록에 추가
+                if (!completedDays.includes(currentDay)) {
+                    completedDays.push(currentDay);
+                }
+
+                currentDay++;
+
+                // 저장
+                localStorage.setItem('dailyMessagesProgress', JSON.stringify({
+                    currentDay,
+                    completedDays
+                }));
+
+                // 화면 업데이트
+                renderMessage(currentDay);
+                renderProgress();
+
+                // 페이지 맨 위로
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                alert('🎉 축하합니다! 7일 모두 완료했습니다!\n\n이제 결과 페이지로 돌아가서 당신의 성장을 확인하세요!');
+                window.location.href = '/daily-miracles-result.html';
+            }
+        }
+
+        function shareMessage() {
+            const msg = messages[currentDay - 1];
+            const text = `Day ${msg.day}: ${msg.title}\n\n"${msg.text}"\n\n하루하루의 기적과 함께하세요!`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: '하루하루의 기적 - 7일 응원 메시지',
+                    text: text,
+                    url: window.location.href
+                });
+            } else {
+                // 폴백: 클립보드 복사
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('메시지가 클립보드에 복사되었습니다!');
+                });
+            }
+        }
+
+        // 진행률 애니메이션
+        setTimeout(() => {
+            document.getElementById('progressBarFill').style.width =
+                document.getElementById('progressBarFill').style.width;
+        }, 500);
+    </script>
+</body>
+</html>
