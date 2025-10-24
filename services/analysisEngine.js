@@ -129,25 +129,26 @@ function analyzeUserProfile(userInput) {
 function generateCounterpartyProfile(data) {
   const startTime = Date.now();
 
-  const responses = data.userInput?.responses || data.responses || {};
+  const userInput = data.userInput || data;
+  const responses = userInput.responses || {};
 
-  // Q6: 관계 유형 확인 (필수)
-  const relationshipType = responses.q6;
+  // 새로운 질문 폼 구조 지원: hasRelationship + relationshipType
+  const hasRelationship = userInput.hasRelationship || responses.hasRelationship;
+  let relationshipType = userInput.relationshipType || responses.q6 || responses.relationshipType;
 
-  // "혼자만의 문제" 선택 시 상대방 프로필 생성 안 함
-  if (!relationshipType || relationshipType === '혼자만의 문제') {
-    console.log('[AnalysisEngine] No relationship type or solo problem - skipping counterparty profile');
+  // 관계가 없는 경우 (hasRelationship === "no" or "혼자만의 문제")
+  if (hasRelationship === 'no' || relationshipType === '혼자만의 문제' || !relationshipType) {
+    console.log('[AnalysisEngine] No relationship - hasRelationship:', hasRelationship, 'relationshipType:', relationshipType);
     return null;
   }
 
   console.log('[AnalysisEngine] generateCounterpartyProfile - relationshipType:', relationshipType);
 
-  // 상대방 이름 추출 (없으면 관계 유형 기반 기본값)
+  // 상대방 이름 추출 (새 구조 우선, 이전 구조 호환)
   const counterpartyName =
-    data.counterpartyName ||
-    data.userInput?.counterpartyName ||
-    responses.partnerName ||
+    userInput.counterpartyName ||
     responses.counterpartyName ||
+    responses.partnerName ||
     getDefaultCounterpartyName(relationshipType);
 
   // 관계 유형
