@@ -119,6 +119,39 @@ app.all("/diag/echo", (req, res) => {
   });
 });
 
+// ---------- Debug: 파일 시스템 확인 ----------
+app.get("/diag/files", (req, res) => {
+  const fs = require("fs");
+  const path = require("path");
+
+  try {
+    const diagnostics = {
+      cwd: process.cwd(),
+      __dirname,
+      yeosuRoutesLoaded: yeosuRoutes !== null,
+      dbLoaded: db !== null,
+      files: {
+        routesDir: fs.existsSync(path.join(__dirname, "routes")),
+        yeosuRoutesFile: fs.existsSync(path.join(__dirname, "routes", "yeosuRoutes.js")),
+        databaseDir: fs.existsSync(path.join(__dirname, "database")),
+        dbFile: fs.existsSync(path.join(__dirname, "database", "db.js"))
+      }
+    };
+
+    if (fs.existsSync(path.join(__dirname, "routes"))) {
+      diagnostics.routesContents = fs.readdirSync(path.join(__dirname, "routes"));
+    }
+
+    if (fs.existsSync(path.join(__dirname, "database"))) {
+      diagnostics.databaseContents = fs.readdirSync(path.join(__dirname, "database"));
+    }
+
+    res.json(diagnostics);
+  } catch (error) {
+    res.status(500).json({ error: error.message, stack: error.stack });
+  }
+});
+
 // ---------- 여수 기적여행 API Routes ----------
 if (yeosuRoutes) {
   app.use("/api", yeosuRoutes);
