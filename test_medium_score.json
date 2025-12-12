@@ -1,0 +1,16 @@
+{
+  "userInput": {
+    "wish": "가족과의 관계를 개선하고 더 행복한 일상을 만들고 싶어요",
+    "hasRelationship": "yes",
+    "relationshipType": "parent",
+    "counterpartyName": "엄마",
+    "emotions": ["hopeful", "frustrated"],
+    "readiness": "60",
+    "efforts": "대화를 시도했지만 잘 안 됐어요. 좋은 책들도 읽어봤어요.",
+    "idealFuture": "6개월 후에는 엄마와 편하게 대화하고 서로를 이해하며 웃음이 넘치는 가정을 만들고 싶어요",
+    "strengths": ["persistence", "empathy", "patience"],
+    "concerns": "관계가 더 나빠질까봐, 서로 상처만 주게 될까봐 걱정이에요",
+    "support": "조금",
+    "expectations": ["clarity", "action", "hope"]
+  }
+}

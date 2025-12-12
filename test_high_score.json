@@ -1,0 +1,16 @@
+{
+  "userInput": {
+    "wish": "지금이 가장 좋은 시기에요! 함께 성장하고 발전하고 싶어요. 노력하면 변화할 수 있어요!",
+    "hasRelationship": "yes",
+    "relationshipType": "partner",
+    "counterpartyName": "사랑하는 사람",
+    "emotions": ["hopeful", "peaceful"],
+    "readiness": "95",
+    "efforts": "매일 노력하고 시도하고 있어요. 계속 배우고 성장 중입니다!",
+    "idealFuture": "우리는 서로를 완벽히 이해하고, 함께 행복한 미래를 만들어가고 있어요. 모든 것이 좋아질 거예요!",
+    "strengths": ["persistence", "empathy", "communication", "creativity", "patience"],
+    "concerns": "없어요, 모든 것이 좋아질 것 같아요",
+    "support": "많음",
+    "expectations": ["clarity", "action", "hope", "perspective"]
+  }
+}

@@ -1,0 +1,122 @@
+[33mcommit 9dcc3e0dd394b49f0da0ec1bfe9eaa99d650bacb[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: ys6448761-hue <ys6448761@gmail.com>
+Date:   Fri Oct 24 18:18:26 2025 +0900
+
+    feat: Fix miracle index dynamic calculation (50-100)
+    
+    Fixed critical bug where miracle index calculation was dividing
+    by 5, resulting in 0-20 range instead of 0-100 range.
+    
+    Changes:
+    - Removed division by 5 in miracle index calculation
+    - Each factor (currentSituation, improvementPotential, luck,
+      effort, timing) now contributes 0-20 points
+    - Total range: 50-100 points (sum clamped with Math.max/Math.min)
+    
+    Test results:
+    - Low scenario (readiness 20): 62 points ✅
+    - Medium scenario (readiness 60): 87 points ✅
+    - High scenario (readiness 95): 98 points ✅
+    
+    All scores now properly reflect user input variation.
+    
+    🤖 Generated with Claude Code
+    
+    Co-Authored-By: Claude <noreply@anthropic.com>
+
+[1mdiff --git a/services/analysisEngine.js b/services/analysisEngine.js[m
+[1mindex 78ef339..c3c2136 100644[m
+[1m--- a/services/analysisEngine.js[m
+[1m+++ b/services/analysisEngine.js[m
+[36m@@ -68,9 +68,11 @@[m [mfunction analyzeUserProfile(userInput) {[m
+ [m
+   const wish = userInput.wish || userInput.concern || userInput.problem || '';[m
+   const name = userInput.name || '사용자';[m
+[31m-  const responses = userInput.responses || {};[m
+[32m+[m[32m  // 🔥 새 질문 폼: userInput 자체가 responses (이전 구조와 호환)[m
+[32m+[m[32m  const responses = userInput.responses || userInput;[m
+ [m
+   console.log('[AnalysisEngine] analyzeUserProfile - wish:', wish);[m
+[32m+[m[32m  console.log('[AnalysisEngine] responses:', JSON.stringify(responses, null, 2));[m
+ [m
+   // 1. 키워드 기반 관심사 추출[m
+   const concerns = extractConcerns(wish);[m
+[36m@@ -93,7 +95,7 @@[m [mfunction analyzeUserProfile(userInput) {[m
+   const strengths = extractStrengths(personality, element);[m
+   const challenges = extractChallenges(concerns, wish);[m
+ [m
+[31m-  // 6. 기적지수 계산[m
+[32m+[m[32m  // 6. 기적지수 계산 (userInput 전체 전달)[m
+   const miracleIndex = calculateMiracleIndex(wish, responses, concerns);[m
+ [m
+   // 7. 통찰 생성[m
+[36m@@ -644,8 +646,52 @@[m [mfunction calculateMiracleIndex(wish, responses, concerns) {[m
+   }[m
+   timing = Math.min(20, timing);[m
+ [m
+[31m-  // 최종 기적지수 계산[m
+[31m-  const calculatedIndex = Math.round((currentSituation + improvementPotential + luck + effort + timing) / 5);[m
+[32m+[m[32m  // 🔥 새 질문 폼 필드 추가 반영[m
+[32m+[m[32m  // readiness (준비도 슬라이더 0-100)[m
+[32m+[m[32m  if (responses.readiness) {[m
+[32m+[m[32m    const readinessScore = parseInt(responses.readiness) || 50;[m
+[32m+[m[32m    // 준비도가 높을수록 개선가능성과 노력도 증가[m
+[32m+[m[32m    improvementPotential = Math.min(20, improvementPotential + Math.floor((readinessScore - 50) / 10));[m
+[32m+[m[32m    effort = Math.min(20, effort + Math.floor((readinessScore - 50) / 15));[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  // emotions (감정 상태) - 긍정적 감정이 많을수록 현재상황 점수 증가[m
+[32m+[m[32m  if (Array.isArray(responses.emotions)) {[m
+[32m+[m[32m    const positiveEmotions = ['hopeful', 'peaceful'];[m
+[32m+[m[32m    const negativeEmotions = ['anxious', 'frustrated', 'confused'];[m
+[32m+[m
+[32m+[m[32m    const positiveCount = responses.emotions.filter(e => positiveEmotions.includes(e)).length;[m
+[32m+[m[32m    const negativeCount = responses.emotions.filter(e => negativeEmotions.includes(e)).length;[m
+[32m+[m
+[32m+[m[32m    currentSituation = Math.max(5, Math.min(20, currentSituation + (positiveCount * 2) - negativeCount));[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  // strengths (강점) - 강점이 많을수록 노력도 증가[m
+[32m+[m[32m  if (Array.isArray(responses.strengths)) {[m
+[32m+[m[32m    const strengthBonus = Math.min(5, responses.strengths.length);[m
+[32m+[m[32m    effort = Math.min(20, effort + strengthBonus);[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  // support (지원 시스템) - 지원이 많을수록 행운도 증가[m
+[32m+[m[32m  if (responses.support) {[m
+[32m+[m[32m    if (responses.support === '많음') {[m
+[32m+[m[32m      luck = Math.min(20, luck + 5);[m
+[32m+[m[32m    } else if (responses.support === '조금') {[m
+[32m+[m[32m      luck = Math.min(20, luck + 2);[m
+[32m+[m[32m    }[m
+[32m+[m[32m    // '없음'은 변화 없음[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  // expectations (기대사항) - 다양한 기대가 있으면 타이밍 점수 증가[m
+[32m+[m[32m  if (Array.isArray(responses.expectations) && responses.expectations.length > 0) {[m
+[32m+[m[32m    timing = Math.min(20, timing + responses.expectations.length);[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  // 최종 기적지수 계산 (각 요소는 0-20, 합계 0-100)[m
+[32m+[m[32m  let calculatedIndex = currentSituation + improvementPotential + luck + effort + timing;[m
+[32m+[m
+[32m+[m[32m  // 50-100 범위로 보정[m
+[32m+[m[32m  calculatedIndex = Math.max(50, Math.min(100, calculatedIndex));[m
+ [m
+   console.log('[MiracleIndex] 계산 상세:', {[m
+     currentSituation,[m
+[36m@@ -656,12 +702,8 @@[m [mfunction calculateMiracleIndex(wish, responses, concerns) {[m
+     calculated: calculatedIndex[m
+   });[m
+ [m
+[31m-  // MVP 단계: 75점 고정 (긍정적 메시지 전달)[m
+[31m-  // 향후: return Math.max(50, Math.min(100, calculatedIndex));[m
+[31m-  const miracleIndex = 75;[m
+[31m-[m
+[31m-  console.log('[MiracleIndex] 최종 기적지수:', miracleIndex, '(MVP 고정값)');[m
+[31m-  return miracleIndex;[m
+[32m+[m[32m  console.log('[MiracleIndex] 최종 기적지수:', calculatedIndex, '(동적 계산)');[m
+[32m+[m[32m  return calculatedIndex;[m
+ }[m
+ [m
+ // ---------- 통찰 생성 ----------[m

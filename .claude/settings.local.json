@@ -40,7 +40,14 @@
       "Bash(PORT=8085 node:*)",
       "Bash(git ls-tree:*)",
       "Bash(PORT=5001 node:*)",
-      "Bash(PORT=5002 node:*)"
+      "Bash(PORT=5002 node:*)",
+      "Bash(PORT=5003 node:*)",
+      "Bash(tasklist:*)",
+      "Bash(PORT=5004 node:*)",
+      "Bash(git remote:*)",
+      "Bash(PORT=5100 node:*)",
+      "Bash(PORT=5101 node:*)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": []

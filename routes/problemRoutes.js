@@ -163,4 +163,132 @@ router.get('/categories', (req, res) => {
   }
 });
 
+// ============================================================
+// 온라인 Wix 폼 전용 통합 API
+// ============================================================
+
+const { buildConversationFromWish, generateReportId } = require('../utils/wishConverter');
+const { analyzeWithClaude } = require('../services/claudeAnalysisService');
+
+/**
+ * POST /api/problem/online-wish
+ * Wix 폼에서 한 번에 고민을 보내고 리포트를 받는 통합 API
+ *
+ * Request Body:
+ * {
+ *   "nickname": "달빛고래",
+ *   "wishSummary": "상사가 회의에서 제 의견을 무시하는 게 너무 힘들어요.",
+ *   "situation": "스타트업에서 PM으로 일하고 있고...",
+ *   "tries": "한 번은 개인적으로 이야기를 해보려고 했는데...",
+ *   "constraints": "퇴사는 최대한 피하고 싶어요. 가족 시간은 지키고 싶어요.",
+ *   "focus": "지금 당장 제가 어떤 행동을 해보면 좋을지 알고 싶어요.",
+ *   "email": "user@example.com" (선택),
+ *   "wixUserId": "wix_12345" (선택)
+ * }
+ *
+ * Response:
+ * {
+ *   "success": true,
+ *   "data": {
+ *     "nickname": "달빛고래",
+ *     "detectedCategory": "직장",
+ *     "categoryName": "직장/업무",
+ *     "analysis": {
+ *       "summary": "...",
+ *       "coreIssue": "...",
+ *       "insights": [...],
+ *       "options": [...],
+ *       "nextActions": [...]
+ *     },
+ *     "reportId": "report_1702345678_abc123",
+ *     "timestamp": "2025-12-12T...",
+ *     "processingTime": 1234
+ *   }
+ * }
+ */
+router.post('/online-wish', async (req, res) => {
+  const startTime = Date.now();
+
+  try {
+    // 1. 입력 검증
+    const { nickname, wishSummary, situation, tries, constraints, focus, email, wixUserId } = req.body;
+
+    if (!nickname || !wishSummary) {
+      return res.status(400).json({
+        success: false,
+        error: 'nickname과 wishSummary는 필수 입력입니다.',
+        hint: '최소한 닉네임과 고민 요약을 입력해주세요.'
+      });
+    }
+
+    console.log(`📝 온라인 고민 접수: ${nickname} - ${wishSummary.substring(0, 30)}...`);
+
+    // 2. Conversation 구조 생성
+    const { category, categoryName, conversation } = buildConversationFromWish({
+      wishSummary,
+      situation,
+      tries,
+      constraints,
+      focus
+    });
+
+    console.log(`🎯 카테고리 감지: ${categoryName} (${category})`);
+    console.log(`📋 Conversation 생성 완료 (${conversation.length}개 레벨)`);
+
+    // 3. Claude API로 분석
+    console.log('🤖 Claude 분석 시작...');
+    const analysis = await analyzeWithClaude({
+      category,
+      categoryName,
+      conversation,
+      nickname
+    });
+    console.log('✅ Claude 분석 완료');
+
+    // 4. 리포트 ID 생성
+    const reportId = generateReportId();
+    const processingTime = Date.now() - startTime;
+
+    // 5. 응답 반환
+    const response = {
+      success: true,
+      data: {
+        // 기본 정보
+        nickname,
+        detectedCategory: category,
+        categoryName,
+
+        // 분석 결과
+        analysis,
+
+        // 메타데이터
+        reportId,
+        timestamp: new Date().toISOString(),
+        processingTime
+      }
+    };
+
+    console.log(`✅ 리포트 생성 완료: ${reportId} (${processingTime}ms)`);
+
+    // 6. (선택) DB 저장 or 이메일 전송
+    // TODO: 나중에 구현
+    if (email) {
+      console.log(`📧 이메일 전송 예정: ${email}`);
+      // await sendReportEmail(email, response.data);
+    }
+
+    return res.status(200).json(response);
+
+  } catch (error) {
+    console.error('💥 온라인 고민 처리 오류:', error);
+
+    return res.status(500).json({
+      success: false,
+      error: '분석 처리 중 오류가 발생했습니다.',
+      message: error.message,
+      processingTime: Date.now() - startTime
+    });
+  }
+});
+
 module.exports = router;

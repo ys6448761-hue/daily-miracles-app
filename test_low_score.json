@@ -1,0 +1,16 @@
+{
+  "userInput": {
+    "wish": "힘들고 어렵고 절망적이에요. 갈등만 계속되고 싸움만 해요.",
+    "hasRelationship": "yes",
+    "relationshipType": "spouse",
+    "counterpartyName": "배우자",
+    "emotions": ["anxious", "frustrated", "confused"],
+    "readiness": "20",
+    "efforts": "시도해봤지만 안 됐어요",
+    "idealFuture": "좀 나아졌으면...",
+    "strengths": ["persistence"],
+    "concerns": "더 나빠질까봐 무서워요",
+    "support": "없음",
+    "expectations": ["clarity"]
+  }
+}
