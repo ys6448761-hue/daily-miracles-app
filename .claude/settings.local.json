@@ -47,7 +47,11 @@
       "Bash(git remote:*)",
       "Bash(PORT=5100 node:*)",
       "Bash(PORT=5101 node:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(cd:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(copy:*)"
     ],
     "deny": [],
     "ask": []

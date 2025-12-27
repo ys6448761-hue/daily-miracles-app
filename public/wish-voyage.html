@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>소원항해 - 여수에서 소원을 출항시키다</title>
+    <meta property="og:title" content="소원항해 - 하루하루의 기적" />
+    <meta property="og:description" content="여수 앞바다에서 진행하는 20분 소원 체험 프로그램" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* 히어로 섹션 */
+        .hero {
+            padding: 80px 20px;
+            text-align: center;
+            color: white;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+            background-size: 100% auto;
+        }
+
+        .hero-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .hero-icon {
+            font-size: 80px;
+            margin-bottom: 24px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .hero h1 {
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+
+        .hero p {
+            font-size: 20px;
+            opacity: 0.95;
+            line-height: 1.7;
+            margin-bottom: 40px;
+        }
+
+        /* 프로그램 정보 */
+        .info-section {
+            background: white;
+            padding: 60px 20px;
+        }
+
+        .info-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 40px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%);
+            border-radius: 16px;
+            padding: 28px;
+            text-align: center;
+            border-left: 4px solid #2a5298;
+        }
+
+        .info-card .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .info-card h3 {
+            font-size: 18px;
+            color: #1e3c72;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .info-card p {
+            font-size: 15px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        /* 프로그램 상세 */
+        .detail-section {
+            background: #f8f9fa;
+            padding: 60px 20px;
+        }
+
+        .detail-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .detail-box {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .detail-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .detail-text h4 {
+            font-size: 18px;
+            color: #1e3c72;
+            margin-bottom: 8px;
+        }
+
+        .detail-text p {
+            font-size: 15px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* 포함 사항 */
+        .includes-section {
+            background: white;
+            padding: 60px 20px;
+        }
+
+        .includes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .include-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .include-item .check {
+            color: #2a5298;
+            font-size: 24px;
+        }
+
+        /* CTA */
+        .cta-section {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 80px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .cta-section h2 {
+            font-size: 32px;
+            margin-bottom: 16px;
+        }
+
+        .cta-section p {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 32px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 18px 36px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-kakao {
+            background: #FEE500;
+            color: #3C1E1E;
+        }
+
+        .btn-kakao:hover {
+            background: #F5DC00;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
+
+        /* 안내 사항 */
+        .notice-section {
+            background: #fff8e6;
+            padding: 40px 20px;
+        }
+
+        .notice-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .notice-title {
+            font-size: 20px;
+            color: #856404;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .notice-text {
+            font-size: 15px;
+            color: #856404;
+            line-height: 1.8;
+        }
+
+        /* 푸터 */
+        .footer {
+            background: #1e3c72;
+            padding: 40px 20px;
+            color: white;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-links {
+            margin-bottom: 24px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            margin: 0 16px;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .business-info {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.8;
+        }
+
+        .business-info .line {
+            margin: 3px 0;
+        }
+
+        .business-info .separator {
+            margin: 0 8px;
+            opacity: 0.5;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .hero-icon {
+                font-size: 60px;
+            }
+
+            .section-title {
+                font-size: 24px;
+            }
+
+            .cta-section h2 {
+                font-size: 24px;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+
+            .footer-links a {
+                display: block;
+                margin: 10px 0;
+            }
+
+            .business-info .separator {
+                display: none;
+            }
+
+            .business-info .line {
+                display: block;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 히어로 -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-icon">⛵</div>
+            <h1>소원항해</h1>
+            <p>여수 앞바다에서 소원을 출항시키다<br>당신의 소원이 바다 위로 떠오르는 특별한 순간</p>
+        </div>
+    </section>
+
+    <!-- 프로그램 정보 -->
+    <section class="info-section">
+        <div class="info-content">
+            <h2 class="section-title">프로그램 소개</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="icon">🕐</div>
+                    <h3>운영 시간</h3>
+                    <p>10:00 ~ 12:00<br>(약 20분 체험)</p>
+                </div>
+                <div class="info-card">
+                    <div class="icon">👥</div>
+                    <h3>대상</h3>
+                    <p>개인 (4인 이하)<br>단체 (5인 이상)</p>
+                </div>
+                <div class="info-card">
+                    <div class="icon">📍</div>
+                    <h3>장소</h3>
+                    <p>여수여행센터 앞<br>여수 앞바다</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 프로그램 상세 -->
+    <section class="detail-section">
+        <div class="detail-content">
+            <h2 class="section-title">체험 내용</h2>
+            <div class="detail-box">
+                <div class="detail-item">
+                    <div class="detail-icon">✉️</div>
+                    <div class="detail-text">
+                        <h4>소원엽서 작성</h4>
+                        <p>당신의 간절한 소원을 특별한 엽서에 담아보세요. 마음을 글로 표현하는 것만으로도 소원은 한 걸음 현실에 가까워집니다.</p>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-icon">✈️</div>
+                    <div class="detail-text">
+                        <h4>비행기 접기</h4>
+                        <p>소원을 담은 종이비행기를 직접 접어보세요. 손끝에서 만들어지는 비행기처럼, 당신의 소원도 하늘로 날아오릅니다.</p>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-icon">🏛️</div>
+                    <div class="detail-text">
+                        <h4>디지털용궁 입항</h4>
+                        <p>여수 바다의 디지털용궁에 당신의 소원을 입항시켜 보세요. 현대 기술과 전통의 만남, 특별한 경험이 됩니다.</p>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-icon">📸</div>
+                    <div class="detail-text">
+                        <h4>기념 촬영</h4>
+                        <p>소원항해의 특별한 순간을 사진으로 남겨드립니다. (인물 촬영은 사전 동의 시 진행)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 포함 사항 -->
+    <section class="includes-section">
+        <h2 class="section-title">포함 사항</h2>
+        <div class="includes-grid">
+            <div class="include-item">
+                <span class="check">✓</span>
+                <span>소원엽서</span>
+            </div>
+            <div class="include-item">
+                <span class="check">✓</span>
+                <span>종이비행기 키트</span>
+            </div>
+            <div class="include-item">
+                <span class="check">✓</span>
+                <span>디지털용궁 입항권</span>
+            </div>
+            <div class="include-item">
+                <span class="check">✓</span>
+                <span>기념 사진</span>
+            </div>
+            <div class="include-item">
+                <span class="check">✓</span>
+                <span>AI 기적 분석</span>
+            </div>
+            <div class="include-item">
+                <span class="check">✓</span>
+                <span>7일 응원 메시지</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 안내 사항 -->
+    <section class="notice-section">
+        <div class="notice-content">
+            <h3 class="notice-title">
+                <span>⚠️</span>
+                <span>환경 보호 안내</span>
+            </h3>
+            <p class="notice-text">
+                소원항해는 <strong>바다 투척 없이 육상 체험 기반</strong>으로 운영됩니다.<br>
+                모든 소모품(엽서, 종이비행기 등)은 <strong>전량 회수</strong>하여 환경을 보호합니다.<br>
+                깨끗한 여수 바다를 함께 지켜주세요.
+            </p>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <h2>소원항해, 함께하시겠어요?</h2>
+        <p>카카오채널로 문의 및 예약이 가능합니다.</p>
+        <div class="cta-buttons">
+            <a href="https://pf.kakao.com/_xnxnKn" target="_blank" class="btn btn-kakao">
+                <span>💬</span> 카카오채널 문의하기
+            </a>
+            <a href="./questions.html" class="btn btn-secondary">
+                <span>✨</span> 온라인 기적 분석 먼저 해보기
+            </a>
+        </div>
+    </section>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="./privacy.html">개인정보처리방침</a>
+                <a href="./terms.html">이용약관</a>
+                <a href="./questions.html">기적 분석</a>
+                <a href="./">메인으로</a>
+            </div>
+            <div class="business-info">
+                <div class="line">
+                    (주)어수여행센터<span class="separator">|</span>대표: 이세진<span class="separator">|</span>사업자등록번호: 409-87-00585
+                </div>
+                <div class="line">
+                    전라남도 여수시 박람회길 1, C동 CD-305호 (덕충동)<span class="separator">|</span>통신판매업: 2016-전라남도-0146호<span class="separator">|</span>전화: 1899-6117
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

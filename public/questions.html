@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>하루하루의 기적 - 12가지 질문</title>
+    <meta property="og:title" content="하루하루의 기적" />
+    <meta property="og:description" content="12문항으로 기적지수와 30일 로드맵을 받아보세요." />
     <style>
         * {
             margin: 0;
@@ -336,6 +338,54 @@
                 flex-direction: column;
             }
         }
+
+        /* 푸터 */
+        .footer {
+            margin-top: 40px;
+            padding: 30px 20px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .footer-links {
+            margin-bottom: 16px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            margin: 0 12px;
+            font-size: 14px;
+        }
+
+        .footer-links a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .business-info {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.8;
+        }
+
+        .business-info .separator {
+            margin: 0 6px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 600px) {
+            .footer-links a {
+                display: block;
+                margin: 8px 0;
+            }
+            .business-info .separator {
+                display: none;
+            }
+            .business-info .line {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
@@ -563,7 +613,7 @@
         window.addEventListener('load', () => {
             const token = localStorage.getItem('token');
             if (!token) {
-                window.location.href = '/login.html';
+                window.location.href = './login.html';
             }
         });
 
@@ -744,7 +794,7 @@
                     localStorage.setItem('latestAnalysis', JSON.stringify(result));
 
                     // 결과 페이지로 이동
-                    window.location.href = result.redirectUrl || '/daily-miracles-result.html';
+                    window.location.href = result.redirectUrl || './daily-miracles-result.html';
                 } else {
                     showError(result.message || '분석 중 오류가 발생했습니다');
                     document.getElementById('loadingOverlay').classList.remove('show');
@@ -771,5 +821,17 @@
         updateProgress();
         updateButtons();
     </script>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="./privacy.html">개인정보처리방침</a>
+            <a href="./terms.html">이용약관</a>
+            <a href="./">메인으로</a>
+        </div>
+        <div class="business-info">
+            <span class="line">(주)어수여행센터<span class="separator">|</span>대표: 이세진<span class="separator">|</span>사업자등록번호: 409-87-00585</span>
+        </div>
+    </footer>
 </body>
 </html>

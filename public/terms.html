@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이용약관 - 하루하루의 기적</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.8;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .content {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section h2 {
+            font-size: 20px;
+            color: #667eea;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .section h3 {
+            font-size: 16px;
+            color: #444;
+            margin: 16px 0 8px;
+        }
+
+        .section p, .section li {
+            font-size: 15px;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .section ul, .section ol {
+            padding-left: 20px;
+            margin-bottom: 16px;
+        }
+
+        .section li {
+            margin-bottom: 6px;
+        }
+
+        .highlight-box {
+            background: #f8f9ff;
+            border-left: 4px solid #667eea;
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .warning-box {
+            background: #fff8f0;
+            border-left: 4px solid #f0ad4e;
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .footer {
+            background: #F8F9FA;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            margin-bottom: 20px;
+        }
+
+        .footer-links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 14px;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .business-info {
+            font-size: 12px;
+            color: #6c757d;
+            line-height: 1.8;
+        }
+
+        .business-info .line {
+            margin: 3px 0;
+        }
+
+        .business-info .separator {
+            margin: 0 8px;
+            color: #dee2e6;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 24px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 600px) {
+            .content {
+                padding: 24px 20px;
+            }
+
+            .section h2 {
+                font-size: 18px;
+            }
+
+            .footer-links a {
+                display: block;
+                margin: 10px 0;
+            }
+
+            .business-info .separator {
+                display: none;
+            }
+
+            .business-info .line {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>이용약관</h1>
+        <p>하루하루의 기적 서비스</p>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <div class="section">
+                <h2>제1조 (목적)</h2>
+                <p>본 약관은 (주)어수여행센터(이하 "회사")가 제공하는 「하루하루의 기적」 서비스(이하 "서비스")의 이용조건 및 절차, 회사와 이용자의 권리·의무 및 책임사항을 규정함을 목적으로 합니다.</p>
+            </div>
+
+            <div class="section">
+                <h2>제2조 (정의)</h2>
+                <ol>
+                    <li><strong>"서비스"</strong>란 회사가 제공하는 AI 기적 분석, 7일 응원 메시지, 30일 로드맵 생성 등 온라인 콘텐츠 서비스를 의미합니다.</li>
+                    <li><strong>"이용자"</strong>란 본 약관에 따라 회사가 제공하는 서비스를 이용하는 자를 말합니다.</li>
+                    <li><strong>"기적지수"</strong>란 이용자의 12가지 질문 응답을 AI가 분석하여 산출하는 50~100점 범위의 지표를 말합니다.</li>
+                    <li><strong>"소원항해"</strong>란 회사가 제공하는 오프라인 체험 프로그램을 말합니다.</li>
+                </ol>
+            </div>
+
+            <div class="section">
+                <h2>제3조 (서비스의 내용)</h2>
+                <p>회사가 제공하는 서비스의 내용은 다음과 같습니다.</p>
+                <ol>
+                    <li><strong>AI 기적 분석:</strong> 12가지 질문을 통한 기적지수 산출 및 맞춤형 분석 제공</li>
+                    <li><strong>7일 응원 메시지:</strong> 카카오 알림톡/SMS를 통한 일일 응원 메시지 발송</li>
+                    <li><strong>30일 로드맵:</strong> 개인 맞춤형 실천 계획 PDF 제공</li>
+                    <li><strong>소원항해 연계:</strong> 오프라인 체험 프로그램 안내 및 예약 연결</li>
+                </ol>
+                <div class="highlight-box">
+                    <strong>무료 서비스 안내:</strong> 현재 AI 기적 분석 및 7일 응원 메시지는 무료로 제공됩니다. 서비스 정책에 따라 향후 변경될 수 있습니다.
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>제4조 (이용자의 의무)</h2>
+                <p>이용자는 다음 행위를 하여서는 안 됩니다.</p>
+                <ol>
+                    <li>타인의 정보를 도용하거나 허위 정보를 입력하는 행위</li>
+                    <li>서비스를 이용하여 얻은 정보를 무단으로 복제, 배포, 상업적으로 이용하는 행위</li>
+                    <li>회사 또는 제3자의 명예를 손상시키거나 업무를 방해하는 행위</li>
+                    <li>서비스의 정상적인 운영을 방해하는 행위</li>
+                    <li>기타 관련 법령에 위배되는 행위</li>
+                </ol>
+            </div>
+
+            <div class="section">
+                <h2>제5조 (회사의 의무)</h2>
+                <ol>
+                    <li>회사는 관련 법령과 본 약관이 금지하는 행위를 하지 않으며, 지속적·안정적으로 서비스를 제공하기 위해 노력합니다.</li>
+                    <li>회사는 이용자의 개인정보를 보호하기 위해 개인정보처리방침을 수립하고 이를 준수합니다.</li>
+                    <li>회사는 이용자가 제기한 의견이나 불만이 정당하다고 인정할 경우 적절한 조치를 취합니다.</li>
+                </ol>
+            </div>
+
+            <div class="section">
+                <h2>제6조 (서비스의 중단)</h2>
+                <ol>
+                    <li>회사는 시스템 정기점검, 설비 보수, 천재지변, 기타 불가피한 사유가 발생한 경우 서비스의 전부 또는 일부를 일시적으로 중단할 수 있습니다.</li>
+                    <li>회사는 무료 서비스의 경우 사전 공지 없이 서비스를 중단하거나 변경할 수 있습니다.</li>
+                </ol>
+            </div>
+
+            <div class="section">
+                <h2>제7조 (면책조항)</h2>
+                <div class="warning-box">
+                    <strong>중요 안내:</strong> 본 서비스는 참고용 콘텐츠로서, 전문적인 의료, 법률, 심리 상담을 대체하지 않습니다.
+                </div>
+                <ol>
+                    <li>회사는 AI가 제공하는 분석 결과의 정확성이나 완전성을 보장하지 않습니다. 분석 결과는 참고 자료로만 활용해 주시기 바랍니다.</li>
+                    <li>회사는 이용자가 서비스를 이용하여 기대하는 효과를 보장하지 않습니다.</li>
+                    <li>회사는 이용자의 귀책사유로 인한 서비스 이용 장애에 대해 책임지지 않습니다.</li>
+                    <li>회사는 무료로 제공되는 서비스 이용과 관련하여 발생한 손해에 대해 책임지지 않습니다.</li>
+                </ol>
+            </div>
+
+            <div class="section">
+                <h2>제8조 (저작권 및 지식재산권)</h2>
+                <ol>
+                    <li>서비스 내 콘텐츠(텍스트, 이미지, 디자인 등)에 대한 저작권 및 지식재산권은 회사에 귀속됩니다.</li>
+                    <li>이용자는 회사의 사전 동의 없이 서비스 내 콘텐츠를 복제, 전송, 배포, 방송할 수 없습니다.</li>
+                    <li>이용자가 서비스에 게시한 콘텐츠에 대한 저작권은 해당 이용자에게 귀속되나, 회사는 서비스 운영 및 개선 목적으로 이를 활용할 수 있습니다.</li>
+                </ol>
+            </div>
+
+            <div class="section">
+                <h2>제9조 (분쟁해결)</h2>
+                <ol>
+                    <li>본 약관과 관련하여 회사와 이용자 간에 발생한 분쟁에 대하여는 상호 협의하여 해결합니다.</li>
+                    <li>협의가 이루어지지 않을 경우 민사소송법에 따른 관할 법원에 제소할 수 있습니다.</li>
+                </ol>
+            </div>
+
+            <div class="section">
+                <h2>제10조 (약관의 변경)</h2>
+                <ol>
+                    <li>회사는 필요한 경우 약관을 변경할 수 있으며, 변경된 약관은 시행일 7일 전 공지합니다.</li>
+                    <li>이용자가 변경된 약관에 동의하지 않는 경우 서비스 이용을 중단할 수 있습니다.</li>
+                </ol>
+            </div>
+
+            <div class="section">
+                <h2>부칙</h2>
+                <p>본 약관은 2024년 12월 27일부터 시행됩니다.</p>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="./questions.html" class="back-btn">기적 분석 시작하기</a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="./privacy.html">개인정보처리방침</a>
+                <a href="./terms.html">이용약관</a>
+                <a href="./questions.html">기적 분석</a>
+            </div>
+            <div class="business-info">
+                <div class="line">
+                    (주)어수여행센터<span class="separator">|</span>대표: 이세진<span class="separator">|</span>사업자등록번호: 409-87-00585
+                </div>
+                <div class="line">
+                    전라남도 여수시 박람회길 1, C동 CD-305호 (덕충동)<span class="separator">|</span>통신판매업: 2016-전라남도-0146호<span class="separator">|</span>전화: 1899-6117
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -44,6 +44,24 @@ try {
   console.error("❌ 문제 해결 라우터 로드 실패:", error.message);
 }
 
+// MVP 1차 폼 (간편 접수) 라우터 로딩
+let inquiryRoutes = null;
+try {
+  inquiryRoutes = require("./routes/inquiryRoutes");
+  console.log("✅ 간편 접수 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 간편 접수 라우터 로드 실패:", error.message);
+}
+
+// Aurora5 자동화 엔진 라우터 로딩
+let aurora5Routes = null;
+try {
+  aurora5Routes = require("./aurora5/routes/aurora5Routes");
+  console.log("✅ Aurora5 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ Aurora5 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -210,6 +228,22 @@ if (problemRoutes) {
   console.log("✅ 문제 해결 API 라우터 등록 완료");
 } else {
   console.warn("⚠️ 문제 해결 API 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- MVP 1차 폼 (간편 접수) API Routes ----------
+if (inquiryRoutes) {
+  app.use("/api/inquiry", inquiryRoutes);
+  console.log("✅ 간편 접수 API 라우터 등록 완료");
+} else {
+  console.warn("⚠️ 간편 접수 API 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- Aurora5 자동화 엔진 API Routes ----------
+if (aurora5Routes) {
+  app.use("/", aurora5Routes); // 루트에 마운트 (webhooks, api, jobs, admin 포함)
+  console.log("✅ Aurora5 API 라우터 등록 완료");
+} else {
+  console.warn("⚠️ Aurora5 API 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Tolerant extractor ----------
@@ -455,13 +489,11 @@ app.listen(PORT, "0.0.0.0", () => {
     "ALL  /diag/echo",
     "POST /api/daily-miracles/analyze",
     "POST /api/relationship/analyze",
-    "POST /api/analyze-relationship",
-    "POST /api/create-story",
-    "POST /api/story",
-    "POST /api/story/generate",
-    "POST /api/story/new",
-    "POST /api/story/create",
     "GET  /api/story/latest",
+    "GET  /api/inquiry/form           (1차 폼 질문 조회)",
+    "POST /api/inquiry/submit         (1차 폼 접수)",
+    "GET  /api/inquiry/:inquiryId     (접수 상태 조회)",
+    "GET  /api/inquiry/list/all       (전체 목록 - 관리자)",
     "GET  /"
   ].forEach(l => console.log("  - " + l));
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");

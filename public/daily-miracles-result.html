@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>당신의 기적 지수 - 하루하루의 기적</title>
+    <meta property="og:title" content="하루하루의 기적" />
+    <meta property="og:description" content="12문항으로 기적지수와 30일 로드맵을 받아보세요." />
     <style>
         * {
             margin: 0;
@@ -410,6 +412,83 @@
                 flex-direction: column;
             }
         }
+
+        /* 프린트용 스타일 */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .action-buttons, .no-print {
+                display: none !important;
+            }
+
+            .hero-section, .destiny-section, .roadmap-section, .relationship-section {
+                box-shadow: none;
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .container {
+                max-width: 100%;
+            }
+        }
+
+        /* 푸터 */
+        .footer {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .footer-links {
+            margin-bottom: 20px;
+        }
+
+        .footer-links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 12px;
+            font-size: 14px;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .business-info {
+            font-size: 12px;
+            color: #6c757d;
+            line-height: 1.8;
+        }
+
+        .business-info .line {
+            margin: 3px 0;
+        }
+
+        .business-info .separator {
+            margin: 0 8px;
+            color: #dee2e6;
+        }
+
+        @media (max-width: 768px) {
+            .footer-links a {
+                display: block;
+                margin: 8px 0;
+            }
+
+            .business-info .separator {
+                display: none;
+            }
+
+            .business-info .line {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
@@ -486,6 +565,13 @@
                 <div class="timeline" id="roadmapTimeline">
                     <!-- JavaScript로 동적 생성 -->
                 </div>
+
+                <!-- PDF 다운로드 버튼 -->
+                <div style="text-align: center; margin-top: 32px;" class="no-print">
+                    <button class="btn btn-secondary" onclick="downloadPDF()" style="display: inline-flex; align-items: center; gap: 8px;">
+                        <span>📄</span> PDF로 저장
+                    </button>
+                </div>
             </div>
 
             <!-- 액션 버튼 -->
@@ -497,6 +583,24 @@
                     결과 공유하기
                 </button>
             </div>
+
+            <!-- 푸터 -->
+            <footer class="footer no-print">
+                <div class="footer-links">
+                    <a href="./privacy.html">개인정보처리방침</a>
+                    <a href="./terms.html">이용약관</a>
+                    <a href="./questions.html">기적 분석</a>
+                    <a href="./wish-voyage.html">소원항해</a>
+                </div>
+                <div class="business-info">
+                    <div class="line">
+                        (주)어수여행센터<span class="separator">|</span>대표: 이세진<span class="separator">|</span>사업자등록번호: 409-87-00585
+                    </div>
+                    <div class="line">
+                        전라남도 여수시 박람회길 1, C동 CD-305호 (덕충동)<span class="separator">|</span>통신판매업: 2016-전라남도-0146호<span class="separator">|</span>전화: 1899-6117
+                    </div>
+                </div>
+            </footer>
         </div>
     </div>
 
@@ -679,7 +783,7 @@
         }
 
         function startDailyMessages() {
-            window.location.href = '/daily-messages.html';
+            window.location.href = './daily-messages.html';
         }
 
         function shareResult() {
@@ -692,6 +796,10 @@
             } else {
                 alert('공유 기능이 지원되지 않는 브라우저입니다.');
             }
+        }
+
+        function downloadPDF() {
+            window.print();
         }
     </script>
 </body>

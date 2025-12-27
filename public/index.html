@@ -3,216 +3,476 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>하루하루의 기적</title>
+    <title>하루하루의 기적 - 당신의 소원을 현실로</title>
+    <meta property="og:title" content="하루하루의 기적" />
+    <meta property="og:description" content="12문항으로 기적지수와 30일 로드맵을 받아보세요." />
+    <meta property="og:type" content="website" />
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Malgun Gothic', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 500px;
-            margin: 0 auto;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-        .title {
-            font-size: 2rem;
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 8px;
-        }
-        .subtitle {
-            font-size: 1rem;
-            color: #7f8c8d;
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #2c3e50;
-            font-size: 0.9rem;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #e8f4fd;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-family: inherit;
-        }
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #74b9ff;
-        }
-        textarea {
-            resize: vertical;
-            height: 60px;
-        }
-        .submit-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #74b9ff, #0984e3);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        .submit-btn:hover {
-            opacity: 0.9;
-        }
-        .submit-btn:disabled {
-            background: #95a5a6;
-            cursor: not-allowed;
-        }
-        .loading {
-            display: none;
-            text-align: center;
-            margin-top: 15px;
-            color: #74b9ff;
-            font-weight: bold;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        /* 사업자 정보 푸터 */
-        .business-info {
-            background: #F8F9FA;
-            margin-top: 40px;
-            padding: 20px;
-            border-radius: 12px;
+        body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* 히어로 섹션 */
+        .hero {
+            padding: 60px 20px 80px;
             text-align: center;
+            color: white;
+        }
+
+        .hero-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+
+        .hero p {
+            font-size: 18px;
+            opacity: 0.95;
+            line-height: 1.7;
+            margin-bottom: 40px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 320px;
+            margin: 0 auto;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 18px 32px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
+
+        /* 신뢰 요소 */
+        .trust-section {
+            background: white;
+            padding: 60px 20px;
+        }
+
+        .trust-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .trust-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 40px;
+        }
+
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+        }
+
+        .trust-card {
+            background: linear-gradient(135deg, #f8f9ff 0%, #fff5f7 100%);
+            border-radius: 16px;
+            padding: 28px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .trust-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .trust-card h3 {
+            font-size: 18px;
+            color: #667eea;
+            margin-bottom: 12px;
+        }
+
+        .trust-card p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* FAQ 섹션 */
+        .faq-section {
+            background: #f8f9fa;
+            padding: 60px 20px;
+        }
+
+        .faq-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 40px;
+        }
+
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .faq-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .faq-question {
+            padding: 20px 24px;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .faq-question:hover {
+            background: #f8f9ff;
+        }
+
+        .faq-question::after {
+            content: '+';
+            font-size: 24px;
+            color: #667eea;
+            font-weight: 300;
+            transition: transform 0.3s;
+        }
+
+        .faq-item.open .faq-question::after {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            padding: 0 24px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s, padding 0.3s;
+        }
+
+        .faq-item.open .faq-answer {
+            padding: 0 24px 20px;
+            max-height: 200px;
+        }
+
+        .faq-answer p {
+            color: #666;
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        /* 하단 CTA */
+        .bottom-cta {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 60px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .bottom-cta h2 {
+            font-size: 28px;
+            margin-bottom: 16px;
+        }
+
+        .bottom-cta p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 32px;
+        }
+
+        .bottom-cta .btn-primary {
+            font-size: 20px;
+            padding: 20px 48px;
+        }
+
+        /* 푸터 */
+        .footer {
+            background: #2c3e50;
+            padding: 40px 20px;
+            color: white;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-links {
+            margin-bottom: 24px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            margin: 0 16px;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-contact {
+            margin-bottom: 24px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .footer-contact a {
+            color: #74b9ff;
+            text-decoration: none;
+        }
+
+        .business-info {
             font-size: 12px;
-            color: #6c757d;
+            color: rgba(255, 255, 255, 0.6);
             line-height: 1.8;
         }
+
         .business-info .line {
             margin: 3px 0;
         }
+
         .business-info .separator {
             margin: 0 8px;
-            color: #dee2e6;
+            opacity: 0.5;
         }
-        @media (max-width: 600px) {
-            .business-info {
-                font-size: 11px;
-                padding: 15px;
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 28px;
             }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .trust-title, .faq-title {
+                font-size: 22px;
+            }
+
+            .bottom-cta h2 {
+                font-size: 24px;
+            }
+
+            .footer-links a {
+                display: block;
+                margin: 10px 0;
+            }
+
             .business-info .separator {
-                margin: 0 5px;
+                display: none;
+            }
+
+            .business-info .line {
+                display: block;
+                margin: 5px 0;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="title">하루하루의 기적</h1>
-        <p class="subtitle">11페이지 개인 스토리북 생성</p>
-        
-        <form id="storyForm">
-            <div class="form-group">
-                <label>이름 *</label>
-                <input type="text" name="name" required>
-            </div>
-            <div class="form-group">
-                <label>나이 *</label>
-                <input type="number" name="age" required min="1" max="100">
-            </div>
-            <div class="form-group">
-                <label>성격 *</label>
-                <input type="text" name="personality" required>
-            </div>
-            <div class="form-group">
-                <label>취미 *</label>
-                <input type="text" name="hobby" required>
-            </div>
-            <div class="form-group">
-                <label>꿈/목표 *</label>
-                <input type="text" name="dreamJob" required>
-            </div>
-            <div class="form-group">
-                <label>좋아하는 색깔 *</label>
-                <input type="text" name="favoriteColor" required>
-            </div>
-            <div class="form-group">
-                <label>좋아하는 동물 *</label>
-                <input type="text" name="favoriteAnimal" required>
-            </div>
-            <div class="form-group">
-                <label>특별한 기억</label>
-                <textarea name="specialMemory"></textarea>
-            </div>
-            
-            <button type="submit" class="submit-btn" id="submitBtn">나만의 기적 만들기</button>
-            
-            <div class="loading" id="loading">
-                스토리북 생성 중... (약 3분 소요)
-            </div>
-        </form>
-
-        <!-- 사업자 정보 -->
-        <div class="business-info">
-            <div class="line">
-                (주)어수여행센터<span class="separator">|</span>대표: 이세진<span class="separator">|</span>사업자등록번호: 409-87-00585
-            </div>
-            <div class="line">
-                전라남도 여수시 박람회길 1, C동 CD-305호 (덕충동)<span class="separator">|</span>통신판매업: 2016-전라남도-0146호<span class="separator">|</span>전화: 1899-6117
+    <!-- 히어로 섹션 -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>하루하루의 기적,<br>당신의 소원을 현실로</h1>
+            <p>
+                12문항으로 '기적지수'와 30일 로드맵을 받아보세요.<br>
+                동의 시 7일 응원 메시지가 카톡/문자로 자동 발송됩니다.
+            </p>
+            <div class="cta-buttons">
+                <a href="./questions.html" class="btn btn-primary">12문항 시작하기</a>
+                <a href="./wish-voyage.html" class="btn btn-secondary">소원항해 알아보기</a>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- 신뢰 요소 -->
+    <section class="trust-section">
+        <div class="trust-content">
+            <h2 class="trust-title">안심하고 이용하세요</h2>
+            <div class="trust-grid">
+                <div class="trust-card">
+                    <div class="trust-icon">🔒</div>
+                    <h3>개인정보 보호</h3>
+                    <p>수집된 개인정보는 서비스 제공 목적으로만 사용되며, 이용 종료 시 즉시 파기됩니다.</p>
+                </div>
+                <div class="trust-card">
+                    <div class="trust-icon">🌊</div>
+                    <h3>전량 회수 운영</h3>
+                    <p>소원항해는 바다 투척 없이 육상 체험 기반으로 운영되며, 모든 소모품은 전량 회수합니다.</p>
+                </div>
+                <div class="trust-card">
+                    <div class="trust-icon">💌</div>
+                    <h3>7일 응원 메시지</h3>
+                    <p>분석 완료 후 카카오 알림톡/문자로 7일간 맞춤형 응원 메시지가 자동 발송됩니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ 섹션 -->
+    <section class="faq-section">
+        <div class="faq-content">
+            <h2 class="faq-title">자주 묻는 질문</h2>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question">바다에 종이를 투척하나요?</div>
+                    <div class="faq-answer">
+                        <p>아니요. 기본 운영은 육상 체험 기반이며, 모든 소모품은 전량 회수합니다.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">소원 내용은 어디에 쓰이나요?</div>
+                    <div class="faq-answer">
+                        <p>기적 분석 결과 제공과 이용자가 동의한 경우 7일 응원 메시지 발송에만 사용됩니다.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">분석 결과는 얼마나 정확한가요?</div>
+                    <div class="faq-answer">
+                        <p>AI 기반의 참고용 콘텐츠입니다. 개인의 선택과 상황에 따라 달라질 수 있습니다.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">메시지는 어떤 방식으로 오나요?</div>
+                    <div class="faq-answer">
+                        <p>카카오 알림톡 우선 발송 후, 불가 시 문자(SMS)로 안내됩니다.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">메시지 수신을 중단할 수 있나요?</div>
+                    <div class="faq-answer">
+                        <p>네. 언제든지 수신거부/중단 요청이 가능합니다.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">개인정보는 얼마나 보관하나요?</div>
+                    <div class="faq-answer">
+                        <p>원칙적으로 서비스 이용 종료 시 파기합니다.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">소원항해는 상업 판매/현장 결제가 있나요?</div>
+                    <div class="faq-answer">
+                        <p>운영 형태에 따라 달라지며, 사전 안내된 방식으로만 진행합니다.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">촬영(사진/영상)이 포함되나요?</div>
+                    <div class="faq-answer">
+                        <p>기념 기록 촬영이 있을 수 있으며, 인물 중심 촬영은 사전 동의를 우선합니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 하단 CTA -->
+    <section class="bottom-cta">
+        <h2>지금 바로 시작하세요</h2>
+        <p>12가지 질문에 답하고, 나만의 기적을 발견하세요.</p>
+        <a href="./questions.html" class="btn btn-primary">무료 기적 분석 시작</a>
+    </section>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="./privacy.html">개인정보처리방침</a>
+                <a href="./terms.html">이용약관</a>
+                <a href="./questions.html">기적 분석</a>
+                <a href="./wish-voyage.html">소원항해</a>
+            </div>
+            <div class="footer-contact">
+                문의: <a href="https://pf.kakao.com/_xnxnKn" target="_blank">카카오채널 "하루하루의 기적"</a> | 전화: 1899-6117
+            </div>
+            <div class="business-info">
+                <div class="line">
+                    (주)어수여행센터<span class="separator">|</span>대표: 이세진<span class="separator">|</span>사업자등록번호: 409-87-00585
+                </div>
+                <div class="line">
+                    전라남도 여수시 박람회길 1, C동 CD-305호 (덕충동)<span class="separator">|</span>통신판매업: 2016-전라남도-0146호
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('storyForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const loading = document.getElementById('loading');
-        
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            submitBtn.disabled = true;
-            submitBtn.textContent = '생성 중...';
-            loading.style.display = 'block';
-            
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData);
+        // FAQ 토글
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                const isOpen = item.classList.contains('open');
 
-            fetch('https://daily-miracles-app.onrender.com/api/create-story', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    window.location.href = result.redirectUrl;
-                } else {
-                    alert('오류: ' + result.error);
-                    resetForm();
+                // 다른 모든 FAQ 닫기
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+
+                // 클릭한 항목 토글
+                if (!isOpen) {
+                    item.classList.add('open');
                 }
-            })
-            .catch(error => {
-                alert('네트워크 오류: ' + error.message);
-                resetForm();
             });
         });
-        
-        function resetForm() {
-            submitBtn.disabled = false;
-            submitBtn.textContent = '나만의 기적 만들기';
-            loading.style.display = 'none';
-        }
-    });
     </script>
 </body>
 </html>

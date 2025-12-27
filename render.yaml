@@ -1,23 +1,44 @@
 services:
   - type: web
-    name: miracle-of-each-day
+    name: daily-miracles-mvp
     runtime: node
     buildCommand: npm install --no-audit --no-fund
     startCommand: npm start
     envVars:
+      # 기본 설정
       - key: NODE_ENV
         value: production
       - key: PORT
         value: "5000"
       - key: NODE_VERSION
         value: "20"
-      - key: ORCHESTRATOR_ENABLED
-        value: "false"
+
+      # 빌드 최적화
       - key: PUPPETEER_SKIP_DOWNLOAD
         value: "true"
       - key: npm_config_optional
         value: "true"
       - key: npm_config_build_from_source
         value: "false"
+
+      # CORS
       - key: ALLOWED_ORIGINS
-        value: "https://daily-miracles-app.onrender.com,http://localhost:3000,http://localhost:5000"
+        value: "https://daily-miracles-mvp.onrender.com,https://yourusername.wixsite.com"
+
+      # ═══════════════════════════════════════════════════
+      # 아래 환경변수는 Render 대시보드에서 직접 설정
+      # ═══════════════════════════════════════════════════
+
+      # DATABASE_URL (Render PostgreSQL 연결 시 자동 설정)
+      # OPENAI_API_KEY 또는 ANTHROPIC_API_KEY
+
+      # Solapi (카카오 알림톡)
+      # SOLAPI_API_KEY=NCSGADMTGNI7DJTD
+      # SOLAPI_API_SECRET=***
+      # SOLAPI_PFID=카카오채널ID
+      # SOLAPI_SENDER=발신번호
+
+      # API 보안
+      # WIX_WEBHOOK_API_KEY=생성할키
+      # CRON_SECRET=생성할키
+      # ADMIN_API_KEY=생성할키

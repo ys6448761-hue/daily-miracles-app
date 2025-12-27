@@ -1,0 +1,32 @@
+# Aurora5 Daily Scheduler
+# 매일 오전 9시 (KST) 자동 발송
+
+name: Daily Miracle Messages
+
+on:
+  schedule:
+    # UTC 00:00 = KST 09:00
+    - cron: '0 0 * * *'
+
+  # 수동 실행 가능
+  workflow_dispatch:
+
+jobs:
+  send-daily-messages:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Daily Job
+        run: |
+          curl -X POST "${{ secrets.API_BASE_URL }}/jobs/daily-9am" \
+            -H "Content-Type: application/json" \
+            -H "x-scheduler-key: ${{ secrets.SCHEDULER_SECRET }}" \
+            --fail \
+            --silent \
+            --show-error
+
+      - name: Log Result
+        if: always()
+        run: |
+          echo "Daily job triggered at $(date)"
+          echo "Status: ${{ job.status }}"
