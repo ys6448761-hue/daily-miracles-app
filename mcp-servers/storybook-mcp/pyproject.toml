@@ -1,0 +1,31 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "storybook-mcp"
+version = "0.1.0"
+description = "MCP server for personalized storybook generation with AI"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "Daily Miracles Team"}
+]
+keywords = ["mcp", "storybook", "ai", "claude", "dalle", "ghibli"]
+dependencies = [
+    "mcp>=1.0.0",
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+]
+
+[project.scripts]
+storybook-mcp = "storybook.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/storybook"]

@@ -1,0 +1,44 @@
+{
+  "project": {
+    "name": "daily-miracles-mvp",
+    "description": "하루하루의 기적 - AI 기반 소원 실현 서비스",
+    "version": "0.1.0"
+  },
+  "agents": {
+    "default_model": "sonnet",
+    "available": [
+      "summarizer",
+      "decision-extractor",
+      "action-extractor",
+      "skill-creator"
+    ]
+  },
+  "mcp_servers": {
+    "summarizer": {
+      "path": "mcp-servers/summarizer-mcp",
+      "command": "uv run summarizer-mcp"
+    },
+    "miracle": {
+      "path": "mcp-servers/miracle-mcp",
+      "command": "uv run miracle-mcp"
+    },
+    "storybook": {
+      "path": "mcp-servers/storybook-mcp",
+      "command": "uv run storybook-mcp"
+    }
+  },
+  "pipelines": {
+    "weekly-summary": {
+      "schedule": "0 9 * * 0",
+      "enabled": true
+    }
+  },
+  "paths": {
+    "agents": "claude/agents",
+    "skills": "claude/skills",
+    "pipelines": "claude/pipelines",
+    "assets": "claude/assets",
+    "references": "claude/references",
+    "reports": "reports"
+  }
+}
