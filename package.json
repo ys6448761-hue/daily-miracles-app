@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "node server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "pipeline:weekly": "npx ts-node scripts/run-pipeline.ts",
+    "pipeline:weekly:test": "npx ts-node scripts/run-pipeline.ts --team=테스트팀"
   },
   "engines": {
     "node": "20.x"
@@ -24,6 +26,11 @@
     "uuid": "^10.0.0",
     "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   },
   "optionalDependencies": {
     "puppeteer": "^24.24.1",
