@@ -1,7 +1,9 @@
 /**
  * 소원그림 생성 API
  * POST /api/wish-image/generate - DALL-E 3로 소원그림 생성 + 영구 저장
+ * POST /api/wish-image/watermark - 워터마크 삽입
  * GET /api/wish-image/status - OpenAI API 상태 체크
+ * GET /api/wish-image/list - 저장된 이미지 목록
  */
 
 const express = require('express');
@@ -10,6 +12,7 @@ const OpenAI = require('openai');
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
+const sharp = require('sharp');
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -244,6 +247,259 @@ router.get('/list', (req, res) => {
     res.status(500).json({
       success: false,
       error: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/wish-image/watermark
+ * 이미지에 워터마크 삽입
+ * 요청: { image_path: string } 또는 { image_url: string }
+ */
+router.post('/watermark', async (req, res) => {
+  try {
+    const { image_path, image_url, text = '하루하루의 기적 | 예시 이미지' } = req.body;
+
+    let inputPath;
+
+    // image_path가 주어진 경우 (로컬 파일)
+    if (image_path) {
+      // /images/wishes/xxx.png 형태를 실제 경로로 변환
+      if (image_path.startsWith('/images/wishes/')) {
+        inputPath = path.join(WISHES_IMAGE_DIR, path.basename(image_path));
+      } else {
+        inputPath = image_path;
+      }
+
+      if (!fs.existsSync(inputPath)) {
+        return res.status(404).json({
+          success: false,
+          error: '이미지 파일을 찾을 수 없습니다.'
+        });
+      }
+    }
+    // image_url이 주어진 경우 (원격 URL)
+    else if (image_url) {
+      ensureImageDir();
+      const tempFilename = `temp_${Date.now()}.png`;
+      inputPath = await downloadAndSaveImage(image_url, tempFilename);
+    }
+    else {
+      return res.status(400).json({
+        success: false,
+        error: 'image_path 또는 image_url이 필요합니다.'
+      });
+    }
+
+    // 출력 파일명 생성
+    const timestamp = Date.now();
+    const outputFilename = `wish_watermarked_${timestamp}.png`;
+    const outputPath = path.join(WISHES_IMAGE_DIR, outputFilename);
+
+    // 이미지 메타데이터 가져오기
+    const metadata = await sharp(inputPath).metadata();
+    const imageWidth = metadata.width || 1024;
+    const imageHeight = metadata.height || 1024;
+
+    // 워터마크 텍스트 SVG 생성 (우하단, 70% 투명도)
+    const fontSize = Math.floor(imageWidth / 30); // 이미지 크기에 비례
+    const padding = Math.floor(imageWidth / 40);
+
+    const watermarkSvg = `
+      <svg width="${imageWidth}" height="${imageHeight}">
+        <style>
+          .watermark {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: ${fontSize}px;
+            fill: white;
+            fill-opacity: 0.7;
+            text-anchor: end;
+          }
+          .shadow {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: ${fontSize}px;
+            fill: black;
+            fill-opacity: 0.3;
+            text-anchor: end;
+          }
+        </style>
+        <text x="${imageWidth - padding + 2}" y="${imageHeight - padding + 2}" class="shadow">${text}</text>
+        <text x="${imageWidth - padding}" y="${imageHeight - padding}" class="watermark">${text}</text>
+      </svg>
+    `;
+
+    // 이미지에 워터마크 합성
+    await sharp(inputPath)
+      .composite([{
+        input: Buffer.from(watermarkSvg),
+        top: 0,
+        left: 0
+      }])
+      .toFile(outputPath);
+
+    console.log(`[WishImage] Watermark added: ${outputFilename}`);
+
+    // 임시 파일 삭제 (URL에서 다운로드한 경우)
+    if (image_url && inputPath.includes('temp_')) {
+      fs.unlink(inputPath, () => {});
+    }
+
+    res.json({
+      success: true,
+      original_path: image_path || image_url,
+      watermarked_url: `/images/wishes/${outputFilename}`,
+      filename: outputFilename,
+      watermark_text: text
+    });
+
+  } catch (error) {
+    console.error('[WishImage] Watermark error:', error);
+    res.status(500).json({
+      success: false,
+      error: '워터마크 삽입 중 오류가 발생했습니다.',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/wish-image/generate-with-watermark
+ * 소원그림 생성 + 자동 워터마크 (광고용)
+ */
+router.post('/generate-with-watermark', async (req, res) => {
+  try {
+    const { wish_content, gem_type, watermark_text = '하루하루의 기적 | 예시 이미지' } = req.body;
+
+    if (!wish_content) {
+      return res.status(400).json({
+        success: false,
+        error: '소원 내용이 필요합니다.'
+      });
+    }
+
+    const colors = gemColors[gem_type] || gemColors.ruby;
+
+    const prompt = `
+      A hopeful, magical illustration representing: "${wish_content}"
+
+      Style: Cosmic universe background with ${colors.primary} and ${colors.secondary} tones
+      Mood: Hopeful, bright, inspiring, miraculous
+      Elements: Stars, soft light rays, gentle sparkles, symbolizing ${colors.keyword}
+      Art style: Digital art, dreamy, ethereal, Korean aesthetic
+
+      No text, no words, no letters, no characters
+    `.trim();
+
+    // DALL-E 3 이미지 생성
+    let dalleImageUrl;
+    let lastError = null;
+
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        console.log(`[WishImage+WM] Attempt ${attempt}: Generating image`);
+
+        const response = await openai.images.generate({
+          model: "dall-e-3",
+          prompt: prompt,
+          n: 1,
+          size: "1024x1024",
+          quality: "standard"
+        });
+
+        dalleImageUrl = response.data[0].url;
+        console.log(`[WishImage+WM] Image generated on attempt ${attempt}`);
+        break;
+
+      } catch (apiError) {
+        lastError = apiError;
+        console.log(`[WishImage+WM] Attempt ${attempt} failed:`, apiError.message);
+        if (attempt < 3) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+      }
+    }
+
+    // 생성 실패 시 Fallback
+    if (!dalleImageUrl) {
+      return res.json({
+        success: true,
+        image_url: fallbackImages[gem_type] || fallbackImages.ruby,
+        watermarked_url: fallbackImages[gem_type] || fallbackImages.ruby,
+        gem_type: gem_type,
+        fallback: true,
+        error_message: lastError?.message
+      });
+    }
+
+    // 이미지 다운로드
+    ensureImageDir();
+    const timestamp = Date.now();
+    const originalFilename = `wish_${timestamp}_${gem_type || 'ruby'}.png`;
+    const originalPath = path.join(WISHES_IMAGE_DIR, originalFilename);
+
+    await downloadAndSaveImage(dalleImageUrl, originalFilename);
+    console.log(`[WishImage+WM] Original saved: ${originalFilename}`);
+
+    // 워터마크 추가
+    const watermarkedFilename = `wish_${timestamp}_${gem_type || 'ruby'}_ad.png`;
+    const watermarkedPath = path.join(WISHES_IMAGE_DIR, watermarkedFilename);
+
+    const metadata = await sharp(originalPath).metadata();
+    const imageWidth = metadata.width || 1024;
+    const imageHeight = metadata.height || 1024;
+    const fontSize = Math.floor(imageWidth / 30);
+    const padding = Math.floor(imageWidth / 40);
+
+    const watermarkSvg = `
+      <svg width="${imageWidth}" height="${imageHeight}">
+        <style>
+          .watermark {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: ${fontSize}px;
+            fill: white;
+            fill-opacity: 0.7;
+            text-anchor: end;
+          }
+          .shadow {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: ${fontSize}px;
+            fill: black;
+            fill-opacity: 0.3;
+            text-anchor: end;
+          }
+        </style>
+        <text x="${imageWidth - padding + 2}" y="${imageHeight - padding + 2}" class="shadow">${watermark_text}</text>
+        <text x="${imageWidth - padding}" y="${imageHeight - padding}" class="watermark">${watermark_text}</text>
+      </svg>
+    `;
+
+    await sharp(originalPath)
+      .composite([{
+        input: Buffer.from(watermarkSvg),
+        top: 0,
+        left: 0
+      }])
+      .toFile(watermarkedPath);
+
+    console.log(`[WishImage+WM] Watermarked saved: ${watermarkedFilename}`);
+
+    res.json({
+      success: true,
+      image_url: `/images/wishes/${originalFilename}`,
+      watermarked_url: `/images/wishes/${watermarkedFilename}`,
+      original_filename: originalFilename,
+      watermarked_filename: watermarkedFilename,
+      gem_type: gem_type,
+      watermark_text: watermark_text,
+      permanent: true
+    });
+
+  } catch (error) {
+    console.error('[WishImage+WM] Error:', error);
+    res.status(500).json({
+      success: false,
+      error: '소원그림 생성 중 오류가 발생했습니다.',
+      details: error.message
     });
   }
 });
