@@ -62,6 +62,15 @@ try {
   console.error("❌ 소원실현 라우터 로드 실패:", error.message);
 }
 
+// 소원그림 생성 라우터 로딩
+let wishImageRoutes = null;
+try {
+  wishImageRoutes = require("./routes/wishImageRoutes");
+  console.log("✅ 소원그림 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 소원그림 라우터 로드 실패:", error.message);
+}
+
 // Aurora5 자동화 엔진 라우터 로딩
 let aurora5Routes = null;
 try {
@@ -253,6 +262,14 @@ if (wishRoutes) {
   console.log("✅ 소원실현 API 라우터 등록 완료");
 } else {
   console.warn("⚠️ 소원실현 API 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 소원그림 생성 API Routes ----------
+if (wishImageRoutes) {
+  app.use("/api/wish-image", wishImageRoutes);
+  console.log("✅ 소원그림 API 라우터 등록 완료");
+} else {
+  console.warn("⚠️ 소원그림 API 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Aurora5 자동화 엔진 API Routes ----------
