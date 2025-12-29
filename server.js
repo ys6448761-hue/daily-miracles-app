@@ -53,6 +53,15 @@ try {
   console.error("❌ 간편 접수 라우터 로드 실패:", error.message);
 }
 
+// 소원실현 폼 라우터 로딩
+let wishRoutes = null;
+try {
+  wishRoutes = require("./routes/wishRoutes");
+  console.log("✅ 소원실현 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 소원실현 라우터 로드 실패:", error.message);
+}
+
 // Aurora5 자동화 엔진 라우터 로딩
 let aurora5Routes = null;
 try {
@@ -236,6 +245,14 @@ if (inquiryRoutes) {
   console.log("✅ 간편 접수 API 라우터 등록 완료");
 } else {
   console.warn("⚠️ 간편 접수 API 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 소원실현 폼 API Routes ----------
+if (wishRoutes) {
+  app.use("/api/wishes", wishRoutes);
+  console.log("✅ 소원실현 API 라우터 등록 완료");
+} else {
+  console.warn("⚠️ 소원실현 API 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Aurora5 자동화 엔진 API Routes ----------
