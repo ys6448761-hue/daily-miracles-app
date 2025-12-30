@@ -61,6 +61,12 @@ let todayMetrics = {
         selected: {},        // gem 선택 분포
         changed: 0           // 추천에서 변경한 수
     },
+    upgrade: {
+        birthdateProvided: 0,   // 최초 접수 시 생년월일 입력 수
+        birthdateNotProvided: 0, // 최초 접수 시 생년월일 미입력 수
+        upgradeClicked: 0,       // 업그레이드 CTA 클릭 수
+        upgradeCompleted: 0      // 업그레이드 완료 (생년월일 저장) 수
+    },
     errors: [],
     startedAt: new Date().toISOString()
 };
@@ -95,6 +101,7 @@ function checkDateReset() {
             ack: { eligible: 0, sent: 0, avgTimeMs: 0, duplicateAttempts: 0, totalTimeMs: 0 },
             vip: { total: 0, byTrafficLight: { green: 0, yellow: 0 }, avgScore: 0, totalScore: 0 },
             gem: { recommended: {}, selected: {}, changed: 0 },
+            upgrade: { birthdateProvided: 0, birthdateNotProvided: 0, upgradeClicked: 0, upgradeCompleted: 0 },
             errors: [],
             startedAt: new Date().toISOString()
         };
@@ -147,7 +154,8 @@ function loadMetrics() {
                     eligible: 0, sent: 0, avgTimeMs: 0, duplicateAttempts: 0, totalTimeMs: 0,
                     ...loaded.ack
                 },
-                gem: loaded.gem || { recommended: {}, selected: {}, changed: 0 }
+                gem: loaded.gem || { recommended: {}, selected: {}, changed: 0 },
+                upgrade: loaded.upgrade || { birthdateProvided: 0, birthdateNotProvided: 0, upgradeClicked: 0, upgradeCompleted: 0 }
             };
 
             console.log(`[Metrics] 로드됨: ${filepath}`);
@@ -256,6 +264,35 @@ function recordGem(recommended, selected) {
 }
 
 /**
+ * 생년월일 입력 여부 기록 (최초 접수 시)
+ * @param {boolean} provided - 생년월일 입력 여부
+ */
+function recordBirthdateProvided(provided) {
+    checkDateReset();
+    if (provided) {
+        todayMetrics.upgrade.birthdateProvided++;
+    } else {
+        todayMetrics.upgrade.birthdateNotProvided++;
+    }
+}
+
+/**
+ * 업그레이드 CTA 클릭 기록
+ */
+function recordUpgradeClick() {
+    checkDateReset();
+    todayMetrics.upgrade.upgradeClicked++;
+}
+
+/**
+ * 업그레이드 완료 기록 (생년월일 저장)
+ */
+function recordUpgradeComplete() {
+    checkDateReset();
+    todayMetrics.upgrade.upgradeCompleted++;
+}
+
+/**
  * 에러 기록
  * @param {string} errorType - 에러 유형
  * @param {string} message - 에러 메시지
@@ -337,6 +374,22 @@ function getMetrics() {
         ? ((todayMetrics.gem.changed / totalRecommended) * 100).toFixed(1)
         : 0;
 
+    // 업그레이드 지표 계산
+    const totalBirthdate = todayMetrics.upgrade.birthdateProvided + todayMetrics.upgrade.birthdateNotProvided;
+    const birthdateProvidedRate = totalBirthdate > 0
+        ? ((todayMetrics.upgrade.birthdateProvided / totalBirthdate) * 100).toFixed(1)
+        : 0;
+
+    // 업그레이드 클릭률 (생년월일 미입력 대상)
+    const upgradeClickRate = todayMetrics.upgrade.birthdateNotProvided > 0
+        ? ((todayMetrics.upgrade.upgradeClicked / todayMetrics.upgrade.birthdateNotProvided) * 100).toFixed(1)
+        : 0;
+
+    // 업그레이드 완료율 (클릭 대비)
+    const upgradeCompleteRate = todayMetrics.upgrade.upgradeClicked > 0
+        ? ((todayMetrics.upgrade.upgradeCompleted / todayMetrics.upgrade.upgradeClicked) * 100).toFixed(1)
+        : 0;
+
     return {
         ...todayMetrics,
         computed: {
@@ -346,7 +399,10 @@ function getMetrics() {
             errorTop3: todayMetrics.errors.slice(0, 3),
             avgVipScore,
             wantMessageRate: wantMessageRate + '%',
-            gemChangeRate: gemChangeRate + '%'
+            gemChangeRate: gemChangeRate + '%',
+            birthdateProvidedRate: birthdateProvidedRate + '%',
+            upgradeClickRate: upgradeClickRate + '%',
+            upgradeCompleteRate: upgradeCompleteRate + '%'
         }
     };
 }
@@ -404,6 +460,11 @@ ${m.computed.errorTop3.length > 0
    • 🟡 YELLOW VIP: ${m.vip.byTrafficLight.yellow}건
    • 평균 VIP 점수: ${m.computed.avgVipScore}점
 
+🎯 정밀 맞춤 업그레이드
+   • 생년월일 입력률: ${m.computed.birthdateProvidedRate} (${m.upgrade.birthdateProvided}/${m.upgrade.birthdateProvided + m.upgrade.birthdateNotProvided}건)
+   • 업그레이드 클릭률: ${m.computed.upgradeClickRate} (${m.upgrade.upgradeClicked}건)
+   • 업그레이드 완료율: ${m.computed.upgradeCompleteRate} (${m.upgrade.upgradeCompleted}건)
+
 ═══════════════════════════════════════════════════════════
 생성시각: ${new Date().toISOString()}
 `;
@@ -424,6 +485,9 @@ module.exports = {
     recordAckEligible,
     recordAck,
     recordGem,
+    recordBirthdateProvided,
+    recordUpgradeClick,
+    recordUpgradeComplete,
     recordError,
     recordVipTagged,
     getMetrics,

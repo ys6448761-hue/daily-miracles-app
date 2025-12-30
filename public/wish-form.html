@@ -638,6 +638,201 @@
             font-weight: 600;
         }
 
+        /* 정밀 맞춤 업그레이드 CTA */
+        .upgrade-section {
+            margin: 24px 0;
+            padding: 20px;
+            background: rgba(255, 215, 0, 0.08);
+            border-radius: 16px;
+            border: 1px dashed rgba(255, 215, 0, 0.4);
+        }
+
+        .upgrade-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 12px;
+        }
+
+        .upgrade-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .upgrade-icon {
+            font-size: 18px;
+        }
+
+        .upgrade-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .upgrade-desc {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* 생년월일 입력 모달 */
+        .birthdate-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            max-width: 400px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #ffd700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: #fff;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-desc {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.8;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-form-group {
+            margin-bottom: 16px;
+        }
+
+        .modal-form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffd700;
+            margin-bottom: 8px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            color-scheme: dark;
+        }
+
+        .modal-input:focus {
+            border-color: #ffd700;
+            outline: none;
+        }
+
+        .modal-footer {
+            padding: 16px 24px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a2e;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(255, 215, 0, 0.4);
+        }
+
+        .modal-btn-secondary {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn-secondary:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+            color: #fff;
+        }
+
+        /* 업그레이드 완료 표시 */
+        .upgrade-complete {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid rgba(46, 204, 113, 0.4);
+            border-radius: 12px;
+            color: #2ecc71;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
         /* 반응형 */
         @media (max-width: 480px) {
             .container {
@@ -843,7 +1038,42 @@
                 30일 로드맵을 곧 받아보실 수 있습니다<br>
                 7일간 응원 메시지가 함께 합니다
             </p>
+
+            <!-- 정밀 맞춤 업그레이드 CTA (생년월일 미입력 시만 표시) -->
+            <div class="upgrade-section" id="upgradeSection" style="display: none;">
+                <button type="button" class="upgrade-btn" id="upgradeBtn">
+                    <span class="upgrade-icon">✨</span>
+                    <span class="upgrade-text">정밀 맞춤 업그레이드</span>
+                </button>
+                <p class="upgrade-desc">생년월일을 입력하면 리듬/에너지 기반으로<br>추천과 안내가 더 정교해져요</p>
+            </div>
+
             <a href="./" class="success-btn">확인</a>
+        </div>
+    </div>
+
+    <!-- 생년월일 입력 모달 -->
+    <div class="birthdate-modal" id="birthdateModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>정밀 맞춤 업그레이드</h3>
+                <button type="button" class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc">
+                    생년월일을 입력하시면<br>
+                    <strong>개인 리듬과 에너지 흐름</strong>을 분석해<br>
+                    더 정교한 추천과 안내를 받으실 수 있어요.
+                </p>
+                <div class="modal-form-group">
+                    <label>생년월일</label>
+                    <input type="date" id="upgradeBirthdate" class="modal-input">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="modal-btn-primary" id="saveBirthdateBtn">저장하고 업그레이드</button>
+                <button type="button" class="modal-btn-secondary" id="skipBirthdateBtn">다음에 할게요</button>
+            </div>
         </div>
     </div>
 
@@ -1046,8 +1276,9 @@
                 document.getElementById('loadingOverlay').classList.remove('show');
 
                 if (result.success) {
-                    // 성공 화면 업데이트
-                    showSuccessOverlay(name, gem, result.miracleScore, wantMessage);
+                    // 성공 화면 업데이트 (wishId, birthdateProvided 전달)
+                    const birthdateProvided = !!birthdate;
+                    showSuccessOverlay(name, gem, result.miracleScore, wantMessage, result.wishId, birthdateProvided);
                 } else {
                     showError(result.message || '전송 중 오류가 발생했습니다');
                 }
@@ -1057,7 +1288,8 @@
 
                 // 개발용: API 없어도 성공 처리
                 console.log('Development mode - showing success');
-                showSuccessOverlay(name, gem, null, wantMessage);
+                const birthdateProvided = !!birthdate;
+                showSuccessOverlay(name, gem, null, wantMessage, 'dev-' + Date.now(), birthdateProvided);
             }
         });
 
@@ -1070,8 +1302,15 @@
             citrine: { emoji: '💛', meaning: '긍정 에너지', color: '#f39c12' }
         };
 
+        // 현재 소원 ID 저장 (업그레이드용)
+        let currentWishId = null;
+        let currentBirthdateProvided = false;
+
         // 성공 오버레이 표시
-        function showSuccessOverlay(userName, selectedGem, serverScore, wantMessage = false) {
+        function showSuccessOverlay(userName, selectedGem, serverScore, wantMessage = false, wishId = null, birthdateProvided = false) {
+            currentWishId = wishId;
+            currentBirthdateProvided = birthdateProvided;
+
             // 이름 표시
             document.getElementById('successName').textContent = userName;
 
@@ -1098,9 +1337,94 @@
                 `;
             }
 
+            // 생년월일 미입력 시 업그레이드 섹션 표시
+            const upgradeSection = document.getElementById('upgradeSection');
+            if (!birthdateProvided) {
+                upgradeSection.style.display = 'block';
+            } else {
+                upgradeSection.style.display = 'none';
+            }
+
             // 오버레이 표시
             document.getElementById('successOverlay').classList.add('show');
         }
+
+        // 업그레이드 버튼 클릭 → 모달 열기
+        document.getElementById('upgradeBtn').addEventListener('click', async () => {
+            // 업그레이드 클릭 메트릭 기록
+            try {
+                await fetch('/api/wishes/metrics/upgrade-click', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ wishId: currentWishId })
+                });
+            } catch (e) {
+                console.log('Upgrade click metric failed:', e);
+            }
+
+            document.getElementById('birthdateModal').style.display = 'flex';
+        });
+
+        // 모달 닫기
+        document.getElementById('modalClose').addEventListener('click', () => {
+            document.getElementById('birthdateModal').style.display = 'none';
+        });
+
+        document.getElementById('skipBirthdateBtn').addEventListener('click', () => {
+            document.getElementById('birthdateModal').style.display = 'none';
+        });
+
+        // 생년월일 저장하고 업그레이드
+        document.getElementById('saveBirthdateBtn').addEventListener('click', async () => {
+            const birthdate = document.getElementById('upgradeBirthdate').value;
+
+            if (!birthdate) {
+                alert('생년월일을 입력해주세요');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/wishes/upgrade-birthdate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        wishId: currentWishId,
+                        birthdate: birthdate
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // 모달 닫기
+                    document.getElementById('birthdateModal').style.display = 'none';
+
+                    // 업그레이드 섹션을 완료 상태로 변경
+                    const upgradeSection = document.getElementById('upgradeSection');
+                    upgradeSection.innerHTML = `
+                        <div class="upgrade-complete">
+                            <span>✅</span>
+                            <span>정밀 맞춤 업그레이드 완료!</span>
+                        </div>
+                        <p class="upgrade-desc">리듬/에너지 기반 분석이 적용됩니다</p>
+                    `;
+                } else {
+                    alert(result.message || '저장 중 오류가 발생했습니다');
+                }
+            } catch (e) {
+                console.error('Upgrade error:', e);
+                // 개발 모드: 성공 처리
+                document.getElementById('birthdateModal').style.display = 'none';
+                const upgradeSection = document.getElementById('upgradeSection');
+                upgradeSection.innerHTML = `
+                    <div class="upgrade-complete">
+                        <span>✅</span>
+                        <span>정밀 맞춤 업그레이드 완료!</span>
+                    </div>
+                    <p class="upgrade-desc">리듬/에너지 기반 분석이 적용됩니다</p>
+                `;
+            }
+        });
 
         // 에러 표시
         function showError(message) {

@@ -9,7 +9,15 @@ const fs = require('fs').promises;
 const path = require('path');
 const { generateWishAckMessage, generateRedAlertMessage } = require('../config/messageTemplates');
 const { sendWishAck, sendRedAlert, isEnabled: isSolapiEnabled } = require('../services/solapiService');
-const { recordWishInbox, recordTrafficLight, recordAckEligible, recordGem } = require('../services/metricsService');
+const {
+    recordWishInbox,
+    recordTrafficLight,
+    recordAckEligible,
+    recordGem,
+    recordBirthdateProvided,
+    recordUpgradeClick,
+    recordUpgradeComplete
+} = require('../services/metricsService');
 
 // 데이터 저장 경로
 const DATA_DIR = path.join(__dirname, '..', 'data', 'wishes');
@@ -140,6 +148,7 @@ router.post('/', async (req, res) => {
         recordWishInbox('new', want_message);
         recordTrafficLight(trafficLight.level);
         recordGem(gemRecommended, gemSelected);
+        recordBirthdateProvided(!!birthdate);  // 생년월일 입력 여부
         if (want_message && phone) {
             recordAckEligible();  // ACK 대상 카운트
         }
@@ -227,6 +236,104 @@ router.get('/today', async (req, res) => {
 
     } catch (error) {
         console.error('[Wish] Error:', error);
+        res.status(500).json({
+            success: false,
+            message: '서버 오류가 발생했습니다'
+        });
+    }
+});
+
+/**
+ * POST /api/wishes/metrics/upgrade-click
+ * 업그레이드 CTA 클릭 메트릭 기록
+ */
+router.post('/metrics/upgrade-click', async (req, res) => {
+    try {
+        recordUpgradeClick();
+        console.log('[Upgrade] CTA 클릭 기록됨');
+        res.json({ success: true });
+    } catch (error) {
+        console.error('[Upgrade] 클릭 메트릭 기록 오류:', error);
+        res.status(500).json({ success: false, message: '서버 오류' });
+    }
+});
+
+/**
+ * POST /api/wishes/upgrade-birthdate
+ * 업그레이드 - 생년월일 저장
+ */
+router.post('/upgrade-birthdate', async (req, res) => {
+    try {
+        const { wishId, birthdate } = req.body;
+
+        if (!wishId || !birthdate) {
+            return res.status(400).json({
+                success: false,
+                message: '소원 ID와 생년월일이 필요합니다'
+            });
+        }
+
+        // 생년월일 형식 검증 (YYYY-MM-DD)
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(birthdate)) {
+            return res.status(400).json({
+                success: false,
+                message: '올바른 생년월일 형식이 아닙니다 (YYYY-MM-DD)'
+            });
+        }
+
+        await ensureDataDir();
+
+        // 개별 파일 찾기 및 업데이트
+        const files = await fs.readdir(DATA_DIR);
+        const wishFile = files.find(f => f.startsWith(wishId + '_'));
+
+        if (!wishFile) {
+            return res.status(404).json({
+                success: false,
+                message: '해당 소원을 찾을 수 없습니다'
+            });
+        }
+
+        const filepath = path.join(DATA_DIR, wishFile);
+        const content = await fs.readFile(filepath, 'utf8');
+        const wishData = JSON.parse(content);
+
+        // 생년월일 업데이트
+        wishData.birthdate = birthdate;
+        wishData.birthdate_upgraded_at = new Date().toISOString();
+
+        await fs.writeFile(filepath, JSON.stringify(wishData, null, 2), 'utf8');
+
+        // 일별 파일도 업데이트
+        const today = new Date().toISOString().split('T')[0];
+        const dailyFile = path.join(DATA_DIR, `daily_${today}.json`);
+
+        try {
+            const dailyContent = await fs.readFile(dailyFile, 'utf8');
+            const dailyData = JSON.parse(dailyContent);
+            const idx = dailyData.findIndex(w => w.id === wishId);
+            if (idx >= 0) {
+                dailyData[idx].birthdate = birthdate;
+                dailyData[idx].birthdate_upgraded_at = wishData.birthdate_upgraded_at;
+                await fs.writeFile(dailyFile, JSON.stringify(dailyData, null, 2), 'utf8');
+            }
+        } catch (err) {
+            // 일별 파일 업데이트 실패는 무시 (크리티컬하지 않음)
+        }
+
+        // 메트릭 기록
+        recordUpgradeComplete();
+        console.log(`[Upgrade] 생년월일 저장 완료: ${wishId} → ${birthdate}`);
+
+        res.json({
+            success: true,
+            message: '생년월일이 저장되었습니다',
+            wishId,
+            birthdate
+        });
+
+    } catch (error) {
+        console.error('[Upgrade] 생년월일 저장 오류:', error);
         res.status(500).json({
             success: false,
             message: '서버 오류가 발생했습니다'
