@@ -302,7 +302,81 @@ async function checkVipTagging() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// 5. 메트릭스 조회
+// 5. 신호등 분류 테스트 (TC1~TC3)
+// ═══════════════════════════════════════════════════════════
+function checkTrafficLight() {
+    log('🚦', '신호등 분류 테스트 중...');
+    const results = {
+        testCases: []
+    };
+
+    // classifyWish 함수 (wishRoutes.js에서 추출)
+    function classifyWish(wishText) {
+        const text = wishText.toLowerCase();
+
+        const redKeywords = [
+            '자살', '죽고싶', '죽고 싶', '죽을래', '죽을 래',
+            '자해', '손목', '목숨', '끝내고 싶', '끝내고싶',
+            '사라지고 싶', '사라지고싶', '없어지고 싶', '없어지고싶',
+            '포기하고 싶', '힘들어서 못살', '살기 싫', '살기싫'
+        ];
+
+        for (const keyword of redKeywords) {
+            if (text.includes(keyword)) {
+                return { level: 'RED', reason: `위험 키워드: ${keyword}` };
+            }
+        }
+
+        const yellowKeywords = ['빚', '대출', '파산', '암', '수술', '병원', '이혼', '양육권', '폭력'];
+        for (const keyword of yellowKeywords) {
+            if (text.includes(keyword)) {
+                return { level: 'YELLOW', reason: `주의 키워드: ${keyword}` };
+            }
+        }
+
+        return { level: 'GREEN', reason: '일반 소원' };
+    }
+
+    // TC1: GREEN
+    const tc1 = classifyWish('새해에는 취업에 성공하고 싶어요');
+    results.testCases.push({
+        name: 'TC1 GREEN (정상)',
+        expected: 'GREEN',
+        actual: tc1.level,
+        pass: tc1.level === 'GREEN'
+    });
+
+    // TC2: YELLOW
+    const tc2 = classifyWish('아버지 암 수술이 잘 되길 바랍니다');
+    results.testCases.push({
+        name: 'TC2 YELLOW (주의)',
+        expected: 'YELLOW',
+        actual: tc2.level,
+        pass: tc2.level === 'YELLOW'
+    });
+
+    // TC3: RED
+    const tc3 = classifyWish('더 이상 살기 싫어요');
+    results.testCases.push({
+        name: 'TC3 RED (긴급)',
+        expected: 'RED',
+        actual: tc3.level,
+        pass: tc3.level === 'RED'
+    });
+
+    // 결과 출력
+    const passCount = results.testCases.filter(tc => tc.pass).length;
+    results.testCases.forEach(tc => {
+        log(tc.pass ? '✅' : '❌', `${tc.name}: ${tc.pass ? 'PASS' : 'FAIL'} (${tc.actual})`);
+    });
+
+    log(passCount === 3 ? '✅' : '⚠️', `신호등 테스트: ${passCount}/3 통과`);
+
+    return results;
+}
+
+// ═══════════════════════════════════════════════════════════
+// 6. 메트릭스 조회
 // ═══════════════════════════════════════════════════════════
 function getMetricsReport() {
     log('📊', '메트릭스 로딩 중...');
@@ -321,9 +395,9 @@ function getMetricsReport() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// 6. 리포트 생성
+// 7. 리포트 생성
 // ═══════════════════════════════════════════════════════════
-function generateReport(gitStatus, apiHealth, alimtalk, vipTest, metricsReport) {
+function generateReport(gitStatus, apiHealth, alimtalk, vipTest, trafficLightTest, metricsReport) {
     const today = getToday();
 
     let report = `# Daily Health Check - ${today}
@@ -339,7 +413,8 @@ function generateReport(gitStatus, apiHealth, alimtalk, vipTest, metricsReport) 
 | API Health | ${apiHealth.health?.ok ? '✅ OK' : '❌ FAIL'} (${apiHealth.latency?.health || '-'}ms) |
 | Result Link | ${apiHealth.resultLink?.ok ? '✅ OK' : '❌ FAIL'} (${apiHealth.latency?.resultLink || '-'}ms) |
 | 알림톡 | ${alimtalk.enabled ? '✅ 활성화' : '⚠️ 비활성화'} |
-| VIP 태깅 | ${vipTest.testCases.filter(tc => tc.pass).length}/${vipTest.testCases.length} 통과 |
+| 🚦 신호등 | ${trafficLightTest.testCases.filter(tc => tc.pass).length}/${trafficLightTest.testCases.length} 통과 |
+| ✨ VIP | ${vipTest.testCases.filter(tc => tc.pass).length}/${vipTest.testCases.length} 통과 |
 | Git 상태 | ${gitStatus.untracked.length === 0 ? '✅ Clean' : `⚠️ Untracked ${gitStatus.untracked.length}개`} |
 
 ---
@@ -430,11 +505,14 @@ async function main() {
     // 4. VIP 태깅 테스트
     const vipTest = await checkVipTagging();
 
-    // 5. 메트릭스 리포트
+    // 5. 신호등 분류 테스트
+    const trafficLightTest = checkTrafficLight();
+
+    // 6. 메트릭스 리포트
     const metricsReport = getMetricsReport();
 
-    // 6. 리포트 생성
-    const report = generateReport(gitStatus, apiHealth, alimtalk, vipTest, metricsReport);
+    // 7. 리포트 생성
+    const report = generateReport(gitStatus, apiHealth, alimtalk, vipTest, trafficLightTest, metricsReport);
 
     // 결과 출력
     console.log('\n' + report);
