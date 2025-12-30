@@ -1,31 +1,31 @@
-title,keyword,category,intent,cta,cta_link,publish_date,platform,status,author,views,url
-"새해 목표 세웠는데 3일 만에 무너질 때, 다시 시작하는 법","새해목표,작심삼일,목표달성",problem,정보,문제해결 상담받기,/problem-solving,2025-01-01,네이버,대기,Claude Code,0,
-"새해 소원, 크게 말 못 하겠다면 '작게 시작하는' 법","새해소원,작은시작,작은습관",wish,정보,나의 소원 등록하기,/wish-form,2025-01-02,네이버,대기,Claude Code,0,
-"새해에 돈 관리 시작하려면 무엇부터 해야 하나요?","돈관리,재테크초보,저축",problem,정보,문제해결 상담받기,/problem-solving,2025-01-03,네이버,대기,Claude Code,0,
-"새해에 바다 보러 가는 이유: 마음이 정리되는 과학과 체감","여수여행,새해여행,바다여행",yeosu,정보,여수항해 알아보기,/wish-voyage,2025-01-04,네이버,대기,Claude Code,0,
-"여수 1박2일 혼자 힐링 여행 코스 (마음정리 루트)","여수여행,혼자여행,힐링여행",yeosu,정보,여수항해 상담받기,/wish-voyage,2025-01-05,네이버,대기,Claude Code,0,
-"번아웃인지 게으름인지 헷갈릴 때 체크하는 5가지","번아웃,게으름,자기진단",problem,정보,문제해결 상담받기,/problem-solving,2025-01-06,네이버,대기,Claude Code,0,
-"30일 안에 루틴 만들기: 실패 확률 줄이는 설계법","루틴만들기,30일챌린지,습관",wish,정보,나의 소원 등록하기,/wish-form,2025-01-07,네이버,대기,Claude Code,0,
-"이직하고 싶은데 두려워서 못 움직일 때 첫 행동 1개","이직고민,이직두려움,커리어",problem,정보,문제해결 상담받기,/problem-solving,2025-01-08,네이버,대기,Claude Code,0,
-"소원이 이루어질 사람의 특징 (현실적인 행동 버전)","소원,목표달성,성공습관",wish,정보,나의 소원 등록하기,/wish-form,2025-01-09,네이버,대기,Claude Code,0,
-"인간관계가 피곤해서 다 끊고 싶을 때 (현실적인 해결)","인간관계,관계정리,피로",problem,정보,문제해결 상담받기,/problem-solving,2025-01-10,네이버,대기,Claude Code,0,
-"여수에서 '새출발' 기분 내는 장소 5곳","여수명소,새출발,여수여행",yeosu,정보,여수항해 알아보기,/wish-voyage,2025-01-11,네이버,대기,Claude Code,0,
-"여수 여행 가기 전 준비하면 좋은 체크리스트","여수여행,체크리스트,여행준비",yeosu,정보,여수항해 상담받기,/wish-voyage,2025-01-12,네이버,대기,Claude Code,0,
-"매일 불안할 때 '생각 멈추는' 10분 루틴","불안,명상,마음관리",problem,정보,문제해결 상담받기,/problem-solving,2025-01-13,네이버,대기,Claude Code,0,
-"목표를 '행동'으로 바꾸는 방법: 1문장→3단계","목표설정,행동,실행력",wish,정보,나의 소원 등록하기,/wish-form,2025-01-14,네이버,대기,Claude Code,0,
-"자존감이 바닥일 때 오늘 당장 할 수 있는 작은 행동","자존감,자존감높이기,멘탈",problem,정보,문제해결 상담받기,/problem-solving,2025-01-15,네이버,대기,Claude Code,0,
-"30일 로드맵을 끝까지 가는 사람 vs 중간 포기하는 사람","로드맵,목표달성,습관",wish,비교,나의 소원 등록하기,/wish-form,2025-01-16,네이버,대기,Claude Code,0,
-"해야 할 일이 많은데 손이 안 움직일 때 (미루기 해결)","미루기,실행력,생산성",problem,정보,문제해결 상담받기,/problem-solving,2025-01-17,네이버,대기,Claude Code,0,
-"여수 앞바다에서 소원을 입항시키는 여행이란?","여수,소원여행,브랜드스토리",yeosu,브랜딩,여수항해 알아보기,/wish-voyage,2025-01-18,네이버,대기,Claude Code,0,
-"여수에서 커플/부부 관계 회복 여행 코스 추천","여수커플,관계회복,커플여행",yeosu,정보,여수항해 상담받기,/wish-voyage,2025-01-19,네이버,대기,Claude Code,0,
-"감정 기복이 심할 때 생활을 안정시키는 최소 습관","감정기복,감정조절,멘탈관리",problem,정보,문제해결 상담받기,/problem-solving,2025-01-20,네이버,대기,Claude Code,0,
-"나에게 맞는 목표 속도 찾기 (지금당장/3개월/천천히)","목표,속도,자기이해",wish,정보,나의 소원 등록하기,/wish-form,2025-01-21,네이버,대기,Claude Code,0,
-"나는 왜 항상 늦을까? 시간 관리가 안 되는 사람의 해결책","시간관리,지각,생산성",problem,정보,문제해결 상담받기,/problem-solving,2025-01-22,네이버,대기,Claude Code,0,
-"하루 10분으로 인생이 바뀌는 루틴 3가지","루틴,10분,자기계발",wish,정보,나의 소원 등록하기,/wish-form,2025-01-23,네이버,대기,Claude Code,0,
-"관계를 회복하고 싶은데 먼저 연락하기 두려울 때","관계회복,연락,인간관계",problem,정보,문제해결 상담받기,/problem-solving,2025-01-24,네이버,대기,Claude Code,0,
-"여수 당일치기 vs 1박2일: 어떤 선택이 후회 없을까","여수당일치기,여수여행,여행계획",yeosu,비교,여수항해 알아보기,/wish-voyage,2025-01-25,네이버,대기,Claude Code,0,
-"여수항해는 누구에게 추천할까? (사연 유형별)","여수항해,추천,브랜드",yeosu,브랜딩,여수항해 상담받기,/wish-voyage,2025-01-26,네이버,대기,Claude Code,0,
-"내 삶이 의미 없어 보일 때 '다시 방향 잡는' 방법","삶의의미,방향,자기이해",problem,정보,문제해결 상담받기,/problem-solving,2025-01-27,네이버,대기,Claude Code,0,
-"나의 기적지수(희망 점수)를 올리는 현실적인 방법","기적지수,희망,자기계발",wish,정보,나의 소원 등록하기,/wish-form,2025-01-28,네이버,대기,Claude Code,0,
-"소원 노트를 쓰면 진짜 도움이 될까? (해보는 방식)","소원노트,위시리스트,목표",wish,정보,나의 소원 등록하기,/wish-form,2025-01-29,네이버,대기,Claude Code,0,
-"목표를 세웠는데 가족/주변 반대가 있을 때 지키는 법","목표,반대,가족관계",wish,정보,나의 소원 등록하기,/wish-form,2025-01-30,네이버,대기,Claude Code,0,
+title,keyword,category,intent,cta,cta_link,publish_date,platform,status,author,views,url,thumbnail_prompt,thumbnail_url,alt_text
+"새해 목표 세웠는데 3일 만에 무너질 때, 다시 시작하는 법","새해목표,작심삼일,목표달성",problem,정보,문제해결 상담받기,https://dailymiracles.kr/problem-solving,2025-01-01,네이버,대기,Claude Code,0,,"A person standing up from fallen position, sunrise background, warm golden light, hopeful atmosphere, minimal illustration style --ar 16:9",,새해 목표 다시 시작하는 사람
+"새해 소원, 크게 말 못 하겠다면 '작게 시작하는' 법","새해소원,작은시작,작은습관",wish,정보,나의 소원 등록하기,https://dailymiracles.kr/wish-form,2025-01-02,네이버,대기,Claude Code,0,,"A tiny seed sprouting in soft soil, gentle sunlight, pastel colors, hope and growth concept, minimal style --ar 16:9",,작은 씨앗에서 싹이 나는 모습
+"새해에 돈 관리 시작하려면 무엇부터 해야 하나요?","돈관리,재테크초보,저축",problem,정보,문제해결 상담받기,https://dailymiracles.kr/problem-solving,2025-01-03,네이버,대기,Claude Code,0,,"A simple piggy bank with coins, new year atmosphere, warm colors, friendly illustration style --ar 16:9",,새해 저금통과 동전
+"새해에 바다 보러 가는 이유: 마음이 정리되는 과학과 체감","여수여행,새해여행,바다여행",yeosu,정보,여수항해 알아보기,https://dailymiracles.kr/wish-voyage,2025-01-04,네이버,대기,Claude Code,0,,"Beautiful sunrise over calm ocean, golden light rays, peaceful atmosphere, Yeosu Korea vibes --ar 16:9",,여수 바다 일출 풍경
+"여수 1박2일 혼자 힐링 여행 코스 (마음정리 루트)","여수여행,혼자여행,힐링여행",yeosu,정보,여수항해 상담받기,https://dailymiracles.kr/wish-voyage,2025-01-05,네이버,대기,Claude Code,0,,"Yeosu night sea view, romantic lights, solo traveler silhouette, peaceful atmosphere --ar 16:9",,여수 밤바다 야경
+"번아웃인지 게으름인지 헷갈릴 때 체크하는 5가지","번아웃,게으름,자기진단",problem,정보,문제해결 상담받기,https://dailymiracles.kr/problem-solving,2025-01-06,네이버,대기,Claude Code,0,,"A tired person with checklist, soft colors, empathetic illustration, self-care concept --ar 16:9",,번아웃 자가진단 체크리스트
+"30일 안에 루틴 만들기: 실패 확률 줄이는 설계법","루틴만들기,30일챌린지,습관",wish,정보,나의 소원 등록하기,https://dailymiracles.kr/wish-form,2025-01-07,네이버,대기,Claude Code,0,,"30-day calendar with checkmarks, progress visualization, motivating colors, clean design --ar 16:9",,30일 캘린더 체크 표시
+"이직하고 싶은데 두려워서 못 움직일 때 첫 행동 1개","이직고민,이직두려움,커리어",problem,정보,문제해결 상담받기,https://dailymiracles.kr/problem-solving,2025-01-08,네이버,대기,Claude Code,0,,"A person taking first step on new path, hopeful lighting, career change concept --ar 16:9",,새로운 길로 첫 걸음
+"소원이 이루어질 사람의 특징 (현실적인 행동 버전)","소원,목표달성,성공습관",wish,정보,나의 소원 등록하기,https://dailymiracles.kr/wish-form,2025-01-09,네이버,대기,Claude Code,0,,"A glowing gemstone with action items around it, magical yet practical, warm colors --ar 16:9",,소원을 이루는 사람 특징
+"인간관계가 피곤해서 다 끊고 싶을 때 (현실적인 해결)","인간관계,관계정리,피로",problem,정보,문제해결 상담받기,https://dailymiracles.kr/problem-solving,2025-01-10,네이버,대기,Claude Code,0,,"A person finding peace among gentle connections, soft boundaries, calming illustration --ar 16:9",,인간관계 정리와 평화
+"여수에서 '새출발' 기분 내는 장소 5곳","여수명소,새출발,여수여행",yeosu,정보,여수항해 알아보기,https://dailymiracles.kr/wish-voyage,2025-01-11,네이버,대기,Claude Code,0,,"Yeosu landmarks collage, fresh start vibes, beautiful scenery, travel inspiration --ar 16:9",,여수 새출발 명소 5곳
+"여수 여행 가기 전 준비하면 좋은 체크리스트","여수여행,체크리스트,여행준비",yeosu,정보,여수항해 상담받기,https://dailymiracles.kr/wish-voyage,2025-01-12,네이버,대기,Claude Code,0,,"Travel checklist with Yeosu elements, organized packing, excitement atmosphere --ar 16:9",,여수 여행 준비 체크리스트
+"매일 불안할 때 '생각 멈추는' 10분 루틴","불안,명상,마음관리",problem,정보,문제해결 상담받기,https://dailymiracles.kr/problem-solving,2025-01-13,네이버,대기,Claude Code,0,,"A calm mind visualization, 10 minute timer, peaceful meditation concept --ar 16:9",,10분 명상으로 불안 멈추기
+"목표를 '행동'으로 바꾸는 방법: 1문장→3단계","목표설정,행동,실행력",wish,정보,나의 소원 등록하기,https://dailymiracles.kr/wish-form,2025-01-14,네이버,대기,Claude Code,0,,"Goal transforming into action steps, visual progression, motivating design --ar 16:9",,목표를 행동으로 바꾸는 3단계
+"자존감이 바닥일 때 오늘 당장 할 수 있는 작은 행동","자존감,자존감높이기,멘탈",problem,정보,문제해결 상담받기,https://dailymiracles.kr/problem-solving,2025-01-15,네이버,대기,Claude Code,0,,"A small flower growing through concrete, resilience and self-worth concept --ar 16:9",,자존감 회복의 작은 행동
+"30일 로드맵을 끝까지 가는 사람 vs 중간 포기하는 사람","로드맵,목표달성,습관",wish,비교,나의 소원 등록하기,https://dailymiracles.kr/wish-form,2025-01-16,네이버,대기,Claude Code,0,,"Two paths comparison, one reaching goal, motivating visual contrast --ar 16:9",,끝까지 가는 사람 vs 포기하는 사람
+"해야 할 일이 많은데 손이 안 움직일 때 (미루기 해결)","미루기,실행력,생산성",problem,정보,문제해결 상담받기,https://dailymiracles.kr/problem-solving,2025-01-17,네이버,대기,Claude Code,0,,"Overwhelmed desk becoming organized, first step concept, calming transition --ar 16:9",,미루기 해결 첫 걸음
+"여수 앞바다에서 소원을 입항시키는 여행이란?","여수,소원여행,브랜드스토리",yeosu,브랜딩,여수항해 알아보기,https://dailymiracles.kr/wish-voyage,2025-01-18,네이버,대기,Claude Code,0,,"A wish ship entering Yeosu harbor, magical atmosphere, brand storytelling --ar 16:9",,여수 앞바다 소원 입항
+"여수에서 커플/부부 관계 회복 여행 코스 추천","여수커플,관계회복,커플여행",yeosu,정보,여수항해 상담받기,https://dailymiracles.kr/wish-voyage,2025-01-19,네이버,대기,Claude Code,0,,"Couple silhouette watching Yeosu sunset, romantic atmosphere, relationship healing --ar 16:9",,여수 커플 관계 회복 여행
+"감정 기복이 심할 때 생활을 안정시키는 최소 습관","감정기복,감정조절,멘탈관리",problem,정보,문제해결 상담받기,https://dailymiracles.kr/problem-solving,2025-01-20,네이버,대기,Claude Code,0,,"Emotional wave becoming calm, stabilizing routine icons, soothing colors --ar 16:9",,감정 안정 최소 습관
+"나에게 맞는 목표 속도 찾기 (지금당장/3개월/천천히)","목표,속도,자기이해",wish,정보,나의 소원 등록하기,https://dailymiracles.kr/wish-form,2025-01-21,네이버,대기,Claude Code,0,,"Three different pace paths, self-understanding concept, personalized journey --ar 16:9",,나에게 맞는 목표 속도
+"나는 왜 항상 늦을까? 시간 관리가 안 되는 사람의 해결책","시간관리,지각,생산성",problem,정보,문제해결 상담받기,https://dailymiracles.kr/problem-solving,2025-01-22,네이버,대기,Claude Code,0,,"Clock with friendly time management tips, non-judgmental illustration --ar 16:9",,시간 관리 해결책
+"하루 10분으로 인생이 바뀌는 루틴 3가지","루틴,10분,자기계발",wish,정보,나의 소원 등록하기,https://dailymiracles.kr/wish-form,2025-01-23,네이버,대기,Claude Code,0,,"10 minute timer with life-changing icons, simple powerful routines --ar 16:9",,하루 10분 루틴
+"관계를 회복하고 싶은데 먼저 연락하기 두려울 때","관계회복,연락,인간관계",problem,정보,문제해결 상담받기,https://dailymiracles.kr/problem-solving,2025-01-24,네이버,대기,Claude Code,0,,"A phone with courage message, reconnection hope, warm supportive feeling --ar 16:9",,관계 회복 첫 연락
+"여수 당일치기 vs 1박2일: 어떤 선택이 후회 없을까","여수당일치기,여수여행,여행계획",yeosu,비교,여수항해 알아보기,https://dailymiracles.kr/wish-voyage,2025-01-25,네이버,대기,Claude Code,0,,"Split view of day trip vs overnight in Yeosu, comparison visual --ar 16:9",,여수 당일치기 vs 1박2일
+"여수항해는 누구에게 추천할까? (사연 유형별)","여수항해,추천,브랜드",yeosu,브랜딩,여수항해 상담받기,https://dailymiracles.kr/wish-voyage,2025-01-26,네이버,대기,Claude Code,0,,"Different people finding their path to Yeosu, inclusive brand message --ar 16:9",,여수항해 추천 대상
+"내 삶이 의미 없어 보일 때 '다시 방향 잡는' 방법","삶의의미,방향,자기이해",problem,정보,문제해결 상담받기,https://dailymiracles.kr/problem-solving,2025-01-27,네이버,대기,Claude Code,0,,"Compass finding direction, life meaning visualization, hopeful journey --ar 16:9",,삶의 방향 다시 잡기
+"나의 기적지수(희망 점수)를 올리는 현실적인 방법","기적지수,희망,자기계발",wish,정보,나의 소원 등록하기,https://dailymiracles.kr/wish-form,2025-01-28,네이버,대기,Claude Code,0,,"Miracle index score rising, hopeful meter, actionable steps visual --ar 16:9",,기적지수 올리는 방법
+"소원 노트를 쓰면 진짜 도움이 될까? (해보는 방식)","소원노트,위시리스트,목표",wish,정보,나의 소원 등록하기,https://dailymiracles.kr/wish-form,2025-01-29,네이버,대기,Claude Code,0,,"Beautiful wish journal with pen, practical magic, journaling concept --ar 16:9",,소원 노트 작성법
+"목표를 세웠는데 가족/주변 반대가 있을 때 지키는 법","목표,반대,가족관계",wish,정보,나의 소원 등록하기,https://dailymiracles.kr/wish-form,2025-01-30,네이버,대기,Claude Code,0,,"A person holding their goal with supportive boundary, family balance --ar 16:9",,주변 반대 속 목표 지키기
