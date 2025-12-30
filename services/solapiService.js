@@ -3,8 +3,11 @@
  * - 카카오 알림톡
  * - SMS 발송 (fallback)
  *
- * @version 1.0 - 2025.12.30
+ * @version 2.0 - 2025.12.30
  * @channel @dailymiracles (http://pf.kakao.com/_xfxhcWn)
+ *
+ * 승인된 템플릿:
+ * - MIRACLE_RESULT: 기적 분석 결과 알림 (KA01TP251221072752085AP4LH3QgNHv)
  */
 
 const { SolapiMessageService } = require('solapi');
@@ -135,6 +138,71 @@ async function sendWishAck(phone, wishData) {
 }
 
 /**
+ * 기적 분석 결과 알림톡 발송
+ * 템플릿: "#{이름}님께서 신청하신 '기적 분석' 결과를 안내드립니다.
+ *         🌟 기적지수: #{점수}점
+ *         📑 나만의 30일 로드맵이 준비되었어요.
+ *         지금 바로 확인하세요!
+ *         #{링크}"
+ *
+ * @param {string} phone - 수신자 전화번호
+ * @param {string} name - 소원이 이름
+ * @param {number} score - 기적지수 (50-100)
+ * @param {string} resultLink - 결과 페이지 링크
+ * @returns {Promise<Object>} 발송 결과
+ */
+async function sendMiracleResult(phone, name, score, resultLink) {
+    const TEMPLATE_ID = process.env.SOLAPI_TEMPLATE_MIRACLE_RESULT;
+
+    if (!TEMPLATE_ID) {
+        console.warn('[Solapi] MIRACLE_RESULT 템플릿 ID 미설정');
+        // SMS fallback
+        const smsText = `[하루하루의기적] ${name}님의 기적지수: ${score}점! 30일 로드맵이 준비되었어요. ${resultLink}`;
+        return sendSMS(phone, smsText);
+    }
+
+    // Solapi 알림톡 변수 (템플릿과 일치해야 함)
+    const variables = {
+        '#{이름}': name,
+        '#{점수}': String(score),
+        '#{링크}': resultLink
+    };
+
+    console.log(`[Solapi] 기적 분석 결과 발송: ${name}님 (${score}점)`);
+
+    const service = initSolapi();
+    if (!service) {
+        console.log('[Solapi] 비활성화 상태 - 시뮬레이션 모드');
+        console.log('[Solapi] [시뮬레이션] 알림톡 발송:');
+        console.log(`  - 수신: ${phone}`);
+        console.log(`  - 이름: ${name}`);
+        console.log(`  - 점수: ${score}점`);
+        console.log(`  - 링크: ${resultLink}`);
+        return { success: false, reason: 'API 키 미설정', simulated: true };
+    }
+
+    try {
+        const result = await service.send({
+            to: phone,
+            from: SENDER_PHONE,
+            kakaoOptions: {
+                pfId: SOLAPI_PFID,
+                templateId: TEMPLATE_ID,
+                variables
+            }
+        });
+
+        console.log(`[Solapi] 기적 분석 결과 알림톡 발송 성공: ${phone}`);
+        return { success: true, result };
+    } catch (error) {
+        console.error('[Solapi] 알림톡 발송 실패:', error.message);
+        // SMS fallback
+        const smsText = `[하루하루의기적] ${name}님의 기적지수: ${score}점! 30일 로드맵이 준비되었어요. ${resultLink}`;
+        return sendSMS(phone, smsText);
+    }
+}
+
+/**
  * RED 신호 긴급 알림 발송 (운영팀용)
  * @param {Object} wishData - 소원 데이터
  * @returns {Promise<Object>} 발송 결과
@@ -183,6 +251,7 @@ module.exports = {
     sendKakaoAlimtalk,
     sendSMS,
     sendWishAck,
+    sendMiracleResult,  // 기적 분석 결과 알림톡
     sendRedAlert,
     isEnabled,
     getBalance,
