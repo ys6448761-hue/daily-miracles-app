@@ -376,7 +376,85 @@ function checkTrafficLight() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// 6. 메트릭스 조회
+// 6. 이상 감지 테스트 (AT1~AT6)
+// ═══════════════════════════════════════════════════════════
+function checkAnomalyDetection() {
+    log('🚨', '이상 감지 룰 테스트 중...');
+    const results = { testCases: [] };
+
+    // checkAnomalies 로직 (airtableService.js에서 추출)
+    function checkAnomalies(m) {
+        const alerts = [];
+        if (m.alimtalk.failed > 0) alerts.push({ rule: 'ALIMTALK_FAILED', severity: '🟡' });
+        const rate = m.alimtalk.sent > 0 ? m.alimtalk.success / m.alimtalk.sent : 1;
+        if (m.alimtalk.sent > 0 && rate < 0.98) alerts.push({ rule: 'SUCCESS_RATE_LOW', severity: '🟡' });
+        if ((m.ack.avgTimeMs || 0) > 600000) alerts.push({ rule: 'ACK_DELAY', severity: '🟡' });
+        if (m.trafficLight.red > 0) alerts.push({ rule: 'RED_CASE', severity: '🔴' });
+        if (m.errors && m.errors.length > 0) alerts.push({ rule: 'ERRORS_PRESENT', severity: '🟡' });
+        if (m.ack.duplicateAttempts >= 5) alerts.push({ rule: 'DUPLICATE_SURGE', severity: '🟡' });
+        return alerts;
+    }
+
+    // AT1: 알림톡 실패
+    const at1 = checkAnomalies({
+        alimtalk: { sent: 10, success: 9, failed: 1 },
+        ack: { avgTimeMs: 5000, duplicateAttempts: 0 },
+        trafficLight: { red: 0 }, errors: []
+    });
+    results.testCases.push({ name: 'AT1 알림톡 실패', pass: at1.some(a => a.rule === 'ALIMTALK_FAILED') });
+
+    // AT2: 성공률 저하
+    const at2 = checkAnomalies({
+        alimtalk: { sent: 100, success: 96, failed: 4 },
+        ack: { avgTimeMs: 5000, duplicateAttempts: 0 },
+        trafficLight: { red: 0 }, errors: []
+    });
+    results.testCases.push({ name: 'AT2 성공률 저하', pass: at2.some(a => a.rule === 'SUCCESS_RATE_LOW') });
+
+    // AT3: ACK 지연
+    const at3 = checkAnomalies({
+        alimtalk: { sent: 10, success: 10, failed: 0 },
+        ack: { avgTimeMs: 720000, duplicateAttempts: 0 },
+        trafficLight: { red: 0 }, errors: []
+    });
+    results.testCases.push({ name: 'AT3 ACK 지연', pass: at3.some(a => a.rule === 'ACK_DELAY') });
+
+    // AT4: RED 케이스
+    const at4 = checkAnomalies({
+        alimtalk: { sent: 10, success: 10, failed: 0 },
+        ack: { avgTimeMs: 5000, duplicateAttempts: 0 },
+        trafficLight: { red: 2 }, errors: []
+    });
+    results.testCases.push({ name: 'AT4 RED 케이스', pass: at4.some(a => a.rule === 'RED_CASE') });
+
+    // AT5: 에러 발생
+    const at5 = checkAnomalies({
+        alimtalk: { sent: 10, success: 10, failed: 0 },
+        ack: { avgTimeMs: 5000, duplicateAttempts: 0 },
+        trafficLight: { red: 0 }, errors: [{ type: 'TEST_ERROR', count: 1 }]
+    });
+    results.testCases.push({ name: 'AT5 에러 발생', pass: at5.some(a => a.rule === 'ERRORS_PRESENT') });
+
+    // AT6: 중복 급증
+    const at6 = checkAnomalies({
+        alimtalk: { sent: 10, success: 10, failed: 0 },
+        ack: { avgTimeMs: 5000, duplicateAttempts: 7 },
+        trafficLight: { red: 0 }, errors: []
+    });
+    results.testCases.push({ name: 'AT6 중복 급증', pass: at6.some(a => a.rule === 'DUPLICATE_SURGE') });
+
+    // 결과 출력
+    const passCount = results.testCases.filter(tc => tc.pass).length;
+    results.testCases.forEach(tc => {
+        log(tc.pass ? '✅' : '❌', `${tc.name}: ${tc.pass ? 'PASS' : 'FAIL'}`);
+    });
+    log(passCount === 6 ? '✅' : '⚠️', `이상 감지 테스트: ${passCount}/6 통과`);
+
+    return results;
+}
+
+// ═══════════════════════════════════════════════════════════
+// 7. 메트릭스 조회
 // ═══════════════════════════════════════════════════════════
 function getMetricsReport() {
     log('📊', '메트릭스 로딩 중...');
@@ -395,9 +473,9 @@ function getMetricsReport() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// 7. 리포트 생성
+// 8. 리포트 생성
 // ═══════════════════════════════════════════════════════════
-function generateReport(gitStatus, apiHealth, alimtalk, vipTest, trafficLightTest, metricsReport) {
+function generateReport(gitStatus, apiHealth, alimtalk, vipTest, trafficLightTest, anomalyTest, metricsReport) {
     const today = getToday();
 
     let report = `# Daily Health Check - ${today}
@@ -415,6 +493,7 @@ function generateReport(gitStatus, apiHealth, alimtalk, vipTest, trafficLightTes
 | 알림톡 | ${alimtalk.enabled ? '✅ 활성화' : '⚠️ 비활성화'} |
 | 🚦 신호등 | ${trafficLightTest.testCases.filter(tc => tc.pass).length}/${trafficLightTest.testCases.length} 통과 |
 | ✨ VIP | ${vipTest.testCases.filter(tc => tc.pass).length}/${vipTest.testCases.length} 통과 |
+| 🚨 이상감지 | ${anomalyTest.testCases.filter(tc => tc.pass).length}/${anomalyTest.testCases.length} 통과 |
 | Git 상태 | ${gitStatus.untracked.length === 0 ? '✅ Clean' : `⚠️ Untracked ${gitStatus.untracked.length}개`} |
 
 ---
@@ -508,11 +587,14 @@ async function main() {
     // 5. 신호등 분류 테스트
     const trafficLightTest = checkTrafficLight();
 
-    // 6. 메트릭스 리포트
+    // 6. 이상 감지 테스트
+    const anomalyTest = checkAnomalyDetection();
+
+    // 7. 메트릭스 리포트
     const metricsReport = getMetricsReport();
 
-    // 7. 리포트 생성
-    const report = generateReport(gitStatus, apiHealth, alimtalk, vipTest, trafficLightTest, metricsReport);
+    // 8. 리포트 생성
+    const report = generateReport(gitStatus, apiHealth, alimtalk, vipTest, trafficLightTest, anomalyTest, metricsReport);
 
     // 결과 출력
     console.log('\n' + report);
