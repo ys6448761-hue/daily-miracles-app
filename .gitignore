@@ -82,3 +82,9 @@ pids
 
 # Windows command output files
 nul
+
+# Raw conversation logs (not for version control)
+docs/raw/conversations/
+
+# Metrics data (auto-generated)
+data/metrics/

@@ -12,6 +12,14 @@
 
 const { SolapiMessageService } = require('solapi');
 
+// 메트릭스 서비스 연동
+let metrics = null;
+try {
+    metrics = require('./metricsService');
+} catch (e) {
+    console.warn('[Solapi] metricsService 로드 실패 - 메트릭스 기록 비활성화');
+}
+
 // 환경변수에서 API 키 로드
 const SOLAPI_API_KEY = process.env.SOLAPI_API_KEY;
 const SOLAPI_API_SECRET = process.env.SOLAPI_API_SECRET;
@@ -193,11 +201,16 @@ async function sendMiracleResult(phone, name, score, resultLink) {
         });
 
         console.log(`[Solapi] 기적 분석 결과 알림톡 발송 성공: ${phone}`);
+        // 메트릭스 기록
+        if (metrics) metrics.recordAlimtalk(true, false);
         return { success: true, result };
     } catch (error) {
         console.error('[Solapi] 알림톡 발송 실패:', error.message);
+        // 메트릭스 기록 (실패)
+        if (metrics) metrics.recordError('ALIMTALK_FAIL', error.message);
         // SMS fallback
         const smsText = `[하루하루의기적] ${name}님의 기적지수: ${score}점! 30일 로드맵이 준비되었어요. ${resultLink}`;
+        if (metrics) metrics.recordAlimtalk(false, true); // fallback SMS
         return sendSMS(phone, smsText);
     }
 }

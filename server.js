@@ -10,6 +10,15 @@ const analysisEngine = require("./services/analysisEngine");
 
 const app = express();
 
+// 메트릭스 서비스 로딩
+let metricsService = null;
+try {
+  metricsService = require("./services/metricsService");
+  console.log("✅ 메트릭스 서비스 로드 성공");
+} catch (error) {
+  console.warn("⚠️ 메트릭스 서비스 로드 실패:", error.message);
+}
+
 // 인증 라우터 로딩
 let authRoutes = null;
 try {
@@ -169,9 +178,35 @@ app.get("/api/health", async (_req, res) => {
     version: "v3.0-debug",
     modules: {
       yeosuRoutes: yeosuRoutes !== null,
-      db: db !== null
+      db: db !== null,
+      metrics: metricsService !== null
     }
   });
+});
+
+// ---------- Metrics API (관제탑) ----------
+app.get("/api/metrics", (_req, res) => {
+  if (!metricsService) {
+    return res.status(503).json({
+      success: false,
+      error: "metrics_unavailable",
+      message: "메트릭스 서비스가 로드되지 않았습니다"
+    });
+  }
+  res.json({
+    success: true,
+    metrics: metricsService.getMetrics()
+  });
+});
+
+app.get("/api/metrics/report", (_req, res) => {
+  if (!metricsService) {
+    return res.status(503).json({
+      success: false,
+      error: "metrics_unavailable"
+    });
+  }
+  res.type('text/plain').send(metricsService.generateDailyReport());
 });
 
 // ---------- Diag (서버가 실제로 받은 것 그대로 보여줌) ----------
