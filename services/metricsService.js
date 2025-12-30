@@ -44,6 +44,15 @@ let todayMetrics = {
         duplicateAttempts: 0,
         totalTimeMs: 0
     },
+    vip: {
+        total: 0,
+        byTrafficLight: {
+            green: 0,
+            yellow: 0
+        },
+        avgScore: 0,
+        totalScore: 0
+    },
     errors: [],
     startedAt: new Date().toISOString()
 };
@@ -76,6 +85,7 @@ function checkDateReset() {
             trafficLight: { red: 0, yellow: 0, green: 0 },
             alimtalk: { sent: 0, success: 0, failed: 0, fallbackSms: 0 },
             ack: { sent: 0, avgTimeMs: 0, duplicateAttempts: 0, totalTimeMs: 0 },
+            vip: { total: 0, byTrafficLight: { green: 0, yellow: 0 }, avgScore: 0, totalScore: 0 },
             errors: [],
             startedAt: new Date().toISOString()
         };
@@ -213,6 +223,25 @@ function recordError(errorType, message) {
 }
 
 /**
+ * VIP 태깅 기록
+ * @param {string} trafficLight - 신호등 색상 ('green' | 'yellow')
+ * @param {number} vipScore - VIP 점수 (0-100)
+ */
+function recordVipTagged(trafficLight, vipScore) {
+    checkDateReset();
+    todayMetrics.vip.total++;
+    todayMetrics.vip.totalScore += vipScore;
+
+    // 신호등별 VIP 카운트
+    const tl = trafficLight.toLowerCase();
+    if (tl === 'green') {
+        todayMetrics.vip.byTrafficLight.green++;
+    } else if (tl === 'yellow') {
+        todayMetrics.vip.byTrafficLight.yellow++;
+    }
+}
+
+/**
  * 현재 메트릭스 조회
  */
 function getMetrics() {
@@ -228,12 +257,18 @@ function getMetrics() {
         ? ((todayMetrics.alimtalk.success / todayMetrics.alimtalk.sent) * 100).toFixed(1)
         : 0;
 
+    // VIP 평균 점수 계산
+    const avgVipScore = todayMetrics.vip.total > 0
+        ? Math.round(todayMetrics.vip.totalScore / todayMetrics.vip.total)
+        : 0;
+
     return {
         ...todayMetrics,
         computed: {
             avgAckTimeMs: avgAckTime,
             alimtalkSuccessRate: successRate + '%',
-            errorTop3: todayMetrics.errors.slice(0, 3)
+            errorTop3: todayMetrics.errors.slice(0, 3),
+            avgVipScore
         }
     };
 }
@@ -277,6 +312,12 @@ ${m.computed.errorTop3.length > 0
     ? m.computed.errorTop3.map((e, i) => `   ${i+1}. ${e.type}: ${e.count}건`).join('\n')
     : '   (에러 없음)'}
 
+✨ VIP (Human Touch)
+   • VIP 태깅: ${m.vip.total}건
+   • 🟢 GREEN VIP: ${m.vip.byTrafficLight.green}건
+   • 🟡 YELLOW VIP: ${m.vip.byTrafficLight.yellow}건
+   • 평균 VIP 점수: ${m.computed.avgVipScore}점
+
 ═══════════════════════════════════════════════════════════
 생성시각: ${new Date().toISOString()}
 `;
@@ -296,6 +337,7 @@ module.exports = {
     recordAlimtalk,
     recordAck,
     recordError,
+    recordVipTagged,
     getMetrics,
     generateDailyReport,
     saveMetrics

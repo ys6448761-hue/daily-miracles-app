@@ -219,7 +219,90 @@ async function checkAlimtalk() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// 4. 메트릭스 조회
+// 4. VIP 태깅 테스트
+// ═══════════════════════════════════════════════════════════
+async function checkVipTagging() {
+    log('✨', 'VIP 태깅 테스트 중...');
+    const results = {
+        enabled: true,
+        testCases: []
+    };
+
+    const { evaluateVip } = require('../services/vipService');
+
+    // TC4-1: VIP True (긴 서사 + 간절함)
+    const tc1Content = `저는 올해로 50세가 된 가장입니다. 작년에 갑자기 회사가 문을 닫으면서
+    실직을 하게 되었고, 이후로 정말 힘든 나날을 보내고 있습니다. 아내는 투병 중이고,
+    아이들 학비도 감당하기 어려워졌습니다. 그래도 포기하지 않고 매일 이력서를 넣고 있습니다.
+    정말 간절하게, 제발 다시 일어설 기회가 주어지길 바랍니다. 가족을 위해 다시 시작하고 싶습니다.
+    감사합니다.`;
+    const tc1Result = evaluateVip(tc1Content, 'green', 0);
+    results.testCases.push({
+        name: 'TC4-1 VIP True (긴 서사)',
+        expected: { vip: true, minScore: 70 },
+        actual: tc1Result,
+        pass: tc1Result.vip && tc1Result.vipScore >= 70
+    });
+
+    // TC4-2: VIP False (짧음)
+    const tc2Content = '취업하고 싶어요';
+    const tc2Result = evaluateVip(tc2Content, 'green', 0);
+    results.testCases.push({
+        name: 'TC4-2 VIP False (짧음)',
+        expected: { vip: false },
+        actual: tc2Result,
+        pass: !tc2Result.vip
+    });
+
+    // TC4-3: VIP 차단 (red 우선)
+    const tc3Content = `저는 정말 간절합니다. 제발 도와주세요. 힘들어서 포기하고 싶지만
+    다시 시작하고 싶습니다. 가족을 위해 희망을 찾고 싶습니다.`;
+    const tc3Result = evaluateVip(tc3Content, 'red', 0);  // RED면 VIP 금지
+    results.testCases.push({
+        name: 'TC4-3 VIP 차단 (RED)',
+        expected: { vip: false, blocked: true, blockedReason: 'RED_PRIORITY' },
+        actual: tc3Result,
+        pass: !tc3Result.vip && tc3Result.blocked && tc3Result.blockedReason === 'RED_PRIORITY'
+    });
+
+    // TC4-4: VIP 차단 (스팸 의심)
+    const tc4Result = evaluateVip(tc1Content, 'green', 10);  // 중복 10회
+    results.testCases.push({
+        name: 'TC4-4 VIP 차단 (스팸)',
+        expected: { vip: false, blocked: true, blockedReason: 'SPAM_SUSPECTED' },
+        actual: tc4Result,
+        pass: !tc4Result.vip && tc4Result.blocked && tc4Result.blockedReason === 'SPAM_SUSPECTED'
+    });
+
+    // 결과 출력
+    const passCount = results.testCases.filter(tc => tc.pass).length;
+    const totalCount = results.testCases.length;
+
+    results.testCases.forEach(tc => {
+        log(tc.pass ? '✅' : '❌', `${tc.name}: ${tc.pass ? 'PASS' : 'FAIL'} (Score: ${tc.actual.vipScore})`);
+    });
+
+    log(passCount === totalCount ? '✅' : '⚠️', `VIP 테스트: ${passCount}/${totalCount} 통과`);
+
+    // VIP SMS 드라이런 테스트
+    if (process.env.VIP_SMS_TEST === 'true') {
+        log('📱', 'VIP SMS 드라이런 테스트...');
+        try {
+            const { processVipAlert } = require('../services/airtableService');
+            const dryRunResult = await processVipAlert(tc1Content, 'green', 0, { dryRun: true });
+            log('✅', `드라이런 완료: VIP=${dryRunResult.vip}, Score=${dryRunResult.vipScore}`);
+            results.dryRun = { success: true, result: dryRunResult };
+        } catch (error) {
+            log('❌', `드라이런 실패: ${error.message}`);
+            results.dryRun = { success: false, error: error.message };
+        }
+    }
+
+    return results;
+}
+
+// ═══════════════════════════════════════════════════════════
+// 5. 메트릭스 조회
 // ═══════════════════════════════════════════════════════════
 function getMetricsReport() {
     log('📊', '메트릭스 로딩 중...');
@@ -238,9 +321,9 @@ function getMetricsReport() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// 5. 리포트 생성
+// 6. 리포트 생성
 // ═══════════════════════════════════════════════════════════
-function generateReport(gitStatus, apiHealth, alimtalk, metricsReport) {
+function generateReport(gitStatus, apiHealth, alimtalk, vipTest, metricsReport) {
     const today = getToday();
 
     let report = `# Daily Health Check - ${today}
@@ -256,6 +339,7 @@ function generateReport(gitStatus, apiHealth, alimtalk, metricsReport) {
 | API Health | ${apiHealth.health?.ok ? '✅ OK' : '❌ FAIL'} (${apiHealth.latency?.health || '-'}ms) |
 | Result Link | ${apiHealth.resultLink?.ok ? '✅ OK' : '❌ FAIL'} (${apiHealth.latency?.resultLink || '-'}ms) |
 | 알림톡 | ${alimtalk.enabled ? '✅ 활성화' : '⚠️ 비활성화'} |
+| VIP 태깅 | ${vipTest.testCases.filter(tc => tc.pass).length}/${vipTest.testCases.length} 통과 |
 | Git 상태 | ${gitStatus.untracked.length === 0 ? '✅ Clean' : `⚠️ Untracked ${gitStatus.untracked.length}개`} |
 
 ---
@@ -343,11 +427,14 @@ async function main() {
     // 3. 알림톡 체크
     const alimtalk = await checkAlimtalk();
 
-    // 4. 메트릭스 리포트
+    // 4. VIP 태깅 테스트
+    const vipTest = await checkVipTagging();
+
+    // 5. 메트릭스 리포트
     const metricsReport = getMetricsReport();
 
-    // 5. 리포트 생성
-    const report = generateReport(gitStatus, apiHealth, alimtalk, metricsReport);
+    // 6. 리포트 생성
+    const report = generateReport(gitStatus, apiHealth, alimtalk, vipTest, metricsReport);
 
     // 결과 출력
     console.log('\n' + report);

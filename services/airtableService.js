@@ -274,6 +274,96 @@ ${alert.message}
 }
 
 /**
+ * VIP 태깅 처리 및 알림
+ * @param {string} wishContent - 소원 내용
+ * @param {string} trafficLight - 신호등 결과
+ * @param {number} duplicateAttempts - 중복 시도 횟수
+ * @param {Object} options - { dryRun: boolean, wishId: string }
+ * @returns {Object} VIP 평가 결과
+ */
+async function processVipAlert(wishContent, trafficLight, duplicateAttempts = 0, options = {}) {
+    const { dryRun = false, wishId = null } = options;
+
+    // VIP 서비스 import
+    const { evaluateVip } = require('./vipService');
+    const { recordVipTagged } = require('./metricsService');
+
+    // VIP 평가
+    const vipResult = evaluateVip(wishContent, trafficLight, duplicateAttempts);
+
+    // VIP가 아니면 early return
+    if (!vipResult.vip) {
+        return vipResult;
+    }
+
+    console.log(`[VIP] 태깅됨! Score: ${vipResult.vipScore}, Reasons: ${vipResult.vipReasons.join(', ')}`);
+
+    // Metrics 기록
+    recordVipTagged(trafficLight, vipResult.vipScore);
+
+    // Alerts 테이블에 이벤트 저장
+    await createAlert('✨', 'VIP_TAGGED', `VIP 소원 감지 (점수: ${vipResult.vipScore})`, {
+        wishId: wishId || `wish_${Date.now()}`,
+        vipScore: vipResult.vipScore,
+        vipReasons: vipResult.vipReasons,
+        trafficLight,
+        contentPreview: wishContent.substring(0, 100) + (wishContent.length > 100 ? '...' : '')
+    });
+
+    // 여의보주 SMS 발송
+    if (!dryRun) {
+        await sendVipNotification(vipResult, trafficLight);
+    } else {
+        console.log('[VIP] [드라이런] SMS 발송 스킵');
+    }
+
+    return vipResult;
+}
+
+/**
+ * VIP 여의보주 알림 발송
+ */
+async function sendVipNotification(vipResult, trafficLight) {
+    try {
+        const { sendSMS } = require('./solapiService');
+
+        // 여의보주 번호
+        const QUALITY_PHONE = process.env.QUALITY_PHONE;
+        const COO_PHONE = process.env.COO_PHONE || process.env.CRO_PHONE;
+
+        if (!QUALITY_PHONE) {
+            console.warn('[VIP] QUALITY_PHONE 미설정 - 알림 발송 스킵');
+            return;
+        }
+
+        const message = `[하루하루의기적 VIP 알림]
+✨ Human Touch 소원 감지
+
+📊 VIP 점수: ${vipResult.vipScore}점
+🚦 신호등: ${trafficLight.toUpperCase()}
+
+💡 선정 근거:
+${vipResult.vipReasons.map((r, i) => `  ${i+1}. ${r}`).join('\n')}
+
+👉 여의보주님의 수기 답장이 필요합니다.
+
+시각: ${new Date().toLocaleString('ko-KR')}`;
+
+        // 여의보주에게 발송
+        await sendSMS(QUALITY_PHONE, message);
+        console.log('[VIP] 여의보주 알림 발송 완료');
+
+        // COO에게 CC (옵션)
+        if (COO_PHONE && COO_PHONE !== QUALITY_PHONE) {
+            await sendSMS(COO_PHONE, `[VIP CC] ${message}`);
+            console.log('[VIP] COO CC 발송 완료');
+        }
+    } catch (error) {
+        console.error('[VIP] 알림 발송 실패:', error.message);
+    }
+}
+
+/**
  * 서비스 활성화 상태 확인
  */
 function isEnabled() {
@@ -284,6 +374,8 @@ module.exports = {
     saveDailySnapshot,
     createAlert,
     checkAndAlert,
+    processVipAlert,
+    sendVipNotification,
     isEnabled,
     TABLES
 };

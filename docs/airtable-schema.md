@@ -33,10 +33,25 @@ date,wishes_total,wishes_new,wishes_processed,red,yellow,green,alimtalk_sent,ali
 | 필드명 | 타입 | 설명 |
 |--------|------|------|
 | created_at | Date/Time | 생성 시각 |
-| severity | Single select | 🟡 / 🔴 |
-| type | Single select | ALIMTALK_FAIL / ACK_SLA / RED_CASE / ERROR / DUPLICATE |
+| severity | Single select | 🟡 / 🔴 / ✨ |
+| type | Single select | ALIMTALK_FAIL / ACK_SLA / RED_CASE / ERROR / DUPLICATE / VIP_TAGGED |
 | message | Single line text | 요약 메시지 |
 | payload_json | Long text | 추가 데이터 (JSON) |
+
+### severity 종류
+- 🟡 YELLOW: 코미(COO) 알림
+- 🔴 RED: 코미 + 푸르미르(CEO) + 여의보주 알림
+- ✨ VIP: 여의보주 알림 (Human Touch 필요)
+
+### type 종류
+| type | 설명 | 알림 대상 |
+|------|------|-----------|
+| ALIMTALK_FAIL | 알림톡 실패 | COO |
+| ACK_SLA | ACK 응답 지연 (>10분) | COO |
+| RED_CASE | 🔴 신호 발생 | CEO+COO+여의보주 |
+| ERROR | 에러 발생 | COO |
+| DUPLICATE | 중복 시도 급증 (≥5회) | COO |
+| VIP_TAGGED | VIP 소원 감지 (점수≥70) | 여의보주 (+COO CC) |
 
 ### CSV Import용 헤더
 ```csv
