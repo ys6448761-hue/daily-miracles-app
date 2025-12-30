@@ -19,6 +19,23 @@ try {
   console.warn("⚠️ 메트릭스 서비스 로드 실패:", error.message);
 }
 
+// Airtable 서비스 로딩
+let airtableService = null;
+try {
+  airtableService = require("./services/airtableService");
+  console.log("✅ Airtable 서비스 로드 성공");
+} catch (error) {
+  console.warn("⚠️ Airtable 서비스 로드 실패:", error.message);
+}
+
+// 빌드 정보 (디버깅용)
+const BUILD_INFO = {
+  commit: process.env.GIT_SHA || process.env.RENDER_GIT_COMMIT || 'unknown',
+  deployedAt: new Date().toISOString(),
+  env: process.env.NODE_ENV || 'development',
+  version: 'v3.1-metrics'
+};
+
 // 인증 라우터 로딩
 let authRoutes = null;
 try {
@@ -195,7 +212,8 @@ app.get("/api/metrics", (_req, res) => {
   }
   res.json({
     success: true,
-    metrics: metricsService.getMetrics()
+    metrics: metricsService.getMetrics(),
+    build: BUILD_INFO
   });
 });
 
@@ -207,6 +225,55 @@ app.get("/api/metrics/report", (_req, res) => {
     });
   }
   res.type('text/plain').send(metricsService.generateDailyReport());
+});
+
+// ---------- Metrics Snapshot (Airtable 저장 + 이상 감지) ----------
+app.post("/api/metrics/snapshot", async (_req, res) => {
+  if (!metricsService) {
+    return res.status(503).json({
+      success: false,
+      error: "metrics_unavailable"
+    });
+  }
+
+  try {
+    const metrics = metricsService.getMetrics();
+    const report = metricsService.generateDailyReport();
+
+    let airtableResult = { skipped: true, reason: 'service_not_loaded' };
+    let alerts = [];
+
+    if (airtableService) {
+      // 1. Daily Health 스냅샷 저장
+      airtableResult = await airtableService.saveDailySnapshot(metrics, report);
+
+      // 2. 이상 감지 및 알림 발송
+      alerts = await airtableService.checkAndAlert(metrics);
+    }
+
+    // 3. 메트릭스 파일 저장
+    metricsService.saveMetrics();
+
+    res.json({
+      success: true,
+      timestamp: new Date().toISOString(),
+      metrics: {
+        date: metrics.date,
+        wishes_total: metrics.wishes.total,
+        alimtalk_sent: metrics.alimtalk.sent,
+        red: metrics.trafficLight.red
+      },
+      airtable: airtableResult,
+      alerts: alerts.length,
+      alertDetails: alerts
+    });
+  } catch (error) {
+    console.error("💥 Snapshot 저장 실패:", error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
 });
 
 // ---------- Diag (서버가 실제로 받은 것 그대로 보여줌) ----------

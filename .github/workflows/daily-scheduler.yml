@@ -1,19 +1,70 @@
-# Aurora5 Daily Scheduler
-# 매일 오전 9시 (KST) 자동 발송
+# Aurora5 Daily Scheduler + ACT 관제탑
+#
+# 스케줄:
+# - 00:10 KST: Daily Health Snapshot (Airtable 저장 + 이상 감지)
+# - 09:00 KST: Daily Miracle Messages
 
-name: Daily Miracle Messages
+name: Daily Scheduler
 
 on:
   schedule:
-    # UTC 00:00 = KST 09:00
+    # UTC 15:10 = KST 00:10 (자정 10분 - Daily Snapshot)
+    - cron: '10 15 * * *'
+    # UTC 00:00 = KST 09:00 (오전 9시 - Daily Messages)
     - cron: '0 0 * * *'
 
   # 수동 실행 가능
   workflow_dispatch:
+    inputs:
+      job_type:
+        description: '실행할 작업'
+        required: true
+        default: 'snapshot'
+        type: choice
+        options:
+          - snapshot
+          - daily-messages
+          - both
 
 jobs:
+  # ===== Daily Snapshot (00:10 KST) =====
+  daily-snapshot:
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '10 15 * * *' || github.event.inputs.job_type == 'snapshot' || github.event.inputs.job_type == 'both'
+
+    steps:
+      - name: Daily Health Snapshot
+        run: |
+          echo "🏥 Daily Health Snapshot 실행..."
+          response=$(curl -X POST "${{ secrets.API_BASE_URL }}/api/metrics/snapshot" \
+            -H "Content-Type: application/json" \
+            --silent \
+            --show-error \
+            --max-time 30)
+
+          echo "Response: $response"
+
+          # 성공 여부 확인
+          success=$(echo $response | jq -r '.success')
+          if [ "$success" != "true" ]; then
+            echo "❌ Snapshot 저장 실패"
+            exit 1
+          fi
+
+          echo "✅ Snapshot 저장 완료"
+          echo "Alerts: $(echo $response | jq -r '.alerts')"
+
+      - name: Log Result
+        if: always()
+        run: |
+          echo "Job: daily-snapshot"
+          echo "Time: $(date)"
+          echo "Status: ${{ job.status }}"
+
+  # ===== Daily Messages (09:00 KST) =====
   send-daily-messages:
     runs-on: ubuntu-latest
+    if: github.event.schedule == '0 0 * * *' || github.event.inputs.job_type == 'daily-messages' || github.event.inputs.job_type == 'both'
 
     steps:
       - name: Trigger Daily Job
@@ -28,5 +79,15 @@ jobs:
       - name: Log Result
         if: always()
         run: |
-          echo "Daily job triggered at $(date)"
+          echo "Job: send-daily-messages"
+          echo "Time: $(date)"
           echo "Status: ${{ job.status }}"
+
+  # ===== Health Check (5분마다 - 추후 활성화) =====
+  # health-check:
+  #   runs-on: ubuntu-latest
+  #   if: false  # 비활성화 상태
+  #   steps:
+  #     - name: Check API Health
+  #       run: |
+  #         curl "${{ secrets.API_BASE_URL }}/api/health" --fail --silent
