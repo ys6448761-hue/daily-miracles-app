@@ -9,6 +9,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const { generateWishAckMessage, generateRedAlertMessage } = require('../config/messageTemplates');
 const { sendWishAck, sendRedAlert, isEnabled: isSolapiEnabled } = require('../services/solapiService');
+const { recordWishInbox, recordTrafficLight, recordAckEligible, recordGem } = require('../services/metricsService');
 
 // 데이터 저장 경로
 const DATA_DIR = path.join(__dirname, '..', 'data', 'wishes');
@@ -33,6 +34,7 @@ router.post('/', async (req, res) => {
             birthdate,
             phone,
             gem,
+            gem_recommended,     // 소원 기반 추천값 (프론트에서 전송)
             wish,
             want_message,        // 7일 메시지 수신 여부
             privacy_agreed,
@@ -40,11 +42,11 @@ router.post('/', async (req, res) => {
             created_at
         } = req.body;
 
-        // 기본 필수 검사 (이름, 생년월일, 소원)
-        if (!name || !birthdate || !wish) {
+        // 기본 필수 검사 (이름, 소원만 필수 / 생년월일은 선택)
+        if (!name || !wish) {
             return res.status(400).json({
                 success: false,
-                message: '이름, 생년월일, 소원은 필수 입력입니다'
+                message: '이름과 소원은 필수 입력입니다'
             });
         }
 
@@ -87,14 +89,22 @@ router.post('/', async (req, res) => {
         // 기적지수 계산
         const miracleScore = calculateMiracleScore();
 
+        // gem 추천 로그용 필드 계산
+        const gemRecommended = gem_recommended || null;  // 프론트에서 추천한 값
+        const gemSelected = gem || null;                  // 사용자가 선택한 값
+        const gemChanged = gemRecommended && gemSelected && gemRecommended !== gemSelected;
+
         // 데이터 구성
         const wishData = {
             id: Date.now().toString(),
             name,
-            birthdate,
+            birthdate: birthdate || null,  // 선택 항목
             phone: phone || null,
             gem: finalGem,
             gem_meaning: getGemMeaning(finalGem),
+            gem_recommended: gemRecommended,    // 추천값
+            gem_selected: gemSelected,          // 사용자 선택값
+            gem_changed: gemChanged,            // 추천에서 변경 여부
             wish,
             want_message: want_message || false,
             privacy_agreed: privacy_agreed || false,
@@ -125,6 +135,14 @@ router.post('/', async (req, res) => {
 
         dailyData.push(wishData);
         await fs.writeFile(dailyFile, JSON.stringify(dailyData, null, 2), 'utf8');
+
+        // 메트릭스 기록
+        recordWishInbox('new', want_message);
+        recordTrafficLight(trafficLight.level);
+        recordGem(gemRecommended, gemSelected);
+        if (want_message && phone) {
+            recordAckEligible();  // ACK 대상 카운트
+        }
 
         // 신호등 상태별 로깅
         const levelEmoji = { RED: '🔴', YELLOW: '🟡', GREEN: '🟢' };

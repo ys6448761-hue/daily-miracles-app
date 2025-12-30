@@ -25,7 +25,9 @@ let todayMetrics = {
     wishes: {
         total: 0,
         new: 0,
-        processed: 0
+        processed: 0,
+        wantMessage: 0,      // 7일 메시지 선택 수
+        noMessage: 0         // 7일 메시지 미선택 수
     },
     trafficLight: {
         red: 0,
@@ -39,7 +41,8 @@ let todayMetrics = {
         fallbackSms: 0
     },
     ack: {
-        sent: 0,
+        eligible: 0,         // ACK 대상 (want_message + contact)
+        sent: 0,             // 실제 발송
         avgTimeMs: 0,
         duplicateAttempts: 0,
         totalTimeMs: 0
@@ -52,6 +55,11 @@ let todayMetrics = {
         },
         avgScore: 0,
         totalScore: 0
+    },
+    gem: {
+        recommended: {},     // gem 추천 분포
+        selected: {},        // gem 선택 분포
+        changed: 0           // 추천에서 변경한 수
     },
     errors: [],
     startedAt: new Date().toISOString()
@@ -81,11 +89,12 @@ function checkDateReset() {
         // 새 날짜로 리셋
         todayMetrics = {
             date: today,
-            wishes: { total: 0, new: 0, processed: 0 },
+            wishes: { total: 0, new: 0, processed: 0, wantMessage: 0, noMessage: 0 },
             trafficLight: { red: 0, yellow: 0, green: 0 },
             alimtalk: { sent: 0, success: 0, failed: 0, fallbackSms: 0 },
-            ack: { sent: 0, avgTimeMs: 0, duplicateAttempts: 0, totalTimeMs: 0 },
+            ack: { eligible: 0, sent: 0, avgTimeMs: 0, duplicateAttempts: 0, totalTimeMs: 0 },
             vip: { total: 0, byTrafficLight: { green: 0, yellow: 0 }, avgScore: 0, totalScore: 0 },
+            gem: { recommended: {}, selected: {}, changed: 0 },
             errors: [],
             startedAt: new Date().toISOString()
         };
@@ -125,7 +134,22 @@ function loadMetrics() {
     if (fs.existsSync(filepath)) {
         try {
             const content = fs.readFileSync(filepath, 'utf-8');
-            todayMetrics = JSON.parse(content);
+            const loaded = JSON.parse(content);
+
+            // 기존 데이터에 새 필드가 없으면 초기화
+            todayMetrics = {
+                ...loaded,
+                wishes: {
+                    total: 0, new: 0, processed: 0, wantMessage: 0, noMessage: 0,
+                    ...loaded.wishes
+                },
+                ack: {
+                    eligible: 0, sent: 0, avgTimeMs: 0, duplicateAttempts: 0, totalTimeMs: 0,
+                    ...loaded.ack
+                },
+                gem: loaded.gem || { recommended: {}, selected: {}, changed: 0 }
+            };
+
             console.log(`[Metrics] 로드됨: ${filepath}`);
         } catch (e) {
             console.error('[Metrics] 로드 실패:', e.message);
@@ -139,14 +163,22 @@ function loadMetrics() {
 
 /**
  * 소원 인입 기록
+ * @param {string} status - 'new' | 'processed'
+ * @param {boolean} wantMessage - 7일 메시지 수신 여부
  */
-function recordWishInbox(status = 'new') {
+function recordWishInbox(status = 'new', wantMessage = false) {
     checkDateReset();
     todayMetrics.wishes.total++;
     if (status === 'new') {
         todayMetrics.wishes.new++;
     } else if (status === 'processed') {
         todayMetrics.wishes.processed++;
+    }
+    // 7일 메시지 선택 분리 집계
+    if (wantMessage) {
+        todayMetrics.wishes.wantMessage++;
+    } else {
+        todayMetrics.wishes.noMessage++;
     }
 }
 
@@ -178,6 +210,14 @@ function recordAlimtalk(success, fallbackSms = false) {
 }
 
 /**
+ * ACK 대상 기록 (want_message + contact 존재)
+ */
+function recordAckEligible() {
+    checkDateReset();
+    todayMetrics.ack.eligible++;
+}
+
+/**
  * ACK 발송 기록
  * @param {number} responseTimeMs - 응답 시간 (ms)
  * @param {boolean} isDuplicate - 중복 발송 시도 여부
@@ -188,6 +228,30 @@ function recordAck(responseTimeMs, isDuplicate = false) {
     todayMetrics.ack.totalTimeMs += responseTimeMs;
     if (isDuplicate) {
         todayMetrics.ack.duplicateAttempts++;
+    }
+}
+
+/**
+ * gem 추천/선택 기록
+ * @param {string} recommended - 추천된 gem
+ * @param {string} selected - 선택된 gem
+ */
+function recordGem(recommended, selected) {
+    checkDateReset();
+
+    // 추천 분포
+    if (recommended) {
+        todayMetrics.gem.recommended[recommended] = (todayMetrics.gem.recommended[recommended] || 0) + 1;
+    }
+
+    // 선택 분포
+    if (selected) {
+        todayMetrics.gem.selected[selected] = (todayMetrics.gem.selected[selected] || 0) + 1;
+    }
+
+    // 변경 여부
+    if (recommended && selected && recommended !== selected) {
+        todayMetrics.gem.changed++;
     }
 }
 
@@ -247,7 +311,7 @@ function recordVipTagged(trafficLight, vipScore) {
 function getMetrics() {
     checkDateReset();
 
-    // 평균 ACK 시간 계산
+    // 평균 ACK 시간 계산 (발송 기준)
     const avgAckTime = todayMetrics.ack.sent > 0
         ? Math.round(todayMetrics.ack.totalTimeMs / todayMetrics.ack.sent)
         : 0;
@@ -262,13 +326,27 @@ function getMetrics() {
         ? Math.round(todayMetrics.vip.totalScore / todayMetrics.vip.total)
         : 0;
 
+    // 7일 메시지 선택률
+    const wantMessageRate = todayMetrics.wishes.total > 0
+        ? ((todayMetrics.wishes.wantMessage / todayMetrics.wishes.total) * 100).toFixed(1)
+        : 0;
+
+    // gem 변경률 (추천 대비)
+    const totalRecommended = Object.values(todayMetrics.gem.recommended).reduce((a, b) => a + b, 0);
+    const gemChangeRate = totalRecommended > 0
+        ? ((todayMetrics.gem.changed / totalRecommended) * 100).toFixed(1)
+        : 0;
+
     return {
         ...todayMetrics,
         computed: {
             avgAckTimeMs: avgAckTime,
+            avgAckMsEligibleOnly: avgAckTime,  // ACK 대상 기준 평균
             alimtalkSuccessRate: successRate + '%',
             errorTop3: todayMetrics.errors.slice(0, 3),
-            avgVipScore
+            avgVipScore,
+            wantMessageRate: wantMessageRate + '%',
+            gemChangeRate: gemChangeRate + '%'
         }
     };
 }
@@ -290,6 +368,8 @@ function generateDailyReport() {
    • 총 인입: ${m.wishes.total}건
    • NEW: ${m.wishes.new}건
    • 처리완료: ${m.wishes.processed}건
+   • 💌 7일 메시지 선택: ${m.wishes.wantMessage}건 (${m.computed.wantMessageRate})
+   • 📝 메시지 미선택: ${m.wishes.noMessage}건
 
 🚦 신호등 분포
    • 🔴 RED: ${tl.red}건 (${((tl.red/total)*100).toFixed(1)}%)
@@ -302,10 +382,16 @@ function generateDailyReport() {
    • 실패: ${m.alimtalk.failed}건
    • SMS 폴백: ${m.alimtalk.fallbackSms}건
 
-⏱️ ACK 성능
+⏱️ ACK 성능 (7일 메시지 대상 기준)
+   • ACK 대상: ${m.ack.eligible}건
    • 발송: ${m.ack.sent}건
-   • 평균 응답: ${m.computed.avgAckTimeMs}ms
+   • 평균 응답: ${m.computed.avgAckMsEligibleOnly}ms
    • 중복 시도: ${m.ack.duplicateAttempts}건
+
+💎 gem 추천 분석
+   • 추천→선택 변경률: ${m.computed.gemChangeRate}
+   • 추천 분포: ${JSON.stringify(m.gem.recommended)}
+   • 선택 분포: ${JSON.stringify(m.gem.selected)}
 
 ⚠️ 에러 Top 3
 ${m.computed.errorTop3.length > 0
@@ -335,7 +421,9 @@ module.exports = {
     recordWishInbox,
     recordTrafficLight,
     recordAlimtalk,
+    recordAckEligible,
     recordAck,
+    recordGem,
     recordError,
     recordVipTagged,
     getMetrics,

@@ -476,6 +476,20 @@
             text-decoration: underline;
         }
 
+        /* 선택 힌트 */
+        .optional-hint {
+            font-size: 12px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .field-hint {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 6px;
+            padding-left: 4px;
+        }
+
         /* 소원 힌트 */
         .wish-hint {
             font-size: 12px;
@@ -664,10 +678,11 @@
                     <input type="text" name="name" id="name" placeholder="홍길동" required>
                 </div>
 
-                <!-- Q2. 생년월일 -->
+                <!-- Q2. 생년월일 (선택) -->
                 <div class="form-group">
-                    <label class="required">2. 생년월일</label>
-                    <input type="date" name="birthdate" id="birthdate" required>
+                    <label>2. 생년월일 <span class="optional-hint">(선택)</span></label>
+                    <input type="date" name="birthdate" id="birthdate">
+                    <div class="field-hint">입력하시면 더 정확한 분석이 가능해요</div>
                 </div>
 
                 <!-- Q3. 소원 입력 -->
@@ -904,6 +919,9 @@
             });
         });
 
+        // gem 추천값 추적 변수
+        let lastRecommendedGem = null;
+
         // 소원 입력 시 보석 추천 (디바운스)
         let wishDebounce = null;
         document.getElementById('wish').addEventListener('input', (e) => {
@@ -912,6 +930,7 @@
                 const wishText = e.target.value.trim();
                 if (wishText.length >= 5) {
                     const recommended = recommendGem(wishText);
+                    lastRecommendedGem = recommended;  // 추천값 저장
                     selectGem(recommended, true);
                     document.getElementById('gemRecommendBadge').style.display = 'inline-block';
                     document.getElementById('wishHint').textContent = '소원에 맞는 에너지를 추천했어요!';
@@ -956,9 +975,9 @@
             const gem = form.gem.value || 'citrine'; // 폴백 기본값
             const wantMessage = form.want_message.value === 'yes';
 
-            // 기본 필수 검사
-            if (!name || !birthdate || !wish) {
-                showError('이름, 생년월일, 소원은 필수 입력입니다');
+            // 기본 필수 검사 (이름, 소원만 필수 / 생년월일은 선택)
+            if (!name || !wish) {
+                showError('이름과 소원은 필수 입력입니다');
                 return;
             }
 
@@ -996,9 +1015,10 @@
             // 데이터 준비
             const data = {
                 name,
-                birthdate,
+                birthdate: birthdate || null,  // 선택 항목
                 wish,
                 gem,
+                gem_recommended: lastRecommendedGem,  // 추천값 (분석용)
                 want_message: wantMessage,
                 phone: phone || null,
                 privacy_agreed: privacyAgreed,
