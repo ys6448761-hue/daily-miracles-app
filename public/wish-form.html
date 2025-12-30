@@ -243,6 +243,17 @@
             text-decoration: underline;
         }
 
+        /* 제출 안내문 */
+        .submit-notice {
+            font-size: 12px;
+            color: rgba(255, 215, 0, 0.8);
+            text-align: center;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 8px;
+        }
+
         /* 제출 버튼 */
         .submit-btn {
             width: 100%;
@@ -496,6 +507,38 @@
             color: rgba(255, 215, 0, 0.7);
             margin-top: 8px;
             padding-left: 4px;
+        }
+
+        /* 모드 탭 */
+        .mode-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px;
+            border-radius: 12px;
+        }
+
+        .mode-tab {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mode-tab:hover {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .mode-tab.active {
+            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+            color: #1a1a2e;
         }
 
         /* 보석 추천 배지 */
@@ -855,13 +898,18 @@
 </head>
 <body>
     <div class="container">
+        <!-- 모드 탭 -->
+        <div class="mode-tabs">
+            <button type="button" class="mode-tab" data-mode="problem" id="tabProblem">문제 해결</button>
+            <button type="button" class="mode-tab" data-mode="wish" id="tabWish">소원 보내기</button>
+        </div>
+
         <div class="header">
-            <h1>당신의 소원을<br>아우룸에게 들려주세요</h1>
-            <p>
-                작은 소원도 괜찮아요. 아우룸이 당신의 소원을<br>
+            <h1 id="headerTitle">지금 막힌 문제를<br>풀어드립니다</h1>
+            <p id="headerDesc">
+                지금 막힌 상황 1문장이면 충분해요.<br>
                 '목표 → 경로 → 실행'으로 정리해 드립니다.<br>
-                지금 상황을 적으면, 다음 한 걸음과 참고할 사례를<br>
-                함께 제시해요.
+                다음 한 걸음과 참고할 사례를 함께 제시해요.
             </p>
         </div>
 
@@ -880,12 +928,12 @@
                     <div class="field-hint">입력하시면 더 정확한 분석이 가능해요</div>
                 </div>
 
-                <!-- Q3. 소원 입력 -->
+                <!-- Q3. 소원/문제 입력 -->
                 <div class="form-group">
-                    <label class="required">3. 소원 한 줄</label>
+                    <label class="required" id="q3Label">3. 지금 막힌 문제</label>
                     <textarea name="wish" id="wish" class="wish-input"
-                              placeholder="예) 6개월 안에 나만의 작은 가게를 열고 싶어요" required></textarea>
-                    <div class="wish-hint" id="wishHint">소원을 적으면 필요한 에너지를 추천해드려요</div>
+                              placeholder="예) 이직을 고민 중인데 방향을 못 정하겠어요" required></textarea>
+                    <div class="wish-hint" id="wishHint">상황을 적으면 필요한 에너지를 추천해드려요</div>
                 </div>
 
                 <!-- Q4. 보석 선택 (추천값 기본 선택) -->
@@ -993,7 +1041,11 @@
 
                 <div class="error-message" id="errorMessage"></div>
 
-                <button type="submit" class="submit-btn">소원 보내기</button>
+                <p class="submit-notice" id="submitNotice" style="display:none;">
+                    💡 7일 응원 메시지 선택 시에만 카톡/문자가 발송됩니다
+                </p>
+
+                <button type="submit" class="submit-btn" id="submitBtn">제출하기</button>
 
                 <div class="analysis-link">
                     <a href="./questions.html">3분 기적지수 테스트도 해볼까요? →</a>
@@ -1078,6 +1130,69 @@
     </div>
 
     <script>
+        // ═══════════════════════════════════════════════════════════
+        // 모드 처리 (문제해결 / 소원)
+        // ═══════════════════════════════════════════════════════════
+        let currentMode = 'problem'; // 기본값: 문제해결
+
+        const modeConfig = {
+            problem: {
+                headerTitle: '지금 막힌 문제를<br>풀어드립니다',
+                headerDesc: '지금 막힌 상황 1문장이면 충분해요.<br>\'목표 → 경로 → 실행\'으로 정리해 드립니다.<br>다음 한 걸음과 참고할 사례를 함께 제시해요.',
+                q3Label: '3. 지금 막힌 문제',
+                q3Placeholder: '예) 이직을 고민 중인데 방향을 못 정하겠어요',
+                wishHint: '상황을 적으면 필요한 에너지를 추천해드려요'
+            },
+            wish: {
+                headerTitle: '당신의 소원을<br>아우룸에게 들려주세요',
+                headerDesc: '작은 소원도 괜찮아요. 아우룸이 당신의 소원을<br>\'목표 → 경로 → 실행\'으로 정리해 드립니다.<br>지금 상황을 적으면, 다음 한 걸음과 참고할 사례를<br>함께 제시해요.',
+                q3Label: '3. 소원 한 줄',
+                q3Placeholder: '예) 6개월 안에 나만의 작은 가게를 열고 싶어요',
+                wishHint: '소원을 적으면 필요한 에너지를 추천해드려요'
+            }
+        };
+
+        function setMode(mode) {
+            currentMode = mode;
+            localStorage.setItem('lastMode', mode);
+
+            // 탭 활성화
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.mode === mode);
+            });
+
+            // 콘텐츠 업데이트
+            const config = modeConfig[mode];
+            document.getElementById('headerTitle').innerHTML = config.headerTitle;
+            document.getElementById('headerDesc').innerHTML = config.headerDesc;
+            document.getElementById('q3Label').textContent = config.q3Label;
+            document.getElementById('wish').placeholder = config.q3Placeholder;
+            document.getElementById('wishHint').textContent = config.wishHint;
+        }
+
+        // 페이지 로드 시 모드 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            // URL 파라미터 우선
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlMode = urlParams.get('mode');
+
+            // URL > localStorage > 기본값
+            const initialMode = urlMode || localStorage.getItem('lastMode') || 'problem';
+            setMode(initialMode);
+
+            // 탭 클릭 이벤트
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    setMode(tab.dataset.mode);
+                    // URL 업데이트 (히스토리 변경 없이)
+                    const url = new URL(window.location);
+                    url.searchParams.set('mode', tab.dataset.mode);
+                    window.history.replaceState({}, '', url);
+                });
+            });
+        });
+
+        // ═══════════════════════════════════════════════════════════
         // 보석 추천 키워드 매핑
         const gemKeywords = {
             ruby: ['열정', '용기', '도전', '시작', '창업', '새로운', '꿈', '목표', '성공', '이루', '달성', '싶어', '되고싶'],
@@ -1172,13 +1287,16 @@
         document.querySelectorAll('input[name="want_message"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
                 const contactSection = document.getElementById('contactSection');
+                const submitNotice = document.getElementById('submitNotice');
                 if (e.target.value === 'yes') {
                     contactSection.style.display = 'block';
+                    submitNotice.style.display = 'block';
                     document.getElementById('phone').setAttribute('required', 'required');
                     document.getElementById('privacy_agreed').setAttribute('required', 'required');
                     document.getElementById('marketing_agreed').setAttribute('required', 'required');
                 } else {
                     contactSection.style.display = 'none';
+                    submitNotice.style.display = 'none';
                     document.getElementById('phone').removeAttribute('required');
                     document.getElementById('privacy_agreed').removeAttribute('required');
                     document.getElementById('marketing_agreed').removeAttribute('required');
