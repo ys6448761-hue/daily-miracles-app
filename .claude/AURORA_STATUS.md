@@ -1,7 +1,7 @@
 # AURORA_STATUS.md
 ## 하루하루의 기적 - 프로젝트 현황판
 
-**마지막 업데이트**: 2025-12-30 07:15 KST
+**마지막 업데이트**: 2025-12-30 13:30 KST
 **업데이트 담당**: Claude Code
 
 ---
@@ -33,10 +33,11 @@
 ## 현재 상태 요약
 
 ```
-🟢 운영 중: MVP 서비스 (소원 등록, 문제 해결)
+🟢 운영 중: MVP 서비스 (소원 등록, 문제 해결, 소원실현)
 🟢 완료: P0 작업 (소원그림 광고 준비)
+🟢 완료: P2 작업 (신호등 시스템 + Solapi 연동)
 🟡 진행 중: P1 작업 (Airtable 연동)
-⚪ 대기: P2 작업 (신호등 시스템)
+⚪ 대기: P3 작업 (Aurora 5 에이전트 고도화)
 ```
 
 ---
@@ -73,13 +74,23 @@ GET  /api/wish-image/list               - 저장된 이미지 목록
 | WishRouter 에이전트 기본 구현 | Code | ⬜ |
 | 인입 채널 → Airtable 웹훅 연동 | Code | ⬜ |
 
-### P2 (다음 주)
+### P2 (완료! 🎉)
 
 | 작업 | 담당 | 상태 |
 |------|------|------|
-| 신호등 시스템 (자동 분류) | Code | ⬜ |
-| 카톡 알림 API 연결 | Code | ⬜ |
+| 신호등 시스템 (RED/YELLOW/GREEN 자동 분류) | Code | ✅ |
+| Solapi 연동 (SMS + 카카오 알림톡) | Code | ✅ |
+| 소원 ACK 메시지 자동 발송 | Code | ✅ |
+| 기적지수 계산 (50-100점 동적 산출) | Code | ✅ |
 | 소원그림 문구 시스템 구현 | Code | ⬜ |
+
+### P3 (에이전틱 워크플로우 고도화)
+
+| 작업 | 담당 | 상태 |
+|------|------|------|
+| Aurora 5 서브에이전트 자동화 | Code | ⬜ |
+| wish-journey 파이프라인 신호등 연동 | Code | 🔄 |
+| 배치 처리 시스템 구현 | Code | ⬜ |
 
 ---
 
@@ -97,7 +108,10 @@ GET  /api/wish-image/list               - 저장된 이미지 목록
 
 ### 코드
 ```
+routes/wishRoutes.js          - 소원실현 API (신호등 + 기적지수)
 routes/wishImageRoutes.js     - 소원그림 API (DALL-E 3 + 워터마크)
+services/solapiService.js     - Solapi 연동 (SMS + 카카오 알림톡)
+config/messageTemplates.js    - ACK/RED Alert 메시지 템플릿
 server.js                     - 메인 서버
 .claude/agents/               - Aurora 5 에이전트 정의
 .claude/skills/               - 자동화 스킬

@@ -341,6 +341,71 @@
             transform: scale(1.05);
         }
 
+        /* 기적지수 스타일 */
+        .miracle-score-container {
+            margin: 24px 0;
+            padding: 24px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .score-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+        }
+
+        .score-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 36px;
+            font-weight: 700;
+            color: #1a1a2e;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            animation: scorePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes scorePulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.7); }
+        }
+
+        .score-message {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .gem-result {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+
+        .gem-emoji {
+            font-size: 32px;
+        }
+
+        .gem-meaning {
+            font-size: 16px;
+            color: #ffd700;
+            font-weight: 600;
+        }
+
         /* 로딩 */
         .loading-overlay {
             position: fixed;
@@ -563,16 +628,30 @@
         <div class="spinner"></div>
     </div>
 
-    <!-- 성공 오버레이 -->
+    <!-- 성공 오버레이 (기적지수 포함) -->
     <div class="success-overlay" id="successOverlay">
         <div class="success-content">
-            <div class="success-icon">✨</div>
-            <h2 class="success-title">소원이 전달되었습니다!</h2>
+            <h2 class="success-title"><span id="successName">사용자</span>님의 기적이 시작됩니다</h2>
+
+            <div class="miracle-score-container">
+                <div class="score-label">기적지수</div>
+                <div class="score-circle" id="miracleScore">88</div>
+                <p class="score-message">
+                    우주가 당신의 소원을 응원합니다<br>
+                    당신의 소원은 반드시 이루어집니다
+                </p>
+            </div>
+
+            <div class="gem-result" id="gemResult">
+                <span class="gem-emoji" id="selectedGemEmoji">💎</span>
+                <span class="gem-meaning" id="selectedGemMeaning">열정과 용기</span>
+            </div>
+
             <p class="success-text">
-                아우룸이 당신의 소원을 분석하고 있어요.<br>
-                곧 결과를 안내해 드릴게요.
+                30일 로드맵을 곧 받아보실 수 있습니다<br>
+                7일간 응원 메시지가 함께 합니다
             </p>
-            <a href="./" class="success-btn">메인으로 돌아가기</a>
+            <a href="./" class="success-btn">확인</a>
         </div>
     </div>
 
@@ -653,8 +732,8 @@
                 document.getElementById('loadingOverlay').classList.remove('show');
 
                 if (result.success) {
-                    // 성공 화면 표시
-                    document.getElementById('successOverlay').classList.add('show');
+                    // 성공 화면 업데이트
+                    showSuccessOverlay(name, gem, result.miracleScore);
                 } else {
                     showError(result.message || '전송 중 오류가 발생했습니다');
                 }
@@ -664,9 +743,36 @@
 
                 // 개발용: API 없어도 성공 처리
                 console.log('Development mode - showing success');
-                document.getElementById('successOverlay').classList.add('show');
+                showSuccessOverlay(name, gem, null);
             }
         });
+
+        // 보석 정보 매핑
+        const gemInfo = {
+            ruby: { emoji: '❤️', meaning: '열정과 용기', color: '#e74c3c' },
+            sapphire: { emoji: '💙', meaning: '안정과 지혜', color: '#3498db' },
+            emerald: { emoji: '💚', meaning: '성장과 치유', color: '#2ecc71' },
+            diamond: { emoji: '💎', meaning: '명확한 결단', color: '#ecf0f1' },
+            citrine: { emoji: '💛', meaning: '긍정 에너지', color: '#f39c12' }
+        };
+
+        // 성공 오버레이 표시
+        function showSuccessOverlay(userName, selectedGem, serverScore) {
+            // 이름 표시
+            document.getElementById('successName').textContent = userName;
+
+            // 기적지수 (1/1 특별 80-95점)
+            const miracleScore = serverScore || (80 + Math.floor(Math.random() * 16));
+            document.getElementById('miracleScore').textContent = miracleScore;
+
+            // 보석 정보 표시
+            const gem = gemInfo[selectedGem] || gemInfo.diamond;
+            document.getElementById('selectedGemEmoji').textContent = gem.emoji;
+            document.getElementById('selectedGemMeaning').textContent = gem.meaning;
+
+            // 오버레이 표시
+            document.getElementById('successOverlay').classList.add('show');
+        }
 
         // 에러 표시
         function showError(message) {

@@ -1,7 +1,8 @@
 ---
 name: wish-journey
-description: 소원이 여정 파이프라인
-version: 1.0.0
+description: 소원이 여정 파이프라인 (신호등 시스템 포함)
+version: 2.0.0
+updated: 2025-12-30
 ---
 
 # 소원 여정 파이프라인
@@ -22,8 +23,38 @@ step:
     - wish_content
   output: wish_id
   success_condition: "wish_id가 생성됨"
-  next_step: 2
+  next_step: 1.5
   on_failure: "retry_3_times"
+```
+
+### Step 1.5: 신호등 판정 (Traffic Light)
+```yaml
+step:
+  id: 1.5
+  name: "신호등 판정"
+  agent: risk-guardian
+  input:
+    - wish_id
+    - wish_content
+  output:
+    - traffic_light: RED | YELLOW | GREEN
+    - reason: string
+    - action: string
+  success_condition: "traffic_light이 판정됨"
+  routing:
+    RED:
+      action: "즉시 CRO 긴급 알림 발송"
+      agent: message-sender
+      template: "red_alert"
+      next_step: "hold_for_cro"  # CRO 수동 개입 대기
+    YELLOW:
+      action: "24시간 내 CRO 검토 필요"
+      log: true
+      next_step: 2  # 분석 계속 진행
+    GREEN:
+      action: "자동 처리 진행"
+      next_step: 2  # 정상 진행
+  on_failure: "default_to_YELLOW"  # 판정 실패 시 안전하게 YELLOW 처리
 ```
 
 ### Step 2: 기적 분석

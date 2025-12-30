@@ -53,7 +53,17 @@
       "Bash(ls:*)",
       "Bash(copy:*)",
       "Bash(uv --version:*)",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "Bash(PORT=5102 node:*)",
+      "Bash(예시 이미지\"\n- sharp 라이브러리로 이미지 처리\n\nDEC-2025-1230-002 이행 완료\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git pull:*)",
+      "Bash(time curl:*)",
+      "WebFetch(domain:dailymiracles.kr)",
+      "WebFetch(domain:www.dailymiracles.kr)",
+      "WebFetch(domain:daily-miracles-app.onrender.com)",
+      "Bash(PORT=5200 node:*)",
+      "Bash(PORT=5201 node:*)",
+      "Bash(PORT=5202 node:*)"
     ],
     "deny": [],
     "ask": []

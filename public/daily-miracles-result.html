@@ -25,6 +25,74 @@
             margin: 0 auto;
         }
 
+        /* 따뜻한 인사 섹션 */
+        .warm-greeting {
+            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,249,255,0.95) 100%);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 24px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            border-left: 5px solid #667eea;
+        }
+
+        .warm-greeting h2 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .warm-greeting .highlight-name {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        .comfort-message {
+            font-size: 18px;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        /* 응원 카드 섹션 */
+        .encouragement-card {
+            background: linear-gradient(135deg, #fff9e6 0%, #fff5f5 100%);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .lucky-charm {
+            font-size: 80px;
+            margin-bottom: 20px;
+            display: block;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+            to { text-shadow: 0 0 30px rgba(255, 215, 0, 0.8), 0 0 60px rgba(255, 215, 0, 0.4); }
+        }
+
+        .charm-message {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .next-step-text {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
         /* 히어로 섹션 - 기적지수 대시보드 */
         .hero-section {
             background: white;
@@ -499,6 +567,16 @@
         </div>
 
         <div id="content" style="display: none;">
+            <!-- 따뜻한 인사 섹션 -->
+            <div class="warm-greeting">
+                <h2><span class="highlight-name" id="warmName">사용자</span>님, 함께 풀어가요</h2>
+                <p class="comfort-message" id="comfortMessage">
+                    힘든 시간을 보내고 계시군요.<br>
+                    하루하루의 기적이 함께 합니다.<br>
+                    천천히, 함께 풀어가요.
+                </p>
+            </div>
+
             <!-- 히어로 섹션 - 기적지수 -->
             <div class="hero-section">
                 <div class="hero-content">
@@ -574,6 +652,19 @@
                 </div>
             </div>
 
+            <!-- 응원 카드 (부적) -->
+            <div class="encouragement-card">
+                <span class="lucky-charm" id="luckyCharm">🔮</span>
+                <p class="charm-message">이 기적의 부적이 <span class="highlight-name" id="charmName">사용자</span>님과 함께 합니다</p>
+                <p class="next-step-text">
+                    7일간 매일 아침 응원 메시지를 받아보세요.<br>
+                    작은 변화가 모여 큰 기적이 됩니다.
+                </p>
+                <button class="btn btn-primary" onclick="startDailyMessages()" style="margin-top: 8px;">
+                    7일 응원 받기
+                </button>
+            </div>
+
             <!-- 액션 버튼 -->
             <div class="action-buttons">
                 <button class="btn btn-primary" onclick="startDailyMessages()">
@@ -634,8 +725,19 @@
         function renderResults(story) {
             const { userProfile, counterpartyProfile, relationshipAnalysis, actionPlan } = story;
 
+            // 사용자 이름 설정
+            const userName = userProfile.name || '사용자';
+
+            // 따뜻한 인사 섹션 업데이트
+            document.getElementById('warmName').textContent = userName;
+            document.getElementById('comfortMessage').innerHTML = getComfortMessage(userProfile.miracleIndex);
+
+            // 응원 카드 업데이트
+            document.getElementById('charmName').textContent = userName;
+            document.getElementById('luckyCharm').textContent = getLuckyCharm(userProfile.element || userProfile.elementKey);
+
             // 기적지수 표시
-            document.getElementById('userName').textContent = userProfile.name || '사용자';
+            document.getElementById('userName').textContent = userName;
             document.getElementById('miracleIndex').textContent = userProfile.miracleIndex || 75;
             document.getElementById('indexDescription').textContent =
                 getIndexDescription(userProfile.miracleIndex);
@@ -664,6 +766,37 @@
             if (index >= 60) return '긍정적인 변화의 씨앗이 심어져 있습니다. 조금만 더 노력하면 큰 변화를 경험할 수 있습니다.';
             if (index >= 40) return '변화를 위한 기반이 마련되었습니다. 꾸준한 실천이 기적을 만들어낼 것입니다.';
             return '새로운 시작의 단계입니다. 작은 변화부터 시작해보세요.';
+        }
+
+        // 위로 메시지 (기적지수에 따라)
+        function getComfortMessage(index) {
+            if (index >= 80) {
+                return '당신 안에 이미 기적의 씨앗이 활짝 피어있어요.<br>하루하루의 기적이 함께 응원합니다.<br>당신의 빛을 마음껏 펼쳐보세요!';
+            } else if (index >= 60) {
+                return '좋은 변화가 시작되고 있어요.<br>하루하루의 기적이 함께 합니다.<br>한 걸음 한 걸음, 천천히 나아가요.';
+            } else if (index >= 40) {
+                return '힘든 시간을 보내고 계시군요.<br>하루하루의 기적이 함께 합니다.<br>천천히, 함께 풀어가요.';
+            } else {
+                return '지금 많이 힘드시죠?<br>괜찮아요, 여기까지 오신 것만으로 대단해요.<br>우리가 함께 할게요.';
+            }
+        }
+
+        // 행운의 부적 (원소에 따라)
+        function getLuckyCharm(element) {
+            const charms = {
+                'fire': '🔥',      // 열정형
+                'water': '💧',     // 감성형
+                'earth': '🌍',     // 안정형
+                'air': '🌬️',      // 지성형
+                'growth': '🌱',    // 성장형
+                'harmony': '☯️',   // 조화형
+                '열정형': '🔥',
+                '감성형': '💧',
+                '안정형': '🌍',
+                '지성형': '🌬️',
+                '성장형': '🌱'
+            };
+            return charms[element] || '🔮';
         }
 
         function renderDestinyPredictions(userProfile) {

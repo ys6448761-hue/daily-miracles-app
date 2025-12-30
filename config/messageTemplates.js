@@ -203,9 +203,91 @@ function getGroupLabel(groupSize) {
   return labels[groupSize] || groupSize;
 }
 
+/**
+ * 소원 접수 ACK 메시지 생성
+ * @param {Object} wishData - 소원 데이터
+ * @returns {Object} { kakao, sms }
+ */
+function generateWishAckMessage(wishData) {
+  const { name, gem, gem_meaning, wish, miracleScore, traffic_light } = wishData;
+
+  // 보석 이모지 매핑
+  const gemEmoji = {
+    ruby: '❤️',
+    sapphire: '💙',
+    emerald: '💚',
+    diamond: '💎',
+    citrine: '💛'
+  };
+
+  const emoji = gemEmoji[gem] || '✨';
+
+  // 카카오톡 메시지 (알림톡)
+  const kakaoMessage = `
+${emoji} ${name}님의 소원이 접수되었습니다!
+
+✨ 기적지수: ${miracleScore}점
+💎 선택 보석: ${gem_meaning}
+
+당신의 소원:
+"${wish.length > 50 ? wish.substring(0, 50) + '...' : wish}"
+
+🌟 30일 로드맵이 곧 준비됩니다.
+7일간 응원 메시지가 함께합니다.
+
+━━━━━━━━━━━━
+하루하루의 기적
+문의: 1899-6117
+━━━━━━━━━━━━
+`.trim();
+
+  // SMS 메시지 (90자 제한)
+  const smsMessage = `[하루하루의기적] ${name}님 소원접수완료!
+기적지수 ${miracleScore}점
+7일 응원메시지 발송예정
+문의 1899-6117`.trim();
+
+  return {
+    kakao: kakaoMessage,
+    sms: smsMessage
+  };
+}
+
+/**
+ * RED 신호 긴급 알림 메시지 (재미/CRO용)
+ * @param {Object} wishData - 소원 데이터
+ * @returns {string} 알림 메시지
+ */
+function generateRedAlertMessage(wishData) {
+  const { id, name, phone, wish, traffic_light, created_at } = wishData;
+
+  return `
+🔴 [긴급] RED 신호 감지
+
+📋 접수정보
+- ID: ${id}
+- 이름: ${name}
+- 연락처: ${phone}
+- 시간: ${created_at}
+
+⚠️ 감지 사유
+${traffic_light.reason}
+
+💬 원문
+"${wish}"
+
+📌 필요 조치
+${traffic_light.action}
+
+즉시 확인 부탁드립니다.
+`.trim();
+}
+
 module.exports = {
   generateConfirmationMessage,
   generateNextStepMessage,
+  generateWishAckMessage,
+  generateRedAlertMessage,
   getRegionLabel,
   getScheduleLabel,
   getGroupLabel

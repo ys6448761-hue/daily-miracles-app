@@ -45,6 +45,78 @@
             50% { transform: translateY(-15px); }
         }
 
+        /* 초대장 스타일 */
+        .invitation-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
+            border: 2px solid rgba(255,215,0,0.4);
+            border-radius: 20px;
+            padding: 32px;
+            margin-top: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .invitation-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,215,0,0.1), transparent);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .invitation-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+            color: #1e3c72;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .invitation-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #ffd700;
+        }
+
+        .invitation-text {
+            font-size: 16px;
+            opacity: 0.95;
+            line-height: 1.7;
+        }
+
+        .invitation-date {
+            display: inline-block;
+            background: rgba(255,255,255,0.1);
+            padding: 12px 24px;
+            border-radius: 12px;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+
+        .invitation-date .year {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .invitation-date .month {
+            font-size: 20px;
+            color: #ffd700;
+        }
+
         .hero h1 {
             font-size: 40px;
             font-weight: 800;
@@ -382,6 +454,20 @@
             <div class="hero-icon">⛵</div>
             <h1>소원항해</h1>
             <p>여수 앞바다에서 소원을 출항시키다<br>당신의 소원이 바다 위로 떠오르는 특별한 순간</p>
+
+            <!-- 초대장 카드 -->
+            <div class="invitation-card">
+                <div class="invitation-badge">Special Invitation</div>
+                <h3 class="invitation-title">당신만을 위한 소원항해에 초대합니다</h3>
+                <p class="invitation-text">
+                    새해 첫 달, 여수 바다에서 당신의 소원을 출항시켜 보세요.<br>
+                    기적은 당신의 첫 걸음에서 시작됩니다.
+                </p>
+                <div class="invitation-date">
+                    <span class="year">2025년</span>
+                    <span class="month">1월</span>
+                </div>
+            </div>
         </div>
     </section>
 
