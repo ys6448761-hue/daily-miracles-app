@@ -189,6 +189,18 @@
             border-color: #f5dc00;
         }
 
+        .kakao-btn:disabled {
+            background: #e5e7eb;
+            border-color: #e5e7eb;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .kakao-btn:disabled:hover {
+            background: #e5e7eb;
+            border-color: #e5e7eb;
+        }
+
         .links {
             text-align: center;
             margin-top: 24px;
@@ -277,8 +289,8 @@
 
         <!-- 소셜 로그인 -->
         <div class="social-login">
-            <button class="social-btn kakao-btn" onclick="loginWithKakao()">
-                💬 카카오 로그인
+            <button class="social-btn kakao-btn" disabled title="카카오 로그인은 준비 중입니다">
+                💬 카카오 로그인 (준비중)
             </button>
         </div>
 
@@ -327,12 +339,6 @@
     </div>
 
     <script>
-        // 카카오 로그인
-        function loginWithKakao() {
-            showError('카카오 로그인 기능은 곧 출시됩니다! 😊');
-            // TODO: 카카오 로그인 API 연동
-        }
-
         // 이메일 로그인 처리
         async function handleLogin(event) {
             event.preventDefault();

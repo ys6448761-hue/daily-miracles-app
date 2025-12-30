@@ -609,13 +609,14 @@
         const totalQuestions = 12;
         let hasRelationship = false;
 
-        // 페이지 로드 시 인증 확인
-        window.addEventListener('load', () => {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                window.location.href = './login.html';
-            }
-        });
+        // 페이지 로드 시 - 로그인 없이도 접근 가능 (출항 전 우회)
+        // 추후 로그인 필수화 시 아래 주석 해제
+        // window.addEventListener('load', () => {
+        //     const token = localStorage.getItem('token');
+        //     if (!token) {
+        //         window.location.href = './login.html';
+        //     }
+        // });
 
         // 관계 질문 토글
         function toggleRelationshipQuestions(show) {
@@ -778,12 +779,13 @@
             try {
                 // API 호출
                 const token = localStorage.getItem('token');
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
                 const response = await fetch('/api/daily-miracles/analyze', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
+                    headers,
                     body: JSON.stringify({ userInput: data })
                 });
 
