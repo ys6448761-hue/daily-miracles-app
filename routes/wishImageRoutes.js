@@ -254,11 +254,25 @@ router.get('/list', (req, res) => {
 /**
  * POST /api/wish-image/watermark
  * 이미지에 워터마크 삽입
- * 요청: { image_path: string } 또는 { image_url: string }
+ * 요청: {
+ *   image_path: string,
+ *   image_url: string,
+ *   text: string (기본값: '하루하루의 기적 | 예시 이미지'),
+ *   position: 'bottom-right' | 'bottom-left' | 'bottom-center' (기본값: 'bottom-right'),
+ *   opacity: 0.3-0.7 (기본값: 0.4),
+ *   size_percent: 5-10 (기본값: 6, 원본 대비 %)
+ * }
  */
 router.post('/watermark', async (req, res) => {
   try {
-    const { image_path, image_url, text = '하루하루의 기적 | 예시 이미지' } = req.body;
+    const {
+      image_path,
+      image_url,
+      text = '하루하루의 기적 | 예시 이미지',
+      position = 'bottom-right',
+      opacity = 0.4,
+      size_percent = 6
+    } = req.body;
 
     let inputPath;
 
@@ -301,30 +315,54 @@ router.post('/watermark', async (req, res) => {
     const imageWidth = metadata.width || 1024;
     const imageHeight = metadata.height || 1024;
 
-    // 워터마크 텍스트 SVG 생성 (우하단, 70% 투명도)
-    const fontSize = Math.floor(imageWidth / 30); // 이미지 크기에 비례
+    // 크기 계산 (원본 대비 %)
+    const clampedSizePercent = Math.max(5, Math.min(10, size_percent));
+    const fontSize = Math.floor(imageWidth * clampedSizePercent / 100);
     const padding = Math.floor(imageWidth / 40);
+
+    // 투명도 클램프 (0.3 ~ 0.7)
+    const clampedOpacity = Math.max(0.3, Math.min(0.7, opacity));
+    const shadowOpacity = clampedOpacity * 0.4;
+
+    // 위치별 좌표 및 정렬 계산
+    let textX, textAnchor;
+    switch (position) {
+      case 'bottom-left':
+        textX = padding;
+        textAnchor = 'start';
+        break;
+      case 'bottom-center':
+        textX = imageWidth / 2;
+        textAnchor = 'middle';
+        break;
+      case 'bottom-right':
+      default:
+        textX = imageWidth - padding;
+        textAnchor = 'end';
+        break;
+    }
+    const textY = imageHeight - padding;
 
     const watermarkSvg = `
       <svg width="${imageWidth}" height="${imageHeight}">
         <style>
           .watermark {
-            font-family: 'Noto Sans KR', sans-serif;
+            font-family: 'Noto Sans KR', Arial, sans-serif;
             font-size: ${fontSize}px;
             fill: white;
-            fill-opacity: 0.7;
-            text-anchor: end;
+            fill-opacity: ${clampedOpacity};
+            text-anchor: ${textAnchor};
           }
           .shadow {
-            font-family: 'Noto Sans KR', sans-serif;
+            font-family: 'Noto Sans KR', Arial, sans-serif;
             font-size: ${fontSize}px;
             fill: black;
-            fill-opacity: 0.3;
-            text-anchor: end;
+            fill-opacity: ${shadowOpacity};
+            text-anchor: ${textAnchor};
           }
         </style>
-        <text x="${imageWidth - padding + 2}" y="${imageHeight - padding + 2}" class="shadow">${text}</text>
-        <text x="${imageWidth - padding}" y="${imageHeight - padding}" class="watermark">${text}</text>
+        <text x="${textX + 2}" y="${textY + 2}" class="shadow">${text}</text>
+        <text x="${textX}" y="${textY}" class="watermark">${text}</text>
       </svg>
     `;
 
@@ -337,7 +375,7 @@ router.post('/watermark', async (req, res) => {
       }])
       .toFile(outputPath);
 
-    console.log(`[WishImage] Watermark added: ${outputFilename}`);
+    console.log(`[WishImage] Watermark added: ${outputFilename} (position: ${position}, opacity: ${clampedOpacity})`);
 
     // 임시 파일 삭제 (URL에서 다운로드한 경우)
     if (image_url && inputPath.includes('temp_')) {
@@ -349,7 +387,12 @@ router.post('/watermark', async (req, res) => {
       original_path: image_path || image_url,
       watermarked_url: `/images/wishes/${outputFilename}`,
       filename: outputFilename,
-      watermark_text: text
+      watermark_text: text,
+      settings: {
+        position,
+        opacity: clampedOpacity,
+        size_percent: clampedSizePercent
+      }
     });
 
   } catch (error) {
