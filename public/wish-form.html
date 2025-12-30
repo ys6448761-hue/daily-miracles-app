@@ -476,6 +476,154 @@
             text-decoration: underline;
         }
 
+        /* 소원 힌트 */
+        .wish-hint {
+            font-size: 12px;
+            color: rgba(255, 215, 0, 0.7);
+            margin-top: 8px;
+            padding-left: 4px;
+        }
+
+        /* 보석 추천 배지 */
+        .gem-recommend-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #1a1a2e;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 8px;
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .gem-option.recommended {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+            position: relative;
+        }
+
+        .gem-option.recommended::after {
+            content: '추천';
+            position: absolute;
+            top: -8px;
+            right: 12px;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #1a1a2e;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 8px;
+        }
+
+        .gem-change-hint {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        /* 7일 메시지 옵션 */
+        .message-option-group {
+            margin-bottom: 24px;
+        }
+
+        .message-option-desc {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 16px;
+        }
+
+        .message-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .message-option {
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .message-option input[type="radio"] {
+            display: none;
+        }
+
+        .message-option-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 16px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            transition: all 0.3s ease;
+        }
+
+        .message-option:hover .message-option-content {
+            border-color: rgba(255, 215, 0, 0.5);
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        .message-option input:checked + .message-option-content {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.15);
+        }
+
+        .message-option-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .message-option-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        /* 연락처 섹션 (조건부) */
+        .contact-section {
+            margin-top: 24px;
+            padding-top: 24px;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .contact-divider {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .contact-divider::before,
+        .contact-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 215, 0, 0.3);
+        }
+
+        .contact-divider span {
+            padding: 0 16px;
+            font-size: 13px;
+            color: #ffd700;
+            font-weight: 600;
+        }
+
         /* 반응형 */
         @media (max-width: 480px) {
             .container {
@@ -510,98 +658,127 @@
 
         <div class="form-container">
             <form id="wishForm">
-                <!-- 이름 -->
+                <!-- Q1. 이름 -->
                 <div class="form-group">
-                    <label class="required">이름</label>
+                    <label class="required">1. 이름</label>
                     <input type="text" name="name" id="name" placeholder="홍길동" required>
                 </div>
 
-                <!-- 생년월일 -->
+                <!-- Q2. 생년월일 -->
                 <div class="form-group">
-                    <label class="required">생년월일</label>
+                    <label class="required">2. 생년월일</label>
                     <input type="date" name="birthdate" id="birthdate" required>
                 </div>
 
-                <!-- 연락처 -->
+                <!-- Q3. 소원 입력 -->
                 <div class="form-group">
-                    <label class="required">연락처</label>
-                    <input type="tel" name="phone" id="phone" placeholder="01012345678 (하이픈 없이)"
-                           pattern="[0-9]{10,11}" required>
+                    <label class="required">3. 소원 한 줄</label>
+                    <textarea name="wish" id="wish" class="wish-input"
+                              placeholder="예) 6개월 안에 나만의 작은 가게를 열고 싶어요" required></textarea>
+                    <div class="wish-hint" id="wishHint">소원을 적으면 필요한 에너지를 추천해드려요</div>
                 </div>
 
-                <!-- 보석 선택 -->
+                <!-- Q4. 보석 선택 (추천값 기본 선택) -->
                 <div class="gem-section">
-                    <label class="gem-label required">보석색깔 (지금 마음이 끌리는 보석을 선택해주세요)</label>
+                    <label class="gem-label required">4. 지금 필요한 에너지 <span class="gem-recommend-badge" id="gemRecommendBadge" style="display:none;">추천</span></label>
                     <div class="gem-options">
-                        <label class="gem-option gem-ruby">
-                            <input type="radio" name="gem" value="ruby" required>
+                        <label class="gem-option gem-ruby" data-gem="ruby">
+                            <input type="radio" name="gem" value="ruby">
                             <div class="gem-icon">💎</div>
                             <div class="gem-text">
                                 <div class="gem-name">루비</div>
-                                <div class="gem-desc">지금 열정과 용기가 필요해요</div>
+                                <div class="gem-desc">열정과 용기가 필요할 때</div>
                             </div>
                         </label>
 
-                        <label class="gem-option gem-sapphire">
+                        <label class="gem-option gem-sapphire" data-gem="sapphire">
                             <input type="radio" name="gem" value="sapphire">
                             <div class="gem-icon">💎</div>
                             <div class="gem-text">
                                 <div class="gem-name">사파이어</div>
-                                <div class="gem-desc">마음의 안정과 지혜가 필요해요</div>
+                                <div class="gem-desc">마음의 안정과 지혜가 필요할 때</div>
                             </div>
                         </label>
 
-                        <label class="gem-option gem-emerald">
+                        <label class="gem-option gem-emerald" data-gem="emerald">
                             <input type="radio" name="gem" value="emerald">
                             <div class="gem-icon">💎</div>
                             <div class="gem-text">
                                 <div class="gem-name">에메랄드</div>
-                                <div class="gem-desc">새로운 성장과 치유가 필요해요</div>
+                                <div class="gem-desc">성장과 치유가 필요할 때</div>
                             </div>
                         </label>
 
-                        <label class="gem-option gem-diamond">
+                        <label class="gem-option gem-diamond" data-gem="diamond">
                             <input type="radio" name="gem" value="diamond">
                             <div class="gem-icon">💎</div>
                             <div class="gem-text">
                                 <div class="gem-name">다이아몬드</div>
-                                <div class="gem-desc">명확한 결단이 필요해요</div>
+                                <div class="gem-desc">명확한 결단이 필요할 때</div>
                             </div>
                         </label>
 
-                        <label class="gem-option gem-citrine">
+                        <label class="gem-option gem-citrine" data-gem="citrine">
                             <input type="radio" name="gem" value="citrine">
                             <div class="gem-icon">💎</div>
                             <div class="gem-text">
                                 <div class="gem-name">시트린</div>
-                                <div class="gem-desc">긍정 에너지와 소통이 필요해요</div>
+                                <div class="gem-desc">긍정 에너지와 행복이 필요할 때</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="gem-change-hint">다른 에너지가 더 끌린다면 변경해도 괜찮아요</div>
+                </div>
+
+                <!-- Q5. 7일 응원 메시지 -->
+                <div class="form-group message-option-group">
+                    <label class="required">5. 7일 응원 메시지</label>
+                    <div class="message-option-desc">7일간 매일 아침/저녁 응원 메시지를 받아보시겠어요?</div>
+                    <div class="message-options">
+                        <label class="message-option" id="messageYes">
+                            <input type="radio" name="want_message" value="yes">
+                            <div class="message-option-content">
+                                <span class="message-option-icon">💌</span>
+                                <span class="message-option-text">네, 받을래요!</span>
+                            </div>
+                        </label>
+                        <label class="message-option" id="messageNo">
+                            <input type="radio" name="want_message" value="no" checked>
+                            <div class="message-option-content">
+                                <span class="message-option-icon">🙏</span>
+                                <span class="message-option-text">괜찮아요, 다음에</span>
                             </div>
                         </label>
                     </div>
                 </div>
 
-                <!-- 소원 입력 -->
-                <div class="form-group">
-                    <label class="required">소원 한 줄</label>
-                    <textarea name="wish" id="wish" class="wish-input"
-                              placeholder="예) 6개월 안에 나만의 작은 가게를 열고 싶어요" required></textarea>
-                </div>
+                <!-- 조건부: 연락처 + 동의 (7일 메시지 선택 시만) -->
+                <div class="contact-section" id="contactSection" style="display: none;">
+                    <div class="contact-divider">
+                        <span>응원 메시지 수신 정보</span>
+                    </div>
 
-                <!-- 동의 체크박스 -->
-                <div class="consent-group">
-                    <label class="consent-item">
-                        <input type="checkbox" name="privacy_agreed" id="privacy_agreed" required>
-                        <span class="consent-text">
-                            <span class="required">[필수]</span>
-                            <a href="./privacy.html" target="_blank">개인정보 수집 및 이용</a>에 동의합니다
-                        </span>
-                    </label>
-                    <label class="consent-item">
-                        <input type="checkbox" name="marketing_agreed" id="marketing_agreed">
-                        <span class="consent-text">
-                            [선택] 마케팅 정보 수신에 동의합니다 (7일 응원 메시지)
-                        </span>
-                    </label>
+                    <div class="form-group">
+                        <label class="required">연락처</label>
+                        <input type="tel" name="phone" id="phone" placeholder="01012345678 (하이픈 없이)"
+                               pattern="[0-9]{10,11}">
+                    </div>
+
+                    <div class="consent-group">
+                        <label class="consent-item">
+                            <input type="checkbox" name="privacy_agreed" id="privacy_agreed">
+                            <span class="consent-text">
+                                <span class="required">[필수]</span>
+                                <a href="./privacy.html" target="_blank">개인정보 수집 및 이용</a>에 동의합니다
+                            </span>
+                        </label>
+                        <label class="consent-item">
+                            <input type="checkbox" name="marketing_agreed" id="marketing_agreed">
+                            <span class="consent-text">
+                                [필수] 마케팅 정보 수신에 동의합니다
+                            </span>
+                        </label>
+                    </div>
                 </div>
 
                 <div class="error-message" id="errorMessage"></div>
@@ -656,11 +833,107 @@
     </div>
 
     <script>
+        // 보석 추천 키워드 매핑
+        const gemKeywords = {
+            ruby: ['열정', '용기', '도전', '시작', '창업', '새로운', '꿈', '목표', '성공', '이루', '달성', '싶어', '되고싶'],
+            sapphire: ['안정', '평화', '지혜', '공부', '시험', '학업', '취업', '합격', '직장', '승진', '안정적'],
+            emerald: ['성장', '치유', '건강', '회복', '힐링', '관계', '가족', '화해', '용서', '마음', '아픔'],
+            diamond: ['결정', '선택', '결단', '명확', '방향', '진로', '고민', '어떻게', '해야할지', '갈림길'],
+            citrine: ['긍정', '에너지', '행복', '사랑', '소통', '만남', '친구', '인연', '즐거', '웃', '기쁨', '희망']
+        };
+
+        // 소원 기반 보석 추천 함수
+        function recommendGem(wishText) {
+            const text = wishText.toLowerCase();
+            const scores = {
+                ruby: 0,
+                sapphire: 0,
+                emerald: 0,
+                diamond: 0,
+                citrine: 0
+            };
+
+            // 키워드 매칭 점수 계산
+            for (const [gem, keywords] of Object.entries(gemKeywords)) {
+                for (const keyword of keywords) {
+                    if (text.includes(keyword)) {
+                        scores[gem] += 1;
+                    }
+                }
+            }
+
+            // 가장 높은 점수의 보석 찾기
+            let maxScore = 0;
+            let recommended = 'citrine'; // 기본값
+
+            for (const [gem, score] of Object.entries(scores)) {
+                if (score > maxScore) {
+                    maxScore = score;
+                    recommended = gem;
+                }
+            }
+
+            return recommended;
+        }
+
+        // 보석 선택 UI 업데이트
+        function selectGem(gemValue, isRecommendation = false) {
+            // 모든 선택 상태 초기화
+            document.querySelectorAll('.gem-option').forEach(o => {
+                o.classList.remove('selected', 'recommended');
+            });
+
+            // 해당 보석 선택
+            const gemOption = document.querySelector(`.gem-option[data-gem="${gemValue}"]`);
+            if (gemOption) {
+                gemOption.classList.add('selected');
+                if (isRecommendation) {
+                    gemOption.classList.add('recommended');
+                }
+                gemOption.querySelector('input[type="radio"]').checked = true;
+            }
+        }
+
         // 보석 선택 시각적 피드백
         document.querySelectorAll('.gem-option').forEach(option => {
             option.addEventListener('click', () => {
-                document.querySelectorAll('.gem-option').forEach(o => o.classList.remove('selected'));
+                document.querySelectorAll('.gem-option').forEach(o => {
+                    o.classList.remove('selected', 'recommended');
+                });
                 option.classList.add('selected');
+            });
+        });
+
+        // 소원 입력 시 보석 추천 (디바운스)
+        let wishDebounce = null;
+        document.getElementById('wish').addEventListener('input', (e) => {
+            clearTimeout(wishDebounce);
+            wishDebounce = setTimeout(() => {
+                const wishText = e.target.value.trim();
+                if (wishText.length >= 5) {
+                    const recommended = recommendGem(wishText);
+                    selectGem(recommended, true);
+                    document.getElementById('gemRecommendBadge').style.display = 'inline-block';
+                    document.getElementById('wishHint').textContent = '소원에 맞는 에너지를 추천했어요!';
+                }
+            }, 500);
+        });
+
+        // 7일 메시지 선택 시 연락처 섹션 표시/숨김
+        document.querySelectorAll('input[name="want_message"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const contactSection = document.getElementById('contactSection');
+                if (e.target.value === 'yes') {
+                    contactSection.style.display = 'block';
+                    document.getElementById('phone').setAttribute('required', 'required');
+                    document.getElementById('privacy_agreed').setAttribute('required', 'required');
+                    document.getElementById('marketing_agreed').setAttribute('required', 'required');
+                } else {
+                    contactSection.style.display = 'none';
+                    document.getElementById('phone').removeAttribute('required');
+                    document.getElementById('privacy_agreed').removeAttribute('required');
+                    document.getElementById('marketing_agreed').removeAttribute('required');
+                }
             });
         });
 
@@ -676,37 +949,58 @@
             const form = e.target;
             const errorDiv = document.getElementById('errorMessage');
 
-            // 유효성 검사
+            // 기본 필드 값
             const name = form.name.value.trim();
             const birthdate = form.birthdate.value;
-            const phone = form.phone.value.trim();
-            const gem = form.gem.value;
             const wish = form.wish.value.trim();
-            const privacyAgreed = form.privacy_agreed.checked;
-            const marketingAgreed = form.marketing_agreed.checked;
+            const gem = form.gem.value || 'citrine'; // 폴백 기본값
+            const wantMessage = form.want_message.value === 'yes';
 
-            if (!name || !birthdate || !phone || !gem || !wish) {
-                showError('모든 필수 항목을 입력해주세요');
+            // 기본 필수 검사
+            if (!name || !birthdate || !wish) {
+                showError('이름, 생년월일, 소원은 필수 입력입니다');
                 return;
             }
 
-            if (!/^01[0-9]{8,9}$/.test(phone)) {
-                showError('올바른 휴대폰 번호를 입력해주세요 (예: 01012345678)');
-                return;
+            // 보석 미선택 시 기본값 안내
+            if (!form.gem.value) {
+                console.log('Gem not selected, using default: citrine');
             }
 
-            if (!privacyAgreed) {
-                showError('개인정보 수집 및 이용에 동의해주세요');
-                return;
+            // 7일 메시지 선택 시 추가 검사
+            let phone = '';
+            let privacyAgreed = false;
+            let marketingAgreed = false;
+
+            if (wantMessage) {
+                phone = form.phone.value.trim();
+                privacyAgreed = form.privacy_agreed.checked;
+                marketingAgreed = form.marketing_agreed.checked;
+
+                if (!phone) {
+                    showError('7일 메시지를 받으려면 연락처를 입력해주세요');
+                    return;
+                }
+
+                if (!/^01[0-9]{8,9}$/.test(phone)) {
+                    showError('올바른 휴대폰 번호를 입력해주세요 (예: 01012345678)');
+                    return;
+                }
+
+                if (!privacyAgreed || !marketingAgreed) {
+                    showError('7일 메시지를 받으려면 개인정보 및 마케팅 수신에 동의해주세요');
+                    return;
+                }
             }
 
             // 데이터 준비
             const data = {
                 name,
                 birthdate,
-                phone,
-                gem,
                 wish,
+                gem,
+                want_message: wantMessage,
+                phone: phone || null,
                 privacy_agreed: privacyAgreed,
                 marketing_agreed: marketingAgreed,
                 created_at: new Date().toISOString()
@@ -733,7 +1027,7 @@
 
                 if (result.success) {
                     // 성공 화면 업데이트
-                    showSuccessOverlay(name, gem, result.miracleScore);
+                    showSuccessOverlay(name, gem, result.miracleScore, wantMessage);
                 } else {
                     showError(result.message || '전송 중 오류가 발생했습니다');
                 }
@@ -743,7 +1037,7 @@
 
                 // 개발용: API 없어도 성공 처리
                 console.log('Development mode - showing success');
-                showSuccessOverlay(name, gem, null);
+                showSuccessOverlay(name, gem, null, wantMessage);
             }
         });
 
@@ -757,7 +1051,7 @@
         };
 
         // 성공 오버레이 표시
-        function showSuccessOverlay(userName, selectedGem, serverScore) {
+        function showSuccessOverlay(userName, selectedGem, serverScore, wantMessage = false) {
             // 이름 표시
             document.getElementById('successName').textContent = userName;
 
@@ -766,9 +1060,23 @@
             document.getElementById('miracleScore').textContent = miracleScore;
 
             // 보석 정보 표시
-            const gem = gemInfo[selectedGem] || gemInfo.diamond;
+            const gem = gemInfo[selectedGem] || gemInfo.citrine;
             document.getElementById('selectedGemEmoji').textContent = gem.emoji;
             document.getElementById('selectedGemMeaning').textContent = gem.meaning;
+
+            // 7일 메시지 여부에 따른 성공 메시지 업데이트
+            const successTextEl = document.querySelector('.success-text');
+            if (wantMessage) {
+                successTextEl.innerHTML = `
+                    30일 로드맵을 곧 받아보실 수 있습니다<br>
+                    <strong>7일간 응원 메시지</strong>가 함께 합니다 💌
+                `;
+            } else {
+                successTextEl.innerHTML = `
+                    30일 로드맵을 곧 받아보실 수 있습니다<br>
+                    소원이 이루어지길 응원합니다
+                `;
+            }
 
             // 오버레이 표시
             document.getElementById('successOverlay').classList.add('show');

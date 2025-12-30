@@ -34,41 +34,51 @@ router.post('/', async (req, res) => {
             phone,
             gem,
             wish,
+            want_message,        // 7일 메시지 수신 여부
             privacy_agreed,
             marketing_agreed,
             created_at
         } = req.body;
 
-        // 유효성 검사
-        if (!name || !birthdate || !phone || !gem || !wish) {
+        // 기본 필수 검사 (이름, 생년월일, 소원)
+        if (!name || !birthdate || !wish) {
             return res.status(400).json({
                 success: false,
-                message: '모든 필수 항목을 입력해주세요'
+                message: '이름, 생년월일, 소원은 필수 입력입니다'
             });
         }
 
-        if (!privacy_agreed) {
-            return res.status(400).json({
-                success: false,
-                message: '개인정보 수집 동의가 필요합니다'
-            });
+        // 7일 메시지 선택 시 추가 검사
+        if (want_message) {
+            if (!phone) {
+                return res.status(400).json({
+                    success: false,
+                    message: '7일 메시지를 받으려면 연락처를 입력해주세요'
+                });
+            }
+
+            // 전화번호 검증
+            if (!/^01[0-9]{8,9}$/.test(phone)) {
+                return res.status(400).json({
+                    success: false,
+                    message: '올바른 휴대폰 번호를 입력해주세요'
+                });
+            }
+
+            if (!privacy_agreed || !marketing_agreed) {
+                return res.status(400).json({
+                    success: false,
+                    message: '7일 메시지를 받으려면 개인정보 및 마케팅 수신에 동의해주세요'
+                });
+            }
         }
 
-        // 전화번호 검증
-        if (!/^01[0-9]{8,9}$/.test(phone)) {
-            return res.status(400).json({
-                success: false,
-                message: '올바른 휴대폰 번호를 입력해주세요'
-            });
-        }
-
-        // 보석 검증
+        // 보석 폴백 기본값 처리 (citrine)
         const validGems = ['ruby', 'sapphire', 'emerald', 'diamond', 'citrine'];
-        if (!validGems.includes(gem)) {
-            return res.status(400).json({
-                success: false,
-                message: '올바른 보석을 선택해주세요'
-            });
+        const finalGem = validGems.includes(gem) ? gem : 'citrine';
+
+        if (!gem || !validGems.includes(gem)) {
+            console.log(`[Wish] gem 미선택/유효하지 않음, 기본값 citrine 적용 (입력: ${gem})`);
         }
 
         // 신호등 자동 판정
@@ -82,11 +92,12 @@ router.post('/', async (req, res) => {
             id: Date.now().toString(),
             name,
             birthdate,
-            phone,
-            gem,
-            gem_meaning: getGemMeaning(gem),
+            phone: phone || null,
+            gem: finalGem,
+            gem_meaning: getGemMeaning(finalGem),
             wish,
-            privacy_agreed,
+            want_message: want_message || false,
+            privacy_agreed: privacy_agreed || false,
             marketing_agreed: marketing_agreed || false,
             created_at: created_at || new Date().toISOString(),
             status: 'pending', // pending, analyzed, completed
@@ -117,7 +128,8 @@ router.post('/', async (req, res) => {
 
         // 신호등 상태별 로깅
         const levelEmoji = { RED: '🔴', YELLOW: '🟡', GREEN: '🟢' };
-        console.log(`[Wish] ${levelEmoji[trafficLight.level]} New wish: ${name} (${gem}) - ${trafficLight.level}`);
+        const msgIcon = want_message ? '💌' : '📝';
+        console.log(`[Wish] ${levelEmoji[trafficLight.level]} ${msgIcon} New wish: ${name} (${finalGem}) - ${trafficLight.level}`);
 
         // RED 신호 시 긴급 경고 및 알림
         if (trafficLight.level === 'RED') {
@@ -136,8 +148,8 @@ router.post('/', async (req, res) => {
             }
         }
 
-        // ACK 메시지 발송 (GREEN/YELLOW만 즉시 발송)
-        if (trafficLight.level !== 'RED') {
+        // ACK 메시지 발송 (GREEN/YELLOW만 즉시 발송, phone이 있을 때만)
+        if (trafficLight.level !== 'RED' && phone && want_message) {
             const ackMessages = generateWishAckMessage(wishData);
             console.log('[ACK] Generated ACK message for:', name);
 
@@ -149,6 +161,8 @@ router.post('/', async (req, res) => {
                 console.log('[ACK] Solapi 미설정 - 로그만 출력');
                 console.log('[ACK] Kakao:', ackMessages.kakao.substring(0, 100) + '...');
             }
+        } else if (!want_message) {
+            console.log('[ACK] 7일 메시지 미선택 - ACK 발송 건너뜀');
         }
 
         res.json({
