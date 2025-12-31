@@ -569,7 +569,7 @@
         <div id="content" style="display: none;">
             <!-- 따뜻한 인사 섹션 -->
             <div class="warm-greeting">
-                <h2><span class="highlight-name" id="warmName"></span><span id="warmNameSuffix">님, 함께 풀어가요</span></h2>
+                <h2><span class="highlight-name" id="warmName"></span><span id="warmNameSuffix">님, 같이 해볼까요?</span></h2>
                 <p class="comfort-message" id="comfortMessage">
                     힘든 시간을 보내고 계시군요.<br>
                     하루하루의 기적이 함께 합니다.<br>
@@ -655,7 +655,7 @@
             <!-- 응원 카드 -->
             <div class="encouragement-card">
                 <span class="lucky-charm" id="luckyCharm">🔮</span>
-                <p class="charm-message"><span class="highlight-name" id="charmName"></span><span id="charmNameSuffix">님, 함께 풀어가요</span></p>
+                <p class="charm-message"><span class="highlight-name" id="charmName"></span><span id="charmNameSuffix">님, 같이 해볼까요?</span></p>
                 <p class="next-step-text">
                     7일 동안 아침마다 응원 메시지를 보내드려요.<br>
                     작은 변화가 모여 큰 기적이 됩니다.
@@ -736,7 +736,7 @@
                 document.getElementById('warmName').textContent = userName;
             } else {
                 document.getElementById('warmName').textContent = '';
-                document.getElementById('warmNameSuffix').textContent = '함께 풀어가요';
+                document.getElementById('warmNameSuffix').textContent = '같이 해볼까요?';
             }
             document.getElementById('comfortMessage').innerHTML = getComfortMessage(userProfile.miracleIndex);
 
@@ -745,7 +745,7 @@
                 document.getElementById('charmName').textContent = userName;
             } else {
                 document.getElementById('charmName').textContent = '';
-                document.getElementById('charmNameSuffix').textContent = '함께 풀어가요';
+                document.getElementById('charmNameSuffix').textContent = '같이 해볼까요?';
             }
             document.getElementById('luckyCharm').textContent = getLuckyCharm(userProfile.element || userProfile.elementKey);
 

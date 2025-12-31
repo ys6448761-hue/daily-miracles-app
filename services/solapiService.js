@@ -31,6 +31,15 @@ const SOLAPI_PFID = process.env.SOLAPI_PFID; // 카카오 채널 ID
 const SENDER_PHONE = process.env.SENDER_PHONE || '18996117'; // 알림톡 발신번호
 const SMS_FROM = process.env.SOLAPI_SMS_FROM; // SMS 전용 발신번호 (등록된 010 번호 필수)
 
+/**
+ * 전화번호 정규화 (하이픈 제거, 숫자만)
+ * 010-1234-5678 → 01012345678
+ */
+function normalizePhone(phone) {
+    if (!phone) return phone;
+    return phone.replace(/[^0-9]/g, '');
+}
+
 // Solapi 클라이언트 초기화
 let messageService = null;
 
@@ -63,12 +72,15 @@ async function sendKakaoAlimtalk(to, templateId, variables = {}) {
         return { success: false, reason: 'API 키 미설정' };
     }
 
+    // 전화번호 정규화 (하이픈 제거)
+    const normalizedTo = normalizePhone(to);
+
     // 발송 전 로그
-    console.log(`[Solapi] ATA 발송 시도: { channel: "ATA", from: "${SENDER_PHONE}", to: "${to}", templateId: "${templateId}" }`);
+    console.log(`[Solapi] ATA 발송 시도: { channel: "ATA", from: "${SENDER_PHONE}", to: "${normalizedTo}", templateId: "${templateId}" }`);
 
     try {
         const result = await service.send({
-            to,
+            to: normalizedTo,
             from: SENDER_PHONE, // 알림톡은 1899-6117 사용 가능
             kakaoOptions: {
                 pfId: SOLAPI_PFID,
@@ -78,11 +90,11 @@ async function sendKakaoAlimtalk(to, templateId, variables = {}) {
         });
 
         const groupId = result?.groupId || result?.messageId || 'unknown';
-        console.log(`[Solapi] ✅ ATA 발송 성공: { channel: "ATA", to: "${to}", groupId: "${groupId}" }`);
+        console.log(`[Solapi] ✅ ATA 발송 성공: { channel: "ATA", to: "${normalizedTo}", groupId: "${groupId}" }`);
         return { success: true, result, channel: 'ATA' };
     } catch (error) {
         const statusCode = error.statusCode || error.code || 'unknown';
-        console.error(`[Solapi] ❌ ATA 발송 실패: { channel: "ATA", to: "${to}", statusCode: ${statusCode}, error: "${error.message}" }`);
+        console.error(`[Solapi] ❌ ATA 발송 실패: { channel: "ATA", to: "${normalizedTo}", statusCode: ${statusCode}, error: "${error.message}" }`);
         // SMS fallback은 호출자가 처리 (sendWishAck, sendMiracleResult 등)
         return { success: false, reason: 'alimtalk_failed', error: error.message, statusCode };
     }
@@ -113,13 +125,16 @@ async function sendSMS(to, text) {
         return { success: false, reason: 'SMS 발신번호 미설정' };
     }
 
+    // 전화번호 정규화 (하이픈 제거)
+    const normalizedTo = normalizePhone(to);
+
     // 발송 전 로그 (디버깅용)
-    console.log(`[Solapi] SMS 발송 시도: { channel: "SMS", from: "${SMS_FROM}", to: "${to}", textLen: ${text.length} }`);
+    console.log(`[Solapi] SMS 발송 시도: { channel: "SMS", from: "${SMS_FROM}", to: "${normalizedTo}", textLen: ${text.length} }`);
 
     try {
         // 90바이트 초과 시 LMS로 자동 전환
         const result = await service.send({
-            to,
+            to: normalizedTo,
             from: SMS_FROM, // 등록된 010 발신번호 사용 (⚠️ 절대 1899 사용 금지)
             text,
             autoTypeDetect: true // SMS/LMS 자동 감지
@@ -127,12 +142,12 @@ async function sendSMS(to, text) {
 
         // 성공 로그 (groupId 포함)
         const groupId = result?.groupId || result?.messageId || 'unknown';
-        console.log(`[Solapi] ✅ SMS 발송 성공: { channel: "SMS", from: "${SMS_FROM}", to: "${to}", statusCode: 4000, groupId: "${groupId}" }`);
+        console.log(`[Solapi] ✅ SMS 발송 성공: { channel: "SMS", from: "${SMS_FROM}", to: "${normalizedTo}", statusCode: 4000, groupId: "${groupId}" }`);
         return { success: true, result, channel: 'SMS', from: SMS_FROM };
     } catch (error) {
         // 실패 로그 (상세)
         const statusCode = error.statusCode || error.code || 'unknown';
-        console.error(`[Solapi] ❌ SMS 발송 실패: { channel: "SMS", from: "${SMS_FROM}", to: "${to}", statusCode: ${statusCode}, error: "${error.message}" }`);
+        console.error(`[Solapi] ❌ SMS 발송 실패: { channel: "SMS", from: "${SMS_FROM}", to: "${normalizedTo}", statusCode: ${statusCode}, error: "${error.message}" }`);
 
         // statusCode 1062: 발신번호 미등록
         if (statusCode === 1062 || statusCode === '1062' || error.message?.includes('1062') || error.message?.includes('발신번호')) {
