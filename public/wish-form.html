@@ -1070,7 +1070,7 @@
     <!-- 성공 오버레이 (기적지수 포함) -->
     <div class="success-overlay" id="successOverlay">
         <div class="success-content">
-            <h2 class="success-title"><span id="successName">사용자</span>님의 기적이 시작됩니다</h2>
+            <h2 class="success-title"><span id="successName"></span><span id="successNameSuffix">님의 기적이 시작됩니다</span></h2>
 
             <div class="miracle-score-container">
                 <div class="score-label">기적지수</div>
@@ -1429,8 +1429,13 @@
             currentWishId = wishId;
             currentBirthdateProvided = birthdateProvided;
 
-            // 이름 표시
-            document.getElementById('successName').textContent = userName;
+            // 이름 표시 (이름 없으면 호칭 생략)
+            if (userName && userName.trim()) {
+                document.getElementById('successName').textContent = userName;
+            } else {
+                document.getElementById('successName').textContent = '';
+                document.getElementById('successNameSuffix').textContent = '기적이 시작됩니다';
+            }
 
             // 기적지수 (1/1 특별 80-95점)
             const miracleScore = serverScore || (80 + Math.floor(Math.random() * 16));
