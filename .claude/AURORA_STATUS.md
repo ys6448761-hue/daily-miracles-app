@@ -1,7 +1,7 @@
 # AURORA_STATUS.md
 ## 하루하루의 기적 - 프로젝트 현황판
 
-**마지막 업데이트**: 2025-12-30 13:30 KST
+**마지막 업데이트**: 2026-01-01 00:30 KST
 **업데이트 담당**: Claude Code
 
 ---
@@ -36,13 +36,47 @@
 🟢 운영 중: MVP 서비스 (소원 등록, 문제 해결, 소원실현)
 🟢 완료: P0 작업 (소원그림 광고 준비)
 🟢 완료: P2 작업 (신호등 시스템 + Solapi 연동)
+🟢 완료: Aurora 5 UBOS 시스템 정의
+🟢 완료: WishMaker Hub MCP 서버 구축
 🟡 진행 중: P1 작업 (Airtable 연동)
 ⚪ 대기: P3 작업 (Aurora 5 에이전트 고도화)
 ```
 
 ---
 
-## 최근 완료 작업 (P0)
+## 최근 완료 작업
+
+### 2026-01-01: Aurora 5 UBOS & WishMaker Hub MCP
+
+| 작업 | 상태 | 산출물 |
+|------|------|--------|
+| Aurora 5 UBOS 6대 시스템 정의 | ✅ | `AURORA5_UNIVERSE_BEST_SYSTEM.md` |
+| WishMaker Hub MCP 서버 구축 | ✅ | `mcp-servers/wishmaker-hub-mcp/` |
+| 시스템 상태 보고서 생성 | ✅ | `SYSTEM_STATUS_REPORT.md` |
+| /api/wishes 404 오류 수정 | ✅ | `services/solapiService.js` 문법 오류 해결 |
+| 3종 필수 로그 추가 | ✅ | correlationId 기반 발송 추적 |
+| OutboundMessage 레코드 저장소 | ✅ | `services/outboundMessageStore.js` |
+
+### WishMaker Hub MCP 도구 (14종)
+
+```
+1. classify_traffic_light     - 신호등 분류
+2. track_signup_funnel        - 퍼널 추적
+3. get_stuck_users            - 멈춘 소원이 조회
+4. send_recovery_message      - 복구 메시지
+5. get_message_schedule       - 7일 스케줄
+6. check_message_health       - 발송 건강도
+7. analyze_message_engagement - 참여도 분석
+8. predict_satisfaction       - 만족도 예측
+9. detect_churn_risk          - 이탈 위험 감지
+10. generate_intervention_plan - 개입 계획
+11. identify_conversion_ready  - 전환 준비 식별
+12. suggest_conversion_timing  - 전환 타이밍
+13. get_daily_metrics         - 일일 메트릭스
+14. get_traffic_light_summary - 신호등 현황
+```
+
+---
 
 ### DEC-2025-1230-002: 소원그림 인스타 광고 (조건부 승인)
 
@@ -108,13 +142,23 @@ GET  /api/wish-image/list               - 저장된 이미지 목록
 
 ### 코드
 ```
-routes/wishRoutes.js          - 소원실현 API (신호등 + 기적지수)
-routes/wishImageRoutes.js     - 소원그림 API (DALL-E 3 + 워터마크)
-services/solapiService.js     - Solapi 연동 (SMS + 카카오 알림톡)
-config/messageTemplates.js    - ACK/RED Alert 메시지 템플릿
-server.js                     - 메인 서버
-.claude/agents/               - Aurora 5 에이전트 정의
-.claude/skills/               - 자동화 스킬
+routes/wishRoutes.js            - 소원실현 API (신호등 + 기적지수)
+routes/wishImageRoutes.js       - 소원그림 API (DALL-E 3 + 워터마크)
+services/solapiService.js       - Solapi 연동 (SMS + 카카오 알림톡)
+services/outboundMessageStore.js - 발송 레코드 저장소
+config/messageTemplates.js      - ACK/RED Alert 메시지 템플릿
+server.js                       - 메인 서버
+.claude/agents/                 - Aurora 5 에이전트 정의
+.claude/skills/                 - 자동화 스킬
+```
+
+### MCP 서버 (5종)
+```
+mcp-servers/miracle-mcp/        - 기적 분석 서비스
+mcp-servers/summarizer-mcp/     - 요약 서비스
+mcp-servers/storybook-mcp/      - 스토리북 서비스
+mcp-servers/wish-image-mcp/     - 소원그림 서비스
+mcp-servers/wishmaker-hub-mcp/  - 소원이 통합 관리 (NEW!)
 ```
 
 ### 문서
@@ -185,6 +229,8 @@ curl -X POST http://localhost:5100/api/wish-image/watermark \
 
 | 날짜 | 담당 | 내용 |
 |------|------|------|
+| 2026-01-01 00:30 | Code | Aurora 5 UBOS + WishMaker Hub MCP 서버 추가 |
+| 2025-12-31 22:30 | Code | 시스템 상태 보고서, /api/wishes 404 수정 |
 | 2025-12-30 07:15 | Code | 최초 생성 (P0 완료 반영) |
 
 ---
