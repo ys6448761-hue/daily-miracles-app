@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "infra-monitor-mcp"
+version = "0.1.0"
+description = "MCP server for Infrastructure Monitoring - 기술 인프라 모니터링"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "Daily Miracles Team"}
+]
+keywords = ["mcp", "infrastructure", "monitoring", "health-check", "daily-miracles", "aurora5"]
+dependencies = [
+    "mcp>=1.0.0",
+    "pydantic>=2.0.0",
+    "httpx>=0.25.0",
+    "psycopg2-binary>=2.9.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+]
+
+[project.scripts]
+infra-monitor-mcp = "infra_monitor.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/infra_monitor"]

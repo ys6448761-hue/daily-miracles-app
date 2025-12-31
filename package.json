@@ -6,7 +6,12 @@
     "dev": "node server.js",
     "start": "node server.js",
     "pipeline:weekly": "npx ts-node scripts/run-pipeline.ts",
-    "pipeline:weekly:test": "npx ts-node scripts/run-pipeline.ts --team=테스트팀"
+    "pipeline:weekly:test": "npx ts-node scripts/run-pipeline.ts --team=테스트팀",
+    "mcp:install": "cd mcp-servers/wishmaker-hub-mcp && uv sync && cd ../business-ops-mcp && uv sync && cd ../infra-monitor-mcp && uv sync",
+    "mcp:test": "python scripts/test-all-mcp.py",
+    "checklist:daily": "python scripts/daily-checklist.py",
+    "checklist:weekly": "python scripts/weekly-checklist.py",
+    "checklist:monthly": "python scripts/monthly-checklist.py"
   },
   "engines": {
     "node": "20.x"
