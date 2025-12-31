@@ -63,6 +63,9 @@ async function sendKakaoAlimtalk(to, templateId, variables = {}) {
         return { success: false, reason: 'API 키 미설정' };
     }
 
+    // 발송 전 로그
+    console.log(`[Solapi] ATA 발송 시도: { channel: "ATA", from: "${SENDER_PHONE}", to: "${to}", templateId: "${templateId}" }`);
+
     try {
         const result = await service.send({
             to,
@@ -74,12 +77,14 @@ async function sendKakaoAlimtalk(to, templateId, variables = {}) {
             }
         });
 
-        console.log(`[Solapi] 알림톡 발송 성공: ${to}`);
-        return { success: true, result };
+        const groupId = result?.groupId || result?.messageId || 'unknown';
+        console.log(`[Solapi] ✅ ATA 발송 성공: { channel: "ATA", to: "${to}", groupId: "${groupId}" }`);
+        return { success: true, result, channel: 'ATA' };
     } catch (error) {
-        console.error('[Solapi] 알림톡 발송 실패:', error.message);
+        const statusCode = error.statusCode || error.code || 'unknown';
+        console.error(`[Solapi] ❌ ATA 발송 실패: { channel: "ATA", to: "${to}", statusCode: ${statusCode}, error: "${error.message}" }`);
         // SMS fallback은 호출자가 처리 (sendWishAck, sendMiracleResult 등)
-        return { success: false, reason: 'alimtalk_failed', error: error.message };
+        return { success: false, reason: 'alimtalk_failed', error: error.message, statusCode };
     }
 }
 
@@ -108,34 +113,41 @@ async function sendSMS(to, text) {
         return { success: false, reason: 'SMS 발신번호 미설정' };
     }
 
+    // 발송 전 로그 (디버깅용)
+    console.log(`[Solapi] SMS 발송 시도: { channel: "SMS", from: "${SMS_FROM}", to: "${to}", textLen: ${text.length} }`);
+
     try {
         // 90바이트 초과 시 LMS로 자동 전환
         const result = await service.send({
             to,
-            from: SMS_FROM, // 등록된 010 발신번호 사용
+            from: SMS_FROM, // 등록된 010 발신번호 사용 (⚠️ 절대 1899 사용 금지)
             text,
             autoTypeDetect: true // SMS/LMS 자동 감지
         });
 
-        console.log(`[Solapi] SMS 발송 성공: ${to} (from: ${SMS_FROM})`);
-        return { success: true, result };
+        // 성공 로그 (groupId 포함)
+        const groupId = result?.groupId || result?.messageId || 'unknown';
+        console.log(`[Solapi] ✅ SMS 발송 성공: { channel: "SMS", from: "${SMS_FROM}", to: "${to}", statusCode: 4000, groupId: "${groupId}" }`);
+        return { success: true, result, channel: 'SMS', from: SMS_FROM };
     } catch (error) {
-        console.error('[Solapi] SMS 발송 실패:', error.message);
+        // 실패 로그 (상세)
+        const statusCode = error.statusCode || error.code || 'unknown';
+        console.error(`[Solapi] ❌ SMS 발송 실패: { channel: "SMS", from: "${SMS_FROM}", to: "${to}", statusCode: ${statusCode}, error: "${error.message}" }`);
 
         // statusCode 1062: 발신번호 미등록
-        if (error.statusCode === 1062 || error.message?.includes('1062') || error.message?.includes('발신번호')) {
+        if (statusCode === 1062 || statusCode === '1062' || error.message?.includes('1062') || error.message?.includes('발신번호')) {
             console.error('[Solapi] 🔴 발신번호 미등록 오류 - SOLAPI_SMS_FROM 확인 필요');
+            console.error(`[Solapi] 현재 SMS_FROM 값: "${SMS_FROM}" (이 번호가 Solapi에 등록되어 있어야 함)`);
             if (metrics) {
-                metrics.recordError('SMS_SENDER_UNREGISTERED', `발신번호 ${SMS_FROM} 미등록`);
+                metrics.recordError('SMS_SENDER_UNREGISTERED', `발신번호 ${SMS_FROM} 미등록 (statusCode: ${statusCode})`);
             }
             // COO 경고 트리거용 로그
             console.warn('[COO-ALERT] 🟡 SMS 발신번호 미등록 - Solapi 콘솔에서 번호 등록 필요');
-            return { success: false, reason: 'sms_sender_unregistered', error: error.message };
+            return { success: false, reason: 'sms_sender_unregistered', error: error.message, from: SMS_FROM };
         }
 
         if (metrics) metrics.recordError('SMS_FAIL', error.message);
-        return { success: false, error: error.message };
-    }
+        return { success: false, error: error.message, from: SMS_FROM };
 }
 
 /**
@@ -173,24 +185,29 @@ async function sendWishAck(phone, wishData) {
 
     const TEMPLATE_ID = process.env.SOLAPI_TEMPLATE_WISH_ACK;
 
+    // 발송 시작 로그
+    console.log(`[Solapi] ACK 발송 시작: { want_message: true, name: "${name}", to: "${phone}" }`);
+
     // 1차: 알림톡 시도 (템플릿 있을 때)
     if (TEMPLATE_ID) {
-        console.log(`[Solapi] ACK 알림톡 시도: ${name}님`);
+        console.log(`[Solapi] 1차 시도: { channel: "ATA", templateId: "${TEMPLATE_ID}" }`);
         const ataResult = await sendKakaoAlimtalk(phone, TEMPLATE_ID, alimtalkVars);
 
         if (ataResult.success) {
+            console.log(`[Solapi] ✅ ACK 완료: { channel: "ATA", to: "${phone}" }`);
             if (metrics) metrics.recordAlimtalk(true, false);
-            return ataResult;
+            return { ...ataResult, channel: 'ATA' };
         }
 
         // 알림톡 실패 → SMS fallback
-        console.log(`[Solapi] ACK 알림톡 실패, SMS fallback 시도`);
+        console.log(`[Solapi] ATA 실패, 2차 시도: { channel: "SMS", fallback: true }`);
         if (metrics) metrics.recordAlimtalk(false, true);
-        return sendSMS(phone, smsText);
+        const smsResult = await sendSMS(phone, smsText);
+        return { ...smsResult, fallback: true };
     }
 
     // 템플릿 미설정 → 바로 SMS
-    console.log(`[Solapi] ACK 템플릿 미설정, SMS 직접 발송`);
+    console.log(`[Solapi] ATA 템플릿 미설정, SMS 직접 발송: { channel: "SMS" }`);
     return sendSMS(phone, smsText);
 }
 
