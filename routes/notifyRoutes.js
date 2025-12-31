@@ -20,6 +20,14 @@ try {
     console.warn('[Notify] solapiService 로드 실패:', e.message);
 }
 
+// OutboundMessage 저장소 연동
+let messageStore = null;
+try {
+    messageStore = require('../services/outboundMessageStore');
+} catch (e) {
+    console.warn('[Notify] outboundMessageStore 로드 실패:', e.message);
+}
+
 /**
  * GET /api/notify/status
  * 메시지 발송 설정 상태 확인
@@ -100,14 +108,27 @@ router.get('/status', async (req, res) => {
             status.recommendations.push('ℹ️ 알림톡 템플릿 미설정 - SMS로만 발송됨');
         }
 
+        // 최근 발송 내역 (OutboundMessage)
+        let recentMessages = [];
+        let messageStats = null;
+        if (messageStore) {
+            recentMessages = messageStore.getRecent(10);
+            messageStats = messageStore.getStats();
+        }
+
         console.log('[Notify] Status check:', JSON.stringify({
             missingEnvs,
-            diagnosis: status.diagnosis
+            diagnosis: status.diagnosis,
+            messageStats
         }));
 
         res.json({
             success: true,
-            status
+            status,
+            // 발송 통계
+            messageStats,
+            // 최근 10건 발송 내역
+            recentMessages
         });
 
     } catch (error) {

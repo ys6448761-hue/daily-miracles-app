@@ -25,6 +25,14 @@ try {
     console.warn('[Solapi] metricsService 로드 실패 - 메트릭스 기록 비활성화');
 }
 
+// OutboundMessage 저장소 연동
+let messageStore = null;
+try {
+    messageStore = require('./outboundMessageStore');
+} catch (e) {
+    console.warn('[Solapi] outboundMessageStore 로드 실패 - 발송 기록 비활성화');
+}
+
 // 환경변수에서 API 키 로드
 const SOLAPI_API_KEY = process.env.SOLAPI_API_KEY;
 const SOLAPI_API_SECRET = process.env.SOLAPI_API_SECRET;
@@ -91,9 +99,15 @@ async function sendKakaoAlimtalk(to, templateId, variables = {}) {
     // ① 함수 진입 로그
     console.log(`[Notify] start type=ata to=${maskPhone(normalizedTo)} from=${maskPhone(SENDER_PHONE)} correlationId=${correlationId}`);
 
+    // OutboundMessage 레코드 생성 (queued)
+    if (messageStore) {
+        messageStore.createRecord(correlationId, 'ata', normalizedTo, SENDER_PHONE);
+    }
+
     const service = initSolapi();
     if (!service) {
         console.log(`[Notify] skip type=ata reason=API_KEY_MISSING correlationId=${correlationId}`);
+        if (messageStore) messageStore.markFailed(correlationId, 'SKIP', 'API 키 미설정');
         return { success: false, reason: 'API 키 미설정', correlationId };
     }
 
@@ -114,12 +128,20 @@ async function sendKakaoAlimtalk(to, templateId, variables = {}) {
         // ③ Solapi 응답 로그 (성공)
         const groupId = result?.groupId || result?.messageId || 'unknown';
         console.log(`[Notify] response type=ata status=SUCCESS groupId=${groupId} correlationId=${correlationId}`);
+
+        // OutboundMessage 성공 업데이트
+        if (messageStore) messageStore.markSent(correlationId, groupId);
+
         return { success: true, result, channel: 'ATA', correlationId, groupId };
     } catch (error) {
         // ③ Solapi 응답 로그 (실패)
         const statusCode = error.statusCode || error.code || 'unknown';
         const errorMessage = error.message?.substring(0, 100) || 'unknown';
         console.error(`[Notify] response type=ata status=FAIL errorCode=${statusCode} errorMessage="${errorMessage}" correlationId=${correlationId}`);
+
+        // OutboundMessage 실패 업데이트
+        if (messageStore) messageStore.markFailed(correlationId, statusCode, errorMessage);
+
         // SMS fallback은 호출자가 처리 (sendWishAck, sendMiracleResult 등)
         return { success: false, reason: 'alimtalk_failed', error: error.message, statusCode, correlationId };
     }
@@ -141,15 +163,22 @@ async function sendSMS(to, text) {
     // ① 함수 진입 로그
     console.log(`[Notify] start type=sms to=${maskPhone(normalizedTo)} from=${maskPhone(SMS_FROM)} correlationId=${correlationId}`);
 
+    // OutboundMessage 레코드 생성 (queued)
+    if (messageStore) {
+        messageStore.createRecord(correlationId, 'sms', normalizedTo, SMS_FROM);
+    }
+
     const service = initSolapi();
     if (!service) {
         console.log(`[Notify] skip type=sms reason=API_KEY_MISSING correlationId=${correlationId}`);
+        if (messageStore) messageStore.markFailed(correlationId, 'SKIP', 'API 키 미설정');
         return { success: false, reason: 'API 키 미설정', simulated: true, correlationId };
     }
 
     // SMS 발신번호 확인 (등록된 010 번호 필수)
     if (!SMS_FROM) {
         console.error(`[Notify] skip type=sms reason=SMS_FROM_MISSING correlationId=${correlationId}`);
+        if (messageStore) messageStore.markFailed(correlationId, 'CONFIG', 'SMS_FROM 미설정');
         if (metrics) metrics.recordError('SMS_FROM_MISSING', 'SOLAPI_SMS_FROM 환경변수 미설정');
         return { success: false, reason: 'SMS 발신번호 미설정', correlationId };
     }
@@ -169,12 +198,19 @@ async function sendSMS(to, text) {
         // ③ Solapi 응답 로그 (성공)
         const groupId = result?.groupId || result?.messageId || 'unknown';
         console.log(`[Notify] response type=sms status=SUCCESS groupId=${groupId} correlationId=${correlationId}`);
+
+        // OutboundMessage 성공 업데이트
+        if (messageStore) messageStore.markSent(correlationId, groupId);
+
         return { success: true, result, channel: 'SMS', from: SMS_FROM, correlationId, groupId };
     } catch (error) {
         // ③ Solapi 응답 로그 (실패)
         const statusCode = error.statusCode || error.code || 'unknown';
         const errorMessage = error.message?.substring(0, 100) || 'unknown';
         console.error(`[Notify] response type=sms status=FAIL errorCode=${statusCode} errorMessage="${errorMessage}" correlationId=${correlationId}`);
+
+        // OutboundMessage 실패 업데이트
+        if (messageStore) messageStore.markFailed(correlationId, statusCode, errorMessage);
 
         // statusCode 1062: 발신번호 미등록
         if (statusCode === 1062 || statusCode === '1062' || error.message?.includes('1062') || error.message?.includes('발신번호')) {
