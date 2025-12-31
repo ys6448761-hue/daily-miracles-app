@@ -1,10 +1,14 @@
 /**
  * Solapi 메시지 발송 서비스
- * - 카카오 알림톡
- * - SMS 발송 (fallback)
+ * - 카카오 알림톡 (ATA) 우선
+ * - SMS/LMS fallback (알림톡 실패 시)
  *
- * @version 2.0 - 2025.12.30
+ * @version 2.1 - 2025.12.31
  * @channel @dailymiracles (http://pf.kakao.com/_xfxhcWn)
+ *
+ * 발신번호 규칙:
+ * - 알림톡: SENDER_PHONE (1899-6117 등 인증된 번호)
+ * - SMS/LMS: SOLAPI_SMS_FROM (등록된 010 번호 필수)
  *
  * 승인된 템플릿:
  * - MIRACLE_RESULT: 기적 분석 결과 알림 (KA01TP251221072752085AP4LH3QgNHv)
@@ -24,7 +28,8 @@ try {
 const SOLAPI_API_KEY = process.env.SOLAPI_API_KEY;
 const SOLAPI_API_SECRET = process.env.SOLAPI_API_SECRET;
 const SOLAPI_PFID = process.env.SOLAPI_PFID; // 카카오 채널 ID
-const SENDER_PHONE = process.env.SENDER_PHONE || '18996117'; // 발신번호
+const SENDER_PHONE = process.env.SENDER_PHONE || '18996117'; // 알림톡 발신번호
+const SMS_FROM = process.env.SOLAPI_SMS_FROM; // SMS 전용 발신번호 (등록된 010 번호 필수)
 
 // Solapi 클라이언트 초기화
 let messageService = null;
@@ -44,6 +49,8 @@ function initSolapi() {
 
 /**
  * 카카오 알림톡 발송
+ * 주의: 알림톡 실패 시 SMS fallback은 호출자가 직접 처리
+ *
  * @param {string} to - 수신자 전화번호
  * @param {string} templateId - 알림톡 템플릿 ID
  * @param {Object} variables - 템플릿 변수
@@ -59,7 +66,7 @@ async function sendKakaoAlimtalk(to, templateId, variables = {}) {
     try {
         const result = await service.send({
             to,
-            from: SENDER_PHONE,
+            from: SENDER_PHONE, // 알림톡은 1899-6117 사용 가능
             kakaoOptions: {
                 pfId: SOLAPI_PFID,
                 templateId,
@@ -71,13 +78,16 @@ async function sendKakaoAlimtalk(to, templateId, variables = {}) {
         return { success: true, result };
     } catch (error) {
         console.error('[Solapi] 알림톡 발송 실패:', error.message);
-        // SMS fallback
-        return sendSMS(to, variables.message || '메시지 발송에 실패했습니다.');
+        // SMS fallback은 호출자가 처리 (sendWishAck, sendMiracleResult 등)
+        return { success: false, reason: 'alimtalk_failed', error: error.message };
     }
 }
 
 /**
  * SMS 발송 (알림톡 실패 시 fallback)
+ * 주의: SMS 발신번호는 Solapi에 등록된 번호만 사용 가능
+ * 1899-6117은 문자 발신번호 등록 전까지 사용 금지
+ *
  * @param {string} to - 수신자 전화번호
  * @param {string} text - 메시지 내용
  * @returns {Promise<Object>} 발송 결과
@@ -90,25 +100,48 @@ async function sendSMS(to, text) {
         return { success: false, reason: 'API 키 미설정', simulated: true };
     }
 
+    // SMS 발신번호 확인 (등록된 010 번호 필수)
+    if (!SMS_FROM) {
+        console.error('[Solapi] ⚠️ SOLAPI_SMS_FROM 미설정 - SMS 발송 불가');
+        console.error('[Solapi] SMS 발신번호는 Solapi에 등록된 010 번호여야 합니다');
+        if (metrics) metrics.recordError('SMS_FROM_MISSING', 'SOLAPI_SMS_FROM 환경변수 미설정');
+        return { success: false, reason: 'SMS 발신번호 미설정' };
+    }
+
     try {
         // 90바이트 초과 시 LMS로 자동 전환
         const result = await service.send({
             to,
-            from: SENDER_PHONE,
+            from: SMS_FROM, // 등록된 010 발신번호 사용
             text,
             autoTypeDetect: true // SMS/LMS 자동 감지
         });
 
-        console.log(`[Solapi] SMS 발송 성공: ${to}`);
+        console.log(`[Solapi] SMS 발송 성공: ${to} (from: ${SMS_FROM})`);
         return { success: true, result };
     } catch (error) {
         console.error('[Solapi] SMS 발송 실패:', error.message);
+
+        // statusCode 1062: 발신번호 미등록
+        if (error.statusCode === 1062 || error.message?.includes('1062') || error.message?.includes('발신번호')) {
+            console.error('[Solapi] 🔴 발신번호 미등록 오류 - SOLAPI_SMS_FROM 확인 필요');
+            if (metrics) {
+                metrics.recordError('SMS_SENDER_UNREGISTERED', `발신번호 ${SMS_FROM} 미등록`);
+            }
+            // COO 경고 트리거용 로그
+            console.warn('[COO-ALERT] 🟡 SMS 발신번호 미등록 - Solapi 콘솔에서 번호 등록 필요');
+            return { success: false, reason: 'sms_sender_unregistered', error: error.message };
+        }
+
+        if (metrics) metrics.recordError('SMS_FAIL', error.message);
         return { success: false, error: error.message };
     }
 }
 
 /**
  * 소원 접수 ACK 발송 (통합)
+ * 우선순위: 1. 알림톡(ATA) → 2. SMS fallback
+ *
  * @param {string} phone - 수신자 전화번호
  * @param {Object} wishData - 소원 데이터
  * @returns {Promise<Object>} 발송 결과
@@ -123,7 +156,7 @@ async function sendWishAck(phone, wishData) {
     };
     const emoji = gemEmoji[wishData.gem] || '✨';
 
-    // SMS용 짧은 메시지
+    // SMS용 짧은 메시지 (fallback용)
     const smsText = `[하루하루의기적] ${name}님 소원접수완료!
 기적지수 ${miracleScore}점
 7일 응원메시지 발송예정
@@ -134,15 +167,31 @@ async function sendWishAck(phone, wishData) {
         name,
         miracleScore: String(miracleScore),
         gemMeaning: gem_meaning,
-        wish: wish.length > 30 ? wish.substring(0, 30) + '...' : wish
+        wish: wish.length > 30 ? wish.substring(0, 30) + '...' : wish,
+        message: smsText // SMS fallback용
     };
 
-    // 알림톡 템플릿이 있으면 알림톡 우선, 없으면 SMS
-    if (process.env.SOLAPI_TEMPLATE_WISH_ACK) {
-        return sendKakaoAlimtalk(phone, process.env.SOLAPI_TEMPLATE_WISH_ACK, alimtalkVars);
-    } else {
+    const TEMPLATE_ID = process.env.SOLAPI_TEMPLATE_WISH_ACK;
+
+    // 1차: 알림톡 시도 (템플릿 있을 때)
+    if (TEMPLATE_ID) {
+        console.log(`[Solapi] ACK 알림톡 시도: ${name}님`);
+        const ataResult = await sendKakaoAlimtalk(phone, TEMPLATE_ID, alimtalkVars);
+
+        if (ataResult.success) {
+            if (metrics) metrics.recordAlimtalk(true, false);
+            return ataResult;
+        }
+
+        // 알림톡 실패 → SMS fallback
+        console.log(`[Solapi] ACK 알림톡 실패, SMS fallback 시도`);
+        if (metrics) metrics.recordAlimtalk(false, true);
         return sendSMS(phone, smsText);
     }
+
+    // 템플릿 미설정 → 바로 SMS
+    console.log(`[Solapi] ACK 템플릿 미설정, SMS 직접 발송`);
+    return sendSMS(phone, smsText);
 }
 
 /**
