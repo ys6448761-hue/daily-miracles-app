@@ -18,6 +18,17 @@
             background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
             color: #e8e8e8;
+            transition: background 0.5s ease;
+        }
+
+        /* 문제 해결 모드: 딥 네이비/차콜 + 골드 (기본) */
+        body.mode-problem {
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+
+        /* 소원 실현 모드: 퍼플/블루 그라데이션 + 골드 */
+        body.mode-wish {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #5a3f7a 100%);
         }
 
         .container {
@@ -44,6 +55,16 @@
             font-size: 15px;
             color: rgba(255, 255, 255, 0.8);
             line-height: 1.8;
+        }
+
+        .test-link-hint {
+            margin-top: 16px;
+            font-size: 13px;
+            opacity: 0.85;
+        }
+
+        .test-link-hint a:hover {
+            opacity: 1;
         }
 
         /* 폼 컨테이너 */
@@ -911,6 +932,11 @@
                 '목표 → 경로 → 실행'으로 정리해 드립니다.<br>
                 다음 한 걸음과 참고할 사례를 함께 제시해요.
             </p>
+            <p class="test-link-hint">
+                <a href="./questions.html" style="color: rgba(255, 215, 0, 0.9); text-decoration: underline;">
+                    원하시면 3분 기적지수 테스트로 방향을 먼저 잡을 수 있어요
+                </a>
+            </p>
         </div>
 
         <div class="form-container">
@@ -1155,6 +1181,10 @@
         function setMode(mode) {
             currentMode = mode;
             localStorage.setItem('lastMode', mode);
+
+            // body 클래스 변경 (컬러 톤 분리)
+            document.body.classList.remove('mode-problem', 'mode-wish');
+            document.body.classList.add('mode-' + mode);
 
             // 탭 활성화
             document.querySelectorAll('.mode-tab').forEach(tab => {
