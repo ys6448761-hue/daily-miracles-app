@@ -223,6 +223,7 @@ async function sendSMS(to, text) {
 
         if (metrics) metrics.recordError('SMS_FAIL', error.message);
         return { success: false, error: error.message, from: SMS_FROM, correlationId };
+    }
 }
 
 /**

@@ -86,6 +86,7 @@ try {
   console.log("✅ 소원실현 라우터 로드 성공");
 } catch (error) {
   console.error("❌ 소원실현 라우터 로드 실패:", error.message);
+  console.error("❌ 스택 트레이스:", error.stack);
 }
 
 // 소원그림 생성 라우터 로딩
