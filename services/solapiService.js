@@ -7,8 +7,9 @@
  * @channel @dailymiracles (http://pf.kakao.com/_xfxhcWn)
  *
  * 발신번호 규칙:
- * - 알림톡: SENDER_PHONE (1899-6117 등 인증된 번호)
- * - SMS/LMS: SOLAPI_SMS_FROM (등록된 010 번호 필수)
+ * - 알림톡(ATA): SENDER_PHONE (1899-6117 등 인증된 번호) - ATA 전용
+ * - SMS/LMS: SOLAPI_SMS_FROM (등록된 010 번호 필수) ⚠️ 유일한 SMS 발신번호
+ * - SENDER_PHONE은 SMS에서 절대 사용 금지 (deprecated for SMS)
  *
  * 승인된 템플릿:
  * - MIRACLE_RESULT: 기적 분석 결과 알림 (KA01TP251221072752085AP4LH3QgNHv)
@@ -28,8 +29,8 @@ try {
 const SOLAPI_API_KEY = process.env.SOLAPI_API_KEY;
 const SOLAPI_API_SECRET = process.env.SOLAPI_API_SECRET;
 const SOLAPI_PFID = process.env.SOLAPI_PFID; // 카카오 채널 ID
-const SENDER_PHONE = process.env.SENDER_PHONE || '18996117'; // 알림톡 발신번호
-const SMS_FROM = process.env.SOLAPI_SMS_FROM; // SMS 전용 발신번호 (등록된 010 번호 필수)
+const SENDER_PHONE = process.env.SENDER_PHONE || '18996117'; // ⚠️ ATA 전용 (SMS 사용 금지)
+const SMS_FROM = process.env.SOLAPI_SMS_FROM; // ✅ SMS 유일한 발신번호 (등록된 010 번호 필수)
 
 /**
  * 전화번호 정규화 (하이픈 제거, 숫자만)

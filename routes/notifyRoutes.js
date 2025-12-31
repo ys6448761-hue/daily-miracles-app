@@ -32,8 +32,8 @@ router.get('/status', async (req, res) => {
             SOLAPI_API_KEY: !!process.env.SOLAPI_API_KEY,
             SOLAPI_API_SECRET: !!process.env.SOLAPI_API_SECRET,
             SOLAPI_PFID: !!process.env.SOLAPI_PFID,
-            // 발신번호
-            SENDER_PHONE: process.env.SENDER_PHONE ? `${process.env.SENDER_PHONE.substring(0, 4)}****` : false,
+            // 발신번호 (⚠️ SENDER_PHONE은 deprecated - ATA 전용)
+            SENDER_PHONE: process.env.SENDER_PHONE ? `${process.env.SENDER_PHONE.substring(0, 4)}**** (ATA only, deprecated)` : false,
             SOLAPI_SMS_FROM: process.env.SOLAPI_SMS_FROM ? `${process.env.SOLAPI_SMS_FROM.substring(0, 3)}****${process.env.SOLAPI_SMS_FROM.slice(-4)}` : false,
             // 템플릿
             SOLAPI_TEMPLATE_MIRACLE_RESULT: !!process.env.SOLAPI_TEMPLATE_MIRACLE_RESULT,
@@ -73,10 +73,15 @@ router.get('/status', async (req, res) => {
             missingEnvs,
             service: serviceStatus,
             balance,
+            // 현재 실제 사용 중인 SMS 발신번호 (마스킹)
+            activeSmsFrom: process.env.SOLAPI_SMS_FROM
+                ? `${process.env.SOLAPI_SMS_FROM.substring(0, 3)}****${process.env.SOLAPI_SMS_FROM.slice(-4)}`
+                : '⚠️ 미설정 (SMS 발송 불가)',
             diagnosis: {
                 canSendATA: envStatus.SOLAPI_API_KEY && envStatus.SOLAPI_API_SECRET && envStatus.SOLAPI_PFID,
-                canSendSMS: envStatus.SOLAPI_API_KEY && envStatus.SOLAPI_API_SECRET && envStatus.SOLAPI_SMS_FROM,
+                canSendSMS: envStatus.SOLAPI_API_KEY && envStatus.SOLAPI_API_SECRET && !!process.env.SOLAPI_SMS_FROM,
                 canSendRedAlert: envStatus.CRO_PHONE || envStatus.COO_PHONE,
+                smsFromSource: process.env.SOLAPI_SMS_FROM ? 'SOLAPI_SMS_FROM' : 'NONE',
             },
             recommendations: []
         };
