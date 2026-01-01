@@ -2,13 +2,21 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 
+// Solapi 서비스 연동 (기적 분석 결과 발송)
+let solapiService = null;
+try {
+    solapiService = require('../services/solapiService');
+} catch (e) {
+    console.warn('[Miracle] solapiService 로드 실패:', e.message);
+}
+
 // In-memory storage (server.js와 공유하려면 별도 파일로 분리 권장)
 const conversations = new Map();
 
 // 기적지수 계산
 router.post('/calculate', async (req, res) => {
   try {
-    const { conversationId, nickname, birthdate, todayFeeling, recentEvent, hopeMessage } = req.body;
+    const { conversationId, nickname, birthdate, todayFeeling, recentEvent, hopeMessage, phone, sendResult = false } = req.body;
 
     // conversationId가 있으면 기존 conversation 사용, 없으면 새로 생성
     let conversation;
@@ -49,18 +57,59 @@ router.post('/calculate', async (req, res) => {
     // 종합 분석 생성
     const analysis = generateAnalysis(conversation.answers);
 
+    // 결과 페이지 URL 생성
+    const baseUrl = process.env.BASE_URL || 'https://dailymiracles.kr';
+    const resultLink = `${baseUrl}/result/${conversation.id}`;
+
+    // 기적 분석 결과 발송 (phone이 있고 sendResult가 true인 경우)
+    let messageSent = false;
+    let messageError = null;
+
+    if (phone && sendResult && solapiService?.sendMiracleResult) {
+      const userName = nickname || '소원이';
+      console.log('[기적 결과 발송 시작]', {
+        phone: `${phone.substring(0, 3)}****${phone.slice(-4)}`,
+        name: userName,
+        score: miracleIndex
+      });
+
+      try {
+        const sendResponse = await solapiService.sendMiracleResult(phone, userName, miracleIndex, resultLink);
+        messageSent = sendResponse.success;
+
+        if (sendResponse.success) {
+          console.log('[기적 결과 발송 완료]', { phone: `${phone.substring(0, 3)}****${phone.slice(-4)}` });
+        } else {
+          messageError = sendResponse.reason || '알 수 없는 오류';
+          console.error('[기적 결과 발송 실패]', messageError);
+        }
+      } catch (error) {
+        messageError = error.message;
+        console.error('[기적 결과 발송 에러]', error);
+        // 발송 실패해도 분석 결과는 정상 반환
+      }
+    } else if (phone && sendResult && !solapiService?.sendMiracleResult) {
+      console.warn('[기적 결과 발송] solapiService 미설정 - 발송 건너뜀');
+    }
+
     res.json({
       success: true,
       data: {
         conversationId: conversation.id,
         miracleIndex,
         analysis,
-        predictions
+        predictions,
+        resultLink,
+        // 발송 결과 포함
+        message: {
+          sent: messageSent,
+          error: messageError
+        }
       }
     });
 
   } catch (error) {
-    console.error('기적지수 계산 오류:', error);
+    console.error('[Miracle] 기적지수 계산 오류:', error);
     res.status(500).json({
       success: false,
       error: error.message || '기적지수 계산 중 오류가 발생했습니다.'
