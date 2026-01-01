@@ -58,20 +58,49 @@ router.post('/', async (req, res) => {
             });
         }
 
+        // 전화번호 정규화 (숫자만 추출)
+        const rawPhone = phone || '';
+        const normalizedPhone = rawPhone.replace(/[^0-9]/g, '');
+
+        // 전화번호 로깅 (디버깅용)
+        if (rawPhone) {
+            console.log('[Wish] Phone validation:', {
+                rawPhone: rawPhone.substring(0, 3) + '****' + rawPhone.slice(-4),
+                normalizedPhone: normalizedPhone.substring(0, 3) + '****' + normalizedPhone.slice(-4),
+                rawLength: rawPhone.length,
+                normalizedLength: normalizedPhone.length
+            });
+        }
+
         // 7일 메시지 선택 시 추가 검사
         if (want_message) {
-            if (!phone) {
+            if (!normalizedPhone) {
                 return res.status(400).json({
                     success: false,
                     message: '7일 메시지를 받으려면 연락처를 입력해주세요'
                 });
             }
 
-            // 전화번호 검증
-            if (!/^01[0-9]{8,9}$/.test(phone)) {
+            // 전화번호 검증 (정규화된 번호로, 정확히 11자리)
+            if (normalizedPhone.length !== 11) {
+                console.log('[Wish] Phone rejected - invalid length:', {
+                    rawPhone: rawPhone,
+                    normalizedPhone: normalizedPhone,
+                    length: normalizedPhone.length,
+                    expected: 11
+                });
                 return res.status(400).json({
                     success: false,
-                    message: '올바른 휴대폰 번호를 입력해주세요'
+                    message: `올바른 휴대폰 번호를 입력해주세요 (11자리, 현재: ${normalizedPhone.length}자리)`
+                });
+            }
+
+            // 01X로 시작하는지 확인
+            if (!/^01[0-9]/.test(normalizedPhone)) {
+                console.log('[Wish] Phone rejected - invalid prefix:', { normalizedPhone });
+                return res.status(400).json({
+                    success: false,
+                    message: '올바른 휴대폰 번호를 입력해주세요 (01X로 시작)'
                 });
             }
 
@@ -107,7 +136,7 @@ router.post('/', async (req, res) => {
             id: Date.now().toString(),
             name,
             birthdate: birthdate || null,  // 선택 항목
-            phone: phone || null,
+            phone: normalizedPhone || null,  // 정규화된 전화번호 (숫자만)
             gem: finalGem,
             gem_meaning: getGemMeaning(finalGem),
             gem_recommended: gemRecommended,    // 추천값
@@ -175,14 +204,14 @@ router.post('/', async (req, res) => {
             }
         }
 
-        // ACK 메시지 발송 (GREEN/YELLOW만 즉시 발송, phone이 있을 때만)
-        if (trafficLight.level !== 'RED' && phone && want_message) {
+        // ACK 메시지 발송 (GREEN/YELLOW만 즉시 발송, normalizedPhone이 있을 때만)
+        if (trafficLight.level !== 'RED' && normalizedPhone && want_message) {
             const ackMessages = generateWishAckMessage(wishData);
-            console.log('[ACK] Generated ACK message for:', name);
+            console.log('[ACK] Generated ACK message for:', name, '→', normalizedPhone.substring(0, 3) + '****');
 
             // Solapi로 ACK 발송
             if (isSolapiEnabled()) {
-                const ackResult = await sendWishAck(phone, wishData);
+                const ackResult = await sendWishAck(normalizedPhone, wishData);
                 console.log('[ACK] 발송 결과:', ackResult.success ? '성공' : ackResult.reason || '실패');
             } else {
                 console.log('[ACK] Solapi 미설정 - 로그만 출력');
@@ -190,6 +219,8 @@ router.post('/', async (req, res) => {
             }
         } else if (!want_message) {
             console.log('[ACK] 7일 메시지 미선택 - ACK 발송 건너뜀');
+        } else if (!normalizedPhone) {
+            console.log('[ACK] 전화번호 없음 - ACK 발송 건너뜀');
         }
 
         res.json({

@@ -40,6 +40,37 @@ const SOLAPI_PFID = process.env.SOLAPI_PFID; // 카카오 채널 ID
 const SENDER_PHONE = process.env.SENDER_PHONE || '18996117'; // ⚠️ ATA 전용 (SMS 사용 금지)
 const SMS_FROM = process.env.SOLAPI_SMS_FROM; // ✅ SMS 유일한 발신번호 (등록된 010 번호 필수)
 
+// 템플릿 환경변수 (Render에 동일 키로 설정 필요)
+const TEMPLATE_MIRACLE_RESULT = process.env.SOLAPI_TEMPLATE_MIRACLE_RESULT;
+const TEMPLATE_WISH_ACK = process.env.SOLAPI_TEMPLATE_WISH_ACK;
+
+// 🔍 서비스 로드 시 환경변수 검증 로깅
+console.log('[Solapi] 환경변수 검증:', {
+    SOLAPI_API_KEY: SOLAPI_API_KEY ? '✅ 설정됨' : '❌ 미설정',
+    SOLAPI_API_SECRET: SOLAPI_API_SECRET ? '✅ 설정됨' : '❌ 미설정',
+    SOLAPI_PFID: SOLAPI_PFID || '❌ 미설정 (알림톡 불가)',
+    SOLAPI_SMS_FROM: SMS_FROM ? `✅ ${SMS_FROM.substring(0, 3)}****` : '❌ 미설정 (SMS 불가)',
+    SENDER_PHONE: SENDER_PHONE ? `${SENDER_PHONE.substring(0, 4)}**** (ATA 전용)` : '❌ 미설정',
+    // 템플릿 ID (Render 환경변수에 동일 키로 설정)
+    SOLAPI_TEMPLATE_MIRACLE_RESULT: TEMPLATE_MIRACLE_RESULT || '❌ 미설정 → Render에 추가 필요!',
+    SOLAPI_TEMPLATE_WISH_ACK: TEMPLATE_WISH_ACK || 'ℹ️ 미설정 (선택)'
+});
+
+// 필수 환경변수 누락 경고
+const missingEnvs = [];
+if (!SOLAPI_API_KEY) missingEnvs.push('SOLAPI_API_KEY');
+if (!SOLAPI_API_SECRET) missingEnvs.push('SOLAPI_API_SECRET');
+if (!SOLAPI_PFID) missingEnvs.push('SOLAPI_PFID');
+if (!SMS_FROM) missingEnvs.push('SOLAPI_SMS_FROM');
+if (!TEMPLATE_MIRACLE_RESULT) missingEnvs.push('SOLAPI_TEMPLATE_MIRACLE_RESULT');
+
+if (missingEnvs.length > 0) {
+    console.warn(`[Solapi] ⚠️ 필수 환경변수 누락: ${missingEnvs.join(', ')}`);
+    console.warn('[Solapi] 📋 Render Dashboard → Environment → 아래 값 추가:');
+    if (!SOLAPI_PFID) console.warn('   SOLAPI_PFID=KA01PF251221071807323H0v42nQPJso');
+    if (!TEMPLATE_MIRACLE_RESULT) console.warn('   SOLAPI_TEMPLATE_MIRACLE_RESULT=KA01TP251221072752085AP4LH3QgNHv');
+}
+
 /**
  * 전화번호 정규화 (하이픈 제거, 숫자만)
  * 010-1234-5678 → 01012345678
@@ -134,16 +165,26 @@ async function sendKakaoAlimtalk(to, templateId, variables = {}) {
 
         return { success: true, result, channel: 'ATA', correlationId, groupId };
     } catch (error) {
-        // ③ Solapi 응답 로그 (실패)
-        const statusCode = error.statusCode || error.code || 'unknown';
-        const errorMessage = error.message?.substring(0, 100) || 'unknown';
+        // ③ Solapi 응답 로그 (실패) - 상세 에러 정보
+        const statusCode = error.statusCode || error.response?.status || error.code || 'unknown';
+        const errorMessage = error.message?.substring(0, 200) || 'unknown';
+        const responseData = error.response?.data || error.data || null;
+
         console.error(`[Notify] response type=ata status=FAIL errorCode=${statusCode} errorMessage="${errorMessage}" correlationId=${correlationId}`);
+        console.error(`[Notify] error details:`, {
+            correlationId,
+            statusCode,
+            errorMessage,
+            responseData: responseData ? JSON.stringify(responseData).substring(0, 500) : 'N/A',
+            errorName: error.name,
+            errorStack: error.stack?.split('\n')[0]
+        });
 
         // OutboundMessage 실패 업데이트
         if (messageStore) messageStore.markFailed(correlationId, statusCode, errorMessage);
 
         // SMS fallback은 호출자가 처리 (sendWishAck, sendMiracleResult 등)
-        return { success: false, reason: 'alimtalk_failed', error: error.message, statusCode, correlationId };
+        return { success: false, reason: 'alimtalk_failed', error: error.message, statusCode, responseData, correlationId };
     }
 }
 
@@ -204,10 +245,20 @@ async function sendSMS(to, text) {
 
         return { success: true, result, channel: 'SMS', from: SMS_FROM, correlationId, groupId };
     } catch (error) {
-        // ③ Solapi 응답 로그 (실패)
-        const statusCode = error.statusCode || error.code || 'unknown';
-        const errorMessage = error.message?.substring(0, 100) || 'unknown';
+        // ③ Solapi 응답 로그 (실패) - 상세 에러 정보
+        const statusCode = error.statusCode || error.response?.status || error.code || 'unknown';
+        const errorMessage = error.message?.substring(0, 200) || 'unknown';
+        const responseData = error.response?.data || error.data || null;
+
         console.error(`[Notify] response type=sms status=FAIL errorCode=${statusCode} errorMessage="${errorMessage}" correlationId=${correlationId}`);
+        console.error(`[Notify] error details:`, {
+            correlationId,
+            statusCode,
+            errorMessage,
+            responseData: responseData ? JSON.stringify(responseData).substring(0, 500) : 'N/A',
+            errorName: error.name,
+            errorStack: error.stack?.split('\n')[0]
+        });
 
         // OutboundMessage 실패 업데이트
         if (messageStore) messageStore.markFailed(correlationId, statusCode, errorMessage);
@@ -218,11 +269,11 @@ async function sendSMS(to, text) {
             if (metrics) {
                 metrics.recordError('SMS_SENDER_UNREGISTERED', `발신번호 ${maskPhone(SMS_FROM)} 미등록 (statusCode: ${statusCode})`);
             }
-            return { success: false, reason: 'sms_sender_unregistered', error: error.message, from: SMS_FROM, correlationId };
+            return { success: false, reason: 'sms_sender_unregistered', error: error.message, statusCode, responseData, from: SMS_FROM, correlationId };
         }
 
         if (metrics) metrics.recordError('SMS_FAIL', error.message);
-        return { success: false, error: error.message, from: SMS_FROM, correlationId };
+        return { success: false, error: error.message, statusCode, responseData, from: SMS_FROM, correlationId };
     }
 }
 
@@ -302,13 +353,26 @@ async function sendWishAck(phone, wishData) {
  * @returns {Promise<Object>} 발송 결과
  */
 async function sendMiracleResult(phone, name, score, resultLink) {
+    const correlationId = generateCorrelationId();
+    const normalizedPhone = normalizePhone(phone);
     const TEMPLATE_ID = process.env.SOLAPI_TEMPLATE_MIRACLE_RESULT;
 
+    // 템플릿 설정 검증 로그
+    console.log(`[Solapi] sendMiracleResult 시작:`, {
+        correlationId,
+        to: maskPhone(normalizedPhone),
+        name,
+        score,
+        templateEnvKey: 'SOLAPI_TEMPLATE_MIRACLE_RESULT',
+        templateId: TEMPLATE_ID || '❌ 미설정',
+        pfid: SOLAPI_PFID || '❌ 미설정'
+    });
+
     if (!TEMPLATE_ID) {
-        console.warn('[Solapi] MIRACLE_RESULT 템플릿 ID 미설정');
+        console.warn(`[Solapi] MIRACLE_RESULT 템플릿 ID 미설정 - SMS fallback 사용 correlationId=${correlationId}`);
         // SMS fallback
         const smsText = `[하루하루의기적] ${name}님의 기적지수: ${score}점! 30일 로드맵이 준비되었어요. ${resultLink}`;
-        return sendSMS(phone, smsText);
+        return sendSMS(normalizedPhone, smsText);
     }
 
     // Solapi 알림톡 변수 (템플릿과 일치해야 함)
@@ -318,22 +382,17 @@ async function sendMiracleResult(phone, name, score, resultLink) {
         '#{링크}': resultLink
     };
 
-    console.log(`[Solapi] 기적 분석 결과 발송: ${name}님 (${score}점)`);
+    console.log(`[Solapi] 기적 분석 결과 발송: ${name}님 (${score}점) correlationId=${correlationId}`);
 
     const service = initSolapi();
     if (!service) {
-        console.log('[Solapi] 비활성화 상태 - 시뮬레이션 모드');
-        console.log('[Solapi] [시뮬레이션] 알림톡 발송:');
-        console.log(`  - 수신: ${phone}`);
-        console.log(`  - 이름: ${name}`);
-        console.log(`  - 점수: ${score}점`);
-        console.log(`  - 링크: ${resultLink}`);
-        return { success: false, reason: 'API 키 미설정', simulated: true };
+        console.log(`[Solapi] 비활성화 상태 - 시뮬레이션 모드 correlationId=${correlationId}`);
+        return { success: false, reason: 'API 키 미설정', simulated: true, correlationId };
     }
 
     try {
         const result = await service.send({
-            to: phone,
+            to: normalizedPhone,
             from: SENDER_PHONE,
             kakaoOptions: {
                 pfId: SOLAPI_PFID,
@@ -342,18 +401,33 @@ async function sendMiracleResult(phone, name, score, resultLink) {
             }
         });
 
-        console.log(`[Solapi] 기적 분석 결과 알림톡 발송 성공: ${phone}`);
+        console.log(`[Solapi] 기적 분석 결과 알림톡 발송 성공: ${maskPhone(normalizedPhone)} correlationId=${correlationId}`);
         // 메트릭스 기록
         if (metrics) metrics.recordAlimtalk(true, false);
-        return { success: true, result };
+        return { success: true, result, correlationId };
     } catch (error) {
-        console.error('[Solapi] 알림톡 발송 실패:', error.message);
+        // 상세 에러 정보 로깅
+        const statusCode = error.statusCode || error.response?.status || error.code || 'unknown';
+        const errorMessage = error.message?.substring(0, 200) || 'unknown';
+        const responseData = error.response?.data || error.data || null;
+
+        console.error(`[Solapi] 알림톡 발송 실패:`, {
+            correlationId,
+            statusCode,
+            errorMessage,
+            responseData: responseData ? JSON.stringify(responseData).substring(0, 500) : 'N/A',
+            errorName: error.name,
+            errorStack: error.stack?.split('\n')[0]
+        });
+
         // 메트릭스 기록 (실패)
-        if (metrics) metrics.recordError('ALIMTALK_FAIL', error.message);
+        if (metrics) metrics.recordError('ALIMTALK_FAIL', `${statusCode}: ${errorMessage}`);
+
         // SMS fallback
+        console.log(`[Solapi] ATA 실패 → SMS fallback 시도 correlationId=${correlationId}`);
         const smsText = `[하루하루의기적] ${name}님의 기적지수: ${score}점! 30일 로드맵이 준비되었어요. ${resultLink}`;
         if (metrics) metrics.recordAlimtalk(false, true); // fallback SMS
-        return sendSMS(phone, smsText);
+        return sendSMS(normalizedPhone, smsText);
     }
 }
 
