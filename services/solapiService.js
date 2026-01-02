@@ -201,12 +201,23 @@ async function sendSMS(to, text) {
     const correlationId = generateCorrelationId();
     const normalizedTo = normalizePhone(to);
 
-    // ① 함수 진입 로그
-    console.log(`[Notify] start type=sms to=${maskPhone(normalizedTo)} from=${maskPhone(SMS_FROM)} correlationId=${correlationId}`);
+    // ⚠️ from 값 검증: SMS_FROM만 사용, SENDER_PHONE 혼용 방지
+    const smsFromValue = SMS_FROM; // 명시적으로 SMS_FROM만 사용
+    const isFromValid = smsFromValue && smsFromValue !== SENDER_PHONE && !smsFromValue.includes('1899');
+
+    // ① 함수 진입 로그 (from 검증 포함)
+    console.log(`[Notify] start type=sms correlationId=${correlationId}`, {
+        to: maskPhone(normalizedTo),
+        from: smsFromValue ? maskPhone(smsFromValue) : 'NULL',
+        fromRaw: smsFromValue, // 디버깅용 원본값
+        isFromValid,
+        senderPhoneCheck: smsFromValue === SENDER_PHONE ? '⚠️ SENDER_PHONE과 동일!' : '✅ 분리됨',
+        has1899: smsFromValue?.includes('1899') ? '⚠️ 1899 포함!' : '✅ 없음'
+    });
 
     // OutboundMessage 레코드 생성 (queued)
     if (messageStore) {
-        messageStore.createRecord(correlationId, 'sms', normalizedTo, SMS_FROM);
+        messageStore.createRecord(correlationId, 'sms', normalizedTo, smsFromValue);
     }
 
     const service = initSolapi();
@@ -217,69 +228,109 @@ async function sendSMS(to, text) {
     }
 
     // SMS 발신번호 확인 (등록된 010 번호 필수)
-    if (!SMS_FROM) {
+    if (!smsFromValue) {
         console.error(`[Notify] skip type=sms reason=SMS_FROM_MISSING correlationId=${correlationId}`);
         if (messageStore) messageStore.markFailed(correlationId, 'CONFIG', 'SMS_FROM 미설정');
         if (metrics) metrics.recordError('SMS_FROM_MISSING', 'SOLAPI_SMS_FROM 환경변수 미설정');
         return { success: false, reason: 'SMS 발신번호 미설정', correlationId };
     }
 
-    // ② Solapi 요청 직전 로그
-    console.log(`[Notify] request type=sms to=${maskPhone(normalizedTo)} from=${maskPhone(SMS_FROM)} contentLength=${text.length} templateId=N/A correlationId=${correlationId}`);
+    // 페이로드 구성
+    const payload = {
+        to: normalizedTo,
+        from: smsFromValue, // 등록된 010 발신번호 사용 (⚠️ 절대 1899 사용 금지)
+        text,
+        autoTypeDetect: true // SMS/LMS 자동 감지
+    };
+
+    // ② Solapi 요청 직전 로그 (페이로드 상세)
+    console.log(`[Notify] request type=sms correlationId=${correlationId}`, {
+        payload: {
+            to: maskPhone(payload.to),
+            from: payload.from, // 마스킹 없이 원본 (디버깅용)
+            textLength: payload.text.length,
+            autoTypeDetect: payload.autoTypeDetect
+        },
+        envCheck: {
+            SOLAPI_SMS_FROM: smsFromValue,
+            SENDER_PHONE: SENDER_PHONE,
+            areEqual: smsFromValue === SENDER_PHONE
+        }
+    });
 
     try {
         // 90바이트 초과 시 LMS로 자동 전환
-        const result = await service.send({
-            to: normalizedTo,
-            from: SMS_FROM, // 등록된 010 발신번호 사용 (⚠️ 절대 1899 사용 금지)
-            text,
-            autoTypeDetect: true // SMS/LMS 자동 감지
-        });
+        const result = await service.send(payload);
 
         // ③ Solapi 응답 로그 (성공)
         const groupId = result?.groupId || result?.messageId || 'unknown';
-        console.log(`[Notify] response type=sms status=SUCCESS groupId=${groupId} correlationId=${correlationId}`);
+        console.log(`[Notify] response type=sms status=SUCCESS groupId=${groupId} correlationId=${correlationId}`, {
+            result: JSON.stringify(result).substring(0, 300)
+        });
 
         // OutboundMessage 성공 업데이트
         if (messageStore) messageStore.markSent(correlationId, groupId);
 
-        return { success: true, result, channel: 'SMS', from: SMS_FROM, correlationId, groupId };
+        return { success: true, result, channel: 'SMS', from: smsFromValue, correlationId, groupId };
     } catch (error) {
-        // ③ Solapi 응답 로그 (실패) - 상세 에러 정보
+        // ③ Solapi 응답 로그 (실패) - 원본 에러 전체 출력
+        console.error(`[Notify] response type=sms status=FAIL correlationId=${correlationId}`);
+        console.error(`[Notify] RAW ERROR:`, {
+            correlationId,
+            // 네트워크 에러 코드
+            'error.code': error.code || 'N/A',
+            // HTTP 상태
+            'error.response?.status': error.response?.status || 'N/A',
+            // 응답 데이터
+            'error.response?.data': error.response?.data || 'N/A',
+            // 에러 메시지
+            'error.message': error.message || 'N/A',
+            // 스택 트레이스
+            'error.stack': error.stack || 'N/A',
+            // 추가 속성들
+            'error.statusCode': error.statusCode || 'N/A',
+            'error.data': error.data || 'N/A',
+            'error.name': error.name || 'N/A',
+            // 전체 에러 객체 (JSON 직렬화 시도)
+            'errorFull': (() => {
+                try {
+                    return JSON.stringify(error, Object.getOwnPropertyNames(error));
+                } catch (e) {
+                    return 'JSON 직렬화 실패';
+                }
+            })()
+        });
+
         const statusCode = error.statusCode || error.response?.status || error.code || 'unknown';
         const errorMessage = error.message?.substring(0, 200) || 'unknown';
         const responseData = error.response?.data || error.data || null;
-
-        console.error(`[Notify] response type=sms status=FAIL errorCode=${statusCode} errorMessage="${errorMessage}" correlationId=${correlationId}`);
-        console.error(`[Notify] error details:`, {
-            correlationId,
-            statusCode,
-            errorMessage,
-            responseData: responseData ? JSON.stringify(responseData).substring(0, 500) : 'N/A',
-            errorName: error.name,
-            errorStack: error.stack?.split('\n')[0]
-        });
 
         // OutboundMessage 실패 업데이트
         if (messageStore) messageStore.markFailed(correlationId, statusCode, errorMessage);
 
         // statusCode 1062: 발신번호 미등록
         if (statusCode === 1062 || statusCode === '1062' || error.message?.includes('1062') || error.message?.includes('발신번호')) {
-            console.error(`[Notify] alert type=sms issue=SENDER_UNREGISTERED from=${maskPhone(SMS_FROM)} correlationId=${correlationId}`);
+            console.error(`[Notify] alert type=sms issue=SENDER_UNREGISTERED from=${smsFromValue} correlationId=${correlationId}`);
             if (metrics) {
-                metrics.recordError('SMS_SENDER_UNREGISTERED', `발신번호 ${maskPhone(SMS_FROM)} 미등록 (statusCode: ${statusCode})`);
+                metrics.recordError('SMS_SENDER_UNREGISTERED', `발신번호 ${maskPhone(smsFromValue)} 미등록 (statusCode: ${statusCode})`);
             }
-            return { success: false, reason: 'sms_sender_unregistered', error: error.message, statusCode, responseData, from: SMS_FROM, correlationId };
+            return { success: false, reason: 'sms_sender_unregistered', error: error.message, statusCode, responseData, from: smsFromValue, correlationId };
         }
 
         if (metrics) metrics.recordError('SMS_FAIL', error.message);
-        return { success: false, error: error.message, statusCode, responseData, from: SMS_FROM, correlationId };
+        return { success: false, error: error.message, statusCode, responseData, from: smsFromValue, correlationId };
     }
 }
 
+// ACK 발송 모드 설정 (환경변수로 제어)
+// - 'fail-fast': 템플릿 미설정 시 발송 스킵 (운영 안정)
+// - 'sms-fallback': 템플릿 미설정 시 SMS로 발송 (기존 동작)
+// - 'skip-log': 발송 스킵하고 로그만 남김 (테스트용)
+const ACK_MODE = process.env.SOLAPI_ACK_MODE || 'fail-fast';
+
 /**
  * 소원 접수 ACK 발송 (통합)
- * 우선순위: 1. 알림톡(ATA) → 2. SMS fallback
+ * 우선순위: 1. 알림톡(ATA) → 2. SMS fallback (모드에 따라)
  *
  * @param {string} phone - 수신자 전화번호
  * @param {Object} wishData - 소원 데이터
@@ -287,6 +338,7 @@ async function sendSMS(to, text) {
  */
 async function sendWishAck(phone, wishData) {
     const { name, gem_meaning, miracleScore, wish } = wishData;
+    const correlationId = generateCorrelationId();
 
     // 보석 이모지
     const gemEmoji = {
@@ -313,29 +365,77 @@ async function sendWishAck(phone, wishData) {
     const TEMPLATE_ID = process.env.SOLAPI_TEMPLATE_WISH_ACK;
 
     // 발송 시작 로그
-    console.log(`[Solapi] ACK 발송 시작: { want_message: true, name: "${name}", to: "${phone}" }`);
+    console.log(`[Solapi] ACK 발송 시작:`, {
+        correlationId,
+        name,
+        to: maskPhone(phone),
+        templateId: TEMPLATE_ID || 'NULL',
+        ackMode: ACK_MODE,
+        hasTemplate: !!TEMPLATE_ID
+    });
 
     // 1차: 알림톡 시도 (템플릿 있을 때)
     if (TEMPLATE_ID) {
-        console.log(`[Solapi] 1차 시도: { channel: "ATA", templateId: "${TEMPLATE_ID}" }`);
+        console.log(`[Solapi] 1차 시도: { channel: "ATA", templateId: "${TEMPLATE_ID}", correlationId: "${correlationId}" }`);
         const ataResult = await sendKakaoAlimtalk(phone, TEMPLATE_ID, alimtalkVars);
 
         if (ataResult.success) {
-            console.log(`[Solapi] ✅ ACK 완료: { channel: "ATA", to: "${phone}" }`);
+            console.log(`[Solapi] ✅ ACK 완료: { channel: "ATA", correlationId: "${correlationId}" }`);
             if (metrics) metrics.recordAlimtalk(true, false);
-            return { ...ataResult, channel: 'ATA' };
+            return { ...ataResult, channel: 'ATA', correlationId };
         }
 
         // 알림톡 실패 → SMS fallback
-        console.log(`[Solapi] ATA 실패, 2차 시도: { channel: "SMS", fallback: true }`);
+        console.log(`[Solapi] ATA 실패, 2차 시도: { channel: "SMS", fallback: true, correlationId: "${correlationId}" }`);
         if (metrics) metrics.recordAlimtalk(false, true);
         const smsResult = await sendSMS(phone, smsText);
-        return { ...smsResult, fallback: true };
+        return { ...smsResult, fallback: true, correlationId };
     }
 
-    // 템플릿 미설정 → 바로 SMS
-    console.log(`[Solapi] ATA 템플릿 미설정, SMS 직접 발송: { channel: "SMS" }`);
-    return sendSMS(phone, smsText);
+    // ⚠️ 템플릿 미설정 시 모드별 처리
+    console.warn(`[Solapi] ⚠️ WISH_ACK 템플릿 미설정! mode=${ACK_MODE} correlationId=${correlationId}`);
+
+    switch (ACK_MODE) {
+        case 'fail-fast':
+            // 운영 안정: 발송 안함, 에러 반환
+            console.error(`[Solapi] ❌ ACK FAIL-FAST: 템플릿 미설정으로 발송 중단`, {
+                correlationId,
+                name,
+                to: maskPhone(phone),
+                action: 'SKIPPED',
+                reason: 'SOLAPI_TEMPLATE_WISH_ACK 환경변수 필요'
+            });
+            if (metrics) metrics.recordError('ACK_TEMPLATE_MISSING', 'WISH_ACK 템플릿 미설정 (fail-fast)');
+            return {
+                success: false,
+                reason: 'ACK 템플릿 미설정 (fail-fast 모드)',
+                skipped: true,
+                correlationId,
+                hint: 'Render에 SOLAPI_TEMPLATE_WISH_ACK 환경변수 추가 필요'
+            };
+
+        case 'skip-log':
+            // 테스트용: 발송 안하고 로그만
+            console.log(`[Solapi] 📝 ACK SKIP-LOG: 발송 스킵 (테스트 모드)`, {
+                correlationId,
+                name,
+                to: maskPhone(phone),
+                wouldSend: smsText.substring(0, 50) + '...'
+            });
+            return {
+                success: true,
+                simulated: true,
+                skipped: true,
+                correlationId,
+                message: '테스트 모드 - 실제 발송 안함'
+            };
+
+        case 'sms-fallback':
+        default:
+            // 기존 동작: SMS로 발송
+            console.log(`[Solapi] ATA 템플릿 미설정, SMS 직접 발송: { channel: "SMS", correlationId: "${correlationId}" }`);
+            return sendSMS(phone, smsText);
+    }
 }
 
 /**
@@ -476,6 +576,73 @@ async function getBalance() {
     }
 }
 
+/**
+ * Solapi 계정 검증 (서버 시작 시 1회 호출 권장)
+ * Render에서 사용 중인 키가 어느 계정인지 확인
+ * @returns {Promise<Object>} 계정 정보 또는 에러
+ */
+async function verifyAccount() {
+    console.log('[Solapi] 계정 검증 시작...');
+    console.log('[Solapi] API_KEY 앞 8자:', SOLAPI_API_KEY?.substring(0, 8) || 'NULL');
+
+    const service = initSolapi();
+    if (!service) {
+        console.error('[Solapi] 계정 검증 실패: API 키 미설정');
+        return { success: false, reason: 'API 키 미설정' };
+    }
+
+    try {
+        // 잔액 조회로 계정 유효성 확인
+        const balance = await service.getBalance();
+
+        console.log('[Solapi] ✅ 계정 검증 성공:', {
+            apiKeyPrefix: SOLAPI_API_KEY?.substring(0, 8) + '...',
+            balance: balance,
+            pfid: SOLAPI_PFID || 'N/A',
+            smsFrom: SMS_FROM || 'N/A',
+            senderPhone: SENDER_PHONE || 'N/A',
+            timestamp: new Date().toISOString()
+        });
+
+        return {
+            success: true,
+            account: {
+                apiKeyPrefix: SOLAPI_API_KEY?.substring(0, 8) + '...',
+                balance,
+                pfid: SOLAPI_PFID,
+                smsFrom: SMS_FROM,
+                senderPhone: SENDER_PHONE
+            }
+        };
+    } catch (error) {
+        console.error('[Solapi] ❌ 계정 검증 실패:', {
+            apiKeyPrefix: SOLAPI_API_KEY?.substring(0, 8) + '...',
+            errorCode: error.code || error.statusCode || 'unknown',
+            errorMessage: error.message,
+            errorResponse: error.response?.data || 'N/A',
+            errorStack: error.stack?.split('\n').slice(0, 3).join(' | ')
+        });
+
+        return {
+            success: false,
+            error: error.message,
+            errorCode: error.code || error.statusCode,
+            apiKeyPrefix: SOLAPI_API_KEY?.substring(0, 8) + '...'
+        };
+    }
+}
+
+// 서비스 초기화 시 계정 검증 (비동기 실행)
+if (SOLAPI_API_KEY && SOLAPI_API_SECRET) {
+    setTimeout(() => {
+        verifyAccount().then(result => {
+            if (!result.success) {
+                console.error('[Solapi] ⚠️ 서버 시작 시 계정 검증 실패 - API 키 확인 필요');
+            }
+        });
+    }, 1000); // 서버 시작 1초 후 검증
+}
+
 module.exports = {
     sendKakaoAlimtalk,
     sendSMS,
@@ -484,5 +651,6 @@ module.exports = {
     sendRedAlert,
     isEnabled,
     getBalance,
+    verifyAccount,      // 계정 검증 API
     initSolapi
 };
