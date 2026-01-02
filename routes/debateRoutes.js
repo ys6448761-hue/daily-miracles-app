@@ -1,7 +1,8 @@
 /**
- * debateRoutes.js v3.2
+ * debateRoutes.js v3.2.1
  *
  * Aurora 5 내부 원탁토론 자동화 API
+ * CI Guardrails: lint-exp-guardrail.js
  *
  * v3.2 추가:
  * - Mode Branching (DECISION | EXPLORE)
