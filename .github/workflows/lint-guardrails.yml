@@ -1,0 +1,60 @@
+name: Lint Guardrails
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'routes/debateRoutes.js'
+      - 'docs/explores/**'
+      - 'scripts/lint-exp-guardrail.js'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'routes/debateRoutes.js'
+      - 'docs/explores/**'
+
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  exp-guardrail-lint:
+    name: EXP File Guardrail Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run EXP Guardrail Lint
+        run: node scripts/lint-exp-guardrail.js
+
+      - name: Report on failure
+        if: failure()
+        run: |
+          echo "::error::EXP 파일에서 DEC/Actions 관련 내용이 발견되었습니다!"
+          echo "::error::EXPLORE 모드는 DEC/Actions를 생성하면 안됩니다."
+          echo "자세한 내용은 위 로그를 확인하세요."
+
+  syntax-check:
+    name: JavaScript Syntax Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check debateRoutes.js syntax
+        run: node --check routes/debateRoutes.js
+
+      - name: Check lint script syntax
+        run: node --check scripts/lint-exp-guardrail.js
