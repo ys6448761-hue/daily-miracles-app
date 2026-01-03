@@ -100,3 +100,6 @@ uv.lock
 
 # Test files
 test-*.json
+
+# Local settings (user-specific)
+.claude/settings.local.json
