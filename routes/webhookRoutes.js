@@ -129,7 +129,7 @@ function determineSignal(content, sentiment) {
 
     // YELLOW 키워드 (주의 필요)
     const yellowKeywords = ['힘들어', '우울', '외로', '고통', '괴로'];
-    if (yellowKeywords.some(kw => lowerContent.includes(kw)) || sentiment === 'urgent') {
+    if (yellowKeywords.some(kw => lowerContent.includes(kw)) || sentiment === 'urgent' || sentiment === 'anxious') {
         return 'yellow';
     }
 
