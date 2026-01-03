@@ -15,7 +15,7 @@ const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
 const TABLES = {
     DAILY_HEALTH: process.env.AIRTABLE_TABLE_DAILY_HEALTH || 'Daily Health',
     ALERTS: process.env.AIRTABLE_TABLE_ALERTS || 'Alerts',
-    WISHES_INBOX: process.env.AIRTABLE_TABLE_WISHES_INBOX || 'Wishes Inbox',
+    WISHES_INBOX: process.env.AIRTABLE_TABLE_WISHES_INBOX || process.env.AIRTABLE_TABLE_NAME || '인입함',
     USERS: process.env.AIRTABLE_TABLE_USERS || 'Users'
 };
 
