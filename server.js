@@ -134,6 +134,15 @@ try {
   console.error("❌ 웹훅 라우터 로드 실패:", error.message);
 }
 
+// 여정 파이프라인 라우터 로딩
+let journeyRoutes = null;
+try {
+  journeyRoutes = require("./routes/journeyRoutes");
+  console.log("✅ 여정 파이프라인 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 여정 파이프라인 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -432,6 +441,14 @@ if (webhookRoutes) {
   console.log("✅ 웹훅 라우터 등록 완료");
 } else {
   console.warn("⚠️ 웹훅 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 여정 파이프라인 Routes ----------
+if (journeyRoutes) {
+  app.use("/api/journey", journeyRoutes);
+  console.log("✅ 여정 파이프라인 라우터 등록 완료");
+} else {
+  console.warn("⚠️ 여정 파이프라인 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Tolerant extractor ----------
