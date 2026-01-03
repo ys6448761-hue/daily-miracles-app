@@ -1,7 +1,7 @@
 # AURORA_STATUS.md
 ## 하루하루의 기적 - 프로젝트 현황판
 
-**마지막 업데이트**: 2026-01-03 11:20 KST
+**마지막 업데이트**: 2026-01-03 14:56 KST
 **업데이트 담당**: Claude Code
 
 ---
@@ -38,13 +38,44 @@
 🟢 완료: GitHub Actions CI/CD 파이프라인 정상화
 🟢 완료: Aurora5 DB 스키마 (4개 테이블)
 🟢 완료: MCP 서버 7종 (신규 2종 추가)
-🟡 진행 중: P1 작업 (Airtable 연동)
+🟢 완료: P1 Airtable 웹훅 연동 + WishRouter 자동 분류
 ⚪ 대기: P3 작업 (Aurora 5 에이전트 고도화)
 ```
 
 ---
 
 ## 최근 완료 작업
+
+### 2026-01-03: P1 Airtable 웹훅 연동 완료
+
+| 작업 | 상태 | 산출물 |
+|------|------|--------|
+| Airtable Wishes Inbox 테이블 생성 | ✅ | Airtable "인입함" 테이블 (17개 필드) |
+| WishRouter 자동 분류 구현 | ✅ | `routes/webhookRoutes.js` |
+| 웹훅 엔드포인트 3종 | ✅ | `/webhooks/wish-form`, `/kakao`, `/web` |
+| 한글 필드명 매핑 | ✅ | `services/airtableService.js` |
+| 신호등 분류 개선 (anxious→yellow) | ✅ | `determineSignal()` 함수 |
+
+### 웹훅 엔드포인트
+
+```
+POST /webhooks/wish-form  - 소원 폼 (웹사이트)
+POST /webhooks/kakao      - 카카오톡 채널
+POST /webhooks/web        - 웹사이트 일반
+POST /webhooks/test       - 테스트용
+GET  /webhooks/status     - 상태 확인
+```
+
+### WishRouter 자동 분류
+
+| 분류 항목 | 옵션 |
+|----------|------|
+| 유형 | career, relationship, health, finance, education, travel, spiritual, general |
+| 감정 | urgent, anxious, hopeful, neutral |
+| 신호등 | red (긴급), yellow (주의), green (정상) |
+| 우선순위 | P0 (RED), P1 (urgent), P2 (anxious), P3 (일반) |
+
+---
 
 ### 2026-01-03: 토론 시스템 v3.2 + CI/CD 정상화
 
@@ -106,13 +137,13 @@ PUT  /api/debate/actions/:id - Action 상태 변경
 
 ## 진행 중 / 다음 할 일
 
-### P1 (이번 주)
+### P1 (완료!)
 
 | 작업 | 담당 | 상태 |
 |------|------|------|
-| Airtable Wishes Inbox 테이블 생성 | 루미 | ⬜ |
-| WishRouter 에이전트 기본 구현 | Code | ⬜ |
-| 인입 채널 → Airtable 웹훅 연동 | Code | ⬜ |
+| Airtable Wishes Inbox 테이블 생성 | 루미 | ✅ |
+| WishRouter 에이전트 기본 구현 | Code | ✅ |
+| 인입 채널 → Airtable 웹훅 연동 | Code | ✅ |
 
 ### P2 (완료!)
 
@@ -148,9 +179,11 @@ PUT  /api/debate/actions/:id - Action 상태 변경
 
 ### 코드
 ```
+routes/webhookRoutes.js         - 소원 인입 웹훅 (WishRouter 자동 분류)
 routes/debateRoutes.js          - 토론 자동화 API v3.2
 routes/wishRoutes.js            - 소원실현 API (신호등 + 기적지수)
 routes/wishImageRoutes.js       - 소원그림 API (DALL-E 3 + 워터마크)
+services/airtableService.js     - Airtable 연동 (Wishes Inbox 저장)
 services/solapiService.js       - Solapi 연동 (SMS + 카카오 알림톡)
 server.js                       - 메인 서버
 database/aurora5_schema.sql     - DB 스키마
@@ -237,6 +270,7 @@ curl -X POST http://localhost:5100/api/debate/run \
 
 | 날짜 | 담당 | 내용 |
 |------|------|------|
+| 2026-01-03 14:56 | Code | P1 완료: Airtable 웹훅 연동, WishRouter 자동 분류 |
 | 2026-01-03 11:20 | Code | 토론 시스템 v3.2, CI/CD 정상화, DB 스키마 적용 |
 | 2026-01-01 00:30 | Code | Aurora 5 UBOS + WishMaker Hub MCP 서버 추가 |
 | 2025-12-31 22:30 | Code | 시스템 상태 보고서, /api/wishes 404 수정 |
