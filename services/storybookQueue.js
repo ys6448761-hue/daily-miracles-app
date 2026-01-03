@@ -36,6 +36,20 @@ try {
   console.warn('⚠️ StorybookQueue: Email 서비스 로드 실패');
 }
 
+// Solapi 서비스 (카카오 알림톡 + SMS)
+let solapiService = null;
+try {
+  solapiService = require('./solapiService');
+  console.log('✅ StorybookQueue: Solapi 서비스 로드 성공');
+} catch (error) {
+  console.warn('⚠️ StorybookQueue: Solapi 서비스 로드 실패');
+}
+
+// CEO 알림 설정
+const CEO_PHONE = process.env.CEO_PHONE || process.env.CRO_PHONE;
+const ALERT_COOLDOWN_MS = 15 * 60 * 1000; // 15분
+const alertHistory = new Map(); // severity:order_id:error_code -> lastAlertTime
+
 // ═══════════════════════════════════════════════════════════════════════════
 // 상수 정의
 // ═══════════════════════════════════════════════════════════════════════════
@@ -479,17 +493,135 @@ async function deliverAssets(order, assets) {
         );
       }
 
-      // 카카오톡 폴백 시도
+      // 이벤트 기록
+      await logEvent(order_id, 'delivery_failed', { channel: 'EMAIL', error: error.message });
+
+      // ═══════════════════════════════════════════════════════════════
+      // 카카오톡 폴백 시도 (Phase 2-1)
+      // ═══════════════════════════════════════════════════════════════
       if (customer_phone) {
-        // TODO: 카카오톡 발송 구현
         console.log(`📱 [폴백] 카카오톡 발송 시도: ${customer_phone}`);
+
+        const kakaoResult = await sendKakaoFallback(order, assets, deliveryHash);
+        if (kakaoResult.success) {
+          return kakaoResult;
+        }
       }
 
       return { success: false, channel: 'EMAIL', error: error.message };
     }
   }
 
+  // 이메일 없이 전화번호만 있는 경우 → 카카오 직접 발송
+  if (customer_phone) {
+    const deliveryHash = require('crypto')
+      .createHash('md5')
+      .update(assets.map(a => a.hash).join(','))
+      .digest('hex')
+      .substring(0, 16);
+
+    return await sendKakaoFallback(order, assets, deliveryHash);
+  }
+
   return { success: false, error: 'NO_DELIVERY_CHANNEL' };
+}
+
+/**
+ * 카카오톡 폴백 발송 (링크-only)
+ */
+async function sendKakaoFallback(order, assets, deliveryHash) {
+  const { customer_phone, order_id, tier } = order;
+
+  // 전달할 링크 목록 생성
+  const assetLinks = assets.map(a => ({
+    name: getAssetDisplayName(a.type),
+    url: a.url
+  }));
+
+  try {
+    // 중복 발송 방지 확인
+    if (db) {
+      const existing = await db.query(
+        `SELECT id FROM storybook_deliveries
+         WHERE order_id = $1 AND channel = 'KAKAO' AND asset_hash = $2`,
+        [order_id, deliveryHash]
+      );
+
+      if (existing.rows.length > 0) {
+        console.log('⚠️ 이미 발송된 카카오톡 (중복 방지)');
+        return { success: true, channel: 'KAKAO', duplicate: true };
+      }
+
+      // 발송 기록 생성
+      await db.query(
+        `INSERT INTO storybook_deliveries
+         (order_id, channel, asset_hash, status, recipient, created_at)
+         VALUES ($1, 'KAKAO', $2, 'PENDING', $3, NOW())`,
+        [order_id, deliveryHash, customer_phone]
+      );
+    }
+
+    // 카카오톡 메시지 구성 (링크-only)
+    const tierName = { STARTER: '스타터', PLUS: '플러스', PREMIUM: '프리미엄' }[tier] || tier;
+    const linkList = assetLinks.map(a => `• ${a.name}: ${a.url}`).join('\n');
+
+    const messageText = `[하루하루의 기적] 스토리북 완성!
+
+주문번호: ${order_id}
+상품: ${tierName}
+
+📥 다운로드 링크:
+${linkList}
+
+※ 링크는 14일간 유효합니다.
+문의: 1899-6117`;
+
+    let messageId = `kakao-mock-${Date.now()}`;
+
+    if (solapiService && solapiService.sendSMS) {
+      // SMS로 발송 (알림톡 템플릿 없는 경우)
+      const result = await solapiService.sendSMS(customer_phone, messageText);
+      messageId = result.messageId || result.groupId || messageId;
+      console.log(`📱 카카오/SMS 발송 성공: ${messageId}`);
+    } else {
+      // Mock 발송
+      console.log(`📱 [Mock] 카카오톡 발송: ${customer_phone}`);
+      console.log(`   산출물: ${assetLinks.map(a => a.name).join(', ')}`);
+    }
+
+    // 발송 성공 기록
+    if (db) {
+      await db.query(
+        `UPDATE storybook_deliveries
+         SET status = 'SENT', message_id = $1, sent_at = NOW()
+         WHERE order_id = $2 AND channel = 'KAKAO' AND asset_hash = $3`,
+        [messageId, order_id, deliveryHash]
+      );
+    }
+
+    // 이벤트 기록
+    await logEvent(order_id, 'delivery_kakao_sent', { message_id: messageId });
+
+    return { success: true, channel: 'KAKAO', messageId };
+
+  } catch (error) {
+    console.error('카카오톡 발송 실패:', error.message);
+
+    // 발송 실패 기록
+    if (db) {
+      await db.query(
+        `UPDATE storybook_deliveries
+         SET status = 'FAIL', error_message = $1
+         WHERE order_id = $2 AND channel = 'KAKAO'`,
+        [error.message, order_id]
+      );
+    }
+
+    // 이벤트 기록
+    await logEvent(order_id, 'delivery_failed', { channel: 'KAKAO', error: error.message });
+
+    return { success: false, channel: 'KAKAO', error: error.message };
+  }
 }
 
 /**
@@ -507,6 +639,98 @@ function getAssetDisplayName(type) {
     ROADMAP_JSON: '90일 로드맵 (JSON)'
   };
   return names[type] || type;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RED 알림 시스템 (SEV1) - Phase 2-1
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * RED 알림 발송 (SEV1)
+ *
+ * 발송 조건:
+ *   - FAIL_* 상태로 종결
+ *   - Gate FAIL
+ *   - 결제 후 SLA*2 초과 미종결
+ *
+ * 피로도 제어:
+ *   - severity:order_id:error_code 기준 15분 쿨다운
+ *   - 동일 에러 반복 시 추가 알림 없음
+ */
+async function sendRedAlert(orderId, errorCode, details = {}) {
+  // CEO 전화번호 확인
+  if (!CEO_PHONE) {
+    console.warn('⚠️ CEO_PHONE 미설정 - RED 알림 건너뜀');
+    return { success: false, reason: 'NO_CEO_PHONE' };
+  }
+
+  // 피로도 제어: 쿨다운 확인
+  const alertKey = `SEV1:${orderId}:${errorCode}`;
+  const lastAlertTime = alertHistory.get(alertKey);
+
+  if (lastAlertTime && (Date.now() - lastAlertTime) < ALERT_COOLDOWN_MS) {
+    console.log(`⏸️ RED 알림 쿨다운 중: ${alertKey}`);
+    return { success: false, reason: 'COOLDOWN', key: alertKey };
+  }
+
+  try {
+    // 알림 메시지 구성
+    const alertText = `🔴 [스토리북 SEV1 알림]
+
+주문: ${orderId}
+에러: ${errorCode}
+시간: ${new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}
+
+상세:
+${JSON.stringify(details, null, 2).substring(0, 200)}
+
+📊 대시보드 확인:
+https://daily-miracles-app.onrender.com/api/storybook/orders/${orderId}`;
+
+    let messageId = `alert-mock-${Date.now()}`;
+
+    if (solapiService && solapiService.sendSMS) {
+      const result = await solapiService.sendSMS(CEO_PHONE, alertText);
+      messageId = result.messageId || result.groupId || messageId;
+      console.log(`🔴 RED 알림 발송 완료: ${messageId}`);
+    } else {
+      console.log(`🔴 [Mock] RED 알림 발송: ${CEO_PHONE}`);
+      console.log(`   주문: ${orderId}, 에러: ${errorCode}`);
+    }
+
+    // 쿨다운 기록
+    alertHistory.set(alertKey, Date.now());
+
+    // 이벤트 기록
+    await logEvent(orderId, 'red_alert_sent', {
+      error_code: errorCode,
+      message_id: messageId,
+      to: CEO_PHONE.substring(0, 3) + '****'
+    });
+
+    return { success: true, messageId };
+
+  } catch (error) {
+    console.error('RED 알림 발송 실패:', error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * FAIL 상태 발생 시 RED 알림 트리거
+ */
+async function triggerFailAlert(orderId, status, extra = {}) {
+  // FAIL_* 상태만 처리
+  if (!status.startsWith('FAIL_')) {
+    return;
+  }
+
+  const errorCode = extra.fail_reason || status;
+  await sendRedAlert(orderId, errorCode, {
+    status,
+    fail_reason: extra.fail_reason,
+    last_error: extra.last_error
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -563,6 +787,11 @@ async function updateOrderStatus(orderId, status, extra = {}) {
       console.error('주문 상태 업데이트 실패:', error.message);
     }
   }
+
+  // FAIL_* 상태 시 RED 알림 트리거
+  if (status.startsWith('FAIL_')) {
+    await triggerFailAlert(orderId, status, extra);
+  }
 }
 
 /**
@@ -613,5 +842,9 @@ module.exports = {
   enqueue,
   processQueue,
   getQueueLength: () => jobQueue.length,
-  isProcessing: () => isProcessing
+  isProcessing: () => isProcessing,
+  // Phase 2-1 추가
+  sendRedAlert,
+  triggerFailAlert,
+  sendKakaoFallback
 };

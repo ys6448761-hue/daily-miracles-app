@@ -645,6 +645,121 @@ router.get('/orders/:orderId/assets', async (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
+// 3.5 다운로드 클릭 추적 (Phase 2-2)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * POST /api/storybook/orders/:orderId/download
+ *
+ * 다운로드 클릭을 추적합니다 (Activation KPI).
+ *
+ * Body:
+ *   {
+ *     "asset_type": "STORYBOOK_PDF"
+ *   }
+ */
+router.post('/orders/:orderId/download', async (req, res) => {
+  const { orderId } = req.params;
+  const { asset_type } = req.body;
+
+  try {
+    // 이벤트 기록
+    await logEvent(orderId, 'download_clicked', {
+      asset_type,
+      timestamp: new Date().toISOString()
+    });
+
+    // DB에 다운로드 기록 (선택적)
+    if (db) {
+      try {
+        await db.query(
+          `INSERT INTO storybook_events (order_id, event_name, payload, created_at)
+           VALUES ($1, 'download_clicked', $2, NOW())`,
+          [orderId, JSON.stringify({ asset_type })]
+        );
+      } catch (e) {
+        // 중복 허용 (같은 파일 여러 번 다운로드 가능)
+      }
+    }
+
+    return res.json({
+      success: true,
+      order_id: orderId,
+      asset_type,
+      tracked: true
+    });
+
+  } catch (error) {
+    console.error('다운로드 추적 실패:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+/**
+ * GET /api/storybook/admin/download-stats
+ *
+ * 다운로드 통계 조회 (관리자용)
+ */
+router.get('/admin/download-stats', async (req, res) => {
+  try {
+    let stats = {
+      total_downloads: 0,
+      by_asset_type: {},
+      download_rate: 0
+    };
+
+    if (db) {
+      // 총 다운로드 수
+      const downloadResult = await db.query(
+        `SELECT COUNT(*) FROM storybook_events WHERE event_name = 'download_clicked'`
+      );
+      stats.total_downloads = parseInt(downloadResult.rows[0].count);
+
+      // 자산 유형별 다운로드
+      const byTypeResult = await db.query(
+        `SELECT payload->>'asset_type' as asset_type, COUNT(*) as count
+         FROM storybook_events
+         WHERE event_name = 'download_clicked'
+         GROUP BY payload->>'asset_type'`
+      );
+      for (const row of byTypeResult.rows) {
+        stats.by_asset_type[row.asset_type] = parseInt(row.count);
+      }
+
+      // 다운로드율 (delivery_success 대비)
+      const deliveryResult = await db.query(
+        `SELECT COUNT(DISTINCT order_id) FROM storybook_deliveries WHERE status = 'SENT'`
+      );
+      const deliveredOrders = parseInt(deliveryResult.rows[0].count);
+
+      const downloadedResult = await db.query(
+        `SELECT COUNT(DISTINCT order_id) FROM storybook_events WHERE event_name = 'download_clicked'`
+      );
+      const downloadedOrders = parseInt(downloadedResult.rows[0].count);
+
+      if (deliveredOrders > 0) {
+        stats.download_rate = Math.round((downloadedOrders / deliveredOrders) * 100);
+      }
+    }
+
+    return res.json({
+      success: true,
+      stats
+    });
+
+  } catch (error) {
+    console.error('다운로드 통계 조회 실패:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
 // 4. 수정 요청 (크레딧 사용)
 // ═══════════════════════════════════════════════════════════════════════════
 
