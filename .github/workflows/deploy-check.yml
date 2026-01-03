@@ -11,7 +11,7 @@ on:
       render_url:
         description: 'Render service URL to test'
         required: true
-        default: 'https://miracle-of-each-day.onrender.com'
+        default: 'https://daily-miracles-app.onrender.com'
 
 jobs:
   health-check:
@@ -33,7 +33,7 @@ jobs:
 
       - name: Run health check
         env:
-          RENDER_EXTERNAL_URL: ${{ github.event.inputs.render_url || 'https://miracle-of-each-day.onrender.com' }}
+          RENDER_EXTERNAL_URL: ${{ github.event.inputs.render_url || 'https://daily-miracles-app.onrender.com' }}
         run: |
           node scripts/health-check.js "$RENDER_EXTERNAL_URL"
 
