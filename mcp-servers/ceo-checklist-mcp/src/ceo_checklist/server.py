@@ -1,7 +1,7 @@
 """
-Business Ops MCP Server
+CEO Checklist MCP Server
 
-Aurora 5 UBOS - 비즈니스 운영 시스템
+Aurora 5 UBOS - 푸르미르 일일 체크리스트 시스템
 """
 
 import asyncio
@@ -22,7 +22,7 @@ from .utils import setup_logger, log_request, log_response, get_server_status
 
 
 # 서버 설정
-SERVER_NAME = "business-ops-mcp"
+SERVER_NAME = "ceo-checklist-mcp"
 SERVER_VERSION = "0.1.0"
 
 # 로거 설정
@@ -59,11 +59,14 @@ async def list_tools() -> list[Tool]:
 
 @server.call_tool()
 async def call_tool(name: str, arguments: dict[str, Any]) -> CallToolResult:
-    """도구를 호출하고 결과를 반환합니다."""
+    """
+    도구를 호출하고 결과를 반환합니다.
+    """
     start_time = time.time()
     log_request(logger, name, arguments or {})
 
     try:
+        # check_status 도구 처리
         if name == "check_status":
             status = get_server_status(
                 server_name=SERVER_NAME,
@@ -82,6 +85,7 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> CallToolResult:
                 ]
             )
 
+        # 일반 도구 처리
         prompt = get_tool_prompt(name, arguments or {})
         duration_ms = (time.time() - start_time) * 1000
         log_response(logger, name, True, duration_ms)

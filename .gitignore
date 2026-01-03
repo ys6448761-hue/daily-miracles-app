@@ -88,3 +88,15 @@ docs/raw/conversations/
 
 # Metrics data (auto-generated)
 data/metrics/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# UV lock files (regenerated)
+uv.lock
+
+# Test files
+test-*.json

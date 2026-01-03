@@ -116,6 +116,15 @@ try {
   console.error("❌ Aurora5 라우터 로드 실패:", error.message);
 }
 
+// 토론 자동화 라우터 로딩
+let debateRoutes = null;
+try {
+  debateRoutes = require("./routes/debateRoutes");
+  console.log("✅ 토론 자동화 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 토론 자동화 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -398,6 +407,14 @@ if (aurora5Routes) {
   console.log("✅ Aurora5 API 라우터 등록 완료");
 } else {
   console.warn("⚠️ Aurora5 API 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 토론 자동화 API Routes ----------
+if (debateRoutes) {
+  app.use("/api/debate", debateRoutes);
+  console.log("✅ 토론 자동화 API 라우터 등록 완료");
+} else {
+  console.warn("⚠️ 토론 자동화 API 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Tolerant extractor ----------

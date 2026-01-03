@@ -1,7 +1,7 @@
 """
-Business Ops MCP Server
+Dashboard MCP Server
 
-Aurora 5 UBOS - 비즈니스 운영 시스템
+Aurora 5 UBOS - 통합 대시보드 시스템
 """
 
 import asyncio
@@ -22,7 +22,7 @@ from .utils import setup_logger, log_request, log_response, get_server_status
 
 
 # 서버 설정
-SERVER_NAME = "business-ops-mcp"
+SERVER_NAME = "dashboard-mcp"
 SERVER_VERSION = "0.1.0"
 
 # 로거 설정

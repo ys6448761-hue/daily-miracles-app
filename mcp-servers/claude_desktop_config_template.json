@@ -1,0 +1,85 @@
+{
+  "mcpServers": {
+    "miracle-mcp": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "C:\\Users\\세진\\OneDrive\\바탕 화면\\daily-miracles-mvp\\mcp-servers\\miracle-mcp",
+        "run",
+        "miracle-mcp"
+      ]
+    },
+    "summarizer-mcp": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "C:\\Users\\세진\\OneDrive\\바탕 화면\\daily-miracles-mvp\\mcp-servers\\summarizer-mcp",
+        "run",
+        "summarizer-mcp"
+      ]
+    },
+    "wishmaker-hub-mcp": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "C:\\Users\\세진\\OneDrive\\바탕 화면\\daily-miracles-mvp\\mcp-servers\\wishmaker-hub-mcp",
+        "run",
+        "wishmaker-hub-mcp"
+      ]
+    },
+    "business-ops-mcp": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "C:\\Users\\세진\\OneDrive\\바탕 화면\\daily-miracles-mvp\\mcp-servers\\business-ops-mcp",
+        "run",
+        "business-ops-mcp"
+      ]
+    },
+    "infra-monitor-mcp": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "C:\\Users\\세진\\OneDrive\\바탕 화면\\daily-miracles-mvp\\mcp-servers\\infra-monitor-mcp",
+        "run",
+        "infra-monitor-mcp"
+      ]
+    },
+    "ceo-checklist-mcp": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "C:\\Users\\세진\\OneDrive\\바탕 화면\\daily-miracles-mvp\\mcp-servers\\ceo-checklist-mcp",
+        "run",
+        "ceo-checklist-mcp"
+      ]
+    },
+    "dashboard-mcp": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "C:\\Users\\세진\\OneDrive\\바탕 화면\\daily-miracles-mvp\\mcp-servers\\dashboard-mcp",
+        "run",
+        "dashboard-mcp"
+      ]
+    },
+    "storybook-mcp": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "C:\\Users\\세진\\OneDrive\\바탕 화면\\daily-miracles-mvp\\mcp-servers\\storybook-mcp",
+        "run",
+        "storybook-mcp"
+      ]
+    },
+    "wish-image-mcp": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "C:\\Users\\세진\\OneDrive\\바탕 화면\\daily-miracles-mvp\\mcp-servers\\wish-image-mcp",
+        "run",
+        "wish-image-mcp"
+      ]
+    }
+  }
+}
