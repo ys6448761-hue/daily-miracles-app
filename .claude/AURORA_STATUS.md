@@ -1,7 +1,7 @@
 # AURORA_STATUS.md
 ## 하루하루의 기적 - 프로젝트 현황판
 
-**마지막 업데이트**: 2026-01-03 20:10 KST
+**마지막 업데이트**: 2026-01-03 20:40 KST
 **업데이트 담당**: Claude Code
 
 ---
@@ -40,12 +40,46 @@
 🟢 완료: MCP 서버 7종 (신규 2종 추가)
 🟢 완료: P1 Airtable 웹훅 연동 + WishRouter 자동 분류
 🟢 완료: P3 wish-journey 파이프라인 (신호등 연동)
-⚪ 대기: P3 나머지 (Aurora 5 서브에이전트 자동화, 배치 처리)
+🟢 완료: P3 Aurora 5 서브에이전트 자동화 API
+⚪ 대기: P3 배치 처리 시스템 구현
 ```
 
 ---
 
 ## 최근 완료 작업
+
+### 2026-01-03: P3 Aurora 5 서브에이전트 자동화 완료
+
+| 작업 | 상태 | 산출물 |
+|------|------|--------|
+| 에이전트 API 라우터 구현 | ✅ | `routes/agentRoutes.js` |
+| 4종 에이전트 정의 | ✅ | 코미, 재미, 루미, 여의보주 |
+| 12종 작업 유형 정의 | ✅ | SYNTHESIZE, RED_ALERT 등 |
+| 다중 에이전트 오케스트레이션 | ✅ | Phase 1 병렬 → Phase 2 종합 |
+| RED 신호 대응 API | ✅ | 재미 + 여의보주 협업 |
+
+### Agent API 엔드포인트
+
+```
+GET  /api/agents              - 에이전트 목록
+GET  /api/agents/:id          - 에이전트 상세
+POST /api/agents/:id/execute  - 개별 작업 실행
+POST /api/agents/orchestrate  - 다중 오케스트레이션
+POST /api/agents/red-response - RED 신호 대응
+GET  /api/agents/tasks/recent - 최근 작업 목록
+GET  /api/agents/task-types   - 작업 유형 목록
+```
+
+### Aurora 5 에이전트 목록
+
+| 에이전트 | 역할 | 주요 작업 |
+|---------|------|----------|
+| 코미 | COO | SYNTHESIZE, DECISION, ACTION_ITEMS |
+| 재미 | CRO | CUSTOMER_RESPONSE, RED_ALERT, COMMUNICATION |
+| 루미 | Analyst | DATA_ANALYSIS, CREATIVE_IDEA, TREND_REPORT |
+| 여의보주 | QA | SAFETY_CHECK, QUALITY_REVIEW, RISK_ASSESSMENT |
+
+---
 
 ### 2026-01-03: P3 wish-journey 파이프라인 완료
 
@@ -200,7 +234,7 @@ PUT  /api/debate/actions/:id - Action 상태 변경
 | 작업 | 담당 | 상태 |
 |------|------|------|
 | wish-journey 파이프라인 신호등 연동 | Code | ✅ |
-| Aurora 5 서브에이전트 자동화 | Code | ⬜ |
+| Aurora 5 서브에이전트 자동화 | Code | ✅ |
 | 배치 처리 시스템 구현 | Code | ⬜ |
 
 ---
@@ -220,6 +254,7 @@ PUT  /api/debate/actions/:id - Action 상태 변경
 
 ### 코드
 ```
+routes/agentRoutes.js           - Aurora 5 서브에이전트 자동화 API
 routes/journeyRoutes.js         - 소원 여정 파이프라인 (신호등 연동)
 routes/webhookRoutes.js         - 소원 인입 웹훅 (WishRouter 자동 분류)
 routes/debateRoutes.js          - 토론 자동화 API v3.2
@@ -312,6 +347,7 @@ curl -X POST http://localhost:5100/api/debate/run \
 
 | 날짜 | 담당 | 내용 |
 |------|------|------|
+| 2026-01-03 20:40 | Code | P3 완료: Aurora 5 서브에이전트 자동화 API |
 | 2026-01-03 20:10 | Code | P3 완료: wish-journey 파이프라인 API, 신호등 연동 |
 | 2026-01-03 14:56 | Code | P1 완료: Airtable 웹훅 연동, WishRouter 자동 분류 |
 | 2026-01-03 11:20 | Code | 토론 시스템 v3.2, CI/CD 정상화, DB 스키마 적용 |
