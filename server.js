@@ -143,6 +143,15 @@ try {
   console.error("❌ 여정 파이프라인 라우터 로드 실패:", error.message);
 }
 
+// Aurora 5 에이전트 라우터 로딩
+let agentRoutes = null;
+try {
+  agentRoutes = require("./routes/agentRoutes");
+  console.log("✅ Aurora 5 에이전트 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ Aurora 5 에이전트 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -449,6 +458,14 @@ if (journeyRoutes) {
   console.log("✅ 여정 파이프라인 라우터 등록 완료");
 } else {
   console.warn("⚠️ 여정 파이프라인 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- Aurora 5 에이전트 Routes ----------
+if (agentRoutes) {
+  app.use("/api/agents", agentRoutes);
+  console.log("✅ Aurora 5 에이전트 라우터 등록 완료");
+} else {
+  console.warn("⚠️ Aurora 5 에이전트 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Tolerant extractor ----------
