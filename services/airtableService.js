@@ -379,24 +379,25 @@ function isEnabled() {
  * @param {Object} wishData - 소원 데이터
  */
 async function createWishInbox(wishData) {
+    // 한글 필드명 매핑 (Airtable 테이블 구조에 맞춤)
     const fields = {
-        wish_id: wishData.wish_id,
-        channel: wishData.channel,
-        status: wishData.status,
-        priority: wishData.priority,
-        type: wishData.type,
-        sentiment: wishData.sentiment,
-        signal: wishData.signal,
-        content: wishData.content,
-        content_summary: wishData.content_summary,
-        is_sensitive: wishData.is_sensitive,
-        requires_human: wishData.requires_human,
-        assigned_to: wishData.assigned_to,
-        name: wishData.name || '',
-        phone: wishData.phone || '',
-        email: wishData.email || '',
-        gem_type: wishData.gem_type || '',
-        raw_payload: wishData.raw_payload || ''
+        '소원ID': wishData.wish_id,
+        '채널': wishData.channel,
+        '상태': wishData.status,
+        '우선순위': wishData.priority,
+        '유형': wishData.type,
+        '감정': wishData.sentiment,
+        '신호등': wishData.signal,
+        '내용': wishData.content,
+        '요약': wishData.content_summary,
+        '민감여부': wishData.is_sensitive,
+        '인간개입필요': wishData.requires_human,
+        '담당자': wishData.assigned_to,
+        '이름': wishData.name || '',
+        '전화번호': wishData.phone || '',
+        '이메일': wishData.email || '',
+        '보석타입': wishData.gem_type || '',
+        '원본데이터': wishData.raw_payload || ''
     };
 
     console.log(`[Airtable] Wishes Inbox 저장: ${wishData.wish_id}`);
@@ -430,13 +431,13 @@ async function updateWishStatus(wishId, newStatus, additionalFields = {}) {
         return { success: false, error: 'Failed to search records' };
     }
 
-    const record = searchResult.data.records.find(r => r.fields.wish_id === wishId);
+    const record = searchResult.data.records.find(r => r.fields['소원ID'] === wishId);
     if (!record) {
         return { success: false, error: `Record not found: ${wishId}` };
     }
 
     const fields = {
-        status: newStatus,
+        '상태': newStatus,
         ...additionalFields
     };
 
@@ -461,15 +462,15 @@ async function getWishesInbox(filters = {}) {
 
     let records = result.data.records || [];
 
-    // 필터 적용
+    // 필터 적용 (한글 필드명 사용)
     if (filters.status) {
-        records = records.filter(r => r.fields.status === filters.status);
+        records = records.filter(r => r.fields['상태'] === filters.status);
     }
     if (filters.signal) {
-        records = records.filter(r => r.fields.signal === filters.signal);
+        records = records.filter(r => r.fields['신호등'] === filters.signal);
     }
     if (filters.channel) {
-        records = records.filter(r => r.fields.channel === filters.channel);
+        records = records.filter(r => r.fields['채널'] === filters.channel);
     }
 
     return {
@@ -498,9 +499,9 @@ async function getSignalStats() {
     }
 
     const stats = {
-        red: result.records.filter(r => r.signal === 'red').length,
-        yellow: result.records.filter(r => r.signal === 'yellow').length,
-        green: result.records.filter(r => r.signal === 'green').length,
+        red: result.records.filter(r => r['신호등'] === 'red').length,
+        yellow: result.records.filter(r => r['신호등'] === 'yellow').length,
+        green: result.records.filter(r => r['신호등'] === 'green').length,
         total: result.count
     };
 
