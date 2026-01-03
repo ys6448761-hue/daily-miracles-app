@@ -960,6 +960,170 @@ router.get('/health', async (req, res) => {
 // 7. 테스트용 엔드포인트 (개발 환경)
 // ═══════════════════════════════════════════════════════════════════════════
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 8. 마이그레이션 엔드포인트 (관리자용)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * POST /api/storybook/admin/migrate
+ *
+ * DB 스키마 마이그레이션 (관리자용)
+ */
+router.post('/admin/migrate', async (req, res) => {
+  const { secret } = req.body;
+
+  // 간단한 비밀키 검증
+  if (secret !== (process.env.ADMIN_SECRET || 'storybook-migrate-2026')) {
+    return res.status(401).json({ success: false, error: 'UNAUTHORIZED' });
+  }
+
+  if (!db) {
+    return res.status(500).json({ success: false, error: 'DB_NOT_CONNECTED' });
+  }
+
+  try {
+    console.log('🚀 스토리북 스키마 마이그레이션 시작...');
+
+    // 스키마 SQL 직접 실행
+    const schemaSql = `
+      -- orders 테이블
+      CREATE TABLE IF NOT EXISTS storybook_orders (
+        id BIGSERIAL PRIMARY KEY,
+        order_id VARCHAR(64) NOT NULL,
+        payment_id VARCHAR(64) NOT NULL,
+        user_id VARCHAR(64),
+        customer_email VARCHAR(128) NOT NULL,
+        customer_phone VARCHAR(20),
+        wish_id VARCHAR(64),
+        tier VARCHAR(16) NOT NULL CHECK (tier IN ('STARTER', 'PLUS', 'PREMIUM')),
+        amount INTEGER NOT NULL,
+        status VARCHAR(32) NOT NULL DEFAULT 'CREATED',
+        fail_reason VARCHAR(64),
+        last_error TEXT,
+        ethics_score INTEGER,
+        gate_result VARCHAR(16),
+        workflow_version VARCHAR(20),
+        generation_time_sec INTEGER,
+        credits_remaining JSONB DEFAULT '{}',
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        paid_at TIMESTAMP,
+        delivered_at TIMESTAMP
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS ux_storybook_orders_order_id ON storybook_orders(order_id);
+      CREATE UNIQUE INDEX IF NOT EXISTS ux_storybook_orders_payment_id ON storybook_orders(payment_id);
+      CREATE INDEX IF NOT EXISTS ix_storybook_orders_status ON storybook_orders(status);
+
+      -- jobs 테이블
+      CREATE TABLE IF NOT EXISTS storybook_jobs (
+        id BIGSERIAL PRIMARY KEY,
+        order_id VARCHAR(64) NOT NULL,
+        job_type VARCHAR(32) NOT NULL,
+        status VARCHAR(32) NOT NULL DEFAULT 'QUEUED',
+        attempt INTEGER NOT NULL DEFAULT 0,
+        max_attempts INTEGER NOT NULL DEFAULT 2,
+        last_error TEXT,
+        tokens_used INTEGER DEFAULT 0,
+        images_generated INTEGER DEFAULT 0,
+        cost_estimate DECIMAL(10,2),
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        started_at TIMESTAMP,
+        finished_at TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS ix_storybook_jobs_order_id ON storybook_jobs(order_id);
+      CREATE INDEX IF NOT EXISTS ix_storybook_jobs_status ON storybook_jobs(status);
+
+      -- assets 테이블
+      CREATE TABLE IF NOT EXISTS storybook_assets (
+        id BIGSERIAL PRIMARY KEY,
+        order_id VARCHAR(64) NOT NULL,
+        asset_type VARCHAR(32) NOT NULL,
+        file_url TEXT NOT NULL,
+        file_name VARCHAR(256),
+        file_size_bytes INTEGER,
+        asset_hash VARCHAR(64) NOT NULL,
+        expires_at TIMESTAMP,
+        metadata JSONB DEFAULT '{}',
+        created_at TIMESTAMP NOT NULL DEFAULT NOW()
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS ux_storybook_assets_order_hash ON storybook_assets(order_id, asset_hash);
+      CREATE INDEX IF NOT EXISTS ix_storybook_assets_order_id ON storybook_assets(order_id);
+
+      -- deliveries 테이블
+      CREATE TABLE IF NOT EXISTS storybook_deliveries (
+        id BIGSERIAL PRIMARY KEY,
+        order_id VARCHAR(64) NOT NULL,
+        channel VARCHAR(16) NOT NULL,
+        asset_hash VARCHAR(64) NOT NULL,
+        status VARCHAR(16) NOT NULL DEFAULT 'PENDING',
+        error_code VARCHAR(64),
+        error_message TEXT,
+        message_id VARCHAR(128),
+        recipient VARCHAR(128),
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        sent_at TIMESTAMP,
+        delivered_at TIMESTAMP,
+        opened_at TIMESTAMP
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS ux_storybook_deliveries_unique ON storybook_deliveries(order_id, channel, asset_hash);
+      CREATE INDEX IF NOT EXISTS ix_storybook_deliveries_order_id ON storybook_deliveries(order_id);
+
+      -- events 테이블
+      CREATE TABLE IF NOT EXISTS storybook_events (
+        id BIGSERIAL PRIMARY KEY,
+        order_id VARCHAR(64),
+        job_id BIGINT,
+        event_name VARCHAR(64) NOT NULL,
+        payload JSONB DEFAULT '{}',
+        created_at TIMESTAMP NOT NULL DEFAULT NOW()
+      );
+      CREATE INDEX IF NOT EXISTS ix_storybook_events_name ON storybook_events(event_name);
+      CREATE INDEX IF NOT EXISTS ix_storybook_events_order_id ON storybook_events(order_id);
+
+      -- revisions 테이블
+      CREATE TABLE IF NOT EXISTS storybook_revisions (
+        id BIGSERIAL PRIMARY KEY,
+        revision_id VARCHAR(64) NOT NULL,
+        order_id VARCHAR(64) NOT NULL,
+        target_doc VARCHAR(32) NOT NULL,
+        revision_type VARCHAR(32) NOT NULL,
+        user_request TEXT,
+        status VARCHAR(20) NOT NULL DEFAULT 'QUEUED',
+        credits_debited JSONB,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        completed_at TIMESTAMP
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS ux_storybook_revisions_id ON storybook_revisions(revision_id);
+      CREATE INDEX IF NOT EXISTS ix_storybook_revisions_order_id ON storybook_revisions(order_id);
+    `;
+
+    await db.query(schemaSql);
+
+    // 테이블 확인
+    const tableCheck = await db.query(`
+      SELECT table_name FROM information_schema.tables
+      WHERE table_schema = 'public' AND table_name LIKE 'storybook_%'
+      ORDER BY table_name
+    `);
+
+    console.log('✅ 마이그레이션 완료!');
+
+    return res.json({
+      success: true,
+      message: '스키마 마이그레이션 완료',
+      tables: tableCheck.rows.map(r => r.table_name)
+    });
+
+  } catch (error) {
+    console.error('💥 마이그레이션 실패:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'MIGRATION_FAILED',
+      message: error.message
+    });
+  }
+});
+
 if (process.env.NODE_ENV !== 'production') {
   /**
    * POST /api/storybook/test/simulate-payment
