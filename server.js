@@ -161,6 +161,15 @@ try {
   console.error("❌ 배치 처리 라우터 로드 실패:", error.message);
 }
 
+// 스토리북 E2E Commerce 라우터 로딩
+let storybookRoutes = null;
+try {
+  storybookRoutes = require("./routes/storybookRoutes");
+  console.log("✅ 스토리북 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 스토리북 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -483,6 +492,14 @@ if (batchRoutes) {
   console.log("✅ 배치 처리 라우터 등록 완료");
 } else {
   console.warn("⚠️ 배치 처리 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 스토리북 E2E Commerce Routes ----------
+if (storybookRoutes) {
+  app.use("/api/storybook", storybookRoutes);
+  console.log("✅ 스토리북 라우터 등록 완료");
+} else {
+  console.warn("⚠️ 스토리북 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Tolerant extractor ----------
