@@ -125,6 +125,15 @@ try {
   console.error("❌ 토론 자동화 라우터 로드 실패:", error.message);
 }
 
+// 웹훅 라우터 로딩
+let webhookRoutes = null;
+try {
+  webhookRoutes = require("./routes/webhookRoutes");
+  console.log("✅ 웹훅 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 웹훅 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -415,6 +424,14 @@ if (debateRoutes) {
   console.log("✅ 토론 자동화 API 라우터 등록 완료");
 } else {
   console.warn("⚠️ 토론 자동화 API 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 웹훅 Routes ----------
+if (webhookRoutes) {
+  app.use("/webhooks", webhookRoutes);
+  console.log("✅ 웹훅 라우터 등록 완료");
+} else {
+  console.warn("⚠️ 웹훅 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Tolerant extractor ----------

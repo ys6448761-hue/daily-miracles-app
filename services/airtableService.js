@@ -14,7 +14,9 @@ const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
 // 테이블 ID (Airtable에서 생성 후 입력)
 const TABLES = {
     DAILY_HEALTH: process.env.AIRTABLE_TABLE_DAILY_HEALTH || 'Daily Health',
-    ALERTS: process.env.AIRTABLE_TABLE_ALERTS || 'Alerts'
+    ALERTS: process.env.AIRTABLE_TABLE_ALERTS || 'Alerts',
+    WISHES_INBOX: process.env.AIRTABLE_TABLE_WISHES_INBOX || 'Wishes Inbox',
+    USERS: process.env.AIRTABLE_TABLE_USERS || 'Users'
 };
 
 /**
@@ -370,12 +372,156 @@ function isEnabled() {
     return !!(AIRTABLE_API_KEY && AIRTABLE_BASE_ID);
 }
 
+// ========== Wishes Inbox 관련 함수 ==========
+
+/**
+ * Wishes Inbox 레코드 생성
+ * @param {Object} wishData - 소원 데이터
+ */
+async function createWishInbox(wishData) {
+    const fields = {
+        wish_id: wishData.wish_id,
+        channel: wishData.channel,
+        status: wishData.status,
+        priority: wishData.priority,
+        type: wishData.type,
+        sentiment: wishData.sentiment,
+        signal: wishData.signal,
+        content: wishData.content,
+        content_summary: wishData.content_summary,
+        is_sensitive: wishData.is_sensitive,
+        requires_human: wishData.requires_human,
+        assigned_to: wishData.assigned_to,
+        name: wishData.name || '',
+        phone: wishData.phone || '',
+        email: wishData.email || '',
+        gem_type: wishData.gem_type || '',
+        raw_payload: wishData.raw_payload || ''
+    };
+
+    console.log(`[Airtable] Wishes Inbox 저장: ${wishData.wish_id}`);
+
+    const result = await airtableRequest(TABLES.WISHES_INBOX, 'POST', { fields });
+
+    if (result.simulated) {
+        console.log('[Airtable] [시뮬레이션] Wishes Inbox 저장됨');
+        return { success: true, simulated: true, wish_id: wishData.wish_id };
+    }
+
+    return result;
+}
+
+/**
+ * Wishes Inbox 상태 업데이트
+ * @param {string} wishId - 소원 ID
+ * @param {string} newStatus - 새 상태
+ * @param {Object} additionalFields - 추가 필드 (옵션)
+ */
+async function updateWishStatus(wishId, newStatus, additionalFields = {}) {
+    // 먼저 레코드 ID 조회
+    const searchResult = await airtableRequest(TABLES.WISHES_INBOX, 'GET');
+
+    if (searchResult.simulated) {
+        console.log(`[Airtable] [시뮬레이션] 상태 업데이트: ${wishId} → ${newStatus}`);
+        return { success: true, simulated: true };
+    }
+
+    if (!searchResult.success || !searchResult.data.records) {
+        return { success: false, error: 'Failed to search records' };
+    }
+
+    const record = searchResult.data.records.find(r => r.fields.wish_id === wishId);
+    if (!record) {
+        return { success: false, error: `Record not found: ${wishId}` };
+    }
+
+    const fields = {
+        status: newStatus,
+        ...additionalFields
+    };
+
+    return airtableRequest(TABLES.WISHES_INBOX, 'PATCH', { fields }, record.id);
+}
+
+/**
+ * Wishes Inbox 조회 (필터)
+ * @param {Object} filters - 필터 조건 { status, signal, channel }
+ */
+async function getWishesInbox(filters = {}) {
+    const result = await airtableRequest(TABLES.WISHES_INBOX, 'GET');
+
+    if (result.simulated) {
+        console.log('[Airtable] [시뮬레이션] Wishes Inbox 조회');
+        return { success: true, simulated: true, records: [] };
+    }
+
+    if (!result.success) {
+        return result;
+    }
+
+    let records = result.data.records || [];
+
+    // 필터 적용
+    if (filters.status) {
+        records = records.filter(r => r.fields.status === filters.status);
+    }
+    if (filters.signal) {
+        records = records.filter(r => r.fields.signal === filters.signal);
+    }
+    if (filters.channel) {
+        records = records.filter(r => r.fields.channel === filters.channel);
+    }
+
+    return {
+        success: true,
+        count: records.length,
+        records: records.map(r => ({
+            id: r.id,
+            ...r.fields,
+            created_at: r.createdTime
+        }))
+    };
+}
+
+/**
+ * 신호등별 통계
+ */
+async function getSignalStats() {
+    const result = await getWishesInbox();
+
+    if (!result.success || result.simulated) {
+        return {
+            success: result.success,
+            simulated: result.simulated,
+            stats: { red: 0, yellow: 0, green: 0, total: 0 }
+        };
+    }
+
+    const stats = {
+        red: result.records.filter(r => r.signal === 'red').length,
+        yellow: result.records.filter(r => r.signal === 'yellow').length,
+        green: result.records.filter(r => r.signal === 'green').length,
+        total: result.count
+    };
+
+    return { success: true, stats };
+}
+
 module.exports = {
+    // Daily Health & Alerts
     saveDailySnapshot,
     createAlert,
     checkAndAlert,
     processVipAlert,
     sendVipNotification,
+
+    // Wishes Inbox
+    createWishInbox,
+    updateWishStatus,
+    getWishesInbox,
+    getSignalStats,
+
+    // Utils
     isEnabled,
     TABLES
 };
