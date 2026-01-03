@@ -14,6 +14,9 @@
  *   GET  /api/storybook/orders/:orderId   - 주문 상태 조회
  *   GET  /api/storybook/orders/:orderId/assets - 산출물 조회
  *   POST /api/storybook/orders/:orderId/revision - 수정 요청
+ *   GET  /api/storybook/orders/:orderId/revisions - 수정 이력 조회
+ *   POST /api/storybook/orders/:orderId/download - 다운로드 추적 (Phase 2-2)
+ *   GET  /api/storybook/revisions/:revisionId - 수정 상태 조회 (Phase 2-3)
  *   GET  /api/storybook/health            - 헬스체크
  *
  * 작성일: 2026-01-03
@@ -860,6 +863,17 @@ router.post('/orders/:orderId/revision', async (req, res) => {
       credits_debited: { [creditKey]: 1 }
     });
 
+    // Revision Job 큐에 추가 (Phase 2-3)
+    if (storybookQueue && storybookQueue.enqueueRevision) {
+      storybookQueue.enqueueRevision({
+        revision_id: revisionId,
+        order_id: orderId,
+        target_doc,
+        revision_type,
+        user_request
+      });
+    }
+
     return res.json({
       success: true,
       revision_id: revisionId,
@@ -868,7 +882,8 @@ router.post('/orders/:orderId/revision', async (req, res) => {
       credits_debited: { [creditKey]: 1 },
       credits_remaining: credits,
       estimated_time: '2~5분',
-      message: '수정 요청이 접수되었습니다'
+      status: 'QUEUED',
+      message: '수정 요청이 접수되었습니다. 잠시 후 완료 알림을 보내드립니다.'
     });
 
   } catch (error) {
@@ -877,6 +892,129 @@ router.post('/orders/:orderId/revision', async (req, res) => {
       success: false,
       error: 'INTERNAL_ERROR',
       message: '수정 요청 처리 중 오류가 발생했습니다'
+    });
+  }
+});
+
+/**
+ * GET /api/storybook/revisions/:revisionId
+ *
+ * 수정 요청 상태 조회
+ */
+router.get('/revisions/:revisionId', async (req, res) => {
+  const { revisionId } = req.params;
+
+  try {
+    let revision = null;
+
+    if (db) {
+      const result = await db.query(
+        `SELECT r.*, o.tier, o.customer_email
+         FROM storybook_revisions r
+         JOIN storybook_orders o ON r.order_id = o.order_id
+         WHERE r.revision_id = $1`,
+        [revisionId]
+      );
+      revision = result.rows[0];
+    }
+
+    if (!revision) {
+      return res.status(404).json({
+        success: false,
+        error: 'REVISION_NOT_FOUND',
+        message: '수정 요청을 찾을 수 없습니다'
+      });
+    }
+
+    // 수정된 산출물 조회
+    let revisedAsset = null;
+    if (revision.status === 'DONE' && db) {
+      const assetResult = await db.query(
+        `SELECT asset_type, file_url, created_at
+         FROM storybook_assets
+         WHERE order_id = $1
+           AND metadata::text LIKE $2
+         ORDER BY created_at DESC
+         LIMIT 1`,
+        [revision.order_id, `%${revisionId}%`]
+      );
+      revisedAsset = assetResult.rows[0];
+    }
+
+    return res.json({
+      success: true,
+      revision: {
+        revision_id: revision.revision_id,
+        order_id: revision.order_id,
+        target_doc: revision.target_doc,
+        revision_type: revision.revision_type,
+        user_request: revision.user_request,
+        status: revision.status,
+        credits_debited: revision.credits_debited,
+        created_at: revision.created_at,
+        completed_at: revision.completed_at
+      },
+      revised_asset: revisedAsset ? {
+        type: revisedAsset.asset_type,
+        url: revisedAsset.file_url,
+        created_at: revisedAsset.created_at
+      } : null
+    });
+
+  } catch (error) {
+    console.error('수정 상태 조회 실패:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: '수정 상태 조회 중 오류가 발생했습니다'
+    });
+  }
+});
+
+/**
+ * GET /api/storybook/orders/:orderId/revisions
+ *
+ * 주문의 수정 이력 조회
+ */
+router.get('/orders/:orderId/revisions', async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    let revisions = [];
+
+    if (db) {
+      const result = await db.query(
+        `SELECT revision_id, target_doc, revision_type, user_request, status, credits_debited, created_at, completed_at
+         FROM storybook_revisions
+         WHERE order_id = $1
+         ORDER BY created_at DESC`,
+        [orderId]
+      );
+      revisions = result.rows;
+    }
+
+    return res.json({
+      success: true,
+      order_id: orderId,
+      count: revisions.length,
+      revisions: revisions.map(r => ({
+        revision_id: r.revision_id,
+        target_doc: r.target_doc,
+        revision_type: r.revision_type,
+        user_request: r.user_request?.substring(0, 100),
+        status: r.status,
+        credits_debited: r.credits_debited,
+        created_at: r.created_at,
+        completed_at: r.completed_at
+      }))
+    });
+
+  } catch (error) {
+    console.error('수정 이력 조회 실패:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: '수정 이력 조회 중 오류가 발생했습니다'
     });
   }
 });

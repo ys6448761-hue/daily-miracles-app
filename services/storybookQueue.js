@@ -74,6 +74,21 @@ const ORDER_STATUS = {
   FAIL_BUDGET: 'FAIL_BUDGET'
 };
 
+// Revision 유형
+const REVISION_TYPES = {
+  REGEN_IMAGE: 'REGEN_IMAGE',   // 이미지 재생성
+  EDIT_TEXT: 'EDIT_TEXT',       // 텍스트 수정
+  REWRITE_DOC: 'REWRITE_DOC'    // 문서 전체 재작성
+};
+
+// Revision 대상 문서
+const TARGET_DOCS = {
+  STORYBOOK: 'STORYBOOK',
+  WEBTOON: 'WEBTOON',
+  DECISION_MAP: 'DECISION_MAP',
+  ROADMAP: 'ROADMAP'
+};
+
 // 티어별 비용 상한
 const BUDGET_LIMITS = {
   STARTER: { tokens: 10000, images: 5 },
@@ -83,7 +98,9 @@ const BUDGET_LIMITS = {
 
 // 큐 저장소
 const jobQueue = [];
+const revisionQueue = [];
 let isProcessing = false;
+let isRevisionProcessing = false;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 큐 관리
@@ -835,6 +852,302 @@ async function logEvent(orderId, eventName, payload = {}) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Phase 2-3: Revision 처리
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Revision Job을 큐에 추가
+ */
+function enqueueRevision(revision) {
+  revisionQueue.push(revision);
+  console.log(`📥 Revision 큐 추가: ${revision.revision_id} (큐 길이: ${revisionQueue.length})`);
+
+  // 자동 처리 시작
+  if (!isRevisionProcessing) {
+    processRevisionQueue();
+  }
+}
+
+/**
+ * Revision 큐 처리 (FIFO)
+ */
+async function processRevisionQueue() {
+  if (isRevisionProcessing || revisionQueue.length === 0) {
+    return;
+  }
+
+  isRevisionProcessing = true;
+  console.log('🔄 Revision 큐 처리 시작');
+
+  while (revisionQueue.length > 0) {
+    const revision = revisionQueue.shift();
+
+    try {
+      await processRevisionJob(revision);
+    } catch (error) {
+      console.error(`💥 Revision 처리 실패: ${revision.revision_id}`, error.message);
+
+      // Revision 실패 처리
+      await updateRevisionStatus(revision.revision_id, 'FAIL', error.message);
+      await logEvent(revision.order_id, 'revision_failed', {
+        revision_id: revision.revision_id,
+        error: error.message
+      });
+    }
+  }
+
+  isRevisionProcessing = false;
+  console.log('✅ Revision 큐 처리 완료');
+}
+
+/**
+ * 개별 Revision 처리
+ */
+async function processRevisionJob(revision) {
+  const { revision_id, order_id, target_doc, revision_type, user_request } = revision;
+  const startTime = Date.now();
+
+  console.log('═══════════════════════════════════════════════════════════════');
+  console.log(`🔧 Revision 처리 시작: ${revision_id}`);
+  console.log(`   주문: ${order_id}`);
+  console.log(`   대상: ${target_doc} / 유형: ${revision_type}`);
+  console.log(`   요청: ${user_request?.substring(0, 50)}...`);
+  console.log('═══════════════════════════════════════════════════════════════');
+
+  // Revision 상태: PROCESSING
+  await updateRevisionStatus(revision_id, 'PROCESSING');
+  await logEvent(order_id, 'revision_started', {
+    revision_id,
+    target_doc,
+    revision_type
+  });
+
+  // 주문 정보 조회
+  const order = await getOrder(order_id);
+  if (!order) {
+    throw new Error('ORDER_NOT_FOUND');
+  }
+
+  // 1. Revision 실행 (유형별 처리)
+  let revisedAsset;
+  switch (revision_type) {
+    case REVISION_TYPES.REGEN_IMAGE:
+      revisedAsset = await executeRegenImage(order, target_doc, user_request);
+      break;
+    case REVISION_TYPES.EDIT_TEXT:
+      revisedAsset = await executeEditText(order, target_doc, user_request);
+      break;
+    case REVISION_TYPES.REWRITE_DOC:
+      revisedAsset = await executeRewriteDoc(order, target_doc, user_request);
+      break;
+    default:
+      throw new Error(`UNKNOWN_REVISION_TYPE: ${revision_type}`);
+  }
+
+  console.log('✅ Revision 생성 완료');
+
+  // 2. 새 산출물 저장
+  const savedAssets = await saveAssets(order_id, [revisedAsset]);
+  console.log(`✅ 수정된 산출물 저장 완료`);
+
+  // 3. 수정 완료 알림 발송 (이메일)
+  await sendRevisionNotification(order, revisedAsset, revision_id);
+  console.log('✅ 수정 완료 알림 발송');
+
+  // 4. 완료 처리
+  await updateRevisionStatus(revision_id, 'DONE');
+
+  const duration = Date.now() - startTime;
+  console.log(`🎉 Revision 완료: ${revision_id} (${duration}ms)`);
+  await logEvent(order_id, 'revision_completed', {
+    revision_id,
+    target_doc,
+    revision_type,
+    duration_ms: duration
+  });
+
+  console.log('═══════════════════════════════════════════════════════════════');
+  return { success: true, revision_id, duration };
+}
+
+/**
+ * Revision 상태 업데이트
+ */
+async function updateRevisionStatus(revisionId, status, error = null) {
+  if (db) {
+    try {
+      const completedAt = status === 'DONE' || status === 'FAIL' ? 'NOW()' : 'NULL';
+      await db.query(
+        `UPDATE storybook_revisions
+         SET status = $1, completed_at = ${completedAt}
+         WHERE revision_id = $2`,
+        [status, revisionId]
+      );
+    } catch (err) {
+      console.error('Revision 상태 업데이트 실패:', err.message);
+    }
+  }
+}
+
+/**
+ * 이미지 재생성 실행
+ */
+async function executeRegenImage(order, targetDoc, userRequest) {
+  console.log(`📸 이미지 재생성: ${targetDoc}`);
+
+  // Mock 구현 (실제로는 OpenAI DALL-E 호출)
+  await sleep(800); // 생성 시뮬레이션
+
+  const assetType = getAssetTypeForDoc(targetDoc);
+  const hash = `regen-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+
+  return {
+    type: assetType,
+    url: `https://storage.example.com/storybook/${order.order_id}/revised_${targetDoc.toLowerCase()}_${Date.now()}.png`,
+    hash: hash,
+    metadata: {
+      revision_type: 'REGEN_IMAGE',
+      user_request: userRequest,
+      generated_at: new Date().toISOString()
+    }
+  };
+}
+
+/**
+ * 텍스트 수정 실행
+ */
+async function executeEditText(order, targetDoc, userRequest) {
+  console.log(`📝 텍스트 수정: ${targetDoc}`);
+
+  // Mock 구현 (실제로는 OpenAI GPT 호출)
+  await sleep(600);
+
+  const assetType = getAssetTypeForDoc(targetDoc);
+  const hash = `edit-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+
+  return {
+    type: assetType,
+    url: `https://storage.example.com/storybook/${order.order_id}/edited_${targetDoc.toLowerCase()}_${Date.now()}.pdf`,
+    hash: hash,
+    metadata: {
+      revision_type: 'EDIT_TEXT',
+      user_request: userRequest,
+      generated_at: new Date().toISOString()
+    }
+  };
+}
+
+/**
+ * 문서 전체 재작성 실행
+ */
+async function executeRewriteDoc(order, targetDoc, userRequest) {
+  console.log(`📄 문서 재작성: ${targetDoc}`);
+
+  // Mock 구현 (실제로는 전체 파이프라인 재실행)
+  await sleep(1200);
+
+  const assetType = getAssetTypeForDoc(targetDoc);
+  const hash = `rewrite-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+
+  return {
+    type: assetType,
+    url: `https://storage.example.com/storybook/${order.order_id}/rewritten_${targetDoc.toLowerCase()}_${Date.now()}.pdf`,
+    hash: hash,
+    metadata: {
+      revision_type: 'REWRITE_DOC',
+      user_request: userRequest,
+      generated_at: new Date().toISOString()
+    }
+  };
+}
+
+/**
+ * 대상 문서에 맞는 asset type 반환
+ */
+function getAssetTypeForDoc(targetDoc) {
+  switch (targetDoc) {
+    case 'STORYBOOK':
+      return 'STORYBOOK_PDF';
+    case 'WEBTOON':
+      return 'WEBTOON_COMBINED';
+    case 'DECISION_MAP':
+      return 'DECISION_MAP_PDF';
+    case 'ROADMAP':
+      return 'ROADMAP_PDF';
+    default:
+      return 'STORYBOOK_PDF';
+  }
+}
+
+/**
+ * 수정 완료 알림 발송
+ */
+async function sendRevisionNotification(order, asset, revisionId) {
+  const { customer_email, customer_phone, order_id } = order;
+
+  // 이메일 발송 시도
+  if (emailService && customer_email) {
+    try {
+      const emailResult = await emailService.sendRevisionComplete({
+        to: customer_email,
+        orderId: order_id,
+        revisionId,
+        downloadUrl: asset.url
+      });
+      console.log(`📧 수정 완료 이메일 발송: ${customer_email}`);
+      return;
+    } catch (error) {
+      console.error('이메일 발송 실패:', error.message);
+    }
+  }
+
+  // 카카오/SMS 폴백
+  if (solapiService && customer_phone) {
+    try {
+      const message = `[하루하루의 기적]\n수정이 완료되었습니다!\n\n주문번호: ${order_id}\n수정번호: ${revisionId}\n\n📥 다운로드:\n${asset.url}\n\n※ 링크는 14일간 유효합니다.`;
+
+      const smsResult = await solapiService.sendSMS({
+        to: customer_phone,
+        text: message
+      });
+
+      console.log(`📱 수정 완료 SMS 발송: ${customer_phone.substring(0, 3)}****`);
+      await logEvent(order_id, 'revision_notification_sent', {
+        channel: 'SMS',
+        revision_id: revisionId
+      });
+    } catch (error) {
+      console.error('SMS 발송 실패:', error.message);
+    }
+  }
+}
+
+/**
+ * Revision 조회
+ */
+async function getRevision(revisionId) {
+  if (db) {
+    try {
+      const result = await db.query(
+        'SELECT * FROM storybook_revisions WHERE revision_id = $1',
+        [revisionId]
+      );
+      return result.rows[0];
+    } catch (error) {
+      console.error('Revision 조회 실패:', error.message);
+    }
+  }
+  return null;
+}
+
+/**
+ * 대기 함수
+ */
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // 모듈 내보내기
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -846,5 +1159,11 @@ module.exports = {
   // Phase 2-1 추가
   sendRedAlert,
   triggerFailAlert,
-  sendKakaoFallback
+  sendKakaoFallback,
+  // Phase 2-3 추가: Revision
+  enqueueRevision,
+  processRevisionQueue,
+  getRevision,
+  getRevisionQueueLength: () => revisionQueue.length,
+  isRevisionProcessing: () => isRevisionProcessing
 };
