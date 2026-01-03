@@ -1,7 +1,7 @@
 # AURORA_STATUS.md
 ## 하루하루의 기적 - 프로젝트 현황판
 
-**마지막 업데이트**: 2026-01-03 14:56 KST
+**마지막 업데이트**: 2026-01-03 20:10 KST
 **업데이트 담당**: Claude Code
 
 ---
@@ -39,12 +39,53 @@
 🟢 완료: Aurora5 DB 스키마 (4개 테이블)
 🟢 완료: MCP 서버 7종 (신규 2종 추가)
 🟢 완료: P1 Airtable 웹훅 연동 + WishRouter 자동 분류
-⚪ 대기: P3 작업 (Aurora 5 에이전트 고도화)
+🟢 완료: P3 wish-journey 파이프라인 (신호등 연동)
+⚪ 대기: P3 나머지 (Aurora 5 서브에이전트 자동화, 배치 처리)
 ```
 
 ---
 
 ## 최근 완료 작업
+
+### 2026-01-03: P3 wish-journey 파이프라인 완료
+
+| 작업 | 상태 | 산출물 |
+|------|------|--------|
+| 여정 파이프라인 API 구현 | ✅ | `routes/journeyRoutes.js` |
+| 신호등 연동 로직 구현 | ✅ | RED/YELLOW/GREEN 분기 처리 |
+| RED 보류 + CRO 재개 기능 | ✅ | `/api/journey/:id/resume` |
+| 파이프라인 상태 추적 | ✅ | 12단계 상태 관리 |
+
+### Journey API 엔드포인트
+
+```
+POST /api/journey/start        - 새 여정 시작
+GET  /api/journey/:id          - 여정 상태 조회
+POST /api/journey/:id/resume   - RED 보류 여정 재개 (CRO 승인)
+GET  /api/journey/list/pending - 보류 중 목록
+GET  /api/journey/stats/summary - 통계
+```
+
+### 파이프라인 단계
+
+```
+1. INTAKE (접수)
+   ↓
+1.5 SIGNAL_CHECK (신호등 판정)
+   ↓ RED → ON_HOLD (CRO 개입 대기)
+   ↓ YELLOW/GREEN → 계속
+2. ANALYSIS (기적 분석)
+   ↓
+3. IMAGE (소원그림 생성)
+   ↓
+5. SEND (결과 전달)
+   ↓
+6. SCHEDULE (7일 메시지 예약)
+   ↓
+COMPLETED (완료)
+```
+
+---
 
 ### 2026-01-03: P1 Airtable 웹훅 연동 완료
 
@@ -158,8 +199,8 @@ PUT  /api/debate/actions/:id - Action 상태 변경
 
 | 작업 | 담당 | 상태 |
 |------|------|------|
+| wish-journey 파이프라인 신호등 연동 | Code | ✅ |
 | Aurora 5 서브에이전트 자동화 | Code | ⬜ |
-| wish-journey 파이프라인 신호등 연동 | Code | 🔄 |
 | 배치 처리 시스템 구현 | Code | ⬜ |
 
 ---
@@ -179,6 +220,7 @@ PUT  /api/debate/actions/:id - Action 상태 변경
 
 ### 코드
 ```
+routes/journeyRoutes.js         - 소원 여정 파이프라인 (신호등 연동)
 routes/webhookRoutes.js         - 소원 인입 웹훅 (WishRouter 자동 분류)
 routes/debateRoutes.js          - 토론 자동화 API v3.2
 routes/wishRoutes.js            - 소원실현 API (신호등 + 기적지수)
@@ -270,6 +312,7 @@ curl -X POST http://localhost:5100/api/debate/run \
 
 | 날짜 | 담당 | 내용 |
 |------|------|------|
+| 2026-01-03 20:10 | Code | P3 완료: wish-journey 파이프라인 API, 신호등 연동 |
 | 2026-01-03 14:56 | Code | P1 완료: Airtable 웹훅 연동, WishRouter 자동 분류 |
 | 2026-01-03 11:20 | Code | 토론 시스템 v3.2, CI/CD 정상화, DB 스키마 적용 |
 | 2026-01-01 00:30 | Code | Aurora 5 UBOS + WishMaker Hub MCP 서버 추가 |
