@@ -39,10 +39,19 @@ on:
         options:
           - 'false'
           - 'true'
+      pr_number:
+        description: 'PR 번호 (라벨 부착용, 비워두면 라벨 생략)'
+        required: false
+        default: ''
+        type: string
 
 jobs:
   approve-dec:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
 
     steps:
       - name: Checkout
@@ -97,3 +106,49 @@ jobs:
             echo "- mode: \`${{ inputs.mode }}\`"
             echo "- k: \`${{ inputs.k }}\`"
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Add DEC-PENDING label to PR
+        if: ${{ inputs.pr_number != '' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = parseInt('${{ inputs.pr_number }}', 10);
+            if (isNaN(prNumber) || prNumber <= 0) {
+              console.log('Invalid PR number, skipping label');
+              return;
+            }
+
+            // 라벨이 없으면 생성
+            try {
+              await github.rest.issues.getLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: 'DEC-PENDING'
+              });
+            } catch (e) {
+              if (e.status === 404) {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: 'DEC-PENDING',
+                  color: 'FBCA04',
+                  description: 'DEC 승인 대기 중'
+                });
+                console.log('Created DEC-PENDING label');
+              }
+            }
+
+            // 라벨 추가
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              labels: ['DEC-PENDING']
+            });
+            console.log(`Added DEC-PENDING label to PR #${prNumber}`);
+
+            // Summary에 라벨 정보 추가
+            const fs = require('fs');
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+              `\n---\n🏷️ **DEC-PENDING** 라벨이 PR #${prNumber}에 부착되었습니다.\n`
+            );
