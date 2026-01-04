@@ -29,6 +29,14 @@ try {
   console.warn('⚠️ DB 모듈 로드 실패 - 파일 모드로 동작');
 }
 
+// 무결성 검사 모듈 로드
+let integrityCheck = null;
+try {
+  integrityCheck = require('./funnel-integrity-check');
+} catch (error) {
+  console.warn('⚠️ 무결성 검사 모듈 로드 실패');
+}
+
 // ============ 목표치 정의 ============
 const THRESHOLDS = {
   'Complete/Initiate': { floor: 5, target: 10, stretch: 15 },
@@ -356,9 +364,62 @@ function formatOneLine(data, funnel) {
 }
 
 /**
+ * 무결성 검사 요약 포맷
+ */
+function formatIntegritySummary(integrity) {
+  if (!integrity) return [];
+
+  const lines = [
+    `## 🔍 무결성 검사`,
+    ``,
+    `**상태**: ${integrity.overall.statusEmoji} ${integrity.overall.status}`,
+    ``
+  ];
+
+  // 주요 지표 요약
+  lines.push(`| 항목 | 결과 | 상태 |`);
+  lines.push(`|------|------|------|`);
+
+  // Key Missing
+  const missingCount = integrity.missingKeys.totalMissing;
+  lines.push(`| Key Missing | ${missingCount}건 | ${missingCount === 0 ? '✅' : '🚨'} |`);
+
+  // Double Terminal
+  lines.push(`| Double Terminal | ${integrity.doubleTerminal.count}건 | ${integrity.doubleTerminal.count === 0 ? '✅' : '🚨'} |`);
+
+  // Orphan Events
+  const totalOrphans = integrity.orphans.orphanComplete.count +
+    integrity.orphans.orphanAbandon.count +
+    integrity.orphans.orphanShareOpened.count;
+  lines.push(`| Orphan Events | ${totalOrphans}건 | ${totalOrphans === 0 ? '✅' : '🟡'} |`);
+
+  // Temporal Issues
+  const temporalIssues = integrity.temporal.completeBeforeInitiate.count +
+    integrity.temporal.viewedBeforeGenerated.count +
+    integrity.temporal.shareOpenedBeforeCreated.count;
+  lines.push(`| Temporal Issues | ${temporalIssues}건 | ${temporalIssues === 0 ? '✅' : '🟡'} |`);
+
+  lines.push(``);
+
+  // 알람이 있으면 표시
+  if (integrity.overall.alerts.length > 0) {
+    lines.push(`### 무결성 알람`);
+    for (const alert of integrity.overall.alerts) {
+      lines.push(`- 🚨 ${alert}`);
+    }
+    lines.push(``);
+  }
+
+  lines.push(`> 상세 검사: \`node scripts/ops/funnel-integrity-check.js\``);
+  lines.push(``);
+
+  return lines;
+}
+
+/**
  * 마크다운 포맷 생성
  */
-function formatMarkdown(data, funnel, dateFrom, dateTo) {
+function formatMarkdown(data, funnel, dateFrom, dateTo, integrity = null) {
   const lines = [
     `# 📊 퍼널 일일 리포트`,
     ``,
@@ -431,6 +492,11 @@ function formatMarkdown(data, funnel, dateFrom, dateTo) {
   lines.push(`- 🚨 ALERT: Floor 미달 (즉시 점검)`);
   lines.push(`- 📊 LOW_SAMPLE: 표본 부족 (${MIN_SAMPLE_SIZE}건 미만)`);
   lines.push(``);
+
+  // 무결성 검사 섹션 추가
+  if (integrity) {
+    lines.push(...formatIntegritySummary(integrity));
+  }
 
   return lines.join('\n');
 }
@@ -527,9 +593,38 @@ async function main() {
   // 퍼널 계산
   const funnel = calculateFunnel(data);
 
+  // 무결성 검사 수행 (모듈이 로드된 경우)
+  let integrity = null;
+  if (integrityCheck && db) {
+    try {
+      console.error('🔍 무결성 검사 중...');
+      const events = await integrityCheck.fetchAllEvents(from, to);
+      if (events && events.length > 0) {
+        const missingKeys = integrityCheck.checkMissingKeys(events);
+        const orphans = integrityCheck.checkOrphanEvents(events);
+        const doubleTerminal = integrityCheck.checkDoubleTerminal(events);
+        const temporal = integrityCheck.checkTemporalSanity(events);
+
+        const sampleSize = new Set(
+          events.filter(e => e.event_type === 'checkout_initiate' && e.checkout_id)
+            .map(e => e.checkout_id)
+        ).size;
+
+        const overall = integrityCheck.determineOverallStatus(
+          missingKeys, orphans, doubleTerminal, temporal, sampleSize
+        );
+
+        integrity = { missingKeys, orphans, doubleTerminal, temporal, overall };
+        console.error(`✅ 무결성 검사 완료: ${overall.statusEmoji} ${overall.status}`);
+      }
+    } catch (err) {
+      console.error('⚠️ 무결성 검사 실패:', err.message);
+    }
+  }
+
   // 출력
   if (options.json) {
-    console.log(JSON.stringify({ dateFrom: from, dateTo: to, data, funnel }, null, 2));
+    console.log(JSON.stringify({ dateFrom: from, dateTo: to, data, funnel, integrity }, null, 2));
   } else if (options.out) {
     // 디렉토리 확인
     const dir = path.dirname(options.out);
@@ -537,7 +632,7 @@ async function main() {
       fs.mkdirSync(dir, { recursive: true });
     }
 
-    const markdown = formatMarkdown(data, funnel, from, to);
+    const markdown = formatMarkdown(data, funnel, from, to, integrity);
     fs.writeFileSync(options.out, markdown, 'utf-8');
     console.error(`✅ 리포트 저장: ${options.out}`);
 
