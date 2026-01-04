@@ -1,0 +1,1146 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-01-04T07:04:35.014Z",
+  "generator": "generate-manifest.js",
+  "total_count": 63,
+  "documents": [
+    {
+      "id": "DOC-airtable-schema",
+      "path": "docs/airtable-schema.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "airtable-schema.md",
+      "tags": [
+        "소원"
+      ],
+      "owner": "comi",
+      "status": "| wishes_processed",
+      "title": "Airtable 테이블 스키마 (ACT 관제탑)",
+      "created_at": "2026-01-04",
+      "checksum": "4976b285"
+    },
+    {
+      "id": "DOC-airtable-wishes-inbox-schema",
+      "path": "docs/airtable-wishes-inbox-schema.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "airtable-wishes-inbox-schema.md",
+      "tags": [
+        "소원"
+      ],
+      "owner": "jemi",
+      "status": "NEW, ACK, IN_PROGRESS, APPROVED, STARTED, DONE, ESCALATED",
+      "title": "Airtable Wishes Inbox 테이블 스키마",
+      "created_at": "2026-01-04",
+      "checksum": "ca0bf766"
+    },
+    {
+      "id": "DOC-online-wish-problem-api",
+      "path": "docs/api/online-wish-problem-api.md",
+      "type": "api",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "api",
+      "tags": [
+        "api",
+        "소원"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "온라인 문제 해결 소원 API v0.1",
+      "created_at": "2026-01-04",
+      "checksum": "266802c0"
+    },
+    {
+      "id": "DOC-online-wish-voyage-api-design",
+      "path": "docs/api/online-wish-voyage-api-design.md",
+      "type": "api",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "api",
+      "tags": [
+        "api",
+        "소원"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "온라인 소원 실현 항해 API 설계안 v0.1",
+      "created_at": "2026-01-04",
+      "checksum": "ed723688"
+    },
+    {
+      "id": "DOC-최수민방식_치트시트",
+      "path": "docs/cheatsheets/최수민방식_치트시트.md",
+      "type": "cheatsheet",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "cheatsheets",
+      "tags": [
+        "최수민",
+        "빠른참조",
+        "cheatsheets"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "최수민방식 치트시트",
+      "created_at": "2026-01-04",
+      "checksum": "9f7529c4"
+    },
+    {
+      "id": "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
+      "path": "docs/CLAUDE_DESKTOP_MCP_CONFIG.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "CLAUDE_DESKTOP_MCP_CONFIG.md",
+      "tags": [
+        "소원",
+        "aurora",
+        "결제"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "Claude Desktop MCP 서버 설정 가이드",
+      "created_at": "2026-01-04",
+      "checksum": "44ccac1b"
+    },
+    {
+      "id": "DOC-README",
+      "path": "docs/conversations/docs/README.md",
+      "type": "conversation",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "conversations",
+      "tags": [],
+      "owner": "team",
+      "status": "active",
+      "title": "README",
+      "created_at": "2026-01-04",
+      "checksum": "60a0b4af"
+    },
+    {
+      "id": "DOC-deployment-checklist",
+      "path": "docs/deployment/deployment-checklist.md",
+      "type": "deployment",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "deployment",
+      "tags": [
+        "deployment"
+      ],
+      "owner": "code",
+      "status": "archived",
+      "title": "Daily Miracles MVP 배포 체크리스트",
+      "created_at": "2026-01-04",
+      "checksum": "0202a43e"
+    },
+    {
+      "id": "DOC-GROWTH-ROADMAP",
+      "path": "docs/GROWTH-ROADMAP.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "GROWTH-ROADMAP.md",
+      "tags": [
+        "소원",
+        "aurora"
+      ],
+      "owner": "comi",
+      "status": "archived",
+      "title": "하루하루의 기적 - 성장 로드맵",
+      "created_at": "2026-01-04",
+      "checksum": "881f0936"
+    },
+    {
+      "id": "DOC-LAUNCH-DECLARATION",
+      "path": "docs/LAUNCH-DECLARATION.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "LAUNCH-DECLARATION.md",
+      "tags": [
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "하루하루의 기적 - 출항 선언문",
+      "created_at": "2026-01-04",
+      "checksum": "c6b4219e"
+    },
+    {
+      "id": "DOC-최수민방식_완전정리",
+      "path": "docs/learnings/최수민방식_완전정리.md",
+      "type": "learning",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "learnings",
+      "tags": [
+        "최수민",
+        "에이전틱",
+        "1인유니콘",
+        "컨텍스트",
+        "피드백",
+        "learnings"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "최수민님 방식 완전 정리",
+      "created_at": "2026-01-04",
+      "checksum": "3722b629"
+    },
+    {
+      "id": "DOC-service-flow",
+      "path": "docs/overview/service-flow.md",
+      "type": "overview",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "overview",
+      "tags": [
+        "overview",
+        "소원"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "Daily Miracles 온라인 소원 서비스 전체 흐름도",
+      "created_at": "2026-01-04",
+      "checksum": "e28e803e"
+    },
+    {
+      "id": "DOC-README",
+      "path": "docs/README.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "README.md",
+      "tags": [
+        "소원"
+      ],
+      "owner": "comi",
+      "status": "active",
+      "title": "하루하루의 기적 - 지식 저장소",
+      "created_at": "2026-01-04",
+      "checksum": "28cf200e"
+    },
+    {
+      "id": "DOC-README",
+      "path": "docs/roadmap/README.md",
+      "type": "roadmap",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "roadmap",
+      "tags": [
+        "roadmap",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "🎯 30일 기적 로드맵 시스템",
+      "created_at": "2026-01-04",
+      "checksum": "a4207922"
+    },
+    {
+      "id": "DOC-ROADMAP_API",
+      "path": "docs/roadmap/ROADMAP_API.md",
+      "type": "roadmap",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "roadmap",
+      "tags": [
+        "roadmap",
+        "소원",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "30일 기적 로드맵 API 문서",
+      "created_at": "2026-01-04",
+      "checksum": "4d39bd13"
+    },
+    {
+      "id": "DOC-agents-index",
+      "path": "docs/system/agents-index.md",
+      "type": "system",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "system",
+      "tags": [
+        "system",
+        "소원",
+        "aurora"
+      ],
+      "owner": "code",
+      "status": "|----",
+      "title": "에이전트 인덱스",
+      "created_at": "2026-01-04",
+      "checksum": "92a49e80"
+    },
+    {
+      "id": "DOC-conversation-workflow",
+      "path": "docs/system/conversation-workflow.md",
+      "type": "system",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "system",
+      "tags": [
+        "system"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "대화 저장소 워크플로우",
+      "created_at": "2026-01-04",
+      "checksum": "55221cd3"
+    },
+    {
+      "id": "DOC-Aurora5_토론시스템_안내문",
+      "path": "docs/team/Aurora5_토론시스템_안내문.md",
+      "type": "team",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "team",
+      "tags": [
+        "team",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "Aurora 5 토론 시스템 안내문",
+      "created_at": "2026-01-04",
+      "checksum": "49189a4d"
+    },
+    {
+      "id": "DOC-CEO-WEEKLY-2025-W52",
+      "path": "docs/reports/CEO-WEEKLY-2025-W52.md",
+      "type": "report",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "reports",
+      "tags": [
+        "reports",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "CEO-WEEKLY-2025-W52",
+      "created_at": "2026-01-02T15:23:35.865Z",
+      "checksum": "bf34ae55"
+    },
+    {
+      "id": "DEC-2026-0102-045",
+      "path": "docs/actions/ACTIONS-DEC-2026-0102-045.md",
+      "type": "action",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "actions",
+      "tags": [
+        "actions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "TODO",
+      "title": "ACTIONS-DEC-2026-0102-045",
+      "created_at": "2026-01-02",
+      "checksum": "bfe48f86"
+    },
+    {
+      "id": "DEC-2026-0102-121",
+      "path": "docs/actions/ACTIONS-DEC-2026-0102-121.md",
+      "type": "action",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "actions",
+      "tags": [
+        "actions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "Action Items",
+      "created_at": "2026-01-02",
+      "checksum": "16d49874"
+    },
+    {
+      "id": "DEC-2026-0102-457",
+      "path": "docs/actions/ACTIONS-DEC-2026-0102-457.md",
+      "type": "action",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "actions",
+      "tags": [
+        "actions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "TODO",
+      "title": "ACTIONS-DEC-2026-0102-457",
+      "created_at": "2026-01-02",
+      "checksum": "48233a1b"
+    },
+    {
+      "id": "DEC-2026-0102-837",
+      "path": "docs/actions/ACTIONS-DEC-2026-0102-837.md",
+      "type": "action",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "actions",
+      "tags": [
+        "actions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "TODO",
+      "title": "ACTIONS-DEC-2026-0102-837",
+      "created_at": "2026-01-02",
+      "checksum": "b29b5cca"
+    },
+    {
+      "id": "DEC-2026-0102-933",
+      "path": "docs/actions/ACTIONS-DEC-2026-0102-933.md",
+      "type": "action",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "actions",
+      "tags": [
+        "actions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "TODO",
+      "title": "ACTIONS-DEC-2026-0102-933",
+      "created_at": "2026-01-02",
+      "checksum": "23ce7717"
+    },
+    {
+      "id": "DEC-2026-0102-937",
+      "path": "docs/actions/ACTIONS-DEC-2026-0102-937.md",
+      "type": "action",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "actions",
+      "tags": [
+        "actions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "Action Items",
+      "created_at": "2026-01-02",
+      "checksum": "da882984"
+    },
+    {
+      "id": "DEC-2026-0103-271",
+      "path": "docs/actions/ACTIONS-DEC-2026-0103-271.md",
+      "type": "action",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "actions",
+      "tags": [
+        "actions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "TODO",
+      "title": "ACTIONS-DEC-2026-0103-271",
+      "created_at": "2026-01-02",
+      "checksum": "589e41a8"
+    },
+    {
+      "id": "DEC-2026-0103-316",
+      "path": "docs/actions/ACTIONS-DEC-2026-0103-316.md",
+      "type": "action",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "actions",
+      "tags": [
+        "actions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "TODO",
+      "title": "ACTIONS-DEC-2026-0103-316",
+      "created_at": "2026-01-02",
+      "checksum": "0c0f7ab3"
+    },
+    {
+      "id": "DEC-2026-0103-325",
+      "path": "docs/actions/ACTIONS-DEC-2026-0103-325.md",
+      "type": "action",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "actions",
+      "tags": [
+        "actions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "TODO",
+      "title": "ACTIONS-DEC-2026-0103-325",
+      "created_at": "2026-01-02",
+      "checksum": "3fa8b630"
+    },
+    {
+      "id": "DEC-2026-0103-371",
+      "path": "docs/actions/ACTIONS-DEC-2026-0103-371.md",
+      "type": "action",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "actions",
+      "tags": [
+        "actions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "TODO",
+      "title": "ACTIONS-DEC-2026-0103-371",
+      "created_at": "2026-01-02",
+      "checksum": "a0abe154"
+    },
+    {
+      "id": "DEC-2026-0103-590",
+      "path": "docs/actions/ACTIONS-DEC-2026-0103-590.md",
+      "type": "action",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "actions",
+      "tags": [
+        "actions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "TODO",
+      "title": "ACTIONS-DEC-2026-0103-590",
+      "created_at": "2026-01-02",
+      "checksum": "24ceed1e"
+    },
+    {
+      "id": "DEC-2026-0103-638",
+      "path": "docs/actions/ACTIONS-DEC-2026-0103-638.md",
+      "type": "action",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "actions",
+      "tags": [
+        "actions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "TODO",
+      "title": "ACTIONS-DEC-2026-0103-638",
+      "created_at": "2026-01-02",
+      "checksum": "cb5c94cd"
+    },
+    {
+      "id": "DEC-2026-0103-858",
+      "path": "docs/actions/ACTIONS-DEC-2026-0103-858.md",
+      "type": "action",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "actions",
+      "tags": [
+        "actions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "TODO",
+      "title": "ACTIONS-DEC-2026-0103-858",
+      "created_at": "2026-01-02",
+      "checksum": "d176fe17"
+    },
+    {
+      "id": "DEC-2026-0102-045",
+      "path": "docs/decisions/DEC-2026-0102-045.md",
+      "type": "decision",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "decisions",
+      "tags": [
+        "decisions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "pending_approval",
+      "title": "DEC-2026-0102-045",
+      "created_at": "2026-01-02",
+      "checksum": "a3443715"
+    },
+    {
+      "id": "DEC-2026-0102-121",
+      "path": "docs/decisions/DEC-2026-0102-121.md",
+      "type": "decision",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "decisions",
+      "tags": [
+        "decisions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "pending_approval",
+      "title": "���α� ������ ���� ����",
+      "created_at": "2026-01-02",
+      "checksum": "cc9dca04"
+    },
+    {
+      "id": "DEC-2026-0102-457",
+      "path": "docs/decisions/DEC-2026-0102-457.md",
+      "type": "decision",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "decisions",
+      "tags": [
+        "decisions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "pending_approval",
+      "title": "DEC-2026-0102-457",
+      "created_at": "2026-01-02",
+      "checksum": "5824be27"
+    },
+    {
+      "id": "DEC-2026-0102-837",
+      "path": "docs/decisions/DEC-2026-0102-837.md",
+      "type": "decision",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "decisions",
+      "tags": [
+        "decisions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "pending_approval",
+      "title": "DEC-2026-0102-837",
+      "created_at": "2026-01-02",
+      "checksum": "87865989"
+    },
+    {
+      "id": "DEC-2026-0102-933",
+      "path": "docs/decisions/DEC-2026-0102-933.md",
+      "type": "decision",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "decisions",
+      "tags": [
+        "decisions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "pending_approval",
+      "title": "DEC-2026-0102-933",
+      "created_at": "2026-01-02",
+      "checksum": "2c55071b"
+    },
+    {
+      "id": "DEC-2026-0102-937",
+      "path": "docs/decisions/DEC-2026-0102-937.md",
+      "type": "decision",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "decisions",
+      "tags": [
+        "decisions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "pending_approval",
+      "title": "�ν�Ÿ�׷� ���� ķ���� ���� ����",
+      "created_at": "2026-01-02",
+      "checksum": "2ac983a5"
+    },
+    {
+      "id": "DEC-2026-0103-271",
+      "path": "docs/decisions/DEC-2026-0103-271.md",
+      "type": "decision",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "decisions",
+      "tags": [
+        "decisions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "pending_approval",
+      "title": "DEC-2026-0103-271",
+      "created_at": "2026-01-02",
+      "checksum": "89e9dcdd"
+    },
+    {
+      "id": "DEC-2026-0103-316",
+      "path": "docs/decisions/DEC-2026-0103-316.md",
+      "type": "decision",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "decisions",
+      "tags": [
+        "decisions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "pending_approval",
+      "title": "DEC-2026-0103-316",
+      "created_at": "2026-01-02",
+      "checksum": "b23adde2"
+    },
+    {
+      "id": "DEC-2026-0103-325",
+      "path": "docs/decisions/DEC-2026-0103-325.md",
+      "type": "decision",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "decisions",
+      "tags": [
+        "decisions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "pending_approval",
+      "title": "DEC-2026-0103-325",
+      "created_at": "2026-01-02",
+      "checksum": "4514839e"
+    },
+    {
+      "id": "DEC-2026-0103-371",
+      "path": "docs/decisions/DEC-2026-0103-371.md",
+      "type": "decision",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "decisions",
+      "tags": [
+        "decisions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "pending_approval",
+      "title": "DEC-2026-0103-371",
+      "created_at": "2026-01-02",
+      "checksum": "c5abeaee"
+    },
+    {
+      "id": "DEC-2026-0103-590",
+      "path": "docs/decisions/DEC-2026-0103-590.md",
+      "type": "decision",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "decisions",
+      "tags": [
+        "decisions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "pending_approval",
+      "title": "DEC-2026-0103-590",
+      "created_at": "2026-01-02",
+      "checksum": "e310684a"
+    },
+    {
+      "id": "DEC-2026-0103-638",
+      "path": "docs/decisions/DEC-2026-0103-638.md",
+      "type": "decision",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "decisions",
+      "tags": [
+        "decisions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "pending_approval",
+      "title": "DEC-2026-0103-638",
+      "created_at": "2026-01-02",
+      "checksum": "ee58d7c2"
+    },
+    {
+      "id": "DEC-2026-0103-858",
+      "path": "docs/decisions/DEC-2026-0103-858.md",
+      "type": "decision",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "decisions",
+      "tags": [
+        "decisions",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "pending_approval",
+      "title": "DEC-2026-0103-858",
+      "created_at": "2026-01-02",
+      "checksum": "326d05d7"
+    },
+    {
+      "id": "EXP-2026-0103-158",
+      "path": "docs/explores/EXP-2026-0103-158.md",
+      "type": "explore",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "explores",
+      "tags": [
+        "explores",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "EXP-2026-0103-158",
+      "created_at": "2026-01-02",
+      "checksum": "2d8e5043"
+    },
+    {
+      "id": "EXP-2026-0103-410",
+      "path": "docs/explores/EXP-2026-0103-410.md",
+      "type": "explore",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "explores",
+      "tags": [
+        "explores",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "EXP-2026-0103-410",
+      "created_at": "2026-01-02",
+      "checksum": "0acb0973"
+    },
+    {
+      "id": "EXP-2026-0103-452",
+      "path": "docs/explores/EXP-2026-0103-452.md",
+      "type": "explore",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "explores",
+      "tags": [
+        "explores",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "EXP-2026-0103-452",
+      "created_at": "2026-01-02",
+      "checksum": "357d524c"
+    },
+    {
+      "id": "DOC-2025-12-30_소원5문항_gem유지_결정서",
+      "path": "docs/conversations/2025-12/2025-12-30_소원5문항_gem유지_결정서.md",
+      "type": "conversation",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "conversations",
+      "tags": [
+        "2025-12",
+        "소원",
+        "결제"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "2025-12-30 소원5문항 gem유지 결정서",
+      "created_at": "2025-12-30",
+      "checksum": "6645a65b"
+    },
+    {
+      "id": "DEC-2025-1230-001",
+      "path": "docs/decisions/DEC-2025-1230-001_소원그림_문구_시스템.md",
+      "type": "decision",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "decisions",
+      "tags": [
+        "decisions",
+        "소원"
+      ],
+      "owner": "comi",
+      "status": "만장일치 승인",
+      "title": "소원그림 문구 시스템",
+      "created_at": "2025-12-30",
+      "checksum": "3c8cde21"
+    },
+    {
+      "id": "DEC-2025-1230-002",
+      "path": "docs/decisions/DEC-2025-1230-002_소원그림_광고_결정.md",
+      "type": "decision",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "decisions",
+      "tags": [
+        "decisions",
+        "소원"
+      ],
+      "owner": "comi",
+      "status": "조건부 승인",
+      "title": "소원그림 인스타 광고",
+      "created_at": "2025-12-30",
+      "checksum": "99e94f6b"
+    },
+    {
+      "id": "DEC-2025-1230-003",
+      "path": "docs/decisions/DEC-2025-1230-003_소원이_실시간_대응_시스템.md",
+      "type": "decision",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "decisions",
+      "tags": [
+        "decisions",
+        "소원"
+      ],
+      "owner": "rumi",
+      "status": "승인",
+      "title": "소원이 실시간 대응 시스템",
+      "created_at": "2025-12-30",
+      "checksum": "8aa3bb36"
+    },
+    {
+      "id": "DOC-EXEC-2025-1230-LUMI-001_광고운영_실",
+      "path": "docs/execution/EXEC-2025-1230-LUMI-001_광고운영_실행패키지.md",
+      "type": "execution",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "execution",
+      "tags": [
+        "execution",
+        "소원"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "EXEC-2025-1230-LUMI-001: 광고운영 실행 패키지",
+      "created_at": "2025-12-30",
+      "checksum": "75f14811"
+    },
+    {
+      "id": "DOC-SYS-2025-1230-LUMI-001_Airtabl",
+      "path": "docs/system/SYS-2025-1230-LUMI-001_Airtable_자동화_설계서.md",
+      "type": "system",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "system",
+      "tags": [
+        "system",
+        "소원",
+        "automation"
+      ],
+      "owner": "rumi",
+      "status": "NEW, ACK, IN_PROGRESS, APPROVED, STARTED, DONE",
+      "title": "SYS-2025-1230-LUMI-001: Airtable 자동화 설계서",
+      "created_at": "2025-12-30",
+      "checksum": "5f1b9ee6"
+    },
+    {
+      "id": "DOC-2025-12-29_Part1_최수민방식QA",
+      "path": "docs/conversations/2025-12/2025-12-29_Part1_최수민방식QA.md",
+      "type": "conversation",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "conversations",
+      "tags": [
+        "최수민",
+        "QA",
+        "에이전틱",
+        "피드백루프",
+        "2025-12"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "Part 1: 최수민님 방식 Q&A 분석",
+      "created_at": "2025-12-29",
+      "checksum": "4d99ff05"
+    },
+    {
+      "id": "DOC-2025-12-29_Part2_컨텍스트관리",
+      "path": "docs/conversations/2025-12/2025-12-29_Part2_컨텍스트관리.md",
+      "type": "conversation",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "conversations",
+      "tags": [
+        "컨텍스트",
+        "최수민",
+        "스크립트화",
+        "배치처리",
+        "2025-12",
+        "소원"
+      ],
+      "owner": "code",
+      "status": "archived",
+      "title": "Part 2: 컨텍스트 관리 지침",
+      "created_at": "2025-12-29",
+      "checksum": "0b928f6b"
+    },
+    {
+      "id": "DOC-2025-12-29_Part3_자가검증",
+      "path": "docs/conversations/2025-12/2025-12-29_Part3_자가검증.md",
+      "type": "conversation",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "conversations",
+      "tags": [
+        "자가검증",
+        "도그푸딩",
+        "품질관리",
+        "최수민",
+        "2025-12"
+      ],
+      "owner": "rumi",
+      "status": "superseded",
+      "title": "Part 3: 자가 검증 시스템",
+      "created_at": "2025-12-29",
+      "checksum": "a70ca3a6"
+    },
+    {
+      "id": "DOC-2025-12-29_Part4_지식관리",
+      "path": "docs/conversations/2025-12/2025-12-29_Part4_지식관리.md",
+      "type": "conversation",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "conversations",
+      "tags": [
+        "지식관리",
+        "docs",
+        "에이전트",
+        "검색",
+        "분석",
+        "2025-12"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "Part 4: 지식 관리 시스템",
+      "created_at": "2025-12-29",
+      "checksum": "bb635330"
+    },
+    {
+      "id": "DOC-2025-12-29_Part5_selfchecker",
+      "path": "docs/conversations/2025-12/2025-12-29_Part5_selfchecker.md",
+      "type": "conversation",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "conversations",
+      "tags": [
+        "self-checker",
+        "자가점검",
+        "품질관리",
+        "스킬",
+        "2025-12",
+        "소원"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "Part 5: self-checker 스킬",
+      "created_at": "2025-12-29",
+      "checksum": "e94300bb"
+    },
+    {
+      "id": "DOC-2025-12-29_Part6_소원착지전략",
+      "path": "docs/conversations/2025-12/2025-12-29_Part6_소원착지전략.md",
+      "type": "conversation",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "conversations",
+      "tags": [
+        "소원착지",
+        "전략",
+        "프로젝트",
+        "에이전트",
+        "2025-12",
+        "소원",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "Part 6: 소원착지 전략",
+      "created_at": "2025-12-29",
+      "checksum": "50f50b35"
+    },
+    {
+      "id": "DOC-2025-12-29_Part7_전략수정",
+      "path": "docs/conversations/2025-12/2025-12-29_Part7_전략수정.md",
+      "type": "conversation",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "conversations",
+      "tags": [
+        "전략수정",
+        "자가점검",
+        "최수민",
+        "소원착지",
+        "2025-12",
+        "소원"
+      ],
+      "owner": "team",
+      "status": "superseded",
+      "title": "Part 7: 전략 수정",
+      "created_at": "2025-12-29",
+      "checksum": "2f4ece45"
+    },
+    {
+      "id": "DOC-2025-12-29_최수민방식적용",
+      "path": "docs/conversations/2025-12/2025-12-29_최수민방식적용.md",
+      "type": "conversation",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "conversations",
+      "tags": [
+        "에이전틱",
+        "최수민",
+        "컨텍스트관리",
+        "피드백루프",
+        "지식관리",
+        "self-checker",
+        "소원착지",
+        "2025-12",
+        "소원"
+      ],
+      "owner": "comi",
+      "status": "active",
+      "title": "2025-12-29 대화 요약",
+      "created_at": "2025-12-29",
+      "checksum": "0f3b3b93"
+    },
+    {
+      "id": "DOC-inquiry-form-api",
+      "path": "docs/api/inquiry-form-api.md",
+      "type": "api",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "api",
+      "tags": [
+        "api",
+        "소원",
+        "결제"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "MVP 1차 폼 (간편 접수) API v1.0",
+      "created_at": "`YYYY-MM-DD`",
+      "checksum": "34d89bb2"
+    }
+  ]
+}
