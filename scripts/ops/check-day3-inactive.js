@@ -92,8 +92,8 @@ async function findInactiveTrialUsers() {
   targetDate.setDate(today.getDate() - INACTIVE_THRESHOLD_DAYS);
   const targetDateStr = targetDate.toISOString().slice(0, 10);
 
-  // 3일 전 trial_start 이벤트 조회
-  const trialEvents = readEvents({
+  // 3일 전 trial_start 이벤트 조회 (async - DB 우선)
+  const trialEvents = await readEvents({
     event: EVENT_TYPES.TRIAL_START,
     date: targetDateStr
   });
@@ -110,7 +110,7 @@ async function findInactiveTrialUsers() {
 
   // 이미 day3_inactive 로깅된 사용자 제외
   const alreadyLogged = new Set();
-  const day3Events = readEvents({ event: EVENT_TYPES.DAY3_INACTIVE });
+  const day3Events = await readEvents({ event: EVENT_TYPES.DAY3_INACTIVE });
   for (const e of day3Events) {
     if (e.phone) alreadyLogged.add(e.phone);
     if (e.wish_id) alreadyLogged.add(e.wish_id);
