@@ -1,0 +1,99 @@
+name: Manual DEC Run (ad-hoc draft + report)
+
+on:
+  workflow_dispatch:
+    inputs:
+      query:
+        description: '검색/토론 쿼리 (필수)'
+        required: true
+        type: string
+      scopes:
+        description: '검색 범위 (decisions,system,execution,team,all)'
+        required: false
+        default: 'all'
+        type: string
+      mode:
+        description: '요약 모드 (general|decision|action)'
+        required: false
+        default: 'decision'
+        type: choice
+        options:
+          - general
+          - decision
+          - action
+      k:
+        description: '상위 결과 개수'
+        required: false
+        default: '5'
+        type: string
+      decider:
+        description: 'DRAFT 메타에 기록할 승인자(기본: 미정)'
+        required: false
+        default: '미정'
+        type: string
+      delete_draft:
+        description: '생성 후 DRAFT 삭제(기본: false) — 보통 false 권장'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+      notify:
+        description: '리포트 알림(webhook 설정 시만 동작)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+jobs:
+  manual-dec:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run debate-trigger (generate DEC DRAFT only)
+        run: |
+          echo "Query=${{ inputs.query }}"
+          echo "Scopes=${{ inputs.scopes }}"
+          echo "Mode=${{ inputs.mode }}"
+          echo "K=${{ inputs.k }}"
+          node scripts/debate-trigger.js \
+            --query "${{ inputs.query }}" \
+            --scopes "${{ inputs.scopes }}" \
+            --mode "${{ inputs.mode }}" \
+            --k "${{ inputs.k }}" \
+            --generate-dec-draft \
+            --decider "${{ inputs.decider }}" \
+            --log
+
+      - name: Optionally delete generated drafts (manual)
+        if: ${{ inputs.delete_draft == 'true' }}
+        run: |
+          echo "Deleting DEC-DRAFT files created today (best-effort)..."
+          # 안전하게 최근 생성된 DRAFT만 정리하려면 로직 강화 가능 (현 단계는 best-effort)
+          rm -f docs/decisions/DEC-DRAFT-*.md || true
+
+      - name: Generate daily DEC report + notify if configured
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ "${{ inputs.notify }}" = "true" ]; then
+            node scripts/ops/daily-dec-report.js --log --notify
+          else
+            node scripts/ops/daily-dec-report.js --log
+          fi
