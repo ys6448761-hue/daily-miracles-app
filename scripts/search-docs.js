@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 /**
- * 문서 검색 에이전트 v1.2
- * Context Bundle 생성 + Telemetry 지원
+ * 문서 검색 에이전트 v1.3
+ * Context Bundle 생성 + Telemetry + Manifest 기반 검색 지원
  *
  * 사용법:
  *   node scripts/search-docs.js --query "신호등 시스템"
  *   node scripts/search-docs.js --query "Airtable" --scopes decisions,system --format json
  *   node scripts/search-docs.js --query "소원그림" --k 10 --out artifacts/context_bundle.md
  *   node scripts/search-docs.js --query "신호등" --log  # 텔레메트리 로깅
+ *   node scripts/search-docs.js --query "DEC-2026" --scopes decisions --use-manifest  # Manifest 우선 검색
  *
  * 옵션:
  *   --query           검색어 (필수)
@@ -18,6 +19,8 @@
  *   --include-snippet 스니펫 포함 여부 (true|false) 기본: true
  *   --max-snippet-chars 스니펫 최대 문자수 (기본: 400)
  *   --recency-bias    최신 문서 가중치 (on|off) 기본: on
+ *   --use-manifest    decisions 스코프에서 manifest 우선 사용 (기본: true)
+ *   --deep            manifest 매칭 있어도 파일 스캔 병행 (기본: false)
  *   --log             텔레메트리 로그 기록 (artifacts/search_logs.ndjson)
  *   -i, --interactive 인터랙티브 모드
  */
@@ -62,6 +65,8 @@ function parseArgs(args) {
     includeSnippet: true,
     maxSnippetChars: 400,
     recencyBias: true,
+    useManifest: true,
+    deep: false,
     interactive: false,
     log: false
   };
@@ -103,6 +108,16 @@ function parseArgs(args) {
       result.recencyBias = args[++i] !== 'off';
     } else if (arg.startsWith('--recency-bias=')) {
       result.recencyBias = arg.split('=')[1] !== 'off';
+    } else if (arg === '--use-manifest') {
+      result.useManifest = true;
+    } else if (arg === '--use-manifest=false' || arg === '--no-manifest') {
+      result.useManifest = false;
+    } else if (arg.startsWith('--use-manifest=')) {
+      result.useManifest = arg.split('=')[1] !== 'false';
+    } else if (arg === '--deep') {
+      result.deep = true;
+    } else if (arg.startsWith('--deep=')) {
+      result.deep = arg.split('=')[1] === 'true';
     } else if (arg === '--log') {
       result.log = true;
     }
@@ -258,6 +273,156 @@ function calculateRecencyScore(dateStr) {
 }
 
 /**
+ * Manifest 로드
+ */
+function loadManifest() {
+  const manifestPath = path.join(__dirname, '..', 'docs', 'manifest.json');
+
+  if (!fs.existsSync(manifestPath)) {
+    return null;
+  }
+
+  try {
+    const content = fs.readFileSync(manifestPath, 'utf-8');
+    return JSON.parse(content);
+  } catch (e) {
+    return null;
+  }
+}
+
+/**
+ * Manifest 기반 검색 (Stage 1: Fast Path)
+ */
+function searchManifest(query, options) {
+  const manifest = loadManifest();
+
+  if (!manifest || !manifest.decisions || manifest.decisions.length === 0) {
+    return { results: [], source: 'manifest' };
+  }
+
+  const queryLower = query.toLowerCase();
+  const keywords = queryLower.split(/\s+/).filter(k => k.length > 1);
+  const results = [];
+
+  for (const dec of manifest.decisions) {
+    const idLower = (dec.id || '').toLowerCase();
+    const titleLower = (dec.title || '').toLowerCase();
+    const approverLower = (dec.approved_by || '').toLowerCase();
+
+    let score = 0;
+    let matchType = null;
+
+    // ID 직접 매칭 (최고 점수)
+    if (idLower === queryLower || idLower.includes(queryLower)) {
+      score = 0.95;
+      matchType = 'id_direct';
+    }
+    // Title 직접 매칭
+    else if (titleLower === queryLower) {
+      score = 0.95;
+      matchType = 'title_direct';
+    }
+    // 키워드 부분 매칭
+    else {
+      let matchCount = 0;
+      for (const kw of keywords) {
+        if (idLower.includes(kw) || titleLower.includes(kw) || approverLower.includes(kw)) {
+          matchCount++;
+        }
+      }
+
+      if (matchCount > 0) {
+        // 부분 매칭: 키워드 비율에 따라 0.70-0.85
+        score = 0.70 + (matchCount / keywords.length) * 0.15;
+        matchType = 'partial';
+      }
+    }
+
+    if (score > 0) {
+      // Recency bias 적용
+      if (options.recencyBias && dec.date) {
+        score *= (1 + calculateRecencyScore(dec.date));
+        score = Math.min(1, score); // 1.0 초과 방지
+      }
+
+      results.push({
+        path: dec.path,
+        score: parseFloat(score.toFixed(2)),
+        updated_at: dec.date,
+        title: dec.title,
+        snippet: `[Manifest] ${dec.title} - 승인자: ${dec.approved_by}`,
+        highlights: keywords.filter(kw =>
+          idLower.includes(kw) || titleLower.includes(kw)
+        ),
+        _matchType: matchType,
+        _source: 'manifest'
+      });
+    }
+  }
+
+  // 점수순 정렬
+  results.sort((a, b) => b.score - a.score);
+
+  return { results, source: 'manifest' };
+}
+
+/**
+ * 2-Stage 검색: decisions 스코프용
+ */
+function searchDecisionsWithManifest(options) {
+  const { query, k, deep } = options;
+
+  // Stage 1: Manifest 검색
+  const manifestSearch = searchManifest(query, options);
+  let results = manifestSearch.results;
+  let source = 'manifest';
+
+  // Stage 2: Fallback 또는 Deep 모드
+  const needsFallback = results.length === 0;
+  const needsDeep = deep && results.length > 0;
+
+  if (needsFallback || needsDeep) {
+    // 파일 시스템 검색
+    const fsResults = searchDocumentsFilesystem({
+      ...options,
+      scopes: ['decisions']
+    });
+
+    if (needsFallback) {
+      // Fallback: 파일 스캔 결과만 사용
+      results = fsResults;
+      source = 'filesystem';
+    } else if (needsDeep) {
+      // Deep: 병합 (manifest 결과 우선, 중복 제거)
+      const existingPaths = new Set(results.map(r => r.path));
+
+      for (const fsResult of fsResults) {
+        if (!existingPaths.has(fsResult.path)) {
+          // 파일 스캔 결과는 source 표시
+          fsResult._source = 'filesystem';
+          results.push(fsResult);
+        } else {
+          // 이미 있는 항목: snippet 보강
+          const existing = results.find(r => r.path === fsResult.path);
+          if (existing && fsResult.snippet && !existing.snippet.startsWith('[Manifest]')) {
+            existing.snippet = fsResult.snippet;
+            existing._source = 'manifest+filesystem';
+          }
+        }
+      }
+
+      source = 'manifest+filesystem';
+    }
+  }
+
+  // 점수순 정렬 후 Top K
+  results.sort((a, b) => b.score - a.score);
+  results = results.slice(0, k);
+
+  return { results, source };
+}
+
+/**
  * 디렉토리 재귀 탐색
  */
 function walkDir(dir, fileList = []) {
@@ -311,9 +476,9 @@ function getFilesInScopes(scopes) {
 }
 
 /**
- * 문서 검색 및 스코어링
+ * 파일 시스템 기반 문서 검색 (기존 로직)
  */
-function searchDocuments(options) {
+function searchDocumentsFilesystem(options) {
   const { query, scopes, k, includeSnippet, maxSnippetChars, recencyBias } = options;
 
   if (!query) return [];
@@ -386,6 +551,55 @@ function searchDocuments(options) {
   return results
     .sort((a, b) => b.score - a.score)
     .slice(0, k);
+}
+
+/**
+ * 문서 검색 메인 함수 (2-Stage 검색 지원)
+ */
+function searchDocuments(options) {
+  const { scopes, useManifest } = options;
+
+  // decisions 스코프이고 useManifest가 true인 경우 2-Stage 검색
+  const isDecisionsOnly = scopes.length === 1 && scopes[0] === 'decisions';
+  const includesDecisions = scopes.includes('decisions') || scopes.includes('all');
+
+  if (useManifest && isDecisionsOnly) {
+    // decisions 단독 스코프: 2-Stage 검색
+    const { results, source } = searchDecisionsWithManifest(options);
+    // source 정보를 results에 첨부 (로깅용)
+    results._searchSource = source;
+    return results;
+  } else if (useManifest && includesDecisions && scopes.length > 1) {
+    // 복합 스코프: decisions는 manifest로, 나머지는 filesystem으로
+    const otherScopes = scopes.filter(s => s !== 'decisions' && s !== 'all');
+
+    // decisions manifest 검색
+    const { results: manifestResults, source: manifestSource } = searchDecisionsWithManifest({
+      ...options,
+      scopes: ['decisions']
+    });
+
+    // 나머지 스코프 filesystem 검색
+    let fsResults = [];
+    if (otherScopes.length > 0 || scopes.includes('all')) {
+      fsResults = searchDocumentsFilesystem({
+        ...options,
+        scopes: scopes.includes('all') ? ['system', 'execution', 'team'] : otherScopes
+      });
+    }
+
+    // 병합 및 정렬
+    const combined = [...manifestResults, ...fsResults];
+    combined.sort((a, b) => b.score - a.score);
+    const results = combined.slice(0, options.k);
+    results._searchSource = manifestResults.length > 0 ? 'manifest+filesystem' : 'filesystem';
+    return results;
+  } else {
+    // manifest 미사용 또는 decisions 미포함: 기존 filesystem 검색
+    const results = searchDocumentsFilesystem(options);
+    results._searchSource = 'filesystem';
+    return results;
+  }
 }
 
 /**
@@ -474,13 +688,19 @@ function writeSearchLog(options, results, runtimeMs) {
     fs.mkdirSync(logDir, { recursive: true });
   }
 
+  // source 정보 추출 (결과 배열에 첨부된 _searchSource 사용)
+  const source = results._searchSource || 'filesystem';
+
   const logEntry = {
     timestamp: new Date().toISOString(),
     type: 'search',
+    source: source,
     query: options.query,
     scopes: options.scopes,
     k: options.k,
     format: options.format,
+    use_manifest: options.useManifest,
+    deep: options.deep,
     top_results: results.slice(0, 5).map(r => r.path),
     result_count: results.length,
     runtime_ms: runtimeMs
@@ -495,8 +715,8 @@ function writeSearchLog(options, results, runtimeMs) {
  */
 function printUsage() {
   console.log(`
-${colors.bold}문서 검색 에이전트 v1.1${colors.reset}
-Context Bundle 생성 지원
+${colors.bold}문서 검색 에이전트 v1.3${colors.reset}
+Context Bundle 생성 + Manifest 기반 검색 지원
 
 ${colors.cyan}사용법:${colors.reset}
   node scripts/search-docs.js --query "검색어" [옵션]
@@ -510,13 +730,16 @@ ${colors.cyan}옵션:${colors.reset}
   --include-snippet   스니펫 포함 여부 (true|false) 기본: true
   --max-snippet-chars 스니펫 최대 문자수 (기본: 400)
   --recency-bias      최신 문서 가중치 (on|off) 기본: on
-  --log               텔레메트리 로그 기록 (P4-3)
+  --use-manifest      decisions 스코프에서 manifest 우선 사용 (기본: true)
+  --deep              manifest 매칭 있어도 파일 스캔 병행 (기본: false)
+  --log               텔레메트리 로그 기록
   -i, --interactive   인터랙티브 모드
 
 ${colors.cyan}예시:${colors.reset}
   node scripts/search-docs.js --query "신호등 시스템" --scopes decisions --format md
+  node scripts/search-docs.js --query "DEC-2026" --scopes decisions --log  # Manifest 우선
+  node scripts/search-docs.js --query "신호등" --scopes decisions --deep   # 병행 검색
   node scripts/search-docs.js --query "Airtable" --format json --k 10 --out artifacts/bundle.json
-  node scripts/search-docs.js --query "소원그림" --scopes all --out artifacts/context_bundle.md
 `);
 }
 

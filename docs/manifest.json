@@ -1,3 +1,25 @@
 {
-  "decisions": []
+  "decisions": [
+    {
+      "id": "DEC-2025-1230-003",
+      "title": "소원이 실시간 대응 시스템",
+      "date": "2025-12-30",
+      "approved_by": "푸르미르",
+      "path": "docs/decisions/DEC-2025-1230-003_소원이_실시간_대응_시스템.md"
+    },
+    {
+      "id": "DEC-2025-1230-002",
+      "title": "소원그림 인스타 광고",
+      "date": "2025-12-30",
+      "approved_by": "푸르미르",
+      "path": "docs/decisions/DEC-2025-1230-002_소원그림_광고_결정.md"
+    },
+    {
+      "id": "DEC-2025-1230-001",
+      "title": "소원그림 문구 시스템",
+      "date": "2025-12-30",
+      "approved_by": "푸르미르",
+      "path": "docs/decisions/DEC-2025-1230-001_소원그림_문구_시스템.md"
+    }
+  ]
 }
