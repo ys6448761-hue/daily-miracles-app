@@ -97,3 +97,23 @@ jobs:
           else
             node scripts/ops/daily-dec-report.js --log
           fi
+
+      - name: Upload run results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: manual-run-results
+          path: |
+            artifacts/reports/nightly-run-*.json
+            artifacts/reports/daily-dec-report-*.md
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload generated drafts
+        if: ${{ inputs.delete_draft != 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: manual-dec-drafts
+          path: docs/decisions/DEC-DRAFT-*.md
+          if-no-files-found: ignore
+          retention-days: 7

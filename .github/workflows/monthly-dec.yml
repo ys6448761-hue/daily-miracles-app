@@ -31,3 +31,22 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: node scripts/ops/daily-dec-report.js --log --notify
+
+      - name: Upload run results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: monthly-run-results
+          path: |
+            artifacts/reports/nightly-run-*.json
+            artifacts/reports/daily-dec-report-*.md
+          if-no-files-found: ignore
+          retention-days: 90
+
+      - name: Upload generated drafts
+        uses: actions/upload-artifact@v4
+        with:
+          name: monthly-dec-drafts
+          path: docs/decisions/DEC-DRAFT-*.md
+          if-no-files-found: ignore
+          retention-days: 30
