@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 /**
- * 토론 트리거 오케스트레이터 v2.0
- * P6-1: search → bundle → summarize → (optional) DEC DRAFT 생성
+ * 토론 트리거 오케스트레이터 v2.1
+ * P6-2: search → bundle → summarize → DEC DRAFT → (optional) 정식 DEC 승격
  *
  * 사용법:
  *   node scripts/debate-trigger.js --query "신호등 시스템"
  *   node scripts/debate-trigger.js --query "Airtable" --scopes system,execution --mode action --log
  *   node scripts/debate-trigger.js --query "신호등" --generate-dec-draft --log
+ *   node scripts/debate-trigger.js --query "신호등" --generate-dec-draft --promote --decider "푸르미르" --log
  *
  * 옵션:
  *   --query             검색/토론 쿼리 (필수)
@@ -19,6 +20,8 @@
  *   --generate-dec-draft  DEC DRAFT 자동 생성 (기본: false)
  *   --dec-out           DRAFT 출력 경로 오버라이드
  *   --decider           DRAFT 메타에 기록할 승인자 (기본: 미정)
+ *   --promote           DRAFT → 정식 DEC 승격 (--generate-dec-draft 필요)
+ *   --delete-draft      승격 후 DRAFT 파일 삭제 (기본: false)
  *   --log               텔레메트리 로그 기록
  */
 
@@ -41,7 +44,9 @@ function parseArgs(args) {
     log: false,
     generateDecDraft: false,
     decOut: null,
-    decider: '미정'
+    decider: '미정',
+    promote: false,
+    deleteDraft: false
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -87,6 +92,10 @@ function parseArgs(args) {
       result.decider = args[++i];
     } else if (arg.startsWith('--decider=')) {
       result.decider = arg.split('=').slice(1).join('=');
+    } else if (arg === '--promote') {
+      result.promote = true;
+    } else if (arg === '--delete-draft') {
+      result.deleteDraft = true;
     }
   }
 
@@ -98,8 +107,8 @@ function parseArgs(args) {
  */
 function printUsage() {
   console.log(`
-토론 트리거 오케스트레이터 v2.0 (P6-1)
-search → bundle → summarize → (optional) DEC DRAFT 생성
+토론 트리거 오케스트레이터 v2.1 (P6-2)
+search → bundle → summarize → DEC DRAFT → (optional) 정식 DEC 승격
 
 사용법:
   node scripts/debate-trigger.js --query "검색어" [옵션]
@@ -117,6 +126,8 @@ search → bundle → summarize → (optional) DEC DRAFT 생성
   --generate-dec-draft DEC DRAFT 자동 생성 (기본: false)
   --dec-out            DRAFT 출력 경로 오버라이드
   --decider            DRAFT 메타에 기록할 승인자 (기본: 미정)
+  --promote            DRAFT → 정식 DEC 승격 (--generate-dec-draft 필요)
+  --delete-draft       승격 후 DRAFT 파일 삭제 (기본: false)
   --log                텔레메트리 로그 기록
 
 예시:
@@ -124,7 +135,7 @@ search → bundle → summarize → (optional) DEC DRAFT 생성
   node scripts/debate-trigger.js --query "Airtable" --scopes system,execution --mode action
   node scripts/debate-trigger.js --query "소원그림" --scopes all --k 8 --mode general --log
   node scripts/debate-trigger.js --query "신호등" --generate-dec-draft --log
-  node scripts/debate-trigger.js --query "API 설계" --generate-dec-draft --decider "푸르미르" --log
+  node scripts/debate-trigger.js --query "API 설계" --generate-dec-draft --promote --decider "푸르미르" --log
 `);
 }
 
@@ -262,11 +273,63 @@ function runDecGenerate(options) {
 }
 
 /**
- * Step D: 결과 요약 출력
+ * Step D: dec-approve.js 실행 (DRAFT → 정식 DEC 승격)
+ * @returns {object} { decPath, decNumber } 또는 null
+ */
+function runDecApprove(draftPath, options) {
+  console.log('🎖️  Step D: DEC 승격 중...');
+
+  const args = [
+    path.join(__dirname, 'dec-approve.js'),
+    '--in', draftPath,
+    '--decider', options.decider
+  ];
+
+  if (options.deleteDraft) {
+    args.push('--delete');
+  }
+
+  if (options.log) {
+    args.push('--log');
+  }
+
+  const result = spawnSync('node', args, {
+    cwd: path.join(__dirname, '..'),
+    encoding: 'utf-8',
+    stdio: ['inherit', 'pipe', 'pipe']
+  });
+
+  if (result.status !== 0) {
+    console.error('❌ Step D 실패: dec-approve.js');
+    if (result.stderr) console.error(result.stderr);
+    process.exit(1);
+  }
+
+  // stdout에서 정식 DEC 경로 파싱
+  const stdout = result.stdout || '';
+  const pathMatch = stdout.match(/저장 경로:\s*(.+\.md)/);
+  const decPath = pathMatch ? pathMatch[1].trim() : null;
+
+  const numMatch = stdout.match(/새 문서번호:\s*(DEC-[\d-]+)/);
+  const decNumber = numMatch ? numMatch[1].trim() : null;
+
+  if (decPath && decNumber) {
+    console.log(`   ✅ 정식 DEC 발행: ${decNumber}`);
+    console.log(`   저장 경로: ${decPath}`);
+  } else {
+    console.log(`   ✅ 정식 DEC 발행 완료`);
+  }
+
+  return { decPath, decNumber };
+}
+
+/**
+ * Step E: 결과 요약 출력
  * @param {object} options - CLI 옵션
  * @param {string|null} draftPath - 생성된 DRAFT 경로 (없으면 null)
+ * @param {object|null} approvedResult - 승격된 DEC 정보 { decPath, decNumber }
  */
-function printSummary(options, draftPath) {
+function printSummary(options, draftPath, approvedResult) {
   console.log('\n' + '='.repeat(50));
   console.log('✅ Debate trigger completed');
   console.log('='.repeat(50));
@@ -274,8 +337,11 @@ function printSummary(options, draftPath) {
   console.log(`\n📁 생성된 파일:`);
   console.log(`   - bundle:  ${options.bundleOut}`);
   console.log(`   - summary: ${options.summaryOut}`);
-  if (draftPath) {
+  if (draftPath && !options.deleteDraft) {
     console.log(`   - draft:   ${draftPath}`);
+  }
+  if (approvedResult && approvedResult.decPath) {
+    console.log(`   - DEC:     ${approvedResult.decPath}`);
   }
 
   // 번들에서 top 결과 읽기
@@ -331,6 +397,18 @@ function main() {
     process.exit(1);
   }
 
+  // --promote는 --generate-dec-draft 필요
+  if (options.promote && !options.generateDecDraft) {
+    console.error('❌ --promote 옵션은 --generate-dec-draft와 함께 사용해야 합니다.');
+    process.exit(1);
+  }
+
+  // --promote 시 decider 필수
+  if (options.promote && options.decider === '미정') {
+    console.error('❌ --promote 옵션 사용 시 --decider 지정이 필요합니다.');
+    process.exit(1);
+  }
+
   console.log('');
   console.log('🎯 토론 트리거 시작');
   console.log(`   Query: "${options.query}"`);
@@ -339,6 +417,9 @@ function main() {
   console.log(`   K: ${options.k}`);
   if (options.generateDecDraft) {
     console.log(`   DEC DRAFT: 활성화 (승인자: ${options.decider})`);
+  }
+  if (options.promote) {
+    console.log(`   승격: 활성화 → 정식 DEC 발행`);
   }
   console.log('');
 
@@ -357,8 +438,14 @@ function main() {
     draftPath = runDecGenerate(options);
   }
 
-  // Step D: 결과 출력
-  printSummary(options, draftPath);
+  // Step D: DEC 승격 (옵션)
+  let approvedResult = null;
+  if (options.promote && draftPath) {
+    approvedResult = runDecApprove(draftPath, options);
+  }
+
+  // Step E: 결과 출력
+  printSummary(options, draftPath, approvedResult);
 }
 
 main();
