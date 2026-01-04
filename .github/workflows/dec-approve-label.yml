@@ -1,112 +1,21 @@
-name: DEC Approve Label (comment trigger)
+name: DEC Approved Label Trigger
 
 on:
   issue_comment:
     types: [created]
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 jobs:
-  check-approve-command:
-    # PR 코멘트만 처리 (issue 코멘트 제외)
-    if: github.event.issue.pull_request && contains(github.event.comment.body, '/dec approved')
-    runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      pull-requests: write
-
-    steps:
-      - name: Ensure labels exist
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const labels = [
-              { name: 'DEC-PENDING', color: 'FBCA04', description: 'DEC 승인 대기 중' },
-              { name: 'DEC-APPROVED', color: '0E8A16', description: 'DEC 승인 완료' }
-            ];
-
-            for (const label of labels) {
-              try {
-                await github.rest.issues.getLabel({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  name: label.name
-                });
-              } catch (e) {
-                if (e.status === 404) {
-                  await github.rest.issues.createLabel({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    name: label.name,
-                    color: label.color,
-                    description: label.description
-                  });
-                  console.log(`Created label "${label.name}"`);
-                }
-              }
-            }
-
-      - name: Add DEC-APPROVED label
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const prNumber = context.payload.issue.number;
-            const commenter = context.payload.comment.user.login;
-
-            console.log(`Processing /dec approved command from @${commenter} on PR #${prNumber}`);
-
-            // DEC-APPROVED 라벨 추가
-            await github.rest.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: prNumber,
-              labels: ['DEC-APPROVED']
-            });
-
-            // DEC-PENDING 라벨 제거
-            try {
-              await github.rest.issues.removeLabel({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: prNumber,
-                name: 'DEC-PENDING'
-              });
-              console.log('Removed DEC-PENDING label');
-            } catch (e) {
-              if (e.status !== 404) {
-                throw e;
-              }
-            }
-
-            // 확인 리액션 추가
-            await github.rest.reactions.createForIssueComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: context.payload.comment.id,
-              content: 'rocket'
-            });
-
-            // 확인 코멘트 (상세)
-            const today = new Date();
-            const kst = new Date(today.getTime() + 9 * 60 * 60 * 1000);
-            const dateStr = kst.toISOString().slice(0, 10).replace(/-/g, '-');
-            const decPath = `docs/decisions/`;
-            const repoUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}`;
-
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: prNumber,
-              body: [
-                `## ✅ 정식 DEC 발행 완료`,
-                ``,
-                `**승인자**: @${commenter}`,
-                `**승인일**: ${dateStr}`,
-                ``,
-                `### 📄 DEC 문서 위치`,
-                `\`${decPath}DEC-${dateStr.replace(/-/g, '-')}-###.md\``,
-                ``,
-                `🔗 [DEC 문서 폴더 보기](${repoUrl}/tree/main/${decPath})`,
-                ``,
-                `---`,
-                `🏷️ 라벨: \`DEC-PENDING\` → \`DEC-APPROVED\``
-              ].join('\n')
-            });
+  approve-label:
+    # PR 코멘트이면서 "/dec approved" 포함할 때만
+    if: |
+      github.event.issue.pull_request != null &&
+      contains(github.event.comment.body, '/dec approved')
+    uses: ./.github/workflows/label-dec-status.yml
+    with:
+      pr_number: ${{ github.event.issue.number }}
+      status: approved

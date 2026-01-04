@@ -3,119 +3,83 @@ name: Label DEC Status (reusable)
 on:
   workflow_call:
     inputs:
-      status:
-        description: "DEC 상태 (pending|approved)"
-        required: true
-        type: string
-      remove_pending:
-        description: "DEC-PENDING 라벨 제거 여부 (approved 시 true)"
-        required: false
-        type: boolean
-        default: false
       pr_number:
-        description: "PR 번호 (없으면 현재 컨텍스트에서 추출)"
-        required: false
+        required: true
         type: number
-        default: 0
+      status:
+        required: true
+        type: string # pending | approved
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
 
 jobs:
   label:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      pull-requests: write
-
     steps:
-      - name: Ensure labels exist
+      - name: Ensure labels exist + apply status
         uses: actions/github-script@v7
         with:
           script: |
-            const labels = [
-              { name: 'DEC-PENDING', color: 'FBCA04', description: 'DEC 승인 대기 중' },
-              { name: 'DEC-APPROVED', color: '0E8A16', description: 'DEC 승인 완료' }
-            ];
+            const prNumber = Number(${{ inputs.pr_number }});
+            const status = String(${{ toJson(inputs.status) }}).toLowerCase();
 
-            for (const label of labels) {
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            const LABEL_PENDING = { name: "DEC-PENDING", color: "FBCA04", description: "DEC 승인 대기" };
+            const LABEL_APPROVED = { name: "DEC-APPROVED", color: "0E8A16", description: "DEC 승인 완료" };
+
+            async function ensureLabel(label) {
               try {
-                await github.rest.issues.getLabel({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  name: label.name
-                });
-                console.log(`Label "${label.name}" already exists`);
+                await github.rest.issues.getLabel({ owner, repo, name: label.name });
               } catch (e) {
                 if (e.status === 404) {
                   await github.rest.issues.createLabel({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
+                    owner, repo,
                     name: label.name,
                     color: label.color,
                     description: label.description
                   });
-                  console.log(`Created label "${label.name}"`);
                 } else {
                   throw e;
                 }
               }
             }
 
-      - name: Apply labels based on status
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const status = '${{ inputs.status }}';
-            const removePending = ${{ inputs.remove_pending }};
-            let prNumber = ${{ inputs.pr_number }};
+            await ensureLabel(LABEL_PENDING);
+            await ensureLabel(LABEL_APPROVED);
 
-            // PR 번호가 없으면 컨텍스트에서 추출
-            if (!prNumber || prNumber === 0) {
-              if (context.payload.pull_request) {
-                prNumber = context.payload.pull_request.number;
-              } else if (context.payload.issue) {
-                prNumber = context.payload.issue.number;
-              } else {
-                console.log('No PR number found in context');
-                return;
-              }
+            if (status === "pending") {
+              await github.rest.issues.addLabels({
+                owner, repo,
+                issue_number: prNumber,
+                labels: [LABEL_PENDING.name]
+              });
+              return;
             }
 
-            console.log(`Processing PR #${prNumber} with status: ${status}`);
-
-            if (status === 'pending') {
-              // DEC-PENDING 라벨 추가
+            if (status === "approved") {
+              // add approved
               await github.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
+                owner, repo,
                 issue_number: prNumber,
-                labels: ['DEC-PENDING']
+                labels: [LABEL_APPROVED.name]
               });
-              console.log('Added DEC-PENDING label');
 
-            } else if (status === 'approved') {
-              // DEC-APPROVED 라벨 추가
-              await github.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: prNumber,
-                labels: ['DEC-APPROVED']
-              });
-              console.log('Added DEC-APPROVED label');
-
-              // DEC-PENDING 제거 (옵션)
-              if (removePending) {
-                try {
-                  await github.rest.issues.removeLabel({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    issue_number: prNumber,
-                    name: 'DEC-PENDING'
-                  });
-                  console.log('Removed DEC-PENDING label');
-                } catch (e) {
-                  if (e.status !== 404) {
-                    throw e;
-                  }
-                  console.log('DEC-PENDING label was not present');
-                }
+              // remove pending (ignore if not present)
+              try {
+                await github.rest.issues.removeLabel({
+                  owner, repo,
+                  issue_number: prNumber,
+                  name: LABEL_PENDING.name
+                });
+              } catch (e) {
+                if (e.status !== 404) throw e;
               }
+              return;
             }
+
+            core.setFailed(`Unknown status: ${status}. Use pending|approved`);
