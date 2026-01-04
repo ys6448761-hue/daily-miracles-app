@@ -1,0 +1,101 @@
+name: Nightly DEC Candidates
+
+on:
+  schedule:
+    # 매일 새벽 2시 KST = 17:00 UTC (전날)
+    - cron: '0 17 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run mode (no actual execution)'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  nightly-dec:
+    name: Generate DEC Candidates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Run nightly DEC candidates
+        id: nightly
+        run: |
+          echo "🌙 Starting nightly DEC candidate generation..."
+
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            node scripts/ops/nightly-dec-candidates.js --dry-run --log
+          else
+            node scripts/ops/nightly-dec-candidates.js --log
+          fi
+
+          echo "✅ Nightly candidates generation completed"
+
+      - name: Generate daily report
+        if: inputs.dry_run != 'true'
+        run: |
+          echo "📊 Generating daily report..."
+          node scripts/ops/daily-dec-report.js --log
+          echo "✅ Daily report generated"
+
+      - name: Upload nightly run results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-run-results
+          path: |
+            artifacts/reports/nightly-run-*.json
+            artifacts/reports/daily-dec-report-*.md
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Upload generated drafts
+        if: inputs.dry_run != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dec-drafts
+          path: docs/decisions/DEC-DRAFT-*.md
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## 🌙 Nightly DEC Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Check for nightly run result
+          TODAY=$(TZ=Asia/Seoul date +%Y%m%d)
+          RESULT_FILE="artifacts/reports/nightly-run-${TODAY}.json"
+
+          if [ -f "$RESULT_FILE" ]; then
+            TOTAL=$(jq '.totalQueries' "$RESULT_FILE")
+            SUCCESS=$(jq '.successCount' "$RESULT_FILE")
+            FAILED=$(jq '.failureCount' "$RESULT_FILE")
+
+            echo "| Metric | Count |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Total Queries | $TOTAL |" >> $GITHUB_STEP_SUMMARY
+            echo "| Success | $SUCCESS |" >> $GITHUB_STEP_SUMMARY
+            echo "| Failed | $FAILED |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            if [ "$FAILED" != "0" ]; then
+              echo "### ⚠️ Failed Queries" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              jq -r '.items[] | select(.status=="failed") | "- \(.id): \(.query)"' "$RESULT_FILE" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "No results file found for today ($TODAY)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📦 Check artifacts for detailed reports." >> $GITHUB_STEP_SUMMARY

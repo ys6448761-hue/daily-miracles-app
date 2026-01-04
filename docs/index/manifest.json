@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-01-04T11:38:00.904Z",
+  "generated_at": "2026-01-04T12:22:43.581Z",
   "generator": "generate-manifest.js",
-  "total_count": 99,
+  "total_count": 100,
   "documents": [
     {
       "id": "DOC-airtable-schema",
@@ -135,7 +135,7 @@
       "status": "active",
       "title": "Decisions Index",
       "created_at": "2026-01-04",
-      "checksum": "fdcd9266"
+      "checksum": "b355d262"
     },
     {
       "id": "DOC-deployment-checklist",
@@ -207,6 +207,22 @@
       "title": "최수민님 방식 완전 정리",
       "created_at": "2026-01-04",
       "checksum": "3722b629"
+    },
+    {
+      "id": "DOC-DEC_OPERATIONS",
+      "path": "docs/ops/DEC_OPERATIONS.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ops",
+      "tags": [
+        "ops"
+      ],
+      "owner": "comi",
+      "status": "active",
+      "title": "DEC 운영 매뉴얼",
+      "created_at": "2026-01-04",
+      "checksum": "0e42ac01"
     },
     {
       "id": "DOC-service-flow",

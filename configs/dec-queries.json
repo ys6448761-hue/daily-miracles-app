@@ -1,0 +1,51 @@
+{
+  "description": "Nightly DEC 후보 생성을 위한 쿼리 목록",
+  "version": "1.0",
+  "queries": [
+    {
+      "id": "signal-system",
+      "query": "신호등 시스템",
+      "scopes": "decisions,system",
+      "mode": "decision",
+      "priority": "high",
+      "enabled": true
+    },
+    {
+      "id": "wish-painting",
+      "query": "소원그림",
+      "scopes": "all",
+      "mode": "decision",
+      "priority": "high",
+      "enabled": true
+    },
+    {
+      "id": "airtable-automation",
+      "query": "Airtable 자동화",
+      "scopes": "system,execution",
+      "mode": "action",
+      "priority": "medium",
+      "enabled": true
+    },
+    {
+      "id": "message-template",
+      "query": "메시지 템플릿",
+      "scopes": "system",
+      "mode": "decision",
+      "priority": "medium",
+      "enabled": true
+    },
+    {
+      "id": "api-design",
+      "query": "API 설계",
+      "scopes": "system",
+      "mode": "action",
+      "priority": "low",
+      "enabled": false
+    }
+  ],
+  "defaults": {
+    "k": 5,
+    "format": "json",
+    "log": true
+  }
+}

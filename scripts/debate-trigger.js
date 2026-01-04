@@ -409,6 +409,17 @@ function main() {
     process.exit(1);
   }
 
+  // 승인 게이트: DEC_PROMOTE_TOKEN 환경변수 필요 (P6-3 안전장치)
+  if (options.promote) {
+    const promoteToken = process.env.DEC_PROMOTE_TOKEN;
+    if (!promoteToken) {
+      console.error('❌ --promote 사용 시 DEC_PROMOTE_TOKEN 환경변수가 필요합니다.');
+      console.error('   설정 방법: export DEC_PROMOTE_TOKEN=your-secret-token');
+      console.error('   또는: DEC_PROMOTE_TOKEN=token node scripts/debate-trigger.js ...');
+      process.exit(1);
+    }
+  }
+
   console.log('');
   console.log('🎯 토론 트리거 시작');
   console.log(`   Query: "${options.query}"`);
