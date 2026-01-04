@@ -1,30 +1,41 @@
 #!/usr/bin/env node
 /**
- * 문서 검색 에이전트
- * 루미 규칙 v1.0 기반
+ * 문서 검색 에이전트 v1.1
+ * Context Bundle 생성 지원
  *
  * 사용법:
- *   node scripts/search-docs.js "검색어"
- *   node scripts/search-docs.js "검색어" --type=decision
- *   node scripts/search-docs.js "검색어" --priority=P0
- *   node scripts/search-docs.js "검색어" --tag=kpi
- *   node scripts/search-docs.js "검색어" --raw (raw 포함 검색)
+ *   node scripts/search-docs.js --query "신호등 시스템"
+ *   node scripts/search-docs.js --query "Airtable" --scopes decisions,system --format json
+ *   node scripts/search-docs.js --query "소원그림" --k 10 --out artifacts/context_bundle.md
  *
- * 검색 우선순위:
- *   1. manifest.json에서 메타데이터 필터링
- *   2. 후보 문서 본문 검색
- *   3. raw/에서 근거 탐색 (--raw 옵션)
+ * 옵션:
+ *   --query           검색어 (필수)
+ *   --scopes          검색 범위 (decisions,system,execution,team,all) 기본: all
+ *   --k               상위 결과 개수 (기본: 5)
+ *   --format          출력 형식 (md|json) 기본: md
+ *   --out             저장 경로 (예: artifacts/context_bundle.md)
+ *   --include-snippet 스니펫 포함 여부 (true|false) 기본: true
+ *   --max-snippet-chars 스니펫 최대 문자수 (기본: 400)
+ *   --recency-bias    최신 문서 가중치 (on|off) 기본: on
+ *   -i, --interactive 인터랙티브 모드
  */
 
 const fs = require('fs');
 const path = require('path');
 
 const DOCS_DIR = path.join(__dirname, '..', 'docs');
-const MANIFEST_PATH = path.join(DOCS_DIR, 'index', 'manifest.json');
-const TAGS_PATH = path.join(DOCS_DIR, 'index', 'tags.json');
-const RAW_DIR = path.join(DOCS_DIR, 'raw', 'conversations');
+const ARTIFACTS_DIR = path.join(__dirname, '..', 'artifacts');
 
-// 색상 코드
+// 검색 범위 폴더 매핑
+const SCOPE_MAPPING = {
+  decisions: 'docs/decisions',
+  system: 'docs/system',
+  execution: 'docs/execution',
+  team: 'docs/team',
+  all: 'docs'
+};
+
+// 색상 코드 (터미널 출력용)
 const colors = {
   reset: '\x1b[0m',
   bold: '\x1b[1m',
@@ -33,285 +44,446 @@ const colors = {
   yellow: '\x1b[33m',
   blue: '\x1b[34m',
   magenta: '\x1b[35m',
-  cyan: '\x1b[36m',
-  white: '\x1b[37m'
+  cyan: '\x1b[36m'
 };
 
 /**
- * 인자 파싱
+ * CLI 인자 파싱
  */
 function parseArgs(args) {
   const result = {
     query: '',
-    type: null,
-    priority: null,
-    tag: null,
-    owner: null,
-    includeRaw: false,
-    limit: 10
+    scopes: ['all'],
+    k: 5,
+    format: 'md',
+    out: null,
+    includeSnippet: true,
+    maxSnippetChars: 400,
+    recencyBias: true,
+    interactive: false
   };
 
-  args.forEach(arg => {
-    if (arg.startsWith('--type=')) {
-      result.type = arg.split('=')[1];
-    } else if (arg.startsWith('--priority=')) {
-      result.priority = arg.split('=')[1].toUpperCase();
-    } else if (arg.startsWith('--tag=')) {
-      result.tag = arg.split('=')[1];
-    } else if (arg.startsWith('--owner=')) {
-      result.owner = arg.split('=')[1];
-    } else if (arg === '--raw') {
-      result.includeRaw = true;
-    } else if (arg.startsWith('--limit=')) {
-      result.limit = parseInt(arg.split('=')[1]) || 10;
-    } else if (!arg.startsWith('--')) {
-      result.query = arg;
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+
+    if (arg === '-i' || arg === '--interactive') {
+      result.interactive = true;
+    } else if (arg === '--query' && args[i + 1]) {
+      result.query = args[++i];
+    } else if (arg.startsWith('--query=')) {
+      result.query = arg.split('=').slice(1).join('=');
+    } else if (arg === '--scopes' && args[i + 1]) {
+      result.scopes = args[++i].split(',').map(s => s.trim());
+    } else if (arg.startsWith('--scopes=')) {
+      result.scopes = arg.split('=')[1].split(',').map(s => s.trim());
+    } else if (arg === '--k' && args[i + 1]) {
+      result.k = parseInt(args[++i]) || 5;
+    } else if (arg.startsWith('--k=')) {
+      result.k = parseInt(arg.split('=')[1]) || 5;
+    } else if (arg === '--format' && args[i + 1]) {
+      result.format = args[++i];
+    } else if (arg.startsWith('--format=')) {
+      result.format = arg.split('=')[1];
+    } else if (arg === '--out' && args[i + 1]) {
+      result.out = args[++i];
+    } else if (arg.startsWith('--out=')) {
+      result.out = arg.split('=')[1];
+    } else if (arg === '--include-snippet' && args[i + 1]) {
+      result.includeSnippet = args[++i] !== 'false';
+    } else if (arg.startsWith('--include-snippet=')) {
+      result.includeSnippet = arg.split('=')[1] !== 'false';
+    } else if (arg === '--max-snippet-chars' && args[i + 1]) {
+      result.maxSnippetChars = parseInt(args[++i]) || 400;
+    } else if (arg.startsWith('--max-snippet-chars=')) {
+      result.maxSnippetChars = parseInt(arg.split('=')[1]) || 400;
+    } else if (arg === '--recency-bias' && args[i + 1]) {
+      result.recencyBias = args[++i] !== 'off';
+    } else if (arg.startsWith('--recency-bias=')) {
+      result.recencyBias = arg.split('=')[1] !== 'off';
     }
-  });
+  }
 
   return result;
 }
 
 /**
- * manifest.json 로드
+ * 파일명/내용에서 날짜 추출
  */
-function loadManifest() {
-  if (!fs.existsSync(MANIFEST_PATH)) {
-    console.error('❌ manifest.json을 찾을 수 없습니다. 먼저 generate-manifest.js를 실행하세요.');
-    process.exit(1);
+function extractDate(filePath, content) {
+  const fileName = path.basename(filePath);
+
+  // 1. 파일명에서 DEC-YYYY-MMDD 패턴
+  const decMatch = fileName.match(/DEC-(\d{4})-(\d{2})(\d{2})/i);
+  if (decMatch) {
+    return `${decMatch[1]}-${decMatch[2]}-${decMatch[3]}`;
   }
-  return JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf-8'));
+
+  // 2. 파일명에서 YYYY-MM-DD 패턴
+  const dateMatch = fileName.match(/(\d{4}-\d{2}-\d{2})/);
+  if (dateMatch) {
+    return dateMatch[1];
+  }
+
+  // 3. 파일명에서 YYYYMMDD 패턴
+  const compactMatch = fileName.match(/(\d{8})/);
+  if (compactMatch) {
+    const d = compactMatch[1];
+    return `${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}`;
+  }
+
+  // 4. Frontmatter에서 date 필드
+  if (content) {
+    const fmMatch = content.match(/^---\s*\n([\s\S]*?)\n---/);
+    if (fmMatch) {
+      const dateFieldMatch = fmMatch[1].match(/date:\s*["']?(\d{4}-\d{2}-\d{2})["']?/i);
+      if (dateFieldMatch) {
+        return dateFieldMatch[1];
+      }
+    }
+  }
+
+  // 5. 파일 수정일 (fallback)
+  try {
+    const stat = fs.statSync(filePath);
+    return stat.mtime.toISOString().slice(0, 10);
+  } catch {
+    return null;
+  }
 }
 
 /**
- * tags.json 로드
+ * 문서 제목 추출
  */
-function loadTags() {
-  if (!fs.existsSync(TAGS_PATH)) return {};
-  return JSON.parse(fs.readFileSync(TAGS_PATH, 'utf-8'));
+function extractTitle(filePath, content) {
+  const fileName = path.basename(filePath, '.md');
+
+  // 1. Frontmatter에서 title 필드
+  if (content) {
+    const fmMatch = content.match(/^---\s*\n([\s\S]*?)\n---/);
+    if (fmMatch) {
+      const titleMatch = fmMatch[1].match(/title:\s*["']?(.+?)["']?\s*$/m);
+      if (titleMatch) {
+        return titleMatch[1].trim();
+      }
+    }
+
+    // 2. 첫 번째 # 헤더
+    const headerMatch = content.match(/^#\s+(.+)$/m);
+    if (headerMatch) {
+      return headerMatch[1].trim();
+    }
+  }
+
+  // 3. 파일명 (언더스코어 → 공백)
+  return fileName.replace(/_/g, ' ');
 }
 
 /**
- * 메타데이터 기반 필터링 (1단계)
+ * 스니펫 추출 (매칭 주변 텍스트)
  */
-function filterByMetadata(documents, options) {
-  return documents.filter(doc => {
-    // 타입 필터
-    if (options.type && doc.type !== options.type) return false;
+function extractSnippet(content, keywords, maxChars = 400) {
+  if (!content || keywords.length === 0) return '';
 
-    // 우선순위 필터
-    if (options.priority && doc.priority !== options.priority) return false;
+  const contentLower = content.toLowerCase();
+  let bestIdx = -1;
+  let bestScore = 0;
 
-    // 태그 필터
-    if (options.tag && !doc.tags.includes(options.tag)) return false;
-
-    // 소유자 필터
-    if (options.owner && doc.owner !== options.owner) return false;
-
-    return true;
-  });
-}
-
-/**
- * 키워드 기반 필터링 (manifest 메타데이터)
- */
-function filterByKeyword(documents, query) {
-  if (!query) return documents;
-
-  const keywords = query.toLowerCase().split(/\s+/);
-
-  return documents.map(doc => {
+  // 가장 많은 키워드가 포함된 위치 찾기
+  for (let i = 0; i < contentLower.length - 100; i += 50) {
+    const window = contentLower.slice(i, i + maxChars);
     let score = 0;
-
-    // 제목 매칭 (가중치 높음)
-    const titleLower = (doc.title || '').toLowerCase();
     keywords.forEach(kw => {
-      if (titleLower.includes(kw)) score += 10;
+      if (window.includes(kw.toLowerCase())) score++;
     });
+    if (score > bestScore) {
+      bestScore = score;
+      bestIdx = i;
+    }
+  }
 
-    // 태그 매칭
-    const tagsLower = (doc.tags || []).join(' ').toLowerCase();
-    keywords.forEach(kw => {
-      if (tagsLower.includes(kw)) score += 5;
-    });
+  if (bestIdx < 0) {
+    // 첫 부분 반환
+    return content.slice(0, maxChars).replace(/\n/g, ' ').trim() + '...';
+  }
 
-    // 토픽 매칭
-    const topicLower = (doc.topic || '').toLowerCase();
-    keywords.forEach(kw => {
-      if (topicLower.includes(kw)) score += 3;
-    });
+  const start = Math.max(0, bestIdx - 20);
+  const end = Math.min(content.length, start + maxChars);
+  let snippet = content.slice(start, end).replace(/\n/g, ' ').trim();
 
-    // ID 매칭
-    const idLower = (doc.id || '').toLowerCase();
-    keywords.forEach(kw => {
-      if (idLower.includes(kw)) score += 2;
-    });
+  if (start > 0) snippet = '...' + snippet;
+  if (end < content.length) snippet = snippet + '...';
 
-    return { ...doc, score };
-  }).filter(doc => doc.score > 0)
-    .sort((a, b) => b.score - a.score);
+  return snippet;
 }
 
 /**
- * 본문 검색 (2단계)
+ * 하이라이트 키워드 추출
  */
-function searchContent(documents, query, limit = 10) {
-  if (!query) return documents.slice(0, limit);
+function extractHighlights(content, keywords) {
+  const found = [];
+  const contentLower = content.toLowerCase();
 
-  const keywords = query.toLowerCase().split(/\s+/);
+  keywords.forEach(kw => {
+    if (contentLower.includes(kw.toLowerCase())) {
+      found.push(kw);
+    }
+  });
+
+  return found;
+}
+
+/**
+ * Recency 점수 계산
+ */
+function calculateRecencyScore(dateStr) {
+  if (!dateStr) return 0;
+
+  try {
+    const docDate = new Date(dateStr);
+    const now = new Date();
+    const daysDiff = Math.floor((now - docDate) / (1000 * 60 * 60 * 24));
+
+    if (daysDiff <= 7) return 0.15;    // 1주일 이내
+    if (daysDiff <= 30) return 0.1;    // 30일 이내
+    if (daysDiff <= 90) return 0.05;   // 90일 이내
+    return 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * 디렉토리 재귀 탐색
+ */
+function walkDir(dir, fileList = []) {
+  if (!fs.existsSync(dir)) return fileList;
+
+  const items = fs.readdirSync(dir);
+
+  for (const item of items) {
+    const fullPath = path.join(dir, item);
+    const stat = fs.statSync(fullPath);
+
+    if (stat.isDirectory()) {
+      // raw, processed, index 폴더 제외
+      if (!['raw', 'processed', 'index', 'images'].includes(item)) {
+        walkDir(fullPath, fileList);
+      }
+    } else if (item.endsWith('.md')) {
+      fileList.push(fullPath);
+    }
+  }
+
+  return fileList;
+}
+
+/**
+ * 검색 범위에 따른 파일 목록 가져오기
+ */
+function getFilesInScopes(scopes) {
+  const files = [];
+  const baseDir = path.join(__dirname, '..');
+
+  for (const scope of scopes) {
+    const scopePath = SCOPE_MAPPING[scope];
+    if (!scopePath) continue;
+
+    const fullPath = path.join(baseDir, scopePath);
+
+    if (scope === 'all') {
+      // all인 경우 decisions, system, execution, team만
+      ['decisions', 'system', 'execution', 'team'].forEach(s => {
+        const subPath = path.join(baseDir, 'docs', s);
+        walkDir(subPath, files);
+      });
+      break;
+    } else {
+      walkDir(fullPath, files);
+    }
+  }
+
+  return [...new Set(files)]; // 중복 제거
+}
+
+/**
+ * 문서 검색 및 스코어링
+ */
+function searchDocuments(options) {
+  const { query, scopes, k, includeSnippet, maxSnippetChars, recencyBias } = options;
+
+  if (!query) return [];
+
+  const keywords = query.toLowerCase().split(/\s+/).filter(k => k.length > 1);
+  const files = getFilesInScopes(scopes);
   const results = [];
 
-  for (const doc of documents) {
-    const filePath = path.join(__dirname, '..', doc.path);
-
-    if (!fs.existsSync(filePath)) continue;
-
+  for (const filePath of files) {
     try {
-      const content = fs.readFileSync(filePath, 'utf-8').toLowerCase();
-      let contentScore = 0;
-      const matches = [];
+      const content = fs.readFileSync(filePath, 'utf-8');
+      const contentLower = content.toLowerCase();
+
+      // 기본 점수: 키워드 매칭
+      let score = 0;
+      const matchCounts = {};
 
       keywords.forEach(kw => {
         const regex = new RegExp(kw, 'gi');
-        const found = content.match(regex);
-        if (found) {
-          contentScore += found.length;
-
-          // 매칭 컨텍스트 추출
-          const idx = content.indexOf(kw);
-          if (idx >= 0) {
-            const start = Math.max(0, idx - 50);
-            const end = Math.min(content.length, idx + kw.length + 50);
-            matches.push('...' + content.slice(start, end).replace(/\n/g, ' ') + '...');
-          }
+        const matches = content.match(regex);
+        if (matches) {
+          matchCounts[kw] = matches.length;
+          score += matches.length;
         }
       });
 
-      if (contentScore > 0) {
-        results.push({
-          ...doc,
-          score: (doc.score || 0) + contentScore,
-          matches: matches.slice(0, 2) // 최대 2개 매칭 컨텍스트
-        });
+      if (score === 0) continue;
+
+      // 제목/파일명 매칭 보너스
+      const fileName = path.basename(filePath).toLowerCase();
+      keywords.forEach(kw => {
+        if (fileName.includes(kw.toLowerCase())) {
+          score += 10;
+        }
+      });
+
+      // 날짜 및 제목 추출
+      const docDate = extractDate(filePath, content);
+      const title = extractTitle(filePath, content);
+
+      // Recency bias 적용
+      if (recencyBias && docDate) {
+        score *= (1 + calculateRecencyScore(docDate));
       }
+
+      // 정규화된 점수 (0-1 범위 근사)
+      const normalizedScore = Math.min(1, score / 50);
+
+      const relativePath = path.relative(path.join(__dirname, '..'), filePath).replace(/\\/g, '/');
+
+      const result = {
+        path: relativePath,
+        score: parseFloat(normalizedScore.toFixed(2)),
+        updated_at: docDate,
+        title: title
+      };
+
+      if (includeSnippet) {
+        result.snippet = extractSnippet(content, keywords, maxSnippetChars);
+        result.highlights = extractHighlights(content, keywords);
+      }
+
+      results.push(result);
     } catch (err) {
       // 파일 읽기 실패 시 무시
     }
   }
 
-  return results.sort((a, b) => b.score - a.score).slice(0, limit);
+  // 점수순 정렬 후 Top K 반환
+  return results
+    .sort((a, b) => b.score - a.score)
+    .slice(0, k);
 }
 
 /**
- * Raw 문서 검색 (3단계)
+ * JSON 형식 출력 생성
  */
-function searchRaw(query, limit = 5) {
-  if (!query || !fs.existsSync(RAW_DIR)) return [];
+function formatJSON(results, options) {
+  const output = {
+    query: options.query,
+    scopes: options.scopes,
+    k: options.k,
+    generated_at: new Date().toISOString(),
+    results: results
+  };
 
-  const keywords = query.toLowerCase().split(/\s+/);
-  const results = [];
+  return JSON.stringify(output, null, 2);
+}
 
-  function searchDir(dir) {
-    const items = fs.readdirSync(dir);
+/**
+ * Markdown 형식 출력 생성
+ */
+function formatMarkdown(results, options) {
+  const now = new Date();
+  const kstTime = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  const generated = kstTime.toISOString().slice(0, 16).replace('T', ' ') + ' KST';
 
-    for (const item of items) {
-      const fullPath = path.join(dir, item);
-      const stat = fs.statSync(fullPath);
+  let md = `# Context Bundle
 
-      if (stat.isDirectory()) {
-        searchDir(fullPath);
-      } else if (item.endsWith('.md')) {
-        try {
-          const content = fs.readFileSync(fullPath, 'utf-8').toLowerCase();
-          let score = 0;
+- **Query**: ${options.query}
+- **Scopes**: ${options.scopes.join(', ')}
+- **Generated**: ${generated}
+- **TopK**: ${options.k}
 
-          keywords.forEach(kw => {
-            const regex = new RegExp(kw, 'gi');
-            const found = content.match(regex);
-            if (found) score += found.length;
-          });
+---
 
-          if (score > 0) {
-            const relativePath = path.relative(DOCS_DIR, fullPath).replace(/\\/g, '/');
-            results.push({
-              path: 'docs/' + relativePath,
-              title: item.replace('.md', ''),
-              score,
-              type: 'raw'
-            });
-          }
-        } catch (err) {
-          // 무시
-        }
-      }
+`;
+
+  if (results.length === 0) {
+    md += `> 검색 결과가 없습니다.\n`;
+    return md;
+  }
+
+  results.forEach((doc, idx) => {
+    md += `## ${idx + 1}) ${doc.title}\n\n`;
+    md += `- **Path**: \`${doc.path}\`\n`;
+    md += `- **Score**: ${doc.score}\n`;
+    if (doc.updated_at) {
+      md += `- **Updated**: ${doc.updated_at}\n`;
     }
-  }
+    if (doc.snippet) {
+      md += `- **Snippet**: ${doc.snippet}\n`;
+    }
+    if (doc.highlights && doc.highlights.length > 0) {
+      md += `- **Highlights**: ${doc.highlights.join(', ')}\n`;
+    }
+    md += '\n';
+  });
 
-  searchDir(RAW_DIR);
-
-  return results.sort((a, b) => b.score - a.score).slice(0, limit);
+  return md;
 }
 
 /**
- * 결과 포맷팅 (루미 v1.0 형식)
+ * 결과 저장
  */
-function formatResults(results, rawResults, query) {
-  console.log('\n' + '='.repeat(60));
-  console.log(`${colors.bold}${colors.cyan}🔎 검색 결과${colors.reset} - "${query}"`);
-  console.log('='.repeat(60) + '\n');
+function saveOutput(content, outPath) {
+  const fullPath = path.join(__dirname, '..', outPath);
+  const dir = path.dirname(fullPath);
 
-  if (results.length === 0 && rawResults.length === 0) {
-    console.log(`${colors.yellow}검색 결과가 없습니다.${colors.reset}\n`);
-    console.log('💡 팁:');
-    console.log('  - 다른 키워드로 검색해보세요');
-    console.log('  - --raw 옵션으로 원본 문서도 검색해보세요');
-    console.log('  - --type, --priority, --tag 필터를 조정해보세요\n');
-    return;
+  // 디렉토리 생성
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
   }
 
-  // 정본 결과
-  if (results.length > 0) {
-    console.log(`${colors.bold}📄 정본 문서 (Top ${results.length})${colors.reset}\n`);
+  fs.writeFileSync(fullPath, content, 'utf-8');
+  return fullPath;
+}
 
-    results.forEach((doc, idx) => {
-      const priorityColor = doc.priority === 'P0' ? colors.magenta :
-                           doc.priority === 'P1' ? colors.yellow : colors.dim;
+/**
+ * 사용법 출력
+ */
+function printUsage() {
+  console.log(`
+${colors.bold}문서 검색 에이전트 v1.1${colors.reset}
+Context Bundle 생성 지원
 
-      console.log(`${colors.bold}${idx + 1}) [${doc.id}] ${doc.title}${colors.reset}`);
-      console.log(`   ${priorityColor}Priority: ${doc.priority}${colors.reset} | Type: ${doc.type} | Owner: ${doc.owner}`);
-      console.log(`   ${colors.dim}Tags: ${doc.tags.join(', ')}${colors.reset}`);
-      console.log(`   ${colors.blue}📁 ${doc.path}${colors.reset}`);
+${colors.cyan}사용법:${colors.reset}
+  node scripts/search-docs.js --query "검색어" [옵션]
 
-      if (doc.matches && doc.matches.length > 0) {
-        console.log(`   ${colors.green}📌 매칭:${colors.reset}`);
-        doc.matches.forEach(m => {
-          console.log(`      "${m.trim()}"`);
-        });
-      }
+${colors.cyan}옵션:${colors.reset}
+  --query             검색어 (필수)
+  --scopes            검색 범위 (decisions,system,execution,team,all) 기본: all
+  --k                 상위 결과 개수 (기본: 5)
+  --format            출력 형식 (md|json) 기본: md
+  --out               저장 경로 (예: artifacts/context_bundle.md)
+  --include-snippet   스니펫 포함 여부 (true|false) 기본: true
+  --max-snippet-chars 스니펫 최대 문자수 (기본: 400)
+  --recency-bias      최신 문서 가중치 (on|off) 기본: on
+  -i, --interactive   인터랙티브 모드
 
-      console.log('');
-    });
-  }
-
-  // Raw 결과
-  if (rawResults.length > 0) {
-    console.log(`${colors.bold}📂 원본 근거 (Top ${rawResults.length})${colors.reset}\n`);
-
-    rawResults.forEach((doc, idx) => {
-      console.log(`${idx + 1}) ${doc.title}`);
-      console.log(`   ${colors.dim}${doc.path}${colors.reset}`);
-    });
-
-    console.log('');
-  }
-
-  // 추천 액션
-  console.log(`${colors.cyan}👉 추천 액션:${colors.reset}`);
-  if (results.length > 0) {
-    console.log(`   - 상세 내용: cat "${results[0].path}"`);
-  }
-  console.log(`   - 필터 검색: node scripts/search-docs.js "${query}" --type=decision`);
-  console.log(`   - P0만 검색: node scripts/search-docs.js "${query}" --priority=P0\n`);
+${colors.cyan}예시:${colors.reset}
+  node scripts/search-docs.js --query "신호등 시스템" --scopes decisions --format md
+  node scripts/search-docs.js --query "Airtable" --format json --k 10 --out artifacts/bundle.json
+  node scripts/search-docs.js --query "소원그림" --scopes all --out artifacts/context_bundle.md
+`);
 }
 
 /**
@@ -325,37 +497,24 @@ function interactiveMode() {
     output: process.stdout
   });
 
-  console.log('\n' + '='.repeat(60));
-  console.log(`${colors.bold}${colors.cyan}🔎 문서 검색 에이전트${colors.reset} (루미 v1.0)`);
-  console.log('='.repeat(60));
+  console.log(`\n${colors.bold}${colors.cyan}🔎 문서 검색 에이전트 v1.1${colors.reset}`);
+  console.log('='.repeat(50));
   console.log('\n명령어:');
-  console.log('  [검색어]              - 키워드 검색');
-  console.log('  :type [타입]          - 타입 필터 설정');
-  console.log('  :priority [P0-P3]     - 우선순위 필터 설정');
-  console.log('  :tag [태그]           - 태그 필터 설정');
-  console.log('  :raw                  - raw 포함 토글');
-  console.log('  :clear                - 필터 초기화');
-  console.log('  :stats                - 통계 보기');
-  console.log('  :quit                 - 종료\n');
+  console.log('  [검색어]     - 키워드 검색');
+  console.log('  :scope [s]   - 범위 설정 (decisions,system,execution,team,all)');
+  console.log('  :k [N]       - 결과 개수 설정');
+  console.log('  :format [f]  - 출력 형식 (md|json)');
+  console.log('  :save [path] - 결과 저장');
+  console.log('  :quit        - 종료\n');
 
-  let filters = { type: null, priority: null, tag: null, includeRaw: false };
+  let state = { scopes: ['all'], k: 5, format: 'md' };
 
   function prompt() {
-    const filterStr = [];
-    if (filters.type) filterStr.push(`type:${filters.type}`);
-    if (filters.priority) filterStr.push(`priority:${filters.priority}`);
-    if (filters.tag) filterStr.push(`tag:${filters.tag}`);
-    if (filters.includeRaw) filterStr.push('raw:on');
-
-    const filterDisplay = filterStr.length > 0 ? ` [${filterStr.join(', ')}]` : '';
-
-    rl.question(`${colors.green}검색>${colors.reset}${filterDisplay} `, (input) => {
+    const scopeStr = state.scopes.join(',');
+    rl.question(`${colors.green}검색>${colors.reset} [${scopeStr}|k=${state.k}|${state.format}] `, (input) => {
       input = input.trim();
 
-      if (!input) {
-        prompt();
-        return;
-      }
+      if (!input) { prompt(); return; }
 
       if (input === ':quit' || input === ':q') {
         console.log('\n👋 종료합니다.\n');
@@ -363,77 +522,48 @@ function interactiveMode() {
         return;
       }
 
-      if (input.startsWith(':type ')) {
-        filters.type = input.split(' ')[1];
-        console.log(`✅ 타입 필터: ${filters.type}`);
-        prompt();
-        return;
+      if (input.startsWith(':scope ')) {
+        state.scopes = input.split(' ')[1].split(',').map(s => s.trim());
+        console.log(`✅ 범위: ${state.scopes.join(', ')}`);
+        prompt(); return;
       }
 
-      if (input.startsWith(':priority ')) {
-        filters.priority = input.split(' ')[1].toUpperCase();
-        console.log(`✅ 우선순위 필터: ${filters.priority}`);
-        prompt();
-        return;
+      if (input.startsWith(':k ')) {
+        state.k = parseInt(input.split(' ')[1]) || 5;
+        console.log(`✅ 결과 개수: ${state.k}`);
+        prompt(); return;
       }
 
-      if (input.startsWith(':tag ')) {
-        filters.tag = input.split(' ')[1];
-        console.log(`✅ 태그 필터: ${filters.tag}`);
-        prompt();
-        return;
+      if (input.startsWith(':format ')) {
+        state.format = input.split(' ')[1];
+        console.log(`✅ 출력 형식: ${state.format}`);
+        prompt(); return;
       }
 
-      if (input === ':raw') {
-        filters.includeRaw = !filters.includeRaw;
-        console.log(`✅ Raw 포함: ${filters.includeRaw ? 'ON' : 'OFF'}`);
-        prompt();
-        return;
-      }
-
-      if (input === ':clear') {
-        filters = { type: null, priority: null, tag: null, includeRaw: false };
-        console.log('✅ 필터 초기화됨');
-        prompt();
-        return;
-      }
-
-      if (input === ':stats') {
-        const manifest = loadManifest();
-        console.log(`\n📊 문서 통계:`);
-        console.log(`   총 문서: ${manifest.total_count}개`);
-        console.log(`   생성일: ${manifest.generated_at}`);
-
-        const types = {};
-        manifest.documents.forEach(d => {
-          types[d.type] = (types[d.type] || 0) + 1;
-        });
-        console.log(`   타입별:`);
-        Object.entries(types).sort((a, b) => b[1] - a[1]).forEach(([t, c]) => {
-          console.log(`      ${t}: ${c}개`);
-        });
-        console.log('');
-        prompt();
-        return;
+      if (input.startsWith(':save ')) {
+        console.log('💡 검색 후 --out 옵션으로 저장하세요');
+        prompt(); return;
       }
 
       // 검색 실행
-      const manifest = loadManifest();
-      let candidates = manifest.documents;
+      const options = {
+        query: input,
+        scopes: state.scopes,
+        k: state.k,
+        format: state.format,
+        includeSnippet: true,
+        maxSnippetChars: 400,
+        recencyBias: true
+      };
 
-      // 메타데이터 필터링
-      candidates = filterByMetadata(candidates, filters);
+      const results = searchDocuments(options);
 
-      // 키워드 필터링
-      candidates = filterByKeyword(candidates, input);
+      if (state.format === 'json') {
+        console.log(formatJSON(results, options));
+      } else {
+        console.log(formatMarkdown(results, options));
+      }
 
-      // 본문 검색
-      const results = searchContent(candidates, input, 10);
-
-      // Raw 검색
-      const rawResults = filters.includeRaw ? searchRaw(input, 5) : [];
-
-      formatResults(results, rawResults, input);
       prompt();
     });
   }
@@ -442,42 +572,51 @@ function interactiveMode() {
 }
 
 /**
- * 메인
+ * 메인 실행
  */
-const args = process.argv.slice(2);
+function main() {
+  const args = process.argv.slice(2);
 
-if (args.length === 0 || args[0] === '-i' || args[0] === '--interactive') {
-  interactiveMode();
-} else {
-  const options = parseArgs(args);
-
-  if (!options.query) {
-    console.log('사용법: node scripts/search-docs.js "검색어" [옵션]');
-    console.log('\n옵션:');
-    console.log('  --type=TYPE       문서 타입 (decision, action, spec 등)');
-    console.log('  --priority=P0-P3  우선순위');
-    console.log('  --tag=TAG         태그');
-    console.log('  --owner=OWNER     소유자 (rumi, comi, code 등)');
-    console.log('  --raw             raw 문서 포함 검색');
-    console.log('  --limit=N         결과 개수 제한 (기본 10)');
-    console.log('  -i, --interactive 인터랙티브 모드');
-    process.exit(0);
+  // 도움말
+  if (args.length === 0 || args.includes('--help') || args.includes('-h')) {
+    printUsage();
+    return;
   }
 
-  const manifest = loadManifest();
-  let candidates = manifest.documents;
+  const options = parseArgs(args);
 
-  // 1단계: 메타데이터 필터링
-  candidates = filterByMetadata(candidates, options);
+  // 인터랙티브 모드
+  if (options.interactive) {
+    interactiveMode();
+    return;
+  }
 
-  // 2단계: 키워드 필터링
-  candidates = filterByKeyword(candidates, options.query);
+  // 쿼리 필수 체크
+  if (!options.query) {
+    console.error('❌ --query 옵션이 필요합니다.\n');
+    printUsage();
+    process.exit(1);
+  }
 
-  // 3단계: 본문 검색
-  const results = searchContent(candidates, options.query, options.limit);
+  // 검색 실행
+  const results = searchDocuments(options);
 
-  // 4단계: Raw 검색 (옵션)
-  const rawResults = options.includeRaw ? searchRaw(options.query, 5) : [];
+  // 출력 생성
+  let output;
+  if (options.format === 'json') {
+    output = formatJSON(results, options);
+  } else {
+    output = formatMarkdown(results, options);
+  }
 
-  formatResults(results, rawResults, options.query);
+  // 파일 저장 또는 stdout
+  if (options.out) {
+    const savedPath = saveOutput(output, options.out);
+    console.log(`✅ 저장됨: ${savedPath}`);
+    console.log(`   결과: ${results.length}개 문서`);
+  } else {
+    console.log(output);
+  }
 }
+
+main();
