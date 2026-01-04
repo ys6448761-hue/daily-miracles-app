@@ -257,25 +257,80 @@ node scripts/ops/daily-dec-report.js --out artifacts/reports/my-report.md
 
 ## 7. GitHub Actions
 
-### 워크플로우 위치
+### 워크플로우 목록
+
+| 워크플로우 | 파일 | 트리거 | 용도 |
+|-----------|------|--------|------|
+| Nightly DEC | `nightly-dec.yml` | 매일 02:00 KST | high priority 자동 실행 |
+| Weekly DEC | `weekly-dec.yml` | 매주 일 20:00 KST | medium priority 자동 실행 |
+| Monthly DEC | `monthly-dec.yml` | 매월 1일 10:00 KST | low priority 자동 실행 |
+| Manual DEC | `manual-dec.yml` | 수동 (workflow_dispatch) | Ad-hoc 1회 실행 |
+| PR DEC Check | `pr-dec-check.yml` | PR 열림/업데이트 | dry-run + 코멘트 |
+| PR DEC Comment | `pr-dec-comment.yml` | workflow_run | 리포트 PR 코멘트 |
+| Upload Artifacts | `upload-dec-artifacts.yml` | workflow_call | 재사용 가능 업로드 |
+
+### 스케줄 요약
 
 ```
-.github/workflows/nightly-dec.yml
+Nightly (high)   : 매일 02:00 KST  → cron: '0 17 * * *'
+Weekly (medium)  : 매주 일 20:00 KST → cron: '0 11 * * 0'
+Monthly (low)    : 매월 1일 10:00 KST → cron: '0 1 1 * *'
 ```
 
-### 수동 트리거
+### 수동 실행 (Manual DEC)
 
-GitHub Actions 탭에서 "Run workflow" 버튼 클릭
+GitHub Actions 탭 → "Manual DEC Run" → "Run workflow" 클릭
 
-### 스케줄
+입력 가능 옵션:
+- `query`: 검색/토론 쿼리 (필수)
+- `scopes`: 검색 범위 (기본: all)
+- `mode`: 요약 모드 (general/decision/action)
+- `k`: 상위 결과 개수 (기본: 5)
+- `decider`: 승인자 메타 (기본: 미정)
+- `notify`: 알림 발송 여부
 
-- 매일 새벽 2시 (KST) = 17:00 UTC (전날)
-- Cron: `0 17 * * *`
+### 아티팩트 보관 정책
+
+| 워크플로우 | Results 보관 | Drafts 보관 |
+|-----------|-------------|------------|
+| Nightly | 30일 | 7일 |
+| Weekly | 30일 | 14일 |
+| Monthly | 90일 | 30일 |
+| Manual | 7일 | 7일 |
+
+### PR 자동화
+
+1. **PR DEC Check** (`pr-dec-check.yml`)
+   - `docs/decisions/**` 변경 시 자동 실행
+   - dry-run 결과 + 파일 카운트 PR 코멘트
+   - 기존 코멘트 업데이트 지원
+
+2. **PR DEC Comment** (`pr-dec-comment.yml`)
+   - DEC 워크플로우 완료 후 트리거
+   - Daily 리포트를 최신 PR에 자동 첨부
+
+### 알림 설정 (Secrets)
+
+```
+DISCORD_WEBHOOK_URL  - Discord 웹훅 URL (선택)
+SLACK_WEBHOOK_URL    - Slack 웹훅 URL (선택)
+```
+
+**주의**: `DEC_PROMOTE_TOKEN`은 GitHub Secrets에 **절대 등록하지 않음** (자동 승인 방지)
 
 ## 8. 디렉토리 구조
 
 ```
 daily-miracles-mvp/
+├── .github/
+│   └── workflows/
+│       ├── nightly-dec.yml           # Nightly 자동 실행 (high)
+│       ├── weekly-dec.yml            # Weekly 자동 실행 (medium)
+│       ├── monthly-dec.yml           # Monthly 자동 실행 (low)
+│       ├── manual-dec.yml            # Ad-hoc 수동 실행
+│       ├── pr-dec-check.yml          # PR 체크 + 코멘트
+│       ├── pr-dec-comment.yml        # 리포트 PR 첨부
+│       └── upload-dec-artifacts.yml  # 재사용 가능 업로드
 ├── configs/
 │   └── dec-queries.json        # 쿼리 설정
 ├── scripts/
@@ -307,4 +362,4 @@ daily-miracles-mvp/
 
 ---
 
-*마지막 업데이트: 2026-01-05 (P6-3.1)*
+*마지막 업데이트: 2026-01-05 (P6-3.7)*
