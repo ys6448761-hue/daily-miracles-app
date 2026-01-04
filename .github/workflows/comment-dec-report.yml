@@ -1,0 +1,148 @@
+name: Comment DEC Report to PR (copy-friendly approve command)
+
+on:
+  workflow_call:
+    inputs:
+      report_glob:
+        description: "리포트 파일 glob (최신 파일 1개를 선택)"
+        required: false
+        type: string
+        default: "artifacts/reports/*.md"
+      title:
+        description: "코멘트 제목"
+        required: false
+        type: string
+        default: "📊 DEC 자동 리포트"
+      decider_default:
+        description: "승인 커맨드 기본 decider"
+        required: false
+        type: string
+        default: "푸르미르"
+      query_hint:
+        description: "승인 커맨드에 넣을 기본 query 힌트(리포트에서 못 뽑으면 사용)"
+        required: false
+        type: string
+        default: "쿼리_여기에_입력"
+
+jobs:
+  comment:
+    # PR 컨텍스트에서만 코멘트
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Find latest DEC report
+        id: report
+        shell: bash
+        run: |
+          set -e
+          REPORT="$(ls -t ${{ inputs.report_glob }} 2>/dev/null | head -n 1 || true)"
+          if [ -z "$REPORT" ]; then
+            echo "No report found for glob: ${{ inputs.report_glob }}"
+            exit 1
+          fi
+          echo "report=$REPORT" >> "$GITHUB_OUTPUT"
+          echo "Found report: $REPORT"
+
+      - name: Extract query from report (best-effort)
+        id: q
+        shell: bash
+        run: |
+          set -e
+          REPORT="${{ steps.report.outputs.report }}"
+
+          # 리포트 내에 Query: "..." 또는 Query: ... 같은 라인이 있으면 추출
+          # (없으면 query_hint 사용)
+          QUERY_LINE="$(grep -E '^\s*(Query|쿼리)\s*:\s*' "$REPORT" | head -n 1 || true)"
+          if [ -n "$QUERY_LINE" ]; then
+            # Query: "신호등 시스템" 형태 가정
+            QUERY="$(echo "$QUERY_LINE" | sed -E 's/^\s*(Query|쿼리)\s*:\s*//; s/^"//; s/"$//')"
+          else
+            QUERY="${{ inputs.query_hint }}"
+          fi
+
+          # 한 줄 안전 처리
+          QUERY="$(echo "$QUERY" | tr '\n' ' ' | sed -E 's/\s+/ /g' | sed -E 's/^\s+|\s+$//g')"
+          echo "query=$QUERY" >> "$GITHUB_OUTPUT"
+          echo "Using query: $QUERY"
+
+      - name: Read report content (top 120 lines)
+        id: content
+        shell: bash
+        run: |
+          set -e
+          REPORT="${{ steps.report.outputs.report }}"
+
+          echo "content<<EOF" >> "$GITHUB_OUTPUT"
+          sed -n '1,120p' "$REPORT" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Comment on PR (with copy-friendly approve command)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `${{ toJson(inputs.title) }}`;
+            const reportPath = `${{ toJson(steps.report.outputs.report) }}`;
+            const reportTop = `${{ toJson(steps.content.outputs.content) }}`;
+            const query = `${{ toJson(steps.q.outputs.query) }}`;
+            const decider = `${{ toJson(inputs.decider_default) }}`;
+
+            // "복붙 버튼 느낌" = GitHub 코드블록의 Copy UI 활용
+            const approveCmd = [
+              'DEC_PROMOTE_TOKEN=YOUR_TOKEN node scripts/debate-trigger.js \\',
+              `  --query "${query}" \\`,
+              '  --generate-dec-draft \\',
+              '  --promote \\',
+              `  --decider "${decider}" \\`,
+              '  --delete-draft \\',
+              '  --log'
+            ].join('\n');
+
+            const body = [
+              `## ${title}`,
+              ``,
+              `### ✅ 승인(정식 DEC 발행) — 복붙용 커맨드`,
+              `👉 아래 박스 우측 상단 **Copy** 버튼으로 그대로 복사해 로컬 터미널에서 실행하세요.`,
+              ``,
+              '```bash',
+              approveCmd,
+              '```',
+              ``,
+              `<details>`,
+              `<summary><b>📌 토큰/환경변수 안내 (클릭)</b></summary>`,
+              ``,
+              `- \`DEC_PROMOTE_TOKEN\`은 **로컬에서만** 사용합니다. (GitHub Actions에는 넣지 않음)`,
+              `- 예시:`,
+              `  - macOS/Linux:`,
+              `    \`\`\`bash`,
+              `    export DEC_PROMOTE_TOKEN="secret"`,
+              `    \`\`\``,
+              `  - Windows PowerShell:`,
+              `    \`\`\`powershell`,
+              `    $env:DEC_PROMOTE_TOKEN="secret"`,
+              `    \`\`\``,
+              ``,
+              `</details>`,
+              ``,
+              `---`,
+              ``,
+              `<details>`,
+              `<summary><b>📄 리포트 요약 (상단 120줄)</b></summary>`,
+              ``,
+              '```md',
+              reportTop,
+              '```',
+              ``,
+              `📁 전체 리포트 경로: \`${reportPath}\``,
+              `</details>`
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });
