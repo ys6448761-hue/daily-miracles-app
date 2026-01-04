@@ -210,8 +210,13 @@
         const form = document.getElementById('storyForm');
         const submitBtn = document.getElementById('submitBtn');
         const loading = document.getElementById('loading');
+        const API_BASE = 'https://daily-miracles-app.onrender.com';
 
-        form.addEventListener('submit', function(e) {
+        // 체크아웃 세션 추적
+        let currentCheckoutId = null;
+        let checkoutCompleted = false;
+
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
 
             submitBtn.disabled = true;
@@ -221,24 +226,54 @@
             const formData = new FormData(form);
             const data = Object.fromEntries(formData);
 
-            fetch('https://daily-miracles-app.onrender.com/api/create-story', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
+            try {
+                // 1. 체크아웃 세션 시작 (마케팅 이벤트 추적)
+                const checkoutRes = await fetch(`${API_BASE}/api/storybook/checkout/initiate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        tier: 'STARTER',
+                        cart_value: 24900
+                    })
+                });
+                const checkoutData = await checkoutRes.json();
+                if (checkoutData.success) {
+                    currentCheckoutId = checkoutData.checkout_id;
+                    console.log('🛒 체크아웃 시작:', currentCheckoutId);
+                }
+
+                // 2. 스토리북 생성 요청
+                const response = await fetch(`${API_BASE}/api/create-story`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+
                 if (result.success) {
+                    checkoutCompleted = true;
                     window.location.href = result.redirectUrl;
                 } else {
                     alert('오류: ' + result.error);
                     resetForm();
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 alert('네트워크 오류: ' + error.message);
                 resetForm();
-            });
+            }
+        });
+
+        // 페이지 이탈 시 체크아웃 이탈 기록
+        window.addEventListener('beforeunload', function() {
+            if (currentCheckoutId && !checkoutCompleted) {
+                // sendBeacon으로 비동기 전송 (페이지 이탈 시에도 전송 보장)
+                const blob = new Blob(
+                    [JSON.stringify({ checkout_id: currentCheckoutId })],
+                    { type: 'application/json' }
+                );
+                navigator.sendBeacon(`${API_BASE}/api/storybook/checkout/abandon`, blob);
+                console.log('🚪 체크아웃 이탈:', currentCheckoutId);
+            }
         });
 
         function resetForm() {
