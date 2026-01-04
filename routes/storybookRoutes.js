@@ -348,6 +348,7 @@ router.post('/webhook/payment', async (req, res) => {
       event,
       payment_id,
       order_id: providedOrderId,
+      checkout_id,
       tier,
       amount,
       customer_email,
@@ -490,6 +491,7 @@ router.post('/webhook/payment', async (req, res) => {
 
     // 5-1. 마케팅 이벤트 로깅: checkout_complete
     logMarketingEvent(EVENT_TYPES.CHECKOUT_COMPLETE, {
+      checkout_id: checkout_id || null,  // 퍼널 연결 키 (필수)
       order_id: orderId,
       payment_id: payment_id,
       user_id: order.user_id,
