@@ -103,3 +103,6 @@ test-*.json
 
 # Local settings (user-specific)
 .claude/settings.local.json
+
+# Artifacts (generated outputs)
+artifacts/
