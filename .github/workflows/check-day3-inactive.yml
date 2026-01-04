@@ -1,0 +1,52 @@
+name: Check Day3 Inactive Users
+
+on:
+  schedule:
+    # 매일 오전 9시 KST (UTC 00:00)
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry-run 모드 (실제 로깅 없음)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+jobs:
+  check-inactive:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Day3 Inactive Check
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "🔍 Dry-run 모드로 실행"
+            node scripts/ops/check-day3-inactive.js --dry-run
+          else
+            echo "📝 실제 모드로 실행"
+            node scripts/ops/check-day3-inactive.js
+          fi
+
+      - name: Upload events log (if exists)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: events-log-${{ github.run_number }}
+          path: artifacts/events.ndjson
+          if-no-files-found: ignore
+          retention-days: 30
