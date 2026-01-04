@@ -18,6 +18,7 @@ const {
     recordUpgradeClick,
     recordUpgradeComplete
 } = require('../services/metricsService');
+const { logEvent, EVENT_TYPES } = require('../services/eventLogger');
 
 // 데이터 저장 경로
 const DATA_DIR = path.join(__dirname, '..', 'data', 'wishes');
@@ -180,6 +181,19 @@ router.post('/', async (req, res) => {
         recordBirthdateProvided(!!birthdate);  // 생년월일 입력 여부
         if (want_message && phone) {
             recordAckEligible();  // ACK 대상 카운트
+        }
+
+        // 마케팅 이벤트 로깅: trial_start (7일 메시지 수신 = 무료 체험 시작)
+        if (want_message && normalizedPhone) {
+            logEvent(EVENT_TYPES.TRIAL_START, {
+                wish_id: wishData.id,
+                user_name: name,
+                phone: normalizedPhone.substring(0, 3) + '****' + normalizedPhone.slice(-4),
+                gem: finalGem,
+                traffic_light: trafficLight.level
+            }, { source: 'wishRoutes' }).catch(err => {
+                console.error('[Event] trial_start 로깅 실패:', err.message);
+            });
         }
 
         // 신호등 상태별 로깅

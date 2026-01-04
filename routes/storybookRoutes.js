@@ -28,6 +28,7 @@
 const express = require('express');
 const crypto = require('crypto');
 const router = express.Router();
+const { logEvent: logMarketingEvent, EVENT_TYPES } = require('../services/eventLogger');
 
 // DB 모듈 (선택적 로딩)
 let db = null;
@@ -80,6 +81,7 @@ const memoryStore = {
   jobs: new Map(),
   assets: new Map(),
   deliveries: new Map(),
+  checkouts: new Map(),  // 체크아웃 세션 추적
   events: []
 };
 
@@ -194,6 +196,110 @@ async function updateOrderStatus(orderId, status, extra = {}) {
 
   await logEvent(orderId, `status_${status.toLowerCase()}`, extra);
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 0. 체크아웃 세션 시작 (checkout_abandon 추적용)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * POST /api/storybook/checkout/initiate
+ *
+ * 체크아웃 시작을 기록합니다. 결제 완료되지 않으면 checkout_abandon으로 집계됩니다.
+ *
+ * Body:
+ *   {
+ *     "tier": "STARTER|PLUS|PREMIUM",
+ *     "user_id": "USER-123",
+ *     "wish_id": "WISH-456",
+ *     "cart_value": 24900
+ *   }
+ */
+router.post('/checkout/initiate', async (req, res) => {
+  try {
+    const { tier, user_id, wish_id, cart_value } = req.body;
+
+    // 체크아웃 세션 ID 생성
+    const checkoutId = `CHK-${Date.now().toString(36).toUpperCase()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}`;
+
+    const checkoutSession = {
+      checkout_id: checkoutId,
+      tier: tier || 'STARTER',
+      user_id: user_id || null,
+      wish_id: wish_id || null,
+      cart_value: cart_value || TIERS[tier]?.price || 0,
+      status: 'initiated',
+      initiated_at: new Date().toISOString(),
+      completed_at: null
+    };
+
+    // 메모리에 저장
+    memoryStore.checkouts.set(checkoutId, checkoutSession);
+
+    console.log(`🛒 체크아웃 시작: ${checkoutId} (${tier}, ${cart_value || TIERS[tier]?.price}원)`);
+
+    res.json({
+      success: true,
+      checkout_id: checkoutId,
+      message: '체크아웃 세션이 시작되었습니다'
+    });
+
+  } catch (error) {
+    console.error('❌ 체크아웃 시작 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/storybook/checkout/abandon
+ *
+ * 체크아웃 이탈을 명시적으로 기록합니다 (페이지 이탈 시 호출).
+ */
+router.post('/checkout/abandon', async (req, res) => {
+  try {
+    const { checkout_id } = req.body;
+
+    const session = memoryStore.checkouts.get(checkout_id);
+
+    if (session && session.status === 'initiated') {
+      session.status = 'abandoned';
+      session.abandoned_at = new Date().toISOString();
+
+      // 마케팅 이벤트 로깅
+      logMarketingEvent(EVENT_TYPES.CHECKOUT_ABANDON, {
+        checkout_id: session.checkout_id,
+        user_id: session.user_id,
+        wish_id: session.wish_id,
+        tier: session.tier,
+        cart_value: session.cart_value,
+        time_to_abandon_ms: Date.now() - new Date(session.initiated_at).getTime()
+      }, { source: 'storybookRoutes' }).catch(err => {
+        console.error('[Event] checkout_abandon 로깅 실패:', err.message);
+      });
+
+      console.log(`🚪 체크아웃 이탈: ${checkout_id}`);
+
+      res.json({
+        success: true,
+        message: '체크아웃 이탈이 기록되었습니다'
+      });
+    } else {
+      res.json({
+        success: false,
+        message: '유효한 체크아웃 세션이 아닙니다'
+      });
+    }
+
+  } catch (error) {
+    console.error('❌ 체크아웃 이탈 기록 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 1. 결제 웹훅 수신
