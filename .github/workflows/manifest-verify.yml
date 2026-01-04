@@ -1,0 +1,63 @@
+name: Manifest Verify
+
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - "scripts/**"
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "scripts/**"
+
+jobs:
+  manifest-verify:
+    name: Verify Manifest & Index
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Run manifest verification
+        id: verify
+        run: |
+          echo "🔍 Running manifest verification..."
+          node scripts/manifest-verify.js --log
+          echo "✅ Manifest verification passed"
+
+      - name: Upload manifest report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: manifest-report
+          path: artifacts/manifest_report.md
+          if-no-files-found: ignore
+
+      - name: Summary on success
+        if: success()
+        run: |
+          echo "## ✅ Manifest Verification Passed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All checks passed:" >> $GITHUB_STEP_SUMMARY
+          echo "- \`docs/manifest.json\` is valid" >> $GITHUB_STEP_SUMMARY
+          echo "- \`docs/decisions/index.md\` is consistent" >> $GITHUB_STEP_SUMMARY
+          echo "- No missing files or duplicate IDs" >> $GITHUB_STEP_SUMMARY
+
+      - name: Summary on failure
+        if: failure()
+        run: |
+          echo "## ❌ Manifest Verification Failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Please fix the following issues:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Run \`node scripts/manifest-verify.js\` locally" >> $GITHUB_STEP_SUMMARY
+          echo "2. Fix any errors (missing files, duplicate IDs, etc.)" >> $GITHUB_STEP_SUMMARY
+          echo "3. Or rebuild: \`node scripts/manifest-rebuild.js --rebuild-index\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Check the uploaded artifact for detailed report." >> $GITHUB_STEP_SUMMARY
