@@ -11,6 +11,16 @@ on:
         required: false
         default: 'false'
         type: boolean
+      priority:
+        description: 'Priority filter (high|medium|low|all)'
+        required: false
+        default: 'high'
+        type: choice
+        options:
+          - high
+          - medium
+          - low
+          - all
 
 jobs:
   nightly-dec:
@@ -28,22 +38,28 @@ jobs:
 
       - name: Run nightly DEC candidates
         id: nightly
+        env:
+          PRIORITY: ${{ inputs.priority || 'high' }}
         run: |
           echo "🌙 Starting nightly DEC candidate generation..."
+          echo "   Priority: $PRIORITY"
 
           if [ "${{ inputs.dry_run }}" = "true" ]; then
-            node scripts/ops/nightly-dec-candidates.js --dry-run --log
+            node scripts/ops/nightly-dec-candidates.js --priority "$PRIORITY" --dry-run --log
           else
-            node scripts/ops/nightly-dec-candidates.js --log
+            node scripts/ops/nightly-dec-candidates.js --priority "$PRIORITY" --log
           fi
 
           echo "✅ Nightly candidates generation completed"
 
       - name: Generate daily report
         if: inputs.dry_run != 'true'
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           echo "📊 Generating daily report..."
-          node scripts/ops/daily-dec-report.js --log
+          node scripts/ops/daily-dec-report.js --log --notify
           echo "✅ Daily report generated"
 
       - name: Upload nightly run results
@@ -68,8 +84,12 @@ jobs:
 
       - name: Summary
         if: always()
+        env:
+          PRIORITY: ${{ inputs.priority || 'high' }}
         run: |
           echo "## 🌙 Nightly DEC Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Priority Filter:** \`$PRIORITY\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # Check for nightly run result

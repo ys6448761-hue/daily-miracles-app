@@ -29,6 +29,58 @@ scripts/debate-trigger.js --promote
 docs/decisions/DEC-YYYY-MMDD-###.md (정식 DEC)
 ```
 
+### 운영 원칙
+
+#### (A) 자동화 범위
+
+| 단계 | 실행 방식 | 설명 |
+|------|----------|------|
+| Nightly | 자동 | DEC 후보(DRAFT) 생성 + 리포트 생성까지만 |
+| Promote | 수동 | 사람이 직접 실행 + 토큰 필요 |
+
+**핵심 규칙**:
+- GitHub Actions에는 `DEC_PROMOTE_TOKEN`을 **절대 넣지 않는다** (자동 승인 방지)
+- 모든 정식 DEC 발행은 승인자가 직접 토큰과 함께 실행
+
+#### (B) 수동 승인 표준 커맨드
+
+```bash
+DEC_PROMOTE_TOKEN=secret node scripts/debate-trigger.js \
+  --query "쿼리" \
+  --generate-dec-draft \
+  --promote \
+  --decider "푸르미르" \
+  --delete-draft \
+  --log
+```
+
+#### (C) 장애 대응 Quick Reference
+
+| 상황 | 확인 파일 | 조치 |
+|------|----------|------|
+| Nightly 실패 | `artifacts/reports/nightly-run-YYYYMMDD.json` | 실패 쿼리 수동 재실행 |
+| DRAFT 누락 | `docs/decisions/DEC-DRAFT-*.md` | debate-trigger 수동 실행 |
+| 승인 실패 | 콘솔 에러 메시지 | 토큰/파일 경로 확인 |
+
+### 쿼리 우선순위 정책
+
+| Priority | 실행 주기 | 설명 |
+|----------|----------|------|
+| `high` | Nightly (매일) | 핵심 의사결정 영역 - 자동 실행 |
+| `medium` | Weekly (주간) | 보조 영역 - 주 1회 수동/예약 |
+| `low` | Manual (수동) | 필요시에만 수동 실행 |
+
+```bash
+# High만 실행 (Nightly 기본)
+node scripts/ops/nightly-dec-candidates.js --priority high
+
+# Medium 포함 (Weekly)
+node scripts/ops/nightly-dec-candidates.js --priority medium
+
+# 전체 실행
+node scripts/ops/nightly-dec-candidates.js --priority all
+```
+
 ## 2. 일일 운영 체크리스트
 
 ### 아침 (09:00)
@@ -117,14 +169,21 @@ configs/dec-queries.json
 
 ### 필드 설명
 
-| 필드 | 설명 | 필수 |
-|------|------|------|
-| id | 고유 식별자 | O |
-| query | 검색할 쿼리 문자열 | O |
-| scopes | 검색 범위 (decisions,system,execution,team,all) | O |
-| mode | 요약 모드 (general,decision,action) | O |
-| priority | 우선순위 (high,medium,low) | X |
-| enabled | 활성화 여부 | X (기본: true) |
+| 필드 | 설명 | 필수 | 기본값 |
+|------|------|------|--------|
+| id | 고유 식별자 | O | - |
+| query | 검색할 쿼리 문자열 | O | - |
+| scopes | 검색 범위 (decisions,system,execution,team,all) | O | - |
+| mode | 요약 모드 (general,decision,action) | O | - |
+| priority | 우선순위 (high,medium,low) | X | medium |
+| enabled | 활성화 여부 | X | true |
+| notes | 비고/메모 (운영용) | X | - |
+
+### 우선순위별 실행 정책
+
+- `priority: "high"` → Nightly 자동 실행 대상
+- `priority: "medium"` → Weekly(주간) 수동/예약 실행
+- `priority: "low"` → 필요시에만 수동 실행
 
 ## 5. 실패 대응
 
@@ -248,4 +307,4 @@ daily-miracles-mvp/
 
 ---
 
-*마지막 업데이트: 2026-01-05*
+*마지막 업데이트: 2026-01-05 (P6-3.1)*

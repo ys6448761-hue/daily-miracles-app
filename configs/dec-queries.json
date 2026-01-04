@@ -1,6 +1,11 @@
 {
   "description": "Nightly DEC 후보 생성을 위한 쿼리 목록",
-  "version": "1.0",
+  "version": "1.1",
+  "policy": {
+    "high": "Nightly 자동 실행 (매일)",
+    "medium": "Weekly 수동/예약 실행 (주 1회)",
+    "low": "Manual 필요시 수동 실행"
+  },
   "queries": [
     {
       "id": "signal-system",
@@ -8,7 +13,8 @@
       "scopes": "decisions,system",
       "mode": "decision",
       "priority": "high",
-      "enabled": true
+      "enabled": true,
+      "notes": "핵심 운영 시스템 - RED/YELLOW/GREEN 대응"
     },
     {
       "id": "wish-painting",
@@ -16,7 +22,8 @@
       "scopes": "all",
       "mode": "decision",
       "priority": "high",
-      "enabled": true
+      "enabled": true,
+      "notes": "핵심 제품 - 소원그림 생성/전달"
     },
     {
       "id": "airtable-automation",
@@ -24,7 +31,8 @@
       "scopes": "system,execution",
       "mode": "action",
       "priority": "medium",
-      "enabled": true
+      "enabled": true,
+      "notes": "주간 점검 대상 - 자동화 설정 변경사항"
     },
     {
       "id": "message-template",
@@ -32,7 +40,8 @@
       "scopes": "system",
       "mode": "decision",
       "priority": "medium",
-      "enabled": true
+      "enabled": true,
+      "notes": "주간 점검 대상 - 메시지 문구 변경"
     },
     {
       "id": "api-design",
@@ -40,7 +49,8 @@
       "scopes": "system",
       "mode": "action",
       "priority": "low",
-      "enabled": false
+      "enabled": false,
+      "notes": "필요시 수동 실행 - 현재 비활성화"
     }
   ],
   "defaults": {
