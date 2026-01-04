@@ -1,0 +1,99 @@
+name: Approve DEC (safe mode: draft + copy command)
+
+on:
+  workflow_dispatch:
+    inputs:
+      query:
+        description: '검색/토론 쿼리 (필수)'
+        required: true
+        type: string
+      decider:
+        description: '승인자 이름 (기본: 푸르미르)'
+        required: false
+        default: '푸르미르'
+        type: string
+      scopes:
+        description: '검색 범위 (decisions,system,execution,team,all)'
+        required: false
+        default: 'all'
+        type: string
+      mode:
+        description: '요약 모드 (general|decision|action)'
+        required: false
+        default: 'decision'
+        type: choice
+        options:
+          - general
+          - decision
+          - action
+      k:
+        description: '상위 결과 개수'
+        required: false
+        default: '5'
+        type: string
+      delete_draft:
+        description: 'DRAFT 생성 후 삭제(기본 false 권장)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+jobs:
+  approve-dec:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate DEC DRAFT (no promote)
+        run: |
+          echo "Query=${{ inputs.query }}"
+          node scripts/debate-trigger.js \
+            --query "${{ inputs.query }}" \
+            --scopes "${{ inputs.scopes }}" \
+            --mode "${{ inputs.mode }}" \
+            --k "${{ inputs.k }}" \
+            --generate-dec-draft \
+            --decider "${{ inputs.decider }}" \
+            --log
+
+      - name: Optionally delete drafts (best-effort)
+        if: ${{ inputs.delete_draft == 'true' }}
+        run: |
+          rm -f docs/decisions/DEC-DRAFT-*.md || true
+
+      - name: Write copy-friendly approve command to workflow summary
+        run: |
+          {
+            echo "## ✅ 승인(정식 DEC 발행) 복붙용 커맨드"
+            echo ""
+            echo "> 아래 박스 우측 상단 **Copy** 버튼으로 복사해 로컬(토큰 보유 환경)에서 실행하세요."
+            echo ""
+            echo '```bash'
+            echo 'DEC_PROMOTE_TOKEN=YOUR_TOKEN node scripts/debate-trigger.js \'
+            echo "  --query \"${{ inputs.query }}\" \\"
+            echo '  --generate-dec-draft \'
+            echo '  --promote \'
+            echo "  --decider \"${{ inputs.decider }}\" \\"
+            echo '  --delete-draft \'
+            echo '  --log'
+            echo '```'
+            echo ""
+            echo "### 입력값"
+            echo "- query: \`${{ inputs.query }}\`"
+            echo "- scopes: \`${{ inputs.scopes }}\`"
+            echo "- mode: \`${{ inputs.mode }}\`"
+            echo "- k: \`${{ inputs.k }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
