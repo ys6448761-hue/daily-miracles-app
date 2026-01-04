@@ -152,3 +152,24 @@ jobs:
             fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
               `\n---\n🏷️ **DEC-PENDING** 라벨이 PR #${prNumber}에 부착되었습니다.\n`
             );
+
+            // PR에 코멘트 추가
+            const query = `${{ inputs.query }}`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: [
+                '## 🔔 승인 커맨드 생성됨 · 로컬 실행 대기',
+                '',
+                `**Query**: \`${query}\``,
+                '',
+                '승인자는 Workflow Summary에서 복붙용 커맨드를 복사하여 로컬에서 실행하세요.',
+                '',
+                '승격 완료 후 이 PR에 `/dec approved` 코멘트를 남겨주세요.',
+                '',
+                '---',
+                `🔗 [Workflow Run](${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID})`
+              ].join('\n')
+            });
+            console.log(`Posted pending comment to PR #${prNumber}`);

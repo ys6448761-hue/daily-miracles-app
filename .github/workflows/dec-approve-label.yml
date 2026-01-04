@@ -84,10 +84,29 @@ jobs:
               content: 'rocket'
             });
 
-            // 확인 코멘트
+            // 확인 코멘트 (상세)
+            const today = new Date();
+            const kst = new Date(today.getTime() + 9 * 60 * 60 * 1000);
+            const dateStr = kst.toISOString().slice(0, 10).replace(/-/g, '-');
+            const decPath = `docs/decisions/`;
+            const repoUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}`;
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: prNumber,
-              body: `✅ **DEC 승인 완료** by @${commenter}\n\n라벨이 \`DEC-APPROVED\`로 변경되었습니다.`
+              body: [
+                `## ✅ 정식 DEC 발행 완료`,
+                ``,
+                `**승인자**: @${commenter}`,
+                `**승인일**: ${dateStr}`,
+                ``,
+                `### 📄 DEC 문서 위치`,
+                `\`${decPath}DEC-${dateStr.replace(/-/g, '-')}-###.md\``,
+                ``,
+                `🔗 [DEC 문서 폴더 보기](${repoUrl}/tree/main/${decPath})`,
+                ``,
+                `---`,
+                `🏷️ 라벨: \`DEC-PENDING\` → \`DEC-APPROVED\``
+              ].join('\n')
             });
