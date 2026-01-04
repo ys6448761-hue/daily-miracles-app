@@ -29,6 +29,26 @@ try {
 // ============ 설정 ============
 const EVENTS_FILE = path.resolve(__dirname, '../artifacts/events.ndjson');
 
+// ============ 중복 방지 규칙 ============
+// 각 이벤트 타입별 idempotent key 정의
+const IDEMPOTENT_RULES = {
+  // storybook_generated: story_id당 1회 (전체 기간)
+  storybook_generated: {
+    keyFields: ['story_id'],
+    scope: 'all'  // 전체 기간
+  },
+  // story_viewed: story_id+user_id+date 기준 1회
+  story_viewed: {
+    keyFields: ['story_id', 'user_id'],
+    scope: 'daily'
+  },
+  // share_opened: share_token+viewer_fingerprint+date 기준 1회
+  share_opened: {
+    keyFields: ['share_token', 'viewer_fingerprint'],
+    scope: 'daily'
+  }
+};
+
 // ============ 이벤트 타입 정의 ============
 const EVENT_TYPES = {
   // 체험 이벤트
@@ -60,6 +80,43 @@ function ensureDirectory() {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
+}
+
+/**
+ * DB에서 중복 이벤트 확인
+ * @param {string} eventType - 이벤트 타입
+ * @param {Object} payload - 이벤트 페이로드
+ * @returns {boolean} - 중복 여부 (true=중복 있음)
+ */
+async function checkDuplicateInDB(eventType, payload) {
+  if (!db) return false;
+
+  const rule = IDEMPOTENT_RULES[eventType];
+  if (!rule) return false;  // 규칙 없으면 중복 체크 안함
+
+  // 쿼리 조건 빌드
+  let query = `SELECT id FROM marketing_events WHERE event_type = $1`;
+  const values = [eventType];
+  let paramIndex = 2;
+
+  // keyFields 조건 추가
+  for (const field of rule.keyFields) {
+    const value = payload[field];
+    if (value !== undefined && value !== null) {
+      query += ` AND payload->>'${field}' = $${paramIndex++}`;
+      values.push(String(value));
+    }
+  }
+
+  // scope에 따른 날짜 조건
+  if (rule.scope === 'daily') {
+    query += ` AND event_date = CURRENT_DATE`;
+  }
+
+  query += ` LIMIT 1`;
+
+  const result = await db.query(query, values);
+  return result.rows.length > 0;
 }
 
 /**
@@ -113,8 +170,8 @@ function logEventToFile(eventType, payload, options) {
  * 이벤트 로깅 (DB 우선, 파일 폴백)
  * @param {string} eventType - 이벤트 타입 (EVENT_TYPES 중 하나)
  * @param {Object} payload - 이벤트 데이터
- * @param {Object} options - 추가 옵션
- * @returns {Object} - 저장된 이벤트 객체
+ * @param {Object} options - 추가 옵션 { source, skipDedup }
+ * @returns {Object} - 저장된 이벤트 객체 또는 null (중복인 경우)
  */
 async function logEvent(eventType, payload = {}, options = {}) {
   // 이벤트 타입 검증
@@ -125,6 +182,15 @@ async function logEvent(eventType, payload = {}, options = {}) {
   try {
     // DB 저장 시도
     if (db) {
+      // 중복 체크 (skipDedup 옵션이 없으면 자동 체크)
+      if (!options.skipDedup && IDEMPOTENT_RULES[eventType]) {
+        const isDuplicate = await checkDuplicateInDB(eventType, payload);
+        if (isDuplicate) {
+          console.log(`⏭️ 이벤트 중복 스킵 [DB]: ${eventType}`);
+          return { event: eventType, _meta: { skipped: true, reason: 'duplicate' } };
+        }
+      }
+
       const dbResult = await logEventToDB(eventType, payload, options);
       if (dbResult) {
         console.log(`📝 이벤트 기록 [DB]: ${eventType} (id: ${dbResult.id})`);
