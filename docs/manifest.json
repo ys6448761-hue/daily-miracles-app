@@ -1,25 +1,116 @@
 {
   "decisions": [
     {
-      "id": "DEC-2025-1230-003",
-      "title": "소원이 실시간 대응 시스템",
-      "date": "2025-12-30",
-      "approved_by": "푸르미르",
-      "path": "docs/decisions/DEC-2025-1230-003_소원이_실시간_대응_시스템.md"
+      "id": "DEC-2026-0103-271",
+      "title": "DEC-2026-0103-271",
+      "date": "2026-01-03",
+      "approved_by": "미정",
+      "path": "docs/decisions/DEC-2026-0103-271.md"
     },
     {
-      "id": "DEC-2025-1230-002",
-      "title": "소원그림 인스타 광고",
-      "date": "2025-12-30",
-      "approved_by": "푸르미르",
-      "path": "docs/decisions/DEC-2025-1230-002_소원그림_광고_결정.md"
+      "id": "DEC-2026-0103-316",
+      "title": "DEC-2026-0103-316",
+      "date": "2026-01-03",
+      "approved_by": "미정",
+      "path": "docs/decisions/DEC-2026-0103-316.md"
+    },
+    {
+      "id": "DEC-2026-0103-325",
+      "title": "DEC-2026-0103-325",
+      "date": "2026-01-03",
+      "approved_by": "미정",
+      "path": "docs/decisions/DEC-2026-0103-325.md"
+    },
+    {
+      "id": "DEC-2026-0103-371",
+      "title": "DEC-2026-0103-371",
+      "date": "2026-01-03",
+      "approved_by": "미정",
+      "path": "docs/decisions/DEC-2026-0103-371.md"
+    },
+    {
+      "id": "DEC-2026-0103-590",
+      "title": "DEC-2026-0103-590",
+      "date": "2026-01-03",
+      "approved_by": "미정",
+      "path": "docs/decisions/DEC-2026-0103-590.md"
+    },
+    {
+      "id": "DEC-2026-0103-638",
+      "title": "DEC-2026-0103-638",
+      "date": "2026-01-03",
+      "approved_by": "미정",
+      "path": "docs/decisions/DEC-2026-0103-638.md"
+    },
+    {
+      "id": "DEC-2026-0103-858",
+      "title": "DEC-2026-0103-858",
+      "date": "2026-01-03",
+      "approved_by": "미정",
+      "path": "docs/decisions/DEC-2026-0103-858.md"
+    },
+    {
+      "id": "DEC-2026-0102-045",
+      "title": "DEC-2026-0102-045",
+      "date": "2026-01-02",
+      "approved_by": "미정",
+      "path": "docs/decisions/DEC-2026-0102-045.md"
+    },
+    {
+      "id": "DEC-2026-0102-121",
+      "title": "���α� ������ ���� ����",
+      "date": "2026-01-02",
+      "approved_by": "미정",
+      "path": "docs/decisions/DEC-2026-0102-121.md"
+    },
+    {
+      "id": "DEC-2026-0102-457",
+      "title": "DEC-2026-0102-457",
+      "date": "2026-01-02",
+      "approved_by": "미정",
+      "path": "docs/decisions/DEC-2026-0102-457.md"
+    },
+    {
+      "id": "DEC-2026-0102-837",
+      "title": "DEC-2026-0102-837",
+      "date": "2026-01-02",
+      "approved_by": "미정",
+      "path": "docs/decisions/DEC-2026-0102-837.md"
+    },
+    {
+      "id": "DEC-2026-0102-933",
+      "title": "DEC-2026-0102-933",
+      "date": "2026-01-02",
+      "approved_by": "미정",
+      "path": "docs/decisions/DEC-2026-0102-933.md"
+    },
+    {
+      "id": "DEC-2026-0102-937",
+      "title": "�ν�Ÿ�׷� ���� ķ���� ���� ����",
+      "date": "2026-01-02",
+      "approved_by": "미정",
+      "path": "docs/decisions/DEC-2026-0102-937.md"
     },
     {
       "id": "DEC-2025-1230-001",
       "title": "소원그림 문구 시스템",
       "date": "2025-12-30",
-      "approved_by": "푸르미르",
+      "approved_by": "푸르미르 (CEO)",
       "path": "docs/decisions/DEC-2025-1230-001_소원그림_문구_시스템.md"
+    },
+    {
+      "id": "DEC-2025-1230-002",
+      "title": "소원그림 인스타 광고",
+      "date": "2025-12-30",
+      "approved_by": "푸르미르 (CEO)",
+      "path": "docs/decisions/DEC-2025-1230-002_소원그림_광고_결정.md"
+    },
+    {
+      "id": "DEC-2025-1230-003",
+      "title": "소원이 실시간 대응 시스템",
+      "date": "2025-12-30",
+      "approved_by": "푸르미르 (CEO)",
+      "path": "docs/decisions/DEC-2025-1230-003_소원이_실시간_대응_시스템.md"
     }
   ]
 }
