@@ -4,7 +4,11 @@
  * 마케팅 이벤트 로깅 유틸리티
  * - DB 우선 저장 (PostgreSQL marketing_events 테이블)
  * - DB 연결 실패 시 파일 폴백 (artifacts/events.ndjson)
- * - 지원 이벤트: trial_start, day3_inactive, checkout_abandon
+ *
+ * 지원 이벤트:
+ *   - trial_start, day3_inactive (체험)
+ *   - checkout_initiate, checkout_abandon, checkout_complete (결제)
+ *   - storybook_generated, story_viewed, share_created, share_opened (가치)
  *
  * Usage:
  *   const { logEvent, EVENT_TYPES } = require('./eventLogger');
@@ -27,11 +31,20 @@ const EVENTS_FILE = path.resolve(__dirname, '../artifacts/events.ndjson');
 
 // ============ 이벤트 타입 정의 ============
 const EVENT_TYPES = {
+  // 체험 이벤트
   TRIAL_START: 'trial_start',             // 무료 체험 시작
   DAY3_INACTIVE: 'day3_inactive',         // 3일째 비활성 사용자
+
+  // 결제 이벤트
   CHECKOUT_INITIATE: 'checkout_initiate', // 체크아웃 시작
   CHECKOUT_ABANDON: 'checkout_abandon',   // 체크아웃 이탈
-  CHECKOUT_COMPLETE: 'checkout_complete'  // 체크아웃 완료 (결제 성공)
+  CHECKOUT_COMPLETE: 'checkout_complete', // 체크아웃 완료 (결제 성공)
+
+  // 가치 이벤트
+  STORYBOOK_GENERATED: 'storybook_generated', // 스토리북 생성 완료
+  STORY_VIEWED: 'story_viewed',               // 스토리 조회
+  SHARE_CREATED: 'share_created',             // 공유 링크 생성
+  SHARE_OPENED: 'share_opened'                // 공유 링크 열람
 };
 
 // 유효 이벤트 타입 목록

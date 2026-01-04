@@ -116,11 +116,18 @@ function getDateRange(options) {
 
 function getEventLabel(event) {
   const labels = {
+    // 체험
     trial_start: '🆓 무료 체험 시작',
     day3_inactive: '⏰ 3일째 비활성',
+    // 결제
     checkout_initiate: '🛒 체크아웃 시작',
     checkout_abandon: '🚪 체크아웃 이탈',
-    checkout_complete: '✅ 결제 완료'
+    checkout_complete: '✅ 결제 완료',
+    // 가치
+    storybook_generated: '📖 스토리북 생성',
+    story_viewed: '👁️ 스토리 조회',
+    share_created: '🔗 공유 생성',
+    share_opened: '📤 공유 열람'
   };
   return labels[event] || event;
 }
@@ -152,13 +159,13 @@ function formatMarkdown(stats) {
   if (dates.length > 0) {
     lines.push(`## 날짜별 상세`);
     lines.push(``);
-    lines.push(`| 날짜 | trial | initiate | abandon | complete | day3 | 합계 |`);
-    lines.push(`|------|-------|----------|---------|----------|------|------|`);
+    lines.push(`| 날짜 | trial | init | aband | compl | day3 | gen | view | share | open | 합계 |`);
+    lines.push(`|------|-------|------|-------|-------|------|-----|------|-------|------|------|`);
 
     for (const date of dates) {
       const d = stats.byDate[date];
       const sum = Object.values(d).reduce((a, b) => a + b, 0);
-      lines.push(`| ${date} | ${d.trial_start || 0} | ${d.checkout_initiate || 0} | ${d.checkout_abandon || 0} | ${d.checkout_complete || 0} | ${d.day3_inactive || 0} | ${sum} |`);
+      lines.push(`| ${date} | ${d.trial_start || 0} | ${d.checkout_initiate || 0} | ${d.checkout_abandon || 0} | ${d.checkout_complete || 0} | ${d.day3_inactive || 0} | ${d.storybook_generated || 0} | ${d.story_viewed || 0} | ${d.share_created || 0} | ${d.share_opened || 0} | ${sum} |`);
     }
     lines.push(``);
   }
@@ -184,8 +191,8 @@ function formatConsole(stats) {
   const dates = Object.keys(stats.byDate).sort();
   if (dates.length > 0) {
     console.log('\n날짜별 상세:');
-    console.log('  날짜         | trial | init  | abandon | complete | day3 | 합계');
-    console.log('  ' + '-'.repeat(65));
+    console.log('  날짜       | trial | init | aband | compl | day3 | gen | view | share | open | 합계');
+    console.log('  ' + '-'.repeat(95));
 
     for (const date of dates) {
       const d = stats.byDate[date];
@@ -193,10 +200,14 @@ function formatConsole(stats) {
       const row = [
         date,
         String(d.trial_start || 0).padStart(5),
-        String(d.checkout_initiate || 0).padStart(5),
-        String(d.checkout_abandon || 0).padStart(7),
-        String(d.checkout_complete || 0).padStart(8),
+        String(d.checkout_initiate || 0).padStart(4),
+        String(d.checkout_abandon || 0).padStart(5),
+        String(d.checkout_complete || 0).padStart(5),
         String(d.day3_inactive || 0).padStart(4),
+        String(d.storybook_generated || 0).padStart(3),
+        String(d.story_viewed || 0).padStart(4),
+        String(d.share_created || 0).padStart(5),
+        String(d.share_opened || 0).padStart(4),
         String(sum).padStart(4)
       ];
       console.log(`  ${row.join(' | ')}`);

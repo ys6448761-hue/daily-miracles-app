@@ -45,6 +45,14 @@ try {
   console.warn('⚠️ StorybookQueue: Solapi 서비스 로드 실패');
 }
 
+// 마케팅 이벤트 로거
+let marketingEventLogger = null;
+try {
+  marketingEventLogger = require('./eventLogger');
+} catch (error) {
+  console.warn('⚠️ StorybookQueue: EventLogger 로드 실패');
+}
+
 // CEO 알림 설정
 const CEO_PHONE = process.env.CEO_PHONE || process.env.CRO_PHONE;
 const ALERT_COOLDOWN_MS = 15 * 60 * 1000; // 15분
@@ -287,6 +295,19 @@ async function processJob(job) {
     duration_ms: duration,
     assets_count: savedAssets.length
   });
+
+  // 마케팅 이벤트: storybook_generated (가치 이벤트)
+  if (marketingEventLogger) {
+    marketingEventLogger.logEvent(marketingEventLogger.EVENT_TYPES.STORYBOOK_GENERATED, {
+      user_id: order.user_id,
+      story_id: order_id,
+      tier: tier,
+      assets_count: savedAssets.length,
+      generation_time_sec: Math.round(duration / 1000)
+    }, { source: 'storybookQueue' }).catch(err => {
+      console.error('[Event] storybook_generated 로깅 실패:', err.message);
+    });
+  }
 
   // DB에 생성 시간 저장
   if (db) {

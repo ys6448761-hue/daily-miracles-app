@@ -756,6 +756,15 @@ router.get('/orders/:orderId/assets', async (req, res) => {
     // 이벤트 기록 (다운로드 클릭)
     await logEvent(orderId, 'assets_viewed', { count: assets.length });
 
+    // 마케팅 이벤트: story_viewed (가치 이벤트)
+    logMarketingEvent(EVENT_TYPES.STORY_VIEWED, {
+      story_id: orderId,
+      view_context: 'my',
+      assets_count: assets.length
+    }, { source: 'storybookRoutes' }).catch(err => {
+      console.error('[Event] story_viewed 로깅 실패:', err.message);
+    });
+
     return res.json({
       success: true,
       order_id: orderId,
@@ -828,6 +837,245 @@ router.post('/orders/:orderId/download', async (req, res) => {
     return res.status(500).json({
       success: false,
       error: 'INTERNAL_ERROR'
+    });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 3.6 공유 기능 (Phase 2-3: 가치 이벤트)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// 메모리 공유 토큰 저장소
+const shareTokens = new Map();
+
+/**
+ * 공유 토큰 생성
+ */
+function generateShareToken() {
+  return crypto.randomBytes(8).toString('base64url');
+}
+
+/**
+ * POST /api/storybook/orders/:orderId/share
+ *
+ * 공유 링크를 생성합니다.
+ *
+ * Body:
+ *   {
+ *     "user_id": "optional"
+ *   }
+ *
+ * Response:
+ *   {
+ *     "success": true,
+ *     "share_token": "abc123",
+ *     "share_url": "/s/abc123",
+ *     "expires_at": "2026-01-11T..."
+ *   }
+ */
+router.post('/orders/:orderId/share', async (req, res) => {
+  const { orderId } = req.params;
+  const { user_id } = req.body;
+
+  try {
+    // 주문 확인
+    let order = null;
+    if (db) {
+      const result = await db.query(
+        'SELECT order_id, user_id, tier, status FROM storybook_orders WHERE order_id = $1',
+        [orderId]
+      );
+      order = result.rows[0];
+    } else {
+      order = memoryStore.orders.get(orderId);
+    }
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        error: 'ORDER_NOT_FOUND',
+        message: '주문을 찾을 수 없습니다'
+      });
+    }
+
+    // 공유 토큰 생성
+    const shareToken = generateShareToken();
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7); // 7일 유효
+
+    const shareData = {
+      token: shareToken,
+      order_id: orderId,
+      user_id: user_id || order.user_id,
+      created_at: new Date().toISOString(),
+      expires_at: expiresAt.toISOString(),
+      view_count: 0
+    };
+
+    // 메모리 저장
+    shareTokens.set(shareToken, shareData);
+
+    // DB 저장 (storybook_shares 테이블이 있으면)
+    if (db) {
+      try {
+        await db.query(
+          `INSERT INTO storybook_shares (share_token, order_id, user_id, expires_at, created_at)
+           VALUES ($1, $2, $3, $4, NOW())
+           ON CONFLICT (share_token) DO NOTHING`,
+          [shareToken, orderId, shareData.user_id, expiresAt]
+        );
+      } catch (e) {
+        // 테이블이 없을 수 있음 - 무시
+      }
+    }
+
+    // 이벤트 기록
+    await logEvent(orderId, 'share_created', { share_token: shareToken });
+
+    // 마케팅 이벤트: share_created (가치 이벤트)
+    logMarketingEvent(EVENT_TYPES.SHARE_CREATED, {
+      user_id: shareData.user_id,
+      story_id: orderId,
+      share_token: shareToken,
+      expires_at: expiresAt.toISOString()
+    }, { source: 'storybookRoutes' }).catch(err => {
+      console.error('[Event] share_created 로깅 실패:', err.message);
+    });
+
+    return res.json({
+      success: true,
+      share_token: shareToken,
+      share_url: `/s/${shareToken}`,
+      expires_at: expiresAt.toISOString()
+    });
+
+  } catch (error) {
+    console.error('공유 링크 생성 실패:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: '공유 링크 생성 중 오류가 발생했습니다'
+    });
+  }
+});
+
+/**
+ * GET /api/storybook/share/:token
+ *
+ * 공유된 스토리를 조회합니다.
+ */
+router.get('/share/:token', async (req, res) => {
+  const { token } = req.params;
+  const referrer = req.get('Referer') || null;
+
+  try {
+    // 토큰 조회
+    let shareData = shareTokens.get(token);
+
+    // DB 조회
+    if (!shareData && db) {
+      try {
+        const result = await db.query(
+          `SELECT share_token, order_id, user_id, expires_at, view_count, created_at
+           FROM storybook_shares
+           WHERE share_token = $1`,
+          [token]
+        );
+        if (result.rows[0]) {
+          shareData = {
+            token: result.rows[0].share_token,
+            order_id: result.rows[0].order_id,
+            user_id: result.rows[0].user_id,
+            expires_at: result.rows[0].expires_at,
+            view_count: result.rows[0].view_count || 0,
+            created_at: result.rows[0].created_at
+          };
+        }
+      } catch (e) {
+        // 테이블이 없을 수 있음
+      }
+    }
+
+    if (!shareData) {
+      return res.status(404).json({
+        success: false,
+        error: 'SHARE_NOT_FOUND',
+        message: '공유 링크를 찾을 수 없습니다'
+      });
+    }
+
+    // 만료 확인
+    if (new Date(shareData.expires_at) < new Date()) {
+      return res.status(410).json({
+        success: false,
+        error: 'SHARE_EXPIRED',
+        message: '공유 링크가 만료되었습니다'
+      });
+    }
+
+    // 산출물 조회
+    let assets = [];
+    if (db) {
+      const result = await db.query(
+        `SELECT asset_type, file_url, file_name FROM storybook_assets WHERE order_id = $1`,
+        [shareData.order_id]
+      );
+      assets = result.rows;
+    } else {
+      assets = Array.from(memoryStore.assets.values())
+        .filter(a => a.order_id === shareData.order_id);
+    }
+
+    // 조회수 증가
+    shareData.view_count = (shareData.view_count || 0) + 1;
+    shareTokens.set(token, shareData);
+
+    if (db) {
+      try {
+        await db.query(
+          `UPDATE storybook_shares SET view_count = view_count + 1 WHERE share_token = $1`,
+          [token]
+        );
+      } catch (e) {
+        // 무시
+      }
+    }
+
+    // 이벤트 기록
+    await logEvent(shareData.order_id, 'share_opened', {
+      share_token: token,
+      view_count: shareData.view_count,
+      referrer
+    });
+
+    // 마케팅 이벤트: share_opened (가치 이벤트)
+    logMarketingEvent(EVENT_TYPES.SHARE_OPENED, {
+      share_token: token,
+      story_id: shareData.order_id,
+      referrer: referrer,
+      view_count: shareData.view_count
+    }, { source: 'storybookRoutes' }).catch(err => {
+      console.error('[Event] share_opened 로깅 실패:', err.message);
+    });
+
+    return res.json({
+      success: true,
+      share_token: token,
+      order_id: shareData.order_id,
+      view_count: shareData.view_count,
+      assets: assets.map(a => ({
+        type: a.asset_type,
+        name: a.file_name,
+        url: a.file_url
+      }))
+    });
+
+  } catch (error) {
+    console.error('공유 링크 조회 실패:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: '공유 링크 조회 중 오류가 발생했습니다'
     });
   }
 });

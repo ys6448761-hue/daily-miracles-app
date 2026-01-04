@@ -219,17 +219,21 @@ async function cmdDaily(days = 7) {
   }
 
   console.log(`\n📈 최근 ${days}일 일별 집계\n`);
-  console.log('─'.repeat(85));
+  console.log('─'.repeat(110));
   console.log(
     'Date'.padEnd(12) +
-    'trial'.padStart(8) +
-    'initiate'.padStart(10) +
-    'abandon'.padStart(10) +
-    'complete'.padStart(10) +
-    'day3'.padStart(8) +
-    'Total'.padStart(10)
+    'trial'.padStart(6) +
+    'init'.padStart(5) +
+    'aband'.padStart(6) +
+    'compl'.padStart(6) +
+    'day3'.padStart(5) +
+    'gen'.padStart(5) +
+    'view'.padStart(6) +
+    'share'.padStart(6) +
+    'open'.padStart(5) +
+    'Total'.padStart(7)
   );
-  console.log('─'.repeat(85));
+  console.log('─'.repeat(110));
 
   const dates = Object.keys(byDate).sort().reverse();
 
@@ -240,16 +244,24 @@ async function cmdDaily(days = 7) {
     const abandon = d.checkout_abandon || 0;
     const complete = d.checkout_complete || 0;
     const day3 = d.day3_inactive || 0;
-    const total = trial + initiate + abandon + complete + day3;
+    const gen = d.storybook_generated || 0;
+    const view = d.story_viewed || 0;
+    const share = d.share_created || 0;
+    const open = d.share_opened || 0;
+    const total = trial + initiate + abandon + complete + day3 + gen + view + share + open;
 
     console.log(
       date.padEnd(12) +
-      String(trial).padStart(8) +
-      String(initiate).padStart(10) +
-      String(abandon).padStart(10) +
-      String(complete).padStart(10) +
-      String(day3).padStart(8) +
-      String(total).padStart(10)
+      String(trial).padStart(6) +
+      String(initiate).padStart(5) +
+      String(abandon).padStart(6) +
+      String(complete).padStart(6) +
+      String(day3).padStart(5) +
+      String(gen).padStart(5) +
+      String(view).padStart(6) +
+      String(share).padStart(6) +
+      String(open).padStart(5) +
+      String(total).padStart(7)
     );
   }
 
