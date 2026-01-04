@@ -235,6 +235,17 @@ router.post('/checkout/initiate', async (req, res) => {
     // 메모리에 저장
     memoryStore.checkouts.set(checkoutId, checkoutSession);
 
+    // 마케팅 이벤트 로깅: checkout_initiate
+    logMarketingEvent(EVENT_TYPES.CHECKOUT_INITIATE, {
+      checkout_id: checkoutId,
+      user_id: checkoutSession.user_id,
+      wish_id: checkoutSession.wish_id,
+      tier: checkoutSession.tier,
+      cart_value: checkoutSession.cart_value
+    }, { source: 'storybookRoutes' }).catch(err => {
+      console.error('[Event] checkout_initiate 로깅 실패:', err.message);
+    });
+
     console.log(`🛒 체크아웃 시작: ${checkoutId} (${tier}, ${cart_value || TIERS[tier]?.price}원)`);
 
     res.json({
@@ -476,6 +487,20 @@ router.post('/webhook/payment', async (req, res) => {
 
     // 5. 이벤트 기록
     await logEvent(orderId, 'pay_success', { tier, amount: order.amount, payment_id });
+
+    // 5-1. 마케팅 이벤트 로깅: checkout_complete
+    logMarketingEvent(EVENT_TYPES.CHECKOUT_COMPLETE, {
+      order_id: orderId,
+      payment_id: payment_id,
+      user_id: order.user_id,
+      wish_id: wish_id,
+      tier: tier,
+      amount: order.amount,
+      customer_email: customer_email ? customer_email.substring(0, 3) + '***' : null,
+      customer_phone: customer_phone ? customer_phone.substring(0, 3) + '****' : null
+    }, { source: 'storybookRoutes' }).catch(err => {
+      console.error('[Event] checkout_complete 로깅 실패:', err.message);
+    });
 
     // 6. Job 큐에 등록
     const jobId = await queueGenerationJob(orderId, tier);

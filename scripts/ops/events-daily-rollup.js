@@ -3,8 +3,8 @@
  * events-daily-rollup.js
  *
  * 일별 마케팅 이벤트 집계 스크립트
- * - artifacts/events.ndjson을 읽어 일별 카운트 집계
- * - 콘솔 출력 또는 JSON/마크다운 파일 저장
+ * - DB 우선 조회 (PostgreSQL marketing_events)
+ * - DB 실패 시 artifacts/events.ndjson 폴백
  *
  * Usage:
  *   node scripts/ops/events-daily-rollup.js [options]
@@ -22,7 +22,7 @@
 const fs = require('fs');
 const path = require('path');
 
-// eventLogger 모듈 로드
+// eventLogger 모듈 로드 (DB 우선 조회 지원)
 const eventLogger = require('../../services/eventLogger');
 
 // ============ 유틸리티 ============
@@ -61,7 +61,7 @@ function parseArgs() {
       case '--help':
       case '-h':
         console.log(`
-일별 마케팅 이벤트 집계 스크립트
+일별 마케팅 이벤트 집계 스크립트 (DB 우선)
 
 Usage:
   node scripts/ops/events-daily-rollup.js [options]
@@ -80,6 +80,10 @@ Examples:
   node scripts/ops/events-daily-rollup.js --range 7        # 최근 7일
   node scripts/ops/events-daily-rollup.js --from 2026-01-01 --to 2026-01-05
   node scripts/ops/events-daily-rollup.js --out artifacts/reports/daily-events.md
+
+Data Source:
+  1. PostgreSQL marketing_events 테이블 (우선)
+  2. artifacts/events.ndjson 파일 (폴백)
 `);
         process.exit(0);
     }
@@ -89,8 +93,6 @@ Examples:
 }
 
 function getDateRange(options) {
-  const today = new Date().toISOString().slice(0, 10);
-
   if (options.date) {
     return { from: options.date, to: options.date };
   }
@@ -112,12 +114,24 @@ function getDateRange(options) {
 
 // ============ 출력 포맷 ============
 
+function getEventLabel(event) {
+  const labels = {
+    trial_start: '🆓 무료 체험 시작',
+    day3_inactive: '⏰ 3일째 비활성',
+    checkout_initiate: '🛒 체크아웃 시작',
+    checkout_abandon: '🚪 체크아웃 이탈',
+    checkout_complete: '✅ 결제 완료'
+  };
+  return labels[event] || event;
+}
+
 function formatMarkdown(stats) {
   const lines = [
     `# 📊 마케팅 이벤트 일별 집계`,
     ``,
     `> 기간: ${stats.dateFrom} ~ ${stats.dateTo}`,
     `> 생성: ${new Date().toLocaleString('ko-KR')}`,
+    `> 소스: ${stats.source || 'unknown'}`,
     ``,
     `## 요약`,
     ``,
@@ -138,13 +152,13 @@ function formatMarkdown(stats) {
   if (dates.length > 0) {
     lines.push(`## 날짜별 상세`);
     lines.push(``);
-    lines.push(`| 날짜 | trial_start | day3_inactive | checkout_abandon | 합계 |`);
-    lines.push(`|------|-------------|---------------|------------------|------|`);
+    lines.push(`| 날짜 | trial | initiate | abandon | complete | day3 | 합계 |`);
+    lines.push(`|------|-------|----------|---------|----------|------|------|`);
 
     for (const date of dates) {
       const d = stats.byDate[date];
       const sum = Object.values(d).reduce((a, b) => a + b, 0);
-      lines.push(`| ${date} | ${d.trial_start || 0} | ${d.day3_inactive || 0} | ${d.checkout_abandon || 0} | ${sum} |`);
+      lines.push(`| ${date} | ${d.trial_start || 0} | ${d.checkout_initiate || 0} | ${d.checkout_abandon || 0} | ${d.checkout_complete || 0} | ${d.day3_inactive || 0} | ${sum} |`);
     }
     lines.push(``);
   }
@@ -152,19 +166,11 @@ function formatMarkdown(stats) {
   return lines.join('\n');
 }
 
-function getEventLabel(event) {
-  const labels = {
-    trial_start: '🆓 무료 체험 시작',
-    day3_inactive: '⏰ 3일째 비활성',
-    checkout_abandon: '🛒 결제 이탈'
-  };
-  return labels[event] || event;
-}
-
 function formatConsole(stats) {
   console.log('\n📊 마케팅 이벤트 일별 집계\n');
   console.log(`기간: ${stats.dateFrom} ~ ${stats.dateTo}`);
-  console.log('─'.repeat(50));
+  console.log(`소스: ${stats.source || 'unknown'}`);
+  console.log('─'.repeat(60));
   console.log('\n요약:');
 
   for (const [event, count] of Object.entries(stats.totals)) {
@@ -173,18 +179,27 @@ function formatConsole(stats) {
   }
 
   console.log(`\n  📌 총 이벤트: ${stats.totalEvents}건`);
-  console.log('─'.repeat(50));
+  console.log('─'.repeat(60));
 
   const dates = Object.keys(stats.byDate).sort();
   if (dates.length > 0) {
     console.log('\n날짜별 상세:');
-    console.log('  날짜         | trial | day3  | checkout | 합계');
-    console.log('  ' + '-'.repeat(45));
+    console.log('  날짜         | trial | init  | abandon | complete | day3 | 합계');
+    console.log('  ' + '-'.repeat(65));
 
     for (const date of dates) {
       const d = stats.byDate[date];
       const sum = Object.values(d).reduce((a, b) => a + b, 0);
-      console.log(`  ${date} | ${String(d.trial_start || 0).padStart(5)} | ${String(d.day3_inactive || 0).padStart(5)} | ${String(d.checkout_abandon || 0).padStart(8)} | ${String(sum).padStart(4)}`);
+      const row = [
+        date,
+        String(d.trial_start || 0).padStart(5),
+        String(d.checkout_initiate || 0).padStart(5),
+        String(d.checkout_abandon || 0).padStart(7),
+        String(d.checkout_complete || 0).padStart(8),
+        String(d.day3_inactive || 0).padStart(4),
+        String(sum).padStart(4)
+      ];
+      console.log(`  ${row.join(' | ')}`);
     }
   }
 
@@ -197,8 +212,18 @@ async function main() {
   const options = parseArgs();
   const { from, to } = getDateRange(options);
 
-  // 집계 수행
-  const stats = eventLogger.getRangeStats(from, to);
+  console.error(`📅 조회 기간: ${from} ~ ${to}`);
+
+  // 집계 수행 (async - DB 우선 조회)
+  const stats = await eventLogger.getRangeStats(from, to);
+
+  // 소스 표시 추가
+  if (stats.byDate && Object.keys(stats.byDate).length > 0) {
+    const firstEvent = Object.values(stats.byDate)[0];
+    stats.source = 'DB (PostgreSQL)';
+  } else {
+    stats.source = 'File (events.ndjson)';
+  }
 
   // 출력
   if (options.out) {
@@ -214,11 +239,10 @@ async function main() {
     if (ext === '.json') {
       fs.writeFileSync(outputPath, JSON.stringify(stats, null, 2), 'utf-8');
     } else {
-      // .md 또는 기타
       fs.writeFileSync(outputPath, formatMarkdown(stats), 'utf-8');
     }
 
-    console.log(`✅ 리포트 저장: ${outputPath}`);
+    console.error(`✅ 리포트 저장: ${outputPath}`);
   } else if (options.json) {
     console.log(JSON.stringify(stats, null, 2));
   } else {

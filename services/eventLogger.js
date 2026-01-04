@@ -27,9 +27,11 @@ const EVENTS_FILE = path.resolve(__dirname, '../artifacts/events.ndjson');
 
 // ============ 이벤트 타입 정의 ============
 const EVENT_TYPES = {
-  TRIAL_START: 'trial_start',           // 무료 체험 시작
-  DAY3_INACTIVE: 'day3_inactive',       // 3일째 비활성 사용자
-  CHECKOUT_ABANDON: 'checkout_abandon'  // 결제 이탈
+  TRIAL_START: 'trial_start',             // 무료 체험 시작
+  DAY3_INACTIVE: 'day3_inactive',         // 3일째 비활성 사용자
+  CHECKOUT_INITIATE: 'checkout_initiate', // 체크아웃 시작
+  CHECKOUT_ABANDON: 'checkout_abandon',   // 체크아웃 이탈
+  CHECKOUT_COMPLETE: 'checkout_complete'  // 체크아웃 완료 (결제 성공)
 };
 
 // 유효 이벤트 타입 목록
