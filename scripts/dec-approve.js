@@ -283,6 +283,228 @@ function writeLog(options, oldDocNumber, newDocNumber, runtimeMs) {
 }
 
 /**
+ * Index 업데이트 로그 기록
+ */
+function writeIndexLog(decMeta, indexSuccess, manifestSuccess, error) {
+  const logPath = path.join(__dirname, '..', 'artifacts', 'search_logs.ndjson');
+
+  const logEntry = {
+    timestamp: new Date().toISOString(),
+    type: 'dec_index_update',
+    doc_id: decMeta.id,
+    index_updated: indexSuccess,
+    manifest_updated: manifestSuccess,
+    error: error || null
+  };
+
+  try {
+    fs.appendFileSync(logPath, JSON.stringify(logEntry) + '\n', 'utf-8');
+  } catch (e) {
+    // 로그 실패는 무시
+  }
+}
+
+/**
+ * 기존 DEC 파일들에서 메타데이터 수집
+ */
+function collectExistingDECs() {
+  const decisionsDir = path.join(__dirname, '..', 'docs', 'decisions');
+  const decs = [];
+
+  if (!fs.existsSync(decisionsDir)) {
+    return decs;
+  }
+
+  const files = fs.readdirSync(decisionsDir);
+  // DEC-YYYY-MMDD-### 형태만 (DRAFT 제외)
+  const pattern = /^DEC-(\d{4})-(\d{4})-(\d{3})(?:_(.+))?\.md$/;
+
+  for (const file of files) {
+    const match = file.match(pattern);
+    if (match) {
+      const [, year, monthDay, seq, slug] = match;
+      const date = `${year}-${monthDay.slice(0, 2)}-${monthDay.slice(2, 4)}`;
+      const id = `DEC-${year}-${monthDay}-${seq}`;
+
+      // 파일에서 승인자 추출 시도
+      let approvedBy = '미정';
+      let title = slug ? slug.replace(/_/g, ' ') : id;
+
+      try {
+        const content = fs.readFileSync(path.join(decisionsDir, file), 'utf-8');
+        const approverMatch = content.match(/\|\s*승인자\s*\|\s*(.+?)\s*\|/);
+        if (approverMatch) {
+          approvedBy = approverMatch[1].trim();
+        }
+        const titleMatch = content.match(/\|\s*(?:제목|주제)\s*\|\s*(.+?)\s*\|/);
+        if (titleMatch) {
+          title = titleMatch[1].trim();
+        }
+      } catch (e) {
+        // 파일 읽기 실패 시 기본값 사용
+      }
+
+      decs.push({
+        id,
+        title,
+        date,
+        approved_by: approvedBy,
+        path: `docs/decisions/${file}`,
+        year,
+        monthDay,
+        seq: parseInt(seq, 10)
+      });
+    }
+  }
+
+  // 최신순 정렬 (날짜 내림차순, 번호 오름차순)
+  decs.sort((a, b) => {
+    const dateCompare = b.date.localeCompare(a.date);
+    if (dateCompare !== 0) return dateCompare;
+    return a.seq - b.seq;
+  });
+
+  return decs;
+}
+
+/**
+ * docs/decisions/index.md 업데이트
+ */
+function updateDecisionsIndex(decMeta) {
+  const indexPath = path.join(__dirname, '..', 'docs', 'decisions', 'index.md');
+
+  // 기존 DEC 수집 (새 항목 포함)
+  let decs = collectExistingDECs();
+
+  // 새 항목이 이미 있는지 확인 (upsert)
+  const existingIdx = decs.findIndex(d => d.id === decMeta.id);
+  if (existingIdx >= 0) {
+    decs[existingIdx] = { ...decs[existingIdx], ...decMeta };
+  }
+  // 이미 collectExistingDECs에서 파일을 읽었으므로 추가 불필요
+
+  // 최대 50개 유지
+  decs = decs.slice(0, 50);
+
+  // 날짜별 그룹화
+  const byDate = {};
+  for (const dec of decs) {
+    if (!byDate[dec.date]) {
+      byDate[dec.date] = [];
+    }
+    byDate[dec.date].push(dec);
+  }
+
+  // 마크다운 생성
+  let md = `# Decisions Index
+
+> 최신 승인된 결정문 목록 (자동 생성)
+> 마지막 업데이트: ${new Date().toISOString().slice(0, 10)}
+
+`;
+
+  const dates = Object.keys(byDate).sort().reverse();
+  for (const date of dates) {
+    md += `## ${date}\n\n`;
+    for (const dec of byDate[date]) {
+      md += `- **${dec.id}** ${dec.title}\n`;
+      md += `  - 승인자: ${dec.approved_by}\n`;
+      md += `  - 경로: ${dec.path}\n\n`;
+    }
+  }
+
+  // 저장
+  fs.writeFileSync(indexPath, md, 'utf-8');
+  return true;
+}
+
+/**
+ * docs/manifest.json 업데이트
+ */
+function updateManifest(decMeta) {
+  const manifestPath = path.join(__dirname, '..', 'docs', 'manifest.json');
+
+  let manifest = { decisions: [] };
+
+  // 기존 manifest 로드
+  if (fs.existsSync(manifestPath)) {
+    try {
+      const content = fs.readFileSync(manifestPath, 'utf-8');
+      manifest = JSON.parse(content);
+      if (!manifest.decisions) {
+        manifest.decisions = [];
+      }
+    } catch (e) {
+      // 파싱 실패 시 새로 생성
+      manifest = { decisions: [] };
+    }
+  }
+
+  // 새 항목 정제
+  const newEntry = {
+    id: decMeta.id,
+    title: decMeta.title,
+    date: decMeta.date,
+    approved_by: decMeta.approved_by,
+    path: decMeta.path
+  };
+
+  // 중복 제거 (id 기준 upsert)
+  const existingIdx = manifest.decisions.findIndex(d => d.id === decMeta.id);
+  if (existingIdx >= 0) {
+    manifest.decisions[existingIdx] = newEntry;
+  } else {
+    // 최신 항목을 앞쪽에 배치
+    manifest.decisions.unshift(newEntry);
+  }
+
+  // 최신순 정렬
+  manifest.decisions.sort((a, b) => {
+    const dateCompare = b.date.localeCompare(a.date);
+    if (dateCompare !== 0) return dateCompare;
+    return a.id.localeCompare(b.id);
+  });
+
+  // 저장
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf-8');
+  return true;
+}
+
+/**
+ * Post-approve hook: Index와 Manifest 갱신 (best-effort)
+ */
+function runPostApproveHooks(decMeta, shouldLog) {
+  let indexSuccess = false;
+  let manifestSuccess = false;
+  let error = null;
+
+  console.log('📋 Index/Manifest 갱신 중...');
+
+  try {
+    indexSuccess = updateDecisionsIndex(decMeta);
+    console.log('   ✅ docs/decisions/index.md 갱신됨');
+  } catch (e) {
+    error = `index: ${e.message}`;
+    console.warn(`   ⚠️  index.md 갱신 실패: ${e.message}`);
+  }
+
+  try {
+    manifestSuccess = updateManifest(decMeta);
+    console.log('   ✅ docs/manifest.json 갱신됨');
+  } catch (e) {
+    error = error ? `${error}, manifest: ${e.message}` : `manifest: ${e.message}`;
+    console.warn(`   ⚠️  manifest.json 갱신 실패: ${e.message}`);
+  }
+
+  // 로그 기록
+  if (shouldLog) {
+    writeIndexLog(decMeta, indexSuccess, manifestSuccess, error);
+  }
+
+  return { indexSuccess, manifestSuccess };
+}
+
+/**
  * 사용법 출력
  */
 function printUsage() {
@@ -389,7 +611,19 @@ function main() {
       console.log(`   🗑️  원본 DRAFT 삭제됨`);
     }
 
-    // 9. 로그 기록
+    // 9. Post-approve hooks: Index/Manifest 갱신 (best-effort)
+    const slug = extractSlugFromPath(options.in);
+    const { full: approvalDate } = getTodayKST();
+    const decMeta = {
+      id: newDocNumber,
+      title: extractQueryFromContent(approvedContent) || slug.replace(/_/g, ' '),
+      date: approvalDate,
+      approved_by: options.decider,
+      path: options.out
+    };
+    runPostApproveHooks(decMeta, options.log);
+
+    // 10. 로그 기록
     if (options.log) {
       writeLog(options, oldDocNumber, newDocNumber, runtimeMs);
       console.log(`📊 로그 기록됨 (${runtimeMs}ms)`);

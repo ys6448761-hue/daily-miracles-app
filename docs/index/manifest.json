@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-01-04T08:42:59.344Z",
+  "generated_at": "2026-01-04T11:18:03.673Z",
   "generator": "generate-manifest.js",
-  "total_count": 98,
+  "total_count": 99,
   "documents": [
     {
       "id": "DOC-airtable-schema",
@@ -119,6 +119,23 @@
       "title": "README",
       "created_at": "2026-01-04",
       "checksum": "60a0b4af"
+    },
+    {
+      "id": "DOC-index",
+      "path": "docs/decisions/index.md",
+      "type": "decision",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "decisions",
+      "tags": [
+        "decisions",
+        "소원"
+      ],
+      "owner": "ceo",
+      "status": "active",
+      "title": "Decisions Index",
+      "created_at": "2026-01-04",
+      "checksum": "43c87fe9"
     },
     {
       "id": "DOC-deployment-checklist",
