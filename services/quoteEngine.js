@@ -298,21 +298,39 @@ function calculateQuote(options) {
   // ─────────────────────────────────────────────────────────────────────────
   // 3. 소원항해단 가격 (1인당 × 인원)
   // ─────────────────────────────────────────────────────────────────────────
+  let wishVoyageLocation = null;
   if (hasWishVoyage) {
-    const wishVoyagePrices = getActiveWishVoyagePrices(region);
+    const activeVersion = region.wishVoyage.versions.find(v => v.status === 'active');
+    const wishVoyagePrices = activeVersion ? activeVersion.items : {};
     const voyagePrice = wishVoyagePrices[wishVoyageType];
 
     if (voyagePrice) {
+      // 타입별 이름 설정
+      const typeNames = {
+        basic: '기본',
+        online: '온라인 구매자',
+        experience: '체험'
+      };
+
+      // [정책 P0] experience 장소 정책 적용
+      if (wishVoyageType === 'experience' && activeVersion?.locationPolicy) {
+        const isWeekendDay = isWeekend(dayType);
+        wishVoyageLocation = isWeekendDay
+          ? activeVersion.locationPolicy.weekend    // gallery_or_mongdol (ship 금지)
+          : activeVersion.locationPolicy.weekday;   // ship_or_gallery
+      }
+
       breakdown.push({
         category: 'wishVoyage',
         code: wishVoyageType,
-        name: `소원항해단 (${wishVoyageType === 'online' ? '온라인 구매자' : '기본'})`,
+        name: `소원항해단 (${typeNames[wishVoyageType] || wishVoyageType})`,
         perPerson: voyagePrice.sell,
         guests: guestCount,
         cost: voyagePrice.cost * guestCount,
         sell: voyagePrice.sell * guestCount,
         list: voyagePrice.list * guestCount,
-        quantity: guestCount
+        quantity: guestCount,
+        ...(wishVoyageLocation && { location: wishVoyageLocation })
       });
       totalCost += voyagePrice.cost * guestCount;
       totalSell += voyagePrice.sell * guestCount;
@@ -400,6 +418,7 @@ function calculateQuote(options) {
   return {
     success: true,
     quoteId: generateQuoteId(),
+    priceVersion: priceData.meta.priceVersion,  // v1.1
     region: regionCode,
     isGroup: isGroup,
     guestCount: guestCount,
@@ -419,6 +438,11 @@ function calculateQuote(options) {
     voucher: voucher,
 
     validUntil: getValidUntil(),
+
+    // experience 장소 정책 (P0)
+    ...(wishVoyageLocation && {
+      wishVoyageLocation: wishVoyageLocation
+    }),
 
     // 단체 추가 정보
     ...(isGroup && {

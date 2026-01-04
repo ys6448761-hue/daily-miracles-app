@@ -22,10 +22,11 @@ module.exports = {
   // ═══════════════════════════════════════════════════════════════════════════
   meta: {
     schemaVersion: "1.0.0",
+    priceVersion: "v1.1",  // 가격/정책 패치 버전
     defaultRegion: "yeosu",
     currency: "KRW",
     lastUpdated: "2026-01-04",
-    updatedBy: "code"
+    updatedBy: "푸르미르 CEO 확정"
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -256,14 +257,15 @@ module.exports = {
       },
 
       // ═══════════════════════════════════════════════════════════════════════
-      // 레저 가격표 (1인당)
+      // 레저 가격표 (1인당) - v1.1 패치 (2026-01-04)
       // ═══════════════════════════════════════════════════════════════════════
       leisure: {
         cable: {
           name: "케이블카",
+          costChannel: "paper",  // 지류권 기본 (추후 mobile/center 확장 가능)
           // weekday: 월~목, weekend: 금~일+공휴일
-          weekday: { cost: 12000, sell: 16000, list: 20000 },
-          weekend: { cost: 12000, sell: 16000, list: 20000 }
+          weekday: { cost: 15000, sell: 16000, list: 20000 },
+          weekend: { cost: 15000, sell: 16000, list: 20000 }
         },
         aqua: {
           name: "아쿠아플라넷",
@@ -272,13 +274,15 @@ module.exports = {
         },
         cruise: {
           name: "유람선",
-          weekday: { cost: 12000, sell: 16000, list: 22000 },
-          weekend: { cost: 28000, sell: 35000, list: 45000 }
+          variant: "weekday_or_fireworks",  // 주말=불꽃 시즌
+          weekday: { cost: 8000, sell: 13000, list: 19800 },
+          weekend: { cost: 28000, sell: 35000, list: 45000 }  // weekend_fireworks
         },
         yacht: {
           name: "요트",
-          weekday: { cost: 20000, sell: 25000, list: 35000 },
-          weekend: { cost: 45000, sell: 55000, list: 70000 }
+          variant: "weekday_or_fireworks",  // 주말=불꽃 시즌
+          weekday: { cost: 25000, sell: 35000, list: 40000 },
+          weekend: { cost: 50000, sell: 55000, list: 60000 }  // weekend_fireworks
         }
       },
 
@@ -288,12 +292,30 @@ module.exports = {
       wishVoyage: {
         versions: [
           {
-            price_version: "v1_active",
+            price_version: "v1.1_active",  // v1.1 패치 (2026-01-04)
             status: "active",
-            effective_from: "2026-01-01",
+            effective_from: "2026-01-04",
             items: {
-              basic: { cost: 25000, sell: 34900, list: 45000 },
-              online: { cost: 18000, sell: 24900, list: 34900 }  // 소원의 씨앗 구매자
+              basic: { cost: 25000, sell: 34900, list: 34900 },
+              online: { cost: 18000, sell: 24900, list: 24900 },  // 소원의 씨앗 구매자
+              experience: {
+                cost: 22000,  // vendor 2k + travelAgency 5k + writer 10k + materials 5k
+                sell: 35000,
+                list: 39900,
+                costBreakdown: {
+                  vendor: 2000,
+                  travelAgency: 5000,
+                  writer: 10000,
+                  materials: 5000
+                }
+              }
+            },
+            // [정책 P0] 장소 정책
+            locationPolicy: {
+              // 주말/공휴일 (금/토/일/공휴): gallery_or_mongdol 필수 (ship 금지)
+              weekend: "gallery_or_mongdol",
+              // 평일 (월~목): ship_or_gallery 허용 (운영 판단)
+              weekday: "ship_or_gallery"
             }
           },
           {
@@ -302,7 +324,6 @@ module.exports = {
             effective_from: null,
             items: {
               light: { cost: 14000, sell: 19000, list: 25000 },       // TBD
-              experience: { cost: 26000, sell: 35000, list: 45000 },  // TBD
               premium_photo_video: null  // TBD - 촬영 패키지
             }
           }
