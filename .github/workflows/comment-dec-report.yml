@@ -29,6 +29,10 @@ jobs:
     # PR 컨텍스트에서만 코멘트
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
 
     steps:
       - name: Checkout
@@ -146,3 +150,38 @@ jobs:
               repo: context.repo.repo,
               body
             });
+
+      - name: Add DEC-PENDING label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.issue.number;
+
+            // 라벨이 없으면 생성
+            try {
+              await github.rest.issues.getLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: 'DEC-PENDING'
+              });
+            } catch (e) {
+              if (e.status === 404) {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: 'DEC-PENDING',
+                  color: 'FBCA04',
+                  description: 'DEC 승인 대기 중'
+                });
+                console.log('Created DEC-PENDING label');
+              }
+            }
+
+            // 라벨 추가
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              labels: ['DEC-PENDING']
+            });
+            console.log(`Added DEC-PENDING label to PR #${prNumber}`);

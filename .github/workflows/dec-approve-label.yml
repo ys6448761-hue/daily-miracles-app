@@ -1,0 +1,93 @@
+name: DEC Approve Label (comment trigger)
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  check-approve-command:
+    # PR 코멘트만 처리 (issue 코멘트 제외)
+    if: github.event.issue.pull_request && contains(github.event.comment.body, '/dec approved')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Ensure labels exist
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = [
+              { name: 'DEC-PENDING', color: 'FBCA04', description: 'DEC 승인 대기 중' },
+              { name: 'DEC-APPROVED', color: '0E8A16', description: 'DEC 승인 완료' }
+            ];
+
+            for (const label of labels) {
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name
+                });
+              } catch (e) {
+                if (e.status === 404) {
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: label.name,
+                    color: label.color,
+                    description: label.description
+                  });
+                  console.log(`Created label "${label.name}"`);
+                }
+              }
+            }
+
+      - name: Add DEC-APPROVED label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.issue.number;
+            const commenter = context.payload.comment.user.login;
+
+            console.log(`Processing /dec approved command from @${commenter} on PR #${prNumber}`);
+
+            // DEC-APPROVED 라벨 추가
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              labels: ['DEC-APPROVED']
+            });
+
+            // DEC-PENDING 라벨 제거
+            try {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                name: 'DEC-PENDING'
+              });
+              console.log('Removed DEC-PENDING label');
+            } catch (e) {
+              if (e.status !== 404) {
+                throw e;
+              }
+            }
+
+            // 확인 리액션 추가
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'rocket'
+            });
+
+            // 확인 코멘트
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: `✅ **DEC 승인 완료** by @${commenter}\n\n라벨이 \`DEC-APPROVED\`로 변경되었습니다.`
+            });
