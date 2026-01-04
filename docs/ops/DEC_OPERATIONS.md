@@ -265,8 +265,12 @@ node scripts/ops/daily-dec-report.js --out artifacts/reports/my-report.md
 | Weekly DEC | `weekly-dec.yml` | 매주 일 20:00 KST | medium priority 자동 실행 |
 | Monthly DEC | `monthly-dec.yml` | 매월 1일 10:00 KST | low priority 자동 실행 |
 | Manual DEC | `manual-dec.yml` | 수동 (workflow_dispatch) | Ad-hoc 1회 실행 |
+| Approve DEC | `approve-dec.yml` | 수동 (workflow_dispatch) | 승인 커맨드 생성 (Safe) |
 | PR DEC Check | `pr-dec-check.yml` | PR 열림/업데이트 | dry-run + 코멘트 |
 | PR DEC Comment | `pr-dec-comment.yml` | workflow_run | 리포트 PR 코멘트 |
+| Label DEC Status | `label-dec-status.yml` | workflow_call | 라벨 관리 (reusable) |
+| DEC Approve Label | `dec-approve-label.yml` | issue_comment | `/dec approved` 트리거 |
+| Comment DEC Report | `comment-dec-report.yml` | workflow_call | 코멘트 + 라벨 (reusable) |
 | Upload Artifacts | `upload-dec-artifacts.yml` | workflow_call | 재사용 가능 업로드 |
 
 ### 스케줄 요약
@@ -309,6 +313,46 @@ GitHub Actions 탭 → "Manual DEC Run" → "Run workflow" 클릭
    - DEC 워크플로우 완료 후 트리거
    - Daily 리포트를 최신 PR에 자동 첨부
 
+### PR 라벨 자동화 (P6-4)
+
+DEC 승인 상태를 PR 라벨로 자동 표시합니다.
+
+#### 라벨 종류
+
+| 라벨 | 색상 | 설명 |
+|------|------|------|
+| `DEC-PENDING` | 🟡 #FBCA04 | 승인 대기 중 |
+| `DEC-APPROVED` | 🟢 #0E8A16 | 승인 완료 |
+
+#### 자동화 흐름
+
+```
+1. 리포트 코멘트/승인 워크플로우 실행
+         ↓
+   🏷️ DEC-PENDING 라벨 자동 부착
+         ↓
+2. 승인자가 로컬에서 승격 커맨드 실행
+         ↓
+3. PR에 코멘트: /dec approved
+         ↓
+   🏷️ DEC-APPROVED 부착 + DEC-PENDING 제거
+```
+
+#### 승인 완료 표시
+
+PR에 아래 코멘트를 남기면 자동으로 라벨이 전환됩니다:
+
+```
+/dec approved
+```
+
+#### 관련 워크플로우
+
+- `label-dec-status.yml`: 라벨 관리 (reusable)
+- `dec-approve-label.yml`: `/dec approved` 코멘트 감지
+- `approve-dec.yml`: 승인 커맨드 생성 + PENDING 라벨
+- `comment-dec-report.yml`: 리포트 코멘트 + PENDING 라벨
+
 ### 알림 설정 (Secrets)
 
 ```
@@ -328,8 +372,12 @@ daily-miracles-mvp/
 │       ├── weekly-dec.yml            # Weekly 자동 실행 (medium)
 │       ├── monthly-dec.yml           # Monthly 자동 실행 (low)
 │       ├── manual-dec.yml            # Ad-hoc 수동 실행
+│       ├── approve-dec.yml           # 승인 커맨드 생성 (Safe)
 │       ├── pr-dec-check.yml          # PR 체크 + 코멘트
 │       ├── pr-dec-comment.yml        # 리포트 PR 첨부
+│       ├── label-dec-status.yml      # 라벨 관리 (reusable)
+│       ├── dec-approve-label.yml     # /dec approved 트리거
+│       ├── comment-dec-report.yml    # 코멘트 + 라벨 (reusable)
 │       └── upload-dec-artifacts.yml  # 재사용 가능 업로드
 ├── configs/
 │   └── dec-queries.json        # 쿼리 설정
@@ -362,4 +410,4 @@ daily-miracles-mvp/
 
 ---
 
-*마지막 업데이트: 2026-01-05 (P6-3.7)*
+*마지막 업데이트: 2026-01-05 (P6-4.1)*
