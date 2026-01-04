@@ -1,0 +1,100 @@
+{
+  "_comment": "오픈 게이트 체크용 필수 링크/경로 설정",
+  "_version": "1.0.0",
+  "_updated": "2026-01-05",
+
+  "required": {
+    "legal": {
+      "privacy": {
+        "path": "public/privacy.html",
+        "description": "개인정보처리방침"
+      },
+      "terms": {
+        "path": "public/terms.html",
+        "description": "이용약관"
+      },
+      "refund": {
+        "path": "public/terms.html",
+        "section": "#제9조",
+        "description": "환불규정 (이용약관 내 포함)"
+      }
+    },
+    "contact": {
+      "kakao_channel": {
+        "url": "https://pf.kakao.com/_xnxnKn",
+        "description": "카카오채널 (하루하루의 기적)"
+      },
+      "phone": {
+        "number": "1899-6117",
+        "description": "고객센터 전화번호"
+      }
+    },
+    "payment": {
+      "entry_route": {
+        "path": "routes/storybookRoutes.js",
+        "endpoint": "/api/storybook/webhook/payment",
+        "description": "유료 결제 진입점"
+      },
+      "checkout_page": {
+        "path": "public/storybook.html",
+        "description": "결제 진입 페이지"
+      }
+    }
+  },
+
+  "checks": [
+    {
+      "id": "legal_privacy",
+      "type": "file_exists",
+      "target": "public/privacy.html",
+      "critical": true,
+      "message": "개인정보처리방침 페이지"
+    },
+    {
+      "id": "legal_terms",
+      "type": "file_exists",
+      "target": "public/terms.html",
+      "critical": true,
+      "message": "이용약관 페이지"
+    },
+    {
+      "id": "payment_route",
+      "type": "file_contains",
+      "target": "routes/storybookRoutes.js",
+      "pattern": "webhook/payment",
+      "critical": true,
+      "message": "결제 웹훅 엔드포인트"
+    },
+    {
+      "id": "payment_page",
+      "type": "file_exists",
+      "target": "public/storybook.html",
+      "critical": true,
+      "message": "결제 진입 페이지"
+    },
+    {
+      "id": "kakao_link_index",
+      "type": "file_contains",
+      "target": "public/index.html",
+      "pattern": "pf.kakao.com",
+      "critical": true,
+      "message": "메인 페이지 카카오채널 링크"
+    },
+    {
+      "id": "kakao_link_voyage",
+      "type": "file_contains",
+      "target": "public/wish-voyage.html",
+      "pattern": "pf.kakao.com",
+      "critical": false,
+      "message": "소원항해 페이지 카카오채널 링크"
+    },
+    {
+      "id": "phone_contact",
+      "type": "file_contains",
+      "target": "public/index.html",
+      "pattern": "1899-6117",
+      "critical": false,
+      "message": "메인 페이지 연락처"
+    }
+  ]
+}
