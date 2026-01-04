@@ -176,7 +176,12 @@ function generateDEC(summary, options) {
   // 파일명용 쿼리 정제
   const safeQuery = options.query.replace(/\s+/g, '_').replace(/[^가-힣a-zA-Z0-9_-]/g, '');
 
-  let md = `# ${docNumber}: ${options.query}
+  // DRAFT 상태일 때 워터마크 추가
+  const draftWarning = options.status === 'DRAFT'
+    ? `> ⚠️ **DRAFT / 미승인** - 이 문서는 검토 전 초안입니다. 승인 후 정식 DEC로 변환됩니다.\n\n`
+    : '';
+
+  let md = `${draftWarning}# ${docNumber}: ${options.query}
 
 ## 결정 정보
 
