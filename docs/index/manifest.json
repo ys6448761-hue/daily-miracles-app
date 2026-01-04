@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-01-04T08:32:53.532Z",
+  "generated_at": "2026-01-04T08:42:59.344Z",
   "generator": "generate-manifest.js",
-  "total_count": 64,
+  "total_count": 98,
   "documents": [
     {
       "id": "DOC-airtable-schema",
@@ -871,6 +871,538 @@
       "checksum": "357d524c"
     },
     {
+      "id": "DOC-20260101-MKI",
+      "path": "docs/processed/2026-01-01_Aurora5-complete-setup-guide-·-MD-2026-01-01.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P0",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "aurora",
+        "결제",
+        "자동화",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "� Aurora 5 UBOS - 완전 점검 및 설정 가이드",
+      "created_at": "2026-01-01",
+      "checksum": "b8304cbd"
+    },
+    {
+      "id": "DOC-20260101-VL5",
+      "path": "docs/processed/2026-01-01_Aurora5-ultimate-system-2026-01-01.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P0",
+      "topic": "aurora",
+      "tags": [
+        "aurora",
+        "마케팅",
+        "자동화",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "🌌 Aurora 5 완전체 시스템 (최수민님 방법론 통합)",
+      "created_at": "2026-01-01",
+      "checksum": "a77bc29c"
+    },
+    {
+      "id": "DOC-20260101-4PA",
+      "path": "docs/processed/2026-01-01_Aurora5가격·결제경험-2026-01-03.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P1",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "storybook",
+        "aurora",
+        "kpi",
+        "가격",
+        "결제",
+        "마케팅",
+        "자동화",
+        "런칭",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "🌏 Aurora 5 Claude Code 종합 지시서",
+      "created_at": "2026-01-01",
+      "checksum": "2a8f5401"
+    },
+    {
+      "id": "DOC-20260101-TRD",
+      "path": "docs/processed/2026-01-01_Aurora5운영표준-2026-01-03.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P0",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "aurora",
+        "kpi",
+        "가격",
+        "결제",
+        "마케팅",
+        "자동화",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "Aurora5운영표준_2026-01-03",
+      "created_at": "2026-01-01",
+      "checksum": "d04f7b28"
+    },
+    {
+      "id": "DOC-20260101-WG8",
+      "path": "docs/processed/2026-01-01_aurora5토론엔진-2026-01-03.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P0",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "aurora",
+        "kpi",
+        "가격",
+        "결제",
+        "마케팅",
+        "자동화",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "DEC-YYYYMMDD-XXX: [결정 주제]",
+      "created_at": "2026-01-01",
+      "checksum": "2dc831a7"
+    },
+    {
+      "id": "DOC-20260101-1YB",
+      "path": "docs/processed/2026-01-01_Aurora5팬덤OS구축결정회의록-2026-01-04.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "aurora",
+        "가격",
+        "자동화",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "Aurora5팬덤OS구축결정회의록_2026-01-04",
+      "created_at": "2026-01-01",
+      "checksum": "99441851"
+    },
+    {
+      "id": "DOC-20260101-RS0",
+      "path": "docs/processed/2026-01-01_Dogfooding-kickoff-2026-01-01.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P0",
+      "topic": "aurora",
+      "tags": [
+        "aurora",
+        "자동화",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "🎉 Aurora 5 UBOS - 2주 도그푸딩 시작 선언!",
+      "created_at": "2026-01-01",
+      "checksum": "589e6d2d"
+    },
+    {
+      "id": "DOC-20260101-H8E",
+      "path": "docs/processed/2026-01-01_Dogfooding-official-start-2026-01-01.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P0",
+      "topic": "aurora",
+      "tags": [
+        "aurora",
+        "자동화",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "🎊 Aurora 5 UBOS - 2주 도그푸딩 공식 시작!",
+      "created_at": "2026-01-01",
+      "checksum": "020170af"
+    },
+    {
+      "id": "DOC-20260101-VG0",
+      "path": "docs/processed/2026-01-01_MCP-Part-2-5-완성-지시서-2026-01-01.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P0",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "aurora",
+        "결제",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "MCP Part 2-5 완성 지시서",
+      "created_at": "2026-01-01",
+      "checksum": "f59c8ca7"
+    },
+    {
+      "id": "DOC-20260101-UZX",
+      "path": "docs/processed/2026-01-01_MICE·단체자동견적시스템-2026-01-04.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "결제",
+        "자동화",
+        "processed",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "� [오로라5 MICE·단체 자동견적 시스템 설계 보고]",
+      "created_at": "2026-01-01",
+      "checksum": "a6e3adb8"
+    },
+    {
+      "id": "DOC-20260101-DZX",
+      "path": "docs/processed/2026-01-01_Quick-30min-checklist-2026-01-01.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "aurora",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "Aurora 5 UBOS - 30분 완성 체크리스트",
+      "created_at": "2026-01-01",
+      "checksum": "2c03b058"
+    },
+    {
+      "id": "DOC-20260101-L9Y",
+      "path": "docs/processed/2026-01-01_가격정책과패치1.1-2026-01-04.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P0",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "가격",
+        "processed",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "� 가격/정책 패치 v1.1 - 푸르미르 CEO 확정",
+      "created_at": "2026-01-01",
+      "checksum": "e79b6c2b"
+    },
+    {
+      "id": "DOC-20260101-97N",
+      "path": "docs/processed/2026-01-01_마케팅오케스트레이터자동화-2026-01-04.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "aurora",
+      "tags": [
+        "aurora",
+        "kpi",
+        "마케팅",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "MO 자동 출력 프롬프트 v1.0 (주간 대시보드 표 자동 채움)",
+      "created_at": "2026-01-01",
+      "checksum": "b8235e7e"
+    },
+    {
+      "id": "DOC-20260101-ICN",
+      "path": "docs/processed/2026-01-01_복복리시스템-2026-01-04.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P3",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "storybook",
+        "aurora",
+        "kpi",
+        "가격",
+        "결제",
+        "마케팅",
+        "자동화",
+        "런칭",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "1) 가격 티어 확정 (v1)",
+      "created_at": "2026-01-01",
+      "checksum": "d6222682"
+    },
+    {
+      "id": "DOC-20260101-8VR",
+      "path": "docs/processed/2026-01-01_소원항해견적시스템2.0-2026-01-03.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P0",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "가격",
+        "결제",
+        "자동화",
+        "processed",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "여수 소원항해 견적 시스템 v2.0",
+      "created_at": "2026-01-01",
+      "checksum": "f8d82957"
+    },
+    {
+      "id": "DOC-20260101-K7C",
+      "path": "docs/processed/2026-01-01_스토리북2-2026-01-03.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P3",
+      "topic": "storybook",
+      "tags": [
+        "storybook",
+        "aurora",
+        "kpi",
+        "가격",
+        "결제",
+        "자동화",
+        "런칭",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "1) 가격 티어 확정 (v1)",
+      "created_at": "2026-01-01",
+      "checksum": "fab1c714"
+    },
+    {
+      "id": "DOC-20260101-6M7",
+      "path": "docs/processed/2026-01-01_스토리북2.0자동화-226-01-03.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P3",
+      "topic": "storybook",
+      "tags": [
+        "storybook",
+        "aurora",
+        "kpi",
+        "가격",
+        "결제",
+        "자동화",
+        "런칭",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "1) 가격 티어 확정 (v1)",
+      "created_at": "2026-01-01",
+      "checksum": "1379060b"
+    },
+    {
+      "id": "DOC-20260101-GR0",
+      "path": "docs/processed/2026-01-01_여행상품판매앱-2026-01-03.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P0",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "kpi",
+        "가격",
+        "결제",
+        "마케팅",
+        "자동화",
+        "런칭",
+        "processed",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "여수 소원항해 견적 시스템 - Claude Code 개발 지시서",
+      "created_at": "2026-01-01",
+      "checksum": "b7639460"
+    },
+    {
+      "id": "DOC-20260101-HP0",
+      "path": "docs/processed/2026-01-01_오로라5결정OS세트-2026-01-04.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P0",
+      "topic": "kpi",
+      "tags": [
+        "kpi",
+        "결제",
+        "자동화",
+        "processed",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "1) 🎯 4줄 결정 템플릿 (요청/이슈가 생길 때마다 이것만 쓰기)",
+      "created_at": "2026-01-01",
+      "checksum": "dcaeb348"
+    },
+    {
+      "id": "DOC-20260101-D2L",
+      "path": "docs/processed/2026-01-01_오픈패키지v0.9-런칭전필수체크리스트-2026-01-04.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P0",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "가격",
+        "결제",
+        "마케팅",
+        "자동화",
+        "런칭",
+        "processed",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "오픈 패키지 v0.9 - 런칭 전 필수 체크리스트",
+      "created_at": "2026-01-01",
+      "checksum": "918dc498"
+    },
+    {
+      "id": "DOC-20260101-XHZ",
+      "path": "docs/processed/2026-01-01_완주소원이MVP구현스펙-v1.0-2026-01-04.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "aurora",
+        "가격",
+        "결제",
+        "자동화",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "[Aurora5] Claude Code 실행 패킷 v1.0 (Week1~Week2)",
+      "created_at": "2026-01-01",
+      "checksum": "701e4c52"
+    },
+    {
+      "id": "DOC-20260101-RET",
+      "path": "docs/processed/2026-01-01_완주소원이구분-2026-01-04.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P3",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "aurora",
+        "kpi",
+        "가격",
+        "결제",
+        "마케팅",
+        "자동화",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "� Aurora5 주간 성과 리포트",
+      "created_at": "2026-01-01",
+      "checksum": "6ef11484"
+    },
+    {
+      "id": "DOC-20260101-YH9",
+      "path": "docs/processed/2026-01-01_지역상품권운영방법-2026-01-04.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P0",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "aurora",
+        "kpi",
+        "가격",
+        "결제",
+        "자동화",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "지역상품권운영방법_2026-01-04",
+      "created_at": "2026-01-01",
+      "checksum": "482a4e0e"
+    },
+    {
+      "id": "DOC-20260101-99J",
+      "path": "docs/processed/2026-01-01_코미스토리북-2026-01-03.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P0",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "storybook",
+        "aurora",
+        "kpi",
+        "가격",
+        "결제",
+        "마케팅",
+        "자동화",
+        "런칭",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "문서명\t내용",
+      "created_at": "2026-01-01",
+      "checksum": "8efe2ae9"
+    },
+    {
+      "id": "DOC-20251231-GV1",
+      "path": "docs/processed/2025-12-31_토론결과가격결정-2025-12-31.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P0",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "가격",
+        "결제",
+        "마케팅",
+        "processed",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "🤖 **[DEC-2025-1231-001-v2] 가격 전략 최종 확정안**",
+      "created_at": "2025-12-31",
+      "checksum": "2b1ad097"
+    },
+    {
       "id": "DOC-2025-12-30_소원5문항_gem유지_결정서",
       "path": "docs/conversations/2025-12/2025-12-30_소원5문항_gem유지_결정서.md",
       "type": "conversation",
@@ -955,6 +1487,62 @@
       "title": "EXEC-2025-1230-LUMI-001: 광고운영 실행 패키지",
       "created_at": "2025-12-30",
       "checksum": "75f14811"
+    },
+    {
+      "id": "DOC-20251230-BAE",
+      "path": "docs/processed/2025-12-30_루미-GPTS-Instructions-v1-2025-12-30.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P0",
+      "topic": "aurora",
+      "tags": [
+        "aurora",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "� [YYYY-MM-DD] 루미 기술 작업 로그",
+      "created_at": "2025-12-30",
+      "checksum": "931e4f5a"
+    },
+    {
+      "id": "DOC-20251230-YKH",
+      "path": "docs/processed/2025-12-30_오로라5변화-2025-12-30.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "aurora",
+        "자동화",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "🎓 최수민님의 에이전틱 워크플로우 적용 사례",
+      "created_at": "2025-12-30",
+      "checksum": "7aab2f25"
+    },
+    {
+      "id": "DOC-20251230-1CZ",
+      "path": "docs/processed/2025-12-30_코드와미래설계-2025-12-30.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "aurora",
+        "마케팅",
+        "자동화",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "코드와미래설계_2025-12-30",
+      "created_at": "2025-12-30",
+      "checksum": "b3c8d7bd"
     },
     {
       "id": "DOC-SYS-2025-1230-LUMI-001_Airtabl",
@@ -1143,6 +1731,131 @@
       "title": "2025-12-29 대화 요약",
       "created_at": "2025-12-29",
       "checksum": "0f3b3b93"
+    },
+    {
+      "id": "DOC-20251229-9PH",
+      "path": "docs/processed/2025-12-29_Github-저장소-활용-가이드-2025-12-29.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "aurora",
+        "결제",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "� GitHub 저장소 활용 가이드",
+      "created_at": "2025-12-29",
+      "checksum": "a1f5635b"
+    },
+    {
+      "id": "DOC-20251229-VPB",
+      "path": "docs/processed/2025-12-29_루미-에어테이블-교본-2025-12-29.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "자동화",
+        "processed",
+        "aurora",
+        "automation"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "루미 에어테이블 교본_2025-12-29",
+      "created_at": "2025-12-29",
+      "checksum": "82e5c442"
+    },
+    {
+      "id": "DOC-20251229-ZF8",
+      "path": "docs/processed/2025-12-29_완전-자동화-설계도-2025-12-29.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "aurora",
+        "마케팅",
+        "자동화",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "Aurora 5 완전체 시스템 구축 지시서",
+      "created_at": "2025-12-29",
+      "checksum": "ef231144"
+    },
+    {
+      "id": "DOC-20251229-A1Y",
+      "path": "docs/processed/2025-12-29_최수민님-원본-자료-2025-12-29.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "마케팅",
+        "자동화",
+        "런칭",
+        "processed",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "최수민님 원본 자료_2025-12-29",
+      "created_at": "2025-12-29",
+      "checksum": "1b422c75"
+    },
+    {
+      "id": "DOC-20251229-SRH",
+      "path": "docs/processed/2025-12-29_코미-대화내용-2025-12-29.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P0",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "storybook",
+        "aurora",
+        "가격",
+        "결제",
+        "마케팅",
+        "자동화",
+        "런칭",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "uv 설치 확인",
+      "created_at": "2025-12-29",
+      "checksum": "8500bfab"
+    },
+    {
+      "id": "DOC-20251229-PFO",
+      "path": "docs/processed/2025-12-29_토론-방식-공유-2025-12-29.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "소원",
+      "tags": [
+        "소원",
+        "aurora",
+        "kpi",
+        "가격",
+        "런칭",
+        "processed"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "� Aurora 5 팀 공지",
+      "created_at": "2025-12-29",
+      "checksum": "b375bcab"
     },
     {
       "id": "DOC-inquiry-form-api",
