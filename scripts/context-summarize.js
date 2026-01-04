@@ -1,17 +1,19 @@
 #!/usr/bin/env node
 /**
- * Context Bundle 요약 파이프라인
- * P4-2: 검색 결과를 판단 가능한 문서로 변환
+ * Context Bundle 요약 파이프라인 v1.1
+ * P4-2/P4-3: 검색 결과를 판단 가능한 문서로 변환 + Telemetry
  *
  * 사용법:
  *   node scripts/context-summarize.js --in artifacts/context_bundle.json --out artifacts/context_summary.md
  *   node scripts/context-summarize.js --in artifacts/context_bundle.json --out artifacts/context_summary.md --mode decision
+ *   node scripts/context-summarize.js --in artifacts/context_bundle.json --out artifacts/context_summary.md --log
  *
  * 옵션:
  *   --in         입력 파일 (context_bundle.json) [필수]
  *   --out        출력 파일 경로 [필수]
  *   --mode       general|decision|action (기본: general)
  *   --max-items  참고 문서 최대 개수 (기본: 5)
+ *   --log        텔레메트리 로그 기록 (artifacts/search_logs.ndjson)
  */
 
 const fs = require('fs');
@@ -36,7 +38,8 @@ function parseArgs(args) {
     in: null,
     out: null,
     mode: 'general',
-    maxItems: 5
+    maxItems: 5,
+    log: false
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -58,6 +61,8 @@ function parseArgs(args) {
       result.maxItems = parseInt(args[++i]) || 5;
     } else if (arg.startsWith('--max-items=')) {
       result.maxItems = parseInt(arg.split('=')[1]) || 5;
+    } else if (arg === '--log') {
+      result.log = true;
     }
   }
 
@@ -289,6 +294,33 @@ function saveOutput(content, outPath) {
 }
 
 /**
+ * 텔레메트리 로그 기록 (NDJSON)
+ */
+function writeSummarizeLog(bundle, options, runtimeMs, usedLLM) {
+  const logPath = path.join(__dirname, '..', 'artifacts', 'search_logs.ndjson');
+  const logDir = path.dirname(logPath);
+
+  if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+  }
+
+  const logEntry = {
+    timestamp: new Date().toISOString(),
+    type: 'summarize',
+    query: bundle.query,
+    scopes: bundle.scopes || ['all'],
+    mode: options.mode,
+    max_items: options.maxItems,
+    input_count: bundle.results.length,
+    top_results: bundle.results.slice(0, 5).map(r => r.path),
+    used_llm: usedLLM,
+    runtime_ms: runtimeMs
+  };
+
+  fs.appendFileSync(logPath, JSON.stringify(logEntry) + '\n', 'utf-8');
+}
+
+/**
  * 사용법 출력
  */
 function printUsage() {
@@ -305,6 +337,7 @@ Context Bundle 요약 파이프라인 (P4-2)
 선택 옵션:
   --mode        general | decision | action (기본: general)
   --max-items   참고 문서 최대 개수 (기본: 5)
+  --log         텔레메트리 로그 기록 (P4-3)
 
 예시:
   node scripts/context-summarize.js --in artifacts/context_bundle.json --out artifacts/context_summary.md
@@ -349,6 +382,8 @@ async function main() {
   }
 
   try {
+    const startTime = Date.now();
+
     // 1. 입력 로드
     console.log(`📥 입력 로드: ${options.in}`);
     const bundle = loadContextBundle(options.in);
@@ -358,10 +393,12 @@ async function main() {
     console.log(`🧠 요약 생성 중... (mode: ${options.mode})`);
 
     let llmSummary = null;
+    let usedLLM = false;
     if (openai) {
       llmSummary = await generateSummaryWithLLM(bundle, options.mode);
       if (llmSummary) {
         console.log('   ✅ LLM 요약 완료');
+        usedLLM = true;
       }
     }
 
@@ -372,9 +409,17 @@ async function main() {
 
     // 4. 저장
     const savedPath = saveOutput(markdown, options.out);
+    const runtimeMs = Date.now() - startTime;
+
     console.log(`\n✅ 저장됨: ${savedPath}`);
     console.log(`   모드: ${options.mode}`);
     console.log(`   참고 문서: ${Math.min(bundle.results.length, options.maxItems)}개`);
+
+    // 5. 텔레메트리 로깅
+    if (options.log) {
+      writeSummarizeLog(bundle, options, runtimeMs, usedLLM);
+      console.log(`📊 로그 기록됨 (${runtimeMs}ms)`);
+    }
 
   } catch (err) {
     console.error(`❌ 오류: ${err.message}`);

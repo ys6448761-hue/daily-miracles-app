@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 /**
- * 문서 검색 에이전트 v1.1
- * Context Bundle 생성 지원
+ * 문서 검색 에이전트 v1.2
+ * Context Bundle 생성 + Telemetry 지원
  *
  * 사용법:
  *   node scripts/search-docs.js --query "신호등 시스템"
  *   node scripts/search-docs.js --query "Airtable" --scopes decisions,system --format json
  *   node scripts/search-docs.js --query "소원그림" --k 10 --out artifacts/context_bundle.md
+ *   node scripts/search-docs.js --query "신호등" --log  # 텔레메트리 로깅
  *
  * 옵션:
  *   --query           검색어 (필수)
@@ -17,6 +18,7 @@
  *   --include-snippet 스니펫 포함 여부 (true|false) 기본: true
  *   --max-snippet-chars 스니펫 최대 문자수 (기본: 400)
  *   --recency-bias    최신 문서 가중치 (on|off) 기본: on
+ *   --log             텔레메트리 로그 기록 (artifacts/search_logs.ndjson)
  *   -i, --interactive 인터랙티브 모드
  */
 
@@ -60,7 +62,8 @@ function parseArgs(args) {
     includeSnippet: true,
     maxSnippetChars: 400,
     recencyBias: true,
-    interactive: false
+    interactive: false,
+    log: false
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -100,6 +103,8 @@ function parseArgs(args) {
       result.recencyBias = args[++i] !== 'off';
     } else if (arg.startsWith('--recency-bias=')) {
       result.recencyBias = arg.split('=')[1] !== 'off';
+    } else if (arg === '--log') {
+      result.log = true;
     }
   }
 
@@ -458,6 +463,34 @@ function saveOutput(content, outPath) {
 }
 
 /**
+ * 텔레메트리 로그 기록 (NDJSON)
+ */
+function writeSearchLog(options, results, runtimeMs) {
+  const logPath = path.join(__dirname, '..', 'artifacts', 'search_logs.ndjson');
+  const logDir = path.dirname(logPath);
+
+  // 디렉토리 생성
+  if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+  }
+
+  const logEntry = {
+    timestamp: new Date().toISOString(),
+    type: 'search',
+    query: options.query,
+    scopes: options.scopes,
+    k: options.k,
+    format: options.format,
+    top_results: results.slice(0, 5).map(r => r.path),
+    result_count: results.length,
+    runtime_ms: runtimeMs
+  };
+
+  // Append to NDJSON file
+  fs.appendFileSync(logPath, JSON.stringify(logEntry) + '\n', 'utf-8');
+}
+
+/**
  * 사용법 출력
  */
 function printUsage() {
@@ -477,6 +510,7 @@ ${colors.cyan}옵션:${colors.reset}
   --include-snippet   스니펫 포함 여부 (true|false) 기본: true
   --max-snippet-chars 스니펫 최대 문자수 (기본: 400)
   --recency-bias      최신 문서 가중치 (on|off) 기본: on
+  --log               텔레메트리 로그 기록 (P4-3)
   -i, --interactive   인터랙티브 모드
 
 ${colors.cyan}예시:${colors.reset}
@@ -598,8 +632,10 @@ function main() {
     process.exit(1);
   }
 
-  // 검색 실행
+  // 검색 실행 (시간 측정)
+  const startTime = Date.now();
   const results = searchDocuments(options);
+  const runtimeMs = Date.now() - startTime;
 
   // 출력 생성
   let output;
@@ -616,6 +652,12 @@ function main() {
     console.log(`   결과: ${results.length}개 문서`);
   } else {
     console.log(output);
+  }
+
+  // 텔레메트리 로깅
+  if (options.log) {
+    writeSearchLog(options, results, runtimeMs);
+    console.log(`📊 로그 기록됨 (${runtimeMs}ms)`);
   }
 }
 
