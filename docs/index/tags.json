@@ -81,6 +81,7 @@
     "DOC-README",
     "DOC-ROADMAP_API",
     "DOC-agents-index",
+    "DOC-manifest-system",
     "DOC-Aurora5_토론시스템_안내문",
     "DOC-CEO-WEEKLY-2025-W52",
     "DEC-2026-0102-045",
@@ -149,6 +150,18 @@
   "system": [
     "DOC-agents-index",
     "DOC-conversation-workflow",
+    "DOC-manifest-system",
+    "DOC-SYS-2025-1230-LUMI-001_Airtabl"
+  ],
+  "storybook": [
+    "DOC-manifest-system",
+    "DOC-2025-12-29_Part6_소원착지전략"
+  ],
+  "kpi": [
+    "DOC-manifest-system"
+  ],
+  "automation": [
+    "DOC-manifest-system",
     "DOC-SYS-2025-1230-LUMI-001_Airtabl"
   ],
   "team": [
@@ -208,9 +221,6 @@
   ],
   "execution": [
     "DOC-EXEC-2025-1230-LUMI-001_광고운영_실"
-  ],
-  "automation": [
-    "DOC-SYS-2025-1230-LUMI-001_Airtabl"
   ],
   "QA": [
     "DOC-2025-12-29_Part1_최수민방식QA"
@@ -272,9 +282,6 @@
     "DOC-2025-12-29_Part6_소원착지전략"
   ],
   "프로젝트": [
-    "DOC-2025-12-29_Part6_소원착지전략"
-  ],
-  "storybook": [
     "DOC-2025-12-29_Part6_소원착지전략"
   ],
   "전략수정": [
