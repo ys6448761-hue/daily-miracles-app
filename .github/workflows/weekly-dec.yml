@@ -50,3 +50,10 @@ jobs:
           path: docs/decisions/DEC-DRAFT-*.md
           if-no-files-found: ignore
           retention-days: 14
+
+  upload-artifacts:
+    needs: weekly-dec
+    uses: ./.github/workflows/upload-dec-artifacts.yml
+    with:
+      artifact_name: weekly-dec-artifacts
+      retention_days: 30

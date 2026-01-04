@@ -119,3 +119,10 @@ jobs:
 
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "📦 Check artifacts for detailed reports." >> $GITHUB_STEP_SUMMARY
+
+  upload-artifacts:
+    needs: nightly-dec
+    uses: ./.github/workflows/upload-dec-artifacts.yml
+    with:
+      artifact_name: nightly-dec-artifacts
+      retention_days: 14

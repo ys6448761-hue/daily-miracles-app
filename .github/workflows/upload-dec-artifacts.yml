@@ -1,0 +1,35 @@
+name: Upload DEC Artifacts (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      artifact_name:
+        required: false
+        type: string
+        default: dec-artifacts
+      report_glob:
+        required: false
+        type: string
+        default: artifacts/reports/*.md
+      json_glob:
+        required: false
+        type: string
+        default: artifacts/reports/*.json
+      retention_days:
+        required: false
+        type: number
+        default: 14
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload reports (md/json) as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: |
+            ${{ inputs.report_glob }}
+            ${{ inputs.json_glob }}
+          if-no-files-found: warn
+          retention-days: ${{ inputs.retention_days }}
