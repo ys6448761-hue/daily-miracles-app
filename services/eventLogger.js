@@ -54,73 +54,160 @@ const TEST_PATTERNS = {
 };
 
 /**
- * 요청/페이로드에서 env 자동 감지
- * 우선순위: 헤더 > body.is_test > payload 패턴 > 기본값(prod)
+ * 테스트 시그널 감지 (패턴 기반)
+ * @param {Object} payload - 이벤트 페이로드
+ * @returns {Object} - { hasTestSignal, reasons }
+ */
+function detectTestSignals(payload = {}) {
+  const reasons = [];
+
+  if (payload.is_test === true) {
+    reasons.push('is_test:true');
+  }
+  if (payload.user_id && TEST_PATTERNS.userId.test(payload.user_id)) {
+    reasons.push(`user_id:${payload.user_id}`);
+  }
+  if (payload.order_id && TEST_PATTERNS.orderId.test(payload.order_id)) {
+    reasons.push(`order_id:${payload.order_id}`);
+  }
+  if (payload.payment_id && TEST_PATTERNS.orderId.test(payload.payment_id)) {
+    reasons.push(`payment_id:${payload.payment_id}`);
+  }
+  if (payload.checkout_id && TEST_PATTERNS.checkoutId.test(payload.checkout_id)) {
+    reasons.push(`checkout_id:${payload.checkout_id}`);
+  }
+
+  return {
+    hasTestSignal: reasons.length > 0,
+    reasons
+  };
+}
+
+/**
+ * 요청/페이로드에서 env 자동 감지 (확장 버전)
+ * 우선순위: 헤더 > is_test > user_id 패턴 > id 패턴 > 기본값(prod)
  *
  * @param {Object} req - Express request 객체 (optional)
  * @param {Object} payload - 이벤트 페이로드
- * @returns {string} - 감지된 env ('prod' | 'test' | 'staging' | 'dev')
+ * @returns {Object} - { env, inferred_by, conflict, conflict_reasons }
  */
-function detectEnv(req, payload = {}) {
+function detectEnvExtended(req, payload = {}) {
+  let env = DEFAULT_ENV;
+  let inferred_by = 'default';
+  let conflict = false;
+  let conflict_reasons = [];
+
+  // 테스트 시그널 먼저 감지 (충돌 체크용)
+  const testSignals = detectTestSignals(payload);
+  const reqTestSignals = detectTestSignals(req?.body || {});
+  const allTestSignals = [...testSignals.reasons, ...reqTestSignals.reasons];
+  const hasAnyTestSignal = testSignals.hasTestSignal || reqTestSignals.hasTestSignal ||
+    (req?.body?.is_test === true) || (req?.query?.is_test === 'true');
+
   // 1) 헤더 X-DM-ENV가 최우선
   if (req && req.headers) {
     const headerEnv = req.headers['x-dm-env'] || req.headers['X-DM-ENV'];
     if (headerEnv && VALID_ENVS.includes(headerEnv.toLowerCase())) {
-      return headerEnv.toLowerCase();
+      env = headerEnv.toLowerCase();
+      inferred_by = 'header:X-DM-ENV';
+
+      // 충돌 체크: 헤더가 prod인데 테스트 시그널 있음
+      if (env === 'prod' && hasAnyTestSignal) {
+        conflict = true;
+        conflict_reasons = allTestSignals;
+      }
+
+      return { env, inferred_by, conflict, conflict_reasons };
     }
   }
 
   // 2) body/query에 is_test=true가 있으면 test
   if (req && req.body && req.body.is_test === true) {
-    return 'test';
+    return { env: 'test', inferred_by: 'body:is_test', conflict: false, conflict_reasons: [] };
   }
   if (req && req.query && req.query.is_test === 'true') {
-    return 'test';
+    return { env: 'test', inferred_by: 'query:is_test', conflict: false, conflict_reasons: [] };
   }
   if (payload.is_test === true) {
-    return 'test';
+    return { env: 'test', inferred_by: 'payload:is_test', conflict: false, conflict_reasons: [] };
   }
 
-  // 3) payload의 env가 명시적으로 있으면 사용
-  if (payload.env && VALID_ENVS.includes(payload.env)) {
-    return payload.env;
-  }
-
-  // 4) 패턴 기반 테스트 감지
+  // 3) user_id 패턴
   if (payload.user_id && TEST_PATTERNS.userId.test(payload.user_id)) {
-    return 'test';
+    return { env: 'test', inferred_by: 'pattern:user_id', conflict: false, conflict_reasons: [] };
   }
+
+  // 4) order_id/payment_id/checkout_id 패턴
   if (payload.order_id && TEST_PATTERNS.orderId.test(payload.order_id)) {
-    return 'test';
+    return { env: 'test', inferred_by: 'pattern:order_id', conflict: false, conflict_reasons: [] };
   }
   if (payload.payment_id && TEST_PATTERNS.orderId.test(payload.payment_id)) {
-    return 'test';
+    return { env: 'test', inferred_by: 'pattern:payment_id', conflict: false, conflict_reasons: [] };
   }
   if (payload.checkout_id && TEST_PATTERNS.checkoutId.test(payload.checkout_id)) {
-    return 'test';
+    return { env: 'test', inferred_by: 'pattern:checkout_id', conflict: false, conflict_reasons: [] };
   }
 
   // 5) 기본값
-  return DEFAULT_ENV;
+  return { env: DEFAULT_ENV, inferred_by: 'default', conflict: false, conflict_reasons: [] };
 }
 
 /**
- * 페이로드에 env 메타데이터 추가
+ * 요청/페이로드에서 env 자동 감지 (간단 버전 - 하위 호환)
+ * @param {Object} req - Express request 객체 (optional)
+ * @param {Object} payload - 이벤트 페이로드
+ * @returns {string} - 감지된 env ('prod' | 'test' | 'staging' | 'dev')
+ */
+function detectEnv(req, payload = {}) {
+  const result = detectEnvExtended(req, payload);
+  return result.env;
+}
+
+/**
+ * 페이로드에 env 메타데이터 추가 (확장 버전)
  * @param {Object} payload - 원본 페이로드
- * @param {string} env - 환경 ('prod' | 'test' | ...)
+ * @param {Object} envInfo - detectEnvExtended 결과 또는 { env, inferred_by, conflict, ... }
  * @param {string} testReason - 테스트 이유 (선택)
+ * @param {string} source - 이벤트 소스 (선택)
  * @returns {Object} - env가 추가된 페이로드
  */
-function addEnvToPayload(payload, env, testReason = null) {
+function addEnvToPayload(payload, envInfo, testReason = null, source = null) {
+  // envInfo가 문자열이면 하위 호환 (이전 버전)
+  const env = typeof envInfo === 'string' ? envInfo : envInfo.env;
+  const inferred_by = typeof envInfo === 'object' ? envInfo.inferred_by : null;
+  const conflict = typeof envInfo === 'object' ? envInfo.conflict : false;
+  const conflict_reasons = typeof envInfo === 'object' ? envInfo.conflict_reasons : [];
+
   const result = {
     ...payload,
     env: env
   };
 
+  // source 추가
+  if (source) {
+    result.source = source;
+  }
+
+  // env 추론 정보 추가
+  if (inferred_by) {
+    result.env_inferred_by = inferred_by;
+  }
+
+  // 충돌 정보 추가
+  if (conflict) {
+    result.env_conflict = true;
+    if (conflict_reasons.length > 0) {
+      result.env_conflict_reasons = conflict_reasons;
+    }
+  }
+
+  // test 환경일 때 추가 필드
   if (env === 'test') {
     result.is_test = true;
     if (testReason) {
       result.test_reason = testReason;
+    } else if (payload.test_reason) {
+      result.test_reason = payload.test_reason;
     }
   }
 
@@ -277,17 +364,40 @@ async function logEvent(eventType, payload = {}, options = {}) {
     throw new Error(`Invalid event type: ${eventType}. Valid types: ${VALID_EVENT_TYPES.join(', ')}`);
   }
 
-  // env 결정: options.env > detectEnv(req, payload) > DEFAULT_ENV
-  let env = options.env;
-  if (!env || !VALID_ENVS.includes(env)) {
-    env = detectEnv(options.req || null, payload);
+  // env 결정: options.env (명시적) > detectEnvExtended (자동 감지) > DEFAULT_ENV
+  let envInfo;
+  if (options.env && VALID_ENVS.includes(options.env)) {
+    // 명시적 env 지정
+    envInfo = {
+      env: options.env,
+      inferred_by: 'options:explicit',
+      conflict: false,
+      conflict_reasons: []
+    };
+  } else {
+    // 자동 감지 (확장 버전)
+    envInfo = detectEnvExtended(options.req || null, payload);
   }
 
-  // payload에 env 추가
-  const enrichedPayload = addEnvToPayload(payload, env, options.testReason);
+  // payload에 env 메타데이터 추가
+  const enrichedPayload = addEnvToPayload(payload, envInfo, options.testReason, options.source);
+  const env = envInfo.env;
+
+  // ====== DB 저장 직전 최종 env 확정 (오염 방지) ======
+  if (!enrichedPayload.env || !VALID_ENVS.includes(enrichedPayload.env)) {
+    console.warn(`⚠️ [ENV 강제 확정] env 없음/유효하지 않음 → 강제 prod 설정 (eventType: ${eventType})`);
+    enrichedPayload.env = DEFAULT_ENV;
+    enrichedPayload.env_inferred_by = 'forced:fallback';
+  }
+
+  // env_conflict가 있으면 경고 로그
+  if (envInfo.conflict) {
+    console.warn(`⚠️ [ENV 충돌] 헤더=${env} but 테스트 시그널 감지: ${envInfo.conflict_reasons.join(', ')}`);
+  }
 
   // 로그에 env 표시
   const envTag = env === 'prod' ? '' : ` [${env.toUpperCase()}]`;
+  const conflictTag = envInfo.conflict ? ' ⚠️CONFLICT' : '';
 
   try {
     // DB 저장 시도
@@ -303,13 +413,20 @@ async function logEvent(eventType, payload = {}, options = {}) {
 
       const dbResult = await logEventToDB(eventType, enrichedPayload, options);
       if (dbResult) {
-        console.log(`📝 이벤트 기록 [DB]: ${eventType}${envTag} (id: ${dbResult.id})`);
+        console.log(`📝 이벤트 기록 [DB]: ${eventType}${envTag}${conflictTag} (id: ${dbResult.id})`);
         return {
           event: eventType,
           timestamp: dbResult.timestamp,
           date: dbResult.event_date,
           ...enrichedPayload,
-          _meta: { source: options.source || 'system', storage: 'db', id: dbResult.id, env }
+          _meta: {
+            source: options.source || 'system',
+            storage: 'db',
+            id: dbResult.id,
+            env,
+            env_inferred_by: envInfo.inferred_by,
+            env_conflict: envInfo.conflict
+          }
         };
       }
     }
@@ -320,7 +437,7 @@ async function logEvent(eventType, payload = {}, options = {}) {
   // 파일 폴백
   try {
     const fileResult = logEventToFile(eventType, enrichedPayload, options);
-    console.log(`📝 이벤트 기록 [File]: ${eventType}${envTag}`);
+    console.log(`📝 이벤트 기록 [File]: ${eventType}${envTag}${conflictTag}`);
     return fileResult;
   } catch (err) {
     console.error(`❌ 이벤트 기록 실패: ${err.message}`);
@@ -571,6 +688,8 @@ module.exports = {
   getDailyStats,
   getRangeStats,
   detectEnv,
+  detectEnvExtended,
+  detectTestSignals,
   addEnvToPayload,
   EVENTS_FILE
 };
