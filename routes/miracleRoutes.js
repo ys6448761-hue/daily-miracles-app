@@ -58,7 +58,7 @@ router.post('/calculate', async (req, res) => {
     const analysis = generateAnalysis(conversation.answers);
 
     // 결과 페이지 URL 생성
-    const baseUrl = process.env.BASE_URL || 'https://dailymiracles.kr';
+    const baseUrl = process.env.BASE_URL || 'https://daily-miracles-app.onrender.com';
     const resultLink = `${baseUrl}/result/${conversation.id}`;
 
     // 기적 분석 결과 발송 (phone이 있고 sendResult가 true인 경우)
