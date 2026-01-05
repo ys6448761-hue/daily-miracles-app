@@ -8,7 +8,15 @@ const router = express.Router();
 const fs = require('fs').promises;
 const path = require('path');
 const { generateWishAckMessage, generateRedAlertMessage } = require('../config/messageTemplates');
-const { sendWishAck, sendRedAlert, isEnabled: isSolapiEnabled } = require('../services/solapiService');
+
+// 메시지 프로바이더 (SENS 우선, Solapi fallback)
+let messageProvider = null;
+try {
+    messageProvider = require('../services/messageProvider');
+    console.log('[Wish] messageProvider 로드 성공:', messageProvider.getConfig());
+} catch (e) {
+    console.warn('[Wish] messageProvider 로드 실패:', e.message);
+}
 const {
     recordWishInbox,
     recordTrafficLight,
@@ -211,10 +219,12 @@ router.post('/', async (req, res) => {
             console.log('[ALERT] CRO Notification:');
             console.log(redAlert);
 
-            // Solapi로 RED 알림 발송
-            if (isSolapiEnabled()) {
-                const alertResult = await sendRedAlert(wishData);
+            // messageProvider로 RED 알림 발송
+            if (messageProvider?.isEnabled()) {
+                const alertResult = await messageProvider.sendRedAlertMessage(wishData);
                 console.log('[ALERT] RED Alert 발송 결과:', alertResult.success ? '성공' : '실패');
+            } else {
+                console.log('[ALERT] messageProvider 미설정 - RED 알림 건너뜀');
             }
         }
 
@@ -223,12 +233,12 @@ router.post('/', async (req, res) => {
             const ackMessages = generateWishAckMessage(wishData);
             console.log('[ACK] Generated ACK message for:', name, '→', normalizedPhone.substring(0, 3) + '****');
 
-            // Solapi로 ACK 발송
-            if (isSolapiEnabled()) {
-                const ackResult = await sendWishAck(normalizedPhone, wishData);
+            // messageProvider로 ACK 발송
+            if (messageProvider?.isEnabled()) {
+                const ackResult = await messageProvider.sendWishAckMessage(normalizedPhone, wishData);
                 console.log('[ACK] 발송 결과:', ackResult.success ? '성공' : ackResult.reason || '실패');
             } else {
-                console.log('[ACK] Solapi 미설정 - 로그만 출력');
+                console.log('[ACK] messageProvider 미설정 - 로그만 출력');
                 console.log('[ACK] Kakao:', ackMessages.kakao.substring(0, 100) + '...');
             }
         } else if (!want_message) {

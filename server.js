@@ -179,6 +179,15 @@ try {
   console.error("❌ 견적 시스템 라우터 로드 실패:", error.message);
 }
 
+// 단축 링크 라우터 로딩 (/r/{token})
+let shortLinkRoutes = null;
+try {
+  shortLinkRoutes = require("./routes/shortLinkRoutes");
+  console.log("✅ 단축 링크 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 단축 링크 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -620,6 +629,14 @@ if (quoteRoutes) {
   console.log("✅ 견적 시스템 라우터 등록 완료 (/api/v2/quote)");
 } else {
   console.warn("⚠️ 견적 시스템 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 단축 링크 Routes (/r/{token}) ----------
+if (shortLinkRoutes) {
+  app.use("/r", shortLinkRoutes);
+  console.log("✅ 단축 링크 라우터 등록 완료 (/r/:token)");
+} else {
+  console.warn("⚠️ 단축 링크 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Tolerant extractor ----------

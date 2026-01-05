@@ -2,12 +2,25 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 
-// Solapi 서비스 연동 (기적 분석 결과 발송)
-let solapiService = null;
+// 메시지 프로바이더 (SENS 우선, Solapi fallback)
+let messageProvider = null;
 try {
-    solapiService = require('../services/solapiService');
+    messageProvider = require('../services/messageProvider');
+    console.log('[Miracle] messageProvider 로드 성공:', messageProvider.getConfig());
 } catch (e) {
-    console.warn('[Miracle] solapiService 로드 실패:', e.message);
+    console.warn('[Miracle] messageProvider 로드 실패:', e.message);
+}
+
+// Solapi 서비스 연동 (레거시 - feature-flag로 제어)
+// ⚠️ 비활성화됨: MSG_USE_SOLAPI=true로 설정해야 사용
+let solapiService = null;
+if (process.env.MSG_USE_SOLAPI === 'true') {
+    try {
+        solapiService = require('../services/solapiService');
+        console.warn('[Miracle] solapiService 로드됨 (레거시 모드)');
+    } catch (e) {
+        console.warn('[Miracle] solapiService 로드 실패:', e.message);
+    }
 }
 
 // In-memory storage (server.js와 공유하려면 별도 파일로 분리 권장)
@@ -64,32 +77,46 @@ router.post('/calculate', async (req, res) => {
     // 기적 분석 결과 발송 (phone이 있고 sendResult가 true인 경우)
     let messageSent = false;
     let messageError = null;
+    let messageChannel = null;
 
-    if (phone && sendResult && solapiService?.sendMiracleResult) {
+    if (phone && sendResult) {
       const userName = nickname || '소원이';
+      const token = conversation.id; // 단축 링크용 토큰
+
       console.log('[기적 결과 발송 시작]', {
         phone: `${phone.substring(0, 3)}****${phone.slice(-4)}`,
         name: userName,
-        score: miracleIndex
+        score: miracleIndex,
+        token,
+        provider: messageProvider ? 'messageProvider' : 'none'
       });
 
-      try {
-        const sendResponse = await solapiService.sendMiracleResult(phone, userName, miracleIndex, resultLink);
-        messageSent = sendResponse.success;
+      // 1. messageProvider 사용 (SENS 우선)
+      if (messageProvider?.sendResultMessage) {
+        try {
+          const sendResponse = await messageProvider.sendResultMessage(phone, userName, miracleIndex, token);
+          messageSent = sendResponse.success;
+          messageChannel = sendResponse.channel || 'unknown';
 
-        if (sendResponse.success) {
-          console.log('[기적 결과 발송 완료]', { phone: `${phone.substring(0, 3)}****${phone.slice(-4)}` });
-        } else {
-          messageError = sendResponse.reason || '알 수 없는 오류';
-          console.error('[기적 결과 발송 실패]', messageError);
+          if (sendResponse.success) {
+            console.log('[기적 결과 발송 완료]', {
+              phone: `${phone.substring(0, 3)}****${phone.slice(-4)}`,
+              channel: messageChannel,
+              messageId: sendResponse.messageId
+            });
+          } else {
+            messageError = sendResponse.reason || sendResponse.error || '알 수 없는 오류';
+            console.error('[기적 결과 발송 실패]', messageError);
+          }
+        } catch (error) {
+          messageError = error.message;
+          console.error('[기적 결과 발송 에러]', error);
+          // 발송 실패해도 분석 결과는 정상 반환
         }
-      } catch (error) {
-        messageError = error.message;
-        console.error('[기적 결과 발송 에러]', error);
-        // 발송 실패해도 분석 결과는 정상 반환
+      } else {
+        console.warn('[기적 결과 발송] messageProvider 미설정 - 발송 건너뜀');
+        messageError = 'messageProvider 미설정';
       }
-    } else if (phone && sendResult && !solapiService?.sendMiracleResult) {
-      console.warn('[기적 결과 발송] solapiService 미설정 - 발송 건너뜀');
     }
 
     res.json({
