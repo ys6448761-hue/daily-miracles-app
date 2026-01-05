@@ -56,6 +56,18 @@ const THRESHOLDS = {
 // 최대 샘플 출력 개수
 const MAX_SAMPLES = 10;
 
+// ============ 레거시 기준일 ============
+// 이 날짜 이전 이벤트는 레거시로 분류 (checkout_id 필드 추가 배포일)
+const LEGACY_CUTOFF_DATE = '2026-01-05';
+
+// 레거시 필드 정의: 특정 날짜 이전에는 해당 필드가 없었던 경우
+const LEGACY_FIELDS = {
+  checkout_complete: {
+    fields: ['checkout_id'],
+    cutoffDate: '2026-01-05'  // 이 날짜부터 checkout_id 필수
+  }
+};
+
 // ============ 유틸리티 ============
 
 function parseArgs() {
@@ -158,23 +170,43 @@ async function fetchAllEvents(dateFrom, dateTo) {
 // ============ 체크 로직 ============
 
 /**
- * 1. Key Missing 체크
+ * 레거시 여부 판단
+ */
+function isLegacyEvent(event, eventType, field) {
+  const legacyRule = LEGACY_FIELDS[eventType];
+  if (!legacyRule) return false;
+  if (!legacyRule.fields.includes(field)) return false;
+
+  // event_date가 cutoffDate 이전이면 레거시
+  const eventDate = typeof event.event_date === 'string'
+    ? event.event_date
+    : event.event_date?.toISOString?.().slice(0, 10);
+
+  return eventDate < legacyRule.cutoffDate;
+}
+
+/**
+ * 1. Key Missing 체크 (레거시/운영 분리)
  */
 function checkMissingKeys(events) {
   const results = {
     issues: [],
     totalMissing: 0,
+    totalLegacy: 0,
+    totalOperational: 0,
     byType: {}
   };
 
   for (const eventType of Object.keys(REQUIRED_KEYS)) {
     const typeEvents = events.filter(e => e.event_type === eventType);
-    const missing = [];
+    const missingLegacy = [];
+    const missingOperational = [];
 
     for (const event of typeEvents) {
       const rule = REQUIRED_KEYS[eventType];
       let hasMissing = false;
       let missingFields = [];
+      let isLegacy = false;
 
       if (Array.isArray(rule)) {
         // 모든 필드 필수
@@ -183,6 +215,10 @@ function checkMissingKeys(events) {
           if (!value) {
             hasMissing = true;
             missingFields.push(field);
+            // 레거시 여부 체크
+            if (isLegacyEvent(event, eventType, field)) {
+              isLegacy = true;
+            }
           }
         }
       } else if (rule.anyOf) {
@@ -205,28 +241,56 @@ function checkMissingKeys(events) {
       }
 
       if (hasMissing) {
-        missing.push({
+        const item = {
           id: event.id,
+          event_date: event.event_date,
           checkout_id: event.checkout_id,
           story_id: event.story_id,
           share_token: event.share_token,
-          missingFields
-        });
+          missingFields,
+          isLegacy
+        };
+
+        if (isLegacy) {
+          missingLegacy.push(item);
+        } else {
+          missingOperational.push(item);
+        }
       }
     }
 
-    if (missing.length > 0) {
+    const totalMissing = missingLegacy.length + missingOperational.length;
+    if (totalMissing > 0) {
       results.byType[eventType] = {
-        count: missing.length,
+        count: totalMissing,
         total: typeEvents.length,
-        rate: typeEvents.length > 0 ? (missing.length / typeEvents.length * 100).toFixed(1) : 0,
-        samples: missing.slice(0, MAX_SAMPLES).map(m => ({
+        rate: typeEvents.length > 0 ? (totalMissing / typeEvents.length * 100).toFixed(1) : 0,
+        legacy: {
+          count: missingLegacy.length,
+          samples: missingLegacy.slice(0, MAX_SAMPLES).map(m => ({
+            id: m.id,
+            key: m.checkout_id || m.story_id || m.share_token || `id:${m.id}`,
+            missing: m.missingFields.join(', ')
+          }))
+        },
+        operational: {
+          count: missingOperational.length,
+          samples: missingOperational.slice(0, MAX_SAMPLES).map(m => ({
+            id: m.id,
+            key: m.checkout_id || m.story_id || m.share_token || `id:${m.id}`,
+            missing: m.missingFields.join(', ')
+          }))
+        },
+        samples: [...missingOperational, ...missingLegacy].slice(0, MAX_SAMPLES).map(m => ({
           id: m.id,
           key: m.checkout_id || m.story_id || m.share_token || `id:${m.id}`,
-          missing: m.missingFields.join(', ')
+          missing: m.missingFields.join(', '),
+          isLegacy: m.isLegacy
         }))
       };
-      results.totalMissing += missing.length;
+      results.totalMissing += totalMissing;
+      results.totalLegacy += missingLegacy.length;
+      results.totalOperational += missingOperational.length;
     }
   }
 
@@ -449,10 +513,11 @@ function checkTemporalSanity(events) {
 }
 
 /**
- * 종합 상태 판정
+ * 종합 상태 판정 (운영 이슈만 ALERT, 레거시는 INFO)
  */
 function determineOverallStatus(missingKeys, orphans, doubleTerminal, temporal, sampleSize) {
   const alerts = [];
+  const legacyInfo = [];
   let status = 'OK';
   let statusEmoji = '✅';
 
@@ -470,13 +535,21 @@ function determineOverallStatus(missingKeys, orphans, doubleTerminal, temporal, 
     statusEmoji = '🚨';
   }
 
-  // Missing Keys (핵심 키) > 0 -> ALERT
+  // Missing Keys (핵심 키) - 운영 이슈만 ALERT, 레거시는 INFO
   const criticalMissing = ['checkout_initiate', 'checkout_complete', 'storybook_generated'];
   for (const type of criticalMissing) {
-    if (missingKeys.byType[type]?.count > 0) {
-      alerts.push(`Missing Key (${type}): ${missingKeys.byType[type].count}건`);
-      status = 'ALERT';
-      statusEmoji = '🚨';
+    const typeData = missingKeys.byType[type];
+    if (typeData) {
+      // 운영 이슈 (ALERT)
+      if (typeData.operational?.count > 0) {
+        alerts.push(`Missing Key (${type}): ${typeData.operational.count}건 [운영]`);
+        status = 'ALERT';
+        statusEmoji = '🚨';
+      }
+      // 레거시 이슈 (INFO)
+      if (typeData.legacy?.count > 0) {
+        legacyInfo.push(`Missing Key (${type}): ${typeData.legacy.count}건 [레거시]`);
+      }
     }
   }
 
@@ -523,6 +596,7 @@ function determineOverallStatus(missingKeys, orphans, doubleTerminal, temporal, 
     status,
     statusEmoji,
     alerts,
+    legacyInfo,
     lowSample,
     sampleSize
   };
@@ -639,34 +713,51 @@ function formatMarkdown(results, dateFrom, dateTo) {
   return lines.join('\n');
 }
 
-function formatConsole(results, dateFrom, dateTo) {
+function formatConsole(results, dateFrom, dateTo, operational7Day = null) {
   const { missingKeys, orphans, doubleTerminal, temporal, overall, totalEvents } = results;
 
   console.log('\n🔍 퍼널 무결성 검사 리포트\n');
   console.log(`기간: ${dateFrom} ~ ${dateTo}`);
   console.log(`전체 이벤트: ${totalEvents}건`);
-  console.log('─'.repeat(60));
+  console.log('─'.repeat(70));
 
   console.log(`\n종합 상태: ${overall.statusEmoji} ${overall.status}`);
   if (overall.lowSample) {
     console.log(`⚠️ 표본 부족 (${overall.sampleSize}/${THRESHOLDS.min_sample}건)`);
   }
 
+  // 운영 알람
   if (overall.alerts.length > 0) {
-    console.log('\n[알람]');
+    console.log('\n[🚨 운영 알람]');
     for (const alert of overall.alerts) {
       console.log(`  🚨 ${alert}`);
     }
   }
 
-  console.log('\n─'.repeat(60));
+  // 레거시 정보
+  if (overall.legacyInfo && overall.legacyInfo.length > 0) {
+    console.log('\n[📦 레거시 이슈 (수정 전 데이터)]');
+    for (const info of overall.legacyInfo) {
+      console.log(`  ℹ️ ${info}`);
+    }
+  }
+
+  console.log('\n' + '─'.repeat(70));
   console.log('[1. Key Missing]');
   if (Object.keys(missingKeys.byType).length === 0) {
     console.log('  ✅ 키 누락 없음');
   } else {
+    console.log('  ' + '─'.repeat(50));
+    console.log('  이벤트'.padEnd(22) + '운영'.padEnd(8) + '레거시'.padEnd(8) + '합계');
+    console.log('  ' + '─'.repeat(50));
     for (const [type, data] of Object.entries(missingKeys.byType)) {
-      console.log(`  ${type}: ${data.count}/${data.total} (${data.rate}%)`);
+      const opCount = data.operational?.count || 0;
+      const legCount = data.legacy?.count || 0;
+      const opStatus = opCount === 0 ? '✅' : '🚨';
+      const legStatus = legCount === 0 ? '-' : '📦';
+      console.log(`  ${type.padEnd(20)} ${opStatus} ${String(opCount).padEnd(5)} ${legStatus} ${String(legCount).padEnd(5)} ${data.count}/${data.total}`);
     }
+    console.log('  ' + '─'.repeat(50));
   }
 
   console.log('\n[2. Orphan Events]');
@@ -701,7 +792,36 @@ function formatConsole(results, dateFrom, dateTo) {
     console.log(`  ${status} ${label}: ${data.count}건`);
   }
 
-  console.log('\n' + '─'.repeat(60) + '\n');
+  // 7일 운영 무결성
+  if (operational7Day) {
+    console.log('\n' + '═'.repeat(70));
+    console.log('[📊 최근 7일 운영 무결성 (Operational Integrity)]');
+    console.log('  ' + '─'.repeat(50));
+    console.log(`  기간: ${operational7Day.dateFrom} ~ ${operational7Day.dateTo}`);
+    console.log(`  전체 이벤트: ${operational7Day.totalEvents}건`);
+    console.log(`  상태: ${operational7Day.overall.statusEmoji} ${operational7Day.overall.status}`);
+
+    if (operational7Day.overall.alerts.length > 0) {
+      console.log('\n  [운영 알람]');
+      for (const alert of operational7Day.overall.alerts) {
+        console.log(`    🚨 ${alert}`);
+      }
+    } else {
+      console.log('  ✅ 운영 알람 없음');
+    }
+
+    // 7일 Key Missing 요약
+    const op7Missing = operational7Day.missingKeys;
+    if (op7Missing.totalOperational > 0) {
+      console.log(`\n  [Key Missing - 운영]: ${op7Missing.totalOperational}건`);
+    }
+    if (op7Missing.totalLegacy > 0) {
+      console.log(`  [Key Missing - 레거시]: ${op7Missing.totalLegacy}건 (무시)`);
+    }
+    console.log('  ' + '─'.repeat(50));
+  }
+
+  console.log('\n' + '─'.repeat(70) + '\n');
 }
 
 // ============ 메인 ============
@@ -753,9 +873,52 @@ async function main() {
     overall
   };
 
+  // 7일 운영 무결성 (별도 조회)
+  let operational7Day = null;
+  if (options.range === 1) {  // 일일 검사 시에만 7일 요약 추가
+    try {
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - 6);  // 최근 7일
+
+      const from7 = startDate.toISOString().slice(0, 10);
+      const to7 = endDate.toISOString().slice(0, 10);
+
+      console.error(`📊 7일 운영 무결성 조회: ${from7} ~ ${to7}`);
+      const events7Day = await fetchAllEvents(from7, to7);
+
+      if (events7Day && events7Day.length > 0) {
+        const missingKeys7 = checkMissingKeys(events7Day);
+        const orphans7 = checkOrphanEvents(events7Day);
+        const doubleTerminal7 = checkDoubleTerminal(events7Day);
+        const temporal7 = checkTemporalSanity(events7Day);
+
+        const sampleSize7 = new Set(
+          events7Day.filter(e => e.event_type === 'checkout_initiate' && e.checkout_id)
+            .map(e => e.checkout_id)
+        ).size;
+
+        const overall7 = determineOverallStatus(missingKeys7, orphans7, doubleTerminal7, temporal7, sampleSize7);
+
+        operational7Day = {
+          dateFrom: from7,
+          dateTo: to7,
+          totalEvents: events7Day.length,
+          missingKeys: missingKeys7,
+          orphans: orphans7,
+          doubleTerminal: doubleTerminal7,
+          temporal: temporal7,
+          overall: overall7
+        };
+      }
+    } catch (err) {
+      console.error('⚠️ 7일 무결성 조회 실패:', err.message);
+    }
+  }
+
   // 출력
   if (options.json) {
-    console.log(JSON.stringify(results, null, 2));
+    console.log(JSON.stringify({ ...results, operational7Day }, null, 2));
   } else if (options.out) {
     const dir = path.dirname(options.out);
     if (!fs.existsSync(dir)) {
@@ -766,7 +929,7 @@ async function main() {
     console.error(`✅ 리포트 저장: ${options.out}`);
     console.log(`\n${overall.statusEmoji} ${overall.status}`);
   } else {
-    formatConsole(results, from, to);
+    formatConsole(results, from, to, operational7Day);
   }
 
   // DB 연결 종료
