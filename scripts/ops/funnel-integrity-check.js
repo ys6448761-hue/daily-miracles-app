@@ -7,6 +7,7 @@
  * - Orphan Event: 부모 없는 이벤트 탐지
  * - Double Terminal: 종결 이벤트 중복 체크
  * - Temporal Sanity: 시간 순서 이상 탐지
+ * - env 필터링으로 테스트/실사용 이벤트 분리
  *
  * Usage:
  *   node scripts/ops/funnel-integrity-check.js [options]
@@ -14,6 +15,8 @@
  * Options:
  *   --date <YYYY-MM-DD>   특정 날짜 (기본: 오늘)
  *   --range <N>           최근 N일 (기본: 1)
+ *   --env <prod|test|all> 환경 필터 (기본: prod)
+ *   --include-test        테스트 포함 (--env all과 동일)
  *   --json                JSON 형식 출력
  *   --strict              ALERT 발생 시 exit code 1
  *   --out <path>          출력 파일 경로
@@ -56,6 +59,10 @@ const THRESHOLDS = {
 // 최대 샘플 출력 개수
 const MAX_SAMPLES = 10;
 
+// env 필터 옵션
+const VALID_ENV_FILTERS = ['prod', 'test', 'all'];
+const DEFAULT_ENV_FILTER = 'prod';
+
 // ============ 레거시 기준일 ============
 // 이 날짜 이전 이벤트는 레거시로 분류 (checkout_id 필드 추가 배포일)
 const LEGACY_CUTOFF_DATE = '2026-01-05';
@@ -75,6 +82,7 @@ function parseArgs() {
   const options = {
     date: null,
     range: 1,
+    env: DEFAULT_ENV_FILTER,
     json: false,
     strict: false,
     out: null
@@ -87,6 +95,17 @@ function parseArgs() {
         break;
       case '--range':
         options.range = parseInt(args[++i], 10) || 1;
+        break;
+      case '--env':
+        const envArg = args[++i];
+        if (VALID_ENV_FILTERS.includes(envArg)) {
+          options.env = envArg;
+        } else {
+          console.warn(`⚠️ 잘못된 env 값: ${envArg}. 기본값 '${DEFAULT_ENV_FILTER}' 사용`);
+        }
+        break;
+      case '--include-test':
+        options.env = 'all';
         break;
       case '--json':
         options.json = true;
@@ -108,6 +127,8 @@ Usage:
 Options:
   --date <YYYY-MM-DD>   특정 날짜 (기본: 오늘)
   --range <N>           최근 N일 (기본: 1)
+  --env <prod|test|all> 환경 필터 (기본: prod)
+  --include-test        테스트 포함 (--env all과 동일)
   --json                JSON 형식 출력
   --strict              ALERT 발생 시 exit code 1 (CI용)
   --out <path>          출력 파일 경로
@@ -144,10 +165,31 @@ function getDateRange(options) {
 // ============ DB 쿼리 ============
 
 /**
- * 기간 내 모든 이벤트 조회
+ * env 필터 조건 생성
+ * @param {string} envFilter - 'prod' | 'test' | 'all'
+ * @returns {string} - SQL WHERE 조건
  */
-async function fetchAllEvents(dateFrom, dateTo) {
+function getEnvCondition(envFilter) {
+  if (envFilter === 'all') {
+    return ''; // 필터 없음
+  }
+  // env가 없는 레거시 데이터는 prod로 취급
+  if (envFilter === 'prod') {
+    return `AND (payload->>'env' = 'prod' OR payload->>'env' IS NULL)`;
+  }
+  return `AND payload->>'env' = '${envFilter}'`;
+}
+
+/**
+ * 기간 내 모든 이벤트 조회
+ * @param {string} dateFrom - 시작 날짜
+ * @param {string} dateTo - 종료 날짜
+ * @param {string} envFilter - 환경 필터 ('prod' | 'test' | 'all')
+ */
+async function fetchAllEvents(dateFrom, dateTo, envFilter = 'prod') {
   if (!db) return null;
+
+  const envCondition = getEnvCondition(envFilter);
 
   const query = `
     SELECT
@@ -157,9 +199,11 @@ async function fetchAllEvents(dateFrom, dateTo) {
       payload->>'share_token' as share_token,
       payload->>'view_context' as view_context,
       payload->>'expires_at' as expires_at,
+      payload->>'env' as env,
       payload
     FROM marketing_events
     WHERE event_date >= $1 AND event_date <= $2
+      ${envCondition}
     ORDER BY timestamp ASC
   `;
 
@@ -604,13 +648,15 @@ function determineOverallStatus(missingKeys, orphans, doubleTerminal, temporal, 
 
 // ============ 출력 포맷 ============
 
-function formatMarkdown(results, dateFrom, dateTo) {
+function formatMarkdown(results, dateFrom, dateTo, envFilter = 'prod') {
   const { missingKeys, orphans, doubleTerminal, temporal, overall, totalEvents } = results;
+  const envLabel = envFilter === 'all' ? 'all (prod + test)' : envFilter;
 
   const lines = [
     `# 🔍 퍼널 무결성 검사 리포트`,
     ``,
     `> 기간: ${dateFrom} ~ ${dateTo}`,
+    `> 환경: **${envLabel}**`,
     `> 생성: ${new Date().toLocaleString('ko-KR')}`,
     `> 전체 이벤트: ${totalEvents}건`,
     ``,
@@ -713,11 +759,13 @@ function formatMarkdown(results, dateFrom, dateTo) {
   return lines.join('\n');
 }
 
-function formatConsole(results, dateFrom, dateTo, operational7Day = null) {
+function formatConsole(results, dateFrom, dateTo, operational7Day = null, envFilter = 'prod') {
   const { missingKeys, orphans, doubleTerminal, temporal, overall, totalEvents } = results;
+  const envLabel = envFilter === 'all' ? 'all (prod + test)' : envFilter;
 
   console.log('\n🔍 퍼널 무결성 검사 리포트\n');
   console.log(`기간: ${dateFrom} ~ ${dateTo}`);
+  console.log(`환경: ${envLabel}`);
   console.log(`전체 이벤트: ${totalEvents}건`);
   console.log('─'.repeat(70));
 
@@ -829,13 +877,16 @@ function formatConsole(results, dateFrom, dateTo, operational7Day = null) {
 async function main() {
   const options = parseArgs();
   const { from, to } = getDateRange(options);
+  const envFilter = options.env || DEFAULT_ENV_FILTER;
 
+  const envLabel = envFilter === 'all' ? 'all (prod + test)' : envFilter;
   console.error(`📅 검사 기간: ${from} ~ ${to}`);
+  console.error(`🏷️ 환경 필터: ${envLabel}`);
 
   // DB에서 이벤트 조회
   let events;
   try {
-    events = await fetchAllEvents(from, to);
+    events = await fetchAllEvents(from, to, envFilter);
     if (!events) {
       console.error('❌ DB 연결 실패');
       process.exit(1);
@@ -865,6 +916,7 @@ async function main() {
   const results = {
     dateFrom: from,
     dateTo: to,
+    env: envFilter,
     totalEvents: events.length,
     missingKeys,
     orphans,
@@ -885,7 +937,7 @@ async function main() {
       const to7 = endDate.toISOString().slice(0, 10);
 
       console.error(`📊 7일 운영 무결성 조회: ${from7} ~ ${to7}`);
-      const events7Day = await fetchAllEvents(from7, to7);
+      const events7Day = await fetchAllEvents(from7, to7, envFilter);
 
       if (events7Day && events7Day.length > 0) {
         const missingKeys7 = checkMissingKeys(events7Day);
@@ -924,12 +976,12 @@ async function main() {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    const markdown = formatMarkdown(results, from, to);
+    const markdown = formatMarkdown(results, from, to, envFilter);
     fs.writeFileSync(options.out, markdown, 'utf-8');
     console.error(`✅ 리포트 저장: ${options.out}`);
     console.log(`\n${overall.statusEmoji} ${overall.status}`);
   } else {
-    formatConsole(results, from, to, operational7Day);
+    formatConsole(results, from, to, operational7Day, envFilter);
   }
 
   // DB 연결 종료
@@ -951,7 +1003,10 @@ module.exports = {
   checkTemporalSanity,
   determineOverallStatus,
   fetchAllEvents,
-  THRESHOLDS
+  getEnvCondition,
+  THRESHOLDS,
+  VALID_ENV_FILTERS,
+  DEFAULT_ENV_FILTER
 };
 
 // 직접 실행 시

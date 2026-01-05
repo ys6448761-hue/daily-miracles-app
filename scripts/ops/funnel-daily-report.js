@@ -6,6 +6,7 @@
  * - DB 우선 조회 (PostgreSQL marketing_events)
  * - 목표치(Floor/Target) 대비 알람 표시
  * - unique 기준 집계 (checkout_id, story_id, share_token)
+ * - env 필터링으로 테스트/실사용 이벤트 분리
  *
  * Usage:
  *   node scripts/ops/funnel-daily-report.js [options]
@@ -13,6 +14,8 @@
  * Options:
  *   --date <YYYY-MM-DD>   특정 날짜 (기본: 오늘)
  *   --range <N>           최근 N일 집계 (기본: 1)
+ *   --env <prod|test|all> 환경 필터 (기본: prod)
+ *   --include-test        테스트 포함 (--env all과 동일)
  *   --out <path>          출력 파일 경로 (기본: artifacts/reports/daily-funnel.md)
  *   --json                JSON 형식 출력
  *   --help                도움말
@@ -49,6 +52,10 @@ const THRESHOLDS = {
 // 최소 표본 수 (이하면 일일 판단 금지)
 const MIN_SAMPLE_SIZE = 30;
 
+// env 필터 옵션
+const VALID_ENV_FILTERS = ['prod', 'test', 'all'];
+const DEFAULT_ENV_FILTER = 'prod';
+
 // ============ 유틸리티 ============
 
 function parseArgs() {
@@ -56,6 +63,7 @@ function parseArgs() {
   const options = {
     date: null,
     range: 1,
+    env: DEFAULT_ENV_FILTER,
     out: path.resolve(__dirname, '../../artifacts/reports/daily-funnel.md'),
     json: false
   };
@@ -67,6 +75,17 @@ function parseArgs() {
         break;
       case '--range':
         options.range = parseInt(args[++i], 10) || 1;
+        break;
+      case '--env':
+        const envArg = args[++i];
+        if (VALID_ENV_FILTERS.includes(envArg)) {
+          options.env = envArg;
+        } else {
+          console.warn(`⚠️ 잘못된 env 값: ${envArg}. 기본값 '${DEFAULT_ENV_FILTER}' 사용`);
+        }
+        break;
+      case '--include-test':
+        options.env = 'all';
         break;
       case '--out':
         options.out = args[++i];
@@ -85,14 +104,18 @@ Usage:
 Options:
   --date <YYYY-MM-DD>   특정 날짜 (기본: 오늘)
   --range <N>           최근 N일 집계 (기본: 1)
+  --env <prod|test|all> 환경 필터 (기본: prod)
+  --include-test        테스트 포함 (--env all과 동일)
   --out <path>          출력 파일 경로 (기본: artifacts/reports/daily-funnel.md)
   --json                JSON 형식 콘솔 출력
   --help                도움말
 
 Examples:
-  node scripts/ops/funnel-daily-report.js                  # 오늘 리포트
-  node scripts/ops/funnel-daily-report.js --range 7        # 최근 7일
-  node scripts/ops/funnel-daily-report.js --date 2026-01-05
+  node scripts/ops/funnel-daily-report.js                  # 오늘 리포트 (prod만)
+  node scripts/ops/funnel-daily-report.js --range 7        # 최근 7일 (prod만)
+  node scripts/ops/funnel-daily-report.js --env test       # 테스트 이벤트만
+  node scripts/ops/funnel-daily-report.js --env all        # prod + test 전체
+  node scripts/ops/funnel-daily-report.js --include-test   # --env all과 동일
 `);
         process.exit(0);
     }
@@ -119,10 +142,31 @@ function getDateRange(options) {
 // ============ DB 쿼리 ============
 
 /**
- * unique 기준 퍼널 데이터 조회 (DB)
+ * env 필터 조건 생성
+ * @param {string} envFilter - 'prod' | 'test' | 'all'
+ * @returns {string} - SQL WHERE 조건
  */
-async function getFunnelDataFromDB(dateFrom, dateTo) {
+function getEnvCondition(envFilter) {
+  if (envFilter === 'all') {
+    return ''; // 필터 없음
+  }
+  // env가 없는 레거시 데이터는 prod로 취급
+  if (envFilter === 'prod') {
+    return `AND (payload->>'env' = 'prod' OR payload->>'env' IS NULL)`;
+  }
+  return `AND payload->>'env' = '${envFilter}'`;
+}
+
+/**
+ * unique 기준 퍼널 데이터 조회 (DB)
+ * @param {string} dateFrom - 시작 날짜
+ * @param {string} dateTo - 종료 날짜
+ * @param {string} envFilter - 환경 필터 ('prod' | 'test' | 'all')
+ */
+async function getFunnelDataFromDB(dateFrom, dateTo, envFilter = 'prod') {
   if (!db) return null;
+
+  const envCondition = getEnvCondition(envFilter);
 
   // checkout_initiate: unique checkout_id
   const initiateQuery = `
@@ -131,6 +175,7 @@ async function getFunnelDataFromDB(dateFrom, dateTo) {
     WHERE event_type = 'checkout_initiate'
       AND event_date >= $1 AND event_date <= $2
       AND payload->>'checkout_id' IS NOT NULL
+      ${envCondition}
   `;
 
   // checkout_complete: unique checkout_id
@@ -140,6 +185,7 @@ async function getFunnelDataFromDB(dateFrom, dateTo) {
     WHERE event_type = 'checkout_complete'
       AND event_date >= $1 AND event_date <= $2
       AND payload->>'checkout_id' IS NOT NULL
+      ${envCondition}
   `;
 
   // storybook_generated: unique story_id
@@ -148,6 +194,7 @@ async function getFunnelDataFromDB(dateFrom, dateTo) {
     FROM marketing_events
     WHERE event_type = 'storybook_generated'
       AND event_date >= $1 AND event_date <= $2
+      ${envCondition}
   `;
 
   // story_viewed: unique story_id
@@ -156,6 +203,7 @@ async function getFunnelDataFromDB(dateFrom, dateTo) {
     FROM marketing_events
     WHERE event_type = 'story_viewed'
       AND event_date >= $1 AND event_date <= $2
+      ${envCondition}
   `;
 
   // share_created: unique share_token
@@ -165,6 +213,7 @@ async function getFunnelDataFromDB(dateFrom, dateTo) {
     WHERE event_type = 'share_created'
       AND event_date >= $1 AND event_date <= $2
       AND payload->>'share_token' IS NOT NULL
+      ${envCondition}
   `;
 
   // share_opened: unique share_token
@@ -174,6 +223,7 @@ async function getFunnelDataFromDB(dateFrom, dateTo) {
     WHERE event_type = 'share_opened'
       AND event_date >= $1 AND event_date <= $2
       AND payload->>'share_token' IS NOT NULL
+      ${envCondition}
   `;
 
   // trial_start: 참고용
@@ -182,6 +232,7 @@ async function getFunnelDataFromDB(dateFrom, dateTo) {
     FROM marketing_events
     WHERE event_type = 'trial_start'
       AND event_date >= $1 AND event_date <= $2
+      ${envCondition}
   `;
 
   const [initiate, complete, generated, viewed, shareCreated, shareOpened, trial] = await Promise.all([
@@ -419,11 +470,13 @@ function formatIntegritySummary(integrity) {
 /**
  * 마크다운 포맷 생성
  */
-function formatMarkdown(data, funnel, dateFrom, dateTo, integrity = null) {
+function formatMarkdown(data, funnel, dateFrom, dateTo, integrity = null, envFilter = 'prod') {
+  const envLabel = envFilter === 'all' ? 'all (prod + test)' : envFilter;
   const lines = [
     `# 📊 퍼널 일일 리포트`,
     ``,
     `> 기간: ${dateFrom} ~ ${dateTo}`,
+    `> 환경: **${envLabel}**`,
     `> 생성: ${new Date().toLocaleString('ko-KR')}`,
     `> 소스: DB (PostgreSQL marketing_events)`,
     ``,
@@ -504,9 +557,11 @@ function formatMarkdown(data, funnel, dateFrom, dateTo, integrity = null) {
 /**
  * 콘솔 포맷 출력
  */
-function formatConsole(data, funnel, dateFrom, dateTo) {
+function formatConsole(data, funnel, dateFrom, dateTo, envFilter = 'prod') {
+  const envLabel = envFilter === 'all' ? 'all (prod + test)' : envFilter;
   console.log('\n📊 퍼널 일일 리포트\n');
   console.log(`기간: ${dateFrom} ~ ${dateTo}`);
+  console.log(`환경: ${envLabel}`);
   console.log('─'.repeat(80));
 
   // 1줄 요약
@@ -574,13 +629,16 @@ function formatConsole(data, funnel, dateFrom, dateTo) {
 async function main() {
   const options = parseArgs();
   const { from, to } = getDateRange(options);
+  const envFilter = options.env || DEFAULT_ENV_FILTER;
 
+  const envLabel = envFilter === 'all' ? 'all (prod + test)' : envFilter;
   console.error(`📅 조회 기간: ${from} ~ ${to}`);
+  console.error(`🏷️ 환경 필터: ${envLabel}`);
 
   // DB에서 데이터 조회
   let data;
   try {
-    data = await getFunnelDataFromDB(from, to);
+    data = await getFunnelDataFromDB(from, to, envFilter);
     if (!data) {
       console.error('❌ DB 연결 실패');
       process.exit(1);
@@ -598,7 +656,7 @@ async function main() {
   if (integrityCheck && db) {
     try {
       console.error('🔍 무결성 검사 중...');
-      const events = await integrityCheck.fetchAllEvents(from, to);
+      const events = await integrityCheck.fetchAllEvents(from, to, envFilter);
       if (events && events.length > 0) {
         const missingKeys = integrityCheck.checkMissingKeys(events);
         const orphans = integrityCheck.checkOrphanEvents(events);
@@ -624,7 +682,7 @@ async function main() {
 
   // 출력
   if (options.json) {
-    console.log(JSON.stringify({ dateFrom: from, dateTo: to, data, funnel, integrity }, null, 2));
+    console.log(JSON.stringify({ dateFrom: from, dateTo: to, env: envFilter, data, funnel, integrity }, null, 2));
   } else if (options.out) {
     // 디렉토리 확인
     const dir = path.dirname(options.out);
@@ -632,14 +690,14 @@ async function main() {
       fs.mkdirSync(dir, { recursive: true });
     }
 
-    const markdown = formatMarkdown(data, funnel, from, to, integrity);
+    const markdown = formatMarkdown(data, funnel, from, to, integrity, envFilter);
     fs.writeFileSync(options.out, markdown, 'utf-8');
     console.error(`✅ 리포트 저장: ${options.out}`);
 
     // 콘솔에도 1줄 요약 출력
     console.log('\n' + formatOneLine(data, funnel) + '\n');
   } else {
-    formatConsole(data, funnel, from, to);
+    formatConsole(data, funnel, from, to, envFilter);
   }
 
   // DB 연결 종료
@@ -652,14 +710,15 @@ async function main() {
 
 /**
  * 프로그래밍 방식으로 퍼널 리포트 생성
- * @param {Object} options - { date, range, out, json }
- * @returns {Object} - { dateFrom, dateTo, data, funnel, integrity, markdown, oneLine }
+ * @param {Object} options - { date, range, env, out, json }
+ * @returns {Object} - { dateFrom, dateTo, env, data, funnel, integrity, markdown, oneLine }
  */
 async function generateFunnelReport(options = {}) {
   const { from, to } = getDateRange(options);
+  const envFilter = options.env || DEFAULT_ENV_FILTER;
 
   // DB에서 데이터 조회
-  const data = await getFunnelDataFromDB(from, to);
+  const data = await getFunnelDataFromDB(from, to, envFilter);
   if (!data) {
     throw new Error('DB 연결 실패');
   }
@@ -671,7 +730,7 @@ async function generateFunnelReport(options = {}) {
   let integrity = null;
   if (integrityCheck && db) {
     try {
-      const events = await integrityCheck.fetchAllEvents(from, to);
+      const events = await integrityCheck.fetchAllEvents(from, to, envFilter);
       if (events && events.length > 0) {
         const missingKeys = integrityCheck.checkMissingKeys(events);
         const orphans = integrityCheck.checkOrphanEvents(events);
@@ -695,12 +754,13 @@ async function generateFunnelReport(options = {}) {
   }
 
   // 마크다운 및 1줄 요약 생성
-  const markdown = formatMarkdown(data, funnel, from, to, integrity);
+  const markdown = formatMarkdown(data, funnel, from, to, integrity, envFilter);
   const oneLine = formatOneLine(data, funnel);
 
   return {
     dateFrom: from,
     dateTo: to,
+    env: envFilter,
     data,
     funnel,
     integrity,
@@ -713,7 +773,10 @@ async function generateFunnelReport(options = {}) {
 module.exports = {
   generateFunnelReport,
   THRESHOLDS,
-  MIN_SAMPLE_SIZE
+  MIN_SAMPLE_SIZE,
+  VALID_ENV_FILTERS,
+  DEFAULT_ENV_FILTER,
+  getEnvCondition
 };
 
 // CLI로 직접 실행 시에만 main() 호출

@@ -367,11 +367,12 @@ app.post("/api/ops/funnel-report", async (req, res) => {
   }
 
   try {
-    const { date, range, format } = req.body || {};
+    const { date, range, format, env } = req.body || {};
 
     const options = {
       date: date || null,
-      range: range || 1
+      range: range || 1,
+      env: env || 'prod'  // 기본값: prod (테스트 이벤트 제외)
     };
 
     console.log(`📊 퍼널 리포트 생성 요청: ${JSON.stringify(options)}`);
@@ -392,6 +393,7 @@ app.post("/api/ops/funnel-report", async (req, res) => {
       timestamp: new Date().toISOString(),
       dateFrom: result.dateFrom,
       dateTo: result.dateTo,
+      env: result.env,
       oneLine: result.oneLine,
       data: result.data,
       funnel: result.funnel,
@@ -401,7 +403,7 @@ app.post("/api/ops/funnel-report", async (req, res) => {
       format: format === 'markdown' ? result.markdown : undefined
     });
 
-    console.log(`✅ 퍼널 리포트 생성 완료: ${result.oneLine}`);
+    console.log(`✅ 퍼널 리포트 생성 완료 [${result.env}]: ${result.oneLine}`);
   } catch (error) {
     console.error("💥 퍼널 리포트 생성 실패:", error);
     res.status(500).json({
@@ -420,11 +422,12 @@ app.get("/api/ops/funnel-report", async (req, res) => {
   }
 
   try {
-    const { date, range } = req.query;
+    const { date, range, env } = req.query;
 
     const options = {
       date: date || null,
-      range: parseInt(range, 10) || 1
+      range: parseInt(range, 10) || 1,
+      env: env || 'prod'  // 기본값: prod (테스트 이벤트 제외)
     };
 
     const result = await funnelReport.generateFunnelReport(options);
@@ -434,6 +437,7 @@ app.get("/api/ops/funnel-report", async (req, res) => {
       timestamp: new Date().toISOString(),
       dateFrom: result.dateFrom,
       dateTo: result.dateTo,
+      env: result.env,
       oneLine: result.oneLine,
       data: result.data,
       funnel: result.funnel,

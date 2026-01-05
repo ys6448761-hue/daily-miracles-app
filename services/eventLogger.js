@@ -4,15 +4,25 @@
  * 마케팅 이벤트 로깅 유틸리티
  * - DB 우선 저장 (PostgreSQL marketing_events 테이블)
  * - DB 연결 실패 시 파일 폴백 (artifacts/events.ndjson)
+ * - env 태깅으로 테스트/실사용 이벤트 분리
  *
  * 지원 이벤트:
  *   - trial_start, day3_inactive (체험)
  *   - checkout_initiate, checkout_abandon, checkout_complete (결제)
  *   - storybook_generated, story_viewed, share_created, share_opened (가치)
  *
+ * env 태깅:
+ *   - prod: 실서비스 이벤트 (기본값)
+ *   - test: 테스트 이벤트
+ *   - staging: 스테이징 환경
+ *   - dev: 개발 환경
+ *
  * Usage:
- *   const { logEvent, EVENT_TYPES } = require('./eventLogger');
- *   await logEvent(EVENT_TYPES.TRIAL_START, { user_id: '...', phone: '...' });
+ *   const { logEvent, EVENT_TYPES, detectEnv } = require('./eventLogger');
+ *   await logEvent(EVENT_TYPES.TRIAL_START, { user_id: '...' }, { env: 'prod' });
+ *   // 또는 자동 감지
+ *   const env = detectEnv(req, payload);
+ *   await logEvent(EVENT_TYPES.TRIAL_START, { user_id: '...' }, { env });
  */
 
 const fs = require('fs');
@@ -28,6 +38,94 @@ try {
 
 // ============ 설정 ============
 const EVENTS_FILE = path.resolve(__dirname, '../artifacts/events.ndjson');
+
+// ============ ENV 태깅 설정 ============
+const VALID_ENVS = ['prod', 'staging', 'dev', 'test'];
+const DEFAULT_ENV = 'prod';
+
+// 테스트 감지 패턴
+const TEST_PATTERNS = {
+  // user_id가 "TEST-"로 시작
+  userId: /^TEST-/i,
+  // order_id/payment_id에 "TEST" 포함
+  orderId: /TEST/i,
+  // checkout_id에 "TEST" 포함
+  checkoutId: /TEST/i
+};
+
+/**
+ * 요청/페이로드에서 env 자동 감지
+ * 우선순위: 헤더 > body.is_test > payload 패턴 > 기본값(prod)
+ *
+ * @param {Object} req - Express request 객체 (optional)
+ * @param {Object} payload - 이벤트 페이로드
+ * @returns {string} - 감지된 env ('prod' | 'test' | 'staging' | 'dev')
+ */
+function detectEnv(req, payload = {}) {
+  // 1) 헤더 X-DM-ENV가 최우선
+  if (req && req.headers) {
+    const headerEnv = req.headers['x-dm-env'] || req.headers['X-DM-ENV'];
+    if (headerEnv && VALID_ENVS.includes(headerEnv.toLowerCase())) {
+      return headerEnv.toLowerCase();
+    }
+  }
+
+  // 2) body/query에 is_test=true가 있으면 test
+  if (req && req.body && req.body.is_test === true) {
+    return 'test';
+  }
+  if (req && req.query && req.query.is_test === 'true') {
+    return 'test';
+  }
+  if (payload.is_test === true) {
+    return 'test';
+  }
+
+  // 3) payload의 env가 명시적으로 있으면 사용
+  if (payload.env && VALID_ENVS.includes(payload.env)) {
+    return payload.env;
+  }
+
+  // 4) 패턴 기반 테스트 감지
+  if (payload.user_id && TEST_PATTERNS.userId.test(payload.user_id)) {
+    return 'test';
+  }
+  if (payload.order_id && TEST_PATTERNS.orderId.test(payload.order_id)) {
+    return 'test';
+  }
+  if (payload.payment_id && TEST_PATTERNS.orderId.test(payload.payment_id)) {
+    return 'test';
+  }
+  if (payload.checkout_id && TEST_PATTERNS.checkoutId.test(payload.checkout_id)) {
+    return 'test';
+  }
+
+  // 5) 기본값
+  return DEFAULT_ENV;
+}
+
+/**
+ * 페이로드에 env 메타데이터 추가
+ * @param {Object} payload - 원본 페이로드
+ * @param {string} env - 환경 ('prod' | 'test' | ...)
+ * @param {string} testReason - 테스트 이유 (선택)
+ * @returns {Object} - env가 추가된 페이로드
+ */
+function addEnvToPayload(payload, env, testReason = null) {
+  const result = {
+    ...payload,
+    env: env
+  };
+
+  if (env === 'test') {
+    result.is_test = true;
+    if (testReason) {
+      result.test_reason = testReason;
+    }
+  }
+
+  return result;
+}
 
 // ============ 중복 방지 규칙 ============
 // 각 이벤트 타입별 idempotent key 정의
@@ -170,7 +268,7 @@ function logEventToFile(eventType, payload, options) {
  * 이벤트 로깅 (DB 우선, 파일 폴백)
  * @param {string} eventType - 이벤트 타입 (EVENT_TYPES 중 하나)
  * @param {Object} payload - 이벤트 데이터
- * @param {Object} options - 추가 옵션 { source, skipDedup }
+ * @param {Object} options - 추가 옵션 { source, skipDedup, env, testReason, req }
  * @returns {Object} - 저장된 이벤트 객체 또는 null (중복인 경우)
  */
 async function logEvent(eventType, payload = {}, options = {}) {
@@ -179,27 +277,39 @@ async function logEvent(eventType, payload = {}, options = {}) {
     throw new Error(`Invalid event type: ${eventType}. Valid types: ${VALID_EVENT_TYPES.join(', ')}`);
   }
 
+  // env 결정: options.env > detectEnv(req, payload) > DEFAULT_ENV
+  let env = options.env;
+  if (!env || !VALID_ENVS.includes(env)) {
+    env = detectEnv(options.req || null, payload);
+  }
+
+  // payload에 env 추가
+  const enrichedPayload = addEnvToPayload(payload, env, options.testReason);
+
+  // 로그에 env 표시
+  const envTag = env === 'prod' ? '' : ` [${env.toUpperCase()}]`;
+
   try {
     // DB 저장 시도
     if (db) {
       // 중복 체크 (skipDedup 옵션이 없으면 자동 체크)
       if (!options.skipDedup && IDEMPOTENT_RULES[eventType]) {
-        const isDuplicate = await checkDuplicateInDB(eventType, payload);
+        const isDuplicate = await checkDuplicateInDB(eventType, enrichedPayload);
         if (isDuplicate) {
-          console.log(`⏭️ 이벤트 중복 스킵 [DB]: ${eventType}`);
-          return { event: eventType, _meta: { skipped: true, reason: 'duplicate' } };
+          console.log(`⏭️ 이벤트 중복 스킵 [DB]: ${eventType}${envTag}`);
+          return { event: eventType, _meta: { skipped: true, reason: 'duplicate', env } };
         }
       }
 
-      const dbResult = await logEventToDB(eventType, payload, options);
+      const dbResult = await logEventToDB(eventType, enrichedPayload, options);
       if (dbResult) {
-        console.log(`📝 이벤트 기록 [DB]: ${eventType} (id: ${dbResult.id})`);
+        console.log(`📝 이벤트 기록 [DB]: ${eventType}${envTag} (id: ${dbResult.id})`);
         return {
           event: eventType,
           timestamp: dbResult.timestamp,
           date: dbResult.event_date,
-          ...payload,
-          _meta: { source: options.source || 'system', storage: 'db', id: dbResult.id }
+          ...enrichedPayload,
+          _meta: { source: options.source || 'system', storage: 'db', id: dbResult.id, env }
         };
       }
     }
@@ -209,8 +319,8 @@ async function logEvent(eventType, payload = {}, options = {}) {
 
   // 파일 폴백
   try {
-    const fileResult = logEventToFile(eventType, payload, options);
-    console.log(`📝 이벤트 기록 [File]: ${eventType}`);
+    const fileResult = logEventToFile(eventType, enrichedPayload, options);
+    console.log(`📝 이벤트 기록 [File]: ${eventType}${envTag}`);
     return fileResult;
   } catch (err) {
     console.error(`❌ 이벤트 기록 실패: ${err.message}`);
@@ -454,9 +564,13 @@ async function getRangeStats(dateFrom, dateTo) {
 module.exports = {
   EVENT_TYPES,
   VALID_EVENT_TYPES,
+  VALID_ENVS,
+  DEFAULT_ENV,
   logEvent,
   readEvents,
   getDailyStats,
   getRangeStats,
+  detectEnv,
+  addEnvToPayload,
   EVENTS_FILE
 };
