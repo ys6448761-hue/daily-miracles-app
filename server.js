@@ -349,6 +349,105 @@ app.post("/api/metrics/snapshot", async (_req, res) => {
   }
 });
 
+// ---------- Funnel Report API (퍼널 일일 리포트) ----------
+let funnelReport = null;
+try {
+  funnelReport = require('./scripts/ops/funnel-daily-report');
+} catch (error) {
+  console.warn('⚠️ Funnel report 모듈 로드 실패:', error.message);
+}
+
+app.post("/api/ops/funnel-report", async (req, res) => {
+  if (!funnelReport) {
+    return res.status(503).json({
+      success: false,
+      error: "funnel_report_unavailable",
+      message: "퍼널 리포트 모듈이 로드되지 않았습니다"
+    });
+  }
+
+  try {
+    const { date, range, format } = req.body || {};
+
+    const options = {
+      date: date || null,
+      range: range || 1
+    };
+
+    console.log(`📊 퍼널 리포트 생성 요청: ${JSON.stringify(options)}`);
+    const result = await funnelReport.generateFunnelReport(options);
+
+    // 알람 추출
+    const alerts = result.funnel
+      .filter(f => f.status === 'ALERT')
+      .map(f => ({
+        metric: f.name,
+        rate: f.rate,
+        threshold: f.threshold?.floor,
+        alerts: f.alerts
+      }));
+
+    res.json({
+      success: true,
+      timestamp: new Date().toISOString(),
+      dateFrom: result.dateFrom,
+      dateTo: result.dateTo,
+      oneLine: result.oneLine,
+      data: result.data,
+      funnel: result.funnel,
+      integrity: result.integrity?.overall || null,
+      alerts: alerts.length,
+      alertDetails: alerts,
+      format: format === 'markdown' ? result.markdown : undefined
+    });
+
+    console.log(`✅ 퍼널 리포트 생성 완료: ${result.oneLine}`);
+  } catch (error) {
+    console.error("💥 퍼널 리포트 생성 실패:", error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+app.get("/api/ops/funnel-report", async (req, res) => {
+  if (!funnelReport) {
+    return res.status(503).json({
+      success: false,
+      error: "funnel_report_unavailable"
+    });
+  }
+
+  try {
+    const { date, range } = req.query;
+
+    const options = {
+      date: date || null,
+      range: parseInt(range, 10) || 1
+    };
+
+    const result = await funnelReport.generateFunnelReport(options);
+
+    res.json({
+      success: true,
+      timestamp: new Date().toISOString(),
+      dateFrom: result.dateFrom,
+      dateTo: result.dateTo,
+      oneLine: result.oneLine,
+      data: result.data,
+      funnel: result.funnel,
+      integrity: result.integrity?.overall || null
+    });
+  } catch (error) {
+    console.error("💥 퍼널 리포트 조회 실패:", error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // ---------- Diag (서버가 실제로 받은 것 그대로 보여줌) ----------
 app.all("/diag/echo", (req, res) => {
   res.json({

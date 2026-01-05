@@ -2,6 +2,7 @@
 #
 # 스케줄:
 # - 00:10 KST: Daily Health Snapshot (Airtable 저장 + 이상 감지)
+# - 06:00 KST: Daily Funnel Report (전일 퍼널 분석)
 # - 09:00 KST: Daily Miracle Messages
 
 name: Daily Scheduler
@@ -10,6 +11,8 @@ on:
   schedule:
     # UTC 15:10 = KST 00:10 (자정 10분 - Daily Snapshot)
     - cron: '10 15 * * *'
+    # UTC 21:00 = KST 06:00 (오전 6시 - Funnel Report)
+    - cron: '0 21 * * *'
     # UTC 00:00 = KST 09:00 (오전 9시 - Daily Messages)
     - cron: '0 0 * * *'
 
@@ -23,14 +26,15 @@ on:
         type: choice
         options:
           - snapshot
+          - funnel-report
           - daily-messages
-          - both
+          - all
 
 jobs:
   # ===== Daily Snapshot (00:10 KST) =====
   daily-snapshot:
     runs-on: ubuntu-latest
-    if: github.event.schedule == '10 15 * * *' || github.event.inputs.job_type == 'snapshot' || github.event.inputs.job_type == 'both'
+    if: github.event.schedule == '10 15 * * *' || github.event.inputs.job_type == 'snapshot' || github.event.inputs.job_type == 'all'
 
     steps:
       - name: Daily Health Snapshot
@@ -61,10 +65,46 @@ jobs:
           echo "Time: $(date)"
           echo "Status: ${{ job.status }}"
 
+  # ===== Daily Funnel Report (06:00 KST) =====
+  daily-funnel-report:
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 21 * * *' || github.event.inputs.job_type == 'funnel-report' || github.event.inputs.job_type == 'all'
+
+    steps:
+      - name: Generate Daily Funnel Report
+        run: |
+          echo "📊 Daily Funnel Report 생성..."
+          response=$(curl -X POST "${{ secrets.API_BASE_URL }}/api/ops/funnel-report" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            --silent \
+            --show-error \
+            --max-time 60)
+
+          echo "Response: $response"
+
+          # 성공 여부 확인
+          success=$(echo $response | jq -r '.success')
+          if [ "$success" != "true" ]; then
+            echo "❌ 퍼널 리포트 생성 실패"
+            exit 1
+          fi
+
+          echo "✅ 퍼널 리포트 생성 완료"
+          echo "📈 1줄 요약: $(echo $response | jq -r '.oneLine')"
+          echo "🚨 알람 수: $(echo $response | jq -r '.alerts')"
+
+      - name: Log Result
+        if: always()
+        run: |
+          echo "Job: daily-funnel-report"
+          echo "Time: $(date)"
+          echo "Status: ${{ job.status }}"
+
   # ===== Daily Messages (09:00 KST) =====
   send-daily-messages:
     runs-on: ubuntu-latest
-    if: github.event.schedule == '0 0 * * *' || github.event.inputs.job_type == 'daily-messages' || github.event.inputs.job_type == 'both'
+    if: github.event.schedule == '0 0 * * *' || github.event.inputs.job_type == 'daily-messages' || github.event.inputs.job_type == 'all'
 
     steps:
       - name: Trigger Daily Job

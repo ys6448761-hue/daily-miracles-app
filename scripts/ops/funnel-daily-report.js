@@ -648,7 +648,78 @@ async function main() {
   }
 }
 
-main().catch(err => {
-  console.error('❌ 오류:', err.message);
-  process.exit(1);
-});
+// ============ 모듈 내보내기 ============
+
+/**
+ * 프로그래밍 방식으로 퍼널 리포트 생성
+ * @param {Object} options - { date, range, out, json }
+ * @returns {Object} - { dateFrom, dateTo, data, funnel, integrity, markdown, oneLine }
+ */
+async function generateFunnelReport(options = {}) {
+  const { from, to } = getDateRange(options);
+
+  // DB에서 데이터 조회
+  const data = await getFunnelDataFromDB(from, to);
+  if (!data) {
+    throw new Error('DB 연결 실패');
+  }
+
+  // 퍼널 계산
+  const funnel = calculateFunnel(data);
+
+  // 무결성 검사 수행 (모듈이 로드된 경우)
+  let integrity = null;
+  if (integrityCheck && db) {
+    try {
+      const events = await integrityCheck.fetchAllEvents(from, to);
+      if (events && events.length > 0) {
+        const missingKeys = integrityCheck.checkMissingKeys(events);
+        const orphans = integrityCheck.checkOrphanEvents(events);
+        const doubleTerminal = integrityCheck.checkDoubleTerminal(events);
+        const temporal = integrityCheck.checkTemporalSanity(events);
+
+        const sampleSize = new Set(
+          events.filter(e => e.event_type === 'checkout_initiate' && e.checkout_id)
+            .map(e => e.checkout_id)
+        ).size;
+
+        const overall = integrityCheck.determineOverallStatus(
+          missingKeys, orphans, doubleTerminal, temporal, sampleSize
+        );
+
+        integrity = { missingKeys, orphans, doubleTerminal, temporal, overall };
+      }
+    } catch (err) {
+      console.error('⚠️ 무결성 검사 실패:', err.message);
+    }
+  }
+
+  // 마크다운 및 1줄 요약 생성
+  const markdown = formatMarkdown(data, funnel, from, to, integrity);
+  const oneLine = formatOneLine(data, funnel);
+
+  return {
+    dateFrom: from,
+    dateTo: to,
+    data,
+    funnel,
+    integrity,
+    markdown,
+    oneLine
+  };
+}
+
+// 내보내기
+module.exports = {
+  generateFunnelReport,
+  THRESHOLDS,
+  MIN_SAMPLE_SIZE
+};
+
+// CLI로 직접 실행 시에만 main() 호출
+if (require.main === module) {
+  main().catch(err => {
+    console.error('❌ 오류:', err.message);
+    process.exit(1);
+  });
+}
