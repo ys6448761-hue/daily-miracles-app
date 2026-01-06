@@ -28,6 +28,15 @@ try {
     console.warn('[QuoteRequest] eventLogger 로드 실패');
 }
 
+// 메시지 프로바이더 (SENS 알림톡)
+let messageProvider = null;
+try {
+    messageProvider = require('../services/messageProvider');
+    console.log('[QuoteRequest] messageProvider 로드 성공');
+} catch (e) {
+    console.warn('[QuoteRequest] messageProvider 로드 실패:', e.message);
+}
+
 // Webhook 시크릿 (환경변수)
 const WEBHOOK_SECRET = process.env.WIX_WEBHOOK_SECRET || process.env.QUOTE_WEBHOOK_SECRET;
 
@@ -244,6 +253,39 @@ router.post('/request', verifyWebhookSecret, async (req, res) => {
 
         const duration = Date.now() - startTime;
         console.log(`[QuoteRequest] 완료: ${quoteId} (${duration}ms)`);
+
+        // 비동기 알림톡 발송 (fire-and-forget)
+        // API 응답은 발송 성공 여부와 무관하게 즉시 반환
+        if (messageProvider && quoteData.customer_phone) {
+            // setImmediate로 비동기 처리 (응답 블로킹 방지)
+            setImmediate(async () => {
+                try {
+                    console.log(`[QuoteRequest] 견적 접수 알림톡 발송 시작: ${quoteId}`);
+                    const sendResult = await messageProvider.sendQuoteAckMessage(
+                        quoteData.customer_phone,
+                        {
+                            quote_id: quoteId,
+                            customer_name: quoteData.customer_name,
+                            guest_count: quoteData.guest_count,
+                            trip_start: quoteData.trip_start,
+                            trip_end: quoteData.trip_end,
+                            env: quoteData.env
+                        }
+                    );
+                    console.log(`[QuoteRequest] 알림톡 발송 결과:`, {
+                        quote_id: quoteId,
+                        success: sendResult.success,
+                        status: sendResult.status,
+                        channel: sendResult.channel,
+                        env: sendResult.env
+                    });
+                } catch (msgErr) {
+                    console.error(`[QuoteRequest] 알림톡 발송 에러:`, msgErr.message);
+                }
+            });
+        } else if (!quoteData.customer_phone) {
+            console.log(`[QuoteRequest] 알림톡 스킵: 전화번호 없음 (${quoteId})`);
+        }
 
         res.json({
             success: true,

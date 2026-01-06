@@ -20,7 +20,8 @@ const SENS_SECRET_KEY = process.env.SENS_SECRET_KEY;
 const SENS_SERVICE_ID = process.env.SENS_SERVICE_ID;        // 알림톡 서비스 ID
 const SENS_SMS_SERVICE_ID = process.env.SENS_SMS_SERVICE_ID; // SMS 서비스 ID (failover)
 const SENS_CHANNEL_ID = process.env.SENS_CHANNEL_ID || '_xfxhcWn'; // 카카오 채널 ID
-const SENS_TEMPLATE_CODE = process.env.SENS_TEMPLATE_CODE;   // 알림톡 템플릿 코드
+const SENS_TEMPLATE_CODE = process.env.SENS_TEMPLATE_CODE;   // 알림톡 템플릿 코드 (기적 결과)
+const SENS_QUOTE_TEMPLATE_CODE = process.env.SENS_QUOTE_TEMPLATE_CODE; // 견적 접수 알림톡 템플릿
 
 // 앱 도메인 (링크 생성용)
 const APP_BASE_URL = process.env.APP_BASE_URL || 'https://daily-miracles-app.onrender.com';
@@ -36,6 +37,7 @@ console.log('[MessageProvider] 설정:', {
     SENS_SERVICE_ID: SENS_SERVICE_ID || '❌ 미설정',
     SENS_CHANNEL_ID: SENS_CHANNEL_ID,
     SENS_TEMPLATE_CODE: SENS_TEMPLATE_CODE || '❌ 미설정',
+    SENS_QUOTE_TEMPLATE_CODE: SENS_QUOTE_TEMPLATE_CODE || '❌ 미설정',
     APP_BASE_URL
 });
 
@@ -500,6 +502,184 @@ async function sendRedAlertMessage(wishData) {
 }
 
 /**
+ * 견적 접수 알림톡 발송 (비동기)
+ *
+ * @param {string} phone - 수신자 전화번호
+ * @param {object} quoteData - 견적 데이터
+ * @param {string} quoteData.quote_id - 견적 ID
+ * @param {string} quoteData.customer_name - 고객명
+ * @param {number} quoteData.guest_count - 인원수
+ * @param {string} quoteData.trip_start - 여행 시작일
+ * @param {string} quoteData.env - 환경 (prod/test)
+ */
+async function sendQuoteAckMessage(phone, quoteData) {
+    const messageId = generateMessageId();
+    const normalizedPhone = normalizePhone(phone);
+    const env = quoteData.env || 'prod';
+
+    console.log(`[MessageProvider] 견적 접수 알림톡 발송:`, {
+        messageId,
+        to: maskPhone(normalizedPhone),
+        quote_id: quoteData.quote_id,
+        name: quoteData.customer_name,
+        env
+    });
+
+    // 전화번호 없으면 스킵
+    if (!normalizedPhone) {
+        console.warn(`[MessageProvider] 견적 알림톡 스킵: 전화번호 없음`);
+        await logMessageSend(messageId, 'quote_ack', '', MESSAGE_STATUS.SKIPPED, {
+            reason: '전화번호 없음',
+            quote_id: quoteData.quote_id,
+            env
+        });
+        return { success: false, reason: '전화번호 없음', status: MESSAGE_STATUS.SKIPPED };
+    }
+
+    // test 환경에서는 실제 발송 스킵 (로그만)
+    if (env === 'test') {
+        console.log(`[MessageProvider] 견적 알림톡 스킵: test 환경`);
+        await logMessageSend(messageId, 'quote_ack', normalizedPhone, MESSAGE_STATUS.SKIPPED, {
+            reason: 'test 환경',
+            quote_id: quoteData.quote_id,
+            env
+        });
+        return { success: true, reason: 'test 환경 - 발송 스킵', status: MESSAGE_STATUS.SKIPPED, env };
+    }
+
+    // SENS 알림톡 시도
+    if (USE_SENS && SENS_QUOTE_TEMPLATE_CODE) {
+        try {
+            // pending 로그
+            await logMessageSend(messageId, 'quote_ack_alimtalk', normalizedPhone, MESSAGE_STATUS.PENDING, {
+                templateCode: SENS_QUOTE_TEMPLATE_CODE,
+                quote_id: quoteData.quote_id,
+                env
+            });
+
+            const timestamp = Date.now().toString();
+            const url = `/alimtalk/v2/services/${SENS_SERVICE_ID}/messages`;
+            const signature = makeSensSignature('POST', url, timestamp);
+
+            const content = buildQuoteAckContent(quoteData);
+
+            const requestBody = {
+                plusFriendId: SENS_CHANNEL_ID,
+                templateCode: SENS_QUOTE_TEMPLATE_CODE,
+                messages: [{
+                    to: normalizedPhone,
+                    content: content
+                }]
+            };
+
+            const response = await fetch(`https://sens.apigw.ntruss.com${url}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'x-ncp-apigw-timestamp': timestamp,
+                    'x-ncp-iam-access-key': SENS_ACCESS_KEY,
+                    'x-ncp-apigw-signature-v2': signature
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.statusCode === '202') {
+                console.log(`[MessageProvider] 견적 알림톡 발송 성공:`, {
+                    messageId,
+                    requestId: result.requestId,
+                    quote_id: quoteData.quote_id
+                });
+                await logMessageSend(messageId, 'quote_ack_alimtalk', normalizedPhone, MESSAGE_STATUS.SENT, {
+                    requestId: result.requestId,
+                    quote_id: quoteData.quote_id,
+                    env
+                });
+                return {
+                    success: true,
+                    messageId,
+                    requestId: result.requestId,
+                    status: MESSAGE_STATUS.SENT,
+                    channel: 'SENS_ALIMTALK',
+                    env
+                };
+            } else {
+                console.error(`[MessageProvider] 견적 알림톡 발송 실패:`, result);
+                await logMessageSend(messageId, 'quote_ack_alimtalk', normalizedPhone, MESSAGE_STATUS.FAILED, {
+                    error: result.statusName || result.error,
+                    quote_id: quoteData.quote_id,
+                    env
+                });
+                // SMS failover
+            }
+        } catch (err) {
+            console.error(`[MessageProvider] 견적 알림톡 에러:`, err.message);
+            await logMessageSend(messageId, 'quote_ack_alimtalk', normalizedPhone, MESSAGE_STATUS.FAILED, {
+                error: err.message,
+                quote_id: quoteData.quote_id,
+                env
+            });
+        }
+    }
+
+    // SMS Failover
+    if (USE_SENS) {
+        const smsText = buildQuoteAckSMS(quoteData);
+        const smsResult = await sendSensSMS(normalizedPhone, smsText);
+
+        if (smsResult.success) {
+            // SMS 로그에 env 추가
+            await logMessageSend(messageId + '-sms', 'quote_ack_sms', normalizedPhone, MESSAGE_STATUS.SENT, {
+                quote_id: quoteData.quote_id,
+                env,
+                fallback: true
+            });
+            return { ...smsResult, env, fallback: true };
+        }
+    }
+
+    // 모든 채널 실패
+    console.error(`[MessageProvider] 견적 알림톡 모든 채널 실패`);
+    await logMessageSend(messageId, 'quote_ack', normalizedPhone, MESSAGE_STATUS.FAILED, {
+        reason: '모든 채널 실패',
+        quote_id: quoteData.quote_id,
+        env
+    });
+    return { success: false, reason: '모든 채널 실패', status: MESSAGE_STATUS.FAILED, env };
+}
+
+/**
+ * 견적 접수 알림톡 컨텐츠 빌드
+ */
+function buildQuoteAckContent(quoteData) {
+    const { customer_name, quote_id, guest_count, trip_start, trip_end } = quoteData;
+    const tripPeriod = trip_start && trip_end
+        ? `${trip_start} ~ ${trip_end}`
+        : trip_start || '미정';
+
+    return `${customer_name}님, 견적 요청이 접수되었습니다!
+
+📋 견적번호: ${quote_id}
+👥 인원: ${guest_count || 2}명
+📅 여행일정: ${tripPeriod}
+
+24시간 내 맞춤 견적서를 보내드리겠습니다.
+궁금한 점은 언제든 문의해주세요!
+
+☎ 1899-6117
+- 여수 소원항해`;
+}
+
+/**
+ * 견적 접수 SMS 컨텐츠 빌드
+ */
+function buildQuoteAckSMS(quoteData) {
+    const { customer_name, quote_id } = quoteData;
+    return `[여수소원항해] ${customer_name}님 견적요청 접수완료(${quote_id}). 24시간 내 견적서 발송예정. 문의 1899-6117`;
+}
+
+/**
  * 발송 가능 상태 확인
  */
 function isEnabled() {
@@ -524,6 +704,7 @@ module.exports = {
     sendResultMessage,
     sendWishAckMessage,
     sendRedAlertMessage,
+    sendQuoteAckMessage,
     sendSensAlimtalk,
     sendSensSMS,
     isEnabled,
