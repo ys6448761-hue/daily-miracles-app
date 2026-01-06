@@ -179,6 +179,15 @@ try {
   console.error("❌ 견적 시스템 라우터 로드 실패:", error.message);
 }
 
+// Wix 자유여행 견적 요청 라우터 로딩
+let quoteRequestRoutes = null;
+try {
+  quoteRequestRoutes = require("./routes/quoteRequestRoutes");
+  console.log("✅ Wix 견적 요청 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ Wix 견적 요청 라우터 로드 실패:", error.message);
+}
+
 // 단축 링크 라우터 로딩 (/r/{token})
 let shortLinkRoutes = null;
 try {
@@ -629,6 +638,14 @@ if (quoteRoutes) {
   console.log("✅ 견적 시스템 라우터 등록 완료 (/api/v2/quote)");
 } else {
   console.warn("⚠️ 견적 시스템 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- Wix 자유여행 견적 요청 Routes ----------
+if (quoteRequestRoutes) {
+  app.use("/api/quote", quoteRequestRoutes);
+  console.log("✅ Wix 견적 요청 라우터 등록 완료 (/api/quote/request)");
+} else {
+  console.warn("⚠️ Wix 견적 요청 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- 단축 링크 Routes (/r/{token}) ----------
