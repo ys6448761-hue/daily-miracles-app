@@ -277,6 +277,18 @@ function calculateQuote(options) {
     const leisurePrice = leisureData[priceType];
 
     if (leisurePrice) {
+      // variant 결정 (요트/유람선: weekday vs weekend_fireworks)
+      let variant = null;
+      if (leisureData.variant) {
+        variant = typeof leisureData.variant === 'object'
+          ? leisureData.variant[priceType]
+          : leisureData.variant;
+      }
+
+      // cost 계산 (null이면 0으로 처리, manual_confirm_required 플래그)
+      const unitCost = leisurePrice.cost ?? 0;
+      const manualConfirm = leisureData.manual_confirm_required || leisurePrice.cost === null;
+
       breakdown.push({
         category: 'leisure',
         code: leisure,
@@ -284,12 +296,15 @@ function calculateQuote(options) {
         perPerson: leisurePrice.sell,
         guests: guestCount,
         dayType: dayType,
-        cost: leisurePrice.cost * guestCount,
+        ...(variant && { variant }),  // weekday | weekend_fireworks
+        ...(leisureData.costChannel && { costChannel: leisureData.costChannel }),
+        cost: unitCost * guestCount,
         sell: leisurePrice.sell * guestCount,
         list: leisurePrice.list * guestCount,
-        quantity: guestCount
+        quantity: guestCount,
+        ...(manualConfirm && { manual_confirm_required: true })
       });
-      totalCost += leisurePrice.cost * guestCount;
+      totalCost += unitCost * guestCount;
       totalSell += leisurePrice.sell * guestCount;
       totalList += leisurePrice.list * guestCount;
     }
@@ -320,19 +335,24 @@ function calculateQuote(options) {
           : activeVersion.locationPolicy.weekday;   // ship_or_gallery
       }
 
+      // cost 계산 (null이면 0으로 처리, manual_confirm_required 플래그)
+      const unitCost = voyagePrice.cost ?? 0;
+      const manualConfirm = voyagePrice.manual_confirm_required || voyagePrice.cost === null;
+
       breakdown.push({
         category: 'wishVoyage',
         code: wishVoyageType,
         name: `소원항해단 (${typeNames[wishVoyageType] || wishVoyageType})`,
         perPerson: voyagePrice.sell,
         guests: guestCount,
-        cost: voyagePrice.cost * guestCount,
+        cost: unitCost * guestCount,
         sell: voyagePrice.sell * guestCount,
         list: voyagePrice.list * guestCount,
         quantity: guestCount,
-        ...(wishVoyageLocation && { location: wishVoyageLocation })
+        ...(wishVoyageLocation && { location: wishVoyageLocation }),
+        ...(manualConfirm && { manual_confirm_required: true })
       });
-      totalCost += voyagePrice.cost * guestCount;
+      totalCost += unitCost * guestCount;
       totalSell += voyagePrice.sell * guestCount;
       totalList += voyagePrice.list * guestCount;
     }

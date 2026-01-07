@@ -22,7 +22,7 @@ module.exports = {
   // ═══════════════════════════════════════════════════════════════════════════
   meta: {
     schemaVersion: "1.0.0",
-    priceVersion: "v1.1",  // 가격/정책 패치 버전
+    priceVersion: "v1.1_20250104",  // 가격/정책 패치 버전 (필수 표기)
     defaultRegion: "yeosu",
     currency: "KRW",
     lastUpdated: "2026-01-04",
@@ -269,18 +269,28 @@ module.exports = {
         },
         aqua: {
           name: "아쿠아플라넷",
-          weekday: { cost: 25000, sell: 32000, list: 40000 },
-          weekend: { cost: 25000, sell: 32000, list: 40000 }
+          // ⚠️ cost 확인 필요 - 계약 조건에 따라 변동
+          manual_confirm_required: true,
+          weekday: { cost: null, sell: 32000, list: 40000 },
+          weekend: { cost: null, sell: 32000, list: 40000 }
         },
         cruise: {
           name: "유람선",
-          variant: "weekday_or_fireworks",  // 주말=불꽃 시즌
+          // variant 분기: weekday (일반) vs weekend_fireworks (불꽃유람선)
+          variant: {
+            weekday: "weekday",
+            weekend: "weekend_fireworks"
+          },
           weekday: { cost: 8000, sell: 13000, list: 19800 },
           weekend: { cost: 28000, sell: 35000, list: 45000 }  // weekend_fireworks
         },
         yacht: {
           name: "요트",
-          variant: "weekday_or_fireworks",  // 주말=불꽃 시즌
+          // variant 분기: weekday (일반) vs weekend_fireworks (불꽃요트)
+          variant: {
+            weekday: "weekday",
+            weekend: "weekend_fireworks"
+          },
           weekday: { cost: 25000, sell: 35000, list: 40000 },
           weekend: { cost: 50000, sell: 55000, list: 60000 }  // weekend_fireworks
         }
@@ -296,8 +306,20 @@ module.exports = {
             status: "active",
             effective_from: "2026-01-04",
             items: {
-              basic: { cost: 25000, sell: 34900, list: 34900 },
-              online: { cost: 18000, sell: 24900, list: 24900 },  // 소원의 씨앗 구매자
+              basic: {
+                // ⚠️ cost 확인 필요 - 운영 방식에 따라 변동
+                manual_confirm_required: true,
+                cost: null,
+                sell: 34900,
+                list: 34900
+              },
+              online: {
+                // ⚠️ cost 확인 필요 - 소원의 씨앗 판매 조건에 따라 변동
+                manual_confirm_required: true,
+                cost: null,
+                sell: 24900,
+                list: 24900
+              },
               experience: {
                 cost: 22000,  // vendor 2k + travelAgency 5k + writer 10k + materials 5k
                 sell: 35000,
