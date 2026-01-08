@@ -440,12 +440,31 @@ function calculateConfidence(content, responses, mode) {
 // ═══════════════════════════════════════════════════════════
 
 function determineEnergyType(content, responses) {
-    const text = (content + ' ' + JSON.stringify(responses)).toLowerCase();
+    // 텍스트 정규화: 유니코드 NFC 정규화 + 공백 정리
+    const rawText = content + ' ' + JSON.stringify(responses);
+    const text = rawText.normalize('NFC').toLowerCase();
+
+    // 디버그 로그
+    console.log('[EnergyType] Input text sample:', text.substring(0, 100));
 
     const scores = {};
+    const matchedKeywords = {};
+
     for (const [type, data] of Object.entries(ENERGY_TYPES)) {
-        scores[type] = data.keywords.filter(k => text.includes(k)).length;
+        const matches = data.keywords.filter(keyword => {
+            // 유니코드 정규화된 키워드로 비교
+            const normalizedKeyword = keyword.normalize('NFC');
+            return text.includes(normalizedKeyword);
+        });
+        scores[type] = matches.length;
+        if (matches.length > 0) {
+            matchedKeywords[type] = matches;
+        }
     }
+
+    // 디버그 로그
+    console.log('[EnergyType] Matched keywords:', matchedKeywords);
+    console.log('[EnergyType] Scores:', scores);
 
     // 최고 점수 타입 찾기
     let maxType = 'citrine'; // 기본값
@@ -457,6 +476,8 @@ function determineEnergyType(content, responses) {
             maxType = type;
         }
     }
+
+    console.log('[EnergyType] Selected:', maxType, 'with score:', maxScore);
 
     return maxType;
 }
