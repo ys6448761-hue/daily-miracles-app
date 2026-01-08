@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 
+// 통합 점수 엔진 v2.0
+const { calculateUnifiedScore, ENERGY_TYPES, VERSION: SCORE_VERSION } = require('../services/miracleScoreEngine');
+
 // 메시지 프로바이더 (SENS 우선, Solapi fallback)
 let messageProvider = null;
 try {
@@ -61,8 +64,23 @@ router.post('/calculate', async (req, res) => {
       conversations.set(newConversationId, conversation);
     }
 
-    // 기적지수 계산 로직
-    const miracleIndex = calculateMiracleIndex(conversation.answers);
+    // 통합 기적지수 계산 (v2.0)
+    const contentFromAnswers = conversation.answers
+        .map(a => `${a.question}: ${a.answer}`)
+        .join(' ');
+
+    const scoreResult = calculateUnifiedScore({
+        content: contentFromAnswers,
+        name: nickname || '소원이',
+        phone: phone || '',
+        responses: conversation.answers.reduce((acc, a) => {
+            acc[a.question] = a.answer;
+            return acc;
+        }, {}),
+        mode: 'problem'
+    });
+
+    const miracleIndex = scoreResult.success ? scoreResult.final_score : 70;
 
     // 5가지 예측 생성
     const predictions = generatePredictions(miracleIndex, conversation.answers);
@@ -131,7 +149,21 @@ router.post('/calculate', async (req, res) => {
         message: {
           sent: messageSent,
           error: messageError
-        }
+        },
+        // v2.0 통합 점수 엔진 응답
+        score_engine: scoreResult.success ? {
+          base_score: scoreResult.base_score,
+          daily_delta: scoreResult.daily_delta,
+          final_score: scoreResult.final_score,
+          confidence: scoreResult.confidence,
+          confidence_detail: scoreResult.confidence_detail,
+          energy_type: scoreResult.energy_type,
+          energy_name: scoreResult.energy_name,
+          energy_meaning: scoreResult.energy_meaning,
+          score_factors: scoreResult.score_factors,
+          analysis_version: scoreResult.analysis_version,
+          cached: scoreResult.cached || false
+        } : null
       }
     });
 
@@ -144,28 +176,22 @@ router.post('/calculate', async (req, res) => {
   }
 });
 
-// 기적지수 계산 함수
-function calculateMiracleIndex(answers) {
-  // 기본 점수
-  let score = 50;
-
-  // 답변 개수에 따른 점수 (더 많은 답변 = 더 높은 점수)
-  score += answers.length * 5;
-
-  // 답변 길이에 따른 점수
-  const totalLength = answers.reduce((sum, a) => sum + (a.answer?.length || 0), 0);
-  score += Math.min(totalLength / 10, 20);
-
-  // 긍정적인 단어가 있으면 보너스
-  const positiveWords = ['좋', '행복', '기쁨', '감사', '희망', '사랑', '꿈', '성공'];
-  const hasPositive = answers.some(a =>
-    positiveWords.some(word => a.answer?.includes(word))
-  );
-  if (hasPositive) score += 15;
-
-  // 0-100 범위로 제한
-  return Math.min(Math.max(Math.round(score), 0), 100);
-}
+/**
+ * 기적지수 계산 함수 (DEPRECATED - v2.0 통합 엔진으로 대체)
+ * @deprecated Use calculateUnifiedScore from miracleScoreEngine.js
+ */
+// function calculateMiracleIndex(answers) {
+//   let score = 50;
+//   score += answers.length * 5;
+//   const totalLength = answers.reduce((sum, a) => sum + (a.answer?.length || 0), 0);
+//   score += Math.min(totalLength / 10, 20);
+//   const positiveWords = ['좋', '행복', '기쁨', '감사', '희망', '사랑', '꿈', '성공'];
+//   const hasPositive = answers.some(a =>
+//     positiveWords.some(word => a.answer?.includes(word))
+//   );
+//   if (hasPositive) score += 15;
+//   return Math.min(Math.max(Math.round(score), 0), 100);
+// }
 
 // 예측 생성 함수
 function generatePredictions(miracleIndex, answers) {

@@ -9,6 +9,9 @@ const fs = require('fs').promises;
 const path = require('path');
 const { generateWishAckMessage, generateRedAlertMessage } = require('../config/messageTemplates');
 
+// 통합 점수 엔진 v2.0
+const { calculateUnifiedScore, ENERGY_TYPES, VERSION: SCORE_VERSION } = require('../services/miracleScoreEngine');
+
 // 메시지 프로바이더 (SENS 우선, Solapi fallback)
 let messageProvider = null;
 try {
@@ -132,8 +135,23 @@ router.post('/', async (req, res) => {
         // 신호등 자동 판정
         const trafficLight = classifyWish(wish);
 
-        // 기적지수 계산
-        const miracleScore = calculateMiracleScore();
+        // 통합 기적지수 계산 (v2.0)
+        const scoreResult = calculateUnifiedScore({
+            content: wish,
+            name: name,
+            phone: normalizedPhone,
+            mode: 'wish'
+        });
+
+        // 일일 제한 도달 시 처리
+        if (!scoreResult.success && scoreResult.error === 'daily_limit') {
+            console.log(`[Wish] Daily limit reached for ${name}`);
+            // 일일 제한이어도 소원은 저장하고 기본값 사용
+        }
+
+        const miracleScore = scoreResult.success ? scoreResult.final_score : 75;
+        const energyType = scoreResult.success ? scoreResult.energy_type : 'citrine';
+        const confidence = scoreResult.success ? scoreResult.confidence : 'low';
 
         // gem 추천 로그용 필드 계산
         const gemRecommended = gem_recommended || null;  // 프론트에서 추천한 값
@@ -158,7 +176,17 @@ router.post('/', async (req, res) => {
             created_at: created_at || new Date().toISOString(),
             status: 'pending', // pending, analyzed, completed
             traffic_light: trafficLight,
-            miracleScore
+            miracleScore,
+            // v2.0 통합 점수 엔진 필드
+            score_engine: {
+                version: SCORE_VERSION,
+                base_score: scoreResult.success ? scoreResult.base_score : null,
+                daily_delta: scoreResult.success ? scoreResult.daily_delta : null,
+                confidence: confidence,
+                energy_type: energyType,
+                cached: scoreResult.cached || false,
+                score_factors: scoreResult.success ? scoreResult.score_factors : null
+            }
         };
 
         // 파일 저장
@@ -252,7 +280,21 @@ router.post('/', async (req, res) => {
             message: '소원이 성공적으로 전달되었습니다',
             wishId: wishData.id,
             miracleScore: miracleScore,
-            trafficLight: trafficLight.level
+            trafficLight: trafficLight.level,
+            // v2.0 통합 점수 엔진 응답
+            score_engine: scoreResult.success ? {
+                base_score: scoreResult.base_score,
+                daily_delta: scoreResult.daily_delta,
+                final_score: scoreResult.final_score,
+                confidence: scoreResult.confidence,
+                confidence_detail: scoreResult.confidence_detail,
+                energy_type: scoreResult.energy_type,
+                energy_name: scoreResult.energy_name,
+                energy_meaning: scoreResult.energy_meaning,
+                score_factors: scoreResult.score_factors,
+                analysis_version: scoreResult.analysis_version,
+                cached: scoreResult.cached || false
+            } : null
         });
 
     } catch (error) {
@@ -479,10 +521,11 @@ function classifyWish(wishText) {
 }
 
 /**
- * 기적지수 계산 (1/1 특별 80-95점)
+ * 기적지수 계산 (DEPRECATED - v2.0 통합 엔진으로 대체)
+ * @deprecated Use calculateUnifiedScore from miracleScoreEngine.js
  */
-function calculateMiracleScore() {
-    return 80 + Math.floor(Math.random() * 16);
-}
+// function calculateMiracleScore() {
+//     return 80 + Math.floor(Math.random() * 16);
+// }
 
 module.exports = router;
