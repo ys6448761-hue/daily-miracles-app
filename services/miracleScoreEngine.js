@@ -84,7 +84,6 @@ function calculateUnifiedScore(input) {
     // 캐시 확인 (24시간 이내 동일 입력)
     const cached = checkCache(signature);
     if (cached) {
-        console.log('[ScoreEngine] Cache hit:', signature.substring(0, 8));
         return {
             ...cached,
             cached: true,
@@ -95,7 +94,6 @@ function calculateUnifiedScore(input) {
     // 일일 생성 횟수 체크
     const dailyCount = getDailyCount(name, phone);
     if (dailyCount >= 3) {
-        console.log('[ScoreEngine] Daily limit reached:', dailyCount);
         return {
             success: false,
             error: 'daily_limit',
@@ -194,16 +192,6 @@ function calculateUnifiedScore(input) {
 
     // 캐시 저장
     saveToCache(signature, result, name, phone);
-
-    console.log('[ScoreEngine] Calculated:', {
-        base: baseScore,
-        delta: dailyDelta,
-        final: finalScore,
-        confidence: confidence.level,
-        energy: energyType.type,
-        mode: mode,
-        time: result.processing_time + 'ms'
-    });
 
     return result;
 }
@@ -440,31 +428,27 @@ function calculateConfidence(content, responses, mode) {
 // ═══════════════════════════════════════════════════════════
 
 function determineEnergyType(content, responses) {
-    // 텍스트 정규화: 유니코드 NFC 정규화 + 공백 정리
+    // 텍스트 정규화: 유니코드 NFC 정규화
     const rawText = content + ' ' + JSON.stringify(responses);
     const text = rawText.normalize('NFC').toLowerCase();
 
-    // 디버그 로그
-    console.log('[EnergyType] Input text sample:', text.substring(0, 100));
-
     const scores = {};
-    const matchedKeywords = {};
+    let matchedKeywords = null;
+
+    // DEBUG 모드에서만 키워드 추적
+    const isDebug = process.env.DEBUG_SCORE === 'true';
+    if (isDebug) matchedKeywords = {};
 
     for (const [type, data] of Object.entries(ENERGY_TYPES)) {
         const matches = data.keywords.filter(keyword => {
-            // 유니코드 정규화된 키워드로 비교
             const normalizedKeyword = keyword.normalize('NFC');
             return text.includes(normalizedKeyword);
         });
         scores[type] = matches.length;
-        if (matches.length > 0) {
+        if (isDebug && matches.length > 0) {
             matchedKeywords[type] = matches;
         }
     }
-
-    // 디버그 로그
-    console.log('[EnergyType] Matched keywords:', matchedKeywords);
-    console.log('[EnergyType] Scores:', scores);
 
     // 최고 점수 타입 찾기
     let maxType = 'citrine'; // 기본값
@@ -477,7 +461,10 @@ function determineEnergyType(content, responses) {
         }
     }
 
-    console.log('[EnergyType] Selected:', maxType, 'with score:', maxScore);
+    // DEBUG 모드에서만 상세 로그
+    if (isDebug) {
+        console.log('[EnergyType] Matched:', matchedKeywords, '→', maxType);
+    }
 
     return maxType;
 }
