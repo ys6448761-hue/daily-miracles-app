@@ -31,6 +31,15 @@ const router = express.Router();
 // 견적 엔진 (필수)
 const quoteEngine = require('../services/quoteEngine');
 
+// 결제 서비스 (선택적 로딩)
+let tossPayments = null;
+try {
+  tossPayments = require('../services/tossPaymentsService');
+  console.log('[Quote] 토스페이먼츠 서비스 로드 완료');
+} catch (error) {
+  console.warn('[Quote] 토스페이먼츠 서비스 로드 실패 - 결제 기능 비활성화');
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -778,6 +787,418 @@ router.post('/admin/migrate', async (req, res) => {
       success: false,
       error: 'MIGRATION_ERROR',
       message: error.message
+    });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 결제 관련 API
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * POST /api/v2/quote/:quoteId/payment-link
+ * 결제 링크 생성
+ */
+router.post('/:quoteId/payment-link', async (req, res) => {
+  try {
+    const { quoteId } = req.params;
+    const { paymentType = 'deposit' } = req.body;  // deposit | full
+
+    // 토스페이먼츠 서비스 체크
+    if (!tossPayments) {
+      return res.status(503).json({
+        success: false,
+        error: 'PAYMENT_SERVICE_UNAVAILABLE',
+        message: '결제 서비스를 사용할 수 없습니다'
+      });
+    }
+
+    // 견적 조회
+    const quote = await getQuote(quoteId);
+    if (!quote) {
+      return res.status(404).json({
+        success: false,
+        error: 'QUOTE_NOT_FOUND',
+        message: '견적을 찾을 수 없습니다'
+      });
+    }
+
+    // 만료 확인
+    if (quote.valid_until && new Date(quote.valid_until) < new Date()) {
+      return res.status(400).json({
+        success: false,
+        error: 'QUOTE_EXPIRED',
+        message: '견적이 만료되었습니다. 다시 계산해주세요.'
+      });
+    }
+
+    // 결제 금액 계산
+    const totalAmount = quote.total_sell || 0;
+    let paymentAmount = totalAmount;
+    let orderNameSuffix = '';
+
+    if (paymentType === 'deposit') {
+      const depositInfo = tossPayments.calculateDeposit(totalAmount);
+      paymentAmount = depositInfo.deposit;
+      orderNameSuffix = ' (예약금)';
+    }
+
+    // 주문명 생성
+    const hotelName = quote.hotel_name || '여수 여행';
+    const guestCount = quote.guest_count || 2;
+    const orderName = `${hotelName} ${guestCount}인${orderNameSuffix}`;
+
+    // 결제 링크 생성
+    const linkResult = await tossPayments.createPaymentLink({
+      quoteId,
+      amount: paymentAmount,
+      orderName,
+      customerName: quote.customer_name,
+      customerPhone: quote.customer_phone,
+      customerEmail: quote.customer_email,
+      paymentType
+    });
+
+    if (!linkResult.success) {
+      return res.status(400).json(linkResult);
+    }
+
+    // DB 업데이트
+    if (db) {
+      try {
+        await db.query(
+          `UPDATE quotes SET
+            payment_link = $1,
+            payment_link_id = $2,
+            payment_order_id = $3,
+            payment_amount = $4,
+            payment_type = $5,
+            payment_link_expires = $6,
+            updated_at = NOW()
+          WHERE quote_id = $7`,
+          [
+            linkResult.paymentLink,
+            linkResult.paymentLinkId,
+            linkResult.orderId,
+            paymentAmount,
+            paymentType,
+            linkResult.expiredAt,
+            quoteId
+          ]
+        );
+      } catch (dbErr) {
+        console.error('[Quote] 결제 링크 DB 저장 실패:', dbErr.message);
+      }
+    }
+
+    // 이벤트 로깅
+    await logEvent('PaymentLinkCreated', quoteId, {
+      paymentLinkId: linkResult.paymentLinkId,
+      amount: paymentAmount,
+      paymentType,
+      testMode: linkResult.testMode
+    });
+
+    res.json({
+      success: true,
+      quoteId,
+      paymentLink: linkResult.paymentLink,
+      paymentLinkId: linkResult.paymentLinkId,
+      orderId: linkResult.orderId,
+      amount: paymentAmount,
+      totalAmount,
+      paymentType,
+      expiredAt: linkResult.expiredAt,
+      testMode: linkResult.testMode || false,
+      message: paymentType === 'deposit'
+        ? `예약금 ${paymentAmount.toLocaleString()}원 결제 링크가 생성되었습니다`
+        : `전액 ${paymentAmount.toLocaleString()}원 결제 링크가 생성되었습니다`
+    });
+
+  } catch (error) {
+    console.error('[Quote] 결제 링크 생성 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: 'PAYMENT_LINK_ERROR',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/v2/quote/webhook/payment
+ * 토스페이먼츠 결제 완료 웹훅
+ */
+router.post('/webhook/payment', async (req, res) => {
+  const startTime = Date.now();
+  console.log('[Quote] 결제 웹훅 수신');
+
+  try {
+    const { paymentKey, orderId, amount, status } = req.body;
+
+    // 필수값 검증
+    if (!paymentKey || !orderId) {
+      return res.status(400).json({
+        success: false,
+        error: 'MISSING_REQUIRED_FIELDS'
+      });
+    }
+
+    console.log(`[Quote] 결제 웹훅: orderId=${orderId}, status=${status}, amount=${amount}`);
+
+    // orderId에서 quoteId 추출 시도 (PAY-YYYYMMDD-XXXX 형식)
+    // 또는 DB에서 payment_order_id로 조회
+    let quote = null;
+    if (db) {
+      try {
+        const result = await db.query(
+          'SELECT * FROM quotes WHERE payment_order_id = $1',
+          [orderId]
+        );
+        if (result.rows.length > 0) {
+          quote = result.rows[0];
+        }
+      } catch (dbErr) {
+        console.error('[Quote] 웹훅 DB 조회 실패:', dbErr.message);
+      }
+    }
+
+    // 결제 상태에 따른 처리
+    if (status === 'DONE' || status === 'COMPLETED' || !status) {
+      // 결제 승인 확인 (선택적)
+      if (tossPayments && paymentKey) {
+        const confirmResult = await tossPayments.confirmPayment({
+          paymentKey,
+          orderId,
+          amount
+        });
+
+        if (!confirmResult.success) {
+          console.error('[Quote] 결제 승인 실패:', confirmResult);
+          // 승인 실패해도 웹훅은 200 반환 (재시도 방지)
+        }
+      }
+
+      // DB 업데이트
+      if (db && quote) {
+        try {
+          const newStatus = quote.payment_type === 'deposit' ? 'deposit_paid' : 'confirmed';
+          await db.query(
+            `UPDATE quotes SET
+              status = $1,
+              payment_key = $2,
+              payment_status = 'paid',
+              payment_approved_at = NOW(),
+              updated_at = NOW()
+            WHERE quote_id = $3`,
+            [newStatus, paymentKey, quote.quote_id]
+          );
+        } catch (dbErr) {
+          console.error('[Quote] 결제 상태 업데이트 실패:', dbErr.message);
+        }
+      }
+
+      // 이벤트 로깅
+      if (quote) {
+        await logEvent('PaymentCompleted', quote.quote_id, {
+          paymentKey,
+          orderId,
+          amount,
+          status
+        });
+      }
+    }
+
+    const duration = Date.now() - startTime;
+    console.log(`[Quote] 결제 웹훅 처리 완료 (${duration}ms)`);
+
+    res.json({
+      success: true,
+      message: '웹훅 처리 완료'
+    });
+
+  } catch (error) {
+    console.error('[Quote] 결제 웹훅 오류:', error);
+    // 웹훅은 항상 200 반환 (재시도 방지)
+    res.json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/v2/quote/payment/success
+ * 결제 성공 콜백 페이지
+ */
+router.get('/payment/success', async (req, res) => {
+  const { quoteId, paymentKey, orderId, amount, paymentType } = req.query;
+
+  console.log(`[Quote] 결제 성공 콜백: quoteId=${quoteId}`);
+
+  try {
+    // 결제 승인
+    if (tossPayments && paymentKey && orderId && amount) {
+      const confirmResult = await tossPayments.confirmPayment({
+        paymentKey,
+        orderId,
+        amount: parseInt(amount, 10)
+      });
+
+      if (confirmResult.success) {
+        // DB 업데이트
+        if (db) {
+          try {
+            const newStatus = paymentType === 'deposit' ? 'deposit_paid' : 'confirmed';
+            await db.query(
+              `UPDATE quotes SET
+                status = $1,
+                payment_key = $2,
+                payment_status = 'paid',
+                payment_approved_at = NOW(),
+                updated_at = NOW()
+              WHERE quote_id = $3`,
+              [newStatus, paymentKey, quoteId]
+            );
+          } catch (dbErr) {
+            console.error('[Quote] 결제 성공 DB 업데이트 실패:', dbErr.message);
+          }
+        }
+
+        // 이벤트 로깅
+        await logEvent('PaymentSuccess', quoteId, {
+          paymentKey,
+          orderId,
+          amount,
+          paymentType
+        });
+      }
+    }
+
+    // 성공 페이지로 리다이렉트 또는 JSON 응답
+    if (req.accepts('html')) {
+      res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>결제 완료</title>
+          <style>
+            body { font-family: sans-serif; text-align: center; padding: 50px; }
+            .success { color: #28a745; font-size: 48px; }
+            h1 { color: #333; }
+            p { color: #666; }
+          </style>
+        </head>
+        <body>
+          <div class="success">✓</div>
+          <h1>결제가 완료되었습니다</h1>
+          <p>견적번호: ${quoteId}</p>
+          <p>결제금액: ${parseInt(amount || 0).toLocaleString()}원</p>
+          <p>담당자가 곧 연락드리겠습니다.</p>
+        </body>
+        </html>
+      `);
+    } else {
+      res.json({
+        success: true,
+        quoteId,
+        paymentKey,
+        amount: parseInt(amount, 10),
+        message: '결제가 완료되었습니다'
+      });
+    }
+
+  } catch (error) {
+    console.error('[Quote] 결제 성공 콜백 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/v2/quote/payment/fail
+ * 결제 실패 콜백 페이지
+ */
+router.get('/payment/fail', async (req, res) => {
+  const { quoteId, code, message } = req.query;
+
+  console.log(`[Quote] 결제 실패 콜백: quoteId=${quoteId}, code=${code}`);
+
+  // 이벤트 로깅
+  if (quoteId) {
+    await logEvent('PaymentFailed', quoteId, { code, message });
+  }
+
+  if (req.accepts('html')) {
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>결제 실패</title>
+        <style>
+          body { font-family: sans-serif; text-align: center; padding: 50px; }
+          .fail { color: #dc3545; font-size: 48px; }
+          h1 { color: #333; }
+          p { color: #666; }
+          a { color: #007bff; }
+        </style>
+      </head>
+      <body>
+        <div class="fail">✗</div>
+        <h1>결제가 실패했습니다</h1>
+        <p>오류 코드: ${code || 'UNKNOWN'}</p>
+        <p>${message || '다시 시도해주세요.'}</p>
+        <p><a href="javascript:history.back()">뒤로 가기</a></p>
+      </body>
+      </html>
+    `);
+  } else {
+    res.json({
+      success: false,
+      quoteId,
+      error: code,
+      message: message || '결제가 실패했습니다'
+    });
+  }
+});
+
+/**
+ * GET /api/v2/quote/:quoteId/payment-status
+ * 결제 상태 조회
+ */
+router.get('/:quoteId/payment-status', async (req, res) => {
+  try {
+    const { quoteId } = req.params;
+
+    const quote = await getQuote(quoteId);
+    if (!quote) {
+      return res.status(404).json({
+        success: false,
+        error: 'QUOTE_NOT_FOUND'
+      });
+    }
+
+    res.json({
+      success: true,
+      quoteId,
+      status: quote.status,
+      paymentStatus: quote.payment_status || 'pending',
+      paymentType: quote.payment_type,
+      paymentAmount: quote.payment_amount,
+      paymentLink: quote.payment_link,
+      paymentLinkExpires: quote.payment_link_expires,
+      paymentApprovedAt: quote.payment_approved_at
+    });
+
+  } catch (error) {
+    console.error('[Quote] 결제 상태 조회 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
     });
   }
 });
