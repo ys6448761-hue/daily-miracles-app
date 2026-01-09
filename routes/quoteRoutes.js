@@ -457,6 +457,135 @@ router.post('/request', async (req, res) => {
 });
 
 /**
+ * POST /api/v2/quote/wix
+ * Wix 폼 웹훅 - 새 리드(견적 요청) 생성
+ *
+ * Wix 폼 필드 매핑:
+ *   - name / 이름 → customer_name
+ *   - phone / 전화번호 → customer_phone
+ *   - email / 이메일 → customer_email
+ *   - travel_date / 여행일 → trip_start
+ *   - pax / party_size / 인원 → guest_count
+ *   - notes / special_request → notes
+ */
+router.post('/wix', async (req, res) => {
+  const startTime = Date.now();
+
+  try {
+    const payload = req.body;
+
+    // Quote ID 생성
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const quoteId = `WIX-${dateStr}-${random}`;
+
+    console.log(`[Quote/Wix] 웹훅 수신: ${quoteId}`);
+
+    // 필수 필드 검증
+    const name = payload.name || payload['이름'];
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        error: 'MISSING_NAME',
+        message: '이름은 필수입니다'
+      });
+    }
+
+    // 전화번호 정규화
+    const rawPhone = payload.phone || payload['전화번호'] || '';
+    const phone = rawPhone.replace(/[^0-9]/g, '') || null;
+
+    // 환경 감지 (테스트 시그널)
+    const testSignals = ['test', '테스트', 'TEST', 'dev'];
+    const isTest = [name, payload.email, payload.notes].some(
+      field => field && testSignals.some(sig => String(field).toLowerCase().includes(sig))
+    ) || phone === '01000000000' || phone === '01012345678';
+    const env = isTest ? 'test' : 'prod';
+
+    // 데이터 정규화
+    const quoteData = {
+      quote_id: quoteId,
+      status: 'lead',
+      customer_name: name.trim(),
+      customer_phone: phone,
+      customer_email: (payload.email || payload['이메일'] || '').trim() || null,
+      trip_start: payload.travel_date || payload['여행일'] || payload.trip_start || null,
+      trip_end: payload.trip_end || null,
+      guest_count: parseInt(payload.pax || payload.party_size || payload['인원'] || 2, 10),
+      notes: payload.notes || payload.special_request || payload['요청사항'] || null,
+      source: 'wix_form',
+      env: env,
+      region_code: payload.region || 'yeosu'
+    };
+
+    console.log(`[Quote/Wix] 리드 생성:`, {
+      quote_id: quoteId,
+      name: quoteData.customer_name,
+      phone: phone ? phone.slice(0, 3) + '****' : null,
+      pax: quoteData.guest_count,
+      env
+    });
+
+    // DB 저장 (day_type, hotel_code는 NOT NULL이므로 기본값 설정)
+    if (db) {
+      try {
+        await db.query(`
+          INSERT INTO quotes (
+            quote_id, status, customer_name, customer_phone, customer_email,
+            travel_date, guest_count, memo, region_code,
+            day_type, hotel_code,
+            created_at, updated_at
+          ) VALUES (
+            $1, $2, $3, $4, $5, $6, $7, $8, $9,
+            $10, $11,
+            NOW(), NOW()
+          )
+        `, [
+          quoteData.quote_id, quoteData.status,
+          quoteData.customer_name, quoteData.customer_phone, quoteData.customer_email,
+          quoteData.trip_start, quoteData.guest_count,
+          quoteData.notes, quoteData.region_code,
+          'pending', 'pending'  // Wix 리드용 기본값
+        ]);
+        console.log(`[Quote/Wix] DB 저장 완료: ${quoteId}`);
+      } catch (dbErr) {
+        console.error(`[Quote/Wix] DB 저장 실패:`, dbErr.message);
+      }
+    }
+
+    // 메모리에도 저장
+    memoryStore.quotes.set(quoteId, quoteData);
+
+    // 이벤트 로깅
+    await logEvent('WixLeadCreated', quoteId, {
+      customer_name: quoteData.customer_name,
+      guest_count: quoteData.guest_count,
+      source: 'wix_form',
+      env
+    }, 'wix_webhook');
+
+    const duration = Date.now() - startTime;
+    console.log(`[Quote/Wix] 완료: ${quoteId} (${duration}ms)`);
+
+    res.json({
+      success: true,
+      quote_id: quoteId,
+      status: 'lead',
+      env,
+      message: '견적 요청이 접수되었습니다'
+    });
+
+  } catch (error) {
+    console.error('[Quote/Wix] 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: 'SERVER_ERROR',
+      message: '견적 요청 처리 중 오류가 발생했습니다'
+    });
+  }
+});
+
+/**
  * GET /api/v2/quote/health
  * 헬스체크 (/:quoteId 보다 먼저 정의해야 함)
  */
