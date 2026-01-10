@@ -1,4 +1,10 @@
 {
+  "automation": [
+    "DOC-WIX_INTEGRATION_GUIDE",
+    "DOC-manifest-system",
+    "DOC-SYS-2025-1230-LUMI-001_Airtabl",
+    "DOC-20251229-VPB"
+  ],
   "소원": [
     "DOC-airtable-schema",
     "DOC-airtable-wishes-inbox-schema",
@@ -281,11 +287,6 @@
     "DOC-20260101-YH9",
     "DOC-20260101-99J",
     "DOC-20251229-PFO"
-  ],
-  "automation": [
-    "DOC-manifest-system",
-    "DOC-SYS-2025-1230-LUMI-001_Airtabl",
-    "DOC-20251229-VPB"
   ],
   "team": [
     "DOC-Aurora5_토론시스템_안내문"

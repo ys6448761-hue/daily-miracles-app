@@ -197,6 +197,15 @@ try {
   console.error("❌ 단축 링크 라우터 로드 실패:", error.message);
 }
 
+// 운영 시스템 라우터 로딩 (헬스체크, 비상알림)
+let opsRoutes = null;
+try {
+  opsRoutes = require("./routes/opsRoutes");
+  console.log("✅ 운영 시스템 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 운영 시스템 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -654,6 +663,14 @@ if (shortLinkRoutes) {
   console.log("✅ 단축 링크 라우터 등록 완료 (/r/:token)");
 } else {
   console.warn("⚠️ 단축 링크 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 운영 시스템 Routes (/ops) ----------
+if (opsRoutes) {
+  app.use("/ops", opsRoutes);
+  console.log("✅ 운영 시스템 라우터 등록 완료 (/ops/health, /ops/status)");
+} else {
+  console.warn("⚠️ 운영 시스템 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Tolerant extractor ----------

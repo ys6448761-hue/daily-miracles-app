@@ -24,6 +24,15 @@ if (NOTION_API_KEY) {
     console.warn('[NotionOps] NOTION_API_KEY 미설정 - 노션 연동 비활성화');
 }
 
+// 비상 알림 서비스 (선택적 로드)
+let emergencyAlert = null;
+try {
+    emergencyAlert = require('./emergencyAlertService');
+    console.log('[NotionOps] 비상 알림 서비스 연동 완료');
+} catch (e) {
+    console.warn('[NotionOps] 비상 알림 서비스 로드 실패');
+}
+
 /**
  * 유형 매핑 (API → 노션 Select)
  */
@@ -164,10 +173,29 @@ async function createOpsLog(data) {
 
         console.log(`[NotionOps] 로그 생성 완료: ${data.quote_id}`);
 
+        // 긴급 리드인 경우 비상 알림 발송
+        if (urgency === '상' && emergencyAlert) {
+            setImmediate(async () => {
+                try {
+                    await emergencyAlert.alertHighPriorityLead({
+                        customer_name: data.customer_name || '고객',
+                        phone: data.customer_phone,
+                        urgency,
+                        summary,
+                        sla: '3시간'
+                    });
+                    console.log(`[NotionOps] 긴급 리드 알림 발송 완료: ${data.quote_id}`);
+                } catch (alertErr) {
+                    console.warn(`[NotionOps] 긴급 알림 발송 실패:`, alertErr.message);
+                }
+            });
+        }
+
         return {
             success: true,
             pageId: response.id,
-            pageUrl: response.url
+            pageUrl: response.url,
+            urgency
         };
 
     } catch (error) {
