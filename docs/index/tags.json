@@ -92,22 +92,8 @@
     "DOC-online-wish-voyage-api-design",
     "DOC-inquiry-form-api"
   ],
-  "최수민": [
-    "DOC-최수민방식_치트시트",
-    "DOC-최수민방식_완전정리",
-    "DOC-2025-12-29_Part1_최수민방식QA",
-    "DOC-2025-12-29_Part2_컨텍스트관리",
-    "DOC-2025-12-29_Part3_자가검증",
-    "DOC-2025-12-29_Part7_전략수정",
-    "DOC-2025-12-29_최수민방식적용"
-  ],
-  "빠른참조": [
-    "DOC-최수민방식_치트시트"
-  ],
-  "cheatsheets": [
-    "DOC-최수민방식_치트시트"
-  ],
   "aurora": [
+    "DOC-AURORA5_CHARACTER_PROMPTS",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
     "DOC-GROWTH-ROADMAP",
     "DOC-LAUNCH-DECLARATION",
@@ -180,6 +166,21 @@
     "DOC-20251229-A1Y",
     "DOC-20251229-SRH",
     "DOC-20251229-PFO"
+  ],
+  "최수민": [
+    "DOC-최수민방식_치트시트",
+    "DOC-최수민방식_완전정리",
+    "DOC-2025-12-29_Part1_최수민방식QA",
+    "DOC-2025-12-29_Part2_컨텍스트관리",
+    "DOC-2025-12-29_Part3_자가검증",
+    "DOC-2025-12-29_Part7_전략수정",
+    "DOC-2025-12-29_최수민방식적용"
+  ],
+  "빠른참조": [
+    "DOC-최수민방식_치트시트"
+  ],
+  "cheatsheets": [
+    "DOC-최수민방식_치트시트"
   ],
   "결제": [
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
