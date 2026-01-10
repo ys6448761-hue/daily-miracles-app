@@ -48,6 +48,15 @@ try {
   console.warn('[Quote] DB 모듈 로드 실패 - 메모리 모드로 동작');
 }
 
+// 노션 Ops 서비스 (선택적 로딩)
+let notionOps = null;
+try {
+  notionOps = require('../services/notionOpsService');
+  console.log('[Quote] 노션 Ops 서비스 로드 완료');
+} catch (error) {
+  console.warn('[Quote] 노션 Ops 서비스 로드 실패 - 노션 연동 비활성화');
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // 상수 정의
 // ═══════════════════════════════════════════════════════════════════════════
@@ -563,6 +572,29 @@ router.post('/wix', async (req, res) => {
       source: 'wix_form',
       env
     }, 'wix_webhook');
+
+    // 노션 Offline Ops Log 기록 (비동기, 실패해도 API 응답에 영향 없음)
+    if (notionOps) {
+      setImmediate(async () => {
+        try {
+          const notionResult = await notionOps.createOpsLog({
+            quote_id: quoteId,
+            customer_name: quoteData.customer_name,
+            customer_phone: quoteData.customer_phone,
+            source: 'wix_form',
+            type: 'quote',
+            notes: quoteData.notes,
+            trip_start: quoteData.trip_start,
+            guest_count: quoteData.guest_count
+          });
+          if (notionResult.success) {
+            console.log(`[Quote/Wix] 노션 기록 완료: ${quoteId}`);
+          }
+        } catch (notionErr) {
+          console.warn(`[Quote/Wix] 노션 기록 실패:`, notionErr.message);
+        }
+      });
+    }
 
     const duration = Date.now() - startTime;
     console.log(`[Quote/Wix] 완료: ${quoteId} (${duration}ms)`);
