@@ -86,6 +86,53 @@ mixed art styles, inconsistent character design.
 
 ---
 
+## 단체샷 금지 규칙 Top 10 (Team Shot Hard Rules)
+
+> **적용**: 단체샷(Group Shot) 생성 시 반드시 프롬프트에 포함
+
+```
+[TEAM SHOT HARD RULES - TOP 10]
+
+1. No new characters. Only the 6 referenced Aurora5 members.
+
+2. No human protagonist / no extra mascots.
+
+3. Do not change species/body type/outfit/colors.
+
+4. Each member must match their reference set identity markers.
+
+5. If drift occurs → multi-turn edit that character only (others locked).
+
+6. Keep the same style anchor throughout.
+
+7. Keep camera/lighting soft watercolor (no hard sci-fi/3D).
+
+8. Background is "digital yonggung", but doesn't overwrite character design.
+
+9. No text/logos in image.
+
+10. Output must pass QA score threshold; otherwise reroll/edit.
+
+[END HARD RULES]
+```
+
+### 규칙 요약 (한글)
+
+| # | 규칙 | 위반 시 조치 |
+|---|------|-------------|
+| 1 | 새 캐릭터 금지 - Aurora5 6명만 | 즉시 리롤 |
+| 2 | 인간 주인공/추가 마스코트 금지 | 즉시 리롤 |
+| 3 | 종족/체형/의상/색상 변경 금지 | 해당 캐릭터 수정 |
+| 4 | 레퍼런스 ID 마커 일치 필수 | 해당 캐릭터 수정 |
+| 5 | 드리프트 발생 시 해당 캐릭터만 수정 (나머지 잠금) | 멀티턴 수정 |
+| 6 | 동일 스타일 앵커 유지 | 앵커 재첨부 |
+| 7 | 소프트 수채화 조명 유지 (하드 SF/3D 금지) | 즉시 리롤 |
+| 8 | 디지털 용궁 배경은 캐릭터 디자인 덮어쓰기 금지 | 배경만 수정 |
+| 9 | 이미지 내 텍스트/로고 금지 | 인페인팅 제거 |
+| 10 | QA 점수 미달 시 리롤/수정 | 재생성 |
+
+---
+
 ## 레퍼런스 첨부 규칙
 
 ### 필수 첨부 순서
@@ -138,4 +185,4 @@ Image 3: {CHARACTER_NAME} - maintain this exact appearance
 
 ---
 
-*마지막 업데이트: 2026-01-11*
+*마지막 업데이트: 2026-01-11 (v1.1 - 단체샷 금지 규칙 Top 10 추가)*
