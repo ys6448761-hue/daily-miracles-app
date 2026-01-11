@@ -9,6 +9,7 @@
     "DOC-index",
     "DOC-GROWTH-ROADMAP",
     "DOC-LAUNCH-DECLARATION",
+    "DOC-JAEMI_ONBOARDING_v11",
     "DOC-service-flow",
     "DOC-README",
     "DOC-REVIEW_COLLECTION_SYSTEM",
@@ -90,6 +91,7 @@
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
     "DOC-GROWTH-ROADMAP",
     "DOC-LAUNCH-DECLARATION",
+    "DOC-JAEMI_ONBOARDING_v11",
     "DOC-README",
     "DOC-ROADMAP_API",
     "DOC-agents-index",
@@ -251,6 +253,9 @@
   ],
   "learnings": [
     "DOC-최수민방식_완전정리"
+  ],
+  "onboarding": [
+    "DOC-JAEMI_ONBOARDING_v11"
   ],
   "ops": [
     "DOC-DEC_OPERATIONS"
