@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-01-11T04:08:40.133Z",
+  "generated_at": "2026-01-11T04:28:21.765Z",
   "generator": "generate-manifest.js",
-  "total_count": 104,
+  "total_count": 105,
   "documents": [
     {
       "id": "DOC-AURORA5_CHARACTER_PROMPTS_V3",
@@ -305,6 +305,23 @@
       "title": "하루하루의 기적 - 지식 저장소",
       "created_at": "2026-01-11",
       "checksum": "28cf200e"
+    },
+    {
+      "id": "DOC-REVIEW_COLLECTION_SYSTEM",
+      "path": "docs/REVIEW_COLLECTION_SYSTEM.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "REVIEW_COLLECTION_SYSTEM.md",
+      "tags": [
+        "소원",
+        "kpi"
+      ],
+      "owner": "comi",
+      "status": "active",
+      "title": "후기 수집 구조 설계서",
+      "created_at": "2026-01-11",
+      "checksum": "bbd74711"
     },
     {
       "id": "DOC-README",

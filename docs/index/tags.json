@@ -11,6 +11,7 @@
     "DOC-LAUNCH-DECLARATION",
     "DOC-service-flow",
     "DOC-README",
+    "DOC-REVIEW_COLLECTION_SYSTEM",
     "DOC-ROADMAP_API",
     "DOC-agents-index",
     "DOC-Aurora5_토론시스템_안내문",
@@ -257,6 +258,23 @@
   "overview": [
     "DOC-service-flow"
   ],
+  "kpi": [
+    "DOC-REVIEW_COLLECTION_SYSTEM",
+    "DOC-manifest-system",
+    "DOC-20260101-4PA",
+    "DOC-20260101-TRD",
+    "DOC-20260101-WG8",
+    "DOC-20260101-97N",
+    "DOC-20260101-ICN",
+    "DOC-20260101-K7C",
+    "DOC-20260101-6M7",
+    "DOC-20260101-GR0",
+    "DOC-20260101-HP0",
+    "DOC-20260101-RET",
+    "DOC-20260101-YH9",
+    "DOC-20260101-99J",
+    "DOC-20251229-PFO"
+  ],
   "roadmap": [
     "DOC-README",
     "DOC-ROADMAP_API"
@@ -276,22 +294,6 @@
     "DOC-20260101-99J",
     "DOC-2025-12-29_Part6_소원착지전략",
     "DOC-20251229-SRH"
-  ],
-  "kpi": [
-    "DOC-manifest-system",
-    "DOC-20260101-4PA",
-    "DOC-20260101-TRD",
-    "DOC-20260101-WG8",
-    "DOC-20260101-97N",
-    "DOC-20260101-ICN",
-    "DOC-20260101-K7C",
-    "DOC-20260101-6M7",
-    "DOC-20260101-GR0",
-    "DOC-20260101-HP0",
-    "DOC-20260101-RET",
-    "DOC-20260101-YH9",
-    "DOC-20260101-99J",
-    "DOC-20251229-PFO"
   ],
   "team": [
     "DOC-Aurora5_토론시스템_안내문"
