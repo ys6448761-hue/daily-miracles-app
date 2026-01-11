@@ -34,6 +34,16 @@ Visual Style:
 - Hand-painted look with visible brush texture
 - Cinematic composition for video use
 
+[HARD RULES]
+1. No new characters. Only referenced Aurora5 members.
+2. Do not change species/body type/outfit/colors.
+3. Each member must match their reference set identity markers.
+4. Keep the same style anchor throughout.
+5. Keep camera/lighting soft watercolor (no hard sci-fi/3D).
+6. Background is "digital yonggung", but doesn't overwrite character design.
+7. No text/logos in image.
+8. Output must pass QA score threshold; otherwise reroll/edit.
+
 [REFERENCE IMAGES]
 Image 1 ({CHARACTER_NAME}): Maintain exact appearance from reference
 

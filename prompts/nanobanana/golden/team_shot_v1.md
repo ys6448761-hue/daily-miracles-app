@@ -48,6 +48,18 @@ Character Consistency Rules:
 - NO detailed realistic faces
 - NO style mixing between characters
 
+[TEAM SHOT HARD RULES - TOP 10]
+1. No new characters. Only the 6 referenced Aurora5 members.
+2. No human protagonist / no extra mascots.
+3. Do not change species/body type/outfit/colors.
+4. Each member must match their reference set identity markers.
+5. If drift occurs → multi-turn edit that character only (others locked).
+6. Keep the same style anchor throughout.
+7. Keep camera/lighting soft watercolor (no hard sci-fi/3D).
+8. Background is "digital yonggung", but doesn't overwrite character design.
+9. No text/logos in image.
+10. Output must pass QA score threshold; otherwise reroll/edit.
+
 [REFERENCE IMAGES]
 Image 1 (Purmilr): Royal purple + gold outfit, human male leader, 30s, holding miracle compass
 Image 2 (Yeouibozu): Jade green + pearl, flowing hanbok, dragon AI sage, holding yeouiju orb

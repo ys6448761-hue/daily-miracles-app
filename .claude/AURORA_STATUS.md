@@ -1,7 +1,7 @@
 # AURORA_STATUS.md
 ## 하루하루의 기적 - 프로젝트 현황판
 
-**마지막 업데이트**: 2026-01-11 15:30 KST
+**마지막 업데이트**: 2026-01-11 18:30 KST
 **업데이트 담당**: Claude Code
 
 ---
@@ -53,11 +53,88 @@
 🟢 완료: Aurora 5 캐릭터 이미지 v3 (6명 개별 + 단체샷)
 🟢 완료: Change→Insight 파이프라인 (변경사항 자동 분석/문서화)
 🟢 완료: NanoBanana C.C.E v2.0 + Change→Insight v2.0 통합 업그레이드
+🟢 완료: Aurora5 Visual OS v1.0 (엔진-독립형 95% 유지 운영체계)
 ```
 
 ---
 
 ## 최근 완료 작업
+
+### 2026-01-11: Aurora5 Visual OS v1.0 (엔진-독립형 95% 유지 운영체계)
+
+| 작업 | 상태 | 산출물 |
+|------|------|--------|
+| Visual OS 폴더 구조 생성 | ✅ | `.claude/visual-os/` |
+| RENDER_REQUEST_TEMPLATE | ✅ | 표준 입력 양식 |
+| RESULT_META_TEMPLATE | ✅ | 결과물 메타데이터 템플릿 |
+| QA_GATE_RUBRIC | ✅ | 4상태 판정 + 100점 루브릭 |
+| FAIL_TAGS | ✅ | 7종 실패 태그 표준 |
+| REPAIR_PROMPTS | ✅ | 멀티턴 수정 프롬프트 모음 |
+
+### Visual OS 핵심 구조
+
+```
+.claude/visual-os/
+├── RENDER_REQUEST_TEMPLATE.md   ← 생성 요청 표준 양식
+├── RESULT_META_TEMPLATE.md      ← 결과물 메타데이터
+├── QA_GATE_RUBRIC.md            ← QA 판정 기준 (100점)
+├── FAIL_TAGS.md                 ← 실패 원인 7종 태그
+└── REPAIR_PROMPTS.md            ← 수정 프롬프트 모음
+
+assets/references/style/         ← 스타일 앵커 (1장 목표)
+├── miracle_watercolor_anchor.png
+└── candidates/                  ← 후보 앵커 보관
+
+assets/golden/                   ← Golden 결과 저장소
+├── team_shot_candidate_*.png    ← 후보 이미지
+├── team_shot_best_*.png         ← 승격된 Best
+└── *_meta.md                    ← 동반 메타 파일
+
+reports/validation/              ← 10회 검증 리포트
+└── YYYY-MM-DD/{scene}_run01~10.md
+```
+
+### Visual OS 운영 루프
+
+```
+[1] Render Request (입력 표준화)
+    ↓
+[2] Prompt Compiler (HARD RULES 자동 주입)
+    ↓
+[3] 생성 (Gemini/Sora/etc)
+    ↓
+[4] QA Gate (PASSED/NEEDS_REVIEW/FAILED/SKIPPED)
+    ↓ NEEDS_REVIEW면
+[5] Repair Loop (1회 제한, 부분 수정)
+    ↓
+[6] Validation (10회 검증, 9/10+ 필요)
+    ↓
+[7] Best 승격 (이미지+meta+QA+validation 세트)
+```
+
+### FAIL 태그 7종
+
+| 태그 | 설명 | 심각도 |
+|------|------|--------|
+| `CAST_MISSING` | 6명 중 누락 | CRITICAL |
+| `NEW_CHARACTER` | 신규 캐릭터 생성 | CRITICAL |
+| `IDENTITY_DRIFT` | 얼굴/종/의상 변형 | HIGH |
+| `SEAT_DRIFT` | 좌석/배치 붕괴 | HIGH |
+| `MARKER_WEAK` | 코미/코드/루미 구분 약화 | MEDIUM |
+| `STYLE_DRIFT` | 수채화 스타일 붕괴 | HIGH |
+| `TEXT_LOGO` | 텍스트/워터마크 | LOW |
+
+### 핵심 원칙
+
+```
+1. SSOT: 이미지 단독 저장 금지 → 이미지+meta+QA 세트 필수
+2. 점수는 참고: 단일 컷 점수는 참고용
+3. 선언은 검증: 95%는 10회 중 9/10 PASSED로만 선언
+4. Repair 1회 제한: 무한 루프 금지
+5. 엔진 독립: Gemini/Sora 어떤 엔진이든 동일 프로세스
+```
+
+---
 
 ### 2026-01-11: NanoBanana C.C.E v2.0 + Change→Insight v2.0 통합 업그레이드
 
@@ -639,6 +716,19 @@ mcp-servers/dashboard-mcp/      - 실시간 대시보드 (NEW!)
 reports/                                  - 보고서 저장소
 ```
 
+### Visual OS v1.0 (엔진-독립형 운영체계)
+```
+.claude/visual-os/
+├── RENDER_REQUEST_TEMPLATE.md   - 생성 요청 표준 양식
+├── RESULT_META_TEMPLATE.md      - 결과물 메타데이터
+├── QA_GATE_RUBRIC.md            - QA 판정 기준 (100점)
+├── FAIL_TAGS.md                 - 실패 원인 7종 태그
+└── REPAIR_PROMPTS.md            - 수정 프롬프트 모음
+assets/references/style/         - 스타일 앵커
+assets/golden/                   - Golden 결과 저장소
+reports/validation/              - 10회 검증 리포트
+```
+
 ### 토론 시스템
 ```
 .claude/agents/debate-system/   - 토론 에이전트 5종
@@ -728,6 +818,7 @@ curl -X POST http://localhost:5100/api/debate/run \
 
 | 날짜 | 담당 | 내용 |
 |------|------|------|
+| 2026-01-11 18:30 | Code | Aurora5 Visual OS v1.0 구축 (엔진-독립형 95% 유지 운영체계) |
 | 2026-01-11 15:30 | Code | NanoBanana C.C.E v2.0 + Change→Insight v2.0 통합 업그레이드 |
 | 2026-01-11 14:00 | Code | Change→Insight 파이프라인 시스템 구축 (변경→지식 자동화) |
 | 2026-01-11 13:30 | Code | NanoBananaSkill SSOT 시스템 구축 (캐릭터 일관성 95%+ 목표) |
