@@ -1,7 +1,7 @@
 # AURORA_STATUS.md
 ## 하루하루의 기적 - 프로젝트 현황판
 
-**마지막 업데이트**: 2026-01-11 14:00 KST
+**마지막 업데이트**: 2026-01-11 15:30 KST
 **업데이트 담당**: Claude Code
 
 ---
@@ -52,11 +52,53 @@
 🟢 완료: NanoBananaSkill SSOT 시스템 (캐릭터 일관성 95%+ 목표)
 🟢 완료: Aurora 5 캐릭터 이미지 v3 (6명 개별 + 단체샷)
 🟢 완료: Change→Insight 파이프라인 (변경사항 자동 분석/문서화)
+🟢 완료: NanoBanana C.C.E v2.0 + Change→Insight v2.0 통합 업그레이드
 ```
 
 ---
 
 ## 최근 완료 작업
+
+### 2026-01-11: NanoBanana C.C.E v2.0 + Change→Insight v2.0 통합 업그레이드
+
+| 작업 | 상태 | 산출물 |
+|------|------|--------|
+| DNA Manifest 6종 | ✅ | `assets/character_dna/*_dna.v1.json` |
+| QA Gate v2.1 | ✅ | PASSED/NEEDS_REVIEW/FAILED/SKIPPED 4종 + SKIPPED 규칙 |
+| doc-update-actions 에이전트 | ✅ | `.claude/agents/doc-update-actions.md` |
+| Golden best 3종 | ✅ | `prompts/nanobanana/golden/*_best_v1.md` |
+| 10회 검증 프로토콜 연결 | ✅ | 자동 트리거 + 케이스 10종 정의 |
+| 레퍼런스 요구사항 문서 | ✅ | `REFERENCE_SET_REQUIREMENTS.md` |
+
+### v2.0 핵심 변경
+
+```
+1. QA 상태 4종: PASSED(57+) / NEEDS_REVIEW(54-56) / FAILED(≤53) / SKIPPED
+2. SKIPPED ≠ PASSED (품질 오해 방지)
+3. DNA Manifest로 캐릭터 시각 정보 SSOT 고정
+4. 10회 검증: 레퍼런스/스타일/프롬프트 변경 시 자동 트리거
+5. Golden best 승격: QA PASSED + 결과 이미지 + 리포트 연결
+```
+
+### 운영 완료 조건 (DoD)
+
+| 조건 | 현재 | 목표 |
+|------|------|------|
+| 레퍼런스 세트 | 6장 | 18장 (6명×3장) |
+| 스타일 앵커 | 0장 | 1장 |
+| Golden PASSED | 0종 | 3종 |
+| 10회 검증 통과 | 0회 | 9/10회+ |
+
+**담당**: 레퍼런스/스타일 앵커 → 재미 (CRO) / 검증 → 루미
+
+### 커밋 이력
+
+```
+63f1568 - feat: P0 추가 3개 완료 - Golden best 승격, SKIPPED 규칙, 10회 검증 연결
+3306f6d - feat: NanoBanana C.C.E v2.0 + Change→Insight v2.0 통합 업그레이드
+```
+
+---
 
 ### 2026-01-11: Change→Insight 파이프라인 시스템
 
@@ -686,6 +728,7 @@ curl -X POST http://localhost:5100/api/debate/run \
 
 | 날짜 | 담당 | 내용 |
 |------|------|------|
+| 2026-01-11 15:30 | Code | NanoBanana C.C.E v2.0 + Change→Insight v2.0 통합 업그레이드 |
 | 2026-01-11 14:00 | Code | Change→Insight 파이프라인 시스템 구축 (변경→지식 자동화) |
 | 2026-01-11 13:30 | Code | NanoBananaSkill SSOT 시스템 구축 (캐릭터 일관성 95%+ 목표) |
 | 2026-01-11 13:00 | Code | Aurora 5 캐릭터 이미지 v3 완성 (6명 + 단체샷) |
