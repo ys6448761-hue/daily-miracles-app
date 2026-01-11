@@ -1,0 +1,159 @@
+{
+  "timestamp": "2026-01-11T14:15:00+09:00",
+  "trigger": "NanoBananaSkill SSOT + Change→Insight 파이프라인",
+  "files_analyzed": 50,
+  "impact_level": "high",
+
+  "affected_assets": [
+    {
+      "type": "document",
+      "path": ".claude/AURORA_STATUS.md",
+      "action": "update",
+      "priority": "high",
+      "auto_updatable": true,
+      "sections": ["현재 상태 요약", "최근 완료 작업", "업데이트 이력"],
+      "status": "completed"
+    },
+    {
+      "type": "character_bible",
+      "path": "brand/characters/*.md",
+      "action": "create",
+      "priority": "high",
+      "auto_updatable": false,
+      "note": "신규 생성 6종, QA 필요",
+      "files": [
+        "brand/characters/purmilr.md",
+        "brand/characters/yeouibozu.md",
+        "brand/characters/komi.md",
+        "brand/characters/lumi.md",
+        "brand/characters/jaemi.md",
+        "brand/characters/code.md"
+      ]
+    },
+    {
+      "type": "reference_image",
+      "path": "assets/references/characters/*/",
+      "action": "create",
+      "priority": "medium",
+      "auto_updatable": false,
+      "note": "레퍼런스 이미지 6종 복사됨",
+      "files": [
+        "assets/references/characters/purmilr/01_front.png",
+        "assets/references/characters/yeouibozu/01_front.png",
+        "assets/references/characters/komi/01_front.png",
+        "assets/references/characters/lumi/01_front.png",
+        "assets/references/characters/jaemi/01_front.png",
+        "assets/references/characters/code/01_front.png"
+      ]
+    },
+    {
+      "type": "scene_template",
+      "path": "prompts/nanobanana/scenes/",
+      "action": "create",
+      "priority": "medium",
+      "auto_updatable": false,
+      "note": "씬 템플릿 4종 생성",
+      "files": [
+        "prompts/nanobanana/scenes/group_shot.md",
+        "prompts/nanobanana/scenes/storybook.md",
+        "prompts/nanobanana/scenes/webtoon.md",
+        "prompts/nanobanana/scenes/video_frame.md"
+      ]
+    },
+    {
+      "type": "agent",
+      "path": ".claude/agents/",
+      "action": "create",
+      "priority": "medium",
+      "auto_updatable": true,
+      "note": "에이전트 4종 추가",
+      "files": [
+        ".claude/agents/nano-banana-skill.md",
+        ".claude/agents/change-summarizer.md",
+        ".claude/agents/impact-mapper.md",
+        ".claude/agents/nanobanana-qa-gate.md"
+      ]
+    },
+    {
+      "type": "pipeline",
+      "path": ".claude/pipelines/change-intel.md",
+      "action": "create",
+      "priority": "medium",
+      "auto_updatable": true,
+      "note": "Change→Insight 파이프라인 추가"
+    },
+    {
+      "type": "qa_checklist",
+      "path": "qa/character_consistency_checklist.md",
+      "action": "create",
+      "priority": "high",
+      "auto_updatable": false,
+      "note": "60점 만점 캐릭터 일관성 체크리스트"
+    }
+  ],
+
+  "qa_required": true,
+  "qa_type": "nanobanana",
+  "qa_reason": "캐릭터 바이블 및 레퍼런스 이미지 신규 생성",
+
+  "dependency_graph": {
+    "brand/characters/*.md": {
+      "depends_on": [],
+      "impacts": [
+        "assets/references/characters/*/",
+        "prompts/nanobanana/scenes/*.md",
+        "qa/character_consistency_checklist.md"
+      ]
+    },
+    "assets/references/characters/*/": {
+      "depends_on": ["brand/characters/*.md"],
+      "impacts": ["prompts/nanobanana/scenes/*.md"]
+    },
+    ".claude/agents/nano-banana-skill.md": {
+      "depends_on": [],
+      "impacts": [
+        "brand/characters/*.md",
+        "prompts/nanobanana/**",
+        "qa/character_consistency_checklist.md"
+      ]
+    }
+  },
+
+  "suggested_actions": [
+    {
+      "order": 1,
+      "action": "update_aurora_status",
+      "target": ".claude/AURORA_STATUS.md",
+      "auto": true,
+      "status": "completed"
+    },
+    {
+      "order": 2,
+      "action": "trigger_qa_gate",
+      "gate": "nanobanana-qa-gate",
+      "auto": true,
+      "status": "pending"
+    },
+    {
+      "order": 3,
+      "action": "manual_review",
+      "target": "brand/characters/*.md",
+      "reviewer": "재미 (CRO)",
+      "auto": false,
+      "note": "캐릭터 바이블 최종 확인",
+      "status": "optional"
+    }
+  ],
+
+  "statistics": {
+    "total_files": 50,
+    "new_files": 47,
+    "modified_files": 3,
+    "deleted_files": 0,
+    "lines_added": 3972,
+    "lines_deleted": 128,
+    "image_files": 13,
+    "document_files": 20,
+    "code_files": 1
+  }
+}
