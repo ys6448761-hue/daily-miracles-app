@@ -1,9 +1,26 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-01-10T08:05:39.642Z",
+  "generated_at": "2026-01-11T02:07:29.180Z",
   "generator": "generate-manifest.js",
-  "total_count": 102,
+  "total_count": 103,
   "documents": [
+    {
+      "id": "DOC-AURORA5_CHARACTER_PROMPTS_V3",
+      "path": "docs/AURORA5_CHARACTER_PROMPTS_V3.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "AURORA5_CHARACTER_PROMPTS_V3.md",
+      "tags": [
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "Aurora 5 캐릭터 생성 프롬프트 패키지 v3.0",
+      "created_at": "변경",
+      "checksum": "fb513144"
+    },
     {
       "id": "DOC-WIX_INTEGRATION_GUIDE",
       "path": "docs/WIX_INTEGRATION_GUIDE.md",
@@ -33,7 +50,7 @@
       "owner": "comi",
       "status": "| wishes_processed",
       "title": "Airtable 테이블 스키마 (ACT 관제탑)",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "4976b285"
     },
     {
@@ -49,7 +66,7 @@
       "owner": "jemi",
       "status": "NEW, ACK, IN_PROGRESS, APPROVED, STARTED, DONE, ESCALATED",
       "title": "Airtable Wishes Inbox 테이블 스키마",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "ca0bf766"
     },
     {
@@ -66,7 +83,7 @@
       "owner": "team",
       "status": "active",
       "title": "온라인 문제 해결 소원 API v0.1",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "266802c0"
     },
     {
@@ -83,7 +100,7 @@
       "owner": "code",
       "status": "active",
       "title": "온라인 소원 실현 항해 API 설계안 v0.1",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "ed723688"
     },
     {
@@ -99,7 +116,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Aurora 5 캐릭터 생성 프롬프트 패키지 v2.1",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "64f0a2d2"
     },
     {
@@ -117,7 +134,7 @@
       "owner": "team",
       "status": "active",
       "title": "최수민방식 치트시트",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "9f7529c4"
     },
     {
@@ -135,7 +152,7 @@
       "owner": "team",
       "status": "active",
       "title": "Claude Desktop MCP 서버 설정 가이드",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "44ccac1b"
     },
     {
@@ -149,7 +166,7 @@
       "owner": "team",
       "status": "active",
       "title": "README",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "60a0b4af"
     },
     {
@@ -166,7 +183,7 @@
       "owner": "ceo",
       "status": "active",
       "title": "Decisions Index",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "b355d262"
     },
     {
@@ -182,7 +199,7 @@
       "owner": "code",
       "status": "archived",
       "title": "Daily Miracles MVP 배포 체크리스트",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "0202a43e"
     },
     {
@@ -199,7 +216,7 @@
       "owner": "comi",
       "status": "archived",
       "title": "하루하루의 기적 - 성장 로드맵",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "881f0936"
     },
     {
@@ -216,7 +233,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "하루하루의 기적 - 출항 선언문",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "c6b4219e"
     },
     {
@@ -237,7 +254,7 @@
       "owner": "code",
       "status": "active",
       "title": "최수민님 방식 완전 정리",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "3722b629"
     },
     {
@@ -253,7 +270,7 @@
       "owner": "comi",
       "status": "archived",
       "title": "DEC 운영 매뉴얼",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "1b4361fe"
     },
     {
@@ -270,7 +287,7 @@
       "owner": "code",
       "status": "active",
       "title": "Daily Miracles 온라인 소원 서비스 전체 흐름도",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "e28e803e"
     },
     {
@@ -286,7 +303,7 @@
       "owner": "comi",
       "status": "active",
       "title": "하루하루의 기적 - 지식 저장소",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "28cf200e"
     },
     {
@@ -303,7 +320,7 @@
       "owner": "team",
       "status": "active",
       "title": "🎯 30일 기적 로드맵 시스템",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "a4207922"
     },
     {
@@ -321,7 +338,7 @@
       "owner": "team",
       "status": "active",
       "title": "30일 기적 로드맵 API 문서",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "4d39bd13"
     },
     {
@@ -339,7 +356,7 @@
       "owner": "code",
       "status": "|----",
       "title": "에이전트 인덱스",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "92a49e80"
     },
     {
@@ -355,7 +372,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "대화 저장소 워크플로우",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "55221cd3"
     },
     {
@@ -375,7 +392,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Manifest 자동 생성 시스템",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "d242fbfe"
     },
     {
@@ -393,7 +410,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Aurora 5 토론 시스템 안내문",
-      "created_at": "2026-01-10",
+      "created_at": "2026-01-11",
       "checksum": "49189a4d"
     },
     {

@@ -1,11 +1,6 @@
 {
-  "automation": [
-    "DOC-WIX_INTEGRATION_GUIDE",
-    "DOC-manifest-system",
-    "DOC-SYS-2025-1230-LUMI-001_Airtabl",
-    "DOC-20251229-VPB"
-  ],
   "소원": [
+    "DOC-AURORA5_CHARACTER_PROMPTS_V3",
     "DOC-airtable-schema",
     "DOC-airtable-wishes-inbox-schema",
     "DOC-online-wish-problem-api",
@@ -87,12 +82,8 @@
     "DOC-20251229-PFO",
     "DOC-inquiry-form-api"
   ],
-  "api": [
-    "DOC-online-wish-problem-api",
-    "DOC-online-wish-voyage-api-design",
-    "DOC-inquiry-form-api"
-  ],
   "aurora": [
+    "DOC-AURORA5_CHARACTER_PROMPTS_V3",
     "DOC-AURORA5_CHARACTER_PROMPTS",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
     "DOC-GROWTH-ROADMAP",
@@ -166,6 +157,17 @@
     "DOC-20251229-A1Y",
     "DOC-20251229-SRH",
     "DOC-20251229-PFO"
+  ],
+  "automation": [
+    "DOC-WIX_INTEGRATION_GUIDE",
+    "DOC-manifest-system",
+    "DOC-SYS-2025-1230-LUMI-001_Airtabl",
+    "DOC-20251229-VPB"
+  ],
+  "api": [
+    "DOC-online-wish-problem-api",
+    "DOC-online-wish-voyage-api-design",
+    "DOC-inquiry-form-api"
   ],
   "최수민": [
     "DOC-최수민방식_치트시트",
