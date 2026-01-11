@@ -1,0 +1,83 @@
+{
+  "character_id": "jaemi",
+  "version": "1.0.0",
+  "created_at": "2026-01-11",
+  "updated_at": "2026-01-11",
+
+  "identity": {
+    "name_ko": "재미",
+    "name_en": "Jaemi",
+    "role": "CRO 크리에이티브 AI",
+    "type": "dragon_ai",
+    "archetype": "creative_artist"
+  },
+
+  "visual_dna": {
+    "face": {
+      "eyes": "bright_playful",
+      "expression": "joyful_creative",
+      "detail_level": "minimal_ghibli"
+    },
+    "form": {
+      "style": "eastern_dragon_humanoid",
+      "scales": "coral_warm",
+      "silhouette": "dynamic_expressive"
+    }
+  },
+
+  "color_palette": {
+    "primary": {
+      "name": "Coral Pink",
+      "hex": "#FF7043",
+      "usage": "main_body_outfit"
+    },
+    "secondary": {
+      "name": "Sunshine Yellow",
+      "hex": "#FFEE58",
+      "usage": "accents_highlights"
+    },
+    "tertiary": {
+      "name": "Deep Coral",
+      "hex": "#E64A19",
+      "usage": "shadows_warmth"
+    }
+  },
+
+  "costume": {
+    "base": "artistic_flowing_hanbok",
+    "pattern": "paint_splash_motif",
+    "signature_elements": [
+      "coral_pink_fabric",
+      "yellow_ribbon_accents"
+    ]
+  },
+
+  "accessories": {
+    "primary": {
+      "name": "Brush Fish",
+      "name_ko": "붓 물고기",
+      "description": "Playful fish companion that doubles as a paintbrush"
+    }
+  },
+
+  "forbidden_changes": [
+    "color_to_blue_purple",
+    "remove_brush_fish",
+    "serious_stern_expression",
+    "3d_realistic_style"
+  ],
+
+  "reference_set": {
+    "01_front": "assets/references/characters/jaemi/01_front.png",
+    "02_3quarter": null,
+    "03_fullbody": null,
+    "master_sheet": null
+  },
+
+  "style_tags": [
+    "ghibli_warmth",
+    "korean_webtoon",
+    "watercolor_texture",
+    "playful_creative"
+  ]
+}

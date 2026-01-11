@@ -1,0 +1,88 @@
+{
+  "character_id": "purmilr",
+  "version": "1.0.0",
+  "created_at": "2026-01-11",
+  "updated_at": "2026-01-11",
+
+  "identity": {
+    "name_ko": "푸르미르",
+    "name_en": "Purmilr",
+    "role": "CEO",
+    "type": "human",
+    "age_range": "30s_late"
+  },
+
+  "visual_dna": {
+    "face": {
+      "eyes": "warm_gentle",
+      "expression": "confident_smile",
+      "detail_level": "minimal_ghibli"
+    },
+    "hair": {
+      "style": "short_swept_back",
+      "color": "#5D4037",
+      "silhouette": "clean_professional"
+    },
+    "body": {
+      "type": "adult_male",
+      "proportions": "realistic_stylized"
+    }
+  },
+
+  "color_palette": {
+    "primary": {
+      "name": "Royal Purple",
+      "hex": "#7E57C2",
+      "usage": "main_outfit"
+    },
+    "secondary": {
+      "name": "Gold",
+      "hex": "#FFD700",
+      "usage": "accents_decorations"
+    },
+    "tertiary": {
+      "name": "White",
+      "hex": "#FFFFFF",
+      "usage": "inner_neckline"
+    }
+  },
+
+  "costume": {
+    "base": "hanbok_inspired_robe",
+    "pattern": "dragon_scale_subtle",
+    "signature_elements": [
+      "purple_main_fabric",
+      "gold_belt_shoulder_trim"
+    ]
+  },
+
+  "accessories": {
+    "primary": {
+      "name": "Miracle Navigator",
+      "name_ko": "기적 나침반",
+      "description": "Golden compass with purple glow"
+    }
+  },
+
+  "forbidden_changes": [
+    "outfit_color_change",
+    "hairstyle_change",
+    "age_change",
+    "remove_compass",
+    "3d_realistic_style"
+  ],
+
+  "reference_set": {
+    "01_front": "assets/references/characters/purmilr/01_front.png",
+    "02_3quarter": null,
+    "03_fullbody": null,
+    "master_sheet": null
+  },
+
+  "style_tags": [
+    "ghibli_warmth",
+    "korean_webtoon",
+    "watercolor_texture",
+    "minimal_face_detail"
+  ]
+}

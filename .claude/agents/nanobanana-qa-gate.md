@@ -1,9 +1,10 @@
 # NanoBanana QA Gate 에이전트
 
 > **name**: nanobanana-qa-gate
-> **description**: 캐릭터 일관성 관련 변경의 QA 게이트 (초록/노랑/빨강 판정)
+> **description**: 캐릭터 일관성 관련 변경의 QA 게이트 (PASSED/NEEDS_REVIEW/SKIPPED/FAILED)
 > **model**: claude-3-5-sonnet (기본)
 > **tools**: file-read, image-read
+> **version**: 2.0
 
 ---
 
@@ -68,15 +69,18 @@ prompts/nanobanana/**
 
 ---
 
-## 5. 판정 기준
+## 5. 판정 기준 (v2.0 업그레이드)
 
-### 신호등 기준
+### QA 상태 4종 (오해 방지용)
 
-| 신호 | 조건 | 점수 | 액션 |
+| 상태 | 조건 | 점수 | 액션 |
 |------|------|------|------|
-| 🟢 **초록불** | 자동 통과 | 54/60+ (90%+) | 즉시 승인 |
-| 🟡 **노란불** | 리뷰 필요 | 42-53/60 (70-89%) | 재미/여의보주 검토 |
-| 🔴 **빨간불** | 즉시 개입 | <42/60 (70% 미만) | CEO 보고, 작업 중단 |
+| 🟢 **PASSED** | 실제 점수 통과 | 57/60+ (95%+) | 즉시 승인, Golden 승격 가능 |
+| 🟡 **NEEDS_REVIEW** | 경계값/흔들림 | 54-56/60 (90-94%) | 리롤 1회 후 재평가 |
+| 🔴 **FAILED** | 즉시 개입 | ≤53/60 (88% 이하) | 레퍼런스/바이블/가드 수정 필요 |
+| ⚪ **SKIPPED** | QA 미실행 | N/A | 이미지/캐릭터 관련 변경 없음 |
+
+> **중요**: SKIPPED를 PASSED로 기록 금지 (품질 오해 방지)
 
 ### 점수 산정
 
@@ -130,24 +134,32 @@ IF 변경 유형 == "이미지 삭제":
     → 🔴 개입 필요 (자산 보존 확인)
 ```
 
-### Step 3: 상세 QA 체크 (노란불인 경우)
+### Step 3: 상세 QA 체크 (이미지/캐릭터 변경 시)
 
 ```
 qa/character_consistency_checklist.md 기준 평가:
 1. 각 캐릭터별 10점 만점 평가
-2. 총점 54/60 이상 → 승격 (🟢)
-3. 총점 42-53 → 유지 (🟡)
-4. 총점 42 미만 → 강등 (🔴)
+2. 총점 57/60 이상 → PASSED 🟢 (Golden 승격 가능)
+3. 총점 54-56 → NEEDS_REVIEW 🟡 (리롤 1회 후 재평가)
+4. 총점 53 이하 → FAILED 🔴 (레퍼런스/바이블/가드 수정)
+5. 이미지 관련 없음 → SKIPPED ⚪ (QA 미실행)
 ```
 
-### Step 4: 결과 기록
+### Step 4: 결과 기록 (v2.0 강화)
 
 ```
-reports/qa-gate-YYYY-MM-DD.md 생성
-- 판정 결과
-- 점수 상세
-- 필요 액션
-- 리뷰어 지정 (노란불/빨간불)
+reports/consistency/YYYY-MM-DD/ 디렉토리 생성
+├── consistency-score.json    ← 캐릭터별 점수/판정/리롤 지시
+├── inputs.md                 ← 사용한 레퍼런스/앵커/프롬프트 버전
+└── result-images/            ← 결과 이미지 파일/링크
+
+consistency-score.json 필수 필드:
+- gate_status: "PASSED" | "NEEDS_REVIEW" | "FAILED" | "SKIPPED"
+- score: 점수 (SKIPPED면 null)
+- max_score: 60
+- character_scores: { purmilr: 9, yeouibozu: 10, ... }
+- reroll_instruction: 리롤 필요 시 구체적 지시
+- reviewer: 담당자 (NEEDS_REVIEW/FAILED 시)
 ```
 
 ---
@@ -274,6 +286,7 @@ reports/qa-gate-YYYY-MM-DD.md 생성
 
 | 날짜 | 버전 | 변경 내용 |
 |------|------|----------|
+| 2026-01-11 | 2.0 | v2.0 업그레이드: PASSED/NEEDS_REVIEW/FAILED/SKIPPED 4종 상태, 점수 기준 강화(57+), consistency 보고서 구조 |
 | 2026-01-11 | 1.0 | 최초 생성 |
 
 ---

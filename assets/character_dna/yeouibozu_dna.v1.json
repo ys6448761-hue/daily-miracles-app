@@ -1,0 +1,83 @@
+{
+  "character_id": "yeouibozu",
+  "version": "1.0.0",
+  "created_at": "2026-01-11",
+  "updated_at": "2026-01-11",
+
+  "identity": {
+    "name_ko": "여의보주",
+    "name_en": "Yeouibozu",
+    "role": "품질 검수 AI",
+    "type": "dragon_ai",
+    "archetype": "sage_philosopher"
+  },
+
+  "visual_dna": {
+    "face": {
+      "eyes": "wise_deep",
+      "expression": "serene_knowing",
+      "detail_level": "minimal_ghibli"
+    },
+    "form": {
+      "style": "eastern_dragon_humanoid",
+      "scales": "jade_shimmer",
+      "silhouette": "flowing_elegant"
+    }
+  },
+
+  "color_palette": {
+    "primary": {
+      "name": "Jade Green",
+      "hex": "#00897B",
+      "usage": "main_body_outfit"
+    },
+    "secondary": {
+      "name": "Pearl",
+      "hex": "#E0E0E0",
+      "usage": "accents_glow"
+    },
+    "tertiary": {
+      "name": "Deep Jade",
+      "hex": "#004D40",
+      "usage": "shadows_depth"
+    }
+  },
+
+  "costume": {
+    "base": "flowing_hanbok_robe",
+    "pattern": "subtle_dragon_scales",
+    "signature_elements": [
+      "jade_green_fabric",
+      "pearl_trim_edges"
+    ]
+  },
+
+  "accessories": {
+    "primary": {
+      "name": "Yeouiju",
+      "name_ko": "여의주",
+      "description": "Luminous pearl orb, held or floating nearby"
+    }
+  },
+
+  "forbidden_changes": [
+    "color_to_pink_orange",
+    "remove_yeouiju",
+    "aggressive_expression",
+    "3d_realistic_style"
+  ],
+
+  "reference_set": {
+    "01_front": "assets/references/characters/yeouibozu/01_front.png",
+    "02_3quarter": null,
+    "03_fullbody": null,
+    "master_sheet": null
+  },
+
+  "style_tags": [
+    "ghibli_warmth",
+    "korean_webtoon",
+    "watercolor_texture",
+    "ethereal_wisdom"
+  ]
+}

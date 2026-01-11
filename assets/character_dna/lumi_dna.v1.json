@@ -1,0 +1,83 @@
+{
+  "character_id": "lumi",
+  "version": "1.0.0",
+  "created_at": "2026-01-11",
+  "updated_at": "2026-01-11",
+
+  "identity": {
+    "name_ko": "루미",
+    "name_en": "Lumi",
+    "role": "Data Analyst AI",
+    "type": "dragon_ai",
+    "archetype": "analyst_observer"
+  },
+
+  "visual_dna": {
+    "face": {
+      "eyes": "curious_analytical",
+      "expression": "thoughtful_gentle",
+      "detail_level": "minimal_ghibli"
+    },
+    "form": {
+      "style": "eastern_dragon_humanoid",
+      "scales": "mint_crystalline",
+      "silhouette": "light_ethereal"
+    }
+  },
+
+  "color_palette": {
+    "primary": {
+      "name": "Mint Teal",
+      "hex": "#26A69A",
+      "usage": "main_body_outfit"
+    },
+    "secondary": {
+      "name": "Crystal",
+      "hex": "#E0F7FA",
+      "usage": "highlights_glow"
+    },
+    "tertiary": {
+      "name": "Deep Teal",
+      "hex": "#00796B",
+      "usage": "shadows_depth"
+    }
+  },
+
+  "costume": {
+    "base": "flowing_scholarly_robe",
+    "pattern": "constellation_dots_subtle",
+    "signature_elements": [
+      "mint_teal_fabric",
+      "crystal_accent_edges"
+    ]
+  },
+
+  "accessories": {
+    "primary": {
+      "name": "Constellation Chart",
+      "name_ko": "별자리 차트",
+      "description": "Holographic tablet showing star patterns and data"
+    }
+  },
+
+  "forbidden_changes": [
+    "color_to_pink_red",
+    "remove_chart_tablet",
+    "3d_cgi_style",
+    "harsh_lighting"
+  ],
+
+  "reference_set": {
+    "01_front": "assets/references/characters/lumi/01_front.png",
+    "02_3quarter": null,
+    "03_fullbody": null,
+    "master_sheet": null
+  },
+
+  "style_tags": [
+    "ghibli_warmth",
+    "korean_webtoon",
+    "watercolor_texture",
+    "analytical_calm"
+  ]
+}

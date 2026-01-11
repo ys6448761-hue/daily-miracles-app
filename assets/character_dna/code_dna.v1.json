@@ -1,0 +1,83 @@
+{
+  "character_id": "code",
+  "version": "1.0.0",
+  "created_at": "2026-01-11",
+  "updated_at": "2026-01-11",
+
+  "identity": {
+    "name_ko": "코드",
+    "name_en": "Code",
+    "role": "기술 실행 AI",
+    "type": "dragon_ai",
+    "archetype": "tech_executor"
+  },
+
+  "visual_dna": {
+    "face": {
+      "eyes": "focused_precise",
+      "expression": "calm_determined",
+      "detail_level": "minimal_ghibli"
+    },
+    "form": {
+      "style": "eastern_dragon_humanoid",
+      "scales": "cyan_digital_glow",
+      "silhouette": "angular_technical"
+    }
+  },
+
+  "color_palette": {
+    "primary": {
+      "name": "Cyan",
+      "hex": "#00BCD4",
+      "usage": "main_body_outfit"
+    },
+    "secondary": {
+      "name": "Deep Navy",
+      "hex": "#0D47A1",
+      "usage": "accents_depth"
+    },
+    "tertiary": {
+      "name": "Electric Blue",
+      "hex": "#00E5FF",
+      "usage": "digital_glow_effects"
+    }
+  },
+
+  "costume": {
+    "base": "tech_integrated_hanbok",
+    "pattern": "circuit_coral_pattern",
+    "signature_elements": [
+      "cyan_main_fabric",
+      "navy_circuit_lines"
+    ]
+  },
+
+  "accessories": {
+    "primary": {
+      "name": "Circuit Coral",
+      "name_ko": "회로 산호",
+      "description": "Glowing circuit patterns integrated into body/outfit"
+    }
+  },
+
+  "forbidden_changes": [
+    "color_to_pink_orange",
+    "remove_circuit_patterns",
+    "organic_only_appearance",
+    "3d_realistic_style"
+  ],
+
+  "reference_set": {
+    "01_front": "assets/references/characters/code/01_front.png",
+    "02_3quarter": null,
+    "03_fullbody": null,
+    "master_sheet": null
+  },
+
+  "style_tags": [
+    "ghibli_warmth",
+    "korean_webtoon",
+    "watercolor_texture",
+    "tech_precision"
+  ]
+}

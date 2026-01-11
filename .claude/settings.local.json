@@ -122,7 +122,8 @@
       "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" run view 20701503360 --repo ys6448761-hue/daily-miracles-app --log)",
       "Bash(DATABASE_URL=\"postgresql://yeosu_user:XEVFpHtXr7CsYZSYYmDhogjbXzo32hCR@dpg-d3t9gpa4d50c73d2i3gg-a.singapore-postgres.render.com/yeosu_miracle_travel\" node:*)",
       "Bash(render:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

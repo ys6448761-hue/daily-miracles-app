@@ -4,6 +4,7 @@
 > **description**: 커밋/PR 변경사항을 "요약 + 영향도 + QA + 문서갱신 액션"으로 자동 가공
 > **trigger**: manual / PR 생성 시 / main merge 직후
 > **goal**: 자료 축적 → 지식 갱신 자동화
+> **version**: 2.0
 
 ---
 
@@ -14,11 +15,12 @@
 - 캐릭터 일관성 관련 변경은 **무조건 QA 게이트**를 거침
 - 운영 원칙: "95% 자동 + 4% 검토 + 1% 개입" 신호등
 
-### 산출물
-1. 이번 변경의 **핵심 요약 (What/Why/Impact)**
-2. 영향 받는 문서/자산 **자동 업데이트 지시**
-3. **캐릭터 일관성 QA 게이트** 통과 여부
-4. **Release Note / 작업 로그 / 다음 액션**
+### 산출물 (5종)
+1. `change-summary-YYYY-MM-DD.md` - 핵심 요약 (What/Why/Impact + 근거)
+2. `impact-map-YYYY-MM-DD.json` - 영향도 매핑
+3. `qa-gate-YYYY-MM-DD.md` - QA 게이트 결과 (PASSED/NEEDS_REVIEW/SKIPPED/FAILED)
+4. `intel-report-YYYY-MM-DD.md` - 최종 통합 보고서
+5. `doc-update-actions-YYYY-MM-DD.md` - 자동 액션 티켓 (**v2.0 추가**)
 
 ---
 
@@ -42,7 +44,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                   Change→Insight Pipeline                   │
+│              Change→Insight Pipeline v2.0                   │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  [Step 1] 변경사항 입력 수집                                │
@@ -51,11 +53,13 @@
 │     ↓                                                       │
 │  [Step 3] 영향도 매핑 (@impact-mapper)                     │
 │     ↓                                                       │
-│  [Step 4] 나노바나나 QA 게이트 (@nanobanana-qa-gate)       │
+│  [Step 4] 나노바나나 QA 게이트 (@nanobanana-qa-gate v2)    │
 │     ↓                                                       │
-│  [Step 5] 문서 자동 갱신 지시                              │
+│  [Step 5] 액션 티켓 생성 (@doc-update-actions) ← v2.0 추가 │
 │     ↓                                                       │
-│  [Step 6] 최종 보고서 생성                                 │
+│  [Step 6] 문서 자동 갱신                                   │
+│     ↓                                                       │
+│  [Step 7] 최종 보고서 생성                                 │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```

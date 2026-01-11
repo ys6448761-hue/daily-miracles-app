@@ -1,0 +1,83 @@
+{
+  "character_id": "komi",
+  "version": "1.0.0",
+  "created_at": "2026-01-11",
+  "updated_at": "2026-01-11",
+
+  "identity": {
+    "name_ko": "코미",
+    "name_en": "Komi",
+    "role": "COO 운영 총괄 AI",
+    "type": "dragon_ai",
+    "archetype": "manager_organizer"
+  },
+
+  "visual_dna": {
+    "face": {
+      "eyes": "alert_focused",
+      "expression": "professional_friendly",
+      "detail_level": "minimal_ghibli"
+    },
+    "form": {
+      "style": "eastern_dragon_humanoid",
+      "scales": "ocean_blue_shimmer",
+      "silhouette": "compact_efficient"
+    }
+  },
+
+  "color_palette": {
+    "primary": {
+      "name": "Ocean Blue",
+      "hex": "#1976D2",
+      "usage": "main_body_outfit"
+    },
+    "secondary": {
+      "name": "Silver",
+      "hex": "#B0BEC5",
+      "usage": "accents_metallic"
+    },
+    "tertiary": {
+      "name": "Deep Navy",
+      "hex": "#0D47A1",
+      "usage": "shadows_depth"
+    }
+  },
+
+  "costume": {
+    "base": "structured_hanbok_vest",
+    "pattern": "wave_motif_subtle",
+    "signature_elements": [
+      "ocean_blue_main",
+      "silver_buttons_trim"
+    ]
+  },
+
+  "accessories": {
+    "primary": {
+      "name": "Clipboard Fish",
+      "name_ko": "클립보드 물고기",
+      "description": "Small silver fish companion holding/being a clipboard"
+    }
+  },
+
+  "forbidden_changes": [
+    "color_to_green_purple",
+    "remove_clipboard_fish",
+    "chaotic_appearance",
+    "3d_realistic_style"
+  ],
+
+  "reference_set": {
+    "01_front": "assets/references/characters/komi/01_front.png",
+    "02_3quarter": null,
+    "03_fullbody": null,
+    "master_sheet": null
+  },
+
+  "style_tags": [
+    "ghibli_warmth",
+    "korean_webtoon",
+    "watercolor_texture",
+    "organized_energy"
+  ]
+}
