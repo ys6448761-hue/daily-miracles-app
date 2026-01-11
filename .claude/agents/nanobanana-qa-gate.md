@@ -282,10 +282,52 @@ consistency-score.json 필수 필드:
 
 ---
 
+## 12. SKIPPED 사용 규칙 (품질 오해 방지)
+
+### SKIPPED 조건
+
+다음 **모두 해당** 시에만 SKIPPED 허용:
+
+```
+✅ 이미지 파일 변경 없음 (assets/characters/*, assets/references/*)
+✅ 캐릭터 바이블 변경 없음 (brand/characters/*)
+✅ 프롬프트/가드 변경 없음 (prompts/nanobanana/*)
+✅ 스타일 앵커 변경 없음
+```
+
+### 절대 금지
+
+| 금지 사항 | 이유 |
+|----------|------|
+| ❌ SKIPPED를 PASSED로 기록 | 품질 보장 오해 유발 |
+| ❌ 이미지 변경 시 SKIPPED | 반드시 점수 평가 필요 |
+| ❌ "신규 생성이라 SKIPPED" | 신규도 점수 평가 후 PASSED |
+
+### SKIPPED 리포트 형식
+
+```json
+{
+  "gate_status": "SKIPPED",
+  "score": null,
+  "reason": "이미지/캐릭터 관련 변경 없음",
+  "changed_files": ["docs/...", "routes/..."],
+  "skipped_checks": ["character_consistency", "style_check"]
+}
+```
+
+### 중요 원칙
+
+> **"SKIPPED ≠ PASSED"**
+> SKIPPED는 "검사 대상 아님"이지, "검사 통과"가 아님.
+> 95% 자동화 비율 계산 시 SKIPPED는 분모에서 제외.
+
+---
+
 ## 변경 이력
 
 | 날짜 | 버전 | 변경 내용 |
 |------|------|----------|
+| 2026-01-11 | 2.1 | SKIPPED 사용 규칙 명시, Golden best 승격 연동 |
 | 2026-01-11 | 2.0 | v2.0 업그레이드: PASSED/NEEDS_REVIEW/FAILED/SKIPPED 4종 상태, 점수 기준 강화(57+), consistency 보고서 구조 |
 | 2026-01-11 | 1.0 | 최초 생성 |
 
