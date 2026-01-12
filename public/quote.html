@@ -153,6 +153,59 @@
       border-color: #667eea;
     }
 
+    /* 레저 체크박스 */
+    .leisure-checkboxes {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .leisure-checkbox {
+      display: flex;
+      align-items: center;
+      padding: 12px 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+    }
+
+    .leisure-checkbox:hover {
+      border-color: #667eea;
+      background: #f8f9ff;
+    }
+
+    .leisure-checkbox input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      cursor: pointer;
+      accent-color: #667eea;
+    }
+
+    .leisure-checkbox input[type="checkbox"]:checked + .checkbox-label {
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    .leisure-checkbox:has(input:checked) {
+      border-color: #667eea;
+      background: #f0f4ff;
+    }
+
+    .checkbox-label {
+      flex: 1;
+      font-size: 15px;
+      color: #333;
+    }
+
+    .checkbox-price {
+      font-size: 13px;
+      font-weight: 600;
+      color: #667eea;
+    }
+
     /* 견적 버튼 */
     .calculate-btn {
       width: 100%;
@@ -515,14 +568,29 @@
         </div>
 
         <div class="form-group">
-          <label>레저 선택 (선택사항)</label>
-          <select id="leisure-select">
-            <option value="">레저 없음</option>
-            <option value="cable">케이블카</option>
-            <option value="aqua">아쿠아플라넷</option>
-            <option value="cruise">유람선</option>
-            <option value="yacht">요트</option>
-          </select>
+          <label>레저 선택 (복수 선택 가능)</label>
+          <div class="leisure-checkboxes" id="leisure-checkboxes">
+            <label class="leisure-checkbox">
+              <input type="checkbox" value="cable" data-name="케이블카" data-weekday="16000" data-weekend="16000">
+              <span class="checkbox-label">케이블카</span>
+              <span class="checkbox-price">+16,000원</span>
+            </label>
+            <label class="leisure-checkbox">
+              <input type="checkbox" value="aqua" data-name="아쿠아플라넷" data-weekday="32000" data-weekend="32000">
+              <span class="checkbox-label">아쿠아플라넷</span>
+              <span class="checkbox-price">+32,000원</span>
+            </label>
+            <label class="leisure-checkbox">
+              <input type="checkbox" value="cruise" data-name="유람선" data-weekday="13000" data-weekend="35000">
+              <span class="checkbox-label">유람선</span>
+              <span class="checkbox-price" data-weekday="+13,000원" data-weekend="+35,000원">+13,000원~</span>
+            </label>
+            <label class="leisure-checkbox">
+              <input type="checkbox" value="yacht" data-name="요트" data-weekday="35000" data-weekend="55000">
+              <span class="checkbox-label">요트</span>
+              <span class="checkbox-price" data-weekday="+35,000원" data-weekend="+55,000원">+35,000원~</span>
+            </label>
+          </div>
         </div>
 
         <button class="calculate-btn" id="calculate-btn" disabled>견적 계산하기</button>
@@ -622,16 +690,66 @@
     const groupSection = document.getElementById('group-section');
     const travelDateInput = document.getElementById('travel-date');
     const hotelSelect = document.getElementById('hotel-select');
-    const leisureSelect = document.getElementById('leisure-select');
+    const leisureCheckboxes = document.querySelectorAll('#leisure-checkboxes input[type="checkbox"]');
     const calculateBtn = document.getElementById('calculate-btn');
     const quoteResult = document.getElementById('quote-result');
     const loadingEl = document.getElementById('loading');
     const errorMsg = document.getElementById('error-msg');
 
+    // 레저 가격표 (1인당, list 가격 포함)
+    const leisurePrices = {
+      cable: { weekday: { sell: 16000, list: 20000 }, weekend: { sell: 16000, list: 20000 } },
+      aqua: { weekday: { sell: 32000, list: 40000 }, weekend: { sell: 32000, list: 40000 } },
+      cruise: { weekday: { sell: 13000, list: 19800 }, weekend: { sell: 35000, list: 45000 } },
+      yacht: { weekday: { sell: 35000, list: 40000 }, weekend: { sell: 55000, list: 60000 } }
+    };
+
+    const leisureNames = {
+      cable: '케이블카',
+      aqua: '아쿠아플라넷',
+      cruise: '유람선',
+      yacht: '요트'
+    };
+
     // 오늘 날짜를 최소값으로 설정
     const today = new Date().toISOString().split('T')[0];
     travelDateInput.min = today;
     travelDateInput.value = today;
+
+    // 주말 여부 판단 (금/토/일/공휴일)
+    function isWeekend(dateStr) {
+      const date = new Date(dateStr);
+      const day = date.getDay();
+      // 0=일, 5=금, 6=토
+      return day === 0 || day === 5 || day === 6;
+    }
+
+    // 선택된 레저 가져오기
+    function getSelectedLeisures() {
+      const selected = [];
+      leisureCheckboxes.forEach(cb => {
+        if (cb.checked) {
+          selected.push(cb.value);
+        }
+      });
+      return selected;
+    }
+
+    // 레저 총 가격 계산 (sell, list 모두)
+    function calculateLeisureTotal(leisures, dateStr, guestCount) {
+      const priceType = isWeekend(dateStr) ? 'weekend' : 'weekday';
+      let totalSell = 0;
+      let totalList = 0;
+
+      leisures.forEach(code => {
+        if (leisurePrices[code]) {
+          totalSell += leisurePrices[code][priceType].sell * guestCount;
+          totalList += leisurePrices[code][priceType].list * guestCount;
+        }
+      });
+
+      return { sell: totalSell, list: totalList };
+    }
 
     // 인원 버튼 클릭
     guestBtns.forEach(btn => {
@@ -697,6 +815,7 @@
       errorMsg.classList.remove('show');
 
       try {
+        // API 호출 (레저 없이 - 프론트에서 합산)
         const response = await fetch('/api/v2/quote/calculate', {
           method: 'POST',
           headers: {
@@ -706,7 +825,7 @@
             guestCount: selectedGuests,
             date: travelDateInput.value,
             hotel: hotelSelect.value,
-            leisure: leisureSelect.value || null,
+            leisure: null, // 레저는 프론트에서 계산
             hasWishVoyage: false
           })
         });
@@ -716,6 +835,19 @@
         if (!data.success) {
           throw new Error(data.message || '견적 계산에 실패했습니다.');
         }
+
+        // 선택된 레저들의 가격 계산
+        const selectedLeisures = getSelectedLeisures();
+        const leisureTotal = calculateLeisureTotal(selectedLeisures, travelDateInput.value, selectedGuests);
+
+        // 최종 가격에 레저 합산
+        data.pricing.totalSell += leisureTotal.sell;
+        data.pricing.totalList += leisureTotal.list;
+        data.pricing.totalSavings = data.pricing.totalList - data.pricing.totalSell;
+
+        // 레저 정보 저장
+        data.selectedLeisures = selectedLeisures;
+        data.leisureTotal = leisureTotal;
 
         currentQuote = data;
         displayQuoteResult(data);
@@ -732,7 +864,7 @@
 
     // 견적 결과 표시
     function displayQuoteResult(data) {
-      const { pricing, breakdown } = data;
+      const { pricing, breakdown, selectedLeisures, leisureTotal } = data;
 
       // 가격 표시
       document.getElementById('result-list-price').textContent =
@@ -747,7 +879,6 @@
 
       // 내역 표시
       const hotelItem = breakdown.find(b => b.category === 'hotel');
-      const leisureItem = breakdown.find(b => b.category === 'leisure');
       const operationItem = breakdown.find(b => b.category === 'operation');
 
       if (hotelItem) {
@@ -755,11 +886,13 @@
           `${hotelItem.name} ${hotelItem.sell.toLocaleString()}원`;
       }
 
+      // 레저 표시 (다중 선택)
       const leisureRow = document.getElementById('breakdown-leisure-row');
-      if (leisureItem) {
+      if (selectedLeisures && selectedLeisures.length > 0) {
         leisureRow.style.display = 'flex';
+        const leisureNamesStr = selectedLeisures.map(code => leisureNames[code]).join(', ');
         document.getElementById('breakdown-leisure').textContent =
-          `${leisureItem.name} ${leisureItem.sell.toLocaleString()}원`;
+          `${leisureNamesStr} ${leisureTotal.sell.toLocaleString()}원`;
       } else {
         leisureRow.style.display = 'none';
       }
@@ -774,9 +907,12 @@
       document.getElementById('breakdown-per-person').textContent =
         `${perPerson.toLocaleString()}원`;
 
-      // 예약 버튼 URL 업데이트 (견적 ID 포함)
+      // 예약 버튼 URL 업데이트 (견적 ID + 레저 정보 포함)
       const requestBtn = document.getElementById('request-btn');
-      requestBtn.href = `https://pf.kakao.com/_xfxhcWn?text=견적번호: ${data.quoteId}`;
+      const leisureInfo = selectedLeisures.length > 0
+        ? `, 레저: ${selectedLeisures.map(code => leisureNames[code]).join('+')}`
+        : '';
+      requestBtn.href = `https://pf.kakao.com/_xfxhcWn?text=견적번호: ${data.quoteId}${leisureInfo}`;
 
       // 결과 표시
       quoteResult.classList.add('show');
@@ -804,7 +940,7 @@
       trackEvent('calculate_quote', {
         guests: selectedGuests,
         hotel: hotelSelect.value,
-        leisure: leisureSelect.value
+        leisures: getSelectedLeisures().join(',')
       });
     });
   </script>
