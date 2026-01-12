@@ -10,10 +10,12 @@
     "DOC-GROWTH-ROADMAP",
     "DOC-LAUNCH-DECLARATION",
     "DOC-JAEMI_ONBOARDING_v11",
+    "DOC-JAEMI_ONBOARDING_v12",
     "DOC-service-flow",
     "DOC-README",
     "DOC-REVIEW_COLLECTION_SYSTEM",
     "DOC-ROADMAP_API",
+    "DOC-GA4_SETUP_GUIDE",
     "DOC-agents-index",
     "DOC-Aurora5_토론시스템_안내문",
     "DOC-WIX_TEAM_PAGE_CONTENT",
@@ -92,6 +94,7 @@
     "DOC-GROWTH-ROADMAP",
     "DOC-LAUNCH-DECLARATION",
     "DOC-JAEMI_ONBOARDING_v11",
+    "DOC-JAEMI_ONBOARDING_v12",
     "DOC-README",
     "DOC-ROADMAP_API",
     "DOC-agents-index",
@@ -191,6 +194,8 @@
   ],
   "결제": [
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
+    "DOC-JAEMI_ONBOARDING_v12",
+    "DOC-GA4_SETUP_GUIDE",
     "DOC-20260101-MKI",
     "DOC-20260101-4PA",
     "DOC-20260101-TRD",
@@ -255,7 +260,8 @@
     "DOC-최수민방식_완전정리"
   ],
   "onboarding": [
-    "DOC-JAEMI_ONBOARDING_v11"
+    "DOC-JAEMI_ONBOARDING_v11",
+    "DOC-JAEMI_ONBOARDING_v12"
   ],
   "ops": [
     "DOC-DEC_OPERATIONS"
@@ -284,13 +290,11 @@
     "DOC-README",
     "DOC-ROADMAP_API"
   ],
-  "system": [
-    "DOC-agents-index",
-    "DOC-conversation-workflow",
-    "DOC-manifest-system",
-    "DOC-SYS-2025-1230-LUMI-001_Airtabl"
+  "setup": [
+    "DOC-GA4_SETUP_GUIDE"
   ],
   "storybook": [
+    "DOC-GA4_SETUP_GUIDE",
     "DOC-manifest-system",
     "DOC-20260101-4PA",
     "DOC-20260101-ICN",
@@ -299,6 +303,12 @@
     "DOC-20260101-99J",
     "DOC-2025-12-29_Part6_소원착지전략",
     "DOC-20251229-SRH"
+  ],
+  "system": [
+    "DOC-agents-index",
+    "DOC-conversation-workflow",
+    "DOC-manifest-system",
+    "DOC-SYS-2025-1230-LUMI-001_Airtabl"
   ],
   "team": [
     "DOC-Aurora5_토론시스템_안내문"

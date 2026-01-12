@@ -257,6 +257,11 @@ app.use((req, _res, next) => {
 // ---------- Static ----------
 app.use(express.static(path.join(__dirname, "public")));
 
+// ---------- Clean URL Routes (확장자 없이 접근) ----------
+app.get("/quote", (_req, res) => {
+  res.sendFile(path.join(__dirname, "public", "quote.html"));
+});
+
 // ---------- Request Logging (가시화) ----------
 if (String(process.env.REQUEST_LOG || "1") === "1") {
   app.use((req, _res, next) => {

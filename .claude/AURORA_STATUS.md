@@ -1,7 +1,7 @@
 # AURORA_STATUS.md
 ## 하루하루의 기적 - 프로젝트 현황판
 
-**마지막 업데이트**: 2026-01-11 20:00 KST
+**마지막 업데이트**: 2026-01-12 KST
 **업데이트 담당**: Claude Code
 
 ---
@@ -55,11 +55,42 @@
 🟢 완료: NanoBanana C.C.E v2.0 + Change→Insight v2.0 통합 업그레이드
 🟢 완료: Aurora5 Visual OS v1.0 (엔진-독립형 95% 유지 운영체계)
 🟢 완료: team_shot_best_v2b 멀티턴 편집 (QA 95점, 코드/코미 마커 강화)
+🟢 완료: 재미 온보딩 가이드 v1.2 (복귀 브리핑 문서)
+🟡 진행중: GA4 설정 (측정 ID 대기 중)
+🟡 진행중: 10회 검증 validation (1/10 완료)
 ```
 
 ---
 
 ## 최근 완료 작업
+
+### 2026-01-12: GA4 설정 준비
+
+| 작업 | 상태 | 산출물 |
+|------|------|--------|
+| 기존 gtag 코드 확인 | ✅ | index.html, beta.html, feedback.html |
+| GA4 설정 가이드 생성 | ✅ | `docs/setup/GA4_SETUP_GUIDE.md` |
+| 측정 ID 설정 | ⏳ | **측정 ID (G-XXXXXXXXXX) 대기 중** |
+
+### 현재 트래킹 상태
+
+| 항목 | 상태 |
+|------|------|
+| gtag 이벤트 코드 | ✅ 일부 구현됨 |
+| gtag.js 스크립트 로드 | ❌ 미설정 |
+| GA4 측정 ID | ❌ 필요 |
+| Meta Pixel | ❌ 미설정 |
+| TikTok Pixel | ❌ 미설정 |
+
+### 다음 단계
+
+```
+1. GA4 측정 ID (G-XXXXXXXXXX) 제공
+2. 19개 HTML 파일에 gtag 스크립트 추가
+3. 전환 이벤트 설정 (start_trial, complete_day7, purchase)
+```
+
+---
 
 ### 2026-01-11: team_shot_best_v2b 멀티턴 편집 완료
 
@@ -854,6 +885,7 @@ curl -X POST http://localhost:5100/api/debate/run \
 
 | 날짜 | 담당 | 내용 |
 |------|------|------|
+| 2026-01-12 | Code | GA4 설정 가이드 생성, 트래킹 현황 분석 (측정 ID 대기 중) |
 | 2026-01-11 20:00 | Code | team_shot_best_v2b 멀티턴 편집 완료 (QA 95점, 코드/코미 마커 강화) |
 | 2026-01-11 18:30 | Code | Aurora5 Visual OS v1.0 구축 (엔진-독립형 95% 유지 운영체계) |
 | 2026-01-11 15:30 | Code | NanoBanana C.C.E v2.0 + Change→Insight v2.0 통합 업그레이드 |

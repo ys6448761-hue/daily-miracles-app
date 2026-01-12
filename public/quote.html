@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>여수 소원여행 견적 - 하루하루의 기적</title>
+  <meta name="description" content="여수 소원여행 특가 견적을 바로 확인하세요. 날짜와 인원만 선택하면 자동 계산됩니다.">
+  <meta property="og:title" content="여수 소원여행 견적 - 하루하루의 기적">
+  <meta property="og:description" content="날짜와 인원만 선택하면 소원여정 특가가 자동 계산됩니다.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 20px 16px;
+      min-height: 100vh;
+    }
+
+    /* 헤더 */
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+      line-height: 1.5;
+    }
+
+    /* 메인 카드 */
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 24px 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    }
+
+    /* 인원 선택 */
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 12px;
+    }
+
+    .guest-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .guest-btn {
+      flex: 1;
+      padding: 14px 8px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      background: white;
+      font-size: 15px;
+      font-weight: 600;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .guest-btn:hover {
+      border-color: #667eea;
+      color: #667eea;
+    }
+
+    .guest-btn.active {
+      border-color: #667eea;
+      background: #667eea;
+      color: white;
+    }
+
+    .guest-btn.group-btn {
+      background: #fff8e1;
+      border-color: #ffc107;
+      color: #f57c00;
+    }
+
+    .guest-btn.group-btn:hover {
+      background: #ffecb3;
+    }
+
+    .guest-btn.group-btn.active {
+      background: #ff9800;
+      border-color: #ff9800;
+      color: white;
+    }
+
+    /* 개인 견적 폼 */
+    #individual-form {
+      display: none;
+    }
+
+    #individual-form.show {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .form-group select,
+    .form-group input[type="date"] {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 15px;
+      font-family: inherit;
+      color: #333;
+      background: white;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .form-group select:focus,
+    .form-group input[type="date"]:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    /* 견적 버튼 */
+    .calculate-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .calculate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .calculate-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* 견적 결과 */
+    #quote-result {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      background: linear-gradient(135deg, #f8f9ff, #fff);
+      border-radius: 16px;
+      border: 2px solid #667eea;
+    }
+
+    #quote-result.show {
+      display: block;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-header {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .result-header h3 {
+      font-size: 14px;
+      color: #667eea;
+      margin-bottom: 4px;
+    }
+
+    .result-price {
+      font-size: 32px;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .result-price .original {
+      font-size: 16px;
+      color: #999;
+      text-decoration: line-through;
+      margin-right: 8px;
+    }
+
+    .result-discount {
+      display: inline-block;
+      background: #ff5252;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    .result-breakdown {
+      margin: 16px 0;
+      padding: 16px;
+      background: white;
+      border-radius: 12px;
+    }
+
+    .breakdown-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 14px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .breakdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .breakdown-item .label {
+      color: #666;
+    }
+
+    .breakdown-item .value {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .benefits {
+      margin-top: 16px;
+    }
+
+    .benefit-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      font-size: 14px;
+      color: #28a745;
+    }
+
+    .benefit-item::before {
+      content: '✅';
+    }
+
+    .request-btn {
+      width: 100%;
+      padding: 16px;
+      background: #28a745;
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: background 0.2s;
+    }
+
+    .request-btn:hover {
+      background: #218838;
+    }
+
+    /* 단체 안내 */
+    #group-section {
+      display: none;
+    }
+
+    #group-section.show {
+      display: block;
+      animation: slideUp 0.3s ease;
+    }
+
+    .group-banner {
+      background: linear-gradient(135deg, #ff9800, #f57c00);
+      border-radius: 16px;
+      padding: 24px 20px;
+      text-align: center;
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    .group-banner .emoji {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+
+    .group-banner h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .group-banner p {
+      font-size: 14px;
+      opacity: 0.95;
+      line-height: 1.6;
+    }
+
+    .group-benefits {
+      background: #fff8e1;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .group-benefit-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      font-size: 15px;
+      color: #333;
+    }
+
+    .group-benefit-item::before {
+      content: '✅';
+      font-size: 16px;
+    }
+
+    .kakao-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 18px;
+      background: #FEE500;
+      border: none;
+      border-radius: 12px;
+      color: #3C1E1E;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .kakao-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(254, 229, 0, 0.5);
+    }
+
+    .kakao-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .contact-info {
+      text-align: center;
+      margin-top: 16px;
+      padding: 16px;
+      background: #f8f9fa;
+      border-radius: 12px;
+    }
+
+    .contact-info p {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    .contact-info .phone {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    /* 푸터 */
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: rgba(255,255,255,0.7);
+      font-size: 12px;
+    }
+
+    .footer a {
+      color: rgba(255,255,255,0.9);
+      text-decoration: none;
+    }
+
+    /* 로딩 */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .loading.show {
+      display: block;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e0e0e0;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* 에러 */
+    .error-msg {
+      display: none;
+      padding: 16px;
+      background: #ffebee;
+      border-radius: 12px;
+      color: #c62828;
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .error-msg.show {
+      display: block;
+    }
+
+    /* 모바일 최적화 */
+    @media (max-width: 400px) {
+      .container {
+        padding: 16px 12px;
+      }
+
+      .header h1 {
+        font-size: 20px;
+      }
+
+      .guest-btn {
+        padding: 12px 6px;
+        font-size: 14px;
+      }
+
+      .result-price {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 헤더 -->
+    <div class="header">
+      <h1>여수 소원여행, 딱 맞는 견적</h1>
+      <p>날짜와 인원만 선택하면<br>소원여정 특가가 자동 계산됩니다.</p>
+    </div>
+
+    <!-- 메인 카드 -->
+    <div class="card">
+      <!-- 인원 선택 -->
+      <div class="section-title">인원을 선택하세요</div>
+      <div class="guest-selector">
+        <button class="guest-btn" data-guests="2">2인</button>
+        <button class="guest-btn" data-guests="3">3인</button>
+        <button class="guest-btn" data-guests="4">4인</button>
+        <button class="guest-btn group-btn" data-guests="5">5인+</button>
+      </div>
+
+      <!-- 개인 견적 폼 (2~4인) -->
+      <div id="individual-form">
+        <div class="form-group">
+          <label>여행 날짜</label>
+          <input type="date" id="travel-date" required>
+        </div>
+
+        <div class="form-group">
+          <label>숙소 선택</label>
+          <select id="hotel-select">
+            <option value="">숙소를 선택하세요</option>
+            <option value="utop">유탑마리나 호텔</option>
+            <option value="ramada">라마다 호텔</option>
+            <option value="odongjae">오동재 호텔</option>
+            <option value="kenny">케니 호텔 (2~3인만)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>레저 선택 (선택사항)</label>
+          <select id="leisure-select">
+            <option value="">레저 없음</option>
+            <option value="cable">케이블카</option>
+            <option value="aqua">아쿠아플라넷</option>
+            <option value="cruise">유람선</option>
+            <option value="yacht">요트</option>
+          </select>
+        </div>
+
+        <button class="calculate-btn" id="calculate-btn" disabled>견적 계산하기</button>
+
+        <!-- 로딩 -->
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <p>견적 계산 중...</p>
+        </div>
+
+        <!-- 에러 메시지 -->
+        <div class="error-msg" id="error-msg"></div>
+
+        <!-- 견적 결과 -->
+        <div id="quote-result">
+          <div class="result-header">
+            <h3>소원여정 특가</h3>
+            <div class="result-price">
+              <span class="original" id="result-list-price"></span>
+              <span id="result-sell-price"></span>
+            </div>
+            <span class="result-discount" id="result-discount"></span>
+          </div>
+
+          <div class="result-breakdown">
+            <div class="breakdown-item">
+              <span class="label">숙소</span>
+              <span class="value" id="breakdown-hotel"></span>
+            </div>
+            <div class="breakdown-item" id="breakdown-leisure-row" style="display:none;">
+              <span class="label">레저</span>
+              <span class="value" id="breakdown-leisure"></span>
+            </div>
+            <div class="breakdown-item">
+              <span class="label">운영비</span>
+              <span class="value" id="breakdown-operation"></span>
+            </div>
+            <div class="breakdown-item">
+              <span class="label">1인당</span>
+              <span class="value" id="breakdown-per-person"></span>
+            </div>
+          </div>
+
+          <div class="benefits">
+            <div class="benefit-item">소원3합 패스 52% 할인 포함</div>
+            <div class="benefit-item">정상가 대비 최대 30% 절약</div>
+          </div>
+
+          <a href="https://pf.kakao.com/_xfxhcWn" target="_blank" class="request-btn" id="request-btn">
+            예약 상담하기
+          </a>
+        </div>
+      </div>
+
+      <!-- 단체 안내 (5인+) -->
+      <div id="group-section">
+        <div class="group-banner">
+          <div class="emoji">🎉</div>
+          <h2>5인 이상 단체 여행이시군요!</h2>
+          <p>단체 고객님께는 특별 맞춤 견적을 드려요.<br>24시간 내 맞춤 견적서를 보내드립니다!</p>
+        </div>
+
+        <div class="group-benefits">
+          <div class="group-benefit-item">단체 특별 할인 적용</div>
+          <div class="group-benefit-item">맞춤형 일정 제안</div>
+          <div class="group-benefit-item">전담 담당자 배정</div>
+        </div>
+
+        <a href="https://pf.kakao.com/_xfxhcWn" target="_blank" class="kakao-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.88 5.32 4.7 6.72-.15.54-.97 3.46-.99 3.7 0 0-.02.17.09.23.11.07.24.02.24.02.32-.04 3.72-2.42 4.3-2.84.54.08 1.1.12 1.66.12 5.52 0 10-3.58 10-8 0-4.42-4.48-8-10-8z"/>
+          </svg>
+          카카오톡으로 상담하기
+        </a>
+
+        <div class="contact-info">
+          <p>전화 문의</p>
+          <a href="tel:010-3819-6178" class="phone">010-3819-6178</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 푸터 -->
+    <div class="footer">
+      <p>하루하루의 기적 | <a href="https://dailymiracles.kr">dailymiracles.kr</a></p>
+    </div>
+  </div>
+
+  <script>
+    // 상태 관리
+    let selectedGuests = 0;
+    let currentQuote = null;
+
+    // DOM 요소
+    const guestBtns = document.querySelectorAll('.guest-btn');
+    const individualForm = document.getElementById('individual-form');
+    const groupSection = document.getElementById('group-section');
+    const travelDateInput = document.getElementById('travel-date');
+    const hotelSelect = document.getElementById('hotel-select');
+    const leisureSelect = document.getElementById('leisure-select');
+    const calculateBtn = document.getElementById('calculate-btn');
+    const quoteResult = document.getElementById('quote-result');
+    const loadingEl = document.getElementById('loading');
+    const errorMsg = document.getElementById('error-msg');
+
+    // 오늘 날짜를 최소값으로 설정
+    const today = new Date().toISOString().split('T')[0];
+    travelDateInput.min = today;
+    travelDateInput.value = today;
+
+    // 인원 버튼 클릭
+    guestBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        guestBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedGuests = parseInt(btn.dataset.guests);
+
+        // 결과 초기화
+        quoteResult.classList.remove('show');
+        errorMsg.classList.remove('show');
+
+        if (selectedGuests >= 5) {
+          // 단체 모드
+          individualForm.classList.remove('show');
+          groupSection.classList.add('show');
+        } else {
+          // 개인 모드
+          groupSection.classList.remove('show');
+          individualForm.classList.add('show');
+          updateKennyOption();
+          validateForm();
+        }
+      });
+    });
+
+    // 케니 호텔 옵션 업데이트 (4인 선택 시 비활성화)
+    function updateKennyOption() {
+      const kennyOption = hotelSelect.querySelector('option[value="kenny"]');
+      if (selectedGuests === 4) {
+        kennyOption.disabled = true;
+        kennyOption.textContent = '케니 호텔 (2~3인만 가능)';
+        if (hotelSelect.value === 'kenny') {
+          hotelSelect.value = '';
+        }
+      } else {
+        kennyOption.disabled = false;
+        kennyOption.textContent = '케니 호텔 (2~3인만)';
+      }
+    }
+
+    // 폼 유효성 검사
+    function validateForm() {
+      const isValid = selectedGuests > 0 &&
+                      selectedGuests <= 4 &&
+                      travelDateInput.value &&
+                      hotelSelect.value;
+      calculateBtn.disabled = !isValid;
+    }
+
+    // 입력 변경 시 유효성 검사
+    travelDateInput.addEventListener('change', validateForm);
+    hotelSelect.addEventListener('change', validateForm);
+
+    // 견적 계산
+    calculateBtn.addEventListener('click', async () => {
+      if (calculateBtn.disabled) return;
+
+      // UI 상태
+      calculateBtn.disabled = true;
+      loadingEl.classList.add('show');
+      quoteResult.classList.remove('show');
+      errorMsg.classList.remove('show');
+
+      try {
+        const response = await fetch('/api/v2/quote/calculate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            guestCount: selectedGuests,
+            date: travelDateInput.value,
+            hotel: hotelSelect.value,
+            leisure: leisureSelect.value || null,
+            hasWishVoyage: false
+          })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.message || '견적 계산에 실패했습니다.');
+        }
+
+        currentQuote = data;
+        displayQuoteResult(data);
+
+      } catch (error) {
+        console.error('Quote error:', error);
+        errorMsg.textContent = error.message || '견적 계산 중 오류가 발생했습니다.';
+        errorMsg.classList.add('show');
+      } finally {
+        loadingEl.classList.remove('show');
+        calculateBtn.disabled = false;
+      }
+    });
+
+    // 견적 결과 표시
+    function displayQuoteResult(data) {
+      const { pricing, breakdown } = data;
+
+      // 가격 표시
+      document.getElementById('result-list-price').textContent =
+        pricing.totalList.toLocaleString() + '원';
+      document.getElementById('result-sell-price').textContent =
+        pricing.totalSell.toLocaleString() + '원';
+
+      // 할인율 계산
+      const discountPercent = Math.round((1 - pricing.totalSell / pricing.totalList) * 100);
+      document.getElementById('result-discount').textContent =
+        `${discountPercent}% 할인`;
+
+      // 내역 표시
+      const hotelItem = breakdown.find(b => b.category === 'hotel');
+      const leisureItem = breakdown.find(b => b.category === 'leisure');
+      const operationItem = breakdown.find(b => b.category === 'operation');
+
+      if (hotelItem) {
+        document.getElementById('breakdown-hotel').textContent =
+          `${hotelItem.name} ${hotelItem.sell.toLocaleString()}원`;
+      }
+
+      const leisureRow = document.getElementById('breakdown-leisure-row');
+      if (leisureItem) {
+        leisureRow.style.display = 'flex';
+        document.getElementById('breakdown-leisure').textContent =
+          `${leisureItem.name} ${leisureItem.sell.toLocaleString()}원`;
+      } else {
+        leisureRow.style.display = 'none';
+      }
+
+      if (operationItem) {
+        document.getElementById('breakdown-operation').textContent =
+          `${operationItem.sell.toLocaleString()}원`;
+      }
+
+      // 1인당 가격
+      const perPerson = Math.round(pricing.totalSell / selectedGuests);
+      document.getElementById('breakdown-per-person').textContent =
+        `${perPerson.toLocaleString()}원`;
+
+      // 예약 버튼 URL 업데이트 (견적 ID 포함)
+      const requestBtn = document.getElementById('request-btn');
+      requestBtn.href = `https://pf.kakao.com/_xfxhcWn?text=견적번호: ${data.quoteId}`;
+
+      // 결과 표시
+      quoteResult.classList.add('show');
+
+      // 스크롤
+      quoteResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // gtag 이벤트 (있을 경우)
+    function trackEvent(eventName, params = {}) {
+      if (typeof gtag === 'function') {
+        gtag('event', eventName, params);
+      }
+    }
+
+    // 인원 선택 트래킹
+    guestBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        trackEvent('select_guests', { guests: btn.dataset.guests });
+      });
+    });
+
+    // 견적 계산 트래킹
+    calculateBtn.addEventListener('click', () => {
+      trackEvent('calculate_quote', {
+        guests: selectedGuests,
+        hotel: hotelSelect.value,
+        leisure: leisureSelect.value
+      });
+    });
+  </script>
+</body>
+</html>
