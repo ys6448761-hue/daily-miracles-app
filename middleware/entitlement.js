@@ -21,7 +21,7 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || 'daily-miracles-secret-key-change-in-production';
 
 // 유효 권한 키 목록
-const VALID_ENTITLEMENTS = ['trial', 'wish_30', 'solve_30', 'dual_30'];
+const VALID_ENTITLEMENTS = ['trial', 'starter_7', 'wish_30', 'solve_30', 'dual_30'];
 
 // DB 모듈 (선택적 로딩 - 실패 시 deny)
 let db = null;

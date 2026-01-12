@@ -67,6 +67,33 @@
       font-size: 12px;
       font-weight: 700;
     }
+    .product-card.entry {
+      border: 3px solid #ffc107;
+      position: relative;
+    }
+    .product-card.entry::before {
+      content: 'START';
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffc107;
+      color: #333;
+      padding: 4px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .upgrade-notice {
+      background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      color: #856404;
+      font-weight: 600;
+      line-height: 1.4;
+    }
     .product-icon {
       font-size: 48px;
       margin-bottom: 16px;
@@ -222,11 +249,21 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>30일 프로그램</h1>
-      <p>하루하루의 기적과 함께하는 30일 여정</p>
+      <h1>소원실현 프로그램</h1>
+      <p>하루하루의 기적과 함께하는 여정</p>
     </div>
 
     <div class="products">
+      <!-- 소원 스타터 7 (엔트리) -->
+      <div class="product-card entry" data-sku="PRG_STARTER_7">
+        <div class="product-icon">⭐</div>
+        <div class="product-name">소원 스타터 7</div>
+        <div class="product-desc">로드맵 Lite PDF 1회<br>7일 체크인 기록/진행률<br>1회 리셋권</div>
+        <div class="product-price">9,900<span>원</span></div>
+        <div class="upgrade-notice">24시간 내 30일 업그레이드 시<br>9,900원 전액 크레딧!</div>
+        <button class="buy-btn" onclick="openCheckout('PRG_STARTER_7')">시작하기</button>
+      </div>
+
       <!-- 소원실현 30 -->
       <div class="product-card" data-sku="PRG_WISH_30">
         <div class="product-icon">✨</div>
@@ -302,6 +339,7 @@
 
   <script>
     const PRODUCTS = {
+      PRG_STARTER_7: { name: '소원 스타터 7', price: 9900 },
       PRG_WISH_30: { name: '소원실현 30', price: 29900 },
       PRG_SOLVE_30: { name: '문제해결 30', price: 29900 },
       PRG_DUAL_30: { name: '듀얼 30 (소원+해결)', price: 49900 }

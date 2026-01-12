@@ -13,6 +13,15 @@ const router = express.Router();
 // 1) 상품 정본 상수 (서버 단일 소스)
 // ───────────────────────────────────────────────────────────
 const PRODUCTS = {
+  PRG_STARTER_7: {
+    sku: 'PRG_STARTER_7',
+    name: '소원 스타터 7',
+    description: '7일 소원실현 스타터 프로그램',
+    price: 9900,
+    duration: 7,
+    entitlementKey: 'starter_7',
+    isEntry: true  // 엔트리 상품 표시
+  },
   PRG_WISH_30: {
     sku: 'PRG_WISH_30',
     name: '소원실현 30',
@@ -37,6 +46,14 @@ const PRODUCTS = {
     duration: 30,
     entitlementKey: 'dual_30'
   }
+};
+
+// 업그레이드 크레딧 상수
+const UPGRADE_CREDIT = {
+  fromSku: 'PRG_STARTER_7',
+  amount: 9900,
+  validHours: 24,
+  toSkus: ['PRG_WISH_30', 'PRG_SOLVE_30', 'PRG_DUAL_30']
 };
 
 // DB 모듈
@@ -72,6 +89,69 @@ function generateOrderId() {
 // ───────────────────────────────────────────────────────────
 function generateGuestToken() {
   return crypto.randomBytes(32).toString('hex');
+}
+
+// ───────────────────────────────────────────────────────────
+// Helper: 24시간 내 스타터 구매 이력으로 업그레이드 크레딧 확인
+// ───────────────────────────────────────────────────────────
+async function checkUpgradeCredit(trialToken, customerEmail, req) {
+  if (!db) return { hasCredit: false };
+
+  try {
+    // JWT에서 user_id 추출
+    let userId = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      try {
+        const jwt = require('jsonwebtoken');
+        const JWT_SECRET = process.env.JWT_SECRET || 'daily-miracles-secret-key-change-in-production';
+        const decoded = jwt.verify(authHeader.substring(7), JWT_SECRET);
+        userId = decoded.userId || null;
+      } catch (e) {
+        // JWT 검증 실패
+      }
+    }
+
+    // 24시간 내 starter_7 구매 이력 조회
+    // 조건: (user_id 일치) OR (trial_token 일치) OR (email 일치)
+    const query = `
+      SELECT order_id, paid_at, guest_access_token, trial_token
+      FROM program_orders
+      WHERE sku = $1
+        AND status = 'PAID'
+        AND paid_at > CURRENT_TIMESTAMP - INTERVAL '${UPGRADE_CREDIT.validHours} hours'
+        AND (
+          (user_id IS NOT NULL AND user_id = $2::uuid)
+          OR (trial_token IS NOT NULL AND trial_token = $3::text)
+          OR (customer_email = $4::text)
+        )
+      ORDER BY paid_at DESC
+      LIMIT 1
+    `;
+
+    const result = await db.query(query, [
+      UPGRADE_CREDIT.fromSku,
+      userId || '00000000-0000-0000-0000-000000000000',  // dummy UUID for null
+      trialToken || '',
+      customerEmail || ''
+    ]);
+
+    if (result.rows.length > 0) {
+      const starterOrder = result.rows[0];
+      console.log(`✅ [Credit] 스타터 구매 이력 발견: ${starterOrder.order_id}, 결제: ${starterOrder.paid_at}`);
+      return {
+        hasCredit: true,
+        starterOrderId: starterOrder.order_id,
+        paidAt: starterOrder.paid_at
+      };
+    }
+
+    return { hasCredit: false };
+
+  } catch (error) {
+    console.error('⚠️ [Credit] 크레딧 조회 오류:', error.message);
+    return { hasCredit: false };
+  }
 }
 
 // ───────────────────────────────────────────────────────────
@@ -149,7 +229,19 @@ router.post('/checkout', async (req, res) => {
     // 4) 주문 ID 생성
     const orderId = generateOrderId();
     const orderName = `${product.name} - ${orderId}`;
-    const amount = product.price;
+    let amount = product.price;
+    let appliedCredit = 0;
+
+    // 4.5) 24시간 업그레이드 크레딧 계산
+    if (UPGRADE_CREDIT.toSkus.includes(sku)) {
+      // 업그레이드 대상 상품인 경우, starter_7 구매 이력 확인
+      const creditResult = await checkUpgradeCredit(trial_token, customer_email, req);
+      if (creditResult.hasCredit) {
+        appliedCredit = UPGRADE_CREDIT.amount;
+        amount = Math.max(0, product.price - appliedCredit);
+        console.log(`✅ [Program] 업그레이드 크레딧 적용: ${appliedCredit}원 할인, 최종 ${amount}원`);
+      }
+    }
 
     // 5) JWT에서 user_id 추출 (있으면)
     let userId = null;
@@ -192,14 +284,16 @@ router.post('/checkout', async (req, res) => {
     }
 
     // 8) 응답
-    res.json({
+    const response = {
       success: true,
       order: {
         orderId,
         orderName,
         sku,
         amount,
-        amountFormatted: amount.toLocaleString() + '원'
+        amountFormatted: amount.toLocaleString() + '원',
+        originalPrice: product.price,
+        originalPriceFormatted: product.price.toLocaleString() + '원'
       },
       payment: paymentInfo || {
         // 테스트용 결제 정보 (Toss 미연동 시)
@@ -207,7 +301,19 @@ router.post('/checkout', async (req, res) => {
         successUrl: `${process.env.APP_BASE_URL || 'https://daily-miracles-app.onrender.com'}/api/program/payment/success`,
         failUrl: `${process.env.APP_BASE_URL || 'https://daily-miracles-app.onrender.com'}/api/program/payment/fail`
       }
-    });
+    };
+
+    // 크레딧 적용 시 정보 추가
+    if (appliedCredit > 0) {
+      response.credit = {
+        applied: true,
+        amount: appliedCredit,
+        amountFormatted: appliedCredit.toLocaleString() + '원',
+        reason: '스타터 7 → 30일 업그레이드 크레딧'
+      };
+    }
+
+    res.json(response);
 
   } catch (error) {
     console.error('💥 [Program] Checkout 오류:', error);
