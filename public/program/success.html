@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>결제 완료 - 하루하루의 기적</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 500px;
+      width: 100%;
+    }
+    .success-card {
+      background: white;
+      border-radius: 24px;
+      padding: 40px 32px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .success-icon {
+      font-size: 72px;
+      margin-bottom: 20px;
+      animation: bounce 1s ease infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .success-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 12px;
+    }
+    .success-subtitle {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    .order-info {
+      background: #f8f9ff;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+    .order-info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .order-info-row:last-child {
+      border-bottom: none;
+    }
+    .order-label {
+      color: #666;
+      font-size: 14px;
+    }
+    .order-value {
+      color: #333;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    /* 업그레이드 안내 박스 */
+    .upgrade-notice {
+      background: linear-gradient(135deg, #fff9e6, #fff3cd);
+      border: 2px solid #ffc107;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+      display: none;
+    }
+    .upgrade-notice.show {
+      display: block;
+    }
+    .upgrade-notice-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #856404;
+      margin-bottom: 8px;
+    }
+    .upgrade-notice-text {
+      font-size: 14px;
+      color: #856404;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .upgrade-notice-highlight {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .upgrade-btn-small {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 10px 20px;
+      background: #856404;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .upgrade-btn-small:hover {
+      background: #6d5003;
+    }
+
+    .btn-primary {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.2s;
+      margin-bottom: 12px;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+    }
+    .btn-secondary {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: white;
+      border: 2px solid #667eea;
+      border-radius: 12px;
+      color: #667eea;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+    }
+    .footer-text {
+      margin-top: 24px;
+      font-size: 13px;
+      color: #999;
+    }
+    .footer-text a {
+      color: #667eea;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="success-card">
+      <div class="success-icon">🎉</div>
+      <h1 class="success-title">결제가 완료되었습니다!</h1>
+      <p class="success-subtitle" id="success-subtitle">
+        프로그램이 활성화되었습니다.<br>
+        지금 바로 시작해보세요!
+      </p>
+
+      <div class="order-info" id="order-info">
+        <div class="order-info-row">
+          <span class="order-label">주문번호</span>
+          <span class="order-value" id="order-id">-</span>
+        </div>
+        <div class="order-info-row">
+          <span class="order-label">상품</span>
+          <span class="order-value" id="product-name">-</span>
+        </div>
+        <div class="order-info-row">
+          <span class="order-label">이용기간</span>
+          <span class="order-value" id="duration">-</span>
+        </div>
+      </div>
+
+      <!-- 스타터 7 구매 시 업그레이드 안내 -->
+      <div class="upgrade-notice" id="upgrade-notice">
+        <div class="upgrade-notice-title">💡 특별 혜택 안내</div>
+        <p class="upgrade-notice-text">
+          24시간 내 30일 프로그램으로 업그레이드하시면<br>
+          지금 결제하신 금액이 전액 크레딧으로 적용됩니다!
+        </p>
+        <div class="upgrade-notice-highlight">
+          9,900원 전액 크레딧 적용
+        </div>
+        <br>
+        <a href="/program" class="upgrade-btn-small">30일 프로그램 보기 →</a>
+      </div>
+
+      <a href="#" class="btn-primary" id="start-btn">프로그램 시작하기</a>
+      <a href="/" class="btn-secondary">홈으로</a>
+
+      <p class="footer-text">
+        문의: <a href="https://pf.kakao.com/_xfxhcWn" target="_blank">카카오톡 채널</a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const PRODUCTS = {
+      PRG_STARTER_7: { name: '소원 스타터 7', duration: '7일', isStarter: true },
+      PRG_WISH_30: { name: '소원실현 30', duration: '30일', isStarter: false },
+      PRG_SOLVE_30: { name: '문제해결 30', duration: '30일', isStarter: false },
+      PRG_DUAL_30: { name: '듀얼 30', duration: '30일', isStarter: false }
+    };
+
+    window.addEventListener('load', async () => {
+      const params = new URLSearchParams(window.location.search);
+      const orderId = params.get('orderId');
+      const token = params.get('token');
+
+      if (!orderId) {
+        document.getElementById('order-id').textContent = '정보 없음';
+        return;
+      }
+
+      document.getElementById('order-id').textContent = orderId;
+
+      // 주문 정보 조회
+      try {
+        const response = await fetch(`/api/program/order/${orderId}`);
+        const data = await response.json();
+
+        if (data.success && data.order) {
+          const order = data.order;
+          const product = PRODUCTS[order.sku] || { name: order.order_name, duration: '-', isStarter: false };
+
+          document.getElementById('product-name').textContent = product.name;
+          document.getElementById('duration').textContent = product.duration;
+
+          // 스타터 7 구매 시 업그레이드 안내 표시
+          if (product.isStarter) {
+            document.getElementById('upgrade-notice').classList.add('show');
+            document.getElementById('success-subtitle').innerHTML =
+              '스타터 7이 활성화되었습니다!<br>24시간 내 업그레이드 시 전액 크레딧 혜택을 받으세요.';
+          }
+
+          // 프로그램 시작 버튼 링크 설정
+          const startBtn = document.getElementById('start-btn');
+          if (token) {
+            startBtn.href = `/program-messages.html?token=${token}`;
+          } else {
+            startBtn.href = '/program-messages.html';
+            startBtn.textContent = '프로그램 페이지로';
+          }
+        }
+      } catch (error) {
+        console.error('주문 조회 오류:', error);
+      }
+    });
+  </script>
+</body>
+</html>

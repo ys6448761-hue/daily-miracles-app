@@ -450,7 +450,7 @@ router.get('/payment/success', async (req, res) => {
     console.log(`✅ [Program] 결제 완료 & 권한 발급: ${orderId}, ${subjectType}:${subjectId}, ${entitlementKey}`);
 
     // 7) 리다이렉트 또는 JSON 응답
-    const redirectUrl = `/program/success?orderId=${orderId}${guestToken ? '&token=' + guestToken : ''}`;
+    const redirectUrl = `/program/success.html?orderId=${orderId}${guestToken ? '&token=' + guestToken : ''}`;
 
     // Accept 헤더에 따라 응답 형식 결정
     if (req.accepts('html')) {
@@ -511,7 +511,7 @@ router.get('/payment/fail', async (req, res) => {
   }
 
   if (req.accepts('html')) {
-    res.redirect(`/program/fail?orderId=${orderId || ''}&message=${encodeURIComponent(message || '결제가 실패했습니다')}`);
+    res.redirect(`/program/fail.html?orderId=${orderId || ''}&message=${encodeURIComponent(message || '결제가 실패했습니다')}`);
   } else {
     res.json({
       success: false,

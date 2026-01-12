@@ -285,6 +285,73 @@
       transform: none;
     }
 
+    /* 업그레이드 안내 박스 */
+    .upgrade-box {
+      display: none;
+      background: linear-gradient(135deg, #fff9e6, #fff3cd);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      border: 2px solid #ffc107;
+      text-align: center;
+    }
+    .upgrade-box.show {
+      display: block;
+      animation: slideIn 0.5s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .upgrade-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 12px;
+    }
+    .upgrade-text {
+      font-size: 15px;
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .upgrade-credit {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+    .upgrade-btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+    .upgrade-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+    }
+    .upgrade-later {
+      display: block;
+      margin-top: 12px;
+      font-size: 13px;
+      color: #888;
+      cursor: pointer;
+    }
+    .upgrade-later:hover {
+      color: #667eea;
+    }
+
     /* 푸터 */
     .footer {
       text-align: center;
@@ -359,6 +426,21 @@
         <div class="days-grid" id="days-grid"></div>
       </div>
 
+      <!-- 업그레이드 안내 박스 (7일 완주 시) -->
+      <div class="upgrade-box" id="upgrade-box">
+        <div class="upgrade-title">🎉 완주 축하해요! 다음 단계</div>
+        <p class="upgrade-text">
+          7일 동안 정말 잘 해냈어요.<br>
+          이제 '의지'가 아니라 '시스템'으로 가요.<br>
+          30일 프로그램으로 소원을 '현실'로 바꿔볼까요?
+        </p>
+        <div class="upgrade-credit" id="upgrade-credit-notice">
+          24시간 내 업그레이드 시 전액 크레딧!
+        </div>
+        <a href="/program" class="upgrade-btn">30일로 이어가기 →</a>
+        <span class="upgrade-later" onclick="hideUpgradeBox()">나중에 할게요</span>
+      </div>
+
       <!-- 액션 버튼 -->
       <div class="action-buttons">
         <button class="btn btn-secondary" id="btn-prev" onclick="changeDay(-1)" disabled>이전</button>
@@ -379,6 +461,8 @@
     let totalDays = 30;
     let currentTime = 'morning';
     let messagesData = [];
+    let is7DayProgram = false;
+    let activeEntitlement = 'trial';
 
     // 프로그램별 설정
     const PROGRAM_CONFIG = {
@@ -469,7 +553,6 @@
     function setupProgram(entitlements) {
       // 가장 높은 등급의 권한 찾기
       const priority = ['dual_30', 'wish_30', 'solve_30', 'starter_7', 'trial'];
-      let activeEntitlement = 'trial';
 
       for (const ent of priority) {
         if (entitlements.includes(ent)) {
@@ -481,8 +564,18 @@
       const config = PROGRAM_CONFIG[activeEntitlement] || PROGRAM_CONFIG['trial'];
       totalDays = config.days;
 
+      // 7일 프로그램인지 확인 (trial 또는 starter_7)
+      is7DayProgram = (activeEntitlement === 'trial' || activeEntitlement === 'starter_7');
+
       document.getElementById('program-badge').textContent = config.name;
       document.getElementById('progress-title').textContent = `${config.days}일 여정`;
+
+      // 스타터 7은 크레딧 안내 표시
+      if (activeEntitlement === 'starter_7') {
+        document.getElementById('upgrade-credit-notice').textContent = '24시간 내 업그레이드 시 9,900원 전액 크레딧!';
+      } else if (activeEntitlement === 'trial') {
+        document.getElementById('upgrade-credit-notice').style.display = 'none';
+      }
 
       // 메시지 데이터 길이 조정
       if (messagesData.length < totalDays) {
@@ -532,6 +625,30 @@
       document.getElementById('btn-prev').disabled = currentDay <= 1;
       document.getElementById('btn-next').disabled = currentDay >= totalDays;
       document.getElementById('btn-next').textContent = currentDay >= totalDays ? '완료!' : '다음 날';
+
+      // 7일 프로그램 마지막 날에 업그레이드 안내 표시
+      checkUpgradeBox();
+    }
+
+    function checkUpgradeBox() {
+      const upgradeBox = document.getElementById('upgrade-box');
+      const dismissed = localStorage.getItem(`upgrade_dismissed_${token ? token.substring(0, 16) : ''}`);
+
+      // 7일 프로그램이고, 마지막 날이고, 아직 dismiss하지 않았으면 표시
+      if (is7DayProgram && currentDay >= totalDays && !dismissed) {
+        upgradeBox.classList.add('show');
+      } else {
+        upgradeBox.classList.remove('show');
+      }
+    }
+
+    function hideUpgradeBox() {
+      const upgradeBox = document.getElementById('upgrade-box');
+      upgradeBox.classList.remove('show');
+      // 이번 세션에서만 숨김 (localStorage에 저장하면 영구 숨김)
+      if (token) {
+        localStorage.setItem(`upgrade_dismissed_${token.substring(0, 16)}`, 'true');
+      }
     }
 
     function renderProgress() {
