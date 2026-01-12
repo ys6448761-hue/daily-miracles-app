@@ -58,6 +58,7 @@
 🟢 완료: 재미 온보딩 가이드 v1.2 (복귀 브리핑 문서)
 🟢 완료: P0 30일 프로그램 결제 시스템 (비회원 결제, entitlement 발급)
 🟢 완료: P0 소원 스타터 7 (9,900원 + 24시간 업그레이드 크레딧)
+🟢 완료: 여수 소원빌기 체험 MVP (접수, 결제, DALL-E 이미지 생성)
 🟡 진행중: GA4 설정 (측정 ID 대기 중)
 🟡 진행중: 10회 검증 validation (1/10 완료)
 ```
@@ -65,6 +66,51 @@
 ---
 
 ## 최근 완료 작업
+
+### 2026-01-13: 여수 소원빌기 체험 MVP
+
+| 작업 | 상태 | 산출물 |
+|------|------|--------|
+| DB 스키마 설계 | ✅ | `database/yeosu_wish_schema.sql` |
+| API 라우터 구현 | ✅ | `routes/yeosuWishRoutes.js` |
+| 접수 페이지 UI | ✅ | `public/yeosu-wish.html` |
+| 결과 페이지 UI | ✅ | `public/yeosu-wish-result.html` |
+| 서버 라우터 등록 | ✅ | `server.js` |
+
+### 상품 라인업 (여수 소원빌기)
+
+| SKU | 상품명 | 가격 | 기간 | 비고 |
+|-----|--------|------|------|------|
+| FREE | 무료 체험 | 0원 | - | AI 소원그림 1장 |
+| YW_BASIC_7 | 베이직 7 | 9,900원 | 7일 | + 7일 응원 메시지 |
+| YW_PREMIUM_30 | 프리미엄 30 | 24,900원 | 30일 | + 30일 응원 메시지, 특별 축원문 |
+
+### API 엔드포인트
+
+```
+GET  /api/yeosu/wish/products       - 상품 목록
+POST /api/yeosu/wish                - 소원 접수
+POST /api/yeosu/wish/checkout       - 결제 요청
+POST /api/yeosu/wish/confirm-payment - 결제 확인
+GET  /api/yeosu/wish/:id            - 결과물 조회
+GET  /api/yeosu/wish/status/:id     - 생성 상태 폴링
+GET  /api/yeosu/wish/download/:token - 이미지 다운로드
+```
+
+### 주요 기능
+
+- DALL-E 3 여수 테마 소원그림 생성 (3회 재시도)
+- 30일 유효 다운로드 토큰
+- 상태 폴링 (생성 중 → 완료)
+- 단체 신청 지원
+
+### 커밋 이력
+
+```
+c86978d - feat(yeosu): 여수 소원빌기 체험 MVP 구현
+```
+
+---
 
 ### 2026-01-13: P0 소원 스타터 7 (9,900원) + 24시간 업그레이드 크레딧
 
@@ -814,6 +860,7 @@ routes/webhookRoutes.js         - 소원 인입 웹훅 (WishRouter 자동 분류
 routes/debateRoutes.js          - 토론 자동화 API v3.2
 routes/wishRoutes.js            - 소원실현 API (신호등 + 기적지수)
 routes/wishImageRoutes.js       - 소원그림 API (DALL-E 3 + 워터마크)
+routes/yeosuWishRoutes.js       - 여수 소원빌기 체험 MVP API
 services/airtableService.js     - Airtable 연동 (Wishes Inbox 저장)
 services/solapiService.js       - Solapi 연동 (SMS + 카카오 알림톡)
 server.js                       - 메인 서버
@@ -943,6 +990,7 @@ curl -X POST http://localhost:5100/api/debate/run \
 
 | 날짜 | 담당 | 내용 |
 |------|------|------|
+| 2026-01-13 | Code | 여수 소원빌기 체험 MVP (접수, 결제, DALL-E 이미지, 다운로드) |
 | 2026-01-13 | Code | Day 7 완주 → 30일 업그레이드 전환 UI (성공/실패 페이지 생성) |
 | 2026-01-13 | Code | P0 소원 스타터 7 (9,900원) + 24시간 업그레이드 크레딧 (테스트 4/4 통과) |
 | 2026-01-12 | Code | GA4 설정 가이드 생성, 트래킹 현황 분석 (측정 ID 대기 중) |
