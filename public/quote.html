@@ -509,6 +509,169 @@
       display: block;
     }
 
+    /* 혜택북 힌트 */
+    .benefit-hint {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 14px;
+      background: linear-gradient(135deg, #fff8e1, #fffde7);
+      border: 1px solid #ffe082;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: #f57c00;
+    }
+
+    .benefit-hint .emoji {
+      font-size: 18px;
+    }
+
+    /* 혜택북 섹션 */
+    .benefit-book {
+      margin-top: 20px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 2px solid #e0e0e0;
+      transition: all 0.3s;
+    }
+
+    .benefit-book.locked {
+      opacity: 0.6;
+      border-color: #e0e0e0;
+    }
+
+    .benefit-book.active {
+      opacity: 1;
+      border-color: #667eea;
+      box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+    }
+
+    .benefit-book-header {
+      padding: 16px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      text-align: center;
+    }
+
+    .benefit-book.locked .benefit-book-header {
+      background: linear-gradient(135deg, #9e9e9e, #757575);
+    }
+
+    .benefit-book-header h4 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .benefit-book-header p {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .benefit-book-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    .benefit-book.active .benefit-book-status {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .benefit-book-body {
+      padding: 16px;
+      background: white;
+    }
+
+    .benefit-category {
+      margin-bottom: 16px;
+    }
+
+    .benefit-category:last-child {
+      margin-bottom: 0;
+    }
+
+    .benefit-category-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .benefit-book.locked .benefit-category-title {
+      color: #9e9e9e;
+    }
+
+    .benefit-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .benefit-list-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: #f8f9ff;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .benefit-book.locked .benefit-list-item {
+      background: #f5f5f5;
+      color: #999;
+    }
+
+    .benefit-list-item .icon {
+      font-size: 16px;
+    }
+
+    .benefit-book-footer {
+      padding: 12px 16px;
+      background: #f8f9fa;
+      font-size: 11px;
+      color: #888;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    /* 결과에서 혜택북 표시 */
+    .result-benefit-book {
+      margin-top: 16px;
+      padding: 14px;
+      background: linear-gradient(135deg, #f0f4ff, #fff);
+      border: 1px solid #667eea;
+      border-radius: 12px;
+    }
+
+    .result-benefit-book h5 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .result-benefit-book .items {
+      font-size: 13px;
+      color: #555;
+      line-height: 1.6;
+    }
+
     /* 모바일 최적화 */
     @media (max-width: 400px) {
       .container {
@@ -569,6 +732,10 @@
 
         <div class="form-group">
           <label>레저 선택 (복수 선택 가능)</label>
+          <div class="benefit-hint">
+            <span class="emoji">🎁</span>
+            <span>레저 1개만 선택해도 <strong>소원이 혜택북</strong>이 자동으로 포함돼요!</span>
+          </div>
           <div class="leisure-checkboxes" id="leisure-checkboxes">
             <label class="leisure-checkbox">
               <input type="checkbox" value="cable" data-name="케이블카" data-weekday="16000" data-weekend="16000">
@@ -590,6 +757,68 @@
               <span class="checkbox-label">요트</span>
               <span class="checkbox-price" data-weekday="+35,000원" data-weekend="+55,000원">+35,000원~</span>
             </label>
+          </div>
+        </div>
+
+        <!-- 소원이 혜택북 -->
+        <div class="benefit-book locked" id="benefit-book">
+          <div class="benefit-book-header">
+            <h4>🎁 소원이 혜택북</h4>
+            <p>레저 선택 시 자동 포함</p>
+            <div class="benefit-book-status" id="benefit-status">
+              <span id="status-icon">🔒</span>
+              <span id="status-text">레저 선택 대기</span>
+            </div>
+          </div>
+          <div class="benefit-book-body">
+            <div class="benefit-category">
+              <div class="benefit-category-title">
+                <span>⭐</span>
+                <span>소원3합 (필수 혜택)</span>
+              </div>
+              <div class="benefit-list">
+                <div class="benefit-list-item">
+                  <span class="icon">🍹</span>
+                  <span>맛집 음료 서비스</span>
+                </div>
+                <div class="benefit-list-item">
+                  <span class="icon">☕</span>
+                  <span>카페 아메리카노 1잔</span>
+                </div>
+                <div class="benefit-list-item">
+                  <span class="icon">🍽️</span>
+                  <span>3합 맛집 할인 쿠폰</span>
+                </div>
+              </div>
+            </div>
+            <div class="benefit-category">
+              <div class="benefit-category-title">
+                <span>🌙</span>
+                <span>달빛혜택 (보너스)</span>
+              </div>
+              <div class="benefit-list">
+                <div class="benefit-list-item">
+                  <span class="icon">🎫</span>
+                  <span>여수 관광지 할인</span>
+                </div>
+                <div class="benefit-list-item">
+                  <span class="icon">🛍️</span>
+                  <span>제휴 매장 할인</span>
+                </div>
+                <div class="benefit-list-item">
+                  <span class="icon">📸</span>
+                  <span>포토 스팟 가이드</span>
+                </div>
+                <div class="benefit-list-item">
+                  <span class="icon">🎁</span>
+                  <span>소원이 굿즈 증정</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="benefit-book-footer">
+            * 1박2일 패키지 + 레저 1개 이상 선택 시 자동 포함<br>
+            * 현장에서 소원3합 카드 제시 필요
           </div>
         </div>
 
@@ -637,6 +866,15 @@
           <div class="benefits">
             <div class="benefit-item">소원3합 패스 52% 할인 포함</div>
             <div class="benefit-item">정상가 대비 최대 30% 절약</div>
+          </div>
+
+          <!-- 혜택북 포함 안내 (레저 선택 시만 표시) -->
+          <div class="result-benefit-book" id="result-benefit-book" style="display:none;">
+            <h5>🎁 소원이 혜택북 포함!</h5>
+            <div class="items">
+              <strong>소원3합:</strong> 맛집 음료, 카페 아메리카노, 3합 맛집 할인<br>
+              <strong>달빛혜택:</strong> 관광지 할인, 제휴 매장 할인, 포토 가이드, 굿즈 증정
+            </div>
           </div>
 
           <a href="https://pf.kakao.com/_xfxhcWn" target="_blank" class="request-btn" id="request-btn">
@@ -695,6 +933,10 @@
     const quoteResult = document.getElementById('quote-result');
     const loadingEl = document.getElementById('loading');
     const errorMsg = document.getElementById('error-msg');
+    const benefitBook = document.getElementById('benefit-book');
+    const benefitStatusIcon = document.getElementById('status-icon');
+    const benefitStatusText = document.getElementById('status-text');
+    const resultBenefitBook = document.getElementById('result-benefit-book');
 
     // 레저 가격표 (1인당, list 가격 포함)
     const leisurePrices = {
@@ -804,6 +1046,40 @@
     travelDateInput.addEventListener('change', validateForm);
     hotelSelect.addEventListener('change', validateForm);
 
+    // 혜택북 상태 업데이트
+    function updateBenefitBookState() {
+      const selectedLeisures = getSelectedLeisures();
+      const hasLeisure = selectedLeisures.length > 0;
+      const isIndividual = selectedGuests > 0 && selectedGuests <= 4;
+
+      if (!isIndividual) {
+        // 단체 (5인 이상) - 혜택북 미적용
+        benefitBook.classList.remove('active');
+        benefitBook.classList.add('locked');
+        benefitStatusIcon.textContent = '❌';
+        benefitStatusText.textContent = '단체 상품 별도 안내';
+      } else if (hasLeisure) {
+        // 레저 선택됨 - 혜택북 활성화
+        benefitBook.classList.remove('locked');
+        benefitBook.classList.add('active');
+        benefitStatusIcon.textContent = '✅';
+        benefitStatusText.textContent = `포함됨 (레저 ${selectedLeisures.length}개 선택)`;
+      } else {
+        // 레저 미선택 - 잠금 상태
+        benefitBook.classList.remove('active');
+        benefitBook.classList.add('locked');
+        benefitStatusIcon.textContent = '🔒';
+        benefitStatusText.textContent = '레저 선택 대기';
+      }
+    }
+
+    // 레저 체크박스 변경 이벤트
+    leisureCheckboxes.forEach(cb => {
+      cb.addEventListener('change', () => {
+        updateBenefitBookState();
+      });
+    });
+
     // 견적 계산
     calculateBtn.addEventListener('click', async () => {
       if (calculateBtn.disabled) return;
@@ -907,12 +1183,21 @@
       document.getElementById('breakdown-per-person').textContent =
         `${perPerson.toLocaleString()}원`;
 
-      // 예약 버튼 URL 업데이트 (견적 ID + 레저 정보 포함)
+      // 혜택북 포함 여부 표시 (레저 선택 시에만)
+      const hasBenefitBook = selectedLeisures && selectedLeisures.length > 0;
+      if (hasBenefitBook) {
+        resultBenefitBook.style.display = 'block';
+      } else {
+        resultBenefitBook.style.display = 'none';
+      }
+
+      // 예약 버튼 URL 업데이트 (견적 ID + 레저 정보 + 혜택북 포함)
       const requestBtn = document.getElementById('request-btn');
       const leisureInfo = selectedLeisures.length > 0
         ? `, 레저: ${selectedLeisures.map(code => leisureNames[code]).join('+')}`
         : '';
-      requestBtn.href = `https://pf.kakao.com/_xfxhcWn?text=견적번호: ${data.quoteId}${leisureInfo}`;
+      const benefitBookInfo = hasBenefitBook ? ', 🎁소원이 혜택북 포함' : '';
+      requestBtn.href = `https://pf.kakao.com/_xfxhcWn?text=견적번호: ${data.quoteId}${leisureInfo}${benefitBookInfo}`;
 
       // 결과 표시
       quoteResult.classList.add('show');
