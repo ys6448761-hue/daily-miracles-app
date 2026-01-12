@@ -292,6 +292,10 @@ app.get("/program/fail", (_req, res) => {
   res.sendFile(path.join(__dirname, "public", "program-fail.html"));
 });
 
+app.get("/program/messages", (_req, res) => {
+  res.sendFile(path.join(__dirname, "public", "program-messages.html"));
+});
+
 // ---------- Request Logging (가시화) ----------
 if (String(process.env.REQUEST_LOG || "1") === "1") {
   app.use((req, _res, next) => {

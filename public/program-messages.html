@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>오늘의 응원 메시지 - 하루하루의 기적</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* 로딩 상태 */
+    .loading {
+      background: white;
+      border-radius: 20px;
+      padding: 60px 40px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #e0e0e0;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* 에러 상태 */
+    .error-card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .error-icon { font-size: 64px; margin-bottom: 20px; }
+    .error-title { font-size: 20px; color: #333; margin-bottom: 12px; }
+    .error-message { font-size: 14px; color: #666; margin-bottom: 24px; }
+    .error-btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    /* 메인 컨텐츠 */
+    .main-content { display: none; }
+    .main-content.show { display: block; }
+
+    /* 헤더 */
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 24px;
+    }
+    .header-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    .header h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    /* 메시지 카드 */
+    .message-card {
+      background: white;
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .message-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    /* 날짜 & 시간대 */
+    .day-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .day-badge {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .time-toggle {
+      display: flex;
+      gap: 8px;
+    }
+    .time-btn {
+      padding: 8px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 20px;
+      background: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .time-btn.active {
+      border-color: #667eea;
+      background: #f8f9ff;
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    /* 메시지 내용 */
+    .message-icon {
+      font-size: 56px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .message-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #333;
+      text-align: center;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+    .message-text {
+      font-size: 16px;
+      color: #555;
+      line-height: 1.8;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .message-quote {
+      background: linear-gradient(135deg, #f8f9ff, #fff5f7);
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 4px solid #667eea;
+      font-style: italic;
+      color: #667eea;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* 진행률 카드 */
+    .progress-card {
+      background: white;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      margin-bottom: 20px;
+    }
+    .progress-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .progress-bar-wrap {
+      height: 12px;
+      background: #e5e7eb;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      transition: width 0.5s ease;
+      border-radius: 6px;
+    }
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: #666;
+    }
+    .progress-percent {
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    /* 날짜 그리드 */
+    .days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .day-dot {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      border: 2px solid #e5e7eb;
+      color: #9ca3af;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .day-dot.completed {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-color: #667eea;
+      color: white;
+    }
+    .day-dot.current {
+      border-color: #667eea;
+      color: #667eea;
+      animation: pulse 2s infinite;
+    }
+    .day-dot.future {
+      opacity: 0.5;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    /* 액션 버튼 */
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+    }
+    .btn-secondary {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* 푸터 */
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+    }
+    .footer a { color: rgba(255,255,255,0.9); }
+
+    /* 반응형 */
+    @media (max-width: 480px) {
+      .message-card { padding: 24px; }
+      .message-title { font-size: 18px; }
+      .message-text { font-size: 14px; }
+      .day-header { flex-direction: column; gap: 12px; }
+      .days-grid { grid-template-columns: repeat(7, 1fr); gap: 6px; }
+      .day-dot { font-size: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 로딩 상태 -->
+    <div class="loading" id="loading">
+      <div class="loading-spinner"></div>
+      <p>메시지를 불러오는 중...</p>
+    </div>
+
+    <!-- 에러 상태 -->
+    <div class="error-card" id="error" style="display: none;">
+      <div class="error-icon">😢</div>
+      <h2 class="error-title">접근 권한이 없습니다</h2>
+      <p class="error-message" id="error-message">프로그램을 구매하시면 매일 맞춤 응원 메시지를 받으실 수 있습니다.</p>
+      <a href="/program" class="error-btn">프로그램 구매하기</a>
+    </div>
+
+    <!-- 메인 컨텐츠 -->
+    <div class="main-content" id="main-content">
+      <!-- 헤더 -->
+      <div class="header">
+        <div class="header-badge" id="program-badge">30일 프로그램</div>
+        <h1>오늘의 응원 메시지</h1>
+        <p id="user-info">하루하루의 기적과 함께합니다</p>
+      </div>
+
+      <!-- 메시지 카드 -->
+      <div class="message-card">
+        <div class="day-header">
+          <div class="day-badge" id="day-badge">Day 1</div>
+          <div class="time-toggle">
+            <button class="time-btn active" id="btn-morning" onclick="showMessage('morning')">아침</button>
+            <button class="time-btn" id="btn-evening" onclick="showMessage('evening')">저녁</button>
+          </div>
+        </div>
+
+        <div class="message-icon" id="message-icon">✨</div>
+        <h2 class="message-title" id="message-title">오늘 하루도 힘내세요!</h2>
+        <p class="message-text" id="message-text">당신의 소원이 이루어지는 그 날까지, 하루하루의 기적이 함께합니다.</p>
+        <div class="message-quote" id="message-quote">"작은 한 걸음이 큰 변화를 만듭니다"</div>
+      </div>
+
+      <!-- 진행률 카드 -->
+      <div class="progress-card">
+        <div class="progress-title" id="progress-title">30일 여정</div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progress-bar" style="width: 0%;"></div>
+        </div>
+        <div class="progress-info">
+          <span id="progress-days">1/30일</span>
+          <span class="progress-percent" id="progress-percent">3%</span>
+        </div>
+        <div class="days-grid" id="days-grid"></div>
+      </div>
+
+      <!-- 액션 버튼 -->
+      <div class="action-buttons">
+        <button class="btn btn-secondary" id="btn-prev" onclick="changeDay(-1)" disabled>이전</button>
+        <button class="btn btn-primary" id="btn-next" onclick="changeDay(1)">다음 날</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>하루하루의 기적 | <a href="/">홈으로</a></p>
+    </div>
+  </div>
+
+  <script>
+    // 상태 변수
+    let token = null;
+    let userData = null;
+    let currentDay = 1;
+    let totalDays = 30;
+    let currentTime = 'morning';
+    let messagesData = [];
+
+    // 프로그램별 설정
+    const PROGRAM_CONFIG = {
+      'trial': { days: 7, name: '7일 체험', icon: '🌱' },
+      'starter_7': { days: 7, name: '스타터 7', icon: '⭐' },
+      'wish_30': { days: 30, name: '소원실현 30', icon: '✨' },
+      'solve_30': { days: 30, name: '문제해결 30', icon: '🔧' },
+      'dual_30': { days: 30, name: '듀얼 30', icon: '🌟' }
+    };
+
+    // 샘플 메시지 (API가 샘플 반환 시 사용)
+    const SAMPLE_MESSAGES = generateSampleMessages(30);
+
+    function generateSampleMessages(days) {
+      const morningIcons = ['🌅', '☀️', '🌤️', '🌈', '✨', '💫', '🌟', '⭐', '🎯', '💪'];
+      const eveningIcons = ['🌙', '🌃', '🌠', '💜', '🌸', '🍀', '🎁', '💝', '🏆', '🎉'];
+      const morningTitles = [
+        '새로운 하루가 시작됩니다', '오늘도 빛나는 하루 되세요', '당신의 하루를 응원합니다',
+        '좋은 일이 가득할 거예요', '오늘은 특별한 날입니다', '희망찬 아침이에요',
+        '기적은 매일 일어납니다', '당신은 할 수 있어요', '오늘도 화이팅!', '행복한 하루 보내세요'
+      ];
+      const eveningTitles = [
+        '오늘 하루도 수고했어요', '편안한 밤 되세요', '당신은 오늘도 최선을 다했어요',
+        '내일은 더 좋은 날이 될 거예요', '푹 쉬고 충전하세요', '오늘의 노력에 박수를',
+        '달콤한 꿈꾸세요', '당신의 하루가 자랑스러워요', '잘 해냈어요!', '굿나잇!'
+      ];
+
+      const messages = [];
+      for (let i = 1; i <= days; i++) {
+        messages.push({
+          day: i,
+          morning: {
+            icon: morningIcons[(i - 1) % morningIcons.length],
+            title: morningTitles[(i - 1) % morningTitles.length],
+            text: `Day ${i}의 아침입니다. 오늘 하루도 당신의 소원이 한 걸음 더 가까워지는 날이 될 거예요. 작은 실천 하나가 큰 변화를 만듭니다.`,
+            quote: '"오늘의 작은 한 걸음이 내일의 큰 도약이 됩니다"'
+          },
+          evening: {
+            icon: eveningIcons[(i - 1) % eveningIcons.length],
+            title: eveningTitles[(i - 1) % eveningTitles.length],
+            text: `Day ${i}의 저녁입니다. 오늘 하루도 정말 수고 많았어요. 당신의 노력은 분명 결실을 맺을 거예요. 편안한 밤 보내세요.`,
+            quote: '"오늘의 수고가 내일의 기적을 만듭니다"'
+          }
+        });
+      }
+      return messages;
+    }
+
+    // 페이지 로드
+    window.addEventListener('load', async () => {
+      const params = new URLSearchParams(window.location.search);
+      token = params.get('token');
+
+      if (!token) {
+        showError('토큰이 없습니다. 프로그램 구매 후 다시 시도해주세요.');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/daily-messages?token=${token}`);
+        const data = await response.json();
+
+        if (!data.success) {
+          showError(data.message || '접근 권한이 없습니다.');
+          return;
+        }
+
+        userData = data.user;
+        messagesData = data.messages && data.messages.length > 0 ? data.messages : SAMPLE_MESSAGES;
+
+        // 권한에 따른 설정
+        setupProgram(data.entitlements || [userData.type]);
+
+        // 저장된 진행상황 불러오기
+        loadProgress();
+
+        // UI 표시
+        showMainContent();
+        renderDay();
+        renderProgress();
+
+      } catch (error) {
+        console.error('Error:', error);
+        showError('서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      }
+    });
+
+    function setupProgram(entitlements) {
+      // 가장 높은 등급의 권한 찾기
+      const priority = ['dual_30', 'wish_30', 'solve_30', 'starter_7', 'trial'];
+      let activeEntitlement = 'trial';
+
+      for (const ent of priority) {
+        if (entitlements.includes(ent)) {
+          activeEntitlement = ent;
+          break;
+        }
+      }
+
+      const config = PROGRAM_CONFIG[activeEntitlement] || PROGRAM_CONFIG['trial'];
+      totalDays = config.days;
+
+      document.getElementById('program-badge').textContent = config.name;
+      document.getElementById('progress-title').textContent = `${config.days}일 여정`;
+
+      // 메시지 데이터 길이 조정
+      if (messagesData.length < totalDays) {
+        messagesData = generateSampleMessages(totalDays);
+      }
+    }
+
+    function showError(message) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error').style.display = 'block';
+      document.getElementById('error-message').textContent = message;
+    }
+
+    function showMainContent() {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('main-content').classList.add('show');
+    }
+
+    function loadProgress() {
+      const saved = localStorage.getItem(`program_progress_${token.substring(0, 16)}`);
+      if (saved) {
+        const data = JSON.parse(saved);
+        currentDay = Math.min(data.currentDay || 1, totalDays);
+      }
+    }
+
+    function saveProgress() {
+      localStorage.setItem(`program_progress_${token.substring(0, 16)}`, JSON.stringify({
+        currentDay,
+        lastUpdated: new Date().toISOString()
+      }));
+    }
+
+    function renderDay() {
+      const msg = messagesData[currentDay - 1];
+      if (!msg) return;
+
+      const timeData = currentTime === 'morning' ? msg.morning : msg.evening;
+
+      document.getElementById('day-badge').textContent = `Day ${currentDay}`;
+      document.getElementById('message-icon').textContent = timeData.icon;
+      document.getElementById('message-title').textContent = timeData.title;
+      document.getElementById('message-text').textContent = timeData.text;
+      document.getElementById('message-quote').textContent = timeData.quote;
+
+      // 버튼 상태
+      document.getElementById('btn-prev').disabled = currentDay <= 1;
+      document.getElementById('btn-next').disabled = currentDay >= totalDays;
+      document.getElementById('btn-next').textContent = currentDay >= totalDays ? '완료!' : '다음 날';
+    }
+
+    function renderProgress() {
+      const percent = Math.round((currentDay / totalDays) * 100);
+
+      document.getElementById('progress-bar').style.width = `${percent}%`;
+      document.getElementById('progress-days').textContent = `${currentDay}/${totalDays}일`;
+      document.getElementById('progress-percent').textContent = `${percent}%`;
+
+      // 날짜 그리드
+      const grid = document.getElementById('days-grid');
+      grid.innerHTML = '';
+
+      for (let i = 1; i <= totalDays; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'day-dot';
+        dot.textContent = i;
+
+        if (i < currentDay) {
+          dot.classList.add('completed');
+        } else if (i === currentDay) {
+          dot.classList.add('current');
+        } else {
+          dot.classList.add('future');
+        }
+
+        dot.onclick = () => goToDay(i);
+        grid.appendChild(dot);
+      }
+    }
+
+    function showMessage(time) {
+      currentTime = time;
+
+      document.getElementById('btn-morning').classList.toggle('active', time === 'morning');
+      document.getElementById('btn-evening').classList.toggle('active', time === 'evening');
+
+      renderDay();
+    }
+
+    function changeDay(delta) {
+      const newDay = currentDay + delta;
+      if (newDay >= 1 && newDay <= totalDays) {
+        currentDay = newDay;
+        saveProgress();
+        renderDay();
+        renderProgress();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function goToDay(day) {
+      if (day >= 1 && day <= currentDay) {
+        currentDay = day;
+        renderDay();
+        renderProgress();
+      }
+    }
+  </script>
+</body>
+</html>

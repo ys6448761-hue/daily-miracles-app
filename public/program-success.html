@@ -113,7 +113,7 @@
       <div class="token" id="access-token"></div>
     </div>
 
-    <a href="/daily-messages.html" class="btn" id="start-btn">프로그램 시작하기</a>
+    <a href="/program-messages.html" class="btn" id="start-btn">프로그램 시작하기</a>
   </div>
 
   <script>
@@ -128,7 +128,7 @@
     if (token) {
       document.getElementById('token-box').style.display = 'block';
       document.getElementById('access-token').textContent = token;
-      document.getElementById('start-btn').href = `/daily-messages.html?token=${token}`;
+      document.getElementById('start-btn').href = `/program-messages.html?token=${token}`;
     }
   </script>
 </body>
