@@ -8,6 +8,11 @@
  * - DB 모듈 로딩 실패 시 deny
  */
 
+const jwt = require('jsonwebtoken');
+
+// JWT 비밀키
+const JWT_SECRET = process.env.JWT_SECRET || 'daily-miracles-secret-key-change-in-production';
+
 // DB 모듈 (선택적 로딩 - 실패 시 deny)
 let db = null;
 try {
@@ -62,15 +67,44 @@ function requireEntitlement(requiredEntitlement = 'trial') {
         });
       }
 
-      // 토큰 검증 (DB 조회)
-      const userResult = await db.query(
-        `SELECT id, email, entitlement, trial_start, trial_end, status
-         FROM users
-         WHERE session_token = $1 AND status = 'active'`,
-        [token]
-      );
+      // 토큰 검증 (JWT 우선, session_token 폴백)
+      let user = null;
 
-      if (userResult.rows.length === 0) {
+      // 1) JWT 토큰 검증 시도
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        if (decoded.userId) {
+          const userResult = await db.query(
+            `SELECT id, email, entitlement, trial_start, trial_end, status
+             FROM users
+             WHERE id = $1 AND is_active = true`,
+            [decoded.userId]
+          );
+          if (userResult.rows.length > 0) {
+            user = userResult.rows[0];
+            console.log(`✅ [Entitlement] JWT 검증 성공 - user: ${user.email}`);
+          }
+        }
+      } catch (jwtError) {
+        // JWT 검증 실패 - session_token으로 폴백
+        console.log(`ℹ️ [Entitlement] JWT 검증 실패, session_token 시도...`);
+      }
+
+      // 2) session_token 폴백 (JWT 실패 시)
+      if (!user) {
+        const userResult = await db.query(
+          `SELECT id, email, entitlement, trial_start, trial_end, status
+           FROM users
+           WHERE session_token = $1 AND status = 'active'`,
+          [token]
+        );
+        if (userResult.rows.length > 0) {
+          user = userResult.rows[0];
+          console.log(`✅ [Entitlement] session_token 검증 성공 - user: ${user.email}`);
+        }
+      }
+
+      if (!user) {
         console.log("❌ [Entitlement] 유효하지 않은 토큰 - 접근 거부");
         return res.status(403).json({
           success: false,
@@ -79,8 +113,6 @@ function requireEntitlement(requiredEntitlement = 'trial') {
           redirect: "/program"
         });
       }
-
-      const user = userResult.rows[0];
 
       // Trial 권한 체크
       if (requiredEntitlement === 'trial') {
