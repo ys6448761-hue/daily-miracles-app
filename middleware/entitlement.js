@@ -75,33 +75,21 @@ function requireEntitlement(requiredEntitlement = 'trial') {
         const decoded = jwt.verify(token, JWT_SECRET);
         if (decoded.userId) {
           const userResult = await db.query(
-            `SELECT id, email, entitlement, trial_start, trial_end, status
+            `SELECT id, email, is_active, created_at
              FROM users
              WHERE id = $1 AND is_active = true`,
             [decoded.userId]
           );
           if (userResult.rows.length > 0) {
             user = userResult.rows[0];
+            // 임시: 가입된 사용자는 모두 trial 권한 부여 (entitlement 컬럼 추가 전까지)
+            user.entitlement = 'trial';
             console.log(`✅ [Entitlement] JWT 검증 성공 - user: ${user.email}`);
           }
         }
       } catch (jwtError) {
-        // JWT 검증 실패 - session_token으로 폴백
-        console.log(`ℹ️ [Entitlement] JWT 검증 실패, session_token 시도...`);
-      }
-
-      // 2) session_token 폴백 (JWT 실패 시)
-      if (!user) {
-        const userResult = await db.query(
-          `SELECT id, email, entitlement, trial_start, trial_end, status
-           FROM users
-           WHERE session_token = $1 AND status = 'active'`,
-          [token]
-        );
-        if (userResult.rows.length > 0) {
-          user = userResult.rows[0];
-          console.log(`✅ [Entitlement] session_token 검증 성공 - user: ${user.email}`);
-        }
+        // JWT 검증 실패 시 로그
+        console.log(`ℹ️ [Entitlement] JWT 검증 실패: ${jwtError.message}`);
       }
 
       if (!user) {
