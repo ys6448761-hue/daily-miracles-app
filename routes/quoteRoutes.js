@@ -1364,4 +1364,512 @@ router.get('/:quoteId/payment-status', async (req, res) => {
   }
 });
 
+// ═══════════════════════════════════════════════════════════════════════════
+// Deal Structuring API (P0)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Deal Structuring 서비스 로드
+let dealStructuring = null;
+try {
+  dealStructuring = require('../services/dealStructuringService');
+  console.log('[Quote] Deal Structuring 서비스 로드 완료');
+} catch (error) {
+  console.warn('[Quote] Deal Structuring 서비스 로드 실패:', error.message);
+}
+
+/**
+ * POST /api/v2/quote/:quoteId/deal-structuring
+ * Deal Structuring 처리 (운영모드 결정 + 승인 워크플로우)
+ */
+router.post('/:quoteId/deal-structuring', async (req, res) => {
+  try {
+    const { quoteId } = req.params;
+    const options = req.body;
+
+    if (!dealStructuring) {
+      return res.status(503).json({
+        success: false,
+        error: 'DEAL_STRUCTURING_UNAVAILABLE',
+        message: 'Deal Structuring 서비스를 사용할 수 없습니다'
+      });
+    }
+
+    // 견적 조회
+    const quote = await getQuote(quoteId);
+    if (!quote) {
+      return res.status(404).json({
+        success: false,
+        error: 'QUOTE_NOT_FOUND'
+      });
+    }
+
+    // Deal Structuring 처리
+    const result = dealStructuring.processDealStructuring({
+      ...quote,
+      ...options,  // 추가 옵션 (manual_mode, incentive_required 등)
+      guest_count: quote.guest_count,
+      total_sell: quote.total_sell
+    });
+
+    // DB 업데이트
+    if (db) {
+      try {
+        await db.query(`
+          UPDATE quotes SET
+            operation_mode = $1,
+            settlement_method = $2,
+            tax_invoice_issuer = $3,
+            payment_receiver = $4,
+            contract_party = $5,
+            refund_liability = $6,
+            requires_approval = $7,
+            approval_reasons = $8,
+            approval_status = $9,
+            incentive_required = $10,
+            is_mice = $11,
+            updated_at = NOW()
+          WHERE quote_id = $12
+        `, [
+          result.operation_mode,
+          result.settlement_method,
+          result.tax_invoice_issuer,
+          result.payment_receiver,
+          result.contract_party,
+          result.refund_liability,
+          result.requires_approval,
+          JSON.stringify(result.approval_reasons),
+          result.approval_status,
+          options.incentive_required || false,
+          options.is_mice || false,
+          quoteId
+        ]);
+      } catch (dbErr) {
+        console.error('[Quote] Deal Structuring DB 업데이트 실패:', dbErr.message);
+      }
+    }
+
+    // 이벤트 로깅
+    await logEvent('DealStructuringProcessed', quoteId, {
+      operation_mode: result.operation_mode,
+      approval_status: result.approval_status,
+      requires_approval: result.requires_approval
+    });
+
+    res.json({
+      success: true,
+      quoteId,
+      ...result
+    });
+
+  } catch (error) {
+    console.error('[Quote] Deal Structuring 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: 'DEAL_STRUCTURING_ERROR',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/v2/quote/:quoteId/approve
+ * 견적 승인 처리
+ */
+router.post('/:quoteId/approve', async (req, res) => {
+  try {
+    const { quoteId } = req.params;
+    const { approved_by, approval_note } = req.body;
+
+    if (!approved_by) {
+      return res.status(400).json({
+        success: false,
+        error: 'MISSING_APPROVER',
+        message: '승인자 정보가 필요합니다'
+      });
+    }
+
+    // 견적 조회
+    const quote = await getQuote(quoteId);
+    if (!quote) {
+      return res.status(404).json({
+        success: false,
+        error: 'QUOTE_NOT_FOUND'
+      });
+    }
+
+    // 승인 가능 상태 확인
+    const approvableStatuses = ['pending', 'deal_review', 'ceo_approval'];
+    if (!approvableStatuses.includes(quote.approval_status)) {
+      return res.status(400).json({
+        success: false,
+        error: 'NOT_APPROVABLE',
+        message: `현재 상태(${quote.approval_status})에서는 승인할 수 없습니다`
+      });
+    }
+
+    // DB 업데이트
+    if (db) {
+      try {
+        await db.query(`
+          UPDATE quotes SET
+            approval_status = 'approved',
+            approved_by = $1,
+            approved_at = NOW(),
+            approval_note = $2,
+            updated_at = NOW()
+          WHERE quote_id = $3
+        `, [approved_by, approval_note || null, quoteId]);
+      } catch (dbErr) {
+        console.error('[Quote] 승인 DB 업데이트 실패:', dbErr.message);
+      }
+    }
+
+    // 이벤트 로깅
+    await logEvent('QuoteApproved', quoteId, {
+      approved_by,
+      approval_note,
+      previous_status: quote.approval_status
+    });
+
+    res.json({
+      success: true,
+      quoteId,
+      approval_status: 'approved',
+      approved_by,
+      approved_at: new Date().toISOString(),
+      message: '견적이 승인되었습니다. 이제 확정할 수 있습니다.'
+    });
+
+  } catch (error) {
+    console.error('[Quote] 승인 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: 'APPROVAL_ERROR',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/v2/quote/:quoteId/reject
+ * 견적 반려 처리
+ */
+router.post('/:quoteId/reject', async (req, res) => {
+  try {
+    const { quoteId } = req.params;
+    const { rejected_by, rejection_reason } = req.body;
+
+    if (!rejected_by || !rejection_reason) {
+      return res.status(400).json({
+        success: false,
+        error: 'MISSING_FIELDS',
+        message: '반려자와 반려 사유가 필요합니다'
+      });
+    }
+
+    // 견적 조회
+    const quote = await getQuote(quoteId);
+    if (!quote) {
+      return res.status(404).json({
+        success: false,
+        error: 'QUOTE_NOT_FOUND'
+      });
+    }
+
+    // DB 업데이트
+    if (db) {
+      try {
+        await db.query(`
+          UPDATE quotes SET
+            approval_status = 'rejected',
+            approved_by = $1,
+            approved_at = NOW(),
+            approval_note = $2,
+            updated_at = NOW()
+          WHERE quote_id = $3
+        `, [rejected_by, rejection_reason, quoteId]);
+      } catch (dbErr) {
+        console.error('[Quote] 반려 DB 업데이트 실패:', dbErr.message);
+      }
+    }
+
+    // 이벤트 로깅
+    await logEvent('QuoteRejected', quoteId, {
+      rejected_by,
+      rejection_reason
+    });
+
+    res.json({
+      success: true,
+      quoteId,
+      approval_status: 'rejected',
+      rejected_by,
+      rejection_reason,
+      message: '견적이 반려되었습니다.'
+    });
+
+  } catch (error) {
+    console.error('[Quote] 반려 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: 'REJECTION_ERROR',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/v2/quote/:quoteId/confirm
+ * 견적 확정 처리
+ */
+router.post('/:quoteId/confirm', async (req, res) => {
+  try {
+    const { quoteId } = req.params;
+    const { confirmed_by } = req.body;
+
+    if (!confirmed_by) {
+      return res.status(400).json({
+        success: false,
+        error: 'MISSING_CONFIRMER',
+        message: '확정자 정보가 필요합니다'
+      });
+    }
+
+    // 견적 조회
+    const quote = await getQuote(quoteId);
+    if (!quote) {
+      return res.status(404).json({
+        success: false,
+        error: 'QUOTE_NOT_FOUND'
+      });
+    }
+
+    // 확정 가능 상태 확인
+    const confirmableStatuses = ['approved', 'auto_approved'];
+    if (quote.requires_approval && !confirmableStatuses.includes(quote.approval_status)) {
+      return res.status(400).json({
+        success: false,
+        error: 'NOT_CONFIRMABLE',
+        message: `승인이 필요합니다. 현재 상태: ${quote.approval_status}`
+      });
+    }
+
+    // DB 업데이트
+    if (db) {
+      try {
+        await db.query(`
+          UPDATE quotes SET
+            status = 'confirmed',
+            quote_type = 'confirmed',
+            confirmed_at = NOW(),
+            confirmed_by = $1,
+            updated_at = NOW()
+          WHERE quote_id = $2
+        `, [confirmed_by, quoteId]);
+      } catch (dbErr) {
+        console.error('[Quote] 확정 DB 업데이트 실패:', dbErr.message);
+      }
+    }
+
+    // 이벤트 로깅
+    await logEvent('QuoteConfirmed', quoteId, {
+      confirmed_by,
+      operation_mode: quote.operation_mode,
+      total_sell: quote.total_sell
+    });
+
+    // 담당자 알림 카드 생성
+    const summaryCard = dealStructuring?.generateSummaryCard({
+      operation_mode: quote.operation_mode,
+      settlement_method: quote.settlement_method,
+      tax_invoice_issuer: quote.tax_invoice_issuer,
+      payment_receiver: quote.payment_receiver,
+      contract_party: quote.contract_party,
+      refund_liability: quote.refund_liability,
+      guest_count: quote.guest_count,
+      total_sell: quote.total_sell,
+      approval_status: 'confirmed'
+    });
+
+    res.json({
+      success: true,
+      quoteId,
+      status: 'confirmed',
+      quote_type: 'confirmed',
+      confirmed_by,
+      confirmed_at: new Date().toISOString(),
+      summary_card: summaryCard,
+      message: '견적이 확정되었습니다.',
+      next_steps: [
+        '고객에게 확정 견적서를 발송하세요.',
+        '결제 링크를 생성하세요.',
+        quote.operation_mode !== 'direct' ? '여행사 정산을 준비하세요.' : null
+      ].filter(Boolean)
+    });
+
+  } catch (error) {
+    console.error('[Quote] 확정 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: 'CONFIRMATION_ERROR',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/v2/admin/quotes/pending-approval
+ * 승인 대기 목록 조회
+ */
+router.get('/admin/quotes/pending-approval', async (req, res) => {
+  try {
+    let quotes = [];
+
+    if (db) {
+      try {
+        const result = await db.query('SELECT * FROM v_quotes_pending_approval LIMIT 50');
+        quotes = result.rows;
+      } catch (viewErr) {
+        // 뷰가 없으면 직접 쿼리
+        const fallback = await db.query(`
+          SELECT * FROM quotes
+          WHERE requires_approval = TRUE
+            AND approval_status IN ('pending', 'deal_review', 'ceo_approval')
+          ORDER BY created_at DESC
+          LIMIT 50
+        `);
+        quotes = fallback.rows;
+      }
+    }
+
+    res.json({
+      success: true,
+      count: quotes.length,
+      quotes,
+      message: quotes.length > 0
+        ? `${quotes.length}건의 승인 대기 견적이 있습니다.`
+        : '승인 대기 중인 견적이 없습니다.'
+    });
+
+  } catch (error) {
+    console.error('[Quote] 승인 대기 목록 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/v2/admin/quotes/by-mode
+ * 운영모드별 현황 조회
+ */
+router.get('/admin/quotes/by-mode', async (req, res) => {
+  try {
+    let stats = [];
+
+    if (db) {
+      try {
+        const result = await db.query('SELECT * FROM v_quotes_by_operation_mode');
+        stats = result.rows;
+      } catch (viewErr) {
+        // 뷰가 없으면 직접 쿼리
+        const fallback = await db.query(`
+          SELECT
+            operation_mode,
+            COUNT(*) as total_count,
+            COUNT(*) FILTER (WHERE status = 'confirmed') as confirmed_count,
+            SUM(total_sell) as total_revenue,
+            SUM(total_margin) as total_margin
+          FROM quotes
+          WHERE created_at >= CURRENT_DATE - INTERVAL '30 days'
+          GROUP BY operation_mode
+          ORDER BY total_count DESC
+        `);
+        stats = fallback.rows;
+      }
+    }
+
+    res.json({
+      success: true,
+      stats,
+      period: 'last_30_days'
+    });
+
+  } catch (error) {
+    console.error('[Quote] 운영모드별 현황 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/v2/quote/:quoteId/incentive-flags
+ * 인센티브 플래그 생성 (P1)
+ */
+router.post('/:quoteId/incentive-flags', async (req, res) => {
+  try {
+    const { quoteId } = req.params;
+
+    if (!dealStructuring) {
+      return res.status(503).json({
+        success: false,
+        error: 'SERVICE_UNAVAILABLE'
+      });
+    }
+
+    // 견적 조회
+    const quote = await getQuote(quoteId);
+    if (!quote) {
+      return res.status(404).json({
+        success: false,
+        error: 'QUOTE_NOT_FOUND'
+      });
+    }
+
+    // 인센티브 플래그 생성
+    const flags = dealStructuring.generateIncentiveFlags({
+      travel_date: quote.travel_date,
+      incentive_type: req.body.incentive_type || 'group_tour'
+    });
+
+    // DB 업데이트
+    if (db) {
+      try {
+        await db.query(`
+          UPDATE quotes SET
+            incentive_required = TRUE,
+            incentive_applicant = $1,
+            required_documents = $2,
+            deadline_flags = $3,
+            updated_at = NOW()
+          WHERE quote_id = $4
+        `, [
+          flags.applicant_recommendation,
+          JSON.stringify(flags.documents),
+          JSON.stringify(flags.deadlines),
+          quoteId
+        ]);
+      } catch (dbErr) {
+        console.error('[Quote] 인센티브 플래그 DB 업데이트 실패:', dbErr.message);
+      }
+    }
+
+    res.json({
+      success: true,
+      quoteId,
+      ...flags
+    });
+
+  } catch (error) {
+    console.error('[Quote] 인센티브 플래그 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;
