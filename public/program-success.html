@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>결제 완료 - 하루하루의 기적</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 12px;
+    }
+    .message {
+      font-size: 15px;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .order-info {
+      background: #f8f9ff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+    .order-info .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .order-info .row:last-child { border-bottom: none; }
+    .order-info .label { color: #666; font-size: 14px; }
+    .order-info .value { color: #333; font-weight: 600; font-size: 14px; }
+    .token-box {
+      background: #e8f5e9;
+      border: 1px solid #4caf50;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 24px;
+    }
+    .token-box .title {
+      font-size: 13px;
+      color: #2e7d32;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .token-box .token {
+      font-family: monospace;
+      font-size: 11px;
+      color: #333;
+      word-break: break-all;
+      background: white;
+      padding: 8px;
+      border-radius: 4px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">🎉</div>
+    <h1>결제가 완료되었습니다!</h1>
+    <p class="message">30일 프로그램이 활성화되었습니다.<br>지금 바로 시작해보세요!</p>
+
+    <div class="order-info">
+      <div class="row">
+        <span class="label">주문번호</span>
+        <span class="value" id="order-id">-</span>
+      </div>
+      <div class="row">
+        <span class="label">상태</span>
+        <span class="value" style="color: #4caf50;">결제 완료</span>
+      </div>
+    </div>
+
+    <div class="token-box" id="token-box" style="display: none;">
+      <div class="title">접근 토큰 (저장해주세요)</div>
+      <div class="token" id="access-token"></div>
+    </div>
+
+    <a href="/daily-messages.html" class="btn" id="start-btn">프로그램 시작하기</a>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('orderId');
+    const token = params.get('token');
+
+    if (orderId) {
+      document.getElementById('order-id').textContent = orderId;
+    }
+
+    if (token) {
+      document.getElementById('token-box').style.display = 'block';
+      document.getElementById('access-token').textContent = token;
+      document.getElementById('start-btn').href = `/daily-messages.html?token=${token}`;
+    }
+  </script>
+</body>
+</html>

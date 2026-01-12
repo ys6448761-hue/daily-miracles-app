@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>결제 실패 - 하루하루의 기적</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .icon { font-size: 64px; margin-bottom: 20px; }
+    h1 { font-size: 24px; color: #333; margin-bottom: 12px; }
+    .message {
+      font-size: 15px;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .error-box {
+      background: #ffebee;
+      border: 1px solid #ef5350;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      color: #c62828;
+    }
+    .btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">😢</div>
+    <h1>결제에 실패했습니다</h1>
+    <p class="message">결제 처리 중 문제가 발생했습니다.<br>다시 시도해주세요.</p>
+    <div class="error-box" id="error-box" style="display: none;"></div>
+    <a href="/program" class="btn">다시 시도하기</a>
+  </div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const message = params.get('message');
+    if (message) {
+      document.getElementById('error-box').textContent = message;
+      document.getElementById('error-box').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

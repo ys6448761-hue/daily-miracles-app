@@ -1,17 +1,27 @@
 /**
- * Entitlement Middleware - Trial 권한 검증
+ * ═══════════════════════════════════════════════════════════
+ * Entitlement Middleware - P0 확장 버전
+ * ═══════════════════════════════════════════════════════════
  *
- * P0 요구사항:
- * - /api/daily-messages, /api/roadmap 접근 제어
- * - 무토큰: 403 + redirect '/program'
- * - trial token: 200 OK
- * - DB 모듈 로딩 실패 시 deny
+ * 지원하는 권한:
+ * - trial: 7일 무료 체험
+ * - wish_30: 소원실현 30일 프로그램
+ * - solve_30: 문제해결 30일 프로그램
+ * - dual_30: 듀얼 30일 프로그램
+ *
+ * 지원하는 인증 방식:
+ * - JWT (Authorization: Bearer xxx) - 회원
+ * - trial_token (query: ?token=xxx) - 트라이얼
+ * - guest_access_token (query: ?token=xxx) - 비회원 결제
  */
 
 const jwt = require('jsonwebtoken');
 
 // JWT 비밀키
 const JWT_SECRET = process.env.JWT_SECRET || 'daily-miracles-secret-key-change-in-production';
+
+// 유효 권한 키 목록
+const VALID_ENTITLEMENTS = ['trial', 'wish_30', 'solve_30', 'dual_30'];
 
 // DB 모듈 (선택적 로딩 - 실패 시 deny)
 let db = null;
@@ -22,10 +32,10 @@ try {
 }
 
 /**
- * Trial 토큰 검증 미들웨어
- * @param {string} requiredEntitlement - 필요한 권한 레벨 ('trial' 등)
+ * 복수 권한 중 하나라도 있으면 통과
+ * @param {string[]} allowedEntitlements - 허용할 권한 키 목록
  */
-function requireEntitlement(requiredEntitlement = 'trial') {
+function requireAnyEntitlement(allowedEntitlements = VALID_ENTITLEMENTS) {
   return async (req, res, next) => {
     try {
       // DB 모듈 로딩 실패 시 deny
@@ -39,22 +49,8 @@ function requireEntitlement(requiredEntitlement = 'trial') {
         });
       }
 
-      // Authorization 헤더에서 토큰 추출
-      const authHeader = req.headers.authorization;
-      let token = null;
-
-      if (authHeader) {
-        if (authHeader.startsWith('Bearer ')) {
-          token = authHeader.substring(7);
-        } else {
-          token = authHeader;
-        }
-      }
-
-      // 쿼리 파라미터에서도 토큰 체크 (대체 방식)
-      if (!token && req.query.token) {
-        token = req.query.token;
-      }
+      // 토큰 추출 (헤더 > 쿼리 > 쿠키)
+      let token = extractToken(req);
 
       // 토큰 없음 - 403 + redirect
       if (!token) {
@@ -67,73 +63,24 @@ function requireEntitlement(requiredEntitlement = 'trial') {
         });
       }
 
-      // 토큰 검증 (JWT 우선, session_token 폴백)
-      let user = null;
+      // 권한 확인
+      const entitlementResult = await checkEntitlement(token, allowedEntitlements);
 
-      // 1) JWT 토큰 검증 시도
-      try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        if (decoded.userId) {
-          const userResult = await db.query(
-            `SELECT id, email, is_active, created_at
-             FROM users
-             WHERE id = $1 AND is_active = true`,
-            [decoded.userId]
-          );
-          if (userResult.rows.length > 0) {
-            user = userResult.rows[0];
-            // 임시: 가입된 사용자는 모두 trial 권한 부여 (entitlement 컬럼 추가 전까지)
-            user.entitlement = 'trial';
-            console.log(`✅ [Entitlement] JWT 검증 성공 - user: ${user.email}`);
-          }
-        }
-      } catch (jwtError) {
-        // JWT 검증 실패 시 로그
-        console.log(`ℹ️ [Entitlement] JWT 검증 실패: ${jwtError.message}`);
-      }
-
-      if (!user) {
-        console.log("❌ [Entitlement] 유효하지 않은 토큰 - 접근 거부");
+      if (!entitlementResult.hasAccess) {
+        console.log(`❌ [Entitlement] 권한 없음 - token: ${token.substring(0, 20)}...`);
         return res.status(403).json({
           success: false,
-          error: "invalid_token",
-          message: "세션이 만료되었습니다. 다시 로그인해주세요.",
+          error: "insufficient_entitlement",
+          message: "이용 권한이 없습니다. 프로그램을 구매해주세요.",
           redirect: "/program"
         });
       }
 
-      // Trial 권한 체크
-      if (requiredEntitlement === 'trial') {
-        const now = new Date();
-        const trialEnd = user.trial_end ? new Date(user.trial_end) : null;
-
-        // trial 권한이 있고 기간 내인지 확인
-        const hasTrialEntitlement =
-          user.entitlement === 'trial' ||
-          user.entitlement === 'paid' ||
-          user.entitlement === 'premium';
-
-        const isWithinTrial = trialEnd ? now <= trialEnd : true;
-
-        if (!hasTrialEntitlement || !isWithinTrial) {
-          console.log(`❌ [Entitlement] 권한 부족 - user: ${user.email}, entitlement: ${user.entitlement}`);
-          return res.status(403).json({
-            success: false,
-            error: "insufficient_entitlement",
-            message: "체험 기간이 만료되었습니다. 프로그램을 구매해주세요.",
-            redirect: "/program"
-          });
-        }
-      }
-
       // 권한 확인 완료 - 사용자 정보를 req에 첨부
-      req.user = {
-        id: user.id,
-        email: user.email,
-        entitlement: user.entitlement
-      };
+      req.user = entitlementResult.user;
+      req.entitlements = entitlementResult.entitlements;
 
-      console.log(`✅ [Entitlement] 권한 확인 완료 - user: ${user.email}, entitlement: ${user.entitlement}`);
+      console.log(`✅ [Entitlement] 권한 확인 완료 - ${entitlementResult.authType}: ${entitlementResult.identifier}, 권한: ${entitlementResult.entitlements.join(', ')}`);
       next();
 
     } catch (error) {
@@ -149,15 +96,148 @@ function requireEntitlement(requiredEntitlement = 'trial') {
 }
 
 /**
- * 간편 권한 체크 (토큰만 확인, DB 조회 없음)
- * 개발/테스트 환경용
+ * 단일 권한 요구 (기존 호환성)
+ */
+function requireEntitlement(requiredEntitlement = 'trial') {
+  // trial 요청 시 모든 유효 권한 허용 (trial 또는 paid)
+  if (requiredEntitlement === 'trial') {
+    return requireAnyEntitlement(VALID_ENTITLEMENTS);
+  }
+  return requireAnyEntitlement([requiredEntitlement]);
+}
+
+/**
+ * 토큰 추출 헬퍼
+ */
+function extractToken(req) {
+  // 1) Authorization 헤더
+  const authHeader = req.headers.authorization;
+  if (authHeader) {
+    if (authHeader.startsWith('Bearer ')) {
+      return authHeader.substring(7);
+    }
+    return authHeader;
+  }
+
+  // 2) Query parameter
+  if (req.query.token) {
+    return req.query.token;
+  }
+
+  // 3) Cookie
+  if (req.cookies && req.cookies.access_token) {
+    return req.cookies.access_token;
+  }
+
+  return null;
+}
+
+/**
+ * 권한 확인 (통합)
+ */
+async function checkEntitlement(token, allowedEntitlements) {
+  const result = {
+    hasAccess: false,
+    authType: null,
+    identifier: null,
+    user: null,
+    entitlements: []
+  };
+
+  // 1) JWT 토큰 검증 시도 (회원)
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (decoded.userId) {
+      const userResult = await db.query(
+        `SELECT id, email, is_active FROM users WHERE id = $1 AND is_active = true`,
+        [decoded.userId]
+      );
+
+      if (userResult.rows.length > 0) {
+        const user = userResult.rows[0];
+        result.authType = 'user';
+        result.identifier = user.email;
+        result.user = { id: user.id, email: user.email };
+
+        // entitlements 테이블에서 권한 조회
+        const entResult = await db.query(
+          `SELECT entitlement_key FROM entitlements
+           WHERE subject_type = 'user' AND subject_id = $1
+           AND is_active = true AND end_at > CURRENT_TIMESTAMP`,
+          [user.id]
+        );
+
+        result.entitlements = entResult.rows.map(r => r.entitlement_key);
+
+        // 회원은 기본 trial 권한 부여 (임시)
+        if (!result.entitlements.includes('trial')) {
+          result.entitlements.push('trial');
+        }
+
+        // 허용된 권한 중 하나라도 있으면 통과
+        result.hasAccess = result.entitlements.some(e => allowedEntitlements.includes(e));
+        return result;
+      }
+    }
+  } catch (jwtError) {
+    // JWT 아님 - 다른 방식 시도
+  }
+
+  // 2) Trial 토큰 검증 (trial subject)
+  const trialResult = await db.query(
+    `SELECT entitlement_key FROM entitlements
+     WHERE subject_type = 'trial' AND subject_id = $1
+     AND is_active = true AND end_at > CURRENT_TIMESTAMP`,
+    [token]
+  );
+
+  if (trialResult.rows.length > 0) {
+    result.authType = 'trial';
+    result.identifier = token.substring(0, 16) + '...';
+    result.user = { token, type: 'trial' };
+    result.entitlements = trialResult.rows.map(r => r.entitlement_key);
+    result.hasAccess = result.entitlements.some(e => allowedEntitlements.includes(e));
+
+    if (result.hasAccess) return result;
+  }
+
+  // 3) Guest Access 토큰 검증 (guest subject)
+  const guestResult = await db.query(
+    `SELECT entitlement_key FROM entitlements
+     WHERE subject_type = 'guest' AND subject_id = $1
+     AND is_active = true AND end_at > CURRENT_TIMESTAMP`,
+    [token]
+  );
+
+  if (guestResult.rows.length > 0) {
+    result.authType = 'guest';
+    result.identifier = token.substring(0, 16) + '...';
+    result.user = { token, type: 'guest' };
+    result.entitlements = guestResult.rows.map(r => r.entitlement_key);
+    result.hasAccess = result.entitlements.some(e => allowedEntitlements.includes(e));
+
+    if (result.hasAccess) return result;
+  }
+
+  // 4) 64자 hex 토큰이면 임시 trial로 처리 (하위 호환)
+  if (token.length === 64 && /^[0-9a-f]+$/i.test(token)) {
+    result.authType = 'legacy_trial';
+    result.identifier = token.substring(0, 16) + '...';
+    result.user = { token, type: 'trial' };
+    result.entitlements = ['trial'];
+    result.hasAccess = allowedEntitlements.includes('trial');
+    return result;
+  }
+
+  return result;
+}
+
+/**
+ * 간편 토큰 체크 (DB 조회 없음)
  */
 function requireToken() {
   return (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    let token = authHeader?.startsWith('Bearer ')
-      ? authHeader.substring(7)
-      : authHeader || req.query.token;
+    const token = extractToken(req);
 
     if (!token) {
       return res.status(403).json({
@@ -175,5 +255,7 @@ function requireToken() {
 
 module.exports = {
   requireEntitlement,
-  requireToken
+  requireAnyEntitlement,
+  requireToken,
+  VALID_ENTITLEMENTS
 };
