@@ -798,20 +798,20 @@
               </div>
               <div class="benefit-list">
                 <div class="benefit-list-item">
-                  <span class="icon">🎫</span>
-                  <span>여수 관광지 할인</span>
+                  <span class="icon">🕹️</span>
+                  <span>오락실 할인</span>
                 </div>
                 <div class="benefit-list-item">
-                  <span class="icon">🛍️</span>
-                  <span>제휴 매장 할인</span>
+                  <span class="icon">🎤</span>
+                  <span>노래방 20% 할인</span>
                 </div>
                 <div class="benefit-list-item">
-                  <span class="icon">📸</span>
-                  <span>포토 스팟 가이드</span>
+                  <span class="icon">🍜</span>
+                  <span>제휴 맛집·음료 추가</span>
                 </div>
                 <div class="benefit-list-item">
-                  <span class="icon">🎁</span>
-                  <span>소원이 굿즈 증정</span>
+                  <span class="icon">🎈</span>
+                  <span>체험 할인</span>
                 </div>
               </div>
             </div>
@@ -846,34 +846,42 @@
 
           <div class="result-breakdown">
             <div class="breakdown-item">
-              <span class="label">숙소</span>
-              <span class="value" id="breakdown-hotel"></span>
-            </div>
-            <div class="breakdown-item" id="breakdown-leisure-row" style="display:none;">
-              <span class="label">레저</span>
-              <span class="value" id="breakdown-leisure"></span>
+              <span class="label">소원항해단(온라인)</span>
+              <span class="value" id="breakdown-wishvoyage"></span>
             </div>
             <div class="breakdown-item">
               <span class="label">운영비</span>
               <span class="value" id="breakdown-operation"></span>
             </div>
             <div class="breakdown-item">
-              <span class="label">1인당</span>
-              <span class="value" id="breakdown-per-person"></span>
+              <span class="label">숙소 (제휴 특가)</span>
+              <span class="value" id="breakdown-hotel"></span>
+            </div>
+            <div class="breakdown-item" id="breakdown-leisure-row" style="display:none;">
+              <span class="label">레저</span>
+              <span class="value" id="breakdown-leisure"></span>
+            </div>
+            <div class="breakdown-item" id="breakdown-benefit-row">
+              <span class="label">소원이 혜택북</span>
+              <span class="value" id="breakdown-benefit"></span>
+            </div>
+            <div class="breakdown-item" style="border-top: 2px solid #667eea; margin-top: 8px; padding-top: 12px;">
+              <span class="label" style="font-weight: 700;">1인당</span>
+              <span class="value" id="breakdown-per-person" style="color: #667eea;"></span>
             </div>
           </div>
 
           <div class="benefits">
-            <div class="benefit-item">소원3합 패스 52% 할인 포함</div>
-            <div class="benefit-item">정상가 대비 최대 30% 절약</div>
+            <div class="benefit-item">소원항해단(온라인) 포함</div>
+            <div class="benefit-item">제휴 특가 적용</div>
           </div>
 
           <!-- 혜택북 포함 안내 (레저 선택 시만 표시) -->
           <div class="result-benefit-book" id="result-benefit-book" style="display:none;">
             <h5>🎁 소원이 혜택북 포함!</h5>
             <div class="items">
-              <strong>소원3합:</strong> 맛집 음료, 카페 아메리카노, 3합 맛집 할인<br>
-              <strong>달빛혜택:</strong> 관광지 할인, 제휴 매장 할인, 포토 가이드, 굿즈 증정
+              <strong>소원3합:</strong> 맛집 음료 1병, 카페 아메리카노 1잔, 3합맛집 할인(주중10%/주말5%)<br>
+              <strong>달빛혜택:</strong> 오락실 할인, 노래방 20%, 제휴 맛집·음료 추가, 체험 할인
             </div>
           </div>
 
@@ -937,6 +945,19 @@
     const benefitStatusIcon = document.getElementById('status-icon');
     const benefitStatusText = document.getElementById('status-text');
     const resultBenefitBook = document.getElementById('result-benefit-book');
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // P0 가격 정책 (v1.2 - 2026-01-12)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    // 소원항해단(온라인) - 2~4인 필수 포함
+    const WISH_VOYAGE_PRICE = 24900; // 1인당
+
+    // 운영비 - v1.2에서 10,000원으로 변경
+    const OPERATION_FEE = 10000; // 1인당
+
+    // 호텔 표시가에 포함할 금액 (제휴 특가 표시용)
+    const HOTEL_DISPLAY_ADDON = 20000; // 룸당
 
     // 레저 가격표 (1인당, list 가격 포함)
     const leisurePrices = {
@@ -1140,27 +1161,44 @@
 
     // 견적 결과 표시
     function displayQuoteResult(data) {
-      const { pricing, breakdown, selectedLeisures, leisureTotal } = data;
+      const { breakdown, selectedLeisures, leisureTotal } = data;
 
-      // 가격 표시
-      document.getElementById('result-list-price').textContent =
-        pricing.totalList.toLocaleString() + '원';
-      document.getElementById('result-sell-price').textContent =
-        pricing.totalSell.toLocaleString() + '원';
+      // ═══════════════════════════════════════════════════════════════════════════
+      // P0 가격 계산 (프론트엔드에서 재계산)
+      // ═══════════════════════════════════════════════════════════════════════════
 
-      // 할인율 계산
-      const discountPercent = Math.round((1 - pricing.totalSell / pricing.totalList) * 100);
-      document.getElementById('result-discount').textContent =
-        `${discountPercent}% 할인`;
+      // 1) 소원항해단(온라인) = 24,900 × 인원
+      const wishVoyageTotal = WISH_VOYAGE_PRICE * selectedGuests;
 
-      // 내역 표시
+      // 2) 운영비 = 10,000 × 인원
+      const operationTotal = OPERATION_FEE * selectedGuests;
+
+      // 3) 숙소 (제휴 특가) = API 호텔가 + 20,000
       const hotelItem = breakdown.find(b => b.category === 'hotel');
-      const operationItem = breakdown.find(b => b.category === 'operation');
+      const hotelSell = hotelItem ? hotelItem.sell + HOTEL_DISPLAY_ADDON : 0;
+      const hotelName = hotelItem ? hotelItem.name : '';
 
-      if (hotelItem) {
-        document.getElementById('breakdown-hotel').textContent =
-          `${hotelItem.name} ${hotelItem.sell.toLocaleString()}원`;
-      }
+      // 4) 레저 합계 (이미 계산됨)
+      const leisureSell = leisureTotal ? leisureTotal.sell : 0;
+
+      // 최종 총액 계산
+      const totalSell = wishVoyageTotal + operationTotal + hotelSell + leisureSell;
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      // breakdown 표시
+      // ═══════════════════════════════════════════════════════════════════════════
+
+      // 소원항해단(온라인)
+      document.getElementById('breakdown-wishvoyage').textContent =
+        `${WISH_VOYAGE_PRICE.toLocaleString()}원 × ${selectedGuests}인 = ${wishVoyageTotal.toLocaleString()}원`;
+
+      // 운영비
+      document.getElementById('breakdown-operation').textContent =
+        `${OPERATION_FEE.toLocaleString()}원 × ${selectedGuests}인 = ${operationTotal.toLocaleString()}원`;
+
+      // 숙소 (제휴 특가)
+      document.getElementById('breakdown-hotel').textContent =
+        `${hotelName} ${hotelSell.toLocaleString()}원`;
 
       // 레저 표시 (다중 선택)
       const leisureRow = document.getElementById('breakdown-leisure-row');
@@ -1168,23 +1206,37 @@
         leisureRow.style.display = 'flex';
         const leisureNamesStr = selectedLeisures.map(code => leisureNames[code]).join(', ');
         document.getElementById('breakdown-leisure').textContent =
-          `${leisureNamesStr} ${leisureTotal.sell.toLocaleString()}원`;
+          `${leisureNamesStr} ${leisureSell.toLocaleString()}원`;
       } else {
         leisureRow.style.display = 'none';
       }
 
-      if (operationItem) {
-        document.getElementById('breakdown-operation').textContent =
-          `${operationItem.sell.toLocaleString()}원`;
-      }
+      // 혜택북 포함 여부 (텍스트만, 가격 X)
+      const hasBenefitBook = selectedLeisures && selectedLeisures.length > 0;
+      const benefitRow = document.getElementById('breakdown-benefit-row');
+      document.getElementById('breakdown-benefit').textContent =
+        hasBenefitBook ? '포함' : '미포함 (레저 선택 시 적용)';
+      document.getElementById('breakdown-benefit').style.color =
+        hasBenefitBook ? '#28a745' : '#999';
 
       // 1인당 가격
-      const perPerson = Math.round(pricing.totalSell / selectedGuests);
+      const perPerson = Math.round(totalSell / selectedGuests);
       document.getElementById('breakdown-per-person').textContent =
         `${perPerson.toLocaleString()}원`;
 
-      // 혜택북 포함 여부 표시 (레저 선택 시에만)
-      const hasBenefitBook = selectedLeisures && selectedLeisures.length > 0;
+      // ═══════════════════════════════════════════════════════════════════════════
+      // 총액 표시 (할인율 표시 제거)
+      // ═══════════════════════════════════════════════════════════════════════════
+
+      // 정가 표시 제거 (원가/마진 언급 금지)
+      document.getElementById('result-list-price').textContent = '';
+      document.getElementById('result-sell-price').textContent =
+        totalSell.toLocaleString() + '원';
+
+      // 할인율 배지 숨김
+      document.getElementById('result-discount').style.display = 'none';
+
+      // 혜택북 상세 박스 표시
       if (hasBenefitBook) {
         resultBenefitBook.style.display = 'block';
       } else {
@@ -1197,7 +1249,7 @@
         ? `, 레저: ${selectedLeisures.map(code => leisureNames[code]).join('+')}`
         : '';
       const benefitBookInfo = hasBenefitBook ? ', 🎁소원이 혜택북 포함' : '';
-      requestBtn.href = `https://pf.kakao.com/_xfxhcWn?text=견적번호: ${data.quoteId}${leisureInfo}${benefitBookInfo}`;
+      requestBtn.href = `https://pf.kakao.com/_xfxhcWn?text=견적번호: ${data.quoteId}, 총액: ${totalSell.toLocaleString()}원${leisureInfo}${benefitBookInfo}`;
 
       // 결과 표시
       quoteResult.classList.add('show');
