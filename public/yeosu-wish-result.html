@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>소원그림 - 여수 소원빌기 체험</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #fff;
+    }
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* 헤더 */
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .header-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+    .header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .header p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* 결과 카드 */
+    .result-card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    /* 상태 표시 */
+    .status-section {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .status-badge.generating {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      animation: pulse 2s infinite;
+    }
+    .status-badge.completed {
+      background: linear-gradient(135deg, #4ecdc4, #44a08d);
+    }
+    .status-badge.failed {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* 이미지 영역 */
+    .image-section {
+      margin-bottom: 24px;
+    }
+    .wish-image-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 100%;
+      background: rgba(255,255,255,0.05);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .wish-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .image-placeholder {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .placeholder-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(255,255,255,0.2);
+      border-top-color: #ffd700;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .placeholder-text {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* 소원 정보 */
+    .wish-info {
+      background: rgba(255,215,0,0.1);
+      border: 1px solid rgba(255,215,0,0.3);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .wish-label {
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 6px;
+    }
+    .wish-text {
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    /* 버튼들 */
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #ffd700, #ffb347);
+      color: #1a1a2e;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255,215,0,0.3);
+    }
+    .btn-primary:disabled {
+      background: rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.5);
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.3);
+      color: #fff;
+    }
+    .btn-secondary:hover {
+      border-color: #ffd700;
+      background: rgba(255,215,0,0.1);
+    }
+
+    /* 만료 경고 */
+    .expiry-notice {
+      background: rgba(255,107,107,0.2);
+      border: 1px solid rgba(255,107,107,0.5);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .expiry-notice-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .expiry-notice-text {
+      font-size: 13px;
+      color: rgba(255,255,255,0.8);
+    }
+
+    /* 공유 섹션 */
+    .share-section {
+      text-align: center;
+      padding: 16px 0;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      margin-top: 20px;
+    }
+    .share-label {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 12px;
+    }
+    .share-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+    .share-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+      transition: all 0.2s;
+    }
+    .share-btn:hover {
+      transform: scale(1.1);
+    }
+    .share-kakao {
+      background: #fee500;
+    }
+    .share-copy {
+      background: rgba(255,255,255,0.2);
+    }
+
+    /* 푸터 */
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+    }
+    .footer a {
+      color: #ffd700;
+      text-decoration: none;
+    }
+
+    /* 에러 상태 */
+    .error-section {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .error-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+    .error-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .error-message {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="header-icon">🌟</div>
+      <h1>나의 소원그림</h1>
+      <p id="customer-name">소원이 이루어지길 빕니다</p>
+    </header>
+
+    <!-- 로딩/에러 상태 -->
+    <div class="result-card" id="loading-card">
+      <div class="error-section">
+        <div class="placeholder-spinner"></div>
+        <p class="placeholder-text">소원 정보를 불러오는 중...</p>
+      </div>
+    </div>
+
+    <!-- 에러 상태 -->
+    <div class="result-card" id="error-card" style="display:none">
+      <div class="error-section">
+        <div class="error-icon">😢</div>
+        <h2 class="error-title" id="error-title">소원을 찾을 수 없습니다</h2>
+        <p class="error-message" id="error-message">링크가 만료되었거나 잘못된 접근입니다.</p>
+        <a href="/yeosu-wish.html" class="btn btn-primary">새로운 소원 빌기</a>
+      </div>
+    </div>
+
+    <!-- 결과 표시 -->
+    <div class="result-card" id="result-card" style="display:none">
+      <!-- 상태 배지 -->
+      <div class="status-section" id="status-section">
+        <span class="status-badge generating" id="status-badge">생성 중...</span>
+      </div>
+
+      <!-- 이미지 -->
+      <div class="image-section">
+        <div class="wish-image-container" id="image-container">
+          <div class="image-placeholder" id="image-placeholder">
+            <div class="placeholder-spinner"></div>
+            <p class="placeholder-text">AI가 소원그림을 그리고 있어요...</p>
+          </div>
+          <img src="" alt="소원그림" class="wish-image" id="wish-image" style="display:none">
+        </div>
+      </div>
+
+      <!-- 소원 정보 -->
+      <div class="wish-info">
+        <div class="wish-label">나의 소원</div>
+        <div class="wish-text" id="wish-text">-</div>
+      </div>
+
+      <!-- 만료 안내 -->
+      <div class="expiry-notice" id="expiry-notice" style="display:none">
+        <div class="expiry-notice-title">다운로드 기한</div>
+        <div class="expiry-notice-text" id="expiry-text">-</div>
+      </div>
+
+      <!-- 액션 버튼 -->
+      <div class="action-buttons">
+        <button class="btn btn-primary" id="download-btn" disabled>
+          다운로드 (생성 중...)
+        </button>
+        <a href="/yeosu-wish.html" class="btn btn-secondary">
+          새로운 소원 빌기
+        </a>
+      </div>
+
+      <!-- 공유 -->
+      <div class="share-section" id="share-section" style="display:none">
+        <div class="share-label">친구에게 공유하기</div>
+        <div class="share-buttons">
+          <button class="share-btn share-kakao" onclick="shareKakao()" title="카카오톡 공유">
+            💬
+          </button>
+          <button class="share-btn share-copy" onclick="copyLink()" title="링크 복사">
+            🔗
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <p>문의: <a href="https://pf.kakao.com/_xfxhcWn" target="_blank">카카오톡 채널</a></p>
+      <p style="margin-top:8px">하루하루의 기적 | Daily Miracles</p>
+    </footer>
+  </div>
+
+  <script>
+    // URL 파라미터
+    const params = new URLSearchParams(window.location.search);
+    const wishId = params.get('id');
+    const token = params.get('token');
+
+    // DOM 요소
+    const loadingCard = document.getElementById('loading-card');
+    const errorCard = document.getElementById('error-card');
+    const resultCard = document.getElementById('result-card');
+    const statusBadge = document.getElementById('status-badge');
+    const imagePlaceholder = document.getElementById('image-placeholder');
+    const wishImage = document.getElementById('wish-image');
+    const wishText = document.getElementById('wish-text');
+    const downloadBtn = document.getElementById('download-btn');
+    const expiryNotice = document.getElementById('expiry-notice');
+    const expiryText = document.getElementById('expiry-text');
+    const shareSection = document.getElementById('share-section');
+    const customerName = document.getElementById('customer-name');
+
+    // 에러 표시
+    function showError(title, message) {
+      loadingCard.style.display = 'none';
+      resultCard.style.display = 'none';
+      errorCard.style.display = 'block';
+      document.getElementById('error-title').textContent = title;
+      document.getElementById('error-message').textContent = message;
+    }
+
+    // 소원 정보 로드
+    async function loadWish() {
+      if (!wishId) {
+        showError('잘못된 접근입니다', '소원 ID가 없습니다.');
+        return;
+      }
+
+      try {
+        const url = token
+          ? `/api/yeosu/wish/${wishId}?token=${token}`
+          : `/api/yeosu/wish/${wishId}`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!data.success) {
+          showError('소원을 찾을 수 없습니다', data.error || '다시 시도해주세요.');
+          return;
+        }
+
+        const wish = data.wish;
+        displayWish(wish);
+
+        // 생성 중인 경우 폴링
+        if (wish.status === 'PENDING' || wish.status === 'GENERATING') {
+          startPolling();
+        }
+
+      } catch (error) {
+        console.error('로드 오류:', error);
+        showError('오류가 발생했습니다', '네트워크 오류입니다. 다시 시도해주세요.');
+      }
+    }
+
+    // 소원 정보 표시
+    function displayWish(wish) {
+      loadingCard.style.display = 'none';
+      errorCard.style.display = 'none';
+      resultCard.style.display = 'block';
+
+      // 고객 이름
+      customerName.textContent = `${wish.customer_name}님의 소원`;
+
+      // 소원 텍스트
+      wishText.textContent = wish.wish_text;
+
+      // 상태 표시
+      updateStatus(wish.status);
+
+      // 이미지 표시
+      if (wish.status === 'COMPLETED' && wish.result_image_url) {
+        showImage(wish.result_image_url);
+      }
+
+      // 만료 정보
+      if (wish.download_expires_at) {
+        const expiryDate = new Date(wish.download_expires_at);
+        const now = new Date();
+        const daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
+
+        if (daysLeft > 0) {
+          expiryNotice.style.display = 'block';
+          expiryText.textContent = `${expiryDate.toLocaleDateString('ko-KR')}까지 (${daysLeft}일 남음)`;
+        } else {
+          expiryNotice.style.display = 'block';
+          expiryNotice.style.background = 'rgba(255,0,0,0.2)';
+          expiryNotice.style.borderColor = 'rgba(255,0,0,0.5)';
+          expiryText.textContent = '다운로드 기한이 만료되었습니다';
+        }
+      }
+    }
+
+    // 상태 업데이트
+    function updateStatus(status) {
+      statusBadge.className = 'status-badge';
+
+      switch (status) {
+        case 'PENDING':
+        case 'GENERATING':
+          statusBadge.classList.add('generating');
+          statusBadge.textContent = '소원그림 생성 중...';
+          downloadBtn.disabled = true;
+          downloadBtn.textContent = '다운로드 (생성 중...)';
+          break;
+        case 'COMPLETED':
+          statusBadge.classList.add('completed');
+          statusBadge.textContent = '완성!';
+          downloadBtn.disabled = false;
+          downloadBtn.textContent = '소원그림 다운로드';
+          shareSection.style.display = 'block';
+          break;
+        case 'FAILED':
+          statusBadge.classList.add('failed');
+          statusBadge.textContent = '생성 실패';
+          downloadBtn.disabled = true;
+          downloadBtn.textContent = '다운로드 불가';
+          break;
+      }
+    }
+
+    // 이미지 표시
+    function showImage(imageUrl) {
+      imagePlaceholder.style.display = 'none';
+      wishImage.src = imageUrl;
+      wishImage.style.display = 'block';
+    }
+
+    // 상태 폴링
+    let pollInterval = null;
+    function startPolling() {
+      if (pollInterval) return;
+
+      pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/yeosu/wish/status/${wishId}`);
+          const data = await res.json();
+
+          if (data.success) {
+            updateStatus(data.status);
+
+            if (data.completed && data.result_image_url) {
+              showImage(data.result_image_url);
+              clearInterval(pollInterval);
+              pollInterval = null;
+            }
+
+            if (data.status === 'FAILED') {
+              clearInterval(pollInterval);
+              pollInterval = null;
+            }
+          }
+        } catch (error) {
+          console.error('폴링 오류:', error);
+        }
+      }, 3000); // 3초마다
+    }
+
+    // 다운로드
+    downloadBtn.addEventListener('click', () => {
+      if (!token) {
+        alert('다운로드 권한이 없습니다.');
+        return;
+      }
+      window.location.href = `/api/yeosu/wish/download/${token}`;
+    });
+
+    // 카카오 공유
+    function shareKakao() {
+      // TODO: 카카오 SDK 연동
+      alert('카카오톡 공유 기능 준비 중입니다.');
+    }
+
+    // 링크 복사
+    async function copyLink() {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        alert('링크가 복사되었습니다!');
+      } catch (error) {
+        // Fallback
+        const input = document.createElement('input');
+        input.value = window.location.href;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        alert('링크가 복사되었습니다!');
+      }
+    }
+
+    // 페이지 종료 시 폴링 중지
+    window.addEventListener('beforeunload', () => {
+      if (pollInterval) {
+        clearInterval(pollInterval);
+      }
+    });
+
+    // 초기화
+    loadWish();
+  </script>
+</body>
+</html>

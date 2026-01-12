@@ -224,6 +224,15 @@ try {
   console.error("❌ 30일 프로그램 라우터 로드 실패:", error.message);
 }
 
+// 여수 소원빌기 체험 라우터 로딩
+let yeosuWishRoutes = null;
+try {
+  yeosuWishRoutes = require("./routes/yeosuWishRoutes");
+  console.log("✅ 여수 소원빌기 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 여수 소원빌기 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -718,6 +727,14 @@ if (programRoutes) {
   console.log("✅ 30일 프로그램 라우터 등록 완료 (/api/program)");
 } else {
   console.warn("⚠️ 30일 프로그램 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 여수 소원빌기 체험 Routes (/api/yeosu/wish) ----------
+if (yeosuWishRoutes) {
+  app.use("/api/yeosu/wish", yeosuWishRoutes);
+  console.log("✅ 여수 소원빌기 라우터 등록 완료 (/api/yeosu/wish)");
+} else {
+  console.warn("⚠️ 여수 소원빌기 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------

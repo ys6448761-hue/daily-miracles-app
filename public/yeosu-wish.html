@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>여수 소원빌기 체험 - 하루하루의 기적</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #fff;
+    }
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* 헤더 */
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .header-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .header p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* 폼 카드 */
+    .form-card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .form-section {
+      margin-bottom: 20px;
+    }
+    .form-section:last-child {
+      margin-bottom: 0;
+    }
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: rgba(255,255,255,0.9);
+    }
+    .form-label .required {
+      color: #ff6b6b;
+    }
+
+    /* 입력 필드 */
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 16px;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: #ffd700;
+      background: rgba(255,255,255,0.15);
+    }
+    .form-input::placeholder {
+      color: rgba(255,255,255,0.5);
+    }
+    textarea.form-input {
+      resize: none;
+      min-height: 100px;
+    }
+
+    /* 글자 수 카운터 */
+    .char-counter {
+      text-align: right;
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      margin-top: 4px;
+    }
+    .char-counter.warning {
+      color: #ff6b6b;
+    }
+
+    /* 상품 선택 */
+    .product-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .product-option {
+      background: rgba(255,255,255,0.05);
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 16px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .product-option:hover {
+      border-color: rgba(255,215,0,0.5);
+    }
+    .product-option.selected {
+      border-color: #ffd700;
+      background: rgba(255,215,0,0.1);
+    }
+    .product-option input {
+      display: none;
+    }
+    .product-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .product-name {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .product-price {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffd700;
+    }
+    .product-price.free {
+      color: #4ecdc4;
+    }
+    .product-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+    }
+    .product-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .product-feature {
+      background: rgba(255,255,255,0.1);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.8);
+    }
+
+    /* 단체 체크박스 */
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .checkbox-row input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: #ffd700;
+    }
+    .group-size-input {
+      display: none;
+      margin-top: 12px;
+    }
+    .group-size-input.show {
+      display: block;
+    }
+
+    /* 제출 버튼 */
+    .submit-btn {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #ffd700, #ffb347);
+      border: none;
+      border-radius: 16px;
+      color: #1a1a2e;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 20px;
+    }
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255,215,0,0.3);
+    }
+    .submit-btn:disabled {
+      background: rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.5);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* 로딩 상태 */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px;
+    }
+    .loading.show {
+      display: block;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255,255,255,0.2);
+      border-top-color: #ffd700;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .loading-text {
+      font-size: 16px;
+      color: rgba(255,255,255,0.8);
+    }
+
+    /* 푸터 */
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+    }
+    .footer a {
+      color: #ffd700;
+      text-decoration: none;
+    }
+
+    /* 반응형 */
+    @media (max-width: 360px) {
+      .container { padding: 0 10px; }
+      .form-card { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="header-icon">🌟</div>
+      <h1>여수 소원빌기 체험</h1>
+      <p>여수 바다의 신비로운 빛 아래<br>당신의 소원을 AI 그림으로 만나보세요</p>
+    </header>
+
+    <form id="wish-form" class="form-card">
+      <!-- 이름 -->
+      <div class="form-section">
+        <label class="form-label">
+          이름 <span class="required">*</span>
+        </label>
+        <input type="text" name="customer_name" class="form-input"
+               placeholder="이름을 입력해주세요" required maxlength="50">
+      </div>
+
+      <!-- 전화번호 -->
+      <div class="form-section">
+        <label class="form-label">
+          전화번호 <span class="required">*</span>
+        </label>
+        <input type="tel" name="customer_phone" class="form-input"
+               placeholder="010-0000-0000" required maxlength="15">
+      </div>
+
+      <!-- 이메일 (선택) -->
+      <div class="form-section">
+        <label class="form-label">이메일 (선택)</label>
+        <input type="email" name="customer_email" class="form-input"
+               placeholder="email@example.com" maxlength="100">
+      </div>
+
+      <!-- 소원 -->
+      <div class="form-section">
+        <label class="form-label">
+          나의 소원 <span class="required">*</span>
+        </label>
+        <textarea name="wish_text" class="form-input" id="wish-text"
+                  placeholder="이루고 싶은 소원을 적어주세요" required maxlength="100"></textarea>
+        <div class="char-counter" id="char-counter">0 / 100자</div>
+      </div>
+
+      <!-- 상품 선택 -->
+      <div class="form-section">
+        <label class="form-label">
+          상품 선택 <span class="required">*</span>
+        </label>
+        <div class="product-options" id="product-options">
+          <!-- 상품 목록은 JS로 렌더링 -->
+        </div>
+      </div>
+
+      <!-- 단체 여부 -->
+      <div class="form-section">
+        <div class="checkbox-row">
+          <input type="checkbox" name="is_group" id="is-group">
+          <label for="is-group">단체로 신청합니다</label>
+        </div>
+        <div class="group-size-input" id="group-size-container">
+          <input type="number" name="group_size" class="form-input"
+                 placeholder="인원 수" min="2" max="100" value="2">
+          <input type="text" name="group_name" class="form-input"
+                 placeholder="단체명 (선택)" maxlength="100" style="margin-top:8px">
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submit-btn">
+        소원 접수하기
+      </button>
+    </form>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p class="loading-text">소원을 접수하고 있습니다...</p>
+    </div>
+
+    <footer class="footer">
+      <p>문의: <a href="https://pf.kakao.com/_xfxhcWn" target="_blank">카카오톡 채널</a></p>
+      <p style="margin-top:8px">하루하루의 기적 | Daily Miracles</p>
+    </footer>
+  </div>
+
+  <script>
+    // 상품 정보
+    let products = [];
+    let selectedSku = 'FREE';
+
+    // 상품 목록 로드
+    async function loadProducts() {
+      try {
+        const res = await fetch('/api/yeosu/wish/products');
+        const data = await res.json();
+        if (data.success) {
+          products = data.products;
+          renderProducts();
+        }
+      } catch (error) {
+        console.error('상품 로드 실패:', error);
+        // 기본값 사용
+        products = [
+          { sku: 'FREE', name: '무료 체험', price: 0, description: '소원그림 1장 무료 생성', features: ['AI 소원그림 1장', '30일 다운로드'] },
+          { sku: 'YW_BASIC_7', name: '베이직 7', price: 9900, description: '7일간 매일 응원 메시지', features: ['AI 소원그림 1장', '7일 응원 메시지', '30일 다운로드'] },
+          { sku: 'YW_PREMIUM_30', name: '프리미엄 30', price: 24900, description: '30일간 매일 응원 메시지', features: ['AI 소원그림 1장', '30일 응원 메시지', '30일 다운로드', '특별 축원문'] }
+        ];
+        renderProducts();
+      }
+    }
+
+    // 상품 렌더링
+    function renderProducts() {
+      const container = document.getElementById('product-options');
+      container.innerHTML = products.map(p => `
+        <label class="product-option ${p.sku === selectedSku ? 'selected' : ''}" data-sku="${p.sku}">
+          <input type="radio" name="sku" value="${p.sku}" ${p.sku === selectedSku ? 'checked' : ''}>
+          <div class="product-header">
+            <span class="product-name">${p.name}</span>
+            <span class="product-price ${p.price === 0 ? 'free' : ''}">
+              ${p.price === 0 ? '무료' : p.price.toLocaleString() + '원'}
+            </span>
+          </div>
+          <div class="product-desc">${p.description}</div>
+          <div class="product-features">
+            ${p.features.map(f => `<span class="product-feature">${f}</span>`).join('')}
+          </div>
+        </label>
+      `).join('');
+
+      // 상품 선택 이벤트
+      container.querySelectorAll('.product-option').forEach(option => {
+        option.addEventListener('click', () => {
+          container.querySelectorAll('.product-option').forEach(o => o.classList.remove('selected'));
+          option.classList.add('selected');
+          option.querySelector('input').checked = true;
+          selectedSku = option.dataset.sku;
+          updateSubmitButton();
+        });
+      });
+    }
+
+    // 제출 버튼 텍스트 업데이트
+    function updateSubmitButton() {
+      const btn = document.getElementById('submit-btn');
+      const product = products.find(p => p.sku === selectedSku);
+      if (product && product.price > 0) {
+        btn.textContent = `결제하기 (${product.price.toLocaleString()}원)`;
+      } else {
+        btn.textContent = '소원 접수하기';
+      }
+    }
+
+    // 글자 수 카운터
+    const wishText = document.getElementById('wish-text');
+    const charCounter = document.getElementById('char-counter');
+    wishText.addEventListener('input', () => {
+      const len = wishText.value.length;
+      charCounter.textContent = `${len} / 100자`;
+      charCounter.classList.toggle('warning', len > 50);
+    });
+
+    // 단체 체크박스
+    const isGroup = document.getElementById('is-group');
+    const groupSizeContainer = document.getElementById('group-size-container');
+    isGroup.addEventListener('change', () => {
+      groupSizeContainer.classList.toggle('show', isGroup.checked);
+    });
+
+    // 폼 제출
+    const form = document.getElementById('wish-form');
+    const loading = document.getElementById('loading');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const data = {
+        customer_name: formData.get('customer_name'),
+        customer_phone: formData.get('customer_phone'),
+        customer_email: formData.get('customer_email') || null,
+        wish_text: formData.get('wish_text'),
+        sku: selectedSku,
+        is_group: formData.get('is_group') === 'on',
+        group_size: parseInt(formData.get('group_size')) || 1,
+        group_name: formData.get('group_name') || null,
+        source: 'WEB'
+      };
+
+      // 유효성 검사
+      if (!data.customer_name || !data.customer_phone || !data.wish_text) {
+        alert('필수 항목을 모두 입력해주세요.');
+        return;
+      }
+
+      form.style.display = 'none';
+      loading.classList.add('show');
+
+      try {
+        const res = await fetch('/api/yeosu/wish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          // 유료 상품인 경우 결제 페이지로 이동
+          if (result.product.price > 0) {
+            const checkoutRes = await fetch('/api/yeosu/wish/checkout', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ wish_id: result.wish_id })
+            });
+            const checkoutData = await checkoutRes.json();
+            if (checkoutData.success && checkoutData.payment_url) {
+              window.location.href = checkoutData.payment_url;
+              return;
+            }
+          }
+
+          // 무료 상품 - 결과 페이지로 이동
+          window.location.href = `/yeosu-wish-result.html?id=${result.wish_id}&token=${result.download_token}`;
+        } else {
+          alert(result.error || '접수 중 오류가 발생했습니다.');
+          form.style.display = 'block';
+          loading.classList.remove('show');
+        }
+      } catch (error) {
+        console.error('접수 오류:', error);
+        alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+        form.style.display = 'block';
+        loading.classList.remove('show');
+      }
+    });
+
+    // 초기화
+    loadProducts();
+  </script>
+</body>
+</html>
