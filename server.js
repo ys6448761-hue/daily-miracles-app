@@ -206,6 +206,15 @@ try {
   console.error("❌ 운영 시스템 라우터 로드 실패:", error.message);
 }
 
+// Entitlement 미들웨어 로딩 (Trial 권한 검증)
+let entitlementMiddleware = null;
+try {
+  entitlementMiddleware = require("./middleware/entitlement");
+  console.log("✅ Entitlement 미들웨어 로드 성공");
+} catch (error) {
+  console.error("❌ Entitlement 미들웨어 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -676,6 +685,52 @@ if (opsRoutes) {
   console.log("✅ 운영 시스템 라우터 등록 완료 (/ops/health, /ops/status)");
 } else {
   console.warn("⚠️ 운영 시스템 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------
+// P0 요구사항: Trial 권한이 있어야만 접근 가능
+if (entitlementMiddleware) {
+  const { requireEntitlement } = entitlementMiddleware;
+
+  // /api/daily-messages - 응원 메시지 조회 (Trial 권한 필요)
+  app.get("/api/daily-messages", requireEntitlement('trial'), async (req, res) => {
+    try {
+      // TODO: 실제 응원 메시지 조회 로직 구현
+      res.json({
+        success: true,
+        user: req.user,
+        messages: [
+          { day: 1, morning: "오늘도 좋은 하루 되세요!", evening: "오늘 하루도 수고했어요." }
+        ],
+        message: "응원 메시지 API (개발 중)"
+      });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // /api/roadmap - 30일 로드맵 조회 (Trial 권한 필요)
+  app.get("/api/roadmap", requireEntitlement('trial'), async (req, res) => {
+    try {
+      // TODO: 실제 로드맵 조회 로직 구현
+      res.json({
+        success: true,
+        user: req.user,
+        roadmap: {
+          totalDays: 30,
+          currentDay: 1,
+          milestones: []
+        },
+        message: "로드맵 API (개발 중)"
+      });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  console.log("✅ Entitlement 보호 라우터 등록 완료 (/api/daily-messages, /api/roadmap)");
+} else {
+  console.warn("⚠️ Entitlement 미들웨어 로드 실패 - 보호 라우트 미등록");
 }
 
 // ---------- Tolerant extractor ----------
