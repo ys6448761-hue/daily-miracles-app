@@ -16,7 +16,8 @@
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
+const chromium = require('@sparticuz/chromium');
 const Handlebars = require('handlebars');
 const fs = require('fs').promises;
 const path = require('path');
@@ -894,15 +895,12 @@ async function generateQuotePdf(quoteData, options = {}) {
   // Puppeteer로 PDF 생성
   let browser;
   try {
+    // @sparticuz/chromium for serverless/cloud environments
     browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',  // Render 메모리 이슈 방지
-        '--disable-gpu',
-        '--single-process'  // 메모리 최적화
-      ]
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless
     });
 
     const page = await browser.newPage();

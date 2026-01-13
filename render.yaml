@@ -2,7 +2,7 @@ services:
   - type: web
     name: daily-miracles-mvp
     runtime: node
-    buildCommand: npm install --no-audit --no-fund && npx puppeteer browsers install chrome
+    buildCommand: npm install --no-audit --no-fund
     startCommand: npm start
     envVars:
       # 기본 설정
@@ -12,12 +12,6 @@ services:
         value: "5000"
       - key: NODE_VERSION
         value: "20"
-
-      # Puppeteer 설정 (PDF 생성용)
-      - key: PUPPETEER_CACHE_DIR
-        value: /opt/render/.cache/puppeteer
-      - key: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD
-        value: "false"
 
       # 빌드 최적화
       - key: npm_config_optional
