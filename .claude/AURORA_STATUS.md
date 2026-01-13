@@ -1,7 +1,7 @@
 # AURORA_STATUS.md
 ## 하루하루의 기적 - 프로젝트 현황판
 
-**마지막 업데이트**: 2026-01-13 14:20 KST
+**마지막 업데이트**: 2026-01-13 21:00 KST
 **업데이트 담당**: Claude Code
 
 ---
@@ -110,6 +110,55 @@
 | T2 | pax=5 → 단체 견적 | ✅ | WIX-20260113-YOIG |
 | T3 | pax=10 + mustGo/avoid | ✅ | WIX-20260113-OZ8N |
 | T4 | source/pax/date/must_go 저장 | ✅ | WIX-20260113-W1RV |
+
+### 2026-01-13: P3 마감 - 단체 견적 플로우 업그레이드
+
+| 작업 | 상태 | 산출물 |
+|------|------|--------|
+| 추천 코스 프리셋 3종 | ✅ | A/B/C 카드 (해상케이블카, 아쿠아엑스포, 향일암돌산) |
+| 견적번호 복사 버튼 | ✅ | clipboard API + 복사완료 토스트 |
+| 카카오 버튼 GA4 이벤트 | ✅ | `itinerary_kakao_click` |
+| 전화 문의 fallback | ✅ | `010-3819-6178` |
+| 슬라이더 100% 초과 방지 | ✅ | `maxAllowed` cap 로직 |
+| PDF 한글 깨짐 수정 | ✅ | Noto Sans KR 임베드 + fonts.ready 대기 |
+
+### 담당자 견적 확인 경로
+
+담당자가 소원이(고객)의 단체 견적 요청을 확인하는 방법:
+
+1. **DB 직접 조회** (PostgreSQL)
+   ```sql
+   SELECT quote_id, customer_name, customer_phone, travel_date, pax, notes, created_at
+   FROM quotes
+   WHERE source = 'itinerary_builder'
+   ORDER BY created_at DESC;
+   ```
+
+2. **API 조회**
+   ```bash
+   # 최근 견적 목록
+   curl https://dailymiracles.co.kr/api/v2/quote/list?source=itinerary_builder
+
+   # 특정 견적 상세
+   curl https://dailymiracles.co.kr/api/v2/quote/{quote_id}
+   ```
+
+3. **quotes 테이블 주요 필드**
+   | 필드 | 설명 |
+   |------|------|
+   | `quote_id` | 견적번호 (WIX-YYYYMMDD-XXXX) |
+   | `customer_name` | 소원이 이름 |
+   | `customer_phone` | 연락처 |
+   | `travel_date` | 여행일 |
+   | `pax` | 인원 (guest_count 동일) |
+   | `notes` | 필수방문/회피/구성/이동/숙박 정보 |
+   | `source` | 인입 경로 (`itinerary_builder`) |
+   | `created_at` | 접수 시각 |
+
+4. **소원이 안내 Flow**
+   - 소원이가 견적번호를 카카오톡으로 전송
+   - 담당자가 DB/API에서 견적번호로 조회
+   - 상세 정보 확인 후 맞춤 견적 회신
 
 ### 2026-01-13: 일정 빌더 프론트엔드 (4인 이하 자동 일정)
 
@@ -1385,6 +1434,7 @@ curl -X POST http://localhost:5100/api/debate/run \
 
 | 날짜 | 담당 | 내용 |
 |------|------|------|
+| 2026-01-13 | Code | P3 마감: 단체 견적 업그레이드 (추천코스, 복사버튼, 슬라이더 100%, PDF 한글) |
 | 2026-01-13 | Code | Day별 고유 일정 템플릿 (4일차까지 다른 코스, 루미 URL 분석으로 테스트 성공) |
 | 2026-01-13 | Code | 일정 빌더 프론트엔드 (3단계 폼 + 결과 페이지 + 메인 배너 + 전체 플로우 테스트) |
 | 2026-01-13 | Code | 4인 이하 자동 일정 생성 API + PDF (AI + Puppeteer) |
