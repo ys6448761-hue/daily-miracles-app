@@ -993,6 +993,18 @@ router.post('/:quoteId/payment-link', async (req, res) => {
       });
     }
 
+    // P2-3: 승인 전 결제 링크 생성 차단
+    const allowedApprovalStatuses = ['approved', 'auto_approved'];
+    if (quote.requires_approval && !allowedApprovalStatuses.includes(quote.approval_status)) {
+      return res.status(400).json({
+        success: false,
+        error: 'APPROVAL_REQUIRED',
+        message: `결제 링크 생성 전 승인이 필요합니다. 현재 상태: ${quote.approval_status || 'pending'}`,
+        approval_status: quote.approval_status,
+        next_step: quote.approval_status === 'ceo_approval' ? 'CEO 승인 대기 중' : '담당자 검토 대기 중'
+      });
+    }
+
     // 결제 금액 계산
     const totalAmount = quote.total_sell || 0;
     let paymentAmount = totalAmount;
@@ -1377,6 +1389,15 @@ try {
   console.warn('[Quote] Deal Structuring 서비스 로드 실패:', error.message);
 }
 
+// PDF 생성 서비스 로드 (P2-1)
+let quotePdfService = null;
+try {
+  quotePdfService = require('../services/quotePdfService');
+  console.log('[Quote] PDF 서비스 로드 완료');
+} catch (error) {
+  console.warn('[Quote] PDF 서비스 로드 실패:', error.message);
+}
+
 /**
  * POST /api/v2/quote/:quoteId/deal-structuring
  * Deal Structuring 처리 (운영모드 결정 + 승인 워크플로우)
@@ -1683,7 +1704,21 @@ router.post('/:quoteId/confirm', async (req, res) => {
       });
     }
 
-    // DB 업데이트
+    // P2-1: 확정 견적 PDF 자동 생성
+    let pdfResult = { success: false, pdfUrl: null };
+    if (quotePdfService) {
+      try {
+        console.log(`[Quote/PDF] 확정 견적 PDF 생성 시작: ${quoteId}`);
+        pdfResult = await quotePdfService.generateAndSaveConfirmedPdf(quote);
+        if (pdfResult.success) {
+          console.log(`[Quote/PDF] PDF 생성 완료: ${pdfResult.pdfUrl}`);
+        }
+      } catch (pdfErr) {
+        console.error('[Quote/PDF] PDF 생성 실패:', pdfErr.message);
+      }
+    }
+
+    // DB 업데이트 (PDF URL 포함)
     if (db) {
       try {
         await db.query(`
@@ -1692,9 +1727,18 @@ router.post('/:quoteId/confirm', async (req, res) => {
             quote_type = 'confirmed',
             confirmed_at = NOW(),
             confirmed_by = $1,
+            pdf_generated = $3,
+            pdf_url = $4,
+            pdf_generated_at = $5,
             updated_at = NOW()
           WHERE quote_id = $2
-        `, [confirmed_by, quoteId]);
+        `, [
+          confirmed_by,
+          quoteId,
+          pdfResult.success,
+          pdfResult.pdfUrl,
+          pdfResult.success ? new Date() : null
+        ]);
       } catch (dbErr) {
         console.error('[Quote] 확정 DB 업데이트 실패:', dbErr.message);
       }
@@ -1704,7 +1748,9 @@ router.post('/:quoteId/confirm', async (req, res) => {
     await logEvent('QuoteConfirmed', quoteId, {
       confirmed_by,
       operation_mode: quote.operation_mode,
-      total_sell: quote.total_sell
+      total_sell: quote.total_sell,
+      pdf_generated: pdfResult.success,
+      pdf_url: pdfResult.pdfUrl
     });
 
     // 담당자 알림 카드 생성
@@ -1727,10 +1773,16 @@ router.post('/:quoteId/confirm', async (req, res) => {
       quote_type: 'confirmed',
       confirmed_by,
       confirmed_at: new Date().toISOString(),
+      // P2-1: PDF 정보
+      pdf_generated: pdfResult.success,
+      pdf_url: pdfResult.pdfUrl,
+      pdf_generated_at: pdfResult.pdfGeneratedAt,
       summary_card: summaryCard,
-      message: '견적이 확정되었습니다.',
+      message: pdfResult.success
+        ? '견적이 확정되었습니다. PDF가 생성되었습니다.'
+        : '견적이 확정되었습니다.',
       next_steps: [
-        '고객에게 확정 견적서를 발송하세요.',
+        pdfResult.success ? `확정 견적서를 고객에게 발송하세요: ${pdfResult.pdfUrl}` : '고객에게 확정 견적서를 발송하세요.',
         '결제 링크를 생성하세요.',
         quote.operation_mode !== 'direct' ? '여행사 정산을 준비하세요.' : null
       ].filter(Boolean)
