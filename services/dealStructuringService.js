@@ -113,22 +113,41 @@ function determineOperationMode(quoteData) {
     };
   }
 
-  // 2. MICE + 여행업 미등록 → 여행사 이관 또는 혼합
+  // 2. MICE + 여행업 미등록 → 여행사 이관 강제 (P1 강화)
   if (is_mice && !HAS_OUR_TRAVEL_LICENSE) {
     recommendations.push({
+      type: 'critical',
+      message: 'MICE 행사는 여행업 등록 업체만 진행 가능합니다. 여행사 이관이 필수입니다.',
+      suggestedMode: OPERATION_MODES.AGENCY
+    });
+
+    return {
+      mode: OPERATION_MODES.AGENCY,
+      reason: 'MICE 행사 (여행업 미등록 → 이관 필수)',
+      recommendations,
+      forced: true,  // P1: 강제 플래그 추가
+      forceReason: 'mice_no_license'
+    };
+  }
+
+  // 3. 대규모 단체 (30인 이상) + 여행업 미등록 → 혼합 강제 추천 (P1 강화)
+  if (guest_count >= 30 && !HAS_OUR_TRAVEL_LICENSE) {
+    recommendations.push({
       type: 'warning',
-      message: 'MICE 행사는 여행사 협력을 권장합니다.',
+      message: '30인 이상 단체는 여행사 협력을 강력 권장합니다.',
       suggestedMode: OPERATION_MODES.HYBRID
     });
 
     return {
       mode: OPERATION_MODES.HYBRID,
-      reason: 'MICE 행사 (여행업 미등록)',
-      recommendations
+      reason: '대규모 단체 (30인+ → 혼합 권장)',
+      recommendations,
+      forceSuggested: true,  // P1: 강력 권장 플래그
+      forceReason: 'large_group_no_license'
     };
   }
 
-  // 3. 대규모 단체 (30인 이상) → 혼합 권장
+  // 3-1. 대규모 단체 (30인 이상) + 여행업 등록 → 혼합 권장만
   if (guest_count >= 30) {
     recommendations.push({
       type: 'info',
@@ -408,6 +427,38 @@ function processDealStructuring(quoteData) {
     nextStep = 'manager_review';
   }
 
+  // 6. 인센티브/MICE 플래그 생성 (P1)
+  let incentiveFlags = null;
+  let miceFlags = null;
+  let incentiveApplicant = quoteData.incentive_applicant || null;
+
+  if (quoteData.incentive_required) {
+    incentiveFlags = generateIncentiveFlags({
+      travel_date: quoteData.travel_date,
+      incentive_type: quoteData.incentive_type || 'group_tour'
+    });
+    // 신청 주체 자동 결정 (여행업 등록 여부 기반)
+    if (!incentiveApplicant) {
+      incentiveApplicant = incentiveFlags.applicant_recommendation;
+    }
+
+    // P1 강화: 강제 이관 시 applicant도 강제 'agency'
+    if (modeResult.forced && modeResult.mode === 'agency') {
+      incentiveApplicant = 'agency';
+    }
+  }
+
+  if (quoteData.is_mice) {
+    miceFlags = generateMiceFlags({
+      travel_date: quoteData.travel_date,
+      mice_type: quoteData.mice_type || 'meeting'
+    });
+  }
+
+  // 인센티브/MICE 마감일 계산
+  const incentiveDeadline = incentiveFlags?.deadlines?.[0]?.date || null;
+  const miceDeadline = miceFlags?.deadlines?.[0]?.date || null;
+
   return {
     success: true,
 
@@ -416,6 +467,8 @@ function processDealStructuring(quoteData) {
     mode_source: modeResult.reason === '수동 지정' ? 'manual' : 'auto',
     operation_mode_reason: modeResult.reason,
     operation_mode_forced: modeResult.forced || false,
+    operation_mode_force_suggested: modeResult.forceSuggested || false,  // P1: 강력 권장
+    operation_mode_force_reason: modeResult.forceReason || null,  // P1: 강제/권장 사유 코드
     recommendations: modeResult.recommendations,
 
     // 책임주체/돈흐름
@@ -430,6 +483,13 @@ function processDealStructuring(quoteData) {
     // 다음 단계
     next_step: nextStep,
     next_step_message: getNextStepMessage(nextStep),
+
+    // 인센티브/MICE 플래그 (P1)
+    incentive_required: quoteData.incentive_required || false,
+    incentive_applicant: incentiveApplicant,
+    incentive_flags: incentiveFlags,
+    is_mice: quoteData.is_mice || false,
+    mice_flags: miceFlags,
 
     // 담당자 알림 카드용 요약 (루미 스펙 v1)
     summary_card: generateSummaryCard({
@@ -453,10 +513,17 @@ function processDealStructuring(quoteData) {
       total_sell: quoteData.total_sell,
       total_margin: quoteData.total_margin,
       quote_type: quoteData.quote_type,
-      // 인센티브/MICE
+      // 인센티브/MICE (P1)
       incentive_required: quoteData.incentive_required,
       is_mice: quoteData.is_mice,
-      incentive_applicant: quoteData.incentive_applicant
+      incentive_applicant: incentiveApplicant,
+      incentive_deadline: incentiveDeadline,
+      mice_deadline: miceDeadline,
+      // 인센티브/MICE 체크리스트 (P1)
+      incentive_checklist: incentiveFlags?.documents || null,
+      incentive_timeline: incentiveFlags?.deadlines || null,
+      mice_checklist: miceFlags?.documents || null,
+      mice_timeline: miceFlags?.deadlines || null
     })
   };
 }
@@ -564,12 +631,20 @@ function generateSummaryCard(data) {
     decision_note: null,
     requested_changes: null,
 
-    // 인센티브/MICE (P1 자리 확보)
+    // 인센티브/MICE (P1)
     incentive_required: data.incentive_required || false,
     is_mice: data.is_mice || false,
     incentive_applicant: data.incentive_applicant || null,
     incentive_deadline: data.incentive_deadline || null,
     mice_deadline: data.mice_deadline || null,
+
+    // 인센티브 체크리스트/타임라인 (P1)
+    incentive_checklist: data.incentive_checklist || null,
+    incentive_timeline: data.incentive_timeline || null,
+
+    // MICE 체크리스트/타임라인 (P1)
+    mice_checklist: data.mice_checklist || null,
+    mice_timeline: data.mice_timeline || null,
 
     // 레거시 호환 (UI용)
     fields: [
