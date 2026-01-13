@@ -104,6 +104,72 @@
             }
         }
 
+        /* 여행 배너 */
+        .travel-banner {
+            background: linear-gradient(135deg, #0f4c75 0%, #1b262c 100%);
+            padding: 24px 20px;
+        }
+
+        .travel-banner-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .travel-banner-icon {
+            font-size: 40px;
+        }
+
+        .travel-banner-text {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .travel-banner-text h3 {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .travel-banner-text p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        .travel-banner-btn {
+            background: linear-gradient(135deg, #00b4d8, #0077b6);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 15px;
+            text-decoration: none;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .travel-banner-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 180, 216, 0.4);
+        }
+
+        @media (max-width: 600px) {
+            .travel-banner-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .travel-banner-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
         /* 신뢰 요소 */
         .trust-section {
             background: white;
@@ -361,6 +427,20 @@
         </div>
     </section>
 
+    <!-- 여수 여행 배너 -->
+    <section class="travel-banner">
+        <div class="travel-banner-content">
+            <div class="travel-banner-icon">🗺️</div>
+            <div class="travel-banner-text">
+                <h3>여수 여행 계획 중이신가요?</h3>
+                <p>AI가 맞춤 일정을 만들어드려요 (4인 이하 무료)</p>
+            </div>
+            <a href="./itinerary-builder.html" class="travel-banner-btn" onclick="if(typeof gtag==='function')gtag('event','cta_itinerary_click')">
+                일정 만들기 →
+            </a>
+        </div>
+    </section>
+
     <!-- 신뢰 요소 -->
     <section class="trust-section">
         <div class="trust-content">
@@ -456,6 +536,7 @@
                 <a href="./privacy.html">개인정보처리방침</a>
                 <a href="./terms.html">이용약관</a>
                 <a href="./questions.html">기적 분석</a>
+                <a href="./itinerary-builder.html">여행 일정</a>
                 <a href="./wish-voyage.html">소원항해</a>
             </div>
             <div class="footer-contact">
