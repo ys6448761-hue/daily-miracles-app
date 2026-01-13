@@ -466,39 +466,155 @@
       100% { width: 100%; }
     }
 
-    /* 5인 이상 안내 */
-    .pax-warning {
+    /* 5인 이상 단체 전환 브릿지 */
+    .group-bridge {
       display: none;
-      background: rgba(255,107,107,0.2);
-      border: 2px solid rgba(255,107,107,0.5);
-      border-radius: 12px;
-      padding: 16px;
+      background: linear-gradient(135deg, rgba(78,205,196,0.2), rgba(0,180,216,0.2));
+      border: 2px solid rgba(78,205,196,0.5);
+      border-radius: 16px;
+      padding: 24px;
       margin-top: 16px;
       text-align: center;
     }
-    .pax-warning.show {
+    .group-bridge.show {
       display: block;
     }
-    .pax-warning-title {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #ff6b6b;
-    }
-    .pax-warning-text {
-      font-size: 14px;
-      color: rgba(255,255,255,0.8);
+    .group-bridge-icon {
+      font-size: 48px;
       margin-bottom: 12px;
     }
-    .pax-warning-btn {
-      display: inline-block;
-      padding: 10px 20px;
-      background: #ff6b6b;
-      color: #fff;
-      border-radius: 8px;
-      text-decoration: none;
+    .group-bridge-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #4ecdc4;
+    }
+    .group-bridge-text {
       font-size: 14px;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+    .group-bridge-notice {
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 16px;
+      padding: 10px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+    }
+    .group-bridge-form {
+      margin-bottom: 16px;
+    }
+    .group-bridge-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 16px;
+      font-family: inherit;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .group-bridge-input:focus {
+      outline: none;
+      border-color: #4ecdc4;
+    }
+    .group-bridge-input::placeholder {
+      color: rgba(255,255,255,0.5);
+    }
+    .group-bridge-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .group-bridge-btn-primary {
+      padding: 14px 24px;
+      background: linear-gradient(135deg, #4ecdc4, #00b4d8);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
       font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .group-bridge-btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(78,205,196,0.3);
+    }
+    .group-bridge-btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .group-bridge-btn-secondary {
+      padding: 12px 20px;
+      background: transparent;
+      color: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .group-bridge-btn-secondary:hover {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+    }
+
+    /* 단체 견적 접수 완료 모달 */
+    .group-success-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15,76,117,0.95);
+      z-index: 1001;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
+    .group-success-modal.show {
+      display: flex;
+    }
+    .group-success-icon {
+      font-size: 72px;
+      margin-bottom: 24px;
+    }
+    .group-success-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #4ecdc4;
+    }
+    .group-success-text {
+      font-size: 16px;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+    .group-success-quote-id {
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 24px;
+      padding: 8px 16px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+    }
+    .group-success-btn {
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #4ecdc4, #00b4d8);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
     }
 
     /* 푸터 */
@@ -577,12 +693,30 @@
               <button type="button" class="stepper-btn" id="pax-plus">+</button>
             </div>
             <input type="hidden" name="pax" value="2">
-            <div class="pax-warning" id="pax-warning">
-              <div class="pax-warning-title">5인 이상은 단체 상담이 필요해요</div>
-              <div class="pax-warning-text">맞춤 견적과 전문 상담을 받아보세요</div>
-              <a href="https://pf.kakao.com/_dailymiracles" target="_blank" class="pax-warning-btn">
-                카카오톡 상담하기
-              </a>
+            <!-- 5인 이상 단체 전환 브릿지 -->
+            <div class="group-bridge" id="group-bridge">
+              <div class="group-bridge-icon">👥</div>
+              <div class="group-bridge-title">5인 이상은 단체 여행으로 도와드려요</div>
+              <div class="group-bridge-text">
+                입력하신 정보로 1분만에 견적 상담 요청이 접수됩니다.
+              </div>
+              <div class="group-bridge-notice">
+                단체는 인원/차량/식당 예약 때문에 담당자 확인 후 확정됩니다.
+              </div>
+              <div class="group-bridge-form">
+                <input type="text" class="group-bridge-input" id="group-name"
+                       placeholder="이름 (대표자)">
+                <input type="tel" class="group-bridge-input" id="group-phone"
+                       placeholder="연락처 (010-0000-0000)">
+              </div>
+              <div class="group-bridge-btns">
+                <button type="button" class="group-bridge-btn-primary" id="group-submit-btn">
+                  단체 견적 요청하기
+                </button>
+                <button type="button" class="group-bridge-btn-secondary" id="group-back-btn">
+                  다시 4인 이하로 만들기
+                </button>
+              </div>
             </div>
           </div>
 
@@ -813,6 +947,18 @@
     </div>
   </div>
 
+  <!-- 단체 견적 접수 완료 모달 -->
+  <div class="group-success-modal" id="group-success-modal">
+    <div class="group-success-icon">🎉</div>
+    <div class="group-success-title">단체 견적 요청 완료!</div>
+    <div class="group-success-text">
+      담당자가 확인 후 연락드릴게요.<br>
+      보통 1영업일 이내에 연락드립니다.
+    </div>
+    <div class="group-success-quote-id" id="group-quote-id">견적번호: -</div>
+    <a href="/" class="group-success-btn">홈으로 돌아가기</a>
+  </div>
+
   <script>
     // 상태 관리
     const state = {
@@ -860,7 +1006,8 @@
     // 인원 스테퍼
     const paxValue = document.getElementById('pax-value');
     const paxInput = document.querySelector('input[name="pax"]');
-    const paxWarning = document.getElementById('pax-warning');
+    const groupBridge = document.getElementById('group-bridge');
+    const groupSuccessModal = document.getElementById('group-success-modal');
 
     document.getElementById('pax-minus').addEventListener('click', () => {
       if (state.pax > 1) {
@@ -870,7 +1017,7 @@
     });
 
     document.getElementById('pax-plus').addEventListener('click', () => {
-      if (state.pax < 10) {
+      if (state.pax < 50) {  // 단체 최대 50명
         state.pax++;
         updatePax();
       }
@@ -879,9 +1026,111 @@
     function updatePax() {
       paxValue.textContent = state.pax;
       paxInput.value = state.pax;
-      paxWarning.classList.toggle('show', state.pax > 4);
-      document.getElementById('step1-next').disabled = state.pax > 4;
+      const isGroup = state.pax >= 5;
+      groupBridge.classList.toggle('show', isGroup);
+      document.getElementById('step1-next').classList.toggle('hidden', isGroup);
+
+      // GA4 이벤트: 5인 이상 모달 열림
+      if (isGroup && typeof gtag === 'function') {
+        gtag('event', 'itinerary_group_convert_open', {
+          pax: state.pax
+        });
+      }
     }
+
+    // 단체 견적 "다시 4인 이하로" 버튼
+    document.getElementById('group-back-btn').addEventListener('click', () => {
+      state.pax = 4;
+      updatePax();
+    });
+
+    // 단체 견적 요청 제출
+    document.getElementById('group-submit-btn').addEventListener('click', async () => {
+      const name = document.getElementById('group-name').value.trim();
+      const phone = document.getElementById('group-phone').value.trim();
+
+      // 필수 검증
+      if (!name) {
+        alert('이름을 입력해주세요.');
+        document.getElementById('group-name').focus();
+        return;
+      }
+      if (!phone || !/^01[0-9]-?\d{3,4}-?\d{4}$/.test(phone.replace(/-/g, ''))) {
+        alert('올바른 연락처를 입력해주세요.');
+        document.getElementById('group-phone').focus();
+        return;
+      }
+
+      const formData = new FormData(form);
+      const startDate = formData.get('startDate');
+
+      if (!startDate) {
+        alert('여행 시작일을 선택해주세요.');
+        return;
+      }
+
+      // 숙박 일수 계산
+      const stayNights = {
+        'day': 0, '1n2d': 1, '2n3d': 2, '3n4d': 3
+      };
+      const nights = stayNights[state.stayType] || 0;
+
+      // 로딩 표시
+      const submitBtn = document.getElementById('group-submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = '요청 중...';
+
+      try {
+        const payload = {
+          name: name,
+          phone: phone,
+          source: 'itinerary_builder',
+          region: 'yeosu',
+          travel_date: startDate,
+          trip_start: startDate,
+          nights: nights,
+          pax: state.pax,
+          party_type: state.partyType,
+          transport: state.transport,
+          tempo: state.tempo,
+          style_weights: state.stylePreferences,
+          must_go: state.mustVisit,
+          avoid: state.avoid,
+          notes: formData.get('additionalRequest') || `[빌더전환] ${state.pax}인 단체`
+        };
+
+        const res = await fetch('/api/v2/quote/wix', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (data.success || data.quote_id) {
+          // GA4 이벤트: 단체 견적 요청 완료
+          if (typeof gtag === 'function') {
+            gtag('event', 'itinerary_group_convert_submit', {
+              quote_id: data.quote_id,
+              pax: state.pax,
+              source: 'itinerary_builder'
+            });
+          }
+
+          // 성공 모달 표시
+          document.getElementById('group-quote-id').textContent = `견적번호: ${data.quote_id}`;
+          groupSuccessModal.classList.add('show');
+        } else {
+          alert(data.message || '견적 요청에 실패했습니다. 다시 시도해주세요.');
+        }
+      } catch (error) {
+        console.error('단체 견적 요청 오류:', error);
+        alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '단체 견적 요청하기';
+      }
+    });
 
     // 옵션 버튼 그룹
     document.querySelectorAll('.option-grid').forEach(grid => {
@@ -1048,6 +1297,15 @@
         const data = await res.json();
 
         if (data.success) {
+          // GA4 이벤트: 일정 생성 성공
+          if (typeof gtag === 'function') {
+            gtag('event', 'itinerary_builder_submit', {
+              itinerary_id: data.itinerary_id,
+              pax: state.pax,
+              stay_type: state.stayType,
+              party_type: state.partyType
+            });
+          }
           // 결과 페이지로 이동
           window.location.href = `/itinerary-result.html?id=${data.itinerary_id}`;
         } else {
