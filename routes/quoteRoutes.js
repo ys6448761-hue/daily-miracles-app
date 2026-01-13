@@ -1407,8 +1407,8 @@ router.post('/:quoteId/deal-structuring', async (req, res) => {
     const result = dealStructuring.processDealStructuring({
       ...quote,
       ...options,  // 추가 옵션 (manual_mode, incentive_required 등)
-      guest_count: quote.guest_count,
-      total_sell: quote.total_sell
+      guest_count: options.guest_count ?? quote.guest_count,  // options 우선
+      total_sell: options.total_sell ?? quote.total_sell       // options 우선
     });
 
     // DB 업데이트
