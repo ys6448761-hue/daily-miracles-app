@@ -128,7 +128,11 @@ const PDF_TEMPLATE = `
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
     @page {
       size: A4;
       margin: 15mm;
@@ -139,7 +143,7 @@ const PDF_TEMPLATE = `
       box-sizing: border-box;
     }
     body {
-      font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
       font-size: 11pt;
       line-height: 1.6;
       color: #333;
@@ -778,7 +782,11 @@ const SETTLEMENT_PDF_TEMPLATE = `
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
     @page {
       size: A4;
       margin: 20mm;
@@ -789,7 +797,7 @@ const SETTLEMENT_PDF_TEMPLATE = `
       box-sizing: border-box;
     }
     body {
-      font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
       font-size: 11pt;
       line-height: 1.6;
       color: #333;
@@ -1332,6 +1340,9 @@ async function generateQuotePdf(quoteData, options = {}) {
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
 
+    // 폰트 로딩 대기 (한글 깨짐 방지)
+    await page.evaluateHandle('document.fonts.ready');
+
     const pdfBuffer = await page.pdf({
       format: 'A4',
       printBackground: true,
@@ -1537,6 +1548,9 @@ async function generateSettlementPdf(quoteData, options = {}) {
 
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
+
+    // 폰트 로딩 대기 (한글 깨짐 방지)
+    await page.evaluateHandle('document.fonts.ready');
 
     const pdfBuffer = await page.pdf({
       format: 'A4',

@@ -453,7 +453,11 @@ const ITINERARY_PDF_TEMPLATE = `
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
     @page {
       size: A4;
       margin: 15mm;
@@ -464,7 +468,7 @@ const ITINERARY_PDF_TEMPLATE = `
       box-sizing: border-box;
     }
     body {
-      font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
       font-size: 10pt;
       line-height: 1.5;
       color: #333;
@@ -921,6 +925,9 @@ async function generateItineraryPdf(itinerary) {
 
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
+
+    // 폰트 로딩 대기 (한글 깨짐 방지)
+    await page.evaluateHandle('document.fonts.ready');
 
     const pdfBuffer = await page.pdf({
       format: 'A4',

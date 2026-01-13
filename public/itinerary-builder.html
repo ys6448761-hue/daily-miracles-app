@@ -1097,8 +1097,11 @@
       </button>
     </div>
     <div class="group-success-btns">
-      <a href="http://pf.kakao.com/_xfxhcWn/chat" target="_blank" class="group-success-btn kakao" id="kakao-chat-btn">
+      <a href="https://pf.kakao.com/_xfxhcWn/chat" target="_blank" class="group-success-btn kakao" id="kakao-chat-btn">
         💬 카카오로 견적번호 보내기
+      </a>
+      <a href="tel:010-1234-5678" class="group-success-btn" style="background:rgba(255,255,255,0.2);">
+        📞 전화 문의
       </a>
       <a href="/" class="group-success-btn">홈으로 돌아가기</a>
     </div>
@@ -1306,7 +1309,19 @@
       const fill = slider.querySelector('.slider-fill');
 
       input.addEventListener('input', () => {
-        const val = parseInt(input.value);
+        let val = parseInt(input.value);
+        const oldVal = state.stylePreferences[styleName];
+        const otherTotal = Object.entries(state.stylePreferences)
+          .filter(([k]) => k !== styleName)
+          .reduce((sum, [, v]) => sum + v, 0);
+
+        // 100% 초과 방지: 다른 슬라이더 합계 + 이 값이 100을 넘으면 제한
+        const maxAllowed = 100 - otherTotal;
+        if (val > maxAllowed) {
+          val = maxAllowed;
+          input.value = val;
+        }
+
         state.stylePreferences[styleName] = val;
         valueDisplay.textContent = val;
         fill.style.width = val + '%';
