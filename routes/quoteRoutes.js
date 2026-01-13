@@ -901,6 +901,7 @@ router.get('/admin/quotes/hot', async (req, res) => {
 /**
  * POST /api/v2/admin/migrate
  * DB 마이그레이션 실행
+ * Body: { migration: 'settlement' } - 특정 마이그레이션 실행
  */
 router.post('/admin/migrate', async (req, res) => {
   try {
@@ -914,32 +915,68 @@ router.post('/admin/migrate', async (req, res) => {
 
     const fs = require('fs');
     const path = require('path');
+    const { migration } = req.body;
 
-    const schemaPath = path.join(__dirname, '../database/quote_schema.sql');
+    // 마이그레이션 파일 매핑
+    const migrationFiles = {
+      'default': '../database/quote_schema.sql',
+      'deal-structuring': '../database/migrations/add_deal_structuring_fields.sql',
+      'settlement': '../database/migrations/add_settlement_pdf_fields.sql',
+      'payment': '../database/migrations/add_payment_fields.sql',
+      'wix': '../database/migrations/add_wix_quote_fields.sql'
+    };
+
+    const migrationKey = migration || 'default';
+    const relativePath = migrationFiles[migrationKey];
+
+    if (!relativePath) {
+      return res.status(400).json({
+        success: false,
+        error: 'INVALID_MIGRATION',
+        message: `유효하지 않은 마이그레이션: ${migrationKey}`,
+        available: Object.keys(migrationFiles)
+      });
+    }
+
+    const schemaPath = path.join(__dirname, relativePath);
     if (!fs.existsSync(schemaPath)) {
       return res.status(404).json({
         success: false,
         error: 'SCHEMA_NOT_FOUND',
-        message: '스키마 파일을 찾을 수 없습니다'
+        message: `마이그레이션 파일을 찾을 수 없습니다: ${migrationKey}`
       });
     }
 
     const schemaSql = fs.readFileSync(schemaPath, 'utf8');
     await db.query(schemaSql);
 
+    // 컬럼 확인 (settlement 마이그레이션일 경우)
+    let addedColumns = [];
+    if (migrationKey === 'settlement') {
+      const colCheck = await db.query(`
+        SELECT column_name, data_type
+        FROM information_schema.columns
+        WHERE table_name = 'quotes'
+          AND column_name IN ('settlement_pdf_generated', 'settlement_pdf_url', 'commission_rate', 'settlement_amount', 'agency_name')
+      `);
+      addedColumns = colCheck.rows;
+    }
+
     // 테이블 확인
     const tableCheck = await db.query(`
       SELECT table_name
       FROM information_schema.tables
       WHERE table_schema = 'public'
-        AND (table_name LIKE 'quotes' OR table_name LIKE 'quote_%' OR table_name LIKE 'group_%')
+        AND (table_name LIKE 'quotes' OR table_name LIKE 'quote_%' OR table_name LIKE 'group_%' OR table_name LIKE 'v_%')
       ORDER BY table_name
     `);
 
     res.json({
       success: true,
-      message: '마이그레이션 완료',
-      tables: tableCheck.rows.map(r => r.table_name)
+      message: `마이그레이션 완료: ${migrationKey}`,
+      migration: migrationKey,
+      tables: tableCheck.rows.map(r => r.table_name),
+      addedColumns: addedColumns.length > 0 ? addedColumns : undefined
     });
 
   } catch (error) {
