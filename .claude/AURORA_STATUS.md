@@ -60,6 +60,8 @@
 🟢 완료: P0 소원 스타터 7 (9,900원 + 24시간 업그레이드 크레딧)
 🟢 완료: 여수 소원빌기 체험 MVP (접수, 결제, DALL-E 이미지 생성)
 🟢 완료: P0 Deal Structuring (운영모드, 책임주체, 승인 워크플로우)
+🟢 완료: 담당자 알림 카드 루미 스펙 v1 (amount_type, mode_source, approval_level)
+🟢 완료: 승인/반려 API decision_note + requested_changes 지원
 🟡 진행중: GA4 설정 (측정 ID 대기 중)
 🟡 진행중: 10회 검증 validation (1/10 완료)
 ```
@@ -77,7 +79,9 @@
 | Deal Structuring 서비스 | ✅ | `services/dealStructuringService.js` |
 | API 엔드포인트 8종 추가 | ✅ | `routes/quoteRoutes.js` |
 | Render DB 마이그레이션 적용 | ✅ | 23개 필드, 6개 인덱스, 2개 뷰 |
-| API 테스트 통과 | ✅ | deal-structuring, approve, confirm |
+| 승인 트리거 코드 표준화 | ✅ | `pax_over_20`, `amount_over_3m`, `mode_not_direct` |
+| 담당자 알림 카드 루미 스펙 v1 | ✅ | `generateSummaryCard()` 확장 |
+| 승인/반려 API decision 필드 | ✅ | `decision_note`, `requested_changes` |
 
 ### 운영모드 (4종)
 
@@ -128,11 +132,26 @@ GET  /admin/quotes/by-mode       - 운영모드별 통계
 | B 금액 | - | >300만 | `amount_over_3m` | ⚠️ 상품 한계 |
 | C 운영모드 | WIX-20260113-3J5A | agency | `agency_transfer` | ✅ deal_review |
 
+### 담당자 알림 카드 (summary_card) 필드
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `quote_id` | string | 견적 ID |
+| `status_badge` | enum | auto_approved/deal_review/ceo_approval |
+| `approval_level` | enum | none/manager/ceo |
+| `amount_type` | enum | lead/calculated/confirmed |
+| `mode_source` | enum | auto/manual |
+| `decision` | enum | approve/reject/request_changes |
+| `decision_note` | string | 승인/반려 사유 |
+| `requested_changes` | array | 수정요청 항목 |
+
 ### 커밋 이력
 
 ```
 feat(quote): P0 Deal Structuring 구현 (운영모드, 책임주체, 승인 워크플로우)
 fix(deal-structuring): 승인 트리거 코드 표준화 (pax_over_20, amount_over_3m 추가)
+feat(deal-structuring): 담당자 알림 카드 루미 스펙 v1 적용
+feat(quote): 승인/반려 API에 decision_note, requested_changes 추가
 ```
 
 ---
@@ -1063,6 +1082,8 @@ curl -X POST http://localhost:5100/api/debate/run \
 
 | 날짜 | 담당 | 내용 |
 |------|------|------|
+| 2026-01-13 | Code | 승인/반려 API decision_note + requested_changes 지원 |
+| 2026-01-13 | Code | 담당자 알림 카드 루미 스펙 v1 (amount_type, mode_source, approval_level) |
 | 2026-01-13 | Code | P0 Deal Structuring (운영모드 4종, 책임주체 6종, 승인 워크플로우, API 8종) |
 | 2026-01-13 | Code | 여수 소원빌기 체험 MVP (접수, 결제, DALL-E 이미지, 다운로드) |
 | 2026-01-13 | Code | Day 7 완주 → 30일 업그레이드 전환 UI (성공/실패 페이지 생성) |
