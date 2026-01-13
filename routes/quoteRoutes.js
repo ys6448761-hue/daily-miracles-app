@@ -560,22 +560,25 @@ router.post('/wix', async (req, res) => {
         await db.query(`
           INSERT INTO quotes (
             quote_id, status, customer_name, customer_phone, customer_email,
-            travel_date, guest_count, memo, region_code,
+            travel_date, guest_count, memo, notes, region_code,
+            source, env,
             day_type, hotel_code,
             created_at, updated_at
           ) VALUES (
-            $1, $2, $3, $4, $5, $6, $7, $8, $9,
-            $10, $11,
+            $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
+            $11, $12,
+            $13, $14,
             NOW(), NOW()
           )
         `, [
           quoteData.quote_id, quoteData.status,
           quoteData.customer_name, quoteData.customer_phone, quoteData.customer_email,
           quoteData.trip_start, quoteData.guest_count,
-          quoteData.notes, quoteData.region_code,
+          quoteData.notes, quoteData.notes, quoteData.region_code,  // memo와 notes 모두 저장
+          sourceValue, env,
           'pending', 'pending'  // Wix 리드용 기본값
         ]);
-        console.log(`[Quote/Wix] DB 저장 완료: ${quoteId}`);
+        console.log(`[Quote/Wix] DB 저장 완료: ${quoteId} (source=${sourceValue})`);
       } catch (dbErr) {
         console.error(`[Quote/Wix] DB 저장 실패:`, dbErr.message);
       }
