@@ -28,7 +28,8 @@ const path = require('path');
 
 const DOCUMENT_TYPES = {
   ESTIMATE: 'estimate',
-  CONFIRMED: 'confirmed'
+  CONFIRMED: 'confirmed',
+  SETTLEMENT: 'settlement'  // P2-2: 정산서/수수료-only
 };
 
 // 운영모드별 자동 문구 (루미 스펙)
@@ -769,6 +770,431 @@ const PDF_TEMPLATE = `
 `;
 
 // ═══════════════════════════════════════════════════════════════════════════
+// P2-2: 정산서 PDF 템플릿 (수수료-only / commission 모드용)
+// ═══════════════════════════════════════════════════════════════════════════
+
+const SETTLEMENT_PDF_TEMPLATE = `
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @page {
+      size: A4;
+      margin: 20mm;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      font-size: 11pt;
+      line-height: 1.6;
+      color: #333;
+      padding: 10mm;
+    }
+
+    /* 헤더 */
+    .header {
+      text-align: center;
+      border-bottom: 3px double #333;
+      padding-bottom: 15px;
+      margin-bottom: 25px;
+    }
+    .doc-title {
+      font-size: 22pt;
+      font-weight: bold;
+      color: #1e40af;
+      margin-bottom: 8px;
+    }
+    .doc-subtitle {
+      font-size: 11pt;
+      color: #666;
+    }
+    .quote-id {
+      font-size: 10pt;
+      color: #999;
+      margin-top: 8px;
+    }
+
+    /* 발행 정보 박스 */
+    .issue-info-box {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 25px;
+      font-size: 10pt;
+    }
+    .issue-info-left {
+      text-align: left;
+    }
+    .issue-info-right {
+      text-align: right;
+    }
+
+    /* 수신/발신 박스 */
+    .party-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+    .party-section {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+    }
+    .party-title {
+      font-size: 12pt;
+      font-weight: bold;
+      color: #1e40af;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+      margin-bottom: 10px;
+    }
+    .party-info {
+      font-size: 10pt;
+    }
+    .party-info-row {
+      display: flex;
+      padding: 4px 0;
+    }
+    .party-info-label {
+      width: 80px;
+      color: #666;
+    }
+    .party-info-value {
+      flex: 1;
+      font-weight: 500;
+    }
+
+    /* 정산 내역 테이블 */
+    .settlement-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    .settlement-table th,
+    .settlement-table td {
+      border: 1px solid #333;
+      padding: 12px 15px;
+      text-align: left;
+    }
+    .settlement-table th {
+      background-color: #f1f5f9;
+      font-weight: bold;
+      width: 35%;
+    }
+    .settlement-table td {
+      width: 65%;
+    }
+    .settlement-table .amount-row td {
+      font-size: 14pt;
+      font-weight: bold;
+      color: #1e40af;
+    }
+    .settlement-table .highlight-row {
+      background-color: #eff6ff;
+    }
+    .settlement-table .total-row {
+      background-color: #1e40af;
+      color: white;
+    }
+    .settlement-table .total-row th,
+    .settlement-table .total-row td {
+      border-color: #1e40af;
+    }
+
+    /* 금액 강조 박스 */
+    .amount-highlight-box {
+      background-color: #fef3c7;
+      border: 2px solid #f59e0b;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      margin: 25px 0;
+    }
+    .amount-highlight-label {
+      font-size: 11pt;
+      color: #b45309;
+      margin-bottom: 8px;
+    }
+    .amount-highlight-value {
+      font-size: 28pt;
+      font-weight: bold;
+      color: #d97706;
+    }
+
+    /* 입금 안내 */
+    .payment-section {
+      background-color: #f0fdf4;
+      border: 1px solid #16a34a;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 25px 0;
+    }
+    .payment-title {
+      font-size: 12pt;
+      font-weight: bold;
+      color: #16a34a;
+      margin-bottom: 15px;
+    }
+    .bank-info {
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 15px;
+      font-size: 12pt;
+    }
+    .bank-info-row {
+      display: flex;
+      padding: 5px 0;
+    }
+    .bank-info-label {
+      width: 100px;
+      color: #666;
+    }
+    .bank-info-value {
+      flex: 1;
+      font-weight: bold;
+      color: #333;
+    }
+
+    /* 세금계산서 안내 */
+    .tax-notice {
+      background-color: #fef2f2;
+      border: 1px solid #dc2626;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 25px 0;
+    }
+    .tax-notice-title {
+      font-weight: bold;
+      color: #dc2626;
+      margin-bottom: 8px;
+    }
+    .tax-notice-content {
+      font-size: 10pt;
+      color: #7f1d1d;
+      line-height: 1.8;
+    }
+
+    /* 참고 사항 */
+    .notes-section {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 25px 0;
+      font-size: 10pt;
+      color: #64748b;
+    }
+    .notes-title {
+      font-weight: bold;
+      color: #475569;
+      margin-bottom: 8px;
+    }
+    .notes-list {
+      list-style: none;
+    }
+    .notes-list li {
+      padding: 3px 0;
+    }
+    .notes-list li::before {
+      content: '• ';
+      color: #94a3b8;
+    }
+
+    /* 서명 영역 */
+    .signature-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px dashed #ddd;
+    }
+    .signature-box {
+      text-align: center;
+    }
+    .signature-label {
+      font-size: 10pt;
+      color: #666;
+      margin-bottom: 30px;
+    }
+    .signature-line {
+      border-bottom: 1px solid #333;
+      margin: 0 20px;
+      padding-bottom: 5px;
+    }
+    .signature-name {
+      font-size: 10pt;
+      color: #999;
+      margin-top: 5px;
+    }
+
+    /* 푸터 */
+    .footer {
+      margin-top: 40px;
+      padding-top: 15px;
+      border-top: 1px solid #ddd;
+      text-align: center;
+      font-size: 9pt;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <!-- 헤더 -->
+  <div class="header">
+    <div class="doc-title">정 산 서</div>
+    <div class="doc-subtitle">Settlement Statement</div>
+    <div class="quote-id">문서번호: {{quoteId}}</div>
+  </div>
+
+  <!-- 발행 정보 -->
+  <div class="issue-info-box">
+    <div class="issue-info-left">
+      발행일: {{formatDate issuedAt}}
+    </div>
+    <div class="issue-info-right">
+      정산 예정일: {{formatDate settlementDueAt}}
+    </div>
+  </div>
+
+  <!-- 수신/발신 -->
+  <div class="party-box">
+    <div class="party-section">
+      <div class="party-title">수신 (갑)</div>
+      <div class="party-info">
+        <div class="party-info-row">
+          <span class="party-info-label">상호</span>
+          <span class="party-info-value">{{receiverCompany}}</span>
+        </div>
+        <div class="party-info-row">
+          <span class="party-info-label">담당자</span>
+          <span class="party-info-value">{{receiverName}}</span>
+        </div>
+      </div>
+    </div>
+    <div class="party-section">
+      <div class="party-title">발신 (을)</div>
+      <div class="party-info">
+        <div class="party-info-row">
+          <span class="party-info-label">상호</span>
+          <span class="party-info-value">하루하루의 기적</span>
+        </div>
+        <div class="party-info-row">
+          <span class="party-info-label">담당자</span>
+          <span class="party-info-value">푸르미르 (이세진)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 정산 내역 -->
+  <table class="settlement-table">
+    <tr>
+      <th>건명</th>
+      <td>{{tripTitle}}</td>
+    </tr>
+    <tr>
+      <th>여행일</th>
+      <td>{{formatDate travelDate}}</td>
+    </tr>
+    <tr>
+      <th>고객</th>
+      <td>{{maskedCustomerName}}</td>
+    </tr>
+    <tr>
+      <th>인원</th>
+      <td>{{paxTotal}}명</td>
+    </tr>
+    <tr class="highlight-row">
+      <th>총 판매가</th>
+      <td>{{formatCurrency totalSell}}</td>
+    </tr>
+    <tr>
+      <th>수수료율</th>
+      <td>{{commissionRate}}%</td>
+    </tr>
+    <tr class="total-row amount-row">
+      <th>정산 금액 (수수료)</th>
+      <td>{{formatCurrency commissionAmount}}</td>
+    </tr>
+  </table>
+
+  <!-- 정산 금액 강조 -->
+  <div class="amount-highlight-box">
+    <div class="amount-highlight-label">정산 금액</div>
+    <div class="amount-highlight-value">{{formatCurrency commissionAmount}}</div>
+  </div>
+
+  <!-- 입금 안내 -->
+  <div class="payment-section">
+    <div class="payment-title">입금 계좌 안내</div>
+    <div class="bank-info">
+      <div class="bank-info-row">
+        <span class="bank-info-label">은행</span>
+        <span class="bank-info-value">{{bankName}}</span>
+      </div>
+      <div class="bank-info-row">
+        <span class="bank-info-label">계좌번호</span>
+        <span class="bank-info-value">{{bankAccountNumber}}</span>
+      </div>
+      <div class="bank-info-row">
+        <span class="bank-info-label">예금주</span>
+        <span class="bank-info-value">{{bankAccountHolder}}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 세금계산서 안내 -->
+  <div class="tax-notice">
+    <div class="tax-notice-title">세금계산서 발행 안내</div>
+    <div class="tax-notice-content">
+      {{taxInvoiceNotice}}
+    </div>
+  </div>
+
+  <!-- 참고 사항 -->
+  <div class="notes-section">
+    <div class="notes-title">참고 사항</div>
+    <ul class="notes-list">
+      <li>본 정산서는 수수료 정산을 위한 참고 문서입니다.</li>
+      <li>정산 금액은 세금계산서 발행 후 지급됩니다.</li>
+      <li>실제 정산일은 상호 협의에 따라 변경될 수 있습니다.</li>
+      {{#if additionalNotes}}
+      <li>{{additionalNotes}}</li>
+      {{/if}}
+    </ul>
+  </div>
+
+  <!-- 서명 영역 -->
+  <div class="signature-section">
+    <div class="signature-box">
+      <div class="signature-label">수신자 (갑)</div>
+      <div class="signature-line"></div>
+      <div class="signature-name">{{receiverCompany}}</div>
+    </div>
+    <div class="signature-box">
+      <div class="signature-label">발신자 (을)</div>
+      <div class="signature-line"></div>
+      <div class="signature-name">하루하루의 기적</div>
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <div class="footer">
+    하루하루의 기적 | Daily Miracles<br>
+    문의: @dailymiracles (카카오톡) | contact@dailymiracles.co.kr
+  </div>
+</body>
+</html>
+`;
+
+// ═══════════════════════════════════════════════════════════════════════════
 // 유틸리티 함수
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -1015,6 +1441,167 @@ async function generateAndSaveEstimatePdf(quoteData) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// P2-2: 정산서 PDF 생성 함수 (수수료-only / commission 모드용)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * 고객명 마스킹 (예: 홍길동 → 홍*동)
+ */
+function maskCustomerName(name) {
+  if (!name || name.length < 2) return name || '-';
+  if (name.length === 2) {
+    return name[0] + '*';
+  }
+  // 첫 글자 + 마스킹 + 마지막 글자
+  const middle = '*'.repeat(name.length - 2);
+  return name[0] + middle + name[name.length - 1];
+}
+
+/**
+ * 정산 예정일 계산 (여행 완료 후 +7일)
+ */
+function calculateSettlementDueDate(travelDate) {
+  if (!travelDate) {
+    // 기본값: 오늘 +14일
+    const date = new Date();
+    date.setDate(date.getDate() + 14);
+    return date;
+  }
+  const date = new Date(travelDate);
+  date.setDate(date.getDate() + 7);
+  return date;
+}
+
+/**
+ * 정산서 PDF 생성
+ * @param {Object} quoteData - 견적 데이터
+ * @param {Object} options - 추가 옵션
+ * @returns {Promise<Buffer>} PDF 버퍼
+ */
+async function generateSettlementPdf(quoteData, options = {}) {
+  // 수수료 계산
+  const totalSell = quoteData.total_sell || quoteData.total_amount || 0;
+  const commissionRate = quoteData.commission_rate || 10; // 기본 10%
+  const commissionAmount = quoteData.commission_amount || Math.round(totalSell * commissionRate / 100);
+
+  // 템플릿 데이터 준비
+  const templateData = {
+    // 문서 정보
+    quoteId: quoteData.quote_id,
+    issuedAt: new Date(),
+    settlementDueAt: quoteData.settlement_due_at || calculateSettlementDueDate(quoteData.travel_date),
+
+    // 수신자 (여행사/파트너)
+    receiverCompany: quoteData.agency_name || quoteData.partner_name || '제휴 여행사',
+    receiverName: quoteData.agency_contact || quoteData.partner_contact || '담당자',
+
+    // 건 정보
+    tripTitle: quoteData.course_title || quoteData.preset_name || `${quoteData.travel_date ? new Date(quoteData.travel_date).toLocaleDateString('ko-KR') : ''} 여행 건`,
+    travelDate: quoteData.travel_date,
+    maskedCustomerName: maskCustomerName(quoteData.customer_name),
+    paxTotal: quoteData.guest_count || quoteData.pax_total || 2,
+
+    // 금액 정보
+    totalSell,
+    commissionRate,
+    commissionAmount,
+
+    // 입금 계좌 (당사 계좌)
+    bankName: options.bankName || process.env.SETTLEMENT_BANK_NAME || '국민은행',
+    bankAccountNumber: options.bankAccountNumber || process.env.SETTLEMENT_BANK_ACCOUNT || '123-456-789012',
+    bankAccountHolder: options.bankAccountHolder || process.env.SETTLEMENT_BANK_HOLDER || '(주)하루하루의기적',
+
+    // 세금계산서 안내
+    taxInvoiceNotice: options.taxInvoiceNotice ||
+      '정산 금액 입금 전, 수수료에 대한 세금계산서를 "하루하루의 기적" 명의로 발행해 주시기 바랍니다.\n' +
+      '세금계산서 수신 후 영업일 기준 3일 이내 입금 처리됩니다.\n' +
+      '사업자번호: 000-00-00000 | 이메일: tax@dailymiracles.co.kr',
+
+    // 추가 메모
+    additionalNotes: quoteData.settlement_notes || options.additionalNotes || null
+  };
+
+  // HTML 생성
+  const template = Handlebars.compile(SETTLEMENT_PDF_TEMPLATE);
+  const html = template(templateData);
+
+  // Puppeteer로 PDF 생성
+  let browser;
+  try {
+    browser = await puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless
+    });
+
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: {
+        top: '10mm',
+        right: '10mm',
+        bottom: '10mm',
+        left: '10mm'
+      }
+    });
+
+    return pdfBuffer;
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
+  }
+}
+
+/**
+ * 정산서 PDF 생성 및 저장 (통합 함수)
+ * @param {Object} quoteData - 견적 데이터 (operation_mode가 'commission'인 경우 호출)
+ * @param {Object} options - 추가 옵션 (bankName, bankAccountNumber 등)
+ * @returns {Promise<Object>} { success, pdfUrl, settlementAmount }
+ */
+async function generateAndSaveSettlementPdf(quoteData, options = {}) {
+  try {
+    // operation_mode 확인 (commission 모드 권장)
+    if (quoteData.operation_mode && quoteData.operation_mode !== 'commission') {
+      console.warn(`[PDF] 정산서는 commission 모드용입니다. 현재: ${quoteData.operation_mode}`);
+    }
+
+    const pdfBuffer = await generateSettlementPdf(quoteData, options);
+
+    const pdfUrl = await savePdfToFile(
+      pdfBuffer,
+      quoteData.quote_id,
+      DOCUMENT_TYPES.SETTLEMENT
+    );
+
+    // 수수료 계산 (응답에 포함)
+    const totalSell = quoteData.total_sell || quoteData.total_amount || 0;
+    const commissionRate = quoteData.commission_rate || 10;
+    const commissionAmount = quoteData.commission_amount || Math.round(totalSell * commissionRate / 100);
+
+    console.log(`[PDF] 정산서 생성 완료: ${quoteData.quote_id}, 수수료: ${commissionAmount.toLocaleString()}원`);
+
+    return {
+      success: true,
+      pdfUrl,
+      settlementAmount: commissionAmount,
+      commissionRate,
+      pdfGeneratedAt: new Date().toISOString()
+    };
+  } catch (error) {
+    console.error('[PDF] 정산서 생성 실패:', error.message);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // 모듈 내보내기
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -1024,5 +1611,10 @@ module.exports = {
   generateQuotePdf,
   savePdfToFile,
   generateAndSaveConfirmedPdf,
-  generateAndSaveEstimatePdf
+  generateAndSaveEstimatePdf,
+  // P2-2: 정산서/수수료-only
+  generateSettlementPdf,
+  generateAndSaveSettlementPdf,
+  maskCustomerName,
+  calculateSettlementDueDate
 };

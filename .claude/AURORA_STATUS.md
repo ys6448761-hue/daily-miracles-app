@@ -64,6 +64,7 @@
 🟢 완료: 승인/반려 API decision_note + requested_changes 지원
 🟢 완료: P1 인센티브/MICE 플래그 로직 (체크리스트, 타임라인, 강제 이관)
 🟢 완료: P2-1 확정견적 PDF 서비스 (@sparticuz/chromium, 프로덕션 검증 완료)
+🟢 완료: P2-2 정산서/수수료-only PDF 자동 생성 (commission 모드)
 🟢 완료: P2-3 승인 전 결제 링크 생성 차단
 🟡 진행중: GA4 설정 (측정 ID 대기 중)
 🟡 진행중: 10회 검증 validation (1/10 완료)
@@ -231,6 +232,54 @@ browser = await puppeteer.launch({
   headless: chromium.headless
 });
 ```
+
+---
+
+### 2026-01-13: P2-2 정산서/수수료-only PDF
+
+| 작업 | 상태 | 산출물 |
+|------|------|--------|
+| 정산서 PDF 템플릿 | ✅ | `SETTLEMENT_PDF_TEMPLATE` |
+| 정산서 생성 함수 | ✅ | `generateAndSaveSettlementPdf()` |
+| confirm 자동 생성 | ✅ | commission 모드 시 자동 생성 |
+| 수동 생성 엔드포인트 | ✅ | `POST /:quoteId/settlement-pdf` |
+| DB 필드 마이그레이션 | ✅ | `add_settlement_pdf_fields.sql` |
+
+### 정산서 PDF 구성
+
+| 섹션 | 필드 |
+|------|------|
+| 헤더 | 문서번호, 발행일, 정산예정일 |
+| 수신/발신 | 갑(파트너), 을(하루하루의 기적) |
+| 정산 내역 | 건명, 여행일, 고객(마스킹), 인원 |
+| 금액 정보 | 총 판매가, 수수료율, 정산금액 |
+| 입금 안내 | 은행, 계좌번호, 예금주 |
+| 세금계산서 | 발행 안내 문구 |
+| 서명 영역 | 갑/을 서명란 |
+
+### 정산서 PDF 서비스 API
+
+```
+// 자동 생성 (confirm 시 commission 모드면 자동)
+POST /:quoteId/confirm → settlement_pdf_generated, settlement_pdf_url
+
+// 수동 생성
+POST /:quoteId/settlement-pdf
+Body: { commission_rate, agency_name, bank_name, ... }
+Response: { settlement_pdf_url, settlement_amount, commission_rate }
+```
+
+### DB 필드 (P2-2)
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| settlement_pdf_generated | BOOLEAN | 정산서 생성 여부 |
+| settlement_pdf_url | TEXT | 정산서 URL |
+| commission_rate | DECIMAL(5,2) | 수수료율 (기본 10%) |
+| settlement_amount | INTEGER | 정산 금액 |
+| settlement_due_at | DATE | 정산 예정일 |
+| agency_name | VARCHAR(100) | 파트너 상호 |
+| agency_contact | VARCHAR(50) | 파트너 담당자 |
 
 ---
 

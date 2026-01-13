@@ -1718,7 +1718,21 @@ router.post('/:quoteId/confirm', async (req, res) => {
       }
     }
 
-    // DB 업데이트 (PDF URL 포함)
+    // P2-2: 정산서 PDF 자동 생성 (commission 모드일 때만)
+    let settlementPdfResult = { success: false, pdfUrl: null };
+    if (quotePdfService && quote.operation_mode === 'commission') {
+      try {
+        console.log(`[Quote/PDF] 정산서 PDF 생성 시작: ${quoteId} (commission 모드)`);
+        settlementPdfResult = await quotePdfService.generateAndSaveSettlementPdf(quote);
+        if (settlementPdfResult.success) {
+          console.log(`[Quote/PDF] 정산서 생성 완료: ${settlementPdfResult.pdfUrl}, 수수료: ${settlementPdfResult.settlementAmount?.toLocaleString()}원`);
+        }
+      } catch (settlementErr) {
+        console.error('[Quote/PDF] 정산서 생성 실패:', settlementErr.message);
+      }
+    }
+
+    // DB 업데이트 (PDF URL 포함 + P2-2 정산서)
     if (db) {
       try {
         await db.query(`
@@ -1730,6 +1744,9 @@ router.post('/:quoteId/confirm', async (req, res) => {
             pdf_generated = $3,
             pdf_url = $4,
             pdf_generated_at = $5,
+            settlement_pdf_generated = $6,
+            settlement_pdf_url = $7,
+            settlement_amount = $8,
             updated_at = NOW()
           WHERE quote_id = $2
         `, [
@@ -1737,7 +1754,10 @@ router.post('/:quoteId/confirm', async (req, res) => {
           quoteId,
           pdfResult.success,
           pdfResult.pdfUrl,
-          pdfResult.success ? new Date() : null
+          pdfResult.success ? new Date() : null,
+          settlementPdfResult.success,
+          settlementPdfResult.pdfUrl,
+          settlementPdfResult.settlementAmount || null
         ]);
       } catch (dbErr) {
         console.error('[Quote] 확정 DB 업데이트 실패:', dbErr.message);
@@ -1750,7 +1770,12 @@ router.post('/:quoteId/confirm', async (req, res) => {
       operation_mode: quote.operation_mode,
       total_sell: quote.total_sell,
       pdf_generated: pdfResult.success,
-      pdf_url: pdfResult.pdfUrl
+      pdf_url: pdfResult.pdfUrl,
+      // P2-2: 정산서 정보
+      settlement_pdf_generated: settlementPdfResult.success,
+      settlement_pdf_url: settlementPdfResult.pdfUrl,
+      settlement_amount: settlementPdfResult.settlementAmount,
+      commission_rate: settlementPdfResult.commissionRate
     });
 
     // 담당자 알림 카드 생성
@@ -1766,6 +1791,14 @@ router.post('/:quoteId/confirm', async (req, res) => {
       approval_status: 'confirmed'
     });
 
+    // 메시지 생성
+    let confirmMessage = '견적이 확정되었습니다.';
+    if (pdfResult.success && settlementPdfResult.success) {
+      confirmMessage = '견적이 확정되었습니다. 확정 견적서 + 정산서가 생성되었습니다.';
+    } else if (pdfResult.success) {
+      confirmMessage = '견적이 확정되었습니다. PDF가 생성되었습니다.';
+    }
+
     res.json({
       success: true,
       quoteId,
@@ -1773,18 +1806,22 @@ router.post('/:quoteId/confirm', async (req, res) => {
       quote_type: 'confirmed',
       confirmed_by,
       confirmed_at: new Date().toISOString(),
-      // P2-1: PDF 정보
+      // P2-1: 확정 견적서 PDF 정보
       pdf_generated: pdfResult.success,
       pdf_url: pdfResult.pdfUrl,
       pdf_generated_at: pdfResult.pdfGeneratedAt,
+      // P2-2: 정산서 PDF 정보 (commission 모드)
+      settlement_pdf_generated: settlementPdfResult.success,
+      settlement_pdf_url: settlementPdfResult.pdfUrl,
+      settlement_amount: settlementPdfResult.settlementAmount,
+      commission_rate: settlementPdfResult.commissionRate,
       summary_card: summaryCard,
-      message: pdfResult.success
-        ? '견적이 확정되었습니다. PDF가 생성되었습니다.'
-        : '견적이 확정되었습니다.',
+      message: confirmMessage,
       next_steps: [
         pdfResult.success ? `확정 견적서를 고객에게 발송하세요: ${pdfResult.pdfUrl}` : '고객에게 확정 견적서를 발송하세요.',
         '결제 링크를 생성하세요.',
-        quote.operation_mode !== 'direct' ? '여행사 정산을 준비하세요.' : null
+        settlementPdfResult.success ? `파트너사에 정산서를 발송하세요: ${settlementPdfResult.pdfUrl}` : null,
+        quote.operation_mode !== 'direct' && !settlementPdfResult.success ? '여행사 정산을 준비하세요.' : null
       ].filter(Boolean)
     });
 
@@ -1793,6 +1830,101 @@ router.post('/:quoteId/confirm', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'CONFIRMATION_ERROR',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/v2/quote/:quoteId/settlement-pdf
+ * P2-2: 정산서 PDF 수동 생성 (commission 모드가 아닌 경우에도 생성 가능)
+ */
+router.post('/:quoteId/settlement-pdf', async (req, res) => {
+  try {
+    const { quoteId } = req.params;
+    const { commission_rate, agency_name, agency_contact, bank_name, bank_account_number, bank_account_holder } = req.body;
+
+    // 견적 조회
+    const quote = await getQuote(quoteId);
+    if (!quote) {
+      return res.status(404).json({
+        success: false,
+        error: 'QUOTE_NOT_FOUND'
+      });
+    }
+
+    // PDF 서비스 확인
+    if (!quotePdfService) {
+      return res.status(503).json({
+        success: false,
+        error: 'PDF_SERVICE_UNAVAILABLE',
+        message: 'PDF 서비스를 사용할 수 없습니다.'
+      });
+    }
+
+    // 커스텀 옵션 병합
+    const quoteWithOptions = {
+      ...quote,
+      commission_rate: commission_rate || quote.commission_rate || 10,
+      agency_name: agency_name || quote.agency_name,
+      agency_contact: agency_contact || quote.agency_contact
+    };
+
+    const pdfOptions = {};
+    if (bank_name) pdfOptions.bankName = bank_name;
+    if (bank_account_number) pdfOptions.bankAccountNumber = bank_account_number;
+    if (bank_account_holder) pdfOptions.bankAccountHolder = bank_account_holder;
+
+    console.log(`[Quote/PDF] 정산서 수동 생성 시작: ${quoteId}`);
+    const result = await quotePdfService.generateAndSaveSettlementPdf(quoteWithOptions, pdfOptions);
+
+    if (!result.success) {
+      return res.status(500).json({
+        success: false,
+        error: 'PDF_GENERATION_FAILED',
+        message: result.error
+      });
+    }
+
+    // DB 업데이트
+    if (db) {
+      try {
+        await db.query(`
+          UPDATE quotes SET
+            settlement_pdf_generated = TRUE,
+            settlement_pdf_url = $1,
+            settlement_amount = $2,
+            commission_rate = $3,
+            updated_at = NOW()
+          WHERE quote_id = $4
+        `, [result.pdfUrl, result.settlementAmount, result.commissionRate, quoteId]);
+      } catch (dbErr) {
+        console.warn('[Quote] 정산서 PDF DB 업데이트 실패:', dbErr.message);
+      }
+    }
+
+    // 이벤트 로깅
+    await logEvent('SettlementPdfGenerated', quoteId, {
+      settlement_amount: result.settlementAmount,
+      commission_rate: result.commissionRate,
+      pdf_url: result.pdfUrl
+    });
+
+    res.json({
+      success: true,
+      quoteId,
+      settlement_pdf_url: result.pdfUrl,
+      settlement_amount: result.settlementAmount,
+      commission_rate: result.commissionRate,
+      generated_at: result.pdfGeneratedAt,
+      message: `정산서가 생성되었습니다. 수수료: ${result.settlementAmount?.toLocaleString()}원 (${result.commissionRate}%)`
+    });
+
+  } catch (error) {
+    console.error('[Quote] 정산서 PDF 생성 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: 'SETTLEMENT_PDF_ERROR',
       message: error.message
     });
   }
