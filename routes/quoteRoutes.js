@@ -923,7 +923,8 @@ router.post('/admin/migrate', async (req, res) => {
       'deal-structuring': '../database/migrations/add_deal_structuring_fields.sql',
       'settlement': '../database/migrations/add_settlement_pdf_fields.sql',
       'payment': '../database/migrations/add_payment_fields.sql',
-      'wix': '../database/migrations/add_wix_quote_fields.sql'
+      'wix': '../database/migrations/add_wix_quote_fields.sql',
+      'itinerary': '../database/migrations/add_itinerary_tables.sql'
     };
 
     const migrationKey = migration || 'default';

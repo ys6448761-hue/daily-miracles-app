@@ -179,6 +179,15 @@ try {
   console.error("❌ 견적 시스템 라우터 로드 실패:", error.message);
 }
 
+// 4인 이하 자동 일정 생성 라우터 로딩
+let itineraryRoutes = null;
+try {
+  itineraryRoutes = require("./routes/itineraryRoutes");
+  console.log("✅ 일정 생성 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 일정 생성 라우터 로드 실패:", error.message);
+}
+
 // Wix 자유여행 견적 요청 라우터 로딩
 let quoteRequestRoutes = null;
 try {
@@ -695,6 +704,14 @@ if (quoteRoutes) {
   console.log("✅ 견적 시스템 라우터 등록 완료 (/api/v2/quote)");
 } else {
   console.warn("⚠️ 견적 시스템 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 4인 이하 자동 일정 생성 Routes ----------
+if (itineraryRoutes) {
+  app.use("/api/v2/itinerary", itineraryRoutes);
+  console.log("✅ 일정 생성 라우터 등록 완료 (/api/v2/itinerary)");
+} else {
+  console.warn("⚠️ 일정 생성 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Wix 자유여행 견적 요청 Routes ----------
