@@ -63,6 +63,8 @@
 🟢 완료: 담당자 알림 카드 루미 스펙 v1 (amount_type, mode_source, approval_level)
 🟢 완료: 승인/반려 API decision_note + requested_changes 지원
 🟢 완료: P1 인센티브/MICE 플래그 로직 (체크리스트, 타임라인, 강제 이관)
+🟢 완료: P2-1 확정견적 PDF 서비스 (코드 완료, Render 빌드팩 설정 필요)
+🟢 완료: P2-3 승인 전 결제 링크 생성 차단
 🟡 진행중: GA4 설정 (측정 ID 대기 중)
 🟡 진행중: 10회 검증 validation (1/10 완료)
 ```
@@ -155,6 +157,76 @@ feat(deal-structuring): 담당자 알림 카드 루미 스펙 v1 적용
 feat(quote): 승인/반려 API에 decision_note, requested_changes 추가
 feat(deal-structuring): P1 인센티브/MICE 플래그 로직 구현
 fix(deal-structuring): options.guest_count/total_sell 우선 적용
+feat(quote): P2-1 확정견적 PDF 자동 생성 + P2-3 결제 안전장치
+```
+
+---
+
+### 2026-01-13: P2 확정견적 PDF + 결제 안전장치
+
+| 작업 | 상태 | 산출물 |
+|------|------|--------|
+| P2-1: 확정견적 PDF 서비스 | ✅ | `services/quotePdfService.js` |
+| P2-1: 운영모드별 자동 문구 | ✅ | direct/agency/commission/hybrid 문구 |
+| P2-1: 포함/불포함/변동 항목 | ✅ | 표준 템플릿 적용 |
+| P2-1: PDF URL quote 저장 | ✅ | pdf_generated, pdf_url 필드 |
+| P2-3: 승인 전 결제 차단 | ✅ | payment-link API 검증 추가 |
+| Render Puppeteer 설정 | ⚠️ | 빌드팩 추가 필요 |
+
+### PDF 서비스 구성
+
+```
+quotePdfService.js
+├── DOCUMENT_TYPES (estimate/confirmed)
+├── OPERATION_MODE_TEXTS (direct/agency/commission/hybrid 문구)
+├── generateQuotePdf() - Puppeteer+Handlebars PDF 생성
+├── savePdfToFile() - /public/pdfs/ 저장
+├── generateAndSaveConfirmedPdf() - 확정 견적 PDF
+└── generateAndSaveEstimatePdf() - 예상 견적 PDF
+```
+
+### PDF 1페이지 구성 (고객용 요약)
+
+| 섹션 | 필드 |
+|------|------|
+| 헤더 | document_type, quote_id, issued_at |
+| 고객/일정 | customer_name, travel_date, pax, origin |
+| 코스 | course_title, schedule_summary |
+| 금액 | total_amount, per_person, amount_type |
+| 운영/책임 | operation_mode, payment_receiver, tax_invoice_issuer |
+| 포함/불포함 | included_items, excluded_items, variable_items |
+| 결제 | payment_link, deposit/balance |
+| 취소/환불 | 규정 요약 |
+
+### P2-3 결제 안전장치
+
+```javascript
+// 승인 전 결제 링크 생성 차단
+if (quote.requires_approval && !['approved', 'auto_approved'].includes(quote.approval_status)) {
+  return { error: 'APPROVAL_REQUIRED', next_step: '...' };
+}
+```
+
+### 프로덕션 검증 결과 (2026-01-13)
+
+| 테스트 | quoteId | 결과 |
+|--------|---------|------|
+| P2-3 승인 전 결제 차단 | WIX-20260113-BRJE | ✅ APPROVAL_REQUIRED |
+| P2-1 PDF 생성 (auto_approved) | WIX-20260113-2RGF | ⚠️ 코드 OK, Puppeteer 빌드팩 필요 |
+
+### Render Puppeteer 설정 (TODO)
+
+Render에서 Puppeteer를 사용하려면 다음 설정이 필요합니다:
+
+1. **render.yaml**에 빌드팩 추가:
+```yaml
+buildCommand: npm install && npx puppeteer browsers install chrome
+```
+
+2. 또는 **Dockerfile** 사용:
+```dockerfile
+FROM node:18
+RUN apt-get update && apt-get install -y chromium
 ```
 
 ---
