@@ -1478,7 +1478,11 @@ router.post('/:quoteId/deal-structuring', async (req, res) => {
 router.post('/:quoteId/approve', async (req, res) => {
   try {
     const { quoteId } = req.params;
-    const { approved_by, approval_note } = req.body;
+    const {
+      approved_by,
+      approval_note,    // 레거시 호환
+      decision_note     // 루미 스펙 v1
+    } = req.body;
 
     if (!approved_by) {
       return res.status(400).json({
@@ -1487,6 +1491,9 @@ router.post('/:quoteId/approve', async (req, res) => {
         message: '승인자 정보가 필요합니다'
       });
     }
+
+    // decision_note 우선, 없으면 approval_note 사용
+    const note = decision_note || approval_note || null;
 
     // 견적 조회
     const quote = await getQuote(quoteId);
@@ -1518,7 +1525,7 @@ router.post('/:quoteId/approve', async (req, res) => {
             approval_note = $2,
             updated_at = NOW()
           WHERE quote_id = $3
-        `, [approved_by, approval_note || null, quoteId]);
+        `, [approved_by, note, quoteId]);
       } catch (dbErr) {
         console.error('[Quote] 승인 DB 업데이트 실패:', dbErr.message);
       }
@@ -1527,7 +1534,8 @@ router.post('/:quoteId/approve', async (req, res) => {
     // 이벤트 로깅
     await logEvent('QuoteApproved', quoteId, {
       approved_by,
-      approval_note,
+      decision: 'approve',
+      decision_note: note,
       previous_status: quote.approval_status
     });
 
@@ -1535,6 +1543,8 @@ router.post('/:quoteId/approve', async (req, res) => {
       success: true,
       quoteId,
       approval_status: 'approved',
+      decision: 'approve',
+      decision_note: note,
       approved_by,
       approved_at: new Date().toISOString(),
       message: '견적이 승인되었습니다. 이제 확정할 수 있습니다.'
@@ -1552,18 +1562,26 @@ router.post('/:quoteId/approve', async (req, res) => {
 
 /**
  * POST /api/v2/quote/:quoteId/reject
- * 견적 반려 처리
+ * 견적 반려 처리 (루미 스펙 v1: decision_note + requested_changes)
  */
 router.post('/:quoteId/reject', async (req, res) => {
   try {
     const { quoteId } = req.params;
-    const { rejected_by, rejection_reason } = req.body;
+    const {
+      rejected_by,
+      rejection_reason,    // 레거시 호환
+      decision_note,       // 루미 스펙 v1
+      requested_changes    // 루미 스펙 v1: 수정요청 항목 배열
+    } = req.body;
 
-    if (!rejected_by || !rejection_reason) {
+    // decision_note 우선, 없으면 rejection_reason 사용
+    const note = decision_note || rejection_reason;
+
+    if (!rejected_by || !note) {
       return res.status(400).json({
         success: false,
         error: 'MISSING_FIELDS',
-        message: '반려자와 반려 사유가 필요합니다'
+        message: '반려자와 반려 사유(decision_note)가 필요합니다'
       });
     }
 
@@ -1576,6 +1594,11 @@ router.post('/:quoteId/reject', async (req, res) => {
       });
     }
 
+    // decision 타입 결정: 수정요청이 있으면 request_changes, 없으면 reject
+    const decision = requested_changes && requested_changes.length > 0
+      ? 'request_changes'
+      : 'reject';
+
     // DB 업데이트
     if (db) {
       try {
@@ -1587,7 +1610,7 @@ router.post('/:quoteId/reject', async (req, res) => {
             approval_note = $2,
             updated_at = NOW()
           WHERE quote_id = $3
-        `, [rejected_by, rejection_reason, quoteId]);
+        `, [rejected_by, note, quoteId]);
       } catch (dbErr) {
         console.error('[Quote] 반려 DB 업데이트 실패:', dbErr.message);
       }
@@ -1596,16 +1619,22 @@ router.post('/:quoteId/reject', async (req, res) => {
     // 이벤트 로깅
     await logEvent('QuoteRejected', quoteId, {
       rejected_by,
-      rejection_reason
+      decision,
+      decision_note: note,
+      requested_changes: requested_changes || null
     });
 
     res.json({
       success: true,
       quoteId,
       approval_status: 'rejected',
+      decision,
+      decision_note: note,
+      requested_changes: requested_changes || null,
       rejected_by,
-      rejection_reason,
-      message: '견적이 반려되었습니다.'
+      message: decision === 'request_changes'
+        ? '수정 요청이 전달되었습니다.'
+        : '견적이 반려되었습니다.'
     });
 
   } catch (error) {
