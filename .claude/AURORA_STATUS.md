@@ -62,6 +62,7 @@
 🟢 완료: P0 Deal Structuring (운영모드, 책임주체, 승인 워크플로우)
 🟢 완료: 담당자 알림 카드 루미 스펙 v1 (amount_type, mode_source, approval_level)
 🟢 완료: 승인/반려 API decision_note + requested_changes 지원
+🟢 완료: P1 인센티브/MICE 플래그 로직 (체크리스트, 타임라인, 강제 이관)
 🟡 진행중: GA4 설정 (측정 ID 대기 중)
 🟡 진행중: 10회 검증 validation (1/10 완료)
 ```
@@ -152,7 +153,65 @@ feat(quote): P0 Deal Structuring 구현 (운영모드, 책임주체, 승인 워�
 fix(deal-structuring): 승인 트리거 코드 표준화 (pax_over_20, amount_over_3m 추가)
 feat(deal-structuring): 담당자 알림 카드 루미 스펙 v1 적용
 feat(quote): 승인/반려 API에 decision_note, requested_changes 추가
+feat(deal-structuring): P1 인센티브/MICE 플래그 로직 구현
+fix(deal-structuring): options.guest_count/total_sell 우선 적용
 ```
+
+---
+
+### 2026-01-13: P1 인센티브/MICE 플래그 로직
+
+| 작업 | 상태 | 산출물 |
+|------|------|--------|
+| processDealStructuring 인센티브/MICE 연결 | ✅ | `services/dealStructuringService.js` |
+| summary_card 체크리스트/타임라인 필드 | ✅ | incentive_checklist, mice_checklist |
+| 여행사 강제 이관 룰 강화 | ✅ | MICE → agency 필수, 30인+ → hybrid 권장 |
+| 프로덕션 테스트 | ✅ | 인센티브/MICE/대규모단체 3케이스 |
+
+### 여행사 강제 이관 정책 (P1)
+
+| 조건 | 결과 | 플래그 |
+|------|------|--------|
+| 인센티브 + 여행업 미등록 | agency 강제 | `forced=true, forceReason=incentive_no_license` |
+| MICE + 여행업 미등록 | agency 강제 | `forced=true, forceReason=mice_no_license` |
+| 30인+ + 여행업 미등록 | hybrid 권장 | `forceSuggested=true, forceReason=large_group_no_license` |
+
+### 인센티브 체크리스트 (documents)
+
+| 코드 | 서류명 | 필수 |
+|------|--------|------|
+| participant_list | 참가자 명단 | ✅ |
+| itinerary | 여행 일정표 | ✅ |
+| bus_contract | 버스 계약서 | ✅ |
+| accommodation_confirm | 숙박 확인서 | ✅ |
+| meal_receipt | 식사 영수증 | - |
+
+### MICE 체크리스트 (documents)
+
+| 코드 | 서류명 | 필수 |
+|------|--------|------|
+| event_proposal | 행사 기획안 | ✅ |
+| participant_list | 참가자 명단 | ✅ |
+| venue_contract | 장소 계약서 | ✅ |
+| budget_plan | 예산 계획서 | ✅ |
+| sponsorship_docs | 후원 관련 서류 | - |
+
+### 타임라인 (deadlines)
+
+| 타입 | 라벨 | 기준일 |
+|------|------|--------|
+| pre_consultation | 사전 협의 완료 | D-15 (인센티브), D-30 (MICE) |
+| document_submit | 서류 제출 | D-3 |
+| final_confirmation | 최종 인원/일정 확정 | D-7 (MICE) |
+| post_application | 사후 신청 마감 | D+7 |
+
+### 프로덕션 검증 결과 (2026-01-13)
+
+| 케이스 | quoteId | 조건 | 결과 |
+|--------|---------|------|------|
+| 인센티브 | WIX-20260113-RZG1 | incentive_required=true | agency 강제, documents 5개, deadlines 3개 |
+| MICE | WIX-20260113-BRJE | is_mice=true | agency 강제, force_reason=mice_no_license |
+| 대규모단체 | WIX-20260113-XYPX | guest_count=35 | hybrid 권장, force_suggested=true |
 
 ---
 
