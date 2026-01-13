@@ -63,7 +63,7 @@
 🟢 완료: 담당자 알림 카드 루미 스펙 v1 (amount_type, mode_source, approval_level)
 🟢 완료: 승인/반려 API decision_note + requested_changes 지원
 🟢 완료: P1 인센티브/MICE 플래그 로직 (체크리스트, 타임라인, 강제 이관)
-🟢 완료: P2-1 확정견적 PDF 서비스 (코드 완료, Render 빌드팩 설정 필요)
+🟢 완료: P2-1 확정견적 PDF 서비스 (@sparticuz/chromium, 프로덕션 검증 완료)
 🟢 완료: P2-3 승인 전 결제 링크 생성 차단
 🟡 진행중: GA4 설정 (측정 ID 대기 중)
 🟡 진행중: 10회 검증 validation (1/10 완료)
@@ -171,7 +171,7 @@ feat(quote): P2-1 확정견적 PDF 자동 생성 + P2-3 결제 안전장치
 | P2-1: 포함/불포함/변동 항목 | ✅ | 표준 템플릿 적용 |
 | P2-1: PDF URL quote 저장 | ✅ | pdf_generated, pdf_url 필드 |
 | P2-3: 승인 전 결제 차단 | ✅ | payment-link API 검증 추가 |
-| Render Puppeteer 설정 | ⚠️ | 빌드팩 추가 필요 |
+| Render @sparticuz/chromium | ✅ | 서버리스 호환 Chromium |
 
 ### PDF 서비스 구성
 
@@ -212,21 +212,24 @@ if (quote.requires_approval && !['approved', 'auto_approved'].includes(quote.app
 | 테스트 | quoteId | 결과 |
 |--------|---------|------|
 | P2-3 승인 전 결제 차단 | WIX-20260113-BRJE | ✅ APPROVAL_REQUIRED |
-| P2-1 PDF 생성 (auto_approved) | WIX-20260113-2RGF | ⚠️ 코드 OK, Puppeteer 빌드팩 필요 |
+| P2-1 PDF 생성 | WIX-20260113-H3X6 | ✅ pdf_generated=true, 106KB |
 
-### Render Puppeteer 설정 (TODO)
+### Chromium 설정 (@sparticuz/chromium)
 
-Render에서 Puppeteer를 사용하려면 다음 설정이 필요합니다:
+```javascript
+// package.json
+"puppeteer-core": "^24.0.0",
+"@sparticuz/chromium": "^131.0.1"
 
-1. **render.yaml**에 빌드팩 추가:
-```yaml
-buildCommand: npm install && npx puppeteer browsers install chrome
-```
+// quotePdfService.js
+const puppeteer = require('puppeteer-core');
+const chromium = require('@sparticuz/chromium');
 
-2. 또는 **Dockerfile** 사용:
-```dockerfile
-FROM node:18
-RUN apt-get update && apt-get install -y chromium
+browser = await puppeteer.launch({
+  args: chromium.args,
+  executablePath: await chromium.executablePath(),
+  headless: chromium.headless
+});
 ```
 
 ---
