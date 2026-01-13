@@ -129,7 +129,7 @@ router.post('/generate', async (req, res) => {
         error: 'PAX_LIMIT_EXCEEDED',
         message: '5인 이상은 단체 상담이 필요합니다.',
         next_step: 'GROUP_CONSULTATION',
-        kakao_link: 'https://pf.kakao.com/_dailymiracles'
+        kakao_link: 'https://pf.kakao.com/_xfxhcWn/chat'
       });
     }
 
@@ -364,7 +364,7 @@ router.post('/:id/edit', async (req, res) => {
         success: false,
         error: 'EDIT_LIMIT_REACHED',
         message: '무료 수정은 1회까지 가능합니다. 추가 수정은 상담을 신청해주세요.',
-        kakao_link: 'https://pf.kakao.com/_dailymiracles'
+        kakao_link: 'https://pf.kakao.com/_xfxhcWn/chat'
       });
     }
 
