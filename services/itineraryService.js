@@ -297,59 +297,96 @@ ${sortedStyles}
 function generateDefaultItinerary(options) {
   const { days, stylePreferences, mustVisit, tempo } = options;
 
+  // 일차별 장소 데이터
+  const daySchedules = [
+    // Day 1
+    {
+      title: '여수의 낭만 시작',
+      morning: { place: '오동도', activity: '동백꽃 산책로 & 해안 절경 감상', tips: '편한 신발 추천, 동백열차 이용 가능' },
+      lunch: { place: '중앙시장', activity: '갓김밥 + 시장 먹거리 탐방', tips: '갓김밥, 꿀빵 필수!' },
+      afternoon: { place: '여수 해상케이블카', activity: '돌산↔자산 바다 위 케이블카', tips: '크리스탈캐빈 예약 추천' },
+      evening: { place: '이순신광장 낭만포차', activity: '해산물 + 여수밤바다 야경', tips: '조개구이, 굴전 추천' }
+    },
+    // Day 2
+    {
+      title: '여수 동쪽 탐험',
+      morning: { place: '향일암', activity: '해돋이 명소, 해안 절벽 사찰', tips: '새벽 일출 시 04:30 출발' },
+      lunch: { place: '돌산 갯장어거리', activity: '갯장어 샤브샤브 점심', tips: '갯장어 코스 2인 6만원대' },
+      afternoon: { place: '금오도 비렁길', activity: '해안 트레킹 (1코스 추천)', tips: '여객선 시간 미리 확인' },
+      evening: { place: '돌산공원', activity: '돌산대교 야경 + 카페', tips: '일몰 30분 전 도착 추천' }
+    },
+    // Day 3
+    {
+      title: '문화와 미식의 날',
+      morning: { place: '진남관', activity: '국보 제304호 조선 수군 본영', tips: '무료 입장, 해설 프로그램 있음' },
+      lunch: { place: '서대회타운', activity: '서대회 정식 + 물회', tips: '점심 특선 저렴' },
+      afternoon: { place: '아쿠아플라넷 여수', activity: '벨루가, 해양생물 관람', tips: '공연시간 미리 체크' },
+      evening: { place: '엑스포 해양공원', activity: '빅오쇼 + 스카이타워', tips: '빅오쇼 19:00/21:00' }
+    },
+    // Day 4
+    {
+      title: '숨은 보석 발견',
+      morning: { place: '거문도/백도', activity: '비경의 섬 투어 (당일 왕복)', tips: '뱃멀미약 챙기기' },
+      lunch: { place: '거문도 해녀촌', activity: '신선한 해산물 점심', tips: '현지에서만 맛볼 수 있는 메뉴' },
+      afternoon: { place: '해양레일바이크', activity: '바다 위 레일바이크', tips: '온라인 사전 예약 필수' },
+      evening: { place: '웅천친수공원', activity: '한적한 일몰 + 포토존', tips: '로컬 숨은 명소' }
+    }
+  ];
+
   const dailyPlans = [];
 
   for (let day = 1; day <= days; day++) {
+    const dayData = daySchedules[(day - 1) % daySchedules.length];
     const schedule = [];
 
     // 오전
     schedule.push({
       time: '09:00',
       slot: 'morning',
-      place: day === 1 ? '오동도' : '향일암',
-      activity: day === 1 ? '동백꽃 산책로 걷기' : '일출 명소 방문',
-      duration: '1.5h',
-      tips: '편한 신발 추천',
-      travel_to_next: '20분'
+      place: dayData.morning.place,
+      activity: dayData.morning.activity,
+      duration: '2h',
+      tips: dayData.morning.tips,
+      travel_to_next: '25분'
     });
 
     // 점심
     schedule.push({
       time: '12:00',
       slot: 'lunch',
-      place: '중앙시장',
-      activity: '시장 구경 + 점심 식사',
+      place: dayData.lunch.place,
+      activity: dayData.lunch.activity,
       duration: '1.5h',
-      tips: '갓김밥, 서대회 추천',
-      travel_to_next: '15분'
+      tips: dayData.lunch.tips,
+      travel_to_next: '20분'
     });
 
     // 오후
     schedule.push({
-      time: '14:00',
+      time: '14:30',
       slot: 'afternoon',
-      place: '여수 해상케이블카',
-      activity: '바다 위 케이블카 탑승',
-      duration: '1h',
-      tips: '석양 시간대 추천',
-      travel_to_next: '10분'
+      place: dayData.afternoon.place,
+      activity: dayData.afternoon.activity,
+      duration: '2h',
+      tips: dayData.afternoon.tips,
+      travel_to_next: '15분'
     });
 
     // 저녁
     schedule.push({
       time: '18:00',
       slot: 'evening',
-      place: '이순신광장',
-      activity: '낭만포차 거리 + 해산물 저녁',
-      duration: '2h',
-      tips: '조개구이 필수!',
+      place: dayData.evening.place,
+      activity: dayData.evening.activity,
+      duration: '2.5h',
+      tips: dayData.evening.tips,
       travel_to_next: '-'
     });
 
     dailyPlans.push({
       day,
       date: null,
-      title: day === 1 ? '여수의 낭만 시작' : `여수 완전 정복 Day ${day}`,
+      title: dayData.title,
       schedule
     });
   }
@@ -358,13 +395,17 @@ function generateDefaultItinerary(options) {
     daily_plans: dailyPlans,
     restaurants: [
       { name: '갓김밥', type: '김밥', menu: '갓김밥', price_range: '₩' },
-      { name: '서대회타운', type: '회', menu: '서대회', price_range: '₩₩₩' },
-      { name: '낭만포차', type: '해산물', menu: '조개구이', price_range: '₩₩' }
+      { name: '서대회타운', type: '회', menu: '서대회 정식', price_range: '₩₩₩' },
+      { name: '낭만포차', type: '해산물', menu: '조개구이', price_range: '₩₩' },
+      { name: '돌산 갯장어', type: '샤브샤브', menu: '갯장어 코스', price_range: '₩₩₩' },
+      { name: '중앙시장 꿀빵', type: '간식', menu: '크림치즈 꿀빵', price_range: '₩' }
     ],
     tips: [
-      '여수는 해산물이 유명해요. 꼭 드셔보세요!',
+      '여수는 해산물이 유명해요. 서대회, 갯장어 꼭 드셔보세요!',
       '해상케이블카는 석양 시간대가 가장 예뻐요.',
-      '돌산공원은 야경이 멋져요. 저녁에 방문 추천!'
+      '돌산공원 야경은 밤 8시 이후가 절정!',
+      '향일암 일출은 새벽 일찍 출발해야 해요.',
+      '금오도 비렁길은 트레킹화 필수!'
     ],
     packing_list: getDefaultPackingList('day', stylePreferences),
     rainy_alternatives: getDefaultRainyAlternatives()
