@@ -59,6 +59,7 @@
 🟢 완료: P0 30일 프로그램 결제 시스템 (비회원 결제, entitlement 발급)
 🟢 완료: P0 소원 스타터 7 (9,900원 + 24시간 업그레이드 크레딧)
 🟢 완료: 여수 소원빌기 체험 MVP (접수, 결제, DALL-E 이미지 생성)
+🟢 완료: P0 Deal Structuring (운영모드, 책임주체, 승인 워크플로우)
 🟡 진행중: GA4 설정 (측정 ID 대기 중)
 🟡 진행중: 10회 검증 validation (1/10 완료)
 ```
@@ -66,6 +67,75 @@
 ---
 
 ## 최근 완료 작업
+
+### 2026-01-13: P0 Deal Structuring (견적 확정 워크플로우)
+
+| 작업 | 상태 | 산출물 |
+|------|------|--------|
+| quotes 테이블 23개 필드 추가 | ✅ | `database/migrations/add_deal_structuring_fields.sql` |
+| 마이그레이션 실행 스크립트 | ✅ | `database/run-deal-structuring-migration.js` |
+| Deal Structuring 서비스 | ✅ | `services/dealStructuringService.js` |
+| API 엔드포인트 8종 추가 | ✅ | `routes/quoteRoutes.js` |
+| Render DB 마이그레이션 적용 | ✅ | 23개 필드, 6개 인덱스, 2개 뷰 |
+| API 테스트 통과 | ✅ | deal-structuring, approve, confirm |
+
+### 운영모드 (4종)
+
+| 모드 | 설명 | 책임주체 |
+|------|------|----------|
+| direct | 직영 | 우리가 전부 처리 |
+| agency | 여행사 이관 | 여행사가 계약/결제/책임 |
+| commission | 수수료만 | 우리는 수수료만 수령 |
+| hybrid | 혼합 | 일부 직영 + 일부 이관 |
+
+### 책임주체 필드 (6종)
+
+| 필드 | 옵션 | 설명 |
+|------|------|------|
+| settlement_method | full, commission_only | 정산방식 |
+| tax_invoice_issuer | us, agency | 세금계산서 발행주체 |
+| payment_receiver | us, agency | 결제 수령주체 |
+| contract_party | us, agency | 계약 주체 |
+| refund_liability | us, agency | 취소/환불 책임 |
+| incentive_applicant | us, agency | 인센티브 신청주체 |
+
+### 승인 워크플로우
+
+```
+pending → deal_review → ceo_approval → approved/rejected → confirmed
+           (담당자)       (CEO)
+
+자동승인 조건: 금액 ≤300만 AND 인원 ≤20명 AND 직영 모드
+```
+
+### API 엔드포인트 (신규)
+
+```
+POST /:quoteId/deal-structuring  - 운영모드 + 승인 워크플로우 처리
+POST /:quoteId/approve           - 견적 승인
+POST /:quoteId/reject            - 견적 반려
+POST /:quoteId/confirm           - 견적 확정
+POST /:quoteId/incentive-flags   - 인센티브 플래그 생성 (P1)
+GET  /admin/quotes/pending-approval  - 승인 대기 목록
+GET  /admin/quotes/by-mode       - 운영모드별 통계
+```
+
+### 프로덕션 검증 결과 (2026-01-13)
+
+| 케이스 | quoteId | 조건 | 트리거 코드 | 결과 |
+|--------|---------|------|-------------|------|
+| A 인원 | WIX-20260113-OLRD | pax=21 | `pax_over_20` | ✅ deal_review |
+| B 금액 | - | >300만 | `amount_over_3m` | ⚠️ 상품 한계 |
+| C 운영모드 | WIX-20260113-3J5A | agency | `agency_transfer` | ✅ deal_review |
+
+### 커밋 이력
+
+```
+feat(quote): P0 Deal Structuring 구현 (운영모드, 책임주체, 승인 워크플로우)
+fix(deal-structuring): 승인 트리거 코드 표준화 (pax_over_20, amount_over_3m 추가)
+```
+
+---
 
 ### 2026-01-13: 여수 소원빌기 체험 MVP
 
@@ -861,11 +931,14 @@ routes/debateRoutes.js          - 토론 자동화 API v3.2
 routes/wishRoutes.js            - 소원실현 API (신호등 + 기적지수)
 routes/wishImageRoutes.js       - 소원그림 API (DALL-E 3 + 워터마크)
 routes/yeosuWishRoutes.js       - 여수 소원빌기 체험 MVP API
+routes/quoteRoutes.js           - 견적 API (Deal Structuring 포함)
+services/dealStructuringService.js - Deal Structuring 워크플로우 로직
 services/airtableService.js     - Airtable 연동 (Wishes Inbox 저장)
 services/solapiService.js       - Solapi 연동 (SMS + 카카오 알림톡)
 server.js                       - 메인 서버
 database/aurora5_schema.sql     - DB 스키마
 database/run-aurora5-schema.js  - 스키마 마이그레이션
+database/migrations/add_deal_structuring_fields.sql - Deal Structuring 마이그레이션
 ```
 
 ### MCP 서버 (7종)
@@ -990,6 +1063,7 @@ curl -X POST http://localhost:5100/api/debate/run \
 
 | 날짜 | 담당 | 내용 |
 |------|------|------|
+| 2026-01-13 | Code | P0 Deal Structuring (운영모드 4종, 책임주체 6종, 승인 워크플로우, API 8종) |
 | 2026-01-13 | Code | 여수 소원빌기 체험 MVP (접수, 결제, DALL-E 이미지, 다운로드) |
 | 2026-01-13 | Code | Day 7 완주 → 30일 업그레이드 전환 UI (성공/실패 페이지 생성) |
 | 2026-01-13 | Code | P0 소원 스타터 7 (9,900원) + 24시간 업그레이드 크레딧 (테스트 4/4 통과) |
