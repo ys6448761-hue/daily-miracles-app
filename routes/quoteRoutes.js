@@ -512,6 +512,23 @@ router.post('/wix', async (req, res) => {
     const env = isTest ? 'test' : 'prod';
 
     // 데이터 정규화
+    // source 필드: itinerary_builder에서 전달하면 사용, 아니면 'wix_form' 기본값
+    const sourceValue = payload.source || 'wix_form';
+
+    // must_go, avoid 필드가 있으면 notes에 병합
+    let combinedNotes = payload.notes || payload.special_request || payload['요청사항'] || '';
+    if (payload.must_go && Array.isArray(payload.must_go) && payload.must_go.length > 0) {
+      combinedNotes += `\n[필수방문] ${payload.must_go.join(', ')}`;
+    }
+    if (payload.avoid && Array.isArray(payload.avoid) && payload.avoid.length > 0) {
+      combinedNotes += `\n[회피] ${payload.avoid.join(', ')}`;
+    }
+    // 추가 정보 (빌더에서 전달)
+    if (payload.party_type) combinedNotes += `\n[구성] ${payload.party_type}`;
+    if (payload.transport) combinedNotes += `\n[이동] ${payload.transport}`;
+    if (payload.tempo) combinedNotes += `\n[템포] ${payload.tempo}`;
+    if (payload.nights !== undefined) combinedNotes += `\n[숙박] ${payload.nights}박`;
+
     const quoteData = {
       quote_id: quoteId,
       status: 'lead',
@@ -521,8 +538,8 @@ router.post('/wix', async (req, res) => {
       trip_start: payload.travel_date || payload['여행일'] || payload.trip_start || null,
       trip_end: payload.trip_end || null,
       guest_count: parseInt(payload.pax || payload.party_size || payload['인원'] || 2, 10),
-      notes: payload.notes || payload.special_request || payload['요청사항'] || null,
-      source: 'wix_form',
+      notes: combinedNotes.trim() || null,
+      source: sourceValue,
       env: env,
       region_code: payload.region || 'yeosu'
     };
@@ -532,6 +549,8 @@ router.post('/wix', async (req, res) => {
       name: quoteData.customer_name,
       phone: phone ? phone.slice(0, 3) + '****' : null,
       pax: quoteData.guest_count,
+      source: sourceValue,
+      date: quoteData.trip_start,
       env
     });
 
@@ -569,9 +588,10 @@ router.post('/wix', async (req, res) => {
     await logEvent('WixLeadCreated', quoteId, {
       customer_name: quoteData.customer_name,
       guest_count: quoteData.guest_count,
-      source: 'wix_form',
+      source: sourceValue,
+      trip_start: quoteData.trip_start,
       env
-    }, 'wix_webhook');
+    }, sourceValue === 'itinerary_builder' ? 'itinerary_builder' : 'wix_webhook');
 
     // 노션 Offline Ops Log 기록 (비동기, 실패해도 API 응답에 영향 없음)
     if (notionOps) {
@@ -581,7 +601,7 @@ router.post('/wix', async (req, res) => {
             quote_id: quoteId,
             customer_name: quoteData.customer_name,
             customer_phone: quoteData.customer_phone,
-            source: 'wix_form',
+            source: sourceValue,
             type: 'quote',
             notes: quoteData.notes,
             trip_start: quoteData.trip_start,
@@ -603,6 +623,9 @@ router.post('/wix', async (req, res) => {
       success: true,
       quote_id: quoteId,
       status: 'lead',
+      source: sourceValue,
+      pax: quoteData.guest_count,
+      date: quoteData.trip_start,
       env,
       message: '견적 요청이 접수되었습니다'
     });
