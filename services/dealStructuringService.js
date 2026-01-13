@@ -413,6 +413,7 @@ function processDealStructuring(quoteData) {
 
     // 운영모드
     operation_mode: modeResult.mode,
+    mode_source: modeResult.reason === '수동 지정' ? 'manual' : 'auto',
     operation_mode_reason: modeResult.reason,
     operation_mode_forced: modeResult.forced || false,
     recommendations: modeResult.recommendations,
@@ -430,14 +431,32 @@ function processDealStructuring(quoteData) {
     next_step: nextStep,
     next_step_message: getNextStepMessage(nextStep),
 
-    // 담당자 알림 카드용 요약
+    // 담당자 알림 카드용 요약 (루미 스펙 v1)
     summary_card: generateSummaryCard({
+      // 헤더
+      quote_id: quoteData.quote_id,
+      // 상태/승인
       operation_mode: modeResult.mode,
-      ...responsibilitySettings,
+      mode_source: modeResult.reason === '수동 지정' ? 'manual' : 'auto',
       approval_status: approvalStatus,
+      next_step: nextStep,
+      // 운영구조
+      ...responsibilitySettings,
+      // 승인 사유
       approval_reasons: approvalCheck.reasons,
+      // 고객/일정
+      customer_name: quoteData.customer_name,
+      customer_phone: quoteData.customer_phone,
+      travel_date: quoteData.travel_date,
       guest_count: quoteData.guest_count,
-      total_sell: quoteData.total_sell
+      // 금액/수익
+      total_sell: quoteData.total_sell,
+      total_margin: quoteData.total_margin,
+      quote_type: quoteData.quote_type,
+      // 인센티브/MICE
+      incentive_required: quoteData.incentive_required,
+      is_mice: quoteData.is_mice,
+      incentive_applicant: quoteData.incentive_applicant
     })
   };
 }
@@ -455,7 +474,9 @@ function getNextStepMessage(nextStep) {
 }
 
 /**
- * 담당자 알림 카드 생성
+ * 담당자 알림 카드 생성 (루미 스펙 v1 기반)
+ * @param {Object} data - 카드 생성용 데이터
+ * @returns {Object} summary_card 객체
  */
 function generateSummaryCard(data) {
   const modeLabels = {
@@ -470,18 +491,96 @@ function generateSummaryCard(data) {
     agency: '여행사'
   };
 
+  const statusLabels = {
+    auto_approved: '자동 승인',
+    deal_review: '매니저 검토',
+    ceo_approval: 'CEO 승인'
+  };
+
+  // approval_level 결정 (none/manager/ceo)
+  let approvalLevel = 'none';
+  if (data.approval_status === APPROVAL_STATUS.CEO_APPROVAL) {
+    approvalLevel = 'ceo';
+  } else if (data.approval_status === APPROVAL_STATUS.DEAL_REVIEW) {
+    approvalLevel = 'manager';
+  }
+
+  // amount_type 결정 (lead/calculated/confirmed)
+  let amountType = 'lead';
+  if (data.quote_type === 'confirmed') {
+    amountType = 'confirmed';
+  } else if (data.total_sell > 0) {
+    amountType = 'calculated';
+  }
+
+  // 마진율 계산
+  const marginRate = data.total_sell > 0 && data.total_margin
+    ? Math.round((data.total_margin / data.total_sell) * 100) / 100
+    : null;
+
+  // 전화번호 마스킹
+  const phoneMasked = data.customer_phone
+    ? data.customer_phone.replace(/(\d{3})[\d-]+(\d{4})/, '$1-****-$2')
+    : null;
+
   return {
+    // 헤더
+    quote_id: data.quote_id,
+    created_at: new Date().toISOString(),
     title: `견적 검토 (${modeLabels[data.operation_mode]})`,
+
+    // 상태/승인
+    status_badge: data.approval_status,
+    status_label: statusLabels[data.approval_status] || data.approval_status,
+    approval_level: approvalLevel,
+    next_step: data.next_step || 'confirm',
+
+    // 고객/일정
+    customer_name: data.customer_name || null,
+    customer_phone_masked: phoneMasked,
+    travel_date: data.travel_date || null,
+    pax: data.guest_count || 0,
+
+    // 금액/수익
+    amount_value: data.total_sell || 0,
+    amount_type: amountType,
+    margin_value: data.total_margin || null,
+    margin_rate: marginRate,
+
+    // 운영구조 (핵심)
+    operation_mode: data.operation_mode,
+    mode_source: data.mode_source || 'auto',
+    payment_receiver: data.payment_receiver,
+    tax_invoice_issuer: data.tax_invoice_issuer,
+    contract_party: data.contract_party,
+    refund_liability: data.refund_liability,
+
+    // 승인 사유/경고
+    approval_reasons: data.approval_reasons || [],
+    warnings: data.approval_reasons?.map(r => r.message) || [],
+
+    // 액션 이력 (운영용, 초기값 null)
+    decision: null,
+    decision_note: null,
+    requested_changes: null,
+
+    // 인센티브/MICE (P1 자리 확보)
+    incentive_required: data.incentive_required || false,
+    is_mice: data.is_mice || false,
+    incentive_applicant: data.incentive_applicant || null,
+    incentive_deadline: data.incentive_deadline || null,
+    mice_deadline: data.mice_deadline || null,
+
+    // 레거시 호환 (UI용)
     fields: [
       { label: '운영모드', value: modeLabels[data.operation_mode], highlight: true },
       { label: '결제수령', value: partyLabels[data.payment_receiver] },
       { label: '세금계산서', value: partyLabels[data.tax_invoice_issuer] },
       { label: '계약주체', value: partyLabels[data.contract_party] },
       { label: '환불책임', value: partyLabels[data.refund_liability] },
-      { label: '인원', value: `${data.guest_count}명` },
-      { label: '금액', value: `${(data.total_sell || 0).toLocaleString()}원` }
+      { label: '인원', value: `${data.guest_count || 0}명` },
+      { label: '금액', value: `${(data.total_sell || 0).toLocaleString()}원`, type: amountType }
     ],
-    warnings: data.approval_reasons?.map(r => r.message) || [],
     status: data.approval_status
   };
 }
