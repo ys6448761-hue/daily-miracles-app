@@ -896,7 +896,13 @@ async function generateQuotePdf(quoteData, options = {}) {
   try {
     browser = await puppeteer.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',  // Render 메모리 이슈 방지
+        '--disable-gpu',
+        '--single-process'  // 메모리 최적화
+      ]
     });
 
     const page = await browser.newPage();
