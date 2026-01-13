@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>나만의 여수 여행 일정 - 하루하루의 기적</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(135deg, #0f4c75 0%, #1b262c 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #fff;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* 헤더 */
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .header-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background: rgba(0,180,216,0.2);
+      border: 1px solid rgba(0,180,216,0.5);
+      border-radius: 20px;
+      font-size: 12px;
+      color: #00b4d8;
+      margin-bottom: 12px;
+    }
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .header p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* 요약 카드 */
+    .summary-card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .summary-item {
+      text-align: center;
+    }
+    .summary-icon {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+    .summary-value {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .summary-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* 다운로드 버튼 */
+    .download-section {
+      margin-bottom: 24px;
+    }
+    .download-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+      border: none;
+      border-radius: 16px;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .download-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255,107,107,0.4);
+    }
+    .download-btn .icon {
+      font-size: 24px;
+    }
+
+    /* 일정 타임라인 */
+    .timeline {
+      margin-bottom: 24px;
+    }
+    .timeline-day {
+      margin-bottom: 20px;
+    }
+    .day-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .day-badge {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #00b4d8, #0077b6);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+    .day-badge .num {
+      font-size: 20px;
+      line-height: 1;
+    }
+    .day-badge .label {
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+    .day-title {
+      flex: 1;
+    }
+    .day-title h3 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .day-date {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* 스팟 카드 */
+    .spot-card {
+      background: rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border-left: 4px solid #00b4d8;
+    }
+    .spot-card:last-child {
+      margin-bottom: 0;
+    }
+    .spot-time {
+      display: inline-block;
+      padding: 4px 10px;
+      background: rgba(0,180,216,0.2);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #00b4d8;
+      margin-bottom: 8px;
+    }
+    .spot-name {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .spot-type {
+      padding: 2px 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.7);
+    }
+    .spot-desc {
+      font-size: 14px;
+      color: rgba(255,255,255,0.8);
+      line-height: 1.5;
+    }
+    .spot-tips {
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: rgba(255,215,0,0.1);
+      border-radius: 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.9);
+    }
+    .spot-tips::before {
+      content: '💡 ';
+    }
+
+    /* 추천 섹션 */
+    .recommendations {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .rec-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .rec-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .rec-item {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .rec-item-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    .rec-item-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .rec-item-desc {
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* 액션 버튼 */
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .action-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .action-btn:hover {
+      border-color: #00b4d8;
+      background: rgba(0,180,216,0.1);
+    }
+
+    /* 수정 요청 모달 */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.show {
+      display: flex;
+    }
+    .modal {
+      background: #1b262c;
+      border-radius: 20px;
+      padding: 24px;
+      max-width: 400px;
+      width: 100%;
+    }
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .modal-input {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      resize: none;
+      min-height: 100px;
+    }
+    .modal-input:focus {
+      outline: none;
+      border-color: #00b4d8;
+    }
+    .modal-hint {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 8px;
+    }
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .modal-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+    }
+    .modal-btn-cancel {
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.8);
+    }
+    .modal-btn-submit {
+      background: linear-gradient(135deg, #00b4d8, #0077b6);
+      color: #fff;
+    }
+
+    /* 로딩 */
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255,255,255,0.2);
+      border-top-color: #00b4d8;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* 에러 */
+    .error-card {
+      background: rgba(255,107,107,0.2);
+      border: 2px solid rgba(255,107,107,0.5);
+      border-radius: 20px;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .error-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    .error-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .error-text {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 20px;
+    }
+    .error-btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #ff6b6b;
+      color: #fff;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* 푸터 */
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+    }
+    .footer a {
+      color: #00b4d8;
+      text-decoration: none;
+    }
+
+    /* 숨김 */
+    .hidden {
+      display: none !important;
+    }
+
+    /* 반응형 */
+    @media (max-width: 400px) {
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .rec-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 로딩 상태 -->
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>일정을 불러오는 중...</p>
+    </div>
+
+    <!-- 에러 상태 -->
+    <div class="error-card hidden" id="error">
+      <div class="error-icon">😢</div>
+      <div class="error-title">일정을 찾을 수 없어요</div>
+      <div class="error-text">일정이 만료되었거나 존재하지 않습니다.</div>
+      <a href="/itinerary-builder.html" class="error-btn">새 일정 만들기</a>
+    </div>
+
+    <!-- 결과 콘텐츠 -->
+    <div class="result-content hidden" id="content">
+      <header class="header">
+        <div class="header-badge" id="result-badge">AI 맞춤 일정</div>
+        <h1 id="result-title">나만의 여수 여행</h1>
+        <p id="result-subtitle">여행 일정이 준비되었어요</p>
+      </header>
+
+      <!-- 요약 -->
+      <div class="summary-card">
+        <div class="summary-grid">
+          <div class="summary-item">
+            <div class="summary-icon">📅</div>
+            <div class="summary-value" id="sum-days">1일</div>
+            <div class="summary-label">기간</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-icon">👥</div>
+            <div class="summary-value" id="sum-pax">2명</div>
+            <div class="summary-label">인원</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-icon">🚗</div>
+            <div class="summary-value" id="sum-transport">자차</div>
+            <div class="summary-label">교통</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-icon">🏃</div>
+            <div class="summary-value" id="sum-tempo">적당히</div>
+            <div class="summary-label">템포</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PDF 다운로드 -->
+      <div class="download-section">
+        <a href="#" class="download-btn" id="download-btn">
+          <span class="icon">📄</span>
+          PDF 일정표 다운로드
+        </a>
+      </div>
+
+      <!-- 일정 타임라인 -->
+      <div class="timeline" id="timeline">
+        <!-- 동적 렌더링 -->
+      </div>
+
+      <!-- 추천 -->
+      <div class="recommendations hidden" id="recommendations">
+        <div class="rec-title">✨ AI 추천</div>
+        <div class="rec-grid" id="rec-grid">
+          <!-- 동적 렌더링 -->
+        </div>
+      </div>
+
+      <!-- 액션 버튼 -->
+      <div class="actions">
+        <button class="action-btn" id="edit-btn">
+          ✏️ 간단 수정 요청 (무료 1회)
+        </button>
+        <a href="/itinerary-builder.html" class="action-btn">
+          🗺️ 새로운 일정 만들기
+        </a>
+        <a href="https://pf.kakao.com/_dailymiracles" target="_blank" class="action-btn">
+          💬 카카오톡 상담하기
+        </a>
+      </div>
+
+      <footer class="footer">
+        <p>일정 ID: <span id="itinerary-id">-</span></p>
+        <p style="margin-top:8px">하루하루의 기적 | Daily Miracles</p>
+      </footer>
+    </div>
+  </div>
+
+  <!-- 수정 요청 모달 -->
+  <div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+      <div class="modal-title">✏️ 수정 요청</div>
+      <textarea class="modal-input" id="edit-input"
+                placeholder="어떤 부분을 수정하고 싶으신가요?&#10;예: 점심을 다른 맛집으로 바꿔주세요"></textarea>
+      <div class="modal-hint">무료 수정은 1회만 가능합니다</div>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-cancel" id="modal-cancel">취소</button>
+        <button class="modal-btn modal-btn-submit" id="modal-submit">수정 요청</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // URL 파라미터
+    const urlParams = new URLSearchParams(window.location.search);
+    const itineraryId = urlParams.get('id');
+
+    // DOM
+    const loadingEl = document.getElementById('loading');
+    const errorEl = document.getElementById('error');
+    const contentEl = document.getElementById('content');
+
+    // 데이터 로드
+    async function loadItinerary() {
+      if (!itineraryId) {
+        showError();
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/v2/itinerary/${itineraryId}`);
+        const data = await res.json();
+
+        if (data.success && data.itinerary) {
+          renderItinerary(data.itinerary);
+        } else {
+          showError();
+        }
+      } catch (error) {
+        console.error('로드 오류:', error);
+        showError();
+      }
+    }
+
+    function showError() {
+      loadingEl.classList.add('hidden');
+      errorEl.classList.remove('hidden');
+    }
+
+    // 교통 라벨
+    const transportLabels = {
+      car: '자차',
+      public: '대중교통',
+      rental: '렌트카'
+    };
+
+    // 템포 라벨
+    const tempoLabels = {
+      relaxed: '여유',
+      normal: '적당히',
+      packed: '빡세게'
+    };
+
+    // 스팟 타입 라벨
+    const spotTypeLabels = {
+      attraction: '관광',
+      restaurant: '맛집',
+      cafe: '카페',
+      activity: '액티비티',
+      hotel: '숙소',
+      transport: '이동'
+    };
+
+    function renderItinerary(itinerary) {
+      loadingEl.classList.add('hidden');
+      contentEl.classList.remove('hidden');
+
+      // 일정 ID
+      document.getElementById('itinerary-id').textContent = itinerary.id || itineraryId;
+
+      // 요약 정보
+      const tripInfo = itinerary.trip_info || {};
+      document.getElementById('sum-days').textContent = `${tripInfo.days || 1}일`;
+      document.getElementById('sum-pax').textContent = `${tripInfo.pax || 2}명`;
+      document.getElementById('sum-transport').textContent = transportLabels[tripInfo.transport] || '자차';
+      document.getElementById('sum-tempo').textContent = tempoLabels[tripInfo.tempo] || '적당히';
+
+      // PDF 다운로드 버튼
+      const pdfUrl = itinerary.pdf_url || `/api/v2/itinerary/${itineraryId}/pdf`;
+      document.getElementById('download-btn').href = pdfUrl;
+      document.getElementById('download-btn').target = '_blank';
+
+      // 타임라인 렌더링
+      const timeline = document.getElementById('timeline');
+      const dailyPlans = itinerary.daily_plans || [];
+
+      if (dailyPlans.length === 0) {
+        timeline.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.5)">일정 정보가 없습니다.</p>';
+      } else {
+        timeline.innerHTML = dailyPlans.map((day, idx) => `
+          <div class="timeline-day">
+            <div class="day-header">
+              <div class="day-badge">
+                <span class="num">${idx + 1}</span>
+                <span class="label">DAY</span>
+              </div>
+              <div class="day-title">
+                <h3>${day.title || `${idx + 1}일차`}</h3>
+                <div class="day-date">${day.date || ''}</div>
+              </div>
+            </div>
+            ${(day.spots || []).map(spot => `
+              <div class="spot-card">
+                <span class="spot-time">${spot.time || ''}</span>
+                <div class="spot-name">
+                  ${spot.name || '장소'}
+                  <span class="spot-type">${spotTypeLabels[spot.type] || spot.type || ''}</span>
+                </div>
+                <div class="spot-desc">${spot.description || ''}</div>
+                ${spot.tips ? `<div class="spot-tips">${spot.tips}</div>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        `).join('');
+      }
+
+      // 추천 섹션
+      const recommendations = itinerary.recommendations || {};
+      const recGrid = document.getElementById('rec-grid');
+      const recItems = [];
+
+      if (recommendations.restaurants && recommendations.restaurants.length > 0) {
+        recommendations.restaurants.forEach(r => {
+          recItems.push({
+            icon: '🍽️',
+            title: r.name || '맛집',
+            desc: r.specialty || r.description || ''
+          });
+        });
+      }
+
+      if (recommendations.tips && recommendations.tips.length > 0) {
+        recommendations.tips.forEach(tip => {
+          recItems.push({
+            icon: '💡',
+            title: '여행 팁',
+            desc: tip
+          });
+        });
+      }
+
+      if (recItems.length > 0) {
+        document.getElementById('recommendations').classList.remove('hidden');
+        recGrid.innerHTML = recItems.slice(0, 4).map(item => `
+          <div class="rec-item">
+            <div class="rec-item-icon">${item.icon}</div>
+            <div class="rec-item-title">${item.title}</div>
+            <div class="rec-item-desc">${item.desc}</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // 수정 모달
+    const editModal = document.getElementById('edit-modal');
+    const editBtn = document.getElementById('edit-btn');
+    const modalCancel = document.getElementById('modal-cancel');
+    const modalSubmit = document.getElementById('modal-submit');
+    const editInput = document.getElementById('edit-input');
+
+    editBtn.addEventListener('click', () => {
+      editModal.classList.add('show');
+    });
+
+    modalCancel.addEventListener('click', () => {
+      editModal.classList.remove('show');
+    });
+
+    editModal.addEventListener('click', (e) => {
+      if (e.target === editModal) {
+        editModal.classList.remove('show');
+      }
+    });
+
+    modalSubmit.addEventListener('click', async () => {
+      const changes = editInput.value.trim();
+      if (!changes) {
+        alert('수정 내용을 입력해주세요.');
+        return;
+      }
+
+      modalSubmit.disabled = true;
+      modalSubmit.textContent = '요청 중...';
+
+      try {
+        const res = await fetch(`/api/v2/itinerary/${itineraryId}/edit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ changes })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          alert('수정 요청이 접수되었습니다. 잠시 후 새 일정이 준비됩니다.');
+          editModal.classList.remove('show');
+          editBtn.disabled = true;
+          editBtn.textContent = '✅ 수정 요청 완료';
+        } else {
+          if (data.error === 'EDIT_LIMIT_REACHED') {
+            alert('무료 수정은 1회까지 가능합니다. 추가 수정은 카카오톡으로 문의해주세요.');
+          } else {
+            alert(data.message || '수정 요청에 실패했습니다.');
+          }
+        }
+      } catch (error) {
+        console.error('수정 오류:', error);
+        alert('네트워크 오류가 발생했습니다.');
+      } finally {
+        modalSubmit.disabled = false;
+        modalSubmit.textContent = '수정 요청';
+      }
+    });
+
+    // 초기화
+    loadItinerary();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>여수 여행 일정 빌더 - 하루하루의 기적</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(135deg, #0f4c75 0%, #1b262c 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #fff;
+    }
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* 헤더 */
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .header-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .header p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* 단계 표시 */
+    .steps {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .step {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.5);
+      transition: all 0.3s;
+    }
+    .step.active {
+      background: linear-gradient(135deg, #00b4d8, #0077b6);
+      color: #fff;
+    }
+    .step.done {
+      background: #4ecdc4;
+      color: #fff;
+    }
+    .step-line {
+      width: 24px;
+      height: 2px;
+      background: rgba(255,255,255,0.2);
+      align-self: center;
+    }
+
+    /* 폼 카드 */
+    .form-card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .form-card-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .form-section {
+      margin-bottom: 20px;
+    }
+    .form-section:last-child {
+      margin-bottom: 0;
+    }
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: rgba(255,255,255,0.9);
+    }
+    .form-label .required {
+      color: #ff6b6b;
+    }
+    .form-hint {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 4px;
+    }
+
+    /* 입력 필드 */
+    .form-input, .form-select {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 16px;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: #00b4d8;
+      background: rgba(255,255,255,0.15);
+    }
+    .form-input::placeholder {
+      color: rgba(255,255,255,0.5);
+    }
+    .form-select option {
+      background: #1b262c;
+      color: #fff;
+    }
+
+    /* 날짜 그리드 */
+    .date-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* 숫자 스테퍼 */
+    .stepper {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .stepper-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 2px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .stepper-btn:hover {
+      border-color: #00b4d8;
+      background: rgba(0,180,216,0.2);
+    }
+    .stepper-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    .stepper-value {
+      font-size: 24px;
+      font-weight: 700;
+      min-width: 50px;
+      text-align: center;
+    }
+    .stepper-label {
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* 옵션 버튼 그리드 */
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .option-grid.cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .option-grid.cols-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .option-btn {
+      padding: 14px 12px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.8);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .option-btn:hover {
+      border-color: rgba(0,180,216,0.5);
+    }
+    .option-btn.selected {
+      border-color: #00b4d8;
+      background: rgba(0,180,216,0.2);
+      color: #fff;
+    }
+    .option-btn .icon {
+      font-size: 20px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* 스타일 슬라이더 */
+    .style-sliders {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .style-slider {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .style-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .style-name {
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .style-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: #00b4d8;
+      min-width: 32px;
+      text-align: right;
+    }
+    .slider-track {
+      position: relative;
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .slider-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      background: linear-gradient(90deg, #00b4d8, #0077b6);
+      border-radius: 4px;
+      transition: width 0.2s;
+    }
+    input[type="range"] {
+      width: 100%;
+      height: 8px;
+      -webkit-appearance: none;
+      background: transparent;
+      cursor: pointer;
+      position: relative;
+      z-index: 1;
+      margin-top: -8px;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      cursor: pointer;
+    }
+    .style-total {
+      text-align: center;
+      padding: 12px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      margin-top: 8px;
+    }
+    .style-total.warning {
+      background: rgba(255,107,107,0.2);
+      border: 1px solid rgba(255,107,107,0.5);
+    }
+    .style-total.valid {
+      background: rgba(78,205,196,0.2);
+      border: 1px solid rgba(78,205,196,0.5);
+    }
+
+    /* 태그 입력 */
+    .tag-input-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px;
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      min-height: 52px;
+      cursor: text;
+    }
+    .tag-input-container:focus-within {
+      border-color: #00b4d8;
+    }
+    .tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(0,180,216,0.3);
+      border-radius: 20px;
+      font-size: 14px;
+    }
+    .tag-remove {
+      cursor: pointer;
+      opacity: 0.7;
+      font-size: 16px;
+    }
+    .tag-remove:hover {
+      opacity: 1;
+    }
+    .tag-input {
+      flex: 1;
+      min-width: 120px;
+      border: none;
+      background: transparent;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    .tag-input:focus {
+      outline: none;
+    }
+    .tag-input::placeholder {
+      color: rgba(255,255,255,0.4);
+    }
+
+    /* 추천 태그 */
+    .suggested-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .suggested-tag {
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .suggested-tag:hover {
+      border-color: #00b4d8;
+      color: #fff;
+    }
+    .suggested-tag.added {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    /* 버튼 */
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .btn {
+      flex: 1;
+      padding: 16px;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.8);
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.15);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #00b4d8, #0077b6);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,180,216,0.3);
+    }
+    .btn-primary:disabled {
+      background: rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.5);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* 로딩 */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15,76,117,0.95);
+      z-index: 1000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
+    .loading-overlay.show {
+      display: flex;
+    }
+    .loading-icon {
+      font-size: 64px;
+      margin-bottom: 24px;
+      animation: float 2s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .loading-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .loading-text {
+      font-size: 16px;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 24px;
+    }
+    .loading-bar {
+      width: 200px;
+      height: 6px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .loading-progress {
+      height: 100%;
+      background: linear-gradient(90deg, #00b4d8, #4ecdc4);
+      border-radius: 3px;
+      animation: progress 2s ease-in-out infinite;
+    }
+    @keyframes progress {
+      0% { width: 0%; }
+      50% { width: 80%; }
+      100% { width: 100%; }
+    }
+
+    /* 5인 이상 안내 */
+    .pax-warning {
+      display: none;
+      background: rgba(255,107,107,0.2);
+      border: 2px solid rgba(255,107,107,0.5);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 16px;
+      text-align: center;
+    }
+    .pax-warning.show {
+      display: block;
+    }
+    .pax-warning-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #ff6b6b;
+    }
+    .pax-warning-text {
+      font-size: 14px;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 12px;
+    }
+    .pax-warning-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #ff6b6b;
+      color: #fff;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* 푸터 */
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+    }
+    .footer a {
+      color: #00b4d8;
+      text-decoration: none;
+    }
+
+    /* 숨김 */
+    .hidden {
+      display: none !important;
+    }
+
+    /* 반응형 */
+    @media (max-width: 400px) {
+      .container { padding: 0 10px; }
+      .form-card { padding: 16px; }
+      .option-grid { grid-template-columns: 1fr 1fr; }
+      .option-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="header-icon">🗺️</div>
+      <h1>여수 여행 일정 빌더</h1>
+      <p>AI가 당신만을 위한 맞춤 일정을 만들어드려요</p>
+    </header>
+
+    <!-- 단계 표시 -->
+    <div class="steps">
+      <div class="step active" data-step="1">1</div>
+      <div class="step-line"></div>
+      <div class="step" data-step="2">2</div>
+      <div class="step-line"></div>
+      <div class="step" data-step="3">3</div>
+    </div>
+
+    <form id="builder-form">
+      <!-- Step 1: 기본 정보 -->
+      <div class="form-step" data-step="1">
+        <div class="form-card">
+          <div class="form-card-title">📅 여행 기본 정보</div>
+
+          <!-- 날짜 선택 -->
+          <div class="form-section">
+            <label class="form-label">여행 날짜 <span class="required">*</span></label>
+            <div class="date-grid">
+              <div>
+                <input type="date" name="startDate" class="form-input" required>
+                <div class="form-hint">출발일</div>
+              </div>
+              <div>
+                <input type="date" name="endDate" class="form-input">
+                <div class="form-hint">도착일 (당일치기면 비워두세요)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 인원 -->
+          <div class="form-section">
+            <label class="form-label">인원 <span class="required">*</span></label>
+            <div class="stepper">
+              <button type="button" class="stepper-btn" id="pax-minus">-</button>
+              <div>
+                <div class="stepper-value" id="pax-value">2</div>
+                <div class="stepper-label">명</div>
+              </div>
+              <button type="button" class="stepper-btn" id="pax-plus">+</button>
+            </div>
+            <input type="hidden" name="pax" value="2">
+            <div class="pax-warning" id="pax-warning">
+              <div class="pax-warning-title">5인 이상은 단체 상담이 필요해요</div>
+              <div class="pax-warning-text">맞춤 견적과 전문 상담을 받아보세요</div>
+              <a href="https://pf.kakao.com/_dailymiracles" target="_blank" class="pax-warning-btn">
+                카카오톡 상담하기
+              </a>
+            </div>
+          </div>
+
+          <!-- 일행 유형 -->
+          <div class="form-section">
+            <label class="form-label">일행 유형</label>
+            <div class="option-grid cols-4">
+              <button type="button" class="option-btn" data-value="couple">
+                <span class="icon">💑</span>
+                커플
+              </button>
+              <button type="button" class="option-btn selected" data-value="friends">
+                <span class="icon">👫</span>
+                친구
+              </button>
+              <button type="button" class="option-btn" data-value="family">
+                <span class="icon">👨‍👩‍👧</span>
+                가족
+              </button>
+              <button type="button" class="option-btn" data-value="solo">
+                <span class="icon">🧳</span>
+                혼자
+              </button>
+            </div>
+            <input type="hidden" name="partyType" value="friends">
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary" id="step1-next">
+            다음 단계로 →
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: 여행 스타일 -->
+      <div class="form-step hidden" data-step="2">
+        <div class="form-card">
+          <div class="form-card-title">🎨 여행 스타일</div>
+
+          <!-- 숙박 유형 -->
+          <div class="form-section">
+            <label class="form-label">숙박 유형</label>
+            <div class="option-grid cols-4">
+              <button type="button" class="option-btn selected" data-value="day">
+                <span class="icon">☀️</span>
+                당일
+              </button>
+              <button type="button" class="option-btn" data-value="1n2d">
+                <span class="icon">🌙</span>
+                1박2일
+              </button>
+              <button type="button" class="option-btn" data-value="2n3d">
+                <span class="icon">🌟</span>
+                2박3일
+              </button>
+              <button type="button" class="option-btn" data-value="3n4d">
+                <span class="icon">✨</span>
+                3박4일
+              </button>
+            </div>
+            <input type="hidden" name="stayType" value="day">
+          </div>
+
+          <!-- 교통수단 -->
+          <div class="form-section">
+            <label class="form-label">교통수단</label>
+            <div class="option-grid cols-3">
+              <button type="button" class="option-btn selected" data-value="car">
+                <span class="icon">🚗</span>
+                자차
+              </button>
+              <button type="button" class="option-btn" data-value="public">
+                <span class="icon">🚌</span>
+                대중교통
+              </button>
+              <button type="button" class="option-btn" data-value="rental">
+                <span class="icon">🚙</span>
+                렌트카
+              </button>
+            </div>
+            <input type="hidden" name="transport" value="car">
+          </div>
+
+          <!-- 여행 템포 -->
+          <div class="form-section">
+            <label class="form-label">여행 템포</label>
+            <div class="option-grid cols-3">
+              <button type="button" class="option-btn" data-value="relaxed">
+                <span class="icon">🐢</span>
+                여유롭게
+              </button>
+              <button type="button" class="option-btn selected" data-value="normal">
+                <span class="icon">🚶</span>
+                적당히
+              </button>
+              <button type="button" class="option-btn" data-value="packed">
+                <span class="icon">🏃</span>
+                빡세게
+              </button>
+            </div>
+            <input type="hidden" name="tempo" value="normal">
+          </div>
+
+          <!-- 스타일 슬라이더 -->
+          <div class="form-section">
+            <label class="form-label">여행 취향 (합계 100%)</label>
+            <div class="style-sliders" id="style-sliders">
+              <div class="style-slider" data-style="healing">
+                <div class="style-header">
+                  <span class="style-name">🧘 힐링</span>
+                  <span class="style-value">20</span>
+                </div>
+                <div class="slider-track"><div class="slider-fill" style="width:20%"></div></div>
+                <input type="range" min="0" max="100" value="20" step="5">
+              </div>
+              <div class="style-slider" data-style="foodie">
+                <div class="style-header">
+                  <span class="style-name">🍽️ 맛집</span>
+                  <span class="style-value">30</span>
+                </div>
+                <div class="slider-track"><div class="slider-fill" style="width:30%"></div></div>
+                <input type="range" min="0" max="100" value="30" step="5">
+              </div>
+              <div class="style-slider" data-style="activity">
+                <div class="style-header">
+                  <span class="style-name">🎯 액티비티</span>
+                  <span class="style-value">20</span>
+                </div>
+                <div class="slider-track"><div class="slider-fill" style="width:20%"></div></div>
+                <input type="range" min="0" max="100" value="20" step="5">
+              </div>
+              <div class="style-slider" data-style="photo">
+                <div class="style-header">
+                  <span class="style-name">📸 포토</span>
+                  <span class="style-value">20</span>
+                </div>
+                <div class="slider-track"><div class="slider-fill" style="width:20%"></div></div>
+                <input type="range" min="0" max="100" value="20" step="5">
+              </div>
+              <div class="style-slider" data-style="budget">
+                <div class="style-header">
+                  <span class="style-name">💰 가성비</span>
+                  <span class="style-value">10</span>
+                </div>
+                <div class="slider-track"><div class="slider-fill" style="width:10%"></div></div>
+                <input type="range" min="0" max="100" value="10" step="5">
+              </div>
+            </div>
+            <div class="style-total" id="style-total">
+              합계: <strong>100%</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button type="button" class="btn btn-secondary" id="step2-prev">← 이전</button>
+          <button type="button" class="btn btn-primary" id="step2-next">다음 단계로 →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: 세부 설정 -->
+      <div class="form-step hidden" data-step="3">
+        <div class="form-card">
+          <div class="form-card-title">📍 세부 설정</div>
+
+          <!-- 필수 방문지 -->
+          <div class="form-section">
+            <label class="form-label">꼭 가고 싶은 곳</label>
+            <div class="tag-input-container" id="must-visit-container">
+              <input type="text" class="tag-input" placeholder="장소 입력 후 Enter" id="must-visit-input">
+            </div>
+            <div class="suggested-tags" id="must-visit-suggestions">
+              <span class="suggested-tag" data-value="향일암">향일암</span>
+              <span class="suggested-tag" data-value="돌산대교">돌산대교</span>
+              <span class="suggested-tag" data-value="여수밤바다">여수밤바다</span>
+              <span class="suggested-tag" data-value="오동도">오동도</span>
+              <span class="suggested-tag" data-value="해상케이블카">해상케이블카</span>
+              <span class="suggested-tag" data-value="낭만포차">낭만포차</span>
+            </div>
+          </div>
+
+          <!-- 회피 조건 -->
+          <div class="form-section">
+            <label class="form-label">피하고 싶은 것</label>
+            <div class="tag-input-container" id="avoid-container">
+              <input type="text" class="tag-input" placeholder="조건 입력 후 Enter" id="avoid-input">
+            </div>
+            <div class="suggested-tags" id="avoid-suggestions">
+              <span class="suggested-tag" data-value="많이 걷기">많이 걷기</span>
+              <span class="suggested-tag" data-value="언덕/계단">언덕/계단</span>
+              <span class="suggested-tag" data-value="해산물">해산물</span>
+              <span class="suggested-tag" data-value="관광지 인파">관광지 인파</span>
+              <span class="suggested-tag" data-value="일찍 일어나기">일찍 일어나기</span>
+            </div>
+          </div>
+
+          <!-- 추가 요청 -->
+          <div class="form-section">
+            <label class="form-label">추가 요청사항 (선택)</label>
+            <textarea name="additionalRequest" class="form-input" rows="3"
+                      placeholder="예: 강아지와 함께 여행해요, 휠체어 이용 가능한 곳으로..."></textarea>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button type="button" class="btn btn-secondary" id="step3-prev">← 이전</button>
+          <button type="submit" class="btn btn-primary" id="generate-btn">
+            🗺️ 일정 만들기
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <footer class="footer">
+      <p>문의: <a href="https://pf.kakao.com/_dailymiracles" target="_blank">카카오톡 채널</a></p>
+      <p style="margin-top:8px">하루하루의 기적 | Daily Miracles</p>
+    </footer>
+  </div>
+
+  <!-- 로딩 오버레이 -->
+  <div class="loading-overlay" id="loading">
+    <div class="loading-icon">🗺️</div>
+    <div class="loading-title">일정을 만들고 있어요</div>
+    <div class="loading-text">AI가 당신만을 위한 여행 코스를 설계 중...</div>
+    <div class="loading-bar">
+      <div class="loading-progress"></div>
+    </div>
+  </div>
+
+  <script>
+    // 상태 관리
+    const state = {
+      step: 1,
+      pax: 2,
+      partyType: 'friends',
+      stayType: 'day',
+      transport: 'car',
+      tempo: 'normal',
+      stylePreferences: {
+        healing: 20,
+        foodie: 30,
+        activity: 20,
+        photo: 20,
+        budget: 10
+      },
+      mustVisit: [],
+      avoid: []
+    };
+
+    // DOM 요소
+    const form = document.getElementById('builder-form');
+    const loading = document.getElementById('loading');
+    const steps = document.querySelectorAll('.step');
+    const formSteps = document.querySelectorAll('.form-step');
+
+    // 단계 이동
+    function goToStep(stepNum) {
+      state.step = stepNum;
+
+      formSteps.forEach(fs => {
+        fs.classList.toggle('hidden', parseInt(fs.dataset.step) !== stepNum);
+      });
+
+      steps.forEach(s => {
+        const sn = parseInt(s.dataset.step);
+        s.classList.remove('active', 'done');
+        if (sn === stepNum) s.classList.add('active');
+        else if (sn < stepNum) s.classList.add('done');
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 인원 스테퍼
+    const paxValue = document.getElementById('pax-value');
+    const paxInput = document.querySelector('input[name="pax"]');
+    const paxWarning = document.getElementById('pax-warning');
+
+    document.getElementById('pax-minus').addEventListener('click', () => {
+      if (state.pax > 1) {
+        state.pax--;
+        updatePax();
+      }
+    });
+
+    document.getElementById('pax-plus').addEventListener('click', () => {
+      if (state.pax < 10) {
+        state.pax++;
+        updatePax();
+      }
+    });
+
+    function updatePax() {
+      paxValue.textContent = state.pax;
+      paxInput.value = state.pax;
+      paxWarning.classList.toggle('show', state.pax > 4);
+      document.getElementById('step1-next').disabled = state.pax > 4;
+    }
+
+    // 옵션 버튼 그룹
+    document.querySelectorAll('.option-grid').forEach(grid => {
+      grid.querySelectorAll('.option-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          grid.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+
+          const hiddenInput = grid.nextElementSibling;
+          if (hiddenInput && hiddenInput.type === 'hidden') {
+            hiddenInput.value = btn.dataset.value;
+            state[hiddenInput.name] = btn.dataset.value;
+          }
+        });
+      });
+    });
+
+    // 스타일 슬라이더
+    const styleSliders = document.getElementById('style-sliders');
+    const styleTotal = document.getElementById('style-total');
+
+    styleSliders.querySelectorAll('.style-slider').forEach(slider => {
+      const styleName = slider.dataset.style;
+      const input = slider.querySelector('input[type="range"]');
+      const valueDisplay = slider.querySelector('.style-value');
+      const fill = slider.querySelector('.slider-fill');
+
+      input.addEventListener('input', () => {
+        const val = parseInt(input.value);
+        state.stylePreferences[styleName] = val;
+        valueDisplay.textContent = val;
+        fill.style.width = val + '%';
+        updateStyleTotal();
+      });
+    });
+
+    function updateStyleTotal() {
+      const total = Object.values(state.stylePreferences).reduce((a, b) => a + b, 0);
+      styleTotal.innerHTML = `합계: <strong>${total}%</strong>`;
+      styleTotal.classList.remove('warning', 'valid');
+      if (total === 100) {
+        styleTotal.classList.add('valid');
+      } else {
+        styleTotal.classList.add('warning');
+      }
+    }
+
+    // 태그 입력 (필수 방문지)
+    const mustVisitContainer = document.getElementById('must-visit-container');
+    const mustVisitInput = document.getElementById('must-visit-input');
+    const mustVisitSuggestions = document.getElementById('must-visit-suggestions');
+
+    mustVisitInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addTag('mustVisit', mustVisitInput.value.trim());
+        mustVisitInput.value = '';
+      }
+    });
+
+    mustVisitSuggestions.querySelectorAll('.suggested-tag').forEach(tag => {
+      tag.addEventListener('click', () => {
+        if (!tag.classList.contains('added')) {
+          addTag('mustVisit', tag.dataset.value);
+          tag.classList.add('added');
+        }
+      });
+    });
+
+    // 태그 입력 (회피 조건)
+    const avoidContainer = document.getElementById('avoid-container');
+    const avoidInput = document.getElementById('avoid-input');
+    const avoidSuggestions = document.getElementById('avoid-suggestions');
+
+    avoidInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addTag('avoid', avoidInput.value.trim());
+        avoidInput.value = '';
+      }
+    });
+
+    avoidSuggestions.querySelectorAll('.suggested-tag').forEach(tag => {
+      tag.addEventListener('click', () => {
+        if (!tag.classList.contains('added')) {
+          addTag('avoid', tag.dataset.value);
+          tag.classList.add('added');
+        }
+      });
+    });
+
+    function addTag(type, value) {
+      if (!value || state[type].includes(value)) return;
+
+      state[type].push(value);
+      const container = type === 'mustVisit' ? mustVisitContainer : avoidContainer;
+      const input = type === 'mustVisit' ? mustVisitInput : avoidInput;
+
+      const tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.innerHTML = `${value} <span class="tag-remove">×</span>`;
+      tag.querySelector('.tag-remove').addEventListener('click', () => {
+        state[type] = state[type].filter(v => v !== value);
+        tag.remove();
+
+        // 추천 태그 복원
+        const suggestions = type === 'mustVisit' ? mustVisitSuggestions : avoidSuggestions;
+        const sugTag = suggestions.querySelector(`[data-value="${value}"]`);
+        if (sugTag) sugTag.classList.remove('added');
+      });
+
+      container.insertBefore(tag, input);
+    }
+
+    // 네비게이션 버튼
+    document.getElementById('step1-next').addEventListener('click', () => goToStep(2));
+    document.getElementById('step2-prev').addEventListener('click', () => goToStep(1));
+    document.getElementById('step2-next').addEventListener('click', () => {
+      const total = Object.values(state.stylePreferences).reduce((a, b) => a + b, 0);
+      if (total !== 100) {
+        alert('여행 취향 합계가 100%가 되어야 합니다. (현재: ' + total + '%)');
+        return;
+      }
+      goToStep(3);
+    });
+    document.getElementById('step3-prev').addEventListener('click', () => goToStep(2));
+
+    // 폼 제출
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const payload = {
+        startDate: formData.get('startDate'),
+        endDate: formData.get('endDate') || formData.get('startDate'),
+        pax: state.pax,
+        partyType: state.partyType,
+        stayType: state.stayType,
+        transport: state.transport,
+        tempo: state.tempo,
+        stylePreferences: state.stylePreferences,
+        mustVisit: state.mustVisit,
+        avoid: state.avoid,
+        additionalRequest: formData.get('additionalRequest') || null,
+        region: 'yeosu'
+      };
+
+      // 필수 검증
+      if (!payload.startDate) {
+        alert('여행 시작일을 선택해주세요.');
+        return;
+      }
+
+      // 로딩 표시
+      loading.classList.add('show');
+
+      try {
+        const res = await fetch('/api/v2/itinerary/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          // 결과 페이지로 이동
+          window.location.href = `/itinerary-result.html?id=${data.itinerary_id}`;
+        } else {
+          loading.classList.remove('show');
+
+          if (data.error === 'PAX_LIMIT_EXCEEDED') {
+            alert('5인 이상은 단체 상담이 필요합니다.');
+            goToStep(1);
+          } else {
+            alert(data.message || '일정 생성에 실패했습니다.');
+          }
+        }
+      } catch (error) {
+        console.error('생성 오류:', error);
+        loading.classList.remove('show');
+        alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    });
+
+    // 오늘 이후 날짜만 선택 가능
+    const today = new Date().toISOString().split('T')[0];
+    document.querySelector('input[name="startDate"]').min = today;
+    document.querySelector('input[name="endDate"]').min = today;
+
+    // 시작일 변경 시 종료일 최소값 업데이트
+    document.querySelector('input[name="startDate"]').addEventListener('change', (e) => {
+      document.querySelector('input[name="endDate"]').min = e.target.value;
+    });
+  </script>
+</body>
+</html>
