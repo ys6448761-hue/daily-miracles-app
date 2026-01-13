@@ -49,7 +49,10 @@ const APPROVAL_REASONS = {
   AGENCY_TRANSFER: 'agency_transfer',   // 여행사 이관
   COMMISSION_ONLY: 'commission_only',   // 수수료만 모드
   HIGH_VALUE: 'high_value',             // 고액 견적 (500만원 이상)
+  AMOUNT_OVER_3M: 'amount_over_3m',     // 금액 > 300만원 (자동승인 불가)
   LARGE_GROUP: 'large_group',           // 대규모 단체 (30인 이상)
+  PAX_OVER_20: 'pax_over_20',           // 인원 > 20명 (자동승인 불가)
+  MODE_NOT_DIRECT: 'mode_not_direct',   // 직영 아닌 운영모드
   CUSTOM_PRICING: 'custom_pricing',     // 맞춤 가격 적용
   RISK_FLAG: 'risk_flag'                // 리스크 플래그
 };
@@ -241,22 +244,52 @@ function checkApprovalRequired(quoteData) {
     });
   }
 
-  // 4. 고액 견적 (500만원 이상)
-  if (total_sell >= 5000000) {
-    reasons.push({
-      code: APPROVAL_REASONS.HIGH_VALUE,
-      message: `고액 견적: ${total_sell.toLocaleString()}원`,
-      severity: 'medium'
-    });
+  // 3-1. 직영 아닌 모드 (hybrid 포함) - 자동승인 불가 트리거
+  if (operation_mode !== OPERATION_MODES.DIRECT) {
+    // AGENCY/COMMISSION은 이미 위에서 추가됨, hybrid만 별도 추가
+    if (operation_mode === OPERATION_MODES.HYBRID) {
+      reasons.push({
+        code: APPROVAL_REASONS.MODE_NOT_DIRECT,
+        message: `운영모드: ${operation_mode} (직영 아님)`,
+        severity: 'medium'
+      });
+    }
   }
 
-  // 5. 대규모 단체 (30인 이상)
-  if (guest_count >= 30) {
-    reasons.push({
-      code: APPROVAL_REASONS.LARGE_GROUP,
-      message: `대규모 단체: ${guest_count}인`,
-      severity: 'medium'
-    });
+  // 4. 금액 트리거 (자동승인 기준: 300만원)
+  if (total_sell > AUTO_APPROVE_THRESHOLDS.maxAmount) {
+    // 500만원 이상은 high_value, 300만~500만원은 amount_over_3m
+    if (total_sell >= 5000000) {
+      reasons.push({
+        code: APPROVAL_REASONS.HIGH_VALUE,
+        message: `고액 견적: ${total_sell.toLocaleString()}원`,
+        severity: 'high'
+      });
+    } else {
+      reasons.push({
+        code: APPROVAL_REASONS.AMOUNT_OVER_3M,
+        message: `금액 초과: ${total_sell.toLocaleString()}원 (자동승인 기준 300만원 초과)`,
+        severity: 'medium'
+      });
+    }
+  }
+
+  // 5. 인원 트리거 (자동승인 기준: 20명)
+  if (guest_count > AUTO_APPROVE_THRESHOLDS.maxGuests) {
+    // 30인 이상은 large_group, 21~29명은 pax_over_20
+    if (guest_count >= 30) {
+      reasons.push({
+        code: APPROVAL_REASONS.LARGE_GROUP,
+        message: `대규모 단체: ${guest_count}인`,
+        severity: 'high'
+      });
+    } else {
+      reasons.push({
+        code: APPROVAL_REASONS.PAX_OVER_20,
+        message: `인원 초과: ${guest_count}명 (자동승인 기준 20명 초과)`,
+        severity: 'medium'
+      });
+    }
   }
 
   // 6. 맞춤 가격 적용
