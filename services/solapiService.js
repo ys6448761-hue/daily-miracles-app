@@ -4,7 +4,7 @@
  * - SMS/LMS fallback (알림톡 실패 시)
  *
  * @version 2.1 - 2025.12.31
- * @channel @dailymiracles (http://pf.kakao.com/_xfxhcWn)
+ * @channel @dailymiracles (https://pf.kakao.com/_xfxhcWn/chat)
  *
  * 발신번호 규칙:
  * - 알림톡(ATA): SENDER_PHONE (1899-6117 등 인증된 번호) - ATA 전용

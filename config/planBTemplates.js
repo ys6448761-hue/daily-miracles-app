@@ -132,8 +132,8 @@ function getKakaoButtons() {
         {
             type: 'WL',
             name: '카카오톡 문의',
-            linkMobile: 'http://pf.kakao.com/_xfxhcWn/chat',
-            linkPc: 'http://pf.kakao.com/_xfxhcWn/chat'
+            linkMobile: 'https://pf.kakao.com/_xfxhcWn/chat',
+            linkPc: 'https://pf.kakao.com/_xfxhcWn/chat'
         }
     ];
 }

@@ -122,5 +122,5 @@ booking: 카카오채널 신청
 
 ## 문의
 
-- 카카오채널: [하루하루의 기적](https://pf.kakao.com/_xnxnKn)
+- 카카오채널: [하루하루의 기적](https://pf.kakao.com/_xfxhcWn/chat)
 - 전화: 1899-6117
