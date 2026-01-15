@@ -318,7 +318,17 @@ app.use(
 app.options("*", (req, res) => res.sendStatus(204));
 
 // ---------- Body Parsing (관용) ----------
-app.use(express.json({ limit: "2mb", type: ["application/json", "text/json", "application/*+json"] }));
+// Slack 서명 검증용 rawBody 저장 (verify 콜백)
+app.use(express.json({
+  limit: "2mb",
+  type: ["application/json", "text/json", "application/*+json"],
+  verify: (req, _res, buf) => {
+    // /api/slack/events 경로에서만 rawBody 저장 (서명 검증용)
+    if (req.originalUrl === '/api/slack/events' || req.url === '/api/slack/events') {
+      req.rawBody = buf;
+    }
+  }
+}));
 app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 // 일부 환경에서 content-type이 틀리면 문자열로 들어오므로 보정
 app.use((req, _res, next) => {
@@ -519,8 +529,8 @@ app.get("/api/admin/health/slack", verifyAdmin, async (_req, res) => {
 });
 
 // ---------- Slack Events API (Aurora5 Bot) ----------
-// express.raw()로 rawBody 받아서 서명 검증 후 JSON 파싱
-app.post("/api/slack/events", express.raw({ type: 'application/json' }), async (req, res) => {
+// 전역 express.json()에서 rawBody 저장됨 (verify 콜백)
+app.post("/api/slack/events", async (req, res) => {
   if (!slackBotService) {
     return res.status(503).json({
       success: false,
@@ -529,21 +539,11 @@ app.post("/api/slack/events", express.raw({ type: 'application/json' }), async (
   }
 
   try {
-    // rawBody (Buffer) → string → JSON
-    const rawBody = req.body;
-    const bodyString = Buffer.isBuffer(rawBody) ? rawBody.toString('utf8') : rawBody;
+    // req.body는 이미 파싱됨 (전역 express.json)
+    // req.rawBody는 verify 콜백에서 저장됨 (Buffer)
+    const { type, challenge, event } = req.body;
 
-    let parsed;
-    try {
-      parsed = JSON.parse(bodyString);
-    } catch (parseErr) {
-      console.error('❌ JSON 파싱 실패:', parseErr.message);
-      return res.status(400).json({ error: 'Invalid JSON' });
-    }
-
-    const { type, challenge, event } = parsed;
-
-    console.log(`📥 Slack 요청 수신: type=${type}, event_type=${event?.type || 'N/A'}`);
+    console.log(`📥 Slack 요청 수신: type=${type}, event_type=${event?.type || 'N/A'}, rawBody=${req.rawBody ? 'OK' : 'MISSING'}`);
 
     // 1. URL Verification (Slack 앱 설정 시 필요) - 서명 검증 전에 처리
     if (type === 'url_verification') {
@@ -552,7 +552,12 @@ app.post("/api/slack/events", express.raw({ type: 'application/json' }), async (
     }
 
     // 2. 서명 검증 (rawBody 기반)
-    if (!slackBotService.verifySlackSignature(rawBody, req.headers)) {
+    if (!req.rawBody) {
+      console.warn('❌ rawBody 없음 - 서명 검증 불가');
+      return res.status(400).json({ error: 'Missing raw body' });
+    }
+
+    if (!slackBotService.verifySlackSignature(req.rawBody, req.headers)) {
       console.warn('❌ Slack 서명 검증 실패 - 401 반환');
       return res.status(401).json({ error: 'Invalid signature' });
     }
