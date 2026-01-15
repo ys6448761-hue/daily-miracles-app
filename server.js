@@ -535,6 +535,8 @@ app.post("/api/slack/events", express.json({
   try {
     const { type, challenge, event } = req.body;
 
+    console.log(`📥 Slack 요청 수신: type=${type}, event_type=${event?.type || 'N/A'}`);
+
     // 1. URL Verification (Slack 앱 설정 시 필요)
     if (type === 'url_verification') {
       console.log('✅ Slack URL verification');
@@ -547,20 +549,27 @@ app.post("/api/slack/events", express.json({
       return res.status(401).json({ error: 'Invalid signature' });
     }
 
+    console.log('✅ Slack 서명 검증 통과');
+
     // 3. 이벤트 처리 (비동기로 응답 후 처리)
     res.status(200).send('OK'); // Slack은 3초 내 응답 필요
 
     if (type === 'event_callback' && event) {
+      console.log(`🔔 이벤트 콜백 처리 시작: ${event.type}`);
+
       // 채널 정보 조회
       const channelInfo = await slackBotService.getChannelInfo(event.channel);
+      console.log(`📍 채널 정보 조회 결과:`, channelInfo ? channelInfo.name : 'null');
 
       // 이벤트 처리
       const result = await slackBotService.handleSlackEvent(event, channelInfo);
-      console.log('🤖 Slack 이벤트 처리:', result);
+      console.log('🤖 Slack 이벤트 처리 결과:', JSON.stringify(result));
+    } else {
+      console.log(`⚠️ 처리하지 않는 이벤트: type=${type}`);
     }
 
   } catch (error) {
-    console.error("💥 Slack 이벤트 처리 실패:", error);
+    console.error("💥 Slack 이벤트 처리 실패:", error.message, error.stack);
     // 이미 응답을 보냈으므로 여기서는 로깅만
   }
 });

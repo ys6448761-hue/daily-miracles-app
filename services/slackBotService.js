@@ -25,12 +25,19 @@ const crypto = require('crypto');
 // ═══════════════════════════════════════════════════════════════════════════
 
 // 허용된 채널 (채널명 또는 ID)
+// 채널 ID 또는 이름 일부 매칭
 const ALLOWED_CHANNELS = [
   'aurora5-hq',
   'aurora5-dev',
   'aurora5-ops',
-  // 채널 ID도 지원 (실제 ID로 교체 필요)
+  'aurora5',  // 부분 매칭용
+  'hq',       // 부분 매칭용
+  // 개발/테스트 모드: 모든 채널 허용하려면 아래 주석 해제
+  // '*'
 ];
+
+// 개발 모드에서는 모든 채널 허용
+const ALLOW_ALL_CHANNELS = process.env.NODE_ENV !== 'production' || process.env.SLACK_ALLOW_ALL_CHANNELS === 'true';
 
 // 역할 키워드 매핑
 const ROLE_KEYWORDS = {
@@ -211,12 +218,23 @@ function verifySlackSignature(req) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function isAllowedChannel(channelId, channelName) {
+  // 개발/테스트 모드에서는 모든 채널 허용
+  if (ALLOW_ALL_CHANNELS) {
+    console.log(`✅ 채널 허용 (ALLOW_ALL_CHANNELS): ${channelId} / ${channelName}`);
+    return true;
+  }
+
   // 채널 ID 또는 이름으로 확인
-  return ALLOWED_CHANNELS.some(allowed =>
-    allowed === channelId ||
-    allowed === channelName ||
-    channelName?.includes(allowed)
+  const allowed = ALLOWED_CHANNELS.some(pattern =>
+    pattern === '*' ||
+    pattern === channelId ||
+    pattern === channelName ||
+    channelName?.toLowerCase().includes(pattern.toLowerCase()) ||
+    channelId?.includes(pattern)
   );
+
+  console.log(`🔍 채널 허용 체크: ${channelId} / ${channelName} → ${allowed ? '✅' : '❌'}`);
+  return allowed;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -397,15 +415,22 @@ async function getTeamContext() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 async function handleSlackEvent(event, channelInfo = null) {
+  console.log('🔔 Slack 이벤트 수신:', JSON.stringify(event, null, 2));
+
   const { type, channel, user, text, ts, thread_ts } = event;
 
   // app_mention 이벤트만 처리
   if (type !== 'app_mention') {
+    console.log(`⚠️ app_mention이 아님: ${type}`);
     return { handled: false, reason: 'not_app_mention' };
   }
 
+  console.log(`📨 멘션 감지: channel=${channel}, user=${user}, text="${text}"`);
+
   // 채널 허용 여부 확인
   const channelName = channelInfo?.name || '';
+  console.log(`📍 채널 정보: ID=${channel}, name=${channelName}`);
+
   if (!isAllowedChannel(channel, channelName)) {
     console.log(`⚠️ 허용되지 않은 채널: ${channel} (${channelName})`);
     return { handled: false, reason: 'channel_not_allowed' };
