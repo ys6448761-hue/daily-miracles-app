@@ -19,6 +19,15 @@ try {
   console.warn("⚠️ 메트릭스 서비스 로드 실패:", error.message);
 }
 
+// Ops Agent 서비스 로딩
+let opsAgentService = null;
+try {
+  opsAgentService = require("./services/opsAgentService");
+  console.log("✅ Ops Agent 서비스 로드 성공");
+} catch (error) {
+  console.warn("⚠️ Ops Agent 서비스 로드 실패:", error.message);
+}
+
 // Airtable 서비스 로딩
 let airtableService = null;
 try {
@@ -426,6 +435,53 @@ app.post("/api/metrics/snapshot", async (_req, res) => {
     });
   } catch (error) {
     console.error("💥 Snapshot 저장 실패:", error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// ---------- Ops Agent: Full Health Check (DEC-006) ----------
+app.get("/api/admin/health/full", async (_req, res) => {
+  if (!opsAgentService) {
+    return res.status(503).json({
+      success: false,
+      error: "ops_agent_unavailable",
+      message: "Ops Agent 서비스가 로드되지 않았습니다"
+    });
+  }
+
+  try {
+    const healthResult = await opsAgentService.runFullHealthCheck(db);
+    res.json({
+      success: true,
+      ...healthResult
+    });
+  } catch (error) {
+    console.error("💥 Ops Agent 헬스체크 실패:", error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// ---------- Ops Agent: Slack Report ----------
+app.get("/api/admin/health/slack", async (_req, res) => {
+  if (!opsAgentService) {
+    return res.status(503).json({
+      success: false,
+      error: "ops_agent_unavailable"
+    });
+  }
+
+  try {
+    const healthResult = await opsAgentService.runFullHealthCheck(db);
+    const slackReport = opsAgentService.generateSlackReport(healthResult);
+    res.type('text/plain').send(slackReport);
+  } catch (error) {
+    console.error("💥 Slack 보고서 생성 실패:", error);
     res.status(500).json({
       success: false,
       error: error.message
