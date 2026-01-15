@@ -28,6 +28,26 @@ try {
   console.warn("⚠️ Ops Agent 서비스 로드 실패:", error.message);
 }
 
+// Admin 인증 미들웨어 로딩
+let verifyAdmin = null;
+try {
+  const authMiddleware = require("./aurora5/middleware/auth");
+  verifyAdmin = authMiddleware.verifyAdmin;
+  console.log("✅ Admin 인증 미들웨어 로드 성공");
+} catch (error) {
+  console.warn("⚠️ Admin 인증 미들웨어 로드 실패:", error.message);
+  // Fallback: 기본 검증 함수
+  verifyAdmin = (req, res, next) => {
+    const adminKey = req.headers['x-admin-key'] || req.query.key;
+    const expectedKey = process.env.ADMIN_API_KEY;
+
+    if (expectedKey && adminKey !== expectedKey) {
+      return res.status(401).json({ success: false, error: 'Admin authentication required' });
+    }
+    next();
+  };
+}
+
 // Airtable 서비스 로딩
 let airtableService = null;
 try {
@@ -443,7 +463,7 @@ app.post("/api/metrics/snapshot", async (_req, res) => {
 });
 
 // ---------- Ops Agent: Full Health Check (DEC-006) ----------
-app.get("/api/admin/health/full", async (_req, res) => {
+app.get("/api/admin/health/full", verifyAdmin, async (_req, res) => {
   if (!opsAgentService) {
     return res.status(503).json({
       success: false,
@@ -468,7 +488,7 @@ app.get("/api/admin/health/full", async (_req, res) => {
 });
 
 // ---------- Ops Agent: Slack Report ----------
-app.get("/api/admin/health/slack", async (_req, res) => {
+app.get("/api/admin/health/slack", verifyAdmin, async (_req, res) => {
   if (!opsAgentService) {
     return res.status(503).json({
       success: false,
