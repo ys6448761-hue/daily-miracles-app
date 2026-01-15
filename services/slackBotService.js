@@ -181,36 +181,70 @@ const THREAD_TTL = 60 * 60 * 1000; // 1시간
 // Slack 서명 검증
 // ═══════════════════════════════════════════════════════════════════════════
 
-function verifySlackSignature(req) {
+function verifySlackSignature(rawBody, headers) {
   const signingSecret = process.env.SLACK_SIGNING_SECRET;
   if (!signingSecret) {
-    console.warn('⚠️ SLACK_SIGNING_SECRET not configured');
+    console.warn('⚠️ SLACK_SIGNING_SECRET not configured - 검증 스킵');
     return true; // 개발 환경에서는 통과
   }
 
-  const timestamp = req.headers['x-slack-request-timestamp'];
-  const slackSignature = req.headers['x-slack-signature'];
+  const timestamp = headers['x-slack-request-timestamp'];
+  const slackSignature = headers['x-slack-signature'];
 
+  // 디버그: 헤더 존재 여부
   if (!timestamp || !slackSignature) {
+    console.warn('❌ 서명 검증 실패: 헤더 누락', {
+      hasTimestamp: !!timestamp,
+      hasSignature: !!slackSignature
+    });
     return false;
   }
 
   // 5분 이상 된 요청 거부 (리플레이 공격 방지)
-  const fiveMinutesAgo = Math.floor(Date.now() / 1000) - 60 * 5;
-  if (parseInt(timestamp) < fiveMinutesAgo) {
+  // Slack timestamp는 seconds 단위
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  const requestAge = nowSeconds - parseInt(timestamp, 10);
+
+  if (requestAge > 300) { // 5분 = 300초
+    console.warn('❌ 서명 검증 실패: 타임스탬프 만료', {
+      requestAge: `${requestAge}초 전`,
+      timestamp,
+      nowSeconds
+    });
     return false;
   }
 
-  const sigBasestring = `v0:${timestamp}:${req.rawBody}`;
+  // rawBody가 Buffer면 string으로 변환
+  const bodyString = Buffer.isBuffer(rawBody) ? rawBody.toString('utf8') : rawBody;
+
+  const sigBasestring = `v0:${timestamp}:${bodyString}`;
   const mySignature = 'v0=' + crypto
     .createHmac('sha256', signingSecret)
     .update(sigBasestring)
     .digest('hex');
 
-  return crypto.timingSafeEqual(
-    Buffer.from(mySignature),
-    Buffer.from(slackSignature)
-  );
+  // 디버그 로그 (시그니처 앞 12자만)
+  const computed8 = mySignature.substring(0, 15);
+  const received8 = slackSignature.substring(0, 15);
+
+  console.log('🔐 서명 검증 시도:', {
+    bodyLength: bodyString.length,
+    timestamp,
+    requestAge: `${requestAge}초`,
+    computedPrefix: computed8,
+    receivedPrefix: received8,
+    match: computed8 === received8 ? '✅' : '❌'
+  });
+
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(mySignature),
+      Buffer.from(slackSignature)
+    );
+  } catch (err) {
+    console.warn('❌ 서명 비교 실패:', err.message);
+    return false;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

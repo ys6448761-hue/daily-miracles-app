@@ -519,12 +519,8 @@ app.get("/api/admin/health/slack", verifyAdmin, async (_req, res) => {
 });
 
 // ---------- Slack Events API (Aurora5 Bot) ----------
-// rawBody 저장을 위한 미들웨어 (Slack 서명 검증용)
-app.post("/api/slack/events", express.json({
-  verify: (req, _res, buf) => {
-    req.rawBody = buf.toString();
-  }
-}), async (req, res) => {
+// express.raw()로 rawBody 받아서 서명 검증 후 JSON 파싱
+app.post("/api/slack/events", express.raw({ type: 'application/json' }), async (req, res) => {
   if (!slackBotService) {
     return res.status(503).json({
       success: false,
@@ -533,19 +529,31 @@ app.post("/api/slack/events", express.json({
   }
 
   try {
-    const { type, challenge, event } = req.body;
+    // rawBody (Buffer) → string → JSON
+    const rawBody = req.body;
+    const bodyString = Buffer.isBuffer(rawBody) ? rawBody.toString('utf8') : rawBody;
+
+    let parsed;
+    try {
+      parsed = JSON.parse(bodyString);
+    } catch (parseErr) {
+      console.error('❌ JSON 파싱 실패:', parseErr.message);
+      return res.status(400).json({ error: 'Invalid JSON' });
+    }
+
+    const { type, challenge, event } = parsed;
 
     console.log(`📥 Slack 요청 수신: type=${type}, event_type=${event?.type || 'N/A'}`);
 
-    // 1. URL Verification (Slack 앱 설정 시 필요)
+    // 1. URL Verification (Slack 앱 설정 시 필요) - 서명 검증 전에 처리
     if (type === 'url_verification') {
-      console.log('✅ Slack URL verification');
+      console.log('✅ Slack URL verification (challenge 응답)');
       return res.json({ challenge });
     }
 
-    // 2. 서명 검증
-    if (!slackBotService.verifySlackSignature(req)) {
-      console.warn('❌ Slack 서명 검증 실패');
+    // 2. 서명 검증 (rawBody 기반)
+    if (!slackBotService.verifySlackSignature(rawBody, req.headers)) {
+      console.warn('❌ Slack 서명 검증 실패 - 401 반환');
       return res.status(401).json({ error: 'Invalid signature' });
     }
 
@@ -570,7 +578,10 @@ app.post("/api/slack/events", express.json({
 
   } catch (error) {
     console.error("💥 Slack 이벤트 처리 실패:", error.message, error.stack);
-    // 이미 응답을 보냈으므로 여기서는 로깅만
+    // 이미 응답을 보냈으면 로깅만, 아니면 에러 응답
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Internal error' });
+    }
   }
 });
 
