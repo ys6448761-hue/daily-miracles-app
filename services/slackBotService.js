@@ -25,19 +25,20 @@ const crypto = require('crypto');
 // ═══════════════════════════════════════════════════════════════════════════
 
 // 허용된 채널 (채널명 또는 ID)
-// 채널 ID 또는 이름 일부 매칭
 const ALLOWED_CHANNELS = [
+  // 채널 ID (실제 운영 채널)
+  'C0A8CRE7MQF',  // 테스트 채널 (2026-01-16 추가)
+  // 채널명 패턴 매칭
   'aurora5-hq',
   'aurora5-dev',
   'aurora5-ops',
-  'aurora5',  // 부분 매칭용
-  'hq',       // 부분 매칭용
-  // 개발/테스트 모드: 모든 채널 허용하려면 아래 주석 해제
-  // '*'
+  'aurora5',
+  'hq',
 ];
 
-// 개발 모드에서는 모든 채널 허용
-const ALLOW_ALL_CHANNELS = process.env.NODE_ENV !== 'production' || process.env.SLACK_ALLOW_ALL_CHANNELS === 'true';
+// 채널 제한 비활성화 (테스트 기간 동안 모든 채널 허용)
+// TODO: 정식 운영 시 false로 변경하고 채널 ID만 허용
+const ALLOW_ALL_CHANNELS = true;
 
 // 역할 키워드 매핑
 const ROLE_KEYWORDS = {
