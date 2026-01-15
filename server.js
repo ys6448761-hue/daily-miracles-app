@@ -57,6 +57,15 @@ try {
   console.warn("⚠️ Airtable 서비스 로드 실패:", error.message);
 }
 
+// Slack Bot 서비스 로딩
+let slackBotService = null;
+try {
+  slackBotService = require("./services/slackBotService");
+  console.log("✅ Slack Bot 서비스 로드 성공");
+} catch (error) {
+  console.warn("⚠️ Slack Bot 서비스 로드 실패:", error.message);
+}
+
 // 빌드 정보 (디버깅용)
 const BUILD_INFO = {
   commit: process.env.GIT_SHA || process.env.RENDER_GIT_COMMIT || 'unknown',
@@ -506,6 +515,53 @@ app.get("/api/admin/health/slack", verifyAdmin, async (_req, res) => {
       success: false,
       error: error.message
     });
+  }
+});
+
+// ---------- Slack Events API (Aurora5 Bot) ----------
+// rawBody 저장을 위한 미들웨어 (Slack 서명 검증용)
+app.post("/api/slack/events", express.json({
+  verify: (req, _res, buf) => {
+    req.rawBody = buf.toString();
+  }
+}), async (req, res) => {
+  if (!slackBotService) {
+    return res.status(503).json({
+      success: false,
+      error: "slack_bot_unavailable"
+    });
+  }
+
+  try {
+    const { type, challenge, event } = req.body;
+
+    // 1. URL Verification (Slack 앱 설정 시 필요)
+    if (type === 'url_verification') {
+      console.log('✅ Slack URL verification');
+      return res.json({ challenge });
+    }
+
+    // 2. 서명 검증
+    if (!slackBotService.verifySlackSignature(req)) {
+      console.warn('❌ Slack 서명 검증 실패');
+      return res.status(401).json({ error: 'Invalid signature' });
+    }
+
+    // 3. 이벤트 처리 (비동기로 응답 후 처리)
+    res.status(200).send('OK'); // Slack은 3초 내 응답 필요
+
+    if (type === 'event_callback' && event) {
+      // 채널 정보 조회
+      const channelInfo = await slackBotService.getChannelInfo(event.channel);
+
+      // 이벤트 처리
+      const result = await slackBotService.handleSlackEvent(event, channelInfo);
+      console.log('🤖 Slack 이벤트 처리:', result);
+    }
+
+  } catch (error) {
+    console.error("💥 Slack 이벤트 처리 실패:", error);
+    // 이미 응답을 보냈으므로 여기서는 로깅만
   }
 });
 
