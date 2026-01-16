@@ -68,11 +68,11 @@ async function checkTokens() {
     };
   }
 
-  // T3: Solapi API 키 존재
-  checks.T3_solapi_key = {
-    name: 'Solapi API 키 존재',
-    ok: !!process.env.SOLAPI_API_KEY,
-    reason: process.env.SOLAPI_API_KEY ? null : 'SOLAPI_API_KEY 환경변수 누락 (알림톡 발송 불가)'
+  // T3: SENS 설정 존재
+  checks.T3_sens_key = {
+    name: 'SENS API 키 존재',
+    ok: !!process.env.SENS_ACCESS_KEY,
+    reason: process.env.SENS_ACCESS_KEY ? null : 'SENS_ACCESS_KEY 환경변수 누락 (알림톡 발송 불가)'
   };
 
   // 전체 상태 결정
@@ -171,7 +171,7 @@ async function checkPayment(db) {
 async function checkMessaging(db) {
   const checks = {};
 
-  // M1: Solapi 발송 성공률 (최근 24h)
+  // M1: 알림톡 발송 성공률 (최근 24h)
   try {
     if (db) {
       const result = await db.query(`
@@ -211,12 +211,12 @@ async function checkMessaging(db) {
   }
 
   // M2: 알림톡 템플릿 상태 (환경변수로 체크)
-  const templateId = process.env.SOLAPI_TEMPLATE_ID;
+  const templateCode = process.env.SENS_TEMPLATE_CODE;
   checks.M2_template = {
     name: '알림톡 템플릿 설정',
-    ok: !!templateId,
-    templateId: templateId ? templateId.substring(0, 10) + '...' : null,
-    reason: templateId ? null : 'SOLAPI_TEMPLATE_ID 환경변수 누락'
+    ok: !!templateCode,
+    templateCode: templateCode ? templateCode.substring(0, 10) + '...' : null,
+    reason: templateCode ? null : 'SENS_TEMPLATE_CODE 환경변수 누락'
   };
 
   const allOk = Object.values(checks).every(c => c.ok);

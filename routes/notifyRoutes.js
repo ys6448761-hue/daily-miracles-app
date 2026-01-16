@@ -2,7 +2,7 @@
  * 메시지 발송 진단/테스트 API
  * P0 긴급 점검용
  *
- * @version 1.0 - 2025.12.31
+ * @version 2.0 - 2026.01.16 (SENS 전환, Solapi 제거)
  *
  * 엔드포인트:
  * - GET  /api/notify/status - 설정/환경변수/최근 발송 상태
@@ -12,12 +12,12 @@
 const express = require('express');
 const router = express.Router();
 
-// Solapi 서비스 연동
-let solapiService = null;
+// messageProvider (SENS 알림톡/SMS)
+let messageProvider = null;
 try {
-    solapiService = require('../services/solapiService');
+    messageProvider = require('../services/messageProvider');
 } catch (e) {
-    console.warn('[Notify] solapiService 로드 실패:', e.message);
+    console.warn('[Notify] messageProvider 로드 실패:', e.message);
 }
 
 // OutboundMessage 저장소 연동
@@ -36,43 +36,33 @@ router.get('/status', async (req, res) => {
     try {
         // 환경변수 존재 여부 (값 노출 X)
         const envStatus = {
-            // Solapi 기본
-            SOLAPI_API_KEY: !!process.env.SOLAPI_API_KEY,
-            SOLAPI_API_SECRET: !!process.env.SOLAPI_API_SECRET,
-            SOLAPI_PFID: !!process.env.SOLAPI_PFID,
-            // 발신번호 (⚠️ SENDER_PHONE은 deprecated - ATA 전용)
-            SENDER_PHONE: process.env.SENDER_PHONE ? `${process.env.SENDER_PHONE.substring(0, 4)}**** (ATA only, deprecated)` : false,
-            SOLAPI_SMS_FROM: process.env.SOLAPI_SMS_FROM ? `${process.env.SOLAPI_SMS_FROM.substring(0, 3)}****${process.env.SOLAPI_SMS_FROM.slice(-4)}` : false,
+            // SENS 기본
+            SENS_ACCESS_KEY: !!process.env.SENS_ACCESS_KEY,
+            SENS_SECRET_KEY: !!process.env.SENS_SECRET_KEY,
+            SENS_SERVICE_ID: !!process.env.SENS_SERVICE_ID,
+            SENS_SMS_SERVICE_ID: !!process.env.SENS_SMS_SERVICE_ID,
+            SENS_CHANNEL_ID: process.env.SENS_CHANNEL_ID || '_xfxhcWn',
+            // 발신번호
+            SENDER_PHONE: process.env.SENDER_PHONE ? `${process.env.SENDER_PHONE.substring(0, 4)}****` : false,
             // 템플릿
-            SOLAPI_TEMPLATE_MIRACLE_RESULT: !!process.env.SOLAPI_TEMPLATE_MIRACLE_RESULT,
-            SOLAPI_TEMPLATE_WISH_ACK: !!process.env.SOLAPI_TEMPLATE_WISH_ACK,
+            SENS_TEMPLATE_CODE: !!process.env.SENS_TEMPLATE_CODE,
+            SENS_QUOTE_TEMPLATE_CODE: !!process.env.SENS_QUOTE_TEMPLATE_CODE,
             // 알림 수신자
             CRO_PHONE: !!process.env.CRO_PHONE,
             COO_PHONE: !!process.env.COO_PHONE,
             CEO_PHONE: !!process.env.CEO_PHONE,
-            // 이메일 (선택)
-            SENDGRID_API_KEY: !!process.env.SENDGRID_API_KEY,
         };
 
         // 필수 설정 체크
-        const requiredEnvs = ['SOLAPI_API_KEY', 'SOLAPI_API_SECRET', 'SOLAPI_PFID', 'SOLAPI_SMS_FROM'];
+        const requiredEnvs = ['SENS_ACCESS_KEY', 'SENS_SECRET_KEY', 'SENS_SERVICE_ID'];
         const missingEnvs = requiredEnvs.filter(key => !process.env[key]);
 
         // 서비스 로딩 상태
         const serviceStatus = {
-            solapiService: !!solapiService,
-            isEnabled: solapiService?.isEnabled?.() || false,
+            messageProvider: !!messageProvider,
+            isEnabled: messageProvider?.isEnabled?.() || false,
+            config: messageProvider?.getConfig?.() || null
         };
-
-        // 잔액 조회 (가능한 경우)
-        let balance = null;
-        if (solapiService?.getBalance) {
-            try {
-                balance = await solapiService.getBalance();
-            } catch (e) {
-                balance = { error: e.message };
-            }
-        }
 
         // 결과 정리
         const status = {
@@ -80,16 +70,10 @@ router.get('/status', async (req, res) => {
             env: envStatus,
             missingEnvs,
             service: serviceStatus,
-            balance,
-            // 현재 실제 사용 중인 SMS 발신번호 (마스킹)
-            activeSmsFrom: process.env.SOLAPI_SMS_FROM
-                ? `${process.env.SOLAPI_SMS_FROM.substring(0, 3)}****${process.env.SOLAPI_SMS_FROM.slice(-4)}`
-                : '⚠️ 미설정 (SMS 발송 불가)',
             diagnosis: {
-                canSendATA: envStatus.SOLAPI_API_KEY && envStatus.SOLAPI_API_SECRET && envStatus.SOLAPI_PFID,
-                canSendSMS: envStatus.SOLAPI_API_KEY && envStatus.SOLAPI_API_SECRET && !!process.env.SOLAPI_SMS_FROM,
+                canSendAlimtalk: envStatus.SENS_ACCESS_KEY && envStatus.SENS_SECRET_KEY && envStatus.SENS_SERVICE_ID,
+                canSendSMS: envStatus.SENS_ACCESS_KEY && envStatus.SENS_SECRET_KEY && envStatus.SENS_SMS_SERVICE_ID,
                 canSendRedAlert: envStatus.CRO_PHONE || envStatus.COO_PHONE,
-                smsFromSource: process.env.SOLAPI_SMS_FROM ? 'SOLAPI_SMS_FROM' : 'NONE',
             },
             recommendations: []
         };
@@ -98,14 +82,11 @@ router.get('/status', async (req, res) => {
         if (missingEnvs.length > 0) {
             status.recommendations.push(`❌ 필수 환경변수 누락: ${missingEnvs.join(', ')}`);
         }
-        if (!envStatus.SOLAPI_SMS_FROM) {
-            status.recommendations.push('⚠️ SOLAPI_SMS_FROM 미설정 - SMS fallback 불가');
+        if (!envStatus.SENS_SMS_SERVICE_ID) {
+            status.recommendations.push('⚠️ SENS_SMS_SERVICE_ID 미설정 - SMS fallback 불가');
         }
-        if (!envStatus.SOLAPI_PFID) {
-            status.recommendations.push('⚠️ SOLAPI_PFID 미설정 - 알림톡 발송 불가');
-        }
-        if (!envStatus.SOLAPI_TEMPLATE_MIRACLE_RESULT && !envStatus.SOLAPI_TEMPLATE_WISH_ACK) {
-            status.recommendations.push('ℹ️ 알림톡 템플릿 미설정 - SMS로만 발송됨');
+        if (!envStatus.SENS_TEMPLATE_CODE) {
+            status.recommendations.push('ℹ️ SENS_TEMPLATE_CODE 미설정 - SMS로만 발송됨');
         }
 
         // 최근 발송 내역 (OutboundMessage)
@@ -125,9 +106,7 @@ router.get('/status', async (req, res) => {
         res.json({
             success: true,
             status,
-            // 발송 통계
             messageStats,
-            // 최근 10건 발송 내역
             recentMessages
         });
 
@@ -142,16 +121,15 @@ router.get('/status', async (req, res) => {
 
 /**
  * POST /api/notify/test
- * 테스트 메시지 발송 (관리자용)
+ * 테스트 SMS 발송 (관리자용)
  *
  * Body:
  * - to: 수신자 전화번호
- * - type: 'ata' | 'sms' | 'both'
- * - message: 테스트 메시지 (SMS용)
+ * - message: 테스트 메시지
  */
 router.post('/test', async (req, res) => {
     try {
-        const { to, type = 'sms', message = '[테스트] 하루하루의 기적 메시지 테스트입니다.' } = req.body;
+        const { to, message = '[테스트] 하루하루의 기적 메시지 테스트입니다.' } = req.body;
 
         if (!to) {
             return res.status(400).json({
@@ -163,56 +141,24 @@ router.post('/test', async (req, res) => {
         // 전화번호 정규화
         const normalizedTo = to.replace(/[^0-9]/g, '');
 
-        console.log(`[Notify] Test send: { type: "${type}", to: "${normalizedTo.substring(0, 3)}****${normalizedTo.slice(-4)}" }`);
+        console.log(`[Notify] Test send: { to: "${normalizedTo.substring(0, 3)}****${normalizedTo.slice(-4)}" }`);
 
-        const results = {
-            timestamp: new Date().toISOString(),
-            to: `${normalizedTo.substring(0, 3)}****${normalizedTo.slice(-4)}`,
-            type,
-            ata: null,
-            sms: null
-        };
-
-        // 알림톡 테스트
-        if ((type === 'ata' || type === 'both') && solapiService?.sendKakaoAlimtalk) {
-            const templateId = process.env.SOLAPI_TEMPLATE_WISH_ACK || process.env.SOLAPI_TEMPLATE_MIRACLE_RESULT;
-            if (templateId) {
-                try {
-                    results.ata = await solapiService.sendKakaoAlimtalk(normalizedTo, templateId, {
-                        name: '테스트',
-                        miracleScore: '88',
-                        message: message
-                    });
-                    console.log('[Notify] ATA test result:', results.ata.success ? '성공' : '실패');
-                } catch (e) {
-                    results.ata = { success: false, error: e.message };
-                    console.error('[Notify] ATA test error:', e.message);
-                }
-            } else {
-                results.ata = { success: false, error: '알림톡 템플릿 미설정' };
-            }
+        if (!messageProvider) {
+            return res.status(500).json({
+                success: false,
+                error: 'messageProvider 로드 실패'
+            });
         }
 
-        // SMS 테스트
-        if ((type === 'sms' || type === 'both') && solapiService?.sendSMS) {
-            try {
-                results.sms = await solapiService.sendSMS(normalizedTo, message);
-                console.log('[Notify] SMS test result:', results.sms.success ? '성공' : '실패');
-            } catch (e) {
-                results.sms = { success: false, error: e.message };
-                console.error('[Notify] SMS test error:', e.message);
-            }
-        }
-
-        // 종합 결과
-        const anySuccess = results.ata?.success || results.sms?.success;
+        // SMS 테스트 발송
+        const result = await messageProvider.sendSensSMS(normalizedTo, message);
 
         res.json({
-            success: anySuccess,
-            results,
-            summary: anySuccess
-                ? `✅ ${type === 'both' ? '최소 1건' : type.toUpperCase()} 발송 성공`
-                : `❌ 발송 실패 - 로그 확인 필요`
+            success: result.success,
+            result,
+            summary: result.success
+                ? '✅ SMS 테스트 발송 성공'
+                : `❌ 발송 실패: ${result.error || '알 수 없는 오류'}`
         });
 
     } catch (error) {
@@ -230,10 +176,10 @@ router.post('/test', async (req, res) => {
  */
 router.post('/red-alert-test', async (req, res) => {
     try {
-        if (!solapiService?.sendRedAlert) {
+        if (!messageProvider?.sendRedAlertMessage) {
             return res.status(500).json({
                 success: false,
-                error: 'sendRedAlert 함수 없음'
+                error: 'sendRedAlertMessage 함수 없음'
             });
         }
 
@@ -248,12 +194,12 @@ router.post('/red-alert-test', async (req, res) => {
         };
 
         console.log('[Notify] RED Alert test triggered');
-        const result = await solapiService.sendRedAlert(mockWishData);
+        const result = await messageProvider.sendRedAlertMessage(mockWishData);
 
         res.json({
             success: result.success,
             result,
-            cro_phone: process.env.CRO_PHONE ? `${process.env.CRO_PHONE.substring(0, 3)}****` : '미설정'
+            admin_phone: process.env.ADMIN_PHONE ? `${process.env.ADMIN_PHONE.substring(0, 3)}****` : '미설정'
         });
 
     } catch (error) {

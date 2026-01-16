@@ -12,13 +12,12 @@
 const EMERGENCY_PHONE = process.env.EMERGENCY_ALERT_PHONE;
 const APP_NAME = 'Daily Miracles';
 
-// 솔라피 서비스 (선택적 로드)
-let solapiService = null;
+// messageProvider (SENS 알림톡/SMS)
+let messageProvider = null;
 try {
-    solapiService = require('./solapiService');
-    console.log('[Emergency] Solapi 서비스 로드 성공');
+    messageProvider = require('./messageProvider');
 } catch (e) {
-    console.warn('[Emergency] Solapi 서비스 로드 실패 - SMS 발송 불가');
+    console.warn('[Emergency] messageProvider 로드 실패 - SMS 발송 불가');
 }
 
 /**
@@ -77,12 +76,9 @@ async function sendAlert(alertType, data = {}) {
     console.log(`[Emergency] 메시지:\n${message}`);
 
     // 실제 SMS 발송 시도
-    if (solapiService && typeof solapiService.sendSMS === 'function') {
+    if (messageProvider && typeof messageProvider.sendSensSMS === 'function') {
         try {
-            const result = await solapiService.sendSMS({
-                to: EMERGENCY_PHONE,
-                text: message
-            });
+            const result = await messageProvider.sendSensSMS(EMERGENCY_PHONE, message);
             console.log('[Emergency] SMS 발송 성공');
             return { success: true, method: 'sms', result };
         } catch (error) {

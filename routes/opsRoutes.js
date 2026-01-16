@@ -65,15 +65,11 @@ router.get('/health', async (req, res) => {
     // 3. SENS 알림톡 상태
     health.services.sens = {
         status: process.env.SENS_ACCESS_KEY && process.env.SENS_SERVICE_ID ? 'configured' : 'not_configured',
-        channelId: process.env.SENS_CHANNEL_ID || null
+        channelId: process.env.SENS_CHANNEL_ID || null,
+        templateCode: process.env.SENS_TEMPLATE_CODE ? 'configured' : 'not_configured'
     };
 
-    // 4. Solapi 상태
-    health.services.solapi = {
-        status: process.env.SOLAPI_API_KEY && process.env.SOLAPI_API_SECRET ? 'configured' : 'not_configured'
-    };
-
-    // 5. 긴급 알림 상태
+    // 4. 긴급 알림 상태
     health.services.emergency = {
         status: process.env.EMERGENCY_ALERT_PHONE ? 'configured' : 'not_configured',
         phone: process.env.EMERGENCY_ALERT_PHONE ?

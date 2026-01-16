@@ -36,13 +36,13 @@ try {
   console.warn('⚠️ StorybookQueue: Email 서비스 로드 실패');
 }
 
-// Solapi 서비스 (카카오 알림톡 + SMS)
-let solapiService = null;
+// messageProvider (SENS 알림톡/SMS)
+let messageProvider = null;
 try {
-  solapiService = require('./solapiService');
-  console.log('✅ StorybookQueue: Solapi 서비스 로드 성공');
+  messageProvider = require('./messageProvider');
+  console.log('✅ StorybookQueue: messageProvider 로드 성공');
 } catch (error) {
-  console.warn('⚠️ StorybookQueue: Solapi 서비스 로드 실패');
+  console.warn('⚠️ StorybookQueue: messageProvider 로드 실패');
 }
 
 // 마케팅 이벤트 로거
@@ -616,9 +616,9 @@ ${linkList}
 
     let messageId = `kakao-mock-${Date.now()}`;
 
-    if (solapiService && solapiService.sendSMS) {
+    if (messageProvider && messageProvider.sendSensSMS) {
       // SMS로 발송 (알림톡 템플릿 없는 경우)
-      const result = await solapiService.sendSMS(customer_phone, messageText);
+      const result = await messageProvider.sendSensSMS(customer_phone, messageText);
       messageId = result.messageId || result.groupId || messageId;
       console.log(`📱 카카오/SMS 발송 성공: ${messageId}`);
     } else {
@@ -727,8 +727,8 @@ https://daily-miracles-app.onrender.com/api/storybook/orders/${orderId}`;
 
     let messageId = `alert-mock-${Date.now()}`;
 
-    if (solapiService && solapiService.sendSMS) {
-      const result = await solapiService.sendSMS(CEO_PHONE, alertText);
+    if (messageProvider && messageProvider.sendSensSMS) {
+      const result = await messageProvider.sendSensSMS(CEO_PHONE, alertText);
       messageId = result.messageId || result.groupId || messageId;
       console.log(`🔴 RED 알림 발송 완료: ${messageId}`);
     } else {
@@ -1123,14 +1123,11 @@ async function sendRevisionNotification(order, asset, revisionId) {
   }
 
   // 카카오/SMS 폴백
-  if (solapiService && customer_phone) {
+  if (messageProvider && customer_phone) {
     try {
       const message = `[하루하루의 기적]\n수정이 완료되었습니다!\n\n주문번호: ${order_id}\n수정번호: ${revisionId}\n\n📥 다운로드:\n${asset.url}\n\n※ 링크는 14일간 유효합니다.`;
 
-      const smsResult = await solapiService.sendSMS({
-        to: customer_phone,
-        text: message
-      });
+      const smsResult = await messageProvider.sendSensSMS(customer_phone, message);
 
       console.log(`📱 수정 완료 SMS 발송: ${customer_phone.substring(0, 3)}****`);
       await logEvent(order_id, 'revision_notification_sent', {

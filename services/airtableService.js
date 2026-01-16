@@ -240,7 +240,7 @@ async function checkAndAlert(metrics) {
  */
 async function sendAlertKakao(alert) {
     try {
-        const { sendSMS } = require('./solapiService');
+        const messageProvider = require('./messageProvider');
 
         // 코미(COO) 번호
         const COO_PHONE = process.env.COO_PHONE || process.env.CRO_PHONE;
@@ -258,15 +258,15 @@ ${alert.message}
 시각: ${new Date().toLocaleString('ko-KR')}`;
 
         // 코미에게 발송
-        await sendSMS(COO_PHONE, message);
+        await messageProvider.sendSensSMS(COO_PHONE, message);
 
         // RED 케이스는 푸르미르/여의보주에게도 발송
         if (alert.severity === '🔴') {
             const CEO_PHONE = process.env.CEO_PHONE;
             const QUALITY_PHONE = process.env.QUALITY_PHONE;
 
-            if (CEO_PHONE) await sendSMS(CEO_PHONE, message);
-            if (QUALITY_PHONE) await sendSMS(QUALITY_PHONE, message);
+            if (CEO_PHONE) await messageProvider.sendSensSMS(CEO_PHONE, message);
+            if (QUALITY_PHONE) await messageProvider.sendSensSMS(QUALITY_PHONE, message);
         }
 
         console.log(`[Airtable] 알림 발송 완료: ${alert.type}`);
@@ -327,7 +327,7 @@ async function processVipAlert(wishContent, trafficLight, duplicateAttempts = 0,
  */
 async function sendVipNotification(vipResult, trafficLight) {
     try {
-        const { sendSMS } = require('./solapiService');
+        const messageProvider = require('./messageProvider');
 
         // 여의보주 번호
         const QUALITY_PHONE = process.env.QUALITY_PHONE;
@@ -352,12 +352,12 @@ ${vipResult.vipReasons.map((r, i) => `  ${i+1}. ${r}`).join('\n')}
 시각: ${new Date().toLocaleString('ko-KR')}`;
 
         // 여의보주에게 발송
-        await sendSMS(QUALITY_PHONE, message);
+        await messageProvider.sendSensSMS(QUALITY_PHONE, message);
         console.log('[VIP] 여의보주 알림 발송 완료');
 
         // COO에게 CC (옵션)
         if (COO_PHONE && COO_PHONE !== QUALITY_PHONE) {
-            await sendSMS(COO_PHONE, `[VIP CC] ${message}`);
+            await messageProvider.sendSensSMS(COO_PHONE, `[VIP CC] ${message}`);
             console.log('[VIP] COO CC 발송 완료');
         }
     } catch (error) {

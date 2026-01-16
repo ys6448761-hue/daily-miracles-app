@@ -5,25 +5,13 @@ const crypto = require('crypto');
 // 통합 점수 엔진 v2.0
 const { calculateUnifiedScore, ENERGY_TYPES, VERSION: SCORE_VERSION } = require('../services/miracleScoreEngine');
 
-// 메시지 프로바이더 (SENS 우선, Solapi fallback)
+// 메시지 프로바이더 (SENS 알림톡/SMS)
 let messageProvider = null;
 try {
     messageProvider = require('../services/messageProvider');
     console.log('[Miracle] messageProvider 로드 성공:', messageProvider.getConfig());
 } catch (e) {
     console.warn('[Miracle] messageProvider 로드 실패:', e.message);
-}
-
-// Solapi 서비스 연동 (레거시 - feature-flag로 제어)
-// ⚠️ 비활성화됨: MSG_USE_SOLAPI=true로 설정해야 사용
-let solapiService = null;
-if (process.env.MSG_USE_SOLAPI === 'true') {
-    try {
-        solapiService = require('../services/solapiService');
-        console.warn('[Miracle] solapiService 로드됨 (레거시 모드)');
-    } catch (e) {
-        console.warn('[Miracle] solapiService 로드 실패:', e.message);
-    }
 }
 
 // In-memory storage (server.js와 공유하려면 별도 파일로 분리 권장)

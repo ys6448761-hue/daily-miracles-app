@@ -2,16 +2,14 @@
  * messageProvider.js
  *
  * 메시지 발송 추상화 계층
- * - SENS (네이버 클라우드) 우선
- * - Solapi fallback (feature-flag로 제어)
+ * - SENS (네이버 클라우드) 알림톡/SMS
  *
- * @version 1.0 - 2026.01.05
+ * @version 1.1 - 2026.01.16 (Solapi 제거)
  */
 
 const crypto = require('crypto');
 
 // ============ Feature Flags ============
-const USE_SOLAPI = process.env.MSG_USE_SOLAPI === 'true';  // 기본 OFF
 const USE_SENS = process.env.MSG_USE_SENS !== 'false';      // 기본 ON
 
 // ============ SENS 설정 ============
@@ -32,7 +30,6 @@ const SENDER_PHONE = process.env.SENDER_PHONE || '18996117';
 // ============ 로깅 ============
 console.log('[MessageProvider] 설정:', {
     USE_SENS: USE_SENS ? '✅ ON' : '❌ OFF',
-    USE_SOLAPI: USE_SOLAPI ? '✅ ON (fallback)' : '❌ OFF',
     SENS_ACCESS_KEY: SENS_ACCESS_KEY ? '✅ 설정됨' : '❌ 미설정',
     SENS_SERVICE_ID: SENS_SERVICE_ID || '❌ 미설정',
     SENS_CHANNEL_ID: SENS_CHANNEL_ID,
@@ -389,8 +386,7 @@ async function sendResultMessage(phone, name, score, token) {
         name,
         score,
         token,
-        useSens: USE_SENS,
-        useSolapi: USE_SOLAPI
+        useSens: USE_SENS
     });
 
     // 1. SENS 알림톡 시도
@@ -408,18 +404,6 @@ async function sendResultMessage(phone, name, score, token) {
 
         if (smsResult.success) {
             return { ...smsResult, fallback: true };
-        }
-    }
-
-    // 2. Solapi fallback (feature-flag ON인 경우)
-    if (USE_SOLAPI) {
-        console.log(`[MessageProvider] Solapi fallback 시도`);
-        try {
-            const solapiService = require('./solapiService');
-            const resultLink = `${APP_BASE_URL}/r/${token}`;
-            return await solapiService.sendMiracleResult(phone, name, score, resultLink);
-        } catch (err) {
-            console.error(`[MessageProvider] Solapi fallback 실패:`, err.message);
         }
     }
 
@@ -451,16 +435,6 @@ async function sendWishAckMessage(phone, wishData) {
         return await sendSensSMS(phone, text);
     }
 
-    // Solapi fallback
-    if (USE_SOLAPI) {
-        try {
-            const solapiService = require('./solapiService');
-            return await solapiService.sendWishAck(phone, wishData);
-        } catch (err) {
-            console.error(`[MessageProvider] ACK Solapi 실패:`, err.message);
-        }
-    }
-
     return { success: false, reason: '발송 채널 비활성화' };
 }
 
@@ -486,16 +460,6 @@ async function sendRedAlertMessage(wishData) {
     // SENS SMS로 발송
     if (USE_SENS) {
         return await sendSensSMS(adminPhone, alertText);
-    }
-
-    // Solapi fallback
-    if (USE_SOLAPI) {
-        try {
-            const solapiService = require('./solapiService');
-            return await solapiService.sendRedAlert(wishData);
-        } catch (err) {
-            console.error(`[MessageProvider] RED Alert Solapi 실패:`, err.message);
-        }
     }
 
     return { success: false, reason: '발송 채널 비활성화' };
@@ -683,7 +647,7 @@ function buildQuoteAckSMS(quoteData) {
  * 발송 가능 상태 확인
  */
 function isEnabled() {
-    return USE_SENS || USE_SOLAPI;
+    return USE_SENS;
 }
 
 /**
@@ -692,7 +656,6 @@ function isEnabled() {
 function getConfig() {
     return {
         useSens: USE_SENS,
-        useSolapi: USE_SOLAPI,
         sensConfigured: !!(SENS_ACCESS_KEY && SENS_SECRET_KEY && SENS_SERVICE_ID),
         sensTemplateCode: SENS_TEMPLATE_CODE || null,
         channelId: SENS_CHANNEL_ID,

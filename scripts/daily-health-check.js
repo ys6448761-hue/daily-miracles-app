@@ -181,29 +181,27 @@ async function checkAlimtalk() {
         testSent: false
     };
 
-    // Solapi 설정 체크
-    const apiKey = process.env.SOLAPI_API_KEY;
-    const apiSecret = process.env.SOLAPI_API_SECRET;
-    const templateId = process.env.SOLAPI_TEMPLATE_MIRACLE_RESULT;
+    // SENS 설정 체크
+    const accessKey = process.env.SENS_ACCESS_KEY;
+    const secretKey = process.env.SENS_SECRET_KEY;
+    const serviceId = process.env.SENS_SERVICE_ID;
 
-    results.enabled = !!(apiKey && apiSecret);
+    results.enabled = !!(accessKey && secretKey && serviceId);
 
     if (!results.enabled) {
-        log('⚠️', 'Solapi API 키 미설정 - 시뮬레이션 모드');
+        log('⚠️', 'SENS API 키 미설정 - 시뮬레이션 모드');
         return results;
     }
 
-    log('✅', 'Solapi 설정 확인됨');
+    log('✅', 'SENS 설정 확인됨');
 
     // 테스트 번호가 있으면 실제 발송 테스트
-    if (CONFIG.testPhone && templateId) {
+    if (CONFIG.testPhone) {
         try {
-            const { sendMiracleResult } = require('../services/solapiService');
-            const testResult = await sendMiracleResult(
+            const messageProvider = require('../services/messageProvider');
+            const testResult = await messageProvider.sendSensSMS(
                 CONFIG.testPhone,
-                '시스템테스트',
-                99,
-                `${CONFIG.apiBaseUrl}/health-check-test`
+                '[헬스체크] 하루하루의기적 시스템 테스트 메시지입니다.'
             );
             results.testSent = testResult.success;
             log(results.testSent ? '✅' : '⚠️', `테스트 발송: ${results.testSent ? '성공' : '실패'}`);
@@ -549,7 +547,7 @@ ${metricsReport}
     }
 
     if (!alimtalk.enabled) {
-        actions.push(`ℹ️ Solapi API 키 설정 확인 (.env 파일)`);
+        actions.push(`ℹ️ SENS API 키 설정 확인 (.env 파일)`);
     }
 
     report += actions.length > 0 ? actions.join('\n') : '- (현재 필요한 조치 없음)';
