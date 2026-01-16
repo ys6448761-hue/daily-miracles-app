@@ -226,10 +226,10 @@ const respondedThreads = new Map();
 const THREAD_TTL = 60 * 60 * 1000; // 1시간
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Task 1: event_id 중복 방지 (10분 TTL)
+// Task 1: event_id 중복 방지 (Slack 재전송용, 60초 TTL)
 // ═══════════════════════════════════════════════════════════════════════════
 const processedEvents = new Map();
-const EVENT_TTL = 10 * 60 * 1000; // 10분
+const EVENT_TTL = 60 * 1000; // 60초 (Slack 재전송 방지)
 
 /**
  * 이벤트 중복 체크 (event_id 또는 channel+event_ts 조합)
@@ -268,6 +268,99 @@ function markEventAsProcessed(event) {
       }
     }
   }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// P1 Hotfix: Rate-limit (연타 방지, 5초 TTL)
+// 키: channel_id + user_id + normalized_text_hash
+// ═══════════════════════════════════════════════════════════════════════════
+const rateLimitCache = new Map();
+const RATE_LIMIT_TTL = 5 * 1000; // 5초
+
+/**
+ * 텍스트 정규화 (멘션 제거 + 소문자 + 공백 정리)
+ */
+function normalizeText(text) {
+  return (text || '')
+    .replace(/<@[A-Z0-9]+>/g, '')  // 멘션 제거
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, ' ')          // 연속 공백 → 단일 공백
+    .substring(0, 100);            // 최대 100자
+}
+
+/**
+ * 간단한 해시 생성
+ */
+function simpleHash(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return hash.toString(16);
+}
+
+/**
+ * Rate-limit 체크 (연타 방지)
+ * @param {string} channel - 채널 ID
+ * @param {string} user - 사용자 ID
+ * @param {string} text - 메시지 텍스트
+ * @returns {boolean} - rate-limited면 true
+ */
+function isRateLimited(channel, user, text) {
+  const normalized = normalizeText(text);
+  const textHash = simpleHash(normalized);
+  const key = `${channel}:${user}:${textHash}`;
+
+  const now = Date.now();
+
+  if (rateLimitCache.has(key)) {
+    const cached = rateLimitCache.get(key);
+    if (now - cached.timestamp < RATE_LIMIT_TTL) {
+      console.log(`⚠️ rate_limited: ${key} (${now - cached.timestamp}ms ago)`);
+      return true;
+    }
+    rateLimitCache.delete(key);
+  }
+
+  return false;
+}
+
+/**
+ * Rate-limit 캐시에 추가
+ */
+function markAsRateLimited(channel, user, text) {
+  const normalized = normalizeText(text);
+  const textHash = simpleHash(normalized);
+  const key = `${channel}:${user}:${textHash}`;
+
+  rateLimitCache.set(key, { timestamp: Date.now() });
+
+  // 오래된 항목 정리 (300개 초과 시)
+  if (rateLimitCache.size > 300) {
+    const now = Date.now();
+    for (const [k, v] of rateLimitCache.entries()) {
+      if (now - v.timestamp > RATE_LIMIT_TTL) {
+        rateLimitCache.delete(k);
+      }
+    }
+  }
+}
+
+/**
+ * Slack 재전송 헤더 체크 (X-Slack-Retry-Num)
+ * @param {Object} headers - HTTP 헤더
+ * @returns {boolean} - 재전송이면 true
+ */
+function isSlackRetry(headers) {
+  const retryNum = headers?.['x-slack-retry-num'];
+  if (retryNum && parseInt(retryNum, 10) > 0) {
+    console.log(`⚠️ slack_retry_ignored: retry_num=${retryNum}`);
+    return true;
+  }
+  return false;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -827,7 +920,7 @@ async function getTeamContext() {
 // 메인 이벤트 핸들러
 // ═══════════════════════════════════════════════════════════════════════════
 
-async function handleSlackEvent(event, channelInfo = null) {
+async function handleSlackEvent(event, channelInfo = null, headers = {}) {
   const eventStartTime = Date.now();
   console.log('🔔 Slack 이벤트 수신:', JSON.stringify(event, null, 2));
 
@@ -840,7 +933,14 @@ async function handleSlackEvent(event, channelInfo = null) {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // Task 1: event_id 중복 방지 (10분 TTL)
+  // P1 Hotfix: X-Slack-Retry-Num 헤더 체크 (Slack 재전송 무시)
+  // ═══════════════════════════════════════════════════════════════════════════
+  if (isSlackRetry(headers)) {
+    return { handled: false, reason: 'slack_retry' };
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Task 1: event_id 중복 방지 (60초 TTL)
   // ═══════════════════════════════════════════════════════════════════════════
   const eventForDedup = { event_id, channel, event_ts: event_ts || ts };
   if (isDuplicateEvent(eventForDedup)) {
@@ -858,17 +958,24 @@ async function handleSlackEvent(event, channelInfo = null) {
     return { handled: false, reason: 'channel_not_allowed' };
   }
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // P1 Hotfix: Rate-limit 체크 (연타 방지, 5초 TTL)
+  // ═══════════════════════════════════════════════════════════════════════════
+  if (isRateLimited(channel, user, text)) {
+    return { handled: false, reason: 'rate_limited' };
+  }
+
   // 스레드 기준 (thread_ts가 없으면 ts 사용)
   const threadTs = thread_ts || ts;
 
   // ═══════════════════════════════════════════════════════════════════════════
   // 운영 커맨드 체크 (status, config, ping)
-  // 운영 커맨드는 스레드 중복 방지 적용하지 않음 (매번 최신 정보 필요)
   // ═══════════════════════════════════════════════════════════════════════════
   const opsCommand = detectOpsCommand(text);
   if (opsCommand) {
     console.log(`🔧 운영 커맨드 감지: ${opsCommand}`);
     markEventAsProcessed(eventForDedup);
+    markAsRateLimited(channel, user, text); // Rate-limit 적용
 
     let response;
     try {
@@ -960,6 +1067,7 @@ async function handleSlackEvent(event, channelInfo = null) {
 
   // 이벤트 처리 시작 표시
   markEventAsProcessed(eventForDedup);
+  markAsRateLimited(channel, user, text); // Rate-limit 적용
 
   // 역할 감지
   const role = detectRole(text);
@@ -1018,11 +1126,15 @@ module.exports = {
   // 역할/커맨드 감지
   detectRole,
   detectOpsCommand,
-  // 중복 방지
+  // 중복 방지 (event_id)
   isDuplicateEvent,
   markEventAsProcessed,
   hasRespondedToThread,
   markThreadAsResponded,
+  // Rate-limit (P1 Hotfix)
+  isRateLimited,
+  markAsRateLimited,
+  isSlackRetry,
   // AI 응답
   generateResponse,
   // Slack API
@@ -1045,5 +1157,6 @@ module.exports = {
   ALLOWED_CHANNELS,
   ROLE_KEYWORDS,
   ROLE_PROMPTS,
-  OPS_COMMANDS
+  OPS_COMMANDS,
+  RATE_LIMIT_TTL
 };

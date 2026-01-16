@@ -574,8 +574,8 @@ app.post("/api/slack/events", async (req, res) => {
       const channelInfo = await slackBotService.getChannelInfo(event.channel);
       console.log(`📍 채널 정보 조회 결과:`, channelInfo ? channelInfo.name : 'null');
 
-      // 이벤트 처리
-      const result = await slackBotService.handleSlackEvent(event, channelInfo);
+      // 이벤트 처리 (headers 전달 - rate-limit/retry 체크용)
+      const result = await slackBotService.handleSlackEvent(event, channelInfo, req.headers);
       console.log('🤖 Slack 이벤트 처리 결과:', JSON.stringify(result));
     } else {
       console.log(`⚠️ 처리하지 않는 이벤트: type=${type}`);
