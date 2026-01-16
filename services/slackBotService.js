@@ -498,14 +498,23 @@ const SERVER_START_TIME = Date.now();
 const OPS_COMMANDS = ['status', 'config', 'ping'];
 
 /**
- * 운영 커맨드 감지
+ * 운영 커맨드 감지 (v3 강화)
+ * - ping: 메시지에 "ping" 포함 시 무조건 ping 커맨드로 처리
+ * - status/config: 시작 또는 정확 매칭
  * @param {string} text - 멘션 텍스트
  * @returns {string|null} - 커맨드명 또는 null
  */
 function detectOpsCommand(text) {
   const cleanText = text.replace(/<@[A-Z0-9]+>/g, '').trim().toLowerCase();
 
+  // v3: ping은 포함 여부로 판단 (ping, pingping, ping ping 등 모두 매칭)
+  if (cleanText.includes('ping')) {
+    return 'ping';
+  }
+
+  // status, config는 시작 매칭
   for (const cmd of OPS_COMMANDS) {
+    if (cmd === 'ping') continue; // ping은 위에서 처리
     if (cleanText === cmd || cleanText.startsWith(cmd + ' ')) {
       return cmd;
     }
