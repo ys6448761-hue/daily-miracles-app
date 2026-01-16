@@ -178,6 +178,150 @@ const ROLE_PROMPTS = {
 const respondedThreads = new Map();
 const THREAD_TTL = 60 * 60 * 1000; // 1시간
 
+// 서버 시작 시간 (uptime 계산용)
+const SERVER_START_TIME = Date.now();
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 운영 커맨드 (status, config, ping)
+// ═══════════════════════════════════════════════════════════════════════════
+
+const OPS_COMMANDS = ['status', 'config', 'ping'];
+
+/**
+ * 운영 커맨드 감지
+ * @param {string} text - 멘션 텍스트
+ * @returns {string|null} - 커맨드명 또는 null
+ */
+function detectOpsCommand(text) {
+  const cleanText = text.replace(/<@[A-Z0-9]+>/g, '').trim().toLowerCase();
+
+  for (const cmd of OPS_COMMANDS) {
+    if (cleanText === cmd || cleanText.startsWith(cmd + ' ')) {
+      return cmd;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * 환경변수 마스킹 (민감값 보호)
+ * @param {string} value - 원본 값
+ * @param {number} showChars - 표시할 앞글자 수
+ * @returns {string} - 마스킹된 값
+ */
+function maskSensitiveValue(value, showChars = 4) {
+  if (!value) return '(not set)';
+  if (value.length <= showChars) return '*'.repeat(value.length);
+  return value.substring(0, showChars) + '*'.repeat(Math.min(8, value.length - showChars));
+}
+
+/**
+ * @Aurora5 status - 시스템 상태 출력
+ */
+async function handleStatusCommand() {
+  const startTime = Date.now();
+
+  // 서비스 상태 체크
+  const services = {
+    notion: process.env.NOTION_API_KEY ? '✅ configured' : '❌ not configured',
+    toss: process.env.TOSS_SECRET_KEY ? '✅ configured' : '❌ not configured',
+    sens: (process.env.SENS_ACCESS_KEY && process.env.SENS_SERVICE_ID) ? '✅ configured' : '❌ not configured',
+    openai: process.env.OPENAI_API_KEY ? '✅ configured' : '❌ not configured',
+    slack: process.env.SLACK_BOT_TOKEN ? '✅ configured' : '❌ not configured',
+    database: process.env.DATABASE_URL ? '✅ configured' : '❌ not configured'
+  };
+
+  // Uptime 계산
+  const uptimeMs = Date.now() - SERVER_START_TIME;
+  const uptimeHours = Math.floor(uptimeMs / (1000 * 60 * 60));
+  const uptimeMinutes = Math.floor((uptimeMs % (1000 * 60 * 60)) / (1000 * 60));
+
+  // 메모리 사용량
+  const memUsage = process.memoryUsage();
+  const memMB = Math.round(memUsage.heapUsed / 1024 / 1024);
+
+  // 응답 시간
+  const responseTime = Date.now() - startTime;
+
+  return `📊 *Aurora5 시스템 상태*
+
+🕐 *Uptime:* ${uptimeHours}h ${uptimeMinutes}m
+💾 *Memory:* ${memMB}MB
+⚡ *Response:* ${responseTime}ms
+
+📡 *서비스 상태:*
+• Notion: ${services.notion}
+• Toss: ${services.toss}
+• SENS: ${services.sens}
+• OpenAI: ${services.openai}
+• Slack: ${services.slack}
+• Database: ${services.database}
+
+🤖 *봇 상태:*
+• 응답 캐시: ${respondedThreads.size}개 스레드
+• 허용 채널: ${ALLOW_ALL_CHANNELS ? '전체 허용 (테스트 모드)' : ALLOWED_CHANNELS.length + '개'}
+
+_${new Date().toLocaleString('ko-KR')}_`;
+}
+
+/**
+ * @Aurora5 config - 설정 출력 (민감값 마스킹)
+ */
+async function handleConfigCommand() {
+  const config = {
+    // 환경
+    NODE_ENV: process.env.NODE_ENV || 'development',
+    PORT: process.env.PORT || '3000',
+
+    // API 키 (마스킹)
+    OPENAI_API_KEY: maskSensitiveValue(process.env.OPENAI_API_KEY, 7),
+    SLACK_BOT_TOKEN: maskSensitiveValue(process.env.SLACK_BOT_TOKEN, 10),
+    SLACK_SIGNING_SECRET: maskSensitiveValue(process.env.SLACK_SIGNING_SECRET, 4),
+    NOTION_API_KEY: maskSensitiveValue(process.env.NOTION_API_KEY, 6),
+    TOSS_SECRET_KEY: maskSensitiveValue(process.env.TOSS_SECRET_KEY, 5),
+
+    // SENS (마스킹)
+    SENS_ACCESS_KEY: maskSensitiveValue(process.env.SENS_ACCESS_KEY, 4),
+    SENS_SERVICE_ID: maskSensitiveValue(process.env.SENS_SERVICE_ID, 5),
+
+    // 채널 설정
+    ALLOW_ALL_CHANNELS: ALLOW_ALL_CHANNELS ? 'true' : 'false',
+    ALLOWED_CHANNELS: ALLOWED_CHANNELS.join(', ')
+  };
+
+  let output = `⚙️ *Aurora5 설정 정보*\n\n`;
+  output += `🌍 *환경:*\n`;
+  output += `• NODE_ENV: \`${config.NODE_ENV}\`\n`;
+  output += `• PORT: \`${config.PORT}\`\n\n`;
+
+  output += `🔑 *API 키 (마스킹):*\n`;
+  output += `• OPENAI: \`${config.OPENAI_API_KEY}\`\n`;
+  output += `• SLACK_TOKEN: \`${config.SLACK_BOT_TOKEN}\`\n`;
+  output += `• SLACK_SECRET: \`${config.SLACK_SIGNING_SECRET}\`\n`;
+  output += `• NOTION: \`${config.NOTION_API_KEY}\`\n`;
+  output += `• TOSS: \`${config.TOSS_SECRET_KEY}\`\n`;
+  output += `• SENS_KEY: \`${config.SENS_ACCESS_KEY}\`\n`;
+  output += `• SENS_ID: \`${config.SENS_SERVICE_ID}\`\n\n`;
+
+  output += `📢 *채널 설정:*\n`;
+  output += `• 전체 허용: \`${config.ALLOW_ALL_CHANNELS}\`\n`;
+  output += `• 허용 목록: \`${config.ALLOWED_CHANNELS}\`\n\n`;
+
+  output += `_⚠️ 민감값은 마스킹되어 표시됩니다_`;
+
+  return output;
+}
+
+/**
+ * @Aurora5 ping - pong + 응답시간
+ */
+async function handlePingCommand(startTime) {
+  const responseTime = Date.now() - startTime;
+
+  return `🏓 pong! (${responseTime}ms)`;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Slack 서명 검증
 // ═══════════════════════════════════════════════════════════════════════════
@@ -450,6 +594,7 @@ async function getTeamContext() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 async function handleSlackEvent(event, channelInfo = null) {
+  const eventStartTime = Date.now();
   console.log('🔔 Slack 이벤트 수신:', JSON.stringify(event, null, 2));
 
   const { type, channel, user, text, ts, thread_ts } = event;
@@ -473,6 +618,45 @@ async function handleSlackEvent(event, channelInfo = null) {
 
   // 스레드 기준 (thread_ts가 없으면 ts 사용)
   const threadTs = thread_ts || ts;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 운영 커맨드 체크 (status, config, ping)
+  // 운영 커맨드는 중복 방지 적용하지 않음 (매번 최신 정보 필요)
+  // ═══════════════════════════════════════════════════════════════════════════
+  const opsCommand = detectOpsCommand(text);
+  if (opsCommand) {
+    console.log(`🔧 운영 커맨드 감지: ${opsCommand}`);
+
+    let response;
+    try {
+      switch (opsCommand) {
+        case 'status':
+          response = await handleStatusCommand();
+          break;
+        case 'config':
+          response = await handleConfigCommand();
+          break;
+        case 'ping':
+          response = await handlePingCommand(eventStartTime);
+          break;
+        default:
+          response = `❓ 알 수 없는 커맨드: ${opsCommand}`;
+      }
+
+      await postSlackMessage(channel, response, threadTs);
+      console.log(`✅ 운영 커맨드 응답 완료: ${opsCommand}`);
+      return { handled: true, command: opsCommand, threadTs };
+
+    } catch (error) {
+      console.error(`❌ 운영 커맨드 오류 (${opsCommand}):`, error);
+      await postSlackMessage(channel, `❌ 커맨드 실행 오류: ${error.message}`, threadTs);
+      return { handled: false, reason: 'command_error', error: error.message };
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 일반 AI 응답 (중복 방지 적용)
+  // ═══════════════════════════════════════════════════════════════════════════
 
   // 중복 응답 방지
   if (hasRespondedToThread(threadTs, channel)) {
@@ -513,13 +697,19 @@ module.exports = {
   handleSlackEvent,
   isAllowedChannel,
   detectRole,
+  detectOpsCommand,
   hasRespondedToThread,
   markThreadAsResponded,
   generateResponse,
   postSlackMessage,
   getChannelInfo,
   getTeamContext,
+  handleStatusCommand,
+  handleConfigCommand,
+  handlePingCommand,
+  maskSensitiveValue,
   ALLOWED_CHANNELS,
   ROLE_KEYWORDS,
-  ROLE_PROMPTS
+  ROLE_PROMPTS,
+  OPS_COMMANDS
 };
