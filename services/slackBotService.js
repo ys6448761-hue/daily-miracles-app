@@ -336,13 +336,26 @@ function isDuplicateMessageTs(messageTs) {
 
 /**
  * Rate-limit 체크 + 즉시 마킹 (원자적 처리)
- * v2: 체크와 마킹을 동시에 수행하여 동시 요청 방지
+ * v3: command 기반 키 (ping/status/config는 변형 무관하게 동일 키)
+ * @param {string} channel - 채널 ID
+ * @param {string} user - 사용자 ID
+ * @param {string} text - 메시지 텍스트
+ * @param {string|null} command - 감지된 커맨드 (ping/status/config) - v3 추가
  * @returns {boolean} - rate-limited면 true
  */
-function checkAndMarkRateLimit(channel, user, text) {
-  const normalized = normalizeText(text);
-  const textHash = simpleHash(normalized);
-  const key = `${channel}:${user}:${textHash}`;
+function checkAndMarkRateLimit(channel, user, text, command = null) {
+  // v3: command가 있으면 command 기반 키, 없으면 text hash 기반
+  let key;
+  if (command) {
+    // ping/status/config 등 운영 커맨드는 변형 무관하게 동일 키
+    key = `${channel}:${user}:cmd:${command}`;
+  } else {
+    // 일반 메시지는 text hash 기반
+    const normalized = normalizeText(text);
+    const textHash = simpleHash(normalized);
+    key = `${channel}:${user}:${textHash}`;
+  }
+
   const now = Date.now();
 
   // 이미 캐시에 있고 TTL 내라면 rate-limited
@@ -1016,10 +1029,15 @@ async function handleSlackEvent(event, channelInfo = null, headers = {}) {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // P1 Hotfix v2: 2차 방어선 - Rate-limit (원자적 check-and-mark, 10초 TTL)
-  // 동일 user+channel+text_hash는 10초 내 1회만 처리
+  // v3: 운영 커맨드 먼저 감지 (rate-limit 키 결정용)
   // ═══════════════════════════════════════════════════════════════════════════
-  if (checkAndMarkRateLimit(channel, user, text)) {
+  const opsCommand = detectOpsCommand(text);
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // P1 Hotfix v3: 2차 방어선 - Rate-limit (command 기반 키, 10초 TTL)
+  // ping/status/config는 텍스트 변형 무관하게 동일 키로 처리
+  // ═══════════════════════════════════════════════════════════════════════════
+  if (checkAndMarkRateLimit(channel, user, text, opsCommand)) {
     return { handled: false, reason: 'rate_limited' };
   }
 
@@ -1027,9 +1045,8 @@ async function handleSlackEvent(event, channelInfo = null, headers = {}) {
   const threadTs = thread_ts || ts;
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // 운영 커맨드 체크 (status, config, ping)
+  // 운영 커맨드 처리 (status, config, ping)
   // ═══════════════════════════════════════════════════════════════════════════
-  const opsCommand = detectOpsCommand(text);
   if (opsCommand) {
     console.log(`🔧 운영 커맨드 감지: ${opsCommand}`);
     markEventAsProcessed(eventForDedup);
