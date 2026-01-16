@@ -271,11 +271,13 @@ function markEventAsProcessed(event) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// P1 Hotfix: Rate-limit (연타 방지, 5초 TTL)
-// 키: channel_id + user_id + normalized_text_hash
+// P1 Hotfix v2: Rate-limit (연타 방지, 10초 TTL) + message_ts 중복 체크
+// 핵심: check-and-mark를 원자적으로 처리
 // ═══════════════════════════════════════════════════════════════════════════
 const rateLimitCache = new Map();
-const RATE_LIMIT_TTL = 5 * 1000; // 5초
+const messageTsCache = new Map();  // message_ts 기반 중복 체크
+const RATE_LIMIT_TTL = 10 * 1000;  // v2: 5초 → 10초로 증가
+const MESSAGE_TS_TTL = 60 * 1000;  // message_ts는 60초
 
 /**
  * 텍스트 정규화 (멘션 제거 + 소문자 + 공백 정리)
@@ -303,50 +305,97 @@ function simpleHash(str) {
 }
 
 /**
- * Rate-limit 체크 (연타 방지)
- * @param {string} channel - 채널 ID
- * @param {string} user - 사용자 ID
- * @param {string} text - 메시지 텍스트
- * @returns {boolean} - rate-limited면 true
+ * message_ts 기반 중복 체크 (1차 방어선)
+ * Slack 메시지의 고유 timestamp로 동일 메시지 재처리 방지
  */
-function isRateLimited(channel, user, text) {
-  const normalized = normalizeText(text);
-  const textHash = simpleHash(normalized);
-  const key = `${channel}:${user}:${textHash}`;
+function isDuplicateMessageTs(messageTs) {
+  if (!messageTs) return false;
 
   const now = Date.now();
 
-  if (rateLimitCache.has(key)) {
-    const cached = rateLimitCache.get(key);
-    if (now - cached.timestamp < RATE_LIMIT_TTL) {
-      console.log(`⚠️ rate_limited: ${key} (${now - cached.timestamp}ms ago)`);
-      return true;
+  // 이미 처리된 message_ts인지 확인
+  if (messageTsCache.has(messageTs)) {
+    console.log(`⚠️ duplicate_message_ts: ${messageTs}`);
+    return true;
+  }
+
+  // 캐시에 추가 (즉시 마킹)
+  messageTsCache.set(messageTs, now);
+
+  // 오래된 항목 정리
+  if (messageTsCache.size > 500) {
+    for (const [ts, timestamp] of messageTsCache.entries()) {
+      if (now - timestamp > MESSAGE_TS_TTL) {
+        messageTsCache.delete(ts);
+      }
     }
-    rateLimitCache.delete(key);
   }
 
   return false;
 }
 
 /**
- * Rate-limit 캐시에 추가
+ * Rate-limit 체크 + 즉시 마킹 (원자적 처리)
+ * v2: 체크와 마킹을 동시에 수행하여 동시 요청 방지
+ * @returns {boolean} - rate-limited면 true
  */
-function markAsRateLimited(channel, user, text) {
+function checkAndMarkRateLimit(channel, user, text) {
   const normalized = normalizeText(text);
   const textHash = simpleHash(normalized);
   const key = `${channel}:${user}:${textHash}`;
+  const now = Date.now();
 
-  rateLimitCache.set(key, { timestamp: Date.now() });
+  // 이미 캐시에 있고 TTL 내라면 rate-limited
+  if (rateLimitCache.has(key)) {
+    const cached = rateLimitCache.get(key);
+    if (now - cached.timestamp < RATE_LIMIT_TTL) {
+      console.log(`⚠️ rate_limited: ${key} (${now - cached.timestamp}ms ago)`);
+      return true;
+    }
+  }
+
+  // 통과 → 즉시 마킹 (다음 요청은 rate-limited)
+  rateLimitCache.set(key, { timestamp: now });
+  console.log(`✅ rate_limit_marked: ${key}`);
 
   // 오래된 항목 정리 (300개 초과 시)
   if (rateLimitCache.size > 300) {
-    const now = Date.now();
     for (const [k, v] of rateLimitCache.entries()) {
       if (now - v.timestamp > RATE_LIMIT_TTL) {
         rateLimitCache.delete(k);
       }
     }
   }
+
+  return false;
+}
+
+/**
+ * [DEPRECATED] 개별 체크 함수 - 하위 호환성 유지
+ */
+function isRateLimited(channel, user, text) {
+  const normalized = normalizeText(text);
+  const textHash = simpleHash(normalized);
+  const key = `${channel}:${user}:${textHash}`;
+  const now = Date.now();
+
+  if (rateLimitCache.has(key)) {
+    const cached = rateLimitCache.get(key);
+    if (now - cached.timestamp < RATE_LIMIT_TTL) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * [DEPRECATED] 개별 마킹 함수 - 하위 호환성 유지
+ */
+function markAsRateLimited(channel, user, text) {
+  const normalized = normalizeText(text);
+  const textHash = simpleHash(normalized);
+  const key = `${channel}:${user}:${textHash}`;
+  rateLimitCache.set(key, { timestamp: Date.now() });
 }
 
 /**
@@ -933,6 +982,14 @@ async function handleSlackEvent(event, channelInfo = null, headers = {}) {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // P1 Hotfix v2: 1차 방어선 - message_ts 중복 체크 (즉시 마킹)
+  // Slack 메시지 고유 ID로 동일 이벤트 재처리 완전 차단
+  // ═══════════════════════════════════════════════════════════════════════════
+  if (isDuplicateMessageTs(ts)) {
+    return { handled: false, reason: 'duplicate_message_ts' };
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // P1 Hotfix: X-Slack-Retry-Num 헤더 체크 (Slack 재전송 무시)
   // ═══════════════════════════════════════════════════════════════════════════
   if (isSlackRetry(headers)) {
@@ -959,9 +1016,10 @@ async function handleSlackEvent(event, channelInfo = null, headers = {}) {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // P1 Hotfix: Rate-limit 체크 (연타 방지, 5초 TTL)
+  // P1 Hotfix v2: 2차 방어선 - Rate-limit (원자적 check-and-mark, 10초 TTL)
+  // 동일 user+channel+text_hash는 10초 내 1회만 처리
   // ═══════════════════════════════════════════════════════════════════════════
-  if (isRateLimited(channel, user, text)) {
+  if (checkAndMarkRateLimit(channel, user, text)) {
     return { handled: false, reason: 'rate_limited' };
   }
 
@@ -975,7 +1033,7 @@ async function handleSlackEvent(event, channelInfo = null, headers = {}) {
   if (opsCommand) {
     console.log(`🔧 운영 커맨드 감지: ${opsCommand}`);
     markEventAsProcessed(eventForDedup);
-    markAsRateLimited(channel, user, text); // Rate-limit 적용
+    // v2: markAsRateLimited 제거 - checkAndMarkRateLimit에서 이미 처리됨
 
     let response;
     try {
@@ -1067,7 +1125,7 @@ async function handleSlackEvent(event, channelInfo = null, headers = {}) {
 
   // 이벤트 처리 시작 표시
   markEventAsProcessed(eventForDedup);
-  markAsRateLimited(channel, user, text); // Rate-limit 적용
+  // v2: markAsRateLimited 제거 - checkAndMarkRateLimit에서 이미 처리됨
 
   // 역할 감지
   const role = detectRole(text);
@@ -1131,9 +1189,11 @@ module.exports = {
   markEventAsProcessed,
   hasRespondedToThread,
   markThreadAsResponded,
-  // Rate-limit (P1 Hotfix)
-  isRateLimited,
-  markAsRateLimited,
+  // Rate-limit (P1 Hotfix v2)
+  checkAndMarkRateLimit,  // v2: 원자적 check-and-mark
+  isDuplicateMessageTs,   // v2: message_ts 중복 체크
+  isRateLimited,          // deprecated: 하위 호환
+  markAsRateLimited,      // deprecated: 하위 호환
   isSlackRetry,
   // AI 응답
   generateResponse,
