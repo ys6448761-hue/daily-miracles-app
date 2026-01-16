@@ -20,47 +20,70 @@
 
 const crypto = require('crypto');
 
+// Decision Service (Task 5)
+let decisionService = null;
+try {
+  decisionService = require('./decisionService');
+} catch (e) {
+  console.warn('[SlackBot] decisionService 로드 실패:', e.message);
+}
+
+// Judge Service (Task 6-7)
+let judgeService = null;
+try {
+  judgeService = require('./judgeService');
+} catch (e) {
+  console.warn('[SlackBot] judgeService 로드 실패:', e.message);
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // 상수 정의
 // ═══════════════════════════════════════════════════════════════════════════
 
-// 허용된 채널 (채널명 또는 ID)
+// 허용된 채널 ID (운영 잠금 - 2026-01-16)
+const ALLOWED_CHANNEL_IDS = [
+  'C0A8CRE7MQF',  // #aurora5-hq
+  'C0A8CRLJW6B',  // #aurora5-dev
+  'C0A8CRP3K5M',  // #aurora5-ops
+];
+
+// 채널명 패턴 매칭 (백업용)
 const ALLOWED_CHANNELS = [
-  // 채널 ID (실제 운영 채널)
-  'C0A8CRE7MQF',  // 테스트 채널 (2026-01-16 추가)
-  // 채널명 패턴 매칭
+  ...ALLOWED_CHANNEL_IDS,
   'aurora5-hq',
   'aurora5-dev',
   'aurora5-ops',
-  'aurora5',
-  'hq',
 ];
 
-// 채널 제한 비활성화 (테스트 기간 동안 모든 채널 허용)
-// TODO: 정식 운영 시 false로 변경하고 채널 ID만 허용
-const ALLOW_ALL_CHANNELS = true;
+// 채널 제한 활성화 (운영 모드)
+const ALLOW_ALL_CHANNELS = false;
 
-// 역할 키워드 매핑
+// 역할 키워드 매핑 (우선순위 순서로 정렬)
 const ROLE_KEYWORDS = {
-  '코미': 'comi',
-  'comi': 'comi',
-  'COO': 'comi',
+  // 코미 (KOMI) - 기본값
+  '코미': 'komi',
+  'comi': 'komi',
+  'COO': 'komi',
+  // 루미 (LUMI)
   '루미': 'lumi',
   'lumi': 'lumi',
   '분석': 'lumi',
   '데이터': 'lumi',
+  // 재미 (JAEMI)
   '재미': 'jaemi',
   'jaemi': 'jaemi',
   'CRO': 'jaemi',
-  '여의보주': 'yeoiboju',
-  '보주': 'yeoiboju',
-  '검수': 'yeoiboju',
-  '품질': 'yeoiboju'
+  // 여의보주 (JU) - "주" 단독도 매칭
+  '여의보주': 'ju',
+  '보주': 'ju',
+  '주': 'ju',
+  '검수': 'ju',
+  '품질': 'ju'
 };
 
-// 역할별 시스템 프롬프트
+// 역할별 시스템 프롬프트 (표준 포맷)
 const ROLE_PROMPTS = {
-  comi: `당신은 Aurora5 팀의 COO "코미"입니다.
+  komi: `당신은 Aurora5 팀의 COO "코미"입니다.
 
 역할:
 - 팀 일정/우선순위 조율
@@ -73,16 +96,19 @@ const ROLE_PROMPTS = {
 3. P0/P1/P2 우선순위 판단
 4. DEC가 필요하면 푸르미르님 태그 제안
 
-응답 포맷:
+응답 포맷 (KOMI 표준):
 📋 [요청 정리]
 • 목적: {한 줄 요약}
 • 결과물: {구체적 산출물}
 • 영향도: {🔴P0/🟡P1/🟢P2}
+
+👥 [추천 담당]
 • 담당: {팀원}
 • 기한: {YYYY-MM-DD}
 • 검증: {완료 조건}
 
-📌 다음 액션: {누가 무엇을}`,
+📌 [다음 액션]
+{누가 무엇을 언제까지}`,
 
   lumi: `당신은 Aurora5 팀의 데이터 분석가 "루미"입니다.
 
@@ -98,15 +124,22 @@ const ROLE_PROMPTS = {
 3. 필요한 이벤트/필드 명시
 4. 구현은 Claude Code 담당 표기
 
-응답 포맷:
-📊 [분석 요청 정리]
-• 측정 목표: {무엇을 알고 싶은지}
-• 필요 데이터: {이벤트/필드}
-• 임계값: {정상/경고/위험 기준}
-• 시각화: {차트 유형}
+응답 포맷 (LUMI 표준):
+🔍 [진단]
+• 현재 상태: {데이터 기반 현황}
+• 문제점: {발견된 이슈}
 
-🔧 구현 담당: Claude Code
-📅 기한 제안: {날짜}`,
+📊 [지표]
+• 핵심 KPI: {측정 항목}
+• 목표치: {숫자}
+• 임계값: {정상/경고/위험}
+
+💡 [가설]
+• {데이터 기반 추론}
+
+🧪 [다음 실험]
+• {검증할 내용}
+• 구현 담당: Claude Code`,
 
   jaemi: `당신은 Aurora5 팀의 CRO "재미"입니다.
 
@@ -122,39 +155,47 @@ const ROLE_PROMPTS = {
 3. 창의적 대안 2-3개 제시
 4. 브랜드 톤앤매너 유지
 
-응답 포맷:
-💡 [아이디어 정리]
+응답 포맷 (JAEMI 표준):
+💡 [아이디어]
 • 소원이 니즈: {핵심 욕구}
-• 제안 A: {옵션 1}
-• 제안 B: {옵션 2}
-• 추천: {A/B 중 선택 + 이유}
+• 핵심 메시지: {한 줄}
 
-🎨 다음 단계: {구체적 액션}`,
+✍️ [카피 제안]
+• A안: {옵션 1}
+• B안: {옵션 2}
+• 추천: {선택 + 이유}
 
-  yeoiboju: `당신은 Aurora5 팀의 품질 검수 담당 "여의보주"입니다.
+📐 [형식]
+• 포맷: {이미지/텍스트/영상}
+• 톤: {따뜻한/유쾌한/진지한}
+
+🚫 [금지선]
+• {브랜드에 맞지 않는 표현}`,
+
+  ju: `당신은 Aurora5 팀의 품질 검수 담당 "여의보주"(주)입니다.
 
 역할:
 - 콘텐츠 품질 검토
 - 메시지 톤/철학 검수
 - 소원이 관점 감성 체크
 - 브랜드 일관성 확인
+- 짧은 영감 제공
 
 응답 규칙:
 1. "소원이가 이걸 받으면 어떤 기분일까?" 관점
-2. 수정이 필요하면 구체적 제안
-3. OK면 승인 + 이유
-4. 브랜드 가치(기적, 희망, 따뜻함) 기준
+2. 간결하고 영감을 주는 답변
+3. 브랜드 가치(기적, 희망, 따뜻함) 기준
+4. 불필요한 말 없이 핵심만
 
-응답 포맷:
-🔍 [품질 검토]
-• 검토 항목: {무엇을 봤는지}
-• 판정: ✅ 승인 / ⚠️ 수정 필요 / ❌ 재작업
-• 피드백: {구체적 의견}
-• 수정 제안: {있다면}
+응답 포맷 (JU 표준):
+✨ [영감]
+{짧은 영감 한 줄}
 
-📝 최종 의견: {한 줄}`,
+🎯 [행동]
+{지금 당장 할 수 있는 한 가지}`,
 
-  default: `당신은 Aurora5 팀의 AI 어시스턴트입니다.
+  // 기본값 = KOMI
+  default: `당신은 Aurora5 팀의 COO "코미"입니다.
 
 역할:
 - 팀 요청 정리 및 분류
@@ -163,20 +204,134 @@ const ROLE_PROMPTS = {
 
 응답 규칙:
 1. 요청 내용을 명확히 정리
-2. 담당자 제안 (코미/루미/재미/여의보주/Claude Code)
+2. 담당자 제안 (코미/루미/재미/주/Claude Code)
 3. 우선순위 판단 (P0/P1/P2)
 
-응답 포맷:
+응답 포맷 (KOMI 표준):
 📋 [요청 정리]
-• 요청 내용: {요약}
-• 추천 담당: {팀원}
-• 우선순위: {P0/P1/P2}
-• 다음 액션: {제안}`
+• 목적: {한 줄 요약}
+• 결과물: {구체적 산출물}
+• 영향도: {🔴P0/🟡P1/🟢P2}
+
+👥 [추천 담당]
+• 담당: {팀원}
+• 기한: {YYYY-MM-DD}
+
+📌 [다음 액션]
+{누가 무엇을}`
 };
 
 // 응답 완료된 스레드 추적 (메모리 캐시, 1시간 TTL)
 const respondedThreads = new Map();
 const THREAD_TTL = 60 * 60 * 1000; // 1시간
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Task 1: event_id 중복 방지 (10분 TTL)
+// ═══════════════════════════════════════════════════════════════════════════
+const processedEvents = new Map();
+const EVENT_TTL = 10 * 60 * 1000; // 10분
+
+/**
+ * 이벤트 중복 체크 (event_id 또는 channel+event_ts 조합)
+ * @param {Object} event - Slack 이벤트
+ * @returns {boolean} - 이미 처리된 이벤트면 true
+ */
+function isDuplicateEvent(event) {
+  // event_id가 있으면 우선 사용, 없으면 channel+ts 조합
+  const eventKey = event.event_id || `${event.channel}:${event.event_ts || event.ts}`;
+
+  if (processedEvents.has(eventKey)) {
+    const processed = processedEvents.get(eventKey);
+    if (Date.now() - processed.timestamp < EVENT_TTL) {
+      console.log(`⚠️ duplicate_event_ignored: ${eventKey}`);
+      return true;
+    }
+    processedEvents.delete(eventKey);
+  }
+
+  return false;
+}
+
+/**
+ * 이벤트 처리 완료 표시
+ */
+function markEventAsProcessed(event) {
+  const eventKey = event.event_id || `${event.channel}:${event.event_ts || event.ts}`;
+  processedEvents.set(eventKey, { timestamp: Date.now() });
+
+  // 오래된 항목 정리 (500개 초과 시)
+  if (processedEvents.size > 500) {
+    const now = Date.now();
+    for (const [k, v] of processedEvents.entries()) {
+      if (now - v.timestamp > EVENT_TTL) {
+        processedEvents.delete(k);
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Task 4: 이벤트 통계 (최근 1시간)
+// ═══════════════════════════════════════════════════════════════════════════
+const eventStats = {
+  total: 0,
+  success: 0,
+  failed: 0,
+  responseTimes: [],
+  lastEvent: null,
+  hourlyEvents: [] // 최근 1시간 이벤트 타임스탬프
+};
+
+/**
+ * 이벤트 통계 기록
+ */
+function recordEventStat(success, responseTime) {
+  const now = Date.now();
+  eventStats.total++;
+  if (success) eventStats.success++;
+  else eventStats.failed++;
+
+  eventStats.responseTimes.push(responseTime);
+  eventStats.lastEvent = now;
+  eventStats.hourlyEvents.push(now);
+
+  // 1시간 이상 된 데이터 정리
+  const oneHourAgo = now - 60 * 60 * 1000;
+  eventStats.hourlyEvents = eventStats.hourlyEvents.filter(t => t > oneHourAgo);
+
+  // 응답시간 최근 100개만 유지
+  if (eventStats.responseTimes.length > 100) {
+    eventStats.responseTimes = eventStats.responseTimes.slice(-100);
+  }
+}
+
+/**
+ * 이벤트 통계 조회
+ */
+function getEventStats() {
+  const now = Date.now();
+  const oneHourAgo = now - 60 * 60 * 1000;
+  const hourlyCount = eventStats.hourlyEvents.filter(t => t > oneHourAgo).length;
+
+  const avgResponseTime = eventStats.responseTimes.length > 0
+    ? Math.round(eventStats.responseTimes.reduce((a, b) => a + b, 0) / eventStats.responseTimes.length)
+    : 0;
+
+  const successRate = eventStats.total > 0
+    ? Math.round((eventStats.success / eventStats.total) * 100)
+    : 100;
+
+  const lastEventAgo = eventStats.lastEvent
+    ? Math.round((now - eventStats.lastEvent) / 1000)
+    : null;
+
+  return {
+    hourlyCount,
+    successRate,
+    avgResponseTime,
+    lastEventAgo
+  };
+}
 
 // 서버 시작 시간 (uptime 계산용)
 const SERVER_START_TIME = Date.now();
@@ -217,19 +372,19 @@ function maskSensitiveValue(value, showChars = 4) {
 }
 
 /**
- * @Aurora5 status - 시스템 상태 출력
+ * @Aurora5 status - 시스템 상태 출력 (이벤트 통계 포함)
  */
 async function handleStatusCommand() {
   const startTime = Date.now();
 
   // 서비스 상태 체크
   const services = {
-    notion: process.env.NOTION_API_KEY ? '✅ configured' : '❌ not configured',
-    toss: process.env.TOSS_SECRET_KEY ? '✅ configured' : '❌ not configured',
-    sens: (process.env.SENS_ACCESS_KEY && process.env.SENS_SERVICE_ID) ? '✅ configured' : '❌ not configured',
-    openai: process.env.OPENAI_API_KEY ? '✅ configured' : '❌ not configured',
-    slack: process.env.SLACK_BOT_TOKEN ? '✅ configured' : '❌ not configured',
-    database: process.env.DATABASE_URL ? '✅ configured' : '❌ not configured'
+    notion: process.env.NOTION_API_KEY ? '✅' : '❌',
+    toss: process.env.TOSS_SECRET_KEY ? '✅' : '❌',
+    sens: (process.env.SENS_ACCESS_KEY && process.env.SENS_SERVICE_ID) ? '✅' : '❌',
+    openai: process.env.OPENAI_API_KEY ? '✅' : '❌',
+    slack: process.env.SLACK_BOT_TOKEN ? '✅' : '❌',
+    database: process.env.DATABASE_URL ? '✅' : '❌'
   };
 
   // Uptime 계산
@@ -241,27 +396,45 @@ async function handleStatusCommand() {
   const memUsage = process.memoryUsage();
   const memMB = Math.round(memUsage.heapUsed / 1024 / 1024);
 
+  // 이벤트 통계
+  const stats = getEventStats();
+  const lastEventStr = stats.lastEventAgo !== null
+    ? `${stats.lastEventAgo}초 전`
+    : '없음';
+
+  // 품질 통계 (Judge)
+  let qualityStr = '';
+  if (judgeService && judgeService.getQualityStats) {
+    const qStats = judgeService.getQualityStats();
+    qualityStr = `\n🎯 *품질 (Judge):*
+• Pass율: ${qStats.passRate}
+• 승급률: ${qStats.upgradeRate}
+• Fail Top3: ${qStats.failTop3.join(', ')}`;
+  }
+
   // 응답 시간
   const responseTime = Date.now() - startTime;
 
   return `📊 *Aurora5 시스템 상태*
 
-🕐 *Uptime:* ${uptimeHours}h ${uptimeMinutes}m
-💾 *Memory:* ${memMB}MB
-⚡ *Response:* ${responseTime}ms
+🕐 *Uptime:* ${uptimeHours}h ${uptimeMinutes}m | 💾 *Mem:* ${memMB}MB
 
-📡 *서비스 상태:*
-• Notion: ${services.notion}
-• Toss: ${services.toss}
-• SENS: ${services.sens}
-• OpenAI: ${services.openai}
-• Slack: ${services.slack}
-• Database: ${services.database}
+📈 *최근 1시간 이벤트:*
+• 이벤트 수: ${stats.hourlyCount}회
+• 성공률: ${stats.successRate}%
+• 평균 응답: ${stats.avgResponseTime}ms
+• 마지막: ${lastEventStr}
+${qualityStr}
 
-🤖 *봇 상태:*
-• 응답 캐시: ${respondedThreads.size}개 스레드
-• 허용 채널: ${ALLOW_ALL_CHANNELS ? '전체 허용 (테스트 모드)' : ALLOWED_CHANNELS.length + '개'}
+📡 *서비스:* Notion${services.notion} Toss${services.toss} SENS${services.sens} OpenAI${services.openai} Slack${services.slack} DB${services.database}
 
+🤖 *봇:*
+• 스레드 캐시: ${respondedThreads.size}개
+• 이벤트 캐시: ${processedEvents.size}개
+• 채널: ${ALLOW_ALL_CHANNELS ? '전체 허용' : ALLOWED_CHANNEL_IDS.length + '개 채널'}
+• 버전: 2.1 (Judge 캐스케이드)
+
+⚡ *응답시간:* ${responseTime}ms
 _${new Date().toLocaleString('ko-KR')}_`;
 }
 
@@ -467,7 +640,7 @@ function markThreadAsResponded(threadTs, channelId) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// OpenAI API 호출
+// OpenAI API 호출 (Judge 캐스케이드 통합)
 // ═══════════════════════════════════════════════════════════════════════════
 
 async function generateResponse(role, userMessage, context = '') {
@@ -478,6 +651,13 @@ async function generateResponse(role, userMessage, context = '') {
 
   const systemPrompt = ROLE_PROMPTS[role] || ROLE_PROMPTS.default;
 
+  // Task 6: Judge 캐스케이드 사용 (judgeService가 있으면)
+  if (judgeService && judgeService.generateWithCascade) {
+    console.log(`🔄 [Cascade] ${role} 모드 - Judge 캐스케이드 활성화`);
+    return await judgeService.generateWithCascade(role, userMessage, systemPrompt, context);
+  }
+
+  // Fallback: 기존 방식
   const messages = [
     { role: 'system', content: systemPrompt },
   ];
@@ -550,6 +730,60 @@ async function postSlackMessage(channel, text, threadTs = null) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Task 3: 스레드 컨텍스트 (conversations.replies)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * 스레드 메시지 조회 (최근 10개, 2000자 제한)
+ * @param {string} channel - 채널 ID
+ * @param {string} threadTs - 스레드 타임스탬프
+ * @returns {string} - 요약된 컨텍스트
+ */
+async function getThreadContext(channel, threadTs) {
+  const token = process.env.SLACK_BOT_TOKEN;
+  if (!token || !threadTs) return '';
+
+  try {
+    const response = await fetch(
+      `https://slack.com/api/conversations.replies?channel=${channel}&ts=${threadTs}&limit=10`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+
+    const data = await response.json();
+    if (!data.ok || !data.messages || data.messages.length <= 1) {
+      return '';
+    }
+
+    // 최근 메시지들 (현재 메시지 제외하고 역순으로)
+    const messages = data.messages.slice(0, -1); // 마지막(현재) 메시지 제외
+
+    // 컨텍스트 구성 (2000자 제한)
+    let context = '';
+    for (const msg of messages) {
+      const cleanText = msg.text?.replace(/<@[A-Z0-9]+>/g, '@user').substring(0, 300) || '';
+      const line = `- ${cleanText}\n`;
+
+      if ((context + line).length > 2000) break;
+      context += line;
+    }
+
+    // 로그에는 길이만 (원문 X)
+    if (context) {
+      console.log(`📜 스레드 컨텍스트 로드: ${messages.length}개 메시지, ${context.length}자`);
+    }
+
+    return context;
+  } catch (error) {
+    console.error('스레드 컨텍스트 조회 실패:', error.message);
+    return '';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // 채널 정보 조회
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -597,7 +831,7 @@ async function handleSlackEvent(event, channelInfo = null) {
   const eventStartTime = Date.now();
   console.log('🔔 Slack 이벤트 수신:', JSON.stringify(event, null, 2));
 
-  const { type, channel, user, text, ts, thread_ts } = event;
+  const { type, channel, user, text, ts, thread_ts, event_id, event_ts } = event;
 
   // app_mention 이벤트만 처리
   if (type !== 'app_mention') {
@@ -605,7 +839,15 @@ async function handleSlackEvent(event, channelInfo = null) {
     return { handled: false, reason: 'not_app_mention' };
   }
 
-  console.log(`📨 멘션 감지: channel=${channel}, user=${user}, text="${text}"`);
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Task 1: event_id 중복 방지 (10분 TTL)
+  // ═══════════════════════════════════════════════════════════════════════════
+  const eventForDedup = { event_id, channel, event_ts: event_ts || ts };
+  if (isDuplicateEvent(eventForDedup)) {
+    return { handled: false, reason: 'duplicate_event' };
+  }
+
+  console.log(`📨 멘션 감지: channel=${channel}, user=${user}, text="${text?.substring(0, 50)}..."`);
 
   // 채널 허용 여부 확인
   const channelName = channelInfo?.name || '';
@@ -621,11 +863,12 @@ async function handleSlackEvent(event, channelInfo = null) {
 
   // ═══════════════════════════════════════════════════════════════════════════
   // 운영 커맨드 체크 (status, config, ping)
-  // 운영 커맨드는 중복 방지 적용하지 않음 (매번 최신 정보 필요)
+  // 운영 커맨드는 스레드 중복 방지 적용하지 않음 (매번 최신 정보 필요)
   // ═══════════════════════════════════════════════════════════════════════════
   const opsCommand = detectOpsCommand(text);
   if (opsCommand) {
     console.log(`🔧 운영 커맨드 감지: ${opsCommand}`);
+    markEventAsProcessed(eventForDedup);
 
     let response;
     try {
@@ -644,13 +887,64 @@ async function handleSlackEvent(event, channelInfo = null) {
       }
 
       await postSlackMessage(channel, response, threadTs);
-      console.log(`✅ 운영 커맨드 응답 완료: ${opsCommand}`);
+      const responseTime = Date.now() - eventStartTime;
+      recordEventStat(true, responseTime);
+      console.log(`✅ 운영 커맨드 응답 완료: ${opsCommand} (${responseTime}ms)`);
       return { handled: true, command: opsCommand, threadTs };
 
     } catch (error) {
       console.error(`❌ 운영 커맨드 오류 (${opsCommand}):`, error);
+      recordEventStat(false, Date.now() - eventStartTime);
       await postSlackMessage(channel, `❌ 커맨드 실행 오류: ${error.message}`, threadTs);
       return { handled: false, reason: 'command_error', error: error.message };
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Task 5: 결정문 트리거 처리
+  // ═══════════════════════════════════════════════════════════════════════════
+  if (decisionService) {
+    // "✅ Final:" 감지 → 결정문 확정
+    if (decisionService.isFinalTrigger(text)) {
+      console.log(`📜 Final 트리거 감지`);
+      markEventAsProcessed(eventForDedup);
+
+      const finalMessage = decisionService.extractFinalMessage(text);
+      const latestDraftId = await decisionService.getLatestDraftId();
+
+      if (latestDraftId) {
+        const result = await decisionService.finalizeDecision(latestDraftId, finalMessage);
+        const responseTime = Date.now() - eventStartTime;
+        recordEventStat(result.success, responseTime);
+
+        await postSlackMessage(channel, result.message, threadTs);
+        return { handled: true, action: 'decision_finalize', decisionId: latestDraftId, threadTs };
+      } else {
+        await postSlackMessage(channel, '⚠️ 확정할 Draft 결정문이 없습니다.', threadTs);
+        return { handled: false, reason: 'no_draft_found' };
+      }
+    }
+
+    // "결정문 생성" 감지 → 결정문 Draft 생성
+    if (decisionService.isDecisionTrigger(text)) {
+      console.log(`📜 Decision 트리거 감지`);
+      markEventAsProcessed(eventForDedup);
+
+      const topic = decisionService.extractDecisionTopic(text);
+      const slackThreadLink = `slack://channel?team=&id=${channel}&message=${ts}`;
+
+      const result = await decisionService.appendDecisionDraft(topic, slackThreadLink);
+      const responseTime = Date.now() - eventStartTime;
+      recordEventStat(result.success, responseTime);
+
+      if (result.success) {
+        await postSlackMessage(channel, result.message, threadTs);
+        markThreadAsResponded(threadTs, channel);
+        return { handled: true, action: 'decision_draft', decisionId: result.decisionId, threadTs };
+      } else {
+        await postSlackMessage(channel, `❌ 결정문 생성 실패: ${result.error}`, threadTs);
+        return { handled: false, reason: 'decision_error', error: result.error };
+      }
     }
   }
 
@@ -658,11 +952,14 @@ async function handleSlackEvent(event, channelInfo = null) {
   // 일반 AI 응답 (중복 방지 적용)
   // ═══════════════════════════════════════════════════════════════════════════
 
-  // 중복 응답 방지
+  // 스레드 중복 응답 방지 (같은 스레드에 2번 응답 X)
   if (hasRespondedToThread(threadTs, channel)) {
     console.log(`⚠️ 이미 응답한 스레드: ${threadTs}`);
     return { handled: false, reason: 'already_responded' };
   }
+
+  // 이벤트 처리 시작 표시
+  markEventAsProcessed(eventForDedup);
 
   // 역할 감지
   const role = detectRole(text);
@@ -671,21 +968,41 @@ async function handleSlackEvent(event, channelInfo = null) {
   // 멘션 텍스트에서 봇 ID 제거
   const cleanText = text.replace(/<@[A-Z0-9]+>/g, '').trim();
 
-  // 컨텍스트 가져오기
-  const context = await getTeamContext();
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Task 3: 스레드 컨텍스트 (후속 질문 시 맥락 유지)
+  // ═══════════════════════════════════════════════════════════════════════════
+  let context = await getTeamContext();
 
-  // AI 응답 생성
-  const response = await generateResponse(role, cleanText, context);
+  // 스레드 내 답글인 경우 이전 대화 컨텍스트 추가
+  if (thread_ts) {
+    const threadContext = await getThreadContext(channel, thread_ts);
+    if (threadContext) {
+      context += `\n\n📜 이전 대화:\n${threadContext}`;
+    }
+  }
 
-  // Slack 스레드에 응답
-  await postSlackMessage(channel, response, threadTs);
+  try {
+    // AI 응답 생성
+    const response = await generateResponse(role, cleanText, context);
 
-  // 스레드 응답 완료 표시
-  markThreadAsResponded(threadTs, channel);
+    // Slack 스레드에 응답
+    await postSlackMessage(channel, response, threadTs);
 
-  console.log(`✅ 응답 완료: 채널=${channel}, 스레드=${threadTs}, 역할=${role}`);
+    // 스레드 응답 완료 표시
+    markThreadAsResponded(threadTs, channel);
 
-  return { handled: true, role, threadTs };
+    const responseTime = Date.now() - eventStartTime;
+    recordEventStat(true, responseTime);
+    console.log(`✅ 응답 완료: 채널=${channel}, 스레드=${threadTs}, 역할=${role} (${responseTime}ms)`);
+
+    return { handled: true, role, threadTs };
+
+  } catch (error) {
+    console.error(`❌ AI 응답 오류:`, error);
+    recordEventStat(false, Date.now() - eventStartTime);
+    await postSlackMessage(channel, `❌ 응답 생성 오류: ${error.message}`, threadTs);
+    return { handled: false, reason: 'ai_error', error: error.message };
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -693,21 +1010,38 @@ async function handleSlackEvent(event, channelInfo = null) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 module.exports = {
+  // 서명 검증
   verifySlackSignature,
+  // 이벤트 처리
   handleSlackEvent,
   isAllowedChannel,
+  // 역할/커맨드 감지
   detectRole,
   detectOpsCommand,
+  // 중복 방지
+  isDuplicateEvent,
+  markEventAsProcessed,
   hasRespondedToThread,
   markThreadAsResponded,
+  // AI 응답
   generateResponse,
+  // Slack API
   postSlackMessage,
   getChannelInfo,
+  getThreadContext,
+  // 컨텍스트
   getTeamContext,
+  // 운영 커맨드
   handleStatusCommand,
   handleConfigCommand,
   handlePingCommand,
+  // 통계
+  getEventStats,
+  recordEventStat,
+  // 유틸
   maskSensitiveValue,
+  // 상수
+  ALLOWED_CHANNEL_IDS,
   ALLOWED_CHANNELS,
   ROLE_KEYWORDS,
   ROLE_PROMPTS,
