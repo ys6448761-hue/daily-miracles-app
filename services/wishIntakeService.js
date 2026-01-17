@@ -502,7 +502,7 @@ async function updateSessionProgress(sessionId, currentQuestion, answeredCount) 
   // 완료 시 상태 자동 전이
   if (isCompleted && sessionResult.session.run_status === SESSION_STATUS.IN_PROGRESS) {
     fields.run_status = SESSION_STATUS.COMPLETED;
-    fields.completed_at = new Date().toISOString();
+    // Note: completed_at 필드는 Airtable에 없으므로 updated_at로 대체
     console.log(`[WishIntake] ✅ 세션 완료 처리: ${sessionId}`);
 
     // Slack 알림: 세션 완료
