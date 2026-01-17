@@ -3,6 +3,7 @@
     "DOC-DECISIONS_LOG",
     "DOC-AURORA5_CHARACTER_PROMPTS_V3",
     "DOC-airtable-schema",
+    "DOC-airtable-wish-intake-schema",
     "DOC-airtable-wishes-inbox-schema",
     "DOC-online-wish-problem-api",
     "DOC-online-wish-voyage-api-design",

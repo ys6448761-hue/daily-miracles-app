@@ -127,6 +127,15 @@ try {
   console.error("❌ 스택 트레이스:", error.stack);
 }
 
+// Wish Intake 7문항 라우터 로딩 (P0-02)
+let wishIntakeRoutes = null;
+try {
+  wishIntakeRoutes = require("./routes/wishIntakeRoutes");
+  console.log("✅ Wish Intake 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ Wish Intake 라우터 로드 실패:", error.message);
+}
+
 // 소원그림 생성 라우터 로딩
 let wishImageRoutes = null;
 try {
@@ -781,6 +790,14 @@ if (wishRoutes) {
   console.log("✅ 소원실현 API 라우터 등록 완료");
 } else {
   console.warn("⚠️ 소원실현 API 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- Wish Intake 7문항 API Routes (P0-02) ----------
+if (wishIntakeRoutes) {
+  app.use("/api/wish-intake", wishIntakeRoutes);
+  console.log("✅ Wish Intake API 라우터 등록 완료");
+} else {
+  console.warn("⚠️ Wish Intake API 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- 소원그림 생성 API Routes ----------
