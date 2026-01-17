@@ -41,5 +41,5 @@ bash tests/fixtures/wish-intake/e2e-smoke-test.sh
 
 ## 관련 P1 태스크
 
-- [ ] 요약 저장 실패 시 fallback 응답 처리
+- [x] 요약 저장 실패 시 fallback 응답 처리 (saveFailed 플래그)
 - [ ] 중복 방지 "연타 5회 → 응답 1회" (실오픈 게이트)

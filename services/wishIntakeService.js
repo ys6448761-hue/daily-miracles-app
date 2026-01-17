@@ -1016,6 +1016,7 @@ async function saveSessionSummary(sessionId, summaryShort, summaryStructured) {
 
 /**
  * 세션 요약 전체 플로우 (생성 + 저장)
+ * P1: 저장 실패해도 요약은 반환 (fallback)
  * @param {string} sessionId
  */
 async function processSessionSummary(sessionId) {
@@ -1025,18 +1026,32 @@ async function processSessionSummary(sessionId) {
     return summaryResult;
   }
 
-  // 2. 요약 저장
+  // 2. 요약 저장 시도
   const saveResult = await saveSessionSummary(
     sessionId,
     summaryResult.summary_short,
     summaryResult.summary_structured
   );
 
+  // P1: 저장 실패해도 요약은 반환
+  if (!saveResult.success && !saveResult.simulated) {
+    console.warn(`[WishIntake] ⚠️ 요약 저장 실패했지만 응답 반환: ${sessionId}`);
+    return {
+      success: true,  // 요약 생성은 성공
+      summary_short: summaryResult.summary_short,
+      summary_structured: summaryResult.summary_structured,
+      fallback: summaryResult.fallback || false,
+      saveFailed: true,  // 저장 실패 플래그
+      saveError: saveResult.error
+    };
+  }
+
   return {
-    ...saveResult,
+    success: true,
     summary_short: summaryResult.summary_short,
     summary_structured: summaryResult.summary_structured,
-    fallback: summaryResult.fallback || false
+    fallback: summaryResult.fallback || false,
+    saveFailed: false
   };
 }
 
