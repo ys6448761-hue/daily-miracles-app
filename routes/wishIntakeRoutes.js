@@ -18,6 +18,72 @@
 const express = require('express');
 const router = express.Router();
 
+// ═══════════════════════════════════════════════════════════════════════════
+// P1: 연타 방지 Rate Limiter (세션별 5회/10초)
+// ═══════════════════════════════════════════════════════════════════════════
+const RATE_LIMIT_WINDOW_MS = 10000; // 10초
+const RATE_LIMIT_MAX = 5;           // 최대 5회
+
+// Map<sessionId, { timestamps: number[], blocked: boolean }>
+const rateLimitMap = new Map();
+
+/**
+ * 세션별 rate limit 체크
+ * @param {string} sessionId
+ * @returns {{ allowed: boolean, remaining: number, retryAfter?: number }}
+ */
+function checkRateLimit(sessionId) {
+  const now = Date.now();
+  let entry = rateLimitMap.get(sessionId);
+
+  if (!entry) {
+    entry = { timestamps: [], blocked: false };
+    rateLimitMap.set(sessionId, entry);
+  }
+
+  // 윈도우 밖의 오래된 타임스탬프 제거
+  entry.timestamps = entry.timestamps.filter(ts => now - ts < RATE_LIMIT_WINDOW_MS);
+
+  // 블록 해제 확인
+  if (entry.blocked && entry.timestamps.length < RATE_LIMIT_MAX) {
+    entry.blocked = false;
+  }
+
+  // 제한 초과 체크
+  if (entry.timestamps.length >= RATE_LIMIT_MAX) {
+    entry.blocked = true;
+    const oldestInWindow = entry.timestamps[0];
+    const retryAfter = Math.ceil((RATE_LIMIT_WINDOW_MS - (now - oldestInWindow)) / 1000);
+
+    console.log(`[WishIntake] ⚠️ Rate limit 초과: ${sessionId} (${entry.timestamps.length}회/${RATE_LIMIT_WINDOW_MS/1000}초)`);
+
+    return {
+      allowed: false,
+      remaining: 0,
+      retryAfter: Math.max(1, retryAfter)
+    };
+  }
+
+  // 허용 - 타임스탬프 기록
+  entry.timestamps.push(now);
+
+  return {
+    allowed: true,
+    remaining: RATE_LIMIT_MAX - entry.timestamps.length
+  };
+}
+
+// 30초마다 오래된 엔트리 정리
+setInterval(() => {
+  const now = Date.now();
+  for (const [sessionId, entry] of rateLimitMap.entries()) {
+    entry.timestamps = entry.timestamps.filter(ts => now - ts < RATE_LIMIT_WINDOW_MS);
+    if (entry.timestamps.length === 0) {
+      rateLimitMap.delete(sessionId);
+    }
+  }
+}, 30000);
+
 let wishIntakeService = null;
 try {
   wishIntakeService = require('../services/wishIntakeService');
@@ -180,6 +246,17 @@ router.post('/:sessionId/answer', async (req, res) => {
   try {
     const { sessionId } = req.params;
     const { answer } = req.body;
+
+    // P1: Rate limit 체크 (연타 5회/10초 제한)
+    const rateCheck = checkRateLimit(sessionId);
+    if (!rateCheck.allowed) {
+      return res.status(429).json({
+        success: false,
+        error: 'rate_limit_exceeded',
+        message: `요청이 너무 빠릅니다. ${rateCheck.retryAfter}초 후 다시 시도해주세요.`,
+        retryAfter: rateCheck.retryAfter
+      });
+    }
 
     // 답변 길이 검증 (DEC-002: 최대 1000자)
     if (answer && answer.length > 1000) {
