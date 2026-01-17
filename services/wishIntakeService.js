@@ -217,6 +217,10 @@ async function airtableRequest(tableName, method = 'GET', body = null, recordId 
 
   if (body) {
     options.body = JSON.stringify(body);
+    // PATCH 요청 시 body 로깅 (민감정보 제외)
+    if (method === 'PATCH') {
+      console.log(`[WishIntake] Airtable PATCH: ${tableName}/${recordId}`, JSON.stringify(body.fields || body));
+    }
   }
 
   try {
@@ -224,13 +228,13 @@ async function airtableRequest(tableName, method = 'GET', body = null, recordId 
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('[WishIntake] Airtable 오류:', data.error);
+      console.error(`[WishIntake] Airtable ${method} 오류:`, data.error);
       return { success: false, error: data.error };
     }
 
     return { success: true, data };
   } catch (error) {
-    console.error('[WishIntake] 요청 실패:', error.message);
+    console.error(`[WishIntake] Airtable ${method} 실패:`, error.message);
     return { success: false, error: error.message };
   }
 }
@@ -479,11 +483,14 @@ async function updateSessionStatus(sessionId, newStatus, additionalFields = {}) 
 async function updateSessionProgress(sessionId, currentQuestion, answeredCount) {
   const sessionResult = await getSession(sessionId);
   if (!sessionResult.success) {
+    console.error('[WishIntake] updateSessionProgress: 세션 조회 실패', sessionId);
     return sessionResult;
   }
 
   const progress = Math.round((answeredCount / 7) * 100) / 100;
   const isCompleted = answeredCount >= 7 || currentQuestion > 7;
+
+  console.log(`[WishIntake] 진행 업데이트: ${sessionId} - Q${currentQuestion}, answered=${answeredCount}, completed=${isCompleted}`);
 
   const fields = {
     current_question: Math.min(currentQuestion, 7),
@@ -496,6 +503,7 @@ async function updateSessionProgress(sessionId, currentQuestion, answeredCount) 
   if (isCompleted && sessionResult.session.run_status === SESSION_STATUS.IN_PROGRESS) {
     fields.run_status = SESSION_STATUS.COMPLETED;
     fields.completed_at = new Date().toISOString();
+    console.log(`[WishIntake] ✅ 세션 완료 처리: ${sessionId}`);
 
     // Slack 알림: 세션 완료
     if (slackService) {
@@ -509,7 +517,13 @@ async function updateSessionProgress(sessionId, currentQuestion, answeredCount) 
     }
   }
 
-  return airtableRequest(TABLES.SESSIONS, 'PATCH', { fields }, sessionResult.session.id);
+  const result = await airtableRequest(TABLES.SESSIONS, 'PATCH', { fields }, sessionResult.session.id);
+
+  if (!result.success && !result.simulated) {
+    console.error('[WishIntake] ❌ 세션 업데이트 실패:', result.error);
+  }
+
+  return result;
 }
 
 /**
