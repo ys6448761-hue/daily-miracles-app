@@ -211,7 +211,7 @@ async function airtableRequest(tableName, method = 'GET', body = null, recordId 
     method,
     headers: {
       'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json; charset=utf-8'
     }
   };
 
@@ -575,6 +575,7 @@ async function saveMessage(params) {
   };
 
   console.log(`[WishIntake] 메시지 저장: ${sessionId}/${questionId} (${riskResult.level})`);
+  console.log(`[WishIntake] 📝 answer 원문: "${answerText}"`);
 
   const result = await airtableRequest(TABLES.MESSAGES, 'POST', { fields });
 

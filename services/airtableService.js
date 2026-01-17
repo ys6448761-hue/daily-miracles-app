@@ -40,7 +40,7 @@ async function airtableRequest(tableName, method = 'GET', body = null, recordId 
         method,
         headers: {
             'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json; charset=utf-8'
         }
     };
 
