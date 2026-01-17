@@ -106,14 +106,27 @@ router.post('/start', async (req, res) => {
   }
 
   try {
-    const { channel = 'web', userId, userName, source } = req.body;
+    const {
+      channel = 'web',
+      userId,
+      userName,
+      source,
+      // P0: UTM 트래킹
+      utm_source,
+      utm_medium,
+      utm_campaign
+    } = req.body;
 
     // 세션 생성
     const result = await wishIntakeService.createSession({
       channel,
       userId: userId || `anon_${Date.now()}`,
       userName: userName || '',
-      source: source || 'direct'
+      source: source || 'direct',
+      // P0: UTM 파라미터 (없으면 unknown)
+      utm_source: utm_source || 'unknown',
+      utm_medium: utm_medium || 'unknown',
+      utm_campaign: utm_campaign || 'unknown'
     });
 
     if (!result.success) {

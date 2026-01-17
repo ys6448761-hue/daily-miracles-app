@@ -904,10 +904,11 @@ if (shortLinkRoutes) {
   console.warn("⚠️ 단축 링크 라우터 로드 실패 - 라우트 미등록");
 }
 
-// ---------- 운영 시스템 Routes (/ops) ----------
+// ---------- 운영 시스템 Routes (/ops, /api/ops) ----------
 if (opsRoutes) {
   app.use("/ops", opsRoutes);
-  console.log("✅ 운영 시스템 라우터 등록 완료 (/ops/health, /ops/status)");
+  app.use("/api/ops", opsRoutes);  // P0: API 경로도 지원
+  console.log("✅ 운영 시스템 라우터 등록 완료 (/ops/health, /api/ops/report/daily)");
 } else {
   console.warn("⚠️ 운영 시스템 라우터 로드 실패 - 라우트 미등록");
 }

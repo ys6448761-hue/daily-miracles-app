@@ -334,11 +334,20 @@ function analyzeRisk(text) {
 
 /**
  * 새 세션 생성
- * @param {Object} params - { channel, userId, userName, source }
+ * @param {Object} params - { channel, userId, userName, source, utm_source, utm_medium, utm_campaign }
  * @returns {Object} 생성된 세션 정보
  */
 async function createSession(params) {
-  const { channel = 'web', userId, userName = '', source = 'direct' } = params;
+  const {
+    channel = 'web',
+    userId,
+    userName = '',
+    source = 'direct',
+    // P0: UTM 트래킹
+    utm_source = 'unknown',
+    utm_medium = 'unknown',
+    utm_campaign = 'unknown'
+  } = params;
 
   const sessionId = generateSessionId();
   const correlationId = generateCorrelationId();
@@ -352,6 +361,10 @@ async function createSession(params) {
     user_name: userName,
     channel: channel,
     source: source,
+    // P0: UTM 필드
+    utm_source: utm_source,
+    utm_medium: utm_medium,
+    utm_campaign: utm_campaign,
     run_status: SESSION_STATUS.CREATED,
     current_question: 1,
     answered_count: 0,

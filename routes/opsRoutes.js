@@ -14,6 +14,7 @@ const router = express.Router();
 // 서비스 로드
 let notionOps = null;
 let emergencyAlert = null;
+let opsReportService = null;
 
 try {
     notionOps = require('../services/notionOpsService');
@@ -25,6 +26,13 @@ try {
     emergencyAlert = require('../services/emergencyAlertService');
 } catch (e) {
     console.warn('[Ops] 비상 알림 서비스 로드 실패');
+}
+
+try {
+    opsReportService = require('../services/opsReportService');
+    console.log('✅ Ops Report 서비스 로드 성공');
+} catch (e) {
+    console.warn('[Ops] Ops Report 서비스 로드 실패:', e.message);
 }
 
 /**
@@ -143,6 +151,153 @@ router.post('/alert/test', async (req, res) => {
         res.status(500).json({
             success: false,
             error: error.message
+        });
+    }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// P0: Ops+Promo 통합 리포트 엔드포인트
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * POST /ops/report/daily
+ *
+ * Daily 운영 리포트 생성
+ * - Sessions 집계 (started/completed/completion_rate)
+ * - 리스크 현황 (yellow/red/pending_review)
+ * - UTM 성과 (top_sources/top_campaigns)
+ * - Airtable 저장 + Slack 게시
+ */
+router.post('/report/daily', async (req, res) => {
+    if (!opsReportService) {
+        return res.status(503).json({
+            success: false,
+            error: 'service_unavailable',
+            message: 'Ops Report 서비스가 로드되지 않았습니다.'
+        });
+    }
+
+    try {
+        const { forceRun = false } = req.body;
+
+        console.log(`[OpsReport] POST /report/daily 요청: forceRun=${forceRun}`);
+
+        const result = await opsReportService.generateDailyReport({ forceRun });
+
+        if (!result.success) {
+            return res.status(500).json({
+                success: false,
+                error: 'report_generation_failed',
+                message: result.error
+            });
+        }
+
+        // 이미 생성된 경우
+        if (result.skipped) {
+            return res.json({
+                success: true,
+                skipped: true,
+                reason: result.reason,
+                idempotencyKey: result.idempotencyKey,
+                message: '오늘 Daily 리포트가 이미 생성되었습니다.'
+            });
+        }
+
+        res.json({
+            success: true,
+            reportType: result.reportType,
+            metrics: result.metrics,
+            saved: result.saved,
+            slackPosted: result.slackPosted,
+            idempotencyKey: result.idempotencyKey,
+            simulated: result.simulated || false
+        });
+
+    } catch (error) {
+        console.error('[OpsReport] Daily 리포트 오류:', error);
+        res.status(500).json({
+            success: false,
+            error: 'internal_error',
+            message: error.message
+        });
+    }
+});
+
+/**
+ * POST /ops/report/launch
+ *
+ * Launch 리포트 생성 (홍보 기간용 실시간 모니터링)
+ * - 최근 N분 세션 집계
+ * - Airtable 저장 + Slack 게시
+ */
+router.post('/report/launch', async (req, res) => {
+    if (!opsReportService) {
+        return res.status(503).json({
+            success: false,
+            error: 'service_unavailable',
+            message: 'Ops Report 서비스가 로드되지 않았습니다.'
+        });
+    }
+
+    try {
+        const {
+            window_minutes = 30,
+            forceRun = false
+        } = req.body;
+
+        // 유효성 검증
+        const windowMinutes = parseInt(window_minutes, 10);
+        if (isNaN(windowMinutes) || windowMinutes < 5 || windowMinutes > 1440) {
+            return res.status(400).json({
+                success: false,
+                error: 'invalid_window',
+                message: 'window_minutes는 5~1440 사이여야 합니다.'
+            });
+        }
+
+        console.log(`[OpsReport] POST /report/launch 요청: window=${windowMinutes}분, forceRun=${forceRun}`);
+
+        const result = await opsReportService.generateLaunchReport({
+            windowMinutes,
+            forceRun
+        });
+
+        if (!result.success) {
+            return res.status(500).json({
+                success: false,
+                error: 'report_generation_failed',
+                message: result.error
+            });
+        }
+
+        // 이미 생성된 경우
+        if (result.skipped) {
+            return res.json({
+                success: true,
+                skipped: true,
+                reason: result.reason,
+                idempotencyKey: result.idempotencyKey,
+                message: `최근 ${windowMinutes}분 Launch 리포트가 이미 생성되었습니다.`
+            });
+        }
+
+        res.json({
+            success: true,
+            reportType: result.reportType,
+            windowMinutes: result.windowMinutes,
+            metrics: result.metrics,
+            saved: result.saved,
+            slackPosted: result.slackPosted,
+            idempotencyKey: result.idempotencyKey,
+            simulated: result.simulated || false
+        });
+
+    } catch (error) {
+        console.error('[OpsReport] Launch 리포트 오류:', error);
+        res.status(500).json({
+            success: false,
+            error: 'internal_error',
+            message: error.message
         });
     }
 });
