@@ -35,6 +35,14 @@ try {
     console.warn('[Ops] Ops Report 서비스 로드 실패:', e.message);
 }
 
+let chiefOfStaffService = null;
+try {
+    chiefOfStaffService = require('../services/chiefOfStaffService');
+    console.log('✅ ChiefOfStaff 서비스 로드 성공');
+} catch (e) {
+    console.warn('[Ops] ChiefOfStaff 서비스 로드 실패:', e.message);
+}
+
 /**
  * GET /ops/health
  *
@@ -294,6 +302,80 @@ router.post('/report/launch', async (req, res) => {
 
     } catch (error) {
         console.error('[OpsReport] Launch 리포트 오류:', error);
+        res.status(500).json({
+            success: false,
+            error: 'internal_error',
+            message: error.message
+        });
+    }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// P0+: ChiefOfStaff 비서실장 오케스트레이터
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * POST /ops/chief/run
+ *
+ * ChiefOfStaff 실행 - 8개 알람 룰 체크
+ * - 앱 health, Airtable, 데이터 정합성
+ * - 🔴/🟡 미처리 에스컬레이션
+ * - Daily 리포트 미생성, 홍보 유입 0, Slack 연결
+ */
+router.post('/chief/run', async (req, res) => {
+    if (!chiefOfStaffService) {
+        return res.status(503).json({
+            success: false,
+            error: 'service_unavailable',
+            message: 'ChiefOfStaff 서비스가 로드되지 않았습니다.'
+        });
+    }
+
+    try {
+        const {
+            window_minutes = 30,
+            forceRun = false
+        } = req.body;
+
+        console.log(`[ChiefOfStaff] POST /chief/run 요청: window=${window_minutes}분, forceRun=${forceRun}`);
+
+        const result = await chiefOfStaffService.runChiefOfStaff({
+            windowMinutes: parseInt(window_minutes, 10) || 30,
+            forceRun
+        });
+
+        if (!result.success) {
+            return res.status(500).json({
+                success: false,
+                error: 'chief_run_failed',
+                message: result.error
+            });
+        }
+
+        // 이미 실행된 경우
+        if (result.skipped) {
+            return res.json({
+                success: true,
+                skipped: true,
+                reason: result.reason,
+                idempotencyKey: result.idempotencyKey,
+                message: '최근 5분 내 이미 실행되었습니다.'
+            });
+        }
+
+        res.json({
+            success: true,
+            runAt: result.runAt,
+            checksRun: result.checksRun,
+            alertsTriggered: result.alertsTriggered,
+            alerts: result.alerts,
+            slackResults: result.slackResults,
+            summary: result.summary,
+            idempotencyKey: result.idempotencyKey
+        });
+
+    } catch (error) {
+        console.error('[ChiefOfStaff] 실행 오류:', error);
         res.status(500).json({
             success: false,
             error: 'internal_error',
