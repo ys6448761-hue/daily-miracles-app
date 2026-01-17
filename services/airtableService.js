@@ -11,12 +11,16 @@
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
 
-// 테이블 ID (Airtable에서 생성 후 입력)
+// 테이블명 (환경변수 또는 기본값)
+// Note: AIRTABLE_TABLE_NAME은 deprecated - AIRTABLE_TABLE_WISHES_INBOX 사용
 const TABLES = {
     DAILY_HEALTH: process.env.AIRTABLE_TABLE_DAILY_HEALTH || 'Daily Health',
     ALERTS: process.env.AIRTABLE_TABLE_ALERTS || 'Alerts',
-    WISHES_INBOX: process.env.AIRTABLE_TABLE_WISHES_INBOX || process.env.AIRTABLE_TABLE_NAME || '인입함',
+    WISHES_INBOX: process.env.AIRTABLE_TABLE_WISHES_INBOX || '인입함',  // 레거시 소원 인입함
     USERS: process.env.AIRTABLE_TABLE_USERS || 'Users'
+    // 신규 WISH 7문항: wishIntakeService.js에서 별도 관리
+    // - AIRTABLE_TABLE_SESSIONS (Wish Intake Sessions)
+    // - AIRTABLE_TABLE_MESSAGES (Wish Intake Messages)
 };
 
 /**
