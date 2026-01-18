@@ -289,6 +289,15 @@ try {
   console.error("❌ 여수 소원빌기 라우터 로드 실패:", error.message);
 }
 
+// RepoPulse 라우터 로딩
+let repoPulseRoutes = null;
+try {
+  repoPulseRoutes = require("./routes/repoPulseRoutes");
+  console.log("✅ RepoPulse 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ RepoPulse 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -927,6 +936,14 @@ if (yeosuWishRoutes) {
   console.log("✅ 여수 소원빌기 라우터 등록 완료 (/api/yeosu/wish)");
 } else {
   console.warn("⚠️ 여수 소원빌기 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- RepoPulse Routes (/api/repopulse) ----------
+if (repoPulseRoutes) {
+  app.use("/api/repopulse", repoPulseRoutes);
+  console.log("✅ RepoPulse 라우터 등록 완료 (/api/repopulse/github, /api/repopulse/render)");
+} else {
+  console.warn("⚠️ RepoPulse 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------
