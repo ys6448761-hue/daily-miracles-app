@@ -1,1 +1,1 @@
-RepoPulse E2E Test v7 - 2026-01-18 19:21:39     - full schema test
+RepoPulse E2E Test v8 - 2026-01-18 21:37:36     - contract_version field fixed
