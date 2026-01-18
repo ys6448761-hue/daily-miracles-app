@@ -121,7 +121,9 @@ const IMPACT_RULES = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 async function airtableRequest(tableName, method = 'GET', body = null, recordId = null, queryParams = null) {
+  // 환경변수 미설정 시 시뮬레이션
   if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) {
+    console.warn('[RepoPulse] Airtable 미설정 - 시뮬레이션 모드');
     return { success: false, simulated: true };
   }
 
@@ -131,6 +133,35 @@ async function airtableRequest(tableName, method = 'GET', body = null, recordId 
 
   if (queryParams) {
     url += `?${queryParams}`;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // 요청 직전 상세 로그
+  // ═══════════════════════════════════════════════════════════════════════
+  console.log(`[RepoPulse] Airtable ${method} 요청:`, JSON.stringify({
+    tableName,
+    baseId: AIRTABLE_BASE_ID?.substring(0, 10) + '...',
+    recordId: recordId || null
+  }));
+
+  // POST/PATCH 시 fields 로그
+  if (body && body.fields) {
+    const fieldKeys = Object.keys(body.fields);
+    console.log(`[RepoPulse] Airtable fields 키: [${fieldKeys.join(', ')}]`);
+
+    // 샘플 값 3~5개 (민감정보 제외)
+    const sampleFields = {};
+    const safeKeys = ['upgrade_id', 'commit_sha', 'impact_severity', 'impact_areas', 'owner'];
+    for (const key of safeKeys) {
+      if (body.fields[key] !== undefined) {
+        const val = body.fields[key];
+        // 긴 값은 잘라서 표시
+        sampleFields[key] = typeof val === 'string' && val.length > 50
+          ? val.substring(0, 50) + '...'
+          : val;
+      }
+    }
+    console.log(`[RepoPulse] Airtable fields 샘플:`, JSON.stringify(sampleFields));
   }
 
   const options = {
@@ -149,14 +180,32 @@ async function airtableRequest(tableName, method = 'GET', body = null, recordId 
     const response = await fetch(url, options);
     const data = await response.json();
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // 응답 상세 로그
+    // ═══════════════════════════════════════════════════════════════════════
     if (!response.ok) {
-      console.error(`[RepoPulse] Airtable ${method} 오류:`, data.error?.message || data.error);
-      return { success: false, error: data.error };
+      console.error(`[RepoPulse] Airtable ${method} 실패:`, JSON.stringify({
+        status: response.status,
+        statusText: response.statusText,
+        error: data.error?.message || data.error?.type || data.error,
+        errorType: data.error?.type || null
+      }));
+      return { success: false, error: data.error, status: response.status };
     }
 
-    return { success: true, data };
+    // 성공 시 record ID 로그
+    const recordIdResult = data.id || (data.records && data.records[0]?.id) || null;
+    console.log(`[RepoPulse] Airtable ${method} 성공:`, JSON.stringify({
+      recordId: recordIdResult,
+      recordCount: data.records?.length || 1
+    }));
+
+    return { success: true, data, recordId: recordIdResult };
   } catch (error) {
-    console.error(`[RepoPulse] Airtable ${method} 실패:`, error.message);
+    console.error(`[RepoPulse] Airtable ${method} 네트워크 오류:`, JSON.stringify({
+      message: error.message,
+      code: error.code || null
+    }));
     return { success: false, error: error.message };
   }
 }
