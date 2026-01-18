@@ -421,6 +421,55 @@ async function saveUpgrade(upgradeData) {
   return { success: false, error: result.error };
 }
 
+/**
+ * 배포 완료 시 deployed_at 업데이트
+ * @param {string} commitSha - 커밋 SHA (전체 또는 일부)
+ * @param {string} deployedAt - 배포 완료 시각 (ISO string)
+ */
+async function updateDeployedAt(commitSha, deployedAt) {
+  if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) {
+    console.warn('[RepoPulse] Airtable 미설정 - deployed_at 업데이트 스킵');
+    return { success: false, simulated: true };
+  }
+
+  // 1. commit_sha로 레코드 찾기 (FIND 함수 사용)
+  const filterFormula = `FIND("${commitSha.substring(0, 7)}", {commit_sha})`;
+  const queryParams = `filterByFormula=${encodeURIComponent(filterFormula)}&maxRecords=1`;
+
+  const searchResult = await airtableRequest(TABLES.UPGRADES, 'GET', null, null, queryParams);
+
+  if (!searchResult.success) {
+    return { success: false, error: searchResult.error };
+  }
+
+  const records = searchResult.data?.records || [];
+  if (records.length === 0) {
+    // 레코드 없음 - GitHub push보다 먼저 deploy webhook이 올 수 있음 (정상)
+    return { success: false, notFound: true };
+  }
+
+  const recordId = records[0].id;
+
+  // 2. deployed_at 업데이트
+  const formatDate = (dateStr) => {
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? new Date().toISOString().split('T')[0] : d.toISOString().split('T')[0];
+  };
+
+  const updateResult = await airtableRequest(
+    TABLES.UPGRADES,
+    'PATCH',
+    { fields: { deployed_at: formatDate(deployedAt) } },
+    recordId
+  );
+
+  if (updateResult.success) {
+    return { success: true, recordId };
+  }
+
+  return { success: false, error: updateResult.error };
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Slack 브리프 포맷 (10줄 고정)
 // ═══════════════════════════════════════════════════════════════════════════
@@ -782,10 +831,19 @@ async function handleRenderDeploy(payload) {
     `${emoji} Render ${statusText}: ${commitMessage}`
   );
 
-  // 배포 완료 시 로그
+  // 배포 완료 시 Airtable deployed_at 업데이트
   if (isLive && normalized.commitId) {
     console.log(`[RepoPulse] 배포 완료: ${normalized.commitId.substring(0, 7)} (${deployId})`);
-    // TODO: Airtable Upgrades에서 해당 커밋의 deployed_at 업데이트
+
+    // commit_sha로 레코드 찾아서 deployed_at 업데이트
+    const updateResult = await updateDeployedAt(normalized.commitId, new Date().toISOString());
+    if (updateResult.success) {
+      console.log(`[RepoPulse] Airtable deployed_at 업데이트 완료: ${updateResult.recordId}`);
+    } else if (updateResult.notFound) {
+      console.log(`[RepoPulse] 해당 커밋 레코드 없음 (정상): ${normalized.commitId.substring(0, 7)}`);
+    } else {
+      console.error(`[RepoPulse] deployed_at 업데이트 실패:`, updateResult.error);
+    }
   }
 
   return {
@@ -815,5 +873,6 @@ module.exports = {
   verifyGitHubSignature,
   analyzeImpact,
   saveUpgrade,
+  updateDeployedAt,
   IMPACT_RULES
 };
