@@ -1,6 +1,6 @@
 # Aurora5 Core Contract (1장 요약)
 
-> Code/LSP/Agent가 항상 참조하는 최신 규칙 - 마지막 업데이트: 2026-01-18
+> Code/LSP/Agent가 항상 참조하는 최신 규칙 - 마지막 업데이트: 2026-01-18 14:30 KST
 
 ---
 
