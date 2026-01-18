@@ -379,10 +379,17 @@ function extractVersionChanges(message) {
 async function saveUpgrade(upgradeData) {
   const upgradeId = `upgrade_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
 
+  // Airtable Date 필드는 YYYY-MM-DD 형식만 허용
+  const formatDateForAirtable = (dateStr) => {
+    if (!dateStr) return new Date().toISOString().split('T')[0];
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? new Date().toISOString().split('T')[0] : d.toISOString().split('T')[0];
+  };
+
   const fields = {
     upgrade_id: upgradeId,
-    merged_at: upgradeData.mergedAt || new Date().toISOString(),
-    deployed_at: upgradeData.deployedAt || '',
+    merged_at: formatDateForAirtable(upgradeData.mergedAt),
+    deployed_at: upgradeData.deployedAt ? formatDateForAirtable(upgradeData.deployedAt) : '',
     contract_version: upgradeData.contractVersion || '',
     rule_version: upgradeData.ruleVersion || '',
     api_changes: JSON.stringify(upgradeData.apiChanges || []),
