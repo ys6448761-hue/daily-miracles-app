@@ -19,6 +19,57 @@
 const crypto = require('crypto');
 
 // ═══════════════════════════════════════════════════════════════════════════
+// UTF-8 문자열 정규화 (인코딩 깨짐 방지)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * UTF-8 문자열 sanitize - 깨진 문자 제거/대체
+ * @param {string} str - 입력 문자열
+ * @param {string} fallback - null/undefined 시 대체값
+ * @returns {string} 정규화된 문자열
+ */
+function sanitizeUtf8(str, fallback = '(없음)') {
+  if (str === null || str === undefined) {
+    return fallback;
+  }
+
+  // 문자열로 변환
+  let result = String(str);
+
+  // 1. 서로게이트 쌍 문제 해결 (잘못된 유니코드)
+  result = result.replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '');
+
+  // 2. NULL 문자 제거
+  result = result.replace(/\x00/g, '');
+
+  // 3. 제어 문자 제거 (탭, 줄바꿈 제외)
+  result = result.replace(/[\x01-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+
+  // 4. 빈 문자열이면 fallback
+  if (result.trim() === '') {
+    return fallback;
+  }
+
+  return result;
+}
+
+/**
+ * 값이 비어있거나 undefined/null인지 체크
+ */
+function isEmpty(val) {
+  return val === null || val === undefined || val === '' || val === 'undefined' || val === 'null';
+}
+
+/**
+ * 안전하게 값 추출 (N/A, unknown, undefined 방지)
+ */
+function safeValue(val, fallback = '(미확인)') {
+  if (isEmpty(val)) return fallback;
+  const str = sanitizeUtf8(val, fallback);
+  return str === 'N/A' || str === 'unknown' || str === 'undefined' ? fallback : str;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // 환경 설정
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -319,10 +370,43 @@ async function saveUpgrade(upgradeData) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function formatUpgradeBrief(data) {
-  const emoji = data.impact.isCritical ? '🔴' : (data.impact.requiresReview ? '🟡' : '🟢');
-  const mentionText = data.impact.notify.length > 0
+  const emoji = data.impact?.isCritical ? '🔴' : (data.impact?.requiresReview ? '🟡' : '🟢');
+  const mentionText = data.impact?.notify?.length > 0
     ? `cc: ${data.impact.notify.join(', ')}`
     : '';
+
+  // 안전한 값 추출 (UTF-8 정규화 + 빈값 방지)
+  const commitSha = safeValue(data.commitSha?.substring(0, 7), '(커밋 없음)');
+  const severity = safeValue(data.impact?.severity, 'LOW');
+  const areas = data.impact?.areas?.length > 0 ? data.impact.areas.join(', ') : '(영역 없음)';
+  const deployStatus = safeValue(data.deployStatus, '대기');
+  const deployId = safeValue(data.deployId, '');
+  const commitMessage = sanitizeUtf8(data.commitMessage?.split('\n')[0], '(메시지 없음)');
+
+  // 배포 상태 표시 (deployId가 있으면 포함)
+  const deployDisplay = deployId && deployId !== '(미확인)'
+    ? `${deployStatus} (\`${deployId.substring(0, 10)}\`)`
+    : deployStatus;
+
+  // 변경 파일 목록
+  let filesText = '(파일 정보 없음)';
+  if (data.changedFiles && data.changedFiles.length > 0) {
+    const files = data.changedFiles.slice(0, 5).map(f => `• ${sanitizeUtf8(f)}`);
+    filesText = files.join('\n');
+    if (data.changedFiles.length > 5) {
+      filesText += `\n... 외 ${data.changedFiles.length - 5}개`;
+    }
+  }
+
+  // 머지 시각
+  let mergeTimeText = '(시각 미확인)';
+  try {
+    if (data.mergedAt) {
+      mergeTimeText = new Date(data.mergedAt).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+    }
+  } catch (e) {
+    mergeTimeText = '(시각 파싱 오류)';
+  }
 
   return [
     {
@@ -336,24 +420,24 @@ function formatUpgradeBrief(data) {
     {
       type: 'section',
       fields: [
-        { type: 'mrkdwn', text: `*커밋*\n\`${data.commitSha?.substring(0, 7) || 'N/A'}\`` },
-        { type: 'mrkdwn', text: `*심각도*\n${data.impact.severity}` },
-        { type: 'mrkdwn', text: `*영역*\n${data.impact.areas.join(', ') || 'N/A'}` },
-        { type: 'mrkdwn', text: `*배포*\n${data.deployStatus || '대기'}` }
+        { type: 'mrkdwn', text: `*커밋*\n\`${commitSha}\`` },
+        { type: 'mrkdwn', text: `*심각도*\n${severity}` },
+        { type: 'mrkdwn', text: `*영역*\n${areas}` },
+        { type: 'mrkdwn', text: `*배포*\n${deployDisplay}` }
       ]
     },
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `*메시지*\n${data.commitMessage?.split('\n')[0] || 'N/A'}`
+        text: `*메시지*\n${commitMessage}`
       }
     },
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `*변경 파일*\n${data.changedFiles?.slice(0, 5).map(f => `• ${f}`).join('\n') || 'N/A'}${data.changedFiles?.length > 5 ? `\n... 외 ${data.changedFiles.length - 5}개` : ''}`
+        text: `*변경 파일*\n${filesText}`
       }
     },
     {
@@ -368,7 +452,7 @@ function formatUpgradeBrief(data) {
       elements: [
         {
           type: 'mrkdwn',
-          text: `머지: ${new Date(data.mergedAt).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}`
+          text: `머지: ${mergeTimeText}`
         }
       ]
     }
@@ -408,18 +492,23 @@ async function handleGitHubPush(payload) {
   const impact = analyzeImpact(uniqueFiles.map(f => ({ filename: f })));
   const versionChanges = extractVersionChanges(latestCommit.message || '');
 
-  console.log(`[RepoPulse] GitHub Push 처리: ${latestCommit.id?.substring(0, 7)} (${uniqueFiles.length}개 파일)`);
+  // 안전한 값 추출
+  const commitSha = safeValue(latestCommit.id, '(커밋 없음)');
+  const commitMessage = sanitizeUtf8(latestCommit.message, '(메시지 없음)');
+  const authorName = sanitizeUtf8(latestCommit.author?.name, 'Unknown');
+
+  console.log(`[RepoPulse] GitHub Push 처리: ${commitSha.substring(0, 7)} (${uniqueFiles.length}개 파일)`);
 
   // Upgrade 저장
   const upgradeData = {
     mergedAt: latestCommit.timestamp || new Date().toISOString(),
     commitSha: latestCommit.id,
-    commitMessage: latestCommit.message,
+    commitMessage: commitMessage,
     changedFiles: uniqueFiles,
     impactAreas: impact.areas,
     impactSeverity: impact.severity,
     ...versionChanges,
-    owner: latestCommit.author?.name || 'Unknown'
+    owner: authorName
   };
 
   const saveResult = await saveUpgrade(upgradeData);
@@ -432,15 +521,17 @@ async function handleGitHubPush(payload) {
   };
 
   const blocks = formatUpgradeBrief(briefData);
+  const slackText = sanitizeUtf8(commitMessage.split('\n')[0], '(메시지 없음)');
   const slackResult = await postToSlack(
     SLACK_CHANNEL_UPGRADES,
     blocks,
-    `${impact.isCritical ? '🔴' : '🟢'} 업그레이드: ${latestCommit.message?.split('\n')[0]}`
+    `${impact.isCritical ? '🔴' : '🟢'} 업그레이드: ${slackText}`
   );
 
   return {
     success: true,
     upgradeId: saveResult.upgradeId,
+    commitSha: latestCommit.id,
     impact,
     slackPosted: slackResult.ok === true,
     slack: {
@@ -511,30 +602,110 @@ async function handleGitHubPRMerged(payload) {
 // Render Deploy 이벤트 처리
 // ═══════════════════════════════════════════════════════════════════════════
 
+/**
+ * Render Webhook Payload 정규화
+ * Render는 두 가지 형식으로 보낼 수 있음:
+ * 1. 중첩: { deploy: { id, status, commit: { id, message } }, service: {...} }
+ * 2. 평면: { status, commit: {...}, service: {...} } (테스트용)
+ */
+function normalizeRenderPayload(payload) {
+  // 중첩 구조 (Render 실제 형식)
+  if (payload.deploy) {
+    return {
+      deployId: payload.deploy.id || null,
+      status: payload.deploy.status || 'unknown',
+      commitId: payload.deploy.commit?.id || payload.commit?.id || null,
+      commitMessage: payload.deploy.commit?.message || payload.commit?.message || null,
+      serviceName: payload.service?.name || 'daily-miracles-app',
+      serviceId: payload.service?.id || null,
+      createdAt: payload.deploy.commit?.createdAt || payload.deploy.createdAt || null
+    };
+  }
+
+  // 평면 구조 (이전 테스트 형식 호환)
+  return {
+    deployId: payload.deployId || null,
+    status: payload.status || 'unknown',
+    commitId: payload.commit?.id || null,
+    commitMessage: payload.commit?.message || null,
+    serviceName: payload.service?.name || 'daily-miracles-app',
+    serviceId: payload.service?.id || null,
+    createdAt: payload.commit?.createdAt || null
+  };
+}
+
 async function handleRenderDeploy(payload) {
-  const { status, service, commit } = payload;
+  // Payload 정규화 - 일관된 필드명 사용
+  const normalized = normalizeRenderPayload(payload);
 
-  console.log(`[RepoPulse] Render Deploy: ${status} (${commit?.id?.substring(0, 7) || 'N/A'})`);
+  // 상세 로그 (디버깅용)
+  console.log(`[RepoPulse] Render Webhook 수신:`, JSON.stringify({
+    deployId: normalized.deployId,
+    status: normalized.status,
+    commitId: normalized.commitId?.substring(0, 7),
+    serviceName: normalized.serviceName
+  }));
 
-  // 배포 상태에 따른 처리
+  // 값 검증 및 안전한 추출
+  const deployId = safeValue(normalized.deployId, '(배포ID 없음)');
+  const status = safeValue(normalized.status, 'unknown');
+  const commitId = safeValue(normalized.commitId?.substring(0, 7), '(커밋 없음)');
+  const commitMessage = sanitizeUtf8(normalized.commitMessage?.split('\n')[0], '(메시지 없음)');
+  const serviceName = safeValue(normalized.serviceName, 'daily-miracles-app');
+
+  // 배포 상태에 따른 이모지
   const statusEmoji = {
     'build_started': '🔨',
+    'build_in_progress': '🔨',
     'build_succeeded': '📦',
     'deploy_started': '🚀',
+    'deploy_in_progress': '🚀',
+    'deploy_live': '✅',
+    'live': '✅',
     'deploy_succeeded': '✅',
-    'deploy_failed': '❌'
+    'build_failed': '❌',
+    'deploy_failed': '❌',
+    'update_failed': '❌',
+    'deactivated': '⏸️',
+    'unknown': '❓'
   };
 
   const emoji = statusEmoji[status] || '📋';
-  const isFailed = status === 'deploy_failed';
+  const isFailed = status.includes('failed');
+  const isLive = status === 'live' || status === 'deploy_live' || status === 'deploy_succeeded';
 
-  // Slack 알림
+  // 배포 상태 한글화
+  const statusKorean = {
+    'build_started': '빌드 시작',
+    'build_in_progress': '빌드 중',
+    'build_succeeded': '빌드 완료',
+    'deploy_started': '배포 시작',
+    'deploy_in_progress': '배포 중',
+    'deploy_live': '배포 완료',
+    'live': '배포 완료',
+    'deploy_succeeded': '배포 완료',
+    'build_failed': '빌드 실패',
+    'deploy_failed': '배포 실패',
+    'update_failed': '업데이트 실패',
+    'deactivated': '비활성화',
+    'unknown': '상태 미확인'
+  };
+
+  const statusText = statusKorean[status] || status;
+
+  // Slack 알림 블록 구성
   const blocks = [
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `${emoji} *Render 배포 ${status}*\n• 서비스: ${service?.name || 'daily-miracles-app'}\n• 커밋: \`${commit?.id?.substring(0, 7) || 'N/A'}\`\n• 메시지: ${commit?.message?.split('\n')[0] || 'N/A'}`
+        text: [
+          `${emoji} *Render ${statusText}*`,
+          `• 서비스: ${serviceName}`,
+          `• 배포 ID: \`${deployId}\``,
+          `• 커밋: \`${commitId}\``,
+          `• 메시지: ${commitMessage}`
+        ].join('\n')
       }
     }
   ];
@@ -552,20 +723,23 @@ async function handleRenderDeploy(payload) {
   const slackResult = await postToSlack(
     SLACK_CHANNEL_UPGRADES,
     blocks,
-    `${emoji} Render 배포 ${status}`
+    `${emoji} Render ${statusText}: ${commitMessage}`
   );
 
-  // 성공 시 최근 Upgrade 레코드 업데이트
-  if (status === 'deploy_succeeded' && commit?.id) {
-    // TODO: 해당 커밋의 Upgrade 레코드 찾아서 deployed_at 업데이트
-    console.log(`[RepoPulse] 배포 완료: ${commit.id.substring(0, 7)}`);
+  // 배포 완료 시 로그
+  if (isLive && normalized.commitId) {
+    console.log(`[RepoPulse] 배포 완료: ${normalized.commitId.substring(0, 7)} (${deployId})`);
+    // TODO: Airtable Upgrades에서 해당 커밋의 deployed_at 업데이트
   }
 
   return {
     success: true,
-    status,
+    deployId: normalized.deployId,
+    status: normalized.status,
+    commitId: normalized.commitId,
     slackPosted: slackResult.ok === true,
     isFailed,
+    isLive,
     slack: {
       ok: slackResult.ok,
       error: slackResult.error,
