@@ -8,6 +8,22 @@ const cors = require("cors");
 const path = require("path");
 const analysisEngine = require("./services/analysisEngine");
 
+// ═══════════════════════════════════════════════════════════
+// 환경변수 검증 (서버 시작 전 필수 체크)
+// ═══════════════════════════════════════════════════════════
+let envValidator = null;
+try {
+  envValidator = require("./utils/envValidator");
+  const validationResult = envValidator.validateEnv({ failFast: false });
+
+  // 오류가 있으면 가이드 출력
+  if (!validationResult.isValid) {
+    envValidator.printEnvGuide();
+  }
+} catch (error) {
+  console.warn("⚠️ 환경변수 검증기 로드 실패:", error.message);
+}
+
 const app = express();
 
 // 메트릭스 서비스 로딩
