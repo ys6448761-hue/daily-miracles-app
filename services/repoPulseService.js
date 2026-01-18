@@ -389,7 +389,7 @@ async function saveUpgrade(upgradeData) {
   const fields = {
     upgrade_id: upgradeId,
     merged_at: formatDateForAirtable(upgradeData.mergedAt),
-    deployed_at: upgradeData.deployedAt ? formatDateForAirtable(upgradeData.deployedAt) : '',
+    deployed_at: upgradeData.deployedAt ? formatDateForAirtable(upgradeData.deployedAt) : null,
     contract_version: upgradeData.contractVersion || '',
     rule_version: upgradeData.ruleVersion || '',
     api_changes: JSON.stringify(upgradeData.apiChanges || []),
