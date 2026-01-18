@@ -1,1 +1,1 @@
-RepoPulse E2E Test v4 - 2026-01-18 17:50:22 KST - date format fix
+RepoPulse E2E Test v6 - 2026-01-18 17:58:19 KST - null fix verification
