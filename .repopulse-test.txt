@@ -1,1 +1,1 @@
-RepoPulse E2E Test v6 - 2026-01-18 17:58:19 KST - null fix verification
+RepoPulse E2E Test v7 - 2026-01-18 19:21:39     - full schema test
