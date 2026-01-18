@@ -117,7 +117,7 @@ async function airtableRequest(tableName, method = 'GET', body = null, recordId 
 async function postToSlack(channel, blocks, text) {
   if (!SLACK_BOT_TOKEN) {
     console.warn('[RepoPulse] Slack 토큰 미설정 - 시뮬레이션');
-    return { success: false, simulated: true };
+    return { success: false, simulated: true, ok: false, error: 'no_token', channel };
   }
 
   try {
@@ -132,15 +132,34 @@ async function postToSlack(channel, blocks, text) {
 
     const data = await response.json();
 
+    // Slack API 응답 상세 로그
+    console.log(`[RepoPulse] Slack API 응답: ok=${data.ok}, channel=${data.channel || channel}, error=${data.error || 'none'}`);
+
     if (!data.ok) {
       console.error('[RepoPulse] Slack 전송 실패:', data.error);
-      return { success: false, error: data.error };
+      return {
+        success: false,
+        ok: false,
+        error: data.error,
+        channel: data.channel || channel
+      };
     }
 
-    return { success: true, ts: data.ts };
+    return {
+      success: true,
+      ok: true,
+      ts: data.ts,
+      channel: data.channel,
+      error: null
+    };
   } catch (error) {
     console.error('[RepoPulse] Slack 전송 오류:', error.message);
-    return { success: false, error: error.message };
+    return {
+      success: false,
+      ok: false,
+      error: error.message,
+      channel
+    };
   }
 }
 
@@ -423,7 +442,12 @@ async function handleGitHubPush(payload) {
     success: true,
     upgradeId: saveResult.upgradeId,
     impact,
-    slackPosted: slackResult.success
+    slackPosted: slackResult.ok === true,
+    slack: {
+      ok: slackResult.ok,
+      error: slackResult.error,
+      channel: slackResult.channel
+    }
   };
 }
 
@@ -474,7 +498,12 @@ async function handleGitHubPRMerged(payload) {
     success: true,
     upgradeId: saveResult.upgradeId,
     impact,
-    slackPosted: slackResult.success
+    slackPosted: slackResult.ok === true,
+    slack: {
+      ok: slackResult.ok,
+      error: slackResult.error,
+      channel: slackResult.channel
+    }
   };
 }
 
@@ -535,8 +564,13 @@ async function handleRenderDeploy(payload) {
   return {
     success: true,
     status,
-    slackPosted: slackResult.success,
-    isFailed
+    slackPosted: slackResult.ok === true,
+    isFailed,
+    slack: {
+      ok: slackResult.ok,
+      error: slackResult.error,
+      channel: slackResult.channel
+    }
   };
 }
 
