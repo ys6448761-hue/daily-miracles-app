@@ -333,18 +333,20 @@ async function postToSlack(result, driveUrl, title) {
       ]
     });
 
-    // Slack API 호출
+    // Slack API 호출 (UTF-8 charset 명시)
+    const payload = JSON.stringify({
+      channel: SLACK_CHANNEL_RAW_DIGEST,
+      blocks: blocks,
+      text: `📄 ${title || '새 문서'}: ${result.summary}`  // fallback
+    });
+
     const response = await fetch('https://slack.com/api/chat.postMessage', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
         'Authorization': `Bearer ${SLACK_BOT_TOKEN}`
       },
-      body: JSON.stringify({
-        channel: SLACK_CHANNEL_RAW_DIGEST,
-        blocks: blocks,
-        text: `📄 ${title || '새 문서'}: ${result.summary}`  // fallback
-      })
+      body: payload
     });
 
     const data = await response.json();
