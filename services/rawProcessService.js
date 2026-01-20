@@ -262,14 +262,15 @@ async function postToSlack(result, driveUrl, title) {
   }
 
   try {
-    // 메시지 블록 구성
+    // 메시지 블록 구성 (header 대신 section+mrkdwn 사용 - 한글 인코딩 호환성)
+    const safeTitle = String(title || '새 문서').normalize('NFC');
+
     const blocks = [
       {
-        type: 'header',
+        type: 'section',
         text: {
-          type: 'plain_text',
-          text: `📄 ${title || '새 문서'}`,
-          emoji: true
+          type: 'mrkdwn',
+          text: `:page_facing_up: *${safeTitle}*`
         }
       },
       {
