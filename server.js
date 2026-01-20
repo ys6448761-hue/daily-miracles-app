@@ -324,6 +324,15 @@ try {
   console.error("❌ Chat Log 라우터 로드 실패:", error.message);
 }
 
+// RAW Process 라우터 로딩
+let rawProcessRoutes = null;
+try {
+  rawProcessRoutes = require("./routes/rawProcessRoutes");
+  console.log("✅ RAW Process 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ RAW Process 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -1012,6 +1021,14 @@ if (chatLogRoutes) {
   console.log("✅ Chat Log 라우터 등록 완료 (/api/chat-log/save)");
 } else {
   console.warn("⚠️ Chat Log 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- RAW Process Routes (/api/raw) ----------
+if (rawProcessRoutes) {
+  app.use("/api/raw", rawProcessRoutes);
+  console.log("✅ RAW Process 라우터 등록 완료 (/api/raw/process, /api/raw/health)");
+} else {
+  console.warn("⚠️ RAW Process 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------
