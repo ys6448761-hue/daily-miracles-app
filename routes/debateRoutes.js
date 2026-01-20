@@ -271,7 +271,64 @@ function extractTags(topic, context) {
 
 // ===== 로컬 DB 함수 (Airtable 대체용) =====
 
-// v3.1: 원자적 write (임시파일 → rename)
+// PR-4: 메모리 캐시 (동기 I/O 제거)
+const tableCache = new Map();  // table명 → 데이터 배열
+const cacheDirty = new Map();  // table명 → dirty 플래그
+const CACHE_FLUSH_INTERVAL = 5000;  // 5초마다 dirty 캐시 flush
+
+// PR-4: 캐시에서 테이블 로드 (최초 1회만 디스크 읽기)
+function loadTableToCache(table) {
+  if (tableCache.has(table)) {
+    return tableCache.get(table);
+  }
+
+  const tablePath = path.join(CONFIG.dbDir, `${table}.json`);
+  let data = [];
+
+  if (fs.existsSync(tablePath)) {
+    try {
+      data = JSON.parse(fs.readFileSync(tablePath, 'utf-8'));
+    } catch (e) {
+      console.warn(`[DebateDB] ${table} 로드 실패:`, e.message);
+      data = [];
+    }
+  }
+
+  tableCache.set(table, data);
+  cacheDirty.set(table, false);
+  return data;
+}
+
+// PR-4: 비동기 디스크 flush (백그라운드)
+function flushTableAsync(table) {
+  if (!cacheDirty.get(table)) return;
+
+  const tablePath = path.join(CONFIG.dbDir, `${table}.json`);
+  const data = tableCache.get(table) || [];
+  const tempPath = `${tablePath}.tmp.${Date.now()}`;
+
+  // 비동기 write
+  fs.promises.writeFile(tempPath, JSON.stringify(data, null, 2), 'utf-8')
+    .then(() => fs.promises.rename(tempPath, tablePath))
+    .then(() => {
+      cacheDirty.set(table, false);
+    })
+    .catch(e => {
+      console.error(`[DebateDB] ${table} flush 실패:`, e.message);
+      fs.promises.unlink(tempPath).catch(() => {});
+    });
+}
+
+// PR-4: 주기적 캐시 flush (5초마다)
+setInterval(() => {
+  for (const [table, dirty] of cacheDirty.entries()) {
+    if (dirty) {
+      flushTableAsync(table);
+    }
+  }
+}, CACHE_FLUSH_INTERVAL);
+
+// v3.1: 원자적 write (임시파일 → rename) - 동기 버전 (fallback용)
 function atomicWriteJSON(filePath, data) {
   const tempPath = `${filePath}.tmp.${Date.now()}`;
   try {
@@ -284,80 +341,59 @@ function atomicWriteJSON(filePath, data) {
   }
 }
 
+// PR-4: 캐시 기반 saveToLocalDB
 function saveToLocalDB(table, record) {
-  const tablePath = path.join(CONFIG.dbDir, `${table}.json`);
-  let data = [];
-
-  if (fs.existsSync(tablePath)) {
-    try {
-      data = JSON.parse(fs.readFileSync(tablePath, 'utf-8'));
-    } catch (e) {
-      data = [];
-    }
-  }
+  const data = loadTableToCache(table);
 
   record.created_at = new Date().toISOString();
   record.updated_at = record.created_at;
   data.push(record);
 
-  // v3.1: 원자적 write 사용
-  atomicWriteJSON(tablePath, data);
+  tableCache.set(table, data);
+  cacheDirty.set(table, true);
+
+  // 즉시 flush (중요 데이터)
+  flushTableAsync(table);
+
   return record;
 }
 
-// v3.1: request_id로 기존 debate 찾기 (Idempotency)
+// PR-4: 캐시 기반 findDebateByRequestId
 function findDebateByRequestId(requestId) {
-  const tablePath = path.join(CONFIG.dbDir, 'debates.json');
-  if (!fs.existsSync(tablePath)) return null;
-
-  try {
-    const data = JSON.parse(fs.readFileSync(tablePath, 'utf-8'));
-    return data.find(d => d.request_id === requestId) || null;
-  } catch (e) {
-    return null;
-  }
+  const data = loadTableToCache('debates');
+  return data.find(d => d.request_id === requestId) || null;
 }
 
-// v3.1: 레코드 업데이트
+// PR-4: 캐시 기반 updateInLocalDB
 function updateInLocalDB(table, id, updates) {
-  const tablePath = path.join(CONFIG.dbDir, `${table}.json`);
-  if (!fs.existsSync(tablePath)) return null;
+  const data = loadTableToCache(table);
+  const index = data.findIndex(r => r.id === id || r.debate_id === id || r.ticket_id === id);
 
-  try {
-    let data = JSON.parse(fs.readFileSync(tablePath, 'utf-8'));
-    const index = data.findIndex(r => r.id === id || r.debate_id === id || r.ticket_id === id);
-    if (index === -1) return null;
+  if (index === -1) return null;
 
-    const oldRecord = { ...data[index] };
-    data[index] = { ...data[index], ...updates, updated_at: new Date().toISOString() };
+  const oldRecord = { ...data[index] };
+  data[index] = { ...data[index], ...updates, updated_at: new Date().toISOString() };
 
-    atomicWriteJSON(tablePath, data);
-    return { old: oldRecord, new: data[index] };
-  } catch (e) {
-    return null;
-  }
+  tableCache.set(table, data);
+  cacheDirty.set(table, true);
+
+  // 즉시 flush (중요 데이터)
+  flushTableAsync(table);
+
+  return { old: oldRecord, new: data[index] };
 }
 
+// PR-4: 캐시 기반 getFromLocalDB
 function getFromLocalDB(table, filter = {}) {
-  const tablePath = path.join(CONFIG.dbDir, `${table}.json`);
+  const data = loadTableToCache(table);
 
-  if (!fs.existsSync(tablePath)) {
-    return [];
+  if (Object.keys(filter).length === 0) {
+    return [...data];  // 복사본 반환
   }
 
-  try {
-    const data = JSON.parse(fs.readFileSync(tablePath, 'utf-8'));
-
-    if (Object.keys(filter).length === 0) {
-      return data;
-    }
-
-    return data.filter(record => {
-      return Object.keys(filter).every(key => record[key] === filter[key]);
-    });
-  } catch (e) {
-    return [];
-  }
+  return data.filter(record => {
+    return Object.keys(filter).every(key => record[key] === filter[key]);
+  });
 }
 
 // ===== SafetyGate 에이전트 =====

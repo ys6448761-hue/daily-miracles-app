@@ -11,6 +11,14 @@
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
 
+// PR-1: 상단에서 1회 require (성능 최적화)
+let messageProvider = null;
+try {
+    messageProvider = require('./messageProvider');
+} catch (e) {
+    console.warn('[Airtable] messageProvider 로드 실패:', e.message);
+}
+
 // 테이블명 (환경변수 또는 기본값)
 // Note: AIRTABLE_TABLE_NAME은 deprecated - AIRTABLE_TABLE_WISHES_INBOX 사용
 const TABLES = {
@@ -227,13 +235,25 @@ async function checkAndAlert(metrics) {
         });
     }
 
-    // Alert 저장 및 카톡 발송
-    for (const alert of alerts) {
-        // Airtable에 저장
-        await createAlert(alert.severity, alert.type, alert.message, alert.payload);
+    // PR-1: Alert 저장 및 카톡 발송 (N+1 → Promise.allSettled 병렬 처리)
+    if (alerts.length > 0) {
+        const results = await Promise.allSettled(
+            alerts.map(async (alert) => {
+                // Airtable 저장과 카톡 발송을 병렬로
+                const [saveResult, kakaoResult] = await Promise.allSettled([
+                    createAlert(alert.severity, alert.type, alert.message, alert.payload),
+                    sendAlertKakao(alert)
+                ]);
+                return { alert, saveResult, kakaoResult };
+            })
+        );
 
-        // 카톡 알림 발송
-        await sendAlertKakao(alert);
+        // 실패 로깅
+        results.forEach((r, i) => {
+            if (r.status === 'rejected') {
+                console.error(`[Airtable] Alert 처리 실패 [${i}]:`, r.reason);
+            }
+        });
     }
 
     return alerts;
@@ -244,7 +264,11 @@ async function checkAndAlert(metrics) {
  */
 async function sendAlertKakao(alert) {
     try {
-        const messageProvider = require('./messageProvider');
+        // PR-1: 상단에서 로드한 messageProvider 사용 (매번 require 제거)
+        if (!messageProvider) {
+            console.warn('[Airtable] messageProvider 미설정 - 알림 발송 스킵');
+            return;
+        }
 
         // 코미(COO) 번호
         const COO_PHONE = process.env.COO_PHONE || process.env.CRO_PHONE;

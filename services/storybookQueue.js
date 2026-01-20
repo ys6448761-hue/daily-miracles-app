@@ -419,22 +419,41 @@ async function runEthicsGate(generatedAssets) {
 async function saveAssets(orderId, assets) {
   const savedAssets = [];
 
-  for (const asset of assets) {
-    // DB에 저장
-    if (db) {
-      try {
-        await db.query(
-          `INSERT INTO storybook_assets
-           (order_id, asset_type, file_url, file_name, file_size_bytes, asset_hash, expires_at, created_at)
-           VALUES ($1, $2, $3, $4, $5, $6, NOW() + INTERVAL '14 days', NOW())
-           ON CONFLICT (order_id, asset_hash) DO NOTHING`,
-          [orderId, asset.type, asset.url, asset.name, asset.size, asset.hash]
-        );
-      } catch (error) {
-        console.error('산출물 저장 실패:', error.message);
-      }
-    }
+  // PR-2: 배치 INSERT (N+1 → 단일 쿼리)
+  if (db && assets.length > 0) {
+    try {
+      // 동적 VALUES 생성
+      const values = [];
+      const params = [];
+      let paramIndex = 1;
 
+      for (const asset of assets) {
+        values.push(`($${paramIndex}, $${paramIndex + 1}, $${paramIndex + 2}, $${paramIndex + 3}, $${paramIndex + 4}, $${paramIndex + 5}, NOW() + INTERVAL '14 days', NOW())`);
+        params.push(
+          orderId,
+          asset.type,
+          asset.url,
+          asset.name,
+          asset.size,
+          asset.hash
+        );
+        paramIndex += 6;
+      }
+
+      await db.query(
+        `INSERT INTO storybook_assets
+         (order_id, asset_type, file_url, file_name, file_size_bytes, asset_hash, expires_at, created_at)
+         VALUES ${values.join(', ')}
+         ON CONFLICT (order_id, asset_hash) DO NOTHING`,
+        params
+      );
+    } catch (error) {
+      console.error('산출물 배치 저장 실패:', error.message);
+    }
+  }
+
+  // savedAssets 배열 생성
+  for (const asset of assets) {
     savedAssets.push({
       ...asset,
       order_id: orderId,

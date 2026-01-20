@@ -294,15 +294,30 @@ router.post('/bookings', async (req, res) => {
 
             const booking = bookingResult.rows[0];
 
-            // 예약별 활동 삽입
+            // PR-2: 예약별 활동 삽입 (N+1 → 배치 INSERT)
             if (selected_activities.length > 0) {
+                // 동적 VALUES 생성
+                const values = [];
+                const params = [];
+                let paramIndex = 1;
+
                 for (const activity of selected_activities) {
-                    await client.query(
-                        `INSERT INTO booking_activities (booking_id, activity_id, scheduled_date, num_participants, price)
-                         VALUES ($1, $2, $3, $4, $5)`,
-                        [booking.id, activity.id, check_in_date, num_guests, activity.price * num_guests]
+                    values.push(`($${paramIndex}, $${paramIndex + 1}, $${paramIndex + 2}, $${paramIndex + 3}, $${paramIndex + 4})`);
+                    params.push(
+                        booking.id,
+                        activity.id,
+                        check_in_date,
+                        num_guests,
+                        activity.price * num_guests
                     );
+                    paramIndex += 5;
                 }
+
+                await client.query(
+                    `INSERT INTO booking_activities (booking_id, activity_id, scheduled_date, num_participants, price)
+                     VALUES ${values.join(', ')}`,
+                    params
+                );
             }
 
             await client.query('COMMIT');

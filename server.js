@@ -5,6 +5,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const compression = require("compression");  // PR-3: gzip 압축
 const path = require("path");
 const analysisEngine = require("./services/analysisEngine");
 
@@ -314,6 +315,15 @@ try {
   console.error("❌ RepoPulse 라우터 로드 실패:", error.message);
 }
 
+// Chat Log 라우터 로딩
+let chatLogRoutes = null;
+try {
+  chatLogRoutes = require("./routes/chatLogRoutes");
+  console.log("✅ Chat Log 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ Chat Log 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -351,6 +361,19 @@ app.use(
 // 모든 프리플라이트를 즉시 OK
 app.options("*", (req, res) => res.sendStatus(204));
 
+// PR-3: gzip 압축 미들웨어 (JSON 응답 60-70% 크기 감소)
+app.use(compression({
+  level: 6,  // 압축 레벨 (1-9, 6이 균형점)
+  threshold: 1024,  // 1KB 이상만 압축
+  filter: (req, res) => {
+    // 기본 필터 사용 (text/*, application/json 등 압축)
+    if (req.headers['x-no-compression']) {
+      return false;  // 클라이언트가 압축 거부 시
+    }
+    return compression.filter(req, res);
+  }
+}));
+
 // ---------- Body Parsing (관용) ----------
 // Slack 서명 검증용 rawBody 저장 (verify 콜백)
 app.use(express.json({
@@ -373,7 +396,28 @@ app.use((req, _res, next) => {
 });
 
 // ---------- Static ----------
-app.use(express.static(path.join(__dirname, "public")));
+// PR-5: Cache-Control 헤더 추가 (브라우저 캐싱 활성화)
+app.use(express.static(path.join(__dirname, "public"), {
+  maxAge: '1d',           // 정적 파일 1일 캐싱
+  etag: true,             // ETag 활성화 (조건부 요청)
+  lastModified: true,     // Last-Modified 헤더
+  setHeaders: (res, filePath) => {
+    // 파일 타입별 캐시 전략
+    if (filePath.endsWith('.html')) {
+      // HTML은 짧게 캐싱 (콘텐츠 변경 가능)
+      res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+    } else if (filePath.match(/\.(js|css)$/)) {
+      // JS/CSS는 1일 캐싱
+      res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
+    } else if (filePath.match(/\.(png|jpg|jpeg|gif|ico|svg|webp)$/)) {
+      // 이미지는 7일 캐싱
+      res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+    } else if (filePath.match(/\.(woff|woff2|ttf|eot)$/)) {
+      // 폰트는 30일 캐싱
+      res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
+    }
+  }
+}));
 
 // ---------- Clean URL Routes (확장자 없이 접근) ----------
 app.get("/quote", (_req, res) => {
@@ -960,6 +1004,14 @@ if (repoPulseRoutes) {
   console.log("✅ RepoPulse 라우터 등록 완료 (/api/repopulse/github, /api/repopulse/render)");
 } else {
   console.warn("⚠️ RepoPulse 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- Chat Log Routes (/api/chat-log) ----------
+if (chatLogRoutes) {
+  app.use("/api/chat-log", chatLogRoutes);
+  console.log("✅ Chat Log 라우터 등록 완료 (/api/chat-log/save)");
+} else {
+  console.warn("⚠️ Chat Log 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------

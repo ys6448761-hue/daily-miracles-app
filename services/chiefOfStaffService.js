@@ -608,11 +608,20 @@ async function runChiefOfStaff(options = {}) {
   const slackResults = [];
 
   if (triggeredAlerts.length > 0) {
-    // 1. 각 알람 Airtable 저장
-    for (const alert of triggeredAlerts) {
-      const saveResult = await saveAlert(alert);
-      savedAlerts.push({ ...alert, saved: saveResult.success, alertId: saveResult.alertId });
-    }
+    // PR-1: 1. 각 알람 Airtable 저장 (N+1 → Promise.allSettled 병렬 처리)
+    const saveResults = await Promise.allSettled(
+      triggeredAlerts.map(alert => saveAlert(alert))
+    );
+
+    saveResults.forEach((result, i) => {
+      const alert = triggeredAlerts[i];
+      if (result.status === 'fulfilled') {
+        savedAlerts.push({ ...alert, saved: result.value.success, alertId: result.value.alertId });
+      } else {
+        console.error(`[ChiefOfStaff] Alert 저장 실패:`, result.reason);
+        savedAlerts.push({ ...alert, saved: false, error: result.reason?.message });
+      }
+    });
 
     // 2. 일반 알람 Slack 게시 (#소원이-리포트)
     const generalAlerts = triggeredAlerts.filter(a =>
@@ -629,19 +638,30 @@ async function runChiefOfStaff(options = {}) {
       slackResults.push({ channel: 'report', ...slackResult });
     }
 
-    // 3. 리스크 에스컬레이션 (#소원이-검수)
+    // PR-1: 3. 리스크 에스컬레이션 (N+1 → Promise.allSettled 병렬 처리)
     const riskAlerts = triggeredAlerts.filter(a =>
       a.rule.includes('RED_UNHANDLED') || a.rule.includes('YELLOW_UNHANDLED')
     );
 
-    for (const alert of riskAlerts) {
-      const blocks = formatEscalationBlocks(alert);
-      const slackResult = await postToSlack(
-        SLACK_CHANNEL_REVIEW,
-        blocks,
-        `${alert.rule.includes('RED') ? '🔴' : '🟡'} 리스크 에스컬레이션: ${alert.message}`
+    if (riskAlerts.length > 0) {
+      const riskSlackResults = await Promise.allSettled(
+        riskAlerts.map(alert => {
+          const blocks = formatEscalationBlocks(alert);
+          return postToSlack(
+            SLACK_CHANNEL_REVIEW,
+            blocks,
+            `${alert.rule.includes('RED') ? '🔴' : '🟡'} 리스크 에스컬레이션: ${alert.message}`
+          ).then(result => ({ channel: 'review', rule: alert.rule, ...result }));
+        })
       );
-      slackResults.push({ channel: 'review', rule: alert.rule, ...slackResult });
+
+      riskSlackResults.forEach((result, i) => {
+        if (result.status === 'fulfilled') {
+          slackResults.push(result.value);
+        } else {
+          console.error(`[ChiefOfStaff] Slack 전송 실패 [${riskAlerts[i].rule}]:`, result.reason);
+        }
+      });
     }
   }
 
