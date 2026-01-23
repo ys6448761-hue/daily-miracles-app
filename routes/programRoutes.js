@@ -298,8 +298,8 @@ router.post('/checkout', async (req, res) => {
       payment: paymentInfo || {
         // 테스트용 결제 정보 (Toss 미연동 시)
         clientKey: process.env.TOSS_CLIENT_KEY || 'test_ck_xxx',
-        successUrl: `${process.env.APP_BASE_URL || 'https://daily-miracles-app.onrender.com'}/api/program/payment/success`,
-        failUrl: `${process.env.APP_BASE_URL || 'https://daily-miracles-app.onrender.com'}/api/program/payment/fail`
+        successUrl: `${process.env.APP_BASE_URL || 'https://app.dailymiracles.kr'}/api/program/payment/success`,
+        failUrl: `${process.env.APP_BASE_URL || 'https://app.dailymiracles.kr'}/api/program/payment/fail`
       }
     };
 

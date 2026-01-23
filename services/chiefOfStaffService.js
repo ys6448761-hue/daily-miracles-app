@@ -151,7 +151,7 @@ async function postToSlack(channel, blocks, text) {
  */
 async function checkAppHealth() {
   try {
-    const response = await fetch('https://daily-miracles-app.onrender.com/api/health', {
+    const response = await fetch(`${process.env.APP_BASE_URL || 'https://app.dailymiracles.kr'}/api/health`, {
       timeout: 10000
     });
 

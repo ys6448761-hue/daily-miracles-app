@@ -29,7 +29,7 @@ const TOSS_SECRET_KEY = process.env.TOSS_SECRET_KEY;
 const TOSS_CLIENT_KEY = process.env.TOSS_CLIENT_KEY;
 
 // 기본 URL (환경변수 우선, 없으면 기본값)
-const BASE_URL = process.env.API_BASE_URL || 'https://daily-miracles-app.onrender.com';
+const BASE_URL = process.env.APP_BASE_URL || 'https://app.dailymiracles.kr';
 const DEFAULT_SUCCESS_URL = process.env.PAYMENT_SUCCESS_URL || `${BASE_URL}/payment/success`;
 const DEFAULT_FAIL_URL = process.env.PAYMENT_FAIL_URL || `${BASE_URL}/payment/fail`;
 

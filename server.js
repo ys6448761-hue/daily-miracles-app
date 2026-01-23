@@ -13,6 +13,7 @@ const analysisEngine = require("./services/analysisEngine");
 // 환경변수 검증 (서버 시작 전 필수 체크)
 // ═══════════════════════════════════════════════════════════
 let envValidator = null;
+let exportPipelineStatus = null;
 try {
   envValidator = require("./utils/envValidator");
   const validationResult = envValidator.validateEnv({ failFast: false });
@@ -21,6 +22,9 @@ try {
   if (!validationResult.isValid) {
     envValidator.printEnvGuide();
   }
+
+  // Export Pipeline 설정 상태 출력
+  exportPipelineStatus = envValidator.printExportStatus();
 } catch (error) {
   console.warn("⚠️ 환경변수 검증기 로드 실패:", error.message);
 }
@@ -333,6 +337,15 @@ try {
   console.error("❌ RAW Process 라우터 로드 실패:", error.message);
 }
 
+// Drive→GitHub Sync 라우터 로딩
+let driveGitHubSyncRoutes = null;
+try {
+  driveGitHubSyncRoutes = require("./routes/driveGitHubSyncRoutes");
+  console.log("✅ Drive→GitHub Sync 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ Drive→GitHub Sync 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -369,6 +382,32 @@ app.use(
 
 // 모든 프리플라이트를 즉시 OK
 app.options("*", (req, res) => res.sendStatus(204));
+
+// ═══════════════════════════════════════════════════════════════════════════
+// onrender.com → app.dailymiracles.kr 리다이렉트 (HTML 페이지만)
+// API 요청은 하위 호환성을 위해 리다이렉트하지 않음
+// ═══════════════════════════════════════════════════════════════════════════
+const NEW_DOMAIN = 'https://app.dailymiracles.kr';
+const OLD_DOMAINS = ['daily-miracles-app.onrender.com', 'daily-miracles-mvp.onrender.com'];
+
+app.use((req, res, next) => {
+  const host = req.get('host') || '';
+
+  // 구 도메인에서 접근한 경우
+  if (OLD_DOMAINS.some(old => host.includes(old))) {
+    // API 요청은 리다이렉트하지 않음 (하위 호환성)
+    if (req.path.startsWith('/api/') || req.path.startsWith('/webhooks/')) {
+      return next();
+    }
+
+    // HTML 페이지 요청은 새 도메인으로 리다이렉트
+    const newUrl = `${NEW_DOMAIN}${req.originalUrl}`;
+    console.log(`🔄 Redirect: ${host}${req.originalUrl} → ${newUrl}`);
+    return res.redirect(301, newUrl);
+  }
+
+  next();
+});
 
 // PR-3: gzip 압축 미들웨어 (JSON 응답 60-70% 크기 감소)
 app.use(compression({
@@ -1029,6 +1068,14 @@ if (rawProcessRoutes) {
   console.log("✅ RAW Process 라우터 등록 완료 (/api/raw/process, /api/raw/health)");
 } else {
   console.warn("⚠️ RAW Process 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- Drive→GitHub Sync Routes (/api/sync) ----------
+if (driveGitHubSyncRoutes) {
+  app.use("/api/sync", driveGitHubSyncRoutes);
+  console.log("✅ Drive→GitHub Sync 라우터 등록 완료 (/api/sync/run, /api/sync/health, /api/sync/status)");
+} else {
+  console.warn("⚠️ Drive→GitHub Sync 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------

@@ -28,7 +28,7 @@ const { execSync } = require('child_process');
 // ═══════════════════════════════════════════════════════════
 const CONFIG = {
     // API 엔드포인트 (Render 배포 URL)
-    apiBaseUrl: process.env.API_BASE_URL || 'https://daily-miracles-app.onrender.com',
+    apiBaseUrl: process.env.APP_BASE_URL || 'https://app.dailymiracles.kr',
     // 내부 테스트용 전화번호
     testPhone: process.env.TEST_PHONE || '',
     // 로그 저장 경로

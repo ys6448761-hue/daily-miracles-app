@@ -22,7 +22,7 @@ const SENS_TEMPLATE_CODE = process.env.SENS_TEMPLATE_CODE;   // 알림톡 템플
 const SENS_QUOTE_TEMPLATE_CODE = process.env.SENS_QUOTE_TEMPLATE_CODE; // 견적 접수 알림톡 템플릿
 
 // 앱 도메인 (링크 생성용)
-const APP_BASE_URL = process.env.APP_BASE_URL || 'https://daily-miracles-app.onrender.com';
+const APP_BASE_URL = process.env.APP_BASE_URL || 'https://app.dailymiracles.kr';
 
 // 발신번호
 const SENDER_PHONE = process.env.SENDER_PHONE || '18996117';

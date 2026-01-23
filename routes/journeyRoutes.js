@@ -185,7 +185,7 @@ async function generateImage(journey) {
     // 실제로는 wish-image API 호출
     // 여기서는 시뮬레이션
     return {
-        image_url: `https://daily-miracles-app.onrender.com/images/wish_${journey.wish_id}.png`,
+        image_url: `${process.env.APP_BASE_URL || 'https://app.dailymiracles.kr'}/images/wish_${journey.wish_id}.png`,
         generated_at: new Date().toISOString()
     };
 }

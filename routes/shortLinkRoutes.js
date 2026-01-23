@@ -120,7 +120,7 @@ router.get('/:token/preview', async (req, res) => {
     <meta property="og:title" content="기적 분석 결과가 도착했어요! ✨" />
     <meta property="og:description" content="나만의 30일 로드맵이 준비되었습니다. 지금 확인해보세요!" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="${process.env.APP_BASE_URL || 'https://daily-miracles-app.onrender.com'}/r/${token}" />
+    <meta property="og:url" content="${process.env.APP_BASE_URL || 'https://app.dailymiracles.kr'}/r/${token}" />
     <meta http-equiv="refresh" content="0;url=/result/${token}" />
 </head>
 <body>

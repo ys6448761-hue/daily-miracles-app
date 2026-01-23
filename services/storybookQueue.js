@@ -742,7 +742,7 @@ async function sendRedAlert(orderId, errorCode, details = {}) {
 ${JSON.stringify(details, null, 2).substring(0, 200)}
 
 📊 대시보드 확인:
-https://daily-miracles-app.onrender.com/api/storybook/orders/${orderId}`;
+${process.env.APP_BASE_URL || 'https://app.dailymiracles.kr'}/api/storybook/orders/${orderId}`;
 
     let messageId = `alert-mock-${Date.now()}`;
 

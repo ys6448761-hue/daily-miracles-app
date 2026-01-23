@@ -19,7 +19,7 @@ const https = require('https');
 
 const CONFIG = {
   RAW_DIR: path.join(__dirname, '..', 'docs', 'raw', 'conversations'),
-  API_URL: 'https://daily-miracles-app.onrender.com/api/raw/process',
+  API_URL: process.env.APP_BASE_URL ? `${process.env.APP_BASE_URL}/api/raw/process` : 'https://app.dailymiracles.kr/api/raw/process',
   DELAY_MS: 2000,  // API 호출 간 딜레이 (레이트 리밋 방지)
   DRY_RUN: process.argv.includes('--dry-run'),
   LIMIT: parseInt((process.argv.find(a => a.startsWith('--limit=')) || '').split('=')[1]) || Infinity

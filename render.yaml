@@ -19,9 +19,13 @@ services:
       - key: npm_config_build_from_source
         value: "false"
 
-      # CORS
+      # CORS (전환기간 4개 도메인 허용)
       - key: ALLOWED_ORIGINS
-        value: "https://daily-miracles-mvp.onrender.com,https://yourusername.wixsite.com"
+        value: "https://dailymiracles.kr,https://www.dailymiracles.kr,https://app.dailymiracles.kr,https://daily-miracles-app.onrender.com"
+
+      # 앱 기본 URL
+      - key: APP_BASE_URL
+        value: "https://app.dailymiracles.kr"
 
       # ═══════════════════════════════════════════════════
       # 아래 환경변수는 Render 대시보드에서 직접 설정

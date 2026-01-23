@@ -670,7 +670,7 @@
     (async () => {
       try {
         // 1차: API에서 최신 결과 가져오기
-        const response = await fetch('https://daily-miracles-app.onrender.com/api/story/latest');
+        const response = await fetch('https://app.dailymiracles.kr/api/story/latest');
 
         if (response.ok) {
           let data = await response.json();
