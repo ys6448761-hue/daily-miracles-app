@@ -20,6 +20,7 @@ const SENS_SMS_SERVICE_ID = process.env.SENS_SMS_SERVICE_ID; // SMS 서비스 ID
 const SENS_CHANNEL_ID = process.env.SENS_CHANNEL_ID || '_xfxhcWn'; // 카카오 채널 ID
 const SENS_TEMPLATE_CODE = process.env.SENS_TEMPLATE_CODE;   // 알림톡 템플릿 코드 (기적 결과)
 const SENS_QUOTE_TEMPLATE_CODE = process.env.SENS_QUOTE_TEMPLATE_CODE; // 견적 접수 알림톡 템플릿
+const SENS_ACK_TEMPLATE_CODE = process.env.SENS_ACK_TEMPLATE_CODE || 'betawelcome'; // 소원 접수 ACK 알림톡 템플릿
 
 // 앱 도메인 (링크 생성용)
 const APP_BASE_URL = process.env.APP_BASE_URL || 'https://app.dailymiracles.kr';
@@ -34,6 +35,7 @@ console.log('[MessageProvider] 설정:', {
     SENS_SERVICE_ID: SENS_SERVICE_ID || '❌ 미설정',
     SENS_CHANNEL_ID: SENS_CHANNEL_ID,
     SENS_TEMPLATE_CODE: SENS_TEMPLATE_CODE || '❌ 미설정',
+    SENS_ACK_TEMPLATE_CODE: SENS_ACK_TEMPLATE_CODE || '❌ 미설정',
     SENS_QUOTE_TEMPLATE_CODE: SENS_QUOTE_TEMPLATE_CODE || '❌ 미설정',
     APP_BASE_URL
 });
@@ -418,24 +420,123 @@ async function sendResultMessage(phone, name, score, token) {
 }
 
 /**
- * 소원 접수 ACK 발송
+ * 소원 접수 ACK 발송 (알림톡 우선, SMS failover)
  */
 async function sendWishAckMessage(phone, wishData) {
     const { name, gem_meaning, miracleScore } = wishData;
+    const messageId = generateMessageId();
+    const normalizedPhone = normalizePhone(phone);
 
     console.log(`[MessageProvider] ACK 발송:`, {
-        to: maskPhone(phone),
+        messageId,
+        to: maskPhone(normalizedPhone),
         name,
-        score: miracleScore
+        score: miracleScore,
+        templateCode: SENS_ACK_TEMPLATE_CODE
     });
 
-    // SENS SMS로 발송 (알림톡 템플릿 승인 전까지)
-    if (USE_SENS) {
-        const text = `[하루하루의기적] ${name}님 소원접수완료! 기적지수 ${miracleScore}점. 7일간 응원메시지 발송예정. 문의 1899-6117`;
-        return await sendSensSMS(phone, text);
+    if (!USE_SENS) {
+        return { success: false, reason: '발송 채널 비활성화' };
     }
 
-    return { success: false, reason: '발송 채널 비활성화' };
+    // 1. 알림톡 발송 시도 (betawelcome 템플릿)
+    if (SENS_ACCESS_KEY && SENS_SECRET_KEY && SENS_SERVICE_ID && SENS_ACK_TEMPLATE_CODE) {
+        try {
+            await logMessageSend(messageId, 'ack_alimtalk', normalizedPhone, MESSAGE_STATUS.PENDING, {
+                templateCode: SENS_ACK_TEMPLATE_CODE,
+                name,
+                score: miracleScore
+            });
+
+            const timestamp = Date.now().toString();
+            const url = `/alimtalk/v2/services/${SENS_SERVICE_ID}/messages`;
+            const signature = makeSensSignature('POST', url, timestamp);
+
+            // betawelcome 템플릿 내용 구성
+            const content = buildAckAlimtalkContent({ name, miracleScore, gem_meaning });
+
+            const requestBody = {
+                plusFriendId: SENS_CHANNEL_ID,
+                templateCode: SENS_ACK_TEMPLATE_CODE,
+                messages: [{
+                    to: normalizedPhone,
+                    content: content
+                }]
+            };
+
+            const response = await fetch(`https://sens.apigw.ntruss.com${url}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'x-ncp-apigw-timestamp': timestamp,
+                    'x-ncp-iam-access-key': SENS_ACCESS_KEY,
+                    'x-ncp-apigw-signature-v2': signature
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.statusCode === '202') {
+                console.log(`[MessageProvider] ACK 알림톡 발송 성공:`, {
+                    messageId,
+                    requestId: result.requestId
+                });
+                await logMessageSend(messageId, 'ack_alimtalk', normalizedPhone, MESSAGE_STATUS.SENT, {
+                    requestId: result.requestId
+                });
+                return {
+                    success: true,
+                    messageId,
+                    requestId: result.requestId,
+                    status: MESSAGE_STATUS.SENT,
+                    channel: 'SENS_ALIMTALK'
+                };
+            } else {
+                console.warn(`[MessageProvider] ACK 알림톡 발송 실패, SMS fallback:`, result);
+                await logMessageSend(messageId, 'ack_alimtalk', normalizedPhone, MESSAGE_STATUS.FAILED, {
+                    error: result.statusName || result.error
+                });
+                // SMS fallback으로 진행
+            }
+        } catch (error) {
+            console.error(`[MessageProvider] ACK 알림톡 에러, SMS fallback:`, error.message);
+            await logMessageSend(messageId, 'ack_alimtalk', normalizedPhone, MESSAGE_STATUS.FAILED, {
+                error: error.message
+            });
+            // SMS fallback으로 진행
+        }
+    }
+
+    // 2. SMS Failover
+    console.log(`[MessageProvider] ACK SMS fallback 발송`);
+    const smsText = `[하루하루의기적] ${name}님 소원접수완료! 기적지수 ${miracleScore}점. 7일간 응원메시지 발송예정. 문의 1899-6117`;
+    const smsResult = await sendSensSMS(normalizedPhone, smsText);
+
+    if (smsResult.success) {
+        return { ...smsResult, fallback: true };
+    }
+
+    return { success: false, reason: '모든 채널 발송 실패', messageId };
+}
+
+/**
+ * ACK 알림톡 컨텐츠 빌드 (betawelcome 템플릿)
+ */
+function buildAckAlimtalkContent(vars) {
+    const { name, miracleScore, gem_meaning } = vars;
+
+    // betawelcome 템플릿에 맞는 내용 구성
+    // 템플릿 변수: #{name}, #{score} 등
+    return `${name}님, 소원이 접수되었습니다! ✨
+
+🌟 기적지수: ${miracleScore}점
+💎 에너지: ${gem_meaning || '긍정 에너지'}
+
+7일간 매일 아침/저녁 응원 메시지가 발송됩니다.
+소원 실현을 응원합니다!
+
+- 하루하루의 기적`;
 }
 
 /**
