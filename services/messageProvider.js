@@ -540,6 +540,7 @@ async function sendWishAckMessage(phone, wishData) {
 function buildAckAlimtalkContent(vars) {
     const { name } = vars;
 
+    // ⚠️ 템플릿 원문과 정확히 일치해야 함 (줄바꿈, 공백, 이모지 포함)
     return `${name}님, 환영합니다! 🎉
 
 하루하루의 기적 베타 테스터가 되어주셔서 감사합니다.
@@ -548,7 +549,9 @@ function buildAckAlimtalkContent(vars) {
 
 내일 아침부터 시작됩니다! ✨
 
-궁금한 점이 있으시면 언제든 문의해주세요 👇`;
+궁금한 점이 있으시면 언제든 문의해주세요 😊
+
+- 하루하루의 기적 드림`;
 }
 
 /**
