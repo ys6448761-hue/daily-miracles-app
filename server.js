@@ -488,6 +488,12 @@ app.get("/program/messages", (_req, res) => {
   res.sendFile(path.join(__dirname, "public", "program-messages.html"));
 });
 
+// ---------- Result Page (기적 결과 페이지) ----------
+// /result/:id 형태의 URL을 result.html로 라우팅 (ID는 프론트에서 처리)
+app.get("/result/:id", (_req, res) => {
+  res.sendFile(path.join(__dirname, "public", "result.html"));
+});
+
 // ---------- Request Logging (가시화) ----------
 if (String(process.env.REQUEST_LOG || "1") === "1") {
   app.use((req, _res, next) => {
