@@ -466,6 +466,11 @@ async function sendWishAckMessage(phone, wishData) {
                 }]
             };
 
+            // 🔍 디버깅: SENS API payload 전체 로그
+            console.log(`[MessageProvider] ACK 알림톡 SENS API Payload:`, JSON.stringify(requestBody, null, 2));
+            console.log(`[MessageProvider] ACK 알림톡 본문 내용:\n${content}`);
+            console.log(`[MessageProvider] ACK 알림톡 버튼:`, JSON.stringify(buttons, null, 2));
+
             const response = await fetch(`https://sens.apigw.ntruss.com${url}`, {
                 method: 'POST',
                 headers: {
