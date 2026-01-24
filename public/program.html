@@ -15,85 +15,156 @@
       color: #333;
     }
     .container {
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
       padding: 40px 20px;
     }
-    .header {
+
+    /* ===== Hero Section ===== */
+    .hero {
       text-align: center;
       color: white;
       margin-bottom: 40px;
+      padding: 20px 0;
     }
-    .header h1 {
+    .hero h1 {
       font-size: 32px;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
+      line-height: 1.3;
     }
-    .header p {
+    .hero p {
       font-size: 16px;
       opacity: 0.9;
+      line-height: 1.6;
+      margin-bottom: 24px;
     }
-    .products {
+    .hero-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .hero-btn {
+      padding: 14px 28px;
+      border-radius: 30px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .hero-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    .hero-btn.primary {
+      background: white;
+      color: #667eea;
+    }
+    .hero-btn.secondary {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 2px solid rgba(255,255,255,0.5);
+    }
+
+    /* ===== Quick Select ===== */
+    .quick-select {
+      background: rgba(255,255,255,0.95);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+    .quick-select h2 {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .quick-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+    .quick-btn {
+      padding: 12px 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 25px;
+      background: white;
+      font-size: 14px;
+      font-weight: 500;
+      color: #555;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .quick-btn:hover {
+      border-color: #667eea;
+      color: #667eea;
+      background: #f8f9ff;
+    }
+
+    /* ===== Section Title ===== */
+    .section-divider {
+      text-align: center;
+      margin: 40px 0 24px;
+      color: white;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    .section-divider span {
+      background: rgba(255,255,255,0.2);
+      padding: 8px 20px;
+      border-radius: 20px;
+    }
+
+    /* ===== Product Cards ===== */
+    .products-row {
       display: grid;
       gap: 20px;
+      margin-bottom: 20px;
     }
-    @media (min-width: 600px) {
-      .products { grid-template-columns: repeat(3, 1fr); }
+    .products-row.two-col {
+      grid-template-columns: 1fr 1fr;
     }
+    .products-row.three-col {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    @media (max-width: 700px) {
+      .products-row.two-col,
+      .products-row.three-col {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .product-card {
       background: white;
       border-radius: 16px;
-      padding: 24px;
+      padding: 28px 24px;
       text-align: center;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.12);
       transition: transform 0.2s;
+      position: relative;
     }
     .product-card:hover {
       transform: translateY(-4px);
     }
-    .product-card.featured {
-      border: 3px solid #667eea;
-      position: relative;
-    }
-    .product-card.featured::before {
-      content: 'BEST';
+
+    /* Tags */
+    .tag {
       position: absolute;
       top: -12px;
       left: 50%;
       transform: translateX(-50%);
-      background: #667eea;
-      color: white;
-      padding: 4px 16px;
+      padding: 5px 16px;
       border-radius: 20px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
+      letter-spacing: 0.5px;
     }
-    .product-card.entry {
-      border: 3px solid #ffc107;
-      position: relative;
-    }
-    .product-card.entry::before {
-      content: 'START';
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #ffc107;
-      color: #333;
-      padding: 4px 16px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
-    }
-    .upgrade-notice {
-      background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 16px;
-      font-size: 12px;
-      color: #856404;
-      font-weight: 600;
-      line-height: 1.4;
-    }
+    .tag.free { background: #4caf50; color: white; }
+    .tag.start { background: #ffc107; color: #333; }
+    .tag.best { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+
     .product-icon {
       font-size: 48px;
       margin-bottom: 16px;
@@ -101,26 +172,102 @@
     .product-name {
       font-size: 20px;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
       color: #333;
     }
-    .product-desc {
+    .product-subtitle {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 12px;
+    }
+    .product-value {
       font-size: 14px;
-      color: #666;
+      color: #667eea;
+      font-weight: 600;
       margin-bottom: 16px;
-      line-height: 1.5;
+      padding: 8px 12px;
+      background: #f8f9ff;
+      border-radius: 8px;
     }
     .product-price {
-      font-size: 28px;
+      font-size: 32px;
       font-weight: 700;
       color: #667eea;
-      margin-bottom: 16px;
+      margin-bottom: 4px;
     }
     .product-price span {
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 400;
+    }
+    .product-price-note {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 16px;
+    }
+
+    .recommend-box {
+      background: #f5f5f5;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+    .recommend-box strong {
+      font-size: 12px;
+      color: #667eea;
+      display: block;
+      margin-bottom: 6px;
+    }
+    .recommend-box ul {
+      list-style: none;
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .includes-box {
+      text-align: left;
+      margin-bottom: 16px;
+    }
+    .includes-box .item {
+      font-size: 13px;
+      color: #333;
+      padding: 4px 0;
+    }
+    .includes-box .item.included::before {
+      content: '✓ ';
+      color: #4caf50;
+      font-weight: 700;
+    }
+    .includes-box .item.excluded {
       color: #999;
     }
+    .includes-box .item.excluded::before {
+      content: '✕ ';
+      color: #ccc;
+    }
+
+    .special-badge {
+      background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      color: #856404;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .discount-badge {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+      color: white;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
     .buy-btn {
       width: 100%;
       padding: 14px;
@@ -128,19 +275,144 @@
       border: none;
       border-radius: 10px;
       color: white;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      transition: opacity 0.2s;
+      transition: opacity 0.2s, transform 0.2s;
     }
     .buy-btn:hover {
       opacity: 0.9;
+      transform: translateY(-1px);
     }
-    .buy-btn:disabled {
-      background: #ccc;
-      cursor: not-allowed;
+    .buy-btn.outline {
+      background: white;
+      border: 2px solid #667eea;
+      color: #667eea;
     }
-    /* Checkout Modal */
+    .buy-btn.outline:hover {
+      background: #f8f9ff;
+    }
+
+    /* ===== Comparison Tables ===== */
+    .comparison-section {
+      background: rgba(255,255,255,0.95);
+      border-radius: 20px;
+      padding: 28px;
+      margin: 30px 0;
+    }
+    .comparison-section h3 {
+      font-size: 18px;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .comparison-table th,
+    .comparison-table td {
+      padding: 12px 8px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+    }
+    .comparison-table th {
+      background: #f8f9ff;
+      font-weight: 600;
+      color: #667eea;
+    }
+    .comparison-table td:first-child {
+      text-align: left;
+      font-weight: 500;
+      color: #555;
+    }
+    .comparison-table .check { color: #4caf50; font-weight: 700; }
+    .comparison-table .cross { color: #ccc; }
+    .comparison-table .best-col {
+      background: #f8f9ff;
+    }
+
+    /* ===== FAQ ===== */
+    .faq-section {
+      background: rgba(255,255,255,0.95);
+      border-radius: 20px;
+      padding: 28px;
+      margin: 30px 0;
+    }
+    .faq-section h3 {
+      font-size: 18px;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .faq-item {
+      border-bottom: 1px solid #eee;
+    }
+    .faq-item:last-child {
+      border-bottom: none;
+    }
+    .faq-question {
+      width: 100%;
+      padding: 16px 0;
+      background: none;
+      border: none;
+      text-align: left;
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: inherit;
+    }
+    .faq-question::after {
+      content: '+';
+      font-size: 20px;
+      color: #667eea;
+      transition: transform 0.2s;
+    }
+    .faq-item.open .faq-question::after {
+      transform: rotate(45deg);
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .faq-item.open .faq-answer {
+      max-height: 200px;
+    }
+    .faq-answer p {
+      padding: 0 0 16px;
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    /* ===== Policy ===== */
+    .policy-section {
+      text-align: center;
+      padding: 24px;
+      color: rgba(255,255,255,0.8);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .policy-section a {
+      color: white;
+    }
+
+    /* ===== Footer ===== */
+    .footer {
+      text-align: center;
+      padding: 30px 20px;
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+    }
+    .footer a { color: rgba(255,255,255,0.9); }
+
+    /* ===== Checkout Modal ===== */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -155,7 +427,7 @@
       background: white;
       border-radius: 16px;
       padding: 32px;
-      max-width: 400px;
+      max-width: 420px;
       width: 90%;
       max-height: 90vh;
       overflow-y: auto;
@@ -202,6 +474,7 @@
       display: flex;
       justify-content: space-between;
       margin-bottom: 8px;
+      font-size: 14px;
     }
     .checkout-summary .total {
       border-top: 1px solid #e0e0e0;
@@ -219,6 +492,7 @@
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
+      font-family: inherit;
     }
     .btn-cancel {
       background: #f5f5f5;
@@ -237,63 +511,347 @@
       display: none;
     }
     .error-msg.show { display: block; }
-    .footer {
-      text-align: center;
-      padding: 40px 20px;
-      color: rgba(255,255,255,0.7);
-      font-size: 13px;
-    }
-    .footer a { color: rgba(255,255,255,0.9); }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <h1>소원실현 프로그램</h1>
-      <p>하루하루의 기적과 함께하는 여정</p>
+    <!-- ===== 1. Hero Section ===== -->
+    <div class="hero">
+      <h1>하루하루의 기적<br>30일 맞춤 응원 & 로드맵</h1>
+      <p>
+        소원 실현 또는 문제 해결을 위해,<br>
+        30일 동안 매일 함께 걷는 개인 맞춤 여정입니다.<br>
+        무료 체험 → 7일 완주 → 30일 달성으로 자연스럽게 이어져요.
+      </p>
+      <div class="hero-buttons">
+        <a href="/wish-form.html" class="hero-btn primary">무료로 시작하기</a>
+        <a href="#quick-select" class="hero-btn secondary">프로그램 둘러보기</a>
+      </div>
     </div>
 
-    <div class="products">
-      <!-- 소원 스타터 7 (엔트리) -->
-      <div class="product-card entry" data-sku="PRG_STARTER_7">
-        <div class="product-icon">⭐</div>
-        <div class="product-name">소원 스타터 7</div>
-        <div class="product-desc">로드맵 Lite PDF 1회<br>7일 체크인 기록/진행률<br>1회 리셋권</div>
-        <div class="product-price">9,900<span>원</span></div>
-        <div class="upgrade-notice">24시간 내 30일 업그레이드 시<br>9,900원 전액 크레딧!</div>
-        <button class="buy-btn" onclick="openCheckout('PRG_STARTER_7')">시작하기</button>
+    <!-- ===== 2. Quick Select ===== -->
+    <div class="quick-select" id="quick-select">
+      <h2>지금 내 상태에 가까운 걸 하나만 고르세요.</h2>
+      <div class="quick-buttons">
+        <a href="#starter-7" class="quick-btn">⭐ 일단 시작이 필요해요</a>
+        <a href="#wish-30" class="quick-btn">✨ 이루고 싶은 소원이 있어요</a>
+        <a href="#solve-30" class="quick-btn">🔧 해결해야 할 문제가 있어요</a>
+        <a href="#dual-30" class="quick-btn">👑 둘 다 필요해요 (추천)</a>
+      </div>
+    </div>
+
+    <!-- ===== 3. 무료 / 스타터 7 ===== -->
+    <div class="section-divider"><span>체험 & 시작</span></div>
+
+    <div class="products-row two-col">
+      <!-- 무료 7일 맛보기 -->
+      <div class="product-card" id="free-7">
+        <div class="tag free">FREE</div>
+        <div class="product-icon">🆓</div>
+        <div class="product-name">무료 7일 메시지 맛보기</div>
+        <div class="product-value">결제 없이 먼저 경험해보세요</div>
+        <div class="product-price">0<span>원</span></div>
+        <div class="product-price-note">완전 무료</div>
+
+        <div class="recommend-box">
+          <strong>이런 분께 추천</strong>
+          <ul>
+            <li>• "일단 분위기만 보고 싶어요"</li>
+            <li>• "돈 내기 전에 먼저 경험해보고 싶어요"</li>
+          </ul>
+        </div>
+
+        <div class="includes-box">
+          <div class="item included">7일 기본 응원 메시지 체험</div>
+          <div class="item excluded">체크인/진행률 추적</div>
+          <div class="item excluded">로드맵 PDF</div>
+          <div class="item excluded">리셋권</div>
+          <div class="item excluded">업그레이드 크레딧</div>
+        </div>
+
+        <a href="/wish-form.html?mode=wish&plan=free" class="buy-btn outline">무료로 7일 시작하기</a>
       </div>
 
+      <!-- 소원 스타터 7 -->
+      <div class="product-card" id="starter-7">
+        <div class="tag start">START</div>
+        <div class="product-icon">⭐</div>
+        <div class="product-name">소원 스타터 7</div>
+        <div class="product-subtitle">완주 패스</div>
+        <div class="product-value">7일을 '진짜로 해내게' 만드는 완주 도구 세트</div>
+        <div class="product-price">9,900<span>원</span></div>
+        <div class="product-price-note">7일 완주 패키지</div>
+
+        <div class="recommend-box">
+          <strong>이런 분께 추천</strong>
+          <ul>
+            <li>• "혼자 하면 흐지부지돼요"</li>
+            <li>• "딱 7일만이라도 확실히 완주하고 싶어요"</li>
+          </ul>
+        </div>
+
+        <div class="includes-box">
+          <div class="item included">7일 체크인 기록 & 진행률 추적</div>
+          <div class="item included">로드맵 Lite PDF 1회</div>
+          <div class="item included">리셋권 1회</div>
+        </div>
+
+        <div class="special-badge">
+          ⭐ 24시간 내 30일 업그레이드 시<br>₩9,900 전액 크레딧!
+        </div>
+
+        <button class="buy-btn" onclick="openCheckout('PRG_STARTER_7')">완주 패스로 시작하기</button>
+      </div>
+    </div>
+
+    <!-- ===== 4. 무료 vs 스타터 비교표 ===== -->
+    <div class="comparison-section">
+      <h3>무료 7일 vs 스타터 7, 뭐가 달라요?</h3>
+      <table class="comparison-table">
+        <tr>
+          <th>구분</th>
+          <th>무료 7일 맛보기</th>
+          <th>스타터 7 완주 패스</th>
+        </tr>
+        <tr>
+          <td>가격</td>
+          <td>₩0</td>
+          <td>₩9,900</td>
+        </tr>
+        <tr>
+          <td>목적</td>
+          <td>먼저 경험</td>
+          <td>7일 완주</td>
+        </tr>
+        <tr>
+          <td>메시지</td>
+          <td>기본 체험</td>
+          <td>체크인 기반 (밀착)</td>
+        </tr>
+        <tr>
+          <td>체크인/진행률</td>
+          <td class="cross">✕</td>
+          <td class="check">✓</td>
+        </tr>
+        <tr>
+          <td>로드맵 PDF</td>
+          <td class="cross">✕</td>
+          <td class="check">✓ (Lite 1회)</td>
+        </tr>
+        <tr>
+          <td>리셋권</td>
+          <td class="cross">✕</td>
+          <td class="check">✓ (1회)</td>
+        </tr>
+        <tr>
+          <td>30일 업그레이드 크레딧</td>
+          <td class="cross">✕</td>
+          <td class="check">✓ (24시간 내 전액)</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- ===== 5. 30일 프로그램 ===== -->
+    <div class="section-divider"><span>30일 본격 프로그램</span></div>
+
+    <div class="products-row three-col">
       <!-- 소원실현 30 -->
-      <div class="product-card" data-sku="PRG_WISH_30">
+      <div class="product-card" id="wish-30">
         <div class="product-icon">✨</div>
         <div class="product-name">소원실현 30</div>
-        <div class="product-desc">30일간 매일 소원 실현을 위한<br>맞춤 응원 메시지와 로드맵</div>
+        <div class="product-value">소원을 현실로 만드는 30일 동반자</div>
         <div class="product-price">29,900<span>원</span></div>
-        <button class="buy-btn" onclick="openCheckout('PRG_WISH_30')">구매하기</button>
+        <div class="product-price-note">30일 프로그램</div>
+
+        <div class="recommend-box">
+          <strong>이런 분께 추천</strong>
+          <ul>
+            <li>• "이루고 싶은 목표가 분명한 분"</li>
+            <li>• "혼자 하면 흐지부지되는 분"</li>
+          </ul>
+        </div>
+
+        <div class="includes-box">
+          <div class="item included">30일간 매일 맞춤 응원 메시지</div>
+          <div class="item included">개인화된 소원 실현 로드맵</div>
+          <div class="item included">진행률 추적</div>
+          <div class="item included">기적지수 분석 기반 콘텐츠</div>
+        </div>
+
+        <button class="buy-btn" onclick="openCheckout('PRG_WISH_30')">소원실현 시작하기</button>
       </div>
 
       <!-- 문제해결 30 -->
-      <div class="product-card" data-sku="PRG_SOLVE_30">
+      <div class="product-card" id="solve-30">
         <div class="product-icon">🔧</div>
         <div class="product-name">문제해결 30</div>
-        <div class="product-desc">30일간 매일 문제 해결을 위한<br>맞춤 가이드와 실천 로드맵</div>
+        <div class="product-value">막힌 문제를 뚫는 30일 실행 가이드</div>
         <div class="product-price">29,900<span>원</span></div>
-        <button class="buy-btn" onclick="openCheckout('PRG_SOLVE_30')">구매하기</button>
+        <div class="product-price-note">30일 프로그램</div>
+
+        <div class="recommend-box">
+          <strong>이런 분께 추천</strong>
+          <ul>
+            <li>• "해결해야 할 구체적 문제가 있는 분"</li>
+            <li>• "정리/우선순위/실행이 막혀 있는 분"</li>
+          </ul>
+        </div>
+
+        <div class="includes-box">
+          <div class="item included">30일간 문제 해결용 맞춤 가이드</div>
+          <div class="item included">일일 실천 로드맵</div>
+          <div class="item included">단계별 해결 방안 제시</div>
+        </div>
+
+        <button class="buy-btn" onclick="openCheckout('PRG_SOLVE_30')">문제해결 시작하기</button>
       </div>
 
-      <!-- 듀얼 30 -->
-      <div class="product-card featured" data-sku="PRG_DUAL_30">
-        <div class="product-icon">🌟</div>
+      <!-- 듀얼 30 BEST -->
+      <div class="product-card" id="dual-30" style="border: 3px solid #667eea;">
+        <div class="tag best">BEST</div>
+        <div class="product-icon">👑</div>
         <div class="product-name">듀얼 30</div>
-        <div class="product-desc">소원실현 + 문제해결<br>통합 30일 프로그램</div>
-        <div class="product-price">49,900<span>원</span></div>
-        <button class="buy-btn" onclick="openCheckout('PRG_DUAL_30')">구매하기</button>
+        <div class="product-value">소원+문제해결, 완전한 여정을 한 번에</div>
+        <div class="product-price">39,900<span>원</span></div>
+        <div class="product-price-note">30일 통합 프로그램</div>
+
+        <div class="recommend-box">
+          <strong>이런 분께 추천</strong>
+          <ul>
+            <li>• "둘 다 필요한 분"</li>
+            <li>• "고민하기 싫고 한 번에 끝내고 싶은 분"</li>
+          </ul>
+        </div>
+
+        <div class="includes-box">
+          <div class="item included">소원실현 30 전체</div>
+          <div class="item included">문제해결 30 전체</div>
+          <div class="item included">통합 로드맵</div>
+        </div>
+
+        <div class="discount-badge">
+          🔥 개별 구매 ₩59,800 → ₩39,900<br>(₩19,900 절약!)
+        </div>
+
+        <button class="buy-btn" onclick="openCheckout('PRG_DUAL_30')">듀얼로 시작하기</button>
       </div>
+    </div>
+
+    <!-- ===== 6. 30일 상품 비교표 ===== -->
+    <div class="comparison-section">
+      <h3>30일 프로그램 한눈에 비교</h3>
+      <table class="comparison-table">
+        <tr>
+          <th>항목</th>
+          <th>소원실현 30</th>
+          <th>문제해결 30</th>
+          <th class="best-col">듀얼 30</th>
+        </tr>
+        <tr>
+          <td>가격</td>
+          <td>₩29,900</td>
+          <td>₩29,900</td>
+          <td class="best-col"><strong>₩39,900</strong></td>
+        </tr>
+        <tr>
+          <td>기간</td>
+          <td>30일</td>
+          <td>30일</td>
+          <td class="best-col">30일</td>
+        </tr>
+        <tr>
+          <td>매일 응원 메시지</td>
+          <td class="check">✓</td>
+          <td class="cross">-</td>
+          <td class="best-col check">✓</td>
+        </tr>
+        <tr>
+          <td>매일 해결 가이드</td>
+          <td class="cross">-</td>
+          <td class="check">✓</td>
+          <td class="best-col check">✓</td>
+        </tr>
+        <tr>
+          <td>로드맵 PDF</td>
+          <td>Full</td>
+          <td>Full</td>
+          <td class="best-col">통합</td>
+        </tr>
+        <tr>
+          <td>체크인/진행률</td>
+          <td class="check">✓</td>
+          <td class="check">✓</td>
+          <td class="best-col check">✓</td>
+        </tr>
+        <tr>
+          <td>추천</td>
+          <td>소원 있는 분</td>
+          <td>문제 있는 분</td>
+          <td class="best-col"><strong>BEST</strong></td>
+        </tr>
+        <tr>
+          <td>절약</td>
+          <td>-</td>
+          <td>-</td>
+          <td class="best-col"><strong>₩19,900</strong></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- ===== 7. FAQ ===== -->
+    <div class="faq-section">
+      <h3>자주 묻는 질문</h3>
+
+      <div class="faq-item">
+        <button class="faq-question">PDF는 언제/어떻게 제공되나요?</button>
+        <div class="faq-answer">
+          <p>결제 완료 즉시 입력하신 이메일로 발송됩니다.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">맞춤 메시지는 어떤 방식으로 오나요?</button>
+        <div class="faq-answer">
+          <p>카카오톡 알림톡 또는 이메일로 매일 발송됩니다.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">중간에 멈추면 어떻게 되나요?</button>
+        <div class="faq-answer">
+          <p>스타터 7은 리셋권 1회 제공됩니다. 30일 상품은 일시정지 기능이 있습니다.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">소원실현 30 vs 문제해결 30 차이는?</button>
+        <div class="faq-answer">
+          <p>소원실현은 "이루고 싶은 목표"에, 문제해결은 "해결해야 할 문제"에 집중합니다. 둘 다 필요하시면 듀얼 30을 추천드려요.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">환불/변경 정책은?</button>
+        <div class="faq-answer">
+          <p>디지털 콘텐츠 특성상 서비스 시작 전까지 전액 환불 가능합니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 8. Policy ===== -->
+    <div class="policy-section">
+      • 결제 후 24시간 내 업그레이드 시 기존 결제액 전액 크레딧 적용<br>
+      • 서비스 시작 전 전액 환불 가능<br>
+      • 문의: 카카오톡 채널 <a href="https://pf.kakao.com/_dailymiracles" target="_blank">@dailymiracles</a>
+    </div>
+
+    <!-- ===== Footer ===== -->
+    <div class="footer">
+      <p>하루하루의 기적 | <a href="/">홈으로</a> | <a href="/privacy.html">개인정보처리방침</a> | <a href="/terms.html">이용약관</a></p>
     </div>
   </div>
 
-  <!-- Checkout Modal -->
+  <!-- ===== Checkout Modal ===== -->
   <div class="modal-overlay" id="checkout-modal">
     <div class="modal">
       <h2>결제 정보 입력</h2>
@@ -333,18 +891,16 @@
     </div>
   </div>
 
-  <div class="footer">
-    <p>하루하루의 기적 | <a href="/">홈으로</a></p>
-  </div>
-
   <script>
+    // ===== Products Data =====
     const PRODUCTS = {
       PRG_STARTER_7: { name: '소원 스타터 7', price: 9900 },
       PRG_WISH_30: { name: '소원실현 30', price: 29900 },
       PRG_SOLVE_30: { name: '문제해결 30', price: 29900 },
-      PRG_DUAL_30: { name: '듀얼 30 (소원+해결)', price: 49900 }
+      PRG_DUAL_30: { name: '듀얼 30 (소원+해결)', price: 39900 }
     };
 
+    // ===== Checkout Modal =====
     function openCheckout(sku) {
       const product = PRODUCTS[sku];
       if (!product) return;
@@ -397,8 +953,7 @@
           throw new Error(data.message || '결제 생성에 실패했습니다');
         }
 
-        // Redirect to payment (simple version - direct success for testing)
-        // In production, integrate with Toss Payments SDK
+        // Redirect to payment
         const successUrl = `/api/program/payment/success?orderId=${data.order.orderId}&amount=${data.order.amount}`;
         window.location.href = successUrl;
 
@@ -411,6 +966,30 @@
     // Close modal on overlay click
     document.getElementById('checkout-modal').addEventListener('click', (e) => {
       if (e.target.id === 'checkout-modal') closeCheckout();
+    });
+
+    // ===== FAQ Accordion =====
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.parentElement;
+        // Close all others
+        document.querySelectorAll('.faq-item').forEach(i => {
+          if (i !== item) i.classList.remove('open');
+        });
+        // Toggle current
+        item.classList.toggle('open');
+      });
+    });
+
+    // ===== Smooth Scroll =====
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
     });
   </script>
 </body>
