@@ -2,6 +2,8 @@
   "소원": [
     "DOC-DECISIONS_LOG",
     "DOC-AURORA5_CHARACTER_PROMPTS_V3",
+    "DOC-weekly_promotion_guide",
+    "DOC-tag_taxonomy",
     "DOC-airtable-schema",
     "DOC-airtable-wish-intake-schema",
     "DOC-airtable-wishes-inbox-schema",
@@ -11,9 +13,11 @@
     "DOC-index",
     "DOC-GROWTH-ROADMAP",
     "DOC-JUDGE_PROMPTS",
+    "DOC-README",
     "DOC-LAUNCH-DECLARATION",
     "DOC-JAEMI_ONBOARDING_v11",
     "DOC-JAEMI_ONBOARDING_v12",
+    "DOC-sens-setup-guide",
     "DOC-service-flow",
     "DOC-README",
     "DOC-REVIEW_COLLECTION_SYSTEM",
@@ -100,6 +104,8 @@
     "DOC-LAUNCH-DECLARATION",
     "DOC-JAEMI_ONBOARDING_v11",
     "DOC-JAEMI_ONBOARDING_v12",
+    "DOC-drive-github-sync-setup",
+    "DOC-sens-setup-guide",
     "DOC-README",
     "DOC-ROADMAP_API",
     "DOC-agents-index",
@@ -170,6 +176,18 @@
     "DOC-20251229-A1Y",
     "DOC-20251229-SRH",
     "DOC-20251229-PFO"
+  ],
+  "ops": [
+    "DOC-weekly_promotion_guide",
+    "DOC-DEC_OPERATIONS",
+    "DOC-drive-github-sync-setup",
+    "DOC-sens-setup-guide"
+  ],
+  "standards": [
+    "DOC-tag_taxonomy"
+  ],
+  "templates": [
+    "DOC-knowledge_card_template"
   ],
   "automation": [
     "DOC-WIX_INTEGRATION_GUIDE",
@@ -264,6 +282,9 @@
     "DOC-20260101-99J",
     "DOC-20251229-PFO"
   ],
+  "knowledge": [
+    "DOC-README"
+  ],
   "에이전틱": [
     "DOC-최수민방식_완전정리",
     "DOC-2025-12-29_Part1_최수민방식QA",
@@ -286,8 +307,26 @@
     "DOC-JAEMI_ONBOARDING_v11",
     "DOC-JAEMI_ONBOARDING_v12"
   ],
-  "ops": [
-    "DOC-DEC_OPERATIONS"
+  "가격": [
+    "DOC-drive-github-sync-setup",
+    "DOC-20260101-4PA",
+    "DOC-20260101-TRD",
+    "DOC-20260101-WG8",
+    "DOC-20260101-1YB",
+    "DOC-20260101-L9Y",
+    "DOC-20260101-ICN",
+    "DOC-20260101-8VR",
+    "DOC-20260101-K7C",
+    "DOC-20260101-6M7",
+    "DOC-20260101-GR0",
+    "DOC-20260101-D2L",
+    "DOC-20260101-XHZ",
+    "DOC-20260101-RET",
+    "DOC-20260101-YH9",
+    "DOC-20260101-99J",
+    "DOC-20251231-GV1",
+    "DOC-20251229-SRH",
+    "DOC-20251229-PFO"
   ],
   "overview": [
     "DOC-service-flow"
@@ -422,26 +461,6 @@
     "DOC-20251229-ZF8",
     "DOC-20251229-A1Y",
     "DOC-20251229-SRH"
-  ],
-  "가격": [
-    "DOC-20260101-4PA",
-    "DOC-20260101-TRD",
-    "DOC-20260101-WG8",
-    "DOC-20260101-1YB",
-    "DOC-20260101-L9Y",
-    "DOC-20260101-ICN",
-    "DOC-20260101-8VR",
-    "DOC-20260101-K7C",
-    "DOC-20260101-6M7",
-    "DOC-20260101-GR0",
-    "DOC-20260101-D2L",
-    "DOC-20260101-XHZ",
-    "DOC-20260101-RET",
-    "DOC-20260101-YH9",
-    "DOC-20260101-99J",
-    "DOC-20251231-GV1",
-    "DOC-20251229-SRH",
-    "DOC-20251229-PFO"
   ],
   "런칭": [
     "DOC-20260101-4PA",
