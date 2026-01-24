@@ -452,15 +452,17 @@ async function sendWishAckMessage(phone, wishData) {
             const url = `/alimtalk/v2/services/${SENS_SERVICE_ID}/messages`;
             const signature = makeSensSignature('POST', url, timestamp);
 
-            // betawelcome 템플릿 내용 구성
-            const content = buildAckAlimtalkContent({ name, miracleScore, gem_meaning });
+            // betawelcome 템플릿 내용 및 버튼 구성
+            const content = buildAckAlimtalkContent({ name });
+            const buttons = buildAckAlimtalkButtons();
 
             const requestBody = {
                 plusFriendId: SENS_CHANNEL_ID,
                 templateCode: SENS_ACK_TEMPLATE_CODE,
                 messages: [{
                     to: normalizedPhone,
-                    content: content
+                    content: content,
+                    buttons: buttons
                 }]
             };
 
@@ -522,21 +524,46 @@ async function sendWishAckMessage(phone, wishData) {
 
 /**
  * ACK 알림톡 컨텐츠 빌드 (betawelcome 템플릿)
+ *
+ * 템플릿 형식:
+ * #{이름}님, 환영합니다! 🎉
+ * 하루하루의 기적 베타 테스터가 되어주셔서 감사합니다.
+ * 7일간 매일 아침(8시), 저녁(8시)에 맞춤 응원 메시지를 보내드려요.
+ * 내일 아침부터 시작됩니다! ✨
+ * 궁금한 점이 있으시면 언제든 문의해주세요 👇
  */
 function buildAckAlimtalkContent(vars) {
-    const { name, miracleScore, gem_meaning } = vars;
+    const { name } = vars;
 
-    // betawelcome 템플릿에 맞는 내용 구성
-    // 템플릿 변수: #{name}, #{score} 등
-    return `${name}님, 소원이 접수되었습니다! ✨
+    return `${name}님, 환영합니다! 🎉
 
-🌟 기적지수: ${miracleScore}점
-💎 에너지: ${gem_meaning || '긍정 에너지'}
+하루하루의 기적 베타 테스터가 되어주셔서 감사합니다.
 
-7일간 매일 아침/저녁 응원 메시지가 발송됩니다.
-소원 실현을 응원합니다!
+7일간 매일 아침(8시), 저녁(8시)에 맞춤 응원 메시지를 보내드려요.
 
-- 하루하루의 기적`;
+내일 아침부터 시작됩니다! ✨
+
+궁금한 점이 있으시면 언제든 문의해주세요 👇`;
+}
+
+/**
+ * ACK 알림톡 버튼 구성 (betawelcome 템플릿)
+ */
+function buildAckAlimtalkButtons() {
+    return [
+        {
+            type: 'WL',
+            name: '나의 기적 보기',
+            linkMobile: 'https://dailymiracles.kr/mypage',
+            linkPc: 'https://dailymiracles.kr/mypage'
+        },
+        {
+            type: 'WL',
+            name: '고객센터',
+            linkMobile: 'https://dailymiracles.kr/support',
+            linkPc: 'https://dailymiracles.kr/support'
+        }
+    ];
 }
 
 /**
