@@ -188,6 +188,18 @@
       color: rgba(255,255,255,0.8);
       line-height: 1.5;
     }
+    .spot-meta {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+    }
+    .spot-meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
     .spot-tips {
       margin-top: 10px;
       padding: 10px 12px;
@@ -218,8 +230,11 @@
     }
     .rec-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 12px;
+    }
+    @media (max-width: 500px) {
+      .rec-grid { grid-template-columns: repeat(2, 1fr); }
     }
     .rec-item {
       background: rgba(255,255,255,0.05);
@@ -578,6 +593,15 @@
       transport: '이동'
     };
 
+    // 시간대(slot) 라벨
+    const slotLabels = {
+      morning: '오전',
+      lunch: '점심',
+      afternoon: '오후',
+      evening: '저녁',
+      night: '밤'
+    };
+
     function renderItinerary(itinerary) {
       loadingEl.classList.add('hidden');
       contentEl.classList.remove('hidden');
@@ -615,11 +639,15 @@
       if (dailyPlans.length === 0) {
         timeline.innerHTML = '<p style="text-align:center;color:rgba(255,255,255,0.5)">일정 정보가 없습니다.</p>';
       } else {
-        timeline.innerHTML = dailyPlans.map((day, idx) => `
+        timeline.innerHTML = dailyPlans.map((day, idx) => {
+          // API 응답이 schedule 또는 spots 배열을 가질 수 있음
+          const items = day.schedule || day.spots || [];
+
+          return `
           <div class="timeline-day">
             <div class="day-header">
               <div class="day-badge">
-                <span class="num">${idx + 1}</span>
+                <span class="num">${day.day || idx + 1}</span>
                 <span class="label">DAY</span>
               </div>
               <div class="day-title">
@@ -627,19 +655,23 @@
                 <div class="day-date">${day.date || ''}</div>
               </div>
             </div>
-            ${(day.spots || []).map(spot => `
+            ${items.map(item => `
               <div class="spot-card">
-                <span class="spot-time">${spot.time || ''}</span>
+                <span class="spot-time">${item.time || ''}</span>
                 <div class="spot-name">
-                  ${spot.name || '장소'}
-                  <span class="spot-type">${spotTypeLabels[spot.type] || spot.type || ''}</span>
+                  ${item.place || item.name || '장소'}
+                  <span class="spot-type">${slotLabels[item.slot] || spotTypeLabels[item.type] || item.slot || ''}</span>
                 </div>
-                <div class="spot-desc">${spot.description || ''}</div>
-                ${spot.tips ? `<div class="spot-tips">${spot.tips}</div>` : ''}
+                <div class="spot-desc">${item.activity || item.description || ''}</div>
+                <div class="spot-meta">
+                  ${item.duration ? `<span>⏱ ${item.duration}</span>` : ''}
+                  ${item.travel_to_next && item.travel_to_next !== '-' ? `<span>🚗 다음까지 ${item.travel_to_next}</span>` : ''}
+                </div>
+                ${item.tips ? `<div class="spot-tips">${item.tips}</div>` : ''}
               </div>
             `).join('')}
           </div>
-        `).join('');
+        `}).join('');
       }
 
       // 추천 섹션
@@ -652,13 +684,13 @@
           recItems.push({
             icon: '🍽️',
             title: r.name || '맛집',
-            desc: r.specialty || r.description || ''
+            desc: r.menu || r.specialty || r.description || `${r.type || ''} ${r.price_range || ''}`.trim()
           });
         });
       }
 
       if (recommendations.tips && recommendations.tips.length > 0) {
-        recommendations.tips.forEach(tip => {
+        recommendations.tips.slice(0, 2).forEach(tip => {
           recItems.push({
             icon: '💡',
             title: '여행 팁',
@@ -667,9 +699,25 @@
         });
       }
 
+      if (recommendations.packing_list && recommendations.packing_list.length > 0) {
+        recItems.push({
+          icon: '🎒',
+          title: '준비물',
+          desc: recommendations.packing_list.slice(0, 5).join(', ')
+        });
+      }
+
+      if (recommendations.rainy_alternatives && recommendations.rainy_alternatives.length > 0) {
+        recItems.push({
+          icon: '☔',
+          title: '우천 대안',
+          desc: recommendations.rainy_alternatives.slice(0, 2).join(', ')
+        });
+      }
+
       if (recItems.length > 0) {
         document.getElementById('recommendations').classList.remove('hidden');
-        recGrid.innerHTML = recItems.slice(0, 4).map(item => `
+        recGrid.innerHTML = recItems.slice(0, 6).map(item => `
           <div class="rec-item">
             <div class="rec-item-icon">${item.icon}</div>
             <div class="rec-item-title">${item.title}</div>
