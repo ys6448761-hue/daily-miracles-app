@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>버튼 컴포넌트 - 하루하루의 기적</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #FFF5F7;
+      padding: 48px;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #333333;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 32px;
+    }
+
+    h2 {
+      color: #666666;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      margin-top: 32px;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    /* Primary Button - Gradient */
+    .btn-primary {
+      background: linear-gradient(135deg, #9B87F5, #F5A7C6);
+      color: #FFFFFF;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 250ms ease-in-out;
+      box-shadow: 0 4px 16px rgba(155, 135, 245, 0.1);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(155, 135, 245, 0.25);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    /* Secondary Button - Outline */
+    .btn-secondary {
+      background: #FFFFFF;
+      color: #9B87F5;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      border: 2px solid #9B87F5;
+      cursor: pointer;
+      transition: all 250ms ease-in-out;
+    }
+
+    .btn-secondary:hover {
+      background: #9B87F5;
+      color: #FFFFFF;
+    }
+
+    /* Accent Button - Deep Purple */
+    .btn-accent {
+      background: #6E59A5;
+      color: #FFFFFF;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 250ms ease-in-out;
+    }
+
+    .btn-accent:hover {
+      background: #5D4A8C;
+      transform: translateY(-2px);
+    }
+
+    /* Ghost Button */
+    .btn-ghost {
+      background: transparent;
+      color: #9B87F5;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 250ms ease-in-out;
+    }
+
+    .btn-ghost:hover {
+      background: #FFE5EC;
+    }
+
+    /* Disabled State */
+    .btn-disabled {
+      background: #E5E5E5;
+      color: #999999;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    /* Size Variants */
+    .btn-sm {
+      padding: 8px 16px;
+      font-size: 14px;
+      border-radius: 8px;
+    }
+
+    .btn-lg {
+      padding: 16px 32px;
+      font-size: 18px;
+      border-radius: 16px;
+    }
+
+    /* Full Width */
+    .btn-full {
+      width: 100%;
+      max-width: 320px;
+    }
+
+    /* With Icon */
+    .btn-icon {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Code Example */
+    .code-block {
+      background: #333333;
+      color: #FFFFFF;
+      padding: 16px;
+      border-radius: 12px;
+      font-family: 'Consolas', monospace;
+      font-size: 14px;
+      overflow-x: auto;
+      margin-top: 16px;
+    }
+
+    .code-block code {
+      color: #F5A7C6;
+    }
+  </style>
+</head>
+<body>
+  <h1>버튼 컴포넌트</h1>
+
+  <h2>기본 버튼 스타일</h2>
+  <div class="button-group">
+    <button class="btn-primary">기적 시작하기</button>
+    <button class="btn-secondary">더 알아보기</button>
+    <button class="btn-accent">소원 분석</button>
+    <button class="btn-ghost">취소</button>
+    <button class="btn-disabled" disabled>비활성화</button>
+  </div>
+
+  <h2>크기 변형</h2>
+  <div class="button-group">
+    <button class="btn-primary btn-sm">Small</button>
+    <button class="btn-primary">Medium (기본)</button>
+    <button class="btn-primary btn-lg">Large</button>
+  </div>
+
+  <h2>전체 너비</h2>
+  <div class="button-group">
+    <button class="btn-primary btn-full">소원 제출하기</button>
+  </div>
+
+  <h2>아이콘 포함</h2>
+  <div class="button-group">
+    <button class="btn-primary btn-icon">
+      <span>기적 시작하기</span>
+    </button>
+  </div>
+
+  <h2>CSS 코드</h2>
+  <div class="code-block">
+    <pre><code>.btn-primary</code> {
+  background: <code>linear-gradient(135deg, #9B87F5, #F5A7C6)</code>;
+  color: #FFFFFF;
+  padding: 12px 24px;
+  border-radius: <code>12px</code>;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 250ms ease-in-out;
+  box-shadow: <code>0 4px 16px rgba(155, 135, 245, 0.1)</code>;
+}</pre>
+  </div>
+</body>
+</html>

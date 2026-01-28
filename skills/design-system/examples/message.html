@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>메시지 박스 컴포넌트 - 하루하루의 기적</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #FFF5F7;
+      padding: 48px;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #333333;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 32px;
+    }
+
+    h2 {
+      color: #666666;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      margin-top: 32px;
+    }
+
+    .message-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 600px;
+    }
+
+    /* Base Message Box */
+    .message-box {
+      background: #FFFFFF;
+      border-left: 4px solid #9B87F5;
+      padding: 16px 20px;
+      border-radius: 0 12px 12px 0;
+      box-shadow: 0 2px 8px rgba(155, 135, 245, 0.08);
+    }
+
+    .message-box .title {
+      color: #9B87F5;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .message-box .content {
+      color: #333333;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .message-box .meta {
+      color: #999999;
+      font-size: 12px;
+      margin-top: 12px;
+    }
+
+    /* Highlight Message */
+    .message-highlight {
+      background: #FFE5EC;
+      border-left: 4px solid #F5A7C6;
+      padding: 16px 20px;
+      border-radius: 0 12px 12px 0;
+    }
+
+    /* Success Message */
+    .message-success {
+      background: rgba(105, 240, 174, 0.1);
+      border-left: 4px solid #69F0AE;
+      padding: 16px 20px;
+      border-radius: 0 12px 12px 0;
+    }
+
+    .message-success .title {
+      color: #00C853;
+    }
+
+    /* Warning Message */
+    .message-warning {
+      background: rgba(255, 215, 64, 0.1);
+      border-left: 4px solid #FFD740;
+      padding: 16px 20px;
+      border-radius: 0 12px 12px 0;
+    }
+
+    .message-warning .title {
+      color: #FFA000;
+    }
+
+    /* Error Message */
+    .message-error {
+      background: rgba(255, 82, 82, 0.1);
+      border-left: 4px solid #FF5252;
+      padding: 16px 20px;
+      border-radius: 0 12px 12px 0;
+    }
+
+    .message-error .title {
+      color: #FF5252;
+    }
+
+    /* Chat Bubble - Outgoing */
+    .chat-bubble-out {
+      background: linear-gradient(135deg, #9B87F5, #F5A7C6);
+      color: #FFFFFF;
+      padding: 12px 16px;
+      border-radius: 16px 16px 4px 16px;
+      max-width: 80%;
+      align-self: flex-end;
+      box-shadow: 0 2px 8px rgba(155, 135, 245, 0.2);
+    }
+
+    /* Chat Bubble - Incoming */
+    .chat-bubble-in {
+      background: #FFFFFF;
+      color: #333333;
+      padding: 12px 16px;
+      border-radius: 16px 16px 16px 4px;
+      max-width: 80%;
+      align-self: flex-start;
+      box-shadow: 0 2px 8px rgba(155, 135, 245, 0.08);
+    }
+
+    .chat-bubble-in .sender {
+      color: #9B87F5;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    /* Toast Notification */
+    .toast {
+      background: #333333;
+      color: #FFFFFF;
+      padding: 12px 20px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .toast-success {
+      background: linear-gradient(135deg, #9B87F5, #F5A7C6);
+    }
+
+    .toast .icon {
+      font-size: 18px;
+    }
+
+    /* Encouragement Card */
+    .encouragement {
+      background: linear-gradient(135deg, rgba(155, 135, 245, 0.1), rgba(245, 167, 198, 0.1));
+      border: 1px solid rgba(155, 135, 245, 0.2);
+      padding: 24px;
+      border-radius: 16px;
+      text-align: center;
+    }
+
+    .encouragement .emoji {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .encouragement .message {
+      color: #333333;
+      font-size: 16px;
+      line-height: 1.6;
+      font-weight: 500;
+    }
+
+    .encouragement .author {
+      color: #9B87F5;
+      font-size: 14px;
+      margin-top: 12px;
+    }
+
+    /* Kakao Talk Style */
+    .kakao-message {
+      background: #FFFFFF;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid #E5E5E5;
+      max-width: 320px;
+    }
+
+    .kakao-message .header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #E5E5E5;
+    }
+
+    .kakao-message .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #9B87F5, #F5A7C6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .kakao-message .brand {
+      color: #333333;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .kakao-message .body {
+      color: #333333;
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    /* Code Block */
+    .code-block {
+      background: #333333;
+      color: #FFFFFF;
+      padding: 16px;
+      border-radius: 12px;
+      font-family: 'Consolas', monospace;
+      font-size: 14px;
+      overflow-x: auto;
+      margin-top: 16px;
+    }
+
+    .code-block code {
+      color: #F5A7C6;
+    }
+  </style>
+</head>
+<body>
+  <h1>메시지 박스 컴포넌트</h1>
+
+  <h2>기본 메시지</h2>
+  <div class="message-container">
+    <div class="message-box">
+      <div class="title">Day 3 응원 메시지</div>
+      <div class="content">
+        오늘도 기적의 씨앗을 심어보세요. 작은 실천이 모여 큰 변화를 만들어갑니다.
+        당신의 소원은 조금씩 이루어지고 있어요.
+      </div>
+      <div class="meta">2025.01.29 오전 9:00</div>
+    </div>
+
+    <div class="message-highlight">
+      <div class="title">특별 안내</div>
+      <div class="content">
+        기적지수 분석이 완료되었습니다! PDF 리포트를 이메일로 발송해드렸어요.
+      </div>
+    </div>
+  </div>
+
+  <h2>상태 메시지</h2>
+  <div class="message-container">
+    <div class="message-success">
+      <div class="title">완료</div>
+      <div class="content">소원 분석이 성공적으로 완료되었습니다.</div>
+    </div>
+
+    <div class="message-warning">
+      <div class="title">주의</div>
+      <div class="content">이메일 주소를 다시 한번 확인해주세요.</div>
+    </div>
+
+    <div class="message-error">
+      <div class="title">오류</div>
+      <div class="content">잠시 후 다시 시도해주세요.</div>
+    </div>
+  </div>
+
+  <h2>채팅 버블</h2>
+  <div class="message-container">
+    <div class="chat-bubble-in">
+      <div class="sender">재미</div>
+      안녕하세요! 하루하루의 기적에 오신 것을 환영해요.
+    </div>
+    <div class="chat-bubble-out">
+      소원 분석 결과가 궁금해요!
+    </div>
+    <div class="chat-bubble-in">
+      <div class="sender">재미</div>
+      분석 결과를 확인해볼게요. 잠시만 기다려주세요.
+    </div>
+  </div>
+
+  <h2>응원 카드</h2>
+  <div class="message-container">
+    <div class="encouragement">
+      <div class="emoji">&#10024;</div>
+      <div class="message">
+        "이 글을 읽는 3초 동안,<br>
+        당신의 심장은 3번 뛰었습니다.<br>
+        그 심장 박동 하나하나가<br>
+        당신의 소원을 향해 나아가고 있어요."
+      </div>
+      <div class="author">- 하루하루의 기적</div>
+    </div>
+  </div>
+
+  <h2>카카오톡 알림 스타일</h2>
+  <div class="message-container">
+    <div class="kakao-message">
+      <div class="header">
+        <div class="logo">기적</div>
+        <div class="brand">하루하루의 기적</div>
+      </div>
+      <div class="body">안녕하세요, 홍길동님!
+
+하루하루의 기적에 오신 것을 환영합니다.
+당신의 소중한 소원을 함께 이루어가겠습니다.
+
+- 하루하루의 기적 드림</div>
+    </div>
+  </div>
+
+  <h2>토스트 알림</h2>
+  <div class="message-container" style="flex-direction: row; gap: 16px;">
+    <div class="toast">
+      <span class="icon">&#10004;</span>
+      <span>저장되었습니다</span>
+    </div>
+    <div class="toast toast-success">
+      <span class="icon">&#10024;</span>
+      <span>기적이 시작되었습니다!</span>
+    </div>
+  </div>
+
+  <h2>CSS 코드</h2>
+  <div class="code-block">
+    <pre><code>.message-box</code> {
+  background: #FFFFFF;
+  border-left: 4px solid <code>#9B87F5</code>;
+  padding: 16px 20px;
+  border-radius: 0 <code>12px</code> 12px 0;
+  box-shadow: <code>0 2px 8px rgba(155, 135, 245, 0.08)</code>;
+}
+
+<code>.chat-bubble-out</code> {
+  background: <code>linear-gradient(135deg, #9B87F5, #F5A7C6)</code>;
+  color: #FFFFFF;
+  padding: 12px 16px;
+  border-radius: 16px 16px 4px 16px;
+}</pre>
+  </div>
+</body>
+</html>

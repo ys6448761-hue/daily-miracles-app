@@ -25,6 +25,7 @@
     "DOC-GA4_SETUP_GUIDE",
     "DOC-agents-index",
     "DOC-Aurora5_토론시스템_안내문",
+    "DOC-alimtalk-templates-design",
     "DOC-WIX_TEAM_PAGE_CONTENT",
     "DEC-2026-0102-045",
     "DEC-2026-0102-121",
@@ -187,7 +188,8 @@
     "DOC-tag_taxonomy"
   ],
   "templates": [
-    "DOC-knowledge_card_template"
+    "DOC-knowledge_card_template",
+    "DOC-alimtalk-templates-design"
   ],
   "automation": [
     "DOC-WIX_INTEGRATION_GUIDE",
@@ -309,6 +311,7 @@
   ],
   "가격": [
     "DOC-drive-github-sync-setup",
+    "DOC-alimtalk-templates-design",
     "DOC-20260101-4PA",
     "DOC-20260101-TRD",
     "DOC-20260101-WG8",

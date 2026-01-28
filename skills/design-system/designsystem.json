@@ -1,0 +1,138 @@
+{
+  "brand": "하루하루의 기적",
+  "brand_en": "Daily Miracles",
+  "version": "1.0.0",
+  "updated_at": "2025-01-29",
+
+  "colors": {
+    "primary": {
+      "main": "#9B87F5",
+      "name": "메인 퍼플",
+      "usage": "주요 버튼, CTA, 브랜드 아이덴티티"
+    },
+    "secondary": {
+      "main": "#F5A7C6",
+      "name": "핑크/코랄",
+      "usage": "서브 강조, 포인트 컬러"
+    },
+    "accent": {
+      "main": "#6E59A5",
+      "name": "딥퍼플",
+      "usage": "강조, 호버 상태, 중요 요소"
+    },
+    "background": {
+      "light": "#FFF5F7",
+      "white": "#FFFFFF",
+      "highlight": "#FFE5EC"
+    },
+    "text": {
+      "primary": "#333333",
+      "secondary": "#666666",
+      "muted": "#999999",
+      "placeholder": "#AAAAAA"
+    },
+    "border": "#E5E5E5",
+    "gradient": {
+      "main": "linear-gradient(135deg, #9B87F5, #F5A7C6)",
+      "soft": "linear-gradient(135deg, #9B87F5 0%, #F5A7C6 100%)"
+    },
+    "semantic": {
+      "success": "#4CAF50",
+      "warning": "#FF9800",
+      "error": "#F44336",
+      "info": "#2196F3"
+    },
+    "traffic_light": {
+      "red": "#FF5252",
+      "yellow": "#FFD740",
+      "green": "#69F0AE"
+    }
+  },
+
+  "fonts": {
+    "korean": "Pretendard",
+    "english": "Pretendard",
+    "fallback": "sans-serif",
+    "stack": "'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif",
+    "weights": {
+      "regular": "400",
+      "medium": "500",
+      "semibold": "600",
+      "bold": "700"
+    },
+    "sizes": {
+      "xs": "12px",
+      "sm": "14px",
+      "base": "16px",
+      "lg": "18px",
+      "xl": "20px",
+      "2xl": "24px",
+      "3xl": "30px",
+      "4xl": "36px"
+    },
+    "lineHeight": {
+      "tight": "1.25",
+      "normal": "1.5",
+      "relaxed": "1.75"
+    }
+  },
+
+  "spacing": {
+    "xs": "4px",
+    "sm": "8px",
+    "md": "16px",
+    "lg": "24px",
+    "xl": "32px",
+    "2xl": "48px",
+    "3xl": "64px"
+  },
+
+  "borderRadius": {
+    "none": "0",
+    "sm": "8px",
+    "md": "12px",
+    "lg": "16px",
+    "xl": "20px",
+    "full": "100px"
+  },
+
+  "shadows": {
+    "none": "none",
+    "sm": "0 2px 8px rgba(155, 135, 245, 0.08)",
+    "md": "0 4px 16px rgba(155, 135, 245, 0.1)",
+    "lg": "0 8px 24px rgba(155, 135, 245, 0.15)",
+    "glow": "0 0 20px rgba(155, 135, 245, 0.3)",
+    "card": "0 4px 16px rgba(155, 135, 245, 0.1)"
+  },
+
+  "transitions": {
+    "fast": "150ms ease-in-out",
+    "normal": "250ms ease-in-out",
+    "slow": "350ms ease-in-out"
+  },
+
+  "breakpoints": {
+    "sm": "640px",
+    "md": "768px",
+    "lg": "1024px",
+    "xl": "1280px"
+  },
+
+  "components": {
+    "button": {
+      "padding": "12px 24px",
+      "borderRadius": "8px",
+      "fontWeight": "600"
+    },
+    "card": {
+      "padding": "24px",
+      "borderRadius": "16px",
+      "shadow": "0 2px 12px rgba(0, 0, 0, 0.08)"
+    },
+    "input": {
+      "padding": "12px 16px",
+      "borderRadius": "8px",
+      "borderColor": "#E5E5E5"
+    }
+  }
+}
