@@ -41,6 +41,31 @@ const ENV_RULES = {
     pattern: /^xoxb-[0-9]+-[0-9]+-[a-zA-Z0-9]+$/,
     example: 'xoxb-XXXX-XXXX-XXXXXXXXXXXX',
     description: 'Slack Bot Token (xoxb-...)'
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // Export Pipeline 관련 환경변수
+  // ═══════════════════════════════════════════════════════════════════════
+
+  // GitHub Token: ghp_ 또는 github_pat_ 로 시작
+  GITHUB_TOKEN: {
+    pattern: /^(ghp_|github_pat_)[a-zA-Z0-9_]+$/,
+    example: 'ghp_xxxxxxxxxxxxxxxxxxxx',
+    description: 'GitHub Personal Access Token (ghp_... 또는 github_pat_...)'
+  },
+
+  // Google Drive Folder ID: 문자+숫자+언더스코어/하이픈
+  DRIVE_FOLDER_ID: {
+    pattern: /^[a-zA-Z0-9_-]{20,}$/,
+    example: '1abc123XYZ_defGHI456',
+    description: 'Google Drive 폴더 ID (20자 이상)'
+  },
+
+  // Google Sheets ID: 문자+숫자+언더스코어/하이픈
+  GOOGLE_SHEET_ID: {
+    pattern: /^[a-zA-Z0-9_-]{20,}$/,
+    example: '1abc123XYZ_defGHI456jkl',
+    description: 'Google Sheets ID (20자 이상)'
   }
 };
 
@@ -167,6 +192,9 @@ function validateEnv(options = { failFast: false }) {
     }
   }
 
+  // 6. Export Pipeline 환경변수 검증
+  validateExportEnvVars(result);
+
   // 결과 출력
   if (result.passed.length > 0) {
     console.log('✅ 검증 통과:');
@@ -235,8 +263,135 @@ function printEnvGuide() {
 `);
 }
 
+/**
+ * Export Pipeline 환경변수 검증
+ * @param {ValidationResult} result - 검증 결과 객체
+ */
+function validateExportEnvVars(result) {
+  // GitHub Token
+  const githubToken = process.env.GITHUB_TOKEN;
+  if (githubToken) {
+    if (!ENV_RULES.GITHUB_TOKEN.pattern.test(githubToken)) {
+      result.addError('GITHUB_TOKEN', githubToken, ENV_RULES.GITHUB_TOKEN);
+    } else {
+      result.addPassed('GITHUB_TOKEN');
+    }
+  } else {
+    result.addWarning('GITHUB_TOKEN', '미설정 - GitHub Export 비활성화');
+  }
+
+  // Google Service Account JSON (존재 여부만 체크)
+  const googleServiceAccount = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  if (googleServiceAccount) {
+    try {
+      const parsed = JSON.parse(googleServiceAccount);
+      if (parsed.client_email && parsed.private_key) {
+        result.addPassed('GOOGLE_SERVICE_ACCOUNT_JSON');
+      } else {
+        result.addError('GOOGLE_SERVICE_ACCOUNT_JSON', '(invalid)', {
+          description: 'client_email과 private_key 필드 필요',
+          example: '{"type":"service_account","client_email":"...","private_key":"..."}'
+        });
+      }
+    } catch (e) {
+      result.addError('GOOGLE_SERVICE_ACCOUNT_JSON', '(parse error)', {
+        description: '유효한 JSON 형식이어야 함',
+        example: '{"type":"service_account",...}'
+      });
+    }
+  } else {
+    result.addWarning('GOOGLE_SERVICE_ACCOUNT_JSON', '미설정 - Drive Export 비활성화');
+  }
+
+  // DECISION_EXPORT_READY_FOLDER_ID
+  const readyFolderId = process.env.DECISION_EXPORT_READY_FOLDER_ID;
+  if (readyFolderId) {
+    if (!ENV_RULES.DRIVE_FOLDER_ID.pattern.test(readyFolderId)) {
+      result.addError('DECISION_EXPORT_READY_FOLDER_ID', readyFolderId, ENV_RULES.DRIVE_FOLDER_ID);
+    } else {
+      result.addPassed('DECISION_EXPORT_READY_FOLDER_ID');
+    }
+  } else {
+    result.addWarning('DECISION_EXPORT_READY_FOLDER_ID', '미설정 - Export READY 폴더 미지정');
+  }
+
+  // EXPORT_REGISTRY_TABLE (Airtable 테이블명 - 형식 자유)
+  const registryTable = process.env.EXPORT_REGISTRY_TABLE;
+  if (registryTable) {
+    result.addPassed('EXPORT_REGISTRY_TABLE');
+  }
+
+  // Slack Alert 채널 (Export용)
+  const alertChannel = process.env.SLACK_CHANNEL_ALERTS || process.env.SLACK_CHANNEL_AURORA5_ALERTS;
+  if (alertChannel) {
+    if (!ENV_RULES.SLACK_CHANNEL.pattern.test(alertChannel)) {
+      result.addError('SLACK_CHANNEL_ALERTS', alertChannel, ENV_RULES.SLACK_CHANNEL);
+    } else {
+      result.addPassed('SLACK_CHANNEL_ALERTS');
+    }
+  }
+}
+
+/**
+ * Export Pipeline 설정 상태 출력 (값 미노출)
+ */
+function printExportStatus() {
+  console.log('\n┌─────────────────────────────────────────────────────────────┐');
+  console.log('│           Export Pipeline 설정 상태                          │');
+  console.log('├─────────────────────────────────────────────────────────────┤');
+
+  const exportEnvs = [
+    { key: 'GITHUB_TOKEN', label: 'GitHub Token' },
+    { key: 'GITHUB_OWNER', label: 'GitHub Owner' },
+    { key: 'GITHUB_REPO', label: 'GitHub Repo' },
+    { key: 'GOOGLE_SERVICE_ACCOUNT_JSON', label: 'Google SA' },
+    { key: 'DECISION_EXPORT_READY_FOLDER_ID', label: 'READY Folder' },
+    { key: 'AIRTABLE_API_KEY', label: 'Registry (Airtable)' },
+    { key: 'SLACK_CHANNEL_ALERTS', label: 'Slack Alerts', alt: 'SLACK_CHANNEL_AURORA5_ALERTS' },
+    { key: 'SLACK_CHANNEL_RAW_DIGEST', label: 'Slack Digest' }
+  ];
+
+  let allConfigured = true;
+  let criticalMissing = [];
+
+  for (const env of exportEnvs) {
+    const value = process.env[env.key] || (env.alt ? process.env[env.alt] : null);
+    const status = value ? '✅' : '❌';
+    const padding = ' '.repeat(Math.max(0, 20 - env.label.length));
+    console.log(`│  ${env.label}${padding}: ${status}                                    │`);
+
+    if (!value) {
+      allConfigured = false;
+      if (['GITHUB_TOKEN', 'GOOGLE_SERVICE_ACCOUNT_JSON', 'DECISION_EXPORT_READY_FOLDER_ID'].includes(env.key)) {
+        criticalMissing.push(env.key);
+      }
+    }
+  }
+
+  console.log('├─────────────────────────────────────────────────────────────┤');
+
+  if (allConfigured) {
+    console.log('│  Export Pipeline: ✅ READY                                  │');
+  } else if (criticalMissing.length > 0) {
+    console.log('│  Export Pipeline: ❌ DISABLED (필수 환경변수 미설정)         │');
+  } else {
+    console.log('│  Export Pipeline: ⚠️  PARTIAL (일부 기능 제한)               │');
+  }
+
+  console.log('└─────────────────────────────────────────────────────────────┘\n');
+
+  return {
+    ready: allConfigured,
+    partial: !allConfigured && criticalMissing.length === 0,
+    disabled: criticalMissing.length > 0,
+    criticalMissing
+  };
+}
+
 module.exports = {
   validateEnv,
   printEnvGuide,
+  printExportStatus,
+  validateExportEnvVars,
   ENV_RULES
 };

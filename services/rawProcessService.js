@@ -110,6 +110,8 @@ const LLM_SYSTEM_PROMPT = `당신은 콘텐츠 분석 전문가입니다. 주어
 출력 형식 (JSON):
 {
   "summary": "핵심 내용을 1줄로 요약 (50자 이내)",
+  "summary_5words": "파일명용 5단어 이내 요약 (한글, 띄어쓰기 없이 언더스코어)",
+  "tags": ["필수태그1개", "선택태그0-2개"],
   "keywords": ["키워드1", "키워드2", "키워드3"],
   "actions": [
     {"who": "담당자", "what": "할 일", "when": "기한", "priority": "HIGH|MEDIUM|LOW"}
@@ -121,14 +123,31 @@ const LLM_SYSTEM_PROMPT = `당신은 콘텐츠 분석 전문가입니다. 주어
   "sensitivity": "PRIVATE|INTERNAL"
 }
 
-분류 기준:
+## 태그 체계 (반드시 이 태그만 사용!)
+
+필수 태그 (반드시 1개 선택):
+- #전략: 방향성, 의사결정, 비전, 마케팅 전략
+- #기술: 개발, 시스템, API, 코드, 버그, 배포
+- #운영: 프로세스, 루틴, 워크플로우, 팀 관리
+- #콘텐츠: 메시지, 디자인, 카피, 영상, 대본
+- #분석: 데이터, 인사이트, 리서치, 시장 조사
+- #고객: 소원이, 피드백, VOC, 사용자 반응
+
+선택 태그 (해당 시 0-2개 추가):
+- #긴급: 24시간 내 액션 필요
+- #검증됨: 실제 적용 후 효과 확인됨
+
+## doc_type 분류 기준:
 - SYSTEM: 배포, 에러, 버그, API, 서버, 코드 관련
 - DECISION: 결정, 정책, 승인, 합의 관련
 - CONTENT: 콘텐츠, 영상, 대본, 유튜브 관련
 - NOTE: 그 외 일반 메모/기록
 
-actions/decisions가 없으면 빈 배열 []로.
-반드시 유효한 JSON만 출력하세요. 설명이나 마크다운 없이 JSON만.`;
+## 규칙:
+- tags 배열에는 반드시 필수 태그 1개 포함
+- summary_5words는 파일명에 사용할 5단어 이내 요약 (예: 베타테스트_피드백_수집방법)
+- actions/decisions가 없으면 빈 배열 []로
+- 반드시 유효한 JSON만 출력. 설명이나 마크다운 없이 JSON만.`;
 
 async function processWithLLM(content, title, category) {
   if (!OPENAI_API_KEY) {
@@ -180,9 +199,27 @@ ${content.slice(0, 4000)}`;  // 토큰 제한
     const result = JSON.parse(jsonMatch[0]);
 
     // 필수 필드 검증/보정
+    const validTags = ['#전략', '#기술', '#운영', '#콘텐츠', '#분석', '#고객', '#긴급', '#검증됨'];
+    const tags = Array.isArray(result.tags)
+      ? result.tags.filter(t => validTags.includes(t)).slice(0, 3)
+      : [inferTagFromDocType(inferDocType(category, content))];
+
+    // 태그가 비어있으면 doc_type 기반 추론
+    if (tags.length === 0) {
+      tags.push(inferTagFromDocType(inferDocType(category, content)));
+    }
+
+    // keywords: LLM 결과 우선, 없으면 fallback 생성
+    const llmKeywords = Array.isArray(result.keywords) ? result.keywords.slice(0, 5) : [];
+    const finalKeywords = llmKeywords.length > 0
+      ? llmKeywords
+      : generateFallbackKeywords(title, result.summary || '', content);
+
     return {
       summary: result.summary || content.slice(0, 50) + '...',
-      keywords: Array.isArray(result.keywords) ? result.keywords.slice(0, 5) : [],
+      summary_5words: result.summary_5words || generateSummary5Words(title, content),
+      tags: tags,
+      keywords: finalKeywords,
       actions: Array.isArray(result.actions) ? result.actions.slice(0, 5) : [],
       decisions: Array.isArray(result.decisions) ? result.decisions.slice(0, 3) : [],
       doc_type: ['SYSTEM', 'DECISION', 'CONTENT', 'NOTE'].includes(result.doc_type)
@@ -197,13 +234,115 @@ ${content.slice(0, 4000)}`;  // 토큰 제한
   }
 }
 
+/**
+ * doc_type에서 기본 태그 추론
+ */
+function inferTagFromDocType(docType) {
+  const mapping = {
+    'SYSTEM': '#기술',
+    'DECISION': '#전략',
+    'CONTENT': '#콘텐츠',
+    'NOTE': '#운영'
+  };
+  return mapping[docType] || '#운영';
+}
+
+/**
+ * Fallback 키워드 생성 (summary/title/content 기반)
+ * LLM이 키워드를 반환하지 않았을 때 사용
+ */
+function generateFallbackKeywords(title, summary, content) {
+  const keywords = new Set();
+
+  // 1. 패턴 매칭 키워드 (기존 extractSimpleKeywords 로직)
+  const patternKeywords = extractSimpleKeywords(content);
+  patternKeywords.forEach(k => keywords.add(k));
+
+  // 2. title에서 명사 추출 (2-10자)
+  if (title) {
+    const titleWords = title
+      .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+      .split(/\s+/)
+      .filter(w => w.length >= 2 && w.length <= 10);
+    titleWords.slice(0, 2).forEach(w => keywords.add(w));
+  }
+
+  // 3. summary에서 명사 추출
+  if (summary) {
+    const summaryWords = summary
+      .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+      .split(/\s+/)
+      .filter(w => w.length >= 2 && w.length <= 10);
+    summaryWords.slice(0, 2).forEach(w => keywords.add(w));
+  }
+
+  // 4. content에서 자주 등장하는 단어 (최후 수단)
+  if (keywords.size < 3 && content) {
+    const contentWords = content
+      .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+      .split(/\s+/)
+      .filter(w => w.length >= 2 && w.length <= 12);
+
+    // 빈도 계산
+    const freq = {};
+    contentWords.forEach(w => {
+      freq[w] = (freq[w] || 0) + 1;
+    });
+
+    // 빈도 순 정렬 후 상위 추가
+    const sorted = Object.entries(freq)
+      .sort((a, b) => b[1] - a[1])
+      .map(([word]) => word);
+
+    sorted.slice(0, 5 - keywords.size).forEach(w => keywords.add(w));
+  }
+
+  // 최소 1개 보장
+  if (keywords.size === 0) {
+    keywords.add('기록');
+  }
+
+  return Array.from(keywords).slice(0, 5);
+}
+
+/**
+ * 파일명용 5단어 요약 생성
+ */
+function generateSummary5Words(title, content) {
+  // 제목이 있으면 제목 기반, 없으면 내용 기반
+  const source = title || content.slice(0, 100);
+
+  // 특수문자 제거, 공백을 언더스코어로
+  let summary = source
+    .replace(/[^\w\s가-힣]/g, '')  // 특수문자 제거
+    .trim()
+    .split(/\s+/)                   // 공백으로 분리
+    .slice(0, 5)                    // 5단어로 제한
+    .join('_');
+
+  // 너무 길면 자르기
+  if (summary.length > 50) {
+    summary = summary.slice(0, 50);
+  }
+
+  return summary || 'untitled';
+}
+
 function createFallbackResult(content, title, category) {
+  const docType = inferDocType(category, content);
+  const summary = (title || content.slice(0, 50)).trim() + (content.length > 50 ? '...' : '');
+
+  // keywords: fallback 로직 적용
+  const keywords = generateFallbackKeywords(title, summary, content);
+
   return {
-    summary: (title || content.slice(0, 50)).trim() + (content.length > 50 ? '...' : ''),
-    keywords: extractSimpleKeywords(content),
+    summary: summary,
+    summary_5words: generateSummary5Words(title, content),
+    tags: [inferTagFromDocType(docType)],
+    keywords: keywords,
     actions: [],
     decisions: [],
-    doc_type: inferDocType(category, content),
+    doc_type: docType,
     sensitivity: 'INTERNAL'
   };
 }
@@ -231,21 +370,48 @@ function extractSimpleKeywords(content) {
   if (!content) return [];
 
   const keywords = [];
+
+  // 확장된 키워드 패턴 (도메인별)
   const keywordPatterns = {
-    '배포': /배포|deploy/i,
-    '에러': /에러|error|버그|bug/i,
-    'API': /api|엔드포인트/i,
-    '결정': /결정|정책|승인/i,
-    '콘텐츠': /콘텐츠|영상|대본/i,
+    // 기술
+    '배포': /배포|deploy|릴리즈|release/i,
+    '에러': /에러|error|버그|bug|오류|장애/i,
+    'API': /api|엔드포인트|endpoint|라우트|route/i,
+    '서버': /서버|server|render|vercel|호스팅/i,
+    'DB': /db|database|데이터베이스|쿼리|query/i,
+    '프론트': /프론트|frontend|react|vue|ui|ux/i,
+
+    // 운영
+    '결정': /결정|정책|승인|합의|확정/i,
+    '회의': /회의|미팅|meeting|논의|토론/i,
+    '프로세스': /프로세스|워크플로우|workflow|절차/i,
+
+    // 콘텐츠
+    '콘텐츠': /콘텐츠|content|영상|대본|스크립트/i,
+    '마케팅': /마케팅|marketing|캠페인|광고|프로모션/i,
+    'SNS': /sns|소셜|인스타|페이스북|트위터/i,
+
+    // 분석
+    '지표': /지표|metric|kpi|전환율|리텐션/i,
+    '분석': /분석|analysis|데이터|통계|리포트/i,
+
+    // 고객
+    '고객': /고객|customer|사용자|user|소원이/i,
+    'VOC': /voc|피드백|feedback|문의|불만/i,
+
+    // 도구
     'Slack': /슬랙|slack/i,
-    'Airtable': /에어테이블|airtable/i
+    'Airtable': /에어테이블|airtable/i,
+    'Wix': /wix|윅스/i,
+    'Drive': /drive|드라이브|구글/i,
+    'GitHub': /github|깃허브|깃헙|repo/i
   };
 
   for (const [keyword, pattern] of Object.entries(keywordPatterns)) {
     if (pattern.test(content)) {
       keywords.push(keyword);
     }
-    if (keywords.length >= 3) break;
+    if (keywords.length >= 5) break;
   }
 
   return keywords;
@@ -282,7 +448,18 @@ async function postToSlack(result, driveUrl, title) {
       }
     ];
 
-    // 키워드
+    // 태그 (표준화된 분류)
+    if (result.tags && result.tags.length > 0) {
+      blocks.push({
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `*태그*: ${result.tags.map(t => '`' + t + '`').join(' ')}`
+        }
+      });
+    }
+
+    // 키워드 (상세 분류)
     if (result.keywords && result.keywords.length > 0) {
       blocks.push({
         type: 'section',
@@ -429,6 +606,8 @@ async function processRawContent(payload) {
       success: true,
       duplicate: true,
       summary: cached.summary,
+      summary_5words: cached.summary_5words,
+      tags: cached.tags,
       keywords: cached.keywords,
       actions: cached.actions,
       decisions: cached.decisions,
@@ -451,6 +630,8 @@ async function processRawContent(payload) {
   const result = {
     success: true,
     summary: llmResult.summary,
+    summary_5words: llmResult.summary_5words,
+    tags: llmResult.tags,
     keywords: llmResult.keywords,
     actions: llmResult.actions,
     decisions: llmResult.decisions,

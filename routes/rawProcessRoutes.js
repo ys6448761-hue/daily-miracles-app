@@ -110,6 +110,8 @@ router.post('/process', verifySecret, async (req, res) => {
       return res.json({
         success: true,
         summary: result.summary,
+        summary_5words: result.summary_5words,
+        tags: result.tags,
         keywords: result.keywords,
         actions: result.actions,
         decisions: result.decisions,

@@ -346,6 +346,15 @@ try {
   console.error("❌ Drive→GitHub Sync 라우터 로드 실패:", error.message);
 }
 
+// Hero8 8초 영상 생성 라우터 로딩
+let hero8Routes = null;
+try {
+  hero8Routes = require("./routes/hero8Routes");
+  console.log("✅ Hero8 영상 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ Hero8 영상 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -1082,6 +1091,26 @@ if (driveGitHubSyncRoutes) {
   console.log("✅ Drive→GitHub Sync 라우터 등록 완료 (/api/sync/run, /api/sync/health, /api/sync/status)");
 } else {
   console.warn("⚠️ Drive→GitHub Sync 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- Hero8 8초 영상 생성 Routes (/api/video/hero8) ----------
+if (hero8Routes) {
+  app.use("/api/video/hero8", hero8Routes);
+  // output 폴더 정적 서빙 (영상 다운로드용)
+  app.use("/output", express.static(path.join(__dirname, "output"), {
+    maxAge: '1h',
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.mp4')) {
+        res.setHeader('Content-Type', 'video/mp4');
+      } else if (filePath.endsWith('.zip')) {
+        res.setHeader('Content-Type', 'application/zip');
+        res.setHeader('Content-Disposition', 'attachment');
+      }
+    }
+  }));
+  console.log("✅ Hero8 영상 라우터 등록 완료 (/api/video/hero8, /output)");
+} else {
+  console.warn("⚠️ Hero8 영상 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------
