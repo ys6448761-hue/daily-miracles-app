@@ -787,10 +787,38 @@ async function getDashboard() {
   if (!db) throw new Error('DB 연결 필요');
 
   const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth() + 1;
+  let year = now.getFullYear();
+  let month = now.getMonth() + 1;
 
-  // 이번 달 요약
+  // 현재 월에 데이터가 없으면 가장 최근 데이터가 있는 월 찾기
+  const latestCheck = await db.query(`
+    SELECT
+      EXTRACT(YEAR FROM transaction_date)::int as year,
+      EXTRACT(MONTH FROM transaction_date)::int as month,
+      COUNT(*) as count
+    FROM finance_transactions
+    WHERE EXTRACT(YEAR FROM transaction_date) = $1
+      AND EXTRACT(MONTH FROM transaction_date) = $2
+    GROUP BY year, month
+  `, [year, month]);
+
+  // 현재 월에 데이터가 없으면 가장 최근 월 조회
+  if (!latestCheck.rows.length || latestCheck.rows[0].count === 0) {
+    const recentMonth = await db.query(`
+      SELECT
+        EXTRACT(YEAR FROM transaction_date)::int as year,
+        EXTRACT(MONTH FROM transaction_date)::int as month
+      FROM finance_transactions
+      ORDER BY transaction_date DESC
+      LIMIT 1
+    `);
+    if (recentMonth.rows.length > 0) {
+      year = recentMonth.rows[0].year;
+      month = recentMonth.rows[0].month;
+    }
+  }
+
+  // 해당 월 요약
   const monthlyResult = await db.query(`
     SELECT
       type,
