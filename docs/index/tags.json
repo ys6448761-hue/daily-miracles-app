@@ -26,6 +26,7 @@
     "DOC-agents-index",
     "DOC-Aurora5_토론시스템_안내문",
     "DOC-alimtalk-templates-design",
+    "DOC-video-promo-30sec-template",
     "DOC-WIX_TEAM_PAGE_CONTENT",
     "DEC-2026-0102-045",
     "DEC-2026-0102-121",
@@ -190,7 +191,8 @@
   ],
   "templates": [
     "DOC-knowledge_card_template",
-    "DOC-alimtalk-templates-design"
+    "DOC-alimtalk-templates-design",
+    "DOC-video-promo-30sec-template"
   ],
   "automation": [
     "DOC-WIX_INTEGRATION_GUIDE",
