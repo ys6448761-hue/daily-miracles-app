@@ -598,7 +598,65 @@ Person sitting peacefully by window with warm cup of tea. Soft afternoon light s
 
 ---
 
-## 12. 영상 요약 테이블
+## 12. 열 번째 영상: "이미 늦은 걸까"
+
+### 유닛 1 (0-8초) - PAIN 1: 흘러간 시간
+
+**장면 설명:** 달력 장이 빠르게 넘어감, 거울 속 나이 든 얼굴, 한숨
+**감정 톤:** 후회, 조바심, 상실
+**자막:** "벌써 이 나이인데..."
+**배경음악:** 쓸쓸한 시계 소리, 느린 피아노
+
+**Sora 프롬프트:**
+```
+Calendar pages flying off rapidly, years passing by. Person looking in mirror, noticing time has passed. Photos of younger self on the wall fading. Hourglass sand almost empty. Regret about lost time visualized. Melancholic atmosphere, sepia tones creeping in. 8 seconds.
+```
+
+---
+
+### 유닛 2 (8-16초) - PAIN 2: 비교의 늪
+
+**장면 설명:** SNS 속 "20대에 성공한 사람들", 자신은 아직 시작도 못한 느낌
+**감정 톤:** 자괴감, 비교, 초조
+**자막:** "다들 나보다 빨랐는데"
+**배경음악:** 불안한 전자음, 빠른 심장박동
+
+**Sora 프롬프트:**
+```
+Phone screen showing "30 under 30" success stories, young CEOs, early achievers. Person shrinking in comparison, feeling left behind. Finish line that everyone else has already crossed. Starting blocks while others celebrate at finish. Age anxiety visualized. 8 seconds.
+```
+
+---
+
+### 유닛 3 (16-24초) - SOLUTION 1: 소원이의 진실
+
+**장면 설명:** 소원이 메시지 "시작하기에 늦은 때는 없어", 눈빛 변화
+**감정 톤:** 깨달음, 희망, 용기
+**자막:** "지금이 가장 빠른 때야"
+**배경음악:** 따뜻한 현악기, 희망적 멜로디
+
+**Sora 프롬프트:**
+```
+Phone glows with star mascot saying "There's no such thing as too late to start" in Korean. Hourglass flipping over - fresh start. Sepia tones transforming back to vibrant colors. Person's eyes lighting up with new determination. Time becoming friend, not enemy. 8 seconds.
+```
+
+---
+
+### 유닛 4 (24-30초) - SOLUTION 2: 나만의 타이밍
+
+**장면 설명:** 첫 걸음 내딛는 발, 나만의 길에서 달리기 시작, 소원이와 함께
+**감정 톤:** 결심, 자유, 희망
+**자막:** "내 속도로, 내 시간에, 시작해"
+**배경음악:** 밝은 오케스트라, 상승 에너지
+
+**Sora 프롬프트:**
+```
+Person stepping onto their own unique path, not comparing to others' lanes. Running at their own pace with confidence. Star mascot cheering alongside. Other finish lines disappearing - only their journey matters. Sunrise ahead symbolizing new beginning. Purple-pink glow. Logo fade in. 6 seconds.
+```
+
+---
+
+## 13. 영상 요약 테이블
 
 | # | 제목 | PAIN 키워드 | SOLUTION 키워드 | 핵심 메시지 |
 |---|------|-------------|-----------------|-------------|
@@ -611,10 +669,11 @@ Person sitting peacefully by window with warm cup of tea. Soft afternoon light s
 | 7 | 꿈을 잃어버렸어 | 상실, 체념 | 회상, 재발견 | 작게라도 다시 나의 꿈 |
 | 8 | 남들 눈이 무서워 | 눈치, 가면 | 자기시선, 진정성 | 나답게 가장 멋진 나 |
 | 9 | 쉬어도 될까 | 번아웃, 죄책감 | 허락, 충전 | 쉬는 것도 용기야 |
+| 10 | 이미 늦은 걸까 | 후회, 비교 | 깨달음, 나만의 속도 | 지금이 가장 빠른 때 |
 
 ---
 
-## 13. 워크플로우
+## 14. 워크플로우
 
 ```
 1. GPTs에서 주제 입력 → 4유닛 스크립트 생성
@@ -626,8 +685,8 @@ Person sitting peacefully by window with warm cup of tea. Soft afternoon light s
 
 ---
 
-**Version:** 1.7.0
+**Version:** 1.8.0
 **Created:** 2025-01-29
 **Updated:** 2025-01-29
 **Author:** Claude Code + 푸르미르님
-**Videos:** 9개 완성
+**Videos:** 10개 완성
