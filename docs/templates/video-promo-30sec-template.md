@@ -540,7 +540,65 @@ Masks falling away and dissolving. Person smiling genuinely for the first time, 
 
 ---
 
-## 11. 영상 요약 테이블
+## 11. 아홉 번째 영상: "쉬어도 될까"
+
+### 유닛 1 (0-8초) - PAIN 1: 멈출 수 없는 러닝머신
+
+**장면 설명:** 끊임없이 돌아가는 할 일 목록, 쉬지 못하고 달리는 모습
+**감정 톤:** 압박, 조급함, 소진
+**자막:** "쉬면 뒤처질 것 같아..."
+**배경음악:** 빠른 시계 소리, 조급한 일렉트로닉
+
+**Sora 프롬프트:**
+```
+Person running on endless treadmill, to-do lists flying past like scenery. Clock hands spinning rapidly. Sweat dripping, exhausted but unable to stop. Others running past them in parallel lanes. Fear of falling behind visualized. Hamster wheel energy. Burnout approaching. 8 seconds.
+```
+
+---
+
+### 유닛 2 (8-16초) - PAIN 2: 죄책감의 무게
+
+**장면 설명:** 잠깐 앉으려다 "게으름뱅이" 목소리, 다시 일어나는 모습
+**감정 톤:** 죄책감, 자책, 피로
+**자막:** "쉬는 건 게으른 거잖아"
+**배경음악:** 무거운 베이스, 비난하는 속삭임
+
+**Sora 프롬프트:**
+```
+Person about to sit down on comfortable couch, but ghostly voices whisper "lazy" "unproductive" "wasting time". They force themselves back up, guilt weighing on shoulders like heavy chains. Dark shadows of self-judgment. Rest feels forbidden. Exhaustion ignored. 8 seconds.
+```
+
+---
+
+### 유닛 3 (16-24초) - SOLUTION 1: 소원이의 허락
+
+**장면 설명:** 소원이 메시지 "쉬는 것도 열심히 사는 거야", 긴장 풀림
+**감정 톤:** 허락, 안도, 위로
+**자막:** "쉬는 것도 용기야"
+**배경음악:** 부드러운 오르골, 평화로운 멜로디
+
+**Sora 프롬프트:**
+```
+Phone glows with star mascot gently saying "Resting is also living your best life" in Korean. Treadmill slowly stops. Heavy chains of guilt dissolving into light. Person's tense muscles finally relaxing. Permission to rest granted. Warm purple glow of acceptance. Relief washing over. 8 seconds.
+```
+
+---
+
+### 유닛 4 (24-30초) - SOLUTION 2: 충전의 시간
+
+**장면 설명:** 따뜻한 차 한 잔, 창가에 앉아 쉬는 모습, 소원이와 평화로운 시간
+**감정 톤:** 평화, 회복, 충전
+**자막:** "오늘은 나를 위해, 쉬어도 괜찮아"
+**배경음악:** 잔잔한 피아노, 새소리
+
+**Sora 프롬프트:**
+```
+Person sitting peacefully by window with warm cup of tea. Soft afternoon light streaming in. Star mascot resting contentedly beside them. No rushing, no to-do lists. Just breathing. Battery icon filling up. Genuine peaceful smile. Self-care moment. Purple-pink warm glow. Logo fade in. 6 seconds.
+```
+
+---
+
+## 12. 영상 요약 테이블
 
 | # | 제목 | PAIN 키워드 | SOLUTION 키워드 | 핵심 메시지 |
 |---|------|-------------|-----------------|-------------|
@@ -552,10 +610,11 @@ Masks falling away and dissolving. Person smiling genuinely for the first time, 
 | 6 | 내일이 두려워도 | 불안, 불면 | 등불, 새벽 | 함께라면 내일도 괜찮아 |
 | 7 | 꿈을 잃어버렸어 | 상실, 체념 | 회상, 재발견 | 작게라도 다시 나의 꿈 |
 | 8 | 남들 눈이 무서워 | 눈치, 가면 | 자기시선, 진정성 | 나답게 가장 멋진 나 |
+| 9 | 쉬어도 될까 | 번아웃, 죄책감 | 허락, 충전 | 쉬는 것도 용기야 |
 
 ---
 
-## 12. 워크플로우
+## 13. 워크플로우
 
 ```
 1. GPTs에서 주제 입력 → 4유닛 스크립트 생성
@@ -567,8 +626,8 @@ Masks falling away and dissolving. Person smiling genuinely for the first time, 
 
 ---
 
-**Version:** 1.6.0
+**Version:** 1.7.0
 **Created:** 2025-01-29
 **Updated:** 2025-01-29
 **Author:** Claude Code + 푸르미르님
-**Videos:** 8개 완성
+**Videos:** 9개 완성
