@@ -447,6 +447,176 @@ router.get('/budgets/status', asyncHandler(async (req, res) => {
   });
 }));
 
+// ============ 증빙 발행 API (Phase 3) ============
+
+// 볼타 서비스 로드
+let boltaService;
+try {
+  boltaService = require('../services/boltaService');
+} catch (e) {
+  console.warn('[FinanceRoutes] 볼타 서비스 로드 실패:', e.message);
+}
+
+/**
+ * GET /api/finance/receipts/pending - 미발행 증빙 목록
+ */
+router.get('/receipts/pending', asyncHandler(async (req, res) => {
+  const { year, month, limit } = req.query;
+
+  const result = await financeService.getPendingReceipts({
+    year: year ? parseInt(year) : null,
+    month: month ? parseInt(month) : null,
+    limit: limit ? parseInt(limit) : 50
+  });
+
+  res.json({
+    success: true,
+    data: result
+  });
+}));
+
+/**
+ * GET /api/finance/receipts/deadline - 발행 기한 임박 건
+ */
+router.get('/receipts/deadline', asyncHandler(async (req, res) => {
+  const result = await financeService.getDeadlineReceipts();
+
+  res.json({
+    success: true,
+    data: result
+  });
+}));
+
+/**
+ * POST /api/finance/receipts/issue/:id - 증빙 발행 요청
+ */
+router.post('/receipts/issue/:id', asyncHandler(async (req, res) => {
+  const transactionId = parseInt(req.params.id);
+  const { provider, receiptNumber, issuedAt } = req.body;
+
+  const result = await financeService.issueReceipt(transactionId, {
+    provider: provider || 'manual',
+    receiptNumber,
+    issuedAt
+  });
+
+  res.json({
+    success: result.success,
+    data: result,
+    message: result.success ? '증빙 발행이 완료되었습니다' : result.message
+  });
+}));
+
+/**
+ * PUT /api/finance/receipts/status/:id - 발행 상태 수동 업데이트
+ */
+router.put('/receipts/status/:id', asyncHandler(async (req, res) => {
+  const transactionId = parseInt(req.params.id);
+  const statusData = req.body;
+
+  const result = await financeService.updateReceiptStatus(transactionId, statusData);
+
+  res.json({
+    success: true,
+    data: result,
+    message: '증빙 상태가 업데이트되었습니다'
+  });
+}));
+
+/**
+ * GET /api/finance/receipts/stats - 증빙 현황 통계
+ */
+router.get('/receipts/stats', asyncHandler(async (req, res) => {
+  const { year, month } = req.query;
+
+  const stats = await financeService.getReceiptStats(
+    year ? parseInt(year) : null,
+    month ? parseInt(month) : null
+  );
+
+  res.json({
+    success: true,
+    data: stats
+  });
+}));
+
+/**
+ * GET /api/finance/receipts/recommend - 증빙 유형 추천
+ */
+router.get('/receipts/recommend', (req, res) => {
+  const { partnerType } = req.query;
+
+  if (!partnerType) {
+    return res.status(400).json({
+      success: false,
+      error: 'partnerType 파라미터가 필요합니다'
+    });
+  }
+
+  const recommendation = boltaService
+    ? boltaService.recommendReceipt(partnerType)
+    : { receiptType: 'none', description: '볼타 서비스 로드 실패' };
+
+  res.json({
+    success: true,
+    data: recommendation
+  });
+});
+
+// ============ 볼타 API 연동 (Phase 3 - 비활성화) ============
+
+/**
+ * POST /api/finance/bolta/tax-invoice - 세금계산서 발행 (비활성화)
+ */
+router.post('/bolta/tax-invoice', asyncHandler(async (req, res) => {
+  if (!boltaService) {
+    return res.status(503).json({
+      success: false,
+      error: '볼타 서비스를 사용할 수 없습니다'
+    });
+  }
+
+  const result = await boltaService.issueTaxInvoice(req.body);
+
+  res.json({
+    success: result.success,
+    data: result
+  });
+}));
+
+/**
+ * POST /api/finance/bolta/cash-receipt - 현금영수증 발행 (비활성화)
+ */
+router.post('/bolta/cash-receipt', asyncHandler(async (req, res) => {
+  if (!boltaService) {
+    return res.status(503).json({
+      success: false,
+      error: '볼타 서비스를 사용할 수 없습니다'
+    });
+  }
+
+  const result = await boltaService.issueCashReceipt(req.body);
+
+  res.json({
+    success: result.success,
+    data: result
+  });
+}));
+
+/**
+ * GET /api/finance/bolta/status - 볼타 서비스 상태
+ */
+router.get('/bolta/status', (req, res) => {
+  const status = boltaService
+    ? boltaService.getServiceStatus()
+    : { enabled: false, message: '볼타 서비스 로드 실패' };
+
+  res.json({
+    success: true,
+    data: status
+  });
+});
+
 // ============ 상태 API ============
 
 /**

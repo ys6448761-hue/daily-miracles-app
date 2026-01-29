@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>증빙 관리 - 기적 금고</title>
+  <style>
+    :root {
+      --primary: #9B87F5;
+      --secondary: #F5A7C6;
+      --accent: #6E59A5;
+      --background: #FFF5F7;
+      --surface: #FFFFFF;
+      --text: #333333;
+      --text-light: #666666;
+      --success: #4CAF50;
+      --warning: #FF9800;
+      --error: #F44336;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--background);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 20px 30px;
+      box-shadow: 0 2px 10px rgba(155, 135, 245, 0.3);
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    .header-links {
+      display: flex;
+      gap: 10px;
+    }
+
+    .header-links a {
+      color: white;
+      text-decoration: none;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 8px;
+      font-size: 13px;
+      transition: background 0.2s;
+    }
+
+    .header-links a:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px;
+    }
+
+    /* Summary Cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .summary-card {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+
+    .summary-card.danger { border-top: 4px solid var(--error); }
+    .summary-card.warning { border-top: 4px solid var(--warning); }
+    .summary-card.success { border-top: 4px solid var(--success); }
+    .summary-card.info { border-top: 4px solid var(--primary); }
+
+    .summary-card .icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .summary-card .value {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .summary-card .label {
+      font-size: 14px;
+      color: var(--text-light);
+    }
+
+    /* Section */
+    .section {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    /* Alert Banner */
+    .alert-banner {
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .alert-banner.danger {
+      background: #FFEBEE;
+      border-left: 4px solid var(--error);
+      color: #C62828;
+    }
+
+    .alert-banner.warning {
+      background: #FFF3E0;
+      border-left: 4px solid var(--warning);
+      color: #E65100;
+    }
+
+    .alert-banner.success {
+      background: #E8F5E9;
+      border-left: 4px solid var(--success);
+      color: #2E7D32;
+    }
+
+    .alert-banner .icon {
+      font-size: 24px;
+    }
+
+    .alert-banner .content {
+      flex: 1;
+    }
+
+    .alert-banner .title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    /* Receipt List */
+    .receipt-list {
+      list-style: none;
+    }
+
+    .receipt-item {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid #f0f0f0;
+      gap: 16px;
+    }
+
+    .receipt-item:last-child {
+      border-bottom: none;
+    }
+
+    .receipt-item:hover {
+      background: #fafafa;
+    }
+
+    .receipt-checkbox {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .receipt-info {
+      flex: 1;
+    }
+
+    .receipt-info h4 {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .receipt-info .meta {
+      font-size: 12px;
+      color: var(--text-light);
+    }
+
+    .receipt-amount {
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--success);
+      min-width: 120px;
+      text-align: right;
+    }
+
+    .receipt-type {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      background: #f0f0f0;
+      min-width: 100px;
+      text-align: center;
+    }
+
+    .receipt-type.tax_invoice { background: #E3F2FD; color: #1565C0; }
+    .receipt-type.cash_receipt_deduction { background: #E8F5E9; color: #2E7D32; }
+    .receipt-type.cash_receipt_expense { background: #FFF3E0; color: #E65100; }
+
+    .receipt-deadline {
+      font-size: 12px;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    .receipt-deadline.urgent { color: var(--error); font-weight: 600; }
+    .receipt-deadline.overdue { color: var(--error); font-weight: 700; }
+
+    .receipt-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 13px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .btn-outline:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    /* Quick Links */
+    .quick-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .quick-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #f5f0ff, #fff5f7);
+      border-radius: 12px;
+      text-decoration: none;
+      color: var(--text);
+      transition: transform 0.2s;
+    }
+
+    .quick-link:hover {
+      transform: translateY(-2px);
+    }
+
+    .quick-link .icon {
+      font-size: 20px;
+    }
+
+    .quick-link .label {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 16px;
+      background: #f8f8f8;
+      border-radius: 12px;
+    }
+
+    .stat-item .value {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .stat-item .label {
+      font-size: 12px;
+      color: var(--text-light);
+    }
+
+    /* Issue Rate */
+    .issue-rate {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px;
+      background: linear-gradient(135deg, #e8f5e9, #f5fff5);
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+
+    .issue-rate .percentage {
+      font-size: 48px;
+      font-weight: 700;
+      color: var(--success);
+    }
+
+    .issue-rate .info {
+      flex: 1;
+    }
+
+    .issue-rate .info h4 {
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    .issue-rate .info p {
+      font-size: 13px;
+      color: var(--text-light);
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-light);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-light);
+    }
+
+    .empty-state .icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal h3 {
+      margin-bottom: 20px;
+      color: var(--accent);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 24px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 16px;
+      }
+
+      .receipt-item {
+        flex-wrap: wrap;
+      }
+
+      .receipt-amount,
+      .receipt-type,
+      .receipt-deadline {
+        min-width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-content">
+      <div>
+        <h1>증빙 관리</h1>
+        <p>세금계산서 / 현금영수증 발행 관리</p>
+      </div>
+      <div class="header-links">
+        <a href="/admin/finance.html">대시보드</a>
+        <a href="https://www.hometax.go.kr" target="_blank">홈택스</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Alert Banner -->
+    <div id="alertBanner" class="alert-banner warning" style="display: none;">
+      <span class="icon">⚠️</span>
+      <div class="content">
+        <div class="title">증빙 발행 기한 임박</div>
+        <div id="alertMessage">미발행 건이 있습니다.</div>
+      </div>
+      <button class="btn btn-primary btn-small" onclick="scrollToPending()">확인하기</button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-grid" id="summaryCards">
+      <div class="loading">로딩 중...</div>
+    </div>
+
+    <!-- Pending Receipts -->
+    <div class="section" id="pendingSection">
+      <div class="section-header">
+        <h2 class="section-title">미발행 증빙</h2>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-outline btn-small" onclick="selectAllPending()">전체 선택</button>
+          <button class="btn btn-success btn-small" onclick="bulkIssue()">선택 발행</button>
+        </div>
+      </div>
+      <ul class="receipt-list" id="pendingList">
+        <li class="loading">로딩 중...</li>
+      </ul>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">바로가기</h2>
+      </div>
+      <div class="quick-links">
+        <a href="https://www.hometax.go.kr/websquare/websquare.wq?w2xPath=/ui/pp/index_pp.xml&tmIdx=02&tm2lIdx=0206000000&tm3lIdx=0206010000" target="_blank" class="quick-link">
+          <span class="icon">📄</span>
+          <span class="label">홈택스 전자세금계산서</span>
+        </a>
+        <a href="https://www.hometax.go.kr/websquare/websquare.wq?w2xPath=/ui/pp/index_pp.xml&tmIdx=02&tm2lIdx=0206000000&tm3lIdx=0206020000" target="_blank" class="quick-link">
+          <span class="icon">🧾</span>
+          <span class="label">홈택스 현금영수증</span>
+        </a>
+        <a href="/admin/finance.html" class="quick-link">
+          <span class="icon">📊</span>
+          <span class="label">재무 대시보드</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Receipt Stats -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">이번 달 증빙 현황</h2>
+      </div>
+      <div class="stats-grid" id="statsGrid">
+        <div class="loading">로딩 중...</div>
+      </div>
+      <div class="issue-rate" id="issueRate" style="display: none;">
+        <div class="percentage" id="issueRateValue">0%</div>
+        <div class="info">
+          <h4>발행률</h4>
+          <p id="issueRateDesc">발행 필요 건 중 발행 완료된 비율</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Issue Modal -->
+  <div class="modal-overlay" id="issueModal">
+    <div class="modal">
+      <h3>증빙 발행 완료 처리</h3>
+      <div class="form-group">
+        <label>발행 번호 (선택)</label>
+        <input type="text" id="receiptNumber" placeholder="홈택스에서 발행된 번호">
+      </div>
+      <div class="form-group">
+        <label>발행일</label>
+        <input type="date" id="issuedAt" value="">
+      </div>
+      <div class="form-group">
+        <label>발행 방법</label>
+        <select id="issueProvider">
+          <option value="manual">홈택스 직접 발행</option>
+          <option value="hometax">홈택스 연동</option>
+          <option value="bolta" disabled>볼타 API (준비중)</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal()">취소</button>
+        <button class="btn btn-success" onclick="confirmIssue()">발행 완료</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '/api/finance';
+    let currentTransactionId = null;
+    let selectedIds = new Set();
+
+    // 금액 포맷
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('ko-KR').format(amount) + '원';
+    }
+
+    // 날짜 포맷
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const date = new Date(dateStr);
+      return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
+    }
+
+    // 데이터 로드
+    async function loadData() {
+      await Promise.all([
+        loadStats(),
+        loadPendingReceipts(),
+        loadDeadlineAlert()
+      ]);
+    }
+
+    // 통계 로드
+    async function loadStats() {
+      try {
+        const res = await fetch(`${API_BASE}/receipts/stats`);
+        const data = await res.json();
+
+        if (data.success) {
+          renderStats(data.data);
+        }
+      } catch (error) {
+        console.error('Stats load error:', error);
+      }
+    }
+
+    // 통계 렌더링
+    function renderStats(stats) {
+      const summaryEl = document.getElementById('summaryCards');
+      summaryEl.innerHTML = `
+        <div class="summary-card ${stats.pending.count > 0 ? 'danger' : 'success'}">
+          <div class="icon">${stats.pending.count > 0 ? '⚠️' : '✅'}</div>
+          <div class="value">${stats.pending.count}</div>
+          <div class="label">미발행</div>
+        </div>
+        <div class="summary-card success">
+          <div class="icon">📄</div>
+          <div class="value">${stats.issued.count}</div>
+          <div class="label">발행 완료</div>
+        </div>
+        <div class="summary-card info">
+          <div class="icon">💰</div>
+          <div class="value">${formatCurrency(stats.pending.amount + stats.issued.amount)}</div>
+          <div class="label">총 수입 금액</div>
+        </div>
+        <div class="summary-card ${stats.issueRate >= 80 ? 'success' : stats.issueRate >= 50 ? 'warning' : 'danger'}">
+          <div class="icon">📈</div>
+          <div class="value">${stats.issueRate}%</div>
+          <div class="label">발행률</div>
+        </div>
+      `;
+
+      // 상세 통계
+      const statsGrid = document.getElementById('statsGrid');
+      statsGrid.innerHTML = `
+        <div class="stat-item">
+          <div class="value" style="color: #1565C0;">${stats.byType.tax_invoice.issued + stats.byType.tax_invoice.pending}</div>
+          <div class="label">세금계산서</div>
+        </div>
+        <div class="stat-item">
+          <div class="value" style="color: #2E7D32;">${stats.byType.cash_receipt_deduction.issued + stats.byType.cash_receipt_deduction.pending}</div>
+          <div class="label">현금영수증 (소득공제)</div>
+        </div>
+        <div class="stat-item">
+          <div class="value" style="color: #E65100;">${stats.byType.cash_receipt_expense.issued + stats.byType.cash_receipt_expense.pending}</div>
+          <div class="label">현금영수증 (지출증빙)</div>
+        </div>
+      `;
+
+      // 발행률
+      const issueRateEl = document.getElementById('issueRate');
+      issueRateEl.style.display = 'flex';
+      document.getElementById('issueRateValue').textContent = stats.issueRate + '%';
+      document.getElementById('issueRateDesc').textContent =
+        `발행 완료 ${stats.issued.count}건 / 전체 ${stats.issued.count + stats.pending.count}건`;
+    }
+
+    // 미발행 목록 로드
+    async function loadPendingReceipts() {
+      try {
+        const res = await fetch(`${API_BASE}/receipts/pending`);
+        const data = await res.json();
+
+        if (data.success) {
+          renderPendingList(data.data);
+        }
+      } catch (error) {
+        console.error('Pending receipts load error:', error);
+      }
+    }
+
+    // 미발행 목록 렌더링
+    function renderPendingList(data) {
+      const listEl = document.getElementById('pendingList');
+
+      if (!data.receipts || data.receipts.length === 0) {
+        listEl.innerHTML = `
+          <li class="empty-state">
+            <div class="icon">✅</div>
+            <div>미발행 증빙이 없습니다!</div>
+          </li>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = data.receipts.map(receipt => {
+        const deadlineClass = receipt.isOverdue ? 'overdue' : receipt.isUrgent ? 'urgent' : '';
+        const deadlineText = receipt.hasDeadline
+          ? (receipt.isOverdue ? '기한 초과' : `D-${receipt.daysRemaining}`)
+          : '-';
+
+        return `
+          <li class="receipt-item">
+            <input type="checkbox" class="receipt-checkbox"
+                   data-id="${receipt.id}"
+                   onchange="toggleSelect(${receipt.id})">
+            <div class="receipt-info">
+              <h4>${receipt.description || '(설명 없음)'}</h4>
+              <div class="meta">
+                ${formatDate(receipt.transaction_date)} ·
+                ${receipt.partner_name || '거래처 미지정'}
+              </div>
+            </div>
+            <div class="receipt-amount">${formatCurrency(receipt.amount)}</div>
+            <div class="receipt-type ${receipt.receipt_type || 'tax_invoice'}">
+              ${receipt.receiptTypeIcon} ${receipt.receiptTypeLabel}
+            </div>
+            <div class="receipt-deadline ${deadlineClass}">${deadlineText}</div>
+            <div class="receipt-actions">
+              <button class="btn btn-primary btn-small" onclick="openIssueModal(${receipt.id})">
+                발행하기
+              </button>
+            </div>
+          </li>
+        `;
+      }).join('');
+    }
+
+    // 기한 알림 로드
+    async function loadDeadlineAlert() {
+      try {
+        const res = await fetch(`${API_BASE}/receipts/deadline`);
+        const data = await res.json();
+
+        if (data.success && data.data.total > 0) {
+          const banner = document.getElementById('alertBanner');
+          const info = data.data;
+
+          banner.className = `alert-banner ${info.isOverdue ? 'danger' : info.isUrgent ? 'warning' : 'success'}`;
+          banner.querySelector('.icon').textContent = info.isOverdue ? '🚨' : '⚠️';
+          banner.querySelector('.title').textContent = info.isOverdue ? '증빙 발행 기한 초과!' : '증빙 발행 기한 임박';
+          document.getElementById('alertMessage').textContent = info.message;
+          banner.style.display = 'flex';
+        }
+      } catch (error) {
+        console.error('Deadline alert load error:', error);
+      }
+    }
+
+    // 체크박스 토글
+    function toggleSelect(id) {
+      if (selectedIds.has(id)) {
+        selectedIds.delete(id);
+      } else {
+        selectedIds.add(id);
+      }
+    }
+
+    // 전체 선택
+    function selectAllPending() {
+      const checkboxes = document.querySelectorAll('.receipt-checkbox');
+      const allSelected = selectedIds.size === checkboxes.length;
+
+      checkboxes.forEach(cb => {
+        const id = parseInt(cb.dataset.id);
+        if (allSelected) {
+          cb.checked = false;
+          selectedIds.delete(id);
+        } else {
+          cb.checked = true;
+          selectedIds.add(id);
+        }
+      });
+    }
+
+    // 발행 모달 열기
+    function openIssueModal(transactionId) {
+      currentTransactionId = transactionId;
+      document.getElementById('issuedAt').value = new Date().toISOString().split('T')[0];
+      document.getElementById('receiptNumber').value = '';
+      document.getElementById('issueModal').classList.add('active');
+    }
+
+    // 모달 닫기
+    function closeModal() {
+      document.getElementById('issueModal').classList.remove('active');
+      currentTransactionId = null;
+    }
+
+    // 발행 확인
+    async function confirmIssue() {
+      if (!currentTransactionId) return;
+
+      const receiptNumber = document.getElementById('receiptNumber').value;
+      const issuedAt = document.getElementById('issuedAt').value;
+      const provider = document.getElementById('issueProvider').value;
+
+      try {
+        const res = await fetch(`${API_BASE}/receipts/issue/${currentTransactionId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ provider, receiptNumber, issuedAt })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          alert('증빙 발행이 완료되었습니다!');
+          closeModal();
+          loadData();
+        } else {
+          alert('발행 실패: ' + (data.message || data.error));
+        }
+      } catch (error) {
+        alert('오류: ' + error.message);
+      }
+    }
+
+    // 일괄 발행
+    async function bulkIssue() {
+      if (selectedIds.size === 0) {
+        alert('발행할 항목을 선택해주세요.');
+        return;
+      }
+
+      if (!confirm(`${selectedIds.size}건을 발행 완료 처리하시겠습니까?`)) {
+        return;
+      }
+
+      const issuedAt = new Date().toISOString();
+      let success = 0;
+      let failed = 0;
+
+      for (const id of selectedIds) {
+        try {
+          const res = await fetch(`${API_BASE}/receipts/issue/${id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider: 'manual', issuedAt })
+          });
+
+          const data = await res.json();
+          if (data.success) {
+            success++;
+          } else {
+            failed++;
+          }
+        } catch (error) {
+          failed++;
+        }
+      }
+
+      alert(`처리 완료: 성공 ${success}건, 실패 ${failed}건`);
+      selectedIds.clear();
+      loadData();
+    }
+
+    // 미발행 섹션으로 스크롤
+    function scrollToPending() {
+      document.getElementById('pendingSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // 페이지 로드
+    document.addEventListener('DOMContentLoaded', loadData);
+  </script>
+</body>
+</html>

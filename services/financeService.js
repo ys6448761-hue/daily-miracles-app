@@ -1385,6 +1385,394 @@ async function getBudgetStatus(year, month) {
   };
 }
 
+// ============ 증빙 발행 시스템 (Phase 3) ============
+
+const boltaService = require('./boltaService');
+
+/**
+ * 미발행 증빙 목록 조회
+ */
+async function getPendingReceipts(options = {}) {
+  if (!db) throw new Error('DB 연결 필요');
+
+  const { year, month, limit = 50 } = options;
+
+  let query = `
+    SELECT
+      t.id,
+      t.type,
+      t.amount,
+      t.supply_amount,
+      t.vat_amount,
+      t.description,
+      t.transaction_date,
+      t.partner_type,
+      t.receipt_type,
+      t.receipt_status,
+      c.name as category_name,
+      p.name as partner_name,
+      p.business_number as partner_business_number
+    FROM finance_transactions t
+    LEFT JOIN finance_categories c ON t.category_id = c.id
+    LEFT JOIN partners p ON t.partner_id = p.id
+    WHERE t.type = 'income'
+      AND t.receipt_status = 'pending'
+  `;
+
+  const params = [];
+  let paramIndex = 1;
+
+  if (year && month) {
+    query += ` AND EXTRACT(YEAR FROM t.transaction_date) = $${paramIndex++}`;
+    params.push(year);
+    query += ` AND EXTRACT(MONTH FROM t.transaction_date) = $${paramIndex++}`;
+    params.push(month);
+  }
+
+  query += ` ORDER BY t.transaction_date ASC LIMIT $${paramIndex}`;
+  params.push(limit);
+
+  const result = await db.query(query, params);
+
+  // 발행 기한 계산 추가
+  const receipts = result.rows.map(row => {
+    const deadline = boltaService.calculateDeadline(
+      row.transaction_date,
+      row.receipt_type || 'tax_invoice'
+    );
+
+    return {
+      ...row,
+      amount: parseFloat(row.amount),
+      supplyAmount: parseFloat(row.supply_amount || 0),
+      vatAmount: parseFloat(row.vat_amount || 0),
+      receiptTypeLabel: boltaService.RECEIPT_TYPES[row.receipt_type]?.label || '미지정',
+      receiptTypeIcon: boltaService.RECEIPT_TYPES[row.receipt_type]?.icon || '📄',
+      ...deadline
+    };
+  });
+
+  return {
+    receipts,
+    total: receipts.length,
+    hasUrgent: receipts.some(r => r.isUrgent),
+    hasOverdue: receipts.some(r => r.isOverdue)
+  };
+}
+
+/**
+ * 발행 기한 임박 건 조회 (익월 10일 기준)
+ */
+async function getDeadlineReceipts() {
+  if (!db) throw new Error('DB 연결 필요');
+
+  const today = new Date();
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
+
+  // 이번 달 10일까지의 기한 (전월 거래 대상)
+  const deadlineDate = new Date(currentYear, currentMonth, 10);
+
+  // 전월 거래 중 미발행 건
+  const prevMonth = currentMonth === 0 ? 12 : currentMonth;
+  const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+  const result = await db.query(`
+    SELECT
+      t.id,
+      t.amount,
+      t.description,
+      t.transaction_date,
+      t.receipt_type,
+      t.receipt_status,
+      p.name as partner_name
+    FROM finance_transactions t
+    LEFT JOIN partners p ON t.partner_id = p.id
+    WHERE t.type = 'income'
+      AND t.receipt_status = 'pending'
+      AND EXTRACT(YEAR FROM t.transaction_date) = $1
+      AND EXTRACT(MONTH FROM t.transaction_date) = $2
+    ORDER BY t.transaction_date ASC
+  `, [prevYear, prevMonth]);
+
+  const daysUntilDeadline = Math.ceil((deadlineDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+  return {
+    receipts: result.rows.map(row => ({
+      ...row,
+      amount: parseFloat(row.amount)
+    })),
+    total: result.rows.length,
+    deadline: deadlineDate.toISOString().split('T')[0],
+    daysUntilDeadline,
+    isUrgent: daysUntilDeadline <= 5 && daysUntilDeadline > 0,
+    isOverdue: daysUntilDeadline < 0,
+    message: daysUntilDeadline > 0
+      ? `${result.rows.length}건의 세금계산서 발행 기한이 ${daysUntilDeadline}일 남았습니다.`
+      : daysUntilDeadline === 0
+        ? `오늘이 세금계산서 발행 마감일입니다! (${result.rows.length}건)`
+        : `세금계산서 발행 기한이 지났습니다! (${result.rows.length}건)`
+  };
+}
+
+/**
+ * 증빙 발행 요청
+ */
+async function issueReceipt(transactionId, options = {}) {
+  if (!db) throw new Error('DB 연결 필요');
+
+  const { provider = 'manual', receiptNumber, issuedAt } = options;
+
+  // 거래 조회
+  const txResult = await db.query(
+    'SELECT * FROM finance_transactions WHERE id = $1',
+    [transactionId]
+  );
+
+  if (txResult.rows.length === 0) {
+    throw new Error('거래를 찾을 수 없습니다');
+  }
+
+  const transaction = txResult.rows[0];
+
+  // 볼타 API로 발행 시도
+  let issueResult;
+  if (provider === 'bolta') {
+    if (transaction.receipt_type === 'tax_invoice') {
+      issueResult = await boltaService.issueTaxInvoice({
+        transactionId,
+        supplyAmount: transaction.supply_amount,
+        vatAmount: transaction.vat_amount,
+        totalAmount: transaction.amount,
+        itemName: transaction.description
+      });
+    } else {
+      issueResult = await boltaService.issueCashReceipt({
+        transactionId,
+        receiptType: transaction.receipt_type,
+        amount: transaction.amount,
+        itemName: transaction.description
+      });
+    }
+  } else {
+    // 수동 발행 (홈택스에서 직접 발행 후 상태 업데이트)
+    issueResult = {
+      success: true,
+      status: 'issued',
+      provider: 'manual',
+      receiptNumber: receiptNumber || null,
+      issuedAt: issuedAt || new Date().toISOString()
+    };
+  }
+
+  // 발행 성공 시 거래 업데이트
+  if (issueResult.success) {
+    await db.query(`
+      UPDATE finance_transactions
+      SET
+        receipt_status = 'issued',
+        receipt_number = $1,
+        receipt_issued_at = $2,
+        receipt_provider = $3,
+        tax_invoice_yn = true,
+        updated_at = NOW()
+      WHERE id = $4
+    `, [
+      issueResult.receiptNumber || receiptNumber,
+      issueResult.issuedAt || new Date(),
+      issueResult.provider || provider,
+      transactionId
+    ]);
+  }
+
+  // 로그 기록
+  await db.query(`
+    INSERT INTO receipt_logs (
+      transaction_id, receipt_type, status, provider,
+      request_data, response_data, error_message
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+  `, [
+    transactionId,
+    transaction.receipt_type,
+    issueResult.success ? 'success' : 'failed',
+    provider,
+    JSON.stringify({ transactionId, options }),
+    JSON.stringify(issueResult),
+    issueResult.message || null
+  ]);
+
+  return issueResult;
+}
+
+/**
+ * 증빙 상태 수동 업데이트
+ */
+async function updateReceiptStatus(transactionId, statusData) {
+  if (!db) throw new Error('DB 연결 필요');
+
+  const {
+    receiptStatus,
+    receiptNumber,
+    receiptIssuedAt,
+    receiptProvider,
+    receiptType,
+    partnerType
+  } = statusData;
+
+  const updates = [];
+  const params = [];
+  let paramIndex = 1;
+
+  if (receiptStatus) {
+    updates.push(`receipt_status = $${paramIndex++}`);
+    params.push(receiptStatus);
+  }
+  if (receiptNumber !== undefined) {
+    updates.push(`receipt_number = $${paramIndex++}`);
+    params.push(receiptNumber);
+  }
+  if (receiptIssuedAt) {
+    updates.push(`receipt_issued_at = $${paramIndex++}`);
+    params.push(receiptIssuedAt);
+  }
+  if (receiptProvider) {
+    updates.push(`receipt_provider = $${paramIndex++}`);
+    params.push(receiptProvider);
+  }
+  if (receiptType) {
+    updates.push(`receipt_type = $${paramIndex++}`);
+    params.push(receiptType);
+  }
+  if (partnerType) {
+    updates.push(`partner_type = $${paramIndex++}`);
+    params.push(partnerType);
+  }
+
+  // tax_invoice_yn 동기화
+  if (receiptStatus === 'issued') {
+    updates.push(`tax_invoice_yn = true`);
+  }
+
+  updates.push(`updated_at = NOW()`);
+
+  params.push(transactionId);
+
+  const result = await db.query(`
+    UPDATE finance_transactions
+    SET ${updates.join(', ')}
+    WHERE id = $${paramIndex}
+    RETURNING *
+  `, params);
+
+  if (result.rows.length === 0) {
+    throw new Error('거래를 찾을 수 없습니다');
+  }
+
+  return result.rows[0];
+}
+
+/**
+ * 증빙 현황 통계
+ */
+async function getReceiptStats(year, month) {
+  if (!db) throw new Error('DB 연결 필요');
+
+  const now = new Date();
+  const targetYear = year || now.getFullYear();
+  const targetMonth = month || now.getMonth() + 1;
+
+  // 이번 달 통계
+  const statsResult = await db.query(`
+    SELECT
+      receipt_status,
+      receipt_type,
+      COUNT(*) as count,
+      SUM(amount) as total_amount
+    FROM finance_transactions
+    WHERE type = 'income'
+      AND EXTRACT(YEAR FROM transaction_date) = $1
+      AND EXTRACT(MONTH FROM transaction_date) = $2
+    GROUP BY receipt_status, receipt_type
+  `, [targetYear, targetMonth]);
+
+  // 집계
+  const stats = {
+    period: { year: targetYear, month: targetMonth },
+    pending: { count: 0, amount: 0 },
+    issued: { count: 0, amount: 0 },
+    notRequired: { count: 0, amount: 0 },
+    byType: {
+      tax_invoice: { pending: 0, issued: 0 },
+      cash_receipt_deduction: { pending: 0, issued: 0 },
+      cash_receipt_expense: { pending: 0, issued: 0 },
+      none: { count: 0 }
+    }
+  };
+
+  statsResult.rows.forEach(row => {
+    const count = parseInt(row.count);
+    const amount = parseFloat(row.total_amount || 0);
+
+    if (row.receipt_status === 'pending') {
+      stats.pending.count += count;
+      stats.pending.amount += amount;
+    } else if (row.receipt_status === 'issued') {
+      stats.issued.count += count;
+      stats.issued.amount += amount;
+    } else if (row.receipt_status === 'not_required') {
+      stats.notRequired.count += count;
+      stats.notRequired.amount += amount;
+    }
+
+    if (row.receipt_type && stats.byType[row.receipt_type]) {
+      if (row.receipt_status === 'pending') {
+        stats.byType[row.receipt_type].pending = count;
+      } else if (row.receipt_status === 'issued') {
+        stats.byType[row.receipt_type].issued = count;
+      }
+    }
+  });
+
+  // 발행률 계산
+  const totalNeedIssue = stats.pending.count + stats.issued.count;
+  stats.issueRate = totalNeedIssue > 0
+    ? Math.round((stats.issued.count / totalNeedIssue) * 100)
+    : 100;
+
+  stats.generatedAt = new Date().toISOString();
+
+  return stats;
+}
+
+/**
+ * 증빙 발행 기한 체크 알림
+ */
+async function checkReceiptDeadlineAlerts() {
+  const today = new Date();
+  const dayOfMonth = today.getDate();
+  const alerts = [];
+
+  // 익월 5~10일 사이에만 알림
+  if (dayOfMonth >= 5 && dayOfMonth <= 10) {
+    const deadlineInfo = await getDeadlineReceipts();
+
+    if (deadlineInfo.total > 0) {
+      alerts.push({
+        type: deadlineInfo.isOverdue ? 'danger' : deadlineInfo.isUrgent ? 'warning' : 'info',
+        icon: deadlineInfo.isOverdue ? '🚨' : '⚠️',
+        title: deadlineInfo.isOverdue ? '증빙 발행 기한 초과' : '증빙 발행 기한 임박',
+        message: deadlineInfo.message,
+        count: deadlineInfo.total,
+        deadline: deadlineInfo.deadline,
+        daysRemaining: deadlineInfo.daysUntilDeadline,
+        actionUrl: '/admin/finance-receipts.html'
+      });
+    }
+  }
+
+  return alerts;
+}
+
 // ============ 모듈 내보내기 ============
 module.exports = {
   // 거래 관리
@@ -1426,6 +1814,14 @@ module.exports = {
   // 엑셀 Import/Export (Phase 2)
   exportToExcel,
   importFromExcel,
+
+  // 증빙 발행 시스템 (Phase 3)
+  getPendingReceipts,
+  getDeadlineReceipts,
+  issueReceipt,
+  updateReceiptStatus,
+  getReceiptStats,
+  checkReceiptDeadlineAlerts,
 
   // 유틸리티
   getServiceStatus,
