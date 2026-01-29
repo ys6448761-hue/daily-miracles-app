@@ -366,7 +366,65 @@ Crumpled papers being folded into beautiful origami flowers. Imperfect but charm
 
 ---
 
-## 8. 영상 요약 테이블
+## 8. 여섯 번째 영상: "내일이 두려워도"
+
+### 유닛 1 (0-8초) - PAIN 1: 불안한 밤
+
+**장면 설명:** 새벽 3시 침대, 천장 바라보며 뒤척이는 모습, 걱정 생각들
+**감정 톤:** 불안, 초조, 두려움
+**자막:** "내일은 또 어떻게 되려나..."
+**배경음악:** 불안한 앰비언트, 심장박동 소리
+
+**Sora 프롬프트:**
+```
+Person lying awake in bed at 3AM, staring at ceiling. Digital clock glowing red. Thought bubbles of worries floating above - bills, deadlines, uncertainties. Tossing and turning. Blue-gray moonlight casting shadows. Insomnia and anxiety visualized. Restless energy. 8 seconds.
+```
+
+---
+
+### 유닛 2 (8-16초) - PAIN 2: 미래의 안개
+
+**장면 설명:** 안개 속을 걷는 모습, 앞이 보이지 않는 길, 멈춰선 발
+**감정 톤:** 막막함, 불확실, 공포
+**자막:** "앞이 하나도 안 보여"
+**배경음악:** 공허한 에코, 바람 소리
+
+**Sora 프롬프트:**
+```
+Person walking alone through thick fog, path ahead completely invisible. They stop, frozen with uncertainty. Silhouettes of possible futures appearing and dissolving in the mist. Cold blue-gray atmosphere. Feeling lost and directionless. Fear of the unknown consuming the frame. 8 seconds.
+```
+
+---
+
+### 유닛 3 (16-24초) - SOLUTION 1: 소원이의 등불
+
+**장면 설명:** 소원이가 작은 등불처럼 빛나며 "한 걸음만 보면 돼" 메시지
+**감정 톤:** 안심, 따뜻함, 용기
+**자막:** "지금 이 한 걸음만 보면 돼"
+**배경음악:** 따뜻한 오르골, 희망적 피아노
+
+**Sora 프롬프트:**
+```
+Small star mascot appears as a warm glowing lantern in the fog. Phone shows message "Just focus on this one step" in Korean. The light illuminates just enough path for one step forward. Fog starts to feel less threatening. Warm purple-pink glow pushing back the darkness. Comfort in uncertainty. 8 seconds.
+```
+
+---
+
+### 유닛 4 (24-30초) - SOLUTION 2: 한 걸음씩 새벽
+
+**장면 설명:** 한 걸음 내딛을 때마다 안개가 걷히고, 동이 트는 하늘
+**감정 톤:** 희망, 평화, 신뢰
+**자막:** "함께라면, 내일도 괜찮아"
+**배경음악:** 밝아지는 오케스트라, 새벽 분위기
+
+**Sora 프롬프트:**
+```
+Each step forward clears a bit more fog. Dawn light breaking through on the horizon. Person walking with star mascot floating beside them as a companion lantern. Sky transitioning from dark blue to warm purple-pink sunrise. Path becoming clearer with each step. Trust in the journey. Logo fade in. 6 seconds.
+```
+
+---
+
+## 9. 영상 요약 테이블
 
 | # | 제목 | PAIN 키워드 | SOLUTION 키워드 | 핵심 메시지 |
 |---|------|-------------|-----------------|-------------|
@@ -375,10 +433,11 @@ Crumpled papers being folded into beautiful origami flowers. Imperfect but charm
 | 3 | 혼자가 아니야 | 외로움, 비교 | 응원, 동행 | 함께하는 기적 |
 | 4 | 다시 시작해도 괜찮아 | 실패, 포기 | 격려, 새출발 | 오늘부터 다시 |
 | 5 | 완벽하지 않아도 돼 | 강박, 자기비판 | 수용, 해방 | 있는 그대로 충분해 |
+| 6 | 내일이 두려워도 | 불안, 불면 | 등불, 새벽 | 함께라면 내일도 괜찮아 |
 
 ---
 
-## 9. 워크플로우
+## 10. 워크플로우
 
 ```
 1. GPTs에서 주제 입력 → 4유닛 스크립트 생성
@@ -390,8 +449,8 @@ Crumpled papers being folded into beautiful origami flowers. Imperfect but charm
 
 ---
 
-**Version:** 1.3.0
+**Version:** 1.4.0
 **Created:** 2025-01-29
 **Updated:** 2025-01-29
 **Author:** Claude Code + 푸르미르님
-**Videos:** 5개 완성 (소원이의 하루, 막막함 탈출, 혼자가 아니야, 다시 시작해도 괜찮아, 완벽하지 않아도 돼)
+**Videos:** 6개 완성
