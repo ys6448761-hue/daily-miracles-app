@@ -482,7 +482,65 @@ Hand wiping dust off the guitar, picking it up again. Or opening old sketchbook 
 
 ---
 
-## 10. 영상 요약 테이블
+## 10. 여덟 번째 영상: "남들 눈이 무서워"
+
+### 유닛 1 (0-8초) - PAIN 1: 시선의 감옥
+
+**장면 설명:** 수많은 눈동자가 지켜보는 느낌, 움츠러드는 어깨
+**감정 톤:** 위축, 긴장, 압박
+**자막:** "다들 나를 어떻게 볼까..."
+**배경음악:** 긴장감 있는 스트링, 속삭이는 소리들
+
+**Sora 프롬프트:**
+```
+Person walking through crowd, feeling watched by countless floating eyes. Shoulders hunching, making themselves smaller. Whispers echoing around them like judgment. Spotlight effect making them feel exposed. Claustrophobic atmosphere despite open space. Social anxiety visualized. 8 seconds.
+```
+
+---
+
+### 유닛 2 (8-16초) - PAIN 2: 가면 뒤의 나
+
+**장면 설명:** 거울 앞에서 억지 미소 연습, 진짜 표정은 지친 모습
+**감정 톤:** 피로, 거짓, 공허
+**자막:** "진짜 나는 어디 있는 걸까"
+**배경음악:** 공허한 에코, 느린 심장박동
+
+**Sora 프롬프트:**
+```
+Person practicing fake smile in mirror, reflection showing exhausted true self behind the mask. Multiple masks floating around them - the "professional" mask, "happy" mask, "perfect" mask. Real face hidden and tired. Identity lost in performance for others. Duality of public vs private self. 8 seconds.
+```
+
+---
+
+### 유닛 3 (16-24초) - SOLUTION 1: 소원이의 속삭임
+
+**장면 설명:** 소원이 메시지 "가장 중요한 시선은 네 자신의 시선이야"
+**감정 톤:** 깨달음, 위로, 자각
+**자막:** "내가 나를 어떻게 보는지가 먼저야"
+**배경음악:** 부드러운 피아노, 따뜻한 멜로디
+
+**Sora 프롬프트:**
+```
+Phone glows with star mascot whispering "The most important eyes are your own" in Korean. The countless watching eyes slowly close and fade away. Person looks in mirror, this time seeing their true self with kindness. Warm purple light replacing harsh spotlight. Self-compassion awakening. 8 seconds.
+```
+
+---
+
+### 유닛 4 (24-30초) - SOLUTION 2: 나다운 걸음
+
+**장면 설명:** 가면 벗고 자연스러운 미소, 당당한 걸음, 소원이와 함께
+**감정 톤:** 해방, 자신감, 진정성
+**자막:** "나답게, 그게 가장 멋진 나"
+**배경음악:** 밝은 팝, 해방감 있는 코러스
+
+**Sora 프롬프트:**
+```
+Masks falling away and dissolving. Person smiling genuinely for the first time, walking with natural confidence. Star mascot dancing beside them. World around them now warm and accepting. No more watching eyes - just open sky. True self finally free. Purple-pink sunset glow. Logo fade in. 6 seconds.
+```
+
+---
+
+## 11. 영상 요약 테이블
 
 | # | 제목 | PAIN 키워드 | SOLUTION 키워드 | 핵심 메시지 |
 |---|------|-------------|-----------------|-------------|
@@ -493,10 +551,11 @@ Hand wiping dust off the guitar, picking it up again. Or opening old sketchbook 
 | 5 | 완벽하지 않아도 돼 | 강박, 자기비판 | 수용, 해방 | 있는 그대로 충분해 |
 | 6 | 내일이 두려워도 | 불안, 불면 | 등불, 새벽 | 함께라면 내일도 괜찮아 |
 | 7 | 꿈을 잃어버렸어 | 상실, 체념 | 회상, 재발견 | 작게라도 다시 나의 꿈 |
+| 8 | 남들 눈이 무서워 | 눈치, 가면 | 자기시선, 진정성 | 나답게 가장 멋진 나 |
 
 ---
 
-## 11. 워크플로우
+## 12. 워크플로우
 
 ```
 1. GPTs에서 주제 입력 → 4유닛 스크립트 생성
@@ -508,8 +567,8 @@ Hand wiping dust off the guitar, picking it up again. Or opening old sketchbook 
 
 ---
 
-**Version:** 1.5.0
+**Version:** 1.6.0
 **Created:** 2025-01-29
 **Updated:** 2025-01-29
 **Author:** Claude Code + 푸르미르님
-**Videos:** 7개 완성
+**Videos:** 8개 완성
