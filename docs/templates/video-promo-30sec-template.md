@@ -134,23 +134,135 @@ Mood keywords:
 
 ---
 
-## 4. 추가 영상 주제 템플릿
+## 4. 두 번째 영상: "막막함 탈출"
 
-### 주제 2: "막막함 탈출"
-- U1: 머리 싸매고 고민하는 모습 (PAIN)
-- U2: 검색창에 "어떻게 해야 하지" 입력 (PAIN)
-- U3: 30일 로드맵이 화면에 펼쳐짐 (SOLUTION)
-- U4: 체크리스트 완료하며 성취감 (SOLUTION)
+### 유닛 1 (0-8초) - PAIN 1: 답 없는 고민
 
-### 주제 3: "혼자가 아니야"
-- U1: 혼자 앉아있는 카페, 빈 의자들 (PAIN)
-- U2: SNS 속 행복한 타인, 비교하는 시선 (PAIN)
-- U3: 소원이 알림 "오늘도 응원해요" (SOLUTION)
-- U4: 친구처럼 대화하는 소원이와의 채팅 화면 (SOLUTION)
+**장면 설명:** 밤늦게 책상 앞, 머리 싸매고 고민하는 모습, 구겨진 종이들
+**감정 톤:** 답답함, 막막함, 좌절
+**자막:** "어디서부터 시작해야 할지..."
+**배경음악:** 낮은 앰비언트, 무거운 분위기
+
+**Sora 프롬프트:**
+```
+A stressed Korean professional in their 30s sitting at a messy desk late at night. Head in hands, surrounded by crumpled papers and empty coffee cups. Laptop screen glowing in dim room. Frustrated expression, feeling overwhelmed. Cinematic, low-key lighting. 8 seconds.
+```
 
 ---
 
-## 5. 워크플로우
+### 유닛 2 (8-16초) - PAIN 2: 끝없는 검색
+
+**장면 설명:** 검색창에 "어떻게 해야 하지" 입력, 수많은 결과에 더 혼란
+**감정 톤:** 혼란, 정보과부하, 지침
+**자막:** "검색해도 답이 없어"
+**배경음악:** 불안한 전자음, 빠른 템포
+
+**Sora 프롬프트:**
+```
+Close-up of hands typing on keyboard. Search bar showing "what should I do" in Korean. Screen rapidly scrolling through countless search results. Person's reflection in monitor looks confused and tired. Information overload visualization. Quick cuts, anxious energy. 8 seconds.
+```
+
+---
+
+### 유닛 3 (16-24초) - SOLUTION 1: 로드맵 발견
+
+**장면 설명:** 화면에 30일 로드맵이 펼쳐지며, 단계별 체크리스트 등장
+**감정 톤:** 발견, 안도, 기대
+**자막:** "30일, 딱 이것만 하면 돼"
+**배경음악:** 희망적 피아노, 상승 멜로디
+
+**Sora 프롬프트:**
+```
+Beautiful animated 30-day roadmap unfolding on screen like a treasure map. Each day lights up with clear checkboxes and simple tasks. Purple and pink gradient colors. Person's face illuminated by screen, expression changing from confusion to hope. Magical reveal effect. 8 seconds.
+```
+
+---
+
+### 유닛 4 (24-30초) - SOLUTION 2: 성취의 순간
+
+**장면 설명:** 체크박스 하나씩 완료, 마지막 체크에 환한 미소, 소원이 축하
+**감정 톤:** 성취감, 자신감, 기쁨
+**자막:** "한 걸음씩, 기적이 되다"
+**배경음악:** 밝은 오케스트라, 클라이맥스
+
+**Sora 프롬프트:**
+```
+Satisfying sequence of checkboxes being ticked one by one with gentle glow effects. Final checkbox completes with celebration animation. Person smiling confidently. Small star mascot appears doing a happy dance. Warm purple-pink lighting. Logo fade in. Triumphant mood. 6 seconds.
+```
+
+---
+
+## 5. 세 번째 영상: "혼자가 아니야"
+
+### 유닛 1 (0-8초) - PAIN 1: 고독한 일상
+
+**장면 설명:** 혼자 앉은 카페, 주변 빈 의자들, 창밖 비 내리는 풍경
+**감정 톤:** 외로움, 고립, 쓸쓸함
+**자막:** "요즘 나, 왜 이렇게 외로울까"
+**배경음악:** 쓸쓸한 어쿠스틱 기타, 빗소리
+
+**Sora 프롬프트:**
+```
+A lonely Korean professional sitting alone at a cafe table. Empty chairs around them. Rain streaming down the window. They stare at their phone with no notifications. Muted colors, melancholic atmosphere. Slow push-in camera movement. Isolated feeling. 8 seconds.
+```
+
+---
+
+### 유닛 2 (8-16초) - PAIN 2: SNS 속 비교
+
+**장면 설명:** 인스타그램 피드 - 행복한 타인들, 점점 어두워지는 표정
+**감정 톤:** 비교, 자괴감, 소외
+**자막:** "다들 잘 사는 것 같은데..."
+**배경음악:** 공허한 전자음, 심장박동 리듬
+
+**Sora 프롬프트:**
+```
+Phone screen scrolling through social media feed showing happy couples, successful friends, celebration photos. Each scroll makes the person's reflection in screen look more dejected. Contrast between bright social media and dark room. Thumb scrolling endlessly. Comparison trap visualization. 8 seconds.
+```
+
+---
+
+### 유닛 3 (16-24초) - SOLUTION 1: 소원이의 응원
+
+**장면 설명:** 갑자기 알림음, 소원이가 "오늘 하루도 수고했어요" 메시지
+**감정 톤:** 놀람, 따뜻함, 위로
+**자막:** "누군가 나를 기억하고 있었어"
+**배경음악:** 따뜻한 벨소리, 부드러운 현악기
+
+**Sora 프롬프트:**
+```
+Phone suddenly lights up with a warm notification. Cute star mascot character appears on screen with a gentle message "You did great today" in Korean. Person's eyes widen with surprise, then soften with emotion. Warm purple glow emanating from phone. Heartwarming moment. 8 seconds.
+```
+
+---
+
+### 유닛 4 (24-30초) - SOLUTION 2: 함께하는 일상
+
+**장면 설명:** 소원이와 대화하는 채팅 화면, 미소 짓는 얼굴, 창밖 무지개
+**감정 톤:** 연결감, 위안, 희망
+**자막:** "혼자가 아니야, 소원이가 있으니까"
+**배경음악:** 밝은 피아노, 따뜻한 합창
+
+**Sora 프롬프트:**
+```
+Split screen: chat conversation with star mascot showing supportive messages, and person's face now smiling genuinely. Rain stops, rainbow appears through window. Room fills with warm purple-pink light. Small star mascot floats out of phone like a companion. Cozy, connected feeling. Logo fade in. 6 seconds.
+```
+
+---
+
+---
+
+## 6. 영상 요약 테이블
+
+| # | 제목 | PAIN 키워드 | SOLUTION 키워드 | 핵심 메시지 |
+|---|------|-------------|-----------------|-------------|
+| 1 | 소원이의 하루 | 피곤, 반복 | 메시지, 활력 | 지친 일상에 활력을 |
+| 2 | 막막함 탈출 | 고민, 검색 | 로드맵, 성취 | 방향을 찾다 |
+| 3 | 혼자가 아니야 | 외로움, 비교 | 응원, 동행 | 함께하는 기적 |
+
+---
+
+## 7. 워크플로우
 
 ```
 1. GPTs에서 주제 입력 → 4유닛 스크립트 생성
@@ -162,6 +274,8 @@ Mood keywords:
 
 ---
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Created:** 2025-01-29
+**Updated:** 2025-01-29
 **Author:** Claude Code + 푸르미르님
+**Videos:** 3개 완성 (소원이의 하루, 막막함 탈출, 혼자가 아니야)
