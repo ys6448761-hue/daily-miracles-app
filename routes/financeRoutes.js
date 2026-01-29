@@ -360,6 +360,93 @@ router.get('/dashboard', asyncHandler(async (req, res) => {
   });
 }));
 
+// ============ AI 인사이트 API (Phase 2) ============
+
+/**
+ * GET /api/finance/dashboard/insights - AI 인사이트 목록
+ */
+router.get('/dashboard/insights', asyncHandler(async (req, res) => {
+  const insights = await financeService.generateInsights();
+
+  res.json({
+    success: true,
+    data: insights
+  });
+}));
+
+// ============ 엑셀 Import/Export API (Phase 2) ============
+
+const multer = require('multer');
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB 제한
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = [
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+      'text/csv'
+    ];
+    if (allowedTypes.includes(file.mimetype) ||
+        file.originalname.endsWith('.xlsx') ||
+        file.originalname.endsWith('.xls') ||
+        file.originalname.endsWith('.csv')) {
+      cb(null, true);
+    } else {
+      cb(new Error('엑셀 파일(.xlsx, .xls) 또는 CSV 파일만 업로드 가능합니다'));
+    }
+  }
+});
+
+/**
+ * GET /api/finance/export/excel/:year/:month - 엑셀 내보내기
+ */
+router.get('/export/excel/:year/:month', asyncHandler(async (req, res) => {
+  const { year, month } = req.params;
+  const result = await financeService.exportToExcel(parseInt(year), parseInt(month));
+
+  res.setHeader('Content-Type', result.mimeType);
+  res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(result.filename)}"`);
+  res.send(result.buffer);
+}));
+
+/**
+ * POST /api/finance/import/excel - 엑셀 가져오기
+ */
+router.post('/import/excel', upload.single('file'), asyncHandler(async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({
+      success: false,
+      error: '파일이 업로드되지 않았습니다'
+    });
+  }
+
+  const result = await financeService.importFromExcel(req.file.buffer);
+
+  res.json({
+    success: true,
+    data: result,
+    message: `${result.success}건 등록 완료 (중복 ${result.duplicates}건, 실패 ${result.failed}건)`
+  });
+}));
+
+// ============ 예산 알림 API (Phase 2) ============
+
+/**
+ * GET /api/finance/budgets/status - 예산 대비 실적 현황
+ */
+router.get('/budgets/status', asyncHandler(async (req, res) => {
+  const now = new Date();
+  const year = parseInt(req.query.year) || now.getFullYear();
+  const month = parseInt(req.query.month) || now.getMonth() + 1;
+
+  const status = await financeService.getBudgetStatus(year, month);
+
+  res.json({
+    success: true,
+    data: status
+  });
+}));
+
 // ============ 상태 API ============
 
 /**

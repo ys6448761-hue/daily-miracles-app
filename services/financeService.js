@@ -899,12 +899,489 @@ async function logAudit(action, tableName, recordId, oldValue, newValue, userId 
 function getServiceStatus() {
   return {
     name: '기적 금고 (Miracle Treasury)',
-    version: '1.0.0',
+    version: '2.0.0',
     status: db ? 'active' : 'inactive',
     dbConnected: !!db,
     vatRate: VAT_RATE,
     withholdingRate: WITHHOLDING_RATE,
     categoryRulesCount: Object.keys(CATEGORY_RULES).length
+  };
+}
+
+// ============ AI 인사이트 엔진 (Phase 2) ============
+
+/**
+ * AI 인사이트 생성
+ * - 지출 이상 감지
+ * - 절세 기회
+ * - 현금흐름 예측
+ * - 비용 절감 제안
+ * - 수익 트렌드
+ */
+async function generateInsights() {
+  if (!db) throw new Error('DB 연결 필요');
+
+  const insights = [];
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+
+  try {
+    // 1. 지출 이상 감지 - 평균 대비 높은 지출 카테고리
+    const expenseAnomaly = await db.query(`
+      WITH monthly_avg AS (
+        SELECT
+          category_id,
+          AVG(amount) as avg_amount
+        FROM finance_transactions
+        WHERE type = 'expense'
+        GROUP BY category_id
+      ),
+      recent_expense AS (
+        SELECT
+          t.category_id,
+          c.name as category_name,
+          SUM(t.amount) as total_amount
+        FROM finance_transactions t
+        JOIN finance_categories c ON t.category_id = c.id
+        WHERE t.type = 'expense'
+          AND t.transaction_date >= CURRENT_DATE - INTERVAL '30 days'
+        GROUP BY t.category_id, c.name
+      )
+      SELECT
+        r.category_name,
+        r.total_amount,
+        m.avg_amount,
+        ROUND((r.total_amount / NULLIF(m.avg_amount, 0) - 1) * 100) as increase_pct
+      FROM recent_expense r
+      JOIN monthly_avg m ON r.category_id = m.category_id
+      WHERE r.total_amount > m.avg_amount * 1.5
+      ORDER BY increase_pct DESC
+      LIMIT 1
+    `);
+
+    if (expenseAnomaly.rows.length > 0) {
+      const anomaly = expenseAnomaly.rows[0];
+      insights.push({
+        type: 'expense_anomaly',
+        icon: '⚠️',
+        title: '지출 이상 감지',
+        description: `${anomaly.category_name} 지출이 평균 대비 ${anomaly.increase_pct}% 높습니다. 최근 30일: ${parseFloat(anomaly.total_amount).toLocaleString()}원`,
+        severity: 'warning',
+        actionable: true
+      });
+    }
+
+    // 2. 절세 기회 - 세금계산서 미발행 건
+    const taxInvoiceMissing = await db.query(`
+      SELECT
+        COUNT(*) as count,
+        SUM(amount) as total
+      FROM finance_transactions
+      WHERE type = 'expense'
+        AND tax_invoice_yn = false
+        AND amount >= 30000
+        AND transaction_date >= CURRENT_DATE - INTERVAL '30 days'
+    `);
+
+    if (taxInvoiceMissing.rows[0]?.count > 0) {
+      const missing = taxInvoiceMissing.rows[0];
+      insights.push({
+        type: 'tax_opportunity',
+        icon: '💡',
+        title: '절세 기회',
+        description: `세금계산서 미발행 건 ${missing.count}건 (${parseFloat(missing.total).toLocaleString()}원). 발행 시 부가세 환급 가능!`,
+        severity: 'info',
+        actionable: true
+      });
+    }
+
+    // 3. 현금흐름 예측
+    const cashFlowTrend = await db.query(`
+      SELECT
+        type,
+        SUM(amount) as total
+      FROM finance_transactions
+      WHERE transaction_date >= CURRENT_DATE - INTERVAL '90 days'
+      GROUP BY type
+    `);
+
+    const income90 = parseFloat(cashFlowTrend.rows.find(r => r.type === 'income')?.total || 0);
+    const expense90 = parseFloat(cashFlowTrend.rows.find(r => r.type === 'expense')?.total || 0);
+    const avgMonthlyNet = (income90 - expense90) / 3;
+
+    insights.push({
+      type: 'cash_flow_prediction',
+      icon: '📊',
+      title: '현금흐름 예측',
+      description: avgMonthlyNet >= 0
+        ? `월평균 순수익 ${Math.round(avgMonthlyNet).toLocaleString()}원 유지 중. 안정적인 현금흐름입니다.`
+        : `월평균 ${Math.abs(Math.round(avgMonthlyNet)).toLocaleString()}원 적자 추세. 지출 관리가 필요합니다.`,
+      severity: avgMonthlyNet >= 0 ? 'success' : 'danger',
+      actionable: avgMonthlyNet < 0
+    });
+
+    // 4. 비용 절감 제안 - 반복 지출 분석
+    const recurringExpenses = await db.query(`
+      SELECT
+        description,
+        COUNT(*) as occurrence,
+        AVG(amount) as avg_amount
+      FROM finance_transactions
+      WHERE type = 'expense'
+        AND transaction_date >= CURRENT_DATE - INTERVAL '90 days'
+      GROUP BY description
+      HAVING COUNT(*) >= 2
+      ORDER BY AVG(amount) DESC
+      LIMIT 3
+    `);
+
+    if (recurringExpenses.rows.length > 0) {
+      const topRecurring = recurringExpenses.rows[0];
+      insights.push({
+        type: 'cost_reduction',
+        icon: '💰',
+        title: '비용 절감 제안',
+        description: `'${topRecurring.description.substring(0, 20)}...' 반복 지출 발견 (${topRecurring.occurrence}회, 평균 ${parseFloat(topRecurring.avg_amount).toLocaleString()}원). 구독료 점검을 권장합니다.`,
+        severity: 'info',
+        actionable: true
+      });
+    }
+
+    // 5. 수익 트렌드
+    const revenueTrend = await db.query(`
+      SELECT
+        EXTRACT(MONTH FROM transaction_date) as month,
+        SUM(amount) as total
+      FROM finance_transactions
+      WHERE type = 'income'
+        AND transaction_date >= CURRENT_DATE - INTERVAL '90 days'
+      GROUP BY month
+      ORDER BY month
+    `);
+
+    if (revenueTrend.rows.length >= 2) {
+      const months = revenueTrend.rows;
+      const lastMonth = parseFloat(months[months.length - 1]?.total || 0);
+      const prevMonth = parseFloat(months[months.length - 2]?.total || 0);
+      const change = prevMonth > 0 ? Math.round((lastMonth / prevMonth - 1) * 100) : 0;
+
+      insights.push({
+        type: 'revenue_trend',
+        icon: change >= 0 ? '📈' : '📉',
+        title: '수익 트렌드',
+        description: change >= 0
+          ? `전월 대비 수익 ${change}% 증가! 좋은 흐름입니다.`
+          : `전월 대비 수익 ${Math.abs(change)}% 감소. 매출 확대 전략이 필요합니다.`,
+        severity: change >= 0 ? 'success' : 'warning',
+        actionable: change < 0
+      });
+    }
+
+    // 기본 인사이트 (데이터 부족 시)
+    if (insights.length === 0) {
+      insights.push({
+        type: 'welcome',
+        icon: '✨',
+        title: '기적 금고 활성화',
+        description: '거래 데이터가 쌓이면 AI 인사이트가 자동으로 생성됩니다.',
+        severity: 'info',
+        actionable: false
+      });
+    }
+
+  } catch (error) {
+    console.error('[Finance] 인사이트 생성 오류:', error.message);
+    insights.push({
+      type: 'error',
+      icon: '⚠️',
+      title: '인사이트 생성 실패',
+      description: '데이터 분석 중 오류가 발생했습니다.',
+      severity: 'warning',
+      actionable: false
+    });
+  }
+
+  return {
+    insights,
+    generatedAt: new Date().toISOString(),
+    count: insights.length
+  };
+}
+
+// ============ 엑셀 Import/Export (Phase 2) ============
+
+const XLSX = require('xlsx');
+
+/**
+ * 엑셀 내보내기 - 월별 거래 내역
+ */
+async function exportToExcel(year, month) {
+  if (!db) throw new Error('DB 연결 필요');
+
+  // 거래 내역 조회
+  const transactions = await db.query(`
+    SELECT
+      t.transaction_date as "거래일",
+      CASE WHEN t.type = 'income' THEN '수입' ELSE '지출' END as "유형",
+      c.name as "카테고리",
+      t.description as "적요",
+      t.amount as "금액",
+      t.supply_amount as "공급가액",
+      t.vat_amount as "부가세",
+      CASE WHEN t.tax_invoice_yn THEN 'Y' ELSE 'N' END as "세금계산서",
+      t.payment_method as "결제수단",
+      p.name as "거래처"
+    FROM finance_transactions t
+    LEFT JOIN finance_categories c ON t.category_id = c.id
+    LEFT JOIN partners p ON t.partner_id = p.id
+    WHERE EXTRACT(YEAR FROM t.transaction_date) = $1
+      AND EXTRACT(MONTH FROM t.transaction_date) = $2
+    ORDER BY t.transaction_date, t.id
+  `, [year, month]);
+
+  // 손익 요약
+  const summary = await db.query(`
+    SELECT
+      type,
+      SUM(amount) as total,
+      SUM(supply_amount) as supply_total,
+      SUM(vat_amount) as vat_total,
+      COUNT(*) as count
+    FROM finance_transactions
+    WHERE EXTRACT(YEAR FROM transaction_date) = $1
+      AND EXTRACT(MONTH FROM transaction_date) = $2
+    GROUP BY type
+  `, [year, month]);
+
+  const income = summary.rows.find(r => r.type === 'income') || { total: 0, count: 0 };
+  const expense = summary.rows.find(r => r.type === 'expense') || { total: 0, count: 0 };
+
+  // 워크북 생성
+  const wb = XLSX.utils.book_new();
+
+  // 시트 1: 거래 내역
+  const wsData = transactions.rows.map(row => ({
+    '거래일': row.거래일 ? new Date(row.거래일).toISOString().split('T')[0] : '',
+    '유형': row.유형,
+    '카테고리': row.카테고리 || '',
+    '적요': row.적요,
+    '금액': parseFloat(row.금액),
+    '공급가액': parseFloat(row.공급가액 || 0),
+    '부가세': parseFloat(row.부가세 || 0),
+    '세금계산서': row.세금계산서,
+    '결제수단': row.결제수단 || '',
+    '거래처': row.거래처 || ''
+  }));
+
+  const ws1 = XLSX.utils.json_to_sheet(wsData);
+  XLSX.utils.book_append_sheet(wb, ws1, '거래내역');
+
+  // 시트 2: 손익계산서
+  const summaryData = [
+    { '항목': '기간', '금액': `${year}년 ${month}월` },
+    { '항목': '', '금액': '' },
+    { '항목': '【수입】', '금액': '' },
+    { '항목': '총 수입', '금액': parseFloat(income.total || 0) },
+    { '항목': '수입 건수', '금액': parseInt(income.count || 0) },
+    { '항목': '', '금액': '' },
+    { '항목': '【지출】', '금액': '' },
+    { '항목': '총 지출', '금액': parseFloat(expense.total || 0) },
+    { '항목': '지출 건수', '금액': parseInt(expense.count || 0) },
+    { '항목': '', '금액': '' },
+    { '항목': '【손익】', '금액': '' },
+    { '항목': '순이익', '금액': parseFloat(income.total || 0) - parseFloat(expense.total || 0) },
+    { '항목': '수익률', '금액': income.total > 0 ? `${Math.round((1 - expense.total / income.total) * 100)}%` : '0%' }
+  ];
+
+  const ws2 = XLSX.utils.json_to_sheet(summaryData);
+  XLSX.utils.book_append_sheet(wb, ws2, '손익계산서');
+
+  // 버퍼 생성
+  const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+
+  return {
+    buffer,
+    filename: `기적금고_${year}년${month}월_거래내역.xlsx`,
+    mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  };
+}
+
+/**
+ * 엑셀 가져오기 - 거래 일괄 등록
+ */
+async function importFromExcel(fileBuffer) {
+  if (!db) throw new Error('DB 연결 필요');
+
+  const wb = XLSX.read(fileBuffer, { type: 'buffer' });
+  const sheetName = wb.SheetNames[0];
+  const ws = wb.Sheets[sheetName];
+  const rows = XLSX.utils.sheet_to_json(ws);
+
+  const results = {
+    total: rows.length,
+    success: 0,
+    failed: 0,
+    duplicates: 0,
+    errors: []
+  };
+
+  const categories = await getCategories();
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    try {
+      // 컬럼 매핑 (다양한 형식 지원)
+      const transactionDate = row['거래일'] || row['날짜'] || row['date'] || row['Date'];
+      const amount = parseFloat(row['금액'] || row['amount'] || row['Amount'] || 0);
+      const description = row['적요'] || row['설명'] || row['description'] || row['Description'] || '';
+      const typeRaw = row['유형'] || row['type'] || row['Type'] || '';
+      const categoryName = row['카테고리'] || row['category'] || row['Category'] || '';
+
+      if (!transactionDate || !amount || !description) {
+        results.failed++;
+        results.errors.push(`행 ${i + 2}: 필수 데이터 누락 (거래일, 금액, 적요)`);
+        continue;
+      }
+
+      // 유형 결정
+      let type = 'expense';
+      if (typeRaw.includes('수입') || typeRaw.toLowerCase().includes('income')) {
+        type = 'income';
+      } else if (amount < 0) {
+        type = 'expense';
+      }
+
+      // 카테고리 찾기 또는 AI 추천
+      let categoryId = null;
+      if (categoryName) {
+        const matched = categories.find(c =>
+          c.name === categoryName || c.name.includes(categoryName)
+        );
+        if (matched) categoryId = matched.id;
+      }
+      if (!categoryId) {
+        const suggestion = await suggestCategory(description);
+        if (suggestion) categoryId = suggestion.categoryId;
+      }
+
+      // 중복 체크
+      const duplicate = await db.query(`
+        SELECT id FROM finance_transactions
+        WHERE transaction_date = $1
+          AND amount = $2
+          AND description = $3
+        LIMIT 1
+      `, [transactionDate, Math.abs(amount), description]);
+
+      if (duplicate.rows.length > 0) {
+        results.duplicates++;
+        continue;
+      }
+
+      // 거래 등록
+      await createTransaction({
+        type,
+        amount: Math.abs(amount),
+        categoryId,
+        description,
+        transactionDate,
+        paymentMethod: row['결제수단'] || row['payment_method'] || 'card',
+        taxInvoiceYn: row['세금계산서'] === 'Y' || row['tax_invoice'] === 'Y'
+      });
+
+      results.success++;
+
+    } catch (error) {
+      results.failed++;
+      results.errors.push(`행 ${i + 2}: ${error.message}`);
+    }
+  }
+
+  return results;
+}
+
+// ============ 예산 알림 시스템 (Phase 2) ============
+
+/**
+ * 예산 대비 실적 현황 (게이지 바용)
+ */
+async function getBudgetStatus(year, month) {
+  if (!db) throw new Error('DB 연결 필요');
+
+  // 예산 설정 조회
+  const budgetResult = await db.query(`
+    SELECT
+      b.id,
+      b.category_id,
+      c.name as category_name,
+      c.icon as category_icon,
+      c.color as category_color,
+      b.amount as budget_amount,
+      b.alert_threshold,
+      b.memo
+    FROM finance_budgets b
+    JOIN finance_categories c ON b.category_id = c.id
+    WHERE b.year = $1 AND b.month = $2
+    ORDER BY c.sort_order
+  `, [year, month]);
+
+  // 각 예산별 실적 계산
+  const budgets = [];
+  for (const budget of budgetResult.rows) {
+    const spentResult = await db.query(`
+      SELECT COALESCE(SUM(amount), 0) as spent
+      FROM finance_transactions
+      WHERE category_id = $1
+        AND EXTRACT(YEAR FROM transaction_date) = $2
+        AND EXTRACT(MONTH FROM transaction_date) = $3
+    `, [budget.category_id, year, month]);
+
+    const spent = parseFloat(spentResult.rows[0].spent);
+    const budgetAmount = parseFloat(budget.budget_amount);
+    const percentage = budgetAmount > 0 ? Math.round((spent / budgetAmount) * 100) : 0;
+    const remaining = budgetAmount - spent;
+
+    let status = 'healthy';
+    if (percentage >= 100) {
+      status = 'over';
+    } else if (percentage >= budget.alert_threshold) {
+      status = 'warning';
+    }
+
+    budgets.push({
+      id: budget.id,
+      categoryId: budget.category_id,
+      categoryName: budget.category_name,
+      categoryIcon: budget.category_icon,
+      categoryColor: budget.category_color,
+      budgetAmount,
+      spent,
+      remaining,
+      percentage,
+      alertThreshold: budget.alert_threshold,
+      status,
+      memo: budget.memo
+    });
+  }
+
+  // 전체 요약
+  const totalBudget = budgets.reduce((sum, b) => sum + b.budgetAmount, 0);
+  const totalSpent = budgets.reduce((sum, b) => sum + b.spent, 0);
+
+  return {
+    period: { year, month },
+    budgets,
+    summary: {
+      totalBudget,
+      totalSpent,
+      totalRemaining: totalBudget - totalSpent,
+      overallPercentage: totalBudget > 0 ? Math.round((totalSpent / totalBudget) * 100) : 0,
+      overCount: budgets.filter(b => b.status === 'over').length,
+      warningCount: budgets.filter(b => b.status === 'warning').length,
+      healthyCount: budgets.filter(b => b.status === 'healthy').length
+    },
+    generatedAt: new Date().toISOString()
   };
 }
 
@@ -928,6 +1405,7 @@ module.exports = {
   // 예산
   setBudget,
   getBudgets,
+  getBudgetStatus,
 
   // 보고서
   getIncomeStatement,
@@ -941,6 +1419,13 @@ module.exports = {
 
   // 대시보드
   getDashboard,
+
+  // AI 인사이트 (Phase 2)
+  generateInsights,
+
+  // 엑셀 Import/Export (Phase 2)
+  exportToExcel,
+  importFromExcel,
 
   // 유틸리티
   getServiceStatus,

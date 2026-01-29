@@ -285,6 +285,62 @@
       background: var(--accent);
     }
 
+    .btn-excel {
+      background: #217346;
+      color: white;
+      font-size: 13px;
+      padding: 8px 16px;
+    }
+
+    .btn-excel:hover {
+      background: #1a5c38;
+    }
+
+    /* Insight Severity Colors */
+    .insight-card.success { background: linear-gradient(135deg, #e8f5e9, #f5fff5); border-left: 3px solid var(--success); }
+    .insight-card.warning { background: linear-gradient(135deg, #fff3e0, #fffaf5); border-left: 3px solid var(--warning); }
+    .insight-card.danger { background: linear-gradient(135deg, #ffebee, #fff5f5); border-left: 3px solid var(--error); }
+    .insight-card.info { background: linear-gradient(135deg, #f5f0ff, #fff5f7); border-left: 3px solid var(--primary); }
+
+    /* Budget Gauge */
+    .budget-gauge {
+      margin-bottom: 16px;
+      padding: 12px;
+      background: #f8f8f8;
+      border-radius: 8px;
+    }
+
+    .budget-gauge-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .budget-gauge-bar {
+      height: 10px;
+      background: #e0e0e0;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .budget-gauge-fill {
+      height: 100%;
+      border-radius: 5px;
+      transition: width 0.3s ease;
+    }
+
+    .budget-gauge-fill.healthy { background: var(--success); }
+    .budget-gauge-fill.warning { background: var(--warning); }
+    .budget-gauge-fill.over { background: var(--error); }
+
+    .budget-gauge-info {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--text-light);
+    }
+
     /* Loading */
     .loading {
       text-align: center;
@@ -337,8 +393,21 @@
 </head>
 <body>
   <div class="header">
-    <h1>기적 금고</h1>
-    <p>하루하루의 기적 - 통합 재무관리 시스템</p>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h1>기적 금고</h1>
+        <p>하루하루의 기적 - 통합 재무관리 시스템 v2.0</p>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-excel" onclick="exportExcel()">
+          📥 엑셀 내보내기
+        </button>
+        <label class="btn btn-excel" style="cursor: pointer;">
+          📤 엑셀 가져오기
+          <input type="file" id="excelImport" accept=".xlsx,.xls,.csv" style="display: none;" onchange="importExcel(this)">
+        </label>
+      </div>
+    </div>
   </div>
 
   <div class="container">
@@ -413,6 +482,9 @@
       return `${date.getMonth() + 1}/${date.getDate()}`;
     }
 
+    // 현재 조회 기간 저장
+    let currentPeriod = { year: new Date().getFullYear(), month: new Date().getMonth() + 1 };
+
     // 대시보드 로드
     async function loadDashboard() {
       try {
@@ -423,10 +495,17 @@
           throw new Error(data.error);
         }
 
+        currentPeriod = data.data.period;
         renderSummary(data.data);
         renderTransactions(data.data.recentTransactions);
         renderBudgets(data.data.budgetStatus);
         renderTaxCalendar(data.data.upcomingTax);
+
+        // AI 인사이트 로드
+        loadInsights();
+
+        // 예산 상세 로드
+        loadBudgetStatus();
 
       } catch (error) {
         console.error('Dashboard load error:', error);
@@ -434,6 +513,161 @@
           <div class="error">대시보드를 불러올 수 없습니다: ${error.message}</div>
         `;
       }
+    }
+
+    // AI 인사이트 로드
+    async function loadInsights() {
+      try {
+        const res = await fetch(`${API_BASE}/dashboard/insights`);
+        const data = await res.json();
+
+        if (data.success) {
+          renderInsights(data.data.insights);
+        }
+      } catch (error) {
+        console.error('Insights load error:', error);
+      }
+    }
+
+    // AI 인사이트 렌더링
+    function renderInsights(insights) {
+      const insightsEl = document.getElementById('insights');
+
+      if (!insights || insights.length === 0) {
+        insightsEl.innerHTML = `
+          <div class="insight-card info">
+            <span class="insight-icon">✨</span>
+            <div class="insight-content">
+              <h4>인사이트 준비 중</h4>
+              <p>데이터가 쌓이면 AI 인사이트가 자동 생성됩니다.</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      insightsEl.innerHTML = insights.map(insight => `
+        <div class="insight-card ${insight.severity}">
+          <span class="insight-icon">${insight.icon}</span>
+          <div class="insight-content">
+            <h4>${insight.title}</h4>
+            <p>${insight.description}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 예산 상세 로드
+    async function loadBudgetStatus() {
+      try {
+        const res = await fetch(`${API_BASE}/budgets/status?year=${currentPeriod.year}&month=${currentPeriod.month}`);
+        const data = await res.json();
+
+        if (data.success && data.data.budgets.length > 0) {
+          renderBudgetGauges(data.data);
+        }
+      } catch (error) {
+        console.error('Budget status load error:', error);
+      }
+    }
+
+    // 예산 게이지 렌더링
+    function renderBudgetGauges(budgetData) {
+      const budgetsEl = document.getElementById('budgets');
+      const { budgets, summary } = budgetData;
+
+      if (budgets.length === 0) return;
+
+      let html = `
+        <div class="budget-gauge">
+          <div class="budget-gauge-header">
+            <span style="font-weight: 600;">전체 예산</span>
+            <span>${summary.overallPercentage}%</span>
+          </div>
+          <div class="budget-gauge-bar">
+            <div class="budget-gauge-fill ${summary.overallPercentage >= 100 ? 'over' : summary.overallPercentage >= 80 ? 'warning' : 'healthy'}"
+                 style="width: ${Math.min(summary.overallPercentage, 100)}%"></div>
+          </div>
+          <div class="budget-gauge-info">
+            <span>사용: ${formatCurrency(summary.totalSpent)}</span>
+            <span>예산: ${formatCurrency(summary.totalBudget)}</span>
+          </div>
+        </div>
+      `;
+
+      // 카테고리별 게이지
+      budgets.forEach(budget => {
+        html += `
+          <div class="budget-gauge">
+            <div class="budget-gauge-header">
+              <span>${budget.categoryName}</span>
+              <span class="${budget.status === 'over' ? 'negative' : budget.status === 'warning' ? '' : 'positive'}">${budget.percentage}%</span>
+            </div>
+            <div class="budget-gauge-bar">
+              <div class="budget-gauge-fill ${budget.status}" style="width: ${Math.min(budget.percentage, 100)}%"></div>
+            </div>
+            <div class="budget-gauge-info">
+              <span>${formatCurrency(budget.spent)} / ${formatCurrency(budget.budgetAmount)}</span>
+              <span>${budget.remaining >= 0 ? '남음: ' + formatCurrency(budget.remaining) : '초과: ' + formatCurrency(Math.abs(budget.remaining))}</span>
+            </div>
+          </div>
+        `;
+      });
+
+      budgetsEl.innerHTML = html;
+    }
+
+    // 엑셀 내보내기
+    async function exportExcel() {
+      try {
+        const url = `${API_BASE}/export/excel/${currentPeriod.year}/${currentPeriod.month}`;
+        const res = await fetch(url);
+
+        if (!res.ok) throw new Error('다운로드 실패');
+
+        const blob = await res.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `기적금고_${currentPeriod.year}년${currentPeriod.month}월_거래내역.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(downloadUrl);
+
+        alert('엑셀 다운로드 완료!');
+      } catch (error) {
+        alert('엑셀 내보내기 실패: ' + error.message);
+      }
+    }
+
+    // 엑셀 가져오기
+    async function importExcel(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const res = await fetch(`${API_BASE}/import/excel`, {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          alert(data.message);
+          loadDashboard(); // 새로고침
+        } else {
+          alert('가져오기 실패: ' + data.error);
+        }
+      } catch (error) {
+        alert('엑셀 가져오기 실패: ' + error.message);
+      }
+
+      input.value = ''; // 파일 선택 초기화
     }
 
     // 요약 렌더링
