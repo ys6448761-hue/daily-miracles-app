@@ -250,19 +250,76 @@ Split screen: chat conversation with star mascot showing supportive messages, an
 
 ---
 
+## 6. 네 번째 영상: "다시 시작해도 괜찮아"
+
+### 유닛 1 (0-8초) - PAIN 1: 실패의 순간
+
+**장면 설명:** 프로젝트 실패 통보, 떨어지는 이력서, 고개 숙인 모습
+**감정 톤:** 좌절, 무력감, 패배
+**자막:** "또 실패했어..."
+**배경음악:** 무거운 첼로, 느린 템포
+
+**Sora 프롬프트:**
+```
+A dejected Korean professional receiving rejection news on their phone. Papers slowly falling to the ground like failed dreams. Head bowed in defeat, shoulders slumped. Dim lighting, muted gray-blue colors. Slow motion falling documents. Weight of failure visualized. 8 seconds.
+```
+
 ---
 
-## 6. 영상 요약 테이블
+### 유닛 2 (8-16초) - PAIN 2: 포기의 유혹
+
+**장면 설명:** 캘린더의 X표시들, "그냥 포기할까" 생각, 멈춘 시계
+**감정 톤:** 포기, 무기력, 정체
+**자막:** "이제 늦은 거 아닐까"
+**배경음악:** 정적, 시계 초침 소리
+
+**Sora 프롬프트:**
+```
+Calendar on wall covered with X marks over failed attempts. Person staring at frozen clock hands. Internal struggle visualized - ghost-like version of them walking away giving up. Time feels stopped. Dust particles floating in stagnant air. Limbo state. 8 seconds.
+```
+
+---
+
+### 유닛 3 (16-24초) - SOLUTION 1: 소원이의 격려
+
+**장면 설명:** 소원이 메시지 "넘어져도 괜찮아, 다시 일어나면 돼"
+**감정 톤:** 위로, 용기, 따뜻함
+**자막:** "넘어진 건 끝이 아니야"
+**배경음악:** 부드러운 피아노, 희망적 현악
+
+**Sora 프롬프트:**
+```
+Phone lights up with star mascot sending encouraging message "It's okay to fall, just get back up" in Korean. Warm purple light starts to fill the dark room. Person looks up with tearful but hopeful eyes. Gentle hand-drawn animation of mascot offering a tiny glowing hand. 8 seconds.
+```
+
+---
+
+### 유닛 4 (24-30초) - SOLUTION 2: 새로운 시작
+
+**장면 설명:** 새 캘린더 첫 장, 펜을 드는 손, 소원이와 함께 첫 걸음
+**감정 톤:** 결심, 희망, 용기
+**자막:** "오늘부터 다시, 하루하루의 기적"
+**배경음악:** 밝은 어쿠스틱, 상승 코러스
+
+**Sora 프롬프트:**
+```
+Fresh calendar page being turned to Day 1. Hand picking up a pen with renewed determination. Small star mascot cheering beside them. Sunrise light flooding through window. Colors transitioning from gray to vibrant purple-pink. Person takes first step forward with a small smile. New beginning energy. Logo fade in. 6 seconds.
+```
+
+---
+
+## 7. 영상 요약 테이블
 
 | # | 제목 | PAIN 키워드 | SOLUTION 키워드 | 핵심 메시지 |
 |---|------|-------------|-----------------|-------------|
 | 1 | 소원이의 하루 | 피곤, 반복 | 메시지, 활력 | 지친 일상에 활력을 |
 | 2 | 막막함 탈출 | 고민, 검색 | 로드맵, 성취 | 방향을 찾다 |
 | 3 | 혼자가 아니야 | 외로움, 비교 | 응원, 동행 | 함께하는 기적 |
+| 4 | 다시 시작해도 괜찮아 | 실패, 포기 | 격려, 새출발 | 오늘부터 다시 |
 
 ---
 
-## 7. 워크플로우
+## 8. 워크플로우
 
 ```
 1. GPTs에서 주제 입력 → 4유닛 스크립트 생성
@@ -274,8 +331,8 @@ Split screen: chat conversation with star mascot showing supportive messages, an
 
 ---
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 **Created:** 2025-01-29
 **Updated:** 2025-01-29
 **Author:** Claude Code + 푸르미르님
-**Videos:** 3개 완성 (소원이의 하루, 막막함 탈출, 혼자가 아니야)
+**Videos:** 4개 완성 (소원이의 하루, 막막함 탈출, 혼자가 아니야, 다시 시작해도 괜찮아)
