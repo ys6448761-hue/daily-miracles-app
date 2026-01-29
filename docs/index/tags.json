@@ -185,7 +185,8 @@
     "DOC-sens-setup-guide"
   ],
   "standards": [
-    "DOC-tag_taxonomy"
+    "DOC-tag_taxonomy",
+    "DOC-quantum-planning-method"
   ],
   "templates": [
     "DOC-knowledge_card_template",
@@ -335,6 +336,9 @@
   ],
   "overview": [
     "DOC-service-flow"
+  ],
+  "plans": [
+    "DOC-phase3-quantum-walkthrough"
   ],
   "reports": [
     "DOC-tax-accounting-ai-tools-analys",

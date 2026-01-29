@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-01-29T01:33:07.346Z",
+  "generated_at": "2026-01-29T02:58:47.464Z",
   "generator": "generate-manifest.js",
-  "total_count": 119,
+  "total_count": 121,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -482,6 +482,22 @@
       "checksum": "e28e803e"
     },
     {
+      "id": "DOC-phase3-quantum-walkthrough",
+      "path": "docs/plans/phase3-quantum-walkthrough.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "plans",
+      "tags": [
+        "plans"
+      ],
+      "owner": "ceo",
+      "status": "✅ 비활성화 정상",
+      "title": "양자 기획서 - 기적 금고 Phase 3 증빙 발행 시스템",
+      "created_at": "2026-01-29",
+      "checksum": "fe4f4df4"
+    },
+    {
       "id": "DOC-README",
       "path": "docs/README.md",
       "type": "document",
@@ -585,6 +601,22 @@
       "title": "GA4 설정 가이드",
       "created_at": "2026-01-29",
       "checksum": "1c318f9b"
+    },
+    {
+      "id": "DOC-quantum-planning-method",
+      "path": "docs/standards/quantum-planning-method.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "standards",
+      "tags": [
+        "standards"
+      ],
+      "owner": "comi",
+      "status": "active",
+      "title": "양자 기획법 (Quantum Planning Method) v1.0",
+      "created_at": "2026-01-29",
+      "checksum": "b360b1b0"
     },
     {
       "id": "DOC-agents-index",
