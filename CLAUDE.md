@@ -4,6 +4,11 @@
 
 ## 빠른 상황 파악
 
+**팀 기억**: `.claude/team-memory/` (세션 간 연속성 유지)
+- `context.md` - 현재 맥락, 우선순위, 팀 구성
+- `decisions.md` - 주요 결정사항
+- `learnings.md` - 배운 것들
+
 **최신 상태**: `.claude/AURORA_STATUS.md` 읽기
 **일일 로그**: `.claude/logs/` 폴더 확인
 
