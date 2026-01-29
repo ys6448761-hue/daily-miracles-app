@@ -424,7 +424,65 @@ Each step forward clears a bit more fog. Dawn light breaking through on the hori
 
 ---
 
-## 9. 영상 요약 테이블
+## 9. 일곱 번째 영상: "꿈을 잃어버렸어"
+
+### 유닛 1 (0-8초) - PAIN 1: 잊혀진 열정
+
+**장면 설명:** 먼지 쌓인 기타/캔버스/노트, 한숨 쉬며 지나치는 모습
+**감정 톤:** 상실, 무관심, 체념
+**자막:** "언제부터였을까, 꿈이 사라진 건"
+**배경음악:** 쓸쓸한 피아노, 느린 템포
+
+**Sora 프롬프트:**
+```
+Dusty guitar sitting in corner of room, untouched for years. Or paint brushes dried up in a jar. Person walks past without looking, heavy sigh. Cobwebs forming on once-beloved hobby items. Faded photographs of younger, passionate self on the wall. Lost dreams visualized. Melancholic nostalgia. 8 seconds.
+```
+
+---
+
+### 유닛 2 (8-16초) - PAIN 2: 현실의 무게
+
+**장면 설명:** 출근 러시, 숫자만 보이는 화면, "현실적으로" 라는 목소리
+**감정 톤:** 포기, 무력감, 회색빛
+**자막:** "어른이 되면 꿈은 사치라던데"
+**배경음악:** 기계적 리듬, 무미건조한 전자음
+
+**Sora 프롬프트:**
+```
+Montage of adult life routine - crowded subway, spreadsheets filling screen, bills piling up. Color draining from the world, everything turning gray. Ghost of younger self with big dreams fading away behind. "Be realistic" text appearing like chains. Passion being crushed by responsibility. 8 seconds.
+```
+
+---
+
+### 유닛 3 (16-24초) - SOLUTION 1: 소원이의 질문
+
+**장면 설명:** 소원이 메시지 "그때 뭘 하면 가장 행복했어요?", 눈빛 반짝
+**감정 톤:** 회상, 설렘, 그리움
+**자막:** "잠깐, 그때 난 뭘 좋아했더라"
+**배경음악:** 따뜻한 어쿠스틱, 희망적 멜로디
+
+**Sora 프롬프트:**
+```
+Phone lights up with star mascot asking "What made you happiest back then?" in Korean. Person pauses, eyes lighting up with distant memory. Flashback glimpses of joyful moments with their passion. Colors slowly returning to the world. Spark of recognition. Reconnecting with forgotten self. 8 seconds.
+```
+
+---
+
+### 유닛 4 (24-30초) - SOLUTION 2: 다시 시작하는 손
+
+**장면 설명:** 먼지 털고 기타를 드는 손, 소원이와 함께 첫 음
+**감정 톤:** 용기, 설렘, 재발견
+**자막:** "작게라도 다시, 나의 꿈"
+**배경음악:** 밝은 어쿠스틱 기타, 상승 멜로디
+
+**Sora 프롬프트:**
+```
+Hand wiping dust off the guitar, picking it up again. Or opening old sketchbook with fresh page. First tentative note or stroke - imperfect but meaningful. Star mascot cheering beside them. Room filling with warm purple-pink light and color returning. Small smile of rediscovery. Dream rekindled. Logo fade in. 6 seconds.
+```
+
+---
+
+## 10. 영상 요약 테이블
 
 | # | 제목 | PAIN 키워드 | SOLUTION 키워드 | 핵심 메시지 |
 |---|------|-------------|-----------------|-------------|
@@ -434,10 +492,11 @@ Each step forward clears a bit more fog. Dawn light breaking through on the hori
 | 4 | 다시 시작해도 괜찮아 | 실패, 포기 | 격려, 새출발 | 오늘부터 다시 |
 | 5 | 완벽하지 않아도 돼 | 강박, 자기비판 | 수용, 해방 | 있는 그대로 충분해 |
 | 6 | 내일이 두려워도 | 불안, 불면 | 등불, 새벽 | 함께라면 내일도 괜찮아 |
+| 7 | 꿈을 잃어버렸어 | 상실, 체념 | 회상, 재발견 | 작게라도 다시 나의 꿈 |
 
 ---
 
-## 10. 워크플로우
+## 11. 워크플로우
 
 ```
 1. GPTs에서 주제 입력 → 4유닛 스크립트 생성
@@ -449,8 +508,8 @@ Each step forward clears a bit more fog. Dawn light breaking through on the hori
 
 ---
 
-**Version:** 1.4.0
+**Version:** 1.5.0
 **Created:** 2025-01-29
 **Updated:** 2025-01-29
 **Author:** Claude Code + 푸르미르님
-**Videos:** 6개 완성
+**Videos:** 7개 완성
