@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-01-28T22:20:35.802Z",
+  "generated_at": "2026-01-29T01:33:07.346Z",
   "generator": "generate-manifest.js",
-  "total_count": 118,
+  "total_count": 119,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -117,7 +117,7 @@
       "owner": "comi",
       "status": "| wishes_processed",
       "title": "Airtable 테이블 스키마 (ACT 관제탑)",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "4976b285"
     },
     {
@@ -133,7 +133,7 @@
       "owner": "team",
       "status": "active",
       "title": "Airtable Wish Intake 스키마",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "a8baafc3"
     },
     {
@@ -149,7 +149,7 @@
       "owner": "jemi",
       "status": "NEW, ACK, IN_PROGRESS, APPROVED, STARTED, DONE, ESCALATED",
       "title": "Airtable Wishes Inbox 테이블 스키마",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "ca0bf766"
     },
     {
@@ -166,7 +166,7 @@
       "owner": "team",
       "status": "active",
       "title": "온라인 문제 해결 소원 API v0.1",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "266802c0"
     },
     {
@@ -183,7 +183,7 @@
       "owner": "code",
       "status": "active",
       "title": "온라인 소원 실현 항해 API 설계안 v0.1",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "ed723688"
     },
     {
@@ -199,7 +199,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Aurora 5 캐릭터 생성 프롬프트 패키지 v2.1",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "64f0a2d2"
     },
     {
@@ -217,7 +217,7 @@
       "owner": "team",
       "status": "active",
       "title": "최수민방식 치트시트",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "9f7529c4"
     },
     {
@@ -235,7 +235,7 @@
       "owner": "team",
       "status": "active",
       "title": "Claude Desktop MCP 서버 설정 가이드",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "44ccac1b"
     },
     {
@@ -249,7 +249,7 @@
       "owner": "team",
       "status": "active",
       "title": "README",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "60a0b4af"
     },
     {
@@ -266,7 +266,7 @@
       "owner": "ceo",
       "status": "active",
       "title": "Decisions Index",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "b355d262"
     },
     {
@@ -282,7 +282,7 @@
       "owner": "code",
       "status": "archived",
       "title": "Daily Miracles MVP 배포 체크리스트",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "0202a43e"
     },
     {
@@ -299,7 +299,7 @@
       "owner": "comi",
       "status": "archived",
       "title": "하루하루의 기적 - 성장 로드맵",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "881f0936"
     },
     {
@@ -317,7 +317,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "📋 Aurora5 Judge 프롬프트 가이드",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "513de9dd"
     },
     {
@@ -334,7 +334,7 @@
       "owner": "team",
       "status": "active",
       "title": "Knowledge Cards (지식카드)",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "a4d0a8e8"
     },
     {
@@ -351,7 +351,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "하루하루의 기적 - 출항 선언문",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "c6b4219e"
     },
     {
@@ -372,7 +372,7 @@
       "owner": "code",
       "status": "active",
       "title": "최수민님 방식 완전 정리",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "3722b629"
     },
     {
@@ -390,7 +390,7 @@
       "owner": "rumi",
       "status": "|------",
       "title": "재미 온보딩 가이드 v1.1",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "00a62da9"
     },
     {
@@ -409,7 +409,7 @@
       "owner": "rumi",
       "status": "대응",
       "title": "재미 온보딩 가이드 v1.2",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "1004a06f"
     },
     {
@@ -425,7 +425,7 @@
       "owner": "comi",
       "status": "archived",
       "title": "DEC 운영 매뉴얼",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "1b4361fe"
     },
     {
@@ -443,7 +443,7 @@
       "owner": "code",
       "status": "active",
       "title": "Drive → GitHub Sync Service 설치 가이드",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "eb6394bc"
     },
     {
@@ -461,7 +461,7 @@
       "owner": "comi",
       "status": "항목",
       "title": "SENS 설정 가이드 (Naver Cloud Platform)",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "fea945f4"
     },
     {
@@ -478,7 +478,7 @@
       "owner": "code",
       "status": "active",
       "title": "Daily Miracles 온라인 소원 서비스 전체 흐름도",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "e28e803e"
     },
     {
@@ -494,8 +494,26 @@
       "owner": "comi",
       "status": "active",
       "title": "하루하루의 기적 - 지식 저장소",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "28cf200e"
+    },
+    {
+      "id": "DOC-tax-accounting-ai-tools-analys",
+      "path": "docs/reports/tax-accounting-ai-tools-analysis.md",
+      "type": "report",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "reports",
+      "tags": [
+        "reports",
+        "가격",
+        "결제"
+      ],
+      "owner": "comi",
+      "status": "active",
+      "title": "한국 세무회계 AI 도구 조사 및 연동 가능성 분석",
+      "created_at": "2026-01-29",
+      "checksum": "5af76d35"
     },
     {
       "id": "DOC-REVIEW_COLLECTION_SYSTEM",
@@ -511,7 +529,7 @@
       "owner": "comi",
       "status": "active",
       "title": "후기 수집 구조 설계서",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "bbd74711"
     },
     {
@@ -528,7 +546,7 @@
       "owner": "team",
       "status": "active",
       "title": "🎯 30일 기적 로드맵 시스템",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "a4207922"
     },
     {
@@ -546,7 +564,7 @@
       "owner": "team",
       "status": "active",
       "title": "30일 기적 로드맵 API 문서",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "4d39bd13"
     },
     {
@@ -565,7 +583,7 @@
       "owner": "code",
       "status": "항목",
       "title": "GA4 설정 가이드",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "1c318f9b"
     },
     {
@@ -583,7 +601,7 @@
       "owner": "code",
       "status": "|----",
       "title": "에이전트 인덱스",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "92a49e80"
     },
     {
@@ -599,7 +617,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "대화 저장소 워크플로우",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "55221cd3"
     },
     {
@@ -619,7 +637,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Manifest 자동 생성 시스템",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "d242fbfe"
     },
     {
@@ -637,7 +655,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Aurora 5 토론 시스템 안내문",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "49189a4d"
     },
     {
@@ -655,7 +673,7 @@
       "owner": "code",
       "status": "분석 중 / 분석 완료",
       "title": "카카오 알림톡 템플릿 설계서",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "75c90dee"
     },
     {
@@ -672,7 +690,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Wix 팀 소개 페이지 콘텐츠",
-      "created_at": "2026-01-28",
+      "created_at": "2026-01-29",
       "checksum": "cb6751ba"
     },
     {

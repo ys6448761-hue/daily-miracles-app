@@ -220,6 +220,7 @@
   "결제": [
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
     "DOC-JAEMI_ONBOARDING_v12",
+    "DOC-tax-accounting-ai-tools-analys",
     "DOC-GA4_SETUP_GUIDE",
     "DOC-20260101-MKI",
     "DOC-20260101-4PA",
@@ -311,6 +312,7 @@
   ],
   "가격": [
     "DOC-drive-github-sync-setup",
+    "DOC-tax-accounting-ai-tools-analys",
     "DOC-alimtalk-templates-design",
     "DOC-20260101-4PA",
     "DOC-20260101-TRD",
@@ -333,6 +335,10 @@
   ],
   "overview": [
     "DOC-service-flow"
+  ],
+  "reports": [
+    "DOC-tax-accounting-ai-tools-analys",
+    "DOC-CEO-WEEKLY-2025-W52"
   ],
   "roadmap": [
     "DOC-README",
@@ -360,9 +366,6 @@
   ],
   "team": [
     "DOC-Aurora5_토론시스템_안내문"
-  ],
-  "reports": [
-    "DOC-CEO-WEEKLY-2025-W52"
   ],
   "actions": [
     "DEC-2026-0102-045",

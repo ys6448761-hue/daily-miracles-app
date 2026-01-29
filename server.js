@@ -355,6 +355,15 @@ try {
   console.error("❌ Hero8 영상 라우터 로드 실패:", error.message);
 }
 
+// 기적 금고 (Finance) 라우터 로딩
+let financeRoutes = null;
+try {
+  financeRoutes = require("./routes/financeRoutes");
+  console.log("✅ 기적 금고(Finance) 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 기적 금고(Finance) 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -1111,6 +1120,14 @@ if (hero8Routes) {
   console.log("✅ Hero8 영상 라우터 등록 완료 (/api/video/hero8, /output)");
 } else {
   console.warn("⚠️ Hero8 영상 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 기적 금고 Finance Routes (/api/finance) ----------
+if (financeRoutes) {
+  app.use("/api/finance", financeRoutes);
+  console.log("✅ 기적 금고(Finance) 라우터 등록 완료 (/api/finance)");
+} else {
+  console.warn("⚠️ 기적 금고(Finance) 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------
