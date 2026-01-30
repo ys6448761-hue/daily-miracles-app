@@ -12,7 +12,8 @@
     "checklist:daily": "python scripts/daily-checklist.py",
     "checklist:weekly": "python scripts/weekly-checklist.py",
     "checklist:monthly": "python scripts/monthly-checklist.py",
-    "backup-memory": "node scripts/backup-memory.js"
+    "backup-memory": "node scripts/backup-memory.js",
+    "save-conversation": "node scripts/save-conversation.js"
   },
   "engines": {
     "node": "20.x"
