@@ -1,8 +1,14 @@
 # Decisions Index
 
-> Single Source of Truth for all decisions. Each line links to the detailed record.
+> Single Source of Truth for all decisions.
+> Pinned (max 20) + Recent (max 30)
 
 ---
+
+## Pinned
+
+- 2025-01-30: [Brand] 브랜드-핵심가치 (pinned.md#브랜드-핵심가치)
+- 2025-01-30: [Team] Aurora-5-팀구성 (pinned.md#aurora-5-팀구성)
 
 ## 2025-01
 
