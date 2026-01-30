@@ -15,7 +15,9 @@
     "backup-memory": "node scripts/backup-memory.js",
     "save-conversation": "node scripts/save-conversation.js",
     "memory:rebuild": "python tools/rebuild_team_memory_indexes_simple.py",
-    "memory:lint": "python tools/lint_team_memory.py"
+    "memory:lint": "python tools/lint_team_memory.py",
+    "memory:digest": "python tools/generate_team_memory_digest.py",
+    "memory:gate": "python tools/rebuild_team_memory_indexes_simple.py && python tools/lint_team_memory.py"
   },
   "engines": {
     "node": "20.x"
