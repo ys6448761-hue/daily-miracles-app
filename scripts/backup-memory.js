@@ -1,14 +1,15 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * Team Memory → Google Drive 백업 스크립트
+ * Team Memory → Google Drive 백업 스크립트 (v2)
  * ═══════════════════════════════════════════════════════════════════════════
  *
  * 실행: npm run backup-memory
  *
- * 백업 대상:
+ * 백업 대상 (v2 구조):
  *   - .claude/team-memory/context.md
- *   - .claude/team-memory/decisions.md
- *   - .claude/team-memory/learnings.md
+ *   - .claude/team-memory/decisions/ (폴더 전체)
+ *   - .claude/team-memory/learnings/ (폴더 전체)
+ *   - .claude/team-memory/conversations/ (폴더 전체)
  *
  * 백업 위치:
  *   Google Drive/하루하루의기적/team-memory/
@@ -16,11 +17,9 @@
  * 파일명 규칙:
  *   - 날짜별: 2025-01-30_context.md
  *   - 최신본: context_latest.md (항상 덮어쓰기)
+ *   - 폴더: decisions/, learnings/, conversations/ (전체 복사)
  *
- * 설정:
- *   .env에 GOOGLE_DRIVE_PATH 설정 또는 자동 탐지
- *
- * @version 1.0
+ * @version 2.0
  * @date 2025-01-30
  * ═══════════════════════════════════════════════════════════════════════════
  */
@@ -33,11 +32,16 @@ const path = require('path');
 // ═══════════════════════════════════════════════════════════════════════════
 
 const CONFIG = {
-  // 백업 대상 파일
+  // 백업 대상 파일 (플랫 파일)
   sourceFiles: [
-    'context.md',
-    'decisions.md',
-    'learnings.md'
+    'context.md'
+  ],
+
+  // 백업 대상 폴더 (v2 구조)
+  sourceFolders: [
+    'decisions',
+    'learnings',
+    'conversations'
   ],
 
   // 소스 폴더 (프로젝트 루트 기준)
@@ -124,12 +128,45 @@ function getDateString() {
 function ensureDir(dirPath) {
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
-    console.log(`📁 폴더 생성: ${dirPath}`);
   }
 }
 
 function copyFile(src, dest) {
   fs.copyFileSync(src, dest);
+}
+
+function copyFolderRecursive(src, dest) {
+  ensureDir(dest);
+
+  const entries = fs.readdirSync(src, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+
+    if (entry.isDirectory()) {
+      copyFolderRecursive(srcPath, destPath);
+    } else {
+      copyFile(srcPath, destPath);
+    }
+  }
+}
+
+function countFilesInFolder(folderPath) {
+  if (!fs.existsSync(folderPath)) return 0;
+
+  let count = 0;
+  const entries = fs.readdirSync(folderPath, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (entry.isDirectory()) {
+      count += countFilesInFolder(path.join(folderPath, entry.name));
+    } else {
+      count++;
+    }
+  }
+
+  return count;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -139,7 +176,7 @@ function copyFile(src, dest) {
 async function backupMemory() {
   console.log('');
   console.log('═══════════════════════════════════════════════════════════');
-  console.log('  📦 Team Memory → Google Drive 백업');
+  console.log('  📦 Team Memory → Google Drive 백업 (v2)');
   console.log('═══════════════════════════════════════════════════════════');
   console.log('');
 
@@ -180,11 +217,12 @@ async function backupMemory() {
   // 5. 날짜 문자열
   const dateStr = getDateString();
   const backedUpFiles = [];
+  const backedUpFolders = [];
 
   console.log('📋 백업 진행:');
   console.log('───────────────────────────────────────────────────────────');
 
-  // 6. 각 파일 백업
+  // 6. 플랫 파일 백업
   for (const fileName of CONFIG.sourceFiles) {
     const srcPath = path.join(sourceDir, fileName);
 
@@ -217,29 +255,72 @@ async function backupMemory() {
     });
   }
 
+  // 7. 폴더 백업 (v2 구조)
+  console.log('');
+  console.log('📂 폴더 백업:');
+  console.log('───────────────────────────────────────────────────────────');
+
+  for (const folderName of CONFIG.sourceFolders) {
+    const srcFolderPath = path.join(sourceDir, folderName);
+
+    if (!fs.existsSync(srcFolderPath)) {
+      console.log(`   ⚠️  ${folderName}/ - 폴더 없음 (스킵)`);
+      continue;
+    }
+
+    const destFolderPath = path.join(backupDir, folderName);
+    const fileCount = countFilesInFolder(srcFolderPath);
+
+    // 폴더 전체 복사
+    copyFolderRecursive(srcFolderPath, destFolderPath);
+
+    console.log(`   ✅ ${folderName}/ (${fileCount}개 파일)`);
+    console.log(`      → ${destFolderPath}`);
+
+    backedUpFolders.push({
+      name: folderName,
+      fileCount: fileCount
+    });
+  }
+
   console.log('───────────────────────────────────────────────────────────');
   console.log('');
 
-  // 7. 완료 메시지
-  if (backedUpFiles.length > 0) {
+  // 8. 완료 메시지
+  const totalFiles = backedUpFiles.length;
+  const totalFolders = backedUpFolders.length;
+  const totalFolderFiles = backedUpFolders.reduce((sum, f) => sum + f.fileCount, 0);
+
+  if (totalFiles > 0 || totalFolders > 0) {
     console.log('═══════════════════════════════════════════════════════════');
-    console.log(`  ✅ 백업 완료! (${backedUpFiles.length}개 파일)`);
+    console.log(`  ✅ 백업 완료!`);
+    console.log(`     파일: ${totalFiles}개 | 폴더: ${totalFolders}개 (${totalFolderFiles}개 파일)`);
     console.log('═══════════════════════════════════════════════════════════');
     console.log('');
     console.log('📁 백업 위치:');
     console.log(`   ${backupDir}`);
     console.log('');
-    console.log('📄 백업된 파일:');
-    for (const file of backedUpFiles) {
-      console.log(`   • ${file.dated}`);
-      console.log(`   • ${file.latest}`);
+
+    if (backedUpFiles.length > 0) {
+      console.log('📄 백업된 파일:');
+      for (const file of backedUpFiles) {
+        console.log(`   • ${file.latest}`);
+      }
+    }
+
+    if (backedUpFolders.length > 0) {
+      console.log('');
+      console.log('📂 백업된 폴더:');
+      for (const folder of backedUpFolders) {
+        console.log(`   • ${folder.name}/ (${folder.fileCount}개)`);
+      }
     }
     console.log('');
   } else {
-    console.log('⚠️  백업된 파일이 없습니다.');
+    console.log('⚠️  백업된 항목이 없습니다.');
   }
 
-  return backedUpFiles;
+  return { files: backedUpFiles, folders: backedUpFolders };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -247,7 +328,7 @@ async function backupMemory() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 backupMemory()
-  .then((files) => {
+  .then(() => {
     process.exit(0);
   })
   .catch((err) => {
