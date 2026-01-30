@@ -13,7 +13,9 @@
     "checklist:weekly": "python scripts/weekly-checklist.py",
     "checklist:monthly": "python scripts/monthly-checklist.py",
     "backup-memory": "node scripts/backup-memory.js",
-    "save-conversation": "node scripts/save-conversation.js"
+    "save-conversation": "node scripts/save-conversation.js",
+    "memory:rebuild": "python tools/rebuild_team_memory_indexes_simple.py",
+    "memory:lint": "python tools/lint_team_memory.py"
   },
   "engines": {
     "node": "20.x"

@@ -1,0 +1,41 @@
+name: team-memory Lint
+
+on:
+  pull_request:
+    paths:
+      - '.claude/team-memory/**'
+  push:
+    branches:
+      - main
+    paths:
+      - '.claude/team-memory/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run team-memory lint
+        run: python tools/lint_team_memory.py
+
+      - name: Verify indexes are up-to-date
+        run: |
+          # Rebuild indexes
+          python tools/rebuild_team_memory_indexes_simple.py
+
+          # Check for uncommitted changes
+          if [ -n "$(git status --porcelain .claude/team-memory/)" ]; then
+            echo "❌ Indexes are out of date. Run 'python tools/rebuild_team_memory_indexes_simple.py' and commit."
+            git diff .claude/team-memory/
+            exit 1
+          fi
+
+          echo "✅ Indexes are up-to-date"
