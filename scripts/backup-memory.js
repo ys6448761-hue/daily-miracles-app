@@ -41,7 +41,8 @@ const CONFIG = {
   sourceFolders: [
     'decisions',
     'learnings',
-    'conversations'
+    'conversations',
+    'playbooks'
   ],
 
   // 소스 폴더 (프로젝트 루트 기준)
