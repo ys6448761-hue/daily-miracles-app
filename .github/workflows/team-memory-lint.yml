@@ -1,4 +1,4 @@
-name: team-memory Lint
+name: team-memory Gate (A-3)
 
 on:
   pull_request:
@@ -11,31 +11,65 @@ on:
       - '.claude/team-memory/**'
 
 jobs:
-  lint:
+  gate:
     runs-on: ubuntu-latest
+    name: rebuild → drift → lint
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for git diff
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Run team-memory lint
-        run: python tools/lint_team_memory.py
-
-      - name: Verify indexes are up-to-date
+      # Step 1: Rebuild indexes
+      - name: 1. Rebuild indexes
         run: |
-          # Rebuild indexes
+          echo "=== Step 1: Rebuilding indexes ==="
           python tools/rebuild_team_memory_indexes_simple.py
 
-          # Check for uncommitted changes
-          if [ -n "$(git status --porcelain .claude/team-memory/)" ]; then
-            echo "❌ Indexes are out of date. Run 'python tools/rebuild_team_memory_indexes_simple.py' and commit."
-            git diff .claude/team-memory/
+      # Step 2: Drift check (index must be committed)
+      - name: 2. Drift check
+        run: |
+          echo "=== Step 2: Checking for uncommitted index changes ==="
+          if [ -n "$(git status --porcelain .claude/team-memory/*/index.md)" ]; then
+            echo ""
+            echo "❌ DRIFT DETECTED!"
+            echo ""
+            echo "Index files have uncommitted changes after rebuild."
+            echo "This means you added entries to detail files but didn't commit the index."
+            echo ""
+            echo "To fix:"
+            echo "  1. Run: python tools/rebuild_team_memory_indexes_simple.py"
+            echo "  2. Commit the updated index.md files"
+            echo ""
+            echo "Changed files:"
+            git status --porcelain .claude/team-memory/*/index.md
+            echo ""
+            echo "Diff:"
+            git diff .claude/team-memory/*/index.md
             exit 1
           fi
+          echo "✅ No drift detected - indexes are up to date"
 
-          echo "✅ Indexes are up-to-date"
+      # Step 3: Lint
+      - name: 3. Lint
+        run: |
+          echo "=== Step 3: Running lint checks ==="
+          python tools/lint_team_memory.py
+
+      - name: Gate passed
+        run: |
+          echo ""
+          echo "═══════════════════════════════════════════════════════════"
+          echo "  ✅ team-memory Gate PASSED"
+          echo "═══════════════════════════════════════════════════════════"
+          echo ""
+          echo "  1. Rebuild: OK"
+          echo "  2. Drift:   OK (indexes committed)"
+          echo "  3. Lint:    OK"
+          echo ""
