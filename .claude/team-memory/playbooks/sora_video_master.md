@@ -5,6 +5,40 @@
 
 ---
 
+## VIDEO SIZE & ASPECT RATIO (Must Specify)
+
+### Platform-Specific Sizes
+
+| Platform | Aspect Ratio | Resolution | Use Case |
+|----------|--------------|------------|----------|
+| **Instagram Reels** | 9:16 (vertical) | 1080x1920 | 30초 홍보영상 기본 |
+| **YouTube Shorts** | 9:16 (vertical) | 1080x1920 | 숏폼 콘텐츠 |
+| **Instagram Feed** | 1:1 (square) | 1080x1080 | 피드 게시물 |
+| **YouTube Standard** | 16:9 (horizontal) | 1920x1080 | 긴 영상 |
+| **TikTok** | 9:16 (vertical) | 1080x1920 | 틱톡 업로드 |
+
+### Default for 30-Second Promo Videos
+
+```
+ALWAYS specify in prompt:
+- Aspect ratio: 9:16 (vertical/portrait)
+- Resolution: 1080x1920
+- Duration: 30 seconds (or specific unit duration)
+```
+
+### Prompt Example for Size
+
+```
+[Scene description]
+
+Technical specs:
+- Aspect ratio: 9:16 (vertical)
+- Resolution: 1080x1920
+- Duration: 8 seconds
+```
+
+---
+
 ## MANDATORY RULES (Must Include in Every Prompt)
 
 ### 1. NO TEXT ON SCREEN
@@ -60,6 +94,11 @@ Logo rules:
 ```
 [Scene description here]
 
+TECHNICAL SPECS:
+- Aspect ratio: 9:16 (vertical)
+- Resolution: 1080x1920
+- Duration: [X seconds]
+
 CRITICAL CONSTRAINTS:
 - NO subtitles, NO captions, NO closed-captions
 - NO readable on-screen text (including UI)
@@ -68,7 +107,6 @@ CRITICAL CONSTRAINTS:
 - Leave clean negative space for logo overlay (do not bake logo)
 
 Style: [cinematic/warm/soft lighting/etc.]
-Duration: [X seconds]
 ```
 
 ---
@@ -77,8 +115,10 @@ Duration: [X seconds]
 
 | Mistake | Correct Approach |
 |---------|------------------|
+| **Wrong aspect ratio** | Always specify "9:16 vertical" for Reels/Shorts |
+| **Size not specified** | Include "1080x1920" resolution in prompt |
 | [alarm ringing] text appears | Remove bracketed descriptions from prompt |
-| 3D mascot generated | Explicitly state "flat 2D hand-drawn watercolor" |
+| 3D mascot generated | Explicitly state "flat 2D hand-drawn watercolor (NOT 3D, NOT Pixar)" |
 | Readable phone UI | Specify "abstract unreadable glyphs only" |
 | Logo burned into video | "Leave clean negative space for logo overlay" |
 | Subtitles appear | Add "NO subtitles/captions" to constraints |
@@ -106,13 +146,24 @@ Duration: [X seconds]
 
 Before submitting Sora prompt:
 
+### Technical Specs
+- [ ] Aspect ratio specified? (9:16 for Reels/Shorts)
+- [ ] Resolution specified? (1080x1920)
+- [ ] Duration specified? (per unit or total)
+
+### Text & UI
 - [ ] "NO subtitles/captions" explicitly stated?
 - [ ] "NO readable text" explicitly stated?
 - [ ] Phone UI described as "abstract glyphs"?
-- [ ] Mascot described as "flat 2D hand-drawn watercolor"?
-- [ ] Anti-3D keywords included (NOT 3D, NOT Pixar)?
-- [ ] Logo space instruction for Unit 4?
 - [ ] No bracketed sound descriptions like [alarm ringing]?
+
+### Mascot Style
+- [ ] Mascot described as "flat 2D hand-drawn watercolor"?
+- [ ] Anti-3D keywords included (NOT 3D, NOT Pixar, NOT plush)?
+
+### Logo
+- [ ] Logo space instruction for Unit 4?
+- [ ] "Leave clean negative space" specified?
 
 ---
 
@@ -121,6 +172,7 @@ Before submitting Sora prompt:
 | Date | Change | Author |
 |------|--------|--------|
 | 2025-01-30 | Initial playbook creation | Code |
+| 2025-01-30 | Added video size & aspect ratio rules (9:16, 1080x1920) | Code |
 
 ---
 
