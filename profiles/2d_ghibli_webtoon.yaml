@@ -1,0 +1,280 @@
+# 2D Ghibli+Webtoon Profile v1.0
+# Track: 2D (지브리 + 한국 웹툰 융합 스타일)
+# Purpose: Sora와 2D 트랙 섞임 방지
+
+version: "1.0"
+track: "2d_ghibli_webtoon"
+lastUpdated: "2026-02-01"
+
+# ===========================================
+# 스타일 정의
+# ===========================================
+style:
+  name: "Ghibli + Korean Webtoon Fusion"
+  description: "100% 순수 2D 애니메이션, 지브리 배경 + 한국 웹툰 캐릭터"
+  technique: "Cel animation, hand-drawn line art"
+  colorPalette: "Warm pastel watercolor"
+
+# ===========================================
+# 기술 사양
+# ===========================================
+technical:
+  aspectRatio: "9:16"
+  resolution: "1080x1920"
+  unitDuration: "5s"
+  rhythm:
+    beatA: "0-2s (Hook)"
+    beatB: "2-4s (Action)"
+    beatC: "4-5s (Hold)"
+
+# ===========================================
+# 자동 주입 문장 (Injection)
+# ===========================================
+injection:
+  styleLock: |
+    Strict 2D hand-drawn animation style.
+    Ink line art + warm watercolor wash + paper grain texture.
+    Ghibli-inspired warmth mixed with Korean manhwa linework.
+    Lighting: Flat lighting (No heavy shadows).
+
+  baseRules:
+    line1: |
+      9:16 vertical, pure 2D animation, Ghibli+Korean webtoon fusion style,
+      NO 3D elements, cel animation aesthetic, hand-drawn line art with visible brush strokes.
+    line2: |
+      Color: warm pastel watercolor, flat color blocks with subtle paper texture,
+      NO gradients resembling 3D shading, edge-lit style like Studio Ghibli background paintings.
+    line3: |
+      Main: Sowoni(20–22, warm smile, pastel casual clothes, consistent 2D face, simple anime eye style),
+      object: wish paper airplane (origami-style flat rendering),
+      SAFE SPACE action + Yeosu sea background (painted backdrop style).
+
+  textZero: |
+    NO readable text, NO subtitles, NO logos, NO watermark.
+    Phone screens: ONLY abstract soft color blocks + bubble shapes.
+
+  waterRule: |
+    sea painted as flat backdrop (no 3D water simulation)
+
+# ===========================================
+# 금지 키워드 (Forbidden) - 70+ 키워드
+# ===========================================
+forbidden:
+  tier1_reject:
+    - "realistic"
+    - "photorealistic"
+    - "3D"
+    - "CGI"
+    - "render"
+    - "Unreal"
+    - "Unity"
+    - "cinema 4D"
+    - "octane render"
+    - "Blender"
+
+  tier2_replace:
+    light: ["hand-painted glow", "watercolor wash"]
+    shadow: ["cel-shaded shadow", "flat shadow"]
+    reflection: ["painted highlight", "simple shine mark"]
+    depth: ["layered planes", "painted distance"]
+    camera_move: ["2D pan", "2D zoom"]
+
+  tier3_context:
+    glow:
+      ok: "soft painted glow"
+      ng: "glow (단독 사용)"
+    blur:
+      ok: "hand-drawn motion blur"
+      ng: "depth of field blur"
+
+  negativePrompt: |
+    photorealistic, 3D render, CGI, Unreal Engine, Unity, Blender,
+    cinematic lighting, lens flare, depth of field, PBR materials,
+    realistic shading, subsurface scattering, ambient occlusion,
+    ray tracing, global illumination, volumetric fog, HDR, bloom effect,
+    chromatic aberration, motion blur, camera shake, handheld camera,
+    live-action, real camera, bokeh, DSLR, film grain, vignette,
+    color grading, LUT, physically-based rendering, metallic, chrome,
+    reflective surface, glossy, wet surface, glass material, mirror,
+    specular highlights, caustics, refraction, translucent,
+    photoreal skin, realistic hair physics, cloth simulation,
+    particle effects, dynamic lighting, shadow mapping, normal mapping,
+    bump mapping, displacement, tessellation
+
+# ===========================================
+# 필수 포함 문구 (Required)
+# ===========================================
+required:
+  styleKeywords:
+    minimum: 3
+    options:
+      - "Studio Ghibli background painting style"
+      - "Korean webtoon character design"
+      - "Hayao Miyazaki soft color palette"
+      - "Naver webtoon flat rendering"
+      - "Spirited Away ambient mood"
+      - "True Beauty character proportion"
+      - "My Neighbor Totoro nature aesthetic"
+      - "Lore Olympus pastel blocking"
+      - "Kiki's Delivery Service cozy atmosphere"
+      - "Solo Leveling action clarity with 2D lines"
+
+  purityChecklist:
+    - "2D / cel / Ghibli / webtoon 키워드"
+    - "NEGATIVE에 3D 엔진/재질 포함"
+    - "조명: hand-painted / watercolor"
+    - "카메라: 2D pan / zoom"
+    - "바다: painted backdrop"
+    - "캐릭터: anime line art / webtoon"
+
+# ===========================================
+# 로고 Safe-Area 규칙
+# ===========================================
+logoSafeArea:
+  position: "top or bottom negative space"
+  requirement: "Beat C (4-5s)에 여백 확보"
+  description: |
+    5초 유닛의 마지막 0.8~1.0초는 홀드(Hold)를 강제하여
+    후편집에서 자막이나 CTA를 넣을 공간을 확보.
+
+# ===========================================
+# 캐릭터 잠금
+# ===========================================
+characters:
+  sowoni:
+    age: "20-22세 (성인)"
+    style: "simple anime line art, 웹툰 스타일 큰 눈"
+    forbidden:
+      - "school uniform"
+      - "minor"
+      - "teen"
+      - "realistic facial anatomy"
+      - "motion capture fluidity"
+    presets:
+      - "SPRING_CASUAL"
+      - "SUMMER_SEASIDE"
+      - "AUTUMN_COZY"
+      - "WINTER_COAT"
+      - "NIGHT_WALK"
+
+  aurum:
+    description: "황금 씨앗 거북이 정령"
+    features:
+      - "scute plates (6-10개)"
+      - "crescent-rune mark"
+      - "watercolor halo ring"
+    forbidden:
+      - "human face"
+      - "teeth"
+      - "eyelashes"
+      - "jewelry"
+      - "volumetric light rays"
+    presets:
+      - "BASE"
+      - "OBSERVE"
+      - "GUIDE"
+      - "SPARKLE"
+      - "COZY_BREEZE"
+      - "NIGHT_CALM"
+
+# ===========================================
+# 배경 시스템
+# ===========================================
+backgrounds:
+  generic:
+    - code: "GN01"
+      name: "바닷가 산책로"
+    - code: "GN02"
+      name: "조용한 골목"
+    - code: "GN03"
+      name: "카페 창가"
+    - code: "GN04"
+      name: "공원 벤치"
+    - code: "GN05"
+      name: "밤 거리"
+    - code: "GN06"
+      name: "일출/일몰 해변"
+
+  yeosu:
+    rules:
+      landmarkMinimum: 2
+      anchorMinimum: 1
+    presets:
+      - code: "YS01"
+        name: "오동도 해안길"
+        emotion: "설렘, 시작"
+      - code: "YS02"
+        name: "해상케이블카"
+        emotion: "이동, 여정"
+      - code: "YS03"
+        name: "돌산공원 야경"
+        emotion: "여운, 마무리"
+      - code: "YS04"
+        name: "돌산대교 야경"
+        emotion: "흐름, 전환"
+      - code: "YS05"
+        name: "향일암 일출"
+        emotion: "기적, 소원"
+        anchor: true
+      - code: "YS06"
+        name: "빅오 (Big-O)"
+        emotion: "시스템, 정답"
+      - code: "YS07"
+        name: "아쿠아플라넷"
+        emotion: "호기심, 발견"
+      - code: "YS08"
+        name: "진남관"
+        emotion: "역사, 무게감"
+      - code: "YS09"
+        name: "종포해양공원"
+        emotion: "산책, 일상"
+      - code: "YS10"
+        name: "여수수산시장"
+        emotion: "활기, 군중"
+
+# ===========================================
+# 컬러 스크립트
+# ===========================================
+colorScript:
+  pain:
+    keywords:
+      - "Cool grey tones"
+      - "Desaturated watercolors"
+      - "Blue shadows"
+    description: "차갑고, 채도 낮고, 그늘진 느낌"
+
+  solution:
+    keywords:
+      - "Warm golden wash"
+      - "Bright pastel colors"
+      - "Soft sunlight bloom"
+    description: "따뜻하고, 파스텔톤, 햇살 느낌"
+
+# ===========================================
+# LINT 검증 규칙
+# ===========================================
+lintRules:
+  required:
+    - "2D/cel/Ghibli/webtoon 키워드 포함"
+    - "NEGATIVE 프롬프트에 3D 엔진/재질 포함"
+    - "조명이 hand-painted/watercolor"
+    - "카메라가 2D pan/zoom"
+    - "바다가 painted backdrop"
+    - "TEXT ZERO 준수"
+
+  qcChecklist:
+    - "플리커링 없음"
+    - "손가락/눈 개수 정상"
+    - "감정-색상 매칭 (Pain=차가움, Solution=따뜻함)"
+    - "텍스트 제로 확인"
+    - "3박자 리듬 확인"
+
+# ===========================================
+# 이 프로필과 충돌하는 트랙
+# ===========================================
+conflicts:
+  - "sora_cinematic"
+  - description: |
+      2D 지브리 웹툰 트랙과 Sora 시네마틱 트랙은
+      동일 영상에서 혼용 불가.
+      2D 순수성 규칙과 시네마틱 조명/카메라 규칙이 상충.

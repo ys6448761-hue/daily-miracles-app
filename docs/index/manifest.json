@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-01-29T08:06:15.258Z",
+  "generated_at": "2026-01-31T22:40:58.219Z",
   "generator": "generate-manifest.js",
-  "total_count": 122,
+  "total_count": 132,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -105,6 +105,124 @@
       "checksum": "edc68ba7"
     },
     {
+      "id": "DOC-20260131_파크_2d_기술지원",
+      "path": "docs/ssot/sources/2026-02-01/20260131_파크_2d_기술지원.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "2026-02-01",
+        "소원"
+      ],
+      "owner": "team",
+      "status": "보강 내용",
+      "title": "파크 2D 영상 기술지원",
+      "created_at": "2026-02-01",
+      "checksum": "a0d6b37a"
+    },
+    {
+      "id": "DOC-20260201_노션_DB_구조_3DB",
+      "path": "docs/ssot/sources/2026-02-01/20260201_노션_DB_구조_3DB.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "2026-02-01"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "노션 DB 구조 (3DB) - 자동화 필수 속성",
+      "created_at": "2026-02-01",
+      "checksum": "b6b6f406"
+    },
+    {
+      "id": "DOC-20260201_드라이브_공유폴더_마스터가이드",
+      "path": "docs/ssot/sources/2026-02-01/20260201_드라이브_공유폴더_마스터가이드.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "2026-02-01",
+        "소원"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "드라이브 공유폴더 마스터가이드 (MASTER GUIDELINES V7.0 포함)",
+      "created_at": "2026-02-01",
+      "checksum": "351d05a9"
+    },
+    {
+      "id": "DOC-AURORA5_SORA_FINAL_v10",
+      "path": "docs/ssot/sources/2026-02-01/AURORA5_SORA_FINAL_v1.0.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "2026-02-01",
+        "소원",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "Aurora5 Sora 영상 제작 최종 자료 v1.0",
+      "created_at": "2026-02-01",
+      "checksum": "d272a8bc"
+    },
+    {
+      "id": "DOC-Code_종합지시서",
+      "path": "docs/ssot/sources/2026-02-01/Code_종합지시서.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "2026-02-01",
+        "aurora"
+      ],
+      "owner": "comi",
+      "status": "active",
+      "title": "Code 종합지시서",
+      "created_at": "2026-02-01",
+      "checksum": "e35ff97e"
+    },
+    {
+      "id": "DOC-GitHub_저장소_활용_가이드",
+      "path": "docs/ssot/sources/2026-02-01/GitHub_저장소_활용_가이드.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "2026-02-01"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "GitHub 저장소 활용 가이드",
+      "created_at": "2026-02-01",
+      "checksum": "6ec89407"
+    },
+    {
+      "id": "DOC-MIRACLE_MASTER_GUIDELINES",
+      "path": "docs/2d/v7.0/MIRACLE_MASTER_GUIDELINES.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "2d",
+      "tags": [
+        "v7.0",
+        "소원"
+      ],
+      "owner": "code",
+      "status": "superseded",
+      "title": "MIRACLE MASTER GUIDELINES v7.0",
+      "created_at": "2026-01-31",
+      "checksum": "63b3e84a"
+    },
+    {
       "id": "DOC-airtable-schema",
       "path": "docs/airtable-schema.md",
       "type": "document",
@@ -117,7 +235,7 @@
       "owner": "comi",
       "status": "| wishes_processed",
       "title": "Airtable 테이블 스키마 (ACT 관제탑)",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "4976b285"
     },
     {
@@ -133,7 +251,7 @@
       "owner": "team",
       "status": "active",
       "title": "Airtable Wish Intake 스키마",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "a8baafc3"
     },
     {
@@ -149,7 +267,7 @@
       "owner": "jemi",
       "status": "NEW, ACK, IN_PROGRESS, APPROVED, STARTED, DONE, ESCALATED",
       "title": "Airtable Wishes Inbox 테이블 스키마",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "ca0bf766"
     },
     {
@@ -166,7 +284,7 @@
       "owner": "team",
       "status": "active",
       "title": "온라인 문제 해결 소원 API v0.1",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "266802c0"
     },
     {
@@ -183,7 +301,7 @@
       "owner": "code",
       "status": "active",
       "title": "온라인 소원 실현 항해 API 설계안 v0.1",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "ed723688"
     },
     {
@@ -199,7 +317,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Aurora 5 캐릭터 생성 프롬프트 패키지 v2.1",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "64f0a2d2"
     },
     {
@@ -217,7 +335,7 @@
       "owner": "team",
       "status": "active",
       "title": "최수민방식 치트시트",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "9f7529c4"
     },
     {
@@ -235,7 +353,7 @@
       "owner": "team",
       "status": "active",
       "title": "Claude Desktop MCP 서버 설정 가이드",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "44ccac1b"
     },
     {
@@ -249,7 +367,7 @@
       "owner": "team",
       "status": "active",
       "title": "README",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "60a0b4af"
     },
     {
@@ -266,7 +384,7 @@
       "owner": "ceo",
       "status": "active",
       "title": "Decisions Index",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "b355d262"
     },
     {
@@ -282,7 +400,7 @@
       "owner": "code",
       "status": "archived",
       "title": "Daily Miracles MVP 배포 체크리스트",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "0202a43e"
     },
     {
@@ -299,7 +417,7 @@
       "owner": "comi",
       "status": "archived",
       "title": "하루하루의 기적 - 성장 로드맵",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "881f0936"
     },
     {
@@ -317,7 +435,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "📋 Aurora5 Judge 프롬프트 가이드",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "513de9dd"
     },
     {
@@ -334,7 +452,7 @@
       "owner": "team",
       "status": "active",
       "title": "Knowledge Cards (지식카드)",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "a4d0a8e8"
     },
     {
@@ -351,7 +469,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "하루하루의 기적 - 출항 선언문",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "c6b4219e"
     },
     {
@@ -372,7 +490,7 @@
       "owner": "code",
       "status": "active",
       "title": "최수민님 방식 완전 정리",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "3722b629"
     },
     {
@@ -390,7 +508,7 @@
       "owner": "rumi",
       "status": "|------",
       "title": "재미 온보딩 가이드 v1.1",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "00a62da9"
     },
     {
@@ -409,7 +527,7 @@
       "owner": "rumi",
       "status": "대응",
       "title": "재미 온보딩 가이드 v1.2",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "1004a06f"
     },
     {
@@ -425,7 +543,7 @@
       "owner": "comi",
       "status": "archived",
       "title": "DEC 운영 매뉴얼",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "1b4361fe"
     },
     {
@@ -443,7 +561,7 @@
       "owner": "code",
       "status": "active",
       "title": "Drive → GitHub Sync Service 설치 가이드",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "eb6394bc"
     },
     {
@@ -461,7 +579,7 @@
       "owner": "comi",
       "status": "항목",
       "title": "SENS 설정 가이드 (Naver Cloud Platform)",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "fea945f4"
     },
     {
@@ -478,7 +596,7 @@
       "owner": "code",
       "status": "active",
       "title": "Daily Miracles 온라인 소원 서비스 전체 흐름도",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "e28e803e"
     },
     {
@@ -494,7 +612,7 @@
       "owner": "ceo",
       "status": "✅ 비활성화 정상",
       "title": "양자 기획서 - 기적 금고 Phase 3 증빙 발행 시스템",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "fe4f4df4"
     },
     {
@@ -510,7 +628,7 @@
       "owner": "comi",
       "status": "active",
       "title": "하루하루의 기적 - 지식 저장소",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "28cf200e"
     },
     {
@@ -528,7 +646,7 @@
       "owner": "comi",
       "status": "active",
       "title": "한국 세무회계 AI 도구 조사 및 연동 가능성 분석",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "5af76d35"
     },
     {
@@ -545,7 +663,7 @@
       "owner": "comi",
       "status": "active",
       "title": "후기 수집 구조 설계서",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "bbd74711"
     },
     {
@@ -562,7 +680,7 @@
       "owner": "team",
       "status": "active",
       "title": "🎯 30일 기적 로드맵 시스템",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "a4207922"
     },
     {
@@ -580,7 +698,7 @@
       "owner": "team",
       "status": "active",
       "title": "30일 기적 로드맵 API 문서",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "4d39bd13"
     },
     {
@@ -599,8 +717,60 @@
       "owner": "code",
       "status": "항목",
       "title": "GA4 설정 가이드",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "1c318f9b"
+    },
+    {
+      "id": "DOC-VIDEO_MASTER",
+      "path": "docs/sora/v1.1/VIDEO_MASTER.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "sora",
+      "tags": [
+        "v1.1",
+        "소원",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "Sora Video Master v1.1",
+      "created_at": "2026-01-31",
+      "checksum": "f4a1b1d5"
+    },
+    {
+      "id": "DOC-CHANGELOG",
+      "path": "docs/ssot/CHANGELOG.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "SSOT 변경 로그 (CHANGELOG)",
+      "created_at": "2026-01-31",
+      "checksum": "457ae6bf"
+    },
+    {
+      "id": "DOC-SOURCES_INDEX",
+      "path": "docs/ssot/SOURCES_INDEX.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "트랙",
+      "title": "SSOT 원문→정본 반영 매핑표",
+      "created_at": "2026-01-31",
+      "checksum": "1e550c3e"
     },
     {
       "id": "DOC-quantum-planning-method",
@@ -615,7 +785,7 @@
       "owner": "comi",
       "status": "active",
       "title": "양자 기획법 (Quantum Planning Method) v1.0",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "b360b1b0"
     },
     {
@@ -633,7 +803,7 @@
       "owner": "code",
       "status": "|----",
       "title": "에이전트 인덱스",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "92a49e80"
     },
     {
@@ -649,7 +819,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "대화 저장소 워크플로우",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "55221cd3"
     },
     {
@@ -669,7 +839,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Manifest 자동 생성 시스템",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "d242fbfe"
     },
     {
@@ -687,7 +857,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Aurora 5 토론 시스템 안내문",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "49189a4d"
     },
     {
@@ -705,7 +875,7 @@
       "owner": "code",
       "status": "분석 중 / 분석 완료",
       "title": "카카오 알림톡 템플릿 설계서",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "75c90dee"
     },
     {
@@ -722,7 +892,7 @@
       "owner": "ceo",
       "status": "active",
       "title": "30초 홍보영상 프롬프트 패키지 v1.0",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "840434d0"
     },
     {
@@ -739,7 +909,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Wix 팀 소개 페이지 콘텐츠",
-      "created_at": "2026-01-29",
+      "created_at": "2026-01-31",
       "checksum": "cb6751ba"
     },
     {

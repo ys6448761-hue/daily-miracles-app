@@ -4,6 +4,10 @@
     "DOC-AURORA5_CHARACTER_PROMPTS_V3",
     "DOC-weekly_promotion_guide",
     "DOC-tag_taxonomy",
+    "DOC-20260131_파크_2d_기술지원",
+    "DOC-20260201_드라이브_공유폴더_마스터가이드",
+    "DOC-AURORA5_SORA_FINAL_v10",
+    "DOC-MIRACLE_MASTER_GUIDELINES",
     "DOC-airtable-schema",
     "DOC-airtable-wish-intake-schema",
     "DOC-airtable-wishes-inbox-schema",
@@ -23,6 +27,7 @@
     "DOC-REVIEW_COLLECTION_SYSTEM",
     "DOC-ROADMAP_API",
     "DOC-GA4_SETUP_GUIDE",
+    "DOC-VIDEO_MASTER",
     "DOC-agents-index",
     "DOC-Aurora5_토론시스템_안내문",
     "DOC-alimtalk-templates-design",
@@ -99,6 +104,8 @@
   "aurora": [
     "DOC-DECISIONS_LOG",
     "DOC-AURORA5_CHARACTER_PROMPTS_V3",
+    "DOC-AURORA5_SORA_FINAL_v10",
+    "DOC-Code_종합지시서",
     "DOC-AURORA5_CHARACTER_PROMPTS",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
     "DOC-GROWTH-ROADMAP",
@@ -110,6 +117,9 @@
     "DOC-sens-setup-guide",
     "DOC-README",
     "DOC-ROADMAP_API",
+    "DOC-VIDEO_MASTER",
+    "DOC-CHANGELOG",
+    "DOC-SOURCES_INDEX",
     "DOC-agents-index",
     "DOC-manifest-system",
     "DOC-Aurora5_토론시스템_안내문",
@@ -199,6 +209,17 @@
     "DOC-manifest-system",
     "DOC-SYS-2025-1230-LUMI-001_Airtabl",
     "DOC-20251229-VPB"
+  ],
+  "2026-02-01": [
+    "DOC-20260131_파크_2d_기술지원",
+    "DOC-20260201_노션_DB_구조_3DB",
+    "DOC-20260201_드라이브_공유폴더_마스터가이드",
+    "DOC-AURORA5_SORA_FINAL_v10",
+    "DOC-Code_종합지시서",
+    "DOC-GitHub_저장소_활용_가이드"
+  ],
+  "v7.0": [
+    "DOC-MIRACLE_MASTER_GUIDELINES"
   ],
   "api": [
     "DOC-online-wish-problem-api",
@@ -363,6 +384,13 @@
     "DOC-20260101-99J",
     "DOC-2025-12-29_Part6_소원착지전략",
     "DOC-20251229-SRH"
+  ],
+  "v1.1": [
+    "DOC-VIDEO_MASTER"
+  ],
+  "ssot": [
+    "DOC-CHANGELOG",
+    "DOC-SOURCES_INDEX"
   ],
   "system": [
     "DOC-agents-index",

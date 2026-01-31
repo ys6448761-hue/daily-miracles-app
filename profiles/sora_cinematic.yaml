@@ -1,0 +1,179 @@
+# Sora Cinematic Profile v1.0
+# Track: Sora (시네마틱 한국 드라마 스타일)
+# Purpose: Sora와 2D 트랙 섞임 방지
+
+version: "1.0"
+track: "sora_cinematic"
+lastUpdated: "2026-02-01"
+
+# ===========================================
+# 스타일 정의
+# ===========================================
+style:
+  name: "Cinematic Korean Drama"
+  description: "한국 드라마 미학의 시네마틱 영상"
+  colorAxis:
+    primary: "#667eea"  # Purple
+    secondary: "#F5A7C6"  # Pink
+    gradient: "purple-to-pink"
+
+# ===========================================
+# 기술 사양
+# ===========================================
+technical:
+  aspectRatio: "9:16"
+  resolution: "1080x1920"
+  fps: 24
+  duration:
+    unit1_3: "8s"
+    unit4: "6s"
+
+# ===========================================
+# 자동 주입 문장 (Injection)
+# ===========================================
+injection:
+  globalTechSuffix: |
+    1080x1920, 9:16 vertical, cinematic Korean drama aesthetic,
+    shallow depth of field, filmic lighting, 24fps.
+    Avoid readable on-screen text and watermarks; add captions in post.
+
+  mascotLock: |
+    A consistent tiny star mascot: 2D hand-drawn watercolor style,
+    minimal face, purple-to-pink aura, gentle floating motion with subtle particles.
+
+  unit4Suffix: |
+    Leave clean negative space at bottom for logo overlay;
+    end on a stable frame hold.
+
+# ===========================================
+# 금지 키워드 (Forbidden)
+# ===========================================
+forbidden:
+  tier1_reject:
+    - "readable text"
+    - "subtitle"
+    - "caption"
+    - "watermark"
+    - "title card"
+    - "logo on screen"
+
+  tier2_avoid:
+    - "3D render"
+    - "CGI"
+    - "Unreal Engine"
+    - "Unity"
+    - "Blender"
+
+# ===========================================
+# 필수 포함 문구 (Required)
+# ===========================================
+required:
+  allUnits:
+    - "1080x1920"
+    - "9:16"
+    - "cinematic Korean drama"
+    - "shallow depth of field"
+    - "Avoid readable on-screen text"
+
+  unit3_4:
+    - "consistent tiny star mascot"
+    - "2D hand-drawn watercolor"
+    - "purple-to-pink aura"
+
+  unit4:
+    - "negative space"
+    - "logo overlay"
+    - "stable frame hold"
+
+# ===========================================
+# 로고 Safe-Area 규칙
+# ===========================================
+logoSafeArea:
+  position: "bottom center"
+  requirement: "Leave clean negative space at bottom"
+  timing: "Last 0.8-1.0s stable frame"
+  description: |
+    Unit 4에서 로고 오버레이를 위한 깨끗한 여백 확보.
+    영상 마지막 0.8~1.0초는 프레임 안정(카메라 흔들림 최소)
+
+# ===========================================
+# 컬러 스크립트
+# ===========================================
+colorScript:
+  pain:
+    units: [1, 2]
+    keywords:
+      - "muted"
+      - "desaturated"
+      - "melancholic"
+      - "gray-blue"
+      - "low-key"
+      - "dim lighting"
+    note: "보라-핑크는 거의 안 보이게 (아주 미세한 힌트만)"
+
+  solution:
+    units: [3, 4]
+    keywords:
+      - "warm"
+      - "purple-pink"
+      - "hopeful"
+      - "vibrant"
+      - "soft glow"
+      - "gentle glow"
+    note: "보라-핑크 그라데이션이 확장되어 전체 전환"
+
+# ===========================================
+# 유닛 구성 규칙
+# ===========================================
+unitStructure:
+  unit1:
+    duration: "8s"
+    phase: "PAIN"
+    role: "문제의 '정서' 한 방 (정적/클로즈업)"
+    mascot: false
+
+  unit2:
+    duration: "8s"
+    phase: "PAIN"
+    role: "문제의 '증폭' (몽타주/타임랩스)"
+    mascot: false
+
+  unit3:
+    duration: "8s"
+    phase: "SOLUTION"
+    role: "트리거(별 알림) + 희망 전환 시작"
+    mascot: true
+
+  unit4:
+    duration: "6s"
+    phase: "SOLUTION"
+    role: "행동 변화 + 동반자 + 로고"
+    mascot: true
+    logoSpace: true
+
+# ===========================================
+# LINT 검증 규칙
+# ===========================================
+lintRules:
+  required:
+    - "9:16, 1080x1920 포함"
+    - "Duration(8s/6s) 명시"
+    - "Camera shot/movement 포함"
+    - "Unit 3~4에 MASCOT_LOCK 포함"
+    - "Avoid readable on-screen text 포함"
+    - "Unit 4에 logo overlay 문구 포함"
+
+  recommended:
+    - "감정 메타포 1개 이상"
+    - "PAIN→SOLUTION 컬러 전환 명확"
+    - "유닛 간 연속성 유지"
+
+# ===========================================
+# 이 프로필과 충돌하는 트랙
+# ===========================================
+conflicts:
+  - "2d_ghibli_webtoon"
+  - description: |
+      Sora 시네마틱 트랙과 2D 지브리 웹툰 트랙은
+      동일 영상에서 혼용 불가. 각 트랙의 스타일 규칙이
+      상호 충돌함.

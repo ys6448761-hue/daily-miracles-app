@@ -1,0 +1,154 @@
+{
+  "version": "1.0.0",
+  "description": "SSOT 공통 린트 규칙 - Sora & 2D 트랙 통합",
+  "lastUpdated": "2026-02-01",
+
+  "global": {
+    "textZero": {
+      "enabled": true,
+      "description": "영상 내 가독성 있는 텍스트 금지",
+      "mustContain": [
+        "Avoid readable on-screen text",
+        "no readable text",
+        "NO readable text"
+      ],
+      "mustNotContain": [
+        "subtitle",
+        "caption",
+        "title card"
+      ]
+    },
+    "logoSafeArea": {
+      "enabled": true,
+      "description": "로고 오버레이용 여백 확보",
+      "mustContain": [
+        "negative space",
+        "logo overlay",
+        "clean space"
+      ]
+    },
+    "aspectRatio": {
+      "enabled": true,
+      "required": "9:16",
+      "resolution": "1080x1920",
+      "mustContain": [
+        "9:16",
+        "1080x1920"
+      ]
+    }
+  },
+
+  "sora": {
+    "version": "1.1",
+    "style": "cinematic",
+    "duration": {
+      "unit1-3": "8s",
+      "unit4": "6s",
+      "mustContain": ["8 seconds", "6 seconds", "Duration 8", "Duration 6"]
+    },
+    "camera": {
+      "mustContain": ["Camera:", "shot", "push-in", "dolly", "tracking", "50mm", "35mm"]
+    },
+    "mascot": {
+      "mustContainInUnit3-4": [
+        "consistent tiny star mascot",
+        "2D hand-drawn watercolor",
+        "purple-to-pink aura"
+      ]
+    },
+    "colorScript": {
+      "pain": ["muted", "desaturated", "melancholic", "gray-blue", "low-key"],
+      "solution": ["warm", "purple-pink", "hopeful", "vibrant", "glow"]
+    },
+    "techSuffix": {
+      "required": true,
+      "mustContain": [
+        "cinematic Korean drama aesthetic",
+        "shallow depth of field",
+        "filmic lighting",
+        "24fps"
+      ]
+    },
+    "forbidden": [
+      "readable text",
+      "watermark",
+      "subtitle",
+      "caption"
+    ]
+  },
+
+  "2d": {
+    "version": "7.0",
+    "style": "ghibli_webtoon",
+    "unitDuration": "5s",
+    "rhythm": {
+      "beatA": "0-2s",
+      "beatB": "2-4s",
+      "beatC": "4-5s"
+    },
+    "styleLock": {
+      "mustContain": [
+        "2D",
+        "hand-drawn",
+        "watercolor",
+        "cel animation",
+        "Ghibli",
+        "webtoon"
+      ]
+    },
+    "characterLock": {
+      "sowoni": {
+        "age": "20-22",
+        "mustContain": ["anime line art", "webtoon"],
+        "mustNotContain": ["school uniform", "minor", "teen"]
+      },
+      "aurum": {
+        "description": "황금 씨앗 거북이 정령",
+        "mustContain": ["scute plates", "rune mark", "halo"],
+        "mustNotContain": ["human face", "teeth", "eyelashes"]
+      }
+    },
+    "negative": {
+      "forbidden": [
+        "photorealistic",
+        "3D render",
+        "CGI",
+        "Unreal Engine",
+        "Unity",
+        "Blender",
+        "PBR",
+        "ray tracing",
+        "volumetric",
+        "metallic",
+        "glossy",
+        "realistic"
+      ]
+    },
+    "water": {
+      "mustContain": ["painted", "flat backdrop", "Ponyo"],
+      "mustNotContain": ["water simulation", "realistic ocean", "foam detail"]
+    },
+    "purityChecklist": [
+      "조명: hand-painted shadow / watercolor ambient",
+      "재질: matte paper texture / flat cel-shaded",
+      "카메라: 2D pan/zoom",
+      "공간: layered flat planes / painted backdrop",
+      "캐릭터: anime line art / webtoon proportion"
+    ]
+  },
+
+  "severity": {
+    "FAIL": {
+      "description": "필수 검증 실패 - 재생성 필요",
+      "blocksRelease": true
+    },
+    "WARN": {
+      "description": "권장 검증 실패 - 검토 권장",
+      "blocksRelease": false
+    },
+    "PASS": {
+      "description": "검증 통과",
+      "blocksRelease": false
+    }
+  }
+}

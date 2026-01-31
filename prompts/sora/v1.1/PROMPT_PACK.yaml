@@ -1,0 +1,258 @@
+# Sora Prompt Pack v1.1
+# Source: AURORA5_SORA_FINAL_v1.0.md
+# Total: 40 prompts (10 videos × 4 units)
+
+version: "1.1"
+lastUpdated: "2026-02-01"
+format:
+  aspectRatio: "9:16"
+  resolution: "1080x1920"
+  fps: 24
+
+globalTechSuffix: "1080x1920, 9:16 vertical, cinematic Korean drama aesthetic, shallow depth of field, filmic lighting, 24fps. Avoid readable on-screen text and watermarks; add captions in post."
+
+mascotLock: "A consistent tiny star mascot: 2D hand-drawn watercolor style, minimal face, purple-to-pink aura, gentle floating motion with subtle particles."
+
+videos:
+  - id: V01
+    title: "소원이의 하루"
+    theme: "일상의 피로"
+    units:
+      - unit: 1
+        duration: 8
+        phase: PAIN
+        prompt: "A tired Korean office worker in their 30s slowly wakes to an alarm in a dark bedroom, exhausted and rubbing their eyes; faint morning light barely leaks through curtains. Camera: close-up to medium, slow push-in, 50mm. Lighting/color: low-key, muted, desaturated, melancholic. Duration 8 seconds."
+      - unit: 2
+        duration: 8
+        phase: PAIN
+        prompt: "Montage: Korean commuters with blank expressions on a subway, office workers typing endlessly, clock hands spinning fast, papers piling up; time-lapse rhythm, trapped-in-routine feeling. Camera: fast-cut montage + timelapse inserts, 35mm. Lighting/color: desaturated, gray-blue, anxious energy. Duration 8 seconds."
+      - unit: 3
+        duration: 8
+        phase: SOLUTION
+        includeMascot: true
+        prompt: "Close-up of a smartphone in hand: a warm notification appears with a consistent tiny star mascot (2D hand-drawn watercolor, minimal face, purple-to-pink aura, gentle floating motion with subtle particles). The person's face softens into a small smile as purple-pink glow begins to spill from the phone into the room. Camera: tight close-up on phone then rack focus to face reflection, slow dolly in, 50mm. Lighting/color: hopeful transition, soft glow, purple-pink gradient emerging. Duration 8 seconds."
+      - unit: 4
+        duration: 6
+        phase: SOLUTION
+        includeMascot: true
+        includeLogoSpace: true
+        prompt: "Same person now walks confidently down a sunlit street, genuine smile; the consistent tiny star mascot floats beside them like a companion, leaving a subtle purple-pink particle trail. Camera: medium-wide, gentle tracking forward, 35mm. Lighting/color: vibrant purple-pink grade, warm uplifting atmosphere. Leave clean negative space at bottom for logo overlay; end on a stable frame hold. Duration 6 seconds."
+
+  - id: V02
+    title: "막막함 탈출"
+    theme: "정보 과부하"
+    units:
+      - unit: 1
+        duration: 8
+        phase: PAIN
+        prompt: "A stressed Korean professional in their 30s at a messy desk late at night, head in hands, crumpled papers and empty coffee cups; laptop glow in a dim room, overwhelmed expression. Camera: medium close-up, slow push-in, 50mm. Lighting/color: cinematic low-key, muted, melancholic. Duration 8 seconds."
+      - unit: 2
+        duration: 8
+        phase: PAIN
+        prompt: "Close-up hands typing; a search bar fills the screen with frantic scrolling results (unreadable generic text), the person's reflection in the monitor looks confused and tired; information overload visualized with quick cuts. Camera: tight close-up + rapid inserts, 35mm. Lighting/color: desaturated, anxious energy, flicker. Duration 8 seconds."
+      - unit: 3
+        duration: 8
+        phase: SOLUTION
+        includeMascot: true
+        prompt: "A beautiful animated 30-day roadmap unfolds on the phone like a treasure map, days lighting up as simple checkmarks; the consistent tiny star mascot appears as a guide, radiating purple-to-pink glow. The person's face shifts from confusion to hope. Camera: close-up on phone then tilt to face, gentle dolly, 50mm. Lighting/color: magical reveal, warm purple-pink gradient, soft glow. Duration 8 seconds."
+      - unit: 4
+        duration: 6
+        phase: SOLUTION
+        includeMascot: true
+        includeLogoSpace: true
+        prompt: "Satisfying sequence of checkboxes being ticked with gentle glow; final checkbox completes with a subtle celebration animation; the person smiles confidently while the consistent tiny star mascot does a happy dance beside the phone. Camera: macro inserts + medium close-up, 50mm. Lighting/color: warm purple-pink, triumphant. Leave clean negative space at bottom for logo overlay; end on a stable frame hold. Duration 6 seconds."
+
+  - id: V03
+    title: "혼자가 아니야"
+    theme: "외로움"
+    units:
+      - unit: 1
+        duration: 8
+        phase: PAIN
+        prompt: "A lonely Korean professional sits alone at a cafe table, empty chairs around; rain streams down the window; they stare at a phone with no notifications. Camera: medium shot, slow push-in, 50mm. Lighting/color: muted, melancholic, isolated. Duration 8 seconds."
+      - unit: 2
+        duration: 8
+        phase: PAIN
+        prompt: "Phone screen scrolls through social media of happy couples and celebrations (unreadable generic UI text); each scroll deepens their dejected reflection. Bright feed contrast against a dim, rainy cafe mood. Camera: tight close-up + reflection focus pulls, 50mm. Lighting/color: desaturated, comparison-trap visualization. Duration 8 seconds."
+      - unit: 3
+        duration: 8
+        phase: SOLUTION
+        includeMascot: true
+        prompt: "The phone suddenly lights up: a warm notification arrives with the consistent tiny star mascot (2D hand-drawn watercolor, purple-to-pink aura). Their eyes widen then soften with emotion as purple glow radiates outward. Camera: close-up on phone then slow push to face, 50mm. Lighting/color: heartwarming, warm purple-pink glow begins. Duration 8 seconds."
+      - unit: 4
+        duration: 6
+        phase: SOLUTION
+        includeMascot: true
+        includeLogoSpace: true
+        prompt: "Split-screen feel: supportive chat bubbles (unreadable generic text shapes) and their genuine smile; rain stops, a faint rainbow appears through the window; the consistent tiny star mascot floats out of the phone as a cozy companion. Camera: medium close-up, gentle push-in, 50mm. Lighting/color: warm purple-pink, connected and cozy. Leave clean negative space at bottom for logo overlay; end on a stable frame hold. Duration 6 seconds."
+
+  - id: V04
+    title: "다시 시작해도 괜찮아"
+    theme: "실패/포기"
+    units:
+      - unit: 1
+        duration: 8
+        phase: PAIN
+        prompt: "A dejected Korean professional receives rejection news on their phone (unreadable generic notification); papers fall in slow motion like failed dreams; shoulders slump. Camera: medium close-up, slow motion inserts, 50mm. Lighting/color: dim, muted gray-blue. Duration 8 seconds."
+      - unit: 2
+        duration: 8
+        phase: PAIN
+        prompt: "A wall calendar covered with X marks; the person stares at a frozen clock; a ghost-like version of them walks away, giving up. Dust floats in stagnant air. Camera: wide to medium, slow drift, 35mm. Lighting/color: limbo, desaturated, time-stopped mood. Duration 8 seconds."
+      - unit: 3
+        duration: 8
+        phase: SOLUTION
+        includeMascot: true
+        prompt: "The phone glows: the consistent tiny star mascot appears on-screen offering a tiny glowing hand; warm purple light fills the room; the person looks up with tearful but hopeful eyes. Camera: close-up on hand/phone then face, slow push-in, 50mm. Lighting/color: gentle hand-drawn feel, warm purple-pink transition. Duration 8 seconds."
+      - unit: 4
+        duration: 6
+        phase: SOLUTION
+        includeMascot: true
+        includeLogoSpace: true
+        prompt: "A fresh calendar page flips to Day 1; a hand picks up a pen with renewed determination; sunrise pours through a window as colors shift from gray to vibrant purple-pink; the consistent tiny star mascot cheers beside them. Camera: medium shot, slow tilt up to sunrise, 35mm. Leave clean negative space at bottom for logo overlay; end on a stable frame hold. Duration 6 seconds."
+
+  - id: V05
+    title: "완벽하지 않아도 돼"
+    theme: "자기비판"
+    units:
+      - unit: 1
+        duration: 8
+        phase: PAIN
+        prompt: "Close-up hands obsessively crossing out handwritten text with a red pen; a mountain of crumpled papers grows; harsh overhead light casts sharp shadows. Camera: macro close-up, jittery micro-movements, 50mm macro. Lighting/color: anxious, desaturated, harsh contrast. Duration 8 seconds."
+      - unit: 2
+        duration: 8
+        phase: PAIN
+        prompt: "The person stares into a mirror with critical eyes; ghostly Korean-like text shapes and shadow whispers swirl around them; the reflection subtly distorts smaller-than-life. Camera: medium close-up, slow push-in, 50mm. Lighting/color: dark vignette, inner critic as shadows. Duration 8 seconds."
+      - unit: 3
+        duration: 8
+        phase: SOLUTION
+        includeMascot: true
+        prompt: "Phone glows with the consistent tiny star mascot; warm purple light gently dissolves the shadow voices; shoulders relax; mirror reflection becomes kind and true. Camera: close-up on phone then mirror reflection, slow dolly, 50mm. Lighting/color: soft embrace, acceptance, warm purple-pink glow. Duration 8 seconds."
+      - unit: 4
+        duration: 6
+        phase: SOLUTION
+        includeMascot: true
+        includeLogoSpace: true
+        prompt: "Crumpled papers fold into imperfect but beautiful origami flowers; the person smiles, accepting their work; the consistent tiny star mascot dances among the paper flowers; warm purple-pink sunset light fills the room. Camera: medium shot, gentle orbit, 35mm. Leave clean negative space at bottom for logo overlay; end on a stable frame hold. Duration 6 seconds."
+
+  - id: V06
+    title: "내일이 두려워도"
+    theme: "미래 불안"
+    units:
+      - unit: 1
+        duration: 8
+        phase: PAIN
+        prompt: "A person lies awake in bed at 3AM, staring at the ceiling; red digital clock glows; worry thought bubbles (bills, deadlines) float above. Camera: close-up, slow push-in, 50mm. Lighting/color: blue-gray moonlight, restless shadows, insomnia. Duration 8 seconds."
+      - unit: 2
+        duration: 8
+        phase: PAIN
+        prompt: "The person walks alone through thick fog; the path ahead is invisible; silhouettes of possible futures appear then dissolve. Camera: wide shot, slow tracking, 35mm. Lighting/color: cold blue-gray, fear of the unknown. Duration 8 seconds."
+      - unit: 3
+        duration: 8
+        phase: SOLUTION
+        includeMascot: true
+        prompt: "In the fog, the consistent tiny star mascot appears like a warm lantern, casting a purple-to-pink glow that reveals just one step ahead; the person checks their phone as a generic unreadable supportive notification pops. Camera: medium shot, slow follow, 35mm. Lighting/color: warm purple-pink glow pushing back darkness, comfort in uncertainty. Duration 8 seconds."
+      - unit: 4
+        duration: 6
+        phase: SOLUTION
+        includeMascot: true
+        includeLogoSpace: true
+        prompt: "Each step forward clears more fog; dawn breaks on the horizon; the person walks with growing confidence while the consistent tiny star mascot floats beside them as a lantern companion; sky transitions to warm purple-pink sunrise. Camera: wide to medium, steady tracking, 35mm. Leave clean negative space at bottom for logo overlay; end on a stable frame hold. Duration 6 seconds."
+
+  - id: V07
+    title: "꿈을 잃어버렸어"
+    theme: "열정 상실"
+    units:
+      - unit: 1
+        duration: 8
+        phase: PAIN
+        prompt: "A dusty guitar in a room corner (or dried paintbrushes in a jar) sits untouched; cobwebs; the person walks past with a heavy sigh; faded photos of their younger passionate self on the wall. Camera: slow pan, 35mm. Lighting/color: melancholic nostalgia, muted. Duration 8 seconds."
+      - unit: 2
+        duration: 8
+        phase: PAIN
+        prompt: "Montage of adult routine: crowded subway, spreadsheets, bills piling up; color drains to gray; a ghost of their younger self fades away; 'be realistic' appears as chain-like shadows (no readable text). Camera: quick montage + timelapse, 35mm. Lighting/color: desaturated, oppressive. Duration 8 seconds."
+      - unit: 3
+        duration: 8
+        phase: SOLUTION
+        includeMascot: true
+        prompt: "Phone lights up with the consistent tiny star mascot asking a warm question (unreadable notification), triggering brief joyful flashback glimpses of their passion; colors slowly return. Camera: close-up on phone then flashback overlays, 50mm. Lighting/color: spark of recognition, purple-pink glow begins. Duration 8 seconds."
+      - unit: 4
+        duration: 6
+        phase: SOLUTION
+        includeMascot: true
+        includeLogoSpace: true
+        prompt: "A hand wipes dust off the guitar and picks it up again (or opens an old sketchbook to a fresh page); first imperfect but meaningful note/stroke; the consistent tiny star mascot cheers; warm purple-pink light fills the room as color returns. Camera: medium close-up, gentle tilt, 50mm. Leave clean negative space at bottom for logo overlay; end on a stable frame hold. Duration 6 seconds."
+
+  - id: V08
+    title: "남들 눈이 무서워"
+    theme: "타인 시선"
+    units:
+      - unit: 1
+        duration: 8
+        phase: PAIN
+        prompt: "The person walks through a crowd feeling watched by countless floating eyes; whispers echo like judgment; a harsh spotlight isolates them, claustrophobic despite open space. Camera: medium shot, slow push-in, 50mm. Lighting/color: desaturated, anxious, spotlight harshness. Duration 8 seconds."
+      - unit: 2
+        duration: 8
+        phase: PAIN
+        prompt: "They practice a fake smile in a mirror; multiple masks float around (professional, happy, perfect); behind the mask their true exhausted self is visible. Camera: mirror composition, slow drift, 50mm. Lighting/color: dim, identity lost, duality. Duration 8 seconds."
+      - unit: 3
+        duration: 8
+        phase: SOLUTION
+        includeMascot: true
+        prompt: "Phone glows with the consistent tiny star mascot whispering reassurance (unreadable notification); the watching eyes slowly close and fade; harsh spotlight softens into warm purple light; in the mirror they see their true self with kindness. Camera: close-up on phone then mirror reflection, slow push, 50mm. Lighting/color: warm purple-pink glow, self-compassion awakening. Duration 8 seconds."
+      - unit: 4
+        duration: 6
+        phase: SOLUTION
+        includeMascot: true
+        includeLogoSpace: true
+        prompt: "Masks dissolve and fall away; the person smiles genuinely and walks with natural confidence; the consistent tiny star mascot dances beside them; open sky replaces the crowd pressure; purple-pink sunset glow. Camera: medium-wide tracking, 35mm. Leave clean negative space at bottom for logo overlay; end on a stable frame hold. Duration 6 seconds."
+
+  - id: V09
+    title: "쉬어도 될까"
+    theme: "번아웃/죄책감"
+    units:
+      - unit: 1
+        duration: 8
+        phase: PAIN
+        prompt: "The person runs on an endless treadmill; to-do lists fly past like scenery; clock hands spin rapidly; sweat drips, exhausted but unable to stop; others run in parallel lanes. Camera: wide to medium, slight shaky intensity, 35mm. Lighting/color: desaturated, hamster-wheel burnout. Duration 8 seconds."
+      - unit: 2
+        duration: 8
+        phase: PAIN
+        prompt: "They try to sit on a comfortable couch, but shadowy judgment voices loom ('lazy' as unreadable shapes); guilt becomes heavy chain-like shadows pulling them up again. Camera: medium close-up, slow push-in, 50mm. Lighting/color: dim, self-judgment shadows, rest forbidden. Duration 8 seconds."
+      - unit: 3
+        duration: 8
+        phase: SOLUTION
+        includeMascot: true
+        prompt: "Phone glows with the consistent tiny star mascot gently granting permission to rest (unreadable notification); treadmill slows and stops; guilt chains dissolve into light; muscles relax. Camera: close-up on phone then wider reveal, 35mm. Lighting/color: warm purple glow, relief washing over. Duration 8 seconds."
+      - unit: 4
+        duration: 6
+        phase: SOLUTION
+        includeMascot: true
+        includeLogoSpace: true
+        prompt: "They sit peacefully by a window with a warm cup of tea; soft afternoon light; the consistent tiny star mascot rests contentedly beside them; a battery icon fills up (unreadable simple icon), genuine peaceful smile. Camera: medium shot, static calm framing, 50mm. Leave clean negative space at bottom for logo overlay; end on a stable frame hold. Duration 6 seconds."
+
+  - id: V10
+    title: "이미 늦은 걸까"
+    theme: "나이/비교"
+    units:
+      - unit: 1
+        duration: 8
+        phase: PAIN
+        prompt: "Calendar pages fly off rapidly as years pass; the person looks in a mirror noticing time; photos of their younger self fade; hourglass sand nearly empty; regret visualized with sepia creeping in. Camera: montage + slow push-in, 50mm. Lighting/color: melancholic, sepia-to-gray. Duration 8 seconds."
+      - unit: 2
+        duration: 8
+        phase: PAIN
+        prompt: "Phone shows glamorous 'success stories' feed (unreadable), young achievers; the person shrinks in comparison; finish line imagery where others celebrate while they stand at starting blocks. Camera: quick-cut montage + symbolic inserts, 35mm. Lighting/color: desaturated, age-anxiety visualization. Duration 8 seconds."
+      - unit: 3
+        duration: 8
+        phase: SOLUTION
+        includeMascot: true
+        prompt: "Phone glows: the consistent tiny star mascot encourages a fresh start (unreadable notification); the hourglass flips over; sepia transforms back into vibrant color; their eyes light up with determination. Camera: close-up hourglass + phone glow, slow dolly, 50mm. Lighting/color: warm purple-pink glow, time becomes friend. Duration 8 seconds."
+      - unit: 4
+        duration: 6
+        phase: SOLUTION
+        includeMascot: true
+        includeLogoSpace: true
+        prompt: "They step onto their own unique path, no longer comparing; they run at their own pace with confidence; the consistent tiny star mascot cheers alongside; other lanes fade away; sunrise ahead with purple-pink glow. Camera: medium-wide tracking forward, 35mm. Leave clean negative space at bottom for logo overlay; end on a stable frame hold. Duration 6 seconds."
+
+# File mapping convention:
+# V01_U01_takeA.mp4, V01_U01_takeB.mp4, etc.
