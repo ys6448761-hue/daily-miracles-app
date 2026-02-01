@@ -364,6 +364,42 @@ try {
   console.error("❌ 기적 금고(Finance) 라우터 로드 실패:", error.message);
 }
 
+// 포인트 시스템 라우터 로딩 (Aurora5 v2.6)
+let pointRoutes = null;
+try {
+  pointRoutes = require("./routes/pointRoutes");
+  console.log("✅ 포인트 시스템 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 포인트 시스템 라우터 로드 실패:", error.message);
+}
+
+// 리워드(예고편 교환) 라우터 로딩 (Aurora5 v2.6)
+let rewardRoutes = null;
+try {
+  rewardRoutes = require("./routes/rewardRoutes");
+  console.log("✅ 리워드(예고편) 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 리워드(예고편) 라우터 로드 실패:", error.message);
+}
+
+// 추천 시스템 라우터 로딩 (Aurora5 v2.6)
+let referralRoutes = null;
+try {
+  referralRoutes = require("./routes/referralRoutes");
+  console.log("✅ 추천 시스템 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 추천 시스템 라우터 로드 실패:", error.message);
+}
+
+// 어드민 포인트/추천 관리 라우터 로딩 (Aurora5 v2.6)
+let adminPointRoutes = null;
+try {
+  adminPointRoutes = require("./routes/adminPointRoutes");
+  console.log("✅ 어드민 포인트 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 어드민 포인트 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -1128,6 +1164,38 @@ if (financeRoutes) {
   console.log("✅ 기적 금고(Finance) 라우터 등록 완료 (/api/finance)");
 } else {
   console.warn("⚠️ 기적 금고(Finance) 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 포인트 시스템 Routes (/api/points) - Aurora5 v2.6 ----------
+if (pointRoutes) {
+  app.use("/api/points", pointRoutes);
+  console.log("✅ 포인트 시스템 라우터 등록 완료 (/api/points)");
+} else {
+  console.warn("⚠️ 포인트 시스템 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 리워드(예고편 교환) Routes (/api/rewards) - Aurora5 v2.6 ----------
+if (rewardRoutes) {
+  app.use("/api/rewards", rewardRoutes);
+  console.log("✅ 리워드(예고편) 라우터 등록 완료 (/api/rewards)");
+} else {
+  console.warn("⚠️ 리워드(예고편) 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 추천 시스템 Routes (/api/referral) - Aurora5 v2.6 ----------
+if (referralRoutes) {
+  app.use("/api/referral", referralRoutes);
+  console.log("✅ 추천 시스템 라우터 등록 완료 (/api/referral)");
+} else {
+  console.warn("⚠️ 추천 시스템 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 어드민 포인트/추천 관리 Routes (/api/admin) - Aurora5 v2.6 ----------
+if (adminPointRoutes) {
+  app.use("/api/admin", adminPointRoutes);
+  console.log("✅ 어드민 포인트 라우터 등록 완료 (/api/admin/points, /api/admin/referral)");
+} else {
+  console.warn("⚠️ 어드민 포인트 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------
