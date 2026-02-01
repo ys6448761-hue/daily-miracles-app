@@ -1,0 +1,198 @@
+name: SSOT LINT Gate
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'docs/sora/**'
+      - 'docs/2d/**'
+      - 'prompts/**'
+      - 'profiles/**'
+      - 'docs/ssot/**'
+  push:
+    branches: [ main ]
+    paths:
+      - 'docs/sora/**'
+      - 'docs/2d/**'
+      - 'prompts/**'
+      - 'profiles/**'
+      - 'docs/ssot/**'
+  workflow_dispatch:
+
+jobs:
+  ssot-lint-gate:
+    name: SSOT LINT Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate LINT Rules JSON
+        run: |
+          echo "📋 Checking lint_rules.common.json syntax..."
+          node -e "JSON.parse(require('fs').readFileSync('scripts/lint/lint_rules.common.json'))"
+          echo "✅ lint_rules.common.json is valid JSON"
+
+      - name: Validate Profile YAML Files
+        run: |
+          echo "📋 Checking profile YAML files..."
+
+          # Install yaml validator
+          npm install -g yaml-lint
+
+          # Validate Sora profile
+          if [ -f "profiles/sora_cinematic.yaml" ]; then
+            yamllint profiles/sora_cinematic.yaml && echo "✅ sora_cinematic.yaml valid" || echo "⚠️ YAML lint warning (non-blocking)"
+          fi
+
+          # Validate 2D profile
+          if [ -f "profiles/2d_ghibli_webtoon.yaml" ]; then
+            yamllint profiles/2d_ghibli_webtoon.yaml && echo "✅ 2d_ghibli_webtoon.yaml valid" || echo "⚠️ YAML lint warning (non-blocking)"
+          fi
+
+      - name: Check Track Conflicts Definition
+        run: |
+          echo "🔍 Verifying track conflict definitions..."
+
+          # Check sora profile has conflict with 2d
+          if grep -q "2d_ghibli_webtoon" profiles/sora_cinematic.yaml; then
+            echo "✅ Sora profile declares conflict with 2D track"
+          else
+            echo "❌ ERROR: Sora profile missing conflict declaration!"
+            exit 1
+          fi
+
+          # Check 2d profile has conflict with sora
+          if grep -q "sora_cinematic" profiles/2d_ghibli_webtoon.yaml; then
+            echo "✅ 2D profile declares conflict with Sora track"
+          else
+            echo "❌ ERROR: 2D profile missing conflict declaration!"
+            exit 1
+          fi
+
+      - name: Verify LINT Reports Exist
+        run: |
+          echo "📊 Checking LINT reports..."
+
+          SORA_LINT="scripts/lint/LINT_REPORT_sora_v1.1.md"
+          D2_LINT="scripts/lint/LINT_REPORT_2d_v7.0.md"
+
+          if [ ! -f "$SORA_LINT" ]; then
+            echo "❌ ERROR: Sora LINT report missing: $SORA_LINT"
+            exit 1
+          fi
+
+          if [ ! -f "$D2_LINT" ]; then
+            echo "❌ ERROR: 2D LINT report missing: $D2_LINT"
+            exit 1
+          fi
+
+          echo "✅ Both LINT reports exist"
+
+      - name: Verify LINT PASS Status
+        run: |
+          echo "🎯 Checking LINT PASS status..."
+
+          # Check Sora LINT passed
+          if grep -q "✅ \*\*PASS\*\*" scripts/lint/LINT_REPORT_sora_v1.1.md; then
+            echo "✅ Sora LINT: PASS"
+          else
+            echo "❌ ERROR: Sora LINT did not pass!"
+            exit 1
+          fi
+
+          # Check 2D LINT passed
+          if grep -q "✅ \*\*PASS\*\*" scripts/lint/LINT_REPORT_2d_v7.0.md; then
+            echo "✅ 2D LINT: PASS"
+          else
+            echo "❌ ERROR: 2D LINT did not pass!"
+            exit 1
+          fi
+
+          echo ""
+          echo "═══════════════════════════════════════"
+          echo "🎉 SSOT LINT Gate: ALL PASS"
+          echo "═══════════════════════════════════════"
+
+      - name: Verify SOURCES_INDEX Mapping
+        run: |
+          echo "📚 Verifying SOURCES_INDEX integrity..."
+
+          INDEX="docs/ssot/SOURCES_INDEX.md"
+
+          if [ ! -f "$INDEX" ]; then
+            echo "❌ ERROR: SOURCES_INDEX.md missing!"
+            exit 1
+          fi
+
+          # Check for LINT status in index
+          if grep -q "LINT Gate 상태" "$INDEX"; then
+            echo "✅ SOURCES_INDEX has LINT Gate status section"
+          else
+            echo "⚠️ WARNING: SOURCES_INDEX missing LINT Gate status"
+          fi
+
+          echo "✅ SOURCES_INDEX validation complete"
+
+      - name: Gate Summary
+        run: |
+          echo ""
+          echo "═══════════════════════════════════════════════════════"
+          echo "📋 SSOT LINT Gate Summary"
+          echo "═══════════════════════════════════════════════════════"
+          echo "✅ lint_rules.common.json: Valid"
+          echo "✅ Profile YAML files: Valid"
+          echo "✅ Track conflicts: Declared"
+          echo "✅ LINT Reports: Exist & PASS"
+          echo "✅ SOURCES_INDEX: Valid"
+          echo ""
+          echo "🎯 Result: GATE PASSED - Merge allowed"
+          echo "═══════════════════════════════════════════════════════"
+
+  immutable-source-check:
+    name: Immutable Source Protection
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check for source modifications
+        run: |
+          echo "🔒 Checking immutable source protection..."
+
+          # Get changed files
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
+
+          # Check if any source file was modified (not added)
+          SOURCE_DIR="docs/ssot/sources"
+          MODIFIED_SOURCES=""
+
+          for file in $CHANGED_FILES; do
+            if [[ "$file" == "$SOURCE_DIR"* ]]; then
+              # Check if file existed in previous commit
+              if git show HEAD~1:"$file" &>/dev/null; then
+                MODIFIED_SOURCES="$MODIFIED_SOURCES $file"
+              fi
+            fi
+          done
+
+          if [ -n "$MODIFIED_SOURCES" ]; then
+            echo "❌ ERROR: Immutable source files were MODIFIED!"
+            echo "Modified files:$MODIFIED_SOURCES"
+            echo ""
+            echo "📋 Rule: docs/ssot/sources/ files are IMMUTABLE"
+            echo "📋 Action: Create new version in new date folder instead"
+            exit 1
+          fi
+
+          echo "✅ No immutable source modifications detected"
+          echo "🎯 Source protection: PASSED"

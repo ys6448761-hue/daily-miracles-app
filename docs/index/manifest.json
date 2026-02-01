@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-01-31T22:40:58.219Z",
+  "generated_at": "2026-02-01T00:12:03.712Z",
   "generator": "generate-manifest.js",
-  "total_count": 132,
+  "total_count": 133,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -103,6 +103,573 @@
       "title": "Wix 폼 연동 가이드",
       "created_at": "버전",
       "checksum": "edc68ba7"
+    },
+    {
+      "id": "DOC-MIRACLE_MASTER_GUIDELINES",
+      "path": "docs/2d/v7.0/MIRACLE_MASTER_GUIDELINES.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "2d",
+      "tags": [
+        "v7.0",
+        "소원"
+      ],
+      "owner": "code",
+      "status": "superseded",
+      "title": "MIRACLE MASTER GUIDELINES v7.0",
+      "created_at": "2026-02-01",
+      "checksum": "63b3e84a"
+    },
+    {
+      "id": "DOC-airtable-schema",
+      "path": "docs/airtable-schema.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "airtable-schema.md",
+      "tags": [
+        "소원"
+      ],
+      "owner": "comi",
+      "status": "| wishes_processed",
+      "title": "Airtable 테이블 스키마 (ACT 관제탑)",
+      "created_at": "2026-02-01",
+      "checksum": "4976b285"
+    },
+    {
+      "id": "DOC-airtable-wish-intake-schema",
+      "path": "docs/airtable-wish-intake-schema.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "airtable-wish-intake-schema.md",
+      "tags": [
+        "소원"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "Airtable Wish Intake 스키마",
+      "created_at": "2026-02-01",
+      "checksum": "a8baafc3"
+    },
+    {
+      "id": "DOC-airtable-wishes-inbox-schema",
+      "path": "docs/airtable-wishes-inbox-schema.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "airtable-wishes-inbox-schema.md",
+      "tags": [
+        "소원"
+      ],
+      "owner": "jemi",
+      "status": "NEW, ACK, IN_PROGRESS, APPROVED, STARTED, DONE, ESCALATED",
+      "title": "Airtable Wishes Inbox 테이블 스키마",
+      "created_at": "2026-02-01",
+      "checksum": "ca0bf766"
+    },
+    {
+      "id": "DOC-online-wish-problem-api",
+      "path": "docs/api/online-wish-problem-api.md",
+      "type": "api",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "api",
+      "tags": [
+        "api",
+        "소원"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "온라인 문제 해결 소원 API v0.1",
+      "created_at": "2026-02-01",
+      "checksum": "266802c0"
+    },
+    {
+      "id": "DOC-online-wish-voyage-api-design",
+      "path": "docs/api/online-wish-voyage-api-design.md",
+      "type": "api",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "api",
+      "tags": [
+        "api",
+        "소원"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "온라인 소원 실현 항해 API 설계안 v0.1",
+      "created_at": "2026-02-01",
+      "checksum": "ed723688"
+    },
+    {
+      "id": "DOC-AURORA5_CHARACTER_PROMPTS",
+      "path": "docs/AURORA5_CHARACTER_PROMPTS.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "AURORA5_CHARACTER_PROMPTS.md",
+      "tags": [
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "Aurora 5 캐릭터 생성 프롬프트 패키지 v2.1",
+      "created_at": "2026-02-01",
+      "checksum": "64f0a2d2"
+    },
+    {
+      "id": "DOC-최수민방식_치트시트",
+      "path": "docs/cheatsheets/최수민방식_치트시트.md",
+      "type": "cheatsheet",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "cheatsheets",
+      "tags": [
+        "최수민",
+        "빠른참조",
+        "cheatsheets"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "최수민방식 치트시트",
+      "created_at": "2026-02-01",
+      "checksum": "9f7529c4"
+    },
+    {
+      "id": "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
+      "path": "docs/CLAUDE_DESKTOP_MCP_CONFIG.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "CLAUDE_DESKTOP_MCP_CONFIG.md",
+      "tags": [
+        "소원",
+        "aurora",
+        "결제"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "Claude Desktop MCP 서버 설정 가이드",
+      "created_at": "2026-02-01",
+      "checksum": "44ccac1b"
+    },
+    {
+      "id": "DOC-README",
+      "path": "docs/conversations/docs/README.md",
+      "type": "conversation",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "conversations",
+      "tags": [],
+      "owner": "team",
+      "status": "active",
+      "title": "README",
+      "created_at": "2026-02-01",
+      "checksum": "60a0b4af"
+    },
+    {
+      "id": "DOC-index",
+      "path": "docs/decisions/index.md",
+      "type": "decision",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "decisions",
+      "tags": [
+        "decisions",
+        "소원"
+      ],
+      "owner": "ceo",
+      "status": "active",
+      "title": "Decisions Index",
+      "created_at": "2026-02-01",
+      "checksum": "b355d262"
+    },
+    {
+      "id": "DOC-deployment-checklist",
+      "path": "docs/deployment/deployment-checklist.md",
+      "type": "deployment",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "deployment",
+      "tags": [
+        "deployment"
+      ],
+      "owner": "code",
+      "status": "archived",
+      "title": "Daily Miracles MVP 배포 체크리스트",
+      "created_at": "2026-02-01",
+      "checksum": "0202a43e"
+    },
+    {
+      "id": "DOC-GROWTH-ROADMAP",
+      "path": "docs/GROWTH-ROADMAP.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "GROWTH-ROADMAP.md",
+      "tags": [
+        "소원",
+        "aurora"
+      ],
+      "owner": "comi",
+      "status": "archived",
+      "title": "하루하루의 기적 - 성장 로드맵",
+      "created_at": "2026-02-01",
+      "checksum": "881f0936"
+    },
+    {
+      "id": "DOC-JUDGE_PROMPTS",
+      "path": "docs/JUDGE_PROMPTS.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "JUDGE_PROMPTS.md",
+      "tags": [
+        "소원",
+        "aurora",
+        "kpi"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "📋 Aurora5 Judge 프롬프트 가이드",
+      "created_at": "2026-02-01",
+      "checksum": "513de9dd"
+    },
+    {
+      "id": "DOC-README",
+      "path": "docs/knowledge/README.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "소원"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "Knowledge Cards (지식카드)",
+      "created_at": "2026-02-01",
+      "checksum": "a4d0a8e8"
+    },
+    {
+      "id": "DOC-LAUNCH-DECLARATION",
+      "path": "docs/LAUNCH-DECLARATION.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "LAUNCH-DECLARATION.md",
+      "tags": [
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "하루하루의 기적 - 출항 선언문",
+      "created_at": "2026-02-01",
+      "checksum": "c6b4219e"
+    },
+    {
+      "id": "DOC-최수민방식_완전정리",
+      "path": "docs/learnings/최수민방식_완전정리.md",
+      "type": "learning",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "learnings",
+      "tags": [
+        "최수민",
+        "에이전틱",
+        "1인유니콘",
+        "컨텍스트",
+        "피드백",
+        "learnings"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "최수민님 방식 완전 정리",
+      "created_at": "2026-02-01",
+      "checksum": "3722b629"
+    },
+    {
+      "id": "DOC-JAEMI_ONBOARDING_v11",
+      "path": "docs/onboarding/JAEMI_ONBOARDING_v1.1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "onboarding",
+      "tags": [
+        "onboarding",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "|------",
+      "title": "재미 온보딩 가이드 v1.1",
+      "created_at": "2026-02-01",
+      "checksum": "00a62da9"
+    },
+    {
+      "id": "DOC-JAEMI_ONBOARDING_v12",
+      "path": "docs/onboarding/JAEMI_ONBOARDING_v1.2.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "onboarding",
+      "tags": [
+        "onboarding",
+        "소원",
+        "aurora",
+        "결제"
+      ],
+      "owner": "rumi",
+      "status": "대응",
+      "title": "재미 온보딩 가이드 v1.2",
+      "created_at": "2026-02-01",
+      "checksum": "1004a06f"
+    },
+    {
+      "id": "DOC-DEC_OPERATIONS",
+      "path": "docs/ops/DEC_OPERATIONS.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ops",
+      "tags": [
+        "ops"
+      ],
+      "owner": "comi",
+      "status": "archived",
+      "title": "DEC 운영 매뉴얼",
+      "created_at": "2026-02-01",
+      "checksum": "1b4361fe"
+    },
+    {
+      "id": "DOC-drive-github-sync-setup",
+      "path": "docs/ops/drive-github-sync-setup.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ops",
+      "tags": [
+        "ops",
+        "aurora",
+        "가격"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "Drive → GitHub Sync Service 설치 가이드",
+      "created_at": "2026-02-01",
+      "checksum": "eb6394bc"
+    },
+    {
+      "id": "DOC-sens-setup-guide",
+      "path": "docs/ops/sens-setup-guide.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ops",
+      "tags": [
+        "ops",
+        "소원",
+        "aurora"
+      ],
+      "owner": "comi",
+      "status": "항목",
+      "title": "SENS 설정 가이드 (Naver Cloud Platform)",
+      "created_at": "2026-02-01",
+      "checksum": "fea945f4"
+    },
+    {
+      "id": "DOC-service-flow",
+      "path": "docs/overview/service-flow.md",
+      "type": "overview",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "overview",
+      "tags": [
+        "overview",
+        "소원"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "Daily Miracles 온라인 소원 서비스 전체 흐름도",
+      "created_at": "2026-02-01",
+      "checksum": "e28e803e"
+    },
+    {
+      "id": "DOC-phase3-quantum-walkthrough",
+      "path": "docs/plans/phase3-quantum-walkthrough.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "plans",
+      "tags": [
+        "plans"
+      ],
+      "owner": "ceo",
+      "status": "✅ 비활성화 정상",
+      "title": "양자 기획서 - 기적 금고 Phase 3 증빙 발행 시스템",
+      "created_at": "2026-02-01",
+      "checksum": "fe4f4df4"
+    },
+    {
+      "id": "DOC-README",
+      "path": "docs/README.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "README.md",
+      "tags": [
+        "소원"
+      ],
+      "owner": "comi",
+      "status": "active",
+      "title": "하루하루의 기적 - 지식 저장소",
+      "created_at": "2026-02-01",
+      "checksum": "28cf200e"
+    },
+    {
+      "id": "DOC-tax-accounting-ai-tools-analys",
+      "path": "docs/reports/tax-accounting-ai-tools-analysis.md",
+      "type": "report",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "reports",
+      "tags": [
+        "reports",
+        "가격",
+        "결제"
+      ],
+      "owner": "comi",
+      "status": "active",
+      "title": "한국 세무회계 AI 도구 조사 및 연동 가능성 분석",
+      "created_at": "2026-02-01",
+      "checksum": "5af76d35"
+    },
+    {
+      "id": "DOC-REVIEW_COLLECTION_SYSTEM",
+      "path": "docs/REVIEW_COLLECTION_SYSTEM.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "REVIEW_COLLECTION_SYSTEM.md",
+      "tags": [
+        "소원",
+        "kpi"
+      ],
+      "owner": "comi",
+      "status": "active",
+      "title": "후기 수집 구조 설계서",
+      "created_at": "2026-02-01",
+      "checksum": "bbd74711"
+    },
+    {
+      "id": "DOC-README",
+      "path": "docs/roadmap/README.md",
+      "type": "roadmap",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "roadmap",
+      "tags": [
+        "roadmap",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "🎯 30일 기적 로드맵 시스템",
+      "created_at": "2026-02-01",
+      "checksum": "a4207922"
+    },
+    {
+      "id": "DOC-ROADMAP_API",
+      "path": "docs/roadmap/ROADMAP_API.md",
+      "type": "roadmap",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "roadmap",
+      "tags": [
+        "roadmap",
+        "소원",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "30일 기적 로드맵 API 문서",
+      "created_at": "2026-02-01",
+      "checksum": "4d39bd13"
+    },
+    {
+      "id": "DOC-GA4_SETUP_GUIDE",
+      "path": "docs/setup/GA4_SETUP_GUIDE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "setup",
+      "tags": [
+        "setup",
+        "소원",
+        "storybook",
+        "결제"
+      ],
+      "owner": "code",
+      "status": "항목",
+      "title": "GA4 설정 가이드",
+      "created_at": "2026-02-01",
+      "checksum": "1c318f9b"
+    },
+    {
+      "id": "DOC-VIDEO_MASTER",
+      "path": "docs/sora/v1.1/VIDEO_MASTER.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "sora",
+      "tags": [
+        "v1.1",
+        "소원",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "Sora Video Master v1.1",
+      "created_at": "2026-02-01",
+      "checksum": "f4a1b1d5"
+    },
+    {
+      "id": "DOC-CHANGELOG",
+      "path": "docs/ssot/CHANGELOG.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "SSOT 변경 로그 (CHANGELOG)",
+      "created_at": "2026-02-01",
+      "checksum": "457ae6bf"
+    },
+    {
+      "id": "DOC-NOTION_PROFILE_GATE",
+      "path": "docs/ssot/NOTION_PROFILE_GATE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "automation"
+      ],
+      "owner": "team",
+      "status": "|------",
+      "title": "Notion DB Profile Gate 가이드",
+      "created_at": "2026-02-01",
+      "checksum": "5abf91a1"
     },
     {
       "id": "DOC-20260131_파크_2d_기술지원",
@@ -206,556 +773,6 @@
       "checksum": "6ec89407"
     },
     {
-      "id": "DOC-MIRACLE_MASTER_GUIDELINES",
-      "path": "docs/2d/v7.0/MIRACLE_MASTER_GUIDELINES.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "2d",
-      "tags": [
-        "v7.0",
-        "소원"
-      ],
-      "owner": "code",
-      "status": "superseded",
-      "title": "MIRACLE MASTER GUIDELINES v7.0",
-      "created_at": "2026-01-31",
-      "checksum": "63b3e84a"
-    },
-    {
-      "id": "DOC-airtable-schema",
-      "path": "docs/airtable-schema.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "airtable-schema.md",
-      "tags": [
-        "소원"
-      ],
-      "owner": "comi",
-      "status": "| wishes_processed",
-      "title": "Airtable 테이블 스키마 (ACT 관제탑)",
-      "created_at": "2026-01-31",
-      "checksum": "4976b285"
-    },
-    {
-      "id": "DOC-airtable-wish-intake-schema",
-      "path": "docs/airtable-wish-intake-schema.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "airtable-wish-intake-schema.md",
-      "tags": [
-        "소원"
-      ],
-      "owner": "team",
-      "status": "active",
-      "title": "Airtable Wish Intake 스키마",
-      "created_at": "2026-01-31",
-      "checksum": "a8baafc3"
-    },
-    {
-      "id": "DOC-airtable-wishes-inbox-schema",
-      "path": "docs/airtable-wishes-inbox-schema.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "airtable-wishes-inbox-schema.md",
-      "tags": [
-        "소원"
-      ],
-      "owner": "jemi",
-      "status": "NEW, ACK, IN_PROGRESS, APPROVED, STARTED, DONE, ESCALATED",
-      "title": "Airtable Wishes Inbox 테이블 스키마",
-      "created_at": "2026-01-31",
-      "checksum": "ca0bf766"
-    },
-    {
-      "id": "DOC-online-wish-problem-api",
-      "path": "docs/api/online-wish-problem-api.md",
-      "type": "api",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "api",
-      "tags": [
-        "api",
-        "소원"
-      ],
-      "owner": "team",
-      "status": "active",
-      "title": "온라인 문제 해결 소원 API v0.1",
-      "created_at": "2026-01-31",
-      "checksum": "266802c0"
-    },
-    {
-      "id": "DOC-online-wish-voyage-api-design",
-      "path": "docs/api/online-wish-voyage-api-design.md",
-      "type": "api",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "api",
-      "tags": [
-        "api",
-        "소원"
-      ],
-      "owner": "code",
-      "status": "active",
-      "title": "온라인 소원 실현 항해 API 설계안 v0.1",
-      "created_at": "2026-01-31",
-      "checksum": "ed723688"
-    },
-    {
-      "id": "DOC-AURORA5_CHARACTER_PROMPTS",
-      "path": "docs/AURORA5_CHARACTER_PROMPTS.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "AURORA5_CHARACTER_PROMPTS.md",
-      "tags": [
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "Aurora 5 캐릭터 생성 프롬프트 패키지 v2.1",
-      "created_at": "2026-01-31",
-      "checksum": "64f0a2d2"
-    },
-    {
-      "id": "DOC-최수민방식_치트시트",
-      "path": "docs/cheatsheets/최수민방식_치트시트.md",
-      "type": "cheatsheet",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "cheatsheets",
-      "tags": [
-        "최수민",
-        "빠른참조",
-        "cheatsheets"
-      ],
-      "owner": "team",
-      "status": "active",
-      "title": "최수민방식 치트시트",
-      "created_at": "2026-01-31",
-      "checksum": "9f7529c4"
-    },
-    {
-      "id": "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
-      "path": "docs/CLAUDE_DESKTOP_MCP_CONFIG.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "CLAUDE_DESKTOP_MCP_CONFIG.md",
-      "tags": [
-        "소원",
-        "aurora",
-        "결제"
-      ],
-      "owner": "team",
-      "status": "active",
-      "title": "Claude Desktop MCP 서버 설정 가이드",
-      "created_at": "2026-01-31",
-      "checksum": "44ccac1b"
-    },
-    {
-      "id": "DOC-README",
-      "path": "docs/conversations/docs/README.md",
-      "type": "conversation",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "conversations",
-      "tags": [],
-      "owner": "team",
-      "status": "active",
-      "title": "README",
-      "created_at": "2026-01-31",
-      "checksum": "60a0b4af"
-    },
-    {
-      "id": "DOC-index",
-      "path": "docs/decisions/index.md",
-      "type": "decision",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "decisions",
-      "tags": [
-        "decisions",
-        "소원"
-      ],
-      "owner": "ceo",
-      "status": "active",
-      "title": "Decisions Index",
-      "created_at": "2026-01-31",
-      "checksum": "b355d262"
-    },
-    {
-      "id": "DOC-deployment-checklist",
-      "path": "docs/deployment/deployment-checklist.md",
-      "type": "deployment",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "deployment",
-      "tags": [
-        "deployment"
-      ],
-      "owner": "code",
-      "status": "archived",
-      "title": "Daily Miracles MVP 배포 체크리스트",
-      "created_at": "2026-01-31",
-      "checksum": "0202a43e"
-    },
-    {
-      "id": "DOC-GROWTH-ROADMAP",
-      "path": "docs/GROWTH-ROADMAP.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "GROWTH-ROADMAP.md",
-      "tags": [
-        "소원",
-        "aurora"
-      ],
-      "owner": "comi",
-      "status": "archived",
-      "title": "하루하루의 기적 - 성장 로드맵",
-      "created_at": "2026-01-31",
-      "checksum": "881f0936"
-    },
-    {
-      "id": "DOC-JUDGE_PROMPTS",
-      "path": "docs/JUDGE_PROMPTS.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "JUDGE_PROMPTS.md",
-      "tags": [
-        "소원",
-        "aurora",
-        "kpi"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "📋 Aurora5 Judge 프롬프트 가이드",
-      "created_at": "2026-01-31",
-      "checksum": "513de9dd"
-    },
-    {
-      "id": "DOC-README",
-      "path": "docs/knowledge/README.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge",
-        "소원"
-      ],
-      "owner": "team",
-      "status": "active",
-      "title": "Knowledge Cards (지식카드)",
-      "created_at": "2026-01-31",
-      "checksum": "a4d0a8e8"
-    },
-    {
-      "id": "DOC-LAUNCH-DECLARATION",
-      "path": "docs/LAUNCH-DECLARATION.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "LAUNCH-DECLARATION.md",
-      "tags": [
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "하루하루의 기적 - 출항 선언문",
-      "created_at": "2026-01-31",
-      "checksum": "c6b4219e"
-    },
-    {
-      "id": "DOC-최수민방식_완전정리",
-      "path": "docs/learnings/최수민방식_완전정리.md",
-      "type": "learning",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "learnings",
-      "tags": [
-        "최수민",
-        "에이전틱",
-        "1인유니콘",
-        "컨텍스트",
-        "피드백",
-        "learnings"
-      ],
-      "owner": "code",
-      "status": "active",
-      "title": "최수민님 방식 완전 정리",
-      "created_at": "2026-01-31",
-      "checksum": "3722b629"
-    },
-    {
-      "id": "DOC-JAEMI_ONBOARDING_v11",
-      "path": "docs/onboarding/JAEMI_ONBOARDING_v1.1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "onboarding",
-      "tags": [
-        "onboarding",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "|------",
-      "title": "재미 온보딩 가이드 v1.1",
-      "created_at": "2026-01-31",
-      "checksum": "00a62da9"
-    },
-    {
-      "id": "DOC-JAEMI_ONBOARDING_v12",
-      "path": "docs/onboarding/JAEMI_ONBOARDING_v1.2.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "onboarding",
-      "tags": [
-        "onboarding",
-        "소원",
-        "aurora",
-        "결제"
-      ],
-      "owner": "rumi",
-      "status": "대응",
-      "title": "재미 온보딩 가이드 v1.2",
-      "created_at": "2026-01-31",
-      "checksum": "1004a06f"
-    },
-    {
-      "id": "DOC-DEC_OPERATIONS",
-      "path": "docs/ops/DEC_OPERATIONS.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "ops",
-      "tags": [
-        "ops"
-      ],
-      "owner": "comi",
-      "status": "archived",
-      "title": "DEC 운영 매뉴얼",
-      "created_at": "2026-01-31",
-      "checksum": "1b4361fe"
-    },
-    {
-      "id": "DOC-drive-github-sync-setup",
-      "path": "docs/ops/drive-github-sync-setup.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "ops",
-      "tags": [
-        "ops",
-        "aurora",
-        "가격"
-      ],
-      "owner": "code",
-      "status": "active",
-      "title": "Drive → GitHub Sync Service 설치 가이드",
-      "created_at": "2026-01-31",
-      "checksum": "eb6394bc"
-    },
-    {
-      "id": "DOC-sens-setup-guide",
-      "path": "docs/ops/sens-setup-guide.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "ops",
-      "tags": [
-        "ops",
-        "소원",
-        "aurora"
-      ],
-      "owner": "comi",
-      "status": "항목",
-      "title": "SENS 설정 가이드 (Naver Cloud Platform)",
-      "created_at": "2026-01-31",
-      "checksum": "fea945f4"
-    },
-    {
-      "id": "DOC-service-flow",
-      "path": "docs/overview/service-flow.md",
-      "type": "overview",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "overview",
-      "tags": [
-        "overview",
-        "소원"
-      ],
-      "owner": "code",
-      "status": "active",
-      "title": "Daily Miracles 온라인 소원 서비스 전체 흐름도",
-      "created_at": "2026-01-31",
-      "checksum": "e28e803e"
-    },
-    {
-      "id": "DOC-phase3-quantum-walkthrough",
-      "path": "docs/plans/phase3-quantum-walkthrough.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "plans",
-      "tags": [
-        "plans"
-      ],
-      "owner": "ceo",
-      "status": "✅ 비활성화 정상",
-      "title": "양자 기획서 - 기적 금고 Phase 3 증빙 발행 시스템",
-      "created_at": "2026-01-31",
-      "checksum": "fe4f4df4"
-    },
-    {
-      "id": "DOC-README",
-      "path": "docs/README.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "README.md",
-      "tags": [
-        "소원"
-      ],
-      "owner": "comi",
-      "status": "active",
-      "title": "하루하루의 기적 - 지식 저장소",
-      "created_at": "2026-01-31",
-      "checksum": "28cf200e"
-    },
-    {
-      "id": "DOC-tax-accounting-ai-tools-analys",
-      "path": "docs/reports/tax-accounting-ai-tools-analysis.md",
-      "type": "report",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "reports",
-      "tags": [
-        "reports",
-        "가격",
-        "결제"
-      ],
-      "owner": "comi",
-      "status": "active",
-      "title": "한국 세무회계 AI 도구 조사 및 연동 가능성 분석",
-      "created_at": "2026-01-31",
-      "checksum": "5af76d35"
-    },
-    {
-      "id": "DOC-REVIEW_COLLECTION_SYSTEM",
-      "path": "docs/REVIEW_COLLECTION_SYSTEM.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "REVIEW_COLLECTION_SYSTEM.md",
-      "tags": [
-        "소원",
-        "kpi"
-      ],
-      "owner": "comi",
-      "status": "active",
-      "title": "후기 수집 구조 설계서",
-      "created_at": "2026-01-31",
-      "checksum": "bbd74711"
-    },
-    {
-      "id": "DOC-README",
-      "path": "docs/roadmap/README.md",
-      "type": "roadmap",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "roadmap",
-      "tags": [
-        "roadmap",
-        "aurora"
-      ],
-      "owner": "team",
-      "status": "active",
-      "title": "🎯 30일 기적 로드맵 시스템",
-      "created_at": "2026-01-31",
-      "checksum": "a4207922"
-    },
-    {
-      "id": "DOC-ROADMAP_API",
-      "path": "docs/roadmap/ROADMAP_API.md",
-      "type": "roadmap",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "roadmap",
-      "tags": [
-        "roadmap",
-        "소원",
-        "aurora"
-      ],
-      "owner": "team",
-      "status": "active",
-      "title": "30일 기적 로드맵 API 문서",
-      "created_at": "2026-01-31",
-      "checksum": "4d39bd13"
-    },
-    {
-      "id": "DOC-GA4_SETUP_GUIDE",
-      "path": "docs/setup/GA4_SETUP_GUIDE.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "setup",
-      "tags": [
-        "setup",
-        "소원",
-        "storybook",
-        "결제"
-      ],
-      "owner": "code",
-      "status": "항목",
-      "title": "GA4 설정 가이드",
-      "created_at": "2026-01-31",
-      "checksum": "1c318f9b"
-    },
-    {
-      "id": "DOC-VIDEO_MASTER",
-      "path": "docs/sora/v1.1/VIDEO_MASTER.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "sora",
-      "tags": [
-        "v1.1",
-        "소원",
-        "aurora"
-      ],
-      "owner": "team",
-      "status": "active",
-      "title": "Sora Video Master v1.1",
-      "created_at": "2026-01-31",
-      "checksum": "f4a1b1d5"
-    },
-    {
-      "id": "DOC-CHANGELOG",
-      "path": "docs/ssot/CHANGELOG.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "ssot",
-      "tags": [
-        "ssot",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "SSOT 변경 로그 (CHANGELOG)",
-      "created_at": "2026-01-31",
-      "checksum": "457ae6bf"
-    },
-    {
       "id": "DOC-SOURCES_INDEX",
       "path": "docs/ssot/SOURCES_INDEX.md",
       "type": "document",
@@ -769,7 +786,7 @@
       "owner": "team",
       "status": "트랙",
       "title": "SSOT 원문→정본 반영 매핑표",
-      "created_at": "2026-01-31",
+      "created_at": "2026-02-01",
       "checksum": "1e550c3e"
     },
     {
@@ -785,7 +802,7 @@
       "owner": "comi",
       "status": "active",
       "title": "양자 기획법 (Quantum Planning Method) v1.0",
-      "created_at": "2026-01-31",
+      "created_at": "2026-02-01",
       "checksum": "b360b1b0"
     },
     {
@@ -803,7 +820,7 @@
       "owner": "code",
       "status": "|----",
       "title": "에이전트 인덱스",
-      "created_at": "2026-01-31",
+      "created_at": "2026-02-01",
       "checksum": "92a49e80"
     },
     {
@@ -819,7 +836,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "대화 저장소 워크플로우",
-      "created_at": "2026-01-31",
+      "created_at": "2026-02-01",
       "checksum": "55221cd3"
     },
     {
@@ -839,7 +856,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Manifest 자동 생성 시스템",
-      "created_at": "2026-01-31",
+      "created_at": "2026-02-01",
       "checksum": "d242fbfe"
     },
     {
@@ -857,7 +874,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Aurora 5 토론 시스템 안내문",
-      "created_at": "2026-01-31",
+      "created_at": "2026-02-01",
       "checksum": "49189a4d"
     },
     {
@@ -875,7 +892,7 @@
       "owner": "code",
       "status": "분석 중 / 분석 완료",
       "title": "카카오 알림톡 템플릿 설계서",
-      "created_at": "2026-01-31",
+      "created_at": "2026-02-01",
       "checksum": "75c90dee"
     },
     {
@@ -892,7 +909,7 @@
       "owner": "ceo",
       "status": "active",
       "title": "30초 홍보영상 프롬프트 패키지 v1.0",
-      "created_at": "2026-01-31",
+      "created_at": "2026-02-01",
       "checksum": "840434d0"
     },
     {
@@ -909,7 +926,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Wix 팀 소개 페이지 콘텐츠",
-      "created_at": "2026-01-31",
+      "created_at": "2026-02-01",
       "checksum": "cb6751ba"
     },
     {

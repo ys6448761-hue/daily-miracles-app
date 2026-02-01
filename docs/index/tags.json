@@ -4,9 +4,6 @@
     "DOC-AURORA5_CHARACTER_PROMPTS_V3",
     "DOC-weekly_promotion_guide",
     "DOC-tag_taxonomy",
-    "DOC-20260131_파크_2d_기술지원",
-    "DOC-20260201_드라이브_공유폴더_마스터가이드",
-    "DOC-AURORA5_SORA_FINAL_v10",
     "DOC-MIRACLE_MASTER_GUIDELINES",
     "DOC-airtable-schema",
     "DOC-airtable-wish-intake-schema",
@@ -28,6 +25,9 @@
     "DOC-ROADMAP_API",
     "DOC-GA4_SETUP_GUIDE",
     "DOC-VIDEO_MASTER",
+    "DOC-20260131_파크_2d_기술지원",
+    "DOC-20260201_드라이브_공유폴더_마스터가이드",
+    "DOC-AURORA5_SORA_FINAL_v10",
     "DOC-agents-index",
     "DOC-Aurora5_토론시스템_안내문",
     "DOC-alimtalk-templates-design",
@@ -104,8 +104,6 @@
   "aurora": [
     "DOC-DECISIONS_LOG",
     "DOC-AURORA5_CHARACTER_PROMPTS_V3",
-    "DOC-AURORA5_SORA_FINAL_v10",
-    "DOC-Code_종합지시서",
     "DOC-AURORA5_CHARACTER_PROMPTS",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
     "DOC-GROWTH-ROADMAP",
@@ -119,6 +117,8 @@
     "DOC-ROADMAP_API",
     "DOC-VIDEO_MASTER",
     "DOC-CHANGELOG",
+    "DOC-AURORA5_SORA_FINAL_v10",
+    "DOC-Code_종합지시서",
     "DOC-SOURCES_INDEX",
     "DOC-agents-index",
     "DOC-manifest-system",
@@ -206,17 +206,10 @@
   ],
   "automation": [
     "DOC-WIX_INTEGRATION_GUIDE",
+    "DOC-NOTION_PROFILE_GATE",
     "DOC-manifest-system",
     "DOC-SYS-2025-1230-LUMI-001_Airtabl",
     "DOC-20251229-VPB"
-  ],
-  "2026-02-01": [
-    "DOC-20260131_파크_2d_기술지원",
-    "DOC-20260201_노션_DB_구조_3DB",
-    "DOC-20260201_드라이브_공유폴더_마스터가이드",
-    "DOC-AURORA5_SORA_FINAL_v10",
-    "DOC-Code_종합지시서",
-    "DOC-GitHub_저장소_활용_가이드"
   ],
   "v7.0": [
     "DOC-MIRACLE_MASTER_GUIDELINES"
@@ -390,7 +383,16 @@
   ],
   "ssot": [
     "DOC-CHANGELOG",
+    "DOC-NOTION_PROFILE_GATE",
     "DOC-SOURCES_INDEX"
+  ],
+  "2026-02-01": [
+    "DOC-20260131_파크_2d_기술지원",
+    "DOC-20260201_노션_DB_구조_3DB",
+    "DOC-20260201_드라이브_공유폴더_마스터가이드",
+    "DOC-AURORA5_SORA_FINAL_v10",
+    "DOC-Code_종합지시서",
+    "DOC-GitHub_저장소_활용_가이드"
   ],
   "system": [
     "DOC-agents-index",
