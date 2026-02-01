@@ -20,15 +20,19 @@
  */
 
 const express = require('express');
+const path = require('path');
+const fs = require('fs');
 const router = express.Router();
 
-// Services
+// Services & DB
 let previewService;
 let pointService;
+let db;
 
 try {
   previewService = require('../services/previewService');
   pointService = require('../services/pointService');
+  db = require('../database/db');
 } catch (e) {
   console.error('[RewardRoutes] Service load failed:', e.message);
 }
@@ -57,19 +61,51 @@ function checkService(req, res, next) {
 router.use(checkService);
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Helper: Token 인증
+// ═══════════════════════════════════════════════════════════════════════════
+
+async function resolveSubject(req) {
+  const token = req.body.token || req.query.token;
+  if (token && db) {
+    try {
+      const result = await db.query(
+        'SELECT id FROM trials WHERE token = $1',
+        [token]
+      );
+      if (result.rows.length > 0) {
+        return { subject_type: 'trial', subject_id: result.rows[0].id.toString() };
+      }
+    } catch (e) {
+      console.error('[RewardRoutes] Token validation error:', e.message);
+    }
+    return { error: 'INVALID_TOKEN' };
+  }
+
+  const subject_id = req.body.subject_id || req.query.subject_id;
+  const subject_type = req.body.subject_type || req.query.subject_type || 'trial';
+  if (subject_id) {
+    return { subject_type, subject_id };
+  }
+
+  return { error: 'NO_AUTH' };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // GET /api/rewards/preview/status
 // 교환 자격 및 한도 확인
 // ═══════════════════════════════════════════════════════════════════════════
 router.get('/preview/status', asyncHandler(async (req, res) => {
-  const { subject_type = 'trial', subject_id } = req.query;
+  const subject = await resolveSubject(req);
 
-  if (!subject_id) {
-    return res.status(400).json({
+  if (subject.error) {
+    return res.status(401).json({
       success: false,
-      error: 'subject_id는 필수입니다',
-      errorCode: 'MISSING_SUBJECT_ID'
+      error: '인증 정보가 필요합니다',
+      errorCode: subject.error
     });
   }
+
+  const { subject_type, subject_id } = subject;
 
   // 종합 자격 확인
   const eligibility = await previewService.checkRedemptionEligibility(
@@ -126,15 +162,17 @@ router.get('/preview/status', asyncHandler(async (req, res) => {
 // Preview 교환 (900P)
 // ═══════════════════════════════════════════════════════════════════════════
 router.post('/preview', asyncHandler(async (req, res) => {
-  const { subject_type = 'trial', subject_id } = req.body;
+  const subject = await resolveSubject(req);
 
-  if (!subject_id) {
-    return res.status(400).json({
+  if (subject.error) {
+    return res.status(401).json({
       success: false,
-      error: 'subject_id는 필수입니다',
-      errorCode: 'MISSING_SUBJECT_ID'
+      error: '인증 정보가 필요합니다',
+      errorCode: subject.error
     });
   }
+
+  const { subject_type, subject_id } = subject;
 
   // 교환 실행
   const result = await previewService.redeemPreview(subject_type, subject_id);
@@ -164,7 +202,7 @@ router.post('/preview', asyncHandler(async (req, res) => {
 
 // ═══════════════════════════════════════════════════════════════════════════
 // GET /api/rewards/preview/download/:token
-// Preview 다운로드 (1회 제한)
+// Preview 다운로드 (1회 제한) - 실제 PDF 파일 전송
 // ═══════════════════════════════════════════════════════════════════════════
 router.get('/preview/download/:token', asyncHandler(async (req, res) => {
   const { token } = req.params;
@@ -189,14 +227,24 @@ router.get('/preview/download/:token', asyncHandler(async (req, res) => {
     return res.status(statusCode).json(result);
   }
 
-  // 성공 시 파일 정보 또는 리다이렉트
-  res.json({
-    success: true,
-    message: result.message,
-    previewUrl: result.previewUrl,
-    specs: result.specs,
-    note: '이 토큰은 더 이상 사용할 수 없습니다.'
-  });
+  // 실제 파일이 있으면 다운로드, 없으면 JSON 응답
+  if (result.filePath && fs.existsSync(result.filePath)) {
+    // Content-Disposition으로 파일 다운로드 강제
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${result.fileName}"`);
+    res.setHeader('X-Download-Warning', 'This token is now invalidated');
+
+    const fileStream = fs.createReadStream(result.filePath);
+    fileStream.pipe(res);
+  } else {
+    // 파일이 없으면 에러 응답
+    res.status(404).json({
+      success: false,
+      error: 'FILE_NOT_FOUND',
+      message: '파일을 찾을 수 없습니다. 다시 교환해 주세요.',
+      specs: result.specs
+    });
+  }
 }));
 
 // ═══════════════════════════════════════════════════════════════════════════

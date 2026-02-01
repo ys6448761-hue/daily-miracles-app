@@ -400,6 +400,15 @@ try {
   console.error("❌ 어드민 포인트 라우터 로드 실패:", error.message);
 }
 
+// 일일 체크 (출석/실행/기록) 라우터 로딩 (Aurora5 v2.6 Gap)
+let dailyCheckRoutes = null;
+try {
+  dailyCheckRoutes = require("./routes/dailyCheckRoutes");
+  console.log("✅ 일일 체크 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 일일 체크 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -546,6 +555,12 @@ app.get("/program/messages", (_req, res) => {
 // /result/:id 형태의 URL을 result.html로 라우팅 (ID는 프론트에서 처리)
 app.get("/result/:id", (_req, res) => {
   res.sendFile(path.join(__dirname, "public", "result.html"));
+});
+
+// ---------- Points Page (포인트 대시보드) ----------
+// 접근: /points?token=xxx (토큰 기반 인증)
+app.get("/points", (_req, res) => {
+  res.sendFile(path.join(__dirname, "public", "points.html"));
 });
 
 // ---------- Request Logging (가시화) ----------
@@ -1196,6 +1211,14 @@ if (adminPointRoutes) {
   console.log("✅ 어드민 포인트 라우터 등록 완료 (/api/admin/points, /api/admin/referral)");
 } else {
   console.warn("⚠️ 어드민 포인트 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 일일 체크 Routes (/api/daily) - Aurora5 v2.6 Gap ----------
+if (dailyCheckRoutes) {
+  app.use("/api/daily", dailyCheckRoutes);
+  console.log("✅ 일일 체크 라우터 등록 완료 (/api/daily/checkin, /api/daily/action, /api/daily/log)");
+} else {
+  console.warn("⚠️ 일일 체크 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------

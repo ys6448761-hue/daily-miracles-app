@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FRRJ7JZPGZ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-FRRJ7JZPGZ');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>포인트 - 하루하루의 기적</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+            background: #FFF5F7;
+            min-height: 100vh;
+            padding: 20px;
+            color: #2c2c2c;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* 섹션 공통 스타일 */
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 12px rgba(155, 135, 245, 0.1);
+        }
+
+        /* 헤더 */
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            color: #6E59A5;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        /* 포인트 카드 */
+        .point-card {
+            background: linear-gradient(135deg, #9B87F5 0%, #F5A7C6 100%);
+            border-radius: 20px;
+            padding: 28px;
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(155, 135, 245, 0.3);
+        }
+
+        .point-card .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .point-card .balance {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .point-card .balance::after {
+            content: 'P';
+            font-size: 1.5rem;
+            margin-left: 4px;
+        }
+
+        .point-card .sub-info {
+            font-size: 0.8rem;
+            opacity: 0.85;
+        }
+
+        /* 체크리스트 */
+        .checklist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .checklist-header h2 {
+            font-size: 1.1rem;
+            color: #6E59A5;
+        }
+
+        .checklist-header .progress {
+            font-size: 0.85rem;
+            color: #9B87F5;
+            font-weight: 600;
+        }
+
+        .checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: #FAFAFA;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checklist-item:hover {
+            background: #F5F0FF;
+        }
+
+        .checklist-item.completed {
+            background: #F0FFF4;
+        }
+
+        .checklist-item .left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .checklist-item .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #DDD;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: transparent;
+            transition: all 0.2s ease;
+        }
+
+        .checklist-item.completed .checkbox {
+            background: #9B87F5;
+            border-color: #9B87F5;
+            color: white;
+        }
+
+        .checklist-item .info h3 {
+            font-size: 0.95rem;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .checklist-item .info p {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .checklist-item .reward {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #9B87F5;
+        }
+
+        .checklist-item.completed .reward {
+            color: #10B981;
+        }
+
+        /* 예고편 교환 */
+        .preview-section {
+            text-align: center;
+        }
+
+        .preview-section h2 {
+            font-size: 1.1rem;
+            color: #6E59A5;
+            margin-bottom: 12px;
+        }
+
+        .preview-section p {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .preview-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #9B87F5 0%, #6E59A5 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(110, 89, 165, 0.3);
+        }
+
+        .preview-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(110, 89, 165, 0.4);
+        }
+
+        .preview-btn:disabled {
+            background: #CCC;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .preview-btn .cost {
+            display: block;
+            font-size: 0.8rem;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .preview-info {
+            margin-top: 16px;
+            padding: 12px;
+            background: #FFF5F7;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            color: #888;
+            line-height: 1.5;
+        }
+
+        /* 추천 코드 */
+        .referral-section h2 {
+            font-size: 1.1rem;
+            color: #6E59A5;
+            margin-bottom: 12px;
+        }
+
+        .referral-section p {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 16px;
+        }
+
+        .referral-code-box {
+            display: flex;
+            gap: 8px;
+        }
+
+        .referral-code {
+            flex: 1;
+            padding: 14px 16px;
+            background: #F5F0FF;
+            border: 2px dashed #9B87F5;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #6E59A5;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .copy-btn {
+            padding: 14px 20px;
+            background: #9B87F5;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: #8B77E5;
+        }
+
+        .copy-btn.copied {
+            background: #10B981;
+        }
+
+        .referral-benefits {
+            margin-top: 16px;
+            padding: 12px;
+            background: #FAFAFA;
+            border-radius: 8px;
+        }
+
+        .referral-benefits h4 {
+            font-size: 0.85rem;
+            color: #6E59A5;
+            margin-bottom: 8px;
+        }
+
+        .referral-benefits ul {
+            list-style: none;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .referral-benefits li {
+            padding: 4px 0;
+        }
+
+        .referral-benefits li::before {
+            content: '✨ ';
+        }
+
+        /* 로딩 상태 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #EEE;
+            border-top-color: #9B87F5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 에러 메시지 */
+        .error-message {
+            padding: 12px;
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            border-radius: 8px;
+            color: #DC2626;
+            font-size: 0.85rem;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        /* 성공 메시지 */
+        .success-message {
+            padding: 12px;
+            background: #F0FFF4;
+            border: 1px solid #BBF7D0;
+            border-radius: 8px;
+            color: #15803D;
+            font-size: 0.85rem;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        /* 모달 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal h3 {
+            font-size: 1.2rem;
+            color: #6E59A5;
+            margin-bottom: 16px;
+        }
+
+        .modal p {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border: none;
+        }
+
+        .modal-actions .cancel {
+            background: #EEE;
+            color: #666;
+        }
+
+        .modal-actions .confirm {
+            background: #9B87F5;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <div class="header">
+            <h1>하루하루의 기적</h1>
+            <p id="dateDisplay">오늘도 기적을 만들어보세요</p>
+        </div>
+
+        <!-- 로딩 상태 -->
+        <div id="loadingState" class="section loading">
+            <div class="spinner"></div>
+            <p>정보를 불러오는 중...</p>
+        </div>
+
+        <!-- 메인 컨텐츠 (로딩 완료 후 표시) -->
+        <div id="mainContent" style="display: none;">
+            <!-- 포인트 카드 -->
+            <div class="point-card">
+                <div class="label">보유 포인트</div>
+                <div class="balance" id="pointBalance">0</div>
+                <div class="sub-info">오늘 <span id="todayEarned">0</span>P 적립 | 최대 100P</div>
+            </div>
+
+            <!-- 오늘의 체크리스트 -->
+            <div class="section">
+                <div class="checklist-header">
+                    <h2>오늘의 미션</h2>
+                    <span class="progress" id="checkProgress">0/3 완료</span>
+                </div>
+                <div class="checklist">
+                    <div class="checklist-item" id="checkinItem" data-type="checkin">
+                        <div class="left">
+                            <div class="checkbox">✓</div>
+                            <div class="info">
+                                <h3>출석체크</h3>
+                                <p>오늘 하루를 시작해요</p>
+                            </div>
+                        </div>
+                        <div class="reward">+50P</div>
+                    </div>
+                    <div class="checklist-item" id="actionItem" data-type="action">
+                        <div class="left">
+                            <div class="checkbox">✓</div>
+                            <div class="info">
+                                <h3>실행체크</h3>
+                                <p>24시간 내 구체적 행동 수행</p>
+                            </div>
+                        </div>
+                        <div class="reward">+30P</div>
+                    </div>
+                    <div class="checklist-item" id="logItem" data-type="log">
+                        <div class="left">
+                            <div class="checkbox">✓</div>
+                            <div class="info">
+                                <h3>기록 작성</h3>
+                                <p>오늘의 경험을 기록해요</p>
+                            </div>
+                        </div>
+                        <div class="reward">+20P</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 예고편 교환 -->
+            <div class="section preview-section">
+                <h2>예고편 교환</h2>
+                <p>소원 실현 로드맵의 미리보기를<br>포인트로 교환할 수 있어요</p>
+                <button class="preview-btn" id="previewBtn" onclick="handlePreviewRedeem()">
+                    예고편 받기
+                    <span class="cost">900P 필요</span>
+                </button>
+                <div class="preview-info" id="previewInfo">
+                    1페이지 미리보기 · 워터마크 포함 · 24시간 유효 · 1회 다운로드
+                </div>
+            </div>
+
+            <!-- 추천 코드 -->
+            <div class="section referral-section">
+                <h2>친구 초대</h2>
+                <p>친구에게 추천 코드를 공유하고<br>함께 포인트를 받으세요</p>
+                <div class="referral-code-box">
+                    <div class="referral-code" id="referralCode">-</div>
+                    <button class="copy-btn" id="copyBtn" onclick="copyReferralCode()">복사</button>
+                </div>
+                <div class="referral-benefits">
+                    <h4>추천 혜택</h4>
+                    <ul>
+                        <li>추천받은 친구: 300P 즉시 지급</li>
+                        <li>나: 친구가 자격 달성 시 300P</li>
+                        <li>월 최대 5명까지 추천 가능</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 에러 상태 -->
+        <div id="errorState" class="section" style="display: none;">
+            <div class="error-message" id="errorMessage">정보를 불러올 수 없습니다</div>
+            <button onclick="loadData()" style="width: 100%; padding: 12px; border: none; border-radius: 8px; background: #9B87F5; color: white; cursor: pointer;">다시 시도</button>
+        </div>
+    </div>
+
+    <!-- 기록 작성 모달 -->
+    <div class="modal-overlay" id="logModal">
+        <div class="modal">
+            <h3>오늘의 기록</h3>
+            <textarea id="logContent" placeholder="오늘 경험한 것, 느낀 것을 자유롭게 적어주세요 (10자 이상)" style="width: 100%; height: 120px; padding: 12px; border: 1px solid #DDD; border-radius: 8px; resize: none; font-size: 0.9rem; margin-bottom: 16px;"></textarea>
+            <div class="modal-actions">
+                <button class="cancel" onclick="closeLogModal()">취소</button>
+                <button class="confirm" onclick="submitLog()">기록하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 예고편 확인 모달 -->
+    <div class="modal-overlay" id="previewModal">
+        <div class="modal">
+            <h3>예고편 교환</h3>
+            <p id="previewModalText">900P를 사용하여 예고편을 교환하시겠습니까?</p>
+            <div class="modal-actions">
+                <button class="cancel" onclick="closePreviewModal()">취소</button>
+                <button class="confirm" onclick="confirmPreviewRedeem()">교환하기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // URL에서 token 또는 subject_id 추출
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        // 상태 변수
+        let subjectId = null;
+        let subjectType = 'trial';
+        let pointBalance = 0;
+        let todayStatus = {};
+        let referralCode = '';
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toLocaleDateString('ko-KR', {
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long'
+            });
+            document.getElementById('dateDisplay').textContent = today;
+
+            if (token) {
+                // 토큰으로 인증 후 데이터 로드
+                authenticateAndLoad();
+            } else {
+                showError('접근 권한이 없습니다. 유효한 링크로 접속해주세요.');
+            }
+        });
+
+        // 토큰 인증 후 데이터 로드
+        async function authenticateAndLoad() {
+            showLoading();
+
+            try {
+                // 토큰으로 subject_id 조회
+                const authRes = await fetch(`/api/daily/auth?token=${encodeURIComponent(token)}`);
+                const authData = await authRes.json();
+
+                if (!authData.success) {
+                    throw new Error(authData.error || '인증에 실패했습니다');
+                }
+
+                subjectId = authData.subject_id;
+                subjectType = authData.subject_type || 'trial';
+
+                // 데이터 로드 진행
+                await loadData();
+            } catch (error) {
+                console.error('Auth error:', error);
+                showError(error.message || '인증에 실패했습니다');
+            }
+        }
+
+        // 데이터 로드 (subjectId가 이미 설정된 상태에서 호출)
+        async function loadData() {
+            if (!subjectId) {
+                showError('인증 정보가 없습니다');
+                return;
+            }
+
+            try {
+                // 병렬로 데이터 조회
+                const [dailyStatus, previewStatus] = await Promise.all([
+                    fetch(`/api/daily/status?token=${encodeURIComponent(token)}`).then(r => r.json()),
+                    fetch(`/api/rewards/preview/status?token=${encodeURIComponent(token)}`).then(r => r.json())
+                ]);
+
+                if (!dailyStatus.success) {
+                    throw new Error(dailyStatus.error || '일일 현황 조회 실패');
+                }
+
+                // 데이터 적용
+                pointBalance = dailyStatus.balance || 0;
+                todayStatus = dailyStatus;
+
+                updateUI(dailyStatus, previewStatus);
+                showContent();
+            } catch (error) {
+                console.error('Data load error:', error);
+                showError(error.message || '데이터를 불러올 수 없습니다');
+            }
+        }
+
+        // UI 업데이트
+        function updateUI(dailyStatus, previewStatus) {
+            // 포인트 잔액
+            document.getElementById('pointBalance').textContent = pointBalance.toLocaleString();
+            document.getElementById('todayEarned').textContent = dailyStatus.totalEarned || 0;
+
+            // 체크리스트 상태
+            const checklist = dailyStatus.checklist || [];
+            let completedCount = 0;
+
+            checklist.forEach(item => {
+                const element = document.getElementById(`${item.type}Item`);
+                if (element && item.completed) {
+                    element.classList.add('completed');
+                    const rewardEl = element.querySelector('.reward');
+                    if (rewardEl) {
+                        rewardEl.textContent = item.earned > 0 ? `+${item.earned}P` : '완료';
+                    }
+                    completedCount++;
+                }
+            });
+
+            document.getElementById('checkProgress').textContent = `${completedCount}/3 완료`;
+
+            // 체크리스트 클릭 이벤트
+            ['checkin', 'action', 'log'].forEach(type => {
+                const element = document.getElementById(`${type}Item`);
+                const item = checklist.find(i => i.type === type);
+                if (element && (!item || !item.completed)) {
+                    element.onclick = () => handleCheck(type);
+                }
+            });
+
+            // 예고편 버튼 상태
+            const previewBtn = document.getElementById('previewBtn');
+            if (!previewStatus.eligible) {
+                previewBtn.disabled = true;
+                const reasons = {
+                    'FEATURE_DISABLED': '현재 교환이 불가능합니다',
+                    'INSUFFICIENT_BALANCE': `잔액 부족 (${pointBalance}P / 900P)`,
+                    'QUALIFICATION_NOT_MET': '자격 요건 미충족',
+                    'USER_WEEKLY_LIMIT': '이번 주 교환 완료',
+                    'GLOBAL_WEEKLY_LIMIT': '주간 한도 도달'
+                };
+                document.getElementById('previewInfo').textContent =
+                    previewStatus.message || reasons[previewStatus.reason] || '교환 불가';
+            }
+
+            // 추천 코드 (trials 테이블에서 가져옴)
+            if (dailyStatus.refCode) {
+                referralCode = dailyStatus.refCode;
+                document.getElementById('referralCode').textContent = referralCode;
+            } else {
+                // 추천 코드가 없으면 생성 요청 (옵션)
+                document.getElementById('referralCode').textContent = '로딩중...';
+                fetchReferralCode();
+            }
+        }
+
+        // 추천 코드 조회
+        async function fetchReferralCode() {
+            try {
+                const res = await fetch(`/api/referral/my-code?token=${encodeURIComponent(token)}`);
+                const data = await res.json();
+                if (data.success && data.code) {
+                    referralCode = data.code;
+                    document.getElementById('referralCode').textContent = referralCode;
+                } else {
+                    document.getElementById('referralCode').textContent = '없음';
+                }
+            } catch (e) {
+                document.getElementById('referralCode').textContent = '-';
+            }
+        }
+
+        // 체크 수행
+        async function handleCheck(type) {
+            if (type === 'log') {
+                document.getElementById('logModal').classList.add('active');
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/daily/${type}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    // UI 업데이트
+                    const element = document.getElementById(`${type}Item`);
+                    element.classList.add('completed');
+                    element.onclick = null;
+
+                    const rewardEl = element.querySelector('.reward');
+                    if (rewardEl && data.pointsEarned > 0) {
+                        rewardEl.textContent = `+${data.pointsEarned}P`;
+                    } else {
+                        rewardEl.textContent = '완료';
+                    }
+
+                    // 잔액 업데이트
+                    if (data.pointsEarned) {
+                        pointBalance += data.pointsEarned;
+                        document.getElementById('pointBalance').textContent = pointBalance.toLocaleString();
+                        document.getElementById('todayEarned').textContent =
+                            parseInt(document.getElementById('todayEarned').textContent) + data.pointsEarned;
+                    }
+
+                    // 진행률 업데이트
+                    const currentProgress = document.getElementById('checkProgress').textContent;
+                    const match = currentProgress.match(/(\d+)\/3/);
+                    if (match) {
+                        const newCount = parseInt(match[1]) + 1;
+                        document.getElementById('checkProgress').textContent = `${newCount}/3 완료`;
+                    }
+
+                    alert(data.message || `${type} 체크 완료!`);
+                } else {
+                    alert(data.message || data.error || '체크에 실패했습니다');
+                }
+            } catch (error) {
+                console.error('Check error:', error);
+                alert('요청 중 오류가 발생했습니다');
+            }
+        }
+
+        // 기록 모달 닫기
+        function closeLogModal() {
+            document.getElementById('logModal').classList.remove('active');
+            document.getElementById('logContent').value = '';
+        }
+
+        // 기록 제출
+        async function submitLog() {
+            const content = document.getElementById('logContent').value.trim();
+            if (content.length < 10) {
+                alert('최소 10자 이상 작성해주세요');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/daily/log', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token,
+                        log_content: content
+                    })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    closeLogModal();
+
+                    const element = document.getElementById('logItem');
+                    element.classList.add('completed');
+                    element.onclick = null;
+
+                    const rewardEl = element.querySelector('.reward');
+                    if (rewardEl && data.pointsEarned > 0) {
+                        rewardEl.textContent = `+${data.pointsEarned}P`;
+                    } else {
+                        rewardEl.textContent = '완료';
+                    }
+
+                    if (data.pointsEarned) {
+                        pointBalance += data.pointsEarned;
+                        document.getElementById('pointBalance').textContent = pointBalance.toLocaleString();
+                    }
+
+                    alert(data.message || '기록 완료!');
+                } else {
+                    alert(data.message || data.error || '기록 저장에 실패했습니다');
+                }
+            } catch (error) {
+                console.error('Log submit error:', error);
+                alert('요청 중 오류가 발생했습니다');
+            }
+        }
+
+        // 예고편 교환 핸들러
+        function handlePreviewRedeem() {
+            if (pointBalance < 900) {
+                alert(`포인트가 부족합니다. (현재: ${pointBalance}P / 필요: 900P)`);
+                return;
+            }
+            document.getElementById('previewModal').classList.add('active');
+        }
+
+        function closePreviewModal() {
+            document.getElementById('previewModal').classList.remove('active');
+        }
+
+        async function confirmPreviewRedeem() {
+            closePreviewModal();
+
+            try {
+                const res = await fetch('/api/rewards/preview', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    pointBalance = data.newBalance;
+                    document.getElementById('pointBalance').textContent = pointBalance.toLocaleString();
+
+                    // 다운로드 링크 안내
+                    alert(`교환 완료! 24시간 내에 다운로드하세요.\n\n다운로드 링크:\n${data.downloadUrl}`);
+
+                    // 자동 다운로드 시작
+                    if (data.downloadUrl) {
+                        window.open(data.downloadUrl, '_blank');
+                    }
+                } else {
+                    if (data.refunded) {
+                        alert(`교환에 실패했습니다. ${data.refundAmount}P가 환불되었습니다.`);
+                    } else {
+                        alert(data.message || data.error || '교환에 실패했습니다');
+                    }
+                }
+            } catch (error) {
+                console.error('Preview redeem error:', error);
+                alert('요청 중 오류가 발생했습니다');
+            }
+        }
+
+        // 추천 코드 복사
+        function copyReferralCode() {
+            if (!referralCode || referralCode === '-') {
+                alert('추천 코드가 없습니다');
+                return;
+            }
+
+            navigator.clipboard.writeText(referralCode).then(() => {
+                const btn = document.getElementById('copyBtn');
+                btn.textContent = '복사됨!';
+                btn.classList.add('copied');
+
+                setTimeout(() => {
+                    btn.textContent = '복사';
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                // 클립보드 API 실패 시 폴백
+                const textarea = document.createElement('textarea');
+                textarea.value = referralCode;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+
+                const btn = document.getElementById('copyBtn');
+                btn.textContent = '복사됨!';
+                btn.classList.add('copied');
+
+                setTimeout(() => {
+                    btn.textContent = '복사';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // UI 상태 전환
+        function showLoading() {
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('errorState').style.display = 'none';
+        }
+
+        function showContent() {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('errorState').style.display = 'none';
+        }
+
+        function showError(message) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+            document.getElementById('errorMessage').textContent = message;
+        }
+    </script>
+</body>
+</html>

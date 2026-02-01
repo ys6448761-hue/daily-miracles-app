@@ -15,8 +15,14 @@
  */
 
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
+const PDFDocument = require('pdfkit');
 const db = require('../database/db');
 const pointService = require('./pointService');
+
+// PDF 출력 디렉토리
+const PREVIEW_OUTPUT_DIR = path.join(__dirname, '..', 'output', 'previews');
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 상수 정의 (SSOT)
@@ -336,7 +342,30 @@ async function redeemPreview(subjectType, subjectId) {
                   updated_at = CURRENT_TIMESTAMP
   `, [yearWeek]);
 
-  console.log(`✅ [Preview] Redeemed: ${subjectType}:${subjectId}, token: ${previewToken.substring(0, 8)}...`);
+  console.log(`[Preview] Redeemed: ${subjectType}:${subjectId}, token: ${previewToken.substring(0, 8)}...`);
+
+  // 6. PDF 생성 (동기)
+  const pdfResult = await generatePreviewPDF(redemption.id, subjectType, subjectId);
+
+  if (!pdfResult.success) {
+    console.error(`[Preview] PDF generation failed, initiating refund...`);
+
+    // 생성 실패 시 환불 처리
+    const refundResult = await refundOnFailure(subjectType, subjectId, redemption.id);
+
+    return {
+      success: false,
+      error: 'PDF_GENERATION_FAILED',
+      refunded: refundResult.success,
+      refundAmount: refundResult.success ? PREVIEW_COST : 0,
+      newBalance: refundResult.newBalance || spendResult.balance + PREVIEW_COST,
+      message: refundResult.success
+        ? `PDF 생성에 실패하여 ${PREVIEW_COST}P가 환불되었습니다.`
+        : `PDF 생성에 실패했습니다. 환불 처리 중 오류가 발생했습니다.`
+    };
+  }
+
+  console.log(`✅ [Preview] Complete: ${subjectType}:${subjectId}, file: ${pdfResult.fileName}`);
 
   return {
     success: true,
@@ -344,6 +373,8 @@ async function redeemPreview(subjectType, subjectId) {
     previewToken: redemption.preview_token,
     expiresAt: redemption.expires_at,
     newBalance: spendResult.balance,
+    fileName: pdfResult.fileName,
+    fileSize: pdfResult.fileSize,
     message: `Preview 교환 완료. 24시간 내 1회 다운로드 가능합니다.`
   };
 }
@@ -419,10 +450,24 @@ async function downloadPreview(previewToken) {
 
   console.log(`📥 [Preview] Downloaded: ${previewToken.substring(0, 8)}...`);
 
-  // 5. 파일 정보 반환 (실제 파일 생성은 별도 처리)
+  // 5. 실제 파일 경로 확인
+  const fileName = redemption.preview_url;
+  let filePath = null;
+
+  if (fileName) {
+    filePath = path.join(PREVIEW_OUTPUT_DIR, fileName);
+    if (!fs.existsSync(filePath)) {
+      console.warn(`[Preview] File not found: ${filePath}`);
+      filePath = null;
+    }
+  }
+
+  console.log(`📥 [Preview] Downloaded: ${previewToken.substring(0, 8)}...`);
+
   return {
     success: true,
-    previewUrl: redemption.preview_url || '/api/rewards/preview/generate/' + redemption.id,
+    fileName: fileName,
+    filePath: filePath,
     watermarkText: redemption.watermark_text,
     message: '다운로드가 완료되었습니다. 이 링크는 더 이상 사용할 수 없습니다.',
     specs: {
@@ -431,6 +476,270 @@ async function downloadPreview(previewToken) {
       watermark: true
     }
   };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PDF 생성
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Preview PDF 생성 (1페이지, 워터마크)
+ * @param {number} redemptionId - preview_redemption ID
+ * @param {string} subjectType - trial/user
+ * @param {string} subjectId - 대상 ID
+ * @returns {Promise<object>} { success, filePath, fileName }
+ */
+async function generatePreviewPDF(redemptionId, subjectType, subjectId) {
+  console.log(`[Preview] Generating PDF for redemption: ${redemptionId}`);
+
+  try {
+    // 1. Trial 및 분석 데이터 조회
+    const dataResult = await db.query(`
+      SELECT
+        t.id as trial_id,
+        t.phone,
+        i.payload_norm->>'nickname' as nickname,
+        i.payload_norm->>'wish' as wish,
+        r.analysis_json,
+        r.analysis_text
+      FROM trials t
+      JOIN mvp_inbox i ON i.id = t.inbox_id
+      JOIN mvp_results r ON r.token = t.token
+      WHERE t.id = $1::integer
+    `, [subjectId]);
+
+    if (dataResult.rows.length === 0) {
+      console.error(`[Preview] Trial data not found: ${subjectId}`);
+      return { success: false, error: 'DATA_NOT_FOUND' };
+    }
+
+    const data = dataResult.rows[0];
+    const nickname = data.nickname || '소원이';
+    const wish = data.wish || '소원을 이루고 싶어요';
+
+    // 분석 결과 파싱
+    let analysisData = {};
+    try {
+      analysisData = typeof data.analysis_json === 'string'
+        ? JSON.parse(data.analysis_json)
+        : (data.analysis_json || {});
+    } catch (e) {
+      console.warn('[Preview] Failed to parse analysis_json:', e.message);
+    }
+
+    // 2. 출력 디렉토리 확인/생성
+    if (!fs.existsSync(PREVIEW_OUTPUT_DIR)) {
+      fs.mkdirSync(PREVIEW_OUTPUT_DIR, { recursive: true });
+    }
+
+    // 3. 파일명 생성
+    const timestamp = Date.now();
+    const fileName = `preview_${redemptionId}_${timestamp}.pdf`;
+    const filePath = path.join(PREVIEW_OUTPUT_DIR, fileName);
+
+    // 4. PDF 생성
+    const doc = new PDFDocument({
+      size: 'A4',
+      margin: 50,
+      info: {
+        Title: '하루하루의 기적 - Preview',
+        Author: 'Daily Miracles',
+        Subject: '소원 실현 미리보기'
+      }
+    });
+
+    const writeStream = fs.createWriteStream(filePath);
+    doc.pipe(writeStream);
+
+    // === PDF 컨텐츠 작성 ===
+
+    // 배경색 (연핑크)
+    doc.rect(0, 0, doc.page.width, doc.page.height)
+       .fill('#FFF5F7');
+
+    // 헤더 배경 (그라데이션 효과 - 단색으로 대체)
+    doc.rect(0, 0, doc.page.width, 120)
+       .fill('#9B87F5');
+
+    // 타이틀
+    doc.fillColor('#FFFFFF')
+       .fontSize(28)
+       .text('하루하루의 기적', 50, 40, { align: 'center' });
+
+    doc.fontSize(14)
+       .text('Daily Miracles - Preview', 50, 75, { align: 'center' });
+
+    // 구분선
+    doc.moveTo(50, 140).lineTo(545, 140).stroke('#9B87F5');
+
+    // 닉네임 & 소원
+    doc.fillColor('#6E59A5')
+       .fontSize(18)
+       .text(`${nickname}님의 소원`, 50, 160);
+
+    doc.fillColor('#333333')
+       .fontSize(12)
+       .text(wish, 50, 190, { width: 495, lineGap: 5 });
+
+    // 기적지수 섹션 (있는 경우)
+    let yPos = 250;
+
+    if (analysisData.miracleIndex || analysisData.miracle_index) {
+      const miracleIndex = analysisData.miracleIndex || analysisData.miracle_index || 75;
+
+      doc.fillColor('#6E59A5')
+         .fontSize(16)
+         .text('기적지수', 50, yPos);
+
+      // 프로그레스 바 배경
+      doc.rect(50, yPos + 25, 200, 20)
+         .fill('#E0E0E0');
+
+      // 프로그레스 바 (기적지수에 따라)
+      const barWidth = Math.min(200, (miracleIndex / 100) * 200);
+      doc.rect(50, yPos + 25, barWidth, 20)
+         .fill('#9B87F5');
+
+      doc.fillColor('#333333')
+         .fontSize(14)
+         .text(`${miracleIndex}점`, 260, yPos + 27);
+
+      yPos += 70;
+    }
+
+    // 요약 텍스트 (있는 경우)
+    if (data.analysis_text) {
+      doc.fillColor('#6E59A5')
+         .fontSize(16)
+         .text('분석 요약', 50, yPos);
+
+      // 미리보기는 첫 200자만 표시
+      const previewText = data.analysis_text.substring(0, 200) + '...';
+
+      doc.fillColor('#333333')
+         .fontSize(11)
+         .text(previewText, 50, yPos + 25, { width: 495, lineGap: 4 });
+
+      yPos += 120;
+    }
+
+    // 워터마크 (대각선으로 여러 개)
+    doc.save();
+    doc.fillColor('#9B87F5')
+       .opacity(0.15)
+       .fontSize(40)
+       .rotate(-45, { origin: [300, 400] });
+
+    const watermarkPositions = [
+      [100, 300], [300, 400], [500, 500],
+      [100, 500], [300, 600], [500, 700]
+    ];
+
+    for (const [x, y] of watermarkPositions) {
+      doc.text(WATERMARK_TEXT, x, y, { align: 'center' });
+    }
+
+    doc.restore();
+
+    // 하단 안내 문구
+    doc.fillColor('#888888')
+       .fontSize(10)
+       .text(
+         '※ 이 문서는 미리보기 버전입니다. 전체 내용은 정식 프로그램 구매 후 확인하실 수 있습니다.',
+         50, 750,
+         { width: 495, align: 'center' }
+       );
+
+    // 생성일시
+    doc.fontSize(8)
+       .text(
+         `Generated: ${new Date().toISOString().slice(0, 19).replace('T', ' ')} | Token: ${redemptionId}`,
+         50, 780,
+         { width: 495, align: 'center' }
+       );
+
+    // PDF 종료
+    doc.end();
+
+    // 스트림 완료 대기
+    await new Promise((resolve, reject) => {
+      writeStream.on('finish', resolve);
+      writeStream.on('error', reject);
+    });
+
+    console.log(`✅ [Preview] PDF generated: ${fileName}`);
+
+    // 5. DB에 파일 경로 저장
+    await db.query(`
+      UPDATE preview_redemption
+      SET preview_url = $1,
+          status = 'READY'
+      WHERE id = $2
+    `, [fileName, redemptionId]);
+
+    return {
+      success: true,
+      filePath,
+      fileName,
+      fileSize: fs.statSync(filePath).size
+    };
+
+  } catch (error) {
+    console.error('[Preview] PDF generation failed:', error);
+    return {
+      success: false,
+      error: 'GENERATION_FAILED',
+      message: error.message
+    };
+  }
+}
+
+/**
+ * PDF 생성 실패 시 포인트 환불
+ * @param {string} subjectType
+ * @param {string} subjectId
+ * @param {number} redemptionId
+ * @returns {Promise<object>}
+ */
+async function refundOnFailure(subjectType, subjectId, redemptionId) {
+  console.log(`[Preview] Refunding points for failed redemption: ${redemptionId}`);
+
+  try {
+    // 환불 포인트 지급
+    const refundResult = await pointService.earnPoints(
+      subjectType,
+      subjectId,
+      'REFUND_PREVIEW',
+      PREVIEW_COST,
+      {
+        referenceType: 'preview_refund',
+        referenceId: redemptionId.toString(),
+        description: `Preview 생성 실패 환불 (${PREVIEW_COST}P)`
+      }
+    );
+
+    // 상태 업데이트
+    await db.query(`
+      UPDATE preview_redemption
+      SET status = 'REFUNDED',
+          metadata = COALESCE(metadata, '{}'::jsonb) || '{"refund_reason": "GENERATION_FAILED"}'::jsonb
+      WHERE id = $1
+    `, [redemptionId]);
+
+    console.log(`✅ [Preview] Refund completed: ${PREVIEW_COST}P`);
+
+    return {
+      success: true,
+      refunded: PREVIEW_COST,
+      newBalance: refundResult.balance
+    };
+  } catch (error) {
+    console.error('[Preview] Refund failed:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -503,6 +812,7 @@ module.exports = {
   LINK_EXPIRY_HOURS,
   QUALIFICATION,
   WATERMARK_TEXT,
+  PREVIEW_OUTPUT_DIR,
 
   // Helpers
   getISOWeek,
@@ -512,6 +822,10 @@ module.exports = {
   checkQualification,
   checkWeeklyLimits,
   checkRedemptionEligibility,
+
+  // PDF Generation
+  generatePreviewPDF,
+  refundOnFailure,
 
   // Operations
   redeemPreview,
