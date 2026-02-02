@@ -409,6 +409,24 @@ try {
   console.error("❌ 일일 체크 라우터 로드 실패:", error.message);
 }
 
+// 몰트봇 (고객응대 Draft 생성기)
+let maltbotRoutes = null;
+try {
+  maltbotRoutes = require("./routes/maltbotRoutes");
+  console.log("✅ 몰트봇 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 몰트봇 라우터 로드 실패:", error.message);
+}
+
+// 나이스페이 결제 라우터 로딩
+let nicepayRoutes = null;
+try {
+  nicepayRoutes = require("./routes/nicepayRoutes");
+  console.log("✅ 나이스페이 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 나이스페이 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -418,10 +436,16 @@ try {
 }
 
 // ---------- CORS (관용 + 화이트리스트 + 프리플라이트) ----------
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
+const baseAllowedOrigins = [
+  'https://dailymiracles.kr',
+  'https://www.dailymiracles.kr',
+  'https://pay.dailymiracles.kr'
+];
+const envOrigins = (process.env.ALLOWED_ORIGINS || "")
   .split(",")
   .map(s => s.trim())
   .filter(Boolean);
+const allowedOrigins = [...new Set([...baseAllowedOrigins, ...envOrigins])];
 
 app.use(
   cors({
@@ -1219,6 +1243,22 @@ if (dailyCheckRoutes) {
   console.log("✅ 일일 체크 라우터 등록 완료 (/api/daily/checkin, /api/daily/action, /api/daily/log)");
 } else {
   console.warn("⚠️ 일일 체크 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 몰트봇 Routes (/api/maltbot) ----------
+if (maltbotRoutes) {
+  app.use("/api/maltbot", maltbotRoutes);
+  console.log("✅ 몰트봇 라우터 등록 완료 (/api/maltbot/generate, /api/maltbot/cases)");
+} else {
+  console.warn("⚠️ 몰트봇 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 나이스페이 결제 Routes (/pay, /nicepay/return, /api/payments/verify) ----------
+if (nicepayRoutes) {
+  app.use("/", nicepayRoutes);
+  console.log("✅ 나이스페이 라우터 등록 완료 (/pay, /nicepay/return, /api/payments/verify)");
+} else {
+  console.warn("⚠️ 나이스페이 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------
