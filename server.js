@@ -427,6 +427,15 @@ try {
   console.error("❌ 나이스페이 라우터 로드 실패:", error.message);
 }
 
+// 소원항해단 v3.1-MVP 라우터 로딩
+let harborRoutes = null;
+try {
+  harborRoutes = require("./routes/harborRoutes");
+  console.log("✅ 소원항해단(Harbor) 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 소원항해단(Harbor) 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -1259,6 +1268,14 @@ if (nicepayRoutes) {
   console.log("✅ 나이스페이 라우터 등록 완료 (/pay, /nicepay/return, /api/payments/verify)");
 } else {
   console.warn("⚠️ 나이스페이 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 소원항해단 v3.1-MVP Routes (/anon/bootstrap, /harbor/*) ----------
+if (harborRoutes) {
+  app.use("/", harborRoutes);
+  console.log("✅ 소원항해단(Harbor) 라우터 등록 완료 (/anon/bootstrap, /harbor/wishes, /harbor/lighthouse, /harbor/temperature)");
+} else {
+  console.warn("⚠️ 소원항해단(Harbor) 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------
