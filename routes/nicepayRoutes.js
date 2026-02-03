@@ -307,8 +307,20 @@ function generatePaymentPage(payment) {
       return 'pc';
     }
 
+    // 에러 표시
+    function showError(msg) {
+      console.error('❌ 결제 오류:', msg);
+      document.getElementById('loading').style.display = 'none';
+      var errorEl = document.getElementById('error');
+      errorEl.style.display = 'block';
+      errorEl.textContent = msg;
+      document.getElementById('debug').textContent += ' | Error: ' + msg;
+    }
+
     // 결제 시작
     function nicepayStart() {
+      console.log('🚀 nicepayStart() 호출됨');
+
       try {
         var platform = checkPlatform(window.navigator.userAgent);
         console.log('Platform:', platform);
@@ -317,29 +329,62 @@ function generatePaymentPage(payment) {
         console.log('Amt:', '${payment.amt}');
         console.log('EdiDate:', '${payment.ediDate}');
         console.log('SignData:', '${payment.signData}'.substring(0, 20) + '...');
+        console.log('goPay 존재:', typeof goPay);
 
         if (platform === 'mobile') {
           // 모바일: 페이지 이동 방식
+          console.log('📱 모바일 결제 시작');
           document.payForm.action = 'https://web.nicepay.co.kr/v3/v3Payment.jsp';
           document.payForm.acceptCharset = 'euc-kr';
           document.payForm.submit();
         } else {
           // PC: 팝업 방식
-          goPay(document.payForm);
+          console.log('💻 PC 결제 시작');
+          if (typeof goPay === 'function') {
+            console.log('✅ goPay 함수 호출');
+            goPay(document.payForm);
+          } else {
+            // goPay가 없으면 모바일 방식으로 폴백
+            console.warn('⚠️ goPay 함수 없음 - 폼 직접 제출');
+            document.payForm.action = 'https://web.nicepay.co.kr/v3/v3Payment.jsp';
+            document.payForm.acceptCharset = 'euc-kr';
+            document.payForm.submit();
+          }
         }
       } catch (err) {
-        console.error('결제 시작 실패:', err);
-        document.getElementById('loading').style.display = 'none';
-        var errorEl = document.getElementById('error');
-        errorEl.style.display = 'block';
-        errorEl.textContent = '결제 서비스에 연결할 수 없습니다: ' + err.message;
+        showError('결제 서비스 연결 실패: ' + err.message);
       }
     }
 
-    // 페이지 로드 시 결제창 호출
-    window.onload = function() {
-      setTimeout(nicepayStart, 500);
-    };
+    // SDK 로드 확인 후 결제 시작
+    function waitForSDKAndStart() {
+      console.log('⏳ SDK 로드 대기 중...');
+      var maxWait = 5000; // 최대 5초 대기
+      var waited = 0;
+      var interval = 100;
+
+      var checker = setInterval(function() {
+        waited += interval;
+
+        // goPay 함수가 로드되었거나 최대 대기 시간 초과
+        if (typeof goPay === 'function' || waited >= maxWait) {
+          clearInterval(checker);
+          console.log('SDK 로드 상태: goPay=' + (typeof goPay) + ', 대기시간=' + waited + 'ms');
+          nicepayStart();
+        }
+      }, interval);
+    }
+
+    // DOM 로드 완료 시 실행
+    if (document.readyState === 'complete') {
+      console.log('📄 DOM 이미 로드됨');
+      setTimeout(waitForSDKAndStart, 100);
+    } else {
+      window.addEventListener('load', function() {
+        console.log('📄 window.onload 이벤트');
+        setTimeout(waitForSDKAndStart, 100);
+      });
+    }
   </script>
 </body>
 </html>
