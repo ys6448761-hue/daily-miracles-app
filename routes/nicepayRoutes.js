@@ -1,7 +1,7 @@
 /**
  * ═══════════════════════════════════════════════════════════
  * nicepayRoutes.js
- * 나이스페이 결제 라우터 (Server 승인 모델)
+ * 나이스페이 결제 라우터 (인증결제 웹 방식)
  * ═══════════════════════════════════════════════════════════
  *
  * 엔드포인트:
@@ -11,7 +11,6 @@
  */
 
 const express = require('express');
-const path = require('path');
 const router = express.Router();
 
 // 서비스 로딩
@@ -25,8 +24,7 @@ try {
 
 /**
  * GET /pay
- * 결제창 호출 페이지
- * Query: amount (필수)
+ * 결제창 호출 페이지 (인증결제 웹)
  */
 router.get('/pay', async (req, res) => {
   try {
@@ -55,16 +53,16 @@ router.get('/pay', async (req, res) => {
     const config = nicepayService.validateConfig();
     if (!config.isValid) {
       console.error('❌ 나이스페이 설정 누락:', config.missing);
-      return res.status(503).send('결제 설정이 완료되지 않았습니다');
+      return res.status(503).send(`결제 설정이 완료되지 않았습니다. 누락: ${config.missing.join(', ')}`);
     }
 
     // 결제 생성 (PENDING 저장)
     const goodsName = goods || '하루하루의 기적 서비스';
     const payment = await nicepayService.createPayment(amountNum, goodsName);
 
-    console.log(`📦 결제 페이지 생성: orderId=${payment.orderId}, amount=${amountNum}`);
+    console.log(`📦 결제 페이지 생성: moid=${payment.moid}, amount=${amountNum}, mid=${payment.mid}`);
 
-    // 결제창 HTML 반환
+    // 결제창 HTML 반환 (인증결제 웹 방식)
     res.send(generatePaymentPage(payment));
 
   } catch (error) {
@@ -75,20 +73,23 @@ router.get('/pay', async (req, res) => {
 
 /**
  * POST /nicepay/return
- * 나이스페이 인증 결과 콜백 (Server 승인 모델)
+ * 나이스페이 인증 결과 콜백 (인증결제 웹)
  */
 router.post('/nicepay/return', express.urlencoded({ extended: true }), async (req, res) => {
   try {
     console.log('📥 나이스페이 콜백 수신:', JSON.stringify(req.body, null, 2));
 
     const {
-      authResultCode,
-      authResultMsg,
-      tid,
-      orderId,
-      amount,
-      signature,
-      authToken
+      AuthResultCode,
+      AuthResultMsg,
+      TID,
+      MID,
+      Moid,
+      Amt,
+      AuthToken,
+      Signature,
+      NextAppURL,
+      NetCancelURL
     } = req.body;
 
     if (!nicepayService) {
@@ -96,69 +97,71 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
     }
 
     // 결제 정보 조회
-    const payment = await nicepayService.getPaymentByOrderId(orderId);
+    const payment = await nicepayService.getPaymentByOrderId(Moid);
     if (!payment) {
-      console.error(`❌ 주문 정보 없음: ${orderId}`);
+      console.error(`❌ 주문 정보 없음: ${Moid}`);
       return res.redirect(`${nicepayService.WIX_SUCCESS_URL}?error=ORDER_NOT_FOUND`);
     }
 
     // 1. 인증 실패 처리
-    if (authResultCode !== '0000') {
-      console.error(`❌ 인증 실패: ${authResultCode} - ${authResultMsg}`);
-      await nicepayService.updatePaymentStatus(orderId, 'FAILED', {
-        resultCode: authResultCode,
-        resultMsg: authResultMsg
+    if (AuthResultCode !== '0000') {
+      console.error(`❌ 인증 실패: ${AuthResultCode} - ${AuthResultMsg}`);
+      await nicepayService.updatePaymentStatus(Moid, 'FAILED', {
+        ResultCode: AuthResultCode,
+        ResultMsg: AuthResultMsg
       });
-      return res.redirect(`${nicepayService.WIX_SUCCESS_URL}?error=AUTH_FAILED&msg=${encodeURIComponent(authResultMsg)}`);
+      return res.redirect(`${nicepayService.WIX_SUCCESS_URL}?error=AUTH_FAILED&msg=${encodeURIComponent(AuthResultMsg || '')}`);
     }
 
     // 2. 서명 검증
-    if (!nicepayService.verifyAuthSignature(authToken, amount, signature)) {
+    if (!nicepayService.verifyAuthSignature(AuthResultCode, AuthToken, Amt, Signature)) {
       console.error('❌ 서명 검증 실패');
-      await nicepayService.updatePaymentStatus(orderId, 'FAILED', {
-        resultCode: 'SIGN_FAIL',
-        resultMsg: '서명 검증 실패'
+      await nicepayService.updatePaymentStatus(Moid, 'FAILED', {
+        ResultCode: 'SIGN_FAIL',
+        ResultMsg: '서명 검증 실패'
       });
       return res.redirect(`${nicepayService.WIX_SUCCESS_URL}?error=SIGNATURE_INVALID`);
     }
 
     // 3. 금액 검증
-    const requestedAmount = parseInt(amount, 10);
+    const requestedAmount = parseInt(Amt, 10);
     if (payment.amount !== requestedAmount) {
       console.error(`❌ 금액 불일치: DB=${payment.amount}, 요청=${requestedAmount}`);
-      await nicepayService.updatePaymentStatus(orderId, 'FAILED', {
-        resultCode: 'AMOUNT_MISMATCH',
-        resultMsg: '결제 금액 불일치'
+      await nicepayService.updatePaymentStatus(Moid, 'FAILED', {
+        ResultCode: 'AMOUNT_MISMATCH',
+        ResultMsg: '결제 금액 불일치'
       });
       return res.redirect(`${nicepayService.WIX_SUCCESS_URL}?error=AMOUNT_MISMATCH`);
     }
 
-    // 4. 승인 API 호출
-    const approvalResult = await nicepayService.requestApproval(tid, orderId, amount);
+    // 4. 승인 API 호출 (인증결제 웹)
+    const { ediDate, signData } = nicepayService.regenerateSignData(Amt);
+    const approvalResult = await nicepayService.requestApproval(
+      AuthToken, Amt, ediDate, signData, Moid, TID
+    );
 
     // 5. 승인 결과 처리
-    if (approvalResult.resultCode === '0000') {
-      // 성공
-      await nicepayService.updatePaymentStatus(orderId, 'PAID', approvalResult);
-      const successUrl = nicepayService.buildWixSuccessUrl(orderId, payment.verification_token);
+    if (approvalResult.ResultCode === '0000' || approvalResult.ResultCode === '3001') {
+      // 성공 (3001 = 이미 승인됨)
+      await nicepayService.updatePaymentStatus(Moid, 'PAID', approvalResult);
+      const successUrl = nicepayService.buildWixSuccessUrl(Moid, payment.verification_token);
       console.log(`✅ 결제 완료! Redirect: ${successUrl}`);
       return res.redirect(successUrl);
     } else {
       // 승인 실패
-      await nicepayService.updatePaymentStatus(orderId, 'FAILED', approvalResult);
-      return res.redirect(`${nicepayService.WIX_SUCCESS_URL}?error=APPROVAL_FAILED&code=${approvalResult.resultCode}`);
+      await nicepayService.updatePaymentStatus(Moid, 'FAILED', approvalResult);
+      return res.redirect(`${nicepayService.WIX_SUCCESS_URL}?error=APPROVAL_FAILED&code=${approvalResult.ResultCode}`);
     }
 
   } catch (error) {
     console.error('❌ 결제 콜백 처리 실패:', error);
-    res.redirect(`${nicepayService.WIX_SUCCESS_URL}?error=SYSTEM_ERROR`);
+    res.redirect(`${nicepayService?.WIX_SUCCESS_URL || 'https://dailymiracles.kr/payment-success'}?error=SYSTEM_ERROR`);
   }
 });
 
 /**
  * GET /api/payments/verify
  * 결제 상태 조회 (Wix용)
- * Query: orderId, vt
  */
 router.get('/api/payments/verify', async (req, res) => {
   try {
@@ -194,7 +197,7 @@ router.get('/api/payments/verify', async (req, res) => {
 });
 
 /**
- * 결제창 HTML 생성
+ * 결제창 HTML 생성 (인증결제 웹 방식)
  */
 function generatePaymentPage(payment) {
   return `
@@ -223,72 +226,36 @@ function generatePaymentPage(payment) {
       text-align: center;
       box-shadow: 0 10px 40px rgba(0,0,0,0.15);
     }
-    .logo {
-      font-size: 48px;
-      margin-bottom: 20px;
-    }
-    h1 {
-      color: #333;
-      font-size: 22px;
-      margin-bottom: 10px;
-    }
+    .logo { font-size: 48px; margin-bottom: 20px; }
+    h1 { color: #333; font-size: 22px; margin-bottom: 10px; }
     .order-info {
       background: #FFF5F7;
       border-radius: 12px;
       padding: 20px;
       margin: 20px 0;
     }
-    .order-info .label {
-      color: #888;
-      font-size: 12px;
-      margin-bottom: 4px;
-    }
-    .order-info .value {
-      color: #333;
-      font-size: 16px;
-      font-weight: 600;
-    }
-    .amount {
-      font-size: 32px;
-      font-weight: 700;
-      color: #9B87F5;
-      margin: 20px 0;
-    }
+    .order-info .label { color: #888; font-size: 12px; margin-bottom: 4px; }
+    .order-info .value { color: #333; font-size: 16px; font-weight: 600; }
+    .amount { font-size: 32px; font-weight: 700; color: #9B87F5; margin: 20px 0; }
     .loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 15px;
-      margin-top: 20px;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 15px; margin-top: 20px;
     }
     .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #9B87F5;
-      border-radius: 50%;
+      width: 40px; height: 40px; border: 3px solid #f3f3f3;
+      border-top: 3px solid #9B87F5; border-radius: 50%;
       animation: spin 1s linear infinite;
     }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .loading-text {
-      color: #666;
-      font-size: 14px;
-    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loading-text { color: #666; font-size: 14px; }
     .error {
-      background: #fee;
-      border: 1px solid #fcc;
-      border-radius: 8px;
-      padding: 15px;
-      margin-top: 20px;
-      color: #c00;
-      display: none;
+      background: #fee; border: 1px solid #fcc; border-radius: 8px;
+      padding: 15px; margin-top: 20px; color: #c00; display: none;
     }
+    .debug { font-size: 10px; color: #999; margin-top: 10px; word-break: break-all; }
   </style>
-  <!-- 나이스페이 SDK -->
-  <script src="https://pay.nicepay.co.kr/v1/js/"></script>
+  <!-- 나이스페이 인증결제 웹 SDK -->
+  <script src="https://web.nicepay.co.kr/v3/webstd/js/nicepay-3.0.js" type="text/javascript"></script>
 </head>
 <body>
   <div class="container">
@@ -297,7 +264,7 @@ function generatePaymentPage(payment) {
 
     <div class="order-info">
       <div class="label">주문번호</div>
-      <div class="value">${payment.orderId}</div>
+      <div class="value">${payment.moid}</div>
     </div>
 
     <div class="amount">${payment.amount.toLocaleString()}원</div>
@@ -308,39 +275,70 @@ function generatePaymentPage(payment) {
     </div>
 
     <div class="error" id="error"></div>
+    <div class="debug" id="debug">MID: ${payment.mid}</div>
   </div>
 
+  <!-- 결제 폼 (인증결제 웹) -->
+  <form name="payForm" id="payForm" method="post" action="${payment.returnUrl}" style="display:none;">
+    <input type="hidden" name="PayMethod" value="CARD">
+    <input type="hidden" name="GoodsName" value="${payment.goodsName}">
+    <input type="hidden" name="Amt" value="${payment.amt}">
+    <input type="hidden" name="MID" value="${payment.mid}">
+    <input type="hidden" name="Moid" value="${payment.moid}">
+    <input type="hidden" name="BuyerName" value="고객">
+    <input type="hidden" name="BuyerEmail" value="customer@example.com">
+    <input type="hidden" name="BuyerTel" value="01000000000">
+    <input type="hidden" name="ReturnURL" value="${payment.returnUrl}">
+    <input type="hidden" name="VbankExpDate" value="">
+    <input type="hidden" name="GoodsCl" value="1">
+    <input type="hidden" name="TransType" value="0">
+    <input type="hidden" name="CharSet" value="utf-8">
+    <input type="hidden" name="EdiDate" value="${payment.ediDate}">
+    <input type="hidden" name="SignData" value="${payment.signData}">
+    <input type="hidden" name="ReqReserved" value="">
+  </form>
+
   <script>
-    // 결제 요청
-    function requestPayment() {
+    // 플랫폼 체크 (PC/모바일)
+    function checkPlatform(ua) {
+      if (ua.match(/Android|Mobile|iP(hone|od)|BlackBerry|IEMobile|Kindle|NetFront|Silk-Accelerated|(hpw|web)OS|Fennec|Minimo|Opera M(obi|ini)|Blazer|Dolfin|Dolphin|Skyfire|Zune/i)) {
+        return 'mobile';
+      }
+      return 'pc';
+    }
+
+    // 결제 시작
+    function nicepayStart() {
       try {
-        AUTHNICE.requestPay({
-          clientId: '${payment.clientId}',
-          method: 'card',
-          orderId: '${payment.orderId}',
-          amount: ${payment.amount},
-          goodsName: '${payment.goodsName}',
-          returnUrl: '${payment.returnUrl}',
-          fnError: function(result) {
-            console.error('결제창 오류:', result);
-            document.getElementById('loading').style.display = 'none';
-            const errorEl = document.getElementById('error');
-            errorEl.style.display = 'block';
-            errorEl.textContent = result.errorMsg || '결제창을 불러올 수 없습니다';
-          }
-        });
+        var platform = checkPlatform(window.navigator.userAgent);
+        console.log('Platform:', platform);
+        console.log('MID:', '${payment.mid}');
+        console.log('Moid:', '${payment.moid}');
+        console.log('Amt:', '${payment.amt}');
+        console.log('EdiDate:', '${payment.ediDate}');
+        console.log('SignData:', '${payment.signData}'.substring(0, 20) + '...');
+
+        if (platform === 'mobile') {
+          // 모바일: 페이지 이동 방식
+          document.payForm.action = 'https://web.nicepay.co.kr/v3/v3Payment.jsp';
+          document.payForm.acceptCharset = 'euc-kr';
+          document.payForm.submit();
+        } else {
+          // PC: 팝업 방식
+          goPay(document.payForm);
+        }
       } catch (err) {
-        console.error('결제 요청 실패:', err);
+        console.error('결제 시작 실패:', err);
         document.getElementById('loading').style.display = 'none';
-        const errorEl = document.getElementById('error');
+        var errorEl = document.getElementById('error');
         errorEl.style.display = 'block';
-        errorEl.textContent = '결제 서비스에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.';
+        errorEl.textContent = '결제 서비스에 연결할 수 없습니다: ' + err.message;
       }
     }
 
     // 페이지 로드 시 결제창 호출
     window.onload = function() {
-      setTimeout(requestPayment, 500);
+      setTimeout(nicepayStart, 500);
     };
   </script>
 </body>
