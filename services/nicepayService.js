@@ -64,10 +64,10 @@ function generateEdiDate() {
 
 /**
  * SignData 생성 (인증결제 웹)
- * SHA256(MID + Amt + EdiDate + MerchantKey)
+ * SHA256(EdiDate + MID + Amt + MerchantKey) - 순서 중요!
  */
 function generateSignData(amt, ediDate) {
-  const data = NICEPAY_MID + amt + ediDate + NICEPAY_MERCHANT_KEY;
+  const data = ediDate + NICEPAY_MID + amt + NICEPAY_MERCHANT_KEY;
   return crypto.createHash('sha256').update(data).digest('hex');
 }
 
@@ -294,11 +294,23 @@ function validateConfig() {
 }
 
 /**
- * EdiDate 및 SignData 재생성 (콜백에서 사용)
+ * 승인 API용 SignData 생성
+ * SHA256(AuthToken + MID + Amt + EdiDate + MerchantKey) - 승인 요청 전용
  */
-function regenerateSignData(amt) {
+function generateApprovalSignData(authToken, amt, ediDate) {
+  const data = authToken + NICEPAY_MID + amt + ediDate + NICEPAY_MERCHANT_KEY;
+  return crypto.createHash('sha256').update(data).digest('hex');
+}
+
+/**
+ * EdiDate 및 승인용 SignData 재생성 (콜백에서 사용)
+ */
+function regenerateSignData(amt, authToken) {
   const ediDate = generateEdiDate();
-  const signData = generateSignData(amt, ediDate);
+  // authToken이 있으면 승인용 SignData, 없으면 일반 SignData
+  const signData = authToken
+    ? generateApprovalSignData(authToken, amt, ediDate)
+    : generateSignData(amt, ediDate);
   return { ediDate, signData };
 }
 

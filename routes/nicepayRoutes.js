@@ -135,7 +135,8 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
     }
 
     // 4. 승인 API 호출 (인증결제 웹)
-    const { ediDate, signData } = nicepayService.regenerateSignData(Amt);
+    // 승인용 SignData: SHA256(AuthToken + MID + Amt + EdiDate + MerchantKey)
+    const { ediDate, signData } = nicepayService.regenerateSignData(Amt, AuthToken);
     const approvalResult = await nicepayService.requestApproval(
       AuthToken, Amt, ediDate, signData, Moid, TID
     );
@@ -254,8 +255,8 @@ function generatePaymentPage(payment) {
     }
     .debug { font-size: 10px; color: #999; margin-top: 10px; word-break: break-all; }
   </style>
-  <!-- 나이스페이 인증결제 웹 SDK -->
-  <script src="https://web.nicepay.co.kr/v3/webstd/js/nicepay-3.0.js" type="text/javascript"></script>
+  <!-- 나이스페이 인증결제 웹 SDK (공식 매뉴얼 URL) -->
+  <script src="https://pg-web.nicepay.co.kr/v3/common/js/nicepay-pgweb.js" type="text/javascript"></script>
 </head>
 <body>
   <div class="container">
@@ -299,6 +300,29 @@ function generatePaymentPage(payment) {
   </form>
 
   <script>
+    // ═══════════════════════════════════════════════════════════
+    // 나이스페이 인증결제 웹 - 필수 콜백 함수
+    // ═══════════════════════════════════════════════════════════
+
+    // PC 인증 완료 콜백 (나이스페이 SDK가 호출)
+    function nicepaySubmit() {
+      console.log('✅ nicepaySubmit() 콜백 - 인증 완료, 폼 제출');
+      document.payForm.submit();
+    }
+
+    // PC 결제 취소 콜백
+    function nicepayClose() {
+      console.log('❌ nicepayClose() 콜백 - 사용자 취소');
+      document.getElementById('loading').style.display = 'none';
+      var errorEl = document.getElementById('error');
+      errorEl.style.display = 'block';
+      errorEl.textContent = '결제가 취소되었습니다.';
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 유틸리티 함수
+    // ═══════════════════════════════════════════════════════════
+
     // 플랫폼 체크 (PC/모바일)
     function checkPlatform(ua) {
       if (ua.match(/Android|Mobile|iP(hone|od)|BlackBerry|IEMobile|Kindle|NetFront|Silk-Accelerated|(hpw|web)OS|Fennec|Minimo|Opera M(obi|ini)|Blazer|Dolfin|Dolphin|Skyfire|Zune/i)) {
@@ -317,7 +341,10 @@ function generatePaymentPage(payment) {
       document.getElementById('debug').textContent += ' | Error: ' + msg;
     }
 
-    // 결제 시작
+    // ═══════════════════════════════════════════════════════════
+    // 결제 시작 로직
+    // ═══════════════════════════════════════════════════════════
+
     function nicepayStart() {
       console.log('🚀 nicepayStart() 호출됨');
 
@@ -331,26 +358,15 @@ function generatePaymentPage(payment) {
         console.log('SignData:', '${payment.signData}'.substring(0, 20) + '...');
         console.log('goPay 존재:', typeof goPay);
 
-        if (platform === 'mobile') {
-          // 모바일: 페이지 이동 방식
-          console.log('📱 모바일 결제 시작');
-          document.payForm.action = 'https://web.nicepay.co.kr/v3/v3Payment.jsp';
-          document.payForm.acceptCharset = 'euc-kr';
-          document.payForm.submit();
-        } else {
-          // PC: 팝업 방식
-          console.log('💻 PC 결제 시작');
-          if (typeof goPay === 'function') {
-            console.log('✅ goPay 함수 호출');
-            goPay(document.payForm);
-          } else {
-            // goPay가 없으면 모바일 방식으로 폴백
-            console.warn('⚠️ goPay 함수 없음 - 폼 직접 제출');
-            document.payForm.action = 'https://web.nicepay.co.kr/v3/v3Payment.jsp';
-            document.payForm.acceptCharset = 'euc-kr';
-            document.payForm.submit();
-          }
+        // goPay 함수 체크
+        if (typeof goPay !== 'function') {
+          showError('결제 SDK 로드 실패 (goPay 함수 없음)');
+          return;
         }
+
+        console.log('✅ goPay 함수 호출 - platform:', platform);
+        goPay(document.payForm);
+
       } catch (err) {
         showError('결제 서비스 연결 실패: ' + err.message);
       }
@@ -359,14 +375,13 @@ function generatePaymentPage(payment) {
     // SDK 로드 확인 후 결제 시작
     function waitForSDKAndStart() {
       console.log('⏳ SDK 로드 대기 중...');
-      var maxWait = 5000; // 최대 5초 대기
+      var maxWait = 5000;
       var waited = 0;
       var interval = 100;
 
       var checker = setInterval(function() {
         waited += interval;
 
-        // goPay 함수가 로드되었거나 최대 대기 시간 초과
         if (typeof goPay === 'function' || waited >= maxWait) {
           clearInterval(checker);
           console.log('SDK 로드 상태: goPay=' + (typeof goPay) + ', 대기시간=' + waited + 'ms');
