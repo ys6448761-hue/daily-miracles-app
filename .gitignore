@@ -106,3 +106,4 @@ test-*.json
 
 # Artifacts (generated outputs)
 artifacts/
+.claude/settings.local.json
