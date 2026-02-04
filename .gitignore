@@ -107,3 +107,10 @@ test-*.json
 # Artifacts (generated outputs)
 artifacts/
 .claude/settings.local.json
+output/
+docs/raw/conversations/
+services/maltbot/
+routes/maltbotRoutes.js
+public/maltbot.html
+database/migrate-007-maltbot.js
+database/migrations/007_maltbot_cases_table.sql
