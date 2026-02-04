@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KPI 리포트 - 운영 컨트롤타워</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #9B87F5;
+      --secondary: #F5A7C6;
+      --accent: #6E59A5;
+      --bg-light: #FFF5F7;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --text-muted: #999999;
+      --border: #E5E5E5;
+      --success: #4CAF50;
+      --warning: #FF9800;
+      --error: #F44336;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+    .breadcrumb { margin-bottom: 16px; font-size: 14px; }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .breadcrumb span { color: var(--text-muted); }
+
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      padding: 32px;
+      border-radius: 16px;
+      color: white;
+      margin-bottom: 24px;
+    }
+
+    header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+
+    .header-meta {
+      display: flex;
+      gap: 24px;
+      opacity: 0.9;
+      font-size: 14px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .btn-white { background: white; color: var(--primary); }
+    .btn-white:hover { background: #f0f0f0; }
+    .btn-secondary { background: white; color: var(--text-primary); border: 1px solid var(--border); }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .kpi-card h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .kpi-main {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .kpi-value {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .kpi-unit {
+      font-size: 16px;
+      color: var(--text-muted);
+    }
+
+    .kpi-breakdown {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .breakdown-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .breakdown-value {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .breakdown-label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .breakdown-value.success { color: var(--success); }
+    .breakdown-value.warning { color: var(--warning); }
+    .breakdown-value.error { color: var(--error); }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      margin-bottom: 24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text-muted);
+      background: var(--bg-light);
+    }
+
+    td { font-size: 14px; }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    .activity-list {
+      list-style: none;
+    }
+
+    .activity-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .activity-item:last-child { border-bottom: none; }
+
+    .activity-time {
+      font-size: 12px;
+      color: var(--text-muted);
+      min-width: 80px;
+    }
+
+    .activity-text {
+      font-size: 14px;
+    }
+
+    .empty-message {
+      text-align: center;
+      padding: 48px;
+      color: var(--text-muted);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 48px;
+      color: var(--text-muted);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 16px;
+    }
+
+    @media print {
+      body { background: white; }
+      .breadcrumb, .actions { display: none; }
+      .container { max-width: none; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="index.html">행사 목록</a>
+      <span> / </span>
+      <a href="#" id="eventLink">행사 상세</a>
+      <span> / </span>
+      <span>KPI 리포트</span>
+    </div>
+
+    <header id="reportHeader">
+      <div class="loading" style="color: white;">로딩 중...</div>
+    </header>
+
+    <div class="kpi-grid" id="kpiGrid">
+      <div class="loading">로딩 중...</div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">카테고리별 현황</h3>
+      <div id="categoryBreakdown">
+        <div class="loading">로딩 중...</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">최근 활동</h3>
+      <div id="recentActivity">
+        <div class="loading">로딩 중...</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-secondary" onclick="exportReport()">리포트 내보내기</button>
+      <button class="btn btn-secondary" onclick="saveSnapshot()">스냅샷 저장</button>
+      <button class="btn btn-secondary" onclick="window.print()">인쇄</button>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '/api/ops-center';
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventId = urlParams.get('event_id');
+
+    if (!eventId) {
+      alert('행사 ID가 필요합니다.');
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('eventLink').href = `event-detail.html?id=${eventId}`;
+
+    async function loadReport() {
+      try {
+        const response = await fetch(`${API_BASE}/reports/kpi-onepage?event_id=${eventId}`);
+        const data = await response.json();
+
+        if (!data.success) throw new Error(data.error);
+
+        const report = data.data;
+
+        // Header
+        document.getElementById('reportHeader').innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+              <h1>${escapeHtml(report.event.name)}</h1>
+              <div class="header-meta">
+                <span>${report.event.periodStart} ~ ${report.event.periodEnd}</span>
+                <span>${getStatusLabel(report.event.status)}</span>
+                <span>생성: ${new Date(report.generatedAt).toLocaleString('ko-KR')}</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // KPI Cards
+        document.getElementById('kpiGrid').innerHTML = `
+          <div class="kpi-card">
+            <h3>SSOT 항목</h3>
+            <div class="kpi-main">
+              <span class="kpi-value">${report.kpi.ssot.totalItems}</span>
+              <span class="kpi-unit">개</span>
+            </div>
+            <div class="kpi-breakdown">
+              <div class="breakdown-item">
+                <span class="breakdown-value success">${report.kpi.ssot.approvedCount}</span>
+                <span class="breakdown-label">승인됨</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="breakdown-value warning">${report.kpi.ssot.pendingCount}</span>
+                <span class="breakdown-label">승인대기</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="breakdown-value error">${report.kpi.ssot.rejectedCount}</span>
+                <span class="breakdown-label">반려</span>
+              </div>
+            </div>
+            <div style="margin-top: 16px;">
+              <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                <span>승인률</span>
+                <span>${report.kpi.ssot.approvalRate}%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: ${report.kpi.ssot.approvalRate}%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <h3>승인 처리</h3>
+            <div class="kpi-main">
+              <span class="kpi-value">${report.kpi.approval.avgLeadtimeHours || '-'}</span>
+              <span class="kpi-unit">시간 (평균)</span>
+            </div>
+            <div class="kpi-breakdown">
+              <div class="breakdown-item">
+                <span class="breakdown-value">${report.kpi.approval.totalRequests}</span>
+                <span class="breakdown-label">총 요청</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="breakdown-value warning">${report.kpi.approval.pendingCount}</span>
+                <span class="breakdown-label">대기 중</span>
+              </div>
+              <div class="breakdown-item">
+                <span class="breakdown-value success">${report.kpi.approval.approvedCount}</span>
+                <span class="breakdown-label">승인</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <h3>활동 현황</h3>
+            <div class="kpi-main">
+              <span class="kpi-value">${report.kpi.activity.totalActions}</span>
+              <span class="kpi-unit">건</span>
+            </div>
+            <div class="kpi-breakdown">
+              <div class="breakdown-item">
+                <span class="breakdown-value">${report.kpi.activity.uniqueActors}</span>
+                <span class="breakdown-label">활동 사용자</span>
+              </div>
+              ${Object.entries(report.kpi.activity.byAction || {}).slice(0, 2).map(([action, count]) => `
+                <div class="breakdown-item">
+                  <span class="breakdown-value">${count}</span>
+                  <span class="breakdown-label">${action}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+
+        // Category Breakdown
+        const categories = report.breakdown.byCategory || [];
+        if (categories.length === 0) {
+          document.getElementById('categoryBreakdown').innerHTML = '<div class="empty-message">데이터 없음</div>';
+        } else {
+          document.getElementById('categoryBreakdown').innerHTML = `
+            <table>
+              <thead>
+                <tr>
+                  <th>카테고리</th>
+                  <th>전체</th>
+                  <th>승인됨</th>
+                  <th>대기 중</th>
+                  <th>승인률</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${categories.map(cat => {
+                  const rate = cat.item_count > 0 ? ((cat.approved_count / cat.item_count) * 100).toFixed(0) : 0;
+                  return `
+                    <tr>
+                      <td><strong>${getCategoryLabel(cat.category)}</strong></td>
+                      <td>${cat.item_count}</td>
+                      <td style="color: var(--success);">${cat.approved_count}</td>
+                      <td style="color: var(--warning);">${cat.pending_count}</td>
+                      <td>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                          <div class="progress-bar" style="width: 100px;">
+                            <div class="progress-fill" style="width: ${rate}%"></div>
+                          </div>
+                          <span>${rate}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          `;
+        }
+
+        // Recent Activity
+        const activities = report.recentActivity || [];
+        if (activities.length === 0) {
+          document.getElementById('recentActivity').innerHTML = '<div class="empty-message">최근 활동 없음</div>';
+        } else {
+          document.getElementById('recentActivity').innerHTML = `
+            <ul class="activity-list">
+              ${activities.map(a => `
+                <li class="activity-item">
+                  <span class="activity-time">${formatTime(a.timestamp)}</span>
+                  <span class="activity-text">
+                    <strong>${escapeHtml(a.actor || '시스템')}</strong>이
+                    <strong>${escapeHtml(a.objectLabel || a.objectType)}</strong>을(를)
+                    ${a.action}
+                  </span>
+                </li>
+              `).join('')}
+            </ul>
+          `;
+        }
+
+      } catch (error) {
+        document.getElementById('kpiGrid').innerHTML = `<div class="empty-message">오류: ${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    async function saveSnapshot() {
+      try {
+        const response = await fetch(`${API_BASE}/reports/kpi-snapshot`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ eventId })
+        });
+        const data = await response.json();
+        if (!data.success) throw new Error(data.error);
+        alert('스냅샷이 저장되었습니다.');
+      } catch (error) {
+        alert('오류: ' + error.message);
+      }
+    }
+
+    function exportReport() {
+      window.open(`${API_BASE}/reports/kpi-onepage?event_id=${eventId}`, '_blank');
+    }
+
+    function getStatusLabel(status) {
+      const labels = { DRAFT: '준비중', ACTIVE: '진행중', COMPLETED: '완료', CANCELLED: '취소' };
+      return labels[status] || status;
+    }
+
+    function getCategoryLabel(category) {
+      const labels = {
+        schedule: '일정', operation: '운영', notice: '공지',
+        contact: '연락처', issue: '이슈', document: '문서'
+      };
+      return labels[category] || category;
+    }
+
+    function formatTime(dateStr) {
+      if (!dateStr) return '';
+      return new Date(dateStr).toLocaleString('ko-KR', {
+        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    loadReport();
+  </script>
+</body>
+</html>

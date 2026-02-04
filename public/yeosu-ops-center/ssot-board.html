@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SSOT 보드 - 운영 컨트롤타워</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #9B87F5;
+      --secondary: #F5A7C6;
+      --accent: #6E59A5;
+      --bg-light: #FFF5F7;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --text-muted: #999999;
+      --border: #E5E5E5;
+      --success: #4CAF50;
+      --warning: #FF9800;
+      --error: #F44336;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+    .breadcrumb { margin-bottom: 16px; font-size: 14px; }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .breadcrumb span { color: var(--text-muted); }
+
+    header {
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 { font-size: 24px; font-weight: 700; }
+
+    .filters {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 10px 20px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-btn:hover { border-color: var(--primary); }
+    .filter-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--accent); }
+    .btn-secondary { background: white; color: var(--text-primary); border: 1px solid var(--border); }
+
+    .category-section {
+      margin-bottom: 32px;
+    }
+
+    .category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .category-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .category-count {
+      background: var(--bg-light);
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .ssot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .ssot-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      cursor: pointer;
+      transition: all 0.2s;
+      border-left: 4px solid transparent;
+    }
+
+    .ssot-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(155, 135, 245, 0.1);
+    }
+
+    .ssot-card.status-APPROVED { border-left-color: var(--success); }
+    .ssot-card.status-PENDING_APPROVAL { border-left-color: var(--warning); }
+    .ssot-card.status-DRAFT { border-left-color: var(--text-muted); }
+    .ssot-card.status-REJECTED { border-left-color: var(--error); }
+
+    .ssot-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .ssot-label {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .ssot-status {
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .ssot-status.APPROVED { background: #E8F5E9; color: #2E7D32; }
+    .ssot-status.PENDING_APPROVAL { background: #FFF3E0; color: #EF6C00; }
+    .ssot-status.DRAFT { background: #ECEFF1; color: #546E7A; }
+    .ssot-status.REJECTED { background: #FFEBEE; color: #C62828; }
+
+    .ssot-value {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .ssot-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal h2 { font-size: 20px; margin-bottom: 24px; }
+
+    .form-group { margin-bottom: 20px; }
+
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .checkbox-label input { width: auto; }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 24px;
+    }
+
+    .empty-message {
+      text-align: center;
+      padding: 64px;
+      color: var(--text-muted);
+      background: white;
+      border-radius: 16px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 48px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="index.html">행사 목록</a>
+      <span> / </span>
+      <a href="#" id="eventLink">행사 상세</a>
+      <span> / </span>
+      <span>SSOT 보드</span>
+    </div>
+
+    <header>
+      <h1>SSOT 보드</h1>
+      <button class="btn btn-primary" onclick="openCreateModal()">+ 새 항목 등록</button>
+    </header>
+
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterByStatus('')" data-status="">전체</button>
+      <button class="filter-btn" onclick="filterByStatus('APPROVED')" data-status="APPROVED">승인됨</button>
+      <button class="filter-btn" onclick="filterByStatus('PENDING_APPROVAL')" data-status="PENDING_APPROVAL">승인대기</button>
+      <button class="filter-btn" onclick="filterByStatus('DRAFT')" data-status="DRAFT">작성중</button>
+      <button class="filter-btn" onclick="filterByStatus('REJECTED')" data-status="REJECTED">반려</button>
+    </div>
+
+    <div id="ssotContent">
+      <div class="loading">로딩 중...</div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="createModal" onclick="closeModal(event, 'createModal')">
+    <div class="modal" onclick="event.stopPropagation()">
+      <h2>새 SSOT 항목 등록</h2>
+      <form id="createForm" onsubmit="createItem(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="category">카테고리 *</label>
+            <select id="category" name="category" required>
+              <option value="schedule">일정 (schedule)</option>
+              <option value="operation">운영 (operation)</option>
+              <option value="notice">공지 (notice)</option>
+              <option value="contact">연락처 (contact)</option>
+              <option value="issue">이슈 (issue)</option>
+              <option value="document">문서 (document)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="itemKey">항목 키 *</label>
+            <input type="text" id="itemKey" name="itemKey" required placeholder="예: main_schedule">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="label">표시명 *</label>
+          <input type="text" id="label" name="label" required placeholder="예: 메인 행사 일정">
+        </div>
+        <div class="form-group">
+          <label for="valueCurrent">값</label>
+          <textarea id="valueCurrent" name="valueCurrent" rows="4" placeholder="현재 값을 입력하세요"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="valueType">값 유형</label>
+            <select id="valueType" name="valueType">
+              <option value="text">텍스트</option>
+              <option value="number">숫자</option>
+              <option value="date">날짜</option>
+              <option value="datetime">날짜시간</option>
+              <option value="json">JSON</option>
+              <option value="file_url">파일 URL</option>
+            </select>
+          </div>
+          <div class="form-group" style="display: flex; align-items: flex-end;">
+            <label class="checkbox-label">
+              <input type="checkbox" id="requiresApproval" name="requiresApproval">
+              수정 시 승인 필요
+            </label>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal(null, 'createModal')">취소</button>
+          <button type="submit" class="btn btn-primary">등록</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '/api/ops-center';
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventId = urlParams.get('event_id');
+    let currentStatus = '';
+
+    if (!eventId) {
+      alert('행사 ID가 필요합니다.');
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('eventLink').href = `event-detail.html?id=${eventId}`;
+
+    async function loadItems() {
+      const container = document.getElementById('ssotContent');
+      try {
+        let url = `${API_BASE}/ssot-items?event_id=${eventId}`;
+        if (currentStatus) {
+          url += `&status=${currentStatus}`;
+        }
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!data.success) throw new Error(data.error);
+
+        if (data.data.length === 0) {
+          container.innerHTML = `
+            <div class="empty-message">
+              <h3>등록된 SSOT 항목이 없습니다</h3>
+              <p>새 항목을 등록하여 운영 정보를 관리하세요</p>
+              <button class="btn btn-primary" onclick="openCreateModal()" style="margin-top: 16px;">+ 새 항목 등록</button>
+            </div>
+          `;
+          return;
+        }
+
+        // 카테고리별 그룹화
+        const byCategory = {};
+        data.data.forEach(item => {
+          if (!byCategory[item.category]) {
+            byCategory[item.category] = [];
+          }
+          byCategory[item.category].push(item);
+        });
+
+        let html = '';
+        for (const [category, items] of Object.entries(byCategory)) {
+          html += `
+            <div class="category-section">
+              <div class="category-header">
+                <span class="category-title">${getCategoryLabel(category)}</span>
+                <span class="category-count">${items.length}개 항목</span>
+              </div>
+              <div class="ssot-grid">
+                ${items.map(item => `
+                  <div class="ssot-card status-${item.status}" onclick="goToDetail('${item.id}')">
+                    <div class="ssot-card-header">
+                      <span class="ssot-label">${escapeHtml(item.label)}</span>
+                      <span class="ssot-status ${item.status}">${getStatusLabel(item.status)}</span>
+                    </div>
+                    <div class="ssot-value">${escapeHtml(item.value_current || '(값 없음)')}</div>
+                    <div class="ssot-meta">
+                      <span>v${item.version}</span>
+                      <span>${item.requires_approval ? '승인필요' : ''}</span>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        container.innerHTML = html;
+
+      } catch (error) {
+        container.innerHTML = `<div class="empty-message">오류: ${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    async function createItem(e) {
+      e.preventDefault();
+      const form = e.target;
+
+      try {
+        const response = await fetch(`${API_BASE}/ssot-items`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            eventId,
+            category: form.category.value,
+            itemKey: form.itemKey.value,
+            label: form.label.value,
+            valueCurrent: form.valueCurrent.value,
+            valueType: form.valueType.value,
+            requiresApproval: form.requiresApproval.checked,
+            createdByName: '관리자'
+          })
+        });
+
+        const data = await response.json();
+        if (!data.success) throw new Error(data.error);
+
+        closeModal(null, 'createModal');
+        form.reset();
+        loadItems();
+        alert('항목이 등록되었습니다.');
+      } catch (error) {
+        alert('오류: ' + error.message);
+      }
+    }
+
+    function filterByStatus(status) {
+      currentStatus = status;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.status === status);
+      });
+      loadItems();
+    }
+
+    function goToDetail(itemId) {
+      window.location.href = `ssot-item-detail.html?id=${itemId}&event_id=${eventId}`;
+    }
+
+    function openCreateModal() {
+      document.getElementById('createModal').classList.add('active');
+    }
+
+    function closeModal(e, modalId) {
+      if (!e || e.target === e.currentTarget) {
+        document.getElementById(modalId).classList.remove('active');
+      }
+    }
+
+    function getCategoryLabel(category) {
+      const labels = {
+        schedule: '일정',
+        operation: '운영',
+        notice: '공지',
+        contact: '연락처',
+        issue: '이슈',
+        document: '문서'
+      };
+      return labels[category] || category;
+    }
+
+    function getStatusLabel(status) {
+      const labels = {
+        APPROVED: '승인됨',
+        PENDING_APPROVAL: '승인대기',
+        DRAFT: '작성중',
+        REJECTED: '반려',
+        ARCHIVED: '보관'
+      };
+      return labels[status] || status;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    loadItems();
+  </script>
+</body>
+</html>

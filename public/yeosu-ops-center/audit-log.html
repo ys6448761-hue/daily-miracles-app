@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>감사 로그 - 운영 컨트롤타워</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #9B87F5;
+      --secondary: #F5A7C6;
+      --accent: #6E59A5;
+      --bg-light: #FFF5F7;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --text-muted: #999999;
+      --border: #E5E5E5;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+    .breadcrumb { margin-bottom: 16px; font-size: 14px; }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .breadcrumb span { color: var(--text-muted); }
+
+    header {
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 { font-size: 24px; font-weight: 700; }
+
+    .filters {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-select {
+      padding: 10px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      background: white;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--accent); }
+    .btn-secondary { background: white; color: var(--text-primary); border: 1px solid var(--border); }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text-muted);
+      background: var(--bg-light);
+      position: sticky;
+      top: 0;
+    }
+
+    td { font-size: 14px; }
+
+    .action-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .action-CREATE { background: #E8F5E9; color: #2E7D32; }
+    .action-UPDATE { background: #E3F2FD; color: #1565C0; }
+    .action-DELETE { background: #FFEBEE; color: #C62828; }
+    .action-APPROVE { background: #E8F5E9; color: #2E7D32; }
+    .action-REJECT { background: #FFF3E0; color: #EF6C00; }
+    .action-VIEW { background: #ECEFF1; color: #546E7A; }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 24px;
+    }
+
+    .page-btn {
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: white;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .page-btn:hover { background: var(--bg-light); }
+    .page-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .empty-message {
+      text-align: center;
+      padding: 48px;
+      color: var(--text-muted);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 48px;
+      color: var(--text-muted);
+    }
+
+    .stats-summary {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      background: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+    }
+
+    .stat-item .value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-item .label {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="index.html">행사 목록</a>
+      <span> / </span>
+      <a href="#" id="eventLink">행사 상세</a>
+      <span> / </span>
+      <span>감사 로그</span>
+    </div>
+
+    <header>
+      <h1>감사 로그</h1>
+      <div>
+        <button class="btn btn-secondary" onclick="exportCsv()">CSV 내보내기</button>
+        <button class="btn btn-secondary" onclick="exportJson()" style="margin-left: 8px;">JSON 내보내기</button>
+      </div>
+    </header>
+
+    <div class="stats-summary" id="statsSummary">
+      <div class="stat-item">
+        <div class="value" id="totalActions">-</div>
+        <div class="label">총 활동</div>
+      </div>
+      <div class="stat-item">
+        <div class="value" id="uniqueActors">-</div>
+        <div class="label">활동 사용자</div>
+      </div>
+    </div>
+
+    <div class="filters">
+      <select class="filter-select" id="filterAction" onchange="loadLogs()">
+        <option value="">전체 액션</option>
+        <option value="CREATE">CREATE</option>
+        <option value="UPDATE">UPDATE</option>
+        <option value="DELETE">DELETE</option>
+        <option value="APPROVE">APPROVE</option>
+        <option value="REJECT">REJECT</option>
+      </select>
+      <select class="filter-select" id="filterObjectType" onchange="loadLogs()">
+        <option value="">전체 유형</option>
+        <option value="ssot_item">SSOT 항목</option>
+        <option value="event">행사</option>
+        <option value="member">멤버</option>
+        <option value="partner">협력업체</option>
+      </select>
+      <input type="date" class="filter-select" id="filterStartDate" onchange="loadLogs()">
+      <span style="color: var(--text-muted);">~</span>
+      <input type="date" class="filter-select" id="filterEndDate" onchange="loadLogs()">
+      <button class="btn btn-secondary" onclick="resetFilters()">초기화</button>
+    </div>
+
+    <div class="card">
+      <div id="logContent">
+        <div class="loading">로딩 중...</div>
+      </div>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+  </div>
+
+  <script>
+    const API_BASE = '/api/ops-center';
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventId = urlParams.get('event_id');
+    const LIMIT = 50;
+    let currentPage = 0;
+
+    if (!eventId) {
+      alert('행사 ID가 필요합니다.');
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('eventLink').href = `event-detail.html?id=${eventId}`;
+
+    async function loadStats() {
+      try {
+        const response = await fetch(`${API_BASE}/reports/kpi-onepage?event_id=${eventId}`);
+        const data = await response.json();
+
+        if (data.success) {
+          const activity = data.data.kpi.activity;
+          document.getElementById('totalActions').textContent = activity.totalActions || 0;
+          document.getElementById('uniqueActors').textContent = activity.uniqueActors || 0;
+        }
+      } catch (error) {
+        console.error('Stats load failed:', error);
+      }
+    }
+
+    async function loadLogs() {
+      const container = document.getElementById('logContent');
+      container.innerHTML = '<div class="loading">로딩 중...</div>';
+
+      try {
+        const params = new URLSearchParams({
+          event_id: eventId,
+          limit: LIMIT,
+          offset: currentPage * LIMIT
+        });
+
+        const action = document.getElementById('filterAction').value;
+        const objectType = document.getElementById('filterObjectType').value;
+        const startDate = document.getElementById('filterStartDate').value;
+        const endDate = document.getElementById('filterEndDate').value;
+
+        if (action) params.append('action', action);
+        if (objectType) params.append('object_type', objectType);
+        if (startDate) params.append('start_date', startDate);
+        if (endDate) params.append('end_date', endDate);
+
+        const response = await fetch(`${API_BASE}/audit?${params}`);
+        const data = await response.json();
+
+        if (!data.success) throw new Error(data.error);
+
+        if (data.data.length === 0) {
+          container.innerHTML = '<div class="empty-message">감사 로그가 없습니다</div>';
+          document.getElementById('pagination').innerHTML = '';
+          return;
+        }
+
+        container.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>시간</th>
+                <th>작업자</th>
+                <th>역할</th>
+                <th>액션</th>
+                <th>대상 유형</th>
+                <th>대상</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.data.map(log => `
+                <tr>
+                  <td>${formatDateTime(log.created_at)}</td>
+                  <td>${escapeHtml(log.actor_name || '-')}</td>
+                  <td>${log.actor_role || '-'}</td>
+                  <td><span class="action-badge action-${log.action}">${log.action}</span></td>
+                  <td>${log.object_type}</td>
+                  <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(log.object_label || '-')}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+
+        // 페이지네이션 (간단 구현)
+        const hasMore = data.data.length === LIMIT;
+        document.getElementById('pagination').innerHTML = `
+          ${currentPage > 0 ? `<button class="page-btn" onclick="goToPage(${currentPage - 1})">이전</button>` : ''}
+          <span style="padding: 8px 16px;">페이지 ${currentPage + 1}</span>
+          ${hasMore ? `<button class="page-btn" onclick="goToPage(${currentPage + 1})">다음</button>` : ''}
+        `;
+
+      } catch (error) {
+        container.innerHTML = `<div class="empty-message">오류: ${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    function goToPage(page) {
+      currentPage = page;
+      loadLogs();
+    }
+
+    function resetFilters() {
+      document.getElementById('filterAction').value = '';
+      document.getElementById('filterObjectType').value = '';
+      document.getElementById('filterStartDate').value = '';
+      document.getElementById('filterEndDate').value = '';
+      currentPage = 0;
+      loadLogs();
+    }
+
+    function exportCsv() {
+      const params = new URLSearchParams({ event_id: eventId, format: 'csv' });
+      const startDate = document.getElementById('filterStartDate').value;
+      const endDate = document.getElementById('filterEndDate').value;
+      if (startDate) params.append('start_date', startDate);
+      if (endDate) params.append('end_date', endDate);
+
+      window.location.href = `${API_BASE}/audit/export?${params}`;
+    }
+
+    function exportJson() {
+      const params = new URLSearchParams({ event_id: eventId, format: 'json' });
+      const startDate = document.getElementById('filterStartDate').value;
+      const endDate = document.getElementById('filterEndDate').value;
+      if (startDate) params.append('start_date', startDate);
+      if (endDate) params.append('end_date', endDate);
+
+      window.open(`${API_BASE}/audit/export?${params}`, '_blank');
+    }
+
+    function formatDateTime(dateStr) {
+      if (!dateStr) return '-';
+      return new Date(dateStr).toLocaleString('ko-KR');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    loadStats();
+    loadLogs();
+  </script>
+</body>
+</html>

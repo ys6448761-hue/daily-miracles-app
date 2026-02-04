@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>행사 상세 - 운영 컨트롤타워</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #9B87F5;
+      --secondary: #F5A7C6;
+      --accent: #6E59A5;
+      --bg-light: #FFF5F7;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --text-muted: #999999;
+      --border: #E5E5E5;
+      --success: #4CAF50;
+      --warning: #FF9800;
+      --error: #F44336;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+    .breadcrumb {
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    .breadcrumb a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .breadcrumb span { color: var(--text-muted); }
+
+    header {
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    header h1 { font-size: 24px; font-weight: 700; }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .status-DRAFT { background: #E5E5E5; color: #666; }
+    .status-ACTIVE { background: #E8F5E9; color: #2E7D32; }
+    .status-COMPLETED { background: #E3F2FD; color: #1565C0; }
+    .status-CANCELLED { background: #FFEBEE; color: #C62828; }
+
+    .event-info {
+      display: flex;
+      gap: 24px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .stat-card .value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-card .label {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .nav-tab {
+      padding: 12px 20px;
+      background: white;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-tab:hover { background: #f0f0f0; }
+    .nav-tab.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--accent); }
+    .btn-secondary { background: white; color: var(--text-primary); border: 1px solid var(--border); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-danger { background: var(--error); color: white; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text-muted);
+      background: var(--bg-light);
+    }
+
+    td { font-size: 14px; }
+
+    .member-role {
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .role-admin { background: #E8EAF6; color: #3949AB; }
+    .role-operator { background: #E8F5E9; color: #2E7D32; }
+    .role-approver { background: #FFF3E0; color: #EF6C00; }
+    .role-viewer { background: #ECEFF1; color: #546E7A; }
+
+    .empty-message {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 48px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="index.html">행사 목록</a>
+      <span> / </span>
+      <span id="breadcrumbName">로딩 중...</span>
+    </div>
+
+    <header id="eventHeader">
+      <div class="loading">로딩 중...</div>
+    </header>
+
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card">
+        <div class="value" id="statMembers">-</div>
+        <div class="label">멤버</div>
+      </div>
+      <div class="stat-card">
+        <div class="value" id="statSsot">-</div>
+        <div class="label">SSOT 항목</div>
+      </div>
+      <div class="stat-card">
+        <div class="value" id="statPending">-</div>
+        <div class="label">승인 대기</div>
+      </div>
+      <div class="stat-card">
+        <div class="value" id="statPartners">-</div>
+        <div class="label">협력업체</div>
+      </div>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showTab('overview')">개요</button>
+      <button class="nav-tab" onclick="showTab('ssot')">SSOT 보드</button>
+      <button class="nav-tab" onclick="showTab('members')">멤버</button>
+      <button class="nav-tab" onclick="showTab('approvals')">승인함</button>
+      <button class="nav-tab" onclick="showTab('partners')">협력업체</button>
+    </div>
+
+    <div id="tab-overview" class="tab-content active">
+      <div class="card">
+        <h3>최근 활동</h3>
+        <div id="recentActivity">
+          <div class="loading">로딩 중...</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-ssot" class="tab-content">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="margin-bottom: 0;">SSOT 항목</h3>
+          <a href="ssot-board.html?event_id=${eventId}" class="btn btn-primary">전체 보기</a>
+        </div>
+        <div id="ssotPreview">
+          <div class="loading">로딩 중...</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-members" class="tab-content">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="margin-bottom: 0;">멤버 목록</h3>
+          <button class="btn btn-primary" onclick="openAddMemberModal()">+ 멤버 추가</button>
+        </div>
+        <div id="membersList">
+          <div class="loading">로딩 중...</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-approvals" class="tab-content">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="margin-bottom: 0;">대기 중인 승인</h3>
+          <a href="approval-inbox.html?event_id=${eventId}" class="btn btn-secondary">전체 보기</a>
+        </div>
+        <div id="pendingApprovals">
+          <div class="loading">로딩 중...</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-partners" class="tab-content">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="margin-bottom: 0;">협력업체</h3>
+          <button class="btn btn-primary" onclick="openAddPartnerModal()">+ 협력업체 추가</button>
+        </div>
+        <div id="partnersList">
+          <div class="loading">로딩 중...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '/api/ops-center';
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventId = urlParams.get('id');
+
+    if (!eventId) {
+      alert('행사 ID가 필요합니다.');
+      window.location.href = 'index.html';
+    }
+
+    async function loadEventDetail() {
+      try {
+        const response = await fetch(`${API_BASE}/events/${eventId}`);
+        const data = await response.json();
+
+        if (!data.success) throw new Error(data.error);
+
+        const event = data.data;
+        document.getElementById('breadcrumbName').textContent = event.name;
+
+        document.getElementById('eventHeader').innerHTML = `
+          <div class="header-top">
+            <h1>${escapeHtml(event.name)}</h1>
+            <span class="status-badge status-${event.status}">${getStatusLabel(event.status)}</span>
+          </div>
+          <div class="event-info">
+            <span>${formatDate(event.period_start)} ~ ${formatDate(event.period_end)}</span>
+            ${event.location ? `<span>${escapeHtml(event.location)}</span>` : ''}
+          </div>
+          ${event.description ? `<p style="margin-top: 12px; color: var(--text-secondary);">${escapeHtml(event.description)}</p>` : ''}
+        `;
+
+        // 통계
+        const stats = event.stats || {};
+        document.getElementById('statMembers').textContent = stats.total_members || 0;
+        document.getElementById('statSsot').textContent = stats.total_ssot_items || 0;
+        document.getElementById('statPending').textContent = stats.pending_approvals || 0;
+        document.getElementById('statPartners').textContent = stats.active_partners || 0;
+
+        // 각 탭 데이터 로드
+        loadRecentActivity();
+        loadSsotPreview();
+        loadMembers();
+        loadPendingApprovals();
+        loadPartners();
+
+      } catch (error) {
+        document.getElementById('eventHeader').innerHTML = `
+          <div class="empty-message">오류: ${escapeHtml(error.message)}</div>
+        `;
+      }
+    }
+
+    async function loadRecentActivity() {
+      try {
+        const response = await fetch(`${API_BASE}/audit?event_id=${eventId}&limit=10`);
+        const data = await response.json();
+
+        const container = document.getElementById('recentActivity');
+        if (!data.success || data.data.length === 0) {
+          container.innerHTML = '<div class="empty-message">최근 활동이 없습니다</div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>시간</th>
+                <th>작업자</th>
+                <th>액션</th>
+                <th>대상</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.data.map(log => `
+                <tr>
+                  <td>${formatDateTime(log.created_at)}</td>
+                  <td>${escapeHtml(log.actor_name || '-')}</td>
+                  <td>${log.action}</td>
+                  <td>${escapeHtml(log.object_label || log.object_type)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (error) {
+        document.getElementById('recentActivity').innerHTML = `<div class="empty-message">오류: ${error.message}</div>`;
+      }
+    }
+
+    async function loadSsotPreview() {
+      try {
+        const response = await fetch(`${API_BASE}/ssot-items?event_id=${eventId}&limit=5`);
+        const data = await response.json();
+
+        const container = document.getElementById('ssotPreview');
+        if (!data.success || data.data.length === 0) {
+          container.innerHTML = '<div class="empty-message">등록된 SSOT 항목이 없습니다</div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>카테고리</th>
+                <th>항목</th>
+                <th>값</th>
+                <th>상태</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.data.slice(0, 5).map(item => `
+                <tr>
+                  <td>${item.category}</td>
+                  <td>${escapeHtml(item.label)}</td>
+                  <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(item.value_current || '-')}</td>
+                  <td><span class="status-badge status-${item.status === 'APPROVED' ? 'ACTIVE' : 'DRAFT'}">${item.status}</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (error) {
+        document.getElementById('ssotPreview').innerHTML = `<div class="empty-message">오류: ${error.message}</div>`;
+      }
+    }
+
+    async function loadMembers() {
+      try {
+        const response = await fetch(`${API_BASE}/events/${eventId}/members`);
+        const data = await response.json();
+
+        const container = document.getElementById('membersList');
+        if (!data.success || data.data.length === 0) {
+          container.innerHTML = '<div class="empty-message">등록된 멤버가 없습니다</div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>이름</th>
+                <th>이메일</th>
+                <th>역할</th>
+                <th>승인레벨</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.data.map(member => `
+                <tr>
+                  <td>${escapeHtml(member.user_name)}</td>
+                  <td>${escapeHtml(member.user_email || '-')}</td>
+                  <td><span class="member-role role-${member.role}">${getRoleLabel(member.role)}</span></td>
+                  <td>${member.approval_level || '-'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (error) {
+        document.getElementById('membersList').innerHTML = `<div class="empty-message">오류: ${error.message}</div>`;
+      }
+    }
+
+    async function loadPendingApprovals() {
+      try {
+        const response = await fetch(`${API_BASE}/approvals/pending?event_id=${eventId}`);
+        const data = await response.json();
+
+        const container = document.getElementById('pendingApprovals');
+        if (!data.success || data.data.length === 0) {
+          container.innerHTML = '<div class="empty-message">대기 중인 승인이 없습니다</div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>항목</th>
+                <th>요청자</th>
+                <th>요청일</th>
+                <th>액션</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.data.map(approval => `
+                <tr>
+                  <td>${escapeHtml(approval.target_label || approval.target_type)}</td>
+                  <td>${escapeHtml(approval.requested_by_name || '-')}</td>
+                  <td>${formatDateTime(approval.created_at)}</td>
+                  <td>
+                    <button class="btn btn-success" style="padding: 6px 12px; font-size: 12px;" onclick="approveItem('${approval.id}')">승인</button>
+                    <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="rejectItem('${approval.id}')">반려</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (error) {
+        document.getElementById('pendingApprovals').innerHTML = `<div class="empty-message">오류: ${error.message}</div>`;
+      }
+    }
+
+    async function loadPartners() {
+      try {
+        const response = await fetch(`${API_BASE}/partners?event_id=${eventId}`);
+        const data = await response.json();
+
+        const container = document.getElementById('partnersList');
+        if (!data.success || data.data.length === 0) {
+          container.innerHTML = '<div class="empty-message">등록된 협력업체가 없습니다</div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>업체명</th>
+                <th>역할</th>
+                <th>담당자</th>
+                <th>연락처</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.data.map(partner => `
+                <tr>
+                  <td>${escapeHtml(partner.partner_name)}</td>
+                  <td>${escapeHtml(partner.partner_role || '-')}</td>
+                  <td>${escapeHtml(partner.contact_name || '-')}</td>
+                  <td>${escapeHtml(partner.contact_phone || '-')}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (error) {
+        document.getElementById('partnersList').innerHTML = `<div class="empty-message">오류: ${error.message}</div>`;
+      }
+    }
+
+    async function approveItem(approvalId) {
+      const reason = prompt('승인 사유를 입력하세요:');
+      if (reason === null) return;
+
+      try {
+        const response = await fetch(`${API_BASE}/approvals/${approvalId}/approve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            decidedByName: '관리자',
+            decisionReason: reason
+          })
+        });
+        const data = await response.json();
+        if (!data.success) throw new Error(data.error);
+        alert('승인되었습니다.');
+        loadPendingApprovals();
+        loadEventDetail();
+      } catch (error) {
+        alert('오류: ' + error.message);
+      }
+    }
+
+    async function rejectItem(approvalId) {
+      const reason = prompt('반려 사유를 입력하세요:');
+      if (!reason) { alert('반려 사유는 필수입니다.'); return; }
+
+      try {
+        const response = await fetch(`${API_BASE}/approvals/${approvalId}/reject`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            decidedByName: '관리자',
+            decisionReason: reason
+          })
+        });
+        const data = await response.json();
+        if (!data.success) throw new Error(data.error);
+        alert('반려되었습니다.');
+        loadPendingApprovals();
+        loadEventDetail();
+      } catch (error) {
+        alert('오류: ' + error.message);
+      }
+    }
+
+    function showTab(tabName) {
+      document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      document.querySelector(`[onclick="showTab('${tabName}')"]`).classList.add('active');
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
+
+    function getStatusLabel(status) {
+      const labels = { DRAFT: '준비중', ACTIVE: '진행중', COMPLETED: '완료', CANCELLED: '취소' };
+      return labels[status] || status;
+    }
+
+    function getRoleLabel(role) {
+      const labels = { admin: '관리자', operator: '운영자', approver: '승인자', viewer: '열람자' };
+      return labels[role] || role;
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      return new Date(dateStr).toLocaleDateString('ko-KR');
+    }
+
+    function formatDateTime(dateStr) {
+      if (!dateStr) return '';
+      return new Date(dateStr).toLocaleString('ko-KR', {
+        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function openAddMemberModal() {
+      const name = prompt('멤버 이름:');
+      if (!name) return;
+      const email = prompt('이메일:');
+      const role = prompt('역할 (admin/operator/approver/viewer):') || 'viewer';
+
+      fetch(`${API_BASE}/events/${eventId}/members`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userName: name, userEmail: email, role })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('멤버가 추가되었습니다.');
+          loadMembers();
+          loadEventDetail();
+        } else {
+          alert('오류: ' + data.error);
+        }
+      });
+    }
+
+    function openAddPartnerModal() {
+      const name = prompt('협력업체명:');
+      if (!name) return;
+      const role = prompt('역할:');
+      const contactName = prompt('담당자 이름:');
+      const contactPhone = prompt('연락처:');
+
+      fetch(`${API_BASE}/partners`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventId,
+          partnerName: name,
+          partnerRole: role,
+          contactName,
+          contactPhone
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('협력업체가 추가되었습니다.');
+          loadPartners();
+          loadEventDetail();
+        } else {
+          alert('오류: ' + data.error);
+        }
+      });
+    }
+
+    loadEventDetail();
+  </script>
+</body>
+</html>

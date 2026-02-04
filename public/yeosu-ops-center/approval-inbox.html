@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>승인함 - 운영 컨트롤타워</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #9B87F5;
+      --secondary: #F5A7C6;
+      --accent: #6E59A5;
+      --bg-light: #FFF5F7;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --text-muted: #999999;
+      --border: #E5E5E5;
+      --success: #4CAF50;
+      --warning: #FF9800;
+      --error: #F44336;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    .container { max-width: 1000px; margin: 0 auto; padding: 24px; }
+
+    .breadcrumb { margin-bottom: 16px; font-size: 14px; }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .breadcrumb span { color: var(--text-muted); }
+
+    header {
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    header h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+    header p { color: var(--text-muted); font-size: 14px; }
+
+    .stats-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      text-align: center;
+      flex: 1;
+    }
+
+    .stat-card .value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-card .label {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .tab-btn {
+      padding: 10px 20px;
+      background: white;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover { background: #f0f0f0; }
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .approval-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .approval-item:last-child { border-bottom: none; }
+
+    .approval-info { flex: 1; }
+
+    .approval-title {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .approval-meta {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .approval-actions { display: flex; gap: 8px; }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { background: #388E3C; }
+    .btn-danger { background: var(--error); color: white; }
+    .btn-danger:hover { background: #C62828; }
+    .btn-secondary { background: var(--bg-light); color: var(--text-secondary); }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-PENDING { background: #FFF3E0; color: #EF6C00; }
+    .status-APPROVED { background: #E8F5E9; color: #2E7D32; }
+    .status-REJECTED { background: #FFEBEE; color: #C62828; }
+    .status-CANCELLED { background: #ECEFF1; color: #546E7A; }
+
+    .empty-message {
+      text-align: center;
+      padding: 48px;
+      color: var(--text-muted);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 48px;
+      color: var(--text-muted);
+    }
+
+    .history-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .history-item:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="index.html">행사 목록</a>
+      <span> / </span>
+      <a href="#" id="eventLink">행사 상세</a>
+      <span> / </span>
+      <span>승인함</span>
+    </div>
+
+    <header>
+      <h1>승인함</h1>
+      <p>SSOT 항목 변경 승인 요청을 관리합니다</p>
+    </header>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="value" id="statPending">-</div>
+        <div class="label">대기 중</div>
+      </div>
+      <div class="stat-card">
+        <div class="value" id="statApproved">-</div>
+        <div class="label">승인됨</div>
+      </div>
+      <div class="stat-card">
+        <div class="value" id="statRejected">-</div>
+        <div class="label">반려됨</div>
+      </div>
+      <div class="stat-card">
+        <div class="value" id="statLeadtime">-</div>
+        <div class="label">평균 리드타임</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('pending')" data-tab="pending">대기 중</button>
+      <button class="tab-btn" onclick="showTab('history')" data-tab="history">처리 이력</button>
+    </div>
+
+    <div class="card">
+      <div id="pendingContent" class="tab-content active">
+        <div class="loading">로딩 중...</div>
+      </div>
+      <div id="historyContent" class="tab-content" style="display: none;">
+        <div class="loading">로딩 중...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '/api/ops-center';
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventId = urlParams.get('event_id');
+
+    if (!eventId) {
+      alert('행사 ID가 필요합니다.');
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('eventLink').href = `event-detail.html?id=${eventId}`;
+
+    async function loadStats() {
+      try {
+        const response = await fetch(`${API_BASE}/reports/kpi-onepage?event_id=${eventId}`);
+        const data = await response.json();
+
+        if (data.success) {
+          const approval = data.data.kpi.approval;
+          document.getElementById('statPending').textContent = approval.pendingCount || 0;
+          document.getElementById('statApproved').textContent = approval.approvedCount || 0;
+          document.getElementById('statRejected').textContent = approval.rejectedCount || 0;
+          document.getElementById('statLeadtime').textContent = approval.avgLeadtimeHours
+            ? `${approval.avgLeadtimeHours}h`
+            : '-';
+        }
+      } catch (error) {
+        console.error('Stats load failed:', error);
+      }
+    }
+
+    async function loadPending() {
+      const container = document.getElementById('pendingContent');
+      try {
+        const response = await fetch(`${API_BASE}/approvals/pending?event_id=${eventId}`);
+        const data = await response.json();
+
+        if (!data.success) throw new Error(data.error);
+
+        if (data.data.length === 0) {
+          container.innerHTML = '<div class="empty-message">대기 중인 승인 요청이 없습니다</div>';
+          return;
+        }
+
+        container.innerHTML = data.data.map(item => `
+          <div class="approval-item">
+            <div class="approval-info">
+              <div class="approval-title">${escapeHtml(item.target_label || item.target_type)}</div>
+              <div class="approval-meta">
+                ${item.target_category ? `[${item.target_category}] ` : ''}
+                요청자: ${escapeHtml(item.requested_by_name || '-')} |
+                ${formatDateTime(item.created_at)}
+                ${item.request_reason ? ` | "${escapeHtml(item.request_reason)}"` : ''}
+              </div>
+            </div>
+            <div class="approval-actions">
+              <button class="btn btn-success" onclick="approve('${item.id}')">승인</button>
+              <button class="btn btn-danger" onclick="reject('${item.id}')">반려</button>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (error) {
+        container.innerHTML = `<div class="empty-message">오류: ${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    async function loadHistory() {
+      const container = document.getElementById('historyContent');
+      try {
+        const response = await fetch(`${API_BASE}/approvals/history?event_id=${eventId}&limit=50`);
+        const data = await response.json();
+
+        if (!data.success) throw new Error(data.error);
+
+        if (data.data.length === 0) {
+          container.innerHTML = '<div class="empty-message">처리 이력이 없습니다</div>';
+          return;
+        }
+
+        container.innerHTML = data.data.map(item => `
+          <div class="history-item">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <div style="font-weight: 600;">${escapeHtml(item.target_label || item.target_type)}</div>
+                <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+                  요청: ${escapeHtml(item.requested_by_name || '-')} (${formatDateTime(item.created_at)})
+                  ${item.decided_by_name ? ` → 처리: ${escapeHtml(item.decided_by_name)} (${formatDateTime(item.decided_at)})` : ''}
+                </div>
+                ${item.decision_reason ? `<div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">"${escapeHtml(item.decision_reason)}"</div>` : ''}
+              </div>
+              <span class="status-badge status-${item.status}">${getStatusLabel(item.status)}</span>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (error) {
+        container.innerHTML = `<div class="empty-message">오류: ${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    async function approve(approvalId) {
+      const reason = prompt('승인 사유 (선택):') || '승인';
+
+      try {
+        const response = await fetch(`${API_BASE}/approvals/${approvalId}/approve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            decidedByName: '관리자',
+            decisionReason: reason
+          })
+        });
+
+        const data = await response.json();
+        if (!data.success) throw new Error(data.error);
+
+        alert('승인되었습니다.');
+        loadPending();
+        loadStats();
+      } catch (error) {
+        alert('오류: ' + error.message);
+      }
+    }
+
+    async function reject(approvalId) {
+      const reason = prompt('반려 사유 (필수):');
+      if (!reason) {
+        alert('반려 사유는 필수입니다.');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/approvals/${approvalId}/reject`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            decidedByName: '관리자',
+            decisionReason: reason
+          })
+        });
+
+        const data = await response.json();
+        if (!data.success) throw new Error(data.error);
+
+        alert('반려되었습니다.');
+        loadPending();
+        loadStats();
+      } catch (error) {
+        alert('오류: ' + error.message);
+      }
+    }
+
+    function showTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+      });
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = 'none';
+      });
+      document.getElementById(`${tabName}Content`).style.display = 'block';
+
+      if (tabName === 'history') {
+        loadHistory();
+      }
+    }
+
+    function getStatusLabel(status) {
+      const labels = {
+        PENDING: '대기 중',
+        APPROVED: '승인됨',
+        REJECTED: '반려됨',
+        CANCELLED: '취소됨'
+      };
+      return labels[status] || status;
+    }
+
+    function formatDateTime(dateStr) {
+      if (!dateStr) return '-';
+      return new Date(dateStr).toLocaleString('ko-KR', {
+        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    loadStats();
+    loadPending();
+  </script>
+</body>
+</html>

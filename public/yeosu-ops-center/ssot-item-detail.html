@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SSOT 항목 상세 - 운영 컨트롤타워</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #9B87F5;
+      --secondary: #F5A7C6;
+      --accent: #6E59A5;
+      --bg-light: #FFF5F7;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --text-muted: #999999;
+      --border: #E5E5E5;
+      --success: #4CAF50;
+      --warning: #FF9800;
+      --error: #F44336;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 24px; }
+
+    .breadcrumb { margin-bottom: 16px; font-size: 14px; }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .breadcrumb span { color: var(--text-muted); }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+
+    .card h2 { font-size: 20px; font-weight: 700; }
+
+    .status-badge {
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .status-APPROVED { background: #E8F5E9; color: #2E7D32; }
+    .status-PENDING_APPROVAL { background: #FFF3E0; color: #EF6C00; }
+    .status-DRAFT { background: #ECEFF1; color: #546E7A; }
+    .status-REJECTED { background: #FFEBEE; color: #C62828; }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .info-item label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .info-item .value {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .value-display {
+      background: var(--bg-light);
+      padding: 16px;
+      border-radius: 8px;
+      font-size: 15px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--accent); }
+    .btn-secondary { background: white; color: var(--text-primary); border: 1px solid var(--border); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-danger { background: var(--error); color: white; }
+
+    .actions { display: flex; gap: 12px; margin-top: 24px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text-muted);
+      background: var(--bg-light);
+    }
+
+    td { font-size: 14px; }
+
+    .change-indicator {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .change-CREATE { background: #E8F5E9; color: #2E7D32; }
+    .change-UPDATE { background: #E3F2FD; color: #1565C0; }
+    .change-APPROVE { background: #E8F5E9; color: #2E7D32; }
+    .change-REJECT { background: #FFEBEE; color: #C62828; }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .modal h3 { font-size: 18px; margin-bottom: 20px; }
+
+    .form-group { margin-bottom: 16px; }
+
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      resize: vertical;
+    }
+
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    .empty-message {
+      text-align: center;
+      padding: 32px;
+      color: var(--text-muted);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 48px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="index.html">행사 목록</a>
+      <span> / </span>
+      <a href="#" id="boardLink">SSOT 보드</a>
+      <span> / </span>
+      <span id="itemLabel">항목 상세</span>
+    </div>
+
+    <div class="card" id="itemDetail">
+      <div class="loading">로딩 중...</div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">변경 이력</h3>
+      <div id="historyList">
+        <div class="loading">로딩 중...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="editModal" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <h3>값 수정</h3>
+      <form id="editForm" onsubmit="updateItem(event)">
+        <div class="form-group">
+          <label for="newValue">새 값</label>
+          <textarea id="newValue" name="newValue" rows="5" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="changeReason">변경 사유</label>
+          <textarea id="changeReason" name="changeReason" rows="2" placeholder="변경 사유를 입력하세요"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">취소</button>
+          <button type="submit" class="btn btn-primary">저장</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '/api/ops-center';
+    const urlParams = new URLSearchParams(window.location.search);
+    const itemId = urlParams.get('id');
+    const eventId = urlParams.get('event_id');
+
+    if (!itemId) {
+      alert('항목 ID가 필요합니다.');
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('boardLink').href = `ssot-board.html?event_id=${eventId}`;
+
+    let currentItem = null;
+
+    async function loadItem() {
+      try {
+        const response = await fetch(`${API_BASE}/ssot-items/${itemId}`);
+        const data = await response.json();
+
+        if (!data.success) throw new Error(data.error);
+
+        currentItem = data.data;
+        document.getElementById('itemLabel').textContent = currentItem.label;
+
+        document.getElementById('itemDetail').innerHTML = `
+          <div class="card-header">
+            <div>
+              <h2>${escapeHtml(currentItem.label)}</h2>
+              <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">
+                ${currentItem.category} / ${currentItem.item_key}
+              </p>
+            </div>
+            <span class="status-badge status-${currentItem.status}">${getStatusLabel(currentItem.status)}</span>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-item">
+              <label>버전</label>
+              <div class="value">v${currentItem.version}</div>
+            </div>
+            <div class="info-item">
+              <label>값 유형</label>
+              <div class="value">${currentItem.value_type}</div>
+            </div>
+            <div class="info-item">
+              <label>승인 필요</label>
+              <div class="value">${currentItem.requires_approval ? '예 (L1)' : '아니오'}</div>
+            </div>
+            <div class="info-item">
+              <label>마지막 수정</label>
+              <div class="value">${formatDateTime(currentItem.updated_at)}</div>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">현재 값</label>
+            <div class="value-display">${escapeHtml(currentItem.value_current || '(값 없음)')}</div>
+          </div>
+
+          ${currentItem.last_approved_value ? `
+            <div style="margin-bottom: 16px;">
+              <label style="display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
+                마지막 승인 값 (${formatDateTime(currentItem.last_approved_at)})
+              </label>
+              <div class="value-display" style="background: #E8F5E9;">${escapeHtml(currentItem.last_approved_value)}</div>
+            </div>
+          ` : ''}
+
+          <div class="actions">
+            <button class="btn btn-primary" onclick="openEditModal()">수정</button>
+            ${currentItem.status === 'PENDING_APPROVAL' ? `
+              <button class="btn btn-success" onclick="approveItem()">승인</button>
+              <button class="btn btn-danger" onclick="rejectItem()">반려</button>
+            ` : ''}
+            <button class="btn btn-secondary" onclick="deleteItem()">삭제</button>
+          </div>
+        `;
+
+        loadHistory();
+
+      } catch (error) {
+        document.getElementById('itemDetail').innerHTML = `
+          <div class="empty-message">오류: ${escapeHtml(error.message)}</div>
+        `;
+      }
+    }
+
+    async function loadHistory() {
+      try {
+        const response = await fetch(`${API_BASE}/ssot-items/${itemId}/history`);
+        const data = await response.json();
+
+        const container = document.getElementById('historyList');
+
+        if (!data.success || data.data.length === 0) {
+          container.innerHTML = '<div class="empty-message">변경 이력이 없습니다</div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>버전</th>
+                <th>변경</th>
+                <th>변경자</th>
+                <th>사유</th>
+                <th>시간</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.data.map(h => `
+                <tr>
+                  <td>v${h.version}</td>
+                  <td>
+                    <span class="change-indicator change-${h.status_after === 'APPROVED' ? 'APPROVE' : (h.version === 1 ? 'CREATE' : 'UPDATE')}">
+                      ${h.status_before ? `${h.status_before} → ` : ''}${h.status_after}
+                    </span>
+                  </td>
+                  <td>${escapeHtml(h.changed_by_name || '-')}</td>
+                  <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(h.change_reason || '-')}</td>
+                  <td>${formatDateTime(h.created_at)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (error) {
+        document.getElementById('historyList').innerHTML = `<div class="empty-message">오류: ${error.message}</div>`;
+      }
+    }
+
+    async function updateItem(e) {
+      e.preventDefault();
+      const form = e.target;
+
+      try {
+        const response = await fetch(`${API_BASE}/ssot-items/${itemId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            valueCurrent: form.newValue.value,
+            changeReason: form.changeReason.value,
+            changedByName: '관리자'
+          })
+        });
+
+        const data = await response.json();
+        if (!data.success) throw new Error(data.error);
+
+        closeModal();
+        form.reset();
+        loadItem();
+
+        if (data.data.status === 'PENDING_APPROVAL') {
+          alert('수정이 완료되었습니다. 승인 대기 상태로 변경되었습니다.');
+        } else {
+          alert('수정이 완료되었습니다.');
+        }
+      } catch (error) {
+        alert('오류: ' + error.message);
+      }
+    }
+
+    async function approveItem() {
+      // 먼저 승인 요청 조회
+      try {
+        const pendingResponse = await fetch(`${API_BASE}/approvals/pending?event_id=${eventId}&target_type=ssot_item`);
+        const pendingData = await pendingResponse.json();
+
+        const approval = pendingData.data?.find(a => a.target_id === itemId);
+        if (!approval) {
+          // 직접 승인
+          const response = await fetch(`${API_BASE}/ssot-items/${itemId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              valueCurrent: currentItem.value_current,
+              skipApproval: true,
+              changedByName: '관리자'
+            })
+          });
+          const data = await response.json();
+          if (!data.success) throw new Error(data.error);
+        } else {
+          // 승인 요청 처리
+          const response = await fetch(`${API_BASE}/approvals/${approval.id}/approve`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              decidedByName: '관리자',
+              decisionReason: '승인'
+            })
+          });
+          const data = await response.json();
+          if (!data.success) throw new Error(data.error);
+        }
+
+        alert('승인되었습니다.');
+        loadItem();
+      } catch (error) {
+        alert('오류: ' + error.message);
+      }
+    }
+
+    async function rejectItem() {
+      const reason = prompt('반려 사유를 입력하세요:');
+      if (!reason) return;
+
+      try {
+        const pendingResponse = await fetch(`${API_BASE}/approvals/pending?event_id=${eventId}&target_type=ssot_item`);
+        const pendingData = await pendingResponse.json();
+
+        const approval = pendingData.data?.find(a => a.target_id === itemId);
+        if (approval) {
+          const response = await fetch(`${API_BASE}/approvals/${approval.id}/reject`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              decidedByName: '관리자',
+              decisionReason: reason
+            })
+          });
+          const data = await response.json();
+          if (!data.success) throw new Error(data.error);
+        }
+
+        alert('반려되었습니다.');
+        loadItem();
+      } catch (error) {
+        alert('오류: ' + error.message);
+      }
+    }
+
+    async function deleteItem() {
+      if (!confirm('정말 삭제하시겠습니까?')) return;
+
+      try {
+        const response = await fetch(`${API_BASE}/ssot-items/${itemId}`, {
+          method: 'DELETE'
+        });
+        const data = await response.json();
+        if (!data.success) throw new Error(data.error);
+
+        alert('삭제되었습니다.');
+        window.location.href = `ssot-board.html?event_id=${eventId}`;
+      } catch (error) {
+        alert('오류: ' + error.message);
+      }
+    }
+
+    function openEditModal() {
+      document.getElementById('newValue').value = currentItem.value_current || '';
+      document.getElementById('editModal').classList.add('active');
+    }
+
+    function closeModal(e) {
+      if (!e || e.target === e.currentTarget) {
+        document.getElementById('editModal').classList.remove('active');
+      }
+    }
+
+    function getStatusLabel(status) {
+      const labels = {
+        APPROVED: '승인됨',
+        PENDING_APPROVAL: '승인대기',
+        DRAFT: '작성중',
+        REJECTED: '반려'
+      };
+      return labels[status] || status;
+    }
+
+    function formatDateTime(dateStr) {
+      if (!dateStr) return '-';
+      return new Date(dateStr).toLocaleString('ko-KR');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    loadItem();
+  </script>
+</body>
+</html>

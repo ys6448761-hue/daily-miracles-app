@@ -436,6 +436,15 @@ try {
   console.error("❌ 소원항해단(Harbor) 라우터 로드 실패:", error.message);
 }
 
+// 여수여행센터 운영 컨트롤타워 OS v0 라우터 로딩
+let yeosuOpsRoutes = null;
+try {
+  yeosuOpsRoutes = require("./routes/yeosuOpsRoutes");
+  console.log("✅ 여수 운영 컨트롤타워(Ops Center) 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 여수 운영 컨트롤타워(Ops Center) 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -1276,6 +1285,14 @@ if (harborRoutes) {
   console.log("✅ 소원항해단(Harbor) 라우터 등록 완료 (/anon/bootstrap, /harbor/wishes, /harbor/lighthouse, /harbor/temperature)");
 } else {
   console.warn("⚠️ 소원항해단(Harbor) 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 여수 운영 컨트롤타워 OS v0 Routes (/api/ops-center/*) ----------
+if (yeosuOpsRoutes) {
+  app.use("/api/ops-center", yeosuOpsRoutes);
+  console.log("✅ 여수 운영 컨트롤타워(Ops Center) 라우터 등록 완료 (/api/ops-center)");
+} else {
+  console.warn("⚠️ 여수 운영 컨트롤타워(Ops Center) 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------
