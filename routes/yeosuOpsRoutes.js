@@ -8,6 +8,14 @@
 const express = require('express');
 const router = express.Router();
 
+// DB 로딩 (Reset API용)
+let db = null;
+try {
+  db = require('../database/db');
+} catch (error) {
+  console.error('❌ DB 로드 실패 (Reset API 사용 불가):', error.message);
+}
+
 // 서비스 로딩
 let services = null;
 try {
@@ -57,7 +65,10 @@ router.get('/health', (req, res) => {
 router.post('/demo/reset/:eventId', async (req, res) => {
   try {
     const eventId = req.params.eventId;
-    const db = require('../database/db');
+
+    if (!db) {
+      return res.status(503).json({ success: false, error: 'DB not available' });
+    }
 
     // 행사 존재 확인
     const event = await services.eventService.getEvent(eventId);
