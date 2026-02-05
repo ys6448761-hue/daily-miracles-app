@@ -14,6 +14,17 @@ const triggerService = require('./triggerService');
 const reportService = require('./reportService');
 const partnerService = require('./partnerService');
 
+// v1: MICE 결과보고 패키지
+let miceService = null;
+let miceReportService = null;
+try {
+  miceService = require('./miceService');
+  miceReportService = require('./miceReportService');
+  console.log('✅ MICE 서비스 로드 성공');
+} catch (error) {
+  console.warn('⚠️ MICE 서비스 로드 실패 (마이그레이션 필요):', error.message);
+}
+
 module.exports = {
   eventService,
   memberService,
@@ -22,5 +33,8 @@ module.exports = {
   auditService,
   triggerService,
   reportService,
-  partnerService
+  partnerService,
+  // v1
+  miceService,
+  miceReportService
 };

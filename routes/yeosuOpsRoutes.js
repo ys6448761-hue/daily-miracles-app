@@ -803,4 +803,465 @@ router.get('/partners/export-contacts', async (req, res) => {
   }
 });
 
+// ═══════════════════════════════════════════════════════════
+// MICE 인센티브 결과보고 (v1)
+// ═══════════════════════════════════════════════════════════
+
+// MICE 서비스 가용성 체크 미들웨어
+function requireMiceServices(req, res, next) {
+  if (!services.miceService || !services.miceReportService) {
+    return res.status(503).json({
+      success: false,
+      error: 'mice_service_unavailable',
+      message: 'MICE 서비스가 로드되지 않았습니다 (마이그레이션 필요)'
+    });
+  }
+  next();
+}
+
+// ─────────────────────────────────────────────────────────────
+// 참가자 등록부 (Participants)
+// ─────────────────────────────────────────────────────────────
+
+router.post('/mice/participants', requireMiceServices, async (req, res) => {
+  try {
+    const participant = await services.miceService.createParticipant({
+      eventId: req.body.eventId,
+      regType: req.body.regType,
+      orgName: req.body.orgName,
+      personName: req.body.personName,
+      email: req.body.email,
+      phone: req.body.phone,
+      nationality: req.body.nationality,
+      isForeign: req.body.isForeign,
+      feePaidAmount: req.body.feePaidAmount,
+      depositDate: req.body.depositDate,
+      notes: req.body.notes
+    });
+    res.status(201).json({ success: true, data: participant });
+  } catch (error) {
+    console.error('Participant creation failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/mice/participants', requireMiceServices, async (req, res) => {
+  try {
+    const participants = await services.miceService.listParticipants(
+      req.query.event_id,
+      { regType: req.query.reg_type }
+    );
+    res.json({ success: true, data: participants, count: participants.length });
+  } catch (error) {
+    console.error('Participant list failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/mice/participants/stats', requireMiceServices, async (req, res) => {
+  try {
+    const stats = await services.miceService.getParticipantStats(req.query.event_id);
+    res.json({ success: true, data: stats });
+  } catch (error) {
+    console.error('Participant stats failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.post('/mice/participants/bulk', requireMiceServices, async (req, res) => {
+  try {
+    const results = await services.miceService.bulkCreateParticipants(
+      req.body.eventId,
+      req.body.participants
+    );
+    res.status(201).json({ success: true, data: results, count: results.length });
+  } catch (error) {
+    console.error('Bulk participant creation failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.delete('/mice/participants/:id', requireMiceServices, async (req, res) => {
+  try {
+    const deleted = await services.miceService.deleteParticipant(req.params.id);
+    res.json({ success: true, deleted });
+  } catch (error) {
+    console.error('Participant delete failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────
+// 숙박확인서 (Stays)
+// ─────────────────────────────────────────────────────────────
+
+router.post('/mice/stays', requireMiceServices, async (req, res) => {
+  try {
+    const stay = await services.miceService.createStay({
+      eventId: req.body.eventId,
+      hotelName: req.body.hotelName,
+      checkinDate: req.body.checkinDate,
+      checkoutDate: req.body.checkoutDate,
+      nights: req.body.nights,
+      guestCountTotal: req.body.guestCountTotal,
+      guestCountForeign: req.body.guestCountForeign,
+      roomsCount: req.body.roomsCount,
+      receiptAssetId: req.body.receiptAssetId,
+      notes: req.body.notes
+    });
+    res.status(201).json({ success: true, data: stay });
+  } catch (error) {
+    console.error('Stay creation failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/mice/stays', requireMiceServices, async (req, res) => {
+  try {
+    const stays = await services.miceService.listStays(req.query.event_id);
+    res.json({ success: true, data: stays, count: stays.length });
+  } catch (error) {
+    console.error('Stay list failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/mice/stays/stats', requireMiceServices, async (req, res) => {
+  try {
+    const stats = await services.miceService.getStayStats(req.query.event_id);
+    res.json({ success: true, data: stats });
+  } catch (error) {
+    console.error('Stay stats failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.delete('/mice/stays/:id', requireMiceServices, async (req, res) => {
+  try {
+    const deleted = await services.miceService.deleteStay(req.params.id);
+    res.json({ success: true, deleted });
+  } catch (error) {
+    console.error('Stay delete failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────
+// 지출증빙 (Expenses)
+// ─────────────────────────────────────────────────────────────
+
+router.post('/mice/expenses', requireMiceServices, async (req, res) => {
+  try {
+    const expense = await services.miceService.createExpense({
+      eventId: req.body.eventId,
+      category: req.body.category,
+      description: req.body.description,
+      vendorName: req.body.vendorName,
+      vendorIsLocal: req.body.vendorIsLocal,
+      vendorBizRegNo: req.body.vendorBizRegNo,
+      amount: req.body.amount,
+      payMethod: req.body.payMethod,
+      paidAt: req.body.paidAt,
+      evidenceAssets: req.body.evidenceAssets,
+      isValid: req.body.isValid,
+      validationNotes: req.body.validationNotes,
+      notes: req.body.notes
+    });
+    res.status(201).json({ success: true, data: expense });
+  } catch (error) {
+    console.error('Expense creation failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/mice/expenses', requireMiceServices, async (req, res) => {
+  try {
+    const expenses = await services.miceService.listExpenses(
+      req.query.event_id,
+      { category: req.query.category }
+    );
+    res.json({ success: true, data: expenses, count: expenses.length });
+  } catch (error) {
+    console.error('Expense list failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/mice/expenses/stats', requireMiceServices, async (req, res) => {
+  try {
+    const stats = await services.miceService.getExpenseStats(req.query.event_id);
+    res.json({ success: true, data: stats });
+  } catch (error) {
+    console.error('Expense stats failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.delete('/mice/expenses/:id', requireMiceServices, async (req, res) => {
+  try {
+    const deleted = await services.miceService.deleteExpense(req.params.id);
+    res.json({ success: true, deleted });
+  } catch (error) {
+    console.error('Expense delete failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────
+// 사진대장 (Photos)
+// ─────────────────────────────────────────────────────────────
+
+router.post('/mice/photos', requireMiceServices, async (req, res) => {
+  try {
+    const photo = await services.miceService.createPhoto({
+      eventId: req.body.eventId,
+      photoAssetId: req.body.photoAssetId,
+      tag: req.body.tag,
+      description: req.body.description,
+      takenAt: req.body.takenAt,
+      location: req.body.location,
+      sortOrder: req.body.sortOrder
+    });
+    res.status(201).json({ success: true, data: photo });
+  } catch (error) {
+    console.error('Photo creation failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/mice/photos', requireMiceServices, async (req, res) => {
+  try {
+    const photos = await services.miceService.listPhotos(
+      req.query.event_id,
+      { tag: req.query.tag }
+    );
+    res.json({ success: true, data: photos, count: photos.length });
+  } catch (error) {
+    console.error('Photo list failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/mice/photos/stats', requireMiceServices, async (req, res) => {
+  try {
+    const stats = await services.miceService.getPhotoStats(req.query.event_id);
+    res.json({ success: true, data: stats });
+  } catch (error) {
+    console.error('Photo stats failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.delete('/mice/photos/:id', requireMiceServices, async (req, res) => {
+  try {
+    const deleted = await services.miceService.deletePhoto(req.params.id);
+    res.json({ success: true, deleted });
+  } catch (error) {
+    console.error('Photo delete failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────
+// 설문 (Survey)
+// ─────────────────────────────────────────────────────────────
+
+router.post('/mice/survey', requireMiceServices, async (req, res) => {
+  try {
+    const response = await services.miceService.createSurveyResponse({
+      eventId: req.body.eventId,
+      respondentType: req.body.respondentType,
+      respondentName: req.body.respondentName,
+      respondentOrg: req.body.respondentOrg,
+      answers: req.body.answers
+    });
+    res.status(201).json({ success: true, data: response });
+  } catch (error) {
+    console.error('Survey response creation failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/mice/survey', requireMiceServices, async (req, res) => {
+  try {
+    const responses = await services.miceService.listSurveyResponses(req.query.event_id);
+    res.json({ success: true, data: responses, count: responses.length });
+  } catch (error) {
+    console.error('Survey list failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────
+// 에셋 업로드 (Assets)
+// ─────────────────────────────────────────────────────────────
+
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const { v4: uuidv4 } = require('uuid');
+
+// 업로드 디렉토리 설정
+const uploadDir = path.join(process.cwd(), 'output', 'mice-assets');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const eventDir = path.join(uploadDir, req.body.eventId || 'unknown');
+    if (!fs.existsSync(eventDir)) {
+      fs.mkdirSync(eventDir, { recursive: true });
+    }
+    cb(null, eventDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = `${uuidv4()}${path.extname(file.originalname)}`;
+    cb(null, uniqueName);
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|pdf|doc|docx|xls|xlsx|csv/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    if (extname || mimetype) {
+      return cb(null, true);
+    }
+    cb(new Error('지원하지 않는 파일 형식입니다'));
+  }
+});
+
+router.post('/assets/upload', requireMiceServices, upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: '파일이 필요합니다' });
+    }
+
+    const asset = await services.miceService.createAsset({
+      eventId: req.body.eventId,
+      kind: req.body.kind || 'ETC',
+      originalFilename: req.file.originalname,
+      storedFilename: req.file.filename,
+      mimeType: req.file.mimetype,
+      sizeBytes: req.file.size,
+      storagePath: req.file.path,
+      metadata: req.body.metadata ? JSON.parse(req.body.metadata) : {},
+      uploadedBy: req.body.uploadedBy
+    });
+
+    res.status(201).json({ success: true, data: asset });
+  } catch (error) {
+    console.error('Asset upload failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/assets', requireMiceServices, async (req, res) => {
+  try {
+    const assets = await services.miceService.listAssets(
+      req.query.event_id,
+      { kind: req.query.kind }
+    );
+    res.json({ success: true, data: assets, count: assets.length });
+  } catch (error) {
+    console.error('Asset list failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/assets/:id', requireMiceServices, async (req, res) => {
+  try {
+    const asset = await services.miceService.getAsset(req.params.id);
+    if (!asset) {
+      return res.status(404).json({ success: false, error: 'Asset not found' });
+    }
+    res.json({ success: true, data: asset });
+  } catch (error) {
+    console.error('Asset get failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────
+// 결과보고 패키지 (Report)
+// ─────────────────────────────────────────────────────────────
+
+router.get('/mice/report/checklist', requireMiceServices, async (req, res) => {
+  try {
+    const checklist = await services.miceReportService.getChecklist(req.query.event_id);
+    res.json({ success: true, data: checklist });
+  } catch (error) {
+    console.error('Checklist failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.post('/mice/report/generate', requireMiceServices, async (req, res) => {
+  try {
+    const result = await services.miceReportService.generateReportPack(
+      req.body.eventId,
+      { generatedBy: req.body.generatedBy }
+    );
+    res.json({
+      success: true,
+      data: {
+        packId: result.packId,
+        downloadUrl: `/api/ops-center/mice/report/download/${result.packId}`,
+        zipFilename: result.zipFilename,
+        zipSize: result.zipSize,
+        includedFiles: result.includedFiles,
+        checklist: result.checklist
+      }
+    });
+  } catch (error) {
+    console.error('Report generation failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/mice/report/download/:packId', requireMiceServices, async (req, res) => {
+  try {
+    const pack = await services.miceReportService.getReportPack(req.params.packId);
+    if (!pack) {
+      return res.status(404).json({ success: false, error: 'Report pack not found' });
+    }
+
+    if (pack.status !== 'READY') {
+      return res.status(400).json({
+        success: false,
+        error: 'Report not ready',
+        status: pack.status
+      });
+    }
+
+    if (!fs.existsSync(pack.zip_path)) {
+      return res.status(404).json({ success: false, error: 'ZIP file not found' });
+    }
+
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(pack.zip_filename)}"`);
+    res.setHeader('Content-Length', pack.zip_size_bytes);
+
+    const fileStream = fs.createReadStream(pack.zip_path);
+    fileStream.pipe(res);
+  } catch (error) {
+    console.error('Report download failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/mice/report/packs', requireMiceServices, async (req, res) => {
+  try {
+    const packs = await services.miceReportService.listReportPacks(req.query.event_id);
+    res.json({ success: true, data: packs, count: packs.length });
+  } catch (error) {
+    console.error('Report packs list failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 module.exports = router;
