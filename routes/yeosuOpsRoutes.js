@@ -57,7 +57,7 @@ router.get('/health', (req, res) => {
 router.post('/demo/reset/:eventId', async (req, res) => {
   try {
     const eventId = req.params.eventId;
-    const db = require('../config/database');
+    const db = require('../database/db');
 
     // 행사 존재 확인
     const event = await services.eventService.getEvent(eventId);
@@ -73,39 +73,39 @@ router.post('/demo/reset/:eventId', async (req, res) => {
     };
 
     // 1. 트리거 로그 삭제
-    const triggerLogResult = await db.pool.query(`
+    const triggerLogResult = await db.query(`
       DELETE FROM ops_trigger_logs
       WHERE trigger_id IN (SELECT id FROM ops_triggers WHERE event_id = $1)
     `, [eventId]);
     results.counts.triggerLogs = triggerLogResult.rowCount;
 
     // 2. 승인 요청 삭제
-    const approvalResult = await db.pool.query(`
+    const approvalResult = await db.query(`
       DELETE FROM ops_approvals WHERE event_id = $1
     `, [eventId]);
     results.counts.approvals = approvalResult.rowCount;
 
     // 3. SSOT 이력 삭제
-    const historyResult = await db.pool.query(`
+    const historyResult = await db.query(`
       DELETE FROM ops_ssot_history
       WHERE item_id IN (SELECT id FROM ops_ssot_items WHERE event_id = $1)
     `, [eventId]);
     results.counts.ssotHistory = historyResult.rowCount;
 
     // 4. SSOT 항목 삭제
-    const ssotResult = await db.pool.query(`
+    const ssotResult = await db.query(`
       DELETE FROM ops_ssot_items WHERE event_id = $1
     `, [eventId]);
     results.counts.ssotItems = ssotResult.rowCount;
 
     // 5. 감사 로그 삭제
-    const auditResult = await db.pool.query(`
+    const auditResult = await db.query(`
       DELETE FROM ops_audit_log WHERE event_id = $1
     `, [eventId]);
     results.counts.auditLogs = auditResult.rowCount;
 
     // 6. KPI 스냅샷 삭제
-    const kpiResult = await db.pool.query(`
+    const kpiResult = await db.query(`
       DELETE FROM ops_kpi_snapshots WHERE event_id = $1
     `, [eventId]);
     results.counts.kpiSnapshots = kpiResult.rowCount;
