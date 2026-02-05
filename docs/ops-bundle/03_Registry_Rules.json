@@ -1,0 +1,300 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "updated_at": "2026-02-05",
+    "next_review": "2026-03-05",
+    "maintainer": "tech@yeosu-travel.kr"
+  },
+
+  "mice_incentive": {
+    "program_name": "여수시 MICE 인센티브 지원사업",
+    "fiscal_year": 2026,
+    "application_period": {
+      "start": "2026-01-01",
+      "end": "2026-12-31"
+    },
+    "submission_deadline_days": 30,
+    "submission_deadline_note": "행사 종료 후 30일 이내"
+  },
+
+  "eligibility": {
+    "min_participants": {
+      "domestic": 30,
+      "foreign": 10,
+      "note": "국내 30명 이상 또는 외국인 10명 이상"
+    },
+    "min_nights": 1,
+    "location": {
+      "required": "여수시",
+      "accommodation": "여수시 내 숙박시설 이용 필수"
+    },
+    "excluded_events": [
+      "종교 행사",
+      "정치 행사",
+      "단순 친목 행사",
+      "개인 행사"
+    ]
+  },
+
+  "support_categories": {
+    "RENTAL": {
+      "label": "회의장/전시장 임차료",
+      "description": "컨벤션센터, 호텔 회의실 등",
+      "local_required": false,
+      "evidence_required": ["TAX_INVOICE", "DEPOSIT_SLIP"]
+    },
+    "LODGING": {
+      "label": "숙박비",
+      "description": "여수시 내 숙박시설",
+      "local_required": true,
+      "evidence_required": ["TAX_INVOICE", "CARD_SLIP"]
+    },
+    "FNB_HOTEL": {
+      "label": "식음료비(호텔)",
+      "description": "호텔 내 케이터링, 연회",
+      "local_required": false,
+      "evidence_required": ["TAX_INVOICE"]
+    },
+    "FNB_OUTSIDE": {
+      "label": "식음료비(호텔외)",
+      "description": "외부 식당, 케이터링",
+      "local_required": true,
+      "evidence_required": ["TAX_INVOICE"]
+    },
+    "TOUR": {
+      "label": "관광/투어비",
+      "description": "단체 관광 프로그램",
+      "local_required": true,
+      "evidence_required": ["TAX_INVOICE", "PROGRAM_SCHEDULE"]
+    },
+    "PRINT_ADS": {
+      "label": "인쇄/광고비",
+      "description": "홍보물, 현수막, 배너 등",
+      "local_required": false,
+      "evidence_required": ["TAX_INVOICE", "SAMPLE_PHOTO"]
+    },
+    "SOUVENIR": {
+      "label": "기념품비",
+      "description": "참가자 기념품",
+      "local_required": true,
+      "evidence_required": ["TAX_INVOICE", "SAMPLE_PHOTO"]
+    },
+    "LOCAL_VENDOR": {
+      "label": "지역업체 이용비",
+      "description": "여수 지역 업체 추가 지원",
+      "local_required": true,
+      "evidence_required": ["TAX_INVOICE", "BIZ_REG"]
+    },
+    "ETC": {
+      "label": "기타",
+      "description": "위에 해당하지 않는 항목",
+      "local_required": false,
+      "evidence_required": ["TAX_INVOICE"],
+      "requires_approval": true
+    }
+  },
+
+  "payment_methods": {
+    "TRANSFER": {
+      "label": "계좌이체",
+      "accepted": true,
+      "evidence_required": ["TAX_INVOICE", "DEPOSIT_SLIP", "BIZ_REG"]
+    },
+    "CORP_CARD": {
+      "label": "법인카드",
+      "accepted": true,
+      "evidence_required": ["TAX_INVOICE", "CARD_SLIP"]
+    },
+    "CASH": {
+      "label": "현금",
+      "accepted": true,
+      "evidence_required": ["TAX_INVOICE", "DEPOSIT_SLIP"],
+      "note": "10만원 이상 현금영수증 필수"
+    },
+    "PERSONAL_CARD": {
+      "label": "개인카드",
+      "accepted": false,
+      "rejection_reason": "개인카드 사용분 불인정"
+    },
+    "SIMPLE_RECEIPT": {
+      "label": "간이영수증",
+      "accepted": false,
+      "rejection_reason": "간이영수증 불인정"
+    }
+  },
+
+  "evidence_types": {
+    "TAX_INVOICE": {
+      "label": "세금계산서",
+      "required": true,
+      "format": ["PDF", "JPG", "PNG"],
+      "max_size_mb": 10
+    },
+    "CARD_SLIP": {
+      "label": "카드전표",
+      "required": false,
+      "format": ["PDF", "JPG", "PNG"],
+      "max_size_mb": 5
+    },
+    "DEPOSIT_SLIP": {
+      "label": "입금증",
+      "required": false,
+      "format": ["PDF", "JPG", "PNG"],
+      "max_size_mb": 5
+    },
+    "BIZ_REG": {
+      "label": "사업자등록증",
+      "required": false,
+      "format": ["PDF", "JPG", "PNG"],
+      "max_size_mb": 5
+    },
+    "BANKBOOK": {
+      "label": "통장사본",
+      "required": true,
+      "format": ["PDF", "JPG", "PNG"],
+      "max_size_mb": 5,
+      "note": "인센티브 입금 계좌"
+    }
+  },
+
+  "photo_requirements": {
+    "LOGO_EXPOSURE": {
+      "label": "여수시 로고 노출",
+      "min_count": 2,
+      "required": true,
+      "description": "배너, 현수막, 스크린 등에 로고 노출"
+    },
+    "MEETING": {
+      "label": "회의/행사 장면",
+      "min_count": 2,
+      "required": true,
+      "description": "행사 진행 장면"
+    },
+    "SUPPORT_ITEM": {
+      "label": "지원물품 활용",
+      "min_count": 1,
+      "required": false,
+      "description": "지원받은 물품 사용 장면"
+    },
+    "VENUE": {
+      "label": "장소 전경",
+      "min_count": 0,
+      "required": false,
+      "description": "행사장 전경"
+    },
+    "PARTICIPANT": {
+      "label": "참가자",
+      "min_count": 0,
+      "required": false,
+      "description": "참가자 사진 (동의 필수)"
+    }
+  },
+
+  "checklist": {
+    "required_items": [
+      {
+        "id": "participants_pre",
+        "label": "사전 참가자 등록부",
+        "description": "별지2-1호 - 사전등록 명단 (입금일 필수)"
+      },
+      {
+        "id": "stays",
+        "label": "숙박확인서",
+        "description": "별지2-2호 - 숙박 내역 및 영수증"
+      },
+      {
+        "id": "expenses",
+        "label": "지출증빙",
+        "description": "세금계산서, 카드전표, 입금증 등"
+      },
+      {
+        "id": "photos_logo",
+        "label": "사진 - 여수시 로고 노출",
+        "description": "별지2-3호 - 로고 노출 사진 2장 이상"
+      },
+      {
+        "id": "photos_meeting",
+        "label": "사진 - 회의/행사 장면",
+        "description": "별지2-3호 - 회의/행사 사진 2장 이상"
+      }
+    ],
+    "optional_items": [
+      {
+        "id": "participants_onsite",
+        "label": "현장 참가자 등록부",
+        "description": "별지2-1호 - 현장등록 명단"
+      },
+      {
+        "id": "photos_support",
+        "label": "사진 - 지원물품 활용",
+        "description": "별지2-3호 - 지원물품 활용 사진"
+      },
+      {
+        "id": "survey",
+        "label": "설문조사",
+        "description": "별지3호 - 주최자 설문 응답"
+      },
+      {
+        "id": "consent",
+        "label": "개인정보 동의서",
+        "description": "별지2-4호 - 참가자 동의서"
+      }
+    ]
+  },
+
+  "local_vendor_definition": {
+    "criteria": [
+      "사업자등록증 주소가 여수시",
+      "여수시 내 실제 사업장 운영",
+      "여수시 사업자등록번호"
+    ],
+    "verification": "사업자등록증 확인",
+    "bonus_rate": "지역업체 이용 시 추가 지원율 적용"
+  },
+
+  "validation_rules": {
+    "participant_pre_registration": {
+      "deposit_date_required": true,
+      "fee_amount_required": false
+    },
+    "participant_onsite": {
+      "signature_required": true,
+      "note": "P1에서 전자서명 지원 예정"
+    },
+    "expense_amount": {
+      "min": 0,
+      "max": 100000000,
+      "currency": "KRW"
+    },
+    "photo_file": {
+      "min_width": 800,
+      "min_height": 600,
+      "max_size_mb": 10,
+      "formats": ["JPG", "JPEG", "PNG"]
+    }
+  },
+
+  "approval_workflow": {
+    "levels": {
+      "L1": {
+        "label": "팀장",
+        "timeout_hours": 24
+      },
+      "L2": {
+        "label": "부장",
+        "timeout_hours": 48
+      },
+      "L3": {
+        "label": "본부장",
+        "timeout_hours": 72
+      },
+      "L4": {
+        "label": "총괄",
+        "timeout_hours": 168
+      }
+    },
+    "default_level": "L1",
+    "escalation_enabled": false,
+    "note": "v0 MVP는 L1 단일 레벨만 지원"
+  }
+}

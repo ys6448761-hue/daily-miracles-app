@@ -11,6 +11,7 @@
     "DOC-online-wish-problem-api",
     "DOC-online-wish-voyage-api-design",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
+    "DOC-DEC-20260201-포인트추천예고편-정책구현",
     "DOC-index",
     "DOC-GROWTH-ROADMAP",
     "DOC-JUDGE_PROMPTS",
@@ -25,14 +26,14 @@
     "DOC-ROADMAP_API",
     "DOC-GA4_SETUP_GUIDE",
     "DOC-VIDEO_MASTER",
-    "DOC-20260131_파크_2d_기술지원",
-    "DOC-20260201_드라이브_공유폴더_마스터가이드",
-    "DOC-AURORA5_SORA_FINAL_v10",
     "DOC-agents-index",
     "DOC-Aurora5_토론시스템_안내문",
     "DOC-alimtalk-templates-design",
     "DOC-video-promo-30sec-template",
     "DOC-WIX_TEAM_PAGE_CONTENT",
+    "DOC-20260131_파크_2d_기술지원",
+    "DOC-20260201_드라이브_공유폴더_마스터가이드",
+    "DOC-AURORA5_SORA_FINAL_v10",
     "DEC-2026-0102-045",
     "DEC-2026-0102-121",
     "DEC-2026-0102-457",
@@ -117,13 +118,13 @@
     "DOC-ROADMAP_API",
     "DOC-VIDEO_MASTER",
     "DOC-CHANGELOG",
-    "DOC-AURORA5_SORA_FINAL_v10",
-    "DOC-Code_종합지시서",
     "DOC-SOURCES_INDEX",
     "DOC-agents-index",
     "DOC-manifest-system",
     "DOC-Aurora5_토론시스템_안내문",
     "DOC-WIX_TEAM_PAGE_CONTENT",
+    "DOC-AURORA5_SORA_FINAL_v10",
+    "DOC-Code_종합지시서",
     "DOC-CEO-WEEKLY-2025-W52",
     "DEC-2026-0102-045",
     "DEC-2026-0102-121",
@@ -195,6 +196,13 @@
     "DOC-drive-github-sync-setup",
     "DOC-sens-setup-guide"
   ],
+  "ops-bundle": [
+    "DOC-README",
+    "DOC-03_Registry_Rules_SOP",
+    "DOC-04_Onboarding_7Day",
+    "DOC-05_Deal_Registration",
+    "DOC-06_Demo_Operations"
+  ],
   "standards": [
     "DOC-tag_taxonomy",
     "DOC-quantum-planning-method"
@@ -237,6 +245,8 @@
   "결제": [
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
     "DOC-JAEMI_ONBOARDING_v12",
+    "DOC-04_Onboarding_7Day",
+    "DOC-05_Deal_Registration",
     "DOC-tax-accounting-ai-tools-analys",
     "DOC-GA4_SETUP_GUIDE",
     "DOC-20260101-MKI",
@@ -263,6 +273,7 @@
     "DOC-inquiry-form-api"
   ],
   "decisions": [
+    "DOC-DEC-20260201-포인트추천예고편-정책구현",
     "DOC-index",
     "DEC-2026-0102-045",
     "DEC-2026-0102-121",
@@ -281,11 +292,37 @@
     "DEC-2025-1230-002",
     "DEC-2025-1230-003"
   ],
+  "가격": [
+    "DOC-DEC-20260201-포인트추천예고편-정책구현",
+    "DOC-drive-github-sync-setup",
+    "DOC-tax-accounting-ai-tools-analys",
+    "DOC-alimtalk-templates-design",
+    "DOC-20260101-4PA",
+    "DOC-20260101-TRD",
+    "DOC-20260101-WG8",
+    "DOC-20260101-1YB",
+    "DOC-20260101-L9Y",
+    "DOC-20260101-ICN",
+    "DOC-20260101-8VR",
+    "DOC-20260101-K7C",
+    "DOC-20260101-6M7",
+    "DOC-20260101-GR0",
+    "DOC-20260101-D2L",
+    "DOC-20260101-XHZ",
+    "DOC-20260101-RET",
+    "DOC-20260101-YH9",
+    "DOC-20260101-99J",
+    "DOC-20251231-GV1",
+    "DOC-20251229-SRH",
+    "DOC-20251229-PFO"
+  ],
   "deployment": [
     "DOC-deployment-checklist"
   ],
   "kpi": [
     "DOC-JUDGE_PROMPTS",
+    "DOC-04_Onboarding_7Day",
+    "DOC-06_Demo_Operations",
     "DOC-REVIEW_COLLECTION_SYSTEM",
     "DOC-manifest-system",
     "DOC-20260101-4PA",
@@ -327,29 +364,6 @@
     "DOC-JAEMI_ONBOARDING_v11",
     "DOC-JAEMI_ONBOARDING_v12"
   ],
-  "가격": [
-    "DOC-drive-github-sync-setup",
-    "DOC-tax-accounting-ai-tools-analys",
-    "DOC-alimtalk-templates-design",
-    "DOC-20260101-4PA",
-    "DOC-20260101-TRD",
-    "DOC-20260101-WG8",
-    "DOC-20260101-1YB",
-    "DOC-20260101-L9Y",
-    "DOC-20260101-ICN",
-    "DOC-20260101-8VR",
-    "DOC-20260101-K7C",
-    "DOC-20260101-6M7",
-    "DOC-20260101-GR0",
-    "DOC-20260101-D2L",
-    "DOC-20260101-XHZ",
-    "DOC-20260101-RET",
-    "DOC-20260101-YH9",
-    "DOC-20260101-99J",
-    "DOC-20251231-GV1",
-    "DOC-20251229-SRH",
-    "DOC-20251229-PFO"
-  ],
   "overview": [
     "DOC-service-flow"
   ],
@@ -386,14 +400,6 @@
     "DOC-NOTION_PROFILE_GATE",
     "DOC-SOURCES_INDEX"
   ],
-  "2026-02-01": [
-    "DOC-20260131_파크_2d_기술지원",
-    "DOC-20260201_노션_DB_구조_3DB",
-    "DOC-20260201_드라이브_공유폴더_마스터가이드",
-    "DOC-AURORA5_SORA_FINAL_v10",
-    "DOC-Code_종합지시서",
-    "DOC-GitHub_저장소_활용_가이드"
-  ],
   "system": [
     "DOC-agents-index",
     "DOC-conversation-workflow",
@@ -402,6 +408,14 @@
   ],
   "team": [
     "DOC-Aurora5_토론시스템_안내문"
+  ],
+  "2026-02-01": [
+    "DOC-20260131_파크_2d_기술지원",
+    "DOC-20260201_노션_DB_구조_3DB",
+    "DOC-20260201_드라이브_공유폴더_마스터가이드",
+    "DOC-AURORA5_SORA_FINAL_v10",
+    "DOC-Code_종합지시서",
+    "DOC-GitHub_저장소_활용_가이드"
   ],
   "actions": [
     "DEC-2026-0102-045",
