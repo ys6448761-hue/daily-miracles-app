@@ -25,6 +25,15 @@ try {
   console.error('❌ Yeosu Ops Center 서비스 로드 실패:', error.message);
 }
 
+// 룰 로더 (스키마 검증 + 캐시)
+let rulesLoader = null;
+try {
+  rulesLoader = require('../services/yeosu-ops-center/rulesLoader');
+  console.log('✅ Rules Loader 로드 성공');
+} catch (error) {
+  console.error('⚠️ Rules Loader 로드 실패 (룰 API 미사용):', error.message);
+}
+
 // 서비스 가용성 체크 미들웨어
 function requireServices(req, res, next) {
   if (!services) {
@@ -50,6 +59,67 @@ router.get('/health', (req, res) => {
     version: 'v0.1.0',
     timestamp: new Date().toISOString()
   });
+});
+
+// ═══════════════════════════════════════════════════════════
+// Rules (룰 버전 조회)
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * 룰 버전 조회 API
+ * GET /api/ops-center/rules/version
+ */
+router.get('/rules/version', (req, res) => {
+  try {
+    if (!rulesLoader) {
+      return res.status(503).json({
+        success: false,
+        error: 'rules_loader_unavailable',
+        message: 'Rules Loader가 로드되지 않았습니다'
+      });
+    }
+
+    const version = rulesLoader.getRulesVersion();
+
+    res.json({
+      success: true,
+      data: version
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'rules_load_failed',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * 룰 캐시 클리어 API (관리자용)
+ * POST /api/ops-center/rules/cache/clear
+ */
+router.post('/rules/cache/clear', (req, res) => {
+  try {
+    if (!rulesLoader) {
+      return res.status(503).json({
+        success: false,
+        error: 'rules_loader_unavailable'
+      });
+    }
+
+    rulesLoader.clearRulesCache();
+
+    res.json({
+      success: true,
+      message: '룰 캐시가 클리어되었습니다',
+      cleared_at: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
 });
 
 // ═══════════════════════════════════════════════════════════

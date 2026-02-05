@@ -148,7 +148,8 @@
       "Bash(powershell.exe -Command \"Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | Select-Object OwningProcess | Format-Table -AutoSize\")",
       "Bash(powershell.exe -Command \"Stop-Process -Id 24712 -Force\")",
       "Bash(powershell.exe:*)",
-      "Bash(ffprobe:*)"
+      "Bash(ffprobe:*)",
+      "Bash(npm run validate:rules:*)"
     ],
     "deny": [],
     "ask": []

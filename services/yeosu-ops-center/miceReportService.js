@@ -10,6 +10,7 @@
 const db = require('../../database/db');
 const miceService = require('./miceService');
 const eventService = require('./eventService');
+const rulesLoader = require('./rulesLoader');
 const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
@@ -293,6 +294,18 @@ async function generateReportPack(eventId, options = {}) {
     );
     includedFiles.push({ name: '08_checklist.json', type: 'checklist' });
 
+    // 11-1. 룰 스냅샷 메타데이터
+    const rulesSnapshot = rulesLoader.getRulesSnapshot();
+    fs.writeFileSync(
+      path.join(outputDir, '09_rules_snapshot.json'),
+      JSON.stringify({
+        snapshot_at: new Date().toISOString(),
+        rules: rulesSnapshot
+      }, null, 2),
+      'utf8'
+    );
+    includedFiles.push({ name: '09_rules_snapshot.json', type: 'meta' });
+
     // 12. ZIP 생성
     const eventName = event.name.replace(/[^가-힣a-zA-Z0-9]/g, '_').substring(0, 30);
     const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
@@ -303,7 +316,7 @@ async function generateReportPack(eventId, options = {}) {
 
     const zipStats = fs.statSync(zipPath);
 
-    // 13. 패키지 업데이트
+    // 13. 패키지 업데이트 (룰 스냅샷 포함)
     await db.query(`
       UPDATE ops_mice_report_packs
       SET
@@ -313,15 +326,17 @@ async function generateReportPack(eventId, options = {}) {
         zip_size_bytes = $3,
         checklist_snapshot = $4,
         included_files = $5,
+        rules_snapshot = $6,
         generated_at = NOW(),
         expires_at = NOW() + INTERVAL '7 days'
-      WHERE id = $6
+      WHERE id = $7
     `, [
       zipFilename,
       zipPath,
       zipStats.size,
       JSON.stringify(checklist),
       JSON.stringify(includedFiles),
+      JSON.stringify(rulesSnapshot),
       pack.id
     ]);
 
@@ -331,7 +346,8 @@ async function generateReportPack(eventId, options = {}) {
       zipPath,
       zipSize: zipStats.size,
       includedFiles,
-      checklist
+      checklist,
+      rulesSnapshot
     };
 
   } catch (error) {
