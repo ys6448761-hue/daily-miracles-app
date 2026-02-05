@@ -651,6 +651,8 @@ app.get("/api/health", async (req, res) => {
     rules: rulesMeta ? {
       version: rulesMeta.versions?.mice?.version || null,
       hash: rulesMeta.hash || null,
+      hash_algo: rulesMeta.hash_algo || null,
+      bundle: rulesMeta.bundle || null,
       loaded_at: rulesMeta.loaded_at || null
     } : null,
     modules: {
@@ -1583,6 +1585,8 @@ app.use((err, _req, res, _next) => {
 });
 
 // ---------- Rules Preload (fail-fast) ----------
+const FAIL_FAST_RULES = process.env.FAIL_FAST_RULES === 'true' || process.env.NODE_ENV === 'production';
+
 let rulesSnapshot = null;
 try {
   const rulesLoader = require('./services/yeosu-ops-center/rulesLoader');
@@ -1591,11 +1595,15 @@ try {
   app.set('rulesSnapshot', rulesSnapshot);
   console.log('✅ Rules preloaded:', {
     version: rulesSnapshot.versions?.mice?.version,
-    hash: rulesSnapshot.hash
+    hash: rulesSnapshot.hash?.substring(0, 16) + '...',
+    algo: rulesSnapshot.hash_algo
   });
 } catch (e) {
-  console.error('⚠️ Rules preload failed (non-fatal):', e.message);
-  // 운영에서는 process.exit(1) 권장
+  console.error('❌ Rules preload failed:', e.message);
+  if (FAIL_FAST_RULES) {
+    console.error('💀 FAIL_FAST_RULES enabled - exiting');
+    process.exit(1);
+  }
 }
 
 // ---------- Start (with fallback port) ----------

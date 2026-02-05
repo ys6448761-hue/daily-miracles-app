@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "skillsmp": {
+      "command": "npx",
+      "args": ["-y", "skillsmp-mcp-lite"],
+      "env": {
+        "SKILLSMP_API_KEY": "${SKILLSMP_API_KEY}"
+      }
+    }
+  }
+}

@@ -29,13 +29,15 @@ function readJson(filePath) {
 /**
  * 메타데이터 생성
  */
-function buildMeta(bundle) {
+function buildMeta(bundle, bundlePath) {
   const now = new Date().toISOString();
   const material = JSON.stringify(bundle, null, 2);
+  const fullHash = sha256(material);
   return {
     loaded_at: now,
-    hash: sha256(material).substring(0, 16), // 앞 16자만 사용
-    hash_full: sha256(material)
+    hash: fullHash, // full 64-char SHA256
+    hash_algo: 'sha256',
+    bundle: bundlePath || 'docs/dev-bundle/03_Rules'
   };
 }
 
@@ -120,10 +122,13 @@ function loadRules(options = {}) {
     }
   }
 
+  // 번들 경로 (상대 경로로 저장)
+  const bundlePath = 'docs/dev-bundle/03_Rules';
+
   const result = {
     rules: loaded,
     meta: {
-      ...buildMeta(loaded),
+      ...buildMeta(loaded, bundlePath),
       versions,
       cache_ttl_ms: CACHE_TTL_MS
     }
@@ -175,6 +180,8 @@ function getRulesSnapshot() {
   const { meta } = loadRules();
   return {
     hash: meta.hash,
+    hash_algo: meta.hash_algo,
+    bundle: meta.bundle,
     loaded_at: meta.loaded_at,
     versions: meta.versions
   };
@@ -191,6 +198,8 @@ function getRulesVersion() {
     checklist: rules.checklist?.meta || {},
     snapshot: {
       hash: meta.hash,
+      hash_algo: meta.hash_algo,
+      bundle: meta.bundle,
       loaded_at: meta.loaded_at
     }
   };

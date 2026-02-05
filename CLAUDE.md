@@ -118,6 +118,35 @@ Step 3: 부족한 원리 보완하여 최종본 생성
 | TRAVEL | 여수, 여행, 견적 | O |
 | GENERAL | 기타 | O + 에스컬레이션 |
 
+### 5. 스킬 자동 탐색 시스템 (14만 5천+ 스킬)
+
+**참조 파일:**
+- `.claude/skills/SKILL-INDEX.md` - 프로젝트 스킬 목록
+- `.claude/skills/SKILLS-REGISTRY.md` - 커뮤니티 스킬 레지스트리
+
+**탐색 절차:**
+새로운 기능을 개발하거나 문제를 해결할 때:
+1. **로컬 탐색**: `.claude/skills/`에서 관련 스킬 확인
+2. **외부 탐색**: `npx skills search "키워드"` 또는 SkillsMP API 검색
+3. **승인 요청**: 적합한 스킬 발견 시 → 설치 전 코미/푸르미르님 승인 요청
+4. **설치 & 기록**: 승인 후 → `community/` 폴더에 설치 + SKILLS-REGISTRY.md 업데이트
+
+**검색 명령어:**
+```bash
+# CLI 검색 (즉시 사용 가능)
+npx skills search "database optimization"
+npx skills search "pdf generation"
+
+# SkillsMP API (AI 시맨틱 검색)
+# Authorization: Bearer $SKILLSMP_API_KEY
+GET https://skillsmp.com/api/v1/skills/ai-search?q=자연어질문
+```
+
+**설치 규칙:**
+- ⚠️ 최소 Star 2개 이상 스킬만 설치
+- ⚠️ 코드 리뷰 필수 (악성 스킬 유입 차단)
+- ⚠️ SKILLS-REGISTRY.md에 기록 없이 설치 금지
+
 ---
 
 ## 작업 시 체크리스트

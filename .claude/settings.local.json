@@ -155,7 +155,21 @@
       "Bash(lsof:*)",
       "Bash(ss:*)",
       "Bash(__NEW_LINE_27eef124f76d5e83__ echo \"\")",
-      "Bash(__NEW_LINE_5728e13ddc16c462__ echo \"\")"
+      "Bash(__NEW_LINE_5728e13ddc16c462__ echo \"\")",
+      "Bash(cmd.exe /c \"netstat -ano | findstr :5000\")",
+      "Bash(PORT=5005 DEMO_RESET_TOKEN=yeosu-ops-demo-2026 node:*)",
+      "Bash(export PORT=5005)",
+      "Bash(export DEMO_RESET_TOKEN=yeosu-ops-demo-2026)",
+      "Bash(export PORT=5006)",
+      "Bash(export DEMO_RESET_TOKEN=test-token-2026)",
+      "Bash(for i in 1 2 3 4 5 6)",
+      "Bash(do echo \"Request $i:\")",
+      "Bash(export PORT=5007)",
+      "Bash(do echo \"=== Request $i ===\")",
+      "Bash(export PORT=5008)",
+      "Bash(export PORT=5009:*)",
+      "Bash(npx skills search:*)",
+      "Bash(git clone:*)"
     ],
     "deny": [],
     "ask": []
