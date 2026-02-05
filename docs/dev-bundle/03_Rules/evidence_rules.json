@@ -1,0 +1,190 @@
+{
+  "meta": {
+    "type": "evidence_rules",
+    "version": "1.0.0",
+    "updated_at": "2026-02-05",
+    "next_review": "2026-03-05",
+    "maintainer": "tech@yeosu-travel.kr"
+  },
+
+  "evidence_types": {
+    "TAX_INVOICE": {
+      "code": "TAX_INVOICE",
+      "label": "세금계산서",
+      "grade": "A",
+      "required": true,
+      "format": ["PDF", "JPG", "PNG"],
+      "max_size_mb": 10,
+      "validation": {
+        "required_fields": ["supplier_name", "supplier_biz_no", "amount", "date"],
+        "pattern_check": true
+      }
+    },
+    "CARD_SLIP": {
+      "code": "CARD_SLIP",
+      "label": "카드전표",
+      "grade": "A",
+      "required": false,
+      "format": ["PDF", "JPG", "PNG"],
+      "max_size_mb": 5,
+      "validation": {
+        "required_fields": ["card_no_masked", "amount", "date"],
+        "pattern_check": false
+      }
+    },
+    "DEPOSIT_SLIP": {
+      "code": "DEPOSIT_SLIP",
+      "label": "입금증",
+      "grade": "A",
+      "required": false,
+      "format": ["PDF", "JPG", "PNG"],
+      "max_size_mb": 5,
+      "validation": {
+        "required_fields": ["recipient", "amount", "date"],
+        "pattern_check": false
+      }
+    },
+    "BIZ_REG": {
+      "code": "BIZ_REG",
+      "label": "사업자등록증",
+      "grade": "A",
+      "required": false,
+      "format": ["PDF", "JPG", "PNG"],
+      "max_size_mb": 5,
+      "validation": {
+        "required_fields": ["biz_no", "company_name", "address"],
+        "pattern_check": true
+      }
+    },
+    "BANKBOOK": {
+      "code": "BANKBOOK",
+      "label": "통장사본",
+      "grade": "A",
+      "required": true,
+      "format": ["PDF", "JPG", "PNG"],
+      "max_size_mb": 5,
+      "note": "인센티브 입금 계좌",
+      "validation": {
+        "required_fields": ["bank_name", "account_no", "holder_name"],
+        "pattern_check": false
+      }
+    },
+    "QUOTE": {
+      "code": "QUOTE",
+      "label": "견적서",
+      "grade": "B",
+      "required": false,
+      "format": ["PDF", "JPG", "PNG"],
+      "max_size_mb": 5
+    },
+    "CONTRACT": {
+      "code": "CONTRACT",
+      "label": "계약서",
+      "grade": "A",
+      "required": false,
+      "format": ["PDF"],
+      "max_size_mb": 20
+    },
+    "OFFICIAL_LETTER": {
+      "code": "OFFICIAL_LETTER",
+      "label": "공문",
+      "grade": "B",
+      "required": false,
+      "format": ["PDF", "JPG", "PNG"],
+      "max_size_mb": 10
+    },
+    "EMAIL": {
+      "code": "EMAIL",
+      "label": "이메일",
+      "grade": "B",
+      "required": false,
+      "format": ["PDF", "EML", "MSG"],
+      "max_size_mb": 10
+    },
+    "CHAT_LOG": {
+      "code": "CHAT_LOG",
+      "label": "카톡/문자",
+      "grade": "C",
+      "required": false,
+      "format": ["PDF", "JPG", "PNG"],
+      "max_size_mb": 10,
+      "note": "보조 증빙으로만 인정"
+    }
+  },
+
+  "evidence_grades": {
+    "A": {
+      "label": "완전 증빙",
+      "description": "계약서, 세금계산서, 입금증 등 법적 효력 있는 문서",
+      "priority": 1,
+      "settlement_eligible": true
+    },
+    "B": {
+      "label": "유효 증빙",
+      "description": "공문, 견적서, 이메일(공식) 등 업무 문서",
+      "priority": 2,
+      "settlement_eligible": false,
+      "note": "A급과 함께 제출 시 보조 자료로 인정"
+    },
+    "C": {
+      "label": "보조 증빙",
+      "description": "카톡/문자, 구두 확인 등 비공식 기록",
+      "priority": 3,
+      "settlement_eligible": false,
+      "note": "예비 딜 등록에만 사용 가능"
+    }
+  },
+
+  "payment_methods": {
+    "TRANSFER": {
+      "code": "TRANSFER",
+      "label": "계좌이체",
+      "accepted": true,
+      "evidence_required": ["TAX_INVOICE", "DEPOSIT_SLIP", "BIZ_REG"],
+      "validation": {
+        "date_match": true,
+        "amount_match": true
+      }
+    },
+    "CORP_CARD": {
+      "code": "CORP_CARD",
+      "label": "법인카드",
+      "accepted": true,
+      "evidence_required": ["TAX_INVOICE", "CARD_SLIP"],
+      "validation": {
+        "card_holder_match": true,
+        "amount_match": true
+      }
+    },
+    "CASH": {
+      "code": "CASH",
+      "label": "현금",
+      "accepted": true,
+      "evidence_required": ["TAX_INVOICE", "DEPOSIT_SLIP"],
+      "note": "10만원 이상 현금영수증 필수",
+      "cash_receipt_threshold": 100000
+    },
+    "PERSONAL_CARD": {
+      "code": "PERSONAL_CARD",
+      "label": "개인카드",
+      "accepted": false,
+      "rejection_reason": "개인카드 사용분 불인정",
+      "blocker": true
+    },
+    "SIMPLE_RECEIPT": {
+      "code": "SIMPLE_RECEIPT",
+      "label": "간이영수증",
+      "accepted": false,
+      "rejection_reason": "간이영수증 불인정",
+      "blocker": true
+    }
+  },
+
+  "file_naming_convention": {
+    "pattern": "[YYYYMMDD]_[TYPE]_[EVENT_NAME]_[SEQ].[EXT]",
+    "example": "20260815_TAX_INVOICE_여수MICE대회_01.pdf",
+    "max_length": 100
+  },
+
+  "retention_period_years": 5
+}

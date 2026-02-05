@@ -251,6 +251,7 @@
   ],
   "결제": [
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
+    "DOC-README",
     "DOC-JAEMI_ONBOARDING_v12",
     "DOC-04_Onboarding_7Day",
     "DOC-05_Deal_Registration",
@@ -326,6 +327,14 @@
   ],
   "deployment": [
     "DOC-deployment-checklist"
+  ],
+  "03_Rules": [
+    "DOC-UPDATE_SOP"
+  ],
+  "dev-bundle": [
+    "DOC-05_Deal_Registration",
+    "DOC-INTEGRATION_GUIDE",
+    "DOC-README"
   ],
   "kpi": [
     "DOC-JUDGE_PROMPTS",

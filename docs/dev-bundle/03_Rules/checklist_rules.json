@@ -1,0 +1,180 @@
+{
+  "meta": {
+    "type": "checklist_rules",
+    "version": "1.0.0",
+    "updated_at": "2026-02-05",
+    "next_review": "2026-03-05",
+    "maintainer": "tech@yeosu-travel.kr"
+  },
+
+  "checklist": {
+    "required_items": [
+      {
+        "id": "participants_pre",
+        "label": "사전 참가자 등록부",
+        "description": "별지2-1호 - 사전등록 명단 (입금일 필수)",
+        "form_reference": "별지2-1호",
+        "data_source": "ops_mice_participants",
+        "filter": { "registration_type": "PRE" },
+        "min_count": 1,
+        "blocking": true,
+        "error_message": "사전 참가자 등록부가 없습니다"
+      },
+      {
+        "id": "stays",
+        "label": "숙박확인서",
+        "description": "별지2-2호 - 숙박 내역 및 영수증",
+        "form_reference": "별지2-2호",
+        "data_source": "ops_mice_stays",
+        "min_count": 1,
+        "blocking": true,
+        "error_message": "숙박확인서가 없습니다"
+      },
+      {
+        "id": "expenses",
+        "label": "지출증빙",
+        "description": "세금계산서, 카드전표, 입금증 등",
+        "form_reference": null,
+        "data_source": "ops_mice_expenses",
+        "min_count": 1,
+        "blocking": true,
+        "error_message": "지출증빙이 없습니다"
+      },
+      {
+        "id": "photos_logo",
+        "label": "사진 - 여수시 로고 노출",
+        "description": "별지2-3호 - 로고 노출 사진 2장 이상",
+        "form_reference": "별지2-3호",
+        "data_source": "ops_mice_photos",
+        "filter": { "photo_type": "LOGO_EXPOSURE" },
+        "min_count": 2,
+        "blocking": true,
+        "error_message": "여수시 로고 노출 사진이 2장 미만입니다"
+      },
+      {
+        "id": "photos_meeting",
+        "label": "사진 - 회의/행사 장면",
+        "description": "별지2-3호 - 회의/행사 사진 2장 이상",
+        "form_reference": "별지2-3호",
+        "data_source": "ops_mice_photos",
+        "filter": { "photo_type": "MEETING" },
+        "min_count": 2,
+        "blocking": true,
+        "error_message": "회의/행사 사진이 2장 미만입니다"
+      }
+    ],
+
+    "optional_items": [
+      {
+        "id": "participants_onsite",
+        "label": "현장 참가자 등록부",
+        "description": "별지2-1호 - 현장등록 명단",
+        "form_reference": "별지2-1호",
+        "data_source": "ops_mice_participants",
+        "filter": { "registration_type": "ONSITE" },
+        "min_count": 0,
+        "blocking": false,
+        "warning_message": "현장 참가자 등록부가 없습니다 (권장)"
+      },
+      {
+        "id": "photos_support",
+        "label": "사진 - 지원물품 활용",
+        "description": "별지2-3호 - 지원물품 활용 사진",
+        "form_reference": "별지2-3호",
+        "data_source": "ops_mice_photos",
+        "filter": { "photo_type": "SUPPORT_ITEM" },
+        "min_count": 0,
+        "blocking": false,
+        "warning_message": "지원물품 활용 사진이 없습니다 (권장)"
+      },
+      {
+        "id": "survey",
+        "label": "설문조사",
+        "description": "별지3호 - 주최자 설문 응답",
+        "form_reference": "별지3호",
+        "data_source": "ops_mice_survey_responses",
+        "min_count": 1,
+        "blocking": false,
+        "warning_message": "설문조사 응답이 없습니다 (권장)"
+      },
+      {
+        "id": "consent",
+        "label": "개인정보 동의서",
+        "description": "별지2-4호 - 참가자 동의서",
+        "form_reference": "별지2-4호",
+        "data_source": "ops_assets",
+        "filter": { "asset_type": "CONSENT_FORM" },
+        "min_count": 0,
+        "blocking": false,
+        "warning_message": "개인정보 동의서가 없습니다 (권장)"
+      }
+    ]
+  },
+
+  "evaluation": {
+    "pass_threshold": 100,
+    "pass_condition": "모든 required_items 충족",
+    "score_calculation": {
+      "formula": "(fulfilled_required / total_required) * 100",
+      "bonus_for_optional": false
+    }
+  },
+
+  "blocker_rules": {
+    "any_required_missing": {
+      "blocks_generation": true,
+      "message": "필수 항목이 미충족되어 패키지를 생성할 수 없습니다"
+    },
+    "force_generation": {
+      "enabled": false,
+      "requires_admin_approval": true,
+      "note": "v1에서는 강제 생성 미지원"
+    }
+  },
+
+  "photo_requirements": {
+    "LOGO_EXPOSURE": {
+      "code": "LOGO_EXPOSURE",
+      "label": "여수시 로고 노출",
+      "min_count": 2,
+      "required": true,
+      "description": "배너, 현수막, 스크린 등에 로고 노출"
+    },
+    "MEETING": {
+      "code": "MEETING",
+      "label": "회의/행사 장면",
+      "min_count": 2,
+      "required": true,
+      "description": "행사 진행 장면"
+    },
+    "SUPPORT_ITEM": {
+      "code": "SUPPORT_ITEM",
+      "label": "지원물품 활용",
+      "min_count": 1,
+      "required": false,
+      "description": "지원받은 물품 사용 장면"
+    },
+    "VENUE": {
+      "code": "VENUE",
+      "label": "장소 전경",
+      "min_count": 0,
+      "required": false,
+      "description": "행사장 전경"
+    },
+    "PARTICIPANT": {
+      "code": "PARTICIPANT",
+      "label": "참가자",
+      "min_count": 0,
+      "required": false,
+      "description": "참가자 사진 (동의 필수)"
+    }
+  },
+
+  "photo_validation": {
+    "min_width": 800,
+    "min_height": 600,
+    "max_size_mb": 10,
+    "formats": ["JPG", "JPEG", "PNG"],
+    "exif_check": false
+  }
+}

@@ -1,0 +1,226 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MICE Rules Schema Collection",
+  "description": "JSON Schema for validating MICE rules files",
+
+  "mice_rules": {
+    "$id": "#/mice_rules",
+    "type": "object",
+    "required": ["meta", "program", "eligibility", "support_categories"],
+    "properties": {
+      "meta": {
+        "$ref": "#/definitions/meta"
+      },
+      "program": {
+        "type": "object",
+        "required": ["name", "fiscal_year", "submission_deadline_days"],
+        "properties": {
+          "name": { "type": "string" },
+          "fiscal_year": { "type": "integer", "minimum": 2020 },
+          "application_period": {
+            "type": "object",
+            "properties": {
+              "start": { "type": "string", "format": "date" },
+              "end": { "type": "string", "format": "date" }
+            }
+          },
+          "submission_deadline_days": { "type": "integer", "minimum": 1 }
+        }
+      },
+      "eligibility": {
+        "type": "object",
+        "required": ["min_participants", "min_nights", "location"],
+        "properties": {
+          "min_participants": {
+            "type": "object",
+            "properties": {
+              "domestic": { "type": "integer", "minimum": 0 },
+              "foreign": { "type": "integer", "minimum": 0 },
+              "logic": { "type": "string", "enum": ["AND", "OR"] }
+            }
+          },
+          "min_nights": { "type": "integer", "minimum": 0 },
+          "location": { "type": "object" },
+          "excluded_events": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "support_categories": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/definitions/support_category"
+        }
+      }
+    }
+  },
+
+  "evidence_rules": {
+    "$id": "#/evidence_rules",
+    "type": "object",
+    "required": ["meta", "evidence_types", "evidence_grades", "payment_methods"],
+    "properties": {
+      "meta": {
+        "$ref": "#/definitions/meta"
+      },
+      "evidence_types": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/definitions/evidence_type"
+        }
+      },
+      "evidence_grades": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "required": ["label", "priority"],
+          "properties": {
+            "label": { "type": "string" },
+            "description": { "type": "string" },
+            "priority": { "type": "integer", "minimum": 1 },
+            "settlement_eligible": { "type": "boolean" }
+          }
+        }
+      },
+      "payment_methods": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/definitions/payment_method"
+        }
+      }
+    }
+  },
+
+  "checklist_rules": {
+    "$id": "#/checklist_rules",
+    "type": "object",
+    "required": ["meta", "checklist"],
+    "properties": {
+      "meta": {
+        "$ref": "#/definitions/meta"
+      },
+      "checklist": {
+        "type": "object",
+        "required": ["required_items", "optional_items"],
+        "properties": {
+          "required_items": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/checklist_item" },
+            "minItems": 1
+          },
+          "optional_items": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/checklist_item" }
+          }
+        }
+      },
+      "evaluation": {
+        "type": "object",
+        "properties": {
+          "pass_threshold": { "type": "integer", "minimum": 0, "maximum": 100 }
+        }
+      }
+    }
+  },
+
+  "definitions": {
+    "meta": {
+      "type": "object",
+      "required": ["type", "version", "updated_at"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["mice_rules", "evidence_rules", "checklist_rules"]
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date"
+        },
+        "next_review": {
+          "type": "string",
+          "format": "date"
+        },
+        "maintainer": {
+          "type": "string",
+          "format": "email"
+        }
+      }
+    },
+
+    "support_category": {
+      "type": "object",
+      "required": ["code", "label", "local_required", "evidence_required"],
+      "properties": {
+        "code": { "type": "string" },
+        "label": { "type": "string" },
+        "description": { "type": "string" },
+        "local_required": { "type": "boolean" },
+        "max_support_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "evidence_required": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "requires_approval": { "type": "boolean" }
+      }
+    },
+
+    "evidence_type": {
+      "type": "object",
+      "required": ["code", "label", "grade"],
+      "properties": {
+        "code": { "type": "string" },
+        "label": { "type": "string" },
+        "grade": { "type": "string", "enum": ["A", "B", "C"] },
+        "required": { "type": "boolean" },
+        "format": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "max_size_mb": { "type": "number", "minimum": 0 },
+        "validation": { "type": "object" }
+      }
+    },
+
+    "payment_method": {
+      "type": "object",
+      "required": ["code", "label", "accepted"],
+      "properties": {
+        "code": { "type": "string" },
+        "label": { "type": "string" },
+        "accepted": { "type": "boolean" },
+        "evidence_required": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "rejection_reason": { "type": "string" },
+        "blocker": { "type": "boolean" }
+      }
+    },
+
+    "checklist_item": {
+      "type": "object",
+      "required": ["id", "label", "data_source", "blocking"],
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "description": { "type": "string" },
+        "form_reference": { "type": ["string", "null"] },
+        "data_source": { "type": "string" },
+        "filter": { "type": "object" },
+        "min_count": { "type": "integer", "minimum": 0 },
+        "blocking": { "type": "boolean" },
+        "error_message": { "type": "string" },
+        "warning_message": { "type": "string" }
+      }
+    }
+  }
+}

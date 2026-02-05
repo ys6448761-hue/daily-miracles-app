@@ -1,0 +1,145 @@
+{
+  "meta": {
+    "type": "mice_rules",
+    "version": "1.0.0",
+    "updated_at": "2026-02-05",
+    "next_review": "2026-03-05",
+    "maintainer": "tech@yeosu-travel.kr"
+  },
+
+  "program": {
+    "name": "여수시 MICE 인센티브 지원사업",
+    "fiscal_year": 2026,
+    "application_period": {
+      "start": "2026-01-01",
+      "end": "2026-12-31"
+    },
+    "submission_deadline_days": 30,
+    "submission_deadline_note": "행사 종료 후 30일 이내"
+  },
+
+  "eligibility": {
+    "min_participants": {
+      "domestic": 30,
+      "foreign": 10,
+      "logic": "OR",
+      "note": "국내 30명 이상 또는 외국인 10명 이상"
+    },
+    "min_nights": 1,
+    "location": {
+      "required": "여수시",
+      "accommodation": "여수시 내 숙박시설 이용 필수"
+    },
+    "excluded_events": [
+      "종교 행사",
+      "정치 행사",
+      "단순 친목 행사",
+      "개인 행사"
+    ]
+  },
+
+  "support_categories": {
+    "RENTAL": {
+      "code": "RENTAL",
+      "label": "회의장/전시장 임차료",
+      "description": "컨벤션센터, 호텔 회의실 등",
+      "local_required": false,
+      "max_support_rate": 0.5,
+      "evidence_required": ["TAX_INVOICE", "DEPOSIT_SLIP"]
+    },
+    "LODGING": {
+      "code": "LODGING",
+      "label": "숙박비",
+      "description": "여수시 내 숙박시설",
+      "local_required": true,
+      "max_support_rate": 0.5,
+      "evidence_required": ["TAX_INVOICE", "CARD_SLIP"]
+    },
+    "FNB_HOTEL": {
+      "code": "FNB_HOTEL",
+      "label": "식음료비(호텔)",
+      "description": "호텔 내 케이터링, 연회",
+      "local_required": false,
+      "max_support_rate": 0.3,
+      "evidence_required": ["TAX_INVOICE"]
+    },
+    "FNB_OUTSIDE": {
+      "code": "FNB_OUTSIDE",
+      "label": "식음료비(호텔외)",
+      "description": "외부 식당, 케이터링",
+      "local_required": true,
+      "max_support_rate": 0.3,
+      "evidence_required": ["TAX_INVOICE"]
+    },
+    "TOUR": {
+      "code": "TOUR",
+      "label": "관광/투어비",
+      "description": "단체 관광 프로그램",
+      "local_required": true,
+      "max_support_rate": 0.3,
+      "evidence_required": ["TAX_INVOICE", "PROGRAM_SCHEDULE"]
+    },
+    "PRINT_ADS": {
+      "code": "PRINT_ADS",
+      "label": "인쇄/광고비",
+      "description": "홍보물, 현수막, 배너 등",
+      "local_required": false,
+      "max_support_rate": 0.3,
+      "evidence_required": ["TAX_INVOICE", "SAMPLE_PHOTO"]
+    },
+    "SOUVENIR": {
+      "code": "SOUVENIR",
+      "label": "기념품비",
+      "description": "참가자 기념품",
+      "local_required": true,
+      "max_support_rate": 0.3,
+      "evidence_required": ["TAX_INVOICE", "SAMPLE_PHOTO"]
+    },
+    "LOCAL_VENDOR": {
+      "code": "LOCAL_VENDOR",
+      "label": "지역업체 이용비",
+      "description": "여수 지역 업체 추가 지원",
+      "local_required": true,
+      "max_support_rate": 0.1,
+      "evidence_required": ["TAX_INVOICE", "BIZ_REG"]
+    },
+    "ETC": {
+      "code": "ETC",
+      "label": "기타",
+      "description": "위에 해당하지 않는 항목",
+      "local_required": false,
+      "max_support_rate": 0.2,
+      "evidence_required": ["TAX_INVOICE"],
+      "requires_approval": true
+    }
+  },
+
+  "local_vendor_definition": {
+    "criteria": [
+      "사업자등록증 주소가 여수시",
+      "여수시 내 실제 사업장 운영",
+      "여수시 사업자등록번호"
+    ],
+    "verification": "사업자등록증 확인",
+    "bonus_rate": 0.1
+  },
+
+  "validation_rules": {
+    "participant_min_check": {
+      "enabled": true,
+      "blocking": true
+    },
+    "location_check": {
+      "enabled": true,
+      "blocking": true
+    },
+    "date_range_check": {
+      "enabled": true,
+      "blocking": true
+    },
+    "excluded_event_check": {
+      "enabled": true,
+      "blocking": true
+    }
+  }
+}

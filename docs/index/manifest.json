@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-02-05T05:49:37.021Z",
+  "generated_at": "2026-02-05T06:03:32.889Z",
   "generator": "generate-manifest.js",
-  "total_count": 144,
+  "total_count": 148,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -351,6 +351,71 @@
       "title": "Daily Miracles MVP 배포 체크리스트",
       "created_at": "2026-02-05",
       "checksum": "0202a43e"
+    },
+    {
+      "id": "DOC-UPDATE_SOP",
+      "path": "docs/dev-bundle/03_Rules/UPDATE_SOP.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "dev-bundle",
+      "tags": [
+        "03_Rules"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "룰 파일 월간 업데이트 SOP",
+      "created_at": "2026-02-05",
+      "checksum": "556f31c3"
+    },
+    {
+      "id": "DOC-05_Deal_Registration",
+      "path": "docs/dev-bundle/05_Deal_Registration.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "dev-bundle",
+      "tags": [
+        "dev-bundle"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "딜 등록 및 보호 정책 (개발 참조용)",
+      "created_at": "2026-02-05",
+      "checksum": "9e550060"
+    },
+    {
+      "id": "DOC-INTEGRATION_GUIDE",
+      "path": "docs/dev-bundle/INTEGRATION_GUIDE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "dev-bundle",
+      "tags": [
+        "dev-bundle"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "통합 가이드 (Integration Guide)",
+      "created_at": "2026-02-05",
+      "checksum": "ebf6e247"
+    },
+    {
+      "id": "DOC-README",
+      "path": "docs/dev-bundle/README.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "dev-bundle",
+      "tags": [
+        "dev-bundle",
+        "결제"
+      ],
+      "owner": "team",
+      "status": "| `/api/ops-center/mice/report/generate/:eventId`",
+      "title": "DEV Bundle (개발 전달용)",
+      "created_at": "2026-02-05",
+      "checksum": "e1f60009"
     },
     {
       "id": "DOC-GROWTH-ROADMAP",
