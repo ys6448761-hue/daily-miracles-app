@@ -149,7 +149,13 @@
       "Bash(powershell.exe -Command \"Stop-Process -Id 24712 -Force\")",
       "Bash(powershell.exe:*)",
       "Bash(ffprobe:*)",
-      "Bash(npm run validate:rules:*)"
+      "Bash(npm run validate:rules:*)",
+      "Bash(pm2 restart:*)",
+      "Bash(pm2 status:*)",
+      "Bash(lsof:*)",
+      "Bash(ss:*)",
+      "Bash(__NEW_LINE_27eef124f76d5e83__ echo \"\")",
+      "Bash(__NEW_LINE_5728e13ddc16c462__ echo \"\")"
     ],
     "deny": [],
     "ask": []

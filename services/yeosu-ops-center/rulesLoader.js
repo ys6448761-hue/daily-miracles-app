@@ -92,7 +92,12 @@ function loadRules(options = {}) {
 
     // 스키마 검증 (해당 스키마가 있는 경우만)
     if (schema[schemaKey]) {
-      const validate = ajv.compile(schema[schemaKey]);
+      // definitions를 포함한 완전한 스키마 생성
+      const fullSchema = {
+        ...schema[schemaKey],
+        definitions: schema.definitions
+      };
+      const validate = ajv.compile(fullSchema);
       const ok = validate(json);
 
       if (!ok) {
