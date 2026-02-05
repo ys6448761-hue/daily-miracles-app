@@ -53,7 +53,8 @@ router.use(requireServices);
 // ═══════════════════════════════════════════════════════════
 
 router.get('/health', (req, res) => {
-  const rulesMeta = rulesLoader ? rulesLoader.getRulesSnapshot() : null;
+  // P0: rulesSnapshot은 req.app.get()으로만 접근 (server.js에서 preload)
+  const rulesMeta = req.app.get('rulesSnapshot');
 
   res.json({
     success: true,
@@ -65,6 +66,8 @@ router.get('/health', (req, res) => {
     rules: rulesMeta ? {
       version: rulesMeta.versions?.mice?.version || null,
       hash: rulesMeta.hash || null,
+      hash_algo: rulesMeta.hash_algo || null,
+      bundle: rulesMeta.bundle || null,
       loaded_at: rulesMeta.loaded_at || null
     } : null,
     timestamp: new Date().toISOString()
@@ -128,6 +131,117 @@ router.post('/rules/cache/clear', (req, res) => {
     res.status(500).json({
       success: false,
       error: error.message
+    });
+  }
+});
+
+/**
+ * 룰 핫 리로드 API (관리자 전용)
+ * POST /api/ops-center/rules/reload
+ *
+ * 서버 재시작 없이 룰 파일 변경사항 반영
+ * 보안: X-ADMIN-TOKEN 헤더 필수 (ADMIN_TOKEN 환경변수와 일치해야 함)
+ *
+ * 감사로그: 콘솔에 변경 전/후 해시, IP, 타임스탬프 기록
+ * Slack 알림: SLACK_WEBHOOK_URL 설정 시 전송 (선택)
+ */
+router.post('/rules/reload', async (req, res) => {
+  try {
+    // 토큰 인증 (운영: ADMIN_TOKEN만, 개발: DEMO_RESET_TOKEN 폴백)
+    const ADMIN_TOKEN = process.env.ADMIN_TOKEN || process.env.DEMO_RESET_TOKEN;
+    const providedToken = req.headers['x-admin-token'];
+
+    if (!ADMIN_TOKEN) {
+      return res.status(503).json({
+        success: false,
+        error: 'admin_not_configured',
+        message: 'ADMIN_TOKEN 환경변수가 설정되지 않았습니다'
+      });
+    }
+
+    if (!providedToken || providedToken !== ADMIN_TOKEN) {
+      return res.status(403).json({
+        success: false,
+        error: 'forbidden',
+        message: 'X-ADMIN-TOKEN 헤더가 필요합니다'
+      });
+    }
+
+    if (!rulesLoader) {
+      return res.status(503).json({
+        success: false,
+        error: 'rules_loader_unavailable'
+      });
+    }
+
+    // 0. 이전 스냅샷 저장 (감사로그용)
+    const prevSnapshot = req.app.get('rulesSnapshot');
+
+    // 1. 캐시 클리어
+    rulesLoader.clearRulesCache();
+
+    // 2. 룰 다시 로드
+    const { meta } = rulesLoader.loadRules();
+
+    // 3. app 전역 rulesSnapshot 갱신
+    req.app.set('rulesSnapshot', meta);
+
+    // 4. 감사로그 (P0: 추적성 필수)
+    const auditLog = {
+      event: 'RULES_RELOAD',
+      by: req.ip || req.headers['x-forwarded-for'] || 'unknown',
+      from: prevSnapshot?.hash?.substring(0, 16) || 'none',
+      to: meta.hash?.substring(0, 16),
+      bundle: meta.bundle,
+      versions: {
+        mice: meta.versions?.mice?.version,
+        evidence: meta.versions?.evidence?.version,
+        checklist: meta.versions?.checklist?.version
+      },
+      at: new Date().toISOString()
+    };
+    console.log('🔁 Rules reloaded:', auditLog);
+
+    // 5. Slack 알림 (P1: 선택 - SLACK_WEBHOOK_URL 있을 때만)
+    const slackWebhook = process.env.SLACK_WEBHOOK_URL || process.env.OPS_SLACK_WEBHOOK;
+    if (slackWebhook) {
+      try {
+        const axios = require('axios');
+        await axios.post(slackWebhook, {
+          text: `🔁 *Rules Hot-Reload*`,
+          blocks: [
+            {
+              type: 'section',
+              text: {
+                type: 'mrkdwn',
+                text: `*Rules Hot-Reload* 완료\n• From: \`${auditLog.from}...\`\n• To: \`${auditLog.to}...\`\n• By: ${auditLog.by}\n• At: ${auditLog.at}`
+              }
+            }
+          ]
+        });
+      } catch (slackErr) {
+        console.warn('⚠️ Slack 알림 전송 실패 (무시):', slackErr.message);
+      }
+    }
+
+    res.json({
+      success: true,
+      message: '룰이 성공적으로 리로드되었습니다',
+      rules: {
+        hash: meta.hash,
+        hash_algo: meta.hash_algo,
+        bundle: meta.bundle,
+        loaded_at: meta.loaded_at,
+        versions: meta.versions
+      },
+      audit: auditLog
+    });
+  } catch (error) {
+    console.error('❌ Rules reload failed:', error);
+    res.status(500).json({
+      success: false,
+      error: 'reload_failed',
+      message: error.message
     });
   }
 });
