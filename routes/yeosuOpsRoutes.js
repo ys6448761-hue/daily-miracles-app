@@ -45,6 +45,85 @@ router.get('/health', (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════
+// Demo Reset (데모 초기화)
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * 데모 초기화 API
+ * - 특정 행사의 SSOT 항목, 승인 요청, 감사 로그를 초기화
+ * - 행사 자체는 유지됨
+ * - 데모/시연용 (운영 환경에서는 주의해서 사용)
+ */
+router.post('/demo/reset/:eventId', async (req, res) => {
+  try {
+    const eventId = req.params.eventId;
+    const db = require('../config/database');
+
+    // 행사 존재 확인
+    const event = await services.eventService.getEvent(eventId);
+    if (!event) {
+      return res.status(404).json({ success: false, error: 'Event not found' });
+    }
+
+    const results = {
+      eventId,
+      eventName: event.name,
+      deletedAt: new Date().toISOString(),
+      counts: {}
+    };
+
+    // 1. 트리거 로그 삭제
+    const triggerLogResult = await db.pool.query(`
+      DELETE FROM ops_trigger_logs
+      WHERE trigger_id IN (SELECT id FROM ops_triggers WHERE event_id = $1)
+    `, [eventId]);
+    results.counts.triggerLogs = triggerLogResult.rowCount;
+
+    // 2. 승인 요청 삭제
+    const approvalResult = await db.pool.query(`
+      DELETE FROM ops_approvals WHERE event_id = $1
+    `, [eventId]);
+    results.counts.approvals = approvalResult.rowCount;
+
+    // 3. SSOT 이력 삭제
+    const historyResult = await db.pool.query(`
+      DELETE FROM ops_ssot_history
+      WHERE item_id IN (SELECT id FROM ops_ssot_items WHERE event_id = $1)
+    `, [eventId]);
+    results.counts.ssotHistory = historyResult.rowCount;
+
+    // 4. SSOT 항목 삭제
+    const ssotResult = await db.pool.query(`
+      DELETE FROM ops_ssot_items WHERE event_id = $1
+    `, [eventId]);
+    results.counts.ssotItems = ssotResult.rowCount;
+
+    // 5. 감사 로그 삭제
+    const auditResult = await db.pool.query(`
+      DELETE FROM ops_audit_log WHERE event_id = $1
+    `, [eventId]);
+    results.counts.auditLogs = auditResult.rowCount;
+
+    // 6. KPI 스냅샷 삭제
+    const kpiResult = await db.pool.query(`
+      DELETE FROM ops_kpi_snapshots WHERE event_id = $1
+    `, [eventId]);
+    results.counts.kpiSnapshots = kpiResult.rowCount;
+
+    console.log(`✅ Demo reset completed for event ${eventId}:`, results.counts);
+
+    res.json({
+      success: true,
+      message: `행사 "${event.name}" 초기화 완료`,
+      data: results
+    });
+  } catch (error) {
+    console.error('Demo reset failed:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
 // Events (행사/축제)
 // ═══════════════════════════════════════════════════════════
 
