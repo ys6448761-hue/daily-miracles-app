@@ -61,9 +61,24 @@ router.get('/health', (req, res) => {
  * - 특정 행사의 SSOT 항목, 승인 요청, 감사 로그를 초기화
  * - 행사 자체는 유지됨
  * - 데모/시연용 (운영 환경에서는 주의해서 사용)
+ *
+ * 보안: X-DEMO-RESET-TOKEN 헤더 필수
+ * ENV: DEMO_RESET_TOKEN (미설정 시 기본값 사용)
  */
 router.post('/demo/reset/:eventId', async (req, res) => {
   try {
+    // 토큰 인증 체크
+    const DEMO_RESET_TOKEN = process.env.DEMO_RESET_TOKEN || 'yeosu-ops-demo-2026';
+    const providedToken = req.headers['x-demo-reset-token'];
+
+    if (!providedToken || providedToken !== DEMO_RESET_TOKEN) {
+      return res.status(401).json({
+        success: false,
+        error: 'unauthorized',
+        message: 'X-DEMO-RESET-TOKEN 헤더가 필요합니다'
+      });
+    }
+
     const eventId = req.params.eventId;
 
     if (!db) {
