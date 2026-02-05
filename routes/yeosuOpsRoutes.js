@@ -34,6 +34,42 @@ try {
   console.error('⚠️ Rules Loader 로드 실패 (룰 API 미사용):', error.message);
 }
 
+// ─────────────────────────────────────────────────────────────
+// Rate Limiter (메모리 기반, 의존성 없음)
+// ─────────────────────────────────────────────────────────────
+const rateLimitBucket = new Map(); // key: ip, value: { count, resetAt }
+
+/**
+ * 간단한 Rate Limiter 미들웨어
+ * - 1분당 5회 제한 (단일 인스턴스 기준)
+ * - 토큰 유출 시 폭주 방지용 최소 방어선
+ */
+function simpleRateLimit(limit = 5, windowMs = 60 * 1000) {
+  return (req, res, next) => {
+    const ip = req.ip || req.headers['x-forwarded-for'] || req.connection?.remoteAddress || 'unknown';
+    const now = Date.now();
+
+    const cur = rateLimitBucket.get(ip);
+    if (!cur || now > cur.resetAt) {
+      rateLimitBucket.set(ip, { count: 1, resetAt: now + windowMs });
+      return next();
+    }
+
+    if (cur.count >= limit) {
+      console.warn(`⚠️ Rate limit exceeded: ${ip} (${cur.count}/${limit})`);
+      return res.status(429).json({
+        success: false,
+        error: 'rate_limited',
+        message: `요청 한도 초과 (${limit}회/분). 잠시 후 다시 시도해주세요.`,
+        retry_after_ms: cur.resetAt - now
+      });
+    }
+
+    cur.count += 1;
+    return next();
+  };
+}
+
 // 서비스 가용성 체크 미들웨어
 function requireServices(req, res, next) {
   if (!services) {
@@ -145,7 +181,7 @@ router.post('/rules/cache/clear', (req, res) => {
  * 감사로그: 콘솔에 변경 전/후 해시, IP, 타임스탬프 기록
  * Slack 알림: SLACK_WEBHOOK_URL 설정 시 전송 (선택)
  */
-router.post('/rules/reload', async (req, res) => {
+router.post('/rules/reload', simpleRateLimit(5, 60 * 1000), async (req, res) => {
   try {
     // 토큰 인증 (운영: ADMIN_TOKEN만, 개발: DEMO_RESET_TOKEN 폴백)
     const ADMIN_TOKEN = process.env.ADMIN_TOKEN || process.env.DEMO_RESET_TOKEN;
