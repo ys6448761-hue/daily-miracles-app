@@ -238,6 +238,36 @@ router.post('/rules/reload', simpleRateLimit(5, 60 * 1000), async (req, res) => 
     };
     console.log('🔁 Rules reloaded:', auditLog);
 
+    // 4-1. DB 감사로그 저장 (P1: 장기 추적용)
+    try {
+      if (services?.auditService) {
+        await services.auditService.log({
+          eventId: null, // 시스템 이벤트 (특정 행사 무관)
+          actorId: null,
+          actorName: 'system',
+          actorRole: null,
+          action: 'RULES_RELOAD',
+          objectType: 'rules',
+          objectId: null,
+          objectLabel: meta.bundle,
+          beforeValue: prevSnapshot ? {
+            hash: prevSnapshot.hash,
+            versions: prevSnapshot.versions
+          } : null,
+          afterValue: {
+            hash: meta.hash,
+            hash_algo: meta.hash_algo,
+            bundle: meta.bundle,
+            versions: meta.versions
+          },
+          ipAddress: auditLog.by,
+          userAgent: req.headers['user-agent'] || null
+        });
+      }
+    } catch (dbErr) {
+      console.warn('⚠️ DB 감사로그 저장 실패 (무시):', dbErr.message);
+    }
+
     // 5. Slack 알림 (P1: 선택 - SLACK_WEBHOOK_URL 있을 때만)
     const slackWebhook = process.env.SLACK_WEBHOOK_URL || process.env.OPS_SLACK_WEBHOOK;
     if (slackWebhook) {
@@ -279,6 +309,48 @@ router.post('/rules/reload', simpleRateLimit(5, 60 * 1000), async (req, res) => 
       error: 'reload_failed',
       message: error.message
     });
+  }
+});
+
+/**
+ * 시스템 감사로그 조회 (event_id NULL인 항목)
+ * GET /api/ops-center/audit/system
+ *
+ * RULES_RELOAD 등 시스템 레벨 이벤트 조회용
+ */
+router.get('/audit/system', async (req, res) => {
+  try {
+    if (!db) {
+      return res.status(503).json({ success: false, error: 'DB not available' });
+    }
+
+    const { action, limit = 50, offset = 0 } = req.query;
+
+    let query = `
+      SELECT * FROM ops_audit_log
+      WHERE event_id IS NULL
+    `;
+    const params = [];
+    let paramIndex = 1;
+
+    if (action) {
+      query += ` AND action = $${paramIndex++}`;
+      params.push(action);
+    }
+
+    query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
+    params.push(parseInt(limit, 10), parseInt(offset, 10));
+
+    const result = await db.query(query, params);
+
+    res.json({
+      success: true,
+      data: result.rows,
+      count: result.rows.length
+    });
+  } catch (error) {
+    console.error('System audit query failed:', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
