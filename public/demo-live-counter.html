@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실시간 카운터 데모 - 하루하루의 기적</title>
+    <style>
+        :root {
+            --dm-primary: #9B87F5;
+            --dm-secondary: #F5A7C6;
+            --dm-bg: #FFF5F7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--dm-primary) 0%, var(--dm-secondary) 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .demo-section {
+            background: white;
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .demo-section h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .demo-section h2 span {
+            font-size: 24px;
+        }
+
+        /* 위치 데모 */
+        .position-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .position-btn {
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .position-btn.active {
+            border-color: var(--dm-primary);
+            background: rgba(155, 135, 245, 0.1);
+        }
+
+        .position-btn:hover {
+            border-color: var(--dm-primary);
+        }
+
+        /* 테마 데모 */
+        .theme-grid {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .theme-btn {
+            padding: 12px 24px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .theme-btn.active {
+            border-color: var(--dm-primary);
+            background: rgba(155, 135, 245, 0.1);
+        }
+
+        .theme-btn.dark {
+            background: #1a1a2e;
+            color: white;
+            border-color: #1a1a2e;
+        }
+
+        .theme-btn.gradient {
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,245,247,0.95));
+        }
+
+        /* 인라인 데모 */
+        .inline-demo {
+            background: linear-gradient(135deg, var(--dm-bg), white);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .inline-demo p {
+            margin-bottom: 16px;
+            color: #666;
+        }
+
+        /* 코드 블록 */
+        .code-block {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        .code-block code {
+            color: #a5d6ff;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            white-space: pre;
+        }
+
+        .code-block .comment {
+            color: #8b949e;
+        }
+
+        .code-block .tag {
+            color: #7ee787;
+        }
+
+        .code-block .attr {
+            color: #79c0ff;
+        }
+
+        .code-block .string {
+            color: #a5d6ff;
+        }
+
+        /* API 테스트 */
+        .api-test {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .api-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .api-btn.primary {
+            background: linear-gradient(135deg, var(--dm-primary), #6E59A5);
+            color: white;
+        }
+
+        .api-btn.secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .api-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .api-result {
+            margin-top: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .api-result.show {
+            display: block;
+        }
+
+        /* 푸터 */
+        .footer {
+            text-align: center;
+            margin-top: 32px;
+            color: white;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>👥 실시간 카운터 데모</h1>
+        <p class="subtitle">네트워크 효과: "함께하는 느낌"을 주는 UI 컴포넌트</p>
+
+        <!-- 위치 선택 -->
+        <div class="demo-section">
+            <h2><span>📍</span> 위치 선택</h2>
+            <div class="position-grid">
+                <button class="position-btn active" data-position="bottom-right">우하단 (기본)</button>
+                <button class="position-btn" data-position="bottom-left">좌하단</button>
+                <button class="position-btn" data-position="top-right">우상단</button>
+                <button class="position-btn" data-position="top-left">좌상단</button>
+            </div>
+        </div>
+
+        <!-- 테마 선택 -->
+        <div class="demo-section">
+            <h2><span>🎨</span> 테마 선택</h2>
+            <div class="theme-grid">
+                <button class="theme-btn active" data-theme="light">Light</button>
+                <button class="theme-btn dark" data-theme="dark">Dark</button>
+                <button class="theme-btn gradient" data-theme="gradient">Gradient</button>
+            </div>
+        </div>
+
+        <!-- 인라인 데모 -->
+        <div class="demo-section">
+            <h2><span>📦</span> 인라인 모드</h2>
+            <div class="inline-demo">
+                <p>페이지 콘텐츠 내부에 삽입할 수 있어요</p>
+                <div id="inline-counter"></div>
+            </div>
+        </div>
+
+        <!-- 사용법 -->
+        <div class="demo-section">
+            <h2><span>💻</span> 사용법</h2>
+            <div class="code-block">
+                <code><span class="comment">&lt;!-- 1. 스크립트 추가 --&gt;</span>
+<span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="string">"/js/liveCounter.js"</span><span class="tag">&gt;&lt;/script&gt;</span>
+
+<span class="comment">&lt;!-- 2. 컨테이너 추가 (자동 초기화) --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">id</span>=<span class="string">"live-counter"</span><span class="tag">&gt;&lt;/div&gt;</span>
+
+<span class="comment">&lt;!-- 또는 수동 초기화 --&gt;</span>
+<span class="tag">&lt;script&gt;</span>
+  LiveCounter.init({
+    position: 'bottom-right',  // 위치
+    theme: 'light',            // 테마
+    showDetails: true,         // 상세 표시
+    animate: true              // 애니메이션
+  });
+<span class="tag">&lt;/script&gt;</span></code>
+            </div>
+        </div>
+
+        <!-- API 테스트 -->
+        <div class="demo-section">
+            <h2><span>🔌</span> API 테스트</h2>
+            <div class="api-test">
+                <button class="api-btn primary" onclick="testStatsApi()">통계 조회</button>
+                <button class="api-btn secondary" onclick="testHeartbeat()">Heartbeat 전송</button>
+                <button class="api-btn secondary" onclick="testFullStats()">전체 통계</button>
+            </div>
+            <pre class="api-result" id="apiResult"></pre>
+        </div>
+
+        <div class="footer">
+            <p>하루하루의 기적 | <a href="./">메인으로</a></p>
+        </div>
+    </div>
+
+    <!-- 실시간 카운터 위젯 (플로팅) -->
+    <div id="live-counter"></div>
+
+    <script src="/js/liveCounter.js"></script>
+    <script>
+        // 위젯 초기화
+        LiveCounter.init({
+            position: 'bottom-right',
+            theme: 'light',
+            showDetails: true
+        });
+
+        // 인라인 카운터 (별도 인스턴스처럼 동작)
+        setTimeout(() => {
+            const inlineContainer = document.getElementById('inline-counter');
+            if (inlineContainer && LiveCounter.state.data) {
+                renderInlineCounter(inlineContainer, LiveCounter.state.data);
+            }
+        }, 1000);
+
+        function renderInlineCounter(container, data) {
+            container.innerHTML = `
+                <div style="display: inline-flex; align-items: center; gap: 16px; padding: 12px 20px; background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.1);">
+                    <span style="display: flex; align-items: center; gap: 6px;">
+                        <span style="width: 8px; height: 8px; background: #4CAF50; border-radius: 50%; animation: pulse 2s infinite;"></span>
+                        <strong style="color: #9B87F5;">${data.activeNow || 1}명</strong> 접속 중
+                    </span>
+                    <span style="color: #ccc;">|</span>
+                    <span>오늘 <strong style="color: #9B87F5;">${data.todayWishes || 0}개</strong> 소원</span>
+                </div>
+            `;
+        }
+
+        // 위치 변경
+        document.querySelectorAll('.position-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.position-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const position = btn.dataset.position;
+                LiveCounter.config.position = position;
+
+                const container = document.getElementById('live-counter');
+                container.style.cssText = LiveCounter.getPositionStyle();
+            });
+        });
+
+        // 테마 변경
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                LiveCounter.config.theme = btn.dataset.theme;
+                LiveCounter.render();
+            });
+        });
+
+        // API 테스트
+        async function testStatsApi() {
+            const result = document.getElementById('apiResult');
+            result.classList.add('show');
+            result.textContent = '로딩 중...';
+
+            try {
+                const response = await fetch('/api/live/stats');
+                const data = await response.json();
+                result.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                result.textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function testHeartbeat() {
+            const result = document.getElementById('apiResult');
+            result.classList.add('show');
+
+            try {
+                const response = await fetch('/api/live/heartbeat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sessionId: LiveCounter.state.sessionId,
+                        page: window.location.pathname
+                    })
+                });
+                const data = await response.json();
+                result.textContent = 'Heartbeat 전송 완료!\n' + JSON.stringify(data, null, 2);
+            } catch (error) {
+                result.textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function testFullStats() {
+            const result = document.getElementById('apiResult');
+            result.classList.add('show');
+            result.textContent = '로딩 중...';
+
+            try {
+                const response = await fetch('/api/live/stats/full');
+                const data = await response.json();
+                result.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                result.textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

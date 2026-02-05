@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>소원 체크인 - 하루하루의 기적</title>
+    <meta property="og:title" content="소원 체크인 - 하루하루의 기적" />
+    <meta property="og:description" content="당신의 소원은 어떻게 되어가고 있나요?" />
+
+    <style>
+        :root {
+            --dm-primary: #9B87F5;
+            --dm-secondary: #F5A7C6;
+            --dm-accent: #6E59A5;
+            --dm-bg: #FFF5F7;
+            --dm-success: #4CAF50;
+            --dm-warning: #FFC107;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', -apple-system, sans-serif;
+            background: var(--dm-bg);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* 로딩 */
+        .loading {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(155, 135, 245, 0.2);
+            border-top-color: var(--dm-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 에러 */
+        .error-page {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .error-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .error-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .error-message {
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        /* 메인 카드 */
+        .tracking-card {
+            background: white;
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 8px 32px rgba(155, 135, 245, 0.15);
+            margin-bottom: 24px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .header-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 15px;
+        }
+
+        /* 소원 정보 */
+        .wish-info {
+            background: linear-gradient(135deg, rgba(155, 135, 245, 0.1), rgba(245, 167, 198, 0.1));
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 28px;
+        }
+
+        .wish-label {
+            font-size: 13px;
+            color: var(--dm-accent);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .wish-text {
+            font-size: 16px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .wish-meta {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* 통계 배너 */
+        .stats-banner {
+            background: linear-gradient(135deg, var(--dm-primary), var(--dm-accent));
+            color: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 28px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .stats-banner strong {
+            font-size: 16px;
+        }
+
+        /* 질문 섹션 */
+        .question-section {
+            margin-bottom: 28px;
+        }
+
+        .question-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        /* 상태 선택 */
+        .status-options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .status-option {
+            position: relative;
+        }
+
+        .status-option input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .status-option label {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .status-option input:checked + label {
+            border-color: var(--dm-primary);
+            background: rgba(155, 135, 245, 0.05);
+        }
+
+        .status-icon {
+            font-size: 28px;
+        }
+
+        .status-text {
+            flex: 1;
+        }
+
+        .status-text strong {
+            display: block;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .status-text span {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .status-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .status-option input:checked + label .status-check {
+            background: var(--dm-primary);
+            border-color: var(--dm-primary);
+        }
+
+        /* 부분 달성 슬라이더 */
+        .partial-slider {
+            display: none;
+            margin-top: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .partial-slider.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .slider-value {
+            font-weight: 700;
+            color: var(--dm-primary);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: linear-gradient(90deg, var(--dm-secondary), var(--dm-primary));
+            border-radius: 4px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        /* 추가 질문 */
+        .additional-questions {
+            margin-top: 28px;
+            padding-top: 28px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 15px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .input-group textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 15px;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .input-group textarea:focus {
+            outline: none;
+            border-color: var(--dm-primary);
+        }
+
+        /* 만족도 */
+        .satisfaction {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .satisfaction button {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .satisfaction button.selected {
+            border-color: var(--dm-primary);
+            background: rgba(155, 135, 245, 0.1);
+            transform: scale(1.1);
+        }
+
+        /* 추천 여부 */
+        .recommend-options {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .recommend-btn {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: white;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .recommend-btn.selected {
+            border-color: var(--dm-primary);
+            background: rgba(155, 135, 245, 0.1);
+            color: var(--dm-primary);
+        }
+
+        /* 제출 버튼 */
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--dm-primary), var(--dm-accent));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 24px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(155, 135, 245, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 완료 페이지 */
+        .completion-page {
+            display: none;
+        }
+
+        .completion-page.show {
+            display: block;
+        }
+
+        .completion-card {
+            background: white;
+            border-radius: 24px;
+            padding: 48px 32px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(155, 135, 245, 0.15);
+        }
+
+        .completion-icon {
+            font-size: 72px;
+            margin-bottom: 24px;
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .completion-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .completion-message {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.7;
+            margin-bottom: 32px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .cta-btn {
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .cta-btn.primary {
+            background: linear-gradient(135deg, var(--dm-primary), var(--dm-accent));
+            color: white;
+        }
+
+        .cta-btn.secondary {
+            background: white;
+            color: var(--dm-primary);
+            border: 2px solid var(--dm-primary);
+        }
+
+        /* 푸터 */
+        .footer {
+            text-align: center;
+            padding: 24px;
+            color: #888;
+            font-size: 13px;
+        }
+
+        .footer a {
+            color: var(--dm-primary);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 로딩 -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>소원 정보를 불러오고 있어요...</p>
+        </div>
+
+        <!-- 에러 -->
+        <div id="errorPage" class="error-page" style="display: none;">
+            <div class="error-icon">😢</div>
+            <h2 class="error-title">링크가 유효하지 않아요</h2>
+            <p class="error-message" id="errorMessage">만료되었거나 잘못된 링크입니다.</p>
+            <a href="./questions.html" class="cta-btn primary" style="display: inline-block;">
+                새로운 소원 빌러가기
+            </a>
+        </div>
+
+        <!-- 응답 폼 -->
+        <div id="formPage" style="display: none;">
+            <div class="tracking-card">
+                <div class="header">
+                    <div class="header-icon" id="stageIcon">📬</div>
+                    <h1 id="headerTitle">소원 체크인</h1>
+                    <p id="headerDesc">소원은 어떻게 되어가고 있나요?</p>
+                </div>
+
+                <!-- 소원 정보 -->
+                <div class="wish-info">
+                    <div class="wish-label">💫 당신의 소원</div>
+                    <div class="wish-text" id="wishText"></div>
+                    <div class="wish-meta">
+                        <span class="meta-item">🎯 기적지수 <strong id="miracleIndex"></strong>점</span>
+                        <span class="meta-item">📅 <span id="daysAgo"></span>일 전</span>
+                    </div>
+                </div>
+
+                <!-- 통계 배너 -->
+                <div class="stats-banner" id="statsBanner" style="display: none;">
+                    <span id="statsMessage"></span>
+                </div>
+
+                <!-- 실현 상태 -->
+                <form id="trackingForm">
+                    <div class="question-section">
+                        <div class="question-title">소원이 실현되었나요?</div>
+
+                        <div class="status-options">
+                            <div class="status-option">
+                                <input type="radio" name="realized_status" id="statusRealized" value="realized">
+                                <label for="statusRealized">
+                                    <span class="status-icon">🎉</span>
+                                    <div class="status-text">
+                                        <strong>완전히 실현됐어요!</strong>
+                                        <span>소원이 이루어졌습니다</span>
+                                    </div>
+                                    <span class="status-check">✓</span>
+                                </label>
+                            </div>
+
+                            <div class="status-option">
+                                <input type="radio" name="realized_status" id="statusPartial" value="partial">
+                                <label for="statusPartial">
+                                    <span class="status-icon">🌱</span>
+                                    <div class="status-text">
+                                        <strong>부분적으로 진행 중</strong>
+                                        <span>조금씩 이루어지고 있어요</span>
+                                    </div>
+                                    <span class="status-check">✓</span>
+                                </label>
+                            </div>
+
+                            <div class="status-option">
+                                <input type="radio" name="realized_status" id="statusNotYet" value="not_yet">
+                                <label for="statusNotYet">
+                                    <span class="status-icon">⏳</span>
+                                    <div class="status-text">
+                                        <strong>아직이에요</strong>
+                                        <span>노력 중이지만 아직 결과가 없어요</span>
+                                    </div>
+                                    <span class="status-check">✓</span>
+                                </label>
+                            </div>
+
+                            <div class="status-option">
+                                <input type="radio" name="realized_status" id="statusGaveUp" value="gave_up">
+                                <label for="statusGaveUp">
+                                    <span class="status-icon">🔄</span>
+                                    <div class="status-text">
+                                        <strong>방향을 바꿨어요</strong>
+                                        <span>다른 목표로 전환했습니다</span>
+                                    </div>
+                                    <span class="status-check">✓</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 부분 달성 슬라이더 -->
+                        <div class="partial-slider" id="partialSlider">
+                            <div class="slider-label">
+                                <span>얼마나 달성되었나요?</span>
+                                <span class="slider-value"><span id="partialValue">50</span>%</span>
+                            </div>
+                            <input type="range" id="partialRange" min="10" max="90" value="50" step="10">
+                        </div>
+                    </div>
+
+                    <!-- 추가 질문 -->
+                    <div class="additional-questions">
+                        <div class="input-group">
+                            <label>무엇이 가장 도움이 됐나요? (선택)</label>
+                            <textarea id="whatHelped" placeholder="예: 꾸준한 실천, 주변의 응원, 명확한 계획..."></textarea>
+                        </div>
+
+                        <div class="input-group">
+                            <label>어떤 어려움이 있었나요? (선택)</label>
+                            <textarea id="whatBlocked" placeholder="예: 시간 부족, 의지력, 외부 환경..."></textarea>
+                        </div>
+
+                        <div class="input-group">
+                            <label>전반적인 만족도는요?</label>
+                            <div class="satisfaction" id="satisfactionBtns">
+                                <button type="button" data-value="1">😔</button>
+                                <button type="button" data-value="2">😐</button>
+                                <button type="button" data-value="3">🙂</button>
+                                <button type="button" data-value="4">😊</button>
+                                <button type="button" data-value="5">🤩</button>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label>친구에게 추천하시겠어요?</label>
+                            <div class="recommend-options">
+                                <button type="button" class="recommend-btn" data-value="true">👍 추천해요</button>
+                                <button type="button" class="recommend-btn" data-value="false">🤔 글쎄요</button>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label>하고 싶은 말이 있다면? (선택)</label>
+                            <textarea id="feedback" placeholder="자유롭게 의견을 남겨주세요"></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        응답 제출하기
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 완료 페이지 -->
+        <div id="completionPage" class="completion-page">
+            <div class="completion-card">
+                <div class="completion-icon" id="completionIcon">🎉</div>
+                <h2 class="completion-title">감사합니다!</h2>
+                <p class="completion-message" id="completionMessage">
+                    소중한 응답이 기록되었어요.<br>
+                    당신의 이야기가 다른 소원이들에게 힘이 됩니다.
+                </p>
+                <div class="cta-buttons">
+                    <a href="./questions.html" class="cta-btn primary">새로운 소원 빌기</a>
+                    <a href="./" class="cta-btn secondary">홈으로 가기</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <a href="./">하루하루의 기적</a> | 응답 시간 약 30초
+        </div>
+    </div>
+
+    <script>
+        // URL에서 토큰 추출
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        // 요소
+        const loading = document.getElementById('loading');
+        const errorPage = document.getElementById('errorPage');
+        const formPage = document.getElementById('formPage');
+        const completionPage = document.getElementById('completionPage');
+        const form = document.getElementById('trackingForm');
+
+        // 데이터
+        let trackingData = null;
+        let selectedSatisfaction = null;
+        let selectedRecommend = null;
+
+        // 초기화
+        async function init() {
+            if (!token) {
+                showError('토큰이 없습니다.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/wish-tracking/respond/${token}`);
+                const result = await response.json();
+
+                if (!result.success) {
+                    showError(result.message || '유효하지 않은 링크입니다.');
+                    return;
+                }
+
+                trackingData = result.data;
+                renderForm();
+
+            } catch (error) {
+                console.error('Error:', error);
+                showError('서버 연결에 실패했습니다.');
+            }
+        }
+
+        function showError(message) {
+            loading.style.display = 'none';
+            errorPage.style.display = 'block';
+            document.getElementById('errorMessage').textContent = message;
+        }
+
+        function renderForm() {
+            loading.style.display = 'none';
+            formPage.style.display = 'block';
+
+            // 헤더 설정
+            const stageLabels = {
+                day7: { icon: '📬', title: '7일 체크인', desc: '소원을 빈 지 7일이 지났어요!' },
+                day30: { icon: '📅', title: '한 달 체크인', desc: '소원을 빈 지 한 달이 지났어요!' },
+                day90: { icon: '🎯', title: '3개월 체크인', desc: '소원을 빈 지 3개월이 지났어요!' }
+            };
+
+            const stage = stageLabels[trackingData.tracking_stage] || stageLabels.day7;
+            document.getElementById('stageIcon').textContent = stage.icon;
+            document.getElementById('headerTitle').textContent = stage.title;
+            document.getElementById('headerDesc').textContent = stage.desc;
+
+            // 소원 정보
+            document.getElementById('wishText').textContent = trackingData.wish_text;
+            document.getElementById('miracleIndex').textContent = trackingData.miracle_index;
+
+            // 일수 계산
+            const created = new Date(trackingData.created_at);
+            const now = new Date();
+            const daysAgo = Math.floor((now - created) / (1000 * 60 * 60 * 24));
+            document.getElementById('daysAgo').textContent = daysAgo;
+
+            // 통계 배너
+            if (trackingData.similar_stats?.hasData) {
+                document.getElementById('statsBanner').style.display = 'block';
+                document.getElementById('statsMessage').innerHTML = trackingData.similar_stats.message;
+            }
+        }
+
+        // 상태 선택 이벤트
+        document.querySelectorAll('input[name="realized_status"]').forEach(input => {
+            input.addEventListener('change', () => {
+                const partialSlider = document.getElementById('partialSlider');
+                if (input.value === 'partial') {
+                    partialSlider.classList.add('show');
+                } else {
+                    partialSlider.classList.remove('show');
+                }
+            });
+        });
+
+        // 슬라이더 이벤트
+        document.getElementById('partialRange').addEventListener('input', (e) => {
+            document.getElementById('partialValue').textContent = e.target.value;
+        });
+
+        // 만족도 버튼
+        document.querySelectorAll('#satisfactionBtns button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#satisfactionBtns button').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedSatisfaction = parseInt(btn.dataset.value);
+            });
+        });
+
+        // 추천 버튼
+        document.querySelectorAll('.recommend-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.recommend-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedRecommend = btn.dataset.value === 'true';
+            });
+        });
+
+        // 폼 제출
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const realizedStatus = document.querySelector('input[name="realized_status"]:checked')?.value;
+
+            if (!realizedStatus) {
+                alert('소원 실현 상태를 선택해주세요.');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '제출 중...';
+
+            try {
+                const response = await fetch(`/api/wish-tracking/respond/${token}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        realized_status: realizedStatus,
+                        realized_percent: realizedStatus === 'partial' ?
+                            parseInt(document.getElementById('partialRange').value) : null,
+                        what_helped: document.getElementById('whatHelped').value || null,
+                        what_blocked: document.getElementById('whatBlocked').value || null,
+                        would_recommend: selectedRecommend,
+                        satisfaction: selectedSatisfaction,
+                        feedback: document.getElementById('feedback').value || null
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showCompletion(result.encouragement, realizedStatus);
+                } else {
+                    alert(result.message || '제출 중 오류가 발생했습니다.');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '응답 제출하기';
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('서버 연결에 실패했습니다.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = '응답 제출하기';
+            }
+        });
+
+        function showCompletion(encouragement, status) {
+            formPage.style.display = 'none';
+            completionPage.classList.add('show');
+
+            const icons = {
+                realized: '🎉',
+                partial: '💪',
+                not_yet: '🌱',
+                gave_up: '💜'
+            };
+
+            document.getElementById('completionIcon').textContent = icons[status] || '✨';
+            document.getElementById('completionMessage').innerHTML =
+                encouragement + '<br><br>당신의 이야기가 다른 소원이들에게 힘이 됩니다.';
+        }
+
+        // 시작
+        init();
+    </script>
+</body>
+</html>

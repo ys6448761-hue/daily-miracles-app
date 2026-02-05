@@ -427,6 +427,24 @@ try {
   console.error("❌ 나이스페이 라우터 로드 실패:", error.message);
 }
 
+// 소원 추적 시스템 라우터 로딩 (바이럴 루프 #2)
+let wishTrackingRoutes = null;
+try {
+  wishTrackingRoutes = require("./routes/wishTrackingRoutes");
+  console.log("✅ 소원 추적 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 소원 추적 라우터 로드 실패:", error.message);
+}
+
+// 실시간 카운터 라우터 로딩 (바이럴 루프 #4: 네트워크 효과)
+let liveCounterRoutes = null;
+try {
+  liveCounterRoutes = require("./routes/liveCounterRoutes");
+  console.log("✅ 실시간 카운터 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 실시간 카운터 라우터 로드 실패:", error.message);
+}
+
 // 소원항해단 v3.1-MVP 라우터 로딩
 let harborRoutes = null;
 try {
@@ -1307,6 +1325,39 @@ if (yeosuOpsRoutes) {
   console.log("✅ 여수 운영 컨트롤타워(Ops Center) 라우터 등록 완료 (/api/ops-center)");
 } else {
   console.warn("⚠️ 여수 운영 컨트롤타워(Ops Center) 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 소원 추적 시스템 Routes (/api/wish-tracking/*) - 바이럴 루프 #2 ----------
+if (wishTrackingRoutes) {
+  // 서비스 초기화 (DB 연결 시)
+  if (pool) {
+    const WishTrackingService = require("./services/wishTrackingService");
+    const trackingService = new WishTrackingService(pool);
+    wishTrackingRoutes.init({
+      trackingService,
+      messageProvider: messageProvider || null
+    });
+  }
+  app.use("/api/wish-tracking", wishTrackingRoutes);
+  console.log("✅ 소원 추적 시스템 라우터 등록 완료 (/api/wish-tracking)");
+} else {
+  console.warn("⚠️ 소원 추적 시스템 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 실시간 카운터 Routes (/api/live/*) - 바이럴 루프 #4: 네트워크 효과 ----------
+if (liveCounterRoutes) {
+  // 서비스 초기화
+  if (pool) {
+    const LiveCounterService = require("./services/liveCounterService");
+    const counterService = new LiveCounterService(pool);
+    liveCounterRoutes.init(counterService);
+  } else {
+    liveCounterRoutes.init(null); // DB 없이도 기본 기능 제공
+  }
+  app.use("/api/live", liveCounterRoutes);
+  console.log("✅ 실시간 카운터 라우터 등록 완료 (/api/live)");
+} else {
+  console.warn("⚠️ 실시간 카운터 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------

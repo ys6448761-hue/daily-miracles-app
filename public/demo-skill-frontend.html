@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>frontend-design 스킬 데모 - 하루하루의 기적</title>
+
+    <!-- 독특한 폰트: Playfair Display + Pretendard -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,500;1,300&display=swap" rel="stylesheet">
+
+    <style>
+        /* ═══════════════════════════════════════════════════════════
+           frontend-design 스킬 적용
+           톤: 럭셔리/리파인드 + 유기적/자연적 혼합
+           ═══════════════════════════════════════════════════════════ */
+
+        :root {
+            /* Daily Miracles 브랜드 컬러 */
+            --dm-primary: #9B87F5;
+            --dm-secondary: #F5A7C6;
+            --dm-accent: #6E59A5;
+            --dm-bg: #FFF5F7;
+
+            /* 확장 팔레트 */
+            --dm-deep: #4A3B7C;
+            --dm-glow: rgba(155, 135, 245, 0.3);
+            --dm-warm: #FFE4EC;
+            --dm-gold: #D4AF37;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background: var(--dm-bg);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           배경: 유기적 그라디언트 + 노이즈 텍스처
+           ═══════════════════════════════════════════════════════════ */
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% 40%, rgba(155, 135, 245, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 80% at 80% 20%, rgba(245, 167, 198, 0.2) 0%, transparent 50%),
+                radial-gradient(ellipse 50% 50% at 50% 80%, rgba(110, 89, 165, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 노이즈 오버레이 */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           히어로: 비대칭 + 대담한 타이포
+           ═══════════════════════════════════════════════════════════ */
+
+        .hero {
+            position: relative;
+            z-index: 10;
+            padding: 80px 24px 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--dm-primary), var(--dm-secondary));
+            color: white;
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(48px, 10vw, 120px);
+            font-weight: 400;
+            line-height: 0.95;
+            color: var(--dm-deep);
+            margin-bottom: 32px;
+            letter-spacing: -2px;
+        }
+
+        .hero-title em {
+            font-style: italic;
+            background: linear-gradient(135deg, var(--dm-primary), var(--dm-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-title .line-2 {
+            display: block;
+            margin-left: 10%;
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            font-size: 0.6em;
+            letter-spacing: 0;
+        }
+
+        .hero-desc {
+            max-width: 480px;
+            margin-left: auto;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            font-weight: 300;
+            color: var(--dm-accent);
+            line-height: 1.7;
+            text-align: right;
+            font-style: italic;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           소원 카드: 글래스모피즘 + 오버랩
+           ═══════════════════════════════════════════════════════════ */
+
+        .cards-section {
+            position: relative;
+            z-index: 10;
+            padding: 40px 24px 100px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+        }
+
+        .wish-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 32px;
+            padding: 40px 32px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow:
+                0 4px 24px rgba(155, 135, 245, 0.1),
+                0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            overflow: hidden;
+        }
+
+        .wish-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                from 0deg,
+                transparent 0deg,
+                rgba(155, 135, 245, 0.1) 60deg,
+                transparent 120deg
+            );
+            animation: rotate 8s linear infinite;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        .wish-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow:
+                0 20px 60px rgba(155, 135, 245, 0.2),
+                0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .wish-card:hover::before {
+            opacity: 1;
+        }
+
+        /* 카드 넘버링: 대담한 오버사이즈 */
+        .card-number {
+            position: absolute;
+            top: -20px;
+            right: 20px;
+            font-family: 'Playfair Display', serif;
+            font-size: 140px;
+            font-weight: 700;
+            color: rgba(155, 135, 245, 0.08);
+            line-height: 1;
+            pointer-events: none;
+            transition: all 0.5s;
+        }
+
+        .wish-card:hover .card-number {
+            color: rgba(155, 135, 245, 0.15);
+            transform: scale(1.1);
+        }
+
+        .card-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--dm-primary), var(--dm-secondary));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 8px 24px rgba(155, 135, 245, 0.3);
+        }
+
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 400;
+            color: var(--dm-deep);
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-desc {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 17px;
+            color: var(--dm-accent);
+            line-height: 1.7;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 24px;
+        }
+
+        .card-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dm-primary);
+            text-decoration: none;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s;
+        }
+
+        .card-cta::after {
+            content: '';
+            width: 24px;
+            height: 1px;
+            background: var(--dm-primary);
+            transition: width 0.3s;
+        }
+
+        .card-cta:hover {
+            color: var(--dm-accent);
+        }
+
+        .card-cta:hover::after {
+            width: 40px;
+            background: var(--dm-accent);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           CTA 버튼: 그라디언트 보더 + 글로우
+           ═══════════════════════════════════════════════════════════ */
+
+        .cta-section {
+            position: relative;
+            z-index: 10;
+            padding: 60px 24px;
+            text-align: center;
+        }
+
+        .cta-button {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 20px 48px;
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 400;
+            color: white;
+            background: linear-gradient(135deg, var(--dm-primary), var(--dm-accent));
+            border: none;
+            border-radius: 100px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow:
+                0 4px 24px rgba(155, 135, 245, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transition: left 0.6s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow:
+                0 16px 48px rgba(155, 135, 245, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-sparkle {
+            font-size: 24px;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.2) rotate(180deg); opacity: 0.8; }
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           플로팅 데코레이션
+           ═══════════════════════════════════════════════════════════ */
+
+        .floating-deco {
+            position: fixed;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0.6;
+        }
+
+        .deco-1 {
+            top: 15%;
+            left: 5%;
+            width: 120px;
+            height: 120px;
+            border: 1px solid var(--dm-secondary);
+            border-radius: 50%;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .deco-2 {
+            top: 60%;
+            right: 8%;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--dm-primary), transparent);
+            border-radius: 50%;
+            filter: blur(40px);
+            animation: pulse 5s ease-in-out infinite reverse;
+        }
+
+        .deco-3 {
+            bottom: 20%;
+            left: 10%;
+            font-family: 'Playfair Display', serif;
+            font-size: 200px;
+            font-style: italic;
+            color: rgba(155, 135, 245, 0.03);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 0.3; }
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           푸터: 미니멀 + 세련
+           ═══════════════════════════════════════════════════════════ */
+
+        .footer {
+            position: relative;
+            z-index: 10;
+            padding: 60px 24px;
+            text-align: center;
+        }
+
+        .footer-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 14px;
+            color: var(--dm-accent);
+            opacity: 0.7;
+        }
+
+        .footer-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-style: italic;
+            color: var(--dm-primary);
+            margin-bottom: 8px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           페이지 로드 애니메이션
+           ═══════════════════════════════════════════════════════════ */
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-badge { animation: fadeInUp 0.8s ease-out 0.2s both; }
+        .hero-title { animation: fadeInUp 0.8s ease-out 0.4s both; }
+        .hero-desc { animation: fadeInUp 0.8s ease-out 0.6s both; }
+        .wish-card:nth-child(1) { animation: fadeInUp 0.8s ease-out 0.8s both; }
+        .wish-card:nth-child(2) { animation: fadeInUp 0.8s ease-out 1.0s both; }
+        .wish-card:nth-child(3) { animation: fadeInUp 0.8s ease-out 1.2s both; }
+        .cta-button { animation: fadeInUp 0.8s ease-out 1.4s both; }
+
+        /* ═══════════════════════════════════════════════════════════
+           반응형
+           ═══════════════════════════════════════════════════════════ */
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: clamp(36px, 12vw, 64px);
+            }
+
+            .hero-title .line-2 {
+                margin-left: 0;
+            }
+
+            .hero-desc {
+                text-align: left;
+                margin-left: 0;
+            }
+
+            .card-number {
+                font-size: 100px;
+            }
+
+            .floating-deco {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 플로팅 데코레이션 -->
+    <div class="floating-deco deco-1"></div>
+    <div class="floating-deco deco-2"></div>
+    <div class="floating-deco deco-3">&</div>
+
+    <!-- 히어로 -->
+    <section class="hero">
+        <span class="hero-badge">
+            <span>frontend-design skill demo</span>
+        </span>
+
+        <h1 class="hero-title">
+            Your <em>Miracle</em>
+            <span class="line-2">begins with a single wish</span>
+        </h1>
+
+        <p class="hero-desc">
+            막힌 문제 하나를 적어주세요.<br>
+            AI가 당신만의 기적 로드맵을 설계해드립니다.
+        </p>
+    </section>
+
+    <!-- 소원 카드 -->
+    <section class="cards-section">
+        <div class="cards-container">
+            <article class="wish-card">
+                <span class="card-number">01</span>
+                <div class="card-icon">✨</div>
+                <h3 class="card-title">기적지수 분석</h3>
+                <p class="card-desc">
+                    12가지 질문으로 당신의 소원이 가진 잠재력을 과학적으로 분석합니다.
+                    50~100점 사이의 기적지수와 5대 성공 지표를 확인하세요.
+                </p>
+                <a href="./questions.html" class="card-cta">분석 시작하기</a>
+            </article>
+
+            <article class="wish-card">
+                <span class="card-number">02</span>
+                <div class="card-icon">🗺️</div>
+                <h3 class="card-title">30일 로드맵</h3>
+                <p class="card-desc">
+                    분석 결과를 바탕으로 맞춤형 30일 액션 플랜을 PDF로 제공합니다.
+                    매일 작은 실천이 기적을 만듭니다.
+                </p>
+                <a href="./wish-form.html" class="card-cta">로드맵 받기</a>
+            </article>
+
+            <article class="wish-card">
+                <span class="card-number">03</span>
+                <div class="card-icon">💌</div>
+                <h3 class="card-title">7일 응원 메시지</h3>
+                <p class="card-desc">
+                    7일간 매일 아침/저녁 맞춤형 응원 메시지를 보내드립니다.
+                    카카오 알림톡으로 따뜻한 에너지를 전달받으세요.
+                </p>
+                <a href="./wish-form.html?mode=wish" class="card-cta">신청하기</a>
+            </article>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <button class="cta-button" onclick="location.href='./wish-form.html'">
+            <span class="cta-sparkle">✦</span>
+            <span>소원 여정 시작하기</span>
+            <span class="cta-sparkle">✦</span>
+        </button>
+    </section>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="footer-brand">Daily Miracles</div>
+        <p class="footer-text">하루하루의 기적 | frontend-design 스킬 데모</p>
+    </footer>
+</body>
+</html>

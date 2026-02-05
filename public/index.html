@@ -578,5 +578,19 @@
             });
         });
     </script>
+    <!-- 실시간 카운터 위젯 (네트워크 효과) -->
+    <div id="live-counter"></div>
+    <script src="/js/liveCounter.js"></script>
+    <script>
+        // 실시간 카운터 초기화 (우하단, 라이트 테마)
+        if (window.LiveCounter) {
+            LiveCounter.init({
+                position: 'bottom-right',
+                theme: 'gradient',
+                showDetails: true,
+                animate: true
+            });
+        }
+    </script>
 </body>
 </html>

@@ -568,6 +568,9 @@
     </style>
 </head>
 <body>
+    <!-- 공유 카드 생성기 -->
+    <script src="./js/shareCardGenerator.js"></script>
+
     <div class="container">
         <div id="loading" class="loading">
             <div class="spinner"></div>
@@ -678,8 +681,8 @@
                 <button class="btn btn-primary" onclick="startDailyMessages()">
                     7일 응원 메시지 시작하기
                 </button>
-                <button class="btn btn-secondary" onclick="shareResult()">
-                    결과 공유하기
+                <button class="btn btn-share" onclick="shareResult()" style="background: linear-gradient(135deg, #F5A7C6 0%, #9B87F5 100%); color: white; display: inline-flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 20px;">✨</span> 기적지수 공유하기
                 </button>
             </div>
 
@@ -946,11 +949,21 @@
         }
 
         function shareResult() {
-            if (navigator.share) {
+            // 공유 카드 생성기 사용
+            const miracleIndex = parseInt(document.getElementById('miracleIndex').textContent) || 75;
+            const userName = document.getElementById('userName').textContent || '';
+
+            if (window.ShareCardGenerator) {
+                ShareCardGenerator.showShareModal({
+                    miracleIndex: miracleIndex,
+                    userName: userName,
+                    wish: analysisData?.story?.userProfile?.wish || ''
+                });
+            } else if (navigator.share) {
                 navigator.share({
                     title: '나의 기적 지수',
-                    text: `내 기적 지수는 ${document.getElementById('miracleIndex').textContent}점! 당신도 확인해보세요!`,
-                    url: window.location.href
+                    text: `내 기적 지수는 ${miracleIndex}점! 당신도 확인해보세요!`,
+                    url: 'https://dailymiracles.kr/questions.html'
                 });
             } else {
                 alert('공유 기능이 지원되지 않는 브라우저입니다.');
