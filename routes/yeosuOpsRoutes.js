@@ -53,10 +53,20 @@ router.use(requireServices);
 // ═══════════════════════════════════════════════════════════
 
 router.get('/health', (req, res) => {
+  const rulesMeta = rulesLoader ? rulesLoader.getRulesSnapshot() : null;
+
   res.json({
     success: true,
     service: 'yeosu-ops-center',
     version: 'v0.1.0',
+    pid: process.pid,
+    runtime_port: req.app.get('runtime_port') || null,
+    env_port: process.env.PORT || null,
+    rules: rulesMeta ? {
+      version: rulesMeta.versions?.mice?.version || null,
+      hash: rulesMeta.hash || null,
+      loaded_at: rulesMeta.loaded_at || null
+    } : null,
     timestamp: new Date().toISOString()
   });
 });

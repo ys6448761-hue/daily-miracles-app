@@ -624,7 +624,7 @@ if (String(process.env.REQUEST_LOG || "1") === "1") {
 global.latestStore = global.latestStore || { story: null };
 
 // ---------- Health ----------
-app.get("/api/health", async (_req, res) => {
+app.get("/api/health", async (req, res) => {
   let dbStatus = "DB 모듈 없음";
   if (db) {
     try {
@@ -635,12 +635,24 @@ app.get("/api/health", async (_req, res) => {
       console.error("DB 연결 오류:", error);
     }
   }
+
+  const rulesMeta = req.app.get('rulesSnapshot');
+
   res.json({
     success: true,
+    service: "daily-miracles-mvp",
     message: "여수 기적여행 API 서버가 정상 작동 중입니다",
+    pid: process.pid,
+    runtime_port: req.app.get('runtime_port') || null,
+    env_port: process.env.PORT || null,
     timestamp: new Date().toISOString(),
     database: dbStatus,
     version: "v3.0-debug",
+    rules: rulesMeta ? {
+      version: rulesMeta.versions?.mice?.version || null,
+      hash: rulesMeta.hash || null,
+      loaded_at: rulesMeta.loaded_at || null
+    } : null,
     modules: {
       yeosuRoutes: yeosuRoutes !== null,
       db: db !== null,
@@ -1570,6 +1582,22 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: "Internal server error", message: err.message });
 });
 
+// ---------- Rules Preload (fail-fast) ----------
+let rulesSnapshot = null;
+try {
+  const rulesLoader = require('./services/yeosu-ops-center/rulesLoader');
+  const { rules, meta } = rulesLoader.loadRules();
+  rulesSnapshot = meta;
+  app.set('rulesSnapshot', rulesSnapshot);
+  console.log('✅ Rules preloaded:', {
+    version: rulesSnapshot.versions?.mice?.version,
+    hash: rulesSnapshot.hash
+  });
+} catch (e) {
+  console.error('⚠️ Rules preload failed (non-fatal):', e.message);
+  // 운영에서는 process.exit(1) 권장
+}
+
 // ---------- Start (with fallback port) ----------
 const DEFAULT_PORT = process.env.PORT || 5000;
 const FALLBACK_PORT = 5002;
@@ -1598,6 +1626,8 @@ function printStartupBanner(port) {
 }
 
 function startServer(port) {
+  app.set('runtime_port', port); // 실제 리슨 포트 저장
+
   const server = app.listen(port, "0.0.0.0", () => {
     printStartupBanner(port);
   });
