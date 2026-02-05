@@ -1570,13 +1570,15 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: "Internal server error", message: err.message });
 });
 
-// ---------- Start ----------
-const PORT = process.env.PORT || 5100;
-app.listen(PORT, "0.0.0.0", () => {
+// ---------- Start (with fallback port) ----------
+const DEFAULT_PORT = process.env.PORT || 5000;
+const FALLBACK_PORT = 5002;
+
+function printStartupBanner(port) {
   console.log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   console.log("🌟 Daily Miracles MVP Server (FINAL)");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  console.log(`📡 Port: ${PORT}`);
+  console.log(`📡 Port: ${port}`);
   console.log(`🌍 ALLOWED_ORIGINS: ${allowedOrigins.join(", ") || "(none→allow all in dev)"}`);
   console.log("📋 Registered Routes:");
   [
@@ -1589,7 +1591,26 @@ app.listen(PORT, "0.0.0.0", () => {
     "POST /api/inquiry/submit         (1차 폼 접수)",
     "GET  /api/inquiry/:inquiryId     (접수 상태 조회)",
     "GET  /api/inquiry/list/all       (전체 목록 - 관리자)",
+    "GET  /api/ops-center/*           (여수 운영 컨트롤타워)",
     "GET  /"
   ].forEach(l => console.log("  - " + l));
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-});
+}
+
+function startServer(port) {
+  const server = app.listen(port, "0.0.0.0", () => {
+    printStartupBanner(port);
+  });
+
+  server.on("error", (err) => {
+    if (err.code === "EADDRINUSE" && port !== FALLBACK_PORT) {
+      console.warn(`⚠️ Port ${port} in use. Falling back to ${FALLBACK_PORT}...`);
+      startServer(FALLBACK_PORT);
+    } else {
+      console.error("❌ Server error:", err);
+      process.exit(1);
+    }
+  });
+}
+
+startServer(DEFAULT_PORT);
