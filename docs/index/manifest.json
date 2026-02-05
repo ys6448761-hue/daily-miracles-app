@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-02-05T05:45:17.268Z",
+  "generated_at": "2026-02-05T05:49:37.021Z",
   "generator": "generate-manifest.js",
-  "total_count": 139,
+  "total_count": 144,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -70,6 +70,22 @@
       "title": "OPS Bundle (운영/현장 전달용)",
       "created_at": "변경",
       "checksum": "e05ef031"
+    },
+    {
+      "id": "DOC-README",
+      "path": "docs/sales-bundle/README.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "sales-bundle",
+      "tags": [
+        "sales-bundle"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SALES Bundle (영업/확산 전달용)",
+      "created_at": "변경",
+      "checksum": "31c6ce23"
     },
     {
       "id": "DOC-tag_taxonomy",
@@ -701,6 +717,73 @@
       "title": "30일 기적 로드맵 API 문서",
       "created_at": "2026-02-05",
       "checksum": "4d39bd13"
+    },
+    {
+      "id": "DOC-01_Approval",
+      "path": "docs/sales-bundle/01_Approval.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "sales-bundle",
+      "tags": [
+        "sales-bundle",
+        "kpi"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "결재 요청서",
+      "created_at": "2026-02-05",
+      "checksum": "65ab88ea"
+    },
+    {
+      "id": "DOC-02_Pilot",
+      "path": "docs/sales-bundle/02_Pilot.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "sales-bundle",
+      "tags": [
+        "sales-bundle",
+        "kpi"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "파일럿 제안서",
+      "created_at": "2026-02-05",
+      "checksum": "93bdfdc9"
+    },
+    {
+      "id": "DOC-06_External_Sharing_Guide",
+      "path": "docs/sales-bundle/06_External_Sharing_Guide.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "sales-bundle",
+      "tags": [
+        "sales-bundle",
+        "가격"
+      ],
+      "owner": "code",
+      "status": "superseded",
+      "title": "외부 공유 가이드 및 리스크 관리",
+      "created_at": "2026-02-05",
+      "checksum": "4f4cb77d"
+    },
+    {
+      "id": "DOC-07_Sales_Cards",
+      "path": "docs/sales-bundle/07_Sales_Cards.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "sales-bundle",
+      "tags": [
+        "sales-bundle"
+      ],
+      "owner": "team",
+      "status": "superseded",
+      "title": "세일즈 카드 문구 3종",
+      "created_at": "2026-02-05",
+      "checksum": "6de9204c"
     },
     {
       "id": "DOC-GA4_SETUP_GUIDE",
