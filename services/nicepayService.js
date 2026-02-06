@@ -24,7 +24,7 @@ try {
 const NICEPAY_MID = (process.env.NICEPAY_MID || process.env.NICEPAY_CLIENT_ID || '').trim();
 const NICEPAY_MERCHANT_KEY = (process.env.NICEPAY_MERCHANT_KEY || process.env.NICEPAY_SECRET_KEY || '').trim();
 const NICEPAY_RETURN_URL = (process.env.NICEPAY_RETURN_URL || '').trim();
-const WIX_SUCCESS_URL = process.env.WIX_SUCCESS_URL || 'https://dailymiracles.kr/payment-success';
+const WIX_SUCCESS_URL = (process.env.WIX_SUCCESS_URL || 'https://dailymiracles.kr/payment-success').trim();
 
 // 나이스페이 API 베이스 URL (공식 매뉴얼: dc1-api 또는 dc2-api)
 const NICEPAY_API_BASE = 'https://dc1-api.nicepay.co.kr';
@@ -38,6 +38,7 @@ console.log('├' + '─'.repeat(58) + '┤');
 console.log(`│  NICEPAY_MID:           ${NICEPAY_MID ? `✅ ${NICEPAY_MID}` : '❌ 미설정'}`.padEnd(59) + '│');
 console.log(`│  NICEPAY_MERCHANT_KEY:  ${NICEPAY_MERCHANT_KEY ? `✅ 설정됨 (${NICEPAY_MERCHANT_KEY.length}자)` : '❌ 미설정'}`.padEnd(59) + '│');
 console.log(`│  NICEPAY_RETURN_URL:    ${NICEPAY_RETURN_URL ? '✅ ' + NICEPAY_RETURN_URL.substring(0, 30) + '...' : '❌ 미설정'}`.padEnd(59) + '│');
+console.log(`│  WIX_SUCCESS_URL:       ${WIX_SUCCESS_URL}`.padEnd(59) + '│');
 console.log(`│  NICEPAY_API_BASE:      ${NICEPAY_API_BASE}`.padEnd(59) + '│');
 console.log('└' + '─'.repeat(58) + '┘\n');
 
@@ -408,7 +409,10 @@ async function getPaymentByOrderId(orderId) {
  * Wix 성공 페이지 URL 생성
  */
 function buildWixSuccessUrl(orderId, verificationToken) {
-  return `${WIX_SUCCESS_URL}?orderId=${encodeURIComponent(orderId)}&vt=${encodeURIComponent(verificationToken)}`;
+  const url = `${WIX_SUCCESS_URL}?orderId=${encodeURIComponent(orderId)}&vt=${encodeURIComponent(verificationToken)}`;
+  console.log(`📍 [buildWixSuccessUrl] WIX_SUCCESS_URL="${WIX_SUCCESS_URL}"`);
+  console.log(`📍 [buildWixSuccessUrl] 생성된 URL="${url}"`);
+  return url;
 }
 
 /**
