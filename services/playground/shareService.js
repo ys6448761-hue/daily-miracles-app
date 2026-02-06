@@ -213,8 +213,9 @@ function hashString(str) {
 }
 
 function buildShareUrl(slug) {
-  const baseUrl = process.env.APP_BASE_URL || 'https://app.dailymiracles.kr';
-  return `${baseUrl}/s/${slug}`;
+  // 공유 랜딩은 pay 도메인으로 통일 (정적 호스팅 + OG 태그)
+  const baseUrl = process.env.SHARE_BASE_URL || 'https://pay.dailymiracles.kr';
+  return `${baseUrl}/playground/share.html?s=${slug}`;
 }
 
 module.exports = {

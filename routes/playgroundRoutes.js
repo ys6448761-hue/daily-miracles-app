@@ -32,6 +32,44 @@ router.init = function(services) {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// 게스트 유저
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * POST /api/playground/guest
+ * 게스트 유저 생성/조회
+ */
+router.post('/guest', async (req, res) => {
+  try {
+    if (!playground) {
+      return res.status(503).json({ success: false, error: 'service_unavailable' });
+    }
+
+    const guestToken = req.headers['x-guest-token'] || req.body.guest_token;
+
+    if (!playground.artifact.getOrCreateGuestUser) {
+      return res.status(501).json({ success: false, error: 'guest_not_supported' });
+    }
+
+    const guest = await playground.artifact.getOrCreateGuestUser(guestToken);
+
+    if (!guest) {
+      return res.status(500).json({ success: false, error: 'guest_creation_failed' });
+    }
+
+    res.json({
+      success: true,
+      user_id: guest.user_id,
+      guest_token: guest.guest_token,
+      new_user: guest.new
+    });
+  } catch (error) {
+    console.error('[Playground] 게스트 생성 실패:', error);
+    res.status(500).json({ success: false, error: 'server_error' });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
 // 아티팩트 CRUD
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -45,10 +83,25 @@ router.post('/artifacts', async (req, res) => {
       return res.status(503).json({ success: false, error: 'service_unavailable' });
     }
 
-    const { user_id, type, visibility, content_json, tags_json, parent_id, status } = req.body;
+    let { user_id, type, visibility, content_json, tags_json, parent_id, status } = req.body;
+    const guestToken = req.headers['x-guest-token'] || req.cookies?.playground_guest;
+
+    // user_id가 없으면 게스트 유저 생성/조회
+    if (!user_id && playground.artifact.getOrCreateGuestUser) {
+      try {
+        const guest = await playground.artifact.getOrCreateGuestUser(guestToken);
+        if (guest) {
+          user_id = guest.user_id;
+          // 응답 헤더에 게스트 토큰 설정
+          res.setHeader('X-Guest-Token', guest.guest_token);
+        }
+      } catch (guestErr) {
+        console.warn('[Playground] 게스트 유저 생성 실패:', guestErr.message);
+      }
+    }
 
     if (!user_id) {
-      return res.status(400).json({ success: false, error: 'user_id required' });
+      return res.status(400).json({ success: false, error: 'user_id required (or provide X-Guest-Token header)' });
     }
 
     if (!content_json) {

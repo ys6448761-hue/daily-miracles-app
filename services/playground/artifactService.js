@@ -7,8 +7,40 @@
  */
 
 const scoreService = require('./scoreService');
+const crypto = require('crypto');
 
 let db = null;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 게스트 유저 생성/조회 (user_id 하드코딩 방지)
+// ═══════════════════════════════════════════════════════════════════════════
+async function getOrCreateGuestUser(guestToken) {
+  if (!db) return null;
+
+  // 토큰이 없으면 새로 생성
+  if (!guestToken) {
+    guestToken = 'guest_' + crypto.randomBytes(16).toString('hex');
+  }
+
+  // 기존 게스트 조회
+  const existing = await db.query(
+    'SELECT user_id FROM playground_users WHERE external_id = $1',
+    [guestToken]
+  );
+
+  if (existing.rows.length > 0) {
+    return { user_id: existing.rows[0].user_id, guest_token: guestToken, new: false };
+  }
+
+  // 새 게스트 생성
+  const result = await db.query(`
+    INSERT INTO playground_users (external_id, locale)
+    VALUES ($1, 'ko')
+    RETURNING user_id
+  `, [guestToken]);
+
+  return { user_id: result.rows[0].user_id, guest_token: guestToken, new: true };
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 필수 필드 검증
@@ -327,6 +359,7 @@ module.exports = {
   addReaction,
   removeReaction,
   getRemixTree,
+  getOrCreateGuestUser,
   REQUIRED_FIELDS,
   VALID_REALITY_TAGS
 };

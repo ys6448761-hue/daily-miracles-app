@@ -244,6 +244,14 @@
     setupCounter('one_step', 'step_count');
     setupCounter('blessing_line', 'blessing_count');
 
+    // 게스트 토큰 관리
+    function getGuestToken() {
+      return localStorage.getItem('playground_guest_token') || '';
+    }
+    function setGuestToken(token) {
+      if (token) localStorage.setItem('playground_guest_token', token);
+    }
+
     // 제출
     document.getElementById('submit_btn').addEventListener('click', async () => {
       const btn = document.getElementById('submit_btn');
@@ -271,24 +279,27 @@
       btn.textContent = '만드는 중...';
 
       try {
-        // TODO: 실제 user_id는 인증 후 설정
-        const userId = localStorage.getItem('playground_user_id') || 1;
+        const headers = { 'Content-Type': 'application/json' };
+        const guestToken = getGuestToken();
+        if (guestToken) headers['X-Guest-Token'] = guestToken;
 
         const res = await fetch('/api/playground/artifacts', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: headers,
           body: JSON.stringify({
-            user_id: parseInt(userId),
             type: 'wish_card',
             visibility: 'public',
             content_json: content_json
           })
         });
 
+        // 게스트 토큰 저장
+        const newToken = res.headers.get('X-Guest-Token');
+        if (newToken) setGuestToken(newToken);
+
         const data = await res.json();
 
         if (data.success) {
-          // 결과 페이지로 이동
           window.location.href = `/playground/result.html?id=${data.artifact_id}`;
         } else {
           throw new Error(data.errors?.join(', ') || data.error || '생성 실패');

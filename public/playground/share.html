@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>소원카드 | 소원놀이터</title>
+
+  <!-- OG 태그 (동적 업데이트) -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" id="og_title" content="소원카드 | 소원놀이터">
+  <meta property="og:description" id="og_desc" content="따뜻한 마음을 나눠요">
+  <meta property="og:image" content="https://dailymiracles.kr/og-image-playground.png">
+  <meta property="og:url" id="og_url" content="">
+
+  <!-- 카카오톡 미리보기 -->
+  <meta property="kakao:title" id="kakao_title" content="소원카드">
+  <meta property="kakao:description" id="kakao_desc" content="따뜻한 마음을 나눠요">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      background: linear-gradient(135deg, #FFF5F7 0%, #F5E6FF 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 500px; margin: 0 auto; }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .brand-logo {
+      font-size: 14px;
+      color: #9B87F5;
+      font-weight: 600;
+    }
+
+    .wish-card {
+      background: white;
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 8px 30px rgba(155, 135, 245, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    .wish-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #9B87F5, #F5A7C6);
+    }
+
+    .grade-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .grade-S { background: linear-gradient(135deg, #FFD700, #FFA500); color: white; }
+    .grade-A { background: #9B87F5; color: white; }
+    .grade-B { background: #6E59A5; color: white; }
+    .grade-C { background: #999; color: white; }
+
+    .heart-line {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .reality-hint {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 20px;
+      padding-left: 12px;
+      border-left: 3px solid #E5E0F5;
+    }
+    .one-step {
+      background: linear-gradient(135deg, #F5E6FF 0%, #FFF5F7 100%);
+      padding: 16px;
+      border-radius: 14px;
+      margin-bottom: 16px;
+    }
+    .one-step-label {
+      font-size: 12px;
+      color: #9B87F5;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .one-step-text {
+      font-size: 15px;
+      color: #333;
+    }
+    .blessing {
+      background: #FFF5F7;
+      padding: 16px;
+      border-radius: 14px;
+      text-align: center;
+    }
+    .blessing-text {
+      font-size: 15px;
+      color: #F5A7C6;
+      font-style: italic;
+    }
+    .tag-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: #F5E6FF;
+      color: #9B87F5;
+      border-radius: 12px;
+      font-size: 12px;
+      margin-top: 16px;
+    }
+
+    .cta {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .cta-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .cta-btn:hover { transform: translateY(-2px); }
+    .cta-primary {
+      background: linear-gradient(135deg, #9B87F5, #6E59A5);
+      color: white;
+    }
+    .cta-secondary {
+      background: white;
+      border: 2px solid #9B87F5;
+      color: #9B87F5;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 60px;
+      color: #999;
+    }
+    .error {
+      background: #FEE;
+      color: #C00;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="brand">
+      <span class="brand-logo">소원놀이터</span>
+    </div>
+
+    <div id="content">
+      <div class="loading">카드를 불러오는 중...</div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const shareSlug = params.get('s');
+
+    if (!shareSlug) {
+      document.getElementById('content').innerHTML = '<div class="error">공유 링크가 올바르지 않습니다.</div>';
+    } else {
+      loadSharedCard();
+    }
+
+    async function loadSharedCard() {
+      try {
+        const res = await fetch(`/api/playground/s/${shareSlug}`);
+        const data = await res.json();
+
+        if (!data.success) {
+          throw new Error(data.message || data.error || '카드를 찾을 수 없습니다');
+        }
+
+        renderCard(data.artifact, data.og);
+        updateOGTags(data.og);
+      } catch (err) {
+        document.getElementById('content').innerHTML = `<div class="error">${err.message}</div>`;
+      }
+    }
+
+    function renderCard(artifact, og) {
+      const content = artifact.content_json || {};
+      const grade = artifact.grade || 'B';
+
+      const html = `
+        <div class="wish-card">
+          <span class="grade-badge grade-${grade}">${grade}등급</span>
+          <div class="heart-line">${escapeHtml(content.heart_line)}</div>
+          <div class="reality-hint">${escapeHtml(content.reality_hint)}</div>
+
+          <div class="one-step">
+            <div class="one-step-label">오늘의 한 걸음</div>
+            <div class="one-step-text">${escapeHtml(content.one_step)}</div>
+          </div>
+
+          <div class="blessing">
+            <div class="blessing-text">"${escapeHtml(content.blessing_line)}"</div>
+          </div>
+
+          <div class="tag-badge">#${content.reality_tag || 'self'}</div>
+        </div>
+
+        <div class="cta">
+          <a href="/playground/remix.html?parent=${artifact.artifact_id}" class="cta-btn cta-primary">
+            나도 내 버전으로 만들기
+          </a>
+          <a href="/playground/" class="cta-btn cta-secondary">
+            소원놀이터 구경하기
+          </a>
+        </div>
+      `;
+
+      document.getElementById('content').innerHTML = html;
+    }
+
+    function updateOGTags(og) {
+      if (!og) return;
+      document.getElementById('og_title').content = og.title;
+      document.getElementById('og_desc').content = og.description;
+      document.getElementById('og_url').content = og.url;
+      document.getElementById('kakao_title').content = og.title;
+      document.getElementById('kakao_desc').content = og.description;
+      document.title = og.title + ' | 소원놀이터';
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+  </script>
+</body>
+</html>
