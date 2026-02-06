@@ -1,0 +1,62 @@
+name: AIL Gate
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  ail-check:
+    name: AIL Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check AIL Section in PR Body
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prBody = context.payload.pull_request.body || '';
+
+            // AIL 섹션 존재 여부 체크
+            const hasAilSection = prBody.includes('[AIL]') ||
+                                  prBody.includes('AIL:') ||
+                                  prBody.includes('```ail');
+
+            // Source ID 존재 여부 체크
+            const hasSourceId = prBody.includes('Issue #') ||
+                                prBody.includes('외부 티켓:') ||
+                                /Source ID/i.test(prBody);
+
+            console.log('='.repeat(50));
+            console.log('AIL Gate 검사 결과');
+            console.log('='.repeat(50));
+            console.log(`AIL 섹션 존재: ${hasAilSection ? '✅' : '❌'}`);
+            console.log(`Source ID 존재: ${hasSourceId ? '✅' : '❌'}`);
+            console.log('-'.repeat(50));
+
+            if (!hasAilSection) {
+              core.setFailed(`
+            ❌ AIL Gate 실패
+
+            PR 본문에 [AIL] 섹션이 없습니다.
+            PR 템플릿을 사용해 [AIL] 섹션을 작성해주세요.
+
+            필수 조건:
+            1. [AIL] 섹션 또는 \`\`\`ail 코드블록 포함
+            2. Source ID (Issue # 또는 외부 티켓) 명시
+
+            예시:
+            ## [AIL] 지시서
+            \`\`\`ail
+            [CONTEXT]
+            - 배경: ...
+            [INSTRUCTION]
+            1. ...
+            \`\`\`
+              `);
+              return;
+            }
+
+            if (!hasSourceId) {
+              core.warning('⚠️ Source ID가 명시되지 않았습니다. 권장: Issue # 또는 외부 티켓 ID를 명시해주세요.');
+            }
+
+            console.log('✅ AIL Gate 통과!');
