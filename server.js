@@ -668,6 +668,12 @@ app.get("/api/health", async (req, res) => {
 
   const rulesMeta = req.app.get('rulesSnapshot');
 
+  // Playground DB 상태 확인 (AIL-510)
+  let playgroundDbStatus = "not_configured";
+  if (playgroundEngine && process.env.DATABASE_URL) {
+    playgroundDbStatus = "configured";
+  }
+
   res.json({
     success: true,
     service: "daily-miracles-mvp",
@@ -677,6 +683,7 @@ app.get("/api/health", async (req, res) => {
     env_port: process.env.PORT || null,
     timestamp: new Date().toISOString(),
     database: dbStatus,
+    playground_db: playgroundDbStatus,
     version: "v3.0-debug",
     rules: rulesMeta ? {
       version: rulesMeta.versions?.mice?.version || null,
@@ -688,7 +695,8 @@ app.get("/api/health", async (req, res) => {
     modules: {
       yeosuRoutes: yeosuRoutes !== null,
       db: db !== null,
-      metrics: metricsService !== null
+      metrics: metricsService !== null,
+      playground: playgroundEngine !== null
     }
   });
 });
@@ -1397,6 +1405,21 @@ if (liveCounterRoutes) {
 }
 
 // ---------- 소원놀이터 Routes (/api/playground/*) ----------
+// AIL-510/511: 도메인 SSOT - Playground는 app 도메인 전용
+// pay.dailymiracles.kr에서 Playground API 요청 시 안내 메시지 반환
+app.use('/api/playground', (req, res, next) => {
+  const host = req.get('host') || '';
+  if (host.includes('pay.dailymiracles.kr')) {
+    return res.status(400).json({
+      success: false,
+      error: 'wrong_domain',
+      message: 'Playground API는 app.dailymiracles.kr에서 사용하세요.',
+      redirect: `https://app.dailymiracles.kr${req.originalUrl}`
+    });
+  }
+  next();
+});
+
 if (playgroundRoutes && playgroundEngine) {
   // DB 연결 시 서비스 초기화
   if (process.env.DATABASE_URL) {
