@@ -1691,6 +1691,7 @@ function printStartupBanner(port) {
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   console.log(`📡 Port: ${port}`);
   console.log(`🌍 ALLOWED_ORIGINS: ${allowedOrigins.join(", ") || "(none→allow all in dev)"}`);
+  console.log(`💳 WIX_SUCCESS_URL (runtime): ${process.env.WIX_SUCCESS_URL || '(미설정→기본값 사용)'}`);
   console.log("📋 Registered Routes:");
   [
     "GET  /api/health",

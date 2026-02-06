@@ -193,7 +193,7 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
 
   } catch (error) {
     console.error('❌ 결제 콜백 처리 실패:', error);
-    res.redirect(`${nicepayService?.WIX_SUCCESS_URL || 'https://dailymiracles.kr/payment-success'}?error=SYSTEM_ERROR`);
+    res.redirect(`${nicepayService?.WIX_SUCCESS_URL || 'https://pay.dailymiracles.kr/payment-success.html'}?error=SYSTEM_ERROR`);
   }
 });
 
