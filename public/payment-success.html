@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>결제 완료 | 하루하루의 기적</title>
+  <style>
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #fff; color: #111; }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 48px 20px; }
+    h1 { font-size: 28px; margin: 0 0 20px; }
+    .card { border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,.04); }
+    .title { font-size: 20px; font-weight: 700; margin: 0; }
+    .sub { margin: 8px 0 0; font-size: 14px; color: #4b5563; }
+    .info { margin-top: 16px; background: #f9fafb; border-radius: 12px; padding: 14px; }
+    .row { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid #eef2f7; }
+    .row:last-child { border-bottom: 0; }
+    .label { color: #6b7280; font-size: 13px; }
+    .value { font-size: 13px; text-align: right; word-break: break-all; }
+    .badge-ok { font-weight: 700; color: #047857; }
+    .badge-warn { font-weight: 700; color: #b45309; }
+    .badge-err { font-weight: 700; color: #b91c1c; }
+    .hint { margin-top: 12px; font-size: 12px; color: #6b7280; }
+    .btns { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 10px; }
+    .btn { border-radius: 12px; padding: 12px 14px; font-size: 14px; font-weight: 700; cursor: pointer; border: 1px solid #d1d5db; background: #fff; }
+    .btn.primary { background: #111; color: #fff; border-color: #111; }
+    .muted { color: #6b7280; }
+    .loader { display: inline-block; width: 10px; height: 10px; border: 2px solid #e5e7eb; border-top: 2px solid #111; border-radius: 999px; animation: spin 1s linear infinite; margin-right: 6px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    code { background: #f3f4f6; padding: 2px 6px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>결제정보</h1>
+
+    <section class="card" id="card">
+      <p class="title" id="headline"><span class="loader"></span>결제 확인 중입니다…</p>
+      <p class="sub" id="subtitle">잠시만 기다려 주세요.</p>
+
+      <div class="info" id="info" style="display:none;">
+        <div class="row"><div class="label">주문번호</div><div class="value" id="v_orderId">-</div></div>
+        <div class="row"><div class="label">결제 금액</div><div class="value" id="v_amount">-</div></div>
+        <div class="row"><div class="label">결제 수단</div><div class="value" id="v_method">-</div></div>
+        <div class="row"><div class="label">결제 일시</div><div class="value" id="v_paidAt">-</div></div>
+        <div class="row"><div class="label">상태</div><div class="value" id="v_status">-</div></div>
+      </div>
+
+      <p class="hint" id="hint" style="display:none;">
+        ※ 본 결제는 정상 승인되었습니다. 문제가 있을 경우 고객센터로 문의해 주세요.
+      </p>
+
+      <div class="btns" id="btns" style="display:none;">
+        <button class="btn primary" id="btnStart">프로그램 바로 시작하기</button>
+        <button class="btn" id="btnMy">나의 기적 아카이브</button>
+        <button class="btn" id="btnHome">홈으로</button>
+        <button class="btn" id="btnRetry" style="display:none;">다시 확인하기</button>
+      </div>
+
+      <p class="hint muted" id="debug" style="display:none;"></p>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const qs = new URLSearchParams(location.search);
+      const orderId = qs.get("orderId") || "";
+      const vt = qs.get("vt") || "";
+
+      const headline = document.getElementById("headline");
+      const subtitle = document.getElementById("subtitle");
+      const info = document.getElementById("info");
+      const hint = document.getElementById("hint");
+      const btns = document.getElementById("btns");
+      const debug = document.getElementById("debug");
+
+      const v_orderId = document.getElementById("v_orderId");
+      const v_amount = document.getElementById("v_amount");
+      const v_method = document.getElementById("v_method");
+      const v_paidAt = document.getElementById("v_paidAt");
+      const v_status = document.getElementById("v_status");
+
+      const btnStart = document.getElementById("btnStart");
+      const btnMy = document.getElementById("btnMy");
+      const btnHome = document.getElementById("btnHome");
+      const btnRetry = document.getElementById("btnRetry");
+
+      function formatKRW(n) {
+        if (typeof n !== "number") return "-";
+        return new Intl.NumberFormat("ko-KR").format(n) + "원";
+      }
+
+      function formatDate(dateStr) {
+        if (!dateStr) return "-";
+        try {
+          const d = new Date(dateStr);
+          return d.toLocaleString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+        } catch {
+          return dateStr;
+        }
+      }
+
+      function setRows(payment) {
+        v_orderId.textContent = payment.orderId || orderId || "-";
+        v_amount.textContent = formatKRW(payment.amount);
+        v_method.textContent = payment.cardName ? payment.cardName + " " + (payment.cardNo || "") : "카드";
+        v_paidAt.textContent = formatDate(payment.paidAt);
+      }
+
+      function showBaseUI() {
+        info.style.display = "block";
+        btns.style.display = "flex";
+      }
+
+      function showPaid(payment) {
+        headline.textContent = "결제가 완료되었습니다 🎉";
+        subtitle.textContent = "하루하루의 기적에 참여해 주셔서 감사합니다.";
+        showBaseUI();
+        setRows(payment);
+        v_status.innerHTML = '<span class="badge-ok">결제 완료</span>';
+        hint.style.display = "block";
+        btnRetry.style.display = "none";
+      }
+
+      function showNotPaid(payment, message) {
+        headline.textContent = "결제 상태 확인이 필요합니다";
+        subtitle.textContent = message || "결제 정보를 확인할 수 없습니다. 고객센터로 문의해 주세요.";
+        showBaseUI();
+        setRows(payment || {});
+        const st = (payment && payment.status) ? payment.status : "UNKNOWN";
+        v_status.innerHTML = '<span class="badge-warn">' + st + '</span>';
+        hint.style.display = "none";
+        btnRetry.style.display = "inline-block";
+      }
+
+      function showError(msg) {
+        headline.textContent = "결제 확인 불가";
+        subtitle.textContent = msg || "결제 정보를 확인할 수 없습니다. 고객센터로 문의해 주세요.";
+        showBaseUI();
+        v_orderId.textContent = orderId || "-";
+        v_amount.textContent = "-";
+        v_method.textContent = "-";
+        v_paidAt.textContent = "-";
+        v_status.innerHTML = '<span class="badge-err">UNKNOWN</span>';
+        hint.style.display = "none";
+        btnRetry.style.display = "inline-block";
+      }
+
+      // 버튼 이동 (원하는 경로로 수정 가능)
+      btnStart.addEventListener("click", function() { location.href = "/program-success.html"; });
+      btnMy.addEventListener("click", function() { location.href = "https://dailymiracles.kr"; });
+      btnHome.addEventListener("click", function() { location.href = "https://dailymiracles.kr"; });
+      btnRetry.addEventListener("click", function() { location.reload(); });
+
+      // 1) 파라미터 체크
+      if (!orderId || !vt) {
+        showError("결제 확인 정보(orderId/vt)가 없습니다.");
+        return;
+      }
+
+      // 2) verify API 호출
+      // API 응답 형식: { success: true, payment: { orderId, amount, status, paidAt, cardName, cardNo, goodsName } }
+      var url = "/api/payments/verify?orderId=" + encodeURIComponent(orderId) + "&vt=" + encodeURIComponent(vt);
+
+      fetch(url, { method: "GET", headers: { "Accept": "application/json" } })
+        .then(function(res) {
+          return res.json();
+        })
+        .then(function(json) {
+          console.log("[verify] response:", json);
+
+          if (!json) {
+            throw new Error("verify 응답 파싱 실패");
+          }
+
+          // API 응답: { success: true/false, payment: {...} } 또는 { success: false, error, message }
+          if (json.success === true && json.payment) {
+            var payment = json.payment;
+            if (payment.status === "PAID") {
+              showPaid(payment);
+            } else {
+              showNotPaid(payment, "결제 상태: " + payment.status);
+            }
+          } else {
+            showError(json.message || "결제 확인에 실패했습니다.");
+          }
+        })
+        .catch(function(err) {
+          console.error("[verify] error:", err);
+          showError("결제 확인 중 네트워크 오류가 발생했습니다.");
+        });
+    })();
+  </script>
+</body>
+</html>
