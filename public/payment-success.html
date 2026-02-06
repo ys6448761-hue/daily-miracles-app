@@ -145,10 +145,10 @@
         btnRetry.style.display = "inline-block";
       }
 
-      // 버튼 이동
-      btnStart.addEventListener("click", function() { location.href = "https://dailymiracles.kr/"; });
+      // 버튼 이동 (purchased=1로 배너 표시)
+      btnStart.addEventListener("click", function() { location.href = "https://dailymiracles.kr/?purchased=1"; });
       btnMy.addEventListener("click", function() { location.href = "https://www.dailymiracles.kr/about-1-4"; });
-      btnHome.addEventListener("click", function() { location.href = "https://dailymiracles.kr/"; });
+      btnHome.addEventListener("click", function() { location.href = "https://dailymiracles.kr/?purchased=1"; });
       btnRetry.addEventListener("click", function() { location.reload(); });
 
       // 1) 파라미터 체크
