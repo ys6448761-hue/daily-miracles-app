@@ -13,6 +13,7 @@
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
     "DOC-DEC-20260201-포인트추천예고편-정책구현",
     "DOC-index",
+    "DOC-playground-events",
     "DOC-GROWTH-ROADMAP",
     "DOC-JUDGE_PROMPTS",
     "DOC-README",
@@ -335,6 +336,9 @@
     "DOC-05_Deal_Registration",
     "DOC-INTEGRATION_GUIDE",
     "DOC-README"
+  ],
+  "events": [
+    "DOC-playground-events"
   ],
   "kpi": [
     "DOC-JUDGE_PROMPTS",
