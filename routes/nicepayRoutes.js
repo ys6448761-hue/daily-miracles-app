@@ -102,6 +102,7 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
       AuthResultCode,
       AuthResultMsg,
       TID,
+      TxTid,  // 웹표준 결제에서 실제 TID는 TxTid로 전달됨
       MID,
       Moid,
       Amt,
@@ -110,6 +111,10 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
       NextAppURL,
       NetCancelURL
     } = req.body;
+
+    // TID 결정: TxTid 우선, 없으면 TID 사용
+    const actualTID = TxTid || TID;
+    console.log(`📌 TID 결정: TxTid="${TxTid}", TID="${TID}" → 사용할 TID: "${actualTID}"`);
 
     if (!nicepayService) {
       return res.status(503).send('결제 서비스를 사용할 수 없습니다');
@@ -159,7 +164,7 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
     // 승인용 SignData: SHA256(AuthToken + MID + Amt + EdiDate + MerchantKey)
     const { ediDate, signData } = nicepayService.regenerateSignData(Amt, AuthToken);
     const approvalResult = await nicepayService.requestApproval(
-      AuthToken, Amt, ediDate, signData, Moid, TID
+      AuthToken, Amt, ediDate, signData, Moid, actualTID  // TxTid 사용
     );
 
     // 5. 승인 결과 처리
