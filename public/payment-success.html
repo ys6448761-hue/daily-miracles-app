@@ -145,8 +145,12 @@
         btnRetry.style.display = "inline-block";
       }
 
-      // 버튼 이동 (purchased=1로 배너 표시)
-      btnStart.addEventListener("click", function() { location.href = "https://dailymiracles.kr/?purchased=1"; });
+      // 버튼 이동
+      // btnStart: 앱으로 직행 (orderId, vt 쿼리 전달)
+      btnStart.addEventListener("click", function() {
+        var appUrl = "https://app.dailymiracles.kr/" + location.search;
+        location.href = appUrl;
+      });
       btnMy.addEventListener("click", function() { location.href = "https://www.dailymiracles.kr/about-1-4"; });
       btnHome.addEventListener("click", function() { location.href = "https://dailymiracles.kr/?purchased=1"; });
       btnRetry.addEventListener("click", function() { location.reload(); });
@@ -189,6 +193,37 @@
           showError("결제 확인 중 네트워크 오류가 발생했습니다.");
         });
     })();
+  </script>
+
+  <!-- 앱 직행 오버라이드 (캡처링 단계) -->
+  <script>
+  (function () {
+    var APP_URL = "https://app.dailymiracles.kr/";
+    var qs = window.location.search || "";
+
+    function forceToApp(e) {
+      try { e.preventDefault(); } catch (_) {}
+      try { e.stopPropagation(); } catch (_) {}
+      window.location.href = APP_URL + qs;
+    }
+
+    // ID 기반 바인딩 (캡처링 = true)
+    var btnStart = document.getElementById("btnStart");
+    if (btnStart) {
+      btnStart.addEventListener("click", forceToApp, true);
+    } else {
+      // Fallback: 텍스트로 탐색
+      var candidates = Array.from(document.querySelectorAll("button, a"));
+      var startEl = candidates.find(function(el) {
+        return (el.innerText || "").trim() === "프로그램 바로 시작하기";
+      });
+      if (startEl) {
+        startEl.addEventListener("click", forceToApp, true);
+      } else {
+        console.warn("[payment-success] start button not found");
+      }
+    }
+  })();
   </script>
 </body>
 </html>
