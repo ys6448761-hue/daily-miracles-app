@@ -189,9 +189,9 @@ const ShareCardGenerator = {
         ctx.textAlign = 'center';
         ctx.fillStyle = this.colors.deep;
 
-        // "My Miracle Index" 텍스트
+        // 타이틀 텍스트 (철학 반영: 과학적 근거 강조)
         ctx.font = `300 ${width * 0.035}px "Cormorant Garamond", Georgia, serif`;
-        ctx.fillText('My Miracle Index', width / 2, height * 0.28);
+        ctx.fillText('AI 가능성 분석', width / 2, height * 0.28);
 
         // 기적지수 원형 디스플레이
         const circleY = height * 0.5;
@@ -230,16 +230,23 @@ const ShareCardGenerator = {
         ctx.font = `800 ${width * 0.12}px "Playfair Display", Georgia, serif`;
         ctx.fillText(miracleIndex.toString(), width / 2, circleY + width * 0.04);
 
-        // "점" 라벨
+        // "%" 라벨 (철학 반영: 가능성 퍼센트로 표현)
         ctx.font = `400 ${width * 0.025}px "Noto Sans KR", sans-serif`;
-        ctx.fillText('점', width / 2, circleY + width * 0.09);
+        ctx.fillText('%', width / 2, circleY + width * 0.09);
 
         // 사용자 이름 (있을 경우)
         if (userName) {
             ctx.fillStyle = this.colors.deep;
             ctx.font = `600 ${width * 0.04}px "Noto Sans KR", sans-serif`;
-            ctx.fillText(`${userName}님의 기적 지수`, width / 2, height * 0.72);
+            ctx.fillText(`AI가 분석한 ${userName}님의 가능성`, width / 2, height * 0.72);
         }
+
+        // 과학적 근거 문구 (철학 DoD 반영)
+        ctx.fillStyle = this.colors.accent;
+        ctx.globalAlpha = 0.8;
+        ctx.font = `400 ${width * 0.022}px "Noto Sans KR", sans-serif`;
+        ctx.fillText('5,000명의 데이터가 알려준 과학적 실현 확률', width / 2, height * 0.76);
+        ctx.globalAlpha = 1;
 
         // 응원 메시지
         const encouragement = this.getEncouragement(miracleIndex);
@@ -320,11 +327,11 @@ const ShareCardGenerator = {
         ctx.fillStyle = btnGradient;
         ctx.fill();
 
-        // CTA 텍스트
+        // CTA 텍스트 (철학 DoD: "무료" + "AI" 키워드 포함)
         ctx.fillStyle = this.colors.white;
         ctx.font = `600 ${width * 0.028}px "Noto Sans KR", sans-serif`;
         ctx.textAlign = 'center';
-        ctx.fillText('나도 기적지수 측정하기 →', width / 2, btnY + btnHeight * 0.65);
+        ctx.fillText('나의 가능성 무료 AI 분석 →', width / 2, btnY + btnHeight * 0.65);
     },
 
     /**
@@ -552,8 +559,8 @@ const ShareCardGenerator = {
                             window.Kakao.Share.sendDefault({
                                 objectType: 'feed',
                                 content: {
-                                    title: `내 기적지수는 ${data.miracleIndex}점!`,
-                                    description: '당신의 기적지수는 몇 점인가요?',
+                                    title: `AI가 분석한 나의 가능성 ${data.miracleIndex}%`,
+                                    description: '5,000명의 데이터 기반 과학적 실현 확률 분석',
                                     imageUrl: imageData,
                                     link: {
                                         mobileWebUrl: 'https://dailymiracles.kr/questions.html',
@@ -561,7 +568,7 @@ const ShareCardGenerator = {
                                     }
                                 },
                                 buttons: [{
-                                    title: '나도 측정하기',
+                                    title: '나의 가능성 무료 AI 분석',
                                     link: {
                                         mobileWebUrl: 'https://dailymiracles.kr/questions.html',
                                         webUrl: 'https://dailymiracles.kr/questions.html'

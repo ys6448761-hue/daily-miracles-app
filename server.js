@@ -1330,13 +1330,26 @@ if (yeosuOpsRoutes) {
 // ---------- 소원 추적 시스템 Routes (/api/wish-tracking/*) - 바이럴 루프 #2 ----------
 if (wishTrackingRoutes) {
   // 서비스 초기화 (DB 연결 시)
-  if (pool) {
-    const WishTrackingService = require("./services/wishTrackingService");
-    const trackingService = new WishTrackingService(pool);
-    wishTrackingRoutes.init({
-      trackingService,
-      messageProvider: messageProvider || null
-    });
+  if (process.env.DATABASE_URL) {
+    try {
+      const { Pool } = require("pg");
+      const trackingPool = new Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: process.env.DATABASE_URL.includes('localhost') ? false : { rejectUnauthorized: false }
+      });
+      const WishTrackingService = require("./services/wishTrackingService");
+      const trackingService = new WishTrackingService(trackingPool);
+      wishTrackingRoutes.init({
+        trackingService,
+        messageProvider: messageProvider || null
+      });
+      console.log("✅ 소원 추적 서비스 DB 연결 완료");
+    } catch (err) {
+      console.warn("⚠️ 소원 추적 서비스 DB 연결 실패:", err.message);
+      wishTrackingRoutes.init({ trackingService: null, messageProvider: null });
+    }
+  } else {
+    wishTrackingRoutes.init({ trackingService: null, messageProvider: null });
   }
   app.use("/api/wish-tracking", wishTrackingRoutes);
   console.log("✅ 소원 추적 시스템 라우터 등록 완료 (/api/wish-tracking)");
@@ -1346,11 +1359,22 @@ if (wishTrackingRoutes) {
 
 // ---------- 실시간 카운터 Routes (/api/live/*) - 바이럴 루프 #4: 네트워크 효과 ----------
 if (liveCounterRoutes) {
-  // 서비스 초기화
-  if (pool) {
-    const LiveCounterService = require("./services/liveCounterService");
-    const counterService = new LiveCounterService(pool);
-    liveCounterRoutes.init(counterService);
+  // 서비스 초기화 (DB 없어도 기본 기능 제공)
+  if (process.env.DATABASE_URL) {
+    try {
+      const { Pool } = require("pg");
+      const counterPool = new Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: process.env.DATABASE_URL.includes('localhost') ? false : { rejectUnauthorized: false }
+      });
+      const LiveCounterService = require("./services/liveCounterService");
+      const counterService = new LiveCounterService(counterPool);
+      liveCounterRoutes.init(counterService);
+      console.log("✅ 실시간 카운터 서비스 DB 연결 완료");
+    } catch (err) {
+      console.warn("⚠️ 실시간 카운터 서비스 DB 연결 실패:", err.message);
+      liveCounterRoutes.init(null);
+    }
   } else {
     liveCounterRoutes.init(null); // DB 없이도 기본 기능 제공
   }

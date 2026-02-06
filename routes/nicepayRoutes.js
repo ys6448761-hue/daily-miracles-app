@@ -74,10 +74,29 @@ router.get('/pay', async (req, res) => {
 /**
  * POST /nicepay/return
  * 나이스페이 인증 결과 콜백 (인증결제 웹)
+ *
+ * [NicePay 지원팀용 상세 로그 포함]
  */
 router.post('/nicepay/return', express.urlencoded({ extended: true }), async (req, res) => {
   try {
-    console.log('📥 나이스페이 콜백 수신:', JSON.stringify(req.body, null, 2));
+    // ═══════════════════════════════════════════════════════════
+    // [NicePay 지원팀용] 인증 콜백 상세 로그
+    // ═══════════════════════════════════════════════════════════
+    console.log('\n' + '═'.repeat(60));
+    console.log('📥 [NicePay 인증 콜백] 수신');
+    console.log('═'.repeat(60));
+    console.log(`📅 수신 시각: ${new Date().toISOString()}`);
+    console.log(`📋 콜백 파라미터:`);
+    console.log(`   - AuthResultCode: ${req.body.AuthResultCode}`);
+    console.log(`   - AuthResultMsg: ${req.body.AuthResultMsg}`);
+    console.log(`   - TID: ${req.body.TID}`);
+    console.log(`   - MID: ${req.body.MID}`);
+    console.log(`   - Moid: ${req.body.Moid}`);
+    console.log(`   - Amt: ${req.body.Amt}`);
+    console.log(`   - AuthToken: ${req.body.AuthToken?.substring(0, 30)}...`);
+    console.log(`   - Signature: ${req.body.Signature?.substring(0, 30)}...`);
+    console.log(`   - NextAppURL: ${req.body.NextAppURL}`);
+    console.log('─'.repeat(60));
 
     const {
       AuthResultCode,
@@ -142,16 +161,27 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
     );
 
     // 5. 승인 결과 처리
+    console.log('─'.repeat(60));
+    console.log('📊 [승인 결과 처리]');
+    console.log(`   - ResultCode: ${approvalResult.ResultCode}`);
+    console.log(`   - ResultMsg: ${approvalResult.ResultMsg}`);
+
     if (approvalResult.ResultCode === '0000' || approvalResult.ResultCode === '3001') {
       // 성공 (3001 = 이미 승인됨)
+      console.log(`✅ 승인 성공! (${approvalResult.ResultCode})`);
       await nicepayService.updatePaymentStatus(Moid, 'PAID', approvalResult);
       const successUrl = nicepayService.buildWixSuccessUrl(Moid, payment.verification_token);
-      console.log(`✅ 결제 완료! Redirect: ${successUrl}`);
+      console.log(`🔗 Redirect URL: ${successUrl}`);
+      console.log('═'.repeat(60) + '\n');
       return res.redirect(successUrl);
     } else {
       // 승인 실패
+      console.log(`❌ 승인 실패: ${approvalResult.ResultCode} - ${approvalResult.ResultMsg}`);
       await nicepayService.updatePaymentStatus(Moid, 'FAILED', approvalResult);
-      return res.redirect(`${nicepayService.WIX_SUCCESS_URL}?error=APPROVAL_FAILED&code=${approvalResult.ResultCode}`);
+      const errorUrl = `${nicepayService.WIX_SUCCESS_URL}?error=APPROVAL_FAILED&code=${approvalResult.ResultCode}&msg=${encodeURIComponent(approvalResult.ResultMsg || '')}`;
+      console.log(`🔗 Error Redirect: ${errorUrl}`);
+      console.log('═'.repeat(60) + '\n');
+      return res.redirect(errorUrl);
     }
 
   } catch (error) {

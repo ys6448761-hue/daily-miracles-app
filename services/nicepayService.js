@@ -21,13 +21,25 @@ try {
 }
 
 // 환경변수 (인증결제 웹용)
-const NICEPAY_MID = process.env.NICEPAY_MID || process.env.NICEPAY_CLIENT_ID || '';
-const NICEPAY_MERCHANT_KEY = process.env.NICEPAY_MERCHANT_KEY || process.env.NICEPAY_SECRET_KEY || '';
-const NICEPAY_RETURN_URL = process.env.NICEPAY_RETURN_URL || '';
+const NICEPAY_MID = (process.env.NICEPAY_MID || process.env.NICEPAY_CLIENT_ID || '').trim();
+const NICEPAY_MERCHANT_KEY = (process.env.NICEPAY_MERCHANT_KEY || process.env.NICEPAY_SECRET_KEY || '').trim();
+const NICEPAY_RETURN_URL = (process.env.NICEPAY_RETURN_URL || '').trim();
 const WIX_SUCCESS_URL = process.env.WIX_SUCCESS_URL || 'https://dailymiracles.kr/payment-success';
 
-// 나이스페이 API 베이스 URL
-const NICEPAY_API_BASE = 'https://webapi.nicepay.co.kr';
+// 나이스페이 API 베이스 URL (공식 매뉴얼: dc1-api 또는 dc2-api)
+const NICEPAY_API_BASE = 'https://dc1-api.nicepay.co.kr';
+
+// ═══════════════════════════════════════════════════════════
+// [NicePay] 시작 시 환경변수 검증 로그 (MerchantKey 값은 출력 안함)
+// ═══════════════════════════════════════════════════════════
+console.log('\n' + '┌' + '─'.repeat(58) + '┐');
+console.log('│' + ' '.repeat(15) + 'NicePay 환경변수 검증' + ' '.repeat(22) + '│');
+console.log('├' + '─'.repeat(58) + '┤');
+console.log(`│  NICEPAY_MID:           ${NICEPAY_MID ? `✅ ${NICEPAY_MID}` : '❌ 미설정'}`.padEnd(59) + '│');
+console.log(`│  NICEPAY_MERCHANT_KEY:  ${NICEPAY_MERCHANT_KEY ? `✅ 설정됨 (${NICEPAY_MERCHANT_KEY.length}자)` : '❌ 미설정'}`.padEnd(59) + '│');
+console.log(`│  NICEPAY_RETURN_URL:    ${NICEPAY_RETURN_URL ? '✅ ' + NICEPAY_RETURN_URL.substring(0, 30) + '...' : '❌ 미설정'}`.padEnd(59) + '│');
+console.log(`│  NICEPAY_API_BASE:      ${NICEPAY_API_BASE}`.padEnd(59) + '│');
+console.log('└' + '─'.repeat(58) + '┘\n');
 
 /**
  * 주문번호 생성 (Moid)
@@ -112,32 +124,80 @@ async function createPayment(amount, goodsName = '하루하루의 기적 서비�
 /**
  * 인증 결과 서명 검증 (인증결제 웹)
  * SHA256(AuthResultCode + AuthToken + MID + Amt + MerchantKey)
+ *
+ * [NicePay 지원팀용 상세 로그]
  */
 function verifyAuthSignature(authResultCode, authToken, amt, signature) {
+  console.log('\n' + '─'.repeat(60));
+  console.log('🔐 [서명 검증] 시작');
+  console.log('─'.repeat(60));
+
   if (!NICEPAY_MERCHANT_KEY) {
-    console.warn('⚠️ NICEPAY_MERCHANT_KEY 미설정');
+    console.error('❌ NICEPAY_MERCHANT_KEY 환경변수 미설정!');
+    console.log('─'.repeat(60) + '\n');
     return false;
   }
 
-  const data = authResultCode + authToken + NICEPAY_MID + amt + NICEPAY_MERCHANT_KEY;
-  const expected = crypto.createHash('sha256').update(data).digest('hex');
+  // 서명 계산 재료 (MerchantKey는 로그 출력 금지)
+  console.log(`📋 서명 계산 입력값:`);
+  console.log(`   - AuthResultCode: ${authResultCode}`);
+  console.log(`   - AuthToken: ${authToken?.substring(0, 30)}...`);
+  console.log(`   - MID: ${NICEPAY_MID}`);
+  console.log(`   - Amt: ${amt}`);
+  console.log(`   - MerchantKey: [설정됨, ${NICEPAY_MERCHANT_KEY.length}자]`);
 
-  const isValid = expected === signature;
-  console.log(`🔐 서명 검증: ${isValid ? '✅ 통과' : '❌ 실패'}`);
-  console.log(`   expected: ${expected.substring(0, 20)}...`);
-  console.log(`   received: ${signature?.substring(0, 20)}...`);
+  // SHA256(AuthResultCode + AuthToken + MID + Amt + MerchantKey)
+  const data = authResultCode + authToken + NICEPAY_MID + amt + NICEPAY_MERCHANT_KEY;
+  const expected = crypto.createHash('sha256').update(data, 'utf8').digest('hex').toLowerCase();
+  const receivedLower = signature?.toLowerCase();
+
+  const isValid = expected === receivedLower;
+
+  console.log(`📊 서명 비교:`);
+  console.log(`   - 계산값: ${expected.substring(0, 40)}...`);
+  console.log(`   - 수신값: ${receivedLower?.substring(0, 40)}...`);
+  console.log(`   - 결과: ${isValid ? '✅ 일치' : '❌ 불일치'}`);
+
+  if (!isValid) {
+    console.log(`⚠️ 서명 불일치 원인 가능성:`);
+    console.log(`   1. Render 환경변수 NICEPAY_MERCHANT_KEY 누락`);
+    console.log(`   2. MerchantKey 앞뒤 공백 포함`);
+    console.log(`   3. 로컬과 서버 MerchantKey 불일치`);
+  }
+
+  console.log('─'.repeat(60) + '\n');
 
   return isValid;
 }
 
 /**
  * 승인 API 호출 (인증결제 웹)
- * POST https://webapi.nicepay.co.kr/webapi/pay_process.jsp
+ * POST https://dc1-api.nicepay.co.kr/webapi/pay_process.jsp
+ *
+ * [NicePay 지원팀용 로그 포함]
  */
 async function requestApproval(authToken, amt, ediDate, signData, moid, tid) {
-  try {
-    console.log(`🚀 승인 API 호출: tid=${tid}, moid=${moid}, amt=${amt}`);
+  const approvalUrl = `${NICEPAY_API_BASE}/webapi/pay_process.jsp`;
 
+  // ═══════════════════════════════════════════════════════════
+  // [NicePay 지원팀용] 승인 요청 상세 로그
+  // ═══════════════════════════════════════════════════════════
+  console.log('\n' + '═'.repeat(60));
+  console.log('🚀 [NicePay 승인 요청] 시작');
+  console.log('═'.repeat(60));
+  console.log(`📍 요청 URL: ${approvalUrl}`);
+  console.log(`📋 요청 파라미터:`);
+  console.log(`   - TID: ${tid}`);
+  console.log(`   - AuthToken: ${authToken?.substring(0, 30)}...`);
+  console.log(`   - MID: ${NICEPAY_MID}`);
+  console.log(`   - Amt: ${amt}`);
+  console.log(`   - EdiDate: ${ediDate}`);
+  console.log(`   - SignData: ${signData?.substring(0, 30)}...`);
+  console.log(`   - Moid: ${moid}`);
+  console.log(`   - CharSet: utf-8`);
+  console.log('─'.repeat(60));
+
+  try {
     // URL encoded form data
     const params = new URLSearchParams();
     params.append('TID', tid);
@@ -148,8 +208,10 @@ async function requestApproval(authToken, amt, ediDate, signData, moid, tid) {
     params.append('SignData', signData);
     params.append('CharSet', 'utf-8');
 
+    const startTime = Date.now();
+
     const response = await axios.post(
-      `${NICEPAY_API_BASE}/webapi/pay_process.jsp`,
+      approvalUrl,
       params.toString(),
       {
         headers: {
@@ -159,12 +221,47 @@ async function requestApproval(authToken, amt, ediDate, signData, moid, tid) {
       }
     );
 
-    console.log(`✅ 승인 API 응답:`, JSON.stringify(response.data, null, 2));
+    const elapsed = Date.now() - startTime;
+
+    // ═══════════════════════════════════════════════════════════
+    // [NicePay 지원팀용] 승인 응답 상세 로그
+    // ═══════════════════════════════════════════════════════════
+    console.log('─'.repeat(60));
+    console.log(`✅ [NicePay 승인 응답] (${elapsed}ms)`);
+    console.log(`   - ResultCode: ${response.data?.ResultCode}`);
+    console.log(`   - ResultMsg: ${response.data?.ResultMsg}`);
+    console.log(`   - TID: ${response.data?.TID}`);
+    console.log(`   - Amt: ${response.data?.Amt}`);
+    console.log(`   - PayMethod: ${response.data?.PayMethod}`);
+    console.log(`   - CardName: ${response.data?.CardName || 'N/A'}`);
+    console.log(`   - CardNo: ${response.data?.CardNo || 'N/A'}`);
+    console.log('═'.repeat(60) + '\n');
+
     return response.data;
 
   } catch (error) {
-    console.error(`❌ 승인 API 실패:`, error.response?.data || error.message);
-    throw error;
+    // ═══════════════════════════════════════════════════════════
+    // [NicePay 지원팀용] 승인 에러 상세 로그
+    // ═══════════════════════════════════════════════════════════
+    console.log('─'.repeat(60));
+    console.error(`❌ [NicePay 승인 에러]`);
+    console.error(`   - Error Type: ${error.name}`);
+    console.error(`   - Error Message: ${error.message}`);
+    if (error.response) {
+      console.error(`   - HTTP Status: ${error.response.status}`);
+      console.error(`   - Response Data:`, JSON.stringify(error.response.data, null, 2));
+    }
+    console.log('═'.repeat(60) + '\n');
+
+    // 에러 응답도 처리 가능하도록 반환
+    if (error.response?.data) {
+      return error.response.data;
+    }
+
+    return {
+      ResultCode: 'E999',
+      ResultMsg: `승인 API 통신 실패: ${error.message}`
+    };
   }
 }
 

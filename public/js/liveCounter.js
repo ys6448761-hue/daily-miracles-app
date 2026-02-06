@@ -317,7 +317,7 @@ const LiveCounter = {
             <div class="live-counter-footer">
                 지금까지 ${total.toLocaleString()}개의 소원이 빌어졌어요
                 <br>
-                <a href="./questions.html" class="live-counter-cta">나도 소원 빌기 ✨</a>
+                <a href="./questions.html" class="live-counter-cta">나의 가능성 AI로 확인하기 ✨</a>
             </div>
         `;
     },
