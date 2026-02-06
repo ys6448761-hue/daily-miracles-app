@@ -131,6 +131,19 @@ router.post('/artifacts', async (req, res) => {
       result.rewards = rewards;
     }
 
+    // 템플릿 사용 기록 (template_id가 있으면)
+    if (content_json.template_id && playground.template) {
+      try {
+        await playground.template.recordTemplateUsage(
+          content_json.template_id,
+          user_id,
+          result.artifact_id
+        );
+      } catch (templateErr) {
+        console.warn('[Playground] 템플릿 사용 기록 실패:', templateErr.message);
+      }
+    }
+
     res.status(201).json(result);
 
   } catch (error) {
@@ -468,6 +481,100 @@ router.get('/users/:id/rewards', async (req, res) => {
 
   } catch (error) {
     console.error('[Playground] 보상 조회 실패:', error);
+    res.status(500).json({ success: false, error: 'server_error' });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 템플릿
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * GET /api/playground/templates
+ * 활성 템플릿 목록 조회
+ */
+router.get('/templates', async (req, res) => {
+  try {
+    if (!playground) {
+      return res.status(503).json({ success: false, error: 'service_unavailable' });
+    }
+
+    const { category, limit } = req.query;
+
+    const templates = await playground.template.getTemplates({
+      category: category || null,
+      limit: parseInt(limit) || 20
+    });
+
+    res.json({ success: true, data: templates });
+
+  } catch (error) {
+    console.error('[Playground] 템플릿 목록 조회 실패:', error);
+    res.status(500).json({ success: false, error: 'server_error' });
+  }
+});
+
+/**
+ * GET /api/playground/templates/popular
+ * 인기 템플릿 조회
+ */
+router.get('/templates/popular', async (req, res) => {
+  try {
+    if (!playground) {
+      return res.status(503).json({ success: false, error: 'service_unavailable' });
+    }
+
+    const { limit } = req.query;
+    const templates = await playground.template.getPopularTemplates(parseInt(limit) || 5);
+
+    res.json({ success: true, data: templates });
+
+  } catch (error) {
+    console.error('[Playground] 인기 템플릿 조회 실패:', error);
+    res.status(500).json({ success: false, error: 'server_error' });
+  }
+});
+
+/**
+ * GET /api/playground/templates/categories
+ * 템플릿 카테고리 목록
+ */
+router.get('/templates/categories', async (req, res) => {
+  try {
+    if (!playground) {
+      return res.status(503).json({ success: false, error: 'service_unavailable' });
+    }
+
+    const categories = await playground.template.getCategories();
+    res.json({ success: true, data: categories });
+
+  } catch (error) {
+    console.error('[Playground] 카테고리 조회 실패:', error);
+    res.status(500).json({ success: false, error: 'server_error' });
+  }
+});
+
+/**
+ * GET /api/playground/templates/:id
+ * 단일 템플릿 조회
+ */
+router.get('/templates/:id', async (req, res) => {
+  try {
+    if (!playground) {
+      return res.status(503).json({ success: false, error: 'service_unavailable' });
+    }
+
+    const templateId = parseInt(req.params.id);
+    const template = await playground.template.getTemplateById(templateId);
+
+    if (!template) {
+      return res.status(404).json({ success: false, error: 'template_not_found' });
+    }
+
+    res.json({ success: true, data: template });
+
+  } catch (error) {
+    console.error('[Playground] 템플릿 조회 실패:', error);
     res.status(500).json({ success: false, error: 'server_error' });
   }
 });

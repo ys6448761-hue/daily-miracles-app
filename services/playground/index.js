@@ -15,6 +15,7 @@ const scoreService = require('./scoreService');
 const feedService = require('./feedService');
 const rewardService = require('./rewardService');
 const shareService = require('./shareService');
+const templateService = require('./templateService');
 
 module.exports = {
   // 아티팩트 (창작물)
@@ -32,6 +33,9 @@ module.exports = {
   // 공유
   share: shareService,
 
+  // 템플릿
+  template: templateService,
+
   // 초기화
   async init(db) {
     console.log('[Playground] 엔진 초기화 중...');
@@ -42,6 +46,7 @@ module.exports = {
     feedService.init(db);
     rewardService.init(db);
     shareService.init(db);
+    templateService.init(db);
 
     console.log('[Playground] ✅ 엔진 초기화 완료');
   }

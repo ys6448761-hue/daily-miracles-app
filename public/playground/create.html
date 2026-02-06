@@ -27,6 +27,7 @@
       border-radius: 20px;
       padding: 24px;
       box-shadow: 0 4px 20px rgba(155, 135, 245, 0.15);
+      margin-bottom: 20px;
     }
     .section {
       margin-bottom: 20px;
@@ -134,86 +135,433 @@
       color: #999;
       margin-top: 4px;
     }
+
+    /* ═══════════════════════════════════════════════════════════════════════════
+       템플릿 피커 스타일
+       ═══════════════════════════════════════════════════════════════════════════ */
+    .template-section {
+      margin-bottom: 24px;
+    }
+    .template-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .template-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #6E59A5;
+    }
+    .template-skip {
+      font-size: 13px;
+      color: #999;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .template-categories {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .category-chip {
+      padding: 6px 14px;
+      background: #F5F0FF;
+      border-radius: 16px;
+      font-size: 12px;
+      color: #6E59A5;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+    .category-chip:hover { background: #E5E0F5; }
+    .category-chip.active {
+      background: #9B87F5;
+      color: white;
+    }
+    .template-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .template-item {
+      padding: 14px;
+      background: linear-gradient(135deg, #FAFAFA, #F5F0FF);
+      border: 2px solid #E5E0F5;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .template-item:hover {
+      border-color: #9B87F5;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(155, 135, 245, 0.15);
+    }
+    .template-item.selected {
+      border-color: #9B87F5;
+      background: linear-gradient(135deg, #F5F0FF, #FFF5F7);
+    }
+    .template-item-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #6E59A5;
+      margin-bottom: 6px;
+    }
+    .template-item-preview {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.4;
+    }
+    .template-loading {
+      text-align: center;
+      padding: 20px;
+      color: #999;
+    }
+    .template-selected-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: #9B87F5;
+      color: white;
+      border-radius: 12px;
+      font-size: 11px;
+      margin-left: 8px;
+    }
+    .form-section {
+      display: none;
+    }
+    .form-section.visible {
+      display: block;
+    }
+    .mode-toggle {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .mode-btn {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #E5E0F5;
+      border-radius: 12px;
+      background: white;
+      cursor: pointer;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .mode-btn:hover { border-color: #9B87F5; }
+    .mode-btn.active {
+      background: linear-gradient(135deg, #9B87F5, #F5A7C6);
+      color: white;
+      border-color: transparent;
+    }
+    .selected-template-info {
+      background: #F5F0FF;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .selected-template-info.visible {
+      display: block;
+    }
+    .selected-template-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #6E59A5;
+    }
+    .clear-template {
+      font-size: 12px;
+      color: #999;
+      cursor: pointer;
+      text-decoration: underline;
+      margin-left: 8px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>소원카드 만들기</h1>
 
+    <!-- 모드 선택 -->
     <div class="card">
-      <!-- 1. 마음 (heart_line) -->
-      <div class="section">
-        <div class="section-label">
-          마음을 담아주세요 <span class="required">*필수</span>
-        </div>
-        <div class="section-hint">지금 당신의 마음, 바람, 소망을 자유롭게 적어주세요</div>
-        <textarea id="heart_line" placeholder="예: 오늘 하루도 무사히 보내고 싶어요..." maxlength="300"></textarea>
-        <div class="char-count"><span id="heart_count">0</span>/300</div>
+      <div class="mode-toggle">
+        <div class="mode-btn active" data-mode="template">템플릿으로 시작</div>
+        <div class="mode-btn" data-mode="blank">직접 작성</div>
       </div>
 
-      <!-- 2. 현실 단서 (reality_hint + reality_tag) -->
-      <div class="section">
-        <div class="section-label">
-          현실의 단서 <span class="required">*필수</span>
+      <!-- 템플릿 선택 섹션 -->
+      <div id="template_section" class="template-section">
+        <div class="template-header">
+          <span class="template-title">오늘의 마음에 맞는 템플릿을 선택하세요</span>
         </div>
-        <div class="section-hint">이 소원과 연결된 구체적인 상황이나 계기를 한 줄로</div>
-        <textarea id="reality_hint" placeholder="예: 다음 주 발표가 있는데 자신감이 없어서..." maxlength="150"></textarea>
-        <div class="char-count"><span id="reality_count">0</span>/150</div>
+        <div class="template-categories" id="category_tabs">
+          <div class="category-chip active" data-category="">전체</div>
+        </div>
+        <div class="template-list" id="template_list">
+          <div class="template-loading">템플릿 불러오는 중...</div>
+        </div>
       </div>
 
-      <div class="section">
-        <div class="section-label">관련 영역</div>
-        <div class="tags" id="tag_container">
-          <div class="tag" data-tag="time">시간</div>
-          <div class="tag" data-tag="money">돈/재정</div>
-          <div class="tag" data-tag="relationship">관계</div>
-          <div class="tag" data-tag="health">건강</div>
-          <div class="tag" data-tag="anxiety">불안/걱정</div>
-          <div class="tag" data-tag="career">일/커리어</div>
-          <div class="tag" data-tag="family">가족</div>
-          <div class="tag" data-tag="self">나 자신</div>
-        </div>
-        <input type="hidden" id="reality_tag" value="">
+      <!-- 선택된 템플릿 표시 -->
+      <div class="selected-template-info" id="selected_info">
+        <span class="selected-template-name" id="selected_name"></span>
+        <span class="clear-template" id="clear_template">선택 해제</span>
       </div>
 
-      <!-- 3. 한 걸음 (one_step) -->
-      <div class="section">
-        <div class="section-label">
-          오늘의 한 걸음 <span class="required">*필수</span>
+      <!-- 폼 섹션 -->
+      <div id="form_section" class="form-section">
+        <!-- 1. 마음 (heart_line) -->
+        <div class="section">
+          <div class="section-label">
+            마음을 담아주세요 <span class="required">*필수</span>
+          </div>
+          <div class="section-hint">지금 당신의 마음, 바람, 소망을 자유롭게 적어주세요</div>
+          <textarea id="heart_line" placeholder="예: 오늘 하루도 무사히 보내고 싶어요..." maxlength="300"></textarea>
+          <div class="char-count"><span id="heart_count">0</span>/300</div>
         </div>
-        <div class="section-hint">이 소원을 위해 오늘 할 수 있는 작은 행동 하나</div>
-        <textarea id="one_step" placeholder="예: 발표 자료를 10분만 정리해볼게요" maxlength="200"></textarea>
-        <div class="char-count"><span id="step_count">0</span>/200</div>
-      </div>
 
-      <!-- 4. 타인을 위한 한 줄 (blessing_line) -->
-      <div class="section">
-        <div class="section-label">
-          누군가를 위한 한 마디 <span class="required">*필수</span>
+        <!-- 2. 현실 단서 (reality_hint + reality_tag) -->
+        <div class="section">
+          <div class="section-label">
+            현실의 단서 <span class="required">*필수</span>
+          </div>
+          <div class="section-hint">이 소원과 연결된 구체적인 상황이나 계기를 한 줄로</div>
+          <textarea id="reality_hint" placeholder="예: 다음 주 발표가 있는데 자신감이 없어서..." maxlength="150"></textarea>
+          <div class="char-count"><span id="reality_count">0</span>/150</div>
         </div>
-        <div class="section-hint">비슷한 고민을 가진 누군가에게 건네고 싶은 말</div>
-        <textarea id="blessing_line" placeholder="예: 발표 앞두고 떨리는 분, 함께 힘내요!" maxlength="200"></textarea>
-        <div class="char-count"><span id="blessing_count">0</span>/200</div>
-      </div>
 
-      <!-- 5. 톤 선택 -->
-      <div class="section">
-        <div class="section-label">카드 분위기</div>
-        <div class="tone-selector">
-          <div class="tone-btn selected" data-tone="warm">따뜻하게</div>
-          <div class="tone-btn" data-tone="calm">차분하게</div>
-          <div class="tone-btn" data-tone="poetic">시적으로</div>
+        <div class="section">
+          <div class="section-label">관련 영역</div>
+          <div class="tags" id="tag_container">
+            <div class="tag" data-tag="time">시간</div>
+            <div class="tag" data-tag="money">돈/재정</div>
+            <div class="tag" data-tag="relationship">관계</div>
+            <div class="tag" data-tag="health">건강</div>
+            <div class="tag" data-tag="anxiety">불안/걱정</div>
+            <div class="tag" data-tag="career">일/커리어</div>
+            <div class="tag" data-tag="family">가족</div>
+            <div class="tag" data-tag="self">나 자신</div>
+          </div>
+          <input type="hidden" id="reality_tag" value="">
         </div>
-        <input type="hidden" id="tone" value="warm">
-      </div>
 
-      <button class="submit-btn" id="submit_btn">소원카드 만들기</button>
-      <div class="error" id="error_box"></div>
+        <!-- 3. 한 걸음 (one_step) -->
+        <div class="section">
+          <div class="section-label">
+            오늘의 한 걸음 <span class="required">*필수</span>
+          </div>
+          <div class="section-hint">이 소원을 위해 오늘 할 수 있는 작은 행동 하나</div>
+          <textarea id="one_step" placeholder="예: 발표 자료를 10분만 정리해볼게요" maxlength="200"></textarea>
+          <div class="char-count"><span id="step_count">0</span>/200</div>
+        </div>
+
+        <!-- 4. 타인을 위한 한 줄 (blessing_line) -->
+        <div class="section">
+          <div class="section-label">
+            누군가를 위한 한 마디 <span class="required">*필수</span>
+          </div>
+          <div class="section-hint">비슷한 고민을 가진 누군가에게 건네고 싶은 말</div>
+          <textarea id="blessing_line" placeholder="예: 발표 앞두고 떨리는 분, 함께 힘내요!" maxlength="200"></textarea>
+          <div class="char-count"><span id="blessing_count">0</span>/200</div>
+        </div>
+
+        <!-- 5. 톤 선택 -->
+        <div class="section">
+          <div class="section-label">카드 분위기</div>
+          <div class="tone-selector">
+            <div class="tone-btn selected" data-tone="warm">따뜻하게</div>
+            <div class="tone-btn" data-tone="calm">차분하게</div>
+            <div class="tone-btn" data-tone="poetic">시적으로</div>
+          </div>
+          <input type="hidden" id="tone" value="warm">
+        </div>
+
+        <button class="submit-btn" id="submit_btn">소원카드 만들기</button>
+        <div class="error" id="error_box"></div>
+      </div>
     </div>
   </div>
 
   <script>
+    // ═══════════════════════════════════════════════════════════════════════════
+    // 상태 변수
+    // ═══════════════════════════════════════════════════════════════════════════
+    let templates = [];
+    let selectedTemplate = null;
+    let currentCategory = '';
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // 템플릿 로드
+    // ═══════════════════════════════════════════════════════════════════════════
+    async function loadTemplates() {
+      try {
+        const res = await fetch('/api/playground/templates');
+        const data = await res.json();
+        if (data.success) {
+          templates = data.data;
+          renderCategories();
+          renderTemplates();
+        }
+      } catch (err) {
+        document.getElementById('template_list').innerHTML =
+          '<div class="template-loading">템플릿을 불러올 수 없습니다</div>';
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // 카테고리 렌더링
+    // ═══════════════════════════════════════════════════════════════════════════
+    const categoryLabels = {
+      'start': '시작',
+      'anxiety': '불안',
+      'rest': '휴식',
+      'self': '나 자신',
+      'relationship': '관계',
+      'weekly': '한 주',
+      'calm': '차분'
+    };
+
+    function renderCategories() {
+      const uniqueCategories = [...new Set(templates.map(t => t.category))];
+      const container = document.getElementById('category_tabs');
+      container.innerHTML = '<div class="category-chip active" data-category="">전체</div>';
+
+      uniqueCategories.forEach(cat => {
+        const chip = document.createElement('div');
+        chip.className = 'category-chip';
+        chip.dataset.category = cat;
+        chip.textContent = categoryLabels[cat] || cat;
+        container.appendChild(chip);
+      });
+
+      // 이벤트 바인딩
+      container.querySelectorAll('.category-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          container.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          currentCategory = chip.dataset.category;
+          renderTemplates();
+        });
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // 템플릿 목록 렌더링
+    // ═══════════════════════════════════════════════════════════════════════════
+    function renderTemplates() {
+      const container = document.getElementById('template_list');
+      const filtered = currentCategory
+        ? templates.filter(t => t.category === currentCategory)
+        : templates;
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="template-loading">템플릿이 없습니다</div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(t => `
+        <div class="template-item${selectedTemplate?.id === t.id ? ' selected' : ''}" data-id="${t.id}">
+          <div class="template-item-title">${t.title}</div>
+          <div class="template-item-preview">"${t.heart_line}"</div>
+        </div>
+      `).join('');
+
+      // 클릭 이벤트
+      container.querySelectorAll('.template-item').forEach(item => {
+        item.addEventListener('click', () => selectTemplate(parseInt(item.dataset.id)));
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // 템플릿 선택
+    // ═══════════════════════════════════════════════════════════════════════════
+    function selectTemplate(templateId) {
+      selectedTemplate = templates.find(t => t.id === templateId);
+      if (!selectedTemplate) return;
+
+      // 폼에 값 채우기
+      document.getElementById('heart_line').value = selectedTemplate.heart_line;
+      document.getElementById('reality_hint').value = selectedTemplate.reality_hint;
+      document.getElementById('one_step').value = selectedTemplate.one_step;
+      document.getElementById('blessing_line').value = selectedTemplate.blessing_line;
+
+      // 태그 선택
+      const tag = selectedTemplate.reality_tag || 'self';
+      document.getElementById('reality_tag').value = tag;
+      document.querySelectorAll('.tag').forEach(t => {
+        t.classList.toggle('selected', t.dataset.tag === tag);
+      });
+
+      // 톤 선택
+      const tone = selectedTemplate.tone || 'warm';
+      document.getElementById('tone').value = tone;
+      document.querySelectorAll('.tone-btn').forEach(b => {
+        b.classList.toggle('selected', b.dataset.tone === tone);
+      });
+
+      // 글자수 업데이트
+      updateAllCounts();
+
+      // 선택 정보 표시
+      document.getElementById('selected_name').textContent = '템플릿: ' + selectedTemplate.title;
+      document.getElementById('selected_info').classList.add('visible');
+
+      // 폼 표시
+      document.getElementById('form_section').classList.add('visible');
+
+      // 템플릿 목록 업데이트
+      renderTemplates();
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // 템플릿 선택 해제
+    // ═══════════════════════════════════════════════════════════════════════════
+    document.getElementById('clear_template').addEventListener('click', () => {
+      selectedTemplate = null;
+      document.getElementById('selected_info').classList.remove('visible');
+
+      // 폼 초기화
+      document.getElementById('heart_line').value = '';
+      document.getElementById('reality_hint').value = '';
+      document.getElementById('one_step').value = '';
+      document.getElementById('blessing_line').value = '';
+      document.getElementById('reality_tag').value = '';
+      document.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
+
+      updateAllCounts();
+      renderTemplates();
+    });
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // 모드 전환
+    // ═══════════════════════════════════════════════════════════════════════════
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const mode = btn.dataset.mode;
+        if (mode === 'blank') {
+          document.getElementById('template_section').style.display = 'none';
+          document.getElementById('form_section').classList.add('visible');
+          selectedTemplate = null;
+          document.getElementById('selected_info').classList.remove('visible');
+        } else {
+          document.getElementById('template_section').style.display = 'block';
+          if (!selectedTemplate) {
+            document.getElementById('form_section').classList.remove('visible');
+          }
+        }
+      });
+    });
+
+    // ═══════════════════════════════════════════════════════════════════════════
     // 태그 선택
+    // ═══════════════════════════════════════════════════════════════════════════
     document.querySelectorAll('.tag').forEach(tag => {
       tag.addEventListener('click', () => {
         document.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
@@ -222,7 +570,9 @@
       });
     });
 
+    // ═══════════════════════════════════════════════════════════════════════════
     // 톤 선택
+    // ═══════════════════════════════════════════════════════════════════════════
     document.querySelectorAll('.tone-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('selected'));
@@ -231,7 +581,9 @@
       });
     });
 
+    // ═══════════════════════════════════════════════════════════════════════════
     // 글자수 카운트
+    // ═══════════════════════════════════════════════════════════════════════════
     function setupCounter(textareaId, counterId) {
       const textarea = document.getElementById(textareaId);
       const counter = document.getElementById(counterId);
@@ -244,7 +596,16 @@
     setupCounter('one_step', 'step_count');
     setupCounter('blessing_line', 'blessing_count');
 
+    function updateAllCounts() {
+      document.getElementById('heart_count').textContent = document.getElementById('heart_line').value.length;
+      document.getElementById('reality_count').textContent = document.getElementById('reality_hint').value.length;
+      document.getElementById('step_count').textContent = document.getElementById('one_step').value.length;
+      document.getElementById('blessing_count').textContent = document.getElementById('blessing_line').value.length;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
     // 게스트 토큰 관리
+    // ═══════════════════════════════════════════════════════════════════════════
     function getGuestToken() {
       return localStorage.getItem('playground_guest_token') || '';
     }
@@ -252,7 +613,9 @@
       if (token) localStorage.setItem('playground_guest_token', token);
     }
 
+    // ═══════════════════════════════════════════════════════════════════════════
     // 제출
+    // ═══════════════════════════════════════════════════════════════════════════
     document.getElementById('submit_btn').addEventListener('click', async () => {
       const btn = document.getElementById('submit_btn');
       const errorBox = document.getElementById('error_box');
@@ -266,6 +629,12 @@
         blessing_line: document.getElementById('blessing_line').value.trim(),
         tone: document.getElementById('tone').value
       };
+
+      // 템플릿 사용 시 template_id 추가
+      if (selectedTemplate) {
+        content_json.template_id = selectedTemplate.id;
+        content_json.template_key = selectedTemplate.template_key;
+      }
 
       // 필수 필드 검증
       if (!content_json.heart_line || !content_json.reality_hint ||
@@ -311,6 +680,11 @@
         btn.textContent = '소원카드 만들기';
       }
     });
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // 초기화
+    // ═══════════════════════════════════════════════════════════════════════════
+    loadTemplates();
   </script>
 </body>
 </html>
