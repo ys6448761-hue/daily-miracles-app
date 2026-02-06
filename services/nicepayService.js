@@ -124,7 +124,7 @@ async function createPayment(amount, goodsName = '하루하루의 기적 서비�
 
 /**
  * 인증 결과 서명 검증 (인증결제 웹)
- * SHA256(AuthResultCode + AuthToken + MID + Amt + MerchantKey)
+ * SHA256(AuthToken + MID + Amt + MerchantKey) - AuthResultCode 제외!
  *
  * [NicePay 지원팀용 상세 로그 - raw 문자열 포함]
  */
@@ -145,34 +145,33 @@ function verifyAuthSignature(authResultCode, authToken, amt, signature) {
   console.log('┌─────────────────────────────────────────────────────────────────');
   console.log('│ 📋 입력값 상세 (타입, 길이 포함)');
   console.log('├─────────────────────────────────────────────────────────────────');
-  console.log(`│  [1] AuthResultCode : "${authResultCode}" (${typeof authResultCode}, ${String(authResultCode).length}자)`);
-  console.log(`│  [2] AuthToken      : "${authToken}" (${typeof authToken}, ${String(authToken).length}자)`);
-  console.log(`│  [3] MID            : "${NICEPAY_MID}" (${typeof NICEPAY_MID}, ${NICEPAY_MID.length}자)`);
-  console.log(`│  [4] Amt            : "${amt}" (${typeof amt}, ${String(amt).length}자)`);
-  console.log(`│  [5] MerchantKey    : (${typeof NICEPAY_MERCHANT_KEY}, ${NICEPAY_MERCHANT_KEY.length}자)`);
+  console.log(`│  [1] AuthToken      : "${authToken}" (${typeof authToken}, ${String(authToken).length}자)`);
+  console.log(`│  [2] MID            : "${NICEPAY_MID}" (${typeof NICEPAY_MID}, ${NICEPAY_MID.length}자)`);
+  console.log(`│  [3] Amt            : "${amt}" (${typeof amt}, ${String(amt).length}자)`);
+  console.log(`│  [4] MerchantKey    : (${typeof NICEPAY_MERCHANT_KEY}, ${NICEPAY_MERCHANT_KEY.length}자)`);
   console.log('└─────────────────────────────────────────────────────────────────');
 
   // ═══════════════════════════════════════════════════════════
   // 2. Raw 문자열 구성 (마스킹 버전)
   // ═══════════════════════════════════════════════════════════
   const maskedKey = '*'.repeat(NICEPAY_MERCHANT_KEY.length);
-  const rawStringMasked = authResultCode + authToken + NICEPAY_MID + amt + maskedKey;
+  const rawStringMasked = authToken + NICEPAY_MID + amt + maskedKey;
 
   console.log('┌─────────────────────────────────────────────────────────────────');
   console.log('│ 📝 SHA256 해시 대상 (Raw String, Key는 * 마스킹)');
   console.log('├─────────────────────────────────────────────────────────────────');
-  console.log(`│  연결 순서: AuthResultCode + AuthToken + MID + Amt + MerchantKey`);
+  console.log(`│  연결 순서: AuthToken + MID + Amt + MerchantKey (AuthResultCode 제외)`);
   console.log('│');
   console.log(`│  Raw String (${rawStringMasked.length}자):`);
   console.log(`│  "${rawStringMasked}"`);
   console.log('└─────────────────────────────────────────────────────────────────');
 
   // ═══════════════════════════════════════════════════════════
-  // 3. SHA256 계산
+  // 3. SHA256 계산 (AuthToken + MID + Amt + MerchantKey)
   // ═══════════════════════════════════════════════════════════
-  const data = authResultCode + authToken + NICEPAY_MID + amt + NICEPAY_MERCHANT_KEY;
+  const data = authToken + NICEPAY_MID + amt + NICEPAY_MERCHANT_KEY;
   const expected = crypto.createHash('sha256').update(data, 'utf8').digest('hex').toLowerCase();
-  const receivedLower = signature?.toLowerCase();
+  const receivedLower = (signature || '').trim().toLowerCase();
 
   console.log('┌─────────────────────────────────────────────────────────────────');
   console.log('│ 🔢 SHA256 Digest 비교');
