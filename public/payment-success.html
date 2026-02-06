@@ -145,10 +145,22 @@
         btnRetry.style.display = "inline-block";
       }
 
-      // 버튼 이동 (원하는 경로로 수정 가능)
-      btnStart.addEventListener("click", function() { location.href = "/program-success.html"; });
-      btnMy.addEventListener("click", function() { location.href = "https://dailymiracles.kr"; });
-      btnHome.addEventListener("click", function() { location.href = "https://dailymiracles.kr"; });
+      // 버튼 이동 - orderId/vt를 파라미터로 전달하여 인증 연계
+      btnStart.addEventListener("click", function() {
+        // 임시 해결: 로그인 후 프로그램 시작으로 이동
+        var startUrl = "https://app.dailymiracles.kr/login?next=/program/start";
+        if (orderId && vt) {
+          startUrl += "&orderId=" + encodeURIComponent(orderId) + "&vt=" + encodeURIComponent(vt);
+        }
+        location.href = startUrl;
+      });
+      btnMy.addEventListener("click", function() {
+        // 나의 기적 아카이브 (로그인 필요)
+        location.href = "https://app.dailymiracles.kr/login?next=/archive";
+      });
+      btnHome.addEventListener("click", function() {
+        location.href = "https://dailymiracles.kr";
+      });
       btnRetry.addEventListener("click", function() { location.reload(); });
 
       // 1) 파라미터 체크
