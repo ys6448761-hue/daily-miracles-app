@@ -209,12 +209,17 @@ function verifyAuthSignature(authResultCode, authToken, amt, signature) {
 
 /**
  * 승인 API 호출 (인증결제 웹)
- * POST https://dc1-api.nicepay.co.kr/webapi/pay_process.jsp
+ * NextAppURL을 우선 사용, 없으면 NICEPAY_API_BASE 사용
  *
  * [NicePay 지원팀용 로그 포함]
  */
-async function requestApproval(authToken, amt, ediDate, signData, moid, tid) {
-  const approvalUrl = `${NICEPAY_API_BASE}/webapi/pay_process.jsp`;
+async function requestApproval(authToken, amt, ediDate, signData, moid, tid, nextAppUrl) {
+  // NextAppURL 우선 사용 (dc1/dc2 IDC 분산 대응)
+  const approvalUrl = nextAppUrl || `${NICEPAY_API_BASE}/webapi/pay_process.jsp`;
+
+  // 승인용 SignData 로깅 (plaintext 길이 + sha 출력)
+  const signPlaintext = authToken + NICEPAY_MID + amt + ediDate + NICEPAY_MERCHANT_KEY;
+  const maskedPlaintext = authToken + NICEPAY_MID + amt + ediDate + '*'.repeat(NICEPAY_MERCHANT_KEY.length);
 
   // ═══════════════════════════════════════════════════════════
   // [NicePay 지원팀용] 승인 요청 상세 로그
@@ -222,7 +227,8 @@ async function requestApproval(authToken, amt, ediDate, signData, moid, tid) {
   console.log('\n' + '═'.repeat(60));
   console.log('🚀 [NicePay 승인 요청] 시작');
   console.log('═'.repeat(60));
-  console.log(`📍 요청 URL: ${approvalUrl}`);
+  console.log(`📍 NextAppURL (콜백): ${nextAppUrl || '(없음)'}`);
+  console.log(`📍 최종 승인 URL: ${approvalUrl}`);
   console.log(`📋 요청 파라미터:`);
   console.log(`   - TID: ${tid}`);
   console.log(`   - AuthToken: ${authToken?.substring(0, 30)}...`);
@@ -232,6 +238,9 @@ async function requestApproval(authToken, amt, ediDate, signData, moid, tid) {
   console.log(`   - SignData: ${signData?.substring(0, 30)}...`);
   console.log(`   - Moid: ${moid}`);
   console.log(`   - CharSet: utf-8`);
+  console.log('─'.repeat(60));
+  console.log(`📝 승인 SignData plaintext (${maskedPlaintext.length}자, Key 마스킹):`);
+  console.log(`   "${maskedPlaintext.substring(0, 80)}..."`);
   console.log('─'.repeat(60));
 
   try {

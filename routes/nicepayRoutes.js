@@ -163,8 +163,10 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
     // 4. 승인 API 호출 (인증결제 웹)
     // 승인용 SignData: SHA256(AuthToken + MID + Amt + EdiDate + MerchantKey)
     const { ediDate, signData } = nicepayService.regenerateSignData(Amt, AuthToken);
+    // NextAppURL: 나이스페이 IDC 라우팅 (dc1/dc2) 대응
+    console.log(`📡 NextAppURL from callback: ${NextAppURL}`);
     const approvalResult = await nicepayService.requestApproval(
-      AuthToken, Amt, ediDate, signData, Moid, actualTID  // TxTid 사용
+      AuthToken, Amt, ediDate, signData, Moid, actualTID, NextAppURL
     );
 
     // 5. 승인 결과 처리
