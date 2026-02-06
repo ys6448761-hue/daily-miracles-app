@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>소원카드 만들기 | 소원놀이터</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      background: linear-gradient(135deg, #FFF5F7 0%, #F5E6FF 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      color: #9B87F5;
+      margin-bottom: 24px;
+      font-size: 24px;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(155, 135, 245, 0.15);
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .section-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #6E59A5;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .section-label .required {
+      color: #F5A7C6;
+      font-size: 12px;
+    }
+    .section-hint {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    textarea, select {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #E5E0F5;
+      border-radius: 12px;
+      font-size: 15px;
+      font-family: inherit;
+      resize: none;
+      transition: border-color 0.2s;
+    }
+    textarea:focus, select:focus {
+      outline: none;
+      border-color: #9B87F5;
+    }
+    textarea { min-height: 80px; }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tag {
+      padding: 8px 14px;
+      border: 2px solid #E5E0F5;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+    }
+    .tag:hover { border-color: #9B87F5; }
+    .tag.selected {
+      background: #9B87F5;
+      color: white;
+      border-color: #9B87F5;
+    }
+    .tone-selector {
+      display: flex;
+      gap: 10px;
+    }
+    .tone-btn {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #E5E0F5;
+      border-radius: 12px;
+      background: white;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .tone-btn:hover { border-color: #9B87F5; }
+    .tone-btn.selected {
+      background: linear-gradient(135deg, #9B87F5, #F5A7C6);
+      color: white;
+      border-color: transparent;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #9B87F5, #6E59A5);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+    .submit-btn:hover { transform: translateY(-2px); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .error {
+      background: #FEE;
+      color: #C00;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-top: 10px;
+      display: none;
+    }
+    .char-count {
+      text-align: right;
+      font-size: 11px;
+      color: #999;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>소원카드 만들기</h1>
+
+    <div class="card">
+      <!-- 1. 마음 (heart_line) -->
+      <div class="section">
+        <div class="section-label">
+          마음을 담아주세요 <span class="required">*필수</span>
+        </div>
+        <div class="section-hint">지금 당신의 마음, 바람, 소망을 자유롭게 적어주세요</div>
+        <textarea id="heart_line" placeholder="예: 오늘 하루도 무사히 보내고 싶어요..." maxlength="300"></textarea>
+        <div class="char-count"><span id="heart_count">0</span>/300</div>
+      </div>
+
+      <!-- 2. 현실 단서 (reality_hint + reality_tag) -->
+      <div class="section">
+        <div class="section-label">
+          현실의 단서 <span class="required">*필수</span>
+        </div>
+        <div class="section-hint">이 소원과 연결된 구체적인 상황이나 계기를 한 줄로</div>
+        <textarea id="reality_hint" placeholder="예: 다음 주 발표가 있는데 자신감이 없어서..." maxlength="150"></textarea>
+        <div class="char-count"><span id="reality_count">0</span>/150</div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">관련 영역</div>
+        <div class="tags" id="tag_container">
+          <div class="tag" data-tag="time">시간</div>
+          <div class="tag" data-tag="money">돈/재정</div>
+          <div class="tag" data-tag="relationship">관계</div>
+          <div class="tag" data-tag="health">건강</div>
+          <div class="tag" data-tag="anxiety">불안/걱정</div>
+          <div class="tag" data-tag="career">일/커리어</div>
+          <div class="tag" data-tag="family">가족</div>
+          <div class="tag" data-tag="self">나 자신</div>
+        </div>
+        <input type="hidden" id="reality_tag" value="">
+      </div>
+
+      <!-- 3. 한 걸음 (one_step) -->
+      <div class="section">
+        <div class="section-label">
+          오늘의 한 걸음 <span class="required">*필수</span>
+        </div>
+        <div class="section-hint">이 소원을 위해 오늘 할 수 있는 작은 행동 하나</div>
+        <textarea id="one_step" placeholder="예: 발표 자료를 10분만 정리해볼게요" maxlength="200"></textarea>
+        <div class="char-count"><span id="step_count">0</span>/200</div>
+      </div>
+
+      <!-- 4. 타인을 위한 한 줄 (blessing_line) -->
+      <div class="section">
+        <div class="section-label">
+          누군가를 위한 한 마디 <span class="required">*필수</span>
+        </div>
+        <div class="section-hint">비슷한 고민을 가진 누군가에게 건네고 싶은 말</div>
+        <textarea id="blessing_line" placeholder="예: 발표 앞두고 떨리는 분, 함께 힘내요!" maxlength="200"></textarea>
+        <div class="char-count"><span id="blessing_count">0</span>/200</div>
+      </div>
+
+      <!-- 5. 톤 선택 -->
+      <div class="section">
+        <div class="section-label">카드 분위기</div>
+        <div class="tone-selector">
+          <div class="tone-btn selected" data-tone="warm">따뜻하게</div>
+          <div class="tone-btn" data-tone="calm">차분하게</div>
+          <div class="tone-btn" data-tone="poetic">시적으로</div>
+        </div>
+        <input type="hidden" id="tone" value="warm">
+      </div>
+
+      <button class="submit-btn" id="submit_btn">소원카드 만들기</button>
+      <div class="error" id="error_box"></div>
+    </div>
+  </div>
+
+  <script>
+    // 태그 선택
+    document.querySelectorAll('.tag').forEach(tag => {
+      tag.addEventListener('click', () => {
+        document.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
+        tag.classList.add('selected');
+        document.getElementById('reality_tag').value = tag.dataset.tag;
+      });
+    });
+
+    // 톤 선택
+    document.querySelectorAll('.tone-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        document.getElementById('tone').value = btn.dataset.tone;
+      });
+    });
+
+    // 글자수 카운트
+    function setupCounter(textareaId, counterId) {
+      const textarea = document.getElementById(textareaId);
+      const counter = document.getElementById(counterId);
+      textarea.addEventListener('input', () => {
+        counter.textContent = textarea.value.length;
+      });
+    }
+    setupCounter('heart_line', 'heart_count');
+    setupCounter('reality_hint', 'reality_count');
+    setupCounter('one_step', 'step_count');
+    setupCounter('blessing_line', 'blessing_count');
+
+    // 제출
+    document.getElementById('submit_btn').addEventListener('click', async () => {
+      const btn = document.getElementById('submit_btn');
+      const errorBox = document.getElementById('error_box');
+      errorBox.style.display = 'none';
+
+      const content_json = {
+        heart_line: document.getElementById('heart_line').value.trim(),
+        reality_hint: document.getElementById('reality_hint').value.trim(),
+        reality_tag: document.getElementById('reality_tag').value || 'self',
+        one_step: document.getElementById('one_step').value.trim(),
+        blessing_line: document.getElementById('blessing_line').value.trim(),
+        tone: document.getElementById('tone').value
+      };
+
+      // 필수 필드 검증
+      if (!content_json.heart_line || !content_json.reality_hint ||
+          !content_json.one_step || !content_json.blessing_line) {
+        errorBox.textContent = '모든 필수 항목을 입력해주세요.';
+        errorBox.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '만드는 중...';
+
+      try {
+        // TODO: 실제 user_id는 인증 후 설정
+        const userId = localStorage.getItem('playground_user_id') || 1;
+
+        const res = await fetch('/api/playground/artifacts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: parseInt(userId),
+            type: 'wish_card',
+            visibility: 'public',
+            content_json: content_json
+          })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          // 결과 페이지로 이동
+          window.location.href = `/playground/result.html?id=${data.artifact_id}`;
+        } else {
+          throw new Error(data.errors?.join(', ') || data.error || '생성 실패');
+        }
+      } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = '소원카드 만들기';
+      }
+    });
+  </script>
+</body>
+</html>

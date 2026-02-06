@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>내 소원카드 | 소원놀이터</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      background: linear-gradient(135deg, #FFF5F7 0%, #F5E6FF 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 500px; margin: 0 auto; }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .back-btn {
+      padding: 8px 16px;
+      background: white;
+      border: 2px solid #E5E0F5;
+      border-radius: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      color: #666;
+    }
+    .grade-badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .grade-S { background: linear-gradient(135deg, #FFD700, #FFA500); color: white; }
+    .grade-A { background: #9B87F5; color: white; }
+    .grade-B { background: #6E59A5; color: white; }
+    .grade-C { background: #999; color: white; }
+    .grade-D { background: #CCC; color: #666; }
+
+    .wish-card {
+      background: white;
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 8px 30px rgba(155, 135, 245, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    .wish-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #9B87F5, #F5A7C6);
+    }
+    .heart-line {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .reality-hint {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 20px;
+      padding-left: 12px;
+      border-left: 3px solid #E5E0F5;
+    }
+    .one-step {
+      background: linear-gradient(135deg, #F5E6FF 0%, #FFF5F7 100%);
+      padding: 16px;
+      border-radius: 14px;
+      margin-bottom: 16px;
+    }
+    .one-step-label {
+      font-size: 12px;
+      color: #9B87F5;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .one-step-text {
+      font-size: 15px;
+      color: #333;
+    }
+    .blessing {
+      background: #FFF5F7;
+      padding: 16px;
+      border-radius: 14px;
+      text-align: center;
+    }
+    .blessing-text {
+      font-size: 15px;
+      color: #F5A7C6;
+      font-style: italic;
+    }
+    .tag-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: #F5E6FF;
+      color: #9B87F5;
+      border-radius: 12px;
+      font-size: 12px;
+      margin-top: 16px;
+    }
+
+    /* 반응 버튼 */
+    .reactions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .reaction-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 12px 16px;
+      background: white;
+      border: 2px solid #E5E0F5;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .reaction-btn:hover {
+      border-color: #9B87F5;
+      transform: translateY(-2px);
+    }
+    .reaction-btn.active {
+      background: #9B87F5;
+      border-color: #9B87F5;
+      color: white;
+    }
+    .reaction-emoji { font-size: 20px; }
+    .reaction-label { font-size: 11px; }
+    .reaction-count { font-size: 12px; font-weight: 600; }
+
+    /* 액션 버튼 */
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .action-btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .action-btn.primary {
+      background: linear-gradient(135deg, #9B87F5, #6E59A5);
+      color: white;
+    }
+    .action-btn.secondary {
+      background: white;
+      border: 2px solid #9B87F5;
+      color: #9B87F5;
+    }
+    .action-btn:hover { transform: translateY(-2px); }
+
+    /* 점수 상세 */
+    .score-detail {
+      background: #F9F9FF;
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 20px;
+    }
+    .score-title {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 12px;
+    }
+    .score-bar {
+      height: 8px;
+      background: #E5E0F5;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .score-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #9B87F5, #F5A7C6);
+      border-radius: 4px;
+      transition: width 0.5s;
+    }
+    .score-text {
+      font-size: 24px;
+      font-weight: 700;
+      color: #9B87F5;
+      text-align: center;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 60px;
+      color: #999;
+    }
+    .error {
+      background: #FEE;
+      color: #C00;
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <a href="/playground/create.html" class="back-btn">+ 새 카드</a>
+      <div class="grade-badge grade-B" id="grade_badge">B</div>
+    </div>
+
+    <div id="content">
+      <div class="loading">카드를 불러오는 중...</div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const artifactId = params.get('id');
+    const userId = localStorage.getItem('playground_user_id') || 1;
+
+    if (!artifactId) {
+      document.getElementById('content').innerHTML = '<div class="error">카드 ID가 없습니다.</div>';
+    } else {
+      loadArtifact();
+    }
+
+    async function loadArtifact() {
+      try {
+        const res = await fetch(`/api/playground/artifacts/${artifactId}?user_id=${userId}`);
+        const data = await res.json();
+
+        if (!data.success) {
+          throw new Error(data.message || data.error);
+        }
+
+        renderCard(data.data, data.exposure_rights);
+      } catch (err) {
+        document.getElementById('content').innerHTML = `<div class="error">${err.message}</div>`;
+      }
+    }
+
+    function renderCard(artifact, rights) {
+      const content = artifact.content_json;
+      const grade = artifact.grade || 'B';
+
+      // 등급 배지 업데이트
+      const gradeBadge = document.getElementById('grade_badge');
+      gradeBadge.textContent = grade;
+      gradeBadge.className = `grade-badge grade-${grade}`;
+
+      const html = `
+        <div class="wish-card">
+          <div class="heart-line">${escapeHtml(content.heart_line)}</div>
+          <div class="reality-hint">${escapeHtml(content.reality_hint)}</div>
+
+          <div class="one-step">
+            <div class="one-step-label">오늘의 한 걸음</div>
+            <div class="one-step-text">${escapeHtml(content.one_step)}</div>
+          </div>
+
+          <div class="blessing">
+            <div class="blessing-text">"${escapeHtml(content.blessing_line)}"</div>
+          </div>
+
+          <div class="tag-badge">#${content.reality_tag || 'self'}</div>
+        </div>
+
+        <div class="reactions">
+          <div class="reaction-btn" data-type="warm">
+            <span class="reaction-emoji">🌸</span>
+            <span class="reaction-label">따뜻해요</span>
+            <span class="reaction-count" id="warm_count">${artifact.warm_count || 0}</span>
+          </div>
+          <div class="reaction-btn" data-type="thanks">
+            <span class="reaction-emoji">🙏</span>
+            <span class="reaction-label">고마워요</span>
+            <span class="reaction-count" id="thanks_count">${artifact.thanks_count || 0}</span>
+          </div>
+          <div class="reaction-btn" data-type="saved">
+            <span class="reaction-emoji">💾</span>
+            <span class="reaction-label">저장했어요</span>
+            <span class="reaction-count" id="saved_count">${artifact.saved_count || 0}</span>
+          </div>
+          <div class="reaction-btn" data-type="cheer">
+            <span class="reaction-emoji">💪</span>
+            <span class="reaction-label">응원해요</span>
+            <span class="reaction-count" id="cheer_count">${artifact.cheer_count || 0}</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="action-btn secondary" id="share_btn">공유하기</button>
+          <button class="action-btn primary" id="remix_btn">이 카드로 만들기</button>
+        </div>
+
+        <div class="score-detail">
+          <div class="score-title">철학점수</div>
+          <div class="score-bar">
+            <div class="score-fill" style="width: ${artifact.score_total || 0}%"></div>
+          </div>
+          <div class="score-text">${artifact.score_total || 0}점</div>
+        </div>
+      `;
+
+      document.getElementById('content').innerHTML = html;
+
+      // 반응 버튼 이벤트
+      document.querySelectorAll('.reaction-btn').forEach(btn => {
+        btn.addEventListener('click', () => addReaction(btn.dataset.type));
+      });
+
+      // 공유 버튼
+      document.getElementById('share_btn').addEventListener('click', shareCard);
+
+      // 리믹스 버튼
+      document.getElementById('remix_btn').addEventListener('click', () => {
+        window.location.href = `/playground/remix.html?parent=${artifactId}`;
+      });
+    }
+
+    async function addReaction(type) {
+      try {
+        const res = await fetch(`/api/playground/artifacts/${artifactId}/reactions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: parseInt(userId), type })
+        });
+        const data = await res.json();
+        if (data.success) {
+          // 카운트 증가 (간단 처리)
+          const countEl = document.getElementById(`${type}_count`);
+          countEl.textContent = parseInt(countEl.textContent) + 1;
+          event.target.closest('.reaction-btn').classList.add('active');
+        }
+      } catch (err) {
+        console.error('반응 추가 실패:', err);
+      }
+    }
+
+    async function shareCard() {
+      try {
+        const res = await fetch('/api/playground/shares', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ artifact_id: parseInt(artifactId), user_id: parseInt(userId) })
+        });
+        const data = await res.json();
+        if (data.success) {
+          // 공유 링크 복사
+          await navigator.clipboard.writeText(data.share_url);
+          alert('링크가 복사되었습니다!\n' + data.share_url);
+        } else {
+          alert(data.message || '공유 생성 실패');
+        }
+      } catch (err) {
+        alert('공유 실패: ' + err.message);
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+  </script>
+</body>
+</html>

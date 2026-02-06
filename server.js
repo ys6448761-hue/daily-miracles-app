@@ -463,6 +463,17 @@ try {
   console.error("❌ 여수 운영 컨트롤타워(Ops Center) 라우터 로드 실패:", error.message);
 }
 
+// 소원놀이터 (Playground Engine) 라우터 로딩
+let playgroundRoutes = null;
+let playgroundEngine = null;
+try {
+  playgroundRoutes = require("./routes/playgroundRoutes");
+  playgroundEngine = require("./services/playground");
+  console.log("✅ 소원놀이터(Playground) 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 소원놀이터(Playground) 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -475,7 +486,8 @@ try {
 const baseAllowedOrigins = [
   'https://dailymiracles.kr',
   'https://www.dailymiracles.kr',
-  'https://pay.dailymiracles.kr'
+  'https://pay.dailymiracles.kr',
+  'https://app.dailymiracles.kr'
 ];
 const envOrigins = (process.env.ALLOWED_ORIGINS || "")
   .split(",")
@@ -1382,6 +1394,75 @@ if (liveCounterRoutes) {
   console.log("✅ 실시간 카운터 라우터 등록 완료 (/api/live)");
 } else {
   console.warn("⚠️ 실시간 카운터 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 소원놀이터 Routes (/api/playground/*) ----------
+if (playgroundRoutes && playgroundEngine) {
+  // DB 연결 시 서비스 초기화
+  if (process.env.DATABASE_URL) {
+    try {
+      const { Pool } = require("pg");
+      const playgroundPool = new Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: process.env.DATABASE_URL.includes('localhost') ? false : { rejectUnauthorized: false }
+      });
+      playgroundEngine.init(playgroundPool);
+      playgroundRoutes.init({ playground: playgroundEngine });
+      console.log("✅ 소원놀이터 서비스 DB 연결 완료");
+    } catch (err) {
+      console.warn("⚠️ 소원놀이터 서비스 DB 연결 실패:", err.message);
+      playgroundRoutes.init({ playground: null });
+    }
+  } else {
+    playgroundRoutes.init({ playground: null });
+  }
+
+  // 상태 확인 엔드포인트
+  app.get("/api/playground/status", async (req, res) => {
+    try {
+      let dbStatus = "not_configured";
+      let tableCount = 0;
+
+      if (process.env.DATABASE_URL) {
+        const { Pool } = require("pg");
+        const pool = new Pool({
+          connectionString: process.env.DATABASE_URL,
+          ssl: process.env.DATABASE_URL.includes('localhost') ? false : { rejectUnauthorized: false }
+        });
+        try {
+          const result = await pool.query(`
+            SELECT COUNT(*) as count FROM information_schema.tables
+            WHERE table_schema = 'public'
+            AND table_name IN ('playground_users', 'artifacts', 'artifact_scores',
+              'artifact_reactions', 'shares', 'share_views', 'rewards',
+              'artifact_reports', 'user_badges', 'artifact_help_scores')
+          `);
+          tableCount = parseInt(result.rows[0].count);
+          dbStatus = tableCount === 10 ? "ok" : "partial";
+          await pool.end();
+        } catch (dbErr) {
+          dbStatus = "error: " + dbErr.message;
+        }
+      }
+
+      res.json({
+        status: "ok",
+        service: "playground",
+        db: dbStatus,
+        migration: "014_playground_engine",
+        tables: tableCount,
+        expected_tables: 10,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({ status: "error", message: error.message });
+    }
+  });
+
+  app.use("/api/playground", playgroundRoutes);
+  console.log("✅ 소원놀이터 라우터 등록 완료 (/api/playground)");
+} else {
+  console.warn("⚠️ 소원놀이터 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------

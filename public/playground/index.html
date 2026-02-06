@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>소원놀이터 | 하루하루의 기적</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      background: linear-gradient(135deg, #FFF5F7 0%, #F5E6FF 100%);
+      min-height: 100vh;
+    }
+    .header {
+      background: white;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: #9B87F5;
+    }
+    .create-btn {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #9B87F5, #F5A7C6);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .tab {
+      padding: 10px 20px;
+      background: white;
+      border: 2px solid #E5E0F5;
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab:hover { border-color: #9B87F5; }
+    .tab.active {
+      background: #9B87F5;
+      color: white;
+      border-color: #9B87F5;
+    }
+
+    .feed {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .feed-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(155, 135, 245, 0.1);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .feed-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(155, 135, 245, 0.15);
+    }
+
+    .feed-grade {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .grade-S { background: linear-gradient(135deg, #FFD700, #FFA500); color: white; }
+    .grade-A { background: #9B87F5; color: white; }
+    .grade-B { background: #6E59A5; color: white; }
+
+    .feed-heart {
+      font-size: 16px;
+      color: #333;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .feed-blessing {
+      font-size: 14px;
+      color: #F5A7C6;
+      font-style: italic;
+    }
+    .feed-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid #F5F5F5;
+    }
+    .feed-reactions {
+      display: flex;
+      gap: 12px;
+      font-size: 13px;
+      color: #888;
+    }
+    .feed-tag {
+      padding: 4px 10px;
+      background: #F5E6FF;
+      color: #9B87F5;
+      border-radius: 10px;
+      font-size: 11px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">소원놀이터</div>
+    <a href="/playground/create.html" class="create-btn">+ 카드 만들기</a>
+  </div>
+
+  <div class="container">
+    <div class="tabs">
+      <div class="tab active" data-tab="feed">추천</div>
+      <div class="tab" data-tab="recent">최신</div>
+      <div class="tab" data-tab="highlights">하이라이트</div>
+    </div>
+
+    <div id="feed_container" class="feed">
+      <div class="loading">피드를 불러오는 중...</div>
+    </div>
+  </div>
+
+  <script>
+    let currentTab = 'feed';
+
+    // 탭 전환
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentTab = tab.dataset.tab;
+        loadFeed();
+      });
+    });
+
+    // 초기 로드
+    loadFeed();
+
+    async function loadFeed() {
+      const container = document.getElementById('feed_container');
+      container.innerHTML = '<div class="loading">피드를 불러오는 중...</div>';
+
+      try {
+        let url = '/api/playground/feed';
+        if (currentTab === 'recent') {
+          url = '/api/playground/feed/recent';
+        } else if (currentTab === 'highlights') {
+          url = '/api/playground/highlights';
+        }
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!data.success) {
+          throw new Error(data.error || '피드 로드 실패');
+        }
+
+        if (!data.data || data.data.length === 0) {
+          container.innerHTML = `
+            <div class="empty">
+              <div class="empty-icon">🌸</div>
+              <p>아직 카드가 없어요</p>
+              <p style="margin-top: 8px; font-size: 14px;">첫 번째 소원카드를 만들어보세요!</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = data.data.map(card => renderFeedCard(card)).join('');
+
+        // 카드 클릭 이벤트
+        container.querySelectorAll('.feed-card').forEach(el => {
+          el.addEventListener('click', () => {
+            window.location.href = `/playground/result.html?id=${el.dataset.id}`;
+          });
+        });
+
+      } catch (err) {
+        container.innerHTML = `<div class="empty">피드를 불러오지 못했어요.<br>${err.message}</div>`;
+      }
+    }
+
+    function renderFeedCard(card) {
+      const content = card.content_json || {};
+      const grade = card.grade || 'B';
+      const helpScore = card.help_score || 0;
+      const warmCount = card.warm_count || 0;
+      const thanksCount = card.thanks_count || 0;
+
+      return `
+        <div class="feed-card" data-id="${card.artifact_id}">
+          <span class="feed-grade grade-${grade}">${grade}</span>
+          <div class="feed-heart">${escapeHtml(content.heart_line || '')}</div>
+          <div class="feed-blessing">"${escapeHtml(content.blessing_line || '')}"</div>
+          <div class="feed-meta">
+            <div class="feed-reactions">
+              <span>🌸 ${warmCount}</span>
+              <span>🙏 ${thanksCount}</span>
+              <span>💪 ${helpScore}</span>
+            </div>
+            <span class="feed-tag">#${content.reality_tag || 'self'}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+  </script>
+</body>
+</html>

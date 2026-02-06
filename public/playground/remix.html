@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>리믹스 | 소원놀이터</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      background: linear-gradient(135deg, #FFF5F7 0%, #F5E6FF 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 500px; margin: 0 auto; }
+    h1 {
+      text-align: center;
+      color: #9B87F5;
+      margin-bottom: 8px;
+      font-size: 22px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    /* 원본 카드 미리보기 */
+    .parent-preview {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 20px;
+      border-left: 4px solid #F5A7C6;
+    }
+    .parent-label {
+      font-size: 11px;
+      color: #F5A7C6;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .parent-heart {
+      font-size: 15px;
+      color: #666;
+      line-height: 1.5;
+    }
+    .parent-blessing {
+      font-size: 13px;
+      color: #999;
+      font-style: italic;
+      margin-top: 8px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(155, 135, 245, 0.15);
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .section-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #6E59A5;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .section-label .required {
+      color: #F5A7C6;
+      font-size: 12px;
+    }
+    .section-hint {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    textarea {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #E5E0F5;
+      border-radius: 12px;
+      font-size: 15px;
+      font-family: inherit;
+      resize: none;
+      min-height: 80px;
+      transition: border-color 0.2s;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: #9B87F5;
+    }
+    .char-count {
+      text-align: right;
+      font-size: 11px;
+      color: #999;
+      margin-top: 4px;
+    }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tag {
+      padding: 8px 14px;
+      border: 2px solid #E5E0F5;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+    }
+    .tag:hover { border-color: #9B87F5; }
+    .tag.selected {
+      background: #9B87F5;
+      color: white;
+      border-color: #9B87F5;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #F5A7C6, #9B87F5);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+    .submit-btn:hover { transform: translateY(-2px); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .error {
+      background: #FEE;
+      color: #C00;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-top: 10px;
+      display: none;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 16px;
+      color: #9B87F5;
+      text-decoration: none;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>내 버전으로 리믹스</h1>
+    <p class="subtitle">원본 카드에서 영감을 받아 나만의 이야기를 만들어보세요</p>
+
+    <div id="parent_preview" class="parent-preview" style="display: none;">
+      <div class="parent-label">원본 카드</div>
+      <div class="parent-heart" id="parent_heart">-</div>
+      <div class="parent-blessing" id="parent_blessing">-</div>
+    </div>
+
+    <div id="content">
+      <div class="loading">원본 카드를 불러오는 중...</div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const parentId = params.get('parent');
+    const userId = localStorage.getItem('playground_user_id') || 1;
+
+    if (!parentId) {
+      document.getElementById('content').innerHTML = '<div class="error">원본 카드 ID가 없습니다.</div>';
+    } else {
+      loadParent();
+    }
+
+    let parentData = null;
+
+    async function loadParent() {
+      try {
+        const res = await fetch(`/api/playground/artifacts/${parentId}?user_id=${userId}`);
+        const data = await res.json();
+
+        if (!data.success) {
+          throw new Error(data.message || data.error);
+        }
+
+        parentData = data.data;
+        renderRemixForm();
+      } catch (err) {
+        document.getElementById('content').innerHTML = `<div class="error">${err.message}</div>`;
+      }
+    }
+
+    function renderRemixForm() {
+      const content = parentData.content_json;
+
+      // 원본 미리보기
+      document.getElementById('parent_preview').style.display = 'block';
+      document.getElementById('parent_heart').textContent = content.heart_line;
+      document.getElementById('parent_blessing').textContent = `"${content.blessing_line}"`;
+
+      const html = `
+        <div class="card">
+          <div class="section">
+            <div class="section-label">
+              나의 마음 <span class="required">*필수</span>
+            </div>
+            <div class="section-hint">원본에서 영감을 받아 나만의 마음을 담아주세요</div>
+            <textarea id="heart_line" placeholder="예: 나도 비슷한 고민이 있어요..." maxlength="300">${escapeHtml(content.heart_line)}</textarea>
+            <div class="char-count"><span id="heart_count">${content.heart_line?.length || 0}</span>/300</div>
+          </div>
+
+          <div class="section">
+            <div class="section-label">
+              나의 현실 단서 <span class="required">*필수</span>
+            </div>
+            <textarea id="reality_hint" placeholder="나의 구체적인 상황은..." maxlength="150"></textarea>
+            <div class="char-count"><span id="reality_count">0</span>/150</div>
+          </div>
+
+          <div class="section">
+            <div class="section-label">관련 영역</div>
+            <div class="tags" id="tag_container">
+              <div class="tag ${content.reality_tag === 'time' ? 'selected' : ''}" data-tag="time">시간</div>
+              <div class="tag ${content.reality_tag === 'money' ? 'selected' : ''}" data-tag="money">돈/재정</div>
+              <div class="tag ${content.reality_tag === 'relationship' ? 'selected' : ''}" data-tag="relationship">관계</div>
+              <div class="tag ${content.reality_tag === 'health' ? 'selected' : ''}" data-tag="health">건강</div>
+              <div class="tag ${content.reality_tag === 'anxiety' ? 'selected' : ''}" data-tag="anxiety">불안/걱정</div>
+              <div class="tag ${content.reality_tag === 'career' ? 'selected' : ''}" data-tag="career">일/커리어</div>
+              <div class="tag ${content.reality_tag === 'family' ? 'selected' : ''}" data-tag="family">가족</div>
+              <div class="tag ${content.reality_tag === 'self' ? 'selected' : ''}" data-tag="self">나 자신</div>
+            </div>
+            <input type="hidden" id="reality_tag" value="${content.reality_tag || 'self'}">
+          </div>
+
+          <div class="section">
+            <div class="section-label">
+              나의 한 걸음 <span class="required">*필수</span>
+            </div>
+            <div class="section-hint">내가 오늘 할 수 있는 작은 행동</div>
+            <textarea id="one_step" placeholder="예: 나는 오늘..." maxlength="200"></textarea>
+            <div class="char-count"><span id="step_count">0</span>/200</div>
+          </div>
+
+          <div class="section">
+            <div class="section-label">
+              나의 응원 메시지 <span class="required">*필수</span>
+            </div>
+            <div class="section-hint">비슷한 상황의 누군가에게 건네고 싶은 말</div>
+            <textarea id="blessing_line" placeholder="예: 우리 함께 힘내요..." maxlength="200"></textarea>
+            <div class="char-count"><span id="blessing_count">0</span>/200</div>
+          </div>
+
+          <button class="submit-btn" id="submit_btn">리믹스 완성하기</button>
+          <div class="error" id="error_box"></div>
+        </div>
+
+        <a href="/playground/result.html?id=${parentId}" class="back-link">← 원본 카드로 돌아가기</a>
+      `;
+
+      document.getElementById('content').innerHTML = html;
+
+      // 태그 선택
+      document.querySelectorAll('.tag').forEach(tag => {
+        tag.addEventListener('click', () => {
+          document.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
+          tag.classList.add('selected');
+          document.getElementById('reality_tag').value = tag.dataset.tag;
+        });
+      });
+
+      // 글자수 카운트
+      function setupCounter(id, counterId) {
+        const el = document.getElementById(id);
+        const counter = document.getElementById(counterId);
+        el.addEventListener('input', () => { counter.textContent = el.value.length; });
+      }
+      setupCounter('heart_line', 'heart_count');
+      setupCounter('reality_hint', 'reality_count');
+      setupCounter('one_step', 'step_count');
+      setupCounter('blessing_line', 'blessing_count');
+
+      // 제출
+      document.getElementById('submit_btn').addEventListener('click', submitRemix);
+    }
+
+    async function submitRemix() {
+      const btn = document.getElementById('submit_btn');
+      const errorBox = document.getElementById('error_box');
+      errorBox.style.display = 'none';
+
+      const content_json = {
+        heart_line: document.getElementById('heart_line').value.trim(),
+        reality_hint: document.getElementById('reality_hint').value.trim(),
+        reality_tag: document.getElementById('reality_tag').value || 'self',
+        one_step: document.getElementById('one_step').value.trim(),
+        blessing_line: document.getElementById('blessing_line').value.trim(),
+        tone: parentData.content_json?.tone || 'warm'
+      };
+
+      // 필수 필드 검증
+      if (!content_json.heart_line || !content_json.reality_hint ||
+          !content_json.one_step || !content_json.blessing_line) {
+        errorBox.textContent = '모든 필수 항목을 입력해주세요.';
+        errorBox.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '리믹스 중...';
+
+      try {
+        const res = await fetch('/api/playground/artifacts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: parseInt(userId),
+            type: 'wish_card',
+            visibility: 'public',
+            content_json: content_json,
+            parent_id: parseInt(parentId)  // 리믹스 연결!
+          })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          window.location.href = `/playground/result.html?id=${data.artifact_id}`;
+        } else {
+          throw new Error(data.errors?.join(', ') || data.error || '리믹스 실패');
+        }
+      } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = '리믹스 완성하기';
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+  </script>
+</body>
+</html>
