@@ -1,0 +1,161 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# BidDoc Ops Center - Configuration Template
+# ═══════════════════════════════════════════════════════════════════════════
+# 복사하여 config.yml로 사용하세요.
+# 실제 config.yml은 .gitignore에 포함됩니다.
+
+# 프로젝트 기본 정보
+project_name: "2026 여수세계섬박람회 연계 여행상품 운영"
+client_alias: "[발주처]"
+event_alias: "[행사명]"
+
+# 입출력 설정
+input_file: "inputs/business_plan.txt"
+output_dir: "outputs"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Step 1: 익명화 설정
+# ─────────────────────────────────────────────────────────────────────────────
+anonymize:
+  strategy: mask  # mask | redact | hash
+
+  # 기본 PII 타입 (영문 기반)
+  types:
+    - name
+    - email
+    - phone
+    - address
+    - url
+
+  # 한국어 커스텀 패턴
+  custom_patterns:
+    - name: event_name
+      pattern: "(여수세계섬박람회|세계섬박람회|섬박람회)"
+      label: "[행사명]"
+
+    - name: company_name
+      pattern: "(여수여행센터|여수관광센터)"
+      label: "[회사명]"
+
+    - name: client_name
+      pattern: "(여수시|전라남도|문화체육관광부)"
+      label: "[발주처]"
+
+    - name: person_name
+      pattern: "(홍길동|김철수|이영희)"
+      label: "[담당자]"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Step 2: 톤 리라이트 설정
+# ─────────────────────────────────────────────────────────────────────────────
+tone:
+  # 섹션별 문장 수 제한
+  sentence_limit_per_section: 2
+
+  # 용어 치환 (비공식 → 공적 어투)
+  replacements:
+    - from: "AI"
+      to: "표준화된 운영"
+    - from: "Control Tower"
+      to: "통합 관리 체계"
+    - from: "플랫폼"
+      to: "운영 시스템"
+    - from: "자동화"
+      to: "체계화"
+    - from: "스마트"
+      to: "효율적"
+
+  # 금지어 (입찰 문서에 부적절)
+  forbidden_words:
+    - "혁신적"
+    - "최첨단"
+    - "획기적"
+    - "압도적"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Step 3: 9장 조립 설정
+# ─────────────────────────────────────────────────────────────────────────────
+assemble:
+  # 9장 구조
+  pages:
+    - title: "1장. 표지"
+      source: "cover"
+      required: true
+
+    - title: "2장. 조직/역할"
+      source: "organization"
+      required: true
+
+    - title: "3장. 유사 실적"
+      source: "track_record"
+      required: true
+
+    - title: "4장. 상품/서비스 구성"
+      source: "services"
+      required: true
+
+    - title: "5장. 협력 구조"
+      source: "partnership"
+      required: true
+
+    - title: "6장. 운영 방식"
+      source: "operations"
+      required: true
+
+    - title: "7장. 홍보/판매/통합 운영"
+      source: "marketing"
+      required: true
+
+    - title: "8장. 리스크 관리"
+      source: "risk_management"
+      required: true
+
+    - title: "9장. 행정/정산"
+      source: "admin_settlement"
+      required: true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Step 4: PDF 출력 설정
+# ─────────────────────────────────────────────────────────────────────────────
+export:
+  format: pdf
+  template: "formal"  # formal | simple
+  page_size: A4
+  margins:
+    top: 25
+    bottom: 25
+    left: 20
+    right: 20
+
+  # 헤더/푸터
+  header:
+    enabled: true
+    text: "[행사명] 연계 여행상품 운영 제안서"
+
+  footer:
+    enabled: true
+    show_page_number: true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Quality Gates 설정
+# ─────────────────────────────────────────────────────────────────────────────
+gates:
+  gate1_anonymize:
+    fail_on_remaining_identifiers: true
+    check_patterns:
+      - "여수여행센터"
+      - "여수세계섬박람회"
+      - "@"
+      - "http"
+      - "www."
+      - "010-"
+      - "02-"
+
+  gate2_tone:
+    check_anonymous_labels: true
+    check_no_new_identifiers: true
+    max_sentences_per_section: 2
+
+  gate3_assemble:
+    required_pages: 9
+    fail_on_missing_page: true

@@ -1,10 +1,12 @@
 {
   "소원": [
     "DOC-DECISIONS_LOG",
+    "DOC-AIL-정산-v2-final",
     "DOC-AURORA5_CHARACTER_PROMPTS_V3",
     "DOC-weekly_promotion_guide",
     "DOC-tag_taxonomy",
     "DOC-MIRACLE_MASTER_GUIDELINES",
+    "DOC-정산-v2-CEO-요약",
     "DOC-airtable-schema",
     "DOC-airtable-wish-intake-schema",
     "DOC-airtable-wishes-inbox-schema",
@@ -105,7 +107,9 @@
   ],
   "aurora": [
     "DOC-DECISIONS_LOG",
+    "DOC-AIL-정산-v2-final",
     "DOC-AURORA5_CHARACTER_PROMPTS_V3",
+    "DOC-정산-v2-CEO-요약",
     "DOC-AURORA5_CHARACTER_PROMPTS",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
     "DOC-GROWTH-ROADMAP",
@@ -191,6 +195,69 @@
     "DOC-20251229-SRH",
     "DOC-20251229-PFO"
   ],
+  "ail": [
+    "DOC-AIL-정산-v2-final",
+    "DOC-정산-v2-CEO-요약"
+  ],
+  "가격": [
+    "DOC-AIL-정산-v2-final",
+    "DOC-DEC-20260201-포인트추천예고편-정책구현",
+    "DOC-drive-github-sync-setup",
+    "DOC-tax-accounting-ai-tools-analys",
+    "DOC-06_External_Sharing_Guide",
+    "DOC-alimtalk-templates-design",
+    "DOC-20260101-4PA",
+    "DOC-20260101-TRD",
+    "DOC-20260101-WG8",
+    "DOC-20260101-1YB",
+    "DOC-20260101-L9Y",
+    "DOC-20260101-ICN",
+    "DOC-20260101-8VR",
+    "DOC-20260101-K7C",
+    "DOC-20260101-6M7",
+    "DOC-20260101-GR0",
+    "DOC-20260101-D2L",
+    "DOC-20260101-XHZ",
+    "DOC-20260101-RET",
+    "DOC-20260101-YH9",
+    "DOC-20260101-99J",
+    "DOC-20251231-GV1",
+    "DOC-20251229-SRH",
+    "DOC-20251229-PFO"
+  ],
+  "결제": [
+    "DOC-AIL-정산-v2-final",
+    "DOC-정산-v2-CEO-요약",
+    "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
+    "DOC-README",
+    "DOC-JAEMI_ONBOARDING_v12",
+    "DOC-04_Onboarding_7Day",
+    "DOC-05_Deal_Registration",
+    "DOC-tax-accounting-ai-tools-analys",
+    "DOC-GA4_SETUP_GUIDE",
+    "DOC-20260101-MKI",
+    "DOC-20260101-4PA",
+    "DOC-20260101-TRD",
+    "DOC-20260101-WG8",
+    "DOC-20260101-VG0",
+    "DOC-20260101-UZX",
+    "DOC-20260101-ICN",
+    "DOC-20260101-8VR",
+    "DOC-20260101-K7C",
+    "DOC-20260101-6M7",
+    "DOC-20260101-GR0",
+    "DOC-20260101-HP0",
+    "DOC-20260101-D2L",
+    "DOC-20260101-XHZ",
+    "DOC-20260101-RET",
+    "DOC-20260101-YH9",
+    "DOC-20260101-99J",
+    "DOC-20251231-GV1",
+    "DOC-2025-12-30_소원5문항_gem유지_결정서",
+    "DOC-20251229-9PH",
+    "DOC-20251229-SRH",
+    "DOC-inquiry-form-api"
+  ],
   "ops": [
     "DOC-weekly_promotion_guide",
     "DOC-DEC_OPERATIONS",
@@ -211,9 +278,19 @@
     "DOC-06_External_Sharing_Guide",
     "DOC-07_Sales_Cards"
   ],
+  "sop": [
+    "DOC-SOP_공모_문서_자동화_표준지침_v1"
+  ],
   "standards": [
     "DOC-tag_taxonomy",
     "DOC-quantum-planning-method"
+  ],
+  "system": [
+    "DOC-GATE_BidDoc_Compliance",
+    "DOC-agents-index",
+    "DOC-conversation-workflow",
+    "DOC-manifest-system",
+    "DOC-SYS-2025-1230-LUMI-001_Airtabl"
   ],
   "templates": [
     "DOC-knowledge_card_template",
@@ -250,37 +327,6 @@
   "cheatsheets": [
     "DOC-최수민방식_치트시트"
   ],
-  "결제": [
-    "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
-    "DOC-README",
-    "DOC-JAEMI_ONBOARDING_v12",
-    "DOC-04_Onboarding_7Day",
-    "DOC-05_Deal_Registration",
-    "DOC-tax-accounting-ai-tools-analys",
-    "DOC-GA4_SETUP_GUIDE",
-    "DOC-20260101-MKI",
-    "DOC-20260101-4PA",
-    "DOC-20260101-TRD",
-    "DOC-20260101-WG8",
-    "DOC-20260101-VG0",
-    "DOC-20260101-UZX",
-    "DOC-20260101-ICN",
-    "DOC-20260101-8VR",
-    "DOC-20260101-K7C",
-    "DOC-20260101-6M7",
-    "DOC-20260101-GR0",
-    "DOC-20260101-HP0",
-    "DOC-20260101-D2L",
-    "DOC-20260101-XHZ",
-    "DOC-20260101-RET",
-    "DOC-20260101-YH9",
-    "DOC-20260101-99J",
-    "DOC-20251231-GV1",
-    "DOC-2025-12-30_소원5문항_gem유지_결정서",
-    "DOC-20251229-9PH",
-    "DOC-20251229-SRH",
-    "DOC-inquiry-form-api"
-  ],
   "decisions": [
     "DOC-DEC-20260201-포인트추천예고편-정책구현",
     "DOC-index",
@@ -300,31 +346,6 @@
     "DEC-2025-1230-001",
     "DEC-2025-1230-002",
     "DEC-2025-1230-003"
-  ],
-  "가격": [
-    "DOC-DEC-20260201-포인트추천예고편-정책구현",
-    "DOC-drive-github-sync-setup",
-    "DOC-tax-accounting-ai-tools-analys",
-    "DOC-06_External_Sharing_Guide",
-    "DOC-alimtalk-templates-design",
-    "DOC-20260101-4PA",
-    "DOC-20260101-TRD",
-    "DOC-20260101-WG8",
-    "DOC-20260101-1YB",
-    "DOC-20260101-L9Y",
-    "DOC-20260101-ICN",
-    "DOC-20260101-8VR",
-    "DOC-20260101-K7C",
-    "DOC-20260101-6M7",
-    "DOC-20260101-GR0",
-    "DOC-20260101-D2L",
-    "DOC-20260101-XHZ",
-    "DOC-20260101-RET",
-    "DOC-20260101-YH9",
-    "DOC-20260101-99J",
-    "DOC-20251231-GV1",
-    "DOC-20251229-SRH",
-    "DOC-20251229-PFO"
   ],
   "deployment": [
     "DOC-deployment-checklist"
@@ -422,12 +443,6 @@
     "DOC-CHANGELOG",
     "DOC-NOTION_PROFILE_GATE",
     "DOC-SOURCES_INDEX"
-  ],
-  "system": [
-    "DOC-agents-index",
-    "DOC-conversation-workflow",
-    "DOC-manifest-system",
-    "DOC-SYS-2025-1230-LUMI-001_Airtabl"
   ],
   "team": [
     "DOC-Aurora5_토론시스템_안내문"
