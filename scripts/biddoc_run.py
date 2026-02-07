@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """
 BidDoc Ops Center - Main Pipeline Runner
-═══════════════════════════════════════════════════════════════════════════
-입찰 문서 자동화 파이프라인 메인 실행 스크립트
 
 Usage:
     python scripts/biddoc_run.py --config ops/biddoc/config.yml
@@ -13,13 +11,101 @@ Usage:
 import argparse
 import json
 import os
+import re
 import shutil
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
 
-import yaml
+# PyYAML fallback - 간단한 YAML 파서
+try:
+    import yaml
+except ImportError:
+    # PyYAML이 없으면 간단한 파서 사용
+    class SimpleYAML:
+        @staticmethod
+        def safe_load(content):
+            """간단한 YAML 파서 (기본 구조만 지원)"""
+            if isinstance(content, str):
+                lines = content.split('\n')
+            else:
+                lines = content.read().split('\n')
+            return SimpleYAML._parse_lines(lines)
+
+        @staticmethod
+        def _parse_lines(lines):
+            result = {}
+            current_key = None
+            current_list = None
+            indent_stack = [(0, result)]
+
+            for line in lines:
+                # 주석, 빈 줄 스킵
+                stripped = line.strip()
+                if not stripped or stripped.startswith('#'):
+                    continue
+
+                # 들여쓰기 계산
+                indent = len(line) - len(line.lstrip())
+
+                # 리스트 항목
+                if stripped.startswith('- '):
+                    value = stripped[2:].strip()
+                    if current_list is not None:
+                        if ':' in value:
+                            # dict in list
+                            k, v = value.split(':', 1)
+                            current_list.append({k.strip(): SimpleYAML._parse_value(v.strip())})
+                        else:
+                            current_list.append(SimpleYAML._parse_value(value))
+                    continue
+
+                # key: value 파싱
+                if ':' in stripped:
+                    key, value = stripped.split(':', 1)
+                    key = key.strip()
+                    value = value.strip()
+
+                    # 현재 컨텍스트 찾기
+                    while indent_stack and indent <= indent_stack[-1][0] and len(indent_stack) > 1:
+                        indent_stack.pop()
+
+                    current_dict = indent_stack[-1][1]
+
+                    if value:
+                        # 값이 있는 경우
+                        current_dict[key] = SimpleYAML._parse_value(value)
+                        current_list = None
+                    else:
+                        # 중첩 구조
+                        new_dict = {}
+                        current_dict[key] = new_dict
+                        indent_stack.append((indent + 2, new_dict))
+                        # 리스트 가능성 체크
+                        current_list = None
+                        current_key = key
+
+            return result
+
+        @staticmethod
+        def _parse_value(value):
+            if value.startswith('"') and value.endswith('"'):
+                return value[1:-1]
+            if value.startswith("'") and value.endswith("'"):
+                return value[1:-1]
+            if value.lower() == 'true':
+                return True
+            if value.lower() == 'false':
+                return False
+            if value.isdigit():
+                return int(value)
+            try:
+                return float(value)
+            except:
+                return value
+
+    yaml = SimpleYAML()
 
 # 스크립트 경로 설정
 SCRIPT_DIR = Path(__file__).parent
@@ -30,9 +116,9 @@ from biddoc_anonymize import anonymize_text, gate1_check
 from biddoc_tone import rewrite_tone, gate2_check
 from biddoc_assemble import assemble_document, gate3_check
 
-# ═══════════════════════════════════════════════════════════════════════════
+# ===========================================================================
 # 상수 정의
-# ═══════════════════════════════════════════════════════════════════════════
+# ===========================================================================
 ARTIFACTS_DIR = PROJECT_ROOT / "artifacts" / "biddoc" / "runs"
 
 
@@ -51,7 +137,16 @@ def create_run_folder():
 
 
 def load_config(config_path):
-    """YAML 설정 파일 로드"""
+    """YAML/JSON 설정 파일 로드"""
+    config_path = Path(config_path)
+
+    # JSON 우선 시도 (PyYAML 없어도 동작)
+    json_path = config_path.with_suffix('.json')
+    if json_path.exists():
+        with open(json_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+
+    # YAML 파일 로드
     with open(config_path, 'r', encoding='utf-8') as f:
         return yaml.safe_load(f)
 
@@ -105,10 +200,10 @@ def write_gate_results(run_dir, gate_results):
 def print_banner():
     """배너 출력"""
     print("""
-═══════════════════════════════════════════════════════════════════════════
+===========================================================================
  BidDoc Ops Center v1
- 입찰 문서 자동화 파이프라인
-═══════════════════════════════════════════════════════════════════════════
+ BidDoc Pipeline
+===========================================================================
 """)
 
 
@@ -147,9 +242,9 @@ def run_pipeline(config, run_dir, steps_to_run=None, dry_run=False, verbose=Fals
     print(f"\n  Run ID: {run_dir.name}")
     print(f"  Output: {run_dir}\n")
 
-    # ─────────────────────────────────────────────────────────────────────
+    # ---------------------------------------------------------------------
     # Step 1: 익명화
-    # ─────────────────────────────────────────────────────────────────────
+    # ---------------------------------------------------------------------
     if "anonymize" in all_steps:
         print_step(1, "Anonymize", "running")
         step_start = time.time()
@@ -196,9 +291,9 @@ def run_pipeline(config, run_dir, steps_to_run=None, dry_run=False, verbose=Fals
         else:
             print_step(1, "Anonymize [DRY-RUN]", "passed")
 
-    # ─────────────────────────────────────────────────────────────────────
+    # ---------------------------------------------------------------------
     # Step 2: 톤 리라이트
-    # ─────────────────────────────────────────────────────────────────────
+    # ---------------------------------------------------------------------
     if "tone" in all_steps:
         print_step(2, "Tone Rewrite", "running")
         step_start = time.time()
@@ -238,9 +333,9 @@ def run_pipeline(config, run_dir, steps_to_run=None, dry_run=False, verbose=Fals
         else:
             print_step(2, "Tone Rewrite [DRY-RUN]", "passed")
 
-    # ─────────────────────────────────────────────────────────────────────
+    # ---------------------------------------------------------------------
     # Step 3: 9장 조립
-    # ─────────────────────────────────────────────────────────────────────
+    # ---------------------------------------------------------------------
     if "assemble" in all_steps:
         print_step(3, "Assemble 9-Pages", "running")
         step_start = time.time()
@@ -282,9 +377,9 @@ def run_pipeline(config, run_dir, steps_to_run=None, dry_run=False, verbose=Fals
         else:
             print_step(3, "Assemble 9-Pages [DRY-RUN]", "passed")
 
-    # ─────────────────────────────────────────────────────────────────────
+    # ---------------------------------------------------------------------
     # Step 4: PDF 출력 (선택적)
-    # ─────────────────────────────────────────────────────────────────────
+    # ---------------------------------------------------------------------
     if "export" in all_steps:
         print_step(4, "Export PDF", "running")
         step_start = time.time()
@@ -383,17 +478,17 @@ def main():
     write_gate_results(run_dir, gate_results)
 
     # 최종 결과 출력
-    print("\n" + "─" * 60)
+    print("\n" + "-" * 60)
     overall_passed = all(s.get('passed', True) for s in steps_result.get('steps', []))
 
     if overall_passed:
-        print(f"  [PASS] 파이프라인 완료")
-        print(f"  출력: {run_dir / 'outputs'}")
+        print(f"  [PASS] Pipeline Complete")
+        print(f"  Output: {run_dir / 'outputs'}")
     else:
-        print(f"  [FAIL] 파이프라인 실패")
+        print(f"  [FAIL] Pipeline Failed")
 
-    print(f"  소요시간: {steps_result.get('total_duration_ms', 0)}ms")
-    print("═" * 60 + "\n")
+    print(f"  Duration: {steps_result.get('total_duration_ms', 0)}ms")
+    print("=" * 60 + "\n")
 
     return 0 if overall_passed else 1
 

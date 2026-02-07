@@ -1,0 +1,65 @@
+{
+  "project_name": "2026 여수세계섬박람회 연계 여행상품 운영",
+  "client_alias": "[발주처]",
+  "event_alias": "[행사명]",
+  "input_file": "inputs/business_plan.txt",
+  "output_dir": "outputs",
+
+  "anonymize": {
+    "strategy": "mask",
+    "types": ["name", "email", "phone", "address", "url"],
+    "custom_patterns": [
+      {"name": "event_name", "pattern": "(여수세계섬박람회|세계섬박람회|섬박람회)", "label": "[행사명]"},
+      {"name": "company_name", "pattern": "(여수여행센터|여수관광센터)", "label": "[회사명]"},
+      {"name": "client_name", "pattern": "(여수시|전라남도|문화체육관광부)", "label": "[발주처]"}
+    ]
+  },
+
+  "tone": {
+    "sentence_limit_per_section": 10,
+    "replacements": [
+      {"from": "AI", "to": "표준화된 운영"},
+      {"from": "Control Tower", "to": "통합 관리 체계"},
+      {"from": "플랫폼", "to": "운영 시스템"},
+      {"from": "자동화", "to": "체계화"}
+    ],
+    "forbidden_words": ["혁신적", "최첨단", "획기적", "압도적"]
+  },
+
+  "assemble": {
+    "pages": [
+      {"title": "1장. 표지", "source": "cover", "required": true},
+      {"title": "2장. 조직/역할", "source": "organization", "required": true},
+      {"title": "3장. 유사 실적", "source": "track_record", "required": true},
+      {"title": "4장. 상품/서비스 구성", "source": "services", "required": true},
+      {"title": "5장. 협력 구조", "source": "partnership", "required": true},
+      {"title": "6장. 운영 방식", "source": "operations", "required": true},
+      {"title": "7장. 홍보/판매/통합 운영", "source": "marketing", "required": true},
+      {"title": "8장. 리스크 관리", "source": "risk_management", "required": true},
+      {"title": "9장. 행정/정산", "source": "admin_settlement", "required": true}
+    ]
+  },
+
+  "export": {
+    "format": "pdf",
+    "template": "formal",
+    "page_size": "A4",
+    "margins": {"top": 25, "bottom": 25, "left": 20, "right": 20}
+  },
+
+  "gates": {
+    "gate1_anonymize": {
+      "fail_on_remaining_identifiers": true,
+      "check_patterns": ["여수여행센터", "여수세계섬박람회", "@", "http", "www.", "010-", "02-"]
+    },
+    "gate2_tone": {
+      "check_anonymous_labels": true,
+      "check_no_new_identifiers": true,
+      "max_sentences_per_section": 2
+    },
+    "gate3_assemble": {
+      "required_pages": 9,
+      "fail_on_missing_page": true
+    }
+  }
+}
