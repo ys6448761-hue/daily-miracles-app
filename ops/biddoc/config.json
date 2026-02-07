@@ -10,8 +10,9 @@
     "types": ["name", "email", "phone", "address", "url"],
     "custom_patterns": [
       {"name": "event_name", "pattern": "(여수세계섬박람회|세계섬박람회|섬박람회)", "label": "[행사명]"},
-      {"name": "company_name", "pattern": "(여수여행센터|여수관광센터)", "label": "[회사명]"},
-      {"name": "client_name", "pattern": "(여수시|전라남도|문화체육관광부)", "label": "[발주처]"}
+      {"name": "company_name", "pattern": "(여수여행센터|여수관광센터|여수\\s*앤\\s*썸)", "label": "[회사명]"},
+      {"name": "client_name", "pattern": "(여수시|전라남도|문화체육관광부)", "label": "[발주처]"},
+      {"name": "partner_org", "pattern": "(농협|NH농협)", "label": "[기관명]"}
     ]
   },
 
@@ -50,7 +51,7 @@
   "gates": {
     "gate1_anonymize": {
       "fail_on_remaining_identifiers": true,
-      "check_patterns": ["여수여행센터", "여수세계섬박람회", "@", "http", "www.", "010-", "02-"]
+      "check_patterns": ["여수여행센터", "여수세계섬박람회", "여수앤썸", "여수 앤 썸", "농협", "@", "http", "www.", "010-", "02-"]
     },
     "gate2_tone": {
       "check_anonymous_labels": true,
