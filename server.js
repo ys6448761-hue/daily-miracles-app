@@ -623,6 +623,28 @@ app.get("/program/messages", (_req, res) => {
   res.sendFile(path.join(__dirname, "public", "program-messages.html"));
 });
 
+// ---------- Playground Pages (소원놀이터) ----------
+// AIL-512: Clean URL 라우트 추가
+app.get("/playground", (_req, res) => {
+  res.sendFile(path.join(__dirname, "public", "playground", "index.html"));
+});
+
+app.get("/playground/create", (_req, res) => {
+  res.sendFile(path.join(__dirname, "public", "playground", "create.html"));
+});
+
+app.get("/playground/result", (_req, res) => {
+  res.sendFile(path.join(__dirname, "public", "playground", "result.html"));
+});
+
+app.get("/playground/remix", (_req, res) => {
+  res.sendFile(path.join(__dirname, "public", "playground", "remix.html"));
+});
+
+app.get("/playground/share", (_req, res) => {
+  res.sendFile(path.join(__dirname, "public", "playground", "share.html"));
+});
+
 // ---------- Result Page (기적 결과 페이지) ----------
 // /result/:id 형태의 URL을 result.html로 라우팅 (ID는 프론트에서 처리)
 app.get("/result/:id", (_req, res) => {
