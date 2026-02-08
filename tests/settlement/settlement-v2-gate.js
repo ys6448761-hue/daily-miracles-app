@@ -200,6 +200,43 @@ console.log('\n--- Gate 6: Server Integration ---');
   console.log(`  ${srvFails.length === 0 ? 'PASS' : 'FAIL'} Reversal original_event_id check`);
 }
 
+// ─── Gate 7: pay→app 파이프라인 검증 ──────────────────────────
+console.log('\n--- Gate 7: Pipeline Verification ---');
+{
+  const routeSource = fs.readFileSync(path.join(__dirname, '..', '..', 'routes', 'settlementRoutes.js'), 'utf-8');
+  const distSource = fs.readFileSync(path.join(__dirname, '..', '..', 'services', 'settlement', 'distributionService.js'), 'utf-8');
+
+  // POST /events 파이프라인 순서: calculate → saveEvent → saveCreatorShares → saveGrowthShares → depositToRiskPool
+  const calcIdx = routeSource.indexOf('.calculate(');
+  const saveIdx = routeSource.indexOf('.saveEvent(');
+  const creatorIdx = routeSource.indexOf('.saveCreatorShares(');
+  const growthIdx = routeSource.indexOf('.saveGrowthShares(');
+  const riskIdx = routeSource.indexOf('.depositToRiskPool(');
+
+  assert(calcIdx > 0 && saveIdx > calcIdx, 'PIPE', 'calc_before_save', true, calcIdx > 0 && saveIdx > calcIdx);
+  assert(saveIdx > 0 && creatorIdx > saveIdx, 'PIPE', 'save_before_creator', true, saveIdx > 0 && creatorIdx > saveIdx);
+  assert(creatorIdx > 0 && growthIdx > creatorIdx, 'PIPE', 'creator_before_growth', true, creatorIdx > 0 && growthIdx > creatorIdx);
+  assert(growthIdx > 0 && riskIdx > growthIdx, 'PIPE', 'growth_before_risk', true, growthIdx > 0 && riskIdx > growthIdx);
+
+  // distributionService: hold 기간 패턴
+  const hasHoldDays = distSource.includes('HOLD_DAYS');
+  assert(hasHoldDays, 'PIPE', 'hold_days', true, hasHoldDays);
+
+  // distributionService: 환불 즉시 처리 패턴
+  const hasRefundBypass = distSource.includes("'pending'") && distSource.includes("'held'");
+  assert(hasRefundBypass, 'PIPE', 'refund_bypass_hold', true, hasRefundBypass);
+
+  // distributionService: risk pool balance tracking
+  const hasBalanceAfter = distSource.includes('balance_after');
+  assert(hasBalanceAfter, 'PIPE', 'risk_balance_track', true, hasBalanceAfter);
+
+  const pipeFails = failures.filter(f => f.startsWith('PIPE'));
+  console.log(`  ${pipeFails.length === 0 ? 'PASS' : 'FAIL'} Pipeline order: calc→save→creator→growth→risk`);
+  console.log(`  ${pipeFails.length === 0 ? 'PASS' : 'FAIL'} Hold period (HOLD_DAYS) applied`);
+  console.log(`  ${pipeFails.length === 0 ? 'PASS' : 'FAIL'} Refund bypass hold pattern`);
+  console.log(`  ${pipeFails.length === 0 ? 'PASS' : 'FAIL'} Risk pool balance tracking`);
+}
+
 // ─── 결과 ────────────────────────────────────────────────────
 console.log(`\n=== Result: ${passed}/${passed + failed} passed ===`);
 
