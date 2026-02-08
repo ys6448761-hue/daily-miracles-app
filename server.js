@@ -772,7 +772,8 @@ app.get("/api/health", async (req, res) => {
       yeosuRoutes: yeosuRoutes !== null,
       db: db !== null,
       metrics: metricsService !== null,
-      playground: playgroundEngine !== null
+      playground: playgroundEngine !== null,
+      settlement: settlementEngine !== null
     }
   });
 });

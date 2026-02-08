@@ -348,6 +348,37 @@ console.log('\n--- Gate 9: Payout Batch Minimum ---');
   console.log(`  ${payoutFails.length === 0 ? 'PASS' : 'FAIL'} Batch endpoints (create/confirm/get/list)`);
 }
 
+// ─── Gate 10: Staging Readiness ──────────────────────────────
+console.log('\n--- Gate 10: Staging Readiness ---');
+{
+  const serverSource = fs.readFileSync(path.join(__dirname, '..', '..', 'server.js'), 'utf-8');
+
+  // /api/health에 settlement 모듈 상태 포함
+  const hasSettlementHealth = serverSource.includes('settlement: settlementEngine');
+  assert(hasSettlementHealth, 'STAGING', 'health_settlement', true, hasSettlementHealth);
+
+  // staging 검증 스크립트 존재
+  const stagingScript = path.join(__dirname, '..', '..', 'scripts', 'ops', 'staging-settlement-check.js');
+  const hasStagingScript = fs.existsSync(stagingScript);
+  assert(hasStagingScript, 'STAGING', 'staging_script', true, hasStagingScript);
+
+  // DB 마이그레이션 파일 존재
+  const migrationPath = path.join(__dirname, '..', '..', 'database', 'migrations', '016_settlement_engine.sql');
+  const hasMigration = fs.existsSync(migrationPath);
+  assert(hasMigration, 'STAGING', 'migration_exists', true, hasMigration);
+
+  // POST /calculate (시뮬레이션) 엔드포인트 존재
+  const routeSource = fs.readFileSync(path.join(__dirname, '..', '..', 'routes', 'settlementRoutes.js'), 'utf-8');
+  const hasSimulate = routeSource.includes("'/calculate'");
+  assert(hasSimulate, 'STAGING', 'simulate_endpoint', true, hasSimulate);
+
+  const stagingFails = failures.filter(f => f.startsWith('STAGING'));
+  console.log(`  ${stagingFails.length === 0 ? 'PASS' : 'FAIL'} /api/health includes settlement module`);
+  console.log(`  ${stagingFails.length === 0 ? 'PASS' : 'FAIL'} Staging check script exists`);
+  console.log(`  ${stagingFails.length === 0 ? 'PASS' : 'FAIL'} DB migration (016) exists`);
+  console.log(`  ${stagingFails.length === 0 ? 'PASS' : 'FAIL'} POST /calculate simulation endpoint`);
+}
+
 // ─── 결과 ────────────────────────────────────────────────────
 console.log(`\n=== Result: ${passed}/${passed + failed} passed ===`);
 
