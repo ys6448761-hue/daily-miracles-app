@@ -118,6 +118,32 @@ console.log('\n--- Gate 4: Reversal ---');
   console.log(`  ${failures.some(f => f.startsWith('REV-PARTIAL')) ? 'FAIL' : 'PASS'} Partial reversal (50%)`);
 }
 
+// ─── Gate 3b: Idempotency (DB 패턴 검증) ──────────────────────
+console.log('\n--- Gate 3b: Idempotency (DB pattern) ---');
+{
+  // saveEvent 소스 코드에 ON CONFLICT (event_id) DO NOTHING 패턴 존재 확인
+  const calcSource = fs.readFileSync(path.join(__dirname, '..', '..', 'services', 'settlement', 'calculationService.js'), 'utf-8');
+  const hasOnConflict = calcSource.includes('ON CONFLICT (event_id) DO NOTHING');
+  assert(hasOnConflict, 'IDEM-DB', 'on_conflict_pattern', true, hasOnConflict);
+
+  // 순수함수 idempotency: 다양한 입력 3회 동일 결과
+  const events = [
+    { gross_amount: 33333, coupon_amount: 5000, remix_chain: ['a', 'b'], referrer_id: 'ref' },
+    { gross_amount: 1000, coupon_amount: 0, remix_chain: [], referrer_id: null },
+    { gross_amount: 100000, coupon_amount: 10000, remix_chain: ['c1', 'c2', 'c3'], referrer_id: 'top' },
+  ];
+  events.forEach((ev, i) => {
+    const r1 = JSON.stringify(calcService.calculate(ev));
+    const r2 = JSON.stringify(calcService.calculate(ev));
+    const r3 = JSON.stringify(calcService.calculate(ev));
+    assert(r1 === r2 && r2 === r3, `IDEM-PURE-${i}`, 'triple_run', 'identical', r1 === r2 && r2 === r3 ? 'identical' : 'differ');
+  });
+
+  const idemFails = failures.filter(f => f.startsWith('IDEM'));
+  console.log(`  ${idemFails.length === 0 ? 'PASS' : 'FAIL'} ON CONFLICT pattern in saveEvent`);
+  console.log(`  ${idemFails.length === 0 ? 'PASS' : 'FAIL'} Pure function 3x idempotency (3 events)`);
+}
+
 // ─── Gate 5: 추천/리믹스 분기 ────────────────────────────────
 console.log('\n--- Gate 5: Referral/Remix Branching ---');
 {
