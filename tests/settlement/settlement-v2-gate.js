@@ -118,6 +118,33 @@ console.log('\n--- Gate 4: Reversal ---');
   console.log(`  ${failures.some(f => f.startsWith('REV-PARTIAL')) ? 'FAIL' : 'PASS'} Partial reversal (50%)`);
 }
 
+// ─── Gate 5: 추천/리믹스 분기 ────────────────────────────────
+console.log('\n--- Gate 5: Referral/Remix Branching ---');
+{
+  // 추천 없음 → reserve = growth_pool 전액
+  const noRef = calcService.calculate({ gross_amount: 10000, coupon_amount: 0, remix_chain: [], referrer_id: null });
+  assert(noRef.growth_breakdown.reserve === noRef.pools.growth, 'BRANCH', 'no_ref_reserve', noRef.pools.growth, noRef.growth_breakdown.reserve);
+  assert(noRef.growth_breakdown.referrer === 0, 'BRANCH', 'no_ref_referrer', 0, noRef.growth_breakdown.referrer);
+
+  // 추천 있음 → referrer + campaign = growth_pool
+  const withRef = calcService.calculate({ gross_amount: 10000, coupon_amount: 0, remix_chain: [], referrer_id: 'ref1' });
+  assert(withRef.growth_breakdown.referrer + withRef.growth_breakdown.campaign === withRef.pools.growth, 'BRANCH', 'ref_sum', withRef.pools.growth, withRef.growth_breakdown.referrer + withRef.growth_breakdown.campaign);
+  assert(withRef.growth_breakdown.reserve === 0, 'BRANCH', 'ref_no_reserve', 0, withRef.growth_breakdown.reserve);
+
+  // 리믹스 없음 → remix_shares empty, remix_total은 미분배 상태
+  const noRemix = calcService.calculate({ gross_amount: 10000, coupon_amount: 0, remix_chain: [], referrer_id: null });
+  assert(noRemix.creator_breakdown.remix_shares.length === 0, 'BRANCH', 'no_remix_shares', 0, noRemix.creator_breakdown.remix_shares.length);
+
+  // 리믹스 4단계 → 3개만 적용
+  const remix4 = calcService.calculate({ gross_amount: 10000, coupon_amount: 0, remix_chain: ['a', 'b', 'c', 'd'], referrer_id: null });
+  assert(remix4.creator_breakdown.remix_shares.length === 3, 'BRANCH', 'remix_max3', 3, remix4.creator_breakdown.remix_shares.length);
+
+  const branchFails = failures.filter(f => f.startsWith('BRANCH'));
+  console.log(`  ${branchFails.length === 0 ? 'PASS' : 'FAIL'} No referrer → reserve full`);
+  console.log(`  ${branchFails.length === 0 ? 'PASS' : 'FAIL'} With referrer → referrer+campaign=growth`);
+  console.log(`  ${branchFails.length === 0 ? 'PASS' : 'FAIL'} Remix max depth=3`);
+}
+
 // ─── 결과 ────────────────────────────────────────────────────
 console.log(`\n=== Result: ${passed}/${passed + failed} passed ===`);
 
