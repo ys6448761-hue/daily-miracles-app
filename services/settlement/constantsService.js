@@ -33,7 +33,7 @@ const DEFAULT_CONSTANTS = {
   MAX_MONTHLY_DEDUCTION_RATE: 0.10,
 
   // PG 수수료
-  PG_FEE_RATE: 0.033,
+  PG_FEE_RATE: 0.035,
 };
 
 // 메모리 캐시

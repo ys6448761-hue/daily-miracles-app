@@ -34,7 +34,7 @@ const SETTLEMENT_CONSTANTS = {
   MAX_MONTHLY_DEDUCTION_RATE: 0.10,
 
   // PG 수수료
-  PG_FEE_RATE: 0.033,
+  PG_FEE_RATE: 0.035,
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -48,8 +48,8 @@ function calculateSettlement(event) {
   const pg_fee = Math.round(paid * SETTLEMENT_CONSTANTS.PG_FEE_RATE);
   const net_cash = paid - pg_fee;
 
-  // Step 2: Anchor 계산 (쿠폰은 플랫폼 부담이므로 Gross 기준)
-  const anchor = gross_amount - Math.round(gross_amount * SETTLEMENT_CONSTANTS.PG_FEE_RATE);
+  // Step 2: Anchor 계산 (쿠폰은 플랫폼 부담 → Gross - 실제PG수수료)
+  const anchor = gross_amount - pg_fee;
 
   // Step 3: 풀별 배분
   const platform_pool = Math.round(anchor * SETTLEMENT_CONSTANTS.PLATFORM_RATE);
@@ -83,7 +83,7 @@ function calculateSettlement(event) {
 
   if (referrer_id) {
     growth_referrer = Math.round(growth_pool * (SETTLEMENT_CONSTANTS.GROWTH_REFERRER_RATE / SETTLEMENT_CONSTANTS.GROWTH_POOL_RATE));
-    growth_campaign = Math.round(growth_pool * (SETTLEMENT_CONSTANTS.GROWTH_CAMPAIGN_RATE / SETTLEMENT_CONSTANTS.GROWTH_POOL_RATE));
+    growth_campaign = growth_pool - growth_referrer; // 잔여 보정
   } else {
     growth_reserve = growth_pool; // 추천 없으면 전액 적립
   }

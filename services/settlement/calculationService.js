@@ -32,8 +32,8 @@ function calculate(event) {
   const pg_fee = Math.round(paid * C.PG_FEE_RATE);
   const net_cash = paid - pg_fee;
 
-  // Step 2: Anchor 계산 (쿠폰은 플랫폼 부담 → Gross 기준)
-  const anchor = gross_amount - Math.round(gross_amount * C.PG_FEE_RATE);
+  // Step 2: Anchor 계산 (쿠폰은 플랫폼 부담 → Gross - 실제PG수수료)
+  const anchor = gross_amount - pg_fee;
 
   // Step 3: 풀별 배분 (Anchor 기준)
   const platform_pool = Math.round(anchor * C.PLATFORM_RATE);
@@ -68,9 +68,9 @@ function calculate(event) {
   let growth_reserve = 0;
 
   if (referrer_id) {
-    // 추천자 있음: 7% + 3% 분배
+    // 추천자 있음: referrer 먼저 계산, campaign은 잔여 보정
     growth_referrer = Math.round(growth_pool * (C.GROWTH_REFERRER_RATE / C.GROWTH_POOL_RATE));
-    growth_campaign = Math.round(growth_pool * (C.GROWTH_CAMPAIGN_RATE / C.GROWTH_POOL_RATE));
+    growth_campaign = growth_pool - growth_referrer;
   } else {
     // 추천 없음: 전액 적립
     growth_reserve = growth_pool;
