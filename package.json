@@ -22,6 +22,7 @@
     "test:caption": "node tests/caption/captionService.test.js",
     "test:certificate": "node tests/certificate/certificateService.test.js",
     "test:postcard": "node tests/postcard/postcardService.test.js",
+    "test:settlement": "node tests/settlement/settlement-v2-gate.js",
     "test:소원그림": "node tests/caption/captionService.test.js && node tests/certificate/certificateService.test.js && node tests/postcard/postcardService.test.js"
   },
   "engines": {

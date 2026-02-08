@@ -1,0 +1,978 @@
+{
+  "version": "2.0",
+  "pg_fee_rate": 0.035,
+  "anchor_formula": "Gross - PG_Fee (PG_Fee = round(Paid * PG_FEE_RATE))",
+  "tolerance": 0,
+  "generated_at": "2026-02-08T21:30:02.736Z",
+  "cases": [
+    {
+      "id": "TC-001",
+      "name": "기본 결제 10,000원",
+      "category": "A",
+      "event": {
+        "event_type": "PAYMENT",
+        "gross_amount": 10000,
+        "coupon_amount": 0,
+        "remix_chain": [],
+        "referrer_id": null
+      },
+      "expected": {
+        "paid": 10000,
+        "pg_fee": 350,
+        "net_cash": 9650,
+        "anchor": 9650,
+        "pools": {
+          "platform": 5308,
+          "platform_actual": 5307,
+          "creator": 2895,
+          "growth": 965,
+          "risk": 483
+        },
+        "creator_breakdown": {
+          "original": 2026,
+          "remix_total": 579,
+          "remix_shares": [],
+          "curation": 290
+        },
+        "growth_breakdown": {
+          "referrer_id": null,
+          "referrer": 0,
+          "campaign": 0,
+          "reserve": 965
+        },
+        "validation": {
+          "total_distributed": 9650,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "10000 = 5307 + 2895 + 965 + 483 + 350"
+        }
+      }
+    },
+    {
+      "id": "TC-002",
+      "name": "기본 결제 100,000원",
+      "category": "A",
+      "event": {
+        "event_type": "PAYMENT",
+        "gross_amount": 100000,
+        "coupon_amount": 0,
+        "remix_chain": [],
+        "referrer_id": null
+      },
+      "expected": {
+        "paid": 100000,
+        "pg_fee": 3500,
+        "net_cash": 96500,
+        "anchor": 96500,
+        "pools": {
+          "platform": 53075,
+          "platform_actual": 53075,
+          "creator": 28950,
+          "growth": 9650,
+          "risk": 4825
+        },
+        "creator_breakdown": {
+          "original": 20265,
+          "remix_total": 5790,
+          "remix_shares": [],
+          "curation": 2895
+        },
+        "growth_breakdown": {
+          "referrer_id": null,
+          "referrer": 0,
+          "campaign": 0,
+          "reserve": 9650
+        },
+        "validation": {
+          "total_distributed": 96500,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "100000 = 53075 + 28950 + 9650 + 4825 + 3500"
+        }
+      }
+    },
+    {
+      "id": "TC-003",
+      "name": "최소 결제 1,000원",
+      "category": "A",
+      "event": {
+        "event_type": "PAYMENT",
+        "gross_amount": 1000,
+        "coupon_amount": 0,
+        "remix_chain": [],
+        "referrer_id": null
+      },
+      "expected": {
+        "paid": 1000,
+        "pg_fee": 35,
+        "net_cash": 965,
+        "anchor": 965,
+        "pools": {
+          "platform": 531,
+          "platform_actual": 530,
+          "creator": 290,
+          "growth": 97,
+          "risk": 48
+        },
+        "creator_breakdown": {
+          "original": 203,
+          "remix_total": 58,
+          "remix_shares": [],
+          "curation": 29
+        },
+        "growth_breakdown": {
+          "referrer_id": null,
+          "referrer": 0,
+          "campaign": 0,
+          "reserve": 97
+        },
+        "validation": {
+          "total_distributed": 965,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "1000 = 530 + 290 + 97 + 48 + 35"
+        }
+      }
+    },
+    {
+      "id": "TC-004",
+      "name": "중간 금액 29,900원",
+      "category": "A",
+      "event": {
+        "event_type": "PAYMENT",
+        "gross_amount": 29900,
+        "coupon_amount": 0,
+        "remix_chain": [],
+        "referrer_id": null
+      },
+      "expected": {
+        "paid": 29900,
+        "pg_fee": 1047,
+        "net_cash": 28853,
+        "anchor": 28853,
+        "pools": {
+          "platform": 15869,
+          "platform_actual": 15869,
+          "creator": 8656,
+          "growth": 2885,
+          "risk": 1443
+        },
+        "creator_breakdown": {
+          "original": 6059,
+          "remix_total": 1731,
+          "remix_shares": [],
+          "curation": 866
+        },
+        "growth_breakdown": {
+          "referrer_id": null,
+          "referrer": 0,
+          "campaign": 0,
+          "reserve": 2885
+        },
+        "validation": {
+          "total_distributed": 28853,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "29900 = 15869 + 8656 + 2885 + 1443 + 1047"
+        }
+      }
+    },
+    {
+      "id": "TC-005",
+      "name": "소수점 33,333원",
+      "category": "A",
+      "event": {
+        "event_type": "PAYMENT",
+        "gross_amount": 33333,
+        "coupon_amount": 0,
+        "remix_chain": [],
+        "referrer_id": null
+      },
+      "expected": {
+        "paid": 33333,
+        "pg_fee": 1167,
+        "net_cash": 32166,
+        "anchor": 32166,
+        "pools": {
+          "platform": 17691,
+          "platform_actual": 17691,
+          "creator": 9650,
+          "growth": 3217,
+          "risk": 1608
+        },
+        "creator_breakdown": {
+          "original": 6755,
+          "remix_total": 1930,
+          "remix_shares": [],
+          "curation": 965
+        },
+        "growth_breakdown": {
+          "referrer_id": null,
+          "referrer": 0,
+          "campaign": 0,
+          "reserve": 3217
+        },
+        "validation": {
+          "total_distributed": 32166,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "33333 = 17691 + 9650 + 3217 + 1608 + 1167"
+        }
+      }
+    },
+    {
+      "id": "TC-006",
+      "name": "쿠폰 10% 할인",
+      "category": "A",
+      "event": {
+        "event_type": "PAYMENT",
+        "gross_amount": 10000,
+        "coupon_amount": 1000,
+        "remix_chain": [],
+        "referrer_id": null
+      },
+      "expected": {
+        "paid": 9000,
+        "pg_fee": 315,
+        "net_cash": 8685,
+        "anchor": 9685,
+        "pools": {
+          "platform": 5327,
+          "platform_actual": 4326,
+          "creator": 2906,
+          "growth": 969,
+          "risk": 484
+        },
+        "creator_breakdown": {
+          "original": 2034,
+          "remix_total": 581,
+          "remix_shares": [],
+          "curation": 291
+        },
+        "growth_breakdown": {
+          "referrer_id": null,
+          "referrer": 0,
+          "campaign": 0,
+          "reserve": 969
+        },
+        "validation": {
+          "total_distributed": 8685,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "9000 = 4326 + 2906 + 969 + 484 + 315"
+        }
+      }
+    },
+    {
+      "id": "TC-007",
+      "name": "쿠폰 50% 대폭 할인",
+      "category": "B",
+      "event": {
+        "event_type": "PAYMENT",
+        "gross_amount": 20000,
+        "coupon_amount": 10000,
+        "remix_chain": [],
+        "referrer_id": null
+      },
+      "expected": {
+        "paid": 10000,
+        "pg_fee": 350,
+        "net_cash": 9650,
+        "anchor": 19650,
+        "pools": {
+          "platform": 10808,
+          "platform_actual": 807,
+          "creator": 5895,
+          "growth": 1965,
+          "risk": 983
+        },
+        "creator_breakdown": {
+          "original": 4127,
+          "remix_total": 1179,
+          "remix_shares": [],
+          "curation": 590
+        },
+        "growth_breakdown": {
+          "referrer_id": null,
+          "referrer": 0,
+          "campaign": 0,
+          "reserve": 1965
+        },
+        "validation": {
+          "total_distributed": 9650,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "10000 = 807 + 5895 + 1965 + 983 + 350"
+        }
+      }
+    },
+    {
+      "id": "TC-008",
+      "name": "쿠폰 정액 3,000원",
+      "category": "B",
+      "event": {
+        "event_type": "PAYMENT",
+        "gross_amount": 15000,
+        "coupon_amount": 3000,
+        "remix_chain": [],
+        "referrer_id": null
+      },
+      "expected": {
+        "paid": 12000,
+        "pg_fee": 420,
+        "net_cash": 11580,
+        "anchor": 14580,
+        "pools": {
+          "platform": 8019,
+          "platform_actual": 5019,
+          "creator": 4374,
+          "growth": 1458,
+          "risk": 729
+        },
+        "creator_breakdown": {
+          "original": 3062,
+          "remix_total": 875,
+          "remix_shares": [],
+          "curation": 437
+        },
+        "growth_breakdown": {
+          "referrer_id": null,
+          "referrer": 0,
+          "campaign": 0,
+          "reserve": 1458
+        },
+        "validation": {
+          "total_distributed": 11580,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "12000 = 5019 + 4374 + 1458 + 729 + 420"
+        }
+      }
+    },
+    {
+      "id": "TC-009",
+      "name": "추천자 직접",
+      "category": "B",
+      "event": {
+        "event_type": "PAYMENT",
+        "gross_amount": 10000,
+        "coupon_amount": 0,
+        "remix_chain": [],
+        "referrer_id": "user_ref_001"
+      },
+      "expected": {
+        "paid": 10000,
+        "pg_fee": 350,
+        "net_cash": 9650,
+        "anchor": 9650,
+        "pools": {
+          "platform": 5308,
+          "platform_actual": 5307,
+          "creator": 2895,
+          "growth": 965,
+          "risk": 483
+        },
+        "creator_breakdown": {
+          "original": 2026,
+          "remix_total": 579,
+          "remix_shares": [],
+          "curation": 290
+        },
+        "growth_breakdown": {
+          "referrer_id": "user_ref_001",
+          "referrer": 676,
+          "campaign": 289,
+          "reserve": 0
+        },
+        "validation": {
+          "total_distributed": 9650,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "10000 = 5307 + 2895 + 965 + 483 + 350"
+        }
+      }
+    },
+    {
+      "id": "TC-010",
+      "name": "추천 + 쿠폰 복합",
+      "category": "B",
+      "event": {
+        "event_type": "PAYMENT",
+        "gross_amount": 20000,
+        "coupon_amount": 2000,
+        "remix_chain": [],
+        "referrer_id": "user_ref_002"
+      },
+      "expected": {
+        "paid": 18000,
+        "pg_fee": 630,
+        "net_cash": 17370,
+        "anchor": 19370,
+        "pools": {
+          "platform": 10654,
+          "platform_actual": 8653,
+          "creator": 5811,
+          "growth": 1937,
+          "risk": 969
+        },
+        "creator_breakdown": {
+          "original": 4068,
+          "remix_total": 1162,
+          "remix_shares": [],
+          "curation": 581
+        },
+        "growth_breakdown": {
+          "referrer_id": "user_ref_002",
+          "referrer": 1356,
+          "campaign": 581,
+          "reserve": 0
+        },
+        "validation": {
+          "total_distributed": 17370,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "18000 = 8653 + 5811 + 1937 + 969 + 630"
+        }
+      }
+    },
+    {
+      "id": "TC-011",
+      "name": "리믹스 1단계",
+      "category": "C",
+      "event": {
+        "event_type": "PAYMENT",
+        "gross_amount": 10000,
+        "coupon_amount": 0,
+        "remix_chain": [
+          "creator_p1"
+        ],
+        "referrer_id": null
+      },
+      "expected": {
+        "paid": 10000,
+        "pg_fee": 350,
+        "net_cash": 9650,
+        "anchor": 9650,
+        "pools": {
+          "platform": 5308,
+          "platform_actual": 5307,
+          "creator": 2895,
+          "growth": 965,
+          "risk": 483
+        },
+        "creator_breakdown": {
+          "original": 2026,
+          "remix_total": 579,
+          "remix_shares": [
+            {
+              "creator_id": "creator_p1",
+              "depth": 1,
+              "amount": 579
+            }
+          ],
+          "curation": 290
+        },
+        "growth_breakdown": {
+          "referrer_id": null,
+          "referrer": 0,
+          "campaign": 0,
+          "reserve": 965
+        },
+        "validation": {
+          "total_distributed": 9650,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "10000 = 5307 + 2895 + 965 + 483 + 350"
+        }
+      }
+    },
+    {
+      "id": "TC-012",
+      "name": "리믹스 2단계",
+      "category": "C",
+      "event": {
+        "event_type": "PAYMENT",
+        "gross_amount": 10000,
+        "coupon_amount": 0,
+        "remix_chain": [
+          "creator_p1",
+          "creator_p2"
+        ],
+        "referrer_id": null
+      },
+      "expected": {
+        "paid": 10000,
+        "pg_fee": 350,
+        "net_cash": 9650,
+        "anchor": 9650,
+        "pools": {
+          "platform": 5308,
+          "platform_actual": 5307,
+          "creator": 2895,
+          "growth": 965,
+          "risk": 483
+        },
+        "creator_breakdown": {
+          "original": 2026,
+          "remix_total": 579,
+          "remix_shares": [
+            {
+              "creator_id": "creator_p1",
+              "depth": 1,
+              "amount": 290
+            },
+            {
+              "creator_id": "creator_p2",
+              "depth": 2,
+              "amount": 290
+            }
+          ],
+          "curation": 290
+        },
+        "growth_breakdown": {
+          "referrer_id": null,
+          "referrer": 0,
+          "campaign": 0,
+          "reserve": 965
+        },
+        "validation": {
+          "total_distributed": 9650,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "10000 = 5307 + 2895 + 965 + 483 + 350"
+        }
+      }
+    },
+    {
+      "id": "TC-013",
+      "name": "리믹스 3단계 (최대)",
+      "category": "C",
+      "event": {
+        "event_type": "PAYMENT",
+        "gross_amount": 30000,
+        "coupon_amount": 0,
+        "remix_chain": [
+          "c1",
+          "c2",
+          "c3"
+        ],
+        "referrer_id": null
+      },
+      "expected": {
+        "paid": 30000,
+        "pg_fee": 1050,
+        "net_cash": 28950,
+        "anchor": 28950,
+        "pools": {
+          "platform": 15923,
+          "platform_actual": 15922,
+          "creator": 8685,
+          "growth": 2895,
+          "risk": 1448
+        },
+        "creator_breakdown": {
+          "original": 6080,
+          "remix_total": 1737,
+          "remix_shares": [
+            {
+              "creator_id": "c1",
+              "depth": 1,
+              "amount": 579
+            },
+            {
+              "creator_id": "c2",
+              "depth": 2,
+              "amount": 579
+            },
+            {
+              "creator_id": "c3",
+              "depth": 3,
+              "amount": 579
+            }
+          ],
+          "curation": 869
+        },
+        "growth_breakdown": {
+          "referrer_id": null,
+          "referrer": 0,
+          "campaign": 0,
+          "reserve": 2895
+        },
+        "validation": {
+          "total_distributed": 28950,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "30000 = 15922 + 8685 + 2895 + 1448 + 1050"
+        }
+      }
+    },
+    {
+      "id": "TC-014",
+      "name": "리믹스 4단계 (3까지만)",
+      "category": "C",
+      "event": {
+        "event_type": "PAYMENT",
+        "gross_amount": 10000,
+        "coupon_amount": 0,
+        "remix_chain": [
+          "c1",
+          "c2",
+          "c3",
+          "c4_ignored"
+        ],
+        "referrer_id": null
+      },
+      "expected": {
+        "paid": 10000,
+        "pg_fee": 350,
+        "net_cash": 9650,
+        "anchor": 9650,
+        "pools": {
+          "platform": 5308,
+          "platform_actual": 5307,
+          "creator": 2895,
+          "growth": 965,
+          "risk": 483
+        },
+        "creator_breakdown": {
+          "original": 2026,
+          "remix_total": 579,
+          "remix_shares": [
+            {
+              "creator_id": "c1",
+              "depth": 1,
+              "amount": 193
+            },
+            {
+              "creator_id": "c2",
+              "depth": 2,
+              "amount": 193
+            },
+            {
+              "creator_id": "c3",
+              "depth": 3,
+              "amount": 193
+            }
+          ],
+          "curation": 290
+        },
+        "growth_breakdown": {
+          "referrer_id": null,
+          "referrer": 0,
+          "campaign": 0,
+          "reserve": 965
+        },
+        "validation": {
+          "total_distributed": 9650,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "10000 = 5307 + 2895 + 965 + 483 + 350"
+        }
+      }
+    },
+    {
+      "id": "TC-015",
+      "name": "복합: 쿠폰+추천+리믹스2",
+      "category": "D",
+      "event": {
+        "event_type": "PAYMENT",
+        "gross_amount": 50000,
+        "coupon_amount": 5000,
+        "remix_chain": [
+          "creator_p1",
+          "creator_p2"
+        ],
+        "referrer_id": "user_ref_complex"
+      },
+      "expected": {
+        "paid": 45000,
+        "pg_fee": 1575,
+        "net_cash": 43425,
+        "anchor": 48425,
+        "pools": {
+          "platform": 26634,
+          "platform_actual": 21633,
+          "creator": 14528,
+          "growth": 4843,
+          "risk": 2421
+        },
+        "creator_breakdown": {
+          "original": 10170,
+          "remix_total": 2906,
+          "remix_shares": [
+            {
+              "creator_id": "creator_p1",
+              "depth": 1,
+              "amount": 1453
+            },
+            {
+              "creator_id": "creator_p2",
+              "depth": 2,
+              "amount": 1453
+            }
+          ],
+          "curation": 1453
+        },
+        "growth_breakdown": {
+          "referrer_id": "user_ref_complex",
+          "referrer": 3390,
+          "campaign": 1453,
+          "reserve": 0
+        },
+        "validation": {
+          "total_distributed": 43425,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "45000 = 21633 + 14528 + 4843 + 2421 + 1575"
+        }
+      }
+    },
+    {
+      "id": "TC-016",
+      "name": "복합: 고가+리믹스3+추천",
+      "category": "D",
+      "event": {
+        "event_type": "PAYMENT",
+        "gross_amount": 100000,
+        "coupon_amount": 10000,
+        "remix_chain": [
+          "c1",
+          "c2",
+          "c3"
+        ],
+        "referrer_id": "top_referrer"
+      },
+      "expected": {
+        "paid": 90000,
+        "pg_fee": 3150,
+        "net_cash": 86850,
+        "anchor": 96850,
+        "pools": {
+          "platform": 53268,
+          "platform_actual": 43267,
+          "creator": 29055,
+          "growth": 9685,
+          "risk": 4843
+        },
+        "creator_breakdown": {
+          "original": 20339,
+          "remix_total": 5811,
+          "remix_shares": [
+            {
+              "creator_id": "c1",
+              "depth": 1,
+              "amount": 1937
+            },
+            {
+              "creator_id": "c2",
+              "depth": 2,
+              "amount": 1937
+            },
+            {
+              "creator_id": "c3",
+              "depth": 3,
+              "amount": 1937
+            }
+          ],
+          "curation": 2906
+        },
+        "growth_breakdown": {
+          "referrer_id": "top_referrer",
+          "referrer": 6780,
+          "campaign": 2905,
+          "reserve": 0
+        },
+        "validation": {
+          "total_distributed": 86850,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "90000 = 43267 + 29055 + 9685 + 4843 + 3150"
+        }
+      }
+    },
+    {
+      "id": "TC-017",
+      "name": "환불 전액",
+      "category": "D",
+      "event": {
+        "event_type": "REFUND",
+        "gross_amount": 10000,
+        "coupon_amount": 0,
+        "remix_chain": [],
+        "referrer_id": null,
+        "original_event_id": "evt_orig_001"
+      },
+      "expected": {
+        "paid": 10000,
+        "pg_fee": 350,
+        "net_cash": 9650,
+        "anchor": 9650,
+        "pools": {
+          "platform": 5308,
+          "platform_actual": 5307,
+          "creator": 2895,
+          "growth": 965,
+          "risk": 483
+        },
+        "creator_breakdown": {
+          "original": 2026,
+          "remix_total": 579,
+          "remix_shares": [],
+          "curation": 290
+        },
+        "growth_breakdown": {
+          "referrer_id": null,
+          "referrer": 0,
+          "campaign": 0,
+          "reserve": 965
+        },
+        "validation": {
+          "total_distributed": 9650,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "10000 = 5307 + 2895 + 965 + 483 + 350"
+        }
+      }
+    },
+    {
+      "id": "TC-018",
+      "name": "환불 부분 50%",
+      "category": "D",
+      "event": {
+        "event_type": "REFUND",
+        "gross_amount": 5000,
+        "coupon_amount": 0,
+        "remix_chain": [],
+        "referrer_id": null,
+        "original_event_id": "evt_orig_002"
+      },
+      "expected": {
+        "paid": 5000,
+        "pg_fee": 175,
+        "net_cash": 4825,
+        "anchor": 4825,
+        "pools": {
+          "platform": 2654,
+          "platform_actual": 2653,
+          "creator": 1448,
+          "growth": 483,
+          "risk": 241
+        },
+        "creator_breakdown": {
+          "original": 1014,
+          "remix_total": 290,
+          "remix_shares": [],
+          "curation": 145
+        },
+        "growth_breakdown": {
+          "referrer_id": null,
+          "referrer": 0,
+          "campaign": 0,
+          "reserve": 483
+        },
+        "validation": {
+          "total_distributed": 4825,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "5000 = 2653 + 1448 + 483 + 241 + 175"
+        }
+      }
+    },
+    {
+      "id": "TC-019",
+      "name": "차지백 리믹스+추천",
+      "category": "D",
+      "event": {
+        "event_type": "CHARGEBACK",
+        "gross_amount": 20000,
+        "coupon_amount": 0,
+        "remix_chain": [
+          "creator_p1"
+        ],
+        "referrer_id": "user_ref_cb",
+        "original_event_id": "evt_orig_003"
+      },
+      "expected": {
+        "paid": 20000,
+        "pg_fee": 700,
+        "net_cash": 19300,
+        "anchor": 19300,
+        "pools": {
+          "platform": 10615,
+          "platform_actual": 10615,
+          "creator": 5790,
+          "growth": 1930,
+          "risk": 965
+        },
+        "creator_breakdown": {
+          "original": 4053,
+          "remix_total": 1158,
+          "remix_shares": [
+            {
+              "creator_id": "creator_p1",
+              "depth": 1,
+              "amount": 1158
+            }
+          ],
+          "curation": 579
+        },
+        "growth_breakdown": {
+          "referrer_id": "user_ref_cb",
+          "referrer": 1351,
+          "campaign": 579,
+          "reserve": 0
+        },
+        "validation": {
+          "total_distributed": 19300,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "20000 = 10615 + 5790 + 1930 + 965 + 700"
+        }
+      }
+    },
+    {
+      "id": "TC-020",
+      "name": "수수료조정 FEE_ADJUSTED",
+      "category": "D",
+      "event": {
+        "event_type": "FEE_ADJUSTED",
+        "gross_amount": 10000,
+        "coupon_amount": 0,
+        "remix_chain": [],
+        "referrer_id": null,
+        "original_event_id": "evt_orig_004"
+      },
+      "expected": {
+        "paid": 10000,
+        "pg_fee": 350,
+        "net_cash": 9650,
+        "anchor": 9650,
+        "pools": {
+          "platform": 5308,
+          "platform_actual": 5307,
+          "creator": 2895,
+          "growth": 965,
+          "risk": 483
+        },
+        "creator_breakdown": {
+          "original": 2026,
+          "remix_total": 579,
+          "remix_shares": [],
+          "curation": 290
+        },
+        "growth_breakdown": {
+          "referrer_id": null,
+          "referrer": 0,
+          "campaign": 0,
+          "reserve": 965
+        },
+        "validation": {
+          "total_distributed": 9650,
+          "balance_diff": 0,
+          "balance_check": true,
+          "invariant": "10000 = 5307 + 2895 + 965 + 483 + 350"
+        }
+      }
+    }
+  ]
+}
