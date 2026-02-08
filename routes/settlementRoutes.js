@@ -150,6 +150,107 @@ router.post('/events', async (req, res) => {
 });
 
 /**
+ * POST /api/settlement/events/reversal
+ * 역분개 이벤트 생성 (환불/차지백/수수료조정)
+ */
+router.post('/events/reversal', async (req, res) => {
+  try {
+    if (!settlement) {
+      return res.status(503).json({ success: false, error: 'service_unavailable' });
+    }
+
+    const {
+      event_type,
+      original_event_id,
+      reversal_amount,
+      gross_amount,
+      coupon_amount,
+      remix_chain,
+      referrer_id,
+      creator_root_id,
+      template_id,
+      artifact_id,
+      buyer_user_id,
+      occurred_at
+    } = req.body;
+
+    // 필수 검증
+    if (!original_event_id) {
+      return res.status(400).json({ success: false, error: 'original_event_id required' });
+    }
+    if (!gross_amount) {
+      return res.status(400).json({ success: false, error: 'gross_amount required' });
+    }
+
+    const validatedType = event_type || 'REFUND';
+    if (!['REFUND', 'CHARGEBACK', 'FEE_ADJUSTED'].includes(validatedType)) {
+      return res.status(400).json({
+        success: false,
+        error: 'invalid reversal event_type',
+        valid_types: ['REFUND', 'CHARGEBACK', 'FEE_ADJUSTED']
+      });
+    }
+
+    // 역분개 계산
+    const originalEvent = {
+      gross_amount,
+      coupon_amount: coupon_amount || 0,
+      remix_chain: remix_chain || [],
+      referrer_id
+    };
+    const reversal = settlement.calculation.calculateReversal(originalEvent, reversal_amount || null);
+
+    // 저장
+    const result = await settlement.calculation.saveEvent({
+      event_type: validatedType,
+      template_id,
+      artifact_id,
+      creator_root_id,
+      buyer_user_id,
+      original_event_id,
+      occurred_at
+    }, reversal);
+
+    // 크리에이터 역분개 몫 저장
+    if (creator_root_id) {
+      await settlement.distribution.saveCreatorShares(
+        result.event_id,
+        reversal,
+        creator_root_id
+      );
+    }
+
+    // 성장 풀 역분개 저장
+    await settlement.distribution.saveGrowthShares(result.event_id, reversal);
+
+    // 리스크 풀 출금 (역분개이므로 음수)
+    if (reversal.pools.risk !== 0) {
+      await settlement.distribution.depositToRiskPool(
+        result.event_id,
+        reversal.pools.risk,
+        `${validatedType} 리스크 풀 차감`
+      );
+    }
+
+    res.status(201).json({
+      success: true,
+      event_id: result.event_id,
+      original_event_id,
+      reversal_ratio: reversal.reversal_ratio,
+      calculation: {
+        paid: reversal.paid_amount,
+        net_cash: reversal.net_cash,
+        pools: reversal.pools
+      }
+    });
+
+  } catch (error) {
+    console.error('[Settlement] 역분개 생성 실패:', error);
+    res.status(500).json({ success: false, error: 'server_error', message: error.message });
+  }
+});
+
+/**
  * GET /api/settlement/events/:id
  * 정산 이벤트 조회
  */

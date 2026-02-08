@@ -237,6 +237,63 @@ console.log('\n--- Gate 7: Pipeline Verification ---');
   console.log(`  ${pipeFails.length === 0 ? 'PASS' : 'FAIL'} Risk pool balance tracking`);
 }
 
+// ─── Gate 8: 역분개 통합 검증 ────────────────────────────────
+console.log('\n--- Gate 8: Reversal Integration ---');
+{
+  const routeSource = fs.readFileSync(path.join(__dirname, '..', '..', 'routes', 'settlementRoutes.js'), 'utf-8');
+
+  // 역분개 전용 엔드포인트 존재
+  const hasReversalEndpoint = routeSource.includes("'/events/reversal'");
+  assert(hasReversalEndpoint, 'REV-INT', 'reversal_endpoint', true, hasReversalEndpoint);
+
+  // calculateReversal 호출 존재
+  const hasCalcReversal = routeSource.includes('.calculateReversal(');
+  assert(hasCalcReversal, 'REV-INT', 'calc_reversal_call', true, hasCalcReversal);
+
+  // 역분개 시 리스크 풀 차감 패턴
+  const hasRiskDeduction = routeSource.includes('리스크 풀 차감');
+  assert(hasRiskDeduction, 'REV-INT', 'risk_deduction', true, hasRiskDeduction);
+
+  // REFUND/CHARGEBACK/FEE_ADJUSTED 모두 검증
+  const hasRefund = routeSource.includes("'REFUND'");
+  const hasChargeback = routeSource.includes("'CHARGEBACK'");
+  const hasFeeAdj = routeSource.includes("'FEE_ADJUSTED'");
+  assert(hasRefund && hasChargeback && hasFeeAdj, 'REV-INT', 'all_reversal_types', true, hasRefund && hasChargeback && hasFeeAdj);
+
+  // 역분개 계산 검증: 원본과 역분개의 합 = 0
+  const events = [
+    { gross_amount: 10000, coupon_amount: 0, remix_chain: [], referrer_id: null },
+    { gross_amount: 50000, coupon_amount: 5000, remix_chain: ['a'], referrer_id: 'ref1' },
+    { gross_amount: 33333, coupon_amount: 3333, remix_chain: ['a', 'b', 'c'], referrer_id: 'ref2' }
+  ];
+
+  events.forEach((ev, i) => {
+    const orig = calcService.calculate(ev);
+    const rev = calcService.calculateReversal(ev);
+    // 원본 + 역분개 = 0
+    assert(orig.paid_amount + rev.paid_amount === 0, `REV-ZERO-${i}`, 'paid_zero', 0, orig.paid_amount + rev.paid_amount);
+    assert(orig.pg_fee + rev.pg_fee === 0, `REV-ZERO-${i}`, 'pg_fee_zero', 0, orig.pg_fee + rev.pg_fee);
+    assert(orig.pools.creator + rev.pools.creator === 0, `REV-ZERO-${i}`, 'creator_zero', 0, orig.pools.creator + rev.pools.creator);
+    assert(orig.pools.growth + rev.pools.growth === 0, `REV-ZERO-${i}`, 'growth_zero', 0, orig.pools.growth + rev.pools.growth);
+    assert(orig.pools.risk + rev.pools.risk === 0, `REV-ZERO-${i}`, 'risk_zero', 0, orig.pools.risk + rev.pools.risk);
+    assert(orig.pools.platform_actual + rev.pools.platform_actual === 0, `REV-ZERO-${i}`, 'platform_zero', 0, orig.pools.platform_actual + rev.pools.platform_actual);
+  });
+
+  // 부분 환불 비율 검증 (25%, 50%, 75%)
+  const baseEvent = { gross_amount: 100000, coupon_amount: 0, remix_chain: [], referrer_id: null };
+  [0.25, 0.5, 0.75].forEach(ratio => {
+    const partial = calcService.calculateReversal(baseEvent, Math.round(100000 * ratio));
+    assert(Math.abs(partial.reversal_ratio - ratio) < 0.001, `REV-RATIO`, `ratio_${ratio}`, ratio, partial.reversal_ratio);
+  });
+
+  const revIntFails = failures.filter(f => f.startsWith('REV-INT') || f.startsWith('REV-ZERO') || f.startsWith('REV-RATIO'));
+  console.log(`  ${revIntFails.length === 0 ? 'PASS' : 'FAIL'} Reversal endpoint exists`);
+  console.log(`  ${revIntFails.length === 0 ? 'PASS' : 'FAIL'} calculateReversal called`);
+  console.log(`  ${revIntFails.length === 0 ? 'PASS' : 'FAIL'} All reversal types (REFUND/CHARGEBACK/FEE_ADJUSTED)`);
+  console.log(`  ${revIntFails.length === 0 ? 'PASS' : 'FAIL'} Original + Reversal = 0 (3 events)`);
+  console.log(`  ${revIntFails.length === 0 ? 'PASS' : 'FAIL'} Partial reversal ratios (25%/50%/75%)`);
+}
+
 // ─── 결과 ────────────────────────────────────────────────────
 console.log(`\n=== Result: ${passed}/${passed + failed} passed ===`);
 
