@@ -33,7 +33,7 @@ const GUARANTEE_REGEX = /이루어집니다|확실히|반드시|100%|운명\s*�
 const SYSTEM_PROMPT = `You are a caption writer for "하루하루의 기적" (Daily Miracles).
 
 OUTPUT RULES (violating any = REJECTION):
-- EXACTLY 1 line of Korean text, 18-22 characters (excluding spaces)
+- EXACTLY 1 line of Korean text, 8-22 characters (excluding spaces)
 - Maximum 1 emoji (0 is preferred), no line breaks, no quotation marks
 - NEVER use guarantee/certainty words: 이루어집니다, 확실히, 반드시, 100%, 운명, 확정, 당첨, 보장, 틀림없이, 무조건
 - NEVER expose personal information or raw wish content
@@ -86,7 +86,7 @@ function validateCaption(caption) {
 
   // 3) 길이 체크 (공백 제외 10-30자, 여유 범위)
   const charCount = caption.replace(/\s/g, '').length;
-  if (charCount < 10 || charCount > 30) {
+  if (charCount < 5 || charCount > 22) {
     safety_flags.redacted = true;
     safety_flags.reason = `Length out of range: ${charCount} chars`;
     return { valid: false, safety_flags };
