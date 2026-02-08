@@ -294,6 +294,60 @@ console.log('\n--- Gate 8: Reversal Integration ---');
   console.log(`  ${revIntFails.length === 0 ? 'PASS' : 'FAIL'} Partial reversal ratios (25%/50%/75%)`);
 }
 
+// ─── Gate 9: Payout 배치 최소버전 ─────────────────────────────
+console.log('\n--- Gate 9: Payout Batch Minimum ---');
+{
+  const payoutSource = fs.readFileSync(path.join(__dirname, '..', '..', 'services', 'settlement', 'payoutService.js'), 'utf-8');
+  const routeSource = fs.readFileSync(path.join(__dirname, '..', '..', 'routes', 'settlementRoutes.js'), 'utf-8');
+  const C = require('../../services/settlement/constantsService').getAll();
+
+  // MIN_PAYOUT 적용
+  const hasMinPayout = payoutSource.includes('MIN_PAYOUT');
+  assert(hasMinPayout, 'PAYOUT', 'min_payout_check', true, hasMinPayout);
+  assert(C.MIN_PAYOUT === 10000, 'PAYOUT', 'min_payout_value', 10000, C.MIN_PAYOUT);
+
+  // 배치 상태 흐름: draft → confirmed
+  const hasDraft = payoutSource.includes("'draft'");
+  const hasConfirmed = payoutSource.includes("'confirmed'");
+  const hasCompleted = payoutSource.includes("'completed'");
+  assert(hasDraft && hasConfirmed && hasCompleted, 'PAYOUT', 'batch_status_flow', true, hasDraft && hasConfirmed && hasCompleted);
+
+  // 이월(deferred) 패턴
+  const hasDeferred = payoutSource.includes("'deferred'");
+  assert(hasDeferred, 'PAYOUT', 'deferred_pattern', true, hasDeferred);
+
+  // MAX_MONTHLY_DEDUCTION_RATE 적용
+  const hasMaxDeduction = payoutSource.includes('MAX_MONTHLY_DEDUCTION_RATE');
+  assert(hasMaxDeduction, 'PAYOUT', 'max_deduction', true, hasMaxDeduction);
+  assert(C.MAX_MONTHLY_DEDUCTION_RATE === 0.10, 'PAYOUT', 'max_deduction_value', 0.10, C.MAX_MONTHLY_DEDUCTION_RATE);
+
+  // Hold 해제 패턴 (distributionService)
+  const distSource = fs.readFileSync(path.join(__dirname, '..', '..', 'services', 'settlement', 'distributionService.js'), 'utf-8');
+  const hasRelease = distSource.includes('releaseHeldShares');
+  assert(hasRelease, 'PAYOUT', 'release_held', true, hasRelease);
+
+  // 라우트: 배치 생성/확정/조회 엔드포인트 존재
+  const hasBatchCreate = routeSource.includes("post('/batches'");
+  const hasBatchConfirm = routeSource.includes("'/batches/:id/confirm'");
+  const hasBatchGet = routeSource.includes("get('/batches/:id'");
+  const hasBatchList = routeSource.includes("get('/batches'");
+  assert(hasBatchCreate, 'PAYOUT', 'batch_create_endpoint', true, hasBatchCreate);
+  assert(hasBatchConfirm, 'PAYOUT', 'batch_confirm_endpoint', true, hasBatchConfirm);
+  assert(hasBatchGet, 'PAYOUT', 'batch_get_endpoint', true, hasBatchGet);
+  assert(hasBatchList, 'PAYOUT', 'batch_list_endpoint', true, hasBatchList);
+
+  // HOLD_DAYS 값
+  assert(C.HOLD_DAYS === 14, 'PAYOUT', 'hold_days_value', 14, C.HOLD_DAYS);
+
+  const payoutFails = failures.filter(f => f.startsWith('PAYOUT'));
+  console.log(`  ${payoutFails.length === 0 ? 'PASS' : 'FAIL'} MIN_PAYOUT = ${C.MIN_PAYOUT}원`);
+  console.log(`  ${payoutFails.length === 0 ? 'PASS' : 'FAIL'} Batch flow: draft→confirmed→completed`);
+  console.log(`  ${payoutFails.length === 0 ? 'PASS' : 'FAIL'} Deferred pattern (이월)`);
+  console.log(`  ${payoutFails.length === 0 ? 'PASS' : 'FAIL'} MAX_MONTHLY_DEDUCTION = ${C.MAX_MONTHLY_DEDUCTION_RATE * 100}%`);
+  console.log(`  ${payoutFails.length === 0 ? 'PASS' : 'FAIL'} Hold release + HOLD_DAYS = ${C.HOLD_DAYS}`);
+  console.log(`  ${payoutFails.length === 0 ? 'PASS' : 'FAIL'} Batch endpoints (create/confirm/get/list)`);
+}
+
 // ─── 결과 ────────────────────────────────────────────────────
 console.log(`\n=== Result: ${passed}/${passed + failed} passed ===`);
 
