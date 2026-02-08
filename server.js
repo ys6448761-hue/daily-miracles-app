@@ -517,6 +517,17 @@ try {
   console.error("❌ 소원놀이터(Playground) 라우터 로드 실패:", error.message);
 }
 
+// Settlement 라우터/서비스 로딩
+let settlementRoutes = null;
+let settlementEngine = null;
+try {
+  settlementRoutes = require("./routes/settlementRoutes");
+  settlementEngine = require("./services/settlement");
+  console.log("✅ Settlement 엔진/라우터 로드 성공");
+} catch (error) {
+  console.warn("⚠️ Settlement 엔진/라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -1601,6 +1612,21 @@ if (playgroundRoutes && playgroundEngine) {
   console.log("✅ 소원놀이터 라우터 등록 완료 (/api/playground)");
 } else {
   console.warn("⚠️ 소원놀이터 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- Settlement v2 라우트 등록 ----------
+if (settlementRoutes && settlementEngine) {
+  // DB 연결 시 엔진 초기화
+  if (db) {
+    settlementEngine.init(db).catch(err => {
+      console.error("❌ Settlement 엔진 초기화 실패:", err.message);
+    });
+  }
+  settlementRoutes.init({ settlement: settlementEngine });
+  app.use("/api/settlement", settlementRoutes);
+  console.log("✅ Settlement 라우터 등록 완료 (/api/settlement)");
+} else {
+  console.warn("⚠️ Settlement 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------

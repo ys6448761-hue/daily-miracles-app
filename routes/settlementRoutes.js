@@ -21,6 +21,9 @@ const router = express.Router();
 // 서비스 인스턴스 (server.js에서 주입)
 let settlement = null;
 
+// 유효 이벤트 타입
+const VALID_EVENT_TYPES = ['PAYMENT', 'REFUND', 'CHARGEBACK', 'FEE_ADJUSTED'];
+
 /**
  * 서비스 초기화 (server.js에서 호출)
  */
@@ -59,6 +62,24 @@ router.post('/events', async (req, res) => {
 
     if (!gross_amount) {
       return res.status(400).json({ success: false, error: 'gross_amount required' });
+    }
+
+    // 이벤트 타입 검증
+    const validatedType = event_type || 'PAYMENT';
+    if (!VALID_EVENT_TYPES.includes(validatedType)) {
+      return res.status(400).json({
+        success: false,
+        error: 'invalid_event_type',
+        valid_types: VALID_EVENT_TYPES
+      });
+    }
+
+    // 역분개 이벤트는 original_event_id 필수
+    if (['REFUND', 'CHARGEBACK', 'FEE_ADJUSTED'].includes(validatedType) && !original_event_id) {
+      return res.status(400).json({
+        success: false,
+        error: 'original_event_id required for reversal events'
+      });
     }
 
     // 계산

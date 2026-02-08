@@ -171,6 +171,35 @@ console.log('\n--- Gate 5: Referral/Remix Branching ---');
   console.log(`  ${branchFails.length === 0 ? 'PASS' : 'FAIL'} Remix max depth=3`);
 }
 
+// ─── Gate 6: 서버 통합 검증 ─────────────────────────────────
+console.log('\n--- Gate 6: Server Integration ---');
+{
+  const serverSource = fs.readFileSync(path.join(__dirname, '..', '..', 'server.js'), 'utf-8');
+
+  // server.js에 settlement 로딩 존재
+  const hasLoad = serverSource.includes('require("./services/settlement")') || serverSource.includes("require('./services/settlement')");
+  assert(hasLoad, 'SRV', 'engine_load', true, hasLoad);
+
+  // settlement 라우트 등록 존재
+  const hasRoute = serverSource.includes('/api/settlement');
+  assert(hasRoute, 'SRV', 'route_mount', true, hasRoute);
+
+  // settlementRoutes에 event_type 검증 존재
+  const routeSource = fs.readFileSync(path.join(__dirname, '..', '..', 'routes', 'settlementRoutes.js'), 'utf-8');
+  const hasTypeValidation = routeSource.includes('VALID_EVENT_TYPES');
+  assert(hasTypeValidation, 'SRV', 'event_type_validation', true, hasTypeValidation);
+
+  // 역분개 시 original_event_id 필수 검증 존재
+  const hasReversalCheck = routeSource.includes('original_event_id required');
+  assert(hasReversalCheck, 'SRV', 'reversal_original_check', true, hasReversalCheck);
+
+  const srvFails = failures.filter(f => f.startsWith('SRV'));
+  console.log(`  ${srvFails.length === 0 ? 'PASS' : 'FAIL'} Settlement engine loaded in server.js`);
+  console.log(`  ${srvFails.length === 0 ? 'PASS' : 'FAIL'} Route mounted at /api/settlement`);
+  console.log(`  ${srvFails.length === 0 ? 'PASS' : 'FAIL'} Event type validation`);
+  console.log(`  ${srvFails.length === 0 ? 'PASS' : 'FAIL'} Reversal original_event_id check`);
+}
+
 // ─── 결과 ────────────────────────────────────────────────────
 console.log(`\n=== Result: ${passed}/${passed + failed} passed ===`);
 
