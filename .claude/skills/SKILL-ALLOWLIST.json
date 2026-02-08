@@ -115,11 +115,10 @@
       "priority": "P0",
       "category": "C. 소원그림 패키지",
       "description": "Certificate 4:5 (1024x1280) 출력",
-      "status": "TODO",
-      "module": null,
-      "entry": null,
-      "deps": ["OPENAI_API_KEY", "sharp (이미지 가공)"],
-      "gap": "4:5 비율 전용 생성/렌더 미구현"
+      "status": "LIVE",
+      "module": "services/certificateService.js",
+      "entry": "generateCertificate({ imagePath, date, boardingId, caption })",
+      "deps": ["sharp (이미지 가공)", "services/captionService.js"]
     },
 
     {
@@ -138,11 +137,10 @@
       "priority": "P0",
       "category": "C. 소원그림 패키지",
       "description": "보장 금지 규칙 지키는 1줄 카피 (HOPEFUL/CALM/RESTART)",
-      "status": "TODO",
-      "module": null,
-      "entry": null,
-      "deps": ["skills/design-system/forbidden-words.json", "skills/design-system/brand-voice.md"],
-      "gap": "AI 기반 캡션 생성 서비스 미구현"
+      "status": "LIVE",
+      "module": "services/captionService.js",
+      "entry": "generateCaption({ tone, keywords?, locale? })",
+      "deps": ["OPENAI_API_KEY (gpt-4o-mini)", "utils/reverseOrderPrompt.js (checkForbiddenWords)"]
     },
 
     {
@@ -194,10 +192,10 @@
   ],
 
   "summary": {
-    "LIVE": 7,
+    "LIVE": 9,
     "PARTIAL": 5,
-    "TODO": 4,
-    "p0_ready": "7/12",
+    "TODO": 2,
+    "p0_ready": "9/12",
     "p1_ready": "2/4"
   }
 }

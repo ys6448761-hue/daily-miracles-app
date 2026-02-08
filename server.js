@@ -200,6 +200,15 @@ try {
   console.error("❌ 소원그림 라우터 로드 실패:", error.message);
 }
 
+// 입항 증명서 라우터 로딩
+let certificateRoutes = null;
+try {
+  certificateRoutes = require("./routes/certificateRoutes");
+  console.log("✅ 입항 증명서 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 입항 증명서 라우터 로드 실패:", error.message);
+}
+
 // 메시지 발송 진단 라우터 로딩
 let notifyRoutes = null;
 try {
@@ -1190,6 +1199,14 @@ if (wishImageRoutes) {
   console.log("✅ 소원그림 API 라우터 등록 완료");
 } else {
   console.warn("⚠️ 소원그림 API 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 입항 증명서 API Routes ----------
+if (certificateRoutes) {
+  app.use("/api/certificate", certificateRoutes);
+  console.log("✅ 입항 증명서 API 라우터 등록 완료");
+} else {
+  console.warn("⚠️ 입항 증명서 API 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- 메시지 발송 진단 API Routes ----------
