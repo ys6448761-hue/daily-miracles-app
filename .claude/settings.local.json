@@ -169,7 +169,17 @@
       "Bash(export PORT=5008)",
       "Bash(export PORT=5009:*)",
       "Bash(npx skills search:*)",
-      "Bash(git clone:*)"
+      "Bash(git clone:*)",
+      "Bash(npx:*)",
+      "Bash(gh api:*)",
+      "Bash(gh secret:*)",
+      "Bash(source:*)",
+      "Bash(if grep -q \"여수여행센터\\\\|여수세계섬박람회\\\\|@\\\\|http\" business_plan_anon.txt)",
+      "Bash(then echo \"FAIL\")",
+      "Bash(else echo \"PASS: 식별요소 0개\")",
+      "Bash(fi)",
+      "Bash(py -m pip install:*)",
+      "Bash(xargs:*)"
     ],
     "deny": [],
     "ask": []
