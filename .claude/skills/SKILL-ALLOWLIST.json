@@ -1,0 +1,203 @@
+{
+  "version": "0.1",
+  "created": "2026-02-08",
+  "mode": "ON_DEMAND",
+  "description": "Aurora5 초기 운영 스킬 allowlist - 레포 실제 모듈 기준",
+  "total": 16,
+
+  "skills": [
+
+    {
+      "id": "ops.healthcheck",
+      "priority": "P0",
+      "category": "A. OPS/배포 안정성",
+      "description": "서비스 생존 확인 (/ops/health, /api/health)",
+      "status": "LIVE",
+      "module": "routes/opsRoutes.js",
+      "entry": "GET /ops/health",
+      "deps": ["server.js:688 /api/health"]
+    },
+
+    {
+      "id": "ops.slack_notify",
+      "priority": "P0",
+      "category": "A. OPS/배포 안정성",
+      "description": "#ops-alerts Slack 알림 전송 (장애/리포트/테스트/heartbeat)",
+      "status": "LIVE",
+      "module": "services/slackHeartbeatService.js",
+      "entry": "sendSlackMessage(), sendHeartbeat()",
+      "deps": ["OPS_SLACK_WEBHOOK (필수)", "FALLBACK_EMAIL (선택)"]
+    },
+
+    {
+      "id": "ops.daily_report",
+      "priority": "P0",
+      "category": "A. OPS/배포 안정성",
+      "description": "일일 운영 리포트 생성/발송 (세션집계, UTM, 리스크)",
+      "status": "LIVE",
+      "module": "services/opsReportService.js",
+      "entry": "generateOpsReport()",
+      "deps": ["SLACK_BOT_TOKEN", "AIRTABLE_API_KEY"]
+    },
+
+    {
+      "id": "env.validate_critical",
+      "priority": "P0",
+      "category": "A. OPS/배포 안정성",
+      "description": "프로덕션 필수 ENV 누락 차단 (FAIL_FAST)",
+      "status": "LIVE",
+      "module": "utils/envValidator.js",
+      "entry": "validateEnv({ failFast: true })",
+      "deps": ["server.js 부팅 시 자동 실행"]
+    },
+
+    {
+      "id": "logs.request_trace",
+      "priority": "P0",
+      "category": "A. OPS/배포 안정성",
+      "description": "request_id/latency/success 표준 로깅",
+      "status": "PARTIAL",
+      "module": "server.js:670 (request logging middleware)",
+      "entry": "app.use() 로깅 미들웨어",
+      "deps": ["routes/debateRoutes.js (request_id 생성)", "services/eventLogger.js"],
+      "gap": "통합 request_id 미들웨어 미구현, latency 추적 없음"
+    },
+
+    {
+      "id": "web.og_meta_builder",
+      "priority": "P1",
+      "category": "B. 전환/공유(OG)",
+      "description": "OG 제목/설명/이미지 메타 생성 (카톡 미리보기 최적)",
+      "status": "PARTIAL",
+      "module": "public/*.html (정적 하드코딩)",
+      "entry": "각 HTML 파일 <meta property=\"og:*\">",
+      "deps": ["public/index.html", "public/wish-tracking.html", "public/playground/share.html"],
+      "gap": "동적 OG 메타 생성 서비스 미구현 - 현재 HTML별 정적 하드코딩"
+    },
+
+    {
+      "id": "web.archive_page_renderer",
+      "priority": "P1",
+      "category": "B. 전환/공유(OG)",
+      "description": "아카이브 페이지 템플릿 렌더 + CTA",
+      "status": "TODO",
+      "module": null,
+      "entry": null,
+      "deps": [],
+      "gap": "전용 아카이브 페이지/템플릿 엔진 미구현"
+    },
+
+    {
+      "id": "link.shortener",
+      "priority": "P1",
+      "category": "B. 전환/공유(OG)",
+      "description": "짧은 링크 생성 (카톡/SMS 전송 안정)",
+      "status": "LIVE",
+      "module": "routes/shortLinkRoutes.js",
+      "entry": "GET /r/:token",
+      "deps": ["server.js:1260 app.use('/r', shortLinkRoutes)"]
+    },
+
+    {
+      "id": "image.postcard_1to1",
+      "priority": "P0",
+      "category": "C. 소원그림 패키지",
+      "description": "Postcard 1:1 (1024x1024) 합성 (씰/ID/날짜/캡션)",
+      "status": "PARTIAL",
+      "module": "routes/wishImageRoutes.js",
+      "entry": "POST /api/wish-image/generate (DALL-E 1024x1024)",
+      "deps": ["OPENAI_API_KEY"],
+      "gap": "씰/ID/날짜/캡션 합성 레이어 미구현 - 현재 DALL-E raw 출력만"
+    },
+
+    {
+      "id": "image.certificate_4to5",
+      "priority": "P0",
+      "category": "C. 소원그림 패키지",
+      "description": "Certificate 4:5 (1024x1280) 출력",
+      "status": "TODO",
+      "module": null,
+      "entry": null,
+      "deps": ["OPENAI_API_KEY", "sharp (이미지 가공)"],
+      "gap": "4:5 비율 전용 생성/렌더 미구현"
+    },
+
+    {
+      "id": "image.wallpaper_9to16",
+      "priority": "P0",
+      "category": "C. 소원그림 패키지",
+      "description": "Wallpaper 9:16 (1024x1792) 출력",
+      "status": "LIVE",
+      "module": "services/hero8/ImageGenerator.js",
+      "entry": "generateImage() (DALL-E 3, 1024x1792)",
+      "deps": ["OPENAI_API_KEY", "services/hero8/WatermarkService.js"]
+    },
+
+    {
+      "id": "copy.caption_one_liner",
+      "priority": "P0",
+      "category": "C. 소원그림 패키지",
+      "description": "보장 금지 규칙 지키는 1줄 카피 (HOPEFUL/CALM/RESTART)",
+      "status": "TODO",
+      "module": null,
+      "entry": null,
+      "deps": ["skills/design-system/forbidden-words.json", "skills/design-system/brand-voice.md"],
+      "gap": "AI 기반 캡션 생성 서비스 미구현"
+    },
+
+    {
+      "id": "queue.job_dispatch",
+      "priority": "P0",
+      "category": "D. 대기열/실패 대비",
+      "description": "작업 큐 등록/처리 (폭주 방지)",
+      "status": "LIVE",
+      "module": "services/storybookQueue.js",
+      "entry": "enqueue(), processQueue()",
+      "deps": ["서버 메모리 기반 큐"]
+    },
+
+    {
+      "id": "retry.with_backoff",
+      "priority": "P0",
+      "category": "D. 대기열/실패 대비",
+      "description": "재시도/백오프 표준화 유틸",
+      "status": "PARTIAL",
+      "module": "orchestrator/router/SmartRouter.js",
+      "entry": "retry 로직 분산 존재",
+      "deps": ["orchestrator/config/orchestratorConfig.js"],
+      "gap": "통합 retry 유틸 미구현 - 각 서비스에 인라인 구현"
+    },
+
+    {
+      "id": "fallback.basic_theme",
+      "priority": "P0",
+      "category": "D. 대기열/실패 대비",
+      "description": "실패 시 기본 테마+캡션으로 즉시 납품 (fail-soft)",
+      "status": "PARTIAL",
+      "module": "routes/wishImageRoutes.js:41",
+      "entry": "fallbackImages (ruby/sapphire/emerald)",
+      "deps": ["public/images/fallback/*.png"],
+      "gap": "캡션 합성 없이 정적 이미지만 반환"
+    },
+
+    {
+      "id": "messaging.t_plus_1",
+      "priority": "P1",
+      "category": "E. 메시지 발송",
+      "description": "T+1 후속 메시지 1회 발송 (아카이브 링크 포함)",
+      "status": "PARTIAL",
+      "module": "services/emailScheduler.js",
+      "entry": "일일 2회 발송 스케줄러 (08:00, 20:00 KST)",
+      "deps": ["services/solapiService.js (SMS/알림톡)"],
+      "gap": "T+1 정확한 시점 발송 로직 미구현 - 현재 고정시간 발송"
+    }
+  ],
+
+  "summary": {
+    "LIVE": 7,
+    "PARTIAL": 5,
+    "TODO": 4,
+    "p0_ready": "7/12",
+    "p1_ready": "2/4"
+  }
+}

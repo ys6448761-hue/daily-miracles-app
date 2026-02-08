@@ -1,10 +1,14 @@
 {
   "mcpServers": {
     "skillsmp": {
-      "command": "npx",
-      "args": ["-y", "skillsmp-mcp-lite"],
+      "command": "node",
+      "args": ["scripts/ops/skillsmp-gate.js"],
       "env": {
-        "SKILLSMP_API_KEY": "${SKILLSMP_API_KEY}"
+        "SKILLSMP_ENABLED": "${SKILLSMP_ENABLED}",
+        "SKILLSMP_API_KEY": "${SKILLSMP_API_KEY}",
+        "SKILLSMP_MAX_RESULTS": "${SKILLSMP_MAX_RESULTS}",
+        "SKILLSMP_MAX_CONTEXT_TOKENS": "${SKILLSMP_MAX_CONTEXT_TOKENS}",
+        "NODE_ENV": "${NODE_ENV}"
       }
     }
   }

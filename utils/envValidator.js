@@ -6,11 +6,13 @@
  * 서버 부팅 시 환경변수 형식을 검증하여 잘못된 설정으로 인한 장애를 방지
  *
  * 검증 규칙:
+ * - OPS_SLACK_WEBHOOK: Slack Incoming Webhook URL (프로덕션 필수)
  * - SLACK_CHANNEL_*: /^(C|G)[A-Z0-9]+$/ (채널 ID 형식)
  * - AIRTABLE_BASE_ID: /^app[a-zA-Z0-9]+$/ (Base ID 형식)
  * - AIRTABLE_TABLE_*: 테이블 이름 (tbl... 형식이 아닌 문자열)
  *
  * 작성일: 2026-01-18
+ * 수정일: 2026-02-08 - OPS_SLACK_WEBHOOK 프로덕션 필수 게이트 추가
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
@@ -66,6 +68,16 @@ const ENV_RULES = {
     pattern: /^[a-zA-Z0-9_-]{20,}$/,
     example: '1abc123XYZ_defGHI456jkl',
     description: 'Google Sheets ID (20자 이상)'
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // Slack Webhook (프로덕션 필수 - 운영 알림 파이프라인)
+  // ═══════════════════════════════════════════════════════════════════════
+
+  OPS_SLACK_WEBHOOK: {
+    pattern: /^https:\/\/hooks\.slack\.com\/services\/[A-Z0-9]+\/[A-Z0-9]+\/[a-zA-Z0-9]+$/,
+    example: 'https://hooks.slack.com/services/TXXXX/BXXXX/xxxxxxxx',
+    description: 'Slack Incoming Webhook URL (프로덕션 필수)'
   }
 };
 
@@ -108,7 +120,7 @@ class ValidationResult {
 
   get hasCriticalErrors() {
     // Slack/Airtable 핵심 키가 잘못되면 CRITICAL
-    const criticalKeys = ['AIRTABLE_BASE_ID', 'AIRTABLE_API_KEY', 'SLACK_BOT_TOKEN'];
+    const criticalKeys = ['AIRTABLE_BASE_ID', 'AIRTABLE_API_KEY', 'SLACK_BOT_TOKEN', 'OPS_SLACK_WEBHOOK'];
     return this.errors.some(e => criticalKeys.some(k => e.key.includes(k)));
   }
 }
@@ -145,7 +157,27 @@ function validateEnv(options = { failFast: false }) {
     }
   }
 
-  // 2. Airtable Base ID 검증
+  // 2. OPS_SLACK_WEBHOOK 검증 (프로덕션 필수)
+  const opsSlackWebhook = process.env.OPS_SLACK_WEBHOOK || process.env.SLACK_WEBHOOK_URL;
+  if (opsSlackWebhook) {
+    if (!ENV_RULES.OPS_SLACK_WEBHOOK.pattern.test(opsSlackWebhook)) {
+      result.addError('OPS_SLACK_WEBHOOK', opsSlackWebhook, ENV_RULES.OPS_SLACK_WEBHOOK);
+    } else {
+      result.addPassed('OPS_SLACK_WEBHOOK');
+    }
+  } else {
+    const isProduction = process.env.NODE_ENV === 'production';
+    if (isProduction) {
+      result.addError('OPS_SLACK_WEBHOOK', null, {
+        description: 'Slack Webhook URL (프로덕션 필수 - 운영 알림 불가)',
+        example: 'https://hooks.slack.com/services/TXXXX/BXXXX/xxxxxxxx'
+      });
+    } else {
+      result.addWarning('OPS_SLACK_WEBHOOK', '미설정 - Slack 운영 알림 비활성화 (프로덕션에서는 필수!)');
+    }
+  }
+
+  // 3. Airtable Base ID 검증
   const airtableBaseId = process.env.AIRTABLE_BASE_ID;
   if (airtableBaseId) {
     if (!ENV_RULES.AIRTABLE_BASE_ID.pattern.test(airtableBaseId)) {
@@ -241,6 +273,10 @@ function printEnvGuide() {
 ╔════════════════════════════════════════════════════════════════════════════╗
 ║                     환경변수 설정 가이드 (Render)                          ║
 ╠════════════════════════════════════════════════════════════════════════════╣
+║                                                                            ║
+║  [Slack Webhook - 프로덕션 필수]                                           ║
+║  • OPS_SLACK_WEBHOOK     = https://hooks.slack.com/services/T.../B.../xxx  ║
+║    ⚠️ 미설정 시 프로덕션 배포 차단됨                                       ║
 ║                                                                            ║
 ║  [Slack 채널 ID]                                                           ║
 ║  • SLACK_CHANNEL_UPGRADES = C0XXXXXXX   # #ops-upgrades                    ║

@@ -14,9 +14,10 @@ const analysisEngine = require("./services/analysisEngine");
 // ═══════════════════════════════════════════════════════════
 let envValidator = null;
 let exportPipelineStatus = null;
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 try {
   envValidator = require("./utils/envValidator");
-  const validationResult = envValidator.validateEnv({ failFast: false });
+  const validationResult = envValidator.validateEnv({ failFast: IS_PRODUCTION });
 
   // 오류가 있으면 가이드 출력
   if (!validationResult.isValid) {
@@ -27,6 +28,30 @@ try {
   exportPipelineStatus = envValidator.printExportStatus();
 } catch (error) {
   console.warn("⚠️ 환경변수 검증기 로드 실패:", error.message);
+}
+
+// ═══════════════════════════════════════════════════════════
+// Slack 운영 알림 게이트 (프로덕션 필수)
+// OPS_SLACK_WEBHOOK 없이 프로덕션 배포 시 서버 부팅 차단
+// ═══════════════════════════════════════════════════════════
+const OPS_SLACK_WEBHOOK = process.env.OPS_SLACK_WEBHOOK || process.env.SLACK_WEBHOOK_URL;
+if (!OPS_SLACK_WEBHOOK) {
+  if (IS_PRODUCTION) {
+    console.error('');
+    console.error('╔══════════════════════════════════════════════════════════════╗');
+    console.error('║  💀 FATAL: OPS_SLACK_WEBHOOK 미설정                          ║');
+    console.error('║                                                              ║');
+    console.error('║  Slack 운영 알림 없이 프로덕션 운영 불가                      ║');
+    console.error('║  Render Dashboard → Environment에서 설정 후 재배포하세요      ║');
+    console.error('║                                                              ║');
+    console.error('║  OPS_SLACK_WEBHOOK=https://hooks.slack.com/services/T.../... ║');
+    console.error('╚══════════════════════════════════════════════════════════════╝');
+    console.error('');
+    process.exit(1);
+  } else {
+    console.warn('⚠️  OPS_SLACK_WEBHOOK 미설정 - Slack 운영 알림 비활성화');
+    console.warn('   프로덕션에서는 이 변수 없이 배포가 차단됩니다.');
+  }
 }
 
 const app = express();
@@ -85,6 +110,15 @@ try {
   console.log("✅ Slack Bot 서비스 로드 성공");
 } catch (error) {
   console.warn("⚠️ Slack Bot 서비스 로드 실패:", error.message);
+}
+
+// Slack Heartbeat 서비스 로딩 (운영 헬스 모니터링)
+let slackHeartbeatService = null;
+try {
+  slackHeartbeatService = require("./services/slackHeartbeatService");
+  console.log("✅ Slack Heartbeat 서비스 로드 성공");
+} catch (error) {
+  console.warn("⚠️ Slack Heartbeat 서비스 로드 실패:", error.message);
 }
 
 // 빌드 정보 (디버깅용)
@@ -816,6 +850,48 @@ app.get("/api/admin/health/full", verifyAdmin, async (_req, res) => {
     });
   } catch (error) {
     console.error("💥 Ops Agent 헬스체크 실패:", error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// ---------- Slack Heartbeat 상태 확인 ----------
+app.get("/api/ops/heartbeat", (_req, res) => {
+  if (!slackHeartbeatService) {
+    return res.status(503).json({
+      success: false,
+      error: "heartbeat_unavailable",
+      message: "Heartbeat 서비스가 로드되지 않았습니다"
+    });
+  }
+
+  const status = slackHeartbeatService.getStatus();
+  res.json({
+    success: true,
+    ...status
+  });
+});
+
+// Heartbeat 수동 전송 (테스트/긴급용)
+app.post("/api/ops/heartbeat/send", verifyAdmin, async (_req, res) => {
+  if (!slackHeartbeatService) {
+    return res.status(503).json({
+      success: false,
+      error: "heartbeat_unavailable"
+    });
+  }
+
+  try {
+    const result = await slackHeartbeatService.sendHeartbeat();
+    res.json({
+      success: result.success,
+      channel: result.channel || null,
+      error: result.error || null,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
     res.status(500).json({
       success: false,
       error: error.message
@@ -1830,6 +1906,8 @@ function printStartupBanner(port) {
     "GET  /api/inquiry/:inquiryId     (접수 상태 조회)",
     "GET  /api/inquiry/list/all       (전체 목록 - 관리자)",
     "GET  /api/ops-center/*           (여수 운영 컨트롤타워)",
+    "GET  /api/ops/heartbeat          (Heartbeat 상태)",
+    "POST /api/ops/heartbeat/send     (수동 Heartbeat)",
     "GET  /"
   ].forEach(l => console.log("  - " + l));
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
@@ -1840,6 +1918,12 @@ function startServer(port) {
 
   const server = app.listen(port, "0.0.0.0", () => {
     printStartupBanner(port);
+
+    // Slack Heartbeat 서비스 초기화 (09:00 KST 일일 알림)
+    if (slackHeartbeatService) {
+      slackHeartbeatService.init();
+      console.log("✅ Slack Heartbeat 스케줄러 시작");
+    }
   });
 
   server.on("error", (err) => {
