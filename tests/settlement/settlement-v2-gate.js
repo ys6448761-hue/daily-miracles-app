@@ -379,6 +379,44 @@ console.log('\n--- Gate 10: Staging Readiness ---');
   console.log(`  ${stagingFails.length === 0 ? 'PASS' : 'FAIL'} POST /calculate simulation endpoint`);
 }
 
+// ─── Gate 11: Production Readiness ───────────────────────────
+console.log('\n--- Gate 11: Production Readiness ---');
+{
+  const routeSource = fs.readFileSync(path.join(__dirname, '..', '..', 'routes', 'settlementRoutes.js'), 'utf-8');
+
+  // 피처 토글 함수 존재
+  const hasToggles = routeSource.includes('getToggles()');
+  assert(hasToggles, 'PROD', 'feature_toggles', true, hasToggles);
+
+  // 3단계 토글: ingest, allocations, payout
+  const hasIngest = routeSource.includes('SETTLEMENT_INGEST');
+  const hasAlloc = routeSource.includes('SETTLEMENT_ALLOC');
+  const hasPayout = routeSource.includes('SETTLEMENT_PAYOUT');
+  assert(hasIngest && hasAlloc && hasPayout, 'PROD', 'toggle_3_stages', true, hasIngest && hasAlloc && hasPayout);
+
+  // 합계불변성 알람 패턴
+  const hasAlarm = routeSource.includes('SETTLEMENT-ALARM');
+  assert(hasAlarm, 'PROD', 'balance_alarm', true, hasAlarm);
+
+  // checkInvariant 호출
+  const hasInvariantCheck = routeSource.includes('checkInvariant(');
+  assert(hasInvariantCheck, 'PROD', 'invariant_check', true, hasInvariantCheck);
+
+  // 토글 상태 조회 엔드포인트
+  const hasToggleEndpoint = routeSource.includes("'/toggles'");
+  assert(hasToggleEndpoint, 'PROD', 'toggles_endpoint', true, hasToggleEndpoint);
+
+  // 롤백 지시사항
+  const hasRollback = routeSource.includes('rollback_instructions');
+  assert(hasRollback, 'PROD', 'rollback_docs', true, hasRollback);
+
+  const prodFails = failures.filter(f => f.startsWith('PROD'));
+  console.log(`  ${prodFails.length === 0 ? 'PASS' : 'FAIL'} Feature toggles (ingest/alloc/payout)`);
+  console.log(`  ${prodFails.length === 0 ? 'PASS' : 'FAIL'} Balance invariant alarm logging`);
+  console.log(`  ${prodFails.length === 0 ? 'PASS' : 'FAIL'} GET /toggles status endpoint`);
+  console.log(`  ${prodFails.length === 0 ? 'PASS' : 'FAIL'} Rollback instructions`);
+}
+
 // ─── 결과 ────────────────────────────────────────────────────
 console.log(`\n=== Result: ${passed}/${passed + failed} passed ===`);
 

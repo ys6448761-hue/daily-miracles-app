@@ -24,12 +24,32 @@ let settlement = null;
 // 유효 이벤트 타입
 const VALID_EVENT_TYPES = ['PAYMENT', 'REFUND', 'CHARGEBACK', 'FEE_ADJUSTED'];
 
+// 피처 토글 (점진적 ON: ingest → allocations → payout)
+function getToggles() {
+  return {
+    ingest: process.env.SETTLEMENT_INGEST !== 'false',     // 이벤트 수신
+    allocations: process.env.SETTLEMENT_ALLOC !== 'false',  // 풀 배분 저장
+    payout: process.env.SETTLEMENT_PAYOUT !== 'false'       // 지급 배치
+  };
+}
+
+// 합계불변성 알람 로깅
+function checkInvariant(calculation, eventType, eventId) {
+  const { balance_check, balance_diff } = calculation.validation;
+  if (!balance_check) {
+    console.error(`[SETTLEMENT-ALARM] balance_invariant_failed | event_id=${eventId} type=${eventType} diff=${balance_diff}`);
+    return false;
+  }
+  return true;
+}
+
 /**
  * 서비스 초기화 (server.js에서 호출)
  */
 router.init = function(services) {
   settlement = services.settlement;
-  console.log('[Settlement] 라우터 초기화 완료');
+  const toggles = getToggles();
+  console.log(`[Settlement] 라우터 초기화 완료 (ingest=${toggles.ingest}, alloc=${toggles.allocations}, payout=${toggles.payout})`);
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -44,6 +64,12 @@ router.post('/events', async (req, res) => {
   try {
     if (!settlement) {
       return res.status(503).json({ success: false, error: 'service_unavailable' });
+    }
+
+    // 피처 토글: ingest OFF → 이벤트 수신 거부
+    const toggles = getToggles();
+    if (!toggles.ingest) {
+      return res.status(503).json({ success: false, error: 'settlement_ingest_disabled' });
     }
 
     const {
@@ -90,8 +116,8 @@ router.post('/events', async (req, res) => {
       referrer_id
     });
 
-    // 검증
-    if (!calculation.validation.balance_check) {
+    // 검증 + 알람
+    if (!checkInvariant(calculation, validatedType, 'pre-save')) {
       return res.status(500).json({
         success: false,
         error: 'balance_check_failed',
@@ -101,7 +127,7 @@ router.post('/events', async (req, res) => {
 
     // 저장
     const result = await settlement.calculation.saveEvent({
-      event_type: event_type || 'PAYMENT',
+      event_type: validatedType,
       template_id,
       artifact_id,
       creator_root_id,
@@ -110,20 +136,23 @@ router.post('/events', async (req, res) => {
       occurred_at
     }, calculation);
 
-    // 크리에이터 몫 저장
-    if (creator_root_id) {
-      await settlement.distribution.saveCreatorShares(
-        result.event_id,
-        calculation,
-        creator_root_id
-      );
+    // 풀 배분 저장 (allocations 토글)
+    if (toggles.allocations) {
+      // 크리에이터 몫 저장
+      if (creator_root_id) {
+        await settlement.distribution.saveCreatorShares(
+          result.event_id,
+          calculation,
+          creator_root_id
+        );
+      }
+
+      // 성장 풀 저장
+      await settlement.distribution.saveGrowthShares(result.event_id, calculation);
     }
 
-    // 성장 풀 저장
-    await settlement.distribution.saveGrowthShares(result.event_id, calculation);
-
     // 리스크 풀 입금
-    if (calculation.pools.risk > 0) {
+    if (toggles.allocations && calculation.pools.risk > 0) {
       await settlement.distribution.depositToRiskPool(
         result.event_id,
         calculation.pools.risk,
@@ -344,6 +373,11 @@ router.post('/batches', async (req, res) => {
       return res.status(503).json({ success: false, error: 'service_unavailable' });
     }
 
+    // payout 토글 체크
+    if (!getToggles().payout) {
+      return res.status(503).json({ success: false, error: 'settlement_payout_disabled' });
+    }
+
     const { batch_date } = req.body;
     const batch = await settlement.payout.createPayoutBatch(batch_date);
 
@@ -524,6 +558,23 @@ router.post('/release-held', async (req, res) => {
     console.error('[Settlement] Hold 해제 실패:', error);
     res.status(500).json({ success: false, error: 'server_error' });
   }
+});
+
+/**
+ * GET /api/settlement/toggles
+ * 피처 토글 상태 조회 (운영용)
+ */
+router.get('/toggles', (_req, res) => {
+  res.json({
+    success: true,
+    data: getToggles(),
+    rollback_instructions: {
+      step1: 'SETTLEMENT_INGEST=false → 이벤트 수신 중단',
+      step2: 'SETTLEMENT_ALLOC=false → 풀 배분 중단',
+      step3: 'SETTLEMENT_PAYOUT=false → 지급 배치 중단',
+      step4: '원인 PR revert 후 재배포'
+    }
+  });
 });
 
 module.exports = router;
