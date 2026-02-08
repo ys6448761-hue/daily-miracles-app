@@ -18,6 +18,20 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
+// 소원그림 패키지 서비스 (tolerant loading)
+let postcardService = null;
+let captionService = null;
+try {
+  postcardService = require('../services/postcardService');
+} catch (err) {
+  console.error('[WishImage] postcardService 로드 실패:', err.message);
+}
+try {
+  captionService = require('../services/captionService');
+} catch (err) {
+  console.error('[WishImage] captionService 로드 실패:', err.message);
+}
+
 // 이미지 저장 경로
 const WISHES_IMAGE_DIR = path.join(__dirname, '..', 'public', 'images', 'wishes');
 
@@ -542,6 +556,85 @@ router.post('/generate-with-watermark', async (req, res) => {
     res.status(500).json({
       success: false,
       error: '소원그림 생성 중 오류가 발생했습니다.',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/wish-image/postcard
+ * 1:1 포스트카드 합성 (씰/ID/날짜/캡션 오버레이)
+ *
+ * Body:
+ * - image_path (필수): 소스 이미지 경로
+ * - date (선택): 날짜 YYYY-MM-DD (기본: 오늘)
+ * - postcard_id (선택): 포스트카드 ID (기본: 자동생성)
+ * - caption (선택): 캡션 텍스트 (미제공 시 captionService 자동생성)
+ * - tone (선택): CALM|HOPEFUL|RESTART (기본: CALM)
+ */
+router.post('/postcard', async (req, res) => {
+  try {
+    if (!postcardService) {
+      return res.status(503).json({ success: false, error: 'Postcard service unavailable' });
+    }
+
+    const { image_path, date, postcard_id, caption, tone = 'CALM' } = req.body;
+
+    if (!image_path) {
+      return res.status(400).json({ success: false, error: 'image_path is required' });
+    }
+
+    // 이미지 경로 해석
+    const PUBLIC_DIR = path.join(__dirname, '..', 'public');
+    let resolvedPath;
+    if (path.isAbsolute(image_path)) {
+      resolvedPath = image_path;
+    } else if (image_path.startsWith('/images/')) {
+      resolvedPath = path.join(PUBLIC_DIR, image_path);
+    } else {
+      resolvedPath = path.join(WISHES_IMAGE_DIR, path.basename(image_path));
+    }
+
+    if (!fs.existsSync(resolvedPath)) {
+      return res.status(404).json({ success: false, error: 'Source image not found' });
+    }
+
+    // 캡션 자동 생성
+    let finalCaption = caption;
+    let captionMeta = null;
+    if (!finalCaption && captionService) {
+      const result = await captionService.generateCaption({ tone });
+      finalCaption = result.caption;
+      captionMeta = result.safety_flags;
+    }
+    if (!finalCaption) {
+      finalCaption = '좋은 방향으로 한 걸음 더.';
+    }
+
+    // 날짜/ID 자동 생성
+    const finalDate = date || new Date().toISOString().split('T')[0];
+    const finalId = postcard_id || `PC-${finalDate.slice(5).replace(/-/g, '')}-${Date.now().toString().slice(-4)}`;
+
+    // 포스트카드 생성
+    const result = await postcardService.generatePostcard({
+      imagePath: resolvedPath,
+      date: finalDate,
+      postcardId: finalId,
+      caption: finalCaption
+    });
+
+    res.json({
+      success: true,
+      ...result,
+      captionGenerated: !caption,
+      captionSafety: captionMeta
+    });
+
+  } catch (error) {
+    console.error('[WishImage] Postcard error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Postcard generation failed',
       details: error.message
     });
   }

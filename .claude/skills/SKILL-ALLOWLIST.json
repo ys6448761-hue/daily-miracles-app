@@ -103,11 +103,10 @@
       "priority": "P0",
       "category": "C. 소원그림 패키지",
       "description": "Postcard 1:1 (1024x1024) 합성 (씰/ID/날짜/캡션)",
-      "status": "PARTIAL",
-      "module": "routes/wishImageRoutes.js",
-      "entry": "POST /api/wish-image/generate (DALL-E 1024x1024)",
-      "deps": ["OPENAI_API_KEY"],
-      "gap": "씰/ID/날짜/캡션 합성 레이어 미구현 - 현재 DALL-E raw 출력만"
+      "status": "LIVE",
+      "module": "services/postcardService.js",
+      "entry": "POST /api/wish-image/postcard + generatePostcard()",
+      "deps": ["sharp (이미지 가공)", "services/captionService.js"]
     },
 
     {
@@ -192,10 +191,10 @@
   ],
 
   "summary": {
-    "LIVE": 9,
-    "PARTIAL": 5,
+    "LIVE": 10,
+    "PARTIAL": 4,
     "TODO": 2,
-    "p0_ready": "9/12",
+    "p0_ready": "10/12",
     "p1_ready": "2/4"
   }
 }
