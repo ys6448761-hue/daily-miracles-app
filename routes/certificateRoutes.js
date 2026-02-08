@@ -40,7 +40,7 @@ router.post('/generate', async (req, res) => {
       return res.status(503).json({ success: false, error: 'Certificate service unavailable' });
     }
 
-    const { image_path, date, boarding_id, caption, tone = 'HOPEFUL' } = req.body;
+    const { image_path, date, boarding_id, caption, tone = 'CALM' } = req.body;
 
     if (!image_path) {
       return res.status(400).json({ success: false, error: 'image_path is required' });

@@ -19,7 +19,9 @@
     "memory:lint": "python tools/lint_team_memory.py",
     "memory:digest": "python tools/generate_team_memory_digest.py",
     "memory:gate": "python tools/rebuild_team_memory_indexes_simple.py && python tools/lint_team_memory.py",
-    "test:caption": "node tests/caption/captionService.test.js"
+    "test:caption": "node tests/caption/captionService.test.js",
+    "test:certificate": "node tests/certificate/certificateService.test.js",
+    "test:소원그림": "node tests/caption/captionService.test.js && node tests/certificate/certificateService.test.js"
   },
   "engines": {
     "node": "20.x"
