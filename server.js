@@ -528,6 +528,15 @@ try {
   console.warn("⚠️ Settlement 엔진/라우터 로드 실패:", error.message);
 }
 
+// WU (Aurora5 통합 엔진) 라우터 로딩
+let wuRoutes = null;
+try {
+  wuRoutes = require("./routes/wuRoutes");
+  console.log("✅ WU API 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ WU API 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -1628,6 +1637,14 @@ if (settlementRoutes && settlementEngine) {
   console.log("✅ Settlement 라우터 등록 완료 (/api/settlement)");
 } else {
   console.warn("⚠️ Settlement 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- WU (Aurora5 통합 엔진) API Routes ----------
+if (wuRoutes) {
+  app.use("/api/wu", wuRoutes);
+  console.log("✅ WU API 라우터 등록 완료 (/api/wu)");
+} else {
+  console.warn("⚠️ WU API 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------

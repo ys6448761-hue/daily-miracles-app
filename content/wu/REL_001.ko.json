@@ -1,0 +1,61 @@
+{
+  "wu_type": "REL",
+  "wu_code": "REL_001",
+  "version": "001",
+  "locale": "ko",
+  "title": "관계 유형 탐색",
+  "description": "나와 주변 사람들의 관계를 탐색합니다.",
+  "question_count": 7,
+  "questions": [
+    {
+      "idx": 0,
+      "key": "REL_WISH",
+      "text": "지금 관계에서 가장 이루고 싶은 소원을 한 문장으로 적어주세요.",
+      "guide": "짧아도 괜찮아요. 떠오르는 그대로요.",
+      "category_hint": "relationship"
+    },
+    {
+      "idx": 1,
+      "key": "REL_WHO",
+      "text": "그 소원과 관련된 사람은 누구인가요? 어떤 관계인가요?",
+      "guide": "가족, 친구, 연인, 동료 등 관계만 적어도 좋아요. 실명은 쓰지 마세요.",
+      "category_hint": "relationship"
+    },
+    {
+      "idx": 2,
+      "key": "REL_NOW",
+      "text": "지금 그 관계의 상태를 0~10점으로 매기면 몇 점이에요?",
+      "guide": "예: \"4점, 대화가 줄었다\"",
+      "category_hint": "emotion",
+      "input_type": "scale_0_10"
+    },
+    {
+      "idx": 3,
+      "key": "REL_BLOCKER",
+      "text": "그 관계에서 가장 어려운 점은 무엇인가요?",
+      "guide": "솔직하게, 작은 것이라도 괜찮아요.",
+      "category_hint": "blocker"
+    },
+    {
+      "idx": 4,
+      "key": "REL_STRENGTH",
+      "text": "그래도 그 관계에서 좋았던 순간이나 강점이 있다면?",
+      "guide": "아주 작은 것이라도요.",
+      "category_hint": "strength"
+    },
+    {
+      "idx": 5,
+      "key": "REL_EMOTION",
+      "text": "그 관계를 떠올리면 어떤 감정이 드나요? 한 단어로 표현하면?",
+      "guide": "예: 그리움, 서운함, 고마움, 불안",
+      "category_hint": "emotion"
+    },
+    {
+      "idx": 6,
+      "key": "REL_STEP",
+      "text": "24시간 안에 그 관계를 위해 할 수 있는 가장 작은 한 걸음은?",
+      "guide": "없다면 \"없음\"이라고 적어도 괜찮아요.",
+      "category_hint": "action"
+    }
+  ]
+}
