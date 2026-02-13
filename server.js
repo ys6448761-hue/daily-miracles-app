@@ -708,6 +708,11 @@ app.get("/playground/share", (_req, res) => {
   res.sendFile(path.join(__dirname, "public", "playground", "share.html"));
 });
 
+// ---------- WU Pages (Aurora5 통합 엔진) ----------
+app.get("/wu", (_req, res) => {
+  res.sendFile(path.join(__dirname, "public", "wu", "index.html"));
+});
+
 // ---------- Result Page (기적 결과 페이지) ----------
 // /result/:id 형태의 URL을 result.html로 라우팅 (ID는 프론트에서 처리)
 app.get("/result/:id", (_req, res) => {

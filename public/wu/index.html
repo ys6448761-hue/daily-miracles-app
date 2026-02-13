@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FRRJ7JZPGZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FRRJ7JZPGZ');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>하루하루의 기적 - WU</title>
+  <meta property="og:title" content="하루하루의 기적 — 나를 알아가는 여정" />
+  <meta property="og:description" content="3분이면 충분해요. 7문항으로 기적지수를 받아보세요." />
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #9B87F5 0%, #F5A7C6 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container { max-width: 600px; margin: 0 auto; }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 24px;
+      padding: 20px 0 10px;
+    }
+    .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+    .header p { font-size: 15px; opacity: 0.9; }
+
+    /* 진행바 */
+    .progress-bar {
+      background: rgba(255,255,255,0.25);
+      border-radius: 12px;
+      height: 10px;
+      margin: 16px 0 8px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      background: white;
+      height: 100%;
+      border-radius: 12px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+    .progress-text {
+      text-align: center;
+      color: white;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    /* 카드 */
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 36px 28px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+      animation: fadeIn 0.4s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity:0; transform:translateY(16px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+    @keyframes slideIn {
+      from { opacity:0; transform:translateX(16px); }
+      to { opacity:1; transform:translateX(0); }
+    }
+
+    /* 스크린 토글 */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ─── 유형 선택 ─── */
+    .type-cards { display: flex; flex-direction: column; gap: 16px; }
+    .type-card {
+      border: 2px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .type-card:hover {
+      border-color: #9B87F5;
+      background: rgba(155,135,245,0.04);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(155,135,245,0.15);
+    }
+    .type-card h3 { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 8px; }
+    .type-card p { font-size: 14px; color: #6b7280; line-height: 1.5; }
+    .type-card .type-meta { font-size: 12px; color: #9B87F5; font-weight: 600; margin-top: 10px; }
+
+    /* ─── 질문 ─── */
+    .question-area { animation: slideIn 0.35s ease; }
+    .question-num { font-size: 13px; font-weight: 600; color: #9B87F5; margin-bottom: 8px; }
+    .question-text { font-size: 19px; font-weight: 600; color: #374151; margin-bottom: 12px; line-height: 1.5; }
+    .question-guide { font-size: 13px; color: #9ca3af; margin-bottom: 20px; line-height: 1.5; }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 14px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 16px;
+      font-family: inherit;
+      transition: border-color 0.25s, box-shadow 0.25s;
+      outline: none;
+      resize: vertical;
+    }
+    textarea:focus {
+      border-color: #9B87F5;
+      box-shadow: 0 0 0 4px rgba(155,135,245,0.12);
+    }
+    .char-count { text-align: right; font-size: 12px; color: #9ca3af; margin-top: 4px; }
+
+    /* 슬라이더 */
+    .slider-wrap { padding: 16px 0; }
+    input[type="range"] {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: #e5e7eb;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #9B87F5;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(155,135,245,0.4);
+    }
+    .slider-val {
+      text-align: center;
+      font-size: 32px;
+      font-weight: 700;
+      color: #9B87F5;
+      margin-top: 8px;
+    }
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    /* 선택지 */
+    .choices { display: flex; flex-direction: column; gap: 10px; }
+    .choice-btn {
+      padding: 14px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      background: white;
+      font-size: 15px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+    .choice-btn:hover { border-color: #9B87F5; background: rgba(155,135,245,0.04); }
+    .choice-btn.selected { border-color: #9B87F5; background: rgba(155,135,245,0.08); font-weight: 600; }
+
+    /* 버튼 */
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      margin-top: 20px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #9B87F5 0%, #F5A7C6 100%);
+      color: white;
+    }
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(155,135,245,0.35);
+    }
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+      margin-top: 10px;
+    }
+    .btn-secondary:hover { background: #e5e7eb; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* 에러 */
+    .error-msg {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-top: 12px;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+
+    /* ─── 결과 ─── */
+    .result-score {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .result-score .score-num {
+      font-size: 64px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .result-score .score-label {
+      font-size: 14px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+    .energy-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+      margin-top: 8px;
+    }
+
+    .ef-chart { margin: 24px 0; }
+    .ef-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+    .ef-label { width: 56px; font-size: 12px; color: #6b7280; text-align: right; flex-shrink: 0; }
+    .ef-bar-bg {
+      flex: 1;
+      height: 12px;
+      background: #f3f4f6;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .ef-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.8s ease;
+    }
+    .ef-val { width: 30px; font-size: 12px; font-weight: 600; color: #374151; }
+
+    .ai-msg {
+      background: linear-gradient(135deg, rgba(155,135,245,0.08), rgba(245,167,198,0.08));
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .ai-msg .encourage { font-size: 16px; font-weight: 600; color: #333; line-height: 1.6; margin-bottom: 8px; }
+    .ai-msg .insight { font-size: 14px; color: #6b7280; line-height: 1.5; }
+
+    .keywords { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+    .kw-pill {
+      background: rgba(155,135,245,0.1);
+      color: #6E59A5;
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .result-meta {
+      text-align: center;
+      font-size: 13px;
+      color: #9ca3af;
+      margin-top: 16px;
+    }
+
+    /* ─── 안전 일시정지 ─── */
+    .paused-icon { font-size: 48px; text-align: center; margin-bottom: 16px; }
+    .paused-title { font-size: 22px; font-weight: 700; text-align: center; color: #333; margin-bottom: 12px; }
+    .paused-msg { font-size: 15px; color: #6b7280; text-align: center; line-height: 1.6; margin-bottom: 24px; }
+    .helpline {
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .helpline strong { color: #DC2626; font-size: 20px; }
+    .helpline p { font-size: 13px; color: #991B1B; margin-top: 4px; }
+
+    /* 로딩 */
+    .loading-center { text-align: center; padding: 60px 0; }
+    .spinner {
+      width: 48px; height: 48px;
+      border: 4px solid rgba(155,135,245,0.2);
+      border-top-color: #9B87F5;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 15px; color: #6b7280; }
+
+    @media (max-width: 480px) {
+      body { padding: 12px; }
+      .card { padding: 24px 18px; border-radius: 16px; }
+      .header h1 { font-size: 24px; }
+      .question-text { font-size: 17px; }
+      .result-score .score-num { font-size: 52px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1 id="headerTitle">나를 알아가는 여정</h1>
+    <p id="headerDesc">3분이면 충분해요</p>
+  </div>
+
+  <!-- 진행바 (질문 화면에서만 보임) -->
+  <div id="progressWrap" style="display:none;">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">0 / 7</div>
+  </div>
+
+  <!-- ═══ Screen 1: 유형 선택 ═══ -->
+  <div id="screen-select" class="screen active">
+    <div class="card">
+      <div id="typeCards" class="type-cards">
+        <div style="text-align:center;color:#9ca3af;padding:40px 0;">불러오는 중...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Screen 2: 질문 ═══ -->
+  <div id="screen-question" class="screen">
+    <div class="card">
+      <div class="question-area" id="questionArea">
+        <div class="question-num" id="qNum"></div>
+        <div class="question-text" id="qText"></div>
+        <div class="question-guide" id="qGuide"></div>
+        <div id="inputArea"></div>
+      </div>
+      <div class="error-msg" id="errorMsg"></div>
+      <button class="btn btn-primary" id="btnNext" onclick="submitAnswer()">다음</button>
+    </div>
+  </div>
+
+  <!-- ═══ Screen 3: 로딩 ═══ -->
+  <div id="screen-loading" class="screen">
+    <div class="card">
+      <div class="loading-center">
+        <div class="spinner"></div>
+        <div class="loading-text">기적지수를 분석하고 있어요...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Screen 4: 결과 ═══ -->
+  <div id="screen-result" class="screen">
+    <div class="card">
+      <div class="result-score">
+        <div class="score-num" id="resScore">72</div>
+        <div class="score-label">기적지수</div>
+        <div class="energy-badge" id="resEnergy">에메랄드</div>
+      </div>
+
+      <div class="ef-chart" id="efChart"></div>
+
+      <div class="ai-msg">
+        <div class="encourage" id="resEncourage"></div>
+        <div class="insight" id="resInsight"></div>
+      </div>
+
+      <div class="keywords" id="resKeywords"></div>
+
+      <div class="result-meta" id="resMeta"></div>
+
+      <button class="btn btn-primary" id="btnNextWu" onclick="goNextWu()">다음 탐색하기</button>
+      <button class="btn btn-secondary" onclick="location.href='/wu'">처음으로</button>
+    </div>
+  </div>
+
+  <!-- ═══ Screen 5: 안전 일시정지 ═══ -->
+  <div id="screen-paused" class="screen">
+    <div class="card">
+      <div class="paused-icon">&#x1F49C;</div>
+      <div class="paused-title">잠시 쉬어가요</div>
+      <div class="paused-msg">지금 마음이 많이 힘드실 수 있어요.<br>혼자 감당하지 않아도 괜찮아요.</div>
+      <div class="helpline">
+        <strong id="helplineNum">1393</strong>
+        <p id="helplineLabel">정신건강위기상담전화 (24시간)</p>
+      </div>
+      <button class="btn btn-secondary" onclick="location.href='/'">홈으로 돌아가기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ═══ 상태 ═══
+  let sessionId = null;
+  let currentQuestion = null;
+  let selectedChoice = null;
+  let wuTitle = '';
+  let nextWuHint = null;
+
+  const ENERGY_COLORS = {
+    ruby:     '#E74C3C',
+    sapphire: '#3498DB',
+    emerald:  '#2ECC71',
+    diamond:  '#95A5A6',
+    citrine:  '#F1C40F'
+  };
+
+  const ENERGY_NAMES = {
+    ruby: '루비',
+    sapphire: '사파이어',
+    emerald: '에메랄드',
+    diamond: '다이아몬드',
+    citrine: '시트린'
+  };
+
+  const EF_LABELS = {
+    vitality: '활력',
+    relationship: '관계',
+    growth: '성장',
+    resolve: '결의',
+    stability: '안정'
+  };
+
+  // ═══ 유틸 ═══
+  function show(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('errorMsg');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 4000);
+  }
+
+  function genPhoneHash() {
+    return Date.now() + '-' + Math.random().toString(36).slice(2);
+  }
+
+  async function api(method, path, body) {
+    const opts = { method, headers: { 'Content-Type': 'application/json' } };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch('/api/wu' + path, opts);
+    const data = await res.json();
+    if (!res.ok && !data.success) {
+      throw { status: res.status, ...data };
+    }
+    return data;
+  }
+
+  // ═══ 초기화 ═══
+  async function init() {
+    const params = new URLSearchParams(location.search);
+    const autoType = params.get('type');
+
+    try {
+      const data = await api('GET', '/types');
+      if (autoType && data.types.some(t => t.wu_type === autoType)) {
+        startWu(autoType);
+        return;
+      }
+      renderTypeCards(data.types);
+    } catch (e) {
+      document.getElementById('typeCards').innerHTML =
+        '<div style="text-align:center;color:#991b1b;padding:30px 0;">서비스를 불러올 수 없습니다.</div>';
+    }
+  }
+
+  function renderTypeCards(types) {
+    const wrap = document.getElementById('typeCards');
+    wrap.innerHTML = '';
+    types.forEach(t => {
+      const card = document.createElement('div');
+      card.className = 'type-card';
+      card.innerHTML = `
+        <h3>${t.title}</h3>
+        <p>${t.description}</p>
+        <div class="type-meta">${t.question_count}문항 &middot; 약 3분</div>
+      `;
+      card.addEventListener('click', () => startWu(t.wu_type));
+      wrap.appendChild(card);
+    });
+  }
+
+  // ═══ 세션 시작 ═══
+  async function startWu(wuType) {
+    try {
+      const data = await api('POST', '/start', {
+        phone_hash: genPhoneHash(),
+        wu_type: wuType
+      });
+
+      sessionId = data.session.id;
+      wuTitle = data.wuTitle || wuType;
+      currentQuestion = data.question;
+
+      document.getElementById('headerTitle').textContent = wuTitle;
+      document.getElementById('headerDesc').textContent = '';
+      document.getElementById('progressWrap').style.display = 'block';
+
+      updateProgress(data.progress, currentQuestion.idx, currentQuestion.total);
+      renderQuestion(currentQuestion);
+      show('screen-question');
+
+      if (typeof gtag === 'function') gtag('event', 'wu_start', { wu_type: wuType });
+    } catch (e) {
+      showError(e.message || '세션을 시작할 수 없습니다.');
+    }
+  }
+
+  // ═══ 질문 렌더 ═══
+  function renderQuestion(q) {
+    document.getElementById('qNum').textContent = `질문 ${q.idx + 1} / ${q.total}`;
+    document.getElementById('qText').textContent = q.text;
+    document.getElementById('qGuide').textContent = q.guide || '';
+
+    const area = document.getElementById('inputArea');
+    area.innerHTML = '';
+    selectedChoice = null;
+
+    const btn = document.getElementById('btnNext');
+    btn.textContent = (q.idx === q.total - 1) ? '완료' : '다음';
+
+    if (q.input_type === 'scale_0_10') {
+      area.innerHTML = `
+        <div class="slider-wrap">
+          <input type="range" id="scaleInput" min="0" max="10" value="5"
+                 oninput="document.getElementById('scaleVal').textContent=this.value">
+          <div class="slider-val" id="scaleVal">5</div>
+          <div class="slider-labels"><span>0</span><span>10</span></div>
+        </div>`;
+    } else if (q.input_type === 'choice_4') {
+      const choices = (q.guide || '').split(/\s*\/\s*/);
+      const div = document.createElement('div');
+      div.className = 'choices';
+      choices.forEach(c => {
+        const b = document.createElement('button');
+        b.className = 'choice-btn';
+        b.textContent = c;
+        b.addEventListener('click', () => {
+          div.querySelectorAll('.choice-btn').forEach(x => x.classList.remove('selected'));
+          b.classList.add('selected');
+          selectedChoice = c;
+        });
+        div.appendChild(b);
+      });
+      area.appendChild(div);
+    } else {
+      area.innerHTML = `
+        <textarea id="answerInput" placeholder="${q.guide || '자유롭게 적어주세요'}"
+                  maxlength="1000"
+                  oninput="document.getElementById('charCnt').textContent=this.value.length+'/1000'"></textarea>
+        <div class="char-count" id="charCnt">0/1000</div>`;
+    }
+
+    // 새 질문 애니메이션
+    const qa = document.getElementById('questionArea');
+    qa.style.animation = 'none';
+    void qa.offsetHeight;
+    qa.style.animation = 'slideIn 0.35s ease';
+  }
+
+  function getAnswer() {
+    if (currentQuestion.input_type === 'scale_0_10') {
+      return document.getElementById('scaleInput').value;
+    }
+    if (currentQuestion.input_type === 'choice_4') {
+      return selectedChoice || '';
+    }
+    return (document.getElementById('answerInput')?.value || '').trim();
+  }
+
+  // ═══ 답변 제출 ═══
+  window.submitAnswer = async function() {
+    const answer = getAnswer();
+
+    // choice_4에서 미선택 시
+    if (currentQuestion.input_type === 'choice_4' && !answer) {
+      showError('하나를 선택해주세요.');
+      return;
+    }
+
+    const btn = document.getElementById('btnNext');
+    btn.disabled = true;
+
+    try {
+      const data = await api('POST', '/' + sessionId + '/answer', { answer });
+
+      // RED 감지
+      if (data.paused) {
+        document.getElementById('helplineNum').textContent = data.helpline || '1393';
+        document.getElementById('progressWrap').style.display = 'none';
+        show('screen-paused');
+        if (typeof gtag === 'function') gtag('event', 'wu_paused', { reason: 'safety' });
+        return;
+      }
+
+      // 완료 준비
+      if (data.readyToComplete) {
+        await completeWu();
+        return;
+      }
+
+      // 다음 질문
+      currentQuestion = data.question;
+      updateProgress(data.progress, currentQuestion.idx, currentQuestion.total);
+      renderQuestion(currentQuestion);
+    } catch (e) {
+      if (e.status === 429) {
+        showError(`잠시 후 다시 시도해주세요. (${e.retryAfter || 3}초)`);
+      } else if (e.status === 410) {
+        showError('세션이 만료되었습니다.');
+        setTimeout(() => location.href = '/wu', 2000);
+      } else {
+        showError(e.message || '오류가 발생했습니다.');
+      }
+    } finally {
+      btn.disabled = false;
+    }
+  };
+
+  function updateProgress(progress, idx, total) {
+    const pct = Math.round((progress || 0) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressText').textContent = (idx || 0) + ' / ' + (total || 7);
+  }
+
+  // ═══ 완료 ═══
+  async function completeWu() {
+    document.getElementById('progressWrap').style.display = 'none';
+    show('screen-loading');
+
+    try {
+      const data = await api('POST', '/' + sessionId + '/complete');
+      renderResult(data.result);
+      show('screen-result');
+      if (typeof gtag === 'function') gtag('event', 'wu_complete', { score: data.result.miracle_score });
+    } catch (e) {
+      showError(e.message || '결과를 불러올 수 없습니다.');
+      show('screen-question');
+    }
+  }
+
+  // ═══ 결과 렌더 ═══
+  function renderResult(r) {
+    const eColor = ENERGY_COLORS[r.energy_type] || '#9B87F5';
+    const eName = r.energy_name || ENERGY_NAMES[r.energy_type] || r.energy_type;
+
+    // 점수
+    const scoreEl = document.getElementById('resScore');
+    scoreEl.textContent = r.miracle_score;
+    scoreEl.style.color = eColor;
+
+    // 에너지 배지
+    const badge = document.getElementById('resEnergy');
+    badge.textContent = eName;
+    badge.style.background = eColor;
+
+    // EF 차트
+    const chart = document.getElementById('efChart');
+    chart.innerHTML = '';
+    const scores = r.ef_scores || {};
+    Object.entries(EF_LABELS).forEach(([key, label]) => {
+      const val = scores[key] || 0;
+      chart.innerHTML += `
+        <div class="ef-row">
+          <div class="ef-label">${label}</div>
+          <div class="ef-bar-bg">
+            <div class="ef-bar-fill" style="width:${val}%;background:${eColor};"></div>
+          </div>
+          <div class="ef-val">${val}</div>
+        </div>`;
+    });
+
+    // AI 메시지
+    const ai = r.ai_response || {};
+    document.getElementById('resEncourage').textContent = ai.encouragement || '';
+    document.getElementById('resInsight').textContent = ai.insight || '';
+
+    // 키워드
+    const kwWrap = document.getElementById('resKeywords');
+    kwWrap.innerHTML = '';
+    (r.keywords || []).forEach(kw => {
+      kwWrap.innerHTML += `<span class="kw-pill">${kw}</span>`;
+    });
+
+    // 메타
+    const dur = r.duration_sec ? Math.round(r.duration_sec / 60) + '분' : '';
+    document.getElementById('resMeta').textContent = dur ? '소요시간 ' + dur : '';
+
+    // 다음 추천
+    nextWuHint = ai.next_wu_hint || null;
+    const nextBtn = document.getElementById('btnNextWu');
+    if (nextWuHint) {
+      nextBtn.style.display = 'block';
+      nextBtn.textContent = '다음 탐색: ' + nextWuHint;
+    } else {
+      nextBtn.style.display = 'none';
+    }
+
+    document.getElementById('headerTitle').textContent = '당신의 기적지수';
+    document.getElementById('headerDesc').textContent = '';
+  }
+
+  window.goNextWu = function() {
+    if (nextWuHint) {
+      location.href = '/wu?type=' + nextWuHint;
+    } else {
+      location.href = '/wu';
+    }
+  };
+
+  // ═══ 실행 ═══
+  init();
+})();
+</script>
+
+</body>
+</html>
