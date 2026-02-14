@@ -669,6 +669,23 @@ app.use(express.static(path.join(__dirname, "public"), {
 app.get("/quote", (_req, res) => {
   res.sendFile(path.join(__dirname, "public", "quote.html"));
 });
+// ===== 출석 API =====
+app.post("/api/attendance/ping", express.json(), (req, res) => {
+  const apiKey = req.headers["x-api-key"];
+
+  if (apiKey !== process.env.LW_API_KEY) {
+    return res.status(401).json({ ok: false, error: "unauthorized" });
+  }
+
+  const { eventType, page } = req.body || {};
+
+  return res.status(200).json({
+    ok: true,
+    eventType,
+    page,
+    timestamp: new Date().toISOString()
+  });
+});
 
 app.get("/program", (_req, res) => {
   res.sendFile(path.join(__dirname, "public", "program.html"));
