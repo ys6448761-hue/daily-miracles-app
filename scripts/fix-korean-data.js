@@ -6,18 +6,8 @@
 const { Client } = require('pg');
 
 async function fixKoreanData() {
-  const connectionConfig = process.env.DATABASE_URL
-    ? { connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } }
-    : {
-        host: process.env.DB_HOST || 'dpg-d3t9gpa4d50c73d2i3gg-a.singapore-postgres.render.com',
-        port: parseInt(process.env.DB_PORT || '5432', 10),
-        database: process.env.DB_NAME || 'yeosu_miracle_travel',
-        user: process.env.DB_USER || 'yeosu_user',
-        password: process.env.DB_PASSWORD || 'XEVFpHtXr7CsYZSYYmDhogjbXzo32hCR',
-        ssl: { rejectUnauthorized: false }
-      };
-
-  const client = new Client(connectionConfig);
+  const { getConnectionConfig } = require('../database/dbConfig');
+  const client = new Client(getConnectionConfig());
 
   try {
     await client.connect();
