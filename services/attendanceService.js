@@ -18,6 +18,15 @@
  */
 
 const db = require('../database/db');
+const { getKSTDateString, getKSTYesterday } = require('../utils/kstDate');
+
+// pointService — tolerant loading (포인트 미연동 시에도 출석은 동작)
+let pointService = null;
+try {
+  pointService = require('./pointService');
+} catch (e) {
+  console.warn('⚠️ [Attendance] pointService 로드 실패 — 포인트 적립 비활성:', e.message);
+}
 
 // ─────────────────────────────────────────────────────
 // 스트릭 보너스 테이블
@@ -37,10 +46,10 @@ const DEFAULT_TEMP = 36.5;
  * @param {string} userId - Wix 유저 ID
  * @param {string} eventType - 'open' | 'pay_success'
  * @param {string} [page] - 페이지명
- * @returns {{ ok: boolean, duplicate?: boolean, streak?: number, temperature?: number }}
+ * @returns {{ ok: boolean, duplicate?: boolean, streak?: number, temperature?: number, pointsEarned?: number }}
  */
 async function ping(userId, eventType, page) {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getKSTDateString();
 
   // 1) 이벤트 기록
   try {
@@ -71,7 +80,7 @@ async function ping(userId, eventType, page) {
 }
 
 /**
- * open 이벤트 처리: 스트릭 + 체온 계산
+ * open 이벤트 처리: 스트릭 + 체온 계산 + 포인트 적립
  */
 async function handleOpen(userId, today) {
   const stateRes = await db.query(
@@ -85,10 +94,10 @@ async function handleOpen(userId, today) {
   if (stateRes.rowCount > 0) {
     const prev = stateRes.rows[0];
     const lastDate = prev.last_open_date
-      ? prev.last_open_date.toISOString().slice(0, 10)
+      ? getKSTDateString(prev.last_open_date)
       : null;
 
-    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    const yesterday = getKSTYesterday();
 
     if (lastDate === yesterday) {
       // 연속 출석
@@ -123,7 +132,30 @@ async function handleOpen(userId, today) {
     [userId, temperature, streak, today]
   );
 
-  return { ok: true, streak, temperature: Number(temperature.toFixed(2)) };
+  // 포인트 적립 (신규 open만, 중복은 ping()에서 이미 리턴)
+  let pointsEarned = 0;
+  if (pointService) {
+    try {
+      const pr = await pointService.earnPoints({
+        subjectType: 'user',
+        subjectId: userId,
+        eventType: pointService.EVENT_TYPES.EARN_CHECKIN,
+        amount: 50,
+        category: 'checkin',
+        referenceType: 'attendance',
+        referenceId: `attendance-open-${today}`,
+        description: '출석 체온 보상',
+      });
+      if (pr.success) {
+        pointsEarned = pr.amount;
+        console.log(`✅ [Attendance→Point] ${userId} +${pr.amount}P`);
+      }
+    } catch (e) {
+      console.error('⚠️ [Attendance→Point] 적립 실패 (출석은 정상):', e.message);
+    }
+  }
+
+  return { ok: true, streak, temperature: Number(temperature.toFixed(2)), pointsEarned };
 }
 
 /**

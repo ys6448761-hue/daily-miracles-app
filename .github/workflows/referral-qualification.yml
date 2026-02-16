@@ -1,0 +1,42 @@
+# Referral Qualification Job
+# PENDING 추천 자격 확인 + 베스팅 보상 지급 + 7일 초과 EXPIRED
+# Schedule: 매일 KST 03:20 (UTC 18:20)
+
+name: Referral Qualification
+
+on:
+  schedule:
+    # UTC 18:20 = KST 03:20
+    - cron: '20 18 * * *'
+
+  workflow_dispatch:
+
+jobs:
+  check-referrals:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci --omit=dev
+
+      - name: Run referral qualification job
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NODE_ENV: production
+          TZ: Asia/Seoul
+        run: node jobs/referralQualificationJob.js
+
+      - name: Log result
+        if: always()
+        run: |
+          echo "Job: referral-qualification"
+          echo "Time: $(TZ=Asia/Seoul date)"
+          echo "Status: ${{ job.status }}"
