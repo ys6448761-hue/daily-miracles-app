@@ -1,0 +1,4 @@
+FROM postgres:16-alpine
+COPY cron-check.sh /cron-check.sh
+RUN chmod +x /cron-check.sh
+CMD ["/cron-check.sh"]
