@@ -8,15 +8,8 @@ const fs = require('fs');
 const path = require('path');
 const { Pool } = require('pg');
 
-// 환경변수 또는 기본값
-const pool = new Pool({
-  host: process.env.DB_HOST || 'dpg-d3t9gpa4d50c73d2i3gg-a.singapore-postgres.render.com',
-  port: process.env.DB_PORT || 5432,
-  database: process.env.DB_NAME || 'yeosu_miracle_travel',
-  user: process.env.DB_USER || 'yeosu_user',
-  password: process.env.DB_PASSWORD || 'XEVFpHtXr7CsYZSYYmDhogjbXzo32hCR',
-  ssl: { rejectUnauthorized: false }
-});
+const { getConnectionConfig } = require('./dbConfig');
+const pool = new Pool(getConnectionConfig());
 
 async function migrate() {
   console.log('🚀 Migration 011: MICE 결과보고 패키지 테이블 시작...\n');

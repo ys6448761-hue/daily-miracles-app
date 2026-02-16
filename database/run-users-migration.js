@@ -4,16 +4,8 @@ const fs = require('fs');
 const path = require('path');
 
 async function runMigration() {
-    const client = new Client({
-        host: process.env.DB_HOST || 'dpg-d3t9gpa4d50c73d2i3gg-a.singapore-postgres.render.com',
-        port: process.env.DB_PORT || 5432,
-        database: process.env.DB_NAME || 'yeosu_miracle_travel',
-        user: process.env.DB_USER || 'yeosu_user',
-        password: process.env.DB_PASSWORD || 'XEVFpHtXr7CsYZSYYmDhogjbXzo32hCR',
-        ssl: {
-            rejectUnauthorized: false
-        }
-    });
+    const { getConnectionConfig } = require('./dbConfig');
+    const client = new Client(getConnectionConfig());
 
     try {
         console.log('🔌 PostgreSQL 연결 중...');

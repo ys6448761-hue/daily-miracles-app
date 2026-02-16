@@ -2,14 +2,8 @@ const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
 
-const pool = new Pool({
-    host: 'dpg-d3t9gpa4d50c73d2i3gg-a.singapore-postgres.render.com',
-    port: 5432,
-    database: 'yeosu_miracle_travel',
-    user: 'yeosu_user',
-    password: 'XEVFpHtXr7CsYZSYYmDhogjbXzo32hCR',
-    ssl: { rejectUnauthorized: false }
-});
+const { getConnectionConfig } = require('./dbConfig');
+const pool = new Pool(getConnectionConfig());
 
 async function runSchema() {
     const client = await pool.connect();

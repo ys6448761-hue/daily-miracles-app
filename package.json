@@ -23,13 +23,20 @@
     "test:certificate": "node tests/certificate/certificateService.test.js",
     "test:postcard": "node tests/postcard/postcardService.test.js",
     "test:settlement": "node tests/settlement/settlement-v2-gate.js",
-    "test:소원그림": "node tests/caption/captionService.test.js && node tests/certificate/certificateService.test.js && node tests/postcard/postcardService.test.js"
+    "test:소원그림": "node tests/caption/captionService.test.js && node tests/certificate/certificateService.test.js && node tests/postcard/postcardService.test.js",
+    "test:attendance": "node tests/attendance/attendanceService.test.js",
+    "prisma:generate": "npx prisma generate --schema=prisma/schema.prisma",
+    "migrate:deploy": "npx prisma migrate deploy --schema=prisma/schema.prisma",
+    "db:push": "npx prisma db push --schema=prisma/schema.prisma",
+    "start:console": "node server.js",
+    "test:quotes:compare": "node compare-quotes.js quotes_before.json quotes_after.json"
   },
   "engines": {
     "node": "20.x"
   },
   "dependencies": {
     "@notionhq/client": "^5.6.0",
+    "@prisma/client": "^5.22.0",
     "@sendgrid/mail": "^8.1.6",
     "@sparticuz/chromium": "^131.0.1",
     "ajv": "^8.17.1",
@@ -38,7 +45,7 @@
     "bcryptjs": "^3.0.2",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.6.1",
     "express": "^4.21.2",
     "fluent-ffmpeg": "^2.1.3",
     "handlebars": "^4.7.8",
@@ -59,6 +66,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
+    "prisma": "^5.22.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },

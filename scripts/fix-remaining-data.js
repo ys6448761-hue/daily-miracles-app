@@ -6,14 +6,8 @@
 const { Client } = require('pg');
 
 async function fix() {
-  const client = new Client({
-    host: 'dpg-d3t9gpa4d50c73d2i3gg-a.singapore-postgres.render.com',
-    port: 5432,
-    database: 'yeosu_miracle_travel',
-    user: 'yeosu_user',
-    password: 'XEVFpHtXr7CsYZSYYmDhogjbXzo32hCR',
-    ssl: { rejectUnauthorized: false }
-  });
+  const { getConnectionConfig } = require('../database/dbConfig');
+  const client = new Client(getConnectionConfig());
 
   await client.connect();
   console.log('Connected\n');

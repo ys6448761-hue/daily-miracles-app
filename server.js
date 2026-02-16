@@ -537,6 +537,15 @@ try {
   console.error("❌ WU API 라우터 로드 실패:", error.message);
 }
 
+// Attendance (Living Wisdom 출석/체온) 라우터 로딩
+let attendanceRoutes = null;
+try {
+  attendanceRoutes = require("./routes/attendanceRoutes");
+  console.log("✅ Attendance 라우터 로드 성공");
+} catch (error) {
+  console.warn("⚠️ Attendance 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -1667,6 +1676,14 @@ if (wuRoutes) {
   console.log("✅ WU API 라우터 등록 완료 (/api/wu)");
 } else {
   console.warn("⚠️ WU API 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- Attendance (Living Wisdom 출석/체온) Routes ----------
+if (attendanceRoutes) {
+  app.use("/api/attendance", attendanceRoutes);
+  console.log("✅ Attendance 라우터 등록 완료 (/api/attendance)");
+} else {
+  console.warn("⚠️ Attendance 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------
