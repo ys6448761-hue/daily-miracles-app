@@ -25,6 +25,8 @@
     "test:settlement": "node tests/settlement/settlement-v2-gate.js",
     "test:소원그림": "node tests/caption/captionService.test.js && node tests/certificate/certificateService.test.js && node tests/postcard/postcardService.test.js",
     "test:attendance": "node tests/attendance/attendanceService.test.js",
+    "test:kst": "node tests/utils/kstDate.test.js",
+    "test:p0": "node tests/utils/kstDate.test.js && node tests/attendance/attendanceService.test.js",
     "prisma:generate": "npx prisma generate --schema=prisma/schema.prisma",
     "migrate:deploy": "npx prisma migrate deploy --schema=prisma/schema.prisma",
     "db:push": "npx prisma db push --schema=prisma/schema.prisma",

@@ -20,6 +20,8 @@
 const express = require('express');
 const router = express.Router();
 
+const { getKSTDateString } = require('../utils/kstDate');
+
 // Services & DB
 let db, pointService;
 try {
@@ -193,7 +195,7 @@ router.get('/auth', asyncHandler(async (req, res) => {
 // ═══════════════════════════════════════════════════════════════════════════
 
 async function getTodayCheckStatus(subjectType, subjectId) {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getKSTDateString();
 
   const result = await db.query(`
     SELECT check_type, checked_at, points_earned
@@ -228,7 +230,7 @@ async function getTodayCheckStatus(subjectType, subjectId) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 async function performCheck(subjectType, subjectId, checkType, metadata = {}) {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getKSTDateString();
   const reward = POINT_REWARDS[checkType];
 
   if (!reward) {
@@ -500,7 +502,7 @@ router.get('/history', asyncHandler(async (req, res) => {
   // 날짜별로 그룹화
   const byDate = {};
   for (const row of result.rows) {
-    const date = row.check_date.toISOString().slice(0, 10);
+    const date = getKSTDateString(row.check_date);
     if (!byDate[date]) {
       byDate[date] = { date, checks: [], totalEarned: 0 };
     }

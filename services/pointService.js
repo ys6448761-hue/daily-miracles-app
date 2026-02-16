@@ -12,6 +12,7 @@
  */
 
 const db = require('../database/db');
+const { getKSTDateString } = require('../utils/kstDate');
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 상수 정의 (SSOT - 변경 시 feature_flags.config도 동기화)
@@ -126,7 +127,7 @@ async function getAvailableBalance(subjectType, subjectId) {
  * @returns {Promise<object>}
  */
 async function getDailyEarnings(subjectType, subjectId, date = null) {
-  const targetDate = date || new Date().toISOString().split('T')[0];
+  const targetDate = date || getKSTDateString();
 
   const result = await db.query(`
     SELECT
@@ -266,12 +267,13 @@ async function earnPoints({
 
   // 7. 일일 적립 기록 업데이트 (category가 있을 때만)
   if (category && DAILY_CAPS[category]) {
+    const kstToday = getKSTDateString();
     await db.query(`
       INSERT INTO point_daily_cap (subject_type, subject_id, cap_date, ${category}_earned)
-      VALUES ($1, $2, CURRENT_DATE, $3)
+      VALUES ($1, $2, $3, $4)
       ON CONFLICT (subject_type, subject_id, cap_date)
-      DO UPDATE SET ${category}_earned = point_daily_cap.${category}_earned + $3
-    `, [subjectType, subjectId, adjustedAmount]);
+      DO UPDATE SET ${category}_earned = point_daily_cap.${category}_earned + $4
+    `, [subjectType, subjectId, kstToday, adjustedAmount]);
   }
 
   console.log(`✅ [Point] Earned: ${subjectType}:${subjectId} +${adjustedAmount}P (${eventType}), balance: ${newBalance}P`);
