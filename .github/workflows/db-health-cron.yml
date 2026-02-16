@@ -13,6 +13,7 @@ jobs:
 
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      OPS_SLACK_WEBHOOK: ${{ secrets.OPS_SLACK_WEBHOOK }}
       TZ: Asia/Seoul
 
     steps:
