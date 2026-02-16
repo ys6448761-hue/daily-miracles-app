@@ -10,7 +10,7 @@
  * - CLI: node jobs/dbHealthCheck.js
  * - GitHub Actions: cron 스케줄
  *
- * @version 1.0
+ * @version 1.1 — retry + backoff for transient DNS errors
  */
 
 require('dotenv').config();
@@ -25,6 +25,33 @@ try {
 }
 
 const OPS_SLACK_WEBHOOK = process.env.OPS_SLACK_WEBHOOK || process.env.SLACK_WEBHOOK_URL;
+
+// ── Retry config ──────────────────────────────────────
+const MAX_RETRIES = 3;
+const BACKOFF_MS = [0, 5000, 10000]; // 1st=immediate, 2nd=5s, 3rd=10s
+const RETRYABLE_CODES = ['EAI_AGAIN', 'ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED', 'ENOTFOUND'];
+
+function isRetryable(err) {
+  return RETRYABLE_CODES.some((code) => err.message?.includes(code) || err.code === code);
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * DB 호스트명 마스킹 (비밀번호/유저 제거, 호스트만 표시)
+ */
+function maskedHost() {
+  const url = process.env.DATABASE_URL;
+  if (!url) return 'N/A';
+  try {
+    const parsed = new URL(url);
+    return `host=***.${parsed.hostname.split('.').slice(-2).join('.')}`;
+  } catch {
+    return 'host=***';
+  }
+}
 
 const HEALTH_TABLES = [
   'trials',
@@ -76,7 +103,7 @@ function sendSlack(message) {
 }
 
 /**
- * 메인 헬스 체크
+ * 메인 헬스 체크 (with retry for transient network errors)
  */
 async function runDBHealthCheck() {
   const startTime = Date.now();
@@ -88,19 +115,31 @@ async function runDBHealthCheck() {
   console.log('========================================');
   console.log(' DB Health Check');
   console.log(`  ${timeStr}`);
+  console.log(`  ${maskedHost()}`);
   console.log('========================================');
 
-  // 1) DB connectivity
+  // 1) DB connectivity — with retry
   let dbOk = false;
   let dbMs = 0;
-  try {
-    const t0 = Date.now();
-    await db.query('SELECT 1');
-    dbMs = Date.now() - t0;
-    dbOk = true;
-    console.log(`  DB SELECT 1: OK (${dbMs}ms)`);
-  } catch (err) {
-    console.error(`  DB SELECT 1: FAIL — ${err.message}`);
+  let attempt = 0;
+  while (attempt < MAX_RETRIES) {
+    try {
+      const t0 = Date.now();
+      await db.query('SELECT 1');
+      dbMs = Date.now() - t0;
+      dbOk = true;
+      console.log(`  DB SELECT 1: OK (${dbMs}ms)${attempt > 0 ? ` [retry #${attempt}]` : ''}`);
+      break;
+    } catch (err) {
+      attempt++;
+      if (isRetryable(err) && attempt < MAX_RETRIES) {
+        const wait = BACKOFF_MS[attempt] || 10000;
+        console.log(`  DB SELECT 1: ${err.code || err.message} — retry ${attempt}/${MAX_RETRIES} in ${wait / 1000}s`);
+        await sleep(wait);
+      } else {
+        console.error(`  DB SELECT 1: FAIL — ${err.message}${attempt > 1 ? ` (after ${attempt} attempts)` : ''}`);
+      }
+    }
   }
 
   // 2) Table row counts
