@@ -121,6 +121,12 @@ try {
   console.warn("⚠️ Slack Heartbeat 서비스 로드 실패:", error.message);
 }
 
+// Error handler middleware (classification + Slack alerts for 500s)
+const { globalErrorHandler, notFoundHandler, initSlackSender } = require('./middleware/errorHandler');
+if (slackHeartbeatService) {
+  initSlackSender((msg) => slackHeartbeatService.sendSlackMessage(msg));
+}
+
 // 빌드 정보 (디버깅용)
 const BUILD_INFO = {
   commit: process.env.GIT_SHA || process.env.RENDER_GIT_COMMIT || 'unknown',
@@ -649,6 +655,10 @@ app.use((req, _res, next) => {
   }
   next();
 });
+
+// ---------- Request ID ----------
+const requestIdMiddleware = require('./middleware/requestId');
+app.use(requestIdMiddleware);
 
 // ---------- Static ----------
 // PR-5: Cache-Control 헤더 추가 (브라우저 캐싱 활성화)
@@ -1963,21 +1973,9 @@ app.get("/", (_req, res) => {
   });
 });
 
-// ---------- 404 & Error ----------
-app.use((req, res) => {
-  console.warn(`❌ 404 Not Found: ${req.method} ${req.originalUrl}`);
-  res.status(404).json({
-    success: false,
-    error: "route_not_found",
-    message: "요청하신 API 경로를 찾을 수 없습니다",
-    path: req.originalUrl
-  });
-});
-
-app.use((err, _req, res, _next) => {
-  console.error("💥 Unhandled Error:", err);
-  res.status(500).json({ error: "Internal server error", message: err.message });
-});
+// ---------- 404 & Error (middleware/errorHandler.js) ----------
+app.use(notFoundHandler);
+app.use(globalErrorHandler);
 
 // ---------- Rules Preload (fail-fast) ----------
 const FAIL_FAST_RULES = process.env.FAIL_FAST_RULES === 'true' || process.env.NODE_ENV === 'production';

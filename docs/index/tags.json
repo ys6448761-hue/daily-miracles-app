@@ -4,7 +4,10 @@
     "DOC-AIL-정산-v2-final",
     "DOC-AURORA5_CHARACTER_PROMPTS_V3",
     "DOC-weekly_promotion_guide",
+    "DOC-상품유형별_가격표_v12",
+    "DOC-전체상품_가격표_종합_v12",
     "DOC-tag_taxonomy",
+    "DOC-소원놀이터_종합문서_v10",
     "DOC-MIRACLE_MASTER_GUIDELINES",
     "DOC-정산-v2-CEO-요약",
     "DOC-airtable-schema",
@@ -24,12 +27,14 @@
     "DOC-JAEMI_ONBOARDING_v12",
     "DOC-sens-setup-guide",
     "DOC-service-flow",
+    "DOC-가격표_퀵레퍼런스",
     "DOC-README",
     "DOC-REVIEW_COLLECTION_SYSTEM",
     "DOC-ROADMAP_API",
     "DOC-GA4_SETUP_GUIDE",
     "DOC-VIDEO_MASTER",
     "DOC-agents-index",
+    "DOC-소원놀이터_퀵레퍼런스",
     "DOC-Aurora5_토론시스템_안내문",
     "DOC-alimtalk-templates-design",
     "DOC-video-promo-30sec-template",
@@ -201,8 +206,11 @@
   ],
   "가격": [
     "DOC-AIL-정산-v2-final",
+    "DOC-상품유형별_가격표_v12",
+    "DOC-전체상품_가격표_종합_v12",
     "DOC-DEC-20260201-포인트추천예고편-정책구현",
     "DOC-drive-github-sync-setup",
+    "DOC-가격표_퀵레퍼런스",
     "DOC-tax-accounting-ai-tools-analys",
     "DOC-06_External_Sharing_Guide",
     "DOC-alimtalk-templates-design",
@@ -271,6 +279,11 @@
     "DOC-05_Deal_Registration",
     "DOC-06_Demo_Operations"
   ],
+  "pricing": [
+    "DOC-상품유형별_가격표_v12",
+    "DOC-전체상품_가격표_종합_v12",
+    "DOC-가격표_퀵레퍼런스"
+  ],
   "sales-bundle": [
     "DOC-README",
     "DOC-01_Approval",
@@ -291,6 +304,22 @@
     "DOC-conversation-workflow",
     "DOC-manifest-system",
     "DOC-SYS-2025-1230-LUMI-001_Airtabl"
+  ],
+  "systems": [
+    "DOC-소원놀이터_종합문서_v10",
+    "DOC-소원놀이터_퀵레퍼런스"
+  ],
+  "storybook": [
+    "DOC-소원놀이터_종합문서_v10",
+    "DOC-GA4_SETUP_GUIDE",
+    "DOC-manifest-system",
+    "DOC-20260101-4PA",
+    "DOC-20260101-ICN",
+    "DOC-20260101-K7C",
+    "DOC-20260101-6M7",
+    "DOC-20260101-99J",
+    "DOC-2025-12-29_Part6_소원착지전략",
+    "DOC-20251229-SRH"
   ],
   "templates": [
     "DOC-knowledge_card_template",
@@ -422,19 +451,13 @@
     "DOC-README",
     "DOC-ROADMAP_API"
   ],
+  "runbook": [
+    "DOC-crash-alert-response",
+    "DOC-db-backup-restore",
+    "DOC-render-rollback"
+  ],
   "setup": [
     "DOC-GA4_SETUP_GUIDE"
-  ],
-  "storybook": [
-    "DOC-GA4_SETUP_GUIDE",
-    "DOC-manifest-system",
-    "DOC-20260101-4PA",
-    "DOC-20260101-ICN",
-    "DOC-20260101-K7C",
-    "DOC-20260101-6M7",
-    "DOC-20260101-99J",
-    "DOC-2025-12-29_Part6_소원착지전략",
-    "DOC-20251229-SRH"
   ],
   "v1.1": [
     "DOC-VIDEO_MASTER"
