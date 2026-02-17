@@ -1,51 +1,94 @@
 const { error: logError } = require('../config/logger');
-const { AppError, createError, isOperationalError } = require('../utils/errors');
+const {
+  AppError, ValidationError, DatabaseError, OpenAIError, ServiceLimitError,
+  createError, isOperationalError,
+} = require('../utils/errors');
 
-// 개발 환경에서 상세한 에러 정보 반환
-function sendErrorDev(err, res) {
+// ── Slack sender (injected at init to avoid circular deps) ──
+let _slackSender = null;
+
+function initSlackSender(sendFn) {
+  _slackSender = sendFn;
+}
+
+/**
+ * Slack alert for 500-level request errors (non-crash, no exit).
+ * Fire-and-forget — never blocks the HTTP response.
+ */
+function sendErrorAlert(err, req, errorClass, severity) {
+  if (!_slackSender) return;
+
+  const msg = {
+    text: `${severity} Server Error: ${errorClass}`,
+    blocks: [
+      { type: 'header', text: { type: 'plain_text', text: `${severity} Server Error: ${errorClass}`, emoji: true } },
+      {
+        type: 'section',
+        fields: [
+          { type: 'mrkdwn', text: `*Route:*\n\`${req.method} ${req.originalUrl}\`` },
+          { type: 'mrkdwn', text: `*Request ID:*\n\`${req.requestId || 'N/A'}\`` },
+          { type: 'mrkdwn', text: `*Error Class:*\n${errorClass}` },
+          { type: 'mrkdwn', text: `*Status:*\n${err.statusCode || 500}` },
+        ],
+      },
+      { type: 'section', text: { type: 'mrkdwn', text: `\`\`\`${String(err.stack || err.message).slice(0, 1500)}\`\`\`` } },
+      { type: 'context', elements: [{ type: 'mrkdwn', text: `env: ${process.env.NODE_ENV || 'dev'} | pid: ${process.pid} | ${new Date().toISOString()}` }] },
+    ],
+  };
+
+  _slackSender(msg).catch(() => {});
+}
+
+// ── Response formatters ──────────────────────────────────────
+
+function sendErrorDev(err, req, res) {
   res.status(err.statusCode || 500).json({
     success: false,
     error: {
       status: err.statusCode || 500,
+      error_class: err.errorClass || 'Unknown',
       errorCode: err.errorCode || 'INTERNAL_ERROR',
       message: err.message,
       stack: err.stack,
+      request_id: req.requestId || null,
       timestamp: err.timestamp || new Date().toISOString(),
       ...(err.field && { field: err.field }),
       ...(err.resource && { resource: err.resource }),
-      ...(err.resourceId && { resourceId: err.resourceId })
-    }
+      ...(err.resourceId && { resourceId: err.resourceId }),
+    },
   });
 }
 
-// 프로덕션 환경에서 사용자 친화적 에러 메시지 반환
-function sendErrorProd(err, res) {
-  // 운영상 에러 (클라이언트에게 안전하게 노출 가능)
+function sendErrorProd(err, req, res) {
   if (isOperationalError(err)) {
     res.status(err.statusCode).json({
       success: false,
       error: {
         status: err.statusCode,
+        error_class: err.errorClass || 'Unknown',
         errorCode: err.errorCode,
         message: createError.userFriendly(err),
-        timestamp: err.timestamp || new Date().toISOString()
-      }
+        request_id: req.requestId || null,
+        timestamp: err.timestamp || new Date().toISOString(),
+      },
     });
   } else {
-    // 프로그래밍 에러 (일반적인 메시지만 반환)
     res.status(500).json({
       success: false,
       error: {
         status: 500,
+        error_class: err.errorClass || 'Unknown',
         errorCode: 'INTERNAL_ERROR',
         message: '서버에 문제가 발생했습니다. 잠시 후 다시 시도해주세요.',
-        timestamp: new Date().toISOString()
-      }
+        request_id: req.requestId || null,
+        timestamp: new Date().toISOString(),
+      },
     });
   }
 }
 
-// SQLite 에러 처리
+// ── Type-specific error handlers ─────────────────────────────
+
 function handleSQLiteError(error) {
   let message = '데이터베이스 작업 중 오류가 발생했습니다.';
   let errorCode = 'DATABASE_ERROR';
@@ -85,7 +128,6 @@ function handleSQLiteError(error) {
   return createError.database(message, error);
 }
 
-// OpenAI 에러 처리
 function handleOpenAIError(error) {
   let message = 'AI 서비스 처리 중 오류가 발생했습니다.';
 
@@ -102,30 +144,21 @@ function handleOpenAIError(error) {
   return createError.openai(message, error);
 }
 
-// 유효성 검사 에러 처리
 function handleValidationError(error) {
   const errors = [];
 
   if (error.details) {
-    // Joi 검증 에러
-    error.details.forEach(detail => {
-      errors.push({
-        field: detail.path.join('.'),
-        message: detail.message
-      });
+    error.details.forEach((detail) => {
+      errors.push({ field: detail.path.join('.'), message: detail.message });
     });
   } else if (error.errors) {
-    // Mongoose 검증 에러
-    Object.keys(error.errors).forEach(key => {
-      errors.push({
-        field: key,
-        message: error.errors[key].message
-      });
+    Object.keys(error.errors).forEach((key) => {
+      errors.push({ field: key, message: error.errors[key].message });
     });
   }
 
   const message = errors.length > 0
-    ? `입력 값 검증 실패: ${errors.map(e => e.message).join(', ')}`
+    ? `입력 값 검증 실패: ${errors.map((e) => e.message).join(', ')}`
     : '입력 값이 올바르지 않습니다.';
 
   const validationError = createError.validation(message);
@@ -133,7 +166,6 @@ function handleValidationError(error) {
   return validationError;
 }
 
-// 네트워크/시스템 에러 처리
 function handleSystemError(error) {
   let message = '시스템 오류가 발생했습니다.';
   let errorCode = 'SYSTEM_ERROR';
@@ -171,96 +203,80 @@ function handleSystemError(error) {
   return new AppError(message, 500, errorCode);
 }
 
-// 중앙화된 에러 핸들러 미들웨어
+// ── Central error handler middleware ──────────────────────────
+
 function globalErrorHandler(err, req, res, next) {
+  // Prevent double-send
+  if (res.headersSent) return next(err);
+
   let error = { ...err };
   error.message = err.message;
+  error.stack = err.stack;
+  let errorClass = 'Unknown';
 
-  // 요청 정보 로깅
-  const requestInfo = {
-    method: req.method,
-    url: req.url,
-    ip: req.ip || req.connection.remoteAddress,
-    userAgent: req.get('User-Agent'),
-    body: req.method === 'POST' ? req.body : undefined
-  };
-
-  // 특정 에러 타입별 처리
+  // ── Error classification ──
   if (err.name === 'CastError') {
     error = createError.validation('잘못된 ID 형식입니다.');
-  } else if (err.code && err.code.startsWith('SQLITE_')) {
+    errorClass = 'Validation';
+  } else if (err.code && String(err.code).startsWith('SQLITE_')) {
     error = handleSQLiteError(err);
-  } else if (err.name === 'ValidationError') {
+    errorClass = 'DB';
+  } else if (err.name === 'ValidationError' || err instanceof ValidationError) {
     error = handleValidationError(err);
-  } else if (err.status && err.status >= 400 && err.status < 500) {
-    // OpenAI API 에러
+    errorClass = 'Validation';
+  } else if (err instanceof DatabaseError) {
+    error = err;
+    errorClass = 'DB';
+  } else if (err instanceof OpenAIError || (err.status && err.status >= 400 && err.status < 500)) {
     error = handleOpenAIError(err);
+    errorClass = 'OpenAI/External';
+  } else if (err instanceof ServiceLimitError || err.statusCode === 429) {
+    error = err instanceof AppError ? err : createError.serviceLimit();
+    errorClass = 'RateLimit';
   } else if (err.code && ['ENOENT', 'EACCES', 'EMFILE', 'ENFILE', 'ECONNRESET', 'ETIMEDOUT'].includes(err.code)) {
     error = handleSystemError(err);
+    errorClass = 'System';
   } else if (!(err instanceof AppError)) {
-    // 예상치 못한 에러
     error = new AppError('서버 내부 오류가 발생했습니다.', 500, 'INTERNAL_ERROR', false);
+    errorClass = 'Unknown';
   }
 
-  // 에러 로깅
-  if (error.statusCode >= 500) {
-    logError('Server Error', err, {
-      request: requestInfo,
-      errorCode: error.errorCode,
-      isOperational: error.isOperational
-    });
+  error.errorClass = errorClass;
+  const statusCode = error.statusCode || 500;
+  const severity = statusCode >= 500 ? '🔴' : '🟡';
+
+  // ── Logging ──
+  const requestInfo = {
+    method: req.method,
+    url: req.originalUrl,
+    requestId: req.requestId || 'N/A',
+    ip: req.ip || req.connection?.remoteAddress,
+  };
+
+  if (statusCode >= 500) {
+    logError('Server Error', err, { request: requestInfo, errorClass, severity });
+    sendErrorAlert(err, req, errorClass, severity);
   } else {
-    logError('Client Error', null, {
-      request: requestInfo,
-      errorCode: error.errorCode,
-      message: error.message,
-      statusCode: error.statusCode
-    });
+    logError('Client Error', null, { request: requestInfo, errorClass, message: error.message });
   }
 
-  // 응답 전송
+  // ── Response ──
   if (process.env.NODE_ENV === 'development') {
-    sendErrorDev(error, res);
+    sendErrorDev(error, req, res);
   } else {
-    sendErrorProd(error, res);
+    sendErrorProd(error, req, res);
   }
 }
 
-// 404 에러 핸들러
+// ── 404 handler ──────────────────────────────────────────────
+
 function notFoundHandler(req, res, next) {
-  const error = createError.notFound('페이지', req.originalUrl);
+  const error = createError.notFound('API 경로', req.originalUrl);
   next(error);
-}
-
-// 처리되지 않은 Promise 거부 처리
-function handleUnhandledRejection() {
-  process.on('unhandledRejection', (err, promise) => {
-    logError('Unhandled Promise Rejection', err, {
-      promise: promise.toString()
-    });
-  });
-}
-
-// 처리되지 않은 예외 처리
-function handleUncaughtException() {
-  process.on('uncaughtException', (err) => {
-    logError('Uncaught Exception', err);
-
-    // Graceful shutdown
-    process.exit(1);
-  });
-}
-
-// 에러 핸들링 초기화
-function initializeErrorHandling() {
-  handleUnhandledRejection();
-  handleUncaughtException();
-
-  console.log('✅ 전역 에러 핸들링 초기화 완료');
 }
 
 module.exports = {
   globalErrorHandler,
   notFoundHandler,
-  initializeErrorHandling
+  initSlackSender,
 };
