@@ -2,11 +2,6 @@ name: DB Health Cron (KST)
 
 on:
   workflow_dispatch:
-    inputs:
-      force_fail:
-        description: "Set 'true' to force DB connection failure (Slack alert test)"
-        required: false
-        default: "false"
   schedule:
     # KST 03:30 (UTC 18:30)
     - cron: "30 18 * * *"
@@ -34,8 +29,6 @@ jobs:
         run: npm ci
 
       - name: Run DB health check
-        env:
-          DATABASE_URL: ${{ github.event.inputs.force_fail == 'true' && 'postgres://test:test@invalid.host.local:5432/testdb' || secrets.DATABASE_URL }}
         run: node jobs/dbHealthCheck.js
 
       - name: Always log summary
