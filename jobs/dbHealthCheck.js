@@ -186,46 +186,47 @@ async function runDBHealthCheck() {
   console.log(`  Result: ${allOk ? 'ALL OK' : 'ISSUES DETECTED'} (${duration}ms)`);
   console.log('========================================');
 
-  // 4) Slack 알림
-  const emoji = allOk ? ':white_check_mark:' : ':rotating_light:';
-  const status = allOk ? 'ALL OK' : 'ISSUES DETECTED';
+  // 4) Slack 알림 — 실패 시에만 발송 (success는 로그만)
+  if (!allOk) {
+    const tableLines = tableCounts
+      .map((t) => `${t.ok ? ':white_check_mark:' : ':x:'} \`${t.table}\` — ~${t.count} rows`)
+      .join('\n');
 
-  const tableLines = tableCounts
-    .map((t) => `${t.ok ? ':white_check_mark:' : ':x:'} \`${t.table}\` — ~${t.count} rows`)
-    .join('\n');
+    const slackMsg = {
+      text: `:rotating_light: DB Health Check — ISSUES DETECTED`,
+      blocks: [
+        {
+          type: 'header',
+          text: { type: 'plain_text', text: '🚨 DB Health Check — FAIL', emoji: true },
+        },
+        {
+          type: 'section',
+          fields: [
+            { type: 'mrkdwn', text: `*Time:*\n${timeStr}` },
+            { type: 'mrkdwn', text: `*DB Ping:*\n${dbOk ? `✅ ${dbMs}ms` : '❌ FAIL'}` },
+          ],
+        },
+        {
+          type: 'section',
+          text: { type: 'mrkdwn', text: `*Table Counts:*\n${tableLines}` },
+        },
+        {
+          type: 'context',
+          elements: [
+            { type: 'mrkdwn', text: `Autovacuum: ${dbActive} | Duration: ${duration}ms` },
+          ],
+        },
+      ],
+    };
 
-  const slackMsg = {
-    text: `${emoji} DB Health Check — ${status}`,
-    blocks: [
-      {
-        type: 'header',
-        text: { type: 'plain_text', text: `${allOk ? '✅' : '🚨'} DB Health Check`, emoji: true },
-      },
-      {
-        type: 'section',
-        fields: [
-          { type: 'mrkdwn', text: `*Time:*\n${timeStr}` },
-          { type: 'mrkdwn', text: `*DB Ping:*\n${dbOk ? `✅ ${dbMs}ms` : '❌ FAIL'}` },
-        ],
-      },
-      {
-        type: 'section',
-        text: { type: 'mrkdwn', text: `*Table Counts:*\n${tableLines}` },
-      },
-      {
-        type: 'context',
-        elements: [
-          { type: 'mrkdwn', text: `Autovacuum: ${dbActive} | Duration: ${duration}ms` },
-        ],
-      },
-    ],
-  };
-
-  const slackResult = await sendSlack(slackMsg);
-  if (slackResult.success) {
-    console.log(slackResult.dryRun ? '  Slack: dry-run (no webhook)' : '  Slack: sent');
+    const slackResult = await sendSlack(slackMsg);
+    if (slackResult.success) {
+      console.log(slackResult.dryRun ? '  Slack: dry-run (no webhook)' : '  Slack: alert sent');
+    } else {
+      console.error(`  Slack send failed: ${slackResult.error}`);
+    }
   } else {
-    console.error(`  Slack send failed: ${slackResult.error}`);
+    console.log('  Slack: skipped (all OK)');
   }
 
   return { allOk, dbOk, dbMs, tableCounts, duration };
