@@ -768,11 +768,24 @@ if (String(process.env.REQUEST_LOG || "1") === "1") {
 
 // ---------- In-memory latest store ----------
 global.latestStore = global.latestStore || { story: null };
+const SERVER_STARTED_AT = new Date().toISOString();
 
-// ---------- Health ----------
+// ---------- Readiness Probe (no DB) ----------
+app.get("/api/ready", (_req, res) => {
+  res.json({
+    status: "ok",
+    uptime: process.uptime(),
+    started_at: SERVER_STARTED_AT,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// ---------- Health (with DB) ----------
 app.get("/api/health", async (req, res) => {
   let dbStatus = "DB 모듈 없음";
+  let dbResponseMs = null;
   if (db) {
+    const t0 = Date.now();
     try {
       await db.query('SELECT 1');
       dbStatus = "연결됨";
@@ -780,6 +793,7 @@ app.get("/api/health", async (req, res) => {
       dbStatus = "연결 실패";
       console.error("DB 연결 오류:", error);
     }
+    dbResponseMs = Date.now() - t0;
   }
 
   const rulesMeta = req.app.get('rulesSnapshot');
@@ -790,15 +804,19 @@ app.get("/api/health", async (req, res) => {
     playgroundDbStatus = "configured";
   }
 
-  res.json({
-    success: true,
+  const httpStatus = dbStatus === "연결 실패" ? 503 : 200;
+
+  res.status(httpStatus).json({
+    success: dbStatus !== "연결 실패",
     service: "daily-miracles-mvp",
     message: "여수 기적여행 API 서버가 정상 작동 중입니다",
     pid: process.pid,
     runtime_port: req.app.get('runtime_port') || null,
     env_port: process.env.PORT || null,
+    started_at: SERVER_STARTED_AT,
     timestamp: new Date().toISOString(),
     database: dbStatus,
+    db_response_ms: dbResponseMs,
     playground_db: playgroundDbStatus,
     version: "v3.0-debug",
     rules: rulesMeta ? {
@@ -2012,6 +2030,33 @@ function printStartupBanner(port) {
   ].forEach(l => console.log("  - " + l));
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
 }
+
+// ── Process-level crash handlers → Slack alert ────────────────────────
+function sendCrashAlert(title, detail) {
+  const msg = {
+    text: `:rotating_light: ${title}`,
+    blocks: [
+      { type: 'header', text: { type: 'plain_text', text: `🚨 ${title}`, emoji: true } },
+      { type: 'section', text: { type: 'mrkdwn', text: `\`\`\`${String(detail).slice(0, 2500)}\`\`\`` } },
+      { type: 'context', elements: [{ type: 'mrkdwn', text: `env: ${process.env.NODE_ENV || 'dev'} | pid: ${process.pid} | ${new Date().toISOString()}` }] },
+    ],
+  };
+  if (slackHeartbeatService) {
+    return slackHeartbeatService.sendSlackMessage(msg).catch(() => {});
+  }
+  return Promise.resolve();
+}
+
+process.on('uncaughtException', async (err) => {
+  console.error('💀 uncaughtException:', err);
+  await sendCrashAlert('Uncaught Exception', err.stack || err.message);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('⚠️ unhandledRejection:', reason);
+  sendCrashAlert('Unhandled Rejection', reason?.stack || String(reason));
+});
 
 function startServer(port) {
   app.set('runtime_port', port); // 실제 리슨 포트 저장
