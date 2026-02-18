@@ -121,6 +121,15 @@ try {
   console.warn("⚠️ Slack Heartbeat 서비스 로드 실패:", error.message);
 }
 
+// Stability Score service (P2.3 — /healthz, rolling counters)
+let stabilityService = null;
+try {
+  stabilityService = require("./services/stabilityService");
+  console.log("✅ Stability Score 서비스 로드 성공");
+} catch (error) {
+  console.warn("⚠️ Stability Score 서비스 로드 실패:", error.message);
+}
+
 // Error handler middleware (classification + Slack alerts for 500s)
 const { globalErrorHandler, notFoundHandler, initSlackSender } = require('./middleware/errorHandler');
 if (slackHeartbeatService) {
@@ -660,6 +669,11 @@ app.use((req, _res, next) => {
 const requestIdMiddleware = require('./middleware/requestId');
 app.use(requestIdMiddleware);
 
+// ---------- Stability Score Tracking (P2.3) ----------
+if (stabilityService) {
+  app.use(stabilityService.middleware());
+}
+
 // ---------- Static ----------
 // PR-5: Cache-Control 헤더 추가 (브라우저 캐싱 활성화)
 app.use(express.static(path.join(__dirname, "public"), {
@@ -779,6 +793,20 @@ if (String(process.env.REQUEST_LOG || "1") === "1") {
 // ---------- In-memory latest store ----------
 global.latestStore = global.latestStore || { story: null };
 const SERVER_STARTED_AT = new Date().toISOString();
+
+// ---------- Stability Score (P2.3) ----------
+app.get("/healthz", (_req, res) => {
+  if (!stabilityService) {
+    return res.status(503).json({
+      success: false,
+      error: "stability_unavailable",
+      message: "Stability Score 서비스가 로드되지 않았습니다",
+    });
+  }
+  const healthz = stabilityService.getHealthz();
+  const httpStatus = healthz.status === 'critical' ? 500 : 200;
+  res.status(httpStatus).json(healthz);
+});
 
 // ---------- Readiness Probe (no DB) ----------
 app.get("/api/ready", (_req, res) => {
@@ -2012,6 +2040,7 @@ function printStartupBanner(port) {
   console.log(`💳 WIX_SUCCESS_URL (runtime): ${process.env.WIX_SUCCESS_URL || '(미설정→기본값 사용)'}`);
   console.log("📋 Registered Routes:");
   [
+    "GET  /healthz                    (Stability Score v1)",
     "GET  /api/health",
     "ALL  /diag/echo",
     "POST /api/daily-miracles/analyze",
@@ -2066,6 +2095,13 @@ function startServer(port) {
     if (slackHeartbeatService) {
       slackHeartbeatService.init();
       console.log("✅ Slack Heartbeat 스케줄러 시작");
+    }
+
+    // P2.3: Stability proactive monitor (5분마다 score 평가 → Slack 선제 경고)
+    if (stabilityService && slackHeartbeatService) {
+      stabilityService.startProactiveMonitor(
+        (msg) => slackHeartbeatService.sendSlackMessage(msg),
+      );
     }
   });
 

@@ -3,6 +3,7 @@ const {
   AppError, ValidationError, DatabaseError, OpenAIError, ServiceLimitError,
   createError, isOperationalError,
 } = require('../utils/errors');
+const alertCooldown = require('./alertCooldown');
 
 // ── Slack sender (injected at init to avoid circular deps) ──
 let _slackSender = null;
@@ -14,9 +15,30 @@ function initSlackSender(sendFn) {
 /**
  * Slack alert for 500-level request errors (non-crash, no exit).
  * Fire-and-forget — never blocks the HTTP response.
+ * P2.3: Applies cooldown to prevent alert fatigue.
  */
 function sendErrorAlert(err, req, errorClass, severity) {
   if (!_slackSender) return;
+
+  const statusCode = err.statusCode || 500;
+  const cooldownKey = alertCooldown.constructor.buildKey({
+    errorClass,
+    route: `${req.method} ${req.originalUrl}`,
+    statusCode,
+  });
+
+  // Determine severity tier for cooldown interval
+  const cooldownSeverity = statusCode >= 500 ? null : 'degraded'; // 500s use default 5min
+  const { allowed, cooldown_suppressed, suppressedCount } = alertCooldown.check(cooldownKey, cooldownSeverity);
+
+  if (!allowed) {
+    logError('Slack alert suppressed (cooldown)', null, {
+      cooldown_suppressed: true,
+      key: cooldownKey,
+      suppressedCount,
+    });
+    return;
+  }
 
   const msg = {
     text: `${severity} Server Error: ${errorClass}`,
@@ -28,7 +50,7 @@ function sendErrorAlert(err, req, errorClass, severity) {
           { type: 'mrkdwn', text: `*Route:*\n\`${req.method} ${req.originalUrl}\`` },
           { type: 'mrkdwn', text: `*Request ID:*\n\`${req.requestId || 'N/A'}\`` },
           { type: 'mrkdwn', text: `*Error Class:*\n${errorClass}` },
-          { type: 'mrkdwn', text: `*Status:*\n${err.statusCode || 500}` },
+          { type: 'mrkdwn', text: `*Status:*\n${statusCode}` },
         ],
       },
       { type: 'section', text: { type: 'mrkdwn', text: `\`\`\`${String(err.stack || err.message).slice(0, 1500)}\`\`\`` } },
