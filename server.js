@@ -1765,6 +1765,23 @@ if (modeDiagnosticRoutes) {
   console.warn("⚠️ Mode Diagnostic 라우터 미등록");
 }
 
+// ---------- Diagnostic API v1 (SSOT-locked, weight-matrix scoring) ----------
+let diagnosticV1Routes = null;
+try {
+  diagnosticV1Routes = require("./routes/diagnosticV1Routes");
+  console.log("✅ Diagnostic v1 라우터 로드 성공");
+} catch (error) {
+  console.warn("⚠️ Diagnostic v1 라우터 로드 실패:", error.message);
+}
+if (diagnosticV1Routes) {
+  global._diagV1Store = global._diagV1Store || new Map();
+  app.use("/v1/diagnostic", diagnosticV1Routes);
+  app.use("/v1/marketing", diagnosticV1Routes);
+  console.log("✅ Diagnostic v1 라우터 등록 완료 (/v1/diagnostic, /v1/marketing)");
+} else {
+  console.warn("⚠️ Diagnostic v1 라우터 미등록");
+}
+
 // ---------- Attendance (Living Wisdom 출석/체온) Routes ----------
 if (attendanceRoutes) {
   app.use("/api/attendance", attendanceRoutes);
