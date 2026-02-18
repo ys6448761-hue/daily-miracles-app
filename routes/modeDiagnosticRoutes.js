@@ -117,6 +117,7 @@ router.get('/segment/today', (req, res) => {
     mode_id: mode.mode_id,
     label_kr: mode.label_kr,
     ad_hook_keywords: mode.ad_hook_keywords,
+    marketing_archetypes: mode.marketing_archetypes || [],
   });
 });
 

@@ -170,6 +170,48 @@ test('ad_hook_keywords에 빈 문자열 없음', () => {
   }
 });
 
+// ── GROUP 5: Marketing Archetypes ──
+console.log('\n🎯 Marketing Archetypes');
+
+test('모든 모드에 marketing_archetypes 존재', () => {
+  for (const mode of getAllModes()) {
+    assert.ok(
+      Array.isArray(mode.marketing_archetypes),
+      `${mode.mode_id}: marketing_archetypes 누락`
+    );
+  }
+});
+
+test('marketing_archetypes 최소 2개 (정확히 3개)', () => {
+  for (const mode of getAllModes()) {
+    assert.strictEqual(
+      mode.marketing_archetypes.length, 3,
+      `${mode.mode_id}: expected 3 archetypes, got ${mode.marketing_archetypes.length}`
+    );
+  }
+});
+
+test('marketing_archetypes에 빈 문자열 없음', () => {
+  for (const mode of getAllModes()) {
+    for (const arch of mode.marketing_archetypes) {
+      assert.ok(
+        typeof arch === 'string' && arch.length > 0,
+        `${mode.mode_id}: 빈 archetype`
+      );
+    }
+  }
+});
+
+test('marketing_archetypes 전체 24개 고유값', () => {
+  const all = [];
+  for (const mode of getAllModes()) {
+    all.push(...mode.marketing_archetypes);
+  }
+  assert.strictEqual(all.length, 24, `expected 24, got ${all.length}`);
+  const unique = new Set(all);
+  assert.strictEqual(unique.size, 24, `중복 archetype 존재: ${all.length} total, ${unique.size} unique`);
+});
+
 // ── Summary ──
 console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 console.log(`🧪 Results: ${passed} passed, ${failed} failed (total ${passed + failed})`);

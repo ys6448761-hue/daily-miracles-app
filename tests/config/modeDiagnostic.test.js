@@ -170,11 +170,14 @@ test('진단 결과에서 ad_hook_keywords 접근 가능', () => {
 test('buildDiagnosticResult에 마케팅 필드 포함', () => {
   const result = buildDiagnosticResult('comparison');
   assert.ok('ad_hook_keywords' in result);
+  assert.ok('marketing_archetypes' in result);
   assert.ok('mode_id' in result);
   assert.ok('mode_label' in result);
   // Meta/CRM 연동 시 필요한 필드 존재 확인
   assert.ok(typeof result.mode_id === 'string');
   assert.ok(Array.isArray(result.ad_hook_keywords));
+  assert.ok(Array.isArray(result.marketing_archetypes));
+  assert.strictEqual(result.marketing_archetypes.length, 3);
 });
 
 // ── Summary ──

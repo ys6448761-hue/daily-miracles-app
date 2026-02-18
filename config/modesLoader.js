@@ -18,6 +18,7 @@ const REQUIRED_FIELDS = [
   'symptoms',
   'recommended_action_templates',
   'ad_hook_keywords',
+  'marketing_archetypes',
 ];
 
 // ── Valid linked_miracle_index values ──
@@ -53,6 +54,9 @@ function validateEntry(entry, index) {
   }
   if (Array.isArray(entry.ad_hook_keywords) && entry.ad_hook_keywords.length < 1) {
     errors.push(`${prefix} (${entry.mode_id}): ad_hook_keywords는 최소 1개 필요`);
+  }
+  if (Array.isArray(entry.marketing_archetypes) && entry.marketing_archetypes.length < 2) {
+    errors.push(`${prefix} (${entry.mode_id}): marketing_archetypes는 최소 2개 필요`);
   }
 
   // linked_miracle_index must be one of 5 기적지수 categories

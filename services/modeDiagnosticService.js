@@ -93,6 +93,7 @@ function buildDiagnosticResult(modeId, options = {}) {
     recommended_action: mode.recommended_action_templates[safeIndex],
     all_action_templates: mode.recommended_action_templates,
     ad_hook_keywords: mode.ad_hook_keywords,
+    marketing_archetypes: mode.marketing_archetypes || [],
   };
 }
 
