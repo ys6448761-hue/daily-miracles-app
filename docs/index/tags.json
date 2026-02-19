@@ -32,6 +32,7 @@
     "DOC-gpt-guidelines",
     "DOC-gpt-sns-marketing",
     "DOC-gpt-video-production",
+    "DOC-video-production-handoff-guide",
     "DOC-JAEMI_ONBOARDING_v11",
     "DOC-JAEMI_ONBOARDING_v12",
     "DOC-sens-setup-guide",
@@ -133,6 +134,7 @@
     "DOC-gpt-copywriting",
     "DOC-gpt-guidelines",
     "DOC-gpt-sns-marketing",
+    "DOC-video-production-handoff-guide",
     "DOC-JAEMI_ONBOARDING_v11",
     "DOC-JAEMI_ONBOARDING_v12",
     "DOC-drive-github-sync-setup",
@@ -458,7 +460,8 @@
     "DOC-gpt-copywriting",
     "DOC-gpt-guidelines",
     "DOC-gpt-sns-marketing",
-    "DOC-gpt-video-production"
+    "DOC-gpt-video-production",
+    "DOC-video-production-handoff-guide"
   ],
   "onboarding": [
     "DOC-JAEMI_ONBOARDING_v11",

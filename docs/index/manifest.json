@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-02-19T00:31:59.691Z",
+  "generated_at": "2026-02-19T00:42:56.524Z",
   "generator": "generate-manifest.js",
-  "total_count": 171,
+  "total_count": 172,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -823,6 +823,24 @@
       "title": "하루하루의 기적 — 영상기획 GPT 지침서",
       "created_at": "2026-02-19",
       "checksum": "de35d373"
+    },
+    {
+      "id": "DOC-video-production-handoff-guide",
+      "path": "docs/marketing/video-production-handoff-guide.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "marketing",
+      "tags": [
+        "marketing",
+        "소원",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "유닛 간 감정 충돌",
+      "title": "영상 제작 핸드오프 가이드 — 실수 방지 매뉴얼",
+      "created_at": "2026-02-19",
+      "checksum": "5d73c3f9"
     },
     {
       "id": "DOC-JAEMI_ONBOARDING_v11",
