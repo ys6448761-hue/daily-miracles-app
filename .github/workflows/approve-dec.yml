@@ -4,45 +4,45 @@ on:
   workflow_dispatch:
     inputs:
       query:
-        description: '검색/토론 쿼리 (필수)'
+        description: "검색/토론 쿼리 (필수)"
         required: true
         type: string
       decider:
-        description: '승인자 이름 (기본: 푸르미르)'
+        description: "승인자 이름 (기본: 푸르미르)"
         required: false
-        default: '푸르미르'
+        default: "푸르미르"
         type: string
       scopes:
-        description: '검색 범위 (decisions,system,execution,team,all)'
+        description: "검색 범위 (decisions,system,execution,team,all)"
         required: false
-        default: 'all'
+        default: "all"
         type: string
       mode:
-        description: '요약 모드 (general|decision|action)'
+        description: "요약 모드 (general|decision|action)"
         required: false
-        default: 'decision'
+        default: "decision"
         type: choice
         options:
           - general
           - decision
           - action
       k:
-        description: '상위 결과 개수'
+        description: "상위 결과 개수"
         required: false
-        default: '5'
+        default: "5"
         type: string
       delete_draft:
-        description: 'DRAFT 생성 후 삭제(기본 false 권장)'
+        description: "DRAFT 생성 후 삭제(기본 false 권장)"
         required: false
-        default: 'false'
+        default: "false"
         type: choice
         options:
-          - 'false'
-          - 'true'
+          - "false"
+          - "true"
       pr_number:
-        description: 'PR 번호 (라벨 부착용, 비워두면 라벨 생략)'
+        description: "PR 번호 (라벨 부착용, 비워두면 라벨 생략)"
         required: false
-        default: ''
+        default: ""
         type: string
 
 jobs:
@@ -60,8 +60,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -135,6 +135,8 @@ jobs:
                   description: 'DEC 승인 대기 중'
                 });
                 console.log('Created DEC-PENDING label');
+              } else {
+                throw e;
               }
             }
 
@@ -149,12 +151,14 @@ jobs:
 
             // Summary에 라벨 정보 추가
             const fs = require('fs');
-            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+            fs.appendFileSync(
+              process.env.GITHUB_STEP_SUMMARY,
               `\n---\n🏷️ **DEC-PENDING** 라벨이 PR #${prNumber}에 부착되었습니다.\n`
             );
 
-            // PR에 코멘트 추가
-            const query = `${{ inputs.query }}`;
+            // PR에 코멘트 추가 (⚠️ 여기 템플릿 리터럴 + Actions 표현식 충돌 방지)
+            const query = '${{ inputs.query }}';
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -172,4 +176,5 @@ jobs:
                 `🔗 [Workflow Run](${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID})`
               ].join('\n')
             });
+
             console.log(`Posted pending comment to PR #${prNumber}`);
