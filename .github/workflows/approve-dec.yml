@@ -1,4 +1,4 @@
-name: Approve DEC (safe mode: draft + copy command)
+﻿name: Approve DEC (safe mode: draft + copy command)
 
 on:
   workflow_dispatch:
@@ -118,7 +118,6 @@ jobs:
               return;
             }
 
-            // 라벨이 없으면 생성
             try {
               await github.rest.issues.getLabel({
                 owner: context.repo.owner,
@@ -134,29 +133,26 @@ jobs:
                   color: 'FBCA04',
                   description: 'DEC 승인 대기 중'
                 });
-                console.log('Created DEC-PENDING label');
               } else {
                 throw e;
               }
             }
 
-            // 라벨 추가
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: prNumber,
               labels: ['DEC-PENDING']
             });
-            console.log(`Added DEC-PENDING label to PR #${prNumber}`);
 
-            // Summary에 라벨 정보 추가
             const fs = require('fs');
-            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+            fs.appendFileSync(
+              process.env.GITHUB_STEP_SUMMARY,
               `\n---\n🏷️ **DEC-PENDING** 라벨이 PR #${prNumber}에 부착되었습니다.\n`
             );
 
-            // PR에 코멘트 추가
             const query = '${{ inputs.query }}';
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -174,4 +170,3 @@ jobs:
                 `🔗 [Workflow Run](${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID})`
               ].join('\n')
             });
-            console.log(`Posted pending comment to PR #${prNumber}`);
