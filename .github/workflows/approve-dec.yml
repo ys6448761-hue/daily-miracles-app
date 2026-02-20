@@ -1,4 +1,5 @@
-﻿name: Approve DEC (safe mode: draft + copy command)
+$yml = @'
+name: Approve DEC (safe mode: draft + copy command)
 
 on:
   workflow_dispatch:
@@ -170,3 +171,8 @@ jobs:
                 `🔗 [Workflow Run](${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID})`
               ].join('\n')
             });
+'@
+
+# ✅ UTF-8 "BOM 없음"으로 저장
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllText(".github\workflows\approve-dec.yml", $yml, $utf8NoBom)
