@@ -121,10 +121,33 @@ try {
   console.warn("⚠️ Slack Heartbeat 서비스 로드 실패:", error.message);
 }
 
+// Stability Score service (P2.3 — /healthz, rolling counters)
+let stabilityService = null;
+try {
+  stabilityService = require("./services/stabilityService");
+  console.log("✅ Stability Score 서비스 로드 성공");
+} catch (error) {
+  console.warn("⚠️ Stability Score 서비스 로드 실패:", error.message);
+}
+
 // Error handler middleware (classification + Slack alerts for 500s)
 const { globalErrorHandler, notFoundHandler, initSlackSender } = require('./middleware/errorHandler');
 if (slackHeartbeatService) {
   initSlackSender((msg) => slackHeartbeatService.sendSlackMessage(msg));
+}
+
+// 8-Mode SSOT Registry (P1-SSOT — modes.registry.json)
+let modesLoader = null;
+try {
+  modesLoader = require("./config/modesLoader");
+  const { modes, errors } = modesLoader.loadRegistry({ failFast: IS_PRODUCTION });
+  if (errors.length > 0) {
+    console.warn("⚠️ Mode Registry 검증 경고:", errors.join('; '));
+  }
+  console.log(`✅ Mode Registry 로드 성공 (${modes.length}개 모드)`);
+} catch (error) {
+  console.error("❌ Mode Registry 로드 실패:", error.message);
+  if (IS_PRODUCTION) process.exit(1);
 }
 
 // 빌드 정보 (디버깅용)
@@ -660,6 +683,11 @@ app.use((req, _res, next) => {
 const requestIdMiddleware = require('./middleware/requestId');
 app.use(requestIdMiddleware);
 
+// ---------- Stability Score Tracking (P2.3) ----------
+if (stabilityService) {
+  app.use(stabilityService.middleware());
+}
+
 // ---------- Static ----------
 // PR-5: Cache-Control 헤더 추가 (브라우저 캐싱 활성화)
 app.use(express.static(path.join(__dirname, "public"), {
@@ -779,6 +807,20 @@ if (String(process.env.REQUEST_LOG || "1") === "1") {
 // ---------- In-memory latest store ----------
 global.latestStore = global.latestStore || { story: null };
 const SERVER_STARTED_AT = new Date().toISOString();
+
+// ---------- Stability Score (P2.3) ----------
+app.get("/healthz", (_req, res) => {
+  if (!stabilityService) {
+    return res.status(503).json({
+      success: false,
+      error: "stability_unavailable",
+      message: "Stability Score 서비스가 로드되지 않았습니다",
+    });
+  }
+  const healthz = stabilityService.getHealthz();
+  const httpStatus = healthz.status === 'critical' ? 500 : 200;
+  res.status(httpStatus).json(healthz);
+});
 
 // ---------- Readiness Probe (no DB) ----------
 app.get("/api/ready", (_req, res) => {
@@ -1706,6 +1748,40 @@ if (wuRoutes) {
   console.warn("⚠️ WU API 라우터 로드 실패 - 라우트 미등록");
 }
 
+// ---------- 8-Mode Diagnostic + Marketing Segment (P1-SSOT) ----------
+let modeDiagnosticRoutes = null;
+try {
+  modeDiagnosticRoutes = require("./routes/modeDiagnosticRoutes");
+  console.log("✅ Mode Diagnostic 라우터 로드 성공");
+} catch (error) {
+  console.warn("⚠️ Mode Diagnostic 라우터 로드 실패:", error.message);
+}
+if (modeDiagnosticRoutes) {
+  // In-memory store for today's diagnoses (v1, DB in v2)
+  global._modeDiagnosticStore = global._modeDiagnosticStore || new Map();
+  app.use("/api/mode", modeDiagnosticRoutes);
+  console.log("✅ Mode Diagnostic 라우터 등록 완료 (/api/mode)");
+} else {
+  console.warn("⚠️ Mode Diagnostic 라우터 미등록");
+}
+
+// ---------- Diagnostic API v1 (SSOT-locked, weight-matrix scoring) ----------
+let diagnosticV1Routes = null;
+try {
+  diagnosticV1Routes = require("./routes/diagnosticV1Routes");
+  console.log("✅ Diagnostic v1 라우터 로드 성공");
+} catch (error) {
+  console.warn("⚠️ Diagnostic v1 라우터 로드 실패:", error.message);
+}
+if (diagnosticV1Routes) {
+  global._diagV1Store = global._diagV1Store || new Map();
+  app.use("/v1/diagnostic", diagnosticV1Routes);
+  app.use("/v1/marketing", diagnosticV1Routes);
+  console.log("✅ Diagnostic v1 라우터 등록 완료 (/v1/diagnostic, /v1/marketing)");
+} else {
+  console.warn("⚠️ Diagnostic v1 라우터 미등록");
+}
+
 // ---------- Attendance (Living Wisdom 출석/체온) Routes ----------
 if (attendanceRoutes) {
   app.use("/api/attendance", attendanceRoutes);
@@ -2012,6 +2088,7 @@ function printStartupBanner(port) {
   console.log(`💳 WIX_SUCCESS_URL (runtime): ${process.env.WIX_SUCCESS_URL || '(미설정→기본값 사용)'}`);
   console.log("📋 Registered Routes:");
   [
+    "GET  /healthz                    (Stability Score v1)",
     "GET  /api/health",
     "ALL  /diag/echo",
     "POST /api/daily-miracles/analyze",
@@ -2066,6 +2143,13 @@ function startServer(port) {
     if (slackHeartbeatService) {
       slackHeartbeatService.init();
       console.log("✅ Slack Heartbeat 스케줄러 시작");
+    }
+
+    // P2.3: Stability proactive monitor (5분마다 score 평가 → Slack 선제 경고)
+    if (stabilityService && slackHeartbeatService) {
+      stabilityService.startProactiveMonitor(
+        (msg) => slackHeartbeatService.sendSlackMessage(msg),
+      );
     }
   });
 
