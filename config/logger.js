@@ -1,13 +1,8 @@
 const winston = require('winston');
-const DailyRotateFile = require('winston-daily-rotate-file');
 const path = require('path');
-const fs = require('fs');
 
-// 로그 디렉토리 생성
-const logDir = path.join(process.cwd(), 'logs');
-if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir, { recursive: true });
-}
+// Vercel Serverless 환경 감지 (읽기전용 /var/task 파일시스템)
+const IS_SERVERLESS = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
 
 // 커스텀 로그 포맷
 const logFormat = winston.format.combine(
@@ -36,85 +31,118 @@ const consoleFormat = winston.format.combine(
   })
 );
 
-// 전체 로그 (모든 레벨)
-const allLogsTransport = new DailyRotateFile({
-  filename: path.join(logDir, 'application-%DATE%.log'),
-  datePattern: 'YYYY-MM-DD',
-  maxSize: '10m',
-  maxFiles: '30d',
-  format: logFormat,
-  level: 'silly'
-});
+let logger, accessLogger;
 
-// 에러 로그만
-const errorLogsTransport = new DailyRotateFile({
-  filename: path.join(logDir, 'error-%DATE%.log'),
-  datePattern: 'YYYY-MM-DD',
-  maxSize: '10m',
-  maxFiles: '30d',
-  format: logFormat,
-  level: 'error'
-});
+if (IS_SERVERLESS) {
+  // ── Serverless: Console transport만 사용 (파일 I/O 없음) ──
+  logger = winston.createLogger({
+    level: 'info',
+    format: logFormat,
+    defaultMeta: { service: 'daily-miracles', version: '1.0.0' },
+    transports: [
+      new winston.transports.Console({ format: consoleFormat })
+    ],
+    exitOnError: false
+  });
 
-// 접근 로그 (HTTP 요청)
-const accessLogsTransport = new DailyRotateFile({
-  filename: path.join(logDir, 'access-%DATE%.log'),
-  datePattern: 'YYYY-MM-DD',
-  maxSize: '10m',
-  maxFiles: '30d',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
-  level: 'info'
-});
+  accessLogger = winston.createLogger({
+    format: winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.json()
+    ),
+    transports: [
+      new winston.transports.Console({ format: consoleFormat })
+    ],
+    exitOnError: false
+  });
 
-// 메인 로거
-const logger = winston.createLogger({
-  level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-  format: logFormat,
-  defaultMeta: {
-    service: 'daily-miracles',
-    version: '1.0.0'
-  },
-  transports: [
-    allLogsTransport,
-    errorLogsTransport
-  ],
-  // 예외 처리
-  exceptionHandlers: [
-    new winston.transports.File({
-      filename: path.join(logDir, 'exceptions.log'),
-      format: logFormat
-    })
-  ],
-  // 처리되지 않은 Promise 거부 처리
-  rejectionHandlers: [
-    new winston.transports.File({
-      filename: path.join(logDir, 'rejections.log'),
-      format: logFormat
-    })
-  ],
-  exitOnError: false
-});
+  logger.info('Logger initialized (serverless mode — console only)');
+} else {
+  // ── 일반 환경: 파일 transport 사용 ──
+  const DailyRotateFile = require('winston-daily-rotate-file');
+  const fs = require('fs');
 
-// 개발 환경에서는 콘솔에도 출력
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: consoleFormat,
-    level: 'debug'
-  }));
+  const logDir = path.join(process.cwd(), 'logs');
+  try {
+    if (!fs.existsSync(logDir)) {
+      fs.mkdirSync(logDir, { recursive: true });
+    }
+  } catch (err) {
+    console.warn('[Logger] logs 디렉토리 생성 실패 (계속 실행):', err.message);
+  }
+
+  const allLogsTransport = new DailyRotateFile({
+    filename: path.join(logDir, 'application-%DATE%.log'),
+    datePattern: 'YYYY-MM-DD',
+    maxSize: '10m',
+    maxFiles: '30d',
+    format: logFormat,
+    level: 'silly'
+  });
+
+  const errorLogsTransport = new DailyRotateFile({
+    filename: path.join(logDir, 'error-%DATE%.log'),
+    datePattern: 'YYYY-MM-DD',
+    maxSize: '10m',
+    maxFiles: '30d',
+    format: logFormat,
+    level: 'error'
+  });
+
+  const accessLogsTransport = new DailyRotateFile({
+    filename: path.join(logDir, 'access-%DATE%.log'),
+    datePattern: 'YYYY-MM-DD',
+    maxSize: '10m',
+    maxFiles: '30d',
+    format: winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.json()
+    ),
+    level: 'info'
+  });
+
+  logger = winston.createLogger({
+    level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+    format: logFormat,
+    defaultMeta: { service: 'daily-miracles', version: '1.0.0' },
+    transports: [allLogsTransport, errorLogsTransport],
+    exceptionHandlers: [
+      new winston.transports.File({
+        filename: path.join(logDir, 'exceptions.log'),
+        format: logFormat
+      })
+    ],
+    rejectionHandlers: [
+      new winston.transports.File({
+        filename: path.join(logDir, 'rejections.log'),
+        format: logFormat
+      })
+    ],
+    exitOnError: false
+  });
+
+  if (process.env.NODE_ENV !== 'production') {
+    logger.add(new winston.transports.Console({
+      format: consoleFormat,
+      level: 'debug'
+    }));
+  }
+
+  accessLogger = winston.createLogger({
+    format: winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.json()
+    ),
+    transports: [accessLogsTransport],
+    exitOnError: false
+  });
+
+  logger.info('Logger initialized', {
+    logDirectory: logDir,
+    environment: process.env.NODE_ENV || 'development',
+    logLevel: logger.level
+  });
 }
-
-// HTTP 접근 로그용 별도 로거
-const accessLogger = winston.createLogger({
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
-  transports: [accessLogsTransport],
-  exitOnError: false
-});
 
 // Express 미들웨어용 로거
 const requestLogger = (req, res, next) => {
@@ -202,13 +230,6 @@ const logHelpers = {
     });
   }
 };
-
-// 서버 시작 시 로그 디렉토리 정보 출력
-logger.info('Logger initialized', {
-  logDirectory: logDir,
-  environment: process.env.NODE_ENV || 'development',
-  logLevel: logger.level
-});
 
 module.exports = {
   logger,

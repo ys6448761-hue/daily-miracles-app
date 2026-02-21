@@ -261,9 +261,14 @@ const VALID_EVENT_TYPES = Object.values(EVENT_TYPES);
  * 이벤트 파일 디렉토리 확인/생성
  */
 function ensureDirectory() {
-  const dir = path.dirname(EVENTS_FILE);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) return;
+  try {
+    const dir = path.dirname(EVENTS_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+  } catch (err) {
+    console.warn('[EventLogger] 디렉토리 생성 실패:', err.message);
   }
 }
 

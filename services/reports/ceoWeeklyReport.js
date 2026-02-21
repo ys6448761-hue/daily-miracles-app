@@ -32,12 +32,18 @@ const CONFIG = {
   scheduleMinute: 0
 };
 
-// 디렉토리 생성
-[CONFIG.reportsDir, CONFIG.dataReportsDir].forEach(dir => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-});
+// 디렉토리 생성 (서버리스 환경에서는 skip)
+if (!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME)) {
+  [CONFIG.reportsDir, CONFIG.dataReportsDir].forEach(dir => {
+    try {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+    } catch (err) {
+      console.warn(`[ceoWeeklyReport] 디렉토리 생성 실패: ${dir}`, err.message);
+    }
+  });
+}
 
 // ===== 유틸리티 함수 =====
 

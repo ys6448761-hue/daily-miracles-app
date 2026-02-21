@@ -15,6 +15,9 @@
 const fs = require('fs');
 const path = require('path');
 
+// Vercel Serverless 환경 감지
+const IS_SERVERLESS = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+
 // 메트릭스 저장 경로
 const METRICS_DIR = path.join(__dirname, '..', 'data', 'metrics');
 const DAILY_METRICS_FILE = () => path.join(METRICS_DIR, `metrics-${getToday()}.json`);
@@ -76,11 +79,18 @@ function getToday() {
 }
 
 /**
- * 디렉토리 확인 및 생성
+ * 디렉토리 확인 및 생성 (서버리스 환경에서는 skip)
  */
 function ensureDir() {
-    if (!fs.existsSync(METRICS_DIR)) {
-        fs.mkdirSync(METRICS_DIR, { recursive: true });
+    if (IS_SERVERLESS) return false;
+    try {
+        if (!fs.existsSync(METRICS_DIR)) {
+            fs.mkdirSync(METRICS_DIR, { recursive: true });
+        }
+        return true;
+    } catch (err) {
+        console.warn('[Metrics] 디렉토리 생성 실패 (인메모리 모드):', err.message);
+        return false;
     }
 }
 
@@ -109,12 +119,9 @@ function checkDateReset() {
 }
 
 /**
- * 메트릭스 파일 저장
+ * 메트릭스 파일 저장 (서버리스 환경에서는 skip)
  */
 function saveMetrics() {
-    ensureDir();
-    const filepath = DAILY_METRICS_FILE();
-
     // 평균 ACK 시간 계산
     if (todayMetrics.ack.sent > 0) {
         todayMetrics.ack.avgTimeMs = Math.round(todayMetrics.ack.totalTimeMs / todayMetrics.ack.sent);
@@ -127,23 +134,34 @@ function saveMetrics() {
 
     todayMetrics.savedAt = new Date().toISOString();
 
-    fs.writeFileSync(filepath, JSON.stringify(todayMetrics, null, 2), 'utf-8');
-    console.log(`[Metrics] 저장됨: ${filepath}`);
+    if (!ensureDir()) return; // 서버리스이거나 mkdir 실패 시 인메모리만 유지
+
+    try {
+        const filepath = DAILY_METRICS_FILE();
+        fs.writeFileSync(filepath, JSON.stringify(todayMetrics, null, 2), 'utf-8');
+        console.log(`[Metrics] 저장됨: ${filepath}`);
+    } catch (err) {
+        console.warn('[Metrics] 파일 저장 실패 (인메모리 유지):', err.message);
+    }
 }
 
 /**
- * 메트릭스 로드 (서버 재시작 시)
+ * 메트릭스 로드 (서버 재시작 시, 서버리스에서는 skip)
  */
 function loadMetrics() {
-    ensureDir();
-    const filepath = DAILY_METRICS_FILE();
+    if (IS_SERVERLESS) {
+        console.log('[Metrics] 서버리스 환경 — 인메모리 모드');
+        return;
+    }
 
-    if (fs.existsSync(filepath)) {
-        try {
+    if (!ensureDir()) return;
+
+    const filepath = DAILY_METRICS_FILE();
+    try {
+        if (fs.existsSync(filepath)) {
             const content = fs.readFileSync(filepath, 'utf-8');
             const loaded = JSON.parse(content);
 
-            // 기존 데이터에 새 필드가 없으면 초기화
             todayMetrics = {
                 ...loaded,
                 wishes: {
@@ -159,9 +177,9 @@ function loadMetrics() {
             };
 
             console.log(`[Metrics] 로드됨: ${filepath}`);
-        } catch (e) {
-            console.error('[Metrics] 로드 실패:', e.message);
         }
+    } catch (e) {
+        console.warn('[Metrics] 로드 실패 (인메모리 모드):', e.message);
     }
 }
 

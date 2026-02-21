@@ -427,6 +427,15 @@ try {
   console.error("❌ Hero8 영상 라우터 로드 실패:", error.message);
 }
 
+// VideoJob 오케스트레이터 라우터 로딩 (AIL-2026-0219-VID-003)
+let videoJobRoutes = null;
+try {
+  videoJobRoutes = require("./routes/videoJobRoutes");
+  console.log("✅ VideoJob 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ VideoJob 라우터 로드 실패:", error.message);
+}
+
 // 기적 금고 (Finance) 라우터 로딩
 let financeRoutes = null;
 try {
@@ -1504,6 +1513,14 @@ if (hero8Routes) {
   console.warn("⚠️ Hero8 영상 라우터 로드 실패 - 라우트 미등록");
 }
 
+// ---------- VideoJob 오케스트레이터 Routes (/api/video/job) ----------
+if (videoJobRoutes) {
+  app.use("/api/video/job", videoJobRoutes);
+  console.log("✅ VideoJob 라우터 등록 완료 (/api/video/job)");
+} else {
+  console.warn("⚠️ VideoJob 라우터 로드 실패 - 라우트 미등록");
+}
+
 // ---------- 기적 금고 Finance Routes (/api/finance) ----------
 if (financeRoutes) {
   app.use("/api/finance", financeRoutes);
@@ -1959,7 +1976,10 @@ app.get("/api/story/latest", (_req, res) => {
 
 // ---------- Feedback System ----------
 const fs = require("fs");
-const FEEDBACK_FILE = path.join(__dirname, "feedback.json");
+const IS_SERVERLESS_ENV = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const FEEDBACK_FILE = IS_SERVERLESS_ENV
+  ? path.join('/tmp', 'feedback.json')
+  : path.join(__dirname, "feedback.json");
 
 // 피드백 저장
 app.post("/api/feedback", (req, res) => {
@@ -1980,18 +2000,23 @@ app.post("/api/feedback", (req, res) => {
 
     // 기존 피드백 로드 (없으면 빈 배열)
     let feedbacks = [];
-    if (fs.existsSync(FEEDBACK_FILE)) {
-      const content = fs.readFileSync(FEEDBACK_FILE, "utf-8");
-      feedbacks = JSON.parse(content);
-    }
+    try {
+      if (fs.existsSync(FEEDBACK_FILE)) {
+        const content = fs.readFileSync(FEEDBACK_FILE, "utf-8");
+        feedbacks = JSON.parse(content);
+      }
+    } catch (_) { /* 읽기 실패 시 빈 배열 유지 */ }
 
     // 새 피드백 추가
     feedbacks.push(feedback);
 
     // 파일에 저장
-    fs.writeFileSync(FEEDBACK_FILE, JSON.stringify(feedbacks, null, 2), "utf-8");
-
-    console.log(`✅ Feedback saved (total: ${feedbacks.length})`);
+    try {
+      fs.writeFileSync(FEEDBACK_FILE, JSON.stringify(feedbacks, null, 2), "utf-8");
+      console.log(`✅ Feedback saved (total: ${feedbacks.length})`);
+    } catch (writeErr) {
+      console.warn('[Feedback] 파일 저장 실패 (로그만 기록):', writeErr.message);
+    }
 
     return res.status(200).json({
       success: true,
