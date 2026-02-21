@@ -456,9 +456,9 @@ function generateDailyReport() {
    • 📝 메시지 미선택: ${m.wishes.noMessage}건
 
 🚦 신호등 분포
-   • 🔴 RED: ${tl.red}건 (${((tl.red/total)*100).toFixed(1)}%)
-   • 🟡 YELLOW: ${tl.yellow}건 (${((tl.yellow/total)*100).toFixed(1)}%)
-   • 🟢 GREEN: ${tl.green}건 (${((tl.green/total)*100).toFixed(1)}%)
+   • 🔴 RED: ${tl.red}건 (${((tl.red / total) * 100).toFixed(1)}%)
+   • 🟡 YELLOW: ${tl.yellow}건 (${((tl.yellow / total) * 100).toFixed(1)}%)
+   • 🟢 GREEN: ${tl.green}건 (${((tl.green / total) * 100).toFixed(1)}%)
 
 📤 알림톡 발송
    • 발송: ${m.alimtalk.sent}건
@@ -479,8 +479,8 @@ function generateDailyReport() {
 
 ⚠️ 에러 Top 3
 ${m.computed.errorTop3.length > 0
-    ? m.computed.errorTop3.map((e, i) => `   ${i+1}. ${e.type}: ${e.count}건`).join('\n')
-    : '   (에러 없음)'}
+            ? m.computed.errorTop3.map((e, i) => `   ${i + 1}. ${e.type}: ${e.count}건`).join('\n')
+            : '   (에러 없음)'}
 
 ✨ VIP (Human Touch)
    • VIP 태깅: ${m.vip.total}건
@@ -498,14 +498,16 @@ ${m.computed.errorTop3.length > 0
 `;
 }
 
-// 초기화 시 기존 메트릭스 로드
-loadMetrics();
+// 초기화 시 기존 메트릭스 로드 (서버리스에서는 skip)
+if (!IS_SERVERLESS) {
+    loadMetrics();
 
-// 5분마다 자동 저장 (serverless에서는 setInterval 무의미하므로 skip)
-if (METRICS_PERSIST) {
+    // 5분마다 자동 저장 (서버리스에서는 interval 불필요)
     setInterval(() => {
         saveMetrics();
     }, 5 * 60 * 1000);
+} else {
+    console.log('[Metrics] 서버리스 환경 — 인메모리 모드 (interval/load skip)');
 }
 
 module.exports = {

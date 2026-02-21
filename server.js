@@ -15,6 +15,7 @@ const analysisEngine = require("./services/analysisEngine");
 let envValidator = null;
 let exportPipelineStatus = null;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+const IS_SERVERLESS = !!(process.env.VERCEL || process.env.NOW_REGION || process.env.AWS_LAMBDA_FUNCTION_NAME);
 try {
   envValidator = require("./utils/envValidator");
   const validationResult = envValidator.validateEnv({ failFast: IS_PRODUCTION });
@@ -36,7 +37,8 @@ try {
 // ═══════════════════════════════════════════════════════════
 const OPS_SLACK_WEBHOOK = process.env.OPS_SLACK_WEBHOOK || process.env.SLACK_WEBHOOK_URL;
 if (!OPS_SLACK_WEBHOOK) {
-  if (IS_PRODUCTION) {
+  // Serverless(Vercel)에서는 process.exit(1) 금지 — 함수 즉시 크래시 유발
+  if (IS_PRODUCTION && !IS_SERVERLESS) {
     console.error('');
     console.error('╔══════════════════════════════════════════════════════════════╗');
     console.error('║  💀 FATAL: OPS_SLACK_WEBHOOK 미설정                          ║');
@@ -50,7 +52,7 @@ if (!OPS_SLACK_WEBHOOK) {
     process.exit(1);
   } else {
     console.warn('⚠️  OPS_SLACK_WEBHOOK 미설정 - Slack 운영 알림 비활성화');
-    console.warn('   프로덕션에서는 이 변수 없이 배포가 차단됩니다.');
+    if (IS_SERVERLESS) console.warn('   [Serverless] process.exit 스킵 — degraded 모드로 계속 실행');
   }
 }
 
@@ -627,6 +629,24 @@ app.use(
 
 // 모든 프리플라이트를 즉시 OK
 app.options("*", (req, res) => res.sendStatus(204));
+
+// ═══════════════════════════════════════════════════════════════════════════
+// /healthz — 절대 500 반환 금지, 어떤 의존성도 호출하지 않음
+// ═══════════════════════════════════════════════════════════════════════════
+app.get('/healthz', (req, res) => {
+  try {
+    return res.status(200).json({
+      status: 'ok',
+      serverless: IS_SERVERLESS,
+      node: process.version,
+      uptimeSec: Math.floor(process.uptime()),
+      ts: new Date().toISOString(),
+      commit: process.env.VERCEL_GIT_COMMIT_SHA || process.env.GIT_SHA || 'unknown'
+    });
+  } catch (e) {
+    return res.status(200).json({ status: 'degraded', message: String(e && e.message || e) });
+  }
+});
 
 // ═══════════════════════════════════════════════════════════════════════════
 // onrender.com → app.dailymiracles.kr 리다이렉트 (HTML 페이지만)
@@ -2187,7 +2207,7 @@ function sendCrashAlert(title, detail) {
     ],
   };
   if (slackHeartbeatService) {
-    return slackHeartbeatService.sendSlackMessage(msg).catch(() => {});
+    return slackHeartbeatService.sendSlackMessage(msg).catch(() => { });
   }
   return Promise.resolve();
 }

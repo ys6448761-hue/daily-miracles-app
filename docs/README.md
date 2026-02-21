@@ -60,24 +60,29 @@ YYYY-WW_주간인사이트.md
 
 ## Raw → 정본 승격 프로세스
 
-### 승격 책임자
-| 역할 | 담당자 |
-|------|--------|
-| 승격 담당 | 코미 (COO) |
-| 최종 승인 | 푸르미르 (CEO) |
+### 승격 경로
+```
+docs/_raw/ (CEO 투입)
+     ↓  코미 판단
+L1: .claude/team-memory/   ← 세션 간 팀 지식
+L2: docs/주제별 폴더/       ← 프로젝트 정본
+L3: docs/MASTER-CONTROL.md ← 허브에 링크 등록
+```
 
-### 승격 파이프라인
-```
-Raw → docs-searcher → decision-extractor → summarizer → 정본
-```
+### 역할
+| 역할 | 담당자 | 할 일 |
+|------|--------|-------|
+| 투입 | 푸르미르 (CEO) | `docs/_raw/`에 파일 넣기만 |
+| 승격 | 코미 (COO) | 분류 + 승격 + MASTER-CONTROL 업데이트 |
 
 ### 정본 완료 조건
 - [ ] 요약 3~7줄 존재
-- [ ] 결정 사항 섹션 존재
-- [ ] 액션 아이템 표 존재
-- [ ] Raw 파일 경로 링크 포함
+- [ ] 결정 사항 섹션 존재 (해당 시)
+- [ ] RAW 원본에 promoted 마커 추가
 
-👉 자세한 내용: [대화 워크플로우](./system/conversation-workflow.md)
+👉 상세 규칙: [PROMOTION-RULES.md](./PROMOTION-RULES.md)
+👉 마스터 허브: [MASTER-CONTROL.md](./MASTER-CONTROL.md)
+👉 대화 워크플로우: [conversation-workflow.md](./system/conversation-workflow.md)
 
 ---
 

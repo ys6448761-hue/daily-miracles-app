@@ -60,7 +60,11 @@ node jobs/dbHealthCheck.js
 # → ALL OK
 ```
 
-## 6. Post-mortem
+## 6. VideoJob 샘플 테스트 증거물
+
+> `output/_vid-sample-test/` 산출물(mp4, frame*.png, ffmpeg_stderr.log)은 **커밋 금지** — meta.json 요약만 로그에 기록합니다.
+
+## 7. Post-mortem
 
 롤백 완료 후 반드시:
 

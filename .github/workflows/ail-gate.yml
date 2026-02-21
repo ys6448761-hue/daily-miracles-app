@@ -23,8 +23,38 @@ jobs:
       - name: Run AIL gate
         run: node scripts/ops/skillsmp-gate.js
 
-      - name: Check AIL Section in PR Body
+      - name: Check if docs-only PR
+        id: docs-check
         if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              per_page: 100
+            });
+
+            // docs-safe 경로 패턴: docs/, .claude/, *.md (루트 포함)
+            const docsSafePatterns = [
+              /^docs\//,
+              /^\.claude\//,
+              /^[^/]+\.md$/,       // 루트 .md (README.md, CLAUDE.md 등)
+              /\.md$/              // 모든 .md 파일
+            ];
+
+            const isDocsSafe = (f) => docsSafePatterns.some(p => p.test(f));
+            const allDocsSafe = files.every(f => isDocsSafe(f.filename));
+
+            console.log(`변경 파일 ${files.length}개:`);
+            files.forEach(f => console.log(`  ${isDocsSafe(f.filename) ? '📄' : '⚙️'} ${f.filename}`));
+            console.log(`\n문서 전용 PR: ${allDocsSafe ? '✅ YES' : '❌ NO'}`);
+
+            core.setOutput('docs_only', allDocsSafe ? 'true' : 'false');
+
+      - name: Check AIL Section in PR Body
+        if: github.event_name == 'pull_request' && steps.docs-check.outputs.docs_only != 'true'
         uses: actions/github-script@v7
         with:
           script: |
@@ -75,3 +105,13 @@ jobs:
             }
 
             console.log('✅ AIL Gate 통과!');
+
+      - name: Docs-only PR auto-pass
+        if: github.event_name == 'pull_request' && steps.docs-check.outputs.docs_only == 'true'
+        run: |
+          echo "═══════════════════════════════════════"
+          echo "📄 문서 전용 PR — AIL 섹션 면제"
+          echo "═══════════════════════════════════════"
+          echo "변경 파일이 모두 docs//.claude//.md 경로입니다."
+          echo "코드 변경이 없으므로 AIL 지시서 없이 통과합니다."
+          echo "✅ AIL Gate 자동 통과!"
