@@ -89,3 +89,170 @@ daily-miracles-mvp/
 ## 📄 라이선스
 
 MIT
+
+좋아요 👍
+그럼 **기존 README 내용은 건드리지 않고**,
+중복 없이 **아래에 “추가로 붙이면 되는 정리본”만** 깔끔하게 다시 만들어 드릴게요.
+
+👉 아래 블록만 그대로 README 맨 아래에 복붙하세요.
+
+---
+
+````md
+---
+
+# 🔧 CI / AIL Gate / Ops Hardening 빠른 해결 가이드
+
+PR이 머지되지 않거나 GitHub Actions가 실패하면 아래 순서대로 점검하세요.
+
+---
+
+## 1️⃣ AIL Gate 실패 시
+
+### 증상
+- `AIL 섹션 존재: ❌`
+- `Source ID 존재: ❌`
+
+### 해결
+PR **본문(Description)** 맨 위에 아래를 평문으로 추가하세요:
+
+```text
+[AIL]
+source_id: ISSUE-<번호>
+owner: <담당자>
+intent: <의도>
+changes:
+  - <변경 내용>
+acceptance_criteria:
+  - AIL 섹션 존재: ✅
+  - Source ID 존재: ✅
+````
+
+⚠️ 주의:
+
+* 코드펜스(````ail`)로 감싸지 마세요
+* `Issue #: #13` 같은 표기만으로는 통과하지 않습니다
+* 반드시 `source_id:` 키를 사용하세요
+
+---
+
+## 2️⃣ approve-dec.yml 오류 시
+
+### 증상
+
+* `Invalid workflow file ... line 1`
+* github-script 단계에서 문자열/템플릿 에러
+
+### 해결 1: UTF-8 No BOM으로 저장
+
+PowerShell:
+
+```powershell
+$path = ".github\workflows\approve-dec.yml"
+$yml = Get-Content $path -Raw
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllText($path, $yml, $utf8NoBom)
+```
+
+---
+
+### 해결 2: github-script에서 `${{ }}` 직접 사용 금지
+
+❌ 금지
+
+```yaml
+script: |
+  const query = '${{ inputs.query }}';
+```
+
+✅ 권장
+
+```yaml
+- uses: actions/github-script@v7
+  env:
+    INPUT_QUERY: ${{ inputs.query }}
+  with:
+    script: |
+      const query = process.env.INPUT_QUERY;
+```
+
+원칙:
+
+* `${{ }}` → 반드시 `env:`로 전달
+* `script:` 내부 → `process.env`만 사용
+
+---
+
+## 3️⃣ Ops Hardening(P2.3) 테스트 실패 시
+
+### 흔한 원인 1: reset() 함수 가정
+
+❌ 위험 코드
+
+```js
+require('../../middleware/alertCooldown').reset();
+```
+
+✅ 안전 코드
+
+```js
+const ac = require('../../middleware/alertCooldown');
+if (typeof ac.reset === 'function') ac.reset();
+```
+
+---
+
+### 흔한 원인 2: 상태값 혼용
+
+`healthy` / `stable`을 섞어 쓰면 CI가 깨질 수 있습니다.
+
+프로젝트 전반에 **하나로 통일**하세요:
+
+* healthy/degraded/critical
+  또는
+* stable/degraded/critical
+
+---
+
+### 흔한 원인 3: 점수 비교 strictEqual
+
+반올림 차이로 실패할 수 있습니다.
+
+```js
+assert.ok(Math.abs(actual - expected) < 0.2);
+```
+
+---
+
+## ✅ 머지 전 빠른 체크리스트
+
+* [ ] PR 본문에 `[AIL]` 있음
+* [ ] `source_id:` 존재
+* [ ] AIL 코드펜스 사용 안 함
+* [ ] approve-dec.yml UTF-8 No BOM
+* [ ] github-script에서 `${{ }}` 직접 사용 안 함
+* [ ] Ops 테스트 통과
+
+---
+
+문제가 반복되면:
+
+1. 실패 로그 마지막 10줄 확인
+2. `docs/where-and-how-to-fix.md` 참고
+3. 그래도 안 되면 로그 기준으로 원인 분리
+
+---
+
+```
+
+---
+
+✅ 이 버전은:
+
+- 기존 README 내용과 중복 없음
+- CRITICAL / Aurora 5 섹션 침범 안 함
+- Daily Miracles 설명 유지
+- 순수 “CI 트러블슈팅 추가 블록”만 포함
+
+```
+

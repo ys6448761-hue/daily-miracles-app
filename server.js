@@ -136,6 +136,20 @@ if (slackHeartbeatService) {
   initSlackSender((msg) => slackHeartbeatService.sendSlackMessage(msg));
 }
 
+// 8-Mode SSOT Registry (P1-SSOT — modes.registry.json)
+let modesLoader = null;
+try {
+  modesLoader = require("./config/modesLoader");
+  const { modes, errors } = modesLoader.loadRegistry({ failFast: IS_PRODUCTION });
+  if (errors.length > 0) {
+    console.warn("⚠️ Mode Registry 검증 경고:", errors.join('; '));
+  }
+  console.log(`✅ Mode Registry 로드 성공 (${modes.length}개 모드)`);
+} catch (error) {
+  console.error("❌ Mode Registry 로드 실패:", error.message);
+  if (IS_PRODUCTION) process.exit(1);
+}
+
 // 빌드 정보 (디버깅용)
 const BUILD_INFO = {
   commit: process.env.GIT_SHA || process.env.RENDER_GIT_COMMIT || 'unknown',
@@ -1732,6 +1746,40 @@ if (wuRoutes) {
   console.log("✅ WU API 라우터 등록 완료 (/api/wu)");
 } else {
   console.warn("⚠️ WU API 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 8-Mode Diagnostic + Marketing Segment (P1-SSOT) ----------
+let modeDiagnosticRoutes = null;
+try {
+  modeDiagnosticRoutes = require("./routes/modeDiagnosticRoutes");
+  console.log("✅ Mode Diagnostic 라우터 로드 성공");
+} catch (error) {
+  console.warn("⚠️ Mode Diagnostic 라우터 로드 실패:", error.message);
+}
+if (modeDiagnosticRoutes) {
+  // In-memory store for today's diagnoses (v1, DB in v2)
+  global._modeDiagnosticStore = global._modeDiagnosticStore || new Map();
+  app.use("/api/mode", modeDiagnosticRoutes);
+  console.log("✅ Mode Diagnostic 라우터 등록 완료 (/api/mode)");
+} else {
+  console.warn("⚠️ Mode Diagnostic 라우터 미등록");
+}
+
+// ---------- Diagnostic API v1 (SSOT-locked, weight-matrix scoring) ----------
+let diagnosticV1Routes = null;
+try {
+  diagnosticV1Routes = require("./routes/diagnosticV1Routes");
+  console.log("✅ Diagnostic v1 라우터 로드 성공");
+} catch (error) {
+  console.warn("⚠️ Diagnostic v1 라우터 로드 실패:", error.message);
+}
+if (diagnosticV1Routes) {
+  global._diagV1Store = global._diagV1Store || new Map();
+  app.use("/v1/diagnostic", diagnosticV1Routes);
+  app.use("/v1/marketing", diagnosticV1Routes);
+  console.log("✅ Diagnostic v1 라우터 등록 완료 (/v1/diagnostic, /v1/marketing)");
+} else {
+  console.warn("⚠️ Diagnostic v1 라우터 미등록");
 }
 
 // ---------- Attendance (Living Wisdom 출석/체온) Routes ----------
