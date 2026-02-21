@@ -1,0 +1,109 @@
+﻿name: team-memory Promote L3
+
+on:
+  pull_request:
+    types: [labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  promote-l3:
+    if: github.event.label.name == 'PROMOTE:L3'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Setup git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Dedup check (PR-number based)
+        id: dedup
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          ENTRY="docs/team-memory/entries/pr-${PR_NUMBER}.md"
+          echo "entry_path=$ENTRY" >> $GITHUB_OUTPUT
+          if [ -f "$ENTRY" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Stop early if dedup hit
+        if: steps.dedup.outputs.skip == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: `🟡 PROMOTE:L3 dedup: 이미 엔트리가 존재합니다. (pr-${prNumber})`
+            });
+
+      - name: Generate entry markdown
+        if: steps.dedup.outputs.skip != 'true'
+        run: |
+          mkdir -p docs/team-memory/entries
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          PR_AUTHOR="${{ github.event.pull_request.user.login }}"
+          TODAY="$(date -u +%Y-%m-%d)"
+
+          cat > "docs/team-memory/entries/pr-${PR_NUMBER}.md" <<EOF
+          ---
+          level: L3
+          source: pull_request
+          pr_number: ${PR_NUMBER}
+          date_utc: ${TODAY}
+          author: ${PR_AUTHOR}
+          ---
+          # L3 Promote — PR #${PR_NUMBER}: ${PR_TITLE}
+
+          - **PR:** ${PR_URL}
+          - **Author:** ${PR_AUTHOR}
+          - **Promoted at (UTC):** ${TODAY}
+
+          ## What changed
+          ${PR_TITLE}
+
+          ## Why (context)
+          (자동 생성) PR 라벨 \`PROMOTE:L3\` 기반 승격.
+
+          ## Impact
+          - team-memory L3 엔트리 생성
+
+          ## Next actions
+          - [ ] 필요한 경우 후속 결정/실행문서(DEC/EXEC) 연결
+          EOF
+
+      - name: Commit & push entry back to PR branch
+        if: steps.dedup.outputs.skip != 'true'
+        run: |
+          git add docs/team-memory/entries
+          git commit -m "docs(team-memory): promote L3 for PR #${{ github.event.pull_request.number }}" || exit 0
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
+
+      - name: Comment result on PR
+        if: steps.dedup.outputs.skip != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const path = `docs/team-memory/entries/pr-${prNumber}.md`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: `✅ PROMOTE:L3 완료: \`${path}\` 생성 및 푸시했습니다.`
+            });
