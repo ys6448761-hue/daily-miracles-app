@@ -1,10 +1,37 @@
 const winston = require('winston');
+const DailyRotateFile = require('winston-daily-rotate-file');
 const path = require('path');
+const fs = require('fs');
+const os = require('os');
 
-// Vercel Serverless 환경 감지 (읽기전용 /var/task 파일시스템)
-const IS_SERVERLESS = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+// ── serverless 감지 ──
+const isServerless =
+  !!process.env.VERCEL ||
+  !!process.env.NOW_REGION ||
+  !!process.env.AWS_LAMBDA_FUNCTION_NAME;
 
-// 커스텀 로그 포맷
+// ── 안전한 디렉토리 결정 ──
+const baseDir = isServerless
+  ? path.join(os.tmpdir(), 'daily-miracles')
+  : process.cwd();
+const logDir = path.join(baseDir, 'logs');
+
+// ── 디렉토리 생성은 "안전하게" (절대 throw 금지) ──
+function ensureDirSafe(dir) {
+  try {
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    return true;
+  } catch (e) {
+    console.warn('[logger] failed to ensure log dir; falling back to console-only', {
+      dir,
+      code: e && e.code,
+      message: e && e.message,
+    });
+    return false;
+  }
+}
+
+// ── 커스텀 로그 포맷 ──
 const logFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.errors({ stack: true }),
@@ -12,228 +39,104 @@ const logFormat = winston.format.combine(
   winston.format.prettyPrint()
 );
 
-// 콘솔용 포맷 (개발 환경)
+// ── 콘솔용 포맷 (개발/서버리스) ──
 const consoleFormat = winston.format.combine(
   winston.format.colorize(),
   winston.format.timestamp({ format: 'HH:mm:ss' }),
   winston.format.printf(({ timestamp, level, message, stack, ...meta }) => {
     let log = `${timestamp} [${level}] ${message}`;
-
-    if (stack) {
-      log += `\n${stack}`;
-    }
-
-    if (Object.keys(meta).length > 0) {
-      log += `\n${JSON.stringify(meta, null, 2)}`;
-    }
-
+    if (stack) log += `\n${stack}`;
+    if (Object.keys(meta).length > 0) log += `\n${JSON.stringify(meta, null, 2)}`;
     return log;
   })
 );
 
-let logger, accessLogger;
+// ── Transport 구성 ──
+const transports = [
+  new winston.transports.Console({
+    level: process.env.LOG_LEVEL || (isServerless ? 'info' : 'debug'),
+    format: consoleFormat,
+  }),
+];
 
-if (IS_SERVERLESS) {
-  // ── Serverless: Console transport만 사용 (파일 I/O 없음) ──
-  logger = winston.createLogger({
-    level: 'info',
-    format: logFormat,
-    defaultMeta: { service: 'daily-miracles', version: '1.0.0' },
-    transports: [
-      new winston.transports.Console({ format: consoleFormat })
-    ],
-    exitOnError: false
-  });
-
-  accessLogger = winston.createLogger({
-    format: winston.format.combine(
-      winston.format.timestamp(),
-      winston.format.json()
-    ),
-    transports: [
-      new winston.transports.Console({ format: consoleFormat })
-    ],
-    exitOnError: false
-  });
-
-  logger.info('Logger initialized (serverless mode — console only)');
-} else {
-  // ── 일반 환경: 파일 transport 사용 ──
-  const DailyRotateFile = require('winston-daily-rotate-file');
-  const fs = require('fs');
-
-  const logDir = path.join(process.cwd(), 'logs');
-  try {
-    if (!fs.existsSync(logDir)) {
-      fs.mkdirSync(logDir, { recursive: true });
-    }
-  } catch (err) {
-    console.warn('[Logger] logs 디렉토리 생성 실패 (계속 실행):', err.message);
-  }
-
-  const allLogsTransport = new DailyRotateFile({
-    filename: path.join(logDir, 'application-%DATE%.log'),
-    datePattern: 'YYYY-MM-DD',
-    maxSize: '10m',
-    maxFiles: '30d',
-    format: logFormat,
-    level: 'silly'
-  });
-
-  const errorLogsTransport = new DailyRotateFile({
-    filename: path.join(logDir, 'error-%DATE%.log'),
-    datePattern: 'YYYY-MM-DD',
-    maxSize: '10m',
-    maxFiles: '30d',
-    format: logFormat,
-    level: 'error'
-  });
-
-  const accessLogsTransport = new DailyRotateFile({
-    filename: path.join(logDir, 'access-%DATE%.log'),
-    datePattern: 'YYYY-MM-DD',
-    maxSize: '10m',
-    maxFiles: '30d',
-    format: winston.format.combine(
-      winston.format.timestamp(),
-      winston.format.json()
-    ),
-    level: 'info'
-  });
-
-  logger = winston.createLogger({
-    level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-    format: logFormat,
-    defaultMeta: { service: 'daily-miracles', version: '1.0.0' },
-    transports: [allLogsTransport, errorLogsTransport],
-    exceptionHandlers: [
-      new winston.transports.File({
-        filename: path.join(logDir, 'exceptions.log'),
-        format: logFormat
+// 로컬/VM 환경에서만 파일 로깅 허용 (serverless면 진입 금지)
+if (!isServerless) {
+  const ok = ensureDirSafe(logDir);
+  if (ok) {
+    transports.push(
+      new DailyRotateFile({
+        dirname: logDir,
+        filename: 'app-%DATE%.log',
+        datePattern: 'YYYY-MM-DD',
+        zippedArchive: true,
+        maxSize: '20m',
+        maxFiles: '14d',
+        level: process.env.LOG_LEVEL || 'info',
+        format: logFormat,
       })
-    ],
-    rejectionHandlers: [
-      new winston.transports.File({
-        filename: path.join(logDir, 'rejections.log'),
-        format: logFormat
-      })
-    ],
-    exitOnError: false
-  });
-
-  if (process.env.NODE_ENV !== 'production') {
-    logger.add(new winston.transports.Console({
-      format: consoleFormat,
-      level: 'debug'
-    }));
+    );
   }
-
-  accessLogger = winston.createLogger({
-    format: winston.format.combine(
-      winston.format.timestamp(),
-      winston.format.json()
-    ),
-    transports: [accessLogsTransport],
-    exitOnError: false
-  });
-
-  logger.info('Logger initialized', {
-    logDirectory: logDir,
-    environment: process.env.NODE_ENV || 'development',
-    logLevel: logger.level
-  });
 }
 
-// Express 미들웨어용 로거
+const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || 'info',
+  format: logFormat,
+  defaultMeta: { service: 'daily-miracles', version: '1.0.0' },
+  transports,
+  exitOnError: false,
+});
+
+// ── HTTP 접근 로그 (console 기반, accessLogger 대체) ──
+const accessLogger = winston.createLogger({
+  format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+  transports: [new winston.transports.Console({ format: consoleFormat })],
+  exitOnError: false,
+});
+
+// ── Express 미들웨어 ──
 const requestLogger = (req, res, next) => {
   const startTime = Date.now();
-
   res.on('finish', () => {
     const duration = Date.now() - startTime;
     const logData = {
-      method: req.method,
-      url: req.url,
-      statusCode: res.statusCode,
+      method: req.method, url: req.url, statusCode: res.statusCode,
       contentLength: res.get('content-length') || 0,
       userAgent: req.get('user-agent'),
       ip: req.ip || req.connection.remoteAddress,
-      duration: `${duration}ms`
+      duration: `${duration}ms`,
     };
-
     if (res.statusCode >= 400) {
       accessLogger.warn('HTTP Error', logData);
     } else {
       accessLogger.info('HTTP Request', logData);
     }
   });
-
   next();
 };
 
-// 로그 레벨별 헬퍼 함수들
+// ── 로그 헬퍼 (기존 destructured import 호환) ──
 const logHelpers = {
-  // 일반 정보 로그
-  info: (message, meta = {}) => {
-    logger.info(message, meta);
-  },
-
-  // 경고 로그
-  warn: (message, meta = {}) => {
-    logger.warn(message, meta);
-  },
-
-  // 에러 로그
+  info: (message, meta = {}) => logger.info(message, meta),
+  warn: (message, meta = {}) => logger.warn(message, meta),
   error: (message, error = null, meta = {}) => {
     const logMeta = { ...meta };
-
     if (error instanceof Error) {
-      logMeta.error = {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-        code: error.code
-      };
+      logMeta.error = { name: error.name, message: error.message, stack: error.stack, code: error.code };
     } else if (error) {
       logMeta.error = error;
     }
-
     logger.error(message, logMeta);
   },
-
-  // 디버그 로그
-  debug: (message, meta = {}) => {
-    logger.debug(message, meta);
-  },
-
-  // 데이터베이스 관련 로그
-  database: (action, details = {}) => {
-    logger.info(`Database ${action}`, {
-      category: 'database',
-      ...details
-    });
-  },
-
-  // OpenAI API 관련 로그
-  openai: (action, details = {}) => {
-    logger.info(`OpenAI ${action}`, {
-      category: 'openai',
-      ...details
-    });
-  },
-
-  // 스토리 생성 관련 로그
-  story: (action, storyId, details = {}) => {
-    logger.info(`Story ${action}`, {
-      category: 'story',
-      storyId,
-      ...details
-    });
-  }
+  debug: (message, meta = {}) => logger.debug(message, meta),
+  database: (action, details = {}) => logger.info(`Database ${action}`, { category: 'database', ...details }),
+  openai: (action, details = {}) => logger.info(`OpenAI ${action}`, { category: 'openai', ...details }),
+  story: (action, storyId, details = {}) => logger.info(`Story ${action}`, { category: 'story', storyId, ...details }),
 };
 
 module.exports = {
   logger,
   accessLogger,
   requestLogger,
-  ...logHelpers
+  isServerless,
+  ...logHelpers,
 };

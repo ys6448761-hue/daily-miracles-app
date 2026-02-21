@@ -14,12 +14,22 @@
 
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
-// Vercel Serverless 환경 감지
-const IS_SERVERLESS = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+// ── serverless 감지 ──
+const IS_SERVERLESS = !!(
+    process.env.VERCEL ||
+    process.env.NOW_REGION ||
+    process.env.AWS_LAMBDA_FUNCTION_NAME
+);
 
-// 메트릭스 저장 경로
-const METRICS_DIR = path.join(__dirname, '..', 'data', 'metrics');
+// ── persistence 플래그: serverless에서는 파일 쓰기 경로 진입 자체를 차단 ──
+const METRICS_PERSIST = !IS_SERVERLESS;
+
+// 메트릭스 저장 경로 (serverless에서는 사용되지 않음)
+const METRICS_DIR = METRICS_PERSIST
+    ? path.join(__dirname, '..', 'data', 'metrics')
+    : path.join(os.tmpdir(), 'daily-miracles', 'metrics');
 const DAILY_METRICS_FILE = () => path.join(METRICS_DIR, `metrics-${getToday()}.json`);
 
 // 인메모리 메트릭스 (서버 시작 후 누적)
@@ -79,17 +89,17 @@ function getToday() {
 }
 
 /**
- * 디렉토리 확인 및 생성 (서버리스 환경에서는 skip)
+ * 디렉토리 안전 생성 — METRICS_PERSIST=false면 진입하지 않음
  */
 function ensureDir() {
-    if (IS_SERVERLESS) return false;
+    if (!METRICS_PERSIST) return false;
     try {
         if (!fs.existsSync(METRICS_DIR)) {
             fs.mkdirSync(METRICS_DIR, { recursive: true });
         }
         return true;
     } catch (err) {
-        console.warn('[Metrics] 디렉토리 생성 실패 (인메모리 모드):', err.message);
+        console.warn('[Metrics] 디렉토리 생성 실패 (인메모리 계속):', err.message);
         return false;
     }
 }
@@ -146,11 +156,11 @@ function saveMetrics() {
 }
 
 /**
- * 메트릭스 로드 (서버 재시작 시, 서버리스에서는 skip)
+ * 메트릭스 로드 — persistence 비활성 시 진입 금지
  */
 function loadMetrics() {
-    if (IS_SERVERLESS) {
-        console.log('[Metrics] 서버리스 환경 — 인메모리 모드');
+    if (!METRICS_PERSIST) {
+        console.log('[Metrics] serverless 환경 — metrics persistence 비활성화 (인메모리 전용)');
         return;
     }
 
@@ -491,10 +501,12 @@ ${m.computed.errorTop3.length > 0
 // 초기화 시 기존 메트릭스 로드
 loadMetrics();
 
-// 5분마다 자동 저장
-setInterval(() => {
-    saveMetrics();
-}, 5 * 60 * 1000);
+// 5분마다 자동 저장 (serverless에서는 setInterval 무의미하므로 skip)
+if (METRICS_PERSIST) {
+    setInterval(() => {
+        saveMetrics();
+    }, 5 * 60 * 1000);
+}
 
 module.exports = {
     recordWishInbox,

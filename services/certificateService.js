@@ -22,8 +22,12 @@ const INFO_AREA = { top: 1120, height: 160 };
  * 출력 디렉토리 보장
  */
 function ensureCertDir() {
-  if (!fs.existsSync(CERT_DIR)) {
-    fs.mkdirSync(CERT_DIR, { recursive: true });
+  try {
+    if (!fs.existsSync(CERT_DIR)) {
+      fs.mkdirSync(CERT_DIR, { recursive: true });
+    }
+  } catch (err) {
+    console.warn('[Certificate] 디렉토리 생성 실패:', err.message);
   }
 }
 
