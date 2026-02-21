@@ -817,18 +817,63 @@ if (String(process.env.REQUEST_LOG || "1") === "1") {
 global.latestStore = global.latestStore || { story: null };
 const SERVER_STARTED_AT = new Date().toISOString();
 
-// ---------- Stability Score (P2.3) ----------
+// ---------- Stability Score (P2.3) — Safe Health Endpoint ----------
+// 절대 500 반환 금지: 어떤 서비스가 실패해도 200 (ok | degraded)
 app.get("/healthz", (_req, res) => {
-  if (!stabilityService) {
-    return res.status(503).json({
-      success: false,
-      error: "stability_unavailable",
-      message: "Stability Score 서비스가 로드되지 않았습니다",
+  const startedAt = Date.now();
+  try {
+    const checks = {};
+    let degraded = false;
+
+    // 1) Stability Score (선택적)
+    try {
+      if (stabilityService) {
+        const h = stabilityService.getHealthz();
+        checks.stability = { status: h.status, score: h.score };
+        if (h.status === 'critical') degraded = true;
+      } else {
+        degraded = true;
+        checks.stability = { status: 'unavailable' };
+      }
+    } catch (e) {
+      degraded = true;
+      checks.stability = { status: 'error', message: e.message };
+    }
+
+    // 2) Metrics 상태 (throw 금지)
+    try {
+      const metricsService = require('./services/metricsService');
+      const m = metricsService.getMetrics();
+      checks.metrics = { date: m.date, wishes: m.wishes.total };
+    } catch (e) {
+      checks.metrics = { status: 'fail', error: e.message };
+    }
+
+    // 3) Slack Webhook 존재 여부만 (호출 금지)
+    checks.slack = process.env.OPS_SLACK_WEBHOOK ? 'configured' : 'missing';
+
+    // 4) 런타임 정보
+    checks.runtime = {
+      node: process.version,
+      uptimeSec: Math.floor(process.uptime()),
+      serverless: !!(process.env.VERCEL || process.env.NOW_REGION || process.env.AWS_LAMBDA_FUNCTION_NAME)
+    };
+
+    return res.status(200).json({
+      status: degraded ? 'degraded' : 'ok',
+      durationMs: Date.now() - startedAt,
+      timestamp: new Date().toISOString(),
+      checks
+    });
+  } catch (fatal) {
+    // 최후 방어: 절대 500 내지 않음
+    return res.status(200).json({
+      status: 'degraded',
+      fatal: true,
+      message: fatal.message,
+      timestamp: new Date().toISOString()
     });
   }
-  const healthz = stabilityService.getHealthz();
-  const httpStatus = healthz.status === 'critical' ? 500 : 200;
-  res.status(httpStatus).json(healthz);
 });
 
 // ---------- Readiness Probe (no DB) ----------
