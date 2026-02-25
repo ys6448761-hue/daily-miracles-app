@@ -1,39 +1,47 @@
-/**
- * 소원 추적 API 라우트
+﻿/**
+ * ?뚯썝 異붿쟻 API ?쇱슦??
  *
- * @purpose 하키스틱 성장 메커니즘 #2: 데이터 복리
+ * @purpose ?섑궎?ㅽ떛 ?깆옣 硫붿빱?덉쬁 #2: ?곗씠??蹂듬━
  *
- * 엔드포인트:
- * - GET  /api/wish-tracking/respond/:token - 추적 응답 페이지 데이터
- * - POST /api/wish-tracking/respond/:token - 추적 응답 제출
- * - GET  /api/wish-tracking/stats - 전체 성공률 통계
- * - GET  /api/wish-tracking/stats/:category - 카테고리별 성공률
- * - POST /api/wish-tracking/batch/send - 배치 발송 (관리자)
+ * ?붾뱶?ъ씤??
+ * - GET  /api/wish-tracking/respond/:token - 異붿쟻 ?묐떟 ?섏씠吏 ?곗씠??
+ * - POST /api/wish-tracking/respond/:token - 異붿쟻 ?묐떟 ?쒖텧
+ * - GET  /api/wish-tracking/stats - ?꾩껜 ?깃났瑜??듦퀎
+ * - GET  /api/wish-tracking/stats/:category - 移댄뀒怨좊━蹂??깃났瑜?
+ * - POST /api/wish-tracking/batch/send - 諛곗튂 諛쒖넚 (愿由ъ옄)
  */
 
 const express = require('express');
 const router = express.Router();
 
-// 서비스 인스턴스 (server.js에서 주입)
+// ?쒕퉬???몄뒪?댁뒪 (server.js?먯꽌 二쇱엯)
 let trackingService = null;
 let messageProvider = null;
 
+// 오버레이 서비스 (tolerant loading)
+let overlayService = null;
+try {
+    overlayService = require('../services/overlayService');
+} catch (err) {
+    console.warn('[WishTracking] overlayService 로드 실패:', err.message);
+}
+
 /**
- * 서비스 초기화 (server.js에서 호출)
+ * ?쒕퉬??珥덇린??(server.js?먯꽌 ?몄텧)
  */
 router.init = function(services) {
     trackingService = services.trackingService;
     messageProvider = services.messageProvider;
-    console.log('[WishTracking] 라우터 초기화 완료');
+    console.log('[WishTracking] ?쇱슦??珥덇린???꾨즺');
 };
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 추적 응답 페이지
-// ═══════════════════════════════════════════════════════════════════════════
+// ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??
+// 異붿쟻 ?묐떟 ?섏씠吏
+// ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??
 
 /**
  * GET /api/wish-tracking/respond/:token
- * 추적 응답 페이지 데이터 조회
+ * 異붿쟻 ?묐떟 ?섏씠吏 ?곗씠??議고쉶
  */
 router.get('/respond/:token', async (req, res) => {
     try {
@@ -43,25 +51,25 @@ router.get('/respond/:token', async (req, res) => {
             return res.status(503).json({
                 success: false,
                 error: 'service_unavailable',
-                message: '추적 서비스가 초기화되지 않았습니다.'
+                message: '異붿쟻 ?쒕퉬?ㅺ? 珥덇린?붾릺吏 ?딆븯?듬땲??'
             });
         }
 
-        // 추적 요청 조회
+        // 異붿쟻 ?붿껌 議고쉶
         const request = await trackingService.getTrackingRequestByToken(token);
 
         if (!request) {
             return res.status(404).json({
                 success: false,
                 error: 'not_found',
-                message: '유효하지 않거나 만료된 링크입니다.'
+                message: '?좏슚?섏? ?딄굅??留뚮즺??留곹겕?낅땲??'
             });
         }
 
-        // 열람 기록
+        // ?대엺 湲곕줉
         await trackingService.markRequestOpened(request.id);
 
-        // 비슷한 소원 통계
+        // 鍮꾩듂???뚯썝 ?듦퀎
         const similarStats = await trackingService.getSimilarWishStats(
             request.wish_category,
             request.miracle_index
@@ -81,18 +89,18 @@ router.get('/respond/:token', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('[WishTracking] 응답 페이지 조회 실패:', error.message);
+        console.error('[WishTracking] ?묐떟 ?섏씠吏 議고쉶 ?ㅽ뙣:', error.message);
         res.status(500).json({
             success: false,
             error: 'server_error',
-            message: '서버 오류가 발생했습니다.'
+            message: '?쒕쾭 ?ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.'
         });
     }
 });
 
 /**
  * POST /api/wish-tracking/respond/:token
- * 추적 응답 제출
+ * 異붿쟻 ?묐떟 ?쒖텧
  */
 router.post('/respond/:token', async (req, res) => {
     try {
@@ -114,12 +122,12 @@ router.post('/respond/:token', async (req, res) => {
             });
         }
 
-        // 유효성 검사
+        // ?좏슚??寃??
         if (!realized_status) {
             return res.status(400).json({
                 success: false,
                 error: 'validation_error',
-                message: '실현 상태를 선택해주세요.'
+                message: '?ㅽ쁽 ?곹깭瑜??좏깮?댁＜?몄슂.'
             });
         }
 
@@ -128,22 +136,22 @@ router.post('/respond/:token', async (req, res) => {
             return res.status(400).json({
                 success: false,
                 error: 'validation_error',
-                message: '유효하지 않은 실현 상태입니다.'
+                message: '?좏슚?섏? ?딆? ?ㅽ쁽 ?곹깭?낅땲??'
             });
         }
 
-        // 추적 요청 조회
+        // 異붿쟻 ?붿껌 議고쉶
         const request = await trackingService.getTrackingRequestByToken(token);
 
         if (!request) {
             return res.status(404).json({
                 success: false,
                 error: 'not_found',
-                message: '유효하지 않거나 만료된 링크입니다.'
+                message: '?좏슚?섏? ?딄굅??留뚮즺??留곹겕?낅땲??'
             });
         }
 
-        // 응답 저장
+        // ?묐떟 ???
         const result = await trackingService.saveTrackingResponse({
             tracking_request_id: request.id,
             realized_status,
@@ -165,12 +173,12 @@ router.post('/respond/:token', async (req, res) => {
             });
         }
 
-        // 응원 메시지 생성
+        // ?묒썝 硫붿떆吏 ?앹꽦
         const encouragement = getResponseEncouragement(realized_status);
 
         res.json({
             success: true,
-            message: '소중한 응답 감사합니다!',
+            message: '?뚯쨷???묐떟 媛먯궗?⑸땲??',
             encouragement,
             data: {
                 response_id: result.response.id
@@ -178,22 +186,22 @@ router.post('/respond/:token', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('[WishTracking] 응답 제출 실패:', error.message);
+        console.error('[WishTracking] ?묐떟 ?쒖텧 ?ㅽ뙣:', error.message);
         res.status(500).json({
             success: false,
             error: 'server_error',
-            message: '서버 오류가 발생했습니다.'
+            message: '?쒕쾭 ?ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.'
         });
     }
 });
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 통계 조회
-// ═══════════════════════════════════════════════════════════════════════════
+// ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??
+// ?듦퀎 議고쉶
+// ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??
 
 /**
  * GET /api/wish-tracking/stats
- * 전체 성공률 통계
+ * ?꾩껜 ?깃났瑜??듦퀎
  */
 router.get('/stats', async (req, res) => {
     try {
@@ -212,14 +220,14 @@ router.get('/stats', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('[WishTracking] 통계 조회 실패:', error.message);
+        console.error('[WishTracking] ?듦퀎 議고쉶 ?ㅽ뙣:', error.message);
         res.status(500).json({ success: false, error: 'server_error' });
     }
 });
 
 /**
  * GET /api/wish-tracking/stats/:category
- * 카테고리별 성공률
+ * 移댄뀒怨좊━蹂??깃났瑜?
  */
 router.get('/stats/:category', async (req, res) => {
     try {
@@ -240,22 +248,22 @@ router.get('/stats/:category', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('[WishTracking] 카테고리 통계 조회 실패:', error.message);
+        console.error('[WishTracking] 移댄뀒怨좊━ ?듦퀎 議고쉶 ?ㅽ뙣:', error.message);
         res.status(500).json({ success: false, error: 'server_error' });
     }
 });
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 배치 작업 (관리자용)
-// ═══════════════════════════════════════════════════════════════════════════
+// ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??
+// 諛곗튂 ?묒뾽 (愿由ъ옄??
+// ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??
 
 /**
  * POST /api/wish-tracking/batch/send
- * 추적 메시지 배치 발송 (관리자 토큰 필요)
+ * 異붿쟻 硫붿떆吏 諛곗튂 諛쒖넚 (愿由ъ옄 ?좏겙 ?꾩슂)
  */
 router.post('/batch/send', async (req, res) => {
     try {
-        // 관리자 인증
+        // 愿由ъ옄 ?몄쬆
         const authToken = req.headers['x-admin-token'] || req.query.token;
         const expectedToken = process.env.ADMIN_TOKEN;
 
@@ -263,7 +271,7 @@ router.post('/batch/send', async (req, res) => {
             return res.status(403).json({
                 success: false,
                 error: 'forbidden',
-                message: '관리자 권한이 필요합니다.'
+                message: '愿由ъ옄 沅뚰븳???꾩슂?⑸땲??'
             });
         }
 
@@ -277,11 +285,11 @@ router.post('/batch/send', async (req, res) => {
             return res.status(400).json({
                 success: false,
                 error: 'validation_error',
-                message: 'stage는 day7, day30, day90 중 하나여야 합니다.'
+                message: 'stage??day7, day30, day90 以??섎굹?ъ빞 ?⑸땲??'
             });
         }
 
-        // 발송 대상 조회
+        // 諛쒖넚 ???議고쉶
         const targets = await trackingService.getTrackingTargets(stage);
 
         if (dry_run) {
@@ -298,37 +306,54 @@ router.post('/batch/send', async (req, res) => {
             });
         }
 
-        // 실제 발송
+        // ?ㅼ젣 諛쒖넚
         const results = { sent: 0, failed: 0, errors: [] };
         const baseUrl = process.env.APP_BASE_URL || 'https://dailymiracles.kr';
 
         for (const target of targets) {
             try {
-                // 추적 요청 생성
+                // 異붿쟻 ?붿껌 ?앹꽦
                 const request = await trackingService.createTrackingRequest(target.id, stage);
 
-                // 메시지 발송
                 const responseUrl = `${baseUrl}/wish-tracking.html?token=${request.response_token}`;
                 const message = buildTrackingMessage(stage, target.name, responseUrl);
 
-                const sendResult = await messageProvider.sendKakao({
-                    to: target.phone,
-                    templateCode: process.env.SENS_TRACKING_TEMPLATE_CODE || 'tracking_default',
-                    variables: {
+                // overlay image generation (fail-safe: never blocks send)
+                let image_url = null;
+                if (overlayService && target.image_filename) {
+                    try {
+                        const captionLines = overlayService.processCaption(
+                            `${target.name || '소원이'}님의 소원이 이루어지는 중`
+                        );
+                        const overlayResult = await overlayService.generateOverlay({
+                            inputPath: require('path').join(__dirname, '..', 'public', 'images', 'wishes', target.image_filename),
+                            captionLines,
+                            originalFilename: target.image_filename
+                        });
+                        image_url = `${baseUrl}${overlayResult.overlay_url}`;
+                    } catch (overlayErr) {
+                        console.error(`[WishTracking] OVERLAY_FAILED wish_id=${target.id}:`, overlayErr.message);
+                    }
+                }
+
+                const sendResult = await messageProvider.sendSensAlimtalk(
+                    target.phone,
+                    {
                         name: target.name || '소원이',
                         stage: getStageLabel(stage),
-                        url: responseUrl
+                        url: responseUrl,
+                        image_url
                     }
-                });
+                );
 
                 if (sendResult.success) {
                     results.sent++;
                 } else {
-                    // 알림톡 실패 시 SMS 대체
-                    await messageProvider.sendSMS({
-                        to: target.phone,
-                        text: message
-                    });
+                    // alimtalk failed -> SMS fallback
+                    await messageProvider.sendSensSMS(
+                        target.phone,
+                        message
+                    );
                     results.sent++;
                 }
 
@@ -348,14 +373,14 @@ router.post('/batch/send', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('[WishTracking] 배치 발송 실패:', error.message);
+        console.error('[WishTracking] 諛곗튂 諛쒖넚 ?ㅽ뙣:', error.message);
         res.status(500).json({ success: false, error: 'server_error', message: error.message });
     }
 });
 
 /**
  * GET /api/wish-tracking/batch/pending
- * 발송 대기 건수 조회
+ * 諛쒖넚 ?湲?嫄댁닔 議고쉶
  */
 router.get('/batch/pending', async (req, res) => {
     try {
@@ -371,43 +396,40 @@ router.get('/batch/pending', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('[WishTracking] 대기 건수 조회 실패:', error.message);
+        console.error('[WishTracking] ?湲?嫄댁닔 議고쉶 ?ㅽ뙣:', error.message);
         res.status(500).json({ success: false, error: 'server_error' });
     }
 });
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 헬퍼 함수
-// ═══════════════════════════════════════════════════════════════════════════
+// ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??
+// ?ы띁 ?⑥닔
+// ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??
 
 function getStageLabel(stage) {
     const labels = {
         day7: '7일',
-        day30: '한 달',
-        day90: '3개월'
+        day30: '30일',
+        day90: '[하루하루의 기적] 90일이 지났어요! 지금까지의 변화를 30초만에 알려주세요 😊\n\n' + String(url || '') + '\n\n(30초면 충분해요)',
+        day30: '30일',
+        day90: '[하루하루의 기적] 90일이 지났어요! 지금까지의 변화를 30초만에 알려주세요 😊\n\n' + String(url || '') + '\n\n(30초면 충분해요)',
+        partial: '?뮞 ?덈컲???깃났????⑦빐?? ?곗씠?곗뿉 ?곕Ⅴ硫?遺遺??ъ꽦?먯쓽 68%媛 理쒖쥌 ?ㅽ쁽???꾨떖?⑸땲?? 怨꾩냽 ?섏븘媛硫?諛섎뱶???꾩꽦?⑸땲??',
+        not_yet: '?뙮 ?꾩쭅 吏꾪뻾 以묒씠?쒓뎔?? ?щ━???곌뎄???곕Ⅴ硫?袁몄??⑥씠 ?щ뒫蹂대떎 2諛???以묒슂?댁슂. ?뱀떊???ъ젙???묒썝?⑸땲??',
+        gave_up: '?뮏 愿쒖갖?꾩슂. ?뚮줈??諛⑺뼢???꾪솚?섎뒗 寃껊룄 ?깆옣???쇰??낅땲?? ?덈줈??媛?μ꽦??遺꾩꽍?대낫?몄슂.'
     };
-    return labels[stage] || stage;
-}
-
-function buildTrackingMessage(stage, name, url) {
-    // 철학 DoD: 4단계 구조 (과학적 근거 → 데이터 → 액션 → 따뜻한 톤)
-    const messages = {
-        day7: `[하루하루의 기적] ${name || '소원이'}님, AI 분석 데이터에 따르면 7일째가 신경과학적으로 습관 형성의 첫 번째 전환점이에요.\n\n지금까지의 변화를 함께 체크해볼까요? 👉\n${url}\n\n(30초면 충분해요)`,
-        day30: `[하루하루의 기적] ${name || '소원이'}님, 30일 전 시작한 여정! 집단지성 데이터 기준, 이 시점에서 73%의 소원이들이 긍정적 변화를 경험했어요.\n\n당신은 어떤가요? 👉\n${url}\n\n(30초면 충분해요)`,
-        day90: `[하루하루의 기적] ${name || '소원이'}님, 90일 대단한 여정이에요! 뇌과학 연구에 따르면 90일은 새로운 습관이 완전히 자리잡는 시점이에요.\n\n당신의 기적을 들려주세요 👉\n${url}\n\n(30초면 충분해요)`
-    };
-    return messages[stage] || messages.day7;
-}
-
-function getResponseEncouragement(status) {
-    // 철학 DoD: "포기" 등 부정적 표현 제거, 4단계 구조 (과학→데이터→액션→응원)
-    const messages = {
-        realized: '🎉 축하드려요! 소원이 실현되었군요! 뇌과학적으로 명확한 목표 설정이 실현 확률을 73% 높인다고 해요. 당신의 노력이 빛났습니다.',
-        partial: '💪 절반의 성공도 대단해요! 데이터에 따르면 부분 달성자의 68%가 최종 실현에 도달합니다. 계속 나아가면 반드시 완성됩니다.',
-        not_yet: '🌱 아직 진행 중이시군요. 심리학 연구에 따르면 꾸준함이 재능보다 2배 더 중요해요. 당신의 여정을 응원합니다.',
-        gave_up: '💜 괜찮아요. 때로는 방향을 전환하는 것도 성장의 일부입니다. 새로운 가능성을 분석해보세요.'
-    };
-    return messages[status] || '소중한 응답 감사합니다!';
+    return messages[status] || '?뚯쨷???묐떟 媛먯궗?⑸땲??';
 }
 
 module.exports = router;
+
+
+
+
+
+
+
+
+
+
+
+
+

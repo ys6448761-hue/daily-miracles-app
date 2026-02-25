@@ -178,19 +178,29 @@ async function sendSensAlimtalk(phone, templateVars = {}) {
     const url = `/alimtalk/v2/services/${SENS_SERVICE_ID}/messages`;
     const signature = makeSensSignature('POST', url, timestamp);
 
+    const messagePayload = {
+        to: normalizedPhone,
+        content: buildAlimtalkContent(templateVars),
+        buttons: templateVars.token ? [{
+            type: 'WL',
+            name: '결과 확인하기',
+            linkMobile: `${APP_BASE_URL}/r/${templateVars.token}`,
+            linkPc: `${APP_BASE_URL}/r/${templateVars.token}`
+        }] : undefined,
+        ...(templateVars.image_url ? {
+            image: {
+                imageUrl: templateVars.image_url,
+                imageLink: templateVars.token
+                    ? `${APP_BASE_URL}/r/${templateVars.token}`
+                    : APP_BASE_URL
+            }
+        } : {})
+    };
+
     const requestBody = {
         plusFriendId: SENS_CHANNEL_ID,
         templateCode: SENS_TEMPLATE_CODE,
-        messages: [{
-            to: normalizedPhone,
-            content: buildAlimtalkContent(templateVars),
-            buttons: templateVars.token ? [{
-                type: 'WL',
-                name: '결과 확인하기',
-                linkMobile: `${APP_BASE_URL}/r/${templateVars.token}`,
-                linkPc: `${APP_BASE_URL}/r/${templateVars.token}`
-            }] : undefined
-        }]
+        messages: [messagePayload]
     };
 
     try {
