@@ -34,6 +34,7 @@ try {
 let overlayService = null;
 try {
   overlayService = require('../services/overlayService');
+  console.log('[WishImage] overlayService 로드 성공');
 } catch (err) {
   console.error('[WishImage] overlayService 로드 실패:', err.message);
 }
