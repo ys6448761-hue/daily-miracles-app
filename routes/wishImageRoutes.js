@@ -31,6 +31,12 @@ try {
 } catch (err) {
   console.error('[WishImage] captionService 로드 실패:', err.message);
 }
+let overlayService = null;
+try {
+  overlayService = require('../services/overlayService');
+} catch (err) {
+  console.error('[WishImage] overlayService 로드 실패:', err.message);
+}
 
 // 이미지 저장 경로
 const WISHES_IMAGE_DIR = path.join(__dirname, '..', 'public', 'images', 'wishes');
@@ -635,6 +641,97 @@ router.post('/postcard', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Postcard generation failed',
+      details: error.message
+    });
+  }
+});
+
+// ── POST /overlay — 하단 그래디언트 + 한국어 캡션 오버레이 ──
+
+router.post('/overlay', async (req, res) => {
+  const rid = req.requestId || 'no-rid';
+
+  try {
+    if (!overlayService) {
+      return res.status(503).json({ success: false, error: 'Overlay service unavailable' });
+    }
+
+    const { filename, image_url, caption_ko, gem_type } = req.body;
+
+    // 입력 검증
+    if (!caption_ko || typeof caption_ko !== 'string') {
+      console.log(`[WishImage:overlay] [${rid}] Missing caption_ko`);
+      return res.status(400).json({ success: false, error: 'caption_ko는 필수입니다.' });
+    }
+
+    if (!filename && !image_url) {
+      console.log(`[WishImage:overlay] [${rid}] Missing filename and image_url`);
+      return res.status(400).json({ success: false, error: 'filename 또는 image_url이 필요합니다.' });
+    }
+
+    if (caption_ko.normalize('NFC').trim().length === 0) {
+      console.log(`[WishImage:overlay] [${rid}] Empty caption after normalize`);
+      return res.status(400).json({ success: false, error: 'caption_ko가 비어 있습니다.' });
+    }
+
+    // 소스 이미지 경로 확정
+    let inputPath;
+    let resolvedFilename;
+
+    if (filename) {
+      const safeName = path.basename(filename);
+      inputPath = path.join(WISHES_IMAGE_DIR, safeName);
+      resolvedFilename = safeName;
+
+      if (!fs.existsSync(inputPath)) {
+        console.log(`[WishImage:overlay] [${rid}] File not found: ${safeName}`);
+        return res.status(404).json({ success: false, error: '이미지 파일을 찾을 수 없습니다.' });
+      }
+    } else {
+      ensureImageDir();
+      const tempFilename = `temp_overlay_${Date.now()}.png`;
+      inputPath = await downloadAndSaveImage(image_url, tempFilename);
+      resolvedFilename = tempFilename;
+      console.log(`[WishImage:overlay] [${rid}] Downloaded: ${tempFilename}`);
+    }
+
+    // 캡션 처리 + 오버레이 생성
+    const captionLines = overlayService.processCaption(caption_ko);
+    console.log(`[WishImage:overlay] [${rid}] Caption lines: ${JSON.stringify(captionLines)}, gem_type=${gem_type || 'none'}`);
+
+    const result = await overlayService.generateOverlay({
+      inputPath,
+      captionLines,
+      originalFilename: resolvedFilename
+    });
+
+    console.log(`[WishImage:overlay] [${rid}] Generated: ${result.filename_overlay}`);
+
+    // 임시 파일 정리
+    if (image_url && resolvedFilename.startsWith('temp_overlay_')) {
+      fs.unlink(path.join(WISHES_IMAGE_DIR, resolvedFilename), () => {});
+    }
+
+    res.json({
+      success: true,
+      overlay_url: result.overlay_url,
+      filename_overlay: result.filename_overlay
+    });
+
+  } catch (error) {
+    console.error(`[WishImage:overlay] [${rid}] Error:`, error);
+
+    if (error.errorCode === 'FONT_NOT_FOUND' || error.errorCode === 'FONT_LOAD_FAILED') {
+      return res.status(503).json({
+        success: false,
+        error: '폰트 로드 실패 — 서버 설정을 확인하세요.',
+        details: error.message
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      error: '오버레이 생성 중 오류가 발생했습니다.',
       details: error.message
     });
   }
