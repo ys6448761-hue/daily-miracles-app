@@ -28,6 +28,7 @@ yarn-error.log*
 generated-images/*.png
 generated-images/*.jpg
 generated-images/*.jpeg
+public/images/wishes/overlay_*
 
 # Test files
 test-images/
@@ -79,6 +80,9 @@ pids
 # Backup files
 *-backup.js
 *.backup.*
+*.bak
+*.bak_*
+*.bak2
 
 # Windows command output files
 nul
