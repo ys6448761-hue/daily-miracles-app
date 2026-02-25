@@ -11,7 +11,24 @@ const sharp = require('sharp');
 const opentype = require('opentype.js');
 const path = require('path');
 const fs = require('fs');
-const FontManager = require('./videoJob/FontManager');
+
+// ── 폰트 경로 해석 (videoJob/FontManager 의존 제거) ────
+const BUNDLED_FONT = path.join(__dirname, '..', 'assets', 'fonts', 'NotoSansKR-Regular.ttf');
+const FONT_SEARCH_PATHS = [
+    BUNDLED_FONT,
+    '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',
+    '/usr/share/fonts/truetype/noto/NotoSansKR-Regular.ttf',
+];
+
+function resolveFont() {
+    for (const fp of FONT_SEARCH_PATHS) {
+        try { if (fs.existsSync(fp) && fs.statSync(fp).isFile()) return fp; } catch {}
+    }
+    throw Object.assign(
+        new Error(`FONT_NOT_FOUND: NotoSansKR 미발견. 검색: ${FONT_SEARCH_PATHS.join(', ')}`),
+        { errorCode: 'FONT_NOT_FOUND' }
+    );
+}
 
 // ── 상수 ──────────────────────────────────────────────
 const WISHES_IMAGE_DIR = path.join(__dirname, '..', 'public', 'images', 'wishes');
@@ -27,7 +44,7 @@ let _font = null;
 function getFont() {
   if (_font) return _font;
 
-  const fontPath = FontManager.resolve(); // throws FONT_NOT_FOUND
+  const fontPath = resolveFont();
   _font = opentype.loadSync(fontPath);
 
   if (!_font) {
