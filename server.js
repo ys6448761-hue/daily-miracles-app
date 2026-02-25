@@ -512,11 +512,17 @@ try {
 
 // 소원 추적 시스템 라우터 로딩 (바이럴 루프 #2)
 let wishTrackingRoutes = null;
+let wishTrackingMessageProvider = null;
 try {
   wishTrackingRoutes = require("./routes/wishTrackingRoutes");
   console.log("✅ 소원 추적 라우터 로드 성공");
 } catch (error) {
   console.error("❌ 소원 추적 라우터 로드 실패:", error.message);
+}
+try {
+  wishTrackingMessageProvider = require("./services/messageProvider");
+} catch (error) {
+  console.warn("⚠️ messageProvider 로드 실패 (추적 발송 비활성):", error.message);
 }
 
 // 실시간 카운터 라우터 로딩 (바이럴 루프 #4: 네트워크 효과)
@@ -1680,7 +1686,7 @@ if (wishTrackingRoutes) {
       const trackingService = new WishTrackingService(trackingPool);
       wishTrackingRoutes.init({
         trackingService,
-        messageProvider: messageProvider || null
+        messageProvider: wishTrackingMessageProvider || null
       });
       console.log("✅ 소원 추적 서비스 DB 연결 완료");
     } catch (err) {
