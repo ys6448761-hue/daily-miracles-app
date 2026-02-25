@@ -118,6 +118,7 @@
     "DOC-20251229-A1Y",
     "DOC-20251229-SRH",
     "DOC-20251229-PFO",
+    "DOC-MASTER-CONTROL",
     "DOC-inquiry-form-api"
   ],
   "aurora": [
@@ -139,6 +140,7 @@
     "DOC-JAEMI_ONBOARDING_v12",
     "DOC-drive-github-sync-setup",
     "DOC-sens-setup-guide",
+    "DOC-PROMOTION-RULES",
     "DOC-README",
     "DOC-ROADMAP_API",
     "DOC-VIDEO_MASTER",
@@ -213,7 +215,8 @@
     "DOC-20251229-ZF8",
     "DOC-20251229-A1Y",
     "DOC-20251229-SRH",
-    "DOC-20251229-PFO"
+    "DOC-20251229-PFO",
+    "DOC-MASTER-CONTROL"
   ],
   "ail": [
     "DOC-AIL-정산-v2-final",
@@ -257,6 +260,7 @@
     "DOC-JAEMI_ONBOARDING_v12",
     "DOC-04_Onboarding_7Day",
     "DOC-05_Deal_Registration",
+    "DOC-PROMOTION-RULES",
     "DOC-tax-accounting-ai-tools-analys",
     "DOC-GA4_SETUP_GUIDE",
     "DOC-20260101-MKI",
@@ -406,6 +410,11 @@
   "events": [
     "DOC-playground-events"
   ],
+  "hotfix": [
+    "DOC-CHECKLIST",
+    "DOC-CONTEXT",
+    "DOC-PLAN"
+  ],
   "kpi": [
     "DOC-JUDGE_PROMPTS",
     "DOC-ad-set-mapping-and-ab-test-v1",
@@ -470,6 +479,11 @@
   "overview": [
     "DOC-service-flow"
   ],
+  "p2-stability": [
+    "DOC-CHECKLIST",
+    "DOC-CONTEXT",
+    "DOC-PLAN"
+  ],
   "plans": [
     "DOC-phase3-quantum-walkthrough"
   ],
@@ -499,6 +513,12 @@
   ],
   "team": [
     "DOC-Aurora5_토론시스템_안내문"
+  ],
+  "entries": [
+    "DOC-pr-12"
+  ],
+  "_raw": [
+    "DOC-README"
   ],
   "2026-02-01": [
     "DOC-20260131_파크_2d_기술지원",

@@ -15,6 +15,7 @@ const analysisEngine = require("./services/analysisEngine");
 let envValidator = null;
 let exportPipelineStatus = null;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+const IS_SERVERLESS = !!(process.env.VERCEL || process.env.NOW_REGION || process.env.AWS_LAMBDA_FUNCTION_NAME);
 try {
   envValidator = require("./utils/envValidator");
   const validationResult = envValidator.validateEnv({ failFast: IS_PRODUCTION });
@@ -36,7 +37,8 @@ try {
 // ═══════════════════════════════════════════════════════════
 const OPS_SLACK_WEBHOOK = process.env.OPS_SLACK_WEBHOOK || process.env.SLACK_WEBHOOK_URL;
 if (!OPS_SLACK_WEBHOOK) {
-  if (IS_PRODUCTION) {
+  // Serverless(Vercel)에서는 process.exit(1) 금지 — 함수 즉시 크래시 유발
+  if (IS_PRODUCTION && !IS_SERVERLESS) {
     console.error('');
     console.error('╔══════════════════════════════════════════════════════════════╗');
     console.error('║  💀 FATAL: OPS_SLACK_WEBHOOK 미설정                          ║');
@@ -50,7 +52,7 @@ if (!OPS_SLACK_WEBHOOK) {
     process.exit(1);
   } else {
     console.warn('⚠️  OPS_SLACK_WEBHOOK 미설정 - Slack 운영 알림 비활성화');
-    console.warn('   프로덕션에서는 이 변수 없이 배포가 차단됩니다.');
+    if (IS_SERVERLESS) console.warn('   [Serverless] process.exit 스킵 — degraded 모드로 계속 실행');
   }
 }
 
@@ -427,6 +429,15 @@ try {
   console.error("❌ Hero8 영상 라우터 로드 실패:", error.message);
 }
 
+// VideoJob 오케스트레이터 라우터 로딩 (AIL-2026-0219-VID-003)
+let videoJobRoutes = null;
+try {
+  videoJobRoutes = require("./routes/videoJobRoutes");
+  console.log("✅ VideoJob 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ VideoJob 라우터 로드 실패:", error.message);
+}
+
 // 기적 금고 (Finance) 라우터 로딩
 let financeRoutes = null;
 try {
@@ -620,6 +631,24 @@ app.use(
 app.options("*", (req, res) => res.sendStatus(204));
 
 // ═══════════════════════════════════════════════════════════════════════════
+// /healthz — 절대 500 반환 금지, 어떤 의존성도 호출하지 않음
+// ═══════════════════════════════════════════════════════════════════════════
+app.get('/healthz', (req, res) => {
+  try {
+    return res.status(200).json({
+      status: 'ok',
+      serverless: IS_SERVERLESS,
+      node: process.version,
+      uptimeSec: Math.floor(process.uptime()),
+      ts: new Date().toISOString(),
+      commit: process.env.VERCEL_GIT_COMMIT_SHA || process.env.GIT_SHA || 'unknown'
+    });
+  } catch (e) {
+    return res.status(200).json({ status: 'degraded', message: String(e && e.message || e) });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
 // onrender.com → app.dailymiracles.kr 리다이렉트 (HTML 페이지만)
 // API 요청은 하위 호환성을 위해 리다이렉트하지 않음
 // ═══════════════════════════════════════════════════════════════════════════
@@ -808,18 +837,63 @@ if (String(process.env.REQUEST_LOG || "1") === "1") {
 global.latestStore = global.latestStore || { story: null };
 const SERVER_STARTED_AT = new Date().toISOString();
 
-// ---------- Stability Score (P2.3) ----------
+// ---------- Stability Score (P2.3) — Safe Health Endpoint ----------
+// 절대 500 반환 금지: 어떤 서비스가 실패해도 200 (ok | degraded)
 app.get("/healthz", (_req, res) => {
-  if (!stabilityService) {
-    return res.status(503).json({
-      success: false,
-      error: "stability_unavailable",
-      message: "Stability Score 서비스가 로드되지 않았습니다",
+  const startedAt = Date.now();
+  try {
+    const checks = {};
+    let degraded = false;
+
+    // 1) Stability Score (선택적)
+    try {
+      if (stabilityService) {
+        const h = stabilityService.getHealthz();
+        checks.stability = { status: h.status, score: h.score };
+        if (h.status === 'critical') degraded = true;
+      } else {
+        degraded = true;
+        checks.stability = { status: 'unavailable' };
+      }
+    } catch (e) {
+      degraded = true;
+      checks.stability = { status: 'error', message: e.message };
+    }
+
+    // 2) Metrics 상태 (throw 금지)
+    try {
+      const metricsService = require('./services/metricsService');
+      const m = metricsService.getMetrics();
+      checks.metrics = { date: m.date, wishes: m.wishes.total };
+    } catch (e) {
+      checks.metrics = { status: 'fail', error: e.message };
+    }
+
+    // 3) Slack Webhook 존재 여부만 (호출 금지)
+    checks.slack = process.env.OPS_SLACK_WEBHOOK ? 'configured' : 'missing';
+
+    // 4) 런타임 정보
+    checks.runtime = {
+      node: process.version,
+      uptimeSec: Math.floor(process.uptime()),
+      serverless: !!(process.env.VERCEL || process.env.NOW_REGION || process.env.AWS_LAMBDA_FUNCTION_NAME)
+    };
+
+    return res.status(200).json({
+      status: degraded ? 'degraded' : 'ok',
+      durationMs: Date.now() - startedAt,
+      timestamp: new Date().toISOString(),
+      checks
+    });
+  } catch (fatal) {
+    // 최후 방어: 절대 500 내지 않음
+    return res.status(200).json({
+      status: 'degraded',
+      fatal: true,
+      message: fatal.message,
+      timestamp: new Date().toISOString()
     });
   }
-  const healthz = stabilityService.getHealthz();
-  const httpStatus = healthz.status === 'critical' ? 500 : 200;
-  res.status(httpStatus).json(healthz);
 });
 
 // ---------- Readiness Probe (no DB) ----------
@@ -1504,6 +1578,14 @@ if (hero8Routes) {
   console.warn("⚠️ Hero8 영상 라우터 로드 실패 - 라우트 미등록");
 }
 
+// ---------- VideoJob 오케스트레이터 Routes (/api/video/job) ----------
+if (videoJobRoutes) {
+  app.use("/api/video/job", videoJobRoutes);
+  console.log("✅ VideoJob 라우터 등록 완료 (/api/video/job)");
+} else {
+  console.warn("⚠️ VideoJob 라우터 로드 실패 - 라우트 미등록");
+}
+
 // ---------- 기적 금고 Finance Routes (/api/finance) ----------
 if (financeRoutes) {
   app.use("/api/finance", financeRoutes);
@@ -1959,7 +2041,10 @@ app.get("/api/story/latest", (_req, res) => {
 
 // ---------- Feedback System ----------
 const fs = require("fs");
-const FEEDBACK_FILE = path.join(__dirname, "feedback.json");
+const IS_SERVERLESS_ENV = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const FEEDBACK_FILE = IS_SERVERLESS_ENV
+  ? path.join('/tmp', 'feedback.json')
+  : path.join(__dirname, "feedback.json");
 
 // 피드백 저장
 app.post("/api/feedback", (req, res) => {
@@ -1980,18 +2065,23 @@ app.post("/api/feedback", (req, res) => {
 
     // 기존 피드백 로드 (없으면 빈 배열)
     let feedbacks = [];
-    if (fs.existsSync(FEEDBACK_FILE)) {
-      const content = fs.readFileSync(FEEDBACK_FILE, "utf-8");
-      feedbacks = JSON.parse(content);
-    }
+    try {
+      if (fs.existsSync(FEEDBACK_FILE)) {
+        const content = fs.readFileSync(FEEDBACK_FILE, "utf-8");
+        feedbacks = JSON.parse(content);
+      }
+    } catch (_) { /* 읽기 실패 시 빈 배열 유지 */ }
 
     // 새 피드백 추가
     feedbacks.push(feedback);
 
     // 파일에 저장
-    fs.writeFileSync(FEEDBACK_FILE, JSON.stringify(feedbacks, null, 2), "utf-8");
-
-    console.log(`✅ Feedback saved (total: ${feedbacks.length})`);
+    try {
+      fs.writeFileSync(FEEDBACK_FILE, JSON.stringify(feedbacks, null, 2), "utf-8");
+      console.log(`✅ Feedback saved (total: ${feedbacks.length})`);
+    } catch (writeErr) {
+      console.warn('[Feedback] 파일 저장 실패 (로그만 기록):', writeErr.message);
+    }
 
     return res.status(200).json({
       success: true,
@@ -2117,7 +2207,7 @@ function sendCrashAlert(title, detail) {
     ],
   };
   if (slackHeartbeatService) {
-    return slackHeartbeatService.sendSlackMessage(msg).catch(() => {});
+    return slackHeartbeatService.sendSlackMessage(msg).catch(() => { });
   }
   return Promise.resolve();
 }

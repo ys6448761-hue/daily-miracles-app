@@ -108,6 +108,9 @@ test-*.json
 artifacts/
 .claude/settings.local.json
 output/
+# VID 샘플 테스트 증거물 (커밋 금지 — meta 요약만 기록)
+output/_vid-sample-test/
+output/_vid-docker-test/
 docs/raw/conversations/
 services/maltbot/
 routes/maltbotRoutes.js

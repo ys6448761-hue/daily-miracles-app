@@ -52,6 +52,15 @@ const system = {
 };
 
 // ═══════════════════════════════════════════════════════════
+// 영상 자동화 토글 (AIL-2026-0219-VID-003, 모두 기본 OFF)
+// ═══════════════════════════════════════════════════════════
+const video = {
+  VIDEO_JOB_ORCHESTRATOR: process.env.VIDEO_JOB_ORCHESTRATOR === 'true',
+  VIDEO_KOREAN_SUBTITLE:  process.env.VIDEO_KOREAN_SUBTITLE === 'true',
+  VIDEO_CIX_SCORING:      process.env.VIDEO_CIX_SCORING === 'true',
+};
+
+// ═══════════════════════════════════════════════════════════
 // 헬퍼 함수
 // ═══════════════════════════════════════════════════════════
 
@@ -78,10 +87,20 @@ function getEnabledWuTypes() {
  * 전체 플래그 상태 반환 (ops/health check용)
  * @returns {Object}
  */
+/**
+ * 영상 자동화 플래그 확인
+ * @param {string} flag - VIDEO_JOB_ORCHESTRATOR 등
+ * @returns {boolean}
+ */
+function isVideoEnabled(flag) {
+  return video[flag] === true;
+}
+
 function getStatus() {
   return {
     wu,
     system,
+    video,
     enabled_wu_types: getEnabledWuTypes(),
     total_wu_types: Object.keys(wu).length,
     enabled_wu_count: getEnabledWuTypes().length,
@@ -91,7 +110,9 @@ function getStatus() {
 module.exports = {
   wu,
   system,
+  video,
   isWuEnabled,
+  isVideoEnabled,
   getEnabledWuTypes,
   getStatus,
 };

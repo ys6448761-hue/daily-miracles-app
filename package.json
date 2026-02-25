@@ -31,7 +31,18 @@
     "migrate:deploy": "npx prisma migrate deploy --schema=prisma/schema.prisma",
     "db:push": "npx prisma db push --schema=prisma/schema.prisma",
     "start:console": "node server.js",
-    "test:quotes:compare": "node compare-quotes.js quotes_before.json quotes_after.json"
+    "test:quotes:compare": "node compare-quotes.js quotes_before.json quotes_after.json",
+    "test:videoJob:p1": "node tests/videoJob/videoJob-phase1-gate.js",
+    "test:videoJob:p2": "node tests/videoJob/videoJob-phase2-gate.js",
+    "test:videoJob:p3": "node tests/videoJob/videoJob-phase3-gate.js",
+    "test:videoJob:p4": "node tests/videoJob/videoJob-phase4-gate.js",
+    "test:videoJob:p5": "node tests/videoJob/videoJob-phase5-gate.js",
+    "test:videoJob:p6": "node tests/videoJob/videoJob-phase6-gate.js",
+    "test:videoJob": "node tests/videoJob/videoJob-phase1-gate.js && node tests/videoJob/videoJob-phase2-gate.js && node tests/videoJob/videoJob-phase3-gate.js && node tests/videoJob/videoJob-phase4-gate.js && node tests/videoJob/videoJob-phase5-gate.js && node tests/videoJob/videoJob-phase6-gate.js",
+    "test:videoJob:staging": "node scripts/ops/staging-videojob-check.js",
+    "test:videoJob:regression": "node scripts/demo-ad-creative.js && node scripts/ssot-video-regression.js",
+    "test:videoJob:sample": "node scripts/ops/vid-sample-test.js",
+    "test:videoJob:docker": "bash scripts/ops/docker-vid-sample-test.sh"
   },
   "engines": {
     "node": "20.x"
@@ -41,6 +52,7 @@
     "@prisma/client": "^5.22.0",
     "@sendgrid/mail": "^8.1.6",
     "@sparticuz/chromium": "^131.0.1",
+    "adm-zip": "^0.5.16",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "archiver": "^6.0.2",

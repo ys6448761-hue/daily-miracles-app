@@ -30,19 +30,26 @@ class Packager {
 
   /**
    * 자막 파일 저장
-   * @param {Object} subtitles - { txt, srt, json }
+   * @param {Object} subtitles - { txt, srt, json, ass? }
    * @param {string} outputDir - 출력 디렉토리
    */
   async saveSubtitles(subtitles, outputDir) {
     const subtitlesDir = path.join(outputDir, 'subtitles');
 
-    await Promise.all([
+    const writes = [
       fs.writeFile(path.join(subtitlesDir, 'subtitles.txt'), subtitles.txt, 'utf-8'),
       fs.writeFile(path.join(subtitlesDir, 'subtitles.srt'), subtitles.srt, 'utf-8'),
-      fs.writeFile(path.join(subtitlesDir, 'subtitles.json'), JSON.stringify(subtitles.json, null, 2), 'utf-8')
-    ]);
+      fs.writeFile(path.join(subtitlesDir, 'subtitles.json'), JSON.stringify(subtitles.json, null, 2), 'utf-8'),
+    ];
 
-    console.log(`  📝 자막 파일 저장 완료`);
+    if (subtitles.ass) {
+      writes.push(
+        fs.writeFile(path.join(subtitlesDir, 'subtitles.ass'), subtitles.ass, 'utf-8')
+      );
+    }
+
+    await Promise.all(writes);
+    console.log(`  📝 자막 파일 저장 완료${subtitles.ass ? ' (+ASS)' : ''}`);
   }
 
   /**
@@ -56,7 +63,8 @@ class Packager {
       storyCard,
       keyframes,
       video,
-      createdAt
+      createdAt,
+      hasAss,
     } = data;
 
     const meta = {
@@ -105,7 +113,8 @@ class Packager {
       subtitles: {
         txt: 'subtitles/subtitles.txt',
         srt: 'subtitles/subtitles.srt',
-        json: 'subtitles/subtitles.json'
+        json: 'subtitles/subtitles.json',
+        ...(hasAss && { ass: 'subtitles/subtitles.ass' }),
       },
 
       // 다운로드 URL (상대 경로)
@@ -176,6 +185,38 @@ class Packager {
   }
 
   /**
+   * ZIP 내 UTF-8 파일 무결성 검증 (in-memory 추출 → 바이트 비교)
+   * @param {string} zipPath - ZIP 파일 경로
+   * @param {Object} originals - { entryName: originalContent } 맵
+   * @throws {Error} ZIP_UTF8_CORRUPTION — 바이트 불일치 시
+   */
+  async verifyZipUtf8(zipPath, originals) {
+    const AdmZip = require('adm-zip');
+    const zip = new AdmZip(zipPath);
+    const entries = zip.getEntries();
+
+    for (const [entryName, originalContent] of Object.entries(originals)) {
+      const entry = entries.find(e => e.entryName === entryName);
+      if (!entry) continue; // optional file
+
+      const extracted = entry.getData();
+      const originalBuf = Buffer.from(originalContent, 'utf-8');
+
+      if (Buffer.compare(extracted, originalBuf) !== 0) {
+        throw Object.assign(
+          new Error(
+            `ZIP UTF-8 corruption: ${entryName} ` +
+            `(extracted ${extracted.length}B vs original ${originalBuf.length}B)`
+          ),
+          { errorCode: 'ZIP_UTF8_CORRUPTION' }
+        );
+      }
+    }
+
+    console.log(`  ✅ ZIP UTF-8 무결성 검증 통과 (${Object.keys(originals).length}건)`);
+  }
+
+  /**
    * 전체 패키징 프로세스
    * @param {Object} params
    * @returns {Promise<Object>} 패키징 결과
@@ -192,6 +233,8 @@ class Packager {
 
     console.log(`\n📦 패키징 시작...`);
 
+    const hasAss = !!(subtitles && subtitles.ass);
+
     // 1. 자막 저장
     if (subtitles) {
       await this.saveSubtitles(subtitles, outputDir);
@@ -203,13 +246,35 @@ class Packager {
       storyCard,
       keyframes,
       video,
+      hasAss,
       createdAt: new Date().toISOString()
     }, outputDir);
 
     // 3. ZIP 생성
     const zipPath = await this.createZip(outputDir);
 
-    // 4. 결과 정리
+    // 4. ZIP UTF-8 무결성 검증 (in-memory 추출 → 바이트 비교)
+    const verifyTargets = {};
+    const metaJson = JSON.stringify(meta, null, 2);
+    verifyTargets['meta.json'] = metaJson;
+    if (subtitles && subtitles.srt) {
+      verifyTargets['subtitles/subtitles.srt'] = subtitles.srt;
+    }
+    if (subtitles && subtitles.ass) {
+      verifyTargets['subtitles/subtitles.ass'] = subtitles.ass;
+    }
+    await this.verifyZipUtf8(zipPath, verifyTargets);
+
+    // 5. 결과 정리
+    const subtitleFiles = {
+      txt: path.join(outputDir, 'subtitles', 'subtitles.txt'),
+      srt: path.join(outputDir, 'subtitles', 'subtitles.srt'),
+      json: path.join(outputDir, 'subtitles', 'subtitles.json'),
+    };
+    if (hasAss) {
+      subtitleFiles.ass = path.join(outputDir, 'subtitles', 'subtitles.ass');
+    }
+
     const result = {
       requestId,
       outputDir,
@@ -217,11 +282,7 @@ class Packager {
         video: path.join(outputDir, 'final.mp4'),
         meta: path.join(outputDir, 'meta.json'),
         zip: zipPath,
-        subtitles: {
-          txt: path.join(outputDir, 'subtitles', 'subtitles.txt'),
-          srt: path.join(outputDir, 'subtitles', 'subtitles.srt'),
-          json: path.join(outputDir, 'subtitles', 'subtitles.json')
-        },
+        subtitles: subtitleFiles,
         keyframes: keyframes.filter(k => k.success).map(k => k.path)
       },
       urls: meta.download_urls,

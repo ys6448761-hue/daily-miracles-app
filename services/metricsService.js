@@ -14,9 +14,22 @@
 
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
-// 메트릭스 저장 경로
-const METRICS_DIR = path.join(__dirname, '..', 'data', 'metrics');
+// ── serverless 감지 ──
+const IS_SERVERLESS = !!(
+    process.env.VERCEL ||
+    process.env.NOW_REGION ||
+    process.env.AWS_LAMBDA_FUNCTION_NAME
+);
+
+// ── persistence 플래그: serverless에서는 파일 쓰기 경로 진입 자체를 차단 ──
+const METRICS_PERSIST = !IS_SERVERLESS;
+
+// 메트릭스 저장 경로 (serverless에서는 사용되지 않음)
+const METRICS_DIR = METRICS_PERSIST
+    ? path.join(__dirname, '..', 'data', 'metrics')
+    : path.join(os.tmpdir(), 'daily-miracles', 'metrics');
 const DAILY_METRICS_FILE = () => path.join(METRICS_DIR, `metrics-${getToday()}.json`);
 
 // 인메모리 메트릭스 (서버 시작 후 누적)
@@ -76,11 +89,18 @@ function getToday() {
 }
 
 /**
- * 디렉토리 확인 및 생성
+ * 디렉토리 안전 생성 — METRICS_PERSIST=false면 진입하지 않음
  */
 function ensureDir() {
-    if (!fs.existsSync(METRICS_DIR)) {
-        fs.mkdirSync(METRICS_DIR, { recursive: true });
+    if (!METRICS_PERSIST) return false;
+    try {
+        if (!fs.existsSync(METRICS_DIR)) {
+            fs.mkdirSync(METRICS_DIR, { recursive: true });
+        }
+        return true;
+    } catch (err) {
+        console.warn('[Metrics] 디렉토리 생성 실패 (인메모리 계속):', err.message);
+        return false;
     }
 }
 
@@ -109,12 +129,9 @@ function checkDateReset() {
 }
 
 /**
- * 메트릭스 파일 저장
+ * 메트릭스 파일 저장 (서버리스 환경에서는 skip)
  */
 function saveMetrics() {
-    ensureDir();
-    const filepath = DAILY_METRICS_FILE();
-
     // 평균 ACK 시간 계산
     if (todayMetrics.ack.sent > 0) {
         todayMetrics.ack.avgTimeMs = Math.round(todayMetrics.ack.totalTimeMs / todayMetrics.ack.sent);
@@ -127,23 +144,34 @@ function saveMetrics() {
 
     todayMetrics.savedAt = new Date().toISOString();
 
-    fs.writeFileSync(filepath, JSON.stringify(todayMetrics, null, 2), 'utf-8');
-    console.log(`[Metrics] 저장됨: ${filepath}`);
+    if (!ensureDir()) return; // 서버리스이거나 mkdir 실패 시 인메모리만 유지
+
+    try {
+        const filepath = DAILY_METRICS_FILE();
+        fs.writeFileSync(filepath, JSON.stringify(todayMetrics, null, 2), 'utf-8');
+        console.log(`[Metrics] 저장됨: ${filepath}`);
+    } catch (err) {
+        console.warn('[Metrics] 파일 저장 실패 (인메모리 유지):', err.message);
+    }
 }
 
 /**
- * 메트릭스 로드 (서버 재시작 시)
+ * 메트릭스 로드 — persistence 비활성 시 진입 금지
  */
 function loadMetrics() {
-    ensureDir();
-    const filepath = DAILY_METRICS_FILE();
+    if (!METRICS_PERSIST) {
+        console.log('[Metrics] serverless 환경 — metrics persistence 비활성화 (인메모리 전용)');
+        return;
+    }
 
-    if (fs.existsSync(filepath)) {
-        try {
+    if (!ensureDir()) return;
+
+    const filepath = DAILY_METRICS_FILE();
+    try {
+        if (fs.existsSync(filepath)) {
             const content = fs.readFileSync(filepath, 'utf-8');
             const loaded = JSON.parse(content);
 
-            // 기존 데이터에 새 필드가 없으면 초기화
             todayMetrics = {
                 ...loaded,
                 wishes: {
@@ -159,9 +187,9 @@ function loadMetrics() {
             };
 
             console.log(`[Metrics] 로드됨: ${filepath}`);
-        } catch (e) {
-            console.error('[Metrics] 로드 실패:', e.message);
         }
+    } catch (e) {
+        console.warn('[Metrics] 로드 실패 (인메모리 모드):', e.message);
     }
 }
 
@@ -428,9 +456,9 @@ function generateDailyReport() {
    • 📝 메시지 미선택: ${m.wishes.noMessage}건
 
 🚦 신호등 분포
-   • 🔴 RED: ${tl.red}건 (${((tl.red/total)*100).toFixed(1)}%)
-   • 🟡 YELLOW: ${tl.yellow}건 (${((tl.yellow/total)*100).toFixed(1)}%)
-   • 🟢 GREEN: ${tl.green}건 (${((tl.green/total)*100).toFixed(1)}%)
+   • 🔴 RED: ${tl.red}건 (${((tl.red / total) * 100).toFixed(1)}%)
+   • 🟡 YELLOW: ${tl.yellow}건 (${((tl.yellow / total) * 100).toFixed(1)}%)
+   • 🟢 GREEN: ${tl.green}건 (${((tl.green / total) * 100).toFixed(1)}%)
 
 📤 알림톡 발송
    • 발송: ${m.alimtalk.sent}건
@@ -451,8 +479,8 @@ function generateDailyReport() {
 
 ⚠️ 에러 Top 3
 ${m.computed.errorTop3.length > 0
-    ? m.computed.errorTop3.map((e, i) => `   ${i+1}. ${e.type}: ${e.count}건`).join('\n')
-    : '   (에러 없음)'}
+            ? m.computed.errorTop3.map((e, i) => `   ${i + 1}. ${e.type}: ${e.count}건`).join('\n')
+            : '   (에러 없음)'}
 
 ✨ VIP (Human Touch)
    • VIP 태깅: ${m.vip.total}건
@@ -470,13 +498,17 @@ ${m.computed.errorTop3.length > 0
 `;
 }
 
-// 초기화 시 기존 메트릭스 로드
-loadMetrics();
+// 초기화 시 기존 메트릭스 로드 (서버리스에서는 skip)
+if (!IS_SERVERLESS) {
+    loadMetrics();
 
-// 5분마다 자동 저장
-setInterval(() => {
-    saveMetrics();
-}, 5 * 60 * 1000);
+    // 5분마다 자동 저장 (서버리스에서는 interval 불필요)
+    setInterval(() => {
+        saveMetrics();
+    }, 5 * 60 * 1000);
+} else {
+    console.log('[Metrics] 서버리스 환경 — 인메모리 모드 (interval/load skip)');
+}
 
 module.exports = {
     recordWishInbox,

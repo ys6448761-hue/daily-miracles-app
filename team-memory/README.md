@@ -1,3 +1,20 @@
+## 🔁 코미 세션 시작 루틴 (필수 5단계)
+
+1. docs/MASTER-CONTROL.md 열어 현재 Top3 / Blockers 확인
+2. docs/_raw/ 폴더 전체 스캔 (신규 RAW 존재 여부 체크)
+3. PROMOTION-RULES.md 기준으로 승격 대상 분류 (L0→L1/L2→L3)
+4. L3 승격 시 MASTER-CONTROL 링크 업데이트
+## 🔁 코미 세션 시작 루틴 (필수 5단계)
+
+1. docs/MASTER-CONTROL.md 열어 현재 Top3 / Blockers 확인
+2. docs/_raw/ 폴더 전체 스캔 (신규 RAW 존재 여부 체크)
+3. PROMOTION-RULES.md 기준으로 승격 대상 분류 (L0→L1/L2→L3)
+4. L3 승격 시 MASTER-CONTROL 링크 업데이트
+5. 공식 결정 발생 시에만 team-memory entries에 기록
+
+⚠️ MASTER-CONTROL에 없는 문서는 팀 공식 문서로 간주하지 않는다.
+
+
 # Team Memory
 
 > Aurora5 팀의 의사결정과 맥락을 기록하는 SSOT 저장소
@@ -64,3 +81,7 @@ status: "done"                  # 선택: open/in_progress/done/archived
 - `team-memory-lint.yml` - 스키마 검증
 - `team-memory-digest.yml` - 다이제스트 생성
 - `ail-gate.yml` - PR AIL 체크
+## 운영 원칙
+
+- team-memory는 "결정"과 "정책 변경"만 기록한다.
+- 일일 운영 상태는 docs/MASTER-CONTROL.md에서 관리한다.

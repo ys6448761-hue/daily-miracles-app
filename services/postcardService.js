@@ -21,8 +21,12 @@ const INFO_BAND = { top: 904, height: 120 };
  * 출력 디렉토리 보장
  */
 function ensurePostcardDir() {
-  if (!fs.existsSync(POSTCARD_DIR)) {
-    fs.mkdirSync(POSTCARD_DIR, { recursive: true });
+  try {
+    if (!fs.existsSync(POSTCARD_DIR)) {
+      fs.mkdirSync(POSTCARD_DIR, { recursive: true });
+    }
+  } catch (err) {
+    console.warn('[Postcard] 디렉토리 생성 실패:', err.message);
   }
 }
 
