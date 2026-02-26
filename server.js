@@ -1044,7 +1044,14 @@ app.post("/api/metrics/snapshot", async (_req, res) => {
 });
 
 // ---------- Admin: DB Migration Runner ----------
-app.post("/api/admin/run-migration", verifyAdmin, async (req, res) => {
+app.post("/api/admin/run-migration", (req, res, next) => {
+  const token = req.headers['x-admin-token'] || req.query.token;
+  const expected = process.env.ADMIN_TOKEN;
+  if (!expected || token !== expected) {
+    return res.status(403).json({ success: false, error: 'forbidden' });
+  }
+  next();
+}, async (req, res) => {
   const { migration } = req.body; // e.g. "013", "022"
   const allowed = ["013", "022"];
 
