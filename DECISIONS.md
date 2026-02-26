@@ -11,6 +11,9 @@
 | D-003 | Prisma read-only layer (Option C) | 기존 pg 389 API 무변경, 공개 뷰 전용 |
 | D-004 | Plaza DB 3컬럼 선반영 | is_public, is_featured, hidden_at |
 | D-005 | docs/ 7폴더 재구성 | SSOT 원칙, 문서 체계화 |
+| S-001 | 소원꿈터 2주 MVP | 속도 중심 출시 |
+| S-002 | 결제 제외 | 초기 복잡도 제거 |
+| S-003 | 광장 → 팬덤 핵심 | 행동 중심 설계 |
 
 ## 상세 결정문
 

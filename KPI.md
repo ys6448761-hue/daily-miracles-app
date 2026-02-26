@@ -1,33 +1,23 @@
-# KPI Dashboard
+# KPI & Event Dictionary (소원꿈터 v0)
 
-> 핵심 성과 지표
-
-## 서비스 KPI
-
-| 지표 | 목표 | 현재 | 상태 |
-|------|------|------|------|
-| 소원 접수 | - | 운영 중 | 🟢 |
-| ACK 발송 성공률 | 95%+ | TBD | 🟡 |
-| Tracking 응답률 (day7) | 30%+ | TBD | 🟡 |
-| 서버 가동률 | 99%+ | 운영 중 | 🟢 |
-
-## 기술 KPI
-
-| 지표 | 값 |
-|------|-----|
-| API 엔드포인트 | 389개 |
-| DB 테이블 | ~80개 |
-| 마이그레이션 | 23개 |
-| 외부 서비스 | 8개 연동 |
-
-## Gate 상태
-
-| Gate | 값 | 상태 |
-|------|-----|------|
-| APP_DISABLED | false | 🟢 정상 |
-| OUTBOUND_ENABLED | true | 🟢 발송 허용 |
-| PLAZA_ENABLED | false | 🟡 Coming Soon |
+## 🌟 North Star
+팬 행동 발생 (가입 → 게시글 작성 → 참여)
 
 ---
 
-*최종 업데이트: 2026-02-26*
+## 🎯 핵심 이벤트
+
+- sign_up
+- plaza_post_create
+- plaza_post_view
+- plaza_like_click
+- event_join
+- d1_return
+
+---
+
+## 📊 초기 목표 (2주)
+
+- 가입 → 글 작성 전환율 20%+
+- 좋아요 발생률 30%+
+- D1 재방문 25%+

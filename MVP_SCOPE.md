@@ -1,31 +1,33 @@
-# MVP Scope
+# 소원꿈터 MVP Scope (v1)
 
-> 하루하루의 기적 MVP 범위 정의
-
-## In Scope
-
-- 소원 접수 + 신호등 시스템 (RED/YELLOW/GREEN)
-- 기적지수 계산 (50-100점, 3경로)
-- ACK 알림톡 발송 (betawelcome)
-- 7일 응원 메시지
-- Tracking (day7/day30/day90) SMS 발송
-- 여수 기적여행 견적
-- 소원놀이터 (playground)
-- 소원항해단 (harbor)
-
-## Out of Scope (Phase 2)
-
-- /dream 개인 대시보드
-- /w/:id-:slug 공개 소원 상세
-- /plaza 소원꿈터 광장
-- Prisma 전면 전환
-
-## Gate 조건
-
-- APP_DISABLED=false
-- OUTBOUND_ENABLED=true
-- PLAZA_ENABLED=false (Phase 2)
+## 🎯 목적
+팬이 "가입 → 글 작성 → 이벤트 참여"까지 1회 이상 행동하게 만든다.
 
 ---
 
-*최종 업데이트: 2026-02-26*
+## ✅ In Scope (MVP 포함)
+
+- 회원가입 / 로그인
+- 광장 게시글 작성 (텍스트)
+- 게시글 목록 / 상세 조회
+- 좋아요 1종
+- 이벤트/미션 1종 생성 및 참여
+
+---
+
+## ❌ Out of Scope (v2)
+
+- 결제/굿즈
+- 댓글
+- 이미지 업로드
+- 알림
+- 등급/포인트 시스템
+
+---
+
+## ✅ MVP 완료 기준
+
+- 10명 이상 테스트 가입
+- 30개 이상 게시글 생성
+- 20회 이상 좋아요 발생
+- D1 재방문 25% 이상
