@@ -93,7 +93,8 @@ class WishTrackingService {
             gem_type,
             want_message,
             privacy_agreed,
-            marketing_agreed
+            marketing_agreed,
+            image_filename
         } = data;
 
         const phoneHash = this.hashPhone(phone);
@@ -104,8 +105,9 @@ class WishTrackingService {
             INSERT INTO wish_entries (
                 name, phone, phone_hash, wish_text, wish_category,
                 miracle_index, traffic_light, energy_type, gem_type,
-                want_message, privacy_agreed, marketing_agreed, tracking_token
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+                want_message, privacy_agreed, marketing_agreed, tracking_token,
+                image_filename
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
             RETURNING *
         `;
 
@@ -113,7 +115,8 @@ class WishTrackingService {
             name, phone, phoneHash, wish_text, wishCategory,
             miracle_index, traffic_light, energy_type, gem_type,
             want_message || false, privacy_agreed || false, marketing_agreed || false,
-            trackingToken
+            trackingToken,
+            image_filename || null
         ];
 
         try {
