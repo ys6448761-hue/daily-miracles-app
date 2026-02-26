@@ -58,6 +58,11 @@ if (!OPS_SLACK_WEBHOOK) {
 
 const app = express();
 
+// ═══════════════════════════════════════════════════════════
+// Open Gate — 릴리즈 차단 게이트 (APP_DISABLED)
+// ═══════════════════════════════════════════════════════════
+app.use(require('./middleware/gateMiddleware'));
+
 // 메트릭스 서비스 로딩
 let metricsService = null;
 try {
@@ -722,6 +727,14 @@ app.use(requestIdMiddleware);
 if (stabilityService) {
   app.use(stabilityService.middleware());
 }
+
+// ---------- Plaza Gate ----------
+app.get('/plaza', (req, res) => {
+  if (process.env.PLAZA_ENABLED !== 'true') {
+    return res.send('소원꿈터 광장 Coming Soon');
+  }
+  res.sendFile(path.join(__dirname, 'public', 'plaza.html'));
+});
 
 // ---------- Static ----------
 // PR-5: Cache-Control 헤더 추가 (브라우저 캐싱 활성화)

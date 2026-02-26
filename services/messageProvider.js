@@ -141,6 +141,11 @@ function makeSensSignature(method, url, timestamp) {
  * SENS 알림톡 발송
  */
 async function sendSensAlimtalk(phone, templateVars = {}) {
+    // Outbound Gate — 실발송 차단
+    if (process.env.OUTBOUND_ENABLED !== 'true') {
+        console.log('[SAFE MODE] outbound blocked — sendSensAlimtalk skipped');
+        return { success: false, skipped: true, reason: 'OUTBOUND_ENABLED=false' };
+    }
     const messageId = generateMessageId();
     const normalizedPhone = normalizePhone(phone);
 
@@ -298,6 +303,11 @@ ${APP_BASE_URL}/r/${token}
  * SENS SMS 발송 (failover)
  */
 async function sendSensSMS(phone, text) {
+    // Outbound Gate — 실발송 차단
+    if (process.env.OUTBOUND_ENABLED !== 'true') {
+        console.log('[SAFE MODE] outbound blocked — sendSensSMS skipped');
+        return { success: false, skipped: true, reason: 'OUTBOUND_ENABLED=false' };
+    }
     const messageId = generateMessageId();
     const normalizedPhone = normalizePhone(phone);
 

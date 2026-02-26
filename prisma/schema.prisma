@@ -1,0 +1,73 @@
+// Prisma Read-Only Layer — 공개 뷰 전용 (Option C)
+// 기존 pg 코드는 건드리지 않음. /dream, /w/:id-:slug 라우트 전용.
+// prisma migrate 실행 금지 — DB 스키마는 SQL 마이그레이션이 관리.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model WishEntry {
+  id            Int       @id @default(autoincrement())
+  name          String?   @db.VarChar(100)
+  wishText      String    @map("wish_text")
+  wishCategory  String?   @map("wish_category") @db.VarChar(50)
+  miracleIndex  Int?      @map("miracle_index")
+  trafficLight  String?   @map("traffic_light") @db.VarChar(10)
+  energyType    String?   @map("energy_type") @db.VarChar(20)
+  gemType       String?   @map("gem_type") @db.VarChar(20)
+  imageFilename String?   @map("image_filename") @db.VarChar(255)
+  trackingToken String?   @unique @map("tracking_token") @db.VarChar(32)
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  // Plaza 3컬럼 (023_plaza_columns.sql)
+  isPublic      Boolean   @default(false) @map("is_public")
+  isFeatured    Boolean   @default(false) @map("is_featured")
+  hiddenAt      DateTime? @map("hidden_at")
+
+  trackingRequests WishTrackingRequest[]
+
+  @@map("wish_entries")
+}
+
+model SowonProfile {
+  id        String   @id @default(uuid()) @db.Uuid
+  phoneHash String   @unique @map("phone_hash") @db.VarChar(128)
+  nickname  String?  @db.VarChar(50)
+  badges    Json?    @default("[]")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("sowon_profiles")
+}
+
+model WishTrackingRequest {
+  id            Int       @id @default(autoincrement())
+  wishEntryId   Int       @map("wish_entry_id")
+  trackingStage String    @map("tracking_stage") @db.VarChar(20)
+  status        String    @default("sent") @db.VarChar(20)
+  responseToken String?   @unique @map("response_token") @db.VarChar(32)
+  sentAt        DateTime  @default(now()) @map("sent_at")
+
+  wishEntry WishEntry              @relation(fields: [wishEntryId], references: [id])
+  response  WishTrackingResponse?
+
+  @@map("wish_tracking_requests")
+}
+
+model WishTrackingResponse {
+  id                Int      @id @default(autoincrement())
+  trackingRequestId Int      @unique @map("tracking_request_id")
+  realizedStatus    String?  @map("realized_status") @db.VarChar(20)
+  realizedPercent   Int?     @map("realized_percent")
+  whatHelped        String?  @map("what_helped")
+  satisfaction      Int?
+  respondedAt       DateTime @default(now()) @map("responded_at")
+
+  trackingRequest WishTrackingRequest @relation(fields: [trackingRequestId], references: [id])
+
+  @@map("wish_tracking_responses")
+}
