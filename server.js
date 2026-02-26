@@ -1069,6 +1069,9 @@ app.post("/api/admin/test-wish-entry", adminTokenGuard, async (req, res) => {
     const name = req.body.name || "테스트소원이";
     const image_filename = req.body.image_filename || null;
 
+    const crypto = require("crypto");
+    const phoneHash = crypto.createHash("sha256").update(phone).digest("hex");
+
     const result = await pool.query(`
       INSERT INTO wish_entries (
         name, phone, phone_hash, wish_text, wish_category,
@@ -1076,15 +1079,15 @@ app.post("/api/admin/test-wish-entry", adminTokenGuard, async (req, res) => {
         want_message, privacy_agreed, marketing_agreed,
         tracking_token, image_filename, created_at
       ) VALUES (
-        $1, $2, encode(sha256($2::bytea), 'hex'),
+        $1, $2, $3,
         '건강하고 행복한 하루를 보내고 싶어요', 'health',
         85, 'GREEN', 'calm', 'sapphire',
         TRUE, TRUE, TRUE,
         substr(md5(random()::text), 1, 16),
-        $3,
+        $4,
         NOW() - INTERVAL '8 days'
       ) RETURNING id, name, phone, tracking_token, image_filename, created_at
-    `, [name, phone, image_filename]);
+    `, [name, phone, phoneHash, image_filename]);
 
     const entry = result.rows[0];
     console.log(`[Admin] Test wish entry created: ID=${entry.id}`);
