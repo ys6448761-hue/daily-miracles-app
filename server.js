@@ -1043,6 +1043,76 @@ app.post("/api/metrics/snapshot", async (_req, res) => {
   }
 });
 
+// ---------- Admin: DB Migration Runner ----------
+app.post("/api/admin/run-migration", verifyAdmin, async (req, res) => {
+  const { migration } = req.body; // e.g. "013", "022"
+  const allowed = ["013", "022"];
+
+  if (!migration || !allowed.includes(migration)) {
+    return res.status(400).json({
+      success: false,
+      error: `migration must be one of: ${allowed.join(", ")}`
+    });
+  }
+
+  const { Pool } = require("pg");
+  const fs = require("fs");
+  const path = require("path");
+
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) {
+    return res.status(503).json({ success: false, error: "DATABASE_URL not set" });
+  }
+
+  const pool = new Pool({
+    connectionString: dbUrl,
+    ssl: dbUrl.includes("localhost") ? false : { rejectUnauthorized: false }
+  });
+
+  try {
+    const sqlFile = path.join(__dirname, "database", "migrations", `${migration}_*.sql`);
+    // resolve glob manually
+    const migrationsDir = path.join(__dirname, "database", "migrations");
+    const files = fs.readdirSync(migrationsDir).filter(f => f.startsWith(`${migration}_`) && f.endsWith(".sql"));
+
+    if (files.length === 0) {
+      return res.status(404).json({ success: false, error: `No SQL file found for migration ${migration}` });
+    }
+
+    const sqlPath = path.join(migrationsDir, files[0]);
+    const sql = fs.readFileSync(sqlPath, "utf8");
+
+    console.log(`[Migration] Running ${files[0]}...`);
+    await pool.query(sql);
+    console.log(`[Migration] ${files[0]} completed`);
+
+    // verify
+    let verification = {};
+    if (migration === "013") {
+      const tables = await pool.query(`
+        SELECT table_name FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_name LIKE 'wish_%'
+        ORDER BY table_name
+      `);
+      verification = { tables: tables.rows.map(r => r.table_name) };
+    } else if (migration === "022") {
+      const col = await pool.query(`
+        SELECT column_name, data_type, character_maximum_length
+        FROM information_schema.columns
+        WHERE table_name = 'wish_entries' AND column_name = 'image_filename'
+      `);
+      verification = { column: col.rows[0] || "NOT FOUND" };
+    }
+
+    res.json({ success: true, migration: files[0], verification });
+  } catch (err) {
+    console.error(`[Migration] Failed:`, err.message);
+    res.status(500).json({ success: false, error: err.message });
+  } finally {
+    await pool.end();
+  }
+});
+
 // ---------- Ops Agent: Full Health Check (DEC-006) ----------
 app.get("/api/admin/health/full", verifyAdmin, async (_req, res) => {
   if (!opsAgentService) {
