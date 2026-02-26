@@ -1,12 +1,12 @@
 ## 🔁 코미 세션 시작 루틴 (필수 5단계)
 
-1. docs/MASTER-CONTROL.md 열어 현재 Top3 / Blockers 확인
+1. docs/01-operations/MASTER-CONTROL.md 열어 현재 Top3 / Blockers 확인
 2. docs/_raw/ 폴더 전체 스캔 (신규 RAW 존재 여부 체크)
-3. PROMOTION-RULES.md 기준으로 승격 대상 분류 (L0→L1/L2→L3)
+3. docs/01-operations/PROMOTION-RULES.md 기준으로 승격 대상 분류 (L0→L1/L2→L3)
 4. L3 승격 시 MASTER-CONTROL 링크 업데이트
 ## 🔁 코미 세션 시작 루틴 (필수 5단계)
 
-1. docs/MASTER-CONTROL.md 열어 현재 Top3 / Blockers 확인
+1. docs/01-operations/MASTER-CONTROL.md 열어 현재 Top3 / Blockers 확인
 2. docs/_raw/ 폴더 전체 스캔 (신규 RAW 존재 여부 체크)
 3. PROMOTION-RULES.md 기준으로 승격 대상 분류 (L0→L1/L2→L3)
 4. L3 승격 시 MASTER-CONTROL 링크 업데이트
@@ -84,4 +84,4 @@ status: "done"                  # 선택: open/in_progress/done/archived
 ## 운영 원칙
 
 - team-memory는 "결정"과 "정책 변경"만 기록한다.
-- 일일 운영 상태는 docs/MASTER-CONTROL.md에서 관리한다.
+- 일일 운영 상태는 docs/01-operations/MASTER-CONTROL.md에서 관리한다.
