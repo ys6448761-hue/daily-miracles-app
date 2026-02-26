@@ -336,12 +336,20 @@ router.post('/batch/send', async (req, res) => {
                     }
                 }
 
+                // betawelcome 템플릿 본문 (NCP 등록 원문과 100% 일치 필수)
+                const safeName = target.name || '소원이';
+                const betawelcomeContent = `${safeName}님, 환영합니다! 🎉\n\n하루하루의 기적 베타 테스터가 되어주셔서 감사합니다.\n\n7일간 매일 아침(8시), 저녁(8시)에 맞춤 응원 메시지를 보내드려요.\n\n내일 아침부터 시작됩니다! ✨\n\n궁금한 점이 있으시면 언제든 문의해주세요 😊\n\n- 하루하루의 기적 드림`;
+
                 const sendResult = await messageProvider.sendSensAlimtalk(
                     target.phone,
                     {
-                        name: target.name || '소원이',
-                        stage: getStageLabel(stage),
-                        url: responseUrl,
+                        templateCode: 'betawelcome',
+                        content: betawelcomeContent,
+                        buttons: [
+                            { type: 'WL', name: '나의 기적 보기', linkMobile: 'https://dailymiracles.kr/mypage', linkPc: 'https://dailymiracles.kr/mypage' },
+                            { type: 'WL', name: '고객센터', linkMobile: 'https://dailymiracles.kr/support', linkPc: 'https://dailymiracles.kr/support' }
+                        ],
+                        name: safeName,
                         image_url
                     }
                 );

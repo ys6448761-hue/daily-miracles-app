@@ -144,10 +144,13 @@ async function sendSensAlimtalk(phone, templateVars = {}) {
     const messageId = generateMessageId();
     const normalizedPhone = normalizePhone(phone);
 
+    // templateCode/content/buttons 오버라이드 지원 (tracking용 betawelcome 등)
+    const effectiveTemplateCode = templateVars.templateCode || SENS_TEMPLATE_CODE;
+
     console.log(`[SENS] 알림톡 발송 시작:`, {
         messageId,
         to: maskPhone(normalizedPhone),
-        templateCode: SENS_TEMPLATE_CODE,
+        templateCode: effectiveTemplateCode,
         channelId: SENS_CHANNEL_ID
     });
 
@@ -160,7 +163,7 @@ async function sendSensAlimtalk(phone, templateVars = {}) {
         return { success: false, reason: 'SENS API 키 미설정', messageId, status: MESSAGE_STATUS.SKIPPED };
     }
 
-    if (!SENS_TEMPLATE_CODE) {
+    if (!effectiveTemplateCode) {
         console.warn(`[SENS] 템플릿 코드 미설정 - 발송 스킵`);
         await logMessageSend(messageId, 'alimtalk', normalizedPhone, MESSAGE_STATUS.SKIPPED, {
             reason: '템플릿 코드 미설정'
@@ -170,7 +173,7 @@ async function sendSensAlimtalk(phone, templateVars = {}) {
 
     // pending 로그
     await logMessageSend(messageId, 'alimtalk', normalizedPhone, MESSAGE_STATUS.PENDING, {
-        templateCode: SENS_TEMPLATE_CODE,
+        templateCode: effectiveTemplateCode,
         vars: templateVars
     });
 
@@ -180,13 +183,13 @@ async function sendSensAlimtalk(phone, templateVars = {}) {
 
     const messagePayload = {
         to: normalizedPhone,
-        content: buildAlimtalkContent(templateVars),
-        buttons: templateVars.token ? [{
+        content: templateVars.content || buildAlimtalkContent(templateVars),
+        buttons: templateVars.buttons || (templateVars.token ? [{
             type: 'WL',
             name: '결과 확인하기',
             linkMobile: `${APP_BASE_URL}/r/${templateVars.token}`,
             linkPc: `${APP_BASE_URL}/r/${templateVars.token}`
-        }] : undefined,
+        }] : undefined),
         ...(templateVars.image_url ? {
             image: {
                 imageUrl: templateVars.image_url,
@@ -199,7 +202,7 @@ async function sendSensAlimtalk(phone, templateVars = {}) {
 
     const requestBody = {
         plusFriendId: SENS_CHANNEL_ID,
-        templateCode: SENS_TEMPLATE_CODE,
+        templateCode: effectiveTemplateCode,
         messages: [messagePayload]
     };
 
