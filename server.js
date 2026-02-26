@@ -1043,15 +1043,63 @@ app.post("/api/metrics/snapshot", async (_req, res) => {
   }
 });
 
-// ---------- Admin: DB Migration Runner ----------
-app.post("/api/admin/run-migration", (req, res, next) => {
+// ---------- Admin: ADMIN_TOKEN guard (reusable) ----------
+function adminTokenGuard(req, res, next) {
   const token = req.headers['x-admin-token'] || req.query.token;
   const expected = process.env.ADMIN_TOKEN;
   if (!expected || token !== expected) {
     return res.status(403).json({ success: false, error: 'forbidden' });
   }
   next();
-}, async (req, res) => {
+}
+
+// ---------- Admin: Insert test wish entry ----------
+app.post("/api/admin/test-wish-entry", adminTokenGuard, async (req, res) => {
+  const { Pool } = require("pg");
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) return res.status(503).json({ success: false, error: "DATABASE_URL not set" });
+
+  const pool = new Pool({
+    connectionString: dbUrl,
+    ssl: dbUrl.includes("localhost") ? false : { rejectUnauthorized: false }
+  });
+
+  try {
+    const phone = req.body.phone || "01012345678";
+    const name = req.body.name || "테스트소원이";
+    const image_filename = req.body.image_filename || null;
+
+    const result = await pool.query(`
+      INSERT INTO wish_entries (
+        name, phone, phone_hash, wish_text, wish_category,
+        miracle_index, traffic_light, energy_type, gem_type,
+        want_message, privacy_agreed, marketing_agreed,
+        tracking_token, image_filename, created_at
+      ) VALUES (
+        $1, $2, encode(sha256($2::bytea), 'hex'),
+        '건강하고 행복한 하루를 보내고 싶어요', 'health',
+        85, 'GREEN', 'calm', 'sapphire',
+        TRUE, TRUE, TRUE,
+        substr(md5(random()::text), 1, 16),
+        $3,
+        NOW() - INTERVAL '8 days'
+      ) RETURNING id, name, phone, tracking_token, image_filename, created_at
+    `, [name, phone, image_filename]);
+
+    const entry = result.rows[0];
+    console.log(`[Admin] Test wish entry created: ID=${entry.id}`);
+
+    res.json({ success: true, entry });
+  } catch (err) {
+    console.error("[Admin] Test entry failed:", err.message);
+    res.status(500).json({ success: false, error: err.message });
+  } finally {
+    await pool.end();
+  }
+});
+
+// ---------- Admin: DB Migration Runner ----------
+app.post("/api/admin/run-migration", adminTokenGuard, async (req, res) => {
   const { migration } = req.body; // e.g. "013", "022"
   const allowed = ["013", "022"];
 
