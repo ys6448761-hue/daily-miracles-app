@@ -318,51 +318,17 @@ router.post('/batch/send', async (req, res) => {
                 const responseUrl = `${baseUrl}/wish-tracking.html?token=${request.response_token}`;
                 const message = buildTrackingMessage(stage, target.name, responseUrl);
 
-                // overlay image generation (fail-safe: never blocks send)
-                let image_url = null;
-                if (overlayService && target.image_filename) {
-                    try {
-                        const captionLines = overlayService.processCaption(
-                            `${target.name || '소원이'}님의 소원이 이루어지는 중`
-                        );
-                        const overlayResult = await overlayService.generateOverlay({
-                            inputPath: require('path').join(__dirname, '..', 'public', 'images', 'wishes', target.image_filename),
-                            captionLines,
-                            originalFilename: target.image_filename
-                        });
-                        image_url = `${baseUrl}${overlayResult.overlay_url}`;
-                    } catch (overlayErr) {
-                        console.error(`[WishTracking] OVERLAY_FAILED wish_id=${target.id}:`, overlayErr.message);
-                    }
-                }
-
-                // betawelcome 템플릿 본문 (NCP 등록 원문과 100% 일치 필수)
-                const safeName = target.name || '소원이';
-                const betawelcomeContent = `${safeName}님, 환영합니다! 🎉\n\n하루하루의 기적 베타 테스터가 되어주셔서 감사합니다.\n\n7일간 매일 아침(8시), 저녁(8시)에 맞춤 응원 메시지를 보내드려요.\n\n내일 아침부터 시작됩니다! ✨\n\n궁금한 점이 있으시면 언제든 문의해주세요 😊\n\n- 하루하루의 기적 드림`;
-
-                const sendResult = await messageProvider.sendSensAlimtalk(
+                // tracking은 전용 알림톡 템플릿 미등록 → SMS로 발송
+                const sendResult = await messageProvider.sendSensSMS(
                     target.phone,
-                    {
-                        templateCode: 'betawelcome',
-                        content: betawelcomeContent,
-                        buttons: [
-                            { type: 'WL', name: '나의 기적 보기', linkMobile: 'https://dailymiracles.kr/mypage', linkPc: 'https://dailymiracles.kr/mypage' },
-                            { type: 'WL', name: '고객센터', linkMobile: 'https://dailymiracles.kr/support', linkPc: 'https://dailymiracles.kr/support' }
-                        ],
-                        name: safeName,
-                        image_url
-                    }
+                    message   // buildTrackingMessage()가 만든 stage별 메시지
                 );
 
                 if (sendResult.success) {
                     results.sent++;
                 } else {
-                    // alimtalk failed -> SMS fallback
-                    await messageProvider.sendSensSMS(
-                        target.phone,
-                        message
-                    );
-                    results.sent++;
+                    results.failed++;
+                    results.errors.push({ wish_id: target.id, error: 'SMS 발송 실패' });
                 }
 
             } catch (error) {

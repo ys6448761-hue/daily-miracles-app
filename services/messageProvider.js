@@ -144,7 +144,7 @@ async function sendSensAlimtalk(phone, templateVars = {}) {
     const messageId = generateMessageId();
     const normalizedPhone = normalizePhone(phone);
 
-    // templateCode/content/buttons 오버라이드 지원 (tracking용 betawelcome 등)
+    // templateCode/content/buttons 오버라이드 지원
     const effectiveTemplateCode = templateVars.templateCode || SENS_TEMPLATE_CODE;
 
     console.log(`[SENS] 알림톡 발송 시작:`, {
