@@ -1171,6 +1171,23 @@ app.post("/api/admin/run-migration", adminTokenGuard, async (req, res) => {
   }
 });
 
+// ---------- Admin: SENS 발송 결과 조회 ----------
+app.get("/api/admin/sens-result", adminTokenGuard, async (req, res) => {
+  const { requestId } = req.query;
+  if (!requestId) {
+    return res.status(400).json({ success: false, error: "requestId query param required" });
+  }
+
+  try {
+    const mp = require("./services/messageProvider");
+    const result = await mp.querySensResult(requestId);
+    res.json(result);
+  } catch (err) {
+    console.error("[SENS Result Query] Error:", err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // ---------- Ops Agent: Full Health Check (DEC-006) ----------
 app.get("/api/admin/health/full", verifyAdmin, async (_req, res) => {
   if (!opsAgentService) {

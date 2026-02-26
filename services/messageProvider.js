@@ -800,6 +800,32 @@ function isEnabled() {
 }
 
 /**
+ * SENS 알림톡 발송 결과 조회 (requestId 기반)
+ */
+async function querySensResult(requestId) {
+    if (!SENS_ACCESS_KEY || !SENS_SECRET_KEY || !SENS_SERVICE_ID) {
+        return { success: false, reason: 'SENS API 키 미설정' };
+    }
+
+    const timestamp = Date.now().toString();
+    const url = `/alimtalk/v2/services/${SENS_SERVICE_ID}/messages?requestId=${requestId}`;
+    const signature = makeSensSignature('GET', url, timestamp);
+
+    const response = await fetch(`https://sens.apigw.ntruss.com${url}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+            'x-ncp-apigw-timestamp': timestamp,
+            'x-ncp-iam-access-key': SENS_ACCESS_KEY,
+            'x-ncp-apigw-signature-v2': signature
+        }
+    });
+
+    const data = await response.json();
+    return { success: response.ok, statusCode: response.status, data };
+}
+
+/**
  * 현재 설정 정보 반환
  */
 function getConfig() {
@@ -819,6 +845,7 @@ module.exports = {
     sendQuoteAckMessage,
     sendSensAlimtalk,
     sendSensSMS,
+    querySensResult,
     isEnabled,
     getConfig,
     MESSAGE_STATUS,
