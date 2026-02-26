@@ -8,6 +8,11 @@
     "DOC-전체상품_가격표_종합_v12",
     "DOC-tag_taxonomy",
     "DOC-소원놀이터_종합문서_v10",
+    "DOC-AURORA-STATUS",
+    "DOC-aurora5-master-knowledge-v2",
+    "DOC-brand-bible",
+    "DOC-architecture",
+    "DOC-code-guide-v3",
     "DOC-MIRACLE_MASTER_GUIDELINES",
     "DOC-정산-v2-CEO-요약",
     "DOC-airtable-schema",
@@ -38,7 +43,6 @@
     "DOC-sens-setup-guide",
     "DOC-service-flow",
     "DOC-가격표_퀵레퍼런스",
-    "DOC-README",
     "DOC-REVIEW_COLLECTION_SYSTEM",
     "DOC-ROADMAP_API",
     "DOC-GA4_SETUP_GUIDE",
@@ -119,12 +123,19 @@
     "DOC-20251229-SRH",
     "DOC-20251229-PFO",
     "DOC-MASTER-CONTROL",
+    "DOC-MASTER-CONTROL",
     "DOC-inquiry-form-api"
   ],
   "aurora": [
     "DOC-DECISIONS_LOG",
     "DOC-AIL-정산-v2-final",
     "DOC-AURORA5_CHARACTER_PROMPTS_V3",
+    "DOC-AURORA-STATUS",
+    "DOC-aurora5-master-knowledge-v2",
+    "DOC-PROMOTION-RULES",
+    "DOC-brand-bible",
+    "DOC-architecture",
+    "DOC-code-guide-v3",
     "DOC-정산-v2-CEO-요약",
     "DOC-AURORA5_CHARACTER_PROMPTS",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
@@ -141,6 +152,7 @@
     "DOC-drive-github-sync-setup",
     "DOC-sens-setup-guide",
     "DOC-PROMOTION-RULES",
+    "DOC-README",
     "DOC-README",
     "DOC-ROADMAP_API",
     "DOC-VIDEO_MASTER",
@@ -216,6 +228,7 @@
     "DOC-20251229-A1Y",
     "DOC-20251229-SRH",
     "DOC-20251229-PFO",
+    "DOC-MASTER-CONTROL",
     "DOC-MASTER-CONTROL"
   ],
   "ail": [
@@ -226,6 +239,7 @@
     "DOC-AIL-정산-v2-final",
     "DOC-상품유형별_가격표_v12",
     "DOC-전체상품_가격표_종합_v12",
+    "DOC-AURORA-STATUS",
     "DOC-DEC-20260201-포인트추천예고편-정책구현",
     "DOC-drive-github-sync-setup",
     "DOC-가격표_퀵레퍼런스",
@@ -253,6 +267,10 @@
   ],
   "결제": [
     "DOC-AIL-정산-v2-final",
+    "DOC-AURORA-STATUS",
+    "DOC-aurora5-master-knowledge-v2",
+    "DOC-PROMOTION-RULES",
+    "DOC-architecture",
     "DOC-정산-v2-CEO-요약",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
     "DOC-README",
@@ -331,6 +349,8 @@
   ],
   "storybook": [
     "DOC-소원놀이터_종합문서_v10",
+    "DOC-AURORA-STATUS",
+    "DOC-architecture",
     "DOC-GA4_SETUP_GUIDE",
     "DOC-manifest-system",
     "DOC-20260101-4PA",
@@ -352,6 +372,48 @@
     "DOC-manifest-system",
     "DOC-SYS-2025-1230-LUMI-001_Airtabl",
     "DOC-20251229-VPB"
+  ],
+  "01-operations": [
+    "DOC-AURORA-STATUS",
+    "DOC-PROJECT_CONTEXT",
+    "DOC-PROMOTION-RULES",
+    "DOC-WORKFLOW",
+    "DOC-MASTER-CONTROL"
+  ],
+  "kpi": [
+    "DOC-AURORA-STATUS",
+    "DOC-JUDGE_PROMPTS",
+    "DOC-ad-set-mapping-and-ab-test-v1",
+    "DOC-04_Onboarding_7Day",
+    "DOC-06_Demo_Operations",
+    "DOC-REVIEW_COLLECTION_SYSTEM",
+    "DOC-01_Approval",
+    "DOC-02_Pilot",
+    "DOC-manifest-system",
+    "DOC-20260101-4PA",
+    "DOC-20260101-TRD",
+    "DOC-20260101-WG8",
+    "DOC-20260101-97N",
+    "DOC-20260101-ICN",
+    "DOC-20260101-K7C",
+    "DOC-20260101-6M7",
+    "DOC-20260101-GR0",
+    "DOC-20260101-HP0",
+    "DOC-20260101-RET",
+    "DOC-20260101-YH9",
+    "DOC-20260101-99J",
+    "DOC-20251229-PFO"
+  ],
+  "00-master": [
+    "DOC-aurora5-master-knowledge-v2"
+  ],
+  "02-brand": [
+    "DOC-brand-bible"
+  ],
+  "03-tech": [
+    "DOC-architecture",
+    "DOC-code-guide-v3",
+    "DOC-DEV-RULES"
   ],
   "v7.0": [
     "DOC-MIRACLE_MASTER_GUIDELINES"
@@ -414,29 +476,6 @@
     "DOC-CHECKLIST",
     "DOC-CONTEXT",
     "DOC-PLAN"
-  ],
-  "kpi": [
-    "DOC-JUDGE_PROMPTS",
-    "DOC-ad-set-mapping-and-ab-test-v1",
-    "DOC-04_Onboarding_7Day",
-    "DOC-06_Demo_Operations",
-    "DOC-REVIEW_COLLECTION_SYSTEM",
-    "DOC-01_Approval",
-    "DOC-02_Pilot",
-    "DOC-manifest-system",
-    "DOC-20260101-4PA",
-    "DOC-20260101-TRD",
-    "DOC-20260101-WG8",
-    "DOC-20260101-97N",
-    "DOC-20260101-ICN",
-    "DOC-20260101-K7C",
-    "DOC-20260101-6M7",
-    "DOC-20260101-GR0",
-    "DOC-20260101-HP0",
-    "DOC-20260101-RET",
-    "DOC-20260101-YH9",
-    "DOC-20260101-99J",
-    "DOC-20251229-PFO"
   ],
   "knowledge": [
     "DOC-README"
