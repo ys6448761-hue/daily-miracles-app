@@ -249,7 +249,13 @@ const EVENT_TYPES = {
   STORYBOOK_GENERATED: 'storybook_generated', // 스토리북 생성 완료
   STORY_VIEWED: 'story_viewed',               // 스토리 조회
   SHARE_CREATED: 'share_created',             // 공유 링크 생성
-  SHARE_OPENED: 'share_opened'                // 공유 링크 열람
+  SHARE_OPENED: 'share_opened',              // 공유 링크 열람
+
+  // 실험 이벤트
+  EXPERIMENT_EXPOSURE: 'experiment_exposure', // 실험 노출
+  CTA_CLICK: 'cta_click',                    // CTA 클릭
+  PAGE_ENGAGEMENT: 'page_engagement',         // scroll depth, 체류시간
+  JOURNEY_START: 'journey_start'              // 실제 여정 시작 (페이지 전환 확인)
 };
 
 // 유효 이벤트 타입 목록

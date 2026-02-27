@@ -671,17 +671,17 @@
                     7일 동안 아침마다 응원 메시지를 보내드려요.<br>
                     작은 변화가 모여 큰 기적이 됩니다.
                 </p>
-                <button class="btn btn-primary" onclick="startDailyMessages()" style="margin-top: 8px;">
+                <button class="btn btn-primary" onclick="trackCTAClick('encouragement_card'); startDailyMessages()" style="margin-top: 8px;">
                     7일 응원 받기
                 </button>
             </div>
 
             <!-- 액션 버튼 -->
             <div class="action-buttons">
-                <button class="btn btn-primary" onclick="startDailyMessages()">
+                <button class="btn btn-primary" onclick="trackCTAClick('daily_messages'); startDailyMessages()">
                     7일 응원 메시지 시작하기
                 </button>
-                <button class="btn btn-share" onclick="shareResult()" style="background: linear-gradient(135deg, #F5A7C6 0%, #9B87F5 100%); color: white; display: inline-flex; align-items: center; gap: 8px;">
+                <button class="btn btn-share" onclick="trackCTAClick('share'); shareResult()" style="background: linear-gradient(135deg, #F5A7C6 0%, #9B87F5 100%); color: white; display: inline-flex; align-items: center; gap: 8px;">
                     <span style="font-size: 20px;">✨</span> 기적지수 공유하기
                 </button>
             </div>
@@ -709,6 +709,117 @@
     <script>
         let analysisData = null;
 
+        // ═══ Experiment Infrastructure ═══
+        const pageLoadTime = Date.now();
+
+        // Session ID (session-scoped, for position experiment)
+        let expSessionId = sessionStorage.getItem('exp_session_id');
+        if (!expSessionId) {
+            expSessionId = crypto.randomUUID();
+            sessionStorage.setItem('exp_session_id', expSessionId);
+        }
+
+        // Device ID (persistent/sticky, for copy experiment)
+        let expDeviceId = localStorage.getItem('exp_device_id');
+        if (!expDeviceId) {
+            expDeviceId = crypto.randomUUID();
+            localStorage.setItem('exp_device_id', expDeviceId);
+        }
+
+        // Stable hash function
+        function stableHash(str) {
+            let hash = 0;
+            for (const ch of str) hash = ((hash << 5) - hash + ch.charCodeAt(0)) | 0;
+            return Math.abs(hash);
+        }
+
+        // Generic event sender
+        function sendExpEvent(experimentId, variant, eventType, payload) {
+            const body = {
+                event_type: eventType,
+                experiment_id: experimentId,
+                variant: variant,
+                session_id: expSessionId,
+                payload: payload || {}
+            };
+            try {
+                if (eventType === 'page_engagement' || eventType === 'journey_start') {
+                    navigator.sendBeacon('/api/experiment/event',
+                        new Blob([JSON.stringify(body)], { type: 'application/json' }));
+                } else {
+                    fetch('/api/experiment/event', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
+                    }).catch(() => {});
+                }
+            } catch (e) { /* silent */ }
+        }
+
+        // ═══ Experiment 1: CTA Position (cta-position-v1) ═══
+        const EXP_POSITION_ID = 'cta-position-v1';
+        const positionVariant = stableHash(expSessionId) % 2 === 0 ? 'control' : 'variant_top';
+
+        // ═══ Experiment 2: CTA Copy (cta-copy-v1) ═══
+        const EXP_COPY_ID = 'cta-copy-v1';
+        const copyBucket = stableHash(expDeviceId + EXP_COPY_ID) % 100;
+        const copyVariant = copyBucket < 33 ? 'C0' : copyBucket < 66 ? 'V1' : 'V2';
+
+        const CTA_COPY = {
+            C0: '7일 응원 메시지 시작하기',
+            V1: '지금 바로 응원 받기',
+            V2: '작은 기적, 지금 시작하기'
+        };
+
+        // ═══ Backward-compat aliases ═══
+        const EXP_ID = EXP_POSITION_ID;
+        const currentVariant = positionVariant;
+
+        function sendExperimentEvent(eventType, payload) {
+            sendExpEvent(EXP_POSITION_ID, positionVariant, eventType, payload);
+        }
+
+        function trackCTAClick(buttonName) {
+            // Log for both experiments
+            sendExpEvent(EXP_POSITION_ID, positionVariant, 'cta_click', { button: buttonName });
+            sendExpEvent(EXP_COPY_ID, copyVariant, 'cta_click', { button: buttonName });
+        }
+
+        // Scroll depth + 체류시간 (beforeunload)
+        window.addEventListener('beforeunload', () => {
+            const scrollDepth = Math.round(
+                (window.scrollY + window.innerHeight) / document.body.scrollHeight * 100
+            );
+            const engagementPayload = {
+                scroll_depth: scrollDepth,
+                time_on_page: Math.round((Date.now() - pageLoadTime) / 1000)
+            };
+            sendExpEvent(EXP_POSITION_ID, positionVariant, 'page_engagement', engagementPayload);
+            sendExpEvent(EXP_COPY_ID, copyVariant, 'page_engagement', engagementPayload);
+        });
+
+        function applyExperiments() {
+            // Position experiment: move CTA buttons if variant_top
+            if (positionVariant === 'variant_top') {
+                const actionButtons = document.querySelector('.action-buttons');
+                const heroSection = document.querySelector('.hero-section');
+                if (actionButtons && heroSection) {
+                    heroSection.after(actionButtons);
+                }
+            }
+
+            // Copy experiment: change CTA text
+            const primaryBtn = document.querySelector('.action-buttons .btn-primary');
+            if (primaryBtn) {
+                primaryBtn.textContent = CTA_COPY[copyVariant] || CTA_COPY.C0;
+            }
+
+            // Exposure logging (1x per experiment)
+            sendExpEvent(EXP_POSITION_ID, positionVariant, 'experiment_exposure', {});
+            sendExpEvent(EXP_COPY_ID, copyVariant, 'experiment_exposure', {});
+        }
+        // ═══ End Experiments ═══
+
         // 페이지 로드 시 데이터 로드
         window.addEventListener('load', async () => {
             try {
@@ -724,6 +835,7 @@
 
                 if (analysisData && analysisData.story) {
                     renderResults(analysisData.story);
+                    applyExperiments();
                 } else {
                     throw new Error('No analysis data found');
                 }
@@ -945,6 +1057,9 @@
         }
 
         function startDailyMessages() {
+            // journey_start: 실제 전환 이벤트 (sendBeacon으로 페이지 전환 전 전송 보장)
+            sendExpEvent(EXP_POSITION_ID, positionVariant, 'journey_start', { destination: 'daily-messages' });
+            sendExpEvent(EXP_COPY_ID, copyVariant, 'journey_start', { destination: 'daily-messages' });
             window.location.href = './daily-messages.html';
         }
 

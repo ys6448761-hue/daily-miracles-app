@@ -597,6 +597,15 @@ try {
   console.warn("⚠️ Attendance 라우터 로드 실패:", error.message);
 }
 
+// Experiment Event 라우터 로딩
+let experimentEventRoutes = null;
+try {
+  experimentEventRoutes = require("./routes/experimentEventRoutes");
+  console.log("✅ Experiment Event 라우터 로드 성공");
+} catch (error) {
+  console.warn("⚠️ Experiment Event 라우터 로드 실패:", error.message);
+}
+
 // DB 모듈 (선택적 로딩)
 let db = null;
 try {
@@ -2034,6 +2043,14 @@ if (attendanceRoutes) {
   console.log("✅ Attendance 라우터 등록 완료 (/api/attendance)");
 } else {
   console.warn("⚠️ Attendance 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- Experiment Event Routes ----------
+if (experimentEventRoutes) {
+  app.use("/api/experiment", experimentEventRoutes);
+  console.log("✅ Experiment Event 라우터 등록 완료 (/api/experiment)");
+} else {
+  console.warn("⚠️ Experiment Event 라우터 미등록");
 }
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------

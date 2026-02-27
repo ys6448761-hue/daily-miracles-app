@@ -1,0 +1,53 @@
+{
+  "experiments": [
+    {
+      "id": "redirect-template-v1",
+      "status": "RUNNING",
+      "owner": "루미",
+      "primaryMetric": "approval_rate",
+      "expectedSplit": { "control": 0.5, "variant_b": 0.5 },
+      "freezeDays": 14,
+      "holdDaysMax": 30,
+      "startDate": "2026-02-13",
+      "constraints": {
+        "minSamples": 200,
+        "alpha": 0.05,
+        "mde": 0.02,
+        "biasThreshold": 0.40,
+        "templateTypeFixed": true
+      }
+    },
+    {
+      "id": "cta-position-v1",
+      "status": "RUNNING",
+      "owner": "루미",
+      "primaryMetric": "ctr",
+      "expectedSplit": { "control": 0.5, "variant_top": 0.5 },
+      "freezeDays": 7,
+      "holdDaysMax": 30,
+      "startDate": "2026-02-27",
+      "constraints": {
+        "minSamples": 200,
+        "alpha": 0.05,
+        "mde": 0.05,
+        "biasThreshold": 0.40
+      }
+    },
+    {
+      "id": "cta-copy-v1",
+      "status": "RUNNING",
+      "owner": "루미",
+      "primaryMetric": "journey_start_rate",
+      "expectedSplit": { "C0": 0.33, "V1": 0.33, "V2": 0.34 },
+      "freezeDays": 7,
+      "holdDaysMax": 30,
+      "startDate": "2026-02-27",
+      "constraints": {
+        "minSamples": 300,
+        "alpha": 0.05,
+        "mde": 0.05,
+        "biasThreshold": 0.40
+      }
+    }
+  ]
+}
