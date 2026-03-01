@@ -48,6 +48,7 @@ async function ensureDataDir() {
  * 소원 제출
  */
 router.post('/', async (req, res) => {
+    const log = req.log || console;
     try {
         const {
             name,
@@ -74,14 +75,9 @@ router.post('/', async (req, res) => {
         const rawPhone = phone || '';
         const normalizedPhone = rawPhone.replace(/[^0-9]/g, '');
 
-        // 전화번호 로깅 (디버깅용)
+        // 전화번호 검증 로깅 (PII-safe: 길이만 기록)
         if (rawPhone) {
-            console.log('[Wish] Phone validation:', {
-                rawPhone: rawPhone.substring(0, 3) + '****' + rawPhone.slice(-4),
-                normalizedPhone: normalizedPhone.substring(0, 3) + '****' + normalizedPhone.slice(-4),
-                rawLength: rawPhone.length,
-                normalizedLength: normalizedPhone.length
-            });
+            log.info('[Wish] phone_validated', { rawLen: rawPhone.length, normalizedLen: normalizedPhone.length });
         }
 
         // 7일 메시지 선택 시 추가 검사
@@ -95,12 +91,7 @@ router.post('/', async (req, res) => {
 
             // 전화번호 검증 (정규화된 번호로, 정확히 11자리)
             if (normalizedPhone.length !== 11) {
-                console.log('[Wish] Phone rejected - invalid length:', {
-                    rawPhone: rawPhone,
-                    normalizedPhone: normalizedPhone,
-                    length: normalizedPhone.length,
-                    expected: 11
-                });
+                log.info('[Wish] phone_rejected', { reason: 'invalid_length', length: normalizedPhone.length, expected: 11 });
                 return res.status(400).json({
                     success: false,
                     message: `올바른 휴대폰 번호를 입력해주세요 (11자리, 현재: ${normalizedPhone.length}자리)`
@@ -109,7 +100,7 @@ router.post('/', async (req, res) => {
 
             // 01X로 시작하는지 확인
             if (!/^01[0-9]/.test(normalizedPhone)) {
-                console.log('[Wish] Phone rejected - invalid prefix:', { normalizedPhone });
+                log.info('[Wish] phone_rejected', { reason: 'invalid_prefix' });
                 return res.status(400).json({
                     success: false,
                     message: '올바른 휴대폰 번호를 입력해주세요 (01X로 시작)'
@@ -129,7 +120,7 @@ router.post('/', async (req, res) => {
         const finalGem = validGems.includes(gem) ? gem : 'citrine';
 
         if (!gem || !validGems.includes(gem)) {
-            console.log(`[Wish] gem 미선택/유효하지 않음, 기본값 citrine 적용 (입력: ${gem})`);
+            log.info('[Wish] gem_fallback', { received: gem });
         }
 
         // 신호등 자동 판정
@@ -145,7 +136,7 @@ router.post('/', async (req, res) => {
 
         // 일일 제한 도달 시 처리
         if (!scoreResult.success && scoreResult.error === 'daily_limit') {
-            console.log(`[Wish] Daily limit reached for ${name}`);
+            log.info('[Wish] daily_limit', { action: 'fallback_score_used' });
             // 일일 제한이어도 소원은 저장하고 기본값 사용
         }
 
@@ -223,56 +214,48 @@ router.post('/', async (req, res) => {
         if (want_message && normalizedPhone) {
             logEvent(EVENT_TYPES.TRIAL_START, {
                 wish_id: wishData.id,
-                user_name: name,
-                phone: normalizedPhone.substring(0, 3) + '****' + normalizedPhone.slice(-4),
                 gem: finalGem,
                 traffic_light: trafficLight.level
             }, { source: 'wishRoutes' }).catch(err => {
-                console.error('[Event] trial_start 로깅 실패:', err.message);
+                log.warn('[Wish] event_log_failed', { error: err.message });
             });
         }
 
-        // 신호등 상태별 로깅
-        const levelEmoji = { RED: '🔴', YELLOW: '🟡', GREEN: '🟢' };
-        const msgIcon = want_message ? '💌' : '📝';
-        console.log(`[Wish] ${levelEmoji[trafficLight.level]} ${msgIcon} New wish: ${name} (${finalGem}) - ${trafficLight.level}`);
+        // wish 접수 로깅 (PII-safe)
+        log.info('[Wish] wish_received', { level: trafficLight.level, gem: finalGem });
 
         // RED 신호 시 긴급 경고 및 알림
         if (trafficLight.level === 'RED') {
-            console.log(`[ALERT] ⚠️ RED SIGNAL: ${trafficLight.reason}`);
-            console.log(`[ALERT] Action Required: ${trafficLight.action}`);
+            log.warn('[Wish] red_signal', { reason: trafficLight.reason });
 
             // 재미(CRO) 긴급 알림 메시지 생성 및 발송
             const redAlert = generateRedAlertMessage(wishData);
-            console.log('[ALERT] CRO Notification:');
-            console.log(redAlert);
 
             // messageProvider로 RED 알림 발송
             if (messageProvider?.isEnabled()) {
                 const alertResult = await messageProvider.sendRedAlertMessage(wishData);
-                console.log('[ALERT] RED Alert 발송 결과:', alertResult.success ? '성공' : '실패');
+                log.info('[Wish] red_alert_sent', { success: alertResult.success });
             } else {
-                console.log('[ALERT] messageProvider 미설정 - RED 알림 건너뜀');
+                log.info('[Wish] red_alert_skipped', { reason: 'no_message_provider' });
             }
         }
 
         // ACK 메시지 발송 (GREEN/YELLOW만 즉시 발송, normalizedPhone이 있을 때만)
         if (trafficLight.level !== 'RED' && normalizedPhone && want_message) {
             const ackMessages = generateWishAckMessage(wishData);
-            console.log('[ACK] Generated ACK message for:', name, '→', normalizedPhone.substring(0, 3) + '****');
+            log.info('[Wish] ack_generated', { phoneLen: normalizedPhone.length });
 
             // messageProvider로 ACK 발송
             if (messageProvider?.isEnabled()) {
                 const ackResult = await messageProvider.sendWishAckMessage(normalizedPhone, wishData);
-                console.log('[ACK] 발송 결과:', ackResult.success ? '성공' : ackResult.reason || '실패');
+                log.info('[Wish] ack_sent', { success: ackResult.success });
             } else {
-                console.log('[ACK] messageProvider 미설정 - 로그만 출력');
-                console.log('[ACK] Kakao:', ackMessages.kakao.substring(0, 100) + '...');
+                log.info('[Wish] ack_skipped', { reason: 'no_message_provider' });
             }
         } else if (!want_message) {
-            console.log('[ACK] 7일 메시지 미선택 - ACK 발송 건너뜀');
+            log.info('[Wish] ack_skipped', { reason: 'no_message_requested' });
         } else if (!normalizedPhone) {
-            console.log('[ACK] 전화번호 없음 - ACK 발송 건너뜀');
+            log.info('[Wish] ack_skipped', { reason: 'no_phone' });
         }
 
         res.json({
@@ -298,7 +281,7 @@ router.post('/', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('[Wish] Error:', error);
+        (req.log || console).error('[Wish] wish_submit_failed', { error: error.message });
         res.status(500).json({
             success: false,
             message: '서버 오류가 발생했습니다'
@@ -311,6 +294,7 @@ router.post('/', async (req, res) => {
  * 오늘 접수된 소원 목록 (관리자용)
  */
 router.get('/today', async (req, res) => {
+    const log = req.log || console;
     try {
         await ensureDataDir();
         const today = new Date().toISOString().split('T')[0];
@@ -332,7 +316,7 @@ router.get('/today', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('[Wish] Error:', error);
+        log.error('[Wish] wish_list_failed', { error: error.message });
         res.status(500).json({
             success: false,
             message: '서버 오류가 발생했습니다'
@@ -345,12 +329,13 @@ router.get('/today', async (req, res) => {
  * 업그레이드 CTA 클릭 메트릭 기록
  */
 router.post('/metrics/upgrade-click', async (req, res) => {
+    const log = req.log || console;
     try {
         recordUpgradeClick();
-        console.log('[Upgrade] CTA 클릭 기록됨');
+        log.info('[Wish] upgrade_click', {});
         res.json({ success: true });
     } catch (error) {
-        console.error('[Upgrade] 클릭 메트릭 기록 오류:', error);
+        log.error('[Wish] upgrade_click_failed', { error: error.message });
         res.status(500).json({ success: false, message: '서버 오류' });
     }
 });
@@ -360,6 +345,7 @@ router.post('/metrics/upgrade-click', async (req, res) => {
  * 업그레이드 - 생년월일 저장
  */
 router.post('/upgrade-birthdate', async (req, res) => {
+    const log = req.log || console;
     try {
         const { wishId, birthdate } = req.body;
 
@@ -420,7 +406,7 @@ router.post('/upgrade-birthdate', async (req, res) => {
 
         // 메트릭 기록
         recordUpgradeComplete();
-        console.log(`[Upgrade] 생년월일 저장 완료: ${wishId} → ${birthdate}`);
+        log.info('[Wish] birthdate_saved', { wishId });
 
         res.json({
             success: true,
@@ -430,7 +416,7 @@ router.post('/upgrade-birthdate', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('[Upgrade] 생년월일 저장 오류:', error);
+        log.error('[Wish] birthdate_save_failed', { error: error.message });
         res.status(500).json({
             success: false,
             message: '서버 오류가 발생했습니다'

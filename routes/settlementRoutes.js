@@ -33,11 +33,35 @@ function getToggles() {
   };
 }
 
+// 로그용 ID 마스킹 (PII-safe: 마지막 6자리만 노출)
+function redactId(id) {
+  if (id === null || id === undefined || id === '') return '(none)';
+  const str = String(id);
+  if (str.length <= 6) return str;
+  return '\u2026' + str.slice(-6);
+}
+
+// 금액 버켓 분류 (PII-safe: 실제 금액 노출 방지)
+function bucketAmount(amount) {
+  const n = Number(amount) || 0;
+  if (n < 0) return 'negative';
+  if (n < 10) return '0-9';
+  if (n < 50) return '10-49';
+  if (n < 100) return '50-99';
+  if (n < 1000) return '100-999';
+  if (n < 10000) return '1k-9k';
+  return '10k+';
+}
+
 // 합계불변성 알람 로깅
-function checkInvariant(calculation, eventType, eventId) {
+function checkInvariant(calculation, eventType, eventId, log) {
   const { balance_check, balance_diff } = calculation.validation;
   if (!balance_check) {
-    console.error(`[SETTLEMENT-ALARM] balance_invariant_failed | event_id=${eventId} type=${eventType} diff=${balance_diff}`);
+    (log || console).error('[Settlement] balance_invariant_failed', {
+      event_id: redactId(eventId),
+      event_type: eventType,
+      diff_bucket: bucketAmount(balance_diff),
+    });
     return false;
   }
   return true;
@@ -117,7 +141,7 @@ router.post('/events', async (req, res) => {
     });
 
     // 검증 + 알람
-    if (!checkInvariant(calculation, validatedType, 'pre-save')) {
+    if (!checkInvariant(calculation, validatedType, 'pre-save', req.log)) {
       return res.status(500).json({
         success: false,
         error: 'balance_check_failed',
@@ -173,7 +197,7 @@ router.post('/events', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[Settlement] 이벤트 생성 실패:', error);
+    (req.log || console).error('[Settlement] event_create_failed', { error: error.message });
     res.status(500).json({ success: false, error: 'server_error', message: error.message });
   }
 });
@@ -274,7 +298,7 @@ router.post('/events/reversal', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[Settlement] 역분개 생성 실패:', error);
+    (req.log || console).error('[Settlement] reversal_create_failed', { error: error.message });
     res.status(500).json({ success: false, error: 'server_error', message: error.message });
   }
 });
@@ -298,7 +322,7 @@ router.get('/events/:id', async (req, res) => {
     res.json({ success: true, data: event });
 
   } catch (error) {
-    console.error('[Settlement] 이벤트 조회 실패:', error);
+    (req.log || console).error('[Settlement] event_get_failed', { error: error.message });
     res.status(500).json({ success: false, error: 'server_error' });
   }
 });
@@ -327,7 +351,7 @@ router.get('/creators/:id', async (req, res) => {
     res.json({ success: true, data: summary });
 
   } catch (error) {
-    console.error('[Settlement] 크리에이터 요약 조회 실패:', error);
+    (req.log || console).error('[Settlement] creator_summary_failed', { error: error.message });
     res.status(500).json({ success: false, error: 'server_error' });
   }
 });
@@ -354,7 +378,7 @@ router.get('/creators/:id/history', async (req, res) => {
     res.json({ success: true, data: history });
 
   } catch (error) {
-    console.error('[Settlement] 크리에이터 내역 조회 실패:', error);
+    (req.log || console).error('[Settlement] creator_history_failed', { error: error.message });
     res.status(500).json({ success: false, error: 'server_error' });
   }
 });
@@ -384,7 +408,7 @@ router.post('/batches', async (req, res) => {
     res.status(201).json({ success: true, data: batch });
 
   } catch (error) {
-    console.error('[Settlement] 배치 생성 실패:', error);
+    (req.log || console).error('[Settlement] batch_create_failed', { error: error.message });
     res.status(500).json({ success: false, error: 'server_error', message: error.message });
   }
 });
@@ -405,7 +429,7 @@ router.post('/batches/:id/confirm', async (req, res) => {
     res.json({ success: true, data: result });
 
   } catch (error) {
-    console.error('[Settlement] 배치 확정 실패:', error);
+    (req.log || console).error('[Settlement] batch_confirm_failed', { error: error.message });
     res.status(500).json({ success: false, error: 'server_error', message: error.message });
   }
 });
@@ -430,7 +454,7 @@ router.get('/batches/:id', async (req, res) => {
     res.json({ success: true, data: batch });
 
   } catch (error) {
-    console.error('[Settlement] 배치 조회 실패:', error);
+    (req.log || console).error('[Settlement] batch_get_failed', { error: error.message });
     res.status(500).json({ success: false, error: 'server_error' });
   }
 });
@@ -455,7 +479,7 @@ router.get('/batches', async (req, res) => {
     res.json({ success: true, data: batches });
 
   } catch (error) {
-    console.error('[Settlement] 배치 목록 조회 실패:', error);
+    (req.log || console).error('[Settlement] batch_list_failed', { error: error.message });
     res.status(500).json({ success: false, error: 'server_error' });
   }
 });
@@ -486,7 +510,7 @@ router.get('/stats', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[Settlement] 통계 조회 실패:', error);
+    (req.log || console).error('[Settlement] stats_get_failed', { error: error.message });
     res.status(500).json({ success: false, error: 'server_error' });
   }
 });
@@ -505,7 +529,7 @@ router.get('/constants', async (req, res) => {
     res.json({ success: true, data: constants });
 
   } catch (error) {
-    console.error('[Settlement] 상수 조회 실패:', error);
+    (req.log || console).error('[Settlement] constants_get_failed', { error: error.message });
     res.status(500).json({ success: false, error: 'server_error' });
   }
 });
@@ -536,7 +560,7 @@ router.post('/calculate', async (req, res) => {
     res.json({ success: true, data: calculation });
 
   } catch (error) {
-    console.error('[Settlement] 계산 실패:', error);
+    (req.log || console).error('[Settlement] calculate_failed', { error: error.message });
     res.status(500).json({ success: false, error: 'server_error', message: error.message });
   }
 });
@@ -555,7 +579,7 @@ router.post('/release-held', async (req, res) => {
     res.json({ success: true, data: result });
 
   } catch (error) {
-    console.error('[Settlement] Hold 해제 실패:', error);
+    (req.log || console).error('[Settlement] release_held_failed', { error: error.message });
     res.status(500).json({ success: false, error: 'server_error' });
   }
 });
@@ -576,5 +600,9 @@ router.get('/toggles', (_req, res) => {
     }
   });
 });
+
+// 테스트 접근용 내부 헬퍼 노출
+router._redactId = redactId;
+router._bucketAmount = bucketAmount;
 
 module.exports = router;
