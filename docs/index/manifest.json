@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-02T07:04:17.368Z",
+  "generated_at": "2026-03-02T07:27:05.124Z",
   "generator": "generate-manifest.js",
   "total_count": 196,
   "documents": [
@@ -672,7 +672,7 @@
       "status": "archived",
       "title": "DEPLOY PACKET — plaza.dailymiracles.kr (소원꿈터 광장) 배포",
       "created_at": "2026-03-02",
-      "checksum": "e2cadae5"
+      "checksum": "cddfbe9c"
     },
     {
       "id": "DOC-deployment-checklist",
