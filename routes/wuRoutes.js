@@ -164,7 +164,7 @@ router.post('/start', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[WU] 세션 시작 오류:', error);
+    (req.log || console).error('[WU] session_start_failed', { action: 'start', error: error.message });
     res.status(500).json({
       success: false,
       error: 'internal_error',
@@ -233,7 +233,7 @@ router.get('/:sessionId', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[WU] 세션 조회 오류:', error);
+    (req.log || console).error('[WU] session_get_failed', { action: 'get', error: error.message });
     res.status(500).json({
       success: false,
       error: 'internal_error',
@@ -302,7 +302,7 @@ router.post('/:sessionId/answer', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[WU] 답변 제출 오류:', error);
+    (req.log || console).error('[WU] answer_submit_failed', { action: 'answer', error: error.message });
     res.status(500).json({
       success: false,
       error: 'internal_error',
@@ -344,7 +344,7 @@ router.post('/:sessionId/complete', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('[WU] 완료 처리 오류:', error);
+    (req.log || console).error('[WU] session_complete_failed', { action: 'complete', error: error.message });
     res.status(500).json({
       success: false,
       error: 'internal_error',
@@ -371,7 +371,7 @@ router.post('/:sessionId/abandon', async (req, res) => {
     res.json({ success: true, abandoned: true });
 
   } catch (error) {
-    console.error('[WU] 이탈 처리 오류:', error);
+    (req.log || console).error('[WU] session_abandon_failed', { action: 'abandon', error: error.message });
     res.status(500).json({
       success: false,
       error: 'internal_error',
@@ -398,7 +398,7 @@ router.get('/profile/:profileId', async (req, res) => {
     res.json({ success: true, profile });
 
   } catch (error) {
-    console.error('[WU] 프로필 조회 오류:', error);
+    (req.log || console).error('[WU] profile_get_failed', { action: 'getProfile', error: error.message });
     res.status(500).json({
       success: false,
       error: 'internal_error',

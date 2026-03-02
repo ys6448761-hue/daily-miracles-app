@@ -13,6 +13,7 @@
     "DOC-brand-bible",
     "DOC-architecture",
     "DOC-code-guide-v3",
+    "DOC-소원드림광장_홈페이지재구성_현황브리핑",
     "DOC-MIRACLE_MASTER_GUIDELINES",
     "DOC-정산-v2-CEO-요약",
     "DOC-airtable-schema",
@@ -23,6 +24,7 @@
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
     "DOC-DEC-20260201-포인트추천예고편-정책구현",
     "DOC-index",
+    "DOC-DEPLOY-PACKET-2026-03-02",
     "DOC-playground-events",
     "DOC-GROWTH-ROADMAP",
     "DOC-JUDGE_PROMPTS",
@@ -53,6 +55,7 @@
     "DOC-alimtalk-templates-design",
     "DOC-video-promo-30sec-template",
     "DOC-WIX_TEAM_PAGE_CONTENT",
+    "DOC-프로젝트지식_수동정리_가이드",
     "DOC-20260131_파크_2d_기술지원",
     "DOC-20260201_드라이브_공유폴더_마스터가이드",
     "DOC-AURORA5_SORA_FINAL_v10",
@@ -123,7 +126,6 @@
     "DOC-20251229-SRH",
     "DOC-20251229-PFO",
     "DOC-MASTER-CONTROL",
-    "DOC-MASTER-CONTROL",
     "DOC-inquiry-form-api"
   ],
   "aurora": [
@@ -139,6 +141,7 @@
     "DOC-정산-v2-CEO-요약",
     "DOC-AURORA5_CHARACTER_PROMPTS",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
+    "DOC-DEPLOY-PACKET-2026-03-02",
     "DOC-GROWTH-ROADMAP",
     "DOC-JUDGE_PROMPTS",
     "DOC-LAUNCH-DECLARATION",
@@ -151,7 +154,6 @@
     "DOC-JAEMI_ONBOARDING_v12",
     "DOC-drive-github-sync-setup",
     "DOC-sens-setup-guide",
-    "DOC-PROMOTION-RULES",
     "DOC-README",
     "DOC-README",
     "DOC-ROADMAP_API",
@@ -162,6 +164,7 @@
     "DOC-manifest-system",
     "DOC-Aurora5_토론시스템_안내문",
     "DOC-WIX_TEAM_PAGE_CONTENT",
+    "DOC-프로젝트지식_수동정리_가이드",
     "DOC-AURORA5_SORA_FINAL_v10",
     "DOC-Code_종합지시서",
     "DOC-CEO-WEEKLY-2025-W52",
@@ -228,7 +231,6 @@
     "DOC-20251229-A1Y",
     "DOC-20251229-SRH",
     "DOC-20251229-PFO",
-    "DOC-MASTER-CONTROL",
     "DOC-MASTER-CONTROL"
   ],
   "ail": [
@@ -278,7 +280,6 @@
     "DOC-JAEMI_ONBOARDING_v12",
     "DOC-04_Onboarding_7Day",
     "DOC-05_Deal_Registration",
-    "DOC-PROMOTION-RULES",
     "DOC-tax-accounting-ai-tools-analys",
     "DOC-GA4_SETUP_GUIDE",
     "DOC-20260101-MKI",
@@ -382,6 +383,7 @@
   ],
   "kpi": [
     "DOC-AURORA-STATUS",
+    "DOC-소원드림광장_홈페이지재구성_현황브리핑",
     "DOC-JUDGE_PROMPTS",
     "DOC-ad-set-mapping-and-ab-test-v1",
     "DOC-04_Onboarding_7Day",
@@ -414,6 +416,9 @@
     "DOC-architecture",
     "DOC-code-guide-v3",
     "DOC-DEV-RULES"
+  ],
+  "04-marketing": [
+    "DOC-소원드림광장_홈페이지재구성_현황브리핑"
   ],
   "v7.0": [
     "DOC-MIRACLE_MASTER_GUIDELINES"
@@ -457,6 +462,9 @@
     "DEC-2025-1230-001",
     "DEC-2025-1230-002",
     "DEC-2025-1230-003"
+  ],
+  "deploy": [
+    "DOC-DEPLOY-PACKET-2026-03-02"
   ],
   "deployment": [
     "DOC-deployment-checklist"

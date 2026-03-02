@@ -97,13 +97,15 @@ const accessLogger = winston.createLogger({
 const requestLogger = (req, res, next) => {
   const startTime = Date.now();
   res.on('finish', () => {
-    const duration = Date.now() - startTime;
+    const durationMs = Date.now() - startTime;
     const logData = {
-      method: req.method, url: req.url, statusCode: res.statusCode,
-      contentLength: res.get('content-length') || 0,
-      userAgent: req.get('user-agent'),
-      ip: req.ip || req.connection.remoteAddress,
-      duration: `${duration}ms`,
+      method: req.method,
+      url: req.originalUrl || req.url,
+      statusCode: res.statusCode,
+      durationMs,
+      requestId: req.requestId || null,
+      headersSent: res.headersSent,
+      error_class: res._errorClass || null,
     };
     if (res.statusCode >= 400) {
       accessLogger.warn('HTTP Error', logData);

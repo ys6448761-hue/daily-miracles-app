@@ -1,7 +1,7 @@
 # AURORA_STATUS.md
 ## 하루하루의 기적 - 프로젝트 현황판
 
-**마지막 업데이트**: 2025-12-30 09:20 KST
+**마지막 업데이트**: 2026-03-02 (PR: docs(deploy): Plaza 배포 확정사항 반영)
 **업데이트 담당**: Claude Code
 
 ---
@@ -172,6 +172,7 @@ curl -X POST http://localhost:5100/api/wish-image/watermark \
 | 날짜 | 담당 | 내용 |
 |------|------|------|
 | 2025-12-30 07:15 | Code | 최초 생성 (P0 완료 반영) |
+| 2026-03-02 15:05 | Antigravity | Plaza 배포 확정사항 반영 (Render OK / DNS Gabia / 관리자 푸르미르) |
 
 ---
 

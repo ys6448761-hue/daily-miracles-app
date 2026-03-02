@@ -10,10 +10,16 @@ const COOLDOWN_MS = {
   degraded: 10 * 60 * 1000,  // 10 min — score 70-79
 };
 
+// ── 메모리 안전 상한 (인시던트 폭발 시 OOM 방지) ──
+const MAX_COOLDOWN_ENTRIES = 10_000;
+
 class AlertCooldown {
   constructor() {
     /** Map<string, { lastSentAt: number, suppressedCount: number }> */
     this._entries = new Map();
+
+    /** 긴급 퍼지 마지막 실행 시각 (1s 버스트 가드) */
+    this._lastEmergencyPurgeAt = 0;
 
     // Purge entries older than 1h every 10 minutes
     this._purgeTimer = setInterval(() => this._purge(), 10 * 60 * 1000);
@@ -40,6 +46,11 @@ class AlertCooldown {
    * @returns {{ allowed: boolean, cooldown_suppressed: boolean, suppressedCount: number }}
    */
   check(key, severity) {
+    // 용량 초과 시 긴급 퍼지 (1s 버스트 가드 포함)
+    if (this._entries.size >= MAX_COOLDOWN_ENTRIES) {
+      this._emergencyPurge();
+    }
+
     const now = Date.now();
     const entry = this._entries.get(key);
 
@@ -62,6 +73,27 @@ class AlertCooldown {
   /** Number of unique keys currently tracked */
   get size() {
     return this._entries.size;
+  }
+
+  /**
+   * 긴급 퍼지: 가장 오래된 엔트리를 제거해 MAX의 75%로 축소.
+   * 1s 버스트 가드: 동일 인시던트 폭발에서 반복 실행 방지.
+   */
+  _emergencyPurge() {
+    const now = Date.now();
+    if (now - this._lastEmergencyPurgeAt < 1000) return; // 1s 가드
+    this._lastEmergencyPurgeAt = now;
+
+    const target = Math.floor(MAX_COOLDOWN_ENTRIES * 0.75);
+    if (this._entries.size <= target) return;
+
+    const toRemove = this._entries.size - target;
+    const sorted = [...this._entries.entries()].sort(
+      ([, a], [, b]) => a.lastSentAt - b.lastSentAt
+    );
+    for (let i = 0; i < toRemove; i++) {
+      this._entries.delete(sorted[i][0]);
+    }
   }
 
   /** Purge entries older than 1 hour */
@@ -88,3 +120,4 @@ const alertCooldown = new AlertCooldown();
 module.exports = alertCooldown;
 module.exports.AlertCooldown = AlertCooldown;
 module.exports.COOLDOWN_MS = COOLDOWN_MS;
+module.exports.MAX_COOLDOWN_ENTRIES = MAX_COOLDOWN_ENTRIES;
