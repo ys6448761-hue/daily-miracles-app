@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-02T06:49:27.384Z",
+  "generated_at": "2026-03-02T07:04:17.368Z",
   "generator": "generate-manifest.js",
-  "total_count": 195,
+  "total_count": 196,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1168,7 +1168,7 @@
       "status": "archived",
       "title": "DEC 운영 매뉴얼",
       "created_at": "2026-03-02",
-      "checksum": "1b4361fe"
+      "checksum": "93d223c7"
     },
     {
       "id": "DOC-drive-github-sync-setup",
@@ -3494,6 +3494,22 @@
       "title": "� Aurora 5 팀 공지",
       "created_at": "2025-12-29",
       "checksum": "b375bcab"
+    },
+    {
+      "id": "DOC-INCIDENT-20260302-001",
+      "path": "docs/ops/INCIDENT-20260302-001.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ops",
+      "tags": [
+        "ops"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "INCIDENT-20260302-001",
+      "created_at": "0302-00-01",
+      "checksum": "d669614b"
     },
     {
       "id": "DOC-MASTER-CONTROL",

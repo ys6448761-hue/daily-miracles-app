@@ -309,7 +309,8 @@
     "DOC-weekly_promotion_guide",
     "DOC-DEC_OPERATIONS",
     "DOC-drive-github-sync-setup",
-    "DOC-sens-setup-guide"
+    "DOC-sens-setup-guide",
+    "DOC-INCIDENT-20260302-001"
   ],
   "ops-bundle": [
     "DOC-README",
