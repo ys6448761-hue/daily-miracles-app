@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-09T20:32:36.070Z",
+  "generated_at": "2026-03-09T20:33:29.532Z",
   "generator": "generate-manifest.js",
-  "total_count": 236,
+  "total_count": 237,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1047,6 +1047,24 @@
       "title": "DreamTown 상생 지원 공식 v1",
       "created_at": "2026-03-09",
       "checksum": "16e980cc"
+    },
+    {
+      "id": "DOC-DreamTown_Pipeline_Design",
+      "path": "docs/design/DreamTown_Pipeline_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "archived",
+      "title": "DreamTown 온라인–오프라인 통합 파이프라인",
+      "created_at": "2026-03-09",
+      "checksum": "c3afe1a6"
     },
     {
       "id": "DOC-DreamTown_Product_Structure_SS",
