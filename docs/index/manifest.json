@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-09T20:33:29.532Z",
+  "generated_at": "2026-03-09T20:34:06.814Z",
   "generator": "generate-manifest.js",
   "total_count": 237,
   "documents": [
@@ -1064,7 +1064,7 @@
       "status": "archived",
       "title": "DreamTown 온라인–오프라인 통합 파이프라인",
       "created_at": "2026-03-09",
-      "checksum": "c3afe1a6"
+      "checksum": "20d83fa5"
     },
     {
       "id": "DOC-DreamTown_Product_Structure_SS",
@@ -2346,7 +2346,7 @@
       "status": "archived",
       "title": "DreamTown 세계 아키텍처 SSOT",
       "created_at": "2026-03-09",
-      "checksum": "72930019"
+      "checksum": "c3eeb3f1"
     },
     {
       "id": "DOC-quantum-planning-method",
