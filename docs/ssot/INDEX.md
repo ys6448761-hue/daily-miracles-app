@@ -1,6 +1,6 @@
 # DreamTown SSOT Index
 
-Version: v1.5
+Version: v1.6
 Owner: Aurora5
 Status: Active
 Purpose: SSOT 파일 목록 및 작업 규칙
@@ -25,8 +25,9 @@ SSOT에 없는 새로운 결정이 생기면 해당 SSOT 파일을 먼저 업데
 | `DreamTown_Naming_System_SSOT.md` | 공식 용어 정의 (Sowoni/Somangi/기적나눔 등) | 콘텐츠·코드·커뮤니케이션 전 |
 | `DreamTown_First_User_Journey_SSOT.md` | 신규 소원이 첫 경험 10단계 흐름 | UX·온보딩·프론트엔드 작업 전 |
 | `DreamTown_Universe_Bible.md` | 세계관, 핵심 개념, 여정 구조 | **모든 작업 전** |
-| `DreamTown_Character_SSOT.md` | 소원이·아우룸 캐릭터 정의 | 이미지·영상·웹툰 제작 전 |
+| `DreamTown_Character_SSOT.md` | 소원이·아우룸 캐릭터 상세 정의 | 이미지·영상·웹툰 제작 전 |
 | `DreamTown_Visual_Style_SSOT.md` | 스타일 잠금, 색상, 기술 스펙 | 이미지·영상·UI 작업 전 |
+| `DreamTown_Character_Style_Guide_SSOT.md` | 캐릭터+환경+장면 통합 스타일 가이드 (여의보주 포함) | 이미지·영상 생성 직전 |
 | `DreamTown_Wish_System_SSOT.md` | 소원 시스템 전체 구조 (소원→별 성장) | 소원·여정·기적 카드 작업 전 |
 | `DreamTown_Miracle_System_SSOT.md` | 기적 카드, 기적지수, 신호등, 별 성장 | 기적·신호등·기적지수 작업 전 |
 | `DreamTown_Galaxy_Mode_SSOT.md` | 은하 구조, 코스 정의, 글로벌 확장 | 여행·은하 작업 전 |
@@ -70,3 +71,4 @@ Created: YYYY-MM-DD
 | v1.3 | 2026-03-09 | DreamTown_Core_Philosophy_SSOT.md 추가 (0번 문서) |
 | v1.4 | 2026-03-09 | DreamTown_Naming_System_SSOT.md 추가 — 공식 용어 체계 확립 |
 | v1.5 | 2026-03-09 | DreamTown_First_User_Journey_SSOT.md 추가 — 신규 소원이 온보딩 10단계 |
+| v1.6 | 2026-03-09 | DreamTown_Character_Style_Guide_SSOT.md 추가 — 캐릭터+환경+장면 통합 가이드 |
