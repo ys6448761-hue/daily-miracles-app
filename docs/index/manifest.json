@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-09T03:12:54.176Z",
+  "generated_at": "2026-03-09T03:45:21.170Z",
   "generator": "generate-manifest.js",
-  "total_count": 211,
+  "total_count": 212,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -300,7 +300,7 @@
       "status": "active",
       "title": "DreamTown SSOT Index",
       "created_at": "내용",
-      "checksum": "e59f3581"
+      "checksum": "16b12b27"
     },
     {
       "id": "DOC-aurora5-master-knowledge-v2",
@@ -1699,6 +1699,24 @@
       "title": "DreamTown Character SSOT",
       "created_at": "2026-03-09",
       "checksum": "bc735ed0"
+    },
+    {
+      "id": "DOC-DreamTown_Core_Philosophy_SSOT",
+      "path": "docs/ssot/DreamTown_Core_Philosophy_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "DreamTown Core Philosophy SSOT",
+      "created_at": "2026-03-09",
+      "checksum": "78e08d52"
     },
     {
       "id": "DOC-DreamTown_Growth_Film_SSOT",
