@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-09T13:32:41.940Z",
+  "generated_at": "2026-03-09T13:35:14.691Z",
   "generator": "generate-manifest.js",
   "total_count": 230,
   "documents": [
@@ -993,7 +993,7 @@
       "status": "내용",
       "title": "DreamTown 별 탄생 정책",
       "created_at": "2026-03-09",
-      "checksum": "9bb45499"
+      "checksum": "b758d54d"
     },
     {
       "id": "DOC-DreamTown_Travel_System_SSOT",
