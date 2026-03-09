@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-09T06:16:50.253Z",
+  "generated_at": "2026-03-09T07:23:10.256Z",
   "generator": "generate-manifest.js",
-  "total_count": 216,
+  "total_count": 217,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -300,7 +300,7 @@
       "status": "active",
       "title": "DreamTown SSOT Index",
       "created_at": "내용",
-      "checksum": "1ca9b977"
+      "checksum": "9cf96e9c"
     },
     {
       "id": "DOC-aurora5-master-knowledge-v2",
@@ -1771,6 +1771,24 @@
       "title": "DreamTown Growth Film SSOT",
       "created_at": "2026-03-09",
       "checksum": "acac5ffd"
+    },
+    {
+      "id": "DOC-DreamTown_Key_Visuals_SSOT",
+      "path": "docs/ssot/DreamTown_Key_Visuals_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "yeoiboju",
+      "status": "active",
+      "title": "DreamTown Key Visuals SSOT",
+      "created_at": "2026-03-09",
+      "checksum": "f51b0d91"
     },
     {
       "id": "DOC-DreamTown_Naming_System_SSOT",
