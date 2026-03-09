@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-09T13:07:11.204Z",
+  "generated_at": "2026-03-09T13:08:33.005Z",
   "generator": "generate-manifest.js",
   "total_count": 226,
   "documents": [
@@ -919,7 +919,7 @@
       "status": "내용",
       "title": "DreamTown 상생 지원 공식 v1",
       "created_at": "2026-03-09",
-      "checksum": "3d134322"
+      "checksum": "16e980cc"
     },
     {
       "id": "DOC-DreamTown_Product_Structure_SS",
