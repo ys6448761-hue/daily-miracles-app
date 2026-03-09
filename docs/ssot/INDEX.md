@@ -1,6 +1,6 @@
 # DreamTown SSOT Index
 
-Version: v1.3
+Version: v1.4
 Owner: Aurora5
 Status: Active
 Purpose: SSOT 파일 목록 및 작업 규칙
@@ -22,6 +22,7 @@ SSOT에 없는 새로운 결정이 생기면 해당 SSOT 파일을 먼저 업데
 | 파일 | 용도 | 필독 시점 |
 |------|------|----------|
 | `DreamTown_Core_Philosophy_SSOT.md` | 철학적 선언, 소원의 의미, DreamTown의 본질 | **모든 작업 전 (0번 문서)** |
+| `DreamTown_Naming_System_SSOT.md` | 공식 용어 정의 (Sowoni/Somangi/기적나눔 등) | 콘텐츠·코드·커뮤니케이션 전 |
 | `DreamTown_Universe_Bible.md` | 세계관, 핵심 개념, 여정 구조 | **모든 작업 전** |
 | `DreamTown_Character_SSOT.md` | 소원이·아우룸 캐릭터 정의 | 이미지·영상·웹툰 제작 전 |
 | `DreamTown_Visual_Style_SSOT.md` | 스타일 잠금, 색상, 기술 스펙 | 이미지·영상·UI 작업 전 |
@@ -66,3 +67,4 @@ Created: YYYY-MM-DD
 | v1.1 | 2026-03-09 | DreamTown_Wish_System_SSOT.md 추가 |
 | v1.2 | 2026-03-09 | DreamTown Foundation Set 완성 — 12개 SSOT 전체 등록 |
 | v1.3 | 2026-03-09 | DreamTown_Core_Philosophy_SSOT.md 추가 (0번 문서) |
+| v1.4 | 2026-03-09 | DreamTown_Naming_System_SSOT.md 추가 — 공식 용어 체계 확립 |
