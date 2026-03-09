@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-09T13:06:17.356Z",
+  "generated_at": "2026-03-09T13:07:11.204Z",
   "generator": "generate-manifest.js",
-  "total_count": 225,
+  "total_count": 226,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -902,6 +902,24 @@
       "title": "DreamTown IP Strategy SSOT",
       "created_at": "2026-03-09",
       "checksum": "29e8c50c"
+    },
+    {
+      "id": "DOC-DreamTown_Partner_Support_Form",
+      "path": "docs/design/DreamTown_Partner_Support_Formula_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "aurora",
+        "가격"
+      ],
+      "owner": "rumi",
+      "status": "내용",
+      "title": "DreamTown 상생 지원 공식 v1",
+      "created_at": "2026-03-09",
+      "checksum": "3d134322"
     },
     {
       "id": "DOC-DreamTown_Product_Structure_SS",
