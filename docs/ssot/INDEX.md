@@ -1,6 +1,6 @@
 # DreamTown SSOT Index
 
-Version: v1.6
+Version: v1.7
 Owner: Aurora5
 Status: Active
 Purpose: SSOT 파일 목록 및 작업 규칙
@@ -32,6 +32,7 @@ SSOT에 없는 새로운 결정이 생기면 해당 SSOT 파일을 먼저 업데
 | `DreamTown_Miracle_System_SSOT.md` | 기적 카드, 기적지수, 신호등, 별 성장 | 기적·신호등·기적지수 작업 전 |
 | `DreamTown_Galaxy_Mode_SSOT.md` | 은하 구조, 코스 정의, 글로벌 확장 | 여행·은하 작업 전 |
 | `DreamTown_Yeosu_Galaxy_SSOT.md` | 여수 4개 코스, 장소별 기적 포인트, 배경 코드 | 여수 여행·영상 제작 전 |
+| `DreamTown_Yeosu_Travel_Routes_SSOT.md` | 여수 신화 레이어(Golden Nine) ↔ 운영 레이어 분리 구조 | 여수 여행 상품·세계관 작업 전 |
 | `DreamTown_Travel_System_SSOT.md` | 항로 4종, 호텔, 견적 시스템 | 여행 상품·견적 작업 전 |
 | `DreamTown_Product_Structure_SSOT.md` | 상품 구조, 가격, 번들 | 상품 관련 작업 전 |
 | `DreamTown_Wish_Image_SSOT.md` | 소원그림 생성 파이프라인, 보석 시스템, 스타일 | 이미지 생성 작업 전 |
@@ -72,3 +73,4 @@ Created: YYYY-MM-DD
 | v1.4 | 2026-03-09 | DreamTown_Naming_System_SSOT.md 추가 — 공식 용어 체계 확립 |
 | v1.5 | 2026-03-09 | DreamTown_First_User_Journey_SSOT.md 추가 — 신규 소원이 온보딩 10단계 |
 | v1.6 | 2026-03-09 | DreamTown_Character_Style_Guide_SSOT.md 추가 — 캐릭터+환경+장면 통합 가이드 |
+| v1.7 | 2026-03-09 | DreamTown_Yeosu_Travel_Routes_SSOT.md 추가 — Golden Nine 신화 ↔ 운영 레이어 분리 |
