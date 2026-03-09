@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-09T14:06:49.148Z",
+  "generated_at": "2026-03-09T14:09:58.277Z",
   "generator": "generate-manifest.js",
-  "total_count": 233,
+  "total_count": 234,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -794,6 +794,24 @@
       "title": "DreamTown Character Style Guide SSOT",
       "created_at": "2026-03-09",
       "checksum": "31174b04"
+    },
+    {
+      "id": "DOC-DreamTown_Constellation_System",
+      "path": "docs/design/DreamTown_Constellation_System_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Constellation 시스템",
+      "created_at": "2026-03-09",
+      "checksum": "7fddfdfd"
     },
     {
       "id": "DOC-DreamTown_Core_Storyboard_SSOT",
