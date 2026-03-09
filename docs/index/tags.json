@@ -9,6 +9,7 @@
     "DOC-tag_taxonomy",
     "DOC-소원놀이터_종합문서_v10",
     "DOC-AURORA-STATUS",
+    "DOC-INDEX",
     "DOC-aurora5-master-knowledge-v2",
     "DOC-brand-bible",
     "DOC-architecture",
@@ -24,7 +25,6 @@
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
     "DOC-DEC-20260201-포인트추천예고편-정책구현",
     "DOC-index",
-    "DOC-DEPLOY-PACKET-2026-03-02",
     "DOC-playground-events",
     "DOC-GROWTH-ROADMAP",
     "DOC-JUDGE_PROMPTS",
@@ -49,6 +49,11 @@
     "DOC-ROADMAP_API",
     "DOC-GA4_SETUP_GUIDE",
     "DOC-VIDEO_MASTER",
+    "DOC-DreamTown_Character_SSOT",
+    "DOC-DreamTown_Galaxy_Mode_SSOT",
+    "DOC-DreamTown_Product_Structure_SS",
+    "DOC-DreamTown_Universe_Bible",
+    "DOC-DreamTown_Visual_Style_SSOT",
     "DOC-agents-index",
     "DOC-소원놀이터_퀵레퍼런스",
     "DOC-Aurora5_토론시스템_안내문",
@@ -56,6 +61,7 @@
     "DOC-video-promo-30sec-template",
     "DOC-WIX_TEAM_PAGE_CONTENT",
     "DOC-프로젝트지식_수동정리_가이드",
+    "DOC-DEPLOY-PACKET-2026-03-02",
     "DOC-20260131_파크_2d_기술지원",
     "DOC-20260201_드라이브_공유폴더_마스터가이드",
     "DOC-AURORA5_SORA_FINAL_v10",
@@ -133,6 +139,7 @@
     "DOC-AIL-정산-v2-final",
     "DOC-AURORA5_CHARACTER_PROMPTS_V3",
     "DOC-AURORA-STATUS",
+    "DOC-INDEX",
     "DOC-aurora5-master-knowledge-v2",
     "DOC-PROMOTION-RULES",
     "DOC-brand-bible",
@@ -141,7 +148,6 @@
     "DOC-정산-v2-CEO-요약",
     "DOC-AURORA5_CHARACTER_PROMPTS",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
-    "DOC-DEPLOY-PACKET-2026-03-02",
     "DOC-GROWTH-ROADMAP",
     "DOC-JUDGE_PROMPTS",
     "DOC-LAUNCH-DECLARATION",
@@ -159,12 +165,18 @@
     "DOC-ROADMAP_API",
     "DOC-VIDEO_MASTER",
     "DOC-CHANGELOG",
+    "DOC-DreamTown_Character_SSOT",
+    "DOC-DreamTown_Galaxy_Mode_SSOT",
+    "DOC-DreamTown_Product_Structure_SS",
+    "DOC-DreamTown_Universe_Bible",
+    "DOC-DreamTown_Visual_Style_SSOT",
     "DOC-SOURCES_INDEX",
     "DOC-agents-index",
     "DOC-manifest-system",
     "DOC-Aurora5_토론시스템_안내문",
     "DOC-WIX_TEAM_PAGE_CONTENT",
     "DOC-프로젝트지식_수동정리_가이드",
+    "DOC-DEPLOY-PACKET-2026-03-02",
     "DOC-AURORA5_SORA_FINAL_v10",
     "DOC-Code_종합지시서",
     "DOC-CEO-WEEKLY-2025-W52",
@@ -242,11 +254,14 @@
     "DOC-상품유형별_가격표_v12",
     "DOC-전체상품_가격표_종합_v12",
     "DOC-AURORA-STATUS",
+    "DOC-INDEX",
     "DOC-DEC-20260201-포인트추천예고편-정책구현",
     "DOC-drive-github-sync-setup",
     "DOC-가격표_퀵레퍼런스",
     "DOC-tax-accounting-ai-tools-analys",
     "DOC-06_External_Sharing_Guide",
+    "DOC-DreamTown_Galaxy_Mode_SSOT",
+    "DOC-DreamTown_Product_Structure_SS",
     "DOC-alimtalk-templates-design",
     "DOC-20260101-4PA",
     "DOC-20260101-TRD",
@@ -407,6 +422,17 @@
     "DOC-20260101-99J",
     "DOC-20251229-PFO"
   ],
+  "ssot": [
+    "DOC-INDEX",
+    "DOC-CHANGELOG",
+    "DOC-DreamTown_Character_SSOT",
+    "DOC-DreamTown_Galaxy_Mode_SSOT",
+    "DOC-DreamTown_Product_Structure_SS",
+    "DOC-DreamTown_Universe_Bible",
+    "DOC-DreamTown_Visual_Style_SSOT",
+    "DOC-NOTION_PROFILE_GATE",
+    "DOC-SOURCES_INDEX"
+  ],
   "00-master": [
     "DOC-aurora5-master-knowledge-v2"
   ],
@@ -416,7 +442,8 @@
   "03-tech": [
     "DOC-architecture",
     "DOC-code-guide-v3",
-    "DOC-DEV-RULES"
+    "DOC-DEV-RULES",
+    "DOC-growth-film-architecture"
   ],
   "04-marketing": [
     "DOC-소원드림광장_홈페이지재구성_현황브리핑"
@@ -463,9 +490,6 @@
     "DEC-2025-1230-001",
     "DEC-2025-1230-002",
     "DEC-2025-1230-003"
-  ],
-  "deploy": [
-    "DOC-DEPLOY-PACKET-2026-03-02"
   ],
   "deployment": [
     "DOC-deployment-checklist"
@@ -554,11 +578,6 @@
   "v1.1": [
     "DOC-VIDEO_MASTER"
   ],
-  "ssot": [
-    "DOC-CHANGELOG",
-    "DOC-NOTION_PROFILE_GATE",
-    "DOC-SOURCES_INDEX"
-  ],
   "team": [
     "DOC-Aurora5_토론시스템_안내문"
   ],
@@ -567,6 +586,9 @@
   ],
   "_raw": [
     "DOC-README"
+  ],
+  "deploy": [
+    "DOC-DEPLOY-PACKET-2026-03-02"
   ],
   "2026-02-01": [
     "DOC-20260131_파크_2d_기술지원",
