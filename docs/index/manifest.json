@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-09T13:21:40.758Z",
+  "generated_at": "2026-03-09T13:32:41.940Z",
   "generator": "generate-manifest.js",
   "total_count": 230,
   "documents": [
@@ -990,10 +990,10 @@
         "aurora"
       ],
       "owner": "rumi",
-      "status": "active",
+      "status": "내용",
       "title": "DreamTown 별 탄생 정책",
       "created_at": "2026-03-09",
-      "checksum": "db6d80f5"
+      "checksum": "9bb45499"
     },
     {
       "id": "DOC-DreamTown_Travel_System_SSOT",
@@ -2221,7 +2221,7 @@
       "status": "archived",
       "title": "DreamTown 세계 아키텍처 SSOT",
       "created_at": "2026-03-09",
-      "checksum": "09ac0a52"
+      "checksum": "72930019"
     },
     {
       "id": "DOC-quantum-planning-method",
