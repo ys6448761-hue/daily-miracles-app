@@ -1,6 +1,6 @@
 # DreamTown SSOT Index
 
-Version: v1.9
+Version: v2.2
 Owner: Aurora5
 Status: Active
 Purpose: SSOT 파일 목록 및 작업 규칙
@@ -41,6 +41,9 @@ SSOT에 없는 새로운 결정이 생기면 해당 SSOT 파일을 먼저 업데
 | `DreamTown_Growth_Film_SSOT.md` | 성장필름 (7일 완주 기념 영상), 바이럴 루프 | 성장필름·챌린지 작업 전 |
 | `DreamTown_Aurora5_System_SSOT.md` | Aurora5 팀 역할, 메시지 시스템, 기적지수 엔진 | AI 동행 시스템 작업 전 |
 | `DreamTown_Safety_Ethics_SSOT.md` | 신호등, 금지 조언, 개인정보, 위기 대응 | 안전·윤리 관련 모든 작업 전 |
+| `DreamTown_Origin_Myth_SSOT.md` | 여수 금오설화 기반 창세 신화 — 아우룸의 탄생, 금오 9형제, 용궁 삼각 구조 | 세계관·캐릭터·콘텐츠 작업 전 |
+| `DreamTown_IP_Strategy_SSOT.md` | 상표·저작권·BM특허·디자인권 보호 로드맵 | IP 관련 모든 의사결정 전 |
+| `DreamTown_Image_Prompts_SSOT.md` | DALL-E/Sora 공식 마스터 프롬프트 (6종) + Style Lock 규칙 | 이미지·영상 생성 직전 |
 
 ---
 
@@ -78,3 +81,6 @@ Created: YYYY-MM-DD
 | v1.7 | 2026-03-09 | DreamTown_Yeosu_Travel_Routes_SSOT.md 추가 — Golden Nine 신화 ↔ 운영 레이어 분리 |
 | v1.8 | 2026-03-09 | DreamTown_Key_Visuals_SSOT.md 추가 — 핵심 비주얼 3장면 확정 |
 | v1.9 | 2026-03-09 | DreamTown_Core_Storyboard_SSOT.md 추가 — 핵심 5장면 IP 구조 확정 |
+| v2.0 | 2026-03-09 | DreamTown_Origin_Myth_SSOT.md 추가 — 여수 금오설화 기반 창세 신화 확정 |
+| v2.1 | 2026-03-09 | DreamTown_IP_Strategy_SSOT.md 추가 — IP 보호 4단계 로드맵 |
+| v2.2 | 2026-03-09 | DreamTown_Image_Prompts_SSOT.md 추가 — 공식 마스터 프롬프트 6종 확정 |

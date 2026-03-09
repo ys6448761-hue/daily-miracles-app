@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-09T07:38:58.990Z",
+  "generated_at": "2026-03-09T12:43:47.844Z",
   "generator": "generate-manifest.js",
-  "total_count": 218,
+  "total_count": 221,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -300,7 +300,7 @@
       "status": "active",
       "title": "DreamTown SSOT Index",
       "created_at": "내용",
-      "checksum": "f452e26f"
+      "checksum": "e1b53e61"
     },
     {
       "id": "DOC-aurora5-master-knowledge-v2",
@@ -1791,6 +1791,42 @@
       "checksum": "acac5ffd"
     },
     {
+      "id": "DOC-DreamTown_Image_Prompts_SSOT",
+      "path": "docs/ssot/DreamTown_Image_Prompts_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "code",
+      "status": "추가 프롬프트",
+      "title": "DreamTown Image Prompts SSOT",
+      "created_at": "2026-03-09",
+      "checksum": "6287474e"
+    },
+    {
+      "id": "DOC-DreamTown_IP_Strategy_SSOT",
+      "path": "docs/ssot/DreamTown_IP_Strategy_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "DreamTown IP Strategy SSOT",
+      "created_at": "2026-03-09",
+      "checksum": "29e8c50c"
+    },
+    {
       "id": "DOC-DreamTown_Key_Visuals_SSOT",
       "path": "docs/ssot/DreamTown_Key_Visuals_SSOT.md",
       "type": "document",
@@ -1825,6 +1861,24 @@
       "title": "DreamTown Naming System SSOT",
       "created_at": "2026-03-09",
       "checksum": "6bd3943d"
+    },
+    {
+      "id": "DOC-DreamTown_Origin_Myth_SSOT",
+      "path": "docs/ssot/DreamTown_Origin_Myth_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "archived",
+      "title": "DreamTown Origin Myth SSOT",
+      "created_at": "2026-03-09",
+      "checksum": "1134dbef"
     },
     {
       "id": "DOC-DreamTown_Product_Structure_SS",
