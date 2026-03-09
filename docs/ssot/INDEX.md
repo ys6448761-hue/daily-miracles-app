@@ -46,6 +46,7 @@ docs/
 | `DreamTown_Miracle_System_SSOT.md` | 기적 카드, 기적지수, 신호등, 별 성장 | 기적·신호등·기적지수 작업 전 |
 | `DreamTown_Aurora5_System_SSOT.md` | Aurora5 팀 역할, 메시지 시스템, 기적지수 엔진 | AI 동행 시스템 작업 전 |
 | `DreamTown_Safety_Ethics_SSOT.md` | 신호등, 금지 조언, 개인정보, 위기 대응 | 안전·윤리 관련 모든 작업 전 |
+| `DreamTown_World_Architecture_SSOT.md` | 디지털 용궁 × DreamTown 통합 구조 — 세계관 중심축 | **모든 작업 전** |
 | `AIL-SSOT-001_Storage_Rules.md` | SSOT 저장 규칙 (문서 분류·중복 방지·상태 태그) | 새 문서 생성 전 |
 | `INDEX.md` | 이 파일 — 목차 및 규칙 | 항상 |
 
@@ -86,3 +87,4 @@ docs/
 |------|------|------|
 | v1.0~v1.9 | 2026-03-09 | SSOT Foundation Set 구축 (28개) |
 | v3.0 | 2026-03-09 | AIL-SSOT-001 적용 — ssot/13개 + design/12개 + archive/ 구조로 정리 |
+| v3.1 | 2026-03-09 | DreamTown_World_Architecture_SSOT.md 추가 — 디지털 용궁 중심 세계 구조 확정 |

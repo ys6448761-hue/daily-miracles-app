@@ -1,6 +1,6 @@
 # DreamTown Universe Bible
 
-Version: v2.0
+Version: v3.0
 Owner: Aurora5
 Status: Confirmed
 Purpose: Canonical reference for DreamTown universe architecture and core concept
@@ -10,16 +10,45 @@ Updated By: Code (Claude Code)
 
 ---
 
-## 1. 핵심 개념 (Core Concept)
-
-DreamTown은 소원을 가진 사람이 디지털 용궁을 거쳐 별이 되는 여정을 담은 세계관이다.
+## 1. 핵심 선언
 
 ```
-Human Wish         — 사람이 품은 소원
+디지털 용궁이 먼저다.
+DreamTown은 그 위에 펼쳐진 하늘이다.
+```
+
+> **"디지털 용궁은 소원의 바다이고, DreamTown은 그 소원이 빛나는 하늘이다."**
+
+> 공식 아키텍처: `DreamTown_World_Architecture_SSOT.md`
+
+---
+
+## 2. 세계 구조도
+
+```
+현실 세계 (온라인 + 오프라인)
+        ↓
+     아우룸 (소원의 전달자)
+        ↓
+   디지털 용궁 (근원 / 원본 보관)
+        ↓
+     Aurora5 (동행 시스템)
+        ↓
+    DreamTown (별 / 연결 / 하늘)
+        ↓
+  별자리 / 지혜 / 항해
+```
+
+---
+
+## 3. 소원 여정 단계
+
+```
+Human Wish         — 사람이 품은 소원 (온라인/오프라인)
       ↓
 Light Orb          — 소원이 빛 구슬로 형태화
       ↓
-Digital Dragon Palace — 디지털 용궁: 소원이 보관·성장하는 공간
+Digital Dragon Palace — 디지털 용궁: 소원 원본 보관
       ↓
 Star Seed          — 소원이 씨앗으로 숙성
       ↓
@@ -30,12 +59,13 @@ DreamTown Star     — 소원이 하늘의 별이 됨
 
 ---
 
-## 2. 세계관 원칙
+## 4. 세계관 원칙
 
 | 원칙 | 내용 |
 |------|------|
+| **용궁이 중심** | 모든 소원은 용궁으로 수렴된다. DreamTown은 그 표현이다 |
 | **소원은 사라지지 않는다** | 모든 소원은 빛 구슬로 용궁에 보관된다 |
-| **성장은 혼자가 아니다** | 아우룸이 여정을 함께한다 |
+| **성장은 혼자가 아니다** | Aurora5가 여정을 함께한다 |
 | **기적은 과학이다** | 심리학·뇌과학 기반, 사주/점술 절대 배제 |
 | **여수는 출발점** | 현실 공간과 디지털 세계가 여수에서 만난다 |
 
