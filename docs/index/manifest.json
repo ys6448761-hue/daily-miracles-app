@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-09T02:43:01.200Z",
+  "generated_at": "2026-03-09T02:48:43.398Z",
   "generator": "generate-manifest.js",
   "total_count": 203,
   "documents": [
@@ -263,6 +263,25 @@
       "title": "AURORA_STATUS.md",
       "created_at": "담당",
       "checksum": "6f22a0bf"
+    },
+    {
+      "id": "DOC-DreamTown_Galaxy_Mode_SSOT",
+      "path": "docs/ssot/DreamTown_Galaxy_Mode_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora",
+        "가격"
+      ],
+      "owner": "code",
+      "status": "|------",
+      "title": "DreamTown Galaxy Mode SSOT",
+      "created_at": "내용",
+      "checksum": "bae6a841"
     },
     {
       "id": "DOC-INDEX",
@@ -1662,25 +1681,6 @@
       "title": "DreamTown Character SSOT",
       "created_at": "2026-03-09",
       "checksum": "bc735ed0"
-    },
-    {
-      "id": "DOC-DreamTown_Galaxy_Mode_SSOT",
-      "path": "docs/ssot/DreamTown_Galaxy_Mode_SSOT.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "ssot",
-      "tags": [
-        "ssot",
-        "소원",
-        "aurora",
-        "가격"
-      ],
-      "owner": "team",
-      "status": "|------",
-      "title": "DreamTown Galaxy Mode SSOT",
-      "created_at": "2026-03-09",
-      "checksum": "20dd83f7"
     },
     {
       "id": "DOC-DreamTown_Product_Structure_SS",
