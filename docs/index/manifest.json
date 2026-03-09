@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-09T13:11:54.923Z",
+  "generated_at": "2026-03-09T13:17:43.746Z",
   "generator": "generate-manifest.js",
-  "total_count": 227,
+  "total_count": 229,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -832,6 +832,43 @@
       "checksum": "42a5815f"
     },
     {
+      "id": "DOC-DreamTown_Expansion_Universe_D",
+      "path": "docs/design/DreamTown_Expansion_Universe_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown 확장 우주 구조",
+      "created_at": "2026-03-09",
+      "checksum": "08e2a37d"
+    },
+    {
+      "id": "DOC-DreamTown_Festival_Commerce_De",
+      "path": "docs/design/DreamTown_Festival_Commerce_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora",
+        "가격"
+      ],
+      "owner": "rumi",
+      "status": "내용",
+      "title": "DreamTown 축제형 커머스 시스템",
+      "created_at": "2026-03-09",
+      "checksum": "f7e77417"
+    },
+    {
       "id": "DOC-DreamTown_First_User_Journey_S",
       "path": "docs/design/DreamTown_First_User_Journey_SSOT.md",
       "type": "document",
@@ -1023,6 +1060,7 @@
       "topic": "design",
       "tags": [
         "design",
+        "소원",
         "aurora",
         "가격"
       ],
@@ -1030,7 +1068,7 @@
       "status": "|------",
       "title": "DreamTown 여수 1차 파일럿 운영 설계",
       "created_at": "2026-03-09",
-      "checksum": "16ba2611"
+      "checksum": "0ca2f423"
     },
     {
       "id": "DOC-DreamTown_Yeosu_Travel_Routes_",
