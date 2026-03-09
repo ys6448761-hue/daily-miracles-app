@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-09T07:23:10.256Z",
+  "generated_at": "2026-03-09T07:38:58.990Z",
   "generator": "generate-manifest.js",
-  "total_count": 217,
+  "total_count": 218,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -300,7 +300,7 @@
       "status": "active",
       "title": "DreamTown SSOT Index",
       "created_at": "내용",
-      "checksum": "9cf96e9c"
+      "checksum": "f452e26f"
     },
     {
       "id": "DOC-aurora5-master-knowledge-v2",
@@ -1735,6 +1735,24 @@
       "title": "DreamTown Core Philosophy SSOT",
       "created_at": "2026-03-09",
       "checksum": "78e08d52"
+    },
+    {
+      "id": "DOC-DreamTown_Core_Storyboard_SSOT",
+      "path": "docs/ssot/DreamTown_Core_Storyboard_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "DreamTown Core Storyboard SSOT",
+      "created_at": "2026-03-09",
+      "checksum": "ab176f6e"
     },
     {
       "id": "DOC-DreamTown_First_User_Journey_S",

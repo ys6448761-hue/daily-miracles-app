@@ -1,6 +1,6 @@
 # DreamTown SSOT Index
 
-Version: v1.8
+Version: v1.9
 Owner: Aurora5
 Status: Active
 Purpose: SSOT 파일 목록 및 작업 규칙
@@ -29,6 +29,7 @@ SSOT에 없는 새로운 결정이 생기면 해당 SSOT 파일을 먼저 업데
 | `DreamTown_Visual_Style_SSOT.md` | 스타일 잠금, 색상, 기술 스펙 | 이미지·영상·UI 작업 전 |
 | `DreamTown_Character_Style_Guide_SSOT.md` | 캐릭터+환경+장면 통합 스타일 가이드 (여의보주 포함) | 이미지·영상 생성 직전 |
 | `DreamTown_Key_Visuals_SSOT.md` | 핵심 비주얼 3장면 (KV-01/02/03) — 브랜딩·영상·앱·마케팅 기준 | 비주얼 제작·브랜딩 작업 전 |
+| `DreamTown_Core_Storyboard_SSOT.md` | 핵심 장면 5개 (Wish→Star→Aurum→Constellation→DreamTown) | 스토리·IP·마케팅 기획 전 |
 | `DreamTown_Wish_System_SSOT.md` | 소원 시스템 전체 구조 (소원→별 성장) | 소원·여정·기적 카드 작업 전 |
 | `DreamTown_Miracle_System_SSOT.md` | 기적 카드, 기적지수, 신호등, 별 성장 | 기적·신호등·기적지수 작업 전 |
 | `DreamTown_Galaxy_Mode_SSOT.md` | 은하 구조, 코스 정의, 글로벌 확장 | 여행·은하 작업 전 |
@@ -76,3 +77,4 @@ Created: YYYY-MM-DD
 | v1.6 | 2026-03-09 | DreamTown_Character_Style_Guide_SSOT.md 추가 — 캐릭터+환경+장면 통합 가이드 |
 | v1.7 | 2026-03-09 | DreamTown_Yeosu_Travel_Routes_SSOT.md 추가 — Golden Nine 신화 ↔ 운영 레이어 분리 |
 | v1.8 | 2026-03-09 | DreamTown_Key_Visuals_SSOT.md 추가 — 핵심 비주얼 3장면 확정 |
+| v1.9 | 2026-03-09 | DreamTown_Core_Storyboard_SSOT.md 추가 — 핵심 5장면 IP 구조 확정 |
