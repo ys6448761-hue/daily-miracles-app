@@ -26,6 +26,7 @@
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
     "DOC-DEC-20260201-포인트추천예고편-정책구현",
     "DOC-index",
+    "DOC-DreamTown_Aurum_UX_Design",
     "DOC-DreamTown_Character_Style_Guid",
     "DOC-DreamTown_Constellation_System",
     "DOC-DreamTown_Core_Storyboard_SSOT",
@@ -178,6 +179,7 @@
     "DOC-SOURCES_INDEX",
     "DOC-AURORA5_CHARACTER_PROMPTS",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
+    "DOC-DreamTown_Aurum_UX_Design",
     "DOC-DreamTown_Character_Style_Guid",
     "DOC-DreamTown_Constellation_System",
     "DOC-DreamTown_Core_Storyboard_SSOT",
@@ -487,6 +489,7 @@
   ],
   "design": [
     "DOC-DreamTown_Galaxy_Mode_SSOT",
+    "DOC-DreamTown_Aurum_UX_Design",
     "DOC-DreamTown_Character_Style_Guid",
     "DOC-DreamTown_Constellation_System",
     "DOC-DreamTown_Core_Storyboard_SSOT",

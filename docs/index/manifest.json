@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-09T14:09:58.277Z",
+  "generated_at": "2026-03-09T14:15:53.705Z",
   "generator": "generate-manifest.js",
-  "total_count": 234,
+  "total_count": 235,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -776,6 +776,24 @@
       "title": "Daily Miracles MVP 배포 체크리스트",
       "created_at": "2026-03-09",
       "checksum": "0202a43e"
+    },
+    {
+      "id": "DOC-DreamTown_Aurum_UX_Design",
+      "path": "docs/design/DreamTown_Aurum_UX_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "archived",
+      "title": "아우룸 UX 설계",
+      "created_at": "2026-03-09",
+      "checksum": "d2aacd32"
     },
     {
       "id": "DOC-DreamTown_Character_Style_Guid",
@@ -2148,7 +2166,7 @@
       "status": "사용 씬",
       "title": "DreamTown Character SSOT",
       "created_at": "2026-03-09",
-      "checksum": "bc735ed0"
+      "checksum": "080dc640"
     },
     {
       "id": "DOC-DreamTown_Core_Philosophy_SSOT",
