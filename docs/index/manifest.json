@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-09T12:58:13.097Z",
+  "generated_at": "2026-03-09T13:03:51.938Z",
   "generator": "generate-manifest.js",
   "total_count": 223,
   "documents": [
@@ -939,7 +939,7 @@
       "status": "내용",
       "title": "DreamTown 영상 제작 파이프라인",
       "created_at": "2026-03-09",
-      "checksum": "70dd6ad5"
+      "checksum": "67ca79a6"
     },
     {
       "id": "DOC-DreamTown_Wish_Image_SSOT",

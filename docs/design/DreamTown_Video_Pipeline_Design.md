@@ -2,7 +2,7 @@
 
 Version: v1.0
 Owner: Aurora5 / 루미
-Status: Review
+Status: Confirmed
 Purpose: DreamTown 영상 제작 표준 파이프라인 — Aurora5 방식
 
 Last Updated: 2026-03-09
@@ -37,15 +37,13 @@ Subtitle burn-in
 
 ### 별씨 (Byeolssi) 이미지 프롬프트
 
-> ⚠️ 별씨 최종 디자인 방향 미결정 — CEO 선택 대기
-> 옵션 A: 순수한 별 형태 (✨ 형상)
-> 옵션 B: 작은 빛 생명체 (눈 있는 별)
+> ✅ CEO 확정: **옵션 B — 작은 빛 생명체 (눈 있는 별)** (2026-03-09)
 
 ```
-a small glowing star spirit called Byeolssi,
-simple star-shaped light,
-soft warm glow,
-gentle eyes made of light,
+a small glowing star creature called Byeolssi,
+tiny round light body with gentle glowing eyes,
+soft warm glow radiating from the body,
+small expressive eyes that convey emotion,
 floating in deep blue cosmic space,
 minimalist design,
 Studio Ghibli style mixed with Korean animation style,
@@ -53,7 +51,8 @@ soft watercolor shading,
 2D hand-drawn animation look,
 consistent character design,
 simple shapes,
-emotional and warm atmosphere
+emotional and warm atmosphere,
+capable of expressing joy, wonder, and warmth through eyes
 ```
 
 ### 캐릭터 고정 조건 (나노바나나 기법)
@@ -215,7 +214,7 @@ physics simulation
 
 | 항목 | 상태 | 내용 |
 |------|------|------|
-| 별씨 디자인 방향 | **CEO 결정 대기** | A: 순수 별 형태 / B: 눈 있는 빛 생명체 |
+| 별씨 디자인 방향 | **✅ 확정** | B: 눈 있는 빛 생명체 (2026-03-09 CEO 결정) |
 | 별씨 ↔ 소원이 관계 | 미정 | 동일 캐릭터? 별개 캐릭터? |
 | FFmpeg 자막 세팅 | 미정 | 폰트·크기·위치 |
 
