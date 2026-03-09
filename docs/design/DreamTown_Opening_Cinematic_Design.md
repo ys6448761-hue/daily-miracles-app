@@ -3,6 +3,7 @@
 Version: v1.0
 Owner: Aurora5 / 루미
 Status: Confirmed
+Note: CEO 확정 시작 화면 구조 (2026-03-10) — 여수 밤바다→아우룸→용궁→별 탄생
 Purpose: 신규 사용자 첫 진입 시 세계관 몰입 연출 — 30초 시네마틱 구조
 
 Last Updated: 2026-03-09
