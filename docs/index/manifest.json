@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-09T13:17:43.746Z",
+  "generated_at": "2026-03-09T13:19:18.435Z",
   "generator": "generate-manifest.js",
   "total_count": 229,
   "documents": [
@@ -866,7 +866,7 @@
       "status": "내용",
       "title": "DreamTown 축제형 커머스 시스템",
       "created_at": "2026-03-09",
-      "checksum": "f7e77417"
+      "checksum": "eb413207"
     },
     {
       "id": "DOC-DreamTown_First_User_Journey_S",
