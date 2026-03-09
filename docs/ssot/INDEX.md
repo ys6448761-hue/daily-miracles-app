@@ -23,8 +23,9 @@ SSOT에 없는 새로운 결정이 생기면 해당 SSOT 파일을 먼저 업데
 |------|------|----------|
 | `DreamTown_Universe_Bible.md` | 세계관, 핵심 개념, 여정 구조 | 모든 작업 전 |
 | `DreamTown_Character_SSOT.md` | 소원이·아우룸 캐릭터 정의 | 이미지·영상·웹툰 제작 전 |
+| `DreamTown_Wish_System_SSOT.md` | 소원 시스템 전체 구조 (소원→별 성장) | 소원·여정·기적 카드 작업 전 |
 | `DreamTown_Product_Structure_SSOT.md` | 상품 구조, 가격, 번들 | 상품 관련 작업 전 |
-| `DreamTown_Galaxy_Mode_SSOT.md` | 여행 항로 체계, 견적 시스템 | 여행 상품 작업 전 |
+| `DreamTown_Galaxy_Mode_SSOT.md` | 은하 구조, 코스 정의, 글로벌 확장 | 여행·은하 작업 전 |
 | `DreamTown_Visual_Style_SSOT.md` | 스타일 잠금, 색상, 기술 스펙 | 이미지·영상·UI 작업 전 |
 
 ---
@@ -54,3 +55,4 @@ Created: YYYY-MM-DD
 | 버전 | 날짜 | 내용 |
 |------|------|------|
 | v1.0 | 2026-03-09 | 최초 생성 (Code) |
+| v1.1 | 2026-03-09 | DreamTown_Wish_System_SSOT.md 추가 |

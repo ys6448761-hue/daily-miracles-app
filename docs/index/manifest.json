@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-09T02:48:43.398Z",
+  "generated_at": "2026-03-09T02:52:14.509Z",
   "generator": "generate-manifest.js",
-  "total_count": 203,
+  "total_count": 204,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -300,7 +300,7 @@
       "status": "active",
       "title": "DreamTown SSOT Index",
       "created_at": "내용",
-      "checksum": "92a5eb82"
+      "checksum": "efa64d43"
     },
     {
       "id": "DOC-aurora5-master-knowledge-v2",
@@ -3655,6 +3655,24 @@
       "title": "MASTER-CONTROL — 회의센터 출입구",
       "created_at": "|----|------|------|",
       "checksum": "75826de7"
+    },
+    {
+      "id": "DOC-DreamTown_Wish_System_SSOT",
+      "path": "docs/ssot/DreamTown_Wish_System_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "code",
+      "status": "| 2",
+      "title": "DreamTown Wish System SSOT",
+      "created_at": "|",
+      "checksum": "2e05fcd8"
     },
     {
       "id": "DOC-inquiry-form-api",

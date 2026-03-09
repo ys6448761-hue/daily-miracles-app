@@ -132,6 +132,7 @@
     "DOC-20251229-SRH",
     "DOC-20251229-PFO",
     "DOC-MASTER-CONTROL",
+    "DOC-DreamTown_Wish_System_SSOT",
     "DOC-inquiry-form-api"
   ],
   "aurora": [
@@ -243,7 +244,8 @@
     "DOC-20251229-A1Y",
     "DOC-20251229-SRH",
     "DOC-20251229-PFO",
-    "DOC-MASTER-CONTROL"
+    "DOC-MASTER-CONTROL",
+    "DOC-DreamTown_Wish_System_SSOT"
   ],
   "ail": [
     "DOC-AIL-정산-v2-final",
@@ -431,7 +433,8 @@
     "DOC-DreamTown_Universe_Bible",
     "DOC-DreamTown_Visual_Style_SSOT",
     "DOC-NOTION_PROFILE_GATE",
-    "DOC-SOURCES_INDEX"
+    "DOC-SOURCES_INDEX",
+    "DOC-DreamTown_Wish_System_SSOT"
   ],
   "00-master": [
     "DOC-aurora5-master-knowledge-v2"
