@@ -1,8 +1,8 @@
 # DreamTown Universe Bible
 
-Version: v1.0
+Version: v2.0
 Owner: Aurora5
-Status: Active
+Status: Confirmed
 Purpose: Canonical reference for DreamTown universe architecture and core concept
 
 Last Updated: 2026-03-09
@@ -86,9 +86,57 @@ DreamTown Star     — 소원이 하늘의 별이 됨
 
 ---
 
-## 참조 SSOT
+## 6. Galaxy 구조 (우주 성장 계층)
+
+소원은 별이 되고, 별들이 모여 우주를 이룬다.
+
+```
+Star (개인의 소원)
+      ↓
+Constellation (비슷한 여정들의 모임)
+      ↓
+Galaxy (테마별 컬렉션)
+      ↓
+Galaxy Cluster (대형 지식 도메인)
+```
+
+### Origin Galaxy — 여수 은하 (Yeosu Galaxy)
+
+DreamTown의 첫 번째 은하. **"DreamTown의 하늘은 여수의 바다에서 태어났다."**
+
+여수가 출발점인 이유:
+- 디지털 용궁(Dragon Palace) — 소원이 보관되는 바닷속 공간
+- 아우룸(황금 거북) — 바다와 별 사이를 잇는 안내자
+- 바다 → 별 변환 — 소원이 현실에서 우주로 이어지는 상징
+
+### 미래 은하 확장
+| 은하 | 상태 |
+|------|------|
+| 서울 은하 | 계획 |
+| 부산 은하 | 계획 |
+| 제주 은하 | 계획 |
+| 교토·발리·산토리니 | 장기 계획 |
+
+> 운영 상세: `docs/design/DreamTown_Galaxy_Mode_SSOT.md`
+
+---
+
+## 7. 창세 신화 요약
+
+여수 금오설화를 기반으로 한 DreamTown의 창세 이야기.
+
+- **금오 9형제** — 용왕의 명을 받아 인간 세상을 지키러 온 황금 거북 형제
+- **1~8 형제** — 여수 지형에 잠든 수호 별 (고정된 별자리)
+- **아우룸 (9번째)** — 유일하게 자유롭게 움직이는 거북. 인간의 소원을 용궁에 전달
+- **Golden Nine Constellation** — 9형제가 DreamTown 하늘의 거북 별자리가 됨
+
+> 전체 신화: `DreamTown_Origin_Myth_SSOT.md`
+
+---
+
+## 참조
 
 - 캐릭터: `DreamTown_Character_SSOT.md`
-- 상품 구조: `DreamTown_Product_Structure_SSOT.md`
-- 갤럭시 모드: `DreamTown_Galaxy_Mode_SSOT.md`
+- 창세 신화: `DreamTown_Origin_Myth_SSOT.md`
 - 비주얼 스타일: `DreamTown_Visual_Style_SSOT.md`
+- Galaxy 운영 설계: `docs/design/DreamTown_Galaxy_Mode_SSOT.md`
