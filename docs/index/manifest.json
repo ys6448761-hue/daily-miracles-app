@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-09T13:19:18.435Z",
+  "generated_at": "2026-03-09T13:20:47.047Z",
   "generator": "generate-manifest.js",
-  "total_count": 229,
+  "total_count": 230,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -976,6 +976,24 @@
       "title": "DreamTown Product Structure SSOT",
       "created_at": "2026-03-09",
       "checksum": "42c15e21"
+    },
+    {
+      "id": "DOC-DreamTown_Star_Birth_Policy_De",
+      "path": "docs/design/DreamTown_Star_Birth_Policy_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown 별 탄생 정책",
+      "created_at": "2026-03-09",
+      "checksum": "05cf19aa"
     },
     {
       "id": "DOC-DreamTown_Travel_System_SSOT",
