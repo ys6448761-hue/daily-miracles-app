@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-09T12:55:40.142Z",
+  "generated_at": "2026-03-09T12:58:13.097Z",
   "generator": "generate-manifest.js",
-  "total_count": 222,
+  "total_count": 223,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -922,6 +922,24 @@
       "title": "DreamTown Travel System SSOT",
       "created_at": "2026-03-09",
       "checksum": "90d9f9e1"
+    },
+    {
+      "id": "DOC-DreamTown_Video_Pipeline_Desig",
+      "path": "docs/design/DreamTown_Video_Pipeline_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "내용",
+      "title": "DreamTown 영상 제작 파이프라인",
+      "created_at": "2026-03-09",
+      "checksum": "70dd6ad5"
     },
     {
       "id": "DOC-DreamTown_Wish_Image_SSOT",
