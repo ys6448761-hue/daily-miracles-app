@@ -97,7 +97,18 @@ export default function WishGate() {
         )}
       </motion.div>
 
-      {error && <p className="text-red-400 text-sm text-center mb-4">{error}</p>}
+      {error && (
+        <div className="bg-white/5 border border-white/20 rounded-2xl p-4 mb-4 text-center">
+          <p className="text-white/70 text-sm mb-2">별을 준비하는 데 문제가 생겼어요. ✨</p>
+          <p className="text-white/40 text-xs mb-3">{error}</p>
+          <button
+            onClick={handleSubmit}
+            className="text-star-gold text-sm font-medium"
+          >
+            다시 시도하기 →
+          </button>
+        </div>
+      )}
 
       {/* CTA */}
       <motion.button

@@ -2,8 +2,24 @@
 
 const BASE = '/api/dt';
 
+async function fetchWithRetry(url, options, retries = 1) {
+  for (let i = 0; i <= retries; i++) {
+    const res = await fetch(url, options);
+    if (res.ok) return res.json();
+    if (i < retries) await new Promise(r => setTimeout(r, 800));
+    else {
+      let msg = '서버에 문제가 생겼어요. 잠시 후 다시 시도해주세요.';
+      try {
+        const body = await res.json();
+        if (body?.error && typeof body.error === 'string') msg = body.error;
+      } catch (_) {}
+      throw new Error(msg);
+    }
+  }
+}
+
 export async function postWish({ userId, wishText, gemType, yeosuTheme }) {
-  const res = await fetch(`${BASE}/wishes`, {
+  return fetchWithRetry(`${BASE}/wishes`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -13,18 +29,14 @@ export async function postWish({ userId, wishText, gemType, yeosuTheme }) {
       yeosu_theme: yeosuTheme,
     }),
   });
-  if (!res.ok) throw new Error('소원 저장 실패');
-  return res.json();
 }
 
 export async function postStarCreate({ wishId, userId }) {
-  const res = await fetch(`${BASE}/stars/create`, {
+  return fetchWithRetry(`${BASE}/stars/create`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ wish_id: wishId, user_id: userId }),
   });
-  if (!res.ok) throw new Error('별 생성 실패');
-  return res.json();
 }
 
 export async function getStar(starId) {
