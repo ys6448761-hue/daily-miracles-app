@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #0D1B2A;
+  color: #ffffff;
+  font-family: 'Pretendard', system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+/* 별빛 반짝임 */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.star-twinkle {
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+/* 부드러운 글로우 */
+.glow-gold {
+  text-shadow: 0 0 20px rgba(255, 215, 106, 0.6);
+}
+
+.glow-purple {
+  text-shadow: 0 0 20px rgba(155, 135, 245, 0.6);
+}

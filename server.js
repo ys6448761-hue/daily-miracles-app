@@ -236,6 +236,15 @@ try {
   console.error("❌ 소원그림 라우터 로드 실패:", error.message);
 }
 
+// 성장필름 챌린지 라우터 로딩 (AIL-105-P0)
+let challengeRoutes = null;
+try {
+  challengeRoutes = require('./routes/challengeRoutes');
+  console.log('✅ 성장필름 챌린지 라우터 로드 성공');
+} catch (error) {
+  console.error('❌ 성장필름 챌린지 라우터 로드 실패:', error.message);
+}
+
 // 입항 증명서 라우터 로딩
 let certificateRoutes = null;
 try {
@@ -441,6 +450,16 @@ try {
   console.log("✅ VideoJob 라우터 로드 성공");
 } catch (error) {
   console.error("❌ VideoJob 라우터 로드 실패:", error.message);
+}
+
+// Aurora Video Job 라우터 로딩 (AIL-2026-0301-VIDJOB-001)
+let auroraJobRoutes = null;
+let auroraWorkerInstance = null;
+try {
+  auroraJobRoutes = require("./routes/auroraJobRoutes");
+  console.log("✅ Aurora Job 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ Aurora Job 라우터 로드 실패:", error.message);
 }
 
 // 기적 금고 (Finance) 라우터 로딩
@@ -743,6 +762,57 @@ app.get('/plaza', (req, res) => {
     return res.send('소원꿈터 광장 Coming Soon');
   }
   res.sendFile(path.join(__dirname, 'public', 'plaza.html'));
+});
+
+// ---------- Growth Film ----------
+app.get('/growth-film', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'growth-film.html'));
+});
+
+// favicon.ico — 파일 없을 때 500 방지
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
+// ---------- Soft Launch 최소 응답 라우트 (fail-open) ----------
+// AIL-2026-PLAZA-STUB: TODO — DB 연동 후 각 라우트 파일로 이전
+
+// GET /api/event
+app.get('/api/event', (req, res) => {
+  try {
+    res.json({ success: true, items: [] });
+  } catch (err) {
+    console.error('[/api/event]', err);
+    res.status(500).json({ success: false, error: 'internal' });
+  }
+});
+
+// GET /api/plaza/showcase
+app.get('/api/plaza/showcase', (req, res) => {
+  try {
+    res.json({ success: true, items: [] });
+  } catch (err) {
+    console.error('[/api/plaza/showcase]', err);
+    res.status(500).json({ success: false, error: 'internal' });
+  }
+});
+
+// GET /api/plaza/curation/today
+app.get('/api/plaza/curation/today', (req, res) => {
+  try {
+    res.json({ success: true, miracle: null, wisdom: null });
+  } catch (err) {
+    console.error('[/api/plaza/curation/today]', err);
+    res.status(500).json({ success: false, error: 'internal' });
+  }
+});
+
+// POST /api/plaza/event
+app.post('/api/plaza/event', (req, res) => {
+  try {
+    res.status(204).send();
+  } catch (err) {
+    console.error('[POST /api/plaza/event]', err);
+    res.status(500).json({ success: false, error: 'internal' });
+  }
 });
 
 // ---------- Static ----------
@@ -1570,6 +1640,48 @@ if (wishImageRoutes) {
   console.warn("⚠️ 소원그림 API 라우터 로드 실패 - 라우트 미등록");
 }
 
+// ---------- 성장필름 챌린지 Routes (/api/challenge/*) ----------
+if (challengeRoutes) {
+  const db = require('./database/db');
+  app.use('/api/challenge', challengeRoutes.init(db));
+  console.log('✅ 성장필름 챌린지 라우터 등록 완료 (/api/challenge)');
+} else {
+  console.warn('⚠️ 성장필름 챌린지 라우터 미등록');
+}
+
+// ---------- BE-3: GET /api/me/temperature (AIL-111) ----------
+// routine_temp: temperature_state.temperature (attendanceService 루틴 온도)
+// social_temp:  temperature_state.social_temperature (기적나눔 수신 누적)
+app.get('/api/me/temperature', async (req, res) => {
+  const { userId } = req.query;
+  if (!userId) {
+    return res.status(400).json({ error: 'userId required' });
+  }
+
+  try {
+    const dbInstance = require('./database/db');
+    const result = await dbInstance.query(
+      'SELECT temperature, social_temperature FROM temperature_state WHERE user_id = $1',
+      [userId]
+    );
+
+    const row = result.rows[0] || {};
+    const routineTemp = Number(Number(row.temperature ?? 36.5).toFixed(2));
+    const socialTemp = Number(Number(row.social_temperature ?? 25.0).toFixed(1));
+
+    // 마일스톤 체크
+    let milestone = null;
+    if (routineTemp >= 36.5) {
+      milestone = { at_36_5: true, message: '소원이 당신의 일부가 되었어요' };
+    }
+
+    return res.json({ routine_temp: routineTemp, social_temp: socialTemp, milestone });
+  } catch (err) {
+    console.error('[ME/Temperature] 조회 오류:', err.message);
+    return res.status(500).json({ error: 'INTERNAL_ERROR' });
+  }
+});
+
 // ---------- 입항 증명서 API Routes ----------
 if (certificateRoutes) {
   app.use("/api/certificate", certificateRoutes);
@@ -1757,6 +1869,14 @@ if (videoJobRoutes) {
   console.log("✅ VideoJob 라우터 등록 완료 (/api/video/job)");
 } else {
   console.warn("⚠️ VideoJob 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- Aurora Video Job Routes (/api/video-jobs) ----------
+if (auroraJobRoutes) {
+  app.use("/", auroraJobRoutes);
+  console.log("✅ Aurora Job 라우터 등록 완료 (/api/video-jobs)");
+} else {
+  console.warn("⚠️ Aurora Job 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- 기적 금고 Finance Routes (/api/finance) ----------
@@ -2053,6 +2173,19 @@ if (experimentEventRoutes) {
   console.warn("⚠️ Experiment Event 라우터 미등록");
 }
 
+// ---------- DreamTown Routes ----------
+const dreamtownRoutes = require('./routes/dreamtownRoutes');
+app.use('/api/dt', dreamtownRoutes);
+console.log('✅ DreamTown 라우터 등록 완료 (/api/dt)');
+
+// ---------- DreamTown Frontend (Prototype) ----------
+const dtFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist');
+app.use('/dreamtown', express.static(dtFrontendPath));
+app.get('/dreamtown/*', (req, res) => {
+  res.sendFile(path.join(dtFrontendPath, 'index.html'));
+});
+console.log('✅ DreamTown 프론트 등록 완료 (/dreamtown)');
+
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------
 // P0 요구사항: Trial 또는 Paid 권한이 있어야만 접근 가능
 if (entitlementMiddleware) {
@@ -2346,6 +2479,19 @@ try {
   }
 }
 
+// ---------- Report Scheduler Initialization ----------
+try {
+  if (db && process.env.DATABASE_URL) {
+    const reportScheduler = require('./services/reportScheduler');
+    reportScheduler.init(db);
+    console.log('✅ Report Scheduler initialization called');
+  } else {
+    console.log('⚠️ db module not loaded, skipping Report Scheduler init');
+  }
+} catch (e) {
+  console.error('❌ Report Scheduler init failed:', e.message);
+}
+
 // ---------- Start (with fallback port) ----------
 const DEFAULT_PORT = process.env.PORT || 5000;
 const FALLBACK_PORT = 5002;
@@ -2421,6 +2567,17 @@ function startServer(port) {
       stabilityService.startProactiveMonitor(
         (msg) => slackHeartbeatService.sendSlackMessage(msg),
       );
+    }
+
+
+    // Aurora Video Job Worker 시작 (AIL-2026-0301-VIDJOB-001)
+    try {
+      const AuroraWorker = require('./services/aurora/AuroraWorker');
+      auroraWorkerInstance = new AuroraWorker();
+      auroraWorkerInstance.start();
+      console.log("✅ Aurora Job Worker 시작 (5초 폴링)");
+    } catch (workerErr) {
+      console.warn("⚠️ Aurora Job Worker 시작 실패:", workerErr.message);
     }
   });
 
