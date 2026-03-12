@@ -42,6 +42,7 @@ const GEM_GALAXY_MAP = {
 // POST /api/dt/wishes — 소원 생성
 // ─────────────────────────────────────────────
 router.post('/wishes', async (req, res) => {
+  console.log('[DT] POST /wishes 진입 | body:', JSON.stringify(req.body));
   try {
     const { user_id, wish_text, gem_type, yeosu_theme } = req.body;
 
@@ -76,8 +77,8 @@ router.post('/wishes', async (req, res) => {
     res.status(201).json({ wish_id: wish.id, status: wish.status });
 
   } catch (err) {
-    console.error('[DT] POST /wishes error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('[DT] POST /wishes error:', err.message, '| code:', err.code, '| stack:', err.stack?.split('\n')[1]);
+    res.status(500).json({ error: 'Internal server error', detail: err.message });
   }
 });
 
@@ -85,6 +86,7 @@ router.post('/wishes', async (req, res) => {
 // POST /api/dt/stars/create — 별 생성
 // ─────────────────────────────────────────────
 router.post('/stars/create', async (req, res) => {
+  console.log('[DT] POST /stars/create 진입 | body:', JSON.stringify(req.body));
   try {
     const { wish_id, user_id } = req.body;
 
@@ -153,8 +155,8 @@ router.post('/stars/create', async (req, res) => {
     });
 
   } catch (err) {
-    console.error('[DT] POST /stars/create error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('[DT] POST /stars/create error:', err.message, '| code:', err.code, '| stack:', err.stack?.split('\n')[1]);
+    res.status(500).json({ error: 'Internal server error', detail: err.message });
   }
 });
 

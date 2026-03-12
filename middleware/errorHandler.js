@@ -249,7 +249,11 @@ function globalErrorHandler(err, req, res, next) {
   } else if (err instanceof DatabaseError) {
     error = err;
     errorClass = 'DB';
-  } else if (err instanceof OpenAIError || (err.status && err.status >= 400 && err.status < 500)) {
+  } else if (err.type === 'entity.parse.failed' || (err.status === 400 && err.body !== undefined)) {
+    // express.json() body parse failure — NOT an OpenAI error
+    error = createError.validation('요청 본문이 올바른 JSON 형식이 아닙니다.');
+    errorClass = 'Validation';
+  } else if (err instanceof OpenAIError || (err.status && err.status >= 400 && err.status < 500 && err.status !== 400)) {
     error = handleOpenAIError(err);
     errorClass = 'OpenAI/External';
   } else if (err instanceof ServiceLimitError || err.statusCode === 429) {
