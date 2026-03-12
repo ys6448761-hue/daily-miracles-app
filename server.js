@@ -2181,7 +2181,7 @@ console.log('✅ DreamTown 라우터 등록 완료 (/api/dt)');
 // ---------- DreamTown Frontend (Prototype) ----------
 const dtFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist');
 app.use('/dreamtown', express.static(dtFrontendPath));
-app.get('/dreamtown/*', (req, res) => {
+app.get(['/dreamtown', '/dreamtown/*'], (req, res) => {
   res.sendFile(path.join(dtFrontendPath, 'index.html'));
 });
 console.log('✅ DreamTown 프론트 등록 완료 (/dreamtown)');
