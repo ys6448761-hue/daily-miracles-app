@@ -12,33 +12,52 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
 
-// 별 이름 사전 풀 — 인디언 작명법 스타일 (AI 호출 없음)
-const STAR_NAMES = [
-  '조용히 빛나는 별',   '새벽을 기다리는 별',  '바람을 걷는 별',
-  '빛을 품은 별',       '노을을 건너온 별',     '밤을 비추는 별',
-  '햇살을 담은 별',     '길을 찾은 별',         '별빛을 간직한 별',
-  '여명을 기다리는 별', '고요를 머금은 별',     '소망을 품은 별',
-  '꿈을 지키는 별',     '희망을 담은 별',       '기억을 간직한 별',
-  '아침을 향하는 별',   '천천히 타오르는 별',   '고요히 빛나는 별',
-  '홀로 빛나는 별',     '먼 곳을 바라보는 별',  '새벽빛을 담은 별',
-  '침묵을 걷는 별',     '시간을 건너온 별',     '꿈을 향하는 별',
-  '빛을 기다리는 별',   '노을을 담은 별',       '밤을 건너온 별',
-  '햇살을 기다리는 별', '길을 비추는 별',       '별빛을 품은 별',
-  '따뜻한 빛을 품은 별','새벽을 건너온 별',     '바람을 담은 별',
-  '빛을 건너온 별',     '소망을 비추는 별',     '꿈을 품어온 별',
-  '희망을 지키는 별',   '기억을 따르는 별',     '아침을 담은 별',
-  '첫 빛을 품은 별',    '깊은 밤의 별',         '고요한 새벽의 별',
-  '빛을 향하는 별',     '노을을 품은 별',       '밤을 지키는 별',
-  '햇살을 건너온 별',   '길을 품은 별',         '꿈을 건너온 별',
-  '소망을 건너온 별',   '희망을 향하는 별',
+// ── 별 이름 자동 생성 (인디언 작명법, AI 없음) ──────────────────────
+// 형식: [자연어] + [을/를] + [행동어] + 별  (15 × 13 = 195 조합)
+const NATURE_WORDS = [
+  '바람', '새벽', '파도', '빛', '별빛',
+  '숲',   '하늘', '구름', '노을', '밤',
+  '햇살', '길',   '비',   '강',  '꽃',
 ];
+const ACTION_WORDS = [
+  '걷는',     '기다리는', '깨우는',   '비추는', '건너온',
+  '찾아온',   '머무는',   '흐르는',   '품은',   '지키는',
+  '안아주는', '따르는',   '담은',
+];
+const FALLBACK_NAMES = ['조용히 빛나는 별', '첫 빛을 품은 별'];
 
-// wish_id(UUID) 기반 결정론적 이름 선택 — 같은 소원은 항상 같은 별 이름
-function makeStarName(wishId) {
+// 한국어 받침 여부로 을/를 자동 선택
+function getParticle(word) {
+  const code = word.charCodeAt(word.length - 1) - 44032;
+  return (code >= 0 && code % 28 !== 0) ? '을' : '를';
+}
+
+// index → 이름 문자열
+function buildStarName(index) {
+  const total = NATURE_WORDS.length * ACTION_WORDS.length;
+  const i = ((index % total) + total) % total;
+  const nature = NATURE_WORDS[Math.floor(i / ACTION_WORDS.length)];
+  const action = ACTION_WORDS[i % ACTION_WORDS.length];
+  return `${nature}${getParticle(nature)} ${action} 별`;
+}
+
+// wish_id 기반 결정론적 선택 + 전역 중복 체크
+async function makeStarName(wishId, dbConn) {
   try {
     const hex = String(wishId).replace(/-/g, '').slice(0, 8);
-    const num = parseInt(hex, 16);
-    return isNaN(num) ? STAR_NAMES[0] : STAR_NAMES[num % STAR_NAMES.length];
+    const baseIndex = parseInt(hex, 16);
+    if (isNaN(baseIndex)) return FALLBACK_NAMES[0];
+
+    const total = NATURE_WORDS.length * ACTION_WORDS.length;
+    for (let offset = 0; offset < total; offset++) {
+      const name = buildStarName(baseIndex + offset);
+      const dup = await dbConn.query(
+        'SELECT id FROM dt_stars WHERE star_name = $1 LIMIT 1', [name]
+      );
+      if (dup.rowCount === 0) return name;
+    }
+    // 195개 모두 사용됨 (매우 희박) → fallback
+    return FALLBACK_NAMES[baseIndex % FALLBACK_NAMES.length];
   } catch {
     return '첫 빛을 품은 별';
   }
@@ -140,7 +159,7 @@ router.post('/stars/create', async (req, res) => {
     );
     const seed = seedResult.rows[0];
 
-    const starName = makeStarName(wish_id);
+    const starName = await makeStarName(wish_id, db);
     const starSlug = `star-${Date.now()}`;
 
     // star 생성
