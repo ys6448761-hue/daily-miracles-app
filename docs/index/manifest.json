@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-12T01:25:15.639Z",
+  "generated_at": "2026-03-12T05:13:52.314Z",
   "generator": "generate-manifest.js",
-  "total_count": 279,
+  "total_count": 280,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2724,6 +2724,24 @@
       "title": "DreamTown Character SSOT",
       "created_at": "2026-03-12",
       "checksum": "080dc640"
+    },
+    {
+      "id": "DOC-DreamTown_Complete_SSOT",
+      "path": "docs/ssot/DreamTown_Complete_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "사용 씬",
+      "title": "🌌 DreamTown Complete SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "b64f6df4"
     },
     {
       "id": "DOC-DreamTown_Core_Philosophy_SSOT",
