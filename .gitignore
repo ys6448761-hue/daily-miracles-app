@@ -55,6 +55,8 @@ Thumbs.db
 # Build output
 dist/
 build/
+# DreamTown 프론트 빌드는 Render 빌드 불안정으로 git에 포함
+!dreamtown-frontend/dist/
 
 # Coverage reports
 coverage/
