@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-10T01:48:51.482Z",
+  "generated_at": "2026-03-12T01:11:50.509Z",
   "generator": "generate-manifest.js",
-  "total_count": 237,
+  "total_count": 278,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -20,6 +20,42 @@
       "title": "📜 Aurora5 결정문 로그 (DECISIONS_LOG)",
       "created_at": "Status",
       "checksum": "32be1bf8"
+    },
+    {
+      "id": "DOC-DreamTown_Frontend_Screen_Map_",
+      "path": "docs/design/DreamTown_Frontend_Screen_Map_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "| 오늘의 메시지",
+      "title": "DreamTown Frontend Screen Map Design",
+      "created_at": "별",
+      "checksum": "3f2950cc"
+    },
+    {
+      "id": "DOC-DreamTown_MVP_Scope_Design",
+      "path": "docs/design/DreamTown_MVP_Scope_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown MVP Scope Design",
+      "created_at": "별",
+      "checksum": "09857e01"
     },
     {
       "id": "DOC-AIL-정산-v2-final",
@@ -318,7 +354,7 @@
       "owner": "rumi",
       "status": "N",
       "title": "Aurora 5 마스터 통합 문서 v2.0",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "440ddf72"
     },
     {
@@ -334,7 +370,7 @@
       "owner": "team",
       "status": "active",
       "title": "Project Context — Daily Miracles MVP",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "131b38ec"
     },
     {
@@ -352,7 +388,7 @@
       "owner": "comi",
       "status": "active",
       "title": "문서 승격 규칙 (Promotion Rules)",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "bb56759d"
     },
     {
@@ -368,7 +404,7 @@
       "owner": "team",
       "status": "active",
       "title": "Workflow — Daily Miracles Development",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "44a5854e"
     },
     {
@@ -386,7 +422,7 @@
       "owner": "rumi",
       "status": "superseded",
       "title": "하루하루의 기적 - 브랜드 보이스 가이드",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "8c342f8b"
     },
     {
@@ -406,7 +442,7 @@
       "owner": "code",
       "status": "|--------",
       "title": "시스템 아키텍처",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "10647947"
     },
     {
@@ -424,7 +460,7 @@
       "owner": "code",
       "status": "active",
       "title": "Claude Code 작업 지침 v3.0",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "394b20ab"
     },
     {
@@ -440,7 +476,7 @@
       "owner": "team",
       "status": "active",
       "title": "Development Rules",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "0d3788a2"
     },
     {
@@ -456,7 +492,7 @@
       "owner": "team",
       "status": "active",
       "title": "Technical Implementation Log: Growth Film & Viral Loop (Referral Injection)",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "a50cd327"
     },
     {
@@ -474,7 +510,7 @@
       "owner": "rumi",
       "status": "MVP v0 개발 완료, Render 배포 예정",
       "title": "소원드림광장 홈페이지 재구성 — 루미 브리핑 문서",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "ac8be86a"
     },
     {
@@ -491,7 +527,7 @@
       "owner": "code",
       "status": "superseded",
       "title": "MIRACLE MASTER GUIDELINES v7.0",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "63b3e84a"
     },
     {
@@ -510,7 +546,7 @@
       "owner": "team",
       "status": "active",
       "title": "소원놀이터 수익배분 정책",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "fb473670"
     },
     {
@@ -526,7 +562,7 @@
       "owner": "comi",
       "status": "| wishes_processed",
       "title": "Airtable 테이블 스키마 (ACT 관제탑)",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "4976b285"
     },
     {
@@ -542,7 +578,7 @@
       "owner": "team",
       "status": "active",
       "title": "Airtable Wish Intake 스키마",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "a8baafc3"
     },
     {
@@ -558,7 +594,7 @@
       "owner": "jemi",
       "status": "NEW, ACK, IN_PROGRESS, APPROVED, STARTED, DONE, ESCALATED",
       "title": "Airtable Wishes Inbox 테이블 스키마",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "ca0bf766"
     },
     {
@@ -575,7 +611,7 @@
       "owner": "team",
       "status": "active",
       "title": "온라인 문제 해결 소원 API v0.1",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "266802c0"
     },
     {
@@ -592,7 +628,7 @@
       "owner": "code",
       "status": "active",
       "title": "온라인 소원 실현 항해 API 설계안 v0.1",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "ed723688"
     },
     {
@@ -609,7 +645,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "SSOT 변경 로그 (CHANGELOG)",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "457ae6bf"
     },
     {
@@ -626,7 +662,7 @@
       "owner": "team",
       "status": "|------",
       "title": "Notion DB Profile Gate 가이드",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "5abf91a1"
     },
     {
@@ -643,7 +679,7 @@
       "owner": "team",
       "status": "트랙",
       "title": "SSOT 원문→정본 반영 매핑표",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "1e550c3e"
     },
     {
@@ -659,7 +695,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Aurora 5 캐릭터 생성 프롬프트 패키지 v2.1",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "64f0a2d2"
     },
     {
@@ -673,7 +709,7 @@
       "owner": "team",
       "status": "active",
       "title": "AURORA 2D EMOTION ENGINE",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "d41d8cd9"
     },
     {
@@ -691,7 +727,7 @@
       "owner": "team",
       "status": "active",
       "title": "최수민방식 치트시트",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "9f7529c4"
     },
     {
@@ -709,7 +745,7 @@
       "owner": "team",
       "status": "active",
       "title": "Claude Desktop MCP 서버 설정 가이드",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "44ccac1b"
     },
     {
@@ -723,7 +759,7 @@
       "owner": "team",
       "status": "active",
       "title": "README",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "60a0b4af"
     },
     {
@@ -741,7 +777,7 @@
       "owner": "rumi",
       "status": "archived",
       "title": "DEC-20260201 — 포인트/추천/예고편(Preview) 정책·구현 결정로그 v1",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "5e969ee6"
     },
     {
@@ -758,7 +794,7 @@
       "owner": "ceo",
       "status": "active",
       "title": "Decisions Index",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "b355d262"
     },
     {
@@ -774,8 +810,62 @@
       "owner": "code",
       "status": "archived",
       "title": "Daily Miracles MVP 배포 체크리스트",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "0202a43e"
+    },
+    {
+      "id": "DOC-DreamTown_API_Spec_Design",
+      "path": "docs/design/DreamTown_API_Spec_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown API Specification Design",
+      "created_at": "2026-03-12",
+      "checksum": "5fee6796"
+    },
+    {
+      "id": "DOC-DreamTown_Aurora5_Master_Map_D",
+      "path": "docs/design/DreamTown_Aurora5_Master_Map_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "Aurora5 + DreamTown Master Map",
+      "created_at": "2026-03-12",
+      "checksum": "64471a52"
+    },
+    {
+      "id": "DOC-DreamTown_Aurum_System_Design",
+      "path": "docs/design/DreamTown_Aurum_System_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Aurum System Design",
+      "created_at": "2026-03-12",
+      "checksum": "0aa6fdeb"
     },
     {
       "id": "DOC-DreamTown_Aurum_UX_Design",
@@ -792,8 +882,26 @@
       "owner": "rumi",
       "status": "archived",
       "title": "아우룸 UX 설계",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "d2aacd32"
+    },
+    {
+      "id": "DOC-DreamTown_Build_Order_Design",
+      "path": "docs/design/DreamTown_Build_Order_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Build Order Design",
+      "created_at": "2026-03-12",
+      "checksum": "fa37ae74"
     },
     {
       "id": "DOC-DreamTown_Character_Style_Guid",
@@ -810,8 +918,42 @@
       "owner": "code",
       "status": "| SA-02",
       "title": "DreamTown Character Style Guide SSOT",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "31174b04"
+    },
+    {
+      "id": "DOC-DreamTown_Closed_Alpha_Questio",
+      "path": "docs/design/DreamTown_Closed_Alpha_Questions_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Closed Alpha 질문 3개",
+      "created_at": "2026-03-12",
+      "checksum": "05ed6f56"
+    },
+    {
+      "id": "DOC-DreamTown_Closed_Alpha_Seed_St",
+      "path": "docs/design/DreamTown_Closed_Alpha_Seed_Stars_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Closed Alpha Seed Stars (10개)",
+      "created_at": "2026-03-12",
+      "checksum": "b0c1993b"
     },
     {
       "id": "DOC-DreamTown_Constellation_System",
@@ -828,7 +970,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "DreamTown Constellation 시스템",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "7fddfdfd"
     },
     {
@@ -846,8 +988,45 @@
       "owner": "team",
       "status": "active",
       "title": "DreamTown Core Storyboard SSOT",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "ab176f6e"
+    },
+    {
+      "id": "DOC-DreamTown_Current_Sprint_v1",
+      "path": "docs/design/DreamTown_Current_Sprint_v1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Current Sprint v1",
+      "created_at": "2026-03-12",
+      "checksum": "df2156e4"
+    },
+    {
+      "id": "DOC-DreamTown_DB_Schema_Design",
+      "path": "docs/design/DreamTown_DB_Schema_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora",
+        "결제"
+      ],
+      "owner": "rumi",
+      "status": "archived",
+      "title": "DreamTown DB Schema Design",
+      "created_at": "2026-03-12",
+      "checksum": "787f5ace"
     },
     {
       "id": "DOC-DreamTown_DragonPalace_DB_Desi",
@@ -864,8 +1043,26 @@
       "owner": "rumi",
       "status": "|------",
       "title": "DreamTown 디지털 용궁 DB 설계",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "42a5815f"
+    },
+    {
+      "id": "DOC-DreamTown_ERD_Summary_Design",
+      "path": "docs/design/DreamTown_ERD_Summary_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown ERD Summary Design",
+      "created_at": "2026-03-12",
+      "checksum": "7c8b9c2c"
     },
     {
       "id": "DOC-DreamTown_Expansion_Universe_D",
@@ -882,7 +1079,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "DreamTown 확장 우주 구조",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "08e2a37d"
     },
     {
@@ -901,8 +1098,44 @@
       "owner": "rumi",
       "status": "내용",
       "title": "DreamTown 축제형 커머스 시스템",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "eb413207"
+    },
+    {
+      "id": "DOC-DreamTown_First_100_Users_Stra",
+      "path": "docs/design/DreamTown_First_100_Users_Strategy.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown First 100 Users Strategy",
+      "created_at": "2026-03-12",
+      "checksum": "f2f297fd"
+    },
+    {
+      "id": "DOC-DreamTown_First_Star_Canon_Des",
+      "path": "docs/design/DreamTown_First_Star_Canon_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown First Star Canon",
+      "created_at": "2026-03-12",
+      "checksum": "824db367"
     },
     {
       "id": "DOC-DreamTown_First_User_Journey_S",
@@ -919,8 +1152,62 @@
       "owner": "code",
       "status": "active",
       "title": "DreamTown First User Journey SSOT",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "389d44d7"
+    },
+    {
+      "id": "DOC-DreamTown_Founding_Stars_Canon",
+      "path": "docs/design/DreamTown_Founding_Stars_Canon_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Founding Stars Canon",
+      "created_at": "2026-03-12",
+      "checksum": "1346a204"
+    },
+    {
+      "id": "DOC-DreamTown_Galaxy_Map_UI_Design",
+      "path": "docs/design/DreamTown_Galaxy_Map_UI_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Galaxy Map UI Design v1",
+      "created_at": "2026-03-12",
+      "checksum": "58979307"
+    },
+    {
+      "id": "DOC-DreamTown_Galaxy_Map_Wireframe",
+      "path": "docs/design/DreamTown_Galaxy_Map_Wireframe_Copy_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Galaxy Map Wireframe Copy v1",
+      "created_at": "2026-03-12",
+      "checksum": "5160f4ea"
     },
     {
       "id": "DOC-DreamTown_Growth_Film_SSOT",
@@ -937,7 +1224,7 @@
       "owner": "code",
       "status": "active",
       "title": "DreamTown Growth Film SSOT",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "acac5ffd"
     },
     {
@@ -955,7 +1242,7 @@
       "owner": "code",
       "status": "추가 프롬프트",
       "title": "DreamTown Image Prompts SSOT",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "6287474e"
     },
     {
@@ -973,7 +1260,7 @@
       "owner": "rumi",
       "status": "옵션",
       "title": "DreamTown × 디지털 용궁 통합 구조도",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "4f1e68c5"
     },
     {
@@ -991,8 +1278,45 @@
       "owner": "code",
       "status": "active",
       "title": "DreamTown IP Strategy SSOT",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "29e8c50c"
+    },
+    {
+      "id": "DOC-DreamTown_Launch_Asset_Checkli",
+      "path": "docs/design/DreamTown_Launch_Asset_Checklist_v1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Launch Asset Checklist v1",
+      "created_at": "2026-03-12",
+      "checksum": "1252dcfd"
+    },
+    {
+      "id": "DOC-DreamTown_Launch_Strategy_v1",
+      "path": "docs/design/DreamTown_Launch_Strategy_v1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora",
+        "kpi"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Launch Strategy v1",
+      "created_at": "2026-03-12",
+      "checksum": "275d940d"
     },
     {
       "id": "DOC-DreamTown_Master_Map_Design",
@@ -1009,8 +1333,80 @@
       "owner": "rumi",
       "status": "|------",
       "title": "DreamTown 세계 지도 (Master Map v1)",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "b2838410"
+    },
+    {
+      "id": "DOC-DreamTown_MVP_Dev_Plan_v1",
+      "path": "docs/design/DreamTown_MVP_Dev_Plan_v1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "DreamTown MVP Dev Plan v1",
+      "created_at": "2026-03-12",
+      "checksum": "3262966b"
+    },
+    {
+      "id": "DOC-DreamTown_My_Star_UX_Master_De",
+      "path": "docs/design/DreamTown_My_Star_UX_Master_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "archived",
+      "title": "DreamTown My Star UX Master Design",
+      "created_at": "2026-03-12",
+      "checksum": "3dee2676"
+    },
+    {
+      "id": "DOC-DreamTown_Onboarding_Experienc",
+      "path": "docs/design/DreamTown_Onboarding_Experience_v1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Onboarding Experience v1",
+      "created_at": "2026-03-12",
+      "checksum": "c391623b"
+    },
+    {
+      "id": "DOC-DreamTown_One_Page_Blueprint_D",
+      "path": "docs/design/DreamTown_One_Page_Blueprint_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown One Page Blueprint v1",
+      "created_at": "2026-03-12",
+      "checksum": "306c2a21"
     },
     {
       "id": "DOC-DreamTown_Opening_Cinematic_De",
@@ -1027,7 +1423,7 @@
       "owner": "rumi",
       "status": "archived",
       "title": "DreamTown 첫 화면 연출 — 30초 시네마틱",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "968339cb"
     },
     {
@@ -1045,7 +1441,7 @@
       "owner": "rumi",
       "status": "내용",
       "title": "DreamTown 상생 지원 공식 v1",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "16e980cc"
     },
     {
@@ -1063,8 +1459,44 @@
       "owner": "rumi",
       "status": "archived",
       "title": "DreamTown 온라인–오프라인 통합 파이프라인",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "20d83fa5"
+    },
+    {
+      "id": "DOC-DreamTown_Product_Architecture",
+      "path": "docs/design/DreamTown_Product_Architecture_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Product Architecture Design",
+      "created_at": "2026-03-12",
+      "checksum": "bfde40ab"
+    },
+    {
+      "id": "DOC-DreamTown_Product_Roadmap_v1",
+      "path": "docs/design/DreamTown_Product_Roadmap_v1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Product Roadmap v1",
+      "created_at": "2026-03-12",
+      "checksum": "de31bac2"
     },
     {
       "id": "DOC-DreamTown_Product_Structure_SS",
@@ -1082,8 +1514,44 @@
       "owner": "ceo",
       "status": "active",
       "title": "DreamTown Product Structure SSOT",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "42c15e21"
+    },
+    {
+      "id": "DOC-DreamTown_Prototype_Kickoff",
+      "path": "docs/design/DreamTown_Prototype_Kickoff.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Prototype Kickoff — Code 실행 지시서",
+      "created_at": "2026-03-12",
+      "checksum": "f1d4cc18"
+    },
+    {
+      "id": "DOC-DreamTown_Screen_Map_v1",
+      "path": "docs/design/DreamTown_Screen_Map_v1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "DreamTown Screen Map v1",
+      "created_at": "2026-03-12",
+      "checksum": "5f4c5fc5"
     },
     {
       "id": "DOC-DreamTown_Sky_Map_Design",
@@ -1099,7 +1567,7 @@
       "owner": "team",
       "status": "active",
       "title": "DreamTown 하늘 지도 스타일",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "d64b297a"
     },
     {
@@ -1117,8 +1585,44 @@
       "owner": "rumi",
       "status": "내용",
       "title": "DreamTown 별 탄생 정책",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "54c75e12"
+    },
+    {
+      "id": "DOC-DreamTown_Star_Share_System_De",
+      "path": "docs/design/DreamTown_Star_Share_System_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Star Share System Design",
+      "created_at": "2026-03-12",
+      "checksum": "535df6ce"
+    },
+    {
+      "id": "DOC-DreamTown_System_Architecture_",
+      "path": "docs/design/DreamTown_System_Architecture_Map_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown System Architecture Map Design",
+      "created_at": "2026-03-12",
+      "checksum": "7d90cdbd"
     },
     {
       "id": "DOC-DreamTown_Travel_System_SSOT",
@@ -1136,7 +1640,7 @@
       "owner": "team",
       "status": "|------",
       "title": "DreamTown Travel System SSOT",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "90d9f9e1"
     },
     {
@@ -1154,7 +1658,7 @@
       "owner": "rumi",
       "status": "내용",
       "title": "DreamTown 영상 제작 파이프라인",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "67ca79a6"
     },
     {
@@ -1173,7 +1677,7 @@
       "owner": "code",
       "status": "archived",
       "title": "DreamTown Wish Image SSOT",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "5de6cf6d"
     },
     {
@@ -1191,7 +1695,7 @@
       "owner": "code",
       "status": "---",
       "title": "DreamTown Yeosu Galaxy SSOT",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "fb61049e"
     },
     {
@@ -1210,7 +1714,7 @@
       "owner": "team",
       "status": "|------",
       "title": "DreamTown 여수 1차 파일럿 운영 설계",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "0ca2f423"
     },
     {
@@ -1227,7 +1731,7 @@
       "owner": "team",
       "status": "active",
       "title": "DreamTown Yeosu Travel Routes SSOT",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "f93cff2c"
     },
     {
@@ -1243,7 +1747,7 @@
       "owner": "team",
       "status": "active",
       "title": "룰 파일 월간 업데이트 SOP",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "556f31c3"
     },
     {
@@ -1259,7 +1763,7 @@
       "owner": "code",
       "status": "active",
       "title": "딜 등록 및 보호 정책 (개발 참조용)",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "9e550060"
     },
     {
@@ -1275,7 +1779,7 @@
       "owner": "team",
       "status": "active",
       "title": "통합 가이드 (Integration Guide)",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "ebf6e247"
     },
     {
@@ -1292,7 +1796,7 @@
       "owner": "team",
       "status": "| `/api/ops-center/mice/report/generate/:eventId`",
       "title": "DEV Bundle (개발 전달용)",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "e1f60009"
     },
     {
@@ -1306,7 +1810,7 @@
       "owner": "team",
       "status": "active",
       "title": "MASTER-CONTROL (ENTRY POINT)",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "120ee9b0"
     },
     {
@@ -1323,7 +1827,7 @@
       "owner": "team",
       "status": "active",
       "title": "소원놀이터 이벤트 스키마",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "eee7162b"
     },
     {
@@ -1340,7 +1844,7 @@
       "owner": "comi",
       "status": "archived",
       "title": "하루하루의 기적 - 성장 로드맵",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "881f0936"
     },
     {
@@ -1356,7 +1860,7 @@
       "owner": "team",
       "status": "active",
       "title": "CHECKLIST — Vercel Serverless Crash Fix",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "b7f29554"
     },
     {
@@ -1372,7 +1876,7 @@
       "owner": "team",
       "status": "active",
       "title": "CONTEXT — Vercel Serverless Crash Fix",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "4cf523f0"
     },
     {
@@ -1388,7 +1892,7 @@
       "owner": "team",
       "status": "active",
       "title": "PLAN — Vercel Serverless Crash Fix",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "34489117"
     },
     {
@@ -1406,7 +1910,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "📋 Aurora5 Judge 프롬프트 가이드",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "513de9dd"
     },
     {
@@ -1423,7 +1927,7 @@
       "owner": "team",
       "status": "active",
       "title": "Knowledge Cards (지식카드)",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "a4d0a8e8"
     },
     {
@@ -1440,7 +1944,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "하루하루의 기적 - 출항 선언문",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "c6b4219e"
     },
     {
@@ -1461,7 +1965,7 @@
       "owner": "code",
       "status": "active",
       "title": "최수민님 방식 완전 정리",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "3722b629"
     },
     {
@@ -1478,7 +1982,7 @@
       "owner": "team",
       "status": "|------",
       "title": "Ad Creative — Growth-Builder × High LTV (v1.0)",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "24fb6ef7"
     },
     {
@@ -1495,7 +1999,7 @@
       "owner": "team",
       "status": "|------",
       "title": "Ad Creative — Growth-Builder × Mid LTV (v1.0)",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "ada4099d"
     },
     {
@@ -1512,7 +2016,7 @@
       "owner": "team",
       "status": "|------",
       "title": "Ad Creative — Healing-Seeker × High LTV (v1.0)",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "ed0ac91c"
     },
     {
@@ -1529,7 +2033,7 @@
       "owner": "team",
       "status": "|------",
       "title": "Ad Creative — Healing-Seeker × Mid LTV (v1.0)",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "d308005c"
     },
     {
@@ -1547,7 +2051,7 @@
       "owner": "team",
       "status": "active",
       "title": "Ad Set ↔ Creative 매핑표 + A/B 테스트 설계 (v1.0)",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "63d88dc8"
     },
     {
@@ -1565,7 +2069,7 @@
       "owner": "rumi",
       "status": "superseded",
       "title": "하루하루의 기적 — 마케팅 GPT 종합 참조 지침서",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "3c176676"
     },
     {
@@ -1583,7 +2087,7 @@
       "owner": "rumi",
       "status": "superseded",
       "title": "하루하루의 기적 — 카피라이팅 GPT 지침서",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "a87ad19b"
     },
     {
@@ -1601,7 +2105,7 @@
       "owner": "rumi",
       "status": "superseded",
       "title": "하루하루의 기적 — 마케팅 GPT 지침서",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "6d112872"
     },
     {
@@ -1619,7 +2123,7 @@
       "owner": "rumi",
       "status": "superseded",
       "title": "하루하루의 기적 — SNS 마케팅 GPT 지침서",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "7164352b"
     },
     {
@@ -1636,7 +2140,7 @@
       "owner": "code",
       "status": "superseded",
       "title": "하루하루의 기적 — 영상기획 GPT 지침서",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "de35d373"
     },
     {
@@ -1654,7 +2158,7 @@
       "owner": "team",
       "status": "유닛 간 감정 충돌",
       "title": "영상 제작 핸드오프 가이드 — 실수 방지 매뉴얼",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "80161640"
     },
     {
@@ -1672,7 +2176,7 @@
       "owner": "rumi",
       "status": "|------",
       "title": "재미 온보딩 가이드 v1.1",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "00a62da9"
     },
     {
@@ -1691,7 +2195,7 @@
       "owner": "rumi",
       "status": "대응",
       "title": "재미 온보딩 가이드 v1.2",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "1004a06f"
     },
     {
@@ -1707,7 +2211,7 @@
       "owner": "comi",
       "status": "archived",
       "title": "DEC 운영 매뉴얼",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "93d223c7"
     },
     {
@@ -1725,7 +2229,7 @@
       "owner": "code",
       "status": "active",
       "title": "Drive → GitHub Sync Service 설치 가이드",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "eb6394bc"
     },
     {
@@ -1743,7 +2247,7 @@
       "owner": "comi",
       "status": "항목",
       "title": "SENS 설정 가이드 (Naver Cloud Platform)",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "fea945f4"
     },
     {
@@ -1759,7 +2263,7 @@
       "owner": "code",
       "status": "active",
       "title": "Registry Rules 월간 업데이트 SOP",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "38fe059e"
     },
     {
@@ -1777,7 +2281,7 @@
       "owner": "code",
       "status": "active",
       "title": "운영 컨트롤타워 온보딩 체크리스트 (7일)",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "df90ab06"
     },
     {
@@ -1794,7 +2298,7 @@
       "owner": "code",
       "status": "보호 기간",
       "title": "딜 등록 및 보호 정책",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "14520fbe"
     },
     {
@@ -1811,7 +2315,7 @@
       "owner": "team",
       "status": "https://app.dailymiracles.kr/api/ops-center/health",
       "title": "데모 운영 가이드",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "d42aba10"
     },
     {
@@ -1828,7 +2332,7 @@
       "owner": "code",
       "status": "active",
       "title": "Daily Miracles 온라인 소원 서비스 전체 흐름도",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "e28e803e"
     },
     {
@@ -1844,7 +2348,7 @@
       "owner": "team",
       "status": "active",
       "title": "CHECKLIST — P2.2 requestId + errorHandler + Wiring",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "ecf6981a"
     },
     {
@@ -1860,7 +2364,7 @@
       "owner": "team",
       "status": "active",
       "title": "CONTEXT — P2.2 requestId + errorHandler + Wiring",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "88f20f68"
     },
     {
@@ -1876,7 +2380,7 @@
       "owner": "team",
       "status": "active",
       "title": "PLAN — P2.2 requestId + errorHandler + Wiring",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "263d5e11"
     },
     {
@@ -1892,7 +2396,7 @@
       "owner": "ceo",
       "status": "✅ 비활성화 정상",
       "title": "양자 기획서 - 기적 금고 Phase 3 증빙 발행 시스템",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "fe4f4df4"
     },
     {
@@ -1910,7 +2414,7 @@
       "owner": "team",
       "status": "active",
       "title": "가격표 퀵 레퍼런스 (영업용)",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "7ca0aa2e"
     },
     {
@@ -1926,7 +2430,7 @@
       "owner": "code",
       "status": "active",
       "title": "하루하루의 기적 - 문서 센터",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "8a1b6b11"
     },
     {
@@ -1944,7 +2448,7 @@
       "owner": "comi",
       "status": "active",
       "title": "한국 세무회계 AI 도구 조사 및 연동 가능성 분석",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "5af76d35"
     },
     {
@@ -1961,7 +2465,7 @@
       "owner": "comi",
       "status": "active",
       "title": "후기 수집 구조 설계서",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "bbd74711"
     },
     {
@@ -1978,7 +2482,7 @@
       "owner": "team",
       "status": "active",
       "title": "🎯 30일 기적 로드맵 시스템",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "a4207922"
     },
     {
@@ -1996,7 +2500,7 @@
       "owner": "team",
       "status": "active",
       "title": "30일 기적 로드맵 API 문서",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "4d39bd13"
     },
     {
@@ -2012,7 +2516,7 @@
       "owner": "team",
       "status": "active",
       "title": "Crash & Error Alert Response Runbook",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "0e925ce0"
     },
     {
@@ -2028,7 +2532,7 @@
       "owner": "ceo",
       "status": "archived",
       "title": "DB Backup & Restore Runbook",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "32100010"
     },
     {
@@ -2044,7 +2548,7 @@
       "owner": "code",
       "status": "active",
       "title": "Render Rollback Runbook",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "57e53002"
     },
     {
@@ -2061,7 +2565,7 @@
       "owner": "team",
       "status": "active",
       "title": "결재 요청서",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "65ab88ea"
     },
     {
@@ -2078,7 +2582,7 @@
       "owner": "team",
       "status": "active",
       "title": "파일럿 제안서",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "93bdfdc9"
     },
     {
@@ -2095,7 +2599,7 @@
       "owner": "code",
       "status": "superseded",
       "title": "외부 공유 가이드 및 리스크 관리",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "4f4cb77d"
     },
     {
@@ -2111,7 +2615,7 @@
       "owner": "team",
       "status": "superseded",
       "title": "세일즈 카드 문구 3종",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "6de9204c"
     },
     {
@@ -2130,7 +2634,7 @@
       "owner": "code",
       "status": "항목",
       "title": "GA4 설정 가이드",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "1c318f9b"
     },
     {
@@ -2148,7 +2652,7 @@
       "owner": "team",
       "status": "active",
       "title": "Sora Video Master v1.1",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "f4a1b1d5"
     },
     {
@@ -2165,7 +2669,7 @@
       "owner": "rumi",
       "status": "archived",
       "title": "AIL-SSOT-001: DreamTown SSOT 저장 규칙",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "a29fbeff"
     },
     {
@@ -2183,7 +2687,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "DreamTown Aurora5 System SSOT",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "ca983478"
     },
     {
@@ -2201,7 +2705,7 @@
       "owner": "code",
       "status": "사용 씬",
       "title": "DreamTown Character SSOT",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "080dc640"
     },
     {
@@ -2216,11 +2720,101 @@
         "소원",
         "aurora"
       ],
-      "owner": "team",
-      "status": "active",
+      "owner": "rumi",
+      "status": "archived",
       "title": "DreamTown Core Philosophy SSOT",
-      "created_at": "2026-03-10",
-      "checksum": "78e08d52"
+      "created_at": "2026-03-12",
+      "checksum": "0700063b"
+    },
+    {
+      "id": "DOC-DreamTown_Cosmic_Map_SSOT",
+      "path": "docs/ssot/DreamTown_Cosmic_Map_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "|------",
+      "title": "DreamTown Cosmic Map SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "ac0a96c6"
+    },
+    {
+      "id": "DOC-DreamTown_Galaxy_Evolution_SSO",
+      "path": "docs/ssot/DreamTown_Galaxy_Evolution_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Galaxy Evolution System SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "007942bf"
+    },
+    {
+      "id": "DOC-DreamTown_Galaxy_Map_SSOT",
+      "path": "docs/ssot/DreamTown_Galaxy_Map_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "|------",
+      "title": "DreamTown Galaxy Map SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "a9635b5f"
+    },
+    {
+      "id": "DOC-DreamTown_Golden_Turtle_Conste",
+      "path": "docs/ssot/DreamTown_Golden_Turtle_Constellation_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Golden Turtle Constellation System SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "7294b7ac"
+    },
+    {
+      "id": "DOC-DreamTown_Key_Moment_SSOT",
+      "path": "docs/ssot/DreamTown_Key_Moment_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Key Moment SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "da4e7a45"
     },
     {
       "id": "DOC-DreamTown_Key_Visuals_SSOT",
@@ -2237,8 +2831,26 @@
       "owner": "yeoiboju",
       "status": "active",
       "title": "DreamTown Key Visuals SSOT",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "f51b0d91"
+    },
+    {
+      "id": "DOC-DreamTown_Master_Architecture_",
+      "path": "docs/ssot/DreamTown_Master_Architecture_Map_v1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Master Architecture Map v1",
+      "created_at": "2026-03-12",
+      "checksum": "1d1dc565"
     },
     {
       "id": "DOC-DreamTown_Naming_System_SSOT",
@@ -2255,7 +2867,7 @@
       "owner": "code",
       "status": "active",
       "title": "DreamTown Naming System SSOT",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "6bd3943d"
     },
     {
@@ -2273,8 +2885,26 @@
       "owner": "team",
       "status": "archived",
       "title": "DreamTown Origin Myth SSOT",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "1134dbef"
+    },
+    {
+      "id": "DOC-DreamTown_Product_Core_Loop_SS",
+      "path": "docs/ssot/DreamTown_Product_Core_Loop_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Product Core Loop SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "a59170ab"
     },
     {
       "id": "DOC-DreamTown_Safety_Ethics_SSOT",
@@ -2291,8 +2921,43 @@
       "owner": "code",
       "status": "superseded",
       "title": "DreamTown Safety & Ethics SSOT",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "cad30bd9"
+    },
+    {
+      "id": "DOC-DreamTown_SSOT_Master_Index",
+      "path": "docs/ssot/DreamTown_SSOT_Master_Index.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "|---",
+      "title": "DreamTown SSOT Master Index",
+      "created_at": "2026-03-12",
+      "checksum": "939d2d85"
+    },
+    {
+      "id": "DOC-DreamTown_Star_Navigation_Syst",
+      "path": "docs/ssot/DreamTown_Star_Navigation_System_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Star Navigation System SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "c2c2e2d3"
     },
     {
       "id": "DOC-DreamTown_Universe_Bible",
@@ -2306,11 +2971,47 @@
         "소원",
         "aurora"
       ],
-      "owner": "team",
+      "owner": "rumi",
       "status": "|------",
       "title": "DreamTown Universe Bible",
-      "created_at": "2026-03-10",
-      "checksum": "e7a57042"
+      "created_at": "2026-03-12",
+      "checksum": "badbc89e"
+    },
+    {
+      "id": "DOC-DreamTown_Universe_Structure_v",
+      "path": "docs/ssot/DreamTown_Universe_Structure_v2_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "archived",
+      "title": "DreamTown Universe Structure v2 SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "3ed44781"
+    },
+    {
+      "id": "DOC-DreamTown_Vision_Stack_SSOT",
+      "path": "docs/ssot/DreamTown_Vision_Stack_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Vision Stack SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "15470ca9"
     },
     {
       "id": "DOC-DreamTown_Visual_Style_SSOT",
@@ -2324,11 +3025,11 @@
         "소원",
         "aurora"
       ],
-      "owner": "code",
+      "owner": "rumi",
       "status": "active",
       "title": "DreamTown Visual Style SSOT",
-      "created_at": "2026-03-10",
-      "checksum": "96fc5abf"
+      "created_at": "2026-03-12",
+      "checksum": "adb97e24"
     },
     {
       "id": "DOC-DreamTown_World_Architecture_S",
@@ -2345,8 +3046,26 @@
       "owner": "rumi",
       "status": "archived",
       "title": "DreamTown 세계 아키텍처 SSOT",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "c3eeb3f1"
+    },
+    {
+      "id": "DOC-DreamTown_World_Map_SSOT",
+      "path": "docs/ssot/DreamTown_World_Map_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown World Map SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "5705211d"
     },
     {
       "id": "DOC-quantum-planning-method",
@@ -2361,7 +3080,7 @@
       "owner": "comi",
       "status": "active",
       "title": "양자 기획법 (Quantum Planning Method) v1.0",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "b360b1b0"
     },
     {
@@ -2379,7 +3098,7 @@
       "owner": "code",
       "status": "|----",
       "title": "에이전트 인덱스",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "92a49e80"
     },
     {
@@ -2395,7 +3114,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "대화 저장소 워크플로우",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "55221cd3"
     },
     {
@@ -2415,7 +3134,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Manifest 자동 생성 시스템",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "d242fbfe"
     },
     {
@@ -2432,7 +3151,7 @@
       "owner": "team",
       "status": "active",
       "title": "소원놀이터 퀵 레퍼런스 (운영용)",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "fc46316d"
     },
     {
@@ -2450,7 +3169,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Aurora 5 토론 시스템 안내문",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "49189a4d"
     },
     {
@@ -2466,7 +3185,7 @@
       "owner": "team",
       "status": "active",
       "title": "L3 Promote — PR #12: [P2.3] Ops Hardening: Stability Score + Alert Cooldown + Proactive Alert",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "7e4e425b"
     },
     {
@@ -2484,7 +3203,7 @@
       "owner": "code",
       "status": "분석 중 / 분석 완료",
       "title": "카카오 알림톡 템플릿 설계서",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "75c90dee"
     },
     {
@@ -2501,7 +3220,7 @@
       "owner": "ceo",
       "status": "active",
       "title": "30초 홍보영상 프롬프트 패키지 v1.0",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "840434d0"
     },
     {
@@ -2518,7 +3237,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Wix 팀 소개 페이지 콘텐츠",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "cb6751ba"
     },
     {
@@ -2534,7 +3253,7 @@
       "owner": "comi",
       "status": "active",
       "title": "docs/_raw/ — CEO 빠른 적재 폴더",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "452d7c2e"
     },
     {
@@ -2551,7 +3270,7 @@
       "owner": "comi",
       "status": "archived",
       "title": "프로젝트 지식 수동 정리 가이드",
-      "created_at": "2026-03-10",
+      "created_at": "2026-03-12",
       "checksum": "86623de8"
     },
     {
@@ -4232,6 +4951,24 @@
       "title": "MASTER-CONTROL — 회의센터 출입구",
       "created_at": "|----|------|------|",
       "checksum": "75826de7"
+    },
+    {
+      "id": "DOC-DreamTown_Core_Action_SSOT",
+      "path": "docs/ssot/DreamTown_Core_Action_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "ceo",
+      "status": "| 나의 작은 희망",
+      "title": "DreamTown Core Action SSOT",
+      "created_at": "|",
+      "checksum": "4bb7f924"
     },
     {
       "id": "DOC-DreamTown_Miracle_System_SSOT",
