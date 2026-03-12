@@ -1,11 +1,11 @@
 # DreamTown Universe Bible
 
-Version: v3.0
-Owner: Aurora5
+Version: v3.1
+Owner: Aurora5 / 루미
 Status: Confirmed
 Purpose: Canonical reference for DreamTown universe architecture and core concept
 
-Last Updated: 2026-03-09
+Last Updated: 2026-03-11
 Updated By: Code (Claude Code)
 
 ---
@@ -17,7 +17,11 @@ Updated By: Code (Claude Code)
 DreamTown은 그 위에 펼쳐진 하늘이다.
 ```
 
-> **"디지털 용궁은 소원의 바다이고, DreamTown은 그 소원이 빛나는 하늘이다."**
+### 공식 오프닝 문장 (CEO 확정 2026-03-11)
+
+> **"여수 바다에서 시작된 하늘."**
+
+> **"당신의 소원은 혼자가 아닙니다."**
 
 > 공식 아키텍처: `DreamTown_World_Architecture_SSOT.md`
 
@@ -28,16 +32,38 @@ DreamTown은 그 위에 펼쳐진 하늘이다.
 ```
 현실 세계 (온라인 + 오프라인)
         ↓
-     아우룸 (소원의 전달자)
+   여수 바다 (Origin — 출발점)
+        ↓
+   빛구슬 (소원의 형태화)
+        ↓
+   별씨앗 (숙성 단계)
         ↓
    디지털 용궁 (근원 / 원본 보관)
         ↓
+   아우룸 (소원의 전달자 / 수호자)
+        ↓
      Aurora5 (동행 시스템)
         ↓
-    DreamTown (별 / 연결 / 하늘)
+   StarLink = Aurora Path (빛의 길)
         ↓
-  별자리 / 지혜 / 항해
+    DreamTown 하늘 (별 / 연결 / 이야기)
+        ↓
+   별 → 별자리 → 은하 → 은하군
 ```
+
+### Golden Turtle Axis (세계관 축)
+
+DreamTown 세계 전체를 연결하는 상징 축:
+
+```
+여수 바다
+    ↓
+황금 거북 별자리 (Golden Nine Constellation)
+    ↓
+DreamTown 은하
+```
+
+**바다 → 하늘 → 우주** — DreamTown의 수직 축이자 브랜드 상징.
 
 ---
 
@@ -151,7 +177,46 @@ DreamTown의 첫 번째 은하. **"DreamTown의 하늘은 여수의 바다에서
 
 ---
 
-## 7. 창세 신화 요약
+## 7. Star Birth Scene (공식 핵심 장면)
+
+DreamTown 세계관의 상징 장면. 모든 시네마틱/UX의 기준.
+
+```
+여수 밤바다
+    ↓
+작은 빛구슬 (누군가의 소원)
+    ↓
+아우룸이 조용히 바라본다
+    ↓
+빛이 하늘로 올라간다
+    ↓
+황금 거북 별자리 아래
+    ↓
+별이 탄생한다
+```
+
+이 장면은 **소원이 별이 되는 순간**이며, DreamTown의 디즈니 성(象징) 역할을 한다.
+
+> 연출 세부: `docs/design/DreamTown_Opening_Cinematic_Design.md`
+
+---
+
+## 8. 아우룸 — 주인공 원칙
+
+> **아우룸은 주인공이 아닙니다.**
+
+DreamTown에서 항상 주인공은:
+
+> **소원이의 소원**
+
+아우룸은 오직 **전환의 순간**에만 등장한다.
+말하지 않는다. 조용히 바라보고, 인도하고, 물러난다.
+
+> 상세 캐릭터: `DreamTown_Character_SSOT.md`
+
+---
+
+## 창세 신화 요약
 
 여수 금오설화를 기반으로 한 DreamTown의 창세 이야기.
 
@@ -166,7 +231,12 @@ DreamTown의 첫 번째 은하. **"DreamTown의 하늘은 여수의 바다에서
 
 ## 참조
 
+- 세계 아키텍처: `DreamTown_World_Architecture_SSOT.md`
+- 핵심 철학: `DreamTown_Core_Philosophy_SSOT.md`
 - 캐릭터: `DreamTown_Character_SSOT.md`
 - 창세 신화: `DreamTown_Origin_Myth_SSOT.md`
 - 비주얼 스타일: `DreamTown_Visual_Style_SSOT.md`
-- Galaxy 운영 설계: `docs/design/DreamTown_Galaxy_Mode_SSOT.md`
+- 첫 화면 연출: `docs/design/DreamTown_Opening_Cinematic_Design.md`
+- 우주 확장 구조: `docs/design/DreamTown_Expansion_Universe_Design.md`
+- Galaxy 운영 설계: `docs/design/DreamTown_Sky_Map_Design.md`
+- 다음 설계 예정: DreamTown Star Navigation System (Cosmic Map v2)

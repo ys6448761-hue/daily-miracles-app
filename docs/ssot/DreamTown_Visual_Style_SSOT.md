@@ -1,11 +1,11 @@
 # DreamTown Visual Style SSOT
 
-Version: v1.0
-Owner: Aurora5
-Status: Active
-Purpose: Canonical reference for all visual style rules — image, webtoon, video production
+Version: v2.0
+Owner: Aurora5 / 루미
+Status: Confirmed
+Purpose: DreamTown 비주얼 아이덴티티 + 영상/이미지 제작 기준 — 브랜드 디자인 철학부터 AI 프롬프트 규칙까지
 
-Last Updated: 2026-03-09
+Last Updated: 2026-03-11
 Updated By: Code (Claude Code)
 
 ---
@@ -15,6 +15,101 @@ Updated By: Code (Claude Code)
 - 모든 이미지·웹툰·영상 제작 전에 이 파일을 먼저 읽는다
 - STYLE LOCK은 절대 변경 불가 (변경 시 CEO 승인 필요)
 - TEXT ZERO 원칙은 모든 산출물에 예외 없이 적용된다
+
+---
+
+## 0. Visual Identity — 브랜드 디자인 철학
+
+### 디자인 3대 감정
+
+```
+희망 / 평온 / 경이
+```
+
+### 디자인 키워드
+
+```
+바다 / 별 / 빛 / 여정
+```
+
+DreamTown은 **차분한 기적의 분위기**를 유지한다.
+
+### 디자인 목표
+
+```
+디즈니처럼 따뜻하고
+지브리처럼 감성적이며
+한국 바다처럼 평온한
+```
+
+---
+
+## 0-1. Core Symbols (핵심 상징 3종)
+
+### 🐢 Aurum (황금 거북)
+
+- 작은 황금 거북 / 둥근 형태 / 부드러운 표정 / 따뜻한 빛
+- **항상 작은 존재**로 표현 — 주인공은 소원이의 소원
+- 색상: Star Gold `#FFD76A` + 소프트 글로우
+
+### ⭐ Star (별)
+
+- 날카로운 별 모양 금지 → **빛구슬 형태**에 가까운 둥근 빛
+- 부드러운 광채 / 따뜻한 색
+
+### 🌌 Golden Turtle Constellation (황금 거북 별자리)
+
+- 거북 실루엣 + 별 연결선 + 부드러운 곡선
+- 의미: 바다 → 하늘 연결
+
+---
+
+## 0-2. DreamTown 공식 컬러 시스템
+
+| 역할 | 이름 | 코드 |
+|------|------|------|
+| Primary | Dream Purple (메인 퍼플) | `#9B87F5` |
+| Secondary | Soft Pink (핑크/코랄) | `#F5A7C6` |
+| Accent | Deep Purple | `#6E59A5` |
+| World | Ocean Blue | `#2E5BFF` |
+| Symbol | Star Gold | `#FFD76A` |
+| Background | Night Sky | `#0D1B2A` |
+| Background | Soft Background | `#FFF5F7` |
+| Gradient | — | `linear-gradient(135deg, #9B87F5, #F5A7C6)` |
+
+### 배경 톤
+
+DreamTown 배경 = 항상 **밤하늘 + 바다**
+
+```
+별 / 달 / 잔잔한 파도 / 빛 반사
+→ 따뜻한 밤 / 조용한 희망
+```
+
+---
+
+## 0-3. 캐릭터 스타일 원칙
+
+**허용:**
+```
+둥근 형태 / 작은 눈 / 부드러운 표정 / 단순한 실루엣
+지브리 / 한국 동화 / 수채화
+```
+
+**금지:**
+```
+3D 현실 스타일 / 과도한 디테일 / 어두운 공포 스타일
+```
+
+---
+
+## 0-4. UI 디자인 원칙
+
+```
+둥근 카드 / 부드러운 그림자 / 큰 여백 / 따뜻한 색
+```
+
+UX 키워드: **탐험 / 여정 / 발견**
 
 ---
 

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-12T05:17:31.671Z",
+  "generated_at": "2026-03-12T06:30:42.289Z",
   "generator": "generate-manifest.js",
   "total_count": 280,
   "documents": [
@@ -23,13 +23,13 @@
     },
     {
       "id": "DOC-DreamTown_Frontend_Screen_Map_",
-      "path": "docs/design/DreamTown_Frontend_Screen_Map_Design.md",
+      "path": "docs/ssot/DreamTown_Frontend_Screen_Map_Design.md",
       "type": "document",
       "project": "aurora5",
       "priority": "P2",
-      "topic": "design",
+      "topic": "ssot",
       "tags": [
-        "design",
+        "ssot",
         "소원",
         "aurora"
       ],
@@ -41,13 +41,13 @@
     },
     {
       "id": "DOC-DreamTown_MVP_Scope_Design",
-      "path": "docs/design/DreamTown_MVP_Scope_Design.md",
+      "path": "docs/ssot/DreamTown_MVP_Scope_Design.md",
       "type": "document",
       "project": "aurora5",
       "priority": "P2",
-      "topic": "design",
+      "topic": "ssot",
       "tags": [
-        "design",
+        "ssot",
         "소원",
         "aurora"
       ],
@@ -426,26 +426,6 @@
       "checksum": "8c342f8b"
     },
     {
-      "id": "DOC-architecture",
-      "path": "docs/03-tech/architecture.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "03-tech",
-      "tags": [
-        "03-tech",
-        "소원",
-        "storybook",
-        "aurora",
-        "결제"
-      ],
-      "owner": "code",
-      "status": "|--------",
-      "title": "시스템 아키텍처",
-      "created_at": "2026-03-12",
-      "checksum": "10647947"
-    },
-    {
       "id": "DOC-code-guide-v3",
       "path": "docs/03-tech/code-guide-v3.md",
       "type": "document",
@@ -478,22 +458,6 @@
       "title": "Development Rules",
       "created_at": "2026-03-12",
       "checksum": "0d3788a2"
-    },
-    {
-      "id": "DOC-growth-film-architecture",
-      "path": "docs/03-tech/growth-film-architecture.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "03-tech",
-      "tags": [
-        "03-tech"
-      ],
-      "owner": "team",
-      "status": "active",
-      "title": "Technical Implementation Log: Growth Film & Viral Loop (Referral Injection)",
-      "created_at": "2026-03-12",
-      "checksum": "a50cd327"
     },
     {
       "id": "DOC-소원드림광장_홈페이지재구성_현황브리핑",
@@ -812,744 +776,6 @@
       "title": "Daily Miracles MVP 배포 체크리스트",
       "created_at": "2026-03-12",
       "checksum": "0202a43e"
-    },
-    {
-      "id": "DOC-DreamTown_Alpha_Decision_Singl",
-      "path": "docs/design/DreamTown_Alpha_Decision_Single_Star.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원"
-      ],
-      "owner": "rumi",
-      "status": "|------",
-      "title": "DreamTown Alpha 결정: 단일 별 구조 유지",
-      "created_at": "2026-03-12",
-      "checksum": "3fb9da2b"
-    },
-    {
-      "id": "DOC-DreamTown_API_Spec_Design",
-      "path": "docs/design/DreamTown_API_Spec_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown API Specification Design",
-      "created_at": "2026-03-12",
-      "checksum": "5fee6796"
-    },
-    {
-      "id": "DOC-DreamTown_Aurora5_Master_Map_D",
-      "path": "docs/design/DreamTown_Aurora5_Master_Map_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "Aurora5 + DreamTown Master Map",
-      "created_at": "2026-03-12",
-      "checksum": "64471a52"
-    },
-    {
-      "id": "DOC-DreamTown_Aurum_System_Design",
-      "path": "docs/design/DreamTown_Aurum_System_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown Aurum System Design",
-      "created_at": "2026-03-12",
-      "checksum": "0aa6fdeb"
-    },
-    {
-      "id": "DOC-DreamTown_Aurum_UX_Design",
-      "path": "docs/design/DreamTown_Aurum_UX_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "archived",
-      "title": "아우룸 UX 설계",
-      "created_at": "2026-03-12",
-      "checksum": "d2aacd32"
-    },
-    {
-      "id": "DOC-DreamTown_Build_Order_Design",
-      "path": "docs/design/DreamTown_Build_Order_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown Build Order Design",
-      "created_at": "2026-03-12",
-      "checksum": "fa37ae74"
-    },
-    {
-      "id": "DOC-DreamTown_Closed_Alpha_Questio",
-      "path": "docs/design/DreamTown_Closed_Alpha_Questions_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown Closed Alpha 질문 3개",
-      "created_at": "2026-03-12",
-      "checksum": "05ed6f56"
-    },
-    {
-      "id": "DOC-DreamTown_Closed_Alpha_Seed_St",
-      "path": "docs/design/DreamTown_Closed_Alpha_Seed_Stars_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown Closed Alpha Seed Stars (10개)",
-      "created_at": "2026-03-12",
-      "checksum": "b0c1993b"
-    },
-    {
-      "id": "DOC-DreamTown_Constellation_System",
-      "path": "docs/design/DreamTown_Constellation_System_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown Constellation 시스템",
-      "created_at": "2026-03-12",
-      "checksum": "7fddfdfd"
-    },
-    {
-      "id": "DOC-DreamTown_Current_Sprint_v1",
-      "path": "docs/design/DreamTown_Current_Sprint_v1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown Current Sprint v1",
-      "created_at": "2026-03-12",
-      "checksum": "df2156e4"
-    },
-    {
-      "id": "DOC-DreamTown_DB_Schema_Design",
-      "path": "docs/design/DreamTown_DB_Schema_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora",
-        "결제"
-      ],
-      "owner": "rumi",
-      "status": "archived",
-      "title": "DreamTown DB Schema Design",
-      "created_at": "2026-03-12",
-      "checksum": "787f5ace"
-    },
-    {
-      "id": "DOC-DreamTown_DragonPalace_DB_Desi",
-      "path": "docs/design/DreamTown_DragonPalace_DB_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "|------",
-      "title": "DreamTown 디지털 용궁 DB 설계",
-      "created_at": "2026-03-12",
-      "checksum": "42a5815f"
-    },
-    {
-      "id": "DOC-DreamTown_ERD_Summary_Design",
-      "path": "docs/design/DreamTown_ERD_Summary_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown ERD Summary Design",
-      "created_at": "2026-03-12",
-      "checksum": "7c8b9c2c"
-    },
-    {
-      "id": "DOC-DreamTown_Expansion_Universe_D",
-      "path": "docs/design/DreamTown_Expansion_Universe_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown 확장 우주 구조",
-      "created_at": "2026-03-12",
-      "checksum": "08e2a37d"
-    },
-    {
-      "id": "DOC-DreamTown_Festival_Commerce_De",
-      "path": "docs/design/DreamTown_Festival_Commerce_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora",
-        "가격"
-      ],
-      "owner": "rumi",
-      "status": "내용",
-      "title": "DreamTown 축제형 커머스 시스템",
-      "created_at": "2026-03-12",
-      "checksum": "eb413207"
-    },
-    {
-      "id": "DOC-DreamTown_First_100_Users_Stra",
-      "path": "docs/design/DreamTown_First_100_Users_Strategy.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown First 100 Users Strategy",
-      "created_at": "2026-03-12",
-      "checksum": "f2f297fd"
-    },
-    {
-      "id": "DOC-DreamTown_First_Star_Canon_Des",
-      "path": "docs/design/DreamTown_First_Star_Canon_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown First Star Canon",
-      "created_at": "2026-03-12",
-      "checksum": "824db367"
-    },
-    {
-      "id": "DOC-DreamTown_Founding_Stars_Canon",
-      "path": "docs/design/DreamTown_Founding_Stars_Canon_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown Founding Stars Canon",
-      "created_at": "2026-03-12",
-      "checksum": "1346a204"
-    },
-    {
-      "id": "DOC-DreamTown_Galaxy_Map_UI_Design",
-      "path": "docs/design/DreamTown_Galaxy_Map_UI_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown Galaxy Map UI Design v1",
-      "created_at": "2026-03-12",
-      "checksum": "58979307"
-    },
-    {
-      "id": "DOC-DreamTown_Galaxy_Map_Wireframe",
-      "path": "docs/design/DreamTown_Galaxy_Map_Wireframe_Copy_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown Galaxy Map Wireframe Copy v1",
-      "created_at": "2026-03-12",
-      "checksum": "5160f4ea"
-    },
-    {
-      "id": "DOC-DreamTown_Integrated_Architect",
-      "path": "docs/design/DreamTown_Integrated_Architecture_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "옵션",
-      "title": "DreamTown × 디지털 용궁 통합 구조도",
-      "created_at": "2026-03-12",
-      "checksum": "4f1e68c5"
-    },
-    {
-      "id": "DOC-DreamTown_Launch_Asset_Checkli",
-      "path": "docs/design/DreamTown_Launch_Asset_Checklist_v1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown Launch Asset Checklist v1",
-      "created_at": "2026-03-12",
-      "checksum": "1252dcfd"
-    },
-    {
-      "id": "DOC-DreamTown_Launch_Strategy_v1",
-      "path": "docs/design/DreamTown_Launch_Strategy_v1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora",
-        "kpi"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown Launch Strategy v1",
-      "created_at": "2026-03-12",
-      "checksum": "275d940d"
-    },
-    {
-      "id": "DOC-DreamTown_Master_Map_Design",
-      "path": "docs/design/DreamTown_Master_Map_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "|------",
-      "title": "DreamTown 세계 지도 (Master Map v1)",
-      "created_at": "2026-03-12",
-      "checksum": "b2838410"
-    },
-    {
-      "id": "DOC-DreamTown_MVP_Dev_Plan_v1",
-      "path": "docs/design/DreamTown_MVP_Dev_Plan_v1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "team",
-      "status": "active",
-      "title": "DreamTown MVP Dev Plan v1",
-      "created_at": "2026-03-12",
-      "checksum": "3262966b"
-    },
-    {
-      "id": "DOC-DreamTown_My_Star_UX_Master_De",
-      "path": "docs/design/DreamTown_My_Star_UX_Master_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "archived",
-      "title": "DreamTown My Star UX Master Design",
-      "created_at": "2026-03-12",
-      "checksum": "3dee2676"
-    },
-    {
-      "id": "DOC-DreamTown_Onboarding_Experienc",
-      "path": "docs/design/DreamTown_Onboarding_Experience_v1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown Onboarding Experience v1",
-      "created_at": "2026-03-12",
-      "checksum": "c391623b"
-    },
-    {
-      "id": "DOC-DreamTown_One_Page_Blueprint_D",
-      "path": "docs/design/DreamTown_One_Page_Blueprint_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown One Page Blueprint v1",
-      "created_at": "2026-03-12",
-      "checksum": "306c2a21"
-    },
-    {
-      "id": "DOC-DreamTown_Opening_Cinematic_De",
-      "path": "docs/design/DreamTown_Opening_Cinematic_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "archived",
-      "title": "DreamTown 첫 화면 연출 — 30초 시네마틱",
-      "created_at": "2026-03-12",
-      "checksum": "968339cb"
-    },
-    {
-      "id": "DOC-DreamTown_Partner_Support_Form",
-      "path": "docs/design/DreamTown_Partner_Support_Formula_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "aurora",
-        "가격"
-      ],
-      "owner": "rumi",
-      "status": "내용",
-      "title": "DreamTown 상생 지원 공식 v1",
-      "created_at": "2026-03-12",
-      "checksum": "16e980cc"
-    },
-    {
-      "id": "DOC-DreamTown_Pipeline_Design",
-      "path": "docs/design/DreamTown_Pipeline_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "archived",
-      "title": "DreamTown 온라인–오프라인 통합 파이프라인",
-      "created_at": "2026-03-12",
-      "checksum": "20d83fa5"
-    },
-    {
-      "id": "DOC-DreamTown_Product_Architecture",
-      "path": "docs/design/DreamTown_Product_Architecture_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown Product Architecture Design",
-      "created_at": "2026-03-12",
-      "checksum": "bfde40ab"
-    },
-    {
-      "id": "DOC-DreamTown_Product_Roadmap_v1",
-      "path": "docs/design/DreamTown_Product_Roadmap_v1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown Product Roadmap v1",
-      "created_at": "2026-03-12",
-      "checksum": "de31bac2"
-    },
-    {
-      "id": "DOC-DreamTown_Prototype_Kickoff",
-      "path": "docs/design/DreamTown_Prototype_Kickoff.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown Prototype Kickoff — Code 실행 지시서",
-      "created_at": "2026-03-12",
-      "checksum": "f1d4cc18"
-    },
-    {
-      "id": "DOC-DreamTown_Screen_Map_v1",
-      "path": "docs/design/DreamTown_Screen_Map_v1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "code",
-      "status": "active",
-      "title": "DreamTown Screen Map v1",
-      "created_at": "2026-03-12",
-      "checksum": "5f4c5fc5"
-    },
-    {
-      "id": "DOC-DreamTown_Sky_Map_Design",
-      "path": "docs/design/DreamTown_Sky_Map_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "aurora"
-      ],
-      "owner": "team",
-      "status": "active",
-      "title": "DreamTown 하늘 지도 스타일",
-      "created_at": "2026-03-12",
-      "checksum": "d64b297a"
-    },
-    {
-      "id": "DOC-DreamTown_Star_Birth_Policy_De",
-      "path": "docs/design/DreamTown_Star_Birth_Policy_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "내용",
-      "title": "DreamTown 별 탄생 정책",
-      "created_at": "2026-03-12",
-      "checksum": "54c75e12"
-    },
-    {
-      "id": "DOC-DreamTown_Star_Share_System_De",
-      "path": "docs/design/DreamTown_Star_Share_System_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown Star Share System Design",
-      "created_at": "2026-03-12",
-      "checksum": "535df6ce"
-    },
-    {
-      "id": "DOC-DreamTown_System_Architecture_",
-      "path": "docs/design/DreamTown_System_Architecture_Map_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "active",
-      "title": "DreamTown System Architecture Map Design",
-      "created_at": "2026-03-12",
-      "checksum": "7d90cdbd"
-    },
-    {
-      "id": "DOC-DreamTown_Video_Pipeline_Desig",
-      "path": "docs/design/DreamTown_Video_Pipeline_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "rumi",
-      "status": "내용",
-      "title": "DreamTown 영상 제작 파이프라인",
-      "created_at": "2026-03-12",
-      "checksum": "67ca79a6"
-    },
-    {
-      "id": "DOC-DreamTown_Yeosu_Pilot_Design",
-      "path": "docs/design/DreamTown_Yeosu_Pilot_Design.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora",
-        "가격"
-      ],
-      "owner": "team",
-      "status": "|------",
-      "title": "DreamTown 여수 1차 파일럿 운영 설계",
-      "created_at": "2026-03-12",
-      "checksum": "0ca2f423"
     },
     {
       "id": "DOC-UPDATE_SOP",
@@ -2490,6 +1716,59 @@
       "checksum": "a29fbeff"
     },
     {
+      "id": "DOC-DreamTown_Alpha_Decision_Singl",
+      "path": "docs/ssot/DreamTown_Alpha_Decision_Single_Star.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원"
+      ],
+      "owner": "rumi",
+      "status": "|------",
+      "title": "DreamTown Alpha 결정: 단일 별 구조 유지",
+      "created_at": "2026-03-12",
+      "checksum": "3fb9da2b"
+    },
+    {
+      "id": "DOC-DreamTown_API_Spec_Design",
+      "path": "docs/ssot/DreamTown_API_Spec_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown API Specification Design",
+      "created_at": "2026-03-12",
+      "checksum": "5fee6796"
+    },
+    {
+      "id": "DOC-DreamTown_Aurora5_Master_Map_D",
+      "path": "docs/ssot/DreamTown_Aurora5_Master_Map_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "Aurora5 + DreamTown Master Map",
+      "created_at": "2026-03-12",
+      "checksum": "64471a52"
+    },
+    {
       "id": "DOC-DreamTown_Aurora5_System_SSOT",
       "path": "docs/ssot/DreamTown_Aurora5_System_SSOT.md",
       "type": "document",
@@ -2506,6 +1785,60 @@
       "title": "DreamTown Aurora5 System SSOT",
       "created_at": "2026-03-12",
       "checksum": "ca983478"
+    },
+    {
+      "id": "DOC-DreamTown_Aurum_System_Design",
+      "path": "docs/ssot/DreamTown_Aurum_System_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Aurum System Design",
+      "created_at": "2026-03-12",
+      "checksum": "0aa6fdeb"
+    },
+    {
+      "id": "DOC-DreamTown_Aurum_UX_Design",
+      "path": "docs/ssot/DreamTown_Aurum_UX_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "archived",
+      "title": "아우룸 UX 설계",
+      "created_at": "2026-03-12",
+      "checksum": "d2aacd32"
+    },
+    {
+      "id": "DOC-DreamTown_Build_Order_Design",
+      "path": "docs/ssot/DreamTown_Build_Order_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Build Order Design",
+      "created_at": "2026-03-12",
+      "checksum": "fa37ae74"
     },
     {
       "id": "DOC-DreamTown_Character_SSOT",
@@ -2544,6 +1877,40 @@
       "checksum": "31174b04"
     },
     {
+      "id": "DOC-DreamTown_Closed_Alpha_Questio",
+      "path": "docs/ssot/DreamTown_Closed_Alpha_Questions_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Closed Alpha 질문 3개",
+      "created_at": "2026-03-12",
+      "checksum": "05ed6f56"
+    },
+    {
+      "id": "DOC-DreamTown_Closed_Alpha_Seed_St",
+      "path": "docs/ssot/DreamTown_Closed_Alpha_Seed_Stars_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Closed Alpha Seed Stars (10개)",
+      "created_at": "2026-03-12",
+      "checksum": "b0c1993b"
+    },
+    {
       "id": "DOC-DreamTown_Complete_SSOT",
       "path": "docs/ssot/DreamTown_Complete_SSOT.md",
       "type": "document",
@@ -2560,6 +1927,24 @@
       "title": "🌌 DreamTown Complete SSOT",
       "created_at": "2026-03-12",
       "checksum": "b64f6df4"
+    },
+    {
+      "id": "DOC-DreamTown_Constellation_System",
+      "path": "docs/ssot/DreamTown_Constellation_System_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Constellation 시스템",
+      "created_at": "2026-03-12",
+      "checksum": "7fddfdfd"
     },
     {
       "id": "DOC-DreamTown_Core_Philosophy_SSOT",
@@ -2616,6 +2001,152 @@
       "checksum": "ac0a96c6"
     },
     {
+      "id": "DOC-DreamTown_Current_Sprint_v1",
+      "path": "docs/ssot/DreamTown_Current_Sprint_v1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Current Sprint v1",
+      "created_at": "2026-03-12",
+      "checksum": "df2156e4"
+    },
+    {
+      "id": "DOC-DreamTown_DB_Schema_Design",
+      "path": "docs/ssot/DreamTown_DB_Schema_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora",
+        "결제"
+      ],
+      "owner": "rumi",
+      "status": "archived",
+      "title": "DreamTown DB Schema Design",
+      "created_at": "2026-03-12",
+      "checksum": "787f5ace"
+    },
+    {
+      "id": "DOC-DreamTown_DragonPalace_DB_Desi",
+      "path": "docs/ssot/DreamTown_DragonPalace_DB_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "|------",
+      "title": "DreamTown 디지털 용궁 DB 설계",
+      "created_at": "2026-03-12",
+      "checksum": "42a5815f"
+    },
+    {
+      "id": "DOC-DreamTown_ERD_Summary_Design",
+      "path": "docs/ssot/DreamTown_ERD_Summary_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown ERD Summary Design",
+      "created_at": "2026-03-12",
+      "checksum": "7c8b9c2c"
+    },
+    {
+      "id": "DOC-DreamTown_Expansion_Universe_D",
+      "path": "docs/ssot/DreamTown_Expansion_Universe_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown 확장 우주 구조",
+      "created_at": "2026-03-12",
+      "checksum": "08e2a37d"
+    },
+    {
+      "id": "DOC-DreamTown_Festival_Commerce_De",
+      "path": "docs/ssot/DreamTown_Festival_Commerce_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora",
+        "가격"
+      ],
+      "owner": "rumi",
+      "status": "내용",
+      "title": "DreamTown 축제형 커머스 시스템",
+      "created_at": "2026-03-12",
+      "checksum": "eb413207"
+    },
+    {
+      "id": "DOC-DreamTown_First_100_Users_Stra",
+      "path": "docs/ssot/DreamTown_First_100_Users_Strategy.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown First 100 Users Strategy",
+      "created_at": "2026-03-12",
+      "checksum": "f2f297fd"
+    },
+    {
+      "id": "DOC-DreamTown_First_Star_Canon_Des",
+      "path": "docs/ssot/DreamTown_First_Star_Canon_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown First Star Canon",
+      "created_at": "2026-03-12",
+      "checksum": "824db367"
+    },
+    {
       "id": "DOC-DreamTown_First_User_Journey_S",
       "path": "docs/ssot/DreamTown_First_User_Journey_SSOT.md",
       "type": "document",
@@ -2632,6 +2163,24 @@
       "title": "DreamTown First User Journey SSOT",
       "created_at": "2026-03-12",
       "checksum": "389d44d7"
+    },
+    {
+      "id": "DOC-DreamTown_Founding_Stars_Canon",
+      "path": "docs/ssot/DreamTown_Founding_Stars_Canon_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Founding Stars Canon",
+      "created_at": "2026-03-12",
+      "checksum": "1346a204"
     },
     {
       "id": "DOC-DreamTown_Galaxy_Evolution_SSO",
@@ -2670,6 +2219,42 @@
       "checksum": "a9635b5f"
     },
     {
+      "id": "DOC-DreamTown_Galaxy_Map_UI_Design",
+      "path": "docs/ssot/DreamTown_Galaxy_Map_UI_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Galaxy Map UI Design v1",
+      "created_at": "2026-03-12",
+      "checksum": "58979307"
+    },
+    {
+      "id": "DOC-DreamTown_Galaxy_Map_Wireframe",
+      "path": "docs/ssot/DreamTown_Galaxy_Map_Wireframe_Copy_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Galaxy Map Wireframe Copy v1",
+      "created_at": "2026-03-12",
+      "checksum": "5160f4ea"
+    },
+    {
       "id": "DOC-DreamTown_Golden_Turtle_Conste",
       "path": "docs/ssot/DreamTown_Golden_Turtle_Constellation_SSOT.md",
       "type": "document",
@@ -2686,6 +2271,22 @@
       "title": "DreamTown Golden Turtle Constellation System SSOT",
       "created_at": "2026-03-12",
       "checksum": "7294b7ac"
+    },
+    {
+      "id": "DOC-DreamTown_Growth_Film_Architec",
+      "path": "docs/ssot/DreamTown_Growth_Film_Architecture_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "Technical Implementation Log: Growth Film & Viral Loop (Referral Injection)",
+      "created_at": "2026-03-12",
+      "checksum": "a50cd327"
     },
     {
       "id": "DOC-DreamTown_Growth_Film_SSOT",
@@ -2722,6 +2323,24 @@
       "title": "DreamTown Image Prompts SSOT",
       "created_at": "2026-03-12",
       "checksum": "6287474e"
+    },
+    {
+      "id": "DOC-DreamTown_Integrated_Architect",
+      "path": "docs/ssot/DreamTown_Integrated_Architecture_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "옵션",
+      "title": "DreamTown × 디지털 용궁 통합 구조도",
+      "created_at": "2026-03-12",
+      "checksum": "4f1e68c5"
     },
     {
       "id": "DOC-DreamTown_IP_Strategy_SSOT",
@@ -2778,6 +2397,43 @@
       "checksum": "f51b0d91"
     },
     {
+      "id": "DOC-DreamTown_Launch_Asset_Checkli",
+      "path": "docs/ssot/DreamTown_Launch_Asset_Checklist_v1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Launch Asset Checklist v1",
+      "created_at": "2026-03-12",
+      "checksum": "1252dcfd"
+    },
+    {
+      "id": "DOC-DreamTown_Launch_Strategy_v1",
+      "path": "docs/ssot/DreamTown_Launch_Strategy_v1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora",
+        "kpi"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Launch Strategy v1",
+      "created_at": "2026-03-12",
+      "checksum": "275d940d"
+    },
+    {
       "id": "DOC-DreamTown_Master_Architecture_",
       "path": "docs/ssot/DreamTown_Master_Architecture_Map_v1.md",
       "type": "document",
@@ -2794,6 +2450,60 @@
       "title": "DreamTown Master Architecture Map v1",
       "created_at": "2026-03-12",
       "checksum": "1d1dc565"
+    },
+    {
+      "id": "DOC-DreamTown_Master_Map_Design",
+      "path": "docs/ssot/DreamTown_Master_Map_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "|------",
+      "title": "DreamTown 세계 지도 (Master Map v1)",
+      "created_at": "2026-03-12",
+      "checksum": "b2838410"
+    },
+    {
+      "id": "DOC-DreamTown_MVP_Dev_Plan_v1",
+      "path": "docs/ssot/DreamTown_MVP_Dev_Plan_v1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "DreamTown MVP Dev Plan v1",
+      "created_at": "2026-03-12",
+      "checksum": "3262966b"
+    },
+    {
+      "id": "DOC-DreamTown_My_Star_UX_Master_De",
+      "path": "docs/ssot/DreamTown_My_Star_UX_Master_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "archived",
+      "title": "DreamTown My Star UX Master Design",
+      "created_at": "2026-03-12",
+      "checksum": "3dee2676"
     },
     {
       "id": "DOC-DreamTown_Naming_System_SSOT",
@@ -2814,6 +2524,60 @@
       "checksum": "6bd3943d"
     },
     {
+      "id": "DOC-DreamTown_Onboarding_Experienc",
+      "path": "docs/ssot/DreamTown_Onboarding_Experience_v1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Onboarding Experience v1",
+      "created_at": "2026-03-12",
+      "checksum": "c391623b"
+    },
+    {
+      "id": "DOC-DreamTown_One_Page_Blueprint_D",
+      "path": "docs/ssot/DreamTown_One_Page_Blueprint_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown One Page Blueprint v1",
+      "created_at": "2026-03-12",
+      "checksum": "306c2a21"
+    },
+    {
+      "id": "DOC-DreamTown_Opening_Cinematic_De",
+      "path": "docs/ssot/DreamTown_Opening_Cinematic_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "archived",
+      "title": "DreamTown 첫 화면 연출 — 30초 시네마틱",
+      "created_at": "2026-03-12",
+      "checksum": "968339cb"
+    },
+    {
       "id": "DOC-DreamTown_Origin_Myth_SSOT",
       "path": "docs/ssot/DreamTown_Origin_Myth_SSOT.md",
       "type": "document",
@@ -2832,6 +2596,60 @@
       "checksum": "1134dbef"
     },
     {
+      "id": "DOC-DreamTown_Partner_Support_Form",
+      "path": "docs/ssot/DreamTown_Partner_Support_Formula_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "aurora",
+        "가격"
+      ],
+      "owner": "rumi",
+      "status": "내용",
+      "title": "DreamTown 상생 지원 공식 v1",
+      "created_at": "2026-03-12",
+      "checksum": "16e980cc"
+    },
+    {
+      "id": "DOC-DreamTown_Pipeline_Design",
+      "path": "docs/ssot/DreamTown_Pipeline_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "archived",
+      "title": "DreamTown 온라인–오프라인 통합 파이프라인",
+      "created_at": "2026-03-12",
+      "checksum": "20d83fa5"
+    },
+    {
+      "id": "DOC-DreamTown_Product_Architecture",
+      "path": "docs/ssot/DreamTown_Product_Architecture_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Product Architecture Design",
+      "created_at": "2026-03-12",
+      "checksum": "bfde40ab"
+    },
+    {
       "id": "DOC-DreamTown_Product_Core_Loop_SS",
       "path": "docs/ssot/DreamTown_Product_Core_Loop_SSOT.md",
       "type": "document",
@@ -2848,6 +2666,24 @@
       "title": "DreamTown Product Core Loop SSOT",
       "created_at": "2026-03-12",
       "checksum": "a59170ab"
+    },
+    {
+      "id": "DOC-DreamTown_Product_Roadmap_v1",
+      "path": "docs/ssot/DreamTown_Product_Roadmap_v1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Product Roadmap v1",
+      "created_at": "2026-03-12",
+      "checksum": "de31bac2"
     },
     {
       "id": "DOC-DreamTown_Product_Structure_SS",
@@ -2869,6 +2705,24 @@
       "checksum": "42c15e21"
     },
     {
+      "id": "DOC-DreamTown_Prototype_Kickoff",
+      "path": "docs/ssot/DreamTown_Prototype_Kickoff.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Prototype Kickoff — Code 실행 지시서",
+      "created_at": "2026-03-12",
+      "checksum": "f1d4cc18"
+    },
+    {
       "id": "DOC-DreamTown_Safety_Ethics_SSOT",
       "path": "docs/ssot/DreamTown_Safety_Ethics_SSOT.md",
       "type": "document",
@@ -2885,6 +2739,41 @@
       "title": "DreamTown Safety & Ethics SSOT",
       "created_at": "2026-03-12",
       "checksum": "cad30bd9"
+    },
+    {
+      "id": "DOC-DreamTown_Screen_Map_v1",
+      "path": "docs/ssot/DreamTown_Screen_Map_v1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "DreamTown Screen Map v1",
+      "created_at": "2026-03-12",
+      "checksum": "5f4c5fc5"
+    },
+    {
+      "id": "DOC-DreamTown_Sky_Map_Design",
+      "path": "docs/ssot/DreamTown_Sky_Map_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "DreamTown 하늘 지도 스타일",
+      "created_at": "2026-03-12",
+      "checksum": "d64b297a"
     },
     {
       "id": "DOC-DreamTown_SSOT_Master_Index",
@@ -2904,6 +2793,24 @@
       "checksum": "939d2d85"
     },
     {
+      "id": "DOC-DreamTown_Star_Birth_Policy_De",
+      "path": "docs/ssot/DreamTown_Star_Birth_Policy_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "내용",
+      "title": "DreamTown 별 탄생 정책",
+      "created_at": "2026-03-12",
+      "checksum": "54c75e12"
+    },
+    {
       "id": "DOC-DreamTown_Star_Navigation_Syst",
       "path": "docs/ssot/DreamTown_Star_Navigation_System_SSOT.md",
       "type": "document",
@@ -2920,6 +2827,62 @@
       "title": "DreamTown Star Navigation System SSOT",
       "created_at": "2026-03-12",
       "checksum": "c2c2e2d3"
+    },
+    {
+      "id": "DOC-DreamTown_Star_Share_System_De",
+      "path": "docs/ssot/DreamTown_Star_Share_System_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown Star Share System Design",
+      "created_at": "2026-03-12",
+      "checksum": "535df6ce"
+    },
+    {
+      "id": "DOC-DreamTown_System_Architecture_",
+      "path": "docs/ssot/DreamTown_System_Architecture_Map_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown System Architecture Map Design",
+      "created_at": "2026-03-12",
+      "checksum": "7d90cdbd"
+    },
+    {
+      "id": "DOC-DreamTown_Tech_Architecture_SS",
+      "path": "docs/ssot/DreamTown_Tech_Architecture_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "storybook",
+        "aurora",
+        "결제"
+      ],
+      "owner": "code",
+      "status": "|--------",
+      "title": "시스템 아키텍처",
+      "created_at": "2026-03-12",
+      "checksum": "10647947"
     },
     {
       "id": "DOC-DreamTown_Travel_System_SSOT",
@@ -2975,6 +2938,24 @@
       "title": "DreamTown Universe Structure v2 SSOT",
       "created_at": "2026-03-12",
       "checksum": "3ed44781"
+    },
+    {
+      "id": "DOC-DreamTown_Video_Pipeline_Desig",
+      "path": "docs/ssot/DreamTown_Video_Pipeline_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "내용",
+      "title": "DreamTown 영상 제작 파이프라인",
+      "created_at": "2026-03-12",
+      "checksum": "67ca79a6"
     },
     {
       "id": "DOC-DreamTown_Vision_Stack_SSOT",
@@ -3084,6 +3065,25 @@
       "title": "DreamTown Yeosu Galaxy SSOT",
       "created_at": "2026-03-12",
       "checksum": "fb61049e"
+    },
+    {
+      "id": "DOC-DreamTown_Yeosu_Pilot_Design",
+      "path": "docs/ssot/DreamTown_Yeosu_Pilot_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora",
+        "가격"
+      ],
+      "owner": "team",
+      "status": "|------",
+      "title": "DreamTown 여수 1차 파일럿 운영 설계",
+      "created_at": "2026-03-12",
+      "checksum": "0ca2f423"
     },
     {
       "id": "DOC-DreamTown_Yeosu_Travel_Routes_",
