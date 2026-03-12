@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-12T01:11:50.509Z",
+  "generated_at": "2026-03-12T01:25:15.639Z",
   "generator": "generate-manifest.js",
-  "total_count": 278,
+  "total_count": 279,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -812,6 +812,23 @@
       "title": "Daily Miracles MVP 배포 체크리스트",
       "created_at": "2026-03-12",
       "checksum": "0202a43e"
+    },
+    {
+      "id": "DOC-DreamTown_Alpha_Decision_Singl",
+      "path": "docs/design/DreamTown_Alpha_Decision_Single_Star.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "design",
+      "tags": [
+        "design",
+        "소원"
+      ],
+      "owner": "rumi",
+      "status": "|------",
+      "title": "DreamTown Alpha 결정: 단일 별 구조 유지",
+      "created_at": "2026-03-12",
+      "checksum": "3fb9da2b"
     },
     {
       "id": "DOC-DreamTown_API_Spec_Design",
