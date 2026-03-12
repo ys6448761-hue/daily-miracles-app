@@ -12,21 +12,36 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
 
-// 소원 텍스트 → 별 이름 생성 (자연스러운 단어 경계 기준)
-function makeStarName(wishText) {
-  const MAX = 12;
-  if (wishText.length <= MAX) return `${wishText}의 별`;
-  // 공백 기준으로 단어를 붙여가며 MAX를 넘지 않는 마지막 단어까지 사용
-  const words = wishText.split(' ');
-  let result = '';
-  for (const word of words) {
-    const next = result ? `${result} ${word}` : word;
-    if (next.length > MAX) break;
-    result = next;
+// 별 이름 사전 풀 — 인디언 작명법 스타일 (AI 호출 없음)
+const STAR_NAMES = [
+  '조용히 빛나는 별',   '새벽을 기다리는 별',  '바람을 걷는 별',
+  '빛을 품은 별',       '노을을 건너온 별',     '밤을 비추는 별',
+  '햇살을 담은 별',     '길을 찾은 별',         '별빛을 간직한 별',
+  '여명을 기다리는 별', '고요를 머금은 별',     '소망을 품은 별',
+  '꿈을 지키는 별',     '희망을 담은 별',       '기억을 간직한 별',
+  '아침을 향하는 별',   '천천히 타오르는 별',   '고요히 빛나는 별',
+  '홀로 빛나는 별',     '먼 곳을 바라보는 별',  '새벽빛을 담은 별',
+  '침묵을 걷는 별',     '시간을 건너온 별',     '꿈을 향하는 별',
+  '빛을 기다리는 별',   '노을을 담은 별',       '밤을 건너온 별',
+  '햇살을 기다리는 별', '길을 비추는 별',       '별빛을 품은 별',
+  '따뜻한 빛을 품은 별','새벽을 건너온 별',     '바람을 담은 별',
+  '빛을 건너온 별',     '소망을 비추는 별',     '꿈을 품어온 별',
+  '희망을 지키는 별',   '기억을 따르는 별',     '아침을 담은 별',
+  '첫 빛을 품은 별',    '깊은 밤의 별',         '고요한 새벽의 별',
+  '빛을 향하는 별',     '노을을 품은 별',       '밤을 지키는 별',
+  '햇살을 건너온 별',   '길을 품은 별',         '꿈을 건너온 별',
+  '소망을 건너온 별',   '희망을 향하는 별',
+];
+
+// wish_id(UUID) 기반 결정론적 이름 선택 — 같은 소원은 항상 같은 별 이름
+function makeStarName(wishId) {
+  try {
+    const hex = String(wishId).replace(/-/g, '').slice(0, 8);
+    const num = parseInt(hex, 16);
+    return isNaN(num) ? STAR_NAMES[0] : STAR_NAMES[num % STAR_NAMES.length];
+  } catch {
+    return '첫 빛을 품은 별';
   }
-  // 단어 분리가 안 되는 경우(한 단어가 MAX 초과) → 그냥 MAX자 절단
-  if (!result) result = wishText.slice(0, MAX);
-  return `${result}의 별`;
 }
 
 // gem_type → galaxy code 분류표
@@ -125,7 +140,7 @@ router.post('/stars/create', async (req, res) => {
     );
     const seed = seedResult.rows[0];
 
-    const starName = makeStarName(wish.wish_text);
+    const starName = makeStarName(wish_id);
     const starSlug = `star-${Date.now()}`;
 
     // star 생성

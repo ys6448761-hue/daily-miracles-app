@@ -6,7 +6,7 @@ const STAGES = [
   { key: 'seed',        emoji: '✨', text: '빛구슬이 떠오릅니다...',          sub: 'A light is rising from the sea.' },
   { key: 'aurum',       emoji: '🐢', text: '아우룸이 나타났습니다.',          sub: 'Aurum has appeared.' },
   { key: 'constellation', emoji: '🌌', text: '황금 거북 별자리가 빛납니다.',  sub: 'The Golden Turtle Constellation shines.' },
-  { key: 'star',        emoji: '⭐', text: '당신의 소원이 별이 되었습니다.', sub: '이제 DreamTown에서 함께 빛납니다.' },
+  { key: 'star',        emoji: '⭐', text: '당신의 소원이',                sub: '별이 되어 빛나기 시작했습니다' },
 ];
 
 export default function StarBirth() {

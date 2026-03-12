@@ -59,7 +59,7 @@ export default function WishGate() {
         <textarea
           value={wishText}
           onChange={e => setWishText(e.target.value)}
-          placeholder="소원을 자유롭게 적어보세요..."
+          placeholder="예) 사람이 되고 싶어요&#10;부모님이 오래 건강하셨으면 좋겠어요"
           maxLength={200}
           className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white placeholder-white/30 resize-none h-36 focus:outline-none focus:border-dream-purple transition-colors"
         />
