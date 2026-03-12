@@ -2182,7 +2182,12 @@ console.log('✅ DreamTown 라우터 등록 완료 (/api/dt)');
 const dtFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist');
 app.use('/dreamtown', express.static(dtFrontendPath));
 app.get(['/dreamtown', '/dreamtown/*'], (req, res) => {
-  res.sendFile(path.join(dtFrontendPath, 'index.html'));
+  res.sendFile(path.join(dtFrontendPath, 'index.html'), (err) => {
+    if (err) {
+      console.error('[DT] SPA sendFile 실패 — dist 미존재 가능:', err.message);
+      res.status(503).send('<html><body><h2>DreamTown 준비 중입니다. 잠시 후 다시 시도해주세요.</h2></body></html>');
+    }
+  });
 });
 console.log('✅ DreamTown 프론트 등록 완료 (/dreamtown)');
 

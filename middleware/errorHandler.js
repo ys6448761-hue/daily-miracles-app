@@ -253,15 +253,15 @@ function globalErrorHandler(err, req, res, next) {
     // express.json() body parse failure — NOT an OpenAI error
     error = createError.validation('요청 본문이 올바른 JSON 형식이 아닙니다.');
     errorClass = 'Validation';
+  } else if (err.code && ['ENOENT', 'EACCES', 'EMFILE', 'ENFILE', 'ECONNRESET', 'ETIMEDOUT'].includes(err.code)) {
+    error = handleSystemError(err);
+    errorClass = 'System';
   } else if (err instanceof OpenAIError || (err.status && err.status >= 400 && err.status < 500 && err.status !== 400)) {
     error = handleOpenAIError(err);
     errorClass = 'OpenAI/External';
   } else if (err instanceof ServiceLimitError || err.statusCode === 429) {
     error = err instanceof AppError ? err : createError.serviceLimit();
     errorClass = 'RateLimit';
-  } else if (err.code && ['ENOENT', 'EACCES', 'EMFILE', 'ENFILE', 'ECONNRESET', 'ETIMEDOUT'].includes(err.code)) {
-    error = handleSystemError(err);
-    errorClass = 'System';
   } else if (!(err instanceof AppError)) {
     error = new AppError('서버 내부 오류가 발생했습니다.', 500, 'INTERNAL_ERROR', false);
     errorClass = 'Unknown';
