@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-12T05:13:52.314Z",
+  "generated_at": "2026-03-12T05:17:31.671Z",
   "generator": "generate-manifest.js",
   "total_count": 280,
   "documents": [
@@ -302,13 +302,13 @@
     },
     {
       "id": "DOC-DreamTown_Galaxy_Mode_SSOT",
-      "path": "docs/design/DreamTown_Galaxy_Mode_SSOT.md",
+      "path": "docs/ssot/DreamTown_Galaxy_Mode_SSOT.md",
       "type": "document",
       "project": "aurora5",
       "priority": "P2",
-      "topic": "design",
+      "topic": "ssot",
       "tags": [
-        "design",
+        "ssot",
         "소원",
         "aurora",
         "가격"
@@ -921,24 +921,6 @@
       "checksum": "fa37ae74"
     },
     {
-      "id": "DOC-DreamTown_Character_Style_Guid",
-      "path": "docs/design/DreamTown_Character_Style_Guide_SSOT.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "code",
-      "status": "| SA-02",
-      "title": "DreamTown Character Style Guide SSOT",
-      "created_at": "2026-03-12",
-      "checksum": "31174b04"
-    },
-    {
       "id": "DOC-DreamTown_Closed_Alpha_Questio",
       "path": "docs/design/DreamTown_Closed_Alpha_Questions_Design.md",
       "type": "document",
@@ -989,24 +971,6 @@
       "title": "DreamTown Constellation 시스템",
       "created_at": "2026-03-12",
       "checksum": "7fddfdfd"
-    },
-    {
-      "id": "DOC-DreamTown_Core_Storyboard_SSOT",
-      "path": "docs/design/DreamTown_Core_Storyboard_SSOT.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "team",
-      "status": "active",
-      "title": "DreamTown Core Storyboard SSOT",
-      "created_at": "2026-03-12",
-      "checksum": "ab176f6e"
     },
     {
       "id": "DOC-DreamTown_Current_Sprint_v1",
@@ -1155,24 +1119,6 @@
       "checksum": "824db367"
     },
     {
-      "id": "DOC-DreamTown_First_User_Journey_S",
-      "path": "docs/design/DreamTown_First_User_Journey_SSOT.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "code",
-      "status": "active",
-      "title": "DreamTown First User Journey SSOT",
-      "created_at": "2026-03-12",
-      "checksum": "389d44d7"
-    },
-    {
       "id": "DOC-DreamTown_Founding_Stars_Canon",
       "path": "docs/design/DreamTown_Founding_Stars_Canon_Design.md",
       "type": "document",
@@ -1227,42 +1173,6 @@
       "checksum": "5160f4ea"
     },
     {
-      "id": "DOC-DreamTown_Growth_Film_SSOT",
-      "path": "docs/design/DreamTown_Growth_Film_SSOT.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "code",
-      "status": "active",
-      "title": "DreamTown Growth Film SSOT",
-      "created_at": "2026-03-12",
-      "checksum": "acac5ffd"
-    },
-    {
-      "id": "DOC-DreamTown_Image_Prompts_SSOT",
-      "path": "docs/design/DreamTown_Image_Prompts_SSOT.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "code",
-      "status": "추가 프롬프트",
-      "title": "DreamTown Image Prompts SSOT",
-      "created_at": "2026-03-12",
-      "checksum": "6287474e"
-    },
-    {
       "id": "DOC-DreamTown_Integrated_Architect",
       "path": "docs/design/DreamTown_Integrated_Architecture_Design.md",
       "type": "document",
@@ -1279,24 +1189,6 @@
       "title": "DreamTown × 디지털 용궁 통합 구조도",
       "created_at": "2026-03-12",
       "checksum": "4f1e68c5"
-    },
-    {
-      "id": "DOC-DreamTown_IP_Strategy_SSOT",
-      "path": "docs/design/DreamTown_IP_Strategy_SSOT.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "code",
-      "status": "active",
-      "title": "DreamTown IP Strategy SSOT",
-      "created_at": "2026-03-12",
-      "checksum": "29e8c50c"
     },
     {
       "id": "DOC-DreamTown_Launch_Asset_Checkli",
@@ -1516,25 +1408,6 @@
       "checksum": "de31bac2"
     },
     {
-      "id": "DOC-DreamTown_Product_Structure_SS",
-      "path": "docs/design/DreamTown_Product_Structure_SSOT.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora",
-        "가격"
-      ],
-      "owner": "ceo",
-      "status": "active",
-      "title": "DreamTown Product Structure SSOT",
-      "created_at": "2026-03-12",
-      "checksum": "42c15e21"
-    },
-    {
       "id": "DOC-DreamTown_Prototype_Kickoff",
       "path": "docs/design/DreamTown_Prototype_Kickoff.md",
       "type": "document",
@@ -1642,25 +1515,6 @@
       "checksum": "7d90cdbd"
     },
     {
-      "id": "DOC-DreamTown_Travel_System_SSOT",
-      "path": "docs/design/DreamTown_Travel_System_SSOT.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora",
-        "가격"
-      ],
-      "owner": "team",
-      "status": "|------",
-      "title": "DreamTown Travel System SSOT",
-      "created_at": "2026-03-12",
-      "checksum": "90d9f9e1"
-    },
-    {
       "id": "DOC-DreamTown_Video_Pipeline_Desig",
       "path": "docs/design/DreamTown_Video_Pipeline_Design.md",
       "type": "document",
@@ -1677,43 +1531,6 @@
       "title": "DreamTown 영상 제작 파이프라인",
       "created_at": "2026-03-12",
       "checksum": "67ca79a6"
-    },
-    {
-      "id": "DOC-DreamTown_Wish_Image_SSOT",
-      "path": "docs/design/DreamTown_Wish_Image_SSOT.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora",
-        "가격"
-      ],
-      "owner": "code",
-      "status": "archived",
-      "title": "DreamTown Wish Image SSOT",
-      "created_at": "2026-03-12",
-      "checksum": "5de6cf6d"
-    },
-    {
-      "id": "DOC-DreamTown_Yeosu_Galaxy_SSOT",
-      "path": "docs/design/DreamTown_Yeosu_Galaxy_SSOT.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "소원",
-        "aurora"
-      ],
-      "owner": "code",
-      "status": "---",
-      "title": "DreamTown Yeosu Galaxy SSOT",
-      "created_at": "2026-03-12",
-      "checksum": "fb61049e"
     },
     {
       "id": "DOC-DreamTown_Yeosu_Pilot_Design",
@@ -1733,23 +1550,6 @@
       "title": "DreamTown 여수 1차 파일럿 운영 설계",
       "created_at": "2026-03-12",
       "checksum": "0ca2f423"
-    },
-    {
-      "id": "DOC-DreamTown_Yeosu_Travel_Routes_",
-      "path": "docs/design/DreamTown_Yeosu_Travel_Routes_SSOT.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "design",
-      "tags": [
-        "design",
-        "aurora"
-      ],
-      "owner": "team",
-      "status": "active",
-      "title": "DreamTown Yeosu Travel Routes SSOT",
-      "created_at": "2026-03-12",
-      "checksum": "f93cff2c"
     },
     {
       "id": "DOC-UPDATE_SOP",
@@ -2726,6 +2526,24 @@
       "checksum": "080dc640"
     },
     {
+      "id": "DOC-DreamTown_Character_Style_Guid",
+      "path": "docs/ssot/DreamTown_Character_Style_Guide_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "code",
+      "status": "| SA-02",
+      "title": "DreamTown Character Style Guide SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "31174b04"
+    },
+    {
       "id": "DOC-DreamTown_Complete_SSOT",
       "path": "docs/ssot/DreamTown_Complete_SSOT.md",
       "type": "document",
@@ -2762,6 +2580,24 @@
       "checksum": "0700063b"
     },
     {
+      "id": "DOC-DreamTown_Core_Storyboard_SSOT",
+      "path": "docs/ssot/DreamTown_Core_Storyboard_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "DreamTown Core Storyboard SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "ab176f6e"
+    },
+    {
       "id": "DOC-DreamTown_Cosmic_Map_SSOT",
       "path": "docs/ssot/DreamTown_Cosmic_Map_SSOT.md",
       "type": "document",
@@ -2778,6 +2614,24 @@
       "title": "DreamTown Cosmic Map SSOT",
       "created_at": "2026-03-12",
       "checksum": "ac0a96c6"
+    },
+    {
+      "id": "DOC-DreamTown_First_User_Journey_S",
+      "path": "docs/ssot/DreamTown_First_User_Journey_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "DreamTown First User Journey SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "389d44d7"
     },
     {
       "id": "DOC-DreamTown_Galaxy_Evolution_SSO",
@@ -2832,6 +2686,60 @@
       "title": "DreamTown Golden Turtle Constellation System SSOT",
       "created_at": "2026-03-12",
       "checksum": "7294b7ac"
+    },
+    {
+      "id": "DOC-DreamTown_Growth_Film_SSOT",
+      "path": "docs/ssot/DreamTown_Growth_Film_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "DreamTown Growth Film SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "acac5ffd"
+    },
+    {
+      "id": "DOC-DreamTown_Image_Prompts_SSOT",
+      "path": "docs/ssot/DreamTown_Image_Prompts_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "code",
+      "status": "추가 프롬프트",
+      "title": "DreamTown Image Prompts SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "6287474e"
+    },
+    {
+      "id": "DOC-DreamTown_IP_Strategy_SSOT",
+      "path": "docs/ssot/DreamTown_IP_Strategy_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "DreamTown IP Strategy SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "29e8c50c"
     },
     {
       "id": "DOC-DreamTown_Key_Moment_SSOT",
@@ -2942,6 +2850,25 @@
       "checksum": "a59170ab"
     },
     {
+      "id": "DOC-DreamTown_Product_Structure_SS",
+      "path": "docs/ssot/DreamTown_Product_Structure_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora",
+        "가격"
+      ],
+      "owner": "ceo",
+      "status": "active",
+      "title": "DreamTown Product Structure SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "42c15e21"
+    },
+    {
       "id": "DOC-DreamTown_Safety_Ethics_SSOT",
       "path": "docs/ssot/DreamTown_Safety_Ethics_SSOT.md",
       "type": "document",
@@ -2993,6 +2920,25 @@
       "title": "DreamTown Star Navigation System SSOT",
       "created_at": "2026-03-12",
       "checksum": "c2c2e2d3"
+    },
+    {
+      "id": "DOC-DreamTown_Travel_System_SSOT",
+      "path": "docs/ssot/DreamTown_Travel_System_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora",
+        "가격"
+      ],
+      "owner": "team",
+      "status": "|------",
+      "title": "DreamTown Travel System SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "90d9f9e1"
     },
     {
       "id": "DOC-DreamTown_Universe_Bible",
@@ -3067,6 +3013,25 @@
       "checksum": "adb97e24"
     },
     {
+      "id": "DOC-DreamTown_Wish_Image_SSOT",
+      "path": "docs/ssot/DreamTown_Wish_Image_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora",
+        "가격"
+      ],
+      "owner": "code",
+      "status": "archived",
+      "title": "DreamTown Wish Image SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "5de6cf6d"
+    },
+    {
       "id": "DOC-DreamTown_World_Architecture_S",
       "path": "docs/ssot/DreamTown_World_Architecture_SSOT.md",
       "type": "document",
@@ -3101,6 +3066,41 @@
       "title": "DreamTown World Map SSOT",
       "created_at": "2026-03-12",
       "checksum": "5705211d"
+    },
+    {
+      "id": "DOC-DreamTown_Yeosu_Galaxy_SSOT",
+      "path": "docs/ssot/DreamTown_Yeosu_Galaxy_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "code",
+      "status": "---",
+      "title": "DreamTown Yeosu Galaxy SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "fb61049e"
+    },
+    {
+      "id": "DOC-DreamTown_Yeosu_Travel_Routes_",
+      "path": "docs/ssot/DreamTown_Yeosu_Travel_Routes_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "DreamTown Yeosu Travel Routes SSOT",
+      "created_at": "2026-03-12",
+      "checksum": "f93cff2c"
     },
     {
       "id": "DOC-quantum-planning-method",
