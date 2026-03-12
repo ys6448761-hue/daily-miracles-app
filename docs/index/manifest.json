@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-12T06:30:42.289Z",
+  "generated_at": "2026-03-12T07:29:13.019Z",
   "generator": "generate-manifest.js",
-  "total_count": 280,
+  "total_count": 281,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1945,6 +1945,24 @@
       "title": "DreamTown Constellation 시스템",
       "created_at": "2026-03-12",
       "checksum": "7fddfdfd"
+    },
+    {
+      "id": "DOC-DreamTown_Copyright_Registrati",
+      "path": "docs/ssot/DreamTown_Copyright_Registration_Doc.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "code",
+      "status": "archived",
+      "title": "DreamTown 저작권 등록용 저작물 명세서",
+      "created_at": "2026-03-12",
+      "checksum": "0616662a"
     },
     {
       "id": "DOC-DreamTown_Core_Philosophy_SSOT",
