@@ -93,14 +93,14 @@ export default function MyStar() {
         </div>
       </motion.div>
 
-      {/* 감성 문구 */}
+      {/* Aurum 메시지 */}
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="text-center text-white/40 text-sm mb-8"
+        className="text-center text-white/40 text-xs mb-8"
       >
-        당신의 소원은 혼자가 아닙니다.
+        🐢 "별은 천천히 자랍니다."
       </motion.p>
 
       {/* CTA */}

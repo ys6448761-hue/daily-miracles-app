@@ -107,6 +107,20 @@ export default function StarBirth() {
         ))}
       </div>
 
+      {/* Aurum 메시지 */}
+      <AnimatePresence>
+        {done && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.15 }}
+            className="text-white/40 text-xs mb-6 text-center"
+          >
+            🐢 "작은 소원이 별이 되었습니다."
+          </motion.p>
+        )}
+      </AnimatePresence>
+
       {/* View My Star 버튼 */}
       <AnimatePresence>
         {done && (

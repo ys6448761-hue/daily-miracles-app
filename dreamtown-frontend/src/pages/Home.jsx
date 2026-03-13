@@ -49,18 +49,17 @@ export default function Home() {
         </div>
       </motion.div>
 
-      {/* 오늘의 메시지 */}
+      {/* Aurum 메시지 */}
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.35 }}
         className="bg-dream-purple/10 border border-dream-purple/20 rounded-3xl p-5 mb-4"
       >
-        <p className="text-white/40 text-xs mb-2">오늘의 메시지</p>
+        <p className="text-white/40 text-xs mb-2">🐢 Aurum</p>
         <p className="text-white text-sm leading-relaxed">
-          "작은 소원도 별이 됩니다. 오늘도 한 걸음 앞으로."
+          "당신의 별이 빛나길."
         </p>
-        <p className="text-dream-purple text-xs mt-2">— Aurora5</p>
       </motion.div>
 
       {/* Galaxy 진입 유도 */}
