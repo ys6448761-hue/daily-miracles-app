@@ -28,6 +28,10 @@
     "DOC-DEC-20260201-포인트추천예고편-정책구현",
     "DOC-index",
     "DOC-playground-events",
+    "DOC-DreamTown_GPT_Knowledge_Pack",
+    "DOC-DreamTown_SSOT_Core",
+    "DOC-DreamTown_SSOT_Registry_Summar",
+    "DOC-DreamTown_System_Map",
     "DOC-GROWTH-ROADMAP",
     "DOC-JUDGE_PROMPTS",
     "DOC-README",
@@ -226,6 +230,10 @@
     "DOC-SOURCES_INDEX",
     "DOC-AURORA5_CHARACTER_PROMPTS",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
+    "DOC-DreamTown_GPT_Knowledge_Pack",
+    "DOC-DreamTown_SSOT_Core",
+    "DOC-DreamTown_SSOT_Registry_Summar",
+    "DOC-DreamTown_System_Map",
     "DOC-GROWTH-ROADMAP",
     "DOC-JUDGE_PROMPTS",
     "DOC-LAUNCH-DECLARATION",
@@ -744,6 +752,12 @@
   ],
   "events": [
     "DOC-playground-events"
+  ],
+  "gpt": [
+    "DOC-DreamTown_GPT_Knowledge_Pack",
+    "DOC-DreamTown_SSOT_Core",
+    "DOC-DreamTown_SSOT_Registry_Summar",
+    "DOC-DreamTown_System_Map"
   ],
   "hotfix": [
     "DOC-CHECKLIST",

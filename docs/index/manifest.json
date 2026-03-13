@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-03-13T05:41:52.589Z",
+  "generated_at": "2026-03-13T06:25:55.569Z",
   "generator": "generate-manifest.js",
-  "total_count": 283,
+  "total_count": 287,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -872,6 +872,78 @@
       "title": "소원놀이터 이벤트 스키마",
       "created_at": "2026-03-13",
       "checksum": "eee7162b"
+    },
+    {
+      "id": "DOC-DreamTown_GPT_Knowledge_Pack",
+      "path": "docs/gpt/DreamTown_GPT_Knowledge_Pack.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "gpt",
+      "tags": [
+        "gpt",
+        "소원",
+        "aurora"
+      ],
+      "owner": "code",
+      "status": "시스템",
+      "title": "DreamTown GPT Knowledge Pack",
+      "created_at": "2026-03-13",
+      "checksum": "9210e7ce"
+    },
+    {
+      "id": "DOC-DreamTown_SSOT_Core",
+      "path": "docs/gpt/DreamTown_SSOT_Core.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "gpt",
+      "tags": [
+        "gpt",
+        "소원",
+        "aurora"
+      ],
+      "owner": "code",
+      "status": "archived",
+      "title": "DreamTown SSOT Core",
+      "created_at": "2026-03-13",
+      "checksum": "cfeafbaf"
+    },
+    {
+      "id": "DOC-DreamTown_SSOT_Registry_Summar",
+      "path": "docs/gpt/DreamTown_SSOT_Registry_Summary.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "gpt",
+      "tags": [
+        "gpt",
+        "소원",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "DreamTown SSOT Registry Summary",
+      "created_at": "2026-03-13",
+      "checksum": "ffe3cee6"
+    },
+    {
+      "id": "DOC-DreamTown_System_Map",
+      "path": "docs/gpt/DreamTown_System_Map.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "gpt",
+      "tags": [
+        "gpt",
+        "소원",
+        "aurora"
+      ],
+      "owner": "code",
+      "status": "|-------",
+      "title": "DreamTown System Map",
+      "created_at": "2026-03-13",
+      "checksum": "7294998d"
     },
     {
       "id": "DOC-GROWTH-ROADMAP",
