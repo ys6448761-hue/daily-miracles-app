@@ -2181,7 +2181,15 @@ console.log('✅ DreamTown 라우터 등록 완료 (/api/dt)');
 // ---------- DreamTown Frontend (Prototype) ----------
 const dtFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist');
 app.use('/dreamtown', express.static(dtFrontendPath));
-app.get(['/dreamtown', '/dreamtown/*'], (req, res) => {
+
+// DreamTown SPA 라우트 — /dreamtown/* 및 React Router 직접 경로
+const DT_SPA_ROUTES = [
+  '/dreamtown', '/dreamtown/*',
+  '/galaxy', '/day', '/star', '/star-growth',
+  '/postcard', '/history', '/intro',
+  '/star-birth', '/my-star', '/my-star/*', '/home',
+];
+app.get(DT_SPA_ROUTES, (req, res) => {
   res.sendFile(path.join(dtFrontendPath, 'index.html'), (err) => {
     if (err) {
       console.error('[DT] SPA sendFile 실패 — dist 미존재 가능:', err.message);
@@ -2189,7 +2197,7 @@ app.get(['/dreamtown', '/dreamtown/*'], (req, res) => {
     }
   });
 });
-console.log('✅ DreamTown 프론트 등록 완료 (/dreamtown)');
+console.log('✅ DreamTown 프론트 등록 완료 (/dreamtown + /galaxy 등)');
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------
 // P0 요구사항: Trial 또는 Paid 권한이 있어야만 접근 가능
@@ -2279,6 +2287,38 @@ async function coreAnalyzeHandler(req, res) {
     // ✅ 실제 분석 엔진 호출
     const userProfile = analysisEngine.analyzeUserProfile(data);
     console.log("✅ User profile analyzed - miracleIndex:", userProfile.miracleIndex);
+
+    // 기적지수 → 현재 단계 매핑 (4단계)
+    const _idx = userProfile.miracleIndex || 75;
+    userProfile.current_stage = _idx < 65
+      ? { code: 1, label: '감정 정리', desc: '마음이 먼저 지쳐 있어 감정 정리가 먼저 필요한 상태예요.' }
+      : _idx < 75
+        ? { code: 2, label: '방향 정리', desc: '중요한 것은 느끼고 있지만 무엇부터 해야 할지 정해지지 않아 에너지가 흩어지기 쉬워요.' }
+        : _idx < 85
+          ? { code: 3, label: '실행 시작', desc: '방향은 잡혔고, 이제는 아주 작은 행동으로 흐름을 시작할 차례예요.' }
+          : { code: 4, label: '유지 회복', desc: '이미 시작은 했지만 흔들림이 생기기 쉬워 회복 리듬이 필요한 시점이에요.' };
+    userProfile.traffic_light_level = _idx < 55 ? 'YELLOW' : 'GREEN';
+
+    // summary_line + today_action 룰 엔진
+    const _SUMMARY_RULES = {
+      GREEN: {
+        1: { summary_line: '지금은 마음을 차분히 정리하며 다음 걸음을 준비하기 좋은 상태예요', today_action: '걱정을 한 문장으로 적고, 그 감정을 그냥 바라봐보세요' },
+        2: { summary_line: '지금은 방향을 하나로 좁혀 첫 움직임을 준비하기 좋은 흐름이에요', today_action: '오늘 가장 중요한 문제 하나를 고르고, 나머지는 내일로 미뤄보세요' },
+        3: { summary_line: '지금은 아주 작은 실행을 시작하기 좋은 상태예요', today_action: '오늘 할 행동을 딱 하나만 골라 10분 안에 끝낼 수 있게 줄여보세요' },
+        4: { summary_line: '지금은 기존 습관을 꾸준히 이어가는 것이 가장 중요한 상태예요', today_action: '기존 습관 중 하나를 오늘 한 번 그대로 해보세요' }
+      },
+      YELLOW: {
+        1: { summary_line: '지금은 해결보다 마음의 무게를 먼저 알아보는 것이 중요한 상태예요', today_action: '걱정을 한 줄 적고, 오늘은 그것을 해결하려 하지 않아도 괜찮아요' },
+        2: { summary_line: '마음은 앞서 있지만, 무엇부터 할지 기준을 정하는 것이 먼저예요', today_action: '오늘 바꿀 것 한 가지만 정하고, 나머지는 결정하지 않아도 돼요' },
+        3: { summary_line: '실행할 힘은 있지만, 시작점을 더 작게 만드는 것이 필요한 상태예요', today_action: '하려던 행동을 절반으로 줄이고, 실패해도 괜찮은 버전으로 시작해보세요' },
+        4: { summary_line: '지금은 더 앞으로 나가기보다, 흔들린 리듬을 다시 고르게 만드는 것이 먼저예요', today_action: '가장 쉬웠던 루틴 하나를 오늘 한 번만 다시 해보세요' }
+      }
+    };
+    const _lvl = userProfile.traffic_light_level;
+    const _code = userProfile.current_stage.code;
+    const _rule = (_SUMMARY_RULES[_lvl] || _SUMMARY_RULES.GREEN)[_code] || _SUMMARY_RULES.GREEN[1];
+    userProfile.summary_line = _rule.summary_line;
+    userProfile.today_action = _rule.today_action;
 
     const counterpartyProfile = analysisEngine.generateCounterpartyProfile(req.body);
     console.log("✅ Counterparty profile:", counterpartyProfile ? "generated" : "skipped (no counterparty)");

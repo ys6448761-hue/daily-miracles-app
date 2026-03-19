@@ -19,6 +19,30 @@ body {
   animation: twinkle 2s ease-in-out infinite;
 }
 
+/* 별 호흡 — Galaxy 선택 화면 (DEC-2026-0319-001) */
+@keyframes breath {
+  0%, 100% { transform: scale(0.98); opacity: 0.95; }
+  50%       { transform: scale(1.02); opacity: 1; }
+}
+
+/* 별 선택 전환 여운 — SelectionTransition (DEC-2026-0319-001) */
+@keyframes selection-glow {
+  0%   { opacity: 0;    transform: scale(0.92); }
+  35%  { opacity: 1;    transform: scale(1); }
+  100% { opacity: 0.92; transform: scale(1.08); }
+}
+
+@keyframes selection-bloom {
+  0%   { opacity: 0;    transform: scale(0.96); }
+  40%  { opacity: 0.88; transform: scale(1); }
+  100% { opacity: 0.72; transform: scale(1.06); }
+}
+
+@keyframes selection-veil {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
 /* 부드러운 글로우 */
 .glow-gold {
   text-shadow: 0 0 20px rgba(255, 215, 106, 0.6);

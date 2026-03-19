@@ -28,6 +28,15 @@ export default function StarBirth() {
     return () => clearTimeout(t);
   }, [stage]);
 
+  // 애니메이션 완료 후 My Star로 자동 이동
+  useEffect(() => {
+    if (!done) return;
+    const t = setTimeout(() => {
+      nav(starId ? `/my-star/${starId}` : '/home');
+    }, 3000);
+    return () => clearTimeout(t);
+  }, [done, starId, nav]);
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden">
       {/* 배경 파티클 */}
@@ -124,16 +133,21 @@ export default function StarBirth() {
       {/* View My Star 버튼 */}
       <AnimatePresence>
         {done && (
-          <motion.button
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => nav(starId ? `/my-star/${starId}` : '/home')}
-            className="w-full max-w-xs bg-star-gold text-night-sky font-bold py-4 rounded-2xl text-lg"
+            className="flex flex-col items-center gap-3"
           >
-            View My Star ⭐
-          </motion.button>
+            <button
+              whileTap={{ scale: 0.97 }}
+              onClick={() => nav(starId ? `/my-star/${starId}` : '/home')}
+              className="w-full max-w-xs bg-star-gold text-night-sky font-bold py-4 rounded-2xl text-lg"
+            >
+              View My Star ⭐
+            </button>
+            <p className="text-white/30 text-xs">잠시 후 자동으로 이동합니다</p>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

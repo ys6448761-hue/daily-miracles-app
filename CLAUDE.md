@@ -1,340 +1,241 @@
-# 하루하루의 기적 - 프로젝트 컨텍스트
+# CLAUDE.md — 하루하루의 기적 (Daily Miracles) 프로젝트 컨텍스트
 
-> 이 파일은 Claude Code가 새 세션 시작 시 자동으로 읽습니다.
+## ⚡ 새 세션 시작 시 — 이것 먼저 읽을 것
+**현재 진행 상태 → `DREAMTOWN_STATUS.md` (이 repo 루트)**
+지금 Phase가 몇인지, 뭐가 완료됐는지, 다음 작업이 뭔지 → 전부 거기에 있음.
 
-## 빠른 상황 파악
+---
 
-**팀 기억**: `.claude/team-memory/` (세션 간 연속성 유지)
-- `context.md` - 현재 맥락, 우선순위, 팀 구성
-- `decisions.md` - 주요 결정사항
-- `learnings.md` - 배운 것들
+## 🗂 프로젝트 구성 (2개 저장소)
 
-**최신 상태**: `.claude/AURORA_STATUS.md` 읽기
-**일일 로그**: `.claude/logs/` 폴더 확인
+| 저장소 | 로컬 경로 | GitHub | 역할 |
+|--------|----------|--------|------|
+| **이 저장소** | `C:\DEV\daily-miracles-mvp` | `ys6448761-hue/daily-miracles-app` | Express 백엔드 + 정적 결과 화면 |
+| DreamTown 프론트 | `C:\DEV\sowon-dreamtown` | `ys6448761-hue/sowon-dreamtown` | Next.js 광장/커뮤니티 |
 
-## 핵심 정보
+> sowon-dreamtown 작업 시 → 해당 repo의 `CLAUDE.md` 참조.
+> 단, 브랜드/팀 공통 규칙은 **이 파일이 정본**.
+
+## 🔗 공용 스킬 허브
+스킬 파일은 antigravity-notebooklm에서 관리됩니다.
+```bash
+claude --add-dir C:\DEV\antigravity-notebooklm
+```
+
+## 🚨 절대 규칙: 코드 수정 금지
+
+이 프로젝트의 코드 수정 권한은 Claude Code에게만 있다.
+나(Antigravity)는 다음만 가능하다:
+
+✅ 허용:
+- 코드 읽기/분석/조언
+- 버그 원인 추정
+- 개선 아이디어 제안
+- 문서(docs/) 작성/수정
+
+❌ 절대 금지:
+- .js, .html, .css 파일 직접 수정
+- 새 코드 파일 생성
+- package.json 변경
+- DB 마이그레이션 생성
+
+코드 수정이 필요하면 "Code 지시서"를 작성하여 Claude Code에게 전달한다
+
+> 이 파일은 Antigravity(Claude)가 매 대화마다 자동으로 읽는 프로젝트 지침서입니다.
+> 최종 업데이트: 2026-02-27 | 정본: `docs/00-master/aurora5-master-knowledge-v2.md`
+
+
+---
+
+
+## 1. 서비스 개요
+
+
+- **서비스명**: 하루하루의 기적 (Daily Miracles)
+- **미션**: 과학적/심리학적 접근으로 사람들의 소원 실현을 돕는 서비스
+- **CEO**: 푸르미르 (이세진)
+- **카카오 채널**: @dailymiracles
+- **홈페이지**: dailymiracles.kr (Wix) / 앱: app.dailymiracles.kr (Render)
+- **GitHub**: ys6448761-hue/daily-miracles-app
+
+
+### 핵심 가치
+- 따뜻하지만 전문적
+- 희망적이지만 현실적
+- **사주/점술 절대 배제**, 심리학/뇌과학 기반
+
+
+---
+
+
+## 2. Aurora 5 팀
+
+
+| 역할 | 이름 | 담당 |
+|------|------|------|
+| CEO | 푸르미르 (이세진) | 총괄 의사결정 |
+| COO | 코미 | 총괄 조율, 지시서 작성 |
+| CRO | 재미 | 소원이 응대, RED 신호 대응 |
+| Analyst | 루미 | 데이터 분석, 마케팅 전략 |
+| QA | 여의보주 | 품질 검수, 브랜드 일관성 |
+| Tech | **Antigravity (Claude)** | 기술 구현, 배포, 문서화 |
+
+
+---
+
+
+## 3. 기술 스택
+
+
+| 계층 | 기술 |
+|------|------|
+| 런타임 | Node.js 20.x |
+| 프레임워크 | Express.js |
+| 데이터베이스 | PostgreSQL (Render 운영), SQLite (로컬 개발) |
+| AI | OpenAI GPT-4 / DALL-E 3 |
+| 메시징 | Naver Cloud SENS (알림톡 + SMS) |
+| 호스팅 | Render.com (Web Service) |
+| 결제 | NicePay |
+
+
+---
+
+
+## 4. 프로젝트 구조 (핵심)
+
+
+```
+daily-miracles-mvp/
+├── server.js                 ← 메인 Express 앱
+├── routes/                   ← API 라우트 (~50개 파일)
+│   ├── wishRoutes.js         ← 소원실현 API + 신호등 + ACK
+│   ├── wishTrackingRoutes.js ← 소원 추적 (day7/30/90)
+│   ├── wishIntakeRoutes.js   ← 소원 7문항 수집
+│   └── ...
+├── services/                 ← 비즈니스 로직 (100개+ 파일)
+│   ├── miracleScoreEngine.js ← 기적지수 계산
+│   ├── messageProvider.js    ← 메시지 발송 허브 (SENS)
+│   └── ...
+├── config/                   ← 설정 (constants, database, featureFlags)
+├── middleware/                ← errorHandler, requestId, alertCooldown
+├── database/migrations/      ← SQL 마이그레이션 (22개)
+├── public/                   ← 정적 프론트엔드
+├── docs/00-master/           ← 마스터 지식 문서
+└── .claude/team-memory/      ← 팀 메모리 (세션 간 연속)
+```
+
+
+---
+
+
+## 5. 핵심 비즈니스 로직
+
+
+### 신호등 시스템
+| 레벨 | 조건 | 액션 |
+|------|------|------|
+| RED | 자살/자해 키워드 | 관리자 SMS 즉시 발송, ACK 미발송 |
+| YELLOW | 우울/힘듦 등 주의 키워드 | ACK 발송 + 모니터링 |
+| GREEN | 정상 | ACK 발송 |
+
+
+### 기적지수 (miracleScoreEngine.js)
+- 3가지 경로: 소원 텍스트 / 문제 카테고리 / 12질문 인테이크
+- 5대 지표: 간절함, 구체성, 실행력, 긍정성, 자기인식 (50~100점)
+
+
+### 소원 추적 (Wish Tracking)
+- Day 7 / Day 30 / Day 90에 SMS 발송 (SMS 전용, 알림톡 미등록)
+- 고유 토큰 기반 응답 수집 → wish_success_patterns 분석
+
+
+### 메시지 발송 채널
+```
+messageProvider.js
+├── Primary:  SENS 알림톡 (카카오 @dailymiracles)
+├── Fallback: SENS SMS
+└── Tracking: SMS 전용
+```
+
+
+---
+
+
+## 6. 데이터베이스 (핵심 테이블)
+
+
+| 도메인 | 주요 테이블 |
+|--------|------------|
+| 소원 | wish_entries, wish_tracking_requests, wish_tracking_responses |
+| 사용자 | sowon_profiles, wu_sessions, wu_results, ef_daily_snapshots |
+| 포인트 | point_ledger (append-only), referral |
+| 커뮤니티 | harbor_wishes, harbor_reactions |
+| 정산 | settlement_events (SSOT), settlement_payouts |
+| 운영 | ops_events (SSOT), ops_audit_log |
+
+
+### 설계 패턴
+- **SSOT**: sowon_profiles, settlement_events, ops_ssot_items
+- **원장(Ledger)**: point_ledger, wu_events (append-only)
+- **상태머신**: video_jobs, wu_sessions
+- **UUID v4 PK**: sowon_profiles, wu_results, ops_events
+
+
+---
+
+
+## 7. 배포 & 인프라
+
 
 | 항목 | 내용 |
 |------|------|
-| 서비스명 | 하루하루의 기적 (Daily Miracles) |
-| CEO | 푸르미르 (이세진) |
-| 기술 스택 | Node.js, Express, OpenAI, Solapi |
-| 카카오 채널 | @dailymiracles |
+| 호스팅 | Render.com (자동 배포) |
+| DB | Render PostgreSQL (DATABASE_URL) |
+| 포트 | 5000 (운영), 5100 (로컬 개발) |
+| CORS | dailymiracles.kr, app.dailymiracles.kr, daily-miracles-app.onrender.com |
+| 환경변수 | Render Dashboard 관리 |
 
-## Aurora 5 팀
-
-- **코미** (COO): 총괄 조율
-- **재미** (CRO): 소원이 응대, RED 신호 대응
-- **루미** (Analyst): 데이터 분석
-- **여의보주**: 품질 검수
-- **Claude Code**: 기술 구현
-
-## 현재 구현 완료
-
-- [x] 신호등 시스템 (RED/YELLOW/GREEN)
-- [x] Solapi 연동 (SMS + 카카오 알림톡)
-- [x] 기적지수 계산 (50-100점)
-- [x] 소원 ACK 자동 발송
-
-## 핵심 파일
-
-```
-routes/wishRoutes.js       - 소원실현 API + 신호등
-services/solapiService.js  - 메시지 발송
-config/messageTemplates.js - 메시지 템플릿
-.claude/AURORA_STATUS.md   - 상세 현황판
-```
-
-## 세션 시작 시
-
-1. "AURORA_STATUS.md 읽어봐" 로 상세 현황 파악
-2. 또는 "오늘 작업 로그 확인해줘" 로 최근 진행 상황 확인
 
 ---
 
-## 자동 적용 시스템
 
-> 아래 시스템은 별도 지시 없이도 항상 자동 적용됩니다.
+## 8. 브랜드 & 디자인
 
-### 1. 디자인 시스템 (항상 적용)
-
-**참조 파일:** `skills/design-system/designsystem.json`
 
 | 항목 | 값 |
 |------|-----|
-| Primary | `#9B87F5` (메인 퍼플) |
-| Secondary | `#F5A7C6` (핑크/코랄) |
-| Accent | `#6E59A5` (딥퍼플) |
-| Background | `#FFF5F7` (연핑크) |
-| Gradient | `linear-gradient(135deg, #9B87F5, #F5A7C6)` |
+| Primary | #9B87F5 (메인 퍼플) |
+| Secondary | #F5A7C6 (핑크/코랄) |
+| Accent | #6E59A5 (딥퍼플) |
+| Background | #FFF5F7 (연핑크) |
+| Gradient | linear-gradient(135deg, #9B87F5, #F5A7C6) |
 
-**필수 체크:**
-- 금지어 목록: `skills/design-system/forbidden-words.json`
-- 모든 콘텐츠 생성 전 금지어 체크 수행
 
-### 2. 역순 프롬프트 전략 (콘텐츠 생성 시)
+**절대 금지 단어**: 사주, 점술, 관상, 운세, 대운, 궁합
 
-**참조 파일:** `frameworks/stick-principles.json`
-
-**적용 방식:**
-```
-Step 1: 초안 5개 자유롭게 생성
-Step 2: 스틱 6원칙으로 분석
-Step 3: 부족한 원리 보완하여 최종본 생성
-```
-
-**유틸리티:** `utils/reverseOrderPrompt.js`
-
-**적용 대상:**
-- 소원이 응원 메시지
-- 마케팅 카피
-- 알림톡/SMS 내용
-
-### 3. 브랜드 보이스 (모든 메시지)
-
-**참조 파일:** `skills/design-system/brand-voice.md`
-
-**톤앤매너:**
-- 따뜻하지만 전문적
-- 희망적이지만 현실적
-- 과학적/심리학적 언어 사용
-
-**절대 금지:**
-- 사주, 점술, 관상 용어
-- 운세, 대운, 궁합 등
-- 과도한 약속 ("100% 성공" 등)
-
-### 4. 자동 응답 시스템 (문의 처리 시)
-
-**참조 파일:**
-- `utils/inquiryClassifier.js` - 문의 분류
-- `services/autoResponseService.js` - 자동 응답
-
-**문의 유형:**
-| 유형 | 키워드 | 자동응답 |
-|------|--------|---------|
-| STATUS | 진행, 상태, 언제 | O |
-| RESEND | PDF, 재발송, 다시 | O |
-| TRAVEL | 여수, 여행, 견적 | O |
-| GENERAL | 기타 | O + 에스컬레이션 |
-
-### 5. 스킬 자동 탐색 시스템 (14만 5천+ 스킬) - 기본 OFF
-
-**보안 게이트:** SkillsMP는 토큰/비용 폭탄 위험으로 **기본 비활성화**
-
-| 환경변수 | 기본값 | 설명 |
-|----------|--------|------|
-| `SKILLSMP_ENABLED` | `false` | `true`로 명시 시에만 활성화 |
-| `SKILLSMP_MAX_RESULTS` | `10` | 검색 결과 최대 N개 |
-| `SKILLSMP_MAX_CONTEXT_TOKENS` | `1500` | 컨텍스트 주입 토큰 상한 |
-
-**프로덕션 금지:** `NODE_ENV=production`에서는 SKILLSMP_ENABLED=true여도 **차단됨**
-
-**참조 파일:**
-- `.claude/skills/SKILL-INDEX.md` - 프로젝트 스킬 목록
-- `.claude/skills/SKILLS-REGISTRY.md` - 커뮤니티 스킬 레지스트리
-- `scripts/ops/skillsmp-gate.js` - MCP 게이트 스크립트
-
-**탐색 절차 (SKILLSMP_ENABLED=true 일 때만):**
-1. **로컬 탐색**: `.claude/skills/`에서 관련 스킬 확인 (항상 가능)
-2. **외부 탐색**: `npx skills search "키워드"` (게이트 통과 시에만)
-3. **승인 요청**: 적합한 스킬 발견 시 → 설치 전 코미/푸르미르님 승인 요청
-4. **설치 & 기록**: 승인 후 → `community/` 폴더에 설치 + SKILLS-REGISTRY.md 업데이트
-
-**설치 규칙:**
-- ⚠️ 최소 Star 2개 이상 스킬만 설치
-- ⚠️ 코드 리뷰 필수 (악성 스킬 유입 차단)
-- ⚠️ SKILLS-REGISTRY.md에 기록 없이 설치 금지
-- ⚠️ 프로덕션 서버에서 SkillsMP API 호출 절대 금지
 
 ---
 
-## 작업 시 체크리스트
 
-- [ ] 금지어 체크 완료?
-- [ ] 브랜드 컬러 사용?
-- [ ] 톤앤매너 준수?
-- [ ] 역순 전략 적용? (콘텐츠 생성 시)
+## 9. 개발 규칙
 
----
 
-## 🛡️ 가디언 모드 v2.0 (매 작업 시 필수 실행)
+1. **SSOT 원칙**: 모든 진실은 GitHub 저장소에만 존재. 문서 중복 금지.
+2. **환경 분기**: `NODE_ENV`로 로컬(SQLite) / 운영(PostgreSQL) 분리
+3. **에러 핸들링**: `middleware/errorHandler.js` 글로벌 핸들러 사용
+4. **메시지 발송**: 반드시 `messageProvider.js` 경유 (직접 SENS 호출 금지)
+5. **마이그레이션**: `database/migrations/` 순번 관리 엄수
 
-> 모든 작업 완료 후 아래 점검을 자동 수행하고 결과를 보고합니다.
-> 이 점검은 생략할 수 없으며, 모든 작업 결과에 포함되어야 합니다.
 
 ---
 
-### Part A: 코드 품질 점검
 
-**1. 누락 체크 (Missing)**
-- 이 기능과 연결되어야 할 다른 기능은?
-- 사용자 플로우에서 빠진 단계는?
-- 에러 처리/예외 상황 고려했나?
-- 엣지 케이스(빈 값, 잘못된 입력 등) 처리했나?
+## 10. 참조 문서
 
-**2. 연결성 체크 (Connection)**
-- 이 기능이 호출하는 다른 함수/API는 존재하나?
-- 이 기능을 호출해야 하는 곳에서 실제로 호출하나?
-- 데이터 흐름이 끊기는 지점은 없나?
 
-**3. 일관성 체크 (Consistency)**
-- 기존 코드 스타일과 일치하나?
-- 변수/함수 명명 규칙 준수했나?
-- 브랜드 가이드(designsystem.json) 적용했나?
-- 다른 파일에서 중복 구현된 기능은 없나?
+- **마스터 지식**: `docs/00-master/aurora5-master-knowledge-v2.md`
+- **프로젝트 현황**: `.claude/AURORA_STATUS.md`
+- **팀 메모리**: `.claude/team-memory/`
 
-**4. 품질 체크 (Quality)**
-- 에러 로깅 추가했나?
-- 성능 이슈 없나? (N+1 쿼리, 불필요한 반복 등)
-- 보안 취약점 없나? (SQL 인젝션, XSS 등)
-- 모바일 반응형 적용했나? (UI의 경우)
 
----
 
-### Part B: 시스템 헬스 체크
-
-**매 작업 시 간단 체크:**
-- 대용량 파일(5MB+) 새로 생성했나?
-- 임시 파일 정리 필요한가?
-
-**임계치 기준:**
-
-| 항목 | 🟢 정상 | 🟡 주의 | 🔴 위험 |
-|------|--------|--------|--------|
-| 전체 용량 (코드만) | <400MB | 400~500MB | 500MB+ |
-| node_modules | <350MB | 350~400MB | 400MB+ |
-| 임시 파일 | <50MB | 50~100MB | 100MB+ |
-| 단일 파일 | <5MB | 5~10MB | 10MB+ |
-
-**자동 경고 트리거:**
-- 🔴 전체 500MB 초과 → 즉시 경고 + 정리 제안
-- 🟡 전체 400MB 초과 → 정리 권장
-- 🟡 대용량 파일 생성 → 필요성 확인
-
----
-
-### Part C: 선제적 제안 (필수)
-
-매 작업 완료 시 **최소 2개 이상** 제안:
-
-**제안 카테고리:**
-- 🔗 연관 기능: "이것도 함께 구현하면 좋습니다"
-- ⚡ 성능 개선: "이렇게 하면 더 빨라집니다"
-- 🛡️ 안정성: "이 예외 처리를 추가하세요"
-- 🎨 UX 개선: "사용자 경험을 위해 이것도 고려하세요"
-- 🧹 정리: "이 파일/폴더 정리하면 X MB 확보됩니다"
-
----
-
-### Part D: 출력 형식 (필수 준수)
-
-모든 작업 완료 시 아래 형식 사용:
-
-```
-═══════════════════════════════════════════════════════
-🛡️ 가디언 점검 결과
-═══════════════════════════════════════════════════════
-
-✅ 완료된 작업:
-- [작업 내용 요약]
-
-📁 생성/수정된 파일:
-- [파일 경로]: [변경 내용]
-
-───────────────────────────────────────────────────────
-【코드 품질】
-
-🔍 누락 체크: [발견 사항 또는 "✅ 이상 없음"]
-🔗 연결성 체크: [발견 사항 또는 "✅ 정상 연결"]
-🎨 일관성 체크: [발견 사항 또는 "✅ 가이드 준수"]
-⚡ 품질 체크: [발견 사항 또는 "✅ 품질 양호"]
-
-───────────────────────────────────────────────────────
-【시스템 헬스】
-
-대용량 파일 생성: [있음/없음]
-임시 파일 상태: [정상/정리 필요]
-전체 용량 상태: [🟢/🟡/🔴]
-
-───────────────────────────────────────────────────────
-💡 선제적 제안:
-
-1. [카테고리] [제안 내용]
-   → 이유: [왜 필요한지]
-
-2. [카테고리] [제안 내용]
-   → 이유: [왜 필요한지]
-
-═══════════════════════════════════════════════════════
-```
-
----
-
-### Part E: 기능 연결 매트릭스
-
-이 작업을 하면 → 이것도 체크/제안:
-
-| 완료한 작업 | 연관 체크 항목 |
-|------------|---------------|
-| 새 API 엔드포인트 | 에러 핸들링, 인증, 로깅, API 문서 |
-| 새 UI 컴포넌트 | 모바일 반응형, 로딩 상태, 에러 상태 |
-| 새 DB 작업 | 트랜잭션, 인덱스, 에러 롤백 |
-| 새 메시지/콘텐츠 | 역순 전략 적용, 금지어 체크 |
-| 파일 생성 | 용량 체크, 임시 파일 여부 |
-| 이미지 처리 | 압축 적용, 정리 필요성 |
-
----
-
-### 🚨 가디언 경고 트리거
-
-| 상황 | 경고 레벨 | 액션 |
-|------|----------|------|
-| 에러 처리 없음 | 🟡 주의 | 추가 권장 |
-| 기존 기능 충돌 | 🟠 경고 | 수정 필요 |
-| 보안 취약점 | 🔴 위험 | 즉시 수정 |
-| 브랜드 가이드 위반 | 🟡 주의 | 수정 권장 |
-| 사용자 플로우 단절 | 🟠 경고 | 연결 필요 |
-| 전체 용량 500MB+ | 🔴 위험 | 즉시 정리 |
-| 대용량 파일 10MB+ | 🟡 주의 | 필요성 검토 |
-
----
-
-## 🔬 양자 기획법 (Quantum Planning Method)
-
-> 모든 기획/개발 작업에 양자역학 5대 원리 적용
-> 상세 가이드: `docs/standards/quantum-planning-method.md`
-
-### 5대 원칙
-
-| 원칙 | 핵심 | 적용 |
-|------|------|------|
-| **양자 중첩** | 옵션 동시 검토 | 결정 전까지 모든 가능성 열어두기 |
-| **양자 얽힘** | 연결 작업 동기화 | DB↔API↔UI 동시 업데이트 |
-| **관찰자 효과** | 25%/50%/75%/100% 검수 | 자주 볼수록 품질 향상 |
-| **확률적 리스크** | 임계점 기반 선제 대응 | 리스크 확률 추적, 80% 도달 시 준비 |
-| **파동 함수 붕괴** | 명확한 결정 선언 | 결정 시 다른 옵션 논의 종료 |
-
-### 파동 함수 붕괴 선언 형식
-
-```
-✅ 파동 함수 붕괴!
-━━━━━━━━━━━━━━━━━━━━━
-결정: [선택된 옵션]
-시점: YYYY-MM-DD HH:MM
-결정자: [이름]
-번복 조건: [치명적 결함 시에만]
-━━━━━━━━━━━━━━━━━━━━━
-```
-
-### 적용 체크리스트
-
-- [ ] 옵션 중첩 분석 완료?
-- [ ] 얽힘 그룹 정의?
-- [ ] 관찰 스케줄 설정?
-- [ ] 리스크 확률 매트릭스 작성?
-- [ ] 파동 함수 붕괴 선언?
-
----
-
-*마지막 업데이트: 2025-01-29 (v2.1 - 양자 기획법 추가)*
