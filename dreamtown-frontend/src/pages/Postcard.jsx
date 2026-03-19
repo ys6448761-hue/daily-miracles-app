@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { track } from '../utils/experiment';
 import PostcardView from '../features/galaxy/components/PostcardView';
 import PostcardActions from '../features/galaxy/components/PostcardActions';
 
@@ -21,6 +22,10 @@ export default function PostcardPage() {
   const growthLine = state?.growthLine ?? '';
 
   const tint = (direction && PAGE_TINT[direction]) || 'transparent';
+
+  useEffect(() => {
+    track('postcard_complete', { direction });
+  }, []);
 
   return (
     <div

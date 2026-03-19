@@ -1,5 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { track, getVariant } from "../utils/experiment";
+
+const EXP_ID  = 'intro_cta_v1';
+const CTA_TEXT = { A: '시작하기', B: '내 빛 찾기' };
 
 // 공유 링크 유입 시 direction 색 tint — 카드의 색감이 Intro까지 이어짐
 const INTRO_TINT = {
@@ -15,13 +19,35 @@ export default function Intro() {
   const [searchParams] = useSearchParams();
 
   // ?g=east 형태로 direction 전달받음 (리텐션 루프 진입점)
-  const g = searchParams.get('g');
+  const g    = searchParams.get('g');
   const tint = INTRO_TINT[g] || null;
+
+  // A/B 실험 — variant 고정
+  const variant = getVariant(EXP_ID);
+  const ctaText = step === 1 ? '다음' : CTA_TEXT[variant];
+
+  // screen_view 이벤트
+  useEffect(() => {
+    track('screen_view', {
+      screen: 'intro',
+      experiment: EXP_ID,
+      variant,
+      from_share: !!g,
+      galaxy: g || null,
+    });
+  }, []);
 
   const handleNext = () => {
     if (step === 1) {
       setStep(2);
     } else {
+      track('cta_click', {
+        experiment: EXP_ID,
+        variant,
+        text: ctaText,
+        from_share: !!g,
+        galaxy: g || null,
+      });
       navigate("/galaxy");
     }
   };
@@ -80,7 +106,7 @@ export default function Intro() {
         onClick={handleNext}
         className="mb-10 px-8 py-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm"
       >
-        {step === 1 ? "다음" : "시작하기"}
+        {ctaText}
       </button>
     </div>
   );
