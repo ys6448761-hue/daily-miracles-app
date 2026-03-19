@@ -25,29 +25,40 @@ body {
   50%       { transform: scale(1.02); opacity: 1; }
 }
 
-/* 별 선택 전환 여운 — SelectionTransition (DEC-2026-0319-001) */
-@keyframes selection-glow {
-  0%   { opacity: 0;    transform: scale(0.92); }
-  35%  { opacity: 1;    transform: scale(1); }
-  100% { opacity: 0.92; transform: scale(1.08); }
+/* 별 선택 전환 — "빛이 내려오는 경험" (SelectionTransition) */
+
+/* ① 상단 방사광 — 위에서 빛이 퍼지며 나타남 */
+@keyframes beam {
+  0%   { opacity: 0; transform: scaleY(0.5); }
+  40%  { opacity: 1; transform: scaleY(1); }
+  100% { opacity: 0; transform: scaleY(1); }
 }
 
-@keyframes selection-bloom {
-  0%   { opacity: 0;    transform: scale(0.96); }
-  40%  { opacity: 0.88; transform: scale(1); }
-  100% { opacity: 0.72; transform: scale(1.06); }
+/* ② 내려오는 빔 — 빛이 위에서 아래로 흘러내림 */
+@keyframes fall {
+  0%   { opacity: 0; transform: translateY(-30%); }
+  50%  { opacity: 1; transform: translateY(0%); }
+  100% { opacity: 0; transform: translateY(20%); }
 }
 
-@keyframes selection-veil {
+/* ③ 전체 tint — 화면 전체에 색이 감싸며 머뭄 */
+@keyframes overlay {
   0%   { opacity: 0; }
-  100% { opacity: 1; }
+  50%  { opacity: 0.25; }
+  100% { opacity: 0.15; }
 }
 
-/* 빛이 내려오는 연출 — SelectionTransition 빛줄기 */
-@keyframes light-descend {
-  0%   { opacity: 0; }
-  18%  { opacity: 0.9; }
-  100% { opacity: 0.7; }
+.animate-beam {
+  animation: beam 900ms ease-out forwards;
+  transform-origin: top center;
+}
+
+.animate-fall {
+  animation: fall 900ms ease-out forwards;
+}
+
+.animate-overlay {
+  animation: overlay 900ms ease-out forwards;
 }
 
 /* 별 끌림 — outer halo 독립 리듬 (breath와 다른 주기) */
