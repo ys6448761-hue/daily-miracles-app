@@ -28,7 +28,7 @@ export default function Star({
         }`,
       }}
     >
-      {/* outer halo — 독립 리듬 끌림 (star-halo-pulse가 opacity 제어, motion.glow 미사용) */}
+      {/* outer halo — 선택 시 pulse 리듬 빨라짐 (살아나는 연출) */}
       <div
         className="absolute rounded-full"
         style={{
@@ -38,11 +38,11 @@ export default function Star({
           left: '50%',
           background: 'rgba(255,255,255,0.09)',
           filter: 'blur(12px)',
-          animation: 'star-halo-pulse 3.8s ease-in-out infinite',
+          animation: `star-halo-pulse ${isSelected ? '2.0s' : '3.8s'} ease-in-out infinite`,
         }}
       />
 
-      {/* inner glow — hover 시 살짝 밝아짐 */}
+      {/* inner glow — hover 밝아짐 + 선택 시 완전 점등 */}
       <div
         className="absolute rounded-full transition-opacity duration-500 group-hover:opacity-100"
         style={{
@@ -53,7 +53,7 @@ export default function Star({
           transform: 'translate(-50%, -50%)',
           background: 'rgba(255,255,255,0.18)',
           filter: 'blur(4px)',
-          opacity: 0.85,
+          opacity: isSelected ? 1 : 0.85,
         }}
       />
 
