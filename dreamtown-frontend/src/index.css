@@ -45,8 +45,33 @@ body {
 
 /* 별 끌림 — outer halo 독립 리듬 (breath와 다른 주기) */
 @keyframes star-halo-pulse {
-  0%, 100% { opacity: 0.06; transform: translate(-50%, -50%) scale(1); }
-  50%       { opacity: 0.16; transform: translate(-50%, -50%) scale(1.12); }
+  0%, 100% { opacity: 0.08; transform: translate(-50%, -50%) scale(1); }
+  50%       { opacity: 0.28; transform: translate(-50%, -50%) scale(1.14); }
+}
+
+/* 선택 별 core glow — box-shadow 기반 (GPU 친화적) */
+.star-core-glow {
+  box-shadow:
+    0 0 6px  rgba(255, 255, 255, 0.70),
+    0 0 18px rgba(255, 255, 255, 0.30);
+  transition: box-shadow 0.35s ease;
+}
+
+/* hover 시 glow 증폭 */
+.group:hover .star-core-glow {
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.95),
+    0 0 28px rgba(255, 255, 255, 0.55),
+    0 0 52px rgba(255, 255, 255, 0.18);
+}
+
+/* 선택된 별 — glow 최대 점등 */
+.star-core-glow-selected {
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.95),
+    0 0 28px rgba(255, 255, 255, 0.55),
+    0 0 52px rgba(255, 255, 255, 0.18);
+  transition: box-shadow 0.35s ease;
 }
 
 /* 부드러운 글로우 */

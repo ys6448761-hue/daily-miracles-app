@@ -19,7 +19,7 @@ export default function Star({
     <button
       onClick={() => onSelect(direction)}
       disabled={disabled}
-      className="absolute transition-all duration-700 ease-in-out group"
+      className="absolute transition-all duration-700 ease-in-out group cursor-pointer"
       style={{
         ...position,
         opacity: isDimmed ? 0.25 : 1,
@@ -57,9 +57,11 @@ export default function Star({
         }}
       />
 
-      {/* core — hover 시 미세 확대 */}
+      {/* core — glow + hover 확대 + 선택 상태 최대 점등 */}
       <div
-        className="rounded-full bg-white transition-transform duration-300 group-hover:scale-110"
+        className={`rounded-full bg-white transition-transform duration-300 group-hover:scale-125 ${
+          isSelected ? 'star-core-glow-selected' : 'star-core-glow'
+        }`}
         style={{
           width: coreSize,
           height: coreSize,
