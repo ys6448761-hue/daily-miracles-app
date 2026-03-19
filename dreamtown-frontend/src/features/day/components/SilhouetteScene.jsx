@@ -8,6 +8,7 @@
  * ❌ 강하게 채색된 옷, 전면 주인공 노출
  *
  * 등장: y 18→0, scale 0.98→1, opacity 0→1 (1.1s ease-out)
+ * 정착 후 breath: scale 1→1.012→1 (3.9s loop, 캐릭터 아닌 공기 진동 수준)
  */
 
 import { motion } from 'framer-motion';
@@ -40,34 +41,46 @@ export default function SilhouetteScene({ galaxy }) {
         transition={{ duration: 1.1, ease: 'easeOut' }}
         className="relative mt-10 h-[320px] w-[220px]"
       >
-        {/* ① 뒤쪽 glow — 선택 색이 공간에 번짐 */}
-        <div
-          className="absolute inset-0 blur-3xl"
-          style={{
-            background: `radial-gradient(circle at 50% 35%, ${glow}, transparent 68%)`,
-          }}
-        />
-
-        {/* ② 몸체 실루엣 — 딥네이비 + 선택 색 rim light */}
-        <div
+        {/* breath 루프 — 진입 완료(1.1s) 후 시작, 공기 진동 수준 */}
+        <motion.div
           className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(to bottom, rgba(10,16,28,0.92), rgba(6,10,18,0.98))',
-            boxShadow: `0 0 0 1px ${rim}, 0 0 28px ${glow}`,
-            clipPath:
-              'polygon(50% 3%, 60% 8%, 67% 18%, 71% 28%, 75% 42%, 82% 62%, 78% 88%, 22% 88%, 18% 62%, 25% 42%, 29% 28%, 33% 18%, 40% 8%)',
+          animate={{ scale: [1, 1.012, 1] }}
+          transition={{
+            duration: 3.9,
+            ease: 'easeInOut',
+            repeat: Infinity,
+            delay: 1.1,
           }}
-        />
+        >
+          {/* ① 뒤쪽 glow — 선택 색이 공간에 번짐 */}
+          <div
+            className="absolute inset-0 blur-3xl"
+            style={{
+              background: `radial-gradient(circle at 50% 35%, ${glow}, transparent 68%)`,
+            }}
+          />
 
-        {/* ③ 상단 머리/어깨 광원 — rim color 집중 */}
-        <div
-          className="absolute left-1/2 top-[18%] h-[120px] w-[120px] -translate-x-1/2 rounded-full blur-2xl"
-          style={{
-            background: `radial-gradient(circle, ${rim}, transparent 72%)`,
-            opacity: 0.7,
-          }}
-        />
+          {/* ② 몸체 실루엣 — 딥네이비 + 선택 색 rim light */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(to bottom, rgba(10,16,28,0.92), rgba(6,10,18,0.98))',
+              boxShadow: `0 0 0 1px ${rim}, 0 0 28px ${glow}`,
+              clipPath:
+                'polygon(50% 3%, 60% 8%, 67% 18%, 71% 28%, 75% 42%, 82% 62%, 78% 88%, 22% 88%, 18% 62%, 25% 42%, 29% 28%, 33% 18%, 40% 8%)',
+            }}
+          />
+
+          {/* ③ 상단 머리/어깨 광원 — rim color 집중 */}
+          <div
+            className="absolute left-1/2 top-[18%] h-[120px] w-[120px] -translate-x-1/2 rounded-full blur-2xl"
+            style={{
+              background: `radial-gradient(circle, ${rim}, transparent 72%)`,
+              opacity: 0.7,
+            }}
+          />
+        </motion.div>
       </motion.div>
     </div>
   );
