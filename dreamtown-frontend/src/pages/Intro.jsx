@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { track, getVariant } from "../utils/experiment";
 
-const EXP_ID  = 'intro_cta_v1';
+const EXP_ID        = 'intro_cta_v1';
+const SCREEN_EXP_ID = 'intro_screen_v1';  // A: 2단계, B: 1단계
 const CTA_TEXT = { A: '시작하기', B: '내 빛 찾기' };
 
 // 공유 링크 유입 시 direction 색 tint — 카드의 색감이 Intro까지 이어짐
@@ -14,7 +15,8 @@ const INTRO_TINT = {
 };
 
 export default function Intro() {
-  const [step, setStep] = useState(1);
+  const screenVariant = getVariant(SCREEN_EXP_ID);
+  const [step, setStep] = useState(screenVariant === 'B' ? 2 : 1);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -32,6 +34,8 @@ export default function Intro() {
       screen: 'intro',
       experiment: EXP_ID,
       variant,
+      screen_experiment: SCREEN_EXP_ID,
+      screen_variant: screenVariant,
       from_share: !!g,
       galaxy: g || null,
     });
@@ -44,6 +48,8 @@ export default function Intro() {
       track('cta_click', {
         experiment: EXP_ID,
         variant,
+        screen_experiment: SCREEN_EXP_ID,
+        screen_variant: screenVariant,
         text: ctaText,
         from_share: !!g,
         galaxy: g || null,
