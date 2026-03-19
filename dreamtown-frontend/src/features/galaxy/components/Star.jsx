@@ -19,25 +19,25 @@ export default function Star({
     <button
       onClick={() => onSelect(direction)}
       disabled={disabled}
-      className="absolute transition-all duration-700 ease-in-out group cursor-pointer"
+      className="absolute transition-all duration-500 ease-in-out group cursor-pointer"
       style={{
         ...position,
-        opacity: isDimmed ? 0.25 : 1,
+        opacity: isDimmed ? 0 : 1,
         transform: `${position.transform || ''} ${
-          isSelected ? 'scale(1.06)' : 'scale(1)'
+          isSelected ? 'scale(1.18)' : 'scale(1)'
         }`,
       }}
     >
-      {/* outer halo — 선택 시 pulse 리듬 빨라짐 (살아나는 연출) */}
+      {/* outer halo — Focus Scene: 선택 시 확장 + pulse 가속 */}
       <div
-        className="absolute rounded-full"
+        className="absolute rounded-full transition-all duration-500"
         style={{
-          width: coreSize * 3.2,
-          height: coreSize * 3.2,
+          width: isSelected ? coreSize * 5.2 : coreSize * 3.2,
+          height: isSelected ? coreSize * 5.2 : coreSize * 3.2,
           top: '50%',
           left: '50%',
-          background: 'rgba(255,255,255,0.09)',
-          filter: 'blur(12px)',
+          background: isSelected ? 'rgba(255,255,255,0.13)' : 'rgba(255,255,255,0.09)',
+          filter: isSelected ? 'blur(18px)' : 'blur(12px)',
           animation: `star-halo-pulse ${isSelected ? '2.0s' : '3.8s'} ease-in-out infinite`,
         }}
       />

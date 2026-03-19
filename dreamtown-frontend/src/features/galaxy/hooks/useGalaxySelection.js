@@ -10,9 +10,10 @@ export function useGalaxySelection(onComplete) {
     setSelectedDirection(direction);
     setPhase('selecting');
 
+    // selecting → transitioning: 400ms Focus Scene 확보
     setTimeout(() => {
       setPhase('transitioning');
-    }, 120);
+    }, 400);
 
     setTimeout(() => {
       setPhase('complete');
