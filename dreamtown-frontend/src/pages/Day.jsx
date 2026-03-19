@@ -94,6 +94,7 @@ export default function DayPage() {
 
               navigate('/postcard', {
                 state: {
+                  direction,
                   message,
                   growthLine: saved.growthLine,
                 },

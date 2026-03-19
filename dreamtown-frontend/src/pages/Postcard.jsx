@@ -8,12 +8,14 @@ export default function PostcardPage() {
   const navigate = useNavigate();
   const [captureMode, setCaptureMode] = useState(false);
 
-  const message = state?.message ?? '오늘은 조용히 빛나도 괜찮습니다';
+  const direction = state?.direction ?? null;
+  const message   = state?.message   ?? '오늘은 조용히 빛나도 괜찮습니다';
   const growthLine = state?.growthLine ?? '';
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-6 py-10">
       <PostcardView
+        direction={direction}
         message={message}
         growthLine={growthLine}
         captureMode={captureMode}
