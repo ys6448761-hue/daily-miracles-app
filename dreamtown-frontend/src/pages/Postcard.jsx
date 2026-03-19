@@ -35,6 +35,7 @@ export default function PostcardPage() {
       />
 
       <PostcardActions
+        direction={direction}
         onBack={() => navigate(-1)}
         setCaptureMode={setCaptureMode}
         message={message}

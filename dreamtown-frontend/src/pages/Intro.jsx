@@ -1,9 +1,22 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+
+// 공유 링크 유입 시 direction 색 tint — 카드의 색감이 Intro까지 이어짐
+const INTRO_TINT = {
+  north: 'rgba(96,165,250,0.10)',
+  east:  'rgba(245,158,11,0.12)',
+  west:  'rgba(244,114,182,0.10)',
+  south: 'rgba(52,211,153,0.10)',
+};
 
 export default function Intro() {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // ?g=east 형태로 direction 전달받음 (리텐션 루프 진입점)
+  const g = searchParams.get('g');
+  const tint = INTRO_TINT[g] || null;
 
   const handleNext = () => {
     if (step === 1) {
@@ -37,6 +50,14 @@ export default function Intro() {
 
         {/* 어둡게 덮기 */}
         <div className="absolute inset-0 bg-black/40" />
+
+        {/* 공유 유입 direction tint — 카드 색감의 여운 */}
+        {tint && (
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: tint, mixBlendMode: 'screen' }}
+          />
+        )}
       </div>
 
       {/* 텍스트 */}

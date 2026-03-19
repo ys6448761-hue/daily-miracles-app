@@ -1,6 +1,6 @@
 import html2canvas from 'html2canvas';
 
-const GALAXY_URL = 'https://app.dailymiracles.kr/galaxy';
+const BASE_URL = 'https://app.dailymiracles.kr';
 
 // 카드 캡처 → Blob/File 반환 (저장 + 공유 공통 사용)
 async function captureCard(setCaptureMode) {
@@ -21,7 +21,11 @@ async function captureCard(setCaptureMode) {
   return canvas;
 }
 
-export default function PostcardActions({ onBack, setCaptureMode, message }) {
+export default function PostcardActions({ direction, onBack, setCaptureMode, message }) {
+  // 공유 링크 — /intro?g={direction} 로 리텐션 루프 시작
+  const shareUrl = direction
+    ? `${BASE_URL}/intro?g=${direction}`
+    : `${BASE_URL}/intro`;
 
   // 저장하기 — PNG 다운로드
   const handleSave = async () => {
@@ -44,14 +48,14 @@ export default function PostcardActions({ onBack, setCaptureMode, message }) {
 
     try {
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        // 이미지 파일 직접 공유 (카톡 포함)
-        await navigator.share({ files: [file], text: message });
+        // 이미지 파일 직접 공유 (카톡 포함) + 리텐션 링크
+        await navigator.share({ files: [file], text: `${message}\n\n👉 ${shareUrl}` });
       } else if (navigator.share) {
         // 텍스트 + 링크 공유
-        await navigator.share({ text: `${message}\n\n👉 ${GALAXY_URL}` });
+        await navigator.share({ text: `${message}\n\n👉 ${shareUrl}` });
       } else {
         // 클립보드 fallback
-        await navigator.clipboard.writeText(`${message}\n\n👉 ${GALAXY_URL}`);
+        await navigator.clipboard.writeText(`${message}\n\n👉 ${shareUrl}`);
       }
     } catch {
       // 사용자 취소 등 무시
