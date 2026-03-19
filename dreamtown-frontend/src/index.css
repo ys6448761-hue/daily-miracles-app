@@ -43,6 +43,12 @@ body {
   100% { opacity: 1; }
 }
 
+/* 별 끌림 — outer halo 독립 리듬 (breath와 다른 주기) */
+@keyframes star-halo-pulse {
+  0%, 100% { opacity: 0.06; transform: translate(-50%, -50%) scale(1); }
+  50%       { opacity: 0.16; transform: translate(-50%, -50%) scale(1.12); }
+}
+
 /* 부드러운 글로우 */
 .glow-gold {
   text-shadow: 0 0 20px rgba(255, 215, 106, 0.6);

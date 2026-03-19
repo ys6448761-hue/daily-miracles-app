@@ -19,7 +19,7 @@ export default function Star({
     <button
       onClick={() => onSelect(direction)}
       disabled={disabled}
-      className="absolute transition-all duration-700 ease-in-out"
+      className="absolute transition-all duration-700 ease-in-out group"
       style={{
         ...position,
         opacity: isDimmed ? 0.25 : 1,
@@ -28,7 +28,7 @@ export default function Star({
         }`,
       }}
     >
-      {/* outer halo */}
+      {/* outer halo — 독립 리듬 끌림 (star-halo-pulse가 opacity 제어, motion.glow 미사용) */}
       <div
         className="absolute rounded-full"
         style={{
@@ -36,16 +36,15 @@ export default function Star({
           height: coreSize * 3.2,
           top: '50%',
           left: '50%',
-          transform: 'translate(-50%, -50%)',
-          background: 'rgba(255,255,255,0.07)',
-          filter: 'blur(10px)',
-          ...motion.glow,
+          background: 'rgba(255,255,255,0.09)',
+          filter: 'blur(12px)',
+          animation: 'star-halo-pulse 3.8s ease-in-out infinite',
         }}
       />
 
-      {/* inner glow */}
+      {/* inner glow — hover 시 살짝 밝아짐 */}
       <div
-        className="absolute rounded-full"
+        className="absolute rounded-full transition-opacity duration-500 group-hover:opacity-100"
         style={{
           width: coreSize * 1.9,
           height: coreSize * 1.9,
@@ -54,12 +53,13 @@ export default function Star({
           transform: 'translate(-50%, -50%)',
           background: 'rgba(255,255,255,0.18)',
           filter: 'blur(4px)',
+          opacity: 0.85,
         }}
       />
 
-      {/* core */}
+      {/* core — hover 시 미세 확대 */}
       <div
-        className="rounded-full bg-white"
+        className="rounded-full bg-white transition-transform duration-300 group-hover:scale-110"
         style={{
           width: coreSize,
           height: coreSize,
