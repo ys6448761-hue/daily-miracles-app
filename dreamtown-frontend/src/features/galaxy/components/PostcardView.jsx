@@ -45,9 +45,23 @@ export default function PostcardView({ message, growthLine, captureMode = false 
         }}
       />
 
-      {/* central star */}
+      {/* central star + 변화된 소원이 실루엣 빛 */}
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="relative flex items-center justify-center">
+          {/* 실루엣 — 변화된 소원이의 잔광 */}
+          <div
+            className="absolute rounded-full"
+            style={{
+              width: 220,
+              height: 220,
+              background: captureMode
+                ? 'rgba(200,220,255,0.07)'
+                : 'radial-gradient(circle, rgba(200,220,255,0.13) 0%, rgba(180,205,255,0.06) 40%, rgba(160,190,255,0) 70%)',
+              filter: captureMode ? 'none' : 'blur(36px)',
+              opacity: captureMode ? 0.12 : 1,
+            }}
+          />
+          {/* outer halo */}
           <div
             className="absolute w-44 h-44 rounded-full"
             style={{
@@ -56,6 +70,7 @@ export default function PostcardView({ message, growthLine, captureMode = false 
               opacity: captureMode ? 0.18 : 1,
             }}
           />
+          {/* inner glow */}
           <div
             className="absolute w-28 h-28 rounded-full"
             style={{
@@ -64,6 +79,7 @@ export default function PostcardView({ message, growthLine, captureMode = false 
               opacity: captureMode ? 0.15 : 1,
             }}
           />
+          {/* core */}
           <div className="w-4 h-4 rounded-full bg-white" />
         </div>
       </div>

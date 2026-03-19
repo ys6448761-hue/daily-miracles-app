@@ -8,8 +8,8 @@ export default function GalaxySelectionScreen({ onComplete }) {
   const { phase, selectedDirection, select } = useGalaxySelection(onComplete);
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-black">
-      <GalaxyLayer phase={phase} selectedDirection={selectedDirection} />
+    <div className="relative w-full h-screen overflow-hidden">
+      <GalaxyLayer />
 
       <StarField
         phase={phase}

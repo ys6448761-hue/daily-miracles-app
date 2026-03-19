@@ -1,5 +1,8 @@
 import { useStarMotion } from '../hooks/useStarMotion';
 
+// direction별 미세 크기 차이 — 랜덤 대신 고정 오프셋 (re-render 안전)
+const SIZE_OFFSET = { north: 0, east: 1, west: -1, south: 0.5 };
+
 export default function Star({
   direction,
   motionPreset,
@@ -10,6 +13,7 @@ export default function Star({
   onSelect,
 }) {
   const motion = useStarMotion(motionPreset);
+  const coreSize = 14 + SIZE_OFFSET[direction];
 
   return (
     <button
@@ -24,13 +28,43 @@ export default function Star({
         }`,
       }}
     >
+      {/* outer halo */}
       <div
-        className="w-4 h-4 rounded-full bg-white"
-        style={motion.core}
+        className="absolute rounded-full"
+        style={{
+          width: coreSize * 3.2,
+          height: coreSize * 3.2,
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          background: 'rgba(255,255,255,0.07)',
+          filter: 'blur(10px)',
+          ...motion.glow,
+        }}
       />
+
+      {/* inner glow */}
       <div
-        className="absolute inset-0 rounded-full bg-white opacity-60"
-        style={motion.glow}
+        className="absolute rounded-full"
+        style={{
+          width: coreSize * 1.9,
+          height: coreSize * 1.9,
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          background: 'rgba(255,255,255,0.18)',
+          filter: 'blur(4px)',
+        }}
+      />
+
+      {/* core */}
+      <div
+        className="rounded-full bg-white"
+        style={{
+          width: coreSize,
+          height: coreSize,
+          ...motion.core,
+        }}
       />
     </button>
   );
