@@ -1,8 +1,12 @@
 import html2canvas from 'html2canvas';
+import { getVariant, track } from '../../../utils/experiment';
+import { buildShareText } from '../constants/shareCopy';
 
-const BASE_URL = 'https://app.dailymiracles.kr';
+const BASE_URL  = 'https://app.dailymiracles.kr';
+const EXP_ID    = 'share_copy_v1';
+const VARIANTS  = ['A', 'B', 'C'];
 
-// 카드 캡처 → Blob/File 반환 (저장 + 공유 공통 사용)
+// 카드 캡처 → canvas 반환 (저장 + 공유 공통 사용)
 async function captureCard(setCaptureMode) {
   const target = document.getElementById('dreamtown-postcard');
   if (!target) return null;
@@ -12,7 +16,7 @@ async function captureCard(setCaptureMode) {
 
   const canvas = await html2canvas(target, {
     backgroundColor: null,
-    scale: 3,          // 1080px 이상 품질
+    scale: 3,
     useCORS: true,
     logging: false,
   });
@@ -22,15 +26,21 @@ async function captureCard(setCaptureMode) {
 }
 
 export default function PostcardActions({ direction, onBack, setCaptureMode, message }) {
-  // 공유 링크 — /intro?g={direction} 로 리텐션 루프 시작
+  // 공유 링크 — /intro?g={direction} 리텐션 루프
   const shareUrl = direction
     ? `${BASE_URL}/intro?g=${direction}`
     : `${BASE_URL}/intro`;
+
+  // 카피 A/B/C 실험
+  const variant   = getVariant(EXP_ID, VARIANTS);
+  const shareText = buildShareText({ variant, direction, shareUrl });
 
   // 저장하기 — PNG 다운로드
   const handleSave = async () => {
     const canvas = await captureCard(setCaptureMode);
     if (!canvas) return;
+
+    track('save_click', { direction });
 
     const link = document.createElement('a');
     link.download = `dreamtown-${Date.now()}.png`;
@@ -43,19 +53,22 @@ export default function PostcardActions({ direction, onBack, setCaptureMode, mes
     const canvas = await captureCard(setCaptureMode);
     if (!canvas) return;
 
+    track('share_click', {
+      experiment: EXP_ID,
+      variant,
+      direction,
+    });
+
     const blob = await new Promise((r) => canvas.toBlob(r, 'image/png'));
     const file = new File([blob], 'dreamtown-postcard.png', { type: 'image/png' });
 
     try {
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        // 이미지 파일 직접 공유 (카톡 포함) + 리텐션 링크
-        await navigator.share({ files: [file], text: `${message}\n\n👉 ${shareUrl}` });
+        await navigator.share({ files: [file], text: shareText });
       } else if (navigator.share) {
-        // 텍스트 + 링크 공유
-        await navigator.share({ text: `${message}\n\n👉 ${shareUrl}` });
+        await navigator.share({ text: shareText });
       } else {
-        // 클립보드 fallback
-        await navigator.clipboard.writeText(`${message}\n\n👉 ${shareUrl}`);
+        await navigator.clipboard.writeText(shareText);
       }
     } catch {
       // 사용자 취소 등 무시

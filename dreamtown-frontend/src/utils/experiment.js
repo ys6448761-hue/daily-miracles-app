@@ -16,11 +16,12 @@ const EVENTS_KEY  = 'dt_events';
 const MAX_EVENTS  = 500;
 
 // 유저당 variant 고정 — 재방문해도 동일 그룹 유지
-export function getVariant(experimentId) {
+// variants 배열로 A/B/C 등 N개 지원
+export function getVariant(experimentId, variants = ['A', 'B']) {
   const stored = JSON.parse(localStorage.getItem(VARIANT_KEY) || '{}');
   if (stored[experimentId]) return stored[experimentId];
 
-  const variant = Math.random() < 0.5 ? 'A' : 'B';
+  const variant = variants[Math.floor(Math.random() * variants.length)];
   stored[experimentId] = variant;
   localStorage.setItem(VARIANT_KEY, JSON.stringify(stored));
   return variant;
