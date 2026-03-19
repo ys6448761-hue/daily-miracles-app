@@ -61,6 +61,16 @@ body {
   animation: overlay 900ms ease-out forwards;
 }
 
+/* /day 소원이 실루엣 색 스며듦 */
+@keyframes seep-in {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.animate-seep {
+  animation: seep-in 2.5s ease-out forwards;
+}
+
 /* /day 진입 잔광 — 선택 은하 색이 이어지다 사라짐 */
 @keyframes afterglow {
   0%   { opacity: 0.25; }

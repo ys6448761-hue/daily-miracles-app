@@ -3,6 +3,61 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import DayLogScreen from '../features/galaxy/components/DayLogScreen';
 import { saveLog } from '../features/galaxy/utils/logStorage';
 
+// 소원이 실루엣 aura 색상 — 잔광보다 약간 강한 존재감
+const SILHOUETTE_AURA = {
+  north: 'rgba(96,165,250,0.14)',
+  east:  'rgba(245,158,11,0.16)',
+  west:  'rgba(244,114,182,0.14)',
+  south: 'rgba(52,211,153,0.14)',
+};
+
+// 소원이 실루엣 — 선택 색 aura + 흰 발광 형태, 텍스트 뒤에 위치
+function DaySilhouette({ direction, phase }) {
+  if (!direction || !SILHOUETTE_AURA[direction]) return null;
+  const aura = SILHOUETTE_AURA[direction];
+
+  return (
+    // 외부: phase 기반 fade-out (before→after 800ms)
+    <div
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        opacity: phase === 'after' ? 0 : 1,
+        transition: 'opacity 800ms ease-in-out',
+      }}
+    >
+      {/* 내부: seep-in 2.5s — 색이 서서히 스며듦 */}
+      <div className="animate-seep absolute inset-0">
+
+        {/* ① 방향 색 aura — 넓고 흐린 발광 타원 */}
+        <div
+          className="absolute"
+          style={{
+            top: '50%', left: '50%',
+            width: 200, height: 280,
+            transform: 'translate(-50%, -50%)',
+            background: `radial-gradient(ellipse at 50% 38%, ${aura} 0%, transparent 68%)`,
+            filter: 'blur(48px)',
+          }}
+        />
+
+        {/* ② 흰 실루엣 형태 — 존재감만 남긴 발광 */}
+        <div
+          className="absolute"
+          style={{
+            top: '50%', left: '50%',
+            width: 60, height: 90,
+            transform: 'translate(-50%, -50%)',
+            background:
+              'radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.03) 60%, transparent 80%)',
+            filter: 'blur(14px)',
+          }}
+        />
+
+      </div>
+    </div>
+  );
+}
+
 // 선택 은하 잔광 색상 — SelectionTransition 동일 계열
 const GALAXY_OVERLAY = {
   north: 'rgba(96,165,250,0.12)',
@@ -46,6 +101,9 @@ export default function DayPage() {
       <DayAfterglow galaxy={direction} />
 
       <div className="relative z-10 w-full h-full">
+
+        {/* 소원이 실루엣 — 메시지 텍스트 뒤에 발광 형태로 자리잡음 */}
+        <DaySilhouette direction={direction} phase={phase} />
 
         {/* Before / Transition — 메시지 전면 */}
         <div
