@@ -17,7 +17,7 @@ export function useGalaxySelection(onComplete) {
     setTimeout(() => {
       setPhase('complete');
       onComplete?.(direction);
-    }, 800);
+    }, 1200);
   };
 
   return {
