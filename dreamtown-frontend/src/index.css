@@ -61,6 +61,16 @@ body {
   animation: overlay 900ms ease-out forwards;
 }
 
+/* /day 진입 잔광 — 선택 은하 색이 이어지다 사라짐 */
+@keyframes afterglow {
+  0%   { opacity: 0.25; }
+  100% { opacity: 0; }
+}
+
+.animate-afterglow {
+  animation: afterglow 1.8s ease-out forwards;
+}
+
 /* 별 끌림 — outer halo 독립 리듬 (breath와 다른 주기) */
 @keyframes star-halo-pulse {
   0%, 100% { opacity: 0.08; transform: translate(-50%, -50%) scale(1); }
