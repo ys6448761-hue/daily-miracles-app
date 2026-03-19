@@ -64,21 +64,15 @@ export default function Intro() {
       {/* 이미지 영역 */}
       <div className="flex-1 w-full flex items-center justify-center relative overflow-hidden">
 
-        {step === 1 && (
-          <img
-            src="/images/intro-wish.jpg"
-            alt="소원이 별이 되는 장면"
-            className="absolute w-full h-full object-cover opacity-90 transition-opacity duration-700"
-          />
-        )}
-
-        {step === 2 && (
-          <img
-            src="/images/intro-transform.jpg"
-            alt="변화된 소원이"
-            className="absolute w-full h-full object-cover opacity-90 transition-opacity duration-700"
-          />
-        )}
+        {/* 배경 — 이미지 파일 준비 전 CSS 그라디언트 placeholder */}
+        <div
+          className="absolute inset-0 transition-all duration-700"
+          style={{
+            background: step === 1
+              ? 'radial-gradient(ellipse at 50% 30%, rgba(120,100,220,0.35) 0%, rgba(30,20,60,0.90) 60%, #020008 100%)'
+              : 'radial-gradient(ellipse at 50% 60%, rgba(80,160,220,0.30) 0%, rgba(20,30,55,0.90) 60%, #020008 100%)',
+          }}
+        />
 
         {/* 어둡게 덮기 */}
         <div className="absolute inset-0 bg-black/40" />
