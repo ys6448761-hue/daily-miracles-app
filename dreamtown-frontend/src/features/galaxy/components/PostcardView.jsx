@@ -4,10 +4,8 @@
  * captureMode = false  → blur 있음, 감성 최적화
  * captureMode = true   → blur 제거 + opacity 보정, 렌더 안정화
  *
- * direction 연동:
- * - watercolor 배경: 방향별 색 tint
- * - 광원 위치: 선택한 별이 있던 방향에서 빛이 들어옴
- * - 중앙 실루엣: 방향 색 반영
+ * 비율: 4:5 (1080×1350 — 카톡/인스타/앨범 저장 최적)
+ * 안전 영역: 상하 8~10%, 좌우 7~8% 기준
  *
  * 금지:
  * ❌ 캡처용 UI 따로 만들기
@@ -15,15 +13,13 @@
  * 👉 "같아 보이지만 내부만 다르게"
  */
 
-// 방향별 테마 — rgb 값으로 관리 (opacity는 사용처에서 결정)
 const DIRECTION_THEME = {
-  north: { r: 140, g: 185, b: 255, lightPos: '50% 8%'  },  // 도전 — 차가운 청
-  east:  { r: 245, g: 195, b:  85, lightPos: '88% 44%' },  // 성장 — 따뜻한 금
-  west:  { r: 240, g: 140, b: 195, lightPos: '12% 44%' },  // 관계 — 부드러운 핑크
-  south: { r:  80, g: 210, b: 175, lightPos: '50% 88%' },  // 치유 — 아쿠아민트
+  north: { r: 140, g: 185, b: 255, lightPos: '50% 8%'  },
+  east:  { r: 245, g: 195, b:  85, lightPos: '88% 44%' },
+  west:  { r: 240, g: 140, b: 195, lightPos: '12% 44%' },
+  south: { r:  80, g: 210, b: 175, lightPos: '50% 88%' },
 };
 
-// 방향 미지정 시 중립 fallback
 const NEUTRAL = { r: 185, g: 205, b: 255, lightPos: '50% 22%' };
 
 export default function PostcardView({ direction, message, growthLine, captureMode = false }) {
@@ -33,14 +29,14 @@ export default function PostcardView({ direction, message, growthLine, captureMo
     <div
       id="dreamtown-postcard"
       data-capture={captureMode ? 'true' : 'false'}
-      className="relative w-full max-w-sm aspect-[3/4] rounded-[28px] overflow-hidden bg-[#070b14] shadow-2xl"
+      className="relative w-full max-w-sm aspect-[4/5] rounded-[28px] overflow-hidden bg-[#070b14] shadow-2xl"
     >
-      {/* watercolor background — 선택 방향에서 빛이 스며드는 느낌 */}
+      {/* watercolor background — 0.18로 썸네일 차이 강화 */}
       <div
         className="absolute inset-0"
         style={{
           background: `
-            radial-gradient(44% 38% at ${lightPos}, rgba(${r},${g},${b},0.16) 0%, rgba(${r},${g},${b},0) 70%),
+            radial-gradient(44% 38% at ${lightPos}, rgba(${r},${g},${b},0.18) 0%, rgba(${r},${g},${b},0) 70%),
             radial-gradient(36% 30% at 82% 44%, rgba(${r},${g},${b},0.07) 0%, rgba(${r},${g},${b},0) 72%),
             radial-gradient(36% 30% at 18% 44%, rgba(${r},${g},${b},0.07) 0%, rgba(${r},${g},${b},0) 72%),
             radial-gradient(40% 34% at 50% 82%, rgba(${r},${g},${b},0.08) 0%, rgba(${r},${g},${b},0) 70%)
@@ -80,13 +76,11 @@ export default function PostcardView({ direction, message, growthLine, captureMo
               opacity: captureMode ? 0.12 : 1,
             }}
           />
-          {/* outer halo — 방향 색 미세 tint */}
+          {/* outer halo */}
           <div
             className="absolute w-44 h-44 rounded-full"
             style={{
-              background: captureMode
-                ? `rgba(${r},${g},${b},0.10)`
-                : `rgba(${r},${g},${b},0.10)`,
+              background: `rgba(${r},${g},${b},0.10)`,
               filter: captureMode ? 'none' : 'blur(48px)',
               opacity: captureMode ? 0.18 : 1,
             }}
@@ -105,24 +99,41 @@ export default function PostcardView({ direction, message, growthLine, captureMo
         </div>
       </div>
 
-      {/* main message */}
+      {/* message backing gradient — 텍스트 가독성 받침 */}
+      <div
+        className="absolute inset-x-0 pointer-events-none"
+        style={{
+          top: '11%',
+          height: '28%',
+          background:
+            'linear-gradient(to bottom, rgba(4,6,12,0.18) 0%, rgba(4,6,12,0.08) 65%, transparent 100%)',
+        }}
+      />
+
+      {/* main message — 안전 영역 상단 18%, 최대 2줄 */}
       <div className="absolute inset-x-0 top-[18%] px-8 text-center">
-        <p className="text-[22px] leading-relaxed tracking-[-0.01em] text-white">
+        <p
+          className="text-[22px] leading-relaxed tracking-[-0.01em] text-white/90"
+          style={{ textShadow: '0 1px 10px rgba(0,0,0,0.55)' }}
+        >
           {message}
         </p>
       </div>
 
-      {/* growth line */}
+      {/* growth line — 안전 영역 내 % 기준 배치 */}
       {growthLine ? (
-        <div className="absolute inset-x-0 bottom-20 px-8 text-center">
-          <p className="text-sm opacity-70 text-white">
+        <div className="absolute inset-x-0 bottom-[22%] px-8 text-center">
+          <p
+            className="text-sm text-white/70"
+            style={{ textShadow: '0 1px 6px rgba(0,0,0,0.4)' }}
+          >
             {growthLine}
           </p>
         </div>
       ) : null}
 
-      {/* brand */}
-      <div className="absolute inset-x-0 bottom-8 text-center">
+      {/* brand — 하단 안전 영역 10% 확보 */}
+      <div className="absolute inset-x-0 bottom-[10%] text-center">
         <p className="text-xs tracking-[0.18em] uppercase opacity-45">
           DreamTown
         </p>
