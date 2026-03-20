@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStar, getGalaxyStars, getResonance, postResonance } from '../api/dreamtown.js';
+import { getStar, getGalaxyStars, getResonance, postResonance, getSimilarStars } from '../api/dreamtown.js';
 import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
 import { sharePostcard } from '../utils/kakaoShare';
@@ -59,6 +59,9 @@ export default function MyStar() {
   const [galaxyStars, setGalaxyStars] = useState([]);
   const { setStarData } = useDreamtownStore();
 
+  // 공명 기반 유사 별
+  const [similarStars, setSimilarStars] = useState([]);
+
   // 공명 & 나눔 상태
   const [resonanceData, setResonanceData] = useState(null); // { resonance, impacts }
   const [resonanceOpen, setResonanceOpen] = useState(false);
@@ -84,6 +87,12 @@ export default function MyStar() {
         // 공명/나눔 현황 조회
         getResonance(data.star_id)
           .then(r => setResonanceData(r))
+          .catch(() => {});
+
+        // 공명 기반 유사 별
+        const resonanceToken = localStorage.getItem('dt_resonance_token');
+        getSimilarStars({ starId: data.star_id, token: resonanceToken })
+          .then(r => setSimilarStars(r.similar_stars ?? []))
           .catch(() => {});
       })
       .catch(() => {
@@ -114,8 +123,11 @@ export default function MyStar() {
       });
       setResonanceResult(result);
       setResonanceSubmitted(true);
-      // 나눔 데이터 갱신
+      // 나눔 데이터 + 유사 별 갱신
       getResonance(star.star_id).then(r => setResonanceData(r)).catch(() => {});
+      getSimilarStars({ starId: star.star_id, token })
+        .then(r => setSimilarStars(r.similar_stars ?? []))
+        .catch(() => {});
     } catch (err) {
       // 409 중복 → 이미 공명한 것으로 처리
       setResonanceResult({ message: err.message });
@@ -283,6 +295,35 @@ export default function MyStar() {
           </div>
         )}
       </motion.div>
+
+      {/* 비슷한 마음이 머문 별 — 공명 기반 연결 */}
+      {similarStars.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+          className="mb-6"
+        >
+          <p className="text-white/35 text-xs mb-3">비슷한 마음이 머문 별</p>
+          <div className="flex flex-col gap-2">
+            {similarStars.map(s => {
+              const d = calcDaysSinceBirth(s.created_at);
+              return (
+                <div
+                  key={s.star_id}
+                  className="flex items-center gap-3 bg-white/3 border border-white/8 rounded-2xl px-4 py-3"
+                >
+                  <span className="text-base text-white/40">✦</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white/70 text-sm font-medium truncate">{s.star_name}</p>
+                    <p className="text-white/30 text-xs">{s.galaxy_name_ko} · D+{d}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
 
       {/* CTA */}
       <div className="flex flex-col gap-3 mt-auto">

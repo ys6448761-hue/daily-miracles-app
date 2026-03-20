@@ -1,8 +1,9 @@
 /**
  * 공명 & 나눔 Routes
  *
- * POST /api/resonance            — 공명 저장 + impact 트리거
- * GET  /api/resonance/:star_id   — 별 공명/나눔 현황 조회
+ * POST /api/resonance              — 공명 저장 + impact 트리거 + summary 갱신
+ * GET  /api/resonance/similar      — 공명 패턴 유사 별 조회 (공명 기반 연결)
+ * GET  /api/resonance/:star_id     — 별 공명/나눔 현황 조회
  */
 
 const express = require('express');
@@ -10,6 +11,7 @@ const router  = express.Router();
 const db      = require('../database/db');
 
 const VALID_RESONANCE = ['relief', 'belief', 'clarity', 'courage'];
+const RESONANCE_TYPES = VALID_RESONANCE;
 
 const RESONANCE_LABEL = {
   relief:  '숨이 놓였어요',
@@ -24,7 +26,21 @@ const IMPACT_LABEL = {
   miracle:   '기적나눔',
 };
 
-// ── impact 트리거 로직 ────────────────────────────────────────
+// ── 유사도 계산 (분포 교집합 / intersection similarity) ──────────
+// 두 프로파일의 공명 타입 비율 분포가 얼마나 겹치는지 측정 (0~1)
+function calcSimilarity(profileA, profileB) {
+  const totalA = RESONANCE_TYPES.reduce((s, t) => s + (profileA[t] || 0), 0);
+  const totalB = RESONANCE_TYPES.reduce((s, t) => s + (profileB[t] || 0), 0);
+  if (!totalA || !totalB) return 0;
+  return RESONANCE_TYPES.reduce((sum, t) => {
+    return sum + Math.min(
+      (profileA[t] || 0) / totalA,
+      (profileB[t] || 0) / totalB,
+    );
+  }, 0);
+}
+
+// ── impact 트리거 로직 ────────────────────────────────────────────
 async function checkImpact(star_id) {
   const result = await db.query(
     `SELECT resonance_type, COUNT(*)::int AS cnt
@@ -35,9 +51,7 @@ async function checkImpact(star_id) {
   );
 
   const counts = {};
-  for (const row of result.rows) {
-    counts[row.resonance_type] = row.cnt;
-  }
+  for (const row of result.rows) counts[row.resonance_type] = row.cnt;
 
   const relief  = counts.relief  ?? 0;
   const belief  = counts.belief  ?? 0;
@@ -45,10 +59,9 @@ async function checkImpact(star_id) {
   const courage = counts.courage ?? 0;
 
   const triggers = [];
-
-  if (relief >= 3) triggers.push('gratitude');
-  if (clarity + belief >= 3) triggers.push('wisdom');
-  if (courage >= 3) triggers.push('miracle');
+  if (relief >= 3)              triggers.push('gratitude');
+  if (clarity + belief >= 3)    triggers.push('wisdom');
+  if (courage >= 3)             triggers.push('miracle');
 
   for (const impact_type of triggers) {
     await db.query(
@@ -63,13 +76,28 @@ async function checkImpact(star_id) {
   return triggers;
 }
 
-// ─────────────────────────────────────────────
+// ── star_resonance_summary upsert ────────────────────────────────
+async function updateSummary(star_id, resonance_type) {
+  const col = `${resonance_type}_count`;
+  await db.query(
+    `INSERT INTO star_resonance_summary
+       (star_id, ${col}, total_count, updated_at)
+     VALUES ($1, 1, 1, CURRENT_TIMESTAMP)
+     ON CONFLICT (star_id) DO UPDATE
+       SET ${col}      = star_resonance_summary.${col} + 1,
+           total_count = star_resonance_summary.total_count + 1,
+           updated_at  = CURRENT_TIMESTAMP`,
+    [star_id]
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────
 // POST /api/resonance — 공명 저장
-// Body: { star_id: "uuid", resonance_type: "relief" }
-// ─────────────────────────────────────────────
+// Body: { star_id, resonance_type, anonymous_token? }
+// ─────────────────────────────────────────────────────────────────
 router.post('/', async (req, res) => {
   try {
-    const { star_id, resonance_type } = req.body;
+    const { star_id, resonance_type, anonymous_token } = req.body;
 
     if (!star_id) {
       return res.status(400).json({ error: 'star_id 필수' });
@@ -80,17 +108,15 @@ router.post('/', async (req, res) => {
 
     // 별 존재 확인
     const starCheck = await db.query(
-      'SELECT id FROM dt_stars WHERE id = $1',
-      [star_id]
+      'SELECT id FROM dt_stars WHERE id = $1', [star_id]
     );
     if (starCheck.rowCount === 0) {
       return res.status(404).json({ error: '별을 찾을 수 없습니다' });
     }
 
-    // user_id: 세션/토큰 없으면 anonymous_token 사용
-    const user_id = req.body.anonymous_token ?? null;
+    const user_id = anonymous_token ?? null;
 
-    // 중복 공명 방지 (같은 user_id + star_id + resonance_type)
+    // 중복 공명 방지
     if (user_id) {
       const dup = await db.query(
         `SELECT 1 FROM resonance
@@ -109,7 +135,8 @@ router.post('/', async (req, res) => {
       [star_id, user_id, resonance_type]
     );
 
-    // impact 트리거
+    // summary 갱신 후 impact 트리거
+    await updateSummary(star_id, resonance_type);
     const newImpacts = await checkImpact(star_id);
 
     res.json({
@@ -125,9 +152,108 @@ router.post('/', async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
+// GET /api/resonance/similar?star_id=xxx&token=yyy
+// 공명 패턴이 유사한 별 2~3개 반환 (공명 기반 연결)
+// ─────────────────────────────────────────────────────────────────
+router.get('/similar', async (req, res) => {
+  try {
+    const { star_id, token } = req.query;
+
+    // 기준 프로파일: 유저 공명 이력 우선, 없으면 현재 별 공명 프로파일
+    let baseProfile = null;
+
+    if (token) {
+      const userRes = await db.query(
+        `SELECT resonance_type, COUNT(*)::int AS cnt
+           FROM resonance
+          WHERE user_id = $1
+          GROUP BY resonance_type`,
+        [token]
+      );
+      if (userRes.rowCount > 0) {
+        baseProfile = {};
+        for (const row of userRes.rows) baseProfile[row.resonance_type] = row.cnt;
+      }
+    }
+
+    // 유저 이력 없으면 현재 별 프로파일을 기준으로 사용
+    if (!baseProfile && star_id) {
+      const starRes = await db.query(
+        `SELECT relief_count, belief_count, clarity_count, courage_count
+           FROM star_resonance_summary
+          WHERE star_id = $1`,
+        [star_id]
+      );
+      if (starRes.rowCount > 0) {
+        const r = starRes.rows[0];
+        baseProfile = {
+          relief:  r.relief_count,
+          belief:  r.belief_count,
+          clarity: r.clarity_count,
+          courage: r.courage_count,
+        };
+      }
+    }
+
+    if (!baseProfile) {
+      return res.json({ similar_stars: [] });
+    }
+
+    // 모든 star_resonance_summary 조회 (공명이 1개 이상인 별만)
+    const summaryRes = await db.query(
+      `SELECT srs.star_id, srs.relief_count, srs.belief_count,
+              srs.clarity_count, srs.courage_count, srs.total_count,
+              s.star_name, s.star_stage, s.created_at,
+              g.code AS galaxy_code, g.name_ko AS galaxy_name_ko
+         FROM star_resonance_summary srs
+         JOIN dt_stars s ON s.id = srs.star_id
+         JOIN dt_galaxies g ON g.id = s.galaxy_id
+        WHERE srs.total_count >= 1
+          AND ($1::text IS NULL OR srs.star_id <> $1)`,
+      [star_id ?? null]
+    );
+
+    if (summaryRes.rowCount === 0) {
+      return res.json({ similar_stars: [] });
+    }
+
+    // 유사도 계산 → 상위 3개 선택
+    const scored = summaryRes.rows.map(row => {
+      const starProfile = {
+        relief:  row.relief_count,
+        belief:  row.belief_count,
+        clarity: row.clarity_count,
+        courage: row.courage_count,
+      };
+      return {
+        star_id:       row.star_id,
+        star_name:     row.star_name,
+        star_stage:    row.star_stage,
+        created_at:    row.created_at,
+        galaxy_code:   row.galaxy_code,
+        galaxy_name_ko: row.galaxy_name_ko,
+        score: calcSimilarity(baseProfile, starProfile),
+      };
+    });
+
+    const similar = scored
+      .filter(s => s.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3)
+      .map(({ score: _, ...rest }) => rest); // score 필드 제거
+
+    res.json({ similar_stars: similar });
+
+  } catch (err) {
+    console.error('[Resonance] GET /similar error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────
 // GET /api/resonance/:star_id — 별 공명/나눔 현황
-// ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────
 router.get('/:star_id', async (req, res) => {
   try {
     const { star_id } = req.params;

@@ -79,6 +79,15 @@ export async function getResonance(starId) {
   return res.json();
 }
 
+export async function getSimilarStars({ starId, token }) {
+  const params = new URLSearchParams();
+  if (starId) params.set('star_id', starId);
+  if (token)  params.set('token', token);
+  const res = await fetch(`/api/resonance/similar?${params}`);
+  if (!res.ok) throw new Error('유사 별 조회 실패');
+  return res.json();
+}
+
 export async function postResonance({ starId, resonanceType, anonymousToken }) {
   return fetchWithRetry('/api/resonance', {
     method: 'POST',
