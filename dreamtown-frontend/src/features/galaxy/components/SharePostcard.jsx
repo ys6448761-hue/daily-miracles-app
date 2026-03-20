@@ -1,27 +1,33 @@
 /**
- * SharePostcard — 외부 공유용 초대 카드
+ * SharePostcard — 외부 공유용 초대 카드 (AIL-DT-004)
  *
- * 목적: "내 경험 회고" 가 아닌 "상대가 눌러보고 싶어지는 초대장"
- *
- * 핵심 원칙:
- * ✅ 별 이름이 메인 훅
- * ✅ 은하 / D+ 은은하게 보조
- * ✅ 하단 훅: "당신의 소원은 어떤 별이 될까요?"
- * ❌ 개인 감정 회고 문장 금지
- * ❌ blur 사용 금지 (html2canvas 캡처 대상)
- *
- * 비율: 4:5 (1080×1350)
+ * 비율: 9:16
+ * 배경: #0D1B2A
+ * ❌ 소원 원문 노출 없음 / blur 사용 금지 (html2canvas 캡처 대상)
  */
 
-const DIRECTION_THEME = {
-  north: { r: 140, g: 185, b: 255, lightPos: '50% 8%'  },
-  east:  { r: 245, g: 195, b:  85, lightPos: '88% 44%' },
-  west:  { r: 240, g: 140, b: 195, lightPos: '12% 44%' },
-  south: { r:  80, g: 210, b: 175, lightPos: '50% 88%' },
-};
-const NEUTRAL = { r: 185, g: 205, b: 255, lightPos: '50% 22%' };
+// 별 파티클 — 고정 좌표 (랜덤처럼 보이되 html2canvas에서 안정적)
+const PARTICLES = [
+  { top: '6%',  left: '14%', size: 2,   color: 'rgba(255,255,255,0.70)' },
+  { top: '11%', left: '82%', size: 1.5, color: 'rgba(255,215,106,0.80)' },
+  { top: '19%', left: '6%',  size: 1,   color: 'rgba(255,255,255,0.50)' },
+  { top: '24%', left: '91%', size: 2.5, color: 'rgba(255,255,255,0.60)' },
+  { top: '72%', left: '5%',  size: 2,   color: 'rgba(255,215,106,0.70)' },
+  { top: '78%', left: '88%', size: 1.5, color: 'rgba(255,255,255,0.55)' },
+  { top: '85%', left: '18%', size: 1,   color: 'rgba(255,255,255,0.45)' },
+  { top: '88%', left: '72%', size: 2,   color: 'rgba(255,215,106,0.65)' },
+  { top: '93%', left: '44%', size: 1.5, color: 'rgba(255,255,255,0.50)' },
+];
 
-// direction → 은하명 fallback (API galaxyName 없을 때 사용)
+// galaxy code → 한글 은하명
+const GALAXY_NAME = {
+  challenge:    '도전 은하',
+  growth:       '성장 은하',
+  healing:      '치유 은하',
+  relationship: '관계 은하',
+};
+
+// direction → galaxy code fallback
 const DIRECTION_GALAXY = {
   north: '도전 은하',
   east:  '성장 은하',
@@ -40,129 +46,116 @@ function calcDaysSinceBirth(createdAt) {
 export default function SharePostcard({
   starName      = '이름 없는 별',
   galaxyName    = null,
+  galaxyCode    = null,
   starCreatedAt = null,
   direction     = null,
 }) {
-  const { r, g, b, lightPos } = DIRECTION_THEME[direction] || NEUTRAL;
-  const galaxyLabel     = galaxyName ?? DIRECTION_GALAXY[direction] ?? '미지의 은하';
-  const daysSinceBirth  = calcDaysSinceBirth(starCreatedAt);
+  const galaxyLabel = galaxyName
+    ?? (galaxyCode && GALAXY_NAME[galaxyCode])
+    ?? DIRECTION_GALAXY[direction]
+    ?? '미지의 은하';
+  const daysSinceBirth = calcDaysSinceBirth(starCreatedAt);
 
   return (
     <div
       id="share-postcard"
-      className="relative w-full max-w-sm aspect-[4/5] rounded-[28px] overflow-hidden bg-[#070b14]"
-      style={{ fontFamily: "'Pretendard', 'Noto Sans KR', sans-serif" }}
+      className="relative w-full max-w-sm overflow-hidden"
+      style={{
+        fontFamily:      "'Pretendard', 'Noto Sans KR', sans-serif",
+        backgroundColor: '#0D1B2A',
+        aspectRatio:     '9 / 16',
+        borderRadius:    28,
+      }}
     >
-      {/* 배경 광원 — blur 없이 opacity로만 표현 */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `
-            radial-gradient(44% 38% at ${lightPos}, rgba(${r},${g},${b},0.22) 0%, rgba(${r},${g},${b},0) 70%),
-            radial-gradient(36% 30% at 82% 44%, rgba(${r},${g},${b},0.08) 0%, rgba(${r},${g},${b},0) 72%),
-            radial-gradient(36% 30% at 18% 44%, rgba(${r},${g},${b},0.08) 0%, rgba(${r},${g},${b},0) 72%),
-            radial-gradient(40% 34% at 50% 82%, rgba(${r},${g},${b},0.10) 0%, rgba(${r},${g},${b},0) 70%)
-          `,
-        }}
-      />
+      {/* 별 파티클 */}
+      {PARTICLES.map((p, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            top:             p.top,
+            left:            p.left,
+            width:           p.size,
+            height:          p.size,
+            backgroundColor: p.color,
+          }}
+        />
+      ))}
 
-      {/* 별 광원 — 중앙 고정 */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="relative flex items-center justify-center">
-          <div
-            className="absolute rounded-full"
-            style={{
-              width: 180,
-              height: 180,
-              background: `rgba(${r},${g},${b},0.10)`,
-            }}
-          />
-          <div
-            className="absolute rounded-full"
-            style={{
-              width: 100,
-              height: 100,
-              background: `rgba(${r},${g},${b},0.14)`,
-            }}
-          />
-          <div
-            className="w-3 h-3 rounded-full"
-            style={{ background: `rgba(${r},${g},${b},0.85)` }}
-          />
-        </div>
-      </div>
-
-      {/* 비네트 */}
+      {/* 중앙 glow — #FFD76A */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background:
-            'radial-gradient(circle at 50% 50%, rgba(8,10,18,0) 0%, rgba(5,7,13,0.20) 58%, rgba(3,4,8,0.50) 100%)',
+          background: 'radial-gradient(ellipse 55% 28% at 50% 50%, rgba(255,215,106,0.18) 0%, transparent 72%)',
         }}
       />
 
       {/* 브랜드 — 상단 */}
-      <div className="absolute top-[8%] inset-x-0 text-center">
-        <p
-          className="text-[11px] tracking-[0.22em] uppercase"
-          style={{ color: `rgba(${r},${g},${b},0.55)` }}
-        >
+      <div className="absolute top-[7%] inset-x-0 text-center">
+        <p style={{ fontSize: 10, letterSpacing: '0.22em', color: 'rgba(155,135,245,0.55)', textTransform: 'uppercase' }}>
           DreamTown
         </p>
       </div>
 
-      {/* 별 이름 — 메인 훅 */}
-      <div className="absolute inset-x-0 top-[22%] px-8 text-center">
-        <p
-          className="text-[26px] font-semibold leading-snug tracking-[-0.02em]"
-          style={{
-            color: 'rgba(255,255,255,0.95)',
-            textShadow: `0 0 24px rgba(${r},${g},${b},0.50), 0 1px 12px rgba(0,0,0,0.60)`,
-          }}
-        >
+      {/* 별 이름 */}
+      <div className="absolute inset-x-0 top-[20%] px-8 text-center">
+        <p style={{ fontSize: 24, fontWeight: 600, color: '#FFD76A', lineHeight: 1.35, letterSpacing: '-0.02em' }}>
           {starName}
         </p>
-        <p
-          className="mt-2 text-[15px]"
-          style={{ color: `rgba(${r},${g},${b},0.75)` }}
-        >
-          ✦
+      </div>
+
+      {/* 중앙 별 아이콘 */}
+      <div className="absolute inset-0 flex items-center justify-center" style={{ top: '-8%' }}>
+        <p style={{ fontSize: 20, color: 'rgba(255,215,106,0.70)' }}>✦</p>
+      </div>
+
+      {/* 은하 + 탄생일 */}
+      <div className="absolute inset-x-0 text-center" style={{ top: '56%' }}>
+        <p style={{ fontSize: 14, color: '#9B87F5', letterSpacing: '0.03em' }}>
+          {galaxyLabel} · 별 탄생 D+{daysSinceBirth}일째
         </p>
       </div>
 
-      {/* 은하 + D+ */}
-      <div className="absolute inset-x-0 top-[48%] text-center space-y-1">
-        <p
-          className="text-[13px] tracking-wide"
-          style={{ color: 'rgba(255,255,255,0.55)' }}
-        >
-          {galaxyLabel}
-        </p>
-        <p
-          className="text-[12px]"
-          style={{ color: 'rgba(255,255,255,0.35)' }}
-        >
-          탄생 D+{daysSinceBirth}
+      {/* 구분선 */}
+      <div
+        className="absolute"
+        style={{
+          top:    '63%',
+          left:   '20%',
+          width:  '60%',
+          height: '0.5px',
+          backgroundColor: 'rgba(155,135,245,0.25)',
+        }}
+      />
+
+      {/* 메인 카피 */}
+      <div className="absolute inset-x-0 text-center" style={{ top: '67%' }}>
+        <p style={{ fontSize: 12, color: '#C8C0E0' }}>
+          {starName}의 소원이 별이 됐어요
         </p>
       </div>
 
-      {/* 훅 카피 — 하단 */}
-      <div className="absolute inset-x-0 bottom-[14%] px-8 text-center space-y-2">
-        <p
-          className="text-[15px] leading-relaxed"
-          style={{
-            color: 'rgba(255,255,255,0.80)',
-            textShadow: '0 1px 8px rgba(0,0,0,0.50)',
-          }}
-        >
+      {/* 훅 카피 */}
+      <div className="absolute inset-x-0 text-center" style={{ top: '73%' }}>
+        <p style={{ fontSize: 10, color: '#8070A0' }}>
           당신의 소원은 어떤 별이 될까요?
         </p>
-        <p
-          className="text-[11px] tracking-wide"
-          style={{ color: 'rgba(255,255,255,0.35)' }}
+      </div>
+
+      {/* CTA pill */}
+      <div className="absolute inset-x-0 flex justify-center" style={{ top: '82%' }}>
+        <div
+          style={{
+            padding:         '6px 18px',
+            borderRadius:    9999,
+            backgroundColor: 'rgba(155,135,245,0.12)',
+            border:          '1px solid rgba(155,135,245,0.25)',
+          }}
         >
-          나도 별을 만나보기
-        </p>
+          <p style={{ fontSize: 11, color: 'rgba(155,135,245,0.80)', letterSpacing: '0.04em' }}>
+            dreamtown 입장하기 →
+          </p>
+        </div>
       </div>
     </div>
   );

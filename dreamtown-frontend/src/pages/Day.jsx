@@ -52,7 +52,7 @@ export default function DayPage() {
   }, []);
 
   return (
-    <main className="relative w-full h-screen bg-black text-white overflow-hidden">
+    <main className="relative w-full h-screen text-white overflow-hidden" style={{ backgroundColor: '#0D1B2A' }}>
 
       {/* z-0 — 진입 잔광 */}
       <DayAfterglow galaxy={direction} />
