@@ -2178,6 +2178,11 @@ const dreamtownRoutes = require('./routes/dreamtownRoutes');
 app.use('/api/dt', dreamtownRoutes);
 console.log('✅ DreamTown 라우터 등록 완료 (/api/dt)');
 
+// ---------- Resonance & Impact Routes ----------
+const resonanceRoutes = require('./routes/resonanceRoutes');
+app.use('/api/resonance', resonanceRoutes);
+console.log('✅ 공명 & 나눔 라우터 등록 완료 (/api/resonance)');
+
 // ---------- DreamTown Frontend (Prototype) ----------
 const dtFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist');
 app.use('/dreamtown', express.static(dtFrontendPath, {

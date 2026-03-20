@@ -71,6 +71,26 @@ export async function getGalaxyStars(galaxyCode, { limit = 5, exclude = null } =
   return res.json();
 }
 
+// ── 공명 & 나눔 API ──────────────────────────────────────────
+
+export async function getResonance(starId) {
+  const res = await fetch(`/api/resonance/${starId}`);
+  if (!res.ok) throw new Error('공명 조회 실패');
+  return res.json();
+}
+
+export async function postResonance({ starId, resonanceType, anonymousToken }) {
+  return fetchWithRetry('/api/resonance', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      star_id:          starId,
+      resonance_type:   resonanceType,
+      anonymous_token:  anonymousToken,
+    }),
+  });
+}
+
 // Prototype용 임시 user ID (로컬 스토리지 기반)
 export function getOrCreateUserId() {
   const key = 'dt_user_id';

@@ -1,10 +1,23 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStar, getGalaxyStars } from '../api/dreamtown.js';
+import { getStar, getGalaxyStars, getResonance, postResonance } from '../api/dreamtown.js';
 import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
 import { sharePostcard } from '../utils/kakaoShare';
+
+const RESONANCE_OPTIONS = [
+  { type: 'relief',  label: '숨이 놓였어요' },
+  { type: 'belief',  label: '믿고 싶어졌어요' },
+  { type: 'clarity', label: '정리됐어요' },
+  { type: 'courage', label: '용기났어요' },
+];
+
+const IMPACT_LABEL = {
+  gratitude: '감사나눔',
+  wisdom:    '지혜나눔',
+  miracle:   '기적나눔',
+};
 
 const STAGE_DAYS = {
   day1:   'Day 1',
@@ -46,6 +59,13 @@ export default function MyStar() {
   const [galaxyStars, setGalaxyStars] = useState([]);
   const { setStarData } = useDreamtownStore();
 
+  // 공명 & 나눔 상태
+  const [resonanceData, setResonanceData] = useState(null); // { resonance, impacts }
+  const [resonanceOpen, setResonanceOpen] = useState(false);
+  const [resonanceSubmitted, setResonanceSubmitted] = useState(false);
+  const [resonanceResult, setResonanceResult] = useState(null); // { message, new_impacts }
+  const [resonancePosting, setResonancePosting] = useState(false);
+
   useEffect(() => {
     getStar(id)
       .then((data) => {
@@ -61,6 +81,10 @@ export default function MyStar() {
             .then(r => setGalaxyStars(r.stars ?? []))
             .catch(() => setGalaxyStars([]));
         }
+        // 공명/나눔 현황 조회
+        getResonance(data.star_id)
+          .then(r => setResonanceData(r))
+          .catch(() => {});
       })
       .catch(() => {
         setStar(DEMO_STAR);
@@ -72,6 +96,34 @@ export default function MyStar() {
       })
       .finally(() => setLoading(false));
   }, [id]);
+
+  async function handleResonance(resonanceType) {
+    if (resonancePosting || resonanceSubmitted) return;
+    setResonancePosting(true);
+    try {
+      // anonymous_token: localStorage에서 일관된 토큰 사용
+      let token = localStorage.getItem('dt_resonance_token');
+      if (!token) {
+        token = crypto.randomUUID();
+        localStorage.setItem('dt_resonance_token', token);
+      }
+      const result = await postResonance({
+        starId: star.star_id,
+        resonanceType,
+        anonymousToken: token,
+      });
+      setResonanceResult(result);
+      setResonanceSubmitted(true);
+      // 나눔 데이터 갱신
+      getResonance(star.star_id).then(r => setResonanceData(r)).catch(() => {});
+    } catch (err) {
+      // 409 중복 → 이미 공명한 것으로 처리
+      setResonanceResult({ message: err.message });
+      setResonanceSubmitted(true);
+    } finally {
+      setResonancePosting(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -170,6 +222,67 @@ export default function MyStar() {
           </button>
         </div>
       )}
+
+      {/* 공명 & 나눔 */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="mb-6"
+      >
+        {/* 나눔 표시 — impact 있을 때만 */}
+        {resonanceData?.impacts?.length > 0 && (
+          <div className="flex gap-2 flex-wrap mb-3">
+            {resonanceData.impacts.map(imp => (
+              <span
+                key={imp.type}
+                className="text-xs bg-dream-purple/15 border border-dream-purple/30 text-purple-300 px-3 py-1 rounded-full"
+              >
+                {imp.label}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* 공명 버튼 / 선택 UI / 결과 */}
+        {!resonanceOpen && !resonanceSubmitted && (
+          <button
+            onClick={() => setResonanceOpen(true)}
+            className="w-full border border-white/15 text-white/60 text-sm py-3 rounded-2xl hover:border-white/30 hover:text-white/80 transition-colors"
+          >
+            공명 남기기
+          </button>
+        )}
+
+        {resonanceOpen && !resonanceSubmitted && (
+          <div className="bg-white/3 border border-white/10 rounded-2xl p-4">
+            <p className="text-white/50 text-xs mb-3 text-center">이 별이 당신에게 어떻게 닿았나요?</p>
+            <div className="grid grid-cols-2 gap-2">
+              {RESONANCE_OPTIONS.map(opt => (
+                <button
+                  key={opt.type}
+                  onClick={() => handleResonance(opt.type)}
+                  disabled={resonancePosting}
+                  className="bg-white/5 hover:bg-dream-purple/20 border border-white/10 hover:border-dream-purple/40 text-white/70 hover:text-white text-sm py-3 rounded-xl transition-colors disabled:opacity-50"
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {resonanceSubmitted && resonanceResult && (
+          <div className="bg-dream-purple/10 border border-dream-purple/20 rounded-2xl p-4 text-center">
+            <p className="text-white/70 text-sm">{resonanceResult.message}</p>
+            {resonanceResult.new_impacts?.length > 0 && (
+              <p className="text-dream-purple text-xs mt-2">
+                ✨ {resonanceResult.new_impacts.map(i => i.label).join(' · ')} 생성됨
+              </p>
+            )}
+          </div>
+        )}
+      </motion.div>
 
       {/* CTA */}
       <div className="flex flex-col gap-3 mt-auto">
