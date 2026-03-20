@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getStar, getGalaxyStars } from '../api/dreamtown.js';
 import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
+import { sharePostcard } from '../utils/kakaoShare';
 
 const STAGE_DAYS = {
   day1:   'Day 1',
@@ -171,19 +172,31 @@ export default function MyStar() {
       )}
 
       {/* CTA */}
-      <div className="flex gap-3 mt-auto">
+      <div className="flex flex-col gap-3 mt-auto">
         <button
-          onClick={() => nav('/galaxy')}
-          className="flex-1 bg-dream-purple hover:bg-purple-500 text-white font-semibold py-4 rounded-2xl transition-colors"
+          onClick={() => sharePostcard({
+            starName:   star.star_name,
+            galaxyName: star.galaxy?.name_ko ?? '미지의 은하',
+            dayCount:   daysSinceBirth,
+          })}
+          className="w-full bg-dream-purple hover:bg-purple-500 text-white font-semibold py-4 rounded-2xl transition-colors"
         >
-          은하 탐험하기
+          카톡으로 보내기
         </button>
-        <button
-          onClick={() => nav('/wish')}
-          className="flex-1 bg-white/5 border border-white/10 text-white/70 font-semibold py-4 rounded-2xl hover:bg-white/10 transition-colors"
-        >
-          새 소원 만들기
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={() => nav('/galaxy')}
+            className="flex-1 bg-white/5 border border-white/10 text-white/70 font-semibold py-4 rounded-2xl hover:bg-white/10 transition-colors"
+          >
+            은하 탐험하기
+          </button>
+          <button
+            onClick={() => nav('/wish')}
+            className="flex-1 bg-white/5 border border-white/10 text-white/70 font-semibold py-4 rounded-2xl hover:bg-white/10 transition-colors"
+          >
+            새 소원 만들기
+          </button>
+        </div>
       </div>
     </div>
   );

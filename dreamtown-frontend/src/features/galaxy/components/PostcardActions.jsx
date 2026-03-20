@@ -1,13 +1,10 @@
 import html2canvas from 'html2canvas';
 import { getVariant, track } from '../../../utils/experiment';
-import { buildShareText } from '../constants/shareCopy';
 import { gaShareClick, gaSaveClick } from '../../../utils/gtag';
+import { sharePostcard } from '../../../utils/kakaoShare';
+import { useDreamtownStore } from '../../../store/dreamtownStore';
 
-const BASE_URL  = 'https://app.dailymiracles.kr';
-const EXP_ID    = 'share_copy_v1';
-const VARIANTS  = ['A', 'B', 'C'];
-
-// 공유용 카드 캡처 (share-postcard) — blur 없는 초대장 버전
+// 공유용 카드 캡처 (share-postcard) — 저장하기 전용
 async function captureShareCard() {
   const target = document.getElementById('share-postcard');
   if (!target) return null;
@@ -26,40 +23,23 @@ async function captureShareCard() {
   });
 }
 
-// 개인 카드 캡처 (dreamtown-postcard) — 화면 그대로 저장 (legacy, 미사용)
-async function capturePersonalCard(setCaptureMode) {
-  const target = document.getElementById('dreamtown-postcard');
-  if (!target) return null;
-
-  setCaptureMode(true);
-  await document.fonts.ready;
-  await new Promise((r) => setTimeout(r, 120));
-
-  const canvas = await html2canvas(target, {
-    backgroundColor: null,
-    scale: 3,
-    useCORS: true,
-    allowTaint: false,
-    logging: false,
-    imageTimeout: 5000,
-    removeContainer: true,
-  });
-
-  setCaptureMode(false);
-  return canvas;
+function calcDaysSinceBirth(createdAt) {
+  if (!createdAt) return 1;
+  return Math.max(
+    1,
+    Math.floor((Date.now() - new Date(createdAt).getTime()) / 86400000) + 1,
+  );
 }
 
-export default function PostcardActions({ direction, onBack, setCaptureMode, message }) {
-  // 공유 링크 — /intro?g={direction} 리텐션 루프
-  const shareUrl = direction
-    ? `${BASE_URL}/intro?g=${direction}`
-    : `${BASE_URL}/intro`;
+const EXP_ID   = 'share_copy_v1';
+const VARIANTS = ['A', 'B', 'C'];
 
-  // 카피 A/B/C 실험
-  const variant   = getVariant(EXP_ID, VARIANTS);
-  const shareText = buildShareText({ variant, direction, shareUrl });
+export default function PostcardActions({ direction, onBack, setCaptureMode }) {
+  const variant = getVariant(EXP_ID, VARIANTS);
 
-  // 저장하기 — 공유용 카드(share-postcard) PNG 다운로드
+  const { starName, starGalaxyName, starCreatedAt } = useDreamtownStore();
+
+  // 저장하기 — share-postcard PNG 다운로드
   const handleSave = async () => {
     const canvas = await captureShareCard();
     if (!canvas) return;
@@ -73,28 +53,16 @@ export default function PostcardActions({ direction, onBack, setCaptureMode, mes
     link.click();
   };
 
-  // 카톡으로 보내기 — 공유용 카드(share-postcard) 이미지 공유
-  const handleShare = async () => {
-    const canvas = await captureShareCard();
-    if (!canvas) return;
-
+  // 카톡으로 보내기 — Kakao SDK 공유
+  const handleShare = () => {
     track('share_click', { experiment: EXP_ID, variant, direction });
-    gaShareClick({ direction, method: 'native_share' });
+    gaShareClick({ direction, method: 'kakao_sdk' });
 
-    const blob = await new Promise((r) => canvas.toBlob(r, 'image/png'));
-    const file = new File([blob], 'dreamtown-postcard.png', { type: 'image/png' });
-
-    try {
-      if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], text: shareText });
-      } else if (navigator.share) {
-        await navigator.share({ text: shareText });
-      } else {
-        await navigator.clipboard.writeText(shareText);
-      }
-    } catch {
-      // 사용자 취소 등 무시
-    }
+    sharePostcard({
+      starName:   starName   ?? '이름 없는 별',
+      galaxyName: starGalaxyName ?? '미지의 은하',
+      dayCount:   calcDaysSinceBirth(starCreatedAt),
+    });
   };
 
   return (
