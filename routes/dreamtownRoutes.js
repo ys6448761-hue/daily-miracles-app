@@ -320,6 +320,42 @@ router.get('/galaxies/:code', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
+// GET /api/dt/galaxies/:code/stars — 같은 은하 별 목록
+// ─────────────────────────────────────────────
+router.get('/galaxies/:code/stars', async (req, res) => {
+  try {
+    const { code } = req.params;
+    const limit   = Math.min(parseInt(req.query.limit  ?? '5', 10), 20);
+    const exclude = req.query.exclude ?? null;
+
+    const galaxyResult = await db.query(
+      'SELECT id FROM dt_galaxies WHERE code = $1 AND is_active = true',
+      [code]
+    );
+    if (galaxyResult.rowCount === 0) {
+      return res.status(404).json({ error: '은하를 찾을 수 없습니다' });
+    }
+    const galaxyId = galaxyResult.rows[0].id;
+
+    const starsResult = await db.query(
+      `SELECT id AS star_id, star_name, created_at
+         FROM dt_stars
+        WHERE galaxy_id = $1
+          AND ($2::uuid IS NULL OR id <> $2::uuid)
+        ORDER BY created_at DESC
+        LIMIT $3`,
+      [galaxyId, exclude, limit]
+    );
+
+    res.json({ stars: starsResult.rows });
+
+  } catch (err) {
+    console.error('[DT] GET /galaxies/:code/stars error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
 // GET /api/dt/health — 헬스체크
 // ─────────────────────────────────────────────
 router.get('/health', (_req, res) => {

@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStar } from '../api/dreamtown.js';
+import { getStar, getGalaxyStars } from '../api/dreamtown.js';
 import { useDreamtownStore } from '../store/dreamtownStore';
+import AURUM_MESSAGES from '../constants/aurumMessages';
 
 const STAGE_DAYS = {
-  day1: 'Day 1',
-  day7: 'Day 7',
-  day30: 'Day 30',
+  day1:   'Day 1',
+  day7:   'Day 7',
+  day30:  'Day 30',
   day100: 'Day 100',
   day365: 'Day 365',
 };
@@ -23,11 +24,26 @@ const DEMO_STAR = {
   created_at: '2026-03-11T00:00:00Z',
 };
 
+function calcDaysSinceBirth(createdAt) {
+  if (!createdAt) return 1;
+  return Math.max(
+    1,
+    Math.floor((Date.now() - new Date(createdAt).getTime()) / 86400000) + 1,
+  );
+}
+
+function getAurumMessage(daysSinceBirth) {
+  const clamped = Math.min(daysSinceBirth, AURUM_MESSAGES.length);
+  return AURUM_MESSAGES.find(m => m.day === clamped)
+    ?? AURUM_MESSAGES[AURUM_MESSAGES.length - 1];
+}
+
 export default function MyStar() {
   const { id } = useParams();
   const nav = useNavigate();
   const [star, setStar] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [galaxyStars, setGalaxyStars] = useState([]);
   const { setStarData } = useDreamtownStore();
 
   useEffect(() => {
@@ -39,6 +55,12 @@ export default function MyStar() {
           starGalaxyName: data.galaxy?.name_ko ?? null,
           starCreatedAt:  data.created_at,
         });
+        // 같은 은하 별 목록 (자신 제외, 최대 5개)
+        if (data.galaxy?.code) {
+          getGalaxyStars(data.galaxy.code, { limit: 5, exclude: data.star_id })
+            .then(r => setGalaxyStars(r.stars ?? []))
+            .catch(() => setGalaxyStars([]));
+        }
       })
       .catch(() => {
         setStar(DEMO_STAR);
@@ -58,6 +80,9 @@ export default function MyStar() {
       </div>
     );
   }
+
+  const daysSinceBirth = calcDaysSinceBirth(star.created_at);
+  const aurumMsg = getAurumMessage(daysSinceBirth);
 
   return (
     <div className="min-h-screen flex flex-col px-6 py-10">
@@ -82,6 +107,11 @@ export default function MyStar() {
           ⭐
         </motion.div>
 
+        {/* 아우룸 메시지 — 별 이름 바로 위 */}
+        <p style={{ fontSize: 12, color: '#9B87F5', fontStyle: 'italic', marginBottom: 8 }}>
+          <span style={{ fontSize: 16 }}>🐢</span> {aurumMsg.text}
+        </p>
+
         <h1 className="text-2xl font-bold text-star-gold glow-gold mb-2">
           {star.star_name}
         </h1>
@@ -103,21 +133,48 @@ export default function MyStar() {
           <div className="bg-white/5 rounded-xl p-3 col-span-2">
             <p className="text-white/40 text-xs mb-1">탄생일</p>
             <p className="text-white text-sm">
-              {new Date(star.created_at).toLocaleDateString('ko-KR')}
+              {new Date(star.created_at).toLocaleDateString('ko-KR')} (D+{daysSinceBirth})
             </p>
           </div>
         </div>
       </motion.div>
 
-      {/* Aurum 메시지 */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="text-center text-white/40 text-xs mb-8"
-      >
-        🐢 "별은 천천히 자랍니다."
-      </motion.p>
+      {/* 같은 은하 별들 — 2개 이상일 때만 표시 */}
+      {galaxyStars.length >= 2 && (
+        <div className="mb-6">
+          <p className="text-white/40 text-xs mb-3">같은 은하 별들</p>
+
+          {/* 가로 스크롤 카드 */}
+          <div
+            className="flex gap-3 overflow-x-auto pb-2"
+            style={{ scrollbarWidth: 'none' }}
+          >
+            {galaxyStars.map((s) => {
+              const d = calcDaysSinceBirth(s.created_at);
+              return (
+                <div
+                  key={s.star_id}
+                  className="flex-shrink-0 bg-white/5 border border-white/8 rounded-2xl px-4 py-3 text-center"
+                  style={{ minWidth: 120 }}
+                >
+                  <p className="text-white/80 text-xs font-medium leading-tight mb-1">
+                    {s.star_name}
+                  </p>
+                  <p className="text-white/35 text-[11px]">D+{d}</p>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* 은하 전체 보기 */}
+          <button
+            onClick={() => nav(`/galaxy?highlight=${star.galaxy.code}`)}
+            className="mt-3 text-white/35 text-xs hover:text-white/55 transition"
+          >
+            은하 전체 보기 →
+          </button>
+        </div>
+      )}
 
       {/* CTA */}
       <div className="flex gap-3 mt-auto">

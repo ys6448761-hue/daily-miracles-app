@@ -57,6 +57,14 @@ export async function getGalaxy(code) {
   return res.json();
 }
 
+export async function getGalaxyStars(galaxyCode, { limit = 5, exclude = null } = {}) {
+  const params = new URLSearchParams({ limit });
+  if (exclude) params.set('exclude', exclude);
+  const res = await fetch(`${BASE}/galaxies/${galaxyCode}/stars?${params}`);
+  if (!res.ok) throw new Error('은하 별 목록 조회 실패');
+  return res.json();
+}
+
 // Prototype용 임시 user ID (로컬 스토리지 기반)
 export function getOrCreateUserId() {
   const key = 'dt_user_id';
