@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { track, getVariant } from "../utils/experiment";
+import { gaIntroView, gaIntroCTAClick } from "../utils/gtag";
 
 const EXP_ID        = 'intro_cta_v1';
 const SCREEN_EXP_ID = 'intro_screen_v1';  // A: 전체 5단계, B: 마지막 1단계
@@ -59,6 +60,7 @@ export default function Intro() {
       from_share: !!g,
       galaxy: g || null,
     });
+    gaIntroView({ screenVariant });
   }, []);
 
   // 타이머 정리
@@ -77,6 +79,7 @@ export default function Intro() {
         from_share: !!g,
         galaxy: g || null,
       });
+      gaIntroCTAClick({ screenVariant, ctaText });
       // 별 zoom 트랜지션 시작 → 1200ms 후 Galaxy 이동
       setTransitioning(true);
       timerRef.current = setTimeout(() => navigate('/galaxy'), 1200);

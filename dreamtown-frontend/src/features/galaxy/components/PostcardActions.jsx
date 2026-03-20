@@ -1,6 +1,7 @@
 import html2canvas from 'html2canvas';
 import { getVariant, track } from '../../../utils/experiment';
 import { buildShareText } from '../constants/shareCopy';
+import { gaShareClick, gaSaveClick } from '../../../utils/gtag';
 
 const BASE_URL  = 'https://app.dailymiracles.kr';
 const EXP_ID    = 'share_copy_v1';
@@ -47,6 +48,7 @@ export default function PostcardActions({ direction, onBack, setCaptureMode, mes
     if (!canvas) return;
 
     track('save_click', { direction });
+    gaSaveClick({ direction });
 
     const link = document.createElement('a');
     link.download = `dreamtown-${Date.now()}.png`;
@@ -59,11 +61,8 @@ export default function PostcardActions({ direction, onBack, setCaptureMode, mes
     const canvas = await captureCard(setCaptureMode);
     if (!canvas) return;
 
-    track('share_click', {
-      experiment: EXP_ID,
-      variant,
-      direction,
-    });
+    track('share_click', { experiment: EXP_ID, variant, direction });
+    gaShareClick({ direction, method: 'native_share' });
 
     const blob = await new Promise((r) => canvas.toBlob(r, 'image/png'));
     const file = new File([blob], 'dreamtown-postcard.png', { type: 'image/png' });

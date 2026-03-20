@@ -7,7 +7,7 @@ export default function DayLogScreen({ direction, onComplete }) {
     selectFeeling,
     selectHelp,
     selectGrowth,
-  } = useDayLogFlow(onComplete);
+  } = useDayLogFlow(onComplete, direction);
 
   const options = LOG_OPTIONS[direction];
 

@@ -6,7 +6,18 @@
     <title>DreamTown</title>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
     <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet" />
-    <script type="module" crossorigin src="/dreamtown/assets/index-B_2Y_Bfv.js"></script>
+
+    <!-- Google Analytics 4 — Measurement ID: Render env VITE_GA4_ID -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=%VITE_GA4_ID%"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '%VITE_GA4_ID%', {
+        send_page_view: false,  // SPA — 페이지뷰는 수동 이벤트로 관리
+      });
+    </script>
+    <script type="module" crossorigin src="/dreamtown/assets/index-BMZ9oN1h.js"></script>
     <link rel="stylesheet" crossorigin href="/dreamtown/assets/index-DR-qvU9g.css">
   </head>
   <body>

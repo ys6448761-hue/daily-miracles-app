@@ -4,6 +4,7 @@ import GalaxySelectionScreen from '../features/galaxy/components/GalaxySelection
 import { POST_SELECTION } from '../features/galaxy/constants/galaxyCopy';
 import { track } from '../utils/experiment';
 import { useDreamtownStore } from '../store/dreamtownStore';
+import { gaGalaxyView, gaGalaxySelect } from '../utils/gtag';
 
 function getRandom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -15,6 +16,7 @@ export default function GalaxyPage() {
 
   useEffect(() => {
     track('galaxy_enter');
+    gaGalaxyView();
     resetFlow(); // 새 사이클 시작 — 이전 선택 초기화
   }, []);
 
@@ -22,6 +24,7 @@ export default function GalaxyPage() {
     <GalaxySelectionScreen
       onComplete={(direction) => {
         track('star_select', { direction });
+        gaGalaxySelect({ direction });
 
         const message = getRandom(POST_SELECTION[direction]);
 

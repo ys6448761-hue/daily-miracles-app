@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { track } from '../utils/experiment';
+import { gaPostcardView } from '../utils/gtag';
 import PostcardView from '../features/galaxy/components/PostcardView';
 import PostcardActions from '../features/galaxy/components/PostcardActions';
 import { useDreamtownStore } from '../store/dreamtownStore';
@@ -29,6 +30,7 @@ export default function PostcardPage() {
 
   useEffect(() => {
     track('postcard_complete', { direction });
+    gaPostcardView({ direction });
   }, []);
 
   return (

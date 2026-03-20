@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useDreamtownStore } from '../../../store/dreamtownStore';
+import { gaDayFeelingSelect, gaDayChangeSelect } from '../../../utils/gtag';
 
-export function useDayLogFlow(onComplete) {
+export function useDayLogFlow(onComplete, direction = null) {
   const [step, setStep] = useState('feeling');
   const [feeling, setFeelingLocal] = useState(null);
   const [helpTag, setHelpTagLocal] = useState(null);
@@ -12,6 +13,7 @@ export function useDayLogFlow(onComplete) {
   const selectFeeling = (value) => {
     setFeelingLocal(value);
     setFeeling(value);  // store SSOT
+    gaDayFeelingSelect({ feeling: value, direction });
     setStep('help');
   };
 
@@ -24,6 +26,7 @@ export function useDayLogFlow(onComplete) {
   const selectGrowth = (value) => {
     setGrowthLineLocal(value);
     setGrowthLine(value);  // store SSOT
+    gaDayChangeSelect({ change: value, direction });
 
     setStep('complete');
 
