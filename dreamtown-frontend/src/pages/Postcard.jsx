@@ -66,10 +66,10 @@ export default function PostcardPage() {
     >
       {/* 화면용 개인 카드 */}
       <PostcardView
+        starName={starName}
+        galaxyName={starGalaxyName}
+        starCreatedAt={starCreatedAt}
         direction={direction}
-        message={message}
-        growthLine={growthLine}
-        captureMode={captureMode}
       />
 
       <PostcardActions

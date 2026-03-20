@@ -1,167 +1,159 @@
 /**
- * PostcardView — 화면용 / 캡처용 분기 (DEC-2026-0319-005)
+ * PostcardView — 화면 표시용 개인 카드
  *
- * captureMode = false  → blur 있음, 감성 최적화
- * captureMode = true   → blur 제거 + opacity 보정, 렌더 안정화
- *
- * 비율: 4:5 (1080×1350 — 카톡/인스타/앨범 저장 최적)
- * 안전 영역: 상하 8~10%, 좌우 7~8% 기준
- *
- * 금지:
- * ❌ 캡처용 UI 따로 만들기
- * ❌ 텍스트 위치 변경
- * 👉 "같아 보이지만 내부만 다르게"
+ * SharePostcard.jsx와 동일한 디자인 스펙 (AIL-DT-004)
+ * 비율: 4:5 (화면 + 하단 버튼 공간 확보)
+ * id="dreamtown-postcard" 유지 (legacy capturePersonalCard 대상)
  */
 
-const DIRECTION_THEME = {
-  north: { r: 140, g: 185, b: 255, lightPos: '50% 8%'  },
-  east:  { r: 245, g: 195, b:  85, lightPos: '88% 44%' },
-  west:  { r: 240, g: 140, b: 195, lightPos: '12% 44%' },
-  south: { r:  80, g: 210, b: 175, lightPos: '50% 88%' },
+const PARTICLES = [
+  { top: '6%',  left: '14%', size: 2,   color: 'rgba(255,255,255,0.70)' },
+  { top: '11%', left: '82%', size: 1.5, color: 'rgba(255,215,106,0.80)' },
+  { top: '19%', left: '6%',  size: 1,   color: 'rgba(255,255,255,0.50)' },
+  { top: '24%', left: '91%', size: 2.5, color: 'rgba(255,255,255,0.60)' },
+  { top: '72%', left: '5%',  size: 2,   color: 'rgba(255,215,106,0.70)' },
+  { top: '78%', left: '88%', size: 1.5, color: 'rgba(255,255,255,0.55)' },
+  { top: '85%', left: '18%', size: 1,   color: 'rgba(255,255,255,0.45)' },
+  { top: '88%', left: '72%', size: 2,   color: 'rgba(255,215,106,0.65)' },
+  { top: '93%', left: '44%', size: 1.5, color: 'rgba(255,255,255,0.50)' },
+];
+
+const GALAXY_NAME = {
+  challenge:    '도전 은하',
+  growth:       '성장 은하',
+  healing:      '치유 은하',
+  relationship: '관계 은하',
 };
 
-const NEUTRAL = { r: 185, g: 205, b: 255, lightPos: '50% 22%' };
+const DIRECTION_GALAXY = {
+  north: '도전 은하',
+  east:  '성장 은하',
+  west:  '관계 은하',
+  south: '치유 은하',
+};
 
-export default function PostcardView({ direction, message, growthLine, captureMode = false }) {
-  const { r, g, b, lightPos } = DIRECTION_THEME[direction] || NEUTRAL;
+function calcDaysSinceBirth(createdAt) {
+  if (!createdAt) return 1;
+  return Math.max(
+    1,
+    Math.floor((Date.now() - new Date(createdAt).getTime()) / 86400000) + 1,
+  );
+}
+
+export default function PostcardView({
+  starName      = '이름 없는 별',
+  galaxyName    = null,
+  galaxyCode    = null,
+  starCreatedAt = null,
+  direction     = null,
+}) {
+  const galaxyLabel = galaxyName
+    ?? (galaxyCode && GALAXY_NAME[galaxyCode])
+    ?? DIRECTION_GALAXY[direction]
+    ?? '미지의 은하';
+  const daysSinceBirth = calcDaysSinceBirth(starCreatedAt);
 
   return (
     <div
       id="dreamtown-postcard"
-      data-capture={captureMode ? 'true' : 'false'}
-      className="relative w-full max-w-sm aspect-[4/5] rounded-[28px] overflow-hidden bg-[#070b14] shadow-2xl"
+      className="relative w-full max-w-sm overflow-hidden"
+      style={{
+        fontFamily:      "'Pretendard', 'Noto Sans KR', sans-serif",
+        backgroundColor: '#0D1B2A',
+        aspectRatio:     '4 / 5',
+        borderRadius:    28,
+      }}
     >
-      {/* watercolor background — 0.18로 썸네일 차이 강화 */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `
-            radial-gradient(44% 38% at ${lightPos}, rgba(${r},${g},${b},0.18) 0%, rgba(${r},${g},${b},0) 70%),
-            radial-gradient(36% 30% at 82% 44%, rgba(${r},${g},${b},0.07) 0%, rgba(${r},${g},${b},0) 72%),
-            radial-gradient(36% 30% at 18% 44%, rgba(${r},${g},${b},0.07) 0%, rgba(${r},${g},${b},0) 72%),
-            radial-gradient(40% 34% at 50% 82%, rgba(${r},${g},${b},0.08) 0%, rgba(${r},${g},${b},0) 70%)
-          `,
-          filter: captureMode ? 'none' : 'blur(44px)',
-          opacity: captureMode ? 0.85 : 1,
-        }}
-      />
-
-      {/* mist */}
-      <div
-        className="absolute inset-[-8%]"
-        style={{
-          background: `
-            radial-gradient(30% 24% at 30% 28%, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 70%),
-            radial-gradient(26% 22% at 68% 30%, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0) 74%),
-            radial-gradient(34% 26% at 52% 70%, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 74%)
-          `,
-          filter: captureMode ? 'none' : 'blur(64px)',
-          opacity: captureMode ? 0.7 : 0.9,
-        }}
-      />
-
-      {/* central star + 변화된 소원이 실루엣 빛 */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="relative flex items-center justify-center">
-          {/* 실루엣 — 방향 색이 스며든 잔광 */}
-          <div
-            className="absolute rounded-full"
-            style={{
-              width: 220,
-              height: 220,
-              background: captureMode
-                ? `rgba(${r},${g},${b},0.07)`
-                : `radial-gradient(circle, rgba(${r},${g},${b},0.14) 0%, rgba(${r},${g},${b},0.06) 40%, rgba(${r},${g},${b},0) 70%)`,
-              filter: captureMode ? 'none' : 'blur(36px)',
-              opacity: captureMode ? 0.12 : 1,
-            }}
-          />
-          {/* outer halo */}
-          <div
-            className="absolute w-44 h-44 rounded-full"
-            style={{
-              background: `rgba(${r},${g},${b},0.10)`,
-              filter: captureMode ? 'none' : 'blur(48px)',
-              opacity: captureMode ? 0.18 : 1,
-            }}
-          />
-          {/* inner glow */}
-          <div
-            className="absolute w-28 h-28 rounded-full"
-            style={{
-              background: 'rgba(255,255,255,0.10)',
-              filter: captureMode ? 'none' : 'blur(32px)',
-              opacity: captureMode ? 0.15 : 1,
-            }}
-          />
-          {/* core */}
-          <div className="w-4 h-4 rounded-full bg-white" />
-        </div>
-      </div>
-
-      {/* message backing gradient — 텍스트 가독성 받침 */}
-      <div
-        className="absolute inset-x-0 pointer-events-none"
-        style={{
-          top: '11%',
-          height: '28%',
-          background:
-            'linear-gradient(to bottom, rgba(4,6,12,0.18) 0%, rgba(4,6,12,0.08) 65%, transparent 100%)',
-        }}
-      />
-
-      {/* main message — 안전 영역 상단 18%, 최대 2줄 */}
-      <div className="absolute inset-x-0 top-[18%] px-8 text-center">
-        <p
-          className="text-[22px] leading-relaxed tracking-[-0.01em] text-white/90"
+      {/* 별 파티클 */}
+      {PARTICLES.map((p, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full"
           style={{
-            fontFamily: "'Pretendard', 'Noto Sans KR', sans-serif",
-            textShadow: '0 1px 10px rgba(0,0,0,0.55)',
+            top:             p.top,
+            left:            p.left,
+            width:           p.size,
+            height:          p.size,
+            backgroundColor: p.color,
           }}
-        >
-          {message}
-        </p>
-      </div>
+        />
+      ))}
 
-      {/* growth line — 안전 영역 내 % 기준 배치 */}
-      {growthLine ? (
-        <div className="absolute inset-x-0 bottom-[22%] px-8 text-center">
-          <p
-            className="text-sm text-white/70"
-            style={{
-              fontFamily: "'Pretendard', 'Noto Sans KR', sans-serif",
-              textShadow: '0 1px 6px rgba(0,0,0,0.4)',
-            }}
-          >
-            {growthLine}
-          </p>
-        </div>
-      ) : null}
-
-      {/* brand — 하단 안전 영역 10% 확보 */}
-      <div className="absolute inset-x-0 bottom-[10%] text-center">
-        <p
-          className="text-xs tracking-[0.18em] uppercase opacity-45"
-          style={{ fontFamily: "'Pretendard', sans-serif" }}
-        >
-          DreamTown
-        </p>
-        <p
-          className="text-xs opacity-45 mt-1"
-          style={{ fontFamily: "'Pretendard', 'Noto Sans KR', sans-serif" }}
-        >
-          하루하루의 기적
-        </p>
-      </div>
-
-      {/* subtle vignette */}
+      {/* 중앙 glow — #FFD76A */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background:
-            'radial-gradient(circle at 50% 50%, rgba(8,10,18,0) 0%, rgba(5,7,13,0.18) 58%, rgba(3,4,8,0.42) 100%)',
+          background: 'radial-gradient(ellipse 55% 28% at 50% 50%, rgba(255,215,106,0.18) 0%, transparent 72%)',
         }}
       />
+
+      {/* 브랜드 — 상단 */}
+      <div className="absolute top-[7%] inset-x-0 text-center">
+        <p style={{ fontSize: 10, letterSpacing: '0.22em', color: 'rgba(155,135,245,0.55)', textTransform: 'uppercase' }}>
+          DreamTown
+        </p>
+      </div>
+
+      {/* 별 이름 */}
+      <div className="absolute inset-x-0 top-[20%] px-8 text-center">
+        <p style={{ fontSize: 24, fontWeight: 600, color: '#FFD76A', lineHeight: 1.35, letterSpacing: '-0.02em' }}>
+          {starName}
+        </p>
+      </div>
+
+      {/* 중앙 별 아이콘 */}
+      <div className="absolute inset-0 flex items-center justify-center" style={{ top: '-8%' }}>
+        <p style={{ fontSize: 20, color: 'rgba(255,215,106,0.70)' }}>✦</p>
+      </div>
+
+      {/* 은하 + 탄생일 */}
+      <div className="absolute inset-x-0 text-center" style={{ top: '56%' }}>
+        <p style={{ fontSize: 14, color: '#9B87F5', letterSpacing: '0.03em' }}>
+          {galaxyLabel} · 별 탄생 D+{daysSinceBirth}일째
+        </p>
+      </div>
+
+      {/* 구분선 */}
+      <div
+        className="absolute"
+        style={{
+          top:    '63%',
+          left:   '20%',
+          width:  '60%',
+          height: '0.5px',
+          backgroundColor: 'rgba(155,135,245,0.25)',
+        }}
+      />
+
+      {/* 메인 카피 */}
+      <div className="absolute inset-x-0 text-center" style={{ top: '67%' }}>
+        <p style={{ fontSize: 12, color: '#C8C0E0' }}>
+          {starName}의 소원이 별이 됐어요
+        </p>
+      </div>
+
+      {/* 훅 카피 */}
+      <div className="absolute inset-x-0 text-center" style={{ top: '73%' }}>
+        <p style={{ fontSize: 10, color: '#8070A0' }}>
+          당신의 소원은 어떤 별이 될까요?
+        </p>
+      </div>
+
+      {/* CTA pill */}
+      <div className="absolute inset-x-0 flex justify-center" style={{ top: '82%' }}>
+        <div
+          style={{
+            padding:         '6px 18px',
+            borderRadius:    9999,
+            backgroundColor: 'rgba(155,135,245,0.12)',
+            border:          '1px solid rgba(155,135,245,0.25)',
+          }}
+        >
+          <p style={{ fontSize: 11, color: 'rgba(155,135,245,0.80)', letterSpacing: '0.04em' }}>
+            dreamtown 입장하기 →
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
