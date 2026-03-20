@@ -12,13 +12,19 @@ async function captureCard(setCaptureMode) {
   if (!target) return null;
 
   setCaptureMode(true);
-  await new Promise((r) => setTimeout(r, 50));
+
+  // React 리렌더 + 폰트 완전 로드 대기
+  await document.fonts.ready;
+  await new Promise((r) => setTimeout(r, 120));
 
   const canvas = await html2canvas(target, {
     backgroundColor: null,
     scale: 3,
     useCORS: true,
+    allowTaint: false,
     logging: false,
+    imageTimeout: 5000,
+    removeContainer: true,
   });
 
   setCaptureMode(false);

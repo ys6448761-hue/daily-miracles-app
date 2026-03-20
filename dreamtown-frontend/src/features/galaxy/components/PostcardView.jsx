@@ -114,7 +114,10 @@ export default function PostcardView({ direction, message, growthLine, captureMo
       <div className="absolute inset-x-0 top-[18%] px-8 text-center">
         <p
           className="text-[22px] leading-relaxed tracking-[-0.01em] text-white/90"
-          style={{ textShadow: '0 1px 10px rgba(0,0,0,0.55)' }}
+          style={{
+            fontFamily: "'Pretendard', 'Noto Sans KR', sans-serif",
+            textShadow: '0 1px 10px rgba(0,0,0,0.55)',
+          }}
         >
           {message}
         </p>
@@ -125,7 +128,10 @@ export default function PostcardView({ direction, message, growthLine, captureMo
         <div className="absolute inset-x-0 bottom-[22%] px-8 text-center">
           <p
             className="text-sm text-white/70"
-            style={{ textShadow: '0 1px 6px rgba(0,0,0,0.4)' }}
+            style={{
+              fontFamily: "'Pretendard', 'Noto Sans KR', sans-serif",
+              textShadow: '0 1px 6px rgba(0,0,0,0.4)',
+            }}
           >
             {growthLine}
           </p>
@@ -134,10 +140,16 @@ export default function PostcardView({ direction, message, growthLine, captureMo
 
       {/* brand — 하단 안전 영역 10% 확보 */}
       <div className="absolute inset-x-0 bottom-[10%] text-center">
-        <p className="text-xs tracking-[0.18em] uppercase opacity-45">
+        <p
+          className="text-xs tracking-[0.18em] uppercase opacity-45"
+          style={{ fontFamily: "'Pretendard', sans-serif" }}
+        >
           DreamTown
         </p>
-        <p className="text-xs opacity-45 mt-1">
+        <p
+          className="text-xs opacity-45 mt-1"
+          style={{ fontFamily: "'Pretendard', 'Noto Sans KR', sans-serif" }}
+        >
           하루하루의 기적
         </p>
       </div>
