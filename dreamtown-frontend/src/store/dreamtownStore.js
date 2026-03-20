@@ -27,12 +27,19 @@ export const useDreamtownStore = create((set) => ({
   helpTag:    null,  // 도움 태그
   growthLine: null,  // 성장 한 줄
 
+  // 별 정보 (MyStar 로드 시 저장 → SharePostcard에서 사용)
+  starName:       null,
+  starGalaxyName: null,
+  starCreatedAt:  null,
+
   // Setters
   setDirection:  (direction) => set({ direction }),
   setMessage:    (message)   => set({ message }),
   setFeeling:    (feeling)   => set({ feeling }),
   setHelpTag:    (helpTag)   => set({ helpTag }),
   setGrowthLine: (growthLine) => set({ growthLine }),
+  setStarData: ({ starName, starGalaxyName, starCreatedAt }) =>
+    set({ starName, starGalaxyName, starCreatedAt }),
 
   // 전체 흐름 초기화 (새 사이클 시작 시)
   resetFlow: () =>

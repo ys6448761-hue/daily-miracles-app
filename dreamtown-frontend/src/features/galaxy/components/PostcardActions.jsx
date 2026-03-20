@@ -7,14 +7,31 @@ const BASE_URL  = 'https://app.dailymiracles.kr';
 const EXP_ID    = 'share_copy_v1';
 const VARIANTS  = ['A', 'B', 'C'];
 
-// 카드 캡처 → canvas 반환 (저장 + 공유 공통 사용)
-async function captureCard(setCaptureMode) {
+// 공유용 카드 캡처 (share-postcard) — blur 없는 초대장 버전
+async function captureShareCard() {
+  const target = document.getElementById('share-postcard');
+  if (!target) return null;
+
+  await document.fonts.ready;
+  await new Promise((r) => setTimeout(r, 120));
+
+  return html2canvas(target, {
+    backgroundColor: null,
+    scale: 3,
+    useCORS: true,
+    allowTaint: false,
+    logging: false,
+    imageTimeout: 5000,
+    removeContainer: true,
+  });
+}
+
+// 개인 카드 캡처 (dreamtown-postcard) — 화면 그대로 저장 (legacy, 미사용)
+async function capturePersonalCard(setCaptureMode) {
   const target = document.getElementById('dreamtown-postcard');
   if (!target) return null;
 
   setCaptureMode(true);
-
-  // React 리렌더 + 폰트 완전 로드 대기
   await document.fonts.ready;
   await new Promise((r) => setTimeout(r, 120));
 
@@ -42,9 +59,9 @@ export default function PostcardActions({ direction, onBack, setCaptureMode, mes
   const variant   = getVariant(EXP_ID, VARIANTS);
   const shareText = buildShareText({ variant, direction, shareUrl });
 
-  // 저장하기 — PNG 다운로드
+  // 저장하기 — 공유용 카드(share-postcard) PNG 다운로드
   const handleSave = async () => {
-    const canvas = await captureCard(setCaptureMode);
+    const canvas = await captureShareCard();
     if (!canvas) return;
 
     track('save_click', { direction });
@@ -56,9 +73,9 @@ export default function PostcardActions({ direction, onBack, setCaptureMode, mes
     link.click();
   };
 
-  // 카톡으로 보내기 — 이미지 파일 공유 우선, 텍스트 fallback
+  // 카톡으로 보내기 — 공유용 카드(share-postcard) 이미지 공유
   const handleShare = async () => {
-    const canvas = await captureCard(setCaptureMode);
+    const canvas = await captureShareCard();
     if (!canvas) return;
 
     track('share_click', { experiment: EXP_ID, variant, direction });

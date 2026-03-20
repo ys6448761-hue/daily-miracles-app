@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getStar } from '../api/dreamtown.js';
+import { useDreamtownStore } from '../store/dreamtownStore';
 
 const STAGE_DAYS = {
   day1: 'Day 1',
@@ -27,11 +28,26 @@ export default function MyStar() {
   const nav = useNavigate();
   const [star, setStar] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { setStarData } = useDreamtownStore();
 
   useEffect(() => {
     getStar(id)
-      .then(setStar)
-      .catch(() => setStar(DEMO_STAR))
+      .then((data) => {
+        setStar(data);
+        setStarData({
+          starName:       data.star_name,
+          starGalaxyName: data.galaxy?.name_ko ?? null,
+          starCreatedAt:  data.created_at,
+        });
+      })
+      .catch(() => {
+        setStar(DEMO_STAR);
+        setStarData({
+          starName:       DEMO_STAR.star_name,
+          starGalaxyName: DEMO_STAR.galaxy?.name_ko ?? null,
+          starCreatedAt:  DEMO_STAR.created_at,
+        });
+      })
       .finally(() => setLoading(false));
   }, [id]);
 
