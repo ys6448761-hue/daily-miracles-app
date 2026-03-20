@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getRecentStars } from '../api/dreamtown.js';
+import { getRecentStars, getStar } from '../api/dreamtown.js';
 
 const GALAXY_STYLE = {
   growth:       { label: '성장 은하', cls: 'bg-blue-500/20 text-blue-300' },
@@ -104,30 +104,36 @@ export default function Home() {
 
   const [stars, setStars] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [myStarData, setMyStarData] = useState(null);
 
   // 사용자 본인의 star_id (localStorage)
   const myStarId = localStorage.getItem('dt_star_id');
 
   useEffect(() => {
-    getRecentStars(13)
+    // 광장 목록 + 내 별 독립 조회 병렬 실행
+    const recentPromise = getRecentStars(13)
       .then(r => setStars(r.stars ?? []))
-      .catch(() => setStars([]))
-      .finally(() => setLoading(false));
-  }, []);
+      .catch(() => setStars([]));
+
+    const myStarPromise = myStarId
+      ? getStar(myStarId)
+          .then(data => setMyStarData({
+            star_id:        data.star_id,
+            star_name:      data.star_name,
+            star_stage:     data.star_stage,
+            galaxy_code:    data.galaxy?.code ?? null,
+            galaxy_name_ko: data.galaxy?.name_ko ?? null,
+            created_at:     data.created_at,
+          }))
+          .catch(() => {})
+      : Promise.resolve();
+
+    Promise.all([recentPromise, myStarPromise]).finally(() => setLoading(false));
+  }, [myStarId]);
 
   // 내 별 / 다른 별 분리
-  const myStar    = stars.find(s => s.star_id === myStarId) ?? null;
   const otherStars = stars.filter(s => s.star_id !== myStarId);
-
-  // 내 별이 API 목록에 없지만 newStarName이 있으면 임시 카드용 데이터
-  const myStarDisplay = myStar ?? (newStarId ? {
-    star_id:        newStarId,
-    star_name:      newStarName ?? '나의 별',
-    star_stage:     'day1',
-    galaxy_code:    null,
-    galaxy_name_ko: '미지의 은하',
-    created_at:     new Date().toISOString(),
-  } : null);
+  const myStarDisplay = myStarData;
 
   const isNewStar = !!(newStarId && myStarId === newStarId);
 
