@@ -116,11 +116,6 @@ export default function MyStar() {
           {star.star_name}
         </h1>
 
-        <div className="bg-white/5 rounded-2xl p-4 mb-4">
-          <p className="text-white/40 text-xs mb-1">소원</p>
-          <p className="text-white text-base leading-relaxed">"{star.wish_text}"</p>
-        </div>
-
         <div className="grid grid-cols-2 gap-3 text-left">
           <div className="bg-white/5 rounded-xl p-3">
             <p className="text-white/40 text-xs mb-1">은하</p>
