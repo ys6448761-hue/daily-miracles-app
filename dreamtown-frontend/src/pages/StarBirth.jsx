@@ -3,10 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const STAGES = [
-  { key: 'seed',        emoji: '✨', text: '빛구슬이 떠오릅니다...',          sub: 'A light is rising from the sea.' },
-  { key: 'aurum',       emoji: '🐢', text: '아우룸이 나타났습니다.',          sub: 'Aurum has appeared.' },
-  { key: 'constellation', emoji: '🌌', text: '황금 거북 별자리가 빛납니다.',  sub: 'The Golden Turtle Constellation shines.' },
-  { key: 'star',        emoji: '⭐', text: '당신의 소원이',                sub: '별이 되어 빛나기 시작했습니다' },
+  { key: 'seed',           emoji: '✨', text: '빛구슬이 떠오릅니다...',         sub: 'A light is rising from the sea.' },
+  { key: 'aurum',          emoji: '🐢', text: '아우룸이 나타났습니다.',         sub: 'Aurum has appeared.' },
+  { key: 'constellation',  emoji: '🌌', text: '황금 거북 별자리가 빛납니다.',   sub: 'The Golden Turtle Constellation shines.' },
+  { key: 'star',           emoji: '⭐', text: '소원이 별이 되었습니다',         sub: 'Your wish is now a star.' },
 ];
 
 export default function StarBirth() {
@@ -17,7 +17,6 @@ export default function StarBirth() {
 
   const starId   = state?.starId;
   const starName = state?.starName || '나의 별';
-  const galaxy   = state?.galaxy   || 'growth';
 
   useEffect(() => {
     if (stage >= STAGES.length - 1) {
@@ -28,14 +27,14 @@ export default function StarBirth() {
     return () => clearTimeout(t);
   }, [stage]);
 
-  // 애니메이션 완료 후 My Star로 자동 이동
+  // 애니메이션 완료 후 광장(Home)으로 자동 이동
   useEffect(() => {
     if (!done) return;
     const t = setTimeout(() => {
-      nav(starId ? `/my-star/${starId}` : '/home');
+      nav('/home', { state: { newStarId: starId, newStarName: starName } });
     }, 3000);
     return () => clearTimeout(t);
-  }, [done, starId, nav]);
+  }, [done, starId, starName, nav]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden">
@@ -47,7 +46,7 @@ export default function StarBirth() {
             initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
             animate={{
               opacity: [0, 1, 0],
-              scale: [0, 1, 0],
+              scale:   [0, 1, 0],
               x: (Math.random() - 0.5) * 200,
               y: (Math.random() - 0.5) * 200,
             }}
@@ -99,7 +98,7 @@ export default function StarBirth() {
             className="text-center mt-4 mb-12"
           >
             <p className="text-star-gold text-2xl font-bold glow-gold">{starName}</p>
-            <p className="text-white/50 text-sm mt-1">이 별의 이름입니다</p>
+            <p className="text-white/50 text-sm mt-1">오늘부터 이 별이 빛나기 시작합니다</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -125,12 +124,12 @@ export default function StarBirth() {
             transition={{ delay: 0.15 }}
             className="text-white/40 text-xs mb-6 text-center"
           >
-            🐢 "작은 소원이 별이 되었습니다."
+            🐢 "오늘 밤, 새로운 별이 태어났습니다."
           </motion.p>
         )}
       </AnimatePresence>
 
-      {/* View My Star 버튼 */}
+      {/* 광장으로 가기 버튼 */}
       <AnimatePresence>
         {done && (
           <motion.div
@@ -140,11 +139,10 @@ export default function StarBirth() {
             className="flex flex-col items-center gap-3"
           >
             <button
-              whileTap={{ scale: 0.97 }}
-              onClick={() => nav(starId ? `/my-star/${starId}` : '/home')}
+              onClick={() => nav('/home', { state: { newStarId: starId, newStarName: starName } })}
               className="w-full max-w-xs bg-star-gold text-night-sky font-bold py-4 rounded-2xl text-lg"
             >
-              View My Star ⭐
+              광장에서 내 별 보기 →
             </button>
             <p className="text-white/30 text-xs">잠시 후 자동으로 이동합니다</p>
           </motion.div>

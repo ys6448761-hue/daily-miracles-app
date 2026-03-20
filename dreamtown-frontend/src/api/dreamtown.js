@@ -39,6 +39,12 @@ export async function postStarCreate({ wishId, userId }) {
   });
 }
 
+export async function getRecentStars(limit = 13) {
+  const res = await fetch(`${BASE}/stars/recent?limit=${limit}`);
+  if (!res.ok) throw new Error('광장 별 목록 조회 실패');
+  return res.json();
+}
+
 export async function getStar(starId) {
   const res = await fetch(`${BASE}/stars/${starId}`);
   if (!res.ok) throw new Error('별 조회 실패');
