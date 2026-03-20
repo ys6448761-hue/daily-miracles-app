@@ -337,15 +337,27 @@ router.get('/galaxies/:code/stars', async (req, res) => {
     }
     const galaxyId = galaxyResult.rows[0].id;
 
-    const starsResult = await db.query(
-      `SELECT id AS star_id, star_name, created_at
-         FROM dt_stars
-        WHERE galaxy_id = $1
-          AND ($2::uuid IS NULL OR id <> $2::uuid)
-        ORDER BY created_at DESC
-        LIMIT $3`,
-      [galaxyId, exclude, limit]
-    );
+    let starsResult;
+    if (exclude) {
+      starsResult = await db.query(
+        `SELECT id AS star_id, star_name, created_at
+           FROM dt_stars
+          WHERE galaxy_id = $1
+            AND id <> $2::uuid
+          ORDER BY created_at DESC
+          LIMIT $3`,
+        [galaxyId, exclude, limit]
+      );
+    } else {
+      starsResult = await db.query(
+        `SELECT id AS star_id, star_name, created_at
+           FROM dt_stars
+          WHERE galaxy_id = $1
+          ORDER BY created_at DESC
+          LIMIT $2`,
+        [galaxyId, limit]
+      );
+    }
 
     res.json({ stars: starsResult.rows });
 
