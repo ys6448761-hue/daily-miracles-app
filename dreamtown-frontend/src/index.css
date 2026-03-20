@@ -81,6 +81,22 @@ body {
   animation: afterglow 1.8s ease-out forwards;
 }
 
+/* Intro → Galaxy 별 zoom 트랜지션 */
+@keyframes starZoom {
+  0%   { transform: scale(1); opacity: 1; }
+  50%  { transform: scale(2); opacity: 1; }
+  100% { transform: scale(4); opacity: 0; }
+}
+
+.animate-star-zoom {
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 9999px;
+  box-shadow: 0 0 40px rgba(255, 255, 200, 0.8), 0 0 80px rgba(255, 255, 200, 0.4);
+  animation: starZoom 1.2s ease-out forwards;
+}
+
 /* 별 끌림 — outer halo 독립 리듬 (breath와 다른 주기) */
 @keyframes star-halo-pulse {
   0%, 100% { opacity: 0.08; transform: translate(-50%, -50%) scale(1); }

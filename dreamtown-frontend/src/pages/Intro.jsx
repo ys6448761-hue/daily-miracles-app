@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { track, getVariant } from "../utils/experiment";
 
@@ -28,6 +28,8 @@ export default function Intro() {
   const screenVariant = getVariant(SCREEN_EXP_ID);
   // A: 1번부터 (5단계 전체), B: 마지막부터 (1단계)
   const [step, setStep] = useState(screenVariant === 'B' ? LAST_STEP : 1);
+  const [transitioning, setTransitioning] = useState(false);
+  const timerRef = useRef(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -55,6 +57,9 @@ export default function Intro() {
     });
   }, []);
 
+  // 타이머 정리
+  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
+
   const handleNext = () => {
     if (!isLast) {
       setStep(s => s + 1);
@@ -68,7 +73,9 @@ export default function Intro() {
         from_share: !!g,
         galaxy: g || null,
       });
-      navigate("/galaxy");
+      // 별 zoom 트랜지션 시작 → 1200ms 후 Galaxy 이동
+      setTransitioning(true);
+      timerRef.current = setTimeout(() => navigate('/galaxy'), 1200);
     }
   };
 
@@ -123,10 +130,18 @@ export default function Intro() {
       {/* 버튼 */}
       <button
         onClick={handleNext}
-        className="mb-10 px-8 py-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm active:scale-95 transition-transform"
+        disabled={transitioning}
+        className="mb-10 px-8 py-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm active:scale-95 transition-transform disabled:pointer-events-none"
       >
         {ctaText}
       </button>
+
+      {/* 별 zoom 트랜지션 오버레이 */}
+      {transitioning && (
+        <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
+          <div className="animate-star-zoom" />
+        </div>
+      )}
     </div>
   );
 }
