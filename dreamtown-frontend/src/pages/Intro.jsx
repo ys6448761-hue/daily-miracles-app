@@ -30,8 +30,8 @@ const INTRO_TINT = {
 
 export default function Intro() {
   const screenVariant = getVariant(SCREEN_EXP_ID);
-  // A: 1번부터 (5단계 전체), B: 마지막부터 (1단계)
-  const [step, setStep] = useState(screenVariant === 'B' ? LAST_STEP : 1);
+  // 항상 01-look부터 시작 — B variant도 01에서 시작 (이미지 순서 고정 원칙)
+  const [step, setStep] = useState(1);
   const [transitioning, setTransitioning] = useState(false);
   const timerRef = useRef(null);
   const navigate = useNavigate();
