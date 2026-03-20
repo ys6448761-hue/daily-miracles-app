@@ -1,23 +1,30 @@
 import { useState } from 'react';
+import { useDreamtownStore } from '../../../store/dreamtownStore';
 
 export function useDayLogFlow(onComplete) {
   const [step, setStep] = useState('feeling');
-  const [feeling, setFeeling] = useState(null);
-  const [helpTag, setHelpTag] = useState(null);
-  const [growthLine, setGrowthLine] = useState(null);
+  const [feeling, setFeelingLocal] = useState(null);
+  const [helpTag, setHelpTagLocal] = useState(null);
+  const [growthLine, setGrowthLineLocal] = useState(null);
+
+  const { setFeeling, setHelpTag, setGrowthLine } = useDreamtownStore();
 
   const selectFeeling = (value) => {
-    setFeeling(value);
+    setFeelingLocal(value);
+    setFeeling(value);  // store SSOT
     setStep('help');
   };
 
   const selectHelp = (value) => {
-    setHelpTag(value);
+    setHelpTagLocal(value);
+    setHelpTag(value);  // store SSOT
     setStep('growth');
   };
 
   const selectGrowth = (value) => {
-    setGrowthLine(value);
+    setGrowthLineLocal(value);
+    setGrowthLine(value);  // store SSOT
+
     setStep('complete');
 
     const log = {

@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import DayLogScreen from '../features/galaxy/components/DayLogScreen';
 import SilhouetteScene from '../features/day/components/SilhouetteScene';
 import { saveLog } from '../features/galaxy/utils/logStorage';
+import { useDreamtownStore } from '../store/dreamtownStore';
+import { POSTCARD_FALLBACK_MESSAGE } from '../constants/dreamtownFlow';
 
 // 선택 은하 잔광 색상 — SelectionTransition 동일 계열
 const GALAXY_OVERLAY = {
@@ -32,8 +34,10 @@ export default function DayPage() {
   const [phase, setPhase] = useState('before'); // before | transitioning | after
   const [textVisible, setTextVisible] = useState(false); // 실루엣보다 300ms 뒤에 텍스트 등장
 
-  const direction = state?.direction;
-  const message   = state?.message;
+  // location.state 우선, 없으면 store fallback (새로고침/직접 진입 대응)
+  const store = useDreamtownStore();
+  const direction = state?.direction ?? store.direction;
+  const message   = state?.message   ?? store.message ?? POSTCARD_FALLBACK_MESSAGE;
 
   useEffect(() => {
     const t1 = setTimeout(() => setPhase('transitioning'), 800);

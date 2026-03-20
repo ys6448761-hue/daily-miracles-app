@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { track } from '../utils/experiment';
 import PostcardView from '../features/galaxy/components/PostcardView';
 import PostcardActions from '../features/galaxy/components/PostcardActions';
+import { useDreamtownStore } from '../store/dreamtownStore';
+import { POSTCARD_FALLBACK_MESSAGE } from '../constants/dreamtownFlow';
 
 // 카드 배경 tint — PostcardView 주광원 색과 동일 계열, 극히 낮은 강도
 const PAGE_TINT = {
@@ -17,9 +19,11 @@ export default function PostcardPage() {
   const navigate = useNavigate();
   const [captureMode, setCaptureMode] = useState(false);
 
-  const direction  = state?.direction  ?? null;
-  const message    = state?.message    ?? '오늘은 조용히 빛나도 괜찮습니다';
-  const growthLine = state?.growthLine ?? '';
+  // location.state 우선, 없으면 store fallback (새로고침/직접 진입 대응)
+  const store = useDreamtownStore();
+  const direction  = state?.direction  ?? store.direction  ?? null;
+  const message    = state?.message    ?? store.message    ?? POSTCARD_FALLBACK_MESSAGE;
+  const growthLine = state?.growthLine ?? store.growthLine ?? '';
 
   const tint = (direction && PAGE_TINT[direction]) || 'transparent';
 
