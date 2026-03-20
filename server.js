@@ -2180,7 +2180,19 @@ console.log('✅ DreamTown 라우터 등록 완료 (/api/dt)');
 
 // ---------- DreamTown Frontend (Prototype) ----------
 const dtFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist');
-app.use('/dreamtown', express.static(dtFrontendPath));
+app.use('/dreamtown', express.static(dtFrontendPath, {
+  setHeaders: (res, filePath) => {
+    // index.html은 절대 캐시 안 함 — 구버전 JS/CSS 해시 참조 방지
+    if (filePath.endsWith('index.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    } else {
+      // 해시된 JS/CSS/이미지는 장기 캐시 OK
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+  },
+}));
 
 // DreamTown SPA 라우트 — /dreamtown/* 및 React Router 직접 경로
 const DT_SPA_ROUTES = [
@@ -2190,6 +2202,9 @@ const DT_SPA_ROUTES = [
   '/star-birth', '/my-star', '/my-star/*', '/home',
 ];
 app.get(DT_SPA_ROUTES, (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
   res.sendFile(path.join(dtFrontendPath, 'index.html'), (err) => {
     if (err) {
       console.error('[DT] SPA sendFile 실패 — dist 미존재 가능:', err.message);
