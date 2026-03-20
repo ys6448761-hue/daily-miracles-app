@@ -33,8 +33,7 @@ function calcDaysSinceBirth(createdAt) {
 }
 
 function getAurumMessage(daysSinceBirth) {
-  const clamped = Math.min(daysSinceBirth, AURUM_MESSAGES.length);
-  return AURUM_MESSAGES.find(m => m.day === clamped)
+  return AURUM_MESSAGES.find(m => m.day === daysSinceBirth)
     ?? AURUM_MESSAGES[AURUM_MESSAGES.length - 1];
 }
 
