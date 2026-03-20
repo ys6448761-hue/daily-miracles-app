@@ -1,15 +1,15 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-03-16
+Last Updated: 2026-03-20
 담당: Claude Code (Antigravity)
 
 ---
 
 ## 한 줄 요약
 
-> 소원 결과 화면 UX Phase 2 완료. DreamTown GPT Knowledge 7종 완료.
-> 다음 작업: Phase 3 (내 변화 화면) 또는 GPT 업로드 → 검증.
+> AIL-DT-001 Core Loop 완료. 별 탄생 → 광장 자동 이동 + 내 별 강조 A/B + Seed Stars 13개 표시.
+> 다음 작업: DoD 검수 (코미) → 모바일 테스트 → VITE_KAKAO_JS_KEY Render 설정.
 
 ---
 
@@ -48,6 +48,23 @@ DT_React_Architecture.md           ← sowon-dreamtown 구조
 DT_Express_Architecture.md         ← daily-miracles-mvp 구조
 DT_ClaudeCode_Work_Order_Guide.md  ← 지시서 작성법
 ```
+
+### AIL-DT-001 Core Loop ✅ (2026-03-20 완료)
+- `StarBirth.jsx` — 별 탄생 후 `/home`으로 라우팅 (newStarId/newStarName state 전달)
+- `StarBirth.jsx` — 완료 멘트: "오늘 밤, 새로운 별이 태어났습니다." / 버튼: "광장에서 내 별 보기 →"
+- `Home.jsx` — API 기반 광장 (최대 13개 별 목록), 내 별 분리 표시
+- `Home.jsx` — 내 별 강조 옵션A (1회 pulse) + 옵션B ("여기예요 ✨" 1.5초 툴팁) 동시 구현
+- `routes/dreamtownRoutes.js` — `GET /api/dt/stars/recent?limit=N` 엔드포인트 추가
+- `dreamtown.js` — `getRecentStars(limit)` API 클라이언트 추가
+
+DoD 검수 항목:
+- [x] 별 탄생 후 Galaxy 선택 화면 미노출
+- [x] 별 탄생 후 Home 자동 이동
+- [x] 수정된 완료 멘트 출력
+- [x] 내 별 강조 연출 (A/B)
+- [x] Seed Stars 13개 광장 표시 API 구현
+- [ ] 모바일(Android/iOS) 테스트 — 푸르미르님 직접
+- [ ] AURORA_STATUS.md 업데이트
 
 ### SSOT 재구조화 ✅ (이전 세션)
 - 87개 → 3-tier 분류: `core/` (13개) / `support/` (25개) / `archive/` (47개)
