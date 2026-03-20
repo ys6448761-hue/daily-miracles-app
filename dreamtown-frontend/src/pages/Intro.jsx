@@ -1,17 +1,21 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { track, getVariant } from "../utils/experiment";
 
 const EXP_ID        = 'intro_cta_v1';
 const SCREEN_EXP_ID = 'intro_screen_v1';  // A: 전체 5단계, B: 마지막 1단계
 const CTA_TEXT = { A: '시작하기', B: '내 빛 찾기' };
 
+// import.meta.env.BASE_URL: dev='/', prod='/dreamtown/' — 경로 자동 대응
+const BASE = import.meta.env.BASE_URL;
+
 const STEPS = [
-  { src: '/images/intro/intro-01-look.jpg',      text: '소원을 떠올려보세요' },
-  { src: '/images/intro/intro-02-write.jpg',     text: '소원을 말하는 것만으로도' },
-  { src: '/images/intro/intro-03-transform.jpg', text: '소원은 별이 됩니다' },
-  { src: '/images/intro/intro-04-choice.jpg',    text: '오늘의 빛을 선택해요' },
-  { src: '/images/intro/intro-05-result.jpg',    text: '오늘은 이 삶을 살아볼 수 있어요' },
+  { src: `${BASE}images/intro/intro-01-look.jpg`,      text: '소원을 떠올려보세요' },
+  { src: `${BASE}images/intro/intro-02-write.jpg`,     text: '소원을 말하는 것만으로도' },
+  { src: `${BASE}images/intro/intro-03-transform.jpg`, text: '소원은 별이 됩니다' },
+  { src: `${BASE}images/intro/intro-04-choice.jpg`,    text: '오늘의 빛을 선택해요' },
+  { src: `${BASE}images/intro/intro-05-result.jpg`,    text: '오늘은 이 삶을 살아볼 수 있어요' },
 ];
 
 const LAST_STEP = STEPS.length;
@@ -80,58 +84,68 @@ export default function Intro() {
   };
 
   return (
-    <div className="w-full h-screen bg-black text-white flex flex-col justify-between items-center">
+    <div className="relative w-full h-screen bg-black text-white overflow-hidden">
 
-      {/* 이미지 영역 */}
-      <div className="flex-1 w-full flex items-center justify-center relative overflow-hidden">
-
-        <img
+      {/* 이미지 — step 변경 시 fade */}
+      <AnimatePresence mode="wait">
+        <motion.img
           key={step}
           src={current.src}
           alt=""
-          className="absolute w-full h-full object-cover opacity-90 transition-opacity duration-700"
+          className="absolute inset-0 w-full h-full object-cover"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.9 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8 }}
         />
+      </AnimatePresence>
 
-        {/* 어둡게 덮기 */}
-        <div className="absolute inset-0 bg-black/40" />
+      {/* 어둡게 덮기 */}
+      <div className="absolute inset-0 bg-black/30" />
 
-        {/* 공유 유입 direction tint — 카드 색감의 여운 */}
-        {tint && (
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{ background: tint, mixBlendMode: 'screen' }}
-          />
-        )}
-      </div>
+      {/* 공유 유입 direction tint — 카드 색감의 여운 */}
+      {tint && (
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: tint, mixBlendMode: 'screen' }}
+        />
+      )}
 
       {/* 텍스트 */}
-      <div className="text-center px-6 pb-6 space-y-2">
-        <p key={step} className="text-lg opacity-90 leading-relaxed">
-          {current.text}
-        </p>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={step}
+          className="absolute bottom-28 w-full text-center px-6 space-y-2"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.6, delay: 0.15 }}
+        >
+          <p className="text-xl leading-relaxed">{current.text}</p>
 
-        {/* 진행 점 (5단계 A 그룹만 표시) */}
-        {screenVariant === 'A' && (
-          <div className="flex justify-center gap-1.5 pt-3">
-            {STEPS.map((_, i) => (
-              <span
-                key={i}
-                className={`block rounded-full transition-all duration-300 ${
-                  i + 1 === step
-                    ? 'w-4 h-1.5 bg-white/80'
-                    : 'w-1.5 h-1.5 bg-white/30'
-                }`}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+          {/* 진행 점 (5단계 A 그룹만 표시) */}
+          {screenVariant === 'A' && (
+            <div className="flex justify-center gap-1.5 pt-3">
+              {STEPS.map((_, i) => (
+                <span
+                  key={i}
+                  className={`block rounded-full transition-all duration-300 ${
+                    i + 1 === step
+                      ? 'w-4 h-1.5 bg-white/80'
+                      : 'w-1.5 h-1.5 bg-white/30'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+        </motion.div>
+      </AnimatePresence>
 
       {/* 버튼 */}
       <button
         onClick={handleNext}
         disabled={transitioning}
-        className="mb-10 px-8 py-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm active:scale-95 transition-transform disabled:pointer-events-none"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 px-8 py-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm active:scale-95 transition-transform disabled:pointer-events-none whitespace-nowrap"
       >
         {ctaText}
       </button>
