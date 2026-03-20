@@ -2187,8 +2187,11 @@ app.use('/dreamtown', express.static(dtFrontendPath, {
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
+    } else if (filePath.includes('/images/')) {
+      // 이미지는 파일명 해시 없음 → 교체 시 브라우저가 재검증하도록
+      res.setHeader('Cache-Control', 'public, max-age=3600, must-revalidate');
     } else {
-      // 해시된 JS/CSS/이미지는 장기 캐시 OK
+      // 해시된 JS/CSS assets — 장기 캐시 OK (파일명에 해시 포함)
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     }
   },
