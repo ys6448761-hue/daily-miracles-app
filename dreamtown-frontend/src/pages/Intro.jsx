@@ -3,8 +3,18 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { track, getVariant } from "../utils/experiment";
 
 const EXP_ID        = 'intro_cta_v1';
-const SCREEN_EXP_ID = 'intro_screen_v1';  // A: 2단계, B: 1단계
+const SCREEN_EXP_ID = 'intro_screen_v1';  // A: 전체 5단계, B: 마지막 1단계
 const CTA_TEXT = { A: '시작하기', B: '내 빛 찾기' };
+
+const STEPS = [
+  { src: '/images/intro/intro-01-look.jpg',      text: '소원을 떠올려보세요' },
+  { src: '/images/intro/intro-02-write.jpg',     text: '소원을 말하는 것만으로도' },
+  { src: '/images/intro/intro-03-transform.jpg', text: '소원은 별이 됩니다' },
+  { src: '/images/intro/intro-04-choice.jpg',    text: '오늘의 빛을 선택해요' },
+  { src: '/images/intro/intro-05-result.jpg',    text: '오늘은 이 삶을 살아볼 수 있어요' },
+];
+
+const LAST_STEP = STEPS.length;
 
 // 공유 링크 유입 시 direction 색 tint — 카드의 색감이 Intro까지 이어짐
 const INTRO_TINT = {
@@ -16,7 +26,8 @@ const INTRO_TINT = {
 
 export default function Intro() {
   const screenVariant = getVariant(SCREEN_EXP_ID);
-  const [step, setStep] = useState(screenVariant === 'B' ? 2 : 1);
+  // A: 1번부터 (5단계 전체), B: 마지막부터 (1단계)
+  const [step, setStep] = useState(screenVariant === 'B' ? LAST_STEP : 1);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -26,7 +37,10 @@ export default function Intro() {
 
   // A/B 실험 — variant 고정
   const variant = getVariant(EXP_ID);
-  const ctaText = step === 1 ? '다음' : CTA_TEXT[variant];
+  const isLast  = step === LAST_STEP;
+  const ctaText = isLast ? CTA_TEXT[variant] : '다음';
+
+  const current = STEPS[step - 1];
 
   // screen_view 이벤트
   useEffect(() => {
@@ -42,8 +56,8 @@ export default function Intro() {
   }, []);
 
   const handleNext = () => {
-    if (step === 1) {
-      setStep(2);
+    if (!isLast) {
+      setStep(s => s + 1);
     } else {
       track('cta_click', {
         experiment: EXP_ID,
@@ -64,14 +78,11 @@ export default function Intro() {
       {/* 이미지 영역 */}
       <div className="flex-1 w-full flex items-center justify-center relative overflow-hidden">
 
-        {/* 배경 — 이미지 파일 준비 전 CSS 그라디언트 placeholder */}
-        <div
-          className="absolute inset-0 transition-all duration-700"
-          style={{
-            background: step === 1
-              ? 'radial-gradient(ellipse at 50% 30%, rgba(120,100,220,0.35) 0%, rgba(30,20,60,0.90) 60%, #020008 100%)'
-              : 'radial-gradient(ellipse at 50% 60%, rgba(80,160,220,0.30) 0%, rgba(20,30,55,0.90) 60%, #020008 100%)',
-          }}
+        <img
+          key={step}
+          src={current.src}
+          alt=""
+          className="absolute w-full h-full object-cover opacity-90 transition-opacity duration-700"
         />
 
         {/* 어둡게 덮기 */}
@@ -87,24 +98,32 @@ export default function Intro() {
       </div>
 
       {/* 텍스트 */}
-      <div className="text-center px-6 pb-20 space-y-4">
-        {step === 1 && (
-          <p className="text-lg opacity-90">
-            소원은 별이 됩니다
-          </p>
-        )}
+      <div className="text-center px-6 pb-6 space-y-2">
+        <p key={step} className="text-lg opacity-90 leading-relaxed">
+          {current.text}
+        </p>
 
-        {step === 2 && (
-          <p className="text-lg opacity-90">
-            오늘은 이 삶을 살아볼 수 있어요
-          </p>
+        {/* 진행 점 (5단계 A 그룹만 표시) */}
+        {screenVariant === 'A' && (
+          <div className="flex justify-center gap-1.5 pt-3">
+            {STEPS.map((_, i) => (
+              <span
+                key={i}
+                className={`block rounded-full transition-all duration-300 ${
+                  i + 1 === step
+                    ? 'w-4 h-1.5 bg-white/80'
+                    : 'w-1.5 h-1.5 bg-white/30'
+                }`}
+              />
+            ))}
+          </div>
         )}
       </div>
 
       {/* 버튼 */}
       <button
         onClick={handleNext}
-        className="mb-10 px-8 py-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm"
+        className="mb-10 px-8 py-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm active:scale-95 transition-transform"
       >
         {ctaText}
       </button>
