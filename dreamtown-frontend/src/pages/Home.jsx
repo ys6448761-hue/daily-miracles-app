@@ -157,21 +157,17 @@ export default function Home() {
 
       {/* 내 별 카드 */}
       {myStarDisplay && (
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
+        <div className="relative z-10 mb-0">
           <MyStarCard
             star={myStarDisplay}
             isNew={isNewStar}
             nav={nav}
           />
-        </motion.div>
+        </div>
       )}
 
-      {/* 광장 — 다른 별들 (motion 제거: transform stacking context가 Link pointer-events 방해) */}
-      <div className="bg-white/3 border border-white/8 rounded-3xl p-5 mb-4">
+      {/* 광장 — 다른 별들 */}
+      <div className="relative z-10 bg-white/3 border border-white/8 rounded-3xl p-5 mb-4">
         <div className="flex items-center justify-between mb-3">
           <p className="text-white/60 text-sm font-medium">광장의 별들</p>
           <p className="text-white/30 text-xs">{stars.length}개</p>
@@ -189,17 +185,12 @@ export default function Home() {
       </div>
 
       {/* Aurum 메시지 */}
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="bg-dream-purple/10 border border-dream-purple/20 rounded-3xl p-5 mb-4"
-      >
+      <div className="bg-dream-purple/10 border border-dream-purple/20 rounded-3xl p-5 mb-4 pointer-events-none">
         <p className="text-white/40 text-xs mb-2">🐢 Aurum</p>
         <p className="text-white text-sm leading-relaxed">
           "당신의 소원은 이미 별이 되고 있어요."
         </p>
-      </motion.div>
+      </div>
 
       {/* 탭 바 */}
       <BottomTab active="home" myStarId={myStarId} />
