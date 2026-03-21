@@ -6,6 +6,33 @@ import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
 import { sharePostcard } from '../utils/kakaoShare';
 
+// ── Day 7 의미 메시지 (은하별) ────────────────────────────────────
+// 규칙: 성공/실패 금지 · 평가/판단 금지 · 감정 압박 금지
+// 핵심: "변화가 완성된 순간"이 아니라 "처음 알아차리는 순간"
+const DAY7_MESSAGES = {
+  growth:       {
+    headline: '이 별이 처음으로 의미를 갖기 시작했어요.',
+    body:     '7일이 쌓였어요. 변화는 보이지 않아도 조용히 일어나고 있어요.',
+  },
+  challenge:    {
+    headline: '이 별이 처음으로 의미를 갖기 시작했어요.',
+    body:     '7일이 지났어요. 여기까지 왔다는 것, 그것 자체가 이미 달라진 거예요.',
+  },
+  healing:      {
+    headline: '이 별이 처음으로 의미를 갖기 시작했어요.',
+    body:     '7일이 흘렀어요. 버텨온 하루하루가 당신 안에 조금씩 쌓이고 있어요.',
+  },
+  relationship: {
+    headline: '이 별이 처음으로 의미를 갖기 시작했어요.',
+    body:     '7일이 지났어요. 마음은 천천히, 그러나 분명하게 변해가고 있어요.',
+  },
+};
+
+const DAY7_DEFAULT = {
+  headline: '이 별이 처음으로 의미를 갖기 시작했어요.',
+  body:     '7일이 지났어요. 작은 변화들이 조용히 쌓이고 있는 시간이에요.',
+};
+
 const STAGE_DAYS = {
   day1:   'Day 1',
   day7:   'Day 7',
@@ -148,6 +175,24 @@ export default function MyStar() {
           </div>
         </div>
       </motion.div>
+
+      {/* Day 7 의미 생성 — 7일 이상 경과 시 노출 */}
+      {daysSinceBirth >= 7 && (() => {
+        const msg = DAY7_MESSAGES[star.galaxy?.code] ?? DAY7_DEFAULT;
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="mb-6 border border-star-gold/20 rounded-3xl p-5"
+            style={{ background: 'rgba(255,215,106,0.04)' }}
+          >
+            <p className="text-star-gold/60 text-[11px] mb-2 tracking-wide">D+{daysSinceBirth}</p>
+            <p className="text-white/80 text-sm font-medium mb-1">{msg.headline}</p>
+            <p className="text-white/45 text-xs leading-relaxed">{msg.body}</p>
+          </motion.div>
+        );
+      })()}
 
       {/* 같은 은하 별들 — 2개 이상일 때만 표시 */}
       {galaxyStars.length >= 2 && (
