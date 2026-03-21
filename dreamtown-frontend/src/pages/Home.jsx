@@ -84,7 +84,7 @@ function StarItem({ star, nav }) {
   return (
     <div
       onClick={() => nav(`/star/${star.star_id}`)}
-      className="flex items-center gap-3 py-3 border-b border-white/5 last:border-0 cursor-pointer hover:bg-white/3 rounded-xl px-1 -mx-1 transition-colors"
+      className="flex items-center gap-3 py-3 border-b border-white/5 last:border-0 cursor-pointer hover:bg-white/3 active:bg-white/8 rounded-xl px-1 -mx-1 transition-colors touch-manipulation"
     >
       <span className="text-lg">✦</span>
       <div className="flex-1 min-w-0">
