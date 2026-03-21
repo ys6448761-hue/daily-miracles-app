@@ -21,6 +21,7 @@ const REQUIRED_TABLES = [
   'resonance',
   'impact',
   'star_resonance_summary',
+  'dt_kpi_events',
 ];
 
 const REQUIRED_COLUMNS = [

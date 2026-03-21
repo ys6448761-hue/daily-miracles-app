@@ -29,6 +29,7 @@
     "DOC-DEC-20260201-포인트추천예고편-정책구현",
     "DOC-index",
     "DOC-DreamTown_Knowledge_Map",
+    "DOC-kpi-event-schema",
     "DOC-playground-events",
     "DOC-DreamTown_GPT_Knowledge_Pack",
     "DOC-DreamTown_SSOT_Core",
@@ -628,6 +629,7 @@
   "kpi": [
     "DOC-AURORA-STATUS",
     "DOC-소원드림광장_홈페이지재구성_현황브리핑",
+    "DOC-kpi-event-schema",
     "DOC-DT_API_Registry",
     "DOC-DT_React_Architecture",
     "DOC-JUDGE_PROMPTS",
@@ -779,7 +781,8 @@
     "DOC-README"
   ],
   "dreamtown": [
-    "DOC-DreamTown_Knowledge_Map"
+    "DOC-DreamTown_Knowledge_Map",
+    "DOC-kpi-event-schema"
   ],
   "events": [
     "DOC-playground-events"

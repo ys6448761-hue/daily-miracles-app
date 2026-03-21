@@ -9,6 +9,7 @@
 const express = require('express');
 const router  = express.Router();
 const db      = require('../database/db');
+const { emitKpiEvent, KPI_EVENTS } = require('../services/kpiEventEmitter');
 
 const VALID_RESONANCE = ['relief', 'belief', 'clarity', 'courage'];
 const RESONANCE_TYPES = VALID_RESONANCE;
@@ -77,18 +78,21 @@ async function checkImpact(star_id) {
 }
 
 // ── star_resonance_summary upsert ────────────────────────────────
+// Returns new total_count (for resonance_received first-time detection)
 async function updateSummary(star_id, resonance_type) {
   const col = `${resonance_type}_count`;
-  await db.query(
+  const result = await db.query(
     `INSERT INTO star_resonance_summary
        (star_id, ${col}, total_count, updated_at)
      VALUES ($1, 1, 1, CURRENT_TIMESTAMP)
      ON CONFLICT (star_id) DO UPDATE
        SET ${col}      = star_resonance_summary.${col} + 1,
            total_count = star_resonance_summary.total_count + 1,
-           updated_at  = CURRENT_TIMESTAMP`,
+           updated_at  = CURRENT_TIMESTAMP
+     RETURNING total_count`,
     [star_id]
   );
+  return result.rows[0]?.total_count ?? 1;
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -106,13 +110,21 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: '유효하지 않은 resonance_type' });
     }
 
-    // 별 존재 확인
+    // 별 존재 확인 + KPI emit에 필요한 컨텍스트 조회
     const starCheck = await db.query(
-      'SELECT id FROM dt_stars WHERE id = $1', [star_id]
+      `SELECT s.id, s.user_id AS owner_id, s.is_hidden, s.wish_id,
+              w.safety_level
+         FROM dt_stars  s
+         JOIN dt_wishes w ON w.id = s.wish_id
+        WHERE s.id = $1`,
+      [star_id]
     );
     if (starCheck.rowCount === 0) {
       return res.status(404).json({ error: '별을 찾을 수 없습니다' });
     }
+    const starRow = starCheck.rows[0];
+    const visibility  = starRow.is_hidden ? 'hidden' : 'public';
+    const safetyBand  = starRow.safety_level ?? 'GREEN';
 
     const user_id = anonymous_token ?? null;
 
@@ -136,8 +148,50 @@ router.post('/', async (req, res) => {
     );
 
     // summary 갱신 후 impact 트리거
-    await updateSummary(star_id, resonance_type);
+    const newTotal   = await updateSummary(star_id, resonance_type);
     const newImpacts = await checkImpact(star_id);
+
+    // ── KPI: resonance_created ────────────────────────────────────
+    emitKpiEvent({
+      eventName:  KPI_EVENTS.RESONANCE_CREATED,
+      userId:     user_id,
+      starId:     star_id,
+      wishId:     starRow.wish_id,
+      visibility,
+      safetyBand,
+      source:     'resonance_route',
+      extra:      { resonance_type },
+    }).catch(() => {});
+
+    // ── KPI: impact_created (각 신규 나눔마다) ──────────────────
+    for (const impactType of newImpacts) {
+      emitKpiEvent({
+        eventName:  KPI_EVENTS.IMPACT_CREATED,
+        userId:     starRow.owner_id,
+        starId:     star_id,
+        wishId:     starRow.wish_id,
+        visibility,
+        safetyBand,
+        source:     'impact_trigger',
+        extra:      { impact_type: impactType },
+      }).catch(() => {});
+    }
+
+    // ── KPI: resonance_received (별 최초 공명 수신 시 1회) ───────
+    if (newTotal === 1) {
+      emitKpiEvent({
+        eventName:  KPI_EVENTS.RESONANCE_RECEIVED,
+        userId:     starRow.owner_id,
+        starId:     star_id,
+        wishId:     starRow.wish_id,
+        visibility,
+        safetyBand,
+        source:     'first_resonance',
+      }).catch(() => {});
+    }
+
+    // TODO: connection_completed — 유사 별 클릭 시점에 emit 예정
+    //   emitKpiEvent({ eventName: KPI_EVENTS.CONNECTION_COMPLETED, ... })
 
     res.json({
       ok: true,
