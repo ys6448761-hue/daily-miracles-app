@@ -1,17 +1,27 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import IntroScene from './IntroScene.jsx';
 
 export default function AppLaunch() {
   const nav = useNavigate();
+  // 최초 방문자에게만 IntroScene 노출 (재방문은 즉시 /my-star 진입)
+  const [showIntro, setShowIntro] = useState(false);
 
   useEffect(() => {
-    // 재방문: 기존 별이 있으면 My Star로 바로 진입 (CEO 확정 2026-03-12)
     const starId = localStorage.getItem('dt_star_id');
     if (starId) {
+      // 재방문: 즉시 My Star로
       nav(`/my-star/${starId}`, { replace: true });
+    } else {
+      // 최초 방문: IntroScene 실행
+      setShowIntro(true);
     }
   }, [nav]);
+
+  if (showIntro) {
+    return <IntroScene onFinish={() => setShowIntro(false)} />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden">
