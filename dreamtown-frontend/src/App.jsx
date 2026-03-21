@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AppLaunch from './pages/AppLaunch.jsx';
-import DreamTownIntro from './pages/DreamTownIntro.jsx';
+import Intro from './pages/Intro.jsx';
 import WishGate from './pages/WishGate.jsx';
 import StarBirth from './pages/StarBirth.jsx';
 import MyStar from './pages/MyStar.jsx';
@@ -11,6 +11,7 @@ import StarGrowth from './pages/StarGrowth.jsx';
 import Star from './pages/Star.jsx';
 import Postcard from './pages/Postcard.jsx';
 import Home from './pages/Home.jsx';
+import StarDetail from './pages/StarDetail.jsx';
 
 export default function App() {
   return (
@@ -18,10 +19,11 @@ export default function App() {
       <div className="min-h-screen bg-night-sky max-w-md mx-auto relative overflow-hidden">
         <Routes>
           <Route path="/"            element={<AppLaunch />} />
-          <Route path="/intro"       element={<DreamTownIntro />} />
+          <Route path="/intro"       element={<Intro />} />
           <Route path="/wish"        element={<WishGate />} />
           <Route path="/star-birth"  element={<StarBirth />} />
           <Route path="/my-star/:id" element={<MyStar />} />
+          <Route path="/star/:id"    element={<StarDetail />} />
           <Route path="/galaxy"      element={<Galaxy />} />
           <Route path="/day"         element={<Day />} />
           <Route path="/history"     element={<History />} />

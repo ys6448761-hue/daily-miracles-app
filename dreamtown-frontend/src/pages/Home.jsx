@@ -77,12 +77,15 @@ function MyStarCard({ star, isNew, nav }) {
 }
 
 // ── 광장 별 카드 (compact) ──────────────────────
-function StarItem({ star }) {
+function StarItem({ star, nav }) {
   const daysSince = calcDaysSinceBirth(star.created_at);
   const galaxy = GALAXY_STYLE[star.galaxy_code] ?? { label: star.galaxy_name_ko ?? '미지의 은하', cls: 'bg-white/10 text-white/50' };
 
   return (
-    <div className="flex items-center gap-3 py-3 border-b border-white/5 last:border-0">
+    <div
+      onClick={() => nav(`/star/${star.star_id}`)}
+      className="flex items-center gap-3 py-3 border-b border-white/5 last:border-0 cursor-pointer hover:bg-white/3 rounded-xl px-1 -mx-1 transition-colors"
+    >
       <span className="text-lg">✦</span>
       <div className="flex-1 min-w-0">
         <p className="text-white/80 text-sm font-medium truncate">{star.star_name}</p>
@@ -185,7 +188,7 @@ export default function Home() {
           <p className="text-white/30 text-xs text-center py-4">아직 광장에 별이 없어요</p>
         ) : (
           <div>
-            {otherStars.map(s => <StarItem key={s.star_id} star={s} />)}
+            {otherStars.map(s => <StarItem key={s.star_id} star={s} nav={nav} />)}
           </div>
         )}
       </motion.div>

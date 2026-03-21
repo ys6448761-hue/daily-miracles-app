@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStar, getGalaxyStars } from '../api/dreamtown.js';
+import { getStar, getGalaxyStars, getResonance } from '../api/dreamtown.js';
 import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
 import { sharePostcard } from '../utils/kakaoShare';
-import { gaGrowthLogged, gaMilestoneDay7 } from '../utils/gtag';
+import { gaGrowthLogged, gaMilestoneDay7, gaResonanceReceived } from '../utils/gtag';
 
 // ── Day 7 의미 메시지 (은하별) ────────────────────────────────────
 // 규칙: 성공/실패 금지 · 평가/판단 금지 · 감정 압박 금지
@@ -93,6 +93,13 @@ export default function MyStar() {
             .then(r => setGalaxyStars(r.stars ?? []))
             .catch(() => setGalaxyStars([]));
         }
+        // 공명 카운트 조회 → resonance_received GA4 이벤트 (세션 1회)
+        getResonance(data.star_id).then(r => {
+          const total = Object.values(r.resonance ?? {})
+            .reduce((s, v) => s + (v.count || 0), 0);
+          if (total > 0) gaResonanceReceived({ starId: data.star_id });
+        }).catch(() => {});
+
         // 기존 성장 기록 불러오기
         const saved = localStorage.getItem(GROWTH_STORAGE_KEY(data.star_id));
         if (saved) {

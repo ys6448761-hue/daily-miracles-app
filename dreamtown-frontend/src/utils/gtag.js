@@ -109,25 +109,31 @@ export function gaGrowthLogged({ starId } = {}) {
 /**
  * 3. 공명 남김 (타인의 별에 공명 저장)
  * KPI: 공명 발생률
+ * star_id 포함: 어느 별이 공명을 유발했는지 추적
  */
-export function gaResonanceCreated({ resonanceType } = {}) {
-  send('resonance_created', { resonance_type: resonanceType });
+export function gaResonanceCreated({ starId, resonanceType } = {}) {
+  send('resonance_created', { star_id: starId, resonance_type: resonanceType });
 }
 
 /**
- * 4. 공명 받음 (내 별에 공명이 처음 생긴 시점)
+ * 4. 공명 받음 (내 별에 공명이 1개 이상 생긴 시점)
  * KPI: North Star — 공명 받은 별의 비율
+ * 중복 방지: sessionStorage 플래그 사용
  */
 export function gaResonanceReceived({ starId } = {}) {
+  const key = `dt_ga_res_recv_${starId}`;
+  if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem(key)) return;
   send('resonance_received', { star_id: starId });
+  if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(key, '1');
 }
 
 /**
  * 5. 나눔 생성 (공명 누적 → impact 트리거)
  * KPI: 연결 깊이 측정
+ * star_id 포함: 어느 별에서 나눔이 생성됐는지 추적
  */
-export function gaImpactCreated({ impactType } = {}) {
-  send('impact_created', { impact_type: impactType });
+export function gaImpactCreated({ starId, impactType } = {}) {
+  send('impact_created', { star_id: starId, impact_type: impactType });
 }
 
 /**
