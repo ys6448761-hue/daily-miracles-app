@@ -17,16 +17,24 @@ export default function WishGate() {
   const [gemType, setGemType] = useState('sapphire');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [careMessage, setCareMessage] = useState(''); // RED 신호 시 케어 메시지
 
   async function handleSubmit() {
     if (!wishText.trim()) { setError('소원을 입력해주세요.'); return; }
     setLoading(true);
     setError('');
+    setCareMessage('');
     try {
       const userId = getOrCreateUserId();
-      const { wish_id } = await postWish({ userId, wishText, gemType, yeosuTheme: 'night_sea' });
-      const star = await postStarCreate({ wishId: wish_id, userId });
-      // 재방문 시 My Star 바로 진입을 위해 star_id 저장
+      const wishResult = await postWish({ userId, wishText, gemType, yeosuTheme: 'night_sea' });
+
+      // RED 신호: 별 생성 없이 케어 메시지 표시
+      if (wishResult.safety === 'RED') {
+        setCareMessage(wishResult.care_message);
+        return;
+      }
+
+      const star = await postStarCreate({ wishId: wishResult.wish_id, userId });
       localStorage.setItem('dt_star_id', star.star_id);
       nav('/star-birth', { state: { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy } });
     } catch (e) {
@@ -96,6 +104,23 @@ export default function WishGate() {
           </p>
         )}
       </motion.div>
+
+      {/* RED 신호 케어 메시지 */}
+      {careMessage && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white/5 border border-white/15 rounded-2xl p-5 mb-4"
+        >
+          <p className="text-white/80 text-sm leading-relaxed mb-4">{careMessage}</p>
+          <button
+            onClick={() => { setCareMessage(''); setWishText(''); }}
+            className="text-white/40 text-xs hover:text-white/60 transition"
+          >
+            다른 소원으로 시작하기
+          </button>
+        </motion.div>
+      )}
 
       {error && (
         <div className="bg-white/5 border border-white/20 rounded-2xl p-4 mb-4 text-center">

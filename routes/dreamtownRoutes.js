@@ -11,6 +11,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
+const { classifyWish, notifyRedSignal } = require('../services/safetyFilter');
 
 // ── 별 이름 자동 생성 (인디언 작명법, AI 없음) ──────────────────────
 // 형식: [자연어] + [을/를] + [행동어] + 별  (50 × 40 = 2000 조합)
@@ -101,6 +102,20 @@ router.post('/wishes', async (req, res) => {
       return res.status(400).json({ error: `gem_type은 ${validGems.join('/')} 중 하나여야 합니다` });
     }
 
+    // ── 안전 필터 (신호등) ──────────────────────────────────────────
+    const safety = classifyWish(wish_text);
+
+    if (safety.level === 'RED') {
+      // RED: DB 저장 안 함, 운영 알림 발송, 케어 메시지 반환
+      notifyRedSignal('dreamtown', wish_text, safety.reason).catch(() => {});
+      console.warn('[DT] RED signal — wish blocked:', safety.reason);
+      return res.status(200).json({
+        ok:           false,
+        safety:       'RED',
+        care_message: '지금 많이 힘드신가요? 이 소원은 별로 만들어지지 않았어요. 혼자 감당하기 어려운 마음이라면 가까운 사람이나 전문 상담(☎️ 1393)에 연락해보세요.',
+      });
+    }
+
     // user 없으면 자동 생성 (Prototype: 게스트 허용)
     let userId = user_id;
     const userCheck = await db.query('SELECT id FROM dt_users WHERE id = $1', [userId]);
@@ -113,14 +128,17 @@ router.post('/wishes', async (req, res) => {
     }
 
     const result = await db.query(
-      `INSERT INTO dt_wishes (user_id, wish_text, gem_type, yeosu_theme, status)
-       VALUES ($1, $2, $3, $4, 'submitted')
-       RETURNING id, status`,
-      [userId, wish_text, gem_type, yeosu_theme || null]
+      `INSERT INTO dt_wishes (user_id, wish_text, gem_type, yeosu_theme, status, safety_level)
+       VALUES ($1, $2, $3, $4, 'submitted', $5)
+       RETURNING id, status, safety_level`,
+      [userId, wish_text, gem_type, yeosu_theme || null, safety.level]
     );
 
     const wish = result.rows[0];
-    res.status(201).json({ wish_id: wish.id, status: wish.status });
+    if (safety.level === 'YELLOW') {
+      console.warn('[DT] YELLOW signal — wish saved with safety flag:', safety.reason);
+    }
+    res.status(201).json({ wish_id: wish.id, status: wish.status, safety: wish.safety_level });
 
   } catch (err) {
     console.error('[DT] POST /wishes error:', err.message, '| code:', err.code, '| stack:', err.stack?.split('\n')[1]);
@@ -174,13 +192,16 @@ router.post('/stars/create', async (req, res) => {
     const starName = await makeStarName(wish_id, db);
     const starSlug = `star-${Date.now()}`;
 
+    // YELLOW 소원 → 별도 is_hidden=true (광장 미노출)
+    const isHidden = wish.safety_level === 'YELLOW';
+
     // star 생성
     const starResult = await db.query(
       `INSERT INTO dt_stars
-         (user_id, wish_id, star_seed_id, star_name, star_slug, galaxy_id, star_stage)
-       VALUES ($1, $2, $3, $4, $5, $6, 'day1')
+         (user_id, wish_id, star_seed_id, star_name, star_slug, galaxy_id, star_stage, is_hidden)
+       VALUES ($1, $2, $3, $4, $5, $6, 'day1', $7)
        RETURNING id, star_name, star_slug, star_stage`,
-      [user_id, wish_id, seed.id, starName, starSlug, galaxy.id]
+      [user_id, wish_id, seed.id, starName, starSlug, galaxy.id, isHidden]
     );
     const star = starResult.rows[0];
 
@@ -217,6 +238,7 @@ router.get('/stars/recent', async (req, res) => {
               g.code AS galaxy_code, g.name_ko AS galaxy_name_ko
          FROM dt_stars s
          JOIN dt_galaxies g ON g.id = s.galaxy_id
+        WHERE s.is_hidden = FALSE
         ORDER BY s.created_at ASC
         LIMIT $1`,
       [limit]
@@ -366,6 +388,7 @@ router.get('/galaxies/:code/stars', async (req, res) => {
            FROM dt_stars
           WHERE galaxy_id = $1
             AND id <> $2::uuid
+            AND is_hidden = FALSE
           ORDER BY created_at DESC
           LIMIT $3`,
         [galaxyId, exclude, limit]
@@ -375,6 +398,7 @@ router.get('/galaxies/:code/stars', async (req, res) => {
         `SELECT id AS star_id, star_name, created_at
            FROM dt_stars
           WHERE galaxy_id = $1
+            AND is_hidden = FALSE
           ORDER BY created_at DESC
           LIMIT $2`,
         [galaxyId, limit]
