@@ -100,6 +100,15 @@ export async function postResonance({ starId, resonanceType, anonymousToken }) {
   });
 }
 
+export async function postGrowthLog(starId, text) {
+  const userId = getOrCreateUserId();
+  return fetchWithRetry(`${BASE}/stars/${starId}/growth-log`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, text }),
+  });
+}
+
 // Prototype용 임시 user ID (로컬 스토리지 기반)
 export function getOrCreateUserId() {
   const key = 'dt_user_id';

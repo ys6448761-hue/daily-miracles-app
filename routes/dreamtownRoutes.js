@@ -12,6 +12,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
 const { classifyWish, notifyRedSignal } = require('../services/safetyFilter');
+const { emitKpiEvent, KPI_EVENTS, isConnectionCompleted, hasResonanceReceived } = require('../services/kpiEventEmitter');
 
 // ── 별 이름 자동 생성 (인디언 작명법, AI 없음) ──────────────────────
 // 형식: [자연어] + [을/를] + [행동어] + 별  (50 × 40 = 2000 조합)
@@ -409,6 +410,75 @@ router.get('/galaxies/:code/stars', async (req, res) => {
 
   } catch (err) {
     console.error('[DT] GET /galaxies/:code/stars error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
+// POST /api/dt/stars/:id/growth-log — 성장 기록 저장
+// Body: { user_id, text }
+// CASE 2: resonance_received 이후 owner 성장 기록 → connection_completed
+// ─────────────────────────────────────────────
+router.post('/stars/:id/growth-log', async (req, res) => {
+  try {
+    const starId  = req.params.id;
+    const { user_id, text } = req.body;
+
+    if (!user_id || !text?.trim()) {
+      return res.status(400).json({ error: 'user_id, text 필수' });
+    }
+
+    // 별 소유자 확인 + 컨텍스트 조회
+    const starResult = await db.query(
+      `SELECT s.id, s.user_id AS owner_id, s.is_hidden, s.wish_id,
+              w.safety_level
+         FROM dt_stars  s
+         JOIN dt_wishes w ON w.id = s.wish_id
+        WHERE s.id = $1`,
+      [starId]
+    );
+    if (starResult.rowCount === 0) {
+      return res.status(404).json({ error: '별을 찾을 수 없습니다' });
+    }
+    const star = starResult.rows[0];
+
+    if (star.owner_id !== user_id) {
+      return res.status(403).json({ error: '본인의 별만 기록할 수 있습니다' });
+    }
+
+    // 성장 기록 저장 (upsert 방식 — 덮어쓰기 허용)
+    await db.query(
+      `UPDATE dt_stars
+          SET growth_log_text  = $1,
+              growth_logged_at = CURRENT_TIMESTAMP
+        WHERE id = $2`,
+      [text.trim(), starId]
+    );
+
+    // ── KPI: connection_completed CASE 2 (owner 성장 기록 기반) ──
+    // resonance_received 이후 owner가 성장 기록 → 연결 완료 (최초 1회)
+    const [received, alreadyCompleted] = await Promise.all([
+      hasResonanceReceived(starId),
+      isConnectionCompleted(starId),
+    ]);
+
+    if (received && !alreadyCompleted) {
+      emitKpiEvent({
+        eventName:  KPI_EVENTS.CONNECTION_COMPLETED,
+        userId:     user_id,
+        starId,
+        wishId:     star.wish_id,
+        visibility: star.is_hidden ? 'hidden' : 'public',
+        safetyBand: star.safety_level ?? 'GREEN',
+        source:     'owner_growth_log',
+        extra:      { case: 2 },
+      }).catch(() => {});
+    }
+
+    res.json({ ok: true });
+
+  } catch (err) {
+    console.error('[DT] POST /stars/:id/growth-log error:', err.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

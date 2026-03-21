@@ -12,7 +12,7 @@
  *   resonance_created    — 공명 저장 완료
  *   impact_created       — 나눔 트리거 (impact 행 upsert 직후)
  *   resonance_received   — 별 최초 공명 수신 (total_count 1 도달 시)
- *   connection_completed — TODO: 유사 별 클릭 → 연결 완료 (stub)
+ *   connection_completed — 연결 완료 (CASE1: 재방문 / CASE2: owner 성장기록)
  */
 
 const db = require('../database/db');
@@ -68,7 +68,38 @@ const KPI_EVENTS = {
   RESONANCE_CREATED:    'resonance_created',
   IMPACT_CREATED:       'impact_created',
   RESONANCE_RECEIVED:   'resonance_received',
-  CONNECTION_COMPLETED: 'connection_completed', // TODO: 실제 emit 지점 미연결
+  CONNECTION_COMPLETED: 'connection_completed',
 };
 
-module.exports = { emitKpiEvent, KPI_EVENTS };
+// ── dedup 헬퍼 ───────────────────────────────────────────────────────
+// connection_completed가 이미 이 별에 emit됐는지 확인 (최초 1회 보장)
+async function isConnectionCompleted(starId) {
+  try {
+    const r = await db.query(
+      `SELECT 1 FROM dt_kpi_events
+        WHERE event_name = 'connection_completed' AND star_id = $1
+        LIMIT 1`,
+      [starId]
+    );
+    return r.rowCount > 0;
+  } catch {
+    return false; // DB 오류 시 dedup 스킵 (non-fatal)
+  }
+}
+
+// resonance_received가 이미 이 별에 emit됐는지 확인
+async function hasResonanceReceived(starId) {
+  try {
+    const r = await db.query(
+      `SELECT 1 FROM dt_kpi_events
+        WHERE event_name = 'resonance_received' AND star_id = $1
+        LIMIT 1`,
+      [starId]
+    );
+    return r.rowCount > 0;
+  } catch {
+    return false;
+  }
+}
+
+module.exports = { emitKpiEvent, KPI_EVENTS, isConnectionCompleted, hasResonanceReceived };

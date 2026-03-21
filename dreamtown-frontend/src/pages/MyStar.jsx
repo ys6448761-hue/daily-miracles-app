@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStar, getGalaxyStars, getResonance } from '../api/dreamtown.js';
+import { getStar, getGalaxyStars, getResonance, postGrowthLog } from '../api/dreamtown.js';
 import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
 import { sharePostcard } from '../utils/kakaoShare';
@@ -123,6 +123,8 @@ export default function MyStar() {
     localStorage.setItem(GROWTH_STORAGE_KEY(star.star_id), growthText.trim());
     setGrowthSaved(true);
     gaGrowthLogged({ starId: star.star_id });
+    // 서버에도 저장 (CASE 2: connection_completed 트리거 — fire-and-forget)
+    postGrowthLog(star.star_id, growthText.trim()).catch(() => {});
   }
 
   if (loading) {

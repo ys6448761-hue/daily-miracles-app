@@ -50,11 +50,23 @@
 - **중복 방지**: total_count가 1일 때만 emit (1회성)
 
 ### 4. `connection_completed`
-- **의미**: 유사 별 발견 → 클릭 → 연결 완료 (공명 연결 퍼널 완성)
-- **emit 지점**: **TODO** — 아직 실제 발생 지점 없음
-  - 예정: `GET /api/resonance/similar` 결과 클릭 시 별도 엔드포인트 또는 프론트에서 POST
-- **extra**: `{ source_star_id, target_star_id, similarity_score }`
-- **현재 상태**: `KPI_EVENTS.CONNECTION_COMPLETED` 상수 정의됨, emit은 TODO 주석으로 표시
+- **의미**: 공명이 실질적 연결로 완성된 순간 (최초 1회 보장)
+- **공통 조건**: `dt_kpi_events`에 동일 star_id의 `connection_completed`가 없을 때만 emit
+- **dedup 헬퍼**: `isConnectionCompleted(starId)` — `kpiEventEmitter.js`
+
+#### CASE 1 — 재방문 기반
+- **조건**: 동일 `actor_user_id`가 동일 `star_id`에 2번째 이상 공명 저장 시
+- **emit 지점**: `routes/resonanceRoutes.js` — POST /api/resonance 후 resonance COUNT ≥ 2 감지
+- **extra**: `{ case: 1, interaction_count: N }`
+- **source**: `'repeat_interaction'`
+
+#### CASE 2 — 소유자 반응 기반
+- **조건**: `resonance_received` 이후, owner가 성장 기록 저장 시
+- **emit 지점**: `routes/dreamtownRoutes.js` — POST /api/dt/stars/:id/growth-log
+  - `hasResonanceReceived(starId)` === true AND `isConnectionCompleted(starId)` === false
+- **extra**: `{ case: 2 }`
+- **source**: `'owner_growth_log'`
+- **서버 저장**: `dt_stars.growth_log_text` (migration 035)
 
 ---
 

@@ -9,7 +9,7 @@
 const express = require('express');
 const router  = express.Router();
 const db      = require('../database/db');
-const { emitKpiEvent, KPI_EVENTS } = require('../services/kpiEventEmitter');
+const { emitKpiEvent, KPI_EVENTS, isConnectionCompleted } = require('../services/kpiEventEmitter');
 
 const VALID_RESONANCE = ['relief', 'belief', 'clarity', 'courage'];
 const RESONANCE_TYPES = VALID_RESONANCE;
@@ -190,8 +190,32 @@ router.post('/', async (req, res) => {
       }).catch(() => {});
     }
 
-    // TODO: connection_completed — 유사 별 클릭 시점에 emit 예정
-    //   emitKpiEvent({ eventName: KPI_EVENTS.CONNECTION_COMPLETED, ... })
+    // ── KPI: connection_completed CASE 1 (재방문 기반) ───────────
+    // 동일 user가 동일 star에 2번째 이상 interaction 발생 시 (최초 1회)
+    if (user_id) {
+      const interactionRes = await db.query(
+        `SELECT COUNT(*)::int AS cnt FROM resonance
+          WHERE star_id = $1 AND user_id = $2`,
+        [star_id, user_id]
+      );
+      const interactionCount = interactionRes.rows[0]?.cnt ?? 0;
+      if (interactionCount >= 2) {
+        isConnectionCompleted(star_id).then(already => {
+          if (!already) {
+            emitKpiEvent({
+              eventName:  KPI_EVENTS.CONNECTION_COMPLETED,
+              userId:     user_id,
+              starId:     star_id,
+              wishId:     starRow.wish_id,
+              visibility,
+              safetyBand,
+              source:     'repeat_interaction',
+              extra:      { case: 1, interaction_count: interactionCount },
+            }).catch(() => {});
+          }
+        }).catch(() => {});
+      }
+    }
 
     res.json({
       ok: true,
