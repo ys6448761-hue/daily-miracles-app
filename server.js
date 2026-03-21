@@ -2618,11 +2618,16 @@ process.on('unhandledRejection', (reason, promise) => {
   sendCrashAlert('Unhandled Rejection', reason?.stack || String(reason));
 });
 
+const { verifySchema } = require('./services/schemaVerifier');
+
 function startServer(port) {
   app.set('runtime_port', port); // 실제 리슨 포트 저장
 
-  const server = app.listen(port, "0.0.0.0", () => {
+  const server = app.listen(port, "0.0.0.0", async () => {
     printStartupBanner(port);
+
+    // DB 스키마 자동 검증 (부팅 직후)
+    await verifySchema();
 
     // Slack Heartbeat 서비스 초기화 (09:00 KST 일일 알림)
     if (slackHeartbeatService) {
