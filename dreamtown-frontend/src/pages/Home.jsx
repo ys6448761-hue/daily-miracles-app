@@ -78,8 +78,16 @@ export default function Home() {
   const [stars, setStars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [myStarData, setMyStarData] = useState(null);
+  const [dbg, setDbg] = useState('');  // DEBUG — 배포 후 제거
 
   const myStarId = localStorage.getItem('dt_star_id');
+
+  // DEBUG: 클릭 타겟 확인 — 배포 후 제거
+  useEffect(() => {
+    const h = e => setDbg(`${e.target.tagName} | ${(e.target.className||'').toString().slice(0,60)}`);
+    window.addEventListener('click', h, true);
+    return () => window.removeEventListener('click', h, true);
+  }, []);
 
   useEffect(() => {
     const recentPromise = getRecentStars(13)
@@ -107,6 +115,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col px-5 pt-10 pb-24">
+      {/* DEBUG 배너 — 탭/클릭 시 실제 타겟 element 표시. 확인 후 제거 */}
+      {dbg && (
+        <div style={{ position:'fixed', top:0, left:0, right:0, background:'red', color:'white', fontSize:11, zIndex:9999, padding:'4px 8px', fontFamily:'monospace' }}>
+          CLICK TARGET: {dbg}
+        </div>
+      )}
       {/* 헤더 */}
       <div className="mb-6">
         <p className="text-white/40 text-xs">DreamTown</p>
