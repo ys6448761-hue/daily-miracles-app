@@ -1,23 +1,10 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStar, getGalaxyStars, getResonance, postResonance, getSimilarStars } from '../api/dreamtown.js';
+import { getStar, getGalaxyStars } from '../api/dreamtown.js';
 import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
 import { sharePostcard } from '../utils/kakaoShare';
-
-const RESONANCE_OPTIONS = [
-  { type: 'relief',  label: '숨이 놓였어요' },
-  { type: 'belief',  label: '믿고 싶어졌어요' },
-  { type: 'clarity', label: '정리됐어요' },
-  { type: 'courage', label: '용기났어요' },
-];
-
-const IMPACT_LABEL = {
-  gratitude: '감사나눔',
-  wisdom:    '지혜나눔',
-  miracle:   '기적나눔',
-};
 
 const STAGE_DAYS = {
   day1:   'Day 1',
@@ -27,7 +14,6 @@ const STAGE_DAYS = {
   day365: 'Day 365',
 };
 
-// Founding Stars fallback (API 실패 시 데모용)
 const DEMO_STAR = {
   star_id:    '00000000-0000-0000-0000-000000000004',
   star_name:  'Origin Star',
@@ -51,6 +37,8 @@ function getAurumMessage(daysSinceBirth) {
     ?? AURUM_MESSAGES[AURUM_MESSAGES.length - 1];
 }
 
+const GROWTH_STORAGE_KEY = (starId) => `dt_growth_reflection_${starId}`;
+
 export default function MyStar() {
   const { id } = useParams();
   const nav = useNavigate();
@@ -59,15 +47,9 @@ export default function MyStar() {
   const [galaxyStars, setGalaxyStars] = useState([]);
   const { setStarData } = useDreamtownStore();
 
-  // 공명 기반 유사 별
-  const [similarStars, setSimilarStars] = useState([]);
-
-  // 공명 & 나눔 상태
-  const [resonanceData, setResonanceData] = useState(null); // { resonance, impacts }
-  const [resonanceOpen, setResonanceOpen] = useState(false);
-  const [resonanceSubmitted, setResonanceSubmitted] = useState(false);
-  const [resonanceResult, setResonanceResult] = useState(null); // { message, new_impacts }
-  const [resonancePosting, setResonancePosting] = useState(false);
+  // 성장 질문 상태
+  const [growthText, setGrowthText] = useState('');
+  const [growthSaved, setGrowthSaved] = useState(false);
 
   useEffect(() => {
     getStar(id)
@@ -78,22 +60,17 @@ export default function MyStar() {
           starGalaxyName: data.galaxy?.name_ko ?? null,
           starCreatedAt:  data.created_at,
         });
-        // 같은 은하 별 목록 (자신 제외, 최대 5개)
         if (data.galaxy?.code) {
           getGalaxyStars(data.galaxy.code, { limit: 5, exclude: data.star_id })
             .then(r => setGalaxyStars(r.stars ?? []))
             .catch(() => setGalaxyStars([]));
         }
-        // 공명/나눔 현황 조회
-        getResonance(data.star_id)
-          .then(r => setResonanceData(r))
-          .catch(() => {});
-
-        // 공명 기반 유사 별
-        const resonanceToken = localStorage.getItem('dt_resonance_token');
-        getSimilarStars({ starId: data.star_id, token: resonanceToken })
-          .then(r => setSimilarStars(r.similar_stars ?? []))
-          .catch(() => {});
+        // 기존 성장 기록 불러오기
+        const saved = localStorage.getItem(GROWTH_STORAGE_KEY(data.star_id));
+        if (saved) {
+          setGrowthText(saved);
+          setGrowthSaved(true);
+        }
       })
       .catch(() => {
         setStar(DEMO_STAR);
@@ -106,35 +83,10 @@ export default function MyStar() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  async function handleResonance(resonanceType) {
-    if (resonancePosting || resonanceSubmitted) return;
-    setResonancePosting(true);
-    try {
-      // anonymous_token: localStorage에서 일관된 토큰 사용
-      let token = localStorage.getItem('dt_resonance_token');
-      if (!token) {
-        token = crypto.randomUUID();
-        localStorage.setItem('dt_resonance_token', token);
-      }
-      const result = await postResonance({
-        starId: star.star_id,
-        resonanceType,
-        anonymousToken: token,
-      });
-      setResonanceResult(result);
-      setResonanceSubmitted(true);
-      // 나눔 데이터 + 유사 별 갱신
-      getResonance(star.star_id).then(r => setResonanceData(r)).catch(() => {});
-      getSimilarStars({ starId: star.star_id, token })
-        .then(r => setSimilarStars(r.similar_stars ?? []))
-        .catch(() => {});
-    } catch (err) {
-      // 409 중복 → 이미 공명한 것으로 처리
-      setResonanceResult({ message: err.message });
-      setResonanceSubmitted(true);
-    } finally {
-      setResonancePosting(false);
-    }
+  function handleGrowthSave() {
+    if (!growthText.trim() || !star) return;
+    localStorage.setItem(GROWTH_STORAGE_KEY(star.star_id), growthText.trim());
+    setGrowthSaved(true);
   }
 
   if (loading) {
@@ -171,7 +123,6 @@ export default function MyStar() {
           ⭐
         </motion.div>
 
-        {/* 아우룸 메시지 — 별 이름 바로 위 */}
         <p style={{ fontSize: 12, color: '#9B87F5', fontStyle: 'italic', marginBottom: 8 }}>
           <span style={{ fontSize: 16 }}>🐢</span> {aurumMsg.text}
         </p>
@@ -202,8 +153,6 @@ export default function MyStar() {
       {galaxyStars.length >= 2 && (
         <div className="mb-6">
           <p className="text-white/40 text-xs mb-3">같은 은하 별들</p>
-
-          {/* 가로 스크롤 카드 */}
           <div
             className="flex gap-3 overflow-x-auto pb-2"
             style={{ scrollbarWidth: 'none' }}
@@ -224,8 +173,6 @@ export default function MyStar() {
               );
             })}
           </div>
-
-          {/* 은하 전체 보기 */}
           <button
             onClick={() => nav(`/galaxy?highlight=${star.galaxy.code}`)}
             className="mt-3 text-white/35 text-xs hover:text-white/55 transition"
@@ -235,95 +182,44 @@ export default function MyStar() {
         </div>
       )}
 
-      {/* 공명 & 나눔 */}
+      {/* 성장 질문 */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="mb-6"
+        className="bg-white/3 border border-white/8 rounded-3xl p-5 mb-6"
       >
-        {/* 나눔 표시 — impact 있을 때만 */}
-        {resonanceData?.impacts?.length > 0 && (
-          <div className="flex gap-2 flex-wrap mb-3">
-            {resonanceData.impacts.map(imp => (
-              <span
-                key={imp.type}
-                className="text-xs bg-dream-purple/15 border border-dream-purple/30 text-purple-300 px-3 py-1 rounded-full"
+        <p className="text-white/50 text-xs mb-3">이 별 이후 당신은 어떻게 달라졌나요?</p>
+        {growthSaved ? (
+          <div>
+            <p className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">{growthText}</p>
+            <button
+              onClick={() => setGrowthSaved(false)}
+              className="mt-3 text-white/25 text-xs hover:text-white/45 transition"
+            >
+              수정하기
+            </button>
+          </div>
+        ) : (
+          <div>
+            <textarea
+              value={growthText}
+              onChange={e => setGrowthText(e.target.value)}
+              placeholder="오늘의 작은 변화를 기록해보세요."
+              rows={3}
+              className="w-full bg-transparent text-white/70 text-sm placeholder-white/20 outline-none resize-none leading-relaxed"
+            />
+            {growthText.trim() && (
+              <button
+                onClick={handleGrowthSave}
+                className="mt-2 text-dream-purple text-xs hover:text-purple-300 transition"
               >
-                {imp.label}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* 공명 버튼 / 선택 UI / 결과 */}
-        {!resonanceOpen && !resonanceSubmitted && (
-          <button
-            onClick={() => setResonanceOpen(true)}
-            className="w-full border border-white/15 text-white/60 text-sm py-3 rounded-2xl hover:border-white/30 hover:text-white/80 transition-colors"
-          >
-            공명 남기기
-          </button>
-        )}
-
-        {resonanceOpen && !resonanceSubmitted && (
-          <div className="bg-white/3 border border-white/10 rounded-2xl p-4">
-            <p className="text-white/50 text-xs mb-3 text-center">이 별이 당신에게 어떻게 닿았나요?</p>
-            <div className="grid grid-cols-2 gap-2">
-              {RESONANCE_OPTIONS.map(opt => (
-                <button
-                  key={opt.type}
-                  onClick={() => handleResonance(opt.type)}
-                  disabled={resonancePosting}
-                  className="bg-white/5 hover:bg-dream-purple/20 border border-white/10 hover:border-dream-purple/40 text-white/70 hover:text-white text-sm py-3 rounded-xl transition-colors disabled:opacity-50"
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {resonanceSubmitted && resonanceResult && (
-          <div className="bg-dream-purple/10 border border-dream-purple/20 rounded-2xl p-4 text-center">
-            <p className="text-white/70 text-sm">{resonanceResult.message}</p>
-            {resonanceResult.new_impacts?.length > 0 && (
-              <p className="text-dream-purple text-xs mt-2">
-                ✨ {resonanceResult.new_impacts.map(i => i.label).join(' · ')} 생성됨
-              </p>
+                저장하기
+              </button>
             )}
           </div>
         )}
       </motion.div>
-
-      {/* 비슷한 마음이 머문 별 — 공명 기반 연결 */}
-      {similarStars.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45 }}
-          className="mb-6"
-        >
-          <p className="text-white/35 text-xs mb-3">비슷한 마음이 머문 별</p>
-          <div className="flex flex-col gap-2">
-            {similarStars.map(s => {
-              const d = calcDaysSinceBirth(s.created_at);
-              return (
-                <div
-                  key={s.star_id}
-                  className="flex items-center gap-3 bg-white/3 border border-white/8 rounded-2xl px-4 py-3"
-                >
-                  <span className="text-base text-white/40">✦</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white/70 text-sm font-medium truncate">{s.star_name}</p>
-                    <p className="text-white/30 text-xs">{s.galaxy_name_ko} · D+{d}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </motion.div>
-      )}
 
       {/* CTA */}
       <div className="flex flex-col gap-3 mt-auto">
