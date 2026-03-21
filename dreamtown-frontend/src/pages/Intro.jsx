@@ -15,8 +15,6 @@ const STEPS = [
   { src: `${BASE}images/intro/intro-01-look.jpg`,      text: '소원을 떠올려보세요' },
   { src: `${BASE}images/intro/intro-02-write.jpg`,     text: '소원을 말하는 것만으로도' },
   { src: `${BASE}images/intro/intro-03-transform.jpg`, text: '소원은 별이 됩니다' },
-  { src: `${BASE}images/intro/intro-04-choice.jpg`,    text: '오늘의 빛을 선택해요' },
-  { src: `${BASE}images/intro/intro-05-result.jpg`,    text: '오늘은 이 삶을 살아볼 수 있어요' },
 ];
 
 const LAST_STEP = STEPS.length;
