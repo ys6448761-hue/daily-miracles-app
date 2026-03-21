@@ -215,7 +215,7 @@ function BottomTab({ active, myStarId }) {
     { key: 'mystar', label: 'My Star', path: myStarId ? `/my-star/${myStarId}` : '/wish', emoji: '⭐' },
   ];
   return (
-    <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-night-sky/90 backdrop-blur border-t border-white/10 flex">
+    <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-night-sky border-t border-white/10 flex z-50">
       {tabs.map(t => (
         <button
           key={t.key}

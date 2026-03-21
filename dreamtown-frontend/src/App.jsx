@@ -17,7 +17,7 @@ import DashboardPage from './pages/DashboardPage.jsx';
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-night-sky max-w-md mx-auto relative overflow-hidden">
+      <div className="min-h-screen bg-night-sky max-w-md mx-auto relative">
         <Routes>
           <Route path="/"            element={<AppLaunch />} />
           <Route path="/intro"       element={<Intro />} />
