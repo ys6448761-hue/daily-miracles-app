@@ -185,6 +185,13 @@ export default function MyStar() {
             </p>
           </div>
         </div>
+
+        <button
+          onClick={() => nav(`/star/${star.star_id}`)}
+          className="mt-4 w-full bg-white/8 hover:bg-white/15 border border-white/15 hover:border-white/30 text-white/70 hover:text-white text-sm font-medium py-3 rounded-2xl transition-colors"
+        >
+          내 별 자세히 보기 ✦
+        </button>
       </motion.div>
 
       {/* Day 7 의미 생성 — 7일 이상 경과 시 노출 */}
