@@ -215,19 +215,21 @@ function BottomTab({ active, myStarId }) {
     { key: 'mystar', label: 'My Star', path: myStarId ? `/my-star/${myStarId}` : '/wish', emoji: '⭐' },
   ];
   return (
-    <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-night-sky border-t border-white/10 flex z-50">
-      {tabs.map(t => (
-        <button
-          key={t.key}
-          onClick={() => nav(t.path)}
-          className={`flex-1 flex flex-col items-center py-3 text-xs transition-colors ${
-            active === t.key ? 'text-star-gold' : 'text-white/30 hover:text-white/60'
-          }`}
-        >
-          <span className="text-lg">{t.emoji}</span>
-          {t.label}
-        </button>
-      ))}
+    <div className="fixed inset-x-0 bottom-0 z-50 pointer-events-none">
+      <nav className="max-w-md mx-auto bg-night-sky border-t border-white/10 flex pointer-events-auto">
+        {tabs.map(t => (
+          <button
+            key={t.key}
+            onClick={() => nav(t.path)}
+            className={`flex-1 flex flex-col items-center py-3 text-xs transition-colors ${
+              active === t.key ? 'text-star-gold' : 'text-white/30 hover:text-white/60'
+            }`}
+          >
+            <span className="text-lg">{t.emoji}</span>
+            {t.label}
+          </button>
+        ))}
+      </nav>
     </div>
   );
 }
