@@ -219,7 +219,8 @@ export default function MyStar() {
               return (
                 <div
                   key={s.star_id}
-                  className="flex-shrink-0 bg-white/5 border border-white/8 rounded-2xl px-4 py-3 text-center"
+                  onClick={() => nav(`/star/${s.star_id}`)}
+                  className="flex-shrink-0 bg-white/5 border border-white/8 rounded-2xl px-4 py-3 text-center cursor-pointer hover:bg-white/10 hover:border-white/20 active:scale-95 transition-all"
                   style={{ minWidth: 120 }}
                 >
                   <p className="text-white/80 text-xs font-medium leading-tight mb-1">
