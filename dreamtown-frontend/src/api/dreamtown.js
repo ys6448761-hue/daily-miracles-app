@@ -109,6 +109,28 @@ export async function postGrowthLog(starId, text) {
   });
 }
 
+// ── KPI 대시보드 ──────────────────────────────────────────────────
+export async function getDashboard(range = '7d') {
+  const res = await fetch(`/api/kpi/dashboard?range=${range}`);
+  if (!res.ok) throw new Error('대시보드 조회 실패');
+  return res.json();
+}
+
+// ── 피드백 ────────────────────────────────────────────────────────
+export async function postFeedback({ userId, starId, feelingType, reason, comment }) {
+  return fetchWithRetry('/api/feedback', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      user_id:      userId,
+      star_id:      starId,
+      feeling_type: feelingType,
+      reason:       reason  ?? null,
+      comment:      comment ?? null,
+    }),
+  });
+}
+
 // Prototype용 임시 user ID (로컬 스토리지 기반)
 export function getOrCreateUserId() {
   const key = 'dt_user_id';

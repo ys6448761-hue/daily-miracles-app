@@ -9,6 +9,8 @@
  * - 모든 필드 null-safe (누락 필드는 NULL 저장, 에러 아님)
  *
  * 이벤트 목록 (KPI SSOT):
+ *   star_created         — 별 생성 완료 (POST /api/dt/stars/create)
+ *   growth_logged        — 성장 기록 저장 (POST /api/dt/stars/:id/growth-log)
  *   resonance_created    — 공명 저장 완료
  *   impact_created       — 나눔 트리거 (impact 행 upsert 직후)
  *   resonance_received   — 별 최초 공명 수신 (total_count 1 도달 시)
@@ -65,6 +67,8 @@ async function emitKpiEvent({
 
 // ── 이벤트 이름 상수 (SSOT) ─────────────────────────────────────────
 const KPI_EVENTS = {
+  STAR_CREATED:         'star_created',
+  GROWTH_LOGGED:        'growth_logged',
   RESONANCE_CREATED:    'resonance_created',
   IMPACT_CREATED:       'impact_created',
   RESONANCE_RECEIVED:   'resonance_received',

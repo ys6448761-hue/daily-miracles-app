@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getStar, getResonance, postResonance } from '../api/dreamtown.js';
+import FeedbackFlow from '../components/FeedbackFlow.jsx';
 import { gaResonanceCreated, gaImpactCreated } from '../utils/gtag';
 
 const RESONANCE_OPTIONS = [
@@ -42,6 +43,7 @@ export default function StarDetail() {
   const [resonanceSubmitted, setResonanceSubmitted] = useState(false);
   const [resonanceResult, setResonanceResult] = useState(null);
   const [resonancePosting, setResonancePosting] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -78,6 +80,8 @@ export default function StarDetail() {
 
       setResonanceResult(result);
       setResonanceSubmitted(true);
+      // 공명 완료 후 피드백 플로우 노출 (0.5초 딜레이)
+      setTimeout(() => setShowFeedback(true), 500);
 
       // 공명/나눔 데이터 갱신
       getResonance(id).then(setResonanceData).catch(() => {});
@@ -189,12 +193,20 @@ export default function StarDetail() {
         )}
 
         {resonanceSubmitted && resonanceResult && (
-          <div className="bg-dream-purple/10 border border-dream-purple/20 rounded-2xl p-4 text-center">
-            <p className="text-white/70 text-sm">{resonanceResult.message}</p>
-            {resonanceResult.new_impacts?.length > 0 && (
-              <p className="text-dream-purple text-xs mt-2">
-                ✨ {resonanceResult.new_impacts.map(i => i.label ?? IMPACT_LABEL[i.type]).join(' · ')} 생성됨
-              </p>
+          <div>
+            <div className="bg-dream-purple/10 border border-dream-purple/20 rounded-2xl p-4 text-center">
+              <p className="text-white/70 text-sm">{resonanceResult.message}</p>
+              {resonanceResult.new_impacts?.length > 0 && (
+                <p className="text-dream-purple text-xs mt-2">
+                  ✨ {resonanceResult.new_impacts.map(i => i.label ?? IMPACT_LABEL[i.type]).join(' · ')} 생성됨
+                </p>
+              )}
+            </div>
+            {showFeedback && (
+              <FeedbackFlow
+                starId={id}
+                onComplete={() => setShowFeedback(false)}
+              />
             )}
           </div>
         )}

@@ -2183,6 +2183,16 @@ const resonanceRoutes = require('./routes/resonanceRoutes');
 app.use('/api/resonance', resonanceRoutes);
 console.log('✅ 공명 & 나눔 라우터 등록 완료 (/api/resonance)');
 
+// ---------- KPI Dashboard Routes ----------
+const kpiRoutes = require('./routes/kpiRoutes');
+app.use('/api/kpi', kpiRoutes);
+console.log('✅ KPI 대시보드 라우터 등록 완료 (/api/kpi)');
+
+// ---------- Feedback Routes ----------
+const feedbackRoutes = require('./routes/feedbackRoutes');
+app.use('/api/feedback', feedbackRoutes);
+console.log('✅ 피드백 라우터 등록 완료 (/api/feedback)');
+
 // ---------- DreamTown Frontend (Prototype) ----------
 const dtFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist');
 app.use('/dreamtown', express.static(dtFrontendPath, {
@@ -2208,6 +2218,7 @@ const DT_SPA_ROUTES = [
   '/galaxy', '/day', '/star', '/star-growth',
   '/postcard', '/history', '/intro',
   '/star-birth', '/my-star', '/my-star/*', '/home',
+  '/star/*', '/dashboard', '/wish',
 ];
 app.get(DT_SPA_ROUTES, (req, res) => {
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');

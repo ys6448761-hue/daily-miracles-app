@@ -212,6 +212,18 @@ router.post('/stars/create', async (req, res) => {
       [wish_id]
     );
 
+    // ── KPI: star_created (서버 사이드 emit) ────────────────────
+    emitKpiEvent({
+      eventName:  KPI_EVENTS.STAR_CREATED,
+      userId:     user_id,
+      starId:     star.id,
+      wishId:     wish_id,
+      visibility: isHidden ? 'hidden' : 'public',
+      safetyBand: wish.safety_level ?? 'GREEN',
+      source:     'star_create_route',
+      extra:      { galaxy: galaxyCode, gem_type: wish.gem_type },
+    }).catch(() => {});
+
     res.status(201).json({
       star_id:              star.id,
       star_name:            star.star_name,
@@ -454,6 +466,17 @@ router.post('/stars/:id/growth-log', async (req, res) => {
         WHERE id = $2`,
       [text.trim(), starId]
     );
+
+    // ── KPI: growth_logged ───────────────────────────────────────
+    emitKpiEvent({
+      eventName:  KPI_EVENTS.GROWTH_LOGGED,
+      userId:     user_id,
+      starId,
+      wishId:     star.wish_id,
+      visibility: star.is_hidden ? 'hidden' : 'public',
+      safetyBand: star.safety_level ?? 'GREEN',
+      source:     'growth_log_route',
+    }).catch(() => {});
 
     // ── KPI: connection_completed CASE 2 (owner 성장 기록 기반) ──
     // resonance_received 이후 owner가 성장 기록 → 연결 완료 (최초 1회)
