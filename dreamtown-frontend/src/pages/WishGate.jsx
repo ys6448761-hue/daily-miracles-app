@@ -145,7 +145,7 @@ export default function WishGate() {
         disabled={loading}
         className="w-full bg-dream-purple hover:bg-purple-500 disabled:opacity-50 text-white font-bold py-4 rounded-2xl text-lg transition-colors mt-auto"
       >
-        {loading ? '별을 만드는 중...' : 'Create My Star ✨'}
+        {loading ? '별을 만드는 중...' : '별 만들기 ✨'}
       </motion.button>
     </div>
   );
