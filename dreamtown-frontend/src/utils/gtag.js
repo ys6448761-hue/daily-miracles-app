@@ -85,3 +85,59 @@ export function gaSaveClick({ direction } = {}) {
     tone: DIRECTION_SEMANTIC[direction] ?? direction,
   });
 }
+
+// ── DreamTown KPI 이벤트 (SSOT: 이 파일에만 정의) ──────────────
+// 퍼널: star_created → growth_logged → resonance_created/received
+//        → impact_created → milestone_day7
+
+/**
+ * 1. 별 생성 완료
+ * KPI: 별 생성률 = star_created / wish 입력
+ */
+export function gaStarCreated({ gemType, galaxyType } = {}) {
+  send('star_created', { gem_type: gemType, galaxy_type: galaxyType });
+}
+
+/**
+ * 2. 성장 기록 1회
+ * KPI: 첫 성장 기록률 = growth_logged ≥1 / star_created
+ */
+export function gaGrowthLogged({ starId } = {}) {
+  send('growth_logged', { star_id: starId });
+}
+
+/**
+ * 3. 공명 남김 (타인의 별에 공명 저장)
+ * KPI: 공명 발생률
+ */
+export function gaResonanceCreated({ resonanceType } = {}) {
+  send('resonance_created', { resonance_type: resonanceType });
+}
+
+/**
+ * 4. 공명 받음 (내 별에 공명이 처음 생긴 시점)
+ * KPI: North Star — 공명 받은 별의 비율
+ */
+export function gaResonanceReceived({ starId } = {}) {
+  send('resonance_received', { star_id: starId });
+}
+
+/**
+ * 5. 나눔 생성 (공명 누적 → impact 트리거)
+ * KPI: 연결 깊이 측정
+ */
+export function gaImpactCreated({ impactType } = {}) {
+  send('impact_created', { impact_type: impactType });
+}
+
+/**
+ * 6. Day 7 도달 (별 생성 후 7일 내 재방문)
+ * KPI: Day 7 재방문율 = milestone_day7 / star_created
+ * 중복 방지: sessionStorage 플래그 사용
+ */
+export function gaMilestoneDay7({ starId } = {}) {
+  const key = `dt_ga_day7_${starId}`;
+  if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem(key)) return;
+  send('milestone_day7', { star_id: starId });
+  if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(key, '1');
+}

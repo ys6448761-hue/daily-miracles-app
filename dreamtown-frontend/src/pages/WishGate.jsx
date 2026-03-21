@@ -36,7 +36,7 @@ export default function WishGate() {
 
       const star = await postStarCreate({ wishId: wishResult.wish_id, userId });
       localStorage.setItem('dt_star_id', star.star_id);
-      nav('/star-birth', { state: { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy } });
+      nav('/star-birth', { state: { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy, gemType } });
     } catch (e) {
       setError(e.message);
     } finally {

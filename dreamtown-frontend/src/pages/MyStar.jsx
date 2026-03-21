@@ -5,6 +5,7 @@ import { getStar, getGalaxyStars } from '../api/dreamtown.js';
 import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
 import { sharePostcard } from '../utils/kakaoShare';
+import { gaGrowthLogged, gaMilestoneDay7 } from '../utils/gtag';
 
 // ── Day 7 의미 메시지 (은하별) ────────────────────────────────────
 // 규칙: 성공/실패 금지 · 평가/판단 금지 · 감정 압박 금지
@@ -114,6 +115,7 @@ export default function MyStar() {
     if (!growthText.trim() || !star) return;
     localStorage.setItem(GROWTH_STORAGE_KEY(star.star_id), growthText.trim());
     setGrowthSaved(true);
+    gaGrowthLogged({ starId: star.star_id });
   }
 
   if (loading) {
@@ -179,6 +181,7 @@ export default function MyStar() {
       {/* Day 7 의미 생성 — 7일 이상 경과 시 노출 */}
       {daysSinceBirth >= 7 && (() => {
         const msg = DAY7_MESSAGES[star.galaxy?.code] ?? DAY7_DEFAULT;
+        gaMilestoneDay7({ starId: star.star_id }); // sessionStorage 중복 방지 내장
         return (
           <motion.div
             initial={{ opacity: 0, y: 10 }}

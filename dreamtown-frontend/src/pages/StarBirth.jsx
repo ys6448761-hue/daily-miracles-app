@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { gaStarCreated } from '../utils/gtag';
 
 const STAGES = [
   { key: 'seed',           emoji: '✨', text: '빛구슬이 떠오릅니다...',         sub: 'A light is rising from the sea.' },
@@ -15,8 +16,10 @@ export default function StarBirth() {
   const [stage, setStage] = useState(0);
   const [done, setDone] = useState(false);
 
-  const starId   = state?.starId;
-  const starName = state?.starName || '나의 별';
+  const starId    = state?.starId;
+  const starName  = state?.starName  || '나의 별';
+  const galaxy    = state?.galaxy    ?? null;
+  const gemType   = state?.gemType   ?? null;
 
   useEffect(() => {
     if (stage >= STAGES.length - 1) {
@@ -26,6 +29,12 @@ export default function StarBirth() {
     const t = setTimeout(() => setStage(s => s + 1), 1200);
     return () => clearTimeout(t);
   }, [stage]);
+
+  // 별 생성 완료 → GA4 star_created (1회)
+  useEffect(() => {
+    if (!done) return;
+    gaStarCreated({ gemType, galaxyType: galaxy });
+  }, [done]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 애니메이션 완료 후 광장(Home)으로 자동 이동
   useEffect(() => {
