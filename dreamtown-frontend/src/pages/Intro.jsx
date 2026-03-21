@@ -82,7 +82,7 @@ export default function Intro() {
       gaIntroCTAClick({ screenVariant, ctaText });
       // 별 zoom 트랜지션 시작 → 1200ms 후 Galaxy 이동
       setTransitioning(true);
-      timerRef.current = setTimeout(() => navigate('/galaxy'), 1200);
+      timerRef.current = setTimeout(() => navigate('/wish'), 1200);
     }
   };
 

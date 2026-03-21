@@ -215,9 +215,8 @@ export default function Home() {
 function BottomTab({ active, myStarId }) {
   const nav = useNavigate();
   const tabs = [
-    { key: 'home',   label: 'Home',    path: '/home',                   emoji: '🏠' },
-    { key: 'wish',   label: 'Wish',    path: '/wish',                   emoji: '✨' },
-    { key: 'galaxy', label: 'Galaxy',  path: '/galaxy',                 emoji: '🌌' },
+    { key: 'home',   label: 'Home',    path: '/home',                              emoji: '🏠' },
+    { key: 'wish',   label: 'Wish',    path: '/wish',                              emoji: '✨' },
     { key: 'mystar', label: 'My Star', path: myStarId ? `/my-star/${myStarId}` : '/wish', emoji: '⭐' },
   ];
   return (

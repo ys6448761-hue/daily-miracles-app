@@ -292,10 +292,10 @@ export default function MyStar() {
         </button>
         <div className="flex gap-3">
           <button
-            onClick={() => nav('/galaxy')}
+            onClick={() => nav('/home')}
             className="flex-1 bg-white/5 border border-white/10 text-white/70 font-semibold py-4 rounded-2xl hover:bg-white/10 transition-colors"
           >
-            은하 탐험하기
+            광장으로 가기
           </button>
           <button
             onClick={() => nav('/wish')}
