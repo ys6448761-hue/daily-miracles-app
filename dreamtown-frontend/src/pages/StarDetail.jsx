@@ -45,6 +45,9 @@ export default function StarDetail() {
   const [resonancePosting, setResonancePosting] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
 
+  // 내 별 ID (공명 후 연결 CTA에 사용)
+  const myStarId = localStorage.getItem('dt_star_id');
+
   useEffect(() => {
     Promise.all([
       getStar(id).then(setStar),
@@ -62,16 +65,9 @@ export default function StarDetail() {
         localStorage.setItem('dt_resonance_token', token);
       }
 
-      const result = await postResonance({
-        starId: id,
-        resonanceType,
-        anonymousToken: token,
-      });
+      const result = await postResonance({ starId: id, resonanceType, anonymousToken: token });
 
-      // GA4: resonance_created (star_id 포함)
       gaResonanceCreated({ starId: id, resonanceType });
-
-      // GA4: impact_created (new_impacts가 있을 때)
       if (result.new_impacts?.length > 0) {
         for (const imp of result.new_impacts) {
           gaImpactCreated({ starId: id, impactType: imp.type });
@@ -80,10 +76,7 @@ export default function StarDetail() {
 
       setResonanceResult(result);
       setResonanceSubmitted(true);
-      // 공명 완료 후 피드백 플로우 노출 (0.5초 딜레이)
       setTimeout(() => setShowFeedback(true), 500);
-
-      // 공명/나눔 데이터 갱신
       getResonance(id).then(setResonanceData).catch(() => {});
 
     } catch (err) {
@@ -112,7 +105,10 @@ export default function StarDetail() {
   }
 
   const daysSince = calcDaysSinceBirth(star.created_at);
-  const galaxyStyle = GALAXY_STYLE[star.galaxy?.code] ?? { label: star.galaxy?.name_ko ?? '미지의 은하', cls: 'bg-white/10 text-white/50' };
+  const galaxyStyle = GALAXY_STYLE[star.galaxy?.code] ?? {
+    label: star.galaxy?.name_ko ?? '미지의 은하',
+    cls: 'bg-white/10 text-white/50',
+  };
   const impacts = resonanceData?.impacts ?? [];
 
   return (
@@ -124,56 +120,74 @@ export default function StarDetail() {
         <div className="w-8" />
       </div>
 
-      {/* 별 카드 */}
+      {/* ── 1. 별 이해 섹션 ────────────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white/5 border border-white/10 rounded-3xl p-6 mb-6 text-center"
+        className="bg-white/5 border border-white/10 rounded-3xl p-6 mb-5"
       >
-        <div className="text-5xl mb-4">✦</div>
+        <div className="text-center mb-4">
+          <div className="text-5xl mb-4">✦</div>
+          <h1 className="text-2xl font-bold text-star-gold mb-3">{star.star_name}</h1>
 
-        <h1 className="text-2xl font-bold text-star-gold mb-3">{star.star_name}</h1>
+          <div className="flex gap-2 justify-center flex-wrap mb-3">
+            <span className={`text-xs px-3 py-1 rounded-full ${galaxyStyle.cls}`}>
+              {galaxyStyle.label}
+            </span>
+            <span className="text-xs bg-white/10 text-white/50 px-3 py-1 rounded-full">
+              D+{daysSince}
+            </span>
+          </div>
 
-        <div className="flex gap-2 justify-center flex-wrap mb-4">
-          <span className={`text-xs px-3 py-1 rounded-full ${galaxyStyle.cls}`}>
-            {galaxyStyle.label}
-          </span>
-          <span className="text-xs bg-white/10 text-white/50 px-3 py-1 rounded-full">
-            D+{daysSince}
-          </span>
+          {/* 나눔 뱃지 */}
+          {impacts.length > 0 && (
+            <div className="flex gap-2 justify-center flex-wrap">
+              {impacts.map(imp => (
+                <span
+                  key={imp.type}
+                  className="text-xs bg-dream-purple/15 border border-dream-purple/30 text-purple-300 px-3 py-1 rounded-full"
+                >
+                  {imp.label}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* 나눔 뱃지 */}
-        {impacts.length > 0 && (
-          <div className="flex gap-2 justify-center flex-wrap">
-            {impacts.map(imp => (
-              <span
-                key={imp.type}
-                className="text-xs bg-dream-purple/15 border border-dream-purple/30 text-purple-300 px-3 py-1 rounded-full"
-              >
-                {imp.label}
-              </span>
-            ))}
+        {/* 소원 내용 — 별의 의미 */}
+        {star.wish_text && (
+          <div className="border-t border-white/8 pt-4 mt-1">
+            <p className="text-white/30 text-xs mb-2 text-center">이 별의 소원</p>
+            <p className="text-white/65 text-sm leading-relaxed text-center italic">
+              "{star.wish_text}"
+            </p>
           </div>
         )}
       </motion.div>
 
-      {/* 공명 UI */}
+      {/* ── 2. 공명 섹션 ──────────────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="mb-6"
+        className="mb-5"
       >
+        {/* 공명 전 */}
         {!resonanceOpen && !resonanceSubmitted && (
-          <button
-            onClick={() => setResonanceOpen(true)}
-            className="w-full border border-white/15 text-white/60 text-sm py-4 rounded-2xl hover:border-white/30 hover:text-white/80 transition-colors"
-          >
-            공명 남기기
-          </button>
+          <div className="bg-white/3 border border-white/8 rounded-2xl p-5">
+            <p className="text-white/45 text-sm text-center leading-relaxed mb-4">
+              이 소원이 당신에게<br />어떻게 닿았나요?
+            </p>
+            <button
+              onClick={() => setResonanceOpen(true)}
+              className="w-full bg-dream-purple/20 hover:bg-dream-purple/30 border border-dream-purple/30 text-white/80 text-sm font-medium py-3.5 rounded-xl transition-colors"
+            >
+              공명 남기기
+            </button>
+          </div>
         )}
 
+        {/* 공명 타입 선택 */}
         {resonanceOpen && !resonanceSubmitted && (
           <div className="bg-white/3 border border-white/10 rounded-2xl p-4">
             <p className="text-white/50 text-xs mb-3 text-center">이 별이 당신에게 어떻게 닿았나요?</p>
@@ -192,6 +206,7 @@ export default function StarDetail() {
           </div>
         )}
 
+        {/* 공명 완료 */}
         {resonanceSubmitted && resonanceResult && (
           <div>
             <div className="bg-dream-purple/10 border border-dream-purple/20 rounded-2xl p-4 text-center">
@@ -202,6 +217,8 @@ export default function StarDetail() {
                 </p>
               )}
             </div>
+
+            {/* 피드백 플로우 */}
             {showFeedback && (
               <FeedbackFlow
                 starId={id}
@@ -212,11 +229,34 @@ export default function StarDetail() {
         )}
       </motion.div>
 
-      {/* 홈으로 */}
-      <div className="mt-auto">
+      {/* ── 3. 내 별 연결 CTA (공명 후 노출) ──────────────────── */}
+      {resonanceSubmitted && myStarId && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="flex flex-col gap-3 mb-5"
+        >
+          <button
+            onClick={() => nav(`/my-star/${myStarId}`)}
+            className="w-full bg-star-gold/15 hover:bg-star-gold/25 border border-star-gold/30 text-star-gold font-semibold py-4 rounded-2xl transition-colors"
+          >
+            내 별 보러 가기 ✦
+          </button>
+          <button
+            onClick={() => nav(`/my-star/${myStarId}`)}
+            className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 font-semibold py-4 rounded-2xl transition-colors"
+          >
+            내 별에 오늘 마음 남기기
+          </button>
+        </motion.div>
+      )}
+
+      {/* ── 광장 복귀 (최하위 우선순위) ───────────────────────── */}
+      <div className="mt-auto pt-2">
         <button
           onClick={() => nav('/home')}
-          className="w-full bg-white/5 border border-white/10 text-white/60 font-semibold py-4 rounded-2xl hover:bg-white/10 transition-colors"
+          className="w-full text-white/35 text-sm py-3 hover:text-white/55 transition-colors"
         >
           광장으로 돌아가기
         </button>
