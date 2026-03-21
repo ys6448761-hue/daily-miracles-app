@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { getRecentStars, getStar } from '../api/dreamtown.js';
 
 const GALAXY_STYLE = {
@@ -77,14 +77,15 @@ function MyStarCard({ star, isNew, nav }) {
 }
 
 // ── 광장 별 카드 (compact) ──────────────────────
-function StarItem({ star, nav }) {
+function StarItem({ star }) {
   const daysSince = calcDaysSinceBirth(star.created_at);
   const galaxy = GALAXY_STYLE[star.galaxy_code] ?? { label: star.galaxy_name_ko ?? '미지의 은하', cls: 'bg-white/10 text-white/50' };
 
   return (
-    <div
-      onClick={() => nav(`/star/${star.star_id}`)}
-      className="flex items-center gap-3 py-3 border-b border-white/5 last:border-0 cursor-pointer hover:bg-white/3 active:bg-white/8 rounded-xl px-1 -mx-1 transition-colors touch-manipulation"
+    <Link
+      to={`/star/${star.star_id}`}
+      className="flex items-center gap-3 py-3 border-b border-white/5 last:border-0 rounded-xl px-1 -mx-1 active:bg-white/8 transition-colors"
+      style={{ display: 'flex', textDecoration: 'none' }}
     >
       <span className="text-lg">✦</span>
       <div className="flex-1 min-w-0">
@@ -94,7 +95,7 @@ function StarItem({ star, nav }) {
       <span className={`text-xs px-2 py-0.5 rounded-full flex-shrink-0 ${galaxy.cls}`}>
         {galaxy.label}
       </span>
-    </div>
+    </Link>
   );
 }
 
@@ -188,7 +189,7 @@ export default function Home() {
           <p className="text-white/30 text-xs text-center py-4">아직 광장에 별이 없어요</p>
         ) : (
           <div>
-            {otherStars.map(s => <StarItem key={s.star_id} star={s} nav={nav} />)}
+            {otherStars.map(s => <StarItem key={s.star_id} star={s} />)}
           </div>
         )}
       </motion.div>
