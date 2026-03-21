@@ -84,8 +84,7 @@ function StarItem({ star }) {
   return (
     <Link
       to={`/star/${star.star_id}`}
-      className="flex items-center gap-3 py-3 border-b border-white/5 last:border-0 rounded-xl px-1 -mx-1 active:bg-white/8 transition-colors"
-      style={{ display: 'flex', textDecoration: 'none' }}
+      className="flex items-center gap-3 py-3 border-b border-white/5 last:border-0 cursor-pointer hover:bg-white/10 active:bg-white/15 rounded-xl px-1 -mx-1 transition-colors no-underline"
     >
       <span className="text-lg">✦</span>
       <div className="flex-1 min-w-0">
@@ -171,13 +170,8 @@ export default function Home() {
         </motion.div>
       )}
 
-      {/* 광장 — 다른 별들 */}
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35 }}
-        className="bg-white/3 border border-white/8 rounded-3xl p-5 mb-4"
-      >
+      {/* 광장 — 다른 별들 (motion 제거: transform stacking context가 Link pointer-events 방해) */}
+      <div className="bg-white/3 border border-white/8 rounded-3xl p-5 mb-4">
         <div className="flex items-center justify-between mb-3">
           <p className="text-white/60 text-sm font-medium">광장의 별들</p>
           <p className="text-white/30 text-xs">{stars.length}개</p>
@@ -192,7 +186,7 @@ export default function Home() {
             {otherStars.map(s => <StarItem key={s.star_id} star={s} />)}
           </div>
         )}
-      </motion.div>
+      </div>
 
       {/* Aurum 메시지 */}
       <motion.div
