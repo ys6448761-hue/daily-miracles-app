@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { getRecentStars, getStar } from '../api/dreamtown.js';
 
@@ -15,52 +14,24 @@ function calcDaysSinceBirth(createdAt) {
   return Math.max(1, Math.floor((Date.now() - new Date(createdAt).getTime()) / 86400000) + 1);
 }
 
-// ── 내 별 카드 (옵션 A + B 동시 구현) ────────────
+// ── 내 별 카드 ────────────────────────────────────
 function MyStarCard({ star, isNew, nav }) {
-  // 옵션 B: "여기예요 ✨" 툴팁 — 1.5초 후 자동 사라짐
-  const [showHere, setShowHere] = useState(isNew);
-  useEffect(() => {
-    if (!isNew) return;
-    const t = setTimeout(() => setShowHere(false), 1500);
-    return () => clearTimeout(t);
-  }, [isNew]);
-
   const daysSince = calcDaysSinceBirth(star.created_at);
   const galaxy = GALAXY_STYLE[star.galaxy_code] ?? { label: star.galaxy_name_ko ?? '미지의 은하', cls: 'bg-white/10 text-white/50' };
 
   return (
     <div className="relative mb-4">
-      {/* 옵션 B: 툴팁 */}
-      <AnimatePresence>
-        {showHere && (
-          <motion.div
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.3 }}
-            className="absolute -top-8 left-1/2 -translate-x-1/2 bg-star-gold text-night-sky text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap z-10"
-          >
-            여기예요 ✨
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* 옵션 A: 진입 시 1회 펄스 + 카드 */}
-      <motion.div
-        // 옵션 A pulse: isNew일 때 0.8초 딜레이 후 한 번 커졌다 돌아옴
-        animate={isNew ? { scale: [1, 1.06, 1] } : {}}
-        transition={isNew ? { duration: 1.0, delay: 0.6, ease: 'easeInOut' } : {}}
+      {isNew && (
+        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-star-gold text-night-sky text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap z-10 pointer-events-none">
+          여기예요 ✨
+        </div>
+      )}
+      <div
         onClick={() => nav(`/my-star/${star.star_id}`)}
-        className="bg-white/5 border border-star-gold/40 rounded-3xl p-5 cursor-pointer hover:border-star-gold/70 transition-colors"
+        className="bg-white/5 border border-star-gold/40 rounded-3xl p-5 cursor-pointer hover:border-star-gold/70 active:bg-white/10 transition-colors"
       >
         <div className="flex items-center gap-3 mb-3">
-          <motion.span
-            animate={{ scale: [1, 1.1, 1] }}
-            transition={{ repeat: Infinity, duration: 3 }}
-            className="text-3xl"
-          >
-            ⭐
-          </motion.span>
+          <span className="text-3xl">⭐</span>
           <div>
             <p className="text-star-gold font-semibold text-sm">내 별</p>
             <p className="text-white/70 text-sm font-medium">{star.star_name}</p>
@@ -71,7 +42,7 @@ function MyStarCard({ star, isNew, nav }) {
           <span className={`text-xs px-2 py-1 rounded-full ${galaxy.cls}`}>{galaxy.label}</span>
           <span className="text-xs bg-white/10 text-white/50 px-2 py-1 rounded-full">D+{daysSince}</span>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -102,18 +73,15 @@ export default function Home() {
   const nav = useNavigate();
   const { state } = useLocation();
 
-  const newStarId   = state?.newStarId   ?? null;
-  const newStarName = state?.newStarName ?? null;
+  const newStarId = state?.newStarId ?? null;
 
   const [stars, setStars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [myStarData, setMyStarData] = useState(null);
 
-  // 사용자 본인의 star_id (localStorage)
   const myStarId = localStorage.getItem('dt_star_id');
 
   useEffect(() => {
-    // 광장 목록 + 내 별 독립 조회 병렬 실행
     const recentPromise = getRecentStars(13)
       .then(r => setStars(r.stars ?? []))
       .catch(() => setStars([]));
@@ -134,40 +102,31 @@ export default function Home() {
     Promise.all([recentPromise, myStarPromise]).finally(() => setLoading(false));
   }, [myStarId]);
 
-  // 내 별 / 다른 별 분리
   const otherStars = stars.filter(s => s.star_id !== myStarId);
-  const myStarDisplay = myStarData;
-
   const isNewStar = !!(newStarId && myStarId === newStarId);
 
   return (
     <div className="min-h-screen flex flex-col px-5 pt-10 pb-24">
       {/* 헤더 */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-6"
-      >
+      <div className="mb-6">
         <p className="text-white/40 text-xs">DreamTown</p>
         <h1 className="text-2xl font-bold text-white mt-1">
           {isNewStar ? '별이 탄생했어요 ⭐' : '안녕하세요 ✨'}
         </h1>
         <p className="text-white/50 text-sm mt-1">당신의 소원은 혼자가 아닙니다.</p>
-      </motion.div>
+      </div>
 
       {/* 내 별 카드 */}
-      {myStarDisplay && (
-        <div className="relative z-10 mb-0">
-          <MyStarCard
-            star={myStarDisplay}
-            isNew={isNewStar}
-            nav={nav}
-          />
-        </div>
+      {myStarData && (
+        <MyStarCard
+          star={myStarData}
+          isNew={isNewStar}
+          nav={nav}
+        />
       )}
 
       {/* 광장 — 다른 별들 */}
-      <div className="relative z-10 bg-white/3 border border-white/8 rounded-3xl p-5 mb-4">
+      <div className="bg-white/3 border border-white/8 rounded-3xl p-5 mb-4">
         <div className="flex items-center justify-between mb-3">
           <p className="text-white/60 text-sm font-medium">광장의 별들</p>
           <p className="text-white/30 text-xs">{stars.length}개</p>
@@ -185,7 +144,7 @@ export default function Home() {
       </div>
 
       {/* Aurum 메시지 */}
-      <div className="bg-dream-purple/10 border border-dream-purple/20 rounded-3xl p-5 mb-4 pointer-events-none">
+      <div className="bg-dream-purple/10 border border-dream-purple/20 rounded-3xl p-5 mb-4">
         <p className="text-white/40 text-xs mb-2">🐢 Aurum</p>
         <p className="text-white text-sm leading-relaxed">
           "당신의 소원은 이미 별이 되고 있어요."
