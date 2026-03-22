@@ -9,7 +9,7 @@ export default function DayLogScreen({ direction, onComplete }) {
     selectGrowth,
   } = useDayLogFlow(onComplete, direction);
 
-  const options = LOG_OPTIONS[direction];
+  const options = LOG_OPTIONS[direction] ?? LOG_OPTIONS['south'];
 
   return (
     <div className="w-full h-screen text-white flex flex-col items-center justify-center px-6" style={{ backgroundColor: '#0D1B2A' }}>

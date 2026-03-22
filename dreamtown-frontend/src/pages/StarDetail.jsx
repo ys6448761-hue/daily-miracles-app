@@ -120,7 +120,7 @@ export default function StarDetail() {
     .reduce((s, v) => s + (v.count || 0), 0);
 
   return (
-    <div className="min-h-screen flex flex-col px-6 py-10">
+    <div className="min-h-screen flex flex-col px-6 py-10 pb-6">
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-8">
         <button onClick={() => nav(-1)} className="text-white/40 hover:text-white/70">← 뒤로</button>
@@ -229,10 +229,10 @@ export default function StarDetail() {
       )}
 
       {/* ── 5. 광장 복귀 ────────────────────────────────────── */}
-      <div className="mt-auto pt-2">
+      <div className="mt-4 mb-4">
         <button
           onClick={() => nav('/home')}
-          className="w-full text-white/30 text-sm py-3 hover:text-white/50 transition-colors"
+          className="w-full bg-white/5 border border-white/10 text-white/60 hover:text-white/80 hover:bg-white/10 text-sm font-medium py-4 rounded-2xl transition-colors"
         >
           광장으로 돌아가기
         </button>

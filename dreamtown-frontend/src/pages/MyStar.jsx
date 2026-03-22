@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStar, getGalaxyStars, getResonance, postGrowthLog } from '../api/dreamtown.js';
+import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs } from '../api/dreamtown.js';
 import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
 import { sharePostcard } from '../utils/kakaoShare';
@@ -99,6 +99,9 @@ export default function MyStar() {
   const [galaxyStars, setGalaxyStars] = useState([]);
   const { setStarData } = useDreamtownStore();
 
+  // 항해 로그
+  const [voyageLogs, setVoyageLogs] = useState([]);
+
   // 성장 질문 상태
   const [growthText, setGrowthText] = useState('');
   const [growthSaved, setGrowthSaved] = useState(false);
@@ -117,6 +120,11 @@ export default function MyStar() {
             .then(r => setGalaxyStars(r.stars ?? []))
             .catch(() => setGalaxyStars([]));
         }
+
+        // 내 별 항해 로그 조회
+        getVoyageLogs(data.star_id)
+          .then(r => setVoyageLogs(r.logs ?? []))
+          .catch(() => setVoyageLogs([]));
         // 공명 카운트 조회 → resonance_received GA4 이벤트 (세션 1회)
         getResonance(data.star_id).then(r => {
           const total = Object.values(r.resonance ?? {})
@@ -217,6 +225,33 @@ export default function MyStar() {
           내 별 자세히 보기 ✦
         </button>
       </motion.div>
+
+      {/* 내 별 이야기 — 항해 로그 기반 */}
+      {voyageLogs.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="bg-white/3 border border-white/8 rounded-3xl p-5 mb-6"
+        >
+          <p className="text-white/40 text-xs mb-3">내 별 이야기</p>
+          <div className="flex flex-col">
+            {voyageLogs.slice(0, 3).map((log, i) => (
+              <div
+                key={log.id ?? i}
+                className={`flex items-start gap-3 py-2.5 ${
+                  i < Math.min(voyageLogs.length, 3) - 1 ? 'border-b border-white/5' : ''
+                }`}
+              >
+                <span className="text-white/30 text-xs flex-shrink-0 mt-0.5 w-10">
+                  D+{log.day_number}
+                </span>
+                <p className="text-white/65 text-sm leading-relaxed">{log.growth}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
 
       {/* Day 7 의미 생성 — 7일 이상 경과 시 노출 */}
       {daysSinceBirth >= 7 && (() => {
@@ -319,7 +354,7 @@ export default function MyStar() {
       </div>
 
       {/* CTA */}
-      <div className="flex flex-col gap-3 mt-auto">
+      <div className="flex flex-col gap-3 mt-6">
         {/* PRIMARY — 이 별 이어가기 */}
         <button
           onClick={() => {

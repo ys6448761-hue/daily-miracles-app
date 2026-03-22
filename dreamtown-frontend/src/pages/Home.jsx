@@ -107,12 +107,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col px-5 pt-10 pb-24">
-      {/* DEBUG 배너 — 탭/클릭 시 실제 타겟 element 표시. 확인 후 제거 */}
-      {dbg && (
-        <div style={{ position:'fixed', top:0, left:0, right:0, background:'red', color:'white', fontSize:11, zIndex:9999, padding:'4px 8px', fontFamily:'monospace' }}>
-          CLICK TARGET: {dbg}
-        </div>
-      )}
       {/* 헤더 */}
       <div className="mb-6">
         <p className="text-white/40 text-xs">DreamTown</p>
