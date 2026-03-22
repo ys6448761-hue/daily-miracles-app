@@ -60,16 +60,19 @@ export default function StarBirth() {
     return () => clearTimeout(t);
   }, [stage]);
 
-  // 별 생성 완료 → GA4 star_created + 4초 후 자동 첫 항해 이동
+  // 별 생성 완료 → GA4 star_created + 4초 후 자동 첫 항해 이동 (1회만)
   useEffect(() => {
     if (!done) return;
     gaStarCreated({ gemType, galaxyType: galaxy });
+
+    const firstVoyageDone = starId ? localStorage.getItem('dt_first_voyage_' + starId) : null;
+    if (firstVoyageDone) return; // 이미 첫 항해 완료 → 자동 이동 없음
 
     const direction = GALAXY_TO_DIRECTION[galaxy] ?? 'south';
     const message   = FIRST_VOYAGE_MESSAGE[galaxy] ?? '오늘, 첫 항해가 시작됩니다.';
     const t = setTimeout(() => {
       gaFirstVoyageStart({ starId, galaxyCode: galaxy, direction });
-      nav('/day', { state: { direction, message } });
+      nav('/day', { state: { direction, message, starId, isFirstVoyage: true }, replace: true });
     }, 4000);
     return () => clearTimeout(t);
   }, [done]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -169,7 +172,7 @@ export default function StarBirth() {
                   const direction = GALAXY_TO_DIRECTION[galaxy] ?? 'south';
                   const message   = FIRST_VOYAGE_MESSAGE[galaxy] ?? '오늘, 첫 항해가 시작됩니다.';
                   gaFirstVoyageStart({ starId, galaxyCode: galaxy, direction });
-                  nav('/day', { state: { direction, message } });
+                  nav('/day', { state: { direction, message, starId, isFirstVoyage: true }, replace: true });
                 }}
                 className="w-full bg-dream-purple hover:bg-purple-500 text-white font-bold py-4 rounded-2xl text-lg transition-colors"
               >
@@ -179,7 +182,7 @@ export default function StarBirth() {
 
               {/* SECONDARY — 내 별 */}
               <button
-                onClick={() => nav(`/my-star/${starId}`)}
+                onClick={() => nav(`/my-star/${starId}`, { replace: true })}
                 className="w-full bg-white/5 border border-white/15 text-white/60 font-medium py-3 rounded-2xl text-sm hover:bg-white/10 transition-colors"
               >
                 내 별 먼저 살펴볼게요

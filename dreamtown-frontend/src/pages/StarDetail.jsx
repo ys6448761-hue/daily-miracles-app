@@ -23,6 +23,12 @@ function calcDaysSinceBirth(createdAt) {
   return Math.max(1, Math.floor((Date.now() - new Date(createdAt).getTime()) / 86400000) + 1);
 }
 
+function formatBirthDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+}
+
 export default function StarDetail() {
   const { id } = useParams();
   const nav = useNavigate();
@@ -40,13 +46,22 @@ export default function StarDetail() {
   const [logsLoading, setLogsLoading] = useState(false);
 
   const myStarId = localStorage.getItem('dt_star_id');
+  const isOwnStar = id === myStarId;
+
+  // 내 별을 /star/:id로 직접 접근하면 MyStar 페이지로 리다이렉트
+  useEffect(() => {
+    if (isOwnStar) {
+      nav(`/my-star/${id}`, { replace: true });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (isOwnStar) return;
     Promise.all([
       getStar(id).then(setStar),
       getResonance(id).then(setResonanceData).catch(() => {}),
     ]).catch(() => {}).finally(() => setLoading(false));
-  }, [id]);
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 항해 로그 섹션 열릴 때 fetch
   useEffect(() => {
@@ -94,6 +109,14 @@ export default function StarDetail() {
     }
   }
 
+  if (isOwnStar) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-white/50 text-sm">내 별로 이동 중...</p>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -123,7 +146,7 @@ export default function StarDetail() {
     <div className="min-h-screen flex flex-col px-6 py-10 pb-6">
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-8">
-        <button onClick={() => nav(-1)} className="text-white/40 hover:text-white/70">← 뒤로</button>
+        <button onClick={() => window.history.length > 1 ? nav(-1) : nav('/home')} className="text-white/40 hover:text-white/70">← 뒤로</button>
         <p className="text-white/40 text-xs">별 상세</p>
         <div className="w-8" />
       </div>
@@ -163,6 +186,7 @@ export default function StarDetail() {
       {/* ── 2. 항해 로그 기반 이야기 섹션 ──────────────────────── */}
       {showLogs && (
         <div className="bg-white/3 border border-white/8 rounded-3xl p-5 mb-3">
+          <p className="text-white/30 text-xs mb-3">탄생일 · {formatBirthDate(star.created_at)}</p>
           {logsLoading ? (
             <p className="text-white/30 text-xs text-center py-2">불러오는 중...</p>
           ) : voyageLogs.length === 0 ? (

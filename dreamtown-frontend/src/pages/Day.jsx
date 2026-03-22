@@ -107,13 +107,18 @@ export default function DayPage() {
                 }).catch(() => {});
               }
 
-              navigate('/postcard', {
-                state: {
-                  direction,
-                  message,
-                  growthLine: saved.growthLine,
-                },
-              });
+              // firstVoyage 플래그 저장 (StarBirth 직후 1회만)
+              const voyageStarId = state?.starId ?? starId;
+              if (state?.isFirstVoyage && voyageStarId) {
+                localStorage.setItem('dt_first_voyage_' + voyageStarId, 'true');
+              }
+              // today 항해 완료 플래그
+              const today = new Date().toISOString().slice(0, 10);
+              if (voyageStarId) {
+                localStorage.setItem('dt_voyage_today_' + voyageStarId + '_' + today, 'true');
+              }
+
+              navigate(voyageStarId ? `/my-star/${voyageStarId}` : '/home', { replace: false });
             }}
           />
         </div>

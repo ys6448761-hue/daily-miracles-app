@@ -16,6 +16,7 @@ function calcDaysSinceBirth(createdAt) {
 
 // ── 내 별 카드 ────────────────────────────────────
 function MyStarCard({ star, isNew, nav }) {
+  if (!star || !star.star_id) return null;
   const daysSince = calcDaysSinceBirth(star.created_at);
   const galaxy = GALAXY_STYLE[star.galaxy_code] ?? { label: star.galaxy_name_ko ?? '미지의 은하', cls: 'bg-white/10 text-white/50' };
 
@@ -49,6 +50,7 @@ function MyStarCard({ star, isNew, nav }) {
 
 // ── 광장 별 카드 (compact) ──────────────────────
 function StarItem({ star }) {
+  if (!star || !star.star_id) return null;
   const daysSince = calcDaysSinceBirth(star.created_at);
   const galaxy = GALAXY_STYLE[star.galaxy_code] ?? { label: star.galaxy_name_ko ?? '미지의 은하', cls: 'bg-white/10 text-white/50' };
 
@@ -102,7 +104,7 @@ export default function Home() {
     Promise.all([recentPromise, myStarPromise]).finally(() => setLoading(false));
   }, [myStarId]);
 
-  const otherStars = stars.filter(s => s.star_id !== myStarId);
+  const otherStars = stars.filter(s => s && s.star_id && s.star_id !== myStarId);
   const isNewStar = !!(newStarId && myStarId === newStarId);
 
   return (

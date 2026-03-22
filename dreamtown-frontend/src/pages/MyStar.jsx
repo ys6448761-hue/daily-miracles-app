@@ -169,12 +169,14 @@ export default function MyStar() {
 
   const daysSinceBirth = calcDaysSinceBirth(star.created_at);
   const aurumMsg = getAurumMessage(daysSinceBirth);
+  const today = new Date().toISOString().slice(0, 10);
+  const doneTodayFlag = !!localStorage.getItem('dt_voyage_today_' + star.star_id + '_' + today);
 
   return (
     <div className="min-h-screen flex flex-col px-6 py-10">
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-8">
-        <button onClick={() => nav(-1)} className="text-white/40 hover:text-white/70">← 뒤로</button>
+        <button onClick={() => window.history.length > 1 ? nav(-1) : nav('/home')} className="text-white/40 hover:text-white/70">← 뒤로</button>
         <p className="text-white/40 text-xs">내 별</p>
         <div className="w-8" />
       </div>
@@ -218,12 +220,6 @@ export default function MyStar() {
           </div>
         </div>
 
-        <button
-          onClick={() => nav(`/star/${star.star_id}`)}
-          className="mt-4 w-full bg-white/8 hover:bg-white/15 border border-white/15 hover:border-white/30 text-white/70 hover:text-white text-sm font-medium py-3 rounded-2xl transition-colors"
-        >
-          내 별 자세히 보기 ✦
-        </button>
       </motion.div>
 
       {/* 내 별 이야기 — 항해 로그 기반 */}
@@ -297,12 +293,6 @@ export default function MyStar() {
               );
             })}
           </div>
-          <button
-            onClick={() => nav(`/galaxy?highlight=${star.galaxy.code}`)}
-            className="mt-3 text-white/35 text-xs hover:text-white/55 transition"
-          >
-            은하 전체 보기 →
-          </button>
         </div>
       )}
 
@@ -313,7 +303,7 @@ export default function MyStar() {
         transition={{ delay: 0.3 }}
         className="bg-white/3 border border-white/8 rounded-3xl p-5 mb-6"
       >
-        <p className="text-white/50 text-xs mb-3">이 별 이후 당신은 어떻게 달라졌나요?</p>
+        <p className="text-white/50 text-xs mb-3">오늘 나는 어떻게 달라졌나요?</p>
         {growthSaved ? (
           <div>
             <p className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">{growthText}</p>
@@ -355,17 +345,23 @@ export default function MyStar() {
 
       {/* CTA */}
       <div className="flex flex-col gap-3 mt-6">
-        {/* PRIMARY — 이 별 이어가기 */}
-        <button
-          onClick={() => {
-            const direction = GALAXY_TO_DIRECTION[star.galaxy?.code] ?? 'south';
-            const message   = CONTINUE_VOYAGE_MSG[star.galaxy?.code] ?? '오늘도, 이 별과 함께합니다.';
-            nav('/day', { state: { direction, message } });
-          }}
-          className="w-full bg-dream-purple hover:bg-purple-500 text-white font-bold py-4 rounded-2xl transition-colors"
-        >
-          이 별 이어가기 ✦
-        </button>
+        {/* PRIMARY — 이 별 이어가기 (오늘 완료 시 안내 표시) */}
+        {doneTodayFlag ? (
+          <div className="w-full bg-white/5 border border-white/10 text-white/40 text-sm font-medium py-4 rounded-2xl text-center">
+            오늘 항해는 완료했어요 ✦
+          </div>
+        ) : (
+          <button
+            onClick={() => {
+              const direction = GALAXY_TO_DIRECTION[star.galaxy?.code] ?? 'south';
+              const message   = CONTINUE_VOYAGE_MSG[star.galaxy?.code] ?? '오늘도, 이 별과 함께합니다.';
+              nav('/day', { state: { direction, message, starId: star.star_id } });
+            }}
+            className="w-full bg-dream-purple hover:bg-purple-500 text-white font-bold py-4 rounded-2xl transition-colors"
+          >
+            이 별 이어가기 ✦
+          </button>
+        )}
         <button
           onClick={() => sharePostcard({
             starName:   star.star_name,
