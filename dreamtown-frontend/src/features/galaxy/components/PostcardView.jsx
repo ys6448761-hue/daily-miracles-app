@@ -139,20 +139,11 @@ export default function PostcardView({
         </p>
       </div>
 
-      {/* CTA pill */}
-      <div className="absolute inset-x-0 flex justify-center" style={{ top: '82%' }}>
-        <div
-          style={{
-            padding:         '6px 18px',
-            borderRadius:    9999,
-            backgroundColor: 'rgba(155,135,245,0.12)',
-            border:          '1px solid rgba(155,135,245,0.25)',
-          }}
-        >
-          <p style={{ fontSize: 11, color: 'rgba(155,135,245,0.80)', letterSpacing: '0.04em' }}>
-            dreamtown 입장하기 →
-          </p>
-        </div>
+      {/* 브랜드 하단 */}
+      <div className="absolute inset-x-0 flex justify-center" style={{ top: '84%' }}>
+        <p style={{ fontSize: 10, letterSpacing: '0.18em', color: 'rgba(155,135,245,0.45)', textTransform: 'uppercase' }}>
+          DreamTown
+        </p>
       </div>
     </div>
   );

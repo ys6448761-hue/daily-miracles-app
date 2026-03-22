@@ -66,7 +66,7 @@ export const LOG_OPTIONS = {
 
   south: {
     feelings: [
-      '숨이 놓였어요',
+      '좀 편해졌어요',
       '조금 쉬고 싶어졌어요',
       '마음이 잔잔해졌어요',
     ],

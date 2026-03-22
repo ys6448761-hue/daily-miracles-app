@@ -27,7 +27,7 @@ export const GALAXY_OPTIONS = [
 // Day 감정 선택지 — direction별 options는 galaxyLogCopy.js 참조
 // 아래는 방향 무관 공통 fallback (direction null 시 사용)
 export const DAY_FEELINGS = [
-  { key: 'relief',  label: '숨이 놓였어요' },
+  { key: 'relief',  label: '좀 편해졌어요' },
   { key: 'rest',    label: '조금 쉬고 싶어졌어요' },
   { key: 'quiet',   label: '마음이 잔잔해졌어요' },
 ];

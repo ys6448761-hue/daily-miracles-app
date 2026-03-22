@@ -60,10 +60,18 @@ export default function StarBirth() {
     return () => clearTimeout(t);
   }, [stage]);
 
-  // 별 생성 완료 → GA4 star_created (1회)
+  // 별 생성 완료 → GA4 star_created + 4초 후 자동 첫 항해 이동
   useEffect(() => {
     if (!done) return;
     gaStarCreated({ gemType, galaxyType: galaxy });
+
+    const direction = GALAXY_TO_DIRECTION[galaxy] ?? 'south';
+    const message   = FIRST_VOYAGE_MESSAGE[galaxy] ?? '오늘, 첫 항해가 시작됩니다.';
+    const t = setTimeout(() => {
+      gaFirstVoyageStart({ starId, galaxyCode: galaxy, direction });
+      nav('/day', { state: { direction, message } });
+    }, 4000);
+    return () => clearTimeout(t);
   }, [done]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
@@ -155,7 +163,7 @@ export default function StarBirth() {
             </p>
 
             <div className="flex flex-col items-center gap-3 w-full max-w-xs mx-auto">
-              {/* PRIMARY — 첫 항해 */}
+              {/* PRIMARY — 첫 항해 (4초 자동이동, 즉시 클릭도 가능) */}
               <button
                 onClick={() => {
                   const direction = GALAXY_TO_DIRECTION[galaxy] ?? 'south';
@@ -167,6 +175,7 @@ export default function StarBirth() {
               >
                 첫 항해 시작하기 ✦
               </button>
+              <p className="text-white/25 text-xs">잠시 후 자동으로 시작됩니다</p>
 
               {/* SECONDARY — 내 별 */}
               <button
