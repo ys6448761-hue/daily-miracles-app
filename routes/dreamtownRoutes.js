@@ -272,14 +272,15 @@ router.get('/stars/:id', async (req, res) => {
 
     const result = await db.query(
       `SELECT
-         s.id         AS star_id,
+         s.id              AS star_id,
          s.star_name,
          s.star_slug,
          s.star_stage,
          s.created_at,
+         s.growth_log_text,
          w.wish_text,
-         g.code       AS galaxy_code,
-         g.name_ko    AS galaxy_name_ko
+         g.code            AS galaxy_code,
+         g.name_ko         AS galaxy_name_ko
        FROM dt_stars s
        JOIN dt_wishes   w ON w.id = s.wish_id
        JOIN dt_galaxies g ON g.id = s.galaxy_id
@@ -293,10 +294,11 @@ router.get('/stars/:id', async (req, res) => {
 
     const row = result.rows[0];
     res.json({
-      star_id:        row.star_id,
-      star_name:      row.star_name,
-      wish_text:      row.wish_text,
-      wish_image_url: null,
+      star_id:          row.star_id,
+      star_name:        row.star_name,
+      wish_text:        row.wish_text,
+      growth_log_text:  row.growth_log_text ?? null,
+      wish_image_url:   null,
       galaxy: {
         code:    row.galaxy_code,
         name_ko: row.galaxy_name_ko,

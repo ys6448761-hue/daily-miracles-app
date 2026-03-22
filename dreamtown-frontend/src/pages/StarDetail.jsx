@@ -23,6 +23,16 @@ function calcDaysSinceBirth(createdAt) {
   return Math.max(1, Math.floor((Date.now() - new Date(createdAt).getTime()) / 86400000) + 1);
 }
 
+function getResonanceQuestion(galaxyCode) {
+  const map = {
+    growth:       '성장을 바라는 이 마음, 당신에게도 닿았나요?',
+    challenge:    '도전을 향한 이 마음, 당신에게도 닿았나요?',
+    healing:      '치유를 바라는 이 마음, 당신에게도 닿았나요?',
+    relationship: '연결을 바라는 이 마음, 당신에게도 닿았나요?',
+  };
+  return map[galaxyCode] ?? '이 이야기가 당신에게 와 닿았나요?';
+}
+
 function formatBirthDate(dateStr) {
   if (!dateStr) return '';
   const d = new Date(dateStr);
@@ -157,6 +167,13 @@ export default function StarDetail() {
           <div className="text-5xl mb-4">✦</div>
           <h1 className="text-2xl font-bold text-star-gold mb-3">{star.star_name}</h1>
 
+          {/* ① 소원 원문 */}
+          {star.wish_text && (
+            <p className="text-white/45 text-xs italic leading-relaxed mb-3 px-2">
+              &ldquo;{star.wish_text}&rdquo;
+            </p>
+          )}
+
           <div className="flex gap-2 justify-center flex-wrap mb-3">
             <span className={`text-xs px-3 py-1 rounded-full ${galaxyStyle.cls}`}>
               {galaxyStyle.label}
@@ -165,6 +182,11 @@ export default function StarDetail() {
               D+{daysSince}
             </span>
           </div>
+
+          {/* ② 현재 변화 문장 */}
+          <p className="text-white/35 text-xs mt-1 mb-1">
+            {star.growth_log_text ?? '조금씩 나아가고 있어요'}
+          </p>
 
           {/* 사회성 문구 — 3명 이상일 때만 */}
           {resonanceTotal >= 3 && (
@@ -216,7 +238,7 @@ export default function StarDetail() {
         {!resonanceSubmitted && (
           <div className="bg-white/3 border border-white/8 rounded-2xl p-4">
             <p className="text-white/40 text-xs mb-3 text-center">
-              소원별, 어떻게 다가오나요?
+              {getResonanceQuestion(star.galaxy?.code)}
             </p>
             <div className="grid grid-cols-2 gap-2">
               {RESONANCE_OPTIONS.map(opt => (
