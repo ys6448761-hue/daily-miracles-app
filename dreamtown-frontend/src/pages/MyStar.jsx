@@ -403,7 +403,7 @@ export default function MyStar() {
             }}
             className="w-full bg-dream-purple hover:bg-purple-500 text-white font-bold py-4 rounded-2xl transition-colors"
           >
-            이 별 이어가기 ✦
+            소원별 이어가기 ✨
           </button>
         )}
         <button
