@@ -147,7 +147,7 @@ export default function GiftLanding() {
         transition={{ delay: 2.2 }}
         className="text-white/25 text-xs mt-6 text-center"
       >
-        이 별은 이제 두 사람의 하늘에 있어요.
+        소원별은 이제 두 사람의 하늘에 있어요.
       </motion.p>
     </div>
   );

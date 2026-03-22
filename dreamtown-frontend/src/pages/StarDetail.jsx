@@ -216,7 +216,7 @@ export default function StarDetail() {
         {!resonanceSubmitted && (
           <div className="bg-white/3 border border-white/8 rounded-2xl p-4">
             <p className="text-white/40 text-xs mb-3 text-center">
-              이 별, 어떻게 다가오나요?
+              소원별, 어떻게 다가오나요?
             </p>
             <div className="grid grid-cols-2 gap-2">
               {RESONANCE_OPTIONS.map(opt => (
