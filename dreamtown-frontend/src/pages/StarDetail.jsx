@@ -169,7 +169,7 @@ export default function StarDetail() {
           {/* 사회성 문구 — 3명 이상일 때만 */}
           {resonanceTotal >= 3 && (
             <p className="text-white/30 text-xs mt-1">
-              이 별에 {resonanceTotal}명의 마음이 닿았어요
+              소원별에 {resonanceTotal}명의 마음이 닿았어요
             </p>
           )}
         </div>
@@ -179,7 +179,7 @@ export default function StarDetail() {
           onClick={() => setShowLogs(v => !v)}
           className="w-full mt-1 border border-white/12 hover:border-white/25 bg-white/3 hover:bg-white/8 text-white/55 hover:text-white/75 text-sm py-3 rounded-2xl transition-colors"
         >
-          {showLogs ? '이야기 닫기' : '이 별의 이야기 보기 ✦'}
+          {showLogs ? '이야기 닫기' : '소원별의 이야기 보기 ✦'}
         </button>
       </div>
 
@@ -235,7 +235,7 @@ export default function StarDetail() {
 
         {resonanceSubmitted && (
           <div className="bg-dream-purple/8 border border-dream-purple/20 rounded-2xl p-4 text-center">
-            <p className="text-white/70 text-sm">이 별에 마음이 닿았어요</p>
+            <p className="text-white/70 text-sm">소원별에 마음이 닿았어요</p>
           </div>
         )}
       </div>

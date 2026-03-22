@@ -43,7 +43,7 @@ export default function GiftLanding() {
       <div className="min-h-screen flex flex-col items-center justify-center px-6 gap-6">
         <p className="text-5xl">✦</p>
         <p className="text-white/60 text-center text-sm leading-relaxed">
-          이 별의 선물을 찾을 수 없어요.<br />링크가 만료됐거나 존재하지 않는 별이에요.
+          소원별의 선물을 찾을 수 없어요.<br />링크가 만료됐거나 존재하지 않는 별이에요.
         </p>
         <button
           onClick={() => nav('/wish')}

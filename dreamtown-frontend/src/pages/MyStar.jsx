@@ -17,7 +17,7 @@ const GALAXY_TO_DIRECTION = {
 
 // 이어가기 항해 메시지 (첫 항해와 구분)
 const CONTINUE_VOYAGE_MSG = {
-  growth:       '오늘도, 이 별과 함께 나아갑니다.',
+  growth:       '오늘도, 소원별과 함께 나아갑니다.',
   challenge:    '오늘도, 도전을 이어갑니다.',
   healing:      '오늘도, 마음이 쉬어갑니다.',
   relationship: '오늘도, 마음이 닿아갑니다.',
@@ -36,19 +36,19 @@ const GALAXY_WISDOM = {
 // 핵심: "변화가 완성된 순간"이 아니라 "처음 알아차리는 순간"
 const DAY7_MESSAGES = {
   growth:       {
-    headline: '이 별이 처음으로 의미를 갖기 시작했어요.',
+    headline: '소원별이 처음으로 의미를 갖기 시작했어요.',
     body:     '7일이 쌓였어요. 변화는 보이지 않아도 조용히 일어나고 있어요.',
   },
   challenge:    {
-    headline: '이 별이 처음으로 의미를 갖기 시작했어요.',
+    headline: '소원별이 처음으로 의미를 갖기 시작했어요.',
     body:     '7일이 지났어요. 여기까지 왔다는 것, 그것 자체가 이미 달라진 거예요.',
   },
   healing:      {
-    headline: '이 별이 처음으로 의미를 갖기 시작했어요.',
+    headline: '소원별이 처음으로 의미를 갖기 시작했어요.',
     body:     '7일이 흘렀어요. 버텨온 하루하루가 당신 안에 조금씩 쌓이고 있어요.',
   },
   relationship: {
-    headline: '이 별이 처음으로 의미를 갖기 시작했어요.',
+    headline: '소원별이 처음으로 의미를 갖기 시작했어요.',
     body:     '7일이 지났어요. 마음은 천천히, 그러나 분명하게 변해가고 있어요.',
   },
 };
@@ -181,7 +181,7 @@ export default function MyStar() {
   const GIFT_COPIES = {
     lover:  '별을 따다 주고 싶었는데, 네 별을 만들었어',
     parent: '당신이 걷는 모든 길에 빛이 있기를 바라요',
-    friend: '넌 이미 별을 닮았어. 이 별이 너한테 어울려',
+    friend: '넌 이미 별을 닮았어. 소원별이 너한테 어울려',
   };
   const GIFT_LABELS = { lover: '연인에게', parent: '부모님께', friend: '친구에게' };
 
@@ -398,7 +398,7 @@ export default function MyStar() {
           <button
             onClick={() => {
               const direction = GALAXY_TO_DIRECTION[star.galaxy?.code] ?? 'south';
-              const message   = CONTINUE_VOYAGE_MSG[star.galaxy?.code] ?? '오늘도, 이 별과 함께합니다.';
+              const message   = CONTINUE_VOYAGE_MSG[star.galaxy?.code] ?? '오늘도, 소원별과 함께합니다.';
               nav('/day', { state: { direction, message, starId: star.star_id } });
             }}
             className="w-full bg-dream-purple hover:bg-purple-500 text-white font-bold py-4 rounded-2xl transition-colors"
@@ -462,7 +462,7 @@ export default function MyStar() {
           )
         ) : (
           <div className="bg-dream-purple/8 border border-dream-purple/20 rounded-2xl p-4 text-center">
-            <p className="text-white/60 text-sm">이 별이 두 사람의 하늘에 닿았어요 ✦</p>
+            <p className="text-white/60 text-sm">소원별이 두 사람의 하늘에 닿았어요 ✦</p>
           </div>
         )}
 
