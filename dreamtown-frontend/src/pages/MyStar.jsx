@@ -454,7 +454,7 @@ export default function MyStar() {
                     disabled={giftPosting}
                     className="w-full bg-star-gold/15 hover:bg-star-gold/25 border border-star-gold/40 text-star-gold font-semibold py-3 rounded-xl transition-colors disabled:opacity-40"
                   >
-                    {giftPosting ? '준비 중...' : '이 별 선물하기 ✨'}
+                    {giftPosting ? '준비 중...' : '소원별 선물하기 ✨'}
                   </button>
                 </>
               )}
