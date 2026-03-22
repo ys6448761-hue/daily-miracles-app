@@ -13,6 +13,7 @@ const router = express.Router();
 const db = require('../database/db');
 const { classifyWish, notifyRedSignal } = require('../services/safetyFilter');
 const { emitKpiEvent, KPI_EVENTS, isConnectionCompleted, hasResonanceReceived } = require('../services/kpiEventEmitter');
+const { sendSensSMS } = require('../services/messageProvider');
 
 // ── 별 이름 자동 생성 (인디언 작명법, AI 없음) ──────────────────────
 // 형식: [자연어] + [을/를] + [행동어] + 별  (50 × 40 = 2000 조합)
@@ -153,7 +154,7 @@ router.post('/wishes', async (req, res) => {
 router.post('/stars/create', async (req, res) => {
   console.log('[DT] POST /stars/create 진입 | body:', JSON.stringify(req.body));
   try {
-    const { wish_id, user_id } = req.body;
+    const { wish_id, user_id, phone_number } = req.body;
 
     if (!wish_id || !user_id) {
       return res.status(400).json({ error: 'wish_id, user_id 필수' });
@@ -211,6 +212,39 @@ router.post('/stars/create', async (req, res) => {
       "UPDATE dt_wishes SET status = 'converted_to_star' WHERE id = $1",
       [wish_id]
     );
+
+    // ── 탄생 축하 SMS (phone_number 있을 때, 중복 방지) ─────────────
+    if (phone_number) {
+      // 중복 방지: aurora5_messages에 이미 탄생 메시지가 있는지 확인
+      const dupCheck = await db.query(
+        `SELECT id FROM aurora5_messages
+          WHERE star_id = $1 AND message LIKE '%탄생했어요%'
+          LIMIT 1`,
+        [star.id]
+      );
+
+      if (dupCheck.rowCount === 0) {
+        const smsText =
+          `🌟 ${star.star_name}이 탄생했어요!\n\n` +
+          `소원이님의 소원별이\n드림타운 우주에서 빛나기 시작했어요.\n\n` +
+          `지금 내 별을 만나러 가볼까요? ✦\n→ https://app.dailymiracles.kr/dreamtown\n\n` +
+          `하루하루의 기적 드림`;
+
+        // SMS 발송 fire-and-forget
+        sendSensSMS(phone_number, smsText).catch(e =>
+          console.error('[DT] 탄생 SMS 발송 실패:', e.message)
+        );
+
+        // aurora5_messages 저장
+        db.query(
+          `INSERT INTO aurora5_messages (star_id, user_id, message, wisdom_tag)
+           VALUES ($1, $2, $3, '실천')`,
+          [star.id, user_id, smsText]
+        ).catch(e => console.error('[DT] aurora5_messages 저장 실패:', e.message));
+      } else {
+        console.log('[DT] 탄생 SMS 중복 — star_id:', star.id);
+      }
+    }
 
     // ── KPI: star_created (서버 사이드 emit) ────────────────────
     emitKpiEvent({

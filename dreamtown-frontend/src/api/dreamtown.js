@@ -31,11 +31,15 @@ export async function postWish({ userId, wishText, gemType, yeosuTheme }) {
   });
 }
 
-export async function postStarCreate({ wishId, userId }) {
+export async function postStarCreate({ wishId, userId, phoneNumber }) {
   return fetchWithRetry(`${BASE}/stars/create`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ wish_id: wishId, user_id: userId }),
+    body: JSON.stringify({
+      wish_id:      wishId,
+      user_id:      userId,
+      phone_number: phoneNumber ?? null,
+    }),
   });
 }
 

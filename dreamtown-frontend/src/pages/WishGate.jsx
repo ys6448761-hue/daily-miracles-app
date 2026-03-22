@@ -15,6 +15,7 @@ export default function WishGate() {
   const nav = useNavigate();
   const [wishText, setWishText] = useState('');
   const [gemType, setGemType] = useState('sapphire');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [careMessage, setCareMessage] = useState(''); // RED 신호 시 케어 메시지
@@ -34,7 +35,7 @@ export default function WishGate() {
         return;
       }
 
-      const star = await postStarCreate({ wishId: wishResult.wish_id, userId });
+      const star = await postStarCreate({ wishId: wishResult.wish_id, userId, phoneNumber: phoneNumber.trim() || null });
       localStorage.setItem('dt_star_id', star.star_id);
       nav('/star-birth', { state: { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy, gemType } });
     } catch (e) {
@@ -134,6 +135,23 @@ export default function WishGate() {
           </button>
         </div>
       )}
+
+      {/* 전화번호 (선택) — 탄생 축하 SMS 수신용 */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+        className="mb-6"
+      >
+        <p className="text-white/40 text-xs mb-2">탄생 축하 문자 받기 (선택)</p>
+        <input
+          type="tel"
+          value={phoneNumber}
+          onChange={e => setPhoneNumber(e.target.value)}
+          placeholder="010-0000-0000"
+          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white/80 placeholder-white/25 text-sm focus:outline-none focus:border-dream-purple/50 transition-colors"
+        />
+      </motion.div>
 
       {/* CTA */}
       <motion.button
