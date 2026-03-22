@@ -218,11 +218,11 @@ export default function StarDetail() {
               {voyageLogs.slice(0, 3).map((log, i) => (
                 <div
                   key={log.id}
-                  className={`flex items-start gap-3 py-3 ${
+                  className={`flex flex-col gap-1 py-3 ${
                     i < Math.min(voyageLogs.length, 3) - 1 ? 'border-b border-white/5' : ''
                   }`}
                 >
-                  <span className="text-white/30 text-xs flex-shrink-0 mt-0.5 whitespace-nowrap">
+                  <span className="text-white/30 text-xs whitespace-nowrap">
                     D+{log.day_number} · {formatBirthDate(log.created_at)}
                   </span>
                   <p className="text-white/60 text-sm leading-relaxed">{log.growth}</p>
