@@ -511,6 +511,59 @@
             }
         }
 
+        /* DreamTown 진입 CTA */
+        .dreamtown-cta {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 24px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(155, 135, 245, 0.3);
+        }
+
+        .dreamtown-cta .star-icon {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 16px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        .dreamtown-cta h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f5d76e;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .dreamtown-cta p {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.65);
+            line-height: 1.7;
+            margin-bottom: 28px;
+        }
+
+        .dreamtown-cta .btn-dreamtown {
+            display: inline-block;
+            background: linear-gradient(135deg, #9B87F5 0%, #764ba2 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            padding: 16px 36px;
+            border-radius: 50px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 6px 24px rgba(155, 135, 245, 0.4);
+        }
+
+        .dreamtown-cta .btn-dreamtown:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 32px rgba(155, 135, 245, 0.6);
+        }
+
         /* 푸터 */
         .footer {
             background: white;
@@ -565,6 +618,231 @@
                 display: block;
             }
         }
+
+        /* ── 현재 단계 카드 ── */
+        .stage-card {
+            background: white;
+            border-radius: 20px;
+            padding: 28px 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+        .stage-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .stage-card-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #9B87F5;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .stage-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #9B87F5 0%, #6E59A5 100%);
+            color: white;
+            border-radius: 100px;
+            padding: 6px 16px;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .stage-step-label {
+            font-size: 11px;
+            opacity: 0.75;
+            font-weight: 400;
+        }
+        .stage-desc {
+            font-size: 15px;
+            color: #555;
+            line-height: 1.7;
+        }
+        .stage-steps {
+            display: flex;
+            gap: 6px;
+            margin-top: 16px;
+        }
+        .stage-step-dot {
+            flex: 1;
+            height: 4px;
+            border-radius: 2px;
+            background: #e5e7eb;
+        }
+        .stage-step-dot.active {
+            background: linear-gradient(90deg, #9B87F5, #6E59A5);
+        }
+
+        /* ── 신호등 카드 ── */
+        .signal-card {
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.10);
+        }
+        .signal-card.green {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-left: 5px solid #22c55e;
+        }
+        .signal-card.yellow {
+            background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+            border-left: 5px solid #eab308;
+        }
+        .signal-card-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .signal-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .signal-dot.green { background: #22c55e; }
+        .signal-dot.yellow { background: #eab308; }
+        .signal-label {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+        .signal-card.green .signal-label { color: #16a34a; }
+        .signal-card.yellow .signal-label { color: #a16207; }
+        .signal-main {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        .signal-sub {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        /* ── summary_line + today_action 카드 ── */
+        .summary-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 20px 18px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(155,135,245,0.10);
+            border-top: 3px solid #9B87F5;
+        }
+        .summary-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #9B87F5;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 8px;
+        }
+        .summary-line-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d1f5e;
+            line-height: 1.55;
+            margin-bottom: 16px;
+        }
+        .today-action-box {
+            background: #f5f3ff;
+            border-radius: 10px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .today-action-icon {
+            font-size: 18px;
+            line-height: 1;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .today-action-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #7c3aed;
+            margin-bottom: 3px;
+            letter-spacing: 0.04em;
+        }
+        .today-action-text {
+            font-size: 14px;
+            color: #4c3a8a;
+            line-height: 1.55;
+        }
+
+        /* ── 7일 여정 섹션 ── */
+        .journey-section {
+            background: white;
+            border-radius: 20px;
+            padding: 28px 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+        .journey-section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 6px;
+        }
+        .journey-section-sub {
+            font-size: 13px;
+            color: #9ca3af;
+            margin-bottom: 20px;
+        }
+        .journey-day {
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 10px;
+            background: #f9fafb;
+            border-left: 4px solid #e5e7eb;
+            transition: border-color 0.2s;
+        }
+        .journey-day.today {
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            border-left-color: #9B87F5;
+        }
+        .journey-day-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        .journey-day-num {
+            font-size: 11px;
+            font-weight: 700;
+            color: #9B87F5;
+            letter-spacing: 0.05em;
+            min-width: 36px;
+        }
+        .journey-day-q {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+        }
+        .journey-day-action {
+            font-size: 13px;
+            color: #6b7280;
+            margin-left: 46px;
+            line-height: 1.5;
+        }
+        .journey-day-close {
+            font-size: 12px;
+            color: #9B87F5;
+            margin-left: 46px;
+            margin-top: 4px;
+            font-style: italic;
+        }
+        @media (max-width: 768px) {
+            .stage-steps { gap: 4px; }
+            .journey-day-action { margin-left: 0; margin-top: 6px; }
+            .journey-day-close { margin-left: 0; }
+        }
     </style>
 </head>
 <body>
@@ -602,6 +880,109 @@
                             당신의 기적은 이미 시작되었습니다. 높은 변화 가능성과 강한 의지가 보입니다.
                         </p>
                     </div>
+                </div>
+            </div>
+
+            <!-- 신호등 카드 (GREEN / YELLOW) -->
+            <div id="signalCard" class="signal-card green" style="display:none;">
+                <div class="signal-card-top">
+                    <div id="signalDot" class="signal-dot green"></div>
+                    <span id="signalLabel" class="signal-label">오늘의 안내 신호</span>
+                </div>
+                <div id="signalMain" class="signal-main"></div>
+                <div id="signalSub" class="signal-sub"></div>
+            </div>
+
+            <!-- 현재 단계 카드 -->
+            <div id="stageCard" class="stage-card" style="display:none;">
+                <div class="stage-card-header">
+                    <span class="stage-card-title">현재 문제 해결 단계</span>
+                </div>
+                <div id="stageBadge" class="stage-badge">
+                    <span id="stageBadgeStep" class="stage-step-label"></span>
+                    <span id="stageBadgeLabel"></span>
+                </div>
+                <p id="stageDesc" class="stage-desc"></p>
+                <div class="stage-steps">
+                    <div class="stage-step-dot" data-step="1"></div>
+                    <div class="stage-step-dot" data-step="2"></div>
+                    <div class="stage-step-dot" data-step="3"></div>
+                    <div class="stage-step-dot" data-step="4"></div>
+                </div>
+            </div>
+
+            <!-- summary_line + today_action 카드 -->
+            <div id="summaryCard" class="summary-card" style="display:none;">
+                <div class="summary-label">지금 상태 한 줄 요약</div>
+                <div id="summaryLineText" class="summary-line-text"></div>
+                <div class="today-action-box">
+                    <div class="today-action-icon">✏️</div>
+                    <div>
+                        <div class="today-action-label">오늘의 행동</div>
+                        <div id="todayActionText" class="today-action-text"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7일 여정 섹션 -->
+            <div class="journey-section">
+                <div class="journey-section-title">7일 작은 기적 여정</div>
+                <div class="journey-section-sub">하루에 하나씩만 해도 괜찮아요. 완벽하게 하지 않아도 여정은 이어져요.</div>
+                <div class="journey-day today">
+                    <div class="journey-day-header">
+                        <span class="journey-day-num">DAY 1</span>
+                        <span class="journey-day-q">지금 내 마음을 가장 무겁게 만드는 건 무엇인가요?</span>
+                    </div>
+                    <div class="journey-day-action">✏️ 걱정을 한 문장으로 적어보세요</div>
+                    <div class="journey-day-close">오늘은 해결보다 알아차림이면 충분해요</div>
+                </div>
+                <div class="journey-day">
+                    <div class="journey-day-header">
+                        <span class="journey-day-num">DAY 2</span>
+                        <span class="journey-day-q">오늘 가장 자주 올라온 감정은 무엇인가요?</span>
+                    </div>
+                    <div class="journey-day-action">✏️ 그 감정에 이름을 붙여보세요</div>
+                    <div class="journey-day-close">감정을 알아보는 순간 정리가 시작돼요</div>
+                </div>
+                <div class="journey-day">
+                    <div class="journey-day-header">
+                        <span class="journey-day-num">DAY 3</span>
+                        <span class="journey-day-q">너무 많은 걸 한꺼번에 바꾸려 하고 있지는 않나요?</span>
+                    </div>
+                    <div class="journey-day-action">✏️ 가장 중요한 한 가지만 남겨보세요</div>
+                    <div class="journey-day-close">하나를 분명히 아는 것이 더 힘이 돼요</div>
+                </div>
+                <div class="journey-day">
+                    <div class="journey-day-header">
+                        <span class="journey-day-num">DAY 4</span>
+                        <span class="journey-day-q">오늘 안에 끝낼 수 있는 가장 작은 행동은 무엇인가요?</span>
+                    </div>
+                    <div class="journey-day-action">✏️ 10분 행동을 실행해보세요</div>
+                    <div class="journey-day-close">작은 완료가 마음을 움직여요</div>
+                </div>
+                <div class="journey-day">
+                    <div class="journey-day-header">
+                        <span class="journey-day-num">DAY 5</span>
+                        <span class="journey-day-q">나를 막는 건 피곤함인가요, 두려움인가요, 막막함인가요?</span>
+                    </div>
+                    <div class="journey-day-action">✏️ 이유를 한 줄로 적어보세요</div>
+                    <div class="journey-day-close">흔들림은 실패가 아니라 신호예요</div>
+                </div>
+                <div class="journey-day">
+                    <div class="journey-day-header">
+                        <span class="journey-day-num">DAY 6</span>
+                        <span class="journey-day-q">나는 어떤 방식일 때 조금 더 편안하게 움직이나요?</span>
+                    </div>
+                    <div class="journey-day-action">✏️ 나에게 맞는 방식을 하나 골라보세요</div>
+                    <div class="journey-day-close">정답보다 나에게 맞는 방식이 오래가요</div>
+                </div>
+                <div class="journey-day">
+                    <div class="journey-day-header">
+                        <span class="journey-day-num">DAY 7</span>
+                        <span class="journey-day-q">이번 주의 나는 어디에서 조금 달라졌나요?</span>
+                    </div>
+                    <div class="journey-day-action">✏️ 바뀐 점 한 가지를 적어보세요</div>
+                    <div class="journey-day-close">작은 변화가 쌓이면 기적처럼 보이기 시작해요</div>
                 </div>
             </div>
 
@@ -684,6 +1065,24 @@
                 <button class="btn btn-share" onclick="trackCTAClick('share'); shareResult()" style="background: linear-gradient(135deg, #F5A7C6 0%, #9B87F5 100%); color: white; display: inline-flex; align-items: center; gap: 8px;">
                     <span style="font-size: 20px;">✨</span> 기적지수 공유하기
                 </button>
+            </div>
+
+            <!-- DreamTown 진입 CTA -->
+            <div class="dreamtown-cta no-print">
+                <span class="star-icon">⭐</span>
+                <h3>당신의 소원이 별이 될 준비가 됐어요</h3>
+                <p>
+                    분석된 소원을 DreamTown에서<br>
+                    소원별로 만들어보세요.<br>
+                    하루하루 항해하며 실제로 이루어집니다.
+                </p>
+                <a
+                    href="https://app.dailymiracles.kr/dreamtown/wish"
+                    class="btn-dreamtown"
+                    onclick="gtag('event', 'dreamtown_cta_click', { event_category: 'conversion', event_label: 'result_page_bottom' });"
+                >
+                    소원별 만들러 가기 ✦
+                </a>
             </div>
 
             <!-- 푸터 -->
@@ -834,6 +1233,14 @@
                 }
 
                 if (analysisData && analysisData.story) {
+                    // RED 신호 시 결과 화면 진입 차단 → 별도 안내 화면으로 이동
+                    const tl = analysisData.story.userProfile?.traffic_light_level
+                        || analysisData.trafficLight
+                        || 'GREEN';
+                    if (tl === 'RED') {
+                        window.location.replace('/red-support.html');
+                        return;
+                    }
                     renderResults(analysisData.story);
                     applyExperiments();
                 } else {
@@ -883,6 +1290,11 @@
             document.getElementById('indexDescription').textContent =
                 getIndexDescription(userProfile.miracleIndex);
 
+            // 신호등 카드 + 현재 단계 카드 + summary_line 카드 렌더
+            renderSignalCard(userProfile);
+            renderStageCard(userProfile);
+            renderSummaryCard(userProfile);
+
             // 5가지 운명 예측 생성
             renderDestinyPredictions(userProfile);
 
@@ -900,6 +1312,90 @@
 
             // 애니메이션 효과
             animateCompatibilityBar();
+        }
+
+        // ── 신호등 카드 렌더 ──────────────────────────────
+        function renderSignalCard(userProfile) {
+            const score = userProfile.miracleIndex || 75;
+            const level = userProfile.traffic_light_level
+                || (score < 55 ? 'YELLOW' : 'GREEN');
+
+            const card = document.getElementById('signalCard');
+            const dot  = document.getElementById('signalDot');
+            const lbl  = document.getElementById('signalLabel');
+            const main = document.getElementById('signalMain');
+            const sub  = document.getElementById('signalSub');
+
+            if (level === 'YELLOW') {
+                card.className = 'signal-card yellow';
+                dot.className  = 'signal-dot yellow';
+                lbl.textContent = '오늘의 안내 신호 · 노란불';
+                main.textContent = '감정이나 기준 정리가 먼저예요';
+                sub.textContent  = '서두르기보다 한 가지를 분명히 해보세요';
+            } else {
+                card.className = 'signal-card green';
+                dot.className  = 'signal-dot green';
+                lbl.textContent = '오늘의 안내 신호 · 초록불';
+                main.textContent = '바로 시작 가능해요';
+                sub.textContent  = '오늘은 작은 실행이 가장 잘 맞아요';
+            }
+            card.style.display = 'block';
+        }
+
+        // ── 단계 카드 렌더 ────────────────────────────────
+        function renderStageCard(userProfile) {
+            const stage = userProfile.current_stage || getStageFromScore(userProfile.miracleIndex || 75);
+
+            document.getElementById('stageBadgeStep').textContent = stage.code + '단계 ·';
+            document.getElementById('stageBadgeLabel').textContent = stage.label;
+            document.getElementById('stageDesc').textContent = stage.desc;
+
+            // 진행 점 활성화
+            document.querySelectorAll('.stage-step-dot').forEach(dot => {
+                dot.classList.toggle('active', Number(dot.dataset.step) <= stage.code);
+            });
+
+            document.getElementById('stageCard').style.display = 'block';
+        }
+
+        // ── summary_line + today_action 카드 렌더 ─────────────
+        const _SUMMARY_RULES_FE = {
+            GREEN: {
+                1: { summary_line: '지금은 마음을 차분히 정리하며 다음 걸음을 준비하기 좋은 상태예요', today_action: '걱정을 한 문장으로 적고, 그 감정을 그냥 바라봐보세요' },
+                2: { summary_line: '지금은 방향을 하나로 좁혀 첫 움직임을 준비하기 좋은 흐름이에요', today_action: '오늘 가장 중요한 문제 하나를 고르고, 나머지는 내일로 미뤄보세요' },
+                3: { summary_line: '지금은 아주 작은 실행을 시작하기 좋은 상태예요', today_action: '오늘 할 행동을 딱 하나만 골라 10분 안에 끝낼 수 있게 줄여보세요' },
+                4: { summary_line: '지금은 기존 습관을 꾸준히 이어가는 것이 가장 중요한 상태예요', today_action: '기존 습관 중 하나를 오늘 한 번 그대로 해보세요' }
+            },
+            YELLOW: {
+                1: { summary_line: '지금은 해결보다 마음의 무게를 먼저 알아보는 것이 중요한 상태예요', today_action: '걱정을 한 줄 적고, 오늘은 그것을 해결하려 하지 않아도 괜찮아요' },
+                2: { summary_line: '마음은 앞서 있지만, 무엇부터 할지 기준을 정하는 것이 먼저예요', today_action: '오늘 바꿀 것 한 가지만 정하고, 나머지는 결정하지 않아도 돼요' },
+                3: { summary_line: '실행할 힘은 있지만, 시작점을 더 작게 만드는 것이 필요한 상태예요', today_action: '하려던 행동을 절반으로 줄이고, 실패해도 괜찮은 버전으로 시작해보세요' },
+                4: { summary_line: '지금은 더 앞으로 나가기보다, 흔들린 리듬을 다시 고르게 만드는 것이 먼저예요', today_action: '가장 쉬웠던 루틴 하나를 오늘 한 번만 다시 해보세요' }
+            }
+        };
+
+        function renderSummaryCard(userProfile) {
+            const level = (userProfile.traffic_light_level || 'GREEN').toUpperCase();
+            const stage = userProfile.current_stage || getStageFromScore(userProfile.miracleIndex || 75);
+            const code = stage.code || 1;
+
+            // server에서 받은 값 우선, 없으면 룰테이블 fallback
+            const summaryLine = userProfile.summary_line
+                || ((_SUMMARY_RULES_FE[level] || _SUMMARY_RULES_FE.GREEN)[code] || _SUMMARY_RULES_FE.GREEN[1]).summary_line;
+            const todayAction = userProfile.today_action
+                || ((_SUMMARY_RULES_FE[level] || _SUMMARY_RULES_FE.GREEN)[code] || _SUMMARY_RULES_FE.GREEN[1]).today_action;
+
+            document.getElementById('summaryLineText').textContent = summaryLine;
+            document.getElementById('todayActionText').textContent = todayAction;
+            document.getElementById('summaryCard').style.display = 'block';
+        }
+
+        // 기적지수 → 4단계 (server에서 못 받을 경우 fallback)
+        function getStageFromScore(score) {
+            if (score < 65) return { code: 1, label: '감정 정리', desc: '마음이 먼저 지쳐 있어 감정 정리가 먼저 필요한 상태예요.' };
+            if (score < 75) return { code: 2, label: '방향 정리', desc: '중요한 것은 느끼고 있지만 무엇부터 해야 할지 정해지지 않아 에너지가 흩어지기 쉬워요.' };
+            if (score < 85) return { code: 3, label: '실행 시작', desc: '방향은 잡혔고, 이제는 아주 작은 행동으로 흐름을 시작할 차례예요.' };
+            return { code: 4, label: '유지 회복', desc: '이미 시작은 했지만 흔들림이 생기기 쉬워 회복 리듬이 필요한 시점이에요.' };
         }
 
         function getIndexDescription(index) {
@@ -1063,22 +1559,45 @@
             window.location.href = './daily-messages.html';
         }
 
-        function shareResult() {
+        async function shareResult() {
             // 공유 카드 생성기 사용
             const miracleIndex = parseInt(document.getElementById('miracleIndex').textContent) || 75;
             const userName = document.getElementById('userName').textContent || '';
+            const wishText = analysisData?.story?.userProfile?.wish || '';
+            let refCode = '';
+
+            // 1. trial_id로 추천인 코드 가져오기 시도
+            try {
+                const trialId = localStorage.getItem('currentTrialId'); 
+                if (trialId) {
+                    const response = await fetch(`/api/referral/my-code?trial_id=${trialId}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success && data.refCode) {
+                            refCode = data.refCode;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('추천인 코드 가져오기 실패:', error);
+            }
+
+            const shareUrl = refCode 
+                ? `https://dailymiracles.kr/questions.html?ref=${refCode}`
+                : 'https://dailymiracles.kr/questions.html';
 
             if (window.ShareCardGenerator) {
                 ShareCardGenerator.showShareModal({
                     miracleIndex: miracleIndex,
                     userName: userName,
-                    wish: analysisData?.story?.userProfile?.wish || ''
+                    wish: wishText,
+                    refCode: refCode
                 });
             } else if (navigator.share) {
                 navigator.share({
                     title: '나의 기적 지수',
                     text: `내 기적 지수는 ${miracleIndex}점! 당신도 확인해보세요!`,
-                    url: 'https://dailymiracles.kr/questions.html'
+                    url: shareUrl
                 });
             } else {
                 alert('공유 기능이 지원되지 않는 브라우저입니다.');
