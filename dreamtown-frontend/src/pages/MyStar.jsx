@@ -222,8 +222,11 @@ export default function MyStar() {
 
       </motion.div>
 
-      {/* 내 별 이야기 — 항해 로그 기반 */}
-      {voyageLogs.length > 0 && (
+      {/* 내 별 이야기 — 항해 로그 기반 (daily만, resonance 제외) */}
+      {(() => {
+        const displayLogs = voyageLogs.filter(log => log.source === 'daily' || !log.source);
+        if (displayLogs.length === 0) return null;
+        return (
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -232,11 +235,11 @@ export default function MyStar() {
         >
           <p className="text-white/40 text-xs mb-3">내 별 이야기</p>
           <div className="flex flex-col">
-            {voyageLogs.slice(0, 3).map((log, i) => (
+            {displayLogs.slice(0, 3).map((log, i) => (
               <div
                 key={log.id ?? i}
                 className={`flex items-start gap-3 py-2.5 ${
-                  i < Math.min(voyageLogs.length, 3) - 1 ? 'border-b border-white/5' : ''
+                  i < Math.min(displayLogs.length, 3) - 1 ? 'border-b border-white/5' : ''
                 }`}
               >
                 <span className="text-white/30 text-xs flex-shrink-0 mt-0.5 w-10">
@@ -247,7 +250,8 @@ export default function MyStar() {
             ))}
           </div>
         </motion.div>
-      )}
+        );
+      })()}
 
       {/* Day 7 의미 생성 — 7일 이상 경과 시 노출 */}
       {daysSinceBirth >= 7 && (() => {

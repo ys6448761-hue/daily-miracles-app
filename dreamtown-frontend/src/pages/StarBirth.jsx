@@ -182,7 +182,10 @@ export default function StarBirth() {
 
               {/* SECONDARY — 내 별 */}
               <button
-                onClick={() => nav(`/my-star/${starId}`, { replace: true })}
+                onClick={() => {
+                  if (starId) localStorage.setItem('dt_first_voyage_' + starId, 'skipped');
+                  nav(`/my-star/${starId}`, { replace: true });
+                }}
                 className="w-full bg-white/5 border border-white/15 text-white/60 font-medium py-3 rounded-2xl text-sm hover:bg-white/10 transition-colors"
               >
                 내 별 먼저 살펴볼게요
