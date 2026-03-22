@@ -13,6 +13,7 @@ import Postcard from './pages/Postcard.jsx';
 import Home from './pages/Home.jsx';
 import StarDetail from './pages/StarDetail.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
+import GiftLanding from './pages/GiftLanding.jsx';
 
 export default function App() {
   return (
@@ -32,8 +33,9 @@ export default function App() {
           <Route path="/star"        element={<Star />} />
           <Route path="/postcard"    element={<Postcard />} />
           <Route path="/home"        element={<Home />} />
-          <Route path="/dashboard"   element={<DashboardPage />} />
-          <Route path="*"            element={<Navigate to="/" replace />} />
+          <Route path="/dashboard"               element={<DashboardPage />} />
+          <Route path="/dreamtown/gift/:star_id" element={<GiftLanding />} />
+          <Route path="*"                        element={<Navigate to="/" replace />} />
         </Routes>
       </div>
     </BrowserRouter>

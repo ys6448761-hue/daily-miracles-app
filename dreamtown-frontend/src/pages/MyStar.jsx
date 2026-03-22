@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs } from '../api/dreamtown.js';
+import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId } from '../api/dreamtown.js';
 import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
 import { sharePostcard } from '../utils/kakaoShare';
@@ -106,6 +106,12 @@ export default function MyStar() {
   const [growthText, setGrowthText] = useState('');
   const [growthSaved, setGrowthSaved] = useState(false);
 
+  // 선물하기 상태
+  const [showGift, setShowGift] = useState(false);
+  const [giftCopyType, setGiftCopyType] = useState(null);
+  const [giftPosting, setGiftPosting] = useState(false);
+  const [giftDone, setGiftDone] = useState(false);
+
   useEffect(() => {
     getStar(id)
       .then((data) => {
@@ -171,6 +177,40 @@ export default function MyStar() {
   const aurumMsg = getAurumMessage(daysSinceBirth);
   const today = new Date().toISOString().slice(0, 10);
   const doneTodayFlag = !!localStorage.getItem('dt_voyage_today_' + star.star_id + '_' + today);
+
+  const GIFT_COPIES = {
+    lover:  '별을 따다 주고 싶었는데, 네 별을 만들었어',
+    parent: '당신이 걷는 모든 길에 빛이 있기를 바라요',
+    friend: '넌 이미 별을 닮았어. 이 별이 너한테 어울려',
+  };
+  const GIFT_LABELS = { lover: '연인에게', parent: '부모님께', friend: '친구에게' };
+
+  async function handleGift() {
+    if (!giftCopyType || giftPosting) return;
+    setGiftPosting(true);
+    try {
+      const { gift_card } = await createGift(star.star_id, {
+        userId: getOrCreateUserId(),
+        giftCopyType,
+      });
+      const shareUrl = window.location.origin + '/dreamtown/gift/' + star.star_id;
+      if (navigator.share) {
+        await navigator.share({
+          title: `${gift_card.star_name}을 선물받으세요 ✨`,
+          text:  `"${gift_card.copy_text}"`,
+          url:   shareUrl,
+        }).catch(() => {}); // AbortError 무시
+      } else {
+        await navigator.clipboard.writeText(shareUrl).catch(() => {});
+        setGiftDone(true);
+      }
+      setGiftDone(true);
+    } catch (err) {
+      console.error('[Gift]', err.message);
+    } finally {
+      setGiftPosting(false);
+    }
+  }
 
   return (
     <div className="min-h-screen flex flex-col px-6 py-10">
@@ -376,6 +416,56 @@ export default function MyStar() {
         >
           카톡으로 보내기
         </button>
+
+        {/* ── 별 선물하기 ──────────────────────────────── */}
+        {!giftDone ? (
+          !showGift ? (
+            <button
+              onClick={() => setShowGift(true)}
+              className="w-full bg-white/5 border border-white/10 text-white/60 font-medium py-4 rounded-2xl hover:bg-white/10 transition-colors"
+            >
+              별 선물하기 🎁
+            </button>
+          ) : (
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+              <p className="text-white/40 text-xs mb-3 text-center">누구에게 선물할까요?</p>
+              <div className="grid grid-cols-3 gap-2 mb-3">
+                {['lover', 'parent', 'friend'].map(type => (
+                  <button
+                    key={type}
+                    onClick={() => setGiftCopyType(type)}
+                    className={`py-2.5 rounded-xl text-sm border transition-colors ${
+                      giftCopyType === type
+                        ? 'border-star-gold/60 bg-star-gold/10 text-star-gold'
+                        : 'border-white/10 text-white/50 hover:border-white/25'
+                    }`}
+                  >
+                    {GIFT_LABELS[type]}
+                  </button>
+                ))}
+              </div>
+              {giftCopyType && (
+                <>
+                  <p className="text-white/50 text-xs text-center italic mb-3 leading-relaxed">
+                    &ldquo;{GIFT_COPIES[giftCopyType]}&rdquo;
+                  </p>
+                  <button
+                    onClick={handleGift}
+                    disabled={giftPosting}
+                    className="w-full bg-star-gold/15 hover:bg-star-gold/25 border border-star-gold/40 text-star-gold font-semibold py-3 rounded-xl transition-colors disabled:opacity-40"
+                  >
+                    {giftPosting ? '준비 중...' : '이 별 선물하기 ✨'}
+                  </button>
+                </>
+              )}
+            </div>
+          )
+        ) : (
+          <div className="bg-dream-purple/8 border border-dream-purple/20 rounded-2xl p-4 text-center">
+            <p className="text-white/60 text-sm">이 별이 두 사람의 하늘에 닿았어요 ✦</p>
+          </div>
+        )}
+
         <div className="flex gap-3">
           <button
             onClick={() => nav('/home')}

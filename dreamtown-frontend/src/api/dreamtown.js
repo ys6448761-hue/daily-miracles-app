@@ -149,6 +149,23 @@ export async function postFeedback({ userId, starId, feelingType, reason, commen
   });
 }
 
+// POST /api/dt/stars/:id/gift — 선물 생성
+export async function createGift(starId, { userId, giftCopyType }) {
+  return fetchWithRetry(`${BASE}/stars/${starId}/gift`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, gift_copy_type: giftCopyType }),
+  });
+}
+
+// GET /api/dt/gift/:star_id — 선물 카드 조회 (수신자)
+export async function getGiftCard(starId) {
+  const res = await fetch(`${BASE}/gift/${starId}`);
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error('선물 정보를 불러올 수 없어요');
+  return res.json();
+}
+
 // Prototype용 임시 user ID (로컬 스토리지 기반)
 export function getOrCreateUserId() {
   const key = 'dt_user_id';

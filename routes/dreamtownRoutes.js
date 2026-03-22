@@ -607,6 +607,96 @@ router.get('/stars/:id/voyage-logs', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
+// Gift 선물 카피 텍스트 (AI 없음, 룰 기반)
+// ─────────────────────────────────────────────
+const GIFT_COPIES = {
+  lover:  '별을 따다 주고 싶었는데, 네 별을 만들었어',
+  parent: '당신이 걷는 모든 길에 빛이 있기를 바라요',
+  friend: '넌 이미 별을 닮았어. 이 별이 너한테 어울려',
+};
+
+// POST /api/dt/stars/:id/gift — 선물 생성 (소유자 확인 + 마킹)
+router.post('/stars/:id/gift', async (req, res) => {
+  try {
+    const { id: starId } = req.params;
+    const { user_id, gift_copy_type } = req.body;
+
+    if (!user_id || !gift_copy_type) {
+      return res.status(400).json({ error: 'user_id, gift_copy_type 필수' });
+    }
+    if (!GIFT_COPIES[gift_copy_type]) {
+      return res.status(400).json({ error: 'gift_copy_type은 lover/parent/friend 중 하나' });
+    }
+
+    // 별 조회 + 소유자 확인
+    const { rows } = await db.query(
+      `SELECT s.id, s.user_id, s.star_name, g.code AS galaxy_code, g.name_ko AS galaxy_name
+         FROM dt_stars s
+         JOIN dt_galaxies g ON g.id = s.galaxy_id
+        WHERE s.id = $1`, [starId]
+    );
+    if (rows.length === 0) return res.status(404).json({ error: '별을 찾을 수 없어요' });
+    const star = rows[0];
+    if (star.user_id !== user_id) return res.status(403).json({ error: '내 별만 선물할 수 있어요' });
+
+    // 선물 마킹
+    await db.query(
+      `UPDATE dt_stars
+          SET is_gifted = true, gifted_at = NOW(), gift_copy_type = $2
+        WHERE id = $1`,
+      [starId, gift_copy_type]
+    );
+
+    res.json({
+      success: true,
+      gift_card: {
+        star_name:  star.star_name,
+        galaxy:     star.galaxy_code,
+        galaxy_ko:  star.galaxy_name,
+        copy_type:  gift_copy_type,
+        copy_text:  GIFT_COPIES[gift_copy_type],
+      },
+    });
+  } catch (err) {
+    console.error('[DT] POST /stars/:id/gift error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/dt/gift/:star_id — 수신자 선물 카드 조회 (공개, view_count 증가)
+router.get('/gift/:star_id', async (req, res) => {
+  try {
+    const { star_id } = req.params;
+
+    const { rows } = await db.query(
+      `SELECT s.star_name, s.is_gifted, s.gift_copy_type, s.gift_view_count,
+              g.code AS galaxy_code, g.name_ko AS galaxy_name
+         FROM dt_stars s
+         JOIN dt_galaxies g ON g.id = s.galaxy_id
+        WHERE s.id = $1`, [star_id]
+    );
+    if (rows.length === 0 || !rows[0].is_gifted) {
+      return res.status(404).json({ error: '선물을 찾을 수 없어요' });
+    }
+    const star = rows[0];
+
+    // view_count 증가 (fire-and-forget)
+    db.query('UPDATE dt_stars SET gift_view_count = gift_view_count + 1 WHERE id = $1', [star_id])
+      .catch(() => {});
+
+    res.json({
+      star_name:  star.star_name,
+      galaxy:     { code: star.galaxy_code, name_ko: star.galaxy_name },
+      copy_text:  GIFT_COPIES[star.gift_copy_type] ?? '',
+      view_count: star.gift_view_count,
+    });
+  } catch (err) {
+    console.error('[DT] GET /gift/:star_id error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
 // GET /api/dt/health — 헬스체크
 // ─────────────────────────────────────────────
 router.get('/health', (_req, res) => {
