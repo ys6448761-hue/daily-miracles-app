@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { getRecentStars, getStar, getTodayStars } from '../api/dreamtown.js';
+import { getRecentStars, getStar } from '../api/dreamtown.js';
 
 const GALAXY_STYLE = {
   growth:       { label: '성장 은하', cls: 'bg-blue-500/20 text-blue-300' },
@@ -78,20 +78,15 @@ export default function Home() {
   const newStarId = state?.newStarId ?? null;
 
   const [stars, setStars] = useState([]);
-  const [todayStars, setTodayStars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [myStarData, setMyStarData] = useState(null);
 
   const myStarId = localStorage.getItem('dt_star_id');
 
   useEffect(() => {
-    const recentPromise = getRecentStars(13)
+    const recentPromise = getRecentStars(20)
       .then(r => setStars(r.stars ?? []))
       .catch(() => setStars([]));
-
-    getTodayStars()
-      .then(r => setTodayStars(r.stars ?? []))
-      .catch(() => setTodayStars([]));
 
     const myStarPromise = myStarId
       ? getStar(myStarId)
@@ -111,6 +106,15 @@ export default function Home() {
 
   const otherStars = stars.filter(s => s && s.star_id && s.star_id !== myStarId);
   const isNewStar = !!(newStarId && myStarId === newStarId);
+
+  // 오늘(KST) 탄생 별 — 별도 API 없이 recent 데이터에서 파생
+  const todayKstMidnight = (() => {
+    const now = new Date();
+    const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+    kst.setUTCHours(0, 0, 0, 0);
+    return new Date(kst.getTime() - 9 * 60 * 60 * 1000); // UTC로 환산
+  })();
+  const todayStars = stars.filter(s => s && new Date(s.created_at) >= todayKstMidnight);
 
   return (
     <div className="min-h-screen flex flex-col px-5 pt-10 pb-24">

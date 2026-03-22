@@ -279,14 +279,14 @@ router.post('/stars/create', async (req, res) => {
 // ─────────────────────────────────────────────
 router.get('/stars/recent', async (req, res) => {
   try {
-    const limit = Math.min(parseInt(req.query.limit ?? '13', 10), 50);
+    const limit = Math.min(parseInt(req.query.limit ?? '20', 10), 50);
     const result = await db.query(
       `SELECT s.id AS star_id, s.star_name, s.star_stage, s.created_at,
               g.code AS galaxy_code, g.name_ko AS galaxy_name_ko
          FROM dt_stars s
          JOIN dt_galaxies g ON g.id = s.galaxy_id
         WHERE s.is_hidden = FALSE
-        ORDER BY s.created_at ASC
+        ORDER BY s.created_at DESC
         LIMIT $1`,
       [limit]
     );
