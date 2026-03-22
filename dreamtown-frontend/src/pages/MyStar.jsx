@@ -7,6 +7,30 @@ import AURUM_MESSAGES from '../constants/aurumMessages';
 import { sharePostcard } from '../utils/kakaoShare';
 import { gaGrowthLogged, gaMilestoneDay7, gaResonanceReceived } from '../utils/gtag';
 
+// 은하 → 항해 방향 (StarBirth와 동일 매핑)
+const GALAXY_TO_DIRECTION = {
+  growth:       'east',
+  challenge:    'north',
+  healing:      'south',
+  relationship: 'west',
+};
+
+// 이어가기 항해 메시지 (첫 항해와 구분)
+const CONTINUE_VOYAGE_MSG = {
+  growth:       '오늘도, 이 별과 함께 나아갑니다.',
+  challenge:    '오늘도, 도전을 이어갑니다.',
+  healing:      '오늘도, 마음이 쉬어갑니다.',
+  relationship: '오늘도, 마음이 닿아갑니다.',
+};
+
+// 이 우주의 지혜 1줄 (은하별)
+const GALAXY_WISDOM = {
+  growth:       '성장은 방향이 아니라 움직임에서 시작됩니다.',
+  challenge:    '도전은 결과가 아니라 시작 자체에서 완성됩니다.',
+  healing:      '치유는 고치는 것이 아니라 받아들이는 것입니다.',
+  relationship: '관계는 거리가 아니라 방향으로 가까워집니다.',
+};
+
 // ── Day 7 의미 메시지 (은하별) ────────────────────────────────────
 // 규칙: 성공/실패 금지 · 평가/판단 금지 · 감정 압박 금지
 // 핵심: "변화가 완성된 순간"이 아니라 "처음 알아차리는 순간"
@@ -286,28 +310,47 @@ export default function MyStar() {
         )}
       </motion.div>
 
+      {/* 이 우주의 지혜 */}
+      <div className="border border-white/8 rounded-2xl p-4 mb-4">
+        <p className="text-white/25 text-xs mb-1">이 우주의 지혜</p>
+        <p className="text-white/55 text-sm">
+          {GALAXY_WISDOM[star.galaxy?.code] ?? '작은 변화들이 조용히 쌓이고 있는 시간이에요.'}
+        </p>
+      </div>
+
       {/* CTA */}
       <div className="flex flex-col gap-3 mt-auto">
+        {/* PRIMARY — 이 별 이어가기 */}
+        <button
+          onClick={() => {
+            const direction = GALAXY_TO_DIRECTION[star.galaxy?.code] ?? 'south';
+            const message   = CONTINUE_VOYAGE_MSG[star.galaxy?.code] ?? '오늘도, 이 별과 함께합니다.';
+            nav('/day', { state: { direction, message } });
+          }}
+          className="w-full bg-dream-purple hover:bg-purple-500 text-white font-bold py-4 rounded-2xl transition-colors"
+        >
+          이 별 이어가기 ✦
+        </button>
         <button
           onClick={() => sharePostcard({
             starName:   star.star_name,
             galaxyName: star.galaxy?.name_ko ?? '미지의 은하',
             dayCount:   daysSinceBirth,
           })}
-          className="w-full bg-dream-purple hover:bg-purple-500 text-white font-semibold py-4 rounded-2xl transition-colors"
+          className="w-full bg-white/5 border border-white/10 text-white/70 font-semibold py-4 rounded-2xl hover:bg-white/10 transition-colors"
         >
           카톡으로 보내기
         </button>
         <div className="flex gap-3">
           <button
             onClick={() => nav('/home')}
-            className="flex-1 bg-white/5 border border-white/10 text-white/70 font-semibold py-4 rounded-2xl hover:bg-white/10 transition-colors"
+            className="flex-1 bg-white/5 border border-white/10 text-white/60 font-semibold py-4 rounded-2xl hover:bg-white/10 transition-colors"
           >
             광장으로 가기
           </button>
           <button
             onClick={() => nav('/wish')}
-            className="flex-1 bg-white/5 border border-white/10 text-white/70 font-semibold py-4 rounded-2xl hover:bg-white/10 transition-colors"
+            className="flex-1 bg-white/5 border border-white/10 text-white/60 font-semibold py-4 rounded-2xl hover:bg-white/10 transition-colors"
           >
             새 소원 만들기
           </button>
