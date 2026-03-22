@@ -110,13 +110,21 @@ export async function postGrowthLog(starId, text) {
 }
 
 // emotion/tag/growth → problem/action/result 자동 추론 저장
-export async function postVoyageLog(starId, { emotion, tag, growth }) {
+// source: 'voyage' (기본) | 'resonance' (공명 시 자동 저장)
+export async function postVoyageLog(starId, { emotion, tag, growth, source = 'voyage' }) {
   const userId = getOrCreateUserId();
   return fetchWithRetry(`${BASE}/voyage-logs`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user_id: userId, star_id: starId, emotion, tag, growth }),
+    body: JSON.stringify({ user_id: userId, star_id: starId, emotion, tag, growth, source }),
   });
+}
+
+// 별의 항해 로그 목록 (D+ 포함)
+export async function getVoyageLogs(starId) {
+  const res = await fetch(`${BASE}/stars/${starId}/voyage-logs`);
+  if (!res.ok) throw new Error('항해 로그 조회 실패');
+  return res.json();
 }
 
 // ── KPI 대시보드 ──────────────────────────────────────────────────

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStar, getResonance, postResonance } from '../api/dreamtown.js';
+import { getStar, getResonance, postResonance, getVoyageLogs, postVoyageLog } from '../api/dreamtown.js';
 import { gaResonanceCreated, gaImpactCreated } from '../utils/gtag';
 
-// 감정 선택형 공명 옵션 (좀 ~ 계열)
+// 감정 선택형 공명 옵션
 const RESONANCE_OPTIONS = [
   { type: 'relief',  label: '좀 편해졌어요' },
   { type: 'courage', label: '좀 용기났어요' },
@@ -16,14 +16,6 @@ const GALAXY_STYLE = {
   challenge:    { label: '도전 은하', cls: 'bg-orange-500/20 text-orange-300' },
   healing:      { label: '치유 은하', cls: 'bg-green-500/20 text-green-300' },
   relationship: { label: '관계 은하', cls: 'bg-pink-500/20 text-pink-300' },
-};
-
-// 은하별 지혜 1줄
-const GALAXY_WISDOM = {
-  growth:       '성장은 방향이 아니라 움직임에서 시작됩니다.',
-  challenge:    '도전은 결과가 아니라 시작 자체에서 완성됩니다.',
-  healing:      '치유는 고치는 것이 아니라 받아들이는 것입니다.',
-  relationship: '관계는 거리가 아니라 방향으로 가까워집니다.',
 };
 
 function calcDaysSinceBirth(createdAt) {
@@ -39,12 +31,13 @@ export default function StarDetail() {
   const [resonanceData, setResonanceData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 공명
   const [resonanceSubmitted, setResonanceSubmitted] = useState(false);
   const [resonancePosting, setResonancePosting] = useState(false);
 
-  // 이야기 섹션 토글
-  const [showStory, setShowStory] = useState(false);
+  // 항해 로그 섹션
+  const [showLogs, setShowLogs] = useState(false);
+  const [voyageLogs, setVoyageLogs] = useState([]);
+  const [logsLoading, setLogsLoading] = useState(false);
 
   const myStarId = localStorage.getItem('dt_star_id');
 
@@ -55,8 +48,19 @@ export default function StarDetail() {
     ]).catch(() => {}).finally(() => setLoading(false));
   }, [id]);
 
+  // 항해 로그 섹션 열릴 때 fetch
+  useEffect(() => {
+    if (!showLogs || voyageLogs.length > 0) return;
+    setLogsLoading(true);
+    getVoyageLogs(id)
+      .then(r => setVoyageLogs(r.logs ?? []))
+      .catch(() => setVoyageLogs([]))
+      .finally(() => setLogsLoading(false));
+  }, [showLogs]); // eslint-disable-line react-hooks/exhaustive-deps
+
   async function handleResonance(resonanceType) {
     if (resonancePosting || resonanceSubmitted) return;
+    const opt = RESONANCE_OPTIONS.find(o => o.type === resonanceType);
     setResonancePosting(true);
     try {
       let token = localStorage.getItem('dt_resonance_token');
@@ -71,10 +75,20 @@ export default function StarDetail() {
         for (const imp of result.new_impacts) gaImpactCreated({ starId: id, impactType: imp.type });
       }
 
+      // 공명 → 내 별 항해 로그 자동 저장 (fire-and-forget)
+      if (myStarId && opt) {
+        postVoyageLog(myStarId, {
+          emotion: opt.label,
+          tag:     '공명',
+          growth:  opt.label,
+          source:  'resonance',
+        }).catch(() => {});
+      }
+
       setResonanceSubmitted(true);
       getResonance(id).then(setResonanceData).catch(() => {});
     } catch {
-      setResonanceSubmitted(true); // 실패해도 UI는 완료 처리
+      setResonanceSubmitted(true);
     } finally {
       setResonancePosting(false);
     }
@@ -102,8 +116,6 @@ export default function StarDetail() {
     label: star.galaxy?.name_ko ?? '미지의 은하',
     cls: 'bg-white/10 text-white/50',
   };
-
-  // 공명 합산
   const resonanceTotal = Object.values(resonanceData?.resonance ?? {})
     .reduce((s, v) => s + (v.count || 0), 0);
 
@@ -141,49 +153,42 @@ export default function StarDetail() {
 
         {/* 이 별의 이야기 보기 버튼 */}
         <button
-          onClick={() => setShowStory(v => !v)}
+          onClick={() => setShowLogs(v => !v)}
           className="w-full mt-1 border border-white/12 hover:border-white/25 bg-white/3 hover:bg-white/8 text-white/55 hover:text-white/75 text-sm py-3 rounded-2xl transition-colors"
         >
-          {showStory ? '이야기 닫기' : '이 별의 이야기 보기 ✦'}
+          {showLogs ? '이야기 닫기' : '이 별의 이야기 보기 ✦'}
         </button>
       </div>
 
-      {/* ── 2. 이야기/변화/지혜 섹션 (토글) ────────────────────── */}
-      {showStory && (
+      {/* ── 2. 항해 로그 기반 이야기 섹션 ──────────────────────── */}
+      {showLogs && (
         <div className="bg-white/3 border border-white/8 rounded-3xl p-5 mb-3">
-          {/* 이야기 — 소원 */}
-          {star.wish_text && (
-            <div className="mb-4">
-              <p className="text-white/30 text-xs mb-2">이야기</p>
-              <p className="text-white/65 text-sm leading-relaxed italic">
-                &quot;{star.wish_text}&quot;
-              </p>
+          {logsLoading ? (
+            <p className="text-white/30 text-xs text-center py-2">불러오는 중...</p>
+          ) : voyageLogs.length === 0 ? (
+            <p className="text-white/30 text-xs text-center py-2">아직 항해 기록이 없어요</p>
+          ) : (
+            <div className="flex flex-col gap-0">
+              {voyageLogs.slice(0, 3).map((log, i) => (
+                <div
+                  key={log.id}
+                  className={`flex items-start gap-3 py-3 ${
+                    i < Math.min(voyageLogs.length, 3) - 1 ? 'border-b border-white/5' : ''
+                  }`}
+                >
+                  <span className="text-white/30 text-xs flex-shrink-0 mt-0.5 w-10">
+                    D+{log.day_number}
+                  </span>
+                  <p className="text-white/60 text-sm leading-relaxed">{log.growth}</p>
+                </div>
+              ))}
             </div>
           )}
-
-          {/* 변화 — 성장 기록 */}
-          {star.growth_log_text && (
-            <div className="border-t border-white/8 pt-4 mb-4">
-              <p className="text-white/30 text-xs mb-2">변화</p>
-              <p className="text-white/60 text-sm leading-relaxed">
-                {star.growth_log_text}
-              </p>
-            </div>
-          )}
-
-          {/* 지혜 */}
-          <div className={star.wish_text || star.growth_log_text ? 'border-t border-white/8 pt-4' : ''}>
-            <p className="text-white/30 text-xs mb-2">지혜</p>
-            <p className="text-white/50 text-sm italic">
-              {GALAXY_WISDOM[star.galaxy?.code] ?? '작은 변화들이 조용히 쌓이고 있어요.'}
-            </p>
-          </div>
         </div>
       )}
 
       {/* ── 3. 공명 섹션 ──────────────────────────────────────── */}
       <div className="mb-5">
-        {/* 감정 선택형 — 중간 버튼 없이 바로 노출 */}
         {!resonanceSubmitted && (
           <div className="bg-white/3 border border-white/8 rounded-2xl p-4">
             <p className="text-white/40 text-xs mb-3 text-center">
@@ -204,7 +209,6 @@ export default function StarDetail() {
           </div>
         )}
 
-        {/* 공명 완료 — 고정 문구 */}
         {resonanceSubmitted && (
           <div className="bg-dream-purple/8 border border-dream-purple/20 rounded-2xl p-4 text-center">
             <p className="text-white/70 text-sm">이 별에 마음이 닿았어요</p>

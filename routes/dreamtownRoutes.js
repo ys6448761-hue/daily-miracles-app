@@ -512,6 +512,7 @@ router.post('/stars/:id/growth-log', async (req, res) => {
 
 // 감정 → 오늘의 상황/문제 자동 추론 (갤럭시 로그 options 기반)
 const PROBLEM_MAP = {
+  // Day.jsx 항해 감정
   '용기났어요':              '도전하기 어려운 순간이 있었다',
   '해볼 수 있을 것 같아요':  '불확실함 앞에서 멈추는 순간이 있었다',
   '조금 앞으로 가고 싶어졌어요': '앞으로 나아가지 못하는 느낌이 들었다',
@@ -524,6 +525,11 @@ const PROBLEM_MAP = {
   '숨이 놓였어요':           '지치고 무거운 마음이 쌓여 있었다',
   '조금 쉬고 싶어졌어요':    '쉬지 못하고 긴장된 상태였다',
   '마음이 잔잔해졌어요':     '마음이 어수선하게 흔들리고 있었다',
+  // 공명(resonance) 감정 — source: 'resonance' 시 사용
+  '좀 편해졌어요':           '다른 별의 소원이 마음에 닿았다',
+  '좀 용기났어요':           '다른 별의 소원에서 용기를 받았다',
+  '좀 정리됐어요':           '다른 별의 소원이 생각을 정리해줬다',
+  '좀 믿고 싶어졌어요':      '다른 별의 소원이 믿음을 불러일으켰다',
 };
 
 // 도움 태그 → 취한 행동 자동 추론
@@ -540,6 +546,7 @@ const ACTION_MAP = {
   '위로':   '스스로를 위로했다',
   '쉼':     '잠깐 멈추고 쉬었다',
   '내려놓기': '내려놓기를 시도했다',
+  '공명':   '공명을 남기고 마음을 나눴다',  // resonance source
 };
 
 function inferVoyageStructure(emotion, tag, growth) {
@@ -553,7 +560,7 @@ function inferVoyageStructure(emotion, tag, growth) {
 // POST /api/dt/voyage-logs — 항해 로그 저장 (emotion → problem/action/result 자동 추론)
 router.post('/voyage-logs', async (req, res) => {
   try {
-    const { user_id, star_id = null, emotion, tag, growth } = req.body;
+    const { user_id, star_id = null, emotion, tag, growth, source = 'voyage' } = req.body;
 
     if (!user_id || !emotion || !tag || !growth) {
       return res.status(400).json({ error: 'user_id, emotion, tag, growth 필수' });
@@ -563,10 +570,10 @@ router.post('/voyage-logs', async (req, res) => {
 
     const { rows } = await db.query(
       `INSERT INTO dt_voyage_logs
-         (user_id, star_id, emotion, tag, growth, problem, action, result)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         (user_id, star_id, emotion, tag, growth, problem, action, result, source)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING id`,
-      [user_id, star_id, emotion, tag, growth, problem, action, result]
+      [user_id, star_id, emotion, tag, growth, problem, action, result, source]
     );
 
     res.status(201).json({ ok: true, log_id: rows[0].id, problem, action, result });
@@ -577,14 +584,18 @@ router.post('/voyage-logs', async (req, res) => {
   }
 });
 
-// GET /api/dt/stars/:id/voyage-logs — 별의 항해 로그 목록 (최근 10개)
+// GET /api/dt/stars/:id/voyage-logs — 별의 항해 로그 목록 (D+ 포함, 최근 10개)
 router.get('/stars/:id/voyage-logs', async (req, res) => {
   try {
     const { rows } = await db.query(
-      `SELECT id, emotion, tag, growth, problem, action, result, logged_at
-         FROM dt_voyage_logs
-        WHERE star_id = $1
-        ORDER BY logged_at DESC
+      `SELECT v.id, v.emotion, v.tag, v.growth, v.source, v.logged_at,
+              GREATEST(1, FLOOR(
+                EXTRACT(EPOCH FROM (v.logged_at - s.created_at)) / 86400
+              )::int + 1) AS day_number
+         FROM dt_voyage_logs v
+         JOIN dt_stars s ON s.id = v.star_id
+        WHERE v.star_id = $1
+        ORDER BY v.logged_at DESC
         LIMIT 10`,
       [req.params.id]
     );
