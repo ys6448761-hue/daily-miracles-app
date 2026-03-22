@@ -78,16 +78,8 @@ export default function Home() {
   const [stars, setStars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [myStarData, setMyStarData] = useState(null);
-  const [dbg, setDbg] = useState('');  // DEBUG — 배포 후 제거
 
   const myStarId = localStorage.getItem('dt_star_id');
-
-  // DEBUG: 클릭 타겟 확인 — 배포 후 제거
-  useEffect(() => {
-    const h = e => setDbg(`${e.target.tagName} | ${(e.target.className||'').toString().slice(0,60)}`);
-    window.addEventListener('click', h, true);
-    return () => window.removeEventListener('click', h, true);
-  }, []);
 
   useEffect(() => {
     const recentPromise = getRecentStars(13)

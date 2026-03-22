@@ -4,7 +4,7 @@ import DayLogScreen from '../features/galaxy/components/DayLogScreen';
 import SilhouetteScene from '../features/day/components/SilhouetteScene';
 import { saveLog } from '../features/galaxy/utils/logStorage';
 import { useDreamtownStore } from '../store/dreamtownStore';
-import { postVoyageLog, getOrCreateUserId } from '../api/dreamtown.js';
+import { postVoyageLog } from '../api/dreamtown.js';
 import { POSTCARD_FALLBACK_MESSAGE } from '../constants/dreamtownFlow';
 
 // 선택 은하 잔광 색상 — SelectionTransition 동일 계열
