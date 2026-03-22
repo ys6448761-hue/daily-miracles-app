@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { getRecentStars, getStar } from '../api/dreamtown.js';
+import { getRecentStars, getStar, getTodayStars } from '../api/dreamtown.js';
 
 const GALAXY_STYLE = {
   growth:       { label: '성장 은하', cls: 'bg-blue-500/20 text-blue-300' },
@@ -78,6 +78,7 @@ export default function Home() {
   const newStarId = state?.newStarId ?? null;
 
   const [stars, setStars] = useState([]);
+  const [todayStars, setTodayStars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [myStarData, setMyStarData] = useState(null);
 
@@ -87,6 +88,10 @@ export default function Home() {
     const recentPromise = getRecentStars(13)
       .then(r => setStars(r.stars ?? []))
       .catch(() => setStars([]));
+
+    getTodayStars()
+      .then(r => setTodayStars(r.stars ?? []))
+      .catch(() => setTodayStars([]));
 
     const myStarPromise = myStarId
       ? getStar(myStarId)
@@ -125,6 +130,24 @@ export default function Home() {
           isNew={isNewStar}
           nav={nav}
         />
+      )}
+
+      {/* 오늘의 탄생 별 — 오늘 생성된 별이 있을 때만 표시 */}
+      {todayStars.length > 0 && (
+        <div className="mb-4">
+          <p className="text-white/50 text-xs mb-2">✨ 오늘 탄생한 소원별</p>
+          <div className="flex gap-2 flex-wrap">
+            {todayStars.map(s => (
+              <button
+                key={s.star_id}
+                onClick={() => nav(`/star/${s.star_id}`)}
+                className="bg-star-gold/10 border border-star-gold/30 text-star-gold text-xs px-3 py-1.5 rounded-full hover:bg-star-gold/20 active:scale-95 transition-all"
+              >
+                ⭐ {s.star_name}
+              </button>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* 광장 — 다른 별들 */}

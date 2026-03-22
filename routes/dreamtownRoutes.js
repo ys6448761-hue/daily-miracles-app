@@ -298,6 +298,28 @@ router.get('/stars/recent', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
+// GET /api/dt/stars/today — 오늘(KST) 탄생 별 (최대 3개)
+// ─────────────────────────────────────────────
+router.get('/stars/today', async (req, res) => {
+  try {
+    const result = await db.query(
+      `SELECT s.id AS star_id, s.star_name, s.created_at,
+              g.code AS galaxy_code, g.name_ko AS galaxy_name_ko
+         FROM dt_stars s
+         JOIN dt_galaxies g ON g.id = s.galaxy_id
+        WHERE s.is_hidden = FALSE
+          AND s.created_at >= (NOW() AT TIME ZONE 'Asia/Seoul')::date AT TIME ZONE 'Asia/Seoul'
+        ORDER BY s.created_at DESC
+        LIMIT 3`
+    );
+    res.json({ stars: result.rows });
+  } catch (err) {
+    console.error('[DT] GET /stars/today error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
 // GET /api/dt/stars/:id — 내 별 조회
 // ─────────────────────────────────────────────
 router.get('/stars/:id', async (req, res) => {

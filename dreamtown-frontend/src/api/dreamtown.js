@@ -43,6 +43,12 @@ export async function postStarCreate({ wishId, userId, phoneNumber }) {
   });
 }
 
+export async function getTodayStars() {
+  const res = await fetch(`${BASE}/stars/today`);
+  if (!res.ok) throw new Error('오늘의 탄생 별 조회 실패');
+  return res.json();
+}
+
 export async function getRecentStars(limit = 13) {
   const res = await fetch(`${BASE}/stars/recent?limit=${limit}`);
   if (!res.ok) throw new Error('광장 별 목록 조회 실패');

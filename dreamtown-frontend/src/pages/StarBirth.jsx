@@ -165,6 +165,11 @@ export default function StarBirth() {
               {starName}과(와) 함께하는 첫 여정
             </p>
 
+            {/* 광장 공지 */}
+            <p className="text-white/35 text-xs mb-5">
+              지금 광장에 당신의 소원별이 빛나고 있어요 🌟
+            </p>
+
             <div className="flex flex-col items-center gap-3 w-full max-w-xs mx-auto">
               {/* PRIMARY — 첫 항해 (4초 자동이동, 즉시 클릭도 가능) */}
               <button
