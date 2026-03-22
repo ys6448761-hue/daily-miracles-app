@@ -137,7 +137,20 @@ export function gaImpactCreated({ starId, impactType } = {}) {
 }
 
 /**
- * 6. Day 7 도달 (별 생성 후 7일 내 재방문)
+ * 6. 첫 항해 시작 (별 생성 직후 → Day 진입)
+ * KPI: 첫 항해 시작률 = first_voyage_start / star_created
+ */
+export function gaFirstVoyageStart({ starId, galaxyCode, direction } = {}) {
+  send('first_voyage_start', {
+    star_id:     starId,
+    galaxy_code: galaxyCode,
+    direction,
+    choice: DIRECTION_SEMANTIC[direction] ?? direction,
+  });
+}
+
+/**
+ * 7. Day 7 도달 (별 생성 후 7일 내 재방문)
  * KPI: Day 7 재방문율 = milestone_day7 / star_created
  * 중복 방지: sessionStorage 플래그 사용
  */
