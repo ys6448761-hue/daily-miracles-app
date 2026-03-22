@@ -609,6 +609,31 @@ router.get('/stars/:id/voyage-logs', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
+// POST /api/dt/stars/:id/aurora5-message — Aurora5 메시지 저장
+// Aurora5 메시지는 현재 은하 기반 로컬 생성
+// 추후 K-지혜 파이프라인 연결 예정
+// wisdom_tag 기준 패턴 분석 → K-지혜 문장 생성
+// ─────────────────────────────────────────────
+router.post('/stars/:id/aurora5-message', async (req, res) => {
+  try {
+    const { id: starId } = req.params;
+    const { user_id, message, wisdom_tag } = req.body;
+    if (!message) return res.status(400).json({ error: 'message 필수' });
+
+    const { rows } = await db.query(
+      `INSERT INTO aurora5_messages (star_id, user_id, message, wisdom_tag)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id`,
+      [starId, user_id ?? null, message, wisdom_tag ?? null]
+    );
+    res.status(201).json({ ok: true, id: rows[0].id });
+  } catch (err) {
+    console.error('[DT] POST /aurora5-message error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
 // Gift 선물 카피 텍스트 (AI 없음, 룰 기반)
 // ─────────────────────────────────────────────
 const GIFT_COPIES = {

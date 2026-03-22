@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId } from '../api/dreamtown.js';
+import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message } from '../api/dreamtown.js';
 import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
 import { sharePostcard } from '../utils/kakaoShare';
@@ -23,13 +23,51 @@ const CONTINUE_VOYAGE_MSG = {
   relationship: '오늘도, 마음이 닿아갑니다.',
 };
 
-// 이 우주의 지혜 1줄 (은하별)
-const GALAXY_WISDOM = {
-  growth:       '성장은 방향이 아니라 움직임에서 시작됩니다.',
-  challenge:    '도전은 결과가 아니라 시작 자체에서 완성됩니다.',
-  healing:      '치유는 고치는 것이 아니라 받아들이는 것입니다.',
-  relationship: '관계는 거리가 아니라 방향으로 가까워집니다.',
+// Aurora5 메시지는 현재 은하 기반 로컬 생성
+// 추후 K-지혜 파이프라인 연결 예정
+// wisdom_tag 기준 패턴 분석 → K-지혜 문장 생성
+const AURORA5_MESSAGES = {
+  growth: [
+    '오늘도 한 걸음 움직였군요.\n성장은 방향이 아니라 움직임에서 시작돼요.\n지금 이 방향이 맞는지 몰라도 괜찮아요.',
+    '어떤 날은 앞이 아니라 옆으로 가기도 해요.\n그것도 성장이에요.\n오늘 어디로든 한 발 내딛어봐요.',
+    '결과보다 과정이 쌓이고 있어요.\n보이지 않아도 분명히요.\n오늘 한 가지, 완벽하지 않아도 시작해봐요.',
+    '움직임이 곧 방향을 만들어요.\n멈춰 있을 때보다 조금 나아갈 때 길이 보여요.\n오늘 가장 작은 것 하나를 해봐요.',
+    '성장은 느리게 오는 것 같아도,\n돌아보면 이미 멀리 와 있어요.\n오늘도 그 길 위에 있어요.',
+  ],
+  challenge: [
+    '두려워도 여기까지 왔어요.\n두려움은 약함이 아니라 진지함의 증거예요.\n오늘 딱 하나만 더 해봐요.',
+    '도전은 결과가 아니라 시작 자체로 완성돼요.\n시작했다는 것, 그게 이미 대단한 거예요.\n오늘도 그 용기를 기억해봐요.',
+    '무서운 건 당연해요.\n두려움이 있다는 건 그만큼 원한다는 뜻이에요.\n오늘 그 마음을 그대로 안고 한 발만요.',
+    '실패도 하나의 데이터예요.\n틀린 게 아니라 알게 된 거예요.\n오늘 무엇을 알게 됐나요?',
+    '아직 안 됐다고 멈출 필요 없어요.\n여기까지 온 것 자체가 이미 성공이에요.\n오늘도 그 흐름 위에 있어요.',
+  ],
+  healing: [
+    '스스로에게 다정해지는 연습,\n가장 오래 걸리는 항해예요.\n오늘도 한 번 더 해봤나요?',
+    '치유는 고치는 게 아니라 받아들이는 거예요.\n지금 이 상태도 괜찮아요.\n오늘 자신에게 한 마디 건네봐요.',
+    '아프다고 말하는 것도 용기예요.\n외면하지 않았다는 것, 그것만으로도 충분해요.\n오늘 하나, 자신에게 쉬는 시간을 줘요.',
+    '서두르지 않아도 돼요.\n마음은 각자의 속도로 회복해요.\n오늘 가장 편한 방식으로 쉬어봐요.',
+    '버텼다는 게 얼마나 대단한 일인지,\n본인은 잘 모를 거예요.\n오늘은 그냥 그 자체로 잘 했어요.',
+  ],
+  relationship: [
+    '관계는 가까워지려는 마음에서 시작돼요.\n그 마음이 있다는 것만으로도 이미 연결돼 있어요.\n오늘 한 사람에게 먼저 말 걸어봐요.',
+    '말하지 않아도 전해지는 게 있어요.\n하지만 말했을 때 더 잘 닿아요.\n오늘 전하지 못한 한 마디를 꺼내봐요.',
+    '연결은 거리가 아니라 방향으로 가까워져요.\n지금 그 마음의 방향이 맞아요.\n오늘 작은 손짓 하나를 해봐요.',
+    '혼자가 편한 날도 있어요.\n그럼에도 닿고 싶은 마음이 있다면,\n그 마음 자체가 소중한 거예요.',
+    '관계에서 용기는 먼저 다가가는 것이에요.\n어색해도 괜찮아요.\n오늘 그 한 발을 내딛어봐요.',
+  ],
 };
+
+const AURORA5_WISDOM_TAGS = {
+  growth:       '실천',
+  challenge:    '버팀',
+  healing:      '자기다스림',
+  relationship: '관계',
+};
+
+function getAurora5Message(galaxyCode, daysSinceBirth) {
+  const pool = AURORA5_MESSAGES[galaxyCode] ?? AURORA5_MESSAGES.growth;
+  return pool[(daysSinceBirth - 1) % pool.length];
+}
 
 // ── Day 7 의미 메시지 (은하별) ────────────────────────────────────
 // 규칙: 성공/실패 금지 · 평가/판단 금지 · 감정 압박 금지
@@ -143,6 +181,21 @@ export default function MyStar() {
         if (saved) {
           setGrowthText(saved);
           setGrowthSaved(true);
+        }
+
+        // Aurora5 메시지 저장 — 세션당 1회 fire-and-forget
+        const aurora5Key = `dt_aurora5_saved_${data.star_id}_${new Date().toISOString().slice(0, 10)}`;
+        if (!sessionStorage.getItem(aurora5Key)) {
+          const days = Math.max(1, Math.floor((Date.now() - new Date(data.created_at).getTime()) / 86400000) + 1);
+          const galaxyCode = data.galaxy?.code;
+          const msg = getAurora5Message(galaxyCode, days);
+          const tag = AURORA5_WISDOM_TAGS[galaxyCode] ?? null;
+          postAurora5Message(data.star_id, {
+            userId:    getOrCreateUserId(),
+            message:   msg,
+            wisdomTag: tag,
+          }).catch(() => {});
+          sessionStorage.setItem(aurora5Key, '1');
         }
       })
       .catch(() => {
@@ -379,11 +432,11 @@ export default function MyStar() {
         )}
       </motion.div>
 
-      {/* 이 우주의 지혜 */}
+      {/* ✨ Aurora5 */}
       <div className="border border-white/8 rounded-2xl p-4 mb-4">
-        <p className="text-white/25 text-xs mb-1">이 우주의 지혜</p>
-        <p className="text-white/55 text-sm">
-          {GALAXY_WISDOM[star.galaxy?.code] ?? '작은 변화들이 조용히 쌓이고 있는 시간이에요.'}
+        <p className="text-white/25 text-xs mb-2">✨ Aurora5</p>
+        <p className="text-white/55 text-sm leading-relaxed whitespace-pre-line">
+          {getAurora5Message(star.galaxy?.code, daysSinceBirth)}
         </p>
       </div>
 

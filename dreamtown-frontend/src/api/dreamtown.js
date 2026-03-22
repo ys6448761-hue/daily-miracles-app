@@ -149,6 +149,15 @@ export async function postFeedback({ userId, starId, feelingType, reason, commen
   });
 }
 
+// POST /api/dt/stars/:id/aurora5-message — Aurora5 메시지 저장 (fire-and-forget용)
+export async function postAurora5Message(starId, { userId, message, wisdomTag }) {
+  return fetchWithRetry(`${BASE}/stars/${starId}/aurora5-message`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, message, wisdom_tag: wisdomTag }),
+  });
+}
+
 // POST /api/dt/stars/:id/gift — 선물 생성
 export async function createGift(starId, { userId, giftCopyType }) {
   return fetchWithRetry(`${BASE}/stars/${starId}/gift`, {
