@@ -507,6 +507,95 @@ router.post('/stars/:id/growth-log', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
+// VoyageLog — 문제-행동-결과 추론 테이블
+// ─────────────────────────────────────────────
+
+// 감정 → 오늘의 상황/문제 자동 추론 (갤럭시 로그 options 기반)
+const PROBLEM_MAP = {
+  '용기났어요':              '도전하기 어려운 순간이 있었다',
+  '해볼 수 있을 것 같아요':  '불확실함 앞에서 멈추는 순간이 있었다',
+  '조금 앞으로 가고 싶어졌어요': '앞으로 나아가지 못하는 느낌이 들었다',
+  '정리됐어요':              '생각이 복잡하게 얽혀 있었다',
+  '이해가 됐어요':           '이해가 잘 되지 않는 부분이 있었다',
+  '조금 또렷해졌어요':       '방향이 흐릿하게 느껴졌다',
+  '마음이 닿았어요':         '연결되지 않는 느낌이 들었다',
+  '조금 표현해보고 싶어졌어요': '표현하기 어려운 마음이 있었다',
+  '거리감이 편안해졌어요':   '거리감이 불편하게 느껴졌다',
+  '숨이 놓였어요':           '지치고 무거운 마음이 쌓여 있었다',
+  '조금 쉬고 싶어졌어요':    '쉬지 못하고 긴장된 상태였다',
+  '마음이 잔잔해졌어요':     '마음이 어수선하게 흔들리고 있었다',
+};
+
+// 도움 태그 → 취한 행동 자동 추론
+const ACTION_MAP = {
+  '결심':   '결심하고 마음을 모았다',
+  '실행':   '작은 실행을 시도했다',
+  '돌파':   '막히는 것을 밀고 나갔다',
+  '이해':   '천천히 이해하려고 했다',
+  '정리':   '생각을 하나씩 정리했다',
+  '깨달음': '깨달음의 순간을 받아들였다',
+  '연결':   '마음을 열고 연결하려 했다',
+  '표현':   '조심스럽게 표현해보았다',
+  '거리조절': '거리를 조절하며 관계를 돌봤다',
+  '위로':   '스스로를 위로했다',
+  '쉼':     '잠깐 멈추고 쉬었다',
+  '내려놓기': '내려놓기를 시도했다',
+};
+
+function inferVoyageStructure(emotion, tag, growth) {
+  return {
+    problem: PROBLEM_MAP[emotion] ?? `${emotion}고 느끼는 상황이 있었다`,
+    action:  ACTION_MAP[tag]     ?? `${tag}을(를) 실천했다`,
+    result:  growth ?? null,
+  };
+}
+
+// POST /api/dt/voyage-logs — 항해 로그 저장 (emotion → problem/action/result 자동 추론)
+router.post('/voyage-logs', async (req, res) => {
+  try {
+    const { user_id, star_id = null, emotion, tag, growth } = req.body;
+
+    if (!user_id || !emotion || !tag || !growth) {
+      return res.status(400).json({ error: 'user_id, emotion, tag, growth 필수' });
+    }
+
+    const { problem, action, result } = inferVoyageStructure(emotion, tag, growth);
+
+    const { rows } = await db.query(
+      `INSERT INTO dt_voyage_logs
+         (user_id, star_id, emotion, tag, growth, problem, action, result)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING id`,
+      [user_id, star_id, emotion, tag, growth, problem, action, result]
+    );
+
+    res.status(201).json({ ok: true, log_id: rows[0].id, problem, action, result });
+
+  } catch (err) {
+    console.error('[DT] POST /voyage-logs error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/dt/stars/:id/voyage-logs — 별의 항해 로그 목록 (최근 10개)
+router.get('/stars/:id/voyage-logs', async (req, res) => {
+  try {
+    const { rows } = await db.query(
+      `SELECT id, emotion, tag, growth, problem, action, result, logged_at
+         FROM dt_voyage_logs
+        WHERE star_id = $1
+        ORDER BY logged_at DESC
+        LIMIT 10`,
+      [req.params.id]
+    );
+    res.json({ logs: rows });
+  } catch (err) {
+    console.error('[DT] GET /stars/:id/voyage-logs error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
 // GET /api/dt/health — 헬스체크
 // ─────────────────────────────────────────────
 router.get('/health', (_req, res) => {

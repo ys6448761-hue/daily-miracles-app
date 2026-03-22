@@ -109,6 +109,16 @@ export async function postGrowthLog(starId, text) {
   });
 }
 
+// emotion/tag/growth → problem/action/result 자동 추론 저장
+export async function postVoyageLog(starId, { emotion, tag, growth }) {
+  const userId = getOrCreateUserId();
+  return fetchWithRetry(`${BASE}/voyage-logs`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, star_id: starId, emotion, tag, growth }),
+  });
+}
+
 // ── KPI 대시보드 ──────────────────────────────────────────────────
 export async function getDashboard(range = '7d') {
   const res = await fetch(`/api/kpi/dashboard?range=${range}`);
