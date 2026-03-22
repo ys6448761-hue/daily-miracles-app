@@ -200,8 +200,8 @@ export default function StarDetail() {
                     i < Math.min(voyageLogs.length, 3) - 1 ? 'border-b border-white/5' : ''
                   }`}
                 >
-                  <span className="text-white/30 text-xs flex-shrink-0 mt-0.5 w-10">
-                    D+{log.day_number}
+                  <span className="text-white/30 text-xs flex-shrink-0 mt-0.5 whitespace-nowrap">
+                    D+{log.day_number} · {formatBirthDate(log.created_at)}
                   </span>
                   <p className="text-white/60 text-sm leading-relaxed">{log.growth}</p>
                 </div>
@@ -216,7 +216,7 @@ export default function StarDetail() {
         {!resonanceSubmitted && (
           <div className="bg-white/3 border border-white/8 rounded-2xl p-4">
             <p className="text-white/40 text-xs mb-3 text-center">
-              이 별이 당신에게 어떻게 닿았나요?
+              이 별, 어떻게 다가오나요?
             </p>
             <div className="grid grid-cols-2 gap-2">
               {RESONANCE_OPTIONS.map(opt => (
