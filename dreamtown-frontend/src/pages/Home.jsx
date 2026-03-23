@@ -98,13 +98,21 @@ export default function Home() {
             galaxy_name_ko: data.galaxy?.name_ko ?? null,
             created_at:     data.created_at,
           }))
-          .catch(() => {})
+          .catch(() => {
+            // getStar 실패 시 recent 목록에서 폴백
+            setMyStarData(prev => prev); // recent 로드 후 아래서 처리
+          })
       : Promise.resolve();
 
     Promise.all([recentPromise, myStarPromise]).finally(() => setLoading(false));
   }, [myStarId]);
 
   const otherStars = stars.filter(s => s && s.star_id && s.star_id !== myStarId);
+
+  // getStar 실패 시 recent 목록에서 내 별 데이터 폴백
+  const effectiveMyStarData = myStarData ?? (
+    myStarId ? (stars.find(s => s.star_id === myStarId) ?? null) : null
+  );
   const isNewStar = !!(newStarId && myStarId === newStarId);
 
   // 오늘(KST) 탄생 별 — 별도 API 없이 recent 데이터에서 파생
@@ -128,9 +136,9 @@ export default function Home() {
       </div>
 
       {/* 내 별 카드 */}
-      {myStarData && (
+      {effectiveMyStarData && (
         <MyStarCard
-          star={myStarData}
+          star={effectiveMyStarData}
           isNew={isNewStar}
           nav={nav}
         />
@@ -139,7 +147,15 @@ export default function Home() {
       {/* 오늘의 탄생 별 — 오늘 생성된 별이 있을 때만 표시 */}
       {todayStars.length > 0 && (
         <div className="mb-4">
-          <p className="text-white/50 text-xs mb-2">✨ 오늘 탄생한 소원별</p>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-white/50 text-xs">✨ 오늘 탄생한 소원별</p>
+            <button
+              onClick={() => nav('/stars')}
+              className="text-dream-purple/80 text-xs hover:text-dream-purple transition-colors"
+            >
+              전체보기 →
+            </button>
+          </div>
           <div className="flex gap-2 flex-wrap">
             {todayStars.map(s => (
               <button
@@ -158,7 +174,15 @@ export default function Home() {
       <div className="bg-white/3 border border-white/8 rounded-3xl p-5 mb-4">
         <div className="flex items-center justify-between mb-3">
           <p className="text-white/60 text-sm font-medium">광장의 별들</p>
-          <p className="text-white/30 text-xs">{stars.length}개</p>
+          <div className="flex items-center gap-2">
+            <p className="text-white/30 text-xs">{stars.length}개</p>
+            <button
+              onClick={() => nav('/stars')}
+              className="text-dream-purple/80 text-xs hover:text-dream-purple transition-colors"
+            >
+              전체보기 →
+            </button>
+          </div>
         </div>
 
         {loading ? (

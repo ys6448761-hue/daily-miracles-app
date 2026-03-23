@@ -459,11 +459,7 @@ export default function MyStar() {
           </div>
         ) : (
           <button
-            onClick={() => {
-              const direction = GALAXY_TO_DIRECTION[star.galaxy?.code] ?? 'south';
-              const message   = CONTINUE_VOYAGE_MSG[star.galaxy?.code] ?? '오늘도, 소원별과 함께합니다.';
-              nav('/day', { state: { direction, message, starId: star.star_id } });
-            }}
+            onClick={() => nav(`/wish?from=gift&star_id=${star.star_id}`)}
             className="w-full bg-dream-purple hover:bg-purple-500 text-white font-bold py-4 rounded-2xl transition-colors"
           >
             소원별 이어가기 ✨
