@@ -1057,6 +1057,7 @@ router.get('/stars/:id/detail', async (req, res) => {
         name_ko: star.galaxy_name_ko,
       },
       created_at:            star.created_at,
+      birth_date:            star.created_at,   // 프론트 양쪽 키 호환
       days_since_birth:      daysSinceBirth,
       nickname,
       milestone_status:      milestoneStatus,

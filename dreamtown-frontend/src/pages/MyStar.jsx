@@ -589,12 +589,26 @@ export default function MyStar() {
         {import.meta.env.VITE_KAKAO_JS_KEY && (
           !giftDone ? (
             !showGift ? (
-              <button
-                onClick={() => setShowGift(true)}
-                className="w-full bg-white/5 border border-white/10 text-white/60 font-medium py-4 rounded-2xl hover:bg-white/10 transition-colors"
-              >
-                별 선물하기 🎁
-              </button>
+              <div>
+                <button
+                  onClick={() => setShowGift(true)}
+                  className="w-full bg-white/5 border border-white/10 text-white/60 font-medium py-4 rounded-2xl hover:bg-white/10 transition-colors"
+                >
+                  별 선물하기 🎁
+                </button>
+                {(() => {
+                  if (!star.created_at) return null;
+                  const d = new Date(star.created_at);
+                  d.setDate(d.getDate() + 7);
+                  const mm = String(d.getMonth() + 1).padStart(2, '0');
+                  const dd = String(d.getDate()).padStart(2, '0');
+                  return (
+                    <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', textAlign: 'center', marginTop: 6 }}>
+                      D+7 기념일 {mm}.{dd}에 선물해보세요
+                    </p>
+                  );
+                })()}
+              </div>
             ) : (
               <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
                 <p className="text-white/40 text-xs mb-3 text-center">누구에게 선물할까요?</p>

@@ -242,7 +242,7 @@ export default function StarDetail() {
       {/* ── ③ MilestoneBar ────────────────────────────────── */}
       <MilestoneBar
         milestones={detail.milestone_status}
-        createdAt={detail.created_at}
+        createdAt={detail.created_at ?? detail.birth_date}
         daysSinceBirth={detail.days_since_birth}
       />
 
