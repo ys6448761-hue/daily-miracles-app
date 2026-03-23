@@ -585,53 +585,55 @@ export default function MyStar() {
           카톡으로 보내기
         </button>
 
-        {/* ── 별 선물하기 ──────────────────────────────── */}
-        {!giftDone ? (
-          !showGift ? (
-            <button
-              onClick={() => setShowGift(true)}
-              className="w-full bg-white/5 border border-white/10 text-white/60 font-medium py-4 rounded-2xl hover:bg-white/10 transition-colors"
-            >
-              별 선물하기 🎁
-            </button>
-          ) : (
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
-              <p className="text-white/40 text-xs mb-3 text-center">누구에게 선물할까요?</p>
-              <div className="grid grid-cols-3 gap-2 mb-3">
-                {['lover', 'parent', 'friend'].map(type => (
-                  <button
-                    key={type}
-                    onClick={() => setGiftCopyType(type)}
-                    className={`py-2.5 rounded-xl text-sm border transition-colors ${
-                      giftCopyType === type
-                        ? 'border-star-gold/60 bg-star-gold/10 text-star-gold'
-                        : 'border-white/10 text-white/50 hover:border-white/25'
-                    }`}
-                  >
-                    {GIFT_LABELS[type]}
-                  </button>
-                ))}
+        {/* ── 별 선물하기 (카카오 키 있을 때만 노출) ──── */}
+        {import.meta.env.VITE_KAKAO_JS_KEY && (
+          !giftDone ? (
+            !showGift ? (
+              <button
+                onClick={() => setShowGift(true)}
+                className="w-full bg-white/5 border border-white/10 text-white/60 font-medium py-4 rounded-2xl hover:bg-white/10 transition-colors"
+              >
+                별 선물하기 🎁
+              </button>
+            ) : (
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                <p className="text-white/40 text-xs mb-3 text-center">누구에게 선물할까요?</p>
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                  {['lover', 'parent', 'friend'].map(type => (
+                    <button
+                      key={type}
+                      onClick={() => setGiftCopyType(type)}
+                      className={`py-2.5 rounded-xl text-sm border transition-colors ${
+                        giftCopyType === type
+                          ? 'border-star-gold/60 bg-star-gold/10 text-star-gold'
+                          : 'border-white/10 text-white/50 hover:border-white/25'
+                      }`}
+                    >
+                      {GIFT_LABELS[type]}
+                    </button>
+                  ))}
+                </div>
+                {giftCopyType && (
+                  <>
+                    <p className="text-white/50 text-xs text-center italic mb-3 leading-relaxed">
+                      &ldquo;{GIFT_COPIES[giftCopyType]}&rdquo;
+                    </p>
+                    <button
+                      onClick={handleGift}
+                      disabled={giftPosting}
+                      className="w-full bg-star-gold/15 hover:bg-star-gold/25 border border-star-gold/40 text-star-gold font-semibold py-3 rounded-xl transition-colors disabled:opacity-40"
+                    >
+                      {giftPosting ? '준비 중...' : '소원별 선물하기 ✨'}
+                    </button>
+                  </>
+                )}
               </div>
-              {giftCopyType && (
-                <>
-                  <p className="text-white/50 text-xs text-center italic mb-3 leading-relaxed">
-                    &ldquo;{GIFT_COPIES[giftCopyType]}&rdquo;
-                  </p>
-                  <button
-                    onClick={handleGift}
-                    disabled={giftPosting}
-                    className="w-full bg-star-gold/15 hover:bg-star-gold/25 border border-star-gold/40 text-star-gold font-semibold py-3 rounded-xl transition-colors disabled:opacity-40"
-                  >
-                    {giftPosting ? '준비 중...' : '소원별 선물하기 ✨'}
-                  </button>
-                </>
-              )}
+            )
+          ) : (
+            <div className="bg-dream-purple/8 border border-dream-purple/20 rounded-2xl p-4 text-center">
+              <p className="text-white/60 text-sm">소원별이 두 사람의 하늘에 닿았어요 ✦</p>
             </div>
           )
-        ) : (
-          <div className="bg-dream-purple/8 border border-dream-purple/20 rounded-2xl p-4 text-center">
-            <p className="text-white/60 text-sm">소원별이 두 사람의 하늘에 닿았어요 ✦</p>
-          </div>
         )}
 
         <div className="flex gap-3">
