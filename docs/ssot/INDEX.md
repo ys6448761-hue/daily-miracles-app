@@ -1,83 +1,98 @@
 # DreamTown SSOT Index
 
-Version: v3.0
+Version: v4.0
 Owner: Aurora5
 Status: Confirmed
-Purpose: SSOT 파일 목록 및 작업 규칙
+Purpose: SSOT 3계층 구조 — 파일 목록 및 작업 규칙
 
-Last Updated: 2026-03-09
+Last Updated: 2026-03-13
 
 ---
 
 ## 코드에게 — 작업 전 필독 규칙
 
-**모든 DreamTown 관련 작업은 아래 SSOT 파일을 먼저 읽고 시작한다.**
+**모든 DreamTown 관련 작업은 `core/` 파일을 먼저 읽고 시작한다.**
 SSOT와 충돌하는 코드는 작성하지 않는다.
 SSOT에 없는 새로운 결정이 생기면 해당 SSOT 파일을 먼저 업데이트한다.
 
 저장 규칙: `AIL-SSOT-001_Storage_Rules.md` 참조
+전체 분류표: `SSOT_Registry_v2.md` 참조
 
 ---
 
 ## 📁 디렉토리 구조
 
 ```
-docs/
- ├── ssot/      ← 핵심 기준 (헌법) — 13개 유지
- ├── design/    ← 설계·운영·제작 가이드
- ├── tasks/     ← 실행 작업 기록 (TASK-YYYY-MM-DD-Subject.md)
- └── archive/   ← 미확정 아이디어 보관
+docs/ssot/
+ ├── core/      ← DreamTown 절대 기준 (헌법) — 13개
+ ├── support/   ← 구현·설계·UX 가이드 — 25개
+ ├── archive/   ← 중복·구버전 보관 — 47개
+ │
+ ├── INDEX.md              ← 이 파일
+ ├── SSOT_Registry_v2.md   ← 전체 분류표 (v2)
+ └── AIL-SSOT-001_Storage_Rules.md  ← 저장 규칙
 ```
 
 ---
 
-## Core SSOT 파일 목록 (13개)
+## Core SSOT (13개) — `docs/ssot/core/`
 
-| 파일 | 용도 | 필독 시점 |
-|------|------|----------|
-| `DreamTown_Core_Philosophy_SSOT.md` | 철학적 선언, 소원의 의미, DreamTown의 본질 | **모든 작업 전 (0번 문서)** |
-| `DreamTown_Universe_Bible.md` | 세계관, 핵심 개념, Galaxy 구조, 창세 신화 요약 | **모든 작업 전** |
-| `DreamTown_Origin_Myth_SSOT.md` | 여수 금오설화 기반 창세 신화, Golden Nine, 용궁 삼각 구조 | 세계관·캐릭터·콘텐츠 작업 전 |
-| `DreamTown_Character_SSOT.md` | 소원이·아우룸 캐릭터 상세 정의 | 이미지·영상·웹툰 제작 전 |
-| `DreamTown_Naming_System_SSOT.md` | 공식 용어 정의 (Sowoni/Somangi/기적나눔 등) | 콘텐츠·코드·커뮤니케이션 전 |
-| `DreamTown_Visual_Style_SSOT.md` | 스타일 잠금, 색상, 기술 스펙 | 이미지·영상·UI 작업 전 |
-| `DreamTown_Key_Visuals_SSOT.md` | 핵심 비주얼 3장면 (KV-01/02/03) | 비주얼 제작·브랜딩 작업 전 |
-| `DreamTown_Wish_System_SSOT.md` | 소원 시스템 전체 구조 (소원→별 성장) | 소원·여정·기적 카드 작업 전 |
-| `DreamTown_Miracle_System_SSOT.md` | 기적 카드, 기적지수, 신호등, 별 성장 | 기적·신호등·기적지수 작업 전 |
-| `DreamTown_Aurora5_System_SSOT.md` | Aurora5 팀 역할, 메시지 시스템, 기적지수 엔진 | AI 동행 시스템 작업 전 |
-| `DreamTown_Safety_Ethics_SSOT.md` | 신호등, 금지 조언, 개인정보, 위기 대응 | 안전·윤리 관련 모든 작업 전 |
-| `DreamTown_World_Architecture_SSOT.md` | 디지털 용궁 × DreamTown 통합 구조 — 세계관 중심축 | **모든 작업 전** |
-| `AIL-SSOT-001_Storage_Rules.md` | SSOT 저장 규칙 (문서 분류·중복 방지·상태 태그) | 새 문서 생성 전 |
-| `INDEX.md` | 이 파일 — 목차 및 규칙 | 항상 |
+**모든 작업 전 필독. CEO 확정 없이 변경 불가.**
 
----
-
-## Design 파일 목록 (docs/design/)
-
-설계·운영·제작 가이드. 핵심 기준이 아닌 **실행 도구**.
-
-| 파일 | 내용 |
-|------|------|
-| `DreamTown_Galaxy_Mode_SSOT.md` | Galaxy Mode 코스, 아우룸 인터랙션, 견적 시스템, 개발 현황 |
-| `DreamTown_Yeosu_Galaxy_SSOT.md` | 여수 4개 코스, 장소별 기적 포인트, 배경 코드 |
-| `DreamTown_Yeosu_Travel_Routes_SSOT.md` | Golden Nine 신화 ↔ 운영 레이어 분리 구조 |
-| `DreamTown_Travel_System_SSOT.md` | 항로 4종, 호텔, 견적 시스템 |
-| `DreamTown_Product_Structure_SSOT.md` | 상품 구조, 가격, 번들 |
-| `DreamTown_First_User_Journey_SSOT.md` | 신규 소원이 온보딩 10단계 흐름 |
-| `DreamTown_Character_Style_Guide_SSOT.md` | 캐릭터+환경+장면 통합 스타일 가이드 (제작용) |
-| `DreamTown_Core_Storyboard_SSOT.md` | 핵심 5장면 IP 구조 (앱·영상·마케팅 제작 기준) |
-| `DreamTown_Wish_Image_SSOT.md` | 소원그림 생성 파이프라인, 보석 시스템 |
-| `DreamTown_Growth_Film_SSOT.md` | 성장필름 (7일 완주 기념 영상), 바이럴 루프 |
-| `DreamTown_Image_Prompts_SSOT.md` | DALL-E/Sora 공식 마스터 프롬프트 6종 |
-| `DreamTown_IP_Strategy_SSOT.md` | 상표·저작권·BM특허 보호 로드맵 |
+| 파일 | 핵심 내용 | 필독 시점 |
+|------|----------|----------|
+| `DreamTown_Core_Philosophy_SSOT.md` | 철학 선언 | **모든 작업 전 (0번)** |
+| `DreamTown_Universe_Bible.md` | 세계관 전체 | **모든 작업 전** |
+| `DreamTown_Universe_Structure_v2_SSOT.md` | 우주 구조 v2 | 세계관 작업 전 |
+| `DreamTown_Origin_Myth_SSOT.md` | 여수 금오설화, Golden Nine | 세계관·캐릭터·콘텐츠 전 |
+| `DreamTown_Character_SSOT.md` | 소원이·아우룸 상세 정의 | 이미지·영상·UX 전 |
+| `DreamTown_Naming_System_SSOT.md` | 공식 용어 (Sowoni/Somangi 등) | 콘텐츠·코드·커뮤니케이션 전 |
+| `DreamTown_Visual_Style_SSOT.md` | 색상, 스타일 잠금 | 이미지·영상·UI 전 |
+| `DreamTown_Product_Core_Loop_SSOT.md` | 핵심 제품 루프 | 제품 기획·UX 전 |
+| `DreamTown_Wish_System_SSOT.md` | 소원 시스템 전체 | 소원·여정·기적 작업 전 |
+| `DreamTown_World_Architecture_SSOT.md` | 디지털 용궁 × DreamTown 구조 | **모든 작업 전** |
+| `DreamTown_Safety_Ethics_SSOT.md` | 신호등, 금지 조언, 위기 대응 | 안전·윤리 관련 모든 작업 전 |
+| `DreamTown_Aurora5_System_SSOT.md` | Aurora5 팀, 메시지 시스템 | AI 동행 시스템 작업 전 |
+| `DreamTown_Miracle_System_SSOT.md` | 기적 카드, 기적지수, 별 성장 | 기적·신호등·기적지수 전 |
 
 ---
 
-## 작업(Task) 규칙
+## Support Docs (25개) — `docs/ssot/support/`
 
-- 작업 파일 위치: `docs/tasks/`
-- 형식: `TASK-YYYY-MM-DD-Subject.md`
-- 작업 파일은 SSOT를 복사하지 않는다 → 참조(링크)한다
+**구현 참고 문서. 작업 전 관련 파일 확인.**
+
+| 분류 | 파일 수 |
+|------|---------|
+| Product / Tech | 9 |
+| UX | 6 |
+| Galaxy / World | 5 |
+| Character / Visual / IP | 5 |
+
+→ 상세 목록: `SSOT_Registry_v2.md` 참조
+
+---
+
+## Archive — `docs/ssot/archive/`
+
+중복·구버전·흡수된 문서 47개 보관.
+**삭제하지 않는다. 읽기 전용으로 참고만 가능.**
+
+---
+
+## 향후 SSOT 생성 규칙
+
+새 SSOT 생성 전 반드시 확인:
+
+1. `SSOT_Registry_v2.md`에서 기존 문서 검색
+2. 기존 문서 확장 가능 여부 확인
+3. Core 필요 시 CEO 승인 필수
+
+**기본 원칙: 새 파일 생성 ❌ → 기존 파일 확장 ✅**
+
+신규 추가 시 분류 기준:
+- 세계관·브랜드·철학 기준 → **Core** (CEO 승인)
+- 설계·UX·기술·전략 → **Support**
+- 중복·구버전·실험 → **Archive**
 
 ---
 
@@ -86,5 +101,6 @@ docs/
 | 버전 | 날짜 | 내용 |
 |------|------|------|
 | v1.0~v1.9 | 2026-03-09 | SSOT Foundation Set 구축 (28개) |
-| v3.0 | 2026-03-09 | AIL-SSOT-001 적용 — ssot/13개 + design/12개 + archive/ 구조로 정리 |
-| v3.1 | 2026-03-09 | DreamTown_World_Architecture_SSOT.md 추가 — 디지털 용궁 중심 세계 구조 확정 |
+| v3.0 | 2026-03-09 | AIL-SSOT-001 적용 — ssot/13개 + design/ 구조 |
+| v3.1 | 2026-03-09 | World_Architecture_SSOT 추가 |
+| v4.0 | 2026-03-13 | 3계층 재편 — core/13 + support/25 + archive/47 |

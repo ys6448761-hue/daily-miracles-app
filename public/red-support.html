@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>마음 지원 안내 - 하루하나의 기적</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(160deg, #f0eeff 0%, #fde8f0 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .container {
+      max-width: 420px;
+      width: 100%;
+    }
+    .heart-icon {
+      font-size: 52px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #3d2c6e;
+      text-align: center;
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: #6b5a8a;
+      text-align: center;
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 28px 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 20px rgba(155, 135, 245, 0.1);
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #9B87F5;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+    .card-body {
+      font-size: 15px;
+      color: #4a3f6e;
+      line-height: 1.7;
+    }
+    .hotline-list {
+      list-style: none;
+      margin-top: 8px;
+    }
+    .hotline-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f3f0ff;
+      font-size: 15px;
+      color: #3d2c6e;
+    }
+    .hotline-list li:last-child {
+      border-bottom: none;
+    }
+    .hotline-number {
+      font-size: 20px;
+      font-weight: 700;
+      color: #9B87F5;
+      min-width: 80px;
+    }
+    .hotline-name {
+      font-size: 13px;
+      color: #7a6a99;
+    }
+    .call-btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #9B87F5, #F5A7C6);
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      border: none;
+      border-radius: 14px;
+      text-align: center;
+      text-decoration: none;
+      margin-top: 4px;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+    }
+    .call-btn:hover {
+      opacity: 0.92;
+    }
+    .notice {
+      font-size: 13px;
+      color: #9a8ab0;
+      text-align: center;
+      margin-top: 20px;
+      line-height: 1.6;
+    }
+    .notice strong {
+      color: #7a6a99;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="heart-icon">🫶</div>
+    <h1 class="title">지금 이 순간,<br>혼자가 아니에요</h1>
+    <p class="subtitle">
+      소원을 나눠주셔서 감사해요.<br>
+      지금 많이 힘드실 것 같아 걱정이 됩니다.<br>
+      전문가와 잠깐 이야기 나눠보시겠어요?
+    </p>
+
+    <div class="card">
+      <div class="card-title">24시간 무료 상담</div>
+      <ul class="hotline-list">
+        <li>
+          <div>
+            <div class="hotline-number">1393</div>
+            <div class="hotline-name">자살예방상담전화 (24시간)</div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <div class="hotline-number">1577-0199</div>
+            <div class="hotline-name">정신건강 위기상담전화 (24시간)</div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <div class="hotline-number">1388</div>
+            <div class="hotline-name">청소년 위기상담전화 (24시간)</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <a href="tel:1393" class="call-btn">지금 전화하기 — 1393</a>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">하루하루의 기적 팀에서</div>
+      <p class="card-body">
+        소원을 전달받았습니다.<br>
+        팀에서 확인 후 곧 연락드리겠습니다.<br>
+        조금만 기다려주세요. 💜
+      </p>
+    </div>
+
+    <p class="notice">
+      <strong>하루하루의 기적</strong>은 전문 상담 서비스가 아닙니다.<br>
+      긴급한 상황에서는 반드시 위의 전문 기관에 연락해주세요.
+    </p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+# Dockerfile.vid-test — Linux 환경 VID 샘플 테스트
+# AIL-2026-0220-VID-SAMPLE-TEST-003
+#
+# 빌드: docker build -f scripts/ops/Dockerfile.vid-test -t vid-sample-test .
+# 실행: docker run --rm -v "%cd%/output/_vid-docker-test:/app/output/_vid-sample-test" vid-sample-test
+#
+# 검증 항목:
+#   - Linux에서 NotoSansKR 폰트 로드
+#   - FFmpeg ass= 필터 burn-in
+#   - KOR Gate 1~5 PASS
+#   - ZIP UTF-8 보존
+#   - CIx-Video ≥ 70
+
+FROM node:20-bookworm-slim
+
+# FFmpeg + libass + fontconfig (한글 자막 burn-in 필수)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg \
+    fonts-noto-cjk \
+    fontconfig \
+  && fc-cache -fv \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# 의존성 먼저 (레이어 캐시)
+COPY package.json package-lock.json* ./
+RUN npm ci --omit=dev 2>/dev/null || npm install --omit=dev
+
+# 소스 복사
+COPY . .
+
+# Feature flags ON
+ENV VIDEO_JOB_ORCHESTRATOR=true
+ENV VIDEO_KOREAN_SUBTITLE=true
+ENV VIDEO_CIX_SCORING=true
+
+# KOR-05 프레임 추출 강제 (Docker에서는 스킵 금지)
+ENV SKIP_KOR05=false
+
+# 출력 디렉토리 생성
+RUN mkdir -p output/_vid-sample-test
+
+CMD ["node", "scripts/ops/vid-sample-test.js"]

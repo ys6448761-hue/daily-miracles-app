@@ -1,0 +1,64 @@
+name: Experiment Auto-Label & Policy Gate
+
+on:
+  pull_request:
+    paths:
+      - 'experiments/**'
+      - 'scripts/evaluate-experiment*'
+      - 'scripts/health*'
+      - 'scripts/lib/health*'
+      - 'scripts/lib/experiment-types*'
+      - 'scripts/lib/stats*'
+      - 'scripts/lib/registry*'
+      - 'scripts/lib/metrics*'
+      - 'scripts/ci-policy*'
+      - 'routes/redirectRoutes*'
+
+permissions:
+  pull-requests: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const prNumber = context.payload.pull_request.number;
+            const label = 'experiment-change';
+
+            // Ensure label exists (create if missing)
+            try {
+              await github.rest.issues.getLabel({ owner, repo, name: label });
+            } catch {
+              await github.rest.issues.createLabel({
+                owner,
+                repo,
+                name: label,
+                color: 'FFA500',
+                description: 'PR touches experiment-related files',
+              });
+            }
+
+            // Add label to PR
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number: prNumber,
+              labels: [label],
+            });
+
+            console.log(`Added "${label}" label to PR #${prNumber}`);
+
+  policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - name: CI Policy (PR Gate)
+        run: npx tsx scripts/ci-policy.ts --pr

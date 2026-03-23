@@ -93,11 +93,92 @@ const accessLogger = winston.createLogger({
   exitOnError: false,
 });
 
+// ─────────────────────────────────────────────────────────────
+// In-process request stats ring buffer
+// AIL-2026-0301-OPS-ERR-REPORT-002
+// - 최대 50,000 엔트리 또는 24h 이내의 요청만 보관
+// - errorRateMonitor.js 가 getRecentStats(5min) 으로 소비
+// - reportScheduler.js 가 getDailyStats(24h) 으로 소비
+// ─────────────────────────────────────────────────────────────
+
+const _REQUEST_BUFFER = [];
+const _BUFFER_MAX_ENTRIES = 50_000;
+const _BUFFER_MAX_AGE_MS  = 24 * 60 * 60 * 1000; // 24h
+
+function _pushToBuffer(entry) {
+  _REQUEST_BUFFER.push(entry);
+  if (_REQUEST_BUFFER.length > _BUFFER_MAX_ENTRIES) {
+    _REQUEST_BUFFER.shift();
+  }
+}
+
+function _pruneBuffer() {
+  const cutoff = Date.now() - _BUFFER_MAX_AGE_MS;
+  while (_REQUEST_BUFFER.length > 0 && _REQUEST_BUFFER[0].ts < cutoff) {
+    _REQUEST_BUFFER.shift();
+  }
+}
+
+function _aggregateWindow(entries) {
+  const total = entries.length;
+  const errorEntries = entries.filter(e => e.isError);
+  const errorRate = total > 0 ? errorEntries.length / total : 0;
+
+  const byClass = {};
+  const byEndpoint = {};
+  for (const e of errorEntries) {
+    const cls = e.error_class || `HTTP${e.statusCode}`;
+    byClass[cls] = (byClass[cls] || 0) + 1;
+    const ep = `${e.method} ${e.url}`;
+    byEndpoint[ep] = (byEndpoint[ep] || 0) + 1;
+  }
+
+  const topClassEntry  = Object.entries(byClass).sort((a, b) => b[1] - a[1])[0]    || null;
+  const topEndpointEntry = Object.entries(byEndpoint).sort((a, b) => b[1] - a[1])[0] || null;
+  const recentRequestIds = errorEntries.slice(-5).map(e => e.requestId).filter(Boolean);
+
+  return {
+    total,
+    errors: errorEntries.length,
+    errorRate,
+    byClass,
+    topErrorClass:  topClassEntry    ? { class: topClassEntry[0],    count: topClassEntry[1]    } : null,
+    topEndpoint:    topEndpointEntry ? { endpoint: topEndpointEntry[0], count: topEndpointEntry[1] } : null,
+    recentRequestIds,
+  };
+}
+
+/**
+ * 최근 windowMs 동안의 HTTP 요청 통계를 반환한다.
+ * @param {number} windowMs - 집계 윈도우 (ms). 기본 5분.
+ * @returns {{ total, errors, errorRate, byClass, topErrorClass, topEndpoint, recentRequestIds, windowFrom, windowTo }}
+ */
+function getRecentStats(windowMs = 5 * 60 * 1000) {
+  _pruneBuffer();
+  const cutoff = Date.now() - windowMs;
+  const window = _REQUEST_BUFFER.filter(e => e.ts >= cutoff);
+  return {
+    ..._aggregateWindow(window),
+    windowFrom: new Date(cutoff).toISOString(),
+    windowTo:   new Date().toISOString(),
+    windowMs,
+  };
+}
+
+/**
+ * 최근 hours 시간 동안의 HTTP 요청 통계를 반환한다.
+ * @param {number} hours - 집계 기간 (시간). 기본 24시간.
+ */
+function getDailyStats(hours = 24) {
+  return getRecentStats(hours * 60 * 60 * 1000);
+}
+
 // ── Express 미들웨어 ──
 const requestLogger = (req, res, next) => {
   const startTime = Date.now();
   res.on('finish', () => {
     const durationMs = Date.now() - startTime;
+    const isError = res.statusCode >= 400 || !!res._errorClass;
     const logData = {
       method: req.method,
       url: req.originalUrl || req.url,
@@ -107,11 +188,21 @@ const requestLogger = (req, res, next) => {
       headersSent: res.headersSent,
       error_class: res._errorClass || null,
     };
-    if (res.statusCode >= 400) {
+    if (isError) {
       accessLogger.warn('HTTP Error', logData);
     } else {
       accessLogger.info('HTTP Request', logData);
     }
+    // In-process ring buffer (AIL-2026-0301-OPS-ERR-REPORT-002)
+    _pushToBuffer({
+      ts:          Date.now(),
+      method:      logData.method,
+      url:         logData.url,
+      statusCode:  logData.statusCode,
+      error_class: logData.error_class,
+      requestId:   logData.requestId,
+      isError,
+    });
   });
   next();
 };
@@ -140,5 +231,8 @@ module.exports = {
   accessLogger,
   requestLogger,
   isServerless,
+  // Stats buffer (AIL-2026-0301-OPS-ERR-REPORT-002)
+  getRecentStats,
+  getDailyStats,
   ...logHelpers,
 };

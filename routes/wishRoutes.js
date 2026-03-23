@@ -264,6 +264,8 @@ router.post('/', async (req, res) => {
             wishId: wishData.id,
             miracleScore: miracleScore,
             trafficLight: trafficLight.level,
+            current_stage: getCurrentStage(miracleScore),
+            ...getSummaryAndAction(trafficLight.level, getCurrentStage(miracleScore).code),
             // v2.0 통합 점수 엔진 응답
             score_engine: scoreResult.success ? {
                 base_score: scoreResult.base_score,
@@ -427,6 +429,65 @@ router.post('/upgrade-birthdate', async (req, res) => {
 /**
  * 보석 의미 반환
  */
+/**
+ * traffic_light_level + current_stage.code → summary_line / today_action 룰 엔진
+ */
+const SUMMARY_RULES = {
+    GREEN: {
+        1: {
+            summary_line: '지금은 마음을 차분히 정리하며 다음 걸음을 준비하기 좋은 상태예요',
+            today_action: '걱정을 한 문장으로 적고, 그 감정을 그냥 바라봐보세요'
+        },
+        2: {
+            summary_line: '지금은 방향을 하나로 좁혀 첫 움직임을 준비하기 좋은 흐름이에요',
+            today_action: '오늘 가장 중요한 문제 하나를 고르고, 나머지는 내일로 미뤄보세요'
+        },
+        3: {
+            summary_line: '지금은 아주 작은 실행을 시작하기 좋은 상태예요',
+            today_action: '오늘 할 행동을 딱 하나만 골라 10분 안에 끝낼 수 있게 줄여보세요'
+        },
+        4: {
+            summary_line: '지금은 기존 습관을 꾸준히 이어가는 것이 가장 중요한 상태예요',
+            today_action: '기존 습관 중 하나를 오늘 한 번 그대로 해보세요'
+        }
+    },
+    YELLOW: {
+        1: {
+            summary_line: '지금은 해결보다 마음의 무게를 먼저 알아보는 것이 중요한 상태예요',
+            today_action: '걱정을 한 줄 적고, 오늘은 그것을 해결하려 하지 않아도 괜찮아요'
+        },
+        2: {
+            summary_line: '마음은 앞서 있지만, 무엇부터 할지 기준을 정하는 것이 먼저예요',
+            today_action: '오늘 바꿀 것 한 가지만 정하고, 나머지는 결정하지 않아도 돼요'
+        },
+        3: {
+            summary_line: '실행할 힘은 있지만, 시작점을 더 작게 만드는 것이 필요한 상태예요',
+            today_action: '하려던 행동을 절반으로 줄이고, 실패해도 괜찮은 버전으로 시작해보세요'
+        },
+        4: {
+            summary_line: '지금은 더 앞으로 나가기보다, 흔들린 리듬을 다시 고르게 만드는 것이 먼저예요',
+            today_action: '가장 쉬웠던 루틴 하나를 오늘 한 번만 다시 해보세요'
+        }
+    }
+};
+
+function getSummaryAndAction(trafficLevel, stageCode) {
+    const level = (trafficLevel || 'GREEN').toUpperCase();
+    const code = stageCode || 1;
+    const rules = (SUMMARY_RULES[level] || SUMMARY_RULES.GREEN)[code] || SUMMARY_RULES.GREEN[1];
+    return rules;
+}
+
+/**
+ * 기적지수 → 현재 단계 매핑 (4단계)
+ */
+function getCurrentStage(score) {
+    if (score < 65) return { code: 1, label: '감정 정리', desc: '마음이 먼저 지쳐 있어 생각보다 감정 정리가 먼저 필요한 상태예요.' };
+    if (score < 75) return { code: 2, label: '방향 정리', desc: '중요한 것은 느끼고 있지만 무엇부터 해야 할지 정해지지 않아 에너지가 흩어지기 쉬워요.' };
+    if (score < 85) return { code: 3, label: '실행 시작', desc: '방향은 잡혔고, 이제는 아주 작은 행동으로 흐름을 시작할 차례예요.' };
+    return { code: 4, label: '유지 회복', desc: '이미 시작은 했지만 흔들림이 생기기 쉬워 회복 리듬이 필요한 시점이에요.' };
+}
+
 function getGemMeaning(gem) {
     const meanings = {
         ruby: '열정과 용기',

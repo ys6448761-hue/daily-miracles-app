@@ -245,7 +245,11 @@ const ShareCardGenerator = {
         ctx.fillStyle = this.colors.accent;
         ctx.globalAlpha = 0.8;
         ctx.font = `400 ${width * 0.022}px "Noto Sans KR", sans-serif`;
-        ctx.fillText('5,000명의 데이터가 알려준 과학적 실현 확률', width / 2, height * 0.76);
+        if (wish) {
+            ctx.fillText(`"${wish}"의 실현 가능성`, width / 2, height * 0.76);
+        } else {
+            ctx.fillText('5,000명의 데이터가 알려준 과학적 실현 확률', width / 2, height * 0.76);
+        }
         ctx.globalAlpha = 1;
 
         // 응원 메시지
@@ -371,6 +375,12 @@ const ShareCardGenerator = {
         // 기존 모달 제거
         const existingModal = document.getElementById('share-card-modal');
         if (existingModal) existingModal.remove();
+
+        // 추천인 코드 추출 (없으면 기본 URL)
+        const refCode = data.refCode || '';
+        const shareUrl = refCode
+            ? `https://dailymiracles.kr/questions.html?ref=${refCode}`
+            : 'https://dailymiracles.kr/questions.html';
 
         // 이미지 생성
         const imageData = await this.generate(data, 'instagram');
@@ -563,15 +573,15 @@ const ShareCardGenerator = {
                                     description: '5,000명의 데이터 기반 과학적 실현 확률 분석',
                                     imageUrl: imageData,
                                     link: {
-                                        mobileWebUrl: 'https://dailymiracles.kr/questions.html',
-                                        webUrl: 'https://dailymiracles.kr/questions.html'
+                                        mobileWebUrl: shareUrl,
+                                        webUrl: shareUrl
                                     }
                                 },
                                 buttons: [{
                                     title: '나의 가능성 무료 AI 분석',
                                     link: {
-                                        mobileWebUrl: 'https://dailymiracles.kr/questions.html',
-                                        webUrl: 'https://dailymiracles.kr/questions.html'
+                                        mobileWebUrl: shareUrl,
+                                        webUrl: shareUrl
                                     }
                                 }]
                             });
@@ -587,7 +597,7 @@ const ShareCardGenerator = {
                         break;
 
                     case 'copy':
-                        await navigator.clipboard.writeText('https://dailymiracles.kr/questions.html');
+                        await navigator.clipboard.writeText(shareUrl);
                         this.showToast('링크가 복사되었습니다!');
                         break;
                 }

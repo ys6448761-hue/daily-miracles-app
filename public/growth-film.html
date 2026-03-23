@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Growth Film — Daily Miracles</title>
+  <style>
+    /* ── 리셋 & 기본 ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f0a1e;
+      color: #e8e0f8;
+      min-height: 100vh;
+    }
+
+    /* ── 페이지 헤더 ── */
+    .page-header {
+      text-align: center;
+      padding: 32px 16px 16px;
+    }
+    .page-header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #c4aaff 0%, #f5a7c6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+    }
+    .page-header .subtitle {
+      font-size: 0.85rem;
+      color: #9b87f5;
+      opacity: 0.8;
+    }
+
+    /* ── 점수 배지 ── */
+    .score-bar {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      padding: 12px 16px;
+      flex-wrap: wrap;
+    }
+    .score-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.75rem;
+      color: #c4aaff;
+    }
+    .score-item strong {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #f5d3ff;
+    }
+
+    /* ── 필름 스트립 ── */
+    .film-strip {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 12px;
+      padding: 16px 20px 24px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: #4a3b7c transparent;
+    }
+    .film-strip::-webkit-scrollbar { height: 4px; }
+    .film-strip::-webkit-scrollbar-thumb { background: #4a3b7c; border-radius: 2px; }
+
+    /* ── 필름 컷 ── */
+    .film-cut {
+      flex: 0 0 220px;
+      scroll-snap-align: start;
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #1a1030;
+      border: 1px solid rgba(155, 135, 245, 0.2);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .film-cut:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(155, 135, 245, 0.25);
+    }
+
+    /* ── 이미지 영역 ── */
+    .cut-image-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+    }
+    .cut-image {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: filter 0.8s ease;
+    }
+
+    /* ── 오버레이: color_wash — cheer_count >= 10 ── */
+    .film-cut.color-wash .cut-image {
+      filter: saturate(2) brightness(1.05);
+      transition: filter 0.8s ease;
+    }
+
+    /* ── 오버레이: light_overlay — total_points >= 20 ── */
+    .light-overlay {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+      background: radial-gradient(
+        circle at 50% 30%,
+        rgba(255, 230, 100, 0.35) 0%,
+        transparent 70%
+      );
+    }
+    .film-cut.light-on .light-overlay { opacity: 1; }
+
+    /* ── 오버레이: sparkle — total_points >= 60 ── */
+    .sparkle-overlay {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+    .film-cut.sparkle-on .sparkle-overlay { opacity: 1; }
+    .sparkle-overlay::after {
+      content: '';
+      position: absolute;
+      inset: -50%;
+      background: linear-gradient(
+        105deg,
+        transparent 40%,
+        rgba(255, 255, 255, 0.18) 50%,
+        transparent 60%
+      );
+      background-size: 200% 100%;
+      animation: sparkleShimmer 2s linear infinite;
+    }
+    @keyframes sparkleShimmer {
+      from { background-position: -200% center; }
+      to   { background-position:  200% center; }
+    }
+
+    /* ── 미체크인 컷 다크 오버레이 ── */
+    .unchecked-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 5, 20, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      pointer-events: none;
+    }
+
+    /* ── 컷 메타 정보 ── */
+    .cut-meta {
+      padding: 10px 12px;
+    }
+    .cut-day-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #9b87f5;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .cut-action-line {
+      font-size: 0.82rem;
+      color: #e8e0f8;
+      line-height: 1.4;
+      min-height: 36px;
+      opacity: 0.9;
+    }
+    .cut-action-empty {
+      font-size: 0.78rem;
+      color: rgba(155, 135, 245, 0.4);
+      font-style: italic;
+    }
+
+    /* ── prefers-reduced-motion ── */
+    @media (prefers-reduced-motion: reduce) {
+      .cut-image, .light-overlay, .sparkle-overlay { transition: none; }
+      .sparkle-overlay::after { animation: none; }
+    }
+
+    /* ── 하단 액션 영역 ── */
+    .action-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px 40px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      border-radius: 50px;
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-cheer {
+      background: linear-gradient(135deg, #9b87f5, #f5a7c6);
+      color: #fff;
+    }
+    .btn-my {
+      background: linear-gradient(135deg, #3b2f6c, #7c6bcc);
+      color: #fff;
+    }
+    .btn-share-story {
+      background: linear-gradient(135deg, #9b87f5, #f5a7c6);
+      color: #fff;
+    }
+    .btn-warm {
+      background: linear-gradient(135deg, #e05c5c, #f5a07c);
+      color: #fff;
+    }
+    .btn-fallback {
+      background: transparent;
+      color: #9b87f5;
+      border: 1px solid #9b87f5;
+      font-size: 0.85rem;
+      display: none;
+    }
+    .cheer-count-label {
+      font-size: 0.78rem;
+      color: rgba(155, 135, 245, 0.7);
+      margin-top: -6px;
+    }
+    /* 텍스트 링크 스타일 */
+    .btn-text-link {
+      font-size: 0.82rem;
+      color: rgba(155, 135, 245, 0.65);
+      text-decoration: none;
+      cursor: pointer;
+      padding: 4px 0;
+      transition: color 0.15s;
+    }
+    .btn-text-link:hover { color: rgba(155, 135, 245, 1); }
+
+    /* 409 nudge 카드 */
+    .nudge-card {
+      margin: 8px 20px 0;
+      background: rgba(224, 92, 92, 0.12);
+      border: 1px solid rgba(224, 92, 92, 0.3);
+      border-radius: 16px;
+      padding: 20px 24px;
+      text-align: center;
+    }
+    .nudge-text {
+      font-size: 0.9rem;
+      color: #f5c4c4;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: rgba(155, 135, 245, 0.95);
+      color: #fff;
+      padding: 10px 24px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 100;
+      white-space: nowrap;
+    }
+    .toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── AIL-114: 체크인 영역 ── */
+    .checkin-section {
+      margin: 0 16px 20px;
+      background: rgba(155, 135, 245, 0.08);
+      border: 1px solid rgba(155, 135, 245, 0.2);
+      border-radius: 16px;
+      padding: 20px;
+    }
+    .today-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      color: #9b87f5;
+      background: rgba(155, 135, 245, 0.15);
+      padding: 3px 10px;
+      border-radius: 50px;
+      margin-bottom: 10px;
+    }
+    .d23-nudge {
+      font-size: 0.82rem;
+      color: rgba(228, 216, 255, 0.6);
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+    .checkin-prompt {
+      font-size: 0.85rem;
+      color: rgba(228, 216, 255, 0.8);
+      margin-bottom: 8px;
+    }
+    .checkin-prompt .optional { opacity: 0.5; font-size: 0.75rem; }
+    .action-input {
+      width: 100%;
+      background: rgba(10, 5, 20, 0.5);
+      border: 1px solid rgba(155, 135, 245, 0.25);
+      border-radius: 10px;
+      color: #e8e0f8;
+      font-size: 0.88rem;
+      padding: 10px 12px;
+      resize: none;
+      font-family: inherit;
+      margin-bottom: 10px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .action-input:focus { border-color: rgba(155, 135, 245, 0.6); }
+    .btn-checkin { background: linear-gradient(135deg, #9b87f5, #c4aaff); color: #fff; width: 100%; }
+
+    /* ── AIL-114: 보상 패널 (도장 + 지연 한마디) ── */
+    .reward-panel {
+      margin: 0 16px 16px;
+      padding: 16px 20px;
+      background: rgba(155, 135, 245, 0.06);
+      border: 1px solid rgba(155, 135, 245, 0.15);
+      border-radius: 16px;
+    }
+    .stamp-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .stamp-icon { font-size: 1.4rem; }
+    .stamp-text { font-size: 0.9rem; font-weight: 600; color: #c4aaff; }
+    .wisdom-card-wrap {
+      transition: opacity 0.6s ease;
+      border-top: 1px solid rgba(155, 135, 245, 0.15);
+      padding-top: 12px;
+    }
+    .wisdom-label {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em;
+      color: rgba(155, 135, 245, 0.55); text-transform: uppercase; margin-bottom: 5px;
+    }
+    .wisdom-text { font-size: 0.88rem; color: rgba(228, 216, 255, 0.85); line-height: 1.6; font-style: italic; }
+
+    /* ── AIL-114: D4~D6 나눔 추천 ── */
+    .share-suggestion {
+      margin: 0 16px 16px;
+      padding: 16px 20px;
+      background: rgba(245, 167, 198, 0.07);
+      border: 1px solid rgba(245, 167, 198, 0.2);
+      border-radius: 16px;
+    }
+    .suggestion-prompt { font-size: 0.85rem; color: rgba(245, 167, 198, 0.8); margin-bottom: 10px; }
+    .suggestion-card-inner {
+      background: rgba(10, 5, 20, 0.4); border-radius: 10px; padding: 12px 14px;
+    }
+    .suggestion-card-inner .s-type {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.07em; color: #f5a7c6; margin-bottom: 4px;
+    }
+    .suggestion-card-inner .s-text { font-size: 0.85rem; color: rgba(228, 216, 255, 0.85); line-height: 1.5; }
+
+    /* ── 로딩 / 에러 ── */
+    .state-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      gap: 12px;
+      color: rgba(155, 135, 245, 0.6);
+      font-size: 0.9rem;
+    }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid rgba(155,135,245,0.2);
+      border-top-color: #9b87f5;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div class="state-center" id="loading-state">
+    <div class="spinner"></div>
+    <span>필름 현상 중...</span>
+  </div>
+  <div class="state-center" id="error-state" style="display:none;">
+    <span id="error-msg">챌린지를 불러올 수 없습니다.</span>
+  </div>
+  <div id="film-content" style="display:none;">
+    <div class="page-header">
+      <h1>My Growth Film</h1>
+      <p class="subtitle" id="film-subtitle">7일 챌린지 성장 기록</p>
+    </div>
+    <div class="score-bar" id="score-bar"></div>
+
+    <!-- AIL-114 ①: 오늘 체크인 (ONGOING + 미체크인 상태에서만 표시) -->
+    <div class="checkin-section" id="checkin-section" style="display:none;">
+      <p class="d23-nudge" id="d23-nudge" style="display:none;"></p>
+      <div class="today-badge" id="today-badge"></div>
+      <p class="checkin-prompt">오늘 한 일을 한 줄로 남겨보세요 <span class="optional">(선택)</span></p>
+      <textarea class="action-input" id="action-input"
+                placeholder="예: 아침 10분 명상을 했어요."
+                rows="2" maxlength="80"></textarea>
+      <button class="btn btn-checkin" id="btn-checkin" onclick="handleCheckin()">
+        오늘 기록하기
+      </button>
+    </div>
+
+    <!-- AIL-114 ①: 체크인 성공 보상 패널 (즉각 도장 + 지연 한마디) -->
+    <div class="reward-panel" id="reward-panel" style="display:none;">
+      <div class="stamp-row">
+        <span class="stamp-icon">✅</span>
+        <span class="stamp-text" id="stamp-text"></span>
+      </div>
+      <div class="wisdom-card-wrap" id="wisdom-card-wrap" style="opacity:0;">
+        <p class="wisdom-label">오늘의 한마디</p>
+        <p class="wisdom-text" id="wisdom-text"></p>
+      </div>
+    </div>
+
+    <!-- AIL-114 ③: D4~D6 나눔 추천 (세션당 1회) -->
+    <div class="share-suggestion" id="share-suggestion" style="display:none;">
+      <p class="suggestion-prompt">오늘 누군가에게 조용히 응원을 건네볼까요?</p>
+      <div id="suggestion-card"></div>
+    </div>
+
+    <div class="film-strip" id="film-strip"></div>
+    <div class="action-area">
+      <!-- 내 성장필름 저장 (항상 사용 가능) -->
+      <button class="btn btn-my" id="btn-my" onclick="handleSaveMyFilm()">
+        🎞️ 내 성장필름 저장
+      </button>
+      <!-- 스토리 공유 (완주 후 활성화) -->
+      <button class="btn btn-share-story" id="btn-share-story" onclick="handleShareStory()">
+        📤 스토리로 공유
+      </button>
+      <!-- 응원 -->
+      <button class="btn btn-cheer" id="btn-cheer" onclick="handleCheer()">
+        ✨ 응원하기
+      </button>
+      <span class="cheer-count-label" id="cheer-label"></span>
+      <!-- fallback -->
+      <button class="btn btn-fallback" id="btn-fallback" onclick="handleFallback()">
+        이미지 직접 다운로드
+      </button>
+      <!-- Plaza 복귀 -->
+      <a class="btn-text-link" id="btn-plaza" href="/plaza"
+         onclick="handleReturnToPlaza()">← Plaza로 돌아가기</a>
+    </div>
+    <!-- 409 nudge: 미완주 상태에서 공유 시도 시 표시 -->
+    <div class="nudge-card" id="nudge-409" style="display:none;">
+      <p class="nudge-text">Day 7에 필름이 완성돼요.<br>오늘의 온기부터 지켜볼까요?</p>
+      <a class="btn btn-warm" href="/plaza"
+         onclick="logEvent('checkin_from_409_click')">🌡️ 36.5° 지키기</a>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="/js/growthFilmCollage.js"></script>
+<script>
+// ── 상태 ──────────────────────────────────────────────────────────────────
+let filmData = null;
+let wishId = null;
+
+// ── 이벤트 로그 (fire-and-forget, fail-open) ──────────────────────────────
+async function logEvent(eventType, extra = {}) {
+  if (!wishId) return;
+  try {
+    fetch(`/api/challenge/${wishId}/event`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event_type: eventType,
+        variant: extra.variant || null,
+        session_id: getOrCreateCheererId()
+      })
+    });
+  } catch (e) { /* 무시 */ }
+}
+
+// ── 초기화 ────────────────────────────────────────────────────────────────
+(async function init() {
+  const params = new URLSearchParams(window.location.search);
+  wishId = params.get('wishId');
+  if (!wishId) return showError('URL에 wishId가 없습니다. (?wishId=X)');
+
+  // 공유 링크로 방문한 경우 로그
+  if (params.get('ref') === 'share') {
+    logEvent('share_landing_visit');
+  }
+
+  try {
+    const res = await fetch(`/api/challenge/${wishId}/film`);
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || `HTTP ${res.status}`);
+    }
+    filmData = await res.json();
+    render(filmData);
+  } catch (err) {
+    showError(err.message);
+  }
+})();
+
+// ── 렌더링 ────────────────────────────────────────────────────────────────
+function render(data) {
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('film-content').style.display = 'block';
+
+  // 점수
+  renderScore(data.score);
+  // 필름 컷
+  renderStrip(data);
+  // 응원 카운트
+  updateCheerLabel(data.score.cheer_count);
+
+  // AIL-114: D7 완주 UI (이미 완주 상태)
+  if (data.status === 'COMPLETED') {
+    applyD7CompletionUI();
+    if (!sessionStorage.getItem('filmCompImpression')) {
+      sessionStorage.setItem('filmCompImpression', '1');
+      logEvent('film_completion_impression');
+    }
+  }
+
+  // AIL-114: 체크인 섹션 초기화 (ONGOING 상태)
+  initCheckin(data);
+
+  // 이벤트: 페이지 뷰
+  logEvent('growth_film_view');
+}
+
+function renderScore(score) {
+  const bar = document.getElementById('score-bar');
+  bar.innerHTML = `
+    <div class="score-item"><strong>${score.checkin_count}</strong><span>체크인</span></div>
+    <div class="score-item"><strong>${score.cheer_count}</strong><span>응원</span></div>
+    <div class="score-item"><strong>${score.action_points}</strong><span>행동점수</span></div>
+    <div class="score-item"><strong>${score.total_points}</strong><span>총점수</span></div>
+  `;
+}
+
+function renderStrip(data) {
+  const strip = document.getElementById('film-strip');
+  strip.innerHTML = '';
+
+  data.days.forEach(day => {
+    const cut = document.createElement('div');
+    cut.className = 'film-cut';
+    cut.dataset.day = day.day;
+
+    cut.innerHTML = `
+      <div class="cut-image-wrap">
+        <img class="cut-image"
+             src="${escHtml(data.base_image_url)}"
+             alt="Day ${day.day}"
+             loading="${day.day <= 2 ? 'eager' : 'lazy'}">
+        <div class="light-overlay"></div>
+        <div class="sparkle-overlay"></div>
+        ${!day.checked_in ? `<div class="unchecked-overlay">🔒</div>` : ''}
+      </div>
+      <div class="cut-meta">
+        <div class="cut-day-label">Day ${day.day}</div>
+        <div class="${day.action_line ? 'cut-action-line' : 'cut-action-empty'}">
+          ${day.action_line ? escHtml(day.action_line) : '아직 기록되지 않았어요'}
+        </div>
+      </div>
+    `;
+
+    strip.appendChild(cut);
+  });
+
+  applyOverlays(data.score);
+}
+
+// ── 오버레이 클래스 적용 ──────────────────────────────────────────────────
+function applyOverlays(score) {
+  const cuts = document.querySelectorAll('.film-cut');
+  cuts.forEach(cut => {
+    if (score.cheer_count >= 10) cut.classList.add('color-wash');
+    if (score.total_points >= 20) cut.classList.add('light-on');
+    if (score.total_points >= 60) cut.classList.add('sparkle-on');
+  });
+}
+
+// ── 응원하기 ──────────────────────────────────────────────────────────────
+async function handleCheer() {
+  if (!filmData || !wishId) return;
+
+  const cheererId = getOrCreateCheererId();
+
+  try {
+    const res = await fetch(`/api/challenge/${wishId}/cheer`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cheerer_id: cheererId })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      showToast('응원 처리 중 오류가 발생했습니다.');
+      return;
+    }
+
+    const prevCount = filmData.score.cheer_count;
+    filmData.score.cheer_count = data.cheer_count;
+    filmData.score.total_points += data.was_new ? 1 : 0;
+    filmData.score.cheer_points += data.was_new ? 1 : 0;
+
+    updateCheerLabel(data.cheer_count);
+    renderScore(filmData.score);
+
+    if (!data.was_new) {
+      showToast('이미 응원하셨어요! 💜');
+      return;
+    }
+
+    // 9→10 전환: color-wash 동적 적용 + toast
+    if (prevCount < 10 && data.cheer_count >= 10) {
+      document.querySelectorAll('.film-cut').forEach(c => c.classList.add('color-wash'));
+      showToast('응원 10개 달성! 필름이 빛납니다 ✨');
+    } else {
+      showToast('응원해주셔서 감사합니다! 💜');
+    }
+
+    // 새 오버레이 조건 충족 여부 재확인
+    applyOverlays(filmData.score);
+
+  } catch (err) {
+    showToast('네트워크 오류가 발생했습니다.');
+  }
+}
+
+// ── 내 성장필름 저장 (personal archive, variant='my') ─────────────────────
+async function handleSaveMyFilm() {
+  if (!filmData) return;
+  logEvent('growth_film_generate_my', { variant: 'my' });
+
+  const canvas = document.createElement('canvas');
+  try {
+    const dataUrl = await GrowthFilmCollage.generate(canvas, filmData, 'my');
+
+    // 서버 캐시 저장 (fire-and-forget — 실패해도 다운로드 진행)
+    fetch(`/api/challenge/${wishId}/growth-film`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ variant: 'my', imageData: dataUrl })
+    }).catch(() => {});
+
+    logEvent('growth_film_save_click', { variant: 'my' });
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = `my-growth-film-${wishId}.png`;
+    a.click();
+    showToast('내 성장필름이 저장됐습니다 🎞️');
+  } catch (err) {
+    console.error('[GrowthFilm] Canvas error:', err);
+    document.getElementById('btn-fallback').style.display = 'inline-flex';
+    showToast('카드 생성 실패. 아래 버튼으로 이미지를 저장하세요.');
+  }
+}
+
+// ── 스토리 공유 (social share, variant='share') ──────────────────────────
+async function handleShareStory() {
+  if (!filmData) return;
+  logEvent('growth_film_share_click', { variant: 'share' });
+
+  // 완주 체크 — 미완주 시 409 nudge 표시
+  if (filmData.status !== 'COMPLETED') {
+    logEvent('share_blocked_409');
+    document.getElementById('nudge-409').style.display = 'block';
+    document.getElementById('nudge-409').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    showToast('7일 완주 후 공유할 수 있어요 🔒');
+    return;
+  }
+
+  logEvent('growth_film_generate_share', { variant: 'share' });
+  const canvas = document.createElement('canvas');
+  try {
+    const dataUrl = await GrowthFilmCollage.generate(canvas, filmData, 'share');
+
+    // 서버 캐시 저장 후 Plaza FILM 포스트에 URL 연동
+    let filmUrl = null;
+    try {
+      const cacheRes = await fetch(`/api/challenge/${wishId}/growth-film`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ variant: 'share', imageData: dataUrl })
+      });
+      const cacheJson = await cacheRes.json();
+      filmUrl = cacheJson.imageUrl || null;
+    } catch (cacheErr) {
+      console.warn('[GrowthFilm] Cache save error (non-fatal):', cacheErr.message);
+    }
+
+    // Plaza FILM 포스트 thumbnailUrl 업데이트
+    if (filmUrl) {
+      fetch(`/api/challenge/${wishId}/share-film`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ thumbnailUrl: filmUrl })
+      }).catch(() => {});
+    }
+
+    logEvent('growth_film_share_success', { variant: 'share' });
+    sessionStorage.setItem('d7Shared_' + wishId, '1');
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = `share-growth-film-${wishId}.png`;
+    a.click();
+    showToast('공유 필름 저장 완료 📤  Plaza에도 등록됐어요 🎬');
+  } catch (err) {
+    console.error('[GrowthFilm] Share error:', err);
+    document.getElementById('btn-fallback').style.display = 'inline-flex';
+    showToast('공유 카드 생성 실패. 아래 버튼으로 이미지를 저장하세요.');
+  }
+}
+
+function handleFallback() {
+  if (!filmData) return;
+  const a = document.createElement('a');
+  a.href = filmData.base_image_url;
+  a.download = `wish-image-${wishId}.png`;
+  a.click();
+}
+
+// ── AIL-114 ①: 체크인 섹션 초기화 ────────────────────────────────────────
+// AIL-TIME-001: 프론트는 서버 can_checkin_today만 렌더링 (직접 계산 금지)
+function initCheckin(data) {
+  if (!data.can_checkin_today) return;
+
+  const nextDay = data.score.checkin_count + 1;
+
+  // D2/D3 격려 문구 (AIL-114 ②)
+  const nudgeEl = document.getElementById('d23-nudge');
+  if (nextDay === 2) {
+    nudgeEl.textContent = "오늘은 '한 번 더'면 충분해요.";
+    nudgeEl.style.display = 'block';
+    logEvent('d23_guidance_impression', { variant: 'day2' });
+  } else if (nextDay === 3) {
+    nudgeEl.textContent = "여기까지 왔어요. 계속 같이 가요.";
+    nudgeEl.style.display = 'block';
+    logEvent('d23_guidance_impression', { variant: 'day3' });
+  }
+
+  document.getElementById('today-badge').textContent = `Day ${nextDay}`;
+  document.getElementById('checkin-section').style.display = 'block';
+}
+
+// ── AIL-114 ①: 체크인 처리 ────────────────────────────────────────────────
+async function handleCheckin() {
+  if (!filmData || !wishId) return;
+  logEvent('checkin_click');
+
+  const btn = document.getElementById('btn-checkin');
+  btn.disabled = true;
+  btn.textContent = '기록 중...';
+
+  const actionLine = document.getElementById('action-input').value.trim() || null;
+  const nextDay = filmData.score.checkin_count + 1;
+
+  try {
+    const res = await fetch(`/api/challenge/${wishId}/checkin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action_line: actionLine })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      showToast(data.error || '체크인 중 오류가 발생했습니다.');
+      btn.disabled = false;
+      btn.textContent = '오늘 기록하기';
+      return;
+    }
+
+    // filmData 상태 동기화
+    filmData.score.checkin_count = nextDay;
+    filmData.score.action_points += data.points_earned;
+    filmData.score.total_points  += data.points_earned;
+    if (data.completed) filmData.status = 'COMPLETED';
+
+    renderScore(filmData.score);
+    logEvent('checkin_success', { variant: 'day' + nextDay });
+
+    // 체크인 섹션 숨기고 즉각 보상 표시
+    document.getElementById('checkin-section').style.display = 'none';
+    showReward(nextDay, data.completed);
+
+    // AIL-114 ③: D4~D6 나눔 추천 (세션당 1회)
+    if (nextDay >= 4 && nextDay <= 6 && !sessionStorage.getItem('shareSuggestionShown')) {
+      sessionStorage.setItem('shareSuggestionShown', '1');
+      showShareSuggestion(nextDay);
+    }
+
+    // AIL-114 ④: D7 완주 처리
+    if (data.completed) {
+      sessionStorage.setItem('d7CompletedToday_' + wishId, '1');
+      applyD7CompletionUI();
+      if (!sessionStorage.getItem('filmCompImpression')) {
+        sessionStorage.setItem('filmCompImpression', '1');
+        logEvent('film_completion_impression');
+      }
+    }
+
+  } catch (err) {
+    showToast('네트워크 오류가 발생했습니다.');
+    btn.disabled = false;
+    btn.textContent = '오늘 기록하기';
+  }
+}
+
+// ── AIL-114 ①: 즉각 도장 + 지연 한마디 (800~1200ms) ────────────────────
+async function showReward(dayNum, completed) {
+  const panel   = document.getElementById('reward-panel');
+  const stampText = document.getElementById('stamp-text');
+  const wisdomWrap = document.getElementById('wisdom-card-wrap');
+  const wisdomText = document.getElementById('wisdom-text');
+
+  const suffix = completed ? ' — 7일을 함께 걸었습니다 🎬' : '';
+  stampText.textContent = `Day ${dayNum} 기록 완료${suffix}`;
+  panel.style.display = 'block';
+
+  // 지연 감성 보상: 한마디 (800~1200ms)
+  const delay = 800 + Math.floor(Math.random() * 401);
+  setTimeout(async () => {
+    try {
+      const res  = await fetch(`/api/challenge/${wishId}/suggestion`);
+      const data = await res.json();
+      if (data.post && data.post.text) {
+        wisdomText.textContent = data.post.text;
+        wisdomWrap.style.opacity = '1';
+        logEvent('checkin_reward_message_impression');
+      }
+    } catch (e) { /* fail-open */ }
+  }, delay);
+}
+
+// ── AIL-114 ③: D4~D6 나눔 추천 카드 ────────────────────────────────────
+async function showShareSuggestion(dayNum) {
+  const section = document.getElementById('share-suggestion');
+  const cardEl  = document.getElementById('suggestion-card');
+
+  try {
+    const res  = await fetch(`/api/challenge/${wishId}/suggestion`);
+    const data = await res.json();
+    if (!data.post) return;
+
+    const typeLabel = data.post.type === 'MIRACLE' ? '🌟 기적나눔' : '✨ 지혜나눔';
+    cardEl.innerHTML = `
+      <div class="suggestion-card-inner">
+        <div class="s-type">${typeLabel}</div>
+        <div class="s-text">${escHtml(data.post.text)}</div>
+      </div>`;
+    section.style.display = 'block';
+    logEvent('post_checkin_share_suggestion_impression', { variant: `day${dayNum}` });
+  } catch (e) { /* fail-open */ }
+}
+
+// ── AIL-114 ④: D7 완주 UI 업데이트 ──────────────────────────────────────
+function applyD7CompletionUI() {
+  // 부제목
+  document.getElementById('film-subtitle').textContent = '7일을 함께 걸었습니다.';
+  // 버튼 텍스트 교체
+  const btnMy    = document.getElementById('btn-my');
+  const btnShare = document.getElementById('btn-share-story');
+  if (btnMy)    btnMy.textContent    = '🎬 내 여정 필름 보기';
+  if (btnShare) btnShare.textContent = '✨ 동행 신호로 공유하기';
+  // Day 7 체크인 상태를 filmData에 반영 후 스트립 재렌더
+  const day7 = filmData && filmData.days && filmData.days.find(d => d.day === 7);
+  if (day7 && !day7.checked_in) {
+    day7.checked_in = true;
+    renderStrip(filmData);
+  }
+}
+
+// ── 유틸 ─────────────────────────────────────────────────────────────────
+function updateCheerLabel(count) {
+  document.getElementById('cheer-label').textContent = `현재 응원 ${count}개`;
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('visible');
+  setTimeout(() => toast.classList.remove('visible'), 3000);
+}
+
+function showError(msg) {
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('error-state').style.display = 'flex';
+  document.getElementById('error-msg').textContent = msg;
+}
+
+function getOrCreateCheererId() {
+  const key = 'dm_anon_id';
+  let id = localStorage.getItem(key);
+  if (!id) {
+    id = `anon_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    localStorage.setItem(key, id);
+  }
+  return id;
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ── Plaza 복귀 — COMPLETED + 미공유 시 share_cancel 이벤트 ────────────────
+function handleReturnToPlaza() {
+  logEvent('return_to_plaza_click');
+  if (filmData && filmData.status === 'COMPLETED' &&
+      !sessionStorage.getItem('d7Shared_' + wishId)) {
+    logEvent('growth_film_share_cancel');
+  }
+}
+</script>
+</body>
+</html>

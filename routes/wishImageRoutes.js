@@ -13,10 +13,13 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 const sharp = require('sharp');
+const { randomUUID } = require('crypto');
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
+
+const db = require('../database/db');
 
 // 소원그림 패키지 서비스 (tolerant loading)
 let postcardService = null;
@@ -106,12 +109,62 @@ function downloadAndSaveImage(imageUrl, filename) {
 }
 
 /**
+ * 챌린지 자동 생성 헬퍼 (fail-open)
+ * @param {string|number|undefined} wishEntryId
+ * @param {string} imageUrl
+ */
+async function autoCreateChallenge(wishEntryId, imageUrl) {
+  if (!wishEntryId) return;
+  try {
+    await db.query(
+      `INSERT INTO wish_challenges (wish_id, base_image_url, overlay_pack_id)
+       VALUES ($1, $2, 'hope_v1')
+       ON CONFLICT (wish_id) DO NOTHING`,
+      [parseInt(wishEntryId, 10), imageUrl]
+    );
+    console.log(`[WishImage] Auto-created challenge for wish_id=${wishEntryId}`);
+  } catch (err) {
+    console.error(`[WishImage] Challenge auto-create failed (non-fatal):`, err.message);
+    // fail-open: 챌린지 생성 실패가 이미지 응답을 막지 않음
+  }
+}
+
+/**
+ * AIL-112: Plaza WISH 카드 자동 생성 (소원꿈터 쇼케이스)
+ * wish_entries.id 기준으로 "Post" 테이블에 WISH 포스트 upsert.
+ * fail-open — 실패 시 이미지 응답을 막지 않음.
+ * @param {number|string} wishEntryId - wish_entries.id
+ * @param {string} imageUrl - permanentUrl
+ */
+async function autoCreateWishPost(wishEntryId, imageUrl) {
+  if (!wishEntryId) return;
+  try {
+    const wishIdStr = String(wishEntryId);
+    const now = new Date().toISOString();
+    // 공유 DB에 직접 INSERT (sowon-dreamtown "Post" 테이블)
+    // authorId NULL = 익명 카드 (AIL-112 P0 정책)
+    await db.query(
+      `INSERT INTO "Post" (
+         id, content, status, "createdAt", "updatedAt",
+         "postType", "wishId", "thumbnailUrl", "badgeText", "summaryStatus"
+       )
+       VALUES ($1, '', 'APPROVED', $2, $2, 'WISH', $3, $4, 'Day 1', 'NONE')
+       ON CONFLICT DO NOTHING`,
+      [randomUUID(), now, wishIdStr, imageUrl]
+    );
+    console.log(`[WishImage] WISH Post created for wish_id=${wishEntryId}`);
+  } catch (err) {
+    console.error(`[WishImage] WISH Post create failed (non-fatal):`, err.message);
+  }
+}
+
+/**
  * POST /api/wish-image/generate
  * 소원그림 생성 + 영구 저장
  */
 router.post('/generate', async (req, res) => {
   try {
-    const { wish_content, gem_type, style = 'miracle_fusion' } = req.body;
+    const { wish_content, gem_type, style = 'miracle_fusion', wish_entry_id } = req.body;
 
     // 유효성 검사
     if (!wish_content) {
@@ -162,6 +215,12 @@ router.post('/generate', async (req, res) => {
 
           // 영구 URL 반환
           const permanentUrl = `/images/wishes/${filename}`;
+
+          // 챌린지 자동 생성 (fail-open)
+          await autoCreateChallenge(wish_entry_id, permanentUrl);
+
+          // AIL-112: Plaza WISH 카드 자동 생성 (fail-open)
+          await autoCreateWishPost(wish_entry_id, permanentUrl);
 
           return res.json({
             success: true,

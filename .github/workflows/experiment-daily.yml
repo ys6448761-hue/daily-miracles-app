@@ -1,0 +1,78 @@
+name: Experiment Daily Health
+
+on:
+  schedule:
+    # KST 01:00 = UTC 16:00 (previous day)
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  OPS_SLACK_WEBHOOK: ${{ secrets.OPS_SLACK_WEBHOOK }}
+
+jobs:
+  daily-health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Batch health evaluation
+        run: npx tsx scripts/health.ts --json
+
+      - name: Trend analysis (7 days)
+        run: npx tsx scripts/health-trend.ts --days=7
+
+      - name: Slack daily digest
+        env:
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: npx tsx scripts/slack-report.ts
+
+      - name: Auto-commit artifacts
+        run: npx tsx scripts/ci-commit-artifacts.ts
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: experiment-health-${{ github.run_id }}
+          path: artifacts/
+          retention-days: 30
+
+      - name: Step summary
+        if: always()
+        run: |
+          TODAY=$(date -u +%Y-%m-%d)
+          BATCH="artifacts/health/$TODAY/batch.json"
+          TREND="artifacts/health/$TODAY/trend.json"
+
+          echo "## Experiment Daily Health — $TODAY" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -f "$BATCH" ]; then
+            echo "### Batch Results" >> "$GITHUB_STEP_SUMMARY"
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat "$BATCH" | head -40 >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          if [ -f "$TREND" ]; then
+            ALERT_COUNT=$(cat "$TREND" | grep -c '"type"' || echo 0)
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "### Trend Alerts: $ALERT_COUNT" >> "$GITHUB_STEP_SUMMARY"
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat "$TREND" | head -60 >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
