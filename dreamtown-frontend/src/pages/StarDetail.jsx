@@ -233,7 +233,23 @@ export default function StarDetail() {
         </div>
       )}
 
-      {/* ── 3. 공명 섹션 ──────────────────────────────────────── */}
+      {/* ── 3. Aurora5 응원 ──────────────────────────────────── */}
+      <div className="flex items-center gap-2 mb-3 px-1">
+        <span className="text-star-gold/40 text-xs">✨ Aurora5</span>
+        <span className="text-star-gold/40 text-xs">
+          {(() => {
+            const m = {
+              growth:       '이 별의 성장을 Aurora5가 응원하고 있어요',
+              challenge:    '이 별의 용기를 Aurora5가 응원하고 있어요',
+              healing:      '이 별의 치유를 Aurora5가 응원하고 있어요',
+              relationship: '이 별의 연결을 Aurora5가 응원하고 있어요',
+            };
+            return m[star.galaxy?.code] ?? '이 소원별은 혼자가 아닙니다. Aurora5가 함께 항해하고 있어요';
+          })()}
+        </span>
+      </div>
+
+      {/* ── 4. 공명 섹션 ──────────────────────────────────────── */}
       <div className="mb-5">
         {!resonanceSubmitted && (
           <div className="bg-white/3 border border-white/8 rounded-2xl p-4">
@@ -262,7 +278,7 @@ export default function StarDetail() {
         )}
       </div>
 
-      {/* ── 4. 내 별 연결 CTA (공명 후) ──────────────────────── */}
+      {/* ── 5. 내 별 연결 CTA (공명 후) ──────────────────────── */}
       {resonanceSubmitted && myStarId && (
         <div className="flex flex-col gap-2 mb-5">
           <button
@@ -274,7 +290,7 @@ export default function StarDetail() {
         </div>
       )}
 
-      {/* ── 5. 광장 복귀 ────────────────────────────────────── */}
+      {/* ── 6. 광장 복귀 ────────────────────────────────────── */}
       <div className="mt-4 mb-4">
         <button
           onClick={() => nav('/home')}
