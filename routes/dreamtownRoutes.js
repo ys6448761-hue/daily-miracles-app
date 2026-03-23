@@ -882,6 +882,81 @@ router.post('/admin/backfill-voyage-schedules', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
+// GET /api/dt/stars/:id/stats
+// My Star 요약 통계 — 카드/마일스톤/변화지수 차트용
+// ─────────────────────────────────────────────
+router.get('/stars/:id/stats', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // 1. 별 생성일
+    const starRow = await db.query(
+      'SELECT created_at FROM dt_stars WHERE id = $1', [id]
+    );
+    if (starRow.rowCount === 0) return res.status(404).json({ error: '별을 찾을 수 없어요' });
+
+    const createdAt = new Date(starRow.rows[0].created_at);
+    const daysSinceBirth = Math.max(
+      1,
+      Math.floor((Date.now() - createdAt.getTime()) / 86400000) + 1
+    );
+
+    // 2. 변화지수 히스토리 — 날짜별 로그 수 기반 (voyage/daily 소스만, 공명 제외)
+    const logsRow = await db.query(
+      `SELECT
+         (logged_at AT TIME ZONE 'Asia/Seoul')::date AS log_date,
+         COUNT(*) AS cnt
+       FROM dt_voyage_logs
+       WHERE star_id = $1
+         AND source != 'resonance'
+       GROUP BY log_date
+       ORDER BY log_date ASC`,
+      [id]
+    );
+    const changeScoreHistory = logsRow.rows.map(r => ({
+      date:  r.log_date,
+      score: Math.min(100, 50 + parseInt(r.cnt, 10) * 10),
+    }));
+    const currentScore = changeScoreHistory.length > 0
+      ? changeScoreHistory[changeScoreHistory.length - 1].score
+      : 50;
+
+    // 3. 공명 수 (resonance 테이블 — star_id TEXT)
+    let resonanceCount = 0;
+    let resonanceUsersCount = 0;
+    try {
+      const resRow = await db.query(
+        `SELECT COUNT(*) AS total, COUNT(DISTINCT user_id) AS users
+           FROM resonance WHERE star_id = $1::text`,
+        [id]
+      );
+      resonanceCount      = parseInt(resRow.rows[0]?.total ?? 0, 10);
+      resonanceUsersCount = parseInt(resRow.rows[0]?.users ?? 0, 10);
+    } catch (_) { /* resonance 테이블 없는 환경 graceful */ }
+
+    // 4. 마일스톤 상태
+    const milestoneStatus = {
+      d7:   daysSinceBirth >= 7,
+      d30:  daysSinceBirth >= 30,
+      d100: daysSinceBirth >= 100,
+      d365: daysSinceBirth >= 365,
+    };
+
+    res.json({
+      days_since_birth:      daysSinceBirth,
+      current_score:         currentScore,
+      change_score_history:  changeScoreHistory,
+      resonance_count:       resonanceCount,
+      resonance_users_count: resonanceUsersCount,
+      milestone_status:      milestoneStatus,
+    });
+  } catch (err) {
+    console.error('[DT] GET /stars/:id/stats error:', err.message);
+    res.status(500).json({ error: '통계 조회에 실패했어요' });
+  }
+});
+
+// ─────────────────────────────────────────────
 // GET /api/dt/health — 헬스체크
 // ─────────────────────────────────────────────
 router.get('/health', (_req, res) => {

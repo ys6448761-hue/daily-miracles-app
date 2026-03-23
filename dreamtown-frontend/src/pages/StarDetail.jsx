@@ -234,19 +234,19 @@ export default function StarDetail() {
       )}
 
       {/* ── 3. Aurora5 응원 ──────────────────────────────────── */}
-      <div className="flex items-center gap-2 mb-3 px-1">
-        <span className="text-star-gold/40 text-xs">✨ Aurora5</span>
-        <span className="text-star-gold/40 text-xs">
+      <div className="mb-4 px-1">
+        <p style={{ color: '#FFD76A', fontSize: 11, marginBottom: 6 }}>✨ Aurora5</p>
+        <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, lineHeight: 1.7, whiteSpace: 'pre-line' }}>
           {(() => {
             const m = {
-              growth:       '이 별의 성장을 Aurora5가 응원하고 있어요',
-              challenge:    '이 별의 용기를 Aurora5가 응원하고 있어요',
-              healing:      '이 별의 치유를 Aurora5가 응원하고 있어요',
-              relationship: '이 별의 연결을 Aurora5가 응원하고 있어요',
+              growth:       '성장을 향한 이 마음을 함께 바라고 있어요.\n조금씩 나아가는 것만으로 충분해요.\n같은 마음을 가진 소원이들이 있어요.',
+              challenge:    '용기를 낸 이 마음이 여기 있어요.\n두려워도 한 걸음 내딛은 것이 진짜예요.\n같은 두려움을 가진 소원이들이 있어요.',
+              healing:      '치유를 바라는 이 마음을 함께 바라고 있어요.\n쉬어가도 괜찮아요. 멈춤도 항해예요.\n같은 아픔을 지나온 소원이들이 있어요.',
+              relationship: '연결을 바라는 이 마음이 여기 있어요.\n혼자가 아니라는 걸 이 별이 보여줘요.\n같은 마음을 가진 소원이들이 있어요.',
             };
-            return m[star.galaxy?.code] ?? '이 소원별은 혼자가 아닙니다. Aurora5가 함께 항해하고 있어요';
+            return m[star.galaxy?.code] ?? '이 소원별은 혼자가 아닙니다.\nAurora5가 함께 항해하고 있어요.\n당신의 마음이 이 별에 닿았어요.';
           })()}
-        </span>
+        </p>
       </div>
 
       {/* ── 4. 공명 섹션 ──────────────────────────────────────── */}

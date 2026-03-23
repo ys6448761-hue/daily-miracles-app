@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message, getTodaySchedule } from '../api/dreamtown.js';
+import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message, getTodaySchedule, getStarStats } from '../api/dreamtown.js';
 import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
 import { sharePostcard } from '../utils/kakaoShare';
@@ -147,6 +147,9 @@ export default function MyStar() {
   // 오늘의 Aurora5 스케줄
   const [todaySchedule, setTodaySchedule] = useState(null);
 
+  // My Star 통계 (카드/마일스톤/차트)
+  const [stats, setStats] = useState(null);
+
   // 선물하기 상태
   const [showGift, setShowGift] = useState(false);
   const [giftCopyType, setGiftCopyType] = useState(null);
@@ -190,6 +193,11 @@ export default function MyStar() {
         getTodaySchedule(data.star_id)
           .then(r => setTodaySchedule(r.schedule ?? null))
           .catch(() => setTodaySchedule(null));
+
+        // My Star 통계
+        getStarStats(data.star_id)
+          .then(s => setStats(s))
+          .catch(() => setStats(null));
 
         // Aurora5 메시지 저장 — 세션당 1회 fire-and-forget
         const aurora5Key = `dt_aurora5_saved_${data.star_id}_${new Date().toISOString().slice(0, 10)}`;
@@ -322,6 +330,49 @@ export default function MyStar() {
         </div>
 
       </motion.div>
+
+      {/* ── 요약 카드 3개 ──────────────────────────────────── */}
+      <div className="grid grid-cols-3 gap-2 mb-5">
+        {[
+          {
+            label: '항해 일수',
+            value: `D+${daysSinceBirth}`,
+            sub: daysSinceBirth < 30
+              ? `D+30까지 ${30 - daysSinceBirth}일`
+              : daysSinceBirth < 100
+                ? `D+100까지 ${100 - daysSinceBirth}일`
+                : 'D+100 달성',
+          },
+          {
+            label: '변화 지수',
+            value: stats ? String(stats.current_score) : '–',
+            sub: stats?.change_score_history?.length > 0 ? '오늘 기준' : '기록 후 갱신',
+          },
+          {
+            label: '공명 받음',
+            value: `${stats?.resonance_count ?? 0}회`,
+            sub: `${stats?.resonance_users_count ?? 0}명이 응원`,
+          },
+        ].map(card => (
+          <div
+            key={card.label}
+            className="rounded-2xl p-3 text-center"
+            style={{ background: '#1e3248', border: '1px solid rgba(255,215,106,0.15)' }}
+          >
+            <p style={{ color: 'rgba(232,228,217,0.5)', fontSize: 11, marginBottom: 4 }}>{card.label}</p>
+            <p style={{ color: '#FFD76A', fontSize: 20, fontWeight: 500, lineHeight: 1 }}>{card.value}</p>
+            <p style={{ color: 'rgba(232,228,217,0.35)', fontSize: 10, marginTop: 4 }}>{card.sub}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* ── 마일스톤 진행바 ───────────────────────────────── */}
+      <MilestoneBar daysSinceBirth={daysSinceBirth} />
+
+      {/* ── 변화 지수 차트 (로그 2개 이상일 때만) ─────────── */}
+      {stats?.change_score_history?.length >= 2 && (
+        <ChangeScoreChart history={stats.change_score_history} />
+      )}
 
       {/* 내 별 이야기 — 항해 로그 기반 (daily만, resonance 제외) */}
       {(() => {
@@ -539,6 +590,96 @@ export default function MyStar() {
             새 소원 만들기
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ── 마일스톤 진행바 ─────────────────────────────────────────
+function MilestoneBar({ daysSinceBirth }) {
+  const MILESTONES = [1, 7, 30, 100, 365];
+  return (
+    <div className="mb-5">
+      <p style={{ color: 'rgba(232,228,217,0.5)', fontSize: 11, marginBottom: 10, paddingLeft: 4 }}>
+        항해 여정
+      </p>
+      <div style={{ display: 'flex', alignItems: 'flex-start', padding: '0 4px' }}>
+        {MILESTONES.map((day, i) => {
+          const reached = daysSinceBirth >= day;
+          const isLast  = i === MILESTONES.length - 1;
+          return (
+            <div key={day} style={{ display: 'flex', alignItems: 'center', flex: isLast ? 'none' : 1 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{
+                  width: 16, height: 16, borderRadius: '50%',
+                  background: reached ? '#FFD76A' : 'transparent',
+                  border: `2px solid ${reached ? '#FFD76A' : 'rgba(255,255,255,0.15)'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  {reached && <span style={{ fontSize: 8, color: '#0a0e1a', fontWeight: 700 }}>✓</span>}
+                </div>
+                <span style={{
+                  fontSize: 9, marginTop: 4,
+                  color: reached ? 'rgba(255,215,106,0.7)' : 'rgba(255,255,255,0.2)',
+                }}>
+                  D+{day}
+                </span>
+              </div>
+              {!isLast && (
+                <div style={{
+                  flex: 1, height: 1, marginBottom: 14,
+                  background: reached ? 'rgba(255,215,106,0.4)' : 'rgba(255,255,255,0.1)',
+                }} />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── 변화 지수 SVG 차트 ──────────────────────────────────────
+function ChangeScoreChart({ history }) {
+  if (!history || history.length < 2) return null;
+  const W = 300, H = 72, PAD = 6;
+  const scores = history.map(h => h.score);
+  const minS   = Math.min(...scores);
+  const maxS   = Math.max(...scores);
+  const rangeS = Math.max(maxS - minS, 10);
+
+  const pts = scores.map((s, i) => {
+    const x = PAD + (i / (scores.length - 1)) * (W - PAD * 2);
+    const y = PAD + (1 - (s - minS) / rangeS) * (H - PAD * 2 - 8);
+    return [x, y];
+  });
+
+  const linePath = 'M ' + pts.map(([x, y]) => `${x} ${y}`).join(' L ');
+  const areaPath = `${linePath} L ${pts[pts.length - 1][0]} ${H - PAD} L ${pts[0][0]} ${H - PAD} Z`;
+  const last = pts[pts.length - 1];
+
+  return (
+    <div className="mb-5">
+      <p style={{ color: 'rgba(232,228,217,0.5)', fontSize: 11, marginBottom: 8, paddingLeft: 4 }}>
+        변화 지수 추이
+      </p>
+      <div style={{
+        borderRadius: 16, overflow: 'hidden',
+        background: '#1e3248',
+        border: '1px solid rgba(255,215,106,0.1)',
+      }}>
+        <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', display: 'block' }}>
+          <defs>
+            <linearGradient id="sgGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stopColor="#FFD76A" stopOpacity="0.25" />
+              <stop offset="100%" stopColor="#FFD76A" stopOpacity="0.02" />
+            </linearGradient>
+          </defs>
+          <path d={areaPath} fill="url(#sgGrad)" />
+          <path d={linePath} fill="none" stroke="#FFD76A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx={last[0]} cy={last[1]} r="4" fill="#FFD76A" />
+          <circle cx={last[0]} cy={last[1]} r="7" fill="#FFD76A" fillOpacity="0.15" />
+        </svg>
       </div>
     </div>
   );

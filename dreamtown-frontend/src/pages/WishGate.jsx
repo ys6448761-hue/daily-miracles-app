@@ -153,6 +153,11 @@ export default function WishGate() {
         />
       </motion.div>
 
+      {/* 아우룸 문구 */}
+      <p style={{ textAlign: 'center', fontSize: '13px', color: 'rgba(255,215,106,0.7)', marginBottom: '12px' }}>
+        ✦ 아우룸이 당신의 소원을 별로 만들어 드릴게요
+      </p>
+
       {/* CTA */}
       <motion.button
         initial={{ opacity: 0 }}

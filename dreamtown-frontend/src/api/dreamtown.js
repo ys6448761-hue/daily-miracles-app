@@ -139,6 +139,13 @@ export async function getVoyageLogs(starId) {
   return res.json();
 }
 
+// GET /api/dt/stars/:id/stats — My Star 요약 통계 (카드/마일스톤/차트)
+export async function getStarStats(starId) {
+  const res = await fetch(`${BASE}/stars/${starId}/stats`);
+  if (!res.ok) return null;
+  return res.json();
+}
+
 // GET /api/dt/stars/:id/today-schedule — 오늘의 Aurora5 스케줄 메시지
 export async function getTodaySchedule(starId) {
   const res = await fetch(`${BASE}/stars/${starId}/today-schedule`);
