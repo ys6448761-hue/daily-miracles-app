@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStarDetail, getResonance, postResonance, postVoyageLog } from '../api/dreamtown.js';
+import { getStarDetail, getStar, getResonance, postResonance, postVoyageLog, getVoyageLogs } from '../api/dreamtown.js';
 import MilestoneBar from '../components/MilestoneBar';
 import { gaResonanceCreated, gaImpactCreated } from '../utils/gtag';
 
@@ -60,14 +60,62 @@ export default function StarDetail() {
 
   useEffect(() => {
     if (isOwnStar) return;
-    Promise.all([
-      getStarDetail(id).then(setDetail),
-      getResonance(id).then(r => {
-        const total = Object.values(r.resonance ?? {})
-          .reduce((s, v) => s + (v.count || 0), 0);
-        setResonanceTotal(total);
-      }).catch(() => {}),
-    ]).catch(() => {}).finally(() => setLoading(false));
+
+    async function loadDetail() {
+      try {
+        // 1차 시도: /detail API (닉네임, 마일스톤, 항해로그 통합)
+        const d = await getStarDetail(id);
+        setDetail(d);
+      } catch (_) {
+        // 폴백: getStar + voyage-logs 개별 조합
+        try {
+          const [star, logsRes] = await Promise.all([
+            getStar(id),
+            getVoyageLogs(id).catch(() => ({ logs: [] })),
+          ]);
+          const daysSinceBirth = Math.max(
+            1,
+            Math.floor((Date.now() - new Date(star.created_at).getTime()) / 86400000) + 1
+          );
+          const MILESTONES = [1, 7, 30, 100, 365];
+          const milestoneStatus = MILESTONES.map(day => {
+            const d2 = new Date(star.created_at);
+            d2.setDate(d2.getDate() + day - 1);
+            return {
+              day,
+              reached: daysSinceBirth >= day,
+              date: `${String(d2.getMonth() + 1).padStart(2, '0')}.${String(d2.getDate()).padStart(2, '0')}`,
+            };
+          });
+          const logs = (logsRes.logs ?? []).filter(l => l.source === 'daily' || !l.source);
+          const latest = logs[0] ?? null;
+          if (latest) {
+            const ld = new Date(latest.logged_at);
+            latest.log_date = `${String(ld.getMonth() + 1).padStart(2, '0')}.${String(ld.getDate()).padStart(2, '0')}`;
+            latest.situation_text = latest.growth;
+            latest.wisdom_tag    = latest.tag;
+          }
+          setDetail({
+            ...star,
+            days_since_birth:      daysSinceBirth,
+            nickname:              '소원이',
+            milestone_status:      milestoneStatus,
+            today_aurora5_message: null,
+            today_aurora5_day:     null,
+            latest_voyage_log:     latest,
+            resonance_count:       0,
+          });
+        } catch (__) { /* detail null → 에러 화면 표시 */ }
+      }
+      setLoading(false);
+    }
+
+    loadDetail();
+    getResonance(id).then(r => {
+      const total = Object.values(r.resonance ?? {})
+        .reduce((s, v) => s + (v.count || 0), 0);
+      setResonanceTotal(total);
+    }).catch(() => {});
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleResonance(resonanceType) {
@@ -192,7 +240,11 @@ export default function StarDetail() {
       </div>
 
       {/* ── ③ MilestoneBar ────────────────────────────────── */}
-      <MilestoneBar createdAt={detail.created_at} daysSinceBirth={detail.days_since_birth} />
+      <MilestoneBar
+        milestones={detail.milestone_status}
+        createdAt={detail.created_at}
+        daysSinceBirth={detail.days_since_birth}
+      />
 
       {/* ── ④ 항해 기록 최근 1개 ──────────────────────────── */}
       <div className="bg-white/3 border border-white/8 rounded-2xl p-4 mb-4">
