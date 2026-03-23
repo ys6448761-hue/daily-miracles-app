@@ -254,7 +254,7 @@ router.post('/stars/create', async (req, res) => {
         `INSERT INTO dt_voyage_schedule
            (star_id, user_id, phone_number, day_number, message_text, wisdom_tag, scheduled_at)
          VALUES ($1, $2, $3, $4, $5, $6,
-           ((($7::timestamptz AT TIME ZONE 'Asia/Seoul')::date + ($4 * INTERVAL '1 day') + INTERVAL '8 hours') AT TIME ZONE 'Asia/Seoul'))
+           ((($7::timestamptz AT TIME ZONE 'Asia/Seoul')::date + $4::int * INTERVAL '1 day' + INTERVAL '8 hours') AT TIME ZONE 'Asia/Seoul'))
          ON CONFLICT (star_id, day_number) DO NOTHING`,
         [star.id, user_id, phone_number ?? null, item.dayNumber, item.message, item.tag, star.created_at]
       ).catch(e => console.error('[DT] voyage schedule insert 실패 day', item.dayNumber, e.message))
@@ -864,7 +864,7 @@ router.post('/admin/backfill-voyage-schedules', async (req, res) => {
           `INSERT INTO dt_voyage_schedule
              (star_id, user_id, day_number, message_text, wisdom_tag, scheduled_at)
            VALUES ($1, $2, $3, $4, $5,
-             ((($6::timestamptz AT TIME ZONE 'Asia/Seoul')::date + ($3 * INTERVAL '1 day') + INTERVAL '8 hours') AT TIME ZONE 'Asia/Seoul'))
+             ((($6::timestamptz AT TIME ZONE 'Asia/Seoul')::date + $3::int * INTERVAL '1 day' + INTERVAL '8 hours') AT TIME ZONE 'Asia/Seoul'))
            ON CONFLICT (star_id, day_number) DO NOTHING`,
           [star.id, star.user_id, item.dayNumber, item.message, item.tag, star.created_at]
         ).catch(() => {});
