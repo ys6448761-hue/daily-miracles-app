@@ -48,6 +48,13 @@ point_ledger, harbor_wishes, settlement_events, ops_events
 2. 환경분기: NODE_ENV (로컬SQLite/운영PostgreSQL)
 3. 에러: middleware/errorHandler.js 글로벌
 4. 마이그레이션: database/migrations/ 순번 엄수
-```
 
----
+## 📚 참조 문서 경로
+| 문서 | 경로 | 용도 |
+|------|------|------|
+| DreamTown 현황 | `DREAMTOWN_STATUS.md` | 완료/진행/다음 작업 |
+| GPT Knowledge 7종 | `docs/gpt/DT_*.md` | Code Architect GPT 업로드용 |
+| SSOT 코어 13개 | `docs/ssot/core/*.md` | 세계관/캐릭터/철학 정본 |
+| SSOT 인덱스 | `docs/ssot/INDEX.md` | 전체 SSOT 목록 |
+| 드림타운 지식맵 | `docs/dreamtown/DreamTown_Knowledge_Map.md` | 시스템 전체 개요 |
+| 마케팅 | `docs/04-marketing/` | 홈페이지 재구성 등 |
