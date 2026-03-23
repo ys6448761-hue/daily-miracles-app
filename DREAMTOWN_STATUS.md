@@ -1,15 +1,15 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-03-20
+Last Updated: 2026-03-23
 담당: Claude Code (Antigravity)
 
 ---
 
 ## 한 줄 요약
 
-> AIL-DT-001 Core Loop 완료. 별 탄생 → 광장 자동 이동 + 내 별 강조 A/B + Seed Stars 13개 표시.
-> 다음 작업: DoD 검수 (코미) → 모바일 테스트 → VITE_KAKAO_JS_KEY Render 설정.
+> P0-1~4 통합 수정 완료. MilestoneBar 공통 컴포넌트, MyStar 닉네임/wish_text/케어현황, StarDetail 공개 프로필 재구조화 완료.
+> 다음 작업: 모바일 320px 실기기 테스트 → /detail API 서버 확인 → VITE_KAKAO_JS_KEY Render 설정.
 
 ---
 
@@ -57,14 +57,59 @@ DT_ClaudeCode_Work_Order_Guide.md  ← 지시서 작성법
 - `routes/dreamtownRoutes.js` — `GET /api/dt/stars/recent?limit=N` 엔드포인트 추가
 - `dreamtown.js` — `getRecentStars(limit)` API 클라이언트 추가
 
-DoD 검수 항목:
-- [x] 별 탄생 후 Galaxy 선택 화면 미노출
-- [x] 별 탄생 후 Home 자동 이동
-- [x] 수정된 완료 멘트 출력
-- [x] 내 별 강조 연출 (A/B)
-- [x] Seed Stars 13개 광장 표시 API 구현
+### AIL-DT-002 역할 분리 + 라우팅 복구 ✅ (2026-03-22 완료)
+- `StarBirth.jsx` — Day 재진입 방지 (`dt_first_voyage_*` localStorage 체크 + `replace:true`)
+- `StarDetail.jsx` — `isOwnStar` 감지 → `/my-star/:id` 자동 리다이렉트, 공명 UI 타인 전용
+- `StarDetail.jsx` — `formatBirthDate()` 추가, 별 탄생일 story 상단 표시
+- `StarDetail.jsx` — 뒤로가기: `history.length > 1 ? nav(-1) : nav('/home')` 폴백
+- `Home.jsx` — `MyStarCard`/`StarItem` null guard 추가
+
+### AIL-DT-003 Day 자동 진입 + 완료 상태 ✅ (2026-03-22 완료)
+- `StarBirth.jsx` — `dt_first_voyage_*` 없을 시 Day 화면 자동 진입 (`isFirstVoyage: true` state)
+- `Day.jsx` — `onComplete` 시 `dt_first_voyage_*` + `dt_voyage_today_*` 플래그 저장
+- `MyStar.jsx` — `doneTodayFlag` 확인 → "오늘 항해는 완료했어요 ✦" 대체 표시
+
+### AIL-DT-004 Core Loop 최종 정비 ✅ (2026-03-22 완료)
+- `Day.jsx` — 완료 후 라우팅: `/my-star/:id` (폴백 `/home`)
+- 폐기 문자열 제거, `navigate` replace 플래그 정리
+- 빌드 + push 완료
+
+### AIL-DT-005 항해 로그 source 필터 ✅ (2026-03-22 완료)
+- `MyStar.jsx` — `displayLogs` IIFE 필터: `source === 'daily' || !source`만 표시 (resonance 제외)
+- `StarBirth.jsx` — "내 별 먼저 보러가기" 클릭 시 `dt_first_voyage_*='skipped'` 저장
+
+### AIL-DT-006 Seed Stars 13개 재시드 ✅ (2026-03-22 완료)
+- `scripts/seed-dreamtown-13stars.js` — 기존 테스트 별 38개 삭제 + 감성 큐레이션 13개 입력
+- 은하 분포: 성장×3, 도전×3, 치유×4, 관계×3
+- 별마다 항해 로그 1~3개 (`source='daily'`, 날짜 분산)
+- 고정 UUID (`00000000-0000-0000-0001-*`) 사용
+
+### AIL-DT-008 Star Gift / 별 선물하기 ✅ (2026-03-22 완료)
+- `database/migrations/039_star_gift.sql` — `dt_stars`에 4컬럼 추가 (`is_gifted`, `gifted_at`, `gift_copy_type`, `gift_view_count`)
+- `routes/dreamtownRoutes.js` — `POST /api/dt/stars/:id/gift` (소유자 확인 + 마킹)
+- `routes/dreamtownRoutes.js` — `GET /api/dt/gift/:star_id` (공개 선물 카드, 조회수 fire-and-forget)
+- `dreamtown-frontend/src/pages/GiftLanding.jsx` — 수신자 랜딩 (Framer Motion, Aurum 2.5초 등장, CTA → `/wish`)
+- `dreamtown-frontend/src/pages/MyStar.jsx` — 선물 UI 3단계 (버튼 → 유형 선택 → 공유), Web Share API + clipboard 폴백
+- `dreamtown-frontend/src/App.jsx` — `/dreamtown/gift/:star_id` 라우트 추가
+- `dreamtown-frontend/src/api/dreamtown.js` — `createGift()` / `getGiftCard()` 추가
+- 빌드 성공 (447 modules) + push 완료 (커밋 `4a87d90`)
+
+DoD 검수 항목 (AIL-DT-008):
+- [ ] `POST /api/dt/stars/:id/gift` → 200 + gift_card 반환 확인
+- [ ] `GET /api/dt/gift/:star_id` → star_name + galaxy + copy_text 확인
+- [ ] `/dreamtown/gift/:star_id` 공개 URL 접근 가능 (로그인 불필요)
+- [ ] MyStar 선물 버튼 → 유형 선택 → 공유 플로우 정상 동작
+- [ ] GiftLanding CTA "나도 내 별 만들기 →" → `/wish` 이동
 - [ ] 모바일(Android/iOS) 테스트 — 푸르미르님 직접
-- [ ] AURORA_STATUS.md 업데이트
+- [ ] VITE_KAKAO_JS_KEY Render 환경변수 설정
+
+### AIL-DT-P0 UX 풍성화 4종 ✅ (2026-03-23 완료)
+- `dreamtown-frontend/src/components/MilestoneBar.jsx` — 공통 컴포넌트 신규 생성 (D+N + MM.DD 날짜 표시, createdAt 기반 자동 계산)
+- `dreamtown-frontend/src/pages/MyStar.jsx` — 인라인 MilestoneBar 제거, 공통 컴포넌트 사용, 닉네임(@) 표시, wish_text 표시, Aurora5 케어 현황 카드 추가, 항해 로그 wisdom_tag 배지 추가
+- `dreamtown-frontend/src/pages/StarDetail.jsx` — getStarDetail API로 전환, 공개 프로필 순서 재구성 (닉네임→별이름/은하→소원→변화→MilestoneBar→항해로그1개→Aurora5→공명→광장), getVoyageLogs/expandable 제거
+- `routes/dreamtownRoutes.js` — `GET /api/dt/stars/:id/detail` 신규 엔드포인트 (닉네임/마일스톤/항해로그/Aurora5 통합 반환)
+- `dreamtown-frontend/src/api/dreamtown.js` — `getStarDetail()` 추가
+- 빌드 성공 (449 modules)
 
 ### SSOT 재구조화 ✅ (이전 세션)
 - 87개 → 3-tier 분류: `core/` (13개) / `support/` (25개) / `archive/` (47개)
@@ -103,19 +148,22 @@ DoD 검수 항목:
 | Phase 1 | current_stage + 신호등 카드 + RED 분기 + 7일 여정(정적) | ✅ 완료 |
 | Phase 2 | summary_line 룰 엔진 + today_action + 오늘의 행동 카드 | ✅ 완료 |
 | Phase 3 | 내 변화 화면 + 데이터 레이어 설계 | ⏳ 미시작 |
+| DreamTown Core Loop | 소원→별→Day→MyStar→광장 전체 루프 | ✅ 완료 |
+| DreamTown Gift Loop | 별 선물하기 바이럴 루프 | ✅ 완료 (DoD 검수 대기) |
 
 ---
 
 ## 다음 작업 후보
 
-### 즉시 할 수 있는 것
-1. **GPT Knowledge 업로드** — `docs/gpt/` 7종을 DreamTown Code Architect GPT에 업로드
-2. **로컬 테스트** — `POST /api/wishes` 응답에 `summary_line` / `today_action` 확인
-3. **결과 화면 모바일 확인** — 카드 순서, 폰트, 여백 점검
+### 즉시 해야 할 것 (AIL-DT-008 DoD 검수 후)
+1. **모바일 테스트** — Android/iOS 전체 플로우 (소원→별→Day→MyStar→선물)
+2. **VITE_KAKAO_JS_KEY** — Render 환경변수 설정
+3. **GPT Knowledge 업로드** — `docs/gpt/` 7종을 DreamTown Code Architect GPT에 업로드
 
-### Phase 3 준비 (다음 지시서 발행 전)
-- 내 변화 화면 와이어프레임 코미가 작성
-- `wish_tracking_responses` 데이터 레이어 설계
+### 다음 기능 후보
+- 별 성장도 시각화 (항해 로그 누적 → 별 밝기 증가)
+- Push Notification / 일일 리마인더
+- 은하 탐험 UX 개선
 
 ---
 
@@ -140,7 +188,7 @@ docs/gpt/                             ← GPT Knowledge 문서들
 2. **메시지 발송 = messageProvider.js 경유만** — 직접 SENS 호출 금지
 3. **금지 표현** — 사주, 점술, 관상, 운세, 대운, 궁합
 4. **point_ledger** — append-only, UPDATE/DELETE 금지
-5. **마이그레이션 순번** — 현재 029, 다음은 030
+5. **마이그레이션 순번** — 현재 039, 다음은 040
 
 ---
 

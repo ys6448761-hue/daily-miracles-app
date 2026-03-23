@@ -957,6 +957,121 @@ router.get('/stars/:id/stats', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
+// GET /api/dt/stars/:id/detail — 공개 별 상세 (StarDetail 전용)
+// 닉네임 / 마일스톤 / 항해 로그 1개 / Aurora5 오늘 메시지 / 공명 수 통합 반환
+// ─────────────────────────────────────────────
+router.get('/stars/:id/detail', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // 1. 별 + 닉네임 (dt_users 조인)
+    const { rows, rowCount } = await db.query(
+      `SELECT
+         s.id              AS star_id,
+         s.star_name,
+         s.star_stage,
+         s.created_at,
+         s.growth_log_text,
+         w.wish_text,
+         g.code            AS galaxy_code,
+         g.name_ko         AS galaxy_name_ko,
+         u.nickname
+       FROM dt_stars s
+       LEFT JOIN dt_wishes   w ON w.id = s.wish_id
+       JOIN      dt_galaxies g ON g.id = s.galaxy_id
+       LEFT JOIN dt_users    u ON u.id = s.user_id
+       WHERE s.id = $1`,
+      [id]
+    );
+    if (rowCount === 0) return res.status(404).json({ error: '별을 찾을 수 없습니다' });
+    const star = rows[0];
+
+    const daysSinceBirth = Math.max(
+      1,
+      Math.floor((Date.now() - new Date(star.created_at).getTime()) / 86400000) + 1
+    );
+    const nickname = star.nickname || '소원이';
+
+    // 2. 오늘 Aurora5 스케줄 메시지
+    const { rows: schedRows } = await db.query(
+      `SELECT day_number, message_text
+         FROM dt_voyage_schedule
+        WHERE star_id = $1
+          AND DATE(scheduled_at AT TIME ZONE 'Asia/Seoul')
+              = (NOW() AT TIME ZONE 'Asia/Seoul')::date
+        ORDER BY day_number LIMIT 1`,
+      [id]
+    );
+    const todaySchedule = schedRows[0] ?? null;
+
+    // 3. 최근 항해 로그 1개 (daily / null source만)
+    const { rows: logRows } = await db.query(
+      `SELECT v.id,
+              v.growth              AS situation_text,
+              v.tag                 AS wisdom_tag,
+              v.logged_at,
+              GREATEST(1, FLOOR(EXTRACT(EPOCH FROM (v.logged_at - s.created_at)) / 86400)::int + 1) AS day_num
+         FROM dt_voyage_logs v
+         JOIN dt_stars s ON s.id = v.star_id
+        WHERE v.star_id = $1
+          AND (v.source = 'daily' OR v.source IS NULL)
+        ORDER BY v.logged_at DESC LIMIT 1`,
+      [id]
+    );
+    const latestLog = logRows[0] ?? null;
+    if (latestLog) {
+      const d = new Date(latestLog.logged_at);
+      latestLog.log_date = `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    // 4. 공명 수
+    let resonanceCount = 0;
+    try {
+      const { rows: resRows } = await db.query(
+        `SELECT COUNT(*) AS total FROM resonance WHERE star_id = $1::text`,
+        [id]
+      );
+      resonanceCount = parseInt(resRows[0]?.total ?? 0, 10);
+    } catch (_) { /* resonance 테이블 없는 환경 graceful */ }
+
+    // 5. 마일스톤 상태 (날짜 포함)
+    const MILESTONES = [1, 7, 30, 100, 365];
+    const milestoneStatus = MILESTONES.map(day => {
+      const d = new Date(star.created_at);
+      d.setDate(d.getDate() + day - 1);
+      return {
+        day,
+        reached: daysSinceBirth >= day,
+        date: `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`,
+      };
+    });
+
+    res.json({
+      star_id:               star.star_id,
+      star_name:             star.star_name,
+      star_stage:            star.star_stage,
+      wish_text:             star.wish_text ?? null,
+      growth_log_text:       star.growth_log_text ?? null,
+      galaxy: {
+        code:    star.galaxy_code,
+        name_ko: star.galaxy_name_ko,
+      },
+      created_at:            star.created_at,
+      days_since_birth:      daysSinceBirth,
+      nickname,
+      milestone_status:      milestoneStatus,
+      today_aurora5_message: todaySchedule?.message_text ?? null,
+      today_aurora5_day:     todaySchedule?.day_number ?? null,
+      latest_voyage_log:     latestLog,
+      resonance_count:       resonanceCount,
+    });
+  } catch (err) {
+    console.error('[DT] GET /stars/:id/detail error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
 // GET /api/dt/health — 헬스체크
 // ─────────────────────────────────────────────
 router.get('/health', (_req, res) => {

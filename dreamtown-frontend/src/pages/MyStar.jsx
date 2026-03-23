@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message, getTodaySchedule, getStarStats } from '../api/dreamtown.js';
+import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message, getTodaySchedule, getStarStats, getStarDetail } from '../api/dreamtown.js';
+import MilestoneBar from '../components/MilestoneBar';
 import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
 import { sharePostcard } from '../utils/kakaoShare';
@@ -150,6 +151,9 @@ export default function MyStar() {
   // My Star 통계 (카드/마일스톤/차트)
   const [stats, setStats] = useState(null);
 
+  // 닉네임
+  const [nickname, setNickname] = useState('');
+
   // 선물하기 상태
   const [showGift, setShowGift] = useState(false);
   const [giftCopyType, setGiftCopyType] = useState(null);
@@ -189,10 +193,21 @@ export default function MyStar() {
           setGrowthSaved(true);
         }
 
-        // 오늘의 Aurora5 스케줄 조회
-        getTodaySchedule(data.star_id)
-          .then(r => setTodaySchedule(r.schedule ?? null))
-          .catch(() => setTodaySchedule(null));
+        // 오늘의 Aurora5 스케줄 + 닉네임 조회 (getStarDetail 통합 호출)
+        getStarDetail(data.star_id)
+          .then(detail => {
+            setTodaySchedule(detail.today_aurora5_day != null ? {
+              message_text: detail.today_aurora5_message,
+              day_number:   detail.today_aurora5_day,
+            } : null);
+            setNickname(detail.nickname || '소원이');
+          })
+          .catch(() => {
+            // 폴백: 기존 개별 호출
+            getTodaySchedule(data.star_id)
+              .then(r => setTodaySchedule(r.schedule ?? null))
+              .catch(() => setTodaySchedule(null));
+          });
 
         // My Star 통계
         getStarStats(data.star_id)
@@ -304,6 +319,12 @@ export default function MyStar() {
           ⭐
         </motion.div>
 
+        {nickname && (
+          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginBottom: 6 }}>
+            @{nickname}
+          </p>
+        )}
+
         <p style={{ fontSize: 12, color: '#9B87F5', fontStyle: 'italic', marginBottom: 8 }}>
           <span style={{ fontSize: 16 }}>🐢</span> {aurumMsg.text}
         </p>
@@ -311,6 +332,12 @@ export default function MyStar() {
         <h1 className="text-2xl font-bold text-star-gold glow-gold mb-2">
           {star.star_name}
         </h1>
+
+        {star.wish_text && (
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', fontStyle: 'italic', marginBottom: 8, lineHeight: 1.5 }}>
+            &ldquo;{star.wish_text.length > 40 ? star.wish_text.slice(0, 40) + '…' : star.wish_text}&rdquo;
+          </p>
+        )}
 
         <div className="grid grid-cols-2 gap-3 text-left">
           <div className="bg-white/5 rounded-xl p-3">
@@ -367,7 +394,24 @@ export default function MyStar() {
       </div>
 
       {/* ── 마일스톤 진행바 ───────────────────────────────── */}
-      <MilestoneBar daysSinceBirth={daysSinceBirth} />
+      <MilestoneBar createdAt={star.created_at} daysSinceBirth={daysSinceBirth} />
+
+      {/* ── Aurora5 케어 현황 카드 ─────────────────────── */}
+      <div className="bg-white/3 border border-white/8 rounded-2xl p-4 mb-5">
+        <div className="flex items-center gap-1.5 mb-2">
+          <span style={{ fontSize: 12 }}>✨</span>
+          <p style={{ color: 'rgba(232,228,217,0.55)', fontSize: 11 }}>Aurora5 케어 현황</p>
+        </div>
+        <p style={{ color: 'rgba(255,215,106,0.75)', fontSize: 12, marginBottom: 8 }}>
+          D+{todaySchedule?.day_number ?? daysSinceBirth} /{' '}
+          {daysSinceBirth <= 7 ? '7일' : daysSinceBirth <= 30 ? '30일' : daysSinceBirth <= 100 ? '100일' : '365일'} 케어 진행 중
+        </p>
+        <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', marginBottom: 8 }} />
+        <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, lineHeight: 1.6 }}>
+          {todaySchedule?.message_text
+            ?? getAurora5Message(star.galaxy?.code, daysSinceBirth).split('\n')[0]}
+        </p>
+      </div>
 
       {/* ── 변화 지수 차트 (로그 2개 이상일 때만) ─────────── */}
       {stats?.change_score_history?.length >= 2 && (
@@ -397,7 +441,21 @@ export default function MyStar() {
                 <span className="text-white/30 text-xs flex-shrink-0 mt-0.5 w-10">
                   D+{log.day_number}
                 </span>
-                <p className="text-white/65 text-sm leading-relaxed">{log.growth}</p>
+                <div className="flex flex-col gap-1">
+                  <p className="text-white/65 text-sm leading-relaxed">{log.growth}</p>
+                  {log.tag && (
+                    <span style={{
+                      display: 'inline-block', fontSize: 10,
+                      padding: '1px 8px', borderRadius: 9999,
+                      background: 'rgba(155,135,245,0.12)',
+                      border: '1px solid rgba(155,135,245,0.2)',
+                      color: 'rgba(155,135,245,0.65)',
+                      alignSelf: 'flex-start',
+                    }}>
+                      {log.tag}
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -590,50 +648,6 @@ export default function MyStar() {
             새 소원 만들기
           </button>
         </div>
-      </div>
-    </div>
-  );
-}
-
-// ── 마일스톤 진행바 ─────────────────────────────────────────
-function MilestoneBar({ daysSinceBirth }) {
-  const MILESTONES = [1, 7, 30, 100, 365];
-  return (
-    <div className="mb-5">
-      <p style={{ color: 'rgba(232,228,217,0.5)', fontSize: 11, marginBottom: 10, paddingLeft: 4 }}>
-        항해 여정
-      </p>
-      <div style={{ display: 'flex', alignItems: 'flex-start', padding: '0 4px' }}>
-        {MILESTONES.map((day, i) => {
-          const reached = daysSinceBirth >= day;
-          const isLast  = i === MILESTONES.length - 1;
-          return (
-            <div key={day} style={{ display: 'flex', alignItems: 'center', flex: isLast ? 'none' : 1 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div style={{
-                  width: 16, height: 16, borderRadius: '50%',
-                  background: reached ? '#FFD76A' : 'transparent',
-                  border: `2px solid ${reached ? '#FFD76A' : 'rgba(255,255,255,0.15)'}`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  {reached && <span style={{ fontSize: 8, color: '#0a0e1a', fontWeight: 700 }}>✓</span>}
-                </div>
-                <span style={{
-                  fontSize: 9, marginTop: 4,
-                  color: reached ? 'rgba(255,215,106,0.7)' : 'rgba(255,255,255,0.2)',
-                }}>
-                  D+{day}
-                </span>
-              </div>
-              {!isLast && (
-                <div style={{
-                  flex: 1, height: 1, marginBottom: 14,
-                  background: reached ? 'rgba(255,215,106,0.4)' : 'rgba(255,255,255,0.1)',
-                }} />
-              )}
-            </div>
-          );
-        })}
       </div>
     </div>
   );

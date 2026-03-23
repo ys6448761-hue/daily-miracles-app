@@ -201,6 +201,13 @@ export async function getGiftCard(starId) {
   return res.json();
 }
 
+// GET /api/dt/stars/:id/detail — 공개 별 상세 (닉네임/마일스톤/항해로그/Aurora5 포함)
+export async function getStarDetail(starId) {
+  const res = await fetch(`${BASE}/stars/${starId}/detail`);
+  if (!res.ok) throw new Error('별 상세 조회 실패');
+  return res.json();
+}
+
 // Prototype용 임시 user ID (로컬 스토리지 기반)
 export function getOrCreateUserId() {
   const key = 'dt_user_id';
