@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message } from '../api/dreamtown.js';
+import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message, getTodaySchedule } from '../api/dreamtown.js';
 import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
 import { sharePostcard } from '../utils/kakaoShare';
@@ -144,6 +144,9 @@ export default function MyStar() {
   const [growthText, setGrowthText] = useState('');
   const [growthSaved, setGrowthSaved] = useState(false);
 
+  // 오늘의 Aurora5 스케줄
+  const [todaySchedule, setTodaySchedule] = useState(null);
+
   // 선물하기 상태
   const [showGift, setShowGift] = useState(false);
   const [giftCopyType, setGiftCopyType] = useState(null);
@@ -182,6 +185,11 @@ export default function MyStar() {
           setGrowthText(saved);
           setGrowthSaved(true);
         }
+
+        // 오늘의 Aurora5 스케줄 조회
+        getTodaySchedule(data.star_id)
+          .then(r => setTodaySchedule(r.schedule ?? null))
+          .catch(() => setTodaySchedule(null));
 
         // Aurora5 메시지 저장 — 세션당 1회 fire-and-forget
         const aurora5Key = `dt_aurora5_saved_${data.star_id}_${new Date().toISOString().slice(0, 10)}`;
@@ -434,9 +442,11 @@ export default function MyStar() {
 
       {/* ✨ Aurora5 */}
       <div className="border border-white/8 rounded-2xl p-4 mb-4">
-        <p className="text-white/25 text-xs mb-2">✨ Aurora5</p>
+        <p className="text-white/25 text-xs mb-2">
+          ✨ Aurora5{todaySchedule ? ` · D+${todaySchedule.day_number}` : ''}
+        </p>
         <p className="text-white/55 text-sm leading-relaxed whitespace-pre-line">
-          {getAurora5Message(star.galaxy?.code, daysSinceBirth)}
+          {todaySchedule?.message_text ?? getAurora5Message(star.galaxy?.code, daysSinceBirth)}
         </p>
       </div>
 

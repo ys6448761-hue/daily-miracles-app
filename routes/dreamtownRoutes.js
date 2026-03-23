@@ -14,6 +14,7 @@ const db = require('../database/db');
 const { classifyWish, notifyRedSignal } = require('../services/safetyFilter');
 const { emitKpiEvent, KPI_EVENTS, isConnectionCompleted, hasResonanceReceived } = require('../services/kpiEventEmitter');
 const { sendSensSMS } = require('../services/messageProvider');
+const { buildScheduleItems } = require('../services/voyageScheduleMessages');
 
 // ── 별 이름 자동 생성 (인디언 작명법, AI 없음) ──────────────────────
 // 형식: [자연어] + [을/를] + [행동어] + 별  (50 × 40 = 2000 조합)
@@ -202,7 +203,7 @@ router.post('/stars/create', async (req, res) => {
       `INSERT INTO dt_stars
          (user_id, wish_id, star_seed_id, star_name, star_slug, galaxy_id, star_stage, is_hidden)
        VALUES ($1, $2, $3, $4, $5, $6, 'day1', $7)
-       RETURNING id, star_name, star_slug, star_stage`,
+       RETURNING id, star_name, star_slug, star_stage, created_at`,
       [user_id, wish_id, seed.id, starName, starSlug, galaxy.id, isHidden]
     );
     const star = starResult.rows[0];
@@ -246,6 +247,19 @@ router.post('/stars/create', async (req, res) => {
       }
     }
 
+    // ── D+1~7 항해 스케줄 자동 생성 (fire-and-forget) ───────────
+    const scheduleItems = buildScheduleItems(galaxyCode);
+    Promise.all(scheduleItems.map(item =>
+      db.query(
+        `INSERT INTO dt_voyage_schedule
+           (star_id, user_id, phone_number, day_number, message_text, wisdom_tag, scheduled_at)
+         VALUES ($1, $2, $3, $4, $5, $6,
+           ((($7::timestamptz AT TIME ZONE 'Asia/Seoul')::date + ($4 * INTERVAL '1 day') + INTERVAL '8 hours') AT TIME ZONE 'Asia/Seoul'))
+         ON CONFLICT (star_id, day_number) DO NOTHING`,
+        [star.id, user_id, phone_number ?? null, item.dayNumber, item.message, item.tag, star.created_at]
+      ).catch(e => console.error('[DT] voyage schedule insert 실패 day', item.dayNumber, e.message))
+    )).catch(() => {});
+
     // ── KPI: star_created (서버 사이드 emit) ────────────────────
     emitKpiEvent({
       eventName:  KPI_EVENTS.STAR_CREATED,
@@ -279,16 +293,18 @@ router.post('/stars/create', async (req, res) => {
 // ─────────────────────────────────────────────
 router.get('/stars/recent', async (req, res) => {
   try {
-    const limit = Math.min(parseInt(req.query.limit ?? '20', 10), 50);
+    const limit = Math.min(parseInt(req.query.limit ?? '20', 10), 100);
+    const galaxy = req.query.galaxy ?? null; // 은하 필터 (optional)
     const result = await db.query(
       `SELECT s.id AS star_id, s.star_name, s.star_stage, s.created_at,
               g.code AS galaxy_code, g.name_ko AS galaxy_name_ko
          FROM dt_stars s
          JOIN dt_galaxies g ON g.id = s.galaxy_id
         WHERE s.is_hidden = FALSE
+          AND ($2::text IS NULL OR g.code = $2)
         ORDER BY s.created_at DESC
         LIMIT $1`,
-      [limit]
+      [limit, galaxy]
     );
     res.json({ stars: result.rows });
   } catch (err) {
@@ -338,8 +354,8 @@ router.get('/stars/:id', async (req, res) => {
          g.code            AS galaxy_code,
          g.name_ko         AS galaxy_name_ko
        FROM dt_stars s
-       JOIN dt_wishes   w ON w.id = s.wish_id
-       JOIN dt_galaxies g ON g.id = s.galaxy_id
+       LEFT JOIN dt_wishes   w ON w.id = s.wish_id
+       JOIN      dt_galaxies g ON g.id = s.galaxy_id
        WHERE s.id = $1`,
       [id]
     );
@@ -775,6 +791,90 @@ router.get('/gift/:star_id', async (req, res) => {
     });
   } catch (err) {
     console.error('[DT] GET /gift/:star_id error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
+// GET /api/dt/stars/:id/today-schedule
+// 오늘(KST) 해당하는 Aurora5 스케줄 메시지 반환
+// ─────────────────────────────────────────────
+router.get('/stars/:id/today-schedule', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rows } = await db.query(
+      `SELECT day_number, message_text, wisdom_tag, scheduled_at
+         FROM dt_voyage_schedule
+        WHERE star_id = $1
+          AND DATE(scheduled_at AT TIME ZONE 'Asia/Seoul')
+              = (NOW() AT TIME ZONE 'Asia/Seoul')::date
+        ORDER BY day_number
+        LIMIT 1`,
+      [id]
+    );
+    const schedule = rows[0] ?? null;
+
+    // 앱 표시 마킹 (fire-and-forget)
+    if (schedule) {
+      db.query(
+        `UPDATE dt_voyage_schedule SET is_shown_in_app = TRUE
+          WHERE star_id = $1 AND day_number = $2`,
+        [id, schedule.day_number]
+      ).catch(() => {});
+    }
+
+    res.json({ schedule });
+  } catch (err) {
+    console.error('[DT] GET /stars/:id/today-schedule error:', err.message);
+    // 테이블 미존재 등 — graceful fallback
+    res.json({ schedule: null });
+  }
+});
+
+// ─────────────────────────────────────────────
+// POST /api/dt/admin/backfill-voyage-schedules
+// 기존 별 소급 적용 — dt_voyage_schedule 없는 별 조회 후 미래 일차만 생성
+// ─────────────────────────────────────────────
+router.post('/admin/backfill-voyage-schedules', async (req, res) => {
+  try {
+    // dt_voyage_schedule이 아예 없는 별만 대상
+    const { rows: stars } = await db.query(
+      `SELECT s.id, s.user_id, s.created_at, g.code AS galaxy_code
+         FROM dt_stars s
+         JOIN dt_galaxies g ON g.id = s.galaxy_id
+        WHERE NOT EXISTS (
+          SELECT 1 FROM dt_voyage_schedule vs WHERE vs.star_id = s.id
+        )
+        LIMIT 200`
+    );
+
+    let created = 0;
+    let skipped = 0;
+
+    for (const star of stars) {
+      const items = buildScheduleItems(star.galaxy_code);
+      for (const item of items) {
+        // 이미 지난 일차 스킵
+        const scheduledAt = new Date(star.created_at);
+        scheduledAt.setDate(scheduledAt.getDate() + item.dayNumber);
+        // 대략적인 미래 체크 (정확한 KST 계산은 DB에서 처리)
+        if (scheduledAt < new Date()) { skipped++; continue; }
+
+        await db.query(
+          `INSERT INTO dt_voyage_schedule
+             (star_id, user_id, day_number, message_text, wisdom_tag, scheduled_at)
+           VALUES ($1, $2, $3, $4, $5,
+             ((($6::timestamptz AT TIME ZONE 'Asia/Seoul')::date + ($3 * INTERVAL '1 day') + INTERVAL '8 hours') AT TIME ZONE 'Asia/Seoul'))
+           ON CONFLICT (star_id, day_number) DO NOTHING`,
+          [star.id, star.user_id, item.dayNumber, item.message, item.tag, star.created_at]
+        ).catch(() => {});
+        created++;
+      }
+    }
+
+    res.json({ ok: true, stars_processed: stars.length, schedules_created: created, skipped });
+  } catch (err) {
+    console.error('[DT] POST /admin/backfill-voyage-schedules error:', err.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

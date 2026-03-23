@@ -49,8 +49,10 @@ export async function getTodayStars() {
   return res.json();
 }
 
-export async function getRecentStars(limit = 13) {
-  const res = await fetch(`${BASE}/stars/recent?limit=${limit}`);
+export async function getRecentStars(limit = 20, galaxy = null) {
+  const params = new URLSearchParams({ limit });
+  if (galaxy) params.set('galaxy', galaxy);
+  const res = await fetch(`${BASE}/stars/recent?${params}`);
   if (!res.ok) throw new Error('광장 별 목록 조회 실패');
   return res.json();
 }
@@ -134,6 +136,13 @@ export async function postVoyageLog(starId, { emotion, tag, growth, source = 'vo
 export async function getVoyageLogs(starId) {
   const res = await fetch(`${BASE}/stars/${starId}/voyage-logs`);
   if (!res.ok) throw new Error('항해 로그 조회 실패');
+  return res.json();
+}
+
+// GET /api/dt/stars/:id/today-schedule — 오늘의 Aurora5 스케줄 메시지
+export async function getTodaySchedule(starId) {
+  const res = await fetch(`${BASE}/stars/${starId}/today-schedule`);
+  if (!res.ok) return { schedule: null };
   return res.json();
 }
 
