@@ -17,13 +17,29 @@ const { classifyWish, notifyRedSignal } = require('../services/safetyFilter');
 
 // ── 044 startup migration (기적 은하 추가) — PostgreSQL 환경에서만 실행 ──
 if (process.env.DATABASE_URL) {
-  const sql044 = fs.readFileSync(
-    path.join(__dirname, '..', 'database', 'migrations', '044_add_miracle_galaxy.sql'),
-    'utf8'
-  );
-  db.query(sql044)
-    .then(() => console.log('[Migration] 044_add_miracle_galaxy 완료'))
-    .catch(err => console.log('[Migration] 044 이미 적용됨 또는 skip:', err.message));
+  try {
+    const INSERT_MIRACLE = `
+      INSERT INTO dt_galaxies (code, name_ko, name_en, direction, description, sort_order)
+      VALUES ('miracle','기적 은하','Miracle Galaxy','중심','하나의 은하에 담기지 않는 가장 순수하고 간절한 소원',5)
+      ON CONFLICT (code) DO NOTHING;
+    `;
+    const UPDATE_DIAMOND = `
+      UPDATE dt_stars
+      SET galaxy_id = (SELECT id FROM dt_galaxies WHERE code = 'miracle')
+      WHERE galaxy_id = (SELECT id FROM dt_galaxies WHERE code = 'growth')
+        AND id IN (
+          SELECT s.id FROM dt_stars s
+          JOIN dt_wishes w ON s.wish_id = w.id
+          WHERE w.gem_type = 'diamond'
+        );
+    `;
+    db.query(INSERT_MIRACLE)
+      .then(() => db.query(UPDATE_DIAMOND))
+      .then(() => console.log('[Migration] 044_add_miracle_galaxy 완료'))
+      .catch(err => console.log('[Migration] 044 스킵:', err.message));
+  } catch (err) {
+    console.log('[Migration] 044 초기화 실패 (서버 계속 실행):', err.message);
+  }
 }
 const { emitKpiEvent, KPI_EVENTS, isConnectionCompleted, hasResonanceReceived } = require('../services/kpiEventEmitter');
 const { sendSensSMS } = require('../services/messageProvider');
