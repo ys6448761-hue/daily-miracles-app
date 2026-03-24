@@ -4,11 +4,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { postWish, postStarCreate, getOrCreateUserId } from '../api/dreamtown.js';
 
 const GEMS = [
-  { type: 'ruby',     label: '루비',     emoji: '🔴', desc: '열정과 도전' },
-  { type: 'sapphire', label: '사파이어', emoji: '🔵', desc: '지혜와 성장' },
-  { type: 'emerald',  label: '에메랄드', emoji: '🟢', desc: '치유와 회복' },
-  { type: 'diamond',  label: '다이아몬드',emoji: '💎', desc: '결단과 변화' },
-  { type: 'citrine',  label: '시트린',   emoji: '🟡', desc: '긍정과 관계' },
+  { type: 'ruby',     label: '루비',      emoji: '🔴', galaxy: '도전 은하',    detail: '용기를 내어 앞으로 나아가려는 마음이에요' },
+  { type: 'sapphire', label: '사파이어',  emoji: '🔵', galaxy: '성장 은하',    detail: '더 나은 나를 향해 배우고 싶은 마음이에요' },
+  { type: 'emerald',  label: '에메랄드',  emoji: '🟢', galaxy: '치유 은하',    detail: '마음의 상처를 보듬고 쉬어가고 싶은 마음이에요' },
+  { type: 'diamond',  label: '다이아몬드',emoji: '💎', galaxy: '기적 은하 ✨',  detail: '하나의 은하에 담기지 않는\n가장 순수하고 간절한 소원이에요' },
+  { type: 'citrine',  label: '시트린',    emoji: '🟡', galaxy: '관계 은하',    detail: '소중한 관계를 더 깊게 이어가고 싶은 마음이에요' },
 ];
 
 export default function WishGate() {
@@ -110,11 +110,15 @@ export default function WishGate() {
             </button>
           ))}
         </div>
-        {gemType && (
-          <p className="text-star-gold text-xs text-center mt-2">
-            {GEMS.find(g => g.type === gemType)?.desc}
-          </p>
-        )}
+        {gemType && (() => {
+          const gem = GEMS.find(g => g.type === gemType);
+          return (
+            <div className="text-center mt-2">
+              <p className="text-star-gold text-xs font-medium">{gem?.galaxy}</p>
+              <p className="text-white/50 text-xs mt-1 whitespace-pre-line">{gem?.detail}</p>
+            </div>
+          );
+        })()}
       </motion.div>
 
       {/* RED 신호 케어 메시지 */}
