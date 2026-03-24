@@ -11,8 +11,6 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
-const fs = require('fs');
-const path = require('path');
 const { classifyWish, notifyRedSignal } = require('../services/safetyFilter');
 
 // ── 044 startup migration (기적 은하 추가) — PostgreSQL 환경에서만 실행 ──
@@ -115,7 +113,7 @@ const GEM_GALAXY_MAP = {
   ruby:      'challenge',
   sapphire:  'growth',
   emerald:   'healing',
-  diamond:   'growth',
+  diamond:   'miracle',
   citrine:   'relationship',
 };
 
