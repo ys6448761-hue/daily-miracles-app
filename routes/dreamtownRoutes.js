@@ -11,7 +11,20 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
+const fs = require('fs');
+const path = require('path');
 const { classifyWish, notifyRedSignal } = require('../services/safetyFilter');
+
+// ── 044 startup migration (기적 은하 추가) — PostgreSQL 환경에서만 실행 ──
+if (process.env.DATABASE_URL) {
+  const sql044 = fs.readFileSync(
+    path.join(__dirname, '..', 'database', 'migrations', '044_add_miracle_galaxy.sql'),
+    'utf8'
+  );
+  db.query(sql044)
+    .then(() => console.log('[Migration] 044_add_miracle_galaxy 완료'))
+    .catch(err => console.log('[Migration] 044 이미 적용됨 또는 skip:', err.message));
+}
 const { emitKpiEvent, KPI_EVENTS, isConnectionCompleted, hasResonanceReceived } = require('../services/kpiEventEmitter');
 const { sendSensSMS } = require('../services/messageProvider');
 const { buildScheduleItems } = require('../services/voyageScheduleMessages');
