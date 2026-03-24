@@ -68,7 +68,7 @@ export default function WishGate() {
         <textarea
           value={wishText}
           onChange={e => setWishText(e.target.value)}
-          placeholder="예) 사람이 되고 싶어요&#10;부모님이 오래 건강하셨으면 좋겠어요"
+          placeholder="내 작은 카페를 열고 싶어요&#10;매일 조금씩 나를 사랑하고 싶어요"
           maxLength={200}
           className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white placeholder-white/30 resize-none h-36 focus:outline-none focus:border-dream-purple transition-colors"
         />
@@ -136,6 +136,11 @@ export default function WishGate() {
         </div>
       )}
 
+      {/* 아우룸 문구 */}
+      <p style={{ textAlign: 'center', fontSize: '13px', color: 'rgba(255,215,106,0.7)', marginBottom: '16px' }}>
+        ✦ 아우룸이 당신의 소원을 별로 만들어 드릴게요
+      </p>
+
       {/* 전화번호 (선택) — 탄생 축하 SMS 수신용 */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -152,11 +157,6 @@ export default function WishGate() {
           className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white/80 placeholder-white/25 text-sm focus:outline-none focus:border-dream-purple/50 transition-colors"
         />
       </motion.div>
-
-      {/* 아우룸 문구 */}
-      <p style={{ textAlign: 'center', fontSize: '13px', color: 'rgba(255,215,106,0.7)', marginBottom: '12px' }}>
-        ✦ 아우룸이 당신의 소원을 별로 만들어 드릴게요
-      </p>
 
       {/* CTA */}
       <motion.button
