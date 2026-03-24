@@ -7,6 +7,7 @@ const GALAXY_STYLE = {
   challenge:    { label: '도전 은하', cls: 'bg-orange-500/20 text-orange-300' },
   healing:      { label: '치유 은하', cls: 'bg-green-500/20 text-green-300' },
   relationship: { label: '관계 은하', cls: 'bg-pink-500/20 text-pink-300' },
+  miracle:      { label: '기적 은하', cls: 'bg-yellow-500/20 text-yellow-300' },
 };
 
 const FILTERS = [
@@ -15,6 +16,7 @@ const FILTERS = [
   { key: 'challenge',    label: '도전' },
   { key: 'healing',      label: '치유' },
   { key: 'relationship', label: '관계' },
+  { key: 'miracle',      label: '기적 ✨' },
 ];
 
 function calcDaysSinceBirth(createdAt) {
