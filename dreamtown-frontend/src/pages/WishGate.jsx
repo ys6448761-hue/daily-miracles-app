@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { postWish, postStarCreate, getOrCreateUserId } from '../api/dreamtown.js';
 
 const GEMS = [
@@ -13,7 +13,18 @@ const GEMS = [
 
 export default function WishGate() {
   const nav = useNavigate();
+  const location = useLocation();
   const [wishText, setWishText] = useState('');
+
+  // 기존 별 있으면 my-star로 리다이렉트 (from=mystar인 경우 제외)
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const fromMystar = searchParams.get('from') === 'mystar';
+    const existingStar = localStorage.getItem('dt_star_id');
+    if (existingStar && !fromMystar) {
+      nav('/my-star/' + existingStar, { replace: true });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [gemType, setGemType] = useState('sapphire');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [loading, setLoading] = useState(false);
