@@ -1,5 +1,34 @@
 markdown# CLAUDE.md — daily-miracles-mvp
 
+## ⚠️ 프로젝트 구조 (반드시 먼저 읽을 것)
+
+이 프로젝트는 Next.js가 아닙니다.
+React + Vite + Express 구조입니다.
+
+### DreamTown 프론트엔드
+경로: `dreamtown-frontend/src/`
+라우터: React Router v6
+주요 파일:
+- `Home.jsx`           ← 홈 + 광장
+- `MyStar.jsx`         ← 내 별
+- `StarDetail.jsx`     ← 별 상세 + 공명
+- `StarBirth.jsx`      ← 별 탄생 축하
+- `WishGate.jsx`       ← 소원 입력
+- `DreamTownIntro.jsx` ← 인트로 3씬
+- `AllStars.jsx`       ← 전체 별 목록
+
+### 백엔드
+경로: `routes/dreamtown*.js`
+API prefix: `/api/dt/`
+
+### 절대 착각 금지
+- Next.js App Router 구조 아님
+- `pages/` 폴더 없음
+- `app/` 폴더 없음
+- React Router가 라우팅 담당
+
+---
+
 ## ⚡ 세션 시작 시 필수
 - 현황: `DREAMTOWN_STATUS.md` (루트)
 - 마스터: `docs/00-master/aurora5-master-knowledge-v2.md`
