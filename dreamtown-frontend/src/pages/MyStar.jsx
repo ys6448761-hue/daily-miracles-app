@@ -559,6 +559,39 @@ export default function MyStar() {
         </p>
       </div>
 
+      {/* ✨ 공명 상세 — 1회 이상일 때만 노출 */}
+      {stats?.resonance_breakdown?.total >= 1 && (() => {
+        const bd = stats.resonance_breakdown;
+        const rows = [
+          { label: '좀 편해졌어요',      count: bd.comfortable },
+          { label: '좀 용기났어요',      count: bd.courage },
+          { label: '좀 정리됐어요',      count: bd.clarity },
+          { label: '좀 믿고 싶어졌어요', count: bd.trust },
+        ];
+        return (
+          <div style={{
+            background: 'rgba(255,215,106,0.06)',
+            border: '1px solid rgba(255,215,106,0.15)',
+            borderRadius: 16,
+            padding: '16px',
+            marginBottom: 16,
+          }}>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 12 }}>
+              ✨ 당신의 별에 닿은 마음들
+            </p>
+            {rows.map(({ label, count }) => count > 0 && (
+              <div key={label} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>{label}</span>
+                <span style={{ fontSize: 13, color: '#FFD76A' }}>{count}명</span>
+              </div>
+            ))}
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', textAlign: 'center', marginTop: 10 }}>
+              &ldquo;{bd.total}명의 마음이 이 별에 닿았어요 ✨&rdquo;
+            </p>
+          </div>
+        );
+      })()}
+
       {/* CTA */}
       <div className="flex flex-col gap-3 mt-6">
         {/* PRIMARY — 소원별 이어가기 */}

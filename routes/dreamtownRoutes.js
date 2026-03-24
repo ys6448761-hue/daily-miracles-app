@@ -948,17 +948,32 @@ router.get('/stars/:id/stats', async (req, res) => {
       ? changeScoreHistory[changeScoreHistory.length - 1].score
       : 50;
 
-    // 3. 공명 수 (resonance 테이블 — star_id TEXT)
+    // 3. 공명 수 + 타입별 breakdown (resonance 테이블 — star_id TEXT)
     let resonanceCount = 0;
     let resonanceUsersCount = 0;
+    let resonanceBreakdown = { comfortable: 0, courage: 0, clarity: 0, trust: 0, total: 0 };
     try {
       const resRow = await db.query(
-        `SELECT COUNT(*) AS total, COUNT(DISTINCT user_id) AS users
-           FROM resonance WHERE star_id = $1::text`,
+        `SELECT
+           COUNT(*) AS total,
+           COUNT(DISTINCT user_id) AS users,
+           COUNT(*) FILTER (WHERE resonance_type = 'relief')  AS comfortable,
+           COUNT(*) FILTER (WHERE resonance_type = 'courage') AS courage,
+           COUNT(*) FILTER (WHERE resonance_type = 'clarity') AS clarity,
+           COUNT(*) FILTER (WHERE resonance_type = 'belief')  AS trust
+         FROM resonance WHERE star_id = $1::text`,
         [id]
       );
-      resonanceCount      = parseInt(resRow.rows[0]?.total ?? 0, 10);
-      resonanceUsersCount = parseInt(resRow.rows[0]?.users ?? 0, 10);
+      const r = resRow.rows[0] ?? {};
+      resonanceCount      = parseInt(r.total        ?? 0, 10);
+      resonanceUsersCount = parseInt(r.users        ?? 0, 10);
+      resonanceBreakdown  = {
+        comfortable: parseInt(r.comfortable ?? 0, 10),
+        courage:     parseInt(r.courage     ?? 0, 10),
+        clarity:     parseInt(r.clarity     ?? 0, 10),
+        trust:       parseInt(r.trust       ?? 0, 10),
+        total:       parseInt(r.total       ?? 0, 10),
+      };
     } catch (_) { /* resonance 테이블 없는 환경 graceful */ }
 
     // 4. 마일스톤 상태
@@ -975,6 +990,7 @@ router.get('/stars/:id/stats', async (req, res) => {
       change_score_history:  changeScoreHistory,
       resonance_count:       resonanceCount,
       resonance_users_count: resonanceUsersCount,
+      resonance_breakdown:   resonanceBreakdown,
       milestone_status:      milestoneStatus,
     });
   } catch (err) {
