@@ -152,7 +152,7 @@ export default function MyStar() {
   const [stats, setStats] = useState(null);
 
   // 닉네임
-  const [nickname, setNickname] = useState('');
+  const [nickname, setNickname] = useState('소원이');
 
   // 선물하기 상태
   const [showGift, setShowGift] = useState(false);
@@ -561,18 +561,18 @@ export default function MyStar() {
 
       {/* CTA */}
       <div className="flex flex-col gap-3 mt-6">
-        {/* PRIMARY — 이 별 이어가기 (오늘 완료 시 안내 표시) */}
-        {doneTodayFlag ? (
+        {/* PRIMARY — 소원별 이어가기 */}
+        <button
+          onClick={() => nav(`/dreamtown/wish?from=mystar&star_id=${star.star_id}`)}
+          className="w-full bg-dream-purple hover:bg-purple-500 text-white font-bold py-4 rounded-2xl transition-colors"
+        >
+          소원별 이어가기 ✨
+        </button>
+        {/* 오늘 완료 시 안내 표시 */}
+        {doneTodayFlag && (
           <div className="w-full bg-white/5 border border-white/10 text-white/40 text-sm font-medium py-4 rounded-2xl text-center">
             오늘 항해는 완료했어요 ✦
           </div>
-        ) : (
-          <button
-            onClick={() => nav(`/wish?from=gift&star_id=${star.star_id}`)}
-            className="w-full bg-dream-purple hover:bg-purple-500 text-white font-bold py-4 rounded-2xl transition-colors"
-          >
-            소원별 이어가기 ✨
-          </button>
         )}
         <button
           onClick={() => sharePostcard({
