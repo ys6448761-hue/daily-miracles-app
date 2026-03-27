@@ -15,13 +15,26 @@ export default function WishGate() {
   const nav = useNavigate();
   const location = useLocation();
   const [wishText, setWishText] = useState('');
+  const prevStarId = localStorage.getItem('dt_prev_star_id');
 
-  // 기존 별 있으면 my-star로 리다이렉트 (from=mystar인 경우 제외)
+  function handleCancel() {
+    if (prevStarId) {
+      localStorage.setItem('dt_star_id', prevStarId);
+      localStorage.removeItem('dt_prev_star_id');
+      window.location.href = window.location.origin + '/my-star/' + prevStarId;
+    } else {
+      nav('/home');
+    }
+  }
+
+  // 기존 별 있으면 my-star로 리다이렉트
+  // 예외: from=mystar (이어가기/새 소원) 또는 new=1 (새 소원 만들기)
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
+    const searchParams = new URLSearchParams(window.location.search);
     const fromMystar = searchParams.get('from') === 'mystar';
+    const isNew = searchParams.get('new') === '1';
     const existingStar = localStorage.getItem('dt_star_id');
-    if (existingStar && !fromMystar) {
+    if (existingStar && !fromMystar && !isNew) {
       nav('/my-star/' + existingStar, { replace: true });
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -48,6 +61,7 @@ export default function WishGate() {
 
       const star = await postStarCreate({ wishId: wishResult.wish_id, userId, phoneNumber: phoneNumber.trim() || null });
       localStorage.setItem('dt_star_id', star.star_id);
+      localStorage.removeItem('dt_prev_star_id');
       nav('/star-birth', { state: { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy, gemType } });
     } catch (e) {
       setError(e.message);
@@ -59,15 +73,17 @@ export default function WishGate() {
   return (
     <div className="min-h-screen flex flex-col px-6 py-10">
       {/* 헤더 */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-8"
-      >
-        <p className="text-white/50 text-xs mb-1">Wish Gate</p>
-        <h1 className="text-2xl font-bold text-white">소원을 말씀해주세요</h1>
-        <p className="text-white/50 text-sm mt-1">당신의 소원은 혼자가 아닙니다.</p>
-      </motion.div>
+      <div className="flex items-center justify-between mb-8">
+        <button onClick={handleCancel} className="text-white/40 hover:text-white/70 text-sm">
+          ← {prevStarId ? '내 별로' : '뒤로'}
+        </button>
+        <div className="text-center">
+          <p className="text-white/50 text-xs mb-1">Wish Gate</p>
+          <h1 className="text-2xl font-bold text-white">소원을 말씀해주세요</h1>
+          <p className="text-white/50 text-sm mt-1">당신의 소원은 혼자가 아닙니다.</p>
+        </div>
+        <div className="w-12" />
+      </div>
 
       {/* 소원 입력 */}
       <motion.div

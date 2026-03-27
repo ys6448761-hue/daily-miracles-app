@@ -596,7 +596,7 @@ export default function MyStar() {
       <div className="flex flex-col gap-3 mt-6">
         {/* PRIMARY — 소원별 이어가기 */}
         <button
-          onClick={() => nav(`/dreamtown/wish?from=mystar&star_id=${star.star_id}`)}
+          onClick={() => nav(`/wish?from=mystar&star_id=${star.star_id}`)}
           className="w-full bg-dream-purple hover:bg-purple-500 text-white font-bold py-4 rounded-2xl transition-colors"
         >
           소원별 이어가기 ✨
@@ -691,7 +691,15 @@ export default function MyStar() {
             광장으로 가기
           </button>
           <button
-            onClick={() => nav('/wish')}
+            onClick={() => {
+              const existingStarId = localStorage.getItem('dt_star_id');
+              if (existingStarId) {
+                localStorage.setItem('dt_prev_star_id', existingStarId);
+              }
+              localStorage.removeItem('dt_star_id');
+              localStorage.removeItem('dt_current_star');
+              window.location.href = window.location.origin + '/wish';
+            }}
             className="flex-1 bg-white/5 border border-white/10 text-white/60 font-semibold py-4 rounded-2xl hover:bg-white/10 transition-colors"
           >
             새 소원 만들기
