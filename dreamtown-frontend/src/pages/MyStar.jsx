@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Navigate } from 'react-router-dom';
 import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message, getTodaySchedule, getStarStats, getStarDetail } from '../api/dreamtown.js';
 import { saveStarId, clearStarId, readSavedStar } from '../lib/utils/starSession.js';
 import MilestoneBar from '../components/MilestoneBar';
@@ -133,6 +133,12 @@ const GROWTH_STORAGE_KEY = (starId) => `dt_growth_reflection_${starId}`;
 
 export default function MyStar() {
   const { id } = useParams();
+  const myStarId = readSavedStar();
+
+  if (!myStarId || myStarId !== id) {
+    return <Navigate to="/dreamtown" replace />;
+  }
+
   const nav = useNavigate();
   const [star, setStar] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -160,14 +166,6 @@ export default function MyStar() {
   const [giftCopyType, setGiftCopyType] = useState(null);
   const [giftPosting, setGiftPosting] = useState(false);
   const [giftDone, setGiftDone] = useState(false);
-
-  useEffect(() => {
-    const myStarId = readSavedStar();
-    if (!myStarId || myStarId !== id) {
-      nav('/dreamtown', { replace: true });
-      return;
-    }
-  }, [id, nav]);
 
   useEffect(() => {
     getStar(id)
