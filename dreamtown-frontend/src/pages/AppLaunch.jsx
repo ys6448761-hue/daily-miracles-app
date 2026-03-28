@@ -9,6 +9,18 @@ export default function AppLaunch() {
   const [showIntro, setShowIntro] = useState(false);
 
   useEffect(() => {
+    // 🔒 공개 경로 가드 — /dreamtown 또는 ?entry=invite 에서는 자동 복귀 절대 금지
+    const pathname = window.location.pathname.replace(/\/+/g, '/');
+    const isPublicEntry =
+      pathname === '/dreamtown' ||
+      new URLSearchParams(window.location.search).get('entry') === 'invite';
+
+    if (isPublicEntry) {
+      // 공개 입구: 저장된 별 무시, DreamTown으로 이동
+      nav('/dreamtown', { replace: true });
+      return;
+    }
+
     const starId = localStorage.getItem('dt_star_id');
     if (starId) {
       // 재방문: 즉시 My Star로
