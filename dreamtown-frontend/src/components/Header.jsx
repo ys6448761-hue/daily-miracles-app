@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
+import { readSavedStar } from '../lib/utils/starSession.js';
 
 // 공개 경로 — "내 별" 버튼 숨김 (star auto-load 차단)
 const PUBLIC_ROUTES = ['/dreamtown', '/my-star'];
@@ -12,7 +13,7 @@ export default function Header() {
   );
 
   function goToMyStar() {
-    const starId = localStorage.getItem('dt_active_star_id');
+    const starId = readSavedStar();
     if (starId) {
       navigate(`/my-star/${starId}`);
     } else {

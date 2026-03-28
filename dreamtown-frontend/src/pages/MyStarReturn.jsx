@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { readSavedStar } from '../lib/utils/starSession.js';
 
 /**
  * /my-star — 개인 복귀 진입점 (Personal Return)
@@ -15,7 +16,7 @@ export default function MyStarReturn() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('dt_active_star_id');
+    const saved = readSavedStar();
     if (!saved) {
       navigate('/dreamtown', { replace: true });
       return;

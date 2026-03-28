@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { readSavedStar } from '../lib/utils/starSession.js';
 
 /**
  * /dreamtown — 공개 입구 (Public Entry)
@@ -21,7 +22,7 @@ export default function DreamTown() {
   useEffect(() => {
     if (!forcePublicEntry) return;
     // 자동 복귀 없음 — 존재 여부만 확인해서 복귀 버튼 노출 여부 결정
-    const saved = localStorage.getItem('dt_active_star_id');
+    const saved = readSavedStar();
     if (saved) setHasExistingStar(true);
   }, [forcePublicEntry]);
 
