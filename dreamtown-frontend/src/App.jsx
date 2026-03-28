@@ -15,6 +15,14 @@ import StarDetail from './pages/StarDetail.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import GiftLanding from './pages/GiftLanding.jsx';
 import AllStars from './pages/AllStars.jsx';
+import DreamTown from './pages/DreamTown.jsx';
+import MyStarReturn from './pages/MyStarReturn.jsx';
+
+// 중복 슬래시 정규화 (//dreamtown → /dreamtown)
+if (window.location.pathname.startsWith('//')) {
+  const normalized = window.location.pathname.replace(/\/+/g, '/');
+  window.history.replaceState({}, '', normalized + window.location.search);
+}
 
 export default function App() {
   return (
@@ -25,6 +33,7 @@ export default function App() {
           <Route path="/intro"       element={<Intro />} />
           <Route path="/wish"        element={<WishGate />} />
           <Route path="/star-birth"  element={<StarBirth />} />
+          <Route path="/my-star"     element={<MyStarReturn />} />
           <Route path="/my-star/:id" element={<MyStar />} />
           <Route path="/star/:id"    element={<StarDetail />} />
           <Route path="/galaxy"      element={<Galaxy />} />
@@ -34,6 +43,7 @@ export default function App() {
           <Route path="/star"        element={<Star />} />
           <Route path="/postcard"    element={<Postcard />} />
           <Route path="/home"        element={<Home />} />
+          <Route path="/dreamtown"               element={<DreamTown />} />
           <Route path="/dashboard"               element={<DashboardPage />} />
           <Route path="/stars"                   element={<AllStars />} />
           <Route path="/dreamtown/gift/:star_id" element={<GiftLanding />} />
