@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { getRecentStars, getStar } from '../api/dreamtown.js';
+import { readSavedStar } from '../lib/utils/starSession.js';
 
 const GALAXY_STYLE = {
   growth:       { label: '성장 은하', cls: 'bg-blue-500/20 text-blue-300' },
@@ -81,7 +82,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [myStarData, setMyStarData] = useState(null);
 
-  const myStarId = localStorage.getItem('dt_star_id');
+  const myStarId = readSavedStar();
 
   useEffect(() => {
     const recentPromise = getRecentStars(20)

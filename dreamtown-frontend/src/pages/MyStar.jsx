@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message, getTodaySchedule, getStarStats, getStarDetail } from '../api/dreamtown.js';
+import { saveStarId, clearStarId } from '../lib/utils/starSession.js';
 import MilestoneBar from '../components/MilestoneBar';
 import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
@@ -692,11 +693,11 @@ export default function MyStar() {
           </button>
           <button
             onClick={() => {
-              const existingStarId = localStorage.getItem('dt_star_id');
+              const existingStarId = localStorage.getItem('dt_active_star_id');
               if (existingStarId) {
                 localStorage.setItem('dt_prev_star_id', existingStarId);
               }
-              localStorage.removeItem('dt_star_id');
+              clearStarId();
               localStorage.removeItem('dt_current_star');
               window.location.href = window.location.origin + '/wish';
             }}

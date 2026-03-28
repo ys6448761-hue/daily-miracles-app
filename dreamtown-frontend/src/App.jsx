@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { migrateStarId } from './lib/utils/starSession.js';
 import AppLaunch from './pages/AppLaunch.jsx';
 import Intro from './pages/Intro.jsx';
 import WishGate from './pages/WishGate.jsx';
@@ -23,6 +24,10 @@ if (window.location.pathname.startsWith('//')) {
   const normalized = window.location.pathname.replace(/\/+/g, '/');
   window.history.replaceState({}, '', normalized + window.location.search);
 }
+
+// dt_star_id → dt_active_star_id 1회 마이그레이션
+migrateStarId();
+
 
 export default function App() {
   return (

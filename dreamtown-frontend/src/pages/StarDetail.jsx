@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getStarDetail, getStar, getResonance, postResonance, postVoyageLog, getVoyageLogs } from '../api/dreamtown.js';
 import MilestoneBar from '../components/MilestoneBar';
 import { gaResonanceCreated, gaImpactCreated } from '../utils/gtag';
+import { readSavedStar } from '../lib/utils/starSession.js';
 
 // 감정 선택형 공명 옵션
 const RESONANCE_OPTIONS = [
@@ -48,7 +49,7 @@ export default function StarDetail() {
   const [resonancePosting, setResonancePosting] = useState(false);
   const [resonanceTotal, setResonanceTotal] = useState(0);
 
-  const myStarId = localStorage.getItem('dt_star_id');
+  const myStarId = readSavedStar();
   const isOwnStar = id === myStarId;
 
   // 내 별을 /star/:id로 직접 접근하면 MyStar 페이지로 리다이렉트

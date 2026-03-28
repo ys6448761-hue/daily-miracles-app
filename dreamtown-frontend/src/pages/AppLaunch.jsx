@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import IntroScene from './IntroScene.jsx';
+import { readSavedStar } from '../lib/utils/starSession.js';
 
 export default function AppLaunch() {
   const nav = useNavigate();
@@ -21,7 +22,7 @@ export default function AppLaunch() {
       return;
     }
 
-    const starId = localStorage.getItem('dt_star_id');
+    const starId = readSavedStar();
     if (starId) {
       // 재방문: 즉시 My Star로
       nav(`/my-star/${starId}`, { replace: true });

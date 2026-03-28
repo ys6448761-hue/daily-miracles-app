@@ -5,6 +5,7 @@ import SilhouetteScene from '../features/day/components/SilhouetteScene';
 import { saveLog } from '../features/galaxy/utils/logStorage';
 import { useDreamtownStore } from '../store/dreamtownStore';
 import { postVoyageLog } from '../api/dreamtown.js';
+import { readSavedStar } from '../lib/utils/starSession.js';
 import { POSTCARD_FALLBACK_MESSAGE } from '../constants/dreamtownFlow';
 
 // 선택 은하 잔광 색상 — SelectionTransition 동일 계열
@@ -98,7 +99,7 @@ export default function DayPage() {
               });
 
               // VoyageLog: emotion/tag/growth → problem/action/result 자동 추론 저장 (fire-and-forget)
-              const starId = localStorage.getItem('dt_star_id');
+              const starId = readSavedStar();
               if (starId && log.feeling && log.helpTag && log.growthLine) {
                 postVoyageLog(starId, {
                   emotion: log.feeling,

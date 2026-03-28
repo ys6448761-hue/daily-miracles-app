@@ -4,6 +4,7 @@ import { getVariant, track } from '../../../utils/experiment';
 import { gaShareClick, gaSaveClick } from '../../../utils/gtag';
 import { sharePostcard } from '../../../utils/kakaoShare';
 import { useDreamtownStore } from '../../../store/dreamtownStore';
+import { readSavedStar } from '../../../lib/utils/starSession.js';
 
 // 공유용 카드 캡처 (share-postcard) — 저장하기 전용
 async function captureShareCard() {
@@ -41,7 +42,7 @@ export default function PostcardActions({ direction, onBack, setCaptureMode }) {
 
   const { starName, starGalaxyName, starCreatedAt } = useDreamtownStore();
 
-  const myStarId = localStorage.getItem('dt_star_id');
+  const myStarId = readSavedStar();
 
   // 저장하기 — share-postcard PNG 다운로드 (에러 시 무시)
   const handleSave = async () => {

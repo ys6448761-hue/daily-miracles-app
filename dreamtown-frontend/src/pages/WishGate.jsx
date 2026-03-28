@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { postWish, postStarCreate, getOrCreateUserId } from '../api/dreamtown.js';
+import { readSavedStar, saveStarId } from '../lib/utils/starSession.js';
 
 const GEMS = [
   { type: 'ruby',     label: '루비',      emoji: '🔴', galaxy: '도전 은하',    detail: '용기를 내어 앞으로 나아가려는 마음이에요' },
@@ -15,11 +16,11 @@ export default function WishGate() {
   const nav = useNavigate();
   const location = useLocation();
   const [wishText, setWishText] = useState('');
-  const prevStarId = localStorage.getItem('dt_prev_star_id');
+  const prevStarId = localStorage.getItem('dt_prev_star_id') || null;
 
   function handleCancel() {
     if (prevStarId) {
-      localStorage.setItem('dt_star_id', prevStarId);
+      saveStarId(prevStarId);
       localStorage.removeItem('dt_prev_star_id');
       window.location.href = window.location.origin + '/my-star/' + prevStarId;
     } else {
@@ -33,7 +34,7 @@ export default function WishGate() {
     const searchParams = new URLSearchParams(window.location.search);
     const fromMystar = searchParams.get('from') === 'mystar';
     const isNew = searchParams.get('new') === '1';
-    const existingStar = localStorage.getItem('dt_star_id');
+    const existingStar = readSavedStar();
     if (existingStar && !fromMystar && !isNew) {
       nav('/my-star/' + existingStar, { replace: true });
     }
@@ -60,7 +61,7 @@ export default function WishGate() {
       }
 
       const star = await postStarCreate({ wishId: wishResult.wish_id, userId, phoneNumber: phoneNumber.trim() || null });
-      localStorage.setItem('dt_star_id', star.star_id);
+      saveStarId(star.star_id);
       localStorage.removeItem('dt_prev_star_id');
       nav('/star-birth', { state: { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy, gemType } });
     } catch (e) {

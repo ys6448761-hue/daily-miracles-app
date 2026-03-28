@@ -21,6 +21,8 @@ export default function DreamTown() {
 
   useEffect(() => {
     if (!forcePublicEntry) return;
+    // 레거시 키 제거 — 공개 입구에서 dt_star_id 완전 소거
+    localStorage.removeItem('dt_star_id');
     // 자동 복귀 없음 — 존재 여부만 확인해서 복귀 버튼 노출 여부 결정
     const saved = readSavedStar();
     if (saved) setHasExistingStar(true);

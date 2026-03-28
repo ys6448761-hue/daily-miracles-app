@@ -8,6 +8,7 @@ import SharePostcard from '../features/galaxy/components/SharePostcard';
 import { useDreamtownStore } from '../store/dreamtownStore';
 import { POSTCARD_FALLBACK_MESSAGE } from '../constants/dreamtownFlow';
 import { getStar } from '../api/dreamtown';
+import { readSavedStar } from '../lib/utils/starSession.js';
 
 // 카드 배경 tint — PostcardView 주광원 색과 동일 계열, 극히 낮은 강도
 const PAGE_TINT = {
@@ -41,7 +42,7 @@ export default function PostcardPage() {
 
     // store에 별 데이터 없으면 localStorage → API fallback
     if (!store.starName) {
-      const starId = localStorage.getItem('dt_star_id');
+      const starId = readSavedStar();
       if (starId) {
         getStar(starId)
           .then((data) => {
