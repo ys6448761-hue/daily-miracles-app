@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message, getTodaySchedule, getStarStats, getStarDetail } from '../api/dreamtown.js';
-import { saveStarId, clearStarId } from '../lib/utils/starSession.js';
+import { saveStarId, clearStarId, readSavedStar } from '../lib/utils/starSession.js';
 import MilestoneBar from '../components/MilestoneBar';
 import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
@@ -160,6 +160,14 @@ export default function MyStar() {
   const [giftCopyType, setGiftCopyType] = useState(null);
   const [giftPosting, setGiftPosting] = useState(false);
   const [giftDone, setGiftDone] = useState(false);
+
+  useEffect(() => {
+    const myStarId = readSavedStar();
+    if (!myStarId || myStarId !== id) {
+      nav('/dreamtown', { replace: true });
+      return;
+    }
+  }, [id, nav]);
 
   useEffect(() => {
     getStar(id)
