@@ -17,7 +17,7 @@ export default function MyStarReturn() {
   useEffect(() => {
     const saved = localStorage.getItem('dt_active_star_id');
     if (!saved) {
-      navigate('/intro', { replace: true });
+      navigate('/dreamtown', { replace: true });
       return;
     }
     setStarId(saved);
