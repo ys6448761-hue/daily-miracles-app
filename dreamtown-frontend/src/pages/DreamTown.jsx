@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { readSavedStar } from '../lib/utils/starSession.js';
+import InviteHero from './InviteHero.jsx';
 
 /**
  * /dreamtown — 공개 입구 (Public Entry)
  *
  * 정책:
  *  - localStorage 있어도 자동 복귀 금지
- *  - ?entry=invite → 동일하게 public flow 강제
+ *  - ?entry=invite → InviteHero 먼저 노출, CTA 클릭 시에만 앱 진입
  *  - 기존 별 안내는 하단 약한 CTA로만 노출
  */
 export default function DreamTown() {
@@ -17,17 +18,29 @@ export default function DreamTown() {
   const [hasExistingStar, setHasExistingStar] = useState(false);
 
   const isInvite = searchParams.get('entry') === 'invite';
-  const forcePublicEntry = location.pathname === '/dreamtown' || isInvite;
+
+  // invite 진입 시: InviteHero 표시 → CTA 클릭 전까지 실제 앱 미진입
+  const [showDreamtown, setShowDreamtown] = useState(!isInvite);
 
   useEffect(() => {
-    if (!forcePublicEntry) return;
     // 레거시 키 제거 — 공개 입구에서 dt_star_id 완전 소거
     localStorage.removeItem('dt_star_id');
     // 자동 복귀 없음 — 존재 여부만 확인해서 복귀 버튼 노출 여부 결정
     const saved = readSavedStar();
     if (saved) setHasExistingStar(true);
-  }, [forcePublicEntry]);
+  }, []);
 
+  // ?entry=invite → InviteHero (CTA 클릭 전)
+  if (isInvite && !showDreamtown) {
+    return (
+      <InviteHero
+        onWish={() => navigate('/intro')}
+        onSeeDreamtown={() => setShowDreamtown(true)}
+      />
+    );
+  }
+
+  // 기존 DreamTown 화면 (직접 진입 또는 "별 보기" CTA 이후)
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-[#0D1B2A] px-6">
       {/* 인트로 */}
