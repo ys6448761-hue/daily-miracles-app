@@ -434,6 +434,21 @@ router.get('/stars/today', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
+// GET /api/dt/stars/count — 전체 별 수
+// ─────────────────────────────────────────────
+router.get('/stars/count', async (req, res) => {
+  try {
+    const result = await db.query(
+      'SELECT COUNT(*)::int AS count FROM dt_stars WHERE is_hidden = FALSE'
+    );
+    res.json({ count: result.rows[0]?.count ?? 0 });
+  } catch (err) {
+    console.error('[DT] GET /stars/count error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
 // GET /api/dt/stars/:id — 내 별 조회
 // ─────────────────────────────────────────────
 router.get('/stars/:id', async (req, res) => {
