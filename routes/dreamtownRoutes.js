@@ -318,6 +318,28 @@ router.post('/stars/create', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
+// GET /api/dt/stars?userId=xxx — 유저 별 목록
+// ─────────────────────────────────────────────
+router.get('/stars', async (req, res) => {
+  const { userId } = req.query;
+  if (!userId) return res.status(400).json({ error: 'userId is required' });
+  try {
+    const { rows } = await db.query(
+      `SELECT s.id AS star_id, s.star_name, g.id AS galaxy_id
+         FROM dt_stars s
+         JOIN dt_galaxies g ON g.id = s.galaxy_id
+        WHERE s.user_id = $1
+        ORDER BY s.created_at DESC`,
+      [userId]
+    );
+    res.json({ stars: rows });
+  } catch (err) {
+    console.error('[DT] GET /stars error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
 // GET /api/dt/stars/recent — 광장 최근 별 목록
 // ─────────────────────────────────────────────
 router.get('/stars/recent', async (req, res) => {
