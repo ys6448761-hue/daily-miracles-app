@@ -2,12 +2,12 @@
  * WishInputScreen.jsx
  * OG 초대 유입 전용 — 1스크린 소원 작성 → 즉시 별 생성
  *
- * UX 원칙:
- *  - 클릭형 추천 문장 3개 → 탭 1회로 입력 완료
- *  - 로그인 선요구 없음 (익명 userId 자동 생성)
- *  - CTA 항상 터치 가능 — 빈 값 클릭 시 input focus 유도 (error 없음)
- *  - 카카오 인앱브라우저 대응: auto-focus 모바일 스킵, backdrop-filter 제거
- *  - 키보드 올라와도 CTA 보이도록 top-align 레이아웃
+ * 핵심 UX 원칙:
+ *  - 초기값 "조금 더 " → 완전 빈칸 이탈 방지, 커서 끝에 위치
+ *  - 추천 문장 3개 고정 → 탭 1회로 입력 완료
+ *  - CTA 항상 활성화 (disabled 없음)
+ *  - 로그인 선요구 없음
+ *  - autoFocus → 진입 즉시 키보드 (카카오 인앱: 유저 제스처 후 mount이므로 동작)
  */
 
 import { useState, useRef, useEffect } from 'react';
@@ -15,106 +15,73 @@ import { useNavigate } from 'react-router-dom';
 import { postWish, postStarCreate, getOrCreateUserId } from '../api/dreamtown.js';
 import { saveStarId } from '../lib/utils/starSession.js';
 
-// ── 추천 문장 풀 ────────────────────────────────────────────────────
-// 짧고 직관적 — 탭 1회로 입력 완료 가능한 길이
-const SUGGESTION_POOL = [
-  '내 작은 카페를 열고 싶어요',
-  '매일 조금씩 나를 사랑하고 싶어요',
-  '두려움 없이 새로운 시작을 하고 싶어요',
-  '소중한 사람과 더 자주 연락하고 싶어요',
-  '올해는 나를 위한 시간을 갖고 싶어요',
-  '하고 싶은 것들을 하나씩 해보고 싶어요',
-  '건강하게, 행복하게 살고 싶어요',
-  '내가 원하는 일을 하며 살고 싶어요',
+// ── 고정 추천 문장 3개 ──────────────────────────────────────────────
+const SUGGESTIONS = [
+  '조금 더 용감해지고 싶어요',
+  '나 자신을 믿고 싶어요',
+  '하루를 덜 불안하게 보내고 싶어요',
 ];
 
-function pickThree() {
-  return [...SUGGESTION_POOL].sort(() => Math.random() - 0.5).slice(0, 3);
-}
-
-// ── placeholder 풀 (추천 문장과 독립) ─────────────────────────────
-const PH_POOL = [
-  '나의 소원은...',
-  '이루고 싶은 것을 한 줄로',
-  '소원을 적어주세요',
-];
-
-// ── 별 shimmer 위치 (렌더마다 고정) ────────────────────────────────
+// ── 별 shimmer 위치 고정 (렌더마다 동일) ────────────────────────────
 const STARS = Array.from({ length: 14 }, (_, i) => ({
   id:    i,
   size:  1 + (i % 3) * 0.7,
-  top:   4 + (i * 6.8) % 91,
-  left:  2 + (i * 7.3) % 95,
+  top:   4  + (i * 6.8)  % 91,
+  left:  2  + (i * 7.3)  % 95,
   delay: (i * 0.41) % 2.8,
   dur:   1.4 + (i * 0.19) % 1.2,
 }));
-
-// ── 카카오/모바일 인앱 감지 ─────────────────────────────────────────
-const IS_MOBILE = typeof navigator !== 'undefined' &&
-  /Mobi|Android|iPhone|iPad|KAKAOTALK/i.test(navigator.userAgent);
 
 // ── keyframes ───────────────────────────────────────────────────────
 const STYLE = `
   @keyframes wis-twinkle {
     0%   { opacity: 0.06; transform: scale(1); }
-    100% { opacity: 0.7;  transform: scale(1.6); }
+    100% { opacity: 0.72; transform: scale(1.6); }
   }
-  @keyframes wis-shake {
-    0%, 100% { transform: translateX(0); }
-    20%       { transform: translateX(-4px); }
-    60%       { transform: translateX(4px); }
-  }
-  .wis-shake { animation: wis-shake 0.28s ease; }
 `;
+
+const INITIAL_TEXT = '조금 더 ';
 
 export default function WishInputScreen({ onBack }) {
   const nav      = useNavigate();
   const inputRef = useRef(null);
-  const inputWrapRef = useRef(null);
 
-  const [text, setText]         = useState('');
-  const [focused, setFocused]   = useState(false);
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState('');
-  const [shaking, setShaking]   = useState(false);
-  const [selected, setSelected] = useState(null); // 선택된 chip index
+  const [text, setText]       = useState(INITIAL_TEXT);
+  const [focused, setFocused] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState('');
+  const [selected, setSelected] = useState(null);
 
-  const [suggestions] = useState(pickThree);
-  const [phIdx, setPhIdx] = useState(0);
-
-  // 데스크탑만 auto-focus (카카오 인앱/모바일은 gesture 없이 focus 불가)
+  // 진입 즉시 커서 끝에 위치
+  // InviteIntro "시작하기" 클릭 직후 mount이므로 유저 제스처 window 안에 있음
   useEffect(() => {
-    if (!IS_MOBILE) {
-      const t = setTimeout(() => inputRef.current?.focus(), 280);
-      return () => clearTimeout(t);
-    }
+    const el = inputRef.current;
+    if (!el) return;
+    el.focus();
+    const len = el.value.length;
+    el.setSelectionRange(len, len);
   }, []);
 
-  // placeholder 2.8s 순환 — 입력 전까지
-  useEffect(() => {
-    if (text) return;
-    const t = setInterval(() => setPhIdx(i => (i + 1) % 3), 2800);
-    return () => clearInterval(t);
-  }, [text]);
-
-  // ── 칩 탭 핸들러 ────────────────────────────────────────────────
+  // ── 칩 탭 ────────────────────────────────────────────────────────
   function handleChip(suggestion, idx) {
     setText(suggestion);
     setSelected(idx);
     setError('');
-    // 유저 제스처 후 focus → 모바일도 동작
-    setTimeout(() => inputRef.current?.focus(), 50);
+    requestAnimationFrame(() => {
+      const el = inputRef.current;
+      if (!el) return;
+      el.focus();
+      el.setSelectionRange(el.value.length, el.value.length);
+    });
   }
 
-  // ── CTA 핸들러 ───────────────────────────────────────────────────
+  // ── 제출 ─────────────────────────────────────────────────────────
   async function handleSubmit() {
     const trimmed = text.trim();
-
-    // 빈 값 → error 없이 input 포커스 + shake
-    if (!trimmed) {
-      setShaking(true);
-      setTimeout(() => setShaking(false), 300);
-      inputRef.current?.focus();
+    // 초기값만 남은 경우 포커스로 유도 (에러 없음)
+    if (!trimmed || trimmed === INITIAL_TEXT.trim()) {
+      const el = inputRef.current;
+      if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
       return;
     }
 
@@ -156,7 +123,7 @@ export default function WishInputScreen({ onBack }) {
     }
   }
 
-  const hasText = !!text.trim();
+  const hasTyped = text.trim() !== INITIAL_TEXT.trim();
 
   return (
     <main
@@ -166,27 +133,27 @@ export default function WishInputScreen({ onBack }) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: '64px 24px 48px',  // top-align → 키보드 올라와도 CTA 접근 가능
+        padding: '64px 24px 48px',
         position: 'relative',
         overflow: 'hidden',
       }}
     >
       <style>{STYLE}</style>
 
-      {/* ── 배경 glow — 포커스/입력 시 점등 ─────────────────────── */}
+      {/* ── 배경 glow ─────────────────────────────────────────── */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
           pointerEvents: 'none',
-          background: (focused || hasText)
-            ? 'radial-gradient(ellipse 80% 55% at 50% 45%, rgba(155,135,245,0.16) 0%, transparent 68%)'
+          background: focused
+            ? 'radial-gradient(ellipse 80% 55% at 50% 42%, rgba(155,135,245,0.17) 0%, transparent 68%)'
             : 'transparent',
           transition: 'background 0.6s ease',
         }}
       />
 
-      {/* ── 별 shimmer ───────────────────────────────────────────── */}
+      {/* ── 별 shimmer (타이핑 시 opacity 상승) ─────────────────── */}
       {STARS.map(s => (
         <div
           key={s.id}
@@ -199,7 +166,9 @@ export default function WishInputScreen({ onBack }) {
             top:  s.top  + '%',
             left: s.left + '%',
             pointerEvents: 'none',
+            opacity: hasTyped ? 1 : 0.6,
             animation: `wis-twinkle ${s.dur}s ${s.delay}s ease-in-out infinite alternate`,
+            transition: 'opacity 0.5s ease',
           }}
         />
       ))}
@@ -211,30 +180,21 @@ export default function WishInputScreen({ onBack }) {
           zIndex: 1,
           width: '100%',
           maxWidth: 320,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 0,
         }}
       >
         {/* 안내 레이블 */}
-        <p
-          style={{
-            fontSize: 12,
-            color: 'rgba(255,215,106,0.65)',
-            textAlign: 'center',
-            marginBottom: 20,
-            letterSpacing: '0.06em',
-          }}
-        >
+        <p style={{
+          fontSize: 12,
+          color: 'rgba(255,215,106,0.65)',
+          textAlign: 'center',
+          marginBottom: 20,
+          letterSpacing: '0.06em',
+        }}>
           ✦ 소원을 한 줄로 담아주세요
         </p>
 
         {/* ── 입력창 ──────────────────────────────────────────── */}
-        <div
-          ref={inputWrapRef}
-          className={shaking ? 'wis-shake' : ''}
-          style={{ marginBottom: 12 }}
-        >
+        <div style={{ marginBottom: 12 }}>
           <input
             ref={inputRef}
             type="text"
@@ -243,19 +203,19 @@ export default function WishInputScreen({ onBack }) {
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             onKeyDown={e => { if (e.key === 'Enter' && !loading) handleSubmit(); }}
-            placeholder={PH_POOL[phIdx]}
             maxLength={60}
             autoComplete="off"
             inputMode="text"
+            enterKeyHint="done"
             style={{
               width: '100%',
               background: 'rgba(255,255,255,0.05)',
               border: `1px solid ${
                 focused
                   ? 'rgba(155,135,245,0.6)'
-                  : hasText
-                  ? 'rgba(255,215,106,0.35)'
-                  : 'rgba(255,255,255,0.14)'
+                  : hasTyped
+                  ? 'rgba(255,215,106,0.4)'
+                  : 'rgba(255,255,255,0.15)'
               }`,
               borderRadius: 16,
               padding: '18px 16px',
@@ -265,35 +225,26 @@ export default function WishInputScreen({ onBack }) {
               boxSizing: 'border-box',
               boxShadow: focused
                 ? '0 0 24px 6px rgba(155,135,245,0.13)'
-                : hasText
-                ? '0 0 16px 3px rgba(255,215,106,0.08)'
+                : hasTyped
+                ? '0 0 14px 3px rgba(255,215,106,0.09)'
                 : 'none',
               transition: 'border-color 0.25s ease, box-shadow 0.25s ease',
             }}
           />
-          <p
-            style={{
-              fontSize: 11,
-              color: text.length > 50 ? 'rgba(255,180,100,0.7)' : 'rgba(255,255,255,0.2)',
-              textAlign: 'right',
-              marginTop: 5,
-              transition: 'color 0.2s',
-            }}
-          >
+          <p style={{
+            fontSize: 11,
+            color: text.length > 50 ? 'rgba(255,180,100,0.75)' : 'rgba(255,255,255,0.2)',
+            textAlign: 'right',
+            marginTop: 5,
+            transition: 'color 0.2s',
+          }}>
             {text.length} / 60
           </p>
         </div>
 
         {/* ── 추천 문장 칩 ────────────────────────────────────── */}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
-            marginBottom: 22,
-          }}
-        >
-          {suggestions.map((s, i) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 22 }}>
+          {SUGGESTIONS.map((s, i) => (
             <button
               key={i}
               onClick={() => handleChip(s, i)}
@@ -325,20 +276,18 @@ export default function WishInputScreen({ onBack }) {
 
         {/* ── 에러 ────────────────────────────────────────────── */}
         {error && (
-          <p
-            style={{
-              fontSize: 12,
-              color: 'rgba(255,110,110,0.85)',
-              textAlign: 'center',
-              marginBottom: 14,
-              lineHeight: 1.55,
-            }}
-          >
+          <p style={{
+            fontSize: 12,
+            color: 'rgba(255,110,110,0.85)',
+            textAlign: 'center',
+            marginBottom: 14,
+            lineHeight: 1.55,
+          }}>
             {error}
           </p>
         )}
 
-        {/* ── CTA — 항상 터치 가능 ────────────────────────────── */}
+        {/* ── CTA — disabled 없음, 항상 터치 가능 ──────────────── */}
         <button
           onClick={handleSubmit}
           disabled={loading}
@@ -349,17 +298,17 @@ export default function WishInputScreen({ onBack }) {
             fontSize: 16,
             fontWeight: 700,
             border: 'none',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            background: hasText ? '#FFD76A' : 'rgba(255,215,106,0.22)',
-            color: hasText ? '#0D1B2A' : 'rgba(255,215,106,0.55)',
-            boxShadow: hasText ? '0 0 32px 8px rgba(255,215,106,0.24)' : 'none',
+            cursor: loading ? 'wait' : 'pointer',
+            background: hasTyped ? '#FFD76A' : 'rgba(255,215,106,0.28)',
+            color: hasTyped ? '#0D1B2A' : 'rgba(255,215,106,0.65)',
+            boxShadow: hasTyped ? '0 0 32px 8px rgba(255,215,106,0.25)' : 'none',
             transition: 'background 0.28s ease, box-shadow 0.28s ease, color 0.28s ease',
           }}
         >
           {loading ? '별을 만드는 중...' : '별 만들기 ✦'}
         </button>
 
-        {/* ── 뒤로가기 ─────────────────────────────────────── */}
+        {/* ── 뒤로가기 ─────────────────────────────────────────── */}
         <button
           onClick={onBack}
           style={{
