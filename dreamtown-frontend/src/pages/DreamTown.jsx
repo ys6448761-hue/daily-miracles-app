@@ -2,14 +2,19 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { readSavedStar } from '../lib/utils/starSession.js';
 import InviteHero from './InviteHero.jsx';
+import WishInputScreen from './WishInputScreen.jsx';
 
 /**
  * /dreamtown — 공개 입구 (Public Entry)
  *
+ * scene 상태 머신:
+ *  'invite'    — ?entry=invite 진입 시 InviteHero 표시
+ *  'wish'      — InviteHero "소원 시작" CTA → WishInputScreen
+ *  'dreamtown' — 직접 진입 or "별 보기" CTA → 기존 광장 화면
+ *
  * 정책:
  *  - localStorage 있어도 자동 복귀 금지
- *  - ?entry=invite → InviteHero 먼저 노출, CTA 클릭 시에만 앱 진입
- *  - 기존 별 안내는 하단 약한 CTA로만 노출
+ *  - CTA 클릭 시에만 실제 앱 진입
  */
 export default function DreamTown() {
   const navigate = useNavigate();
@@ -19,8 +24,8 @@ export default function DreamTown() {
 
   const isInvite = searchParams.get('entry') === 'invite';
 
-  // invite 진입 시: InviteHero 표시 → CTA 클릭 전까지 실제 앱 미진입
-  const [showDreamtown, setShowDreamtown] = useState(!isInvite);
+  // invite → 'invite' scene 먼저, 직접 진입 → 'dreamtown' 바로
+  const [scene, setScene] = useState(isInvite ? 'invite' : 'dreamtown');
 
   useEffect(() => {
     // 레거시 키 제거 — 공개 입구에서 dt_star_id 완전 소거
@@ -30,17 +35,26 @@ export default function DreamTown() {
     if (saved) setHasExistingStar(true);
   }, []);
 
-  // ?entry=invite → InviteHero (CTA 클릭 전)
-  if (isInvite && !showDreamtown) {
+  // ── Scene: invite ───────────────────────────────────────────────
+  if (scene === 'invite') {
     return (
       <InviteHero
-        onWish={() => navigate('/intro')}
-        onSeeDreamtown={() => setShowDreamtown(true)}
+        onWish={() => setScene('wish')}
+        onSeeDreamtown={() => setScene('dreamtown')}
       />
     );
   }
 
-  // 기존 DreamTown 화면 (직접 진입 또는 "별 보기" CTA 이후)
+  // ── Scene: wish ─────────────────────────────────────────────────
+  if (scene === 'wish') {
+    return (
+      <WishInputScreen
+        onBack={() => setScene('invite')}
+      />
+    );
+  }
+
+  // ── Scene: dreamtown (기존 광장 화면) ───────────────────────────
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-[#0D1B2A] px-6">
       {/* 인트로 */}
