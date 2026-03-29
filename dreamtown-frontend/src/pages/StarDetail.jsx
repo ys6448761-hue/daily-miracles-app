@@ -1,23 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStarDetail, getStar, getResonance, postResonance, postVoyageLog, getVoyageLogs } from '../api/dreamtown.js';
+import { getStarDetail, getStar, getResonance, postVoyageLog, postDtResonance } from '../api/dreamtown.js';
 import MilestoneBar from '../components/MilestoneBar';
-import { gaResonanceCreated, gaImpactCreated } from '../utils/gtag';
+import { gaResonanceCreated } from '../utils/gtag';
 import { readSavedStar } from '../lib/utils/starSession.js';
-
-// 감정 선택형 공명 옵션 (standalone resonance 모드)
-const RESONANCE_OPTIONS = [
-  { type: 'relief',  label: '좀 편해졌어요' },
-  { type: 'courage', label: '좀 용기났어요' },
-  { type: 'clarity', label: '좀 정리됐어요' },
-  { type: 'belief',  label: '좀 믿고 싶어졌어요' },
-];
-
-// 공명 버튼 (기적나눔 / 지혜나눔) — resonance viewMode
-const SHARE_RESONANCE_OPTIONS = [
-  { type: 'belief',  label: '기적나눔' },
-  { type: 'clarity', label: '지혜나눔' },
-];
 
 const GALAXY_STYLE = {
   growth:       { label: '성장 은하', cls: 'bg-blue-500/20 text-blue-300' },
@@ -27,7 +13,6 @@ const GALAXY_STYLE = {
   miracle:      { label: '기적 은하', cls: 'bg-purple-500/20 text-purple-300' },
 };
 
-// 은하코드 → 공명 키워드
 const GALAXY_RESONANCE_LABEL = {
   challenge:    '용기의 공명',
   growth:       '성장의 공명',
@@ -36,23 +21,12 @@ const GALAXY_RESONANCE_LABEL = {
   miracle:      '기적의 공명',
 };
 
-// Aurora5 은하별 응원 문구 3줄
 const AURORA5_3LINES = {
   growth:       '성장을 향한 이 마음을 함께 바라고 있어요.\n조금씩 나아가는 것만으로 충분해요.\n같은 마음을 가진 소원이들이 있어요.',
   challenge:    '용기를 낸 이 마음이 여기 있어요.\n두려워도 한 걸음 내딛은 것이 진짜예요.\n같은 두려움을 가진 소원이들이 있어요.',
   healing:      '치유를 바라는 이 마음을 함께 바라고 있어요.\n쉬어가도 괜찮아요. 멈춤도 항해예요.\n같은 아픔을 지나온 소원이들이 있어요.',
   relationship: '연결을 바라는 이 마음이 여기 있어요.\n혼자가 아니라는 걸 이 별이 보여줘요.\n같은 마음을 가진 소원이들이 있어요.',
 };
-
-function getResonanceQuestion(galaxyCode) {
-  const map = {
-    growth:       '성장을 바라는 이 마음, 당신에게도 닿았나요?',
-    challenge:    '도전을 향한 이 마음, 당신에게도 닿았나요?',
-    healing:      '치유를 바라는 이 마음, 당신에게도 닿았나요?',
-    relationship: '연결을 바라는 이 마음, 당신에게도 닿았나요?',
-  };
-  return map[galaxyCode] ?? '이 이야기가 당신에게 와 닿았나요?';
-}
 
 function calcDaysSinceBirth(createdAt) {
   if (!createdAt) return 1;
@@ -62,29 +36,35 @@ function calcDaysSinceBirth(createdAt) {
   );
 }
 
+// 공명 버튼 정의
+const DT_RESONANCE_OPTS = [
+  { type: 'miracle', label: '✨ 기적나눔', color: 'rgba(255,215,106,0.15)', border: 'rgba(255,215,106,0.35)', text: '#FFD76A' },
+  { type: 'wisdom',  label: '🧠 지혜나눔', color: 'rgba(155,135,245,0.15)', border: 'rgba(155,135,245,0.35)', text: 'rgba(155,135,245,0.9)' },
+];
+
 export default function StarDetail({ starId: propStarId, viewMode: propViewMode } = {}) {
   const { id: paramId } = useParams();
   const id = propStarId ?? paramId;
   const nav = useNavigate();
 
-  const [detail, setDetail] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [detail, setDetail]             = useState(null);
+  const [loading, setLoading]           = useState(true);
+  const [miracleCount, setMiracleCount] = useState(0);
+  const [wisdomCount, setWisdomCount]   = useState(0);
+  const [submitted, setSubmitted]       = useState(false);
+  const [submitting, setSubmitting]     = useState(false);
+  const [animating, setAnimating]       = useState(null); // 'miracle' | 'wisdom'
+  const [bounceKey, setBounceKey]       = useState({ miracle: 0, wisdom: 0 });
 
-  const [resonanceSubmitted, setResonanceSubmitted] = useState(false);
-  const [resonancePosting, setResonancePosting] = useState(false);
-  const [resonanceTotal, setResonanceTotal] = useState(0);
-
-  const myStarId = readSavedStar();
-
-  // prop viewMode 없이 자기 별에 접근하면 /my-star로 리다이렉트
+  const myStarId  = readSavedStar();
   const isOwnStar = !propViewMode && id === myStarId;
 
-  const viewMode  = propViewMode ?? 'resonance';
+  const viewMode    = propViewMode ?? 'resonance';
   const isOwner     = viewMode === 'owner';
   const isResonance = viewMode === 'resonance';
   const isPublic    = viewMode === 'public';
+  const canResonate = isResonance || isPublic; // 비오너 모두 공명 가능
 
-  // own star standalone redirect
   useEffect(() => {
     if (isOwnStar) {
       nav(`/my-star/${id}`, { replace: true });
@@ -97,7 +77,6 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
     async function loadDetail() {
       try {
         if (isOwner) {
-          // owner 전체 로드
           const d = await getStarDetail(id);
           setDetail(d);
         } else {
@@ -115,11 +94,11 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
             };
           });
           setDetail({
-            star_id:         star.star_id,
-            star_name:       star.star_name,
-            galaxy:          star.galaxy,
+            star_id:          star.star_id,
+            star_name:        star.star_name,
+            galaxy:           star.galaxy,
             days_since_birth: daysSinceBirth,
-            created_at:      star.created_at,
+            created_at:       star.created_at,
             milestone_status: milestoneStatus,
           });
         }
@@ -129,49 +108,48 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
 
     loadDetail();
 
-    if (isResonance || isOwner) {
-      getResonance(id).then(r => {
-        const total = Object.values(r.resonance ?? {})
-          .reduce((s, v) => s + (v.count || 0), 0);
-        setResonanceTotal(total);
-      }).catch(() => {});
-    }
+    // 공명 카운트 로드 (miracle/wisdom impact 포함)
+    getResonance(id).then(r => {
+      const impacts = r.impacts ?? [];
+      setMiracleCount(impacts.find(i => i.type === 'miracle')?.count ?? 0);
+      setWisdomCount(impacts.find(i => i.type === 'wisdom')?.count  ?? 0);
+    }).catch(() => {});
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  async function handleResonance(resonanceType) {
-    if (resonancePosting || resonanceSubmitted) return;
-    const opt = [...RESONANCE_OPTIONS, ...SHARE_RESONANCE_OPTIONS]
-      .find(o => o.type === resonanceType);
-    setResonancePosting(true);
-    try {
-      let token = localStorage.getItem('dt_resonance_token');
-      if (!token) {
-        token = crypto.randomUUID();
-        localStorage.setItem('dt_resonance_token', token);
-      }
-      const result = await postResonance({ starId: id, resonanceType, anonymousToken: token });
+  async function handleResonance(type) {
+    if (submitting || submitted) return;
 
-      gaResonanceCreated({ starId: id, resonanceType });
-      if (result.new_impacts?.length > 0) {
-        for (const imp of result.new_impacts) gaImpactCreated({ starId: id, impactType: imp.type });
-      }
+    // 버튼 클릭 애니메이션
+    setAnimating(type);
+    setTimeout(() => setAnimating(null), 200);
+
+    // 낙관적 업데이트
+    if (type === 'miracle') {
+      setMiracleCount(c => c + 1);
+      setBounceKey(k => ({ ...k, miracle: k.miracle + 1 }));
+    } else {
+      setWisdomCount(c => c + 1);
+      setBounceKey(k => ({ ...k, wisdom: k.wisdom + 1 }));
+    }
+
+    setSubmitting(true);
+    try {
+      await postDtResonance({ starId: id, type });
+      gaResonanceCreated({ starId: id, resonanceType: type });
 
       // 공명 → 내 별 항해 로그 자동 저장 (fire-and-forget)
-      if (myStarId && opt) {
-        postVoyageLog(myStarId, {
-          emotion: opt.label,
-          tag:     '공명',
-          growth:  opt.label,
-          source:  'resonance',
-        }).catch(() => {});
+      if (myStarId) {
+        const label = type === 'miracle' ? '기적나눔' : '지혜나눔';
+        postVoyageLog(myStarId, { emotion: label, tag: '공명', growth: label, source: 'resonance' }).catch(() => {});
       }
 
-      setResonanceTotal(prev => prev + 1);
-      setResonanceSubmitted(true);
+      setSubmitted(true);
     } catch {
-      setResonanceSubmitted(true);
+      // 롤백
+      if (type === 'miracle') setMiracleCount(c => c - 1);
+      else setWisdomCount(c => c - 1);
     } finally {
-      setResonancePosting(false);
+      setSubmitting(false);
     }
   }
 
@@ -210,6 +188,17 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
 
   return (
     <div className="min-h-screen flex flex-col px-6 py-10 pb-6">
+      {/* 바운스 키프레임 */}
+      <style>{`
+        @keyframes countBounce {
+          0%   { transform: scale(1); }
+          40%  { transform: scale(1.35); }
+          70%  { transform: scale(0.9); }
+          100% { transform: scale(1); }
+        }
+        .count-bounce { animation: countBounce 0.3s ease; }
+      `}</style>
+
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-6">
         <button
@@ -244,7 +233,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
             </span>
           </div>
 
-          {/* Resonance 추가: 공명 키워드 + 한 줄 문장 */}
+          {/* resonance 모드: 공명 키워드 + 한 줄 문장 */}
           {isResonance && (
             <>
               <span style={{
@@ -262,7 +251,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
             </>
           )}
 
-          {/* Owner only: 소원 본문 + 변화 문장 */}
+          {/* owner 전용: 소원 본문 + 변화 문장 */}
           {isOwner && detail.wish_text && (
             <p className="text-white/45 text-xs italic leading-relaxed mb-3 px-2">
               &ldquo;{detail.wish_text}&rdquo;
@@ -274,11 +263,20 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
             </p>
           )}
 
-          {/* 사회성 문구 — resonance에서 3명 이상일 때 */}
-          {isResonance && resonanceTotal >= 3 && (
-            <p className="text-white/30 text-xs mt-2">
-              소원별에 {resonanceTotal}명의 마음이 닿았어요
-            </p>
+          {/* owner: 누적 공명 결과 표시 */}
+          {isOwner && (miracleCount > 0 || wisdomCount > 0) && (
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 12 }}>
+              {miracleCount > 0 && (
+                <span style={{ fontSize: 12, color: '#FFD76A' }}>
+                  ✨ 기적나눔 <span key={`m-${miracleCount}`} className="count-bounce">{miracleCount}</span>
+                </span>
+              )}
+              {wisdomCount > 0 && (
+                <span style={{ fontSize: 12, color: 'rgba(155,135,245,0.9)' }}>
+                  🧠 지혜나눔 <span key={`w-${wisdomCount}`} className="count-bounce">{wisdomCount}</span>
+                </span>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -343,38 +341,72 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
         </div>
       )}
 
-      {/* ⑥ 공명 섹션 — resonance 모드 (기적나눔 / 지혜나눔) */}
-      {isResonance && (
+      {/* ⑥ 공명 버튼 — resonance / public 모두 허용 */}
+      {canResonate && (
         <div className="mb-5">
-          {!resonanceSubmitted ? (
+          {!submitted ? (
             <div className="bg-white/3 border border-white/8 rounded-2xl p-4">
-              <p className="text-white/40 text-xs mb-3 text-center">
-                {getResonanceQuestion(detail.galaxy?.code)}
+              <p className="text-white/40 text-xs mb-4 text-center">
+                이 별의 소원에 마음을 나눠주세요
               </p>
-              <div className="grid grid-cols-2 gap-2">
-                {SHARE_RESONANCE_OPTIONS.map(opt => (
+              <div className="grid grid-cols-2 gap-3">
+                {DT_RESONANCE_OPTS.map(opt => (
                   <button
                     key={opt.type}
                     onClick={() => handleResonance(opt.type)}
-                    disabled={resonancePosting}
-                    className="bg-white/5 hover:bg-dream-purple/20 border border-white/10 hover:border-dream-purple/40 text-white/65 hover:text-white text-sm py-3.5 rounded-xl transition-colors disabled:opacity-40"
+                    disabled={submitting}
+                    style={{
+                      background:     opt.color,
+                      border:         `1px solid ${animating === opt.type ? opt.text : opt.border}`,
+                      color:          opt.text,
+                      borderRadius:   16,
+                      padding:        '14px 0',
+                      fontSize:       14,
+                      fontWeight:     600,
+                      cursor:         submitting ? 'not-allowed' : 'pointer',
+                      opacity:        submitting ? 0.5 : 1,
+                      transform:      animating === opt.type ? 'scale(0.94)' : 'scale(1)',
+                      transition:     'transform 0.15s ease, opacity 0.15s ease, border-color 0.15s ease',
+                      display:        'flex',
+                      flexDirection:  'column',
+                      alignItems:     'center',
+                      gap:            4,
+                    }}
                   >
-                    {opt.label}
+                    <span>{opt.label}</span>
+                    <span style={{ fontSize: 11, opacity: 0.7 }}>
+                      <span
+                        key={opt.type === 'miracle' ? bounceKey.miracle : bounceKey.wisdom}
+                        className={
+                          (opt.type === 'miracle' ? bounceKey.miracle : bounceKey.wisdom) > 0
+                            ? 'count-bounce'
+                            : ''
+                        }
+                        style={{ display: 'inline-block' }}
+                      >
+                        {opt.type === 'miracle' ? miracleCount : wisdomCount}
+                      </span>
+                      명이 나눴어요
+                    </span>
                   </button>
                 ))}
               </div>
             </div>
           ) : (
-            <div className="bg-dream-purple/8 border border-dream-purple/20 rounded-2xl p-4 text-center">
-              <p className="text-white/70 text-sm">소원별에 마음이 닿았어요</p>
+            <div className="bg-white/3 border border-white/8 rounded-2xl p-5 text-center">
+              <p className="text-white/70 text-sm mb-1">소원별에 마음이 닿았어요</p>
+              <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 8 }}>
+                <span style={{ fontSize: 13, color: '#FFD76A' }}>✨ {miracleCount}</span>
+                <span style={{ fontSize: 13, color: 'rgba(155,135,245,0.9)' }}>🧠 {wisdomCount}</span>
+              </div>
             </div>
           )}
         </div>
       )}
 
-      {/* ⑦ standalone resonance: 내 별 연결 CTA (공명 후) */}
-      {isResonance && resonanceSubmitted && myStarId && (
-        <div className="flex flex-col gap-2 mb-5">
+      {/* ⑦ 공명 후 내 별 CTA (resonance 모드) */}
+      {isResonance && submitted && myStarId && (
+        <div className="mb-5">
           <button
             onClick={() => nav(`/my-star/${myStarId}`)}
             className="w-full bg-star-gold/15 hover:bg-star-gold/25 border border-star-gold/30 text-star-gold font-semibold py-4 rounded-2xl transition-colors"
@@ -384,7 +416,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
         </div>
       )}
 
-      {/* ⑧ Public: 나도 별 만들기 CTA */}
+      {/* ⑧ public 모드: 나도 별 만들기 CTA */}
       {isPublic && (
         <div className="mb-5">
           <button

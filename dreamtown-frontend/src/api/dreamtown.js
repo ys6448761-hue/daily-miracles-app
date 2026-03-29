@@ -112,6 +112,14 @@ export async function postResonance({ starId, resonanceType, anonymousToken }) {
   });
 }
 
+export async function postDtResonance({ starId, type }) {
+  return fetchWithRetry(`${BASE}/resonance`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ starId, type }),
+  });
+}
+
 export async function postGrowthLog(starId, text) {
   const userId = getOrCreateUserId();
   return fetchWithRetry(`${BASE}/stars/${starId}/growth-log`, {

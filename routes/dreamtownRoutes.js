@@ -318,6 +318,53 @@ router.post('/stars/create', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
+// POST /api/dt/resonance — 기적나눔 / 지혜나눔
+// Body: { starId, type: "miracle"|"wisdom" }
+// ─────────────────────────────────────────────
+router.post('/resonance', async (req, res) => {
+  const { starId, type } = req.body;
+  if (!starId || !['miracle', 'wisdom'].includes(type)) {
+    return res.status(400).json({ error: 'starId, type(miracle|wisdom) 필수' });
+  }
+  try {
+    // 별 존재 확인
+    const starCheck = await db.query(
+      'SELECT id FROM dt_stars WHERE id = $1',
+      [starId]
+    );
+    if (starCheck.rowCount === 0) {
+      return res.status(404).json({ error: '별을 찾을 수 없습니다' });
+    }
+
+    // impact 테이블 upsert (miracle / wisdom 직접 누적)
+    await db.query(
+      `INSERT INTO impact (star_id, impact_type, count, updated_at)
+       VALUES ($1, $2, 1, CURRENT_TIMESTAMP)
+       ON CONFLICT (star_id, impact_type)
+       DO UPDATE SET count = impact.count + 1, updated_at = CURRENT_TIMESTAMP`,
+      [starId, type]
+    );
+
+    // 최신 카운트 반환
+    const counts = await db.query(
+      `SELECT impact_type, count FROM impact
+        WHERE star_id = $1 AND impact_type IN ('miracle','wisdom')`,
+      [starId]
+    );
+    const result = { miracleCount: 0, wisdomCount: 0 };
+    for (const row of counts.rows) {
+      if (row.impact_type === 'miracle') result.miracleCount = row.count;
+      if (row.impact_type === 'wisdom')  result.wisdomCount  = row.count;
+    }
+
+    res.json({ ok: true, ...result });
+  } catch (err) {
+    console.error('[DT] POST /resonance error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
 // GET /api/dt/stars?userId=xxx — 유저 별 목록
 // ─────────────────────────────────────────────
 router.get('/stars', async (req, res) => {
