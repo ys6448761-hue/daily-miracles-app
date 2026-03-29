@@ -137,13 +137,7 @@ export default function MyStar() {
   const myStarId = readSavedStar();
   const isOwner = myStarId === id;
 
-  if (!isOwner) {
-    const fromResonance =
-      new URLSearchParams(window.location.search).get('from');
-    const mode = fromResonance ? 'resonance' : 'public';
-    return <StarDetail starId={id} viewMode={mode} />;
-  }
-
+  // ── 모든 훅을 조건 분기 이전에 선언 (Rules of Hooks) ──────────────
   const nav = useNavigate();
   const [star, setStar] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -172,7 +166,9 @@ export default function MyStar() {
   const [giftPosting, setGiftPosting] = useState(false);
   const [giftDone, setGiftDone] = useState(false);
 
+  // ── 소유자 전용 데이터 로드 (isOwner=false 시 즉시 반환) ──────────
   useEffect(() => {
+    if (!isOwner) return;
     getStar(id)
       .then((data) => {
         setStar(data);
@@ -259,6 +255,15 @@ export default function MyStar() {
     gaGrowthLogged({ starId: star.star_id });
     // 서버에도 저장 (CASE 2: connection_completed 트리거 — fire-and-forget)
     postGrowthLog(star.star_id, growthText.trim()).catch(() => {});
+  }
+
+  // ── 비소유자 → StarDetail public/resonance 위임 ────────────────────
+  // 모든 훅 선언·useEffect 이후에 위치 (Rules of Hooks 준수)
+  if (!isOwner) {
+    const fromResonance =
+      new URLSearchParams(window.location.search).get('from');
+    const mode = fromResonance ? 'resonance' : 'public';
+    return <StarDetail starId={id} viewMode={mode} />;
   }
 
   if (loading) {

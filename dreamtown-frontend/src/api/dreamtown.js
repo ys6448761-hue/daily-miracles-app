@@ -6,12 +6,19 @@ async function fetchWithRetry(url, options, retries = 1) {
   for (let i = 0; i <= retries; i++) {
     const res = await fetch(url, options);
     if (res.ok) return res.json();
+    // 인증 오류(401/403)는 에러 본문 노출 금지 — fallback 메시지만
+    if (res.status === 401 || res.status === 403) {
+      throw new Error('잠시 후 다시 시도해주세요.');
+    }
     if (i < retries) await new Promise(r => setTimeout(r, 800));
     else {
       let msg = '서버에 문제가 생겼어요. 잠시 후 다시 시도해주세요.';
       try {
         const body = await res.json();
-        if (body?.error && typeof body.error === 'string') msg = body.error;
+        // 서버 내부 에러 메시지는 노출하지 않음 — 사용자 친화적 메시지만
+        if (body?.message && typeof body.message === 'string' && !body.message.includes('Internal')) {
+          msg = body.message;
+        }
       } catch (_) {}
       throw new Error(msg);
     }
@@ -59,8 +66,19 @@ export async function getRecentStars(limit = 20, galaxy = null) {
 
 export async function getStar(starId) {
   const res = await fetch(`${BASE}/stars/${starId}`);
-  if (!res.ok) throw new Error('별 조회 실패');
+  if (!res.ok) throw new Error('별 조회 실패');  // StarDetail catch에서 처리
   return res.json();
+}
+
+// 비로그인 공개 접근용 — 실패 시 null 반환 (에러 화면 방지)
+export async function getStarPublic(starId) {
+  try {
+    const res = await fetch(`${BASE}/stars/${starId}`);
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
 }
 
 export async function getGalaxies() {

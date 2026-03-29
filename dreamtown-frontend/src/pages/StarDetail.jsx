@@ -220,9 +220,17 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   }
   if (!detail) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-6">
         <p className="text-white/50 text-sm">별을 찾을 수 없어요.</p>
-        <button onClick={() => nav(-1)} className="text-white/30 text-xs">← 돌아가기</button>
+        <button
+          onClick={() => nav('/dreamtown')}
+          className="w-full max-w-xs bg-star-gold/15 border border-star-gold/30 text-star-gold text-sm font-medium py-3 rounded-2xl"
+        >
+          드림타운 입장 ✦
+        </button>
+        <button onClick={() => window.history.length > 1 ? nav(-1) : nav('/dreamtown')} className="text-white/25 text-xs">
+          ← 돌아가기
+        </button>
       </div>
     );
   }
@@ -509,7 +517,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
         </div>
       )}
 
-      {/* ⑥ 공명 후 내 별 CTA (resonance 모드) */}
+      {/* ⑥ 공명 후 CTA (resonance 모드) */}
       {isResonance && submitted && myStarId && (
         <div className="mb-5">
           <button
@@ -517,6 +525,17 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
             className="w-full bg-star-gold/15 hover:bg-star-gold/25 border border-star-gold/30 text-star-gold font-semibold py-4 rounded-2xl transition-colors"
           >
             내 별 보러 가기 ✦
+          </button>
+        </div>
+      )}
+      {/* ⑥-b 비로그인 공명 완료 → 별 만들기 CTA */}
+      {isResonance && submitted && !myStarId && (
+        <div className="mb-5">
+          <button
+            onClick={() => nav('/dreamtown')}
+            className="w-full bg-star-gold/15 hover:bg-star-gold/25 border border-star-gold/30 text-star-gold font-semibold py-4 rounded-2xl transition-colors"
+          >
+            나도 별 만들기 ✦
           </button>
         </div>
       )}

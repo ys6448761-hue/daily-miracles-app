@@ -4,8 +4,8 @@
  * 환경변수: VITE_KAKAO_JS_KEY (Render 대시보드에서 설정)
  */
 
-const DREAMTOWN_URL = 'https://app.dailymiracles.kr/dreamtown';
-const OG_IMAGE_URL  = 'https://app.dailymiracles.kr/dreamtown/og-image.png';
+const DREAMTOWN_URL = 'https://app.dailymiracles.kr/dreamtown?entry=invite';
+const OG_IMAGE_URL  = 'https://app.dailymiracles.kr/images/dreamtown-og.jpg';
 
 function initKakao() {
   if (!window.Kakao) return false;
