@@ -8,6 +8,7 @@ import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
 import { sharePostcard } from '../utils/kakaoShare';
 import { gaGrowthLogged, gaMilestoneDay7, gaResonanceReceived } from '../utils/gtag';
+import StarDetail from './StarDetail';
 
 // 은하 → 항해 방향 (StarBirth와 동일 매핑)
 const GALAXY_TO_DIRECTION = {
@@ -134,9 +135,13 @@ const GROWTH_STORAGE_KEY = (starId) => `dt_growth_reflection_${starId}`;
 export default function MyStar() {
   const { id } = useParams();
   const myStarId = readSavedStar();
+  const isOwner = myStarId === id;
 
-  if (!myStarId || myStarId !== id) {
-    return <Navigate to="/dreamtown" replace />;
+  if (!isOwner) {
+    const fromResonance =
+      new URLSearchParams(window.location.search).get('from');
+    const mode = fromResonance ? 'resonance' : 'public';
+    return <StarDetail starId={id} viewMode={mode} />;
   }
 
   const nav = useNavigate();
