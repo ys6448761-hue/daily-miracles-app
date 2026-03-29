@@ -434,6 +434,15 @@ try {
   console.error("❌ Drive→GitHub Sync 라우터 로드 실패:", error.message);
 }
 
+// Storyboard 배치 라우터 로딩
+let storyboardRoutes = null;
+try {
+  storyboardRoutes = require("./routes/storyboardRoutes");
+  console.log("✅ Storyboard 배치 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ Storyboard 배치 라우터 로드 실패:", error.message);
+}
+
 // Hero8 8초 영상 생성 라우터 로딩
 let hero8Routes = null;
 try {
@@ -1841,6 +1850,14 @@ if (driveGitHubSyncRoutes) {
   console.log("✅ Drive→GitHub Sync 라우터 등록 완료 (/api/sync/run, /api/sync/health, /api/sync/status)");
 } else {
   console.warn("⚠️ Drive→GitHub Sync 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- Storyboard 배치 Routes (/api/storyboard) ----------
+if (storyboardRoutes) {
+  app.use("/api/storyboard", storyboardRoutes);
+  console.log("✅ Storyboard 배치 라우터 등록 완료 (/api/storyboard)");
+} else {
+  console.warn("⚠️ Storyboard 배치 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Hero8 8초 영상 생성 Routes (/api/video/hero8) ----------

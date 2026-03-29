@@ -15,6 +15,47 @@ const path = require('path');
 const fs = require('fs').promises;
 
 const { CAMERA_PLAN, TIMING, QA_SETTINGS } = require('./constants');
+const { VIDEO_PRESETS } = require('../../config/videoPresets');
+
+/**
+ * getTiming — presetName으로 클립별 타이밍 계산
+ * default 프리셋은 V4.2.1 TIMING 원본 그대로 반환 (안정성 보장)
+ *
+ * @param {string} presetName - 'short' | 'default' | 'extended'
+ * @returns {{ KF1, KF2, KF3, crossfade, total, fps, frames, xfadeOffset1, xfadeOffset2 }}
+ */
+function getTiming(presetName = 'default') {
+  // default → 기존 상수 그대로 (V4.2.1 정확 보장)
+  if (!presetName || presetName === 'default') {
+    return { ...TIMING };
+  }
+
+  const preset = VIDEO_PRESETS[presetName] ?? VIDEO_PRESETS.default;
+  const total     = preset.duration;
+  const crossfade = TIMING.crossfade; // 0.2s 고정
+
+  // 각 클립 파일 길이: total + 2*crossfade 를 ratio로 배분
+  // 검증: KF1 + KF2 + KF3 - 2*crossfade = total
+  const totalClipTime = total + 2 * crossfade;
+  const KF1 = Math.round(totalClipTime * preset.ratio.zoomIn * 1000) / 1000;
+  const KF2 = Math.round(totalClipTime * preset.ratio.pan    * 1000) / 1000;
+  const KF3 = Math.round(totalClipTime * preset.ratio.outro  * 1000) / 1000;
+
+  const xfadeOffset1 = Math.round((KF1 - crossfade) * 100) / 100;
+  const xfadeOffset2 = Math.round((xfadeOffset1 + KF2 - crossfade) * 100) / 100;
+
+  return {
+    KF1,
+    KF2,
+    KF3,
+    crossfade,
+    total,
+    fps:    TIMING.fps,
+    frames: Math.round(KF1 * TIMING.fps),
+    xfadeOffset1,
+    xfadeOffset2,
+  };
+}
 
 class Hero8Renderer {
   constructor() {
@@ -279,7 +320,12 @@ class Hero8Renderer {
    * @param {string} outputDir - 출력 디렉토리
    * @returns {Promise<{ path: string, duration: number }>}
    */
-  async render(keyframes, outputDir) {
+  async render(keyframes, outputDir, presetName = 'default') {
+    const originalTiming = this.timing;
+    if (presetName !== 'default') {
+      this.timing = getTiming(presetName);
+    }
+    try {
     console.log(`\n🎥 Hero8 V4.2.1 비디오 렌더링 시작...`);
     console.log(`   타이밍: ${this.timing.KF1}s + ${this.timing.KF2}s + ${this.timing.KF3}s - 0.4s(xfade) = ${this.timing.total}s`);
     console.log(`   xfade offsets: ${this.timing.xfadeOffset1 || 2.6} / ${this.timing.xfadeOffset2 || 5.2}`);
@@ -362,6 +408,9 @@ class Hero8Renderer {
       // 에러 시 임시 파일 정리 시도
       await fs.rm(tempDir, { recursive: true, force: true }).catch(() => {});
       throw error;
+    }
+    } finally {
+      this.timing = originalTiming;
     }
   }
 

@@ -1,0 +1,25 @@
+{
+  "seriesId": "dt-global-001",
+  "title": "드림타운 글로벌 시리즈 001",
+  "durationPreset": "default",
+  "scenes": [
+    {
+      "sceneId": "s01",
+      "text": "오동도 아침, 바다가 열리는 순간",
+      "promptSeed": "HERO1",
+      "mood": "calm"
+    },
+    {
+      "sceneId": "s02",
+      "text": "돌산대교 위에서 여수 야경을 바라보다",
+      "promptSeed": "HERO2",
+      "mood": "romantic"
+    },
+    {
+      "sceneId": "s03",
+      "text": "게마을 골목, 소원을 품은 발걸음",
+      "promptSeed": "HERO3",
+      "mood": "hopeful"
+    }
+  ]
+}
