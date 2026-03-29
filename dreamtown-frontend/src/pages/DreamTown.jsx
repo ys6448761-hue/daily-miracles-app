@@ -1,20 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { readSavedStar } from '../lib/utils/starSession.js';
-import InviteHero from './InviteHero.jsx';
+import InviteIntro from './InviteIntro.jsx';
 import WishInputScreen from './WishInputScreen.jsx';
 
 /**
  * /dreamtown — 공개 입구 (Public Entry)
  *
  * scene 상태 머신:
- *  'invite'    — ?entry=invite 진입 시 InviteHero 표시
- *  'wish'      — InviteHero "소원 시작" CTA → WishInputScreen
- *  'dreamtown' — 직접 진입 or "별 보기" CTA → 기존 광장 화면
+ *  'intro'     — ?entry=invite 진입 시 단일 인트로 화면 (InviteIntro)
+ *  'wish'      — "시작하기 ✦" CTA → WishInputScreen (즉시 전환)
+ *  'dreamtown' — 직접 진입 or 기존 광장 화면
  *
  * 정책:
  *  - localStorage 있어도 자동 복귀 금지
- *  - CTA 클릭 시에만 실제 앱 진입
+ *  - invite 유입: 인트로 → 입력, 단계 없음, "다음" 없음
+ *  - 일반 진입: 기존 광장 화면 바로 표시
  */
 export default function DreamTown() {
   const navigate = useNavigate();
@@ -24,8 +25,8 @@ export default function DreamTown() {
 
   const isInvite = searchParams.get('entry') === 'invite';
 
-  // invite → 'invite' scene 먼저, 직접 진입 → 'dreamtown' 바로
-  const [scene, setScene] = useState(isInvite ? 'invite' : 'dreamtown');
+  // invite → 'intro' 먼저, 직접 진입 → 'dreamtown' 바로
+  const [scene, setScene] = useState(isInvite ? 'intro' : 'dreamtown');
 
   useEffect(() => {
     // 레거시 키 제거 — 공개 입구에서 dt_star_id 완전 소거
@@ -35,26 +36,25 @@ export default function DreamTown() {
     if (saved) setHasExistingStar(true);
   }, []);
 
-  // ── Scene: invite ───────────────────────────────────────────────
-  if (scene === 'invite') {
+  // ── Scene: intro (단일 인트로 — ?entry=invite 전용) ──────────────
+  if (scene === 'intro') {
     return (
-      <InviteHero
-        onWish={() => setScene('wish')}
-        onSeeDreamtown={() => setScene('dreamtown')}
+      <InviteIntro
+        onStart={() => setScene('wish')}
       />
     );
   }
 
-  // ── Scene: wish ─────────────────────────────────────────────────
+  // ── Scene: wish (즉시 소원 입력) ───────────────────────────────────
   if (scene === 'wish') {
     return (
       <WishInputScreen
-        onBack={() => setScene('invite')}
+        onBack={() => setScene('intro')}
       />
     );
   }
 
-  // ── Scene: dreamtown (기존 광장 화면) ───────────────────────────
+  // ── Scene: dreamtown (기존 광장 화면) ───────────────────────────────
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-[#0D1B2A] px-6">
       {/* 인트로 */}
