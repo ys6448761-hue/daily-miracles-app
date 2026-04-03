@@ -149,6 +149,98 @@ export function gaFirstVoyageStart({ starId, galaxyCode, direction } = {}) {
   });
 }
 
+// ── DreamTown 루프 퍼널 (SSOT) ────────────────────────────────────────
+// 퍼널 단계:
+//   resonance_click → resonance_success → resonance_cta_click
+//   → similar_star_click (반복 루프)
+//   → wish_input_start → wish_create_submit
+//   → dt_share_click → dt_share_success
+//
+// 공통 파라미터 규약:
+//   star_id   — 대상 별 ID
+//   is_invite — ?entry=invite 유입 여부 (boolean)
+//   method    — 공유 방법: 'kakao' | 'native' | 'clipboard'
+
+/**
+ * 공명 버튼 클릭 (API 호출 직전)
+ * 측정: 공명 의향률 = resonance_click / star_detail_view
+ */
+export function gaResonanceClick({ starId, type, isInvite = false } = {}) {
+  send('resonance_click', { star_id: starId, resonance_type: type, is_invite: isInvite });
+}
+
+/**
+ * 공명 API 성공 (낙관적 업데이트 후 서버 확인 완료)
+ * 측정: 공명 완료율 = resonance_success / resonance_click
+ */
+export function gaResonanceSuccess({ starId, type, isInvite = false } = {}) {
+  send('resonance_success', { star_id: starId, resonance_type: type, is_invite: isInvite });
+}
+
+/**
+ * 공명 후 CTA 클릭 ("나도 별 만들기" / "내 별 보러 가기")
+ * 측정: 전환율 = resonance_cta_click / resonance_success
+ */
+export function gaResonanceCTAClick({ starId, ctaType, isInvite = false, hasMyStarId = false } = {}) {
+  send('resonance_cta_click', { star_id: starId, cta_type: ctaType, is_invite: isInvite, has_my_star_id: hasMyStarId });
+}
+
+/**
+ * 유사 별 클릭 (공명 후 추천 목록 → 다음 별)
+ * 측정: 루프 반복률 = similar_star_click / resonance_success
+ */
+export function gaSimilarStarClick({ fromStarId, toStarId, position } = {}) {
+  send('similar_star_click', { from_star_id: fromStarId, to_star_id: toStarId, position });
+}
+
+/**
+ * 소원 입력 시작 (INITIAL_TEXT 이탈 첫 감지, 1회만 발화)
+ * 측정: 입력 시작율 = wish_input_start / wish_screen_view
+ */
+export function gaWishInputStart({ isInvite = false, trigger = 'manual' } = {}) {
+  send('wish_input_start', { is_invite: isInvite, trigger });
+}
+
+/**
+ * 소원 작성 제출 ("별 만들기" CTA 클릭)
+ * 측정: 제출율 = wish_create_submit / wish_input_start
+ */
+export function gaWishCreateSubmit({ isInvite = false, wishLength = 0 } = {}) {
+  send('wish_create_submit', { is_invite: isInvite, wish_length: wishLength });
+}
+
+/**
+ * 공유 버튼 클릭 (StarBirth 화면)
+ * 측정: 공유 의향률 = dt_share_click / star_created
+ */
+export function gaDtShareClick({ starId, location = 'star_birth' } = {}) {
+  send('dt_share_click', { star_id: starId, location });
+}
+
+/**
+ * 공유 완료 (Kakao sendDefault 성공 / navigator.share 성공 / clipboard 복사)
+ * 측정: 공유 완료율 = dt_share_success / dt_share_click
+ */
+export function gaDtShareSuccess({ starId, method = 'kakao' } = {}) {
+  send('dt_share_success', { star_id: starId, method });
+}
+
+/**
+ * 유사 별 없음 → 광장 fallback 클릭
+ * 측정: 공명 후 이탈 방향 분석 (similar_star 미노출 시 광장 이동율)
+ */
+export function gaSquareFallbackClick({ starId, isInvite = false, hasMyStarId = false } = {}) {
+  send('square_fallback_click', { star_id: starId, is_invite: isInvite, has_my_star_id: hasMyStarId });
+}
+
+/**
+ * 유사 별 섹션 노출 시 결과 0개 (API 응답 후 빈 상태)
+ * 측정: similar_star API 실효율 — 빈 결과 비율이 높으면 추천 품질 개선 필요
+ */
+export function gaSimularStarsEmptyView({ starId, isInvite = false, hasMyStarId = false } = {}) {
+  send('similar_stars_empty_view', { star_id: starId, is_invite: isInvite, has_my_star_id: hasMyStarId });
+}
+
 /**
  * 7. Day 7 도달 (별 생성 후 7일 내 재방문)
  * KPI: Day 7 재방문율 = milestone_day7 / star_created

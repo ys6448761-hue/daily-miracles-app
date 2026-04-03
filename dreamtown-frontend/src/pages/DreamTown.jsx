@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { readSavedStar } from '../lib/utils/starSession.js';
 import InviteIntro from './InviteIntro.jsx';
 import WishInputScreen from './WishInputScreen.jsx';
+import StarDetail from './StarDetail.jsx';
 
 /**
  * /dreamtown — 공개 입구 (Public Entry)
@@ -21,20 +22,30 @@ export default function DreamTown() {
   const navigate = useNavigate();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
+
+  const isInvite    = searchParams.get('entry') === 'invite';
+  const starIdParam = searchParams.get('starId');
+
+  // ── 훅은 조건 분기 이전에 모두 선언 (Rules of Hooks) ────────────────
   const [hasExistingStar, setHasExistingStar] = useState(false);
-
-  const isInvite = searchParams.get('entry') === 'invite';
-
-  // invite → 'intro' 먼저, 직접 진입 → 'dreamtown' 바로
-  const [scene, setScene] = useState(isInvite ? 'intro' : 'dreamtown');
+  // invite+starId 분기에서는 scene 상태를 사용하지 않지만 훅 순서 유지를 위해 선언
+  const [scene, setScene] = useState(
+    isInvite && !starIdParam ? 'intro' : 'dreamtown'
+  );
 
   useEffect(() => {
+    if (isInvite && starIdParam) return; // StarDetail에 위임 — 아무것도 하지 않음
     // 레거시 키 제거 — 공개 입구에서 dt_star_id 완전 소거
     localStorage.removeItem('dt_star_id');
     // 자동 복귀 없음 — 존재 여부만 확인해서 복귀 버튼 노출 여부 결정
     const saved = readSavedStar();
     if (saved) setHasExistingStar(true);
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── invite + starId → 특정 별 상세 바로 표시 (InviteIntro 건너뜀) ──
+  if (isInvite && starIdParam) {
+    return <StarDetail starId={starIdParam} viewMode="public" />;
+  }
 
   // ── Scene: intro (단일 인트로 — ?entry=invite 전용) ──────────────
   if (scene === 'intro') {

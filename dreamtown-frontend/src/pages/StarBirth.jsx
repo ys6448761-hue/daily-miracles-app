@@ -1,14 +1,19 @@
+/**
+ * StarBirth.jsx — 3-phase 변환 애니메이션
+ *
+ * Phase 1  (0 → 0.8s)   wishText glow 표시 + 배경 파티클
+ * Phase 2  (0.8 → 1.8s) 텍스트 blur 분해 → 중앙 ✦ flash 등장 + 배경 이미지 fade-in
+ * Phase 3  (1.8 → 3.5s) "당신의 소원이 별이 되었어요 ✨" + wishText 재표시
+ * CTA      (2.3s~)       공유하기 / 나중에 — delay 0.5s 자연 노출, 강제 이동 없음
+ */
+
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { gaStarCreated, gaFirstVoyageStart } from '../utils/gtag';
+import { gaStarCreated, gaFirstVoyageStart, gaDtShareClick } from '../utils/gtag';
+import { shareStarBirth } from '../utils/kakaoShare';
 
-const STAGES = [
-  { key: 'seed',           emoji: '✨', text: '빛구슬이 떠오릅니다...',         sub: 'A light is rising from the sea.' },
-  { key: 'aurum',          emoji: '🐢', text: '아우룸이 나타났습니다.',         sub: 'Aurum has appeared.' },
-  { key: 'constellation',  emoji: '🌌', text: '황금 거북 별자리가 빛납니다.',   sub: 'The Golden Turtle Constellation shines.' },
-  { key: 'star',           emoji: '⭐', text: '소원이 별이 되었습니다',         sub: 'Your wish is now a star.' },
-];
+const BASE = import.meta.env.BASE_URL;
 
 const GALAXY_LABEL = {
   growth:       '성장 은하',
@@ -17,15 +22,13 @@ const GALAXY_LABEL = {
   relationship: '관계 은하',
 };
 
-// 은하 코드 → 항해 방향 (galaxyLogCopy.js options 기반)
 const GALAXY_TO_DIRECTION = {
-  growth:       'east',   // 정리하기 — 성장은 명료함에서 시작
-  challenge:    'north',  // 나아가기 — 도전은 용기에서 시작
-  healing:      'south',  // 놓아보기 — 치유는 내려놓음에서 시작
-  relationship: 'west',   // 가라앉기 — 관계는 고요함에서 시작
+  growth:       'east',
+  challenge:    'north',
+  healing:      'south',
+  relationship: 'west',
 };
 
-// 첫 항해 Aurum 메시지 (은하별)
 const FIRST_VOYAGE_MESSAGE = {
   growth:       '오늘, 이 별이 처음 빛나는 날입니다.',
   challenge:    '오늘, 첫 발걸음이 시작됩니다.',
@@ -33,172 +36,347 @@ const FIRST_VOYAGE_MESSAGE = {
   relationship: '오늘, 마음이 닿기 시작하는 날입니다.',
 };
 
-// 고정 파티클 좌표 (Math.random 제거 → 렌더 일관성 보장)
-const PARTICLES = [
-  { x: -90, y: -80 }, { x:  90, y: -70 }, { x: -70, y:  60 }, { x:  80, y:  75 },
-  { x:   0, y:-100 }, { x:-110, y:  10 }, { x: 110, y:  20 }, { x: -40, y:  90 },
-  { x:  50, y: -95 }, { x:-100, y: -30 }, { x: 100, y: -50 }, { x:  30, y: 100 },
+// ── Phase 1 배경 파티클 (고정 좌표, Math.random 없음) ──
+const BG_PARTICLES = [
+  { top: '18%', left: '10%', size: 3, dur: 2.0, delay: 0.0 },
+  { top: '12%', left: '80%', size: 2, dur: 1.8, delay: 0.4 },
+  { top: '72%', left: '6%',  size: 4, dur: 2.2, delay: 0.8 },
+  { top: '78%', left: '84%', size: 3, dur: 1.9, delay: 0.2 },
+  { top: '42%', left: '3%',  size: 2, dur: 2.4, delay: 1.1 },
+  { top: '48%', left: '92%', size: 2, dur: 2.1, delay: 0.6 },
+  { top: '28%', left: '87%', size: 3, dur: 2.3, delay: 0.9 },
+  { top: '88%', left: '38%', size: 2, dur: 1.7, delay: 0.3 },
+  { top: '8%',  left: '45%', size: 2, dur: 2.0, delay: 0.7 },
 ];
 
+// ── Phase 3 burst 파티클 (중앙 → 방사) ──
+const BURST = [
+  { x: -88, y: -78 }, { x:  88, y: -68 }, { x: -68, y:  58 }, { x:  78, y:  72 },
+  { x:   0, y:-102 }, { x:-108, y:  12 }, { x: 108, y:  18 }, { x: -38, y:  88 },
+  { x:  48, y: -96 }, { x: -98, y: -28 }, { x:  98, y: -48 }, { x:  28, y:  98 },
+  { x: -58, y: -48 }, { x:  58, y: -38 }, { x: -28, y:  68 },
+];
+
+const STYLE = `
+  @keyframes sb-float {
+    0%, 100% { transform: translateY(0);     opacity: 0.5; }
+    50%       { transform: translateY(-10px); opacity: 1;   }
+  }
+  @keyframes sb-glow-pulse {
+    0%, 100% { box-shadow: 0 0 20px 4px rgba(255,215,106,0.16); }
+    50%       { box-shadow: 0 0 52px 16px rgba(255,215,106,0.36); }
+  }
+  /* Phase 3 이후 별 living-state — 은은한 glow breathing */
+  @keyframes sb-star-breathe {
+    0%, 100% { filter: drop-shadow(0 0 12px rgba(255,215,106,0.45)) brightness(1);   }
+    50%       { filter: drop-shadow(0 0 28px rgba(255,215,106,0.75)) brightness(1.15); }
+  }
+  /* 공유 성공 피드백 — fade-in → hold → fade-out */
+  @keyframes sb-share-feedback {
+    0%   { opacity: 0; transform: translateY(4px); }
+    15%  { opacity: 1; transform: translateY(0); }
+    75%  { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  .sb-share-feedback { animation: sb-share-feedback 1.8s ease forwards; }
+`;
+
 export default function StarBirth() {
-  const nav = useNavigate();
-  const { state } = useLocation();
-  const [stage, setStage] = useState(0);
-  const [done, setDone] = useState(false);
+  const nav          = useNavigate();
+  const { state }    = useLocation();
 
-  const starId    = state?.starId;
-  const starName  = state?.starName  || '나의 별';
-  const galaxy    = state?.galaxy    ?? null;
-  const gemType   = state?.gemType   ?? null;
+  const starId   = state?.starId;
+  const starName = state?.starName  || '나의 별';
+  const galaxy   = state?.galaxy    ?? null;
+  const gemType  = state?.gemType   ?? null;
+  const wishText = state?.wishText  ?? '';
 
+  // phase: 1 → 2 → 3 → 'done'
+  const [phase,        setPhase]        = useState(1);
+  const [showCTA,      setShowCTA]      = useState(false);
+  const [shareFeedback, setShareFeedback] = useState(0); // 공유 피드백 animation key (0=미노출)
+
+  // ── 타임라인 ────────────────────────────────────────────
   useEffect(() => {
-    if (stage >= STAGES.length - 1) {
-      const t = setTimeout(() => setDone(true), 1000);
-      return () => clearTimeout(t);
-    }
-    const t = setTimeout(() => setStage(s => s + 1), 1200);
-    return () => clearTimeout(t);
-  }, [stage]);
+    const ts = [
+      setTimeout(() => setPhase(2),       800),   // Phase 2: 텍스트 분해 + 별 flash
+      setTimeout(() => setPhase(3),      1800),   // Phase 3: 결과 메시지
+      setTimeout(() => setPhase('done'), 3500),   // done: GA 발화
+      setTimeout(() => setShowCTA(true), 2300),   // CTA: 0.5s delay (1800+500)
+    ];
+    return () => ts.forEach(clearTimeout);
+  }, []);
 
-  // 별 생성 완료 → GA4 star_created + 4초 후 자동 첫 항해 이동 (1회만)
+  // ── GA: star_created ────────────────────────────────────
   useEffect(() => {
-    if (!done) return;
-    gaStarCreated({ gemType, galaxyType: galaxy });
+    if (phase === 'done') gaStarCreated({ gemType, galaxyType: galaxy });
+  }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const firstVoyageDone = starId ? localStorage.getItem('dt_first_voyage_' + starId) : null;
-    if (firstVoyageDone) return; // 이미 첫 항해 완료 → 자동 이동 없음
-
+  function handleVoyage() {
     const direction = GALAXY_TO_DIRECTION[galaxy] ?? 'south';
     const message   = FIRST_VOYAGE_MESSAGE[galaxy] ?? '오늘, 첫 항해가 시작됩니다.';
-    const t = setTimeout(() => {
-      gaFirstVoyageStart({ starId, galaxyCode: galaxy, direction });
-      nav('/day', { state: { direction, message, starId, isFirstVoyage: true }, replace: true });
-    }, 4000);
-    return () => clearTimeout(t);
-  }, [done]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (starId) localStorage.setItem('dt_first_voyage_' + starId, 'started');
+    gaFirstVoyageStart({ starId, galaxyCode: galaxy, direction });
+    nav('/day', { state: { direction, message, starId, isFirstVoyage: true }, replace: true });
+  }
 
+  const isDone      = phase === 'done';
+  const bgVisible   = phase === 2 || phase === 3 || isDone;
+  const showResult  = phase === 3 || isDone;
+  const showStar    = phase !== 1;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden">
-      {/* 배경 파티클 — 고정 좌표, Math.random 없음 */}
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        overflow: 'hidden',
+        background: '#0D1B2A',
+        padding: '40px 24px',
+      }}
+    >
+      <style>{STYLE}</style>
+
+      {/* ── 배경 이미지 — Phase 2부터 fade-in ── */}
+      <motion.img
+        src={`${BASE}images/dreamtown-main.jpg`}
+        alt=""
+        style={{
+          position: 'absolute', inset: 0,
+          width: '100%', height: '100%',
+          objectFit: 'cover',
+          pointerEvents: 'none',
+        }}
+        animate={{ opacity: bgVisible ? 0.38 : 0 }}
+        transition={{ duration: 0.9, ease: 'easeOut' }}
+      />
+      {/* 어두운 그라디언트 오버레이 */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(to bottom, rgba(13,27,42,0.5) 0%, rgba(13,27,42,0.82) 100%)',
+        pointerEvents: 'none',
+      }} />
+
+      {/* ── Phase 1 배경 파티클 ── */}
+      {BG_PARTICLES.map((p, i) => (
+        <div
+          key={i}
+          style={{
+            position: 'absolute',
+            top: p.top, left: p.left,
+            width: p.size + 'px', height: p.size + 'px',
+            borderRadius: '50%',
+            background: '#FFD76A',
+            animation: `sb-float ${p.dur}s ${p.delay}s ease-in-out infinite`,
+            pointerEvents: 'none',
+            opacity: phase === 1 ? 1 : 0,
+            transition: 'opacity 0.5s ease',
+          }}
+        />
+      ))}
+
+      {/* ── Phase 3 burst 파티클 ── */}
       <AnimatePresence>
-        {done && PARTICLES.map((p, i) => (
+        {showResult && BURST.map((p, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
-            animate={{ opacity: [0, 1, 0], scale: [0, 1, 0], x: p.x, y: p.y }}
-            transition={{ duration: 1.5, delay: i * 0.06 }}
-            className="absolute w-2 h-2 rounded-full bg-star-gold pointer-events-none"
+            animate={{ opacity: [0, 1, 0], scale: [0, 1.2, 0], x: p.x, y: p.y }}
+            transition={{ duration: 1.4, delay: i * 0.04, ease: 'easeOut' }}
+            style={{
+              position: 'absolute',
+              width: 5, height: 5,
+              borderRadius: '50%',
+              background: '#FFD76A',
+              pointerEvents: 'none',
+            }}
           />
         ))}
       </AnimatePresence>
 
-      {/* 메인 아이콘 */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={stage}
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 1.3 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="text-8xl mb-6"
-        >
-          {STAGES[stage].emoji}
-        </motion.div>
-      </AnimatePresence>
+      {/* ── Content ── */}
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 340, textAlign: 'center' }}>
 
-      {/* 단계 텍스트 */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={`text-${stage}`}
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-5"
-        >
-          <p className="text-xl font-semibold text-white mb-2">{STAGES[stage].text}</p>
-          <p className="text-white/40 text-sm">{STAGES[stage].sub}</p>
-        </motion.div>
-      </AnimatePresence>
+        {/* Phase 1: wishText glow 박스 */}
+        <AnimatePresence>
+          {phase === 1 && (
+            <motion.div
+              key="wish-glow"
+              initial={{ opacity: 0, scale: 0.88 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, filter: 'blur(14px)', scale: 1.18 }}
+              transition={{ duration: 0.45, ease: 'easeOut' }}
+              style={{
+                padding: '22px 24px',
+                borderRadius: 20,
+                background: 'rgba(255,215,106,0.07)',
+                border: '1px solid rgba(255,215,106,0.28)',
+                animation: 'sb-glow-pulse 2s ease-in-out infinite',
+                marginBottom: 24,
+              }}
+            >
+              {wishText ? (
+                <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.9)', lineHeight: 1.65, fontStyle: 'italic' }}>
+                  &ldquo;{wishText}&rdquo;
+                </p>
+              ) : (
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)' }}>소원이 별이 되고 있어요...</p>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      {/* 진행 바 — 애니메이션 중에만 노출, done 후 사라짐 */}
-      {!done && (
-        <div className="flex gap-2 mb-8">
-          {STAGES.map((_, i) => (
-            <div
-              key={i}
-              className={`h-1 rounded-full transition-all duration-500 ${
-                i <= stage ? 'bg-star-gold w-8' : 'bg-white/20 w-4'
-              }`}
-            />
-          ))}
-        </div>
-      )}
+        {/* ── 중앙 ✦ 별 아이콘 — Phase 2에 flash, 이후 glow 유지 ── */}
+        <AnimatePresence>
+          {showStar && (
+            <motion.div
+              key="star-icon"
+              initial={{ scale: 0.1, opacity: 0 }}
+              animate={{
+                scale:   [0.1, 2.8, 1.4, 1],
+                opacity: [0,   1,   1,   1],
+              }}
+              transition={{ duration: 0.88, times: [0, 0.34, 0.65, 1], ease: 'easeOut' }}
+              style={{
+                fontSize: 76,
+                lineHeight: 1,
+                marginBottom: 16,
+                display: 'inline-block',
+                color: '#FFD76A',
+                // Phase 3 이후: sb-star-breathe living-state 유지
+                // Phase 2: flash는 framer-motion scale keyframe이 담당
+                animation: showResult
+                  ? 'sb-star-breathe 2.8s ease-in-out infinite'
+                  : 'none',
+              }}
+            >
+              ✦
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      {/* 완료 — 별 이름 + 첫 항해 CTA */}
-      <AnimatePresence>
-        {done && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-center w-full"
-          >
-            {/* 별 이름 + 은하 */}
-            <p className="text-star-gold text-2xl font-bold glow-gold mb-1">{starName}</p>
-            {galaxy && (
-              <p className="text-white/40 text-xs mb-2">
-                {GALAXY_LABEL[galaxy] ?? galaxy} · D+1
+        {/* Phase 3 + done: 결과 메시지 + wishText 재표시 */}
+        <AnimatePresence>
+          {showResult && (
+            <motion.div
+              key="result"
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+            >
+              {/* 메인 메시지 */}
+              <p style={{ fontSize: 20, fontWeight: 700, color: 'white', marginBottom: 6, lineHeight: 1.4 }}>
+                당신의 소원이 별이 되었어요 ✨
               </p>
-            )}
-            <p className="text-white/50 text-sm mb-4">오늘부터 이 별이 빛나기 시작합니다</p>
 
-            {/* 첫 항해 유도 메시지 */}
-            <p className="text-white/40 text-xs mb-1">🐢 Aurum</p>
-            <p className="text-white/60 text-sm italic mb-8">
-              &quot;{FIRST_VOYAGE_MESSAGE[galaxy] ?? '오늘 밤, 새로운 별이 태어났습니다.'}&quot;
-            </p>
+              {/* 별 이름 + 은하 */}
+              <p style={{ fontSize: 14, color: 'rgba(255,215,106,0.75)', marginBottom: galaxy ? 4 : 20 }}>
+                {starName}
+              </p>
+              {galaxy && (
+                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginBottom: 20 }}>
+                  {GALAXY_LABEL[galaxy] ?? galaxy} · D+1
+                </p>
+              )}
 
-            {/* 첫 항해 연결 문구 */}
-            <p className="text-white/30 text-xs mb-5">
-              {starName}과(와) 함께하는 첫 여정
-            </p>
+              {/* wishText 인용 재표시 */}
+              {wishText && (
+                <p style={{
+                  fontSize: 13,
+                  color: 'rgba(255,215,106,0.62)',
+                  fontStyle: 'italic',
+                  padding: '12px 18px',
+                  borderRadius: 14,
+                  background: 'rgba(255,215,106,0.06)',
+                  border: '1px solid rgba(255,215,106,0.16)',
+                  lineHeight: 1.65,
+                  marginBottom: 28,
+                }}>
+                  &ldquo;{wishText}&rdquo;
+                </p>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-            {/* 광장 공지 */}
-            <p className="text-white/35 text-xs mb-5">
-              지금 광장에 당신의 소원별이 빛나고 있어요 🌟
-            </p>
+        {/* ── CTA — 2.3s 후 자연 노출 ── */}
+        <AnimatePresence>
+          {showCTA && (
+            <motion.div
+              key="cta"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+              style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
+            >
+              {/* 공유 성공 피드백 — inline, 1.8s 자동 소멸 */}
+              {shareFeedback && (
+                <p
+                  key={shareFeedback}
+                  className="sb-share-feedback"
+                  style={{
+                    fontSize: 13,
+                    color: 'rgba(255,215,106,0.82)',
+                    textAlign: 'center',
+                    marginBottom: 2,
+                    pointerEvents: 'none',
+                  }}
+                >
+                  이 별이 누군가에게 닿을 수 있어요 ✨
+                </p>
+              )}
 
-            <div className="flex flex-col items-center gap-3 w-full max-w-xs mx-auto">
-              {/* PRIMARY — 첫 항해 (4초 자동이동, 즉시 클릭도 가능) */}
+              {/* PRIMARY: 공유하기 (A안) */}
               <button
                 onClick={() => {
-                  const direction = GALAXY_TO_DIRECTION[galaxy] ?? 'south';
-                  const message   = FIRST_VOYAGE_MESSAGE[galaxy] ?? '오늘, 첫 항해가 시작됩니다.';
-                  gaFirstVoyageStart({ starId, galaxyCode: galaxy, direction });
-                  nav('/day', { state: { direction, message, starId, isFirstVoyage: true }, replace: true });
+                  gaDtShareClick({ starId, location: 'star_birth' });
+                  shareStarBirth({ starId, starName, wishText });
+                  // 공유 성공 피드백 — key 변경으로 animation 재실행
+                  setShareFeedback(k => (k || 0) + 1);
                 }}
-                className="w-full bg-dream-purple hover:bg-purple-500 text-white font-bold py-4 rounded-2xl text-lg transition-colors"
+                style={{
+                  width: '100%',
+                  padding: '16px 0',
+                  borderRadius: 9999,
+                  background: '#FFD76A',
+                  color: '#0D1B2A',
+                  fontSize: 16,
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: '0 0 32px 8px rgba(255,215,106,0.22)',
+                  letterSpacing: '0.01em',
+                }}
               >
-                첫 항해 시작하기 ✦
+                이 순간을 남겨보세요 ✨
               </button>
-              <p className="text-white/25 text-xs">잠시 후 자동으로 시작됩니다</p>
 
-              {/* SECONDARY — 내 별 */}
+              {/* SECONDARY: 나중에 → 첫 항해 */}
               <button
-                onClick={() => {
-                  if (starId) localStorage.setItem('dt_first_voyage_' + starId, 'skipped');
-                  nav(`/my-star/${starId}`, { replace: true });
+                onClick={handleVoyage}
+                style={{
+                  width: '100%',
+                  padding: '13px 0',
+                  borderRadius: 9999,
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  color: 'rgba(255,255,255,0.48)',
+                  fontSize: 14,
+                  cursor: 'pointer',
+                  letterSpacing: '0.01em',
                 }}
-                className="w-full bg-white/5 border border-white/15 text-white/60 font-medium py-3 rounded-2xl text-sm hover:bg-white/10 transition-colors"
               >
-                내 별 먼저 살펴볼게요
+                나중에 · 첫 항해 시작하기 ✦
               </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+      </div>
     </div>
   );
 }

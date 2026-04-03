@@ -5,7 +5,7 @@
  * ═══════════════════════════════════════════════════════════
  *
  * 나이스페이 "인증결제 웹" 연동
- * - SDK: https://web.nicepay.co.kr/v3/webstd/js/nicepay-3.0.js
+ * - SDK: https://pg-web.nicepay.co.kr/v3/common/js/nicepay-pgweb.js (nicepayRoutes.js HTML 실제 사용)
  * - SignData: SHA256(MID + Amt + EdiDate + MerchantKey)
  */
 

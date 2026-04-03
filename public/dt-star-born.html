@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>소원꿈터 — 별이 태어났습니다</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #09090f;
+      --fg:      #e8e4f0;
+      --muted:   #8b829c;
+      --accent:  #c8a8ff;
+      --star:    #f0e0ff;
+      --cta-bg:  #6e44c8;
+      --cta-hover: #8a60e0;
+    }
+
+    html, body {
+      height: 100%; background: var(--bg); color: var(--fg);
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      line-height: 1.7; overflow-x: hidden;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 48px 24px; text-align: center;
+    }
+
+    /* ── Phase 1: 로딩 ── */
+    #phaseLoading {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 20px;
+    }
+    .forming-star {
+      font-size: 72px;
+      animation: starForm 3s ease-in-out infinite;
+    }
+    @keyframes starForm {
+      0%   { transform: scale(0.6) rotate(-10deg); opacity: .3; filter: blur(8px); }
+      50%  { transform: scale(1.1) rotate(5deg);   opacity: .9; filter: blur(0); }
+      100% { transform: scale(0.6) rotate(-10deg); opacity: .3; filter: blur(8px); }
+    }
+    .forming-text {
+      font-size: 16px; color: var(--muted); font-weight: 300;
+      animation: fadeInOut 2s ease-in-out infinite;
+    }
+    @keyframes fadeInOut {
+      0%, 100% { opacity: .4; } 50% { opacity: 1; }
+    }
+
+    /* ── Phase 2: 별 탄생 ── */
+    #phaseBorn {
+      display: none;
+      flex-direction: column;
+      align-items: center; gap: 0;
+    }
+
+    .star-burst {
+      position: relative;
+      width: 180px; height: 180px;
+      margin-bottom: 32px;
+    }
+    .star-core {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 80px;
+      animation: starGlow 3s ease-in-out infinite;
+    }
+    @keyframes starGlow {
+      0%, 100% { filter: drop-shadow(0 0 16px rgba(200,168,255,.6)); transform: scale(1); }
+      50%       { filter: drop-shadow(0 0 40px rgba(200,168,255,1));  transform: scale(1.08); }
+    }
+    .star-ring {
+      position: absolute; inset: -20px;
+      border-radius: 50%;
+      border: 1px solid rgba(200,168,255,.2);
+      animation: ringExpand 3s ease-in-out infinite;
+    }
+    .star-ring:nth-child(2) { inset: -40px; animation-delay: .5s; opacity: .6; }
+    .star-ring:nth-child(3) { inset: -60px; animation-delay: 1s;  opacity: .3; }
+    @keyframes ringExpand {
+      0%   { transform: scale(0.8); opacity: 0; }
+      50%  { transform: scale(1);   opacity: 1; }
+      100% { transform: scale(1.1); opacity: 0; }
+    }
+
+    .born-pre {
+      font-size: 13px; letter-spacing: 2px; color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .born-title {
+      font-size: clamp(22px, 5vw, 32px);
+      font-weight: 300; color: var(--star);
+      line-height: 1.5; margin-bottom: 12px;
+    }
+    .star-name {
+      font-size: 14px; color: var(--accent);
+      margin-bottom: 32px; letter-spacing: 1px;
+    }
+
+    /* ── Aurora5 개인화 메시지 ── */
+    .aurora-msg {
+      max-width: 440px;
+      padding: 20px 24px;
+      border: 1px solid rgba(200,168,255,.15);
+      border-radius: 16px;
+      background: rgba(110,68,200,.07);
+      font-size: 14px; color: var(--fg);
+      font-weight: 300; line-height: 1.8;
+      margin-bottom: 40px;
+      min-height: 80px;
+      position: relative;
+    }
+    .aurora-label {
+      position: absolute; top: -9px; left: 16px;
+      background: var(--bg);
+      padding: 0 8px;
+      font-size: 10px; color: var(--accent);
+      letter-spacing: 2px;
+    }
+    .aurora-loading {
+      color: var(--muted); font-size: 13px;
+      animation: fadeInOut 2s ease-in-out infinite;
+    }
+
+    /* ── CTA ── */
+    .cta-group {
+      display: flex; flex-direction: column; gap: 12px;
+      width: 100%; max-width: 440px;
+    }
+    .cta-primary {
+      background: var(--cta-bg); color: #fff;
+      font-size: 16px; font-weight: 500;
+      padding: 18px 24px; border-radius: 100px;
+      border: none; cursor: pointer;
+      transition: background .25s, transform .2s;
+      box-shadow: 0 0 24px rgba(110,68,200,.4);
+      text-decoration: none; display: block;
+    }
+    .cta-primary:hover {
+      background: var(--cta-hover); transform: translateY(-2px);
+    }
+    .cta-secondary {
+      font-size: 13px; color: var(--muted);
+      text-decoration: none; padding: 8px;
+      transition: color .2s;
+    }
+    .cta-secondary:hover { color: var(--fg); }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- Phase 1: 별 생성 중 -->
+    <div id="phaseLoading">
+      <div class="forming-star">✦</div>
+      <p class="forming-text">당신의 소원이<br>별이 되고 있습니다…</p>
+    </div>
+
+    <!-- Phase 2: 별 탄생 -->
+    <div id="phaseBorn">
+      <div class="star-burst">
+        <div class="star-ring"></div>
+        <div class="star-ring"></div>
+        <div class="star-ring"></div>
+        <div class="star-core">⭐</div>
+      </div>
+
+      <p class="born-pre">✦ 탄생</p>
+      <h1 class="born-title">
+        당신의 소원이<br>
+        하나의 별이 되었습니다
+      </h1>
+      <p class="star-name" id="starName">…</p>
+
+      <div class="aurora-msg" id="auroraMsg">
+        <span class="aurora-label">Aurora5</span>
+        <span class="aurora-loading" id="auroraLoading">별지기가 메시지를 전하고 있습니다…</span>
+        <span id="auroraText" style="display:none;"></span>
+      </div>
+
+      <div class="cta-group">
+        <a class="cta-primary" href="/dt-upgrade.html" id="ctaUpgrade">
+          내 이야기 계속하기
+        </a>
+        <a class="cta-secondary" href="#" id="ctaStar">내 별 바로 보기 →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ── 세션 데이터 ──────────────────────────────────────────
+    const starData = JSON.parse(sessionStorage.getItem('dt_star') || 'null');
+
+    if (!starData?.star_id) {
+      window.location.href = '/dt-wish.html';
+    }
+
+    const { star_id, star_name, wish_text } = starData;
+
+    // ── Phase 전환 ───────────────────────────────────────────
+    function showBornPhase() {
+      document.getElementById('phaseLoading').style.display = 'none';
+      const born = document.getElementById('phaseBorn');
+      born.style.display = 'flex';
+      born.style.animation = 'none';
+      // 별 이름 + 내 별 링크 설정
+      document.getElementById('starName').textContent = star_name || '첫 번째 별';
+      document.getElementById('ctaStar').href = `/dreamtown/star/${star_id}`;
+    }
+
+    // ── Aurora5 개인화 메시지 로딩 ──────────────────────────
+    async function loadAuroraMessage() {
+      try {
+        const res = await fetch('/api/dt/engine/wisdom', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ star_id, wish_text, phase: 'day' }),
+        });
+        const data = await res.json();
+        if (data.success && data.wisdom?.content) {
+          document.getElementById('auroraLoading').style.display = 'none';
+          const textEl = document.getElementById('auroraText');
+          textEl.style.display = 'block';
+          textEl.textContent = data.wisdom.content;
+        }
+      } catch {
+        // 실패 시 기본 메시지
+        document.getElementById('auroraLoading').style.display = 'none';
+        const textEl = document.getElementById('auroraText');
+        textEl.style.display = 'block';
+        textEl.textContent = '멈춘 것처럼 보여도, 여정은 사라지지 않았습니다.\n당신의 소원이 이제 별로 남았습니다.';
+      }
+    }
+
+    // ── 실행 ─────────────────────────────────────────────────
+    // 2초 연출 후 Phase 2 전환
+    setTimeout(showBornPhase, 2200);
+    // Aurora5 메시지는 Phase 2 전환 후 요청
+    setTimeout(loadAuroraMessage, 2500);
+  </script>
+</body>
+</html>

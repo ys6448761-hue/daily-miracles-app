@@ -433,6 +433,60 @@ router.get('/stars/today', async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────────────────────────────────────
+// GET /api/dt/stars/featured — 성장 루프 노출 구조 (자동 정렬, 수동 개입 불필요)
+//
+// hot   (top 3): hot_score = (공명수 × 10 + 1) / (경과시간h + 2)
+//                30일 이내, 공명 가중 + 시간 감소. 운영자 개입 없이 자동 갱신.
+// fresh (top 3): 48h 이내 탄생 + 공명 0개 — 0공명 별이 죽지 않고 진입점으로 작동
+// ─────────────────────────────────────────────────────────────────────────
+router.get('/stars/featured', async (req, res) => {
+  try {
+    const [hotResult, freshResult] = await Promise.all([
+      // hot: 공명 가중 hot score (linear time decay, 30일 window)
+      db.query(`
+        SELECT s.id          AS star_id,
+               s.star_name,
+               s.created_at,
+               g.code        AS galaxy_code,
+               g.name_ko     AS galaxy_name_ko,
+               COALESCE(SUM(i.count), 0)::int AS resonance_count,
+               (COALESCE(SUM(i.count), 0) * 10.0 + 1.0)
+                 / (EXTRACT(EPOCH FROM (NOW() - s.created_at)) / 3600.0 + 2) AS hot_score
+          FROM dt_stars   s
+          JOIN dt_galaxies g ON g.id = s.galaxy_id
+          LEFT JOIN impact i ON i.star_id = s.id::text
+         WHERE s.is_hidden = FALSE
+           AND s.created_at >= NOW() - INTERVAL '30 days'
+         GROUP BY s.id, s.star_name, s.created_at, g.code, g.name_ko
+         ORDER BY hot_score DESC, s.created_at DESC
+         LIMIT 3
+      `),
+      // fresh: 48h 이내 + 공명 0개 — 첫 공명 진입점
+      db.query(`
+        SELECT s.id          AS star_id,
+               s.star_name,
+               s.created_at,
+               g.code        AS galaxy_code,
+               g.name_ko     AS galaxy_name_ko
+          FROM dt_stars   s
+          JOIN dt_galaxies g ON g.id = s.galaxy_id
+          LEFT JOIN impact i ON i.star_id = s.id::text
+         WHERE s.is_hidden = FALSE
+           AND s.created_at >= NOW() - INTERVAL '48 hours'
+         GROUP BY s.id, s.star_name, s.created_at, g.code, g.name_ko
+        HAVING COALESCE(SUM(i.count), 0) = 0
+         ORDER BY s.created_at DESC
+         LIMIT 3
+      `),
+    ]);
+    res.json({ hot: hotResult.rows, fresh: freshResult.rows });
+  } catch (err) {
+    console.error('[DT] GET /stars/featured error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // ─────────────────────────────────────────────
 // GET /api/dt/stars/count — 전체 별 수
 // ─────────────────────────────────────────────

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>소원꿈터 — 당신의 소원은 혼자가 아닙니다</title>
+  <meta property="og:title" content="당신의 소원은 혼자가 아닙니다">
+  <meta property="og:description" content="지금 이 마음, 여기 남겨도 괜찮습니다">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #09090f;
+      --fg:      #e8e4f0;
+      --muted:   #8b829c;
+      --accent:  #c8a8ff;
+      --star:    #f0e0ff;
+      --cta-bg:  #6e44c8;
+      --cta-hover: #8a60e0;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ── 별 배경 ── */
+    .stars {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    }
+    .stars::before, .stars::after {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 20% 30%, #fff 0%, transparent 100%),
+        radial-gradient(1px 1px at 80% 10%, #fff 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 50% 60%, rgba(200,168,255,.8) 0%, transparent 100%),
+        radial-gradient(1px 1px at 10% 80%, #fff 0%, transparent 100%),
+        radial-gradient(1px 1px at 70% 90%, rgba(200,168,255,.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 35% 15%, #fff 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 50%, rgba(200,168,255,.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 60% 40%, #fff 0%, transparent 100%);
+      animation: twinkle 6s ease-in-out infinite alternate;
+    }
+    .stars::after {
+      background-image:
+        radial-gradient(1px 1px at 15% 65%, #fff 0%, transparent 100%),
+        radial-gradient(1px 1px at 45% 85%, rgba(200,168,255,.7) 0%, transparent 100%),
+        radial-gradient(1px 1px at 75% 25%, #fff 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 25% 45%, rgba(200,168,255,.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 5%, #fff 0%, transparent 100%);
+      animation-delay: 3s;
+    }
+    @keyframes twinkle {
+      0%   { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+
+    /* ── 레이아웃 ── */
+    .page {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 48px 24px;
+      text-align: center;
+    }
+
+    /* ── Hero 글로우 ── */
+    .glow-ring {
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(110,68,200,.35) 0%, transparent 70%);
+      margin: 0 auto 40px;
+      position: relative;
+    }
+    .glow-ring::after {
+      content: '✦';
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 56px;
+      color: var(--accent);
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0);   opacity: .9; }
+      50%       { transform: translateY(-8px); opacity: 1; }
+    }
+
+    /* ── 타이포 ── */
+    .hero-label {
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+
+    .hero-main {
+      font-size: clamp(26px, 6vw, 42px);
+      font-weight: 300;
+      color: var(--star);
+      line-height: 1.5;
+      margin-bottom: 8px;
+      word-break: keep-all;
+    }
+    .hero-main em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      font-size: clamp(13px, 3vw, 16px);
+      color: var(--muted);
+      margin-top: 28px;
+      margin-bottom: 4px;
+    }
+
+    .hero-tagline {
+      font-size: clamp(14px, 3.5vw, 18px);
+      color: var(--fg);
+      font-weight: 300;
+      margin-bottom: 56px;
+    }
+
+    /* ── CTA ── */
+    .cta-btn {
+      display: inline-block;
+      background: var(--cta-bg);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 500;
+      padding: 16px 48px;
+      border-radius: 100px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      letter-spacing: 0.5px;
+      transition: background .25s, transform .2s, box-shadow .25s;
+      box-shadow: 0 0 24px rgba(110,68,200,.4);
+    }
+    .cta-btn:hover {
+      background: var(--cta-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 32px rgba(110,68,200,.6);
+    }
+    .cta-hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 16px;
+    }
+
+    /* ── 공명 섹션 ── */
+    .resonance {
+      margin-top: 80px;
+      padding-top: 48px;
+      border-top: 1px solid rgba(255,255,255,.06);
+      width: 100%; max-width: 480px;
+    }
+    .resonance-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+    .resonance-quotes {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .quote-item {
+      font-size: 13px;
+      color: var(--muted);
+      padding: 12px 16px;
+      border-left: 2px solid rgba(110,68,200,.4);
+      text-align: left;
+      border-radius: 0 4px 4px 0;
+    }
+    .quote-item span { color: rgba(200,168,255,.5); font-size: 11px; display: block; margin-top: 4px; }
+
+    /* ── 푸터 ── */
+    footer {
+      margin-top: 60px;
+      font-size: 11px;
+      color: rgba(255,255,255,.15);
+    }
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+
+  <div class="page">
+    <p class="hero-label">소원꿈터 · DreamTown</p>
+
+    <div class="glow-ring"></div>
+
+    <h1 class="hero-main">
+      지금 이 마음,<br>
+      어디에도 말 못했죠<br>
+      <em>여기 남겨도 괜찮습니다</em>
+    </h1>
+
+    <p class="hero-sub">당신의 소원은 혼자가 아닙니다</p>
+    <p class="hero-tagline">소원 하나가 별이 되고,<br>별들이 서로 빛납니다</p>
+
+    <a class="cta-btn" href="/dt-wish.html">소원 하나 남기기</a>
+    <p class="cta-hint">30초면 충분합니다 · 무료</p>
+
+    <div class="resonance">
+      <p class="resonance-label">지금 이 순간도, 누군가의 소원이 빛나고 있습니다</p>
+      <div class="resonance-quotes" id="resonanceQuotes">
+        <div class="quote-item">다시 시작할 용기가 필요해요<span>방금 전</span></div>
+        <div class="quote-item">소중한 사람과 더 많은 시간을 보내고 싶어요<span>3분 전</span></div>
+        <div class="quote-item">나 자신을 믿고 싶습니다<span>7분 전</span></div>
+      </div>
+    </div>
+
+    <footer>© 하루하루의 기적 · 소원꿈터</footer>
+  </div>
+
+  <script>
+    // 실시간 공명 — 실제 배포 시 API 연결
+    // GET /api/dt/stars?limit=3&public=true 로 교체 가능
+  </script>
+</body>
+</html>

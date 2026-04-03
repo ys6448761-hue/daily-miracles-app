@@ -56,6 +56,18 @@ export async function getTodayStars() {
   return res.json();
 }
 
+// 성장 루프 노출 구조 — hot(공명 가중) + fresh(0공명 신생별)
+// 실패 시 빈 배열 반환 — Home 렌더 블로킹 없음
+export async function getFeaturedStars() {
+  try {
+    const res = await fetch(`${BASE}/stars/featured`);
+    if (!res.ok) return { hot: [], fresh: [] };
+    return res.json();
+  } catch {
+    return { hot: [], fresh: [] };
+  }
+}
+
 export async function getRecentStars(limit = 20, galaxy = null) {
   const params = new URLSearchParams({ limit });
   if (galaxy) params.set('galaxy', galaxy);

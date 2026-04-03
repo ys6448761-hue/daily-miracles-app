@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { getRecentStars, getStar } from '../api/dreamtown.js';
+import { getRecentStars, getStar, getFeaturedStars } from '../api/dreamtown.js';
 import { readSavedStar } from '../lib/utils/starSession.js';
 
 const GALAXY_STYLE = {
@@ -72,15 +72,53 @@ function StarItem({ star }) {
   );
 }
 
+// ── 공명 수 → 짧은 감정 레이블 ─────────────────────
+function resonanceLabel(count) {
+  if (count === 0) return null;
+  if (count === 1) return '한 마음';
+  if (count <= 4)  return `${count}개 마음`;
+  if (count <= 10) return '따뜻한 마음들';
+  return '많은 마음';
+}
+
+// ── Hot 별 카드 (공명 가중 상위) ────────────────────
+function HotStarCard({ star }) {
+  const daysSince = calcDaysSinceBirth(star.created_at);
+  const galaxy    = GALAXY_STYLE[star.galaxy_code] ?? { label: star.galaxy_name_ko ?? '미지의 은하', cls: 'bg-white/10 text-white/50' };
+  const label     = resonanceLabel(star.resonance_count ?? 0);
+
+  return (
+    <Link
+      to={`/star/${star.star_id}`}
+      className="block bg-white/4 border border-star-gold/25 rounded-2xl p-4 cursor-pointer hover:border-star-gold/50 active:bg-white/8 transition-colors no-underline"
+      style={{ boxShadow: '0 0 18px 2px rgba(255,215,106,0.06)' }}
+    >
+      <div className="flex items-start justify-between mb-2">
+        <p className="text-white/85 text-sm font-semibold truncate mr-2">{star.star_name}</p>
+        {label && (
+          <span style={{ fontSize: 11, color: 'rgba(255,215,106,0.75)', flexShrink: 0 }}>
+            ✨ {label}
+          </span>
+        )}
+      </div>
+      <div className="flex gap-2 items-center">
+        <span className={`text-xs px-2 py-0.5 rounded-full ${galaxy.cls}`}>{galaxy.label}</span>
+        <span className="text-white/30 text-xs">D+{daysSince}</span>
+      </div>
+    </Link>
+  );
+}
+
 export default function Home() {
   const nav = useNavigate();
   const { state } = useLocation();
 
   const newStarId = state?.newStarId ?? null;
 
-  const [stars, setStars] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [stars, setStars]       = useState([]);
+  const [loading, setLoading]   = useState(true);
   const [myStarData, setMyStarData] = useState(null);
+  const [featured, setFeatured] = useState({ hot: [], fresh: [] });
 
   const myStarId = readSavedStar();
 
@@ -88,6 +126,10 @@ export default function Home() {
     const recentPromise = getRecentStars(20)
       .then(r => setStars(r.stars ?? []))
       .catch(() => setStars([]));
+
+    const featuredPromise = getFeaturedStars()
+      .then(f => setFeatured(f))
+      .catch(() => {});
 
     const myStarPromise = myStarId
       ? getStar(myStarId)
@@ -105,7 +147,7 @@ export default function Home() {
           })
       : Promise.resolve();
 
-    Promise.all([recentPromise, myStarPromise]).finally(() => setLoading(false));
+    Promise.all([recentPromise, myStarPromise, featuredPromise]).finally(() => setLoading(false));
   }, [myStarId]);
 
   const otherStars = stars.filter(s => s && s.star_id && s.star_id !== myStarId);
@@ -166,6 +208,38 @@ export default function Home() {
               >
                 ⭐ {s.star_name}
               </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── 지금 빛나는 별 (hot top 3) — 공명 가중 자동 정렬 ── */}
+      {featured.hot.length > 0 && (
+        <div className="mb-4">
+          <p className="text-white/50 text-xs mb-2" style={{ letterSpacing: '0.05em' }}>
+            💫 지금 가장 많은 공명
+          </p>
+          <div className="flex flex-col gap-2">
+            {featured.hot.map(s => <HotStarCard key={s.star_id} star={s} />)}
+          </div>
+        </div>
+      )}
+
+      {/* ── 새로 태어난 별 (0공명 48h) — 첫 공명 진입점 ── */}
+      {featured.fresh.length > 0 && (
+        <div className="mb-4">
+          <p className="text-white/35 text-xs mb-2">
+            🌱 새로 태어난 별 · 첫 마음을 나눠주세요
+          </p>
+          <div className="flex gap-2 flex-wrap">
+            {featured.fresh.map(s => (
+              <Link
+                key={s.star_id}
+                to={`/star/${s.star_id}`}
+                className="bg-white/4 border border-white/12 text-white/55 text-xs px-3 py-1.5 rounded-full hover:bg-white/8 active:scale-95 transition-all no-underline"
+              >
+                ✦ {s.star_name}
+              </Link>
             ))}
           </div>
         </div>

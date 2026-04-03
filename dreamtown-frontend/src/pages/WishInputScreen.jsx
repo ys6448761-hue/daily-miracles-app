@@ -14,6 +14,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { postWish, postStarCreate, getOrCreateUserId } from '../api/dreamtown.js';
 import { saveStarId } from '../lib/utils/starSession.js';
+import { gaWishInputStart, gaWishCreateSubmit } from '../utils/gtag';
 
 // ── 고정 추천 문장 3개 ──────────────────────────────────────────────
 const SUGGESTIONS = [
@@ -51,6 +52,7 @@ export default function WishInputScreen({ onBack }) {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
   const [selected, setSelected] = useState(null);
+  const inputStartedRef = useRef(false); // wish_input_start 중복 방지
 
   // 진입 즉시 커서 끝에 위치
   // InviteIntro "시작하기" 클릭 직후 mount이므로 유저 제스처 window 안에 있음
@@ -67,6 +69,10 @@ export default function WishInputScreen({ onBack }) {
     setText(suggestion);
     setSelected(idx);
     setError('');
+    if (!inputStartedRef.current) {
+      inputStartedRef.current = true;
+      gaWishInputStart({ isInvite: true, trigger: 'chip' });
+    }
     requestAnimationFrame(() => {
       const el = inputRef.current;
       if (!el) return;
@@ -85,6 +91,7 @@ export default function WishInputScreen({ onBack }) {
       return;
     }
 
+    gaWishCreateSubmit({ isInvite: true, wishLength: trimmed.length });
     setLoading(true);
     setError('');
     try {
@@ -114,6 +121,7 @@ export default function WishInputScreen({ onBack }) {
           starName: star.star_name,
           galaxy:   star.galaxy,
           gemType:  'sapphire',
+          wishText: trimmed,
         },
       });
     } catch (e) {
@@ -199,7 +207,17 @@ export default function WishInputScreen({ onBack }) {
             ref={inputRef}
             type="text"
             value={text}
-            onChange={e => { setText(e.target.value); setError(''); setSelected(null); }}
+            onChange={e => {
+              const val = e.target.value;
+              setText(val);
+              setError('');
+              setSelected(null);
+              // wish_input_start: INITIAL_TEXT 이탈 첫 감지 시 1회만 발화
+              if (!inputStartedRef.current && val.trim() !== INITIAL_TEXT.trim()) {
+                inputStartedRef.current = true;
+                gaWishInputStart({ isInvite: true, trigger: 'manual' });
+              }
+            }}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             onKeyDown={e => { if (e.key === 'Enter' && !loading) handleSubmit(); }}

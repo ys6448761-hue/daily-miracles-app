@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>소원꿈터 — 소원 남기기</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #09090f;
+      --fg:       #e8e4f0;
+      --muted:    #8b829c;
+      --accent:   #c8a8ff;
+      --border:   rgba(200,168,255,.2);
+      --cta-bg:   #6e44c8;
+      --cta-hover: #8a60e0;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      line-height: 1.7;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 48px 24px;
+      text-align: center;
+    }
+
+    /* ── 질문 ── */
+    .back-link {
+      position: fixed; top: 20px; left: 20px;
+      font-size: 12px; color: var(--muted);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .back-link:hover { color: var(--fg); }
+
+    .step-label {
+      font-size: 11px; letter-spacing: 3px; color: var(--muted);
+      margin-bottom: 32px;
+    }
+
+    .question {
+      font-size: clamp(20px, 5vw, 30px);
+      font-weight: 300;
+      color: var(--fg);
+      line-height: 1.6;
+      margin-bottom: 40px;
+      word-break: keep-all;
+    }
+    .question em { color: var(--accent); font-style: normal; }
+
+    /* ── 입력창 ── */
+    .input-wrap {
+      width: 100%; max-width: 480px;
+      position: relative;
+    }
+    .wish-input {
+      width: 100%;
+      min-height: 120px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      color: var(--fg);
+      font-size: 16px;
+      font-family: inherit;
+      padding: 20px;
+      resize: none;
+      outline: none;
+      line-height: 1.6;
+      transition: border-color .25s, box-shadow .25s;
+    }
+    .wish-input:focus {
+      border-color: rgba(200,168,255,.5);
+      box-shadow: 0 0 0 3px rgba(110,68,200,.15);
+    }
+    .wish-input::placeholder { color: var(--muted); }
+
+    .char-count {
+      position: absolute; bottom: 12px; right: 16px;
+      font-size: 11px; color: var(--muted);
+    }
+
+    /* ── gem 선택 (숨겨진) ── */
+    .gem-hint {
+      margin-top: 16px;
+      font-size: 12px; color: var(--muted);
+      text-align: left; width: 100%; max-width: 480px;
+    }
+
+    /* ── CTA ── */
+    .cta-btn {
+      margin-top: 32px;
+      width: 100%; max-width: 480px;
+      background: var(--cta-bg);
+      color: #fff;
+      font-size: 16px; font-weight: 500;
+      padding: 18px 24px;
+      border-radius: 100px;
+      border: none; cursor: pointer;
+      transition: background .25s, transform .2s, opacity .2s;
+      box-shadow: 0 0 24px rgba(110,68,200,.35);
+      letter-spacing: 0.5px;
+    }
+    .cta-btn:hover:not(:disabled) {
+      background: var(--cta-hover);
+      transform: translateY(-2px);
+    }
+    .cta-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+    /* ── 로딩 ── */
+    .loading-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: var(--bg);
+      z-index: 100;
+      flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 24px;
+    }
+    .loading-overlay.show { display: flex; }
+
+    .spinner-star {
+      font-size: 48px;
+      animation: spinPulse 2s ease-in-out infinite;
+    }
+    @keyframes spinPulse {
+      0%   { transform: scale(1) rotate(0deg);   opacity: .7; }
+      50%  { transform: scale(1.2) rotate(180deg); opacity: 1; }
+      100% { transform: scale(1) rotate(360deg); opacity: .7; }
+    }
+
+    .loading-text {
+      font-size: 15px; color: var(--muted);
+      animation: fadeInOut 2s ease-in-out infinite;
+    }
+    @keyframes fadeInOut {
+      0%, 100% { opacity: .5; }
+      50%       { opacity: 1; }
+    }
+
+    /* ── 에러 ── */
+    .error-msg {
+      display: none;
+      margin-top: 12px;
+      font-size: 12px; color: #e87070;
+      width: 100%; max-width: 480px;
+      text-align: left;
+    }
+    .error-msg.show { display: block; }
+
+    .footer-note {
+      margin-top: 40px;
+      font-size: 11px; color: rgba(255,255,255,.15);
+    }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="/dt-landing.html">← 돌아가기</a>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner-star">✦</div>
+    <p class="loading-text">소원이 별이 되고 있습니다…</p>
+  </div>
+
+  <div class="page">
+    <p class="step-label">소원꿈터 · 첫 번째 별</p>
+
+    <h1 class="question">
+      지금,<br>
+      당신이 가장 바라는 것은<br>
+      <em>무엇인가요?</em>
+    </h1>
+
+    <div class="input-wrap">
+      <textarea
+        class="wish-input"
+        id="wishInput"
+        maxlength="200"
+        placeholder="예: 다시 시작할 용기가 필요해요"
+        autofocus
+      ></textarea>
+      <span class="char-count" id="charCount">0 / 200</span>
+    </div>
+
+    <p class="gem-hint">✦ 마음에서 나온 진짜 소원일수록, 별이 더 밝게 빛납니다</p>
+
+    <button class="cta-btn" id="submitBtn" disabled>내 이야기 시작하기</button>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <p class="footer-note">소원은 저장되며, 당신의 성장 여정에 사용됩니다</p>
+  </div>
+
+  <script>
+    // ── UUID 생성 (user_id 관리) ──────────────────────────────
+    function generateUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+      });
+    }
+
+    function getUserId() {
+      let uid = localStorage.getItem('dt_user_id');
+      if (!uid) { uid = generateUUID(); localStorage.setItem('dt_user_id', uid); }
+      return uid;
+    }
+
+    // ── DOM ──────────────────────────────────────────────────
+    const wishInput  = document.getElementById('wishInput');
+    const charCount  = document.getElementById('charCount');
+    const submitBtn  = document.getElementById('submitBtn');
+    const errorMsg   = document.getElementById('errorMsg');
+    const loading    = document.getElementById('loadingOverlay');
+
+    wishInput.addEventListener('input', () => {
+      const len = wishInput.value.length;
+      charCount.textContent = `${len} / 200`;
+      submitBtn.disabled = len < 5;
+      errorMsg.classList.remove('show');
+    });
+
+    // ── 제출 ─────────────────────────────────────────────────
+    submitBtn.addEventListener('click', async () => {
+      const wishText = wishInput.value.trim();
+      if (wishText.length < 5) return;
+
+      submitBtn.disabled = true;
+      loading.classList.add('show');
+
+      try {
+        const userId = getUserId();
+
+        const res = await fetch('/api/dt/engine/star', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id:   userId,
+            wish_text: wishText,
+            gem_type:  'ruby',
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || '별 생성에 실패했습니다');
+        }
+
+        // 세션에 별 정보 저장
+        sessionStorage.setItem('dt_star', JSON.stringify({
+          star_id:      data.star.id,
+          star_name:    data.star.star_name,
+          wish_text:    wishText,
+          artifact_job: data.artifact_job?.id,
+        }));
+
+        // 별 탄생 페이지로 이동
+        window.location.href = '/dt-star-born.html';
+
+      } catch (err) {
+        loading.classList.remove('show');
+        submitBtn.disabled = false;
+        errorMsg.textContent = err.message || '잠시 후 다시 시도해주세요';
+        errorMsg.classList.add('show');
+      }
+    });
+
+    // 엔터 키 제출 (Shift+Enter는 줄바꿈)
+    wishInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey && !submitBtn.disabled) {
+        e.preventDefault();
+        submitBtn.click();
+      }
+    });
+  </script>
+</body>
+</html>

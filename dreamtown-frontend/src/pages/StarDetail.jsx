@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStarDetail, getStar, getResonance, postVoyageLog, postDtResonance } from '../api/dreamtown.js';
+import { getStarDetail, getStar, getResonance, postVoyageLog, postDtResonance, getSimilarStars } from '../api/dreamtown.js';
 import MilestoneBar from '../components/MilestoneBar';
-import { gaResonanceCreated } from '../utils/gtag';
+import { gaResonanceCreated, gaResonanceClick, gaResonanceSuccess, gaResonanceCTAClick, gaSimilarStarClick, gaSquareFallbackClick, gaSimularStarsEmptyView } from '../utils/gtag';
 import { readSavedStar } from '../lib/utils/starSession.js';
 import { generateResonanceHint } from '../utils/resonanceHint.js';
 
@@ -44,6 +44,27 @@ const DT_RESONANCE_OPTS = [
   },
 ];
 
+// ── 공명 카운트 → 감정 문장 ───────────────────────────────────────
+function countToEmotion(count) {
+  if (count === 0) return '첫 마음이 되어보세요';
+  if (count === 1) return '한 마음이 닿았어요';
+  if (count <= 4)  return '작은 마음들이 모이고 있어요';
+  if (count <= 10) return '따뜻한 마음들이 모여요';
+  if (count <= 30) return '많은 마음이 함께해요';
+  return '수많은 마음이 빛나요';
+}
+
+// ── 공명 히스토리 저장 (localStorage) ────────────────────────────
+const RESONANCE_HISTORY_KEY = 'dt_resonated_stars';
+function saveResonanceHistory(starId, starName) {
+  try {
+    const existing = JSON.parse(localStorage.getItem(RESONANCE_HISTORY_KEY) || '[]');
+    const filtered = existing.filter(e => e.starId !== starId);
+    const updated  = [{ starId, starName, ts: Date.now() }, ...filtered].slice(0, 20);
+    localStorage.setItem(RESONANCE_HISTORY_KEY, JSON.stringify(updated));
+  } catch (_) {}
+}
+
 // ── 유틸 ────────────────────────────────────────────────────────
 function calcDaysSinceBirth(createdAt) {
   if (!createdAt) return 1;
@@ -80,6 +101,22 @@ const KEYFRAMES = `
     100% { filter: brightness(1); }
   }
   .star-pulse { animation: starPulse 0.35s ease; }
+
+  /* ✦ 아이콘 scale + glow — 공명 성공 시 0.6s */
+  @keyframes starScale {
+    0%   { transform: scale(1);   text-shadow: none; }
+    35%  { transform: scale(2.0); text-shadow: 0 0 28px 8px rgba(255,215,106,0.7); }
+    70%  { transform: scale(1.5); }
+    100% { transform: scale(1);   text-shadow: none; }
+  }
+  .star-icon-pop { animation: starScale 0.65s ease; }
+
+  /* 유사 별 카드 진입 */
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .slide-up { animation: slideUp 0.4s ease forwards; }
 `;
 
 // ── 컴포넌트 ─────────────────────────────────────────────────────
@@ -100,6 +137,9 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   const [feedbackMsg, setFeedbackMsg]   = useState(null);        // 성공 피드백 문구
   const [starFlash, setStarFlash]       = useState(false);       // 별 카드 반짝
   const [starFlashKey, setStarFlashKey] = useState(0);           // animation 재트리거용
+  const [starIconPop, setStarIconPop]   = useState(false);       // ✦ 아이콘 scale pop
+  const [starIconKey, setStarIconKey]   = useState(0);
+  const [similarStars, setSimilarStars] = useState([]);          // 공명 후 유사 별 목록
 
   const myStarId  = readSavedStar();
   const isOwnStar = !propViewMode && id === myStarId;
@@ -157,8 +197,13 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── 공명 핸들러 ────────────────────────────────────────────────
+  const isInviteEntry = typeof window !== 'undefined' && window.location.search.includes('entry=invite');
+
   async function handleResonance(type) {
     if (submitting || submitted) return;
+
+    // 0. resonance_click 이벤트 (API 호출 직전)
+    gaResonanceClick({ starId: id, type, isInvite: isInviteEntry });
 
     // 1. 버튼 press 애니메이션 (scale + glow, 0.2s)
     setAnimating(type);
@@ -177,22 +222,39 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
     try {
       await postDtResonance({ starId: id, type });
       gaResonanceCreated({ starId: id, resonanceType: type });
+      gaResonanceSuccess({ starId: id, type, isInvite: isInviteEntry });
 
       if (myStarId) {
         const label = type === 'miracle' ? '기적나눔' : '지혜나눔';
         postVoyageLog(myStarId, { emotion: label, tag: '공명', growth: label, source: 'resonance' }).catch(() => {});
       }
 
-      // 3. 별 카드 반짝임 (0.35s)
+      // 3. 별 카드 반짝임 (0.35s) + ✦ 아이콘 scale pop
       setStarFlash(true);
       setStarFlashKey(k => k + 1);
       setTimeout(() => setStarFlash(false), 400);
 
-      // 4. 성공 피드백 문구 (1.3s 자동 소멸)
-      const opt = DT_RESONANCE_OPTS.find(o => o.type === type);
-      setFeedbackMsg(opt.feedback);
+      setStarIconPop(true);
+      setStarIconKey(k => k + 1);
+      setTimeout(() => setStarIconPop(false), 700);
+
+      // 4. 성공 피드백 문구 (1.5s 자동 소멸) + 히스토리 저장
+      setFeedbackMsg('당신의 마음이 닿았어요 ✨');
+      saveResonanceHistory(id, detail?.star_name ?? '');
       setSubmitted(true);                           // 버튼 즉시 숨김
-      setTimeout(() => setFeedbackMsg(null), 1300);
+      setTimeout(() => setFeedbackMsg(null), 1500);
+
+      // 5. 유사 별 3개 fetch (비동기, 실패 무시)
+      getSimilarStars({ starId: id }).then(res => {
+        const list = Array.isArray(res) ? res : (res?.stars ?? []);
+        const trimmed = list.slice(0, 3);
+        setSimilarStars(trimmed);
+        if (trimmed.length === 0) {
+          gaSimularStarsEmptyView({ starId: id, isInvite: isInviteEntry, hasMyStarId: !!myStarId });
+        }
+      }).catch(() => {
+        gaSimularStarsEmptyView({ starId: id, isInvite: isInviteEntry, hasMyStarId: !!myStarId });
+      });
 
     } catch {
       // 롤백
@@ -277,7 +339,10 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
         className={`bg-white/5 border border-white/10 rounded-3xl p-6 mb-4${starFlash ? ' star-pulse' : ''}`}
       >
         <div className="text-center">
-          <div className="text-5xl mb-4">✦</div>
+          <div
+            key={starIconKey}
+            className={`text-5xl mb-4 inline-block${starIconPop ? ' star-icon-pop' : ''}`}
+          >✦</div>
           <h1 className="text-2xl font-bold text-star-gold mb-3">{detail.star_name}</h1>
 
           {/* 은하 + D+N 뱃지 */}
@@ -423,9 +488,10 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
             /* 버튼 상태 */
             <div className="bg-white/3 border border-white/8 rounded-2xl p-4">
               <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.38)', textAlign: 'center', marginBottom: 14 }}>
-                이 별은{' '}
-                <strong style={{ color: 'rgba(255,255,255,0.6)' }}>{hint.supportType}</strong>
-                을 필요로 해요. 마음을 나눠주세요.
+                {miracleCount + wisdomCount === 0
+                  ? '이 소원에 처음 닿는 마음이 되어보세요'
+                  : <>이 별은{' '}<strong style={{ color: 'rgba(255,255,255,0.6)' }}>{hint.supportType}</strong>을 필요로 해요</>
+                }
               </p>
               <div className="grid grid-cols-2 gap-3">
                 {DT_RESONANCE_OPTS.map(opt => (
@@ -454,19 +520,16 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
                     }}
                   >
                     <span>{opt.label}</span>
-                    {/* 카운트 — 증가 시 bounce */}
-                    <span style={{ fontSize: 11, opacity: 0.65 }}>
-                      <span
-                        key={opt.type === 'miracle' ? bounceKey.miracle : bounceKey.wisdom}
-                        className={
-                          (opt.type === 'miracle' ? bounceKey.miracle : bounceKey.wisdom) > 0
-                            ? 'count-bounce' : ''
-                        }
-                        style={{ display: 'inline-block' }}
-                      >
-                        {opt.type === 'miracle' ? miracleCount : wisdomCount}
-                      </span>
-                      명이 나눴어요
+                    {/* 카운트 → 감정 문장 */}
+                    <span
+                      key={opt.type === 'miracle' ? bounceKey.miracle : bounceKey.wisdom}
+                      className={
+                        (opt.type === 'miracle' ? bounceKey.miracle : bounceKey.wisdom) > 0
+                          ? 'count-bounce' : ''
+                      }
+                      style={{ fontSize: 11, opacity: 0.65, display: 'inline-block' }}
+                    >
+                      {countToEmotion(opt.type === 'miracle' ? miracleCount : wisdomCount)}
                     </span>
                   </button>
                 ))}
@@ -475,41 +538,26 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
           ) : (
             /* 제출 완료 상태 */
             <div className="bg-white/3 border border-white/8 rounded-2xl p-5 text-center">
-              {/* 성공 피드백 문구 — 1.3s 자동 소멸 */}
-              {feedbackMsg && (
-                <p
-                  className="feedback-msg"
-                  style={{ fontSize: 14, color: 'rgba(255,255,255,0.78)', marginBottom: 6 }}
-                >
-                  {feedbackMsg}
-                </p>
-              )}
-              {!feedbackMsg && (
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 8 }}>
-                  소원별에 마음이 닿았어요
-                </p>
-              )}
-              {/* 최종 카운트 */}
-              <div style={{ display: 'flex', gap: 18, justifyContent: 'center', marginTop: feedbackMsg ? 10 : 0 }}>
-                <span style={{ fontSize: 13, color: '#FFD76A' }}>
-                  ✨{' '}
-                  <span
-                    key={`m-${bounceKey.miracle}`}
-                    className={bounceKey.miracle > 0 ? 'count-bounce' : ''}
-                    style={{ display: 'inline-block' }}
-                  >
-                    {miracleCount}
-                  </span>
+              {/* 성공 피드백 문구 */}
+              <p
+                className={feedbackMsg ? 'feedback-msg' : ''}
+                style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.85)', marginBottom: 6 }}
+              >
+                {feedbackMsg ?? '마음이 닿았어요'}
+              </p>
+
+              {/* 공명 → 성장 연결 */}
+              <p style={{ fontSize: 12, color: 'rgba(255,215,106,0.55)', marginBottom: 12 }}>
+                이 마음이 <strong style={{ color: 'rgba(255,215,106,0.8)' }}>{detail.star_name}</strong>의 성장에 힘이 돼요
+              </p>
+
+              {/* 최종 카운트 (감정 문장) */}
+              <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
+                <span style={{ fontSize: 12, color: '#FFD76A' }}>
+                  ✨ {countToEmotion(miracleCount)}
                 </span>
-                <span style={{ fontSize: 13, color: 'rgba(155,135,245,0.9)' }}>
-                  🧠{' '}
-                  <span
-                    key={`w-${bounceKey.wisdom}`}
-                    className={bounceKey.wisdom > 0 ? 'count-bounce' : ''}
-                    style={{ display: 'inline-block' }}
-                  >
-                    {wisdomCount}
-                  </span>
+                <span style={{ fontSize: 12, color: 'rgba(155,135,245,0.9)' }}>
+                  🧠 {countToEmotion(wisdomCount)}
                 </span>
               </div>
             </div>
@@ -517,34 +565,119 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
         </div>
       )}
 
-      {/* ⑥ 공명 후 CTA (resonance 모드) */}
-      {isResonance && submitted && myStarId && (
-        <div className="mb-5">
-          <button
-            onClick={() => nav(`/my-star/${myStarId}`)}
-            className="w-full bg-star-gold/15 hover:bg-star-gold/25 border border-star-gold/30 text-star-gold font-semibold py-4 rounded-2xl transition-colors"
+      {/* ── ⑥ 공명 후 CTA + 유사 별 (resonance/public 공통) ──────── */}
+      {canResonate && submitted && (
+        <>
+          {/* 유사 별 섹션 */}
+          {similarStars.length > 0 ? (
+            <div className="mb-5">
+              <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginBottom: 10, letterSpacing: '0.05em' }}>
+                비슷한 마음을 가진 별들이에요
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {similarStars.map((s, i) => (
+                  <button
+                    key={s.star_id ?? i}
+                    onClick={() => {
+                      gaSimilarStarClick({ fromStarId: id, toStarId: s.star_id, position: i });
+                      nav(`/star/${s.star_id}`);
+                    }}
+                    className="slide-up"
+                    style={{
+                      animationDelay: `${i * 0.1}s`,
+                      textAlign: 'left',
+                      padding: '12px 14px',
+                      borderRadius: 14,
+                      background: 'rgba(255,255,255,0.03)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      color: 'rgba(255,255,255,0.65)',
+                      fontSize: 13,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                    }}
+                  >
+                    <span style={{ color: '#FFD76A', fontSize: 16, flexShrink: 0 }}>✦</span>
+                    <span>{s.star_name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            /* 유사 별 없음 — 광장 fallback */
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.22)', textAlign: 'center', marginBottom: 16 }}>
+              <button
+                onClick={() => {
+                  gaSquareFallbackClick({ starId: id, isInvite: isInviteEntry, hasMyStarId: !!myStarId });
+                  nav('/home');
+                }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.35)', fontSize: 12, textDecoration: 'underline', textUnderlineOffset: 3 }}
+              >
+                광장에서 다른 별 구경하기
+              </button>
+            </p>
+          )}
+
+          {/* CTA — !myStarId: full gold (전환 강도 max) / myStarId: 보조 버튼만 */}
+          <div
+            className="mb-5 flex flex-col gap-3 slide-up"
+            style={{ animationDelay: similarStars.length > 0 ? '0.35s' : '0.1s' }}
           >
-            내 별 보러 가기 ✦
-          </button>
-        </div>
-      )}
-      {/* ⑥-b 비로그인 공명 완료 → 별 만들기 CTA */}
-      {isResonance && submitted && !myStarId && (
-        <div className="mb-5">
-          <button
-            onClick={() => nav('/dreamtown')}
-            className="w-full bg-star-gold/15 hover:bg-star-gold/25 border border-star-gold/30 text-star-gold font-semibold py-4 rounded-2xl transition-colors"
-          >
-            나도 별 만들기 ✦
-          </button>
-        </div>
+            {!myStarId ? (
+              /* 비로그인 — full gold 버튼 */
+              <button
+                onClick={() => {
+                  gaResonanceCTAClick({ starId: id, ctaType: 'make_star', isInvite: isInviteEntry, hasMyStarId: false });
+                  nav('/dreamtown?entry=invite');
+                }}
+                style={{
+                  width: '100%',
+                  padding: '16px 0',
+                  borderRadius: 9999,
+                  background: '#FFD76A',
+                  color: '#0D1B2A',
+                  fontSize: 16,
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: '0 0 28px 8px rgba(255,215,106,0.22)',
+                }}
+              >
+                나도 별 만들기 ✦
+              </button>
+            ) : (
+              /* 기존 별 있음 — 보조 스타일 */
+              <>
+                <button
+                  onClick={() => {
+                    gaResonanceCTAClick({ starId: id, ctaType: 'make_star', isInvite: isInviteEntry, hasMyStarId: true });
+                    nav('/dreamtown?entry=invite');
+                  }}
+                  className="w-full bg-star-gold/15 hover:bg-star-gold/25 border border-star-gold/30 text-star-gold font-semibold py-4 rounded-2xl transition-colors"
+                >
+                  나도 별 만들기 ✦
+                </button>
+                <button
+                  onClick={() => {
+                    gaResonanceCTAClick({ starId: id, ctaType: 'my_star', isInvite: isInviteEntry, hasMyStarId: true });
+                    nav(`/my-star/${myStarId}`);
+                  }}
+                  className="w-full bg-white/5 border border-white/10 text-white/50 text-sm py-3 rounded-2xl hover:bg-white/8 transition-colors"
+                >
+                  내 별 보러 가기
+                </button>
+              </>
+            )}
+          </div>
+        </>
       )}
 
-      {/* ⑦ Public: 나도 별 만들기 CTA */}
-      {isPublic && (
+      {/* ⑦ Public + 미공명 상태: 나도 별 만들기 CTA */}
+      {isPublic && !submitted && (
         <div className="mb-5">
           <button
-            onClick={() => nav('/dreamtown')}
+            onClick={() => nav('/dreamtown?entry=invite')}
             className="w-full bg-star-gold/15 hover:bg-star-gold/25 border border-star-gold/30 text-star-gold font-semibold py-4 rounded-2xl transition-colors"
           >
             나도 별 만들기 ✦

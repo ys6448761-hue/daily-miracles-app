@@ -317,6 +317,15 @@ try {
   console.error("❌ 배치 처리 라우터 로드 실패:", error.message);
 }
 
+// Shorts 자동 생성 라우터 로딩
+let shortsRoutes = null;
+try {
+  shortsRoutes = require("./routes/shortsRoutes");
+  console.log("✅ Shorts 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ Shorts 라우터 로드 실패:", error.message);
+}
+
 // 스토리북 E2E Commerce 라우터 로딩
 let storybookRoutes = null;
 try {
@@ -1860,6 +1869,14 @@ if (storyboardRoutes) {
   console.warn("⚠️ Storyboard 배치 라우터 로드 실패 - 라우트 미등록");
 }
 
+// ---------- Shorts 자동 생성 Routes (/api/shorts) ----------
+if (shortsRoutes) {
+  app.use("/api/shorts", shortsRoutes);
+  console.log("✅ Shorts 라우터 등록 완료 (/api/shorts)");
+} else {
+  console.warn("⚠️ Shorts 라우터 로드 실패 - 라우트 미등록");
+}
+
 // ---------- Hero8 8초 영상 생성 Routes (/api/video/hero8) ----------
 if (hero8Routes) {
   app.use("/api/video/hero8", hero8Routes);
@@ -2194,6 +2211,40 @@ if (experimentEventRoutes) {
 const dreamtownRoutes = require('./routes/dreamtownRoutes');
 app.use('/api/dt', dreamtownRoutes);
 console.log('✅ DreamTown 라우터 등록 완료 (/api/dt)');
+
+// ---------- DreamTown Core Engine Routes (DEC-2026-0331-001) ----------
+try {
+  const dtEngineRoutes = require('./routes/dtEngineRoutes');
+  app.use('/api/dt/engine', dtEngineRoutes);
+  console.log('✅ DreamTown Core Engine 라우터 등록 완료 (/api/dt/engine)');
+} catch (err) {
+  console.warn('⚠️ DreamTown Core Engine 라우터 등록 실패:', err.message);
+}
+
+// ---------- DreamTown Artifact Worker (DB 기반 큐) ----------
+try {
+  const dtArtifactWorker = require('./services/dtArtifactWorker');
+  dtArtifactWorker.start();
+} catch (err) {
+  console.warn('⚠️ dtArtifactWorker 시작 실패:', err.message);
+}
+
+// ---------- DreamTown Narrative Worker (DB 기반 큐) ----------
+try {
+  const dtNarrativeWorker = require('./services/dtNarrativeWorker');
+  dtNarrativeWorker.start();
+} catch (err) {
+  console.warn('⚠️ dtNarrativeWorker 시작 실패:', err.message);
+}
+
+// ---------- Aurora5 Orchestrator Worker (이벤트 기반 자동화) ----------
+try {
+  const dtOrchestratorWorker = require('./services/dtOrchestratorWorker');
+  dtOrchestratorWorker.start();
+  console.log('✅ Aurora5 Orchestrator Worker 시작 완료');
+} catch (err) {
+  console.warn('⚠️ dtOrchestratorWorker 시작 실패:', err.message);
+}
 
 // ---------- Resonance & Impact Routes ----------
 const resonanceRoutes = require('./routes/resonanceRoutes');
