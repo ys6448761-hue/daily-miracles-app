@@ -471,7 +471,7 @@ router.post('/upgrade', async (req, res) => {
 
     return res.json({
       success:      true,
-      payment_url:  `/pay?moid=${encodeURIComponent(payment.orderId)}`,
+      payment_url:  `/pay?moid=${encodeURIComponent(payment.orderId)}&amount=${config.amount}`,
       order_id:     payment.orderId,
       amount:       config.amount,
       plan,
