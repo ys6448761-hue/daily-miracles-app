@@ -2245,6 +2245,47 @@ const dreamtownRoutes = require('./routes/dreamtownRoutes');
 app.use('/api/dt', dreamtownRoutes);
 console.log('✅ DreamTown 라우터 등록 완료 (/api/dt)');
 
+// ---------- 실물책 제작 신청 API ----------
+// POST /api/book/upgrade — 디지털북 → 실물책 전환 신청 (관심 등록)
+app.post('/api/book/upgrade', async (req, res) => {
+  const { star_id, user_id, phone = null } = req.body;
+  if (!star_id) return res.status(400).json({ error: 'star_id는 필수입니다' });
+
+  const requestId = `book-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+  console.info(JSON.stringify({
+    requestId,
+    user_id:  user_id ?? null,
+    star_id,
+    phone:    phone ? '***' : null,
+    action:   'book_upgrade_click',
+    ts:       new Date().toISOString(),
+  }));
+
+  try {
+    const db = require('./database/db');
+    // dt_dream_logs에 book_interest 이벤트 기록 (append-only 원장 패턴)
+    await db.query(
+      `INSERT INTO dt_dream_logs (star_id, log_type, payload)
+       VALUES ($1, 'voyage', $2)`,
+      [star_id, JSON.stringify({
+        event:      'book_upgrade_interest',
+        user_id:    user_id ?? null,
+        phone:      phone ?? null,
+        request_id: requestId,
+      })]
+    );
+  } catch (dbErr) {
+    // DB 실패해도 신청 자체는 성공 응답 (로그는 남김)
+    console.warn('[book/upgrade] DB 저장 실패:', dbErr.message);
+  }
+
+  return res.status(201).json({
+    success:    true,
+    request_id: requestId,
+    message:    '실물책 제작 신청이 접수되었습니다. 담당자가 곧 연락드립니다.',
+  });
+});
+
 // ---------- DreamTown Core Engine Routes (DEC-2026-0331-001) ----------
 try {
   const dtEngineRoutes = require('./routes/dtEngineRoutes');

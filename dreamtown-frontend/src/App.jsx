@@ -18,6 +18,7 @@ import GiftLanding from './pages/GiftLanding.jsx';
 import AllStars from './pages/AllStars.jsx';
 import DreamTown from './pages/DreamTown.jsx';
 import MyStarReturn from './pages/MyStarReturn.jsx';
+import DigitalBook from './pages/DigitalBook.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
 if (window.location.pathname.startsWith('//')) {
@@ -40,6 +41,7 @@ export default function App() {
           <Route path="/star-birth"  element={<StarBirth />} />
           <Route path="/my-star"     element={<MyStarReturn />} />
           <Route path="/my-star/:id" element={<MyStar />} />
+          <Route path="/my-star/:id/book" element={<DigitalBook />} />
           <Route path="/star/:id"    element={<StarDetail />} />
           <Route path="/galaxy"      element={<Galaxy />} />
           <Route path="/day"         element={<Day />} />

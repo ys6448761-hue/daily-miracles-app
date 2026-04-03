@@ -259,6 +259,22 @@ export async function getStarDetail(starId) {
   return res.json();
 }
 
+// GET /api/dt/engine/star/:starId/timeline — 별 전체 여정 타임라인 (책 UI 기반)
+export async function getStarTimeline(starId) {
+  const res = await fetch(`/api/dt/engine/star/${starId}/timeline`);
+  if (!res.ok) throw new Error('타임라인 조회 실패');
+  return res.json();
+}
+
+// POST /api/book/upgrade — 실물책 제작 신청
+export async function postBookUpgrade({ starId, userId, phone = null }) {
+  return fetchWithRetry('/api/book/upgrade', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ star_id: starId, user_id: userId, phone }),
+  });
+}
+
 // Prototype용 임시 user ID (로컬 스토리지 기반)
 export function getOrCreateUserId() {
   const key = 'dt_user_id';
