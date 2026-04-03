@@ -442,11 +442,12 @@ router.post('/upgrade', async (req, res) => {
   if (!star_id) return res.status(400).json({ error: 'star_id는 필수입니다' });
 
   const PLAN_CONFIG = {
+    'basic7': { amount:  9900, name: '소원꿈터 7일 여정' },
     '30day':  { amount: 24900, name: '소원꿈터 30일 여정' },
     'annual': { amount: 89000, name: '소원꿈터 1년 여정 + 책' },
   };
   const config = PLAN_CONFIG[plan];
-  if (!config) return res.status(400).json({ error: `plan은 30day/annual 중 하나여야 합니다` });
+  if (!config) return res.status(400).json({ error: `plan은 basic7/30day/annual 중 하나여야 합니다` });
 
   try {
     await assertStarExists(star_id);
