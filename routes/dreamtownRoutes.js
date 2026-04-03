@@ -509,23 +509,48 @@ router.get('/stars/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
-    const result = await db.query(
-      `SELECT
-         s.id              AS star_id,
-         s.star_name,
-         s.star_slug,
-         s.star_stage,
-         s.created_at,
-         s.growth_log_text,
-         w.wish_text,
-         g.code            AS galaxy_code,
-         g.name_ko         AS galaxy_name_ko
-       FROM dt_stars s
-       LEFT JOIN dt_wishes   w ON w.id = s.wish_id
-       JOIN      dt_galaxies g ON g.id = s.galaxy_id
-       WHERE s.id = $1`,
-      [id]
-    );
+    // growth_log_text는 migration 035에서 추가 — 미적용 환경 graceful fallback
+    let result;
+    let growthLogText = null;
+    try {
+      result = await db.query(
+        `SELECT
+           s.id              AS star_id,
+           s.star_name,
+           s.star_slug,
+           s.star_stage,
+           s.created_at,
+           s.growth_log_text,
+           w.wish_text,
+           g.code            AS galaxy_code,
+           g.name_ko         AS galaxy_name_ko
+         FROM dt_stars s
+         LEFT JOIN dt_wishes   w ON w.id = s.wish_id
+         JOIN      dt_galaxies g ON g.id = s.galaxy_id
+         WHERE s.id = $1`,
+        [id]
+      );
+      if (result.rowCount > 0) growthLogText = result.rows[0].growth_log_text ?? null;
+    } catch (colErr) {
+      if (colErr.code !== '42703') throw colErr; // 42703 = undefined_column
+      // migration 035 미적용 — growth_log_text 없이 재조회
+      result = await db.query(
+        `SELECT
+           s.id              AS star_id,
+           s.star_name,
+           s.star_slug,
+           s.star_stage,
+           s.created_at,
+           w.wish_text,
+           g.code            AS galaxy_code,
+           g.name_ko         AS galaxy_name_ko
+         FROM dt_stars s
+         LEFT JOIN dt_wishes   w ON w.id = s.wish_id
+         JOIN      dt_galaxies g ON g.id = s.galaxy_id
+         WHERE s.id = $1`,
+        [id]
+      );
+    }
 
     if (result.rowCount === 0) {
       return res.status(404).json({ error: '별을 찾을 수 없습니다' });
@@ -536,7 +561,7 @@ router.get('/stars/:id', async (req, res) => {
       star_id:          row.star_id,
       star_name:        row.star_name,
       wish_text:        row.wish_text,
-      growth_log_text:  row.growth_log_text ?? null,
+      growth_log_text:  growthLogText,
       wish_image_url:   null,
       galaxy: {
         code:    row.galaxy_code,
@@ -867,6 +892,11 @@ router.post('/stars/:id/aurora5-message', async (req, res) => {
     );
     res.status(201).json({ ok: true, id: rows[0].id });
   } catch (err) {
+    // 42P01 = undefined_table — migration 042 미적용 환경 graceful skip
+    if (err.code === '42P01') {
+      console.warn('[DT] aurora5_messages 테이블 없음 (migration 042 필요) — skip');
+      return res.status(201).json({ ok: false, skipped: true });
+    }
     console.error('[DT] POST /aurora5-message error:', err.message);
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -1146,22 +1176,36 @@ router.get('/stars/:id/detail', async (req, res) => {
     const { id } = req.params;
 
     // 1. 별 + 닉네임 (dt_users 조인)
-    const { rows, rowCount } = await db.query(
-      `SELECT
-         s.id              AS star_id,
-         s.star_name,
-         s.star_stage,
-         s.created_at,
-         s.growth_log_text,
-         w.wish_text,
-         g.code            AS galaxy_code,
-         g.name_ko         AS galaxy_name_ko,
-         u.nickname
-       FROM dt_stars s
-       LEFT JOIN dt_wishes   w ON w.id = s.wish_id
-       JOIN      dt_galaxies g ON g.id = s.galaxy_id
-       LEFT JOIN dt_users    u ON u.id = s.user_id
-       WHERE s.id = $1`,
+    // growth_log_text는 migration 035에서 추가 — 미적용 환경 graceful fallback
+    let detailGrowthLogText = null;
+    let starQueryResult;
+    try {
+      starQueryResult = await db.query(
+        `SELECT s.id AS star_id, s.star_name, s.star_stage, s.created_at,
+                s.growth_log_text, w.wish_text,
+                g.code AS galaxy_code, g.name_ko AS galaxy_name_ko, u.nickname
+           FROM dt_stars s
+           LEFT JOIN dt_wishes   w ON w.id = s.wish_id
+           JOIN      dt_galaxies g ON g.id = s.galaxy_id
+           LEFT JOIN dt_users    u ON u.id = s.user_id
+          WHERE s.id = $1`,
+        [id]
+      );
+      if (starQueryResult.rowCount > 0) detailGrowthLogText = starQueryResult.rows[0].growth_log_text ?? null;
+    } catch (colErr) {
+      if (colErr.code !== '42703') throw colErr;
+      starQueryResult = await db.query(
+        `SELECT s.id AS star_id, s.star_name, s.star_stage, s.created_at,
+                w.wish_text, g.code AS galaxy_code, g.name_ko AS galaxy_name_ko, u.nickname
+           FROM dt_stars s
+           LEFT JOIN dt_wishes   w ON w.id = s.wish_id
+           JOIN      dt_galaxies g ON g.id = s.galaxy_id
+           LEFT JOIN dt_users    u ON u.id = s.user_id
+          WHERE s.id = $1`,
+        [id]
+      );
+    }
+    const { rows, rowCount } = starQueryResult;
       [id]
     );
     if (rowCount === 0) return res.status(404).json({ error: '별을 찾을 수 없습니다' });
@@ -1232,7 +1276,7 @@ router.get('/stars/:id/detail', async (req, res) => {
       star_name:             star.star_name,
       star_stage:            star.star_stage,
       wish_text:             star.wish_text ?? null,
-      growth_log_text:       star.growth_log_text ?? null,
+      growth_log_text:       detailGrowthLogText,
       galaxy: {
         code:    star.galaxy_code,
         name_ko: star.galaxy_name_ko,

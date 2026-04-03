@@ -278,7 +278,7 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
             LIMIT 1
           `, [Moid]);
           if (dtLog.rows.length > 0) {
-            successUrl = `/dreamtown/star/${dtLog.rows[0].star_id}?paid=true`;
+            successUrl = `/my-star/${dtLog.rows[0].star_id}?paid=true`;
             console.log(`🌟 DreamTown 결제 완료 → ${successUrl}`);
           }
         } catch (e) {

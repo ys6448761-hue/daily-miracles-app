@@ -160,6 +160,11 @@ export default function MyStar() {
   // 닉네임
   const [nickname, setNickname] = useState('소원이');
 
+  // 결제 완료 배너 (?paid=true 진입 시)
+  const [showPaidBanner, setShowPaidBanner] = useState(
+    () => new URLSearchParams(window.location.search).get('paid') === 'true'
+  );
+
   // 선물하기 상태
   const [showGift, setShowGift] = useState(false);
   const [giftCopyType, setGiftCopyType] = useState(null);
@@ -315,6 +320,15 @@ export default function MyStar() {
 
   return (
     <div className="min-h-screen flex flex-col px-6 py-10">
+      {/* 결제 완료 배너 */}
+      {showPaidBanner && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-sm w-full px-4">
+          <div className="bg-indigo-600 text-white text-sm text-center rounded-xl px-4 py-3 shadow-lg flex items-center justify-between gap-3">
+            <span>✨ 여정이 시작됐어요. 별이 당신을 기다리고 있어요.</span>
+            <button onClick={() => setShowPaidBanner(false)} className="shrink-0 opacity-70 hover:opacity-100">✕</button>
+          </div>
+        </div>
+      )}
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-8">
         <button onClick={() => window.history.length > 1 ? nav(-1) : nav('/home')} className="text-white/40 hover:text-white/70">← 뒤로</button>
