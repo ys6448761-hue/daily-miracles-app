@@ -82,6 +82,19 @@ export async function getStar(starId) {
   return res.json();
 }
 
+// GET /api/dt/engine/artifact/:jobId — artifact 작업 상태 폴링
+// artifact_status: 'pending' | 'processing' | 'done' | 'failed'
+export async function getArtifactJob(jobId) {
+  try {
+    const res = await fetch(`/api/dt/engine/artifact/${jobId}`);
+    if (!res.ok) return null;
+    const body = await res.json();
+    return body.job ?? null;
+  } catch {
+    return null;
+  }
+}
+
 // 비로그인 공개 접근용 — 실패 시 null 반환 (에러 화면 방지)
 export async function getStarPublic(starId) {
   try {

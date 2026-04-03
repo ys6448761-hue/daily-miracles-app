@@ -510,6 +510,7 @@ router.get('/stars/:id', async (req, res) => {
     const { id } = req.params;
 
     // growth_log_text는 migration 035에서 추가 — 미적용 환경 graceful fallback
+    // artifact_jobs LEFT JOIN — 최신 image job의 result_url + status 포함
     let result;
     let growthLogText = null;
     try {
@@ -523,10 +524,19 @@ router.get('/stars/:id', async (req, res) => {
            s.growth_log_text,
            w.wish_text,
            g.code            AS galaxy_code,
-           g.name_ko         AS galaxy_name_ko
+           g.name_ko         AS galaxy_name_ko,
+           aj.result_url     AS wish_image_url,
+           aj.status         AS artifact_status
          FROM dt_stars s
-         LEFT JOIN dt_wishes   w ON w.id = s.wish_id
-         JOIN      dt_galaxies g ON g.id = s.galaxy_id
+         LEFT JOIN dt_wishes   w  ON w.id = s.wish_id
+         JOIN      dt_galaxies g  ON g.id = s.galaxy_id
+         LEFT JOIN LATERAL (
+           SELECT result_url, status
+             FROM dt_artifact_jobs
+            WHERE star_id = s.id AND type = 'image'
+            ORDER BY created_at DESC
+            LIMIT 1
+         ) aj ON true
          WHERE s.id = $1`,
         [id]
       );
@@ -543,10 +553,19 @@ router.get('/stars/:id', async (req, res) => {
            s.created_at,
            w.wish_text,
            g.code            AS galaxy_code,
-           g.name_ko         AS galaxy_name_ko
+           g.name_ko         AS galaxy_name_ko,
+           aj.result_url     AS wish_image_url,
+           aj.status         AS artifact_status
          FROM dt_stars s
-         LEFT JOIN dt_wishes   w ON w.id = s.wish_id
-         JOIN      dt_galaxies g ON g.id = s.galaxy_id
+         LEFT JOIN dt_wishes   w  ON w.id = s.wish_id
+         JOIN      dt_galaxies g  ON g.id = s.galaxy_id
+         LEFT JOIN LATERAL (
+           SELECT result_url, status
+             FROM dt_artifact_jobs
+            WHERE star_id = s.id AND type = 'image'
+            ORDER BY created_at DESC
+            LIMIT 1
+         ) aj ON true
          WHERE s.id = $1`,
         [id]
       );
@@ -562,7 +581,8 @@ router.get('/stars/:id', async (req, res) => {
       star_name:        row.star_name,
       wish_text:        row.wish_text,
       growth_log_text:  growthLogText,
-      wish_image_url:   null,
+      wish_image_url:   row.wish_image_url ?? null,
+      artifact_status:  row.artifact_status ?? null,
       galaxy: {
         code:    row.galaxy_code,
         name_ko: row.galaxy_name_ko,

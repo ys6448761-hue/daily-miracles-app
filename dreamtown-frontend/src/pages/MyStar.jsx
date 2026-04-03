@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
-import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message, getTodaySchedule, getStarStats, getStarDetail } from '../api/dreamtown.js';
+import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message, getTodaySchedule, getStarStats, getStarDetail, getArtifactJob } from '../api/dreamtown.js';
 import { saveStarId, clearStarId, readSavedStar } from '../lib/utils/starSession.js';
 import MilestoneBar from '../components/MilestoneBar';
 import { useDreamtownStore } from '../store/dreamtownStore';
@@ -253,6 +253,26 @@ export default function MyStar() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  // ── 소원그림 폴링 — artifact_status가 pending/processing인 동안 10초마다 갱신 ──
+  useEffect(() => {
+    if (!isOwner || !star?.star_id) return;
+    const status = star.artifact_status;
+    if (status !== 'pending' && status !== 'processing') return;
+
+    const timer = setInterval(async () => {
+      try {
+        const data = await getStar(star.star_id);
+        setStar(prev => ({
+          ...prev,
+          wish_image_url:  data.wish_image_url  ?? prev.wish_image_url,
+          artifact_status: data.artifact_status ?? prev.artifact_status,
+        }));
+      } catch (_) {}
+    }, 10000);
+
+    return () => clearInterval(timer);
+  }, [star?.artifact_status, star?.star_id, isOwner]);
+
   function handleGrowthSave() {
     if (!growthText.trim() || !star) return;
     localStorage.setItem(GROWTH_STORAGE_KEY(star.star_id), growthText.trim());
@@ -388,6 +408,41 @@ export default function MyStar() {
         </div>
 
       </motion.div>
+
+      {/* ── 소원그림 카드 ──────────────────────────────────── */}
+      {star.artifact_status && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="mb-6"
+        >
+          {star.artifact_status === 'done' && star.wish_image_url ? (
+            <div className="rounded-2xl overflow-hidden border border-white/10">
+              <img
+                src={star.wish_image_url}
+                alt="소원그림"
+                className="w-full object-cover"
+                loading="lazy"
+              />
+            </div>
+          ) : star.artifact_status === 'pending' || star.artifact_status === 'processing' ? (
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-center">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
+                className="text-2xl mb-3 inline-block"
+              >✨</motion.div>
+              <p className="text-white/60 text-sm">소원그림을 그리는 중이에요...</p>
+              <p className="text-white/30 text-xs mt-1">잠시 후 자동으로 나타납니다</p>
+            </div>
+          ) : star.artifact_status === 'failed' ? (
+            <div className="bg-white/5 border border-red-500/20 rounded-2xl p-4 text-center">
+              <p className="text-red-400/60 text-xs">소원그림 생성에 실패했어요</p>
+            </div>
+          ) : null}
+        </motion.div>
+      )}
 
       {/* ── 요약 카드 3개 ──────────────────────────────────── */}
       <div className="grid grid-cols-3 gap-2 mb-5">
