@@ -842,8 +842,9 @@ app.use(express.static(path.join(__dirname, "public"), {
   setHeaders: (res, filePath) => {
     // 파일 타입별 캐시 전략
     if (filePath.endsWith('.html')) {
-      // HTML은 짧게 캐싱 (콘텐츠 변경 가능)
-      res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+      // HTML은 캐싱 비활성화 — 배포 직후 항상 최신 파일 보장
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
     } else if (filePath.match(/\.(js|css)$/)) {
       // JS/CSS는 1일 캐싱
       res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
