@@ -1226,8 +1226,6 @@ router.get('/stars/:id/detail', async (req, res) => {
       );
     }
     const { rows, rowCount } = starQueryResult;
-      [id]
-    );
     if (rowCount === 0) return res.status(404).json({ error: '별을 찾을 수 없습니다' });
     const star = rows[0];
 
@@ -1325,3 +1323,4 @@ router.get('/health', (_req, res) => {
 });
 
 module.exports = router;
+
