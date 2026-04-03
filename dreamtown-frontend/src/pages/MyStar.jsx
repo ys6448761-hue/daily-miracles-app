@@ -409,6 +409,23 @@ export default function MyStar() {
 
       </motion.div>
 
+      {/* ── 내 여정 책으로 보기 (별 카드 바로 아래, 항상 노출) ── */}
+      <button
+        onClick={() => {
+          const uid = getOrCreateUserId();
+          console.info(JSON.stringify({
+            requestId: `book-entry-${Date.now().toString(36)}`,
+            user_id:   uid,
+            star_id:   star.star_id,
+            action:    'book_entry_click',
+          }));
+          nav(`/my-star/${star.star_id}/book`);
+        }}
+        className="w-full mb-6 bg-white/5 border border-star-gold/25 text-star-gold/75 font-semibold py-3.5 rounded-2xl hover:bg-star-gold/8 hover:border-star-gold/45 hover:text-star-gold transition-all text-sm"
+      >
+        내 여정 책으로 보기 📖
+      </button>
+
       {/* ── 소원그림 카드 ──────────────────────────────────── */}
       {star.artifact_status && (
         <motion.div
@@ -688,13 +705,6 @@ export default function MyStar() {
           소원별 이어가기 ✨
         </button>
 
-        {/* 내 여정 책으로 보기 — D+1 이상 항상 노출 */}
-        <button
-          onClick={() => nav(`/my-star/${star.star_id}/book`)}
-          className="w-full bg-white/5 border border-star-gold/20 text-star-gold/70 font-semibold py-4 rounded-2xl hover:bg-star-gold/5 hover:border-star-gold/40 hover:text-star-gold transition-all"
-        >
-          내 여정 책으로 보기 📖
-        </button>
         {/* 오늘 완료 시 안내 표시 */}
         {doneTodayFlag && (
           <div className="w-full bg-white/5 border border-white/10 text-white/40 text-sm font-medium py-4 rounded-2xl text-center">
