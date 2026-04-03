@@ -22,27 +22,53 @@ try {
   console.error('❌ nicepayService 로드 실패:', error.message);
 }
 
+// DB 직접 참조 (yeosu_wishes 상태 전이용)
+let _db = null;
+try {
+  _db = require('../database/db');
+} catch (e) {
+  console.warn('⚠️ [NicePay] DB 로드 실패 — yeosu_wishes 자동 전이 불가');
+}
+
+/**
+ * 결제 성공 후 yeosu_wishes 상태 AWAITING_PAYMENT → PENDING 전이
+ * 멱등: status = 'AWAITING_PAYMENT' 조건으로 중복 전이 방지
+ *
+ * @param {string} orderId  - nicepay_payments.order_id (pg_payment_key와 일치)
+ * @param {string} tid      - NicePay TID (pg_transaction_id로 저장)
+ */
+async function _activateYeosuWish(orderId, tid) {
+  if (!_db) return;
+  try {
+    const result = await _db.query(
+      `UPDATE yeosu_wishes
+       SET status         = 'PENDING',
+           pg_transaction_id = $1,
+           paid_at        = NOW(),
+           updated_at     = NOW()
+       WHERE pg_payment_key = $2
+         AND status = 'AWAITING_PAYMENT'
+       RETURNING wish_id`,
+      [tid || null, orderId]
+    );
+    if (result.rows.length > 0) {
+      const wishId = result.rows[0].wish_id;
+      console.log(`✅ [NicePay→YeosuWish] 상태 전이 완료: wish_id=${wishId} → PENDING (order=${orderId}, tid=${tid})`);
+    } else {
+      console.log(`ℹ️  [NicePay→YeosuWish] 전이 대상 없음 (이미 전이됐거나 order와 wish 미연결): order=${orderId}`);
+    }
+  } catch (e) {
+    console.error('❌ [NicePay→YeosuWish] 상태 전이 실패:', e.message);
+  }
+}
+
 /**
  * GET /pay
  * 결제창 호출 페이지 (인증결제 웹)
  */
 router.get('/pay', async (req, res) => {
   try {
-    const { amount, goods } = req.query;
-
-    // 금액 검증
-    const amountNum = parseInt(amount, 10);
-    if (!amount || isNaN(amountNum) || amountNum <= 0) {
-      return res.status(400).send(`
-        <html>
-          <head><meta charset="UTF-8"><title>결제 오류</title></head>
-          <body style="font-family: sans-serif; padding: 40px; text-align: center;">
-            <h2>결제 금액이 필요합니다</h2>
-            <p>사용법: /pay?amount=24900</p>
-          </body>
-        </html>
-      `);
-    }
+    const { amount, goods, moid } = req.query;
 
     // 서비스 체크
     if (!nicepayService) {
@@ -56,14 +82,64 @@ router.get('/pay', async (req, res) => {
       return res.status(503).send(`결제 설정이 완료되지 않았습니다. 누락: ${config.missing.join(', ')}`);
     }
 
-    // 결제 생성 (PENDING 저장)
-    const goodsName = goods || '하루하루의 기적 서비스';
-    const payment = await nicepayService.createPayment(amountNum, goodsName);
+    // ── 경로 A: 기존 결제 레코드로 결제창 표시 (checkout에서 생성된 경우) ──
+    if (moid) {
+      const existing = await nicepayService.getPaymentByOrderId(moid);
+      if (!existing) {
+        return res.status(404).send(`
+          <html><head><meta charset="UTF-8"><title>결제 오류</title></head>
+          <body style="font-family:sans-serif;padding:40px;text-align:center;">
+            <h2>결제 정보를 찾을 수 없습니다</h2>
+            <p>주문번호: ${moid}</p>
+          </body></html>`);
+      }
+      if (existing.status !== 'PENDING') {
+        return res.status(400).send(`
+          <html><head><meta charset="UTF-8"><title>결제 오류</title></head>
+          <body style="font-family:sans-serif;padding:40px;text-align:center;">
+            <h2>이미 처리된 결제입니다</h2>
+            <p>상태: ${existing.status}</p>
+          </body></html>`);
+      }
+      // 기존 레코드로 SignData 재생성 (createPayment 미호출)
+      const { ediDate, signData } = nicepayService.regenerateSignData(existing.amount.toString());
+      const payment = {
+        mid:               nicepayService.NICEPAY_MID,
+        moid:              existing.order_id,
+        amt:               existing.amount.toString(),
+        amount:            existing.amount,
+        goodsName:         existing.goods_name,
+        ediDate,
+        signData,
+        returnUrl:         nicepayService.NICEPAY_RETURN_URL,
+        orderId:           existing.order_id,
+        verificationToken: existing.verification_token,
+      };
+      console.log(`📦 기존 결제 페이지 표시: moid=${moid}, amount=${existing.amount}`);
+      return res.send(generatePaymentPage(payment));
+    }
 
-    console.log(`📦 결제 페이지 생성: moid=${payment.moid}, amount=${amountNum}, mid=${payment.mid}`);
-
-    // 결제창 HTML 반환 (인증결제 웹 방식)
-    res.send(generatePaymentPage(payment));
+    // ── 경로 B: moid 없는 직접 접근 — 차단 ──────────────────────
+    // 결제는 반드시 /api/yeosu/wish/checkout → moid 발급 경로를 통해야 함
+    console.warn(`⚠️  [NicePay] /pay moid 없는 직접 접근 차단 (amount=${amount}, ip=${req.ip})`);
+    return res.status(400).send(`
+      <html>
+        <head><meta charset="UTF-8"><title>결제 오류</title></head>
+        <body style="font-family:sans-serif;padding:40px;text-align:center;background:#f9f9f9;">
+          <div style="max-width:400px;margin:0 auto;background:#fff;border-radius:16px;padding:40px;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+            <p style="font-size:40px;margin-bottom:16px;">⚠️</p>
+            <h2 style="color:#333;margin-bottom:12px;">잘못된 결제 접근입니다</h2>
+            <p style="color:#666;font-size:14px;line-height:1.6;">
+              결제는 소원 접수 후 결제하기 버튼을 통해 시작해주세요.<br>
+              직접 URL 접근은 허용되지 않습니다.
+            </p>
+            <a href="javascript:history.back()" style="display:inline-block;margin-top:24px;padding:12px 28px;background:#9B87F5;color:#fff;border-radius:8px;text-decoration:none;font-size:14px;">
+              돌아가기
+            </a>
+          </div>
+        </body>
+      </html>
+    `);
 
   } catch (error) {
     console.error('❌ 결제창 생성 실패:', error);
@@ -127,6 +203,13 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
       return res.redirect(`${nicepayService.WIX_SUCCESS_URL}?error=ORDER_NOT_FOUND`);
     }
 
+    // ── 멱등성 체크: 이미 PAID 처리된 콜백 재호출 방지 ──────────
+    if (payment.status === 'PAID') {
+      console.warn(`⚠️  [NicePay] 중복 콜백 감지 — 이미 PAID 처리됨: ${Moid}`);
+      const successUrl = nicepayService.buildWixSuccessUrl(Moid, payment.verification_token);
+      return res.redirect(successUrl);
+    }
+
     // 1. 인증 실패 처리
     if (AuthResultCode !== '0000') {
       console.error(`❌ 인증 실패: ${AuthResultCode} - ${AuthResultMsg}`);
@@ -179,7 +262,30 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
       // 성공 (3001 = 이미 승인됨)
       console.log(`✅ 승인 성공! (${approvalResult.ResultCode})`);
       await nicepayService.updatePaymentStatus(Moid, 'PAID', approvalResult);
-      const successUrl = nicepayService.buildWixSuccessUrl(Moid, payment.verification_token);
+
+      // ── yeosu_wishes 상태 전이 (AWAITING_PAYMENT → PENDING) ───
+      const paidTid = approvalResult.TID || actualTID;
+      setImmediate(() => _activateYeosuWish(Moid, paidTid));
+
+      // ── DreamTown: moid → star_id 조회 후 별 상세 페이지로 이동 ─
+      let successUrl = nicepayService.buildWixSuccessUrl(Moid, payment.verification_token);
+      if (_db) {
+        try {
+          const dtLog = await _db.query(`
+            SELECT star_id FROM dt_dream_logs
+            WHERE payload->>'order_id' = $1
+              AND payload->>'event'    = 'upgrade_checkout_started'
+            LIMIT 1
+          `, [Moid]);
+          if (dtLog.rows.length > 0) {
+            successUrl = `/dreamtown/star/${dtLog.rows[0].star_id}?paid=true`;
+            console.log(`🌟 DreamTown 결제 완료 → ${successUrl}`);
+          }
+        } catch (e) {
+          console.warn('⚠️ DreamTown star_id 조회 실패 — 기본 successUrl 사용:', e.message);
+        }
+      }
+
       console.log(`🔗 Redirect URL: ${successUrl}`);
       console.log('═'.repeat(60) + '\n');
       return res.redirect(successUrl);
@@ -195,7 +301,7 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
 
   } catch (error) {
     console.error('❌ 결제 콜백 처리 실패:', error);
-    res.redirect(`${nicepayService?.WIX_SUCCESS_URL || 'https://pay.dailymiracles.kr/payment-success.html'}?error=SYSTEM_ERROR`);
+    res.redirect(`${nicepayService?.WIX_SUCCESS_URL || 'https://app.dailymiracles.kr/nicepay/success'}?error=SYSTEM_ERROR`);
   }
 });
 
