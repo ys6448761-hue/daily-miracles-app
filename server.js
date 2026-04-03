@@ -1214,8 +1214,14 @@ app.post("/api/admin/test-wish-entry", adminTokenGuard, async (req, res) => {
 
 // ---------- Admin: DB Migration Runner ----------
 app.post("/api/admin/run-migration", adminTokenGuard, async (req, res) => {
-  const { migration } = req.body; // e.g. "013", "022"
-  const allowed = ["013", "022"];
+  const { migration } = req.body; // e.g. "013", "035"
+  const allowed = [
+    "013", "022",
+    // DreamTown migrations
+    "029", "030", "031", "032", "033", "034", "035",
+    "036", "037", "038", "039", "040", "042", "043",
+    "044", "045", "046", "047", "048",
+  ];
 
   if (!migration || !allowed.includes(migration)) {
     return res.status(400).json({
@@ -1271,6 +1277,32 @@ app.post("/api/admin/run-migration", adminTokenGuard, async (req, res) => {
         WHERE table_name = 'wish_entries' AND column_name = 'image_filename'
       `);
       verification = { column: col.rows[0] || "NOT FOUND" };
+    } else if (migration === "035") {
+      const col = await pool.query(`
+        SELECT column_name FROM information_schema.columns
+        WHERE table_name = 'dt_stars' AND column_name = 'growth_log_text'
+      `);
+      verification = { growth_log_text_exists: col.rowCount > 0 };
+    } else if (migration === "042") {
+      const tbl = await pool.query(`
+        SELECT table_name FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_name = 'aurora5_messages'
+      `);
+      verification = { aurora5_messages_exists: tbl.rowCount > 0 };
+    } else if (migration === "043") {
+      const tbl = await pool.query(`
+        SELECT table_name FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_name = 'dt_voyage_schedule'
+      `);
+      verification = { dt_voyage_schedule_exists: tbl.rowCount > 0 };
+    } else if (migration === "045") {
+      const tbls = await pool.query(`
+        SELECT table_name FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name IN ('dt_dream_logs','dt_artifact_jobs','dt_wisdom_logs')
+        ORDER BY table_name
+      `);
+      verification = { tables: tbls.rows.map(r => r.table_name) };
     }
 
     res.json({ success: true, migration: files[0], verification });
