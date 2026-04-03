@@ -279,8 +279,10 @@
   </div>
 
   <script>
-    const starData = JSON.parse(sessionStorage.getItem('dt_star') || 'null');
-    const star_id  = starData?.star_id;
+    // URL 파라미터 우선, 없으면 sessionStorage fallback
+    const _urlParams = new URLSearchParams(location.search);
+    const star_id    = _urlParams.get('star_id')
+                    || JSON.parse(sessionStorage.getItem('dt_star') || 'null')?.star_id;
 
     // ── 플랜 선택 상태 ────────────────────────────────────────
     let selectedPlan = 'free';

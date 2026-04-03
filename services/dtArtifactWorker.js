@@ -143,6 +143,92 @@ async function processOne(job) {
   }
 }
 
+// ── Yeosu Origin Scene Pool ───────────────────────────────────
+const YEOSU_SCENES = [
+  {
+    id: 'ododdo',
+    name: '오동도',
+    keywords: ['희망', '자연', '여유', '시작', '봄', '꽃'],
+    prompt_detail:
+      'Odongdo Island of Yeosu, camellia flowers blooming on the cliffside path, ' +
+      'a white lighthouse glowing softly at dusk, calm sea mirroring a petal-pink sky, ' +
+      'a solitary figure standing at the tip of the island gazing outward',
+    weight: 1,
+  },
+  {
+    id: 'hyangiam',
+    name: '향일암',
+    keywords: ['기원', '간절함', '치유', '건강', '기도', '병', '회복'],
+    prompt_detail:
+      'Hyangilam Buddhist hermitage perched on rugged cliffs above the East Sea, ' +
+      'golden sunrise pouring through narrow stone archways, ' +
+      'wisps of incense smoke drifting upward toward the sky, ' +
+      'a lone figure with hands clasped in prayer facing the rising sun',
+    weight: 1,
+  },
+  {
+    id: 'dolsandaegyo',
+    name: '돌산대교',
+    keywords: ['사랑', '연결', '가족', '함께', '결혼', '동행'],
+    prompt_detail:
+      'Dolsandaegyo suspension bridge lit in soft blue and violet light, ' +
+      'its reflection shimmering on the night sea of Yeosu, ' +
+      'two silhouettes walking hand in hand across the bridge, ' +
+      'city lights sparkling in the dark water below',
+    weight: 1,
+  },
+  {
+    id: 'nightsea',
+    name: '여수 밤바다',
+    keywords: ['낭만', '소원', '감성', '행복', '꿈', '별'],
+    prompt_detail:
+      'Yeosu harbor promenade at night, strings of warm amber fairy lights ' +
+      'lining the waterfront walk, stars and lights reflected on gently lapping waves, ' +
+      'a paper lantern drifting upward from open hands carrying a silent wish',
+    weight: 1,
+  },
+  {
+    id: 'cablecar',
+    name: '해상 케이블카',
+    keywords: ['설렘', '도전', '자유', '성공', '새', '취업', '합격', '승진'],
+    prompt_detail:
+      'Yeosu maritime cable car gondola gliding high above turquoise island waters, ' +
+      'aerial view of green hillsides and the sparkling harbor below, ' +
+      'golden hour sunlight streaming through the glass cabin walls, ' +
+      'a figure inside looking down with an expression of wonder',
+    weight: 1,
+  },
+  {
+    id: 'dolsannight',
+    name: '돌산 야경 해안도로',
+    keywords: ['평화', '힐링', '여유', '쉬고', '위로', '공부', '학업'],
+    prompt_detail:
+      'Dolsan coastal night road winding along a quiet inlet, ' +
+      'soft streetlamps reflecting golden ribbons on still water, ' +
+      'distant city glow of Yeosu glittering across the harbor, ' +
+      'a solitary figure seated on the seawall, face turned up to the stars',
+    weight: 1,
+  },
+];
+
+// ── scene 선택 (mood 키워드 기반 가중치 + weighted random) ────
+function pickYeosuScene(wishText) {
+  const text = wishText || '';
+  const scenes = YEOSU_SCENES.map(s => ({ ...s }));
+
+  // 키워드 매칭 시 해당 장면 가중치 2배
+  scenes.forEach(s => {
+    if (s.keywords.some(kw => text.includes(kw))) s.weight = 2;
+  });
+
+  let rand = Math.random() * scenes.reduce((sum, s) => sum + s.weight, 0);
+  for (const scene of scenes) {
+    rand -= scene.weight;
+    if (rand <= 0) return scene;
+  }
+  return scenes[0];
+}
+
 // ── 이미지 URL → Buffer 다운로드 ─────────────────────────────
 function downloadToBuffer(url) {
   return new Promise((resolve, reject) => {
@@ -217,28 +303,42 @@ async function compositeWishText(imageBuffer, wishText) {
 
 // ── 이미지 생성 (DALL-E 3 → 로컬 저장 + 텍스트 합성) ─────────
 async function generateImage(job) {
-  // 1. star_name / wish_text 조회 (텍스트 합성에도 필요)
-  let star_name = '소원별', wish_text = '소원이 이루어지기를';
+  // 1. star_name / wish_text / yeosu_theme 조회 (텍스트 합성에도 필요)
+  let star_name = '소원별', wish_text = '소원이 이루어지기를', yeosu_theme = null;
   const starResult = await db.query(
-    `SELECT s.star_name, w.wish_text
+    `SELECT s.star_name, w.wish_text, w.yeosu_theme
      FROM dt_stars s JOIN dt_wishes w ON s.wish_id = w.id
      WHERE s.id = $1`,
     [job.star_id]
   );
   if (starResult.rows.length > 0) {
-    star_name = starResult.rows[0].star_name;
-    wish_text = starResult.rows[0].wish_text;
+    star_name   = starResult.rows[0].star_name;
+    wish_text   = starResult.rows[0].wish_text;
+    yeosu_theme = starResult.rows[0].yeosu_theme;
   }
 
   // 2. 프롬프트 빌드 (job.prompt 직접 지정 시 우선)
   let prompt = job.prompt;
   if (!prompt) {
-    prompt =
-      `2D flat illustration, Korean webtoon style, clean line art, minimal shading, ` +
-      `no realistic lighting, no 3D rendering, soft pastel colors. ` +
-      `Dreamlike scene for the wish: "${wish_text}". ` +
-      `A gentle glowing star named "${star_name}" as the central motif. ` +
-      `9:16 vertical portrait format. No text in image. No photorealism.`;
+    if (yeosu_theme === 'yeosu') {
+      // Yeosu scene pool: mood 기반 weighted pick
+      const scene = pickYeosuScene(wish_text);
+      log.info(`[SCENE] ${scene.name}(${scene.id}) 선택`, { wish_text, star_id: job.star_id });
+      console.log(`[dtArtifactWorker][SCENE] ${scene.name} (${scene.id})`);
+      prompt =
+        `2D flat illustration, Korean webtoon style, clean line art, minimal shading, ` +
+        `no realistic lighting, no 3D rendering, soft pastel colors. ` +
+        `${scene.prompt_detail}. ` +
+        `The scene embodies the heartfelt wish: "${wish_text}". ` +
+        `9:16 vertical portrait format. No text in image. No photorealism.`;
+    } else {
+      prompt =
+        `2D flat illustration, Korean webtoon style, clean line art, minimal shading, ` +
+        `no realistic lighting, no 3D rendering, soft pastel colors. ` +
+        `Dreamlike scene for the wish: "${wish_text}". ` +
+        `A gentle glowing star named "${star_name}" as the central motif. ` +
+        `9:16 vertical portrait format. No text in image. No photorealism.`;
+    }
   }
 
   // 3. DALL-E 3 생성

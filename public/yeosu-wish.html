@@ -301,38 +301,14 @@
         <div class="char-counter" id="char-counter">0 / 100자</div>
       </div>
 
-      <!-- 상품 선택 -->
-      <div class="form-section">
-        <label class="form-label">
-          상품 선택 <span class="required">*</span>
-        </label>
-        <div class="product-options" id="product-options">
-          <!-- 상품 목록은 JS로 렌더링 -->
-        </div>
-      </div>
-
-      <!-- 단체 여부 -->
-      <div class="form-section">
-        <div class="checkbox-row">
-          <input type="checkbox" name="is_group" id="is-group">
-          <label for="is-group">단체로 신청합니다</label>
-        </div>
-        <div class="group-size-input" id="group-size-container">
-          <input type="number" name="group_size" class="form-input"
-                 placeholder="인원 수" min="2" max="100" value="2">
-          <input type="text" name="group_name" class="form-input"
-                 placeholder="단체명 (선택)" maxlength="100" style="margin-top:8px">
-        </div>
-      </div>
-
       <button type="submit" class="submit-btn" id="submit-btn">
-        소원 접수하기
+        소원그림 받기
       </button>
     </form>
 
     <div class="loading" id="loading">
       <div class="spinner"></div>
-      <p class="loading-text">소원을 접수하고 있습니다...</p>
+      <p class="loading-text">소원별을 만들고 있습니다…</p>
     </div>
 
     <footer class="footer">
@@ -342,159 +318,70 @@
   </div>
 
   <script>
-    // 상품 정보
-    let products = [];
-    let selectedSku = 'FREE';
-
-    // 상품 목록 로드
-    async function loadProducts() {
-      try {
-        const res = await fetch('/api/yeosu/wish/products');
-        const data = await res.json();
-        if (data.success) {
-          products = data.products;
-          renderProducts();
-        }
-      } catch (error) {
-        console.error('상품 로드 실패:', error);
-        // 기본값 사용
-        products = [
-          { sku: 'FREE', name: '무료 체험', price: 0, description: '소원그림 1장 무료 생성', features: ['AI 소원그림 1장', '30일 다운로드'] },
-          { sku: 'YW_BASIC_7', name: '베이직 7', price: 9900, description: '7일간 매일 응원 메시지', features: ['AI 소원그림 1장', '7일 응원 메시지', '30일 다운로드'] },
-          { sku: 'YW_PREMIUM_30', name: '프리미엄 30', price: 24900, description: '30일간 매일 응원 메시지', features: ['AI 소원그림 1장', '30일 응원 메시지', '30일 다운로드', '특별 축원문'] }
-        ];
-        renderProducts();
-      }
-    }
-
-    // 상품 렌더링
-    function renderProducts() {
-      const container = document.getElementById('product-options');
-      container.innerHTML = products.map(p => `
-        <label class="product-option ${p.sku === selectedSku ? 'selected' : ''}" data-sku="${p.sku}">
-          <input type="radio" name="sku" value="${p.sku}" ${p.sku === selectedSku ? 'checked' : ''}>
-          <div class="product-header">
-            <span class="product-name">${p.name}</span>
-            <span class="product-price ${p.price === 0 ? 'free' : ''}">
-              ${p.price === 0 ? '무료' : p.price.toLocaleString() + '원'}
-            </span>
-          </div>
-          <div class="product-desc">${p.description}</div>
-          <div class="product-features">
-            ${p.features.map(f => `<span class="product-feature">${f}</span>`).join('')}
-          </div>
-        </label>
-      `).join('');
-
-      // 상품 선택 이벤트
-      container.querySelectorAll('.product-option').forEach(option => {
-        option.addEventListener('click', () => {
-          container.querySelectorAll('.product-option').forEach(o => o.classList.remove('selected'));
-          option.classList.add('selected');
-          option.querySelector('input').checked = true;
-          selectedSku = option.dataset.sku;
-          updateSubmitButton();
-        });
-      });
-    }
-
-    // 제출 버튼 텍스트 업데이트
-    function updateSubmitButton() {
-      const btn = document.getElementById('submit-btn');
-      const product = products.find(p => p.sku === selectedSku);
-      if (product && product.price > 0) {
-        btn.textContent = `결제하기 (${product.price.toLocaleString()}원)`;
-      } else {
-        btn.textContent = '소원 접수하기';
-      }
-    }
-
     // 글자 수 카운터
-    const wishText = document.getElementById('wish-text');
+    const wishTextEl  = document.getElementById('wish-text');
     const charCounter = document.getElementById('char-counter');
-    wishText.addEventListener('input', () => {
-      const len = wishText.value.length;
+    wishTextEl.addEventListener('input', () => {
+      const len = wishTextEl.value.length;
       charCounter.textContent = `${len} / 100자`;
       charCounter.classList.toggle('warning', len > 50);
     });
 
-    // 단체 체크박스
-    const isGroup = document.getElementById('is-group');
-    const groupSizeContainer = document.getElementById('group-size-container');
-    isGroup.addEventListener('change', () => {
-      groupSizeContainer.classList.toggle('show', isGroup.checked);
-    });
+    // 소원 키워드 → gem_type 매핑
+    function detectGemType(text) {
+      if (/건강|치유|회복|아프|병/.test(text))               return 'emerald';
+      if (/사랑|행복|가족|결혼|아이|아기|부모/.test(text))    return 'ruby';
+      if (/성공|사업|돈|취업|합격|직장|승진|매출/.test(text)) return 'citrine';
+      if (/공부|학업|시험|지혜|지식|입시/.test(text))         return 'sapphire';
+      return 'diamond';
+    }
 
-    // 폼 제출
-    const form = document.getElementById('wish-form');
+    // 폼 제출 → DreamTown Star 생성
+    const form    = document.getElementById('wish-form');
     const loading = document.getElementById('loading');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const formData = new FormData(form);
-      const data = {
-        customer_name: formData.get('customer_name'),
-        customer_phone: formData.get('customer_phone'),
-        customer_email: formData.get('customer_email') || null,
-        wish_text: formData.get('wish_text'),
-        sku: selectedSku,
-        is_group: formData.get('is_group') === 'on',
-        group_size: parseInt(formData.get('group_size')) || 1,
-        group_name: formData.get('group_name') || null,
-        source: 'WEB'
-      };
+      const formData  = new FormData(form);
+      const name      = (formData.get('customer_name')  || '').trim();
+      const phone     = (formData.get('customer_phone') || '').trim();
+      const wish_text = (formData.get('wish_text')      || '').trim();
 
-      // 유효성 검사
-      if (!data.customer_name || !data.customer_phone || !data.wish_text) {
-        alert('필수 항목을 모두 입력해주세요.');
+      if (!name || !phone || !wish_text) {
+        alert('이름, 전화번호, 소원을 모두 입력해주세요.');
         return;
       }
+
+      // 전화번호 기반 익명 user_id (동일 번호 → 동일 별 흐름 추적)
+      const user_id  = 'yeosu_' + phone.replace(/\D/g, '');
+      const gem_type = detectGemType(wish_text);
 
       form.style.display = 'none';
       loading.classList.add('show');
 
       try {
-        const res = await fetch('/api/yeosu/wish', {
-          method: 'POST',
+        const res = await fetch('/api/dt/engine/star', {
+          method:  'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
+          body: JSON.stringify({ user_id, wish_text, gem_type, yeosu_theme: 'yeosu' }),
         });
 
-        const result = await res.json();
+        const data = await res.json();
 
-        if (result.success) {
-          // 유료 상품인 경우 결제 페이지로 이동
-          if (result.product.price > 0) {
-            const checkoutRes = await fetch('/api/yeosu/wish/checkout', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ wish_id: result.wish_id })
-            });
-            const checkoutData = await checkoutRes.json();
-            if (checkoutData.success && checkoutData.payment_url) {
-              window.location.href = checkoutData.payment_url;
-              return;
-            }
-          }
-
-          // 무료 상품 - 결과 페이지로 이동
-          window.location.href = `/yeosu-wish-result.html?id=${result.wish_id}&token=${result.download_token}`;
-        } else {
-          alert(result.error || '접수 중 오류가 발생했습니다.');
-          form.style.display = 'block';
-          loading.classList.remove('show');
+        if (!res.ok || !data.star?.id) {
+          throw new Error(data.error || '소원 접수 중 오류가 발생했습니다.');
         }
-      } catch (error) {
-        console.error('접수 오류:', error);
-        alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
-        form.style.display = 'block';
+
+        window.location.href = `/dt-upgrade.html?star_id=${data.star.id}`;
+
+      } catch (err) {
+        console.error('[yeosu-wish] 소원 접수 오류:', err);
+        alert(err.message);
         loading.classList.remove('show');
+        form.style.display = 'block';
       }
     });
-
-    // 초기화
-    loadProducts();
   </script>
 </body>
 </html>
