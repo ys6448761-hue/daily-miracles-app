@@ -1,14 +1,22 @@
 /**
  * JourneySceneEngine.jsx
  *
- * DreamTown Journey Scene Engine — MVP
- * 사용자가 앱 진입 시 장면 카드를 조용히 1회 노출하는 시스템
+ * DreamTown Journey Scene Engine — Scene→Action MVP
+ *
+ * 흐름:
+ *   idle → question → scene(5단) → coupon → done
+ *
+ * 5단 구조 (SSOT: Scene→Action SSOT v1):
+ *   1. 감정 리마인드
+ *   2. 장면 몰입
+ *   3. 공명 문장 (🔥 감정 peak / A/B 실험)
+ *   4. 선택 1개
+ *   5. 쿠폰 행동 연결
  *
  * 원칙:
- *   - 서버 의존 없음 (localStorage만 사용)
- *   - 하루 1회, 장면 순서 고정
- *   - 입력/버튼 최소화, 강요 없음
- *   - 자동 등장 / 자동 사라짐
+ *   - 선택은 항상 1개
+ *   - 서버 의존 없음
+ *   - 하루 1회
  */
 
 import { useEffect, useRef, useState } from 'react';
@@ -16,87 +24,85 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { logEvent } from '../lib/events.js';
 import { getOrAssignVariant } from '../lib/experiment.js';
 
-// ── 상수 ────────────────────────────────────────────────────────
-const LS_KEY = 'dreamtown_scene_state';
-
-const SCENE_ORDER = ['cablecar', 'observatory', 'cruise'];
-
-// coupon_test_1: cablecar 감정 문장 A/B
+// ── 상수 ────────────────────────────────────────────────────────────
+const LS_KEY       = 'dreamtown_scene_state';
+const SCENE_ORDER  = ['cablecar', 'observatory', 'cruise'];
 const EXPERIMENT_ID = 'coupon_test_1';
-const CABLECAR_TEXT = {
-  A: '지금 이 순간,\n잠깐 쉬어도 괜찮아요',
-  B: '지금 멈춘 건 포기가 아니라,\n다시 가기 위한 준비일지도 몰라요',
-};
 
+// ── 장면 정의 ────────────────────────────────────────────────────────
 const SCENES = {
   cablecar: {
-    // text는 A/B variant에 따라 런타임에 결정됨 (아래 resolveSceneText 참고)
-    duration: 3000,
+    atmosphere:  '바람이 조용히 스치는 순간',
+    resonance: {
+      A: '지금 이 순간,\n잠깐 쉬어도 괜찮아요',
+      B: '지금 멈춘 건 포기가 아니라,\n다시 가기 위한 준비일지도 몰라요',
+    },
+    choice:   '조금 더 이 순간에 있어볼래요',
+    coupon: {
+      title:    '여수 해상케이블카 이용권',
+      desc:     '돌산~자산 구간 왕복 · 여수 전경이 한눈에',
+      ctaLabel: '지금 확인하기',
+    },
+    duration: null, // 버튼 선택형 — 자동 소멸 없음
   },
   observatory: {
-    text: '이 장면에서\n시작해도 괜찮을 것 같나요?',
-    duration: 5000,
+    atmosphere: '멀리서 보이는 것들이 선명해지는 순간',
+    resonance:  { A: '이 장면에서\n시작해도 괜찮을 것 같나요?', B: null },
+    choice:     null, // 선택 버튼 없음 (자동 소멸)
+    coupon:     null,
+    duration:   5000,
   },
   cruise: {
-    text: '이 이야기를\n조금 더 이어가보고 싶어졌나요?',
-    duration: 4000,
+    atmosphere: '파도 소리가 조용히 따라오는 순간',
+    resonance:  { A: '이 이야기를\n조금 더 이어가보고 싶어졌나요?', B: null },
+    choice:     null,
+    coupon:     null,
+    duration:   4000,
   },
 };
 
-function resolveSceneText(sceneId, variant) {
-  if (sceneId === 'cablecar') return CABLECAR_TEXT[variant] ?? CABLECAR_TEXT.A;
-  return SCENES[sceneId]?.text ?? '';
-}
-
-// ── 헬퍼 ────────────────────────────────────────────────────────
-function today() {
-  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-}
+// ── 헬퍼 ────────────────────────────────────────────────────────────
+function today() { return new Date().toISOString().slice(0, 10); }
 
 function loadState() {
-  try {
-    return JSON.parse(localStorage.getItem(LS_KEY)) ?? {};
-  } catch {
-    return {};
-  }
+  try { return JSON.parse(localStorage.getItem(LS_KEY)) ?? {}; }
+  catch { return {}; }
 }
 
 function saveState(scene) {
-  localStorage.setItem(
-    LS_KEY,
-    JSON.stringify({ lastSeenScene: scene, lastSeenDate: today() }),
-  );
+  localStorage.setItem(LS_KEY, JSON.stringify({ lastSeenScene: scene, lastSeenDate: today() }));
 }
 
-function resolveNextScene(lastSeenScene) {
-  if (!lastSeenScene) return 'cablecar';
-  const idx = SCENE_ORDER.indexOf(lastSeenScene);
-  return idx === -1 || idx === SCENE_ORDER.length - 1
-    ? null
-    : SCENE_ORDER[idx + 1];
+function resolveNextScene(last) {
+  if (!last) return 'cablecar';
+  const idx = SCENE_ORDER.indexOf(last);
+  return idx === -1 || idx === SCENE_ORDER.length - 1 ? null : SCENE_ORDER[idx + 1];
 }
 
-// ── 컴포넌트 ────────────────────────────────────────────────────
+function nl2br(text) {
+  if (!text) return null;
+  return text.split('\n').map((line, i, arr) => (
+    <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
+  ));
+}
+
+// ── 컴포넌트 ─────────────────────────────────────────────────────────
 export default function JourneySceneEngine() {
-  // 'idle' | 'question' | 'scene' | 'done'
-  const [phase, setPhase] = useState('idle');
+  // 'idle' | 'question' | 'scene' | 'coupon' | 'done'
+  const [phase, setPhase]           = useState('idle');
   const [currentScene, setCurrentScene] = useState(null);
-  const timerRef  = useRef(null);
-  // A/B variant — cablecar 진입 시 1회 할당, 이후 고정
-  const variantRef = useRef(null);
+  const timerRef   = useRef(null);
+  const variantRef = useRef(null); // A/B variant
 
+  // ── 진입 타이머 ───────────────────────────────────────────────
   useEffect(() => {
     timerRef.current = setTimeout(() => {
       const { lastSeenDate, lastSeenScene } = loadState();
-
-      // 오늘 이미 노출됐으면 종료
       if (lastSeenDate === today()) return;
 
-      // 다음에 보여줄 장면 결정
       const next = resolveNextScene(lastSeenScene ?? null);
-      if (!next) return; // 모든 장면 소진
+      if (!next) return;
 
-      // cablecar 장면일 때 A/B 할당
       if (next === 'cablecar') {
         variantRef.current = getOrAssignVariant(EXPERIMENT_ID);
       }
@@ -108,10 +114,9 @@ export default function JourneySceneEngine() {
     return () => clearTimeout(timerRef.current);
   }, []);
 
+  // ── 이벤트 핸들러 ─────────────────────────────────────────────
   function handleYes() {
-    setPhase('scene');
     const variant = variantRef.current;
-    // scene_view 이벤트 (experiment 정보 포함)
     logEvent('scene_view', {
       scene_id:        currentScene,
       scene_type:      '여행',
@@ -121,71 +126,135 @@ export default function JourneySceneEngine() {
         : {}),
     });
 
-    const { duration } = SCENES[currentScene];
-    timerRef.current = setTimeout(() => {
-      saveState(currentScene);
-      setPhase('done');
-    }, duration);
+    setPhase('scene');
+
+    // 자동 소멸 장면 (choice 없음)
+    const scene = SCENES[currentScene];
+    if (scene.duration) {
+      timerRef.current = setTimeout(() => {
+        saveState(currentScene);
+        setPhase('done');
+      }, scene.duration);
+    }
   }
 
-  function handleNo() {
+  function handleNo() { setPhase('done'); }
+
+  function handleChoice() {
+    const variant = variantRef.current;
+    logEvent('coupon_open', {
+      coupon_id:       'cpn_cablecar_001',
+      trigger_emotion: null,
+      scene_id:        currentScene,
+      ...(variant ? { experiment_id: EXPERIMENT_ID, variant } : {}),
+    });
+    setPhase('coupon');
+  }
+
+  function handleCouponCta() {
+    const variant = variantRef.current;
+    logEvent('conversion_action', {
+      action_type: 'book',
+      value:       null,
+      ...(variant ? { experiment_id: EXPERIMENT_ID, variant } : {}),
+    });
+    saveState(currentScene);
     setPhase('done');
   }
 
-  if (phase === 'idle' || phase === 'done') return null;
+  function handleCouponClose() {
+    saveState(currentScene);
+    setPhase('done');
+  }
 
-  const variant   = variantRef.current;
-  const sceneText = currentScene ? resolveSceneText(currentScene, variant) : '';
+  // ── 렌더 가드 ────────────────────────────────────────────────
+  if (phase === 'idle' || phase === 'done' || !currentScene) return null;
+
+  const scene   = SCENES[currentScene];
+  const variant = variantRef.current;
+  const resonanceText = scene.resonance?.[variant] ?? scene.resonance?.A ?? '';
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
+
+      {/* ── 진입 질문 ─────────────────────────────── */}
       {phase === 'question' && (
         <motion.div
           key="question"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 24 }}
+          exit={{ opacity: 0, y: 16 }}
           transition={{ duration: 0.3 }}
           style={overlayStyle}
         >
+          <p style={labelStyle}>잠깐, 그 느낌 기억나시나요?</p>
           <p style={questionTextStyle}>
             지금 이 순간을{'\n'}조금 더 느껴보고 싶으세요?
           </p>
-          <div style={btnRowStyle}>
-            <button style={btnPrimaryStyle} onClick={handleYes}>
-              가볍게 볼게요
-            </button>
-            <button style={btnGhostStyle} onClick={handleNo}>
-              그냥 둘게요
-            </button>
+          <div style={btnColStyle}>
+            <button style={btnPrimaryStyle} onClick={handleYes}>가볍게 볼게요</button>
+            <button style={btnGhostStyle}   onClick={handleNo}>그냥 둘게요</button>
           </div>
         </motion.div>
       )}
 
+      {/* ── 장면 카드 (5단) ───────────────────────── */}
       {phase === 'scene' && (
         <motion.div
           key="scene"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 24 }}
-          transition={{ duration: 0.3 }}
-          style={{ ...overlayStyle, pointerEvents: 'none' }}
+          exit={{ opacity: 0, y: 16 }}
+          transition={{ duration: 0.35 }}
+          style={overlayStyle}
         >
-          <p style={sceneTextStyle}>
-            {sceneText.split('\n').map((line, i) => (
-              <span key={i}>
-                {line}
-                {i < sceneText.split('\n').length - 1 && <br />}
-              </span>
-            ))}
-          </p>
+          {/* 1 감정 리마인드 */}
+          <p style={labelStyle}>아까 이런 느낌이었죠</p>
+
+          {/* 2 장면 */}
+          <p style={atmosphereStyle}>{scene.atmosphere}</p>
+
+          {/* 3 공명 */}
+          <p style={resonanceStyle}>{nl2br(resonanceText)}</p>
+
+          {/* 4 선택 (cablecar만) */}
+          {scene.choice && (
+            <button style={choiceBtnStyle} onClick={handleChoice}>
+              {scene.choice}
+            </button>
+          )}
         </motion.div>
       )}
+
+      {/* ── 쿠폰 카드 ─────────────────────────────── */}
+      {phase === 'coupon' && scene.coupon && (
+        <motion.div
+          key="coupon"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 16 }}
+          transition={{ duration: 0.35 }}
+          style={overlayStyle}
+        >
+          <p style={labelStyle}>이 순간과 함께</p>
+          <p style={couponTitleStyle}>{scene.coupon.title}</p>
+          <p style={couponDescStyle}>{scene.coupon.desc}</p>
+          <div style={{ ...btnColStyle, marginTop: 20 }}>
+            <button style={btnPrimaryStyle} onClick={handleCouponCta}>
+              {scene.coupon.ctaLabel}
+            </button>
+            <button style={btnGhostStyle} onClick={handleCouponClose}>
+              나중에 볼게요
+            </button>
+          </div>
+        </motion.div>
+      )}
+
     </AnimatePresence>
   );
 }
 
-// ── 스타일 ───────────────────────────────────────────────────────
+// ── 스타일 ───────────────────────────────────────────────────────────
 const overlayStyle = {
   position:             'fixed',
   bottom:               '32px',
@@ -194,55 +263,100 @@ const overlayStyle = {
   margin:               '0 auto',
   width:                'auto',
   maxWidth:             '420px',
-  background:           'rgba(13, 27, 42, 0.82)',
-  backdropFilter:       'blur(16px)',
-  WebkitBackdropFilter: 'blur(16px)',
+  background:           'rgba(13, 27, 42, 0.88)',
+  backdropFilter:       'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
   border:               '1px solid rgba(255, 255, 255, 0.10)',
   borderRadius:         '20px',
   padding:              '28px 24px',
   textAlign:            'center',
   zIndex:               9999,
-  boxShadow:            '0 8px 32px rgba(0,0,0,0.4)',
+  boxShadow:            '0 8px 40px rgba(0,0,0,0.5)',
   boxSizing:            'border-box',
 };
 
+const labelStyle = {
+  fontSize:     '11px',
+  color:        'rgba(255,255,255,0.28)',
+  letterSpacing: '0.06em',
+  marginBottom: '10px',
+};
+
 const questionTextStyle = {
-  color:        'rgba(255,255,255,0.75)',
-  fontSize:     '15px',
+  color:        'rgba(255,255,255,0.78)',
+  fontSize:     '16px',
   lineHeight:   1.7,
   whiteSpace:   'pre-line',
-  marginBottom: '20px',
+  marginBottom: '22px',
+  fontWeight:   500,
 };
 
-const sceneTextStyle = {
-  color:      'rgba(255,255,255,0.70)',
-  fontSize:   '15px',
-  lineHeight: 1.8,
-  whiteSpace: 'pre-line',
+const atmosphereStyle = {
+  color:        'rgba(255,255,255,0.42)',
+  fontSize:     '13px',
+  lineHeight:   1.7,
+  marginBottom: '14px',
 };
 
-const btnRowStyle = {
-  display:        'flex',
-  flexDirection:  'column',
-  gap:            '10px',
+const resonanceStyle = {
+  color:        'rgba(255,255,255,0.82)',
+  fontSize:     '16px',
+  lineHeight:   1.85,
+  whiteSpace:   'pre-line',
+  fontWeight:   500,
+  marginBottom: '22px',
+};
+
+const couponTitleStyle = {
+  color:        '#FFD76A',
+  fontSize:     '17px',
+  fontWeight:   700,
+  marginBottom: '8px',
+};
+
+const couponDescStyle = {
+  color:        'rgba(255,255,255,0.45)',
+  fontSize:     '13px',
+  lineHeight:   1.6,
+  marginBottom: '4px',
+};
+
+const btnColStyle = {
+  display:       'flex',
+  flexDirection: 'column',
+  gap:           '10px',
+};
+
+const choiceBtnStyle = {
+  width:        '100%',
+  padding:      '14px 0',
+  borderRadius: '12px',
+  border:       '1px solid rgba(255,255,255,0.22)',
+  background:   'rgba(255,255,255,0.08)',
+  color:        'rgba(255,255,255,0.85)',
+  fontSize:     '14px',
+  fontWeight:   500,
+  cursor:       'pointer',
+  marginBottom: '0',
 };
 
 const btnPrimaryStyle = {
-  padding:      '13px 0',
+  padding:      '14px 0',
   borderRadius: '12px',
-  border:       '1px solid rgba(255,255,255,0.18)',
-  background:   'rgba(255,255,255,0.07)',
-  color:        'rgba(255,255,255,0.80)',
+  border:       '1px solid rgba(255,255,255,0.20)',
+  background:   'rgba(255,255,255,0.08)',
+  color:        'rgba(255,255,255,0.85)',
   fontSize:     '14px',
+  fontWeight:   500,
   cursor:       'pointer',
 };
 
 const btnGhostStyle = {
-  padding:      '13px 0',
+  padding:      '12px 0',
   borderRadius: '12px',
   border:       'none',
   background:   'transparent',
-  color:        'rgba(255,255,255,0.30)',
+  color:        'rgba(255,255,255,0.28)',
   fontSize:     '13px',
   cursor:       'pointer',
 };
