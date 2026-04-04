@@ -441,7 +441,10 @@ export default function MyStar() {
             star_id:   star.star_id,
             action:    'book_entry_click',
           }));
-          nav(`/my-star/${star.star_id}/book`);
+          // [검증용 임시 연결 — AIL-STORY-2026-0404-001]
+          // 원래 경로: /my-star/${star.star_id}/book (DigitalBook.jsx)
+          // 원복 시: 아래 줄을 nav(`/my-star/${star.star_id}/book`) 로 교체
+          nav('/story-draft-mvp');
         }}
         className="w-full mb-4 bg-white/5 border border-star-gold/25 text-star-gold/75 font-semibold py-3.5 rounded-2xl hover:bg-star-gold/8 hover:border-star-gold/45 hover:text-star-gold transition-all text-sm"
       >

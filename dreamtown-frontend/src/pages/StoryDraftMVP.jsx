@@ -82,7 +82,7 @@ export default function StoryDraftMVP() {
         </motion.h1>
 
         <motion.p {...fade(0.5)} className="text-white/40 text-sm leading-relaxed">
-          여기, 당신이 걸어온 길이 있습니다
+          당신의 이야기가 조금씩 드러나고 있습니다
         </motion.p>
       </motion.section>
 
