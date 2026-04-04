@@ -127,6 +127,23 @@
     .badge-purple { background: rgba(155,135,245,0.18); color: #9B87F5; }
     .badge-gold   { background: rgba(255,215,106,0.15); color: #FFD76A; }
     .badge-green  { background: rgba(80,200,120,0.15);  color: #50c878; }
+    .badge-a      { background: rgba(100,180,255,0.15); color: #64B4FF; }
+    .badge-b      { background: rgba(255,120,180,0.15); color: #FF78B4; }
+
+    .ab-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 13px;
+    }
+    .ab-row:last-child { border-bottom: none; }
+    .ab-label { color: rgba(255,255,255,0.55); }
+    .ab-vals  { display: flex; gap: 16px; }
+    .ab-val   { text-align: center; }
+    .ab-val .num  { font-size: 20px; font-weight: 700; color: #fff; }
+    .ab-val .sub  { font-size: 10px; color: rgba(255,255,255,0.30); }
 
     .empty {
       text-align: center;
@@ -196,6 +213,17 @@
     <div id="tbl-funnel"></div>
   </div>
 
+  <!-- KPI 4: A/B 실험 결과 -->
+  <div class="card">
+    <div class="card-title">KPI 4 · coupon_test_1 · 전체 기간</div>
+    <div class="card-subtitle">감정 문장 A/B — 전환율 비교</div>
+    <div style="margin-bottom:12px;font-size:11px;color:rgba(255,255,255,0.25);">
+      A: "잠깐 쉬어도 괜찮아요"<br>
+      B: "다시 가기 위한 준비일지도"
+    </div>
+    <div id="tbl-ab"></div>
+  </div>
+
 </div>
 
 <div class="generated-at" id="footer-gen"></div>
@@ -239,6 +267,45 @@
       </tr>`).join('');
   }
 
+  function renderAB(rows) {
+    const wrap = document.getElementById('tbl-ab');
+    if (!rows.length) { wrap.innerHTML = '<div class="empty">데이터 없음 (수집 시작 후 표시)</div>'; return; }
+
+    // 이벤트별로 A/B 집계
+    const events = ['scene_view','emotion_select','conversion_action'];
+    const eventLabel = { scene_view:'장면 노출', emotion_select:'감정 선택', conversion_action:'전환 행동' };
+    const map = {};
+    rows.forEach(r => {
+      if (!map[r.event_name]) map[r.event_name] = { A: 0, B: 0 };
+      map[r.event_name][r.variant] = r.count;
+    });
+
+    // 전환율: conversion_action / scene_view
+    const sv = map['scene_view'] ?? { A: 0, B: 0 };
+    const ca = map['conversion_action'] ?? { A: 0, B: 0 };
+    const rateA = sv.A ? ((ca.A / sv.A) * 100).toFixed(1) : '—';
+    const rateB = sv.B ? ((ca.B / sv.B) * 100).toFixed(1) : '—';
+
+    wrap.innerHTML = events.map(ev => {
+      const d = map[ev] ?? { A: 0, B: 0 };
+      return `
+        <div class="ab-row">
+          <div class="ab-label">${eventLabel[ev] ?? ev}</div>
+          <div class="ab-vals">
+            <div class="ab-val"><div class="num">${d.A}</div><div class="sub"><span class="badge badge-a">A</span></div></div>
+            <div class="ab-val"><div class="num">${d.B}</div><div class="sub"><span class="badge badge-b">B</span></div></div>
+          </div>
+        </div>`;
+    }).join('') + `
+      <div class="ab-row" style="margin-top:8px;border-top:1px solid rgba(255,255,255,0.08);padding-top:14px;">
+        <div class="ab-label" style="color:#FFD76A;font-weight:600;">전환율 (→전환/장면)</div>
+        <div class="ab-vals">
+          <div class="ab-val"><div class="num" style="color:#64B4FF">${rateA}%</div><div class="sub"><span class="badge badge-a">A</span></div></div>
+          <div class="ab-val"><div class="num" style="color:#FF78B4">${rateB}%</div><div class="sub"><span class="badge badge-b">B</span></div></div>
+        </div>
+      </div>`;
+  }
+
   function renderFunnel(rows) {
     const wrap = document.getElementById('tbl-funnel');
     if (!rows.length) { wrap.innerHTML = '<div class="empty">데이터 없음</div>'; return; }
@@ -266,6 +333,7 @@
       renderEntry(data.kpi1_entry   ?? []);
       renderScene(data.kpi2_scene   ?? []);
       renderFunnel(data.kpi3_funnel ?? []);
+      renderAB(data.kpi4_ab         ?? []);
 
       const d = new Date(data.generated_at).toLocaleString('ko-KR');
       document.getElementById('gen-at').textContent     = `기준: ${d}`;

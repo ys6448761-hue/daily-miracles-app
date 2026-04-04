@@ -74,11 +74,25 @@ router.get('/kpi', async (_req, res) => {
       ORDER BY t.cnt DESC
     `);
 
+    // KPI 4: A/B 실험 결과 — coupon_test_1 (전체 기간)
+    const kpi4 = await db.query(`
+      SELECT
+        params->>'variant'    AS variant,
+        event_name,
+        COUNT(*)::int         AS count
+      FROM dt_events
+      WHERE params->>'experiment_id' = 'coupon_test_1'
+        AND event_name IN ('scene_view', 'emotion_select', 'conversion_action')
+      GROUP BY variant, event_name
+      ORDER BY variant, event_name
+    `);
+
     return res.json({
       generated_at: new Date().toISOString(),
       kpi1_entry:   kpi1.rows,
       kpi2_scene:   kpi2.rows,
       kpi3_funnel:  kpi3.rows,
+      kpi4_ab:      kpi4.rows,
     });
   } catch (err) {
     log.error('kpi 조회 실패', { err: err.message });

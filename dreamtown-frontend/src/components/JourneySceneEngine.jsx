@@ -14,15 +14,23 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { logEvent } from '../lib/events.js';
+import { getOrAssignVariant } from '../lib/experiment.js';
 
 // ── 상수 ────────────────────────────────────────────────────────
 const LS_KEY = 'dreamtown_scene_state';
 
 const SCENE_ORDER = ['cablecar', 'observatory', 'cruise'];
 
+// coupon_test_1: cablecar 감정 문장 A/B
+const EXPERIMENT_ID = 'coupon_test_1';
+const CABLECAR_TEXT = {
+  A: '지금 이 순간,\n잠깐 쉬어도 괜찮아요',
+  B: '지금 멈춘 건 포기가 아니라,\n다시 가기 위한 준비일지도 몰라요',
+};
+
 const SCENES = {
   cablecar: {
-    text: '지금 이 장면이\n당신이 떠올렸던 모습과 닮아 있나요?',
+    // text는 A/B variant에 따라 런타임에 결정됨 (아래 resolveSceneText 참고)
     duration: 3000,
   },
   observatory: {
@@ -34,6 +42,11 @@ const SCENES = {
     duration: 4000,
   },
 };
+
+function resolveSceneText(sceneId, variant) {
+  if (sceneId === 'cablecar') return CABLECAR_TEXT[variant] ?? CABLECAR_TEXT.A;
+  return SCENES[sceneId]?.text ?? '';
+}
 
 // ── 헬퍼 ────────────────────────────────────────────────────────
 function today() {
@@ -68,7 +81,9 @@ export default function JourneySceneEngine() {
   // 'idle' | 'question' | 'scene' | 'done'
   const [phase, setPhase] = useState('idle');
   const [currentScene, setCurrentScene] = useState(null);
-  const timerRef = useRef(null);
+  const timerRef  = useRef(null);
+  // A/B variant — cablecar 진입 시 1회 할당, 이후 고정
+  const variantRef = useRef(null);
 
   useEffect(() => {
     timerRef.current = setTimeout(() => {
@@ -81,6 +96,11 @@ export default function JourneySceneEngine() {
       const next = resolveNextScene(lastSeenScene ?? null);
       if (!next) return; // 모든 장면 소진
 
+      // cablecar 장면일 때 A/B 할당
+      if (next === 'cablecar') {
+        variantRef.current = getOrAssignVariant(EXPERIMENT_ID);
+      }
+
       setCurrentScene(next);
       setPhase('question');
     }, 2000);
@@ -90,11 +110,15 @@ export default function JourneySceneEngine() {
 
   function handleYes() {
     setPhase('scene');
-    // scene_view 이벤트
+    const variant = variantRef.current;
+    // scene_view 이벤트 (experiment 정보 포함)
     logEvent('scene_view', {
-      scene_id:       currentScene,
-      scene_type:     '여행',
+      scene_id:        currentScene,
+      scene_type:      '여행',
       emotion_context: null,
+      ...(currentScene === 'cablecar' && variant
+        ? { experiment_id: EXPERIMENT_ID, variant }
+        : {}),
     });
 
     const { duration } = SCENES[currentScene];
@@ -110,7 +134,8 @@ export default function JourneySceneEngine() {
 
   if (phase === 'idle' || phase === 'done') return null;
 
-  const sceneText = currentScene ? SCENES[currentScene].text : '';
+  const variant   = variantRef.current;
+  const sceneText = currentScene ? resolveSceneText(currentScene, variant) : '';
 
   return (
     <AnimatePresence>
