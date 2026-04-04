@@ -2400,6 +2400,7 @@ const DT_SPA_ROUTES = [
   '/postcard', '/history', '/intro',
   '/star-birth', '/my-star', '/my-star/*', '/home',
   '/star/*', '/dashboard', '/wish',
+  '/story-draft-mvp', // 검증용 MVP — AIL-STORY-2026-0404-001
 ];
 app.get(DT_SPA_ROUTES, (req, res) => {
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
