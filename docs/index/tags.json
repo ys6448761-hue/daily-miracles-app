@@ -60,6 +60,7 @@
     "DOC-video-production-handoff-guide",
     "DOC-JAEMI_ONBOARDING_v11",
     "DOC-JAEMI_ONBOARDING_v12",
+    "DOC-DreamTown_KPI_Checklist",
     "DOC-sens-setup-guide",
     "DOC-service-flow",
     "DOC-가격표_퀵레퍼런스",
@@ -440,6 +441,7 @@
   "ops": [
     "DOC-weekly_promotion_guide",
     "DOC-DEC_OPERATIONS",
+    "DOC-DreamTown_KPI_Checklist",
     "DOC-drive-github-sync-setup",
     "DOC-sens-setup-guide",
     "DOC-INCIDENT-20260302-001"
@@ -539,6 +541,7 @@
     "DOC-DT_React_Architecture",
     "DOC-JUDGE_PROMPTS",
     "DOC-ad-set-mapping-and-ab-test-v1",
+    "DOC-DreamTown_KPI_Checklist",
     "DOC-04_Onboarding_7Day",
     "DOC-06_Demo_Operations",
     "DOC-REVIEW_COLLECTION_SYSTEM",
