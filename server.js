@@ -2286,6 +2286,45 @@ app.post('/api/book/upgrade', async (req, res) => {
   });
 });
 
+// ---------- 작품 전환 상담 신청 API (6개월 게이트) ----------
+// POST /api/book/inquiry — days >= 180 사용자 작품 전환 의사 접수
+app.post('/api/book/inquiry', async (req, res) => {
+  const { star_id, user_id, phone = null, days_since_start = null } = req.body;
+  if (!star_id) return res.status(400).json({ error: 'star_id는 필수입니다' });
+
+  const requestId = `inquiry-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+  console.info(JSON.stringify({
+    requestId, user_id, star_id,
+    phone:            phone ? '***' : null,
+    days_since_start: days_since_start ?? null,
+    action:           'book_inquiry_submit',
+    ts:               new Date().toISOString(),
+  }));
+
+  try {
+    const db = require('./database/db');
+    await db.query(
+      `INSERT INTO dt_dream_logs (star_id, log_type, payload)
+       VALUES ($1, 'voyage', $2)`,
+      [star_id, JSON.stringify({
+        event:            'book_inquiry_submit',
+        user_id:          user_id ?? null,
+        phone:            phone ?? null,
+        days_since_start: days_since_start ?? null,
+        request_id:       requestId,
+      })]
+    );
+  } catch (dbErr) {
+    console.warn('[book/inquiry] DB 저장 실패:', dbErr.message);
+  }
+
+  return res.status(201).json({
+    success:    true,
+    request_id: requestId,
+    message:    '상담 신청이 접수되었습니다. 담당 작가가 곧 연락드립니다.',
+  });
+});
+
 // ---------- DreamTown Core Engine Routes (DEC-2026-0331-001) ----------
 try {
   const dtEngineRoutes = require('./routes/dtEngineRoutes');

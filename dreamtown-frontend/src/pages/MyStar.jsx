@@ -409,6 +409,28 @@ export default function MyStar() {
 
       </motion.div>
 
+      {/* ── 100일 이벤트 배너 (days >= 100) ── */}
+      {daysSinceBirth >= 100 && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          onClick={() => {
+            console.info(JSON.stringify({
+              requestId: `100d-entry-${Date.now().toString(36)}`,
+              user_id:   getOrCreateUserId(),
+              star_id:   star.star_id,
+              action:    'story_100day_entry',
+            }));
+            nav(`/my-star/${star.star_id}/100days`);
+          }}
+          className="mb-4 bg-star-gold/8 border border-star-gold/25 rounded-2xl px-5 py-4 cursor-pointer hover:bg-star-gold/12 transition-all"
+        >
+          <p className="text-star-gold font-semibold text-sm mb-0.5">🌟 100일의 이야기</p>
+          <p className="text-white/50 text-xs">당신의 이야기가 100일을 넘었습니다 →</p>
+        </motion.div>
+      )}
+
       {/* ── 내 이야기 초안 보기 (별 카드 바로 아래, 항상 노출) ── */}
       <button
         onClick={() => {
@@ -421,10 +443,28 @@ export default function MyStar() {
           }));
           nav(`/my-star/${star.star_id}/book`);
         }}
-        className="w-full mb-6 bg-white/5 border border-star-gold/25 text-star-gold/75 font-semibold py-3.5 rounded-2xl hover:bg-star-gold/8 hover:border-star-gold/45 hover:text-star-gold transition-all text-sm"
+        className="w-full mb-4 bg-white/5 border border-star-gold/25 text-star-gold/75 font-semibold py-3.5 rounded-2xl hover:bg-star-gold/8 hover:border-star-gold/45 hover:text-star-gold transition-all text-sm"
       >
         📖 나의 이야기 초안 보기
       </button>
+
+      {/* ── 6개월 작품 게이트 (days >= 180) ── */}
+      {daysSinceBirth >= 180 && (
+        <button
+          onClick={() => {
+            console.info(JSON.stringify({
+              requestId: `masterpiece-${Date.now().toString(36)}`,
+              user_id:   getOrCreateUserId(),
+              star_id:   star.star_id,
+              action:    'book_masterpiece_impression',
+            }));
+            nav(`/my-star/${star.star_id}/masterpiece`);
+          }}
+          className="w-full mb-6 bg-gradient-to-r from-dream-purple/20 to-violet-500/20 border border-violet-400/30 text-violet-300/80 font-semibold py-3.5 rounded-2xl hover:border-violet-400/50 hover:text-violet-300 transition-all text-sm"
+        >
+          내 이야기를 작품으로 만들기 ✦
+        </button>
+      )}
 
       {/* ── 소원그림 카드 ──────────────────────────────────── */}
       {star.artifact_status && (
