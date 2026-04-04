@@ -17,40 +17,15 @@ import { useNavigate } from 'react-router-dom';
 
 // ── 샘플 데이터 (더미, PRIVATE 데이터 0건) ──────────────────
 const SAMPLE = {
-  wish:     '나는 내 삶을 스스로 결정하는 사람이 되고 싶다',
+  wish:   '나는 내 삶을 스스로 결정하는 사람이 되고 싶다',
   emotion: [
     '그날은 오래 참아온 것들이 한꺼번에 쏟아진 날이었어요.',
     '그래도 뭔가를 시작해보고 싶다는 마음이 처음으로 분명하게 느껴졌습니다.',
   ],
-  logs: [
-    {
-      day:     'Day 1',
-      label:   '시작한 날',
-      text:    '잘 할 수 있을지 모르겠어요. 그냥 시작했어요.',
-      tone:    '조심스러움',
-    },
-    {
-      day:     'Day 37',
-      label:   '가장 흔들렸던 순간',
-      text:    '오늘 처음으로 하기 싫어서 안 했는데, 그래도 내일 또 할 것 같아요.',
-      tone:    '솔직함',
-    },
-    {
-      day:     'Day 102',
-      label:   '가장 달라진 생각',
-      text:    '이게 내 것이 됐다는 걸 오늘 느꼈어요.',
-      tone:    '확신',
-    },
-  ],
-  moments: [
-    { label: '가장 흔들렸던 순간', text: '하기 싫어서 멈췄지만, 다음날 다시 시작했다' },
-    { label: '가장 용기 냈던 선택', text: '아무도 시키지 않았는데 혼자 결정했다' },
-    { label: '가장 달라진 생각',   text: '잘 해야 한다는 생각이 그냥 하면 된다로 바뀌었다' },
-  ],
-  pivot:   '당신은 도망치지 않는 사람이 되었습니다',
+  pivot: '당신은 도망치지 않는 사람이 되었습니다',
 };
 
-// ── 진입/클릭 로그 (최소 3개) ────────────────────────────────
+// ── 진입/클릭 로그 ────────────────────────────────────────────
 function log(action, extra = {}) {
   console.info(JSON.stringify({
     requestId: `mvp-${Date.now().toString(36)}`,
@@ -101,7 +76,6 @@ export default function StoryDraftMVP() {
 
   function handleKeep() {
     log('story_draft_keep');
-    // 반응 수집 — 기능 연결 없음
   }
 
   function handleContinue() {
@@ -165,75 +139,39 @@ export default function StoryDraftMVP() {
       <Divider />
 
       {/* ══════════════════════════════════════════════════════
-          [3] 변화 — Day 로그 + 3가지 요약 블록
+          [3] 변화 — 감정 피크 + 서사 산문
           ══════════════════════════════════════════════════════ */}
       <motion.section {...fade(0.7)} className="px-6 mb-10">
         <p className="text-white/20 text-xs uppercase tracking-widest text-center mb-6">
           2장 — 여정
         </p>
 
-        {/* 서사 브릿지 문장 */}
-        <div className="mb-8 px-1">
-          <p className="text-white/40 text-sm leading-relaxed mb-1">어떤 날은 조금 더 나아갔고,</p>
+        {/* 감정 피크 — 스크롤 멈춤 지점 */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.75, duration: 0.9 }}
+          className="py-16 text-center mb-8"
+        >
+          <p className="text-white/35 text-base leading-relaxed mb-4">
+            그리고 지금,
+          </p>
+          <p className="text-white/55 text-lg leading-relaxed mb-4">
+            당신은
+          </p>
+          <p className="text-white text-2xl font-bold leading-snug tracking-tight">
+            &ldquo;조금씩 앞으로 나아가는<br />사람이 되고 있습니다&rdquo;
+          </p>
+        </motion.div>
+
+        {/* 서사 산문 */}
+        <div className="space-y-3 px-1">
+          <p className="text-white/40 text-sm leading-relaxed">어떤 날은 조금 더 나아갔고,</p>
           <p className="text-white/40 text-sm leading-relaxed">어떤 날은 그대로인 것 같았습니다.</p>
-        </div>
-
-        {/* 이야기 문장 3개 — 시스템 표현 없이 */}
-        <div className="space-y-3 mb-8">
-          {SAMPLE.logs.map((l, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, x: -12 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.75 + i * 0.12, duration: 0.6 }}
-              className="bg-white/4 border border-white/8 rounded-2xl px-5 py-4"
-            >
-              <p className="text-white/65 text-sm leading-relaxed">
-                &ldquo;{l.text}&rdquo;
-              </p>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* 마무리 서사 */}
-        <div className="px-1 mb-2">
-          <p className="text-white/35 text-sm leading-relaxed mb-1">그럼에도 불구하고</p>
-          <p className="text-white/60 text-sm leading-relaxed font-medium">당신은 멈추지 않았습니다.</p>
-        </div>
-
-        {/* 요약 블록 3개 */}
-        <div className="space-y-3 mt-6">
-          {SAMPLE.moments.map((m, i) => (
-            <div key={i} className="flex gap-3 items-start">
-              <div className="w-1 h-1 rounded-full bg-white/30 mt-2 shrink-0" />
-              <div>
-                <p className="text-white/30 text-xs mb-0.5">{m.label}</p>
-                <p className="text-white/60 text-sm leading-relaxed">{m.text}</p>
-              </div>
-            </div>
-          ))}
+          <p className="text-white/55 text-sm leading-relaxed mt-2">그래도 당신은</p>
+          <p className="text-white/70 text-sm leading-relaxed font-medium">다시 돌아왔습니다.</p>
         </div>
       </motion.section>
-
-      {/* ══════════════════════════════════════════════════════
-          [감정 피크] 전환 문장 — 스크롤 멈춤 지점
-          ══════════════════════════════════════════════════════ */}
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.85, duration: 0.9 }}
-        className="px-6 py-20 text-center"
-      >
-        <p className="text-white/35 text-base leading-relaxed mb-6">
-          그리고 지금,
-        </p>
-        <p className="text-white/55 text-lg leading-relaxed mb-6">
-          당신은
-        </p>
-        <p className="text-white text-2xl font-bold leading-snug tracking-tight">
-          &ldquo;조금씩 앞으로 나아가는<br />사람이 되고 있습니다&rdquo;
-        </p>
-      </motion.div>
 
       <Divider />
 
@@ -242,7 +180,7 @@ export default function StoryDraftMVP() {
           ══════════════════════════════════════════════════════ */}
       <motion.section {...fade(0.9)} className="px-6 mb-10 text-center">
         <p className="text-white/20 text-xs uppercase tracking-widest mb-8">
-          3장 — 지금
+          3장 — 변화
         </p>
 
         <motion.div

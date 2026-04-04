@@ -101,15 +101,6 @@ export default function DigitalBook() {
   const startDate = fmt(star.created_at);
   const today     = fmt(new Date());
 
-  // ── Progress 계산 (표시용) ────────────────────────────────────
-  const totalLogs           = stats?.total_events ?? (careLogs.length + voyageLogs.length);
-  const storyCompletionRate = Math.min(1, (careLogs.length + voyageLogs.length + choices.length) / 15);
-  const progressPct         = Math.min(100, Math.round(
-    Math.min(1, days / 30) * 50 +
-    Math.min(1, totalLogs / 10) * 30 +
-    storyCompletionRate * 20
-  ));
-
   return (
     <div className="min-h-screen text-white pb-24 overflow-x-hidden">
 
@@ -287,21 +278,9 @@ export default function DigitalBook() {
 
         {/* 변화 요약 */}
         <div className="bg-white/5 border border-white/10 rounded-2xl px-5 py-5 mb-4">
-          <p className="text-white/70 text-sm leading-relaxed mb-3">
-            당신은 {days}일 동안 이렇게 살아왔습니다.
+          <p className="text-white/70 text-sm leading-relaxed">
+            당신은 이렇게 지나왔습니다.
           </p>
-          <div className="space-y-2">
-            {[
-              { label: '기록한 날',   value: `${stats?.total_events ?? 0}회` },
-              { label: '성장 단계',   value: star.star_stage ?? 'day1' },
-              { label: '함께한 은하', value: star.galaxy ?? '' },
-            ].map(item => (
-              <div key={item.label} className="flex justify-between items-center">
-                <span className="text-white/35 text-xs">{item.label}</span>
-                <span className="text-white/65 text-xs font-medium">{item.value}</span>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* 주요 선택 */}
@@ -323,41 +302,12 @@ export default function DigitalBook() {
           transition={{ delay: 1.3, duration: 0.7 }}
           className="bg-white/4 border border-white/10 rounded-2xl px-5 py-6 mb-6 text-center"
         >
-          <p className="text-white/70 text-sm leading-relaxed mb-3">
-            당신은 {days}일 동안 이렇게 살아왔습니다
-          </p>
           <p className="text-white/30 text-xs leading-relaxed">하지만</p>
           <p className="text-white/60 text-sm leading-relaxed mt-1">
             이 이야기는 아직 완성되지 않았습니다
           </p>
         </motion.div>
 
-        {/* Progress + 기록 이어가기 (항상 노출) */}
-        <div className="text-center">
-          <div className="mb-5">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-white/30 text-xs">이야기 완성도</span>
-              <span className="text-white/50 text-xs font-medium">{progressPct}%</span>
-            </div>
-            <div className="h-1.5 rounded-full bg-white/8 overflow-hidden">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${progressPct}%` }}
-                transition={{ delay: 1.4, duration: 0.9, ease: 'easeOut' }}
-                className="h-full rounded-full bg-gradient-to-r from-dream-purple to-violet-400"
-              />
-            </div>
-          </div>
-          <p className="text-white/45 text-sm leading-relaxed mb-5">
-            이 이야기는 계속 만들어지고 있습니다
-          </p>
-          <button
-            onClick={() => nav(`/my-star/${id}`)}
-            className="text-white/55 text-sm border border-white/20 rounded-xl px-8 py-3.5 hover:border-white/35 hover:text-white/75 transition-all"
-          >
-            기록 이어가기 →
-          </button>
-        </div>
       </motion.section>
 
     </div>
