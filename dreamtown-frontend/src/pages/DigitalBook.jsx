@@ -197,7 +197,7 @@ export default function DigitalBook() {
           <button onClick={() => nav(-1)} className="text-white/40 hover:text-white/70 mr-3 transition-colors">
             ←
           </button>
-          <span className="text-white/40 text-sm">내 여정 책</span>
+          <span className="text-white/40 text-sm">내 여정 초안</span>
         </div>
 
         {/* ════════════════════════════════════════════════════════
@@ -362,7 +362,7 @@ export default function DigitalBook() {
 
           {/* CTA ① — 중간 · 약한 강조 (조건부) */}
           {shouldShowBookCTA && (
-            <BookCTA onClick={handleCTAClick} label="내 책 만들기" subtle />
+            <BookCTA onClick={handleCTAClick} label="내 이야기 초안 보기" subtle />
           )}
         </motion.section>
 
