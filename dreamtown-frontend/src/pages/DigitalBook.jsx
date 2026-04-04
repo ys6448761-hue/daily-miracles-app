@@ -228,17 +228,6 @@ export default function DigitalBook() {
             </p>
           </motion.div>
 
-          {/* CTA ① — 낮은 강조도 */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.85, duration: 0.5 }}
-          >
-            <p className="text-white/30 text-xs text-center mb-3">
-              이 이야기를 작품으로 만들 수 있습니다
-            </p>
-            <BookCTA onClick={handleCTAClick} subtle />
-          </motion.div>
         </motion.section>
 
         {/* ════════════════════════════════════════════════════════
@@ -304,8 +293,8 @@ export default function DigitalBook() {
           )}
 
           {/* RULE 2: 의도적 빈 구간 (항상 포함) ── */}
-          <div className="bg-white/3 border border-dashed border-white/12 rounded-2xl p-5 mb-3">
-            <p className="text-white/20 text-xs text-center mb-4">중간 여정</p>
+          <div className="bg-white/3 border border-dashed border-white/15 rounded-2xl p-5 mb-3">
+            <p className="text-white/25 text-xs text-center mb-4">중간 여정</p>
             <div className="space-y-2">
               {[60, 80, 45, 70, 50].map((w, i) => (
                 <div key={i} className="flex gap-2 items-center">
@@ -314,7 +303,7 @@ export default function DigitalBook() {
                 </div>
               ))}
             </div>
-            <p className="text-white/20 text-xs text-center mt-4 leading-relaxed">
+            <p className="text-white/40 text-sm text-center mt-4 leading-relaxed font-medium">
               이 구간은 아직 완전히 정리되지 않았습니다
             </p>
           </div>
@@ -335,7 +324,7 @@ export default function DigitalBook() {
             </div>
           )}
 
-          {/* CTA ② — 중간 강조도 */}
+          {/* CTA ① — 중간 · 약한 강조 */}
           <BookCTA onClick={handleCTAClick} label="내 책 만들기" subtle />
         </motion.section>
 
@@ -400,8 +389,8 @@ export default function DigitalBook() {
             </p>
           </motion.div>
 
-          {/* CTA ③ — 가장 강한 강조 */}
-          <BookCTA onClick={handleCTAClick} label="내 책 만들기" />
+          {/* CTA ② — 마지막 · 가장 강한 강조 */}
+          <BookCTA onClick={handleCTAClick} label="이 이야기를 작품으로 만들기" />
         </motion.section>
 
       </div>
@@ -516,8 +505,16 @@ function BookUpgradeModal({ star, starId, userId, onClose }) {
               </button>
             </form>
 
-            <p className="text-white/20 text-xs text-center mt-4 leading-relaxed">
-              300~500만원 · 신청 후 담당자가 개별 연락드립니다
+            <div className="mt-5 text-center space-y-1">
+              <p className="text-white/55 text-sm leading-relaxed">
+                이건 기록이 아닙니다
+              </p>
+              <p className="text-white/55 text-sm leading-relaxed">
+                당신의 인생을 작품으로 만드는 과정입니다
+              </p>
+            </div>
+            <p className="text-white/25 text-xs text-center mt-3 leading-relaxed">
+              신청 후 담당 작가가 직접 연락드립니다 · 300~500만원
             </p>
           </>
         ) : (
