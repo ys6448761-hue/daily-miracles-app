@@ -112,6 +112,26 @@ export default function DigitalBook() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  // book_cta_impression — CTA 노출 조건 충족 시 1회 로그
+  useEffect(() => {
+    if (!timeline) return;
+    const { star: s, stats: st } = timeline;
+    const { careLogs: cl, voyageLogs: vl, choices: ch } = parseTimeline(timeline);
+    const d   = daysSince(s.created_at);
+    const tl  = st?.total_events ?? (cl.length + vl.length);
+    const scr = Math.min(1, (cl.length + vl.length + ch.length) / 15);
+    if (d >= 30 || tl >= 10 || scr >= 0.6) {
+      console.info(JSON.stringify({
+        requestId: `cta-imp-${Date.now().toString(36)}`,
+        user_id:   getOrCreateUserId(),
+        star_id:   id,
+        action:    'book_cta_impression',
+        days:      d,
+        total_logs: tl,
+      }));
+    }
+  }, [timeline, id]);
+
   // ── CTA 클릭 핸들러 (Task 5: 로그 + Task 2: API) ──────────
   function handleCTAClick() {
     const userId = getOrCreateUserId();
@@ -146,11 +166,27 @@ export default function DigitalBook() {
   }
 
   const { star, stats } = timeline;
-  const { wishImage, firstLog, growthLogs, choices, report } = parseTimeline(timeline);
+  const { wishImage, firstLog, growthLogs, choices, report, careLogs, voyageLogs } = parseTimeline(timeline);
   const days      = daysSince(star.created_at);
   const startDate = fmt(star.created_at);
   const today     = fmt(new Date());
   const userId    = getOrCreateUserId();
+
+  // ── 책 CTA 노출 조건 ──────────────────────────────────────────
+  // days >= 30 OR total_logs >= 10 OR story_completion_rate >= 0.6
+  const totalLogs          = stats?.total_events ?? (careLogs.length + voyageLogs.length);
+  const storyCompletionRate = Math.min(1, (careLogs.length + voyageLogs.length + choices.length) / 15);
+  const shouldShowBookCTA  =
+    days >= 30 ||
+    totalLogs >= 10 ||
+    storyCompletionRate >= 0.6;
+
+  // Progress % — days(50%) + logs(30%) + story(20%)
+  const progressPct = Math.min(100, Math.round(
+    Math.min(1, days / 30) * 50 +
+    Math.min(1, totalLogs / 10) * 30 +
+    storyCompletionRate * 20
+  ));
 
   return (
     <>
@@ -324,8 +360,10 @@ export default function DigitalBook() {
             </div>
           )}
 
-          {/* CTA ① — 중간 · 약한 강조 */}
-          <BookCTA onClick={handleCTAClick} label="내 책 만들기" subtle />
+          {/* CTA ① — 중간 · 약한 강조 (조건부) */}
+          {shouldShowBookCTA && (
+            <BookCTA onClick={handleCTAClick} label="내 책 만들기" subtle />
+          )}
         </motion.section>
 
         {/* ════════════════════════════════════════════════════════
@@ -389,8 +427,43 @@ export default function DigitalBook() {
             </p>
           </motion.div>
 
-          {/* CTA ② — 마지막 · 가장 강한 강조 */}
-          <BookCTA onClick={handleCTAClick} label="이 이야기를 작품으로 만들기" />
+          {/* CTA ② — 마지막 · 조건부 분기 */}
+          {shouldShowBookCTA ? (
+            <>
+              {/* Progress bar */}
+              <div className="mb-5">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-white/30 text-xs">이야기 완성도</span>
+                  <span className="text-white/50 text-xs font-medium">{progressPct}%</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-white/8 overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progressPct}%` }}
+                    transition={{ delay: 1.4, duration: 0.9, ease: 'easeOut' }}
+                    className="h-full rounded-full bg-gradient-to-r from-dream-purple to-violet-400"
+                  />
+                </div>
+              </div>
+              <BookCTA onClick={handleCTAClick} label="이 이야기를 작품으로 만들기" />
+            </>
+          ) : (
+            /* 조건 미충족 — 대체 UI */
+            <div className="text-center pt-2">
+              <p className="text-white/45 text-sm leading-relaxed mb-1">
+                이 이야기는 계속 만들어지고 있습니다
+              </p>
+              <p className="text-white/25 text-xs mb-5">
+                당신의 이야기가 {progressPct}% 완성되었습니다
+              </p>
+              <button
+                onClick={() => nav(`/my-star/${id}`)}
+                className="text-white/50 text-sm border border-white/15 rounded-xl px-6 py-3 hover:border-white/30 hover:text-white/70 transition-all"
+              >
+                기록 이어가기 →
+              </button>
+            </div>
+          )}
         </motion.section>
 
       </div>
