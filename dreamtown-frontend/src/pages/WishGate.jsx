@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { postWish, postStarCreate, getOrCreateUserId } from '../api/dreamtown.js';
 import { readSavedStar, saveStarId } from '../lib/utils/starSession.js';
+import { logEvent } from '../lib/events.js';
 
 const GEMS = [
   { type: 'ruby',     label: '루비',      emoji: '🔴', galaxy: '도전 은하',    detail: '용기를 내어 앞으로 나아가려는 마음이에요' },
@@ -37,7 +38,11 @@ export default function WishGate() {
     const existingStar = readSavedStar();
     if (existingStar && !fromMystar && !isNew) {
       nav('/my-star/' + existingStar, { replace: true });
+      return;
     }
+    // wish_start 이벤트
+    const entryPoint = fromMystar ? 'mystar' : isNew ? 'new' : (searchParams.get('entry') === 'invite' ? 'share' : 'home');
+    logEvent('wish_start', { user_id: getOrCreateUserId(), entry_point: entryPoint });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [gemType, setGemType] = useState('sapphire');
   const [phoneNumber, setPhoneNumber] = useState('');

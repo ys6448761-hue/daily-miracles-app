@@ -13,6 +13,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { logEvent } from '../lib/events.js';
 
 // ── 상수 ────────────────────────────────────────────────────────
 const LS_KEY = 'dreamtown_scene_state';
@@ -89,13 +90,12 @@ export default function JourneySceneEngine() {
 
   function handleYes() {
     setPhase('scene');
-    console.log(
-      JSON.stringify({
-        tag: '[DreamTown Scene]',
-        scene: currentScene,
-        time: new Date().toISOString(),
-      }),
-    );
+    // scene_view 이벤트
+    logEvent('scene_view', {
+      scene_id:       currentScene,
+      scene_type:     '여행',
+      emotion_context: null,
+    });
 
     const { duration } = SCENES[currentScene];
     timerRef.current = setTimeout(() => {

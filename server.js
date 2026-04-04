@@ -2334,6 +2334,15 @@ try {
   console.warn('⚠️ DreamTown Core Engine 라우터 등록 실패:', err.message);
 }
 
+// ---------- DreamTown Event Routes (SSOT: DreamTown_Event_SSOT v1) ----------
+try {
+  const dtEventRoutes = require('./routes/dtEventRoutes');
+  app.use('/api/dt/events', dtEventRoutes);
+  console.log('✅ DreamTown Event 라우터 등록 완료 (/api/dt/events)');
+} catch (err) {
+  console.warn('⚠️ DreamTown Event 라우터 등록 실패:', err.message);
+}
+
 // ---------- DreamTown Artifact Worker (DB 기반 큐) ----------
 try {
   const dtArtifactWorker = require('./services/dtArtifactWorker');

@@ -8,6 +8,7 @@ import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
 import { sharePostcard } from '../utils/kakaoShare';
 import { gaGrowthLogged, gaMilestoneDay7, gaResonanceReceived } from '../utils/gtag';
+import { logEvent } from '../lib/events.js';
 import StarDetail from './StarDetail';
 
 // 은하 → 항해 방향 (StarBirth와 동일 매핑)
@@ -314,6 +315,7 @@ export default function MyStar() {
   async function handleGift() {
     if (!giftCopyType || giftPosting) return;
     setGiftPosting(true);
+    logEvent('conversion_action', { action_type: 'share', value: null });
     try {
       const { gift_card } = await createGift(star.star_id, {
         userId: getOrCreateUserId(),
@@ -755,11 +757,14 @@ export default function MyStar() {
           </div>
         )}
         <button
-          onClick={() => sharePostcard({
-            starName:   star.star_name,
-            galaxyName: star.galaxy?.name_ko ?? '미지의 은하',
-            dayCount:   daysSinceBirth,
-          })}
+          onClick={() => {
+            logEvent('conversion_action', { action_type: 'share', value: null });
+            sharePostcard({
+              starName:   star.star_name,
+              galaxyName: star.galaxy?.name_ko ?? '미지의 은하',
+              dayCount:   daysSinceBirth,
+            });
+          }}
           className="w-full bg-white/5 border border-white/10 text-white/70 font-semibold py-4 rounded-2xl hover:bg-white/10 transition-colors"
         >
           카톡으로 보내기
