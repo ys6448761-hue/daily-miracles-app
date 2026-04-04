@@ -24,7 +24,7 @@ SSOT에 없는 새로운 결정이 생기면 해당 SSOT 파일을 먼저 업데
 
 ```
 docs/ssot/
- ├── core/      ← DreamTown 절대 기준 (헌법) — 13개
+ ├── core/      ← DreamTown 절대 기준 (헌법) — 14개
  ├── support/   ← 구현·설계·UX 가이드 — 25개
  ├── archive/   ← 중복·구버전 보관 — 47개
  │

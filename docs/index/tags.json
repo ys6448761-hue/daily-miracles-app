@@ -8,6 +8,7 @@
     "DOC-weekly_promotion_guide",
     "DOC-상품유형별_가격표_v12",
     "DOC-전체상품_가격표_종합_v12",
+    "DOC-DreamTown_Event_SSOT",
     "DOC-tag_taxonomy",
     "DOC-소원놀이터_종합문서_v10",
     "DOC-AURORA-STATUS",
@@ -45,6 +46,8 @@
     "DOC-JUDGE_PROMPTS",
     "DOC-README",
     "DOC-LAUNCH-DECLARATION",
+    "DOC-설계구조-루미기획-충돌분석",
+    "DOC-소원이야기-책-구조-설명",
     "DOC-ad-creative-growth-high-v1",
     "DOC-ad-creative-growth-mid-v1",
     "DOC-ad-creative-healing-high-v1",
@@ -176,6 +179,7 @@
     "DOC-DreamTown_MVP_Scope_Design",
     "DOC-AIL-정산-v2-final",
     "DOC-AURORA5_CHARACTER_PROMPTS_V3",
+    "DOC-DreamTown_Event_SSOT",
     "DOC-AURORA-STATUS",
     "DOC-INDEX",
     "DOC-SSOT_Registry_v2",
@@ -201,6 +205,8 @@
     "DOC-GROWTH-ROADMAP",
     "DOC-JUDGE_PROMPTS",
     "DOC-LAUNCH-DECLARATION",
+    "DOC-설계구조-루미기획-충돌분석",
+    "DOC-소원이야기-책-구조-설명",
     "DOC-gpt-comprehensive-reference",
     "DOC-gpt-copywriting",
     "DOC-gpt-guidelines",
@@ -389,6 +395,7 @@
   ],
   "결제": [
     "DOC-AIL-정산-v2-final",
+    "DOC-DreamTown_Event_SSOT",
     "DOC-AURORA-STATUS",
     "DOC-aurora5-master-knowledge-v2",
     "DOC-PROMOTION-RULES",
@@ -397,6 +404,7 @@
     "DOC-README",
     "DOC-DT_Express_Architecture",
     "DOC-DT_Folder_Responsibility_Index",
+    "DOC-설계구조-루미기획-충돌분석",
     "DOC-ad-set-mapping-and-ab-test-v1",
     "DOC-JAEMI_ONBOARDING_v12",
     "DOC-04_Onboarding_7Day",
@@ -457,6 +465,22 @@
   ],
   "sop": [
     "DOC-SOP_공모_문서_자동화_표준지침_v1"
+  ],
+  "core": [
+    "DOC-DreamTown_Event_SSOT",
+    "DOC-DreamTown_Aurora5_System_SSOT",
+    "DOC-DreamTown_Character_SSOT",
+    "DOC-DreamTown_Core_Philosophy_SSOT",
+    "DOC-DreamTown_Naming_System_SSOT",
+    "DOC-DreamTown_Origin_Myth_SSOT",
+    "DOC-DreamTown_Product_Core_Loop_SS",
+    "DOC-DreamTown_Safety_Ethics_SSOT",
+    "DOC-DreamTown_Universe_Bible",
+    "DOC-DreamTown_Universe_Structure_v",
+    "DOC-DreamTown_Visual_Style_SSOT",
+    "DOC-DreamTown_World_Architecture_S",
+    "DOC-DreamTown_Miracle_System_SSOT",
+    "DOC-DreamTown_Wish_System_SSOT"
   ],
   "standards": [
     "DOC-tag_taxonomy",
@@ -661,6 +685,10 @@
   "learnings": [
     "DOC-최수민방식_완전정리"
   ],
+  "lumi": [
+    "DOC-설계구조-루미기획-충돌분석",
+    "DOC-소원이야기-책-구조-설명"
+  ],
   "marketing": [
     "DOC-ad-creative-growth-high-v1",
     "DOC-ad-creative-growth-mid-v1",
@@ -709,21 +737,6 @@
   ],
   "v1.1": [
     "DOC-VIDEO_MASTER"
-  ],
-  "core": [
-    "DOC-DreamTown_Aurora5_System_SSOT",
-    "DOC-DreamTown_Character_SSOT",
-    "DOC-DreamTown_Core_Philosophy_SSOT",
-    "DOC-DreamTown_Naming_System_SSOT",
-    "DOC-DreamTown_Origin_Myth_SSOT",
-    "DOC-DreamTown_Product_Core_Loop_SS",
-    "DOC-DreamTown_Safety_Ethics_SSOT",
-    "DOC-DreamTown_Universe_Bible",
-    "DOC-DreamTown_Universe_Structure_v",
-    "DOC-DreamTown_Visual_Style_SSOT",
-    "DOC-DreamTown_World_Architecture_S",
-    "DOC-DreamTown_Miracle_System_SSOT",
-    "DOC-DreamTown_Wish_System_SSOT"
   ],
   "team": [
     "DOC-Aurora5_토론시스템_안내문"
