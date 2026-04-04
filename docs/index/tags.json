@@ -106,6 +106,7 @@
     "DOC-video-promo-30sec-template",
     "DOC-WIX_TEAM_PAGE_CONTENT",
     "DOC-프로젝트지식_수동정리_가이드",
+    "DOC-AIL-STORY-2026-0404-001_story-",
     "DOC-DEPLOY-PACKET-2026-03-02",
     "DEC-2026-0319-004",
     "DOC-20260131_파크_2d_기술지원",
@@ -366,6 +367,7 @@
     "DOC-DreamTown_Product_Structure_SS",
     "DOC-DreamTown_Travel_System_SSOT",
     "DOC-alimtalk-templates-design",
+    "DOC-AIL-STORY-2026-0404-001_story-",
     "DOC-20260101-4PA",
     "DOC-20260101-TRD",
     "DOC-20260101-WG8",
@@ -403,6 +405,7 @@
     "DOC-GA4_SETUP_GUIDE",
     "DOC-DreamTown_DB_Schema_Design",
     "DOC-DreamTown_Tech_Architecture_SS",
+    "DOC-AIL-STORY-2026-0404-001_story-",
     "DOC-20260101-MKI",
     "DOC-20260101-4PA",
     "DOC-20260101-TRD",
@@ -730,6 +733,9 @@
   ],
   "_raw": [
     "DOC-README"
+  ],
+  "experiments": [
+    "DOC-AIL-STORY-2026-0404-001_story-"
   ],
   "deploy": [
     "DOC-DEPLOY-PACKET-2026-03-02"
