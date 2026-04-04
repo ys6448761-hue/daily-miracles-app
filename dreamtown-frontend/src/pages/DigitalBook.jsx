@@ -260,7 +260,7 @@ export default function DigitalBook() {
           >
             <p className="text-white/80 text-sm leading-relaxed">
               당신의 <span className="text-star-gold font-semibold">{days}일</span>이<br />
-              한 권의 이야기로 정리되었습니다
+              이야기로 만들어지고 있습니다
             </p>
           </motion.div>
 

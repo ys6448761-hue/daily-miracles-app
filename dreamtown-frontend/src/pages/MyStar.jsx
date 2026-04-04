@@ -423,7 +423,7 @@ export default function MyStar() {
         }}
         className="w-full mb-6 bg-white/5 border border-star-gold/25 text-star-gold/75 font-semibold py-3.5 rounded-2xl hover:bg-star-gold/8 hover:border-star-gold/45 hover:text-star-gold transition-all text-sm"
       >
-        내 이야기 초안 보기
+        📖 나의 이야기 초안 보기
       </button>
 
       {/* ── 소원그림 카드 ──────────────────────────────────── */}
