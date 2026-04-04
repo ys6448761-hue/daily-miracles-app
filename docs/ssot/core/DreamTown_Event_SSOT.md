@@ -182,18 +182,84 @@ DreamTown 사용자 행동을 추적하는 표준 이벤트 정의서입니다.
 
 ---
 
+### 6. `scene_action_click`
+
+> 장면 카드의 선택 버튼을 클릭한 순간 (감정 peak 후 행동 전환점)
+
+| 항목 | 내용 |
+|------|------|
+| 발생 시점 | 장면 카드 선택 버튼 탭 |
+| 수집 목적 | 장면 → 상품 전환율 측정 |
+
+**params**
+
+| 키 | 타입 | 값 | 필수 |
+|----|------|----|------|
+| `scene_id` | string | 장면 식별자 | ✅ |
+| `scene_type` | enum | `여행` / `일상` / `쿠폰연결` | ✅ |
+| `experiment_id` | string | A/B 실험 ID (없으면 생략) | 선택 |
+| `variant` | string | `A` / `B` | 선택 |
+
+**예시**
+```json
+{
+  "event": "scene_action_click",
+  "scene_id": "cablecar",
+  "scene_type": "여행",
+  "experiment_id": "coupon_test_1",
+  "variant": "B"
+}
+```
+
+---
+
+### 7. `travel_offer_view`
+
+> 감정 peak 이후 여행 상품 카드가 노출된 순간
+
+| 항목 | 내용 |
+|------|------|
+| 발생 시점 | 쿠폰/상품 카드 표시 직후 |
+| 수집 목적 | 상품 노출 → 전환율 분모 확보 |
+
+> **원칙**: 처음부터 상품 노출 금지. 반드시 감정 peak 이후에만 등장.
+
+**params**
+
+| 키 | 타입 | 값 | 필수 |
+|----|------|----|------|
+| `offer_id` | string | 상품/쿠폰 식별자 | ✅ |
+| `scene_id` | string | 연결된 장면 | ✅ |
+| `experiment_id` | string | A/B 실험 ID (없으면 생략) | 선택 |
+| `variant` | string | `A` / `B` | 선택 |
+
+**예시**
+```json
+{
+  "event": "travel_offer_view",
+  "offer_id": "cpn_cablecar_001",
+  "scene_id": "cablecar",
+  "experiment_id": "coupon_test_1",
+  "variant": "A"
+}
+```
+
+---
+
 ## 이벤트 흐름 (정상 경로)
 
 ```
 wish_start
   → scene_view
     → emotion_select
-      → coupon_open
-        → conversion_action
+      → scene_action_click   ← 선택 클릭 (감정 peak 후)
+        → travel_offer_view  ← 상품 노출
+          → conversion_action
 ```
 
-> 각 단계는 독립적으로 발생 가능. 순서 강제 없음.  
-> 단, `coupon_open`의 `trigger_emotion`은 직전 `emotion_select` 값을 참조.
+> 각 단계는 독립적으로 발생 가능.  
+> `travel_offer_view`는 반드시 `scene_action_click` 이후에만 발생해야 함 (SSOT 원칙).  
+> `coupon_open`은 레거시 — 신규 구현은 `scene_action_click` + `travel_offer_view` 사용.
 
 ---
 

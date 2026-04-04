@@ -22,6 +22,8 @@ const ALLOWED_EVENTS = new Set([
   'wish_start',
   'scene_view',
   'emotion_select',
+  'scene_action_click',   // 장면 선택 버튼 클릭 (Travel UX SSOT v1)
+  'travel_offer_view',    // 감정 peak 이후 상품 노출 (Travel UX SSOT v1)
   'coupon_open',
   'conversion_action',
 ]);

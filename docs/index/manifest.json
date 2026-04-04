@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-04-04T07:51:25.484Z",
+  "generated_at": "2026-04-04T08:12:10.739Z",
   "generator": "generate-manifest.js",
   "total_count": 249,
   "documents": [
@@ -212,7 +212,7 @@
       "status": "active",
       "title": "DreamTown Event SSOT v1",
       "created_at": "변경",
-      "checksum": "a53e99ec"
+      "checksum": "ac9d176d"
     },
     {
       "id": "DOC-tag_taxonomy",

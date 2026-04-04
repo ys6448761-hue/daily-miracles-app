@@ -39,9 +39,10 @@ const SCENES = {
     },
     choice:   '조금 더 이 순간에 있어볼래요',
     coupon: {
-      title:    '여수 해상케이블카 이용권',
-      desc:     '돌산~자산 구간 왕복 · 여수 전경이 한눈에',
-      ctaLabel: '지금 확인하기',
+      // Travel UX SSOT 3단 구조
+      emotion: '조금 가벼워진 이 마음,\n그대로 바람 속에 두고 와도 괜찮아요',
+      experience: '케이블카에서 천천히 내려다보는 시간',
+      ctaLabel: '이 순간 이어가기',
     },
     duration: null, // 버튼 선택형 — 자동 소멸 없음
   },
@@ -142,12 +143,22 @@ export default function JourneySceneEngine() {
 
   function handleChoice() {
     const variant = variantRef.current;
-    logEvent('coupon_open', {
-      coupon_id:       'cpn_cablecar_001',
-      trigger_emotion: null,
-      scene_id:        currentScene,
-      ...(variant ? { experiment_id: EXPERIMENT_ID, variant } : {}),
+    const expParams = variant ? { experiment_id: EXPERIMENT_ID, variant } : {};
+
+    // 선택 클릭 — scene_action_click
+    logEvent('scene_action_click', {
+      scene_id:  currentScene,
+      scene_type: '여행',
+      ...expParams,
     });
+
+    // 상품 노출 — travel_offer_view (감정 peak 이후 등장)
+    logEvent('travel_offer_view', {
+      offer_id:  'cpn_cablecar_001',
+      scene_id:  currentScene,
+      ...expParams,
+    });
+
     setPhase('coupon');
   }
 
@@ -236,10 +247,14 @@ export default function JourneySceneEngine() {
           transition={{ duration: 0.35 }}
           style={overlayStyle}
         >
-          <p style={labelStyle}>이 순간과 함께</p>
-          <p style={couponTitleStyle}>{scene.coupon.title}</p>
-          <p style={couponDescStyle}>{scene.coupon.desc}</p>
-          <div style={{ ...btnColStyle, marginTop: 20 }}>
+          {/* 1단: 감정 연결 문장 */}
+          <p style={offerEmotionStyle}>{nl2br(scene.coupon.emotion)}</p>
+
+          {/* 2단: 경험 설명 */}
+          <p style={offerExperienceStyle}>{scene.coupon.experience}</p>
+
+          {/* 3단: 행동 버튼 1개 */}
+          <div style={{ ...btnColStyle, marginTop: 22 }}>
             <button style={btnPrimaryStyle} onClick={handleCouponCta}>
               {scene.coupon.ctaLabel}
             </button>
@@ -307,18 +322,21 @@ const resonanceStyle = {
   marginBottom: '22px',
 };
 
-const couponTitleStyle = {
-  color:        '#FFD76A',
-  fontSize:     '17px',
-  fontWeight:   700,
-  marginBottom: '8px',
+// Travel UX SSOT — 3단 상품 카드
+const offerEmotionStyle = {
+  color:        'rgba(255,255,255,0.80)',
+  fontSize:     '15px',
+  fontWeight:   500,
+  lineHeight:   1.85,
+  whiteSpace:   'pre-line',
+  marginBottom: '14px',
 };
 
-const couponDescStyle = {
-  color:        'rgba(255,255,255,0.45)',
+const offerExperienceStyle = {
+  color:        'rgba(255,255,255,0.38)',
   fontSize:     '13px',
   lineHeight:   1.6,
-  marginBottom: '4px',
+  marginBottom: '2px',
 };
 
 const btnColStyle = {
