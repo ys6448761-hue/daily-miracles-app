@@ -4,6 +4,7 @@
  * 등록: /api/dt/events
  *
  * POST /          — 이벤트 1건 기록
+ * GET  /kpi       — KPI 3종 (진입경로 / 장면노출 / 전환깔때기)
  * GET  /ping      — 헬스체크
  *
  * SSOT: docs/ssot/core/DreamTown_Event_SSOT.md
@@ -27,6 +28,63 @@ const ALLOWED_EVENTS = new Set([
 
 // ── 헬스체크 ─────────────────────────────────────────────────
 router.get('/ping', (_req, res) => res.json({ ok: true }));
+
+// ── GET /kpi — KPI 3종 ───────────────────────────────────────
+router.get('/kpi', async (_req, res) => {
+  try {
+    // KPI 1: 진입 경로별 wish_start (오늘)
+    const kpi1 = await db.query(`
+      SELECT
+        COALESCE(params->>'entry_point', 'unknown') AS entry_point,
+        COUNT(*)::int                               AS count
+      FROM dt_events
+      WHERE event_name = 'wish_start'
+        AND created_at >= CURRENT_DATE
+      GROUP BY entry_point
+      ORDER BY count DESC
+    `);
+
+    // KPI 2: 장면별 노출 수 (최근 7일)
+    const kpi2 = await db.query(`
+      SELECT
+        COALESCE(params->>'scene_id',   'unknown') AS scene_id,
+        COALESCE(params->>'scene_type', 'unknown') AS scene_type,
+        COUNT(*)::int                               AS views
+      FROM dt_events
+      WHERE event_name = 'scene_view'
+        AND created_at >= CURRENT_DATE - INTERVAL '7 days'
+      GROUP BY scene_id, scene_type
+      ORDER BY views DESC
+    `);
+
+    // KPI 3: 전환 깔때기 — 이벤트별 발생 수 + 전체 대비 비율 (오늘)
+    const kpi3 = await db.query(`
+      WITH totals AS (
+        SELECT event_name, COUNT(*)::int AS cnt
+        FROM dt_events
+        WHERE created_at >= CURRENT_DATE
+        GROUP BY event_name
+      ),
+      grand AS (SELECT SUM(cnt) AS total FROM totals)
+      SELECT
+        t.event_name,
+        t.cnt                                                         AS count,
+        ROUND(t.cnt * 100.0 / NULLIF(g.total, 0), 1)::float          AS pct
+      FROM totals t, grand g
+      ORDER BY t.cnt DESC
+    `);
+
+    return res.json({
+      generated_at: new Date().toISOString(),
+      kpi1_entry:   kpi1.rows,
+      kpi2_scene:   kpi2.rows,
+      kpi3_funnel:  kpi3.rows,
+    });
+  } catch (err) {
+    log.error('kpi 조회 실패', { err: err.message });
+    return res.status(500).json({ error: 'KPI 조회에 실패했습니다' });
+  }
+});
 
 // ── POST / — 이벤트 기록 ─────────────────────────────────────
 router.post('/', async (req, res) => {

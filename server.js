@@ -2343,6 +2343,11 @@ try {
   console.warn('⚠️ DreamTown Event 라우터 등록 실패:', err.message);
 }
 
+// DreamTown KPI 대시보드
+app.get('/dt-events-dashboard', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dt-events-dashboard.html'));
+});
+
 // ---------- DreamTown Artifact Worker (DB 기반 큐) ----------
 try {
   const dtArtifactWorker = require('./services/dtArtifactWorker');

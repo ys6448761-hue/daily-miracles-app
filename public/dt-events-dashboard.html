@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DreamTown KPI Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0d1b2a;
+      color: #e0e0e0;
+      font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+      min-height: 100vh;
+      padding: 32px 24px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+    .header p {
+      font-size: 12px;
+      color: rgba(255,255,255,0.35);
+    }
+    .refresh-btn {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 20px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: transparent;
+      color: rgba(255,255,255,0.55);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .refresh-btn:hover { border-color: rgba(255,255,255,0.35); color: #fff; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .card-title {
+      font-size: 11px;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+    }
+    .card-subtitle {
+      font-size: 13px;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th {
+      text-align: left;
+      padding: 6px 8px;
+      color: rgba(255,255,255,0.30);
+      font-size: 11px;
+      font-weight: 500;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    td {
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: middle;
+    }
+    td:last-child { text-align: right; }
+    tr:last-child td { border-bottom: none; }
+
+    .bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .bar-bg {
+      flex: 1;
+      height: 6px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: #9B87F5;
+      transition: width 0.5s ease;
+    }
+    .bar-val {
+      font-size: 12px;
+      color: rgba(255,255,255,0.55);
+      min-width: 36px;
+      text-align: right;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-purple { background: rgba(155,135,245,0.18); color: #9B87F5; }
+    .badge-gold   { background: rgba(255,215,106,0.15); color: #FFD76A; }
+    .badge-green  { background: rgba(80,200,120,0.15);  color: #50c878; }
+
+    .empty {
+      text-align: center;
+      padding: 24px 0;
+      color: rgba(255,255,255,0.20);
+      font-size: 13px;
+    }
+
+    .generated-at {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.15);
+    }
+
+    .funnel-step {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .funnel-step:last-child { border-bottom: none; }
+    .funnel-label { font-size: 13px; color: rgba(255,255,255,0.65); }
+    .funnel-count { font-size: 18px; font-weight: 700; color: #fff; }
+    .funnel-pct   { font-size: 11px; color: rgba(255,255,255,0.30); }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>✦ DreamTown KPI</h1>
+  <p id="gen-at">—</p>
+  <button class="refresh-btn" onclick="load()">↻ 새로고침</button>
+</div>
+
+<div class="grid">
+
+  <!-- KPI 1: 진입 경로 -->
+  <div class="card">
+    <div class="card-title">KPI 1 · 오늘</div>
+    <div class="card-subtitle">진입 경로별 wish_start</div>
+    <table>
+      <thead>
+        <tr><th>경로</th><th>수</th><th></th></tr>
+      </thead>
+      <tbody id="tbl-entry"></tbody>
+    </table>
+  </div>
+
+  <!-- KPI 2: 장면 노출 -->
+  <div class="card">
+    <div class="card-title">KPI 2 · 최근 7일</div>
+    <div class="card-subtitle">장면별 scene_view 노출</div>
+    <table>
+      <thead>
+        <tr><th>장면</th><th>유형</th><th>노출</th></tr>
+      </thead>
+      <tbody id="tbl-scene"></tbody>
+    </table>
+  </div>
+
+  <!-- KPI 3: 전환 깔때기 -->
+  <div class="card">
+    <div class="card-title">KPI 3 · 오늘</div>
+    <div class="card-subtitle">이벤트별 발생 수 (깔때기)</div>
+    <div id="tbl-funnel"></div>
+  </div>
+
+</div>
+
+<div class="generated-at" id="footer-gen"></div>
+
+<script>
+  const EVENT_ORDER = ['wish_start','scene_view','emotion_select','coupon_open','conversion_action'];
+  const EVENT_LABEL = {
+    wish_start:        '소원 시작',
+    scene_view:        '장면 노출',
+    emotion_select:    '감정 선택',
+    coupon_open:       '쿠폰 진입',
+    conversion_action: '전환 행동',
+  };
+
+  function maxVal(rows, key) {
+    return Math.max(...rows.map(r => Number(r[key]) || 0), 1);
+  }
+
+  function renderEntry(rows) {
+    const tbody = document.getElementById('tbl-entry');
+    if (!rows.length) { tbody.innerHTML = '<tr><td colspan="3" class="empty">데이터 없음</td></tr>'; return; }
+    const mx = maxVal(rows, 'count');
+    tbody.innerHTML = rows.map(r => `
+      <tr>
+        <td><span class="badge badge-purple">${r.entry_point}</span></td>
+        <td style="width:40px;text-align:right">${r.count}</td>
+        <td style="width:80px">
+          <div class="bar-bg"><div class="bar-fill" style="width:${Math.round(r.count/mx*100)}%"></div></div>
+        </td>
+      </tr>`).join('');
+  }
+
+  function renderScene(rows) {
+    const tbody = document.getElementById('tbl-scene');
+    if (!rows.length) { tbody.innerHTML = '<tr><td colspan="3" class="empty">데이터 없음</td></tr>'; return; }
+    tbody.innerHTML = rows.map(r => `
+      <tr>
+        <td>${r.scene_id}</td>
+        <td><span class="badge badge-gold">${r.scene_type}</span></td>
+        <td>${r.views}</td>
+      </tr>`).join('');
+  }
+
+  function renderFunnel(rows) {
+    const wrap = document.getElementById('tbl-funnel');
+    if (!rows.length) { wrap.innerHTML = '<div class="empty">데이터 없음</div>'; return; }
+
+    const map = Object.fromEntries(rows.map(r => [r.event_name, r]));
+    wrap.innerHTML = EVENT_ORDER.map(ev => {
+      const r = map[ev];
+      return `
+        <div class="funnel-step">
+          <div>
+            <div class="funnel-label">${EVENT_LABEL[ev] ?? ev}</div>
+            <div class="funnel-pct">${r ? r.pct + '%' : '—'}</div>
+          </div>
+          <div class="funnel-count">${r ? r.count : '0'}</div>
+        </div>`;
+    }).join('');
+  }
+
+  async function load() {
+    try {
+      const res  = await fetch('/api/dt/events/kpi');
+      const data = await res.json();
+      if (data.error) { alert(data.error); return; }
+
+      renderEntry(data.kpi1_entry   ?? []);
+      renderScene(data.kpi2_scene   ?? []);
+      renderFunnel(data.kpi3_funnel ?? []);
+
+      const d = new Date(data.generated_at).toLocaleString('ko-KR');
+      document.getElementById('gen-at').textContent     = `기준: ${d}`;
+      document.getElementById('footer-gen').textContent = `자동 생성 · ${d}`;
+    } catch (e) {
+      alert('KPI 로드 실패: ' + e.message);
+    }
+  }
+
+  load();
+</script>
+</body>
+</html>
