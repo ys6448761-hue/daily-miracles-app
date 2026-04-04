@@ -21,6 +21,7 @@ import MyStarReturn from './pages/MyStarReturn.jsx';
 import DigitalBook from './pages/DigitalBook.jsx';
 import HundredDays from './pages/HundredDays.jsx';
 import StoryDraftMVP from './pages/StoryDraftMVP.jsx';
+import JourneySceneEngine from './components/JourneySceneEngine.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
 if (window.location.pathname.startsWith('//')) {
@@ -36,6 +37,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-night-sky max-w-md mx-auto relative">
+        <JourneySceneEngine />
         <Routes>
           <Route path="/"            element={<AppLaunch />} />
           <Route path="/intro"       element={<Intro />} />
