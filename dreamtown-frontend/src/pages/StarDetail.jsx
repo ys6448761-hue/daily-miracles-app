@@ -387,12 +387,12 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
                 {detail.growth_log_text ?? hint.publicLine}
               </p>
 
-              {/* 공명 수 — 1개 이상일 때만 표시 */}
-              {(miracleCount + wisdomCount) > 0 && (
-                <p style={{ fontSize: 12, color: 'rgba(255,215,106,0.65)', marginTop: 4 }}>
-                  ✨ {miracleCount + wisdomCount}개 마음이 닿았어요
-                </p>
-              )}
+              {/* 공명 수 — 항상 표시 (0개도 노출) */}
+              <p style={{ fontSize: 12, color: 'rgba(255,215,106,0.65)', marginTop: 4 }}>
+                {(miracleCount + wisdomCount) > 0
+                  ? `✨ ${miracleCount + wisdomCount}개 마음이 닿았어요`
+                  : '✨ 아직 마음이 닿지 않은 별이에요'}
+              </p>
             </div>
           )}
 
