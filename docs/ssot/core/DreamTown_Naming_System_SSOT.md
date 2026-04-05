@@ -1,11 +1,11 @@
 # DreamTown Naming System SSOT
 
-Version: v1.0
+Version: v1.1
 Owner: Aurora5
 Status: Active
 Purpose: Define the official terminology used across DreamTown.
 
-Last Updated: 2026-03-09
+Last Updated: 2026-04-06
 Updated By: Code (Claude Code)
 
 ---
@@ -118,6 +118,42 @@ Somangi ✨ (소망이 — 다른 이를 밝히는 별)
 | **Simple & Intuitive** | 직관적으로 의미가 전달되어야 한다 |
 | **Philosophy Consistent** | DreamTown 철학과 일치해야 한다 |
 | **Emotionally Warm** | 따뜻하되 유치하지 않아야 한다 |
+
+---
+
+---
+
+## 9. Star Location Naming SSOT
+
+별의 위치 정보는 두 레이어의 결합으로 정의된다.
+두 요소가 만나는 지점 = **현실과 별이 만나는 지점**
+
+### 정의
+
+| 필드 | 역할 | 언어 규칙 | 설명 |
+|------|------|-----------|------|
+| `place_name` | 현실 뿌리 (Root) | **한글 원어 유지** | 실제 존재하는 지명. DreamTown 세계의 현실적 기반 |
+| `constellation_name` | 의미 레이어 (Meaning Layer) | **영어 전용** | 별의 감정·의미를 표현하는 이름. 글로벌 표준 |
+
+### 예시
+
+```
+place_name:          여수
+constellation_name:  Healing Shore
+
+place_name:          오동도
+constellation_name:  Blooming Courage
+
+place_name:          향일암
+constellation_name:  Rising Light
+```
+
+### 금지 규칙
+
+| 금지 | 이유 |
+|------|------|
+| `place_name`을 영어로 번역 (Yeosu, Odong Island) | 현실 뿌리가 훼손됨 |
+| `constellation_name`에 한글 혼용 (치유 Shore) | 의미 레이어의 일관성 파괴 |
 
 ---
 
