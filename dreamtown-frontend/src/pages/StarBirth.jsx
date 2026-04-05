@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { gaStarCreated, gaFirstVoyageStart, gaDtShareClick } from '../utils/gtag';
 import { shareStarBirth } from '../utils/kakaoShare';
+import { readSavedStar } from '../lib/utils/starSession.js';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -96,6 +97,18 @@ export default function StarBirth() {
   const [showCTA,      setShowCTA]      = useState(false);
   const [shareFeedback, setShareFeedback] = useState(0); // 공유 피드백 animation key (0=미노출)
 
+  // ── 필수 데이터 없으면 흐름 복구 ─────────────────────────
+  useEffect(() => {
+    if (!starId) {
+      const saved = readSavedStar();
+      if (saved) {
+        nav(`/my-star/${saved}`, { replace: true });
+      } else {
+        nav('/wish/select', { replace: true });
+      }
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── 타임라인 ────────────────────────────────────────────
   useEffect(() => {
     const ts = [
@@ -119,6 +132,9 @@ export default function StarBirth() {
     gaFirstVoyageStart({ starId, galaxyCode: galaxy, direction });
     nav('/day', { state: { direction, message, starId, isFirstVoyage: true }, replace: true });
   }
+
+  // 리다이렉트 진행 중 — 빈 화면 유지 (flash 방지)
+  if (!starId) return null;
 
   const isDone      = phase === 'done';
   const bgVisible   = phase === 2 || phase === 3 || isDone;

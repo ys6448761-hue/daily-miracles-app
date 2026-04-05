@@ -244,12 +244,9 @@ export default function MyStar() {
         }
       })
       .catch(() => {
-        setStar(DEMO_STAR);
-        setStarData({
-          starName:       DEMO_STAR.star_name,
-          starGalaxyName: DEMO_STAR.galaxy?.name_ko ?? null,
-          starCreatedAt:  DEMO_STAR.created_at,
-        });
+        // 별 조회 실패 → 로컬 세션 초기화 후 소원 선택 화면으로 복구
+        clearStarId();
+        nav('/wish/select', { replace: true });
       })
       .finally(() => setLoading(false));
   }, [id]);
