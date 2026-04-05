@@ -349,56 +349,56 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
           >✦</div>
           <h1 className="text-2xl font-bold text-star-gold mb-3">{detail.star_name}</h1>
 
-          {/* 은하 + D+N 뱃지 */}
-          <div className="flex gap-2 justify-center flex-wrap mb-4">
-            <span className={`text-xs px-3 py-1 rounded-full ${galaxyStyle.cls}`}>
-              {galaxyStyle.label}
-            </span>
-            <span className="text-xs bg-white/10 text-white/50 px-3 py-1 rounded-full">
-              D+{detail.days_since_birth}
-            </span>
-          </div>
-
-          {/* Public / Resonance: 별 맥락 정보 */}
+          {/* Public / Resonance: 소원 텍스트 — 별 이름 바로 아래, 가장 중요한 정보 */}
           {canResonate && (
-            <div>
-              {/* 감정 태그 뱃지 */}
-              <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 12 }}>
-                <span style={{
-                  fontSize: 11, padding: '2px 10px', borderRadius: 9999,
-                  background: 'rgba(255,215,106,0.12)',
-                  border: '1px solid rgba(255,215,106,0.25)',
-                  color: 'rgba(255,215,106,0.85)',
-                }}>
-                  {hint.emotionTag}
-                </span>
-                <span style={{
-                  fontSize: 11, padding: '2px 10px', borderRadius: 9999,
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  color: 'rgba(255,255,255,0.45)',
-                }}>
-                  {hint.supportType} 방향
-                </span>
-              </div>
-
-              {/* 이야기 요약 — growth_log_text 우선, 없으면 publicLine */}
-              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.72)', lineHeight: 1.65, marginBottom: 8 }}>
+            <>
+              {/* ① 소원/이야기 텍스트 (인용 강조) */}
+              <p style={{
+                fontSize: 16,
+                fontWeight: 500,
+                color: 'rgba(255,255,255,0.90)',
+                lineHeight: 1.70,
+                marginBottom: 16,
+                padding: '10px 14px',
+                borderLeft: '3px solid rgba(255,215,106,0.55)',
+                textAlign: 'left',
+                background: 'rgba(255,215,106,0.05)',
+                borderRadius: '0 10px 10px 0',
+              }}>
                 {detail.growth_log_text ?? hint.publicLine}
               </p>
 
-              {/* 공명 수 — 항상 표시 (0개도 노출) */}
-              <p style={{ fontSize: 12, color: 'rgba(255,215,106,0.65)', marginTop: 4 }}>
+              {/* ② 은하 + D+N 뱃지 */}
+              <div className="flex gap-2 justify-center flex-wrap mb-3">
+                <span className={`text-xs px-3 py-1 rounded-full ${galaxyStyle.cls}`}>
+                  {galaxyStyle.label}
+                </span>
+                <span className="text-xs bg-white/10 text-white/50 px-3 py-1 rounded-full">
+                  D+{detail.days_since_birth}
+                </span>
+              </div>
+
+              {/* ③ 공명 수 — 항상 표시 */}
+              <p style={{ fontSize: 12, color: 'rgba(255,215,106,0.65)' }}>
                 {(miracleCount + wisdomCount) > 0
                   ? `✨ ${miracleCount + wisdomCount}개 마음이 닿았어요`
                   : '✨ 아직 마음이 닿지 않은 별이에요'}
               </p>
-            </div>
+            </>
           )}
 
-          {/* Owner: 소원 원문 + 변화 문장 + 누적 공명 */}
+          {/* Owner: 은하/D+ 뱃지 + 소원 원문 + 변화 문장 + 누적 공명 */}
           {isOwner && (
             <>
+              {/* 은하 + D+N 뱃지 (owner 전용) */}
+              <div className="flex gap-2 justify-center flex-wrap mb-4">
+                <span className={`text-xs px-3 py-1 rounded-full ${galaxyStyle.cls}`}>
+                  {galaxyStyle.label}
+                </span>
+                <span className="text-xs bg-white/10 text-white/50 px-3 py-1 rounded-full">
+                  D+{detail.days_since_birth}
+                </span>
+              </div>
               {detail.wish_text && (
                 <p className="text-white/45 text-xs italic leading-relaxed mb-3 px-2 mt-2">
                   &ldquo;{detail.wish_text}&rdquo;
