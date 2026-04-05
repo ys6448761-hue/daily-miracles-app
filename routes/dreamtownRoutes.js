@@ -446,7 +446,8 @@ router.get('/stars/today', async (req, res) => {
 router.get('/stars/featured', async (req, res) => {
   try {
     const [hotResult, freshResult] = await Promise.all([
-      // hot: resonance 테이블 집계 → 상/중/하 구간 대표 1개씩 선발
+      // hot: impact 테이블 집계 (DT 기적/지혜나눔 SSOT) → 상/중/하 구간 대표 1개씩 선발
+      // impact 테이블: postDtResonance(miracle/wisdom) + 구공명 threshold 트리거(gratitude 등) 모두 집계
       db.query(`
         WITH scored AS (
           SELECT s.id          AS star_id,
@@ -454,14 +455,14 @@ router.get('/stars/featured', async (req, res) => {
                  s.created_at,
                  g.code        AS galaxy_code,
                  g.name_ko     AS galaxy_name_ko,
-                 COUNT(r.resonance_id)::int AS resonance_count,
-                 MAX(r.created_at)          AS latest_resonated_at
+                 COALESCE(SUM(i.count), 0)::int AS resonance_count,
+                 MAX(i.updated_at)               AS latest_resonated_at
             FROM dt_stars   s
             JOIN dt_galaxies g ON g.id = s.galaxy_id
-            LEFT JOIN resonance r ON r.star_id = s.id::text
+            LEFT JOIN impact i ON i.star_id = s.id::text
            WHERE s.is_hidden = FALSE
            GROUP BY s.id, s.star_name, s.created_at, g.code, g.name_ko
-          HAVING COUNT(r.resonance_id) > 0
+          HAVING COALESCE(SUM(i.count), 0) > 0
         ),
         windowed AS (
           SELECT *,
@@ -479,7 +480,7 @@ router.get('/stars/featured', async (req, res) => {
          ORDER BY rn
          LIMIT 3
       `),
-      // fresh: 48h 이내 + resonance 0개 — 첫 공명 진입점
+      // fresh: 48h 이내 + impact 0개 — 첫 나눔 진입점
       db.query(`
         SELECT s.id          AS star_id,
                s.star_name,
@@ -488,11 +489,11 @@ router.get('/stars/featured', async (req, res) => {
                g.name_ko     AS galaxy_name_ko
           FROM dt_stars   s
           JOIN dt_galaxies g ON g.id = s.galaxy_id
-          LEFT JOIN resonance r ON r.star_id = s.id::text
+          LEFT JOIN impact i ON i.star_id = s.id::text
          WHERE s.is_hidden = FALSE
            AND s.created_at >= NOW() - INTERVAL '48 hours'
          GROUP BY s.id, s.star_name, s.created_at, g.code, g.name_ko
-        HAVING COUNT(r.resonance_id) = 0
+        HAVING COALESCE(SUM(i.count), 0) = 0
          ORDER BY s.created_at DESC
          LIMIT 3
       `),
@@ -1153,33 +1154,28 @@ router.get('/stars/:id/stats', async (req, res) => {
       ? changeScoreHistory[changeScoreHistory.length - 1].score
       : 50;
 
-    // 3. 공명 수 + 타입별 breakdown (resonance 테이블 — star_id TEXT)
+    // 3. 공명 수 — impact 테이블 기준 (DT 기적/지혜나눔 SSOT)
+    //    breakdown: miracle(기적나눔) / wisdom(지혜나눔) 타입별 집계
     let resonanceCount = 0;
     let resonanceUsersCount = 0;
-    let resonanceBreakdown = { comfortable: 0, courage: 0, clarity: 0, trust: 0, total: 0 };
+    let resonanceBreakdown = { miracle: 0, wisdom: 0, total: 0 };
     try {
       const resRow = await db.query(
         `SELECT
-           COUNT(*) AS total,
-           COUNT(DISTINCT user_id) AS users,
-           COUNT(*) FILTER (WHERE resonance_type = 'relief')  AS comfortable,
-           COUNT(*) FILTER (WHERE resonance_type = 'courage') AS courage,
-           COUNT(*) FILTER (WHERE resonance_type = 'clarity') AS clarity,
-           COUNT(*) FILTER (WHERE resonance_type = 'belief')  AS trust
-         FROM resonance WHERE star_id = $1::text`,
+           COALESCE(SUM(count), 0)::int AS total,
+           COALESCE(SUM(count) FILTER (WHERE impact_type = 'miracle'), 0)::int AS miracle,
+           COALESCE(SUM(count) FILTER (WHERE impact_type = 'wisdom'),  0)::int AS wisdom
+         FROM impact WHERE star_id = $1::text`,
         [id]
       );
       const r = resRow.rows[0] ?? {};
-      resonanceCount      = parseInt(r.total        ?? 0, 10);
-      resonanceUsersCount = parseInt(r.users        ?? 0, 10);
-      resonanceBreakdown  = {
-        comfortable: parseInt(r.comfortable ?? 0, 10),
-        courage:     parseInt(r.courage     ?? 0, 10),
-        clarity:     parseInt(r.clarity     ?? 0, 10),
-        trust:       parseInt(r.trust       ?? 0, 10),
-        total:       parseInt(r.total       ?? 0, 10),
+      resonanceCount  = parseInt(r.total   ?? 0, 10);
+      resonanceBreakdown = {
+        miracle: parseInt(r.miracle ?? 0, 10),
+        wisdom:  parseInt(r.wisdom  ?? 0, 10),
+        total:   parseInt(r.total   ?? 0, 10),
       };
-    } catch (_) { /* resonance 테이블 없는 환경 graceful */ }
+    } catch (_) { /* impact 테이블 없는 환경 graceful */ }
 
     // 4. 마일스톤 상태
     const milestoneStatus = {
@@ -1284,15 +1280,15 @@ router.get('/stars/:id/detail', async (req, res) => {
       latestLog.log_date = `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
     }
 
-    // 4. 공명 수
+    // 4. 공명 수 — impact 테이블 기준 (DT 기적/지혜나눔 SSOT)
     let resonanceCount = 0;
     try {
       const { rows: resRows } = await db.query(
-        `SELECT COUNT(*) AS total FROM resonance WHERE star_id = $1::text`,
+        `SELECT COALESCE(SUM(count), 0)::int AS total FROM impact WHERE star_id = $1::text`,
         [id]
       );
       resonanceCount = parseInt(resRows[0]?.total ?? 0, 10);
-    } catch (_) { /* resonance 테이블 없는 환경 graceful */ }
+    } catch (_) { /* impact 테이블 없는 환경 graceful */ }
 
     // 5. 마일스톤 상태 (날짜 포함)
     const MILESTONES = [1, 7, 30, 100, 365];

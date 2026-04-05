@@ -711,10 +711,8 @@ export default function MyStar() {
       {stats?.resonance_breakdown?.total >= 1 && (() => {
         const bd = stats.resonance_breakdown;
         const rows = [
-          { label: '좀 편해졌어요',      count: bd.comfortable },
-          { label: '좀 용기났어요',      count: bd.courage },
-          { label: '좀 정리됐어요',      count: bd.clarity },
-          { label: '좀 믿고 싶어졌어요', count: bd.trust },
+          { label: '✨ 기적나눔', count: bd.miracle ?? 0 },
+          { label: '🧠 지혜나눔', count: bd.wisdom  ?? 0 },
         ];
         return (
           <div style={{
