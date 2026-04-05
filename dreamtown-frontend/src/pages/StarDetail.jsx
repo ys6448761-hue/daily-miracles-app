@@ -312,6 +312,10 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
     wishText:   isOwner ? detail.wish_text : undefined,
     galaxyCode: detail.galaxy?.code,
   });
+  const displayText =
+    detail?.growth_log_text ??
+    hint?.publicLine ??
+    '아직 이 별의 이야기가 준비되지 않았어요';
 
   // ── 렌더 ────────────────────────────────────────────────────────
   return (
@@ -365,7 +369,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
                 background: 'rgba(255,215,106,0.05)',
                 borderRadius: '0 10px 10px 0',
               }}>
-                {detail.growth_log_text ?? hint.publicLine}
+                {displayText}
               </p>
 
               {/* ② 은하 + D+N 뱃지 */}
