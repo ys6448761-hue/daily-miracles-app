@@ -185,7 +185,8 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
             days_since_birth: daysSinceBirth,
             created_at:       star.created_at,
             milestone_status: milestoneStatus,
-            growth_log_text:  star.growth_log_text ?? null,  // 이야기 요약
+            growth_log_text:  star.growth_log_text ?? null,
+            wish_text:        star.wish_text ?? null,
           });
         }
       } catch (_) { /* detail null → 에러 화면 */ }
@@ -314,6 +315,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   });
   const displayText =
     detail?.growth_log_text ??
+    detail?.wish_text ??
     hint?.publicLine ??
     '아직 이 별의 이야기가 준비되지 않았어요';
 
