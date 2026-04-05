@@ -26,6 +26,13 @@ function starPoints(cx, cy, outerR, innerR, points = 5) {
 const STAR_PTS  = starPoints(880, 315, 115, 48);
 const STAR_PTS2 = starPoints(880, 315, 130, 56); // 글로우용 (살짝 큰)
 
+// 보조 별 5개 — 메인 별과 거리 확보, 우주 분산 배치
+const S1 = starPoints(748, 122, 17, 7);   // 왼쪽 상단
+const S2 = starPoints(1058, 168, 13, 5);  // 오른쪽 상단
+const S3 = starPoints(1090, 448, 15, 6);  // 오른쪽 하단
+const S4 = starPoints(688, 244, 10, 4);   // 왼쪽 중단
+const S5 = starPoints(1005, 88,  12, 5);  // 상단 중앙우
+
 const HTML = `<!DOCTYPE html>
 <html>
 <head>
@@ -198,6 +205,19 @@ const HTML = `<!DOCTYPE html>
     fill="url(#starFill)"
     filter="url(#starGlow)"
   />
+
+  <!-- 보조 별들 — 약한 glow, 낮은 opacity -->
+  <defs>
+    <filter id="miniGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <polygon points="${S1}" fill="#FFD76A" opacity="0.35" filter="url(#miniGlow)"/>
+  <polygon points="${S2}" fill="#FFE590" opacity="0.28" filter="url(#miniGlow)"/>
+  <polygon points="${S3}" fill="#FFD76A" opacity="0.30" filter="url(#miniGlow)"/>
+  <polygon points="${S4}" fill="#FFFBEA" opacity="0.22" filter="url(#miniGlow)"/>
+  <polygon points="${S5}" fill="#FFE590" opacity="0.25" filter="url(#miniGlow)"/>
 </svg>
 
 <!-- 텍스트 -->
