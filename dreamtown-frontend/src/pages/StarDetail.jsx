@@ -140,6 +140,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   const [starIconPop, setStarIconPop]   = useState(false);       // ✦ 아이콘 scale pop
   const [starIconKey, setStarIconKey]   = useState(0);
   const [similarStars, setSimilarStars] = useState([]);          // 공명 후 유사 별 목록
+  const [storyOpen, setStoryOpen]       = useState(false);       // 이야기 영역 토글
 
   const myStarId  = readSavedStar();
   const isOwnStar = !propViewMode && id === myStarId;
@@ -355,43 +356,77 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
           >✦</div>
           <h1 className="text-2xl font-bold text-star-gold mb-3">{detail.star_name}</h1>
 
-          {/* Public / Resonance: 소원 텍스트 — 별 이름 바로 아래, 가장 중요한 정보 */}
-          {canResonate && (
-            <>
-              {/* ① 소원/이야기 텍스트 (인용 강조) */}
-              <p style={{
-                fontSize: 16,
-                fontWeight: 500,
-                color: 'rgba(255,255,255,0.90)',
-                lineHeight: 1.70,
-                marginBottom: 16,
-                padding: '10px 14px',
-                borderLeft: '3px solid rgba(255,215,106,0.55)',
-                textAlign: 'left',
-                background: 'rgba(255,215,106,0.05)',
-                borderRadius: '0 10px 10px 0',
-              }}>
-                {displayText}
-              </p>
+          {/* Public / Resonance: 은하/D+ + 이야기 토글 + 공명 수 */}
+          {canResonate && (() => {
+            const hasStory = !!(detail.growth_log_text || detail.wish_text);
+            return (
+              <>
+                {/* ① 은하 + D+N 뱃지 */}
+                <div className="flex gap-2 justify-center flex-wrap mb-4">
+                  <span className={`text-xs px-3 py-1 rounded-full ${galaxyStyle.cls}`}>
+                    {galaxyStyle.label}
+                  </span>
+                  <span className="text-xs bg-white/10 text-white/50 px-3 py-1 rounded-full">
+                    D+{detail.days_since_birth}
+                  </span>
+                </div>
 
-              {/* ② 은하 + D+N 뱃지 */}
-              <div className="flex gap-2 justify-center flex-wrap mb-3">
-                <span className={`text-xs px-3 py-1 rounded-full ${galaxyStyle.cls}`}>
-                  {galaxyStyle.label}
-                </span>
-                <span className="text-xs bg-white/10 text-white/50 px-3 py-1 rounded-full">
-                  D+{detail.days_since_birth}
-                </span>
-              </div>
+                {/* ② 이야기 토글 — story 없으면 숨김 */}
+                {hasStory && (
+                  <div style={{ marginBottom: 12 }}>
+                    <button
+                      onClick={() => setStoryOpen(o => !o)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontSize: 13,
+                        color: storyOpen ? 'rgba(255,215,106,0.85)' : 'rgba(255,255,255,0.45)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 5,
+                        margin: '0 auto',
+                        padding: '4px 0',
+                        transition: 'color 0.2s',
+                      }}
+                    >
+                      <span style={{
+                        display: 'inline-block',
+                        transform: storyOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.2s',
+                        fontSize: 10,
+                      }}>▶</span>
+                      이 마음은 어떤 이야기일까요
+                    </button>
 
-              {/* ③ 공명 수 — 항상 표시 */}
-              <p style={{ fontSize: 12, color: 'rgba(255,215,106,0.65)' }}>
-                {(miracleCount + wisdomCount) > 0
-                  ? `✨ ${miracleCount + wisdomCount}개 마음이 닿았어요`
-                  : '✨ 아직 마음이 닿지 않은 별이에요'}
-              </p>
-            </>
-          )}
+                    {storyOpen && (
+                      <p style={{
+                        marginTop: 10,
+                        fontSize: 15,
+                        fontWeight: 500,
+                        color: 'rgba(255,255,255,0.88)',
+                        lineHeight: 1.72,
+                        padding: '10px 14px',
+                        borderLeft: '3px solid rgba(255,215,106,0.55)',
+                        textAlign: 'left',
+                        background: 'rgba(255,215,106,0.05)',
+                        borderRadius: '0 10px 10px 0',
+                      }}>
+                        {displayText}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* ③ 공명 수 — 항상 표시 */}
+                <p style={{ fontSize: 12, color: 'rgba(255,215,106,0.65)' }}>
+                  {(miracleCount + wisdomCount) > 0
+                    ? `✨ ${miracleCount + wisdomCount}개 마음이 닿았어요`
+                    : '✨ 아직 마음이 닿지 않은 별이에요'}
+                </p>
+              </>
+            );
+          })()}
 
           {/* Owner: 은하/D+ 뱃지 + 소원 원문 + 변화 문장 + 누적 공명 */}
           {isOwner && (
