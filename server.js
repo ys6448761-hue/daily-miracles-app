@@ -790,6 +790,28 @@ app.get('/growth-film', (req, res) => {
 // favicon.ico — 파일 없을 때 500 방지
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
+// ---------- Static (API 라우트보다 반드시 먼저) ----------
+// 순서: /images 명시 → public 전체 → API routes
+app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
+app.use(express.static(path.join(__dirname, 'public'), {
+  etag: true,
+  lastModified: true,
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+    } else if (/\.(js|css)$/.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
+    } else if (/\.(png|jpe?g|gif|ico|svg|webp)$/.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+    } else if (/\.(woff2?|ttf|eot)$/.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
+    }
+  },
+}));
+// /images 미매칭 → 404 (aurora5Routes catch-all 낙하 방지)
+app.use('/images', (_req, res) => res.status(404).end());
+
 // ---------- Soft Launch 최소 응답 라우트 (fail-open) ----------
 // AIL-2026-PLAZA-STUB: TODO — DB 연동 후 각 라우트 파일로 이전
 
@@ -833,30 +855,7 @@ app.post('/api/plaza/event', (req, res) => {
   }
 });
 
-// ---------- Static ----------
-// PR-5: Cache-Control 헤더 추가 (브라우저 캐싱 활성화)
-app.use(express.static(path.join(__dirname, "public"), {
-  maxAge: '1d',           // 정적 파일 1일 캐싱
-  etag: true,             // ETag 활성화 (조건부 요청)
-  lastModified: true,     // Last-Modified 헤더
-  setHeaders: (res, filePath) => {
-    // 파일 타입별 캐시 전략
-    if (filePath.endsWith('.html')) {
-      // HTML은 캐싱 비활성화 — 배포 직후 항상 최신 파일 보장
-      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-    } else if (filePath.match(/\.(js|css)$/)) {
-      // JS/CSS는 1일 캐싱
-      res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
-    } else if (filePath.match(/\.(png|jpg|jpeg|gif|ico|svg|webp)$/)) {
-      // 이미지는 7일 캐싱
-      res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
-    } else if (filePath.match(/\.(woff|woff2|ttf|eot)$/)) {
-      // 폰트는 30일 캐싱
-      res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
-    }
-  }
-}));
+// static은 favicon 직후로 이동 (API 라우터보다 앞)
 
 // ---------- Clean URL Routes (확장자 없이 접근) ----------
 app.get("/quote", (_req, res) => {
