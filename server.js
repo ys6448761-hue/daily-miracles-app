@@ -59,6 +59,14 @@ if (!OPS_SLACK_WEBHOOK) {
 const app = express();
 
 // ═══════════════════════════════════════════════════════════
+// 정적 파일 — gateMiddleware/미들웨어 체인 최상단에 위치
+// /images, public 전체를 API 에러 체인과 완전히 분리
+// ═══════════════════════════════════════════════════════════
+app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images', (_req, res) => res.status(404).end()); // 파일 없으면 404로 끊음
+
+// ═══════════════════════════════════════════════════════════
 // Open Gate — 릴리즈 차단 게이트 (APP_DISABLED)
 // ═══════════════════════════════════════════════════════════
 app.use(require('./middleware/gateMiddleware'));
@@ -790,27 +798,7 @@ app.get('/growth-film', (req, res) => {
 // favicon.ico — 파일 없을 때 500 방지
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
-// ---------- Static (API 라우트보다 반드시 먼저) ----------
-// 순서: /images 명시 → public 전체 → API routes
-app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
-app.use(express.static(path.join(__dirname, 'public'), {
-  etag: true,
-  lastModified: true,
-  setHeaders: (res, filePath) => {
-    if (filePath.endsWith('.html')) {
-      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-    } else if (/\.(js|css)$/.test(filePath)) {
-      res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
-    } else if (/\.(png|jpe?g|gif|ico|svg|webp)$/.test(filePath)) {
-      res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
-    } else if (/\.(woff2?|ttf|eot)$/.test(filePath)) {
-      res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
-    }
-  },
-}));
-// /images 미매칭 → 404 (aurora5Routes catch-all 낙하 방지)
-app.use('/images', (_req, res) => res.status(404).end());
+// static은 app 생성 직후 최상단으로 이동 (gateMiddleware보다 위)
 
 // ---------- Soft Launch 최소 응답 라우트 (fail-open) ----------
 // AIL-2026-PLAZA-STUB: TODO — DB 연동 후 각 라우트 파일로 이전
