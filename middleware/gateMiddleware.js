@@ -7,6 +7,8 @@ module.exports = function gateMiddleware(req, res, next) {
   if (process.env.APP_DISABLED === 'true') {
     // 헬스 체크는 항상 통과 (Render 무한 재시작 방지)
     if (req.path === '/api/health') return next();
+    // 정적 이미지는 점검 중에도 통과 (OG 썸네일 등 카카오 크롤러 대응)
+    if (req.path.startsWith('/images')) return next();
     return res.status(503).json({
       success: false,
       error: 'maintenance',
