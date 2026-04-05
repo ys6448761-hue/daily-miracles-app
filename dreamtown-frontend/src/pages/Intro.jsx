@@ -5,49 +5,28 @@ import { track, getVariant } from "../utils/experiment";
 import { gaIntroView, gaIntroCTAClick } from "../utils/gtag";
 
 const EXP_ID        = 'intro_cta_v1';
-const SCREEN_EXP_ID = 'intro_screen_v1';  // A: 전체 5단계, B: 마지막 1단계
-const CTA_TEXT = { A: '시작하기', B: '내 빛 찾기' };
+const SCREEN_EXP_ID = 'intro_screen_v1';
 
-// import.meta.env.BASE_URL: dev='/', prod='/dreamtown/' — 경로 자동 대응
 const BASE = import.meta.env.BASE_URL;
 
-const STEPS = [
-  { src: `${BASE}images/intro/intro-01-look.jpg`,      text: '소원을 떠올려보세요' },
-  { src: `${BASE}images/intro/intro-02-write.jpg`,     text: '소원을 말하는 것만으로도' },
-  { src: `${BASE}images/intro/intro-03-transform.jpg`, text: '소원은 별이 됩니다' },
+const PHASES = [
+  "여수 바다에는\n소원을 품으면 별이 된다는\n이야기가 있습니다",
+  "지금 마음속에 있는\n그 한 가지 소원",
+  "당신의 소원을\n용궁으로 안내합니다",
 ];
 
-const LAST_STEP = STEPS.length;
-
-// 공유 링크 유입 시 direction 색 tint — 카드의 색감이 Intro까지 이어짐
-const INTRO_TINT = {
-  north: 'rgba(96,165,250,0.10)',
-  east:  'rgba(245,158,11,0.12)',
-  west:  'rgba(244,114,182,0.10)',
-  south: 'rgba(52,211,153,0.10)',
-};
+const PHASE_DURATION = 3200; // ms — 다음 단계로 자동 전환
 
 export default function Intro() {
   const screenVariant = getVariant(SCREEN_EXP_ID);
-  // 항상 01-look부터 시작 — B variant도 01에서 시작 (이미지 순서 고정 원칙)
-  const [step, setStep] = useState(1);
+  const variant       = getVariant(EXP_ID);
+  const [phase, setPhase]               = useState(0); // 0~2 텍스트, 3 = CTA
   const [transitioning, setTransitioning] = useState(false);
-  const timerRef = useRef(null);
-  const navigate = useNavigate();
+  const timerRef  = useRef(null);
+  const navigate  = useNavigate();
   const [searchParams] = useSearchParams();
-
-  // ?g=east 형태로 direction 전달받음 (리텐션 루프 진입점)
   const g    = searchParams.get('g');
-  const tint = INTRO_TINT[g] || null;
 
-  // A/B 실험 — variant 고정
-  const variant = getVariant(EXP_ID);
-  const isLast  = step === LAST_STEP;
-  const ctaText = isLast ? CTA_TEXT[variant] : '다음';
-
-  const current = STEPS[step - 1];
-
-  // screen_view 이벤트
   useEffect(() => {
     track('screen_view', {
       screen: 'intro',
@@ -64,98 +43,171 @@ export default function Intro() {
   // 타이머 정리
   useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
 
-  const handleNext = () => {
-    if (!isLast) {
-      setStep(s => s + 1);
-    } else {
-      track('cta_click', {
-        experiment: EXP_ID,
-        variant,
-        screen_experiment: SCREEN_EXP_ID,
-        screen_variant: screenVariant,
-        text: ctaText,
-        from_share: !!g,
-        galaxy: g || null,
-      });
-      gaIntroCTAClick({ screenVariant, ctaText });
-      // 별 zoom 트랜지션 시작 → 1200ms 후 Galaxy 이동
-      setTransitioning(true);
-      timerRef.current = setTimeout(() => navigate('/wish'), 1200);
+  // 텍스트 단계 자동 전환
+  useEffect(() => {
+    if (phase < PHASES.length) {
+      timerRef.current = setTimeout(() => setPhase(p => p + 1), PHASE_DURATION);
     }
-  };
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [phase]);
+
+  // 화면 탭으로 다음 단계 건너뛰기
+  function handleTap() {
+    if (phase < PHASES.length) {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      setPhase(p => p + 1);
+    }
+  }
+
+  function handleCTA(type) {
+    track('cta_click', {
+      experiment: EXP_ID,
+      variant,
+      screen_experiment: SCREEN_EXP_ID,
+      screen_variant: screenVariant,
+      text: type,
+      from_share: !!g,
+      galaxy: g || null,
+    });
+    gaIntroCTAClick({ screenVariant, ctaText: type });
+
+    if (type === 'wish') {
+      setTransitioning(true);
+      timerRef.current = setTimeout(() => navigate('/wish/select'), 800);
+    } else {
+      navigate('/stars');
+    }
+  }
+
+  const isCTA = phase >= PHASES.length;
 
   return (
-    <div className="relative w-full h-screen bg-black text-white overflow-hidden">
-
-      {/* 이미지 — step 변경 시 fade */}
-      <AnimatePresence mode="wait">
-        <motion.img
-          key={step}
-          src={current.src}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.9 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
-        />
-      </AnimatePresence>
+    <div
+      className="relative w-full h-screen bg-black text-white overflow-hidden"
+      onClick={!isCTA ? handleTap : undefined}
+      style={{ cursor: !isCTA ? 'pointer' : 'default' }}
+    >
+      {/* 영상 배경 */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ opacity: 0.72 }}
+      >
+        <source src={`${BASE}videos/intro-yeosu-entry-v1.mp4`} type="video/mp4" />
+      </video>
 
       {/* 어둡게 덮기 */}
-      <div className="absolute inset-0 bg-black/30" />
+      <div className="absolute inset-0 bg-black/40" />
 
-      {/* 공유 유입 direction tint — 카드 색감의 여운 */}
-      {tint && (
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: tint, mixBlendMode: 'screen' }}
-        />
-      )}
-
-      {/* 텍스트 */}
+      {/* 텍스트 단계 */}
       <AnimatePresence mode="wait">
-        <motion.div
-          key={step}
-          className="absolute bottom-28 w-full text-center px-6 space-y-2"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.6, delay: 0.15 }}
-        >
-          <p className="text-xl leading-relaxed">{current.text}</p>
-
-          {/* 진행 점 (5단계 A 그룹만 표시) */}
-          {screenVariant === 'A' && (
-            <div className="flex justify-center gap-1.5 pt-3">
-              {STEPS.map((_, i) => (
-                <span
-                  key={i}
-                  className={`block rounded-full transition-all duration-300 ${
-                    i + 1 === step
-                      ? 'w-4 h-1.5 bg-white/80'
-                      : 'w-1.5 h-1.5 bg-white/30'
-                  }`}
-                />
-              ))}
-            </div>
-          )}
-        </motion.div>
+        {!isCTA && (
+          <motion.div
+            key={phase}
+            className="absolute inset-0 flex items-center justify-center px-8"
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.7 }}
+          >
+            <p
+              className="text-center text-white/95"
+              style={{
+                fontSize: 'clamp(17px, 4.5vw, 21px)',
+                whiteSpace: 'pre-line',
+                lineHeight: 1.80,
+                letterSpacing: '-0.01em',
+                fontWeight: 400,
+                textShadow: '0 2px 20px rgba(0,0,0,0.75)',
+              }}
+            >
+              {PHASES[phase]}
+            </p>
+          </motion.div>
+        )}
       </AnimatePresence>
 
-      {/* 버튼 */}
-      <button
-        onClick={handleNext}
-        disabled={transitioning}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 px-8 py-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm active:scale-95 transition-transform disabled:pointer-events-none whitespace-nowrap"
-      >
-        {ctaText}
-      </button>
-
-      {/* 별 zoom 트랜지션 오버레이 */}
-      {transitioning && (
-        <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
-          <div className="animate-star-zoom" />
+      {/* 진행 점 */}
+      {!isCTA && (
+        <div
+          className="absolute left-1/2 -translate-x-1/2 flex gap-2"
+          style={{ bottom: 52 }}
+        >
+          {PHASES.map((_, i) => (
+            <span
+              key={i}
+              className="block rounded-full transition-all duration-300"
+              style={{
+                width:      i === phase ? 18 : 6,
+                height:     6,
+                background: i === phase
+                  ? 'rgba(255,215,106,0.85)'
+                  : 'rgba(255,255,255,0.25)',
+              }}
+            />
+          ))}
         </div>
+      )}
+
+      {/* 건너뛰기 */}
+      {!isCTA && (
+        <button
+          onClick={e => {
+            e.stopPropagation();
+            if (timerRef.current) clearTimeout(timerRef.current);
+            setPhase(PHASES.length);
+          }}
+          className="absolute top-5 right-5 text-xs px-3 py-1.5"
+          style={{ color: 'rgba(255,255,255,0.30)' }}
+        >
+          건너뛰기
+        </button>
+      )}
+
+      {/* CTA 버튼 */}
+      <AnimatePresence>
+        {isCTA && (
+          <motion.div
+            className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-3 px-6 pb-14"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55 }}
+          >
+            <button
+              onClick={() => handleCTA('wish')}
+              className="w-full max-w-xs py-4 rounded-full text-base font-bold"
+              style={{
+                background:  '#FFD76A',
+                color:       '#0D1B2A',
+                boxShadow:   '0 0 32px 8px rgba(255,215,106,0.28)',
+                border:      'none',
+              }}
+            >
+              내 별 만들기 ✦
+            </button>
+            <button
+              onClick={() => handleCTA('browse')}
+              className="w-full max-w-xs py-4 rounded-full text-sm"
+              style={{
+                background:     'rgba(255,255,255,0.07)',
+                border:         '1px solid rgba(255,255,255,0.18)',
+                color:          'rgba(255,255,255,0.60)',
+                backdropFilter: 'blur(8px)',
+              }}
+            >
+              다른 별 보기
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 전환 오버레이 */}
+      {transitioning && (
+        <div className="fixed inset-0 z-50 bg-black pointer-events-none"
+             style={{ opacity: 0.85 }} />
       )}
     </div>
   );

@@ -63,8 +63,10 @@ const app = express();
 // /images, public 전체를 API 에러 체인과 완전히 분리
 // ═══════════════════════════════════════════════════════════
 app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
+app.use('/videos', express.static(path.join(__dirname, 'public', 'videos')));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', (_req, res) => res.status(404).end()); // 파일 없으면 404로 끊음
+app.use('/videos', (_req, res) => res.status(404).end()); // 파일 없으면 404로 끊음
 
 // ═══════════════════════════════════════════════════════════
 // Open Gate — 릴리즈 차단 게이트 (APP_DISABLED)

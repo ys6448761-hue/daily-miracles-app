@@ -11,7 +11,7 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { postWish, postStarCreate, getOrCreateUserId } from '../api/dreamtown.js';
 import { saveStarId } from '../lib/utils/starSession.js';
 import { gaWishInputStart, gaWishCreateSubmit } from '../utils/gtag';
@@ -46,8 +46,13 @@ const INITIAL_TEXT = '조금 더 ';
 export default function WishInputScreen({ onBack }) {
   const nav      = useNavigate();
   const inputRef = useRef(null);
+  const [searchParams] = useSearchParams();
 
-  const [text, setText]       = useState(INITIAL_TEXT);
+  // ?preset= 파라미터가 있으면 선택값을 초기 텍스트로 사용
+  const preset = searchParams.get('preset') || '';
+  const startText = preset || INITIAL_TEXT;
+
+  const [text, setText]       = useState(startText);
   const [focused, setFocused] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
@@ -131,7 +136,7 @@ export default function WishInputScreen({ onBack }) {
     }
   }
 
-  const hasTyped = text.trim() !== INITIAL_TEXT.trim();
+  const hasTyped = text.trim() !== startText.trim() || (preset && text.trim().length > 0);
 
   return (
     <main
@@ -328,7 +333,7 @@ export default function WishInputScreen({ onBack }) {
 
         {/* ── 뒤로가기 ─────────────────────────────────────────── */}
         <button
-          onClick={onBack}
+          onClick={onBack || (() => nav('/wish/select'))}
           style={{
             display: 'block',
             margin: '20px auto 0',

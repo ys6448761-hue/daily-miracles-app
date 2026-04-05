@@ -21,6 +21,8 @@ import MyStarReturn from './pages/MyStarReturn.jsx';
 import DigitalBook from './pages/DigitalBook.jsx';
 import HundredDays from './pages/HundredDays.jsx';
 import StoryDraftMVP from './pages/StoryDraftMVP.jsx';
+import WishSelect from './pages/WishSelect.jsx';
+import WishInputScreen from './pages/WishInputScreen.jsx';
 import JourneySceneEngine from './components/JourneySceneEngine.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
@@ -42,6 +44,8 @@ export default function App() {
           <Route path="/"            element={<AppLaunch />} />
           <Route path="/intro"       element={<Intro />} />
           <Route path="/wish"        element={<WishGate />} />
+          <Route path="/wish/select" element={<WishSelect />} />
+          <Route path="/wish/input"  element={<WishInputScreen />} />
           <Route path="/star-birth"  element={<StarBirth />} />
           <Route path="/my-star"     element={<MyStarReturn />} />
           <Route path="/my-star/:id" element={<MyStar />} />
