@@ -7,8 +7,6 @@ import { gaIntroView, gaIntroCTAClick } from "../utils/gtag";
 const EXP_ID        = 'intro_cta_v1';
 const SCREEN_EXP_ID = 'intro_screen_v1';
 
-const BASE = import.meta.env.BASE_URL;
-
 const PHASES = [
   "여수 바다에는\n소원을 품으면 별이 된다는\n이야기가 있습니다",
   "지금 마음속에 있는\n그 한 가지 소원",
@@ -96,7 +94,7 @@ export default function Intro() {
         className="absolute inset-0 w-full h-full object-cover"
         style={{ opacity: 0.72 }}
       >
-        <source src={`${BASE}videos/intro-yeosu-entry-v1.mp4`} type="video/mp4" />
+        <source src="/videos/intro-yeosu-entry-v1.mp4" type="video/mp4" />
       </video>
 
       {/* 어둡게 덮기 */}
