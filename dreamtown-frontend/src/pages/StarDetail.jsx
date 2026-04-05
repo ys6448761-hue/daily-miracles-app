@@ -179,9 +179,13 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
             };
           });
           setDetail({
-            star_id: star.star_id, star_name: star.star_name,
-            galaxy: star.galaxy,  days_since_birth: daysSinceBirth,
-            created_at: star.created_at, milestone_status: milestoneStatus,
+            star_id:          star.star_id,
+            star_name:        star.star_name,
+            galaxy:           star.galaxy,
+            days_since_birth: daysSinceBirth,
+            created_at:       star.created_at,
+            milestone_status: milestoneStatus,
+            growth_log_text:  star.growth_log_text ?? null,  // 이야기 요약
           });
         }
       } catch (_) { /* detail null → 에러 화면 */ }
@@ -355,10 +359,11 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
             </span>
           </div>
 
-          {/* Public / Resonance: 공명 힌트 (소원 원문 금지) */}
+          {/* Public / Resonance: 별 맥락 정보 */}
           {canResonate && (
             <div>
-              <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 10 }}>
+              {/* 감정 태그 뱃지 */}
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 12 }}>
                 <span style={{
                   fontSize: 11, padding: '2px 10px', borderRadius: 9999,
                   background: 'rgba(255,215,106,0.12)',
@@ -376,12 +381,18 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
                   {hint.supportType} 방향
                 </span>
               </div>
-              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, marginBottom: 6 }}>
-                {hint.publicLine}
+
+              {/* 이야기 요약 — growth_log_text 우선, 없으면 publicLine */}
+              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.72)', lineHeight: 1.65, marginBottom: 8 }}>
+                {detail.growth_log_text ?? hint.publicLine}
               </p>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', lineHeight: 1.5 }}>
-                {hint.growthMessage}
-              </p>
+
+              {/* 공명 수 — 1개 이상일 때만 표시 */}
+              {(miracleCount + wisdomCount) > 0 && (
+                <p style={{ fontSize: 12, color: 'rgba(255,215,106,0.65)', marginTop: 4 }}>
+                  ✨ {miracleCount + wisdomCount}개 마음이 닿았어요
+                </p>
+              )}
             </div>
           )}
 
@@ -487,11 +498,13 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
           {!submitted ? (
             /* 버튼 상태 */
             <div className="bg-white/3 border border-white/8 rounded-2xl p-4">
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.38)', textAlign: 'center', marginBottom: 14 }}>
-                {miracleCount + wisdomCount === 0
-                  ? '이 소원에 처음 닿는 마음이 되어보세요'
-                  : <>이 별은{' '}<strong style={{ color: 'rgba(255,255,255,0.6)' }}>{hint.supportType}</strong>을 필요로 해요</>
-                }
+              {/* 구분 레이블 */}
+              <p style={{
+                fontSize: 11, color: 'rgba(255,255,255,0.28)',
+                textAlign: 'center', marginBottom: 14,
+                letterSpacing: '0.06em', textTransform: 'uppercase',
+              }}>
+                마음 나누기
               </p>
               <div className="grid grid-cols-2 gap-3">
                 {DT_RESONANCE_OPTS.map(opt => (
