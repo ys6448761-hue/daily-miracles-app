@@ -436,33 +436,50 @@ router.get('/stars/today', async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────
 // GET /api/dt/stars/featured — 성장 루프 노출 구조 (자동 정렬, 수동 개입 불필요)
 //
-// hot   (top 3): hot_score = (공명수 × 10 + 1) / (경과시간h + 2)
-//                30일 이내, 공명 가중 + 시간 감소. 운영자 개입 없이 자동 갱신.
-// fresh (top 3): 48h 이내 탄생 + 공명 0개 — 0공명 별이 죽지 않고 진입점으로 작동
+// hot (최대 3): resonance 테이블 기준, resonance_count > 0 필터
+//   선발 기준: 전체 공명 분포를 상/중/하 구간으로 나눠 각 1개 대표 추출
+//   정렬: resonance_count DESC, tiebreaker = latest_resonated_at DESC
+//   금지: impact 테이블 사용 금지 (impact = 나눔 집계, resonance ≠ impact)
+//
+// fresh (최대 3): 48h 이내 탄생 + resonance 0개 — 첫 공명 진입점
 // ─────────────────────────────────────────────────────────────────────────
 router.get('/stars/featured', async (req, res) => {
   try {
     const [hotResult, freshResult] = await Promise.all([
-      // hot: 공명 가중 hot score (linear time decay, 30일 window)
+      // hot: resonance 테이블 집계 → 상/중/하 구간 대표 1개씩 선발
       db.query(`
-        SELECT s.id          AS star_id,
-               s.star_name,
-               s.created_at,
-               g.code        AS galaxy_code,
-               g.name_ko     AS galaxy_name_ko,
-               COALESCE(SUM(i.count), 0)::int AS resonance_count,
-               (COALESCE(SUM(i.count), 0) * 10.0 + 1.0)
-                 / (EXTRACT(EPOCH FROM (NOW() - s.created_at)) / 3600.0 + 2) AS hot_score
-          FROM dt_stars   s
-          JOIN dt_galaxies g ON g.id = s.galaxy_id
-          LEFT JOIN impact i ON i.star_id = s.id::text
-         WHERE s.is_hidden = FALSE
-           AND s.created_at >= NOW() - INTERVAL '30 days'
-         GROUP BY s.id, s.star_name, s.created_at, g.code, g.name_ko
-         ORDER BY hot_score DESC, s.created_at DESC
+        WITH scored AS (
+          SELECT s.id          AS star_id,
+                 s.star_name,
+                 s.created_at,
+                 g.code        AS galaxy_code,
+                 g.name_ko     AS galaxy_name_ko,
+                 COUNT(r.resonance_id)::int AS resonance_count,
+                 MAX(r.created_at)          AS latest_resonated_at
+            FROM dt_stars   s
+            JOIN dt_galaxies g ON g.id = s.galaxy_id
+            LEFT JOIN resonance r ON r.star_id = s.id::text
+           WHERE s.is_hidden = FALSE
+           GROUP BY s.id, s.star_name, s.created_at, g.code, g.name_ko
+          HAVING COUNT(r.resonance_id) > 0
+        ),
+        windowed AS (
+          SELECT *,
+            ROW_NUMBER() OVER (
+              ORDER BY resonance_count DESC, latest_resonated_at DESC NULLS LAST
+            ) AS rn,
+            COUNT(*) OVER () AS total_count
+          FROM scored
+        )
+        SELECT star_id, star_name, created_at, galaxy_code, galaxy_name_ko, resonance_count
+          FROM windowed
+         WHERE rn = 1
+            OR rn = GREATEST(2, (total_count + 1) / 2)
+            OR rn = total_count
+         ORDER BY rn
          LIMIT 3
       `),
-      // fresh: 48h 이내 + 공명 0개 — 첫 공명 진입점
+      // fresh: 48h 이내 + resonance 0개 — 첫 공명 진입점
       db.query(`
         SELECT s.id          AS star_id,
                s.star_name,
@@ -471,11 +488,11 @@ router.get('/stars/featured', async (req, res) => {
                g.name_ko     AS galaxy_name_ko
           FROM dt_stars   s
           JOIN dt_galaxies g ON g.id = s.galaxy_id
-          LEFT JOIN impact i ON i.star_id = s.id::text
+          LEFT JOIN resonance r ON r.star_id = s.id::text
          WHERE s.is_hidden = FALSE
            AND s.created_at >= NOW() - INTERVAL '48 hours'
          GROUP BY s.id, s.star_name, s.created_at, g.code, g.name_ko
-        HAVING COALESCE(SUM(i.count), 0) = 0
+        HAVING COUNT(r.resonance_id) = 0
          ORDER BY s.created_at DESC
          LIMIT 3
       `),
