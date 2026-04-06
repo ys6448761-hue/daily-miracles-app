@@ -13,6 +13,7 @@ const router = express.Router();
 const db = require('../database/db');
 const { classifyWish, notifyRedSignal } = require('../services/safetyFilter');
 const { createStarLocation } = require('../services/starLocationService');
+const { getEmotionTag }     = require('../services/emotionService');
 
 // ── 044 startup migration (기적 은하 추가) — PostgreSQL 환경에서만 실행 ──
 if (process.env.DATABASE_URL) {
@@ -228,13 +229,16 @@ router.post('/stars/create', async (req, res) => {
     // YELLOW 소원 → 별도 is_hidden=true (광장 미노출)
     const isHidden = wish.safety_level === 'YELLOW';
 
+    // 감정 태그 결정 (wish_text 기반, 결정론적)
+    const emotionTag = getEmotionTag(wish.wish_text);
+
     // star 생성
     const starResult = await db.query(
       `INSERT INTO dt_stars
-         (user_id, wish_id, star_seed_id, star_name, star_slug, galaxy_id, star_stage, is_hidden)
-       VALUES ($1, $2, $3, $4, $5, $6, 'day1', $7)
+         (user_id, wish_id, star_seed_id, star_name, star_slug, galaxy_id, star_stage, is_hidden, emotion_tag)
+       VALUES ($1, $2, $3, $4, $5, $6, 'day1', $7, $8)
        RETURNING id, star_name, star_slug, star_stage, created_at`,
-      [user_id, wish_id, seed.id, starName, starSlug, galaxy.id, isHidden]
+      [user_id, wish_id, seed.id, starName, starSlug, galaxy.id, isHidden, emotionTag]
     );
     const star = starResult.rows[0];
 
