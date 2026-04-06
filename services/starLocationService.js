@@ -12,94 +12,85 @@
  *   ✅ 오직 wish_id 기반 결정
  *
  * 보장:
- *   동일 wish_id → 항상 동일 zone / offset 계산
- *   slot 충돌 → linear probing (DB UNIQUE 제약 준수)
+ *   동일 wish_id → 항상 동일 zone / slot / 좌표
+ *   slot 충돌 → linear probing (UNIQUE(zone_code, slot_number) 준수)
+ *   zone 추가 시 기존 별 위치 불변 (ON CONFLICT star_id DO NOTHING)
  */
 
-// Zone 목록은 DB에서 읽는다 (원칙 1/2: 코드 내 하드코딩 금지, 활성 zone 수 기준)
-// star_zones에 is_active 컬럼이 생기면 WHERE is_active = true로 전환
-async function getActiveZones(db) {
-  const result = await db.query(
-    'SELECT zone_code FROM star_zones ORDER BY zone_code'
+const crypto = require('crypto');
+
+/**
+ * wish_id (UUID) → uint32 해시
+ * MD5 앞 8자리 hex → base-16 정수
+ * @param {string} wishId
+ * @returns {number} 0 이상 정수
+ */
+function hashFunction(input) {
+  return parseInt(
+    crypto.createHash('md5').update(input).digest('hex').substring(0, 8),
+    16
   );
-  if (result.rowCount === 0) {
-    throw new Error('star_zones 데이터 없음 — migration 051 적용 필요');
-  }
-  return result.rows.map(r => r.zone_code);
 }
 
 /**
- * UUID 문자열 → 부호 없는 32비트 정수 해시 (djb2 변형)
- * 하이픈 제거 후 charCode 기반 순수 계산.
- * @param {string} wishId  UUID v4 string
- * @returns {number}       0 이상 정수
+ * 활성 zone 목록 조회 (SSOT: star_zones 테이블)
+ * 코드 내 하드코딩 금지 — zone 추가는 DB INSERT만으로 반영
+ * @param {object} db
+ * @returns {Array<{zone_code, lat, lng}>}
  */
-function hashWishId(wishId) {
-  const str = wishId.replace(/-/g, '');
-  let hash = 5381;
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) + hash + str.charCodeAt(i)) >>> 0; // unsigned 32-bit
+async function getActiveZones(db) {
+  const result = await db.query(`
+    SELECT zone_code, lat, lng
+      FROM star_zones
+     WHERE is_active = true
+     ORDER BY zone_code
+  `);
+
+  if (!result.rows.length) {
+    throw new Error('No active star zones — migration 051 + 054 적용 필요');
   }
-  return hash;
+
+  return result.rows;
 }
 
 /**
  * 별 생성 시 위치를 자동 할당한다.
  *
- * - 이미 할당된 경우(UNIQUE star_id 충돌) → 조용히 무시
- * - slot 충돌 → linear probing (최대 1000회)
- * - 실패해도 별 생성 롤백하지 않음 (호출부에서 try/catch)
- *
- * @param {object} db       pg client / pool
- * @param {object} params
- * @param {string} params.starId   dt_stars.id (UUID)
- * @param {string} params.wishId   dt_wishes.id (UUID)
+ * @param {object} db
+ * @param {string} star_id   dt_stars.id (UUID)
+ * @param {string} wish_id   dt_wishes.id (UUID)
  */
-async function assignStarLocation(db, { starId, wishId }) {
-  const hash = hashWishId(wishId);
-
-  // 1. 활성 zone 목록 조회 (DB SSOT — 하드코딩 금지)
+async function createStarLocation(db, star_id, wish_id) {
   const zones = await getActiveZones(db);
-  const zoneCode = zones[hash % zones.length];
+  const hash  = hashFunction(wish_id);
 
-  // 2. zone 중심 좌표 조회
-  const zoneResult = await db.query(
-    'SELECT lat, lng FROM star_zones WHERE zone_code = $1',
-    [zoneCode]
-  );
-  if (zoneResult.rowCount === 0) {
-    throw new Error(`star_zones에 zone_code=${zoneCode} 없음 — migration 051 적용 필요`);
-  }
-  const zone = zoneResult.rows[0];
+  // 1. zone 결정 (활성 zone 수 기준 — 확장 시 자동 반영)
+  const zone = zones[hash % zones.length];
 
-  // 3. slot 결정 (linear probing)
-  let slot = (hash >>> 8) % 1000;
-  let found = false;
+  // 2. slot 결정 + linear probing (충돌 방지)
+  let slot = (hash >> 8) % 1000;
   for (let attempt = 0; attempt < 1000; attempt++) {
-    const exists = await db.query(
+    const check = await db.query(
       'SELECT 1 FROM star_locations WHERE zone_code = $1 AND slot_number = $2',
-      [zoneCode, slot]
+      [zone.zone_code, slot]
     );
-    if (exists.rowCount === 0) { found = true; break; }
+    if (!check.rows.length) break;
     slot = (slot + 1) % 1000;
   }
-  if (!found) {
-    throw new Error(`zone=${zoneCode} slot 1000개 모두 사용 중 — 확장 필요`);
-  }
 
-  // 4. 미세 좌표 오프셋 (wish_id 기반, ±0.0005° 범위)
+  // 3. 미세 좌표 오프셋 (wish_id 기반, ±0.0005° 이내)
   const offsetLat = ((hash % 100) - 50) * 0.00001;
-  const offsetLng = (((hash >>> 8) % 100) - 50) * 0.00001;
+  const offsetLng = (((hash >> 8) % 100) - 50) * 0.00001;
   const finalLat  = parseFloat(zone.lat) + offsetLat;
   const finalLng  = parseFloat(zone.lng) + offsetLng;
 
-  // 5. INSERT (star_id UNIQUE → 이중 생성 방지)
+  // 4. INSERT (star_id UNIQUE → 이중 생성 방지)
   await db.query(
     `INSERT INTO star_locations (star_id, zone_code, slot_number, lat, lng)
      VALUES ($1, $2, $3, $4, $5)
      ON CONFLICT (star_id) DO NOTHING`,
-    [starId, zoneCode, slot, finalLat, finalLng]
+    [star_id, zone.zone_code, slot, finalLat, finalLng]
   );
 }
 
-module.exports = { assignStarLocation, hashWishId };
+module.exports = { createStarLocation, hashFunction, getActiveZones };

@@ -12,7 +12,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
 const { classifyWish, notifyRedSignal } = require('../services/safetyFilter');
-const { assignStarLocation } = require('../services/starLocationService');
+const { createStarLocation } = require('../services/starLocationService');
 
 // ── 044 startup migration (기적 은하 추가) — PostgreSQL 환경에서만 실행 ──
 if (process.env.DATABASE_URL) {
@@ -240,7 +240,7 @@ router.post('/stars/create', async (req, res) => {
 
     // ── 별 위치 자동 할당 (wish_id 해시 기반, 결정론적) ────────────
     try {
-      await assignStarLocation(db, { starId: star.id, wishId: wish_id });
+      await createStarLocation(db, star.id, wish_id);
     } catch (locErr) {
       console.error('[DT] star_location 할당 실패 (별 생성은 유지):', locErr.message);
     }
