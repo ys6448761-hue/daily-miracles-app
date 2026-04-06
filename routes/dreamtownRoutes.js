@@ -13,7 +13,16 @@ const router = express.Router();
 const db = require('../database/db');
 const { classifyWish, notifyRedSignal } = require('../services/safetyFilter');
 const { createStarLocation } = require('../services/starLocationService');
-const { getEmotionTag }     = require('../services/emotionService');
+const { getEmotionTag }      = require('../services/emotionService');
+const { generateStarMeaning } = require('../services/starMeaningService');
+const crypto = require('crypto');
+
+function dtHashWishId(input) {
+  return parseInt(
+    crypto.createHash('md5').update(input).digest('hex').substring(0, 8),
+    16
+  );
+}
 
 // ── 044 startup migration (기적 은하 추가) — PostgreSQL 환경에서만 실행 ──
 if (process.env.DATABASE_URL) {
@@ -247,6 +256,31 @@ router.post('/stars/create', async (req, res) => {
       await createStarLocation(db, star.id, wish_id);
     } catch (locErr) {
       console.error('[DT] star_location 할당 실패 (별 생성은 유지):', locErr.message);
+    }
+
+    // ── 의미 문장 생성 (위치 + 감정 → 스토리) ───────────────────
+    try {
+      const locRow = await db.query(
+        `SELECT sl.zone_code, sz.place_name
+           FROM star_locations sl
+           JOIN star_zones sz ON sz.zone_code = sl.zone_code
+          WHERE sl.star_id = $1`,
+        [star.id]
+      );
+      if (locRow.rowCount > 0) {
+        const hash        = dtHashWishId(wish_id);
+        const meaningText = generateStarMeaning({
+          emotion_tag: emotionTag,
+          zone:        locRow.rows[0],
+          hash,
+        });
+        await db.query(
+          'UPDATE dt_stars SET meaning_text = $1 WHERE id = $2',
+          [meaningText, star.id]
+        );
+      }
+    } catch (mErr) {
+      console.error('[DT] meaning_text 생성 실패 (별 생성은 유지):', mErr.message);
     }
 
     // wish status 업데이트
