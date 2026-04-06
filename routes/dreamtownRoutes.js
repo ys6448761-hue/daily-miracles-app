@@ -15,6 +15,7 @@ const { classifyWish, notifyRedSignal } = require('../services/safetyFilter');
 const { createStarLocation } = require('../services/starLocationService');
 const { getEmotionTag }      = require('../services/emotionService');
 const { generateStarMeaning } = require('../services/starMeaningService');
+const { getStarStage }        = require('../services/starGrowthService');
 const crypto = require('crypto');
 
 function dtHashWishId(input) {
@@ -640,6 +641,24 @@ router.get('/stars/:id', async (req, res) => {
     }
 
     const row = result.rows[0];
+
+    // ── 성장 단계 계산 (DB 저장 금지 — 항상 계산형) ─────────────
+    const [impactResult, logResult] = await Promise.all([
+      db.query(
+        'SELECT COALESCE(SUM(count), 0)::int AS total FROM impact WHERE star_id = $1::text',
+        [row.star_id]
+      ),
+      db.query(
+        'SELECT COUNT(*)::int AS total FROM dt_voyage_logs WHERE star_id = $1',
+        [row.star_id]
+      ),
+    ]);
+    const growthStage = getStarStage({
+      created_at:   row.created_at,
+      impact_count: impactResult.rows[0].total,
+      log_count:    logResult.rows[0].total,
+    });
+
     res.json({
       star_id:          row.star_id,
       star_name:        row.star_name,
@@ -651,9 +670,13 @@ router.get('/stars/:id', async (req, res) => {
         code:    row.galaxy_code,
         name_ko: row.galaxy_name_ko,
       },
-      constellation: null,
-      star_stage:    row.star_stage,
-      created_at:    row.created_at,
+      constellation:  null,
+      star_stage:     row.star_stage,
+      created_at:     row.created_at,
+      // 성장 단계 (계산형)
+      growth_stage:   growthStage.stage,
+      growth_days:    growthStage.days,
+      growth_message: growthStage.message,
     });
 
   } catch (err) {
