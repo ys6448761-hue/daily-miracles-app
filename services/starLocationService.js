@@ -16,12 +16,17 @@
  *   slot 충돌 → linear probing (DB UNIQUE 제약 준수)
  */
 
-const ZONES = [
-  'S-1', 'S-2', 'S-3',
-  'W-1', 'W-2', 'W-3',
-  'N-1', 'N-2', 'N-3',
-  'E-1', 'E-2', 'E-3',
-];
+// Zone 목록은 DB에서 읽는다 (원칙 1/2: 코드 내 하드코딩 금지, 활성 zone 수 기준)
+// star_zones에 is_active 컬럼이 생기면 WHERE is_active = true로 전환
+async function getActiveZones(db) {
+  const result = await db.query(
+    'SELECT zone_code FROM star_zones ORDER BY zone_code'
+  );
+  if (result.rowCount === 0) {
+    throw new Error('star_zones 데이터 없음 — migration 051 적용 필요');
+  }
+  return result.rows.map(r => r.zone_code);
+}
 
 /**
  * UUID 문자열 → 부호 없는 32비트 정수 해시 (djb2 변형)
@@ -53,8 +58,9 @@ function hashWishId(wishId) {
 async function assignStarLocation(db, { starId, wishId }) {
   const hash = hashWishId(wishId);
 
-  // 1. zone 결정
-  const zoneCode = ZONES[hash % ZONES.length];
+  // 1. 활성 zone 목록 조회 (DB SSOT — 하드코딩 금지)
+  const zones = await getActiveZones(db);
+  const zoneCode = zones[hash % zones.length];
 
   // 2. zone 중심 좌표 조회
   const zoneResult = await db.query(
