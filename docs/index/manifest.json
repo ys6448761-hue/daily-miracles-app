@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-04-06T00:06:48.696Z",
+  "generated_at": "2026-04-06T01:21:37.823Z",
   "generator": "generate-manifest.js",
-  "total_count": 251,
+  "total_count": 252,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2153,6 +2153,24 @@
       "title": "DreamTown Safety & Ethics SSOT",
       "created_at": "2026-04-06",
       "checksum": "cad30bd9"
+    },
+    {
+      "id": "DOC-DreamTown_Star_Experience_Prin",
+      "path": "docs/ssot/core/DreamTown_Star_Experience_Principle_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "core",
+        "소원",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "DreamTown Star Experience Principle SSOT",
+      "created_at": "2026-04-06",
+      "checksum": "9267b256"
     },
     {
       "id": "DOC-DreamTown_Universe_Bible",
