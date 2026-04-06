@@ -6,7 +6,7 @@
 import { gaDtShareSuccess } from './gtag';
 
 const DREAMTOWN_URL = 'https://app.dailymiracles.kr/dreamtown?entry=invite';
-const OG_IMAGE_URL  = 'https://app.dailymiracles.kr/images/dreamtown-og.jpg';
+const OG_IMAGE_URL  = 'https://app.dailymiracles.kr/images/dreamtown-og-v4.jpg';
 
 function initKakao() {
   if (!window.Kakao) return false;
