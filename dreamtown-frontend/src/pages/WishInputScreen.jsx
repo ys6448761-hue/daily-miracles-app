@@ -120,15 +120,16 @@ export default function WishInputScreen({ onBack }) {
       });
       saveStarId(star.star_id);
 
-      nav('/star-birth', {
-        state: {
-          starId:   star.star_id,
-          starName: star.star_name,
-          galaxy:   star.galaxy,
-          gemType:  'sapphire',
-          wishText: trimmed,
-        },
-      });
+      const starBirthState = {
+        starId:   star.star_id,
+        starName: star.star_name,
+        galaxy:   star.galaxy,
+        gemType:  'sapphire',
+        wishText: trimmed,
+      };
+      try { sessionStorage.setItem('dt_recent_star', JSON.stringify(starBirthState)); } catch (_) {}
+
+      nav('/star-birth', { state: starBirthState });
     } catch (e) {
       setError(e.message || '잠시 후 다시 시도해주세요.');
     } finally {

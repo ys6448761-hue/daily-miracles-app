@@ -4,7 +4,7 @@
  * Phase 1  (0 → 0.8s)   wishText glow 표시 + 배경 파티클
  * Phase 2  (0.8 → 1.8s) 텍스트 blur 분해 → 중앙 ✦ flash 등장 + 배경 이미지 fade-in
  * Phase 3  (1.8 → 3.5s) "당신의 소원이 별이 되었어요 ✨" + wishText 재표시
- * CTA      (2.3s~)       공유하기 / 나중에 — delay 0.5s 자연 노출, 강제 이동 없음
+ * CTA      (2.3s~)       첫 항해 시작(primary) / 이 순간 간직하기(secondary) — delay 0.5s 자연 노출
  */
 
 import { useState, useEffect } from 'react';
@@ -82,32 +82,37 @@ const STYLE = `
   .sb-share-feedback { animation: sb-share-feedback 1.8s ease forwards; }
 `;
 
+// ── sessionStorage 복원 헬퍼 ──────────────────────────────────────
+const RECENT_STAR_KEY = 'dt_recent_star';
+
+function loadRecentStar() {
+  try {
+    const raw = sessionStorage.getItem(RECENT_STAR_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed?.starId ? parsed : null;
+  } catch (_) { return null; }
+}
+
 export default function StarBirth() {
   const nav          = useNavigate();
   const { state }    = useLocation();
 
-  const starId   = state?.starId;
-  const starName = state?.starName  || '나의 별';
-  const galaxy   = state?.galaxy    ?? null;
-  const gemType  = state?.gemType   ?? null;
-  const wishText = state?.wishText  ?? '';
+  // 복원 우선순위: location.state → sessionStorage → fallback
+  const resolved = (state?.starId ? state : null) ?? loadRecentStar();
+
+  const starId        = resolved?.starId        ?? null;
+  const starName      = resolved?.starName      ?? '나의 별';
+  const galaxy        = resolved?.galaxy        ?? null;
+  const gemType       = resolved?.gemType       ?? null;
+  const wishText      = resolved?.wishText      ?? '';
+  // galaxyDisplay: 항해(voyage) 등 외부 유입 시 '북은하' 등 커스텀 노출 가능
+  const galaxyDisplay = resolved?.galaxyDisplay ?? null;
 
   // phase: 1 → 2 → 3 → 'done'
   const [phase,        setPhase]        = useState(1);
   const [showCTA,      setShowCTA]      = useState(false);
   const [shareFeedback, setShareFeedback] = useState(0); // 공유 피드백 animation key (0=미노출)
-
-  // ── 필수 데이터 없으면 흐름 복구 ─────────────────────────
-  useEffect(() => {
-    if (!starId) {
-      const saved = readSavedStar();
-      if (saved) {
-        nav(`/my-star/${saved}`, { replace: true });
-      } else {
-        nav('/wish/select', { replace: true });
-      }
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── 타임라인 ────────────────────────────────────────────
   useEffect(() => {
@@ -133,8 +138,13 @@ export default function StarBirth() {
     nav('/day', { state: { direction, message, starId, isFirstVoyage: true }, replace: true });
   }
 
-  // 리다이렉트 진행 중 — 빈 화면 유지 (flash 방지)
-  if (!starId) return null;
+  // starId 없음 — state + sessionStorage 모두 유실
+  // 기존 별 있으면 my-star로, 없으면 wish/select로 자연 이동 (막힌 화면 없음)
+  if (!starId) {
+    const saved = readSavedStar();
+    nav(saved ? `/my-star/${saved}` : '/wish/select', { replace: true });
+    return null;
+  }
 
   const isDone      = phase === 'done';
   const bgVisible   = phase === 2 || phase === 3 || isDone;
@@ -295,7 +305,7 @@ export default function StarBirth() {
               </p>
               {galaxy && (
                 <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginBottom: 20 }}>
-                  {GALAXY_LABEL[galaxy] ?? galaxy} · D+1
+                  {galaxyDisplay ?? GALAXY_LABEL[galaxy] ?? galaxy} · D+1
                 </p>
               )}
 
@@ -329,31 +339,9 @@ export default function StarBirth() {
               transition={{ duration: 0.5, ease: 'easeOut' }}
               style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
             >
-              {/* 공유 성공 피드백 — inline, 1.8s 자동 소멸 */}
-              {shareFeedback && (
-                <p
-                  key={shareFeedback}
-                  className="sb-share-feedback"
-                  style={{
-                    fontSize: 13,
-                    color: 'rgba(255,215,106,0.82)',
-                    textAlign: 'center',
-                    marginBottom: 2,
-                    pointerEvents: 'none',
-                  }}
-                >
-                  이 별이 누군가에게 닿을 수 있어요 ✨
-                </p>
-              )}
-
-              {/* PRIMARY: 공유하기 (A안) */}
+              {/* PRIMARY: 첫 항해 시작 */}
               <button
-                onClick={() => {
-                  gaDtShareClick({ starId, location: 'star_birth' });
-                  shareStarBirth({ starId, starName, wishText });
-                  // 공유 성공 피드백 — key 변경으로 animation 재실행
-                  setShareFeedback(k => (k || 0) + 1);
-                }}
+                onClick={handleVoyage}
                 style={{
                   width: '100%',
                   padding: '16px 0',
@@ -368,26 +356,47 @@ export default function StarBirth() {
                   letterSpacing: '0.01em',
                 }}
               >
-                이 순간을 남겨보세요 ✨
+                지금 항해 시작하기 ✨
               </button>
 
-              {/* SECONDARY: 나중에 → 첫 항해 */}
+              {/* SECONDARY: 공유 — 보조 행동 */}
               <button
-                onClick={handleVoyage}
+                onClick={() => {
+                  gaDtShareClick({ starId, location: 'star_birth' });
+                  shareStarBirth({ starId, starName, wishText });
+                  setShareFeedback(k => (k || 0) + 1);
+                }}
                 style={{
                   width: '100%',
                   padding: '13px 0',
                   borderRadius: 9999,
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  color: 'rgba(255,255,255,0.48)',
+                  background: 'transparent',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  color: 'rgba(255,255,255,0.45)',
                   fontSize: 14,
                   cursor: 'pointer',
                   letterSpacing: '0.01em',
                 }}
               >
-                나중에 · 첫 항해 시작하기 ✦
+                이 순간 간직하기
               </button>
+
+              {/* 공유 성공 피드백 — inline, 1.8s 자동 소멸 */}
+              {shareFeedback && (
+                <p
+                  key={shareFeedback}
+                  className="sb-share-feedback"
+                  style={{
+                    fontSize: 12,
+                    color: 'rgba(255,255,255,0.4)',
+                    textAlign: 'center',
+                    marginTop: -4,
+                    pointerEvents: 'none',
+                  }}
+                >
+                  이 별이 누군가에게 닿을 수 있어요
+                </p>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

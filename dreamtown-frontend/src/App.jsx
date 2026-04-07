@@ -24,6 +24,11 @@ import StoryDraftMVP from './pages/StoryDraftMVP.jsx';
 import WishSelect from './pages/WishSelect.jsx';
 import WishInputScreen from './pages/WishInputScreen.jsx';
 import JourneySceneEngine from './components/JourneySceneEngine.jsx';
+import VoyageWish from './pages/VoyageWish.jsx';
+import VoyageBooking from './pages/VoyageBooking.jsx';
+import VoyageStatus from './pages/VoyageStatus.jsx';
+import VoyageReflection from './pages/VoyageReflection.jsx';
+import VoyagePaymentReturn from './pages/VoyagePaymentReturn.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
 if (window.location.pathname.startsWith('//')) {
@@ -64,7 +69,13 @@ export default function App() {
           <Route path="/dashboard"               element={<DashboardPage />} />
           <Route path="/stars"                   element={<AllStars />} />
           <Route path="/dreamtown/gift/:star_id" element={<GiftLanding />} />
-          <Route path="*"                        element={<Navigate to="/" replace />} />
+          {/* 북은하 항해 MVP */}
+          <Route path="/voyage"                    element={<VoyageWish />} />
+          <Route path="/voyage/booking"            element={<VoyageBooking />} />
+          <Route path="/voyage/payment/result"     element={<VoyagePaymentReturn />} />
+          <Route path="/voyage/:id"                element={<VoyageStatus />} />
+          <Route path="/voyage/:id/reflection"     element={<VoyageReflection />} />
+          <Route path="*"                          element={<Navigate to="/" replace />} />
         </Routes>
       </div>
     </BrowserRouter>

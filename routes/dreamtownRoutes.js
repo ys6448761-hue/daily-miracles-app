@@ -191,6 +191,98 @@ router.post('/wishes', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
+// POST /api/dt/wishes/with-star — 소원 + 별 동시 생성
+// 입력: { user_id, content, gem_type }
+// 출력: { wish: {...}, star: {...} }
+// ─────────────────────────────────────────────
+router.post('/wishes/with-star', async (req, res) => {
+  try {
+    const { user_id, content, gem_type } = req.body;
+    const wish_text = content; // 요청 카드 필드명 매핑
+
+    if (!user_id || !wish_text || !gem_type) {
+      return res.status(400).json({ error: 'user_id, content, gem_type 필수' });
+    }
+
+    const validGems = ['ruby', 'sapphire', 'emerald', 'diamond', 'citrine'];
+    if (!validGems.includes(gem_type.toLowerCase())) {
+      return res.status(400).json({ error: `gem_type은 ${validGems.join('/')} 중 하나여야 합니다` });
+    }
+
+    // 안전 필터
+    const safety = classifyWish(wish_text);
+    if (safety.level === 'RED') {
+      notifyRedSignal('dreamtown', wish_text, safety.reason).catch(() => {});
+      return res.status(200).json({
+        ok: false,
+        safety: 'RED',
+        care_message: '지금 많이 힘드신가요? 이 소원은 별로 만들어지지 않았어요.',
+      });
+    }
+
+    // user 없으면 자동 생성
+    const userCheck = await db.query('SELECT id FROM dt_users WHERE id = $1', [user_id]);
+    if (userCheck.rowCount === 0) {
+      await db.query('INSERT INTO dt_users (id, nickname) VALUES ($1, $2)', [user_id, 'Guest']);
+    }
+
+    // 소원 생성
+    const wishResult = await db.query(
+      `INSERT INTO dt_wishes (user_id, wish_text, gem_type, status, safety_level)
+       VALUES ($1, $2, $3, 'submitted', $4)
+       RETURNING id, wish_text, gem_type, status, safety_level, created_at`,
+      [user_id, wish_text, gem_type.toLowerCase(), safety.level]
+    );
+    const wish = wishResult.rows[0];
+
+    // galaxy 분류
+    const galaxyCode = GEM_GALAXY_MAP[wish.gem_type] || 'growth';
+    const galaxyResult = await db.query(
+      'SELECT id, code FROM dt_galaxies WHERE code = $1',
+      [galaxyCode]
+    );
+    if (galaxyResult.rowCount === 0) {
+      return res.status(500).json({ error: '은하 데이터 없음 — seed 데이터를 확인하세요' });
+    }
+    const galaxy = galaxyResult.rows[0];
+
+    // star_seed + star 생성
+    const seedResult = await db.query(
+      `INSERT INTO dt_star_seeds (wish_id, seed_name, seed_state)
+       VALUES ($1, $2, 'promoted') RETURNING id`,
+      [wish.id, `${wish_text.slice(0, 10)} 씨앗`]
+    );
+
+    const starName = await makeStarName(wish.id, db);
+    const emotionTag = getEmotionTag(wish_text);
+    const isHidden = safety.level === 'YELLOW';
+
+    const starResult = await db.query(
+      `INSERT INTO dt_stars
+         (user_id, wish_id, star_seed_id, star_name, star_slug, galaxy_id, star_stage, is_hidden, emotion_tag)
+       VALUES ($1, $2, $3, $4, $5, $6, 'day1', $7, $8)
+       RETURNING id, star_name, star_slug, star_stage, wish_id, created_at`,
+      [user_id, wish.id, seedResult.rows[0].id, starName, `star-${Date.now()}`, galaxy.id, isHidden, emotionTag]
+    );
+    const star = starResult.rows[0];
+
+    // 위치 할당 (fire-and-forget)
+    createStarLocation(db, star.id, wish.id).catch(e =>
+      console.error('[DT] with-star location 실패:', e.message)
+    );
+
+    // wish status 업데이트
+    await db.query("UPDATE dt_wishes SET status = 'converted_to_star' WHERE id = $1", [wish.id]);
+
+    res.status(201).json({ wish, star });
+
+  } catch (err) {
+    console.error('[DT] POST /wishes/with-star error:', err.message);
+    res.status(500).json({ error: 'Internal server error', detail: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────
 // POST /api/dt/stars/create — 별 생성
 // ─────────────────────────────────────────────
 router.post('/stars/create', async (req, res) => {
@@ -365,6 +457,27 @@ router.post('/stars/create', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
+// 공명 레벨 계산 헬퍼 (SSOT: 계산 레이어)
+// count 0 → level 0 / 1 → 1 / 2~4 → 2 / 5+ → 3
+// ─────────────────────────────────────────────
+function getResonanceLevel(count) {
+  if (count === 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 4)  return 2;
+  return 3;
+}
+
+function getResonanceLabel(level) {
+  const LABELS = {
+    0: '첫 마음을 기다리고 있어요',
+    1: '첫 공명이 닿았어요',
+    2: '공명이 쌓이고 있어요',
+    3: '세 번의 공명이 이 별을 밝혔어요',
+  };
+  return LABELS[level] ?? LABELS[0];
+}
+
+// ─────────────────────────────────────────────
 // POST /api/dt/resonance — 기적나눔 / 지혜나눔
 // Body: { starId, type: "miracle"|"wisdom" }
 // ─────────────────────────────────────────────
@@ -392,6 +505,69 @@ router.post('/resonance', async (req, res) => {
       [starId, type]
     );
 
+    // 레벨업 감지 — resonance_count 컬럼 미적용 환경 graceful (42703 방어)
+    let prevCount = 0;
+    try {
+      const prevStar = await db.query(
+        'SELECT resonance_count FROM dt_stars WHERE id = $1',
+        [starId]
+      );
+      prevCount = parseInt(prevStar.rows[0]?.resonance_count ?? 0, 10);
+    } catch (colErr) {
+      if (colErr.code !== '42703') throw colErr; // 컬럼 없음 외 에러는 전파
+      // 42703: resonance_count 컬럼 미존재 → 레벨업 감지 건너뜀, 서비스 유지
+      console.warn('[DT] resonance_count column missing, level detection skipped');
+    }
+    const prevLevel = getResonanceLevel(prevCount);
+
+    // dt_stars.resonance_count 누적 + star_logs 기록 (constellation 선구축)
+    // 42703 graceful: 컬럼 없으면 업데이트 건너뜀 (impact 저장은 이미 완료)
+    try {
+      await db.query(
+        `UPDATE dt_stars
+            SET resonance_count   = resonance_count + 1,
+                last_resonated_at = NOW()
+          WHERE id = $1`,
+        [starId]
+      );
+    } catch (colErr) {
+      if (colErr.code !== '42703') throw colErr;
+      console.warn('[DT] resonance_count update skipped (column missing)');
+    }
+
+    // star_logs 기록 (42703 또는 star_logs 미존재 방어)
+    try {
+      await db.query(
+        `INSERT INTO star_logs (star_id, action_type) VALUES ($1, 'resonance')`,
+        [starId]
+      );
+    } catch (logErr) {
+      console.warn('[DT] star_logs insert skipped:', logErr.message);
+    }
+
+    // 레벨업 여부 확인 및 로그 (마이그 058 미적용 환경 graceful)
+    const newCount = prevCount + 1;
+    const newLevel = getResonanceLevel(newCount);
+    if (newLevel > prevLevel) {
+      const requestId = crypto.randomUUID();
+      try {
+        await db.query(
+          `INSERT INTO star_logs (star_id, action_type, payload)
+           VALUES ($1, 'star_resonance_level_up', $2::jsonb)`,
+          [starId, JSON.stringify({
+            star_id:         starId,
+            previous_level:  prevLevel,
+            new_level:       newLevel,
+            resonance_count: newCount,
+            request_id:      requestId,
+            timestamp:       new Date().toISOString(),
+          })]
+        );
+      } catch (logErr) {
+        console.warn('[DT] level_up log skipped (migration pending?):', logErr.message);
+      }
+    }
+
     // 최신 카운트 반환
     const counts = await db.query(
       `SELECT impact_type, count FROM impact
@@ -404,7 +580,14 @@ router.post('/resonance', async (req, res) => {
       if (row.impact_type === 'wisdom')  result.wisdomCount  = row.count;
     }
 
-    res.json({ ok: true, ...result });
+    res.json({
+      ok: true,
+      ...result,
+      resonance_count: newCount,
+      resonance_level: newLevel,
+      resonance_label: getResonanceLabel(newLevel),
+      level_up: newLevel > prevLevel,
+    });
   } catch (err) {
     console.error('[DT] POST /resonance error:', err.message);
     res.status(500).json({ error: 'Internal server error' });
@@ -503,10 +686,15 @@ router.get('/stars/featured', async (req, res) => {
                  g.code        AS galaxy_code,
                  g.name_ko     AS galaxy_name_ko,
                  COALESCE(SUM(i.count), 0)::int AS resonance_count,
-                 MAX(i.updated_at)               AS latest_resonated_at
+                 MAX(i.updated_at)               AS latest_resonated_at,
+                 COALESCE(COUNT(sl.id) FILTER (
+                   WHERE sl.action_type = 'resonance'
+                     AND sl.created_at >= NOW() - INTERVAL '24 hours'
+                 ), 0)::int AS recent_growth
             FROM dt_stars   s
             JOIN dt_galaxies g ON g.id = s.galaxy_id
-            LEFT JOIN impact i ON i.star_id = s.id::text
+            LEFT JOIN impact    i  ON i.star_id  = s.id::text
+            LEFT JOIN star_logs sl ON sl.star_id = s.id
            WHERE s.is_hidden = FALSE
            GROUP BY s.id, s.star_name, s.created_at, g.code, g.name_ko
           HAVING COALESCE(SUM(i.count), 0) > 0
@@ -514,7 +702,8 @@ router.get('/stars/featured', async (req, res) => {
         windowed AS (
           SELECT *,
             ROW_NUMBER() OVER (
-              ORDER BY resonance_count DESC, latest_resonated_at DESC NULLS LAST
+              ORDER BY (resonance_count * 0.7 + recent_growth * 1.5) DESC,
+                       latest_resonated_at DESC NULLS LAST
             ) AS rn,
             COUNT(*) OVER () AS total_count
           FROM scored
@@ -801,13 +990,14 @@ router.get('/galaxies/:code/stars', async (req, res) => {
 
 // ─────────────────────────────────────────────
 // POST /api/dt/stars/:id/growth-log — 성장 기록 저장
-// Body: { user_id, text }
+// Body: { user_id, text } — 기존
+//       { user_id, text, day_type, emotion_tag, help_tag, growth_message } — 구조화 확장 (migration 060)
 // CASE 2: resonance_received 이후 owner 성장 기록 → connection_completed
 // ─────────────────────────────────────────────
 router.post('/stars/:id/growth-log', async (req, res) => {
   try {
     const starId  = req.params.id;
-    const { user_id, text } = req.body;
+    const { user_id, text, day_type, emotion_tag, help_tag, growth_message } = req.body;
 
     if (!user_id || !text?.trim()) {
       return res.status(400).json({ error: 'user_id, text 필수' });
@@ -840,6 +1030,32 @@ router.post('/stars/:id/growth-log', async (req, res) => {
       [text.trim(), starId]
     );
 
+    // star_logs 기록 (constellation 선구축)
+    await db.query(
+      `INSERT INTO star_logs (star_id, action_type) VALUES ($1, 'record')`,
+      [starId]
+    );
+
+    // ── growth_logs 구조화 기록 (migration 060, day_type 있을 때만) ──
+    let growthLog = null;
+    if (day_type != null) {
+      try {
+        const glResult = await db.query(
+          `INSERT INTO growth_logs (star_id, day_type, emotion_tag, help_tag, growth_message)
+           VALUES ($1, $2, $3, $4, $5)
+           RETURNING id, star_id, day_type, emotion_tag, help_tag, growth_message, created_at`,
+          [starId, day_type, emotion_tag ?? null, help_tag ?? null, growth_message ?? text.trim()]
+        );
+        growthLog = glResult.rows[0];
+      } catch (glErr) {
+        if (glErr.code === '42P01') {
+          console.warn('[DT] growth_logs 테이블 없음 — migration 060 미적용');
+        } else {
+          throw glErr;
+        }
+      }
+    }
+
     // ── KPI: growth_logged ───────────────────────────────────────
     emitKpiEvent({
       eventName:  KPI_EVENTS.GROWTH_LOGGED,
@@ -871,7 +1087,7 @@ router.post('/stars/:id/growth-log', async (req, res) => {
       }).catch(() => {});
     }
 
-    res.json({ ok: true });
+    res.json({ ok: true, ...(growthLog && { growth_log: growthLog }) });
 
   } catch (err) {
     console.error('[DT] POST /stars/:id/growth-log error:', err.message);
@@ -1390,9 +1606,721 @@ router.get('/stars/:id/detail', async (req, res) => {
       today_aurora5_day:     todaySchedule?.day_number ?? null,
       latest_voyage_log:     latestLog,
       resonance_count:       resonanceCount,
+      resonance_level:       getResonanceLevel(resonanceCount),
+      resonance_label:       getResonanceLabel(getResonanceLevel(resonanceCount)),
     });
   } catch (err) {
     console.error('[DT] GET /stars/:id/detail error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
+// 은하 전환 신호 계산 (내부 헬퍼)
+// emotion / help_tag → galaxy score → signal
+// 히스테리시스: 최근 5건만 사용
+// ─────────────────────────────────────────────
+const GALAXY_EMOTION_MAP = {
+  '용기':        'challenge',
+  '해보고싶다':  'challenge',
+  '해보고 싶다': 'challenge',
+  '정리됨':      'growth',
+  '깨달음':      'growth',
+  '따뜻함':      'relationship',
+  '연결됨':      'relationship',
+  '힘듦':        'healing',
+  '위로':        'healing',
+  '놓임':        'healing',
+};
+const GALAXY_HELP_MAP = {
+  '실행': 'challenge',
+  '결심': 'growth',
+  '연결': 'relationship',
+  '위로': 'healing',
+  '쉼':   'healing',
+};
+const GALAXY_FLOW_MESSAGES = {
+  challenge:    '요즘 무언가 시도하는 흐름이에요',
+  growth:       '요즘 뭔가 정리되는 흐름이에요',
+  relationship: '요즘 따뜻한 연결의 흐름이에요',
+  healing:      '요즘 마음이 조금 놓이고 있는 흐름이에요',
+};
+// 우선순위: healing → growth → challenge → relationship
+const GALAXY_PRIORITY = ['healing', 'growth', 'challenge', 'relationship'];
+
+function calcGalaxySignal(logs) {
+  const MIN_LOGS = 3;
+  const THRESHOLD = 0.4;
+
+  if (!logs || logs.length < MIN_LOGS) return { signal: 'miracle', scores: {}, can_transition: false };
+
+  // 히스테리시스: 최근 5건만
+  const recent = logs.slice(-5);
+  const scores = { challenge: 0, growth: 0, relationship: 0, healing: 0 };
+
+  for (const log of recent) {
+    const eg = GALAXY_EMOTION_MAP[log.emotion?.trim()] ?? null;
+    const hg = GALAXY_HELP_MAP[log.help_type?.trim()] ?? null;
+    if (eg) scores[eg] += 1;
+    if (hg) scores[hg] += 1;
+  }
+
+  const total = Object.values(scores).reduce((s, v) => s + v, 0);
+  if (total === 0) return { signal: 'miracle', scores, can_transition: false };
+
+  const ratios = {};
+  for (const [g, v] of Object.entries(scores)) ratios[g] = v / total;
+
+  // 우선순위 순으로 임계치 체크 + 혼합 상태 보호 (2개 은하가 각각 35% 이상이면 유지)
+  const overThreshold = GALAXY_PRIORITY.filter(g => ratios[g] >= THRESHOLD);
+  const signal = overThreshold.length === 1 ? overThreshold[0] : 'miracle';
+
+  return { signal, scores, ratios, can_transition: signal !== 'miracle' };
+}
+
+// ─────────────────────────────────────────────
+// GET /api/dt/stars/:id/galaxy-signal — 은하 전환 신호 조회 (읽기 전용)
+// 출력: { signal, can_transition, flow_message, scores, ratios }
+// ─────────────────────────────────────────────
+router.get('/stars/:id/galaxy-signal', async (req, res) => {
+  try {
+    const starId = req.params.id;
+
+    const starCheck = await db.query('SELECT id FROM dt_stars WHERE id = $1', [starId]);
+    if (starCheck.rowCount === 0) return res.status(404).json({ error: '별을 찾을 수 없습니다' });
+
+    const logsResult = await db.query(
+      `SELECT emotion, help_type FROM journey_logs
+        WHERE journey_id IN (
+          SELECT id::text FROM journeys WHERE user_id = (
+            SELECT user_id::text FROM dt_stars WHERE id = $1
+          )
+        )
+        ORDER BY created_at ASC`,
+      [starId]
+    );
+
+    const { signal, scores, ratios, can_transition } = calcGalaxySignal(logsResult.rows);
+
+    res.json({
+      signal,
+      can_transition,
+      flow_message: can_transition ? GALAXY_FLOW_MESSAGES[signal] : null,
+      scores,
+      ratios,
+      log_count: logsResult.rows.length,
+    });
+
+  } catch (err) {
+    if (err.code === '42P01') return res.status(503).json({ error: 'journey_logs 또는 journeys 테이블 미적용' });
+    console.error('[DT] GET /stars/:id/galaxy-signal error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
+// POST /api/dt/stars/:id/galaxy-signal/apply — 은하 전환 실제 적용
+// can_transition=true일 때만 galaxy_id 업데이트
+// 출력: { applied, signal, previous_galaxy, new_galaxy }
+// ─────────────────────────────────────────────
+router.post('/stars/:id/galaxy-signal/apply', async (req, res) => {
+  try {
+    const starId = req.params.id;
+    const { user_id } = req.body;
+
+    if (!user_id) return res.status(400).json({ error: 'user_id 필수' });
+
+    // 소유자 확인
+    const starResult = await db.query(
+      `SELECT s.id, s.user_id, s.galaxy_id, g.code AS galaxy_code
+         FROM dt_stars s
+         JOIN dt_galaxies g ON g.id = s.galaxy_id
+        WHERE s.id = $1`,
+      [starId]
+    );
+    if (starResult.rowCount === 0) return res.status(404).json({ error: '별을 찾을 수 없습니다' });
+    if (starResult.rows[0].user_id !== user_id) return res.status(403).json({ error: '본인의 별만 변경할 수 있습니다' });
+
+    const star = starResult.rows[0];
+
+    // 신호 계산
+    const logsResult = await db.query(
+      `SELECT emotion, help_type FROM journey_logs
+        WHERE journey_id IN (SELECT id::text FROM journeys WHERE user_id = $1)
+        ORDER BY created_at ASC`,
+      [user_id]
+    );
+    const { signal, can_transition } = calcGalaxySignal(logsResult.rows);
+
+    if (!can_transition) {
+      return res.json({ applied: false, signal: 'miracle', reason: '아직 패턴이 형성되지 않았어요' });
+    }
+
+    if (star.galaxy_code === signal) {
+      return res.json({ applied: false, signal, reason: '이미 같은 흐름 위에 있어요' });
+    }
+
+    // galaxy_id 조회 후 업데이트
+    const galaxyRow = await db.query('SELECT id FROM dt_galaxies WHERE code = $1', [signal]);
+    if (galaxyRow.rowCount === 0) return res.status(500).json({ error: '은하 데이터 없음' });
+
+    await db.query('UPDATE dt_stars SET galaxy_id = $1 WHERE id = $2', [galaxyRow.rows[0].id, starId]);
+
+    res.json({
+      applied:          true,
+      signal,
+      flow_message:     GALAXY_FLOW_MESSAGES[signal],
+      previous_galaxy:  star.galaxy_code,
+      new_galaxy:       signal,
+    });
+
+  } catch (err) {
+    if (err.code === '42P01') return res.status(503).json({ error: 'journey_logs 또는 journeys 테이블 미적용' });
+    console.error('[DT] POST /stars/:id/galaxy-signal/apply error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
+// 은하별 추천 항로 매핑 (route_catalog에 없는 코드는 조회 시 자동 제외)
+// ─────────────────────────────────────────────
+const GALAXY_ROUTE_MAP = {
+  healing:      { primary: 'yeosu_healing',    secondary: 'daily_basic',         reason: '요즘 마음을 조금 놓는 흐름이에요\n가볍게 하루를 기록해보는 것도 좋아요' },
+  challenge:    { primary: 'north_challenge_core', secondary: 'yeosu_activity',  reason: '지금은 뭔가 해보고 싶은 흐름이에요\n작은 실행부터 시작해볼 수 있어요' },
+  growth:       { primary: 'yeosu_reflection', secondary: 'daily_basic',         reason: '요즘 뭔가 정리되는 흐름이에요\n기록하면서 조금 또렷해질 수 있어요' },
+  relationship: { primary: 'yeosu_social',     secondary: 'miracle_intro_route', reason: '요즘 따뜻한 연결이 느껴지는 흐름이에요\n함께하는 경험이 잘 맞을 것 같아요' },
+  miracle:      { primary: 'miracle_intro_route', secondary: 'daily_basic',      reason: '일단 시작해보는 것만으로 충분해요\n작은 첫 걸음부터 함께해요' },
+};
+
+// ─────────────────────────────────────────────
+// entry_mode 판단 헬퍼
+// auto  : 명확한 단일 신호 (비율 ≥ 60%) + journey 이력 있음
+// choose: miracle / 첫 사용자 / 비율 40~60% / miracle 계열 primary
+// ─────────────────────────────────────────────
+const MIRACLE_ROUTE_CODES = new Set(['miracle_intro_route', 'daily_basic']);
+const AUTO_THRESHOLD = 0.6;
+
+function calcEntryMode({ signal, ratios, journeyCount, primaryCode }) {
+  if (signal === 'miracle')                        return { mode: 'choose', reason_code: 'no_signal' };
+  if (journeyCount === 0)                          return { mode: 'choose', reason_code: 'first_user' };
+  if (MIRACLE_ROUTE_CODES.has(primaryCode))        return { mode: 'choose', reason_code: 'miracle_route' };
+  if ((ratios?.[signal] ?? 0) >= AUTO_THRESHOLD)  return { mode: 'auto',   reason_code: 'strong_signal' };
+  return { mode: 'choose', reason_code: 'weak_signal' };
+}
+
+const ENTRY_MODE_MESSAGES = {
+  auto:   '지금 흐름에 자연스럽게 연결됩니다',
+  choose: '어떤 방향으로 시작할지 골라보세요',
+};
+
+// ─────────────────────────────────────────────
+// GET /api/dt/stars/:id/route-recommendation — 은하 기반 항로 추천
+// 출력: { signal, reason, entry_mode, entry_message, primary, secondary, routes }
+// ─────────────────────────────────────────────
+router.get('/stars/:id/route-recommendation', async (req, res) => {
+  try {
+    const starId = req.params.id;
+
+    const starResult = await db.query('SELECT id, user_id FROM dt_stars WHERE id = $1', [starId]);
+    if (starResult.rowCount === 0) return res.status(404).json({ error: '별을 찾을 수 없습니다' });
+
+    const userId = starResult.rows[0].user_id;
+
+    // 신호 계산 + journey 이력 수 (병렬)
+    let signal = 'miracle';
+    let ratios  = {};
+    let journeyCount = 0;
+
+    try {
+      const [logsResult, jCountResult] = await Promise.all([
+        db.query(
+          `SELECT emotion, help_type FROM journey_logs
+            WHERE journey_id IN (SELECT id::text FROM journeys WHERE user_id = $1)
+            ORDER BY created_at ASC`,
+          [userId]
+        ),
+        db.query('SELECT COUNT(*) AS cnt FROM journeys WHERE user_id = $1', [userId]),
+      ]);
+      const calc = calcGalaxySignal(logsResult.rows);
+      signal        = calc.signal;
+      ratios        = calc.ratios ?? {};
+      journeyCount  = parseInt(jCountResult.rows[0].cnt, 10);
+    } catch (_) { /* 테이블 미적용 시 miracle + choose */ }
+
+    const mapping     = GALAXY_ROUTE_MAP[signal] ?? GALAXY_ROUTE_MAP.miracle;
+    const { mode, reason_code } = calcEntryMode({
+      signal,
+      ratios,
+      journeyCount,
+      primaryCode: mapping.primary,
+    });
+
+    const candidateCodes = [mapping.primary, mapping.secondary].filter(Boolean);
+    const routeResult = await db.query(
+      `SELECT route_code, route_name, theme
+         FROM route_catalog
+        WHERE route_code = ANY($1) AND active = TRUE
+        ORDER BY array_position($1::text[], route_code)`,
+      [candidateCodes]
+    );
+
+    res.json({
+      signal,
+      reason:        mapping.reason,
+      entry_mode:    mode,                         // 'auto' | 'choose'
+      entry_message: ENTRY_MODE_MESSAGES[mode],
+      reason_code,                                 // 내부 디버그용
+      primary:       mapping.primary,
+      secondary:     mapping.secondary,
+      routes:        routeResult.rows,
+    });
+
+  } catch (err) {
+    if (err.code === '42P01') return res.status(503).json({ error: 'route_catalog 미적용 — migration 062 실행 필요' });
+    console.error('[DT] GET /stars/:id/route-recommendation error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
+// GET /api/dt/stars/:id/growth-summary — 별 성장 요약 집계
+// 출력: { total_logs, latest, top_emotion, top_help, growth_sentences, summary_line }
+// ─────────────────────────────────────────────
+router.get('/stars/:id/growth-summary', async (req, res) => {
+  try {
+    const starId = req.params.id;
+
+    // 별 존재 확인
+    const starCheck = await db.query('SELECT id FROM dt_stars WHERE id = $1', [starId]);
+    if (starCheck.rowCount === 0) {
+      return res.status(404).json({ error: '별을 찾을 수 없습니다' });
+    }
+
+    // 전체 집계
+    const aggResult = await db.query(
+      `SELECT
+         COUNT(*)                                              AS total_logs,
+         mode() WITHIN GROUP (ORDER BY emotion_tag)           AS top_emotion,
+         mode() WITHIN GROUP (ORDER BY help_tag)              AS top_help,
+         MIN(created_at)                                      AS first_log_at,
+         MAX(created_at)                                      AS last_log_at
+       FROM growth_logs
+       WHERE star_id = $1`,
+      [starId]
+    );
+    const agg = aggResult.rows[0];
+
+    // 최근 기록 1건
+    const latestResult = await db.query(
+      `SELECT day_type, emotion_tag, help_tag, growth_message, created_at
+         FROM growth_logs
+        WHERE star_id = $1
+        ORDER BY created_at DESC
+        LIMIT 1`,
+      [starId]
+    );
+
+    // 성장 문장 목록 (최대 5건, 최신순)
+    const sentencesResult = await db.query(
+      `SELECT growth_message, created_at
+         FROM growth_logs
+        WHERE star_id = $1 AND growth_message IS NOT NULL
+        ORDER BY created_at DESC
+        LIMIT 5`,
+      [starId]
+    );
+
+    const totalLogs = parseInt(agg.total_logs, 10);
+
+    // 대표 성장 문장 — 가장 긴 문장 선택 (내용이 많은 기록)
+    const summaryLine = sentencesResult.rows.reduce((best, row) =>
+      (row.growth_message?.length ?? 0) > (best?.length ?? 0) ? row.growth_message : best
+    , null);
+
+    res.json({
+      total_logs:       totalLogs,
+      first_log_at:     agg.first_log_at ?? null,
+      last_log_at:      agg.last_log_at  ?? null,
+      top_emotion:      agg.top_emotion  ?? null,
+      top_help:         agg.top_help     ?? null,
+      latest:           latestResult.rows[0] ?? null,
+      growth_sentences: sentencesResult.rows.map(r => r.growth_message),
+      summary_line:     summaryLine,
+    });
+
+  } catch (err) {
+    if (err.code === '42P01') {
+      return res.status(503).json({ error: 'growth_logs 테이블 미적용 — migration 060 실행 필요' });
+    }
+    console.error('[DT] GET /stars/:id/growth-summary error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
+// POST /api/dt/journeys/start — 항로 시작 (route_catalog 연결)
+// Body: { user_id, route_code }
+// 출력: { journey: { id, route_code, started_at, completed_at } }
+// ─────────────────────────────────────────────
+router.post('/journeys/start', async (req, res) => {
+  try {
+    const { user_id, route_code } = req.body;
+
+    if (!user_id || !route_code) {
+      return res.status(400).json({ error: 'user_id, route_code 필수' });
+    }
+
+    // route_code 유효성 확인
+    const routeCheck = await db.query(
+      'SELECT route_code FROM route_catalog WHERE route_code = $1 AND active = TRUE',
+      [route_code]
+    );
+    if (routeCheck.rowCount === 0) {
+      return res.status(404).json({ error: `존재하지 않는 route_code: ${route_code}` });
+    }
+
+    const result = await db.query(
+      `INSERT INTO journeys (user_id, route_code, status)
+       VALUES ($1, $2, 'STARTED')
+       RETURNING id, route_code, status, started_at, completed_at`,
+      [user_id, route_code]
+    );
+
+    res.status(201).json({ journey: result.rows[0] });
+
+  } catch (err) {
+    if (err.code === '42P01') {
+      console.warn('[DT] journeys 테이블 없음 — migration 064 미적용');
+      return res.status(503).json({ error: 'journeys 테이블 미적용 — psql $DATABASE_URL -f database/migrations/064_journeys_route_code.sql' });
+    }
+    console.error('[DT] POST /journeys/start error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
+// POST /api/dt/journey-logs — 항로 반응 저장 (플랫 URL)
+// Body: { journey_id, emotion, help_tag, growth_text }
+// 출력: { log: { id, journey_id, emotion, help_tag, growth_text, created_at } }
+// ─────────────────────────────────────────────
+router.post('/journey-logs', async (req, res) => {
+  try {
+    const { journey_id, emotion, help_tag, growth_text } = req.body;
+
+    if (!journey_id) {
+      return res.status(400).json({ error: 'journey_id 필수' });
+    }
+    if (!emotion && !help_tag && !growth_text) {
+      return res.status(400).json({ error: 'emotion, help_tag, growth_text 중 하나 이상 필요' });
+    }
+
+    // help_tag → help_type, growth_text → growth_line 으로 컬럼 매핑
+    const result = await db.query(
+      `INSERT INTO journey_logs (journey_id, emotion, help_type, growth_line)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, journey_id, emotion,
+                 help_type   AS help_tag,
+                 growth_line AS growth_text,
+                 created_at`,
+      [journey_id, emotion ?? null, help_tag ?? null, growth_text ?? null]
+    );
+
+    res.status(201).json({ log: result.rows[0] });
+
+  } catch (err) {
+    if (err.code === '42P01') {
+      return res.status(503).json({ error: 'journey_logs 테이블 미적용 — migration 061 실행 필요' });
+    }
+    console.error('[DT] POST /journey-logs error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
+// GET /api/dt/journey-logs?journey_id=... — 항로 반응 조회 (시간순)
+// 출력: { logs: [...] }
+// ─────────────────────────────────────────────
+router.get('/journey-logs', async (req, res) => {
+  try {
+    const { journey_id } = req.query;
+
+    if (!journey_id) {
+      return res.status(400).json({ error: 'journey_id 쿼리 파라미터 필수' });
+    }
+
+    const result = await db.query(
+      `SELECT id, journey_id, emotion,
+              help_type   AS help_tag,
+              growth_line AS growth_text,
+              created_at
+         FROM journey_logs
+        WHERE journey_id = $1
+        ORDER BY created_at ASC`,
+      [journey_id]
+    );
+
+    res.json({ logs: result.rows });
+
+  } catch (err) {
+    if (err.code === '42P01') {
+      return res.status(503).json({ error: 'journey_logs 테이블 미적용 — migration 061 실행 필요' });
+    }
+    console.error('[DT] GET /journey-logs error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
+// POST /api/dt/journeys/from-recommendation — 추천 항로 → journey 자동 생성
+// 중복 방지: user_id + status=STARTED 기준 기존 항로 있으면 재사용
+// Body: { user_id, route_code }
+// 출력: { journey: {...}, created: true|false }
+// ─────────────────────────────────────────────
+router.post('/journeys/from-recommendation', async (req, res) => {
+  try {
+    const { user_id, route_code } = req.body;
+
+    if (!user_id || !route_code) {
+      return res.status(400).json({ error: 'user_id, route_code 필수' });
+    }
+
+    // route_code 유효성 확인
+    const routeCheck = await db.query(
+      'SELECT route_code FROM route_catalog WHERE route_code = $1 AND active = TRUE',
+      [route_code]
+    );
+    if (routeCheck.rowCount === 0) {
+      return res.status(404).json({ error: `존재하지 않는 route_code: ${route_code}` });
+    }
+
+    // 중복 방지: 이미 STARTED 상태 journey 있으면 재사용
+    const existing = await db.query(
+      `SELECT id, route_code, status, started_at, completed_at
+         FROM journeys
+        WHERE user_id = $1 AND status = 'STARTED'
+        LIMIT 1`,
+      [user_id]
+    );
+    if (existing.rowCount > 0) {
+      return res.status(200).json({ journey: existing.rows[0], created: false });
+    }
+
+    // 신규 생성
+    const result = await db.query(
+      `INSERT INTO journeys (user_id, route_code, status)
+       VALUES ($1, $2, 'STARTED')
+       RETURNING id, route_code, status, started_at, completed_at`,
+      [user_id, route_code]
+    );
+
+    res.status(201).json({ journey: result.rows[0], created: true });
+
+  } catch (err) {
+    if (err.code === '42P01') {
+      console.warn('[DT] journeys 테이블 없음 — migration 064/065 미적용');
+      return res.status(503).json({ error: 'journeys 테이블 미적용 — migration 064, 065 실행 필요' });
+    }
+    console.error('[DT] POST /journeys/from-recommendation error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
+// POST /api/dt/journeys/:journeyId/log — 항로 로그 저장
+// Body: { emotion, help_type, growth_line }
+// 출력: { log: { id, journey_id, journeys_id, emotion, help_type, growth_line, created_at } }
+// ─────────────────────────────────────────────
+router.post('/journeys/:journeyId/log', async (req, res) => {
+  try {
+    const { journeyId } = req.params;
+    const { emotion, help_type, growth_line } = req.body;
+
+    if (!emotion && !help_type && !growth_line) {
+      return res.status(400).json({ error: 'emotion, help_type, growth_line 중 하나 이상 필요' });
+    }
+
+    // journeys 테이블에서 유효한 journey 확인 (migration 066 이후)
+    let journeysId = null;
+    try {
+      const jCheck = await db.query(
+        'SELECT id FROM journeys WHERE id = $1 AND status = $2',
+        [journeyId, 'STARTED']
+      );
+      if (jCheck.rowCount > 0) journeysId = journeyId;
+    } catch (_) { /* journeys 테이블 없으면 무시 */ }
+
+    const result = await db.query(
+      `INSERT INTO journey_logs (journey_id, journeys_id, emotion, help_type, growth_line)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id, journey_id, journeys_id, emotion, help_type, growth_line, created_at`,
+      [journeyId, journeysId, emotion ?? null, help_type ?? null, growth_line ?? null]
+    );
+
+    res.status(201).json({ log: result.rows[0] });
+
+  } catch (err) {
+    if (err.code === '42P01') {
+      console.warn('[DT] journey_logs 테이블 없음 — migration 061 미적용');
+      return res.status(503).json({ error: 'journey_logs 테이블 미적용 — psql $DATABASE_URL -f database/migrations/061_journey_logs.sql' });
+    }
+    if (err.code === '42703') {
+      // journeys_id 컬럼 없음 (migration 066 미적용) — 구 컬럼으로 재시도
+      try {
+        const { journeyId: jId } = req.params;
+        const { emotion, help_type, growth_line } = req.body;
+        const result = await db.query(
+          `INSERT INTO journey_logs (journey_id, emotion, help_type, growth_line)
+           VALUES ($1, $2, $3, $4)
+           RETURNING id, journey_id, emotion, help_type, growth_line, created_at`,
+          [jId, emotion ?? null, help_type ?? null, growth_line ?? null]
+        );
+        return res.status(201).json({ log: result.rows[0] });
+      } catch (retryErr) {
+        console.error('[DT] journey_log retry error:', retryErr.message);
+      }
+    }
+    console.error('[DT] POST /journeys/:journeyId/log error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
+// POST /api/dt/journeys/:journeyId/complete — 항로 완료 + 성장 데이터 변환
+// journey_logs 집계 → growth_logs 1건 기록 + journeys.status=COMPLETED
+// Body: { star_id, user_id }
+// 출력: { journey, growth_log }
+// ─────────────────────────────────────────────
+router.post('/journeys/:journeyId/complete', async (req, res) => {
+  try {
+    const { journeyId } = req.params;
+    const { star_id, user_id } = req.body;
+
+    if (!star_id || !user_id) {
+      return res.status(400).json({ error: 'star_id, user_id 필수' });
+    }
+
+    // journey 확인
+    const jResult = await db.query(
+      'SELECT id, route_code, status FROM journeys WHERE id = $1 AND user_id = $2',
+      [journeyId, user_id]
+    );
+    if (jResult.rowCount === 0) {
+      return res.status(404).json({ error: 'journey를 찾을 수 없습니다' });
+    }
+    if (jResult.rows[0].status === 'COMPLETED') {
+      return res.status(409).json({ error: '이미 완료된 journey입니다' });
+    }
+
+    // journey_logs 집계 (가장 많이 등장한 emotion / help_type)
+    const logsResult = await db.query(
+      `SELECT
+         mode() WITHIN GROUP (ORDER BY emotion)   AS top_emotion,
+         mode() WITHIN GROUP (ORDER BY help_type) AS top_help_type,
+         string_agg(growth_line, ' / ' ORDER BY created_at) AS growth_summary
+       FROM journey_logs
+       WHERE journey_id = $1 AND growth_line IS NOT NULL`,
+      [journeyId]
+    );
+    const agg = logsResult.rows[0];
+
+    // growth_logs 변환 기록
+    let growthLog = null;
+    try {
+      const glResult = await db.query(
+        `INSERT INTO growth_logs (star_id, day_type, emotion_tag, help_tag, growth_message)
+         VALUES ($1, 7, $2, $3, $4)
+         RETURNING id, star_id, day_type, emotion_tag, help_tag, growth_message, created_at`,
+        [star_id, agg.top_emotion ?? null, agg.top_help_type ?? null, agg.growth_summary ?? null]
+      );
+      growthLog = glResult.rows[0];
+    } catch (glErr) {
+      if (glErr.code !== '42P01') throw glErr;
+      console.warn('[DT] growth_logs 테이블 없음 — migration 060 미적용, 변환 건너뜀');
+    }
+
+    // journey 완료 처리
+    const completed = await db.query(
+      `UPDATE journeys SET status = 'COMPLETED', completed_at = NOW()
+       WHERE id = $1
+       RETURNING id, route_code, status, started_at, completed_at`,
+      [journeyId]
+    );
+
+    // K-지혜 — complete context 100% 노출
+    let wisdom = null;
+    try {
+      const wRow = await db.query(
+        `SELECT message FROM wisdom_pool w
+          JOIN journeys j ON j.id = $1
+          JOIN dt_galaxies g ON g.code = w.theme
+          WHERE w.active = TRUE
+          ORDER BY RANDOM() LIMIT 1`,
+        [journeyId]
+      );
+      if (wRow.rowCount > 0) wisdom = wRow.rows[0].message;
+    } catch (_) { /* wisdom_pool 미적용 무시 */ }
+
+    res.json({ journey: completed.rows[0], growth_log: growthLog, wisdom });
+
+  } catch (err) {
+    if (err.code === '42P01') {
+      return res.status(503).json({ error: 'journeys 테이블 미적용 — migration 064, 065 실행 필요' });
+    }
+    console.error('[DT] POST /journeys/:journeyId/complete error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
+// GET /api/dt/wisdom/recommend — 은하 기반 K-지혜 추천
+// Query: ?galaxy=healing  또는  ?star_id=uuid (star 기반 자동 감지)
+// 출력: { message, intro }  — 은하명/출처 노출 없음
+// ─────────────────────────────────────────────
+// context별 노출 확률
+const WISDOM_SHOW_PROB = { complete: 1.0, recommend: 0.5, star: 0.3 };
+
+router.get('/wisdom/recommend', async (req, res) => {
+  try {
+    const context = req.query.context ?? 'star'; // complete | recommend | star
+    const prob    = WISDOM_SHOW_PROB[context] ?? 0.3;
+    const show    = Math.random() < prob;
+
+    // show=false → 메시지 없이 즉시 반환 (complete는 항상 통과)
+    if (!show) return res.json({ show: false, context });
+
+    let galaxy = req.query.galaxy ?? null;
+
+    if (!galaxy && req.query.star_id) {
+      try {
+        const starRow = await db.query('SELECT user_id FROM dt_stars WHERE id = $1', [req.query.star_id]);
+        if (starRow.rowCount > 0) {
+          const logsResult = await db.query(
+            `SELECT emotion, help_type FROM journey_logs
+              WHERE journey_id IN (SELECT id::text FROM journeys WHERE user_id = $1)
+              ORDER BY created_at ASC`,
+            [starRow.rows[0].user_id]
+          );
+          galaxy = calcGalaxySignal(logsResult.rows).signal;
+        }
+      } catch (_) {}
+    }
+
+    const result = galaxy && galaxy !== 'miracle'
+      ? await db.query(
+          'SELECT message FROM wisdom_pool WHERE theme = $1 AND active = TRUE ORDER BY RANDOM() LIMIT 1',
+          [galaxy]
+        )
+      : await db.query(
+          'SELECT message FROM wisdom_pool WHERE active = TRUE ORDER BY RANDOM() LIMIT 1'
+        );
+
+    if (result.rowCount === 0) return res.json({ show: false, context });
+
+    res.json({ show: true, context, message: result.rows[0].message });
+
+  } catch (err) {
+    if (err.code === '42P01') return res.status(503).json({ error: 'wisdom_pool 미적용 — migration 068 실행 필요' });
+    console.error('[DT] GET /wisdom/recommend error:', err.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

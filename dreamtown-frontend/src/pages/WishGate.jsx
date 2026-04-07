@@ -68,7 +68,11 @@ export default function WishGate() {
       const star = await postStarCreate({ wishId: wishResult.wish_id, userId, phoneNumber: phoneNumber.trim() || null });
       saveStarId(star.star_id);
       localStorage.removeItem('dt_prev_star_id');
-      nav('/star-birth', { state: { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy, gemType } });
+
+      const starBirthState = { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy, gemType };
+      try { sessionStorage.setItem('dt_recent_star', JSON.stringify(starBirthState)); } catch (_) {}
+
+      nav('/star-birth', { state: starBirthState });
     } catch (e) {
       setError(e.message);
     } finally {

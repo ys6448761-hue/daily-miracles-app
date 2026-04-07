@@ -54,6 +54,14 @@ function countToEmotion(count) {
   return '수많은 마음이 빛나요';
 }
 
+// ── 공명 3별 레벨 계산 (백엔드 동일 로직)
+function getResonanceLevel(count) {
+  if (count === 0) return 0;
+  if (count === 1) return 1;
+  if (count <= 4)  return 2;
+  return 3;
+}
+
 // ── 공명 히스토리 저장 (localStorage) ────────────────────────────
 const RESONANCE_HISTORY_KEY = 'dt_resonated_stars';
 function saveResonanceHistory(starId, starName) {
@@ -418,12 +426,23 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
                   </div>
                 )}
 
-                {/* ③ 공명 수 — 항상 표시 */}
+                {/* ③ 공명 수 + 공명 N별 뱃지 — 항상 표시 */}
                 <p style={{ fontSize: 12, color: 'rgba(255,215,106,0.65)' }}>
                   {(miracleCount + wisdomCount) > 0
                     ? `✨ ${miracleCount + wisdomCount}개 마음이 닿았어요`
                     : '✨ 아직 마음이 닿지 않은 별이에요'}
                 </p>
+                {getResonanceLevel(miracleCount + wisdomCount) > 0 && (
+                  <p style={{
+                    fontSize: 11,
+                    color: 'rgba(255,215,106,0.5)',
+                    marginTop: 4,
+                    letterSpacing: '0.03em',
+                  }}>
+                    {'✦'.repeat(getResonanceLevel(miracleCount + wisdomCount))}{' '}
+                    공명 {getResonanceLevel(miracleCount + wisdomCount)}별
+                  </p>
+                )}
               </>
             );
           })()}
@@ -449,21 +468,29 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
                 {detail.growth_log_text ?? '조금씩 나아가고 있어요'}
               </p>
               {(miracleCount > 0 || wisdomCount > 0) && (
-                <div style={{ display: 'flex', gap: 14, justifyContent: 'center', marginTop: 12 }}>
-                  {miracleCount > 0 && (
-                    <span style={{ fontSize: 12, color: '#FFD76A' }}>
-                      ✨ 기적나눔{' '}
-                      <span key={`m-${bounceKey.miracle}`} className="count-bounce" style={{ display: 'inline-block' }}>
-                        {miracleCount}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, marginTop: 12 }}>
+                  <div style={{ display: 'flex', gap: 14, justifyContent: 'center' }}>
+                    {miracleCount > 0 && (
+                      <span style={{ fontSize: 12, color: '#FFD76A' }}>
+                        ✨ 기적나눔{' '}
+                        <span key={`m-${bounceKey.miracle}`} className="count-bounce" style={{ display: 'inline-block' }}>
+                          {miracleCount}
+                        </span>
                       </span>
-                    </span>
-                  )}
-                  {wisdomCount > 0 && (
-                    <span style={{ fontSize: 12, color: 'rgba(155,135,245,0.9)' }}>
-                      🧠 지혜나눔{' '}
-                      <span key={`w-${bounceKey.wisdom}`} className="count-bounce" style={{ display: 'inline-block' }}>
-                        {wisdomCount}
+                    )}
+                    {wisdomCount > 0 && (
+                      <span style={{ fontSize: 12, color: 'rgba(155,135,245,0.9)' }}>
+                        🧠 지혜나눔{' '}
+                        <span key={`w-${bounceKey.wisdom}`} className="count-bounce" style={{ display: 'inline-block' }}>
+                          {wisdomCount}
+                        </span>
                       </span>
+                    )}
+                  </div>
+                  {getResonanceLevel(miracleCount + wisdomCount) > 0 && (
+                    <span style={{ fontSize: 11, color: 'rgba(255,215,106,0.5)', letterSpacing: '0.03em' }}>
+                      {'✦'.repeat(getResonanceLevel(miracleCount + wisdomCount))}{' '}
+                      공명 {getResonanceLevel(miracleCount + wisdomCount)}별
                     </span>
                   )}
                 </div>

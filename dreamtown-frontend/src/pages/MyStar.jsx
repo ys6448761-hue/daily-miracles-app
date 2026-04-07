@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
-import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message, getTodaySchedule, getStarStats, getStarDetail, getArtifactJob } from '../api/dreamtown.js';
+import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message, getTodaySchedule, getStarStats, getStarDetail, getArtifactJob, getGrowthSummary, getRouteRecommendation, startJourneyFromRecommendation, getWisdom } from '../api/dreamtown.js';
 import { saveStarId, clearStarId, readSavedStar } from '../lib/utils/starSession.js';
 import MilestoneBar from '../components/MilestoneBar';
 import { useDreamtownStore } from '../store/dreamtownStore';
@@ -158,6 +158,17 @@ export default function MyStar() {
   // My Star 통계 (카드/마일스톤/차트)
   const [stats, setStats] = useState(null);
 
+  // 성장 요약 집계
+  const [growthSummary, setGrowthSummary] = useState(null);
+
+  // 항로 추천
+  const [recommendation, setRecommendation]     = useState(null);
+  const [journeyStarting, setJourneyStarting]   = useState(false);
+  const [journeyStarted, setJourneyStarted]     = useState(false);
+
+  // K-지혜 (30% 확률, 별 페이지)
+  const [wisdom, setWisdom] = useState(null);
+
   // 닉네임
   const [nickname, setNickname] = useState('소원이');
 
@@ -227,6 +238,21 @@ export default function MyStar() {
         getStarStats(data.star_id)
           .then(s => setStats(s))
           .catch(() => setStats(null));
+
+        // 성장 요약 집계
+        getGrowthSummary(data.star_id)
+          .then(s => setGrowthSummary(s))
+          .catch(() => setGrowthSummary(null));
+
+        // 항로 추천
+        getRouteRecommendation(data.star_id)
+          .then(r => setRecommendation(r))
+          .catch(() => setRecommendation(null));
+
+        // K-지혜 (30% 확률, star context)
+        getWisdom({ starId: data.star_id, context: 'star' })
+          .then(w => w?.show ? setWisdom(w.message) : null)
+          .catch(() => null);
 
         // Aurora5 메시지 저장 — 세션당 1회 fire-and-forget
         const aurora5Key = `dt_aurora5_saved_${data.star_id}_${new Date().toISOString().slice(0, 10)}`;
@@ -653,6 +679,132 @@ export default function MyStar() {
             })}
           </div>
         </div>
+      )}
+
+      {/* 성장 요약 카드 */}
+      {growthSummary && growthSummary.total_logs > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-5 space-y-3"
+        >
+          {/* 대표 성장 문장 */}
+          {growthSummary.summary_line && (
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+              <p className="text-white/35 text-[11px] mb-1">✦ 내 별의 대표 성장 문장</p>
+              <p className="text-white/85 text-sm leading-relaxed font-medium">
+                &ldquo;{growthSummary.summary_line}&rdquo;
+              </p>
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 gap-2">
+            {/* 최근 변화 */}
+            {growthSummary.latest && (
+              <div className="bg-white/3 border border-white/8 rounded-2xl p-3">
+                <p className="text-white/30 text-[10px] mb-1">최근 변화</p>
+                <p className="text-white/70 text-xs leading-snug line-clamp-2">
+                  {growthSummary.latest.growth_message ?? '—'}
+                </p>
+              </div>
+            )}
+
+            {/* 누적 변화 */}
+            <div className="bg-white/3 border border-white/8 rounded-2xl p-3">
+              <p className="text-white/30 text-[10px] mb-1">누적 기록</p>
+              <p className="text-white/70 text-xs">{growthSummary.total_logs}번의 성장</p>
+            </div>
+          </div>
+
+          {/* 감정 / 도움 태그 배지 */}
+          {(growthSummary.top_emotion || growthSummary.top_help) && (
+            <div className="flex gap-2 flex-wrap">
+              {growthSummary.top_emotion && (
+                <span className="px-2.5 py-1 rounded-full bg-purple-500/15 text-purple-300/80 text-[11px]">
+                  # {growthSummary.top_emotion}
+                </span>
+              )}
+              {growthSummary.top_help && (
+                <span className="px-2.5 py-1 rounded-full bg-blue-500/15 text-blue-300/80 text-[11px]">
+                  # {growthSummary.top_help}
+                </span>
+              )}
+            </div>
+          )}
+          {/* K-지혜 — 하단 조용한 영역 (30% 확률 등장) */}
+          {wisdom && (
+            <p className="text-white/25 text-[11px] leading-relaxed text-center pt-1 italic">
+              {wisdom}
+            </p>
+          )}
+        </motion.div>
+      )}
+
+      {/* 항로 추천 카드 */}
+      {recommendation?.routes?.length > 0 && !journeyStarted && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="mb-5"
+        >
+          {/* reason — 현재 흐름 문장 */}
+          <p className="text-white/45 text-xs leading-relaxed mb-3 whitespace-pre-line px-1">
+            {recommendation.reason}
+          </p>
+
+          <div className="space-y-2">
+            {recommendation.routes.map((route, idx) => {
+              const isPrimary = route.route_code === recommendation.primary;
+              return (
+                <button
+                  key={route.route_code}
+                  disabled={journeyStarting}
+                  onClick={async () => {
+                    setJourneyStarting(true);
+                    try {
+                      const userId = getOrCreateUserId();
+                      await startJourneyFromRecommendation(userId, route.route_code);
+                      setJourneyStarted(true);
+                    } catch (_) {}
+                    setJourneyStarting(false);
+                  }}
+                  className={[
+                    'w-full text-left rounded-2xl px-4 py-3 transition',
+                    isPrimary
+                      ? 'bg-white/8 border border-white/15 hover:bg-white/12'
+                      : 'bg-white/3 border border-white/6 hover:bg-white/6',
+                  ].join(' ')}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className={isPrimary ? 'text-white/85 text-sm font-medium' : 'text-white/50 text-sm'}>
+                        {route.route_name}
+                      </p>
+                      {!isPrimary && (
+                        <p className="text-white/25 text-[11px] mt-0.5">다른 방향도 괜찮아요</p>
+                      )}
+                    </div>
+                    <span className={isPrimary ? 'text-white/50 text-xs' : 'text-white/20 text-xs'}>
+                      {journeyStarting ? '...' : '→'}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
+
+      {journeyStarted && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mb-5 bg-white/3 border border-white/8 rounded-2xl px-4 py-3"
+        >
+          <p className="text-white/55 text-sm">항해가 시작됐어요 ✦</p>
+        </motion.div>
       )}
 
       {/* 성장 질문 */}

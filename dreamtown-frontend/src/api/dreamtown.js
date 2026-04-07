@@ -190,6 +190,41 @@ export async function getVoyageLogs(starId) {
   return res.json();
 }
 
+// GET /api/dt/wisdom/recommend — K-지혜 (context: complete|recommend|star)
+export async function getWisdom({ galaxy, starId, context = 'star' } = {}) {
+  const params = new URLSearchParams({ context });
+  if (galaxy)  params.set('galaxy',  galaxy);
+  if (starId)  params.set('star_id', starId);
+  const res = await fetch(`${BASE}/wisdom/recommend?${params}`);
+  if (!res.ok) return null;
+  return res.json(); // { show, context, message? }
+}
+
+// GET /api/dt/stars/:id/route-recommendation — 은하 기반 항로 추천
+export async function getRouteRecommendation(starId) {
+  const res = await fetch(`${BASE}/stars/${starId}/route-recommendation`);
+  if (!res.ok) return null;
+  return res.json();
+}
+
+// POST /api/dt/journeys/from-recommendation — 추천 항로로 journey 시작 (중복 방지)
+export async function startJourneyFromRecommendation(userId, routeCode) {
+  const res = await fetch(`${BASE}/journeys/from-recommendation`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, route_code: routeCode }),
+  });
+  if (!res.ok) throw new Error('journey 시작 실패');
+  return res.json();
+}
+
+// GET /api/dt/stars/:id/growth-summary — 별 성장 요약 집계
+export async function getGrowthSummary(starId) {
+  const res = await fetch(`${BASE}/stars/${starId}/growth-summary`);
+  if (!res.ok) return null;
+  return res.json();
+}
+
 // GET /api/dt/stars/:id/stats — My Star 요약 통계 (카드/마일스톤/차트)
 export async function getStarStats(starId) {
   const res = await fetch(`${BASE}/stars/${starId}/stats`);

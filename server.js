@@ -417,6 +417,15 @@ try {
   console.error("❌ 여수 소원빌기 라우터 로드 실패:", error.message);
 }
 
+// 북은하 항해 MVP 라우터
+let voyageRoutes = null;
+try {
+  voyageRoutes = require("./routes/voyageRoutes");
+  console.log("✅ 북은하 항해 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 북은하 항해 라우터 로드 실패:", error.message);
+}
+
 // RepoPulse 라우터 로딩
 let repoPulseRoutes = null;
 try {
@@ -1844,6 +1853,10 @@ if (programRoutes) {
 }
 
 // ---------- 여수 소원빌기 체험 Routes (/api/yeosu/wish) ----------
+if (voyageRoutes) {
+  app.use("/api/voyage", voyageRoutes);
+}
+
 if (yeosuWishRoutes) {
   app.use("/api/yeosu/wish", yeosuWishRoutes);
   console.log("✅ 여수 소원빌기 라우터 등록 완료 (/api/yeosu/wish)");
