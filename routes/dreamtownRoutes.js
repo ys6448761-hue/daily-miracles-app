@@ -1692,8 +1692,8 @@ router.get('/stars/:id/galaxy-signal', async (req, res) => {
     const logsResult = await db.query(
       `SELECT emotion, help_type FROM journey_logs
         WHERE journey_id IN (
-          SELECT id::text FROM journeys WHERE user_id = (
-            SELECT user_id::text FROM dt_stars WHERE id = $1
+          SELECT id FROM journeys WHERE user_id = (
+            SELECT user_id FROM dt_stars WHERE id = $1
           )
         )
         ORDER BY created_at ASC`,
@@ -1746,7 +1746,7 @@ router.post('/stars/:id/galaxy-signal/apply', async (req, res) => {
     // 신호 계산
     const logsResult = await db.query(
       `SELECT emotion, help_type FROM journey_logs
-        WHERE journey_id IN (SELECT id::text FROM journeys WHERE user_id = $1)
+        WHERE journey_id IN (SELECT id FROM journeys WHERE user_id = $1)
         ORDER BY created_at ASC`,
       [user_id]
     );
@@ -1835,7 +1835,7 @@ router.get('/stars/:id/route-recommendation', async (req, res) => {
       const [logsResult, jCountResult] = await Promise.all([
         db.query(
           `SELECT emotion, help_type FROM journey_logs
-            WHERE journey_id IN (SELECT id::text FROM journeys WHERE user_id = $1)
+            WHERE journey_id IN (SELECT id FROM journeys WHERE user_id = $1)
             ORDER BY created_at ASC`,
           [userId]
         ),
@@ -2296,7 +2296,7 @@ router.get('/wisdom/recommend', async (req, res) => {
         if (starRow.rowCount > 0) {
           const logsResult = await db.query(
             `SELECT emotion, help_type FROM journey_logs
-              WHERE journey_id IN (SELECT id::text FROM journeys WHERE user_id = $1)
+              WHERE journey_id IN (SELECT id FROM journeys WHERE user_id = $1)
               ORDER BY created_at ASC`,
             [starRow.rows[0].user_id]
           );
