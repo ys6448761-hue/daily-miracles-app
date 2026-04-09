@@ -14,6 +14,12 @@ const LUMI_DAY3 = {
   cta: '다시 이어가기',
 };
 
+const LUMI_DAY7 = {
+  trigger: 'day7_push',
+  message: '여기까지 온 사람들은\n거의 다 변화를 느꼈어요',
+  cta: '마지막 한 걸음',
+};
+
 // 선택 은하 잔광 색상 — SelectionTransition 동일 계열
 const GALAXY_OVERLAY = {
   north: 'rgba(96,165,250,0.12)',
@@ -41,7 +47,8 @@ export default function DayPage() {
   const navigate = useNavigate();
   const [phase, setPhase] = useState('before'); // before | transitioning | after
   const [textVisible, setTextVisible] = useState(false); // 실루엣보다 300ms 뒤에 텍스트 등장
-  const [lumiVisible, setLumiVisible] = useState(false);
+  const [lumiVisible, setLumiVisible]     = useState(false);
+  const [lumiDay7Visible, setLumiDay7Visible] = useState(false);
 
   // location.state 우선, 없으면 store fallback (새로고침/직접 진입 대응)
   const store = useDreamtownStore();
@@ -60,14 +67,16 @@ export default function DayPage() {
     return () => clearTimeout(t);
   }, []);
 
-  // Day3 이탈 위험 체크 — GET /api/dt/stars 응답의 retentionTrigger 활용
-  // isDay3Resume 플래그(MyStar LumiCard 클릭) 또는 서버 응답으로 감지
+  // Day3/Day7 이탈 위험 체크 — GET /api/dt/stars 응답의 retentionTrigger 활용
   useEffect(() => {
     if (state?.isDay3Resume) { setLumiVisible(true); return; }
     const userId = getOrCreateUserId();
     fetch(`/api/dt/stars?userId=${encodeURIComponent(userId)}`)
       .then(r => r.json())
-      .then(data => { if (data.retentionTrigger === 'day3') setLumiVisible(true); })
+      .then(data => {
+        if (data.retentionTrigger === 'day3') setLumiVisible(true);
+        if (data.retentionTrigger === 'day7') setLumiDay7Visible(true);
+      })
       .catch(() => {});
   }, []);
 
@@ -100,6 +109,42 @@ export default function DayPage() {
             </button>
             <button
               onClick={() => setLumiVisible(false)}
+              style={{ padding: '11px 14px', background: 'none', border: 'none', color: 'rgba(255,255,255,0.35)', cursor: 'pointer', fontSize: 13 }}
+            >
+              나중에
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* LumiCard Day7 — 완주 유도 (retentionTrigger=day7 시 노출) */}
+      {lumiDay7Visible && (
+        <div style={{
+          position: 'fixed', top: 72, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 50, width: '90%', maxWidth: 360,
+          background: 'linear-gradient(135deg, rgba(13,27,42,0.97) 0%, rgba(20,38,58,0.97) 100%)',
+          border: '1px solid rgba(255,215,106,0.45)', borderRadius: 18, padding: '18px 20px',
+          animation: 'fadeInDown 0.3s ease',
+        }}>
+          <p style={{ fontSize: 12, color: 'rgba(255,215,106,0.7)', marginBottom: 6 }}>✨ 루미의 발견</p>
+          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.88)', lineHeight: 1.6, whiteSpace: 'pre-line', marginBottom: 14 }}>
+            "{LUMI_DAY7.message}"
+          </p>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button
+              onClick={() => {
+                const uid = getOrCreateUserId();
+                const sid = readSavedStar();
+                logFlowEvent({ userId: uid, stage: 'recommendation', action: 'click', value: { trigger: LUMI_DAY7.trigger } });
+                setLumiDay7Visible(false);
+                navigate('/day7-complete', { state: { starId: sid } });
+              }}
+              style={{ flex: 1, padding: '11px 0', background: '#FFD76A', color: '#0D1B2A', fontWeight: 700, border: 'none', borderRadius: 10, cursor: 'pointer' }}
+            >
+              {LUMI_DAY7.cta}
+            </button>
+            <button
+              onClick={() => setLumiDay7Visible(false)}
               style={{ padding: '11px 14px', background: 'none', border: 'none', color: 'rgba(255,255,255,0.35)', cursor: 'pointer', fontSize: 13 }}
             >
               나중에

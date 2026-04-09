@@ -3,7 +3,9 @@
  *
  * getRetentionState(userId)  → 'day3' | 'day7' | null  (미들웨어용 단순 인터페이스)
  * findDay3InactiveUsers()    → 48~72h 비활동 유저 목록 (CRON용)
- * sendDay3Sms(userId, phone) → SMS 발송 + 쿨다운 체크
+ * sendDay3Sms(userId, phone) → Day3 SMS 발송 + 쿨다운 체크
+ * findDay7InactiveUsers()    → 5일+ + 48h 비활동 유저 목록 (CRON용)
+ * sendDay7Sms(userId, phone) → Day7 완주 유도 SMS + 쿨다운 체크
  */
 
 'use strict';
@@ -99,4 +101,76 @@ async function sendDay3Sms(userId, phone) {
   }
 }
 
-module.exports = { getRetentionState, findDay3InactiveUsers, sendDay3Sms };
+/**
+ * Day7 완주 위험 유저 목록
+ * 조건: day1_start 후 5일+ + day7_complete 없음 + 48h 비활동 + 폰번호 있음
+ */
+async function findDay7InactiveUsers() {
+  try {
+    const { rows } = await db.query(
+      `SELECT
+         f.user_id,
+         u.phone_number,
+         MAX(CASE WHEN f.action = 'day1_start' THEN f.created_at END)    AS day1_at,
+         MAX(f.created_at) FILTER (WHERE f.stage = 'growth')             AS last_active_at
+       FROM dreamtown_flow f
+       JOIN dt_users u ON u.id::text = f.user_id
+       WHERE f.stage = 'growth'
+         AND u.phone_number IS NOT NULL
+         AND u.phone_number != ''
+       GROUP BY f.user_id, u.phone_number
+       HAVING
+         MAX(CASE WHEN f.action = 'day1_start' THEN f.created_at END) IS NOT NULL
+         AND MAX(CASE WHEN f.action = 'day7_complete' THEN f.created_at END) IS NULL
+         AND EXTRACT(EPOCH FROM (NOW() - MAX(CASE WHEN f.action = 'day1_start' THEN f.created_at END))) / 86400 >= 5
+         AND (MAX(f.created_at) FILTER (WHERE f.stage = 'growth') IS NULL
+              OR NOW() - MAX(f.created_at) FILTER (WHERE f.stage = 'growth') > INTERVAL '48 hours')`
+    );
+    return rows;
+  } catch (e) {
+    console.error('[retention] findDay7InactiveUsers error:', e.message);
+    return [];
+  }
+}
+
+/**
+ * Day7 완주 유도 SMS 발송
+ * 48h 쿨다운: recommendation/day7_sms_sent 로그 확인
+ */
+async function sendDay7Sms(userId, phone) {
+  try {
+    const { rows } = await db.query(
+      `SELECT created_at FROM dreamtown_flow
+        WHERE user_id = $1 AND stage = 'recommendation' AND action = 'day7_sms_sent'
+          AND created_at >= NOW() - INTERVAL '48 hours'
+        LIMIT 1`,
+      [String(userId)]
+    );
+    if (rows.length > 0) return { skipped: true, reason: 'cooldown' };
+  } catch { /* 쿨다운 조회 실패 시 발송 허용 */ }
+
+  const text =
+    `✨ 거의 다 왔어요\n\n` +
+    `여기서 이어간 사람들이\n` +
+    `가장 많이 변화를 느꼈어요.\n\n` +
+    `마지막 한 걸음 →\n` +
+    `https://app.dailymiracles.kr/dreamtown\n\n` +
+    `하루하루의 기적 드림`;
+
+  try {
+    await sendSensSMS(phone, text);
+
+    await db.query(
+      `INSERT INTO dreamtown_flow (user_id, stage, action, value)
+       VALUES ($1, 'recommendation', 'day7_sms_sent', $2)`,
+      [String(userId), JSON.stringify({ trigger: 'day7_push', phone_masked: phone.slice(-4) })]
+    );
+
+    return { sent: true };
+  } catch (e) {
+    console.error('[retention] sendDay7Sms error:', e.message);
+    return { sent: false, error: e.message };
+  }
+}
+
+module.exports = { getRetentionState, findDay3InactiveUsers, sendDay3Sms, findDay7InactiveUsers, sendDay7Sms };

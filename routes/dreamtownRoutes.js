@@ -2453,5 +2453,53 @@ router.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: 'dreamtown-api', timestamp: new Date().toISOString() });
 });
 
+// ── POST /api/dt/stars/:id/complete — Day7 완주 확정 ────────────
+// Body: { userId }
+// 역할: star_stage day7 승격 + day7_complete 로그
+router.post('/stars/:id/complete', async (req, res) => {
+  const { id: starId } = req.params;
+  const { userId }     = req.body;
+  if (!userId) return res.status(400).json({ error: 'userId 필수' });
+
+  try {
+    // 이미 완료된 별인지 확인
+    const { rows } = await db.query(
+      `SELECT star_stage, user_id FROM dt_stars WHERE id = $1`,
+      [starId]
+    );
+    if (!rows.length) return res.status(404).json({ error: '별을 찾을 수 없어요' });
+
+    const star = rows[0];
+    if (String(star.user_id) !== String(userId)) {
+      return res.status(403).json({ error: '본인 별만 완료할 수 있어요' });
+    }
+
+    // 이미 day7 이상이면 중복 방지
+    if (star.star_stage !== 'day1') {
+      return res.json({ ok: true, already_completed: true, star_stage: star.star_stage });
+    }
+
+    // star_stage day1 → day7 승격
+    await db.query(
+      `UPDATE dt_stars SET star_stage = 'day7' WHERE id = $1`,
+      [starId]
+    );
+
+    // day7_complete 로그
+    await flow.log({
+      userId: String(userId),
+      stage:  'growth',
+      action: 'day7_complete',
+      value:  { star_id: starId, source: 'user_action' },
+      refId:  String(starId),
+    });
+
+    return res.json({ ok: true, star_stage: 'day7', starId });
+  } catch (e) {
+    console.error('[DT] POST /stars/:id/complete error:', e.message);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 module.exports = router;
 

@@ -42,6 +42,7 @@ import OnboardingPage from './pages/OnboardingPage.jsx';
 import AdminBenefitPage from './pages/AdminBenefitPage.jsx';
 import AdminExperimentPage from './pages/AdminExperimentPage.jsx';
 import AdminKpiPage from './pages/AdminKpiPage.jsx';
+import Day7Complete from './pages/Day7Complete.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
 if (window.location.pathname.startsWith('//')) {
@@ -76,7 +77,8 @@ export default function App() {
           <Route path="/story-draft-mvp"     element={<StoryDraftMVP />} />
           <Route path="/star/:id"    element={<StarDetail />} />
           <Route path="/galaxy"      element={<Galaxy />} />
-          <Route path="/day"         element={<Day />} />
+          <Route path="/day"              element={<Day />} />
+          <Route path="/day7-complete"   element={<Day7Complete />} />
           <Route path="/history"     element={<History />} />
           <Route path="/star-growth" element={<StarGrowth />} />
           <Route path="/star"        element={<Star />} />
