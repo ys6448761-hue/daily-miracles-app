@@ -202,7 +202,9 @@ export async function getWisdom({ galaxy, starId, context = 'star' } = {}) {
 
 // GET /api/dt/stars/:id/route-recommendation — 은하 기반 항로 추천
 export async function getRouteRecommendation(starId) {
-  const res = await fetch(`${BASE}/stars/${starId}/route-recommendation`);
+  const journeyId = localStorage.getItem('dreamtown_whisper_journey_id');
+  const qs = journeyId ? `?journey_id=${encodeURIComponent(journeyId)}` : '';
+  const res = await fetch(`${BASE}/stars/${starId}/route-recommendation${qs}`);
   if (!res.ok) return null;
   return res.json();
 }
@@ -319,4 +321,70 @@ export function getOrCreateUserId() {
     localStorage.setItem(key, id);
   }
   return id;
+}
+
+
+// ── AI Unlock 모네타이제이션 API ─────────────────────────────────────
+
+// GET /api/dt/ai-unlock/status
+export async function getAiStatus({ userId, daysActive = 0 }) {
+  const params = new URLSearchParams({ user_id: userId });
+  if (daysActive > 0) params.set('days_active', String(daysActive));
+  const res = await fetch(`/api/dt/ai-unlock/status?${params}`);
+  if (!res.ok) return null;
+  return res.json();
+}
+
+// POST /api/dt/ai-unlock/event
+export async function logAiUpsellEvent({ userId, starId, eventName, stage, group, productType, context }) {
+  try {
+    await fetch('/api/dt/ai-unlock/event', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id:      userId,
+        star_id:      starId ?? null,
+        event_name:   eventName,
+        stage:        stage ?? null,
+        group:        group ?? null,
+        product_type: productType ?? null,
+        context:      context ?? null,
+      }),
+    });
+  } catch { /* fire-and-forget */ }
+}
+
+// POST /api/dt/ai-unlock/purchase
+export async function purchaseAiProduct({ userId, productType, pgOrderId, pgTid }) {
+  const res = await fetch('/api/dt/ai-unlock/purchase', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      user_id:      userId,
+      product_type: productType,
+      pg_order_id:  pgOrderId ?? null,
+      pg_tid:       pgTid ?? null,
+    }),
+  });
+  return res.json();
+}
+
+// ── Wish Checkin ─────────────────────────────────────────────
+export async function getCheckinStates() {
+  const res = await fetch('/api/dt/wish-checkin/states');
+  return res.json();
+}
+
+export async function postCheckinState({ userId, stateKey, actionClicked = false, sessionId = null }) {
+  const res = await fetch('/api/dt/wish-checkin', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      user_id:        userId ?? null,
+      state_key:      stateKey,
+      action_clicked: actionClicked,
+      session_id:     sessionId ?? null,
+    }),
+  });
+  return res.json();
 }
