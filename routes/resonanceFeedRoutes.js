@@ -27,7 +27,6 @@ const router  = express.Router();
 const db      = require('../database/db');
 const { getUserSignalState, detectEmotion, detectLength } = require('../services/galaxySignalService');
 const flow    = require('../services/dreamtownFlowService');
-const { getTriggerRecommendation } = require('../services/aiRecommendationService');
 
 // ── 점수 계산 상수 ────────────────────────────────────────────────────
 const CONTEXT_MATCH_SCORE = 3;
@@ -194,14 +193,10 @@ router.get('/', async (req, res) => {
       await flow.log({ userId: String(journey_id), stage: 'resonance', action: 'trigger', value: { type: 'feed', target: 'internal' }, refId: String(journey_id) });
     } catch (e) { console.warn('flow log failed (resonance/trigger)', e.message); }
 
-    // ── AI 트리거 추천 (before_resonance) ───────────────────────
-    const lumi = await getTriggerRecommendation(String(journey_id), 'before_resonance');
-
     res.json({
       show:          true,
       aurum_message: '조용히 이어진 순간들이 있어요',
       items:         selected.map(r => ({ text: r.growth_text })),
-      lumi,
     });
 
   } catch (err) {

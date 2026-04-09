@@ -154,8 +154,14 @@ const AI_MESSAGES = {
   },
 };
 
-// ── 트리거 기반 고정 메시지 (4개 위치) ───────────────────────
-const DAILY_CAP = 2; // 하루 최대 노출 횟수
+// ── 트리거 SSOT — 4개 외 추가 금지 ─────────────────────────
+// Trigger 1: after_star    — 별 생성 직후 (강제 1회)
+// Trigger 2: idle_after_star — 별 생성 후 30초 무행동 (클라이언트 감지 → 서버 검증)
+// Trigger 3: day1_miss     — Day1 미시작 + 24시간 경과
+// Trigger 4: day7_stall    — Day7 미완료 + 48시간 비활동
+
+const DAILY_CAP    = 2;   // 하루 최대 노출 횟수
+const COOLDOWN_MS  = 6 * 60 * 60 * 1000; // 같은 트리거 6시간 쿨다운
 
 const TRIGGER_MESSAGES = {
   after_star: {
@@ -163,56 +169,99 @@ const TRIGGER_MESSAGES = {
     message: '지금 이 단계에서는\n작은 행동 하나가 가장 큰 변화를 만들어요',
     cta:     '오늘의 행동 시작',
   },
-  after_day1: {
-    type:    'persist',
-    message: '비슷한 사람들은 감정을 남겼을 때\n더 오래 유지됐어요',
-    cta:     '감정 남기기',
+  idle_after_star: {
+    type:    'action',
+    message: '여기서 멈춘 사람들이\n작은 행동 하나로 다시 움직였어요',
+    cta:     '지금 이어가기',
   },
-  before_day7: {
+  day1_miss: {
+    type:    'persist',
+    message: '비슷한 사람들은 첫날을 시작했을 때\n가장 오래 이어졌어요',
+    cta:     '지금 시작하기',
+  },
+  day7_stall: {
     type:    'persist',
     message: '여기서 멈추지 않은 사람들이\n가장 많이 변화했어요',
     cta:     '한 번 더 이어가기',
   },
-  before_resonance: {
-    type:    'social',
-    message: '이 순간을 나눈 사람들이\n더 또렷해졌어요',
-    cta:     '공명하기',
-  },
 };
 
-// 오늘 이미 몇 번 노출됐는지
-async function checkDailyCap(userId) {
+// 하루 노출 횟수 + 같은 트리거 쿨다운 통합 확인
+async function checkGate(userId, trigger) {
   try {
     const { rows } = await db.query(
-      `SELECT COUNT(*) AS cnt FROM dreamtown_flow
-       WHERE user_id = $1 AND stage = 'recommendation' AND action = 'ai_suggest'
-         AND created_at >= NOW() - INTERVAL '1 day'`,
+      `SELECT action, value->>'trigger' AS trig, created_at
+       FROM dreamtown_flow
+       WHERE user_id = $1 AND stage = 'recommendation' AND action = 'trigger'
+         AND created_at >= NOW() - INTERVAL '1 day'
+       ORDER BY created_at DESC`,
       [userId]
     );
-    return parseInt(rows[0]?.cnt, 10) || 0;
-  } catch { return 0; }
+
+    // 하루 2회 상한
+    if (rows.length >= DAILY_CAP) return false;
+
+    // 같은 트리거 6시간 쿨다운
+    const lastSame = rows.find(r => r.trig === trigger);
+    if (lastSame) {
+      const elapsed = Date.now() - new Date(lastSame.created_at).getTime();
+      if (elapsed < COOLDOWN_MS) return false;
+    }
+
+    return true;
+  } catch { return true; } // DB 오류 시 통과 (추천 실패보다 노출 우선)
 }
 
-// 트리거 추천 조회 — 일일 상한 초과 시 null 반환
+// 멈춤 상태 자동 감지 (Trigger 3, 4) — 앱 진입 시 호출
+async function detectStall(userId) {
+  try {
+    const { rows } = await db.query(
+      `SELECT
+         MAX(CASE WHEN stage='star'   AND action='create'       THEN created_at END) AS star_at,
+         MAX(CASE WHEN stage='growth' AND action='day1_start'   THEN created_at END) AS day1_at,
+         MAX(CASE WHEN stage='growth' AND action='day7_complete' THEN created_at END) AS day7_at,
+         MAX(created_at) FILTER (WHERE stage='growth')                                AS last_growth_at
+       FROM dreamtown_flow WHERE user_id = $1`,
+      [userId]
+    );
+    const r   = rows[0] ?? {};
+    const now = Date.now();
+
+    const starAt      = r.star_at       ? new Date(r.star_at).getTime()       : null;
+    const day1At      = r.day1_at       ? new Date(r.day1_at).getTime()       : null;
+    const day7At      = r.day7_at       ? new Date(r.day7_at).getTime()       : null;
+    const lastGrowthAt = r.last_growth_at ? new Date(r.last_growth_at).getTime() : null;
+
+    // Trigger 3: 별은 있는데 Day1 미시작 + 24시간 경과
+    if (starAt && !day1At && (now - starAt) > 24 * 60 * 60 * 1000) return 'day1_miss';
+
+    // Trigger 4: Day1은 했는데 Day7 미완료 + 마지막 성장 활동 48시간 경과
+    if (day1At && !day7At && lastGrowthAt && (now - lastGrowthAt) > 48 * 60 * 60 * 1000) return 'day7_stall';
+
+    return null;
+  } catch { return null; }
+}
+
+// 트리거 추천 조회 — 게이트 통과 시에만 반환
 async function getTriggerRecommendation(userId, trigger) {
   const msg = TRIGGER_MESSAGES[trigger];
   if (!msg) return null;
 
   try {
-    const todayCount = await checkDailyCap(userId);
-    if (todayCount >= DAILY_CAP) return null;
+    const pass = await checkGate(userId, trigger);
+    if (!pass) return null;
 
     flow.log({
       userId,
       stage:  'recommendation',
-      action: 'ai_suggest',
+      action: 'trigger',
       value:  { trigger, type: msg.type },
     }).catch(() => {});
 
-    log.info('트리거 추천 노출', { userId, trigger, type: msg.type });
+    log.info('트리거 노출', { userId, trigger, type: msg.type });
     return { trigger, ...msg };
   } catch {
-    return null; // 오류 시 조용히 생략 — 추천 실패가 흐름을 막지 않음
+    return null;
   }
 }
 
@@ -310,4 +359,4 @@ async function getAIKpi({ days = 7 } = {}) {
   }
 }
 
-module.exports = { getAIRecommendation, logAIClick, getAIKpi, getTriggerRecommendation };
+module.exports = { getAIRecommendation, logAIClick, getAIKpi, getTriggerRecommendation, detectStall };

@@ -2523,6 +2523,15 @@ try {
   console.warn('⚠️ Recommendation 라우터 등록 실패:', err.message);
 }
 
+// ---------- AI Trigger Routes ----------
+try {
+  const aiTriggerRoutes = require('./routes/aiTriggerRoutes');
+  app.use('/api/dt/ai-trigger', aiTriggerRoutes);
+  console.log('✅ AI Trigger 라우터 등록 완료 (/api/dt/ai-trigger)');
+} catch (err) {
+  console.warn('⚠️ AI Trigger 라우터 등록 실패:', err.message);
+}
+
 // DreamTown KPI 대시보드
 app.get('/dt-events-dashboard', (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dt-events-dashboard.html'));
