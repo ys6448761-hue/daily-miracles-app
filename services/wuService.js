@@ -298,6 +298,9 @@ async function recordEvent(sessionId, profileId, eventType, wuType, payload = {}
 // AI 호출 (가드레일 [3]: 1회만, keywords 포함)
 // ═══════════════════════════════════════════════════════════════════════════
 
+let aiGateway = null;
+try { aiGateway = require('./aiGateway'); } catch (e) { /* optional */ }
+
 let openaiClient = null;
 
 function getOpenAI() {
@@ -322,53 +325,44 @@ function getOpenAI() {
  */
 async function callAI(wuType, category, efScores, rawAnswers) {
   const openai = getOpenAI();
-
-  // AI 불가 시 룰 기반 폴백
-  if (!openai) {
-    return generateFallbackResponse(wuType, category, efScores, rawAnswers);
-  }
+  const fallbackResult = generateFallbackResponse(wuType, category, efScores, rawAnswers);
 
   const answersContext = rawAnswers
     .map(a => `Q${a.idx + 1}(${a.key}): ${a.text}`)
     .join('\n');
 
-  try {
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      temperature: 0.7,
-      max_tokens: 300,
-      messages: [
-        {
-          role: 'system',
-          content: `당신은 소원이 심리 분석 엔진입니다.
-아래 WU 응답을 분석하여 JSON으로만 응답하세요.
-- encouragement: 따뜻한 응원 문장 (50자 이내)
-- insight: 핵심 인사이트 (30자 이내)
-- next_wu_hint: 다음 추천 WU 유형 코드 (REL/SELF_ST_TXT/CAREER/HEALTH/MONEY/GROWTH 중 택1)
-- keywords: 응답에서 추출한 핵심 키워드 3~5개 (개인 식별 정보 제외)
+  const wishText = `${wuType}:${category}:${answersContext.slice(0, 80)}`;
 
-절대 금지: 사주/점술/운세 용어, 과도한 약속, 실명 언급
-톤: 따뜻하지만 전문적, 희망적이지만 현실적`
+  // aiGateway 경유 (캐시/한도/예산 적용)
+  const gwResult = aiGateway
+    ? await aiGateway.call({
+        service:  'wuService',
+        step:     `wu_${wuType}`,
+        wishText,
+        fallback: JSON.stringify(fallbackResult),
+        modelFn: !openai ? null : async () => {
+          const completion = await openai.chat.completions.create({
+            model: 'gpt-4o-mini', temperature: 0.7, max_tokens: 300,
+            messages: [
+              { role: 'system', content: `당신은 소원이 심리 분석 엔진입니다.\n아래 WU 응답을 분석하여 JSON으로만 응답하세요.\n- encouragement: 따뜻한 응원 문장 (50자 이내)\n- insight: 핵심 인사이트 (30자 이내)\n- next_wu_hint: 다음 추천 WU 유형 코드 (REL/SELF_ST_TXT/CAREER/HEALTH/MONEY/GROWTH 중 택1)\n- keywords: 응답에서 추출한 핵심 키워드 3~5개 (개인 식별 정보 제외)\n\n절대 금지: 사주/점술/운세 용어, 과도한 약속, 실명 언급\n톤: 따뜻하지만 전문적, 희망적이지만 현실적` },
+              { role: 'user', content: `WU유형: ${wuType}\n카테고리: ${category}\nEF점수: ${JSON.stringify(efScores)}\n\n응답:\n${answersContext}\n\nJSON으로만 응답:` }
+            ],
+          });
+          return {
+            text:      completion.choices[0]?.message?.content ?? '',
+            model:     'gpt-4o-mini',
+            tokensIn:  completion.usage?.prompt_tokens     ?? 0,
+            tokensOut: completion.usage?.completion_tokens ?? 0,
+          };
         },
-        {
-          role: 'user',
-          content: `WU유형: ${wuType}
-카테고리: ${category}
-EF점수: ${JSON.stringify(efScores)}
+      })
+    : { text: JSON.stringify(fallbackResult), source: 'fallback' };
 
-응답:
-${answersContext}
-
-JSON으로만 응답:`
-        }
-      ],
-    });
-
-    const raw = completion.choices[0]?.message?.content || '';
+  try {
+    const raw = gwResult.text;
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       const parsed = JSON.parse(jsonMatch[0]);
-      // PII 필터: 전화번호, 이메일, 1글자 토큰 제거
       const PII_PATTERNS = [/\d{2,}/, /@/, /^.$/];
       const safeKeywords = (Array.isArray(parsed.keywords) ? parsed.keywords : [])
         .slice(0, 5)
@@ -383,11 +377,10 @@ JSON으로만 응답:`
       };
     }
   } catch (e) {
-    console.error('[WU] AI 호출 실패:', e.message);
+    console.error('[WU] AI 응답 파싱 실패:', e.message);
   }
 
-  // 파싱 실패 시 폴백
-  return generateFallbackResponse(wuType, category, efScores, rawAnswers);
+  return fallbackResult;
 }
 
 /**

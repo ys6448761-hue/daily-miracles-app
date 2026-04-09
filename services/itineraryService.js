@@ -19,6 +19,7 @@ const Handlebars = require('handlebars');
 const fs = require('fs').promises;
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+const aiGateway = require('./aiGateway');
 
 // OpenAI 클라이언트
 let openai = null;
@@ -162,30 +163,33 @@ async function generateItinerary(options) {
   });
 
   let aiResponse;
+  // aiGateway 경유 (캐시/한도/예산 적용) — 일정 생성은 quoteId 기반 캐시
+  const gwResult = await aiGateway.call({
+    service:  'itineraryService',
+    step:     `${region}_${days}d_${stylePreferences?.join('-') ?? 'default'}`,
+    wishText: `${region}:${days}:${partyType}`,
+    fallback: JSON.stringify(generateDefaultItinerary({ region, days, stylePreferences, mustVisit, tempo })),
+    modelFn: !openai ? null : async () => {
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4',
+        messages: [
+          { role: 'system', content: '당신은 여수 지역 전문 여행 플래너입니다.\nJSON 형식으로만 응답하세요. 한국어로 작성하세요.\n일정은 시간대별로 구성하고, 이동 시간과 팁을 포함하세요.' },
+          { role: 'user', content: prompt }
+        ],
+        max_tokens: 3000, temperature: 0.7, response_format: { type: 'json_object' }
+      });
+      return {
+        text:      completion.choices[0].message.content,
+        model:     'gpt-4',
+        tokensIn:  completion.usage?.prompt_tokens     ?? 0,
+        tokensOut: completion.usage?.completion_tokens ?? 0,
+      };
+    },
+  });
   try {
-    if (!openai) {
-      throw new Error('OpenAI 서비스 불가');
-    }
-
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [
-        {
-          role: 'system',
-          content: `당신은 여수 지역 전문 여행 플래너입니다.
-JSON 형식으로만 응답하세요. 한국어로 작성하세요.
-일정은 시간대별로 구성하고, 이동 시간과 팁을 포함하세요.`
-        },
-        { role: 'user', content: prompt }
-      ],
-      max_tokens: 3000,
-      temperature: 0.7,
-      response_format: { type: 'json_object' }
-    });
-
-    aiResponse = JSON.parse(completion.choices[0].message.content);
-  } catch (error) {
-    console.warn('[Itinerary] AI 생성 실패, 기본 템플릿 사용:', error.message);
+    aiResponse = JSON.parse(gwResult.text);
+  } catch {
+    console.warn('[Itinerary] AI 응답 파싱 실패, 기본 템플릿 사용');
     aiResponse = generateDefaultItinerary({ region, days, stylePreferences, mustVisit, tempo });
   }
 

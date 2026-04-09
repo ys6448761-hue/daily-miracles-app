@@ -4,6 +4,7 @@
  */
 
 const OpenAI = require('openai');
+const aiGateway = require('./aiGateway');
 
 // OpenAI 클라이언트 초기화
 const openai = new OpenAI({
@@ -40,24 +41,32 @@ async function analyzeWithClaude({ category, categoryName, conversation, nicknam
       level5
     });
 
-    // OpenAI API 호출 (GPT-4)
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [
-        {
-          role: 'system',
-          content: '당신은 심리 상담 전문가이자 문제 해결 컨설턴트입니다. 사용자의 고민을 깊이 분석하고, 구체적이고 실행 가능한 해결책을 제시합니다.'
-        },
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      temperature: 0.7,
-      max_tokens: 2000
+    // aiGateway 경유 (캐시/한도/예산 적용) — gpt-4 → 고비용, 캐시 필수
+    const wishText = `${category}:${level1.slice(0, 60)}`;
+    const gwResult = await aiGateway.call({
+      service:  'claudeAnalysis',
+      step:     `analysis_${category}`,
+      wishText,
+      fallback: JSON.stringify({ summary: '분석 준비 중', coreIssue: '잠시 후 다시 시도해 주세요.' }),
+      modelFn:  async () => {
+        const response = await openai.chat.completions.create({
+          model: 'gpt-4',
+          messages: [
+            { role: 'system', content: '당신은 심리 상담 전문가이자 문제 해결 컨설턴트입니다. 사용자의 고민을 깊이 분석하고, 구체적이고 실행 가능한 해결책을 제시합니다.' },
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.7, max_tokens: 2000,
+        });
+        return {
+          text:      response.choices[0].message.content,
+          model:     'gpt-4',
+          tokensIn:  response.usage?.prompt_tokens     ?? 0,
+          tokensOut: response.usage?.completion_tokens ?? 0,
+        };
+      },
     });
 
-    const rawText = response.choices[0].message.content;
+    const rawText = gwResult.text;
 
     // 응답 파싱 (JSON 형식으로 요청했으므로)
     const analysis = parseAnalysisResponse(rawText);

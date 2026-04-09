@@ -17,6 +17,7 @@ const db = require('../../../database/db');
 const { OpenAI } = require('openai');
 const logService = require('../logService');
 const { makeLogger } = require('../../../utils/logger');
+const aiGateway = require('../../aiGateway');
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const log = makeLogger('kWisdomAgent');
@@ -108,21 +109,33 @@ async function run(starId, input = {}) {
   const scenario = await detectScenario(starId, input);
   const prompt   = buildPrompt(scenario, wishText, starName);
 
-  // GPT 구조화 출력
-  const res = await openai.chat.completions.create({
-    model:           'gpt-4.1-mini',
-    messages:        [{ role: 'user', content: prompt }],
-    max_tokens:      300,
-    temperature:     0.8,
-    response_format: { type: 'json_object' },
-  });
-
+  // GPT 구조화 출력 — aiGateway 경유 (캐시/한도/예산 적용)
   let structured = { insight: '', action: '', timing_reason: scenario };
+  const gwResult = await aiGateway.call({
+    userId:   String(star?.user_id ?? 'unknown'),
+    starId,
+    service:  'kWisdomAgent',
+    step:     scenario,
+    wishText: wishText,
+    fallback: JSON.stringify({ insight: '지금 이 순간도 여정의 일부입니다.', action: '오늘 한 가지 작은 행동을 해보세요.', timing_reason: scenario }),
+    modelFn:  async () => {
+      const res = await openai.chat.completions.create({
+        model: 'gpt-4.1-mini', messages: [{ role: 'user', content: prompt }],
+        max_tokens: 300, temperature: 0.8, response_format: { type: 'json_object' },
+      });
+      return {
+        text:      res.choices[0].message.content,
+        model:     'gpt-4.1-mini',
+        tokensIn:  res.usage?.prompt_tokens     ?? 0,
+        tokensOut: res.usage?.completion_tokens ?? 0,
+      };
+    },
+  });
   try {
-    structured = JSON.parse(res.choices[0].message.content);
+    structured = JSON.parse(gwResult.text);
     structured.timing_reason = structured.timing_reason || scenario;
   } catch {
-    structured.insight = res.choices[0].message.content.trim();
+    structured.insight = gwResult.text;
   }
 
   // ── dt_wisdom_logs 저장 ────────────────────────────────────

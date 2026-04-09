@@ -12,6 +12,7 @@
 
 const { OpenAI } = require('openai');
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const aiGateway = require('../aiGateway');
 
 // ── 로그 타입별 요약 ────────────────────────────────────────────
 function summarizeLogs(logs) {
@@ -58,7 +59,7 @@ const AURORA5_SYSTEM = `당신은 Aurora5입니다.
 - 따뜻하지만 절제된 문체 (과장 금지)`;
 
 // ── Chapter 1: Origin ─────────────────────────────────────────
-async function buildOrigin(wishText, starName) {
+async function buildOrigin(wishText, starName, userId) {
   const prompt = `${AURORA5_SYSTEM}
 
 [별 이름] ${starName}
@@ -73,17 +74,30 @@ async function buildOrigin(wishText, starName) {
 
 출력 (서사 텍스트만):`;
 
-  const res = await openai.chat.completions.create({
-    model:       'gpt-4.1-mini',
-    messages:    [{ role: 'user', content: prompt }],
-    max_tokens:  300,
-    temperature: 0.8,
+  const result = await aiGateway.call({
+    userId,
+    service:  'narrativeBuilder',
+    step:     'origin',
+    wishText,
+    fallback: '당신은 이런 흐름을 걸어왔습니다. 소원이 별이 되는 순간, 작지만 분명한 변화가 시작되었습니다.',
+    modelFn:  async () => {
+      const res = await openai.chat.completions.create({
+        model: 'gpt-4.1-mini', messages: [{ role: 'user', content: prompt }],
+        max_tokens: 300, temperature: 0.8,
+      });
+      return {
+        text:      res.choices[0].message.content.trim(),
+        model:     'gpt-4.1-mini',
+        tokensIn:  res.usage?.prompt_tokens     ?? 0,
+        tokensOut: res.usage?.completion_tokens ?? 0,
+      };
+    },
   });
-  return res.choices[0].message.content.trim();
+  return result.text;
 }
 
 // ── Chapter 2: Growth ────────────────────────────────────────
-async function buildGrowth(wishText, logSummary, reportSummary) {
+async function buildGrowth(wishText, logSummary, reportSummary, userId) {
   const prompt = `${AURORA5_SYSTEM}
 
 [소원] "${wishText}"
@@ -101,17 +115,30 @@ async function buildGrowth(wishText, logSummary, reportSummary) {
 
 출력 (서사 텍스트만):`;
 
-  const res = await openai.chat.completions.create({
-    model:       'gpt-4.1-mini',
-    messages:    [{ role: 'user', content: prompt }],
-    max_tokens:  400,
-    temperature: 0.8,
+  const result = await aiGateway.call({
+    userId,
+    service:  'narrativeBuilder',
+    step:     `growth_${logSummary.total}`,
+    wishText,
+    fallback: '소원을 향한 작은 선택들이 쌓여 지금의 흐름을 만들었습니다.',
+    modelFn:  async () => {
+      const res = await openai.chat.completions.create({
+        model: 'gpt-4.1-mini', messages: [{ role: 'user', content: prompt }],
+        max_tokens: 400, temperature: 0.8,
+      });
+      return {
+        text:      res.choices[0].message.content.trim(),
+        model:     'gpt-4.1-mini',
+        tokensIn:  res.usage?.prompt_tokens     ?? 0,
+        tokensOut: res.usage?.completion_tokens ?? 0,
+      };
+    },
   });
-  return res.choices[0].message.content.trim();
+  return result.text;
 }
 
 // ── Chapter 5: Evolution ─────────────────────────────────────
-async function buildEvolution(wishText, logSummary, changePoint) {
+async function buildEvolution(wishText, logSummary, changePoint, userId) {
   const prompt = `${AURORA5_SYSTEM}
 
 [소원] "${wishText}"
@@ -127,13 +154,26 @@ async function buildEvolution(wishText, logSummary, changePoint) {
 
 출력 (서사 텍스트만):`;
 
-  const res = await openai.chat.completions.create({
-    model:       'gpt-4.1-mini',
-    messages:    [{ role: 'user', content: prompt }],
-    max_tokens:  300,
-    temperature: 0.8,
+  const result = await aiGateway.call({
+    userId,
+    service:  'narrativeBuilder',
+    step:     'evolution',
+    wishText,
+    fallback: '처음과 지금 사이, 분명한 변화가 있었습니다. 앞으로의 방향은 이미 시작되었습니다.',
+    modelFn:  async () => {
+      const res = await openai.chat.completions.create({
+        model: 'gpt-4.1-mini', messages: [{ role: 'user', content: prompt }],
+        max_tokens: 300, temperature: 0.8,
+      });
+      return {
+        text:      res.choices[0].message.content.trim(),
+        model:     'gpt-4.1-mini',
+        tokensIn:  res.usage?.prompt_tokens     ?? 0,
+        tokensOut: res.usage?.completion_tokens ?? 0,
+      };
+    },
   });
-  return res.choices[0].message.content.trim();
+  return result.text;
 }
 
 // ── 공개 빌더 ────────────────────────────────────────────────
@@ -144,11 +184,13 @@ async function buildNarrative(star, logs, report) {
   const reportSummary = report?.summary || '';
   const changePoint   = report?.change_point || '';
 
-  // 3개 챕터 병렬 생성
+  const userId = star.user_id ?? null;
+
+  // 3개 챕터 병렬 생성 (aiGateway 캐시/한도/예산 적용)
   const [originText, growthText, evolutionText] = await Promise.all([
-    buildOrigin(wishText, starName),
-    buildGrowth(wishText, logSummary, reportSummary),
-    buildEvolution(wishText, logSummary, changePoint),
+    buildOrigin(wishText, starName, userId),
+    buildGrowth(wishText, logSummary, reportSummary, userId),
+    buildEvolution(wishText, logSummary, changePoint, userId),
   ]);
 
   return {
