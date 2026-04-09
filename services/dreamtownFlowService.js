@@ -15,6 +15,14 @@ const { makeLogger } = require('../utils/logger');
 
 const log = makeLogger('dtFlow');
 
+// ── 감정 4개 (UX "3초 반응" 원칙) ────────────────────────────
+const EMOTIONS = [
+  { key: 'relieved',   label: '숨이 놓였어요' },
+  { key: 'believing',  label: '믿고 싶어졌어요' },
+  { key: 'organized',  label: '정리됐어요' },
+  { key: 'courageous', label: '용기났어요' },
+];
+
 const STAGES  = ['wish','star','growth','resonance','impact','connection'];
 const ACTIONS = {
   wish:       ['create','edit','delete'],
@@ -40,6 +48,16 @@ async function log_event({ userId, stage, action, value = {}, refId = null, sess
     const msg = e?.message || e?.detail || String(e) || '알 수 없는 오류';
     log.warn('flow 기록 실패', { err: msg, stage, action });
     // 기록 실패는 사용자 흐름을 막지 않음
+  }
+
+  // star_profile 자동 동기 (refId = starId인 경우만)
+  if (refId) {
+    try {
+      const { syncFromFlow } = require('./starProfileService');
+      await syncFromFlow({ userId: String(userId), starId: String(refId), stage, action, value });
+    } catch (e) {
+      log.warn('star_profile 동기 실패', { err: e?.message });
+    }
   }
 }
 
@@ -139,4 +157,5 @@ module.exports = {
   STAGES,
   ACTIONS,
   GOALS,
+  EMOTIONS,
 };
