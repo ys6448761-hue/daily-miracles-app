@@ -17,6 +17,7 @@ const { getEmotionTag }      = require('../services/emotionService');
 const { generateStarMeaning } = require('../services/starMeaningService');
 const { getStarStage }        = require('../services/starGrowthService');
 const flow                    = require('../services/dreamtownFlowService');
+const { assignVariant }       = require('../services/experimentService');
 const crypto = require('crypto');
 
 function dtHashWishId(input) {
@@ -291,7 +292,18 @@ router.post('/wishes/with-star', async (req, res) => {
     // wish status 업데이트
     await db.query("UPDATE dt_wishes SET status = 'converted_to_star' WHERE id = $1", [wish.id]);
 
-    res.status(201).json({ wish, star });
+    // ── A/B 실험: star_cta_test — exposure + conversion ──────
+    const expVariant = assignVariant(String(user_id), 'star_cta_test');
+    const CTA_VARIANTS = { A: '지금 별을 만들어보세요', B: '당신의 별이 곧 시작됩니다' };
+    const ctaText = CTA_VARIANTS[expVariant];
+    // exposure: 이 응답을 받는 순간 노출됨
+    flow.log({ userId: String(user_id), stage: 'experiment', action: 'exposure',
+      value: { experiment: 'star_cta_test', variant: expVariant } }).catch(() => {});
+    // conversion: 별 생성 완료 = 전환 성공
+    flow.log({ userId: String(user_id), stage: 'experiment', action: 'conversion',
+      value: { experiment: 'star_cta_test', variant: expVariant } }).catch(() => {});
+
+    res.status(201).json({ wish, star, cta: { text: ctaText, variant: expVariant } });
 
   } catch (err) {
     console.error('[DT] POST /wishes/with-star error:', err.message);

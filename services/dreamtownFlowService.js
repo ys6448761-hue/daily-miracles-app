@@ -23,7 +23,7 @@ const EMOTIONS = [
   { key: 'courageous', label: '용기났어요' },
 ];
 
-const STAGES  = ['wish','star','growth','resonance','impact','connection'];
+const STAGES  = ['wish','star','growth','resonance','impact','connection','experiment'];
 const ACTIONS = {
   wish:       ['create','edit','delete'],
   star:       ['create','name','activate'],
@@ -224,6 +224,8 @@ module.exports = {
   getDailyTrend,
   computeVerdict,
   generateActionPlan,
+  // re-export from experimentService for convenience
+  get generateExperiment() { return require('./experimentService').generateExperiment; },
   STAGES,
   ACTIONS,
   GOALS,

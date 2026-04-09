@@ -16,6 +16,7 @@ require('dotenv').config();
 const https             = require('https');
 const { run: runKpi }   = require('./kpi-report');
 const flowSvc           = require('../services/dreamtownFlowService');
+const expSvc            = require('../services/experimentService');
 
 const WEBHOOK = process.env.OPS_SLACK_WEBHOOK;
 
@@ -81,6 +82,17 @@ function pct(val) {
   return val != null ? `${val}%` : '—';
 }
 
+// ── 실험 결과 포맷 ─────────────────────────────────────────────
+function formatExperiments(winners) {
+  if (!winners || !winners.length) return null;
+  return winners.map(w => {
+    const winnerText = w.winner ? `*Winner: ${w.winner}*` : '진행 중';
+    const aLine = w.A ? `A: ${w.A.conversion_rate ?? '—'}%  (${w.A.exposures ?? 0}명)` : 'A: 데이터 없음';
+    const bLine = w.B ? `B: ${w.B.conversion_rate ?? '—'}%  (${w.B.exposures ?? 0}명)` : 'B: 데이터 없음';
+    return `🧪 \`${w.key}\`\n${aLine}\n${bLine}\n→ ${winnerText}  ${w.reason}`;
+  }).join('\n\n');
+}
+
 // ── 개선 제안 포맷 ─────────────────────────────────────────────
 function formatActionPlan(actions) {
   if (!actions || !actions.length) return '✅ 개선 필요 없음';
@@ -92,7 +104,7 @@ function formatActionPlan(actions) {
 }
 
 // ── Block Kit 빌드 ────────────────────────────────────────────
-function buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, period, kstDate }) {
+function buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, expWinners, period, kstDate }) {
   const { current: r, baseline, verdict: av } = aurora;
   const ae = auroraEmoji(av.status);
   const de = dtEmoji(dtVerdict.status);
@@ -119,6 +131,7 @@ function buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, period, kstDate })
     : '모든 지표 목표 범위 내';
 
   const actionPlanText = formatActionPlan(actionPlan);
+  const expText        = formatExperiments(expWinners);
 
   return {
     blocks: [
@@ -160,6 +173,11 @@ function buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, period, kstDate })
         type: 'section',
         text: { type: 'mrkdwn', text: `*📋 개선 제안*\n${actionPlanText}` },
       },
+      // 실험 결과 섹션 (데이터 있을 때만)
+      ...(expText ? [
+        { type: 'divider' },
+        { type: 'section', text: { type: 'mrkdwn', text: `*🧪 Experiment 결과*\n${expText}` } },
+      ] : []),
       { type: 'divider' },
 
       {
@@ -174,18 +192,19 @@ function buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, period, kstDate })
 async function main() {
   console.log(`📊 KPI 집계 중... (${DAYS}일)`);
 
-  const [aurora, dtFull] = await Promise.all([
+  const [aurora, dtFull, expResults] = await Promise.all([
     runKpi(),
     flowSvc.getKpiSummary({ days: DAYS }).catch(() => null),
+    expSvc.getExperimentResults({ days: DAYS }).catch(() => []),
   ]);
 
-  // getKpiSummary now returns { ...kpi, verdict, actionPlan }
   const dtKpi      = dtFull;
-  const dtVerdict  = dtFull?.verdict  ?? flowSvc.computeVerdict(dtFull);
+  const dtVerdict  = dtFull?.verdict   ?? flowSvc.computeVerdict(dtFull);
   const actionPlan = dtFull?.actionPlan ?? flowSvc.generateActionPlan(dtFull);
+  const expWinners = expSvc.computeWinner(expResults);
   const kstDate    = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', dateStyle: 'short', timeStyle: 'short' });
 
-  const payload = buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, period: `${DAYS}d`, kstDate });
+  const payload = buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, expWinners, period: `${DAYS}d`, kstDate });
 
   console.log('📨 Slack 전송 중...');
   const result = await postSlack(payload);
