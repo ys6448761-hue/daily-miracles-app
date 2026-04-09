@@ -16,7 +16,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { postCheckinState } from '../api/dreamtown.js';
+import { postCheckinState, postCheckinSkip } from '../api/dreamtown.js';
 
 // 상태 4개 (하드코딩 — 서버와 동기화)
 const STATES = [
@@ -61,6 +61,7 @@ export default function WishCheckin({ userId, onDone }) {
 
   // 스킵
   function handleSkip() {
+    postCheckinSkip({ userId });
     onDone();
   }
 

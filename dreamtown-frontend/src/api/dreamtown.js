@@ -388,3 +388,11 @@ export async function postCheckinState({ userId, stateKey, actionClicked = false
   });
   return res.json();
 }
+
+export function postCheckinSkip({ userId, sessionId = null } = {}) {
+  fetch('/api/dt/wish-checkin/skip', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId ?? null, session_id: sessionId ?? null }),
+  }).catch(() => {}); // fire-and-forget
+}
