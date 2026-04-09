@@ -426,6 +426,68 @@ try {
   console.error("❌ 북은하 항해 라우터 로드 실패:", error.message);
 }
 
+// 모바일 이용권 (증명 시스템)
+let benefitCredentialRoutes = null;
+try {
+  benefitCredentialRoutes = require("./routes/benefitCredentialRoutes");
+  console.log("✅ 모바일 이용권 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ 모바일 이용권 라우터 로드 실패:", error.message);
+}
+
+// DreamTown 핵심 퍼널 (소원 → 추천 → 별 생성)
+let dtFunnelRoutes = null;
+try {
+  dtFunnelRoutes = require("./routes/dtFunnelRoutes");
+  console.log("✅ DreamTown 퍼널 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ DreamTown 퍼널 라우터 로드 실패:", error.message);
+}
+
+// DreamTown 파트너 정산
+let dtSettlementRoutes = null;
+try {
+  dtSettlementRoutes = require("./routes/dtSettlementRoutes");
+  console.log("✅ DreamTown 정산 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ DreamTown 정산 라우터 로드 실패:", error.message);
+}
+
+// DreamTown Benefit Engine — 상품/혜택/지역
+let dtProductRoutes = null;
+try {
+  dtProductRoutes = require("./routes/dtProductRoutes");
+  console.log("✅ DreamTown 상품 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ DreamTown 상품 라우터 로드 실패:", error.message);
+}
+
+let dtAdminBenefitRoutes = null;
+try {
+  dtAdminBenefitRoutes = require("./routes/dtAdminBenefitRoutes");
+  console.log("✅ DreamTown 혜택 관리자 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ DreamTown 혜택 관리자 라우터 로드 실패:", error.message);
+}
+
+// DreamTown AI Unlock 모네타이제이션
+let dtAiUnlockRoutes = null;
+try {
+  dtAiUnlockRoutes = require("./routes/dtAiUnlockRoutes");
+  console.log("✅ DreamTown AI Unlock 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ DreamTown AI Unlock 라우터 로드 실패:", error.message);
+}
+
+// Aurora 5 Agent KPI 메트릭
+let agentMetricsRoutes = null;
+try {
+  agentMetricsRoutes = require("./routes/agentMetricsRoutes");
+  console.log("✅ Agent KPI 메트릭 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ Agent KPI 메트릭 라우터 로드 실패:", error.message);
+}
+
 // RepoPulse 라우터 로딩
 let repoPulseRoutes = null;
 try {
@@ -1859,6 +1921,42 @@ if (voyageRoutes) {
   app.use("/api/voyage", voyageRoutes);
 }
 
+if (benefitCredentialRoutes) {
+  app.use("/api/dt/credentials", benefitCredentialRoutes);
+  console.log("✅ 모바일 이용권 라우터 등록 완료 (/api/dt/credentials)");
+}
+
+if (dtFunnelRoutes) {
+  app.use("/api/dt/funnel", dtFunnelRoutes);
+  console.log("✅ DreamTown 퍼널 등록 완료 (/api/dt/funnel)");
+}
+
+if (dtSettlementRoutes) {
+  app.use("/api/dt/settlements", dtSettlementRoutes);
+  console.log("✅ DreamTown 정산 라우터 등록 완료 (/api/dt/settlements)");
+}
+
+if (dtProductRoutes) {
+  app.use("/api/dt/products", dtProductRoutes);
+  console.log("✅ DreamTown 상품 라우터 등록 완료 (/api/dt/products)");
+}
+
+if (dtAdminBenefitRoutes) {
+  app.use("/api/admin/dt", dtAdminBenefitRoutes);
+  console.log("✅ DreamTown 혜택 관리자 라우터 등록 완료 (/api/admin/dt)");
+}
+
+if (dtAiUnlockRoutes) {
+  app.use("/api/dt/ai-unlock", dtAiUnlockRoutes);
+  app.use("/api/admin/dt/ai-unlock", dtAiUnlockRoutes);
+  console.log("✅ DreamTown AI Unlock 라우터 등록 완료 (/api/dt/ai-unlock)");
+}
+
+if (agentMetricsRoutes) {
+  app.use("/api/ops/metrics", agentMetricsRoutes);
+  console.log("✅ Agent KPI 메트릭 라우터 등록 완료 (/api/ops/metrics)");
+}
+
 if (yeosuWishRoutes) {
   app.use("/api/yeosu/wish", yeosuWishRoutes);
   console.log("✅ 여수 소원빌기 라우터 등록 완료 (/api/yeosu/wish)");
@@ -2345,6 +2443,51 @@ try {
   console.log('✅ DreamTown Event 라우터 등록 완료 (/api/dt/events)');
 } catch (err) {
   console.warn('⚠️ DreamTown Event 라우터 등록 실패:', err.message);
+}
+
+// ---------- 별들의 속삭임 Journey Log Routes ----------
+try {
+  const journeyLogRoutes = require('./routes/journeyLogRoutes');
+  app.use('/api/dt/journey-logs', journeyLogRoutes);
+  console.log('✅ Journey Log 라우터 등록 완료 (/api/dt/journey-logs)');
+} catch (err) {
+  console.warn('⚠️ Journey Log 라우터 등록 실패:', err.message);
+}
+
+// ---------- 공명(Resonance) 피드 Routes ----------
+try {
+  const resonanceFeedRoutes = require('./routes/resonanceFeedRoutes');
+  app.use('/api/dt/resonance-feed', resonanceFeedRoutes);
+  console.log('✅ Resonance Feed 라우터 등록 완료 (/api/dt/resonance-feed)');
+} catch (err) {
+  console.warn('⚠️ Resonance Feed 라우터 등록 실패:', err.message);
+}
+
+// ---------- 연결(Connection) 단계 Routes ----------
+try {
+  const connectionStageRoutes = require('./routes/connectionStageRoutes');
+  app.use('/api/dt/connection-stage', connectionStageRoutes);
+  console.log('✅ Connection Stage 라우터 등록 완료 (/api/dt/connection-stage)');
+} catch (err) {
+  console.warn('⚠️ Connection Stage 라우터 등록 실패:', err.message);
+}
+
+// ---------- 과거 속삭임 재등장 Routes ----------
+try {
+  const recallWhisperRoutes = require('./routes/recallWhisperRoutes');
+  app.use('/api/dt/recall-whisper', recallWhisperRoutes);
+  console.log('✅ Recall Whisper 라우터 등록 완료 (/api/dt/recall-whisper)');
+} catch (err) {
+  console.warn('⚠️ Recall Whisper 라우터 등록 실패:', err.message);
+}
+
+// ---------- Galaxy Signal Routes ----------
+try {
+  const galaxySignalRoutes = require('./routes/galaxySignalRoutes');
+  app.use('/api/dt/galaxy-signal', galaxySignalRoutes);
+  console.log('✅ Galaxy Signal 라우터 등록 완료 (/api/dt/galaxy-signal)');
+} catch (err) {
+  console.warn('⚠️ Galaxy Signal 라우터 등록 실패:', err.message);
 }
 
 // DreamTown KPI 대시보드

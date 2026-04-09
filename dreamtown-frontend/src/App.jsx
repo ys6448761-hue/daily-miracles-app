@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { migrateStarId } from './lib/utils/starSession.js';
 import AppLaunch from './pages/AppLaunch.jsx';
@@ -24,11 +25,23 @@ import StoryDraftMVP from './pages/StoryDraftMVP.jsx';
 import WishSelect from './pages/WishSelect.jsx';
 import WishInputScreen from './pages/WishInputScreen.jsx';
 import JourneySceneEngine from './components/JourneySceneEngine.jsx';
+import ResonanceCard from './components/ResonanceCard.jsx';
+import ConnectionStageCard from './components/ConnectionStageCard.jsx';
+import RecallWhisperCard from './components/RecallWhisperCard.jsx';
+import MonetizationFlow from './components/MonetizationFlow.jsx';
 import VoyageWish from './pages/VoyageWish.jsx';
 import VoyageBooking from './pages/VoyageBooking.jsx';
 import VoyageStatus from './pages/VoyageStatus.jsx';
 import VoyageReflection from './pages/VoyageReflection.jsx';
 import VoyagePaymentReturn from './pages/VoyagePaymentReturn.jsx';
+import MobileTicket from './pages/MobileTicket.jsx';
+// html5-qrcode가 포함된 PartnerVerify는 lazy load — 파트너 화면 진입 시에만 번들 로드
+const PartnerVerify = lazy(() => import('./pages/PartnerVerify.jsx'));
+import PartnerManual from './pages/PartnerManual.jsx';
+import OnboardingPage from './pages/OnboardingPage.jsx';
+import AdminBenefitPage from './pages/AdminBenefitPage.jsx';
+import AdminExperimentPage from './pages/AdminExperimentPage.jsx';
+import AdminKpiPage from './pages/AdminKpiPage.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
 if (window.location.pathname.startsWith('//')) {
@@ -45,6 +58,10 @@ export default function App() {
     <BrowserRouter>
       <div className="min-h-screen bg-night-sky max-w-md mx-auto relative">
         <JourneySceneEngine />
+        <ResonanceCard />
+        <ConnectionStageCard />
+        <RecallWhisperCard />
+        <MonetizationFlow />
         <Routes>
           <Route path="/"            element={<AppLaunch />} />
           <Route path="/intro"       element={<Intro />} />
@@ -75,6 +92,18 @@ export default function App() {
           <Route path="/voyage/payment/result"     element={<VoyagePaymentReturn />} />
           <Route path="/voyage/:id"                element={<VoyageStatus />} />
           <Route path="/voyage/:id/reflection"     element={<VoyageReflection />} />
+          {/* 모바일 이용권 */}
+          <Route path="/ticket/:code"              element={<MobileTicket />} />
+          <Route path="/onboarding"                element={<OnboardingPage />} />
+          <Route path="/admin/benefit"             element={<AdminBenefitPage />} />
+          <Route path="/admin/experiment"          element={<AdminExperimentPage />} />
+          <Route path="/admin/kpi"                 element={<AdminKpiPage />} />
+          <Route path="/partner/manual"            element={<PartnerManual />} />
+          <Route path="/partner/verify"            element={
+            <Suspense fallback={<div style={{ minHeight:'100vh', background:'#0A1628' }} />}>
+              <PartnerVerify />
+            </Suspense>
+          } />
           <Route path="*"                          element={<Navigate to="/" replace />} />
         </Routes>
       </div>
