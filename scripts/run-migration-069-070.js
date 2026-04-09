@@ -53,6 +53,7 @@ const MIGRATIONS = [
   '091_dreamtown_flow.sql',
   '092_star_profile.sql',
   '093_experiment_winners.sql',
+  '094_dreamtown_flow_add_stages.sql',
 ];
 
 async function run() {

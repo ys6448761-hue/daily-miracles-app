@@ -23,7 +23,7 @@ const EMOTIONS = [
   { key: 'courageous', label: '용기났어요' },
 ];
 
-const STAGES  = ['wish','star','growth','resonance','impact','connection','experiment'];
+const STAGES  = ['wish','star','growth','resonance','impact','connection','experiment','recommendation'];
 const ACTIONS = {
   wish:       ['create','edit','delete'],
   star:       ['create','name','activate'],

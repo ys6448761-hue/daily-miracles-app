@@ -2514,6 +2514,15 @@ try {
   console.warn('⚠️ Galaxy Signal 라우터 등록 실패:', err.message);
 }
 
+// ---------- Recommendation Routes ----------
+try {
+  const recommendationRoutes = require('./routes/recommendationRoutes');
+  app.use('/api/dt/recommendation', recommendationRoutes);
+  console.log('✅ Recommendation 라우터 등록 완료 (/api/dt/recommendation)');
+} catch (err) {
+  console.warn('⚠️ Recommendation 라우터 등록 실패:', err.message);
+}
+
 // DreamTown KPI 대시보드
 app.get('/dt-events-dashboard', (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dt-events-dashboard.html'));
