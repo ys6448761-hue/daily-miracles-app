@@ -510,6 +510,22 @@ router.post('/stars/create', async (req, res) => {
       extra:      { galaxy: galaxyCode, gem_type: wish.gem_type },
     }).catch(() => {});
 
+    // Day1 프롬프트 (감정 맞춤)
+    let day1 = null;
+    try {
+      const emoRes = await db.query(
+        `SELECT value->>'state' AS state FROM dreamtown_flow
+          WHERE user_id = $1 AND stage = 'wish' AND action = 'state_checkin'
+          ORDER BY created_at DESC LIMIT 1`,
+        [String(user_id)]
+      );
+      day1 = getDay1Prompt({ emotion: emoRes.rows[0]?.state ?? null });
+    } catch { day1 = getDay1Prompt({}); }
+
+    // Day1 노출 로그
+    flow.log({ userId: String(user_id), stage: 'growth', action: 'day1_prompt_shown',
+      value: { star_id: star.id }, refId: String(star.id) }).catch(() => {});
+
     res.status(201).json({
       star_id:              star.id,
       star_name:            star.star_name,
@@ -518,6 +534,8 @@ router.post('/stars/create', async (req, res) => {
       constellation:        null,
       birth_scene_version:  'v1',
       star_stage:           star.star_stage,
+      day1,
+      next:                 `/star-birth`,
     });
 
   } catch (err) {
