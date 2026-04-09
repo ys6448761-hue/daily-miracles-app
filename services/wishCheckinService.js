@@ -18,28 +18,32 @@
 // 4개 상태. 이 외 추가 금지 (UX 무게 원칙 — 3초 반응)
 const STATE_MAP = {
   'breathless': {
-    label:      '숨이 좀 막혀요',
-    message:    '지금은 잠깐 멈춰도 괜찮아요',
-    action:     '30초만 천천히 숨 쉬어볼까요?',
-    action_key: 'breathe',
+    label:              '숨이 좀 막혀요',
+    message:            '지금은 잠깐 멈춰도 괜찮아요',
+    action:             '30초만 천천히 숨 쉬어볼까요?',
+    action_key:         'breathe',
+    completion_message: '좋아요, 충분해요',
   },
   'overthinking': {
-    label:      '생각이 많아요',
-    message:    '지금은 하나만 정해도 충분해요',
-    action:     '지금 가장 중요한 한 가지만 적어볼까요?',
-    action_key: 'write_one',
+    label:              '생각이 많아요',
+    message:            '지금은 하나만 정해도 충분해요',
+    action:             '지금 가장 중요한 한 가지만 적어볼까요?',
+    action_key:         'write_one',
+    completion_message: '이 정도면 괜찮아요',
   },
   'want_rest': {
-    label:      '그냥 쉬고 싶어요',
-    message:    '지금은 쉬어도 되는 타이밍이에요',
-    action:     '3분만 아무것도 안 해볼까요?',
-    action_key: 'rest',
+    label:              '그냥 쉬고 싶어요',
+    message:            '지금은 쉬어도 되는 타이밍이에요',
+    action:             '3분만 아무것도 안 해볼까요?',
+    action_key:         'rest',
+    completion_message: '좋아요, 충분해요',
   },
   'want_more': {
-    label:      '괜찮은데 더 잘해보고 싶어요',
-    message:    '지금 흐름 좋네요, 하나만 더 해볼까요?',
-    action:     '지금 할 일 하나만 더 해볼까요?',
-    action_key: 'next_step',
+    label:              '괜찮은데 더 잘해보고 싶어요',
+    message:            '지금 흐름 좋네요, 하나만 더 해볼까요?',
+    action:             '지금 할 일 하나만 더 해볼까요?',
+    action_key:         'next_step',
+    completion_message: '이 정도면 괜찮아요',
   },
 };
 
@@ -54,11 +58,12 @@ function getResponse(stateKey) {
   const state = STATE_MAP[stateKey];
   if (!state) return null;
   return {
-    state_key:  stateKey,
-    label:      state.label,
-    message:    state.message,
-    action:     state.action,
-    action_key: state.action_key,
+    state_key:          stateKey,
+    label:              state.label,
+    message:            state.message,
+    action:             state.action,
+    action_key:         state.action_key,
+    completion_message: state.completion_message,
   };
 }
 
