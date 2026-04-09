@@ -19,6 +19,7 @@ const { getStarStage }        = require('../services/starGrowthService');
 const flow                    = require('../services/dreamtownFlowService');
 const { assignVariantSmart, getUXConfig } = require('../services/experimentService');
 const { getTriggerRecommendation }        = require('../services/aiRecommendationService');
+const { getDay1Prompt }                   = require('../services/day1OnboardingService');
 const crypto = require('crypto');
 
 function dtHashWishId(input) {
@@ -305,12 +306,37 @@ router.post('/wishes/with-star', async (req, res) => {
         value: { experiment: 'star_flow_layout_test', variant: expVariant } }),
     ]).catch(() => {});
 
+    // ── Day1 진입 브릿지 — 별 생성 완료 화면 = Day1 시작 화면 ─
+    // 마지막 wish-checkin 감정 조회 (있으면 맞춤 프롬프트)
+    let lastEmotion = null;
+    try {
+      const emoRes = await db.query(
+        `SELECT value->>'state' AS state
+         FROM dreamtown_flow
+         WHERE user_id = $1 AND stage = 'wish' AND action = 'state_checkin'
+         ORDER BY created_at DESC LIMIT 1`,
+        [String(user_id)]
+      );
+      lastEmotion = emoRes.rows[0]?.state ?? null;
+    } catch { /* 감정 없어도 default 제공 */ }
+
+    const day1 = getDay1Prompt({ emotion: lastEmotion });
+
+    // Day1 프롬프트 노출 로그 (KPI: shown vs started 비교)
+    flow.log({
+      userId: String(user_id),
+      stage:  'growth',
+      action: 'day1_prompt_shown',
+      value:  { star_id: star.id, emotion: lastEmotion },
+    }).catch(() => {});
+
     // ── AI 트리거 추천 (after_star) — 일일 상한 적용 ──────────
     const lumi = await getTriggerRecommendation(String(user_id), 'after_star');
 
     res.status(201).json({
       wish,
       star,
+      day1,   // 별 생성 직후 Day1 시작 화면으로 연결 — 선택지 1개
       ux:   { variant: expVariant, ctaPosition: ux.ctaPosition, emotionStep: ux.emotionStep, ctaText: CTA_TEXT[expVariant] },
       lumi,
     });

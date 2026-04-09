@@ -9,9 +9,11 @@
 
 'use strict';
 
-const express = require('express');
-const router  = express.Router();
-const flow    = require('../services/dreamtownFlowService');
+const express  = require('express');
+const router   = express.Router();
+const flow     = require('../services/dreamtownFlowService');
+const db       = require('../database/db');
+const { getDay1ConversionRate } = require('../services/day1OnboardingService');
 
 // ── POST /api/dt/flow ─────────────────────────────────────────
 router.post('/', async (req, res) => {
@@ -47,6 +49,18 @@ router.get('/trend', async (req, res) => {
   const days = parseInt(req.query.days, 10) || 7;
   const trend = await flow.getDailyTrend({ days });
   return res.json({ days, trend });
+});
+
+// ── GET /api/dt/flow/day1-kpi ────────────────────────────────
+// Day1 진입률: day1_prompt_shown → day1_start 전환율 (온보딩 병목 핵심 지표)
+router.get('/day1-kpi', async (req, res) => {
+  const days = parseInt(req.query.days, 10) || 7;
+  try {
+    const kpi = await getDay1ConversionRate(db, { days });
+    res.json(kpi);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // ── GET /api/dt/flow/bottleneck ───────────────────────────────
