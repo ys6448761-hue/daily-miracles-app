@@ -1969,6 +1969,18 @@ if (dreamtownFlowRoutes) {
   console.log("✅ DreamTown Flow 라우터 등록 완료 (/api/dt/flow)");
 }
 
+let wishCheckinRoutes = null;
+try {
+  wishCheckinRoutes = require("./routes/wishCheckinRoutes");
+  console.log("✅ 소원 상태 체크인 라우터 로드 성공");
+} catch (e) {
+  console.warn("⚠️ 소원 상태 체크인 라우터 로드 실패:", e.message);
+}
+if (wishCheckinRoutes) {
+  app.use("/api/dt/wish-checkin", wishCheckinRoutes);
+  console.log("✅ 소원 상태 체크인 라우터 등록 완료 (/api/dt/wish-checkin)");
+}
+
 if (yeosuWishRoutes) {
   app.use("/api/yeosu/wish", yeosuWishRoutes);
   console.log("✅ 여수 소원빌기 라우터 등록 완료 (/api/yeosu/wish)");
