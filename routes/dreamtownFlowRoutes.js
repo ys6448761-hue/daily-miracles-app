@@ -1,9 +1,10 @@
 /**
  * dreamtownFlowRoutes.js
  *
- * POST /api/dt/flow          — 이벤트 기록
- * GET  /api/dt/flow/kpi      — KPI 3개 + 루미 판정
- * GET  /api/dt/flow/trend    — 일별 트렌드
+ * POST /api/dt/flow             — 이벤트 기록
+ * GET  /api/dt/flow/kpi         — KPI 3개 + 루미 판정
+ * GET  /api/dt/flow/trend       — 일별 트렌드
+ * GET  /api/dt/flow/bottleneck  — 병목 분석 (1개 선택 SSOT)
  */
 
 'use strict';
@@ -46,6 +47,23 @@ router.get('/trend', async (req, res) => {
   const days = parseInt(req.query.days, 10) || 7;
   const trend = await flow.getDailyTrend({ days });
   return res.json({ days, trend });
+});
+
+// ── GET /api/dt/flow/bottleneck ───────────────────────────────
+// 병목 분석: 퍼널 4단계 중 gap 최대 1개 → 원인 + 액션 반환
+router.get('/bottleneck', async (req, res) => {
+  const days = parseInt(req.query.days, 10) || 7;
+  try {
+    const kpi        = await flow.getKpiSummary({ days });
+    const bottleneck = flow.analyzeBottleneck(kpi);
+    return res.json({
+      period:     `${days}d`,
+      generated:  new Date().toISOString(),
+      bottleneck,
+    });
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
+  }
 });
 
 module.exports = router;

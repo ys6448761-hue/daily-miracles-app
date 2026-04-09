@@ -16,6 +16,7 @@ require('dotenv').config();
 const https             = require('https');
 const { run: runKpi }   = require('./kpi-report');
 const flowSvc           = require('../services/dreamtownFlowService');
+const { analyzeBottleneck } = flowSvc;
 const expSvc            = require('../services/experimentService');
 const evaluator         = require('../services/experimentEvaluator');
 const uxConfig          = require('../services/uxExperimentConfig');
@@ -109,6 +110,18 @@ function formatUXExperiments(uxWinners) {
   }).join('\n\n');
 }
 
+// ── 병목 분석 포맷 (루미 SSOT — 1개만) ───────────────────────
+function formatBottleneck(b) {
+  if (!b) return null;
+  if (b.status === 'healthy') return '✅ 모든 단계 목표 달성 — 병목 없음';
+  return [
+    `*병목:* → ${b.stage} 단계  (현재 ${b.rate}%  목표 ${b.threshold}%+)`,
+    `*원인:* → ${b.cause_detail}`,
+    `*액션:* → ${b.action}`,
+    `*목표:* → ${b.rate}% → ${b.target}%  (${b.period_days}일)`,
+  ].join('\n');
+}
+
 // ── 개선 제안 포맷 ─────────────────────────────────────────────
 function formatActionPlan(actions) {
   if (!actions || !actions.length) return '✅ 개선 필요 없음';
@@ -120,7 +133,7 @@ function formatActionPlan(actions) {
 }
 
 // ── Block Kit 빌드 ────────────────────────────────────────────
-function buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, expWinners, uxWinners, period, kstDate }) {
+function buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, bottleneck, expWinners, uxWinners, period, kstDate }) {
   const { current: r, baseline, verdict: av } = aurora;
   const ae = auroraEmoji(av.status);
   const de = dtEmoji(dtVerdict.status);
@@ -146,6 +159,7 @@ function buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, expWinners, uxWinn
     ? dtVerdict.insights.map(i => `• ${i}`).join('\n')
     : '모든 지표 목표 범위 내';
 
+  const bottleneckText = formatBottleneck(bottleneck);
   const actionPlanText = formatActionPlan(actionPlan);
   const expText        = formatExperiments(expWinners);
   const uxExpText      = formatUXExperiments(uxWinners);
@@ -185,6 +199,11 @@ function buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, expWinners, uxWinn
       },
       { type: 'divider' },
 
+      // 병목 분석 섹션 (1개 SSOT)
+      ...(bottleneckText ? [
+        { type: 'divider' },
+        { type: 'section', text: { type: 'mrkdwn', text: `*📊 병목 분석*\n${bottleneckText}` } },
+      ] : []),
       // 개선 제안 섹션
       {
         type: 'section',
@@ -221,8 +240,9 @@ async function main() {
   ]);
 
   const dtKpi      = dtFull;
-  const dtVerdict  = dtFull?.verdict   ?? flowSvc.computeVerdict(dtFull);
-  const actionPlan = dtFull?.actionPlan ?? flowSvc.generateActionPlan(dtFull);
+  const dtVerdict  = dtFull?.verdict        ?? flowSvc.computeVerdict(dtFull);
+  const actionPlan = dtFull?.actionPlan     ?? flowSvc.generateActionPlan(dtFull);
+  const bottleneck = flowSvc.analyzeBottleneck(dtFull);
   const expWinners = expSvc.computeWinner(expResults);
 
   // ── UX 자동 승격 ─────────────────────────────────────────────
@@ -244,7 +264,7 @@ async function main() {
 
   const kstDate = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', dateStyle: 'short', timeStyle: 'short' });
 
-  const payload = buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, expWinners, uxWinners, period: `${DAYS}d`, kstDate });
+  const payload = buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, bottleneck, expWinners, uxWinners, period: `${DAYS}d`, kstDate });
 
   console.log('📨 Slack 전송 중...');
   const result = await postSlack(payload);

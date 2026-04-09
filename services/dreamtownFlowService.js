@@ -218,12 +218,96 @@ function generateActionPlan(kpi) {
   return actions;
 }
 
+// ── 병목 분석 (루미 SSOT — 1개만 선택) ──────────────────────
+//
+// 퍼널 4단계: Wish → Star → Growth 진입 → Growth 유지 → Resonance
+// 판단 규칙:
+//   Star 생성률 < 70  → UX 문제
+//   Growth 진입률 < 60 → 온보딩 문제
+//   Growth 유지율 < 50 → 경험 문제
+//   Resonance < 20    → 콘텐츠 문제
+// 선택: gap(threshold - actual)이 가장 큰 1개만 반환
+function analyzeBottleneck(kpi) {
+  if (!kpi) return null;
+
+  const starRate    = parseFloat(kpi.star_creation_rate  ?? 0);
+  const growthEntry = kpi.star_count > 0
+    ? Math.round((kpi.growth_day1_count ?? 0) / kpi.star_count * 100)
+    : 0;
+  const growthPersist = parseFloat(kpi.growth_persist_rate ?? 0);
+  const resonRate   = parseFloat(kpi.resonance_rate ?? 0);
+
+  const FUNNEL = [
+    {
+      stage:     'Star 생성',
+      rate:      starRate,
+      threshold: 70,
+      cause:     'UX',
+      cause_detail: 'UX 문제 (소원→별 전환)',
+      action:    'CTA 위치 A/B 테스트',
+      kpi_key:   'star_creation_rate',
+    },
+    {
+      stage:     'Growth 진입',
+      rate:      growthEntry,
+      threshold: 60,
+      cause:     '온보딩',
+      cause_detail: '온보딩 문제 (별→첫 행동 진입)',
+      action:    'Day1 메시지 단순화 실험',
+      kpi_key:   'growth_entry_rate',
+    },
+    {
+      stage:     'Growth 유지',
+      rate:      growthPersist,
+      threshold: 50,
+      cause:     '경험',
+      cause_detail: '경험 문제 (Day1→Day7 완주)',
+      action:    'Day7 완주 리마인더 실험',
+      kpi_key:   'growth_persist_rate',
+    },
+    {
+      stage:     'Resonance',
+      rate:      resonRate,
+      threshold: 20,
+      cause:     '콘텐츠',
+      cause_detail: '콘텐츠 문제 (공명 동기 부족)',
+      action:    '공명 메시지 감정 A/B 테스트',
+      kpi_key:   'resonance_rate',
+    },
+  ];
+
+  // 목표 미달 항목 중 gap 최대 1개 선택
+  const worst = FUNNEL
+    .map(f => ({ ...f, gap: f.threshold - f.rate }))
+    .filter(f => f.gap > 0)
+    .sort((a, b) => b.gap - a.gap)[0] ?? null;
+
+  if (!worst) return { status: 'healthy', message: '모든 단계 목표 달성' };
+
+  const target = Math.min(worst.threshold, Math.round(worst.rate * 1.1) + 1);
+
+  return {
+    status:       'bottleneck',
+    stage:        worst.stage,
+    rate:         worst.rate,
+    threshold:    worst.threshold,
+    gap:          worst.gap,
+    cause:        worst.cause,
+    cause_detail: worst.cause_detail,
+    action:       worst.action,
+    kpi_key:      worst.kpi_key,
+    target,
+    period_days:  7,
+  };
+}
+
 module.exports = {
   log: log_event,
   getKpiSummary,
   getDailyTrend,
   computeVerdict,
   generateActionPlan,
+  analyzeBottleneck,
   // re-export from experimentService for convenience
   get generateExperiment() { return require('./experimentService').generateExperiment; },
   STAGES,
