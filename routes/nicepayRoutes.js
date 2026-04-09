@@ -271,15 +271,39 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
       let successUrl = nicepayService.buildWixSuccessUrl(Moid, payment.verification_token);
       if (_db) {
         try {
-          const dtLog = await _db.query(`
-            SELECT star_id FROM dt_dream_logs
-            WHERE payload->>'order_id' = $1
-              AND payload->>'event'    = 'upgrade_checkout_started'
+          // Day7 업그레이드 감지 (dreamtown_flow 우선)
+          const dtFlow = await _db.query(`
+            SELECT value->>'star_id' AS star_id, user_id
+            FROM dreamtown_flow
+            WHERE value->>'order_id' = $1
+              AND stage = 'impact'
+              AND action = 'upgrade_order_created'
             LIMIT 1
           `, [Moid]);
-          if (dtLog.rows.length > 0) {
-            successUrl = `/my-star/${dtLog.rows[0].star_id}?paid=true`;
-            console.log(`🌟 DreamTown 결제 완료 → ${successUrl}`);
+
+          if (dtFlow.rows.length > 0) {
+            const { star_id: starId, user_id: userId } = dtFlow.rows[0];
+            // impact/upgrade_success 로그
+            await _db.query(
+              `INSERT INTO dreamtown_flow (user_id, stage, action, value, ref_id)
+               VALUES ($1, 'impact', 'upgrade_success', $2, $3)`,
+              [userId, JSON.stringify({ star_id: starId, order_id: Moid, plan: '30day' }), starId]
+            ).catch(e => console.warn('⚠️ upgrade_success 로그 실패:', e.message));
+
+            successUrl = `/day7-complete?upgraded=true&starId=${encodeURIComponent(starId)}`;
+            console.log(`🌟 DreamTown Day7 업그레이드 완료 → ${successUrl}`);
+          } else {
+            // 기존 dt_dream_logs 경로 (dtEngineRoutes /upgrade)
+            const dtLog = await _db.query(`
+              SELECT star_id FROM dt_dream_logs
+              WHERE payload->>'order_id' = $1
+                AND payload->>'event'    = 'upgrade_checkout_started'
+              LIMIT 1
+            `, [Moid]);
+            if (dtLog.rows.length > 0) {
+              successUrl = `/my-star/${dtLog.rows[0].star_id}?paid=true`;
+              console.log(`🌟 DreamTown Engine 결제 완료 → ${successUrl}`);
+            }
           }
         } catch (e) {
           console.warn('⚠️ DreamTown star_id 조회 실패 — 기본 successUrl 사용:', e.message);

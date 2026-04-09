@@ -2453,6 +2453,69 @@ router.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: 'dreamtown-api', timestamp: new Date().toISOString() });
 });
 
+// ── POST /api/dt/upgrade — Day7 완주 직후 30일 여정 업그레이드 ─
+// Body: { userId, starId }
+// 원칙: Day7 완료 직후 1회만 — 강제 아님, 자연스러운 다음 단계
+router.post('/upgrade', async (req, res) => {
+  const { userId, starId } = req.body;
+  if (!userId || !starId) return res.status(400).json({ error: 'userId, starId 필수' });
+
+  // Day7 완료 확인 — 완주하지 않은 유저에게 제안 금지
+  try {
+    const { rows } = await db.query(
+      `SELECT star_stage FROM dt_stars WHERE id = $1 AND user_id = $2`,
+      [starId, userId]
+    );
+    if (!rows.length)               return res.status(404).json({ error: '별을 찾을 수 없어요' });
+    if (rows[0].star_stage === 'day1') {
+      return res.status(403).json({ error: 'Day7 완주 후 선택할 수 있어요' });
+    }
+  } catch (e) {
+    console.error('[DT] upgrade star check error:', e.message);
+  }
+
+  // impact/upgrade_attempt 로그
+  await flow.log({
+    userId: String(userId),
+    stage:  'impact',
+    action: 'upgrade_attempt',
+    value:  { star_id: starId, plan: '30day' },
+    refId:  String(starId),
+  }).catch(() => {});
+
+  // NicePay 주문 생성
+  let nicepayService;
+  try {
+    nicepayService = require('../services/nicepayService');
+  } catch {
+    return res.status(503).json({ error: '결제 서비스를 사용할 수 없습니다' });
+  }
+
+  try {
+    const payment = await nicepayService.createPayment(24900, '소원꿈터 30일 여정');
+
+    // dreamtown_flow에 order_id 저장 (콜백에서 day7_upgrade 감지용)
+    await flow.log({
+      userId: String(userId),
+      stage:  'impact',
+      action: 'upgrade_order_created',
+      value:  { star_id: starId, order_id: payment.moid ?? payment.orderId, plan: '30day' },
+      refId:  String(starId),
+    }).catch(() => {});
+
+    return res.json({
+      ok:          true,
+      payment_url: `/pay?moid=${encodeURIComponent(payment.moid ?? payment.orderId)}&amount=24900`,
+      order_id:    payment.moid ?? payment.orderId,
+      amount:      24900,
+      plan:        '30day',
+    });
+  } catch (e) {
+    console.error('[DT] upgrade NicePay error:', e.message);
+    return res.status(500).json({ error: '결제 시작에 실패했습니다' });
+  }
+});
+
 // ── POST /api/dt/stars/:id/complete — Day7 완주 확정 ────────────
 // Body: { userId }
 // 역할: star_stage day7 승격 + day7_complete 로그
