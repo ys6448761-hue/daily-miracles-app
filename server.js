@@ -1957,6 +1957,18 @@ if (agentMetricsRoutes) {
   console.log("✅ Agent KPI 메트릭 라우터 등록 완료 (/api/ops/metrics)");
 }
 
+let dreamtownFlowRoutes = null;
+try {
+  dreamtownFlowRoutes = require("./routes/dreamtownFlowRoutes");
+  console.log("✅ DreamTown Flow 라우터 로드 성공");
+} catch (e) {
+  console.warn("⚠️ DreamTown Flow 라우터 로드 실패:", e.message);
+}
+if (dreamtownFlowRoutes) {
+  app.use("/api/dt/flow", dreamtownFlowRoutes);
+  console.log("✅ DreamTown Flow 라우터 등록 완료 (/api/dt/flow)");
+}
+
 if (yeosuWishRoutes) {
   app.use("/api/yeosu/wish", yeosuWishRoutes);
   console.log("✅ 여수 소원빌기 라우터 등록 완료 (/api/yeosu/wish)");

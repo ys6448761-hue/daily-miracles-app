@@ -50,6 +50,7 @@ const MIGRATIONS = [
   '088_ai_unlock_monetization.sql',
   '089_ab_experiment_assignments.sql',
   '090_agent_metrics.sql',
+  '091_dreamtown_flow.sql',
 ];
 
 async function run() {

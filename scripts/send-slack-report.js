@@ -1,19 +1,21 @@
 /**
- * send-slack-report.js — Aurora 5 KPI Slack 자동 리포트
+ * send-slack-report.js — Aurora 5 + DreamTown KPI Slack 자동 리포트
  *
  * 실행: node scripts/send-slack-report.js [--days 7]
  * 환경변수: DATABASE_URL, OPS_SLACK_WEBHOOK
  *
- * GitHub Actions daily cron에서 호출됨.
- * kpi-report.js의 run()을 실행한 뒤 Block Kit 메시지로 Slack 전송.
+ * 두 섹션:
+ *   1. Aurora 5 KPI (재시도율/턴수/응답길이) — Claude Code 개발 효율
+ *   2. DreamTown KPI (별생성률/성장지속률/공명률) — 사용자 흐름 건강도
  */
 
 'use strict';
 
 require('dotenv').config();
 
-const https   = require('https');
-const { run: runKpi } = require('./kpi-report');
+const https             = require('https');
+const { run: runKpi }   = require('./kpi-report');
+const flowSvc           = require('../services/dreamtownFlowService');
 
 const WEBHOOK = process.env.OPS_SLACK_WEBHOOK;
 
@@ -22,7 +24,12 @@ if (!WEBHOOK) {
   process.exit(1);
 }
 
-// ── Slack https 전송 ─────────────────────────────────────────────
+// ── CLI 인자 ──────────────────────────────────────────────────
+const args    = process.argv.slice(2);
+const daysArg = args.indexOf('--days');
+const DAYS    = daysArg !== -1 ? parseInt(args[daysArg + 1], 10) : 7;
+
+// ── Slack https 전송 ──────────────────────────────────────────
 function postSlack(payload) {
   return new Promise((resolve) => {
     const url      = new URL(WEBHOOK);
@@ -42,11 +49,7 @@ function postSlack(payload) {
       let body = '';
       res.on('data', chunk => body += chunk);
       res.on('end', () => {
-        if (res.statusCode === 200) {
-          resolve({ ok: true });
-        } else {
-          resolve({ ok: false, error: `HTTP ${res.statusCode}: ${body}` });
-        }
+        resolve(res.statusCode === 200 ? { ok: true } : { ok: false, error: `HTTP ${res.statusCode}: ${body}` });
       });
     });
 
@@ -58,12 +61,15 @@ function postSlack(payload) {
   });
 }
 
-// ── 판정 색상 → Slack emoji ──────────────────────────────────────
-function verdictEmoji(status) {
+// ── 헬퍼 ──────────────────────────────────────────────────────
+function auroraEmoji(status) {
   return { success: '🟢', partial: '🟡', rollback: '🔴', no_change: '🟣', insufficient_data: '⬜' }[status] ?? '⬜';
 }
 
-// ── 지표 델타 문자열 ─────────────────────────────────────────────
+function dtEmoji(status) {
+  return { success: '🟢', partial: '🟡', weak: '🟠', critical: '🔴', insufficient_data: '⬜' }[status] ?? '⬜';
+}
+
 function delta(current, baseline, key, unit = '') {
   if (current[key] == null || !baseline || baseline[key] == null) return '—';
   const diff = parseFloat(current[key]) - parseFloat(baseline[key]);
@@ -71,50 +77,90 @@ function delta(current, baseline, key, unit = '') {
   return `${sign}${diff.toFixed(1)}${unit}`;
 }
 
-// ── Block Kit 페이로드 생성 ──────────────────────────────────────
-function buildPayload(report) {
-  const { period, generated, current: r, baseline, verdict } = report;
-  const kstDate = new Date(generated).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', dateStyle: 'short', timeStyle: 'short' });
-  const emoji   = verdictEmoji(verdict.status);
+function pct(val) {
+  return val != null ? `${val}%` : '—';
+}
 
-  const lines = [
-    `*재시도율*   \`${r.retry_rate ?? '—'}%\`  (기준: ${baseline?.retry_rate ?? '—'}%  /  목표: -30%)  ${delta(r, baseline, 'retry_rate', '%')}`,
-    `*평균 턴*     \`${r.avg_turns ?? '—'}턴\`  (기준: ${baseline?.avg_turns ?? '—'}  /  목표: -20~40%)  ${delta(r, baseline, 'avg_turns', '턴')}`,
-    `*응답 길이*  \`${r.avg_length ?? '—'}자\`  (기준: ${baseline?.avg_length ?? '—'}  /  목표: -30~50%)  ${delta(r, baseline, 'avg_length', '자')}`,
+// ── Block Kit 빌드 ────────────────────────────────────────────
+function buildPayload({ aurora, dtKpi, dtVerdict, period, kstDate }) {
+  const { current: r, baseline, verdict: av } = aurora;
+  const ae = auroraEmoji(av.status);
+  const de = dtEmoji(dtVerdict.status);
+
+  // Aurora 5 섹션
+  const auroraLines = [
+    `*재시도율*   \`${r.retry_rate ?? '—'}%\`   기준 ${baseline?.retry_rate ?? '—'}%   목표 -30%   ${delta(r, baseline, 'retry_rate', '%')}`,
+    `*평균 턴*     \`${r.avg_turns ?? '—'}턴\`   기준 ${baseline?.avg_turns ?? '—'}턴   목표 -20~40%   ${delta(r, baseline, 'avg_turns', '턴')}`,
+    `*응답 길이*  \`${r.avg_length ?? '—'}자\`   기준 ${baseline?.avg_length ?? '—'}자   목표 -30~50%   ${delta(r, baseline, 'avg_length', '자')}`,
     `*작업 수*     시작 ${r.total_tasks ?? 0} / 완료 ${r.total_completed ?? 0} / 재시도 ${r.total_retries ?? 0}`,
   ].join('\n');
+
+  // DreamTown 섹션
+  const dtLines = dtKpi ? [
+    `*별 생성률*       \`${pct(dtKpi.star_creation_rate)}\`   목표 70%+   (소원 ${dtKpi.wish_count ?? 0}개 → 별 ${dtKpi.star_count ?? 0}개)`,
+    `*성장 지속률*    \`${pct(dtKpi.growth_persist_rate)}\`   목표 50%+   (Day1 ${dtKpi.growth_day1_count ?? 0}명 → Day7 ${dtKpi.growth_day7_count ?? 0}명)`,
+    `*공명 발생률*    \`${pct(dtKpi.resonance_rate)}\`   목표 20%+   (전체 ${dtKpi.total_active_users ?? 0}명 중 ${dtKpi.resonance_user_count ?? 0}명 공명)`,
+  ].join('\n') : '데이터 수집 중...';
+
+  // 루미 인사이트
+  const insightText = dtVerdict.insights?.length
+    ? dtVerdict.insights.map(i => `• ${i}`).join('\n')
+    : '모든 지표 목표 범위 내';
 
   return {
     blocks: [
       {
         type: 'header',
-        text: { type: 'plain_text', text: `${emoji} Aurora 5 KPI — ${period} 리포트`, emoji: true },
+        text: { type: 'plain_text', text: `🌌 DreamTown Daily KPI — ${period} 리포트`, emoji: true },
       },
       { type: 'divider' },
+
+      // Aurora 5 (개발 효율)
       {
         type: 'section',
-        text: { type: 'mrkdwn', text: lines },
-      },
-      {
-        type: 'section',
-        text: { type: 'mrkdwn', text: `${emoji} *판정: ${verdict.label}*\n>${verdict.message}` },
+        text: { type: 'mrkdwn', text: `${ae} *Aurora 5 — 개발 효율*\n${auroraLines}` },
       },
       {
         type: 'context',
-        elements: [{ type: 'mrkdwn', text: `생성: ${kstDate} KST  |  /admin/kpi 에서 전체 대시보드 확인` }],
+        elements: [{ type: 'mrkdwn', text: `${ae} 판정: *${av.label}*  — ${av.message}` }],
+      },
+      { type: 'divider' },
+
+      // DreamTown KPI (사용자 흐름)
+      {
+        type: 'section',
+        text: { type: 'mrkdwn', text: `${de} *DreamTown — 사용자 흐름*\n${dtLines}` },
+      },
+      {
+        type: 'section',
+        text: { type: 'mrkdwn', text: `${de} *루미 판정: ${dtVerdict.label}*\n${insightText}` },
+      },
+      { type: 'divider' },
+
+      {
+        type: 'context',
+        elements: [{ type: 'mrkdwn', text: `생성: ${kstDate} KST  |  /admin/kpi  |  GET /api/dt/flow/kpi` }],
       },
     ],
   };
 }
 
-// ── 메인 ─────────────────────────────────────────────────────────
+// ── 메인 ──────────────────────────────────────────────────────
 async function main() {
-  console.log('📊 KPI 집계 중...');
-  const report = await runKpi();
+  console.log(`📊 KPI 집계 중... (${DAYS}일)`);
+
+  const [aurora, dtKpi] = await Promise.all([
+    runKpi(),
+    flowSvc.getKpiSummary({ days: DAYS }).catch(() => null),
+  ]);
+
+  const dtVerdict = flowSvc.computeVerdict(dtKpi);
+  const kstDate   = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', dateStyle: 'short', timeStyle: 'short' });
+
+  const payload = buildPayload({ aurora, dtKpi, dtVerdict, period: `${DAYS}d`, kstDate });
 
   console.log('📨 Slack 전송 중...');
-  const payload = buildPayload(report);
-  const result  = await postSlack(payload);
+  const result = await postSlack(payload);
 
   if (result.ok) {
     console.log('✅ Slack 리포트 전송 완료');
