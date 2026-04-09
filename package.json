@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "node server.js",
     "start": "node server.js",
+    "report:bottleneck": "node scripts/bottleneck-report.js",
+    "report:slack": "node scripts/send-slack-report.js",
+    "retention:cron": "node scripts/retention-cron.js",
     "validate:rules": "node scripts/validateRules.js",
     "pipeline:weekly": "npx ts-node scripts/run-pipeline.ts",
     "pipeline:weekly:test": "npx ts-node scripts/run-pipeline.ts --team=테스트팀",
