@@ -7,12 +7,19 @@
  * CTA      (2.3s~)       첫 항해 시작(primary) / 이 순간 간직하기(secondary) — delay 0.5s 자연 노출
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { gaStarCreated, gaFirstVoyageStart, gaDtShareClick } from '../utils/gtag';
-import { shareStarBirth } from '../utils/kakaoShare';
+import { gaStarCreated, gaFirstVoyageStart } from '../utils/gtag';
 import { readSavedStar } from '../lib/utils/starSession.js';
+import { logFlowEvent } from '../api/dreamtown.js';
+
+const DAY1_DEFAULT = {
+  message:    '지금 이 순간이 가장 중요해요',
+  prompt:     '오늘 이 소원을 위한 작은 행동 하나를 적어볼까요?',
+  cta:        '오늘의 작은 행동 시작',
+  action_key: 'first_step',
+};
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -106,13 +113,17 @@ export default function StarBirth() {
   const galaxy        = resolved?.galaxy        ?? null;
   const gemType       = resolved?.gemType       ?? null;
   const wishText      = resolved?.wishText      ?? '';
+  const userId        = resolved?.userId        ?? null;
+  const day1          = resolved?.day1          ?? DAY1_DEFAULT;
   // galaxyDisplay: 항해(voyage) 등 외부 유입 시 '북은하' 등 커스텀 노출 가능
   const galaxyDisplay = resolved?.galaxyDisplay ?? null;
 
   // phase: 1 → 2 → 3 → 'done'
-  const [phase,        setPhase]        = useState(1);
-  const [showCTA,      setShowCTA]      = useState(false);
-  const [shareFeedback, setShareFeedback] = useState(0); // 공유 피드백 animation key (0=미노출)
+  const [phase,      setPhase]      = useState(1);
+  const [showCTA,    setShowCTA]    = useState(false);
+  // Day1 자동 카운트다운 (1.5s after CTA 노출)
+  const [autoCount,  setAutoCount]  = useState(null); // null | 1.5 → 0
+  const autoRef = useRef(null);
 
   // ── 타임라인 ────────────────────────────────────────────
   useEffect(() => {
@@ -130,12 +141,38 @@ export default function StarBirth() {
     if (phase === 'done') gaStarCreated({ gemType, galaxyType: galaxy });
   }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  function handleVoyage() {
+  // ── Day1 자동 카운트다운 (CTA 노출 후 1.5s) ─────────────
+  useEffect(() => {
+    if (!showCTA) return;
+    setAutoCount(1.5);
+    let remain = 1.5;
+    autoRef.current = setInterval(() => {
+      remain = Math.max(0, remain - 0.1);
+      setAutoCount(remain);
+      if (remain <= 0) {
+        clearInterval(autoRef.current);
+        handleDay1Start('auto');
+      }
+    }, 100);
+    return () => clearInterval(autoRef.current);
+  }, [showCTA]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function handleDay1Start(source = 'click') {
+    clearInterval(autoRef.current);
+    // day1_start 로그 — fire-and-forget
+    if (userId || starId) {
+      logFlowEvent({
+        userId: String(userId ?? starId),
+        stage:  'growth',
+        action: 'day1_start',
+        value:  { starId, action_key: day1.action_key, source },
+      });
+    }
+    gaFirstVoyageStart({ starId, galaxyCode: galaxy, direction: GALAXY_TO_DIRECTION[galaxy] ?? 'south' });
     const direction = GALAXY_TO_DIRECTION[galaxy] ?? 'south';
     const message   = FIRST_VOYAGE_MESSAGE[galaxy] ?? '오늘, 첫 항해가 시작됩니다.';
     if (starId) localStorage.setItem('dt_first_voyage_' + starId, 'started');
-    gaFirstVoyageStart({ starId, galaxyCode: galaxy, direction });
-    nav('/day', { state: { direction, message, starId, isFirstVoyage: true }, replace: true });
+    nav('/day', { state: { direction, message, starId, isFirstVoyage: true, fromDay1: true }, replace: true });
   }
 
   // starId 없음 — state + sessionStorage 모두 유실
@@ -329,7 +366,7 @@ export default function StarBirth() {
           )}
         </AnimatePresence>
 
-        {/* ── CTA — 2.3s 후 자연 노출 ── */}
+        {/* ── Day1 CTA — 2.3s 후 자연 노출 ── */}
         <AnimatePresence>
           {showCTA && (
             <motion.div
@@ -337,11 +374,22 @@ export default function StarBirth() {
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
-              style={{ display: 'flex', flexDirection: 'column', gap: 12 }}
+              style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}
             >
-              {/* PRIMARY: 첫 항해 시작 */}
+              {/* 루미 메시지 */}
+              <p style={{ fontSize: 13, color: 'rgba(255,215,106,0.75)', marginBottom: 2, letterSpacing: '0.02em' }}>
+                ✨ 루미의 발견
+              </p>
+              <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.88)', lineHeight: 1.55, marginBottom: 6, textAlign: 'center' }}>
+                &ldquo;{day1.message}&rdquo;
+              </p>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 14, textAlign: 'center', lineHeight: 1.5 }}>
+                {day1.prompt}
+              </p>
+
+              {/* PRIMARY: 오늘의 작은 행동 시작 — 1개만 */}
               <button
-                onClick={handleVoyage}
+                onClick={() => handleDay1Start('click')}
                 style={{
                   width: '100%',
                   padding: '16px 0',
@@ -354,47 +402,29 @@ export default function StarBirth() {
                   cursor: 'pointer',
                   boxShadow: '0 0 32px 8px rgba(255,215,106,0.22)',
                   letterSpacing: '0.01em',
+                  position: 'relative',
+                  overflow: 'hidden',
                 }}
               >
-                지금 항해 시작하기 ✨
+                {day1.cta}
+                {/* 카운트다운 progress bar */}
+                {autoCount !== null && autoCount > 0 && (
+                  <span style={{
+                    position: 'absolute',
+                    bottom: 0, left: 0,
+                    height: 3,
+                    width: `${((1.5 - autoCount) / 1.5) * 100}%`,
+                    background: 'rgba(13,27,42,0.25)',
+                    transition: 'width 0.1s linear',
+                    borderRadius: 9999,
+                  }} />
+                )}
               </button>
 
-              {/* SECONDARY: 공유 — 보조 행동 */}
-              <button
-                onClick={() => {
-                  gaDtShareClick({ starId, location: 'star_birth' });
-                  shareStarBirth({ starId, starName, wishText });
-                  setShareFeedback(k => (k || 0) + 1);
-                }}
-                style={{
-                  width: '100%',
-                  padding: '13px 0',
-                  borderRadius: 9999,
-                  background: 'transparent',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                  color: 'rgba(255,255,255,0.45)',
-                  fontSize: 14,
-                  cursor: 'pointer',
-                  letterSpacing: '0.01em',
-                }}
-              >
-                이 순간 간직하기
-              </button>
-
-              {/* 공유 성공 피드백 — inline, 1.8s 자동 소멸 */}
-              {shareFeedback && (
-                <p
-                  key={shareFeedback}
-                  className="sb-share-feedback"
-                  style={{
-                    fontSize: 12,
-                    color: 'rgba(255,255,255,0.4)',
-                    textAlign: 'center',
-                    marginTop: -4,
-                    pointerEvents: 'none',
-                  }}
-                >
-                  이 별이 누군가에게 닿을 수 있어요
+              {/* 카운트다운 힌트 */}
+              {autoCount !== null && autoCount > 0 && (
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', marginTop: -2 }}>
+                  {autoCount.toFixed(1)}초 후 자동으로 시작돼요
                 </p>
               )}
             </motion.div>

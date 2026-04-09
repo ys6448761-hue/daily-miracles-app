@@ -396,3 +396,12 @@ export function postCheckinSkip({ userId, sessionId = null } = {}) {
     body: JSON.stringify({ user_id: userId ?? null, session_id: sessionId ?? null }),
   }).catch(() => {}); // fire-and-forget
 }
+
+// dreamtown_flow 이벤트 로그 — fire-and-forget (응답 대기 없음)
+export function logFlowEvent({ userId, stage, action, value = {}, refId = null }) {
+  fetch('/api/dt/flow', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, stage, action, value, refId }),
+  }).catch(() => {});
+}

@@ -69,7 +69,15 @@ export default function WishGate() {
       saveStarId(star.star_id);
       localStorage.removeItem('dt_prev_star_id');
 
-      const starBirthState = { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy, gemType };
+      // Day1 진입 브릿지 — 별 생성 완료 화면 = Day1 시작 화면
+      const day1 = star.day1 ?? {
+        message:    '지금 이 순간이 가장 중요해요',
+        prompt:     '오늘 이 소원을 위한 작은 행동 하나를 적어볼까요?',
+        cta:        '오늘의 작은 행동 시작',
+        action_key: 'first_step',
+      };
+
+      const starBirthState = { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy, gemType, userId, day1, wishText: wishText.trim() };
       try { sessionStorage.setItem('dt_recent_star', JSON.stringify(starBirthState)); } catch (_) {}
 
       nav('/star-birth', { state: starBirthState });
