@@ -16,6 +16,7 @@ const { createStarLocation } = require('../services/starLocationService');
 const { getEmotionTag }      = require('../services/emotionService');
 const { generateStarMeaning } = require('../services/starMeaningService');
 const { getStarStage }        = require('../services/starGrowthService');
+const flow                    = require('../services/dreamtownFlowService');
 const crypto = require('crypto');
 
 function dtHashWishId(input) {
@@ -182,6 +183,12 @@ router.post('/wishes', async (req, res) => {
     if (safety.level === 'YELLOW') {
       console.warn('[DT] YELLOW signal — wish saved with safety flag:', safety.reason);
     }
+
+    // ── flow 계측 (wish/create) ──────────────────────────────────
+    try {
+      await flow.log({ userId: String(userId), stage: 'wish', action: 'create', value: { channel: 'web', gemType: gem_type }, refId: String(wish.id) });
+    } catch (e) { console.warn('flow log failed (wish/create)', e.message); }
+
     res.status(201).json({ wish_id: wish.id, status: wish.status, safety: wish.safety_level });
 
   } catch (err) {
@@ -235,6 +242,11 @@ router.post('/wishes/with-star', async (req, res) => {
     );
     const wish = wishResult.rows[0];
 
+    // ── flow 계측 (wish/create) ──────────────────────────────────
+    try {
+      await flow.log({ userId: String(user_id), stage: 'wish', action: 'create', value: { channel: 'web', gemType: wish.gem_type }, refId: String(wish.id) });
+    } catch (e) { console.warn('flow log failed (wish/create with-star)', e.message); }
+
     // galaxy 분류
     const galaxyCode = GEM_GALAXY_MAP[wish.gem_type] || 'growth';
     const galaxyResult = await db.query(
@@ -265,6 +277,11 @@ router.post('/wishes/with-star', async (req, res) => {
       [user_id, wish.id, seedResult.rows[0].id, starName, `star-${Date.now()}`, galaxy.id, isHidden, emotionTag]
     );
     const star = starResult.rows[0];
+
+    // ── flow 계측 (star/create) ──────────────────────────────────
+    try {
+      await flow.log({ userId: String(user_id), stage: 'star', action: 'create', value: { source: 'wish', gemType: wish.gem_type }, refId: String(star.id) });
+    } catch (e) { console.warn('flow log failed (star/create with-star)', e.message); }
 
     // 위치 할당 (fire-and-forget)
     createStarLocation(db, star.id, wish.id).catch(e =>
@@ -343,6 +360,11 @@ router.post('/stars/create', async (req, res) => {
       [user_id, wish_id, seed.id, starName, starSlug, galaxy.id, isHidden, emotionTag]
     );
     const star = starResult.rows[0];
+
+    // ── flow 계측 (star/create) ──────────────────────────────────
+    try {
+      await flow.log({ userId: String(user_id), stage: 'star', action: 'create', value: { source: 'wish', gemType: wish.gem_type }, refId: String(star.id) });
+    } catch (e) { console.warn('flow log failed (star/create)', e.message); }
 
     // ── 별 위치 자동 할당 (wish_id 해시 기반, 결정론적) ────────────
     try {
@@ -1815,11 +1837,16 @@ const ENTRY_MODE_MESSAGES = {
 
 // ─────────────────────────────────────────────
 // GET /api/dt/stars/:id/route-recommendation — 은하 기반 항로 추천
-// 출력: { signal, reason, entry_mode, entry_message, primary, secondary, routes }
+// Query: ?journey_id=xxx (optional — 있으면 signal ranking 적용)
+// 출력: { signal, reason, entry_mode, entry_message, primary, secondary, routes, ranking? }
 // ─────────────────────────────────────────────
+let recRankingService = null;
+try { recRankingService = require('../services/recommendationRankingService'); } catch (_) {}
+
 router.get('/stars/:id/route-recommendation', async (req, res) => {
   try {
-    const starId = req.params.id;
+    const starId    = req.params.id;
+    const journeyId = req.query.journey_id ?? null; // optional — signal ranking용
 
     const starResult = await db.query('SELECT id, user_id FROM dt_stars WHERE id = $1', [starId]);
     if (starResult.rowCount === 0) return res.status(404).json({ error: '별을 찾을 수 없습니다' });
@@ -1855,7 +1882,32 @@ router.get('/stars/:id/route-recommendation', async (req, res) => {
       primaryCode: mapping.primary,
     });
 
-    const candidateCodes = [mapping.primary, mapping.secondary].filter(Boolean);
+    // ── Signal-Aware Ranking Layer ──────────────────────────────────
+    let candidateCodes  = [mapping.primary, mapping.secondary].filter(Boolean);
+    let rankingMeta     = null;
+
+    if (journeyId && recRankingService) {
+      try {
+        const rankResult = await recRankingService.rank(candidateCodes, journeyId);
+        if (rankResult.signal_used) {
+          candidateCodes = rankResult.ranked;
+          rankingMeta    = {
+            signal_used:     true,
+            dominant_context: rankResult.dominant?.context ?? null,
+            dominant_emotion: rankResult.dominant?.emotion ?? null,
+            top_score:        rankResult.top_score,
+            score_breakdown:  rankResult.score_breakdown,
+          };
+          // 노출 기록 (fire-and-forget)
+          recRankingService.recordExposure(journeyId, candidateCodes[0])
+            .catch(e => console.error('[rec ranking] exposure 기록 실패:', e.message));
+        }
+      } catch (rankErr) {
+        console.error('[rec ranking] ranking 실패 — 기존 순서 유지:', rankErr.message);
+      }
+    }
+    // ── /Signal-Aware Ranking Layer ─────────────────────────────────
+
     const routeResult = await db.query(
       `SELECT route_code, route_name, theme
          FROM route_catalog
@@ -1870,9 +1922,10 @@ router.get('/stars/:id/route-recommendation', async (req, res) => {
       entry_mode:    mode,                         // 'auto' | 'choose'
       entry_message: ENTRY_MODE_MESSAGES[mode],
       reason_code,                                 // 내부 디버그용
-      primary:       mapping.primary,
-      secondary:     mapping.secondary,
+      primary:       candidateCodes[0] ?? mapping.primary,
+      secondary:     candidateCodes[1] ?? mapping.secondary,
       routes:        routeResult.rows,
+      ...(rankingMeta ? { ranking: rankingMeta } : {}),
     });
 
   } catch (err) {
