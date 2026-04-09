@@ -19,19 +19,19 @@
 const STATE_MAP = {
   'breathless': {
     label:      '숨이 좀 막혀요',
-    message:    '막힌 느낌, 그냥 있어도 괜찮아요',
-    action:     '3분만 아무것도 안 해볼까요?',
-    action_key: 'rest',
+    message:    '잠깐 숨을 고르는 것도 괜찮아요',
+    action:     '30초만 천천히 숨 쉬어볼까요?',
+    action_key: 'breathe',
   },
   'overthinking': {
     label:      '생각이 많아요',
-    message:    '생각 많을 때 글로 꺼내면 가벼워져요',
-    action:     '한 문장만 써볼까요?',
+    message:    '생각이 많을수록, 하나만 정하면 편해져요',
+    action:     '지금 가장 중요한 한 가지만 적어볼까요?',
     action_key: 'write_one',
   },
   'want_rest': {
     label:      '그냥 쉬고 싶어요',
-    message:    '지금 흐름, 순간도 필요한 흐름이에요',
+    message:    '쉬고 싶은 순간도 필요한 흐름이에요',
     action:     '3분만 아무것도 안 해볼까요?',
     action_key: 'rest',
   },
