@@ -4,9 +4,15 @@ import DayLogScreen from '../features/galaxy/components/DayLogScreen';
 import SilhouetteScene from '../features/day/components/SilhouetteScene';
 import { saveLog } from '../features/galaxy/utils/logStorage';
 import { useDreamtownStore } from '../store/dreamtownStore';
-import { postVoyageLog } from '../api/dreamtown.js';
+import { postVoyageLog, getOrCreateUserId, logFlowEvent } from '../api/dreamtown.js';
 import { readSavedStar } from '../lib/utils/starSession.js';
 import { POSTCARD_FALLBACK_MESSAGE } from '../constants/dreamtownFlow';
+
+const LUMI_DAY3 = {
+  trigger: 'day3_resume',
+  message: '여기서 멈추는 사람들이 가장 많아요\n그래서 이 순간이 가장 중요해요',
+  cta: '다시 이어가기',
+};
 
 // 선택 은하 잔광 색상 — SelectionTransition 동일 계열
 const GALAXY_OVERLAY = {
@@ -35,6 +41,7 @@ export default function DayPage() {
   const navigate = useNavigate();
   const [phase, setPhase] = useState('before'); // before | transitioning | after
   const [textVisible, setTextVisible] = useState(false); // 실루엣보다 300ms 뒤에 텍스트 등장
+  const [lumiVisible, setLumiVisible] = useState(false);
 
   // location.state 우선, 없으면 store fallback (새로고침/직접 진입 대응)
   const store = useDreamtownStore();
@@ -53,8 +60,53 @@ export default function DayPage() {
     return () => clearTimeout(t);
   }, []);
 
+  // Day3 이탈 위험 체크 — GET /api/dt/stars 응답의 retentionTrigger 활용
+  // isDay3Resume 플래그(MyStar LumiCard 클릭) 또는 서버 응답으로 감지
+  useEffect(() => {
+    if (state?.isDay3Resume) { setLumiVisible(true); return; }
+    const userId = getOrCreateUserId();
+    fetch(`/api/dt/stars?userId=${encodeURIComponent(userId)}`)
+      .then(r => r.json())
+      .then(data => { if (data.retentionTrigger === 'day3') setLumiVisible(true); })
+      .catch(() => {});
+  }, []);
+
   return (
     <main className="relative w-full h-screen text-white overflow-hidden" style={{ backgroundColor: '#0D1B2A' }}>
+
+      {/* LumiCard — Day3 이탈 방지 (retentionTrigger=day3 시 노출) */}
+      {lumiVisible && (
+        <div style={{
+          position: 'fixed', top: 72, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 50, width: '90%', maxWidth: 360,
+          background: 'linear-gradient(135deg, rgba(13,27,42,0.97) 0%, rgba(20,38,58,0.97) 100%)',
+          border: '1px solid rgba(255,215,106,0.28)', borderRadius: 18, padding: '18px 20px',
+          animation: 'fadeInDown 0.3s ease',
+        }}>
+          <p style={{ fontSize: 12, color: 'rgba(255,215,106,0.7)', marginBottom: 6 }}>✨ 루미의 발견</p>
+          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.88)', lineHeight: 1.6, whiteSpace: 'pre-line', marginBottom: 14 }}>
+            "{LUMI_DAY3.message}"
+          </p>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button
+              onClick={() => {
+                logFlowEvent({ userId: getOrCreateUserId(), stage: 'recommendation', action: 'click', value: { trigger: LUMI_DAY3.trigger } });
+                logFlowEvent({ userId: getOrCreateUserId(), stage: 'growth', action: 'day3_resume', value: { source: 'day_page' } });
+                setLumiVisible(false);
+              }}
+              style={{ flex: 1, padding: '11px 0', background: '#FFD76A', color: '#0D1B2A', fontWeight: 700, border: 'none', borderRadius: 10, cursor: 'pointer' }}
+            >
+              {LUMI_DAY3.cta}
+            </button>
+            <button
+              onClick={() => setLumiVisible(false)}
+              style={{ padding: '11px 14px', background: 'none', border: 'none', color: 'rgba(255,255,255,0.35)', cursor: 'pointer', fontSize: 13 }}
+            >
+              나중에
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* z-0 — 진입 잔광 */}
       <DayAfterglow galaxy={direction} />

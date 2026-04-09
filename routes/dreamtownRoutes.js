@@ -20,6 +20,7 @@ const flow                    = require('../services/dreamtownFlowService');
 const { assignVariantSmart, getUXConfig } = require('../services/experimentService');
 const { getTriggerRecommendation }        = require('../services/aiRecommendationService');
 const { getDay1Prompt }                   = require('../services/day1OnboardingService');
+const { retentionCheck }                  = require('../middleware/retentionMiddleware');
 const crypto = require('crypto');
 
 function dtHashWishId(input) {
@@ -684,8 +685,9 @@ router.post('/resonance', async (req, res) => {
 
 // ─────────────────────────────────────────────
 // GET /api/dt/stars?userId=xxx — 유저 별 목록
+// retentionCheck: Day3/Day7 이탈 위험 감지 → retentionTrigger 주입
 // ─────────────────────────────────────────────
-router.get('/stars', async (req, res) => {
+router.get('/stars', retentionCheck, async (req, res) => {
   const { userId } = req.query;
   if (!userId) return res.status(400).json({ error: 'userId is required' });
   try {
@@ -697,7 +699,7 @@ router.get('/stars', async (req, res) => {
         ORDER BY s.created_at DESC`,
       [userId]
     );
-    res.json({ stars: rows });
+    res.json({ stars: rows, retentionTrigger: req.retentionTrigger });
   } catch (err) {
     console.error('[DT] GET /stars error:', err.message);
     res.status(500).json({ error: 'Internal server error' });
