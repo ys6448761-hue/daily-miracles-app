@@ -1,0 +1,38 @@
+name: Aurora 5 KPI Daily Report
+
+on:
+  schedule:
+    # 매일 09:00 KST = 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      days:
+        description: '집계 기간 (일)'
+        required: false
+        default: '7'
+
+jobs:
+  kpi-report:
+    name: KPI 집계 & Slack 전송
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --omit=dev
+
+      - name: Run KPI report & send to Slack
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          OPS_SLACK_WEBHOOK: ${{ secrets.OPS_SLACK_WEBHOOK }}
+          DAYS: ${{ github.event.inputs.days || '7' }}
+        run: node scripts/send-slack-report.js --days $DAYS
