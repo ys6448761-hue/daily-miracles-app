@@ -17,6 +17,8 @@ const https             = require('https');
 const { run: runKpi }   = require('./kpi-report');
 const flowSvc           = require('../services/dreamtownFlowService');
 const expSvc            = require('../services/experimentService');
+const evaluator         = require('../services/experimentEvaluator');
+const uxConfig          = require('../services/uxExperimentConfig');
 
 const WEBHOOK = process.env.OPS_SLACK_WEBHOOK;
 
@@ -93,6 +95,20 @@ function formatExperiments(winners) {
   }).join('\n\n');
 }
 
+// ── UX 실험 자동 승격 결과 포맷 ────────────────────────────────
+function formatUXExperiments(uxWinners) {
+  if (!uxWinners || !uxWinners.length) return null;
+  return uxWinners.map(w => {
+    const cfg      = uxConfig[w.experiment_key];
+    const variantA = cfg?.variants?.A ? JSON.stringify(cfg.variants.A) : '';
+    const variantB = cfg?.variants?.B ? JSON.stringify(cfg.variants.B) : '';
+    const aLine = w.rate_a != null ? `A${variantA ? ` (${variantA})` : ''}: ${w.rate_a}%  (${w.sample_a ?? 0}명)` : 'A: 데이터 없음';
+    const bLine = w.rate_b != null ? `B${variantB ? ` (${variantB})` : ''}: ${w.rate_b}%  (${w.sample_b ?? 0}명)` : 'B: 데이터 없음';
+    const promotedAt = w.promoted_at ? new Date(w.promoted_at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', dateStyle: 'short', timeStyle: 'short' }) : '—';
+    return `🧪 \`${w.experiment_key}\`\n${aLine}\n${bLine}\n👉 *Winner: ${w.winner}* (자동 적용됨)  _${promotedAt}_`;
+  }).join('\n\n');
+}
+
 // ── 개선 제안 포맷 ─────────────────────────────────────────────
 function formatActionPlan(actions) {
   if (!actions || !actions.length) return '✅ 개선 필요 없음';
@@ -104,7 +120,7 @@ function formatActionPlan(actions) {
 }
 
 // ── Block Kit 빌드 ────────────────────────────────────────────
-function buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, expWinners, period, kstDate }) {
+function buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, expWinners, uxWinners, period, kstDate }) {
   const { current: r, baseline, verdict: av } = aurora;
   const ae = auroraEmoji(av.status);
   const de = dtEmoji(dtVerdict.status);
@@ -132,6 +148,7 @@ function buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, expWinners, period
 
   const actionPlanText = formatActionPlan(actionPlan);
   const expText        = formatExperiments(expWinners);
+  const uxExpText      = formatUXExperiments(uxWinners);
 
   return {
     blocks: [
@@ -173,10 +190,15 @@ function buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, expWinners, period
         type: 'section',
         text: { type: 'mrkdwn', text: `*📋 개선 제안*\n${actionPlanText}` },
       },
-      // 실험 결과 섹션 (데이터 있을 때만)
+      // A/B 실험 결과 섹션 (데이터 있을 때만)
       ...(expText ? [
         { type: 'divider' },
-        { type: 'section', text: { type: 'mrkdwn', text: `*🧪 Experiment 결과*\n${expText}` } },
+        { type: 'section', text: { type: 'mrkdwn', text: `*🧪 A/B Experiment 결과*\n${expText}` } },
+      ] : []),
+      // UX 자동 승격 실험 섹션
+      ...(uxExpText ? [
+        { type: 'divider' },
+        { type: 'section', text: { type: 'mrkdwn', text: `*🧪 UX 실험 결과 (자동 승격)*\n${uxExpText}` } },
       ] : []),
       { type: 'divider' },
 
@@ -202,9 +224,27 @@ async function main() {
   const dtVerdict  = dtFull?.verdict   ?? flowSvc.computeVerdict(dtFull);
   const actionPlan = dtFull?.actionPlan ?? flowSvc.generateActionPlan(dtFull);
   const expWinners = expSvc.computeWinner(expResults);
-  const kstDate    = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', dateStyle: 'short', timeStyle: 'short' });
 
-  const payload = buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, expWinners, period: `${DAYS}d`, kstDate });
+  // ── UX 자동 승격 ─────────────────────────────────────────────
+  // expResults를 key별로 그룹핑 → evaluateExperiment → setGlobalVariant
+  const expByKey = {};
+  expResults.forEach(r => {
+    if (!expByKey[r.experiment_key]) expByKey[r.experiment_key] = {};
+    expByKey[r.experiment_key][r.variant] = { rate: r.conversion_rate, sample: r.exposures };
+  });
+  for (const [key, cfg] of Object.entries(uxConfig)) {
+    const results = expByKey[key];
+    if (!results) continue;
+    const winner = evaluator.evaluateExperiment(results, cfg);
+    if (winner && cfg.autoPromote) {
+      await evaluator.setGlobalVariant(key, winner, results).catch(() => {});
+    }
+  }
+  const uxWinners = await evaluator.getAllWinners().catch(() => []);
+
+  const kstDate = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', dateStyle: 'short', timeStyle: 'short' });
+
+  const payload = buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, expWinners, uxWinners, period: `${DAYS}d`, kstDate });
 
   console.log('📨 Slack 전송 중...');
   const result = await postSlack(payload);

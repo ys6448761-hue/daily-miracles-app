@@ -340,6 +340,22 @@ function assignVariant(userId, experimentKey) {
   return bucket < 50 ? 'A' : 'B';
 }
 
+// ── 승자 우선 배정 (승자 있으면 모두 winner로, 없으면 랜덤) ──
+async function assignVariantSmart(userId, experimentKey) {
+  try {
+    const { getActiveVariant } = require('./experimentEvaluator');
+    const winner = await getActiveVariant(experimentKey);
+    if (winner) return winner;
+  } catch { /* fallback */ }
+  return assignVariant(userId, experimentKey);
+}
+
+// ── UX 설정 조회 ─────────────────────────────────────────────
+function getUXConfig(experimentKey, variant) {
+  const config = require('./uxExperimentConfig')[experimentKey];
+  return config?.variants[variant] ?? null;
+}
+
 // ── actionPlan 문제 → 실험 설정 매핑 ──────────────────────────────
 function generateExperiment(action) {
   if (action.problem === 'UX 문제') {
@@ -420,6 +436,8 @@ module.exports = {
   getExperimentStats,
   // DreamTown 범용 실험 엔진
   assignVariant,
+  assignVariantSmart,
+  getUXConfig,
   generateExperiment,
   getExperimentResults,
   computeWinner,
