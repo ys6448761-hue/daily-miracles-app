@@ -81,11 +81,22 @@ function pct(val) {
   return val != null ? `${val}%` : '—';
 }
 
+// ── 개선 제안 포맷 ─────────────────────────────────────────────
+function formatActionPlan(actions) {
+  if (!actions || !actions.length) return '✅ 개선 필요 없음';
+
+  return actions.map(a => {
+    const sevEmoji = a.severity === 'high' ? '🚨' : '⚠️';
+    return `${sevEmoji} *${a.problem}*  현재 ${a.current}% → 목표 ${a.target}%\n담당: ${a.owner.join(', ')}\n${a.actions.map(x => `• ${x}`).join('\n')}`;
+  }).join('\n\n');
+}
+
 // ── Block Kit 빌드 ────────────────────────────────────────────
-function buildPayload({ aurora, dtKpi, dtVerdict, period, kstDate }) {
+function buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, period, kstDate }) {
   const { current: r, baseline, verdict: av } = aurora;
   const ae = auroraEmoji(av.status);
   const de = dtEmoji(dtVerdict.status);
+  const hasCritical = actionPlan?.some(a => a.severity === 'high') ?? false;
 
   // Aurora 5 섹션
   const auroraLines = [
@@ -107,8 +118,15 @@ function buildPayload({ aurora, dtKpi, dtVerdict, period, kstDate }) {
     ? dtVerdict.insights.map(i => `• ${i}`).join('\n')
     : '모든 지표 목표 범위 내';
 
+  const actionPlanText = formatActionPlan(actionPlan);
+
   return {
     blocks: [
+      // Task 4 — high severity 긴급 배너
+      ...(hasCritical ? [{
+        type: 'section',
+        text: { type: 'mrkdwn', text: '🚨 *즉시 개선 필요 — high severity 지표 감지*' },
+      }] : []),
       {
         type: 'header',
         text: { type: 'plain_text', text: `🌌 DreamTown Daily KPI — ${period} 리포트`, emoji: true },
@@ -137,6 +155,13 @@ function buildPayload({ aurora, dtKpi, dtVerdict, period, kstDate }) {
       },
       { type: 'divider' },
 
+      // 개선 제안 섹션
+      {
+        type: 'section',
+        text: { type: 'mrkdwn', text: `*📋 개선 제안*\n${actionPlanText}` },
+      },
+      { type: 'divider' },
+
       {
         type: 'context',
         elements: [{ type: 'mrkdwn', text: `생성: ${kstDate} KST  |  /admin/kpi  |  GET /api/dt/flow/kpi` }],
@@ -149,15 +174,18 @@ function buildPayload({ aurora, dtKpi, dtVerdict, period, kstDate }) {
 async function main() {
   console.log(`📊 KPI 집계 중... (${DAYS}일)`);
 
-  const [aurora, dtKpi] = await Promise.all([
+  const [aurora, dtFull] = await Promise.all([
     runKpi(),
     flowSvc.getKpiSummary({ days: DAYS }).catch(() => null),
   ]);
 
-  const dtVerdict = flowSvc.computeVerdict(dtKpi);
-  const kstDate   = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', dateStyle: 'short', timeStyle: 'short' });
+  // getKpiSummary now returns { ...kpi, verdict, actionPlan }
+  const dtKpi      = dtFull;
+  const dtVerdict  = dtFull?.verdict  ?? flowSvc.computeVerdict(dtFull);
+  const actionPlan = dtFull?.actionPlan ?? flowSvc.generateActionPlan(dtFull);
+  const kstDate    = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', dateStyle: 'short', timeStyle: 'short' });
 
-  const payload = buildPayload({ aurora, dtKpi, dtVerdict, period: `${DAYS}d`, kstDate });
+  const payload = buildPayload({ aurora, dtKpi, dtVerdict, actionPlan, period: `${DAYS}d`, kstDate });
 
   console.log('📨 Slack 전송 중...');
   const result = await postSlack(payload);

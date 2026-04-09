@@ -64,32 +64,41 @@ async function log_event({ userId, stage, action, value = {}, refId = null, sess
 // ── 7일 KPI 집계 (뷰 사용) ───────────────────────────────────
 async function getKpiSummary({ days = 7 } = {}) {
   try {
+    let kpiRow;
     if (days === 7) {
       const { rows } = await db.query('SELECT * FROM dreamtown_kpi_7d');
-      return rows[0] ?? null;
+      kpiRow = rows[0] ?? null;
+    } else {
+      const { rows } = await db.query(`
+        WITH period AS (SELECT NOW() - INTERVAL '${days} days' AS since),
+        wishes  AS (SELECT COUNT(DISTINCT user_id) n FROM dreamtown_flow, period WHERE stage='wish'      AND action='create'        AND created_at>=since),
+        stars   AS (SELECT COUNT(DISTINCT user_id) n FROM dreamtown_flow, period WHERE stage='star'      AND action='create'        AND created_at>=since),
+        day1    AS (SELECT COUNT(DISTINCT user_id) n FROM dreamtown_flow, period WHERE stage='growth'    AND action='day1_start'    AND created_at>=since),
+        day7    AS (SELECT COUNT(DISTINCT user_id) n FROM dreamtown_flow, period WHERE stage='growth'    AND action='day7_complete' AND created_at>=since),
+        res_u   AS (SELECT COUNT(DISTINCT user_id) n FROM dreamtown_flow, period WHERE stage='resonance'                            AND created_at>=since),
+        total_u AS (SELECT COUNT(DISTINCT user_id) n FROM dreamtown_flow, period WHERE                                               created_at>=since)
+        SELECT
+          wishes.n                                                   AS wish_count,
+          stars.n                                                    AS star_count,
+          ROUND(stars.n::numeric / NULLIF(wishes.n,0)*100,1)        AS star_creation_rate,
+          day1.n                                                     AS growth_day1_count,
+          day7.n                                                     AS growth_day7_count,
+          ROUND(day7.n::numeric  / NULLIF(day1.n,0) *100,1)         AS growth_persist_rate,
+          res_u.n                                                    AS resonance_user_count,
+          total_u.n                                                  AS total_active_users,
+          ROUND(res_u.n::numeric / NULLIF(total_u.n,0)*100,1)       AS resonance_rate
+        FROM wishes,stars,day1,day7,res_u,total_u
+      `);
+      kpiRow = rows[0] ?? null;
     }
-    // 다른 기간: 직접 집계
-    const { rows } = await db.query(`
-      WITH period AS (SELECT NOW() - INTERVAL '${days} days' AS since),
-      wishes  AS (SELECT COUNT(DISTINCT user_id) n FROM dreamtown_flow, period WHERE stage='wish'      AND action='create'        AND created_at>=since),
-      stars   AS (SELECT COUNT(DISTINCT user_id) n FROM dreamtown_flow, period WHERE stage='star'      AND action='create'        AND created_at>=since),
-      day1    AS (SELECT COUNT(DISTINCT user_id) n FROM dreamtown_flow, period WHERE stage='growth'    AND action='day1_start'    AND created_at>=since),
-      day7    AS (SELECT COUNT(DISTINCT user_id) n FROM dreamtown_flow, period WHERE stage='growth'    AND action='day7_complete' AND created_at>=since),
-      res_u   AS (SELECT COUNT(DISTINCT user_id) n FROM dreamtown_flow, period WHERE stage='resonance'                            AND created_at>=since),
-      total_u AS (SELECT COUNT(DISTINCT user_id) n FROM dreamtown_flow, period WHERE                                               created_at>=since)
-      SELECT
-        wishes.n                                                   AS wish_count,
-        stars.n                                                    AS star_count,
-        ROUND(stars.n::numeric / NULLIF(wishes.n,0)*100,1)        AS star_creation_rate,
-        day1.n                                                     AS growth_day1_count,
-        day7.n                                                     AS growth_day7_count,
-        ROUND(day7.n::numeric  / NULLIF(day1.n,0) *100,1)         AS growth_persist_rate,
-        res_u.n                                                    AS resonance_user_count,
-        total_u.n                                                  AS total_active_users,
-        ROUND(res_u.n::numeric / NULLIF(total_u.n,0)*100,1)       AS resonance_rate
-      FROM wishes,stars,day1,day7,res_u,total_u
-    `);
-    return rows[0] ?? null;
+
+    if (!kpiRow) return null;
+
+    // verdict + actionPlan 포함하여 반환
+    const verdict    = computeVerdict(kpiRow);
+    const actionPlan = generateActionPlan(kpiRow);
+    return { ...kpiRow, verdict, actionPlan };
+
   } catch (e) {
     log.warn('KPI 집계 실패', { err: e?.message || String(e) });
     return null;
@@ -149,11 +158,72 @@ function computeVerdict(kpi) {
   return              { status: 'critical', label: '목표 미달성',      color: '🔴', insights };
 }
 
+// ── 자동 개선 제안 ────────────────────────────────────────────
+function generateActionPlan(kpi) {
+  if (!kpi) return [];
+  const actions = [];
+
+  const starRate      = parseFloat(kpi.star_creation_rate  ?? 0);
+  const growthRate    = parseFloat(kpi.growth_persist_rate ?? 0);
+  const resonanceRate = parseFloat(kpi.resonance_rate      ?? 0);
+
+  if (starRate < GOALS.star_creation_rate) {
+    actions.push({
+      problem:  'UX 문제',
+      metric:   'star_creation_rate',
+      current:  starRate,
+      target:   GOALS.star_creation_rate,
+      owner:    ['Code', '코미'],
+      severity: 'high',
+      actions: [
+        '소원 입력 → 별 생성 CTA 문구 A/B 테스트',
+        '보석 선택 단계 이탈 로그 추가',
+        '별 생성 완료까지 소요 시간 측정',
+      ],
+    });
+  }
+
+  if (growthRate < GOALS.growth_persist_rate) {
+    actions.push({
+      problem:  '온보딩 문제',
+      metric:   'growth_persist_rate',
+      current:  growthRate,
+      target:   GOALS.growth_persist_rate,
+      owner:    ['루미', '재미'],
+      severity: 'medium',
+      actions: [
+        'Day1 메시지 감정선 개선',
+        'Day3 이탈 구간 분석',
+        '감정 선택 UX 단순화',
+      ],
+    });
+  }
+
+  if (resonanceRate < GOALS.resonance_rate) {
+    actions.push({
+      problem:  '콘텐츠 문제',
+      metric:   'resonance_rate',
+      current:  resonanceRate,
+      target:   GOALS.resonance_rate,
+      owner:    ['재미', '코미'],
+      severity: 'medium',
+      actions: [
+        '공유 CTA 문구 개선',
+        '피드 카드 디자인 개선',
+        'SNS 공유 포맷 실험',
+      ],
+    });
+  }
+
+  return actions;
+}
+
 module.exports = {
   log: log_event,
   getKpiSummary,
   getDailyTrend,
   computeVerdict,
+  generateActionPlan,
   STAGES,
   ACTIONS,
   GOALS,
