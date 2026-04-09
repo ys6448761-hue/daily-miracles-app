@@ -18,6 +18,7 @@ const { generateStarMeaning } = require('../services/starMeaningService');
 const { getStarStage }        = require('../services/starGrowthService');
 const flow                    = require('../services/dreamtownFlowService');
 const { assignVariantSmart, getUXConfig } = require('../services/experimentService');
+const { getTriggerRecommendation }        = require('../services/aiRecommendationService');
 const crypto = require('crypto');
 
 function dtHashWishId(input) {
@@ -304,10 +305,14 @@ router.post('/wishes/with-star', async (req, res) => {
         value: { experiment: 'star_flow_layout_test', variant: expVariant } }),
     ]).catch(() => {});
 
+    // ── AI 트리거 추천 (after_star) — 일일 상한 적용 ──────────
+    const lumi = await getTriggerRecommendation(String(user_id), 'after_star');
+
     res.status(201).json({
       wish,
       star,
-      ux: { variant: expVariant, ctaPosition: ux.ctaPosition, emotionStep: ux.emotionStep, ctaText: CTA_TEXT[expVariant] },
+      ux:   { variant: expVariant, ctaPosition: ux.ctaPosition, emotionStep: ux.emotionStep, ctaText: CTA_TEXT[expVariant] },
+      lumi,
     });
 
   } catch (err) {

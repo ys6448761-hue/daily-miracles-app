@@ -10,8 +10,9 @@
 const express = require('express');
 const router  = express.Router();
 const db      = require('../database/db');
-const { generateSignals } = require('../services/galaxySignalService');
-const flow    = require('../services/dreamtownFlowService');
+const { generateSignals }           = require('../services/galaxySignalService');
+const flow                          = require('../services/dreamtownFlowService');
+const { getTriggerRecommendation }  = require('../services/aiRecommendationService');
 
 router.post('/', async (req, res) => {
   try {
@@ -33,17 +34,27 @@ router.post('/', async (req, res) => {
     // Galaxy Signal 생성 — fire-and-forget (응답 지연 없음)
     generateSignals(journey_id, growth_text.trim(), context_tag || null);
 
+    // ── 로그 수 + 경과일 (트리거 판정 + flow 계측 공용) ─────────
+    const cntRes  = await db.query(
+      'SELECT COUNT(*) AS cnt, MIN(created_at) AS first_at FROM journey_logs WHERE journey_id = $1',
+      [journey_id]
+    );
+    const cnt      = parseInt(cntRes.rows[0]?.cnt, 10) || 1;
+    const firstAt  = cntRes.rows[0]?.first_at;
+    const daysSince = firstAt ? (Date.now() - new Date(firstAt).getTime()) / 86400000 : 0;
+
+    // ── AI 트리거 추천 (최대 1개, 일일 2회 상한) ────────────────
+    let lumiTrigger = null;
+    if (cnt === 1)                              lumiTrigger = 'after_day1';
+    else if (daysSince >= 6 && daysSince < 7)  lumiTrigger = 'before_day7';
+
+    const lumi = lumiTrigger
+      ? await getTriggerRecommendation(journey_id, lumiTrigger)
+      : null;
+
     // ── flow 계측 (growth) — fire-and-forget ──────────────────
     Promise.resolve().then(async () => {
       try {
-        // 이번 journey_id의 총 로그 수 확인 (day1/day7 판정용)
-        const cntRes = await db.query(
-          'SELECT COUNT(*) AS cnt, MIN(created_at) AS first_at FROM journey_logs WHERE journey_id = $1',
-          [journey_id]
-        );
-        const cnt     = parseInt(cntRes.rows[0]?.cnt, 10) || 1;
-        const firstAt = cntRes.rows[0]?.first_at;
-
         // growth/log_entry — 모든 기록
         await flow.log({ userId: journey_id, stage: 'growth', action: 'log_entry',
           value: { emotion: emotion || null, context_tag: context_tag || null }, refId: journey_id });
@@ -55,18 +66,15 @@ router.post('/', async (req, res) => {
         }
 
         // growth/day7_complete — 첫 기록일로부터 7일 이상 + 아직 완료 기록 없음
-        if (firstAt) {
-          const daysSince = (Date.now() - new Date(firstAt).getTime()) / 86400000;
-          if (daysSince >= 7) {
-            const alreadyDone = await db.query(
-              `SELECT 1 FROM dreamtown_flow
-               WHERE user_id = $1 AND stage = 'growth' AND action = 'day7_complete' LIMIT 1`,
-              [journey_id]
-            );
-            if (alreadyDone.rowCount === 0) {
-              await flow.log({ userId: journey_id, stage: 'growth', action: 'day7_complete',
-                value: { total_logs: cnt }, refId: journey_id });
-            }
+        if (daysSince >= 7) {
+          const alreadyDone = await db.query(
+            `SELECT 1 FROM dreamtown_flow
+             WHERE user_id = $1 AND stage = 'growth' AND action = 'day7_complete' LIMIT 1`,
+            [journey_id]
+          );
+          if (alreadyDone.rowCount === 0) {
+            await flow.log({ userId: journey_id, stage: 'growth', action: 'day7_complete',
+              value: { total_logs: cnt }, refId: journey_id });
           }
         }
       } catch (e) {
@@ -74,7 +82,7 @@ router.post('/', async (req, res) => {
       }
     });
 
-    res.json({ log: entry });
+    res.json({ log: entry, lumi });
 
   } catch (err) {
     console.error('[journeyLog] POST error:', err);

@@ -154,6 +154,68 @@ const AI_MESSAGES = {
   },
 };
 
+// ── 트리거 기반 고정 메시지 (4개 위치) ───────────────────────
+const DAILY_CAP = 2; // 하루 최대 노출 횟수
+
+const TRIGGER_MESSAGES = {
+  after_star: {
+    type:    'action',
+    message: '지금 이 단계에서는\n작은 행동 하나가 가장 큰 변화를 만들어요',
+    cta:     '오늘의 행동 시작',
+  },
+  after_day1: {
+    type:    'persist',
+    message: '비슷한 사람들은 감정을 남겼을 때\n더 오래 유지됐어요',
+    cta:     '감정 남기기',
+  },
+  before_day7: {
+    type:    'persist',
+    message: '여기서 멈추지 않은 사람들이\n가장 많이 변화했어요',
+    cta:     '한 번 더 이어가기',
+  },
+  before_resonance: {
+    type:    'social',
+    message: '이 순간을 나눈 사람들이\n더 또렷해졌어요',
+    cta:     '공명하기',
+  },
+};
+
+// 오늘 이미 몇 번 노출됐는지
+async function checkDailyCap(userId) {
+  try {
+    const { rows } = await db.query(
+      `SELECT COUNT(*) AS cnt FROM dreamtown_flow
+       WHERE user_id = $1 AND stage = 'recommendation' AND action = 'ai_suggest'
+         AND created_at >= NOW() - INTERVAL '1 day'`,
+      [userId]
+    );
+    return parseInt(rows[0]?.cnt, 10) || 0;
+  } catch { return 0; }
+}
+
+// 트리거 추천 조회 — 일일 상한 초과 시 null 반환
+async function getTriggerRecommendation(userId, trigger) {
+  const msg = TRIGGER_MESSAGES[trigger];
+  if (!msg) return null;
+
+  try {
+    const todayCount = await checkDailyCap(userId);
+    if (todayCount >= DAILY_CAP) return null;
+
+    flow.log({
+      userId,
+      stage:  'recommendation',
+      action: 'ai_suggest',
+      value:  { trigger, type: msg.type },
+    }).catch(() => {});
+
+    log.info('트리거 추천 노출', { userId, trigger, type: msg.type });
+    return { trigger, ...msg };
+  } catch {
+    return null; // 오류 시 조용히 생략 — 추천 실패가 흐름을 막지 않음
+  }
+}
+
 // ── 메인: AI 추천 조회 ────────────────────────────────────────
 async function getAIRecommendation(userId) {
   const [userVec, allVectors] = await Promise.all([
@@ -248,4 +310,4 @@ async function getAIKpi({ days = 7 } = {}) {
   }
 }
 
-module.exports = { getAIRecommendation, logAIClick, getAIKpi };
+module.exports = { getAIRecommendation, logAIClick, getAIKpi, getTriggerRecommendation };
