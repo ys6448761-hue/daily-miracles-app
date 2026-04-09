@@ -154,11 +154,13 @@ const AI_MESSAGES = {
   },
 };
 
-// ── 트리거 SSOT — 4개 외 추가 금지 ─────────────────────────
-// Trigger 1: after_star    — 별 생성 직후 (강제 1회)
-// Trigger 2: idle_after_star — 별 생성 후 30초 무행동 (클라이언트 감지 → 서버 검증)
-// Trigger 3: day1_miss     — Day1 미시작 + 24시간 경과
-// Trigger 4: day7_stall    — Day7 미완료 + 48시간 비활동
+// ── 트리거 SSOT — 6개 (4 기존 + Day3/Day7 retention) ────────
+// Trigger 1: after_star      — 별 생성 직후 (강제 1회)
+// Trigger 2: idle_after_star — 별 생성 후 30초 무행동
+// Trigger 3: day1_miss       — Day1 미시작 + 24시간 경과
+// Trigger 4: day3_resume     — Day1 후 48~72시간 + 비활동 (이탈 직전)
+// Trigger 5: day7_stall      — Day7 미완료 + 48시간 비활동 (포기 직전)
+// Trigger 6: day7_push       — Day7 5일차 이상 + 미완료 (완주 유도)
 
 const DAILY_CAP    = 2;   // 하루 최대 노출 횟수
 const COOLDOWN_MS  = 6 * 60 * 60 * 1000; // 같은 트리거 6시간 쿨다운
@@ -179,10 +181,20 @@ const TRIGGER_MESSAGES = {
     message: '비슷한 사람들은 첫날을 시작했을 때\n가장 오래 이어졌어요',
     cta:     '지금 시작하기',
   },
+  day3_resume: {
+    type:    'persist',
+    message: '여기서 멈추는 사람들이 가장 많아요\n그래서 이 순간이 가장 중요해요',
+    cta:     '다시 이어가기',
+  },
   day7_stall: {
     type:    'persist',
-    message: '여기서 멈추지 않은 사람들이\n가장 많이 변화했어요',
-    cta:     '한 번 더 이어가기',
+    message: '거의 다 왔어요\n여기서 멈추지 않은 사람들이 가장 많이 변화했어요',
+    cta:     '마지막 한 걸음',
+  },
+  day7_push: {
+    type:    'persist',
+    message: '여기까지 온 사람들은\n거의 다 변화를 느꼈어요',
+    cta:     '마지막 한 걸음',
   },
 };
 
@@ -212,13 +224,13 @@ async function checkGate(userId, trigger) {
   } catch { return true; } // DB 오류 시 통과 (추천 실패보다 노출 우선)
 }
 
-// 멈춤 상태 자동 감지 (Trigger 3, 4) — 앱 진입 시 호출
+// 멈춤 상태 자동 감지 — 앱 진입 시 호출 (우선순위 순)
 async function detectStall(userId) {
   try {
     const { rows } = await db.query(
       `SELECT
-         MAX(CASE WHEN stage='star'   AND action='create'       THEN created_at END) AS star_at,
-         MAX(CASE WHEN stage='growth' AND action='day1_start'   THEN created_at END) AS day1_at,
+         MAX(CASE WHEN stage='star'   AND action='create'        THEN created_at END) AS star_at,
+         MAX(CASE WHEN stage='growth' AND action='day1_start'    THEN created_at END) AS day1_at,
          MAX(CASE WHEN stage='growth' AND action='day7_complete' THEN created_at END) AS day7_at,
          MAX(created_at) FILTER (WHERE stage='growth')                                AS last_growth_at
        FROM dreamtown_flow WHERE user_id = $1`,
@@ -226,17 +238,30 @@ async function detectStall(userId) {
     );
     const r   = rows[0] ?? {};
     const now = Date.now();
+    const H   = 60 * 60 * 1000; // 1시간 ms
 
-    const starAt      = r.star_at       ? new Date(r.star_at).getTime()       : null;
-    const day1At      = r.day1_at       ? new Date(r.day1_at).getTime()       : null;
-    const day7At      = r.day7_at       ? new Date(r.day7_at).getTime()       : null;
+    const starAt       = r.star_at        ? new Date(r.star_at).getTime()        : null;
+    const day1At       = r.day1_at        ? new Date(r.day1_at).getTime()        : null;
+    const day7At       = r.day7_at        ? new Date(r.day7_at).getTime()        : null;
     const lastGrowthAt = r.last_growth_at ? new Date(r.last_growth_at).getTime() : null;
 
-    // Trigger 3: 별은 있는데 Day1 미시작 + 24시간 경과
-    if (starAt && !day1At && (now - starAt) > 24 * 60 * 60 * 1000) return 'day1_miss';
+    const daysSinceDay1 = day1At ? (now - day1At) / (24 * H) : null;
 
-    // Trigger 4: Day1은 했는데 Day7 미완료 + 마지막 성장 활동 48시간 경과
-    if (day1At && !day7At && lastGrowthAt && (now - lastGrowthAt) > 48 * 60 * 60 * 1000) return 'day7_stall';
+    // T3: 별은 있는데 Day1 미시작 + 24시간 경과
+    if (starAt && !day1At && (now - starAt) > 24 * H) return 'day1_miss';
+
+    // T4: Day1 후 48~72시간 + 48시간 비활동 (Day3 이탈 구간)
+    if (day1At && !day7At && daysSinceDay1 >= 2 && daysSinceDay1 < 4) {
+      if (!lastGrowthAt || (now - lastGrowthAt) > 48 * H) return 'day3_resume';
+    }
+
+    // T5: Day5 이상 도달 + 미완료 + 48시간 비활동 (Day7 직전 밀기)
+    if (day1At && !day7At && daysSinceDay1 >= 5) {
+      if (!lastGrowthAt || (now - lastGrowthAt) > 48 * H) return 'day7_push';
+    }
+
+    // T6: Day1은 했는데 Day7 미완료 + 48시간 비활동 (일반 정체)
+    if (day1At && !day7At && lastGrowthAt && (now - lastGrowthAt) > 48 * H) return 'day7_stall';
 
     return null;
   } catch { return null; }

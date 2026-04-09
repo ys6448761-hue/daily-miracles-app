@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
-import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message, getTodaySchedule, getStarStats, getStarDetail, getArtifactJob, getGrowthSummary, getRouteRecommendation, startJourneyFromRecommendation, getWisdom } from '../api/dreamtown.js';
+import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message, getTodaySchedule, getStarStats, getStarDetail, getArtifactJob, getGrowthSummary, getRouteRecommendation, startJourneyFromRecommendation, getWisdom, logFlowEvent } from '../api/dreamtown.js';
 import { saveStarId, clearStarId, readSavedStar } from '../lib/utils/starSession.js';
 import MilestoneBar from '../components/MilestoneBar';
+import AiUpsellModal from '../components/AiUpsellModal.jsx';
+import { useAiUpsell } from '../hooks/useAiUpsell.js';
 import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
 import { sharePostcard } from '../utils/kakaoShare';
@@ -177,11 +179,34 @@ export default function MyStar() {
     () => new URLSearchParams(window.location.search).get('paid') === 'true'
   );
 
+  // AI 업셀 (A/B 실험) — star 로드 후 days 계산해서 전달
+  const _userId = getOrCreateUserId();
+  const _daysActive = star ? (() => {
+    const ms = Date.now() - new Date(star.created_at).getTime();
+    return Math.floor(ms / 86400000) + 1;
+  })() : 0;
+  const {
+    upsell, experiment, products: aiProducts,
+    showModal: showAiModal, handleClose: closeAiModal, handlePurchase: onAiPurchased,
+  } = useAiUpsell({ userId: _userId, daysActive: _daysActive, enabled: isOwner && !!star });
+
   // 선물하기 상태
   const [showGift, setShowGift] = useState(false);
   const [giftCopyType, setGiftCopyType] = useState(null);
   const [giftPosting, setGiftPosting] = useState(false);
   const [giftDone, setGiftDone] = useState(false);
+  // ── AI 트리거 (Day3/Day7 리텐션) ────────────────────────────
+  const [lumi, setLumi] = useState(null);
+
+  // ── AI 트리거 체크 (Day3/Day7 리텐션 — 앱 진입 시 1회) ──────
+  useEffect(() => {
+    if (!isOwner) return;
+    const userId = getOrCreateUserId();
+    fetch(`/api/dt/ai-trigger/check?userId=${encodeURIComponent(userId)}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data?.lumi) setLumi(data.lumi); })
+      .catch(() => {});
+  }, [isOwner]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── 소유자 전용 데이터 로드 (isOwner=false 시 즉시 반환) ──────────
   useEffect(() => {
@@ -374,6 +399,61 @@ export default function MyStar() {
           </div>
         </div>
       )}
+      {/* ── 루미 카드 (Day3/Day7 리텐션 트리거) ── */}
+      {lumi && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.4 }}
+          style={{
+            position: 'fixed', top: 72, left: '50%', transform: 'translateX(-50%)',
+            zIndex: 40, width: '90%', maxWidth: 360,
+            background: 'linear-gradient(135deg, rgba(13,27,42,0.97) 0%, rgba(20,38,58,0.97) 100%)',
+            border: '1px solid rgba(255,215,106,0.28)',
+            borderRadius: 18, padding: '18px 20px', boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+          }}
+        >
+          <p style={{ fontSize: 12, color: 'rgba(255,215,106,0.7)', marginBottom: 6, letterSpacing: '0.04em' }}>
+            ✨ 루미의 발견
+          </p>
+          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.88)', lineHeight: 1.6, whiteSpace: 'pre-line', marginBottom: 14 }}>
+            &ldquo;{lumi.message}&rdquo;
+          </p>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button
+              onClick={() => {
+                logFlowEvent({
+                  userId: getOrCreateUserId(),
+                  stage: 'recommendation', action: 'click',
+                  value: { trigger: lumi.trigger },
+                });
+                setLumi(null);
+                // 성장 입력 화면으로 자연 이동
+                nav('/day', { state: { isDay3Resume: true } });
+              }}
+              style={{
+                flex: 1, padding: '11px 0', borderRadius: 9999,
+                background: '#FFD76A', color: '#0D1B2A',
+                fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer',
+              }}
+            >
+              {lumi.cta}
+            </button>
+            <button
+              onClick={() => setLumi(null)}
+              style={{
+                padding: '11px 16px', borderRadius: 9999,
+                background: 'transparent', border: '1px solid rgba(255,255,255,0.15)',
+                color: 'rgba(255,255,255,0.35)', fontSize: 13, cursor: 'pointer',
+              }}
+            >
+              나중에
+            </button>
+          </div>
+        </motion.div>
+      )}
+
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-8">
         <button onClick={() => window.history.length > 1 ? nav(-1) : nav('/home')} className="text-white/40 hover:text-white/70">← 뒤로</button>
@@ -1005,6 +1085,19 @@ export default function MyStar() {
           </button>
         </div>
       </div>
+
+      {/* AI 업셀 모달 — A/B 실험 */}
+      {showAiModal && upsell && (
+        <AiUpsellModal
+          upsell={upsell}
+          experiment={experiment}
+          products={aiProducts}
+          userId={_userId}
+          starId={star?.star_id}
+          onClose={closeAiModal}
+          onPurchase={onAiPurchased}
+        />
+      )}
     </div>
   );
 }

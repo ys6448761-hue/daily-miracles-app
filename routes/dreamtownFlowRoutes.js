@@ -13,7 +13,7 @@ const express  = require('express');
 const router   = express.Router();
 const flow     = require('../services/dreamtownFlowService');
 const db       = require('../database/db');
-const { getDay1ConversionRate } = require('../services/day1OnboardingService');
+const { getDay1ConversionRate, getGrowthRetentionKpi } = require('../services/day1OnboardingService');
 
 // ── POST /api/dt/flow ─────────────────────────────────────────
 router.post('/', async (req, res) => {
@@ -57,6 +57,18 @@ router.get('/day1-kpi', async (req, res) => {
   const days = parseInt(req.query.days, 10) || 7;
   try {
     const kpi = await getDay1ConversionRate(db, { days });
+    res.json(kpi);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ── GET /api/dt/flow/growth-kpi ──────────────────────────────
+// Day3 복귀율 (목표 40%+) / Day7 완주율 (목표 30%+)
+router.get('/growth-kpi', async (req, res) => {
+  const days = parseInt(req.query.days, 10) || 30;
+  try {
+    const kpi = await getGrowthRetentionKpi(db, { days });
     res.json(kpi);
   } catch (e) {
     res.status(500).json({ error: e.message });
