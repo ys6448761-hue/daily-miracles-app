@@ -48,6 +48,8 @@ import JourneyWishPage from './pages/JourneyWishPage.jsx';
 import JourneyContextPage from './pages/JourneyContextPage.jsx';
 import JourneyRecommendPage from './pages/JourneyRecommendPage.jsx';
 import Day7Complete from './pages/Day7Complete.jsx';
+import HometownLanding from './pages/HometownLanding.jsx';
+import HometownAdmin from './pages/HometownAdmin.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
 if (window.location.pathname.startsWith('//')) {
@@ -102,6 +104,9 @@ export default function App() {
           {/* 모바일 이용권 */}
           <Route path="/ticket/:code"              element={<MobileTicket />} />
           <Route path="/onboarding"                element={<OnboardingPage />} />
+          {/* 별들의 고향 */}
+          <Route path="/hometown"                  element={<HometownLanding />} />
+          <Route path="/admin/hometown/:partnerId" element={<HometownAdmin />} />
           {/* 어드민 — 일반 사용자 인증 가드 완전 제외, VoyageAdmin 자체 TokenGate만 사용 */}
           <Route path="/admin/benefit"             element={<AdminBenefitPage />} />
           <Route path="/admin/experiment"          element={<AdminExperimentPage />} />

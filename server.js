@@ -2157,6 +2157,18 @@ if (voyageAdminRoutes) {
   console.log("✅ 항해 예약 어드민 라우터 등록 완료 (/api/admin/voyage/bookings)");
 }
 
+// ---------- 별들의 고향 Routes (/api/hometown) ----------
+let hometownRoutes = null;
+try {
+  hometownRoutes = require('./routes/hometownRoutes');
+} catch (e) {
+  console.warn('⚠️ hometownRoutes 로드 실패:', e.message);
+}
+if (hometownRoutes) {
+  app.use('/api/hometown', hometownRoutes);
+  console.log('✅ 별들의 고향 라우터 등록 완료 (/api/hometown)');
+}
+
 // ---------- AI 비용 대시보드 Routes (/api/admin/ai-cost) ----------
 if (adminAiCostRoutes) {
   app.use("/api/admin/ai-cost", adminAiCostRoutes);
@@ -2675,6 +2687,8 @@ const DT_SPA_ROUTES = [
   '/onboarding',
   // Day7 완료
   '/day7-complete',
+  // 별들의 고향
+  '/hometown',
   // 어드민
   '/admin/*',
   // 파트너
