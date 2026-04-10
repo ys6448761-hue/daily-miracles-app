@@ -7,12 +7,20 @@
  * CTA      (2.3s~)       첫 항해 시작(primary) / 이 순간 간직하기(secondary) — delay 0.5s 자연 노출
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { gaStarCreated, gaFirstVoyageStart } from '../utils/gtag';
 import { readSavedStar } from '../lib/utils/starSession.js';
 import { logFlowEvent } from '../api/dreamtown.js';
+import { logEvent } from '../lib/events.js';
+
+// 공유 문구 3종 — 랜덤 노출
+const SHARE_MESSAGES = [
+  '이건 나만 보기 아까운 하루네요',
+  '오늘 내 마음을 남겨봤어요',
+  '누군가에게 닿았으면 좋겠어요',
+];
 
 const DAY1_DEFAULT = {
   message:    '지금 이 순간이 가장 중요해요',
@@ -124,6 +132,10 @@ export default function StarBirth() {
   // Day1 자동 카운트다운 (1.5s after CTA 노출)
   const [autoCount,  setAutoCount]  = useState(null); // null | 1.5 → 0
   const autoRef = useRef(null);
+  // 공유
+  const [shareMsg,        setShareMsg]        = useState('');
+  const [shareFeedback,   setShareFeedback]   = useState(''); // 공유 완료 피드백 텍스트
+  const shareFeedbackRef = useRef(null);
 
   // ── 타임라인 ────────────────────────────────────────────
   useEffect(() => {
@@ -136,9 +148,15 @@ export default function StarBirth() {
     return () => ts.forEach(clearTimeout);
   }, []);
 
-  // ── GA: star_created ────────────────────────────────────
+  // ── GA + 공유 메시지 초기화 ──────────────────────────────
   useEffect(() => {
-    if (phase === 'done') gaStarCreated({ gemType, galaxyType: galaxy });
+    if (phase === 'done') {
+      gaStarCreated({ gemType, galaxyType: galaxy });
+      const msg = SHARE_MESSAGES[Math.floor(Math.random() * SHARE_MESSAGES.length)];
+      setShareMsg(msg);
+      // wish_created 이벤트
+      logEvent('wish_created', { star_id: starId, galaxy });
+    }
   }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Day1 자동 카운트다운 (CTA 노출 후 1.5s) ─────────────
@@ -156,6 +174,61 @@ export default function StarBirth() {
     }, 100);
     return () => clearInterval(autoRef.current);
   }, [showCTA]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── 공유 피드백 헬퍼 ────────────────────────────────────
+  function showShareFeedback(text) {
+    clearTimeout(shareFeedbackRef.current);
+    setShareFeedback(text);
+    shareFeedbackRef.current = setTimeout(() => setShareFeedback(''), 1800);
+  }
+
+  // ── 카카오 공유 ─────────────────────────────────────────
+  const handleKakaoShare = useCallback(() => {
+    clearInterval(autoRef.current); // 공유 시 카운트다운 중단
+    setAutoCount(null);
+    logEvent('share_clicked', { star_id: starId, message_variant: shareMsg, platform: 'kakao' });
+
+    const baseUrl = 'https://app.dailymiracles.kr';
+    const imageUrl = `${baseUrl}/images/dreamtown-og.jpg`;
+    const linkUrl  = `${baseUrl}/my-star/${starId}`;
+
+    try {
+      if (window.Kakao?.isInitialized?.() && window.Kakao?.Share) {
+        window.Kakao.Share.sendDefault({
+          objectType: 'feed',
+          content: {
+            title: '내 별이 탄생했어요 ✨',
+            description: shareMsg,
+            imageUrl,
+            link: { mobileWebUrl: linkUrl, webUrl: linkUrl },
+          },
+        });
+        logEvent('share_completed', { star_id: starId, platform: 'kakao' });
+        showShareFeedback('카카오로 공유됐어요 ✨');
+      } else {
+        // 카카오 SDK 미초기화 → 링크 복사 fallback
+        navigator.clipboard?.writeText(linkUrl).then(() => {
+          logEvent('share_completed', { star_id: starId, platform: 'copy' });
+          showShareFeedback('링크가 복사됐어요 ✨');
+        }).catch(() => showShareFeedback('공유 링크: ' + linkUrl));
+      }
+    } catch (e) {
+      console.warn('[StarBirth] 카카오 공유 실패:', e.message);
+      showShareFeedback('공유에 실패했어요');
+    }
+  }, [starId, shareMsg]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── 링크 복사 (저장하기) ────────────────────────────────
+  const handleCopyLink = useCallback(() => {
+    clearInterval(autoRef.current);
+    setAutoCount(null);
+    const linkUrl = `https://app.dailymiracles.kr/my-star/${starId}`;
+    logEvent('share_clicked', { star_id: starId, message_variant: shareMsg, platform: 'copy' });
+    navigator.clipboard?.writeText(linkUrl).then(() => {
+      logEvent('share_completed', { star_id: starId, platform: 'copy' });
+      showShareFeedback('링크가 복사됐어요 ✨');
+    }).catch(() => showShareFeedback('복사를 지원하지 않는 환경이에요'));
+  }, [starId, shareMsg]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleDay1Start(source = 'click') {
     clearInterval(autoRef.current);
@@ -387,7 +460,74 @@ export default function StarBirth() {
                 {day1.prompt}
               </p>
 
-              {/* PRIMARY: 오늘의 작은 행동 시작 — 1개만 */}
+              {/* ── 공유하기 — 1순위 최상단 ── */}
+              {shareMsg && (
+                <div style={{ width: '100%', marginBottom: 4 }}>
+                  {/* 공유 문구 */}
+                  <p style={{
+                    fontSize: 13,
+                    color: 'rgba(255,255,255,0.55)',
+                    marginBottom: 8,
+                    fontStyle: 'italic',
+                    textAlign: 'center',
+                    lineHeight: 1.5,
+                  }}>
+                    &ldquo;{shareMsg}&rdquo;
+                  </p>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    {/* 카카오 공유 */}
+                    <button
+                      onClick={handleKakaoShare}
+                      style={{
+                        flex: 1,
+                        padding: '13px 0',
+                        borderRadius: 9999,
+                        background: '#FEE500',
+                        color: '#191919',
+                        fontSize: 14,
+                        fontWeight: 700,
+                        border: 'none',
+                        cursor: 'pointer',
+                        letterSpacing: '0.01em',
+                      }}
+                    >
+                      💬 공유하기
+                    </button>
+                    {/* 링크 복사 (저장하기) */}
+                    <button
+                      onClick={handleCopyLink}
+                      style={{
+                        flex: 1,
+                        padding: '13px 0',
+                        borderRadius: 9999,
+                        background: 'rgba(255,255,255,0.08)',
+                        color: 'rgba(255,255,255,0.75)',
+                        fontSize: 14,
+                        fontWeight: 600,
+                        border: '1px solid rgba(255,255,255,0.15)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      🔗 저장하기
+                    </button>
+                  </div>
+                  {/* 공유 완료 피드백 */}
+                  {shareFeedback && (
+                    <p className="sb-share-feedback" style={{
+                      fontSize: 12,
+                      color: 'rgba(255,215,106,0.8)',
+                      textAlign: 'center',
+                      marginTop: 6,
+                    }}>
+                      {shareFeedback}
+                    </p>
+                  )}
+                  {/* 구분선 */}
+                  <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '14px 0 6px' }} />
+                </div>
+              )}
+
+              {/* PRIMARY: 오늘의 작은 행동 시작 */}
               <button
                 onClick={() => handleDay1Start('click')}
                 style={{
