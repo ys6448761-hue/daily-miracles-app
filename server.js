@@ -597,6 +597,47 @@ try {
   console.error("❌ 추천 시스템 라우터 로드 실패:", error.message);
 }
 
+// 항해 예약 어드민 라우터 로딩
+let voyageAdminRoutes = null;
+try {
+  voyageAdminRoutes = require('./routes/voyageAdminRoutes');
+  console.log('✅ 항해 예약 어드민 라우터 로드 성공');
+} catch (e) { console.error('❌ 항해 예약 어드민 라우터 로드 실패:', e.message); }
+
+// AI 비용 대시보드 라우터 로딩
+let adminAiCostRoutes = null;
+try {
+  adminAiCostRoutes = require("./routes/adminAiCostRoutes");
+  console.log("✅ AI 비용 대시보드 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ AI 비용 대시보드 라우터 로드 실패:", error.message);
+}
+
+// ── Core Journey Flow 라우터 로딩 ────────────────────────────────────
+let wishCoreRoutes = null;
+try {
+  wishCoreRoutes = require('./routes/wishCoreRoutes');
+  console.log('✅ wishCore 라우터 로드 성공');
+} catch (e) { console.error('❌ wishCore 라우터 로드 실패:', e.message); }
+
+let journeyContextRoutes = null;
+try {
+  journeyContextRoutes = require('./routes/journeyContextRoutes');
+  console.log('✅ journeyContext 라우터 로드 성공');
+} catch (e) { console.error('❌ journeyContext 라우터 로드 실패:', e.message); }
+
+let recommendationRoutes = null;
+try {
+  recommendationRoutes = require('./routes/recommendationRoutes');
+  console.log('✅ recommendation 라우터 로드 성공');
+} catch (e) { console.error('❌ recommendation 라우터 로드 실패:', e.message); }
+
+let wishJourneyRoutes = null;
+try {
+  wishJourneyRoutes = require('./routes/wishJourneyRoutes');
+  console.log('✅ wishJourney 라우터 로드 성공');
+} catch (e) { console.error('❌ wishJourney 라우터 로드 실패:', e.message); }
+
 // 어드민 포인트/추천 관리 라우터 로딩 (Aurora5 v2.6)
 let adminPointRoutes = null;
 try {
@@ -2096,12 +2137,30 @@ if (rewardRoutes) {
   console.warn("⚠️ 리워드(예고편) 라우터 로드 실패 - 라우트 미등록");
 }
 
+// ---------- Core Journey Flow Routes ─────────────────────────────────
+if (wishCoreRoutes)      app.use('/api/wishes',           wishCoreRoutes);
+if (journeyContextRoutes) app.use('/api/journey-contexts', journeyContextRoutes);
+if (recommendationRoutes) app.use('/api/recommendation',   recommendationRoutes);
+if (wishJourneyRoutes)   app.use('/api/journeys',          wishJourneyRoutes);
+
 // ---------- 추천 시스템 Routes (/api/referral) - Aurora5 v2.6 ----------
 if (referralRoutes) {
   app.use("/api/referral", referralRoutes);
   console.log("✅ 추천 시스템 라우터 등록 완료 (/api/referral)");
 } else {
   console.warn("⚠️ 추천 시스템 라우터 로드 실패 - 라우트 미등록");
+}
+
+// ---------- 항해 예약 어드민 Routes (/api/admin/voyage) ----------
+if (voyageAdminRoutes) {
+  app.use("/api/admin/voyage", voyageAdminRoutes);
+  console.log("✅ 항해 예약 어드민 라우터 등록 완료 (/api/admin/voyage/bookings)");
+}
+
+// ---------- AI 비용 대시보드 Routes (/api/admin/ai-cost) ----------
+if (adminAiCostRoutes) {
+  app.use("/api/admin/ai-cost", adminAiCostRoutes);
+  console.log("✅ AI 비용 대시보드 라우터 등록 완료 (/api/admin/ai-cost, /api/admin/ai-cost/trend)");
 }
 
 // ---------- 어드민 포인트/추천 관리 Routes (/api/admin) - Aurora5 v2.6 ----------
