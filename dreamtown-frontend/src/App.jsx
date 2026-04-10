@@ -102,11 +102,14 @@ export default function App() {
           {/* 모바일 이용권 */}
           <Route path="/ticket/:code"              element={<MobileTicket />} />
           <Route path="/onboarding"                element={<OnboardingPage />} />
+          {/* 어드민 — 일반 사용자 인증 가드 완전 제외, VoyageAdmin 자체 TokenGate만 사용 */}
           <Route path="/admin/benefit"             element={<AdminBenefitPage />} />
           <Route path="/admin/experiment"          element={<AdminExperimentPage />} />
           <Route path="/admin/kpi"                 element={<AdminKpiPage />} />
           <Route path="/admin/ai-cost"             element={<AdminAiDashboard />} />
           <Route path="/admin/voyage"              element={<VoyageAdmin />} />
+          {/* /admin/* catch-all — catch-all → / → AppLaunch 경로 차단 */}
+          <Route path="/admin/*"                   element={<VoyageAdmin />} />
           {/* Core Journey Flow */}
           <Route path="/journey"                   element={<JourneyWishPage />} />
           <Route path="/journey/context"           element={<JourneyContextPage />} />
