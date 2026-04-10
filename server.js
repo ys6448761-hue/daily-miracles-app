@@ -2654,15 +2654,33 @@ app.use('/dreamtown', express.static(dtFrontendPath, {
     }
   },
 }));
+// 루트 경로에서도 JS/CSS/이미지 assets 직접 접근 가능하도록
+app.use(express.static(dtFrontendPath));
 
-// DreamTown SPA 라우트 — /dreamtown/* 및 React Router 직접 경로
+// DreamTown SPA 라우트 — React Router 직접 경로 (새로고침/직접 URL 진입)
 const DT_SPA_ROUTES = [
   '/dreamtown', '/dreamtown/*',
   '/galaxy', '/day', '/star', '/star-growth',
   '/postcard', '/history', '/intro',
   '/star-birth', '/my-star', '/my-star/*', '/home',
-  '/star/*', '/dashboard', '/wish',
-  '/story-draft-mvp', // 검증용 MVP — AIL-STORY-2026-0404-001
+  '/star/*', '/dashboard', '/wish', '/wish/*',
+  '/story-draft-mvp',
+  // 항해 MVP
+  '/voyage', '/voyage/*',
+  // Core Journey Flow
+  '/journey', '/journey/*',
+  // 모바일 이용권
+  '/ticket/*',
+  // 온보딩
+  '/onboarding',
+  // Day7 완료
+  '/day7-complete',
+  // 어드민
+  '/admin/*',
+  // 파트너
+  '/partner/*',
+  // 전체 별 목록
+  '/stars',
 ];
 app.get(DT_SPA_ROUTES, (req, res) => {
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -2675,7 +2693,7 @@ app.get(DT_SPA_ROUTES, (req, res) => {
     }
   });
 });
-console.log('✅ DreamTown 프론트 등록 완료 (/dreamtown + /galaxy 등)');
+console.log('✅ DreamTown 프론트 등록 완료 (SPA 라우트 전체 확장)');
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------
 // P0 요구사항: Trial 또는 Paid 권한이 있어야만 접근 가능
