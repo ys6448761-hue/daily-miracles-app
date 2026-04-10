@@ -42,6 +42,11 @@ import OnboardingPage from './pages/OnboardingPage.jsx';
 import AdminBenefitPage from './pages/AdminBenefitPage.jsx';
 import AdminExperimentPage from './pages/AdminExperimentPage.jsx';
 import AdminKpiPage from './pages/AdminKpiPage.jsx';
+import AdminAiDashboard from './pages/AdminAiDashboard.jsx';
+import VoyageAdmin from './pages/VoyageAdmin.jsx';
+import JourneyWishPage from './pages/JourneyWishPage.jsx';
+import JourneyContextPage from './pages/JourneyContextPage.jsx';
+import JourneyRecommendPage from './pages/JourneyRecommendPage.jsx';
 import Day7Complete from './pages/Day7Complete.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
@@ -100,6 +105,12 @@ export default function App() {
           <Route path="/admin/benefit"             element={<AdminBenefitPage />} />
           <Route path="/admin/experiment"          element={<AdminExperimentPage />} />
           <Route path="/admin/kpi"                 element={<AdminKpiPage />} />
+          <Route path="/admin/ai-cost"             element={<AdminAiDashboard />} />
+          <Route path="/admin/voyage"              element={<VoyageAdmin />} />
+          {/* Core Journey Flow */}
+          <Route path="/journey"                   element={<JourneyWishPage />} />
+          <Route path="/journey/context"           element={<JourneyContextPage />} />
+          <Route path="/journey/recommend"         element={<JourneyRecommendPage />} />
           <Route path="/partner/manual"            element={<PartnerManual />} />
           <Route path="/partner/verify"            element={
             <Suspense fallback={<div style={{ minHeight:'100vh', background:'#0A1628' }} />}>
