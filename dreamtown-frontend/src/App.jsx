@@ -29,6 +29,7 @@ import ResonanceCard from './components/ResonanceCard.jsx';
 import ConnectionStageCard from './components/ConnectionStageCard.jsx';
 import RecallWhisperCard from './components/RecallWhisperCard.jsx';
 import MonetizationFlow from './components/MonetizationFlow.jsx';
+import VoyageLanding from './pages/VoyageLanding.jsx';
 import VoyageWish from './pages/VoyageWish.jsx';
 import VoyageBooking from './pages/VoyageBooking.jsx';
 import VoyageStatus from './pages/VoyageStatus.jsx';
@@ -107,7 +108,8 @@ export default function App() {
           <Route path="/stars"                   element={<AllStars />} />
           <Route path="/dreamtown/gift/:star_id" element={<GiftLanding />} />
           {/* 북은하 항해 MVP */}
-          <Route path="/voyage"                    element={<VoyageWish />} />
+          <Route path="/voyage"                    element={<VoyageLanding />} />
+          <Route path="/voyage/wish"               element={<VoyageWish />} />
           <Route path="/voyage/booking"            element={<VoyageBooking />} />
           <Route path="/voyage/payment/result"     element={<VoyagePaymentReturn />} />
           <Route path="/voyage/:id"                element={<VoyageStatus />} />

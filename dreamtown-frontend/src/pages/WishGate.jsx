@@ -72,6 +72,16 @@ export default function WishGate() {
       const starBirthState = { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy, gemType, userId, day1: star.day1, wishText: wishText.trim() };
       try { sessionStorage.setItem('dt_recent_star', JSON.stringify(starBirthState)); } catch (_) {}
 
+      // QR 경유 시 고향 자동 확정 (fire-and-forget)
+      const partnerCode = new URLSearchParams(window.location.search).get('partner');
+      if (partnerCode) {
+        fetch('/api/hometown/arrive', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ partner_code: partnerCode, user_id: userId }),
+        }).catch(() => {});
+      }
+
       nav(star.next ?? '/star-birth', { state: starBirthState });
     } catch (e) {
       setError(e.message);

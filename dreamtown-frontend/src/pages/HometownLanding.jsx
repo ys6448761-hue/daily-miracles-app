@@ -8,6 +8,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { postWish, postStarCreate, getOrCreateUserId } from '../api/dreamtown.js';
+import { saveStarId } from '../lib/utils/starSession.js';
 
 // ── 공통 스타일 ──────────────────────────────────────────────────────
 const S = {
@@ -197,8 +199,13 @@ function LoadingView() {
 export default function HometownLanding() {
   const nav = useNavigate();
   const [state, setState] = useState('loading');
-  // loading | need_login | need_star | first_visit | revisit | already_hometown | error
+  // loading | need_star | first_visit | revisit | already_hometown | error
   const [data, setData] = useState({});
+
+  // 인라인 소원 입력 상태 (need_star 상태에서 사용)
+  const [wishText,    setWishText]    = useState('');
+  const [wishLoading, setWishLoading] = useState(false);
+  const [wishError,   setWishError]   = useState('');
 
   useEffect(() => {
     const partnerCode = new URLSearchParams(window.location.search).get('partner');
@@ -217,7 +224,12 @@ export default function HometownLanding() {
     })
       .then(r => r.json())
       .then(d => {
-        setState(d.status || 'error');
+        // need_login → need_star로 통합 (인라인 소원 입력)
+        if (d.status === 'need_login') {
+          setState('need_star');
+        } else {
+          setState(d.status || 'error');
+        }
         setData(d);
       })
       .catch(() => {
@@ -225,6 +237,40 @@ export default function HometownLanding() {
         setData({ message: '서버 연결에 실패했어요' });
       });
   }, []);
+
+  // 인라인 소원 제출 → 별 탄생 → 고향 자동 확정
+  async function handleWishSubmit(e) {
+    e.preventDefault();
+    if (!wishText.trim()) { setWishError('소원을 입력해주세요.'); return; }
+    setWishLoading(true);
+    setWishError('');
+    const partnerCode = new URLSearchParams(window.location.search).get('partner');
+    try {
+      const userId = getOrCreateUserId();
+      const wishResult = await postWish({ userId, wishText: wishText.trim(), gemType: 'sapphire', yeosuTheme: 'night_sea' });
+      if (wishResult.safety === 'RED') { setWishError(wishResult.care_message || '입력 내용을 확인해주세요.'); return; }
+
+      const star = await postStarCreate({ wishId: wishResult.wish_id, userId, phoneNumber: null });
+      saveStarId(star.star_id);
+
+      // 고향 자동 확정 (fire-and-forget)
+      if (partnerCode) {
+        fetch('/api/hometown/arrive', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ partner_code: partnerCode, user_id: userId }),
+        }).catch(() => {});
+      }
+
+      nav(star.next ?? '/star-birth', {
+        state: { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy, gemType: 'sapphire', userId, day1: star.day1, wishText: wishText.trim() },
+      });
+    } catch (err) {
+      setWishError(err.message || '별 탄생에 실패했어요. 다시 시도해주세요.');
+    } finally {
+      setWishLoading(false);
+    }
+  }
 
   if (state === 'loading') return <LoadingView />;
 
@@ -253,26 +299,57 @@ export default function HometownLanding() {
     );
   }
 
-  // ── need_star ───────────────────────────────────────────────────
+  // ── need_star — 인라인 소원 입력 ────────────────────────────────
   if (state === 'need_star') {
     return (
       <div style={S.page}>
         <motion.div style={S.card} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <div style={{ fontSize: 40, marginBottom: 16 }}>⭐</div>
-          {data.partner && (
-            <>
-              <div style={S.partnerName}>{data.partner.name}</div>
-              {data.partner.address && <div style={S.partnerAddress}>{data.partner.address}</div>}
-            </>
-          )}
-          <div style={S.title}>아직 별이 없어요</div>
-          <div style={S.body}>
-            소원을 품으면<br />
-            여기가 당신 별의 고향이 됩니다
+          <div style={{ fontSize: 36, marginBottom: 12 }}>✨</div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: '#9B87F5', marginBottom: 4 }}>
+            여기서 별이 태어납니다
           </div>
-          <button style={S.btn} onClick={() => nav('/wish')}>
-            소원 입력하러 가기
-          </button>
+          {data.partner?.name && (
+            <div style={{ fontSize: 20, fontWeight: 800, color: '#E8E4F0', marginBottom: 16 }}>
+              {data.partner.name}에서
+            </div>
+          )}
+          <div style={{ fontSize: 13, color: '#7A6E9C', marginBottom: 20, lineHeight: 1.6 }}>
+            지금 소원을 입력하면<br />
+            이곳이 당신 별의 고향이 됩니다
+          </div>
+          <form onSubmit={handleWishSubmit}>
+            <textarea
+              value={wishText}
+              onChange={e => { setWishText(e.target.value); setWishError(''); }}
+              placeholder="마음속 소원을 적어주세요&#10;예: 더 용감해지고 싶어요"
+              maxLength={200}
+              rows={4}
+              style={{
+                width: '100%', padding: '14px', borderRadius: 12, border: '1px solid rgba(155,135,245,0.3)',
+                background: 'rgba(255,255,255,0.04)', color: '#E8E4F0', fontSize: 14,
+                lineHeight: 1.65, resize: 'none', outline: 'none', boxSizing: 'border-box',
+                marginBottom: 4, fontFamily: "'Noto Sans KR', sans-serif",
+              }}
+            />
+            <div style={{ fontSize: 11, color: '#5a5370', textAlign: 'right', marginBottom: wishError ? 8 : 16 }}>
+              {wishText.length}/200
+            </div>
+            {wishError && (
+              <div style={{ fontSize: 12, color: '#f87171', marginBottom: 12, lineHeight: 1.5 }}>{wishError}</div>
+            )}
+            <button
+              type="submit"
+              disabled={wishLoading || !wishText.trim()}
+              style={{
+                ...S.btn,
+                background: (wishText.trim() && !wishLoading) ? '#9B87F5' : 'rgba(155,135,245,0.2)',
+                color: (wishText.trim() && !wishLoading) ? '#0D1B2A' : '#7A6E9C',
+                cursor: (wishText.trim() && !wishLoading) ? 'pointer' : 'default',
+              }}
+            >
+              {wishLoading ? '별 탄생 중...' : '별 탄생시키기 ✨'}
+            </button>
+          </form>
         </motion.div>
       </div>
     );
