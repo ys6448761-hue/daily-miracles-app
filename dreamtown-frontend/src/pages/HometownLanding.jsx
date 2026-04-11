@@ -315,21 +315,40 @@ export default function HometownLanding() {
 
   // ── revisit ─────────────────────────────────────────────────────
   if (state === 'revisit') {
+    const visitCount = data.visit_count ?? 1;
+    const returnMessages = [
+      '돌아왔군요. 별이 기다리고 있었어요 ✨',
+      '고향의 빛이 조금 더 밝아졌어요 🌟',
+      `${visitCount}번째 귀환이에요. 별이 성장했습니다 ⭐`,
+    ];
+    const returnMsg = visitCount >= 5
+      ? returnMessages[2]
+      : visitCount >= 2
+        ? returnMessages[1]
+        : returnMessages[0];
+
     return (
       <div style={S.page}>
         <motion.div style={S.card} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          {/* 귀환 sparkle 애니메이션 */}
+          <StarParticles />
+          {/* 별 밝기 상승 */}
           <BrightnessRise />
           {data.partner && <div style={S.partnerName}>{data.partner.name}</div>}
-          <div style={S.title}>고향에 돌아왔어요 🌟</div>
+          {/* 오럼 귀환 메시지 */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            style={{ fontSize: 15, color: '#C4BAE0', marginBottom: 12, lineHeight: 1.6 }}
+          >
+            {returnMsg}
+          </motion.div>
           {data.star?.star_name && (
             <div style={S.starName}>★ {data.star.star_name}</div>
           )}
           <div style={S.visitBadge}>
-            {data.visit_count}번째 방문
-          </div>
-          <div style={S.body}>
-            별이 조금 더 밝아졌어요<br />
-            <span style={{ color: '#9B87F5', fontSize: 13 }}>방문할수록 별빛이 깊어집니다</span>
+            {visitCount}번째 방문
           </div>
           <motion.div
             initial={{ scaleX: 0 }}
@@ -344,9 +363,13 @@ export default function HometownLanding() {
             }}
           />
           {data.star?.id && (
-            <button style={S.btn} onClick={() => nav(`/my-star/${data.star.id}`)}>
-              내 별 보러 가기
-            </button>
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              style={{ ...S.btn, background: 'linear-gradient(135deg, #9B87F5, #B8A8FF)' }}
+              onClick={() => nav(`/my-star/${data.star.id}`)}
+            >
+              ✨ 내 별 확인하기
+            </motion.button>
           )}
         </motion.div>
       </div>

@@ -14,13 +14,7 @@ import { gaStarCreated, gaFirstVoyageStart } from '../utils/gtag';
 import { readSavedStar } from '../lib/utils/starSession.js';
 import { logFlowEvent } from '../api/dreamtown.js';
 import { logEvent } from '../lib/events.js';
-
-// 공유 문구 3종 — 랜덤 노출
-const SHARE_MESSAGES = [
-  '이건 나만 보기 아까운 하루네요',
-  '오늘 내 마음을 남겨봤어요',
-  '누군가에게 닿았으면 좋겠어요',
-];
+import { generateShareMessage } from '../lib/emotionMessage.js';
 
 const DAY1_DEFAULT = {
   message:    '지금 이 순간이 가장 중요해요',
@@ -152,7 +146,7 @@ export default function StarBirth() {
   useEffect(() => {
     if (phase === 'done') {
       gaStarCreated({ gemType, galaxyType: galaxy });
-      const msg = SHARE_MESSAGES[Math.floor(Math.random() * SHARE_MESSAGES.length)];
+      const msg = generateShareMessage(wishText);
       setShareMsg(msg);
       // wish_created 이벤트
       logEvent('wish_created', { star_id: starId, galaxy });
