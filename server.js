@@ -2183,6 +2183,30 @@ if (partnerAuthRoutes) {
   console.log('✅ 파트너 어드민 라우터 등록 완료 (/api/partner)');
 }
 
+// ---------- 파트너 주문·정산 Routes (/api/partner) ----------
+let partnerOrderRoutes = null;
+try {
+  partnerOrderRoutes = require('./routes/partnerOrderRoutes');
+} catch (e) {
+  console.warn('⚠️ partnerOrderRoutes 로드 실패:', e.message);
+}
+if (partnerOrderRoutes) {
+  app.use('/api/partner', partnerOrderRoutes);
+  console.log('✅ 파트너 주문·정산 라우터 등록 완료 (/api/partner/orders, /api/partner/settlement)');
+}
+
+// ---------- 특산품 쇼핑 Routes (/api/shop) ----------
+let shopRoutes = null;
+try {
+  shopRoutes = require('./routes/shopRoutes');
+} catch (e) {
+  console.warn('⚠️ shopRoutes 로드 실패:', e.message);
+}
+if (shopRoutes) {
+  app.use('/api/shop', shopRoutes);
+  console.log('✅ 특산품 쇼핑 라우터 등록 완료 (/api/shop)');
+}
+
 // ---------- AI 비용 대시보드 Routes (/api/admin/ai-cost) ----------
 if (adminAiCostRoutes) {
   app.use("/api/admin/ai-cost", adminAiCostRoutes);
@@ -2707,6 +2731,8 @@ const DT_SPA_ROUTES = [
   '/admin/*',
   // 파트너
   '/partner/*',
+  // 특산품 쇼핑
+  '/shop', '/shop/*',
   // 전체 별 목록
   '/stars',
 ];
