@@ -132,6 +132,15 @@ export default function StarBirth() {
   const [shareFeedback,   setShareFeedback]   = useState(''); // 공유 완료 피드백 텍스트
   const shareFeedbackRef = useRef(null);
 
+  // ── 마운트 시 Kakao SDK 선제 초기화 ────────────────────────
+  useEffect(() => {
+    const ready = initKakao();
+    console.log('[StarBirth] 마운트 — Kakao initKakao:', ready,
+      '| window.Kakao:', !!window.Kakao,
+      '| Kakao.Share:', !!window.Kakao?.Share,
+      '| isInitialized:', window.Kakao?.isInitialized?.());
+  }, []);
+
   // ── 타임라인 ────────────────────────────────────────────
   useEffect(() => {
     const ts = [
@@ -188,7 +197,9 @@ export default function StarBirth() {
     const linkUrl  = `${baseUrl}/my-star/${starId}`;
 
     const kakaoReady = initKakao();
-    console.log('[StarBirth] Kakao 공유 시도 — initKakao:', kakaoReady, '| isInitialized:', window.Kakao?.isInitialized?.());
+    console.log('[StarBirth] Kakao 공유 시도 — initKakao:', kakaoReady,
+      '| Kakao.Share:', !!window.Kakao?.Share,
+      '| isInitialized:', window.Kakao?.isInitialized?.());
 
     try {
       if (kakaoReady && window.Kakao?.Share) {
