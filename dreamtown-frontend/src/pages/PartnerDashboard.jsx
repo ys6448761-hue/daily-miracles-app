@@ -238,16 +238,17 @@ function StarCard({ star }) {
 // ── 뷰 상태: 'dashboard' | 'stars' | 'qr' ─────────────────────────────
 export default function PartnerDashboard() {
   const nav = useNavigate();
-  const [view,       setView]       = useState('dashboard');
-  const [data,       setData]       = useState(null);  // /api/partner/me
-  const [stars,      setStars]      = useState([]);
-  const [qrImage,    setQrImage]    = useState(null);
-  const [qrCode,     setQrCode]     = useState(null);
-  const [qrUrl,      setQrUrl]      = useState(null);
-  const [loading,    setLoading]    = useState(true);
-  const [qrLoading,  setQrLoading]  = useState(false);
-  const [error,      setError]      = useState('');
+  const [view,         setView]         = useState('dashboard');
+  const [data,         setData]         = useState(null);  // /api/partner/me
+  const [stars,        setStars]        = useState([]);
+  const [qrImage,      setQrImage]      = useState(null);
+  const [qrCode,       setQrCode]       = useState(null);
+  const [qrUrl,        setQrUrl]        = useState(null);
+  const [loading,      setLoading]      = useState(true);
+  const [qrLoading,    setQrLoading]    = useState(false);
+  const [error,        setError]        = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [showV11Banner, setShowV11Banner] = useState(false);
 
   const jwt = localStorage.getItem(PARTNER_JWT_KEY);
   const authHeader = { Authorization: `Bearer ${jwt}` };
@@ -255,10 +256,19 @@ export default function PartnerDashboard() {
   // ── 인증 확인 → 미로그인 시 로그인 / 약관 미동의 시 약관 페이지로 ──────
   useEffect(() => {
     if (!jwt) { nav('/partner/login', { replace: true }); return; }
-    // 약관 동의 여부 확인
     fetch('/api/partner/terms-status', { headers: { Authorization: `Bearer ${jwt}` } })
       .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d && !d.terms_agreed) nav('/partner/agreement', { replace: true }); })
+      .then(d => {
+        if (!d) return;
+        if (!d.terms_agreed) {
+          nav('/partner/agreement', { replace: true });
+        } else if (d.terms_version !== 'v1.1') {
+          // 기존 v1.0 파트너 — 재동의 불요, 배너 1회 표시
+          if (!localStorage.getItem('dt_v11_banner_dismissed')) {
+            setShowV11Banner(true);
+          }
+        }
+      })
       .catch(() => {});
   }, [jwt, nav]);
 
@@ -398,6 +408,58 @@ export default function PartnerDashboard() {
           )}
         </div>
       </div>
+
+      {/* v1.1 약관 업데이트 배너 — 기존 파트너 1회 표시 */}
+      <AnimatePresence>
+        {showV11Banner && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25 }}
+            style={{
+              background: 'rgba(155,135,245,0.12)',
+              border: '1px solid rgba(155,135,245,0.3)',
+              borderRadius: 10,
+              padding: '12px 16px',
+              margin: '12px 20px 0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 10,
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#9B87F5', marginBottom: 3 }}>
+                📋 파트너 약관이 업데이트 됐어요 (v1.1)
+              </div>
+              <div style={{ fontSize: 12, color: '#C4BAE0', lineHeight: 1.5 }}>
+                수익 배분 변동 조항이 추가됐습니다. 재동의는 필요 없어요.
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                localStorage.setItem('dt_v11_banner_dismissed', '1');
+                setShowV11Banner(false);
+              }}
+              style={{
+                background: 'transparent',
+                border: '1px solid rgba(155,135,245,0.4)',
+                borderRadius: 8,
+                padding: '6px 12px',
+                color: '#9B87F5',
+                fontSize: 12,
+                fontWeight: 700,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+              }}
+            >
+              확인
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {error && <div style={S.errorBox}>{error}</div>}
 

@@ -251,6 +251,68 @@ router.post('/generate-qr', partnerAuth, async (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────
+// GET /api/partner/terms-status
+// 약관 동의 여부 + 현재 버전 반환
+// ─────────────────────────────────────────────────────────────────────────
+router.get('/terms-status', partnerAuth, async (req, res) => {
+  const { partnerId, accountId } = req;
+  try {
+    const r = await db.query(
+      `SELECT pa.terms_agreed,
+              COALESCE(ag.terms_version, 'v1.0') AS terms_version
+         FROM partner_accounts pa
+         LEFT JOIN LATERAL (
+           SELECT terms_version FROM partner_agreements
+            WHERE partner_id = $1
+            ORDER BY agreed_at DESC LIMIT 1
+         ) ag ON true
+        WHERE pa.id = $2`,
+      [partnerId, accountId]
+    );
+    const row = r.rows[0] || { terms_agreed: false, terms_version: 'v1.0' };
+    return res.json({
+      terms_agreed:  row.terms_agreed ?? false,
+      terms_version: row.terms_version,
+    });
+  } catch (err) {
+    console.error('[partner/terms-status]:', err.message);
+    // terms_status 실패는 치명적이지 않음 — 기본값으로 진행
+    return res.json({ terms_agreed: true, terms_version: 'v1.0' });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────
+// POST /api/partner/terms-agree
+// Body: { terms_version, agreed_clause_4_variable, agreed_clause_10_6 }
+// ─────────────────────────────────────────────────────────────────────────
+router.post('/terms-agree', partnerAuth, async (req, res) => {
+  const {
+    terms_version             = 'v1.1',
+    agreed_clause_4_variable  = false,
+    agreed_clause_10_6        = false,
+  } = req.body;
+  const { partnerId, accountId } = req;
+
+  try {
+    await db.query(
+      `INSERT INTO partner_agreements
+         (partner_id, partner_account_id, terms_version, agreed_clause_4_variable, agreed_clause_10_6)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [partnerId, accountId, terms_version, agreed_clause_4_variable, agreed_clause_10_6]
+    );
+    await db.query(
+      `UPDATE partner_accounts SET terms_agreed = true, terms_agreed_at = NOW() WHERE id = $1`,
+      [accountId]
+    );
+    console.log('[partner/terms-agree] 저장 완료:', { partnerId, terms_version });
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error('[partner/terms-agree]:', err.message);
+    return res.status(500).json({ error: '약관 동의 처리에 실패했어요.' });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────
 // GET /api/partner/qr-download
 // ─────────────────────────────────────────────────────────────────────────
 router.get('/qr-download', partnerAuth, async (req, res) => {
