@@ -5,7 +5,8 @@
  *
  * 인증: X-Admin-Token 헤더 (ADMIN_TOKEN 환경변수)
  *
- * GET  /api/admin/partners                전체 파트너 목록 (등급순)
+ * GET  /api/admin/regions                 전체 지역 목록 + 파트너 수
+ * GET  /api/admin/partners?city_code=     전체/지역별 파트너 목록 (등급순)
  * GET  /api/admin/partners/:id            파트너 상세 + 평가이력
  * POST /api/admin/partners/:id/evaluate   수동 평가 실행
  * PATCH /api/admin/partners/:id/grade     수동 등급 변경
@@ -37,19 +38,52 @@ router.use(adminGuard);
 const GRADE_ORDER = ['danger', 'warning', 'normal', 'star'];
 
 // ─────────────────────────────────────────────────────────────────────────
-// GET /api/admin/partners
+// GET /api/admin/regions
 // ─────────────────────────────────────────────────────────────────────────
-router.get('/partners', async (req, res) => {
+router.get('/regions', async (req, res) => {
   try {
     const r = await db.query(`
       SELECT
-        p.id, p.name, p.category, p.address, p.phone,
+        r.city_code, r.city_name, r.country_code, r.is_active,
+        COUNT(p.id)                                         AS partner_count,
+        COALESCE(SUM(p.hometown_star_count), 0)             AS total_stars,
+        COUNT(p.id) FILTER (WHERE p.grade = 'star')         AS star_count,
+        COUNT(p.id) FILTER (WHERE p.grade = 'warning')      AS warning_count,
+        COUNT(p.id) FILTER (WHERE p.grade = 'danger')       AS danger_count
+      FROM dt_regions r
+      LEFT JOIN dt_partners p ON p.city_code = r.city_code AND p.is_active = TRUE
+      GROUP BY r.city_code, r.city_name, r.country_code, r.is_active
+      ORDER BY r.is_active DESC, partner_count DESC
+    `);
+    return res.json({ regions: r.rows });
+  } catch (err) {
+    console.error('[admin/regions] 오류:', err);
+    return res.status(500).json({ error: '서버 오류', detail: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────
+// GET /api/admin/partners?city_code=yeosu
+// ─────────────────────────────────────────────────────────────────────────
+router.get('/partners', async (req, res) => {
+  const { city_code } = req.query; // undefined = 전체
+
+  try {
+    const cityFilter = city_code ? `AND p.city_code = $1` : '';
+    const params     = city_code ? [city_code] : [];
+
+    const r = await db.query(`
+      SELECT
+        p.id, p.name, p.category, p.address, p.phone, p.city_code,
         p.is_active, p.grade, p.grade_updated_at,
         p.hometown_star_count, p.is_subscribed,
         -- 이번 달 방문 수
         (SELECT COUNT(*) FROM hometown_visits hv
           WHERE hv.partner_id = p.id
             AND hv.visited_at >= date_trunc('month', NOW())) AS month_visits,
+        -- 전체 방문 수
+        (SELECT COUNT(*) FROM hometown_visits hv2
+          WHERE hv2.partner_id = p.id) AS total_visits,
         -- 최근 평가 점수
         pe.total_score, pe.return_rate, pe.qr_scan_count,
         pe.order_process_rate, pe.admin_login_count,
@@ -60,8 +94,9 @@ router.get('/partners', async (req, res) => {
       LEFT JOIN partner_evaluations pe
         ON pe.partner_id = p.id
         AND pe.eval_month = date_trunc('month', NOW())::DATE
+      WHERE TRUE ${cityFilter}
       ORDER BY p.is_active DESC, p.created_at
-    `);
+    `, params);
 
     // danger→warning→normal→star 순 정렬
     const sorted = [...r.rows].sort((a, b) => {
@@ -74,7 +109,49 @@ router.get('/partners', async (req, res) => {
     const summary = { star: 0, normal: 0, warning: 0, danger: 0 };
     for (const p of sorted) summary[p.grade || 'normal'] = (summary[p.grade || 'normal'] || 0) + 1;
 
-    return res.json({ partners: sorted, summary, total: sorted.length });
+    // 전체 통계
+    const statsR = await db.query(`
+      SELECT
+        COALESCE(SUM(p.hometown_star_count), 0)                       AS total_stars,
+        (SELECT COUNT(*) FROM hometown_visits hv
+          JOIN dt_partners pp ON pp.id = hv.partner_id
+          WHERE TRUE ${cityFilter ? 'AND pp.city_code = $1' : ''})    AS total_visits,
+        (SELECT COUNT(*) FROM dt_stars s2
+          WHERE s2.hometown_partner_id IS NOT NULL
+            AND s2.hometown_confirmed_at >= date_trunc('month', NOW())
+            ${cityFilter ? `AND EXISTS (SELECT 1 FROM dt_partners pp2 WHERE pp2.id = s2.hometown_partner_id AND pp2.city_code = $1)` : ''})
+                                                                       AS new_stars_this_month,
+        ROUND(AVG(NULLIF(pe2.return_rate, 0)), 1)                     AS avg_return_rate
+      FROM dt_partners p
+      LEFT JOIN partner_evaluations pe2
+        ON pe2.partner_id = p.id
+        AND pe2.eval_month = date_trunc('month', NOW())::DATE
+      WHERE TRUE ${cityFilter}
+    `, params);
+    const stats = statsR.rows[0] || {};
+
+    // 지역별 파트너 수 (탭 뱃지용)
+    const regionsR = await db.query(`
+      SELECT city_code, COUNT(*) AS cnt
+        FROM dt_partners
+       WHERE is_active = TRUE
+       GROUP BY city_code
+    `);
+    const regionCounts = {};
+    for (const row of regionsR.rows) regionCounts[row.city_code] = Number(row.cnt);
+
+    return res.json({
+      partners: sorted,
+      summary,
+      total: sorted.length,
+      stats: {
+        total_stars:        Number(stats.total_stars ?? 0),
+        total_visits:       Number(stats.total_visits ?? 0),
+        new_stars_this_month: Number(stats.new_stars_this_month ?? 0),
+        avg_return_rate:    Number(stats.avg_return_rate ?? 0),
+      },
+      region_counts: regionCounts,
+    });
   } catch (err) {
     console.error('[admin/partners] 오류:', err);
     return res.status(500).json({ error: '서버 오류', detail: err.message });
