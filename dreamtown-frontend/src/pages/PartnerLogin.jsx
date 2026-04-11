@@ -95,15 +95,15 @@ const S = {
 
 export default function PartnerLogin() {
   const nav = useNavigate();
-  const [email, setEmail]       = useState('');
+  const [loginId,  setLoginId]  = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState('');
+  const [loading,  setLoading]  = useState(false);
+  const [error,    setError]    = useState('');
 
   async function handleLogin(e) {
     e.preventDefault();
-    if (!email || !password) {
-      setError('이메일과 비밀번호를 모두 입력해주세요.');
+    if (!loginId || !password) {
+      setError('아이디와 비밀번호를 모두 입력해주세요.');
       return;
     }
     setLoading(true);
@@ -113,7 +113,7 @@ export default function PartnerLogin() {
       const r = await fetch('/api/partner/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), password }),
+        body: JSON.stringify({ login_id: loginId.trim(), password }),
       });
       const d = await r.json();
 
@@ -150,14 +150,14 @@ export default function PartnerLogin() {
         <form onSubmit={handleLogin} autoComplete="on">
           {error && <div style={S.error}>{error}</div>}
 
-          <label style={S.label} htmlFor="email">이메일</label>
+          <label style={S.label} htmlFor="login_id">아이디</label>
           <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            placeholder="partner@example.com"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
+            id="login_id"
+            type="text"
+            autoComplete="username"
+            placeholder="DT-YS-C001"
+            value={loginId}
+            onChange={e => setLoginId(e.target.value)}
             style={S.input}
           />
 

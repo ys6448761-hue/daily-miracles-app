@@ -51,30 +51,33 @@ function makeQrCode(partnerId) {
 // Body: { email, password }
 // ─────────────────────────────────────────────────────────────────────────
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ error: '이메일과 비밀번호를 입력해주세요.' });
+  const { login_id, email, password } = req.body;
+  const identifier = (login_id || email || '').trim();
+
+  if (!identifier || !password) {
+    return res.status(400).json({ error: '아이디와 비밀번호를 입력해주세요.' });
   }
 
   try {
+    // login_id(DT-YS-C001 형식) 또는 email 둘 다 조회
     const r = await db.query(
-      `SELECT pa.id, pa.partner_id, pa.email, pa.password_hash, pa.is_active,
+      `SELECT pa.id, pa.partner_id, pa.email, pa.login_id, pa.password_hash, pa.is_active,
               p.name AS partner_name
          FROM partner_accounts pa
          JOIN dt_partners p ON p.id = pa.partner_id
-        WHERE pa.email = $1
+        WHERE pa.login_id = $1 OR pa.email = $2
         LIMIT 1`,
-      [email.toLowerCase().trim()]
+      [identifier, identifier.toLowerCase()]
     );
     const account = r.rows[0];
 
     if (!account || !account.is_active) {
-      return res.status(401).json({ error: '이메일 또는 비밀번호가 올바르지 않아요.' });
+      return res.status(401).json({ error: '아이디 또는 비밀번호가 올바르지 않아요.' });
     }
 
     const valid = await bcrypt.compare(password, account.password_hash);
     if (!valid) {
-      return res.status(401).json({ error: '이메일 또는 비밀번호가 올바르지 않아요.' });
+      return res.status(401).json({ error: '아이디 또는 비밀번호가 올바르지 않아요.' });
     }
 
     // last_login_at 업데이트 (fire-and-forget)
