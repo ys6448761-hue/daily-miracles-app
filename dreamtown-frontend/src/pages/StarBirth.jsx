@@ -24,6 +24,13 @@ const DAY1_DEFAULT = {
   action_key: 'first_step',
 };
 
+// ── A/B/C 카피 3종 ─────────────────────────────────────────────────
+const STAR_BIRTH_COPIES = [
+  { variant: 'A', title: '당신의 별이 이곳에서 태어났어요',     subtitle: '오늘의 이 마음, 여기서 시작됐어요' },
+  { variant: 'B', title: '이 카페가 당신 별의 고향이 되었어요',  subtitle: '이 순간이, 당신 별의 시작이에요'   },
+  { variant: 'C', title: '오늘, 내 마음을 남겨봤어요',          subtitle: '여수에서 나의 별 하나 만들었어요'   },
+];
+
 const BASE = import.meta.env.BASE_URL;
 
 const GALAXY_LABEL = {
@@ -121,25 +128,27 @@ export default function StarBirth() {
   // galaxyDisplay: 항해(voyage) 등 외부 유입 시 '북은하' 등 커스텀 노출 가능
   const galaxyDisplay = resolved?.galaxyDisplay ?? null;
 
+  // A/B/C 카피 변형 — 마운트 시 1회 고정
+  const [copyVariant] = useState(() => STAR_BIRTH_COPIES[Math.floor(Math.random() * STAR_BIRTH_COPIES.length)]);
+
   // phase: 1 → 2 → 3 → 'done'
   const [phase,      setPhase]      = useState(1);
   const [showCTA,    setShowCTA]    = useState(false);
-  // Day1 자동 카운트다운 (1.5s after CTA 노출)
-  const [autoCount,  setAutoCount]  = useState(null); // null | 1.5 → 0
-  const autoRef = useRef(null);
   // 공유
   const [shareMsg,        setShareMsg]        = useState('');
   const [shareFeedback,   setShareFeedback]   = useState(''); // 공유 완료 피드백 텍스트
   const shareFeedbackRef = useRef(null);
 
-  // ── 마운트 시 Kakao SDK 선제 초기화 ────────────────────────
+  // ── 마운트 시 Kakao SDK 선제 초기화 + A/B/C 이벤트 ────────
   useEffect(() => {
     const ready = initKakao();
     console.log('[StarBirth] 마운트 — Kakao initKakao:', ready,
       '| window.Kakao:', !!window.Kakao,
       '| Kakao.Share:', !!window.Kakao?.Share,
       '| isInitialized:', window.Kakao?.isInitialized?.());
-  }, []);
+    logEvent('star_birth_view',  { variant: copyVariant.variant, star_id: starId });
+    logEvent('star_birth_copy',  { variant: copyVariant.variant });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── 타임라인 ────────────────────────────────────────────
   useEffect(() => {
@@ -163,22 +172,6 @@ export default function StarBirth() {
     }
   }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Day1 자동 카운트다운 (CTA 노출 후 1.5s) ─────────────
-  useEffect(() => {
-    if (!showCTA) return;
-    setAutoCount(1.5);
-    let remain = 1.5;
-    autoRef.current = setInterval(() => {
-      remain = Math.max(0, remain - 0.1);
-      setAutoCount(remain);
-      if (remain <= 0) {
-        clearInterval(autoRef.current);
-        handleDay1Start('auto');
-      }
-    }, 100);
-    return () => clearInterval(autoRef.current);
-  }, [showCTA]); // eslint-disable-line react-hooks/exhaustive-deps
-
   // ── 공유 피드백 헬퍼 ────────────────────────────────────
   function showShareFeedback(text) {
     clearTimeout(shareFeedbackRef.current);
@@ -188,8 +181,6 @@ export default function StarBirth() {
 
   // ── 카카오 공유 ─────────────────────────────────────────
   const handleKakaoShare = useCallback(() => {
-    clearInterval(autoRef.current); // 공유 시 카운트다운 중단
-    setAutoCount(null);
     logEvent('share_clicked', { star_id: starId, message_variant: shareMsg, platform: 'kakao' });
 
     const baseUrl = 'https://app.dailymiracles.kr';
@@ -239,8 +230,6 @@ export default function StarBirth() {
 
   // ── 링크 복사 (저장하기) ────────────────────────────────
   const handleCopyLink = useCallback(() => {
-    clearInterval(autoRef.current);
-    setAutoCount(null);
     const linkUrl = `https://app.dailymiracles.kr/my-star/${starId}`;
     logEvent('share_clicked', { star_id: starId, message_variant: shareMsg, platform: 'copy' });
     navigator.clipboard?.writeText(linkUrl).then(() => {
@@ -250,7 +239,6 @@ export default function StarBirth() {
   }, [starId, shareMsg]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleDay1Start(source = 'click') {
-    clearInterval(autoRef.current);
     // day1_start 로그 — fire-and-forget
     if (userId || starId) {
       logFlowEvent({
@@ -423,9 +411,12 @@ export default function StarBirth() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: 'easeOut' }}
             >
-              {/* 메인 메시지 */}
-              <p style={{ fontSize: 20, fontWeight: 700, color: 'white', marginBottom: 6, lineHeight: 1.4 }}>
-                당신의 소원이 별이 되었어요 ✨
+              {/* A/B/C 카피 — 메인 타이틀 */}
+              <p style={{ fontSize: 20, fontWeight: 700, color: 'white', marginBottom: 4, lineHeight: 1.4 }}>
+                {copyVariant.title}
+              </p>
+              <p style={{ fontSize: 13, color: 'rgba(255,215,106,0.7)', marginBottom: 6, lineHeight: 1.5 }}>
+                {copyVariant.subtitle}
               </p>
 
               {/* 별 이름 + 은하 */}
@@ -482,11 +473,22 @@ export default function StarBirth() {
               {/* ── 공유하기 — 1순위 최상단 ── */}
               {shareMsg && (
                 <div style={{ width: '100%', marginBottom: 4 }}>
+                  {/* 공유 트리거 문구 */}
+                  <p style={{
+                    fontSize: 14,
+                    color: 'rgba(255,255,255,0.75)',
+                    marginBottom: 4,
+                    fontWeight: 600,
+                    textAlign: 'center',
+                    lineHeight: 1.5,
+                  }}>
+                    이건 나만 보기 아까운 순간이에요
+                  </p>
                   {/* 공유 문구 */}
                   <p style={{
                     fontSize: 13,
-                    color: 'rgba(255,255,255,0.55)',
-                    marginBottom: 8,
+                    color: 'rgba(255,255,255,0.45)',
+                    marginBottom: 10,
                     fontStyle: 'italic',
                     textAlign: 'center',
                     lineHeight: 1.5,
@@ -510,7 +512,7 @@ export default function StarBirth() {
                         letterSpacing: '0.01em',
                       }}
                     >
-                      💬 공유하기
+                      ✨ 공유하기
                     </button>
                     {/* 링크 복사 (저장하기) */}
                     <button
@@ -566,26 +568,7 @@ export default function StarBirth() {
                 }}
               >
                 {day1.cta}
-                {/* 카운트다운 progress bar */}
-                {autoCount !== null && autoCount > 0 && (
-                  <span style={{
-                    position: 'absolute',
-                    bottom: 0, left: 0,
-                    height: 3,
-                    width: `${((1.5 - autoCount) / 1.5) * 100}%`,
-                    background: 'rgba(13,27,42,0.25)',
-                    transition: 'width 0.1s linear',
-                    borderRadius: 9999,
-                  }} />
-                )}
               </button>
-
-              {/* 카운트다운 힌트 */}
-              {autoCount !== null && autoCount > 0 && (
-                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', marginTop: -2 }}>
-                  {autoCount.toFixed(1)}초 후 자동으로 시작돼요
-                </p>
-              )}
             </motion.div>
           )}
         </AnimatePresence>
