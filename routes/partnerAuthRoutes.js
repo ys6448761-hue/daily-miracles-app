@@ -54,28 +54,49 @@ router.post('/login', async (req, res) => {
   const { login_id, email, password } = req.body;
   const identifier = (login_id || email || '').trim();
 
+  console.log('[partner/login] 시도:', { identifier, hasPassword: !!password });
+
   if (!identifier || !password) {
     return res.status(400).json({ error: '아이디와 비밀번호를 입력해주세요.' });
   }
 
   try {
     // login_id(DT-YS-C001 형식) 또는 email 둘 다 조회
-    const r = await db.query(
-      `SELECT pa.id, pa.partner_id, pa.email, pa.login_id, pa.password_hash, pa.is_active,
-              p.name AS partner_name
-         FROM partner_accounts pa
-         JOIN dt_partners p ON p.id = pa.partner_id
-        WHERE pa.login_id = $1 OR pa.email = $2
-        LIMIT 1`,
-      [identifier, identifier.toLowerCase()]
-    );
+    // login_id 컬럼이 없을 경우 fallback: email만 조회
+    let r;
+    try {
+      r = await db.query(
+        `SELECT pa.id, pa.partner_id, pa.email, pa.login_id, pa.password_hash, pa.is_active,
+                p.name AS partner_name
+           FROM partner_accounts pa
+           JOIN dt_partners p ON p.id = pa.partner_id
+          WHERE pa.login_id = $1 OR pa.email = $2
+          LIMIT 1`,
+        [identifier, identifier.toLowerCase()]
+      );
+    } catch (colErr) {
+      // login_id 컬럼 미존재 시 email만으로 재시도
+      console.warn('[partner/login] login_id 컬럼 없음, email 폴백:', colErr.message);
+      r = await db.query(
+        `SELECT pa.id, pa.partner_id, pa.email, pa.password_hash, pa.is_active,
+                p.name AS partner_name
+           FROM partner_accounts pa
+           JOIN dt_partners p ON p.id = pa.partner_id
+          WHERE pa.email = $1
+          LIMIT 1`,
+        [identifier.toLowerCase()]
+      );
+    }
+
     const account = r.rows[0];
+    console.log('[partner/login] 계정 조회:', account ? `found — active=${account.is_active}` : 'not found');
 
     if (!account || !account.is_active) {
       return res.status(401).json({ error: '아이디 또는 비밀번호가 올바르지 않아요.' });
     }
 
     const valid = await bcrypt.compare(password, account.password_hash);
+    console.log('[partner/login] 비밀번호 검증:', valid ? 'ok' : 'fail');
     if (!valid) {
       return res.status(401).json({ error: '아이디 또는 비밀번호가 올바르지 않아요.' });
     }
@@ -92,6 +113,7 @@ router.post('/login', async (req, res) => {
       { expiresIn: JWT_EXPIRES }
     );
 
+    console.log('[partner/login] 성공:', account.partner_name);
     return res.json({
       token,
       partner_id:   account.partner_id,
@@ -100,8 +122,8 @@ router.post('/login', async (req, res) => {
     });
 
   } catch (err) {
-    console.error('[partner/login] 오류:', err);
-    return res.status(500).json({ error: '서버 오류가 발생했습니다.' });
+    console.error('[partner/login] 오류:', err.message, err.stack);
+    return res.status(500).json({ error: '서버 오류가 발생했습니다.', detail: err.message });
   }
 });
 
