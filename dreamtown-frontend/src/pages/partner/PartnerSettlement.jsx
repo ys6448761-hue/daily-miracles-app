@@ -56,8 +56,15 @@ export default function PartnerSettlement() {
     fetch('/api/partner/settlement', {
       headers: { Authorization: `Bearer ${jwt}` },
     })
-      .then(r => { if (r.status === 401) { nav('/partner/login'); return null; } return r.json(); })
-      .then(d => d && setData(d))
+      .then(r => {
+        if (r.status === 401) { nav('/partner/login'); return null; }
+        if (!r.ok) return null; // 500 등 오류 → 빈 상태로 처리
+        return r.json();
+      })
+      .then(d => {
+        if (d && d.current_month) setData(d); // 유효한 응답만 반영
+        // null 또는 error 응답은 data=null 유지 → 빈 상태 UI 표시
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -140,7 +147,19 @@ export default function PartnerSettlement() {
           )}
         </>
       ) : (
-        <div style={{ textAlign: 'center', padding: 60, color: '#f87171' }}>데이터를 불러올 수 없어요</div>
+        /* API 오류 또는 데이터 없음 — 친화적 빈 상태 */
+        <div style={{ textAlign: 'center', padding: '80px 24px', color: '#7A6E9C' }}>
+          <div style={{ fontSize: 40, marginBottom: 16 }}>✨</div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: '#9B87F5', marginBottom: 8 }}>
+            아직 정산 내역이 없어요
+          </div>
+          <div style={{ fontSize: 13, lineHeight: 1.7 }}>
+            첫 주문이 들어오면 자동으로 집계돼요 ✨<br />
+            <span style={{ fontSize: 11, color: '#5a5370', marginTop: 6, display: 'block' }}>
+              정산은 매월 말일 기준 다음 달 10일 입금
+            </span>
+          </div>
+        </div>
       )}
     </div>
   );

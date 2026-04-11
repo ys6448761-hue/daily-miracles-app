@@ -152,7 +152,12 @@ export default function PartnerOrders() {
       ) : orders.length === 0 ? (
         <div style={S.emptyBox}>
           <div style={{ fontSize: 36, marginBottom: 12 }}>📦</div>
-          주문이 없어요
+          <div style={{ fontWeight: 700, color: '#9B87F5', marginBottom: 6 }}>주문이 없어요</div>
+          <div style={{ fontSize: 12 }}>
+            {filter !== 'all'
+              ? `'${STATUS_LABEL[filter]?.text || filter}' 상태 주문이 없습니다`
+              : '첫 주문을 기다리고 있어요 ✨'}
+          </div>
         </div>
       ) : (
         orders.map((o, oi) => {

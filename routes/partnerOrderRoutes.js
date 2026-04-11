@@ -52,15 +52,18 @@ router.get('/orders', partnerAuth, async (req, res) => {
         o.quantity, o.total_amount, o.partner_amount, o.status,
         o.buyer_phone, o.created_at,
         p.name AS product_name, p.price, p.image_url,
-        json_agg(json_build_object(
-          'id',              d.id,
-          'recipient_name',  d.recipient_name,
-          'recipient_phone', d.recipient_phone,
-          'address',         d.address,
-          'gift_message',    d.gift_message,
-          'delivery_status', d.delivery_status,
-          'tracking_number', d.tracking_number
-        ) ORDER BY d.created_at) AS deliveries
+        COALESCE(
+          json_agg(json_build_object(
+            'id',              d.id,
+            'recipient_name',  d.recipient_name,
+            'recipient_phone', d.recipient_phone,
+            'address',         d.address,
+            'gift_message',    d.gift_message,
+            'delivery_status', d.delivery_status,
+            'tracking_number', d.tracking_number
+          ) ORDER BY d.created_at) FILTER (WHERE d.id IS NOT NULL),
+          '[]'::json
+        ) AS deliveries
       FROM dt_shop_orders o
       JOIN dt_shop_products p ON p.id = o.product_id
       LEFT JOIN dt_order_deliveries d ON d.order_id = o.id
