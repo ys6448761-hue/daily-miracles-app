@@ -2169,6 +2169,18 @@ if (hometownRoutes) {
   console.log('✅ 별들의 고향 라우터 등록 완료 (/api/hometown)');
 }
 
+// ---------- 파트너 어드민 인증 Routes (/api/partner) ----------
+let partnerAuthRoutes = null;
+try {
+  partnerAuthRoutes = require('./routes/partnerAuthRoutes');
+} catch (e) {
+  console.warn('⚠️ partnerAuthRoutes 로드 실패:', e.message);
+}
+if (partnerAuthRoutes) {
+  app.use('/api/partner', partnerAuthRoutes);
+  console.log('✅ 파트너 어드민 라우터 등록 완료 (/api/partner)');
+}
+
 // ---------- AI 비용 대시보드 Routes (/api/admin/ai-cost) ----------
 if (adminAiCostRoutes) {
   app.use("/api/admin/ai-cost", adminAiCostRoutes);
