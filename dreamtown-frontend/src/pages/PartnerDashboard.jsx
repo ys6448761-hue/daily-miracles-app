@@ -251,11 +251,14 @@ export default function PartnerDashboard() {
   const jwt = localStorage.getItem(PARTNER_JWT_KEY);
   const authHeader = { Authorization: `Bearer ${jwt}` };
 
-  // ── 인증 확인 → 미로그인 시 로그인 페이지로 ───────────────────────────
+  // ── 인증 확인 → 미로그인 시 로그인 / 약관 미동의 시 약관 페이지로 ──────
   useEffect(() => {
-    if (!jwt) {
-      nav('/partner/login', { replace: true });
-    }
+    if (!jwt) { nav('/partner/login', { replace: true }); return; }
+    // 약관 동의 여부 확인
+    fetch('/api/partner/terms-status', { headers: { Authorization: `Bearer ${jwt}` } })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d && !d.terms_agreed) nav('/partner/agreement', { replace: true }); })
+      .catch(() => {});
   }, [jwt, nav]);
 
   // ── 대시보드 데이터 로드 ──────────────────────────────────────────────

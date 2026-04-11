@@ -2730,6 +2730,7 @@ const DT_SPA_ROUTES = [
   // 어드민
   '/admin/*',
   // 파트너
+  '/partner/agreement',
   '/partner/*',
   // 특산품 쇼핑
   '/shop', '/shop/*',

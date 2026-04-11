@@ -260,4 +260,68 @@ router.get('/qr-download', partnerAuth, async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────────────────────────────────────
+// GET /api/partner/terms-status
+// 약관 동의 여부 확인
+// ─────────────────────────────────────────────────────────────────────────
+router.get('/terms-status', partnerAuth, async (req, res) => {
+  const { accountId } = req;
+  try {
+    const r = await db.query(
+      `SELECT terms_agreed, terms_agreed_at FROM partner_accounts WHERE id = $1`,
+      [accountId]
+    );
+    const row = r.rows[0];
+    return res.json({
+      terms_agreed:    row?.terms_agreed    ?? false,
+      terms_agreed_at: row?.terms_agreed_at ?? null,
+    });
+  } catch (err) {
+    console.error('[partner/terms-status] 오류:', err);
+    return res.status(500).json({ error: '서버 오류가 발생했습니다.' });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────
+// POST /api/partner/terms-agree
+// Body: { terms_version? }
+// 약관 동의 기록
+// ─────────────────────────────────────────────────────────────────────────
+router.post('/terms-agree', partnerAuth, async (req, res) => {
+  const { partnerId, accountId } = req;
+  const { terms_version = 'v1.0' } = req.body;
+  const ip        = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || null;
+  const userAgent = req.headers['user-agent'] || null;
+
+  const client = await db.pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // partner_agreements 레코드 삽입
+    await client.query(
+      `INSERT INTO partner_agreements
+         (partner_id, partner_account_id, ip_address, user_agent, terms_version)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [partnerId, accountId, ip, userAgent, terms_version]
+    );
+
+    // partner_accounts.terms_agreed 업데이트
+    await client.query(
+      `UPDATE partner_accounts
+          SET terms_agreed = TRUE, terms_agreed_at = NOW()
+        WHERE id = $1`,
+      [accountId]
+    );
+
+    await client.query('COMMIT');
+    return res.json({ ok: true, agreed_at: new Date().toISOString() });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('[partner/terms-agree] 오류:', err);
+    return res.status(500).json({ error: '약관 동의 처리 중 오류가 발생했습니다.' });
+  } finally {
+    client.release();
+  }
+});
+
 module.exports = router;
