@@ -2159,6 +2159,18 @@ if (voyageAdminRoutes) {
   console.log("✅ 항해 예약 어드민 라우터 등록 완료 (/api/admin/voyage/bookings)");
 }
 
+// ---------- 슈퍼어드민 파트너 관리 Routes (/api/admin/partners) ----------
+let adminPartnerRoutes = null;
+try {
+  adminPartnerRoutes = require('./routes/adminPartnerRoutes');
+} catch (e) {
+  console.warn('⚠️ adminPartnerRoutes 로드 실패:', e.message);
+}
+if (adminPartnerRoutes) {
+  app.use('/api/admin', adminPartnerRoutes);
+  console.log('✅ 파트너 어드민 라우터 등록 완료 (/api/admin/partners, /api/admin/evaluate-all)');
+}
+
 // ---------- 별들의 고향 Routes (/api/hometown) ----------
 let hometownRoutes = null;
 try {
