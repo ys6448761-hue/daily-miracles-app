@@ -23,11 +23,33 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { logEvent } from '../lib/events.js';
 import { getOrAssignVariant } from '../lib/experiment.js';
+import StarWhisperInput from './StarWhisperInput.jsx';
 
 // ── 상수 ────────────────────────────────────────────────────────────
-const LS_KEY       = 'dreamtown_scene_state';
-const SCENE_ORDER  = ['cablecar', 'observatory', 'cruise'];
+const LS_KEY        = 'dreamtown_scene_state';
+const LS_WHISPER    = 'dreamtown_whisper_shown'; // 별들의 속삭임 최초 1회 노출 추적
+const SCENE_ORDER   = ['cablecar', 'observatory', 'cruise'];
 const EXPERIMENT_ID = 'coupon_test_1';
+
+// ── whisper journeyId: 디바이스 영속 UUID (공명 eligibility 크로스-세션 체크 필요)
+const WHISPER_JOURNEY_KEY = 'dreamtown_whisper_journey_id';
+
+function getOrCreateWhisperJourneyId() {
+  let id = localStorage.getItem(WHISPER_JOURNEY_KEY);
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem(WHISPER_JOURNEY_KEY, id);
+  }
+  return id;
+}
+
+function hasWhisperShown() {
+  return localStorage.getItem(LS_WHISPER) === '1';
+}
+
+function markWhisperShown() {
+  localStorage.setItem(LS_WHISPER, '1');
+}
 
 // ── 장면 정의 ────────────────────────────────────────────────────────
 const SCENES = {
@@ -89,11 +111,13 @@ function nl2br(text) {
 
 // ── 컴포넌트 ─────────────────────────────────────────────────────────
 export default function JourneySceneEngine() {
-  // 'idle' | 'question' | 'scene' | 'coupon' | 'done'
-  const [phase, setPhase]           = useState('idle');
+  // 'idle' | 'question' | 'scene' | 'coupon' | 'whisper' | 'done'
+  const [phase, setPhase]               = useState('idle');
   const [currentScene, setCurrentScene] = useState(null);
-  const timerRef   = useRef(null);
-  const variantRef = useRef(null); // A/B variant
+  const [showWhisper, setShowWhisper]   = useState(false);
+  const timerRef    = useRef(null);
+  const variantRef  = useRef(null); // A/B variant
+  const journeyIdRef = useRef(null);
 
   // ── 진입 타이머 ───────────────────────────────────────────────
   useEffect(() => {
@@ -134,7 +158,7 @@ export default function JourneySceneEngine() {
     if (scene.duration) {
       timerRef.current = setTimeout(() => {
         saveState(currentScene);
-        setPhase('done');
+        goToWhisperOrDone();
       }, scene.duration);
     }
   }
@@ -162,6 +186,16 @@ export default function JourneySceneEngine() {
     setPhase('coupon');
   }
 
+  function goToWhisperOrDone() {
+    if (!hasWhisperShown()) {
+      journeyIdRef.current = getOrCreateWhisperJourneyId();
+      markWhisperShown();
+      setShowWhisper(true);
+    } else {
+      setPhase('done');
+    }
+  }
+
   function handleCouponCta() {
     const variant = variantRef.current;
     logEvent('conversion_action', {
@@ -170,12 +204,33 @@ export default function JourneySceneEngine() {
       ...(variant ? { experiment_id: EXPERIMENT_ID, variant } : {}),
     });
     saveState(currentScene);
-    setPhase('done');
+    goToWhisperOrDone();
   }
 
   function handleCouponClose() {
     saveState(currentScene);
-    setPhase('done');
+    goToWhisperOrDone();
+  }
+
+  // ── 별들의 속삭임 오버레이 (showWhisper) ─────────────────────
+  if (showWhisper) {
+    return (
+      <AnimatePresence mode="wait">
+        <motion.div
+          key="whisper"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 16 }}
+          transition={{ duration: 0.3 }}
+          style={overlayStyle}
+        >
+          <StarWhisperInput
+            journeyId={journeyIdRef.current}
+            onClose={() => { setShowWhisper(false); setPhase('done'); }}
+          />
+        </motion.div>
+      </AnimatePresence>
+    );
   }
 
   // ── 렌더 가드 ────────────────────────────────────────────────

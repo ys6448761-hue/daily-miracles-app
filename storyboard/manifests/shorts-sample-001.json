@@ -1,0 +1,30 @@
+{
+  "manifestId": "shorts-sample-001",
+  "title": "드림타운 Shorts 샘플 3종",
+  "description": "POST /api/shorts/sample 로 자동 생성되는 3개 샘플의 레퍼런스 정의",
+  "durationPreset": "short",
+  "aspectRatio": "9:16",
+  "items": [
+    {
+      "itemId": "s01",
+      "templateId": "single_wish",
+      "heroId": "HERO1",
+      "wishText": "오동도 아침빛 아래, 조용히 소원을 접어요",
+      "note": "single_wish 템플릿 — 오동도 HERO1 / calm hopeful"
+    },
+    {
+      "itemId": "s02",
+      "templateId": "question_prompt",
+      "heroId": "HERO2",
+      "wishText": "",
+      "note": "question_prompt 템플릿 — 향일암 HERO2 / calm reflective"
+    },
+    {
+      "itemId": "s03",
+      "templateId": "brand_close",
+      "heroId": "HERO4",
+      "wishText": "",
+      "note": "brand_close 템플릿 — 돌산대교 HERO4 / warm romantic"
+    }
+  ]
+}

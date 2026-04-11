@@ -103,6 +103,15 @@ const BATCH_TYPES = {
         description: 'Airtable 데이터 동기화',
         maxConcurrent: 5,
         retryLimit: 3
+    },
+
+    // ── Shorts 자동 생성 ──────────────────────────────────────────
+    SHORTS_BATCH: {
+        id: 'shorts_batch',
+        name: 'Shorts 일괄 생성',
+        description: 'YouTube Shorts 일괄 생성 (9:16, short preset ~6초)',
+        maxConcurrent: 2,   // 영상 생성은 GPU/CPU 부하가 높으므로 2로 제한
+        retryLimit: 1
     }
 };
 
@@ -218,6 +227,53 @@ async function processItem(batch, itemIndex) {
                     scanned_at: new Date().toISOString()
                 };
                 break;
+            case 'shorts_batch': {
+                // 실제 Shorts 생성 파이프라인 호출
+                const { buildManifest }   = require('../services/shorts/ShortsManifestBuilder');
+                const ShortsRenderer      = require('../services/shorts/ShortsRenderer');
+                const ShortsPackager      = require('../services/shorts/ShortsPackager');
+                const Hero8Builder        = require('../services/hero8/Hero8Builder');
+                const ImageGenerator      = require('../services/hero8/ImageGenerator');
+                const { randomUUID }      = require('crypto');
+
+                const { templateId, wishText, heroId, mood } = item.data || {};
+                if (!templateId) throw new Error('shorts_batch item requires templateId');
+
+                const manifest  = buildManifest({ templateId, wishText, heroId, mood });
+                const requestId = item.data.requestId || randomUUID();
+                const scene     = manifest.scenes[0];
+                const packager  = new ShortsPackager();
+                const outputDir = await packager.createOutputDir(requestId);
+
+                const builder   = new Hero8Builder();
+                const { storyCard, kfPrompts, subtitles } = builder.build({
+                    hero_id: scene.promptSeed || 'HERO1',
+                    topic:   scene.text,
+                    mood:    scene.mood || 'calm',
+                    tier:    'free',
+                });
+
+                const imageGenerator = new ImageGenerator();
+                const keyframes      = await imageGenerator.generateKeyframes(kfPrompts, outputDir);
+
+                const renderer = new ShortsRenderer();
+                const video    = await renderer.render(keyframes, outputDir);
+
+                const packaged = await packager.package({
+                    requestId, storyCard, keyframes, subtitles, video, outputDir,
+                    shorts_metadata: manifest.shorts_metadata,
+                });
+
+                result = {
+                    requestId,
+                    templateId:      manifest.templateId,
+                    title:           manifest.title,
+                    urls:            packaged.urls,
+                    shorts_metadata: packaged.shorts_metadata,
+                    generated_at:    new Date().toISOString(),
+                };
+                break;
+            }
             default:
                 result = { processed: true };
         }

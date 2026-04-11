@@ -13,11 +13,13 @@
 const db = require('../../../database/db');
 const { OpenAI } = require('openai');
 const { sendSensSMS } = require('../../../services/messageProvider');
-const logService = require('../logService');
-const { makeLogger } = require('../../../utils/logger');
+const logService      = require('../logService');
+const { makeLogger }  = require('../../../utils/logger');
+const aiGateway       = require('../../aiGateway');
+const templateBank    = require('../../messageTemplateBank');
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const log = makeLogger('careAgent');
+const log    = makeLogger('careAgent');
 
 // ── 맥락 기반 메시지 유형 선택 ─────────────────────────────────
 function selectMessageType(context) {
@@ -80,8 +82,15 @@ async function gatherContext(starId) {
   };
 }
 
-// ── GPT 개입 메시지 생성 ────────────────────────────────────────
-async function generateInterventionMessage(wishText, starName, messageType, day) {
+// ── GPT 개입 메시지 생성 (aiGateway 경유) ─────────────────────
+async function generateInterventionMessage(wishText, starName, messageType, day, options = {}) {
+  const { userId, starId, galaxy = 'healing' } = options;
+
+  // restart 유형은 항상 템플릿 (감동 품질 유지하면서 AI 0)
+  if (messageType === 'restart') {
+    return templateBank.getRestartTemplate(galaxy, starName);
+  }
+
   const system = SYSTEM_PROMPTS[messageType];
   const userPrompt =
     `소원이의 별 이름: ${starName}\n` +
@@ -90,16 +99,33 @@ async function generateInterventionMessage(wishText, starName, messageType, day)
     `위 소원이에게 맞는 ${messageType} 메시지를 2-3문장으로 작성해주세요. ` +
     `메시지 텍스트만 출력하세요.`;
 
-  const res = await openai.chat.completions.create({
-    model:       'gpt-4.1-mini',
-    messages:    [
-      { role: 'system', content: system },
-      { role: 'user',   content: userPrompt },
-    ],
-    max_tokens:  150,
-    temperature: 0.85,
+  const { text } = await aiGateway.call({
+    userId,
+    starId,
+    service:  'careAgent',
+    step:     `intervention_${messageType}`,
+    wishText,
+    modelFn: async () => {
+      const res = await openai.chat.completions.create({
+        model:       'gpt-4.1-mini',
+        messages:    [
+          { role: 'system', content: system },
+          { role: 'user',   content: userPrompt },
+        ],
+        max_tokens:  150,
+        temperature: 0.85,
+      });
+      return {
+        text:      res.choices[0].message.content.trim(),
+        model:     'gpt-4.1-mini',
+        tokensIn:  res.usage?.prompt_tokens     ?? 0,
+        tokensOut: res.usage?.completion_tokens ?? 0,
+      };
+    },
+    fallback: templateBank.getCheckinTemplate(galaxy, starName),
   });
-  return res.choices[0].message.content.trim();
+
+  return text;
 }
 
 // ── 메인 실행 ──────────────────────────────────────────────────
@@ -130,17 +156,45 @@ async function run(starId, input = {}) {
   let messageText = '';
   let reason      = mode;
 
-  const isIntervention = ['intervention', 'checkin'].includes(mode) ||
-    (mode === 'daily' && day === 3);
+  // ── galaxy 조회 (templateBank + aiGateway에 전달) ─────────────
+  const galaxyResult = await db.query(
+    `SELECT emotion_tag FROM dt_stars WHERE id = $1 LIMIT 1`,
+    [starId]
+  ).catch(() => ({ rows: [] }));
+  const galaxy = galaxyResult.rows[0]?.emotion_tag ?? 'healing';
+
+  // ── userId 조회 (한도 추적) ─────────────────────────────────────
+  const userResult = await db.query(
+    `SELECT user_id FROM dt_stars WHERE id = $1 LIMIT 1`,
+    [starId]
+  ).catch(() => ({ rows: [] }));
+  const userId = userResult.rows[0]?.user_id ?? null;
+
+  // ── Day 2-6 daily: 무조건 템플릿 (AI 미호출) ─────────────────────
+  if (mode === 'daily' && templateBank.isTemplateEligible('daily', day)) {
+    const tmpl = templateBank.getDailyTemplate(galaxy, day, starName);
+    if (tmpl) {
+      messageText = tmpl;
+      messageType = 'template';
+      reason      = `daily_template_day${day}`;
+      aiGateway.logTemplateUsed({ userId, starId, service: 'careAgent', step: 'daily', day, galaxy }).catch(() => {});
+    }
+  }
+
+  // ── 개입 필요 구간 (Day3 이후, intervention/checkin 모드) ──────────
+  const isIntervention = !messageText && (
+    ['intervention', 'checkin'].includes(mode) ||
+    (mode === 'daily' && day === 3)
+  );
 
   if (isIntervention) {
     const context = await gatherContext(starId);
     context.day   = day;
     messageType   = selectMessageType(context);
     reason        = day === 3 ? 'day3_intervention' : `${mode}_intervention`;
-    messageText   = await generateInterventionMessage(wishText, starName, messageType, day);
-  } else {
-    // 고정 템플릿 모드 (welcome/daily/welcome_paid)
+    messageText   = await generateInterventionMessage(wishText, starName, messageType, day, { userId, starId, galaxy });
+  } else if (!messageText) {
+    // welcome, welcome_paid, 기타 고정 템플릿
     const fn = DAILY_TEMPLATES[mode] || DAILY_TEMPLATES.daily;
     messageText = fn(starName, day);
     messageType = 'template';

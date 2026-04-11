@@ -624,6 +624,92 @@ async function sendRedAlertMessage(wishData) {
     return { success: false, reason: '발송 채널 비활성화' };
 }
 
+// ── 이용권 REDEEMED 알림톡 템플릿 ─────────────────────────────────────
+// 은하군별 본문 + 버튼 구성 (SENS 사전 등록 필요)
+const BENEFIT_ALIMTALK_TEMPLATE = {
+    challenge: {
+        templateCode: process.env.SENS_BENEFIT_TEMPLATE_CHALLENGE || 'benefit_redeemed_challenge',
+        content: (benefitName) =>
+`[하루하루의 기적]
+오늘의 도전 항로 이용이 확인되었어요.
+소원이의 한 걸음이 별의 기록으로 남았어요.
+
+이용: ${benefitName}`,
+        buttons: [
+            { type: 'WL', name: '내 별 보러가기',  linkMobile: `${APP_BASE_URL}/my-star` },
+            { type: 'WL', name: '다음 도전 보기',   linkMobile: `${APP_BASE_URL}/dreamtown` },
+        ],
+    },
+    growth: {
+        templateCode: process.env.SENS_BENEFIT_TEMPLATE_GROWTH || 'benefit_redeemed_growth',
+        content: (benefitName) =>
+`[하루하루의 기적]
+오늘의 경험이 성장의 기록으로 남았어요.
+조금 더 또렷해진 순간이 쌓이고 있어요.
+
+이용: ${benefitName}`,
+        buttons: [
+            { type: 'WL', name: '성장 기록 보기',   linkMobile: `${APP_BASE_URL}/my-star` },
+            { type: 'WL', name: '다음 항로 추천',   linkMobile: `${APP_BASE_URL}/dreamtown` },
+        ],
+    },
+    relation: {
+        templateCode: process.env.SENS_BENEFIT_TEMPLATE_RELATION || 'benefit_redeemed_relation',
+        content: (benefitName) =>
+`[하루하루의 기적]
+오늘의 연결이 별에 기록되었어요.
+함께한 시간이 의미로 남았어요.
+
+이용: ${benefitName}`,
+        buttons: [
+            { type: 'WL', name: '내 별 보러가기',  linkMobile: `${APP_BASE_URL}/my-star` },
+            { type: 'WL', name: '소감 남기기',      linkMobile: `${APP_BASE_URL}/dreamtown` },
+        ],
+    },
+    healing: {
+        templateCode: process.env.SENS_BENEFIT_TEMPLATE_HEALING || 'benefit_redeemed_healing',
+        content: (benefitName) =>
+`[하루하루의 기적]
+오늘의 체험이 회복의 기록으로 남았어요.
+지금의 속도도 충분히 괜찮아요.
+
+이용: ${benefitName}`,
+        buttons: [
+            { type: 'WL', name: '내 상태 보기',    linkMobile: `${APP_BASE_URL}/my-star` },
+            { type: 'WL', name: '다음 추천 보기',  linkMobile: `${APP_BASE_URL}/dreamtown` },
+        ],
+    },
+    miracle: {
+        templateCode: process.env.SENS_BENEFIT_TEMPLATE_MIRACLE || 'benefit_redeemed_miracle',
+        content: (benefitName) =>
+`[하루하루의 기적]
+오늘의 선택이 하나의 항로가 되었어요.
+방향 없이 흐른 순간도 충분히 의미 있어요.
+
+이용: ${benefitName}`,
+        buttons: [
+            { type: 'WL', name: '내 별 보러가기',   linkMobile: `${APP_BASE_URL}/my-star` },
+            { type: 'WL', name: '새로운 항로 보기', linkMobile: `${APP_BASE_URL}/dreamtown` },
+        ],
+    },
+};
+
+/**
+ * 이용권 사용 완료 알림톡 발송
+ * @param {string} phone - 수신자 전화번호
+ * @param {{ galaxy_code, benefit_name, credential_code }} data
+ */
+async function sendBenefitRedeemedMessage(phone, data) {
+    const { galaxy_code, benefit_name } = data;
+    const tmpl = BENEFIT_ALIMTALK_TEMPLATE[galaxy_code] ?? BENEFIT_ALIMTALK_TEMPLATE.miracle;
+
+    return sendSensAlimtalk(phone, {
+        templateCode: tmpl.templateCode,
+        content:      tmpl.content(benefit_name),
+        buttons:      tmpl.buttons,
+    });
+}
+
 /**
  * 견적 접수 알림톡 발송 (비동기)
  *
@@ -853,6 +939,7 @@ module.exports = {
     sendWishAckMessage,
     sendRedAlertMessage,
     sendQuoteAckMessage,
+    sendBenefitRedeemedMessage,
     sendSensAlimtalk,
     sendSensSMS,
     querySensResult,

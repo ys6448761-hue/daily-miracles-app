@@ -18,6 +18,15 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
+// NicePay 서비스 (결제 연동)
+let nicepayService = null;
+try {
+  nicepayService = require('../services/nicepayService');
+  console.log('✅ [YeosuWish] nicepayService 로드 성공');
+} catch (e) {
+  console.warn('⚠️ [YeosuWish] nicepayService 로드 실패 — 결제 기능 비활성화');
+}
+
 // DB 연결
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -435,17 +444,46 @@ router.post('/checkout', async (req, res) => {
 
     const product = PRODUCTS[wish.sku];
 
-    // TODO: 실제 PG 연동 시 결제 링크 생성
-    // 현재는 테스트용 응답
+    // ── NicePay 실결제 연동 ─────────────────────────────────────
+    if (!nicepayService) {
+      return res.status(503).json({
+        success: false,
+        error: '결제 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요.'
+      });
+    }
+
+    const pgConfig = nicepayService.validateConfig();
+    if (!pgConfig.isValid) {
+      console.error('[YeosuWish] NicePay 설정 누락:', pgConfig.missing);
+      return res.status(503).json({
+        success: false,
+        error: '결제 설정이 완료되지 않았습니다.',
+        missing: pgConfig.missing
+      });
+    }
+
+    const goodsName = `여수 소원빌기 - ${product?.name || wish.sku}`;
+    const payment = await nicepayService.createPayment(wish.amount, goodsName);
+
+    // wish ↔ order_id 연결 — 콜백에서 역참조 가능하도록
+    await pool.query(
+      `UPDATE yeosu_wishes
+       SET pg_payment_key = $1, updated_at = NOW()
+       WHERE wish_id = $2`,
+      [payment.orderId, wish_id]
+    );
+
+    console.log(`[YeosuWish] 결제 생성: wish_id=${wish_id}, order_id=${payment.orderId}, amount=${wish.amount}`);
+
     res.json({
       success: true,
-      wish_id: wish_id,
+      wish_id,
+      order_id: payment.orderId,
       amount: wish.amount,
-      order_name: `여수 소원빌기 - ${product?.name || wish.sku}`,
+      order_name: goodsName,
       customer_name: wish.customer_name,
       customer_phone: wish.customer_phone,
-      // 테스트용: 실제 PG 연동 시 payment_url 제공
-      payment_url: `/api/yeosu/wish/test-payment?wish_id=${wish_id}`,
+      payment_url: `/pay?moid=${encodeURIComponent(payment.orderId)}`,
       message: '결제 페이지로 이동합니다.'
     });
 
@@ -753,6 +791,92 @@ router.get('/status/:id', async (req, res) => {
       success: false,
       error: '상태 조회 중 오류가 발생했습니다.'
     });
+  }
+});
+
+/**
+ * GET /api/yeosu/wish/track
+ * 운영자 추적 엔드포인트 — wish_id / order_id / TID 1건 통합 조회
+ *
+ * Query params (하나만 있으면 됨):
+ *   ?q=YW-20260331-XXXX      (wish_id)
+ *   ?q=PAY20260331142530ABCD (order_id)
+ *   ?q=nicepay-TID-string    (pg_transaction_id)
+ *
+ * 보호: ADMIN_TOKEN 헤더 또는 쿼리 필요 (없으면 401)
+ */
+router.get('/track', async (req, res) => {
+  // Admin 토큰 검증
+  const adminToken = req.headers['x-admin-token'] || req.query.admin_token;
+  if (!adminToken || adminToken !== process.env.ADMIN_TOKEN) {
+    return res.status(401).json({ success: false, error: 'Unauthorized' });
+  }
+
+  const { q } = req.query;
+  if (!q) {
+    return res.status(400).json({ success: false, error: 'q 파라미터가 필요합니다. (wish_id / order_id / TID)' });
+  }
+
+  try {
+    // 1) yeosu_wishes에서 직접 찾기 (wish_id, pg_payment_key, pg_transaction_id)
+    const wishResult = await pool.query(
+      `SELECT w.wish_id, w.customer_name, w.customer_phone, w.wish_text,
+              w.sku, w.amount, w.status, w.pg_payment_key, w.pg_transaction_id,
+              w.paid_at, w.created_at, w.updated_at, w.result_image_url
+       FROM yeosu_wishes w
+       WHERE w.wish_id = $1
+          OR w.pg_payment_key = $1
+          OR w.pg_transaction_id = $1
+       LIMIT 1`,
+      [q]
+    );
+
+    if (wishResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: `조회 결과 없음: ${q}` });
+    }
+
+    const wish = wishResult.rows[0];
+
+    // 2) 연결된 nicepay_payments 조회 (pg_payment_key가 order_id와 일치)
+    let nicepayRow = null;
+    if (wish.pg_payment_key) {
+      const npResult = await pool.query(
+        `SELECT order_id, status AS payment_status, amount AS payment_amount,
+                result_code, result_msg, tid, payment_method,
+                card_name, card_no, paid_at AS payment_paid_at
+         FROM nicepay_payments
+         WHERE order_id = $1
+         LIMIT 1`,
+        [wish.pg_payment_key]
+      );
+      nicepayRow = npResult.rows[0] || null;
+    }
+
+    res.json({
+      success: true,
+      query: q,
+      wish: {
+        wish_id:           wish.wish_id,
+        customer_name:     wish.customer_name,
+        customer_phone:    wish.customer_phone,
+        wish_text:         wish.wish_text,
+        sku:               wish.sku,
+        amount:            wish.amount,
+        status:            wish.status,
+        pg_payment_key:    wish.pg_payment_key,   // order_id
+        pg_transaction_id: wish.pg_transaction_id, // NicePay TID
+        paid_at:           wish.paid_at,
+        created_at:        wish.created_at,
+        updated_at:        wish.updated_at,
+        result_image_url:  wish.result_image_url,
+      },
+      payment: nicepayRow,
+      trace: `wish_id=${wish.wish_id} → order_id=${wish.pg_payment_key || '(미연결)'} → tid=${wish.pg_transaction_id || '(미결제)'}`,
+    });
+
+  } catch (error) {
+    console.error('[YeosuWish] track 조회 오류:', error);
+    res.status(500).json({ success: false, error: '조회 중 오류가 발생했습니다.' });
   }
 });
 
