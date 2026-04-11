@@ -15,6 +15,7 @@ import { readSavedStar } from '../lib/utils/starSession.js';
 import { logFlowEvent } from '../api/dreamtown.js';
 import { logEvent } from '../lib/events.js';
 import { generateShareMessage } from '../lib/emotionMessage.js';
+import { initKakao } from '../utils/kakaoShare.js';
 
 const DAY1_DEFAULT = {
   message:    '지금 이 순간이 가장 중요해요',
@@ -183,11 +184,14 @@ export default function StarBirth() {
     logEvent('share_clicked', { star_id: starId, message_variant: shareMsg, platform: 'kakao' });
 
     const baseUrl = 'https://app.dailymiracles.kr';
-    const imageUrl = `${baseUrl}/images/dreamtown-og.jpg`;
+    const imageUrl = `${baseUrl}/images/dreamtown-og-v4.jpg`;
     const linkUrl  = `${baseUrl}/my-star/${starId}`;
 
+    const kakaoReady = initKakao();
+    console.log('[StarBirth] Kakao 공유 시도 — initKakao:', kakaoReady, '| isInitialized:', window.Kakao?.isInitialized?.());
+
     try {
-      if (window.Kakao?.isInitialized?.() && window.Kakao?.Share) {
+      if (kakaoReady && window.Kakao?.Share) {
         window.Kakao.Share.sendDefault({
           objectType: 'feed',
           content: {
@@ -200,11 +204,21 @@ export default function StarBirth() {
         logEvent('share_completed', { star_id: starId, platform: 'kakao' });
         showShareFeedback('카카오로 공유됐어요 ✨');
       } else {
-        // 카카오 SDK 미초기화 → 링크 복사 fallback
-        navigator.clipboard?.writeText(linkUrl).then(() => {
-          logEvent('share_completed', { star_id: starId, platform: 'copy' });
-          showShareFeedback('링크가 복사됐어요 ✨');
-        }).catch(() => showShareFeedback('공유 링크: ' + linkUrl));
+        // 카카오 SDK 미초기화 → navigator.share 또는 링크 복사 fallback
+        console.warn('[StarBirth] Kakao 미준비 — native share / clipboard fallback');
+        if (navigator.share) {
+          navigator.share({ title: '내 별이 탄생했어요 ✨', text: shareMsg, url: linkUrl })
+            .then(() => {
+              logEvent('share_completed', { star_id: starId, platform: 'native' });
+              showShareFeedback('공유됐어요 ✨');
+            })
+            .catch(() => {});
+        } else {
+          navigator.clipboard?.writeText(linkUrl).then(() => {
+            logEvent('share_completed', { star_id: starId, platform: 'copy_fallback' });
+            showShareFeedback('링크가 복사됐어요 (카카오 준비 중)');
+          }).catch(() => showShareFeedback('공유 링크: ' + linkUrl));
+        }
       }
     } catch (e) {
       console.warn('[StarBirth] 카카오 공유 실패:', e.message);

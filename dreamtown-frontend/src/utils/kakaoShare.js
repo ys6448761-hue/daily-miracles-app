@@ -8,12 +8,19 @@ import { gaDtShareSuccess } from './gtag';
 const DREAMTOWN_URL = 'https://app.dailymiracles.kr/dreamtown?entry=invite';
 const OG_IMAGE_URL  = 'https://app.dailymiracles.kr/images/dreamtown-og-v4.jpg';
 
-function initKakao() {
-  if (!window.Kakao) return false;
+export function initKakao() {
+  if (!window.Kakao) {
+    console.warn('[Kakao] window.Kakao 없음 — SDK 로드 실패');
+    return false;
+  }
   if (!window.Kakao.isInitialized()) {
     const key = import.meta.env.VITE_KAKAO_JS_KEY;
-    if (!key) return false;
+    if (!key) {
+      console.warn('[Kakao] VITE_KAKAO_JS_KEY 환경변수 미설정');
+      return false;
+    }
     window.Kakao.init(key);
+    console.log('[Kakao] init 완료. isInitialized:', window.Kakao.isInitialized());
   }
   return true;
 }
