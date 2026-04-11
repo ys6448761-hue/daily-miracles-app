@@ -455,6 +455,22 @@ export default function PartnerDashboard() {
                 <span style={S.menuChevron}>›</span>
               </button>
 
+              <button style={S.menuBtn} onClick={() => nav('/partner/orders')}>
+                <span>
+                  <span style={S.menuIcon}>📦</span>
+                  주문 관리
+                </span>
+                <span style={S.menuChevron}>›</span>
+              </button>
+
+              <button style={S.menuBtn} onClick={() => nav('/partner/settlement')}>
+                <span>
+                  <span style={S.menuIcon}>💰</span>
+                  정산 내역
+                </span>
+                <span style={S.menuChevron}>›</span>
+              </button>
+
               <button
                 style={{ ...S.menuBtn, opacity: 0.5, cursor: 'not-allowed' }}
                 disabled
