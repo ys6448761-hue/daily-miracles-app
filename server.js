@@ -2219,6 +2219,18 @@ if (partnerSubscriptionRoutes) {
   console.log('✅ 파트너 구독 라우터 등록 완료 (/api/partner/subscription)');
 }
 
+// ---------- 파트너 셀프 온보딩 (신청 + 심사) ----------
+let partnerApplyRoutes = null;
+try {
+  partnerApplyRoutes = require('./routes/partnerApplyRoutes');
+} catch (e) {
+  console.warn('⚠️ partnerApplyRoutes 로드 실패:', e.message);
+}
+if (partnerApplyRoutes) {
+  app.use('/api/partner', partnerApplyRoutes);
+  console.log('✅ 파트너 신청 라우터 등록 완료 (/api/partner/apply)');
+}
+
 // ---------- 특산품 쇼핑 Routes (/api/shop) ----------
 let shopRoutes = null;
 try {

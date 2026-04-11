@@ -397,4 +397,61 @@ router.post('/evaluate-all', async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────────────────────────────────────
+// GET /api/admin/partner-applications?verdict=all|pending|approved|rejected|manual
+// ─────────────────────────────────────────────────────────────────────────
+router.get('/partner-applications', async (req, res) => {
+  const { verdict = 'all', limit = 50 } = req.query;
+  try {
+    const verdictFilter = ['pending','approved','rejected','manual'].includes(verdict)
+      ? `WHERE aurora_verdict = $2`
+      : '';
+    const params = verdictFilter ? [Math.min(Number(limit) || 50, 200), verdict]
+                                 : [Math.min(Number(limit) || 50, 200)];
+    const { rows } = await db.query(
+      `SELECT id, business_name, owner_name, phone, region_code,
+              q3_galaxy_choice, galaxy_assigned,
+              aurora_score, aurora_verdict, aurora_reason,
+              partner_id, account_created_at, applied_at, decided_at
+         FROM partner_applications
+         ${verdictFilter}
+         ORDER BY applied_at DESC
+         LIMIT $1`,
+      params
+    );
+    const all = await db.query(
+      `SELECT aurora_verdict, COUNT(*)::int AS cnt
+         FROM partner_applications GROUP BY aurora_verdict`
+    );
+    const summary = { total: 0, approved: 0, pending: 0, manual: 0, rejected: 0 };
+    all.rows.forEach(r => {
+      summary[r.aurora_verdict] = r.cnt;
+      summary.total += r.cnt;
+    });
+    return res.json({ summary, applications: rows });
+  } catch (err) {
+    console.error('[admin/partner-applications]:', err.message);
+    return res.status(500).json({ error: '서버 오류' });
+  }
+});
+
+// PATCH /api/admin/partner-applications/:id/verdict — 수동 판정
+router.patch('/partner-applications/:id/verdict', async (req, res) => {
+  const { id }      = req.params;
+  const { verdict } = req.body;
+  if (!['approved', 'rejected'].includes(verdict)) {
+    return res.status(400).json({ error: 'verdict: approved | rejected 만 허용' });
+  }
+  try {
+    await db.query(
+      `UPDATE partner_applications SET aurora_verdict = $1, decided_at = NOW() WHERE id = $2`,
+      [verdict, id]
+    );
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error('[admin/partner-applications/verdict]:', err.message);
+    return res.status(500).json({ error: '서버 오류' });
+  }
+});
+
 module.exports = router;

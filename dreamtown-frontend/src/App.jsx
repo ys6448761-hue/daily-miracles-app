@@ -39,6 +39,8 @@ import MobileTicket from './pages/MobileTicket.jsx';
 // html5-qrcode가 포함된 PartnerVerify는 lazy load — 파트너 화면 진입 시에만 번들 로드
 const PartnerVerify = lazy(() => import('./pages/PartnerVerify.jsx'));
 import PartnerManual from './pages/PartnerManual.jsx';
+import PartnerApply from './pages/PartnerApply.jsx';
+import PartnerApplyResult from './pages/PartnerApplyResult.jsx';
 import PartnerLogin from './pages/PartnerLogin.jsx';
 import PartnerDashboard from './pages/PartnerDashboard.jsx';
 import OnboardingPage from './pages/OnboardingPage.jsx';
@@ -139,6 +141,8 @@ export default function App() {
           <Route path="/shop/checkout"             element={<ShopCheckout />} />
           <Route path="/shop/:id"                  element={<ShopDetail />} />
           {/* 파트너 */}
+          <Route path="/partner/apply"             element={<PartnerApply />} />
+          <Route path="/partner/apply/result"     element={<PartnerApplyResult />} />
           <Route path="/partner/agreement"          element={<PartnerAgreement />} />
           <Route path="/partner/subscribe"         element={<PartnerSubscribe />} />
           <Route path="/partner/login"              element={<PartnerLogin />} />
