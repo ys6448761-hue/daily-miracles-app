@@ -489,6 +489,23 @@ export default function MyStar() {
           {star.star_name}
         </h1>
 
+        {/* 한정 별 뱃지 — 섬박람회 등 이벤트 기간 탄생 별만 표시 */}
+        {star.star_rarity === 'limited' && star.source_event === 'island_expo_2026' && (
+          <div style={{
+            display: 'inline-block',
+            border: '1px solid rgba(232,160,0,0.55)',
+            borderRadius: 8,
+            padding: '3px 10px',
+            fontSize: 12,
+            color: '#E8A000',
+            background: 'rgba(232,160,0,0.08)',
+            marginBottom: 8,
+            letterSpacing: '0.03em',
+          }}>
+            ✦ 2026 세계섬박람회 탄생
+          </div>
+        )}
+
         {star.wish_text && (
           <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', fontStyle: 'italic', marginBottom: 8, lineHeight: 1.5 }}>
             &ldquo;{star.wish_text.length > 40 ? star.wish_text.slice(0, 40) + '…' : star.wish_text}&rdquo;

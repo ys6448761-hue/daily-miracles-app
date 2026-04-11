@@ -125,6 +125,9 @@ export default function StarBirth() {
   const wishText      = resolved?.wishText      ?? '';
   const userId        = resolved?.userId        ?? null;
   const day1          = resolved?.day1          ?? DAY1_DEFAULT;
+  const starRarity    = resolved?.starRarity    ?? 'standard';
+  const sourceEvent   = resolved?.sourceEvent   ?? 'standard';
+  const isLimited     = starRarity === 'limited';
   // galaxyDisplay: 항해(voyage) 등 외부 유입 시 '북은하' 등 커스텀 노출 가능
   const galaxyDisplay = resolved?.galaxyDisplay ?? null;
 
@@ -332,9 +335,14 @@ export default function StarBirth() {
             transition={{ duration: 1.4, delay: i * 0.04, ease: 'easeOut' }}
             style={{
               position: 'absolute',
-              width: 5, height: 5,
+              width: isLimited ? 6 : 5,
+              height: isLimited ? 6 : 5,
               borderRadius: '50%',
-              background: '#FFD76A',
+              // 한정 별: 홀수 인덱스는 골드(#E8A000), 짝수는 기존 퍼플/옐로
+              background: isLimited
+                ? (i % 2 === 0 ? '#FFD76A' : '#E8A000')
+                : '#FFD76A',
+              boxShadow: isLimited ? `0 0 6px 2px ${i % 2 === 0 ? 'rgba(255,215,106,0.6)' : 'rgba(232,160,0,0.7)'}` : 'none',
               pointerEvents: 'none',
             }}
           />

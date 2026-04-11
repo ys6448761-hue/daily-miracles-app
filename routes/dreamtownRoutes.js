@@ -21,6 +21,7 @@ const { assignVariantSmart, getUXConfig } = require('../services/experimentServi
 const { getTriggerRecommendation }        = require('../services/aiRecommendationService');
 const { getDay1Prompt }                   = require('../services/day1OnboardingService');
 const { retentionCheck }                  = require('../middleware/retentionMiddleware');
+const { determineStarMeta }               = require('../services/expoStarService');
 const crypto = require('crypto');
 
 function dtHashWishId(input) {
@@ -400,13 +401,16 @@ router.post('/stars/create', async (req, res) => {
     // 감정 태그 결정 (wish_text 기반, 결정론적)
     const emotionTag = getEmotionTag(wish.wish_text);
 
+    // 한정 별 여부 자동 판별 (섬박람회 등 이벤트 기간 체크)
+    const { star_rarity, source_event } = determineStarMeta();
+
     // star 생성
     const starResult = await db.query(
       `INSERT INTO dt_stars
-         (user_id, wish_id, star_seed_id, star_name, star_slug, galaxy_id, star_stage, is_hidden, emotion_tag)
-       VALUES ($1, $2, $3, $4, $5, $6, 'day1', $7, $8)
-       RETURNING id, star_name, star_slug, star_stage, created_at`,
-      [user_id, wish_id, seed.id, starName, starSlug, galaxy.id, isHidden, emotionTag]
+         (user_id, wish_id, star_seed_id, star_name, star_slug, galaxy_id, star_stage, is_hidden, emotion_tag, star_rarity, source_event)
+       VALUES ($1, $2, $3, $4, $5, $6, 'day1', $7, $8, $9, $10)
+       RETURNING id, star_name, star_slug, star_stage, star_rarity, source_event, created_at`,
+      [user_id, wish_id, seed.id, starName, starSlug, galaxy.id, isHidden, emotionTag, star_rarity, source_event]
     );
     const star = starResult.rows[0];
 
@@ -535,6 +539,8 @@ router.post('/stars/create', async (req, res) => {
       constellation:        null,
       birth_scene_version:  'v1',
       star_stage:           star.star_stage,
+      star_rarity:          star.star_rarity,
+      source_event:         star.source_event,
       day1,
       next:                 `/star-birth`,
     });
@@ -866,6 +872,8 @@ router.get('/stars/:id', async (req, res) => {
            s.star_stage,
            s.created_at,
            s.growth_log_text,
+           s.star_rarity,
+           s.source_event,
            w.wish_text,
            g.code            AS galaxy_code,
            g.name_ko         AS galaxy_name_ko,
@@ -945,6 +953,8 @@ router.get('/stars/:id', async (req, res) => {
       growth_log_text:  growthLogText,
       wish_image_url:   row.wish_image_url ?? null,
       artifact_status:  row.artifact_status ?? null,
+      star_rarity:      row.star_rarity  ?? 'standard',
+      source_event:     row.source_event ?? 'standard',
       galaxy: {
         code:    row.galaxy_code,
         name_ko: row.galaxy_name_ko,

@@ -33,6 +33,8 @@ export default function PostcardPage() {
   const [starName,       setStarName]       = useState(store.starName       ?? null);
   const [starGalaxyName, setStarGalaxyName] = useState(store.starGalaxyName ?? null);
   const [starCreatedAt,  setStarCreatedAt]  = useState(store.starCreatedAt  ?? null);
+  const [starRarity,     setStarRarity]     = useState(null);
+  const [sourceEvent,    setSourceEvent]    = useState(null);
 
   const tint = (direction && PAGE_TINT[direction]) || 'transparent';
 
@@ -49,6 +51,8 @@ export default function PostcardPage() {
             setStarName(data.star_name);
             setStarGalaxyName(data.galaxy?.name_ko ?? null);
             setStarCreatedAt(data.created_at);
+            setStarRarity(data.star_rarity ?? 'standard');
+            setSourceEvent(data.source_event ?? 'standard');
             store.setStarData({
               starName:       data.star_name,
               starGalaxyName: data.galaxy?.name_ko ?? null,
@@ -72,6 +76,24 @@ export default function PostcardPage() {
         starCreatedAt={starCreatedAt}
         direction={direction}
       />
+
+      {/* 섬박람회 한정 별 인장 */}
+      {starRarity === 'limited' && sourceEvent === 'island_expo_2026' && (
+        <div style={{
+          marginTop: 8,
+          marginBottom: 4,
+          border: '1px solid rgba(232,160,0,0.45)',
+          borderRadius: 10,
+          padding: '5px 14px',
+          fontSize: 12,
+          color: '#E8A000',
+          background: 'rgba(232,160,0,0.07)',
+          letterSpacing: '0.04em',
+          textAlign: 'center',
+        }}>
+          2026 세계섬박람회 ✦ 특별한 별
+        </div>
+      )}
 
       <PostcardActions
         direction={direction}

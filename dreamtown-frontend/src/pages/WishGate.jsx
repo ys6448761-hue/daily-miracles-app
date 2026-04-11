@@ -69,7 +69,7 @@ export default function WishGate() {
       saveStarId(star.star_id);
       localStorage.removeItem('dt_prev_star_id');
 
-      const starBirthState = { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy, gemType, userId, day1: star.day1, wishText: wishText.trim() };
+      const starBirthState = { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy, gemType, userId, day1: star.day1, wishText: wishText.trim(), starRarity: star.star_rarity ?? 'standard', sourceEvent: star.source_event ?? 'standard' };
       try { sessionStorage.setItem('dt_recent_star', JSON.stringify(starBirthState)); } catch (_) {}
 
       // QR 경유 시 고향 자동 확정 (fire-and-forget)
