@@ -11,6 +11,9 @@ data/
 # Feedback data (contains user information)
 feedback.json
 
+# 파트너 계정 목록 (임시 비밀번호 포함 — 절대 커밋 금지)
+partner_list_2026.txt
+
 # Log files
 logs/
 
