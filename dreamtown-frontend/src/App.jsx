@@ -52,6 +52,13 @@ import JourneyRecommendPage from './pages/JourneyRecommendPage.jsx';
 import Day7Complete from './pages/Day7Complete.jsx';
 import HometownLanding from './pages/HometownLanding.jsx';
 import HometownAdmin from './pages/HometownAdmin.jsx';
+import Shop from './pages/Shop.jsx';
+import ShopDetail from './pages/ShopDetail.jsx';
+import ShopCheckout from './pages/ShopCheckout.jsx';
+import ShopOrders from './pages/ShopOrders.jsx';
+import PartnerOrders from './pages/partner/PartnerOrders.jsx';
+import PartnerSettlement from './pages/partner/PartnerSettlement.jsx';
+import PartnerAgreement from './pages/partner/PartnerAgreement.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
 if (window.location.pathname.startsWith('//')) {
@@ -121,8 +128,17 @@ export default function App() {
           <Route path="/journey"                   element={<JourneyWishPage />} />
           <Route path="/journey/context"           element={<JourneyContextPage />} />
           <Route path="/journey/recommend"         element={<JourneyRecommendPage />} />
+          {/* 특산품 쇼핑 */}
+          <Route path="/shop"                      element={<Shop />} />
+          <Route path="/shop/orders"               element={<ShopOrders />} />
+          <Route path="/shop/checkout"             element={<ShopCheckout />} />
+          <Route path="/shop/:id"                  element={<ShopDetail />} />
+          {/* 파트너 */}
+          <Route path="/partner/agreement"          element={<PartnerAgreement />} />
           <Route path="/partner/login"              element={<PartnerLogin />} />
           <Route path="/partner/dashboard"         element={<PartnerDashboard />} />
+          <Route path="/partner/orders"            element={<PartnerOrders />} />
+          <Route path="/partner/settlement"        element={<PartnerSettlement />} />
           <Route path="/partner/manual"            element={<PartnerManual />} />
           <Route path="/partner/verify"            element={
             <Suspense fallback={<div style={{ minHeight:'100vh', background:'#0A1628' }} />}>
