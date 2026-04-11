@@ -247,6 +247,7 @@ export default function PartnerDashboard() {
   const [loading,    setLoading]    = useState(true);
   const [qrLoading,  setQrLoading]  = useState(false);
   const [error,      setError]      = useState('');
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   const jwt = localStorage.getItem(PARTNER_JWT_KEY);
   const authHeader = { Authorization: `Bearer ${jwt}` };
@@ -276,6 +277,11 @@ export default function PartnerDashboard() {
       if (!r.ok) { setError(d.error || '데이터 로드 실패'); return; }
       setData(d);
       if (d.partner?.hometown_qr_code) setQrCode(d.partner.hometown_qr_code);
+      // 구독 상태 병렬 조회
+      fetch('/api/partner/subscription', { headers: authHeader })
+        .then(r => r.ok ? r.json() : null)
+        .then(s => s && setIsSubscribed(s.subscribed))
+        .catch(() => {});
     } catch {
       setError('서버 연결에 실패했어요');
     } finally {
@@ -436,6 +442,30 @@ export default function PartnerDashboard() {
                   <span style={S.statLabel}>전체 방문</span>
                 </div>
               </div>
+            </div>
+
+            {/* 구독 배너 */}
+            <div style={{ margin: '0 0 4px' }}>
+              {isSubscribed ? (
+                <div
+                  style={{ margin: '0 0 0', background: 'rgba(52,211,153,0.07)', border: '1px solid rgba(52,211,153,0.2)', borderRadius: 12, padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+                  onClick={() => nav('/partner/subscribe')}
+                >
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#34d399' }}>✅ 프리미엄 구독 중</div>
+                    <div style={{ fontSize: 11, color: '#7A6E9C', marginTop: 2 }}>별자리 스토리 · 감사편지 자동발송 중</div>
+                  </div>
+                  <span style={{ color: '#34d399', fontSize: 16 }}>›</span>
+                </div>
+              ) : (
+                <div
+                  style={{ background: 'linear-gradient(135deg, rgba(155,135,245,0.12) 0%, rgba(255,215,0,0.07) 100%)', border: '1px solid rgba(155,135,245,0.25)', borderRadius: 12, padding: '14px 16px', cursor: 'pointer' }}
+                  onClick={() => nav('/partner/subscribe')}
+                >
+                  <div style={{ fontSize: 13, fontWeight: 800, color: '#FFD700', marginBottom: 4 }}>이거 안 하면 손해예요 →</div>
+                  <div style={{ fontSize: 11, color: '#C4BAE0' }}>별자리 스토리 자동생성 · 손님 감사편지 · 지역 랭킹 노출 · 월 30,000원</div>
+                </div>
+              )}
             </div>
 
             {/* 메뉴 */}

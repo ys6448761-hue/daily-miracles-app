@@ -59,6 +59,7 @@ import ShopOrders from './pages/ShopOrders.jsx';
 import PartnerOrders from './pages/partner/PartnerOrders.jsx';
 import PartnerSettlement from './pages/partner/PartnerSettlement.jsx';
 import PartnerAgreement from './pages/partner/PartnerAgreement.jsx';
+import PartnerSubscribe from './pages/partner/PartnerSubscribe.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
 if (window.location.pathname.startsWith('//')) {
@@ -135,6 +136,7 @@ export default function App() {
           <Route path="/shop/:id"                  element={<ShopDetail />} />
           {/* 파트너 */}
           <Route path="/partner/agreement"          element={<PartnerAgreement />} />
+          <Route path="/partner/subscribe"         element={<PartnerSubscribe />} />
           <Route path="/partner/login"              element={<PartnerLogin />} />
           <Route path="/partner/dashboard"         element={<PartnerDashboard />} />
           <Route path="/partner/orders"            element={<PartnerOrders />} />

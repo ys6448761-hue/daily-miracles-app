@@ -2195,6 +2195,18 @@ if (partnerOrderRoutes) {
   console.log('✅ 파트너 주문·정산 라우터 등록 완료 (/api/partner/orders, /api/partner/settlement)');
 }
 
+// ---------- 파트너 구독 Routes (/api/partner) ----------
+let partnerSubscriptionRoutes = null;
+try {
+  partnerSubscriptionRoutes = require('./routes/partnerSubscriptionRoutes');
+} catch (e) {
+  console.warn('⚠️ partnerSubscriptionRoutes 로드 실패:', e.message);
+}
+if (partnerSubscriptionRoutes) {
+  app.use('/api/partner', partnerSubscriptionRoutes);
+  console.log('✅ 파트너 구독 라우터 등록 완료 (/api/partner/subscription)');
+}
+
 // ---------- 특산품 쇼핑 Routes (/api/shop) ----------
 let shopRoutes = null;
 try {
@@ -2731,6 +2743,7 @@ const DT_SPA_ROUTES = [
   '/admin/*',
   // 파트너
   '/partner/agreement',
+  '/partner/subscribe',
   '/partner/*',
   // 특산품 쇼핑
   '/shop', '/shop/*',
