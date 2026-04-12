@@ -171,6 +171,9 @@ export default function MyStar() {
   // K-지혜 (30% 확률, 별 페이지)
   const [wisdom, setWisdom] = useState(null);
 
+  // 이용권 탭
+  const [myCredentials, setMyCredentials] = useState(null);   // null=미조회, []=없음
+
   // 닉네임
   const [nickname, setNickname] = useState('소원이');
 
@@ -904,6 +907,16 @@ export default function MyStar() {
         </motion.div>
       )}
 
+      {/* ── 내 이용권 탭 ─────────────────────────────────── */}
+      {isOwner && (
+        <MyCredentialsSection
+          starId={star.star_id}
+          credentials={myCredentials}
+          onLoad={setMyCredentials}
+          onNavigate={nav}
+        />
+      )}
+
       {/* 성장 질문 */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
@@ -1114,6 +1127,164 @@ export default function MyStar() {
           onClose={closeAiModal}
           onPurchase={onAiPurchased}
         />
+      )}
+    </div>
+  );
+}
+
+// ── 내 이용권 섹션 ──────────────────────────────────────────
+const CRED_STATUS = {
+  ISSUED:    { label: '사용 가능', color: '#6AE8B8', bg: 'rgba(106,232,184,0.10)' },
+  ACTIVE:    { label: '사용 가능', color: '#6AE8B8', bg: 'rgba(106,232,184,0.10)' },
+  VERIFIED:  { label: '확인 완료', color: '#FFD76A', bg: 'rgba(255,215,106,0.10)' },
+  REDEEMED:  { label: '이용 완료', color: '#9B87F5', bg: 'rgba(155,135,245,0.10)' },
+  EXPIRED:   { label: '기간 만료', color: '#f87171', bg: 'rgba(248,113,113,0.08)' },
+  CANCELLED: { label: '취소됨',   color: 'rgba(255,255,255,0.3)', bg: 'rgba(255,255,255,0.04)' },
+};
+
+const API_BASE = import.meta.env.VITE_API_BASE ?? '';
+
+function MyCredentialsSection({ starId, credentials, onLoad, onNavigate }) {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  async function fetchCredentials() {
+    if (credentials !== null) return;   // 이미 조회함
+    setLoading(true);
+    try {
+      const r = await fetch(`${API_BASE}/api/dt/credentials/my?star_id=${starId}`);
+      const d = await r.json();
+      onLoad(d.credentials || []);
+    } catch (_) {
+      onLoad([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleToggle() {
+    if (!open) fetchCredentials();
+    setOpen(v => !v);
+  }
+
+  const activeCount = (credentials || []).filter(c => c.status === 'ISSUED' || c.status === 'ACTIVE').length;
+
+  return (
+    <div style={{ marginBottom: 20 }}>
+      {/* 탭 버튼 */}
+      <button
+        onClick={handleToggle}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '13px 16px',
+          background: open ? 'rgba(155,135,245,0.1)' : 'rgba(255,255,255,0.03)',
+          border: open ? '1px solid rgba(155,135,245,0.3)' : '1px solid rgba(255,255,255,0.08)',
+          borderRadius: open ? '14px 14px 0 0' : 14,
+          color: '#E8E4F0',
+          fontSize: 14,
+          fontWeight: 700,
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+        }}
+      >
+        <span>
+          🎫 내 이용권
+          {activeCount > 0 && (
+            <span style={{
+              marginLeft: 8, fontSize: 11, fontWeight: 800,
+              background: '#6AE8B8', color: '#0D1B2A',
+              padding: '2px 7px', borderRadius: 10,
+            }}>
+              {activeCount}
+            </span>
+          )}
+        </span>
+        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'none' }}>
+          ▼
+        </span>
+      </button>
+
+      {/* 이용권 목록 */}
+      {open && (
+        <div style={{
+          background: 'rgba(255,255,255,0.02)',
+          border: '1px solid rgba(155,135,245,0.15)',
+          borderTop: 'none',
+          borderRadius: '0 0 14px 14px',
+          padding: 12,
+        }}>
+          {loading ? (
+            <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.3)', fontSize: 13, padding: '16px 0' }}>
+              불러오는 중...
+            </p>
+          ) : !credentials || credentials.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '20px 0' }}>
+              <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 13, marginBottom: 6 }}>
+                아직 이용권이 없어요
+              </p>
+              <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: 11 }}>
+                항해 예약 후 자동 발급됩니다
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {credentials.map(c => {
+                const s   = CRED_STATUS[c.status] || CRED_STATUS.ISSUED;
+                const exp = new Date(c.valid_until);
+                const dLeft = Math.max(0, Math.ceil((exp - new Date()) / 86400000));
+                const isUsable = c.status === 'ISSUED' || c.status === 'ACTIVE';
+                return (
+                  <button
+                    key={c.credential_code}
+                    onClick={() => isUsable && onNavigate(`/ticket/${c.credential_code}`)}
+                    style={{
+                      width: '100%',
+                      textAlign: 'left',
+                      background: s.bg,
+                      border: `1px solid ${s.color}44`,
+                      borderRadius: 12,
+                      padding: '12px 14px',
+                      cursor: isUsable ? 'pointer' : 'default',
+                      opacity: c.status === 'EXPIRED' || c.status === 'CANCELLED' ? 0.5 : 1,
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#E8E4F0' }}>
+                        {c.benefit_name}
+                      </span>
+                      <span style={{
+                        fontSize: 11, fontWeight: 700, color: s.color,
+                        background: s.bg, border: `1px solid ${s.color}55`,
+                        padding: '2px 8px', borderRadius: 8, whiteSpace: 'nowrap',
+                        marginLeft: 8,
+                      }}>
+                        {s.label}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
+                      <span>{c.credential_code}</span>
+                      <span>
+                        {c.status === 'REDEEMED'
+                          ? `${new Date(c.redeemed_at).toLocaleDateString('ko-KR')} 사용`
+                          : dLeft > 0
+                            ? `${dLeft}일 남음`
+                            : '만료'}
+                      </span>
+                    </div>
+                    {isUsable && (
+                      <p style={{ fontSize: 10, color: s.color, marginTop: 6, opacity: 0.75 }}>
+                        탭하면 QR 화면으로 이동해요 →
+                      </p>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

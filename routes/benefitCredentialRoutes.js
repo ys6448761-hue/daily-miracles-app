@@ -176,22 +176,74 @@ router.post('/issue', async (req, res) => {
 
 // ── GET /my ──────────────────────────────────────────────────────────
 // 내 이용권 목록
-// Query: journey_id (required)
+// Query: journey_id OR star_id (하나 필수)
+// star_id 전달 시: dt_stars → voyage_bookings 경유 자동 조인
 router.get('/my', async (req, res) => {
-  const { journey_id } = req.query;
-  if (!journey_id) return res.status(400).json({ error: 'journey_id 필요' });
+  const { journey_id, star_id, user_phone } = req.query;
+
+  if (!journey_id && !star_id && !user_phone) {
+    return res.status(400).json({ error: 'journey_id 또는 star_id 또는 user_phone 필요' });
+  }
 
   try {
-    const result = await db.query(
-      `SELECT credential_code, benefit_type, benefit_name, face_value,
-              galaxy_code, status, valid_from, valid_until, redeemed_at
-       FROM benefit_credentials
-       WHERE journey_id = $1
-       ORDER BY created_at DESC`,
-      [journey_id]
-    );
+    let rows;
 
-    res.json({ ok: true, credentials: result.rows });
+    if (star_id) {
+      // star_id → voyage_wish.id(journey_id) 경유 + user_phone 경유 통합 조회
+      const r = await db.query(
+        `SELECT bc.credential_code, bc.benefit_type, bc.benefit_name, bc.face_value,
+                bc.galaxy_code, bc.status, bc.valid_from, bc.valid_until, bc.redeemed_at
+         FROM   benefit_credentials bc
+         WHERE  bc.journey_id = (
+                  SELECT vw.id FROM voyage_wishes vw
+                  JOIN   dt_stars ds ON ds.id = $1::uuid
+                  WHERE  vw.id::text = ds.wish_id::text
+                  LIMIT 1
+                )
+            OR bc.source_id IN (
+                  SELECT vb.id::text FROM voyage_bookings vb
+                  JOIN   voyage_wishes vw ON vw.id = vb.wish_id
+                  JOIN   dt_stars ds ON ds.id = $1::uuid AND ds.wish_id::text = vw.id::text
+                )
+            OR (bc.user_phone IS NOT NULL AND bc.user_phone = (
+                  SELECT s.user_phone FROM dt_stars s WHERE s.id = $1::uuid LIMIT 1
+                ))
+         ORDER  BY
+           CASE bc.status
+             WHEN 'ISSUED'   THEN 1
+             WHEN 'ACTIVE'   THEN 1
+             WHEN 'VERIFIED' THEN 2
+             WHEN 'REDEEMED' THEN 3
+             ELSE 4
+           END,
+           bc.created_at DESC`,
+        [star_id]
+      );
+      rows = r.rows;
+    } else if (journey_id) {
+      const r = await db.query(
+        `SELECT credential_code, benefit_type, benefit_name, face_value,
+                galaxy_code, status, valid_from, valid_until, redeemed_at
+         FROM   benefit_credentials
+         WHERE  journey_id = $1
+         ORDER  BY created_at DESC`,
+        [journey_id]
+      );
+      rows = r.rows;
+    } else {
+      // user_phone 직접 조회
+      const r = await db.query(
+        `SELECT credential_code, benefit_type, benefit_name, face_value,
+                galaxy_code, status, valid_from, valid_until, redeemed_at
+         FROM   benefit_credentials
+         WHERE  user_phone = $1
+         ORDER  BY created_at DESC`,
+        [user_phone]
+      );
+      rows = r.rows;
+    }
+
+    res.json({ ok: true, credentials: rows });
   } catch (err) {
     log.error('my 조회 실패', { err: err.message });
     res.status(500).json({ error: '이용권 조회에 실패했습니다' });
