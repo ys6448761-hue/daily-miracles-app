@@ -20,30 +20,51 @@ const QR_OPTIONS = {
   width:        512,
   margin:       2,
   color: {
-    dark:  '#0D1B2A',
+    dark:  '#1B2A4A',   // 네이비 (DoD 기준)
     light: '#FAFAFA',
   },
   errorCorrectionLevel: 'M',
 };
 
+// QR 스캔 → 파트너 방문 확인 화면
 function getQRUrl(partnerId) {
-  return `${APP_BASE}/partner/verify?pid=${partnerId}`;
+  return `${APP_BASE}/partner/${partnerId}`;
 }
 
 // 파트너 목록 공통 쿼리
+// is_founding_partner = TRUE 우선, 없으면 전체 active (컬럼 없는 경우 폴백)
 async function fetchActivePartners() {
-  const r = await db.query(
-    `SELECT pa.login_id  AS partner_id,
-            p.name       AS business_name,
-            pa.galaxy_type,
-            pa.partner_tier,
-            pa.is_active,
-            pa.created_at
-     FROM   partner_accounts pa
-     JOIN   dt_partners p ON p.id = pa.partner_id
-     WHERE  pa.is_active = true
-     ORDER  BY pa.created_at ASC`
-  );
+  // is_founding_partner 컬럼 존재 여부 확인 후 필터 적용
+  let r;
+  try {
+    r = await db.query(
+      `SELECT pa.login_id           AS partner_id,
+              p.name                AS business_name,
+              pa.galaxy_type,
+              pa.partner_tier,
+              pa.is_founding_partner,
+              pa.created_at
+       FROM   partner_accounts pa
+       JOIN   dt_partners p ON p.id = pa.partner_id
+       WHERE  pa.is_active = true
+         AND  pa.is_founding_partner = true
+       ORDER  BY pa.login_id ASC`
+    );
+    // 한 건도 없으면 전체 active로 폴백
+    if (r.rows.length === 0) throw new Error('no founding');
+  } catch (_) {
+    r = await db.query(
+      `SELECT pa.login_id  AS partner_id,
+              p.name       AS business_name,
+              pa.galaxy_type,
+              pa.partner_tier,
+              pa.created_at
+       FROM   partner_accounts pa
+       JOIN   dt_partners p ON p.id = pa.partner_id
+       WHERE  pa.is_active = true
+       ORDER  BY pa.login_id ASC`
+    );
+  }
   return r.rows;
 }
 

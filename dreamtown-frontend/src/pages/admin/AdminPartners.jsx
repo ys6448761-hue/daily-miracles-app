@@ -8,6 +8,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const ADMIN_TOKEN_KEY = 'dt_admin_token';
 
@@ -137,6 +138,7 @@ function TokenGate({ onAuth }) {
 
 // ── 메인 ───────────────────────────────────────────────────────────────────
 export default function AdminPartners() {
+  const nav = useNavigate();
   const [adminToken,  setAdminToken]  = useState(() => sessionStorage.getItem(ADMIN_TOKEN_KEY) || '');
   const [authFailed,  setAuthFailed]  = useState(false);
 
@@ -235,10 +237,17 @@ export default function AdminPartners() {
           <div style={S.title}>여수 파트너 현황</div>
           <div style={S.subtitle}>전체 {partners.length}곳 {region && `· ${currentRegion?.label}`}</div>
         </div>
-        <button style={{ background: 'none', border: 'none', color: '#7A6E9C', cursor: 'pointer', fontSize: 12 }}
-          onClick={() => { sessionStorage.removeItem(ADMIN_TOKEN_KEY); setAdminToken(''); }}>
-          로그아웃
-        </button>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <button
+            onClick={() => nav('/admin/qr-center')}
+            style={{ background: 'rgba(155,135,245,0.12)', border: '1px solid rgba(155,135,245,0.3)', borderRadius: 8, color: '#9B87F5', cursor: 'pointer', fontSize: 11, fontWeight: 700, padding: '5px 10px' }}>
+            📱 QR
+          </button>
+          <button style={{ background: 'none', border: 'none', color: '#7A6E9C', cursor: 'pointer', fontSize: 12 }}
+            onClick={() => { sessionStorage.removeItem(ADMIN_TOKEN_KEY); setAdminToken(''); }}>
+            로그아웃
+          </button>
+        </div>
       </div>
 
       {/* 지역 탭 */}
