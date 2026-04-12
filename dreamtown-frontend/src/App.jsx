@@ -52,6 +52,7 @@ import VoyageAdmin from './pages/VoyageAdmin.jsx';
 import JourneyWishPage from './pages/JourneyWishPage.jsx';
 import JourneyContextPage from './pages/JourneyContextPage.jsx';
 import JourneyRecommendPage from './pages/JourneyRecommendPage.jsx';
+import StarJourneyPage from './pages/StarJourneyPage.jsx';
 import Day7Complete from './pages/Day7Complete.jsx';
 import HometownLanding from './pages/HometownLanding.jsx';
 import HometownAdmin from './pages/HometownAdmin.jsx';
@@ -135,6 +136,8 @@ export default function App() {
           <Route path="/journey"                   element={<JourneyWishPage />} />
           <Route path="/journey/context"           element={<JourneyContextPage />} />
           <Route path="/journey/recommend"         element={<JourneyRecommendPage />} />
+          {/* Star Journey — 파트너 방문 동선 탐색 */}
+          <Route path="/star-journey"              element={<StarJourneyPage />} />
           {/* 특산품 쇼핑 */}
           <Route path="/shop"                      element={<Shop />} />
           <Route path="/shop/orders"               element={<ShopOrders />} />
