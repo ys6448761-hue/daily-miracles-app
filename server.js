@@ -2171,6 +2171,18 @@ if (adminPartnerRoutes) {
   console.log('✅ 파트너 어드민 라우터 등록 완료 (/api/admin/partners, /api/admin/evaluate-all)');
 }
 
+// ---------- 파트너 QR 코드 센터 (/admin/partner-qr-*) ----------
+let adminQRRoutes = null;
+try {
+  adminQRRoutes = require('./routes/adminQRRoutes');
+} catch (e) {
+  console.warn('⚠️ adminQRRoutes 로드 실패:', e.message);
+}
+if (adminQRRoutes) {
+  app.use('/admin', adminQRRoutes);
+  console.log('✅ 파트너 QR 라우터 등록 완료 (/admin/partner-qr-*)');
+}
+
 // ---------- 별들의 고향 Routes (/api/hometown) ----------
 let hometownRoutes = null;
 try {

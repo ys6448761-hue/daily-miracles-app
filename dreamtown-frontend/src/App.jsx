@@ -65,6 +65,7 @@ import PartnerSettlement from './pages/partner/PartnerSettlement.jsx';
 import PartnerAgreement from './pages/partner/PartnerAgreement.jsx';
 import PartnerSubscribe from './pages/partner/PartnerSubscribe.jsx';
 import AdminPartners from './pages/admin/AdminPartners.jsx';
+import AdminQRCenter from './pages/admin/AdminQRCenter.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
 if (window.location.pathname.startsWith('//')) {
@@ -130,6 +131,7 @@ export default function App() {
           <Route path="/admin/ai-cost"             element={<AdminAiDashboard />} />
           <Route path="/admin/voyage"              element={<VoyageAdmin />} />
           <Route path="/admin/partners"            element={<AdminPartners />} />
+          <Route path="/admin/qr-center"           element={<AdminQRCenter />} />
           {/* /admin/* catch-all — catch-all → / → AppLaunch 경로 차단 */}
           <Route path="/admin/*"                   element={<VoyageAdmin />} />
           {/* Core Journey Flow */}
