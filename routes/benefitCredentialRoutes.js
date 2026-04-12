@@ -37,6 +37,7 @@ const BENEFIT_CATALOG = {
   aqua:             { name: '아쿠아플라넷 이용권',  face_value: 32000 },
   yeosu3pass:       { name: '여수3합 패스',         face_value: 15000 },
   moonlight:        { name: '달빛혜택 쿠폰',        face_value: 6000  },
+  voyage_pass:      { name: '소원항해 이용권',      face_value: 0     },
 };
 
 // 은하군별 REDEEMED 토스트 메시지 (각 5종, 랜덤 선택)

@@ -23,6 +23,10 @@ try {
 }
 
 // DB 직접 참조 (yeosu_wishes 상태 전이용)
+// 이용권 자동 발급 트리거 (결제 성공에 영향 없도록 lazy load)
+let credentialTrigger = null;
+try { credentialTrigger = require('../services/credentialTriggerService'); } catch (_) {}
+
 let _db = null;
 try {
   _db = require('../database/db');
@@ -266,6 +270,11 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
       // ── yeosu_wishes 상태 전이 (AWAITING_PAYMENT → PENDING) ───
       const paidTid = approvalResult.TID || actualTID;
       setImmediate(() => _activateYeosuWish(Moid, paidTid));
+
+      // ── 이용권 자동 발급 (결제 완료와 독립 — 실패해도 무시) ───
+      if (credentialTrigger) {
+        setImmediate(() => credentialTrigger.issueOnNicepayPaid(Moid));
+      }
 
       // ── DreamTown: moid → star_id 조회 후 별 상세 페이지로 이동 ─
       let successUrl = nicepayService.buildWixSuccessUrl(Moid, payment.verification_token);

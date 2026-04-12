@@ -24,6 +24,10 @@ try {
   console.warn('[Voyage] nicepayService 로드 실패 — 결제 기능 비활성');
 }
 
+// 이용권 자동 발급 트리거
+let credentialTrigger = null;
+try { credentialTrigger = require('../services/credentialTriggerService'); } catch (_) {}
+
 // ── 세션 키 헬퍼 ──────────────────────────────────────────────────
 function getSessionKey(req) {
   return req.headers['x-session-key']
@@ -216,6 +220,11 @@ router.post('/payment/confirm', async (req, res) => {
       `UPDATE voyage_wishes SET status = 'booking_confirmed', updated_at = NOW() WHERE id = $1`,
       [booking.wish_id]
     );
+
+    // ── 이용권 자동 발급 (결제와 독립) ─────────────────────────
+    if (credentialTrigger) {
+      setImmediate(() => credentialTrigger.issueOnVoyageConfirmed(booking));
+    }
 
     res.json({
       ok: true,
