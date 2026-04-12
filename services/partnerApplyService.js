@@ -36,8 +36,9 @@ const CITY_CODE = 'yeosu';
 /**
  * 8자리 임시 비밀번호 생성 (영문 대소문자 + 숫자)
  */
+// 신규 파트너 기본 비번 — 통합 관리 비번 dt1234
 function generateTempPassword() {
-  return crypto.randomBytes(6).toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 8).padEnd(8, '0');
+  return 'dt1234';
 }
 
 /**

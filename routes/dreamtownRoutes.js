@@ -725,6 +725,7 @@ router.get('/stars/recent', async (req, res) => {
          FROM dt_stars s
          JOIN dt_galaxies g ON g.id = s.galaxy_id
         WHERE s.is_hidden = FALSE
+          AND (s.is_sample IS NOT TRUE)
           AND ($2::text IS NULL OR g.code = $2)
         ORDER BY s.created_at DESC
         LIMIT $1`,
@@ -748,6 +749,7 @@ router.get('/stars/today', async (req, res) => {
          FROM dt_stars s
          JOIN dt_galaxies g ON g.id = s.galaxy_id
         WHERE s.is_hidden = FALSE
+          AND (s.is_sample IS NOT TRUE)
           AND s.created_at >= (NOW() AT TIME ZONE 'Asia/Seoul')::date AT TIME ZONE 'Asia/Seoul'
         ORDER BY s.created_at DESC
         LIMIT 3`
@@ -792,6 +794,7 @@ router.get('/stars/featured', async (req, res) => {
             LEFT JOIN impact    i  ON i.star_id  = s.id::text
             LEFT JOIN star_logs sl ON sl.star_id = s.id
            WHERE s.is_hidden = FALSE
+             AND (s.is_sample IS NOT TRUE)
            GROUP BY s.id, s.star_name, s.created_at, g.code, g.name_ko
           HAVING COALESCE(SUM(i.count), 0) > 0
         ),
@@ -823,6 +826,7 @@ router.get('/stars/featured', async (req, res) => {
           JOIN dt_galaxies g ON g.id = s.galaxy_id
           LEFT JOIN impact i ON i.star_id = s.id::text
          WHERE s.is_hidden = FALSE
+           AND (s.is_sample IS NOT TRUE)
            AND s.created_at >= NOW() - INTERVAL '48 hours'
          GROUP BY s.id, s.star_name, s.created_at, g.code, g.name_ko
         HAVING COALESCE(SUM(i.count), 0) = 0
@@ -843,7 +847,7 @@ router.get('/stars/featured', async (req, res) => {
 router.get('/stars/count', async (req, res) => {
   try {
     const result = await db.query(
-      'SELECT COUNT(*)::int AS count FROM dt_stars WHERE is_hidden = FALSE'
+      'SELECT COUNT(*)::int AS count FROM dt_stars WHERE is_hidden = FALSE AND (is_sample IS NOT TRUE)'
     );
     res.json({ count: result.rows[0]?.count ?? 0 });
   } catch (err) {
@@ -1064,6 +1068,7 @@ router.get('/galaxies/:code/stars', async (req, res) => {
           WHERE galaxy_id = $1
             AND id <> $2::uuid
             AND is_hidden = FALSE
+            AND (is_sample IS NOT TRUE)
           ORDER BY created_at DESC
           LIMIT $3`,
         [galaxyId, exclude, limit]
@@ -1074,6 +1079,7 @@ router.get('/galaxies/:code/stars', async (req, res) => {
            FROM dt_stars
           WHERE galaxy_id = $1
             AND is_hidden = FALSE
+            AND (is_sample IS NOT TRUE)
           ORDER BY created_at DESC
           LIMIT $2`,
         [galaxyId, limit]
