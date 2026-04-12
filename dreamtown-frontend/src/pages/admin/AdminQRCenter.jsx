@@ -46,7 +46,6 @@ export default function AdminQRCenter() {
   const [authed,     setAuthed]     = useState(false);
   const [partners,   setPartners]   = useState([]);
   const [loading,    setLoading]    = useState(false);
-  const [zipLoading, setZipLoading] = useState(false);
   const [error,      setError]      = useState(null);
 
   function handleLogin(e) {
@@ -78,24 +77,12 @@ export default function AdminQRCenter() {
     if (t) { setToken(t); loadList(t); }
   }, []);
 
-  async function downloadAll() {
-    setZipLoading(true);
-    try {
-      const r    = await fetch('/admin/partner-qr/download-all', { headers: { 'X-Admin-Token': token } });
-      const blob = await r.blob();
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement('a');
-      a.href = url; a.download = 'DreamTown_Partners_QR.zip'; a.click();
-      URL.revokeObjectURL(url);
-    } catch (_) {}
-    setZipLoading(false);
+  function downloadAll() {
+    window.location.href = '/admin/partner-qr/download-all';
   }
 
-  function downloadOne(partnerId, businessName) {
-    const a = document.createElement('a');
-    a.href     = `/admin/partner-qr/${partnerId}/download`;
-    a.download = `QR_${partnerId}_${businessName}.png`;
-    a.click();
+  function downloadOne(partnerId) {
+    window.location.href = `/admin/partner-qr/${partnerId}/download`;
   }
 
   // ── 로그인 화면 ────────────────────────────────────────────────
@@ -200,19 +187,16 @@ export default function AdminQRCenter() {
         <motion.button
           whileTap={{ scale: 0.97 }}
           onClick={downloadAll}
-          disabled={zipLoading}
           style={{
             display: 'block', width: '100%',
             padding: '14px 0', marginBottom: 24,
-            background: zipLoading ? '#2a3344' : 'linear-gradient(135deg, #9B87F5, #6FCFB0)',
+            background: 'linear-gradient(135deg, #C8960C, #9B87F5)',
             border: 'none', borderRadius: 14,
-            color: '#fff', fontSize: 15, fontWeight: 800,
-            cursor: zipLoading ? 'not-allowed' : 'pointer',
+            color: '#1B2A4A', fontSize: 15, fontWeight: 800,
+            cursor: 'pointer',
           }}
         >
-          {zipLoading
-            ? '⏳ ZIP 생성 중...'
-            : `📦 전체 ZIP 다운로드 (${partners.length}개)`}
+          📦 전체 ZIP 다운로드 ({partners.length}개)
         </motion.button>
 
         {/* 파트너 카드 그리드 — 4열(데스크탑) / 2열(모바일) */}
@@ -292,7 +276,7 @@ export default function AdminQRCenter() {
 
                 {/* 개별 PNG 저장 */}
                 <button
-                  onClick={() => downloadOne(p.partner_id, p.business_name)}
+                  onClick={() => downloadOne(p.partner_id)}
                   style={{
                     width: '100%',
                     padding: '7px 0',
