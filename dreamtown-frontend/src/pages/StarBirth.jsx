@@ -520,7 +520,7 @@ export default function StarBirth() {
                         letterSpacing: '0.01em',
                       }}
                     >
-                      ✨ 공유하기
+                      이 순간을 전하기
                     </button>
                     {/* 링크 복사 (저장하기) */}
                     <button
