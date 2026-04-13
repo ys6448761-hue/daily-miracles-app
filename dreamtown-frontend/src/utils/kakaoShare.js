@@ -10,17 +10,26 @@ const OG_IMAGE_URL  = 'https://app.dailymiracles.kr/images/dreamtown-og-v4.jpg';
 
 export function initKakao() {
   if (!window.Kakao) {
-    console.warn('[Kakao] window.Kakao 없음 — SDK 로드 실패');
+    console.error('[Kakao] ❌ window.Kakao 없음 — CDN 스크립트 로드 실패. index.html <script> 태그 확인');
     return false;
   }
   if (!window.Kakao.isInitialized()) {
     const key = import.meta.env.VITE_KAKAO_JS_KEY;
     if (!key) {
-      console.warn('[Kakao] VITE_KAKAO_JS_KEY 환경변수 미설정');
+      console.error('[Kakao] ❌ VITE_KAKAO_JS_KEY 미설정 — dreamtown-frontend/.env 또는 Render 대시보드 환경변수 확인');
       return false;
     }
-    window.Kakao.init(key);
-    console.log('[Kakao] init 완료. isInitialized:', window.Kakao.isInitialized());
+    try {
+      window.Kakao.init(key);
+    } catch (e) {
+      console.error('[Kakao] ❌ Kakao.init() 실패:', e.message, '| key 앞 6자:', key.slice(0, 6));
+      return false;
+    }
+    if (!window.Kakao.isInitialized()) {
+      console.error('[Kakao] ❌ init() 호출 후에도 isInitialized=false — JavaScript 키 타입 확인 (네이티브/REST 키는 사용 불가)');
+      return false;
+    }
+    console.log('[Kakao] ✅ init 완료 | key 앞 6자:', key.slice(0, 6));
   }
   return true;
 }
