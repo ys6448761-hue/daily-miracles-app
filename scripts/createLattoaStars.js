@@ -16,11 +16,11 @@ const PARTNER_NAME  = '라또아 커피숍';
 
 // ── 소원 10개 ────────────────────────────────────────────────────────
 const WISH_TEXTS = [
-  '오늘 하루가 조금 더 따뜻했으면 좋겠어요',
-  '이 공간에서 잠시 숨을 고를 수 있어서 감사해요',
-  '오늘 만난 사람과 오래 인연이 이어졌으면 해요',
-  '내가 좋아하는 일을 조금씩 더 할 수 있었으면 해요',
-  '다음에 다시 올 이유가 생겼으면 좋겠어요',
+  '오늘 마음이 조금 더 편안해졌으면 좋겠어요',
+  '이곳에서 시작한 소원이 좋은 방향으로 자라나길',
+  '나 자신을 더 믿을 수 있는 하루가 되었으면 좋겠어요',
+  '사랑하는 사람들과 오래 웃을 수 있길 바라요',
+  '새로운 기회가 자연스럽게 찾아왔으면 좋겠어요',
   '지금의 고민이 조금씩 풀려가길 바래요',
   '작은 용기로도 충분한 하루였으면 좋겠어요',
   '여기서 시작한 마음이 별처럼 오래 남았으면 좋겠어요',
@@ -179,7 +179,7 @@ async function run() {
       // wish
       const wishR = await db.query(
         `INSERT INTO dt_wishes (user_id, wish_text, gem_type, status)
-         VALUES ($1, $2, 'aquamarine', 'fulfilled') RETURNING id`,
+         VALUES ($1, $2, 'sapphire', 'converted_to_star') RETURNING id`,
         [demoUserId, WISH_TEXTS[idx]]
       );
       const wishId = wishR.rows[0].id;
