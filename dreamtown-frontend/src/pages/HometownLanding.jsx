@@ -539,7 +539,7 @@ export default function HometownLanding() {
       <motion.div style={S.card} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         <div style={{ fontSize: 40, marginBottom: 16 }}>⚠️</div>
         <div style={S.title}>문제가 생겼어요</div>
-        <div style={S.errorText}>{data.message || '알 수 없는 오류입니다'}</div>
+        <div style={S.errorText}>{data.message || data.error || '알 수 없는 오류입니다'}</div>
         <button style={{ ...S.btnSecondary, marginTop: 24 }} onClick={() => nav('/')}>
           홈으로 가기
         </button>
