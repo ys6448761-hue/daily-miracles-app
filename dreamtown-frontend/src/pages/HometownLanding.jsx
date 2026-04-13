@@ -196,6 +196,55 @@ function LoadingView() {
 }
 
 // ── 메인 컴포넌트 ────────────────────────────────────────────────────
+// ── 별 프리뷰 박스 ────────────────────────────────────────────────────
+function StarPreviewBox({ partnerCode }) {
+  const [preview, setPreview] = useState(null);
+
+  useEffect(() => {
+    if (!partnerCode) return;
+    fetch(`/api/hometown/partner-stars?partner_code=${encodeURIComponent(partnerCode)}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setPreview(d); })
+      .catch(() => {});
+  }, [partnerCode]);
+
+  if (!preview || preview.star_count === 0) return null;
+
+  return (
+    <div style={{
+      marginTop: 24,
+      padding: '16px 18px',
+      borderRadius: 14,
+      background: 'rgba(155, 135, 245, 0.06)',
+      border: '1px solid rgba(155, 135, 245, 0.15)',
+      textAlign: 'left',
+    }}>
+      <div style={{ fontSize: 12, color: '#9B87F5', fontWeight: 600, marginBottom: 10, letterSpacing: '0.04em' }}>
+        ✨ 이 곳에서 {preview.star_count}개의 별이 태어났어요
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+        {preview.stars.slice(0, 8).map((s, i) => (
+          <span key={i} style={{
+            fontSize: 12,
+            color: '#C4BAE0',
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(155,135,245,0.18)',
+            borderRadius: 20,
+            padding: '3px 10px',
+          }}>
+            {s.star_name}
+          </span>
+        ))}
+        {preview.star_count > 8 && (
+          <span style={{ fontSize: 11, color: '#7A6E9C', padding: '4px 4px' }}>
+            +{preview.star_count - 8}개 더
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function HometownLanding() {
   const nav = useNavigate();
   const [state, setState] = useState('loading');
@@ -206,6 +255,8 @@ export default function HometownLanding() {
   const [wishText,    setWishText]    = useState('');
   const [wishLoading, setWishLoading] = useState(false);
   const [wishError,   setWishError]   = useState('');
+
+  const partnerCodeRef = new URLSearchParams(window.location.search).get('partner');
 
   useEffect(() => {
     const partnerCode = new URLSearchParams(window.location.search).get('partner');
@@ -350,6 +401,7 @@ export default function HometownLanding() {
               {wishLoading ? '별 탄생 중...' : '별 탄생시키기 ✨'}
             </button>
           </form>
+          <StarPreviewBox partnerCode={partnerCodeRef} />
         </motion.div>
       </div>
     );

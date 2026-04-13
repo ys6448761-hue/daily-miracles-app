@@ -80,6 +80,7 @@ router.post('/arrive', async (req, res) => {
     name:        partnerRow.name,
     address:     partnerRow.address,
     description: partnerRow.description,
+    star_count:  partnerRow.hometown_star_count ?? 0,
   };
 
   // ③ user_id 없으면 로그인 필요
@@ -442,6 +443,49 @@ router.get('/admin/:partnerId/qr-download', adminGuard, async (req, res) => {
   } catch (err) {
     console.error('[hometown/admin/:partnerId/qr-download] 오류:', err);
     return res.status(500).json({ error: 'QR 다운로드 중 오류가 발생했습니다.' });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// GET /api/hometown/partner-stars?partner_code=HT_xxx
+// 공개 API — QR 랜딩 화면에서 별 이름 프리뷰 (소원 내용 비노출)
+// ─────────────────────────────────────────────────────────────────────
+router.get('/partner-stars', async (req, res) => {
+  const { partner_code } = req.query;
+  if (!partner_code) {
+    return res.status(400).json({ error: 'partner_code가 필요합니다.' });
+  }
+
+  try {
+    const pR = await db.query(
+      `SELECT id, name, hometown_star_count
+         FROM dt_partners
+        WHERE hometown_qr_code = $1 AND is_active = true
+        LIMIT 1`,
+      [partner_code]
+    );
+    if (!pR.rows[0]) {
+      return res.status(404).json({ error: '유효하지 않은 파트너 코드입니다.' });
+    }
+    const { id: partnerId, hometown_star_count } = pR.rows[0];
+
+    // 최근 별 이름 10개 (소원 내용 제외 — star_name만)
+    const starsR = await db.query(
+      `SELECT star_name, created_at
+         FROM dt_stars
+        WHERE hometown_partner_id = $1
+        ORDER BY created_at DESC
+        LIMIT 10`,
+      [partnerId]
+    );
+
+    return res.json({
+      star_count: hometown_star_count ?? starsR.rowCount,
+      stars: starsR.rows.map(s => ({ star_name: s.star_name })),
+    });
+  } catch (err) {
+    console.error('[hometown/partner-stars] 오류:', err);
+    return res.status(500).json({ error: '서버 오류가 발생했습니다.' });
   }
 });
 
