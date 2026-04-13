@@ -116,6 +116,7 @@
     "DOC-WIX_TEAM_PAGE_CONTENT",
     "DOC-프로젝트지식_수동정리_가이드",
     "DOC-AIL-STORY-2026-0404-001_story-",
+    "DOC-SSOT-2026-0413-001_별_고향_로그_세계관",
     "DOC-DEPLOY-PACKET-2026-03-02",
     "DEC-2026-0319-004",
     "DOC-20260131_파크_2d_기술지원",
@@ -270,6 +271,7 @@
     "DOC-Aurora5_토론시스템_안내문",
     "DOC-WIX_TEAM_PAGE_CONTENT",
     "DOC-프로젝트지식_수동정리_가이드",
+    "DOC-CEO-WEEKLY-2026-W15",
     "DOC-CEO-WEEKLY-2026-W12",
     "DOC-CEO-WEEKLY-2026-W11",
     "DOC-DEPLOY-PACKET-2026-03-02",
@@ -494,6 +496,8 @@
     "DOC-DreamTown_Universe_Structure_v",
     "DOC-DreamTown_Visual_Style_SSOT",
     "DOC-DreamTown_World_Architecture_S",
+    "DOC-SSOT-2026-0413-001_별_고향_로그_세계관",
+    "DOC-SSOT-2026-0413-002_여수_재방문_엔진_및",
     "DOC-DreamTown_Miracle_System_SSOT",
     "DOC-DreamTown_Wish_System_SSOT"
   ],
@@ -629,6 +633,8 @@
   "decisions": [
     "DOC-DEC-20260201-포인트추천예고편-정책구현",
     "DOC-index",
+    "DEC-2026-0413-001",
+    "DEC-2026-0413-002",
     "DEC-2026-0102-045",
     "DEC-2026-0102-121",
     "DEC-2026-0102-457",
@@ -737,6 +743,7 @@
   ],
   "reports": [
     "DOC-tax-accounting-ai-tools-analys",
+    "DOC-CEO-WEEKLY-2026-W15",
     "DOC-CEO-WEEKLY-2026-W12",
     "DOC-CEO-WEEKLY-2026-W11",
     "DOC-CEO-WEEKLY-2025-W52"
@@ -767,6 +774,9 @@
   ],
   "experiments": [
     "DOC-AIL-STORY-2026-0404-001_story-"
+  ],
+  "tasks": [
+    "DOC-TASK-2026-0413-001_SSOT_반영_MVP"
   ],
   "deploy": [
     "DOC-DEPLOY-PACKET-2026-03-02"

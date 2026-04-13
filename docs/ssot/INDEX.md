@@ -35,12 +35,14 @@ docs/ssot/
 
 ---
 
-## Core SSOT (13개) — `docs/ssot/core/`
+## Core SSOT (15개) — `docs/ssot/core/`
 
 **모든 작업 전 필독. CEO 확정 없이 변경 불가.**
 
 | 파일 | 핵심 내용 | 필독 시점 |
 |------|----------|----------|
+| `SSOT-2026-0413-001_별_고향_로그_세계관.md` | 세계관·역할·흐름 구조 확정 (2026-04-13) | 고향·파트너·로그 작업 전 |
+| `SSOT-2026-0413-002_여수_재방문_엔진_및_포인트_구조.md` | 포인트·제휴·수익 구조 확정 (2026-04-13) | 포인트·파트너·제휴 작업 전 |
 | `DreamTown_Core_Philosophy_SSOT.md` | 철학 선언 | **모든 작업 전 (0번)** |
 | `DreamTown_Universe_Bible.md` | 세계관 전체 | **모든 작업 전** |
 | `DreamTown_Universe_Structure_v2_SSOT.md` | 우주 구조 v2 | 세계관 작업 전 |
