@@ -4,8 +4,6 @@ import { useNavigate, useParams, Navigate } from 'react-router-dom';
 import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message, getTodaySchedule, getStarStats, getStarDetail, getArtifactJob, getGrowthSummary, getRouteRecommendation, startJourneyFromRecommendation, getWisdom, logFlowEvent } from '../api/dreamtown.js';
 import { saveStarId, clearStarId, readSavedStar } from '../lib/utils/starSession.js';
 import MilestoneBar from '../components/MilestoneBar';
-import AiUpsellModal from '../components/AiUpsellModal.jsx';
-import { useAiUpsell } from '../hooks/useAiUpsell.js';
 import { useDreamtownStore } from '../store/dreamtownStore';
 import AURUM_MESSAGES from '../constants/aurumMessages';
 import { sharePostcard } from '../utils/kakaoShare';
@@ -181,17 +179,6 @@ export default function MyStar() {
   const [showPaidBanner, setShowPaidBanner] = useState(
     () => new URLSearchParams(window.location.search).get('paid') === 'true'
   );
-
-  // AI 업셀 (A/B 실험) — star 로드 후 days 계산해서 전달
-  const _userId = getOrCreateUserId();
-  const _daysActive = star ? (() => {
-    const ms = Date.now() - new Date(star.created_at).getTime();
-    return Math.floor(ms / 86400000) + 1;
-  })() : 0;
-  const {
-    upsell, experiment, products: aiProducts,
-    showModal: showAiModal, handleClose: closeAiModal, handlePurchase: onAiPurchased,
-  } = useAiUpsell({ userId: _userId, daysActive: _daysActive, enabled: isOwner && !!star });
 
   // 선물하기 상태
   const [showGift, setShowGift] = useState(false);
@@ -1116,18 +1103,6 @@ export default function MyStar() {
         </div>
       </div>
 
-      {/* AI 업셀 모달 — A/B 실험 */}
-      {showAiModal && upsell && (
-        <AiUpsellModal
-          upsell={upsell}
-          experiment={experiment}
-          products={aiProducts}
-          userId={_userId}
-          starId={star?.star_id}
-          onClose={closeAiModal}
-          onPurchase={onAiPurchased}
-        />
-      )}
     </div>
   );
 }

@@ -13,38 +13,11 @@ import { readSavedStar } from '../lib/utils/starSession.js';
 export default function Day7Complete() {
   const { state }  = useLocation();
   const navigate   = useNavigate();
-  const [done, setDone]           = useState(false);
-  const [visible, setVisible]     = useState(false);
-  const [upgrading, setUpgrading] = useState(false);
+  const [done, setDone]       = useState(false);
+  const [visible, setVisible] = useState(false);
 
-  // NicePay 콜백으로 돌아온 경우 (?upgraded=true)
-  const searchParams = new URLSearchParams(window.location.search);
-  const isUpgraded   = searchParams.get('upgraded') === 'true';
-
-  const starId  = state?.starId ?? searchParams.get('starId') ?? readSavedStar();
-  const userId  = getOrCreateUserId();
-
-  async function handleUpgrade() {
-    if (!starId || upgrading) return;
-    setUpgrading(true);
-    logFlowEvent({ userId, stage: 'impact', action: 'upgrade_cta_click', value: { starId } });
-    try {
-      const res  = await fetch('/api/dt/upgrade', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ userId, starId }),
-      });
-      const data = await res.json();
-      if (data.payment_url) {
-        window.location.href = data.payment_url;
-      } else {
-        alert(data.error ?? '결제 시작에 실패했습니다');
-        setUpgrading(false);
-      }
-    } catch {
-      setUpgrading(false);
-    }
-  }
+  const starId = state?.starId ?? readSavedStar();
+  const userId = getOrCreateUserId();
 
   useEffect(() => {
     // 완주 API 호출 (중복 호출 무해 — 서버에서 이미 완료 체크)
@@ -125,7 +98,7 @@ export default function Day7Complete() {
           fontSize: 14,
           color: 'rgba(255,255,255,0.55)',
           lineHeight: 1.7,
-          marginBottom: isUpgraded ? 20 : 40,
+          marginBottom: 40,
           opacity: visible ? 1 : 0,
           transition: 'opacity 0.8s ease 0.7s',
         }}
@@ -133,18 +106,6 @@ export default function Day7Complete() {
         7일을 이어온 당신의 별은<br />
         이제 다른 사람들에게도 빛날 수 있어요
       </p>
-
-      {/* 업그레이드 완료 배너 (NicePay 콜백 후) */}
-      {isUpgraded && visible && (
-        <div style={{
-          background: 'rgba(255,215,106,0.12)', border: '1px solid rgba(255,215,106,0.35)',
-          borderRadius: 12, padding: '12px 18px', marginBottom: 28,
-          fontSize: 13, color: 'rgba(255,215,106,0.9)', lineHeight: 1.6,
-        }}>
-          ✨ 30일 여정이 시작됐어요<br />
-          <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>개인화 메시지 + AI 추천이 강화됩니다</span>
-        </div>
-      )}
 
       {/* CTA 버튼 그룹 */}
       <div
@@ -158,31 +119,15 @@ export default function Day7Complete() {
           transition: 'opacity 0.8s ease 0.9s',
         }}
       >
-        {/* 30일 여정 업그레이드 CTA — Day7 완주 직후 1회만, 강제 아님 */}
-        {!isUpgraded && (
-          <button
-            onClick={handleUpgrade}
-            disabled={upgrading}
-            style={{
-              width: '100%', padding: '14px 0',
-              background: upgrading ? 'rgba(255,215,106,0.5)' : '#FFD76A',
-              color: '#0D1B2A', fontWeight: 700, fontSize: 15,
-              border: 'none', borderRadius: 12, cursor: upgrading ? 'default' : 'pointer',
-            }}
-          >
-            {upgrading ? '결제 페이지로 이동 중...' : '30일 여정 이어가기'}
-          </button>
-        )}
-
         {/* 공명 — 진짜 DreamTown 시작 */}
         <button
           onClick={() => navigate(starId ? `/my-star/${starId}` : '/home')}
           style={{
             width: '100%',
             padding: '14px 0',
-            background: isUpgraded ? '#FFD76A' : 'rgba(255,255,255,0.08)',
-            color: isUpgraded ? '#0D1B2A' : 'rgba(255,255,255,0.7)',
-            fontWeight: isUpgraded ? 700 : 400,
+            background: '#FFD76A',
+            color: '#0D1B2A',
+            fontWeight: 700,
             fontSize: 15,
             border: 'none',
             borderRadius: 12,

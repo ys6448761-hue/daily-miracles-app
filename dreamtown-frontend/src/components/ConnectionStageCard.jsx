@@ -51,8 +51,6 @@ export default function ConnectionStageCard() {
 
         timerRef.current = setTimeout(() => {
           setVisible(false);
-          // 연결 소멸 후 1.5s 뒤 항로 오퍼 트리거
-          setTimeout(() => window.dispatchEvent(new CustomEvent('dt:voyage_offer')), 1500);
         }, AUTO_DISMISS_MS);
       })
       .catch(() => {});

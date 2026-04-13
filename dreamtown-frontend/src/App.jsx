@@ -28,7 +28,6 @@ import JourneySceneEngine from './components/JourneySceneEngine.jsx';
 import ResonanceCard from './components/ResonanceCard.jsx';
 import ConnectionStageCard from './components/ConnectionStageCard.jsx';
 import RecallWhisperCard from './components/RecallWhisperCard.jsx';
-import MonetizationFlow from './components/MonetizationFlow.jsx';
 import VoyageLanding from './pages/VoyageLanding.jsx';
 import VoyageWish from './pages/VoyageWish.jsx';
 import VoyageBooking from './pages/VoyageBooking.jsx';
@@ -85,7 +84,6 @@ export default function App() {
         <ResonanceCard />
         <ConnectionStageCard />
         <RecallWhisperCard />
-        <MonetizationFlow />
         <Routes>
           <Route path="/"            element={<AppLaunch />} />
           <Route path="/intro"       element={<Intro />} />
