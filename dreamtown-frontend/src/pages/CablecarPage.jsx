@@ -127,49 +127,33 @@ function ProcessingView({ headline }) {
   );
 }
 
-// ── 각성 완료 화면 ────────────────────────────────────────────────
-function AwakenedView({ mode, headline, starName, onNext }) {
-  const isNew = mode === 'created_and_awakened';
-  const isFirst = mode === 'awakened';
-
-  useEffect(() => {
-    const t = setTimeout(onNext, 2200);
-    return () => clearTimeout(t);
-  }, [onNext]);
-
+// ── 완료 화면 (단순) ─────────────────────────────────────────────
+function AwakenedView({ onNext }) {
   return (
     <div style={S.page}>
       <motion.div
-        style={S.card}
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
+        style={{ ...S.card, padding: '48px 24px', textAlign: 'center' }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
       >
-        <motion.div
-          animate={{ y: [0, -8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          style={{ fontSize: 56, marginBottom: 20 }}
+        <div style={{ fontSize: 18, fontWeight: 700, color: '#E8E4F0', marginBottom: 6 }}>
+          이 순간이 기록되었습니다
+        </div>
+        <div style={{ fontSize: 13, color: '#7A6E9C', marginBottom: 32 }}>
+          여수 케이블카에서
+        </div>
+        <button
+          onClick={onNext}
+          style={{
+            ...S.btn,
+            marginTop: 0,
+            padding: '13px 0',
+            fontSize: 14,
+          }}
         >
-          {isNew ? '✨' : isFirst ? '⭐' : '🌟'}
-        </motion.div>
-
-        <div style={S.label}>여수 케이블카 캐빈</div>
-        <div style={S.headline}>{headline}</div>
-
-        {starName && (
-          <div style={{ fontSize: 18, fontWeight: 700, color: '#FFD700', marginBottom: 8 }}>
-            ★ {starName}
-          </div>
-        )}
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          style={{ fontSize: 13, color: '#7A6E9C', marginTop: 16 }}
-        >
-          내 별 페이지로 이동합니다...
-        </motion.div>
+          내 별 보기
+        </button>
       </motion.div>
     </div>
   );
@@ -328,14 +312,7 @@ export default function CablecarPage() {
   }
 
   if (phase === 'awakened' && result) {
-    return (
-      <AwakenedView
-        mode={result.mode}
-        headline={result.headline}
-        starName={result.starName}
-        onNext={goToStar}
-      />
-    );
+    return <AwakenedView onNext={goToStar} />;
   }
 
   return (
