@@ -2799,6 +2799,8 @@ const DT_SPA_ROUTES = [
   '/day7-complete',
   // 별들의 고향
   '/hometown',
+  // 케이블카 캐빈 QR
+  '/cablecar',
   // 어드민
   '/admin/*',
   // 파트너

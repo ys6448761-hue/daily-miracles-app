@@ -295,10 +295,26 @@ function globalErrorHandler(err, req, res, next) {
 }
 
 // ── 404 handler ──────────────────────────────────────────────
+// ※ next(error) 대신 직접 응답 — globalErrorHandler의 spread copy 이슈 우회
 
-function notFoundHandler(req, res, next) {
-  const error = createError.notFound('API 경로', req.originalUrl);
-  next(error);
+function notFoundHandler(req, res, _next) {
+  // SPA 프론트 경로(비-API)는 절대 여기까지 오면 안 됨 (DT_SPA_ROUTES 확인)
+  const isApiPath = req.originalUrl.startsWith('/api/');
+  logError('Client Error', null, {
+    request: { method: req.method, url: req.originalUrl },
+    errorClass: 'NotFound',
+    message: `경로 없음: ${req.method} ${req.originalUrl}`,
+  });
+  res.status(404).json({
+    success: false,
+    error: {
+      status: 404,
+      errorCode: 'NOT_FOUND',
+      message: isApiPath
+        ? `API 경로를 찾을 수 없습니다: ${req.originalUrl}`
+        : '경로를 찾을 수 없습니다.',
+    },
+  });
 }
 
 module.exports = {

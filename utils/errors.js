@@ -148,9 +148,14 @@ const createError = {
 };
 
 // 에러가 운영상 에러인지 확인 (로깅 레벨 결정에 사용)
+// ※ spread copy({ ...appError })도 isOperational 속성을 own property로 갖고 있으므로 fallback 체크
 function isOperationalError(error) {
   if (error instanceof AppError) {
     return error.isOperational;
+  }
+  // spread copy 방어: { ...new AppError(...) } 는 instanceof 실패하지만 isOperational 속성은 유지됨
+  if (error && typeof error === 'object' && typeof error.isOperational !== 'undefined') {
+    return !!error.isOperational;
   }
   return false;
 }
