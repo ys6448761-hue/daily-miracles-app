@@ -2195,6 +2195,18 @@ if (hometownRoutes) {
   console.log('✅ 별들의 고향 라우터 등록 완료 (/api/hometown)');
 }
 
+// ---------- 케이블카 캐빈 QR 진입 엔진 (/api/cablecar) ----------
+let cablecarRoutes = null;
+try {
+  cablecarRoutes = require('./routes/cablecarRoutes');
+} catch (e) {
+  console.warn('⚠️ cablecarRoutes 로드 실패:', e.message);
+}
+if (cablecarRoutes) {
+  app.use('/api/cablecar', cablecarRoutes);
+  console.log('✅ 케이블카 라우터 등록 완료 (/api/cablecar)');
+}
+
 // ---------- 파트너 어드민 인증 Routes (/api/partner) ----------
 let partnerAuthRoutes = null;
 try {

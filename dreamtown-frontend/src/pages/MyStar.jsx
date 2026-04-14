@@ -502,6 +502,45 @@ export default function MyStar() {
           </p>
         )}
 
+        {/* ── 각성 상태 문구 (케이블카 캐빈 등 장소 기반) ── */}
+        {star.status && star.status !== 'created' && (
+          <div style={{
+            margin: '4px 0 16px',
+            padding: '10px 14px',
+            borderRadius: 10,
+            background: star.status === 'unified'
+              ? 'rgba(255,215,0,0.08)'
+              : 'rgba(155,135,245,0.08)',
+            border: `1px solid ${star.status === 'unified' ? 'rgba(255,215,0,0.2)' : 'rgba(155,135,245,0.18)'}`,
+            fontSize: 13,
+            color: star.status === 'unified' ? '#FFD700' : '#9B87F5',
+            lineHeight: 1.6,
+          }}>
+            {{
+              awakened: '당신의 이야기가 시작되었습니다',
+              growing:  '다시 이곳에 오셨네요. 당신의 별이 더 밝아집니다',
+              unified:  '지금까지의 순간이 하나로 이어졌어요',
+            }[star.status] || ''}
+            {star.awakened_place === 'yeosu_cablecar_cabin' && (
+              <span style={{ display: 'block', fontSize: 11, color: '#7A6E9C', marginTop: 4 }}>
+                여수 케이블카 캐빈에서
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* status === 'created' → 아직 연결 전 */}
+        {(!star.status || star.status === 'created') && star.origin_type === null && (
+          <div style={{
+            margin: '4px 0 16px',
+            fontSize: 12,
+            color: '#5a5370',
+            fontStyle: 'italic',
+          }}>
+            아직 연결되지 않은 이야기
+          </div>
+        )}
+
         <div className="grid grid-cols-2 gap-3 text-left">
           <div className="bg-white/5 rounded-xl p-3">
             <p className="text-white/40 text-xs mb-1">은하</p>

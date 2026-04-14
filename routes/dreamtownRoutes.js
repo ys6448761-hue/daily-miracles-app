@@ -950,6 +950,17 @@ router.get('/stars/:id', async (req, res) => {
       log_count:    logResult.rows[0].total,
     });
 
+    // ── 각성 상태 조회 (migration 117 — 없으면 null graceful) ─────
+    let awakeningData = { status: null, awakened_at: null, awakened_place: null, awaken_count: 0, origin_type: null, origin_place: null };
+    try {
+      const awR = await db.query(
+        `SELECT status, awakened_at, awakened_place, awaken_count, origin_type, origin_place
+           FROM dt_stars WHERE id = $1`,
+        [row.star_id]
+      );
+      if (awR.rows[0]) awakeningData = awR.rows[0];
+    } catch (_) { /* migration 117 미적용 — 무시 */ }
+
     res.json({
       star_id:          row.star_id,
       star_name:        row.star_name,
@@ -970,6 +981,13 @@ router.get('/stars/:id', async (req, res) => {
       growth_stage:   growthStage.stage,
       growth_days:    growthStage.days,
       growth_message: growthStage.message,
+      // 각성 상태 (migration 117)
+      status:          awakeningData.status ?? 'created',
+      awakened_at:     awakeningData.awakened_at ?? null,
+      awakened_place:  awakeningData.awakened_place ?? null,
+      awaken_count:    awakeningData.awaken_count ?? 0,
+      origin_type:     awakeningData.origin_type ?? null,
+      origin_place:    awakeningData.origin_place ?? null,
     });
 
   } catch (err) {
