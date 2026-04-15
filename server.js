@@ -2207,6 +2207,18 @@ if (cablecarRoutes) {
   console.log('✅ 케이블카 라우터 등록 완료 (/api/cablecar)');
 }
 
+// ---------- 여수 미션 + 포인트 (/api/yeosu-missions) ----------
+let yeosuMissionRoutes = null;
+try {
+  yeosuMissionRoutes = require('./routes/yeosuMissionRoutes');
+} catch (e) {
+  console.warn('⚠️ yeosuMissionRoutes 로드 실패:', e.message);
+}
+if (yeosuMissionRoutes) {
+  app.use('/api/yeosu-missions', yeosuMissionRoutes);
+  console.log('✅ 여수 미션 라우터 등록 완료 (/api/yeosu-missions)');
+}
+
 // ---------- 파트너 어드민 인증 Routes (/api/partner) ----------
 let partnerAuthRoutes = null;
 try {
@@ -2801,6 +2813,8 @@ const DT_SPA_ROUTES = [
   '/hometown',
   // 케이블카 캐빈 QR
   '/cablecar',
+  // 여수 미션
+  '/missions',
   // 어드민
   '/admin/*',
   // 파트너

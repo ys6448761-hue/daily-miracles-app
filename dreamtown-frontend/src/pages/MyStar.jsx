@@ -172,6 +172,9 @@ export default function MyStar() {
   // 이용권 탭
   const [myCredentials, setMyCredentials] = useState(null);   // null=미조회, []=없음
 
+  // 여수 미션 요약
+  const [missionSummary, setMissionSummary] = useState(null); // { completed_count, total_count, total_points }
+
   // 닉네임
   const [nickname, setNickname] = useState('소원이');
 
@@ -268,6 +271,20 @@ export default function MyStar() {
         getWisdom({ starId: data.star_id, context: 'star' })
           .then(w => w?.show ? setWisdom(w.message) : null)
           .catch(() => null);
+
+        // 여수 미션 요약
+        Promise.all([
+          fetch(`/api/yeosu-missions?star_id=${encodeURIComponent(data.star_id)}`).then(r => r.ok ? r.json() : null).catch(() => null),
+          fetch(`/api/yeosu-missions/points?star_id=${encodeURIComponent(data.star_id)}`).then(r => r.ok ? r.json() : null).catch(() => null),
+        ]).then(([mData, pData]) => {
+          if (mData?.success && pData?.success) {
+            setMissionSummary({
+              completed_count: mData.completed_count ?? 0,
+              total_count:     mData.total_count ?? 5,
+              total_points:    pData.total_points ?? 0,
+            });
+          }
+        }).catch(() => {});
 
         // Aurora5 메시지 저장 — 세션당 1회 fire-and-forget
         const aurora5Key = `dt_aurora5_saved_${data.star_id}_${new Date().toISOString().slice(0, 10)}`;
@@ -559,6 +576,42 @@ export default function MyStar() {
         </div>
 
       </motion.div>
+
+      {/* ── 여수 미션 진입 배너 ──────────────────────────────── */}
+      {missionSummary !== null && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.08 }}
+          onClick={() => nav(`/missions?star_id=${star.star_id}`)}
+          style={{
+            marginBottom: 16,
+            background: 'linear-gradient(135deg, rgba(155,135,245,0.1) 0%, rgba(255,215,106,0.05) 100%)',
+            border: '1px solid rgba(155,135,245,0.22)',
+            borderRadius: 18,
+            padding: '14px 18px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#E8E4F0', marginBottom: 3 }}>
+              🚡 여수 미션
+            </div>
+            <div style={{ fontSize: 11, color: '#7A6E9C' }}>
+              {missionSummary.completed_count}/{missionSummary.total_count} 완료 · {missionSummary.total_points}P 획득
+            </div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 18, fontWeight: 800, color: '#FFD76A', lineHeight: 1 }}>
+              {missionSummary.total_points.toLocaleString()}P
+            </div>
+            <div style={{ fontSize: 10, color: '#7A6E9C', marginTop: 2 }}>미션 바로가기 →</div>
+          </div>
+        </motion.div>
+      )}
 
       {/* ── 100일 이벤트 배너 (days >= 100) ── */}
       {daysSinceBirth >= 100 && (
