@@ -7,10 +7,11 @@
  */
 
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getOrCreateUserId } from '../api/dreamtown.js';
 import { readSavedStar, saveStarId, clearStarId } from '../lib/utils/starSession.js';
+import StarAwakeningScene from '../components/StarAwakeningScene.jsx';
 
 // ── 디버그 로거 (브라우저 콘솔에서 [Cablecar] 태그로 확인) ─────────
 function dbg(step, data) {
@@ -240,9 +241,13 @@ function ErrorView({ message, onRetry, savedStarId }) {
 // ── 메인 ─────────────────────────────────────────────────────────
 export default function CablecarPage() {
   const nav = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // ?code=XXXX → 유료 상품 credential (결제 완료 리디렉트 시 포함)
+  const credentialCode = searchParams.get('code') ?? null;
 
   const [phase, setPhase] = useState('init');
-  // init | processing | input | awakened | error
+  // init | processing | input | awakened | awakening | error
   const [result, setResult] = useState(null);
   const [inputError, setInputError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -255,6 +260,7 @@ export default function CablecarPage() {
     const body = { user_id: userId, place: 'yeosu_cablecar_cabin' };
     if (starId) body.star_id = starId;
     if (wishText) body.wish_text = wishText;
+    if (credentialCode) body.credential_code = credentialCode;
 
     const r = await fetch('/api/cablecar/enter', {
       method: 'POST',
@@ -286,7 +292,8 @@ export default function CablecarPage() {
           dbg('D. saveStarId', data.starId);
           saveStarId(data.starId);
           setResult(data);
-          setPhase('awakened');
+          dbg('E. has_product', data.has_product);
+          setPhase(data.has_product ? 'awakening' : 'awakened');
         })
         .catch(err => {
           dbg('E. 자동 각성 실패', { message: err.message, status: err.status });
@@ -319,8 +326,9 @@ export default function CablecarPage() {
       dbg('G. 신규 별 saveStarId', data.starId);
       saveStarId(data.starId);
       dbg('H. localStorage 확인', localStorage.getItem('dt_active_star_id'));
+      dbg('I. has_product', data.has_product);
       setResult(data);
-      setPhase('awakened');
+      setPhase(data.has_product ? 'awakening' : 'awakened');
     } catch (err) {
       dbg('I. 소원 제출 실패', err.message);
       setInputError(err.message || '별 탄생에 실패했어요. 다시 시도해주세요.');
@@ -349,6 +357,17 @@ export default function CablecarPage() {
     );
   }
 
+  // ── 유료: 별 각성 시그니처 연출 (5초) ───────────────────────────
+  if (phase === 'awakening' && result) {
+    return (
+      <StarAwakeningScene
+        starName={result.starName}
+        onComplete={goToStar}
+      />
+    );
+  }
+
+  // ── 무료: 기본 완료 화면 ─────────────────────────────────────────
   if (phase === 'awakened' && result) {
     return <AwakenedView onNext={goToStar} />;
   }

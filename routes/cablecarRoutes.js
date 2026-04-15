@@ -3,9 +3,14 @@
  * cablecarRoutes.js — 케이블카 캐빈 QR 전용 진입 엔진
  *
  * POST /api/cablecar/enter
+ *   Body: { user_id, star_id?, wish_text?, place?, credential_code? }
+ *
  *   - star_id 없음 → 소원 + 별 생성 + 즉시 각성
  *   - star_id 있음 + status='created' → 각성 (awakened)
  *   - star_id 있음 + 이미 각성 → 재각성 (growing, awaken_count++)
+ *
+ *   - credential_code 있음 + 유효 → has_product: true → 각성 연출 트리거
+ *   - credential_code 없음 or 무효 → has_product: false → 기본 로그 화면
  */
 
 const express = require('express');
@@ -26,14 +31,44 @@ const CABLECAR_STAR_NAMES = [
 ];
 
 function pickStarName(wishText) {
-  // wish_text 첫 글자 코드 기반 결정론적 선택
   const code = (wishText || '').charCodeAt(0) || 0;
   return CABLECAR_STAR_NAMES[code % CABLECAR_STAR_NAMES.length];
 }
 
+// ── credential_code 유효성 검증 ──────────────────────────────────
+// 유효하면 VERIFIED 처리 후 true 반환 / 예외·없음은 false 반환
+async function validateAndRedeemCredential(credentialCode) {
+  if (!credentialCode) return false;
+  try {
+    const r = await db.query(
+      `SELECT id, benefit_type, status
+         FROM benefit_credentials
+        WHERE credential_code = $1
+          AND benefit_type LIKE 'cablecar%'
+          AND status IN ('ISSUED','ACTIVE','VERIFIED')
+          AND (valid_until IS NULL OR valid_until > NOW())
+        LIMIT 1`,
+      [credentialCode]
+    );
+    if (!r.rows.length) return false;
+
+    // VERIFIED 상태로 업데이트 (이미 VERIFIED면 무시)
+    await db.query(
+      `UPDATE benefit_credentials
+          SET status      = 'VERIFIED',
+              verified_at = NOW()
+        WHERE id = $1 AND status != 'REDEEMED'`,
+      [r.rows[0].id]
+    ).catch(() => {}); // verified_at 컬럼 없는 환경 graceful skip
+
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────
 // POST /api/cablecar/enter
-// Body: { user_id, star_id?, wish_text?, place? }
 // ─────────────────────────────────────────────────────────────────────
 router.post('/enter', async (req, res) => {
   const {
@@ -41,11 +76,15 @@ router.post('/enter', async (req, res) => {
     star_id,
     wish_text,
     place = 'yeosu_cablecar_cabin',
+    credential_code,
   } = req.body;
 
   if (!user_id) {
     return res.status(400).json({ error: 'user_id가 필요합니다.' });
   }
+
+  // 유료 상품 여부 확인 (각성 연출 트리거 결정)
+  const hasProduct = await validateAndRedeemCredential(credential_code);
 
   try {
     // ── CASE A: 기존 별 있음 → 각성 or 재각성 ─────────────────────
@@ -63,7 +102,6 @@ router.post('/enter', async (req, res) => {
       }
       const star = starR.rows[0];
 
-      // status 컬럼이 아직 없을 수 있음 (migration 117 미적용 환경)
       const currentStatus  = star.status ?? 'created';
       const currentCount   = star.awaken_count ?? 0;
       const isFirstAwaken  = currentStatus === 'created' || currentStatus === null;
@@ -79,18 +117,17 @@ router.post('/enter', async (req, res) => {
                 updated_at      = NOW()
           WHERE id = $4`,
         [newStatus, place, newCount, star.id]
-      ).catch(() => {
-        // migration 117 미적용 환경 — 컬럼 없으면 graceful skip
-      });
+      ).catch(() => {});
 
       const mode = isFirstAwaken ? 'awakened' : 'reawakened';
-      console.log(`[cablecar/enter] ${mode} | star=${star.id} | count=${newCount}`);
+      console.log(`[cablecar/enter] ${mode} | star=${star.id} | hasProduct=${hasProduct} | count=${newCount}`);
 
       return res.json({
-        success:  true,
+        success:     true,
         mode,
-        starId:   star.id,
-        starName: star.star_name,
+        starId:      star.id,
+        starName:    star.star_name,
+        has_product: hasProduct,
         headline: isFirstAwaken
           ? '당신의 별이 이곳에서 빛나기 시작합니다'
           : '다시 이곳에 오셨네요. 당신의 별이 더 밝아집니다',
@@ -105,7 +142,6 @@ router.post('/enter', async (req, res) => {
     }
     const trimmedWish = wish_text.trim();
 
-    // ① 소원 생성
     const wishR = await db.query(
       `INSERT INTO dt_wishes (user_id, wish_text, gem_type, status, safety_level)
        VALUES ($1, $2, $3, 'converted_to_star', 'GREEN')
@@ -114,7 +150,6 @@ router.post('/enter', async (req, res) => {
     );
     const wishId = wishR.rows[0].id;
 
-    // ② 은하 조회
     const galaxyR = await db.query(
       `SELECT id FROM dt_galaxies WHERE code = $1 LIMIT 1`,
       [GALAXY_CODE]
@@ -124,7 +159,6 @@ router.post('/enter', async (req, res) => {
     }
     const galaxyId = galaxyR.rows[0].id;
 
-    // ③ 별 씨앗
     const seedR = await db.query(
       `INSERT INTO dt_star_seeds (wish_id, seed_name, seed_state)
        VALUES ($1, $2, 'promoted')
@@ -133,7 +167,6 @@ router.post('/enter', async (req, res) => {
     );
     const seedId = seedR.rows[0].id;
 
-    // ④ 별 생성 (즉시 각성 상태로 INSERT)
     const starName = pickStarName(trimmedWish);
     const starSlug = `cablecar-${Date.now()}`;
 
@@ -149,7 +182,6 @@ router.post('/enter', async (req, res) => {
        RETURNING id, star_name`,
       [user_id, wishId, seedId, starName, starSlug, galaxyId, ORIGIN_TYPE, place]
     ).catch(async () => {
-      // migration 117 미적용 — status 컬럼 없이 재시도
       return db.query(
         `INSERT INTO dt_stars
            (user_id, wish_id, star_seed_id, star_name, star_slug, galaxy_id, star_stage)
@@ -160,16 +192,17 @@ router.post('/enter', async (req, res) => {
     });
 
     const newStar = newStarR.rows[0];
-    console.log(`[cablecar/enter] created_and_awakened | star=${newStar.id} | user=${user_id}`);
+    console.log(`[cablecar/enter] created_and_awakened | star=${newStar.id} | hasProduct=${hasProduct}`);
 
     return res.json({
-      success:  true,
-      mode:     'created_and_awakened',
-      starId:   newStar.id,
-      starName: newStar.star_name,
-      headline: '당신의 별이 이곳에서 빛나기 시작합니다',
-      subline:  `${PLACE_LABEL}에서`,
-      nextUrl:  `/my-star/${newStar.id}`,
+      success:     true,
+      mode:        'created_and_awakened',
+      starId:      newStar.id,
+      starName:    newStar.star_name,
+      has_product: hasProduct,
+      headline:    '당신의 별이 이곳에서 빛나기 시작합니다',
+      subline:     `${PLACE_LABEL}에서`,
+      nextUrl:     `/my-star/${newStar.id}`,
     });
 
   } catch (err) {
