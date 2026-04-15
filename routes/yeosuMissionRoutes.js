@@ -3,20 +3,18 @@
  * prefix: /api/yeosu-missions
  *
  * GET  /              ?star_id=xxx  — 5개 미션 목록 + 완료 현황
- * POST /complete                    — 미션 완료 (100P)
- * POST /daily-log                   — 일일 감정 로그 (50P)
- * GET  /points        ?star_id=xxx  — star 총 포인트
+ * POST /complete                    — 미션 완료 (100P) + 전체 완료 시 +500P 보너스
+ * POST /daily-log                   — 일일 감정 로그 (50P, 1일 1회)
+ * GET  /points        ?star_id=xxx  — 미션P + 로그P + 보너스P 합계
  */
 
 const router = require('express').Router();
 const db     = require('../database/connection');
 const { ValidationError, NotFoundError } = require('../utils/errors');
 
-// ── 헬퍼: star_id 존재 확인 ──────────────────────────────────────
-async function assertStarExists(starId) {
-  const r = await db.query('SELECT id FROM dt_stars WHERE id = $1', [starId]);
-  if (!r.rows.length) throw new NotFoundError('Star', starId);
-}
+const TOTAL_MISSIONS   = 5;
+const BONUS_POINTS     = 500;
+const BONUS_TYPE       = 'all_missions_complete';
 
 // ── GET / — 미션 목록 + 완료 현황 ───────────────────────────────
 router.get('/', async (req, res, next) => {
@@ -24,9 +22,9 @@ router.get('/', async (req, res, next) => {
     const { star_id } = req.query;
     if (!star_id) throw new ValidationError('star_id 파라미터가 필요합니다.');
 
-    // 미션 마스터
+    // 미션 마스터 (question + answers 포함)
     const mR = await db.query(
-      'SELECT * FROM dt_yeosu_missions ORDER BY sort_order'
+      'SELECT id, title, description, icon, points, question, answers, sort_order FROM dt_yeosu_missions ORDER BY sort_order'
     );
 
     // 완료 기록
@@ -47,13 +45,21 @@ router.get('/', async (req, res, next) => {
     );
     const todayLog = dlR.rows[0] ?? null;
 
+    // 보너스 지급 여부
+    const bonusR = await db.query(
+      'SELECT id FROM dt_star_bonuses WHERE star_id = $1 AND bonus_type = $2',
+      [star_id, BONUS_TYPE]
+    ).catch(() => ({ rows: [] }));
+    const bonusGiven = bonusR.rows.length > 0;
+
     const missions = mR.rows.map(m => ({
       id:          m.id,
       title:       m.title,
       description: m.description,
       icon:        m.icon,
       points:      m.points,
-      emotions:    m.emotions,
+      question:    m.question   ?? '이 순간 어떤 감정인가요?',
+      answers:     m.answers    ?? [],
       completed:   !!completedMap[m.id],
       completion:  completedMap[m.id] ?? null,
     }));
@@ -61,12 +67,14 @@ router.get('/', async (req, res, next) => {
     const completedCount = Object.keys(completedMap).length;
 
     res.json({
-      success:        true,
+      success:         true,
       missions,
       completed_count: completedCount,
       total_count:     missions.length,
       today_log:       todayLog,
       today_log_done:  !!todayLog,
+      bonus_given:     bonusGiven,
+      all_complete:    completedCount >= TOTAL_MISSIONS,
     });
   } catch (err) {
     next(err);
@@ -97,9 +105,9 @@ router.post('/complete', async (req, res, next) => {
     );
     if (existing.rows.length) {
       return res.status(409).json({
-        success:  false,
-        error:    'ALREADY_COMPLETED',
-        message:  '이미 완료한 미션입니다.',
+        success: false,
+        error:   'ALREADY_COMPLETED',
+        message: '이미 완료한 미션이에요.',
       });
     }
 
@@ -118,13 +126,32 @@ router.post('/complete', async (req, res, next) => {
     );
     const completedCount = countR.rows[0]?.cnt ?? 0;
 
+    // 5개 전체 완료 보너스 (1회)
+    let bonusAwarded = 0;
+    let allComplete  = false;
+    if (completedCount >= TOTAL_MISSIONS) {
+      allComplete = true;
+      const bonusR = await db.query(
+        `INSERT INTO dt_star_bonuses (star_id, bonus_type, points_awarded)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (star_id, bonus_type) DO NOTHING
+         RETURNING id`,
+        [star_id, BONUS_TYPE, BONUS_POINTS]
+      ).catch(() => ({ rows: [] }));
+      if (bonusR.rows.length > 0) {
+        bonusAwarded = BONUS_POINTS;
+      }
+    }
+
     res.json({
       success:         true,
       mission_id,
       mission_title:   mission.title,
       points_awarded:  mission.points,
+      bonus_awarded:   bonusAwarded,
       emotion:         emotion ?? null,
       completed_count: completedCount,
+      all_complete:    allComplete,
     });
   } catch (err) {
     next(err);
@@ -150,10 +177,10 @@ router.post('/daily-log', async (req, res, next) => {
     );
     if (existing.rows.length) {
       return res.status(409).json({
-        success:        false,
-        error:          'ALREADY_LOGGED',
-        message:        '오늘은 이미 로그를 남겼어요.',
-        existing_log:   existing.rows[0],
+        success:      false,
+        error:        'ALREADY_LOGGED',
+        message:      '오늘은 이미 기록했어요.',
+        existing_log: existing.rows[0],
       });
     }
 
@@ -181,23 +208,31 @@ router.get('/points', async (req, res, next) => {
     const { star_id } = req.query;
     if (!star_id) throw new ValidationError('star_id 파라미터가 필요합니다.');
 
-    const mcR = await db.query(
-      'SELECT COALESCE(SUM(points_awarded),0)::int AS total FROM dt_mission_completions WHERE star_id = $1',
-      [star_id]
-    );
-    const dlR = await db.query(
-      'SELECT COALESCE(SUM(points_awarded),0)::int AS total FROM dt_daily_logs WHERE star_id = $1',
-      [star_id]
-    );
+    const [mcR, dlR, bonusR] = await Promise.all([
+      db.query(
+        'SELECT COALESCE(SUM(points_awarded),0)::int AS total FROM dt_mission_completions WHERE star_id = $1',
+        [star_id]
+      ),
+      db.query(
+        'SELECT COALESCE(SUM(points_awarded),0)::int AS total FROM dt_daily_logs WHERE star_id = $1',
+        [star_id]
+      ),
+      db.query(
+        'SELECT COALESCE(SUM(points_awarded),0)::int AS total FROM dt_star_bonuses WHERE star_id = $1',
+        [star_id]
+      ).catch(() => ({ rows: [{ total: 0 }] })),
+    ]);
 
     const missionPoints = mcR.rows[0]?.total ?? 0;
     const logPoints     = dlR.rows[0]?.total ?? 0;
+    const bonusPoints   = bonusR.rows[0]?.total ?? 0;
 
     res.json({
       success:        true,
       mission_points: missionPoints,
       log_points:     logPoints,
-      total_points:   missionPoints + logPoints,
+      bonus_points:   bonusPoints,
+      total_points:   missionPoints + logPoints + bonusPoints,
     });
   } catch (err) {
     next(err);
