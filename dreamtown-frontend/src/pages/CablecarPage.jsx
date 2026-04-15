@@ -10,7 +10,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getOrCreateUserId } from '../api/dreamtown.js';
-import { readSavedStar, saveStarId } from '../lib/utils/starSession.js';
+import { readSavedStar, saveStarId, clearStarId } from '../lib/utils/starSession.js';
+
+// ── 디버그 로거 (브라우저 콘솔에서 [Cablecar] 태그로 확인) ─────────
+function dbg(step, data) {
+  console.log(`[Cablecar] ${step}`, data ?? '');
+}
 
 const S = {
   page: {
@@ -211,14 +216,22 @@ function WishInputView({ onSubmit, loading, error }) {
 }
 
 // ── 에러 화면 ─────────────────────────────────────────────────────
-function ErrorView({ message, onRetry }) {
+function ErrorView({ message, onRetry, savedStarId }) {
   return (
     <div style={S.page}>
       <motion.div style={S.card} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         <div style={{ fontSize: 40, marginBottom: 16 }}>⚠️</div>
         <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 12 }}>문제가 생겼어요</div>
-        <div style={{ fontSize: 14, color: '#f87171', marginBottom: 24 }}>{message}</div>
+        <div style={{ fontSize: 13, color: '#f87171', marginBottom: 24, lineHeight: 1.5 }}>{message}</div>
         <button style={S.btn} onClick={onRetry}>다시 시도</button>
+        {savedStarId && (
+          <button
+            style={{ ...S.btn, background: 'transparent', border: '1px solid rgba(155,135,245,0.3)', color: '#9B87F5', marginTop: 8 }}
+            onClick={() => window.location.href = `/my-star/${savedStarId}`}
+          >
+            내 별 바로 보기
+          </button>
+        )}
       </motion.div>
     </div>
   );
@@ -236,6 +249,9 @@ export default function CablecarPage() {
 
   const callEnter = async ({ starId, wishText }) => {
     const userId = getOrCreateUserId();
+    dbg('A. userId', userId);
+    dbg('B. starId 전달값', starId ?? '(없음 — 신규 생성)');
+
     const body = { user_id: userId, place: 'yeosu_cablecar_cabin' };
     if (starId) body.star_id = starId;
     if (wishText) body.wish_text = wishText;
@@ -246,30 +262,49 @@ export default function CablecarPage() {
       body: JSON.stringify(body),
     });
     const data = await r.json();
-    if (!r.ok || !data.success) throw new Error(data.error || '오류가 발생했습니다.');
+    dbg('C. API 응답', { status: r.status, ...data });
+
+    if (!r.ok || !data.success) {
+      const err = new Error(data.error || '오류가 발생했습니다.');
+      err.status = r.status;
+      throw err;
+    }
+    if (!data.starId) throw new Error('API가 starId를 반환하지 않았습니다.');
     return data;
   };
 
   // ── 마운트 시 기존 별 확인 ──────────────────────────────────────
   useEffect(() => {
     const existingStarId = readSavedStar();
+    const userId = getOrCreateUserId();
+    dbg('0. 마운트', { existingStarId: existingStarId ?? '없음', userId });
 
     if (existingStarId) {
-      // 기존 별 → 자동 각성/재각성 처리
       setPhase('processing');
       callEnter({ starId: existingStarId })
         .then(data => {
+          dbg('D. saveStarId', data.starId);
           saveStarId(data.starId);
           setResult(data);
           setPhase('awakened');
         })
         .catch(err => {
-          console.error('[cablecar] 자동 각성 실패:', err.message);
-          setPhase('error');
-          setResult({ message: err.message });
+          dbg('E. 자동 각성 실패', { message: err.message, status: err.status });
+          // ── 복구 로직 ──────────────────────────────────────────────
+          if (err.status === 404) {
+            // 저장된 starId가 DB에 없음 (삭제됐거나 user_id 불일치)
+            // → localStorage 초기화 후 소원 입력 화면으로 폴백
+            dbg('F. 404 감지 — localStorage 초기화 후 소원 입력으로 폴백');
+            clearStarId();
+            setPhase('input');
+          } else {
+            // 네트워크/서버 오류는 에러 화면 (재시도 가능)
+            setPhase('error');
+            setResult({ message: err.message });
+          }
         });
     } else {
-      // 새 사용자 → 소원 입력 화면
+      dbg('0-B. 저장된 별 없음 → 소원 입력 화면');
       setPhase('input');
     }
   }, []);
@@ -281,10 +316,13 @@ export default function CablecarPage() {
     setInputError('');
     try {
       const data = await callEnter({ wishText: wishText.trim() });
+      dbg('G. 신규 별 saveStarId', data.starId);
       saveStarId(data.starId);
+      dbg('H. localStorage 확인', localStorage.getItem('dt_active_star_id'));
       setResult(data);
       setPhase('awakened');
     } catch (err) {
+      dbg('I. 소원 제출 실패', err.message);
       setInputError(err.message || '별 탄생에 실패했어요. 다시 시도해주세요.');
     } finally {
       setLoading(false);
@@ -319,6 +357,7 @@ export default function CablecarPage() {
     <ErrorView
       message={result?.message || '알 수 없는 오류입니다'}
       onRetry={() => window.location.reload()}
+      savedStarId={readSavedStar()}
     />
   );
 }
