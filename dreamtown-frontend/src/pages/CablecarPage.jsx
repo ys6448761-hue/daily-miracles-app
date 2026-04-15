@@ -1,9 +1,17 @@
 /**
  * CablecarPage.jsx — 케이블카 캐빈 QR 전용 진입 엔진
- * 경로: /cablecar
+ * 경로: /cablecar          (무료)
+ *       /cablecar?code=XXX (유료 — 결제 완료 리디렉트)
  *
- * 처음 사용자 → 소원 입력 → 별 생성 + 즉시 각성 → /my-star/:id
- * 기존 사용자 → 자동 각성/재각성 → /my-star/:id
+ * ── 분기 ──────────────────────────────────────────────────────────
+ *
+ *  [유료 + 기존 별]  → 각성 연출 5초 → /my-star/:id
+ *  [유료 + 별 없음]  → 소원 입력 → 별 생성 → 각성 연출 5초 → /my-star/:id
+ *  [무료 + 기존 별]  → "방문 기록됨" 화면 (각성 없음)
+ *  [무료 + 별 없음]  → 상품 구매 안내 화면 (별 생성 없음)
+ *
+ * ── 원칙 ──────────────────────────────────────────────────────────
+ *  "각성은 무료 기능이 아니라 상품이다"
  */
 
 import { useEffect, useState } from 'react';
@@ -13,11 +21,11 @@ import { getOrCreateUserId } from '../api/dreamtown.js';
 import { readSavedStar, saveStarId, clearStarId } from '../lib/utils/starSession.js';
 import StarAwakeningScene from '../components/StarAwakeningScene.jsx';
 
-// ── 디버그 로거 (브라우저 콘솔에서 [Cablecar] 태그로 확인) ─────────
 function dbg(step, data) {
   console.log(`[Cablecar] ${step}`, data ?? '');
 }
 
+// ── 공통 스타일 ──────────────────────────────────────────────────
 const S = {
   page: {
     minHeight: '100vh',
@@ -72,6 +80,21 @@ const S = {
     fontWeight: 700,
     cursor: 'pointer',
     marginTop: 8,
+    fontFamily: "'Noto Sans KR', sans-serif",
+  },
+  btnOutline: {
+    display: 'block',
+    width: '100%',
+    padding: '13px 0',
+    borderRadius: 14,
+    border: '1px solid rgba(155,135,245,0.3)',
+    background: 'transparent',
+    color: '#9B87F5',
+    fontSize: 14,
+    fontWeight: 600,
+    cursor: 'pointer',
+    marginTop: 8,
+    fontFamily: "'Noto Sans KR', sans-serif",
   },
   btnDisabled: {
     background: 'rgba(155,135,245,0.2)',
@@ -93,24 +116,15 @@ const S = {
     fontFamily: "'Noto Sans KR', sans-serif",
     marginBottom: 4,
   },
-  error: {
-    fontSize: 13,
-    color: '#f87171',
-    marginTop: 12,
-    lineHeight: 1.5,
-  },
+  error: { fontSize: 13, color: '#f87171', marginTop: 12, lineHeight: 1.5 },
   dot: {
-    width: 10,
-    height: 10,
-    borderRadius: '50%',
-    background: '#9B87F5',
-    display: 'inline-block',
-    margin: '0 4px',
+    width: 10, height: 10, borderRadius: '50%',
+    background: '#9B87F5', display: 'inline-block', margin: '0 4px',
   },
 };
 
-// ── 로딩 (자동 각성 처리 중) ──────────────────────────────────────
-function ProcessingView({ headline }) {
+// ── 로딩 ──────────────────────────────────────────────────────────
+function ProcessingView() {
   return (
     <div style={S.page}>
       <motion.div style={S.card} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -118,74 +132,33 @@ function ProcessingView({ headline }) {
         <div style={{ marginBottom: 20 }}>
           {[0, 1, 2].map(i => (
             <motion.span
-              key={i}
-              style={S.dot}
+              key={i} style={S.dot}
               animate={{ opacity: [0.3, 1, 0.3], y: [0, -6, 0] }}
               transition={{ duration: 1, delay: i * 0.2, repeat: Infinity }}
             />
           ))}
         </div>
         <div style={{ fontSize: 15, color: '#C4BAE0', lineHeight: 1.7 }}>
-          {headline || '별과 연결하는 중...'}
+          확인하는 중...
         </div>
       </motion.div>
     </div>
   );
 }
 
-// ── 완료 화면 (단순) ─────────────────────────────────────────────
-function AwakenedView({ onNext }) {
-  return (
-    <div style={S.page}>
-      <motion.div
-        style={{ ...S.card, padding: '48px 24px', textAlign: 'center' }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4 }}
-      >
-        <div style={{ fontSize: 18, fontWeight: 700, color: '#E8E4F0', marginBottom: 6 }}>
-          이 순간이 기록되었습니다
-        </div>
-        <div style={{ fontSize: 13, color: '#7A6E9C', marginBottom: 32 }}>
-          여수 케이블카에서
-        </div>
-        <button
-          onClick={onNext}
-          style={{
-            ...S.btn,
-            marginTop: 0,
-            padding: '13px 0',
-            fontSize: 14,
-          }}
-        >
-          내 별 보기
-        </button>
-      </motion.div>
-    </div>
-  );
-}
-
-// ── 소원 입력 화면 (처음 사용자) ─────────────────────────────────
+// ── [유료] 소원 입력 ──────────────────────────────────────────────
 function WishInputView({ onSubmit, loading, error }) {
   const [text, setText] = useState('');
-
   return (
     <div style={S.page}>
-      <motion.div
-        style={S.card}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
+      <motion.div style={S.card} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>🚡</div>
         <div style={S.label}>여수 케이블카 캐빈</div>
-        <div style={S.headline}>
-          이 순간,<br />소원을 담아 별을 탄생시키세요
-        </div>
+        <div style={S.headline}>이 순간,<br />소원을 담아 별을 탄생시키세요</div>
         <div style={S.subline}>
           케이블카 위에서 시작한 소원은<br />
           별이 되어 하늘에 남습니다
         </div>
-
         <form onSubmit={e => { e.preventDefault(); onSubmit(text); }}>
           <textarea
             value={text}
@@ -203,10 +176,7 @@ function WishInputView({ onSubmit, loading, error }) {
           <button
             type="submit"
             disabled={loading || !text.trim()}
-            style={{
-              ...S.btn,
-              ...(loading || !text.trim() ? S.btnDisabled : {}),
-            }}
+            style={{ ...S.btn, ...(loading || !text.trim() ? S.btnDisabled : {}) }}
           >
             {loading ? '별 탄생 중...' : '별 탄생시키기 ✨'}
           </button>
@@ -216,8 +186,102 @@ function WishInputView({ onSubmit, loading, error }) {
   );
 }
 
-// ── 에러 화면 ─────────────────────────────────────────────────────
+// ── [무료 + 기존별] 방문 기록만 ──────────────────────────────────
+function BasicLogView({ onNext }) {
+  return (
+    <div style={S.page}>
+      <motion.div
+        style={{ ...S.card, padding: '40px 24px' }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+      >
+        <div style={{ fontSize: 40, marginBottom: 16 }}>🚡</div>
+        <div style={{ fontSize: 17, fontWeight: 700, color: '#E8E4F0', marginBottom: 8 }}>
+          여수에 왔어요
+        </div>
+        <div style={{ fontSize: 13, color: '#7A6E9C', marginBottom: 6, lineHeight: 1.6 }}>
+          이 순간이 기록됐어요
+        </div>
+        <div style={{
+          fontSize: 12, color: '#5a5370',
+          marginBottom: 28, lineHeight: 1.6,
+          padding: '10px 12px',
+          background: 'rgba(155,135,245,0.06)',
+          borderRadius: 10,
+          border: '1px solid rgba(155,135,245,0.1)',
+        }}>
+          별 각성은 케이블카 상품 구매 후<br />이용할 수 있어요
+        </div>
+        <button onClick={onNext} style={{ ...S.btn, marginTop: 0, fontSize: 14, padding: '13px 0' }}>
+          내 별 보기
+        </button>
+      </motion.div>
+    </div>
+  );
+}
+
+// ── [무료 + 별 없음] 상품 구매 안내 ──────────────────────────────
+function ProductCTAView({ onShop }) {
+  return (
+    <div style={S.page}>
+      <motion.div
+        style={S.card}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <div style={{ fontSize: 48, marginBottom: 16 }}>⭐</div>
+        <div style={S.label}>여수 케이블카 캐빈</div>
+        <div style={S.headline}>케이블카에서<br />별을 탄생시키세요</div>
+        <div style={S.subline}>
+          별 탄생과 각성 연출은<br />
+          케이블카 상품 구매 후 이용 가능해요
+        </div>
+
+        {/* 상품 카드 2종 */}
+        <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+          {[
+            { name: '베이직', price: '19,900원', desc: '기록 + 내 별 연결' },
+            { name: '프리미엄', price: '24,900원', desc: '기억 확장 + 장소 연결', highlight: true },
+          ].map(p => (
+            <div
+              key={p.name}
+              style={{
+                flex: 1,
+                padding: '12px 10px',
+                borderRadius: 12,
+                background: p.highlight ? 'rgba(155,135,245,0.12)' : 'rgba(255,255,255,0.04)',
+                border: p.highlight ? '1px solid rgba(155,135,245,0.35)' : '1px solid rgba(255,255,255,0.08)',
+                textAlign: 'center',
+              }}
+            >
+              <div style={{ fontSize: 12, fontWeight: 700, color: p.highlight ? '#9B87F5' : '#E8E4F0', marginBottom: 4 }}>
+                {p.name}
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: '#FFD76A', marginBottom: 4 }}>
+                {p.price}
+              </div>
+              <div style={{ fontSize: 10, color: '#7A6E9C', lineHeight: 1.4 }}>
+                {p.desc}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <button onClick={onShop} style={S.btn}>
+          상품 보러가기 →
+        </button>
+        <div style={{ fontSize: 11, color: '#5a5370', marginTop: 12 }}>
+          이미 구매하셨다면 구매 완료 화면에서 접속해주세요
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// ── 에러 ──────────────────────────────────────────────────────────
 function ErrorView({ message, onRetry, savedStarId }) {
+  const nav = useNavigate();
   return (
     <div style={S.page}>
       <motion.div style={S.card} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -227,8 +291,8 @@ function ErrorView({ message, onRetry, savedStarId }) {
         <button style={S.btn} onClick={onRetry}>다시 시도</button>
         {savedStarId && (
           <button
-            style={{ ...S.btn, background: 'transparent', border: '1px solid rgba(155,135,245,0.3)', color: '#9B87F5', marginTop: 8 }}
-            onClick={() => window.location.href = `/my-star/${savedStarId}`}
+            style={S.btnOutline}
+            onClick={() => nav(`/my-star/${savedStarId}`)}
           >
             내 별 바로 보기
           </button>
@@ -243,110 +307,130 @@ export default function CablecarPage() {
   const nav = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // ?code=XXXX → 유료 상품 credential (결제 완료 리디렉트 시 포함)
+  // 유료 여부: 결제 완료 후 /cablecar?code=XXXX 로 리디렉트됨
   const credentialCode = searchParams.get('code') ?? null;
+  const isPaid         = !!credentialCode;
 
-  const [phase, setPhase] = useState('init');
-  // init | processing | input | awakened | awakening | error
-  const [result, setResult] = useState(null);
+  const [phase,      setPhase]      = useState('init');
+  // init | processing | input | awakening | logged_only | no_product | error
+  const [result,     setResult]     = useState(null);
   const [inputError, setInputError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading,    setLoading]    = useState(false);
 
+  // ── API 호출 ──────────────────────────────────────────────────
   const callEnter = async ({ starId, wishText }) => {
     const userId = getOrCreateUserId();
     dbg('A. userId', userId);
-    dbg('B. starId 전달값', starId ?? '(없음 — 신규 생성)');
+    dbg('B. isPaid', isPaid);
+    dbg('C. starId', starId ?? '(없음)');
 
     const body = { user_id: userId, place: 'yeosu_cablecar_cabin' };
-    if (starId) body.star_id = starId;
-    if (wishText) body.wish_text = wishText;
-    if (credentialCode) body.credential_code = credentialCode;
+    if (starId)          body.star_id          = starId;
+    if (wishText)        body.wish_text         = wishText;
+    if (credentialCode)  body.credential_code   = credentialCode;
 
-    const r = await fetch('/api/cablecar/enter', {
-      method: 'POST',
+    const r    = await fetch('/api/cablecar/enter', {
+      method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body:    JSON.stringify(body),
     });
     const data = await r.json();
-    dbg('C. API 응답', { status: r.status, ...data });
+    dbg('D. API 응답', { status: r.status, mode: data.mode, has_product: data.has_product });
 
-    if (!r.ok || !data.success) {
-      const err = new Error(data.error || '오류가 발생했습니다.');
+    if (!r.ok) {
+      const err = new Error(data.error || data.message || '오류가 발생했습니다.');
       err.status = r.status;
       throw err;
     }
-    if (!data.starId) throw new Error('API가 starId를 반환하지 않았습니다.');
     return data;
   };
 
-  // ── 마운트 시 기존 별 확인 ──────────────────────────────────────
+  // ── 마운트 ───────────────────────────────────────────────────
   useEffect(() => {
     const existingStarId = readSavedStar();
-    const userId = getOrCreateUserId();
-    dbg('0. 마운트', { existingStarId: existingStarId ?? '없음', userId });
+    dbg('0. 마운트', { existingStarId: existingStarId ?? '없음', isPaid });
 
-    if (existingStarId) {
-      setPhase('processing');
-      callEnter({ starId: existingStarId })
-        .then(data => {
-          dbg('D. saveStarId', data.starId);
+    // [무료 + 별 없음] → 즉시 상품 안내 (API 불필요)
+    if (!isPaid && !existingStarId) {
+      dbg('0-A. 무료 + 별 없음 → no_product');
+      setPhase('no_product');
+      return;
+    }
+
+    // [유료 + 별 없음] → 소원 입력 (API 불필요)
+    if (isPaid && !existingStarId) {
+      dbg('0-B. 유료 + 별 없음 → input');
+      setPhase('input');
+      return;
+    }
+
+    // [별 있음] → API 호출 (유료면 각성, 무료면 logged_only)
+    setPhase('processing');
+    callEnter({ starId: existingStarId })
+      .then(data => {
+        if (data.has_product) {
+          dbg('1. 유료 각성 → awakening', data.starName);
           saveStarId(data.starId);
           setResult(data);
-          dbg('E. has_product', data.has_product);
-          setPhase(data.has_product ? 'awakening' : 'awakened');
-        })
-        .catch(err => {
-          dbg('E. 자동 각성 실패', { message: err.message, status: err.status });
-          // ── 복구 로직 ──────────────────────────────────────────────
-          if (err.status === 404) {
-            // 저장된 starId가 DB에 없음 (삭제됐거나 user_id 불일치)
-            // → localStorage 초기화 후 소원 입력 화면으로 폴백
-            dbg('F. 404 감지 — localStorage 초기화 후 소원 입력으로 폴백');
-            clearStarId();
-            setPhase('input');
-          } else {
-            // 네트워크/서버 오류는 에러 화면 (재시도 가능)
-            setPhase('error');
-            setResult({ message: err.message });
-          }
-        });
-    } else {
-      dbg('0-B. 저장된 별 없음 → 소원 입력 화면');
-      setPhase('input');
-    }
-  }, []);
+          setPhase('awakening');
+        } else {
+          // logged_only: 방문 기록됨, 각성 없음
+          dbg('1. 무료 방문 → logged_only', data.starId);
+          saveStarId(data.starId);
+          setResult(data);
+          setPhase('logged_only');
+        }
+      })
+      .catch(err => {
+        dbg('2. 오류', { message: err.message, status: err.status });
+        if (err.status === 404) {
+          clearStarId();
+          setPhase(isPaid ? 'input' : 'no_product');
+        } else {
+          setPhase('error');
+          setResult({ message: err.message });
+        }
+      });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── 소원 제출 ──────────────────────────────────────────────────
+  // ── [유료] 소원 제출 ─────────────────────────────────────────
   const handleWishSubmit = async (wishText) => {
     if (!wishText.trim()) { setInputError('소원을 입력해주세요.'); return; }
     setLoading(true);
     setInputError('');
     try {
       const data = await callEnter({ wishText: wishText.trim() });
-      dbg('G. 신규 별 saveStarId', data.starId);
+      dbg('3. 신규 별 생성', data.starId);
       saveStarId(data.starId);
-      dbg('H. localStorage 확인', localStorage.getItem('dt_active_star_id'));
-      dbg('I. has_product', data.has_product);
       setResult(data);
-      setPhase(data.has_product ? 'awakening' : 'awakened');
+      setPhase('awakening');
     } catch (err) {
-      dbg('I. 소원 제출 실패', err.message);
+      dbg('4. 소원 제출 실패', err.message);
       setInputError(err.message || '별 탄생에 실패했어요. 다시 시도해주세요.');
     } finally {
       setLoading(false);
     }
   };
 
-  // ── 완료 후 이동 ──────────────────────────────────────────────
+  // ── 내 별로 이동 ─────────────────────────────────────────────
   const goToStar = () => {
     if (result?.nextUrl) nav(result.nextUrl);
+    else if (result?.starId) nav(`/my-star/${result.starId}`);
     else nav('/my-star');
   };
 
+  // ── 렌더 ─────────────────────────────────────────────────────
+
   if (phase === 'init' || phase === 'processing') {
-    return <ProcessingView headline={phase === 'processing' ? '별과 연결하는 중...' : undefined} />;
+    return <ProcessingView />;
   }
 
+  // [무료 + 별 없음] 상품 안내
+  if (phase === 'no_product') {
+    return <ProductCTAView onShop={() => nav('/shop')} />;
+  }
+
+  // [유료 + 별 없음] 소원 입력
   if (phase === 'input') {
     return (
       <WishInputView
@@ -357,7 +441,7 @@ export default function CablecarPage() {
     );
   }
 
-  // ── 유료: 별 각성 시그니처 연출 (5초) ───────────────────────────
+  // [유료] 별 각성 시그니처 연출 (5초)
   if (phase === 'awakening' && result) {
     return (
       <StarAwakeningScene
@@ -367,11 +451,12 @@ export default function CablecarPage() {
     );
   }
 
-  // ── 무료: 기본 완료 화면 ─────────────────────────────────────────
-  if (phase === 'awakened' && result) {
-    return <AwakenedView onNext={goToStar} />;
+  // [무료 + 기존별] 방문 기록
+  if (phase === 'logged_only') {
+    return <BasicLogView onNext={goToStar} />;
   }
 
+  // 에러
   return (
     <ErrorView
       message={result?.message || '알 수 없는 오류입니다'}

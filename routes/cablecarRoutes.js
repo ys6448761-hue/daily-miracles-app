@@ -5,12 +5,16 @@
  * POST /api/cablecar/enter
  *   Body: { user_id, star_id?, wish_text?, place?, credential_code? }
  *
- *   - star_id 없음 → 소원 + 별 생성 + 즉시 각성
- *   - star_id 있음 + status='created' → 각성 (awakened)
- *   - star_id 있음 + 이미 각성 → 재각성 (growing, awaken_count++)
+ * ── 분기 로직 ──────────────────────────────────────────────────────
  *
- *   - credential_code 있음 + 유효 → has_product: true → 각성 연출 트리거
- *   - credential_code 없음 or 무효 → has_product: false → 기본 로그 화면
+ *  [유료 + 기존 별]  → 각성/재각성 (DB 상태 변경) → mode: awakened|reawakened
+ *  [유료 + 별 없음]  → 소원 + 별 생성 + 즉시 각성 → mode: created_and_awakened
+ *  [무료 + 기존 별]  → 방문 로그만, DB 상태 변경 없음 → mode: logged_only
+ *  [무료 + 별 없음]  → 프론트에서 차단 (여기 도달 시 no_product 반환)
+ *
+ * ── 핵심 원칙 ──────────────────────────────────────────────────────
+ *  "각성은 무료 기능이 아니라 상품이다"
+ *  credential_code 검증 실패 = has_product: false → 각성 없음
  */
 
 const express = require('express');
@@ -18,12 +22,11 @@ const router  = express.Router();
 const { v4: uuidv4 } = require('uuid');
 const db      = require('../database/db');
 
-const PLACE_LABEL  = '여수 케이블카 캐빈';
-const GALAXY_CODE  = 'challenge';
-const GEM_TYPE     = 'citrine';
-const ORIGIN_TYPE  = 'cablecar';
+const PLACE_LABEL = '여수 케이블카 캐빈';
+const GALAXY_CODE = 'challenge';
+const GEM_TYPE    = 'citrine';
+const ORIGIN_TYPE = 'cablecar';
 
-// ── 케이블카 테마 별 이름 풀 ────────────────────────────────────────
 const CABLECAR_STAR_NAMES = [
   '용기의 별', '도전의 빛', '비상의 별', '하늘의 빛',
   '바람의 별', '높이의 별', '새벽의 별', '의지의 빛',
@@ -35,9 +38,8 @@ function pickStarName(wishText) {
   return CABLECAR_STAR_NAMES[code % CABLECAR_STAR_NAMES.length];
 }
 
-// ── credential_code 유효성 검증 ──────────────────────────────────
-// 유효하면 VERIFIED 처리 후 true 반환 / 예외·없음은 false 반환
-async function validateAndRedeemCredential(credentialCode) {
+// ── credential_code 검증 (실패 시 항상 false 반환) ─────────────────
+async function validateCredential(credentialCode) {
   if (!credentialCode) return false;
   try {
     const r = await db.query(
@@ -52,14 +54,13 @@ async function validateAndRedeemCredential(credentialCode) {
     );
     if (!r.rows.length) return false;
 
-    // VERIFIED 상태로 업데이트 (이미 VERIFIED면 무시)
+    // VERIFIED 처리 (already VERIFIED: no-op)
     await db.query(
       `UPDATE benefit_credentials
-          SET status      = 'VERIFIED',
-              verified_at = NOW()
+          SET status = 'VERIFIED', verified_at = NOW()
         WHERE id = $1 AND status != 'REDEEMED'`,
       [r.rows[0].id]
-    ).catch(() => {}); // verified_at 컬럼 없는 환경 graceful skip
+    ).catch(() => {}); // verified_at 없는 환경 graceful skip
 
     return true;
   } catch (_) {
@@ -80,14 +81,13 @@ router.post('/enter', async (req, res) => {
   } = req.body;
 
   if (!user_id) {
-    return res.status(400).json({ error: 'user_id가 필요합니다.' });
+    return res.status(400).json({ success: false, error: 'user_id가 필요합니다.' });
   }
 
-  // 유료 상품 여부 확인 (각성 연출 트리거 결정)
-  const hasProduct = await validateAndRedeemCredential(credential_code);
+  const hasProduct = await validateCredential(credential_code);
 
   try {
-    // ── CASE A: 기존 별 있음 → 각성 or 재각성 ─────────────────────
+    // ── CASE A: 기존 별 있음 ───────────────────────────────────────
     if (star_id) {
       const starR = await db.query(
         `SELECT id, star_name, status, awaken_count
@@ -98,50 +98,77 @@ router.post('/enter', async (req, res) => {
       );
 
       if (!starR.rows[0]) {
-        return res.status(404).json({ error: '별을 찾을 수 없습니다.' });
+        return res.status(404).json({ success: false, error: '별을 찾을 수 없습니다.' });
       }
       const star = starR.rows[0];
 
-      const currentStatus  = star.status ?? 'created';
-      const currentCount   = star.awaken_count ?? 0;
-      const isFirstAwaken  = currentStatus === 'created' || currentStatus === null;
-      const newStatus      = isFirstAwaken ? 'awakened' : 'growing';
-      const newCount       = currentCount + 1;
+      // ── 무료: 방문 로그만, 각성 없음 ─────────────────────────────
+      if (!hasProduct) {
+        console.log(`[cablecar/enter] logged_only | star=${star.id} | user=${user_id}`);
+        return res.json({
+          success:     true,
+          mode:        'logged_only',
+          starId:      star.id,
+          starName:    star.star_name,
+          has_product: false,
+          nextUrl:     `/my-star/${star.id}`,
+        });
+      }
+
+      // ── 유료: 각성 or 재각성 ─────────────────────────────────────
+      const currentStatus = star.status ?? 'created';
+      const currentCount  = star.awaken_count ?? 0;
+      const isFirstAwaken = currentStatus === 'created' || currentStatus === null;
+      const newStatus     = isFirstAwaken ? 'awakened' : 'growing';
+      const newCount      = currentCount + 1;
 
       await db.query(
         `UPDATE dt_stars
-            SET status          = $1,
-                awakened_at     = COALESCE(awakened_at, NOW()),
-                awakened_place  = COALESCE(awakened_place, $2),
-                awaken_count    = $3,
-                updated_at      = NOW()
+            SET status         = $1,
+                awakened_at    = COALESCE(awakened_at, NOW()),
+                awakened_place = COALESCE(awakened_place, $2),
+                awaken_count   = $3,
+                updated_at     = NOW()
           WHERE id = $4`,
         [newStatus, place, newCount, star.id]
       ).catch(() => {});
 
       const mode = isFirstAwaken ? 'awakened' : 'reawakened';
-      console.log(`[cablecar/enter] ${mode} | star=${star.id} | hasProduct=${hasProduct} | count=${newCount}`);
+      console.log(`[cablecar/enter] ${mode} | star=${star.id} | hasProduct=true | count=${newCount}`);
 
       return res.json({
         success:     true,
         mode,
         starId:      star.id,
         starName:    star.star_name,
-        has_product: hasProduct,
-        headline: isFirstAwaken
+        has_product: true,
+        headline:    isFirstAwaken
           ? '당신의 별이 이곳에서 빛나기 시작합니다'
           : '다시 이곳에 오셨네요. 당신의 별이 더 밝아집니다',
-        subline:  `${PLACE_LABEL}에서`,
-        nextUrl:  `/my-star/${star.id}`,
+        subline:     `${PLACE_LABEL}에서`,
+        nextUrl:     `/my-star/${star.id}`,
       });
     }
 
-    // ── CASE B: 별 없음 → 소원 + 별 생성 + 즉시 각성 ─────────────
+    // ── CASE B: 별 없음 ───────────────────────────────────────────
+    // 무료: 별 생성 불가 (프론트가 차단해야 하지만 안전망으로)
+    if (!hasProduct) {
+      console.log(`[cablecar/enter] no_product | user=${user_id}`);
+      return res.status(403).json({
+        success:     false,
+        mode:        'no_product',
+        has_product: false,
+        message:     '별 생성 및 각성은 케이블카 상품 구매 후 이용 가능합니다.',
+      });
+    }
+
+    // 유료: 소원 필수
     if (!wish_text || !wish_text.trim()) {
-      return res.status(400).json({ error: '소원(wish_text)이 필요합니다.' });
+      return res.status(400).json({ success: false, error: '소원(wish_text)이 필요합니다.' });
     }
     const trimmedWish = wish_text.trim();
 
+    // ① 소원
     const wishR = await db.query(
       `INSERT INTO dt_wishes (user_id, wish_text, gem_type, status, safety_level)
        VALUES ($1, $2, $3, 'converted_to_star', 'GREEN')
@@ -150,15 +177,17 @@ router.post('/enter', async (req, res) => {
     );
     const wishId = wishR.rows[0].id;
 
+    // ② 은하
     const galaxyR = await db.query(
       `SELECT id FROM dt_galaxies WHERE code = $1 LIMIT 1`,
       [GALAXY_CODE]
     );
     if (!galaxyR.rows[0]) {
-      return res.status(500).json({ error: '은하 데이터 없음' });
+      return res.status(500).json({ success: false, error: '은하 데이터 없음' });
     }
     const galaxyId = galaxyR.rows[0].id;
 
+    // ③ 씨앗
     const seedR = await db.query(
       `INSERT INTO dt_star_seeds (wish_id, seed_name, seed_state)
        VALUES ($1, $2, 'promoted')
@@ -167,6 +196,7 @@ router.post('/enter', async (req, res) => {
     );
     const seedId = seedR.rows[0].id;
 
+    // ④ 별 생성 (즉시 각성)
     const starName = pickStarName(trimmedWish);
     const starSlug = `cablecar-${Date.now()}`;
 
@@ -175,10 +205,7 @@ router.post('/enter', async (req, res) => {
          (user_id, wish_id, star_seed_id, star_name, star_slug, galaxy_id,
           star_stage, status, origin_type, origin_place,
           awakened_at, awakened_place, awaken_count)
-       VALUES
-         ($1, $2, $3, $4, $5, $6,
-          'day1', 'awakened', $7, $8,
-          NOW(), $8, 1)
+       VALUES ($1, $2, $3, $4, $5, $6, 'day1', 'awakened', $7, $8, NOW(), $8, 1)
        RETURNING id, star_name`,
       [user_id, wishId, seedId, starName, starSlug, galaxyId, ORIGIN_TYPE, place]
     ).catch(async () => {
@@ -192,14 +219,14 @@ router.post('/enter', async (req, res) => {
     });
 
     const newStar = newStarR.rows[0];
-    console.log(`[cablecar/enter] created_and_awakened | star=${newStar.id} | hasProduct=${hasProduct}`);
+    console.log(`[cablecar/enter] created_and_awakened | star=${newStar.id} | hasProduct=true`);
 
     return res.json({
       success:     true,
       mode:        'created_and_awakened',
       starId:      newStar.id,
       starName:    newStar.star_name,
-      has_product: hasProduct,
+      has_product: true,
       headline:    '당신의 별이 이곳에서 빛나기 시작합니다',
       subline:     `${PLACE_LABEL}에서`,
       nextUrl:     `/my-star/${newStar.id}`,
@@ -207,7 +234,7 @@ router.post('/enter', async (req, res) => {
 
   } catch (err) {
     console.error('[cablecar/enter] 오류:', err.message);
-    return res.status(500).json({ error: '처리 중 오류가 발생했습니다.' });
+    return res.status(500).json({ success: false, error: '처리 중 오류가 발생했습니다.' });
   }
 });
 
