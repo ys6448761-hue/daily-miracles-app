@@ -5,9 +5,9 @@
  *
  * ── 분기 ──────────────────────────────────────────────────────────
  *
- *  [유료 + 기존 별]  → 각성 연출 5초 → /my-star/:id
- *  [유료 + 별 없음]  → 소원 입력 → 별 생성 → 각성 연출 5초 → /my-star/:id
- *  [무료 + 기존 별]  → "방문 기록됨" 화면 (각성 없음)
+ *  [유료 + 기존 별]  → 각성 연출 5초 → 공유 → 업셀 → /my-star/:id
+ *  [유료 + 별 없음]  → 소원 입력 → 별 생성 → 각성 연출 5초 → 공유 → 업셀 → /my-star/:id
+ *  [무료 + 기존 별]  → 각성 구매 유도 화면 (별 있음 강조)
  *  [무료 + 별 없음]  → 상품 구매 안내 화면 (별 생성 없음)
  *
  * ── 원칙 ──────────────────────────────────────────────────────────
@@ -17,8 +17,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import html2canvas from 'html2canvas';
 import { getOrCreateUserId } from '../api/dreamtown.js';
 import { readSavedStar, saveStarId, clearStarId } from '../lib/utils/starSession.js';
+import { shareStarBirth } from '../utils/kakaoShare.js';
 import StarAwakeningScene from '../components/StarAwakeningScene.jsx';
 
 function dbg(step, data) {
@@ -308,6 +310,277 @@ function ProductCTAView({ onShop }) {
   );
 }
 
+// ── 공유 카드 파티클 (고정 좌표 — html2canvas 호환) ───────────────
+const CARD_PARTICLES = [
+  { top: '7%',  left: '13%', size: 2,   op: 0.70 },
+  { top: '12%', left: '80%', size: 1.5, op: 0.80 },
+  { top: '20%', left: '5%',  size: 1,   op: 0.50 },
+  { top: '28%', left: '90%', size: 2.5, op: 0.60 },
+  { top: '40%', left: '3%',  size: 1.5, op: 0.55 },
+  { top: '60%', left: '92%', size: 1,   op: 0.50 },
+  { top: '68%', left: '7%',  size: 2,   op: 0.65 },
+  { top: '75%', left: '84%', size: 1.5, op: 0.55 },
+  { top: '82%', left: '22%', size: 1,   op: 0.45 },
+  { top: '88%', left: '68%', size: 2,   op: 0.60 },
+  { top: '94%', left: '44%', size: 1.5, op: 0.50 },
+  { top: '4%',  left: '52%', size: 1,   op: 0.55 },
+];
+
+// ── 공유 카드 (화면에 보이는 프리뷰 = html2canvas 캡처 대상) ─────
+function AwakenShareCard({ starName, cardId = 'awaken-share-card' }) {
+  const date = new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+  return (
+    <div
+      id={cardId}
+      style={{
+        position:   'relative',
+        width:      '100%',
+        maxWidth:   360,
+        aspectRatio: '1 / 1',
+        background: 'linear-gradient(155deg, #000008 0%, #0D1228 45%, #0A1A36 100%)',
+        borderRadius: 20,
+        overflow:   'hidden',
+        fontFamily: "'Noto Sans KR', sans-serif",
+      }}
+    >
+      {/* 별 파티클 */}
+      {CARD_PARTICLES.map((p, i) => (
+        <div key={i} style={{
+          position: 'absolute',
+          top: p.top, left: p.left,
+          width: p.size, height: p.size,
+          borderRadius: '50%',
+          backgroundColor: `rgba(255,255,255,${p.op})`,
+        }} />
+      ))}
+
+      {/* 배경 글로우 */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'radial-gradient(ellipse 60% 55% at 50% 48%, rgba(155,135,245,0.22) 0%, transparent 70%)',
+      }} />
+
+      {/* 상단 — DreamTown 브랜드 */}
+      <div style={{
+        position: 'absolute', top: '8%',
+        left: 0, right: 0, textAlign: 'center',
+        fontSize: 10, letterSpacing: '0.22em',
+        color: 'rgba(155,135,245,0.55)',
+      }}>
+        DREAMTOWN
+      </div>
+
+      {/* 별 이름 */}
+      <div style={{
+        position: 'absolute', top: '18%',
+        left: 0, right: 0, textAlign: 'center',
+        fontSize: 15, fontWeight: 700,
+        color: 'rgba(200,190,255,0.85)',
+        letterSpacing: '0.06em',
+      }}>
+        {starName}
+      </div>
+
+      {/* 중앙 별 글로우 — outer */}
+      <div style={{
+        position: 'absolute',
+        top: '50%', left: '50%',
+        width: 100, height: 100,
+        marginTop: -50, marginLeft: -50,
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(155,135,245,0.45) 0%, rgba(100,80,200,0.12) 55%, transparent 100%)',
+      }} />
+      {/* 별 코어 */}
+      <div style={{
+        position: 'absolute',
+        top: '50%', left: '50%',
+        width: 18, height: 18,
+        marginTop: -9, marginLeft: -9,
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, #ffffff 0%, #e8e0ff 45%, rgba(155,135,245,0.9) 100%)',
+      }} />
+
+      {/* 메인 카피 */}
+      <div style={{
+        position: 'absolute', bottom: '20%',
+        left: 0, right: 0, textAlign: 'center',
+        padding: '0 28px',
+      }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: '#E8E4F0', lineHeight: 1.7 }}>
+          여수 케이블카에서<br />내 별이 깨어난 순간 ✨
+        </div>
+      </div>
+
+      {/* 날짜 */}
+      <div style={{
+        position: 'absolute', bottom: '9%',
+        left: 0, right: 0, textAlign: 'center',
+        fontSize: 10, color: 'rgba(122,110,156,0.7)',
+      }}>
+        {date}
+      </div>
+    </div>
+  );
+}
+
+// ── [유료] 각성 직후 공유 화면 ────────────────────────────────────
+function AwakenShareView({ starId, starName, onNext }) {
+  const [toast,   setToast]   = useState('');
+  const [saving,  setSaving]  = useState(false);
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(''), 2200);
+  };
+
+  // 이미지 저장
+  const handleSave = async () => {
+    if (saving) return;
+    setSaving(true);
+    try {
+      const target = document.getElementById('awaken-share-card');
+      if (!target) { showToast('저장 실패'); return; }
+      await document.fonts.ready;
+      await new Promise(r => setTimeout(r, 100));
+      const canvas = await html2canvas(target, {
+        backgroundColor: null,
+        scale: 3,
+        useCORS: true,
+        allowTaint: false,
+        logging: false,
+      });
+      const link = document.createElement('a');
+      link.download = `dreamtown-${starName}-${Date.now()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast('이미지 저장됨 📸');
+    } catch {
+      showToast('저장 실패 — 다시 시도해주세요');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // 링크 복사
+  const handleCopyLink = async () => {
+    const url = `${window.location.origin}/star/${starId}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast('링크 복사됨 🔗');
+    } catch {
+      showToast('링크 복사 실패');
+    }
+  };
+
+  // 카카오 / 네이티브 공유
+  const handleKakao = () => {
+    shareStarBirth({
+      starId,
+      starName,
+      wishText: '여수 케이블카에서 내 별이 깨어난 순간',
+    });
+  };
+
+  return (
+    <div style={S.page}>
+      <div style={{ width: '100%', maxWidth: 360, padding: '0 0 32px' }}>
+
+        {/* 헤더 */}
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          style={{ textAlign: 'center', marginBottom: 20, paddingTop: 28 }}
+        >
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#9B87F5', letterSpacing: '0.1em', marginBottom: 6 }}>
+            이 순간을 기억하세요
+          </div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: '#E8E4F0' }}>
+            별이 깨어났어요 ✨
+          </div>
+        </motion.div>
+
+        {/* 카드 프리뷰 */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.1, duration: 0.5 }}
+          style={{ marginBottom: 20 }}
+        >
+          <AwakenShareCard starName={starName} />
+        </motion.div>
+
+        {/* 공유 버튼 3종 */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25, duration: 0.4 }}
+          style={{ display: 'flex', gap: 8, marginBottom: 12 }}
+        >
+          {[
+            { label: saving ? '저장 중...' : '이미지 저장', icon: '📸', fn: handleSave },
+            { label: '링크 복사',  icon: '🔗', fn: handleCopyLink },
+            { label: '공유하기',   icon: '💬', fn: handleKakao },
+          ].map(btn => (
+            <button
+              key={btn.label}
+              onClick={btn.fn}
+              style={{
+                flex: 1,
+                padding: '12px 4px',
+                borderRadius: 14,
+                border: '1px solid rgba(155,135,245,0.25)',
+                background: 'rgba(155,135,245,0.07)',
+                color: '#C4BAE0',
+                fontSize: 11,
+                fontWeight: 600,
+                cursor: 'pointer',
+                fontFamily: "'Noto Sans KR', sans-serif",
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 5,
+              }}
+            >
+              <span style={{ fontSize: 18 }}>{btn.icon}</span>
+              {btn.label}
+            </button>
+          ))}
+        </motion.div>
+
+        {/* 계속하기 */}
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.4 }}
+          onClick={onNext}
+          style={{ ...S.btnOutline, width: '100%', fontSize: 13 }}
+        >
+          계속하기 →
+        </motion.button>
+
+        {/* 토스트 */}
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            style={{
+              marginTop: 14,
+              textAlign: 'center',
+              fontSize: 13,
+              color: '#9B87F5',
+              fontWeight: 600,
+            }}
+          >
+            {toast}
+          </motion.div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── [유료] 각성 직후 앱 상품 업셀 ────────────────────────────────
 function UpsellView({ starId, onNext }) {
   const nav = useNavigate();
@@ -448,7 +721,7 @@ export default function CablecarPage() {
   const isPaid         = !!credentialCode;
 
   const [phase,      setPhase]      = useState('init');
-  // init | processing | input | awakening | upsell | logged_only | no_product | error
+  // init | processing | input | awakening | share | upsell | logged_only | no_product | error
   const [result,     setResult]     = useState(null);
   const [inputError, setInputError] = useState('');
   const [loading,    setLoading]    = useState(false);
@@ -577,17 +850,28 @@ export default function CablecarPage() {
     );
   }
 
-  // [유료] 별 각성 시그니처 연출 (5초) → 완료 시 업셀로
+  // [유료] 별 각성 시그니처 연출 (5초) → 완료 시 공유 화면으로
   if (phase === 'awakening' && result) {
     return (
       <StarAwakeningScene
         starName={result.starName}
-        onComplete={() => setPhase('upsell')}
+        onComplete={() => setPhase('share')}
       />
     );
   }
 
-  // [유료] 각성 직후 앱 상품 업셀
+  // [유료] 각성 직후 공유 화면
+  if (phase === 'share' && result) {
+    return (
+      <AwakenShareView
+        starId={result.starId}
+        starName={result.starName}
+        onNext={() => setPhase('upsell')}
+      />
+    );
+  }
+
+  // [유료] 공유 후 앱 상품 업셀
   if (phase === 'upsell' && result) {
     return <UpsellView starId={result.starId} onNext={goToStar} />;
   }
