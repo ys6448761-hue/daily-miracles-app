@@ -9,6 +9,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { getOrCreateUserId } from '../api/dreamtown.js';
+import { readSavedStar } from '../lib/utils/starSession.js';
 
 const S = {
   page: {
@@ -148,7 +149,26 @@ const FEATURES = [
   { icon: '📍', text: '여수 케이블카 방문 기록 영구 보존' },
 ];
 
+// ── 카피 분기: 기존 별 유무에 따라 다른 메시지 ─────────────────────
+const COPY = {
+  hasStar: {
+    badge:      '내 별이 기다리고 있어요',
+    headline:   '당신의 별이\n다시 깨어납니다',
+    subline:    '이미 만든 별이 있어요.\n케이블카 위에서 다시 깨울 수 있어요.',
+    btnLabel:   '내 별 깨우기 ✨',
+  },
+  noStar: {
+    badge:      '여수 케이블카 캐빈 × DreamTown',
+    headline:   '지금, 당신의 별이\n깨어납니다',
+    subline:    '이 순간은, 그냥 지나가지 않습니다.\n케이블카 위에서 소원을 담아\n별을 탄생시키고 각성시키세요.',
+    btnLabel:   '내 별 만들기 ✨',
+  },
+};
+
 export default function CablecarLandingPage() {
+  const hasStar  = !!readSavedStar();
+  const copy     = hasStar ? COPY.hasStar : COPY.noStar;
+
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
 
@@ -197,13 +217,16 @@ export default function CablecarLandingPage() {
           ]}}
           transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
         />
-        <div style={S.badge}>여수 케이블카 캐빈 × DreamTown</div>
+        <div style={S.badge}>{copy.badge}</div>
         <div style={S.headline}>
-          지금, 당신의 별이<br />깨어납니다
+          {copy.headline.split('\n').map((line, i) => (
+            <span key={i}>{line}{i < copy.headline.split('\n').length - 1 && <br />}</span>
+          ))}
         </div>
         <div style={S.subline}>
-          이 순간은, 그냥 지나가지 않습니다.<br />
-          케이블카 위에서 소원을 담아<br />별을 탄생시키고 각성시키세요.
+          {copy.subline.split('\n').map((line, i) => (
+            <span key={i}>{line}{i < copy.subline.split('\n').length - 1 && <br />}</span>
+          ))}
         </div>
       </motion.div>
 
@@ -247,7 +270,7 @@ export default function CablecarLandingPage() {
           onClick={handleCheckout}
           disabled={loading}
         >
-          {loading ? '결제 준비 중...' : '지금, 내 별을 깨운다'}
+          {loading ? '결제 준비 중...' : copy.btnLabel}
         </button>
         <div style={S.disclaimer}>
           결제 완료 후 케이블카 캐빈 체험 화면으로 이동합니다.<br />

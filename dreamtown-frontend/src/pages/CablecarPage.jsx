@@ -186,35 +186,64 @@ function WishInputView({ onSubmit, loading, error }) {
   );
 }
 
-// ── [무료 + 기존별] 방문 기록만 ──────────────────────────────────
+// ── [무료 + 기존별] 각성 구매 유도 ──────────────────────────────
 function BasicLogView({ onNext }) {
+  const nav = useNavigate();
   return (
     <div style={S.page}>
       <motion.div
-        style={{ ...S.card, padding: '40px 24px' }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4 }}
+        style={{ ...S.card, padding: '36px 20px' }}
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45 }}
       >
-        <div style={{ fontSize: 40, marginBottom: 16 }}>🚡</div>
-        <div style={{ fontSize: 17, fontWeight: 700, color: '#E8E4F0', marginBottom: 8 }}>
-          여수에 왔어요
+        {/* 잠든 별 글로우 */}
+        <motion.div
+          style={{
+            width: 52, height: 52, borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(200,190,255,0.6) 0%, rgba(155,135,245,0.3) 50%, transparent 80%)',
+            boxShadow: '0 0 16px 6px rgba(155,135,245,0.3)',
+            margin: '0 auto 20px',
+            filter: 'blur(1px)',
+          }}
+          animate={{ opacity: [0.5, 0.9, 0.5] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+        />
+
+        <div style={{ fontSize: 11, fontWeight: 700, color: '#9B87F5', letterSpacing: '0.1em', marginBottom: 8 }}>
+          내 별이 있어요
         </div>
-        <div style={{ fontSize: 13, color: '#7A6E9C', marginBottom: 6, lineHeight: 1.6 }}>
-          이 순간이 기록됐어요
+        <div style={{ fontSize: 19, fontWeight: 800, color: '#E8E4F0', lineHeight: 1.4, marginBottom: 8 }}>
+          별이 깨어날<br />준비가 됐어요
         </div>
+        <div style={{ fontSize: 13, color: '#7A6E9C', lineHeight: 1.65, marginBottom: 24 }}>
+          케이블카 위에서 이 순간을 기록했어요.<br />
+          각성 패스로 지금 바로 깨울 수 있어요.
+        </div>
+
+        {/* 가격 뱃지 */}
         <div style={{
-          fontSize: 12, color: '#5a5370',
-          marginBottom: 28, lineHeight: 1.6,
-          padding: '10px 12px',
-          background: 'rgba(155,135,245,0.06)',
-          borderRadius: 10,
-          border: '1px solid rgba(155,135,245,0.1)',
+          display: 'inline-block',
+          padding: '6px 16px',
+          borderRadius: 20,
+          background: 'rgba(255,215,106,0.1)',
+          border: '1px solid rgba(255,215,106,0.25)',
+          fontSize: 13,
+          color: '#FFD76A',
+          fontWeight: 700,
+          marginBottom: 20,
         }}>
-          별 각성은 케이블카 상품 구매 후<br />이용할 수 있어요
+          오픈가 19,900원
         </div>
-        <button onClick={onNext} style={{ ...S.btn, marginTop: 0, fontSize: 14, padding: '13px 0' }}>
-          내 별 보기
+
+        <button
+          onClick={() => nav('/cablecar-landing')}
+          style={{ ...S.btn, marginTop: 0 }}
+        >
+          내 별 깨우기 ✨
+        </button>
+        <button onClick={onNext} style={{ ...S.btnOutline, marginTop: 8, fontSize: 13 }}>
+          지금은 괜찮아요 — 내 별 보기
         </button>
       </motion.div>
     </div>
@@ -232,10 +261,10 @@ function ProductCTAView({ onShop }) {
       >
         <div style={{ fontSize: 48, marginBottom: 16 }}>⭐</div>
         <div style={S.label}>여수 케이블카 캐빈</div>
-        <div style={S.headline}>케이블카에서<br />별을 탄생시키세요</div>
+        <div style={S.headline}>케이블카에서<br />내 별을 만들어요</div>
         <div style={S.subline}>
           별 탄생과 각성 연출은<br />
-          케이블카 상품 구매 후 이용 가능해요
+          각성 패스 구매 후 바로 시작돼요
         </div>
 
         {/* 상품 카드 2종 */}
