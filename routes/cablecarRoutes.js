@@ -1,6 +1,6 @@
 'use strict';
 /**
- * cablecarRoutes.js — 케이블카 캐빈 QR 전용 진입 엔진
+ * cablecarRoutes.js — 케이블카 캐빈 QR 진입 엔진 + 각성 패스 결제
  *
  * POST /api/cablecar/enter
  *   Body: { user_id, star_id?, wish_text?, place?, credential_code? }
@@ -20,7 +20,15 @@
 const express = require('express');
 const router  = express.Router();
 const { v4: uuidv4 } = require('uuid');
+const crypto  = require('crypto');
 const db      = require('../database/db');
+
+let nicepayService = null;
+try { nicepayService = require('../services/nicepayService'); } catch (_) {}
+
+function generateCredentialCode() {
+  return 'TC-' + crypto.randomBytes(5).toString('hex').toUpperCase();
+}
 
 const PLACE_LABEL = '여수 케이블카 캐빈';
 const GALAXY_CODE = 'challenge';
@@ -235,6 +243,48 @@ router.post('/enter', async (req, res) => {
   } catch (err) {
     console.error('[cablecar/enter] 오류:', err.message);
     return res.status(500).json({ success: false, error: '처리 중 오류가 발생했습니다.' });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// POST /api/cablecar/checkout — 케이블카 각성 패스 결제 요청
+// ─────────────────────────────────────────────────────────────────────
+router.post('/checkout', async (req, res) => {
+  const { user_id, phone } = req.body;
+
+  if (!user_id) {
+    return res.status(400).json({ success: false, error: 'user_id가 필요합니다.' });
+  }
+
+  if (!nicepayService) {
+    return res.status(503).json({ success: false, error: '결제 서비스를 사용할 수 없습니다.' });
+  }
+
+  const pgConfig = nicepayService.validateConfig?.();
+  if (pgConfig && !pgConfig.isValid) {
+    return res.status(503).json({ success: false, error: '결제 설정 오류' });
+  }
+
+  try {
+    const payment = await nicepayService.createPayment(19900, '케이블카 각성 패스');
+    const credentialCode = generateCredentialCode();
+
+    await db.query(
+      `INSERT INTO cablecar_checkouts (order_id, user_id, phone, credential_code)
+       VALUES ($1, $2, $3, $4)`,
+      [payment.orderId, user_id, phone ?? null, credentialCode]
+    );
+
+    console.log(`[cablecar/checkout] order=${payment.orderId} user=${user_id} code=${credentialCode}`);
+
+    return res.json({
+      success:     true,
+      order_id:    payment.orderId,
+      payment_url: `/pay?moid=${encodeURIComponent(payment.orderId)}`,
+    });
+  } catch (err) {
+    console.error('[cablecar/checkout] 오류:', err.message);
+    return res.status(500).json({ success: false, error: '결제 요청 중 오류가 발생했습니다.' });
   }
 });
 

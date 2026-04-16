@@ -269,11 +269,118 @@ function ProductCTAView({ onShop }) {
         </div>
 
         <button onClick={onShop} style={S.btn}>
-          상품 보러가기 →
+          각성 패스 구매하기 →
         </button>
         <div style={{ fontSize: 11, color: '#5a5370', marginTop: 12 }}>
-          이미 구매하셨다면 구매 완료 화면에서 접속해주세요
+          오픈가 19,900원 · 결제 완료 후 바로 각성 시작
         </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// ── [유료] 각성 직후 앱 상품 업셀 ────────────────────────────────
+function UpsellView({ starId, onNext }) {
+  const nav = useNavigate();
+  return (
+    <div style={S.page}>
+      <motion.div
+        style={{ ...S.card, padding: '36px 20px' }}
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        {/* 별 글로우 */}
+        <motion.div
+          style={{
+            width: 56, height: 56, borderRadius: '50%',
+            background: 'radial-gradient(circle, #fff 0%, #e8e0ff 25%, #9B87F5 55%, transparent 80%)',
+            boxShadow: '0 0 20px 8px rgba(155,135,245,0.7)',
+            margin: '0 auto 20px',
+          }}
+          animate={{ boxShadow: [
+            '0 0 20px 8px rgba(155,135,245,0.7)',
+            '0 0 32px 14px rgba(155,135,245,0.9)',
+            '0 0 20px 8px rgba(155,135,245,0.7)',
+          ]}}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        />
+
+        <div style={{ fontSize: 11, fontWeight: 700, color: '#9B87F5', letterSpacing: '0.1em', marginBottom: 10 }}>
+          별이 각성됐어요
+        </div>
+        <div style={{ fontSize: 19, fontWeight: 800, color: '#E8E4F0', lineHeight: 1.4, marginBottom: 8 }}>
+          이 별, 계속<br />키워보시겠어요?
+        </div>
+        <div style={{ fontSize: 13, color: '#7A6E9C', lineHeight: 1.65, marginBottom: 24 }}>
+          별은 지금 막 깨어났어요.<br />
+          DreamTown 멤버십으로 함께 성장시켜봐요.
+        </div>
+
+        {/* 플랜 카드 2종 */}
+        <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+          {[
+            {
+              name:  '베이직',
+              price: '9,900원',
+              tag:   '가볍게 이어가기',
+              desc:  '별 성장 + 하루 기록 + 공명',
+              highlight: false,
+            },
+            {
+              name:  '프리미엄',
+              price: '24,900원',
+              tag:   '제대로 이어가기',
+              desc:  '모든 기능 + AI 코치 + 여행 연결',
+              highlight: true,
+            },
+          ].map(plan => (
+            <motion.div
+              key={plan.name}
+              onClick={() => nav('/shop')}
+              whileTap={{ scale: 0.97 }}
+              style={{
+                flex: 1,
+                padding: '14px 10px',
+                borderRadius: 14,
+                background: plan.highlight
+                  ? 'rgba(155,135,245,0.14)'
+                  : 'rgba(255,255,255,0.04)',
+                border: plan.highlight
+                  ? '1px solid rgba(155,135,245,0.4)'
+                  : '1px solid rgba(255,255,255,0.08)',
+                cursor: 'pointer',
+                textAlign: 'center',
+              }}
+            >
+              <div style={{ fontSize: 11, fontWeight: 700, color: plan.highlight ? '#9B87F5' : '#E8E4F0', marginBottom: 4 }}>
+                {plan.name}
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: '#FFD76A', marginBottom: 4 }}>
+                {plan.price}
+              </div>
+              <div style={{ fontSize: 9, color: '#9B87F5', fontWeight: 600, marginBottom: 6 }}>
+                {plan.tag}
+              </div>
+              <div style={{ fontSize: 10, color: '#7A6E9C', lineHeight: 1.4 }}>
+                {plan.desc}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        <button
+          onClick={() => nav('/shop')}
+          style={{ ...S.btn, fontSize: 14, padding: '13px 0', marginTop: 0 }}
+        >
+          멤버십 자세히 보기 →
+        </button>
+        <button
+          onClick={onNext}
+          style={{ ...S.btnOutline, marginTop: 8, fontSize: 13 }}
+        >
+          지금은 괜찮아요 — 내 별 보기
+        </button>
       </motion.div>
     </div>
   );
@@ -312,7 +419,7 @@ export default function CablecarPage() {
   const isPaid         = !!credentialCode;
 
   const [phase,      setPhase]      = useState('init');
-  // init | processing | input | awakening | logged_only | no_product | error
+  // init | processing | input | awakening | upsell | logged_only | no_product | error
   const [result,     setResult]     = useState(null);
   const [inputError, setInputError] = useState('');
   const [loading,    setLoading]    = useState(false);
@@ -427,7 +534,7 @@ export default function CablecarPage() {
 
   // [무료 + 별 없음] 상품 안내
   if (phase === 'no_product') {
-    return <ProductCTAView onShop={() => nav('/shop')} />;
+    return <ProductCTAView onShop={() => nav('/cablecar-landing')} />;
   }
 
   // [유료 + 별 없음] 소원 입력
@@ -441,14 +548,19 @@ export default function CablecarPage() {
     );
   }
 
-  // [유료] 별 각성 시그니처 연출 (5초)
+  // [유료] 별 각성 시그니처 연출 (5초) → 완료 시 업셀로
   if (phase === 'awakening' && result) {
     return (
       <StarAwakeningScene
         starName={result.starName}
-        onComplete={goToStar}
+        onComplete={() => setPhase('upsell')}
       />
     );
+  }
+
+  // [유료] 각성 직후 앱 상품 업셀
+  if (phase === 'upsell' && result) {
+    return <UpsellView starId={result.starId} onNext={goToStar} />;
   }
 
   // [무료 + 기존별] 방문 기록

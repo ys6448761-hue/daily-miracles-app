@@ -271,14 +271,54 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
       const paidTid = approvalResult.TID || actualTID;
       setImmediate(() => _activateYeosuWish(Moid, paidTid));
 
-      // ── 이용권 자동 발급 (결제 완료와 독립 — 실패해도 무시) ───
-      if (credentialTrigger) {
+      // ── successUrl 결정 (케이블카 → DreamTown → 기본 순) ───────────
+      let successUrl = nicepayService.buildWixSuccessUrl(Moid, payment.verification_token);
+      let isCablecarPayment = false;
+
+      if (_db) {
+        try {
+          // ── 케이블카 각성 패스 체크 (최우선) ─────────────────────
+          const ccR = await _db.query(
+            `SELECT credential_code, status FROM cablecar_checkouts
+             WHERE order_id = $1 LIMIT 1`,
+            [Moid]
+          );
+          if (ccR.rows.length > 0) {
+            isCablecarPayment = true;
+            const { credential_code: credCode, status: ccStatus } = ccR.rows[0];
+
+            if (ccStatus === 'pending') {
+              // benefit_credentials 발급 (qr_token = md5(code+moid))
+              await _db.query(
+                `INSERT INTO benefit_credentials
+                   (credential_code, qr_token, benefit_type, benefit_name, face_value,
+                    valid_until, issued_from, source_id)
+                 VALUES ($1, md5($1 || $2), 'cablecar_awakening', '케이블카 각성 패스', 19900,
+                         NOW() + INTERVAL '30 days', 'payment', $2)`,
+                [credCode, Moid]
+              ).catch(e => console.warn('⚠️ benefit_credentials 발급 실패:', e.message));
+
+              await _db.query(
+                `UPDATE cablecar_checkouts SET status='paid', paid_at=NOW() WHERE order_id=$1`,
+                [Moid]
+              ).catch(() => {});
+            }
+
+            successUrl = `/cablecar?code=${credCode}`;
+            console.log(`🚡 케이블카 각성 패스 결제 완료 → ${successUrl}`);
+          }
+        } catch (e) {
+          console.warn('⚠️ 케이블카 결제 처리 실패 — 기본 successUrl 사용:', e.message);
+        }
+      }
+
+      // ── 이용권 자동 발급 (케이블카 제외 — 위에서 직접 처리됨) ───
+      if (!isCablecarPayment && credentialTrigger) {
         setImmediate(() => credentialTrigger.issueOnNicepayPaid(Moid));
       }
 
       // ── DreamTown: moid → star_id 조회 후 별 상세 페이지로 이동 ─
-      let successUrl = nicepayService.buildWixSuccessUrl(Moid, payment.verification_token);
-      if (_db) {
+      if (!isCablecarPayment && _db) {
         try {
           // Day7 업그레이드 감지 (dreamtown_flow 우선)
           const dtFlow = await _db.query(`

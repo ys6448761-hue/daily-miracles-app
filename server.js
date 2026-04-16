@@ -2811,8 +2811,9 @@ const DT_SPA_ROUTES = [
   '/day7-complete',
   // 별들의 고향
   '/hometown',
-  // 케이블카 캐빈 QR
+  // 케이블카
   '/cablecar',
+  '/cablecar-landing',
   // 여수 미션
   '/missions',
   // 어드민

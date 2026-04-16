@@ -55,6 +55,7 @@ import StarJourneyPage from './pages/StarJourneyPage.jsx';
 import Day7Complete from './pages/Day7Complete.jsx';
 import HometownLanding from './pages/HometownLanding.jsx';
 import CablecarPage from './pages/CablecarPage.jsx';
+import CablecarLandingPage from './pages/CablecarLandingPage.jsx';
 import MissionPage from './pages/MissionPage.jsx';
 import HometownAdmin from './pages/HometownAdmin.jsx';
 import Shop from './pages/Shop.jsx';
@@ -123,6 +124,8 @@ export default function App() {
           <Route path="/onboarding"                element={<OnboardingPage />} />
           {/* 케이블카 캐빈 QR 진입 */}
           <Route path="/cablecar"                  element={<CablecarPage />} />
+          {/* 케이블카 각성 패스 구매 랜딩 */}
+          <Route path="/cablecar-landing"          element={<CablecarLandingPage />} />
           {/* 여수 미션 + 포인트 */}
           <Route path="/missions"                  element={<MissionPage />} />
           {/* 별들의 고향 */}
