@@ -11,7 +11,8 @@
  */
 
 const express = require('express');
-const router = express.Router();
+const router  = express.Router();
+const crypto  = require('crypto');
 
 // 서비스 로딩
 let nicepayService = null;
@@ -288,14 +289,15 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
             const { credential_code: credCode, status: ccStatus } = ccR.rows[0];
 
             if (ccStatus === 'pending') {
-              // benefit_credentials 발급 (qr_token = md5(code+moid))
+              // qr_token: Node.js에서 계산 (PostgreSQL md5($1||$2) 타입 충돌 회피)
+              const qrToken = crypto.createHash('md5').update(credCode + Moid).digest('hex');
               await _db.query(
                 `INSERT INTO benefit_credentials
                    (credential_code, qr_token, benefit_type, benefit_name, face_value,
                     valid_until, issued_from, source_id)
-                 VALUES ($1, md5($1 || $2), 'cablecar_awakening', '케이블카 각성 패스', 19900,
-                         NOW() + INTERVAL '30 days', 'payment', $2)`,
-                [credCode, Moid]
+                 VALUES ($1, $2, 'cablecar_awakening', '케이블카 각성 패스', 19900,
+                         NOW() + INTERVAL '30 days', 'payment', $3)`,
+                [credCode, qrToken, Moid]
               ).catch(e => console.warn('⚠️ benefit_credentials 발급 실패:', e.message));
 
               await _db.query(
