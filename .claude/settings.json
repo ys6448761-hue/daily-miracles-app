@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(gh *)",
+      "Bash(node *)",
+      "Bash(npm *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(grep *)",
+      "Bash(find *)",
+      "Bash(curl *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(rm *)",
+      "Bash(wc *)",
+      "Bash(tail *)",
+      "Bash(head *)",
+      "Bash(echo *)",
+      "Bash(sleep *)",
+      "Bash(kill *)",
+      "Bash(sed *)",
+      "Bash(sort *)",
+      "Bash(npx *)",
+      "Bash(PORT=* node *)",
+      "Bash(TEST_BASE_URL=* node *)",
+      "Bash(DATABASE_URL=* node *)"
+    ],
+    "deny": [
+      "Bash(* DROP TABLE *)",
+      "Bash(* DROP DATABASE *)",
+      "Bash(* DELETE FROM dt_ai_purchases *)",
+      "Bash(* DELETE FROM dt_users *)",
+      "Bash(* TRUNCATE *)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git reset --hard *)"
+    ]
+  }
+}
