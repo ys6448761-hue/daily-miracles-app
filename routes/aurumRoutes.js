@@ -14,6 +14,9 @@ const express = require('express');
 const router  = express.Router();
 const db      = require('../database/db');
 
+// 기본 반경 — 환경변수로 조정 가능 (현장 구조에 따라 100~300m)
+const DEFAULT_RADIUS_M = parseInt(process.env.AURUM_RADIUS_M || '200', 10);
+
 // ── Haversine 거리 계산 (미터) ─────────────────────────────────────
 function haversine(lat1, lng1, lat2, lng2) {
   const R    = 6371000;
@@ -37,7 +40,7 @@ router.post('/record', async (req, res) => {
     lng,
     place_name = null,
     star_id    = null,
-    radius_m   = 200,
+    radius_m   = DEFAULT_RADIUS_M,
   } = req.body;
 
   if (!user_id)            return res.status(400).json({ success: false, error: 'user_id가 필요합니다.' });

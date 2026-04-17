@@ -1,22 +1,20 @@
 /**
  * PromiseLocationPage.jsx — 약속 기록 생성
- * 경로: /location/:locationId
+ * 경로: /promise/create?loc=yeosu-cablecar
  *
- * 특정 장소(location_id)에서 기록을 남기는 화면.
- * 사진 업로드 (선택) + 감정/다짐 텍스트 → 90일 시간 잠금 봉인.
+ * GPS 조용히 캡처 → 사진(선택) + 다짐 + 미래 메시지(선택) → 90일 봉인
  */
 
 import { useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getOrCreateUserId } from '../api/dreamtown.js';
 
-// ── 장소명 매핑 ──────────────────────────────────────────────────────
 const LOCATION_NAMES = {
-  'yeosu-cablecar': '여수 해상 케이블카',
-  'yeosu-aqua':     '여수 아쿠아플라넷',
-  'yeosu-yacht':    '여수 야경 요트',
-  'yeosu-odongdo':  '여수 오동도',
+  'yeosu-cablecar':  '여수 해상 케이블카',
+  'yeosu-aqua':      '여수 아쿠아플라넷',
+  'yeosu-yacht':     '여수 야경 요트',
+  'yeosu-odongdo':   '여수 오동도',
   'yeosu-hyangiram': '향일암',
 };
 
@@ -24,31 +22,25 @@ const S = {
   page: {
     minHeight: '100vh',
     background: 'linear-gradient(180deg, #05040a 0%, #0c0a18 50%, #070b1a 100%)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
+    display: 'flex', flexDirection: 'column', alignItems: 'center',
     padding: '0 20px 60px',
-    fontFamily: "'Noto Sans KR', sans-serif",
-    color: '#E8E4F0',
+    fontFamily: "'Noto Sans KR', sans-serif", color: '#E8E4F0',
   },
   card: {
-    width: '100%',
-    maxWidth: 360,
+    width: '100%', maxWidth: 360,
     background: 'rgba(180,120,255,0.04)',
     border: '1px solid rgba(180,120,255,0.18)',
-    borderRadius: 24,
-    padding: '32px 22px',
+    borderRadius: 24, padding: '32px 22px',
   },
   label: {
     fontSize: 11, fontWeight: 700,
     color: '#9B7FE0', letterSpacing: '0.1em', marginBottom: 8,
   },
-  headline: {
-    fontSize: 21, fontWeight: 800,
-    color: '#E8E4F0', lineHeight: 1.4, marginBottom: 8,
-  },
-  sub: {
-    fontSize: 13, color: '#6A6090', lineHeight: 1.7, marginBottom: 24,
+  headline: { fontSize: 21, fontWeight: 800, color: '#E8E4F0', lineHeight: 1.4, marginBottom: 8 },
+  sub: { fontSize: 13, color: '#6A6090', lineHeight: 1.7, marginBottom: 24 },
+  fieldLabel: {
+    fontSize: 11, fontWeight: 700, color: '#9B7FE0',
+    letterSpacing: '0.08em', marginBottom: 8,
   },
   textarea: {
     width: '100%', padding: '14px',
@@ -67,76 +59,65 @@ const S = {
     cursor: 'pointer', marginTop: 12,
     fontFamily: "'Noto Sans KR', sans-serif",
   },
-  btnDisabled: {
-    background: 'rgba(180,120,255,0.12)',
-    color: '#4A3A70',
-    cursor: 'default',
-  },
+  btnDisabled: { background: 'rgba(180,120,255,0.12)', color: '#4A3A70', cursor: 'default' },
 };
 
-// ── 사진 선택 영역 ──────────────────────────────────────────────────
+// GPS 조용히 취득 (best-effort — 실패해도 계속 진행)
+function tryGetGps() {
+  return new Promise(resolve => {
+    if (!navigator.geolocation) { resolve(null); return; }
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => resolve({ lat: coords.latitude, lng: coords.longitude }),
+      ()           => resolve(null),
+      { timeout: 8000, maximumAge: 60000 }
+    );
+  });
+}
+
+// ── 사진 선택 영역 ─────────────────────────────────────────────────
 function PhotoPicker({ photoPreview, onSelect, onRemove }) {
   const inputRef = useRef(null);
-
   return (
     <div style={{ marginBottom: 20 }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: '#9B7FE0', letterSpacing: '0.08em', marginBottom: 8 }}>
-        사진 (선택)
-      </div>
+      <div style={S.fieldLabel}>사진 <span style={{ color: '#4A3A70', fontWeight: 400 }}>(선택)</span></div>
       {photoPreview ? (
         <div style={{ position: 'relative', borderRadius: 14, overflow: 'hidden' }}>
-          <img
-            src={photoPreview}
-            alt="preview"
-            style={{ width: '100%', height: 180, objectFit: 'cover', display: 'block' }}
-          />
-          <button
-            onClick={onRemove}
-            style={{
-              position: 'absolute', top: 8, right: 8,
-              width: 28, height: 28, borderRadius: '50%',
-              background: 'rgba(0,0,0,0.6)', border: 'none',
-              color: '#fff', fontSize: 14, cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}
-          >×</button>
+          <img src={photoPreview} alt="preview"
+            style={{ width: '100%', height: 180, objectFit: 'cover', display: 'block' }} />
+          <button onClick={onRemove} style={{
+            position: 'absolute', top: 8, right: 8,
+            width: 28, height: 28, borderRadius: '50%',
+            background: 'rgba(0,0,0,0.6)', border: 'none',
+            color: '#fff', fontSize: 14, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>×</button>
         </div>
       ) : (
-        <button
-          onClick={() => inputRef.current?.click()}
-          style={{
-            width: '100%', padding: '18px 0',
-            borderRadius: 14,
-            border: '1.5px dashed rgba(180,120,255,0.25)',
-            background: 'rgba(180,120,255,0.04)',
-            color: '#6A6090', fontSize: 13, cursor: 'pointer',
-            fontFamily: "'Noto Sans KR', sans-serif",
-          }}
-        >
+        <button onClick={() => inputRef.current?.click()} style={{
+          width: '100%', padding: '18px 0', borderRadius: 14,
+          border: '1.5px dashed rgba(180,120,255,0.25)',
+          background: 'rgba(180,120,255,0.04)',
+          color: '#6A6090', fontSize: 13, cursor: 'pointer',
+          fontFamily: "'Noto Sans KR', sans-serif",
+        }}>
           + 이 순간의 사진 추가하기
         </button>
       )}
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        style={{ display: 'none' }}
-        onChange={onSelect}
-      />
+      <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp"
+        style={{ display: 'none' }} onChange={onSelect} />
     </div>
   );
 }
 
-// ── 봉인 완료 화면 ──────────────────────────────────────────────────
+// ── 봉인 완료 화면 ─────────────────────────────────────────────────
 function SealedView({ promiseId, openAt, locationName }) {
-  const nav   = useNavigate();
+  const nav = useNavigate();
   const [copied, setCopied] = useState(false);
-  const url   = `${window.location.origin}/promise/${promiseId}`;
-  const openDate = new Date(openAt).toLocaleDateString('ko-KR', {
-    year: 'numeric', month: 'long', day: 'numeric',
-  });
+  const url      = `${window.location.origin}/promise/${promiseId}`;
+  const openDate = new Date(openAt).toLocaleDateString('ko-KR',
+    { year: 'numeric', month: 'long', day: 'numeric' });
 
-  const handleCopy = async () => {
+  const copy = async () => {
     try { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 2000); }
     catch { /* ignore */ }
   };
@@ -145,11 +126,9 @@ function SealedView({ promiseId, openAt, locationName }) {
     <div style={S.page}>
       <motion.div
         style={{ ...S.card, textAlign: 'center', marginTop: 64, paddingTop: 44 }}
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.55 }}
       >
-        {/* 보라 글로우 */}
         <motion.div
           style={{
             width: 64, height: 64, borderRadius: '50%',
@@ -163,7 +142,6 @@ function SealedView({ promiseId, openAt, locationName }) {
           ]}}
           transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
         />
-
         <div style={{ fontSize: 11, fontWeight: 700, color: '#9B7FE0', letterSpacing: '0.1em', marginBottom: 12 }}>
           봉인 완료
         </div>
@@ -177,55 +155,43 @@ function SealedView({ promiseId, openAt, locationName }) {
         <div style={{ fontSize: 12, color: '#4A3A70', marginBottom: 24 }}>
           그날, 다시 이 장소로 돌아와보세요.
         </div>
-
-        {/* URL 박스 */}
         <div style={{
           padding: '10px 14px', borderRadius: 10,
           background: 'rgba(167,139,250,0.06)',
           border: '1px solid rgba(167,139,250,0.15)',
           fontSize: 11, color: '#9B7FE0',
           wordBreak: 'break-all', marginBottom: 14, textAlign: 'left',
-        }}>
-          {url}
-        </div>
-
-        <button
-          onClick={handleCopy}
-          style={{ ...S.btn, fontSize: 14, padding: '13px 0', marginTop: 0 }}
-        >
+        }}>{url}</div>
+        <button onClick={copy} style={{ ...S.btn, fontSize: 14, padding: '13px 0', marginTop: 0 }}>
           {copied ? '링크 복사됨 ✓' : '기록 링크 복사하기'}
         </button>
-
-        <button
-          onClick={() => nav(-1)}
-          style={{
-            background: 'none', border: 'none', color: '#4A3A70',
-            fontSize: 12, cursor: 'pointer', marginTop: 16,
-            fontFamily: "'Noto Sans KR', sans-serif', width: '100%",
-            display: 'block', textAlign: 'center',
-          }}
-        >
-          ← 돌아가기
-        </button>
+        <button onClick={() => nav(-1)} style={{
+          background: 'none', border: 'none', color: '#4A3A70',
+          fontSize: 12, cursor: 'pointer', marginTop: 16,
+          fontFamily: "'Noto Sans KR', sans-serif",
+          display: 'block', width: '100%', textAlign: 'center',
+        }}>← 돌아가기</button>
       </motion.div>
     </div>
   );
 }
 
-// ── 메인 ─────────────────────────────────────────────────────────────
+// ── 메인 ──────────────────────────────────────────────────────────
 export default function PromiseLocationPage() {
-  const { locationId } = useParams();
+  const [searchParams] = useSearchParams();
   const nav = useNavigate();
 
-  const locationName = LOCATION_NAMES[locationId] || locationId;
+  const locationId   = searchParams.get('loc') || '';
+  const locationName = LOCATION_NAMES[locationId] || locationId || '이 장소';
 
-  const [text,         setText]         = useState('');
-  const [photoFile,    setPhotoFile]    = useState(null);
-  const [photoPreview, setPhotoPreview] = useState(null);
-  const [uploading,    setUploading]    = useState(false);
-  const [loading,      setLoading]      = useState(false);
-  const [error,        setError]        = useState('');
-  const [created,      setCreated]      = useState(null); // { promiseId, openAt }
+  const [text,            setText]            = useState('');
+  const [futureMsg,       setFutureMsg]       = useState('');
+  const [photoFile,       setPhotoFile]       = useState(null);
+  const [photoPreview,    setPhotoPreview]    = useState(null);
+  const [uploading,       setUploading]       = useState(false);
+  const [loading,         setLoading]         = useState(false);
+  const [error,           setError]           = useState('');
+  const [created,         setCreated]         = useState(null);
 
   if (created) {
     return <SealedView promiseId={created.promiseId} openAt={created.openAt} locationName={locationName} />;
@@ -240,11 +206,6 @@ export default function PromiseLocationPage() {
     setPhotoPreview(URL.createObjectURL(file));
   };
 
-  const handlePhotoRemove = () => {
-    setPhotoFile(null);
-    setPhotoPreview(null);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!canSubmit) return;
@@ -254,7 +215,10 @@ export default function PromiseLocationPage() {
     try {
       const userId = getOrCreateUserId();
 
-      // 1. 사진 업로드 (있을 때만)
+      // GPS 조용히 취득 (실패해도 진행)
+      const gps = await tryGetGps();
+
+      // 사진 업로드
       let photo_url = null;
       if (photoFile) {
         setUploading(true);
@@ -267,15 +231,18 @@ export default function PromiseLocationPage() {
         photo_url = upData.photo_url;
       }
 
-      // 2. 기록 저장
+      // 기록 저장
       const r = await fetch('/api/promise', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({
-          user_id:      userId,
-          location_id:  locationId,
-          emotion_text: text.trim(),
+          user_id:           userId,
+          location_id:       locationId,
+          emotion_text:      text.trim(),
+          message_to_future: futureMsg.trim() || null,
           photo_url,
+          created_lat: gps?.lat ?? null,
+          created_lng: gps?.lng ?? null,
         }),
       });
       const data = await r.json();
@@ -294,21 +261,21 @@ export default function PromiseLocationPage() {
     <div style={S.page}>
       <motion.div
         style={{ width: '100%', maxWidth: 360, paddingTop: 52 }}
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45 }}
       >
         {/* 장소 배지 */}
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <span style={{
-            display: 'inline-block', padding: '5px 14px',
-            borderRadius: 20,
-            background: 'rgba(167,139,250,0.1)',
-            border: '1px solid rgba(167,139,250,0.25)',
-            fontSize: 12, color: '#A78BFA', fontWeight: 600,
-          }}>
-            📍 {locationName}
-          </span>
+          {locationId ? (
+            <span style={{
+              display: 'inline-block', padding: '5px 14px', borderRadius: 20,
+              background: 'rgba(167,139,250,0.1)',
+              border: '1px solid rgba(167,139,250,0.25)',
+              fontSize: 12, color: '#A78BFA', fontWeight: 600,
+            }}>📍 {locationName}</span>
+          ) : (
+            <span style={{ fontSize: 12, color: '#4A3A70' }}>장소 미지정</span>
+          )}
         </div>
 
         <div style={S.card}>
@@ -323,50 +290,53 @@ export default function PromiseLocationPage() {
             <PhotoPicker
               photoPreview={photoPreview}
               onSelect={handlePhotoSelect}
-              onRemove={handlePhotoRemove}
+              onRemove={() => { setPhotoFile(null); setPhotoPreview(null); }}
             />
 
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#9B7FE0', letterSpacing: '0.08em', marginBottom: 8 }}>
-              지금 이 자리에서의 다짐
-            </div>
+            <div style={S.fieldLabel}>지금 이 자리에서의 다짐 *</div>
             <textarea
               value={text}
               onChange={e => setText(e.target.value)}
               placeholder="90일 후의 나에게 남기고 싶은 말을 적어주세요"
-              maxLength={400}
-              rows={6}
-              style={S.textarea}
+              maxLength={400} rows={5}
+              style={{ ...S.textarea, marginBottom: 4 }}
               autoFocus
             />
-            <div style={{ fontSize: 11, color: '#3A2F60', textAlign: 'right', marginBottom: 12 }}>
+            <div style={{ fontSize: 11, color: '#3A2F60', textAlign: 'right', marginBottom: 20 }}>
               {text.length}/400
+            </div>
+
+            <div style={S.fieldLabel}>
+              미래의 나에게 전하는 말 <span style={{ color: '#4A3A70', fontWeight: 400 }}>(선택)</span>
+            </div>
+            <textarea
+              value={futureMsg}
+              onChange={e => setFutureMsg(e.target.value)}
+              placeholder="90일 뒤 이 기록을 여는 나에게..."
+              maxLength={200} rows={3}
+              style={{ ...S.textarea, marginBottom: 4 }}
+            />
+            <div style={{ fontSize: 11, color: '#3A2F60', textAlign: 'right', marginBottom: 12 }}>
+              {futureMsg.length}/200
             </div>
 
             {error && (
               <div style={{ fontSize: 13, color: '#f87171', marginBottom: 10 }}>{error}</div>
             )}
 
-            <button
-              type="submit"
-              disabled={!canSubmit}
-              style={{ ...S.btn, ...(canSubmit ? {} : S.btnDisabled) }}
-            >
+            <button type="submit" disabled={!canSubmit}
+              style={{ ...S.btn, ...(canSubmit ? {} : S.btnDisabled) }}>
               {uploading ? '사진 업로드 중...' : loading ? '봉인 중...' : '이 순간을 봉인하기 ✦'}
             </button>
           </form>
         </div>
 
-        <button
-          onClick={() => nav(-1)}
-          style={{
-            background: 'none', border: 'none', color: '#3A2F60',
-            fontSize: 12, cursor: 'pointer', marginTop: 20,
-            fontFamily: "'Noto Sans KR', sans-serif",
-            display: 'block', width: '100%', textAlign: 'center',
-          }}
-        >
-          ← 뒤로
-        </button>
+        <button onClick={() => nav(-1)} style={{
+          background: 'none', border: 'none', color: '#3A2F60',
+          fontSize: 12, cursor: 'pointer', marginTop: 20,
+          fontFamily: "'Noto Sans KR', sans-serif",
+          display: 'block', width: '100%', textAlign: 'center',
+        }}>← 뒤로</button>
       </motion.div>
     </div>
   );

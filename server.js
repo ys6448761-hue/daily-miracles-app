@@ -2841,8 +2841,7 @@ const DT_SPA_ROUTES = [
   // 아우룸
   '/aurum/create',
   '/aurum/*',
-  // 약속 기록
-  '/location/*',
+  // 약속 기록 (/promise/* 가 create, list, :id 모두 커버)
   '/promise/*',
   // 여수 미션
   '/missions',

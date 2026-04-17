@@ -134,7 +134,7 @@ export default function App() {
           <Route path="/aurum/create"              element={<AurumCreatePage />} />
           <Route path="/aurum/:id"                 element={<AurumViewPage />} />
           {/* 약속 기록 — 장소 × 시간 이중 잠금 */}
-          <Route path="/location/:locationId"      element={<PromiseLocationPage />} />
+          <Route path="/promise/create"            element={<PromiseLocationPage />} />
           <Route path="/promise/:id"               element={<PromiseViewPage />} />
           {/* 여수 미션 + 포인트 */}
           <Route path="/missions"                  element={<MissionPage />} />

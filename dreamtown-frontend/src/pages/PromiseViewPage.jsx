@@ -1,23 +1,21 @@
 /**
  * PromiseViewPage.jsx — 약속 기록 열기
- * 경로: /promise/:id
+ * 경로: /promise/:id?loc=yeosu-cablecar
  *
- * Lock states:
- *   LOCKED_LOCATION  → 다른 장소 ("이곳에서만 열립니다")
- *   LOCKED_TIME      → 시간 미도달 ("N일 후에 열립니다")
- *   OPEN             → 기록 표시
+ * Phases: loading → opening → open | locked_loc | locked_time | error
+ * Lock states: LOCKED_LOCATION | LOCKED_TIME | OPEN
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getOrCreateUserId } from '../api/dreamtown.js';
 
 const LOCATION_NAMES = {
-  'yeosu-cablecar': '여수 해상 케이블카',
-  'yeosu-aqua':     '여수 아쿠아플라넷',
-  'yeosu-yacht':    '여수 야경 요트',
-  'yeosu-odongdo':  '여수 오동도',
+  'yeosu-cablecar':  '여수 해상 케이블카',
+  'yeosu-aqua':      '여수 아쿠아플라넷',
+  'yeosu-yacht':     '여수 야경 요트',
+  'yeosu-odongdo':   '여수 오동도',
   'yeosu-hyangiram': '향일암',
 };
 
@@ -28,21 +26,82 @@ const S = {
     display: 'flex', flexDirection: 'column',
     alignItems: 'center', justifyContent: 'center',
     padding: '0 20px',
-    fontFamily: "'Noto Sans KR', sans-serif",
-    color: '#E8E4F0',
+    fontFamily: "'Noto Sans KR', sans-serif", color: '#E8E4F0',
   },
   card: {
     width: '100%', maxWidth: 360,
     background: 'rgba(180,120,255,0.04)',
     border: '1px solid rgba(180,120,255,0.18)',
-    borderRadius: 24, padding: '36px 22px',
-    textAlign: 'center',
+    borderRadius: 24, padding: '36px 22px', textAlign: 'center',
   },
   dot: {
     width: 8, height: 8, borderRadius: '50%',
     background: '#A78BFA', display: 'inline-block', margin: '0 4px',
   },
 };
+
+// ── 개봉 연출 (보라빛 구슬, 2.5초) ─────────────────────────────────
+// 연출 실패 시 fallback: 1초 후 강제 전환
+function OpeningScene({ onComplete }) {
+  const calledRef = useRef(false);
+
+  useEffect(() => {
+    const done = () => {
+      if (!calledRef.current) { calledRef.current = true; onComplete(); }
+    };
+    const normal   = setTimeout(done, 2600);          // 정상 종료
+    const fallback = setTimeout(done, 3500);           // 연출 실패 대비 안전망
+    return () => { clearTimeout(normal); clearTimeout(fallback); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const D = 2.5;
+  const t = s => s / D;
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0,
+      background: '#05040a', zIndex: 9999, overflow: 'hidden',
+    }}>
+      {/* 배경 글로우 */}
+      <motion.div
+        style={{
+          position: 'absolute', inset: 0,
+          background: 'radial-gradient(circle at 50% 50%, rgba(167,139,250,0.4) 0%, rgba(120,80,220,0.1) 40%, transparent 65%)',
+        }}
+        animate={{ opacity: [0, 0, 0.1, 0.5, 0.7, 0.5, 0] }}
+        transition={{ duration: D, times: [0, t(0.3), t(0.7), t(1.3), t(1.9), t(2.2), 1], ease: 'linear' }}
+      />
+      {/* 구슬 */}
+      <motion.div
+        style={{
+          position: 'absolute', top: '50%', left: '50%',
+          width: 52, height: 52, marginTop: -26, marginLeft: -26,
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, #e8d8ff 0%, #A78BFA 30%, #7B5CE5 60%, transparent 80%)',
+          boxShadow: '0 0 20px 8px rgba(167,139,250,0.8), 0 0 50px 20px rgba(120,80,220,0.4)',
+        }}
+        animate={{
+          scale:   [0, 0, 0.05, 0.2, 0.6, 1.2, 4, 18],
+          opacity: [0, 0, 0.7, 0.9, 1,   1,   1,  0],
+        }}
+        transition={{
+          duration: D,
+          times: [0, t(0.3), t(0.9), t(1.4), t(1.8), t(2.1), t(2.4), 1],
+          ease: [0.2, 0.0, 0.9, 1.0],
+        }}
+      />
+      {/* 플래시 */}
+      <motion.div
+        style={{
+          position: 'absolute', inset: 0,
+          background: 'radial-gradient(circle at 50% 50%, rgba(230,210,255,0.95) 0%, rgba(167,139,250,0.4) 50%, transparent 80%)',
+        }}
+        animate={{ opacity: [0, 0, 0, 0.7, 0] }}
+        transition={{ duration: D, times: [0, t(2.0), t(2.2), t(2.35), 1], ease: 'linear' }}
+      />
+    </div>
+  );
+}
 
 // ── 로딩 ─────────────────────────────────────────────────────────────
 function LoadingView() {
@@ -67,16 +126,13 @@ function LoadingView() {
 function LockedLocationView({ locationId, createdAt }) {
   const nav          = useNavigate();
   const locationName = LOCATION_NAMES[locationId] || locationId;
-  const date         = new Date(createdAt).toLocaleDateString('ko-KR', {
-    year: 'numeric', month: 'long', day: 'numeric',
-  });
+  const date         = new Date(createdAt).toLocaleDateString('ko-KR',
+    { year: 'numeric', month: 'long', day: 'numeric' });
 
   return (
     <div style={S.page}>
-      <motion.div
-        style={S.card}
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
+      <motion.div style={S.card}
+        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45 }}
       >
         <div style={{
@@ -84,11 +140,8 @@ function LockedLocationView({ locationId, createdAt }) {
           background: 'radial-gradient(circle, rgba(167,139,250,0.25) 0%, transparent 70%)',
           border: '1.5px solid rgba(167,139,250,0.3)',
           margin: '0 auto 20px',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 22,
-        }}>
-          🔒
-        </div>
+          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22,
+        }}>🔒</div>
 
         <div style={{ fontSize: 11, fontWeight: 700, color: '#4A3A70', letterSpacing: '0.1em', marginBottom: 10 }}>
           약속 기록
@@ -98,30 +151,20 @@ function LockedLocationView({ locationId, createdAt }) {
         </div>
         <div style={{ fontSize: 13, color: '#6A6090', lineHeight: 1.7, marginBottom: 20 }}>
           이 기록은 <strong style={{ color: '#A78BFA' }}>{locationName}</strong>에서<br />
-          봉인된 약속이에요.<br />
-          그 자리로 돌아가면 열립니다.
+          봉인된 약속이에요.<br />그 자리로 돌아가면 열립니다.
         </div>
-
         <div style={{
           padding: '10px 14px', borderRadius: 10,
           background: 'rgba(167,139,250,0.05)',
           border: '1px solid rgba(167,139,250,0.1)',
           fontSize: 12, color: '#4A3A70', marginBottom: 20,
-        }}>
-          📅 {date}에 이곳에서 봉인됨
-        </div>
-
-        <button
-          onClick={() => nav(-1)}
-          style={{
-            background: 'none', border: '1px solid rgba(255,255,255,0.08)',
-            color: '#6A6090', fontSize: 13, borderRadius: 12,
-            padding: '10px 0', width: '100%', cursor: 'pointer',
-            fontFamily: "'Noto Sans KR', sans-serif",
-          }}
-        >
-          돌아가기
-        </button>
+        }}>📅 {date}에 이곳에서 봉인됨</div>
+        <button onClick={() => nav(-1)} style={{
+          background: 'none', border: '1px solid rgba(255,255,255,0.08)',
+          color: '#6A6090', fontSize: 13, borderRadius: 12,
+          padding: '10px 0', width: '100%', cursor: 'pointer',
+          fontFamily: "'Noto Sans KR', sans-serif",
+        }}>돌아가기</button>
       </motion.div>
     </div>
   );
@@ -131,45 +174,35 @@ function LockedLocationView({ locationId, createdAt }) {
 function LockedTimeView({ daysLeft, openAt, locationId, createdAt }) {
   const nav          = useNavigate();
   const locationName = LOCATION_NAMES[locationId] || locationId;
-  const openDate     = new Date(openAt).toLocaleDateString('ko-KR', {
-    year: 'numeric', month: 'long', day: 'numeric',
-  });
-  const createDate   = new Date(createdAt).toLocaleDateString('ko-KR', {
-    year: 'numeric', month: 'long', day: 'numeric',
-  });
+  const openDate     = new Date(openAt).toLocaleDateString('ko-KR',
+    { year: 'numeric', month: 'long', day: 'numeric' });
+  const createDate   = new Date(createdAt).toLocaleDateString('ko-KR',
+    { year: 'numeric', month: 'long', day: 'numeric' });
 
-  // 진행률 (90일 기준)
-  const total  = 90;
-  const passed = total - daysLeft;
-  const pct    = Math.max(0, Math.min(100, Math.round((passed / total) * 100)));
+  const total = 90;
+  const pct   = Math.max(0, Math.min(100, Math.round(((total - daysLeft) / total) * 100)));
 
   return (
     <div style={S.page}>
-      <motion.div
-        style={S.card}
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
+      <motion.div style={S.card}
+        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45 }}
       >
-        {/* 모래시계 글로우 */}
         <motion.div
           style={{
             width: 52, height: 52, borderRadius: '50%',
             background: 'radial-gradient(circle, rgba(167,139,250,0.3) 0%, transparent 70%)',
             border: '1.5px solid rgba(167,139,250,0.3)',
             margin: '0 auto 20px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 24,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24,
           }}
           animate={{ boxShadow: [
             '0 0 12px 4px rgba(167,139,250,0.2)',
-            '0 0 20px 8px rgba(167,139,250,0.35)',
+            '0 0 22px 8px rgba(167,139,250,0.38)',
             '0 0 12px 4px rgba(167,139,250,0.2)',
           ]}}
           transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          ⏳
-        </motion.div>
+        >⏳</motion.div>
 
         <div style={{ fontSize: 11, fontWeight: 700, color: '#4A3A70', letterSpacing: '0.1em', marginBottom: 10 }}>
           약속 기록
@@ -177,8 +210,8 @@ function LockedTimeView({ daysLeft, openAt, locationId, createdAt }) {
         <div style={{ fontSize: 20, fontWeight: 800, color: '#E8E4F0', lineHeight: 1.4, marginBottom: 10 }}>
           아직 열릴 때가<br />아니에요
         </div>
-        <div style={{ fontSize: 13, color: '#6A6090', lineHeight: 1.7, marginBottom: 20 }}>
-          <strong style={{ color: '#A78BFA', fontSize: 28, fontWeight: 900, display: 'block', marginBottom: 4 }}>
+        <div style={{ fontSize: 13, color: '#6A6090', lineHeight: 1.7, marginBottom: 16 }}>
+          <strong style={{ color: '#A78BFA', fontSize: 30, fontWeight: 900, display: 'block', marginBottom: 4 }}>
             {daysLeft}일
           </strong>
           후에 열립니다.
@@ -187,16 +220,13 @@ function LockedTimeView({ daysLeft, openAt, locationId, createdAt }) {
         {/* 진행 바 */}
         <div style={{
           height: 6, borderRadius: 3,
-          background: 'rgba(167,139,250,0.1)',
-          marginBottom: 8, overflow: 'hidden',
+          background: 'rgba(167,139,250,0.1)', marginBottom: 6, overflow: 'hidden',
         }}>
-          <motion.div
-            style={{
-              height: '100%', borderRadius: 3,
-              background: 'linear-gradient(90deg, #7B5CE5, #A78BFA)',
-            }}
-            initial={{ width: 0 }}
-            animate={{ width: `${pct}%` }}
+          <motion.div style={{
+            height: '100%', borderRadius: 3,
+            background: 'linear-gradient(90deg, #7B5CE5, #A78BFA)',
+          }}
+            initial={{ width: 0 }} animate={{ width: `${pct}%` }}
             transition={{ duration: 1, ease: 'easeOut' }}
           />
         </div>
@@ -208,23 +238,17 @@ function LockedTimeView({ daysLeft, openAt, locationId, createdAt }) {
           padding: '10px 14px', borderRadius: 10,
           background: 'rgba(167,139,250,0.05)',
           border: '1px solid rgba(167,139,250,0.1)',
-          fontSize: 12, color: '#4A3A70', marginBottom: 20,
+          fontSize: 12, color: '#4A3A70', marginBottom: 20, lineHeight: 1.8,
         }}>
           📅 {createDate} {locationName}에서 봉인<br />
           🔓 {openDate} 개봉 예정
         </div>
-
-        <button
-          onClick={() => nav(-1)}
-          style={{
-            background: 'none', border: '1px solid rgba(255,255,255,0.08)',
-            color: '#6A6090', fontSize: 13, borderRadius: 12,
-            padding: '10px 0', width: '100%', cursor: 'pointer',
-            fontFamily: "'Noto Sans KR', sans-serif",
-          }}
-        >
-          돌아가기
-        </button>
+        <button onClick={() => nav(-1)} style={{
+          background: 'none', border: '1px solid rgba(255,255,255,0.08)',
+          color: '#6A6090', fontSize: 13, borderRadius: 12,
+          padding: '10px 0', width: '100%', cursor: 'pointer',
+          fontFamily: "'Noto Sans KR', sans-serif",
+        }}>돌아가기</button>
       </motion.div>
     </div>
   );
@@ -232,22 +256,18 @@ function LockedTimeView({ daysLeft, openAt, locationId, createdAt }) {
 
 // ── OPEN ─────────────────────────────────────────────────────────────
 function OpenView({ data }) {
-  const { emotion_text, photo_url, location_id, created_at, open_at, first_open } = data;
-
+  const { emotion_text, message_to_future, photo_url, location_id, created_at, is_first_open } = data;
   const locationName = LOCATION_NAMES[location_id] || location_id;
-  const createDate   = new Date(created_at).toLocaleDateString('ko-KR', {
-    year: 'numeric', month: 'long', day: 'numeric',
-  });
+  const createDate   = new Date(created_at).toLocaleDateString('ko-KR',
+    { year: 'numeric', month: 'long', day: 'numeric' });
 
   return (
     <div style={{ ...S.page, justifyContent: 'flex-start', paddingTop: 48, paddingBottom: 60 }}>
       <motion.div
         style={{ width: '100%', maxWidth: 360 }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6 }}
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7 }}
       >
-        {/* 글로우 헤더 */}
+        {/* 헤더 */}
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <motion.div
             style={{
@@ -262,46 +282,34 @@ function OpenView({ data }) {
             ]}}
             transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
           />
-
-          {first_open && (
+          {is_first_open && (
             <motion.div
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               style={{ fontSize: 12, fontWeight: 700, color: '#A78BFA', marginBottom: 8 }}
             >
-              ✦ 처음 개봉됐어요
+              ✦ 처음 열렸어요
             </motion.div>
           )}
-
-          <div style={{ fontSize: 11, color: '#4A3A70', marginBottom: 4 }}>
-            📍 {locationName}
-          </div>
-          <div style={{ fontSize: 11, color: '#3A2F60' }}>
-            {createDate}에 봉인된 약속
-          </div>
+          <div style={{ fontSize: 11, color: '#4A3A70', marginBottom: 4 }}>📍 {locationName}</div>
+          <div style={{ fontSize: 11, color: '#3A2F60' }}>{createDate}에 봉인된 약속</div>
         </div>
 
         {/* 사진 */}
         {photo_url && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.55 }}
             style={{ borderRadius: 18, overflow: 'hidden', marginBottom: 16 }}
           >
-            <img
-              src={photo_url}
-              alt="봉인 사진"
-              style={{ width: '100%', maxHeight: 260, objectFit: 'cover', display: 'block' }}
-            />
+            <img src={photo_url} alt="봉인 사진"
+              style={{ width: '100%', maxHeight: 260, objectFit: 'cover', display: 'block' }} />
           </motion.div>
         )}
 
-        {/* 다짐 텍스트 */}
+        {/* 다짐 */}
         <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.5 }}
           style={{
             padding: '20px 18px', borderRadius: 18,
@@ -309,11 +317,30 @@ function OpenView({ data }) {
             border: '1px solid rgba(167,139,250,0.15)',
             fontSize: 15, color: '#E8E4F0', lineHeight: 1.85,
             whiteSpace: 'pre-wrap', wordBreak: 'break-word',
-            marginBottom: 20,
+            marginBottom: message_to_future ? 14 : 20,
           }}
-        >
-          {emotion_text}
-        </motion.div>
+        >{emotion_text}</motion.div>
+
+        {/* 미래 메시지 */}
+        {message_to_future && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            style={{
+              padding: '16px 18px', borderRadius: 18,
+              background: 'rgba(167,139,250,0.03)',
+              border: '1px dashed rgba(167,139,250,0.2)',
+              fontSize: 13, color: '#9B7FE0', lineHeight: 1.8,
+              whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+              marginBottom: 20,
+            }}
+          >
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#4A3A70', marginBottom: 8, letterSpacing: '0.1em' }}>
+              미래의 나에게
+            </div>
+            {message_to_future}
+          </motion.div>
+        )}
 
         <div style={{ fontSize: 11, color: '#3A2F60', textAlign: 'center' }}>
           90일의 봉인이 끝났습니다
@@ -332,17 +359,12 @@ function ErrorView({ message }) {
         <div style={{ fontSize: 32, marginBottom: 16 }}>⚠️</div>
         <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 10 }}>열 수 없어요</div>
         <div style={{ fontSize: 13, color: '#f87171', marginBottom: 20, lineHeight: 1.5 }}>{message}</div>
-        <button
-          onClick={() => nav(-1)}
-          style={{
-            background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.2)',
-            color: '#9B7FE0', fontSize: 13, borderRadius: 12,
-            padding: '11px 0', width: '100%', cursor: 'pointer',
-            fontFamily: "'Noto Sans KR', sans-serif",
-          }}
-        >
-          돌아가기
-        </button>
+        <button onClick={() => nav(-1)} style={{
+          background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.2)',
+          color: '#9B7FE0', fontSize: 13, borderRadius: 12,
+          padding: '11px 0', width: '100%', cursor: 'pointer',
+          fontFamily: "'Noto Sans KR', sans-serif",
+        }}>돌아가기</button>
       </motion.div>
     </div>
   );
@@ -350,8 +372,8 @@ function ErrorView({ message }) {
 
 // ── 메인 ─────────────────────────────────────────────────────────────
 export default function PromiseViewPage() {
-  const { id }   = useParams();
-  const [phase,  setPhase]  = useState('loading');   // loading | locked_loc | locked_time | open | error
+  const { id }  = useParams();
+  const [phase,  setPhase]  = useState('loading');
   const [data,   setData]   = useState(null);
   const [errMsg, setErrMsg] = useState('');
 
@@ -361,13 +383,18 @@ export default function PromiseViewPage() {
     (async () => {
       try {
         const userId = getOrCreateUserId();
-        // current_location: URL에 ?loc= 쿼리로 받거나, 현재 위치 ID를 URLSearchParams로 전달
         const params = new URLSearchParams(window.location.search);
-        const currentLocation = params.get('loc') || '';
+        const currentLoc = params.get('loc') || '';
 
-        const url = `/api/promise/${id}?user_id=${encodeURIComponent(userId)}${currentLocation ? `&location_id=${encodeURIComponent(currentLocation)}` : ''}`;
-        const r   = await fetch(url);
-        const d   = await r.json();
+        const r = await fetch(`/api/promise/${id}/open`, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({
+            user_id:     userId,
+            location_id: currentLoc || undefined,
+          }),
+        });
+        const d = await r.json();
 
         if (cancelled) return;
 
@@ -380,12 +407,9 @@ export default function PromiseViewPage() {
         setData(d);
         if      (d.lock_state === 'LOCKED_LOCATION') setPhase('locked_loc');
         else if (d.lock_state === 'LOCKED_TIME')     setPhase('locked_time');
-        else                                          setPhase('open');
+        else                                          setPhase('opening');   // → 연출 → open
       } catch (e) {
-        if (!cancelled) {
-          setErrMsg(e.message);
-          setPhase('error');
-        }
+        if (!cancelled) { setErrMsg(e.message); setPhase('error'); }
       }
     })();
 
@@ -393,12 +417,8 @@ export default function PromiseViewPage() {
   }, [id]);
 
   if (phase === 'loading')    return <LoadingView />;
-  if (phase === 'locked_loc') return (
-    <LockedLocationView
-      locationId={data?.location_id}
-      createdAt={data?.created_at}
-    />
-  );
+  if (phase === 'opening')    return <OpeningScene onComplete={() => setPhase('open')} />;
+  if (phase === 'locked_loc') return <LockedLocationView locationId={data?.location_id} createdAt={data?.created_at} />;
   if (phase === 'locked_time') return (
     <LockedTimeView
       daysLeft={data?.days_left ?? 90}

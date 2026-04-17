@@ -280,7 +280,7 @@ export default function AurumViewPage() {
         setData(d);
 
         if (d.can_open) {
-          setPhase('opening'); // → AurumOpenScene
+          setPhase('opening'); // → AurumOpenScene (3초 연출)
         } else {
           setPhase('locked');
         }
@@ -296,7 +296,13 @@ export default function AurumViewPage() {
   }, [id]);
 
   if (phase === 'checking') return <CheckingView />;
-  if (phase === 'opening')  return <AurumOpenScene onComplete={() => setPhase('open')} />;
+  if (phase === 'opening')  return (
+    <AurumOpenScene
+      onComplete={() => setPhase('open')}
+      fallbackMs={5000}  // 5초 안에 연출 못 끝내면 강제 전환
+      onFallback={() => setPhase('open')}
+    />
+  );
   if (phase === 'locked')   return (
     <LockedView
       distanceM={data?.distance_m ?? 0}

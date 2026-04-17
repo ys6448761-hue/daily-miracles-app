@@ -16,17 +16,31 @@ import { motion } from 'framer-motion';
 const D = 3.0;
 const t = (sec) => sec / D;
 
-export default function AurumOpenScene({ onComplete }) {
+export default function AurumOpenScene({ onComplete, fallbackMs, onFallback }) {
   const calledRef = useRef(false);
 
+  const done = () => {
+    if (!calledRef.current) {
+      calledRef.current = true;
+      onComplete?.();
+    }
+  };
+
   useEffect(() => {
-    const id = setTimeout(() => {
+    // 정상 종료: 연출 끝나면 전환
+    const tid = setTimeout(done, D * 1000 + 100);
+    // 안전망: fallbackMs 내 onComplete 미호출 시 강제 전환 (연출 실패 대비)
+    const fid = fallbackMs ? setTimeout(() => {
       if (!calledRef.current) {
         calledRef.current = true;
-        onComplete?.();
+        (onFallback ?? onComplete)?.();
       }
-    }, D * 1000 + 100);
-    return () => clearTimeout(id);
+    }, fallbackMs) : null;
+
+    return () => {
+      clearTimeout(tid);
+      if (fid) clearTimeout(fid);
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
