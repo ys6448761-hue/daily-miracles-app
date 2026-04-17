@@ -123,11 +123,14 @@ function LoadingView() {
 }
 
 // ── LOCKED_LOCATION ───────────────────────────────────────────────────
-function LockedLocationView({ locationId, createdAt }) {
+function LockedLocationView({ locationId, createdAt, distanceM }) {
   const nav          = useNavigate();
   const locationName = LOCATION_NAMES[locationId] || locationId;
   const date         = new Date(createdAt).toLocaleDateString('ko-KR',
     { year: 'numeric', month: 'long', day: 'numeric' });
+  const awayStr = distanceM != null
+    ? (distanceM >= 1000 ? `${(distanceM / 1000).toFixed(1)}km` : `${distanceM}m`)
+    : null;
 
   return (
     <div style={S.page}>
@@ -152,6 +155,9 @@ function LockedLocationView({ locationId, createdAt }) {
         <div style={{ fontSize: 13, color: '#6A6090', lineHeight: 1.7, marginBottom: 20 }}>
           이 기록은 <strong style={{ color: '#A78BFA' }}>{locationName}</strong>에서<br />
           봉인된 약속이에요.<br />그 자리로 돌아가면 열립니다.
+          {awayStr && (
+            <><br />현재 위치에서 약 <strong style={{ color: '#A78BFA' }}>{awayStr}</strong> 떨어져 있어요.</>
+          )}
         </div>
         <div style={{
           padding: '10px 14px', borderRadius: 10,
@@ -370,6 +376,18 @@ function ErrorView({ message }) {
   );
 }
 
+// GPS 취득 (best-effort — 거부해도 계속 진행, 서버가 문자열 fallback 처리)
+function tryGetGps() {
+  return new Promise(resolve => {
+    if (!navigator.geolocation) { resolve(null); return; }
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => resolve({ lat: coords.latitude, lng: coords.longitude }),
+      ()           => resolve(null),
+      { timeout: 6000, maximumAge: 30000 }
+    );
+  });
+}
+
 // ── 메인 ─────────────────────────────────────────────────────────────
 export default function PromiseViewPage() {
   const { id }  = useParams();
@@ -386,12 +404,18 @@ export default function PromiseViewPage() {
         const params = new URLSearchParams(window.location.search);
         const currentLoc = params.get('loc') || '';
 
+        // ① GPS 취득 (서버 GPS 검증을 위해 — 조작 방지 1순위)
+        const gps = await tryGetGps();
+        if (cancelled) return;
+
         const r = await fetch(`/api/promise/${id}/open`, {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({
             user_id:     userId,
             location_id: currentLoc || undefined,
+            lat:         gps?.lat ?? null,  // 서버가 haversine 거리 계산
+            lng:         gps?.lng ?? null,
           }),
         });
         const d = await r.json();
@@ -418,7 +442,13 @@ export default function PromiseViewPage() {
 
   if (phase === 'loading')    return <LoadingView />;
   if (phase === 'opening')    return <OpeningScene onComplete={() => setPhase('open')} />;
-  if (phase === 'locked_loc') return <LockedLocationView locationId={data?.location_id} createdAt={data?.created_at} />;
+  if (phase === 'locked_loc') return (
+    <LockedLocationView
+      locationId={data?.location_id}
+      createdAt={data?.created_at}
+      distanceM={data?.distance_m ?? null}
+    />
+  );
   if (phase === 'locked_time') return (
     <LockedTimeView
       daysLeft={data?.days_left ?? 90}
