@@ -388,14 +388,23 @@ function tryGetGps() {
   });
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 // ── 메인 ─────────────────────────────────────────────────────────────
 export default function PromiseViewPage() {
   const { id }  = useParams();
+  const nav     = useNavigate();
   const [phase,  setPhase]  = useState('loading');
   const [data,   setData]   = useState(null);
   const [errMsg, setErrMsg] = useState('');
 
   useEffect(() => {
+    // id가 UUID 형식이 아니면 create 페이지로 리다이렉트
+    if (!id || !UUID_RE.test(id)) {
+      nav('/promise/create', { replace: true });
+      return;
+    }
+
     let cancelled = false;
 
     (async () => {
