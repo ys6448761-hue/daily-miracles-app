@@ -2195,6 +2195,18 @@ if (hometownRoutes) {
   console.log('✅ 별들의 고향 라우터 등록 완료 (/api/hometown)');
 }
 
+// ---------- 아우룸 위치 잠금 기억 (/api/aurum) ----------
+let aurumRoutes = null;
+try {
+  aurumRoutes = require('./routes/aurumRoutes');
+} catch (e) {
+  console.warn('⚠️ aurumRoutes 로드 실패:', e.message);
+}
+if (aurumRoutes) {
+  app.use('/api/aurum', aurumRoutes);
+  console.log('✅ 아우룸 라우터 등록 완료 (/api/aurum)');
+}
+
 // ---------- 케이블카 캐빈 QR 진입 엔진 (/api/cablecar) ----------
 let cablecarRoutes = null;
 try {
@@ -2814,6 +2826,9 @@ const DT_SPA_ROUTES = [
   // 케이블카
   '/cablecar',
   '/cablecar-landing',
+  // 아우룸
+  '/aurum/create',
+  '/aurum/*',
   // 여수 미션
   '/missions',
   // 어드민

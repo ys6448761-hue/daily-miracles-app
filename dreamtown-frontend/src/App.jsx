@@ -56,6 +56,8 @@ import Day7Complete from './pages/Day7Complete.jsx';
 import HometownLanding from './pages/HometownLanding.jsx';
 import CablecarPage from './pages/CablecarPage.jsx';
 import CablecarLandingPage from './pages/CablecarLandingPage.jsx';
+import AurumCreatePage from './pages/AurumCreatePage.jsx';
+import AurumViewPage from './pages/AurumViewPage.jsx';
 import MissionPage from './pages/MissionPage.jsx';
 import HometownAdmin from './pages/HometownAdmin.jsx';
 import Shop from './pages/Shop.jsx';
@@ -126,6 +128,9 @@ export default function App() {
           <Route path="/cablecar"                  element={<CablecarPage />} />
           {/* 케이블카 각성 패스 구매 랜딩 */}
           <Route path="/cablecar-landing"          element={<CablecarLandingPage />} />
+          {/* 아우룸 — 위치 잠금 기억 캡슐 */}
+          <Route path="/aurum/create"              element={<AurumCreatePage />} />
+          <Route path="/aurum/:id"                 element={<AurumViewPage />} />
           {/* 여수 미션 + 포인트 */}
           <Route path="/missions"                  element={<MissionPage />} />
           {/* 별들의 고향 */}
