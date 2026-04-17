@@ -178,6 +178,7 @@ function SealedView({ promiseId, openAt, locationName }) {
 
 // ── 메인 ──────────────────────────────────────────────────────────
 export default function PromiseLocationPage() {
+  console.log('CREATE_PAGE_MOUNTED'); // TODO: remove after deploy verify
   const [searchParams] = useSearchParams();
   const nav = useNavigate();
 
