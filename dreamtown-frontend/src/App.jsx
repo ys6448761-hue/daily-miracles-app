@@ -58,6 +58,8 @@ import CablecarPage from './pages/CablecarPage.jsx';
 import CablecarLandingPage from './pages/CablecarLandingPage.jsx';
 import AurumCreatePage from './pages/AurumCreatePage.jsx';
 import AurumViewPage from './pages/AurumViewPage.jsx';
+import PromiseLocationPage from './pages/PromiseLocationPage.jsx';
+import PromiseViewPage from './pages/PromiseViewPage.jsx';
 import MissionPage from './pages/MissionPage.jsx';
 import HometownAdmin from './pages/HometownAdmin.jsx';
 import Shop from './pages/Shop.jsx';
@@ -131,6 +133,9 @@ export default function App() {
           {/* 아우룸 — 위치 잠금 기억 캡슐 */}
           <Route path="/aurum/create"              element={<AurumCreatePage />} />
           <Route path="/aurum/:id"                 element={<AurumViewPage />} />
+          {/* 약속 기록 — 장소 × 시간 이중 잠금 */}
+          <Route path="/location/:locationId"      element={<PromiseLocationPage />} />
+          <Route path="/promise/:id"               element={<PromiseViewPage />} />
           {/* 여수 미션 + 포인트 */}
           <Route path="/missions"                  element={<MissionPage />} />
           {/* 별들의 고향 */}

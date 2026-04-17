@@ -2207,6 +2207,18 @@ if (aurumRoutes) {
   console.log('✅ 아우룸 라우터 등록 완료 (/api/aurum)');
 }
 
+// ---------- 약속 기록 (/api/promise) ----------
+let promiseRoutes = null;
+try {
+  promiseRoutes = require('./routes/promiseRoutes');
+} catch (e) {
+  console.warn('⚠️ promiseRoutes 로드 실패:', e.message);
+}
+if (promiseRoutes) {
+  app.use('/api/promise', promiseRoutes);
+  console.log('✅ 약속 기록 라우터 등록 완료 (/api/promise)');
+}
+
 // ---------- 케이블카 캐빈 QR 진입 엔진 (/api/cablecar) ----------
 let cablecarRoutes = null;
 try {
@@ -2829,6 +2841,9 @@ const DT_SPA_ROUTES = [
   // 아우룸
   '/aurum/create',
   '/aurum/*',
+  // 약속 기록
+  '/location/*',
+  '/promise/*',
   // 여수 미션
   '/missions',
   // 어드민
