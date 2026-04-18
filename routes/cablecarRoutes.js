@@ -288,4 +288,64 @@ router.post('/checkout', async (req, res) => {
   }
 });
 
+// ── POST /entry — 단일 QR 진입 (Issue 2: PRE-ON → ON) ───────────────
+// 기존 별 있으면 activate, 없으면 생성 후 activate
+// stars 테이블 기준 (dt_stars 아님)
+router.post('/entry', async (req, res) => {
+  try {
+    const { user_id, wish_text, gem_type = 'diamond' } = req.body;
+    if (!user_id) return res.status(400).json({ success: false, error: 'user_id 필수' });
+
+    // 기존 별 조회 (가장 최근 PRE-ON 우선)
+    const existing = await db.query(
+      `SELECT * FROM stars WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1`,
+      [user_id]
+    ).catch(() => ({ rows: [] }));
+
+    let star = existing.rows[0];
+    let mode;
+
+    if (star) {
+      // 기존 별 → activate
+      if (star.status !== 'ON') {
+        await db.query(
+          `UPDATE stars SET status = 'ON', activated_at = CURRENT_TIMESTAMP WHERE id = $1`,
+          [star.id]
+        );
+        star.status = 'ON';
+      }
+      mode = 'activated';
+    } else {
+      // 신규 → 생성 + activate
+      if (!wish_text) return res.status(400).json({ success: false, error: '신규 유저: wish_text 필수' });
+      if (!['ruby', 'sapphire', 'emerald', 'diamond', 'citrine'].includes(gem_type))
+        return res.status(400).json({ success: false, error: 'gem_type 유효값: ruby, sapphire, emerald, diamond, citrine' });
+
+      const id = uuidv4();
+      await db.query(
+        `INSERT INTO stars (id, user_id, wish_text, gem_type, status, activated_at)
+         VALUES ($1, $2, $3, $4, 'ON', CURRENT_TIMESTAMP)`,
+        [id, user_id, wish_text, gem_type]
+      );
+      const newRow = await db.query(`SELECT * FROM stars WHERE id = $1`, [id]);
+      star = newRow.rows[0];
+      mode = 'created_and_activated';
+    }
+
+    res.json({
+      success:      true,
+      mode,
+      star_id:      star.id,
+      status:       star.status,
+      activated_at: star.activated_at,
+      message:      mode === 'created_and_activated'
+        ? '별이 탄생하고 켜졌습니다'
+        : '별이 켜졌습니다',
+    });
+  } catch (err) {
+    console.error('[cablecar/entry] 오류:', err.message);
+    res.status(500).json({ success: false, error: '진입 처리 실패' });
+  }
+});
+
 module.exports = router;

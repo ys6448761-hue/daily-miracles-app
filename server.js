@@ -58,6 +58,22 @@ if (!OPS_SLACK_WEBHOOK) {
 
 const app = express();
 
+// ── 운영 에러 피드 (관제 대시보드용 인메모리 버퍼) ──────────────────
+const errorFeed = require('./services/errorFeed');
+app.use('/api', (req, res, next) => {
+  res.on('finish', () => {
+    if (res.statusCode >= 400) {
+      errorFeed.add({
+        method:    req.method,
+        route:     req.path,
+        status:    res.statusCode,
+        requestId: res.getHeader('x-request-id') || req.requestId || null,
+      });
+    }
+  });
+  next();
+});
+
 // ═══════════════════════════════════════════════════════════
 // 정적 파일 — gateMiddleware/미들웨어 체인 최상단에 위치
 // /images, public 전체를 API 에러 체인과 완전히 분리
@@ -1326,6 +1342,8 @@ app.post("/api/admin/run-migration", adminTokenGuard, async (req, res) => {
     "060", "061", "062", "063", "064", "065", "066", "067", "068",
     // 별들의 고향 + 파트너 어드민
     "099", "100", "101",
+    // 단순 별 시스템 (stars, star_logs)
+    "124",
   ];
 
   if (!migration || !allowed.includes(migration)) {
@@ -2207,6 +2225,41 @@ if (aurumRoutes) {
   console.log('✅ 아우룸 라우터 등록 완료 (/api/aurum)');
 }
 
+// ---------- 단순 별 시스템 (/api/stars, /api/logs) ----------
+let starsRoutes = null;
+try {
+  starsRoutes = require('./routes/starsRoutes');
+} catch (e) {
+  console.warn('⚠️ starsRoutes 로드 실패:', e.message);
+}
+if (starsRoutes) {
+  app.use('/api/stars', starsRoutes);
+  console.log('✅ 별 시스템 라우터 등록 완료 (/api/stars)');
+}
+
+let logsRoutes = null;
+try {
+  logsRoutes = require('./routes/logsRoutes');
+} catch (e) {
+  console.warn('⚠️ logsRoutes 로드 실패:', e.message);
+}
+if (logsRoutes) {
+  app.use('/api/logs', logsRoutes);
+  console.log('✅ 로그 라우터 등록 완료 (/api/logs)');
+}
+
+// ---------- 운영 관제 대시보드 (/api/admin/dashboard) ----------
+let adminDashboardRoutes = null;
+try {
+  adminDashboardRoutes = require('./routes/adminDashboardRoutes');
+} catch (e) {
+  console.warn('⚠️ adminDashboardRoutes 로드 실패:', e.message);
+}
+if (adminDashboardRoutes) {
+  app.use('/api/admin/dashboard', adminDashboardRoutes);
+  console.log('✅ 운영 관제 대시보드 등록 완료 (/api/admin/dashboard)');
+}
+
 // ---------- 약속 기록 (/api/promise) ----------
 let promiseRoutes = null;
 try {
@@ -2846,7 +2899,7 @@ const DT_SPA_ROUTES = [
   // 여수 미션
   '/missions',
   // 어드민
-  '/admin/*',
+  '/admin', '/admin/*',
   // 파트너
   '/partner/agreement',
   '/partner/subscribe',
