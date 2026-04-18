@@ -61,6 +61,7 @@ import AurumViewPage from './pages/AurumViewPage.jsx';
 import PromiseLocationPage from './pages/PromiseLocationPage.jsx';
 import PromiseViewPage from './pages/PromiseViewPage.jsx';
 import MissionPage from './pages/MissionPage.jsx';
+import AdminDashboardPage from './pages/AdminDashboardPage.jsx';
 import HometownAdmin from './pages/HometownAdmin.jsx';
 import Shop from './pages/Shop.jsx';
 import ShopDetail from './pages/ShopDetail.jsx';
@@ -142,6 +143,7 @@ export default function App() {
           <Route path="/hometown"                  element={<HometownLanding />} />
           <Route path="/admin/hometown/:partnerId" element={<HometownAdmin />} />
           {/* 어드민 — 일반 사용자 인증 가드 완전 제외, VoyageAdmin 자체 TokenGate만 사용 */}
+          <Route path="/admin"                       element={<AdminDashboardPage />} />
           <Route path="/admin/benefit"             element={<AdminBenefitPage />} />
           <Route path="/admin/experiment"          element={<AdminExperimentPage />} />
           <Route path="/admin/kpi"                 element={<AdminKpiPage />} />

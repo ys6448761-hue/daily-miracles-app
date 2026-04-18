@@ -288,6 +288,52 @@ router.post('/checkout', async (req, res) => {
   }
 });
 
+// ── GET /entry — QR URL 진입 지원 (user_id 쿼리파라미터) ─────────────
+router.get('/entry', async (req, res) => {
+  try {
+    const { user_id } = req.query;
+    if (!user_id) return res.status(400).json({ success: false, error: 'user_id 필수' });
+
+    const existing = await db.query(
+      `SELECT * FROM stars WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1`,
+      [user_id]
+    ).catch(() => ({ rows: [] }));
+
+    let star = existing.rows[0];
+
+    if (star) {
+      if (star.status !== 'ON') {
+        await db.query(
+          `UPDATE stars SET status = 'ON', activated_at = CURRENT_TIMESTAMP WHERE id = $1`,
+          [star.id]
+        );
+        star.status = 'ON';
+      }
+    } else {
+      // 신규 유저 — 기본 별 자동 생성
+      const newId = uuidv4();
+      await db.query(
+        `INSERT INTO stars (id, user_id, wish_text, gem_type, status, activated_at)
+         VALUES ($1, $2, '여수에서의 특별한 소원', 'diamond', 'ON', CURRENT_TIMESTAMP)`,
+        [newId, user_id]
+      );
+      const newRow = await db.query(`SELECT * FROM stars WHERE id = $1`, [newId]);
+      star = newRow.rows[0];
+    }
+
+    res.json({
+      success:      true,
+      status:       'activated',
+      star_id:      star.id,
+      activated_at: star.activated_at,
+      message:      '당신의 별이 현실과 연결되었습니다',
+    });
+  } catch (err) {
+    console.error('[cablecar/entry GET] 오류:', err.message);
+    res.status(500).json({ success: false, error: '진입 처리 실패' });
+  }
+});
+
 // ── POST /entry — 단일 QR 진입 (Issue 2: PRE-ON → ON) ───────────────
 // 기존 별 있으면 activate, 없으면 생성 후 activate
 // stars 테이블 기준 (dt_stars 아님)

@@ -2235,6 +2235,44 @@ try {
 if (starsRoutes) {
   app.use('/api/stars', starsRoutes);
   console.log('✅ 별 시스템 라우터 등록 완료 (/api/stars)');
+
+  // GET /api/messages?user_id= — user 기반 day 메시지 (Issue 4 편의 엔드포인트)
+  app.get('/api/messages', async (req, res) => {
+    try {
+      const star = await starsRoutes.latestStarByUser(req.query.user_id);
+      if (!star) return res.status(404).json({ success: false, error: '별을 찾을 수 없어요' });
+      const day = starsRoutes.calcDay(star.created_at);
+      res.json({ success: true, day, message: starsRoutes.dayMessage(day), star_id: star.id });
+    } catch (e) {
+      res.status(500).json({ success: false, error: e.message });
+    }
+  });
+
+  // GET /api/result?user_id= — user 기반 Day30 요약 (Issue 5 편의 엔드포인트)
+  app.get('/api/result', async (req, res) => {
+    try {
+      const star = await starsRoutes.latestStarByUser(req.query.user_id);
+      if (!star) return res.status(404).json({ success: false, error: '별을 찾을 수 없어요' });
+      const day = starsRoutes.calcDay(star.created_at);
+      if (day < 30) return res.status(403).json({ success: false, error: `Day${day} — 30일 후에 열립니다`, day, days_left: 30 - day });
+      const db = require('./database/db');
+      const logRow = await db.query(`SELECT COUNT(*) AS n FROM star_logs WHERE star_id = $1`, [star.id]);
+      const logCount = parseInt(logRow.rows[0]?.n ?? 0, 10);
+      const identity = starsRoutes.IDENTITY[star.gem_type] || '당신은 멈추지 않는 사람입니다';
+      res.json({
+        success:    true,
+        day,
+        summary:    `${day}일간 ${logCount}번의 여정을 별에 새겼습니다.`,
+        identity,
+        share_text: '내 별이, 하나의 이야기가 됐다',
+        star_id:    star.id,
+      });
+    } catch (e) {
+      res.status(500).json({ success: false, error: e.message });
+    }
+  });
+
+  console.log('✅ 편의 엔드포인트 등록 완료 (/api/messages, /api/result)');
 }
 
 let logsRoutes = null;

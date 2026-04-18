@@ -4,9 +4,12 @@
  * starsRoutes.js — 단순 별 시스템
  * Base path: /api/stars
  *
- * POST /           Issue 1: 별 생성 (PRE-ON)
- * GET  /:id        Issue 4: 별 상세 + day 메시지
- * GET  /:id/day30  Issue 5: day30 결과 요약
+ * POST /            Issue 1: 별 생성 (PRE-ON)
+ * GET  /:id         Issue 4: 별 상세 + day 메시지
+ * GET  /:id/day30   Issue 5: day30 결과 요약
+ *
+ * GET  /api/messages?user_id=  Issue 4: user 기반 day 메시지
+ * GET  /api/result?user_id=    Issue 5: user 기반 day30 결과
  */
 
 const express  = require('express');
@@ -143,4 +146,18 @@ router.get('/:id/day30', async (req, res) => {
   }
 });
 
+// ── 유저 기반 최신 별 조회 헬퍼 ──────────────────────────────────
+async function latestStarByUser(user_id) {
+  if (!user_id) return null;
+  const r = await db.query(
+    `SELECT * FROM stars WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1`,
+    [user_id]
+  );
+  return r.rows[0] || null;
+}
+
 module.exports = router;
+module.exports.latestStarByUser = latestStarByUser;
+module.exports.calcDay          = calcDay;
+module.exports.dayMessage       = dayMessage;
+module.exports.IDENTITY         = IDENTITY;
