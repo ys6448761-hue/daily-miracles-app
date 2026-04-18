@@ -188,6 +188,12 @@ router.get('/list', async (req, res) => {
   }
 });
 
+// ── GET /create — 정적 경로 가드 (/:id 계열보다 반드시 위) ──────────
+// 'create'가 /:id/meta 로 매칭되어 UUID 파싱 오류(500) 발생하는 것을 차단
+router.get('/create', (_req, res) => {
+  res.status(405).json({ success: false, error: '기록 생성은 POST /api/promise 를 사용하세요' });
+});
+
 // ── GET /:id/meta — 잠금 상태 (내용 미포함) ─────────────────────────
 router.get('/:id/meta', async (req, res) => {
   try {
