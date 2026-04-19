@@ -190,6 +190,7 @@ export default function MyStar() {
   const [giftDone, setGiftDone] = useState(false);
   // ── AI 트리거 (Day3/Day7 리텐션) ────────────────────────────
   const [lumi, setLumi] = useState(null);
+  const [showMore, setShowMore] = useState(false);
 
   // ── AI 트리거 체크 (Day3/Day7 리텐션 — 앱 진입 시 1회) ──────
   useEffect(() => {
@@ -576,6 +577,51 @@ export default function MyStar() {
         </div>
 
       </motion.div>
+
+      {/* 감정 메시지 */}
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3, duration: 0.8 }}
+        style={{ textAlign: 'center', fontSize: 16, fontWeight: 300, color: 'rgba(255,255,255,0.55)', letterSpacing: '-0.01em', marginBottom: 24, marginTop: 4 }}
+      >
+        조금 또렷해졌어요
+      </motion.p>
+
+      {/* 핵심 행동 2개 */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
+        <motion.button
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={() => nav(`/promise/create?starId=${star.star_id}`)}
+          style={{ width: '100%', padding: '16px 0', borderRadius: 9999, background: 'rgba(255,215,106,0.12)', border: '1px solid rgba(255,215,106,0.3)', color: '#FFD76A', fontSize: 15, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.02em' }}
+        >
+          약속 이어가기 ✦
+        </motion.button>
+        <motion.button
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={() => nav('/stars')}
+          style={{ width: '100%', padding: '16px 0', borderRadius: 9999, background: 'rgba(155,135,245,0.1)', border: '1px solid rgba(155,135,245,0.25)', color: '#9B87F5', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}
+        >
+          공명해보기
+        </motion.button>
+      </div>
+
+      {/* 더 보기 토글 */}
+      <button
+        onClick={() => setShowMore(v => !v)}
+        style={{ width: '100%', padding: '12px 0', background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', fontSize: 13, cursor: 'pointer', letterSpacing: '0.01em', marginBottom: 8 }}
+      >
+        {showMore ? '접기 ▲' : '더 보기 ▾'}
+      </button>
+
+      {showMore && (
+      <div>
 
       {/* ── 여수 미션 진입 배너 ──────────────────────────────── */}
       {missionSummary !== null && (
@@ -1106,30 +1152,6 @@ export default function MyStar() {
           카톡으로 보내기
         </button>
 
-        {/* ── 약속 이어가기 ── */}
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 16, marginTop: 4 }}>
-          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.30)', textAlign: 'center', marginBottom: 10, lineHeight: 1.6 }}>
-            이 순간을 약속으로 남길 수 있어요
-          </p>
-          <button
-            onClick={() => nav(`/promise/create?starId=${star.star_id}`)}
-            style={{
-              width: '100%',
-              padding: '14px 0',
-              borderRadius: 9999,
-              background: 'rgba(255,215,106,0.08)',
-              border: '1px solid rgba(255,215,106,0.22)',
-              color: 'rgba(255,215,106,0.75)',
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: 'pointer',
-              letterSpacing: '0.02em',
-            }}
-          >
-            약속 이어가기 ✦
-          </button>
-        </div>
-
         {/* ── 별 선물하기 (카카오 키 있을 때만 노출) ──── */}
         {import.meta.env.VITE_KAKAO_JS_KEY && (
           !giftDone ? (
@@ -1217,7 +1239,16 @@ export default function MyStar() {
             새 소원 만들기
           </button>
         </div>
+        <button
+          onClick={() => nav('/stars')}
+          style={{ width: '100%', padding: '13px 0', background: 'none', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, color: 'rgba(255,255,255,0.35)', fontSize: 13, cursor: 'pointer', marginTop: 4 }}
+        >
+          다른 별 보기
+        </button>
       </div>
+
+      </div>
+      )}
 
     </div>
   );
