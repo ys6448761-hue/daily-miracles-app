@@ -141,6 +141,16 @@ function getStarLevel(resonanceUsersCount) {
   return STAR_LEVEL_CONFIG[3];
 }
 
+function getStarCTA(level) {
+  switch (level) {
+    case 0: return '첫 마음을 남겨보세요';
+    case 1: return '조금 더 밝혀볼까요';
+    case 2: return '이 별을 더 빛나게 해주세요';
+    case 3: return '다른 별에도 마음을 전해보세요';
+    default: return '';
+  }
+}
+
 function getAurumMessage(daysSinceBirth) {
   return AURUM_MESSAGES.find(m => m.day === daysSinceBirth)
     ?? AURUM_MESSAGES[AURUM_MESSAGES.length - 1];
@@ -591,10 +601,14 @@ export default function MyStar() {
           </div>
           {stats != null && (() => {
             const { level, msg, color, text, border } = getStarLevel(stats.resonance_users_count);
+            const cta = getStarCTA(level);
             return (
               <div className="col-span-2" style={{ background: color, border: `1px solid ${border}`, borderRadius: 10, padding: '10px 14px', textAlign: 'center' }}>
                 <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginBottom: 3, letterSpacing: '0.04em' }}>별 성장</p>
                 <p style={{ fontSize: 13, color: text, fontWeight: 500 }}>Lv.{level} · {msg}</p>
+                {cta && (
+                  <p style={{ marginTop: 6, fontSize: 14, color: '#9B87F5', fontWeight: 500 }}>{cta}</p>
+                )}
               </div>
             );
           })()}
