@@ -286,6 +286,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
             milestone_status: milestoneStatus,
             growth_log_text:  star.growth_log_text ?? null,
             wish_text:        star.wish_text ?? null,
+            wish_emotion:     star.wish_emotion ?? null,
           });
         }
       } catch (_) { /* detail null → 에러 화면 */ }
@@ -515,6 +516,11 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
             className={`text-5xl mb-4 inline-block${starIconPop ? ' star-icon-pop' : ''}`}
           >✦</div>
           <h1 className="text-2xl font-bold text-star-gold mb-3">{detail.star_name}</h1>
+
+          {/* 소원 감정 한 줄 */}
+          <p style={{ fontSize: 13, color: 'rgba(255,215,106,0.65)', marginBottom: 12, letterSpacing: '0.01em' }}>
+            {detail.wish_emotion || '이 마음은 아직 말을 찾고 있어요'}
+          </p>
 
           {/* Public / Resonance: 은하/D+ + 이야기 토글 + 공명 수 */}
           {canResonate && (() => {
