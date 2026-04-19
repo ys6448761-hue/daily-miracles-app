@@ -164,9 +164,12 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   const isPublic    = viewMode === 'public';
   const canResonate = !isOwner;
 
-  // ── 리다이렉트 ─────────────────────────────────────────────────
+  // ── 리다이렉트 + 공유 유입 로그 ────────────────────────────────
   useEffect(() => {
     if (isOwnStar) nav(`/my-star/${id}`, { replace: true });
+    if (isShareEntry) {
+      logUserEvent({ userId: getOrCreateUserId(), eventType: 'share_link_opened', metadata: { star_id: id } });
+    }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── 데이터 로드 ────────────────────────────────────────────────
@@ -218,6 +221,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
 
   // ── 공명 핸들러 ────────────────────────────────────────────────
   const isInviteEntry = typeof window !== 'undefined' && window.location.search.includes('entry=invite');
+  const isShareEntry  = typeof window !== 'undefined' && window.location.search.includes('source=share');
 
   // ── 공유 핸들러 ────────────────────────────────────────────────
   const SHARE_LEVEL_MSG = [
@@ -230,7 +234,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   async function handleShare() {
     const level = getResonanceLevel(miracleCount + wisdomCount);
     const levelMsg = SHARE_LEVEL_MSG[level] ?? SHARE_LEVEL_MSG[0];
-    const url = `${window.location.origin}/star/${id}`;
+    const url = `${window.location.origin}/star/${id}?source=share`;
     const parts = [
       detail.wish_text    ? `"${detail.wish_text}"`  : null,
       detail.wish_emotion ?? null,
@@ -266,7 +270,10 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
     // 0. 즉시 토스트 + resonance_click 이벤트
     showResonanceToast(type);
     gaResonanceClick({ starId: id, type, isInvite: isInviteEntry });
-    logUserEvent({ userId: getOrCreateUserId(), eventType: 'resonance_click', metadata: { star_id: id, resonance_type: type, is_invite: isInviteEntry } });
+    logUserEvent({ userId: getOrCreateUserId(), eventType: 'resonance_click', metadata: { star_id: id, resonance_type: type, is_invite: isInviteEntry, source: isShareEntry ? 'share' : null } });
+    if (isShareEntry) {
+      logUserEvent({ userId: getOrCreateUserId(), eventType: 'invite_resonance_started', metadata: { star_id: id, resonance_type: type } });
+    }
 
     // 1. 버튼 press 애니메이션 (scale + glow, 0.2s)
     setAnimating(type);
@@ -560,6 +567,52 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
         </div>
       </div>
 
+      {/* ── 공유 유입 초대 블록 (source=share, 미공명 상태) ── */}
+      {isShareEntry && canResonate && !submitted && (
+        <div style={{
+          marginBottom: 16,
+          padding: '16px 18px',
+          borderRadius: 18,
+          background: 'rgba(155,135,245,0.08)',
+          border: '1px solid rgba(155,135,245,0.20)',
+          textAlign: 'center',
+        }}>
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', marginBottom: 14, lineHeight: 1.6 }}>
+            이 마음에 조용히 함께할 수 있어요
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <button
+              onClick={() => {
+                logUserEvent({ userId: getOrCreateUserId(), eventType: 'invite_cta_clicked', metadata: { star_id: id, cta_type: 'resonance', source: 'share' } });
+                document.getElementById('dt-resonance-section')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              style={{
+                padding: '13px 0', borderRadius: 9999,
+                background: 'rgba(255,215,106,0.13)',
+                border: '1px solid rgba(255,215,106,0.35)',
+                color: '#FFD76A', fontSize: 14, fontWeight: 600, cursor: 'pointer',
+              }}
+            >
+              이 별에 마음 남기기
+            </button>
+            <button
+              onClick={() => {
+                logUserEvent({ userId: getOrCreateUserId(), eventType: 'invite_cta_clicked', metadata: { star_id: id, cta_type: 'make_star', source: 'share' } });
+                nav('/dreamtown?entry=share');
+              }}
+              style={{
+                padding: '11px 0', borderRadius: 9999,
+                background: 'none',
+                border: '1px solid rgba(255,255,255,0.12)',
+                color: 'rgba(255,255,255,0.45)', fontSize: 13, cursor: 'pointer',
+              }}
+            >
+              나도 별 만들기
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ② MilestoneBar — owner 전용 */}
       {isOwner && (
         <MilestoneBar
@@ -622,7 +675,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
 
       {/* ── ⑤ 공명 섹션 — resonance + public ─────────────────── */}
       {canResonate && (
-        <div className="mb-5">
+        <div id="dt-resonance-section" className="mb-5">
           {!submitted ? (
             /* 버튼 상태 */
             <div className="bg-white/3 border border-white/8 rounded-2xl p-4">
