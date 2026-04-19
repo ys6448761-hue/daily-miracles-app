@@ -143,6 +143,16 @@ export async function getSimilarStars({ starId, token }) {
   return res.json();
 }
 
+export async function getResonancePeople(starId) {
+  try {
+    const res = await fetch(`${BASE}/stars/${encodeURIComponent(starId)}/resonance-people`);
+    if (!res.ok) return { people: [], total: 0 };
+    return res.json();
+  } catch {
+    return { people: [], total: 0 };
+  }
+}
+
 export async function getRelatedStars(starId) {
   const res = await fetch(`${BASE}/stars/${encodeURIComponent(starId)}/similar`);
   if (!res.ok) return { stars: [] };

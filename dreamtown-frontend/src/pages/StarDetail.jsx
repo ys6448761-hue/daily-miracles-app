@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStarDetail, getStar, getResonance, postVoyageLog, postDtResonance, getSimilarStars, getRelatedStars, logUserEvent, getOrCreateUserId } from '../api/dreamtown.js';
+import { getStarDetail, getStar, getResonance, postVoyageLog, postDtResonance, getSimilarStars, getRelatedStars, getResonancePeople, logUserEvent, getOrCreateUserId } from '../api/dreamtown.js';
 import MilestoneBar from '../components/MilestoneBar';
 import { gaResonanceCreated, gaResonanceClick, gaResonanceSuccess, gaResonanceCTAClick, gaSimilarStarClick, gaSquareFallbackClick, gaSimularStarsEmptyView } from '../utils/gtag';
 import { readSavedStar } from '../lib/utils/starSession.js';
@@ -73,6 +73,13 @@ function saveResonanceHistory(starId, starName) {
     const updated  = [{ starId, starName, ts: Date.now() }, ...filtered].slice(0, 20);
     localStorage.setItem(RESONANCE_HISTORY_KEY, JSON.stringify(updated));
   } catch (_) {}
+}
+
+// ── 익명 아바타 색상 (userId 해시 → hsl) ─────────────────────────
+function avatarColor(userId) {
+  let h = 5381;
+  for (let i = 0; i < userId.length; i++) h = ((h << 5) + h) ^ userId.charCodeAt(i);
+  return `hsl(${Math.abs(h) % 360}, 52%, 58%)`;
 }
 
 // ── 유틸 ────────────────────────────────────────────────────────
@@ -154,6 +161,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   const [toastMsg, setToastMsg]         = useState(null);        // 공명 즉시 토스트
   const [relatedStars, setRelatedStars] = useState([]);          // 하단 추천 별
   const [shareCopied, setShareCopied]   = useState(false);       // 공유 링크 복사 완료
+  const [resonancePeople, setResonancePeople] = useState({ people: [], total: 0 }); // 공명 참여자
 
   const myStarId  = readSavedStar();
   const isOwnStar = !propViewMode && id === myStarId;
@@ -217,6 +225,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
       setWisdomCount(impacts.find(i => i.type === 'wisdom')?.count  ?? 0);
     }).catch(() => {});
     getRelatedStars(id).then(r => setRelatedStars(r.stars ?? [])).catch(() => {});
+    getResonancePeople(id).then(r => setResonancePeople(r)).catch(() => {});
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── 공명 핸들러 ────────────────────────────────────────────────
@@ -504,6 +513,38 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
                     {'✦'.repeat(getResonanceLevel(miracleCount + wisdomCount))}{' '}
                     공명 {getResonanceLevel(miracleCount + wisdomCount)}별
                   </p>
+                )}
+
+                {/* ④ 공명 참여자 아바타 */}
+                {resonancePeople.total > 0 && (
+                  <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      {resonancePeople.people.map((uid, i) => (
+                        <div key={uid} style={{
+                          width: 26, height: 26, borderRadius: '50%',
+                          background: avatarColor(uid),
+                          border: '2px solid rgba(13,27,42,0.85)',
+                          marginLeft: i > 0 ? -9 : 0,
+                          flexShrink: 0,
+                        }} />
+                      ))}
+                      {resonancePeople.total > resonancePeople.people.length && (
+                        <div style={{
+                          width: 26, height: 26, borderRadius: '50%',
+                          background: 'rgba(255,255,255,0.10)',
+                          border: '2px solid rgba(13,27,42,0.85)',
+                          fontSize: 9, color: 'rgba(255,255,255,0.45)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          marginLeft: -9, flexShrink: 0,
+                        }}>
+                          +{resonancePeople.total - resonancePeople.people.length}
+                        </div>
+                      )}
+                    </div>
+                    <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.30)' }}>
+                      {resonancePeople.total}명이 이 마음에 함께했어요
+                    </p>
+                  </div>
                 )}
               </>
             );

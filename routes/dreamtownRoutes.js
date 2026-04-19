@@ -861,6 +861,39 @@ router.get('/stars/count', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
+// GET /api/dt/stars/:id/resonance-people — 공명 참여자 (익명, 최대 5명 + 총계)
+// ─────────────────────────────────────────────
+router.get('/stars/:id/resonance-people', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [peopleResult, countResult] = await Promise.all([
+      db.query(
+        `SELECT DISTINCT user_id
+           FROM user_events
+          WHERE event_type = 'resonance_click'
+            AND metadata->>'star_id' = $1
+          LIMIT 5`,
+        [id]
+      ),
+      db.query(
+        `SELECT COUNT(DISTINCT user_id)::int AS total
+           FROM user_events
+          WHERE event_type = 'resonance_click'
+            AND metadata->>'star_id' = $1`,
+        [id]
+      ),
+    ]);
+    res.json({
+      people: peopleResult.rows.map(r => r.user_id),
+      total:  countResult.rows[0]?.total ?? 0,
+    });
+  } catch (err) {
+    console.error('[DT] GET /stars/:id/resonance-people error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
 // GET /api/dt/stars/top-today — 오늘 유니크 공명 상위 3개
 // ─────────────────────────────────────────────
 router.get('/stars/top-today', async (req, res) => {
