@@ -235,7 +235,10 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
 
     setSubmitting(true);
     try {
-      await postDtResonance({ starId: id, type });
+      const dtRes = await postDtResonance({ starId: id, type });
+      // 서버 실제 카운트로 동기화 (낙관적 업데이트 오차 보정)
+      if (dtRes?.miracleCount != null) setMiracleCount(dtRes.miracleCount);
+      if (dtRes?.wisdomCount  != null) setWisdomCount(dtRes.wisdomCount);
       gaResonanceCreated({ starId: id, resonanceType: type });
       gaResonanceSuccess({ starId: id, type, isInvite: isInviteEntry });
       logUserEvent({ userId: getOrCreateUserId(), eventType: 'resonance_created', metadata: { star_id: id, resonance_type: type, is_invite: isInviteEntry } });

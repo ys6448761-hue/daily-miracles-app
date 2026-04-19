@@ -1569,16 +1569,26 @@ router.get('/stars/:id/stats', async (req, res) => {
     let resonanceUsersCount = 0;
     let resonanceBreakdown = { miracle: 0, wisdom: 0, total: 0 };
     try {
-      const resRow = await db.query(
-        `SELECT
-           COALESCE(SUM(count), 0)::int AS total,
-           COALESCE(SUM(count) FILTER (WHERE impact_type = 'miracle'), 0)::int AS miracle,
-           COALESCE(SUM(count) FILTER (WHERE impact_type = 'wisdom'),  0)::int AS wisdom
-         FROM impact WHERE star_id = $1::text`,
-        [id]
-      );
+      const [resRow, usersRow] = await Promise.all([
+        db.query(
+          `SELECT
+             COALESCE(SUM(count), 0)::int AS total,
+             COALESCE(SUM(count) FILTER (WHERE impact_type = 'miracle'), 0)::int AS miracle,
+             COALESCE(SUM(count) FILTER (WHERE impact_type = 'wisdom'),  0)::int AS wisdom
+           FROM impact WHERE star_id = $1::text`,
+          [id]
+        ),
+        db.query(
+          `SELECT COUNT(DISTINCT metadata->>'user_id')::int AS cnt
+             FROM user_events
+            WHERE event_type = 'resonance_created'
+              AND metadata->>'star_id' = $1`,
+          [id]
+        ).catch(() => ({ rows: [{ cnt: 0 }] })),
+      ]);
       const r = resRow.rows[0] ?? {};
       resonanceCount  = parseInt(r.total   ?? 0, 10);
+      resonanceUsersCount = parseInt(usersRow.rows[0]?.cnt ?? 0, 10);
       resonanceBreakdown = {
         miracle: parseInt(r.miracle ?? 0, 10),
         wisdom:  parseInt(r.wisdom  ?? 0, 10),
