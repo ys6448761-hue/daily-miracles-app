@@ -161,6 +161,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   const [toastMsg, setToastMsg]         = useState(null);        // 공명 즉시 토스트
   const [relatedStars, setRelatedStars] = useState([]);          // 하단 추천 별
   const [shareCopied, setShareCopied]   = useState(false);       // 공유 링크 복사 완료
+  const [showStayMsg, setShowStayMsg]   = useState(false);       // 머물기 상태 메시지
   const [resonancePeople, setResonancePeople] = useState({ people: [], total: 0 }); // 공명 참여자
 
   const myStarId  = readSavedStar();
@@ -179,6 +180,12 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
       logUserEvent({ userId: getOrCreateUserId(), eventType: 'share_link_opened', metadata: { star_id: id } });
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── 머물기 상태 — 4초 후 자동 표시 (1회) ──────────────────────
+  useEffect(() => {
+    const t = setTimeout(() => setShowStayMsg(true), 4000);
+    return () => clearTimeout(t);
+  }, []);
 
   // ── 데이터 로드 ────────────────────────────────────────────────
   useEffect(() => {
@@ -607,6 +614,20 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
           )}
         </div>
       </div>
+
+      {/* ── 머물기 상태 메시지 (4초 후 fade-in) ── */}
+      {showStayMsg && (
+        <p style={{
+          textAlign: 'center', fontSize: 13,
+          color: 'rgba(255,255,255,0.32)',
+          marginBottom: 16, marginTop: -8,
+          animation: 'feedbackIn 1.8s ease forwards',
+          animationFillMode: 'forwards',
+          opacity: 0,
+        }}>
+          ✨ 지금은 아무것도 하지 않아도 괜찮아요
+        </p>
+      )}
 
       {/* ── 공유 유입 초대 블록 (source=share, 미공명 상태) ── */}
       {isShareEntry && canResonate && !submitted && (
