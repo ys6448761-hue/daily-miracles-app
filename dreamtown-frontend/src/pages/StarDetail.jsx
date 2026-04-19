@@ -953,6 +953,32 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
         </motion.div>
       )}
 
+      {/* ── 🌊 공개 항해 장면 (visibility=public 일 때만) ── */}
+      {detail.journey_visibility === 'public' && detail.journey_origin_public && (
+        <div style={{
+          marginBottom: 16, padding: '18px 18px',
+          borderRadius: 18,
+          background: 'rgba(255,255,255,0.03)',
+          border: '1px solid rgba(255,255,255,0.08)',
+        }}>
+          <p style={{ fontSize: 11, color: 'rgba(255,215,106,0.55)', marginBottom: 14, letterSpacing: '0.05em' }}>
+            🌊 이 별의 항해
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {[
+              { label: '처음,',   val: detail.journey_origin_public },
+              { label: '그 사이,', val: detail.journey_shift_public },
+              { label: '지금,',   val: detail.journey_now_public },
+            ].filter(r => r.val).map(r => (
+              <p key={r.label} style={{ fontSize: 14, color: 'rgba(255,255,255,0.70)', lineHeight: 1.7 }}>
+                <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.28)', marginRight: 6 }}>{r.label}</span>
+                {r.val}
+              </p>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ⑨ 이 별의 마음 전하기 (공유) */}
       <div style={{ marginBottom: 12 }}>
         <button

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
-import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message, getTodaySchedule, getStarStats, getStarDetail, getArtifactJob, getGrowthSummary, getRouteRecommendation, startJourneyFromRecommendation, getWisdom, logFlowEvent } from '../api/dreamtown.js';
+import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message, getTodaySchedule, getStarStats, getStarDetail, getArtifactJob, getGrowthSummary, getRouteRecommendation, startJourneyFromRecommendation, getWisdom, logFlowEvent, getJourneyStory, putJourneyStory } from '../api/dreamtown.js';
 import { saveStarId, clearStarId, readSavedStar } from '../lib/utils/starSession.js';
 import MilestoneBar from '../components/MilestoneBar';
 import { useDreamtownStore } from '../store/dreamtownStore';
@@ -217,6 +217,14 @@ export default function MyStar() {
   const [lumi, setLumi] = useState(null);
   const [showMore, setShowMore] = useState(false);
 
+  // ── 공개용 항해 장면 ──────────────────────────────────────────
+  const [journeyStory, setJourneyStory]   = useState(null);   // 서버 저장값
+  const [journeyEditing, setJourneyEditing] = useState(false);
+  const [journeyDraft, setJourneyDraft]   = useState({ origin: '', shift: '', now: '', visibility: 'private' });
+  const [journeySaving, setJourneySaving] = useState(false);
+  const [journeySaved, setJourneySaved]   = useState(false);
+  const [journeyWarn, setJourneyWarn]     = useState(null);
+
   // ── AI 트리거 체크 (Day3/Day7 리텐션 — 앱 진입 시 1회) ──────
   useEffect(() => {
     if (!isOwner) return;
@@ -297,6 +305,12 @@ export default function MyStar() {
         getWisdom({ starId: data.star_id, context: 'star' })
           .then(w => w?.show ? setWisdom(w.message) : null)
           .catch(() => null);
+
+        // 공개용 항해 장면 로드
+        getJourneyStory(data.star_id).then(s => {
+          setJourneyStory(s);
+          setJourneyDraft({ origin: s.origin ?? '', shift: s.shift ?? '', now: s.now ?? '', visibility: s.visibility ?? 'private' });
+        }).catch(() => {});
 
         // 여수 미션 요약
         Promise.all([
@@ -660,6 +674,137 @@ export default function MyStar() {
 
       {showMore && (
       <div>
+
+      {/* ── 🌊 공개용 항해 장면 편집 ─────────────────────────── */}
+      {(() => {
+        const PRESETS = {
+          origin: ['작은 마음 하나에서 시작했어요', '막막했지만 시작해야 했어요', '오래된 꿈이 다시 떠올랐어요', '누군가의 한 마디가 시작이었어요'],
+          shift:  ['조금 더 또렷해졌어요', '생각보다 많이 흔들렸어요', '작은 진전이 생겼어요', '예상과 다르게 흘러가고 있어요'],
+          now:    ['여전히 조용히 이어가고 있어요', '조금씩 나아가고 있어요', '다시 첫 마음으로 돌아왔어요', '아직 안개 속이지만 계속해요'],
+        };
+        const WARN_PHRASES = ['쓸모없어', '나는 최악', '내가 문제야', '못난이야'];
+        const hasStory = journeyStory?.origin || journeyStory?.shift || journeyStory?.now;
+
+        async function saveJourneyStory() {
+          const texts = [journeyDraft.origin, journeyDraft.shift, journeyDraft.now];
+          const warned = WARN_PHRASES.some(p => texts.some(t => t?.includes(p)));
+          if (warned) { setJourneyWarn('이 표현은 자신에게 너무 가혹할 수 있어요. 조금 부드럽게 바꿔볼까요?'); return; }
+          setJourneyWarn(null);
+          setJourneySaving(true);
+          try {
+            const res = await putJourneyStory(star.star_id, { ...journeyDraft, userId: getOrCreateUserId() });
+            if (res.error === 'blocked') { setJourneyWarn(res.message); return; }
+            setJourneyStory({ origin: journeyDraft.origin, shift: journeyDraft.shift, now: journeyDraft.now, visibility: journeyDraft.visibility });
+            setJourneyEditing(false);
+            setJourneySaved(true);
+            setTimeout(() => setJourneySaved(false), 2000);
+          } catch { setJourneyWarn('저장에 실패했어요. 잠시 후 다시 시도해주세요.'); }
+          finally { setJourneySaving(false); }
+        }
+
+        function SentencePicker({ field, label }) {
+          const isCustom = journeyDraft[field] && !PRESETS[field].includes(journeyDraft[field]);
+          return (
+            <div style={{ marginBottom: 14 }}>
+              <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginBottom: 6 }}>{label}</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                {PRESETS[field].map(s => (
+                  <button key={s} onClick={() => setJourneyDraft(d => ({ ...d, [field]: s }))}
+                    style={{
+                      textAlign: 'left', padding: '8px 12px', borderRadius: 10, fontSize: 13, cursor: 'pointer',
+                      background: journeyDraft[field] === s ? 'rgba(155,135,245,0.15)' : 'rgba(255,255,255,0.04)',
+                      border: `1px solid ${journeyDraft[field] === s ? 'rgba(155,135,245,0.40)' : 'rgba(255,255,255,0.08)'}`,
+                      color: journeyDraft[field] === s ? 'rgba(155,135,245,0.95)' : 'rgba(255,255,255,0.55)',
+                    }}
+                  >{s}</button>
+                ))}
+                <input
+                  placeholder="직접 입력..."
+                  value={isCustom ? journeyDraft[field] : ''}
+                  onChange={e => setJourneyDraft(d => ({ ...d, [field]: e.target.value }))}
+                  style={{
+                    padding: '8px 12px', borderRadius: 10, fontSize: 13, outline: 'none',
+                    background: isCustom ? 'rgba(255,215,106,0.06)' : 'rgba(255,255,255,0.03)',
+                    border: `1px solid ${isCustom ? 'rgba(255,215,106,0.25)' : 'rgba(255,255,255,0.08)'}`,
+                    color: 'rgba(255,255,255,0.75)',
+                  }}
+                />
+              </div>
+            </div>
+          );
+        }
+
+        return (
+          <div style={{ marginBottom: 16, borderRadius: 16, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.09)', padding: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: journeyEditing ? 16 : 0 }}>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', fontWeight: 600 }}>🌊 항해 장면</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                {journeyStory?.visibility === 'public' && (
+                  <span style={{ fontSize: 10, color: 'rgba(155,135,245,0.70)', background: 'rgba(155,135,245,0.10)', border: '1px solid rgba(155,135,245,0.20)', borderRadius: 9999, padding: '2px 8px' }}>공개 중</span>
+                )}
+                {journeySaved && <span style={{ fontSize: 11, color: 'rgba(74,222,128,0.8)' }}>저장됨 ✓</span>}
+                <button onClick={() => setJourneyEditing(v => !v)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
+                  {journeyEditing ? '닫기' : (hasStory ? '편집' : '설정하기')}
+                </button>
+              </div>
+            </div>
+
+            {/* 미편집 상태: 현재 장면 미리보기 */}
+            {!journeyEditing && hasStory && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+                {[{ label: '처음,', val: journeyStory.origin }, { label: '그 사이,', val: journeyStory.shift }, { label: '지금,', val: journeyStory.now }]
+                  .filter(r => r.val)
+                  .map(r => (
+                    <p key={r.label} style={{ fontSize: 13, color: 'rgba(255,255,255,0.60)', lineHeight: 1.6 }}>
+                      <span style={{ color: 'rgba(255,255,255,0.28)', marginRight: 6 }}>{r.label}</span>
+                      {r.val}
+                    </p>
+                  ))}
+              </div>
+            )}
+            {!journeyEditing && !hasStory && (
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.28)', marginTop: 8 }}>
+                이 별의 항해를 장면으로 남겨보세요
+              </p>
+            )}
+
+            {/* 편집 모드 */}
+            {journeyEditing && (
+              <div>
+                <SentencePicker field="origin" label="처음," />
+                <SentencePicker field="shift"  label="그 사이," />
+                <SentencePicker field="now"    label="지금," />
+
+                {journeyWarn && (
+                  <p style={{ fontSize: 12, color: 'rgba(255,165,0,0.85)', marginBottom: 10, padding: '8px 10px', background: 'rgba(255,165,0,0.08)', borderRadius: 8, border: '1px solid rgba(255,165,0,0.18)' }}>
+                    ⚠️ {journeyWarn}
+                  </p>
+                )}
+
+                {/* 공개 설정 */}
+                <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+                  {[{ val: 'private', label: '🔒 나만 보기' }, { val: 'public', label: '🌐 함께 나누기' }].map(opt => (
+                    <button key={opt.val} onClick={() => setJourneyDraft(d => ({ ...d, visibility: opt.val }))}
+                      style={{
+                        flex: 1, padding: '9px 0', borderRadius: 9999, fontSize: 12, cursor: 'pointer',
+                        background: journeyDraft.visibility === opt.val ? 'rgba(155,135,245,0.12)' : 'transparent',
+                        border: `1px solid ${journeyDraft.visibility === opt.val ? 'rgba(155,135,245,0.35)' : 'rgba(255,255,255,0.10)'}`,
+                        color: journeyDraft.visibility === opt.val ? 'rgba(155,135,245,0.90)' : 'rgba(255,255,255,0.38)',
+                      }}
+                    >{opt.label}</button>
+                  ))}
+                </div>
+
+                <button onClick={saveJourneyStory} disabled={journeySaving}
+                  style={{ width: '100%', padding: '12px 0', borderRadius: 9999, fontSize: 14, fontWeight: 600, cursor: journeySaving ? 'not-allowed' : 'pointer', background: 'rgba(155,135,245,0.15)', border: '1px solid rgba(155,135,245,0.35)', color: '#9B87F5', opacity: journeySaving ? 0.6 : 1 }}>
+                  {journeySaving ? '저장 중...' : '장면 저장하기'}
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* ── 여수 미션 진입 배너 ──────────────────────────────── */}
       {missionSummary !== null && (

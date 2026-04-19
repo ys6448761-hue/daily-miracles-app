@@ -1737,6 +1737,8 @@ router.get('/stars/:id/detail', async (req, res) => {
       starQueryResult = await db.query(
         `SELECT s.id AS star_id, s.star_name, s.star_stage, s.created_at,
                 s.growth_log_text, w.wish_text, w.wish_emotion,
+                s.journey_origin_public, s.journey_shift_public,
+                s.journey_now_public, s.journey_visibility,
                 g.code AS galaxy_code, g.name_ko AS galaxy_name_ko, u.nickname
            FROM dt_stars s
            LEFT JOIN dt_wishes   w ON w.id = s.wish_id
@@ -1843,12 +1845,79 @@ router.get('/stars/:id/detail', async (req, res) => {
       today_aurora5_message: todaySchedule?.message_text ?? null,
       today_aurora5_day:     todaySchedule?.day_number ?? null,
       latest_voyage_log:     latestLog,
-      resonance_count:       resonanceCount,
-      resonance_level:       getResonanceLevel(resonanceCount),
-      resonance_label:       getResonanceLabel(getResonanceLevel(resonanceCount)),
+      resonance_count:          resonanceCount,
+      resonance_level:          getResonanceLevel(resonanceCount),
+      resonance_label:          getResonanceLabel(getResonanceLevel(resonanceCount)),
+      journey_origin_public:    star.journey_origin_public    ?? null,
+      journey_shift_public:     star.journey_shift_public     ?? null,
+      journey_now_public:       star.journey_now_public       ?? null,
+      journey_visibility:       star.journey_visibility       ?? 'private',
     });
   } catch (err) {
     console.error('[DT] GET /stars/:id/detail error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
+// PUT /api/dt/stars/:id/journey-story — 공개용 항해 장면 저장 (소유자 전용)
+// ─────────────────────────────────────────────
+router.put('/stars/:id/journey-story', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { origin, shift, now, visibility, user_id } = req.body;
+
+    const { rows, rowCount } = await db.query('SELECT user_id FROM dt_stars WHERE id = $1', [id]);
+    if (rowCount === 0) return res.status(404).json({ error: '별을 찾을 수 없습니다' });
+    if (rows[0].user_id && user_id && rows[0].user_id !== user_id) {
+      return res.status(403).json({ error: '권한이 없습니다' });
+    }
+
+    const BLOCKED = ['죽고 싶', '자살', '자해', '사라지고 싶', '없어지고 싶', '죽어야'];
+    for (const text of [origin, shift, now].filter(Boolean)) {
+      if (BLOCKED.some(p => text.includes(p))) {
+        return res.status(422).json({ error: 'blocked', message: '이 내용은 저장할 수 없어요. 혼자 감당하기 어려운 순간이라면 도움을 요청해주세요.' });
+      }
+    }
+
+    const vis = ['private', 'public'].includes(visibility) ? visibility : 'private';
+    await db.query(
+      `UPDATE dt_stars
+          SET journey_origin_public = $1,
+              journey_shift_public  = $2,
+              journey_now_public    = $3,
+              journey_visibility    = $4
+        WHERE id = $5`,
+      [origin ?? null, shift ?? null, now ?? null, vis, id]
+    );
+    res.json({ ok: true, visibility: vis });
+  } catch (err) {
+    console.error('[DT] PUT /stars/:id/journey-story error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
+// GET /api/dt/stars/:id/journey-story — 항해 장면 조회 (소유자 전용)
+// ─────────────────────────────────────────────
+router.get('/stars/:id/journey-story', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rows, rowCount } = await db.query(
+      `SELECT journey_origin_public, journey_shift_public,
+              journey_now_public, journey_visibility
+         FROM dt_stars WHERE id = $1`,
+      [id]
+    );
+    if (rowCount === 0) return res.status(404).json({ error: '별을 찾을 수 없습니다' });
+    res.json({
+      origin:     rows[0].journey_origin_public ?? null,
+      shift:      rows[0].journey_shift_public  ?? null,
+      now:        rows[0].journey_now_public     ?? null,
+      visibility: rows[0].journey_visibility    ?? 'private',
+    });
+  } catch (err) {
+    console.error('[DT] GET /stars/:id/journey-story error:', err.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

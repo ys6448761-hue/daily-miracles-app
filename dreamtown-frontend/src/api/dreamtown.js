@@ -325,6 +325,27 @@ export async function getGiftCard(starId) {
   return res.json();
 }
 
+// GET /api/dt/stars/:id/journey-story — 항해 장면 조회 (소유자)
+export async function getJourneyStory(starId) {
+  try {
+    const res = await fetch(`${BASE}/stars/${encodeURIComponent(starId)}/journey-story`);
+    if (!res.ok) return { origin: null, shift: null, now: null, visibility: 'private' };
+    return res.json();
+  } catch {
+    return { origin: null, shift: null, now: null, visibility: 'private' };
+  }
+}
+
+// PUT /api/dt/stars/:id/journey-story — 항해 장면 저장
+export async function putJourneyStory(starId, { origin, shift, now, visibility, userId }) {
+  const res = await fetch(`${BASE}/stars/${encodeURIComponent(starId)}/journey-story`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ origin, shift, now, visibility, user_id: userId }),
+  });
+  return res.json();
+}
+
 // GET /api/dt/stars/:id/detail — 공개 별 상세 (닉네임/마일스톤/항해로그/Aurora5 포함)
 export async function getStarDetail(starId) {
   const res = await fetch(`${BASE}/stars/${starId}/detail`);
