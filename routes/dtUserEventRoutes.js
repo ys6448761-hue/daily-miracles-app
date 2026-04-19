@@ -20,8 +20,13 @@ router.post('/', async (req, res) => {
   const { user_id, event_type, metadata } = req.body;
   if (!event_type) return res.status(400).json({ error: 'event_type 필수' });
 
-  await logEvent({ userId: user_id, eventType: event_type, metadata });
-  return res.json({ success: true });
+  try {
+    await logEvent({ userId: user_id, eventType: event_type, metadata });
+    return res.json({ success: true });
+  } catch (err) {
+    log.error('user_event POST 실패', { event_type, err: err.message });
+    return res.status(500).json({ error: 'event 저장 실패' });
+  }
 });
 
 // POST /api/dt/user-events/revisit  — 재방문 감지 + 기록

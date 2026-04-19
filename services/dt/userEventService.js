@@ -29,6 +29,10 @@ const EVENTS = {
   SIMILAR_STARS_SHOWN: 'similar_stars_shown',
   SIMILAR_STAR_CLICK:  'similar_star_click',
   RESONANCE_CTA_CLICK: 'resonance_cta_click',
+  // 공유 유입 퍼널
+  SHARE_LINK_OPENED:       'share_link_opened',
+  INVITE_RESONANCE_STARTED:'invite_resonance_started',
+  INVITE_CTA_CLICKED:      'invite_cta_clicked',
 };
 
 const ALLOWED = new Set(Object.values(EVENTS));
