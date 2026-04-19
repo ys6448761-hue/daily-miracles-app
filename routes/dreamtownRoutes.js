@@ -861,6 +861,37 @@ router.get('/stars/count', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
+// GET /api/dt/stars/top-today — 오늘 유니크 공명 상위 3개
+// ─────────────────────────────────────────────
+router.get('/stars/top-today', async (req, res) => {
+  try {
+    const { rows } = await db.query(
+      `SELECT s.id AS star_id, s.star_name, w.wish_text, w.wish_emotion,
+              t.resonance_users
+         FROM (
+           SELECT metadata->>'star_id' AS star_id,
+                  COUNT(DISTINCT user_id)::int AS resonance_users
+             FROM user_events
+            WHERE event_type = 'resonance_click'
+              AND created_at >= CURRENT_DATE
+            GROUP BY metadata->>'star_id'
+            ORDER BY resonance_users DESC
+            LIMIT 3
+         ) t
+         JOIN dt_stars  s ON s.id::text = t.star_id
+         JOIN dt_wishes w ON w.id = s.wish_id
+        WHERE s.is_hidden = FALSE
+          AND w.wish_text IS NOT NULL
+        ORDER BY t.resonance_users DESC`
+    );
+    res.json({ stars: rows });
+  } catch (err) {
+    console.error('[DT] GET /stars/top-today error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
 // GET /api/dt/stars/trending — 최근 30분 공명 활발 별 (최대 5개)
 // ─────────────────────────────────────────────
 router.get('/stars/trending', async (req, res) => {

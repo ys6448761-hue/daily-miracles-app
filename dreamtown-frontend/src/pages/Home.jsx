@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { getRecentStars, getStar, getFeaturedStars, getTrendingStars } from '../api/dreamtown.js';
+import { getRecentStars, getStar, getFeaturedStars, getTrendingStars, getTopTodayStars } from '../api/dreamtown.js';
 import { readSavedStar } from '../lib/utils/starSession.js';
 
 const GALAXY_STYLE = {
@@ -81,6 +81,44 @@ function resonanceLabel(count) {
   return '많은 마음';
 }
 
+// ── 오늘 Top 별 카드 (유니크 공명 깊이 기준) ─────────
+const TOP_RANK_STYLE = [
+  { border: 'rgba(255,215,106,0.35)', bg: 'rgba(255,215,106,0.07)', badge: '#FFD76A' },
+  { border: 'rgba(255,255,255,0.15)', bg: 'rgba(255,255,255,0.04)', badge: 'rgba(255,255,255,0.45)' },
+  { border: 'rgba(255,255,255,0.10)', bg: 'rgba(255,255,255,0.03)', badge: 'rgba(255,255,255,0.30)' },
+];
+
+function TopTodayStarCard({ star, rank }) {
+  const s = TOP_RANK_STYLE[rank] ?? TOP_RANK_STYLE[2];
+  return (
+    <Link
+      to={`/star/${star.star_id}`}
+      className="block rounded-2xl p-4 cursor-pointer no-underline transition-colors hover:brightness-110"
+      style={{ background: s.bg, border: `1px solid ${s.border}` }}
+    >
+      <div className="flex items-start gap-3">
+        <span style={{ fontSize: 13, color: s.badge, fontWeight: 700, flexShrink: 0, lineHeight: '20px' }}>
+          {rank === 0 ? '✨' : `0${rank + 1}`}
+        </span>
+        <div className="flex-1 min-w-0">
+          <p className="text-white/85 text-sm font-semibold truncate">{star.star_name}</p>
+          {star.wish_text && (
+            <p className="text-white/45 text-xs truncate mt-0.5">{star.wish_text}</p>
+          )}
+          {star.wish_emotion && (
+            <p style={{ fontSize: 11, color: 'rgba(255,215,106,0.55)', marginTop: 3 }} className="truncate">
+              {star.wish_emotion}
+            </p>
+          )}
+        </div>
+        <span style={{ fontSize: 11, color: s.badge, flexShrink: 0 }}>
+          {star.resonance_users}명
+        </span>
+      </div>
+    </Link>
+  );
+}
+
 // ── 트렌딩 별 카드 (최근 30분 공명 활발) ─────────────
 function TrendingStarCard({ star }) {
   return (
@@ -149,6 +187,7 @@ export default function Home() {
   const [myStarData, setMyStarData] = useState(null);
   const [featured, setFeatured] = useState({ hot: [], fresh: [] });
   const [trending, setTrending] = useState([]);
+  const [topToday, setTopToday] = useState([]);
 
   const myStarId = readSavedStar();
 
@@ -163,6 +202,10 @@ export default function Home() {
 
     const trendingPromise = getTrendingStars(5)
       .then(r => setTrending(r.stars ?? []))
+      .catch(() => {});
+
+    const topTodayPromise = getTopTodayStars()
+      .then(r => setTopToday(r.stars ?? []))
       .catch(() => {});
 
     const myStarPromise = myStarId
@@ -181,7 +224,7 @@ export default function Home() {
           })
       : Promise.resolve();
 
-    Promise.all([recentPromise, myStarPromise, featuredPromise, trendingPromise]).finally(() => setLoading(false));
+    Promise.all([recentPromise, myStarPromise, featuredPromise, trendingPromise, topTodayPromise]).finally(() => setLoading(false));
   }, [myStarId]);
 
   const otherStars = stars.filter(s => s && s.star_id && s.star_id !== myStarId);
@@ -243,6 +286,18 @@ export default function Home() {
                 ⭐ {s.star_name}
               </button>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── 오늘 가장 마음이 모인 별 (유니크 공명 깊이) ── */}
+      {topToday.length > 0 && (
+        <div className="mb-4">
+          <p className="text-white/55 text-xs mb-2" style={{ letterSpacing: '0.05em' }}>
+            ✨ 오늘 가장 마음이 모인 별
+          </p>
+          <div className="flex flex-col gap-2">
+            {topToday.map((s, i) => <TopTodayStarCard key={s.star_id} star={s} rank={i} />)}
           </div>
         </div>
       )}

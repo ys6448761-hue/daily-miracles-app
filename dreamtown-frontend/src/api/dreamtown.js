@@ -149,6 +149,16 @@ export async function getRelatedStars(starId) {
   return res.json();
 }
 
+export async function getTopTodayStars() {
+  try {
+    const res = await fetch(`${BASE}/stars/top-today`);
+    if (!res.ok) return { stars: [] };
+    return res.json();
+  } catch {
+    return { stars: [] };
+  }
+}
+
 export async function getTrendingStars(limit = 5) {
   try {
     const res = await fetch(`${BASE}/stars/trending?limit=${limit}`);
