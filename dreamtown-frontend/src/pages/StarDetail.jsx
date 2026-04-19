@@ -697,15 +697,15 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
             </div>
           ) : (
             /* 유사 별 없음 — 광장 fallback */
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.22)', textAlign: 'center', marginBottom: 16 }}>
+            <p style={{ textAlign: 'center', marginBottom: 16 }}>
               <button
                 onClick={() => {
                   gaSquareFallbackClick({ starId: id, isInvite: isInviteEntry, hasMyStarId: !!myStarId });
-                  nav('/home');
+                  nav('/stars');
                 }}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.35)', fontSize: 12, textDecoration: 'underline', textUnderlineOffset: 3 }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(155,135,245,0.75)', fontSize: 13, fontWeight: 500 }}
               >
-                광장에서 다른 별 구경하기
+                ✨ 다른 별에도 마음을 전해보세요
               </button>
             </p>
           )}
