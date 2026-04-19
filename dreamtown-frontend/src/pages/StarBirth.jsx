@@ -516,26 +516,6 @@ export default function StarBirth() {
                 별로 남기기
               </button>
 
-              {/* ── B. 별의 약속 ── */}
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)', textAlign: 'center', marginTop: 8, marginBottom: 2, lineHeight: 1.5 }}>
-                이 별과 약속을 이어갈 수도 있어요
-              </p>
-              <button
-                onClick={() => handleDay1Start('promise')}
-                style={{
-                  width: '100%',
-                  padding: '14px 0',
-                  borderRadius: 9999,
-                  background: 'rgba(255,255,255,0.07)',
-                  border: '1px solid rgba(255,255,255,0.18)',
-                  color: 'rgba(255,255,255,0.60)',
-                  fontSize: 14,
-                  cursor: 'pointer',
-                  backdropFilter: 'blur(8px)',
-                }}
-              >
-                별의 약속 이어가기
-              </button>
             </motion.div>
           )}
         </AnimatePresence>

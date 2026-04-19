@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { postWish, postStarCreate, getOrCreateUserId } from '../api/dreamtown.js';
@@ -50,10 +50,13 @@ export default function WishGate() {
   const [error, setError] = useState('');
   const [careMessage, setCareMessage] = useState(''); // RED 신호 시 케어 메시지
   const [cablecarVideoFailed, setCablecarVideoFailed] = useState(false);
+  const loadingStartRef = useRef(null);
+  const CABLECAR_MIN_MS = 3500; // 케이블카 연출 최소 보장 시간
 
   async function handleSubmit() {
     if (!wishText.trim()) { setError('소원을 입력해주세요.'); return; }
     setLoading(true);
+    loadingStartRef.current = Date.now();
     setError('');
     setCareMessage('');
     try {
@@ -82,6 +85,11 @@ export default function WishGate() {
           body: JSON.stringify({ partner_code: partnerCode, user_id: userId }),
         }).catch(() => {});
       }
+
+      // 케이블카 연출 최소 시간 보장 (3.5초)
+      const elapsed = Date.now() - (loadingStartRef.current ?? Date.now());
+      const remaining = CABLECAR_MIN_MS - elapsed;
+      if (remaining > 0) await new Promise(r => setTimeout(r, remaining));
 
       nav(star.next ?? '/star-birth', { state: starBirthState });
     } catch (e) {
@@ -113,7 +121,7 @@ export default function WishGate() {
         <motion.p
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.9 }}
+          transition={{ delay: 1.5, duration: 0.9 }}
           style={{
             position: 'relative', zIndex: 1,
             fontSize: 20, fontWeight: 300,

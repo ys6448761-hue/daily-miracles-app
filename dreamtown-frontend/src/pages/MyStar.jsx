@@ -1106,6 +1106,30 @@ export default function MyStar() {
           카톡으로 보내기
         </button>
 
+        {/* ── 약속 이어가기 ── */}
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 16, marginTop: 4 }}>
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.30)', textAlign: 'center', marginBottom: 10, lineHeight: 1.6 }}>
+            이 순간을 약속으로 남길 수 있어요
+          </p>
+          <button
+            onClick={() => nav(`/promise/create?starId=${star.star_id}`)}
+            style={{
+              width: '100%',
+              padding: '14px 0',
+              borderRadius: 9999,
+              background: 'rgba(255,215,106,0.08)',
+              border: '1px solid rgba(255,215,106,0.22)',
+              color: 'rgba(255,215,106,0.75)',
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: 'pointer',
+              letterSpacing: '0.02em',
+            }}
+          >
+            약속 이어가기 ✦
+          </button>
+        </div>
+
         {/* ── 별 선물하기 (카카오 키 있을 때만 노출) ──── */}
         {import.meta.env.VITE_KAKAO_JS_KEY && (
           !giftDone ? (
