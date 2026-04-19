@@ -1,26 +1,30 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { readSavedStar } from '../lib/utils/starSession.js';
 import InviteIntro from './InviteIntro.jsx';
 import WishInputScreen from './WishInputScreen.jsx';
 import StarDetail from './StarDetail.jsx';
+
+// import.meta.env.BASE_URL: dev='/', prod='/dreamtown/'
+const BASE = import.meta.env.BASE_URL;
 
 /**
  * /dreamtown — 공개 입구 (Public Entry)
  *
  * scene 상태 머신:
  *  'intro'     — ?entry=invite 진입 시 단일 인트로 화면 (InviteIntro)
- *  'wish'      — "시작하기 ✦" CTA → WishInputScreen (즉시 전환)
- *  'dreamtown' — 직접 진입 or 기존 광장 화면
+ *  'wish'      — invite CTA → WishInputScreen
+ *  'dreamtown' — 직접 진입: 용궁 + 아우룸 비주얼 세계관 시작 화면
  *
  * 정책:
- *  - localStorage 있어도 자동 복귀 금지
- *  - invite 유입: 인트로 → 입력, 단계 없음
- *  - 일반 진입: 광장 화면 → "내 소원 남기기 ✦" → /wish (케이블카 인트로)
+ *  - QR 1개 진입, 상품 선택 화면 없음
+ *  - invite 유입: InviteIntro → WishInputScreen
+ *  - 일반 진입: 용궁 비주얼 → "내 소원 남기기 ✦" → /wish (케이블카 인트로)
  */
 export default function DreamTown() {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate     = useNavigate();
+  const location     = useLocation();
   const searchParams = new URLSearchParams(location.search);
 
   const isInvite    = searchParams.get('entry') === 'invite';
@@ -48,52 +52,131 @@ export default function DreamTown() {
     return <InviteIntro onStart={() => setScene('wish')} />;
   }
 
-  // ── Scene: wish (즉시 소원 입력) ───────────────────────────────────
+  // ── Scene: wish (invite 소원 입력) ────────────────────────────────
   if (scene === 'wish') {
     return <WishInputScreen onBack={() => setScene('intro')} />;
   }
 
-  // ── Scene: dreamtown (세계관 시작 화면) ────────────────────────────
+  // ── Scene: dreamtown (세계관 시작 / 용궁 + 아우룸 비주얼) ───────────
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-[#0D1B2A] px-6">
-      {/* 인트로 */}
-      <div className="mb-14 text-center">
-        <div
-          className="mx-auto mb-6 h-3 w-3 rounded-full bg-[#9B87F5]"
-          style={{ boxShadow: '0 0 18px 5px rgba(155,135,245,0.4)' }}
-        />
-        <h1 className="text-lg font-medium text-white/80">
-          드림타운에 오신 걸 환영해요
-        </h1>
-        <p className="mt-3 text-sm leading-relaxed text-white/40">
-          소원을 품은 별들이 모이는 곳이에요.
-          <br />
-          당신의 별을 만들어보세요.
-        </p>
-      </div>
+    <div style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden', background: '#000' }}>
 
-      {/* 메인 CTA */}
-      <div className="w-full max-w-xs space-y-3">
-        <button
+      {/* 배경 이미지 — 용궁 + 아우룸 비주얼 */}
+      <motion.img
+        src={`${BASE}images/intro/intro-03-transform.jpg`}
+        alt=""
+        style={{
+          position: 'absolute', inset: 0,
+          width: '100%', height: '100%',
+          objectFit: 'cover',
+        }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.88 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+      />
+
+      {/* 어두운 그라디언트 오버레이 */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(to bottom, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.65) 60%, rgba(0,0,0,0.85) 100%)',
+      }} />
+
+      {/* 카피 + CTA — 하단 고정 */}
+      <div style={{
+        position: 'absolute', bottom: 0,
+        width: '100%',
+        padding: '0 28px 52px',
+        textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}>
+
+        {/* 메인 카피 */}
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
+          style={{
+            fontSize: 'clamp(22px, 5.5vw, 26px)',
+            fontWeight: 300,
+            color: 'rgba(255,255,255,0.95)',
+            whiteSpace: 'pre-line',
+            lineHeight: 1.78,
+            letterSpacing: '-0.01em',
+            textShadow: '0 2px 20px rgba(0,0,0,0.7)',
+            marginBottom: 40,
+          }}
+        >
+          {'지금,\n당신의 소원이\n별이 되는 순간'}
+        </motion.p>
+
+        {/* Primary CTA */}
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 0.6 }}
+          whileTap={{ scale: 0.97 }}
           onClick={() => navigate('/wish')}
-          className="w-full rounded-full bg-[#9B87F5] py-3.5 text-sm font-medium text-white"
+          style={{
+            width: '100%',
+            maxWidth: 320,
+            padding: '17px 0',
+            borderRadius: 9999,
+            background: '#FFD76A',
+            color: '#0D1B2A',
+            fontSize: 17,
+            fontWeight: 700,
+            border: 'none',
+            cursor: 'pointer',
+            boxShadow: '0 0 32px 10px rgba(255,215,106,0.28)',
+            letterSpacing: '0.02em',
+            marginBottom: 12,
+          }}
         >
           내 소원 남기기 ✦
-        </button>
-      </div>
+        </motion.button>
 
-      {/* 기존 별 — 약한 CTA */}
-      {hasExistingStar && (
-        <p className="mt-10 text-xs text-white/25">
-          이미 만든 별이 있나요?{' '}
-          <button
-            onClick={() => navigate('/my-star')}
-            className="underline underline-offset-4 hover:text-white/40 transition-colors"
+        {/* Secondary CTA */}
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.0, duration: 0.6 }}
+          onClick={() => navigate('/stars')}
+          style={{
+            width: '100%',
+            maxWidth: 320,
+            padding: '14px 0',
+            borderRadius: 9999,
+            background: 'rgba(255,255,255,0.07)',
+            border: '1px solid rgba(255,255,255,0.18)',
+            color: 'rgba(255,255,255,0.60)',
+            fontSize: 14,
+            cursor: 'pointer',
+            backdropFilter: 'blur(8px)',
+          }}
+        >
+          다른 별 보기
+        </motion.button>
+
+        {/* 기존 별 보유자 */}
+        {hasExistingStar && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.3, duration: 0.5 }}
+            style={{ marginTop: 20, fontSize: 12, color: 'rgba(255,255,255,0.25)', textAlign: 'center' }}
           >
-            내 별로 돌아가기
-          </button>
-        </p>
-      )}
-    </main>
+            이미 만든 별이 있나요?{' '}
+            <button
+              onClick={() => navigate('/my-star')}
+              style={{ textDecoration: 'underline', color: 'rgba(255,255,255,0.35)', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              내 별로 돌아가기
+            </button>
+          </motion.p>
+        )}
+      </div>
+    </div>
   );
 }

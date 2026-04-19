@@ -457,7 +457,7 @@ export default function StarBirth() {
           )}
         </AnimatePresence>
 
-        {/* ── Day1 CTA — 2.3s 후 자연 노출 ── */}
+        {/* ── CTA — 2.3s 후 자연 노출 (별 만들기 체험 / 별의 약속 분기) ── */}
         <AnimatePresence>
           {showCTA && (
             <motion.div
@@ -467,98 +467,38 @@ export default function StarBirth() {
               transition={{ duration: 0.5, ease: 'easeOut' }}
               style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}
             >
-              {/* 루미 메시지 */}
-              <p style={{ fontSize: 13, color: 'rgba(255,215,106,0.75)', marginBottom: 2, letterSpacing: '0.02em' }}>
-                ✨ 루미의 발견
-              </p>
-              <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.88)', lineHeight: 1.55, marginBottom: 6, textAlign: 'center' }}>
-                &ldquo;{day1.message}&rdquo;
-              </p>
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 14, textAlign: 'center', lineHeight: 1.5 }}>
-                {day1.prompt}
-              </p>
-
-              {/* ── 공유하기 — 1순위 최상단 ── */}
+              {/* ── 공유하기 ── */}
               {shareMsg && (
                 <div style={{ width: '100%', marginBottom: 4 }}>
-                  {/* 공유 트리거 문구 */}
-                  <p style={{
-                    fontSize: 14,
-                    color: 'rgba(255,255,255,0.75)',
-                    marginBottom: 4,
-                    fontWeight: 600,
-                    textAlign: 'center',
-                    lineHeight: 1.5,
-                  }}>
+                  <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', marginBottom: 4, fontWeight: 600, textAlign: 'center', lineHeight: 1.5 }}>
                     이건 나만 보기 아까운 순간이에요
                   </p>
-                  {/* 공유 문구 */}
-                  <p style={{
-                    fontSize: 13,
-                    color: 'rgba(255,255,255,0.45)',
-                    marginBottom: 10,
-                    fontStyle: 'italic',
-                    textAlign: 'center',
-                    lineHeight: 1.5,
-                  }}>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginBottom: 10, fontStyle: 'italic', textAlign: 'center', lineHeight: 1.5 }}>
                     &ldquo;{shareMsg}&rdquo;
                   </p>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    {/* 카카오 공유 */}
-                    <button
-                      onClick={handleKakaoShare}
-                      style={{
-                        flex: 1,
-                        padding: '13px 0',
-                        borderRadius: 9999,
-                        background: '#FEE500',
-                        color: '#191919',
-                        fontSize: 14,
-                        fontWeight: 700,
-                        border: 'none',
-                        cursor: 'pointer',
-                        letterSpacing: '0.01em',
-                      }}
-                    >
+                    <button onClick={handleKakaoShare} style={{ flex: 1, padding: '13px 0', borderRadius: 9999, background: '#FEE500', color: '#191919', fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer' }}>
                       이 순간을 전하기
                     </button>
-                    {/* 링크 복사 (저장하기) */}
-                    <button
-                      onClick={handleCopyLink}
-                      style={{
-                        flex: 1,
-                        padding: '13px 0',
-                        borderRadius: 9999,
-                        background: 'rgba(255,255,255,0.08)',
-                        color: 'rgba(255,255,255,0.75)',
-                        fontSize: 14,
-                        fontWeight: 600,
-                        border: '1px solid rgba(255,255,255,0.15)',
-                        cursor: 'pointer',
-                      }}
-                    >
+                    <button onClick={handleCopyLink} style={{ flex: 1, padding: '13px 0', borderRadius: 9999, background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.75)', fontSize: 14, fontWeight: 600, border: '1px solid rgba(255,255,255,0.15)', cursor: 'pointer' }}>
                       🔗 저장하기
                     </button>
                   </div>
-                  {/* 공유 완료 피드백 */}
                   {shareFeedback && (
-                    <p className="sb-share-feedback" style={{
-                      fontSize: 12,
-                      color: 'rgba(255,215,106,0.8)',
-                      textAlign: 'center',
-                      marginTop: 6,
-                    }}>
+                    <p className="sb-share-feedback" style={{ fontSize: 12, color: 'rgba(255,215,106,0.8)', textAlign: 'center', marginTop: 6 }}>
                       {shareFeedback}
                     </p>
                   )}
-                  {/* 구분선 */}
                   <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '14px 0 6px' }} />
                 </div>
               )}
 
-              {/* PRIMARY: 오늘의 작은 행동 시작 */}
+              {/* ── A. 별 만들기 체험 ── */}
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', textAlign: 'center', marginBottom: 2, lineHeight: 1.5 }}>
+                이 순간을 별로 남겨둘 수 있어요
+              </p>
               <button
-                onClick={() => handleDay1Start('click')}
+                onClick={() => nav(`/my-star/${starId}`, { replace: true })}
                 style={{
                   width: '100%',
                   padding: '16px 0',
@@ -571,11 +511,30 @@ export default function StarBirth() {
                   cursor: 'pointer',
                   boxShadow: '0 0 32px 8px rgba(255,215,106,0.22)',
                   letterSpacing: '0.01em',
-                  position: 'relative',
-                  overflow: 'hidden',
                 }}
               >
-                {day1.cta}
+                별로 남기기
+              </button>
+
+              {/* ── B. 별의 약속 ── */}
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)', textAlign: 'center', marginTop: 8, marginBottom: 2, lineHeight: 1.5 }}>
+                이 별과 약속을 이어갈 수도 있어요
+              </p>
+              <button
+                onClick={() => handleDay1Start('promise')}
+                style={{
+                  width: '100%',
+                  padding: '14px 0',
+                  borderRadius: 9999,
+                  background: 'rgba(255,255,255,0.07)',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                  color: 'rgba(255,255,255,0.60)',
+                  fontSize: 14,
+                  cursor: 'pointer',
+                  backdropFilter: 'blur(8px)',
+                }}
+              >
+                별의 약속 이어가기
               </button>
             </motion.div>
           )}
