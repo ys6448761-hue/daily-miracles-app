@@ -118,10 +118,23 @@ export default function AppLaunch() {
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2, duration: 0.6 }}
           whileTap={{ scale: 0.97 }}
-          onClick={() => nav('/intro')}
-          className="w-full max-w-xs bg-dream-purple hover:bg-purple-500 text-white font-semibold py-4 rounded-2xl text-lg transition-colors"
+          onClick={() => nav('/wish')}
+          style={{
+            width: '100%',
+            maxWidth: 320,
+            padding: '18px 0',
+            borderRadius: 9999,
+            background: '#FFD76A',
+            color: '#0D1B2A',
+            fontSize: 17,
+            fontWeight: 700,
+            border: 'none',
+            cursor: 'pointer',
+            boxShadow: '0 0 32px 10px rgba(255,215,106,0.28)',
+            letterSpacing: '0.02em',
+          }}
         >
-          Enter DreamTown
+          내 소원 남기기 ✦
         </motion.button>
 
         {/* 실시간 별 카운터 */}
