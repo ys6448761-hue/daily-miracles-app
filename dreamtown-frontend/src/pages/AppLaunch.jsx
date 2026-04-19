@@ -4,27 +4,32 @@ import { useNavigate } from 'react-router-dom';
 import IntroScene from './IntroScene.jsx';
 import { readSavedStar } from '../lib/utils/starSession.js';
 
+const INTRO_KEY = 'dt_intro_seen';
+const today = () => new Date().toISOString().slice(0, 10);
+
 // ── Scene 2: Aurum ────────────────────────────────────────
 function AurumScene({ onFinish }) {
   const BASE = import.meta.env.BASE_URL;
-  const [lineIdx, setLineIdx] = useState(0);
+  const [lineIdx, setLineIdx]   = useState(0);
+  const [canSkip, setCanSkip]   = useState(false);
 
   useEffect(() => {
     const t1 = setTimeout(() => setLineIdx(1), 1400);
-    const t2 = setTimeout(() => setLineIdx(2), 3300);
-    const t3 = setTimeout(onFinish, 6000);
-    return () => [t1, t2, t3].forEach(clearTimeout);
+    const t2 = setTimeout(() => setLineIdx(2), 3000);
+    const t3 = setTimeout(() => setCanSkip(true), 2000);
+    const t4 = setTimeout(onFinish, 5000);
+    return () => [t1, t2, t3, t4].forEach(clearTimeout);
   }, [onFinish]);
 
   const LINES = [
     '드림타운에 오신 걸 환영해요',
-    '이곳은 소원이 별이 되는 곳이에요',
+    '소원이 별이 되는 곳이에요',
   ];
 
   return (
     <div
-      onClick={onFinish}
-      style={{ position: 'fixed', inset: 0, overflow: 'hidden', cursor: 'pointer', background: '#060c17' }}
+      onClick={canSkip ? onFinish : undefined}
+      style={{ position: 'fixed', inset: 0, overflow: 'hidden', cursor: canSkip ? 'pointer' : 'default', background: '#060c17' }}
     >
       <img
         src={`${BASE}images/aurum_intro.webp`}
@@ -61,26 +66,30 @@ function AurumScene({ onFinish }) {
         ))}
       </div>
 
-      <p style={{ position: 'absolute', bottom: 32, right: 24, zIndex: 10, color: 'rgba(255,255,255,0.35)', fontSize: 13, margin: 0 }}>
-        건너뛰기
-      </p>
+      {canSkip && (
+        <p style={{ position: 'absolute', bottom: 32, right: 24, zIndex: 10, color: 'rgba(255,255,255,0.35)', fontSize: 13, margin: 0 }}>
+          건너뛰기
+        </p>
+      )}
     </div>
   );
 }
 
 // ── Scene 3: Cablecar ─────────────────────────────────────
 function CablecarScene({ onFinish }) {
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed]   = useState(false);
+  const [canSkip, setCanSkip] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(onFinish, 5500);
-    return () => clearTimeout(t);
+    const t1 = setTimeout(() => setCanSkip(true), 2000);
+    const t2 = setTimeout(onFinish, 5000);
+    return () => [t1, t2].forEach(clearTimeout);
   }, [onFinish]);
 
   return (
     <div
-      onClick={onFinish}
-      style={{ position: 'fixed', inset: 0, overflow: 'hidden', cursor: 'pointer', background: '#060c17' }}
+      onClick={canSkip ? onFinish : undefined}
+      style={{ position: 'fixed', inset: 0, overflow: 'hidden', cursor: canSkip ? 'pointer' : 'default', background: '#060c17' }}
     >
       {!failed ? (
         <motion.video
@@ -106,7 +115,7 @@ function CablecarScene({ onFinish }) {
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 2.2, duration: 1.6 }}
+        transition={{ delay: 2.0, duration: 1.5 }}
         style={{
           position: 'absolute', bottom: '32%', left: 0, right: 0,
           textAlign: 'center',
@@ -118,12 +127,14 @@ function CablecarScene({ onFinish }) {
           margin: 0,
         }}
       >
-        별들이 태어나는 곳으로...
+        별들이 태어나는 곳으로
       </motion.p>
 
-      <p style={{ position: 'absolute', bottom: 32, right: 24, zIndex: 10, color: 'rgba(255,255,255,0.35)', fontSize: 13, margin: 0 }}>
-        건너뛰기
-      </p>
+      {canSkip && (
+        <p style={{ position: 'absolute', bottom: 32, right: 24, zIndex: 10, color: 'rgba(255,255,255,0.35)', fontSize: 13, margin: 0 }}>
+          건너뛰기
+        </p>
+      )}
     </div>
   );
 }
@@ -144,7 +155,6 @@ function LandingScene({ starCount }) {
       />
       <div className="absolute inset-0 bg-black/50 pointer-events-none" />
 
-      {/* 별빛 파티클 */}
       <div className="absolute inset-0 pointer-events-none">
         {[...Array(20)].map((_, i) => (
           <div
@@ -229,7 +239,7 @@ function LandingScene({ starCount }) {
 // ── Orchestrator ──────────────────────────────────────────
 export default function AppLaunch() {
   const nav = useNavigate();
-  const [scene, setScene] = useState(null); // null | 'intro' | 'aurum' | 'cablecar' | 'landing'
+  const [scene, setScene]     = useState(null);
   const [starCount, setStarCount] = useState(null);
 
   useEffect(() => {
@@ -249,7 +259,13 @@ export default function AppLaunch() {
       return;
     }
 
-    setScene('intro');
+    // 재방문: 오늘 이미 Intro 봤으면 Landing으로 바로
+    if (localStorage.getItem(INTRO_KEY) === today()) {
+      setScene('landing');
+    } else {
+      localStorage.setItem(INTRO_KEY, today());
+      setScene('intro');
+    }
   }, [nav]);
 
   useEffect(() => {
@@ -259,10 +275,10 @@ export default function AppLaunch() {
       .catch(() => {});
   }, []);
 
-  if (!scene) return <div style={{ background: '#060c17', height: '100vh' }} />;
-  if (scene === 'intro')    return <IntroScene     onFinish={() => setScene('aurum')}   />;
-  if (scene === 'aurum')    return <AurumScene     onFinish={() => setScene('cablecar')} />;
-  if (scene === 'cablecar') return <CablecarScene  onFinish={() => setScene('landing')} />;
+  if (!scene)               return <div style={{ background: '#060c17', height: '100vh' }} />;
+  if (scene === 'intro')    return <IntroScene    onFinish={() => setScene('aurum')}    />;
+  if (scene === 'aurum')    return <AurumScene    onFinish={() => setScene('cablecar')} />;
+  if (scene === 'cablecar') return <CablecarScene onFinish={() => setScene('landing')}  />;
 
   return <LandingScene starCount={starCount} />;
 }
