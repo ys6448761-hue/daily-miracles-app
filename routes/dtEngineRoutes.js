@@ -25,7 +25,10 @@ const wisdomGenerator  = require('../services/dt/wisdomGenerator');
 const choiceService    = require('../services/dt/choiceService');
 const artifactService  = require('../services/dt/artifactService');
 const logService       = require('../services/dt/logService');
-const narrativeService = require('../services/dt/narrativeService');
+const narrativeService    = require('../services/dt/narrativeService');
+const wishJourneyEngine   = require('../services/dt/wishJourneyEngine');
+const lifeSpotService     = require('../services/dt/lifeSpotService');
+const starCareService     = require('../services/dt/starCareService');
 
 const log = makeLogger('dtEngineRoutes');
 
@@ -60,6 +63,11 @@ router.post('/star', async (req, res) => {
     const result = await starService.createStar(user_id, wish_text, {
       gem_type, yeosu_theme, image_prompt,
     });
+
+    // 7일 케어 스케줄 자동 생성 (비동기 — 응답 블로킹 안 함)
+    const { phone_number } = req.body;
+    starCareService.scheduleStarCare(user_id, result.star.id, phone_number ?? null)
+      .catch(e => log.warn('케어 스케줄 생성 실패 (계속)', { err: e.message }));
 
     return res.status(201).json({
       success: true,
@@ -567,6 +575,40 @@ router.get('/star/:starId/logs', async (req, res) => {
   } catch (err) {
     if (err.status) return res.status(err.status).json({ error: err.message });
     return res.status(500).json({ error: '로그 조회에 실패했습니다' });
+  }
+});
+
+// ══════════════════════════════════════════════════════════════
+// POST /journey
+// Wish Journey Engine: 입력 1개 → (장소 반영) 상태/장면/행동/방향/기록
+// Body: { user_id?, wish_text, user_state, life_spot_id?, history? }
+// ══════════════════════════════════════════════════════════════
+router.post('/journey', async (req, res) => {
+  const { user_id, wish_text, user_state, life_spot_id, history } = req.body;
+
+  if (!wish_text && !user_state) {
+    return res.status(400).json({ error: 'wish_text 또는 user_state 중 하나는 필요합니다' });
+  }
+
+  try {
+    // 장소 컨텍스트 조회 (없으면 null — 엔진은 계속 동작)
+    const lifeSpot = user_id && life_spot_id
+      ? await lifeSpotService.getSpotContext({ userId: user_id, lifeSpotId: life_spot_id })
+      : null;
+
+    const result = wishJourneyEngine.generateResponse({ wish_text, user_state, history, lifeSpot });
+
+    // 장소 로그 저장 (비동기 — 응답 블로킹 안 함)
+    if (user_id && lifeSpot) {
+      lifeSpotService.saveLog({ userId: user_id, spotId: lifeSpot.id, engineResult: result })
+        .then(() => lifeSpotService.touchSpot(lifeSpot.id))
+        .catch(err => log.warn('spot 로그/통계 저장 실패', { err: err.message }));
+    }
+
+    return res.json({ success: true, ...result });
+  } catch (err) {
+    log.error('journey 생성 실패', { err: err.message });
+    return res.status(500).json({ error: '여정 생성에 실패했습니다' });
   }
 });
 

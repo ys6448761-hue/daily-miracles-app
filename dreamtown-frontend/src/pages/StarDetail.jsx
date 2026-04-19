@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStarDetail, getStar, getResonance, postVoyageLog, postDtResonance, getSimilarStars } from '../api/dreamtown.js';
+import { getStarDetail, getStar, getResonance, postVoyageLog, postDtResonance, getSimilarStars, logUserEvent, getOrCreateUserId } from '../api/dreamtown.js';
 import MilestoneBar from '../components/MilestoneBar';
 import { gaResonanceCreated, gaResonanceClick, gaResonanceSuccess, gaResonanceCTAClick, gaSimilarStarClick, gaSquareFallbackClick, gaSimularStarsEmptyView } from '../utils/gtag';
 import { readSavedStar } from '../lib/utils/starSession.js';
@@ -216,8 +216,9 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   async function handleResonance(type) {
     if (submitting || submitted) return;
 
-    // 0. resonance_click 이벤트 (API 호출 직전)
+    // 0. resonance_click — GA4 + user_events (광고차단 환경에도 반드시 남김)
     gaResonanceClick({ starId: id, type, isInvite: isInviteEntry });
+    logUserEvent({ userId: getOrCreateUserId(), eventType: 'resonance_click', metadata: { star_id: id, resonance_type: type, is_invite: isInviteEntry } });
 
     // 1. 버튼 press 애니메이션 (scale + glow, 0.2s)
     setAnimating(type);
@@ -237,6 +238,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
       await postDtResonance({ starId: id, type });
       gaResonanceCreated({ starId: id, resonanceType: type });
       gaResonanceSuccess({ starId: id, type, isInvite: isInviteEntry });
+      logUserEvent({ userId: getOrCreateUserId(), eventType: 'resonance_created', metadata: { star_id: id, resonance_type: type, is_invite: isInviteEntry } });
 
       if (myStarId) {
         const label = type === 'miracle' ? '기적나눔' : '지혜나눔';
@@ -263,6 +265,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
         const list = Array.isArray(res) ? res : (res?.stars ?? []);
         const trimmed = list.slice(0, 3);
         setSimilarStars(trimmed);
+        logUserEvent({ userId: getOrCreateUserId(), eventType: 'similar_stars_shown', metadata: { star_id: id, count: trimmed.length } });
         if (trimmed.length === 0) {
           gaSimularStarsEmptyView({ starId: id, isInvite: isInviteEntry, hasMyStarId: !!myStarId });
         }
@@ -274,6 +277,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
       // 롤백
       if (type === 'miracle') setMiracleCount(c => c - 1);
       else setWisdomCount(c => c - 1);
+      logUserEvent({ userId: getOrCreateUserId(), eventType: 'resonance_failed', metadata: { star_id: id, resonance_type: type } });
     } finally {
       setSubmitting(false);
     }
@@ -661,6 +665,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
                     key={s.star_id ?? i}
                     onClick={() => {
                       gaSimilarStarClick({ fromStarId: id, toStarId: s.star_id, position: i });
+                      logUserEvent({ userId: getOrCreateUserId(), eventType: 'similar_star_click', metadata: { from_star_id: id, to_star_id: s.star_id, position: i } });
                       nav(`/star/${s.star_id}`);
                     }}
                     className="slide-up"
@@ -710,6 +715,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
               <button
                 onClick={() => {
                   gaResonanceCTAClick({ starId: id, ctaType: 'make_star', isInvite: isInviteEntry, hasMyStarId: false });
+                  logUserEvent({ userId: getOrCreateUserId(), eventType: 'resonance_cta_click', metadata: { star_id: id, cta_type: 'make_star', has_my_star: false, is_invite: isInviteEntry } });
                   nav('/dreamtown?entry=invite');
                 }}
                 style={{
@@ -733,6 +739,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
                 <button
                   onClick={() => {
                     gaResonanceCTAClick({ starId: id, ctaType: 'make_star', isInvite: isInviteEntry, hasMyStarId: true });
+                    logUserEvent({ userId: getOrCreateUserId(), eventType: 'resonance_cta_click', metadata: { star_id: id, cta_type: 'make_star', has_my_star: true, is_invite: isInviteEntry } });
                     nav('/dreamtown?entry=invite');
                   }}
                   className="w-full bg-star-gold/15 hover:bg-star-gold/25 border border-star-gold/30 text-star-gold font-semibold py-4 rounded-2xl transition-colors"
@@ -742,6 +749,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
                 <button
                   onClick={() => {
                     gaResonanceCTAClick({ starId: id, ctaType: 'my_star', isInvite: isInviteEntry, hasMyStarId: true });
+                    logUserEvent({ userId: getOrCreateUserId(), eventType: 'resonance_cta_click', metadata: { star_id: id, cta_type: 'my_star', has_my_star: true, is_invite: isInviteEntry } });
                     nav(`/my-star/${myStarId}`);
                   }}
                   className="w-full bg-white/5 border border-white/10 text-white/50 text-sm py-3 rounded-2xl hover:bg-white/8 transition-colors"

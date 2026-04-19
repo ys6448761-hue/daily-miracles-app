@@ -28,6 +28,9 @@ try {
 let credentialTrigger = null;
 try { credentialTrigger = require('../services/credentialTriggerService'); } catch (_) {}
 
+let dtPaymentService = null;
+try { dtPaymentService = require('../services/dt/dtPaymentService'); } catch (_) {}
+
 let _db = null;
 try {
   _db = require('../database/db');
@@ -319,6 +322,19 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
         setImmediate(() => credentialTrigger.issueOnNicepayPaid(Moid));
       }
 
+      // ── Day 8 Flow 플랜 활성화 (payments 테이블 연동) ────────────
+      if (!isCablecarPayment && dtPaymentService) {
+        try {
+          const activated = await dtPaymentService.activatePlan(Moid, paidTid);
+          if (activated) {
+            successUrl = `/star-summary?plan=flow&payment=success`;
+            console.log(`🌟 Day8 Flow 플랜 활성화 완료 → ${successUrl}`);
+          }
+        } catch (e) {
+          console.warn('⚠️ Day8 플랜 활성화 실패 — 기본 successUrl 사용:', e.message);
+        }
+      }
+
       // ── DreamTown: moid → star_id 조회 후 별 상세 페이지로 이동 ─
       if (!isCablecarPayment && _db) {
         try {
@@ -368,6 +384,9 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
       // 승인 실패
       console.log(`❌ 승인 실패: ${approvalResult.ResultCode} - ${approvalResult.ResultMsg}`);
       await nicepayService.updatePaymentStatus(Moid, 'FAILED', approvalResult);
+      if (dtPaymentService) {
+        dtPaymentService.handleFailed(Moid, 'failed').catch(() => {});
+      }
       const errorUrl = `${nicepayService.WIX_SUCCESS_URL}?error=APPROVAL_FAILED&code=${approvalResult.ResultCode}&msg=${encodeURIComponent(approvalResult.ResultMsg || '')}`;
       console.log(`🔗 Error Redirect: ${errorUrl}`);
       console.log('═'.repeat(60) + '\n');

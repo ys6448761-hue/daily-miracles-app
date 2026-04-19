@@ -11,8 +11,7 @@ const express   = require('express');
 const router    = express.Router();
 const errorFeed = require('../services/errorFeed');
 
-let db;
-try { db = require('../database/db'); } catch (e) { /* SQLite 미연결 환경 허용 */ }
+const db = require('../database/db');
 
 const SERVER_START = new Date().toISOString();
 
@@ -44,7 +43,6 @@ async function fetchRenderDeploys() {
 
 // ── Promise 플로우 통계 (최근 1시간) ─────────────────────────────
 async function fetchFlowStats() {
-  if (!db) return null;
   try {
     const oneHourAgo = new Date(Date.now() - 3_600_000);
     const [created, opened, withPhoto] = await Promise.all([
@@ -80,8 +78,8 @@ router.get('/status', adminGuard, async (req, res) => {
   ]);
 
   // 1. Health
-  let health = { db: 'unknown', dbMs: null, checkedAt: null };
-  if (db) {
+  let health;
+  {
     const t0 = Date.now();
     try {
       await db.query('SELECT 1');
@@ -120,6 +118,179 @@ router.get('/status', adminGuard, async (req, res) => {
     flowStats,
     alerts,
   });
+});
+
+// ══════════════════════════════════════════════════════════════════
+// Journey 운영 통제실 — 6개 엔드포인트
+// ══════════════════════════════════════════════════════════════════
+
+async function safeQuery(sql, params = []) {
+  try { return (await db.query(sql, params)).rows; } catch { return []; }
+}
+
+// ── GET /overview ─────────────────────────────────────────────────
+router.get('/overview', adminGuard, async (_req, res) => {
+  const [newWishes, events, growthEntries, riskRows] = await Promise.all([
+    safeQuery(`SELECT COUNT(*) AS n FROM dt_wishes WHERE created_at >= CURRENT_DATE`),
+    safeQuery(`SELECT
+        COUNT(*) FILTER (WHERE event_type='action_clicked')    AS action_clicked,
+        COUNT(*) FILTER (WHERE event_type='star_page_view')    AS page_views,
+        COUNT(*) FILTER (WHERE event_type='question_shown')    AS q_shown,
+        COUNT(*) FILTER (WHERE event_type='question_answered') AS q_answered,
+        COUNT(*) FILTER (WHERE event_type='revisit_detected')  AS revisits,
+        COUNT(*) FILTER (WHERE event_type='resonance_click')   AS resonance_click,
+        COUNT(*) FILTER (WHERE event_type='resonance_created') AS resonance_created
+       FROM user_events WHERE created_at >= CURRENT_DATE`),
+    safeQuery(`SELECT COUNT(*) AS n FROM star_timeline_summary WHERE current_phase='성장' AND updated_at >= CURRENT_DATE`),
+    safeQuery(`SELECT user_id FROM star_daily_logs
+               WHERE state IN ('ANXIETY','BLOCKED') AND log_date >= CURRENT_DATE - 3
+               GROUP BY user_id HAVING COUNT(*)>=3`),
+  ]);
+
+  const ev   = events[0] || {};
+  const views = Number(ev.page_views) || 0;
+
+  res.json({
+    success: true,
+    today: {
+      new_wishes:           Number(newWishes[0]?.n) || 0,
+      red_count:            riskRows.length,
+      action_click_rate:    views ? +((Number(ev.action_clicked)/views)*100).toFixed(1) : 0,
+      question_answer_rate: Number(ev.q_shown) ? +((Number(ev.q_answered)/Number(ev.q_shown))*100).toFixed(1) : 0,
+      revisit_rate:         views ? +((Number(ev.revisits)/views)*100).toFixed(1) : 0,
+      growth_entries:       Number(growthEntries[0]?.n) || 0,
+      resonance_click:      Number(ev.resonance_click)   || 0,
+      resonance_created:    Number(ev.resonance_created) || 0,
+      resonance_conv_rate:  Number(ev.resonance_click) ? +((Number(ev.resonance_created)/Number(ev.resonance_click))*100).toFixed(1) : 0,
+    },
+    ts: new Date().toISOString(),
+  });
+});
+
+// ── GET /risk-users ───────────────────────────────────────────────
+router.get('/risk-users', adminGuard, async (req, res) => {
+  const type = req.query.type || 'all';
+
+  const [stagnant, dropoff] = await Promise.all([
+    safeQuery(`SELECT user_id, state AS latest_state, COUNT(*) AS streak, MAX(log_date) AS last_date
+               FROM star_daily_logs
+               WHERE state IN ('ANXIETY','BLOCKED') AND log_date >= CURRENT_DATE - 7
+               GROUP BY user_id, state HAVING COUNT(*) >= 3
+               ORDER BY streak DESC LIMIT 20`),
+    safeQuery(`SELECT user_id, MAX(created_at) AS last_seen
+               FROM user_events
+               WHERE event_type='star_page_view'
+                 AND created_at BETWEEN CURRENT_DATE - 7 AND CURRENT_DATE - 1
+                 AND user_id NOT IN (
+                   SELECT DISTINCT user_id FROM user_events
+                   WHERE event_type='action_clicked' AND created_at >= CURRENT_DATE - 7
+                 )
+               GROUP BY user_id ORDER BY last_seen DESC LIMIT 20`),
+  ]);
+
+  const fmt = (r, reason) => ({
+    user_id:            r.user_id,
+    latest_state:       r.latest_state || '-',
+    risk_reason:        reason,
+    recommended_action: reason === '3일 이상 정체' ? '공감 메시지 발송' : '재방문 유도 알림',
+  });
+
+  const result = {
+    stagnant: stagnant.map(r => fmt(r, '3일 이상 정체')),
+    dropoff:  dropoff.map(r => fmt(r, '행동 없음')),
+    total:    stagnant.length + dropoff.length,
+  };
+
+  if (type === 'stagnant') return res.json({ success: true, users: result.stagnant });
+  if (type === 'dropoff')  return res.json({ success: true, users: result.dropoff });
+  res.json({ success: true, ...result });
+});
+
+// ── GET /stars ────────────────────────────────────────────────────
+router.get('/stars', adminGuard, async (_req, res) => {
+  const [phaseDist, stagnant, transitions] = await Promise.all([
+    safeQuery(`SELECT current_phase, COUNT(*) AS n FROM star_timeline_summary GROUP BY current_phase ORDER BY n DESC`),
+    safeQuery(`SELECT COUNT(DISTINCT user_id) AS n FROM star_daily_logs WHERE state IN ('BLOCKED','SEARCHING') AND log_date >= CURRENT_DATE - 3`),
+    safeQuery(`SELECT current_phase, COUNT(*) AS n FROM star_timeline_summary WHERE current_phase IN ('회복','전환','성장') GROUP BY current_phase`),
+  ]);
+
+  const dist = {};
+  phaseDist.forEach(r => { dist[r.current_phase] = Number(r.n); });
+  const transMap = {};
+  transitions.forEach(r => { transMap[r.current_phase] = Number(r.n); });
+
+  res.json({ success: true, stars: {
+    phase_distribution: dist,
+    stagnant_count:  Number(stagnant[0]?.n) || 0,
+    recovery_count:  transMap['회복'] || 0,
+    transition_count:transMap['전환'] || 0,
+    growth_count:    transMap['성장'] || 0,
+  }});
+});
+
+// ── GET /places ───────────────────────────────────────────────────
+router.get('/places', adminGuard, async (_req, res) => {
+  const [topSpots, unstableSpots, recoverySpots] = await Promise.all([
+    safeQuery(`SELECT ls.spot_type, COUNT(*) AS n FROM life_spot_logs lsl JOIN life_spots ls ON lsl.spot_id=ls.id GROUP BY ls.spot_type ORDER BY n DESC LIMIT 5`),
+    safeQuery(`SELECT ls.spot_name, lsl.state, COUNT(*) AS n FROM life_spot_logs lsl JOIN life_spots ls ON lsl.spot_id=ls.id WHERE lsl.state IN ('ANXIETY','BLOCKED','SEARCHING') GROUP BY ls.spot_name, lsl.state ORDER BY n DESC LIMIT 5`),
+    safeQuery(`SELECT ls.spot_name, lsl.state, COUNT(*) AS n FROM life_spot_logs lsl JOIN life_spots ls ON lsl.spot_id=ls.id WHERE lsl.state IN ('RECOVERY','GROWTH','TRANSITION') GROUP BY ls.spot_name, lsl.state ORDER BY n DESC LIMIT 5`),
+  ]);
+
+  res.json({ success: true, places: {
+    top_spots:      topSpots.map(r => ({ spot_type: r.spot_type, count: Number(r.n) })),
+    unstable_spots: unstableSpots.map(r => ({ spot_name: r.spot_name, state: r.state, count: Number(r.n) })),
+    recovery_spots: recoverySpots.map(r => ({ spot_name: r.spot_name, state: r.state, count: Number(r.n) })),
+  }});
+});
+
+// ── GET /content ──────────────────────────────────────────────────
+router.get('/content', adminGuard, async (_req, res) => {
+  const [questionStats, actionStats] = await Promise.all([
+    safeQuery(`SELECT metadata->>'type' AS question_type,
+        COUNT(*) FILTER (WHERE event_type='question_shown')    AS shown,
+        COUNT(*) FILTER (WHERE event_type='question_answered') AS answered
+       FROM user_events
+       WHERE event_type IN ('question_shown','question_answered') AND created_at >= CURRENT_DATE - 7
+       GROUP BY metadata->>'type'`),
+    safeQuery(`SELECT metadata->>'phase' AS phase,
+        COUNT(*) FILTER (WHERE event_type='action_clicked') AS clicked,
+        COUNT(*) FILTER (WHERE event_type='star_page_view') AS views
+       FROM user_events
+       WHERE event_type IN ('action_clicked','star_page_view') AND created_at >= CURRENT_DATE - 7
+       GROUP BY metadata->>'phase'`),
+  ]);
+
+  res.json({ success: true, content: {
+    question_performance: questionStats.map(r => ({
+      question_type: r.question_type || 'unknown',
+      shown:         Number(r.shown),
+      answered:      Number(r.answered),
+      answer_rate:   Number(r.shown) ? +((Number(r.answered)/Number(r.shown))*100).toFixed(1) : 0,
+    })),
+    action_performance: actionStats.map(r => ({
+      phase:      r.phase || 'unknown',
+      views:      Number(r.views),
+      clicked:    Number(r.clicked),
+      click_rate: Number(r.views) ? +((Number(r.clicked)/Number(r.views))*100).toFixed(1) : 0,
+    })),
+  }});
+});
+
+// ── GET /operations ───────────────────────────────────────────────
+router.get('/operations', adminGuard, async (_req, res) => {
+  const [evCnt, logCnt, sumCnt] = await Promise.all([
+    safeQuery(`SELECT COUNT(*) AS n FROM user_events WHERE created_at >= CURRENT_DATE`),
+    safeQuery(`SELECT COUNT(*) AS n FROM star_daily_logs WHERE created_at >= CURRENT_DATE`),
+    safeQuery(`SELECT COUNT(*) AS n FROM star_timeline_summary WHERE updated_at >= CURRENT_DATE`),
+  ]);
+
+  res.json({ success: true, operations: {
+    events_today:        Number(evCnt[0]?.n)  || 0,
+    daily_logs_today:    Number(logCnt[0]?.n) || 0,
+    summaries_refreshed: Number(sumCnt[0]?.n) || 0,
+    db_status:           db ? 'ok' : 'disconnected',
+    last_updated_at:     new Date().toISOString(),
+  }});
 });
 
 module.exports = router;

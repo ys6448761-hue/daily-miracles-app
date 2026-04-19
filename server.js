@@ -2768,6 +2768,44 @@ try {
   console.warn('⚠️ DreamTown Core Engine 라우터 등록 실패:', err.message);
 }
 
+// ---------- DreamTown Life Spot Routes ----------
+try {
+  const dtLifeSpotRoutes = require('./routes/dtLifeSpotRoutes');
+  app.use('/api/dt/life-spots', dtLifeSpotRoutes);
+  console.log('✅ DreamTown Life Spot 라우터 등록 완료 (/api/dt/life-spots)');
+} catch (err) {
+  console.warn('⚠️ DreamTown Life Spot 라우터 등록 실패:', err.message);
+}
+
+// ---------- DreamTown User Event Routes ----------
+try {
+  const dtUserEventRoutes = require('./routes/dtUserEventRoutes');
+  app.use('/api/dt/user-events', dtUserEventRoutes);
+  console.log('✅ DreamTown User Event 라우터 등록 완료 (/api/dt/user-events)');
+} catch (err) {
+  console.warn('⚠️ DreamTown User Event 라우터 등록 실패:', err.message);
+}
+
+// ---------- DreamTown Star Trajectory + Summary Routes ----------
+try {
+  const dtStarTrajectoryRoutes = require('./routes/dtStarTrajectoryRoutes');
+  app.use('/api/dt/trajectory', dtStarTrajectoryRoutes);
+  // 스펙 명시 경로 /api/dt/star/summary 도 동일 라우터로 연결
+  app.use('/api/dt/star', dtStarTrajectoryRoutes);
+  console.log('✅ DreamTown Star Trajectory 라우터 등록 완료 (/api/dt/trajectory, /api/dt/star)');
+} catch (err) {
+  console.warn('⚠️ DreamTown Star Trajectory 라우터 등록 실패:', err.message);
+}
+
+// ---------- DreamTown Payment Routes (Day 8 Flow 플랜 결제) ----------
+try {
+  const dtPaymentRoutes = require('./routes/dtPaymentRoutes');
+  app.use('/api/payment/nicepay', dtPaymentRoutes);
+  console.log('✅ DreamTown Payment 라우터 등록 완료 (/api/payment/nicepay)');
+} catch (err) {
+  console.warn('⚠️ DreamTown Payment 라우터 등록 실패:', err.message);
+}
+
 // ---------- DreamTown Event Routes (SSOT: DreamTown_Event_SSOT v1) ----------
 try {
   const dtEventRoutes = require('./routes/dtEventRoutes');
@@ -3389,6 +3427,19 @@ function startServer(port) {
       console.log("✅ Aurora Job Worker 시작 (5초 폴링)");
     } catch (workerErr) {
       console.warn("⚠️ Aurora Job Worker 시작 실패:", workerErr.message);
+    }
+
+    // Star Care Engine — 7일 케어 cron (매일 오전 10시 KST)
+    try {
+      const cron          = require('node-cron');
+      const starCare      = require('./services/dt/starCareService');
+      cron.schedule('0 1 * * *', async () => {   // UTC 01:00 = KST 10:00
+        console.log('[StarCare] 케어 cron 실행');
+        await starCare.runStarCare();
+      }, { timezone: 'UTC' });
+      console.log('✅ Star Care Engine cron 등록 완료 (매일 KST 10:00)');
+    } catch (e) {
+      console.warn('⚠️ Star Care Engine cron 등록 실패:', e.message);
     }
   });
 

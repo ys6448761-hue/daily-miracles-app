@@ -405,3 +405,80 @@ export function logFlowEvent({ userId, stage, action, value = {}, refId = null }
     body: JSON.stringify({ userId, stage, action, value, refId }),
   }).catch(() => {});
 }
+
+// POST /api/dt/user-events — 사용자 반응 이벤트 기록 (fire-and-forget)
+export const USER_EVENTS = {
+  STAR_PAGE_VIEW:    'star_page_view',
+  PHASE_EXPOSED:     'phase_exposed',
+  ACTION_CLICKED:    'action_clicked',
+  QUESTION_SHOWN:    'question_shown',
+  QUESTION_ANSWERED: 'question_answered',
+  REVISIT_DETECTED:  'revisit_detected',
+};
+
+export function logUserEvent({ userId, eventType, metadata = {} }) {
+  fetch('/api/dt/user-events', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ user_id: userId, event_type: eventType, metadata }),
+  }).catch(() => {});
+}
+
+export function checkRevisit(userId) {
+  return fetch('/api/dt/user-events/revisit', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ user_id: userId }),
+  }).catch(() => {});
+}
+
+// GET /api/dt/trajectory/summary?user_id=uuid — 별 페이지 5블록 요약
+export async function getStarPageSummary(userId) {
+  const res = await fetch(`${BASE}/trajectory/summary?user_id=${encodeURIComponent(userId)}`);
+  if (!res.ok) throw new Error('별 요약 조회 실패');
+  return res.json();
+}
+
+// POST /api/dt/engine/journey — 일상 입력 → 상태/장면/행동/방향
+export async function postJourney({ userId, wishText, userState, lifeSpotId = null, history = [] }) {
+  return fetchWithRetry(`${BASE}/engine/journey`, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      user_id:      userId,
+      wish_text:    wishText,
+      user_state:   userState,
+      life_spot_id: lifeSpotId,
+      history,
+    }),
+  });
+}
+
+// GET /api/dt/star/day8-status?user_id= — Day 8 전환 상태 조회
+export async function getDay8Status(userId) {
+  try {
+    const res = await fetch(`${BASE}/star/day8-status?user_id=${encodeURIComponent(userId)}`);
+    if (!res.ok) return null;
+    return res.json();
+  } catch { return null; }
+}
+
+// POST /api/dt/star/day8-choose — Day 8 플랜 선택
+// choice: 'continue' | 'lite' | 'pause'
+export async function postDay8Choose({ userId, choice }) {
+  return fetchWithRetry(`${BASE}/star/day8-choose`, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, choice }),
+  });
+}
+
+// POST /api/payment/nicepay/request — Day 8 Flow 플랜 결제 요청
+// Returns: { order_id, redirect_url, amount }
+export async function requestDay8Payment(userId) {
+  return fetchWithRetry('/api/payment/nicepay/request', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId }),
+  });
+}

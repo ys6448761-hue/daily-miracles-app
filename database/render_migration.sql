@@ -284,15 +284,165 @@ VALUES (
 */
 
 -- ═══════════════════════════════════════════════════════════
+-- DreamTown Journey Engine Tables (125~130)
+-- ═══════════════════════════════════════════════════════════
+
+-- 125: Life Spot
+CREATE TABLE IF NOT EXISTS life_spots (
+  id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID        NOT NULL,
+  spot_name       VARCHAR(100) NOT NULL,
+  spot_type       VARCHAR(30)  NOT NULL,
+  is_favorite     BOOLEAN      DEFAULT false,
+  emotion_pattern JSONB        DEFAULT '[]'::jsonb,
+  visit_count     INT          DEFAULT 0,
+  last_visited_at TIMESTAMP    NULL,
+  created_at      TIMESTAMP    DEFAULT NOW(),
+  updated_at      TIMESTAMP    DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_life_spots_user_id ON life_spots(user_id);
+CREATE INDEX IF NOT EXISTS idx_life_spots_type    ON life_spots(spot_type);
+
+CREATE TABLE IF NOT EXISTS life_spot_logs (
+  id              UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID         NOT NULL,
+  spot_id         UUID         NOT NULL REFERENCES life_spots(id) ON DELETE CASCADE,
+  state           VARCHAR(30)  NOT NULL,
+  scene           TEXT         NOT NULL,
+  action          TEXT         NOT NULL,
+  direction       TEXT         NOT NULL,
+  emotion_signal  VARCHAR(50)  NOT NULL,
+  help_tag        VARCHAR(30)  NOT NULL,
+  growth_sentence VARCHAR(100) NOT NULL,
+  question_type   VARCHAR(30)  NULL,
+  question_answer VARCHAR(100) NULL,
+  source_type     VARCHAR(20)  NOT NULL DEFAULT 'daily',
+  created_at      TIMESTAMP    DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_life_spot_logs_user    ON life_spot_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_life_spot_logs_spot    ON life_spot_logs(spot_id);
+CREATE INDEX IF NOT EXISTS idx_life_spot_logs_created ON life_spot_logs(created_at DESC);
+
+CREATE TABLE IF NOT EXISTS user_preference_profiles (
+  user_id                UUID        PRIMARY KEY,
+  question_preference    VARCHAR(20) DEFAULT 'auto',
+  question_response_rate NUMERIC(5,2) DEFAULT 0,
+  action_response_rate   NUMERIC(5,2) DEFAULT 0,
+  dominant_spot_type     VARCHAR(30)  NULL,
+  updated_at             TIMESTAMP    DEFAULT NOW()
+);
+
+-- 126: Star Trajectory
+CREATE TABLE IF NOT EXISTS star_daily_logs (
+  id              UUID      PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID      NOT NULL,
+  star_id         UUID      NOT NULL,
+  log_date        DATE      NOT NULL DEFAULT CURRENT_DATE,
+  state           VARCHAR(30),
+  emotion_signal  VARCHAR(50),
+  help_tag        VARCHAR(30),
+  growth_sentence VARCHAR(100),
+  life_spot_id    UUID      NULL,
+  source_log_id   UUID      NULL,
+  created_at      TIMESTAMP DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_star_daily_user ON star_daily_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_star_daily_star ON star_daily_logs(star_id);
+CREATE INDEX IF NOT EXISTS idx_star_daily_date ON star_daily_logs(log_date DESC);
+
+CREATE TABLE IF NOT EXISTS star_travel_logs (
+  id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID        NOT NULL,
+  star_id         UUID        NOT NULL,
+  place_type      VARCHAR(30),
+  place_name      VARCHAR(100),
+  visited_at      TIMESTAMP   DEFAULT NOW(),
+  state           VARCHAR(30),
+  emotion_signal  VARCHAR(50),
+  help_tag        VARCHAR(30),
+  growth_sentence VARCHAR(100),
+  created_at      TIMESTAMP   DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_star_travel_user ON star_travel_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_star_travel_star ON star_travel_logs(star_id);
+
+CREATE TABLE IF NOT EXISTS star_timeline_summary (
+  star_id            UUID        PRIMARY KEY,
+  current_phase      VARCHAR(30) DEFAULT '시작',
+  last_7d_pattern    JSONB       DEFAULT '{}'::jsonb,
+  last_30d_pattern   JSONB       DEFAULT '{}'::jsonb,
+  dominant_state     VARCHAR(30),
+  dominant_help_tag  VARCHAR(30),
+  growth_score       INT         DEFAULT 0,
+  updated_at         TIMESTAMP   DEFAULT NOW()
+);
+
+-- 127: User Events
+CREATE TABLE IF NOT EXISTS user_events (
+  id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id    UUID,
+  event_type VARCHAR(50) NOT NULL,
+  metadata   JSONB       DEFAULT '{}'::jsonb,
+  created_at TIMESTAMP   DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_user_events_user    ON user_events(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_events_type    ON user_events(event_type);
+CREATE INDEX IF NOT EXISTS idx_user_events_created ON user_events(created_at DESC);
+
+-- 128: Star Care Schedule
+CREATE TABLE IF NOT EXISTS star_care_schedule (
+  id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id      UUID        NOT NULL,
+  star_id      UUID        NOT NULL,
+  phone_number VARCHAR(20) NULL,
+  day          INT         NOT NULL,
+  scheduled_at TIMESTAMP   NOT NULL,
+  executed     BOOLEAN     DEFAULT FALSE,
+  sent_at      TIMESTAMP   NULL,
+  send_type    VARCHAR(20) NULL,
+  created_at   TIMESTAMP   DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_care_user    ON star_care_schedule(user_id);
+CREATE INDEX IF NOT EXISTS idx_care_star    ON star_care_schedule(star_id);
+CREATE INDEX IF NOT EXISTS idx_care_pending ON star_care_schedule(scheduled_at, executed) WHERE executed = FALSE;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_care_star_day ON star_care_schedule(star_id, day);
+
+-- 129: User Plan Status
+CREATE TABLE IF NOT EXISTS user_plan_status (
+  user_id         UUID        PRIMARY KEY,
+  plan_type       VARCHAR(20) DEFAULT 'free',
+  plan_started_at TIMESTAMP   NULL,
+  trial_ended_at  TIMESTAMP   NULL,
+  created_at      TIMESTAMP   DEFAULT NOW(),
+  updated_at      TIMESTAMP   DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_plan_type ON user_plan_status(plan_type);
+
+-- 130: DreamTown Payments
+CREATE TABLE IF NOT EXISTS dt_payments (
+  id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id      UUID        NOT NULL,
+  plan_type    VARCHAR(20),
+  provider     VARCHAR(20) DEFAULT 'nicepay',
+  order_id     VARCHAR(100) UNIQUE,
+  tid          VARCHAR(100),
+  amount       INT,
+  status       VARCHAR(20) DEFAULT 'ready',
+  requested_at TIMESTAMP   DEFAULT NOW(),
+  paid_at      TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_dt_payments_user_id  ON dt_payments(user_id);
+CREATE INDEX IF NOT EXISTS idx_dt_payments_order_id ON dt_payments(order_id);
+CREATE INDEX IF NOT EXISTS idx_dt_payments_status   ON dt_payments(status);
+
+-- ═══════════════════════════════════════════════════════════
 -- Migration Complete
 -- ═══════════════════════════════════════════════════════════
 
--- 마이그레이션 완료 확인
 DO $$
 BEGIN
     RAISE NOTICE '✅ Migration completed successfully!';
-    RAISE NOTICE '   - Tables created: story_results, feedbacks, api_logs, sessions';
-    RAISE NOTICE '   - Views created: feedback_stats, daily_analysis_stats, api_performance_stats';
-    RAISE NOTICE '   - Functions created: get_latest_story_result, cleanup_expired_sessions, cleanup_old_api_logs';
-    RAISE NOTICE '   - Triggers created: auto-update updated_at columns';
+    RAISE NOTICE '   - Base tables: story_results, feedbacks, api_logs, sessions';
+    RAISE NOTICE '   - DreamTown Journey: life_spots, star_daily_logs, user_events';
+    RAISE NOTICE '   - DreamTown Care: star_care_schedule, user_plan_status, payments';
 END $$;

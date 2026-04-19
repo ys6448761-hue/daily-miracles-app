@@ -24,6 +24,7 @@ import HundredDays from './pages/HundredDays.jsx';
 import StoryDraftMVP from './pages/StoryDraftMVP.jsx';
 import WishSelect from './pages/WishSelect.jsx';
 import WishInputScreen from './pages/WishInputScreen.jsx';
+import StarSummaryPage from './pages/StarSummaryPage.jsx';
 import JourneySceneEngine from './components/JourneySceneEngine.jsx';
 import ResonanceCard from './components/ResonanceCard.jsx';
 import ConnectionStageCard from './components/ConnectionStageCard.jsx';
@@ -62,6 +63,7 @@ import PromiseLocationPage from './pages/PromiseLocationPage.jsx';
 import PromiseViewPage from './pages/PromiseViewPage.jsx';
 import MissionPage from './pages/MissionPage.jsx';
 import AdminDashboardPage from './pages/AdminDashboardPage.jsx';
+import AdminJourneyDashboard from './pages/AdminJourneyDashboard.jsx';
 import HometownAdmin from './pages/HometownAdmin.jsx';
 import Shop from './pages/Shop.jsx';
 import ShopDetail from './pages/ShopDetail.jsx';
@@ -103,6 +105,7 @@ export default function App() {
           <Route path="/my-star/:id" element={<MyStar />} />
           <Route path="/my-star/:id/book"     element={<DigitalBook />} />
           <Route path="/my-star/:id/100days"  element={<HundredDays />} />
+          <Route path="/my-star/:id/summary"  element={<StarSummaryPage />} />
           <Route path="/story-draft-mvp"     element={<StoryDraftMVP />} />
           <Route path="/star/:id"    element={<StarDetail />} />
           <Route path="/galaxy"      element={<Galaxy />} />
@@ -149,6 +152,7 @@ export default function App() {
           <Route path="/admin/kpi"                 element={<AdminKpiPage />} />
           <Route path="/admin/ai-cost"             element={<AdminAiDashboard />} />
           <Route path="/admin/voyage"              element={<VoyageAdmin />} />
+          <Route path="/admin/journey"             element={<AdminJourneyDashboard />} />
           <Route path="/admin/partners"            element={<AdminPartners />} />
           <Route path="/admin/qr-center"           element={<AdminQRCenter />} />
           {/* /admin/* catch-all — catch-all → / → AppLaunch 경로 차단 */}
