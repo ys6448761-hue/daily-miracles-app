@@ -27,6 +27,7 @@ const DT_RESONANCE_OPTS = [
   {
     type:    'miracle',
     label:   '✨ 기적나눔',
+    desc:    '조용히 마음을 보낼게요',
     color:   'rgba(255,215,106,0.13)',
     border:  'rgba(255,215,106,0.32)',
     text:    '#FFD76A',
@@ -36,6 +37,7 @@ const DT_RESONANCE_OPTS = [
   {
     type:    'wisdom',
     label:   '🧠 지혜나눔',
+    desc:    '작은 생각을 남겨볼게요',
     color:   'rgba(155,135,245,0.13)',
     border:  'rgba(155,135,245,0.32)',
     text:    'rgba(155,135,245,0.92)',
@@ -608,16 +610,8 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
                     }}
                   >
                     <span>{opt.label}</span>
-                    {/* 카운트 → 감정 문장 */}
-                    <span
-                      key={opt.type === 'miracle' ? bounceKey.miracle : bounceKey.wisdom}
-                      className={
-                        (opt.type === 'miracle' ? bounceKey.miracle : bounceKey.wisdom) > 0
-                          ? 'count-bounce' : ''
-                      }
-                      style={{ fontSize: 11, opacity: 0.65, display: 'inline-block' }}
-                    >
-                      {countToEmotion(opt.type === 'miracle' ? miracleCount : wisdomCount)}
+                    <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginTop: 4, fontWeight: 400 }}>
+                      {opt.desc}
                     </span>
                   </button>
                 ))}
