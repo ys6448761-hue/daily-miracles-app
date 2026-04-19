@@ -18,12 +18,15 @@ const log = makeLogger('dtUserEventRoutes');
 // POST /api/dt/user-events
 router.post('/', async (req, res) => {
   const { user_id, event_type, metadata } = req.body;
+  console.log('[user-events] POST 도달 :', event_type, '| user:', user_id?.slice(0, 8));
   if (!event_type) return res.status(400).json({ error: 'event_type 필수' });
 
   try {
     await logEvent({ userId: user_id, eventType: event_type, metadata });
+    console.log('[user-events] 저장 완료:', event_type);
     return res.json({ success: true });
   } catch (err) {
+    console.error('[user-events] 저장 실패:', event_type, err.message);
     log.error('user_event POST 실패', { event_type, err: err.message });
     return res.status(500).json({ error: 'event 저장 실패' });
   }
