@@ -151,6 +151,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   const [starIconKey, setStarIconKey]   = useState(0);
   const [similarStars, setSimilarStars] = useState([]);          // 공명 후 유사 별 목록
   const [storyOpen, setStoryOpen]       = useState(false);       // 이야기 영역 토글
+  const [toastMsg, setToastMsg]         = useState(null);        // 공명 즉시 토스트
 
   const myStarId  = readSavedStar();
   const isOwnStar = !propViewMode && id === myStarId;
@@ -215,10 +216,17 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   // ── 공명 핸들러 ────────────────────────────────────────────────
   const isInviteEntry = typeof window !== 'undefined' && window.location.search.includes('entry=invite');
 
+  function showResonanceToast(type) {
+    const msg = type === 'miracle' ? '✨ 작은 마음이 닿았어요' : '🧠 따뜻한 생각이 전해졌어요';
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 1000);
+  }
+
   async function handleResonance(type) {
     if (submitting || submitted) return;
 
-    // 0. resonance_click — GA4 + user_events (광고차단 환경에도 반드시 남김)
+    // 0. 즉시 토스트 + resonance_click 이벤트
+    showResonanceToast(type);
     gaResonanceClick({ starId: id, type, isInvite: isInviteEntry });
     logUserEvent({ userId: getOrCreateUserId(), eventType: 'resonance_click', metadata: { star_id: id, resonance_type: type, is_invite: isInviteEntry } });
 
@@ -780,6 +788,33 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
           광장으로 돌아가기
         </button>
       </div>
+
+      {/* 공명 토스트 */}
+      {toastMsg && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          style={{
+            position: 'fixed',
+            bottom: 80,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'rgba(155,135,245,0.90)',
+            color: '#fff',
+            padding: '8px 18px',
+            borderRadius: 16,
+            fontSize: 13,
+            fontWeight: 500,
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            zIndex: 999,
+            boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+          }}
+        >
+          {toastMsg}
+        </motion.div>
+      )}
     </div>
   );
 }
