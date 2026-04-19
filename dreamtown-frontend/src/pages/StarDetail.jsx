@@ -153,6 +153,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   const [storyOpen, setStoryOpen]       = useState(false);       // 이야기 영역 토글
   const [toastMsg, setToastMsg]         = useState(null);        // 공명 즉시 토스트
   const [relatedStars, setRelatedStars] = useState([]);          // 하단 추천 별
+  const [shareCopied, setShareCopied]   = useState(false);       // 공유 링크 복사 완료
 
   const myStarId  = readSavedStar();
   const isOwnStar = !propViewMode && id === myStarId;
@@ -217,6 +218,41 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
 
   // ── 공명 핸들러 ────────────────────────────────────────────────
   const isInviteEntry = typeof window !== 'undefined' && window.location.search.includes('entry=invite');
+
+  // ── 공유 핸들러 ────────────────────────────────────────────────
+  const SHARE_LEVEL_MSG = [
+    '아직 조용한 별이에요',
+    '작은 공명이 시작됐어요',
+    '별이 조금 밝아졌어요',
+    '많은 마음이 모인 별이에요',
+  ];
+
+  async function handleShare() {
+    const level = getResonanceLevel(miracleCount + wisdomCount);
+    const levelMsg = SHARE_LEVEL_MSG[level] ?? SHARE_LEVEL_MSG[0];
+    const url = `${window.location.origin}/star/${id}`;
+    const parts = [
+      detail.wish_text    ? `"${detail.wish_text}"`  : null,
+      detail.wish_emotion ?? null,
+      levelMsg,
+      '',
+      '하루하루의 기적 DreamTown',
+      url,
+    ].filter(Boolean);
+    const text = parts.join('\n');
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: detail.star_name, text, url });
+      } catch (_) {}
+    } else {
+      try {
+        await navigator.clipboard.writeText(text);
+        setShareCopied(true);
+        setTimeout(() => setShareCopied(false), 2000);
+      } catch (_) {}
+    }
+  }
 
   function showResonanceToast(type) {
     const msg = type === 'miracle' ? '✨ 작은 마음이 닿았어요' : '🧠 따뜻한 생각이 전해졌어요';
@@ -823,7 +859,33 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
         </motion.div>
       )}
 
-      {/* ⑨ 광장 복귀 */}
+      {/* ⑨ 이 별의 마음 전하기 (공유) */}
+      <div style={{ marginBottom: 12 }}>
+        <button
+          onClick={handleShare}
+          style={{
+            width: '100%',
+            padding: '14px 0',
+            borderRadius: 9999,
+            background: 'rgba(255,215,106,0.09)',
+            border: '1px solid rgba(255,215,106,0.28)',
+            color: '#FFD76A',
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: 'pointer',
+            transition: 'background 0.15s',
+          }}
+        >
+          이 별의 마음 전하기 ↗
+        </button>
+        {shareCopied && (
+          <p style={{ marginTop: 8, fontSize: 12, color: 'rgba(255,255,255,0.45)', textAlign: 'center' }}>
+            링크가 복사됐어요 ✓
+          </p>
+        )}
+      </div>
+
+      {/* ⑩ 광장 복귀 */}
       <div className="mt-2 mb-4">
         <button
           onClick={() => nav('/home')}
