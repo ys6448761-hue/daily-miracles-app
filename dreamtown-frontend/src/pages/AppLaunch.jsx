@@ -7,8 +7,8 @@ import { readSavedStar } from '../lib/utils/starSession.js';
 export default function AppLaunch() {
   const nav = useNavigate();
   const [showIntro, setShowIntro]       = useState(false);
-  const [starCount, setStarCount]       = useState(null);   // null = 로딩 중
-  const [brightestStar, setBrightestStar] = useState(null); // 오늘의 빛난 별 이름
+  const [starCount, setStarCount]       = useState(null);
+  const [videoFailed, setVideoFailed]   = useState(false);
 
   useEffect(() => {
     const pathname = window.location.pathname.replace(/\/+/g, '/');
@@ -29,19 +29,10 @@ export default function AppLaunch() {
     }
   }, [nav]);
 
-  // 별 카운터 + 오늘의 빛난 별 로드
   useEffect(() => {
     fetch('/api/dt/stars/count')
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d?.count != null) setStarCount(d.count); })
-      .catch(() => {});
-
-    fetch('/api/dt/stars/today')
-      .then(r => r.ok ? r.json() : null)
-      .then(d => {
-        const stars = d?.stars ?? [];
-        if (stars.length > 0) setBrightestStar(stars[0].star_name);
-      })
       .catch(() => {});
   }, []);
 
@@ -50,17 +41,30 @@ export default function AppLaunch() {
   }
 
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden"
-      style={{
-        backgroundImage: "url('/images/dreamtown-main.jpg')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}
-    >
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden">
+
+      {/* 영상 배경 */}
+      {!videoFailed ? (
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          src="/assets/brand/intro/cablecar-star-intro.mp4"
+          onError={() => setVideoFailed(true)}
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ opacity: 0.72 }}
+        />
+      ) : (
+        <img
+          src="/assets/brand/core/cablecar-star-intro.png"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      )}
+
       {/* 어두운 오버레이 */}
-      <div className="absolute inset-0 bg-black/45 pointer-events-none" />
+      <div className="absolute inset-0 bg-black/50 pointer-events-none" />
 
       {/* 별빛 파티클 */}
       <div className="absolute inset-0 pointer-events-none">
@@ -79,44 +83,34 @@ export default function AppLaunch() {
         ))}
       </div>
 
-      {/* 콘텐츠 — 오버레이 위 */}
+      {/* 콘텐츠 */}
       <div className="relative z-10 flex flex-col items-center w-full">
 
-        {/* 거북 별자리 상징 */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.6 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.2, ease: 'easeOut' }}
-          className="mb-8 text-7xl"
-        >
-          🐢
-        </motion.div>
-
-        {/* 로고 */}
-        <motion.h1
+        {/* 카피 */}
+        <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
-          className="text-3xl font-bold text-star-gold glow-gold text-center mb-3"
+          transition={{ delay: 0.3, duration: 0.9 }}
+          style={{
+            fontSize: 'clamp(22px, 6vw, 30px)',
+            fontWeight: 300,
+            color: 'rgba(255,255,255,0.95)',
+            textAlign: 'center',
+            whiteSpace: 'pre-line',
+            lineHeight: 1.75,
+            letterSpacing: '-0.01em',
+            textShadow: '0 2px 24px rgba(0,0,0,0.7)',
+            marginBottom: 56,
+          }}
         >
-          DreamTown
-        </motion.h1>
-
-        {/* 슬로건 */}
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.8 }}
-          className="text-white/70 text-sm text-center mb-16"
-        >
-          여수 바다에서 시작된 하늘.
+          {'지금,\n당신의 소원이\n별이 되는 순간'}
         </motion.p>
 
         {/* CTA */}
         <motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 0.6 }}
+          transition={{ delay: 0.9, duration: 0.6 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => nav('/wish')}
           style={{
@@ -142,7 +136,7 @@ export default function AppLaunch() {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.6, duration: 0.6 }}
+            transition={{ delay: 1.4, duration: 0.6 }}
             style={{
               marginTop: 28,
               fontSize: 13,
@@ -152,23 +146,6 @@ export default function AppLaunch() {
             }}
           >
             지금까지 <strong style={{ color: '#FFD76A' }}>{starCount.toLocaleString()}</strong>개의 별이 태어났어요 ✨
-          </motion.p>
-        )}
-
-        {/* 오늘의 빛난 별 (선택) */}
-        {brightestStar && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.9, duration: 0.6 }}
-            style={{
-              marginTop: 8,
-              fontSize: 11,
-              color: 'rgba(255,255,255,0.38)',
-              textAlign: 'center',
-            }}
-          >
-            오늘 가장 빛난 별 — {brightestStar}
           </motion.p>
         )}
       </div>
