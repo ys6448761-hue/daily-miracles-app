@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStarDetail, getStar, getResonance, postVoyageLog, postDtResonance, getSimilarStars, logUserEvent, getOrCreateUserId } from '../api/dreamtown.js';
+import { getStarDetail, getStar, getResonance, postVoyageLog, postDtResonance, getSimilarStars, getRelatedStars, logUserEvent, getOrCreateUserId } from '../api/dreamtown.js';
 import MilestoneBar from '../components/MilestoneBar';
 import { gaResonanceCreated, gaResonanceClick, gaResonanceSuccess, gaResonanceCTAClick, gaSimilarStarClick, gaSquareFallbackClick, gaSimularStarsEmptyView } from '../utils/gtag';
 import { readSavedStar } from '../lib/utils/starSession.js';
@@ -152,6 +152,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   const [similarStars, setSimilarStars] = useState([]);          // 공명 후 유사 별 목록
   const [storyOpen, setStoryOpen]       = useState(false);       // 이야기 영역 토글
   const [toastMsg, setToastMsg]         = useState(null);        // 공명 즉시 토스트
+  const [relatedStars, setRelatedStars] = useState([]);          // 하단 추천 별
 
   const myStarId  = readSavedStar();
   const isOwnStar = !propViewMode && id === myStarId;
@@ -211,6 +212,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
       setMiracleCount(impacts.find(i => i.type === 'miracle')?.count ?? 0);
       setWisdomCount(impacts.find(i => i.type === 'wisdom')?.count  ?? 0);
     }).catch(() => {});
+    getRelatedStars(id).then(r => setRelatedStars(r.stars ?? [])).catch(() => {});
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── 공명 핸들러 ────────────────────────────────────────────────
@@ -784,7 +786,44 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
         </div>
       )}
 
-      {/* ⑧ 광장 복귀 */}
+      {/* ⑧ 이런 마음의 별도 있어요 */}
+      {relatedStars.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+          style={{ marginTop: 28, marginBottom: 8 }}
+        >
+          <p style={{ fontSize: 13, color: 'rgba(255,215,106,0.65)', marginBottom: 12, textAlign: 'center', letterSpacing: '0.01em' }}>
+            ✨ 이런 마음의 별도 있어요
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {relatedStars.map(s => (
+              <button
+                key={s.star_id}
+                onClick={() => nav(`/my-star/${s.star_id}`)}
+                style={{
+                  display: 'block', width: '100%', textAlign: 'left',
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: 12, padding: '12px 14px', cursor: 'pointer',
+                }}
+              >
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.80)', marginBottom: s.wish_emotion ? 4 : 0, lineHeight: 1.5 }}>
+                  {s.wish_text?.length > 50 ? s.wish_text.slice(0, 50) + '…' : s.wish_text}
+                </p>
+                {s.wish_emotion && (
+                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.38)', lineHeight: 1.5 }}>
+                    {s.wish_emotion}
+                  </p>
+                )}
+              </button>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+      {/* ⑨ 광장 복귀 */}
       <div className="mt-2 mb-4">
         <button
           onClick={() => nav('/home')}

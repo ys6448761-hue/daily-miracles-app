@@ -1762,6 +1762,31 @@ router.get('/stars/:id/detail', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
+// GET /api/dt/stars/:id/similar — 추천 별 (랜덤 MVP)
+// wish_text + wish_emotion 포함, 현재 별 제외
+// ─────────────────────────────────────────────
+router.get('/stars/:id/similar', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const limit = Math.min(parseInt(req.query.limit ?? 3, 10), 6);
+    const { rows } = await db.query(
+      `SELECT s.id AS star_id, s.star_name, w.wish_text, w.wish_emotion
+         FROM dt_stars s
+         JOIN dt_wishes w ON w.id = s.wish_id
+        WHERE s.id != $1
+          AND w.wish_text IS NOT NULL
+        ORDER BY RANDOM()
+        LIMIT $2`,
+      [id, limit]
+    );
+    res.json({ stars: rows });
+  } catch (err) {
+    console.error('[DT] GET /stars/:id/similar error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
 // 은하 전환 신호 계산 (내부 헬퍼)
 // emotion / help_tag → galaxy score → signal
 // 히스테리시스: 최근 5건만 사용

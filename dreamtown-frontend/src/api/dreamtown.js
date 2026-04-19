@@ -143,6 +143,12 @@ export async function getSimilarStars({ starId, token }) {
   return res.json();
 }
 
+export async function getRelatedStars(starId) {
+  const res = await fetch(`${BASE}/stars/${encodeURIComponent(starId)}/similar`);
+  if (!res.ok) return { stars: [] };
+  return res.json();
+}
+
 export async function postResonance({ starId, resonanceType, anonymousToken }) {
   return fetchWithRetry('/api/resonance', {
     method: 'POST',
