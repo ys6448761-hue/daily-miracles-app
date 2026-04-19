@@ -43,9 +43,12 @@ export default function AppLaunch() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden">
 
-      {/* 영상 배경 */}
+      {/* 영상 배경 — 2.5초 fade-in으로 자연스러운 여운 */}
       {!videoFailed ? (
-        <video
+        <motion.video
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.72 }}
+          transition={{ duration: 2.5, ease: 'easeInOut' }}
           autoPlay
           muted
           loop
@@ -53,7 +56,6 @@ export default function AppLaunch() {
           src="/assets/brand/intro/cablecar-star-intro.mp4"
           onError={() => setVideoFailed(true)}
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ opacity: 0.72 }}
         />
       ) : (
         <img
@@ -90,7 +92,7 @@ export default function AppLaunch() {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.9 }}
+          transition={{ delay: 1.8, duration: 1.2 }}
           style={{
             fontSize: 'clamp(22px, 6vw, 30px)',
             fontWeight: 300,
@@ -110,7 +112,7 @@ export default function AppLaunch() {
         <motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.9, duration: 0.6 }}
+          transition={{ delay: 4.0, duration: 0.8 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => nav('/wish')}
           style={{
@@ -136,7 +138,7 @@ export default function AppLaunch() {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.4, duration: 0.6 }}
+            transition={{ delay: 5.5, duration: 0.8 }}
             style={{
               marginTop: 28,
               fontSize: 13,
