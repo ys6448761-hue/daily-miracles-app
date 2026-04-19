@@ -136,6 +136,68 @@ const KEYFRAMES = `
   .slide-up { animation: slideUp 0.4s ease forwards; }
 `;
 
+// ── 공유 유입 첫 방문 인트로 오버레이 ────────────────────────────
+function SharedIntroOverlay({ onFinish }) {
+  const BASE = import.meta.env.BASE_URL;
+  const [lineIdx, setLineIdx] = useState(0);
+  const [canSkip, setCanSkip] = useState(false);
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setLineIdx(1), 700);
+    const t2 = setTimeout(() => setLineIdx(2), 2000);
+    const t3 = setTimeout(() => setCanSkip(true), 2000);
+    const t4 = setTimeout(onFinish, 3500);
+    return () => [t1, t2, t3, t4].forEach(clearTimeout);
+  }, [onFinish]);
+
+  const LINES = [
+    '누군가의 마음이 당신을 여기로 데려왔어요',
+    '이곳은, 소원이 별이 되는 곳입니다',
+  ];
+
+  return (
+    <div
+      onClick={canSkip ? onFinish : undefined}
+      style={{ position: 'fixed', inset: 0, zIndex: 50, overflow: 'hidden', cursor: canSkip ? 'pointer' : 'default', background: '#060c17' }}
+    >
+      <img
+        src={`${BASE}images/aurum_intro.webp`}
+        alt=""
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.45 }}
+      />
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(6,12,23,0.3), rgba(6,12,23,0.78))' }} />
+
+      <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '0 36px', gap: 22 }}>
+        {LINES.map((line, i) => (
+          <p
+            key={i}
+            style={{
+              opacity: lineIdx > i ? 1 : 0,
+              transform: lineIdx > i ? 'translateY(0)' : 'translateY(14px)',
+              transition: 'opacity 1.1s ease, transform 1.1s ease',
+              color: i === 0 ? 'rgba(255,255,255,0.82)' : 'rgba(255,215,106,0.92)',
+              fontSize: 'clamp(16px, 4.5vw, 21px)',
+              fontWeight: 300,
+              textAlign: 'center',
+              lineHeight: 1.75,
+              textShadow: '0 2px 20px rgba(0,0,0,0.85)',
+              margin: 0,
+            }}
+          >
+            {line}
+          </p>
+        ))}
+      </div>
+
+      {canSkip && (
+        <p style={{ position: 'absolute', bottom: 32, right: 24, zIndex: 10, color: 'rgba(255,255,255,0.35)', fontSize: 13, margin: 0 }}>
+          건너뛰기
+        </p>
+      )}
+    </div>
+  );
+}
+
 // ── 컴포넌트 ─────────────────────────────────────────────────────
 export default function StarDetail({ starId: propStarId, viewMode: propViewMode } = {}) {
   const { id: paramId } = useParams();
@@ -163,6 +225,11 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   const [shareCopied, setShareCopied]   = useState(false);       // 공유 링크 복사 완료
   const [showStayMsg, setShowStayMsg]   = useState(false);       // 머물기 상태 메시지
   const [resonancePeople, setResonancePeople] = useState({ people: [], total: 0 }); // 공명 참여자
+  const [showSharedIntro, setShowSharedIntro] = useState(() => {
+    const isShare = typeof window !== 'undefined' && window.location.search.includes('source=share');
+    const hasSeen = localStorage.getItem('dt_intro_seen');
+    return isShare && !hasSeen;
+  });
 
   const myStarId  = readSavedStar();
   const isOwnStar = !propViewMode && id === myStarId;
@@ -410,6 +477,13 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   return (
     <div className="min-h-screen flex flex-col px-6 py-10 pb-6">
       <style>{KEYFRAMES}</style>
+
+      {showSharedIntro && (
+        <SharedIntroOverlay onFinish={() => {
+          localStorage.setItem('dt_intro_seen', new Date().toISOString().slice(0, 10));
+          setShowSharedIntro(false);
+        }} />
+      )}
 
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-6">
