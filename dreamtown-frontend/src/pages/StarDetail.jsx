@@ -477,8 +477,13 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
                 </span>
               </div>
               {detail.wish_text && (
-                <p className="text-white/45 text-xs italic leading-relaxed mb-3 px-2 mt-2">
+                <p className="text-white/45 text-xs italic leading-relaxed mb-1 px-2 mt-2">
                   &ldquo;{detail.wish_text}&rdquo;
+                </p>
+              )}
+              {detail.wish_emotion && (
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.42)', marginBottom: 12, paddingLeft: 8, paddingRight: 8, lineHeight: 1.6 }}>
+                  {detail.wish_emotion}
                 </p>
               )}
               <p className="text-white/35 text-xs">

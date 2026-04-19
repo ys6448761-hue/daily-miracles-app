@@ -22,6 +22,7 @@ const { getTriggerRecommendation }        = require('../services/aiRecommendatio
 const { getDay1Prompt }                   = require('../services/day1OnboardingService');
 const { retentionCheck }                  = require('../middleware/retentionMiddleware');
 const { determineStarMeta }               = require('../services/expoStarService');
+const wishEmotionService                  = require('../services/dt/wishEmotionService');
 const crypto = require('crypto');
 
 function dtHashWishId(input) {
@@ -193,6 +194,9 @@ router.post('/wishes', async (req, res) => {
     try {
       await flow.log({ userId: String(userId), stage: 'wish', action: 'create', value: { channel: 'web', gemType: gem_type }, refId: String(wish.id) });
     } catch (e) { console.warn('flow log failed (wish/create)', e.message); }
+
+    // 감정 한 줄 생성 (fire-and-forget — 응답 지연 없음)
+    wishEmotionService.generateAndSave(wish.id, wish_text).catch(() => {});
 
     res.status(201).json({ wish_id: wish.id, status: wish.status, safety: wish.safety_level });
 
@@ -1640,7 +1644,7 @@ router.get('/stars/:id/detail', async (req, res) => {
     try {
       starQueryResult = await db.query(
         `SELECT s.id AS star_id, s.star_name, s.star_stage, s.created_at,
-                s.growth_log_text, w.wish_text,
+                s.growth_log_text, w.wish_text, w.wish_emotion,
                 g.code AS galaxy_code, g.name_ko AS galaxy_name_ko, u.nickname
            FROM dt_stars s
            LEFT JOIN dt_wishes   w ON w.id = s.wish_id
@@ -1654,7 +1658,8 @@ router.get('/stars/:id/detail', async (req, res) => {
       if (colErr.code !== '42703') throw colErr;
       starQueryResult = await db.query(
         `SELECT s.id AS star_id, s.star_name, s.star_stage, s.created_at,
-                w.wish_text, g.code AS galaxy_code, g.name_ko AS galaxy_name_ko, u.nickname
+                w.wish_text, w.wish_emotion,
+                g.code AS galaxy_code, g.name_ko AS galaxy_name_ko, u.nickname
            FROM dt_stars s
            LEFT JOIN dt_wishes   w ON w.id = s.wish_id
            JOIN      dt_galaxies g ON g.id = s.galaxy_id
@@ -1732,6 +1737,7 @@ router.get('/stars/:id/detail', async (req, res) => {
       star_name:             star.star_name,
       star_stage:            star.star_stage,
       wish_text:             star.wish_text ?? null,
+      wish_emotion:          star.wish_emotion ?? null,
       growth_log_text:       detailGrowthLogText,
       galaxy: {
         code:    star.galaxy_code,
