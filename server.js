@@ -2177,6 +2177,18 @@ if (voyageAdminRoutes) {
   console.log("✅ 항해 예약 어드민 라우터 등록 완료 (/api/admin/voyage/bookings)");
 }
 
+// ---------- 운영 관제 대시보드 (/api/admin/dashboard) — 반드시 /api/admin 광역 마운트보다 앞에 위치 ----------
+let adminDashboardRoutes = null;
+try {
+  adminDashboardRoutes = require('./routes/adminDashboardRoutes');
+} catch (e) {
+  console.warn('⚠️ adminDashboardRoutes 로드 실패:', e.message);
+}
+if (adminDashboardRoutes) {
+  app.use('/api/admin/dashboard', adminDashboardRoutes);
+  console.log('✅ 운영 관제 대시보드 등록 완료 (/api/admin/dashboard)');
+}
+
 // ---------- 슈퍼어드민 파트너 관리 Routes (/api/admin/partners) ----------
 let adminPartnerRoutes = null;
 try {
@@ -2284,18 +2296,6 @@ try {
 if (logsRoutes) {
   app.use('/api/logs', logsRoutes);
   console.log('✅ 로그 라우터 등록 완료 (/api/logs)');
-}
-
-// ---------- 운영 관제 대시보드 (/api/admin/dashboard) ----------
-let adminDashboardRoutes = null;
-try {
-  adminDashboardRoutes = require('./routes/adminDashboardRoutes');
-} catch (e) {
-  console.warn('⚠️ adminDashboardRoutes 로드 실패:', e.message);
-}
-if (adminDashboardRoutes) {
-  app.use('/api/admin/dashboard', adminDashboardRoutes);
-  console.log('✅ 운영 관제 대시보드 등록 완료 (/api/admin/dashboard)');
 }
 
 // ---------- 약속 기록 (/api/promise) ----------
