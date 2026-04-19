@@ -4,68 +4,144 @@ import { useNavigate } from 'react-router-dom';
 import IntroScene from './IntroScene.jsx';
 import { readSavedStar } from '../lib/utils/starSession.js';
 
-export default function AppLaunch() {
-  const nav = useNavigate();
-  const [showIntro, setShowIntro]       = useState(false);
-  const [starCount, setStarCount]       = useState(null);
-  const [videoFailed, setVideoFailed]   = useState(false);
+// ── Scene 2: Aurum ────────────────────────────────────────
+function AurumScene({ onFinish }) {
+  const BASE = import.meta.env.BASE_URL;
+  const [lineIdx, setLineIdx] = useState(0);
 
   useEffect(() => {
-    const pathname = window.location.pathname.replace(/\/+/g, '/');
-    const isPublicEntry =
-      pathname === '/dreamtown' ||
-      new URLSearchParams(window.location.search).get('entry') === 'invite';
+    const t1 = setTimeout(() => setLineIdx(1), 1400);
+    const t2 = setTimeout(() => setLineIdx(2), 3300);
+    const t3 = setTimeout(onFinish, 6000);
+    return () => [t1, t2, t3].forEach(clearTimeout);
+  }, [onFinish]);
 
-    if (isPublicEntry) {
-      nav('/dreamtown', { replace: true });
-      return;
-    }
-
-    const starId = readSavedStar();
-    if (starId) {
-      nav(`/my-star/${starId}`, { replace: true });
-    } else {
-      setShowIntro(true);
-    }
-  }, [nav]);
-
-  useEffect(() => {
-    fetch('/api/dt/stars/count')
-      .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d?.count != null) setStarCount(d.count); })
-      .catch(() => {});
-  }, []);
-
-  if (showIntro) {
-    return <IntroScene onFinish={() => setShowIntro(false)} />;
-  }
+  const LINES = [
+    '드림타운에 오신 걸 환영해요',
+    '이곳은 소원이 별이 되는 곳이에요',
+  ];
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden">
+    <div
+      onClick={onFinish}
+      style={{ position: 'fixed', inset: 0, overflow: 'hidden', cursor: 'pointer', background: '#060c17' }}
+    >
+      <img
+        src={`${BASE}images/aurum_intro.webp`}
+        alt=""
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5 }}
+      />
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(6,12,23,0.25), rgba(6,12,23,0.72))' }} />
 
-      {/* 영상 배경 — 2.5초 fade-in으로 자연스러운 여운 */}
-      {!videoFailed ? (
+      <div style={{
+        position: 'relative', zIndex: 10,
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        height: '100%', padding: '0 36px', gap: 22,
+      }}>
+        {LINES.map((line, i) => (
+          lineIdx > i ? (
+            <motion.p
+              key={i}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.3 }}
+              style={{
+                color: 'rgba(255,215,106,0.92)',
+                fontSize: 'clamp(18px, 5vw, 24px)',
+                fontWeight: 300,
+                textAlign: 'center',
+                lineHeight: 1.75,
+                textShadow: '0 2px 20px rgba(0,0,0,0.85)',
+                margin: 0,
+              }}
+            >
+              {line}
+            </motion.p>
+          ) : null
+        ))}
+      </div>
+
+      <p style={{ position: 'absolute', bottom: 32, right: 24, zIndex: 10, color: 'rgba(255,255,255,0.35)', fontSize: 13, margin: 0 }}>
+        건너뛰기
+      </p>
+    </div>
+  );
+}
+
+// ── Scene 3: Cablecar ─────────────────────────────────────
+function CablecarScene({ onFinish }) {
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(onFinish, 5500);
+    return () => clearTimeout(t);
+  }, [onFinish]);
+
+  return (
+    <div
+      onClick={onFinish}
+      style={{ position: 'fixed', inset: 0, overflow: 'hidden', cursor: 'pointer', background: '#060c17' }}
+    >
+      {!failed ? (
         <motion.video
           initial={{ opacity: 0 }}
-          animate={{ opacity: 0.72 }}
+          animate={{ opacity: 0.88 }}
           transition={{ duration: 2.5, ease: 'easeInOut' }}
           autoPlay
           muted
-          loop
           playsInline
           src="/assets/brand/intro/cablecar-star-intro.mp4"
-          onError={() => setVideoFailed(true)}
-          className="absolute inset-0 w-full h-full object-cover"
+          onError={() => setFailed(true)}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
         />
       ) : (
         <img
           src="/assets/brand/core/cablecar-star-intro.png"
           alt=""
-          className="absolute inset-0 w-full h-full object-cover"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.88 }}
         />
       )}
+      <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.32)' }} />
 
-      {/* 어두운 오버레이 */}
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2.2, duration: 1.6 }}
+        style={{
+          position: 'absolute', bottom: '32%', left: 0, right: 0,
+          textAlign: 'center',
+          color: 'rgba(255,215,106,0.78)',
+          fontSize: 'clamp(14px, 4vw, 17px)',
+          fontWeight: 300,
+          letterSpacing: '0.06em',
+          textShadow: '0 2px 16px rgba(0,0,0,0.85)',
+          margin: 0,
+        }}
+      >
+        별들이 태어나는 곳으로...
+      </motion.p>
+
+      <p style={{ position: 'absolute', bottom: 32, right: 24, zIndex: 10, color: 'rgba(255,255,255,0.35)', fontSize: 13, margin: 0 }}>
+        건너뛰기
+      </p>
+    </div>
+  );
+}
+
+// ── Scene 4: Landing (CTA) ────────────────────────────────
+function LandingScene({ starCount }) {
+  const nav = useNavigate();
+
+  return (
+    <div
+      className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden"
+      style={{ background: '#060c17' }}
+    >
+      <img
+        src="/assets/brand/core/cablecar-star-intro.png"
+        alt=""
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.22 }}
+      />
       <div className="absolute inset-0 bg-black/50 pointer-events-none" />
 
       {/* 별빛 파티클 */}
@@ -85,14 +161,11 @@ export default function AppLaunch() {
         ))}
       </div>
 
-      {/* 콘텐츠 */}
       <div className="relative z-10 flex flex-col items-center w-full">
-
-        {/* 카피 */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.8, duration: 1.2 }}
+          transition={{ delay: 0.3, duration: 1.2 }}
           style={{
             fontSize: 'clamp(22px, 6vw, 30px)',
             fontWeight: 300,
@@ -108,11 +181,10 @@ export default function AppLaunch() {
           {'지금,\n당신의 소원이\n별이 되는 순간'}
         </motion.p>
 
-        {/* CTA */}
         <motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 4.0, duration: 0.8 }}
+          transition={{ delay: 1.2, duration: 0.8 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => nav('/wish')}
           style={{
@@ -133,12 +205,11 @@ export default function AppLaunch() {
           내 소원 남기기 ✦
         </motion.button>
 
-        {/* 실시간 별 카운터 */}
         {starCount != null && (
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 5.5, duration: 0.8 }}
+            transition={{ delay: 2.0, duration: 0.8 }}
             style={{
               marginTop: 28,
               fontSize: 13,
@@ -153,4 +224,45 @@ export default function AppLaunch() {
       </div>
     </div>
   );
+}
+
+// ── Orchestrator ──────────────────────────────────────────
+export default function AppLaunch() {
+  const nav = useNavigate();
+  const [scene, setScene] = useState(null); // null | 'intro' | 'aurum' | 'cablecar' | 'landing'
+  const [starCount, setStarCount] = useState(null);
+
+  useEffect(() => {
+    const pathname = window.location.pathname.replace(/\/+/g, '/');
+    const isPublicEntry =
+      pathname === '/dreamtown' ||
+      new URLSearchParams(window.location.search).get('entry') === 'invite';
+
+    if (isPublicEntry) {
+      nav('/dreamtown', { replace: true });
+      return;
+    }
+
+    const starId = readSavedStar();
+    if (starId) {
+      nav(`/my-star/${starId}`, { replace: true });
+      return;
+    }
+
+    setScene('intro');
+  }, [nav]);
+
+  useEffect(() => {
+    fetch('/api/dt/stars/count')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.count != null) setStarCount(d.count); })
+      .catch(() => {});
+  }, []);
+
+  if (!scene) return <div style={{ background: '#060c17', height: '100vh' }} />;
+  if (scene === 'intro')    return <IntroScene     onFinish={() => setScene('aurum')}   />;
+  if (scene === 'aurum')    return <AurumScene     onFinish={() => setScene('cablecar')} />;
+  if (scene === 'cablecar') return <CablecarScene  onFinish={() => setScene('landing')} />;
+
+  return <LandingScene starCount={starCount} />;
 }
