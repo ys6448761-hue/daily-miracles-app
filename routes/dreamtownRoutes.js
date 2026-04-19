@@ -861,6 +861,34 @@ router.get('/stars/count', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
+// GET /api/dt/stars/trending — 최근 30분 공명 활발 별 (최대 5개)
+// ─────────────────────────────────────────────
+router.get('/stars/trending', async (req, res) => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit, 10) || 5, 10);
+    const { rows } = await db.query(
+      `SELECT s.id AS star_id, s.star_name, w.wish_text, w.wish_emotion,
+              COUNT(*)::int AS recent_resonance
+         FROM user_events ue
+         JOIN dt_stars  s ON s.id::text = ue.metadata->>'star_id'
+         JOIN dt_wishes w ON w.id = s.wish_id
+        WHERE ue.event_type = 'resonance_click'
+          AND ue.created_at >= NOW() - INTERVAL '30 minutes'
+          AND w.wish_text IS NOT NULL
+          AND s.is_hidden = FALSE
+        GROUP BY s.id, s.star_name, w.wish_text, w.wish_emotion
+        ORDER BY recent_resonance DESC
+        LIMIT $1`,
+      [limit]
+    );
+    res.json({ stars: rows });
+  } catch (err) {
+    console.error('[DT] GET /stars/trending error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
 // GET /api/dt/stars/:id — 내 별 조회
 // ─────────────────────────────────────────────
 router.get('/stars/:id', async (req, res) => {

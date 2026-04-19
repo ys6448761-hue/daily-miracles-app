@@ -149,6 +149,16 @@ export async function getRelatedStars(starId) {
   return res.json();
 }
 
+export async function getTrendingStars(limit = 5) {
+  try {
+    const res = await fetch(`${BASE}/stars/trending?limit=${limit}`);
+    if (!res.ok) return { stars: [] };
+    return res.json();
+  } catch {
+    return { stars: [] };
+  }
+}
+
 export async function postResonance({ starId, resonanceType, anonymousToken }) {
   return fetchWithRetry('/api/resonance', {
     method: 'POST',

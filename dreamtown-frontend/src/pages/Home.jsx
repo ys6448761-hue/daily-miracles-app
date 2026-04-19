@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { getRecentStars, getStar, getFeaturedStars } from '../api/dreamtown.js';
+import { getRecentStars, getStar, getFeaturedStars, getTrendingStars } from '../api/dreamtown.js';
 import { readSavedStar } from '../lib/utils/starSession.js';
 
 const GALAXY_STYLE = {
@@ -81,6 +81,35 @@ function resonanceLabel(count) {
   return '많은 마음';
 }
 
+// ── 트렌딩 별 카드 (최근 30분 공명 활발) ─────────────
+function TrendingStarCard({ star }) {
+  return (
+    <Link
+      to={`/star/${star.star_id}`}
+      className="block rounded-2xl p-4 cursor-pointer no-underline transition-colors hover:bg-white/8 active:bg-white/12"
+      style={{
+        background: 'rgba(155,135,245,0.06)',
+        border: '1px solid rgba(155,135,245,0.18)',
+      }}
+    >
+      <div className="flex items-start justify-between mb-1.5">
+        <p className="text-white/85 text-sm font-semibold truncate mr-2">{star.star_name}</p>
+        <span style={{ fontSize: 11, color: 'rgba(155,135,245,0.80)', flexShrink: 0 }}>
+          🔥 {star.recent_resonance}명
+        </span>
+      </div>
+      {star.wish_text && (
+        <p className="text-white/45 text-xs truncate mb-1">{star.wish_text}</p>
+      )}
+      {star.wish_emotion && (
+        <p style={{ fontSize: 11, color: 'rgba(155,135,245,0.55)' }} className="truncate">
+          {star.wish_emotion}
+        </p>
+      )}
+    </Link>
+  );
+}
+
 // ── Hot 별 카드 (공명 가중 상위) ────────────────────
 function HotStarCard({ star }) {
   const daysSince = calcDaysSinceBirth(star.created_at);
@@ -119,6 +148,7 @@ export default function Home() {
   const [loading, setLoading]   = useState(true);
   const [myStarData, setMyStarData] = useState(null);
   const [featured, setFeatured] = useState({ hot: [], fresh: [] });
+  const [trending, setTrending] = useState([]);
 
   const myStarId = readSavedStar();
 
@@ -129,6 +159,10 @@ export default function Home() {
 
     const featuredPromise = getFeaturedStars()
       .then(f => setFeatured(f))
+      .catch(() => {});
+
+    const trendingPromise = getTrendingStars(5)
+      .then(r => setTrending(r.stars ?? []))
       .catch(() => {});
 
     const myStarPromise = myStarId
@@ -147,7 +181,7 @@ export default function Home() {
           })
       : Promise.resolve();
 
-    Promise.all([recentPromise, myStarPromise, featuredPromise]).finally(() => setLoading(false));
+    Promise.all([recentPromise, myStarPromise, featuredPromise, trendingPromise]).finally(() => setLoading(false));
   }, [myStarId]);
 
   const otherStars = stars.filter(s => s && s.star_id && s.star_id !== myStarId);
@@ -209,6 +243,18 @@ export default function Home() {
                 ⭐ {s.star_name}
               </button>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── 지금 공명 중인 별 (최근 30분 활발) ── */}
+      {trending.length > 0 && (
+        <div className="mb-4">
+          <p className="text-white/50 text-xs mb-2" style={{ letterSpacing: '0.05em' }}>
+            ✨ 지금 마음이 모이고 있어요
+          </p>
+          <div className="flex flex-col gap-2">
+            {trending.map(s => <TrendingStarCard key={s.star_id} star={s} />)}
           </div>
         </div>
       )}
