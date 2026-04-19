@@ -49,6 +49,14 @@ export default function WishGate() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [careMessage, setCareMessage] = useState(''); // RED 신호 시 케어 메시지
+  const [showCablecar, setShowCablecar] = useState(() => {
+    const sp = new URLSearchParams(window.location.search);
+    const fromMystar = sp.get('from') === 'mystar';
+    const isNew = sp.get('new') === '1';
+    const existingStar = readSavedStar();
+    return !(existingStar && !fromMystar && !isNew);
+  });
+  const [videoFailed, setVideoFailed] = useState(false);
 
   async function handleSubmit() {
     if (!wishText.trim()) { setError('소원을 입력해주세요.'); return; }
@@ -88,6 +96,79 @@ export default function WishGate() {
     } finally {
       setLoading(false);
     }
+  }
+
+  // ── 케이블카 인트로 (별 만들기 진입 직전) ──────────────────────────
+  if (showCablecar) {
+    return (
+      <div className="relative w-full min-h-screen overflow-hidden bg-black flex flex-col items-center justify-end pb-16 px-6">
+        {!videoFailed ? (
+          <video
+            autoPlay muted loop playsInline
+            src="/assets/brand/intro/cablecar-star-intro.mp4"
+            onError={() => setVideoFailed(true)}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ opacity: 0.72 }}
+          />
+        ) : (
+          <img
+            src="/assets/brand/core/cablecar-star-intro.png"
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )}
+        <div className="absolute inset-0 bg-black/48 pointer-events-none" />
+        <button
+          onClick={() => setShowCablecar(false)}
+          className="absolute top-5 right-5 text-xs px-3 py-1.5 z-10"
+          style={{ color: 'rgba(255,255,255,0.30)' }}
+        >
+          건너뛰기
+        </button>
+        <div className="relative z-10 flex flex-col items-center w-full max-w-xs">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.9 }}
+            style={{
+              fontSize: 'clamp(22px, 6vw, 28px)',
+              fontWeight: 300,
+              color: 'rgba(255,255,255,0.95)',
+              textAlign: 'center',
+              whiteSpace: 'pre-line',
+              lineHeight: 1.75,
+              letterSpacing: '-0.01em',
+              textShadow: '0 2px 24px rgba(0,0,0,0.7)',
+              marginBottom: 48,
+            }}
+          >
+            {'지금,\n당신의 소원이\n별이 되는 순간'}
+          </motion.p>
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9, duration: 0.6 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => setShowCablecar(false)}
+            style={{
+              width: '100%',
+              padding: '18px 0',
+              borderRadius: 9999,
+              background: '#FFD76A',
+              color: '#0D1B2A',
+              fontSize: 17,
+              fontWeight: 700,
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 0 32px 10px rgba(255,215,106,0.28)',
+              letterSpacing: '0.02em',
+            }}
+          >
+            소원 남기기 ✦
+          </motion.button>
+        </div>
+      </div>
+    );
   }
 
   return (
