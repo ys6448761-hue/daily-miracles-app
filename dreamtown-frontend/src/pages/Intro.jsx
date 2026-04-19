@@ -71,7 +71,7 @@ export default function Intro() {
 
     if (type === 'wish') {
       setTransitioning(true);
-      timerRef.current = setTimeout(() => navigate('/wish/select'), 800);
+      timerRef.current = setTimeout(() => navigate('/wish'), 800);
     } else {
       navigate('/stars');
     }
@@ -184,7 +184,7 @@ export default function Intro() {
                 border:      'none',
               }}
             >
-              내 별 만들기 ✦
+              내 소원 남기기 ✦
             </button>
             <button
               onClick={() => handleCTA('browse')}
