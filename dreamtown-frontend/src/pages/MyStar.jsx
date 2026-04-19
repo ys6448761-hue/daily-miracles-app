@@ -126,6 +126,21 @@ function calcDaysSinceBirth(createdAt) {
   );
 }
 
+const STAR_LEVEL_CONFIG = [
+  { level: 0, msg: '아직 조용한 별이에요',     color: 'rgba(255,255,255,0.06)', text: 'rgba(255,255,255,0.35)', border: 'rgba(255,255,255,0.08)' },
+  { level: 1, msg: '작은 공명이 시작됐어요',   color: 'rgba(155,135,245,0.08)', text: 'rgba(155,135,245,0.75)', border: 'rgba(155,135,245,0.18)' },
+  { level: 2, msg: '별이 조금 밝아졌어요',     color: 'rgba(99,210,255,0.08)',  text: 'rgba(99,210,255,0.80)',  border: 'rgba(99,210,255,0.20)' },
+  { level: 3, msg: '많은 마음이 모인 별이에요', color: 'rgba(255,215,106,0.10)', text: '#FFD76A',               border: 'rgba(255,215,106,0.25)' },
+];
+
+function getStarLevel(resonanceUsersCount) {
+  const n = resonanceUsersCount ?? 0;
+  if (n < 1)  return STAR_LEVEL_CONFIG[0];
+  if (n < 3)  return STAR_LEVEL_CONFIG[1];
+  if (n < 10) return STAR_LEVEL_CONFIG[2];
+  return STAR_LEVEL_CONFIG[3];
+}
+
 function getAurumMessage(daysSinceBirth) {
   return AURUM_MESSAGES.find(m => m.day === daysSinceBirth)
     ?? AURUM_MESSAGES[AURUM_MESSAGES.length - 1];
@@ -574,6 +589,15 @@ export default function MyStar() {
               {new Date(star.created_at).toLocaleDateString('ko-KR')} (D+{daysSinceBirth})
             </p>
           </div>
+          {stats != null && (() => {
+            const { level, msg, color, text, border } = getStarLevel(stats.resonance_users_count);
+            return (
+              <div className="col-span-2" style={{ background: color, border: `1px solid ${border}`, borderRadius: 10, padding: '10px 14px', textAlign: 'center' }}>
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginBottom: 3, letterSpacing: '0.04em' }}>별 성장</p>
+                <p style={{ fontSize: 13, color: text, fontWeight: 500 }}>Lv.{level} · {msg}</p>
+              </div>
+            );
+          })()}
         </div>
 
       </motion.div>
