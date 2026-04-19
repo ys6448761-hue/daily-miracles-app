@@ -65,7 +65,7 @@ app.use('/api', (req, res, next) => {
     if (res.statusCode >= 400) {
       errorFeed.add({
         method:    req.method,
-        route:     req.path,
+        route:     req.originalUrl,
         status:    res.statusCode,
         requestId: res.getHeader('x-request-id') || req.requestId || null,
       });
