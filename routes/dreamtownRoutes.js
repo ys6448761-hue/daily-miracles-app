@@ -1567,9 +1567,10 @@ router.get('/stars/:id/stats', async (req, res) => {
     //    breakdown: miracle(기적나눔) / wisdom(지혜나눔) 타입별 집계
     let resonanceCount = 0;
     let resonanceUsersCount = 0;
+    let resonanceClickCount = 0;
     let resonanceBreakdown = { miracle: 0, wisdom: 0, total: 0 };
     try {
-      const [resRow, usersRow] = await Promise.all([
+      const [resRow, clickRow] = await Promise.all([
         db.query(
           `SELECT
              COALESCE(SUM(count), 0)::int AS total,
@@ -1579,16 +1580,20 @@ router.get('/stars/:id/stats', async (req, res) => {
           [id]
         ),
         db.query(
-          `SELECT COUNT(DISTINCT metadata->>'user_id')::int AS cnt
-             FROM user_events
-            WHERE event_type = 'resonance_created'
-              AND metadata->>'star_id' = $1`,
+          `SELECT
+             COUNT(DISTINCT user_id)::int        AS unique_users,
+             COUNT(*)::int                        AS total_clicks
+           FROM user_events
+          WHERE event_type = 'resonance_click'
+            AND metadata->>'star_id' = $1`,
           [id]
-        ).catch(() => ({ rows: [{ cnt: 0 }] })),
+        ).catch(() => ({ rows: [{ unique_users: 0, total_clicks: 0 }] })),
       ]);
       const r = resRow.rows[0] ?? {};
-      resonanceCount  = parseInt(r.total   ?? 0, 10);
-      resonanceUsersCount = parseInt(usersRow.rows[0]?.cnt ?? 0, 10);
+      const c = clickRow.rows[0] ?? {};
+      resonanceCount      = parseInt(r.total         ?? 0, 10);
+      resonanceUsersCount = parseInt(c.unique_users  ?? 0, 10);
+      resonanceClickCount = parseInt(c.total_clicks  ?? 0, 10);
       resonanceBreakdown = {
         miracle: parseInt(r.miracle ?? 0, 10),
         wisdom:  parseInt(r.wisdom  ?? 0, 10),
@@ -1605,13 +1610,14 @@ router.get('/stars/:id/stats', async (req, res) => {
     };
 
     res.json({
-      days_since_birth:      daysSinceBirth,
-      current_score:         currentScore,
-      change_score_history:  changeScoreHistory,
-      resonance_count:       resonanceCount,
-      resonance_users_count: resonanceUsersCount,
-      resonance_breakdown:   resonanceBreakdown,
-      milestone_status:      milestoneStatus,
+      days_since_birth:        daysSinceBirth,
+      current_score:           currentScore,
+      change_score_history:    changeScoreHistory,
+      resonance_count:         resonanceCount,
+      resonance_users_count:   resonanceUsersCount,
+      resonance_click_count:   resonanceClickCount,
+      resonance_breakdown:     resonanceBreakdown,
+      milestone_status:        milestoneStatus,
     });
   } catch (err) {
     console.error('[DT] GET /stars/:id/stats error:', err.message);
