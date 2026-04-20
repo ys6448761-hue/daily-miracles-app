@@ -140,7 +140,7 @@ router.get('/overview', adminGuard, async (_req, res) => {
         COUNT(*) FILTER (WHERE event_type='revisit_detected')  AS revisits,
         COUNT(*) FILTER (WHERE event_type='resonance_click')   AS resonance_click,
         COUNT(*) FILTER (WHERE event_type='resonance_created') AS resonance_created
-       FROM user_events WHERE created_at >= CURRENT_DATE`),
+       FROM user_events WHERE created_at >= NOW() - INTERVAL '24 hours'`),
     safeQuery(`SELECT COUNT(*) AS n FROM star_timeline_summary WHERE current_phase='성장' AND updated_at >= CURRENT_DATE`),
     safeQuery(`SELECT user_id FROM star_daily_logs
                WHERE state IN ('ANXIETY','BLOCKED') AND log_date >= CURRENT_DATE - 3
