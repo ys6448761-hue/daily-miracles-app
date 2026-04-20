@@ -82,6 +82,11 @@ router.post('/', async (req, res) => {
   }
 });
 
+// ── GET /featured — /:id 보다 먼저 등록 (UUID 파싱 오류 방지) ─────
+router.get('/featured', (_req, res) => {
+  res.status(301).json({ message: 'DreamTown featured는 /api/dt/stars/featured 를 사용하세요' });
+});
+
 // ── GET /:id — 별 상세 + day 메시지 (Issue 4) ────────────────────
 router.get('/:id', async (req, res) => {
   try {
