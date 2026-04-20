@@ -667,6 +667,15 @@ router.post('/resonance', async (req, res) => {
       }
     }
 
+    // KPI 이벤트 emit — resonance_created + 최초 수신 시 resonance_received
+    try {
+      emitKpiEvent({ eventName: KPI_EVENTS.RESONANCE_CREATED, starId, source: type });
+      const alreadyReceived = await hasResonanceReceived(starId);
+      if (!alreadyReceived) {
+        emitKpiEvent({ eventName: KPI_EVENTS.RESONANCE_RECEIVED, starId });
+      }
+    } catch (_) {}
+
     // 최신 카운트 반환
     const counts = await db.query(
       `SELECT impact_type, count FROM impact
