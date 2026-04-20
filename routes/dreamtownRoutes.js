@@ -776,67 +776,63 @@ router.get('/stars/today', async (req, res) => {
 // fresh (최대 3): 48h 이내 탄생 + resonance 0개 — 첫 공명 진입점
 // ─────────────────────────────────────────────────────────────────────────
 router.get('/stars/featured', async (req, res) => {
+  // star_logs 의존 제거 — impact 테이블만 사용 (star_logs migration 미적용 환경 안전)
+  const hotQuery = `
+    WITH scored AS (
+      SELECT s.id          AS star_id,
+             s.star_name,
+             s.created_at,
+             g.code        AS galaxy_code,
+             g.name_ko     AS galaxy_name_ko,
+             COALESCE(SUM(i.count), 0)::int AS resonance_count,
+             MAX(i.updated_at)               AS latest_resonated_at
+        FROM dt_stars   s
+        JOIN dt_galaxies g ON g.id = s.galaxy_id
+        LEFT JOIN impact i ON i.star_id = s.id::text
+       WHERE s.is_hidden = FALSE
+         AND (s.is_sample IS NOT TRUE)
+       GROUP BY s.id, s.star_name, s.created_at, g.code, g.name_ko
+      HAVING COALESCE(SUM(i.count), 0) > 0
+    ),
+    windowed AS (
+      SELECT *,
+        ROW_NUMBER() OVER (
+          ORDER BY resonance_count DESC, latest_resonated_at DESC NULLS LAST
+        ) AS rn,
+        COUNT(*) OVER () AS total_count
+      FROM scored
+    )
+    SELECT star_id, star_name, created_at, galaxy_code, galaxy_name_ko, resonance_count
+      FROM windowed
+     WHERE rn = 1
+        OR rn = GREATEST(2, (total_count + 1) / 2)
+        OR rn = total_count
+     ORDER BY rn
+     LIMIT 3
+  `;
+
+  const freshQuery = `
+    SELECT s.id          AS star_id,
+           s.star_name,
+           s.created_at,
+           g.code        AS galaxy_code,
+           g.name_ko     AS galaxy_name_ko
+      FROM dt_stars   s
+      JOIN dt_galaxies g ON g.id = s.galaxy_id
+      LEFT JOIN impact i ON i.star_id = s.id::text
+     WHERE s.is_hidden = FALSE
+       AND (s.is_sample IS NOT TRUE)
+       AND s.created_at >= NOW() - INTERVAL '48 hours'
+     GROUP BY s.id, s.star_name, s.created_at, g.code, g.name_ko
+    HAVING COALESCE(SUM(i.count), 0) = 0
+     ORDER BY s.created_at DESC
+     LIMIT 3
+  `;
+
   try {
     const [hotResult, freshResult] = await Promise.all([
-      // hot: impact 테이블 집계 (DT 기적/지혜나눔 SSOT) → 상/중/하 구간 대표 1개씩 선발
-      // impact 테이블: postDtResonance(miracle/wisdom) + 구공명 threshold 트리거(gratitude 등) 모두 집계
-      db.query(`
-        WITH scored AS (
-          SELECT s.id          AS star_id,
-                 s.star_name,
-                 s.created_at,
-                 g.code        AS galaxy_code,
-                 g.name_ko     AS galaxy_name_ko,
-                 COALESCE(SUM(i.count), 0)::int AS resonance_count,
-                 MAX(i.updated_at)               AS latest_resonated_at,
-                 COALESCE(COUNT(sl.id) FILTER (
-                   WHERE sl.action_type = 'resonance'
-                     AND sl.created_at >= NOW() - INTERVAL '24 hours'
-                 ), 0)::int AS recent_growth
-            FROM dt_stars   s
-            JOIN dt_galaxies g ON g.id = s.galaxy_id
-            LEFT JOIN impact    i  ON i.star_id  = s.id::text
-            LEFT JOIN star_logs sl ON sl.star_id = s.id
-           WHERE s.is_hidden = FALSE
-             AND (s.is_sample IS NOT TRUE)
-           GROUP BY s.id, s.star_name, s.created_at, g.code, g.name_ko
-          HAVING COALESCE(SUM(i.count), 0) > 0
-        ),
-        windowed AS (
-          SELECT *,
-            ROW_NUMBER() OVER (
-              ORDER BY (resonance_count * 0.7 + recent_growth * 1.5) DESC,
-                       latest_resonated_at DESC NULLS LAST
-            ) AS rn,
-            COUNT(*) OVER () AS total_count
-          FROM scored
-        )
-        SELECT star_id, star_name, created_at, galaxy_code, galaxy_name_ko, resonance_count
-          FROM windowed
-         WHERE rn = 1
-            OR rn = GREATEST(2, (total_count + 1) / 2)
-            OR rn = total_count
-         ORDER BY rn
-         LIMIT 3
-      `),
-      // fresh: 48h 이내 + impact 0개 — 첫 나눔 진입점
-      db.query(`
-        SELECT s.id          AS star_id,
-               s.star_name,
-               s.created_at,
-               g.code        AS galaxy_code,
-               g.name_ko     AS galaxy_name_ko
-          FROM dt_stars   s
-          JOIN dt_galaxies g ON g.id = s.galaxy_id
-          LEFT JOIN impact i ON i.star_id = s.id::text
-         WHERE s.is_hidden = FALSE
-           AND (s.is_sample IS NOT TRUE)
-           AND s.created_at >= NOW() - INTERVAL '48 hours'
-         GROUP BY s.id, s.star_name, s.created_at, g.code, g.name_ko
-        HAVING COALESCE(SUM(i.count), 0) = 0
-         ORDER BY s.created_at DESC
-         LIMIT 3
-      `),
+      db.query(hotQuery),
+      db.query(freshQuery),
     ]);
     res.json({ hot: hotResult.rows, fresh: freshResult.rows });
   } catch (err) {
