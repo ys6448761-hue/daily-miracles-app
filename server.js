@@ -1273,11 +1273,14 @@ app.post("/api/metrics/snapshot", async (_req, res) => {
 
 // ---------- Admin: ADMIN_TOKEN guard (reusable) ----------
 function adminTokenGuard(req, res, next) {
-  const token = req.headers['x-admin-token'] || req.query.token;
+  const bearerToken = req.headers.authorization?.startsWith('Bearer ')
+    ? req.headers.authorization.slice(7)
+    : null;
+  const token    = req.headers['x-admin-token'] || bearerToken || req.query.token;
   const expected = process.env.ADMIN_TOKEN;
-  console.log('[ADMIN CHECK] x-admin-token:', token?.slice(0, 6) ?? 'NONE',
-              '| Authorization:', req.headers.authorization?.slice(0, 12) ?? 'NONE',
-              '| ADMIN_TOKEN set:', !!expected);
+  console.log('[ADMIN CHECK] token앞6:', token?.slice(0, 6) ?? 'NONE',
+              '| ADMIN_TOKEN set:', !!expected,
+              '| ENV KEY: ADMIN_TOKEN');
   if (!expected || token !== expected) {
     return res.status(403).json({ success: false, error: 'forbidden' });
   }
