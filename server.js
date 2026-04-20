@@ -1352,6 +1352,8 @@ app.post("/api/admin/run-migration", adminTokenGuard, async (req, res) => {
     "124",
     // 공명/이벤트/감정/항해 시스템
     "070", "127", "128", "129", "130", "131", "132",
+    // star_logs 구스키마 패치 (124 먼저 실행된 환경)
+    "133",
   ];
 
   if (!migration || !allowed.includes(migration)) {
@@ -1455,6 +1457,12 @@ app.post("/api/admin/run-migration", adminTokenGuard, async (req, res) => {
     } else if (migration === "132") {
       const col = await pool.query(`SELECT column_name FROM information_schema.columns WHERE table_name='dt_stars' AND column_name='journey_origin_public'`);
       verification = { journey_columns_exist: col.rowCount > 0 };
+    } else if (migration === "133") {
+      const [at, pl] = await Promise.all([
+        pool.query(`SELECT column_name FROM information_schema.columns WHERE table_name='star_logs' AND column_name='action_type'`),
+        pool.query(`SELECT column_name FROM information_schema.columns WHERE table_name='star_logs' AND column_name='payload'`),
+      ]);
+      verification = { action_type_exists: at.rowCount > 0, payload_exists: pl.rowCount > 0 };
     }
 
     res.json({ success: true, migration: files[0], verification });
