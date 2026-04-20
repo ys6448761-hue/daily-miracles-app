@@ -1275,6 +1275,9 @@ app.post("/api/metrics/snapshot", async (_req, res) => {
 function adminTokenGuard(req, res, next) {
   const token = req.headers['x-admin-token'] || req.query.token;
   const expected = process.env.ADMIN_TOKEN;
+  console.log('[ADMIN CHECK] x-admin-token:', token?.slice(0, 6) ?? 'NONE',
+              '| Authorization:', req.headers.authorization?.slice(0, 12) ?? 'NONE',
+              '| ADMIN_TOKEN set:', !!expected);
   if (!expected || token !== expected) {
     return res.status(403).json({ success: false, error: 'forbidden' });
   }
