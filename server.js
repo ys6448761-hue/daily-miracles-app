@@ -1344,6 +1344,8 @@ app.post("/api/admin/run-migration", adminTokenGuard, async (req, res) => {
     "099", "100", "101",
     // 단순 별 시스템 (stars, star_logs)
     "124",
+    // 공명/이벤트/감정/항해 시스템
+    "070", "127", "128", "129", "130", "131", "132",
   ];
 
   if (!migration || !allowed.includes(migration)) {
@@ -1426,6 +1428,27 @@ app.post("/api/admin/run-migration", adminTokenGuard, async (req, res) => {
         ORDER BY table_name
       `);
       verification = { tables: tbls.rows.map(r => r.table_name) };
+    } else if (migration === "057") {
+      const [col, tbl] = await Promise.all([
+        pool.query(`SELECT column_name FROM information_schema.columns WHERE table_name='dt_stars' AND column_name='resonance_count'`),
+        pool.query(`SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name='star_logs'`),
+      ]);
+      verification = { resonance_count_exists: col.rowCount > 0, star_logs_exists: tbl.rowCount > 0 };
+    } else if (migration === "058") {
+      const col = await pool.query(`SELECT column_name FROM information_schema.columns WHERE table_name='star_logs' AND column_name='payload'`);
+      verification = { payload_exists: col.rowCount > 0 };
+    } else if (migration === "070") {
+      const col = await pool.query(`SELECT column_name FROM information_schema.columns WHERE table_name='dt_stars' AND column_name='last_resonated_at'`);
+      verification = { last_resonated_at_exists: col.rowCount > 0 };
+    } else if (migration === "127") {
+      const tbl = await pool.query(`SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name='user_events'`);
+      verification = { user_events_exists: tbl.rowCount > 0 };
+    } else if (migration === "131") {
+      const col = await pool.query(`SELECT column_name FROM information_schema.columns WHERE table_name='dt_wishes' AND column_name='wish_emotion'`);
+      verification = { wish_emotion_exists: col.rowCount > 0 };
+    } else if (migration === "132") {
+      const col = await pool.query(`SELECT column_name FROM information_schema.columns WHERE table_name='dt_stars' AND column_name='journey_origin_public'`);
+      verification = { journey_columns_exist: col.rowCount > 0 };
     }
 
     res.json({ success: true, migration: files[0], verification });
