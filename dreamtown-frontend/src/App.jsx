@@ -57,6 +57,7 @@ import Day7Complete from './pages/Day7Complete.jsx';
 import HometownLanding from './pages/HometownLanding.jsx';
 import CablecarPage from './pages/CablecarPage.jsx';
 import CablecarLandingPage from './pages/CablecarLandingPage.jsx';
+import EntryPage from './pages/EntryPage.jsx';
 import AurumCreatePage from './pages/AurumCreatePage.jsx';
 import AurumViewPage from './pages/AurumViewPage.jsx';
 import PromiseLocationPage from './pages/PromiseLocationPage.jsx';
@@ -75,6 +76,7 @@ import PartnerAgreement from './pages/partner/PartnerAgreement.jsx';
 import PartnerSubscribe from './pages/partner/PartnerSubscribe.jsx';
 import AdminPartners from './pages/admin/AdminPartners.jsx';
 import AdminQRCenter from './pages/admin/AdminQRCenter.jsx';
+import AdminCablecarPage from './pages/AdminCablecarPage.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
 if (window.location.pathname.startsWith('//')) {
@@ -132,8 +134,10 @@ export default function App() {
           <Route path="/onboarding"                element={<OnboardingPage />} />
           {/* 케이블카 캐빈 QR 진입 */}
           <Route path="/cablecar"                  element={<CablecarPage />} />
-          {/* 케이블카 각성 패스 구매 랜딩 */}
+          {/* 케이블카 각성 패스 구매 랜딩 (→ /entry?loc=cablecar 로 통합) */}
           <Route path="/cablecar-landing"          element={<CablecarLandingPage />} />
+          {/* 장소별 공통 진입 */}
+          <Route path="/entry"                     element={<EntryPage />} />
           {/* 아우룸 — 위치 잠금 기억 캡슐 */}
           <Route path="/aurum/create"              element={<AurumCreatePage />} />
           <Route path="/aurum/:id"                 element={<AurumViewPage />} />
@@ -155,6 +159,7 @@ export default function App() {
           <Route path="/admin/journey"             element={<AdminJourneyDashboard />} />
           <Route path="/admin/partners"            element={<AdminPartners />} />
           <Route path="/admin/qr-center"           element={<AdminQRCenter />} />
+          <Route path="/admin/cablecar"            element={<AdminCablecarPage />} />
           {/* /admin/* catch-all — catch-all → / → AppLaunch 경로 차단 */}
           <Route path="/admin/*"                   element={<VoyageAdmin />} />
           {/* Core Journey Flow */}

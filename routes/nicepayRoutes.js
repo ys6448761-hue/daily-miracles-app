@@ -377,6 +377,23 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
         }
       }
 
+      // ── Star Voyage: voyages 상태 전이 (pending → paid) ──────────
+      if (!isCablecarPayment && _db) {
+        try {
+          const vR = await _db.query(
+            `UPDATE voyages SET status='paid', paid_at=NOW()
+             WHERE pg_order_id=$1 AND status='pending' RETURNING id`,
+            [Moid]
+          );
+          if (vR.rows.length > 0) {
+            successUrl = `/voyage-done?id=${vR.rows[0].id}`;
+            console.log(`⚓ Star Voyage 결제 완료 → ${successUrl}`);
+          }
+        } catch (e) {
+          console.warn('⚠️ Star Voyage 상태 전이 실패 — 기본 successUrl 사용:', e.message);
+        }
+      }
+
       console.log(`🔗 Redirect URL: ${successUrl}`);
       console.log('═'.repeat(60) + '\n');
       return res.redirect(successUrl);

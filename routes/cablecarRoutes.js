@@ -1,21 +1,17 @@
 'use strict';
 /**
- * cablecarRoutes.js — 케이블카 캐빈 QR 진입 엔진 + 각성 패스 결제
+ * cablecarRoutes.js — 케이블카 캐빈 QR 진입 엔진
  *
  * POST /api/cablecar/enter
  *   Body: { user_id, star_id?, wish_text?, place?, credential_code? }
  *
- * ── 분기 로직 ──────────────────────────────────────────────────────
- *
- *  [유료 + 기존 별]  → 각성/재각성 (DB 상태 변경) → mode: awakened|reawakened
- *  [유료 + 별 없음]  → 소원 + 별 생성 + 즉시 각성 → mode: created_and_awakened
- *  [무료 + 기존 별]  → 방문 로그만, DB 상태 변경 없음 → mode: logged_only
- *  [무료 + 별 없음]  → 프론트에서 차단 (여기 도달 시 no_product 반환)
- *
- * ── 핵심 원칙 ──────────────────────────────────────────────────────
- *  "각성은 무료 기능이 아니라 상품이다"
- *  credential_code 검증 실패 = has_product: false → 각성 없음
+ * [운영 정책] CABLECAR_PAYMENT_ENABLED = false
+ *   → /checkout 엔드포인트 비활성
+ *   → 별 만들기/진입은 무료로 동작
  */
+
+// ── 결제 플래그 (env로 재활성화 가능) ─────────────────────────────────
+const CABLECAR_PAYMENT_ENABLED = process.env.CABLECAR_PAYMENT_ENABLED === 'true';
 
 const express = require('express');
 const router  = express.Router();
@@ -248,8 +244,17 @@ router.post('/enter', async (req, res) => {
 
 // ─────────────────────────────────────────────────────────────────────
 // POST /api/cablecar/checkout — 케이블카 각성 패스 결제 요청
+// [운영 정책] CABLECAR_PAYMENT_ENABLED=false 시 차단
 // ─────────────────────────────────────────────────────────────────────
 router.post('/checkout', async (req, res) => {
+  if (!CABLECAR_PAYMENT_ENABLED) {
+    return res.status(503).json({
+      success: false,
+      error:   '결제 기능이 현재 비활성화되어 있습니다.',
+      code:    'PAYMENT_DISABLED',
+    });
+  }
+
   const { user_id, phone } = req.body;
 
   if (!user_id) {

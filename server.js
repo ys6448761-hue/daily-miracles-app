@@ -925,6 +925,37 @@ app.get('/growth-film', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'growth-film.html'));
 });
 
+// ---------- Star MVP 뷰 ----------
+app.get('/star-entry', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'star-entry.html'));
+});
+app.get('/star/:access_key', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'star-view.html'));
+});
+app.get('/travel', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'travel.html'));
+});
+app.get('/yeosu-travel', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'yeosu-travel.html'));
+});
+
+// ---------- Star Voyage 뷰 ----------
+app.get('/voyage-select', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'voyage-select.html'));
+});
+app.get('/voyage-detail', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'voyage-detail.html'));
+});
+app.get('/voyage-pay', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'voyage-pay.html'));
+});
+app.get('/voyage-done', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'voyage-done.html'));
+});
+app.get('/voyage-benefit', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'voyage-benefit.html'));
+});
+
 // favicon.ico — 파일 없을 때 500 방지
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
@@ -2214,6 +2245,15 @@ if (voyageAdminRoutes) {
   console.log("✅ 항해 예약 어드민 라우터 등록 완료 (/api/admin/voyage/bookings)");
 }
 
+// ---------- 케이블카 운영 관리 Routes (/api/admin/cablecar) ----------
+try {
+  const adminCablecarRoutes = require('./routes/adminCablecarRoutes');
+  app.use('/api/admin/cablecar', adminCablecarRoutes);
+  console.log('✅ 케이블카 어드민 라우터 등록 완료 (/api/admin/cablecar)');
+} catch (e) {
+  console.warn('⚠️ adminCablecarRoutes 로드 실패:', e.message);
+}
+
 // ---------- 운영 관제 대시보드 (/api/admin/dashboard) — 반드시 /api/admin 광역 마운트보다 앞에 위치 ----------
 let adminDashboardRoutes = null;
 try {
@@ -2357,6 +2397,42 @@ try {
 if (cablecarRoutes) {
   app.use('/api/cablecar', cablecarRoutes);
   console.log('✅ 케이블카 라우터 등록 완료 (/api/cablecar)');
+}
+
+// ---------- Travel Click 로그 (/api/travel) ----------
+let travelClickRoutes = null;
+try {
+  travelClickRoutes = require('./routes/travelClickRoutes');
+} catch (e) {
+  console.warn('⚠️ travelClickRoutes 로드 실패:', e.message);
+}
+if (travelClickRoutes) {
+  app.use('/api/travel', travelClickRoutes);
+  console.log('✅ Travel Click 라우터 등록 완료 (/api/travel)');
+}
+
+// ---------- Star MVP (/api/star) ----------
+let starMvpRoutes = null;
+try {
+  starMvpRoutes = require('./routes/starMvpRoutes');
+} catch (e) {
+  console.warn('⚠️ starMvpRoutes 로드 실패:', e.message);
+}
+if (starMvpRoutes) {
+  app.use('/api/star', starMvpRoutes);
+  console.log('✅ Star MVP 라우터 등록 완료 (/api/star)');
+}
+
+// ---------- Star Voyage (/api/star-voyage) ----------
+let starVoyageRoutes = null;
+try {
+  starVoyageRoutes = require('./routes/starVoyageRoutes');
+} catch (e) {
+  console.warn('⚠️ starVoyageRoutes 로드 실패:', e.message);
+}
+if (starVoyageRoutes) {
+  app.use('/api/star-voyage', starVoyageRoutes);
+  console.log('✅ Star Voyage 라우터 등록 완료 (/api/star-voyage)');
 }
 
 // ---------- 여수 미션 + 포인트 (/api/yeosu-missions) ----------
@@ -3004,6 +3080,8 @@ const DT_SPA_ROUTES = [
   // 케이블카
   '/cablecar',
   '/cablecar-landing',
+  '/entry',
+  '/admin/cablecar',
   // 아우룸
   '/aurum/create',
   '/aurum/*',
@@ -3330,6 +3408,19 @@ app.get("/", (_req, res) => {
       diag: "/diag/echo",
       analyze: "/api/daily-miracles/analyze",
       latest: "/api/story/latest"
+    }
+  });
+});
+
+// ---------- SPA catch-all — /api/* 제외한 모든 GET을 index.html로 -------
+// DT_SPA_ROUTES 화이트리스트에 없는 신규 SPA 경로(/entry 등) 404 방지
+app.get(/^(?!\/api\/).*$/, (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.sendFile(path.join(dtFrontendPath, 'index.html'), (err) => {
+    if (err) {
+      res.status(503).send('<html><body><h2>DreamTown 준비 중입니다.</h2></body></html>');
     }
   });
 });

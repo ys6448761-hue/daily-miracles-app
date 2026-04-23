@@ -239,7 +239,7 @@ function BasicLogView({ onNext }) {
         </div>
 
         <button
-          onClick={() => nav('/cablecar-landing')}
+          onClick={() => nav('/entry?loc=cablecar')}
           style={{ ...S.btn, marginTop: 0 }}
         >
           내 별 깨우기 ✨
@@ -836,7 +836,7 @@ export default function CablecarPage() {
 
   // [무료 + 별 없음] 상품 안내
   if (phase === 'no_product') {
-    return <ProductCTAView onShop={() => nav('/cablecar-landing')} />;
+    return <ProductCTAView onShop={() => nav('/entry?loc=cablecar')} />;
   }
 
   // [유료 + 별 없음] 소원 입력
