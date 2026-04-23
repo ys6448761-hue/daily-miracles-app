@@ -188,9 +188,8 @@ function WishInputView({ onSubmit, loading, error }) {
   );
 }
 
-// ── [무료 + 기존별] 각성 구매 유도 ──────────────────────────────
+// ── [무료 + 기존별] 방문 기록 확인 ──────────────────────────────
 function BasicLogView({ onNext }) {
-  const nav = useNavigate();
   return (
     <div style={S.page}>
       <motion.div
@@ -199,7 +198,7 @@ function BasicLogView({ onNext }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45 }}
       >
-        {/* 잠든 별 글로우 */}
+        {/* 별 글로우 */}
         <motion.div
           style={{
             width: 52, height: 52, borderRadius: '50%',
@@ -213,46 +212,25 @@ function BasicLogView({ onNext }) {
         />
 
         <div style={{ fontSize: 11, fontWeight: 700, color: '#9B87F5', letterSpacing: '0.1em', marginBottom: 8 }}>
-          내 별이 있어요
+          여수 케이블카 캐빈
         </div>
         <div style={{ fontSize: 19, fontWeight: 800, color: '#E8E4F0', lineHeight: 1.4, marginBottom: 8 }}>
-          별이 깨어날<br />준비가 됐어요
+          이 순간이<br />별에 기록됐어요
         </div>
-        <div style={{ fontSize: 13, color: '#7A6E9C', lineHeight: 1.65, marginBottom: 24 }}>
-          케이블카 위에서 이 순간을 기록했어요.<br />
-          각성 패스로 지금 바로 깨울 수 있어요.
-        </div>
-
-        {/* 가격 뱃지 */}
-        <div style={{
-          display: 'inline-block',
-          padding: '6px 16px',
-          borderRadius: 20,
-          background: 'rgba(255,215,106,0.1)',
-          border: '1px solid rgba(255,215,106,0.25)',
-          fontSize: 13,
-          color: '#FFD76A',
-          fontWeight: 700,
-          marginBottom: 20,
-        }}>
-          오픈가 19,900원
+        <div style={{ fontSize: 13, color: '#7A6E9C', lineHeight: 1.65, marginBottom: 32 }}>
+          케이블카 위에서의 이 시간,<br />
+          당신의 별이 조용히 기억합니다.
         </div>
 
-        <button
-          onClick={() => nav('/entry?loc=cablecar')}
-          style={{ ...S.btn, marginTop: 0 }}
-        >
-          내 별 깨우기 ✨
-        </button>
-        <button onClick={onNext} style={{ ...S.btnOutline, marginTop: 8, fontSize: 13 }}>
-          지금은 괜찮아요 — 내 별 보기
+        <button onClick={onNext} style={{ ...S.btn, marginTop: 0 }}>
+          내 별 보기 →
         </button>
       </motion.div>
     </div>
   );
 }
 
-// ── [무료 + 별 없음] 상품 구매 안내 ──────────────────────────────
+// ── [무료 + 별 없음] 별 만들기 안내 ──────────────────────────────
 function ProductCTAView({ onShop }) {
   return (
     <div style={S.page}>
@@ -263,48 +241,29 @@ function ProductCTAView({ onShop }) {
       >
         <div style={{ fontSize: 48, marginBottom: 16 }}>⭐</div>
         <div style={S.label}>여수 케이블카 캐빈</div>
-        <div style={S.headline}>케이블카에서<br />내 별을 만들어요</div>
+        <div style={S.headline}>지금, 이 순간에<br />내 별을 만들어요</div>
         <div style={S.subline}>
-          별 탄생과 각성 연출은<br />
-          각성 패스 구매 후 바로 시작돼요
+          케이블카 위에서 소원을 담으면<br />
+          별이 되어 하늘에 남습니다
         </div>
 
-        {/* 상품 카드 2종 */}
-        <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+        {/* 경험 목록 */}
+        <div style={{ marginBottom: 28 }}>
           {[
-            { name: '베이직', price: '19,900원', desc: '기록 + 내 별 연결' },
-            { name: '프리미엄', price: '24,900원', desc: '기억 확장 + 장소 연결', highlight: true },
-          ].map(p => (
-            <div
-              key={p.name}
-              style={{
-                flex: 1,
-                padding: '12px 10px',
-                borderRadius: 12,
-                background: p.highlight ? 'rgba(155,135,245,0.12)' : 'rgba(255,255,255,0.04)',
-                border: p.highlight ? '1px solid rgba(155,135,245,0.35)' : '1px solid rgba(255,255,255,0.08)',
-                textAlign: 'center',
-              }}
-            >
-              <div style={{ fontSize: 12, fontWeight: 700, color: p.highlight ? '#9B87F5' : '#E8E4F0', marginBottom: 4 }}>
-                {p.name}
-              </div>
-              <div style={{ fontSize: 14, fontWeight: 800, color: '#FFD76A', marginBottom: 4 }}>
-                {p.price}
-              </div>
-              <div style={{ fontSize: 10, color: '#7A6E9C', lineHeight: 1.4 }}>
-                {p.desc}
-              </div>
+            { icon: '✨', text: '케이블카 위에서 소원 담기' },
+            { icon: '⭐', text: '나만의 별 탄생 + 여수 기억 저장' },
+            { icon: '🌌', text: '도전 은하에 별 등록' },
+          ].map((f) => (
+            <div key={f.text} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid rgba(155,135,245,0.07)' }}>
+              <span style={{ fontSize: 16, flexShrink: 0 }}>{f.icon}</span>
+              <span style={{ fontSize: 13, color: '#C4BAE0' }}>{f.text}</span>
             </div>
           ))}
         </div>
 
         <button onClick={onShop} style={S.btn}>
-          각성 패스 구매하기 →
+          내 별 만들기 ✨
         </button>
-        <div style={{ fontSize: 11, color: '#5a5370', marginTop: 12 }}>
-          오픈가 19,900원 · 결제 완료 후 바로 각성 시작
-        </div>
       </motion.div>
     </div>
   );
@@ -609,79 +568,27 @@ function UpsellView({ starId, onNext }) {
         />
 
         <div style={{ fontSize: 11, fontWeight: 700, color: '#9B87F5', letterSpacing: '0.1em', marginBottom: 10 }}>
-          별이 각성됐어요
+          별이 깨어났어요
         </div>
         <div style={{ fontSize: 19, fontWeight: 800, color: '#E8E4F0', lineHeight: 1.4, marginBottom: 8 }}>
-          이 별, 계속<br />키워보시겠어요?
+          여수에서 시작된<br />이 이야기를 이어가볼까요
         </div>
-        <div style={{ fontSize: 13, color: '#7A6E9C', lineHeight: 1.65, marginBottom: 24 }}>
-          별은 지금 막 깨어났어요.<br />
-          DreamTown 멤버십으로 함께 성장시켜봐요.
-        </div>
-
-        {/* 플랜 카드 2종 */}
-        <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
-          {[
-            {
-              name:  '베이직',
-              price: '9,900원',
-              tag:   '가볍게 이어가기',
-              desc:  '별 성장 + 하루 기록 + 공명',
-              highlight: false,
-            },
-            {
-              name:  '프리미엄',
-              price: '24,900원',
-              tag:   '제대로 이어가기',
-              desc:  '모든 기능 + AI 코치 + 여행 연결',
-              highlight: true,
-            },
-          ].map(plan => (
-            <motion.div
-              key={plan.name}
-              onClick={() => nav('/shop')}
-              whileTap={{ scale: 0.97 }}
-              style={{
-                flex: 1,
-                padding: '14px 10px',
-                borderRadius: 14,
-                background: plan.highlight
-                  ? 'rgba(155,135,245,0.14)'
-                  : 'rgba(255,255,255,0.04)',
-                border: plan.highlight
-                  ? '1px solid rgba(155,135,245,0.4)'
-                  : '1px solid rgba(255,255,255,0.08)',
-                cursor: 'pointer',
-                textAlign: 'center',
-              }}
-            >
-              <div style={{ fontSize: 11, fontWeight: 700, color: plan.highlight ? '#9B87F5' : '#E8E4F0', marginBottom: 4 }}>
-                {plan.name}
-              </div>
-              <div style={{ fontSize: 15, fontWeight: 800, color: '#FFD76A', marginBottom: 4 }}>
-                {plan.price}
-              </div>
-              <div style={{ fontSize: 9, color: '#9B87F5', fontWeight: 600, marginBottom: 6 }}>
-                {plan.tag}
-              </div>
-              <div style={{ fontSize: 10, color: '#7A6E9C', lineHeight: 1.4 }}>
-                {plan.desc}
-              </div>
-            </motion.div>
-          ))}
+        <div style={{ fontSize: 13, color: '#7A6E9C', lineHeight: 1.65, marginBottom: 28 }}>
+          별은 방금 깨어났어요.<br />
+          여수에서 이 흐름을 여행으로 이어갈 수 있어요.
         </div>
 
         <button
-          onClick={() => nav('/shop')}
+          onClick={() => nav('/voyage-select')}
           style={{ ...S.btn, fontSize: 14, padding: '13px 0', marginTop: 0 }}
         >
-          멤버십 자세히 보기 →
+          여수 여행 이어가기 →
         </button>
         <button
           onClick={onNext}
           style={{ ...S.btnOutline, marginTop: 8, fontSize: 13 }}
         >
-          지금은 괜찮아요 — 내 별 보기
+          내 별 먼저 보기
         </button>
       </motion.div>
     </div>
