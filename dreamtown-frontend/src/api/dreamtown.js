@@ -370,6 +370,16 @@ export async function postTravelLog(starId, { place, emotion }) {
   return res.json();
 }
 
+// POST /api/dt/stars/:id/travel-reflection — 여행 이후 3단 반성 저장
+export async function postTravelReflection(starId, { emotion_label, meaning_label, change_label }) {
+  const res = await fetch(`${BASE}/stars/${encodeURIComponent(starId)}/travel-reflection`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ emotion_label, meaning_label, change_label }),
+  });
+  return res.json();
+}
+
 // GET /api/dt/stars/:id/travel-log — 여행 기록 조회
 export async function getTravelLog(starId) {
   try {

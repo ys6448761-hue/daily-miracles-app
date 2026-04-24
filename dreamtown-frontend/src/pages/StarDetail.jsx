@@ -1213,29 +1213,45 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
       {/* 별 생성 완료(isOwner) OR 공명 발생 OR Day 1 이상 중 하나 충족 시에만 표시 */}
       {(isOwner || resonancePeople.total > 0 || (detail.days_since_birth ?? 0) >= 1) && (
         <div style={{ marginBottom: 12 }}>
-          {travelLog && (
-            <div style={{ textAlign: 'center', fontSize: 12, color: 'rgba(91,200,192,0.75)', marginBottom: 8, lineHeight: 1.6 }}>
-              여수에서 이어가기 시작했어요 ✨<br />
+          {/* 여행 완료 + 반성 완료 → "한 번 더 빛났어요" */}
+          {travelLog?.has_reflection && (
+            <div style={{ textAlign: 'center', fontSize: 13, color: 'rgba(91,200,192,0.85)', marginBottom: 10, lineHeight: 1.7 }}>
+              이 별은, 여수에서 한 번 더 빛났어요 ✨<br />
               <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11 }}>{travelLog.place} · {travelLog.emotion}</span>
             </div>
           )}
-          <button
-            onClick={() => nav(`/voyage-select?starId=${id}`)}
-            style={{
-              width: '100%',
-              padding: '14px 0',
-              borderRadius: 9999,
-              background: 'rgba(91,200,192,0.07)',
-              border: '1px solid rgba(91,200,192,0.22)',
-              color: '#5BC8C0',
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: 'pointer',
-              fontFamily: "'Noto Sans KR', sans-serif",
-            }}
-          >
-            이 마음을, 여수에서 이어가 볼까요?
-          </button>
+          {/* 여행 완료 + 1일 경과 + 반성 미완료 → 재방문 유도 배너 */}
+          {travelLog && travelLog.needs_reflection && !travelLog.has_reflection && (
+            <button
+              onClick={() => nav(`/voyage-reflect?starId=${id}`)}
+              style={{
+                display: 'block', width: '100%',
+                padding: '13px 0', marginBottom: 8,
+                borderRadius: 9999,
+                background: 'rgba(91,200,192,0.10)',
+                border: '1.5px solid rgba(91,200,192,0.35)',
+                color: '#5BC8C0', fontSize: 14, fontWeight: 700,
+                cursor: 'pointer', fontFamily: "'Noto Sans KR', sans-serif",
+              }}
+            >
+              여수에서의 이야기를 들려주세요 →
+            </button>
+          )}
+          {/* 여행 이동 CTA — 아직 미선택이거나 반성 완료된 경우 */}
+          {!travelLog?.needs_reflection && (
+            <button
+              onClick={() => nav(`/voyage-select?starId=${id}`)}
+              style={{
+                width: '100%', padding: '14px 0', borderRadius: 9999,
+                background: 'rgba(91,200,192,0.07)',
+                border: '1px solid rgba(91,200,192,0.22)',
+                color: '#5BC8C0', fontSize: 14, fontWeight: 600,
+                cursor: 'pointer', fontFamily: "'Noto Sans KR', sans-serif",
+              }}
+            >
+              이 마음을, 여수에서 이어가 볼까요?
+            </button>
+          )}
         </div>
       )}
 

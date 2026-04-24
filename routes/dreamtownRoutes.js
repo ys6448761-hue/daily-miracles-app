@@ -1443,20 +1443,45 @@ router.post('/stars/:id/travel-log', async (req, res) => {
   }
 });
 
-// GET /api/dt/stars/:id/travel-log — 여행 기록 조회 (최신 1건)
+// GET /api/dt/stars/:id/travel-log — 여행 기록 조회 (needs_reflection/has_reflection 포함)
 router.get('/stars/:id/travel-log', async (req, res) => {
   try {
     const { rows } = await db.query(
-      `SELECT place, emotion, created_at
-         FROM star_travel_log
-        WHERE star_id = $1
-        ORDER BY created_at DESC
-        LIMIT 1`,
+      `SELECT
+         t.place, t.emotion, t.created_at,
+         (EXTRACT(EPOCH FROM (NOW() - t.created_at)) >= 86400) AS needs_reflection,
+         EXISTS(
+           SELECT 1 FROM star_travel_reflection r WHERE r.star_id = $1
+         ) AS has_reflection
+       FROM star_travel_log t
+      WHERE t.star_id = $1
+      ORDER BY t.created_at DESC
+      LIMIT 1`,
       [req.params.id]
     );
     res.json({ log: rows[0] ?? null });
   } catch (err) {
     console.error('[DT] GET /stars/:id/travel-log error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/dt/stars/:id/travel-reflection — 여행 이후 3단 반성 저장
+router.post('/stars/:id/travel-reflection', async (req, res) => {
+  try {
+    const { emotion_label, meaning_label, change_label } = req.body;
+    if (!emotion_label || !meaning_label || !change_label) {
+      return res.status(400).json({ error: 'emotion_label, meaning_label, change_label 3개 필수' });
+    }
+    const { rows } = await db.query(
+      `INSERT INTO star_travel_reflection (star_id, emotion_label, meaning_label, change_label)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id`,
+      [req.params.id, emotion_label, meaning_label, change_label]
+    );
+    res.status(201).json({ ok: true, id: rows[0].id });
+  } catch (err) {
+    console.error('[DT] POST /stars/:id/travel-reflection error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });

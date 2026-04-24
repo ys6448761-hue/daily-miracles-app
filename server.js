@@ -1394,6 +1394,8 @@ app.post("/api/admin/run-migration", adminTokenGuard, async (req, res) => {
     "139",
     // 여행 선택 기록 (별 성장 연결)
     "140",
+    // 여행 이후 별 변화 기록
+    "141",
   ];
 
   if (!migration || !allowed.includes(migration)) {
@@ -3108,6 +3110,8 @@ const DT_SPA_ROUTES = [
   '/shop', '/shop/*',
   // 전체 별 목록
   '/stars',
+  // 여행 이후 별 변화 기록
+  '/voyage-reflect',
 ];
 app.get(DT_SPA_ROUTES, (req, res) => {
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
