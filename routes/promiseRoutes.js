@@ -118,8 +118,8 @@ router.post('/', async (req, res) => {
     } = req.body;
 
     if (!user_id)      return res.status(400).json({ success: false, error: 'user_id 필요' });
-    if (!location_id)  return res.status(400).json({ success: false, error: 'location_id 필요' });
     if (!emotion_text) return res.status(400).json({ success: false, error: 'emotion_text 필요' });
+    const resolvedLocationId = location_id || 'yeosu-cablecar';
 
     const openAt = open_at
       ? new Date(open_at)
@@ -132,13 +132,13 @@ router.post('/', async (req, res) => {
        VALUES ($1, $2, $3, $4, $5, $6, $7, 'SEALED', $8)
        RETURNING id, status, open_at, created_at`,
       [
-        user_id, location_id, emotion_text, message_to_future,
+        user_id, resolvedLocationId, emotion_text, message_to_future,
         photo_url, created_lat, created_lng, openAt,
       ]
     );
 
     const row = result.rows[0];
-    console.log(`[promise] 생성 | id=${row.id} | loc=${location_id} | user=${user_id}`);
+    console.log(`[promise] 생성 | id=${row.id} | loc=${resolvedLocationId} | user=${user_id}`);
     res.json({
       success:    true,
       promise_id: row.id,

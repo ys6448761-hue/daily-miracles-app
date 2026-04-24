@@ -182,7 +182,7 @@ export default function PromiseLocationPage() {
   const [searchParams] = useSearchParams();
   const nav = useNavigate();
 
-  const locationId   = searchParams.get('loc') || '';
+  const locationId   = searchParams.get('loc') || 'yeosu-cablecar';
   const locationName = LOCATION_NAMES[locationId] || locationId || '이 장소';
 
   const [text,            setText]            = useState('');
