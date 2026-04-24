@@ -170,6 +170,7 @@ router.get('/photo/:filename', (req, res) => {
 //         photo_url?, created_lat?, created_lng?, open_at? }
 router.post('/', async (req, res) => {
   try {
+    console.log('[promise] POST body:', JSON.stringify(req.body));
     const {
       user_id, location_id, emotion_text,
       message_to_future = null,
@@ -225,8 +226,8 @@ router.post('/', async (req, res) => {
       aurora_comment: savedComment,
     });
   } catch (e) {
-    console.error('POST /api/promise error:', e.message);
-    res.status(500).json({ success: false, error: '저장 실패' });
+    console.error('POST /api/promise error:', e.message, e.stack);
+    res.status(500).json({ success: false, error: `저장 실패: ${e.message}` });
   }
 });
 

@@ -244,21 +244,27 @@ export default function PromiseLocationPage() {
       }
 
       // 기록 저장
+      const payload = {
+        user_id:           userId,
+        location_id:       locationId,
+        emotion_text:      text.trim(),
+        message_to_future: futureMsg.trim() || null,
+        photo_url,
+        created_lat: gps?.lat ?? null,
+        created_lng: gps?.lng ?? null,
+      };
+      console.log('[promise] POST payload:', JSON.stringify(payload));
+
       const r = await fetch('/api/promise', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({
-          user_id:           userId,
-          location_id:       locationId,
-          emotion_text:      text.trim(),
-          message_to_future: futureMsg.trim() || null,
-          photo_url,
-          created_lat: gps?.lat ?? null,
-          created_lng: gps?.lng ?? null,
-        }),
+        body:    JSON.stringify(payload),
       });
-      const data = await r.json();
-      if (!r.ok || !data.success) throw new Error(data.error || '저장 실패');
+      let data;
+      try { data = await r.json(); }
+      catch { data = { success: false, error: `HTTP ${r.status}` }; }
+      console.log('[promise] POST response:', r.status, JSON.stringify(data));
+      if (!r.ok || !data.success) throw new Error(data.error || `저장 실패 (${r.status})`);
 
       setCreated({ promiseId: data.promise_id, openAt: data.open_at, auroraComment: data.aurora_comment ?? null });
     } catch (err) {
