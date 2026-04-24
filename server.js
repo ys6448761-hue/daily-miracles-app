@@ -1396,6 +1396,8 @@ app.post("/api/admin/run-migration", adminTokenGuard, async (req, res) => {
     "140",
     // 여행 이후 별 변화 기록
     "141",
+    // 다음날의 마음
+    "142",
   ];
 
   if (!migration || !allowed.includes(migration)) {

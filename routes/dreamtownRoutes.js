@@ -1486,6 +1486,41 @@ router.post('/stars/:id/travel-reflection', async (req, res) => {
   }
 });
 
+// POST /api/dt/stars/:id/next-day-heart — 다음날의 마음 저장
+router.post('/stars/:id/next-day-heart', async (req, res) => {
+  try {
+    const { choice } = req.body;
+    const VALID = new Set(['조금 가벼워졌어요', '아직 그대로예요', '조금 또렷해졌어요', '용기가 생겼어요']);
+    if (!choice || !VALID.has(choice)) {
+      return res.status(400).json({ error: 'choice 값 오류' });
+    }
+    await db.query(
+      `INSERT INTO star_next_day_heart (star_id, choice)
+       VALUES ($1, $2)
+       ON CONFLICT (star_id) DO NOTHING`,
+      [req.params.id, choice]
+    );
+    res.status(201).json({ ok: true });
+  } catch (err) {
+    console.error('[DT] POST /stars/:id/next-day-heart error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/dt/stars/:id/next-day-heart — 다음날의 마음 조회
+router.get('/stars/:id/next-day-heart', async (req, res) => {
+  try {
+    const { rows } = await db.query(
+      `SELECT choice, created_at FROM star_next_day_heart WHERE star_id = $1`,
+      [req.params.id]
+    );
+    res.json({ heart: rows[0] ?? null });
+  } catch (err) {
+    console.error('[DT] GET /stars/:id/next-day-heart error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ─────────────────────────────────────────────
 // POST /api/dt/stars/:id/aurora5-message — Aurora5 메시지 저장
 // Aurora5 메시지는 현재 은하 기반 로컬 생성

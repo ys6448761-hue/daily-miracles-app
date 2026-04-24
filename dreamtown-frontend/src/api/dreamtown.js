@@ -360,6 +360,27 @@ export async function getStarTimeline(starId) {
   return res.json();
 }
 
+// POST /api/dt/stars/:id/next-day-heart — 다음날의 마음 저장
+export async function postNextDayHeart(starId, choice) {
+  const res = await fetch(`${BASE}/stars/${encodeURIComponent(starId)}/next-day-heart`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ choice }),
+  });
+  return res.json();
+}
+
+// GET /api/dt/stars/:id/next-day-heart — 다음날의 마음 조회
+export async function getNextDayHeart(starId) {
+  try {
+    const res = await fetch(`${BASE}/stars/${encodeURIComponent(starId)}/next-day-heart`);
+    if (!res.ok) return { heart: null };
+    return res.json();
+  } catch {
+    return { heart: null };
+  }
+}
+
 // POST /api/dt/stars/:id/travel-log — 여행 선택 기록 저장
 export async function postTravelLog(starId, { place, emotion }) {
   const res = await fetch(`${BASE}/stars/${encodeURIComponent(starId)}/travel-log`, {

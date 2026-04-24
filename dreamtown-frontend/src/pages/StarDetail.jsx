@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStarDetail, getStar, getResonance, postVoyageLog, postDtResonance, getSimilarStars, getRelatedStars, getResonancePeople, logUserEvent, getOrCreateUserId, getTravelLog } from '../api/dreamtown.js';
+import { getStarDetail, getStar, getResonance, postVoyageLog, postDtResonance, getSimilarStars, getRelatedStars, getResonancePeople, logUserEvent, getOrCreateUserId, getTravelLog, postNextDayHeart, getNextDayHeart } from '../api/dreamtown.js';
 import MilestoneBar from '../components/MilestoneBar';
 import { gaResonanceCreated, gaResonanceClick, gaResonanceSuccess, gaResonanceCTAClick, gaSimilarStarClick, gaSquareFallbackClick, gaSimularStarsEmptyView } from '../utils/gtag';
 import { readSavedStar } from '../lib/utils/starSession.js';
@@ -100,6 +100,14 @@ function getAurora5WishComment(wishText) {
   }
   return AURORA5_FALLBACK[hashText(text) % AURORA5_FALLBACK.length];
 }
+
+// 다음날의 마음 — 선택지별 Aurora5 문장
+const NEXT_DAY_AURORA5 = {
+  '조금 가벼워졌어요':  '가벼워진 마음이,\n소원을 향한 첫 걸음이 되고 있어요.',
+  '아직 그대로예요':    '그대로인 마음도,\n이미 별이 되어 빛나고 있어요.',
+  '조금 또렷해졌어요':  '또렷해진 소원은,\n이미 현실 가까이 다가오고 있어요.',
+  '용기가 생겼어요':    '생겨난 용기가,\n당신의 별을 더 밝히고 있어요.',
+};
 
 // 공명 버튼 정의 (type별 색상/glow 분리)
 const DT_RESONANCE_OPTS = [
@@ -303,6 +311,8 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   const [relatedStars, setRelatedStars] = useState([]);          // 하단 추천 별
   const [shareCopied, setShareCopied]   = useState(false);       // fallback 복사 완료 (Kakao 미지원 환경)
   const [travelLog, setTravelLog]       = useState(null);        // 여행 선택 기록
+  const [nextDayHeart, setNextDayHeart] = useState(null);        // 다음날의 마음 (이미 답변 여부)
+  const [heartResult, setHeartResult]   = useState(null);        // 선택 직후 로컬 결과
   const [showStayMsg, setShowStayMsg]   = useState(false);       // 머물기 상태 메시지
   const [resonancePeople, setResonancePeople] = useState({ people: [], total: 0 }); // 공명 참여자
   const [showSharedIntro, setShowSharedIntro] = useState(() => {
@@ -339,6 +349,12 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
     if (!id) return;
     getTravelLog(id).then(({ log }) => { if (log) setTravelLog(log); }).catch(() => {});
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── 다음날의 마음 로드 (owner + days >= 1) ────────────────────
+  useEffect(() => {
+    if (!id || !isOwner) return;
+    getNextDayHeart(id).then(({ heart }) => { if (heart) setNextDayHeart(heart); }).catch(() => {});
+  }, [id, isOwner]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── 데이터 로드 ────────────────────────────────────────────────
   useEffect(() => {
@@ -899,6 +915,86 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
           )}
         </div>
       )}
+
+      {/* ⑤ 다음날의 마음 — owner + D+1 이상 */}
+      {isOwner && (detail.days_since_birth ?? 0) >= 1 && (() => {
+        const done = nextDayHeart || heartResult;
+        if (done) {
+          const choice = done.choice;
+          return (
+            <div style={{
+              marginBottom: 16, padding: '16px 18px', borderRadius: 18,
+              background: 'rgba(91,200,192,0.06)',
+              border: '1px solid rgba(91,200,192,0.20)',
+              textAlign: 'center',
+            }}>
+              <p style={{ fontSize: 11, color: 'rgba(91,200,192,0.6)', marginBottom: 6, letterSpacing: '0.06em' }}>✨ 다음날의 마음</p>
+              <p style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 10 }}>
+                이 별은, 여수에서 한 번 더 빛났어요 ✨
+              </p>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.75, whiteSpace: 'pre-line', marginBottom: heartResult ? 12 : 0 }}>
+                {NEXT_DAY_AURORA5[choice]}
+              </p>
+              {heartResult && (
+                <>
+                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginBottom: 12 }}>
+                    {heartResult.resonance}명이 비슷한 마음이에요
+                  </p>
+                  <button
+                    onClick={() => {
+                      const text = `여수에서 보낸 하루, ${choice} ✨`;
+                      if (navigator.share) navigator.share({ text }).catch(() => {});
+                      else navigator.clipboard?.writeText(text);
+                    }}
+                    style={{
+                      padding: '10px 24px', borderRadius: 9999,
+                      background: 'rgba(91,200,192,0.12)',
+                      border: '1px solid rgba(91,200,192,0.30)',
+                      color: '#5BC8C0', fontSize: 13, fontWeight: 600,
+                      cursor: 'pointer', fontFamily: "'Noto Sans KR', sans-serif",
+                    }}
+                  >
+                    공유하기 →
+                  </button>
+                </>
+              )}
+            </div>
+          );
+        }
+        return (
+          <div style={{
+            marginBottom: 16, padding: '16px 18px', borderRadius: 18,
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.08)',
+          }}>
+            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginBottom: 10, letterSpacing: '0.06em', textAlign: 'center' }}>
+              어제의 소원, 오늘은 어때요?
+            </p>
+            {['조금 가벼워졌어요', '아직 그대로예요', '조금 또렷해졌어요', '용기가 생겼어요'].map(choice => (
+              <button
+                key={choice}
+                onClick={async () => {
+                  const resonance = Math.floor(Math.random() * 10) + 3;
+                  setHeartResult({ choice, resonance });
+                  postNextDayHeart(id, choice).catch(() => {});
+                }}
+                style={{
+                  display: 'block', width: '100%',
+                  padding: '11px 16px', marginBottom: 8,
+                  borderRadius: 12,
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.09)',
+                  color: 'rgba(255,255,255,0.55)',
+                  fontSize: 14, textAlign: 'left', cursor: 'pointer',
+                  fontFamily: "'Noto Sans KR', sans-serif",
+                }}
+              >
+                {choice}
+              </button>
+            ))}
+          </div>
+        );
+      })()}
 
       {/* ── Aurora5 코멘트 — canResonate 뷰어 (별 카드↓, 마음 나누기↑) ── */}
       {canResonate && (
