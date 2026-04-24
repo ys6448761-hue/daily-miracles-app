@@ -162,6 +162,14 @@ function saveResonanceHistory(starId, starName) {
   } catch (_) {}
 }
 
+// 은하 → 감정 선택 매핑 (별 생성 CTA prefill 용)
+const GALAXY_TO_EMOTION = {
+  growth:       'hopeful',
+  challenge:    'anxious',
+  healing:      'tired',
+  relationship: 'lonely',
+};
+
 // ── 익명 아바타 색상 (userId 해시 → hsl) ─────────────────────────
 function avatarColor(userId) {
   let h = 5381;
@@ -320,6 +328,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
     const hasSeen = localStorage.getItem('dt_intro_seen');
     return isShare && !hasSeen;
   });
+  const [viralClicked, setViralClicked] = useState(false);
 
   const myStarId  = readSavedStar();
   const isOwnStar = !propViewMode && id === myStarId;
@@ -810,50 +819,96 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
         </p>
       )}
 
-      {/* ── 공유 유입 초대 블록 (source=share, 미공명 상태) ── */}
-      {isShareEntry && canResonate && !submitted && (
-        <div style={{
-          marginBottom: 16,
-          padding: '16px 18px',
-          borderRadius: 18,
-          background: 'rgba(155,135,245,0.08)',
-          border: '1px solid rgba(155,135,245,0.20)',
-          textAlign: 'center',
-        }}>
-          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', marginBottom: 14, lineHeight: 1.6 }}>
-            이 마음에 조용히 함께할 수 있어요
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <button
-              onClick={() => {
-                logUserEvent({ userId: getOrCreateUserId(), eventType: 'invite_cta_clicked', metadata: { star_id: id, cta_type: 'resonance', source: 'share' } });
-                document.getElementById('dt-resonance-section')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              style={{
-                padding: '13px 0', borderRadius: 9999,
-                background: 'rgba(255,215,106,0.13)',
-                border: '1px solid rgba(255,215,106,0.35)',
-                color: '#FFD76A', fontSize: 14, fontWeight: 600, cursor: 'pointer',
-              }}
+      {/* ── 바이럴 랜딩 블록 (비로그인 방문자 전용) ── */}
+      {canResonate && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          style={{
+            marginBottom: 16,
+            padding: '20px 18px',
+            borderRadius: 20,
+            background: viralClicked
+              ? 'rgba(255,215,106,0.07)'
+              : 'rgba(255,255,255,0.05)',
+            border: viralClicked
+              ? '1px solid rgba(255,215,106,0.25)'
+              : '1px solid rgba(255,255,255,0.10)',
+            textAlign: 'center',
+            transition: 'background 0.4s, border 0.4s',
+          }}
+        >
+          {!viralClicked ? (
+            <>
+              <p style={{ fontSize: 16, fontWeight: 600, color: 'rgba(255,255,255,0.85)', marginBottom: 6, lineHeight: 1.5 }}>
+                이 마음, 당신도 느껴본 적 있나요?
+              </p>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.40)', marginBottom: 16, lineHeight: 1.6 }}>
+                {detail.wish_emotion || '이 별의 마음이 닿았나요'}
+              </p>
+              <button
+                onClick={() => {
+                  setViralClicked(true);
+                  logUserEvent({ userId: getOrCreateUserId(), eventType: 'viral_nado_clicked', metadata: { star_id: id, source: isShareEntry ? 'share' : 'direct' } });
+                  if (!submitted && !submitting) handleResonance('miracle');
+                }}
+                style={{
+                  width: '100%',
+                  padding: '15px 0',
+                  borderRadius: 9999,
+                  background: 'linear-gradient(135deg, rgba(255,215,106,0.20) 0%, rgba(255,215,106,0.10) 100%)',
+                  border: '1px solid rgba(255,215,106,0.45)',
+                  color: '#FFD76A',
+                  fontSize: 16,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  letterSpacing: '0.01em',
+                  boxShadow: '0 0 20px 2px rgba(255,215,106,0.12)',
+                }}
+              >
+                나도 그래요
+              </button>
+            </>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4 }}
             >
-              이 별에 마음 남기기
-            </button>
-            <button
-              onClick={() => {
-                logUserEvent({ userId: getOrCreateUserId(), eventType: 'invite_cta_clicked', metadata: { star_id: id, cta_type: 'make_star', source: 'share' } });
-                nav('/dreamtown?entry=share');
-              }}
-              style={{
-                padding: '11px 0', borderRadius: 9999,
-                background: 'none',
-                border: '1px solid rgba(255,255,255,0.12)',
-                color: 'rgba(255,255,255,0.45)', fontSize: 13, cursor: 'pointer',
-              }}
-            >
-              나도 별 만들기
-            </button>
-          </div>
-        </div>
+              <p style={{ fontSize: 22, marginBottom: 8 }}>✨</p>
+              <p style={{ fontSize: 15, fontWeight: 600, color: '#FFD76A', marginBottom: 4, lineHeight: 1.5 }}>
+                {(miracleCount + wisdomCount) > 0
+                  ? `${miracleCount + wisdomCount}명이 같은 마음이에요`
+                  : '마음이 닿았어요'}
+              </p>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginBottom: 18, lineHeight: 1.6 }}>
+                당신의 마음이 이 별에 조용히 닿았어요
+              </p>
+              <button
+                onClick={() => {
+                  logUserEvent({ userId: getOrCreateUserId(), eventType: 'viral_make_star_clicked', metadata: { star_id: id } });
+                  const emotionChoice = GALAXY_TO_EMOTION[detail.galaxy?.code] ?? null;
+                  nav('/wish?new=1', { state: { emotionChoice } });
+                }}
+                style={{
+                  width: '100%',
+                  padding: '14px 0',
+                  borderRadius: 9999,
+                  background: 'rgba(255,215,106,0.15)',
+                  border: '1px solid rgba(255,215,106,0.35)',
+                  color: '#FFD76A',
+                  fontSize: 15,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  letterSpacing: '0.01em',
+                }}
+              >
+                나도 별 하나 남기기 →
+              </button>
+            </motion.div>
+          )}
+        </motion.div>
       )}
 
       {/* ② MilestoneBar — owner 전용 */}

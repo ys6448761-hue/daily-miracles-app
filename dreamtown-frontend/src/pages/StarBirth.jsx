@@ -32,6 +32,14 @@ const EMOTION_SENTENCE = {
   hopeful:  '기대하던 그 마음이, 이 별이 되었어요.',
 };
 
+// 공유 제목용 감정 레이블
+const EMOTION_SHARE_LABEL = {
+  tired:   '조금 지쳤던 마음',
+  lonely:  '혼자인 것 같던 마음',
+  anxious: '불안했던 마음',
+  hopeful: '기대하던 마음',
+};
+
 const BASE = import.meta.env.BASE_URL;
 
 const GALAXY_LABEL = {
@@ -186,9 +194,11 @@ export default function StarBirth() {
   const handleKakaoShare = useCallback(() => {
     logEvent('share_clicked', { star_id: starId, message_variant: shareMsg, platform: 'kakao' });
 
-    const baseUrl = 'https://app.dailymiracles.kr';
-    const imageUrl = `${baseUrl}/images/dreamtown-og-v4.jpg`;
-    const linkUrl  = `${baseUrl}/my-star/${starId}`;
+    const baseUrl   = 'https://app.dailymiracles.kr';
+    const imageUrl  = `${baseUrl}/images/dreamtown-og-v4.jpg`;
+    const linkUrl   = `${baseUrl}/star/${starId}?source=share`;
+    const emotionLabel = EMOTION_SHARE_LABEL[emotionChoice] ?? '이 마음';
+    const shareTitle = `여수에서 시작된 하루, ${emotionLabel} ✨`;
 
     const kakaoReady = initKakao();
     console.log('[StarBirth] Kakao 공유 시도 — initKakao:', kakaoReady,
@@ -200,7 +210,7 @@ export default function StarBirth() {
         window.Kakao.Share.sendDefault({
           objectType: 'feed',
           content: {
-            title: '내 별이 탄생했어요 ✨',
+            title: shareTitle,
             description: shareMsg,
             imageUrl,
             link: { mobileWebUrl: linkUrl, webUrl: linkUrl },
@@ -212,7 +222,7 @@ export default function StarBirth() {
         // 카카오 SDK 미초기화 → navigator.share 또는 링크 복사 fallback
         console.warn('[StarBirth] Kakao 미준비 — native share / clipboard fallback');
         if (navigator.share) {
-          navigator.share({ title: '내 별이 탄생했어요 ✨', text: shareMsg, url: linkUrl })
+          navigator.share({ title: shareTitle, text: shareMsg, url: linkUrl })
             .then(() => {
               logEvent('share_completed', { star_id: starId, platform: 'native' });
               showShareFeedback('공유됐어요 ✨');
@@ -229,11 +239,11 @@ export default function StarBirth() {
       console.warn('[StarBirth] 카카오 공유 실패:', e.message);
       showShareFeedback('공유에 실패했어요');
     }
-  }, [starId, shareMsg]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [starId, shareMsg, emotionChoice]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── 링크 복사 (저장하기) ────────────────────────────────
   const handleCopyLink = useCallback(() => {
-    const linkUrl = `https://app.dailymiracles.kr/my-star/${starId}`;
+    const linkUrl = `https://app.dailymiracles.kr/star/${starId}?source=share`;
     logEvent('share_clicked', { star_id: starId, message_variant: shareMsg, platform: 'copy' });
     navigator.clipboard?.writeText(linkUrl).then(() => {
       logEvent('share_completed', { star_id: starId, platform: 'copy' });
