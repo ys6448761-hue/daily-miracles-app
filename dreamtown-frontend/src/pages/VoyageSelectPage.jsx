@@ -9,36 +9,41 @@
  *
  */
 
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { postTravelLog } from '../api/dreamtown.js';
 
 const HOTELS = [
   {
-    id:     'rest',
-    name:   '유탑 마리나 호텔',
-    tag:    '오동도 바다 앞',
-    desc:   '오동도 앞 · 수영장 · 전 객실 테라스 오션뷰',
-    tel:    '061-690-8000',
-    icon:   '⚓',
-    accent: '#5BC8C0',
+    id:      'rest',
+    emotion: '쉼',
+    name:    '유탑 마리나 호텔',
+    tag:     '오동도 바다 앞',
+    desc:    '오동도 앞 · 수영장 · 전 객실 테라스 오션뷰',
+    tel:     '061-690-8000',
+    icon:    '⚓',
+    accent:  '#5BC8C0',
   },
   {
-    id:     'mood',
-    name:   '라마다 호텔',
-    tag:    '시내 중심',
-    desc:   '여수 시내 · 오동도 근처 · 루프탑 뷰',
-    tel:    '061-642-0000',
-    icon:   '🏨',
-    accent: '#9B87F5',
+    id:      'mood',
+    emotion: '감성',
+    name:    '라마다 호텔',
+    tag:     '시내 중심',
+    desc:    '여수 시내 · 오동도 근처 · 루프탑 뷰',
+    tel:     '061-642-0000',
+    icon:    '🏨',
+    accent:  '#9B87F5',
   },
   {
-    id:     'value',
-    name:   '케니호텔',
-    tag:    '케이블카 인근',
-    desc:   '케이블카 도보 · 오션뷰 객실',
-    tel:    '0507-1383-5001',
-    icon:   '🌊',
-    accent: '#FFD76A',
+    id:      'value',
+    emotion: '시작',
+    name:    '케니호텔',
+    tag:     '케이블카 인근',
+    desc:    '케이블카 도보 · 오션뷰 객실',
+    tel:     '0507-1383-5001',
+    icon:    '🌊',
+    accent:  '#FFD76A',
   },
 ];
 
@@ -134,8 +139,9 @@ const S = {
   },
 };
 
-function HotelCard({ hotel, index }) {
+function HotelCard({ hotel, index, onSelect }) {
   const handleCall = () => {
+    onSelect(hotel);
     window.location.href = `tel:${hotel.tel}`;
   };
 
@@ -181,9 +187,40 @@ function HotelCard({ hotel, index }) {
 
 export default function VoyageSelectPage() {
   const nav = useNavigate();
+  const [searchParams] = useSearchParams();
+  const starId = searchParams.get('starId');
+  const [toast, setToast] = useState(false);
+
+  const handleSelect = (hotel) => {
+    if (starId) {
+      postTravelLog(starId, { place: hotel.name, emotion: hotel.emotion }).catch(() => {});
+    }
+    setToast(true);
+    setTimeout(() => setToast(false), 3000);
+  };
 
   return (
     <div style={S.page}>
+
+      {/* 선택 토스트 */}
+      {toast && (
+        <motion.div
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          style={{
+            position: 'fixed', top: 24, left: '50%', transform: 'translateX(-50%)',
+            background: 'rgba(91,200,192,0.15)', border: '1px solid rgba(91,200,192,0.35)',
+            color: '#5BC8C0', fontSize: 13, fontWeight: 600,
+            padding: '10px 20px', borderRadius: 20,
+            fontFamily: "'Noto Sans KR', sans-serif",
+            zIndex: 999, whiteSpace: 'nowrap',
+            backdropFilter: 'blur(8px)',
+          }}
+        >
+          이 선택이, 당신의 별을 조금 더 밝히고 있어요 ✨
+        </motion.div>
+      )}
 
       {/* 헤더 */}
       <motion.div
@@ -203,7 +240,7 @@ export default function VoyageSelectPage() {
 
       {/* 호텔 카드 3종 */}
       {HOTELS.map((hotel, i) => (
-        <HotelCard key={hotel.id} hotel={hotel} index={i} />
+        <HotelCard key={hotel.id} hotel={hotel} index={i} onSelect={handleSelect} />
       ))}
 
       {/* 뒤로 */}

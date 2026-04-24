@@ -1392,6 +1392,8 @@ app.post("/api/admin/run-migration", adminTokenGuard, async (req, res) => {
     "133",
     // promise_records aurora_comment 컬럼
     "139",
+    // 여행 선택 기록 (별 성장 연결)
+    "140",
   ];
 
   if (!migration || !allowed.includes(migration)) {

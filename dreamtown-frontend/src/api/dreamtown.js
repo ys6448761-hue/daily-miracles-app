@@ -360,6 +360,27 @@ export async function getStarTimeline(starId) {
   return res.json();
 }
 
+// POST /api/dt/stars/:id/travel-log — 여행 선택 기록 저장
+export async function postTravelLog(starId, { place, emotion }) {
+  const res = await fetch(`${BASE}/stars/${encodeURIComponent(starId)}/travel-log`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ place, emotion }),
+  });
+  return res.json();
+}
+
+// GET /api/dt/stars/:id/travel-log — 여행 기록 조회
+export async function getTravelLog(starId) {
+  try {
+    const res = await fetch(`${BASE}/stars/${encodeURIComponent(starId)}/travel-log`);
+    if (!res.ok) return { log: null };
+    return res.json();
+  } catch {
+    return { log: null };
+  }
+}
+
 // POST /api/book/upgrade — 실물책 제작 신청
 export async function postBookUpgrade({ starId, userId, phone = null }) {
   return fetchWithRetry('/api/book/upgrade', {

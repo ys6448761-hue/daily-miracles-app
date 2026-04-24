@@ -1423,6 +1423,44 @@ router.get('/stars/:id/voyage-logs', async (req, res) => {
   }
 });
 
+// POST /api/dt/stars/:id/travel-log — 여행 선택 기록 저장
+router.post('/stars/:id/travel-log', async (req, res) => {
+  try {
+    const { place, emotion } = req.body;
+    if (!place || !emotion) {
+      return res.status(400).json({ error: 'place, emotion 필수' });
+    }
+    const { rows } = await db.query(
+      `INSERT INTO star_travel_log (star_id, place, emotion)
+       VALUES ($1, $2, $3)
+       RETURNING id, created_at`,
+      [req.params.id, place, emotion]
+    );
+    res.status(201).json({ ok: true, log: rows[0] });
+  } catch (err) {
+    console.error('[DT] POST /stars/:id/travel-log error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/dt/stars/:id/travel-log — 여행 기록 조회 (최신 1건)
+router.get('/stars/:id/travel-log', async (req, res) => {
+  try {
+    const { rows } = await db.query(
+      `SELECT place, emotion, created_at
+         FROM star_travel_log
+        WHERE star_id = $1
+        ORDER BY created_at DESC
+        LIMIT 1`,
+      [req.params.id]
+    );
+    res.json({ log: rows[0] ?? null });
+  } catch (err) {
+    console.error('[DT] GET /stars/:id/travel-log error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ─────────────────────────────────────────────
 // POST /api/dt/stars/:id/aurora5-message — Aurora5 메시지 저장
 // Aurora5 메시지는 현재 은하 기반 로컬 생성

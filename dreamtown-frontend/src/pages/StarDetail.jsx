@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStarDetail, getStar, getResonance, postVoyageLog, postDtResonance, getSimilarStars, getRelatedStars, getResonancePeople, logUserEvent, getOrCreateUserId } from '../api/dreamtown.js';
+import { getStarDetail, getStar, getResonance, postVoyageLog, postDtResonance, getSimilarStars, getRelatedStars, getResonancePeople, logUserEvent, getOrCreateUserId, getTravelLog } from '../api/dreamtown.js';
 import MilestoneBar from '../components/MilestoneBar';
 import { gaResonanceCreated, gaResonanceClick, gaResonanceSuccess, gaResonanceCTAClick, gaSimilarStarClick, gaSquareFallbackClick, gaSimularStarsEmptyView } from '../utils/gtag';
 import { readSavedStar } from '../lib/utils/starSession.js';
@@ -302,6 +302,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   const [toastMsg, setToastMsg]         = useState(null);        // 공명 즉시 토스트
   const [relatedStars, setRelatedStars] = useState([]);          // 하단 추천 별
   const [shareCopied, setShareCopied]   = useState(false);       // fallback 복사 완료 (Kakao 미지원 환경)
+  const [travelLog, setTravelLog]       = useState(null);        // 여행 선택 기록
   const [showStayMsg, setShowStayMsg]   = useState(false);       // 머물기 상태 메시지
   const [resonancePeople, setResonancePeople] = useState({ people: [], total: 0 }); // 공명 참여자
   const [showSharedIntro, setShowSharedIntro] = useState(() => {
@@ -332,6 +333,12 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
     const t = setTimeout(() => setShowStayMsg(true), 4000);
     return () => clearTimeout(t);
   }, []);
+
+  // ── 여행 기록 로드 ────────────────────────────────────────────
+  useEffect(() => {
+    if (!id) return;
+    getTravelLog(id).then(({ log }) => { if (log) setTravelLog(log); }).catch(() => {});
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── 데이터 로드 ────────────────────────────────────────────────
   useEffect(() => {
@@ -1206,8 +1213,14 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
       {/* 별 생성 완료(isOwner) OR 공명 발생 OR Day 1 이상 중 하나 충족 시에만 표시 */}
       {(isOwner || resonancePeople.total > 0 || (detail.days_since_birth ?? 0) >= 1) && (
         <div style={{ marginBottom: 12 }}>
+          {travelLog && (
+            <div style={{ textAlign: 'center', fontSize: 12, color: 'rgba(91,200,192,0.75)', marginBottom: 8, lineHeight: 1.6 }}>
+              여수에서 이어가기 시작했어요 ✨<br />
+              <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11 }}>{travelLog.place} · {travelLog.emotion}</span>
+            </div>
+          )}
           <button
-            onClick={() => nav('/voyage-select')}
+            onClick={() => nav(`/voyage-select?starId=${id}`)}
             style={{
               width: '100%',
               padding: '14px 0',
