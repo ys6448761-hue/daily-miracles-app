@@ -134,6 +134,7 @@ function SealedView({ promiseId, openAt, locationName, auroraComment }) {
             width: 64, height: 64, borderRadius: '50%',
             background: 'radial-gradient(circle, #A78BFA 0%, rgba(167,139,250,0.25) 60%, transparent 100%)',
             margin: '0 auto 20px',
+            pointerEvents: 'none', // 글로우 레이어가 하위 버튼 터치 차단 방지
           }}
           animate={{ boxShadow: [
             '0 0 20px 8px rgba(167,139,250,0.4)',
@@ -179,12 +180,21 @@ function SealedView({ promiseId, openAt, locationName, auroraComment }) {
         <button onClick={copy} style={{ ...S.btn, fontSize: 14, padding: '13px 0', marginTop: 0 }}>
           {copied ? '링크 복사됨 ✓' : '기록 링크 복사하기'}
         </button>
-        <button onClick={() => nav(-1)} style={{
-          background: 'none', border: 'none', color: '#4A3A70',
-          fontSize: 12, cursor: 'pointer', marginTop: 16,
-          fontFamily: "'Noto Sans KR', sans-serif",
-          display: 'block', width: '100%', textAlign: 'center',
-        }}>← 돌아가기</button>
+        <button
+          onClick={() => {
+            // QR 직접 진입 시 history 없음 → nav(-1) 무시됨. 명시적 경로로 이동
+            if (window.history.length > 1) nav(-1);
+            else nav('/home');
+          }}
+          style={{
+            position: 'relative', zIndex: 10,
+            background: 'none', border: 'none', color: '#4A3A70',
+            fontSize: 12, cursor: 'pointer', marginTop: 16,
+            fontFamily: "'Noto Sans KR', sans-serif",
+            display: 'block', width: '100%', textAlign: 'center',
+            padding: '12px 0', // 터치 영역 확보
+          }}
+        >← 돌아가기</button>
       </motion.div>
     </div>
   );
