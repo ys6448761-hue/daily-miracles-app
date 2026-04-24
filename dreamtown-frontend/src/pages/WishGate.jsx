@@ -16,7 +16,8 @@ const GEMS = [
 export default function WishGate() {
   const nav = useNavigate();
   const location = useLocation();
-  const [wishText, setWishText] = useState('');
+  const prefillText = location.state?.prefillText ?? '';
+  const [wishText, setWishText] = useState(prefillText);
   const prevStarId = localStorage.getItem('dt_prev_star_id') || null;
 
   function handleCancel() {
@@ -166,7 +167,14 @@ export default function WishGate() {
           maxLength={200}
           className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white placeholder-white/30 resize-none h-36 focus:outline-none focus:border-dream-purple transition-colors"
         />
-        <p className="text-white/30 text-xs text-right mt-1">{wishText.length}/200</p>
+        <div className="flex items-center justify-between mt-1">
+          {prefillText ? (
+            <p className="text-white/30 text-xs">추가 입력은 선택 사항이에요</p>
+          ) : (
+            <span />
+          )}
+          <p className="text-white/30 text-xs">{wishText.length}/200</p>
+        </div>
       </motion.div>
 
       {/* 보석 선택 */}

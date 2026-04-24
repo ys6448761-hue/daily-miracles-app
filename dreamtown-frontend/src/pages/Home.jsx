@@ -21,6 +21,13 @@ const HERO_AURORA5 = {
   '그냥 흘러갔어요': '흘러가는 하루도,\n당신 안에서 천천히 쌓이고 있어요.',
 };
 
+const HERO_PREFILL = {
+  '조금 가벼웠어요': '오늘, 조금 가벼워진 그 마음을...',
+  '조금 지쳤어요':  '오늘, 조금 지쳤던 그 마음을...',
+  '조금 또렷했어요':'오늘, 조금 또렷해진 그 마음을...',
+  '그냥 흘러갔어요':'오늘, 그냥 흘러간 그 하루를...',
+};
+
 // ── 유틸 ──────────────────────────────────────────
 function calcDaysSinceBirth(createdAt) {
   if (!createdAt) return 1;
@@ -174,12 +181,15 @@ function HotStarCard({ star }) {
 
 // ── 히어로 섹션 ───────────────────────────────────
 function HeroSection({ myStarId, nav }) {
-  const [choice, setChoice]   = useState(null);
+  const [choice, setChoice]     = useState(null);
   const [resonance, setResonance] = useState(null);
+  const [showCta, setShowCta]   = useState(false);
 
   const handleChoice = (c) => {
+    setShowCta(false);
     setChoice(c);
-    setResonance(Math.floor(Math.random() * 16) + 5); // 5~20
+    setResonance(Math.floor(Math.random() * 16) + 5);
+    setTimeout(() => setShowCta(true), 500);
   };
 
   return (
@@ -252,21 +262,34 @@ function HeroSection({ myStarId, nav }) {
             <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.30)', marginBottom: 16 }}>
               {resonance}명이 오늘 같은 마음이에요
             </p>
+            <AnimatePresence>
+              {showCta && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <button
+                    onClick={() => nav('/wish?new=1', {
+                      state: { prefillText: HERO_PREFILL[choice] },
+                    })}
+                    style={{
+                      display: 'block', width: '100%',
+                      padding: '13px 0', borderRadius: 9999,
+                      background: 'linear-gradient(135deg, rgba(255,215,106,0.18) 0%, rgba(255,215,106,0.08) 100%)',
+                      border: '1px solid rgba(255,215,106,0.35)',
+                      color: '#FFD76A', fontSize: 14, fontWeight: 700,
+                      cursor: 'pointer', fontFamily: "'Noto Sans KR', sans-serif",
+                    }}
+                  >
+                    이 마음을 별로 남기기 →
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
             <button
-              onClick={() => nav('/wish')}
-              style={{
-                display: 'block', width: '100%',
-                padding: '13px 0', borderRadius: 9999,
-                background: 'linear-gradient(135deg, rgba(255,215,106,0.18) 0%, rgba(255,215,106,0.08) 100%)',
-                border: '1px solid rgba(255,215,106,0.35)',
-                color: '#FFD76A', fontSize: 14, fontWeight: 700,
-                cursor: 'pointer', fontFamily: "'Noto Sans KR', sans-serif",
-              }}
-            >
-              이 마음을 별로 남기기 →
-            </button>
-            <button
-              onClick={() => setChoice(null)}
+              onClick={() => { setChoice(null); setShowCta(false); }}
               style={{
                 display: 'block', width: '100%', marginTop: 8,
                 padding: '9px 0', borderRadius: 9999,
