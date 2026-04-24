@@ -1037,7 +1037,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
                   letterSpacing: '0.01em',
                 }}
               >
-                {myStarId ? '내 별에도 이 마음 더하기 →' : '나도 별 하나 남기기 →'}
+                {myStarId ? '이 마음, 내 별에도 닿게 하기 →' : '나도 별 하나 남기기 →'}
               </button>
             </motion.div>
           )}
