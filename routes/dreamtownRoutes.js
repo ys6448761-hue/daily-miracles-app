@@ -637,7 +637,7 @@ router.post('/resonance', async (req, res) => {
     // star_logs 기록 (42703 또는 star_logs 미존재 방어)
     try {
       await db.query(
-        `INSERT INTO star_logs (star_id, action_type) VALUES ($1, 'resonance')`,
+        `INSERT INTO star_logs (star_id, action_type, message) VALUES ($1, 'resonance', '마음이 닿았어요 ✨')`,
         [starId]
       );
     } catch (logErr) {
@@ -651,8 +651,8 @@ router.post('/resonance', async (req, res) => {
       const requestId = crypto.randomUUID();
       try {
         await db.query(
-          `INSERT INTO star_logs (star_id, action_type, payload)
-           VALUES ($1, 'star_resonance_level_up', $2::jsonb)`,
+          `INSERT INTO star_logs (star_id, action_type, payload, message)
+           VALUES ($1, 'star_resonance_level_up', $2::jsonb, $3)`,
           [starId, JSON.stringify({
             star_id:         starId,
             previous_level:  prevLevel,
@@ -660,7 +660,7 @@ router.post('/resonance', async (req, res) => {
             resonance_count: newCount,
             request_id:      requestId,
             timestamp:       new Date().toISOString(),
-          })]
+          }), `${newCount}명의 마음이 함께했어요 ⭐`]
         );
       } catch (logErr) {
         console.warn('[DT] level_up log skipped (migration pending?):', logErr.message);
@@ -2069,6 +2069,67 @@ router.get('/stars/:id/similar', async (req, res) => {
     res.json({ stars: rows });
   } catch (err) {
     console.error('[DT] GET /stars/:id/similar error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────
+// GET /api/dt/stars/:id/logs  — "이 별의 흐름" 타임라인
+// POST /api/dt/stars/:id/logs — 클라이언트 이벤트 기록
+// ─────────────────────────────────────────────
+function deriveLogMessage(log) {
+  switch (log.action_type) {
+    case 'resonance':             return '마음이 닿았어요 ✨';
+    case 'record':                return '이 마음이 기록되었어요 🌙';
+    case 'connected':             return '마음이 이어졌어요 🌙';
+    case 'star_resonance_level_up': {
+      const count = log.payload?.resonance_count;
+      return count ? `${count}명의 마음이 함께했어요 ⭐` : '많은 마음이 함께했어요 ⭐';
+    }
+    default: return '이 별에 마음이 닿았어요 ✨';
+  }
+}
+
+router.get('/stars/:id/logs', async (req, res) => {
+  try {
+    const { id }  = req.params;
+    const limit   = Math.min(parseInt(req.query.limit ?? 20, 10), 50);
+    const { rows } = await db.query(
+      `SELECT id, action_type, message, payload, created_at
+         FROM star_logs
+        WHERE star_id = $1
+        ORDER BY created_at DESC
+        LIMIT $2`,
+      [id, limit]
+    );
+    const logs = rows.map(r => ({
+      id:          r.id,
+      action_type: r.action_type,
+      message:     r.message ?? deriveLogMessage(r),
+      created_at:  r.created_at,
+    }));
+    res.json({ logs });
+  } catch (err) {
+    console.error('[DT] GET /stars/:id/logs error:', err.message);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.post('/stars/:id/logs', async (req, res) => {
+  try {
+    const { id }  = req.params;
+    const { action_type = 'connected', message } = req.body;
+    const ALLOWED = ['resonance', 'record', 'connected'];
+    if (!ALLOWED.includes(action_type)) {
+      return res.status(400).json({ error: 'invalid action_type' });
+    }
+    await db.query(
+      `INSERT INTO star_logs (star_id, action_type, message) VALUES ($1, $2, $3)`,
+      [id, action_type, message ?? null]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[DT] POST /stars/:id/logs error:', err.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

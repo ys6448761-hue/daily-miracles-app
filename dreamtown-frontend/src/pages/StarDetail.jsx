@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStarDetail, getStar, getResonance, postVoyageLog, postDtResonance, getSimilarStars, getRelatedStars, getResonancePeople, logUserEvent, getOrCreateUserId, getTravelLog, postNextDayHeart, getNextDayHeart } from '../api/dreamtown.js';
+import { getStarDetail, getStar, getResonance, postVoyageLog, postDtResonance, getSimilarStars, getRelatedStars, getResonancePeople, logUserEvent, getOrCreateUserId, getTravelLog, postNextDayHeart, getNextDayHeart, getStarLogs, postStarLog } from '../api/dreamtown.js';
 import MilestoneBar from '../components/MilestoneBar';
 import { gaResonanceCreated, gaResonanceClick, gaResonanceSuccess, gaResonanceCTAClick, gaSimilarStarClick, gaSquareFallbackClick, gaSimularStarsEmptyView } from '../utils/gtag';
 import { readSavedStar } from '../lib/utils/starSession.js';
@@ -187,6 +187,17 @@ function avatarColor(userId) {
 }
 
 // ── 유틸 ────────────────────────────────────────────────────────
+function formatLogTime(createdAt) {
+  const diff = Date.now() - new Date(createdAt).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return '방금';
+  if (mins < 60) return `${mins}분 전`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}시간 전`;
+  const d = new Date(createdAt);
+  return `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+}
+
 function calcDaysSinceBirth(createdAt) {
   if (!createdAt) return 1;
   return Math.max(
@@ -335,6 +346,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   const [showSharedIntro] = useState(false); // 새 감정 랜딩으로 대체됨
   const [viralClicked, setViralClicked] = useState(false);
   const [galaxyResonated, setGalaxyResonated] = useState({}); // { [starId]: { done, count } }
+  const [starLogs, setStarLogs]               = useState([]);
   const [detailRevealed, setDetailRevealed] = useState(() => {
     if (typeof window === 'undefined') return true;
     if (!window.location.search.includes('source=share')) return true;
@@ -383,6 +395,12 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
     if (!id || !isOwner) return;
     getNextDayHeart(id).then(({ heart }) => { if (heart) setNextDayHeart(heart); }).catch(() => {});
   }, [id, isOwner]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── 이 별의 흐름 로그 로드 ────────────────────────────────────
+  useEffect(() => {
+    if (!id) return;
+    getStarLogs(id).then(({ logs }) => setStarLogs(logs ?? [])).catch(() => {});
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── 데이터 로드 ────────────────────────────────────────────────
   useEffect(() => {
@@ -1017,6 +1035,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
                 onClick={() => {
                   if (myStarId) {
                     logUserEvent({ userId: getOrCreateUserId(), eventType: 'viral_add_to_star_clicked', metadata: { star_id: id, my_star_id: myStarId } });
+                    postStarLog(id, { action_type: 'connected', message: '마음이 이어졌어요 🌙' });
                     nav(`/my-star/${myStarId}`);
                   } else {
                     logUserEvent({ userId: getOrCreateUserId(), eventType: 'viral_make_star_clicked', metadata: { star_id: id } });
@@ -1497,7 +1516,66 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
         </div>
       )}
 
-      {/* ⑨ 이 별의 마음 전하기 (공유) */}
+      {/* ⑨ 이 별의 흐름 (타임라인) */}
+      {starLogs.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+          style={{ marginBottom: 24 }}
+        >
+          <p style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,215,106,0.72)', marginBottom: 14, textAlign: 'center' }}>
+            이 별의 흐름
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+            {starLogs.map((log, i) => (
+              <div
+                key={log.id ?? i}
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 12,
+                  paddingBottom: i < starLogs.length - 1 ? 14 : 0,
+                  position: 'relative',
+                }}
+              >
+                {/* 타임라인 라인 */}
+                {i < starLogs.length - 1 && (
+                  <div style={{
+                    position: 'absolute',
+                    left: 7,
+                    top: 18,
+                    bottom: 0,
+                    width: 1,
+                    background: 'rgba(255,255,255,0.08)',
+                  }} />
+                )}
+                {/* 도트 */}
+                <div style={{
+                  width: 15, height: 15, borderRadius: '50%', flexShrink: 0, marginTop: 2,
+                  background: log.action_type === 'star_resonance_level_up'
+                    ? 'rgba(255,215,106,0.55)'
+                    : log.action_type === 'connected'
+                      ? 'rgba(155,135,245,0.55)'
+                      : 'rgba(255,255,255,0.18)',
+                  border: '2px solid rgba(255,255,255,0.10)',
+                }} />
+                {/* 내용 */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.68)', lineHeight: 1.5, marginBottom: 2 }}>
+                    {log.message}
+                  </p>
+                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>
+                    {formatLogTime(log.created_at)}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+      {/* ⑩ 이 별의 마음 전하기 (공유) */}
       <div style={{ marginBottom: 12 }}>
         <button
           onClick={handleShare}

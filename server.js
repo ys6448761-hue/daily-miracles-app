@@ -1398,6 +1398,8 @@ app.post("/api/admin/run-migration", adminTokenGuard, async (req, res) => {
     "141",
     // 다음날의 마음
     "142",
+    // star_logs 타임라인: message 컬럼 + CHECK 제약 확장
+    "143",
   ];
 
   if (!migration || !allowed.includes(migration)) {

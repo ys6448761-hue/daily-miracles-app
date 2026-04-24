@@ -153,6 +153,24 @@ export async function getResonancePeople(starId) {
   }
 }
 
+export async function getStarLogs(starId) {
+  try {
+    const res = await fetch(`${BASE}/stars/${encodeURIComponent(starId)}/logs`);
+    if (!res.ok) return { logs: [] };
+    return res.json();
+  } catch { return { logs: [] }; }
+}
+
+export async function postStarLog(starId, { action_type = 'connected', message }) {
+  try {
+    await fetch(`${BASE}/stars/${encodeURIComponent(starId)}/logs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action_type, message }),
+    });
+  } catch (_) {}
+}
+
 export async function getRelatedStars(starId, galaxy = null) {
   const qs  = galaxy ? `?galaxy=${encodeURIComponent(galaxy)}&limit=5` : '';
   const res = await fetch(`${BASE}/stars/${encodeURIComponent(starId)}/similar${qs}`);
