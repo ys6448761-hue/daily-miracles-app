@@ -153,8 +153,9 @@ export async function getResonancePeople(starId) {
   }
 }
 
-export async function getRelatedStars(starId) {
-  const res = await fetch(`${BASE}/stars/${encodeURIComponent(starId)}/similar`);
+export async function getRelatedStars(starId, galaxy = null) {
+  const qs  = galaxy ? `?galaxy=${encodeURIComponent(galaxy)}&limit=5` : '';
+  const res = await fetch(`${BASE}/stars/${encodeURIComponent(starId)}/similar${qs}`);
   if (!res.ok) return { stars: [] };
   return res.json();
 }

@@ -2029,23 +2029,43 @@ router.get('/stars/:id/journey-story', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-// GET /api/dt/stars/:id/similar — 추천 별 (랜덤 MVP)
-// wish_text + wish_emotion 포함, 현재 별 제외
+// GET /api/dt/stars/:id/similar — 추천 별 (galaxy 필터 지원)
+// ?galaxy=healing  → 동일 은하 기반, wish_emotion 있는 별만
+// ?galaxy 없음     → 랜덤 fallback
 // ─────────────────────────────────────────────
 router.get('/stars/:id/similar', async (req, res) => {
   try {
-    const { id } = req.params;
-    const limit = Math.min(parseInt(req.query.limit ?? 3, 10), 6);
-    const { rows } = await db.query(
-      `SELECT s.id AS star_id, s.star_name, w.wish_text, w.wish_emotion
-         FROM dt_stars s
-         JOIN dt_wishes w ON w.id = s.wish_id
-        WHERE s.id != $1
-          AND w.wish_text IS NOT NULL
-        ORDER BY RANDOM()
-        LIMIT $2`,
-      [id, limit]
-    );
+    const { id }   = req.params;
+    const limit    = Math.min(parseInt(req.query.limit ?? 5, 10), 6);
+    const galaxy   = req.query.galaxy ?? null;
+
+    let rows;
+    if (galaxy) {
+      ({ rows } = await db.query(
+        `SELECT s.id AS star_id, s.star_name, w.wish_text, w.wish_emotion,
+                g.code AS galaxy_code, g.name_ko AS galaxy_name_ko
+           FROM dt_stars s
+           JOIN dt_wishes w ON w.id = s.wish_id
+           JOIN dt_galaxies g ON g.id = s.galaxy_id
+          WHERE s.id != $1
+            AND g.code = $2
+            AND w.wish_emotion IS NOT NULL
+          ORDER BY RANDOM()
+          LIMIT $3`,
+        [id, galaxy, limit]
+      ));
+    } else {
+      ({ rows } = await db.query(
+        `SELECT s.id AS star_id, s.star_name, w.wish_text, w.wish_emotion
+           FROM dt_stars s
+           JOIN dt_wishes w ON w.id = s.wish_id
+          WHERE s.id != $1
+            AND w.wish_text IS NOT NULL
+          ORDER BY RANDOM()
+          LIMIT $2`,
+        [id, limit]
+      ));
+    }
     res.json({ stars: rows });
   } catch (err) {
     console.error('[DT] GET /stars/:id/similar error:', err.message);

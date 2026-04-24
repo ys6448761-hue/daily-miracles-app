@@ -162,6 +162,15 @@ function saveResonanceHistory(starId, starName) {
   } catch (_) {}
 }
 
+// 은하 → 별자리 이름 (비슷한 별 섹션용)
+const GALAXY_CONSTELLATION = {
+  growth:       '성장의 별자리',
+  challenge:    '도전의 별자리',
+  healing:      '치유의 별자리',
+  relationship: '관계의 별자리',
+  miracle:      '기적의 별자리',
+};
+
 // 은하 → 감정 선택 매핑 (별 생성 CTA prefill 용)
 const GALAXY_TO_EMOTION = {
   growth:       'hopeful',
@@ -325,6 +334,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   const [resonancePeople, setResonancePeople] = useState({ people: [], total: 0 }); // 공명 참여자
   const [showSharedIntro] = useState(false); // 새 감정 랜딩으로 대체됨
   const [viralClicked, setViralClicked] = useState(false);
+  const [galaxyResonated, setGalaxyResonated] = useState({}); // { [starId]: { done, count } }
   const [detailRevealed, setDetailRevealed] = useState(() => {
     if (typeof window === 'undefined') return true;
     if (!window.location.search.includes('source=share')) return true;
@@ -383,6 +393,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
         if (isOwner) {
           const d = await getStarDetail(id);
           setDetail(d);
+          getRelatedStars(id, d.galaxy?.code ?? null).then(r => setRelatedStars(r.stars ?? [])).catch(() => {});
         } else {
           // resonance/public — 소원 원문·항해기록 fetch 금지
           const star = await getStar(id);
@@ -408,6 +419,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
             wish_text:        star.wish_text ?? null,
             wish_emotion:     star.wish_emotion ?? null,
           });
+          getRelatedStars(id, star.galaxy?.code ?? null).then(r => setRelatedStars(r.stars ?? [])).catch(() => {});
         }
       } catch (_) { /* detail null → 에러 화면 */ }
       setLoading(false);
@@ -419,7 +431,6 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
       setMiracleCount(impacts.find(i => i.type === 'miracle')?.count ?? 0);
       setWisdomCount(impacts.find(i => i.type === 'wisdom')?.count  ?? 0);
     }).catch(() => {});
-    getRelatedStars(id).then(r => setRelatedStars(r.stars ?? [])).catch(() => {});
     getResonancePeople(id).then(r => setResonancePeople(r)).catch(() => {});
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -435,6 +446,18 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   const isInviteEntry = typeof window !== 'undefined' && window.location.search.includes('entry=invite');
   const isShareEntry  = typeof window !== 'undefined' && window.location.search.includes('source=share');
   const showLanding   = isShareEntry && canResonate && !detailRevealed;
+
+  // ── 비슷한 별 공명 핸들러 ──────────────────────────────────────
+  async function handleSimilarResonance(targetStarId) {
+    if (galaxyResonated[targetStarId]?.done) return;
+    setGalaxyResonated(prev => ({ ...prev, [targetStarId]: { done: true, count: 0 } }));
+    try {
+      const r = await postDtResonance({ starId: targetStarId, type: 'miracle' });
+      const total = (r.miracleCount ?? 1) + (r.wisdomCount ?? 0);
+      setGalaxyResonated(prev => ({ ...prev, [targetStarId]: { done: true, count: total } }));
+      logUserEvent({ userId: getOrCreateUserId(), eventType: 'similar_star_resonance', metadata: { from_star_id: id, to_star_id: targetStarId } });
+    } catch (_) {}
+  }
 
   // ── 공유 핸들러 ────────────────────────────────────────────────
   const SHARE_LEVEL_MSG = [
@@ -1376,42 +1399,72 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
         </div>
       )}
 
-      {/* ⑧ 이런 마음의 별도 있어요 */}
-      {relatedStars.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-          style={{ marginTop: 28, marginBottom: 8 }}
-        >
-          <p style={{ fontSize: 13, color: 'rgba(255,215,106,0.65)', marginBottom: 12, textAlign: 'center', letterSpacing: '0.01em' }}>
-            ✨ 이런 마음의 별도 있어요
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {relatedStars.map(s => (
-              <button
-                key={s.star_id}
-                onClick={() => nav(`/my-star/${s.star_id}`)}
-                style={{
-                  display: 'block', width: '100%', textAlign: 'left',
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: 12, padding: '12px 14px', cursor: 'pointer',
-                }}
-              >
-                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.80)', marginBottom: s.wish_emotion ? 4 : 0, lineHeight: 1.5 }}>
-                  {s.wish_text?.length > 50 ? s.wish_text.slice(0, 50) + '…' : s.wish_text}
-                </p>
-                {s.wish_emotion && (
-                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.38)', lineHeight: 1.5 }}>
-                    {s.wish_emotion}
-                  </p>
-                )}
-              </button>
-            ))}
-          </div>
-        </motion.div>
-      )}
+      {/* ⑧ 비슷한 별 — 동일 은하 기반 */}
+      {relatedStars.length > 0 && (() => {
+        const galaxyCode    = detail.galaxy?.code;
+        const constellation = GALAXY_CONSTELLATION[galaxyCode] ?? '이 별자리';
+        const ownerLabel    = isOwner ? '당신의' : '이';
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            style={{ marginTop: 32, marginBottom: 8 }}
+          >
+            <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,215,106,0.80)', marginBottom: 4, textAlign: 'center' }}>
+              이 별과 닮은 마음들이 있어요 ✨
+            </p>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.28)', marginBottom: 16, textAlign: 'center', lineHeight: 1.6 }}>
+              {ownerLabel} 별은, {constellation}와 연결되어 있어요 ✨
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {relatedStars.map((s, i) => {
+                const res = galaxyResonated[s.star_id];
+                return (
+                  <motion.div
+                    key={s.star_id ?? i}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 + i * 0.08, duration: 0.4 }}
+                    style={{
+                      padding: '14px 16px',
+                      borderRadius: 16,
+                      background: res?.done ? 'rgba(255,215,106,0.07)' : 'rgba(255,255,255,0.04)',
+                      border: `1px solid ${res?.done ? 'rgba(255,215,106,0.22)' : 'rgba(255,255,255,0.08)'}`,
+                      transition: 'background 0.35s, border 0.35s',
+                    }}
+                  >
+                    <p style={{
+                      fontSize: 13, color: 'rgba(255,255,255,0.68)',
+                      marginBottom: 12, lineHeight: 1.65,
+                    }}>
+                      {s.wish_emotion || (s.wish_text?.length > 45 ? s.wish_text.slice(0, 45) + '…' : s.wish_text) || '이 마음은 아직 말을 찾고 있어요'}
+                    </p>
+                    {!res?.done ? (
+                      <button
+                        onClick={() => handleSimilarResonance(s.star_id)}
+                        style={{
+                          width: '100%', padding: '10px 0', borderRadius: 9999,
+                          background: 'rgba(255,215,106,0.10)',
+                          border: '1px solid rgba(255,215,106,0.32)',
+                          color: '#FFD76A', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                          transition: 'background 0.2s',
+                        }}
+                      >
+                        나도 이 마음이에요
+                      </button>
+                    ) : (
+                      <p style={{ fontSize: 12, color: 'rgba(255,215,106,0.72)', textAlign: 'center', lineHeight: 1.5 }}>
+                        지금 이 순간, {res.count > 0 ? `${res.count}명이 같은 마음을 느꼈어요` : '마음이 닿았어요'} ✨
+                      </p>
+                    )}
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
+        );
+      })()}
 
       {/* ── 🌊 공개 항해 장면 (visibility=public 일 때만) ── */}
       {detail.journey_visibility === 'public' && detail.journey_origin_public && (
