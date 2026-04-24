@@ -7,8 +7,23 @@ import { gaDtShareSuccess } from './gtag';
 
 const DREAMTOWN_URL = 'https://app.dailymiracles.kr/dreamtown?entry=invite';
 const OG_IMAGE_URL  = 'https://app.dailymiracles.kr/images/dreamtown-og-v4.jpg';
-// 별 공유 전용 OG 이미지 — public/og-star.png 로 교체 시 아래 URL 변경
-const STAR_OG_IMAGE = 'https://app.dailymiracles.kr/images/dreamtown-og-v4.jpg';
+
+// ── 별 공유 썸네일 3종 (public/og/) ───────────────────────────────────────
+const BASE = 'https://app.dailymiracles.kr/og';
+const STAR_THUMBNAILS = {
+  courage: `${BASE}/star-courage.png`, // 보라 — 용기/도전/꿈
+  rest:    `${BASE}/star-rest.png`,    // 청록 — 쉬고 싶음/지침/힐링
+  clarity: `${BASE}/star-clarity.png`, // 금빛 — 정리/결심/감사
+};
+
+// wish_text 키워드 → 썸네일 자동 매칭
+function pickStarThumbnail(wishText = '') {
+  const t = wishText;
+  if (/용기|도전|두렵|무서|겁나|꿈|열고|시작|시작하|바꾸|이루|성공|취업|직장/.test(t)) return STAR_THUMBNAILS.courage;
+  if (/쉬|쉽|힘들|지쳐|지침|아프|아파|회복|혼자|외로|힐링|여행|떠나|바다|카페|여유/.test(t)) return STAR_THUMBNAILS.rest;
+  if (/정리|결심|감사|고마|가족|관계|사랑|고백|연인|행복|건강|소중|감사/.test(t)) return STAR_THUMBNAILS.clarity;
+  return STAR_THUMBNAILS.courage; // 기본값
+}
 
 export function initKakao() {
   if (!window.Kakao) {
@@ -88,7 +103,8 @@ export function shareStarBirth({ starId, starName = '나의 별', wishText = '' 
  * @param {{ starId: string, wishText: string }} params
  */
 export function shareStarDetail({ starId, wishText = '' }) {
-  const starUrl = `https://app.dailymiracles.kr/star/${starId}`;
+  const starUrl   = `https://app.dailymiracles.kr/star/${starId}`;
+  const thumbnail = pickStarThumbnail(wishText);
   const truncated = wishText.length > 40 ? wishText.slice(0, 40) + '…' : wishText;
   const desc = truncated
     ? `"${truncated}"\n이 순간이 별로 남았습니다. 함께 이어가볼까요?`
@@ -102,7 +118,7 @@ export function shareStarDetail({ starId, wishText = '' }) {
       content: {
         title:       '여수에서 시작된 하나의 마음 ✨',
         description: desc,
-        imageUrl:    STAR_OG_IMAGE,
+        imageUrl:    thumbnail,
         link: {
           mobileWebUrl: starUrl,
           webUrl:       starUrl,
