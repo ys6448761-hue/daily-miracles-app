@@ -173,7 +173,7 @@ function HotelCard({ hotel, index }) {
           color: hotel.accent,
         }}
       >
-        전화로 이어가기 →
+        이곳에서 이어가기 →
       </button>
     </motion.div>
   );
