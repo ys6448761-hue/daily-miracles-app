@@ -6,6 +6,7 @@ import MilestoneBar from '../components/MilestoneBar';
 import { gaResonanceCreated, gaResonanceClick, gaResonanceSuccess, gaResonanceCTAClick, gaSimilarStarClick, gaSquareFallbackClick, gaSimularStarsEmptyView } from '../utils/gtag';
 import { readSavedStar } from '../lib/utils/starSession.js';
 import { generateResonanceHint } from '../utils/resonanceHint.js';
+import { shareStarDetail } from '../utils/kakaoShare.js';
 
 // ── 스타일 상수 ──────────────────────────────────────────────────
 const GALAXY_STYLE = {
@@ -253,7 +254,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   const [storyOpen, setStoryOpen]       = useState(false);       // 이야기 영역 토글
   const [toastMsg, setToastMsg]         = useState(null);        // 공명 즉시 토스트
   const [relatedStars, setRelatedStars] = useState([]);          // 하단 추천 별
-  const [shareCopied, setShareCopied]   = useState(false);       // 공유 링크 복사 완료
+  const [shareCopied, setShareCopied]   = useState(false);       // fallback 복사 완료 (Kakao 미지원 환경)
   const [showStayMsg, setShowStayMsg]   = useState(false);       // 머물기 상태 메시지
   const [resonancePeople, setResonancePeople] = useState({ people: [], total: 0 }); // 공명 참여자
   const [showSharedIntro, setShowSharedIntro] = useState(() => {
@@ -346,31 +347,12 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
     '많은 마음이 모인 별이에요',
   ];
 
-  async function handleShare() {
-    const level = getResonanceLevel(miracleCount + wisdomCount);
-    const levelMsg = SHARE_LEVEL_MSG[level] ?? SHARE_LEVEL_MSG[0];
-    const url = `${window.location.origin}/star/${id}?source=share`;
-    const parts = [
-      detail.wish_text    ? `"${detail.wish_text}"`  : null,
-      detail.wish_emotion ?? null,
-      levelMsg,
-      '',
-      '하루하루의 기적 DreamTown',
-      url,
-    ].filter(Boolean);
-    const text = parts.join('\n');
-
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: detail.star_name, text, url });
-      } catch (_) {}
-    } else {
-      try {
-        await navigator.clipboard.writeText(text);
-        setShareCopied(true);
-        setTimeout(() => setShareCopied(false), 2000);
-      } catch (_) {}
-    }
+  function handleShare() {
+    shareStarDetail({
+      starId:   id,
+      starName: detail.star_name  ?? '나의 별',
+      wishText: detail.wish_text  ?? '',
+    });
   }
 
   function showResonanceToast(type) {
@@ -1146,7 +1128,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
             transition: 'background 0.15s',
           }}
         >
-          이 별의 마음 전하기 ↗
+          카카오로 이 별 공유하기
         </button>
         {shareCopied && (
           <p style={{ marginTop: 8, fontSize: 12, color: 'rgba(255,255,255,0.45)', textAlign: 'center' }}>
