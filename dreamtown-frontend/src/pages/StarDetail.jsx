@@ -1157,26 +1157,29 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
         )}
       </div>
 
-      {/* ── 여수에서 이어가기 (앱 전용 — QR 흐름에는 미노출) ── */}
-      <div style={{ marginBottom: 12 }}>
-        <button
-          onClick={() => nav('/voyage-select')}
-          style={{
-            width: '100%',
-            padding: '14px 0',
-            borderRadius: 9999,
-            background: 'rgba(91,200,192,0.07)',
-            border: '1px solid rgba(91,200,192,0.22)',
-            color: '#5BC8C0',
-            fontSize: 14,
-            fontWeight: 600,
-            cursor: 'pointer',
-            fontFamily: "'Noto Sans KR', sans-serif",
-          }}
-        >
-          여수에서 이어가기 →
-        </button>
-      </div>
+      {/* ── 여수에서 이어가기 — 조건부 노출 ── */}
+      {/* 별 생성 완료(isOwner) OR 공명 발생 OR Day 1 이상 중 하나 충족 시에만 표시 */}
+      {(isOwner || resonancePeople.total > 0 || (detail.days_since_birth ?? 0) >= 1) && (
+        <div style={{ marginBottom: 12 }}>
+          <button
+            onClick={() => nav('/voyage-select')}
+            style={{
+              width: '100%',
+              padding: '14px 0',
+              borderRadius: 9999,
+              background: 'rgba(91,200,192,0.07)',
+              border: '1px solid rgba(91,200,192,0.22)',
+              color: '#5BC8C0',
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontFamily: "'Noto Sans KR', sans-serif",
+            }}
+          >
+            이 마음을, 여수에서 이어가 볼까요?
+          </button>
+        </div>
+      )}
 
       {/* ⑩ 광장 복귀 */}
       <div className="mt-2 mb-4">
