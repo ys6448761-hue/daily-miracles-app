@@ -2,7 +2,15 @@
  * kakaoShare — 카카오 SDK 공유 유틸
  *
  * 환경변수: VITE_KAKAO_JS_KEY (Render 대시보드에서 설정)
+ *
+ * KAKAO_ENABLED: Kakao Developers 플랫폼 도메인 등록 + JS Key 검증 완료 후 true로 변경
+ *   체크리스트:
+ *   1. https://developers.kakao.com → 내 앱 → 플랫폼 → Web → https://app.dailymiracles.kr 등록
+ *   2. 앱 키 → JavaScript 키 복사 (REST API 키 아님)
+ *   3. Render 환경변수 VITE_KAKAO_JS_KEY = 위 JS 키
  */
+const KAKAO_ENABLED = false;
+
 import { gaDtShareSuccess } from './gtag';
 
 const DREAMTOWN_URL = 'https://app.dailymiracles.kr/dreamtown?entry=invite';
@@ -26,6 +34,10 @@ function pickStarThumbnail(wishText = '') {
 }
 
 export function initKakao() {
+  if (!KAKAO_ENABLED) {
+    console.info('[Kakao] 비활성 (KAKAO_ENABLED=false) — navigator.share/clipboard fallback 사용');
+    return false;
+  }
   if (!window.Kakao) {
     console.error('[Kakao] ❌ window.Kakao 없음 — CDN 스크립트 로드 실패. index.html <script> 태그 확인');
     return false;

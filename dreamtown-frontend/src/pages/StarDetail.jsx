@@ -365,14 +365,25 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
 
   async function handleShare() {
     const starUrl = `https://app.dailymiracles.kr/star/${id}`;
-    // 클립보드 복사 항상 먼저 — 카카오 auth 실패 시에도 링크 확보
-    try {
-      await navigator.clipboard.writeText(starUrl);
-      setShareCopied(true);
-      setTimeout(() => setShareCopied(false), 3000);
-    } catch (_) {}
-    // 카카오 공유도 병행 시도 (실패해도 링크는 복사됨)
-    shareStarDetail({ starId: id, wishText: detail.wish_text ?? '' });
+    const truncated = (detail.wish_text ?? '').slice(0, 40);
+    const shareText = truncated ? `"${truncated}"` : '이 순간이 별로 남았습니다.';
+
+    // navigator.share (모바일 시스템 공유 시트)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: '여수에서 시작된 하나의 마음 ✨',
+          text:  shareText,
+          url:   starUrl,
+        });
+        return; // 사용자가 공유 완료 — 토스트 불필요
+      } catch (_) { /* 취소 또는 지원 안 함 → clipboard fallback */ }
+    }
+
+    // clipboard fallback
+    try { await navigator.clipboard.writeText(starUrl); } catch (_) {}
+    setShareCopied(true);
+    setTimeout(() => setShareCopied(false), 3000);
   }
 
   function showResonanceToast(type) {
