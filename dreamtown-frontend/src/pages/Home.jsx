@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getRecentStars, getStar, getFeaturedStars, getTrendingStars, getTopTodayStars } from '../api/dreamtown.js';
 import { readSavedStar } from '../lib/utils/starSession.js';
 
+// ── 상수 ──────────────────────────────────────────
 const GALAXY_STYLE = {
   growth:       { label: '성장 은하', cls: 'bg-blue-500/20 text-blue-300' },
   challenge:    { label: '도전 은하', cls: 'bg-orange-500/20 text-orange-300' },
@@ -10,17 +12,35 @@ const GALAXY_STYLE = {
   relationship: { label: '관계 은하', cls: 'bg-pink-500/20 text-pink-300' },
 };
 
+const HERO_CHOICES = ['조금 가벼웠어요', '조금 지쳤어요', '조금 또렷했어요', '그냥 흘러갔어요'];
+
+const HERO_AURORA5 = {
+  '조금 가벼웠어요':  '가벼워진 마음이,\n이미 변화의 시작이에요.',
+  '조금 지쳤어요':   '지쳐있다는 걸 알아챈 것만으로도,\n이미 돌아봄이 시작됐어요.',
+  '조금 또렷했어요': '또렷한 마음은,\n이미 방향을 찾고 있어요.',
+  '그냥 흘러갔어요': '흘러가는 하루도,\n당신 안에서 천천히 쌓이고 있어요.',
+};
+
+// ── 유틸 ──────────────────────────────────────────
 function calcDaysSinceBirth(createdAt) {
   if (!createdAt) return 1;
   return Math.max(1, Math.floor((Date.now() - new Date(createdAt).getTime()) / 86400000) + 1);
 }
 
-// ── 내 별 카드 ────────────────────────────────────
+function resonanceLabel(count) {
+  if (count === 0) return null;
+  if (count === 1) return '한 마음';
+  if (count <= 4)  return `${count}개 마음`;
+  if (count <= 10) return '따뜻한 마음들';
+  return '많은 마음';
+}
+
+// ── 서브 컴포넌트 ─────────────────────────────────
+
 function MyStarCard({ star, isNew, nav }) {
   if (!star || !star.star_id) return null;
   const daysSince = calcDaysSinceBirth(star.created_at);
   const galaxy = GALAXY_STYLE[star.galaxy_code] ?? { label: star.galaxy_name_ko ?? '미지의 은하', cls: 'bg-white/10 text-white/50' };
-
   return (
     <div className="relative mb-4">
       {isNew && (
@@ -49,12 +69,10 @@ function MyStarCard({ star, isNew, nav }) {
   );
 }
 
-// ── 광장 별 카드 (compact) ──────────────────────
 function StarItem({ star }) {
   if (!star || !star.star_id) return null;
   const daysSince = calcDaysSinceBirth(star.created_at);
   const galaxy = GALAXY_STYLE[star.galaxy_code] ?? { label: star.galaxy_name_ko ?? '미지의 은하', cls: 'bg-white/10 text-white/50' };
-
   return (
     <Link
       to={`/star/${star.star_id}`}
@@ -72,16 +90,6 @@ function StarItem({ star }) {
   );
 }
 
-// ── 공명 수 → 짧은 감정 레이블 ─────────────────────
-function resonanceLabel(count) {
-  if (count === 0) return null;
-  if (count === 1) return '한 마음';
-  if (count <= 4)  return `${count}개 마음`;
-  if (count <= 10) return '따뜻한 마음들';
-  return '많은 마음';
-}
-
-// ── 오늘 Top 별 카드 (유니크 공명 깊이 기준) ─────────
 const TOP_RANK_STYLE = [
   { border: 'rgba(255,215,106,0.35)', bg: 'rgba(255,215,106,0.07)', badge: '#FFD76A' },
   { border: 'rgba(255,255,255,0.15)', bg: 'rgba(255,255,255,0.04)', badge: 'rgba(255,255,255,0.45)' },
@@ -119,16 +127,12 @@ function TopTodayStarCard({ star, rank }) {
   );
 }
 
-// ── 트렌딩 별 카드 (최근 30분 공명 활발) ─────────────
 function TrendingStarCard({ star }) {
   return (
     <Link
       to={`/star/${star.star_id}`}
-      className="block rounded-2xl p-4 cursor-pointer no-underline transition-colors hover:bg-white/8 active:bg-white/12"
-      style={{
-        background: 'rgba(155,135,245,0.06)',
-        border: '1px solid rgba(155,135,245,0.18)',
-      }}
+      className="block rounded-2xl p-4 cursor-pointer no-underline transition-colors hover:brightness-110"
+      style={{ background: 'rgba(155,135,245,0.06)', border: '1px solid rgba(155,135,245,0.18)' }}
     >
       <div className="flex items-start justify-between mb-1.5">
         <p className="text-white/85 text-sm font-semibold truncate mr-2">{star.star_name}</p>
@@ -136,9 +140,7 @@ function TrendingStarCard({ star }) {
           🔥 {star.recent_resonance}명
         </span>
       </div>
-      {star.wish_text && (
-        <p className="text-white/45 text-xs truncate mb-1">{star.wish_text}</p>
-      )}
+      {star.wish_text && <p className="text-white/45 text-xs truncate mb-1">{star.wish_text}</p>}
       {star.wish_emotion && (
         <p style={{ fontSize: 11, color: 'rgba(155,135,245,0.55)' }} className="truncate">
           {star.wish_emotion}
@@ -148,12 +150,10 @@ function TrendingStarCard({ star }) {
   );
 }
 
-// ── Hot 별 카드 (공명 가중 상위) ────────────────────
 function HotStarCard({ star }) {
   const daysSince = calcDaysSinceBirth(star.created_at);
   const galaxy    = GALAXY_STYLE[star.galaxy_code] ?? { label: star.galaxy_name_ko ?? '미지의 은하', cls: 'bg-white/10 text-white/50' };
   const label     = resonanceLabel(star.resonance_count ?? 0);
-
   return (
     <Link
       to={`/star/${star.star_id}`}
@@ -162,11 +162,7 @@ function HotStarCard({ star }) {
     >
       <div className="flex items-start justify-between mb-2">
         <p className="text-white/85 text-sm font-semibold truncate mr-2">{star.star_name}</p>
-        {label && (
-          <span style={{ fontSize: 11, color: 'rgba(255,215,106,0.75)', flexShrink: 0 }}>
-            ✨ {label}
-          </span>
-        )}
+        {label && <span style={{ fontSize: 11, color: 'rgba(255,215,106,0.75)', flexShrink: 0 }}>✨ {label}</span>}
       </div>
       <div className="flex gap-2 items-center">
         <span className={`text-xs px-2 py-0.5 rounded-full ${galaxy.cls}`}>{galaxy.label}</span>
@@ -176,18 +172,160 @@ function HotStarCard({ star }) {
   );
 }
 
+// ── 히어로 섹션 ───────────────────────────────────
+function HeroSection({ myStarId, nav }) {
+  const [choice, setChoice]   = useState(null);
+  const [resonance, setResonance] = useState(null);
+
+  const handleChoice = (c) => {
+    setChoice(c);
+    setResonance(Math.floor(Math.random() * 16) + 5); // 5~20
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45 }}
+      style={{
+        marginBottom: 20,
+        padding: '20px 18px',
+        borderRadius: 20,
+        background: 'rgba(255,255,255,0.03)',
+        border: '1px solid rgba(255,255,255,0.08)',
+      }}
+    >
+      <AnimatePresence mode="wait">
+        {!choice ? (
+          <motion.div
+            key="question"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+          >
+            <p style={{ fontSize: 10, color: 'rgba(255,215,106,0.55)', letterSpacing: '0.08em', marginBottom: 10 }}>
+              ✨ 오늘의 마음
+            </p>
+            <p style={{ fontSize: 16, fontWeight: 800, color: '#fff', lineHeight: 1.5, marginBottom: 16 }}>
+              오늘 하루, 가장 오래<br />남아있는 마음은 무엇인가요?
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {HERO_CHOICES.map(c => (
+                <button
+                  key={c}
+                  onClick={() => handleChoice(c)}
+                  style={{
+                    padding: '12px 16px', borderRadius: 12, textAlign: 'left',
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.10)',
+                    color: 'rgba(255,255,255,0.60)',
+                    fontSize: 14, cursor: 'pointer',
+                    fontFamily: "'Noto Sans KR', sans-serif",
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,215,106,0.08)'; e.currentTarget.style.borderColor = 'rgba(255,215,106,0.25)'; e.currentTarget.style.color = 'rgba(255,255,255,0.85)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)'; e.currentTarget.style.color = 'rgba(255,255,255,0.60)'; }}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="result"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35 }}
+          >
+            <p style={{ fontSize: 10, color: 'rgba(255,215,106,0.55)', letterSpacing: '0.08em', marginBottom: 8 }}>
+              ✨ Aurora5
+            </p>
+            <p style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,215,106,0.85)', marginBottom: 6 }}>
+              {choice}
+            </p>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.72)', lineHeight: 1.75, whiteSpace: 'pre-line', marginBottom: 12 }}>
+              {HERO_AURORA5[choice]}
+            </p>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.30)', marginBottom: 16 }}>
+              {resonance}명이 오늘 같은 마음이에요
+            </p>
+            <button
+              onClick={() => nav('/wish')}
+              style={{
+                display: 'block', width: '100%',
+                padding: '13px 0', borderRadius: 9999,
+                background: 'linear-gradient(135deg, rgba(255,215,106,0.18) 0%, rgba(255,215,106,0.08) 100%)',
+                border: '1px solid rgba(255,215,106,0.35)',
+                color: '#FFD76A', fontSize: 14, fontWeight: 700,
+                cursor: 'pointer', fontFamily: "'Noto Sans KR', sans-serif",
+              }}
+            >
+              이 마음을 별로 남기기 →
+            </button>
+            <button
+              onClick={() => setChoice(null)}
+              style={{
+                display: 'block', width: '100%', marginTop: 8,
+                padding: '9px 0', borderRadius: 9999,
+                background: 'transparent', border: 'none',
+                color: 'rgba(255,255,255,0.25)', fontSize: 12, cursor: 'pointer',
+                fontFamily: "'Noto Sans KR', sans-serif",
+              }}
+            >
+              다시 선택하기
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
+// ── 여행 연결 섹션 ────────────────────────────────
+function TravelSection({ myStarId, nav }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.15, duration: 0.4 }}
+      style={{
+        marginBottom: 16,
+        padding: '16px 18px',
+        borderRadius: 18,
+        background: 'rgba(91,200,192,0.06)',
+        border: '1px solid rgba(91,200,192,0.18)',
+        cursor: 'pointer',
+      }}
+      onClick={() => nav(myStarId ? `/voyage-select?starId=${myStarId}` : '/voyage-select')}
+    >
+      <p style={{ fontSize: 10, color: 'rgba(91,200,192,0.6)', letterSpacing: '0.08em', marginBottom: 6 }}>
+        ⚓ 여수에서 이어가기
+      </p>
+      <p style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 4 }}>
+        별이 시작된 곳에서 하룻밤 더
+      </p>
+      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
+        숙소 선택 → 별에 기록됩니다 ✨
+      </p>
+    </motion.div>
+  );
+}
+
+// ── 메인 ──────────────────────────────────────────
 export default function Home() {
   const nav = useNavigate();
   const { state } = useLocation();
-
   const newStarId = state?.newStarId ?? null;
 
-  const [stars, setStars]       = useState([]);
-  const [loading, setLoading]   = useState(true);
+  const [stars, setStars]         = useState([]);
+  const [loading, setLoading]     = useState(true);
   const [myStarData, setMyStarData] = useState(null);
-  const [featured, setFeatured] = useState({ hot: [], fresh: [] });
-  const [trending, setTrending] = useState([]);
-  const [topToday, setTopToday] = useState([]);
+  const [featured, setFeatured]   = useState({ hot: [], fresh: [] });
+  const [trending, setTrending]   = useState([]);
+  const [topToday, setTopToday]   = useState([]);
 
   const myStarId = readSavedStar();
 
@@ -218,79 +356,32 @@ export default function Home() {
             galaxy_name_ko: data.galaxy?.name_ko ?? null,
             created_at:     data.created_at,
           }))
-          .catch(() => {
-            // getStar 실패 시 recent 목록에서 폴백
-            setMyStarData(prev => prev); // recent 로드 후 아래서 처리
-          })
+          .catch(() => {})
       : Promise.resolve();
 
-    Promise.all([recentPromise, myStarPromise, featuredPromise, trendingPromise, topTodayPromise]).finally(() => setLoading(false));
-  }, [myStarId]);
+    Promise.all([recentPromise, myStarPromise, featuredPromise, trendingPromise, topTodayPromise])
+      .finally(() => setLoading(false));
+  }, [myStarId]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const effectiveMyStarData = myStarData ?? (myStarId ? (stars.find(s => s.star_id === myStarId) ?? null) : null);
+  const isNewStar = !!(newStarId && myStarId === newStarId);
   const otherStars = stars.filter(s => s && s.star_id && s.star_id !== myStarId);
 
-  // getStar 실패 시 recent 목록에서 내 별 데이터 폴백
-  const effectiveMyStarData = myStarData ?? (
-    myStarId ? (stars.find(s => s.star_id === myStarId) ?? null) : null
-  );
-  const isNewStar = !!(newStarId && myStarId === newStarId);
-
-  // 오늘(KST) 탄생 별 — 별도 API 없이 recent 데이터에서 파생
-  const todayKstMidnight = (() => {
-    const now = new Date();
-    const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-    kst.setUTCHours(0, 0, 0, 0);
-    return new Date(kst.getTime() - 9 * 60 * 60 * 1000); // UTC로 환산
-  })();
-  const todayStars = stars.filter(s => s && new Date(s.created_at) >= todayKstMidnight);
-
   return (
-    <div className="min-h-screen flex flex-col px-5 pt-10 pb-24">
-      {/* 헤더 */}
-      <div className="mb-6">
-        <p className="text-white/40 text-xs">DreamTown</p>
-        <h1 className="text-2xl font-bold text-white mt-1">
-          {isNewStar ? '별이 탄생했어요 ⭐' : '안녕하세요 ✨'}
-        </h1>
-        <p className="text-white/50 text-sm mt-1">당신의 소원은 혼자가 아닙니다.</p>
-      </div>
+    <div className="min-h-screen flex flex-col px-5 pt-8 pb-24">
 
-      {/* 내 별 카드 */}
+      {/* ① 히어로 섹션 — 오늘의 마음 */}
+      <HeroSection myStarId={myStarId} nav={nav} />
+
+      {/* ② 내 별 카드 */}
       {effectiveMyStarData && (
-        <MyStarCard
-          star={effectiveMyStarData}
-          isNew={isNewStar}
-          nav={nav}
-        />
+        <MyStarCard star={effectiveMyStarData} isNew={isNewStar} nav={nav} />
       )}
 
-      {/* 오늘의 탄생 별 — 오늘 생성된 별이 있을 때만 표시 */}
-      {todayStars.length > 0 && (
-        <div className="mb-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-white/50 text-xs">✨ 오늘 탄생한 소원별</p>
-            <button
-              onClick={() => nav('/stars')}
-              className="text-dream-purple/80 text-xs hover:text-dream-purple transition-colors"
-            >
-              전체보기 →
-            </button>
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            {todayStars.map(s => (
-              <button
-                key={s.star_id}
-                onClick={() => nav(`/star/${s.star_id}`)}
-                className="bg-star-gold/10 border border-star-gold/30 text-star-gold text-xs px-3 py-1.5 rounded-full hover:bg-star-gold/20 active:scale-95 transition-all"
-              >
-                ⭐ {s.star_name}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* ③ 여행 연결 섹션 */}
+      <TravelSection myStarId={myStarId} nav={nav} />
 
-      {/* ── 오늘 가장 마음이 모인 별 (유니크 공명 깊이) ── */}
+      {/* ④ 공명 피드 — 오늘 가장 마음이 모인 별 */}
       {topToday.length > 0 && (
         <div className="mb-4">
           <p className="text-white/55 text-xs mb-2" style={{ letterSpacing: '0.05em' }}>
@@ -302,7 +393,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* ── 지금 공명 중인 별 (최근 30분 활발) ── */}
+      {/* ⑤ 지금 공명 중인 별 */}
       {trending.length > 0 && (
         <div className="mb-4">
           <p className="text-white/50 text-xs mb-2" style={{ letterSpacing: '0.05em' }}>
@@ -314,7 +405,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* ── 지금 빛나는 별 (hot top 3) — 공명 가중 자동 정렬 ── */}
+      {/* ⑥ 지금 빛나는 별 */}
       {featured.hot.length > 0 && (
         <div className="mb-4">
           <p className="text-white/50 text-xs mb-2" style={{ letterSpacing: '0.05em' }}>
@@ -326,12 +417,10 @@ export default function Home() {
         </div>
       )}
 
-      {/* ── 새로 태어난 별 (0공명 48h) — 첫 공명 진입점 ── */}
+      {/* ⑦ 새로 태어난 별 */}
       {featured.fresh.length > 0 && (
         <div className="mb-4">
-          <p className="text-white/35 text-xs mb-2">
-            🌱 새로 태어난 별 · 첫 마음을 나눠주세요
-          </p>
+          <p className="text-white/35 text-xs mb-2">🌱 새로 태어난 별 · 첫 마음을 나눠주세요</p>
           <div className="flex gap-2 flex-wrap">
             {featured.fresh.map(s => (
               <Link
@@ -346,7 +435,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* 광장 — 다른 별들 */}
+      {/* ⑧ 광장 — 다른 별들 */}
       <div className="bg-white/3 border border-white/8 rounded-3xl p-5 mb-4">
         <div className="flex items-center justify-between mb-3">
           <p className="text-white/60 text-sm font-medium">광장의 별들</p>
@@ -360,27 +449,15 @@ export default function Home() {
             </button>
           </div>
         </div>
-
         {loading ? (
           <p className="text-white/30 text-xs text-center py-4">별을 불러오는 중...</p>
         ) : otherStars.length === 0 ? (
           <p className="text-white/30 text-xs text-center py-4">아직 광장에 별이 없어요</p>
         ) : (
-          <div>
-            {otherStars.map(s => <StarItem key={s.star_id} star={s} />)}
-          </div>
+          <div>{otherStars.map(s => <StarItem key={s.star_id} star={s} />)}</div>
         )}
       </div>
 
-      {/* Aurum 메시지 */}
-      <div className="bg-dream-purple/10 border border-dream-purple/20 rounded-3xl p-5 mb-4">
-        <p className="text-white/40 text-xs mb-2">🐢 Aurum</p>
-        <p className="text-white text-sm leading-relaxed">
-          "당신의 소원은 이미 별이 되고 있어요."
-        </p>
-      </div>
-
-      {/* 탭 바 */}
       <BottomTab active="home" myStarId={myStarId} />
     </div>
   );
@@ -389,8 +466,8 @@ export default function Home() {
 function BottomTab({ active, myStarId }) {
   const nav = useNavigate();
   const tabs = [
-    { key: 'home',   label: 'Home',    path: '/home',                              emoji: '🏠' },
-    { key: 'wish',   label: 'Wish',    path: '/wish',                              emoji: '✨' },
+    { key: 'home',   label: 'Home',    path: '/home',                                emoji: '🏠' },
+    { key: 'wish',   label: 'Wish',    path: '/wish',                                emoji: '✨' },
     { key: 'mystar', label: 'My Star', path: myStarId ? `/my-star/${myStarId}` : '/wish', emoji: '⭐' },
   ];
   return (
