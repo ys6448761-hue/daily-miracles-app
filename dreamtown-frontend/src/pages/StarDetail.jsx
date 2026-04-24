@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getStarDetail, getStar, getResonance, postVoyageLog, postDtResonance, getSimilarStars, getRelatedStars, getResonancePeople, logUserEvent, getOrCreateUserId } from '../api/dreamtown.js';
 import MilestoneBar from '../components/MilestoneBar';
@@ -21,6 +22,36 @@ const AURORA5_3LINES = {
   healing:      '치유를 바라는 이 마음을 함께 바라고 있어요.\n쉬어가도 괜찮아요. 멈춤도 항해예요.\n같은 아픔을 지나온 소원이들이 있어요.',
   relationship: '연결을 바라는 이 마음이 여기 있어요.\n혼자가 아니라는 걸 이 별이 보여줘요.\n같은 마음을 가진 소원이들이 있어요.',
 };
+
+// wish_text 키워드 → Aurora5 1문장 코멘트 (우선순위 순)
+const AURORA5_WISH_MAP = [
+  { kw: ['용기', '두렵', '무서', '겁나', '도전'],
+    text: '용기는 갑자기 생기는 힘이 아니라,\n작은 한 걸음을 선택할 때 조용히 피어나는 마음이에요.' },
+  { kw: ['사랑', '좋아', '연인', '고백', '관계'],
+    text: '사랑은 완벽한 순간을 기다리는 게 아니에요.\n지금 이 마음을 솔직히 내보이는 것에서 시작돼요.' },
+  { kw: ['건강', '몸', '아프', '병', '회복'],
+    text: '몸이 보내는 신호에 귀 기울이는 것,\n그것도 자신을 사랑하는 방법이에요.' },
+  { kw: ['돈', '직업', '취업', '직장', '일', '성공'],
+    text: '원하는 것에 가까워지는 길은\n오늘 할 수 있는 가장 작은 것부터 시작돼요.' },
+  { kw: ['가족', '부모', '엄마', '아빠', '형', '언니', '동생'],
+    text: '가장 가까운 마음이 때로 가장 어렵죠.\n그 마음을 꺼낸 것만으로도 충분히 용감해요.' },
+  { kw: ['여행', '떠나', '새로', '시작', '변화'],
+    text: '새로운 곳으로 나아가려는 마음,\nAurora5가 이 별과 함께 그 길을 바라고 있어요.' },
+  { kw: ['외로', '혼자', '쓸쓸', '힘들', '지쳐'],
+    text: '지금 이 마음을 꺼낸 것이 시작이에요.\n혼자가 아니라는 걸, 이 별이 기억해줄 거예요.' },
+];
+
+function getAurora5WishComment(wishText, galaxyCode) {
+  if (wishText) {
+    for (const entry of AURORA5_WISH_MAP) {
+      if (entry.kw.some(k => wishText.includes(k))) return entry.text;
+    }
+  }
+  return (
+    AURORA5_3LINES[galaxyCode] ??
+    '이 소원별은 혼자가 아닙니다.\nAurora5가 함께 항해하고 있어요.\n당신의 마음이 이 별에 닿았어요.'
+  );
+}
 
 // 공명 버튼 정의 (type별 색상/glow 분리)
 const DT_RESONANCE_OPTS = [
@@ -812,6 +843,24 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
               </p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── Aurora5 코멘트 — canResonate 뷰어 (별 카드↓, 마음 나누기↑) ── */}
+      {canResonate && (
+        <div style={{
+          marginBottom: 16,
+          padding: '14px 16px',
+          borderRadius: 16,
+          background: 'rgba(255,215,106,0.05)',
+          border: '1px solid rgba(255,215,106,0.15)',
+        }}>
+          <p style={{ fontSize: 10, color: 'rgba(255,215,106,0.5)', marginBottom: 6, letterSpacing: '0.06em' }}>
+            ✨ Aurora5
+          </p>
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.75, whiteSpace: 'pre-line' }}>
+            {getAurora5WishComment(detail.wish_text, detail.galaxy?.code)}
+          </p>
         </div>
       )}
 
