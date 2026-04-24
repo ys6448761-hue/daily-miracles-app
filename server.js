@@ -929,9 +929,12 @@ app.get('/growth-film', (req, res) => {
 app.get('/star-entry', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'star-entry.html'));
 });
-app.get('/star/:access_key', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'star-view.html'));
-});
+// /star/:id → DreamTown SPA (StarDetail) 로 위임
+// 이전 star-view.html 서빙 라우트는 DT_SPA_ROUTES(/star/*) 보다 앞에 있어
+// 구버전 HTML이 서빙되어 500을 유발하므로 제거 (DT_SPA_ROUTES가 대신 처리)
+// app.get('/star/:access_key', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'public', 'star-view.html'));
+// });
 app.get('/travel', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'travel.html'));
 });

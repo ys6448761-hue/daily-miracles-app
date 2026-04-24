@@ -459,11 +459,14 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
         gaSimularStarsEmptyView({ starId: id, isInvite: isInviteEntry, hasMyStarId: !!myStarId });
       });
 
-    } catch {
+    } catch (err) {
       // 롤백
       if (type === 'miracle') setMiracleCount(c => c - 1);
       else setWisdomCount(c => c - 1);
       logUserEvent({ userId: getOrCreateUserId(), eventType: 'resonance_failed', metadata: { star_id: id, resonance_type: type } });
+      // 에러 토스트 (3초 자동 소멸) — JSON 화면 노출 방지
+      setFeedbackMsg('잠시 후 다시 시도해주세요 🌙');
+      setTimeout(() => setFeedbackMsg(null), 3000);
     } finally {
       setSubmitting(false);
     }
