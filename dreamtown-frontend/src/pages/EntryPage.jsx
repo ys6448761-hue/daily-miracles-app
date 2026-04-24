@@ -221,6 +221,16 @@ export default function EntryPage() {
         <button style={S.ctaBtn} onClick={() => navigate(dest)}>
           {btnLabel}
         </button>
+
+        <p style={{
+          marginTop: 20,
+          fontSize: 11,
+          color: 'rgba(155,135,245,0.35)',
+          lineHeight: 1.7,
+          textAlign: 'center',
+        }}>
+          이 서비스는 위치를 추적하지 않고,<br />선택한 순간만 기록합니다.
+        </p>
       </motion.div>
 
     </div>

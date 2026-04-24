@@ -225,6 +225,10 @@ function BasicLogView({ onNext }) {
         <button onClick={onNext} style={{ ...S.btn, marginTop: 0 }}>
           내 별 보기 →
         </button>
+
+        <div style={{ marginTop: 20, fontSize: 11, color: 'rgba(122,110,156,0.55)', lineHeight: 1.6, textAlign: 'center' }}>
+          이 서비스는 위치를 추적하지 않고,<br />선택한 순간만 기록합니다.
+        </div>
       </motion.div>
     </div>
   );
@@ -264,6 +268,10 @@ function ProductCTAView({ onShop }) {
         <button onClick={onShop} style={S.btn}>
           내 별 만들기 ✨
         </button>
+
+        <div style={{ marginTop: 20, fontSize: 11, color: 'rgba(122,110,156,0.55)', lineHeight: 1.6, textAlign: 'center' }}>
+          이 서비스는 위치를 추적하지 않고,<br />선택한 순간만 기록합니다.
+        </div>
       </motion.div>
     </div>
   );
@@ -540,60 +548,6 @@ function AwakenShareView({ starId, starName, onNext }) {
   );
 }
 
-// ── [유료] 각성 직후 앱 상품 업셀 ────────────────────────────────
-function UpsellView({ starId, onNext }) {
-  const nav = useNavigate();
-  return (
-    <div style={S.page}>
-      <motion.div
-        style={{ ...S.card, padding: '36px 20px' }}
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        {/* 별 글로우 */}
-        <motion.div
-          style={{
-            width: 56, height: 56, borderRadius: '50%',
-            background: 'radial-gradient(circle, #fff 0%, #e8e0ff 25%, #9B87F5 55%, transparent 80%)',
-            boxShadow: '0 0 20px 8px rgba(155,135,245,0.7)',
-            margin: '0 auto 20px',
-          }}
-          animate={{ boxShadow: [
-            '0 0 20px 8px rgba(155,135,245,0.7)',
-            '0 0 32px 14px rgba(155,135,245,0.9)',
-            '0 0 20px 8px rgba(155,135,245,0.7)',
-          ]}}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        />
-
-        <div style={{ fontSize: 11, fontWeight: 700, color: '#9B87F5', letterSpacing: '0.1em', marginBottom: 10 }}>
-          별이 깨어났어요
-        </div>
-        <div style={{ fontSize: 19, fontWeight: 800, color: '#E8E4F0', lineHeight: 1.4, marginBottom: 8 }}>
-          여수에서 시작된<br />이 이야기를 이어가볼까요
-        </div>
-        <div style={{ fontSize: 13, color: '#7A6E9C', lineHeight: 1.65, marginBottom: 28 }}>
-          별은 방금 깨어났어요.<br />
-          여수에서 이 흐름을 여행으로 이어갈 수 있어요.
-        </div>
-
-        <button
-          onClick={() => nav('/voyage-select')}
-          style={{ ...S.btn, fontSize: 14, padding: '13px 0', marginTop: 0 }}
-        >
-          여수 여행 이어가기 →
-        </button>
-        <button
-          onClick={onNext}
-          style={{ ...S.btnOutline, marginTop: 8, fontSize: 13 }}
-        >
-          내 별 먼저 보기
-        </button>
-      </motion.div>
-    </div>
-  );
-}
 
 // ── 에러 ──────────────────────────────────────────────────────────
 function ErrorView({ message, onRetry, savedStarId }) {
@@ -767,20 +721,15 @@ export default function CablecarPage() {
     );
   }
 
-  // [유료] 각성 직후 공유 화면
+  // [유료] 각성 직후 공유 화면 → 완료 시 내 별로 바로 이동
   if (phase === 'share' && result) {
     return (
       <AwakenShareView
         starId={result.starId}
         starName={result.starName}
-        onNext={() => setPhase('upsell')}
+        onNext={goToStar}
       />
     );
-  }
-
-  // [유료] 공유 후 앱 상품 업셀
-  if (phase === 'upsell' && result) {
-    return <UpsellView starId={result.starId} onNext={goToStar} />;
   }
 
   // [무료 + 기존별] 방문 기록

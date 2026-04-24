@@ -57,6 +57,7 @@ import Day7Complete from './pages/Day7Complete.jsx';
 import HometownLanding from './pages/HometownLanding.jsx';
 import CablecarPage from './pages/CablecarPage.jsx';
 import CablecarLandingPage from './pages/CablecarLandingPage.jsx';
+import VoyageSelectPage from './pages/VoyageSelectPage.jsx';
 import EntryPage from './pages/EntryPage.jsx';
 import AurumCreatePage from './pages/AurumCreatePage.jsx';
 import AurumViewPage from './pages/AurumViewPage.jsx';
@@ -138,6 +139,8 @@ export default function App() {
           <Route path="/cablecar-landing"          element={<CablecarLandingPage />} />
           {/* 장소별 공통 진입 */}
           <Route path="/entry"                     element={<EntryPage />} />
+          {/* 여수 숙박/레저 선택 — 앱 전용, QR 흐름에서 미사용 */}
+          <Route path="/voyage-select"             element={<VoyageSelectPage />} />
           {/* 아우룸 — 위치 잠금 기억 캡슐 */}
           <Route path="/aurum/create"              element={<AurumCreatePage />} />
           <Route path="/aurum/:id"                 element={<AurumViewPage />} />
