@@ -7,10 +7,6 @@
  *
  * 수수료: 예약 완료 건당 5,000원 (내부 정산 메모 — 외부 노출 없음)
  *
- * ⚠️ 전화번호 확인 필요:
- *   - 유탑마리나: 061-650-5700
- *   - 라마다앙코르: 061-660-9000
- *   - 케니호텔: 확인 후 하단 tel 값 교체
  */
 
 import { useNavigate } from 'react-router-dom';
@@ -18,30 +14,30 @@ import { motion } from 'framer-motion';
 
 const HOTELS = [
   {
-    id:   'utap',
-    name: '유탑마리나 호텔',
-    tag:  '마리나 뷰',
-    desc: '여수 돌산 · 마리나 전망 · 수영장',
-    tel:  '061-650-5700',   // ← 실제 예약실 번호 확인 필요
-    icon: '⚓',
+    id:     'rest',
+    name:   '유탑 마리나 호텔',
+    tag:    '마리나 뷰',
+    desc:   '여수 돌산 · 마리나 전망 · 수영장',
+    tel:    '061-690-8000',
+    icon:   '⚓',
     accent: '#5BC8C0',
   },
   {
-    id:   'ramada',
-    name: '라마다앙코르 여수',
-    tag:  '시내 중심',
-    desc: '여수 시내 · 오동도 근처 · 루프탑 뷰',
-    tel:  '061-660-9000',   // ← 실제 예약실 번호 확인 필요
-    icon: '🏨',
+    id:     'mood',
+    name:   '라마다 호텔',
+    tag:    '시내 중심',
+    desc:   '여수 시내 · 오동도 근처 · 루프탑 뷰',
+    tel:    '061-642-0000',
+    icon:   '🏨',
     accent: '#9B87F5',
   },
   {
-    id:   'kenny',
-    name: '켄싱턴 호텔 여수',
-    tag:  '케이블카 인근',
-    desc: '케이블카 도보 · 오션뷰 객실',
-    tel:  '061-000-0000',   // ← 실제 예약실 번호 확인 후 교체
-    icon: '🌊',
+    id:     'value',
+    name:   '케니호텔',
+    tag:    '케이블카 인근',
+    desc:   '케이블카 도보 · 오션뷰 객실',
+    tel:    '0507-1383-5001',
+    icon:   '🌊',
     accent: '#FFD76A',
   },
 ];
@@ -177,7 +173,7 @@ function HotelCard({ hotel, index }) {
           color: hotel.accent,
         }}
       >
-        📞 예약 전화 연결 · {hotel.tel}
+        전화로 이어가기 →
       </button>
     </motion.div>
   );
@@ -201,8 +197,7 @@ export default function VoyageSelectPage() {
           별이 시작된 곳에서<br />하룻밤 더
         </div>
         <div style={S.subline}>
-          여수의 밤을 담으세요.<br />
-          예약 전화 한 번으로 연결됩니다.
+          가장 잘 맞는 숙소로 바로 연결됩니다 ✨
         </div>
       </motion.div>
 
