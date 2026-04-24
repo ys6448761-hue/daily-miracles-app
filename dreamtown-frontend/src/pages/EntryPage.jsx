@@ -27,7 +27,7 @@ const LOC_CONFIG = {
     btn_hasStar: '별의 약속 보기 →',
     btn_noStar:  '내 별 만들기 ✨',
     dest_hasStar: (starId) => `/my-star/${starId}`,
-    dest_noStar:  () => '/cablecar',
+    dest_noStar:  () => '/wish',
     features: [
       { icon: '✨', text: '케이블카 위에서 소원 담기' },
       { icon: '⭐', text: '나만의 별 탄생 + 여수 기억 저장' },

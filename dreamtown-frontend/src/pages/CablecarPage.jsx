@@ -7,8 +7,8 @@
  *
  *  [유료 + 기존 별]  → 각성 연출 5초 → 공유 → 업셀 → /my-star/:id
  *  [유료 + 별 없음]  → 소원 입력 → 별 생성 → 각성 연출 5초 → 공유 → 업셀 → /my-star/:id
- *  [무료 + 기존 별]  → 각성 구매 유도 화면 (별 있음 강조)
- *  [무료 + 별 없음]  → 상품 구매 안내 화면 (별 생성 없음)
+ *  [무료 + 기존 별]  → 방문 기록 안내 → /my-star/:id
+ *  [무료 + 별 없음]  → 별 만들기 안내 → /wish (무료 생성)
  *
  * ── 원칙 ──────────────────────────────────────────────────────────
  *  "각성은 무료 기능이 아니라 상품이다"
@@ -743,7 +743,7 @@ export default function CablecarPage() {
 
   // [무료 + 별 없음] 상품 안내
   if (phase === 'no_product') {
-    return <ProductCTAView onShop={() => nav('/entry?loc=cablecar')} />;
+    return <ProductCTAView onShop={() => nav('/wish')} />;
   }
 
   // [유료 + 별 없음] 소원 입력
