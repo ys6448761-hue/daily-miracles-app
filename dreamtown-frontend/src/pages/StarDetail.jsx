@@ -323,12 +323,21 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   const [heartResult, setHeartResult]   = useState(null);        // 선택 직후 로컬 결과
   const [showStayMsg, setShowStayMsg]   = useState(false);       // 머물기 상태 메시지
   const [resonancePeople, setResonancePeople] = useState({ people: [], total: 0 }); // 공명 참여자
-  const [showSharedIntro, setShowSharedIntro] = useState(() => {
-    const isShare = typeof window !== 'undefined' && window.location.search.includes('source=share');
-    const hasSeen = localStorage.getItem('dt_intro_seen');
-    return isShare && !hasSeen;
-  });
+  const [showSharedIntro] = useState(false); // 새 감정 랜딩으로 대체됨
   const [viralClicked, setViralClicked] = useState(false);
+  const [detailRevealed, setDetailRevealed] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    if (!window.location.search.includes('source=share')) return true;
+    const vMode = propViewMode ?? 'resonance';
+    if (vMode === 'owner') return true;
+    // 이미 공명한 별이면 랜딩 스킵
+    try {
+      const history = JSON.parse(localStorage.getItem(RESONANCE_HISTORY_KEY) || '[]');
+      const sid = propStarId ?? paramId;
+      if (history.some(e => e.starId === sid)) return true;
+    } catch (_) {}
+    return false;
+  });
 
   const myStarId  = readSavedStar();
   const isOwnStar = !propViewMode && id === myStarId;
@@ -414,9 +423,18 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
     getResonancePeople(id).then(r => setResonancePeople(r)).catch(() => {});
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // ── 공유 유입 랜딩: 나도그래요 클릭 후 2초 뒤 상세 자동 reveal ──
+  useEffect(() => {
+    if (viralClicked && !detailRevealed) {
+      const t = setTimeout(() => setDetailRevealed(true), 2000);
+      return () => clearTimeout(t);
+    }
+  }, [viralClicked]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── 공명 핸들러 ────────────────────────────────────────────────
   const isInviteEntry = typeof window !== 'undefined' && window.location.search.includes('entry=invite');
   const isShareEntry  = typeof window !== 'undefined' && window.location.search.includes('source=share');
+  const showLanding   = isShareEntry && canResonate && !detailRevealed;
 
   // ── 공유 핸들러 ────────────────────────────────────────────────
   const SHARE_LEVEL_MSG = [
@@ -563,6 +581,93 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
         <button onClick={() => window.history.length > 1 ? nav(-1) : nav('/dreamtown')} className="text-white/25 text-xs">
           ← 돌아가기
         </button>
+      </div>
+    );
+  }
+
+  // ── 공유 유입 감정 랜딩 ─────────────────────────────────────────
+  if (showLanding) {
+    const galaxyLabel = detail.galaxy?.name_ko ?? '별의 마음';
+    const emotionLine = detail.wish_emotion
+      || (detail.galaxy?.code ? AURORA5_3LINES[detail.galaxy.code]?.split('\n')[0] : null)
+      || '이 별에 담긴 마음이에요';
+    const totalCount = miracleCount + wisdomCount;
+
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 28px', background: '#0D1B2A' }}>
+        <style>{KEYFRAMES}</style>
+
+        {!viralClicked ? (
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65 }}
+            style={{ textAlign: 'center', maxWidth: 360, width: '100%' }}
+          >
+            <p style={{ fontSize: 44, marginBottom: 18, lineHeight: 1 }}>✦</p>
+            <p style={{ fontSize: 12, color: 'rgba(255,215,106,0.6)', marginBottom: 10, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              {galaxyLabel}
+            </p>
+            <h1 style={{ fontSize: 24, fontWeight: 700, color: 'white', marginBottom: 10, lineHeight: 1.4 }}>
+              이 마음, 당신도<br />느껴본 적 있나요?
+            </h1>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.42)', marginBottom: 36, lineHeight: 1.75 }}>
+              {emotionLine}
+            </p>
+            <button
+              onClick={() => {
+                setViralClicked(true);
+                localStorage.setItem('dt_intro_seen', new Date().toISOString().slice(0, 10));
+                logUserEvent({ userId: getOrCreateUserId(), eventType: 'viral_nado_clicked', metadata: { star_id: id, source: 'share_landing' } });
+                if (!submitted && !submitting) handleResonance('miracle');
+              }}
+              style={{
+                width: '100%', padding: '17px 0', borderRadius: 9999,
+                background: 'linear-gradient(135deg, rgba(255,215,106,0.22) 0%, rgba(255,215,106,0.10) 100%)',
+                border: '1px solid rgba(255,215,106,0.55)',
+                color: '#FFD76A', fontSize: 18, fontWeight: 700, cursor: 'pointer',
+                boxShadow: '0 0 32px 6px rgba(255,215,106,0.18)',
+                letterSpacing: '0.01em',
+              }}
+            >
+              나도 그래요
+            </button>
+            <button
+              onClick={() => {
+                localStorage.setItem('dt_intro_seen', new Date().toISOString().slice(0, 10));
+                setDetailRevealed(true);
+              }}
+              style={{ marginTop: 18, background: 'none', border: 'none', color: 'rgba(255,255,255,0.22)', fontSize: 13, cursor: 'pointer' }}
+            >
+              별 보러 가기 →
+            </button>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            style={{ textAlign: 'center', maxWidth: 360, width: '100%' }}
+          >
+            <p style={{ fontSize: 52, marginBottom: 16, lineHeight: 1 }}>✨</p>
+            <p style={{ fontSize: 20, fontWeight: 600, color: '#FFD76A', marginBottom: 8, lineHeight: 1.5, whiteSpace: 'pre-line' }}>
+              {`지금 이 순간,\n${totalCount > 0 ? `${totalCount}명이 같은 마음을 느꼈어요` : '마음이 닿았어요'}`}
+            </p>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.38)', marginBottom: 28, lineHeight: 1.6 }}>
+              잠시 후 별을 보여드릴게요
+            </p>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+              {[0, 1, 2].map(i => (
+                <motion.div
+                  key={i}
+                  animate={{ opacity: [0.25, 1, 0.25] }}
+                  transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.35 }}
+                  style={{ width: 7, height: 7, borderRadius: '50%', background: 'rgba(255,215,106,0.65)' }}
+                />
+              ))}
+            </div>
+          </motion.div>
+        )}
       </div>
     );
   }
@@ -819,8 +924,8 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
         </p>
       )}
 
-      {/* ── 바이럴 랜딩 블록 (비로그인 방문자 전용) ── */}
-      {canResonate && (
+      {/* ── 바이럴 랜딩 블록 (직접 유입 비로그인 방문자 전용) ── */}
+      {canResonate && !isShareEntry && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
