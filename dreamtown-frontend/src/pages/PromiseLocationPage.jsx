@@ -148,9 +148,12 @@ function SealedView({ promiseId, openAt, locationName, auroraComment }) {
         <div style={{ fontSize: 20, fontWeight: 800, color: '#E8E4F0', lineHeight: 1.4, marginBottom: 10 }}>
           이 기록은<br />봉인되었습니다
         </div>
-        <div style={{ fontSize: 13, color: '#6A6090', lineHeight: 1.7, marginBottom: 8 }}>
+        <div style={{ fontSize: 13, color: '#6A6090', lineHeight: 1.7, marginBottom: 6 }}>
           {locationName}에서 남긴 이 기록은<br />
           <strong style={{ color: '#A78BFA' }}>{openDate}</strong>에 열립니다.
+        </div>
+        <div style={{ fontSize: 12, color: 'rgba(167,139,250,0.38)', lineHeight: 1.7, marginBottom: 16 }}>
+          이 마음은, 시간이 지나며 더 또렷해질 거예요.
         </div>
         {auroraComment && (
           <div style={{
