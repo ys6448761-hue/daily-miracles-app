@@ -1015,9 +1015,14 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
               </p>
               <button
                 onClick={() => {
-                  logUserEvent({ userId: getOrCreateUserId(), eventType: 'viral_make_star_clicked', metadata: { star_id: id } });
-                  const emotionChoice = GALAXY_TO_EMOTION[detail.galaxy?.code] ?? null;
-                  nav('/wish?new=1', { state: { emotionChoice } });
+                  if (myStarId) {
+                    logUserEvent({ userId: getOrCreateUserId(), eventType: 'viral_add_to_star_clicked', metadata: { star_id: id, my_star_id: myStarId } });
+                    nav(`/my-star/${myStarId}`);
+                  } else {
+                    logUserEvent({ userId: getOrCreateUserId(), eventType: 'viral_make_star_clicked', metadata: { star_id: id } });
+                    const emotionChoice = GALAXY_TO_EMOTION[detail.galaxy?.code] ?? null;
+                    nav('/wish?new=1', { state: { emotionChoice } });
+                  }
                 }}
                 style={{
                   width: '100%',
@@ -1032,7 +1037,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
                   letterSpacing: '0.01em',
                 }}
               >
-                나도 별 하나 남기기 →
+                {myStarId ? '내 별에도 이 마음 더하기 →' : '나도 별 하나 남기기 →'}
               </button>
             </motion.div>
           )}
