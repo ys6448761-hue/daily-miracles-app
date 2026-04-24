@@ -363,11 +363,16 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
     '많은 마음이 모인 별이에요',
   ];
 
-  function handleShare() {
-    shareStarDetail({
-      starId:   id,
-      wishText: detail.wish_text ?? '',
-    });
+  async function handleShare() {
+    const starUrl = `https://app.dailymiracles.kr/star/${id}`;
+    // 클립보드 복사 항상 먼저 — 카카오 auth 실패 시에도 링크 확보
+    try {
+      await navigator.clipboard.writeText(starUrl);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 3000);
+    } catch (_) {}
+    // 카카오 공유도 병행 시도 (실패해도 링크는 복사됨)
+    shareStarDetail({ starId: id, wishText: detail.wish_text ?? '' });
   }
 
   function showResonanceToast(type) {

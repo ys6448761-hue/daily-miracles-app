@@ -187,29 +187,42 @@ router.post('/', async (req, res) => {
       ? new Date(open_at)
       : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
 
-    const generatedComment = getAuroraComment(emotion_text);
-
+    // INSERT — aurora_comment 제외 (migration 139 미적용 환경 대비)
     const result = await db.query(
       `INSERT INTO promise_records
          (user_id, location_id, emotion_text, message_to_future,
-          photo_url, created_lat, created_lng, status, open_at, aurora_comment)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, 'SEALED', $8, $9)
-       RETURNING id, status, open_at, created_at, aurora_comment`,
+          photo_url, created_lat, created_lng, status, open_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'SEALED', $8)
+       RETURNING id, status, open_at, created_at`,
       [
         user_id, resolvedLocationId, emotion_text, message_to_future,
-        photo_url, created_lat, created_lng, openAt, generatedComment,
+        photo_url, created_lat, created_lng, openAt,
       ]
     );
 
     const row = result.rows[0];
     console.log(`[promise] 생성 | id=${row.id} | loc=${resolvedLocationId} | user=${user_id}`);
+
+    // aurora_comment 별도 저장 (migration 139 컬럼 없으면 graceful skip)
+    const generatedComment = getAuroraComment(emotion_text);
+    let savedComment = null;
+    try {
+      await db.query(
+        `UPDATE promise_records SET aurora_comment = $1 WHERE id = $2`,
+        [generatedComment, row.id]
+      );
+      savedComment = generatedComment;
+    } catch (auroraErr) {
+      console.warn('[promise] aurora_comment 저장 skip (migration 139 미적용?):', auroraErr.message);
+    }
+
     res.json({
       success:        true,
       promise_id:     row.id,
       status:         row.status,
       open_at:        row.open_at,
       created_at:     row.created_at,
-      aurora_comment: row.aurora_comment,
+      aurora_comment: savedComment,
     });
   } catch (e) {
     console.error('POST /api/promise error:', e.message);
