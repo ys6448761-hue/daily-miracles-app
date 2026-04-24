@@ -24,12 +24,13 @@ const DAY1_DEFAULT = {
   action_key: 'first_step',
 };
 
-// ── A/B/C 카피 3종 ─────────────────────────────────────────────────
-const STAR_BIRTH_COPIES = [
-  { variant: 'A', title: '당신의 별이 이곳에서 태어났어요',     subtitle: '오늘의 이 마음, 여기서 시작됐어요' },
-  { variant: 'B', title: '이 카페가 당신 별의 고향이 되었어요',  subtitle: '이 순간이, 당신 별의 시작이에요'   },
-  { variant: 'C', title: '오늘, 내 마음을 남겨봤어요',          subtitle: '여수에서 나의 별 하나 만들었어요'   },
-];
+// ── 감정 선택 → 감정 문장 맵 ────────────────────────────────────────
+const EMOTION_SENTENCE = {
+  tired:    '조금 지쳤던 그 마음이, 이 별이 되었어요.',
+  lonely:   '혼자인 것 같던 그 마음이, 이 별이 되었어요.',
+  anxious:  '불안했던 그 마음이, 이 별이 되었어요.',
+  hopeful:  '기대하던 그 마음이, 이 별이 되었어요.',
+};
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -130,9 +131,9 @@ export default function StarBirth() {
   const isLimited     = starRarity === 'limited';
   // galaxyDisplay: 항해(voyage) 등 외부 유입 시 '북은하' 등 커스텀 노출 가능
   const galaxyDisplay = resolved?.galaxyDisplay ?? null;
+  const emotionChoice = resolved?.emotionChoice ?? null;
 
-  // A/B/C 카피 변형 — 마운트 시 1회 고정
-  const [copyVariant] = useState(() => STAR_BIRTH_COPIES[Math.floor(Math.random() * STAR_BIRTH_COPIES.length)]);
+  const [resonanceCount] = useState(() => Math.floor(Math.random() * 10) + 3); // 3~12
 
   // phase: 1 → 2 → 3 → 'done'
   const [phase,      setPhase]      = useState(1);
@@ -142,15 +143,14 @@ export default function StarBirth() {
   const [shareFeedback,   setShareFeedback]   = useState(''); // 공유 완료 피드백 텍스트
   const shareFeedbackRef = useRef(null);
 
-  // ── 마운트 시 Kakao SDK 선제 초기화 + A/B/C 이벤트 ────────
+  // ── 마운트 시 Kakao SDK 선제 초기화 ────────────────────────
   useEffect(() => {
     const ready = initKakao();
     console.log('[StarBirth] 마운트 — Kakao initKakao:', ready,
       '| window.Kakao:', !!window.Kakao,
       '| Kakao.Share:', !!window.Kakao?.Share,
       '| isInitialized:', window.Kakao?.isInitialized?.());
-    logEvent('star_birth_view',  { variant: copyVariant.variant, star_id: starId });
-    logEvent('star_birth_copy',  { variant: copyVariant.variant });
+    logEvent('star_birth_view', { star_id: starId });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── 타임라인 ────────────────────────────────────────────
@@ -419,23 +419,27 @@ export default function StarBirth() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: 'easeOut' }}
             >
-              {/* A/B/C 카피 — 메인 타이틀 */}
-              <p style={{ fontSize: 20, fontWeight: 700, color: 'white', marginBottom: 4, lineHeight: 1.4 }}>
-                {copyVariant.title}
-              </p>
-              <p style={{ fontSize: 13, color: 'rgba(255,215,106,0.7)', marginBottom: 6, lineHeight: 1.5 }}>
-                {copyVariant.subtitle}
+              {/* 메인 타이틀 */}
+              <p style={{ fontSize: 20, fontWeight: 700, color: 'white', marginBottom: 8, lineHeight: 1.4 }}>
+                이 마음이, 하나의 별이 되었어요 ✨
               </p>
 
-              {/* 별 이름 + 은하 */}
-              <p style={{ fontSize: 14, color: 'rgba(255,215,106,0.75)', marginBottom: galaxy ? 4 : 20 }}>
-                {starName}
+              {/* Aurora5 고정 문장 */}
+              <p style={{ fontSize: 13, color: 'rgba(255,215,106,0.75)', marginBottom: 6, lineHeight: 1.7, whiteSpace: 'pre-line' }}>
+                {'이미 당신 안에 있던 마음이,\n지금 이렇게 보이기 시작했어요.'}
               </p>
-              {galaxy && (
-                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginBottom: 20 }}>
-                  {galaxyDisplay ?? GALAXY_LABEL[galaxy] ?? galaxy} · D+1
+
+              {/* 감정 선택 반영 문장 */}
+              {emotionChoice && EMOTION_SENTENCE[emotionChoice] && (
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 6, lineHeight: 1.6, fontStyle: 'italic' }}>
+                  {EMOTION_SENTENCE[emotionChoice]}
                 </p>
               )}
+
+              {/* 공명 문장 */}
+              <p style={{ fontSize: 12, color: 'rgba(255,215,106,0.5)', marginBottom: 22, lineHeight: 1.5 }}>
+                지금 이 순간, {resonanceCount}명이 비슷한 마음을 느끼고 있어요
+              </p>
 
               {/* wishText 인용 재표시 */}
               {wishText && (
@@ -467,38 +471,9 @@ export default function StarBirth() {
               transition={{ duration: 0.5, ease: 'easeOut' }}
               style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}
             >
-              {/* ── 공유하기 ── */}
-              {shareMsg && (
-                <div style={{ width: '100%', marginBottom: 4 }}>
-                  <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', marginBottom: 4, fontWeight: 600, textAlign: 'center', lineHeight: 1.5 }}>
-                    이건 나만 보기 아까운 순간이에요
-                  </p>
-                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginBottom: 10, fontStyle: 'italic', textAlign: 'center', lineHeight: 1.5 }}>
-                    &ldquo;{shareMsg}&rdquo;
-                  </p>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button onClick={handleKakaoShare} style={{ flex: 1, padding: '13px 0', borderRadius: 9999, background: '#FEE500', color: '#191919', fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer' }}>
-                      이 순간을 전하기
-                    </button>
-                    <button onClick={handleCopyLink} style={{ flex: 1, padding: '13px 0', borderRadius: 9999, background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.75)', fontSize: 14, fontWeight: 600, border: '1px solid rgba(255,255,255,0.15)', cursor: 'pointer' }}>
-                      🔗 저장하기
-                    </button>
-                  </div>
-                  {shareFeedback && (
-                    <p className="sb-share-feedback" style={{ fontSize: 12, color: 'rgba(255,215,106,0.8)', textAlign: 'center', marginTop: 6 }}>
-                      {shareFeedback}
-                    </p>
-                  )}
-                  <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '14px 0 6px' }} />
-                </div>
-              )}
-
-              {/* ── A. 별 만들기 체험 ── */}
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', textAlign: 'center', marginBottom: 2, lineHeight: 1.5 }}>
-                이 순간을 별로 남겨둘 수 있어요
-              </p>
+              {/* ── 이 마음 나누기 ── */}
               <button
-                onClick={() => nav(`/my-star/${starId}`, { replace: true })}
+                onClick={handleKakaoShare}
                 style={{
                   width: '100%',
                   padding: '16px 0',
@@ -513,7 +488,32 @@ export default function StarBirth() {
                   letterSpacing: '0.01em',
                 }}
               >
-                별로 남기기
+                이 마음 나누기
+              </button>
+
+              {shareFeedback && (
+                <p className="sb-share-feedback" style={{ fontSize: 12, color: 'rgba(255,215,106,0.8)', textAlign: 'center', marginTop: 4 }}>
+                  {shareFeedback}
+                </p>
+              )}
+
+              {/* ── 조용히 간직하기 ── */}
+              <button
+                onClick={() => nav(`/my-star/${starId}`, { replace: true })}
+                style={{
+                  width: '100%',
+                  padding: '14px 0',
+                  borderRadius: 9999,
+                  background: 'rgba(255,255,255,0.06)',
+                  color: 'rgba(255,255,255,0.6)',
+                  fontSize: 15,
+                  fontWeight: 500,
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  cursor: 'pointer',
+                  letterSpacing: '0.01em',
+                }}
+              >
+                조용히 간직하기
               </button>
 
             </motion.div>
