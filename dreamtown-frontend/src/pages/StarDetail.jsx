@@ -350,8 +350,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   function handleShare() {
     shareStarDetail({
       starId:   id,
-      starName: detail.star_name  ?? '나의 별',
-      wishText: detail.wish_text  ?? '',
+      wishText: detail.wish_text ?? '',
     });
   }
 
@@ -1128,7 +1127,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
             transition: 'background 0.15s',
           }}
         >
-          카카오로 이 별 공유하기
+          이 마음 나누기
         </button>
         {shareCopied && (
           <p style={{ marginTop: 8, fontSize: 12, color: 'rgba(255,255,255,0.45)', textAlign: 'center' }}>

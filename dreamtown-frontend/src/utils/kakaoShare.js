@@ -7,6 +7,8 @@ import { gaDtShareSuccess } from './gtag';
 
 const DREAMTOWN_URL = 'https://app.dailymiracles.kr/dreamtown?entry=invite';
 const OG_IMAGE_URL  = 'https://app.dailymiracles.kr/images/dreamtown-og-v4.jpg';
+// 별 공유 전용 OG 이미지 — public/og-star.png 로 교체 시 아래 URL 변경
+const STAR_OG_IMAGE = 'https://app.dailymiracles.kr/images/dreamtown-og-v4.jpg';
 
 export function initKakao() {
   if (!window.Kakao) {
@@ -83,13 +85,14 @@ export function shareStarBirth({ starId, starName = '나의 별', wishText = '' 
 }
 
 /**
- * @param {{ starId: string, starName: string, wishText: string }} params
+ * @param {{ starId: string, wishText: string }} params
  */
-export function shareStarDetail({ starId, starName = '나의 별', wishText = '' }) {
-  const starUrl = `https://app.dailymiracles.kr/star/${starId}?source=share`;
-  const desc = wishText
-    ? `"${wishText.length > 30 ? wishText.slice(0, 30) + '…' : wishText}"`
-    : '소원이 별이 되는 순간';
+export function shareStarDetail({ starId, wishText = '' }) {
+  const starUrl = `https://app.dailymiracles.kr/star/${starId}`;
+  const truncated = wishText.length > 40 ? wishText.slice(0, 40) + '…' : wishText;
+  const desc = truncated
+    ? `"${truncated}"\n이 순간이 별로 남았습니다. 함께 이어가볼까요?`
+    : '이 순간이 별로 남았습니다. 함께 이어가볼까요?';
 
   try {
     if (!initKakao()) throw new Error('Kakao not available');
@@ -97,9 +100,9 @@ export function shareStarDetail({ starId, starName = '나의 별', wishText = ''
     window.Kakao.Share.sendDefault({
       objectType: 'feed',
       content: {
-        title:       `⭐ "${starName}"`,
-        description: `${desc} · 이 별에 마음을 나눠보세요`,
-        imageUrl:    OG_IMAGE_URL,
+        title:       '여수에서 시작된 하나의 마음 ✨',
+        description: desc,
+        imageUrl:    STAR_OG_IMAGE,
         link: {
           mobileWebUrl: starUrl,
           webUrl:       starUrl,
@@ -107,7 +110,7 @@ export function shareStarDetail({ starId, starName = '나의 별', wishText = ''
       },
       buttons: [
         {
-          title: '별 보러 가기',
+          title: '별 보러가기',
           link: {
             mobileWebUrl: starUrl,
             webUrl:       starUrl,
@@ -117,9 +120,9 @@ export function shareStarDetail({ starId, starName = '나의 별', wishText = ''
     });
     gaDtShareSuccess({ starId, method: 'kakao' });
   } catch {
-    const text = `⭐ "${starName}"\n${desc}\n이 별에 마음을 나눠보세요\n${starUrl}`;
+    const text = `여수에서 시작된 하나의 마음 ✨\n${desc}\n${starUrl}`;
     if (navigator.share) {
-      navigator.share({ title: starName, text, url: starUrl })
+      navigator.share({ title: '여수에서 시작된 하나의 마음 ✨', text, url: starUrl })
         .then(() => gaDtShareSuccess({ starId, method: 'native' }))
         .catch(() => {});
     } else {
