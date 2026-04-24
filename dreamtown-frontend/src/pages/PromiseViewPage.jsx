@@ -262,7 +262,7 @@ function LockedTimeView({ daysLeft, openAt, locationId, createdAt }) {
 
 // ── OPEN ─────────────────────────────────────────────────────────────
 function OpenView({ data }) {
-  const { emotion_text, message_to_future, photo_url, location_id, created_at, is_first_open } = data;
+  const { emotion_text, message_to_future, photo_url, location_id, created_at, is_first_open, aurora_comment } = data;
   const locationName = LOCATION_NAMES[location_id] || location_id;
   const createDate   = new Date(created_at).toLocaleDateString('ko-KR',
     { year: 'numeric', month: 'long', day: 'numeric' });
@@ -348,9 +348,25 @@ function OpenView({ data }) {
           </motion.div>
         )}
 
-        <div style={{ fontSize: 11, color: '#3A2F60', textAlign: 'center' }}>
-          90일의 봉인이 끝났습니다
-        </div>
+        {/* Aurora5 코멘트 */}
+        {aurora_comment && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.55, duration: 0.5 }}
+            style={{
+              padding: '14px 18px', borderRadius: 16, marginBottom: 20,
+              background: 'rgba(167,139,250,0.05)',
+              border: '1px solid rgba(167,139,250,0.18)',
+            }}
+          >
+            <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,139,250,0.5)', marginBottom: 6, letterSpacing: '0.06em' }}>
+              ✨ Aurora5
+            </div>
+            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.8, whiteSpace: 'pre-line' }}>
+              {aurora_comment}
+            </div>
+          </motion.div>
+        )}
       </motion.div>
     </div>
   );

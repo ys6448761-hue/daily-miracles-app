@@ -110,7 +110,7 @@ function PhotoPicker({ photoPreview, onSelect, onRemove }) {
 }
 
 // ── 봉인 완료 화면 ─────────────────────────────────────────────────
-function SealedView({ promiseId, openAt, locationName }) {
+function SealedView({ promiseId, openAt, locationName, auroraComment }) {
   const nav = useNavigate();
   const [copied, setCopied] = useState(false);
   const url      = `${window.location.origin}/promise/${promiseId}`;
@@ -152,9 +152,20 @@ function SealedView({ promiseId, openAt, locationName }) {
           {locationName}에서 남긴 이 기록은<br />
           <strong style={{ color: '#A78BFA' }}>{openDate}</strong>에 열립니다.
         </div>
-        <div style={{ fontSize: 12, color: '#4A3A70', marginBottom: 24 }}>
-          그날, 다시 이 장소로 돌아와보세요.
-        </div>
+        {auroraComment && (
+          <div style={{
+            padding: '12px 14px', borderRadius: 14, marginBottom: 20,
+            background: 'rgba(167,139,250,0.05)',
+            border: '1px solid rgba(167,139,250,0.18)',
+          }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(167,139,250,0.5)', marginBottom: 5, letterSpacing: '0.06em' }}>
+              ✨ Aurora5
+            </div>
+            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.75, whiteSpace: 'pre-line' }}>
+              {auroraComment}
+            </div>
+          </div>
+        )}
         <div style={{
           padding: '10px 14px', borderRadius: 10,
           background: 'rgba(167,139,250,0.06)',
@@ -195,7 +206,7 @@ export default function PromiseLocationPage() {
   const [created,         setCreated]         = useState(null);
 
   if (created) {
-    return <SealedView promiseId={created.promiseId} openAt={created.openAt} locationName={locationName} />;
+    return <SealedView promiseId={created.promiseId} openAt={created.openAt} locationName={locationName} auroraComment={created.auroraComment} />;
   }
 
   const canSubmit = !!text.trim() && !loading && !uploading;
@@ -249,7 +260,7 @@ export default function PromiseLocationPage() {
       const data = await r.json();
       if (!r.ok || !data.success) throw new Error(data.error || '저장 실패');
 
-      setCreated({ promiseId: data.promise_id, openAt: data.open_at });
+      setCreated({ promiseId: data.promise_id, openAt: data.open_at, auroraComment: data.aurora_comment ?? null });
     } catch (err) {
       setError(err.message);
     } finally {

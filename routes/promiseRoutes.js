@@ -46,6 +46,68 @@ const LOCATION_COORDS = {
 // 위치 검증 반경 (env로 조정 가능)
 const PROMISE_RADIUS_M = parseInt(process.env.PROMISE_RADIUS_M || '200', 10);
 
+// ── Aurora5 코멘트 — emotion_text 키워드 기반 동적 생성 ──────────────
+// 조회마다 msgs 배열에서 랜덤 선택 → 동일 데이터 재조회 시 변경됨
+const AURORA5_MAP = [
+  { kw: ['용기', '두렵', '무서', '겁나', '도전', '시작하', '바꾸', '이루'],
+    msgs: [
+      '용기는 갑자기 생기는 힘이 아니라,\n작은 한 걸음을 선택할 때 조용히 피어나는 마음이에요.',
+      '두려움과 함께 내딛은 첫 걸음,\n그것이 이미 가장 큰 용기예요.',
+    ] },
+  { kw: ['사랑', '좋아', '연인', '고백', '관계', '그 사람'],
+    msgs: [
+      '사랑은 완벽한 순간을 기다리는 게 아니에요.\n지금 이 마음을 솔직히 내보이는 것에서 시작돼요.',
+      '이 마음을 꺼낸 것만으로도,\n이미 충분히 용감한 거예요.',
+    ] },
+  { kw: ['건강', '몸', '아프', '아파', '병', '회복'],
+    msgs: [
+      '몸이 보내는 신호에 귀 기울이는 것,\n그것도 자신을 사랑하는 방법이에요.',
+      '지금 이 순간 쉬어가는 것도\n앞으로 나아가는 방법이에요.',
+    ] },
+  { kw: ['돈', '직업', '취업', '직장', '성공', '꿈', '열고', '카페', '가게', '창업'],
+    msgs: [
+      '원하는 것에 가까워지는 길은\n오늘 할 수 있는 가장 작은 것부터 시작돼요.',
+      '이 마음을 봉인한 오늘이,\n그 꿈의 첫 번째 페이지예요.',
+    ] },
+  { kw: ['가족', '부모', '엄마', '아빠', '형', '언니', '동생', '남편', '아내'],
+    msgs: [
+      '가장 가까운 마음이 때로 가장 어렵죠.\n그 마음을 꺼낸 것만으로도 충분히 용감해요.',
+      '이 마음이 전해지길,\nAurora5가 함께 바라고 있어요.',
+    ] },
+  { kw: ['여행', '떠나', '새로', '변화', '바다', '케이블카', '여수'],
+    msgs: [
+      '새로운 곳으로 나아가려는 마음,\nAurora5가 이 별과 함께 그 길을 바라고 있어요.',
+      '여수에서 시작된 이 마음,\n오랫동안 기억될 거예요.',
+    ] },
+  { kw: ['외로', '혼자', '쓸쓸', '힘들', '지쳐', '지침', '쉬고'],
+    msgs: [
+      '지금 이 마음을 꺼낸 것이 시작이에요.\n혼자가 아니라는 걸, 이 기록이 기억해줄 거예요.',
+      '지쳐있을 때도 이 마음을 담은 당신,\n그것만으로 이미 충분해요.',
+    ] },
+  { kw: ['감사', '고마', '행복', '기쁘', '소중', '사랑해'],
+    msgs: [
+      '이 감사함이 봉인된 오늘,\n시간이 지나도 빛날 거예요.',
+      '기쁜 마음을 기록으로 남긴 것,\n미래의 당신에게 큰 선물이 될 거예요.',
+    ] },
+];
+
+const AURORA5_DEFAULTS = [
+  '여수에서 남긴 이 마음,\nAurora5가 함께 기억하고 있어요.',
+  '이 순간을 봉인한 당신,\n미래의 자신에게 보내는 가장 솔직한 편지예요.',
+  '작은 결심 하나가\n큰 변화의 시작이 되기도 해요.',
+];
+
+function getAuroraComment(text = '') {
+  if (text) {
+    for (const entry of AURORA5_MAP) {
+      if (entry.kw.some(k => text.includes(k))) {
+        return entry.msgs[Math.floor(Math.random() * entry.msgs.length)];
+      }
+    }
+  }
+  return AURORA5_DEFAULTS[Math.floor(Math.random() * AURORA5_DEFAULTS.length)];
+}
+
 // ── Haversine 거리 계산 (미터) ────────────────────────────────────
 function haversine(lat1, lng1, lat2, lng2) {
   const R    = 6371000;
@@ -140,11 +202,12 @@ router.post('/', async (req, res) => {
     const row = result.rows[0];
     console.log(`[promise] 생성 | id=${row.id} | loc=${resolvedLocationId} | user=${user_id}`);
     res.json({
-      success:    true,
-      promise_id: row.id,
-      status:     row.status,
-      open_at:    row.open_at,
-      created_at: row.created_at,
+      success:        true,
+      promise_id:     row.id,
+      status:         row.status,
+      open_at:        row.open_at,
+      created_at:     row.created_at,
+      aurora_comment: getAuroraComment(emotion_text),
     });
   } catch (e) {
     console.error('POST /api/promise error:', e.message);
@@ -327,6 +390,7 @@ router.post('/:id/open', async (req, res) => {
       created_at:        rec.created_at,
       open_at:           rec.open_at,
       opened_count:      (rec.opened_count ?? 0) + 1,
+      aurora_comment:    getAuroraComment(rec.emotion_text),
     });
   } catch (e) {
     console.error('POST /api/promise/:id/open error:', e.message);
