@@ -187,15 +187,17 @@ router.post('/', async (req, res) => {
       ? new Date(open_at)
       : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
 
+    const generatedComment = getAuroraComment(emotion_text);
+
     const result = await db.query(
       `INSERT INTO promise_records
          (user_id, location_id, emotion_text, message_to_future,
-          photo_url, created_lat, created_lng, status, open_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, 'SEALED', $8)
-       RETURNING id, status, open_at, created_at`,
+          photo_url, created_lat, created_lng, status, open_at, aurora_comment)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'SEALED', $8, $9)
+       RETURNING id, status, open_at, created_at, aurora_comment`,
       [
         user_id, resolvedLocationId, emotion_text, message_to_future,
-        photo_url, created_lat, created_lng, openAt,
+        photo_url, created_lat, created_lng, openAt, generatedComment,
       ]
     );
 
@@ -207,7 +209,7 @@ router.post('/', async (req, res) => {
       status:         row.status,
       open_at:        row.open_at,
       created_at:     row.created_at,
-      aurora_comment: getAuroraComment(emotion_text),
+      aurora_comment: row.aurora_comment,
     });
   } catch (e) {
     console.error('POST /api/promise error:', e.message);
@@ -304,7 +306,8 @@ router.post('/:id/open', async (req, res) => {
 
     const result = await db.query(
       `SELECT id, user_id, location_id, emotion_text, message_to_future,
-              photo_url, status, open_at, created_at, first_opened_at, opened_count
+              photo_url, status, open_at, created_at, first_opened_at, opened_count,
+              aurora_comment
        FROM promise_records WHERE id = $1`,
       [req.params.id]
     );
@@ -390,7 +393,7 @@ router.post('/:id/open', async (req, res) => {
       created_at:        rec.created_at,
       open_at:           rec.open_at,
       opened_count:      (rec.opened_count ?? 0) + 1,
-      aurora_comment:    getAuroraComment(rec.emotion_text),
+      aurora_comment:    rec.aurora_comment ?? getAuroraComment(rec.emotion_text),
     });
   } catch (e) {
     console.error('POST /api/promise/:id/open error:', e.message);

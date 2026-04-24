@@ -1385,6 +1385,8 @@ app.post("/api/admin/run-migration", adminTokenGuard, async (req, res) => {
     "070", "127", "128", "129", "130", "131", "132",
     // star_logs 구스키마 패치 (124 먼저 실행된 환경)
     "133",
+    // promise_records aurora_comment 컬럼
+    "139",
   ];
 
   if (!migration || !allowed.includes(migration)) {
