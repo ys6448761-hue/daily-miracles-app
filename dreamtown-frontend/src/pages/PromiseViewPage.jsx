@@ -122,6 +122,12 @@ function LoadingView() {
   );
 }
 
+// QR 직접 진입 시 history 없음 → nav(-1) 무시됨. 명시적 경로 fallback
+function goBack(nav) {
+  if (window.history.length > 1) nav(-1);
+  else nav('/home');
+}
+
 // ── LOCKED_LOCATION ───────────────────────────────────────────────────
 function LockedLocationView({ locationId, createdAt, distanceM }) {
   const nav          = useNavigate();
@@ -165,10 +171,11 @@ function LockedLocationView({ locationId, createdAt, distanceM }) {
           border: '1px solid rgba(167,139,250,0.1)',
           fontSize: 12, color: '#4A3A70', marginBottom: 20,
         }}>📅 {date}에 이곳에서 봉인됨</div>
-        <button onClick={() => nav(-1)} style={{
+        <button onClick={() => goBack(nav)} style={{
+          position: 'relative', zIndex: 10,
           background: 'none', border: '1px solid rgba(255,255,255,0.08)',
           color: '#6A6090', fontSize: 13, borderRadius: 12,
-          padding: '10px 0', width: '100%', cursor: 'pointer',
+          padding: '14px 0', width: '100%', cursor: 'pointer',
           fontFamily: "'Noto Sans KR', sans-serif",
         }}>돌아가기</button>
       </motion.div>
@@ -201,6 +208,7 @@ function LockedTimeView({ daysLeft, openAt, locationId, createdAt }) {
             border: '1.5px solid rgba(167,139,250,0.3)',
             margin: '0 auto 20px',
             display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24,
+            pointerEvents: 'none', // 글로우가 하위 버튼 터치 차단 방지
           }}
           animate={{ boxShadow: [
             '0 0 12px 4px rgba(167,139,250,0.2)',
@@ -216,11 +224,14 @@ function LockedTimeView({ daysLeft, openAt, locationId, createdAt }) {
         <div style={{ fontSize: 20, fontWeight: 800, color: '#E8E4F0', lineHeight: 1.4, marginBottom: 10 }}>
           아직 열릴 때가<br />아니에요
         </div>
-        <div style={{ fontSize: 13, color: '#6A6090', lineHeight: 1.7, marginBottom: 16 }}>
+        <div style={{ fontSize: 13, color: '#6A6090', lineHeight: 1.7, marginBottom: 8 }}>
           <strong style={{ color: '#A78BFA', fontSize: 30, fontWeight: 900, display: 'block', marginBottom: 4 }}>
             {daysLeft}일
           </strong>
           후에 열립니다.
+        </div>
+        <div style={{ fontSize: 12, color: 'rgba(167,139,250,0.38)', lineHeight: 1.7, marginBottom: 16 }}>
+          이 마음은, 시간이 지나며 더 또렷해질 거예요.
         </div>
 
         {/* 진행 바 */}
@@ -249,10 +260,11 @@ function LockedTimeView({ daysLeft, openAt, locationId, createdAt }) {
           📅 {createDate} {locationName}에서 봉인<br />
           🔓 {openDate} 개봉 예정
         </div>
-        <button onClick={() => nav(-1)} style={{
+        <button onClick={() => goBack(nav)} style={{
+          position: 'relative', zIndex: 10,
           background: 'none', border: '1px solid rgba(255,255,255,0.08)',
           color: '#6A6090', fontSize: 13, borderRadius: 12,
-          padding: '10px 0', width: '100%', cursor: 'pointer',
+          padding: '14px 0', width: '100%', cursor: 'pointer',
           fontFamily: "'Noto Sans KR', sans-serif",
         }}>돌아가기</button>
       </motion.div>
@@ -381,10 +393,11 @@ function ErrorView({ message }) {
         <div style={{ fontSize: 32, marginBottom: 16 }}>⚠️</div>
         <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 10 }}>열 수 없어요</div>
         <div style={{ fontSize: 13, color: '#f87171', marginBottom: 20, lineHeight: 1.5 }}>{message}</div>
-        <button onClick={() => nav(-1)} style={{
+        <button onClick={() => goBack(nav)} style={{
+          position: 'relative', zIndex: 10,
           background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.2)',
           color: '#9B7FE0', fontSize: 13, borderRadius: 12,
-          padding: '11px 0', width: '100%', cursor: 'pointer',
+          padding: '14px 0', width: '100%', cursor: 'pointer',
           fontFamily: "'Noto Sans KR', sans-serif",
         }}>돌아가기</button>
       </motion.div>
