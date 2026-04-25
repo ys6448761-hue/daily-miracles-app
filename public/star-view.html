@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>내 별 — 하루하루의 기적</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(160deg, #1a1a2e 0%, #16213e 55%, #0f3460 100%);
+      min-height: 100vh;
+      padding: 0 0 60px;
+      color: #fff;
+    }
+    .container { max-width: 480px; margin: 0 auto; padding: 0 20px; }
+
+    /* ── 헤더 ── */
+    .page-header {
+      text-align: center;
+      padding: 40px 0 32px;
+    }
+    .star-icon { font-size: 60px; display: block; margin-bottom: 14px; }
+    .date-badge {
+      display: inline-block;
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 20px;
+      padding: 4px 14px;
+    }
+
+    /* ── 블록 공통 ── */
+    .block {
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 22px 20px;
+      margin-bottom: 14px;
+    }
+    .block-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+
+    /* ── 블록 1: 과거 ── */
+    .emotion-chip {
+      display: inline-block;
+      background: rgba(100,160,255,0.18);
+      border: 1px solid rgba(100,160,255,0.35);
+      border-radius: 20px;
+      padding: 5px 16px;
+      font-size: 14px;
+      color: #a8c8ff;
+      margin-bottom: 14px;
+    }
+    .promise-item {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+    }
+    .promise-item:last-child { margin-bottom: 0; }
+    .promise-type-label {
+      font-size: 11px;
+      color: #64a0ff;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .promise-text {
+      font-size: 15px;
+      line-height: 1.65;
+      color: rgba(255,255,255,0.88);
+    }
+    .promise-when {
+      margin-top: 6px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* ── 블록 2: 현재 ── */
+    .reflect-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .reflect-btn {
+      background: rgba(255,255,255,0.07);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      padding: 16px 20px;
+      color: rgba(255,255,255,0.85);
+      font-size: 15px;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.18s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .reflect-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); }
+    .reflect-btn.selected {
+      background: rgba(100,160,255,0.2);
+      border-color: #64a0ff;
+    }
+    .reflect-btn.disabled { opacity: 0.45; pointer-events: none; }
+    .reflect-emoji { font-size: 22px; flex-shrink: 0; }
+
+    /* ── 블록 3: 다음 ── */
+    #block3 { display: none; }
+    .next-grid { display: flex; flex-direction: column; gap: 10px; }
+    .btn-travel {
+      display: block;
+      width: 100%;
+      padding: 18px 20px;
+      background: linear-gradient(90deg, #4f8ef7 0%, #7b5ea7 100%);
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+    }
+    .btn-exit {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.18);
+      border-radius: 14px;
+      color: rgba(255,255,255,0.5);
+      font-size: 14px;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+    }
+    .voyage-nudge {
+      margin-top: 6px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.38);
+      line-height: 1.7;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .btn-voyage {
+      display: inline-block;
+      padding: 10px 22px;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      color: rgba(255,255,255,0.5);
+      font-size: 13px;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .btn-voyage:hover { border-color: rgba(255,255,255,0.4); color: rgba(255,255,255,0.7); }
+    .travel-copy {
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    /* ── 로딩 / 에러 ── */
+    .loading-state {
+      text-align: center;
+      padding: 80px 0;
+      color: rgba(255,255,255,0.4);
+      font-size: 14px;
+    }
+    .not-found { text-align: center; padding: 80px 0; }
+    .not-found h2 { font-size: 18px; margin-bottom: 8px; }
+    .not-found p { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 24px; }
+    .btn-ghost {
+      display: inline-block;
+      padding: 12px 24px;
+      border: 1.5px solid rgba(255,255,255,0.25);
+      border-radius: 12px;
+      color: rgba(255,255,255,0.65);
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    /* ── 저장 완료 안내 ── */
+    .saved-badge {
+      display: none;
+      font-size: 12px;
+      color: #7bc67e;
+      text-align: center;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="app">
+      <div class="loading-state">별을 불러오는 중...</div>
+    </div>
+  </div>
+
+  <script>
+    const TYPE_LABELS  = { '3m': '3개월 후', '6m': '6개월 후', '12m': '1년 후' };
+    const TRAVEL_COPY  = {
+      '3m':  '조금 더 가볍게,\n다시 한번 떠나볼까요',
+      '6m':  '계절이 바뀌었어요.\n그때의 당신을 다시 만나러 갈 시간이에요',
+      '12m': '1년 전의 당신과\n지금의 당신이 만나는 날이에요',
+    };
+
+    function formatDate(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function escHtml(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function getPrimaryType(promises) {
+      if (!promises.length) return null;
+      const order = ['12m','6m','3m'];
+      for (const t of order) {
+        if (promises.find(p => p.type === t)) return t;
+      }
+      return promises[0].type;
+    }
+
+    let globalStarId = null;
+
+    async function loadStar() {
+      const accessKey = window.location.pathname.split('/').filter(Boolean).pop();
+      if (!accessKey) return renderNotFound();
+
+      try {
+        const res  = await fetch(`/api/star/${accessKey}`);
+        const data = await res.json();
+        if (!data.success) return renderNotFound();
+        render(data.star, data.promises, data.last_reflection);
+      } catch {
+        renderNotFound();
+      }
+    }
+
+    function render(star, promises, lastReflection) {
+      globalStarId = star.id;
+      const primaryType  = getPrimaryType(promises);
+      const travelCopy   = TRAVEL_COPY[primaryType] || TRAVEL_COPY['3m'];
+      const travelUrl    = `/travel?type=${primaryType || '3m'}&star_id=${star.id}`;
+      const alreadyRefl  = !!lastReflection;
+
+      const promisesHtml = promises.length > 0
+        ? promises.map(p => `
+            <div class="promise-item">
+              <div class="promise-type-label">${TYPE_LABELS[p.type] || p.type}</div>
+              <div class="promise-text">${escHtml(p.content)}</div>
+              <div class="promise-when">열리는 날 ${formatDate(p.target_date || p.created_at)}</div>
+            </div>`).join('')
+        : `<div style="font-size:14px;color:rgba(255,255,255,0.4);padding:8px 0">약속이 없어요</div>`;
+
+      const reflStatus = alreadyRefl
+        ? `<div style="font-size:13px;color:rgba(255,255,255,0.4);padding:8px 0">이미 기록했어요 — ${escHtml(lastReflection.status)}</div>`
+        : '';
+
+      document.getElementById('app').innerHTML = `
+        <div class="page-header">
+          <span class="star-icon">⭐</span>
+          <div class="date-badge">${formatDate(star.created_at)} · 케이블카</div>
+        </div>
+
+        <!-- 블록 1: 과거의 나 -->
+        <div class="block">
+          <div class="block-label">그날의 당신</div>
+          ${star.emotion ? `<div class="emotion-chip">${escHtml(star.emotion)}</div>` : ''}
+          ${promisesHtml}
+        </div>
+
+        <!-- 블록 2: 지금의 나 -->
+        <div class="block" id="block2">
+          <div class="block-label">지금의 당신은 어떤가요</div>
+          ${reflStatus}
+          <div class="reflect-grid ${alreadyRefl ? 'already' : ''}">
+            <button class="reflect-btn ${alreadyRefl ? 'disabled' : ''}" data-status="closer">
+              <span class="reflect-emoji">🌱</span>조금 가까워졌어요
+            </button>
+            <button class="reflect-btn ${alreadyRefl ? 'disabled' : ''}" data-status="same">
+              <span class="reflect-emoji">🌙</span>그대로예요
+            </button>
+            <button class="reflect-btn ${alreadyRefl ? 'disabled' : ''}" data-status="changed">
+              <span class="reflect-emoji">🌀</span>생각이 달라졌어요
+            </button>
+          </div>
+          <div class="saved-badge" id="savedBadge">✓ 기록됐어요</div>
+        </div>
+
+        <!-- 블록 3: 다음 선택 -->
+        <div class="block" id="block3" ${alreadyRefl ? 'style="display:block"' : ''}>
+          <div class="block-label">이제, 다음을 선택해보세요</div>
+          <div class="next-grid">
+            <a class="btn-exit" href="javascript:history.back()">그냥 나가기</a>
+          </div>
+          <div style="text-align:center;margin-top:20px;">
+            <p class="voyage-nudge">여수에서 이 흐름을 이어볼 수도 있어요</p>
+            <a class="btn-voyage" href="/voyage-select?star_id=${encodeURIComponent(star.id)}">한번 볼까</a>
+          </div>
+        </div>
+      `;
+
+      // reflection 버튼 이벤트
+      document.querySelectorAll('.reflect-btn:not(.disabled)').forEach(btn => {
+        btn.addEventListener('click', () => handleReflect(btn.dataset.status));
+      });
+    }
+
+    async function handleReflect(status) {
+      if (!globalStarId) return;
+
+      // 즉시 시각 피드백
+      document.querySelectorAll('.reflect-btn').forEach(b => {
+        b.classList.add('disabled');
+        if (b.dataset.status === status) b.classList.add('selected');
+      });
+
+      try {
+        await fetch('/api/star/reflect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ star_id: globalStarId, status }),
+        });
+      } catch { /* 저장 실패해도 UX 계속 진행 */ }
+
+      document.getElementById('savedBadge').style.display = 'block';
+
+      // Block 3 노출
+      setTimeout(() => {
+        const b3 = document.getElementById('block3');
+        if (b3) {
+          b3.style.display = 'block';
+          b3.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 400);
+    }
+
+    function renderNotFound() {
+      document.getElementById('app').innerHTML = `
+        <div class="not-found">
+          <h2>별을 찾을 수 없어요</h2>
+          <p>접근 코드를 다시 확인해주세요</p>
+          <a class="btn-ghost" href="/star-entry.html">새 별 만들기</a>
+        </div>`;
+    }
+
+    loadStar();
+  </script>
+</body>
+</html>

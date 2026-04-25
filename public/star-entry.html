@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>별 만들기 — 하루하루의 기적</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      color: #fff;
+    }
+    .container { max-width: 480px; width: 100%; }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .star-icon { font-size: 56px; margin-bottom: 16px; display: block; }
+    .header h1 {
+      font-size: 22px;
+      font-weight: 600;
+      line-height: 1.5;
+      color: #fff;
+    }
+    .header p {
+      margin-top: 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+    }
+
+    .emotion-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .emotion-btn {
+      background: rgba(255,255,255,0.08);
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 16px;
+      padding: 20px 16px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 500;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .emotion-btn:hover { background: rgba(255,255,255,0.15); }
+    .emotion-btn.selected {
+      background: rgba(100,160,255,0.3);
+      border-color: #64a0ff;
+      box-shadow: 0 0 16px rgba(100,160,255,0.25);
+    }
+    .emotion-emoji { font-size: 28px; display: block; margin-bottom: 6px; }
+
+    .btn-next {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(90deg, #4f8ef7, #7b5ea7);
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 17px;
+      font-weight: 600;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      opacity: 0.4;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .btn-next.active { opacity: 1; pointer-events: auto; }
+
+    .loading {
+      display: none;
+      text-align: center;
+      margin-top: 16px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+    }
+    .error-msg {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 16px;
+      background: rgba(255,80,80,0.2);
+      border-radius: 10px;
+      font-size: 13px;
+      color: #ff9999;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <span class="star-icon">✨</span>
+      <h1>지금 이 순간,<br>당신의 마음은 어떤가요</h1>
+      <p>케이블카에서 느낀 감정을 하나 골라주세요</p>
+    </div>
+
+    <div class="emotion-grid">
+      <button class="emotion-btn" data-emotion="설렘">
+        <span class="emotion-emoji">🌟</span>설렘
+      </button>
+      <button class="emotion-btn" data-emotion="편안함">
+        <span class="emotion-emoji">🌿</span>편안함
+      </button>
+      <button class="emotion-btn" data-emotion="기대">
+        <span class="emotion-emoji">🌅</span>기대
+      </button>
+      <button class="emotion-btn" data-emotion="정리됨">
+        <span class="emotion-emoji">🪐</span>정리됨
+      </button>
+    </div>
+
+    <button class="btn-next" id="btnNext">별 만들기 →</button>
+    <div class="loading" id="loading">별을 만들고 있어요...</div>
+    <div class="error-msg" id="errorMsg">잠시 후 다시 시도해주세요</div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const loc = params.get('loc') || 'cablecar';
+
+    let selectedEmotion = null;
+
+    document.querySelectorAll('.emotion-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.emotion-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedEmotion = btn.dataset.emotion;
+        document.getElementById('btnNext').classList.add('active');
+      });
+    });
+
+    document.getElementById('btnNext').addEventListener('click', async () => {
+      if (!selectedEmotion) return;
+
+      document.getElementById('btnNext').classList.remove('active');
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('errorMsg').style.display = 'none';
+
+      try {
+        const res = await fetch('/api/star/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ emotion: selectedEmotion, origin_location: loc }),
+        });
+        const data = await res.json();
+
+        if (!data.success) throw new Error(data.error || '별 생성 실패');
+
+        localStorage.setItem('access_key', data.access_key);
+        localStorage.setItem('star_id', data.star_id);
+
+        window.location.href = '/promise.html';
+      } catch (e) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('errorMsg').style.display = 'block';
+        document.getElementById('btnNext').classList.add('active');
+      }
+    });
+  </script>
+</body>
+</html>

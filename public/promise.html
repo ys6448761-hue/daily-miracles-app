@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>약속 남기기 — 하루하루의 기적</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      color: #fff;
+    }
+    .container { max-width: 480px; width: 100%; }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .header h1 {
+      font-size: 22px;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+    .header p {
+      margin-top: 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+    }
+
+    .type-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .type-btn {
+      background: rgba(255,255,255,0.08);
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 14px 8px;
+      color: rgba(255,255,255,0.7);
+      font-size: 15px;
+      font-weight: 500;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .type-btn:hover { background: rgba(255,255,255,0.14); }
+    .type-btn.selected {
+      background: rgba(100,160,255,0.3);
+      border-color: #64a0ff;
+      color: #fff;
+    }
+    .type-sub {
+      display: block;
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+      margin-top: 3px;
+    }
+
+    .content-area {
+      background: rgba(255,255,255,0.07);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      padding: 4px;
+      margin-bottom: 20px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 15px;
+      font-family: 'Noto Sans KR', sans-serif;
+      line-height: 1.6;
+      padding: 14px;
+      resize: none;
+    }
+    textarea::placeholder { color: rgba(255,255,255,0.3); }
+
+    .char-count {
+      text-align: right;
+      font-size: 12px;
+      color: rgba(255,255,255,0.35);
+      padding: 0 14px 10px;
+    }
+
+    .btn-save {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(90deg, #4f8ef7, #7b5ea7);
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 17px;
+      font-weight: 600;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      opacity: 0.4;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .btn-save.active { opacity: 1; pointer-events: auto; }
+
+    .loading { display: none; text-align: center; margin-top: 14px; font-size: 14px; color: rgba(255,255,255,0.6); }
+    .error-msg {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 16px;
+      background: rgba(255,80,80,0.2);
+      border-radius: 10px;
+      font-size: 13px;
+      color: #ff9999;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>이 시간 뒤,<br>어떤 모습이길 바라나요</h1>
+      <p>미래의 당신에게 남기는 한 마디</p>
+    </div>
+
+    <div class="type-grid">
+      <button class="type-btn" data-type="3m">
+        3개월<span class="type-sub">후에 열림</span>
+      </button>
+      <button class="type-btn" data-type="6m">
+        6개월<span class="type-sub">후에 열림</span>
+      </button>
+      <button class="type-btn" data-type="12m">
+        1년<span class="type-sub">후에 열림</span>
+      </button>
+    </div>
+
+    <div class="content-area">
+      <textarea id="content" maxlength="200" placeholder="지금의 마음을 적어주세요..."></textarea>
+      <div class="char-count"><span id="charCount">0</span> / 200</div>
+    </div>
+
+    <button class="btn-save" id="btnSave">약속 저장하기</button>
+    <div class="loading" id="loading">저장하고 있어요...</div>
+    <div class="error-msg" id="errorMsg">저장에 실패했어요. 다시 시도해주세요.</div>
+  </div>
+
+  <script>
+    const starId = localStorage.getItem('star_id');
+    if (!starId) {
+      window.location.href = '/star-entry.html';
+    }
+
+    let selectedType = null;
+
+    document.querySelectorAll('.type-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedType = btn.dataset.type;
+        checkReady();
+      });
+    });
+
+    const textarea = document.getElementById('content');
+    textarea.addEventListener('input', () => {
+      document.getElementById('charCount').textContent = textarea.value.length;
+      checkReady();
+    });
+
+    function checkReady() {
+      const ready = selectedType && textarea.value.trim().length > 0;
+      document.getElementById('btnSave').classList.toggle('active', ready);
+    }
+
+    document.getElementById('btnSave').addEventListener('click', async () => {
+      const content = textarea.value.trim();
+      if (!selectedType || !content) return;
+
+      document.getElementById('btnSave').classList.remove('active');
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('errorMsg').style.display = 'none';
+
+      try {
+        const res = await fetch('/api/star/promise', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ star_id: starId, type: selectedType, content }),
+        });
+        const data = await res.json();
+
+        if (!data.success) throw new Error(data.error || '저장 실패');
+
+        window.location.href = '/complete.html';
+      } catch (e) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('errorMsg').style.display = 'block';
+        document.getElementById('btnSave').classList.add('active');
+      }
+    });
+  </script>
+</body>
+</html>

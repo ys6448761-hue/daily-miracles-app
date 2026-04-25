@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>항해 시작 — 하루하루의 기적</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(160deg, #1a1a2e 0%, #16213e 55%, #0f3460 100%);
+      min-height: 100vh;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+    }
+    .container { max-width: 400px; width: 100%; text-align: center; }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .icon {
+      font-size: 64px;
+      display: block;
+      margin-bottom: 24px;
+      animation: rise 0.8s ease forwards;
+    }
+    .title {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.55;
+      color: rgba(255,255,255,0.95);
+      margin-bottom: 16px;
+      animation: rise 0.9s ease forwards;
+    }
+    .desc {
+      font-size: 14px;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.8;
+      margin-bottom: 44px;
+      animation: rise 1s ease forwards;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(100,160,255,0.12);
+      border: 1px solid rgba(100,160,255,0.25);
+      border-radius: 20px;
+      padding: 6px 18px;
+      font-size: 13px;
+      color: #a8c8ff;
+      margin-bottom: 40px;
+    }
+
+    .actions { display: flex; flex-direction: column; gap: 12px; }
+
+    .btn-star {
+      display: block;
+      padding: 18px;
+      background: rgba(255,255,255,0.07);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      color: rgba(255,255,255,0.75);
+      font-size: 15px;
+      font-weight: 500;
+      font-family: 'Noto Sans KR', sans-serif;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-star:hover { background: rgba(255,255,255,0.12); }
+
+    .btn-home {
+      display: block;
+      padding: 14px;
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.3);
+      font-size: 13px;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <span class="icon">⚓</span>
+    <div class="title">항해가 시작됩니다</div>
+
+    <div class="badge" id="typeBadge">항해 프로그램</div>
+
+    <div class="desc">
+      곧 안내 연락을 드릴게요.<br>
+      당신의 시간을 소중히 준비하겠습니다.
+    </div>
+
+    <div class="actions">
+      <a class="btn-star" href="/voyage-benefit">내 여행 혜택 확인하기</a>
+      <a class="btn-star" id="btnStar" href="/star-entry">내 별 보러 가기</a>
+      <a class="btn-home" href="/">처음으로</a>
+    </div>
+  </div>
+
+  <script>
+    const TYPE_LABELS = { rest:'쉼 항해', reflect:'정리 항해', move:'설렘 항해' };
+    const params = new URLSearchParams(window.location.search);
+    const id     = params.get('id');
+
+    if (id) {
+      fetch(`/api/star-voyage/${id}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.success && data.voyage) {
+            const v = data.voyage;
+            document.getElementById('typeBadge').textContent = TYPE_LABELS[v.type] || '항해 프로그램';
+            if (v.star_id) {
+              document.getElementById('btnStar').href = `/star-entry`;
+            }
+          }
+        })
+        .catch(() => {});
+    }
+  </script>
+</body>
+</html>

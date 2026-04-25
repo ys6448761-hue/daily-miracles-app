@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FRRJ7JZPGZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date()); gtag('config', 'G-FRRJ7JZPGZ');
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>다시 여수로 — 하루하루의 기적</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(160deg, #0d1b2a 0%, #1a2e4a 60%, #0f3460 100%);
+      min-height: 100vh;
+      padding: 0 0 60px;
+      color: #fff;
+    }
+    .container { max-width: 480px; margin: 0 auto; padding: 0 20px; }
+    .step { display: none; }
+    .step.active { display: block; }
+
+    .page-top { text-align: center; padding: 44px 0 28px; }
+    .page-icon { font-size: 56px; display: block; margin-bottom: 14px; }
+    .page-top h1 { font-size: 20px; font-weight: 600; line-height: 1.55; }
+    .page-top p  { margin-top: 8px; font-size: 13px; color: rgba(255,255,255,0.5); }
+
+    /* ── 선택 버튼 ── */
+    .choice-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+    .choice-btn {
+      background: rgba(255,255,255,0.07);
+      border: 2px solid rgba(255,255,255,0.13);
+      border-radius: 18px; padding: 20px;
+      cursor: pointer; transition: all 0.18s;
+      display: flex; align-items: center; gap: 16px; width: 100%;
+    }
+    .choice-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.28); }
+    .choice-emoji { font-size: 36px; flex-shrink: 0; }
+    .choice-info h3 { font-size: 17px; font-weight: 600; margin-bottom: 4px; color: #fff; }
+    .choice-info p  { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.45; }
+
+    /* ── 코스 + 숙소 카드 ── */
+    .course-card {
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 20px; overflow: hidden; margin-bottom: 14px;
+    }
+    .card-label {
+      background: rgba(255,255,255,0.07); padding: 12px 20px;
+      font-size: 11px; font-weight: 600; letter-spacing: 1.2px;
+      color: rgba(255,255,255,0.45); text-transform: uppercase;
+    }
+    .course-list { padding: 14px 20px; }
+    .course-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 14px; color: rgba(255,255,255,0.82);
+    }
+    .course-item:last-child { border-bottom: none; }
+    .ci-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── 숙소 카드 ── */
+    .hotel-card {
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 20px; padding: 22px 20px; margin-bottom: 14px;
+    }
+    .hotel-label {
+      font-size: 11px; font-weight: 600; letter-spacing: 1.2px;
+      color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 12px;
+    }
+    .hotel-tag {
+      display: inline-block; font-size: 11px; color: #a8c8ff;
+      background: rgba(100,160,255,0.15); border-radius: 10px;
+      padding: 3px 10px; margin-bottom: 8px;
+    }
+    .hotel-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .hotel-desc { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+
+    /* ── 버튼 ── */
+    .action-area { margin-top: 16px; }
+    .btn-primary {
+      display: block; width: 100%; padding: 17px;
+      background: linear-gradient(90deg, #4f8ef7, #7b5ea7);
+      border: none; border-radius: 14px;
+      color: #fff; font-size: 16px; font-weight: 600;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer; text-align: center; text-decoration: none; margin-bottom: 10px;
+    }
+    .btn-secondary {
+      display: block; width: 100%; padding: 14px;
+      background: rgba(255,255,255,0.07);
+      border: 1.5px solid rgba(255,255,255,0.18);
+      border-radius: 14px; color: rgba(255,255,255,0.75);
+      font-size: 14px; text-align: center; text-decoration: none; margin-bottom: 10px;
+      cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+    }
+    .btn-ghost {
+      display: block; width: 100%; padding: 13px; background: transparent; border: none;
+      color: rgba(255,255,255,0.3); font-size: 13px;
+      text-align: center; cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+    }
+    .btn-prev {
+      display: block; width: 100%; padding: 12px; background: none; border: none;
+      color: rgba(255,255,255,0.35); font-size: 13px;
+      text-align: center; cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+      margin-top: 4px;
+    }
+
+    /* ── 당일치기 · 그룹 ── */
+    .info-card {
+      background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 20px; padding: 24px 20px; text-align: center; margin-bottom: 14px;
+    }
+    .info-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+    .info-card p  { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.65; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ── STEP 0: 유형 선택 ── -->
+  <div id="step0" class="step active">
+    <div class="page-top">
+      <span class="page-icon">🚡</span>
+      <h1>지금의 당신에게<br>어울리는 하루를 골라보세요</h1>
+    </div>
+    <div class="choice-grid">
+      <button class="choice-btn" data-go="step1">
+        <span class="choice-emoji">🌙</span>
+        <div class="choice-info">
+          <h3>1박2일</h3>
+          <p>천천히, 제대로 머물다 오기</p>
+        </div>
+      </button>
+      <button class="choice-btn" data-go="stepDay">
+        <span class="choice-emoji">🚶</span>
+        <div class="choice-info">
+          <h3>가볍게 다녀오기</h3>
+          <p>케이블카 + 오동도, 당일치기</p>
+        </div>
+      </button>
+      <button class="choice-btn" data-go="stepGroup">
+        <span class="choice-emoji">👥</span>
+        <div class="choice-info">
+          <h3>함께 가기</h3>
+          <p>5인 이상 — 단체 문의로 연결</p>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── STEP 1: 1박2일 테마 선택 ── -->
+  <div id="step1" class="step">
+    <div class="page-top">
+      <span class="page-icon">✨</span>
+      <h1>이 흐름이 어울려요</h1>
+      <p>하나를 골라주세요</p>
+    </div>
+    <div class="choice-grid">
+      <button class="choice-btn" data-theme="rest">
+        <span class="choice-emoji">🌿</span>
+        <div class="choice-info">
+          <h3>쉼</h3>
+          <p>조용히 머물며, 다시 충전되는 시간</p>
+        </div>
+      </button>
+      <button class="choice-btn" data-theme="thrill">
+        <span class="choice-emoji">🌊</span>
+        <div class="choice-info">
+          <h3>설렘</h3>
+          <p>두근두근, 새로운 여수를 만나는 시간</p>
+        </div>
+      </button>
+      <button class="choice-btn" data-theme="settle">
+        <span class="choice-emoji">🌙</span>
+        <div class="choice-info">
+          <h3>정리</h3>
+          <p>혼자 걷고, 생각을 내려놓는 1박2일</p>
+        </div>
+      </button>
+    </div>
+    <button class="btn-prev" data-back="step0">← 처음으로</button>
+  </div>
+
+  <!-- ── STEP 2: 코스 + 숙소 ── -->
+  <div id="step2" class="step">
+    <div class="page-top" style="padding-bottom:12px">
+      <span class="page-icon" id="r-emoji">🌿</span>
+      <h1 id="r-title">오늘의 흐름</h1>
+    </div>
+    <button class="btn-prev" data-back="step1">← 다른 테마 보기</button>
+
+    <div class="course-card">
+      <div class="card-label">오늘의 코스</div>
+      <div class="course-list" id="r-course"></div>
+    </div>
+
+    <div class="hotel-card">
+      <div class="hotel-label">숙소</div>
+      <div class="hotel-tag" id="r-tag"></div>
+      <div class="hotel-name" id="r-name"></div>
+      <div class="hotel-desc" id="r-desc"></div>
+    </div>
+
+    <div class="action-area">
+      <a class="btn-primary" id="r-book" href="#" target="_blank" rel="noopener">예약하러 가기 →</a>
+      <a class="btn-secondary" id="r-call" href="#">전화하기</a>
+      <button class="btn-ghost" onclick="history.back()">그냥 나가기</button>
+    </div>
+  </div>
+
+  <!-- ── STEP Day: 당일치기 ── -->
+  <div id="stepDay" class="step">
+    <div class="page-top">
+      <span class="page-icon">🚶</span>
+      <h1>가볍게,<br>여수 한 바퀴</h1>
+      <p>케이블카 → 오동도 — 원도심 안에서 닫히는 반나절</p>
+    </div>
+    <div class="course-card">
+      <div class="card-label">추천 동선</div>
+      <div class="course-list">
+        <div class="course-item"><span class="ci-icon">🚡</span><span>해상 케이블카 — 바다 위에서 여수 한눈에</span></div>
+        <div class="course-item"><span class="ci-icon">🌿</span><span>오동도 산책 — 동백숲 따라 천천히</span></div>
+        <div class="course-item"><span class="ci-icon">☕</span><span>원도심 카페 — 바다 보며 커피 한 잔</span></div>
+        <div class="course-item"><span class="ci-icon">🐟</span><span>수산시장 — 여수 맛 한 접시</span></div>
+      </div>
+    </div>
+    <div class="action-area">
+      <a class="btn-primary" href="https://www.yeosu-cablecar.com" target="_blank" rel="noopener"
+         onclick="track('daytrip_cablecar_clicked')">케이블카 예약하러 가기 →</a>
+      <button class="btn-ghost" onclick="history.back()">그냥 나가기</button>
+    </div>
+    <button class="btn-prev" data-back="step0">← 처음으로</button>
+  </div>
+
+  <!-- ── STEP Group: 그룹 문의 ── -->
+  <div id="stepGroup" class="step">
+    <div class="page-top">
+      <span class="page-icon">👥</span>
+      <h1>함께 가는 여수,<br>직접 연결해드릴게요</h1>
+      <p>5인 이상은 아래로 문의해주세요</p>
+    </div>
+    <div class="info-card">
+      <h3>단체 여행 문의</h3>
+      <p>인원, 날짜, 원하는 테마를 말씀해주시면<br>맞춤으로 연결해드려요.</p>
+    </div>
+    <div class="action-area">
+      <a class="btn-primary" href="tel:010-0000-0000" onclick="track('group_call_clicked')">전화로 문의하기</a>
+      <a class="btn-secondary" href="https://open.kakao.com/o/placeholder" target="_blank" rel="noopener"
+         onclick="track('group_kakao_clicked')">카카오로 문의하기</a>
+      <button class="btn-ghost" onclick="history.back()">그냥 나가기</button>
+    </div>
+    <button class="btn-prev" data-back="step0">← 처음으로</button>
+  </div>
+
+</div>
+
+<script>
+  /* ── 테마 데이터 (v1.2 SSOT: 감정 → 코스 → 호텔) ── */
+  const THEMES = {
+    rest: {
+      emoji: '🌿', title: '천천히, 다시 여수에서',
+      course: [
+        { icon: '🚡', text: '케이블카 — 바다 위에 잠시 멈춰 있기' },
+        { icon: '🌿', text: '오동도 혼자 걷기 — 동백숲 속 천천히' },
+        { icon: '🏨', text: '케니호텔에서 쉬기 — 조용히 하루 마무리' },
+        { icon: '🌙', text: '밤바다 산책 — 아무 생각 없이 걷기' },
+      ],
+      default_hotel: {
+        name: '케니호텔',
+        tag:  '조용한 · 오션뷰',
+        desc: '조용히 쉬어가기 좋은 공간\n여수 바다가 가까운 곳에 있어요',
+        // TODO: 실제 야놀자 숙소 ID 확인 후 교체
+        book: 'https://www.yanolja.com/search?keyword=케니호텔+여수',
+        call: 'tel:061-000-0000',
+      },
+      hotel_options: [], // v2 확장 예정
+    },
+    thrill: {
+      emoji: '🌊', title: '두근두근, 새로운 여수',
+      course: [
+        { icon: '🚡', text: '케이블카 — 두근두근 여수 바다 위' },
+        { icon: '⛵', text: '요트 투어 — 바다에서 여수 보기' },
+        { icon: '🏙️', text: '루프탑 야경 — 여수의 밤을 한눈에' },
+        { icon: '🌿', text: '오동도 이른 아침 — 산책 후 커피' },
+      ],
+      default_hotel: {
+        name: '라마다 앙코르 여수',
+        tag:  '루프탑 · 야경',
+        desc: '여수 밤바다가 한눈에 보이는 루프탑\n설레는 하루의 마무리',
+        book: 'https://www.yanolja.com/search?keyword=라마다앙코르+여수',
+        call: 'tel:061-659-7000',
+      },
+      hotel_options: [],
+    },
+    settle: {
+      emoji: '🌙', title: '혼자, 그리고 조용히',
+      course: [
+        { icon: '🌿', text: '오동도 혼자 걷기 — 동백숲 속 생각 정리' },
+        { icon: '🚡', text: '케이블카 — 바다 위에서 아무 말 없이' },
+        { icon: '☕', text: '바다 앞 카페 — 아무것도 안 해도 되는 시간' },
+        { icon: '🌙', text: '밤바다 — 저녁, 조용히 마무리' },
+      ],
+      default_hotel: {
+        name: '디오션리조트 여수',
+        tag:  '조용한 · 자연',
+        desc: '소란스럽지 않은, 혼자만의 공간\n깊은 쉼이 필요한 밤',
+        book: 'https://www.yanolja.com/search?keyword=디오션리조트+여수',
+        call: 'tel:061-660-8000',
+      },
+      hotel_options: [],
+    },
+  };
+
+  const params     = new URLSearchParams(window.location.search);
+  const promType   = params.get('type')       || '';
+  const starId     = params.get('star_id')    || localStorage.getItem('star_id')    || '';
+  const accessKey  = params.get('access_key') || localStorage.getItem('access_key') || '';
+  const refSource  = (['reminder','qr','direct'].includes(params.get('ref')))
+                   ? params.get('ref') : 'direct';
+
+  function track(event, extra = {}) {
+    if (typeof gtag === 'function') {
+      gtag('event', event, { promise_type: promType, star_id: starId, ...extra });
+    }
+  }
+
+  /* ── DB 클릭 로그 + 외부 이동 ── */
+  async function logClick(actionType, theme, hotelName, externalUrl) {
+    track(actionType === 'reserve' ? 'travel_booking_clicked' : 'travel_call_clicked',
+          { theme, hotel: hotelName });
+    try {
+      await fetch('/api/travel/click', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          star_id:    starId    || null,
+          access_key: accessKey || null,
+          theme,
+          hotel_name:  hotelName,
+          action_type: actionType,
+          ref_source:  refSource,
+        }),
+      });
+    } catch { /* 로그 실패해도 UX 차단하지 않음 */ }
+
+    if (actionType === 'reserve') {
+      window.open(externalUrl, '_blank', 'noopener');
+    } else {
+      window.location.href = externalUrl;
+    }
+  }
+
+  function show(id) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    const el = document.getElementById(id);
+    if (el) { el.classList.add('active'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+  }
+
+  /* ── 유형 선택 버튼 ── */
+  document.querySelectorAll('[data-go]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      track('travel_type_selected', { type: btn.dataset.go });
+      show(btn.dataset.go);
+    });
+  });
+
+  /* ── 테마 버튼 ── */
+  document.querySelectorAll('[data-theme]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.theme;
+      track('travel_theme_selected', { theme: key });
+      localStorage.setItem('selected_theme', key);
+      renderResult(key);
+      show('step2');
+    });
+  });
+
+  /* ── 뒤로 버튼 ── */
+  document.querySelectorAll('[data-back]').forEach(btn => {
+    btn.addEventListener('click', () => show(btn.dataset.back));
+  });
+
+  /* ── 결과 렌더 ── */
+  function renderResult(key) {
+    const t = THEMES[key];
+    const h = t.default_hotel;
+
+    document.getElementById('r-emoji').textContent = t.emoji;
+    document.getElementById('r-title').textContent = t.title;
+    document.getElementById('r-tag').textContent   = h.tag;
+    document.getElementById('r-name').textContent  = h.name;
+    document.getElementById('r-desc').textContent  = h.desc;
+
+    document.getElementById('r-course').innerHTML = t.course
+      .map(c => `<div class="course-item">
+                   <span class="ci-icon">${c.icon}</span>
+                   <span>${c.text}</span>
+                 </div>`).join('');
+
+    const bb = document.getElementById('r-book');
+    bb.href    = h.book;
+    bb.onclick = (e) => { e.preventDefault(); logClick('reserve', key, h.name, h.book); };
+
+    const bc = document.getElementById('r-call');
+    bc.href        = h.call;
+    bc.textContent = `전화하기 — ${h.name}`;
+    bc.onclick     = (e) => { e.preventDefault(); logClick('call', key, h.name, h.call); };
+  }
+
+  /* ── 진입 시 테마 자동 복원 (선택) ── */
+  const saved = localStorage.getItem('selected_theme');
+  if (saved && THEMES[saved]) {
+    renderResult(saved);
+    show('step2');
+  }
+</script>
+</body>
+</html>

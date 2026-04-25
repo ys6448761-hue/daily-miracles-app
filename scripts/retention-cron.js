@@ -1,10 +1,11 @@
 /**
- * retention-cron.js — Day3/Day7 이탈 방지 CRON
+ * retention-cron.js — Day1/Day3/Day7 이탈 방지 CRON
  *
  * 실행: node scripts/retention-cron.js
- * 권장 스케줄: 매일 오전 9시 KST (cron: "0 0 * * *" UTC)
+ * 권장 스케줄: 매일 오전 10시 KST (cron: "0 1 * * *" UTC)
  *
- * Day3: day1_start 후 48~72h + 48h 비활동 → "지금이 가장 중요한 순간"
+ * Day1: star_created 후 12~24h + 재방문 없음 → 알림톡 재방문 유도
+ * Day3: day1_start 후 48~72h + 48h 비활동   → "지금이 가장 중요한 순간"
  * Day7: day1_start 후 5일+ + 완주 없음 + 48h 비활동 → "거의 다 왔어요"
  */
 
@@ -13,6 +14,7 @@
 require('dotenv').config();
 
 const {
+  findDay1ReturnUsers, sendDay1Alimtalk,
   findDay3InactiveUsers, sendDay3Sms,
   findDay7InactiveUsers, sendDay7Sms,
 } = require('../services/retentionService');
@@ -35,16 +37,18 @@ async function runBatch(label, users, sendFn) {
 async function main() {
   console.log('[retention-cron] 시작:', new Date().toISOString());
 
-  const [day3Users, day7Users] = await Promise.all([
+  const [day1Users, day3Users, day7Users] = await Promise.all([
+    findDay1ReturnUsers(),
     findDay3InactiveUsers(),
     findDay7InactiveUsers(),
   ]);
 
+  const r1 = await runBatch('Day1', day1Users, sendDay1Alimtalk);
   const r3 = await runBatch('Day3', day3Users, sendDay3Sms);
   const r7 = await runBatch('Day7', day7Users, sendDay7Sms);
 
   console.log(
-    `[retention-cron] 완료 — Day3: ${r3.sent}건 / Day7: ${r7.sent}건`
+    `[retention-cron] 완료 — Day1: ${r1.sent}건 / Day3: ${r3.sent}건 / Day7: ${r7.sent}건`
   );
   process.exit(0);
 }

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>별이 태어났어요 — 하루하루의 기적</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      color: #fff;
+    }
+    .container { max-width: 480px; width: 100%; text-align: center; }
+
+    .star-anim {
+      font-size: 72px;
+      margin-bottom: 24px;
+      display: block;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .sub {
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+
+    .access-card {
+      background: rgba(255,255,255,0.08);
+      border: 1.5px solid rgba(255,255,255,0.18);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 28px;
+    }
+    .access-label {
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 8px;
+    }
+    .access-key {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: #a8c8ff;
+    }
+    .access-hint {
+      margin-top: 8px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .btn-view {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(90deg, #4f8ef7, #7b5ea7);
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 17px;
+      font-weight: 600;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      margin-bottom: 12px;
+      text-decoration: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <span class="star-anim">⭐</span>
+    <h1>당신의 별이 기록되었습니다</h1>
+    <p class="sub">
+      이 코드를 저장해두면<br>
+      언제든 다시 별을 만날 수 있어요
+    </p>
+
+    <div class="access-card">
+      <div class="access-label">내 별 접근 코드</div>
+      <div class="access-key" id="accessKey">—</div>
+      <div class="access-hint">화면 캡처 또는 메모해두세요</div>
+    </div>
+
+    <a class="btn-view" id="btnView" href="#">내 별 보러 가기 →</a>
+  </div>
+
+  <script>
+    const accessKey = localStorage.getItem('access_key');
+    if (!accessKey) {
+      window.location.href = '/star-entry.html';
+    } else {
+      document.getElementById('accessKey').textContent = accessKey;
+      document.getElementById('btnView').href = '/star/' + accessKey;
+    }
+  </script>
+</body>
+</html>

@@ -272,7 +272,7 @@ function HeroSection({ myStarId, nav }) {
                 >
                   <button
                     onClick={() => nav('/wish?new=1', {
-                      state: { prefillText: HERO_PREFILL[choice] },
+                      state: { prefillText: HERO_PREFILL[choice], emotionChoice: choice },
                     })}
                     style={{
                       display: 'block', width: '100%',

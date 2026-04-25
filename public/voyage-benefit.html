@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>나의 여행 혜택 — 하루하루의 기적</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(160deg, #1a1a2e 0%, #16213e 55%, #0f3460 100%);
+      min-height: 100vh;
+      color: #fff;
+      padding: 0 0 60px;
+    }
+    .container { max-width: 420px; margin: 0 auto; padding: 0 22px; }
+
+    /* ── 상단 ── */
+    .page-header {
+      text-align: center;
+      padding: 48px 0 32px;
+    }
+    .page-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.93);
+      margin-bottom: 10px;
+    }
+    .page-sub {
+      font-size: 14px;
+      color: rgba(255,255,255,0.45);
+    }
+
+    /* ── 인증 뱃지 ── */
+    .verify-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(100,220,160,0.1);
+      border: 1px solid rgba(100,220,160,0.25);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+    }
+    .verify-icon { font-size: 18px; }
+    .verify-text { font-size: 14px; font-weight: 600; color: #7bc67e; }
+
+    /* ── 혜택 카드 ── */
+    .benefit-card {
+      background: rgba(255,255,255,0.05);
+      border: 1.5px solid rgba(255,255,255,0.09);
+      border-radius: 20px;
+      padding: 22px 20px;
+      margin-bottom: 12px;
+    }
+    .benefit-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .benefit-section-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(100,160,255,0.6);
+      flex-shrink: 0;
+    }
+    .benefit-list { display: flex; flex-direction: column; gap: 12px; }
+    .benefit-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .benefit-emoji { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .benefit-info {}
+    .benefit-name {
+      font-size: 15px;
+      color: rgba(255,255,255,0.85);
+      font-weight: 500;
+      line-height: 1.4;
+    }
+    .benefit-cond {
+      font-size: 12px;
+      color: rgba(255,255,255,0.32);
+      margin-top: 2px;
+    }
+
+    /* ── 제시 안내 ── */
+    .show-block {
+      text-align: center;
+      padding: 32px 0 20px;
+    }
+    .show-main {
+      font-size: 20px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 8px;
+    }
+    .show-sub {
+      font-size: 12px;
+      color: rgba(255,255,255,0.2);
+      line-height: 1.6;
+    }
+
+    /* ── 하단 버튼 ── */
+    .back-btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      color: rgba(255,255,255,0.35);
+      font-size: 13px;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="page-header">
+      <div class="page-title">나의 여행 혜택</div>
+      <div class="page-sub">당신의 여행이 시작되었습니다</div>
+    </div>
+
+    <div class="verify-badge">
+      <span class="verify-icon">✔</span>
+      <span class="verify-text">레저 이용 확인 완료</span>
+    </div>
+
+    <!-- 3합 혜택 -->
+    <div class="benefit-card">
+      <div class="benefit-section-title">
+        <span class="benefit-section-dot"></span>
+        3합 혜택
+      </div>
+      <div class="benefit-list">
+        <div class="benefit-row">
+          <span class="benefit-emoji">☕</span>
+          <div class="benefit-info">
+            <div class="benefit-name">제휴 카페 아메리카노 제공</div>
+            <div class="benefit-cond">제휴 카페 7곳 · 1인 1잔 · 2~4인 방문 시</div>
+          </div>
+        </div>
+        <div class="benefit-row">
+          <span class="benefit-emoji">🍶</span>
+          <div class="benefit-info">
+            <div class="benefit-name">제휴 맛집 음료 1병 제공</div>
+            <div class="benefit-cond">제휴 맛집 · 테이블당 1병</div>
+          </div>
+        </div>
+        <div class="benefit-row">
+          <span class="benefit-emoji">🎫</span>
+          <div class="benefit-info">
+            <div class="benefit-name">낭만도시 할인 혜택</div>
+            <div class="benefit-cond">주중 10% · 금/토/일 5%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 달빛 혜택 -->
+    <div class="benefit-card">
+      <div class="benefit-section-title">
+        <span class="benefit-section-dot"></span>
+        달빛 혜택
+      </div>
+      <div class="benefit-list">
+        <div class="benefit-row">
+          <span class="benefit-emoji">🎤</span>
+          <div class="benefit-info">
+            <div class="benefit-name">해공 노래방 20% 할인</div>
+          </div>
+        </div>
+        <div class="benefit-row">
+          <span class="benefit-emoji">🕹️</span>
+          <div class="benefit-info">
+            <div class="benefit-name">인생네컷 오락실 2,000원 지원</div>
+            <div class="benefit-cond">1인 기준</div>
+          </div>
+        </div>
+        <div class="benefit-row">
+          <span class="benefit-emoji">🎈</span>
+          <div class="benefit-info">
+            <div class="benefit-name">풍선터트리기 할인 혜택</div>
+          </div>
+        </div>
+        <div class="benefit-row">
+          <span class="benefit-emoji">🍵</span>
+          <div class="benefit-info">
+            <div class="benefit-name">범앗간 분식 식혜 제공</div>
+            <div class="benefit-cond">테이블당 1잔</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 제시 안내 -->
+    <div class="show-block">
+      <div class="show-main">이 화면을 보여주세요</div>
+      <div class="show-sub">DreamTown 이용자 전용 혜택입니다</div>
+    </div>
+
+    <a class="back-btn" href="javascript:history.back()">← 돌아가기</a>
+
+  </div>
+</body>
+</html>

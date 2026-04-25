@@ -2994,6 +2994,22 @@ router.post('/stars/:id/complete', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────
+// POST /api/dt/events — 클라이언트 이벤트 로그 수신 (fire-and-forget)
+// lib/events.js logEvent() 가 호출 — 실패해도 UX 무관
+// ─────────────────────────────────────────────────────────────────────────
+router.post('/events', async (req, res) => {
+  const { event, user_id, ts, ...rest } = req.body ?? {};
+  if (event && user_id) {
+    db.query(
+      `INSERT INTO dreamtown_flow (user_id, stage, action, value, created_at)
+       VALUES ($1, $2, 'event_log', $3, NOW())`,
+      [String(user_id), String(event), JSON.stringify({ ts: ts ?? new Date().toISOString(), ...rest })]
+    ).catch(() => {});
+  }
+  return res.json({ ok: true });
+});
+
+// ─────────────────────────────────────────────────────────────────────────
 // GET /api/dt/admin/location/:loc — 제휴업체 장소별 별공방 현황
 // Auth: ?token=ADMIN_TOKEN  또는  X-Admin-Token 헤더
 // ─────────────────────────────────────────────────────────────────────────

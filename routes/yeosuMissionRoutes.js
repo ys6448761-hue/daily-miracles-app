@@ -9,12 +9,18 @@
  */
 
 const router = require('express').Router();
-const db     = require('../database/connection');
+const db     = require('../database/db');
 const { ValidationError, NotFoundError } = require('../utils/errors');
 
 const TOTAL_MISSIONS   = 5;
 const BONUS_POINTS     = 500;
 const BONUS_TYPE       = 'all_missions_complete';
+
+// migration 118/119 미실행 환경(DB 테이블 없음) → 500 대신 { success: false } 반환
+function handleErr(err, res, next) {
+  if (err.code === '42P01') return res.json({ success: false, reason: 'feature_unavailable' });
+  next(err);
+}
 
 // ── GET / — 미션 목록 + 완료 현황 ───────────────────────────────
 router.get('/', async (req, res, next) => {
@@ -77,7 +83,7 @@ router.get('/', async (req, res, next) => {
       all_complete:    completedCount >= TOTAL_MISSIONS,
     });
   } catch (err) {
-    next(err);
+    handleErr(err, res, next);
   }
 });
 
@@ -154,7 +160,7 @@ router.post('/complete', async (req, res, next) => {
       all_complete:    allComplete,
     });
   } catch (err) {
-    next(err);
+    handleErr(err, res, next);
   }
 });
 
@@ -198,7 +204,7 @@ router.post('/daily-log', async (req, res, next) => {
       points_awarded: DAILY_LOG_POINTS,
     });
   } catch (err) {
-    next(err);
+    handleErr(err, res, next);
   }
 });
 
@@ -235,7 +241,7 @@ router.get('/points', async (req, res, next) => {
       total_points:   missionPoints + logPoints + bonusPoints,
     });
   } catch (err) {
-    next(err);
+    handleErr(err, res, next);
   }
 });
 

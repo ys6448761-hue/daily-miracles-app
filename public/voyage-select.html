@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>어떤 시간이 필요하세요 — 하루하루의 기적</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(160deg, #1a1a2e 0%, #16213e 55%, #0f3460 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      color: #fff;
+    }
+    .container { max-width: 420px; width: 100%; }
+
+    .heading {
+      text-align: center;
+      margin-bottom: 44px;
+    }
+    .heading p {
+      font-size: 23px;
+      font-weight: 700;
+      line-height: 1.55;
+      color: rgba(255,255,255,0.93);
+    }
+
+    .choices { display: flex; flex-direction: column; gap: 12px; }
+
+    .choice-btn {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: rgba(255,255,255,0.05);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 18px;
+      padding: 22px 22px;
+      color: rgba(255,255,255,0.87);
+      font-size: 17px;
+      font-weight: 500;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      width: 100%;
+    }
+    .choice-btn:active, .choice-btn:focus {
+      background: rgba(100,160,255,0.13);
+      border-color: rgba(100,160,255,0.38);
+      outline: none;
+    }
+    .choice-emoji { font-size: 26px; flex-shrink: 0; }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 36px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.25);
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="heading">
+      <p>이번 여행에서<br>어떤 시간이 필요하신가요</p>
+    </div>
+
+    <div class="choices">
+      <button class="choice-btn" data-type="rest">
+        <span class="choice-emoji">🌙</span>
+        조용히 쉬고 싶어요
+      </button>
+      <button class="choice-btn" data-type="reflect">
+        <span class="choice-emoji">🌀</span>
+        생각을 정리하고 싶어요
+      </button>
+      <button class="choice-btn" data-type="move">
+        <span class="choice-emoji">🌱</span>
+        조금 설레고 싶어요
+      </button>
+    </div>
+
+    <a class="back-link" href="javascript:history.back()">← 돌아가기</a>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const starId = params.get('star_id') || localStorage.getItem('star_id') || '';
+
+    document.querySelectorAll('.choice-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const type = btn.dataset.type;
+        window.location.href = `/voyage-detail?type=${type}${starId ? '&star_id=' + encodeURIComponent(starId) : ''}`;
+      });
+    });
+  </script>
+</body>
+</html>
