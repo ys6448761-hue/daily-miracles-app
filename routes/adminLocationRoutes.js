@@ -48,20 +48,28 @@ router.get('/:code', adminGuard, async (req, res) => {
         `SELECT COUNT(*) AS n FROM dt_stars WHERE origin_place = $1`,
         [code]
       ),
-      // 총 공명
+      // 총 공명 — star_logs.action_type='resonance' 기준 (resonance_count 컬럼 미존재)
       db.query(
-        `SELECT COALESCE(SUM(resonance_count), 0) AS n FROM dt_stars WHERE origin_place = $1`,
+        `SELECT COUNT(*) AS n
+         FROM   star_logs sl
+         JOIN   dt_stars  s ON s.id::text = sl.star_id::text
+         WHERE  s.origin_place = $1
+           AND  sl.action_type = 'resonance'`,
         [code]
       ),
-      // 대표 문장: 공명 가장 많은 별의 소원
+      // 대표 문장: 공명 수(star_logs) 가장 많은 별의 소원
       db.query(
-        `SELECT s.star_name, s.resonance_count, w.wish_text
+        `SELECT s.star_name, w.wish_text,
+                COUNT(sl.id) AS resonance_count
          FROM   dt_stars  s
-         LEFT JOIN dt_wishes w ON w.id = s.wish_id
+         LEFT JOIN dt_wishes  w  ON w.id = s.wish_id
+         LEFT JOIN star_logs  sl ON sl.star_id::text = s.id::text
+                                 AND sl.action_type = 'resonance'
          WHERE  s.origin_place = $1
            AND  w.wish_text IS NOT NULL
-         ORDER BY s.resonance_count DESC, s.created_at DESC
-         LIMIT 1`,
+         GROUP  BY s.id, s.star_name, w.wish_text, s.created_at
+         ORDER  BY resonance_count DESC, s.created_at DESC
+         LIMIT  1`,
         [code]
       ),
       // 감정 TOP 3
@@ -74,14 +82,17 @@ router.get('/:code', adminGuard, async (req, res) => {
          LIMIT  3`,
         [code]
       ),
-      // 최근 별 5개
+      // 최근 별 5개 — 공명 수는 star_logs 집계
       db.query(
-        `SELECT s.id, s.star_name, s.emotion_tag, s.resonance_count,
-                s.status, s.created_at,
-                LEFT(w.wish_text, 30) AS wish_preview
+        `SELECT s.id, s.star_name, s.emotion_tag, s.status, s.created_at,
+                LEFT(w.wish_text, 30) AS wish_preview,
+                COUNT(sl.id)          AS resonance_count
          FROM   dt_stars  s
-         LEFT JOIN dt_wishes w ON w.id = s.wish_id
+         LEFT JOIN dt_wishes  w  ON w.id = s.wish_id
+         LEFT JOIN star_logs  sl ON sl.star_id::text = s.id::text
+                                 AND sl.action_type = 'resonance'
          WHERE  s.origin_place = $1
+         GROUP  BY s.id, s.star_name, s.emotion_tag, s.status, s.created_at, w.wish_text
          ORDER  BY s.created_at DESC
          LIMIT  5`,
         [code]
