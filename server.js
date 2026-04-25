@@ -2305,6 +2305,21 @@ if (adminQRRoutes) {
   console.log('✅ 파트너 QR 라우터 등록 완료 (/admin/partner-qr-*)');
 }
 
+// ---------- 장소별 관리자 대시보드 (/dreamtown/admin/location/:code) ----------
+let adminLocationRoutes = null;
+try {
+  adminLocationRoutes = require('./routes/adminLocationRoutes');
+} catch (e) {
+  console.warn('⚠️ adminLocationRoutes 로드 실패:', e.message);
+}
+if (adminLocationRoutes) {
+  app.use('/api/admin/dt/location', adminLocationRoutes);
+  console.log('✅ Location 어드민 라우터 등록 완료 (/api/admin/dt/location/:code)');
+}
+app.get('/dreamtown/admin/location/:code', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin', 'location.html'));
+});
+
 // ---------- 별들의 고향 Routes (/api/hometown) ----------
 let hometownRoutes = null;
 try {
