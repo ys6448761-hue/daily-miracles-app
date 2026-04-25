@@ -1438,7 +1438,12 @@ router.post('/stars/:id/travel-log', async (req, res) => {
     );
     res.status(201).json({ ok: true, log: rows[0] });
   } catch (err) {
-    console.error('[DT] POST /stars/:id/travel-log error:', err.message);
+    // 42P01: relation does not exist — migration 140 미실행
+    if (err.code === '42P01') {
+      console.error('[DT] POST /stars/:id/travel-log — 테이블 없음 (migration 140 미실행):', err.message);
+      return res.status(503).json({ error: 'star_travel_log 테이블 없음 — migration 140 실행 필요', migration: '140' });
+    }
+    console.error('[DT] POST /stars/:id/travel-log error:', err.message, '\n', err.stack);
     res.status(500).json({ error: err.message });
   }
 });
@@ -1461,7 +1466,14 @@ router.get('/stars/:id/travel-log', async (req, res) => {
     );
     res.json({ log: rows[0] ?? null });
   } catch (err) {
-    console.error('[DT] GET /stars/:id/travel-log error:', err.message);
+    // 42P01: relation does not exist — migration 140 또는 141 미실행
+    if (err.code === '42P01') {
+      const missing = err.message.includes('star_travel_reflection') ? '141' : '140';
+      console.error(`[DT] GET /stars/:id/travel-log — 테이블 없음 (migration ${missing} 미실행):`, err.message);
+      // 테이블 없으면 null 반환 (UI graceful 처리)
+      return res.json({ log: null, _migration_needed: missing });
+    }
+    console.error('[DT] GET /stars/:id/travel-log error:', err.message, '\n', err.stack);
     res.status(500).json({ error: err.message });
   }
 });
@@ -1481,7 +1493,11 @@ router.post('/stars/:id/travel-reflection', async (req, res) => {
     );
     res.status(201).json({ ok: true, id: rows[0].id });
   } catch (err) {
-    console.error('[DT] POST /stars/:id/travel-reflection error:', err.message);
+    if (err.code === '42P01') {
+      console.error('[DT] POST /stars/:id/travel-reflection — 테이블 없음 (migration 141 미실행):', err.message);
+      return res.status(503).json({ error: 'star_travel_reflection 테이블 없음 — migration 141 실행 필요', migration: '141' });
+    }
+    console.error('[DT] POST /stars/:id/travel-reflection error:', err.message, '\n', err.stack);
     res.status(500).json({ error: err.message });
   }
 });
@@ -1502,7 +1518,11 @@ router.post('/stars/:id/next-day-heart', async (req, res) => {
     );
     res.status(201).json({ ok: true });
   } catch (err) {
-    console.error('[DT] POST /stars/:id/next-day-heart error:', err.message);
+    if (err.code === '42P01') {
+      console.error('[DT] POST /stars/:id/next-day-heart — 테이블 없음 (migration 142 미실행):', err.message);
+      return res.status(503).json({ error: 'star_next_day_heart 테이블 없음 — migration 142 실행 필요', migration: '142' });
+    }
+    console.error('[DT] POST /stars/:id/next-day-heart error:', err.message, '\n', err.stack);
     res.status(500).json({ error: err.message });
   }
 });
