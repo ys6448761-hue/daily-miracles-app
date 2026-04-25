@@ -79,6 +79,7 @@ import PartnerSubscribe from './pages/partner/PartnerSubscribe.jsx';
 import AdminPartners from './pages/admin/AdminPartners.jsx';
 import AdminQRCenter from './pages/admin/AdminQRCenter.jsx';
 import AdminCablecarPage from './pages/AdminCablecarPage.jsx';
+import LocationAdmin from './pages/admin/LocationAdmin.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
 if (window.location.pathname.startsWith('//')) {
@@ -166,6 +167,7 @@ export default function App() {
           <Route path="/admin/partners"            element={<AdminPartners />} />
           <Route path="/admin/qr-center"           element={<AdminQRCenter />} />
           <Route path="/admin/cablecar"            element={<AdminCablecarPage />} />
+          <Route path="/admin/location/:loc"       element={<LocationAdmin />} />
           {/* /admin/* catch-all — catch-all → / → AppLaunch 경로 차단 */}
           <Route path="/admin/*"                   element={<VoyageAdmin />} />
           {/* Core Journey Flow */}

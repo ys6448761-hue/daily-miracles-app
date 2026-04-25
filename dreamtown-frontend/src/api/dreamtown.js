@@ -38,7 +38,7 @@ export async function postWish({ userId, wishText, gemType, yeosuTheme }) {
   });
 }
 
-export async function postStarCreate({ wishId, userId, phoneNumber }) {
+export async function postStarCreate({ wishId, userId, phoneNumber, originPlace }) {
   return fetchWithRetry(`${BASE}/stars/create`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -46,6 +46,7 @@ export async function postStarCreate({ wishId, userId, phoneNumber }) {
       wish_id:      wishId,
       user_id:      userId,
       phone_number: phoneNumber ?? null,
+      origin_place: originPlace ?? null,
     }),
   });
 }

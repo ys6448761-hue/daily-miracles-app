@@ -13,12 +13,34 @@ const GEMS = [
   { type: 'citrine',  label: '시트린',    emoji: '🟡', galaxy: '관계 은하',    detail: '소중한 관계를 더 깊게 이어가고 싶은 마음이에요' },
 ];
 
+const QR_PLACE_LABEL = {
+  'lattoa':         '라또아 카페',
+  'forestland':     '더 포레스트랜드',
+  'paransi':        '파란시',
+  'yeosu-cablecar': '여수 해상 케이블카',
+};
+
 export default function WishGate() {
   const nav = useNavigate();
   const location = useLocation();
-  const prefillText = location.state?.prefillText ?? '';
+  const prefillText   = location.state?.prefillText ?? '';
+  const emotionChoice = location.state?.emotionChoice ?? null;
   const [wishText, setWishText] = useState(prefillText);
   const prevStarId = localStorage.getItem('dt_prev_star_id') || null;
+
+  // QR 진입 분기: new=1 + loc=xxx 이고 기존 별이 있을 때 선택지 화면 노출
+  const _qrParams   = new URLSearchParams(window.location.search);
+  const _isQrEntry  = _qrParams.get('new') === '1' && !!_qrParams.get('loc');
+  const _locParam   = _qrParams.get('loc') ?? '';
+  const _existingId = readSavedStar();
+  const [qrChoiceMode, setQrChoiceMode] = useState(() => _isQrEntry && !!_existingId);
+  // 아우룸 인트로: QR 진입(신규·기존 모두) 시 0.5초 감각 트리거
+  const [qrIntro, setQrIntro] = useState(() => _isQrEntry);
+  useEffect(() => {
+    if (!_isQrEntry) return;
+    const t = setTimeout(() => setQrIntro(false), 500);
+    return () => clearTimeout(t);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleCancel() {
     if (prevStarId) {
@@ -70,11 +92,12 @@ export default function WishGate() {
         return;
       }
 
-      const star = await postStarCreate({ wishId: wishResult.wish_id, userId, phoneNumber: phoneNumber.trim() || null });
+      const originPlace = new URLSearchParams(window.location.search).get('loc') || null;
+      const star = await postStarCreate({ wishId: wishResult.wish_id, userId, phoneNumber: phoneNumber.trim() || null, originPlace });
       saveStarId(star.star_id);
       localStorage.removeItem('dt_prev_star_id');
 
-      const starBirthState = { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy, gemType, userId, day1: star.day1, wishText: wishText.trim(), starRarity: star.star_rarity ?? 'standard', sourceEvent: star.source_event ?? 'standard' };
+      const starBirthState = { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy, gemType, userId, day1: star.day1, wishText: wishText.trim(), starRarity: star.star_rarity ?? 'standard', sourceEvent: star.source_event ?? 'standard', emotionChoice };
       try { sessionStorage.setItem('dt_recent_star', JSON.stringify(starBirthState)); } catch (_) {}
 
       // QR 경유 시 고향 자동 확정 (fire-and-forget)
@@ -98,6 +121,91 @@ export default function WishGate() {
     } finally {
       setLoading(false);
     }
+  }
+
+  // ── 아우룸 감각 트리거 (0.5초) ─────────────────────────────────────
+  if (qrIntro) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, background: '#06060e', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+        {/* 낙하 불꽃 — 위에서 중앙으로 빠르게 떨어짐 */}
+        <motion.div
+          initial={{ y: -90, opacity: 0 }}
+          animate={{ y: [-90, 0, 18], opacity: [0, 1, 0] }}
+          transition={{ duration: 0.38, times: [0, 0.55, 1], ease: ['easeIn', 'easeOut'] }}
+          style={{ position: 'absolute', width: 5, height: 5, borderRadius: '50%', background: '#FFD76A', boxShadow: '0 0 8px 3px rgba(255,215,106,0.8)', zIndex: 2 }}
+        />
+        {/* 충돌 후 방사 — 낙하 직후 짧은 글로우 */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.1 }}
+          animate={{ opacity: [0, 0.55, 0], scale: [0.1, 1.6, 0.8] }}
+          transition={{ duration: 0.28, delay: 0.2, times: [0, 0.45, 1], ease: 'easeOut' }}
+          style={{
+            position: 'absolute', width: 90, height: 90, borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(255,215,106,0.45) 0%, rgba(160,100,255,0.12) 60%, transparent 80%)',
+            zIndex: 1,
+          }}
+        />
+        {/* 파편 — 4개 작은 빛 조각 바깥으로 산란 */}
+        {[[-22,-18],[20,-14],[-14,20],[18,16]].map(([dx, dy], i) => (
+          <motion.div
+            key={i}
+            initial={{ x: 0, y: 0, opacity: 0, scale: 0 }}
+            animate={{ x: dx * 1.8, y: dy * 1.8, opacity: [0, 0.7, 0], scale: [0, 1, 0] }}
+            transition={{ duration: 0.25, delay: 0.22 + i * 0.02, ease: 'easeOut' }}
+            style={{ position: 'absolute', width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,215,106,0.9)' }}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  // ── QR 진입 선택지 화면 (기존 별 보유 사용자 전용) ─────────────────
+  if (qrChoiceMode) {
+    const placeLabel = QR_PLACE_LABEL[_locParam] ?? '이 공간';
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center px-6 py-10">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          style={{ width: '100%', maxWidth: 360, textAlign: 'center' }}
+        >
+          <p style={{ fontSize: 13, color: 'rgba(255,215,106,0.7)', marginBottom: 10 }}>
+            📍 {placeLabel}
+          </p>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#fff', lineHeight: 1.5, marginBottom: 8 }}>
+            이 공간에서<br />새 별을 만들어볼까요?
+          </h2>
+          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', lineHeight: 1.7, marginBottom: 40 }}>
+            이미 별이 있어요.<br />새로 만들거나, 내 별에 마음을 더할 수 있어요.
+          </p>
+          <button
+            onClick={() => setQrChoiceMode(false)}
+            style={{
+              display: 'block', width: '100%', padding: '16px 0',
+              borderRadius: 9999, marginBottom: 12,
+              background: 'rgba(255,215,106,0.18)',
+              border: '1px solid rgba(255,215,106,0.45)',
+              color: '#FFD76A', fontSize: 16, fontWeight: 700, cursor: 'pointer',
+            }}
+          >
+            새 별 만들기 ✦
+          </button>
+          <button
+            onClick={() => nav('/star/' + _existingId)}
+            style={{
+              display: 'block', width: '100%', padding: '16px 0',
+              borderRadius: 9999,
+              background: 'transparent',
+              border: '1px solid rgba(255,255,255,0.15)',
+              color: 'rgba(255,255,255,0.55)', fontSize: 15, fontWeight: 500, cursor: 'pointer',
+            }}
+          >
+            이 마음, 내 별에도 닿게 하기 →
+          </button>
+        </motion.div>
+      </div>
+    );
   }
 
   // ── 케이블카 변환 장면 (별 생성 로딩 중) ────────────────────────────

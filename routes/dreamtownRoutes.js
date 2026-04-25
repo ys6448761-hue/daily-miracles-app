@@ -359,7 +359,7 @@ router.post('/wishes/with-star', async (req, res) => {
 router.post('/stars/create', async (req, res) => {
   console.log('[DT] POST /stars/create 진입 | body:', JSON.stringify(req.body));
   try {
-    const { wish_id, user_id, phone_number } = req.body;
+    const { wish_id, user_id, phone_number, origin_place } = req.body;
 
     if (!wish_id || !user_id) {
       return res.status(400).json({ error: 'wish_id, user_id 필수' });
@@ -411,10 +411,10 @@ router.post('/stars/create', async (req, res) => {
     // star 생성
     const starResult = await db.query(
       `INSERT INTO dt_stars
-         (user_id, wish_id, star_seed_id, star_name, star_slug, galaxy_id, star_stage, is_hidden, emotion_tag, star_rarity, source_event)
-       VALUES ($1, $2, $3, $4, $5, $6, 'day1', $7, $8, $9, $10)
+         (user_id, wish_id, star_seed_id, star_name, star_slug, galaxy_id, star_stage, is_hidden, emotion_tag, star_rarity, source_event, origin_place, origin_type)
+       VALUES ($1, $2, $3, $4, $5, $6, 'day1', $7, $8, $9, $10, $11, $12)
        RETURNING id, star_name, star_slug, star_stage, star_rarity, source_event, created_at`,
-      [user_id, wish_id, seed.id, starName, starSlug, galaxy.id, isHidden, emotionTag, star_rarity, source_event]
+      [user_id, wish_id, seed.id, starName, starSlug, galaxy.id, isHidden, emotionTag, star_rarity, source_event, origin_place ?? null, origin_place ? 'qr' : null]
     );
     const star = starResult.rows[0];
 
@@ -2990,6 +2990,105 @@ router.post('/stars/:id/complete', async (req, res) => {
   } catch (e) {
     console.error('[DT] POST /stars/:id/complete error:', e.message);
     return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────
+// GET /api/dt/admin/location/:loc — 제휴업체 장소별 별공방 현황
+// Auth: ?token=ADMIN_TOKEN  또는  X-Admin-Token 헤더
+// ─────────────────────────────────────────────────────────────────────────
+const LOCATION_PLACE_LABEL = {
+  'lattoa':         '라또아 카페',
+  'forestland':     '더 포레스트랜드',
+  'paransi':        '파란시',
+  'yeosu-cablecar': '여수 해상 케이블카',
+};
+const VALID_LOCS = Object.keys(LOCATION_PLACE_LABEL);
+
+router.get('/admin/location/:loc', async (req, res) => {
+  const token = req.headers['x-admin-token'] || req.query.token;
+  if (process.env.ADMIN_TOKEN && token !== process.env.ADMIN_TOKEN) {
+    return res.status(403).json({ error: '인증 필요 — ?token= 파라미터를 확인하세요' });
+  }
+
+  const { loc } = req.params;
+  if (!VALID_LOCS.includes(loc)) {
+    return res.status(400).json({ error: '알 수 없는 장소 코드', valid: VALID_LOCS });
+  }
+
+  try {
+    const [todayR, totalR, emotionR, resonanceR, recentR] = await Promise.all([
+      // 오늘(KST) 생성 수
+      db.query(
+        `SELECT COUNT(*) AS cnt FROM dt_stars
+          WHERE origin_place = $1
+            AND (created_at AT TIME ZONE 'Asia/Seoul')::date = CURRENT_DATE`,
+        [loc]
+      ),
+      // 전체 생성 수
+      db.query(
+        `SELECT COUNT(*) AS cnt FROM dt_stars WHERE origin_place = $1`,
+        [loc]
+      ),
+      // 감정 TOP 3
+      db.query(
+        `SELECT wish_emotion, COUNT(*) AS cnt
+           FROM dt_stars
+          WHERE origin_place = $1
+            AND wish_emotion IS NOT NULL AND wish_emotion <> ''
+          GROUP BY wish_emotion
+          ORDER BY cnt DESC
+          LIMIT 3`,
+        [loc]
+      ),
+      // 공명 합계
+      db.query(
+        `SELECT COALESCE(SUM(COALESCE(resonance_count, 0)), 0) AS total
+           FROM dt_stars WHERE origin_place = $1`,
+        [loc]
+      ),
+      // 최근 별 5개
+      db.query(
+        `SELECT star_name, wish_emotion, COALESCE(resonance_count, 0) AS resonance_count, created_at
+           FROM dt_stars WHERE origin_place = $1
+          ORDER BY created_at DESC LIMIT 5`,
+        [loc]
+      ),
+    ]);
+
+    const todayCount     = parseInt(todayR.rows[0].cnt, 10);
+    const totalCount     = parseInt(totalR.rows[0].cnt, 10);
+    const resonanceTotal = parseInt(resonanceR.rows[0].total, 10);
+    const emotions       = emotionR.rows.map(r => ({ emotion: r.wish_emotion, count: parseInt(r.cnt, 10) }));
+    const placeLabel     = LOCATION_PLACE_LABEL[loc];
+
+    // 대표 문장 자동 생성
+    const lines = [];
+    if (todayCount > 0) {
+      lines.push(`오늘 ${placeLabel}에서 ${todayCount}개의 별이 태어났어요.`);
+    } else {
+      lines.push(`오늘은 아직 새 별이 없어요. 곧 첫 별이 빛날 거예요.`);
+    }
+    if (emotions[0]) {
+      lines.push(`가장 많이 담긴 마음은 "${emotions[0].emotion}"이에요.`);
+    }
+    if (resonanceTotal > 0) {
+      lines.push(`지금까지 ${resonanceTotal}번의 마음이 이 별들에 닿았어요.`);
+    }
+
+    return res.json({
+      loc,
+      place_label:      placeLabel,
+      today_count:      todayCount,
+      total_count:      totalCount,
+      resonance_total:  resonanceTotal,
+      emotion_top3:     emotions,
+      recent_stars:     recentR.rows,
+      summary_sentence: lines.join(' '),
+    });
+  } catch (err) {
+    console.error('[DT] GET /admin/location/:loc error:', err.message);
+    return res.status(500).json({ error: '서버 오류', detail: err.message });
   }
 });
 

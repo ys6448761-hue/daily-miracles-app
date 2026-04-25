@@ -162,6 +162,13 @@ function saveResonanceHistory(starId, starName) {
   } catch (_) {}
 }
 
+const ORIGIN_PLACE_LABEL = {
+  'lattoa':           '라또아 카페',
+  'forestland':       '더 포레스트랜드',
+  'paransi':          '파란시',
+  'yeosu-cablecar':   '여수 해상 케이블카',
+};
+
 // 은하 → 별자리 이름 (비슷한 별 섹션용)
 const GALAXY_CONSTELLATION = {
   growth:       '성장의 별자리',
@@ -436,6 +443,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
             growth_log_text:  star.growth_log_text ?? null,
             wish_text:        star.wish_text ?? null,
             wish_emotion:     star.wish_emotion ?? null,
+            origin_place:     star.origin_place ?? null,
           });
           getRelatedStars(id, star.galaxy?.code ?? null).then(r => setRelatedStars(r.stars ?? [])).catch(() => {});
         }
@@ -783,7 +791,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
             const hasStory = !!(detail.growth_log_text || detail.wish_text);
             return (
               <>
-                {/* ① 은하 + D+N 뱃지 */}
+                {/* ① 은하 + D+N + 장소 뱃지 */}
                 <div className="flex gap-2 justify-center flex-wrap mb-4">
                   <span className={`text-xs px-3 py-1 rounded-full ${galaxyStyle.cls}`}>
                     {galaxyStyle.label}
@@ -791,6 +799,11 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
                   <span className="text-xs bg-white/10 text-white/50 px-3 py-1 rounded-full">
                     D+{detail.days_since_birth}
                   </span>
+                  {detail.origin_place && ORIGIN_PLACE_LABEL[detail.origin_place] && (
+                    <span className="text-xs bg-star-gold/10 text-star-gold/70 px-3 py-1 rounded-full">
+                      📍 {ORIGIN_PLACE_LABEL[detail.origin_place]}
+                    </span>
+                  )}
                 </div>
 
                 {/* ② 이야기 토글 — story 없으면 숨김 */}
