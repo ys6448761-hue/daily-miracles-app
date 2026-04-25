@@ -2085,6 +2085,20 @@ if (dtProductRoutes) {
   console.log("✅ DreamTown 상품 라우터 등록 완료 (/api/dt/products)");
 }
 
+// ---------- Location 관리자 — dtAdminBenefitRoutes 보다 먼저 등록해야 401 방지 ----------
+// dtAdminBenefitRoutes는 /api/admin/dt 전체에 x-admin-key guard를 걸기 때문에
+// /api/admin/dt/location 은 반드시 그 앞에 위치해야 함
+let adminLocationRoutes = null;
+try {
+  adminLocationRoutes = require('./routes/adminLocationRoutes');
+} catch (e) {
+  console.warn('⚠️ adminLocationRoutes 로드 실패:', e.message);
+}
+if (adminLocationRoutes) {
+  app.use('/api/admin/dt/location', adminLocationRoutes);
+  console.log('✅ Location 어드민 라우터 등록 완료 (/api/admin/dt/location/:code)');
+}
+
 if (dtAdminBenefitRoutes) {
   app.use("/api/admin/dt", dtAdminBenefitRoutes);
   console.log("✅ DreamTown 혜택 관리자 라우터 등록 완료 (/api/admin/dt)");
@@ -2306,16 +2320,6 @@ if (adminQRRoutes) {
 }
 
 // ---------- 장소별 관리자 대시보드 (/dreamtown/admin/location/:code) ----------
-let adminLocationRoutes = null;
-try {
-  adminLocationRoutes = require('./routes/adminLocationRoutes');
-} catch (e) {
-  console.warn('⚠️ adminLocationRoutes 로드 실패:', e.message);
-}
-if (adminLocationRoutes) {
-  app.use('/api/admin/dt/location', adminLocationRoutes);
-  console.log('✅ Location 어드민 라우터 등록 완료 (/api/admin/dt/location/:code)');
-}
 app.get('/dreamtown/admin/location/:code', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin', 'location.html'));
 });
