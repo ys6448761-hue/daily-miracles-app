@@ -2119,7 +2119,7 @@ router.post('/stars/:id/logs', async (req, res) => {
   try {
     const { id }  = req.params;
     const { action_type = 'connected', message } = req.body;
-    const ALLOWED = ['resonance', 'record', 'connected'];
+    const ALLOWED = ['resonance', 'record', 'connected', 'sharing'];
     if (!ALLOWED.includes(action_type)) {
       return res.status(400).json({ error: 'invalid action_type' });
     }
@@ -2127,6 +2127,16 @@ router.post('/stars/:id/logs', async (req, res) => {
       `INSERT INTO star_logs (star_id, action_type, message) VALUES ($1, $2, $3)`,
       [id, action_type, message ?? null]
     );
+    // 나눔 KPI emit
+    if (action_type === 'sharing') {
+      try {
+        const r = await db.query(
+          `SELECT COUNT(*) AS n FROM star_logs WHERE star_id = $1 AND action_type = 'sharing'`,
+          [id]
+        );
+        emitKpiEvent({ eventName: 'sharing_created', starId: id, source: message ?? 'sharing' });
+      } catch (_) {}
+    }
     res.json({ ok: true });
   } catch (err) {
     console.error('[DT] POST /stars/:id/logs error:', err.message);

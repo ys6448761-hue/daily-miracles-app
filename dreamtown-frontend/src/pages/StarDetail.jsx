@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getStarDetail, getStar, getResonance, postVoyageLog, postDtResonance, getSimilarStars, getRelatedStars, getResonancePeople, logUserEvent, getOrCreateUserId, getTravelLog, postNextDayHeart, getNextDayHeart, getStarLogs, postStarLog } from '../api/dreamtown.js';
+import { getStarDetail, getStar, getResonance, postVoyageLog, postDtResonance, postDtSharing, getSimilarStars, getRelatedStars, getResonancePeople, logUserEvent, getOrCreateUserId, getTravelLog, postNextDayHeart, getNextDayHeart, getStarLogs, postStarLog } from '../api/dreamtown.js';
 import MilestoneBar from '../components/MilestoneBar';
 import { gaResonanceCreated, gaResonanceClick, gaResonanceSuccess, gaResonanceCTAClick, gaSimilarStarClick, gaSquareFallbackClick, gaSimularStarsEmptyView } from '../utils/gtag';
 import { readSavedStar } from '../lib/utils/starSession.js';
@@ -354,6 +354,8 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   const [viralClicked, setViralClicked] = useState(false);
   const [galaxyResonated, setGalaxyResonated] = useState({}); // { [starId]: { done, count } }
   const [starLogs, setStarLogs]               = useState([]);
+  const [sharingDone, setSharingDone]         = useState(false);
+  const [sharingMsg, setSharingMsg]           = useState(null);
   const [detailRevealed, setDetailRevealed] = useState(() => {
     if (typeof window === 'undefined') return true;
     if (!window.location.search.includes('source=share')) return true;
@@ -600,6 +602,26 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
     } finally {
       setSubmitting(false);
     }
+  }
+
+  // ── 나눔 핸들러 ────────────────────────────────────────────────
+  const SHARING_LABELS = {
+    warm:    '✨ 따뜻한 마음 보내기',
+    similar: '💭 나도 비슷했어요',
+    quiet:   '🌿 조용히 함께할게요',
+  };
+  const SHARING_DONE_MSGS = {
+    warm:    '따뜻한 마음이 전해졌어요 ✨',
+    similar: '같은 마음이 닿았어요 💭',
+    quiet:   '조용히 함께하고 있어요 🌿',
+  };
+
+  async function handleSharing(type) {
+    if (sharingDone) return;
+    setSharingDone(true);
+    setSharingMsg(SHARING_DONE_MSGS[type] ?? '마음이 전해졌어요');
+    logUserEvent({ userId: getOrCreateUserId(), eventType: 'sharing_click', metadata: { star_id: id, sharing_type: type } });
+    await postDtSharing({ starId: id, type });
   }
 
   // ── 이른 반환 ───────────────────────────────────────────────────
@@ -1315,6 +1337,39 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
       {/* ── ⑥ 공명 후 CTA + 유사 별 (resonance/public 공통) ──────── */}
       {canResonate && submitted && (
         <>
+          {/* ── 나눔 버튼 — 공명 직후 노출, 1회 클릭 후 완료 메시지로 전환 */}
+          <div className="mb-5 slide-up" style={{ animationDelay: '0.1s' }}>
+            {sharingDone ? (
+              <p style={{ textAlign: 'center', fontSize: 14, color: 'rgba(201,184,255,0.8)', padding: '12px 0' }}>
+                {sharingMsg}
+              </p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {['warm', 'similar', 'quiet'].map(type => (
+                  <button
+                    key={type}
+                    onClick={() => handleSharing(type)}
+                    style={{
+                      padding: '13px 18px',
+                      borderRadius: 14,
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      color: 'rgba(255,255,255,0.75)',
+                      fontSize: 14,
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      transition: 'background 0.15s, border 0.15s',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.09)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
+                  >
+                    {SHARING_LABELS[type]}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* 유사 별 섹션 */}
           {similarStars.length > 0 ? (
             <div className="mb-5">

@@ -172,6 +172,23 @@ export async function postStarLog(starId, { action_type = 'connected', message }
   } catch (_) {}
 }
 
+const SHARING_MESSAGES = {
+  warm:    '따뜻한 마음을 보냈어요 ✨',
+  similar: '나도 비슷했어요 💭',
+  quiet:   '조용히 함께할게요 🌿',
+};
+
+export async function postDtSharing({ starId, type }) {
+  const message = SHARING_MESSAGES[type] ?? '마음을 보냈어요';
+  try {
+    await fetch(`${BASE}/stars/${encodeURIComponent(starId)}/logs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action_type: 'sharing', message }),
+    });
+  } catch (_) {}
+}
+
 export async function getRelatedStars(starId, galaxy = null) {
   const qs  = galaxy ? `?galaxy=${encodeURIComponent(galaxy)}&limit=5` : '';
   const res = await fetch(`${BASE}/stars/${encodeURIComponent(starId)}/similar${qs}`);
