@@ -204,11 +204,18 @@
 
     async function load() {
       const app = document.getElementById('app');
+
+      if (!token) {
+        app.innerHTML = `<div class="error-box">🔒 관리자 토큰이 필요합니다.<br>URL에 <code>?token=ADMIN_TOKEN</code> 을 추가해주세요.</div>`;
+        return;
+      }
+
       try {
-        const qs  = token ? `?token=${encodeURIComponent(token)}` : '';
-        const res = await fetch(`/api/admin/dt/location/${code}${qs}`);
+        const res = await fetch(`/api/admin/dt/location/${code}`, {
+          headers: { 'x-admin-token': token },
+        });
         if (res.status === 401) {
-          app.innerHTML = `<div class="error-box">🔒 관리자 토큰이 필요합니다.<br>URL에 <code>?token=ADMIN_TOKEN</code> 을 추가해주세요.</div>`;
+          app.innerHTML = `<div class="error-box">🔒 토큰이 올바르지 않습니다. 값을 확인해주세요.</div>`;
           return;
         }
         if (res.status === 404) {
