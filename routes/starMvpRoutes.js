@@ -55,6 +55,19 @@ router.post('/create', async (req, res) => {
         break;
       } catch (e) {
         if (e.code === '23505' && i < 2) continue; // unique 충돌 → 재시도
+        // migration 135 미실행 시 phone_number 컬럼 없음 → 없이 재시도
+        if (e.code === '42703' && e.message.includes('phone_number')) {
+          const { rows: rows2 } = await db.query(
+            `INSERT INTO stars
+               (id, user_id, wish_text, gem_type, status, access_key, origin_location, emotion, is_public)
+             VALUES
+               (gen_random_uuid(), $1, $2, 'cablecar', 'PRE-ON', $3, $4, $5, false)
+             RETURNING id, access_key, created_at`,
+            [crypto.randomUUID(), emotion || '케이블카 별', access_key, origin_location, emotion || null]
+          );
+          inserted = rows2[0];
+          break;
+        }
         throw e;
       }
     }
