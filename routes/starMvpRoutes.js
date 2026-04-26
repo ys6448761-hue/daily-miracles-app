@@ -17,6 +17,9 @@ const db     = require('../database/db');
 let emitKpiEvent = null;
 try { ({ emitKpiEvent } = require('../services/kpiEventEmitter')); } catch (_) {}
 
+let generateStarImage = null;
+try { ({ generateStarImage } = require('../services/imageGenerationService')); } catch (_) {}
+
 // URL-safe 10자리 접근키 (모호한 문자 제외)
 function generateAccessKey() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -80,6 +83,11 @@ router.post('/create', async (req, res) => {
         source:    'qr_star_entry',
         extra:     { origin_location, table: 'stars' },
       }).catch(() => {});
+    }
+
+    // 이미지 생성 — 비동기 fire-and-forget (응답 블로킹 없음)
+    if (generateStarImage) {
+      generateStarImage(inserted.id, emotion || null, origin_location).catch(() => {});
     }
 
     return res.status(201).json({
