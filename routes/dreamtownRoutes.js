@@ -2143,23 +2143,30 @@ router.post('/stars/:id/logs', async (req, res) => {
     if (!ALLOWED.includes(action_type)) {
       return res.status(400).json({ error: 'invalid action_type' });
     }
-    await db.query(
-      `INSERT INTO star_logs (star_id, action_type, message) VALUES ($1, $2, $3)`,
-      [id, action_type, message ?? null]
-    );
+    try {
+      await db.query(
+        `INSERT INTO star_logs (star_id, action_type, message) VALUES ($1, $2, $3)`,
+        [id, action_type, message ?? null]
+      );
+    } catch (colErr) {
+      // 42703: message 컬럼 없음 (migration 143 미실행) → 컬럼 제외 재시도
+      if (colErr.code === '42703') {
+        console.warn('[DT] star_logs.message 컬럼 없음 — migration 143 미실행, 컬럼 제외 저장');
+        await db.query(
+          `INSERT INTO star_logs (star_id, action_type) VALUES ($1, $2)`,
+          [id, action_type]
+        );
+      } else {
+        throw colErr;
+      }
+    }
     // 나눔 KPI emit
     if (action_type === 'sharing') {
-      try {
-        const r = await db.query(
-          `SELECT COUNT(*) AS n FROM star_logs WHERE star_id = $1 AND action_type = 'sharing'`,
-          [id]
-        );
-        emitKpiEvent({ eventName: 'sharing_created', starId: id, source: message ?? 'sharing' });
-      } catch (_) {}
+      emitKpiEvent({ eventName: 'sharing_created', starId: id, source: message ?? 'sharing' });
     }
     res.json({ ok: true });
   } catch (err) {
-    console.error('[DT] POST /stars/:id/logs error:', err.message);
+    console.error('[DT] POST /stars/:id/logs error:', err.message, err.code);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

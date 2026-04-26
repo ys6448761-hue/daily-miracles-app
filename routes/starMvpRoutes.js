@@ -14,6 +14,9 @@ const router = require('express').Router();
 const crypto = require('crypto');
 const db     = require('../database/db');
 
+let emitKpiEvent = null;
+try { ({ emitKpiEvent } = require('../services/kpiEventEmitter')); } catch (_) {}
+
 // URL-safe 10자리 접근키 (모호한 문자 제외)
 function generateAccessKey() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -54,6 +57,16 @@ router.post('/create', async (req, res) => {
         if (e.code === '23505' && i < 2) continue; // unique 충돌 → 재시도
         throw e;
       }
+    }
+
+    // KPI emit — dt_kpi_events에 star_created 기록 (DreamTown 관제판 연동)
+    if (emitKpiEvent) {
+      emitKpiEvent({
+        eventName: 'star_created',
+        starId:    inserted.id,
+        source:    'qr_star_entry',
+        extra:     { origin_location, table: 'stars' },
+      }).catch(() => {});
     }
 
     return res.status(201).json({
