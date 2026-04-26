@@ -115,20 +115,35 @@ router.post('/promise', async (req, res) => {
       return res.status(404).json({ success: false, error: '별을 찾을 수 없습니다.' });
     }
 
-    const { rows } = await db.query(
-      `INSERT INTO star_promises (star_id, type, content, reminder_opt_in, target_date)
-       VALUES ($1, $2, $3, $4,
-         CASE $2::text
-           WHEN '3m'  THEN NOW() + INTERVAL '3 months'
-           WHEN '6m'  THEN NOW() + INTERVAL '6 months'
-           WHEN '12m' THEN NOW() + INTERVAL '12 months'
-         END
-       )
-       RETURNING id, star_id, type, content, reminder_opt_in, target_date, created_at`,
-      [star_id, type, content, !!reminder_opt_in]
-    );
+    let promiseRow;
+    try {
+      const { rows } = await db.query(
+        `INSERT INTO star_promises (star_id, type, content, reminder_opt_in, target_date)
+         VALUES ($1, $2, $3, $4,
+           CASE $2::text
+             WHEN '3m'  THEN NOW() + INTERVAL '3 months'
+             WHEN '6m'  THEN NOW() + INTERVAL '6 months'
+             WHEN '12m' THEN NOW() + INTERVAL '12 months'
+           END
+         )
+         RETURNING id, star_id, type, content, reminder_opt_in, target_date, created_at`,
+        [star_id, type, content, !!reminder_opt_in]
+      );
+      promiseRow = rows[0];
+    } catch (colErr) {
+      // migration 135 미실행 시 reminder_opt_in / target_date 컬럼 없음 → 기본 INSERT
+      if (colErr.code === '42703') {
+        const { rows } = await db.query(
+          `INSERT INTO star_promises (star_id, type, content)
+           VALUES ($1, $2, $3)
+           RETURNING id, star_id, type, content, created_at`,
+          [star_id, type, content]
+        );
+        promiseRow = rows[0];
+      } else { throw colErr; }
+    }
 
-    return res.status(201).json({ success: true, promise: rows[0] });
+    return res.status(201).json({ success: true, promise: promiseRow });
   } catch (err) {
     console.error('[star-mvp] POST /promise error:', err.message);
     res.status(500).json({ success: false, error: err.message });
@@ -180,12 +195,24 @@ router.get('/:access_key', async (req, res) => {
     }
     const star = starRows[0];
 
-    const { rows: promises } = await db.query(
-      `SELECT id, type, content, reminder_opt_in, target_date, created_at
-       FROM star_promises WHERE star_id = $1
-       ORDER BY created_at`,
-      [star.id]
-    );
+    let promises;
+    try {
+      const { rows } = await db.query(
+        `SELECT id, type, content, reminder_opt_in, target_date, created_at
+         FROM star_promises WHERE star_id = $1
+         ORDER BY created_at`,
+        [star.id]
+      );
+      promises = rows;
+    } catch (colErr) {
+      if (colErr.code === '42703') {
+        const { rows } = await db.query(
+          `SELECT id, type, content, created_at FROM star_promises WHERE star_id = $1 ORDER BY created_at`,
+          [star.id]
+        );
+        promises = rows;
+      } else { throw colErr; }
+    }
 
     // 가장 최근 reflection (있으면)
     const { rows: reflRows } = await db.query(
