@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="60%" r="70%">
+      <stop offset="0%" stop-color="#1a1240"/>
+      <stop offset="60%" stop-color="#0d0820"/>
+      <stop offset="100%" stop-color="#050310"/>
+    </radialGradient>
+    <radialGradient id="star-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffddaa" stop-opacity="1"/>
+      <stop offset="40%" stop-color="#ff9955" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#ff6622" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <!-- Ocean reflection -->
+  <rect x="0" y="680" width="1024" height="344" fill="#0a0618" opacity="0.8"/>
+  <!-- City lights -->
+  <g opacity="0.5">
+    <circle cx="200" cy="700" r="2" fill="#ffee99"/>
+    <circle cx="250" cy="710" r="1.5" fill="#ffddaa"/>
+    <circle cx="310" cy="695" r="2" fill="#aaddff"/>
+    <circle cx="380" cy="705" r="1.5" fill="#ffee99"/>
+    <circle cx="440" cy="698" r="2" fill="#ffddaa"/>
+    <circle cx="500" cy="708" r="1.5" fill="#aaddff"/>
+    <circle cx="580" cy="700" r="2" fill="#ffee99"/>
+    <circle cx="650" cy="712" r="1.5" fill="#ffddaa"/>
+    <circle cx="720" cy="696" r="2" fill="#aaddff"/>
+    <circle cx="800" cy="704" r="1.5" fill="#ffee99"/>
+  </g>
+  <!-- Star glow -->
+  <circle cx="512" cy="320" r="80" fill="url(#star-glow)"/>
+  <!-- Star -->
+  <polygon points="512,270 522,305 558,305 530,326 540,361 512,340 484,361 494,326 466,305 502,305"
+           fill="#ffeecc" opacity="0.95"/>
+  <!-- Korean text -->
+  <text x="512" y="460" font-family="serif" font-size="28" fill="#e8d5ff" text-anchor="middle" opacity="0.85">괜찮아졌어요 ✨</text>
+  <!-- Cable car outline -->
+  <rect x="400" y="560" width="224" height="100" rx="12" fill="none" stroke="#aaaacc" stroke-width="2" opacity="0.4"/>
+  <line x1="0" y1="540" x2="1024" y2="540" stroke="#888aaa" stroke-width="1.5" opacity="0.3"/>
+</svg>

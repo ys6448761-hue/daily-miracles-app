@@ -3,10 +3,13 @@
 /**
  * imageGenerationService.js — Star Image Generation (SSOT 기반)
  *
- * SSOT → 템플릿 → 자동 생성 구조
+ * 3단계 Fallback 방어선:
+ *   1) content_policy → 한글 제거 단순화 프롬프트 재시도
+ *   2) rate_limit / quota / timeout → 장소별 정적 fallback 이미지
+ *   3) 전체 실패 → is_fallback:true 명시 + KPI 이벤트 기록
  *
- * generateStarImage(starId, emotion, location)  → star 연동 생성 (비동기 fire-and-forget)
- * generateShareImage(location, emotionText)     → 공유용 온디맨드 생성 (즉시 반환)
+ * generateStarImage(starId, emotion, location)  → star 연동 비동기
+ * generateShareImage(location, emotionText)     → 공유용 온디맨드
  */
 
 const { OpenAI } = require('openai');
@@ -20,6 +23,9 @@ function getOpenAI() {
   return _openai;
 }
 
+let emitKpiEvent = null;
+try { ({ emitKpiEvent } = require('./kpiEventEmitter')); } catch (_) {}
+
 // ── SSOT: 장소 → 씬 설명 ─────────────────────────────────────────
 const SCENE_MAP = {
   'yeosu-cablecar': 'Inside a cable car at night above the sea in Yeosu. Tiny glowing city lights below, dark ocean stretching to the horizon.',
@@ -28,6 +34,16 @@ const SCENE_MAP = {
   'paransi':        'A coastal hilltop lookout at night. A distant lighthouse blinks slowly over the dark sea below.',
   'cablecar':       'Inside a cable car at night above the sea in Yeosu. Tiny glowing city lights below, dark ocean stretching to the horizon.',
 };
+
+// ── SSOT: 장소별 정적 Fallback 이미지 (Tier 2 방어선) ────────────
+const FALLBACK_IMAGE_URLS = {
+  'yeosu-cablecar': '/images/fallback/star-yeosu-cablecar.svg',
+  'lattoa_cafe':    '/images/fallback/star-lattoa-cafe.svg',
+  'forestland':     '/images/fallback/star-forestland.svg',
+  'paransi':        '/images/fallback/star-paransi.svg',
+  'cablecar':       '/images/fallback/star-yeosu-cablecar.svg',
+};
+const FALLBACK_DEFAULT = '/images/fallback/star-default.svg';
 
 // 입력 표기 정규화 (underscore ↔ hyphen 혼용 허용)
 const LOCATION_NORMALIZE = {
@@ -76,27 +92,68 @@ Deep navy, soft purple, warm pink glow
 Add minimal Korean text:
 "${emotionText}"`;
 
-// ── DALL-E 3 호출 (공통) ──────────────────────────────────────────
-async function _callDallE(prompt) {
+// Fallback 프롬프트 (Tier 1 재시도 — 한글 제거, 단순화)
+const FALLBACK_PROMPT = (scene) => `\
+A soft 2D watercolor illustration.
+
+Scene:
+${scene}
+
+Style: 2D only, watercolor texture, soft edges, no photorealism.
+Color palette: Deep navy, soft purple, warm pink glow.
+Focus: A single small glowing star.
+Mood: Calm, hopeful.`;
+
+// ── 에러 분류 ─────────────────────────────────────────────────────
+function classifyDallEError(err) {
+  const msg = (err.message || '').toLowerCase();
+  const code = err.status || err.code || 0;
+  if (msg.includes('content_policy') || msg.includes('safety'))   return 'content_policy';
+  if (msg.includes('rate_limit') || code === 429)                  return 'rate_limit';
+  if (msg.includes('insufficient_quota') || code === 402)         return 'quota_exceeded';
+  if (msg.includes('timeout') || err.code === 'ETIMEDOUT')        return 'timeout';
+  if (msg.includes('billing') || msg.includes('payment'))         return 'billing';
+  return 'unknown';
+}
+
+// ── DALL-E 3 호출 + Tier 1 재시도 ────────────────────────────────
+async function _callDallEWithFallback(primaryPrompt, fallbackPrompt) {
   const openai = getOpenAI();
-  if (!openai) return null;
+  if (!openai) return { url: null, used_fallback_prompt: false, error_type: 'no_key' };
+
+  // 1차 시도: 원본 프롬프트
   try {
-    const response = await openai.images.generate({
-      model:   'dall-e-3',
-      prompt,
-      n:       1,
-      size:    '1024x1024',
-      quality: 'standard',
-      style:   'vivid',
+    const res = await openai.images.generate({
+      model: 'dall-e-3', prompt: primaryPrompt,
+      n: 1, size: '1024x1024', quality: 'standard', style: 'vivid',
     });
-    return response.data?.[0]?.url ?? null;
+    return { url: res.data?.[0]?.url ?? null, used_fallback_prompt: false, error_type: null };
   } catch (err) {
-    console.error('[ImageGen] DALL-E 호출 실패:', err.message);
-    return null;
+    const errType = classifyDallEError(err);
+    console.warn(`[ImageGen] 1차 실패 (${errType}):`, err.message?.slice(0, 80));
+
+    // content_policy인 경우에만 재시도 (한글 없는 단순화 프롬프트)
+    if (errType !== 'content_policy') {
+      return { url: null, used_fallback_prompt: false, error_type: errType };
+    }
+  }
+
+  // 2차 시도: 단순화 프롬프트 (content_policy 우회)
+  try {
+    const res = await openai.images.generate({
+      model: 'dall-e-3', prompt: fallbackPrompt,
+      n: 1, size: '1024x1024', quality: 'standard', style: 'vivid',
+    });
+    console.log('[ImageGen] 2차 시도(단순화) 성공');
+    return { url: res.data?.[0]?.url ?? null, used_fallback_prompt: true, error_type: null };
+  } catch (err2) {
+    const errType2 = classifyDallEError(err2);
+    console.error(`[ImageGen] 2차 실패 (${errType2}):`, err2.message?.slice(0, 80));
+    return { url: null, used_fallback_prompt: true, error_type: errType2 };
   }
 }
 
-// ── 검수 1단계: URL 유효성 (Phase 2: GPT-4V 시각 검수 예정) ──────
+// ── 검수 1단계: URL 유효성 ────────────────────────────────────────
 function validateImage(imageUrl) {
   return typeof imageUrl === 'string' && imageUrl.startsWith('http');
 }
@@ -120,62 +177,87 @@ async function saveImage({ starId = null, imageUrl, emotionText, location, promp
   }
 }
 
-// ── API 1: star 연동 생성 (POST /api/star/create 비동기 연결) ─────
+// ── KPI: 실패 이벤트 기록 ─────────────────────────────────────────
+function _emitFailure(errorType, location, source) {
+  if (!emitKpiEvent) return;
+  emitKpiEvent({
+    eventName: 'image_generation_failed',
+    source,
+    extra: { error_type: errorType, location },
+  }).catch(() => {});
+}
+
+// ── API 1: star 연동 생성 (POST /api/star/create 비동기) ──────────
 async function generateStarImage(starId, emotion, location) {
-  if (!getOpenAI()) {
-    console.warn('[ImageGen] OPENAI_API_KEY 미설정 — 생략');
+  if (!getOpenAI()) return null;
+
+  const scene          = SCENE_MAP[location] ?? SCENE_MAP['cablecar'];
+  const emotionText    = EMOTION_TEXT_MAP[emotion] ?? DEFAULT_EMOTION_TEXT;
+  const primaryPrompt  = PROMPT_TEMPLATE(scene, emotionText);
+  const fallbackPrompt = FALLBACK_PROMPT(scene);
+
+  console.log(`[ImageGen] star 시작 | star:${starId} | loc:${location}`);
+
+  const { url: imageUrl, error_type } = await _callDallEWithFallback(primaryPrompt, fallbackPrompt);
+
+  if (!imageUrl) {
+    _emitFailure(error_type, location, 'star_create');
     return null;
   }
-
-  const scene       = SCENE_MAP[location] ?? SCENE_MAP['cablecar'];
-  const emotionText = EMOTION_TEXT_MAP[emotion] ?? DEFAULT_EMOTION_TEXT;
-  const prompt      = PROMPT_TEMPLATE(scene, emotionText);
-
-  console.log(`[ImageGen] star 생성 시작 | star:${starId} | loc:${location} | em:${emotion}`);
-
-  const imageUrl = await _callDallE(prompt);
-  if (!imageUrl) return null;
 
   const pass   = validateImage(imageUrl);
-  const record = await saveImage({ starId, imageUrl, emotionText, location, promptUsed: prompt, validationPass: pass });
+  const record = await saveImage({ starId, imageUrl, emotionText, location, promptUsed: primaryPrompt, validationPass: pass });
 
-  if (!pass) {
-    console.warn(`[ImageGen] 검수 실패 | star:${starId}`);
-    return null;
-  }
+  if (!pass) return null;
   console.log(`[ImageGen] star 완료 | image_id:${record?.id}`);
   return { image_url: imageUrl, image_id: record?.id };
 }
 
 // ── API 2: 공유용 온디맨드 생성 (POST /api/generate-share-image) ──
 async function generateShareImage(location, emotionText) {
-  if (!location || !emotionText) {
-    throw new Error('location, emotionText 필수');
-  }
+  if (!location || !emotionText) throw new Error('location, emotionText 필수');
+
+  const normalizedLoc  = LOCATION_NORMALIZE[location] ?? location;
+  if (!SCENE_MAP[normalizedLoc]) throw new Error(`알 수 없는 location: ${location}`);
+
+  const scene          = SCENE_MAP[normalizedLoc];
+  const primaryPrompt  = PROMPT_TEMPLATE(scene, emotionText);
+  const fallbackPrompt = FALLBACK_PROMPT(scene);
+
+  console.log(`[ImageGen] share 시작 | loc:${location} | text:${emotionText?.slice(0, 20)}`);
+
+  // OPENAI_API_KEY 없으면 즉시 정적 fallback
   if (!getOpenAI()) {
-    throw new Error('OPENAI_API_KEY 미설정');
+    const fbUrl = FALLBACK_IMAGE_URLS[normalizedLoc] ?? FALLBACK_DEFAULT;
+    console.warn('[ImageGen] API key 없음 → 정적 fallback 반환');
+    return { image_url: fbUrl, image_id: null, location: normalizedLoc, is_fallback: true, fallback_reason: 'no_api_key' };
   }
 
-  const normalizedLoc = LOCATION_NORMALIZE[location] ?? location;
-  const scene         = SCENE_MAP[normalizedLoc] ?? SCENE_MAP['cablecar'];
+  const { url: imageUrl, used_fallback_prompt, error_type } = await _callDallEWithFallback(primaryPrompt, fallbackPrompt);
 
-  if (!SCENE_MAP[normalizedLoc]) {
-    throw new Error(`알 수 없는 location: ${location}`);
+  // DALL-E 실패 → Tier 2: 정적 fallback
+  if (!imageUrl) {
+    _emitFailure(error_type, normalizedLoc, 'share_image');
+    const fbUrl = FALLBACK_IMAGE_URLS[normalizedLoc] ?? FALLBACK_DEFAULT;
+    console.warn(`[ImageGen] 전체 실패(${error_type}) → 정적 fallback: ${fbUrl}`);
+    return { image_url: fbUrl, image_id: null, location: normalizedLoc, is_fallback: true, fallback_reason: error_type };
   }
-
-  const prompt = PROMPT_TEMPLATE(scene, emotionText);
-  console.log(`[ImageGen] share 생성 시작 | loc:${location} | text:${emotionText}`);
-
-  const imageUrl = await _callDallE(prompt);
-  if (!imageUrl) throw new Error('이미지 생성 실패 (DALL-E 오류)');
 
   const pass   = validateImage(imageUrl);
-  const record = await saveImage({ starId: null, imageUrl, emotionText, location: normalizedLoc, promptUsed: prompt, validationPass: pass });
+  const record = await saveImage({
+    starId: null, imageUrl, emotionText, location: normalizedLoc,
+    promptUsed: used_fallback_prompt ? fallbackPrompt : primaryPrompt,
+    validationPass: pass,
+  });
 
-  if (!pass) throw new Error('이미지 검수 실패');
-
-  console.log(`[ImageGen] share 완료 | image_id:${record?.id}`);
-  return { image_url: imageUrl, image_id: record?.id, location: normalizedLoc };
+  console.log(`[ImageGen] share 완료 | fallback_prompt:${used_fallback_prompt} | image_id:${record?.id}`);
+  return {
+    image_url:             imageUrl,
+    image_id:              record?.id ?? null,
+    location:              normalizedLoc,
+    is_fallback:           false,
+    used_simplified_prompt: used_fallback_prompt,
+  };
 }
 
 module.exports = {
@@ -184,5 +266,6 @@ module.exports = {
   SCENE_MAP,
   EMOTION_TEXT_MAP,
   LOCATION_NORMALIZE,
+  FALLBACK_IMAGE_URLS,
   PROMPT_TEMPLATE,
 };

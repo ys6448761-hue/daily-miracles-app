@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#0f1a28"/>
+      <stop offset="60%" stop-color="#080e15"/>
+      <stop offset="100%" stop-color="#030608"/>
+    </radialGradient>
+    <radialGradient id="star-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ccffcc" stop-opacity="1"/>
+      <stop offset="40%" stop-color="#88dd88" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#44aa44" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <!-- Forest canopy silhouettes -->
+  <ellipse cx="100" cy="900" rx="180" ry="320" fill="#030c05" opacity="0.9"/>
+  <ellipse cx="300" cy="950" rx="200" ry="280" fill="#040e06" opacity="0.9"/>
+  <ellipse cx="724" cy="940" rx="200" ry="300" fill="#040e06" opacity="0.9"/>
+  <ellipse cx="924" cy="900" rx="180" ry="320" fill="#030c05" opacity="0.9"/>
+  <ellipse cx="512" cy="980" rx="150" ry="200" fill="#050f07" opacity="0.8"/>
+  <!-- Path -->
+  <path d="M 440 1024 Q 512 700 512 500 Q 512 300 512 200" stroke="#1a2a18" stroke-width="60" fill="none" opacity="0.4"/>
+  <!-- Fireflies -->
+  <circle cx="250" cy="600" r="3" fill="#aaffaa" opacity="0.7"/>
+  <circle cx="320" cy="520" r="2" fill="#ccffcc" opacity="0.5"/>
+  <circle cx="700" cy="580" r="3" fill="#aaffaa" opacity="0.6"/>
+  <circle cx="780" cy="640" r="2" fill="#ccffcc" opacity="0.5"/>
+  <circle cx="150" cy="700" r="2" fill="#88ff88" opacity="0.4"/>
+  <circle cx="850" cy="550" r="2" fill="#aaffaa" opacity="0.6"/>
+  <!-- Star glow through canopy -->
+  <circle cx="512" cy="300" r="90" fill="url(#star-glow)"/>
+  <polygon points="512,250 523,283 558,283 531,303 542,336 512,316 482,336 493,303 466,283 501,283"
+           fill="#ddffd8" opacity="0.9"/>
+  <!-- Starlight rays -->
+  <line x1="512" y1="350" x2="512" y2="480" stroke="#aaffaa" stroke-width="1" opacity="0.2"/>
+  <!-- Korean text -->
+  <text x="512" y="440" font-family="serif" font-size="28" fill="#c8ffc0" text-anchor="middle" opacity="0.8">괜찮아졌어요 ✨</text>
+</svg>

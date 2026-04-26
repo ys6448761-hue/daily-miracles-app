@@ -43,22 +43,21 @@ router.post('/generate-share-image', async (req, res) => {
     });
   }
 
-  // 서비스 가용 여부
   if (!generateShareImage) {
     return res.status(503).json({ success: false, error: 'imageGenerationService 로드 실패' });
-  }
-  if (!process.env.OPENAI_API_KEY) {
-    return res.status(503).json({ success: false, error: 'OPENAI_API_KEY 미설정' });
   }
 
   try {
     const result = await generateShareImage(location, emotion);
     return res.json({
-      success:   true,
-      image_url: result.image_url,
+      success:                true,
+      image_url:              result.image_url,
       emotion,
-      location:  result.location,
-      image_id:  result.image_id,
+      location:               result.location,
+      image_id:               result.image_id,
+      is_fallback:            result.is_fallback ?? false,
+      fallback_reason:        result.fallback_reason ?? null,
+      used_simplified_prompt: result.used_simplified_prompt ?? false,
     });
   } catch (err) {
     console.error('[share-image] 생성 실패:', err.message);

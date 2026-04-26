@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="bg" cx="40%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#1e1030"/>
+      <stop offset="70%" stop-color="#0c0818"/>
+      <stop offset="100%" stop-color="#06040e"/>
+    </radialGradient>
+    <radialGradient id="warm" cx="30%" cy="60%" r="30%">
+      <stop offset="0%" stop-color="#ffcc66" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#ff8800" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="star-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffeebb" stop-opacity="1"/>
+      <stop offset="50%" stop-color="#ffaa44" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#ff6600" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <rect width="1024" height="1024" fill="url(#warm)"/>
+  <!-- Window frame -->
+  <rect x="180" y="300" width="320" height="260" rx="8" fill="#110a1e" stroke="#554433" stroke-width="3" opacity="0.9"/>
+  <line x1="340" y1="300" x2="340" y2="560" stroke="#554433" stroke-width="2"/>
+  <line x1="180" y1="430" x2="500" y2="430" stroke="#554433" stroke-width="2"/>
+  <!-- Sea through window -->
+  <rect x="183" y="303" width="154" height="124" rx="4" fill="#08051a"/>
+  <rect x="340" y="303" width="157" height="124" rx="4" fill="#080518"/>
+  <!-- Cafe warm glow -->
+  <rect x="0" y="600" width="1024" height="424" fill="#1a0e05" opacity="0.7"/>
+  <!-- Star -->
+  <circle cx="512" cy="280" r="70" fill="url(#star-glow)"/>
+  <polygon points="512,235 521,265 553,265 528,283 537,313 512,295 487,313 496,283 471,265 503,265"
+           fill="#fff5dd" opacity="0.95"/>
+  <!-- Korean text -->
+  <text x="512" y="420" font-family="serif" font-size="28" fill="#e8d5ff" text-anchor="middle" opacity="0.85">괜찮아졌어요 ✨</text>
+  <!-- Table surface hint -->
+  <ellipse cx="512" cy="820" rx="200" ry="30" fill="#2a1a08" opacity="0.6"/>
+  <rect x="312" y="760" width="400" height="60" rx="4" fill="#1e1205" opacity="0.5"/>
+</svg>

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#16102e"/>
+      <stop offset="60%" stop-color="#0a0818"/>
+      <stop offset="100%" stop-color="#04030c"/>
+    </radialGradient>
+    <radialGradient id="star-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffeebb" stop-opacity="1"/>
+      <stop offset="40%" stop-color="#ffaa55" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#ff7722" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <!-- Background stars -->
+  <circle cx="150" cy="200" r="1.5" fill="#ffffff" opacity="0.4"/>
+  <circle cx="300" cy="150" r="1" fill="#ffffff" opacity="0.3"/>
+  <circle cx="700" cy="180" r="1.5" fill="#ffffff" opacity="0.4"/>
+  <circle cx="850" cy="220" r="1" fill="#ffffff" opacity="0.3"/>
+  <circle cx="200" cy="400" r="1" fill="#ffffff" opacity="0.2"/>
+  <circle cx="780" cy="350" r="1.5" fill="#ffffff" opacity="0.3"/>
+  <circle cx="950" cy="150" r="1" fill="#ffffff" opacity="0.4"/>
+  <circle cx="80" cy="600" r="1" fill="#ffffff" opacity="0.2"/>
+  <circle cx="920" cy="700" r="1.5" fill="#ffffff" opacity="0.3"/>
+  <!-- Main star glow -->
+  <circle cx="512" cy="380" r="120" fill="url(#star-glow)"/>
+  <!-- Main star -->
+  <polygon points="512,300 528,352 582,352 538,382 555,434 512,404 469,434 486,382 442,352 496,352"
+           fill="#fff5dd" opacity="0.95"/>
+  <!-- Korean text -->
+  <text x="512" y="540" font-family="serif" font-size="32" fill="#e8d5ff" text-anchor="middle" opacity="0.9">괜찮아졌어요 ✨</text>
+  <!-- Small silhouette -->
+  <ellipse cx="512" cy="820" rx="12" ry="30" fill="#110820" opacity="0.7"/>
+  <circle cx="512" cy="782" r="10" fill="#110820" opacity="0.7"/>
+</svg>
