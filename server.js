@@ -3070,6 +3070,12 @@ const feedbackRoutes = require('./routes/feedbackRoutes');
 app.use('/api/feedback', feedbackRoutes);
 console.log('✅ 피드백 라우터 등록 완료 (/api/feedback)');
 
+// ---------- 장소별 관리자 — /dreamtown/:code/admin (SPA fallback보다 먼저 등록) ----------
+// /dreamtown/* SPA 라우트가 이 경로도 잡아버리기 때문에 반드시 그 앞에 위치해야 함
+app.get('/dreamtown/:code/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin', 'location.html'));
+});
+
 // ---------- DreamTown Frontend (Prototype) ----------
 const dtFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist');
 app.use('/dreamtown', express.static(dtFrontendPath, {

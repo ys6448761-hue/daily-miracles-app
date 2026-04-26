@@ -192,34 +192,147 @@
       color: #fca5a5;
       font-size: 14px;
     }
+    /* 비밀번호 화면 */
+    .pw-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pw-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+    }
+    .pw-card .icon { font-size: 36px; margin-bottom: 16px; }
+    .pw-card h2 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+    .pw-card p  { font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 24px; }
+    .pw-input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.07);
+      color: #fff;
+      font-size: 22px;
+      letter-spacing: 0.3em;
+      text-align: center;
+      outline: none;
+      margin-bottom: 16px;
+    }
+    .pw-input:focus { border-color: rgba(201,184,255,0.5); }
+    .pw-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      background: rgba(201,184,255,0.2);
+      color: #c9b8ff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .pw-btn:hover { background: rgba(201,184,255,0.3); }
+    .pw-error { color: #fca5a5; font-size: 13px; margin-top: 12px; min-height: 18px; }
   </style>
 </head>
 <body>
-  <div id="app"><div class="loading">불러오는 중...</div></div>
+  <div id="app"></div>
 
   <script>
-    const segments = window.location.pathname.split('/');
-    const code     = segments[segments.length - 1];
-    const token    = new URLSearchParams(window.location.search).get('token') || '';
+    // URL 파싱: /dreamtown/lattoa/admin → code='lattoa'
+    //           /dreamtown/admin/location/lattoa → code='lattoa' (구 경로 호환)
+    //           /admin/location/lattoa → code='lattoa' (구 경로 호환)
+    const segs = window.location.pathname.split('/').filter(Boolean);
+    let code;
+    if (segs[segs.length - 1] === 'admin') {
+      code = segs[segs.length - 2]; // /dreamtown/lattoa/admin
+    } else {
+      code = segs[segs.length - 1]; // /dreamtown/admin/location/lattoa (구 경로)
+    }
+
+    const SESSION_KEY = `loc_admin_auth_${code}`;
+
+    function showPasswordScreen() {
+      document.getElementById('app').innerHTML = `
+        <div class="pw-screen">
+          <div class="pw-card">
+            <div class="icon">🔐</div>
+            <h2>관리자 인증</h2>
+            <p>비밀번호를 입력하세요</p>
+            <input class="pw-input" id="pwInput" type="password"
+              maxlength="20" placeholder="••••" autocomplete="off"
+              autofocus />
+            <button class="pw-btn" id="pwBtn">확인</button>
+            <div class="pw-error" id="pwError"></div>
+          </div>
+        </div>`;
+
+      const input = document.getElementById('pwInput');
+      const btn   = document.getElementById('pwBtn');
+      const err   = document.getElementById('pwError');
+
+      async function attempt() {
+        const pw = input.value.trim();
+        if (!pw) return;
+        btn.disabled = true;
+        btn.textContent = '확인 중...';
+        err.textContent = '';
+
+        const res = await fetch(`/api/admin/dt/location/${code}`, {
+          headers: { 'x-admin-token': pw },
+        }).catch(() => null);
+
+        if (!res || res.status === 401) {
+          err.textContent = '비밀번호가 틀렸습니다.';
+          btn.disabled = false;
+          btn.textContent = '확인';
+          input.value = '';
+          input.focus();
+          return;
+        }
+        if (res.status === 404) {
+          err.textContent = `알 수 없는 장소: ${code}`;
+          btn.disabled = false;
+          btn.textContent = '확인';
+          return;
+        }
+
+        // 인증 성공 — 세션에 토큰 저장 후 대시보드 렌더
+        sessionStorage.setItem(SESSION_KEY, pw);
+        const d = await res.json();
+        render(d);
+      }
+
+      btn.addEventListener('click', attempt);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') attempt(); });
+    }
 
     async function load() {
-      const app = document.getElementById('app');
+      const savedToken = sessionStorage.getItem(SESSION_KEY);
+      // URL ?token= 도 허용 (구 방식 호환)
+      const urlToken = new URLSearchParams(window.location.search).get('token') || '';
+      const token = urlToken || savedToken;
 
-      if (!token) {
-        app.innerHTML = `<div class="error-box">🔒 관리자 토큰이 필요합니다.<br>URL에 <code>?token=ADMIN_TOKEN</code> 을 추가해주세요.</div>`;
-        return;
-      }
+      if (!token) { showPasswordScreen(); return; }
 
       try {
         const res = await fetch(`/api/admin/dt/location/${code}`, {
           headers: { 'x-admin-token': token },
         });
         if (res.status === 401) {
-          app.innerHTML = `<div class="error-box">🔒 토큰이 올바르지 않습니다. 값을 확인해주세요.</div>`;
+          sessionStorage.removeItem(SESSION_KEY);
+          showPasswordScreen();
           return;
         }
         if (res.status === 404) {
-          app.innerHTML = `<div class="error-box">알 수 없는 장소 코드: <strong>${code}</strong></div>`;
+          document.getElementById('app').innerHTML =
+            `<div class="error-box">알 수 없는 장소 코드: <strong>${code}</strong></div>`;
           return;
         }
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
