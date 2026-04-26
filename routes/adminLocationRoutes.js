@@ -37,62 +37,65 @@ router.get('/:code', adminGuard, async (req, res) => {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
 
+    // QR 별 생성 경로: star-entry.html → /api/star/create → stars 테이블 (origin_location 컬럼)
+    // dt_stars.origin_place 가 아닌 stars.origin_location 기준으로 집계
     const [todayR, totalR, resonanceR, topStarR, emotionR, recentR] = await Promise.all([
       // 오늘 별 생성
       db.query(
-        `SELECT COUNT(*) AS n FROM dt_stars WHERE origin_place = $1 AND created_at >= $2`,
+        `SELECT COUNT(*) AS n
+         FROM   stars
+         WHERE  origin_location = $1 AND created_at >= $2`,
         [code, todayStart]
       ),
       // 누적 별
       db.query(
-        `SELECT COUNT(*) AS n FROM dt_stars WHERE origin_place = $1`,
+        `SELECT COUNT(*) AS n
+         FROM   stars
+         WHERE  origin_location = $1`,
         [code]
       ),
-      // 총 공명 — star_logs.action_type='resonance' 기준 (resonance_count 컬럼 미존재)
+      // 총 공명 — star_logs.action_type='resonance' (star_id → stars.id FK)
       db.query(
         `SELECT COUNT(*) AS n
          FROM   star_logs sl
-         JOIN   dt_stars  s ON s.id::text = sl.star_id::text
-         WHERE  s.origin_place = $1
-           AND  sl.action_type = 'resonance'`,
+         JOIN   stars     s ON s.id = sl.star_id
+         WHERE  s.origin_location = $1
+           AND  sl.action_type   = 'resonance'`,
         [code]
       ),
-      // 대표 문장: 공명 수(star_logs) 가장 많은 별의 소원
+      // 대표 문장: 공명 많은 별의 wish_text
       db.query(
-        `SELECT s.star_name, w.wish_text,
-                COUNT(sl.id) AS resonance_count
-         FROM   dt_stars  s
-         LEFT JOIN dt_wishes  w  ON w.id = s.wish_id
-         LEFT JOIN star_logs  sl ON sl.star_id::text = s.id::text
-                                 AND sl.action_type = 'resonance'
-         WHERE  s.origin_place = $1
-           AND  w.wish_text IS NOT NULL
-         GROUP  BY s.id, s.star_name, w.wish_text, s.created_at
+        `SELECT s.id, s.wish_text, COUNT(sl.id) AS resonance_count
+         FROM   stars     s
+         LEFT JOIN star_logs sl ON sl.star_id = s.id
+                                AND sl.action_type = 'resonance'
+         WHERE  s.origin_location = $1
+           AND  s.wish_text IS NOT NULL
+         GROUP  BY s.id, s.wish_text, s.created_at
          ORDER  BY resonance_count DESC, s.created_at DESC
          LIMIT  1`,
         [code]
       ),
-      // 감정 TOP 3
+      // 감정 TOP 3 (stars.emotion 컬럼)
       db.query(
-        `SELECT emotion_tag AS emotion, COUNT(*) AS cnt
-         FROM   dt_stars
-         WHERE  origin_place = $1 AND emotion_tag IS NOT NULL
-         GROUP  BY emotion_tag
+        `SELECT emotion, COUNT(*) AS cnt
+         FROM   stars
+         WHERE  origin_location = $1 AND emotion IS NOT NULL
+         GROUP  BY emotion
          ORDER  BY cnt DESC
          LIMIT  3`,
         [code]
       ),
-      // 최근 별 5개 — 공명 수는 star_logs 집계
+      // 최근 별 5개
       db.query(
-        `SELECT s.id, s.star_name, s.emotion_tag, s.status, s.created_at,
-                LEFT(w.wish_text, 30) AS wish_preview,
-                COUNT(sl.id)          AS resonance_count
-         FROM   dt_stars  s
-         LEFT JOIN dt_wishes  w  ON w.id = s.wish_id
-         LEFT JOIN star_logs  sl ON sl.star_id::text = s.id::text
-                                 AND sl.action_type = 'resonance'
-         WHERE  s.origin_place = $1
-         GROUP  BY s.id, s.star_name, s.emotion_tag, s.status, s.created_at, w.wish_text
+        `SELECT s.id, s.access_key, s.emotion, s.status, s.created_at,
+                LEFT(s.wish_text, 30)  AS wish_preview,
+                COUNT(sl.id)           AS resonance_count
+         FROM   stars     s
+         LEFT JOIN star_logs sl ON sl.star_id = s.id
+                                AND sl.action_type = 'resonance'
+         WHERE  s.origin_location = $1
+         GROUP  BY s.id, s.access_key, s.emotion, s.status, s.created_at, s.wish_text
          ORDER  BY s.created_at DESC
          LIMIT  5`,
         [code]
@@ -109,7 +112,7 @@ router.get('/:code', adminGuard, async (req, res) => {
         total_resonance: parseInt(resonanceR.rows[0].n,  10),
       },
       representative: topStar
-        ? { wish_text: topStar.wish_text, star_name: topStar.star_name, resonance_count: parseInt(topStar.resonance_count, 10) }
+        ? { wish_text: topStar.wish_text, star_name: topStar.access_key ?? topStar.id?.slice(0, 8), resonance_count: parseInt(topStar.resonance_count, 10) }
         : null,
       emotion_top3:  emotionR.rows.map(r => ({ emotion: r.emotion, count: parseInt(r.cnt, 10) })),
       recent_stars:  recentR.rows,
