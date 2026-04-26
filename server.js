@@ -1187,10 +1187,6 @@ app.get("/api/health", async (req, res) => {
       dbStatus = "연결 실패";
       console.error("DB 연결 오류:", error);
     }
-    try {
-      const enc = await db.query("SELECT current_setting('server_encoding') AS se, current_setting('client_encoding') AS ce");
-      dbStatus += ` | enc:${enc.rows[0].se}/${enc.rows[0].ce}`;
-    } catch (_) {}
     dbResponseMs = Date.now() - t0;
   }
 
