@@ -18,6 +18,14 @@ const LOCATION_META = {
   'yeosu-cablecar': { name: '여수 해상 케이블카',  emoji: '🚡' },
 };
 
+// URL 코드 → QR ?loc= 값 (dt_kpi_events.extra->>'origin_location')
+const KPI_ORIGIN_CODE = {
+  lattoa:           'lattoa_cafe',
+  forestland:       'forestland',
+  paransi:          'paransi',
+  'yeosu-cablecar': 'yeosu-cablecar',
+};
+
 const LOCATION_ADMIN_PIN = '1234';
 
 function adminGuard(req, res, next) {
@@ -40,8 +48,9 @@ router.get('/:code', adminGuard, async (req, res) => {
     return res.status(404).json({ error: `알 수 없는 장소: ${code}` });
   }
 
-  // QR 별 생성: star-entry.html → /api/star/create → stars 테이블 (origin_location)
-  // migration 134 미실행 시 origin_location 컬럼 없음 → 42703 graceful 처리
+  // QR URL: ?loc=lattoa_cafe → stars.origin_location & dt_kpi_events.extra->>'origin_location'
+  const kpiCode = KPI_ORIGIN_CODE[code] ?? code;
+
   const log = (label, err) =>
     console.error(`[admin/dt/location/${code}] ${label} 실패:`, err.code, err.message);
 
@@ -71,20 +80,29 @@ router.get('/:code', adminGuard, async (req, res) => {
 
     const [todayStars, totalStars, totalResonance, topStarRows, emotionRows, recentRows] =
       await Promise.all([
+        // 오늘 별: dt_kpi_events 기준 (QR origin_location 값으로 필터)
         safeCount(
-          `SELECT COUNT(*) AS n FROM stars WHERE origin_location = $1 AND created_at >= $2`,
-          [code, todayStart], '오늘별'
+          `SELECT COUNT(*) AS n
+           FROM   dt_kpi_events
+           WHERE  event_name = 'star_created'
+             AND  extra->>'origin_location' = $1
+             AND  created_at::date = CURRENT_DATE`,
+          [kpiCode], '오늘별'
         ),
+        // 누적 별: dt_kpi_events 기준
         safeCount(
-          `SELECT COUNT(*) AS n FROM stars WHERE origin_location = $1`,
-          [code], '누적별'
+          `SELECT COUNT(*) AS n
+           FROM   dt_kpi_events
+           WHERE  event_name = 'star_created'
+             AND  extra->>'origin_location' = $1`,
+          [kpiCode], '누적별'
         ),
         safeCount(
           `SELECT COUNT(*) AS n
            FROM   star_logs sl
            JOIN   stars     s ON s.id = sl.star_id
            WHERE  s.origin_location = $1 AND sl.action_type = 'resonance'`,
-          [code], '총공명'
+          [kpiCode], '총공명'
         ),
         safeRows(
           `SELECT s.id, s.wish_text, COUNT(sl.id) AS resonance_count
@@ -94,14 +112,14 @@ router.get('/:code', adminGuard, async (req, res) => {
            GROUP  BY s.id, s.wish_text, s.created_at
            ORDER  BY resonance_count DESC, s.created_at DESC
            LIMIT  1`,
-          [code], '대표문장'
+          [kpiCode], '대표문장'
         ),
         safeRows(
           `SELECT emotion, COUNT(*) AS cnt
            FROM   stars
            WHERE  origin_location = $1 AND emotion IS NOT NULL
            GROUP  BY emotion ORDER BY cnt DESC LIMIT 3`,
-          [code], '감정TOP3'
+          [kpiCode], '감정TOP3'
         ),
         safeRows(
           `SELECT s.id, s.access_key, s.emotion, s.status, s.created_at,
@@ -112,7 +130,7 @@ router.get('/:code', adminGuard, async (req, res) => {
            WHERE  s.origin_location = $1
            GROUP  BY s.id, s.access_key, s.emotion, s.status, s.created_at, s.wish_text
            ORDER  BY s.created_at DESC LIMIT 5`,
-          [code], '최근별5'
+          [kpiCode], '최근별5'
         ),
       ]);
 
