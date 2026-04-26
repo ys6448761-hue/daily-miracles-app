@@ -2463,6 +2463,18 @@ if (starMvpRoutes) {
   console.log('✅ Star MVP 라우터 등록 완료 (/api/star)');
 }
 
+// ---------- Share Image Generation (/api/generate-share-image) ----------
+let shareImageRoutes = null;
+try {
+  shareImageRoutes = require('./routes/shareImageRoutes');
+} catch (e) {
+  console.warn('⚠️ shareImageRoutes 로드 실패:', e.message);
+}
+if (shareImageRoutes) {
+  app.use('/api', shareImageRoutes);
+  console.log('✅ Share Image 라우터 등록 완료 (/api/generate-share-image)');
+}
+
 // ---------- Star Voyage (/api/star-voyage) ----------
 let starVoyageRoutes = null;
 try {
