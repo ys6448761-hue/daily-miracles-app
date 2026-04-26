@@ -18,10 +18,17 @@ const LOCATION_META = {
   'yeosu-cablecar': { name: '여수 해상 케이블카',  emoji: '🚡' },
 };
 
+const LOCATION_ADMIN_PIN = '1234';
+
 function adminGuard(req, res, next) {
-  const token = req.headers['x-admin-token'] || req.query.token;
-  if (!process.env.ADMIN_TOKEN) return next();
-  if (token === process.env.ADMIN_TOKEN) return next();
+  const realToken = process.env.ADMIN_TOKEN;
+  if (!realToken) return next(); // 로컬 개발: 토큰 미설정 시 통과
+
+  const input = req.headers['x-admin-token'] || req.query.token || '';
+  // PIN(1234) 입력 시 서버에서 실제 ADMIN_TOKEN으로 변환 — 클라이언트에 토큰 미노출
+  const token = input === LOCATION_ADMIN_PIN ? realToken : input;
+
+  if (token === realToken) return next();
   return res.status(401).json({ error: '관리자 인증이 필요합니다.' });
 }
 
