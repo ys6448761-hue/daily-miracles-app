@@ -1386,6 +1386,10 @@ app.post("/api/admin/run-migration", adminTokenGuard, async (req, res) => {
     "122", "123",
     // 단순 별 시스템 (stars, star_logs)
     "124",
+    // Star MVP — access_key / origin_location / emotion / is_public (stars 컬럼 추가)
+    "134",
+    // Star MVP 리마인더, 회상, 여행 클릭, 항로
+    "135", "136", "137", "138",
     // 공명/이벤트/감정/항해 시스템
     "070", "127", "128", "129", "130", "131", "132",
     // star_logs 구스키마 패치 (124 먼저 실행된 환경)

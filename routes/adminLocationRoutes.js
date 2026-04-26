@@ -40,92 +40,99 @@ router.get('/:code', adminGuard, async (req, res) => {
     return res.status(404).json({ error: `알 수 없는 장소: ${code}` });
   }
 
+  // QR 별 생성: star-entry.html → /api/star/create → stars 테이블 (origin_location)
+  // migration 134 미실행 시 origin_location 컬럼 없음 → 42703 graceful 처리
+  const log = (label, err) =>
+    console.error(`[admin/dt/location/${code}] ${label} 실패:`, err.code, err.message);
+
+  async function safeCount(sql, params, label) {
+    try {
+      const r = await db.query(sql, params);
+      return parseInt(r.rows[0]?.n ?? 0, 10);
+    } catch (err) {
+      log(label, err);
+      return 0;
+    }
+  }
+
+  async function safeRows(sql, params, label) {
+    try {
+      const r = await db.query(sql, params);
+      return r.rows;
+    } catch (err) {
+      log(label, err);
+      return [];
+    }
+  }
+
   try {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
 
-    // QR 별 생성 경로: star-entry.html → /api/star/create → stars 테이블 (origin_location 컬럼)
-    // dt_stars.origin_place 가 아닌 stars.origin_location 기준으로 집계
-    const [todayR, totalR, resonanceR, topStarR, emotionR, recentR] = await Promise.all([
-      // 오늘 별 생성
-      db.query(
-        `SELECT COUNT(*) AS n
-         FROM   stars
-         WHERE  origin_location = $1 AND created_at >= $2`,
-        [code, todayStart]
-      ),
-      // 누적 별
-      db.query(
-        `SELECT COUNT(*) AS n
-         FROM   stars
-         WHERE  origin_location = $1`,
-        [code]
-      ),
-      // 총 공명 — star_logs.action_type='resonance' (star_id → stars.id FK)
-      db.query(
-        `SELECT COUNT(*) AS n
-         FROM   star_logs sl
-         JOIN   stars     s ON s.id = sl.star_id
-         WHERE  s.origin_location = $1
-           AND  sl.action_type   = 'resonance'`,
-        [code]
-      ),
-      // 대표 문장: 공명 많은 별의 wish_text
-      db.query(
-        `SELECT s.id, s.wish_text, COUNT(sl.id) AS resonance_count
-         FROM   stars     s
-         LEFT JOIN star_logs sl ON sl.star_id = s.id
-                                AND sl.action_type = 'resonance'
-         WHERE  s.origin_location = $1
-           AND  s.wish_text IS NOT NULL
-         GROUP  BY s.id, s.wish_text, s.created_at
-         ORDER  BY resonance_count DESC, s.created_at DESC
-         LIMIT  1`,
-        [code]
-      ),
-      // 감정 TOP 3 (stars.emotion 컬럼)
-      db.query(
-        `SELECT emotion, COUNT(*) AS cnt
-         FROM   stars
-         WHERE  origin_location = $1 AND emotion IS NOT NULL
-         GROUP  BY emotion
-         ORDER  BY cnt DESC
-         LIMIT  3`,
-        [code]
-      ),
-      // 최근 별 5개
-      db.query(
-        `SELECT s.id, s.access_key, s.emotion, s.status, s.created_at,
-                LEFT(s.wish_text, 30)  AS wish_preview,
-                COUNT(sl.id)           AS resonance_count
-         FROM   stars     s
-         LEFT JOIN star_logs sl ON sl.star_id = s.id
-                                AND sl.action_type = 'resonance'
-         WHERE  s.origin_location = $1
-         GROUP  BY s.id, s.access_key, s.emotion, s.status, s.created_at, s.wish_text
-         ORDER  BY s.created_at DESC
-         LIMIT  5`,
-        [code]
-      ),
-    ]);
+    const [todayStars, totalStars, totalResonance, topStarRows, emotionRows, recentRows] =
+      await Promise.all([
+        safeCount(
+          `SELECT COUNT(*) AS n FROM stars WHERE origin_location = $1 AND created_at >= $2`,
+          [code, todayStart], '오늘별'
+        ),
+        safeCount(
+          `SELECT COUNT(*) AS n FROM stars WHERE origin_location = $1`,
+          [code], '누적별'
+        ),
+        safeCount(
+          `SELECT COUNT(*) AS n
+           FROM   star_logs sl
+           JOIN   stars     s ON s.id = sl.star_id
+           WHERE  s.origin_location = $1 AND sl.action_type = 'resonance'`,
+          [code], '총공명'
+        ),
+        safeRows(
+          `SELECT s.id, s.wish_text, COUNT(sl.id) AS resonance_count
+           FROM   stars     s
+           LEFT JOIN star_logs sl ON sl.star_id = s.id AND sl.action_type = 'resonance'
+           WHERE  s.origin_location = $1 AND s.wish_text IS NOT NULL
+           GROUP  BY s.id, s.wish_text, s.created_at
+           ORDER  BY resonance_count DESC, s.created_at DESC
+           LIMIT  1`,
+          [code], '대표문장'
+        ),
+        safeRows(
+          `SELECT emotion, COUNT(*) AS cnt
+           FROM   stars
+           WHERE  origin_location = $1 AND emotion IS NOT NULL
+           GROUP  BY emotion ORDER BY cnt DESC LIMIT 3`,
+          [code], '감정TOP3'
+        ),
+        safeRows(
+          `SELECT s.id, s.access_key, s.emotion, s.status, s.created_at,
+                  LEFT(s.wish_text, 30) AS wish_preview,
+                  COUNT(sl.id)          AS resonance_count
+           FROM   stars     s
+           LEFT JOIN star_logs sl ON sl.star_id = s.id AND sl.action_type = 'resonance'
+           WHERE  s.origin_location = $1
+           GROUP  BY s.id, s.access_key, s.emotion, s.status, s.created_at, s.wish_text
+           ORDER  BY s.created_at DESC LIMIT 5`,
+          [code], '최근별5'
+        ),
+      ]);
 
-    const topStar = topStarR.rows[0] ?? null;
+    const topStar = topStarRows[0] ?? null;
 
     return res.json({
       location: { code, ...meta },
       stats: {
-        today_stars:     parseInt(todayR.rows[0].n,      10),
-        total_stars:     parseInt(totalR.rows[0].n,      10),
-        total_resonance: parseInt(resonanceR.rows[0].n,  10),
+        today_stars:     todayStars,
+        total_stars:     totalStars,
+        total_resonance: totalResonance,
       },
       representative: topStar
         ? { wish_text: topStar.wish_text, star_name: topStar.access_key ?? topStar.id?.slice(0, 8), resonance_count: parseInt(topStar.resonance_count, 10) }
         : null,
-      emotion_top3:  emotionR.rows.map(r => ({ emotion: r.emotion, count: parseInt(r.cnt, 10) })),
-      recent_stars:  recentR.rows,
+      emotion_top3: emotionRows.map(r => ({ emotion: r.emotion, count: parseInt(r.cnt, 10) })),
+      recent_stars: recentRows,
     });
   } catch (err) {
-    console.error('[admin/dt/location]', err);
+    console.error(`[admin/dt/location/${code}] 예상치 못한 에러:`, err.stack);
     return res.status(500).json({ error: err.message });
   }
 });
