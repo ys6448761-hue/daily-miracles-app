@@ -265,12 +265,22 @@
     }
     localStorage.removeItem('emotion_linked');
 
-    // ── Kakao SDK 초기화 ──────────────────────────────
+    // ── Kakao SDK 초기화 (1회만) ─────────────────────
     function initKakao() {
-      if (!window.Kakao) return false;
+      if (!window.Kakao) {
+        console.error('[Kakao] window.Kakao 없음 — CDN 로드 실패');
+        return false;
+      }
       try {
-        if (!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_KEY);
-        return window.Kakao.isInitialized();
+        if (!window.Kakao.isInitialized()) {
+          console.log('[Kakao] init 호출 | key 앞 6자:', KAKAO_KEY.slice(0, 6));
+          window.Kakao.init(KAKAO_KEY);
+        } else {
+          console.log('[Kakao] 이미 initialized — init 스킵');
+        }
+        const ok = window.Kakao.isInitialized();
+        console.log('[Kakao] isInitialized:', ok, '| Share 사용 가능:', !!window.Kakao?.Share);
+        return ok;
       } catch (e) {
         console.warn('[Kakao] init 실패:', e.message);
         return false;
@@ -282,10 +292,21 @@
     let   emotionText = '괜찮아졌어요 ✨';
     let   imageUrl    = localStorage.getItem('share_image_url') || '';
 
-    // 절대 URL 보정
+    // shareUrl 도메인 검증 (Kakao 등록 도메인과 일치해야 함)
+    console.log('[Kakao] shareUrl:', shareUrl);
+    console.assert(
+      shareUrl.startsWith('https://app.dailymiracles.kr/'),
+      '[Kakao] ❌ shareUrl이 등록 도메인(https://app.dailymiracles.kr)과 불일치'
+    );
+
+    // 절대 URL 보정 — blob:/data:/http: 차단, 상대경로 보정
     function toAbsoluteUrl(url) {
-      if (!url) return `${BASE_URL}/images/fallback/star-default.svg`;
-      return url.startsWith('https://') ? url : `${BASE_URL}${url}`;
+      if (!url)                              return `${BASE_URL}/images/fallback/star-default.svg`;
+      if (url.startsWith('blob:') ||
+          url.startsWith('data:'))           return `${BASE_URL}/images/fallback/star-default.svg`;
+      if (url.startsWith('http://'))         return url.replace('http://', 'https://');
+      if (url.startsWith('https://'))        return url;
+      return `${BASE_URL}${url.startsWith('/') ? url : '/' + url}`;
     }
 
     // star API에서 emotion + image 보완 (fire-and-forget)
@@ -319,12 +340,13 @@
       }
 
       try {
-        window.Kakao.Share.sendDefault({
+        const _absImage = toAbsoluteUrl(imageUrl);
+        const _payload  = {
           objectType: 'feed',
           content: {
             title:       '당신의 별이 도착했어요 🌌',
             description: emotionText,
-            imageUrl:    toAbsoluteUrl(imageUrl),
+            imageUrl:    _absImage,
             link: {
               mobileWebUrl: shareUrl,
               webUrl:       shareUrl,
@@ -337,7 +359,9 @@
               webUrl:       shareUrl,
             },
           }],
-        });
+        };
+        console.log('[Kakao] sendDefault payload:', JSON.stringify(_payload, null, 2));
+        window.Kakao.Share.sendDefault(_payload);
       } catch (e) {
         console.warn('[Kakao] sendDefault 실패:', e.message);
         showFallback('카카오톡 공유가 열리지 않았어요.\n링크를 복사해서 보내주세요.');
