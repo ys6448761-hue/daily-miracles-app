@@ -259,7 +259,7 @@ router.get('/:access_key', async (req, res) => {
     ).catch(() => ({ rows: [] }));
     const lastReflection = reflRows[0] ?? null;
 
-    // 감정 연결 여부 (star_links 테이블 없으면 조용히 null)
+    // 감정 연결 여부
     const { rows: linkRows } = await db.query(
       `SELECT COUNT(*) AS n FROM star_links
        WHERE source_star_id = $1 OR target_star_id = $1`,
@@ -267,7 +267,16 @@ router.get('/:access_key', async (req, res) => {
     ).catch(() => ({ rows: [{ n: '0' }] }));
     const is_linked = parseInt(linkRows[0]?.n ?? 0) > 0;
 
-    return res.json({ success: true, star, promises, last_reflection: lastReflection, is_linked });
+    // 생성 이미지 (공유 랜딩용 — star_images 없으면 null)
+    const { rows: imgRows } = await db.query(
+      `SELECT image_url FROM star_images
+       WHERE star_id = $1 AND validation_pass = true
+       ORDER BY created_at DESC LIMIT 1`,
+      [star.id]
+    ).catch(() => ({ rows: [] }));
+    const image_url = imgRows[0]?.image_url ?? null;
+
+    return res.json({ success: true, star, promises, last_reflection: lastReflection, is_linked, image_url });
   } catch (err) {
     console.error('[star-mvp] GET /:access_key error:', err.message);
     res.status(500).json({ success: false, error: err.message });
