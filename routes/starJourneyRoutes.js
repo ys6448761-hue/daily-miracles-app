@@ -29,18 +29,19 @@ router.post('/start', async (req, res) => {
 
   try {
     const { rows: starRows } = await db.query(
-      'SELECT id FROM stars WHERE id = $1',
+      'SELECT id, user_id FROM stars WHERE id = $1',
       [star_id]
     );
     if (!starRows.length) {
       return res.status(404).json({ success: false, error: '별을 찾을 수 없습니다.' });
     }
+    const user_id = starRows[0].user_id;
 
     const { rows } = await db.query(
-      `INSERT INTO journeys (star_id, journey_type, title)
-       VALUES ($1, $2, $3)
-       RETURNING id, star_id, journey_type, title, created_at`,
-      [star_id, journey_type, title?.trim() || null]
+      `INSERT INTO journeys (star_id, user_id, journey_type, title)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, star_id, user_id, journey_type, title, created_at`,
+      [star_id, user_id, journey_type, title?.trim() || null]
     );
     const journey = rows[0];
 

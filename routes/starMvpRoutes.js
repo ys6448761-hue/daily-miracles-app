@@ -28,10 +28,13 @@ async function _autoJourneyMoment(starId, emotion, originLocation) {
   // Step 1: Journey 자동 생성
   let journeyId = null;
   try {
+    const { rows: uRows } = await db.query('SELECT user_id FROM stars WHERE id = $1', [starId]);
+    const user_id = uRows[0]?.user_id ?? null;
+
     const { rows } = await db.query(
-      `INSERT INTO journeys (star_id, journey_type, title)
-       VALUES ($1, 'travel', '소원 여정') RETURNING id`,
-      [starId]
+      `INSERT INTO journeys (star_id, user_id, journey_type, title)
+       VALUES ($1, $2, 'travel', '소원 여정') RETURNING id`,
+      [starId, user_id]
     );
     journeyId = rows[0].id;
     console.log(`[star-mvp] journey 생성 | ${journeyId}`);
