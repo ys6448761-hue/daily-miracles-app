@@ -6,6 +6,33 @@
 
 import { useEffect, useState, useCallback } from 'react';
 
+// ── 별공방 Config — 새 별공방 추가 시 여기만 수정 ────────────────
+const WORKSHOP_CONFIGS = [
+  {
+    name:         '케이블카 별공방',
+    locationCode: 'yeosu_cablecar',
+    userUrl:      '/star-entry.html?loc=yeosu_cablecar',
+    adminUrl:     '/admin/cablecar',
+    qrUrl:        '/star-entry.html?loc=yeosu_cablecar&qr=1',
+    status:       'testing',
+  },
+  {
+    name:         '라또아 별공방',
+    locationCode: 'lattoa_cafe',
+    userUrl:      '/star-entry.html?loc=lattoa_cafe',
+    adminUrl:     '/admin/location/lattoa_cafe',
+    qrUrl:        '/star-entry.html?loc=lattoa_cafe&qr=1',
+    status:       'testing',
+  },
+];
+
+const STATUS_LABELS = { ready: '준비중', testing: '테스트중', running: '운영중' };
+const STATUS_STYLE  = {
+  ready:   { bg: 'rgba(100,100,140,0.15)', color: '#6b6b90', border: 'rgba(100,100,140,0.3)' },
+  testing: { bg: 'rgba(245,158,11,0.12)',  color: '#f59e0b', border: 'rgba(245,158,11,0.3)' },
+  running: { bg: 'rgba(74,222,128,0.10)',  color: '#4ade80', border: 'rgba(74,222,128,0.25)' },
+};
+
 const S = {
   page: {
     minHeight: '100vh',
@@ -67,6 +94,19 @@ const S = {
     color: '#fff', fontSize: 14, fontWeight: 700,
     cursor: 'pointer', fontFamily: "'Noto Sans KR', sans-serif",
   },
+  wBtn: (color) => ({
+    padding: '11px 8px',
+    background: `${color}22`,
+    border: `1px solid ${color}55`,
+    borderRadius: 10,
+    color,
+    fontSize: 12,
+    fontWeight: 700,
+    fontFamily: "'Noto Sans KR', sans-serif",
+    cursor: 'pointer',
+    textAlign: 'center',
+    WebkitTapHighlightColor: 'transparent',
+  }),
 };
 
 function fmt(iso) {
@@ -265,6 +305,89 @@ function AlertCard({ alerts, errors }) {
   );
 }
 
+// ── 별공방 카드 (단일) ────────────────────────────────────────────
+function WorkshopCard({ config, stats }) {
+  const s  = stats?.[config.locationCode] ?? {};
+  const sc = STATUS_STYLE[config.status] ?? STATUS_STYLE.ready;
+  const open = url => window.open(url, '_blank');
+
+  return (
+    <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 14, padding: '16px 18px' }}>
+      {/* 헤더 */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#e8e4f0' }}>{config.name}</div>
+          <div style={{ fontSize: 10, color: '#4a4a60', marginTop: 2, fontFamily: 'monospace' }}>{config.locationCode}</div>
+        </div>
+        <span style={{ display: 'inline-block', padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: sc.bg, color: sc.color, border: `1px solid ${sc.border}` }}>
+          {STATUS_LABELS[config.status] ?? config.status}
+        </span>
+      </div>
+
+      {/* 오늘 지표 */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8, padding: '10px 0', marginBottom: 14, borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        {[
+          { label: '오늘 별', val: s.stars   ?? '-' },
+          { label: 'Moment',  val: s.moments ?? '-' },
+          { label: '공유',    val: s.shares  ?? '-' },
+        ].map(({ label, val }) => (
+          <div key={label} style={{ textAlign: 'center' }}>
+            <div style={S.statNum}>{val}</div>
+            <div style={S.statLabel}>{label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* 액션 버튼 */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
+        <button onClick={() => open(config.userUrl)}  style={S.wBtn('#3b82f6')}>사용자 페이지</button>
+        <button onClick={() => open(config.adminUrl)} style={S.wBtn('#7c3aed')}>관리자 페이지</button>
+      </div>
+      <button onClick={() => open(config.qrUrl)} style={{ ...S.wBtn('#059669'), width: '100%' }}>QR 테스트</button>
+    </div>
+  );
+}
+
+// ── 별공방 운영센터 섹션 ──────────────────────────────────────────
+function WorkshopCenterSection({ adminKey }) {
+  const [stats,   setStats]   = useState({});
+  const [loading, setLoading] = useState(true);
+
+  const fetchStats = useCallback(async () => {
+    const locs = WORKSHOP_CONFIGS.map(c => c.locationCode).join(',');
+    try {
+      const r = await fetch(
+        `/api/admin/dashboard/workshop-stats?key=${encodeURIComponent(adminKey)}&locations=${encodeURIComponent(locs)}`
+      );
+      const d = await r.json();
+      if (d.success) setStats(d.stats ?? {});
+    } catch { /* ignore */ } finally {
+      setLoading(false);
+    }
+  }, [adminKey]);
+
+  useEffect(() => {
+    fetchStats();
+    const id = setInterval(fetchStats, 30_000);
+    return () => clearInterval(id);
+  }, [fetchStats]);
+
+  return (
+    <div style={S.card}>
+      <div style={{ ...S.cardTitle, fontSize: 13, marginBottom: 16 }}>🌌 별공방 운영센터</div>
+      {loading ? (
+        <div style={{ fontSize: 12, color: '#3a3a52', textAlign: 'center', padding: '12px 0' }}>로딩 중...</div>
+      ) : (
+        <div style={{ display: 'grid', gap: 14 }}>
+          {WORKSHOP_CONFIGS.map(config => (
+            <WorkshopCard key={config.locationCode} config={config} stats={stats} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── 메인 ─────────────────────────────────────────────────────────
 export default function AdminDashboardPage() {
   const [key,       setKey]       = useState(() => {
@@ -349,8 +472,13 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
+      {/* 별공방 운영센터 — 독립 fetch, 항상 표시 */}
+      <div style={{ marginBottom: 16 }}>
+        <WorkshopCenterSection adminKey={key} />
+      </div>
+
       {!data && loading && (
-        <div style={{ textAlign: 'center', color: '#4a4a60', fontSize: 13, paddingTop: 60 }}>로딩 중...</div>
+        <div style={{ textAlign: 'center', color: '#4a4a60', fontSize: 13, paddingTop: 40 }}>로딩 중...</div>
       )}
 
       {data && (

@@ -293,4 +293,52 @@ router.get('/operations', adminGuard, async (_req, res) => {
   }});
 });
 
+// ── GET /workshop-stats — 별공방 오늘 지표 (config 기반 다중 위치) ─
+router.get('/workshop-stats', adminGuard, async (req, res) => {
+  const locations = (req.query.locations || '').split(',').filter(Boolean);
+  if (!locations.length) return res.json({ success: true, stats: {} });
+
+  const stats = {};
+  await Promise.all(locations.map(async (loc) => {
+    const s = { stars: 0, moments: 0, shares: 0 };
+
+    // 오늘 별 수
+    try {
+      const r = await db.query(
+        `SELECT COUNT(*) AS n FROM stars WHERE origin_location = $1 AND created_at >= CURRENT_DATE`,
+        [loc]
+      );
+      s.stars = parseInt(r.rows[0]?.n ?? 0, 10);
+    } catch { /* 테이블 없음 — 0 유지 */ }
+
+    // 오늘 Moment 수 (journeys join — migration 146 없으면 0)
+    try {
+      const r = await db.query(
+        `SELECT COUNT(*) AS n FROM moments m
+         JOIN journeys j ON j.id = m.journey_id
+         JOIN stars    s ON s.id = j.star_id
+         WHERE s.origin_location = $1 AND m.created_at >= CURRENT_DATE`,
+        [loc]
+      );
+      s.moments = parseInt(r.rows[0]?.n ?? 0, 10);
+    } catch { /* migration 146 미실행 — 0 유지 */ }
+
+    // 오늘 공유 수 (dt_kpi_events — 없으면 0)
+    try {
+      const r = await db.query(
+        `SELECT COUNT(*) AS n FROM dt_kpi_events
+         WHERE event_name ILIKE '%share%'
+           AND extra->>'origin_location' = $1
+           AND created_at >= CURRENT_DATE`,
+        [loc]
+      );
+      s.shares = parseInt(r.rows[0]?.n ?? 0, 10);
+    } catch { /* dt_kpi_events 없음 — 0 유지 */ }
+
+    stats[loc] = s;
+  }));
+
+  return res.json({ success: true, stats });
+});
+
 module.exports = router;
