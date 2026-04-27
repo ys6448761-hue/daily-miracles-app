@@ -144,8 +144,8 @@ const LOCATION_NORMALIZE = {
   'lattoa-cafe':    'lattoa_cafe',
 };
 
-// ── 3초 타임아웃 ─────────────────────────────────────────────────
-const DALLE_TIMEOUT_MS = 3000;
+// ── 25초 타임아웃 (DALL-E 3 실측 응답 ~20s 기준)
+const DALLE_TIMEOUT_MS = 25000;
 
 function _withTimeout(promise, ms) {
   let timer;
