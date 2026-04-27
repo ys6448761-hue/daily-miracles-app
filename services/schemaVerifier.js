@@ -23,6 +23,9 @@ const REQUIRED_TABLES = [
   'star_resonance_summary',
   'dt_kpi_events',
   'feedback_events',
+  // Star MVP 테이블 (migration 136, 138)
+  'star_reflections',
+  'voyages',
 ];
 
 const REQUIRED_COLUMNS = [

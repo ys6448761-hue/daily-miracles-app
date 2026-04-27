@@ -22,6 +22,24 @@ let generateShareImage = null;
 let EMOTION_TEXT_MAP   = {};
 try { ({ generateStarImage, generateShareImage, EMOTION_TEXT_MAP } = require('../services/imageGenerationService')); } catch (_) {}
 
+// ── star_reflections 테이블 자동 생성 (migration 136 미실행 환경 안전망) ──
+;(async () => {
+  try {
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS star_reflections (
+        id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+        star_id    UUID        NOT NULL,
+        status     VARCHAR(20) NOT NULL CHECK (status IN ('closer', 'same', 'changed')),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `);
+    await db.query(`CREATE INDEX IF NOT EXISTS idx_star_reflections_star_id ON star_reflections (star_id)`);
+    console.log('[star-mvp] star_reflections 테이블 확인/생성 완료');
+  } catch (e) {
+    console.warn('[star-mvp] star_reflections 테이블 초기화 실패 (SQLite 환경 무시):', e.message);
+  }
+})();
+
 // ── Journey + Moment 자동 생성 (별 생성 시 fire-and-forget) ───────
 // "기존 image 생성 코드를 moment로 감싼다" — Star → Journey → Moment
 // 기존 API/응답 변화 없음. 기존 star_images 기록도 유지.
@@ -288,6 +306,10 @@ router.post('/reflect', async (req, res) => {
 
     return res.status(201).json({ success: true, reflection: rows[0] });
   } catch (err) {
+    if (err.code === '42P01') {
+      console.error('[star-mvp] star_reflections 테이블 없음 — migration 136 필요');
+      return res.status(503).json({ success: false, error: 'star_reflections 테이블 초기화 중. 잠시 후 재시도', migration: '136' });
+    }
     console.error('[star-mvp] POST /reflect error:', err.message);
     res.status(500).json({ success: false, error: err.message });
   }
