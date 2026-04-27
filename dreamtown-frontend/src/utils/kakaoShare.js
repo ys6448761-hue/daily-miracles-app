@@ -43,7 +43,7 @@ export function initKakao() {
     return false;
   }
   if (!window.Kakao.isInitialized()) {
-    const key = import.meta.env.VITE_KAKAO_JS_KEY;
+    const key = import.meta.env.VITE_KAKAO_JS_KEY || '8557586f56efb74719c1738c31beda97';
     if (!key) {
       console.error('[Kakao] ❌ VITE_KAKAO_JS_KEY 미설정 — dreamtown-frontend/.env 또는 Render 대시보드 환경변수 확인');
       return false;
