@@ -2,13 +2,18 @@
 
 /**
  * imageGenerationService.js — Star Image Generation (SSOT 기반)
+ * Phase 1: 여수 Base SSOT 적용
  *
- * 응답 보장 구조:
- *   1) 3초 타임아웃 → 즉시 정적 fallback 반환 (UX 끊김 없음)
- *   2) content_policy → 한글 제거 단순화 프롬프트 재시도 (3s 이내)
- *   3) timeout / rate_limit → async 재시도 큐 (백그라운드, DB 저장)
- *   4) quota / billing → 정적 fallback (재시도 없음)
- *   5) 전체 실패 → is_fallback:true + KPI 이벤트 기록
+ * 장면 선택 우선순위:
+ *   1) emotion key → EMOTION_SCENE_MAP → YEOSU_SCENES
+ *   2) emotionText 역추적 → emotion key → scene
+ *   3) location → LOCATION_SCENE_MAP → scene
+ *
+ * 응답 보장:
+ *   1) 3초 타임아웃 → 정적 fallback 즉시 반환
+ *   2) content_policy → 한글 제거 단순화 재시도 (3s)
+ *   3) timeout / rate_limit → async 재시도 큐 (백그라운드)
+ *   4) quota / billing → 재시도 없음
  */
 
 const { OpenAI } = require('openai');
@@ -25,16 +30,59 @@ function getOpenAI() {
 let emitKpiEvent = null;
 try { ({ emitKpiEvent } = require('./kpiEventEmitter')); } catch (_) {}
 
-// ── SSOT: 장소 → 씬 설명 ─────────────────────────────────────────
-const SCENE_MAP = {
-  'yeosu-cablecar': 'Inside a cable car at night above the sea in Yeosu. Tiny glowing city lights below, dark ocean stretching to the horizon.',
-  'lattoa_cafe':    'A quiet seaside café at night with soft warm lights. A single window reveals the dark sea and a star above.',
-  'forestland':     'A quiet forest path at night with soft starlight filtering through the canopy. Fireflies drift in the stillness.',
-  'paransi':        'A coastal hilltop lookout at night. A distant lighthouse blinks slowly over the dark sea below.',
-  'cablecar':       'Inside a cable car at night above the sea in Yeosu. Tiny glowing city lights below, dark ocean stretching to the horizon.',
+// ── Phase 1 SSOT: 여수 3대 장면 ──────────────────────────────────
+const YEOSU_SCENES = {
+  'night-sea':
+    'The still night sea of Yeosu seen from a low pier. Dark calm water. Distant city glow on the horizon. Absolute silence.',
+  'night-view':
+    'An elevated rooftop overlooking the night cityscape of Yeosu. Soft amber and white city lights far below. Open sky above.',
+  'cablecar':
+    'Inside a cable car drifting silently above the sea at night. Far below, Yeosu city lights flicker on dark water. Wide horizon.',
 };
 
-// ── SSOT: 장소별 정적 Fallback 이미지 ────────────────────────────
+// emotion key → 여수 장면 key
+// 치유/위로 → 밤바다 | 정리/생각 → 야경 | 희망/전환 → 케이블카
+const EMOTION_SCENE_MAP = {
+  '편안함': 'night-sea',
+  '설렘':   'cablecar',
+  '기대':   'cablecar',
+  '정리됨': 'night-view',
+};
+
+// location → 여수 장면 key (share image API 역호환)
+const LOCATION_SCENE_MAP = {
+  'yeosu-cablecar': 'cablecar',
+  'lattoa_cafe':    'night-sea',
+  'forestland':     'night-view',
+  'paransi':        'night-sea',
+  'cablecar':       'cablecar',
+};
+
+// emotionText display → emotion key (share image에서 scene 역추적)
+const DISPLAY_TO_EMOTION = {
+  '괜찮아졌어요 ✨':   '설렘',
+  '조금 가벼워졌어요': '편안함',
+  '기대가 별이 됐어요': '기대',
+  '지금이 괜찮아요':   '정리됨',
+};
+
+// ── 장면 해석 ─────────────────────────────────────────────────────
+function _resolveSceneKey(emotion, normalizedLoc, emotionText) {
+  if (emotion && EMOTION_SCENE_MAP[emotion])               return EMOTION_SCENE_MAP[emotion];
+  const eKey = emotionText && DISPLAY_TO_EMOTION[emotionText];
+  if (eKey && EMOTION_SCENE_MAP[eKey])                     return EMOTION_SCENE_MAP[eKey];
+  return LOCATION_SCENE_MAP[normalizedLoc] ?? 'cablecar';
+}
+
+// ── 장소별 정적 Fallback 이미지 (DoD ③ — fallback도 같은 scene 규칙) ──
+const SCENE_FALLBACK_URLS = {
+  'night-sea':  '/images/fallback/star-yeosu-cablecar.svg',
+  'night-view': '/images/fallback/star-paransi.svg',
+  'cablecar':   '/images/fallback/star-yeosu-cablecar.svg',
+};
+const FALLBACK_DEFAULT = '/images/fallback/star-default.svg';
+
+// 역호환 export용 (외부 참조 유지)
 const FALLBACK_IMAGE_URLS = {
   'yeosu-cablecar': '/images/fallback/star-yeosu-cablecar.svg',
   'lattoa_cafe':    '/images/fallback/star-lattoa-cafe.svg',
@@ -42,15 +90,13 @@ const FALLBACK_IMAGE_URLS = {
   'paransi':        '/images/fallback/star-paransi.svg',
   'cablecar':       '/images/fallback/star-yeosu-cablecar.svg',
 };
-const FALLBACK_DEFAULT = '/images/fallback/star-default.svg';
 
-// 입력 표기 정규화
 const LOCATION_NORMALIZE = {
   'yeosu_cablecar': 'yeosu-cablecar',
   'lattoa-cafe':    'lattoa_cafe',
 };
 
-// ── SSOT: 감정 → 이미지 텍스트 ───────────────────────────────────
+// ── SSOT: 감정 키 → 이미지 텍스트 ───────────────────────────────
 const EMOTION_TEXT_MAP = {
   '설렘':   '괜찮아졌어요 ✨',
   '편안함': '조금 가벼워졌어요',
@@ -59,51 +105,51 @@ const EMOTION_TEXT_MAP = {
 };
 const DEFAULT_EMOTION_TEXT = '괜찮아졌어요 ✨';
 
-// ── SSOT: 프롬프트 템플릿 (절대 고정 — 변수 2개만 교체) ──────────
+// ── Phase 1 SSOT 프롬프트 템플릿 ─────────────────────────────────
+// DoD: 텍스트 1줄만 / 여수 + 감정 + 별 1개 구조
 const PROMPT_TEMPLATE = (scene, emotionText) => `\
-A soft 2D watercolor illustration in Ghibli-inspired and Korean manhwa style.
+A soft 2D watercolor illustration.
 
 Scene:
 ${scene}
 
-Perspective:
-First-person or immersive perspective.
+Composition:
+Wide, still, immersive. One small glowing star as the single focal point, aligned with the viewer's gaze.
 
 Character:
-A very small, subtle silhouette, not the main subject.
-
-Focus:
-A single small glowing star aligned with the viewer's gaze.
+A single tiny silhouette — barely visible, far in the distance. Not the subject.
 
 Mood:
-Calm, emotional, slightly hopeful.
+Quiet, calm, slightly hopeful. No movement. No drama.
 
-Style constraints:
-- 2D only
-- watercolor texture
-- no photorealism
-- no 3D
-- soft edges
+Style:
+- 2D watercolor only
+- No photorealism, no 3D rendering
+- Soft brush strokes, muted glow
+- Palette: deep navy, warm amber, faint starlight
 
-Color palette:
-Deep navy, soft purple, warm pink glow
+Text:
+One line only, minimal, placed near the star — "${emotionText}"`;
 
-Add minimal Korean text:
-"${emotionText}"`;
-
-// Fallback 프롬프트 (content_policy 재시도 — 한글 제거, 단순화)
+// Fallback 프롬프트 (content_policy 재시도 — 한글 제거)
+// DoD ③: fallback도 같은 scene 규칙
 const FALLBACK_PROMPT = (scene) => `\
 A soft 2D watercolor illustration.
 
 Scene:
 ${scene}
 
-Style: 2D only, watercolor texture, soft edges, no photorealism.
-Color palette: Deep navy, soft purple, warm pink glow.
-Focus: A single small glowing star.
-Mood: Calm, hopeful.`;
+Composition: Wide, still. One small glowing star as focal point.
+Style: 2D watercolor, soft edges, no photorealism, no 3D.
+Palette: Deep navy, warm amber.
+Mood: Quiet, hopeful.`;
 
-// ── UX 타임아웃: 3초 초과 시 fallback 즉시 반환 ─────────────────
+// 역호환 export용 (외부 참조 유지)
+const SCENE_MAP = Object.fromEntries(
+  Object.entries(LOCATION_SCENE_MAP).map(([loc, key]) => [loc, YEOSU_SCENES[key]])
+);
+
+// ── 3s 타임아웃 ───────────────────────────────────────────────────
 const DALLE_TIMEOUT_MS = 3000;
 
 function _withTimeout(promise, ms) {
@@ -119,7 +165,7 @@ function _withTimeout(promise, ms) {
   ]);
 }
 
-// ── Async 재시도 큐 (백그라운드 — 타임아웃/레이트리밋 시) ─────────
+// ── Async 재시도 큐 ───────────────────────────────────────────────
 const _retryQueue = [];
 let _retryBusy = false;
 
@@ -150,7 +196,7 @@ function classifyDallEError(err) {
   return 'unknown';
 }
 
-// ── DALL-E 3 직접 호출 (타임아웃 없음 — 재시도 큐 전용) ──────────
+// ── DALL-E 직접 호출 (타임아웃 없음 — 재시도 큐 전용) ────────────
 async function _callDallERaw(prompt) {
   const openai = getOpenAI();
   if (!openai) return { url: null, error_type: 'no_key' };
@@ -165,12 +211,11 @@ async function _callDallERaw(prompt) {
   }
 }
 
-// ── DALL-E 3 빠른 경로: 3s 타임아웃 + content_policy 재시도 ──────
+// ── DALL-E 빠른 경로: 3s + content_policy 재시도 ─────────────────
 async function _callDallEWithFallback(primaryPrompt, fallbackPrompt) {
   const openai = getOpenAI();
   if (!openai) return { url: null, used_fallback_prompt: false, error_type: 'no_key' };
 
-  // 1차 시도: 원본 프롬프트 (3s)
   try {
     const res = await _withTimeout(
       openai.images.generate({
@@ -188,7 +233,6 @@ async function _callDallEWithFallback(primaryPrompt, fallbackPrompt) {
     }
   }
 
-  // 2차 시도: 단순화 프롬프트 (content_policy 우회, 3s)
   try {
     const res = await _withTimeout(
       openai.images.generate({
@@ -197,7 +241,7 @@ async function _callDallEWithFallback(primaryPrompt, fallbackPrompt) {
       }),
       DALLE_TIMEOUT_MS
     );
-    console.log('[ImageGen] 2차 시도(단순화) 성공');
+    console.log('[ImageGen] 2차(단순화) 성공');
     return { url: res.data?.[0]?.url ?? null, used_fallback_prompt: true, error_type: null };
   } catch (err2) {
     const errType2 = classifyDallEError(err2);
@@ -206,7 +250,7 @@ async function _callDallEWithFallback(primaryPrompt, fallbackPrompt) {
   }
 }
 
-// ── 검수: URL 유효성 ──────────────────────────────────────────────
+// ── 검수 ──────────────────────────────────────────────────────────
 function validateImage(imageUrl) {
   return typeof imageUrl === 'string' && imageUrl.startsWith('http');
 }
@@ -252,36 +296,36 @@ function _emitFailure(errorType, location, source) {
   }).catch(() => {});
 }
 
-// 재시도 대상 에러 (quota/billing은 재시도 무의미)
 const RETRYABLE = new Set(['timeout', 'rate_limit', 'unknown']);
 
-// ── API 1: star 연동 생성 (POST /api/star/create 비동기) ──────────
+// ── API 1: star 연동 생성 ─────────────────────────────────────────
+// Phase 1: emotion → YEOSU_SCENES 자동 선택
 async function generateStarImage(starId, emotion, location) {
   if (!getOpenAI()) return null;
 
-  const scene          = SCENE_MAP[location] ?? SCENE_MAP['cablecar'];
-  const emotionText    = EMOTION_TEXT_MAP[emotion] ?? DEFAULT_EMOTION_TEXT;
+  const sceneKey     = EMOTION_SCENE_MAP[emotion] ?? LOCATION_SCENE_MAP[location] ?? 'cablecar';
+  const scene        = YEOSU_SCENES[sceneKey];
+  const emotionText  = EMOTION_TEXT_MAP[emotion] ?? DEFAULT_EMOTION_TEXT;
   const primaryPrompt  = PROMPT_TEMPLATE(scene, emotionText);
   const fallbackPrompt = FALLBACK_PROMPT(scene);
 
-  console.log(`[ImageGen] star 시작 | star:${starId} | loc:${location}`);
+  console.log(`[ImageGen] star 시작 | star:${starId} | emotion:${emotion} | scene:${sceneKey}`);
 
   const { url: imageUrl, error_type } = await _callDallEWithFallback(primaryPrompt, fallbackPrompt);
 
   if (!imageUrl) {
-    _emitFailure(error_type, location, 'star_create');
-    _log({ status: 'fallback', location, emotion, reason: error_type, source: 'star_create' });
+    _emitFailure(error_type, sceneKey, 'star_create');
+    _log({ status: 'fallback', location: sceneKey, emotion, reason: error_type, source: 'star_create' });
 
     if (RETRYABLE.has(error_type)) {
       _enqueueRetry(async () => {
-        console.log(`[ImageGen] star retry 시작 | star:${starId}`);
+        console.log(`[ImageGen] star retry | star:${starId} | scene:${sceneKey}`);
         const { url: retryUrl, error_type: retryErr } = await _callDallERaw(primaryPrompt);
         if (retryUrl && validateImage(retryUrl)) {
-          await saveImage({ starId, imageUrl: retryUrl, emotionText, location, promptUsed: primaryPrompt, validationPass: true });
-          _log({ status: 'success', location, emotion, source: 'star_retry' });
-          console.log(`[ImageGen] star retry 성공 | star:${starId}`);
+          await saveImage({ starId, imageUrl: retryUrl, emotionText, location: sceneKey, promptUsed: primaryPrompt, validationPass: true });
+          _log({ status: 'success', location: sceneKey, emotion, source: 'star_retry' });
         } else {
-          _emitFailure(retryErr, location, 'star_create_retry');
+          _emitFailure(retryErr, sceneKey, 'star_create_retry');
         }
       });
     }
@@ -289,81 +333,83 @@ async function generateStarImage(starId, emotion, location) {
   }
 
   const pass   = validateImage(imageUrl);
-  const record = await saveImage({ starId, imageUrl, emotionText, location, promptUsed: primaryPrompt, validationPass: pass });
+  const record = await saveImage({ starId, imageUrl, emotionText, location: sceneKey, promptUsed: primaryPrompt, validationPass: pass });
 
   if (!pass) return null;
-  _log({ status: 'success', location, emotion, source: 'star_create' });
-  console.log(`[ImageGen] star 완료 | image_id:${record?.id}`);
+  _log({ status: 'success', location: sceneKey, emotion, source: 'star_create' });
+  console.log(`[ImageGen] star 완료 | image_id:${record?.id} | scene:${sceneKey}`);
   return { image_url: imageUrl, image_id: record?.id };
 }
 
-// ── API 2: 공유용 온디맨드 생성 (POST /api/generate-share-image) ──
+// ── API 2: 공유용 온디맨드 생성 ───────────────────────────────────
+// Phase 1: emotionText 역추적 → scene, 없으면 location → scene
 async function generateShareImage(location, emotionText) {
   if (!location || !emotionText) throw new Error('location, emotionText 필수');
 
-  const normalizedLoc  = LOCATION_NORMALIZE[location] ?? location;
-  if (!SCENE_MAP[normalizedLoc]) throw new Error(`알 수 없는 location: ${location}`);
+  const normalizedLoc = LOCATION_NORMALIZE[location] ?? location;
+  if (!LOCATION_SCENE_MAP[normalizedLoc] && !DISPLAY_TO_EMOTION[emotionText]) {
+    throw new Error(`알 수 없는 location: ${location}`);
+  }
 
-  const scene          = SCENE_MAP[normalizedLoc];
+  const sceneKey     = _resolveSceneKey(null, normalizedLoc, emotionText);
+  const scene        = YEOSU_SCENES[sceneKey];
   const primaryPrompt  = PROMPT_TEMPLATE(scene, emotionText);
   const fallbackPrompt = FALLBACK_PROMPT(scene);
+  const fbUrl        = SCENE_FALLBACK_URLS[sceneKey] ?? FALLBACK_DEFAULT;
 
-  console.log(`[ImageGen] share 시작 | loc:${location} | text:${emotionText?.slice(0, 20)}`);
+  console.log(`[ImageGen] share 시작 | loc:${location} | scene:${sceneKey} | text:${emotionText?.slice(0, 20)}`);
 
-  // API key 없으면 즉시 정적 fallback
   if (!getOpenAI()) {
-    const fbUrl = FALLBACK_IMAGE_URLS[normalizedLoc] ?? FALLBACK_DEFAULT;
-    _log({ status: 'fallback', location: normalizedLoc, emotion: emotionText, reason: 'no_api_key' });
-    return { image_url: fbUrl, image_id: null, location: normalizedLoc, is_fallback: true, fallback_reason: 'no_api_key' };
+    _log({ status: 'fallback', location: sceneKey, emotion: emotionText, reason: 'no_api_key' });
+    return { image_url: fbUrl, image_id: null, location: sceneKey, is_fallback: true, fallback_reason: 'no_api_key' };
   }
 
   const { url: imageUrl, used_fallback_prompt, error_type } = await _callDallEWithFallback(primaryPrompt, fallbackPrompt);
 
-  // DALL-E 실패 → 정적 fallback 즉시 반환 + async 재시도 큐
   if (!imageUrl) {
-    _emitFailure(error_type, normalizedLoc, 'share_image');
-    const fbUrl = FALLBACK_IMAGE_URLS[normalizedLoc] ?? FALLBACK_DEFAULT;
-    _log({ status: 'fallback', location: normalizedLoc, emotion: emotionText, reason: error_type });
+    _emitFailure(error_type, sceneKey, 'share_image');
+    _log({ status: 'fallback', location: sceneKey, emotion: emotionText, reason: error_type });
 
     if (RETRYABLE.has(error_type)) {
       _enqueueRetry(async () => {
-        console.log(`[ImageGen] share retry 시작 | loc:${normalizedLoc}`);
+        console.log(`[ImageGen] share retry | scene:${sceneKey}`);
         const { url: retryUrl, error_type: retryErr } = await _callDallERaw(primaryPrompt);
         if (retryUrl && validateImage(retryUrl)) {
-          await saveImage({ starId: null, imageUrl: retryUrl, emotionText, location: normalizedLoc, promptUsed: primaryPrompt, validationPass: true });
-          _log({ status: 'success', location: normalizedLoc, emotion: emotionText, source: 'share_retry' });
-          console.log(`[ImageGen] share retry 성공 저장 | loc:${normalizedLoc}`);
+          await saveImage({ starId: null, imageUrl: retryUrl, emotionText, location: sceneKey, promptUsed: primaryPrompt, validationPass: true });
+          _log({ status: 'success', location: sceneKey, emotion: emotionText, source: 'share_retry' });
         } else {
-          _emitFailure(retryErr, normalizedLoc, 'share_image_retry');
+          _emitFailure(retryErr, sceneKey, 'share_image_retry');
         }
       });
     }
 
-    return { image_url: fbUrl, image_id: null, location: normalizedLoc, is_fallback: true, fallback_reason: error_type };
+    return { image_url: fbUrl, image_id: null, location: sceneKey, is_fallback: true, fallback_reason: error_type };
   }
 
   const pass   = validateImage(imageUrl);
   const record = await saveImage({
-    starId: null, imageUrl, emotionText, location: normalizedLoc,
+    starId: null, imageUrl, emotionText, location: sceneKey,
     promptUsed: used_fallback_prompt ? fallbackPrompt : primaryPrompt,
     validationPass: pass,
   });
 
-  _log({ status: 'success', location: normalizedLoc, emotion: emotionText });
-  console.log(`[ImageGen] share 완료 | fallback_prompt:${used_fallback_prompt} | image_id:${record?.id}`);
+  _log({ status: 'success', location: sceneKey, emotion: emotionText });
+  console.log(`[ImageGen] share 완료 | scene:${sceneKey} | simplified:${used_fallback_prompt} | image_id:${record?.id}`);
   return {
-    image_url:               imageUrl,
-    image_id:                record?.id ?? null,
-    location:                normalizedLoc,
-    is_fallback:             false,
-    used_simplified_prompt:  used_fallback_prompt,
+    image_url:              imageUrl,
+    image_id:               record?.id ?? null,
+    location:               sceneKey,
+    is_fallback:            false,
+    used_simplified_prompt: used_fallback_prompt,
   };
 }
 
 module.exports = {
   generateStarImage,
   generateShareImage,
-  SCENE_MAP,
+  SCENE_MAP,          // 역호환 (location → Yeosu scene description)
+  YEOSU_SCENES,
+  EMOTION_SCENE_MAP,
   EMOTION_TEXT_MAP,
   LOCATION_NORMALIZE,
   FALLBACK_IMAGE_URLS,
