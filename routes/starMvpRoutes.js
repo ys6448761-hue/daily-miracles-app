@@ -17,9 +17,10 @@ const db     = require('../database/db');
 let emitKpiEvent = null;
 try { ({ emitKpiEvent } = require('../services/kpiEventEmitter')); } catch (_) {}
 
-let generateStarImage = null;
-let EMOTION_TEXT_MAP  = {};
-try { ({ generateStarImage, EMOTION_TEXT_MAP } = require('../services/imageGenerationService')); } catch (_) {}
+let generateStarImage  = null;
+let generateShareImage = null;
+let EMOTION_TEXT_MAP   = {};
+try { ({ generateStarImage, generateShareImage, EMOTION_TEXT_MAP } = require('../services/imageGenerationService')); } catch (_) {}
 
 // ── Journey + Moment 자동 생성 (별 생성 시 fire-and-forget) ───────
 // "기존 image 생성 코드를 moment로 감싼다" — Star → Journey → Moment
@@ -70,6 +71,30 @@ async function _autoJourneyMoment(starId, emotion, originLocation) {
     console.log(`[star-mvp] moment 생성 | journey:${journeyId} | fallback:${is_fallback}`);
   } catch (e) {
     if (e.code !== '42P01') console.warn('[star-mvp] moment 생성 실패:', e.message);
+  }
+}
+
+// ── Journey + Moment Commit (preview_image_url 직접 사용) ─────────
+async function _commitJourneyMoment(starId, emotionText, originLocation, image_url, is_fallback) {
+  try {
+    const { rows: uRows } = await db.query('SELECT user_id FROM stars WHERE id = $1', [starId]);
+    const user_id = uRows[0]?.user_id ?? null;
+
+    const { rows } = await db.query(
+      `INSERT INTO journeys (star_id, user_id, journey_type, title)
+       VALUES ($1, $2, 'travel', '소원 여정') RETURNING id`,
+      [starId, user_id]
+    );
+    const journeyId = rows[0].id;
+
+    await db.query(
+      `INSERT INTO moments (journey_id, emotion, context_type, image_url, is_fallback)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [journeyId, emotionText, originLocation || 'cablecar', image_url, is_fallback]
+    );
+    console.log(`[star-mvp] commit journey+moment | journey:${journeyId} | fallback:${is_fallback}`);
+  } catch (e) {
+    if (e.code !== '42P01') console.warn('[star-mvp] commit journey/moment 실패:', e.message);
   }
 }
 
@@ -330,6 +355,124 @@ router.get('/:access_key', async (req, res) => {
     return res.json({ success: true, star, promises, last_reflection: lastReflection, is_linked, image_url });
   } catch (err) {
     console.error('[star-mvp] GET /:access_key error:', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ── POST /preview ─────────────────────────────────────────────────
+// 감정 입력 → 이미지 생성만 (star 저장 없음)
+router.post('/preview', async (req, res) => {
+  try {
+    const { emotion, origin_location = 'cablecar' } = req.body;
+    if (!emotion) return res.status(400).json({ success: false, error: 'emotion 필수' });
+
+    const emotionText = EMOTION_TEXT_MAP[emotion] ?? '괜찮아졌어요 ✨';
+    let image_url   = '/images/fallback/star-default.svg';
+    let is_fallback = true;
+
+    if (generateShareImage) {
+      try {
+        const result = await generateShareImage(origin_location, emotionText);
+        image_url   = result.image_url;
+        is_fallback  = result.is_fallback ?? false;
+      } catch { /* fallback 유지 */ }
+    }
+
+    return res.json({ success: true, image_url, is_fallback, emotion_text: emotionText });
+  } catch (err) {
+    console.error('[star-mvp] POST /preview error:', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ── POST /commit ───────────────────────────────────────────────────
+// "별로 남기기" 클릭 시: star + journey + moment 일괄 생성
+// preview_image_url이 있으면 그대로 moment.image_url로 연결
+router.post('/commit', async (req, res) => {
+  try {
+    const { emotion, origin_location = 'cablecar', preview_image_url, phone_number } = req.body;
+    if (!emotion) return res.status(400).json({ success: false, error: 'emotion 필수' });
+
+    // Star 생성 (access_key 충돌 시 최대 3회 재시도)
+    let access_key, inserted;
+    for (let i = 0; i < 3; i++) {
+      access_key = generateAccessKey();
+      try {
+        const { rows } = await db.query(
+          `INSERT INTO stars
+             (id, user_id, wish_text, gem_type, status, access_key, origin_location, emotion, is_public, phone_number)
+           VALUES
+             (gen_random_uuid(), $1, $2, 'cablecar', 'PRE-ON', $3, $4, $5, false, $6)
+           RETURNING id, access_key, created_at`,
+          [crypto.randomUUID(), emotion || '케이블카 별', access_key, origin_location, emotion || null, phone_number || null]
+        );
+        inserted = rows[0];
+        break;
+      } catch (e) {
+        if (e.code === '23505' && i < 2) continue;
+        if (e.code === '42703' && e.message.includes('phone_number')) {
+          const { rows: rows2 } = await db.query(
+            `INSERT INTO stars
+               (id, user_id, wish_text, gem_type, status, access_key, origin_location, emotion, is_public)
+             VALUES
+               (gen_random_uuid(), $1, $2, 'cablecar', 'PRE-ON', $3, $4, $5, false)
+             RETURNING id, access_key, created_at`,
+            [crypto.randomUUID(), emotion || '케이블카 별', access_key, origin_location, emotion || null]
+          );
+          inserted = rows2[0];
+          break;
+        }
+        throw e;
+      }
+    }
+
+    if (emitKpiEvent) {
+      emitKpiEvent({
+        eventName: 'star_created',
+        starId:    inserted.id,
+        source:    'qr_star_commit',
+        extra:     { origin_location, table: 'stars' },
+      }).catch(() => {});
+    }
+
+    // Journey + Moment (preview 이미지 직접 연결)
+    const emotionText = EMOTION_TEXT_MAP[emotion] ?? '괜찮아졌어요 ✨';
+    const image_url   = preview_image_url || '/images/fallback/star-default.svg';
+    const is_fallback = !preview_image_url || preview_image_url.startsWith('/');
+    _commitJourneyMoment(inserted.id, emotionText, origin_location, image_url, is_fallback).catch(() => {});
+
+    // Emotion Link
+    let emotionLink = null;
+    if (emotion) {
+      try {
+        const { rows: prevRows } = await db.query(
+          `SELECT id FROM stars
+           WHERE emotion = $1 AND id <> $2 AND emotion IS NOT NULL
+           ORDER BY created_at DESC LIMIT 1`,
+          [emotion, inserted.id]
+        );
+        if (prevRows.length) {
+          await db.query(
+            `INSERT INTO star_links (source_star_id, target_star_id, emotion) VALUES ($1, $2, $3)`,
+            [inserted.id, prevRows[0].id, emotion]
+          );
+          emotionLink = { linked: true, emotion };
+          console.log(`[star-mvp] commit emotion link | ${inserted.id} → ${prevRows[0].id}`);
+        }
+      } catch (linkErr) {
+        if (linkErr.code !== '42P01') console.warn('[star-mvp] emotion link 실패:', linkErr.message);
+      }
+    }
+
+    return res.status(201).json({
+      success:      true,
+      star_id:      inserted.id,
+      access_key:   inserted.access_key,
+      created_at:   inserted.created_at,
+      emotion_link: emotionLink,
+    });
+  } catch (err) {
+    console.error('[star-mvp] POST /commit error:', err.message);
     res.status(500).json({ success: false, error: err.message });
   }
 });
