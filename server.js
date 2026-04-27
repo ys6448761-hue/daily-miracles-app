@@ -1410,6 +1410,8 @@ app.post("/api/admin/run-migration", adminTokenGuard, async (req, res) => {
     "145",
     // journeys + moments: Journey/Moment API (스토리북 구조)
     "146",
+    // location_admins: 장소별 관리자 계정 (username/bcrypt)
+    "147",
   ];
 
   if (!migration || !allowed.includes(migration)) {
@@ -2282,6 +2284,15 @@ if (referralRoutes) {
 if (voyageAdminRoutes) {
   app.use("/api/admin/voyage", voyageAdminRoutes);
   console.log("✅ 항해 예약 어드민 라우터 등록 완료 (/api/admin/voyage/bookings)");
+}
+
+// ---------- 장소 관리자 로그인 (/api/admin/login) ----------
+try {
+  const locationAdminAuthRoutes = require('./routes/locationAdminAuthRoutes');
+  app.use('/api/admin', locationAdminAuthRoutes);
+  console.log('✅ 장소 관리자 로그인 라우터 등록 완료 (/api/admin/login)');
+} catch (e) {
+  console.warn('⚠️ locationAdminAuthRoutes 로드 실패:', e.message);
 }
 
 // ---------- 케이블카 운영 관리 Routes (/api/admin/cablecar) ----------
