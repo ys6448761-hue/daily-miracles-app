@@ -18,7 +18,57 @@ let emitKpiEvent = null;
 try { ({ emitKpiEvent } = require('../services/kpiEventEmitter')); } catch (_) {}
 
 let generateStarImage = null;
-try { ({ generateStarImage } = require('../services/imageGenerationService')); } catch (_) {}
+let EMOTION_TEXT_MAP  = {};
+try { ({ generateStarImage, EMOTION_TEXT_MAP } = require('../services/imageGenerationService')); } catch (_) {}
+
+// ── Journey + Moment 자동 생성 (별 생성 시 fire-and-forget) ───────
+// "기존 image 생성 코드를 moment로 감싼다" — Star → Journey → Moment
+// 기존 API/응답 변화 없음. 기존 star_images 기록도 유지.
+async function _autoJourneyMoment(starId, emotion, originLocation) {
+  // Step 1: Journey 자동 생성
+  let journeyId = null;
+  try {
+    const { rows } = await db.query(
+      `INSERT INTO journeys (star_id, journey_type, title)
+       VALUES ($1, 'travel', '소원 여정') RETURNING id`,
+      [starId]
+    );
+    journeyId = rows[0].id;
+    console.log(`[star-mvp] journey 생성 | ${journeyId}`);
+  } catch (e) {
+    // journeys 테이블 없으면 (migration 146 미실행) → 기존 이미지 생성만 수행
+    if (e.code !== '42P01') console.warn('[star-mvp] journey 생성 실패:', e.message);
+    if (generateStarImage) await generateStarImage(starId, emotion, originLocation).catch(() => {});
+    return;
+  }
+
+  // Step 2: 이미지 생성 (generateStarImage → star_images 기록 유지)
+  const emotionText = EMOTION_TEXT_MAP[emotion] ?? '괜찮아졌어요 ✨';
+  let image_url   = '/images/fallback/star-default.svg';
+  let is_fallback = true;
+
+  if (generateStarImage) {
+    try {
+      const result = await generateStarImage(starId, emotion, originLocation);
+      if (result?.image_url) {
+        image_url   = result.image_url;
+        is_fallback = false;
+      }
+    } catch { /* fallback 유지 */ }
+  }
+
+  // Step 3: Moment 생성 (append-only)
+  try {
+    await db.query(
+      `INSERT INTO moments (journey_id, emotion, context_type, image_url, is_fallback)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [journeyId, emotionText, originLocation || 'cablecar', image_url, is_fallback]
+    );
+    console.log(`[star-mvp] moment 생성 | journey:${journeyId} | fallback:${is_fallback}`);
+  } catch (e) {
+    if (e.code !== '42P01') console.warn('[star-mvp] moment 생성 실패:', e.message);
+  }
+}
 
 // URL-safe 10자리 접근키 (모호한 문자 제외)
 function generateAccessKey() {
@@ -85,10 +135,8 @@ router.post('/create', async (req, res) => {
       }).catch(() => {});
     }
 
-    // 이미지 생성 — 비동기 fire-and-forget (응답 블로킹 없음)
-    if (generateStarImage) {
-      generateStarImage(inserted.id, emotion || null, origin_location).catch(() => {});
-    }
+    // Journey + Moment 자동 생성 (이미지 생성 포함) — fire-and-forget
+    _autoJourneyMoment(inserted.id, emotion || null, origin_location).catch(() => {});
 
     // 감정 연결 — 같은 emotion의 가장 최근 별 1개 링크
     let emotionLink = null;
