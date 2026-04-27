@@ -2574,18 +2574,6 @@ if (partnerApplyRoutes) {
   console.log('✅ 파트너 신청 라우터 등록 완료 (/api/partner/apply)');
 }
 
-// ---------- Star Journey (방문 동선 + 별자리 달성 + 쿠폰) ----------
-let starJourneyRoutes = null;
-try {
-  starJourneyRoutes = require('./routes/starJourneyRoutes');
-} catch (e) {
-  console.warn('⚠️ starJourneyRoutes 로드 실패:', e.message);
-}
-if (starJourneyRoutes) {
-  app.use('/api/star-journey', starJourneyRoutes);
-  console.log('✅ Star Journey 라우터 등록 완료 (/api/star-journey)');
-}
-
 // ---------- 특산품 쇼핑 Routes (/api/shop) ----------
 let shopRoutes = null;
 try {
