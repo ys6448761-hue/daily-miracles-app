@@ -81,6 +81,43 @@
       text-decoration: none;
       display: block;
     }
+
+    /* 감정 연결 배너 */
+    .emotion-banner {
+      margin-bottom: 28px;
+      padding: 22px 24px;
+      border-radius: 18px;
+      text-align: center;
+      animation: fadeInUp 0.6s ease both;
+    }
+    .emotion-banner.linked {
+      background: rgba(255, 220, 100, 0.1);
+      border: 1.5px solid rgba(255, 220, 100, 0.35);
+      box-shadow: 0 0 24px rgba(255, 200, 80, 0.12);
+    }
+    .emotion-banner.no-link {
+      background: rgba(255,255,255,0.05);
+      border: 1.5px solid rgba(255,255,255,0.1);
+    }
+    .banner-line1 {
+      font-size: 15px;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 6px;
+    }
+    .banner-line2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.5;
+    }
+    .banner-line2.glow {
+      color: #ffe899;
+      text-shadow: 0 0 12px rgba(255, 220, 80, 0.5);
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
@@ -91,6 +128,11 @@
       이 코드를 저장해두면<br>
       언제든 다시 별을 만날 수 있어요
     </p>
+
+    <div class="emotion-banner" id="emotionBanner">
+      <p class="banner-line1" id="bannerLine1"></p>
+      <p class="banner-line2" id="bannerLine2"></p>
+    </div>
 
     <div class="access-card">
       <div class="access-label">내 별 접근 코드</div>
@@ -108,6 +150,25 @@
     } else {
       document.getElementById('accessKey').textContent = accessKey;
       document.getElementById('btnView').href = '/star/' + accessKey;
+
+      // 감정 연결 배너
+      const banner   = document.getElementById('emotionBanner');
+      const line1    = document.getElementById('bannerLine1');
+      const line2    = document.getElementById('bannerLine2');
+      const isLinked = localStorage.getItem('emotion_linked') === '1';
+
+      if (isLinked) {
+        banner.classList.add('linked');
+        line1.textContent = '당신의 별이';
+        line2.textContent = '누군가의 별과 이어졌어요 ✨';
+        line2.classList.add('glow');
+      } else {
+        banner.classList.add('no-link');
+        line1.textContent = '';
+        line2.textContent = '당신의 별이 떠올랐어요 🌌';
+      }
+
+      localStorage.removeItem('emotion_linked');
     }
   </script>
 </body>

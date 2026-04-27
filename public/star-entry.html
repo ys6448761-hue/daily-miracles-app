@@ -161,6 +161,7 @@
 
         localStorage.setItem('access_key', data.access_key);
         localStorage.setItem('star_id', data.star_id);
+        localStorage.setItem('emotion_linked', data.emotion_link?.linked ? '1' : '0');
 
         window.location.href = '/promise.html';
       } catch (e) {
