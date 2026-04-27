@@ -242,7 +242,8 @@
     let globalStarId = null;
 
     async function loadStar() {
-      const accessKey = window.location.pathname.split('/').filter(Boolean).pop();
+      const _qp = new URLSearchParams(window.location.search);
+      const accessKey = _qp.get('key') || window.location.pathname.split('/').filter(Boolean).pop();
       if (!accessKey) return renderNotFound();
 
       try {
