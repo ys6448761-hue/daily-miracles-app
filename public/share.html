@@ -4,15 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#0a0818">
-  <title>별 🌌 — 하루하루의 기적</title>
+  <title>별 — 하루하루의 기적</title>
 
-  <!-- OG / 공유 미리보기 -->
-  <meta property="og:title"       content="누군가의 별이 당신을 불렀어요 🌌">
+  <meta property="og:title"       content="누군가의 별이 여기 있어요">
   <meta property="og:description" content="괜찮아졌어요 ✨">
   <meta property="og:image"       content="/images/fallback/star-default.svg">
   <meta property="og:type"        content="website">
 
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -21,144 +20,140 @@
       height: 100%;
       height: 100dvh;
       overflow: hidden;
-      background: #0a0818;
+      background: #07060f;
       font-family: 'Noto Sans KR', sans-serif;
       color: #fff;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* 전체 화면 배경 이미지 */
+    /* ── 배경 이미지 ─────────────────────────────────────── */
     .bg {
       position: fixed;
       inset: 0;
       background-size: cover;
       background-position: center;
-      background-color: #0a0818;
-      transition: opacity 0.6s ease;
+      background-color: #07060f;
       opacity: 0;
+      transition: opacity 1s ease;
     }
     .bg.loaded { opacity: 1; }
 
-    /* 그라디언트 오버레이 — 상단/하단만 어둡게, 중앙 투명 */
+    /* ── 그라디언트 오버레이
+         이미지가 화면 70~80%에서 숨 쉬도록
+         상단은 거의 투명, 하단만 어둡게           ── */
     .overlay {
       position: fixed;
       inset: 0;
       background:
         linear-gradient(to bottom,
-          rgba(4, 3, 18, 0.6) 0%,
-          rgba(4, 3, 18, 0.0) 30%,
-          rgba(4, 3, 18, 0.0) 60%,
-          rgba(4, 3, 18, 0.85) 100%
+          rgba(7, 6, 15, 0.22) 0%,
+          rgba(7, 6, 15, 0.0)  28%,
+          rgba(7, 6, 15, 0.0)  52%,
+          rgba(7, 6, 15, 0.78) 78%,
+          rgba(7, 6, 15, 0.96) 100%
         );
     }
 
-    /* 콘텐츠 레이어 */
+    /* ── 콘텐츠 레이어 ───────────────────────────────────── */
     .content {
       position: fixed;
       inset: 0;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: env(safe-area-inset-top, 48px) 28px
-               calc(env(safe-area-inset-bottom, 0px) + 36px);
+      padding:
+        env(safe-area-inset-top,  40px) 32px
+        calc(env(safe-area-inset-bottom, 0px) + 48px);
       max-width: 480px;
       margin: 0 auto;
       width: 100%;
     }
 
-    /* 상단: 별 이름 */
+    /* ── 상단: 별 이름 — 가장 조용하게 ─────────────────── */
     .star-name {
-      font-size: 15px;
-      font-weight: 500;
-      color: rgba(255, 255, 255, 0.65);
-      letter-spacing: 0.2px;
-      animation: fadeDown 0.5s ease both 0.1s;
+      font-size: 11px;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.32);
+      letter-spacing: 0.6px;
+      animation: fadeIn 0.7s ease both 0.4s;
+      min-height: 16px;
     }
 
-    /* 중앙: 감정 문장 */
-    .emotion-phrase {
-      text-align: center;
-      font-size: 28px;
-      font-weight: 700;
-      line-height: 1.45;
-      letter-spacing: -0.5px;
-      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.6);
-      animation: fadeUp 0.55s ease both 0.2s;
-    }
-
-    /* 하단: CTA — thumb zone */
-    .cta-area {
+    /* ── 하단 영역 ───────────────────────────────────────── */
+    .bottom-area {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 14px;
-      animation: fadeUp 0.5s ease both 0.35s;
+      gap: 22px;
+      animation: fadeUp 0.65s ease both 0.5s;
     }
 
-    .btn-cta {
-      width: 100%;
-      padding: 19px 24px;
-      background: rgba(255, 255, 255, 0.96);
-      border: none;
-      border-radius: 18px;
-      color: #0a0818;
-      font-size: 17px;
+    /* 메인 감정 문장 — 약간 크게, 조용한 존재감 */
+    .emotion-phrase {
+      font-size: 25px;
       font-weight: 700;
-      font-family: 'Noto Sans KR', sans-serif;
-      cursor: pointer;
-      letter-spacing: -0.2px;
-      text-decoration: none;
-      display: block;
-      text-align: center;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform 0.12s ease, opacity 0.12s ease;
-    }
-    .btn-cta:active {
-      transform: scale(0.97);
-      opacity: 0.88;
+      line-height: 1.55;
+      letter-spacing: -0.4px;
+      color: rgba(255, 255, 255, 0.92);
+      text-shadow: 0 2px 24px rgba(0, 0, 0, 0.55);
     }
 
-    .hint {
+    /* 링크 — 작게, 밑줄만, 버튼 아님 */
+    .entry-link {
       font-size: 12px;
-      color: rgba(255, 255, 255, 0.28);
-      letter-spacing: 0.5px;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.34);
+      text-decoration: none;
+      letter-spacing: 0.4px;
+      display: inline;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+      padding-bottom: 2px;
+      transition: color 0.25s, border-color 0.25s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .entry-link:hover,
+    .entry-link:active {
+      color: rgba(255, 255, 255, 0.6);
+      border-color: rgba(255, 255, 255, 0.38);
     }
 
-    /* 애니메이션 */
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-8px); }
-      to   { opacity: 1; transform: translateY(0); }
+    /* ── 애니메이션 ─────────────────────────────────────── */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
     }
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(10px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* 로딩 중 skeleton */
+    /* ── 로딩 스켈레톤 ──────────────────────────────────── */
+    .skeleton .star-name    { color: transparent; }
     .skeleton .emotion-phrase {
       color: transparent;
-      background: rgba(255,255,255,0.1);
-      border-radius: 8px;
-      width: 60%;
-      margin: 0 auto;
-      animation: pulse 1.2s ease-in-out infinite;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 6px;
+      width: 52%;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    .skeleton .entry-link {
+      opacity: 0;
+      pointer-events: none;
     }
     @keyframes pulse {
-      0%, 100% { opacity: 0.4; }
-      50%       { opacity: 0.8; }
+      0%, 100% { opacity: 0.35; }
+      50%       { opacity: 0.75; }
     }
   </style>
 </head>
 <body>
-  <div class="bg" id="bg"></div>
+  <div class="bg"      id="bg"></div>
   <div class="overlay"></div>
 
   <div class="content skeleton" id="content">
-    <div class="star-name" id="starName">— 🌌</div>
-    <div class="emotion-phrase" id="emotionPhrase">&nbsp;</div>
-    <div class="cta-area">
-      <a class="btn-cta" id="btnCta" href="/star-entry.html">내 별 만들기</a>
-      <div class="hint">하루하루의 기적</div>
+    <div class="star-name" id="starName"></div>
+    <div class="bottom-area">
+      <div class="emotion-phrase" id="emotionPhrase">&nbsp;</div>
+      <a class="entry-link" id="entryLink" href="/star-entry.html">나도 이런 별 하나</a>
     </div>
   </div>
 
@@ -177,10 +172,10 @@
       '정리됨': '/images/fallback/star-paransi.svg',
     };
 
-    const params     = new URLSearchParams(window.location.search);
-    const key        = params.get('key');
-    const bgEl       = document.getElementById('bg');
-    const contentEl  = document.getElementById('content');
+    const params  = new URLSearchParams(window.location.search);
+    const key     = params.get('key');
+    const bgEl    = document.getElementById('bg');
+    const content = document.getElementById('content');
 
     function applyBg(url) {
       bgEl.style.backgroundImage = `url('${encodeURI(url)}')`;
@@ -191,16 +186,16 @@
     }
 
     function render({ starName, emotionPhrase, bgUrl, ctaHref }) {
-      document.getElementById('starName').textContent     = starName;
+      document.getElementById('starName').textContent      = starName;
       document.getElementById('emotionPhrase').textContent = emotionPhrase;
-      document.getElementById('btnCta').href              = ctaHref;
+      document.getElementById('entryLink').href            = ctaHref;
       applyBg(bgUrl);
-      contentEl.classList.remove('skeleton');
+      content.classList.remove('skeleton');
     }
 
     async function loadStar() {
       const fallback = {
-        starName:      '누군가의 별 🌌',
+        starName:      '',
         emotionPhrase: '괜찮아졌어요 ✨',
         bgUrl:         '/images/fallback/star-default.svg',
         ctaHref:       '/star-entry.html?ref=share',
@@ -216,7 +211,7 @@
         const { star, image_url } = data;
         const emotion       = star.emotion || '';
         const emotionPhrase = EMOTION_TEXT[emotion] || '괜찮아졌어요 ✨';
-        const starName      = emotion ? `${emotion}의 별 🌌` : '누군가의 별 🌌';
+        const starName      = emotion ? `${emotion}의 별` : '';
         const bgUrl         = image_url || EMOTION_BG[emotion] || '/images/fallback/star-default.svg';
         const loc           = star.origin_location || 'cablecar';
         const ctaHref       = `/star-entry.html?loc=${encodeURIComponent(loc)}&ref=share`;
