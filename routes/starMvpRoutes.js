@@ -90,11 +90,40 @@ router.post('/create', async (req, res) => {
       generateStarImage(inserted.id, emotion || null, origin_location).catch(() => {});
     }
 
+    // 감정 연결 — 같은 emotion의 가장 최근 별 1개 링크
+    let emotionLink = null;
+    if (emotion) {
+      try {
+        const { rows: prevRows } = await db.query(
+          `SELECT id FROM stars
+           WHERE emotion = $1 AND id <> $2 AND emotion IS NOT NULL
+           ORDER BY created_at DESC LIMIT 1`,
+          [emotion, inserted.id]
+        );
+        if (prevRows.length) {
+          const targetId = prevRows[0].id;
+          await db.query(
+            `INSERT INTO star_links (source_star_id, target_star_id, emotion)
+             VALUES ($1, $2, $3)`,
+            [inserted.id, targetId, emotion]
+          );
+          emotionLink = { linked: true, emotion };
+          console.log(`[star-mvp] emotion link 생성 | ${inserted.id} → ${targetId} (${emotion})`);
+        }
+      } catch (linkErr) {
+        // star_links 테이블 없으면 (migration 145 미실행) 조용히 건너뜀
+        if (linkErr.code !== '42P01') {
+          console.warn('[star-mvp] emotion link 실패:', linkErr.message);
+        }
+      }
+    }
+
     return res.status(201).json({
-      success:    true,
-      star_id:    inserted.id,
-      access_key: inserted.access_key,
-      created_at: inserted.created_at,
+      success:      true,
+      star_id:      inserted.id,
+      access_key:   inserted.access_key,
+      created_at:   inserted.created_at,
+      emotion_link: emotionLink,
     });
   } catch (err) {
     console.error('[star-mvp] POST /create error:', err.message);
@@ -230,7 +259,15 @@ router.get('/:access_key', async (req, res) => {
     ).catch(() => ({ rows: [] }));
     const lastReflection = reflRows[0] ?? null;
 
-    return res.json({ success: true, star, promises, last_reflection: lastReflection });
+    // 감정 연결 여부 (star_links 테이블 없으면 조용히 null)
+    const { rows: linkRows } = await db.query(
+      `SELECT COUNT(*) AS n FROM star_links
+       WHERE source_star_id = $1 OR target_star_id = $1`,
+      [star.id]
+    ).catch(() => ({ rows: [{ n: '0' }] }));
+    const is_linked = parseInt(linkRows[0]?.n ?? 0) > 0;
+
+    return res.json({ success: true, star, promises, last_reflection: lastReflection, is_linked });
   } catch (err) {
     console.error('[star-mvp] GET /:access_key error:', err.message);
     res.status(500).json({ success: false, error: err.message });

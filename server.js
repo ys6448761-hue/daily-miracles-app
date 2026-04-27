@@ -1406,6 +1406,8 @@ app.post("/api/admin/run-migration", adminTokenGuard, async (req, res) => {
     "143",
     // star_images: SSOT 이미지 생성 시스템
     "144",
+    // star_links: 감정 기반 별 연결 (Emotion Link MVP)
+    "145",
   ];
 
   if (!migration || !allowed.includes(migration)) {
