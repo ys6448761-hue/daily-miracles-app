@@ -1408,6 +1408,8 @@ app.post("/api/admin/run-migration", adminTokenGuard, async (req, res) => {
     "144",
     // star_links: 감정 기반 별 연결 (Emotion Link MVP)
     "145",
+    // journeys + moments: Journey/Moment API (스토리북 구조)
+    "146",
   ];
 
   if (!migration || !allowed.includes(migration)) {
@@ -2475,6 +2477,29 @@ try {
 if (shareImageRoutes) {
   app.use('/api', shareImageRoutes);
   console.log('✅ Share Image 라우터 등록 완료 (/api/generate-share-image)');
+}
+
+// ---------- Star Journey + Moment (/api/star/journeys, /api/moments) ----------
+let starJourneyRoutes = null;
+try {
+  starJourneyRoutes = require('./routes/starJourneyRoutes');
+} catch (e) {
+  console.warn('⚠️ starJourneyRoutes 로드 실패:', e.message);
+}
+if (starJourneyRoutes) {
+  app.use('/api/star/journeys', starJourneyRoutes);
+  console.log('✅ Star Journey 라우터 등록 완료 (/api/star/journeys)');
+}
+
+let momentRoutes = null;
+try {
+  momentRoutes = require('./routes/momentRoutes');
+} catch (e) {
+  console.warn('⚠️ momentRoutes 로드 실패:', e.message);
+}
+if (momentRoutes) {
+  app.use('/api/moments', momentRoutes);
+  console.log('✅ Moment 라우터 등록 완료 (/api/moments)');
 }
 
 // ---------- Star Voyage (/api/star-voyage) ----------
