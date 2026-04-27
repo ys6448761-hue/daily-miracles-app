@@ -371,9 +371,10 @@
         const data = await res.json();
         if (!data.success) throw new Error(data.error || '별 저장 실패');
 
-        localStorage.setItem('access_key',     data.access_key);
+        localStorage.setItem('access_key',      data.access_key);
         localStorage.setItem('star_id',        data.star_id);
         localStorage.setItem('emotion_linked', data.emotion_link?.linked ? '1' : '0');
+        localStorage.setItem('share_image_url', previewImageUrl || '');
 
         window.location.href = '/promise.html';
       } catch {

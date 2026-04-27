@@ -9,7 +9,7 @@
  *   2. 앱 키 → JavaScript 키 복사 (REST API 키 아님)
  *   3. Render 환경변수 VITE_KAKAO_JS_KEY = 위 JS 키
  */
-const KAKAO_ENABLED = false;
+const KAKAO_ENABLED = true;
 
 import { gaDtShareSuccess } from './gtag';
 
