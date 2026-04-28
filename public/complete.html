@@ -216,10 +216,10 @@
             d="M9 0C4.037 0 0 3.223 0 7.2c0 2.57 1.648 4.825 4.127 6.108l-1.05 3.894c-.092.342.305.608.603.396l4.684-3.127A10.9 10.9 0 009 14.4c4.963 0 9-3.223 9-7.2S13.963 0 9 0z"
             fill="#191919"/>
         </svg>
-        카카오톡으로 전하기
+        친구에게 공유하기
       </button>
 
-      <button class="btn-copy" id="btnCopy">링크 복사하기</button>
+      <button class="btn-copy" id="btnCopy">링크 복사</button>
       <div class="copy-toast" id="copyToast">링크가 복사됐어요 ✓</div>
       <div class="share-error" id="shareError"></div>
     </div>
@@ -288,16 +288,15 @@
     }
 
     // ── 공유 데이터 준비 ──────────────────────────────
-    const shareUrl    = `${BASE_URL}/share.html?key=${encodeURIComponent(accessKey)}`;
-    let   emotionText = '괜찮아졌어요 ✨';
-    let   imageUrl    = localStorage.getItem('share_image_url') || '';
+    let   emotionText      = '괜찮아졌어요 ✨';
+    let   imageUrl         = localStorage.getItem('share_image_url') || '';
+    let   originLocation   = localStorage.getItem('origin_location') || '';
 
-    // shareUrl 도메인 검증 (Kakao 등록 도메인과 일치해야 함)
-    console.log('[Kakao] shareUrl:', shareUrl);
-    console.assert(
-      shareUrl.startsWith('https://app.dailymiracles.kr/'),
-      '[Kakao] ❌ shareUrl이 등록 도메인(https://app.dailymiracles.kr)과 불일치'
-    );
+    // 친구 유입용 URL: 별 생성 입력 → 공유 추적
+    function buildEntryUrl() {
+      const loc = originLocation || 'direct';
+      return `${BASE_URL}/star-entry.html?loc=${encodeURIComponent(loc)}&from=share&ref=${encodeURIComponent(accessKey)}`;
+    }
 
     // 절대 URL 보정 — blob:/data:/http: 차단, 상대경로 보정
     function toAbsoluteUrl(url) {
@@ -309,14 +308,15 @@
       return `${BASE_URL}${url.startsWith('/') ? url : '/' + url}`;
     }
 
-    // star API에서 emotion + image 보완 (fire-and-forget)
+    // star API에서 emotion + image + origin_location 보완 (fire-and-forget)
     (async () => {
       try {
         const res  = await fetch(`/api/star/${encodeURIComponent(accessKey)}`);
         const data = await res.json();
         if (data.success) {
           emotionText = EMOTION_MAP[data.star?.emotion] || emotionText;
-          if (data.image_url) imageUrl = data.image_url;
+          if (data.image_url)               imageUrl       = data.image_url;
+          if (data.star?.origin_location)   originLocation = data.star.origin_location;
         }
       } catch { /* fallback 유지 */ }
     })();
@@ -334,6 +334,8 @@
     document.getElementById('btnKakao').addEventListener('click', () => {
       document.getElementById('shareError').style.display = 'none';
 
+      const _entryUrl = buildEntryUrl();
+
       if (!initKakao() || !window.Kakao?.Share) {
         showFallback('카카오톡 공유가 열리지 않았어요.\n링크를 복사해서 보내주세요.');
         return;
@@ -344,19 +346,19 @@
         const _payload  = {
           objectType: 'feed',
           content: {
-            title:       '당신의 별이 도착했어요 🌌',
-            description: emotionText,
+            title:       '내 소원이 별이 됐어요 ✨',
+            description: '당신의 소원을, 별로 만들어보세요',
             imageUrl:    _absImage,
             link: {
-              mobileWebUrl: shareUrl,
-              webUrl:       shareUrl,
+              mobileWebUrl: _entryUrl,
+              webUrl:       _entryUrl,
             },
           },
           buttons: [{
-            title: '별 보러가기',
+            title: '나도 만들어보기',
             link: {
-              mobileWebUrl: shareUrl,
-              webUrl:       shareUrl,
+              mobileWebUrl: _entryUrl,
+              webUrl:       _entryUrl,
             },
           }],
         };
@@ -370,15 +372,16 @@
 
     // ── 링크 복사 ─────────────────────────────────────
     document.getElementById('btnCopy').addEventListener('click', async () => {
+      const _entryUrl = buildEntryUrl();
       try {
-        await navigator.clipboard.writeText(shareUrl);
+        await navigator.clipboard.writeText(_entryUrl);
         const toast = document.getElementById('copyToast');
         toast.style.display = 'block';
         setTimeout(() => { toast.style.display = 'none'; }, 2200);
       } catch {
         // clipboard API 실패 시 selection 방식 fallback
         const input = document.createElement('input');
-        input.value = shareUrl;
+        input.value = buildEntryUrl();
         document.body.appendChild(input);
         input.select();
         document.execCommand('copy');

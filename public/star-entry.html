@@ -209,10 +209,68 @@
       text-align: center;
       display: none;
     }
+
+    /* ── Panel 0: 공유 유입 인트로 ─────────────────────── */
+    .intro-star-wrap {
+      width: 100%; max-width: 260px;
+      margin: 0 auto 24px;
+      aspect-ratio: 1 / 1;
+      border-radius: 22px;
+      overflow: hidden;
+      position: relative;
+      background: rgba(255,255,255,0.05);
+    }
+    .intro-star-img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: none;
+    }
+    .intro-star-img.ready { display: block; }
+    .intro-skeleton {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 60px; opacity: 0.35;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .intro-message {
+      text-align: center;
+      font-size: 19px; font-weight: 700;
+      line-height: 1.65; margin-bottom: 10px;
+      color: rgba(255,255,255,0.92);
+    }
+    .intro-sub {
+      text-align: center;
+      font-size: 13px; color: rgba(255,255,255,0.42);
+      margin-bottom: 36px; line-height: 1.6;
+    }
+    .btn-make-star {
+      width: 100%; padding: 18px;
+      background: linear-gradient(90deg, #4f8ef7, #7b5ea7);
+      border: none; border-radius: 14px;
+      color: #fff; font-size: 17px; font-weight: 700;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: opacity 0.2s;
+    }
+    .btn-make-star:active { opacity: 0.85; }
   </style>
 </head>
 <body>
   <div class="container">
+
+    <!-- ── Panel 0: 공유 유입 인트로 ─────────────────────────── -->
+    <div class="panel hidden" id="panelIntro">
+      <div style="text-align:center;margin-bottom:28px;">
+        <span style="font-size:13px;color:rgba(255,255,255,0.35);letter-spacing:.05em">✦ DAILY MIRACLES</span>
+      </div>
+      <div class="intro-star-wrap">
+        <div class="intro-skeleton" id="introSkeleton">✨</div>
+        <img class="intro-star-img" id="introStarImg" alt="누군가의 별">
+      </div>
+      <p class="intro-message">이건, 누군가의 소원이<br>만든 별이에요</p>
+      <p class="intro-sub">지금 이 순간의 마음을<br>당신도 별로 남겨보세요</p>
+      <button class="btn-make-star" id="btnMakeStar">나도 내 별 만들어보기 →</button>
+    </div>
 
     <!-- ── Panel 1: 감정 선택 ─────────────────────────────── -->
     <div class="panel" id="panelSelect">
@@ -266,15 +324,45 @@
   </div>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const loc    = params.get('loc') || 'direct';   // QR 스캔 시 항상 ?loc= 포함 — fallback은 직접 접근 표시
+    const params       = new URLSearchParams(window.location.search);
+    const loc          = params.get('loc')  || 'direct';   // QR 스캔 시 항상 ?loc= 포함
+    const isFromShare  = params.get('from') === 'share';
+    const refKey       = params.get('ref')  || '';
 
     let selectedEmotion   = null;
     let previewImageUrl   = null;
     let previewInProgress = false;
 
+    const panelIntro   = document.getElementById('panelIntro');
     const panelSelect  = document.getElementById('panelSelect');
     const panelPreview = document.getElementById('panelPreview');
+
+    // ── 공유 유입 인트로 ──────────────────────────────────
+    if (isFromShare) {
+      panelSelect.classList.add('hidden');
+      panelIntro.classList.remove('hidden');
+
+      if (refKey) {
+        fetch(`/api/star/${encodeURIComponent(refKey)}`)
+          .then(r => r.json())
+          .then(data => {
+            const imgUrl = data.image_url || data.star?.preview_image_url;
+            if (imgUrl) {
+              const img  = document.getElementById('introStarImg');
+              const skel = document.getElementById('introSkeleton');
+              img.onload = () => { skel.style.display = 'none'; img.classList.add('ready'); };
+              img.onerror = () => { /* skeleton stays */ };
+              img.src = imgUrl;
+            }
+          })
+          .catch(() => {});
+      }
+    }
+
+    document.getElementById('btnMakeStar').addEventListener('click', () => {
+      panelIntro.classList.add('hidden');
+      panelSelect.classList.remove('hidden');
+    });
     const btnNext      = document.getElementById('btnNext');
     const btnCommit    = document.getElementById('btnCommit');
     const btnBack      = document.getElementById('btnBack');
@@ -371,10 +459,11 @@
         const data = await res.json();
         if (!data.success) throw new Error(data.error || '별 저장 실패');
 
-        localStorage.setItem('access_key',      data.access_key);
-        localStorage.setItem('star_id',        data.star_id);
-        localStorage.setItem('emotion_linked', data.emotion_link?.linked ? '1' : '0');
+        localStorage.setItem('access_key',       data.access_key);
+        localStorage.setItem('star_id',         data.star_id);
+        localStorage.setItem('emotion_linked',  data.emotion_link?.linked ? '1' : '0');
         localStorage.setItem('share_image_url', previewImageUrl || '');
+        localStorage.setItem('origin_location', loc);
 
         window.location.href = '/promise.html';
       } catch {
