@@ -88,21 +88,19 @@ router.get('/:code', adminGuard, async (req, res) => {
 
     const [todayStars, totalStars, totalResonance, topStarRows, emotionRows, recentRows, emotionMissing, shareCount] =
       await Promise.all([
-        // 오늘 별: dt_kpi_events 기준 (QR origin_location 값으로 필터)
+        // 오늘 별: stars 테이블 SSOT
         safeCount(
           `SELECT COUNT(*) AS n
-           FROM   dt_kpi_events
-           WHERE  event_name = 'star_created'
-             AND  extra->>'origin_location' = $1
+           FROM   stars
+           WHERE  origin_location = $1
              AND  created_at::date = CURRENT_DATE`,
           [kpiCode], '오늘별'
         ),
-        // 누적 별: dt_kpi_events 기준
+        // 누적 별: stars 테이블 SSOT
         safeCount(
           `SELECT COUNT(*) AS n
-           FROM   dt_kpi_events
-           WHERE  event_name = 'star_created'
-             AND  extra->>'origin_location' = $1`,
+           FROM   stars
+           WHERE  origin_location = $1`,
           [kpiCode], '누적별'
         ),
         safeCount(

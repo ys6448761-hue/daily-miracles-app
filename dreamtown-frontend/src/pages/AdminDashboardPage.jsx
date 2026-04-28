@@ -12,7 +12,7 @@ const WORKSHOP_CONFIGS = [
     name:         '케이블카 별공방',
     locationCode: 'yeosu_cablecar',
     userUrl:      '/star-entry.html?loc=yeosu_cablecar',
-    adminUrl:     '/admin/cablecar',
+    adminUrl:     '/admin/location/yeosu_cablecar',
     qrUrl:        '/star-entry.html?loc=yeosu_cablecar&qr=1',
     status:       'testing',
   },
@@ -335,9 +335,9 @@ function WorkshopCard({ config, stats, adminKey }) {
       {/* 오늘 지표 */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8, padding: '10px 0', marginBottom: 14, borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         {[
-          { label: '오늘 별', val: s.stars   ?? '-' },
-          { label: 'Moment',  val: s.moments ?? '-' },
-          { label: '공유',    val: s.shares  ?? '-' },
+          { label: '오늘 별', val: s.stars  ?? '-' },
+          { label: '누적 별', val: s.total  ?? '-' },
+          { label: '공유',    val: s.shares ?? '-' },
         ].map(({ label, val }) => (
           <div key={label} style={{ textAlign: 'center' }}>
             <div style={S.statNum}>{val}</div>

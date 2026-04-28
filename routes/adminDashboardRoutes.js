@@ -300,7 +300,7 @@ router.get('/workshop-stats', adminGuard, async (req, res) => {
 
   const stats = {};
   await Promise.all(locations.map(async (loc) => {
-    const s = { stars: 0, moments: 0, shares: 0 };
+    const s = { stars: 0, total: 0, shares: 0 };
 
     // 오늘 별 수
     try {
@@ -311,17 +311,14 @@ router.get('/workshop-stats', adminGuard, async (req, res) => {
       s.stars = parseInt(r.rows[0]?.n ?? 0, 10);
     } catch { /* 테이블 없음 — 0 유지 */ }
 
-    // 오늘 Moment 수 (journeys join — migration 146 없으면 0)
+    // 누적 별 (stars 테이블 SSOT — dt_kpi_events 아님)
     try {
       const r = await db.query(
-        `SELECT COUNT(*) AS n FROM moments m
-         JOIN journeys j ON j.id = m.journey_id
-         JOIN stars    s ON s.id = j.star_id
-         WHERE s.origin_location = $1 AND m.created_at >= CURRENT_DATE`,
+        `SELECT COUNT(*) AS n FROM stars WHERE origin_location = $1`,
         [loc]
       );
-      s.moments = parseInt(r.rows[0]?.n ?? 0, 10);
-    } catch { /* migration 146 미실행 — 0 유지 */ }
+      s.total = parseInt(r.rows[0]?.n ?? 0, 10);
+    } catch { /* 테이블 없음 — 0 유지 */ }
 
     // 오늘 공유 수 (dt_kpi_events — 없으면 0)
     try {
