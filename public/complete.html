@@ -355,8 +355,14 @@
     const accessKey = localStorage.getItem('access_key');
     const _flowStep = Number(localStorage.getItem('flow_step'));
     if (!accessKey || _flowStep < FLOW.ASCEND) {
-      window.location.href = '/star-entry.html';
+      window.location.replace('/star-entry.html');
     }
+
+    // ── 뒤로가기 방어: complete에서 back 누르면 다시 여기로 ──
+    history.pushState({ page: 'complete' }, '', '/complete.html');
+    window.addEventListener('popstate', () => {
+      window.location.replace('/complete.html');
+    });
 
     // ── 기본 UI 세팅 ──────────────────────────────────
     document.getElementById('accessKey').textContent = accessKey;
