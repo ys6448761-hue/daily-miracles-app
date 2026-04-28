@@ -319,21 +319,7 @@
       <div class="access-hint">화면 캡처 또는 메모해두세요</div>
     </div>
 
-    <!-- 3개월 봉인 섹션 (케이블카 영상 종료 후 표시) -->
-    <div class="seal-section" id="sealSection">
-      <span class="seal-icon">🔒</span>
-      <h2 class="seal-title">3개월 뒤, 이 별을<br>다시 만날게요</h2>
-      <p class="seal-sub">지금의 마음을 미래의 당신에게<br>한 마디 남겨도 좋아요 (선택)</p>
-      <div class="seal-textarea-wrap">
-        <textarea id="sealContent" maxlength="100" placeholder="3개월 뒤의 나에게..."></textarea>
-        <div class="seal-count"><span id="sealCount">0</span> / 100</div>
-      </div>
-      <button class="btn-seal" id="btnSeal">이 마음 봉인하기 🔒</button>
-      <button class="btn-seal-skip" id="btnSealSkip">나중에 하기</button>
-      <div class="seal-saved" id="sealSaved">봉인됐어요 ✨</div>
-    </div>
-
-    <!-- 공유 섹션 (봉인 이후 표시) -->
+    <!-- 공유 섹션 (케이블카 영상 종료 후 표시) -->
     <div id="shareSection" style="display:none">
       <div class="share-area">
         <button class="btn-kakao" id="btnKakao">
@@ -363,7 +349,7 @@
     };
 
     // ── FLOW 상수 (star-entry.html과 동일) ─────────────
-    const FLOW = { WISH:1, EMOTION:2, GEM:3, AURUM:4, GENERATING:5, RESULT:6, ASCEND:7, LOCK:8, SHARE:9 };
+    const FLOW = { EMOTION:1, GEM:2, WISH:3, AURUM:4, GENERATING:5, RESULT:6, PROMISE:7, ASCEND:8, SHARE:9 };
 
     // ── 진입 가드: ASCEND 미만이면 처음부터 ─────────────
     const accessKey = localStorage.getItem('access_key');
@@ -509,10 +495,10 @@
       function closeModal() {
         modal.classList.remove('active');
         video.pause();
-        localStorage.setItem('flow_step', FLOW.LOCK);
-        const sealEl = document.getElementById('sealSection');
-        sealEl.style.display = 'block';
-        setTimeout(() => sealEl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+        localStorage.setItem('flow_step', FLOW.SHARE);
+        const shareEl = document.getElementById('shareSection');
+        shareEl.style.display = 'block';
+        setTimeout(() => shareEl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
       }
 
       video.addEventListener('ended', closeModal);
@@ -533,51 +519,6 @@
           .then(() => { canPlay = true; })
           .catch(() => { skip.textContent = '영상 보기 →'; });
       }, 1500);
-    })();
-
-    // ── 3개월 봉인 ────────────────────────────────────
-    (function() {
-      const starId     = localStorage.getItem('star_id');
-      const sealTa     = document.getElementById('sealContent');
-      const sealCount  = document.getElementById('sealCount');
-      const btnSeal    = document.getElementById('btnSeal');
-      const btnSkip    = document.getElementById('btnSealSkip');
-      const sealSaved  = document.getElementById('sealSaved');
-
-      function revealShare() {
-        localStorage.setItem('flow_step', FLOW.SHARE);
-        document.getElementById('shareSection').style.display = 'block';
-        setTimeout(() => {
-          document.getElementById('btnKakao').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
-      }
-
-      sealTa.addEventListener('input', () => { sealCount.textContent = sealTa.value.length; });
-
-      btnSeal.addEventListener('click', async () => {
-        btnSeal.disabled = true;
-        btnSeal.textContent = '봉인 중...';
-        const content = sealTa.value.trim();
-        if (content && starId) {
-          try {
-            await fetch('/api/star/promise', {
-              method:  'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body:    JSON.stringify({ star_id: starId, type: '3m', content }),
-            });
-          } catch { /* 실패해도 진행 */ }
-        }
-        sealSaved.style.display = 'block';
-        setTimeout(() => {
-          document.getElementById('sealSection').style.display = 'none';
-          revealShare();
-        }, 1200);
-      });
-
-      btnSkip.addEventListener('click', () => {
-        document.getElementById('sealSection').style.display = 'none';
-        revealShare();
-      });
     })();
 
     // ── 링크 복사 ─────────────────────────────────────

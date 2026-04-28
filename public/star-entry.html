@@ -257,33 +257,12 @@
       <button class="btn-make-star" id="btnMakeStar">나도 내 별 만들어보기 →</button>
     </div>
 
-    <!-- ── P1: 소원 입력 ──────────────────────────────────── -->
-    <div class="panel hidden" id="panelWish">
-      <div class="step-bar">
-        <div class="step-dot active" id="dot1"></div>
-        <div class="step-dot" id="dot2"></div>
-        <div class="step-dot" id="dot3"></div>
-        <div class="step-dot" id="dot4"></div>
-        <div class="step-dot" id="dot5"></div>
-      </div>
-      <div class="header">
-        <span class="star-icon">🌟</span>
-        <h1>지금, 마음속에<br>담아온 소원은 무엇인가요</h1>
-        <p>이 순간의 소원을 별에 담아요</p>
-      </div>
-      <div class="wish-wrap">
-        <textarea id="wishInput" maxlength="100" placeholder="이 소원이 별이 됩니다..."></textarea>
-        <div class="wish-count"><span id="wishCount">0</span> / 100</div>
-      </div>
-      <button class="btn-primary" id="btnWishNext">다음 →</button>
-    </div>
-
-    <!-- ── P2: 감정 선택 ──────────────────────────────────── -->
+    <!-- ── P1: 감정 선택 ──────────────────────────────────── -->
     <div class="panel hidden" id="panelSelect">
       <div class="step-bar">
-        <div class="step-dot done"></div>
         <div class="step-dot active"></div>
-        <div class="step-dot" id="dot3s"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
         <div class="step-dot"></div>
         <div class="step-dot"></div>
       </div>
@@ -299,15 +278,14 @@
         <button class="emotion-btn" data-emotion="정리됨"><span class="emotion-emoji">🪐</span>정리됨</button>
       </div>
       <button class="btn-primary" id="btnEmotionNext">다음 →</button>
-      <button class="btn-back-link" id="btnBackToWish">← 이전</button>
     </div>
 
-    <!-- ── P3: 보석 선택 ──────────────────────────────────── -->
+    <!-- ── P2: 보석 선택 ──────────────────────────────────── -->
     <div class="panel hidden" id="panelGem">
       <div class="step-bar">
         <div class="step-dot done"></div>
-        <div class="step-dot done"></div>
         <div class="step-dot active"></div>
+        <div class="step-dot"></div>
         <div class="step-dot"></div>
         <div class="step-dot"></div>
       </div>
@@ -340,6 +318,28 @@
       </div>
       <button class="btn-primary" id="btnGemNext">다음 →</button>
       <button class="btn-back-link" id="btnBackToEmotion">← 이전</button>
+    </div>
+
+    <!-- ── P3: 소원 입력 ──────────────────────────────────── -->
+    <div class="panel hidden" id="panelWish">
+      <div class="step-bar">
+        <div class="step-dot done"></div>
+        <div class="step-dot done"></div>
+        <div class="step-dot active"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
+      </div>
+      <div class="header">
+        <span class="star-icon">🌟</span>
+        <h1>지금, 마음속에<br>담아온 소원은 무엇인가요</h1>
+        <p>이 순간의 소원을 별에 담아요</p>
+      </div>
+      <div class="wish-wrap">
+        <textarea id="wishInput" maxlength="100" placeholder="이 소원이 별이 됩니다..."></textarea>
+        <div class="wish-count"><span id="wishCount">0</span> / 100</div>
+      </div>
+      <button class="btn-primary" id="btnWishNext">다음 →</button>
+      <button class="btn-back-link" id="btnBackToGem">← 이전</button>
     </div>
 
     <!-- ── P4: 아우룸 전달 (필수, 자동 전환) ────────────────── -->
@@ -382,18 +382,35 @@
       </div>
       <div class="emotion-text-label" id="emotionTextLabel"></div>
       <div class="loading-hint" id="loadingHint">잠깐, 별을 완성하고 있어요</div>
-      <button class="btn-commit" id="btnCommit" disabled>✨ 별로 남기기</button>
+      <button class="btn-commit" id="btnPreviewNext" disabled>다음 →</button>
       <button class="btn-restart" id="btnRestart">처음부터 다시</button>
+    </div>
+
+    <!-- ── P6: 3개월 약속 + 별 남기기 ───────────────────────── -->
+    <div class="panel hidden" id="panelPromise">
+      <div style="text-align:center;margin-bottom:24px">
+        <span style="font-size:48px">🔒</span>
+      </div>
+      <div class="header" style="margin-bottom:20px">
+        <h1 style="font-size:20px">이 마음을<br>3개월 뒤 다시 만나볼까요?</h1>
+        <p>지금의 소원을 미래의 당신에게 남겨도 좋아요<br><span style="opacity:.7">(선택 사항)</span></p>
+      </div>
+      <div class="wish-wrap" style="margin-bottom:20px">
+        <textarea id="promiseInput" maxlength="100" placeholder="3개월 뒤의 나에게..."></textarea>
+        <div class="wish-count"><span id="promiseCount">0</span> / 100</div>
+      </div>
+      <button class="btn-primary active" id="btnCommit">✨ 이 마음 봉인하고 별 만들기 🔒</button>
+      <button class="btn-back-link" id="btnSkipPromise">그냥 별 만들기 →</button>
       <div class="error-msg" id="errorMsg">잠시 후 다시 시도해주세요</div>
     </div>
 
   </div>
 
   <script>
-    // ── FLOW: 단 하나의 진실 ────────────────────────────────
-    const FLOW = { WISH:1, EMOTION:2, GEM:3, AURUM:4, GENERATING:5, RESULT:6, ASCEND:7, LOCK:8, SHARE:9 };
+    // ── FLOW: 단 하나의 진실 (SSOT 확정 순서) ──────────────
+    const FLOW = { EMOTION:1, GEM:2, WISH:3, AURUM:4, GENERATING:5, RESULT:6, PROMISE:7, ASCEND:8, SHARE:9 };
     // 새 흐름 진입 — 항상 처음부터
-    localStorage.setItem('flow_step', FLOW.WISH);
+    localStorage.setItem('flow_step', FLOW.EMOTION);
 
     const params      = new URLSearchParams(window.location.search);
     const loc         = params.get('loc')  || 'direct';
@@ -404,6 +421,7 @@
     let wishText         = '';
     let selectedEmotion  = null;
     let selectedGem      = null;
+    let promiseContent   = '';
     let previewImageUrl  = null;
     let previewStarted   = false;
     let aurumDone        = false;
@@ -419,7 +437,7 @@
     if (isFromShare) {
       showPanel('panelIntro');
     } else {
-      showPanel('panelWish');
+      showPanel('panelSelect');
     }
 
     // ── 3개월 재방문 감지 ─────────────────────────────────────
@@ -455,25 +473,9 @@
           }
         }).catch(() => {});
     }
-    document.getElementById('btnMakeStar').addEventListener('click', () => showPanel('panelWish'));
+    document.getElementById('btnMakeStar').addEventListener('click', () => showPanel('panelSelect'));
 
-    // ── P1: 소원 입력 → P2: 감정 ─────────────────────────────
-    const wishInput   = document.getElementById('wishInput');
-    const wishCount   = document.getElementById('wishCount');
-    const btnWishNext = document.getElementById('btnWishNext');
-
-    wishInput.addEventListener('input', () => {
-      wishText = wishInput.value;
-      wishCount.textContent = wishText.length;
-      btnWishNext.classList.toggle('active', wishText.trim().length > 0);
-    });
-    btnWishNext.addEventListener('click', () => {
-      if (!wishText.trim()) return;
-      localStorage.setItem('flow_step', FLOW.EMOTION);
-      showPanel('panelSelect');
-    });
-
-    // ── P2: 감정 선택 → P3: 보석 ─────────────────────────────
+    // ── P1: 감정 선택 → P2: 보석 ─────────────────────────────
     const btnEmotionNext = document.getElementById('btnEmotionNext');
 
     document.querySelectorAll('.emotion-btn').forEach(btn => {
@@ -489,9 +491,8 @@
       localStorage.setItem('flow_step', FLOW.GEM);
       showPanel('panelGem');
     });
-    document.getElementById('btnBackToWish').addEventListener('click', () => showPanel('panelWish'));
 
-    // ── P3: 보석 선택 → P4: 아우룸 ───────────────────────────
+    // ── P2: 보석 선택 → P3: 소원 ─────────────────────────────
     const btnGemNext = document.getElementById('btnGemNext');
 
     document.querySelectorAll('.gem-btn').forEach(btn => {
@@ -503,14 +504,29 @@
       });
     });
     btnGemNext.addEventListener('click', () => {
-      if (!selectedGem) return;
-      // Guard: 이전 단계 미완료 시 차단
-      if (!wishText.trim() || !selectedEmotion) return;
+      if (!selectedGem || !selectedEmotion) return;
+      localStorage.setItem('flow_step', FLOW.WISH);
+      showPanel('panelWish');
+    });
+    document.getElementById('btnBackToEmotion').addEventListener('click', () => showPanel('panelSelect'));
+
+    // ── P3: 소원 입력 → P4: 아우룸 ───────────────────────────
+    const wishInput   = document.getElementById('wishInput');
+    const wishCount   = document.getElementById('wishCount');
+    const btnWishNext = document.getElementById('btnWishNext');
+
+    wishInput.addEventListener('input', () => {
+      wishText = wishInput.value;
+      wishCount.textContent = wishText.length;
+      btnWishNext.classList.toggle('active', wishText.trim().length > 0);
+    });
+    btnWishNext.addEventListener('click', () => {
+      if (!wishText.trim() || !selectedEmotion || !selectedGem) return;
       localStorage.setItem('flow_step', FLOW.AURUM);
       showPanel('panelAurum');
       startAurum();
     });
-    document.getElementById('btnBackToEmotion').addEventListener('click', () => showPanel('panelSelect'));
+    document.getElementById('btnBackToGem').addEventListener('click', () => showPanel('panelGem'));
 
     // ── P4: 아우룸 전달 (2.5s 필수 노출 + 이미지 생성 병렬) ──
     function startAurum() {
@@ -537,12 +553,11 @@
     }
 
     // ── P5: 소원그림 생성 (아우룸 시작 시 병렬 실행) ───────────
-    const btnCommit    = document.getElementById('btnCommit');
-    const previewImg   = document.getElementById('previewImg');
-    const imgSkeleton  = document.getElementById('imgSkeleton');
-    const loadingHint  = document.getElementById('loadingHint');
-    const emotionLabel = document.getElementById('emotionTextLabel');
-    const errorMsg     = document.getElementById('errorMsg');
+    const btnPreviewNext = document.getElementById('btnPreviewNext');
+    const previewImg     = document.getElementById('previewImg');
+    const imgSkeleton    = document.getElementById('imgSkeleton');
+    const loadingHint    = document.getElementById('loadingHint');
+    const emotionLabel   = document.getElementById('emotionTextLabel');
 
     async function startPreviewGeneration() {
       if (previewStarted) return;
@@ -565,17 +580,17 @@
         previewImg.onload = () => {
           imgSkeleton.classList.add('hidden');
           previewImg.classList.add('ready');
-          btnCommit.disabled = false;
+          btnPreviewNext.disabled = false;
         };
         previewImg.onerror = () => {
           imgSkeleton.classList.add('hidden');
-          btnCommit.disabled = false;
+          btnPreviewNext.disabled = false;
         };
         previewImg.src = data.image_url;
       } catch {
         imgSkeleton.classList.add('hidden');
         loadingHint.classList.add('hidden');
-        btnCommit.disabled = false;
+        btnPreviewNext.disabled = false;
       } finally {
         imageDone = true;
         checkAdvanceToPreview();
@@ -585,16 +600,32 @@
     // ── 처음부터 버튼 ─────────────────────────────────────────
     document.getElementById('btnRestart').addEventListener('click', () => window.location.reload());
 
-    // ── Commit (guard: 모든 단계 완료 필수) ──────────────────
-    btnCommit.addEventListener('click', async () => {
-      // Guard: 빠진 단계 있으면 차단 (감정/보석 없으면 결과 진입 금지)
+    // ── P5 → P6: 결과 확인 후 약속 패널로 ────────────────────
+    btnPreviewNext.addEventListener('click', () => {
+      localStorage.setItem('flow_step', FLOW.PROMISE);
+      showPanel('panelPromise');
+    });
+
+    // ── P6: 3개월 약속 입력 ───────────────────────────────────
+    const promiseInput = document.getElementById('promiseInput');
+    const promiseCount = document.getElementById('promiseCount');
+    promiseInput.addEventListener('input', () => {
+      promiseContent = promiseInput.value;
+      promiseCount.textContent = promiseContent.length;
+    });
+
+    // ── 약속 건너뛰기 → commit ────────────────────────────────
+    document.getElementById('btnSkipPromise').addEventListener('click', () => doCommit());
+
+    // ── Commit 실행 (봉인 또는 건너뛰기 공통) ─────────────────
+    const btnCommit = document.getElementById('btnCommit');
+    const errorMsg  = document.getElementById('errorMsg');
+
+    btnCommit.addEventListener('click', () => doCommit());
+
+    async function doCommit() {
       if (!wishText.trim() || !selectedEmotion || !selectedGem) {
-        errorMsg.textContent = '모든 단계를 완료해주세요';
-        errorMsg.style.display = 'block';
-        return;
-      }
-      if (Number(localStorage.getItem('flow_step')) < FLOW.RESULT) {
-        errorMsg.textContent = '별 그림이 아직 준비 중이에요';
+        errorMsg.textContent   = '모든 단계를 완료해주세요';
         errorMsg.style.display = 'block';
         return;
       }
@@ -618,6 +649,15 @@
         const data = await res.json();
         if (!data.success) throw new Error(data.error || '별 저장 실패');
 
+        // 3개월 약속 저장 (선택, fire-and-forget)
+        if (promiseContent.trim()) {
+          fetch('/api/star/promise', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ star_id: data.star_id, type: '3m', content: promiseContent.trim() }),
+          }).catch(() => {});
+        }
+
         localStorage.setItem('access_key',      data.access_key);
         localStorage.setItem('star_id',         data.star_id);
         localStorage.setItem('emotion_linked',  data.emotion_link?.linked ? '1' : '0');
@@ -627,12 +667,12 @@
 
         window.location.href = '/complete.html';
       } catch {
-        errorMsg.textContent  = '잠시 후 다시 시도해주세요';
+        errorMsg.textContent   = '잠시 후 다시 시도해주세요';
         errorMsg.style.display = 'block';
-        btnCommit.disabled    = false;
-        btnCommit.textContent = '✨ 별로 남기기';
+        btnCommit.disabled     = false;
+        btnCommit.textContent  = '✨ 이 마음 봉인하고 별 만들기 🔒';
       }
-    });
+    }
   </script>
 </body>
 </html>

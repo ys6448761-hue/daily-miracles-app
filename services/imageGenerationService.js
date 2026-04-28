@@ -31,24 +31,19 @@ try { ({ emitKpiEvent } = require('./kpiEventEmitter')); } catch (_) {}
 // "하나의 여수를 16번 다르게 느끼게 한다"
 
 const BASE_PROMPT =
-`A soft watercolor illustration in a Ghibli-inspired Korean style.
+`A soft 2D Korean watercolor webtoon illustration.
+Inside a modern Yeosu marine cable car cabin at night, a Korean traveler is sitting by the window, seen from behind, wearing simple modern casual clothes.
+The traveler gently holds a small glowing gem-like star seed in both hands.
+Outside the window, the Yeosu night sea, cable car line, harbor lights, and distant coastline are visible.
+The mood is quiet, warm, personal, and emotional.
+No Japanese traditional clothing, no anime exaggeration, no 3D, no photorealism.`;
 
-Inside a cable car at night in Yeosu, a person is sitting quietly, seen from behind.
-
-Outside the window, the Yeosu night sea spreads out, with city lights reflecting like stars on the water.
-
-The person is holding a small glowing light in their hands, representing their wish.
-
-The atmosphere is emotional, calm, and slightly magical.
-
-2D illustration, soft lighting, no realistic or 3D style.`;
-
-// 보석 레이어 — 빛의 색깔/질감
+// 보석 레이어 — 별씨앗의 빛 색깔/질감
 const GEM_PROMPT = {
-  crystal:  `The light is transparent and softly diffused, with subtle rainbow reflections spreading gently.`,
-  ruby:     `The light glows with a warm red tone, soft and emotional, like a gentle heartbeat.`,
-  emerald:  `The light has a soft green glow, natural and healing, like a quiet forest breath.`,
-  sapphire: `The light shines with a deep blue tone, calm and thoughtful, like the night sky.`,
+  crystal:  `The star seed emits a transparent, softly diffused glow with subtle rainbow shimmer spreading through the fingers.`,
+  ruby:     `The star seed glows with a warm, deep red tone — soft and emotional, pulsing gently like a heartbeat.`,
+  emerald:  `The star seed radiates a gentle green light, natural and calm, breathing quietly like a forest.`,
+  sapphire: `The star seed shines with a deep, steady blue — peaceful and thoughtful, like a still night sky.`,
 };
 
 // 감정 레이어 — 분위기
@@ -76,27 +71,21 @@ function buildPrompt(emotionKey, gem_type = 'ruby') {
   return `${BASE_PROMPT}\n\n${gemPart}\n\n${emotionPart}`;
 }
 
-// 프롬프트 검수 (핵심 3요소 필수)
+// 프롬프트 검수 (SSOT 핵심 3요소 필수)
 function validatePrompt(prompt) {
-  if (!prompt.includes('cable car'))     return false;
-  if (!prompt.includes('person'))        return false;
-  if (!prompt.includes('glowing light')) return false;
-  if (prompt.split('\n').length < 8)     return false;
+  if (!prompt.includes('cable car')) return false;
+  if (!prompt.includes('traveler'))  return false;
+  if (!prompt.includes('star seed')) return false;
   return true;
 }
 
-// Fallback 프롬프트 (content_policy 재시도 — 한글 제거)
+// Fallback 프롬프트 (content_policy 재시도 — 단순화)
 function buildFallbackPrompt(emotionKey, gem_type = 'ruby') {
   const gemPart = GEM_PROMPT[gem_type] || GEM_PROMPT.ruby;
-  return `A soft 2D watercolor illustration.
-
-Inside a cable car at night above the sea in Yeosu. A person seen from behind, holding a glowing light in their hands.
-
+  return `A soft 2D Korean watercolor webtoon illustration.
+Inside a Yeosu marine cable car cabin at night. A Korean traveler seen from behind, casual clothes, holding a glowing star seed. Yeosu night sea and cable car line visible outside.
 ${gemPart}
-
-Style: 2D watercolor, soft edges, no photorealism, no 3D.
-Color palette: Deep navy, soft purple, gentle glow.
-Mood: Calm, quiet, emotional.`;
+No Japanese traditional clothing, no anime exaggeration, no 3D, no photorealism.`;
 }
 
 // 하위 호환 — 기존 코드가 emotionText(display)로 호출하는 경우 대비
