@@ -362,9 +362,13 @@
       '정리됨': '지금이 괜찮아요',
     };
 
-    // ── 인증 확인 ─────────────────────────────────────
+    // ── FLOW 상수 (star-entry.html과 동일) ─────────────
+    const FLOW = { WISH:1, EMOTION:2, GEM:3, AURUM:4, GENERATING:5, RESULT:6, ASCEND:7, LOCK:8, SHARE:9 };
+
+    // ── 진입 가드: ASCEND 미만이면 처음부터 ─────────────
     const accessKey = localStorage.getItem('access_key');
-    if (!accessKey) {
+    const _flowStep = Number(localStorage.getItem('flow_step'));
+    if (!accessKey || _flowStep < FLOW.ASCEND) {
       window.location.href = '/star-entry.html';
     }
 
@@ -505,6 +509,7 @@
       function closeModal() {
         modal.classList.remove('active');
         video.pause();
+        localStorage.setItem('flow_step', FLOW.LOCK);
         const sealEl = document.getElementById('sealSection');
         sealEl.style.display = 'block';
         setTimeout(() => sealEl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
@@ -540,6 +545,7 @@
       const sealSaved  = document.getElementById('sealSaved');
 
       function revealShare() {
+        localStorage.setItem('flow_step', FLOW.SHARE);
         document.getElementById('shareSection').style.display = 'block';
         setTimeout(() => {
           document.getElementById('btnKakao').scrollIntoView({ behavior: 'smooth', block: 'center' });

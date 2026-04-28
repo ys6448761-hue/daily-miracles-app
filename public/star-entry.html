@@ -390,6 +390,11 @@
   </div>
 
   <script>
+    // ── FLOW: 단 하나의 진실 ────────────────────────────────
+    const FLOW = { WISH:1, EMOTION:2, GEM:3, AURUM:4, GENERATING:5, RESULT:6, ASCEND:7, LOCK:8, SHARE:9 };
+    // 새 흐름 진입 — 항상 처음부터
+    localStorage.setItem('flow_step', FLOW.WISH);
+
     const params      = new URLSearchParams(window.location.search);
     const loc         = params.get('loc')  || 'direct';
     const isFromShare = params.get('from') === 'share';
@@ -464,6 +469,7 @@
     });
     btnWishNext.addEventListener('click', () => {
       if (!wishText.trim()) return;
+      localStorage.setItem('flow_step', FLOW.EMOTION);
       showPanel('panelSelect');
     });
 
@@ -480,6 +486,7 @@
     });
     btnEmotionNext.addEventListener('click', () => {
       if (!selectedEmotion) return;
+      localStorage.setItem('flow_step', FLOW.GEM);
       showPanel('panelGem');
     });
     document.getElementById('btnBackToWish').addEventListener('click', () => showPanel('panelWish'));
@@ -499,6 +506,7 @@
       if (!selectedGem) return;
       // Guard: 이전 단계 미완료 시 차단
       if (!wishText.trim() || !selectedEmotion) return;
+      localStorage.setItem('flow_step', FLOW.AURUM);
       showPanel('panelAurum');
       startAurum();
     });
@@ -522,7 +530,10 @@
     }
 
     function checkAdvanceToPreview() {
-      if (aurumDone && imageDone) showPanel('panelPreview');
+      if (aurumDone && imageDone) {
+        localStorage.setItem('flow_step', FLOW.RESULT);
+        showPanel('panelPreview');
+      }
     }
 
     // ── P5: 소원그림 생성 (아우룸 시작 시 병렬 실행) ───────────
@@ -536,6 +547,7 @@
     async function startPreviewGeneration() {
       if (previewStarted) return;
       previewStarted = true;
+      localStorage.setItem('flow_step', FLOW.GENERATING);
 
       try {
         const res  = await fetch('/api/star/preview', {
@@ -575,9 +587,14 @@
 
     // ── Commit (guard: 모든 단계 완료 필수) ──────────────────
     btnCommit.addEventListener('click', async () => {
-      // Guard: 빠진 단계 있으면 차단
+      // Guard: 빠진 단계 있으면 차단 (감정/보석 없으면 결과 진입 금지)
       if (!wishText.trim() || !selectedEmotion || !selectedGem) {
         errorMsg.textContent = '모든 단계를 완료해주세요';
+        errorMsg.style.display = 'block';
+        return;
+      }
+      if (Number(localStorage.getItem('flow_step')) < FLOW.RESULT) {
+        errorMsg.textContent = '별 그림이 아직 준비 중이에요';
         errorMsg.style.display = 'block';
         return;
       }
@@ -606,6 +623,7 @@
         localStorage.setItem('emotion_linked',  data.emotion_link?.linked ? '1' : '0');
         localStorage.setItem('share_image_url', previewImageUrl || '');
         localStorage.setItem('origin_location', loc);
+        localStorage.setItem('flow_step',       FLOW.ASCEND);
 
         window.location.href = '/complete.html';
       } catch {
