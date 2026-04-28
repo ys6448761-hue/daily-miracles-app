@@ -38,6 +38,19 @@ function normalizeEmotion(val) {
   return EMOTION_KO[trimmed.toLowerCase()] ?? trimmed;
 }
 
+// ── 상태값 한국어 매핑 ────────────────────────────────────────────
+const STATUS_LABEL = {
+  'PRE-ON':  '생성됨',
+  'ON':      '저장 완료',
+  'CREATED': '생성됨',
+  'SAVED':   '저장 완료',
+  'SHARED':  '공유됨',
+  'FAILED':  '실패',
+};
+function statusLabel(val) {
+  return STATUS_LABEL[(val || '').toUpperCase()] ?? STATUS_LABEL[val] ?? val ?? '-';
+}
+
 // ── 보석 라벨 ─────────────────────────────────────────────────────
 const GEM_LABEL = {
   ruby:       '루비',
@@ -311,7 +324,7 @@ export default function LocationAdmin() {
                   {[
                     { label: '감정',   value: emotion ?? '미기록', dim: !emotion },
                     { label: '보석',   value: gemLabel(star.gem_type) },
-                    { label: '상태',   value: star.status ?? '-' },
+                    { label: '상태',   value: statusLabel(star.status) },
                     { label: '생성',   value: fmtTime(star.created_at) },
                   ].map(({ label, value, dim }) => (
                     <div key={label} style={{ display: 'flex', gap: 4, alignItems: 'baseline' }}>

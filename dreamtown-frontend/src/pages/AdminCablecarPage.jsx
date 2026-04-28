@@ -2,7 +2,7 @@
  * AdminCablecarPage.jsx — 케이블카 별공방 운영 관리
  * 경로: /admin/cablecar
  *
- * Tab 1: 오늘 현황  — 신규 별, 활성화, 최근 피드
+ * Tab 1: 오늘 현황  — 신규 별 생성, 최근 피드
  * Tab 2: 별 현황    — stars.origin_location='yeosu_cablecar' 전체 목록
  * Tab 3: QR/운영    — QR 이미지, 연결 URL, 결제 상태
  *
@@ -10,6 +10,19 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+
+// ── 상태값 한국어 매핑 (DB 값 → 운영 언어) ────────────────────────
+const STATUS_LABEL = {
+  'PRE-ON':  '생성됨',
+  'ON':      '저장 완료',
+  'CREATED': '생성됨',
+  'SAVED':   '저장 완료',
+  'SHARED':  '공유됨',
+  'FAILED':  '실패',
+};
+function statusLabel(val) {
+  return STATUS_LABEL[(val || '').toUpperCase()] ?? STATUS_LABEL[val] ?? val ?? '-';
+}
 
 // ── 스타일 ─────────────────────────────────────────────────────────
 const S = {
@@ -69,9 +82,10 @@ const S = {
   },
   statusPill: (status) => {
     const s = (status || '').toUpperCase();
-    if (s === 'ON')     return { fontSize: 10, fontWeight: 700, color: '#4ade80', background: 'rgba(74,222,128,0.1)',  padding: '2px 8px', borderRadius: 10, flexShrink: 0, border: '1px solid rgba(74,222,128,0.25)' };
-    if (s === 'PRE-ON') return { fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: 10, flexShrink: 0, border: '1px solid rgba(255,255,255,0.1)' };
-    return               { fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.35)', background: 'rgba(255,255,255,0.04)', padding: '2px 8px', borderRadius: 10, flexShrink: 0, border: '1px solid rgba(255,255,255,0.08)' };
+    if (s === 'ON' || s === 'SAVED')    return { fontSize: 10, fontWeight: 700, color: '#4ade80', background: 'rgba(74,222,128,0.1)',  padding: '2px 8px', borderRadius: 10, flexShrink: 0, border: '1px solid rgba(74,222,128,0.25)' };
+    if (s === 'SHARED')                 return { fontSize: 10, fontWeight: 700, color: '#60a5fa', background: 'rgba(96,165,250,0.1)',  padding: '2px 8px', borderRadius: 10, flexShrink: 0, border: '1px solid rgba(96,165,250,0.25)' };
+    if (s === 'FAILED')                 return { fontSize: 10, fontWeight: 700, color: '#f87171', background: 'rgba(248,113,113,0.1)', padding: '2px 8px', borderRadius: 10, flexShrink: 0, border: '1px solid rgba(248,113,113,0.25)' };
+    return { fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: 10, flexShrink: 0, border: '1px solid rgba(255,255,255,0.1)' };
   },
   table: { width: '100%', borderCollapse: 'collapse', fontSize: 12 },
   th: {
@@ -196,7 +210,7 @@ function TodayTab({ token }) {
       <div style={S.kpiRow}>
         {[
           { value: kpi.new_today,      label: '신규 별 생성',  accent: '#9B87F5' },
-          { value: kpi.awakened_today, label: '오늘 활성화',   accent: '#4ade80' },
+          { value: kpi.awakened_today, label: '오늘 저장 완료', accent: '#4ade80' },
         ].map(k => (
           <div key={k.label} style={{ ...S.kpiCard, borderColor: `${k.accent}30` }}>
             <div style={{ ...S.kpiValue, color: k.accent }}>{k.value}</div>
@@ -209,9 +223,7 @@ function TodayTab({ token }) {
       <div style={S.sectionTitle}>누적</div>
       <div style={S.kpiRow}>
         {[
-          { value: kpi.total_all,      label: '전체 별' },
-          { value: kpi.total_awakened, label: '활성화' },
-          { value: kpi.total_pending,  label: '미활성' },
+          { value: kpi.total_all, label: '전체 별' },
         ].map(k => (
           <div key={k.label} style={S.kpiCard}>
             <div style={S.kpiValue}>{k.value}</div>
@@ -230,7 +242,7 @@ function TodayTab({ token }) {
       {feed.map((f) => (
         <div key={f.id} style={S.feedCard}>
           <div>
-            <span style={S.statusPill(f.status)}>{f.status}</span>
+            <span style={S.statusPill(f.status)}>{statusLabel(f.status)}</span>
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: '#E8E4F0', marginBottom: 2 }}>
@@ -273,8 +285,8 @@ function StarsTab({ token }) {
 
   const STATUS_OPTS = [
     { key: 'all',    label: '전체' },
-    { key: 'ON',     label: '활성화' },
-    { key: 'PRE-ON', label: '미활성' },
+    { key: 'ON',     label: '저장 완료' },
+    { key: 'PRE-ON', label: '생성됨' },
   ];
 
   return (
@@ -319,7 +331,7 @@ function StarsTab({ token }) {
                     <span style={{ fontWeight: 700, color: '#E8E4F0' }}>{s.star_name}</span>
                   </td>
                   <td style={S.td}>
-                    <span style={S.statusPill(s.status)}>{s.status}</span>
+                    <span style={S.statusPill(s.status)}>{statusLabel(s.status)}</span>
                   </td>
                   <td style={{ ...S.td, color: 'rgba(255,255,255,0.5)', maxWidth: 200 }}>
                     {s.wish_preview
@@ -402,8 +414,8 @@ function OpsTab({ token }) {
       <div style={S.kpiRow}>
         {[
           { value: stats.total_stars, label: '전체 별' },
-          { value: stats.awakened,    label: '활성화' },
-          { value: stats.pending,     label: '미활성' },
+          { value: stats.awakened,    label: '저장 완료' },
+          { value: stats.pending,     label: '생성됨' },
         ].map(k => (
           <div key={k.label} style={S.kpiCard}>
             <div style={S.kpiValue}>{k.value}</div>
