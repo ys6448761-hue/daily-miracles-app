@@ -82,7 +82,7 @@ router.get('/:code', adminGuard, async (req, res) => {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
 
-    const [todayStars, totalStars, totalResonance, topStarRows, emotionRows, recentRows] =
+    const [todayStars, totalStars, totalResonance, topStarRows, emotionRows, recentRows, emotionMissing, shareCount] =
       await Promise.all([
         // 오늘 별: dt_kpi_events 기준 (QR origin_location 값으로 필터)
         safeCount(
@@ -121,39 +121,59 @@ router.get('/:code', adminGuard, async (req, res) => {
         safeRows(
           `SELECT emotion, COUNT(*) AS cnt
            FROM   stars
-           WHERE  origin_location = $1 AND emotion IS NOT NULL
-           GROUP  BY emotion ORDER BY cnt DESC LIMIT 3`,
-          [kpiCode], '감정TOP3'
+           WHERE  origin_location = $1 AND emotion IS NOT NULL AND emotion != ''
+           GROUP  BY emotion ORDER BY cnt DESC LIMIT 10`,
+          [kpiCode], '감정TOP10'
         ),
         safeRows(
-          `SELECT s.id, s.access_key, s.emotion, s.status, s.created_at,
+          `SELECT s.id, s.access_key, s.emotion, s.gem_type, s.status, s.created_at,
                   LEFT(s.wish_text, 30) AS wish_preview,
                   COUNT(sl.id)          AS resonance_count
            FROM   stars     s
            LEFT JOIN star_logs sl ON sl.star_id = s.id AND sl.action_type = 'resonance'
            WHERE  s.origin_location = $1
-           GROUP  BY s.id, s.access_key, s.emotion, s.status, s.created_at, s.wish_text
+           GROUP  BY s.id, s.access_key, s.emotion, s.gem_type, s.status, s.created_at, s.wish_text
            ORDER  BY s.created_at DESC LIMIT 5`,
           [kpiCode], '최근별5'
+        ),
+        // 감정 미기록 수 (null 또는 빈 문자열)
+        safeCount(
+          `SELECT COUNT(*) AS n FROM stars
+           WHERE  origin_location = $1 AND (emotion IS NULL OR emotion = '')`,
+          [kpiCode], '감정미기록'
+        ),
+        // 공유 클릭 수 (dt_kpi_events)
+        safeCount(
+          `SELECT COUNT(*) AS n FROM dt_kpi_events
+           WHERE  event_name ILIKE '%share%'
+             AND  extra->>'origin_location' = $1`,
+          [kpiCode], '공유수'
         ),
       ]);
 
     const topStar = topStarRows[0] ?? null;
 
-    // recent_stars: star_name / wish_emotion 필드를 LocationAdmin.jsx 와 맞춤
+    // recent_stars: 프론트 필드명 맞춤
     const recentFormatted = recentRows.map(r => ({
       ...r,
-      star_name:    r.access_key ?? r.id?.slice(0, 8),
-      wish_emotion: r.emotion,
+      star_name:       r.access_key ?? r.id?.slice(0, 8),
+      wish_emotion:    r.emotion,
+      resonance_count: parseInt(r.resonance_count, 10),
     }));
+
+    // last_star_at: 가장 최근 별 생성 시각
+    const lastStarAt = recentRows[0]?.created_at ?? null;
 
     return res.json({
       // ── 구조화 응답 (SSOT) ──────────────────────────────
       location: { code, ...meta },
       stats: {
-        today_stars:     todayStars,
-        total_stars:     totalStars,
-        total_resonance: totalResonance,
+        today_stars:          todayStars,
+        total_stars:          totalStars,
+        total_resonance:      totalResonance,
+        emotion_missing:      emotionMissing,
+        share_count:          shareCount,
+        last_star_at:         lastStarAt,
       },
       representative: topStar
         ? { wish_text: topStar.wish_text, star_name: topStar.access_key ?? topStar.id?.slice(0, 8), resonance_count: parseInt(topStar.resonance_count, 10) }
@@ -161,11 +181,14 @@ router.get('/:code', adminGuard, async (req, res) => {
       emotion_top3: emotionRows.map(r => ({ emotion: r.emotion, count: parseInt(r.cnt, 10) })),
       recent_stars: recentFormatted,
       // ── flat 별칭 (LocationAdmin.jsx 컴포넌트 호환) ──────
-      place_label:      meta.name,
-      today_count:      todayStars,
-      total_count:      totalStars,
-      resonance_total:  totalResonance,
-      summary_sentence: topStar?.wish_text ?? '오늘의 첫 별을 기다리고 있어요',
+      place_label:          meta.name,
+      today_count:          todayStars,
+      total_count:          totalStars,
+      resonance_total:      totalResonance,
+      emotion_missing:      emotionMissing,
+      share_count:          shareCount,
+      last_star_at:         lastStarAt,
+      summary_sentence:     topStar?.wish_text ?? '오늘의 첫 별을 기다리고 있어요',
     });
   } catch (err) {
     console.error(`[admin/dt/location/${code}] 예상치 못한 에러:`, err.stack);
