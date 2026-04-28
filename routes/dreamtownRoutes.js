@@ -2167,6 +2167,9 @@ router.post('/stars/:id/logs', async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     console.error('[DT] POST /stars/:id/logs error:', err.message, err.code);
+    if (err.code === '42P01') {
+      return res.status(503).json({ error: 'star_logs 테이블 초기화 중. 잠시 후 재시도', migration: '124' });
+    }
     res.status(500).json({ error: 'Internal server error' });
   }
 });
