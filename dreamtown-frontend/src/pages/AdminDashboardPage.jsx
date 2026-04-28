@@ -306,10 +306,18 @@ function AlertCard({ alerts, errors }) {
 }
 
 // ── 별공방 카드 (단일) ────────────────────────────────────────────
-function WorkshopCard({ config, stats }) {
+function WorkshopCard({ config, stats, adminKey }) {
   const s  = stats?.[config.locationCode] ?? {};
   const sc = STATUS_STYLE[config.status] ?? STATUS_STYLE.ready;
   const open = url => window.open(url, '_blank');
+
+  // 관리자 페이지 URL — /admin/location/* 경로는 ?token= 자동 첨부
+  const adminHref = (() => {
+    const base = config.adminUrl;
+    if (!adminKey) return base;
+    const sep = base.includes('?') ? '&' : '?';
+    return `${base}${sep}token=${encodeURIComponent(adminKey)}`;
+  })();
 
   return (
     <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 14, padding: '16px 18px' }}>
@@ -341,7 +349,7 @@ function WorkshopCard({ config, stats }) {
       {/* 액션 버튼 */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
         <button onClick={() => open(config.userUrl)}  style={S.wBtn('#3b82f6')}>사용자 페이지</button>
-        <button onClick={() => open(config.adminUrl)} style={S.wBtn('#7c3aed')}>관리자 페이지</button>
+        <button onClick={() => open(adminHref)} style={S.wBtn('#7c3aed')}>관리자 페이지</button>
       </div>
       <button onClick={() => open(config.qrUrl)} style={{ ...S.wBtn('#059669'), width: '100%' }}>QR 테스트</button>
     </div>
@@ -380,7 +388,7 @@ function WorkshopCenterSection({ adminKey }) {
       ) : (
         <div style={{ display: 'grid', gap: 14 }}>
           {WORKSHOP_CONFIGS.map(config => (
-            <WorkshopCard key={config.locationCode} config={config} stats={stats} />
+            <WorkshopCard key={config.locationCode} config={config} stats={stats} adminKey={adminKey} />
           ))}
         </div>
       )}
