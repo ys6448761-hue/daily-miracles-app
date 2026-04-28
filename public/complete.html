@@ -169,6 +169,55 @@
       white-space: pre-line;
     }
 
+    /* ── 케이블카 영상 모달 ─────────────────────────────── */
+    .video-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: #000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .video-modal.active { display: flex; }
+    .video-modal video {
+      width: 100%;
+      max-width: 480px;
+      max-height: 100vh;
+      object-fit: cover;
+    }
+    .video-caption {
+      position: absolute;
+      bottom: 88px;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.92);
+      text-shadow: 0 2px 16px rgba(0,0,0,0.7);
+      padding: 0 24px;
+      line-height: 1.7;
+      pointer-events: none;
+    }
+    .video-skip {
+      position: absolute;
+      bottom: 28px;
+      left: 50%; transform: translateX(-50%);
+      padding: 11px 32px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 24px;
+      color: rgba(255,255,255,0.65);
+      font-size: 14px;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.15s;
+    }
+    .video-skip:active { background: rgba(255,255,255,0.2); }
+
     /* ── 내 별 보러가기 ─────────────────────────────── */
     .btn-view {
       width: 100%;
@@ -189,6 +238,15 @@
   </style>
 </head>
 <body>
+  <!-- 케이블카 상승 영상 모달 -->
+  <div class="video-modal" id="videoModal">
+    <video id="cablecarVideo" muted playsinline preload="auto">
+      <source src="/videos/cablecar-star-intro.mp4" type="video/mp4">
+    </video>
+    <p class="video-caption">당신의 소원이,<br>하늘로 올라가고 있어요</p>
+    <button class="video-skip" id="videoSkip">건너뛰기</button>
+  </div>
+
   <div class="container">
     <span class="star-anim">⭐</span>
     <h1>당신의 별이 기록되었습니다</h1>
@@ -369,6 +427,41 @@
         showFallback('카카오톡 공유가 열리지 않았어요.\n링크를 복사해서 보내주세요.');
       }
     });
+
+    // ── 케이블카 영상 모달 ─────────────────────────────────
+    (function() {
+      const modal = document.getElementById('videoModal');
+      const video = document.getElementById('cablecarVideo');
+      const skip  = document.getElementById('videoSkip');
+      let   canPlay = false;
+
+      function closeModal() {
+        modal.classList.remove('active');
+        video.pause();
+        setTimeout(() => {
+          document.getElementById('btnKakao').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 150);
+      }
+
+      video.addEventListener('ended', closeModal);
+
+      skip.addEventListener('click', () => {
+        if (canPlay) {
+          closeModal();
+        } else {
+          video.play()
+            .then(() => { canPlay = true; skip.textContent = '건너뛰기'; })
+            .catch(() => closeModal());
+        }
+      });
+
+      setTimeout(() => {
+        modal.classList.add('active');
+        video.play()
+          .then(() => { canPlay = true; })
+          .catch(() => { skip.textContent = '영상 보기 →'; });
+      }, 1500);
+    })();
 
     // ── 링크 복사 ─────────────────────────────────────
     document.getElementById('btnCopy').addEventListener('click', async () => {
