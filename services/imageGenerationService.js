@@ -32,11 +32,11 @@ try { ({ emitKpiEvent } = require('./kpiEventEmitter')); } catch (_) {}
 
 const BASE_PROMPT =
 `A soft 2D Korean watercolor webtoon illustration.
-Inside a modern Yeosu marine cable car cabin at night, a Korean traveler is sitting by the window, seen from behind, wearing simple modern casual clothes.
-The traveler gently holds a small glowing gem-like star seed in both hands.
+Inside a modern Yeosu marine cable car cabin at night, a person is sitting quietly by the window, seen from behind, wearing simple modern casual clothes.
+They gently hold a small glowing gem-like star seed in both hands, in a quiet personal moment.
 Outside the window, the Yeosu night sea, cable car line, harbor lights, and distant coastline are visible.
 The mood is quiet, warm, personal, and emotional.
-No Japanese traditional clothing, no anime exaggeration, no 3D, no photorealism.`;
+Strictly avoid Japanese traditional clothing, anime exaggeration, travel poster feeling, backpacks, suitcases, tourist pose, 3D, photorealism.`;
 
 // 보석 레이어 — 별씨앗의 빛 색깔/질감
 const GEM_PROMPT = {
@@ -74,7 +74,7 @@ function buildPrompt(emotionKey, gem_type = 'ruby') {
 // 프롬프트 검수 (SSOT 핵심 3요소 필수)
 function validatePrompt(prompt) {
   if (!prompt.includes('cable car')) return false;
-  if (!prompt.includes('traveler'))  return false;
+  if (!prompt.includes('person'))    return false;
   if (!prompt.includes('star seed')) return false;
   return true;
 }
@@ -83,9 +83,9 @@ function validatePrompt(prompt) {
 function buildFallbackPrompt(emotionKey, gem_type = 'ruby') {
   const gemPart = GEM_PROMPT[gem_type] || GEM_PROMPT.ruby;
   return `A soft 2D Korean watercolor webtoon illustration.
-Inside a Yeosu marine cable car cabin at night. A Korean traveler seen from behind, casual clothes, holding a glowing star seed. Yeosu night sea and cable car line visible outside.
+Inside a Yeosu marine cable car cabin at night. A person seen from behind, casual clothes, holding a glowing star seed, in a quiet personal moment. Yeosu night sea and cable car line visible outside.
 ${gemPart}
-No Japanese traditional clothing, no anime exaggeration, no 3D, no photorealism.`;
+Strictly avoid Japanese traditional clothing, anime exaggeration, travel poster feeling, backpacks, suitcases, tourist pose, 3D, photorealism.`;
 }
 
 // 하위 호환 — 기존 코드가 emotionText(display)로 호출하는 경우 대비
@@ -185,7 +185,7 @@ async function _callDallERaw(prompt) {
   try {
     const res = await openai.images.generate({
       model: 'dall-e-3', prompt,
-      n: 1, size: '1024x1024', quality: 'standard', style: 'vivid',
+      n: 1, size: '1024x1024', quality: 'standard', style: 'natural',
     });
     return { url: res.data?.[0]?.url ?? null, error_type: null };
   } catch (err) {
@@ -202,7 +202,7 @@ async function _callDallEWithFallback(primaryPrompt, fallbackPrompt) {
     const res = await _withTimeout(
       openai.images.generate({
         model: 'dall-e-3', prompt: primaryPrompt,
-        n: 1, size: '1024x1024', quality: 'standard', style: 'vivid',
+        n: 1, size: '1024x1024', quality: 'standard', style: 'natural',
       }),
       DALLE_TIMEOUT_MS
     );
@@ -219,7 +219,7 @@ async function _callDallEWithFallback(primaryPrompt, fallbackPrompt) {
     const res = await _withTimeout(
       openai.images.generate({
         model: 'dall-e-3', prompt: fallbackPrompt,
-        n: 1, size: '1024x1024', quality: 'standard', style: 'vivid',
+        n: 1, size: '1024x1024', quality: 'standard', style: 'natural',
       }),
       DALLE_TIMEOUT_MS
     );

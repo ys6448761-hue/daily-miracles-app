@@ -95,6 +95,11 @@
     const params = new URLSearchParams(window.location.search);
     const starId = params.get('star_id') || localStorage.getItem('star_id') || '';
 
+    // Guard: 신규 QR 플로우 — 별/access_key 없이 진입하면 star-entry로 리다이렉트
+    if (!starId && !localStorage.getItem('access_key')) {
+      window.location.replace('/star-entry.html');
+    }
+
     document.querySelectorAll('.choice-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const type = btn.dataset.type;

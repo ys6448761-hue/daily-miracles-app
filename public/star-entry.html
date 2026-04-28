@@ -140,36 +140,28 @@
     .gem-sub   { font-size: 11px; color: rgba(255,255,255,0.45); }
 
     /* ── P4: 아우룸 전달 ── */
-    .aurum-center {
-      position: relative; width: 180px; height: 180px;
-      margin: 0 auto 36px;
+    .aurum-video-wrap {
+      width: 100%; aspect-ratio: 16/9; border-radius: 18px;
+      overflow: hidden; margin-bottom: 28px; position: relative;
+      background: rgba(0,0,0,0.5);
+    }
+    .aurum-video-wrap video {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .aurum-video-overlay {
+      position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
     }
     .aurum-star-core {
-      font-size: 76px; position: relative; z-index: 2;
+      font-size: 64px; position: relative; z-index: 2;
       animation: aurum-pulse 1.6s ease-in-out infinite;
+      filter: drop-shadow(0 0 18px rgba(255,210,60,0.7));
     }
     @keyframes aurum-pulse {
-      0%,100% { transform: scale(1); filter: brightness(1); }
-      50% { transform: scale(1.14); filter: brightness(1.6) drop-shadow(0 0 22px rgba(255,210,60,0.9)); }
+      0%,100% { transform: scale(1); filter: drop-shadow(0 0 18px rgba(255,210,60,0.7)); }
+      50% { transform: scale(1.14); filter: drop-shadow(0 0 32px rgba(255,210,60,1)); }
     }
-    .aurum-ring {
-      position: absolute; inset: 0;
-      animation: ring-spin 5s linear infinite;
-    }
-    @keyframes ring-spin { to { transform: rotate(360deg); } }
-    .aurum-ring span {
-      position: absolute; font-size: 13px;
-      color: rgba(255,210,60,0.65);
-      animation: orb-counter 5s linear infinite;
-    }
-    @keyframes orb-counter { to { transform: rotate(-360deg); } }
-    .aurum-ring span:nth-child(1) { top:0;      left:calc(50% - 6px); }
-    .aurum-ring span:nth-child(2) { top:13%;    right:2px; }
-    .aurum-ring span:nth-child(3) { bottom:13%; right:2px; }
-    .aurum-ring span:nth-child(4) { bottom:0;   left:calc(50% - 6px); }
-    .aurum-ring span:nth-child(5) { bottom:13%; left:2px; }
-    .aurum-ring span:nth-child(6) { top:13%;    left:2px; }
     .aurum-title {
       text-align: center; font-size: 20px; font-weight: 700;
       line-height: 1.6; margin-bottom: 10px;
@@ -351,12 +343,12 @@
         <div class="step-dot active"></div>
         <div class="step-dot"></div>
       </div>
-      <div class="aurum-center">
-        <div class="aurum-ring">
-          <span>✦</span><span>✦</span><span>✦</span>
-          <span>✦</span><span>✦</span><span>✦</span>
+      <div class="aurum-video-wrap">
+        <video id="aurumVideo" src="/videos/cablecar-star-intro.mp4"
+               muted playsinline preload="auto"></video>
+        <div class="aurum-video-overlay">
+          <div class="aurum-star-core">⭐</div>
         </div>
-        <div class="aurum-star-core">⭐</div>
       </div>
       <h2 class="aurum-title">당신의 소원이<br>별이 되고 있어요</h2>
       <p class="aurum-sub">아우룸이 담기는 중이에요</p>
@@ -543,6 +535,10 @@
 
     // ── P4: 아우룸 전달 (2.5s 필수 노출 + 이미지 생성 병렬) ──
     function startAurum() {
+      // 비디오 재생 시작
+      const aurumVideo = document.getElementById('aurumVideo');
+      if (aurumVideo) aurumVideo.play().catch(() => {});
+
       // 이미지 생성 즉시 시작 (병렬)
       startPreviewGeneration();
 
@@ -551,7 +547,7 @@
         document.getElementById('aurumBar').style.width = '100%';
       });
 
-      // 2.5초 후 arum 완료 플래그 → 이미지도 준비됐으면 preview로 전환
+      // 2.5초 후 aurum 완료 플래그 → 이미지도 준비됐으면 preview로 전환
       setTimeout(() => {
         aurumDone = true;
         checkAdvanceToPreview();
