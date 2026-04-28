@@ -267,7 +267,7 @@
 
   <script>
     const params = new URLSearchParams(window.location.search);
-    const loc    = params.get('loc') || 'cablecar';
+    const loc    = params.get('loc') || 'direct';   // QR 스캔 시 항상 ?loc= 포함 — fallback은 직접 접근 표시
 
     let selectedEmotion   = null;
     let previewImageUrl   = null;

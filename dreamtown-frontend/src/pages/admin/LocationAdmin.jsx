@@ -10,9 +10,10 @@
  * 집계 SSOT: stars.origin_location
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import QRCode from 'qrcode';
 
 // ── 감정값 정규화 ─────────────────────────────────────────────────
 const EMOTION_KO = {
@@ -111,20 +112,21 @@ const S = {
 };
 
 // ── 인증 레이어 ───────────────────────────────────────────────────
-function useLocationToken(urlToken) {
+function useLocationToken(urlToken, loc) {
   const [token,  setToken]  = useState(() => urlToken || localStorage.getItem('loc_admin_token') || '');
   const [authed, setAuthed] = useState(false);
   const [input,  setInput]  = useState('');
 
   const tryAuth = useCallback(async (t) => {
-    const res = await fetch(`/api/admin/dt/location/lattoa_cafe/ops?token=${encodeURIComponent(t)}`);
+    const checkLoc = loc || 'lattoa_cafe';
+    const res = await fetch(`/api/admin/dt/location/${encodeURIComponent(checkLoc)}/ops?token=${encodeURIComponent(t)}`);
     if (res.ok || res.status === 503) {
       localStorage.setItem('loc_admin_token', t);
       setToken(t); setAuthed(true);
     } else {
       alert('토큰이 올바르지 않습니다.');
     }
-  }, []);
+  }, [loc]);
 
   useEffect(() => {
     if (token) tryAuth(token);
@@ -402,6 +404,51 @@ function StarsTab({ loc, token }) {
   );
 }
 
+// ── QR 캔버스 생성 + PNG 다운로드 ────────────────────────────────
+function QRSection({ url, loc }) {
+  const canvasRef = useRef(null);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (!canvasRef.current || !url) return;
+    setReady(false);
+    QRCode.toCanvas(canvasRef.current, url, {
+      width: 200, margin: 2,
+      color: { dark: '#000000', light: '#ffffff' },
+    }).then(() => setReady(true)).catch(console.error);
+  }, [url]);
+
+  const handleDownload = () => {
+    if (!canvasRef.current || !ready) return;
+    canvasRef.current.toBlob((blob) => {
+      if (!blob) return;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${loc}_star_workshop_qr.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    }, 'image/png');
+  };
+
+  return (
+    <div style={{ textAlign: 'center' }}>
+      <canvas ref={canvasRef} style={{ borderRadius: 8, background: '#fff', padding: 4, display: 'block', margin: '0 auto' }} />
+      {url && (
+        <div style={{ marginTop: 10, fontSize: 11, color: 'rgba(255,255,255,0.4)', wordBreak: 'break-all', lineHeight: 1.5 }}>
+          {url}
+        </div>
+      )}
+      {ready && (
+        <button onClick={handleDownload} style={S.dlBtn}>
+          PNG 다운로드
+        </button>
+      )}
+    </div>
+  );
+}
+
 // ── Tab 4: QR / 운영 ─────────────────────────────────────────────
 function OpsTab({ loc, token }) {
   const { data, loading, error } = useFetch(`/api/admin/dt/location/${encodeURIComponent(loc)}/ops`, token);
@@ -410,29 +457,14 @@ function OpsTab({ loc, token }) {
   if (error)   return <div style={S.errBox}>오류: {error}</div>;
   if (!data)   return null;
 
-  const { qr_url, qr_image_path, qr_download_name, ssot_field, stats, origin_location } = data;
+  const { qr_url, ssot_field, stats, origin_location } = data;
 
   return (
     <div>
-      {/* QR 이미지 */}
+      {/* QR 생성 (동적 캔버스) */}
       <div style={S.section}>현재 활성 QR</div>
       <div style={{ ...S.card, textAlign: 'center' }}>
-        {qr_image_path ? (
-          <img
-            src={qr_image_path}
-            alt="별공방 체험 QR"
-            style={{ width: 180, height: 180, borderRadius: 8, background: '#fff', padding: 4 }}
-            onError={(e) => { e.target.style.display = 'none'; }}
-          />
-        ) : (
-          <div style={{ width: 180, height: 180, borderRadius: 8, background: 'rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontSize: 12, color: 'rgba(255,255,255,0.25)' }}>
-            QR 이미지 준비 중
-          </div>
-        )}
-        <div style={{ marginTop: 12, fontSize: 12, color: 'rgba(255,255,255,0.5)', wordBreak: 'break-all' }}>{qr_url}</div>
-        {qr_image_path && (
-          <a href={qr_image_path} download={qr_download_name} style={S.dlBtn}>PNG 다운로드</a>
-        )}
+        <QRSection url={qr_url} loc={loc} />
       </div>
 
       {/* 운영 상태 */}
@@ -470,9 +502,8 @@ function OpsTab({ loc, token }) {
       <div style={{ ...S.card, fontSize: 12, lineHeight: 1.9, color: 'rgba(255,255,255,0.5)' }}>
         <div style={{ marginBottom: 8, color: '#FFD76A', fontWeight: 700 }}>새 별공방 장소 추가 시 (예: hamel, odongjae)</div>
         <div>① QR URL: <code style={{ color: '#E8E4F0' }}>/star-entry.html?loc=hamel</code></div>
-        <div>② <code style={{ color: '#E8E4F0' }}>star-entry.html</code> LOC_CONFIG에 <code style={{ color: '#E8E4F0' }}>hamel: &#123;…&#125;</code> 키 추가</div>
-        <div>③ <code style={{ color: '#E8E4F0' }}>AdminDashboardPage.jsx</code> WORKSHOP_CONFIGS에 <code style={{ color: '#E8E4F0' }}>locationCode: 'hamel'</code> 추가</div>
-        <div>④ 집계: <code style={{ color: '#E8E4F0' }}>stars WHERE origin_location = 'hamel'</code> — 별도 라우트 불필요</div>
+        <div>② <code style={{ color: '#E8E4F0' }}>adminLocationRoutes.js</code> LOCATION_META에 <code style={{ color: '#E8E4F0' }}>hamel: &#123;…&#125;</code> 키 추가</div>
+        <div>③ 집계: <code style={{ color: '#E8E4F0' }}>stars WHERE origin_location = 'hamel'</code> — 별도 라우트 불필요</div>
         <div style={{ marginTop: 8, color: 'rgba(255,255,255,0.3)' }}>→ stars.origin_location 기반 단일 테이블, 파라미터화만으로 확장 가능</div>
       </div>
     </div>
@@ -519,11 +550,12 @@ export default function LocationAdmin() {
   const [searchParams] = useSearchParams();
   const urlToken       = searchParams.get('token') ?? '';
 
-  const { token, authed, input, setInput, tryAuth } = useLocationToken(urlToken);
+  const { token, authed, input, setInput, tryAuth } = useLocationToken(urlToken, loc);
   const [activeTab, setActiveTab] = useState('dashboard');
 
   const emoji     = PLACE_EMOJI[loc] ?? '✦';
   const placeName = loc === 'lattoa_cafe' || loc === 'lattoa' ? '라또아 카페'
+                  : loc === 'yeosu_cablecar' || loc === 'yeosu-cablecar' ? '여수 해상 케이블카'
                   : loc === 'forestland'  ? '포레스트랜드'
                   : loc === 'paransi'     ? '파란시'
                   : loc;
