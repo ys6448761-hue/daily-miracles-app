@@ -930,13 +930,24 @@ app.get('/star-entry', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'star-entry.html'));
 });
 
-// /entry?loc=cablecar → v2 케이블카 플로우 (star-entry.html) 로 리다이렉트
-// v1 DreamTown SPA EntryPage.jsx를 건드리지 않고 QR 진입만 v2로 전환
-app.get('/entry', (req, res, next) => {
-  if (req.query.loc === 'cablecar') {
-    return res.redirect(302, '/star-entry.html?loc=yeosu_cablecar');
+// ── DreamTown Core Entry 단일화 ────────────────────────────────────
+// 모든 외부 유입 → star-entry.html (SSOT)
+// v1 EntryPage.jsx 수정 없음 — Express 레벨에서 차단
+app.get('/entry', (req, res) => {
+  const loc = req.query.loc;
+  if (loc === 'cablecar') {
+    return res.redirect(302, '/star-entry.html?loc=yeosu_cablecar&reset=1');
   }
-  next(); // cablecar 외 loc → DT SPA로 위임
+  return res.redirect(302, '/star-entry.html?reset=1');
+});
+
+// ── v1 SPA 외부 진입 격리 ───────────────────────────────────────────
+// 직접 URL 접근 → star-entry (React Router 내부 nav는 영향 없음)
+app.get(['/wish', '/wish/select', '/wish/input'], (_req, res) => {
+  res.redirect(302, '/star-entry.html?reset=1');
+});
+app.get(['/cablecar', '/cablecar-landing'], (_req, res) => {
+  res.redirect(302, '/star-entry.html?loc=yeosu_cablecar&reset=1');
 });
 // /star/:id → DreamTown SPA (StarDetail) 로 위임
 // 이전 star-view.html 서빙 라우트는 DT_SPA_ROUTES(/star/*) 보다 앞에 있어
@@ -952,8 +963,10 @@ app.get('/yeosu-travel', (req, res) => {
 });
 
 // ---------- Star Voyage 뷰 ----------
-app.get('/voyage-select', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'voyage-select.html'));
+// voyage-select 직접 접근 → star-entry (여행 선택 화면 격리)
+// React Router 내부 nav는 VoyageSelectPage.jsx 유지
+app.get('/voyage-select', (_req, res) => {
+  res.redirect(302, '/star-entry.html?reset=1');
 });
 app.get('/voyage-detail', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'voyage-detail.html'));
