@@ -26,92 +26,90 @@ function getOpenAI() {
 let emitKpiEvent = null;
 try { ({ emitKpiEvent } = require('./kpiEventEmitter')); } catch (_) {}
 
-// ── DreamTown SSOT Template (Phase 1 확정 — 절대 수정 금지) ──────
-const TEMPLATE = `A soft 2D watercolor illustration in Ghibli-inspired and Korean manhwa style.
+// ── SSOT v1 확정: 3-레이어 프롬프트 ─────────────────────────────
+// BASE × GEM × EMOTION = 16가지 조합
+// "하나의 여수를 16번 다르게 느끼게 한다"
 
-Scene:
-{scene_description}
+const BASE_PROMPT =
+`A soft watercolor illustration in a Ghibli-inspired Korean style.
 
-A single small glowing star is placed at the end of the viewer's gaze.
-The star is subtle, warm, and not dominant.
+Inside a cable car at night in Yeosu, a person is sitting quietly, seen from behind.
 
-Mood:
-Calm, quiet, emotional, and slightly hopeful.
+Outside the window, the Yeosu night sea spreads out, with city lights reflecting like stars on the water.
 
-The atmosphere should feel like a gentle emotional moment,
-not dramatic, not exaggerated.
+The person is holding a small glowing light in their hands, representing their wish.
 
-Style constraints:
-- 2D only
-- watercolor texture
-- soft edges
-- no photorealism
-- no 3D
-- no sharp contrast
-- no excessive detail
+The atmosphere is emotional, calm, and slightly magical.
 
-Color palette:
-Deep navy, soft purple, gentle pink glow
+2D illustration, soft lighting, no realistic or 3D style.`;
 
-Composition:
-One single scene only.
-No complex storytelling.
-No multiple focal points.
-
-Add minimal Korean text at the bottom:
-
-"{emotion_text}"`;
-
-// ── SSOT: emotion type → 여수 장면 ───────────────────────────────
-const SCENE_MAP = {
-  healing: `A calm night sea in Yeosu with gentle waves reflecting soft lights.
-The horizon is quiet and peaceful.`,
-
-  clarity: `A quiet night view of Yeosu city with warm glowing lights.
-The atmosphere is calm and still.`,
-
-  hope: `Inside a cable car at night above the sea in Yeosu.
-Soft city lights glow below, and the sea reflects them gently.
-The perspective feels immersive and quiet.`,
+// 보석 레이어 — 빛의 색깔/질감
+const GEM_PROMPT = {
+  crystal:  `The light is transparent and softly diffused, with subtle rainbow reflections spreading gently.`,
+  ruby:     `The light glows with a warm red tone, soft and emotional, like a gentle heartbeat.`,
+  emerald:  `The light has a soft green glow, natural and healing, like a quiet forest breath.`,
+  sapphire: `The light shines with a deep blue tone, calm and thoughtful, like the night sky.`,
 };
 
-// ── emotion text → type 변환 ──────────────────────────────────────
+// 감정 레이어 — 분위기
+const EMOTION_PROMPT = {
+  '설렘':   `The atmosphere feels slightly bright and sparkling, with soft glowing particles floating in the air.`,
+  '편안함': `The atmosphere is calm, stable, and gently dim, with smooth and quiet lighting.`,
+  '기대':   `The atmosphere feels open and expanding, with soft light spreading outward into the distance.`,
+  '정리됨': `The atmosphere is deep and still, with minimal movement and a quiet sense of clarity.`,
+};
+
+// 역방향 맵 (generateShareImage 하위 호환 — display text → emotion key)
+const EMOTION_TEXT_REVERSE_MAP = Object.fromEntries(
+  Object.entries({
+    '설렘':   '괜찮아졌어요 ✨',
+    '편안함': '조금 가벼워졌어요',
+    '기대':   '기대가 별이 됐어요',
+    '정리됨': '지금이 괜찮아요',
+  }).map(([k, v]) => [v, k])
+);
+
+// SSOT: 프롬프트 조합 (BASE + GEM + EMOTION)
+function buildPrompt(emotionKey, gem_type = 'ruby') {
+  const gemPart     = GEM_PROMPT[gem_type]     || GEM_PROMPT.ruby;
+  const emotionPart = EMOTION_PROMPT[emotionKey] || EMOTION_PROMPT['설렘'];
+  return `${BASE_PROMPT}\n\n${gemPart}\n\n${emotionPart}`;
+}
+
+// 프롬프트 검수 (핵심 3요소 필수)
+function validatePrompt(prompt) {
+  if (!prompt.includes('cable car'))     return false;
+  if (!prompt.includes('person'))        return false;
+  if (!prompt.includes('glowing light')) return false;
+  if (prompt.split('\n').length < 8)     return false;
+  return true;
+}
+
+// Fallback 프롬프트 (content_policy 재시도 — 한글 제거)
+function buildFallbackPrompt(emotionKey, gem_type = 'ruby') {
+  const gemPart = GEM_PROMPT[gem_type] || GEM_PROMPT.ruby;
+  return `A soft 2D watercolor illustration.
+
+Inside a cable car at night above the sea in Yeosu. A person seen from behind, holding a glowing light in their hands.
+
+${gemPart}
+
+Style: 2D watercolor, soft edges, no photorealism, no 3D.
+Color palette: Deep navy, soft purple, gentle glow.
+Mood: Calm, quiet, emotional.`;
+}
+
+// 하위 호환 — 기존 코드가 emotionText(display)로 호출하는 경우 대비
 function getEmotionType(emotion) {
   if (emotion.includes('가벼') || emotion.includes('괜찮')) return 'healing';
   if (emotion.includes('정리') || emotion.includes('또렷'))  return 'clarity';
   return 'hope';
 }
-
-// ── 프롬프트 생성 (emotion display text 입력) ─────────────────────
-function buildPrompt(emotion) {
-  const type  = getEmotionType(emotion);
-  const scene = SCENE_MAP[type];
-  return TEMPLATE
-    .replace('{scene_description}', scene.trim())
-    .replace('{emotion_text}', emotion);
-}
-
-// ── 프롬프트 검수 ─────────────────────────────────────────────────
-function validatePrompt(prompt) {
-  if (!prompt.includes('single small glowing star')) return false;
-  if (prompt.split('\n').length < 10)                return false;
-  return true;
-}
-
-// Fallback 프롬프트 (content_policy 재시도 — 한글 제거, 같은 scene 규칙)
-function buildFallbackPrompt(emotion) {
-  const type  = getEmotionType(emotion);
-  const scene = SCENE_MAP[type];
-  return `A soft 2D watercolor illustration.
-
-Scene:
-${scene.trim()}
-
-Style: 2D watercolor, soft edges, no photorealism, no 3D, no sharp contrast.
-Color palette: Deep navy, soft purple, gentle pink glow.
-Focus: A single small glowing star placed subtly in the scene.
-Mood: Calm, quiet, hopeful.`;
-}
+const SCENE_MAP = {
+  healing: `A calm night sea in Yeosu with gentle waves reflecting soft lights.`,
+  clarity: `A quiet night view of Yeosu city with warm glowing lights.`,
+  hope:    `Inside a cable car at night above the sea in Yeosu.`,
+};
 
 // ── SSOT: 감정 키 → 이미지 텍스트 ───────────────────────────────
 const EMOTION_TEXT_MAP = {
@@ -294,20 +292,20 @@ function _emitFailure(errorType, emotionType, source) {
 const RETRYABLE = new Set(['timeout', 'rate_limit', 'unknown']);
 
 // ── API 1: star 연동 생성 (POST /api/star/create 비동기) ──────────
-async function generateStarImage(starId, emotion, location) {
+async function generateStarImage(starId, emotion, location, gem_type = 'ruby') {
   if (!getOpenAI()) return null;
 
   const emotionText    = EMOTION_TEXT_MAP[emotion] ?? DEFAULT_EMOTION_TEXT;
   const emotionType    = getEmotionType(emotionText);
-  const primaryPrompt  = buildPrompt(emotionText);
-  const fallbackPrompt = buildFallbackPrompt(emotionText);
+  const primaryPrompt  = buildPrompt(emotion, gem_type);
+  const fallbackPrompt = buildFallbackPrompt(emotion, gem_type);
 
   if (!validatePrompt(primaryPrompt)) {
     console.error('[ImageGen] 프롬프트 검수 실패 — SSOT 위반');
     return null;
   }
 
-  console.log(`[ImageGen] star 시작 | star:${starId} | emotion:${emotion} | type:${emotionType}`);
+  console.log(`[ImageGen] star 시작 | star:${starId} | emotion:${emotion} | gem:${gem_type} | type:${emotionType}`);
 
   const { url: imageUrl, error_type } = await _callDallEWithFallback(primaryPrompt, fallbackPrompt);
 
@@ -340,12 +338,14 @@ async function generateStarImage(starId, emotion, location) {
 }
 
 // ── API 2: 공유용 온디맨드 생성 (POST /api/generate-share-image) ──
-async function generateShareImage(location, emotionText) {
+async function generateShareImage(location, emotionText, gem_type = 'ruby') {
   if (!location || !emotionText) throw new Error('location, emotionText 필수');
 
+  // emotionText가 display text로 들어온 경우 key로 역변환 (하위 호환)
+  const emotionKey     = EMOTION_TEXT_REVERSE_MAP[emotionText] || emotionText;
   const emotionType    = getEmotionType(emotionText);
-  const primaryPrompt  = buildPrompt(emotionText);
-  const fallbackPrompt = buildFallbackPrompt(emotionText);
+  const primaryPrompt  = buildPrompt(emotionKey, gem_type);
+  const fallbackPrompt = buildFallbackPrompt(emotionKey, gem_type);
   const fbUrl          = TYPE_FALLBACK_URLS[emotionType] ?? FALLBACK_DEFAULT;
 
   if (!validatePrompt(primaryPrompt)) {
@@ -353,7 +353,7 @@ async function generateShareImage(location, emotionText) {
     return { image_url: fbUrl, image_id: null, location: emotionType, is_fallback: true, fallback_reason: 'prompt_validation_failed' };
   }
 
-  console.log(`[ImageGen] share 시작 | type:${emotionType} | text:${emotionText?.slice(0, 20)}`);
+  console.log(`[ImageGen] share 시작 | type:${emotionType} | key:${emotionKey} | gem:${gem_type}`);
 
   if (!getOpenAI()) {
     _log({ status: 'fallback', emotionType, emotion: emotionText, reason: 'no_api_key' });
@@ -410,5 +410,5 @@ module.exports = {
   EMOTION_TEXT_MAP,
   LOCATION_NORMALIZE,
   FALLBACK_IMAGE_URLS,
-  PROMPT_TEMPLATE: TEMPLATE,
+  PROMPT_TEMPLATE: null,
 };

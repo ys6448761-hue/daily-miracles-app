@@ -541,7 +541,7 @@
         const res  = await fetch('/api/star/preview', {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ emotion: selectedEmotion, origin_location: loc }),
+          body:    JSON.stringify({ emotion: selectedEmotion, origin_location: loc, gem_type: selectedGem }),
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'preview 실패');

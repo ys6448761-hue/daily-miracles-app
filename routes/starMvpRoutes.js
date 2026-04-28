@@ -385,7 +385,7 @@ router.get('/:access_key', async (req, res) => {
 // 감정 입력 → 이미지 생성만 (star 저장 없음)
 router.post('/preview', async (req, res) => {
   try {
-    const { emotion, origin_location = 'cablecar' } = req.body;
+    const { emotion, origin_location = 'cablecar', gem_type = 'ruby' } = req.body;
     if (!emotion) return res.status(400).json({ success: false, error: 'emotion 필수' });
 
     const emotionText = EMOTION_TEXT_MAP[emotion] ?? '괜찮아졌어요 ✨';
@@ -394,7 +394,7 @@ router.post('/preview', async (req, res) => {
 
     if (generateShareImage) {
       try {
-        const result = await generateShareImage(origin_location, emotionText);
+        const result = await generateShareImage(origin_location, emotionText, gem_type);
         image_url   = result.image_url;
         is_fallback  = result.is_fallback ?? false;
       } catch { /* fallback 유지 */ }
