@@ -929,6 +929,15 @@ app.get('/growth-film', (req, res) => {
 app.get('/star-entry', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'star-entry.html'));
 });
+
+// /entry?loc=cablecar → v2 케이블카 플로우 (star-entry.html) 로 리다이렉트
+// v1 DreamTown SPA EntryPage.jsx를 건드리지 않고 QR 진입만 v2로 전환
+app.get('/entry', (req, res, next) => {
+  if (req.query.loc === 'cablecar') {
+    return res.redirect(302, '/star-entry.html?loc=yeosu_cablecar');
+  }
+  next(); // cablecar 외 loc → DT SPA로 위임
+});
 // /star/:id → DreamTown SPA (StarDetail) 로 위임
 // 이전 star-view.html 서빙 라우트는 DT_SPA_ROUTES(/star/*) 보다 앞에 있어
 // 구버전 HTML이 서빙되어 500을 유발하므로 제거 (DT_SPA_ROUTES가 대신 처리)

@@ -402,6 +402,12 @@
     // ── FLOW: 단 하나의 진실 (SSOT 확정 순서) ──────────────
     const FLOW = { EMOTION:1, GEM:2, WISH:3, AURUM:4, GENERATING:5, RESULT:6, PROMISE:7, ASCEND:8, SHARE:9 };
 
+    // ── reset=1: 테스트/재시작용 — localStorage 전체 초기화 ──
+    const _urlParams = new URLSearchParams(window.location.search);
+    if (_urlParams.get('reset') === '1') {
+      ['flow_step','access_key','star_id','emotion_linked','share_image_url','origin_location'].forEach(k => localStorage.removeItem(k));
+    }
+
     // ── 역진입 차단: 이미 완성된 흐름이면 complete로 복귀 ──
     // (뒤로가기/새로고침 시 감정 패널 재등장 방지)
     const _existingStep = Number(localStorage.getItem('flow_step') || 0);
