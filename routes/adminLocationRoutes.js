@@ -12,18 +12,22 @@ const router = require('express').Router();
 const db     = require('../database/db');
 
 const LOCATION_META = {
-  lattoa:           { name: '라또아 카페',        emoji: '☕' },
+  lattoa_cafe:      { name: '라또아 카페',        emoji: '☕' },
+  lattoa:           { name: '라또아 카페',        emoji: '☕' }, // 구 코드 alias
   forestland:       { name: '더 포레스트랜드',     emoji: '🌲' },
   paransi:          { name: '파란시',              emoji: '🔵' },
   'yeosu-cablecar': { name: '여수 해상 케이블카',  emoji: '🚡' },
+  yeosu_cablecar:   { name: '여수 해상 케이블카',  emoji: '🚡' }, // snake_case alias
 };
 
-// URL 코드 → QR ?loc= 값 (dt_kpi_events.extra->>'origin_location')
+// URL 코드 → QR ?loc= 값 (dt_kpi_events.extra->>'origin_location' / stars.origin_location)
 const KPI_ORIGIN_CODE = {
-  lattoa:           'lattoa_cafe',
+  lattoa_cafe:      'lattoa_cafe',
+  lattoa:           'lattoa_cafe', // alias
   forestland:       'forestland',
   paransi:          'paransi',
   'yeosu-cablecar': 'yeosu-cablecar',
+  yeosu_cablecar:   'yeosu_cablecar',
 };
 
 const LOCATION_ADMIN_PIN = '1234';
@@ -136,7 +140,15 @@ router.get('/:code', adminGuard, async (req, res) => {
 
     const topStar = topStarRows[0] ?? null;
 
+    // recent_stars: star_name / wish_emotion 필드를 LocationAdmin.jsx 와 맞춤
+    const recentFormatted = recentRows.map(r => ({
+      ...r,
+      star_name:    r.access_key ?? r.id?.slice(0, 8),
+      wish_emotion: r.emotion,
+    }));
+
     return res.json({
+      // ── 구조화 응답 (SSOT) ──────────────────────────────
       location: { code, ...meta },
       stats: {
         today_stars:     todayStars,
@@ -147,7 +159,13 @@ router.get('/:code', adminGuard, async (req, res) => {
         ? { wish_text: topStar.wish_text, star_name: topStar.access_key ?? topStar.id?.slice(0, 8), resonance_count: parseInt(topStar.resonance_count, 10) }
         : null,
       emotion_top3: emotionRows.map(r => ({ emotion: r.emotion, count: parseInt(r.cnt, 10) })),
-      recent_stars: recentRows,
+      recent_stars: recentFormatted,
+      // ── flat 별칭 (LocationAdmin.jsx 컴포넌트 호환) ──────
+      place_label:      meta.name,
+      today_count:      todayStars,
+      total_count:      totalStars,
+      resonance_total:  totalResonance,
+      summary_sentence: topStar?.wish_text ?? '오늘의 첫 별을 기다리고 있어요',
     });
   } catch (err) {
     console.error(`[admin/dt/location/${code}] 예상치 못한 에러:`, err.stack);

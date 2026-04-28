@@ -3,10 +3,12 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const PLACE_EMOJI = {
-  lattoa:         '☕',
-  forestland:     '🌿',
-  paransi:        '🌊',
+  lattoa_cafe:      '☕',
+  lattoa:           '☕', // alias
+  forestland:       '🌿',
+  paransi:          '🌊',
   'yeosu-cablecar': '🚡',
+  yeosu_cablecar:   '🚡',
 };
 
 export default function LocationAdmin() {
@@ -20,8 +22,8 @@ export default function LocationAdmin() {
 
   useEffect(() => {
     const url = token
-      ? `/api/dt/admin/location/${encodeURIComponent(loc)}?token=${encodeURIComponent(token)}`
-      : `/api/dt/admin/location/${encodeURIComponent(loc)}`;
+      ? `/api/admin/dt/location/${encodeURIComponent(loc)}?token=${encodeURIComponent(token)}`
+      : `/api/admin/dt/location/${encodeURIComponent(loc)}`;
 
     fetch(url)
       .then(r => r.json())
