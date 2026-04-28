@@ -412,8 +412,12 @@ router.post('/preview', async (req, res) => {
 // preview_image_url이 있으면 그대로 moment.image_url로 연결
 router.post('/commit', async (req, res) => {
   try {
-    const { emotion, origin_location = 'cablecar', preview_image_url, phone_number } = req.body;
+    const { emotion, origin_location = 'cablecar', preview_image_url, phone_number,
+            wish_text, gem_type } = req.body;
     if (!emotion) return res.status(400).json({ success: false, error: 'emotion 필수' });
+
+    const _wishText = (wish_text && wish_text.trim()) || emotion || '케이블카 별';
+    const _gemType  = gem_type || 'cablecar';
 
     // Star 생성 (access_key 충돌 시 최대 3회 재시도)
     let access_key, inserted;
@@ -424,9 +428,9 @@ router.post('/commit', async (req, res) => {
           `INSERT INTO stars
              (id, user_id, wish_text, gem_type, status, access_key, origin_location, emotion, is_public, phone_number)
            VALUES
-             (gen_random_uuid(), $1, $2, 'cablecar', 'PRE-ON', $3, $4, $5, false, $6)
+             (gen_random_uuid(), $1, $2, $3, 'PRE-ON', $4, $5, $6, false, $7)
            RETURNING id, access_key, created_at`,
-          [crypto.randomUUID(), emotion || '케이블카 별', access_key, origin_location, emotion || null, phone_number || null]
+          [crypto.randomUUID(), _wishText, _gemType, access_key, origin_location, emotion || null, phone_number || null]
         );
         inserted = rows[0];
         break;
@@ -437,9 +441,9 @@ router.post('/commit', async (req, res) => {
             `INSERT INTO stars
                (id, user_id, wish_text, gem_type, status, access_key, origin_location, emotion, is_public)
              VALUES
-               (gen_random_uuid(), $1, $2, 'cablecar', 'PRE-ON', $3, $4, $5, false)
+               (gen_random_uuid(), $1, $2, $3, 'PRE-ON', $4, $5, $6, false)
              RETURNING id, access_key, created_at`,
-            [crypto.randomUUID(), emotion || '케이블카 별', access_key, origin_location, emotion || null]
+            [crypto.randomUUID(), _wishText, _gemType, access_key, origin_location, emotion || null]
           );
           inserted = rows2[0];
           break;
