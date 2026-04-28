@@ -12,27 +12,9 @@
  * 집계 SSOT: stars.origin_location
  */
 
-const router = require('express').Router();
-const db     = require('../database/db');
-
-const LOCATION_META = {
-  lattoa_cafe:      { name: '라또아 카페',        emoji: '☕' },
-  lattoa:           { name: '라또아 카페',        emoji: '☕' }, // 구 코드 alias
-  forestland:       { name: '더 포레스트랜드',     emoji: '🌲' },
-  paransi:          { name: '파란시',              emoji: '🔵' },
-  'yeosu-cablecar': { name: '여수 해상 케이블카',  emoji: '🚡' },
-  yeosu_cablecar:   { name: '여수 해상 케이블카',  emoji: '🚡' }, // snake_case alias
-};
-
-// URL 코드 → QR ?loc= 값 (dt_kpi_events.extra->>'origin_location' / stars.origin_location)
-const KPI_ORIGIN_CODE = {
-  lattoa_cafe:      'lattoa_cafe',
-  lattoa:           'lattoa_cafe', // alias
-  forestland:       'forestland',
-  paransi:          'paransi',
-  'yeosu-cablecar': 'yeosu-cablecar',
-  yeosu_cablecar:   'yeosu_cablecar',
-};
+const router   = require('express').Router();
+const db       = require('../database/db');
+const registry = require('../config/locationRegistry');
 
 const LOCATION_ADMIN_PIN = '1234';
 
@@ -51,13 +33,12 @@ function adminGuard(req, res, next) {
 // GET /api/admin/dt/location/:code
 router.get('/:code', adminGuard, async (req, res) => {
   const { code } = req.params;
-  const meta = LOCATION_META[code];
+  const meta = registry.resolve(code);
   if (!meta) {
     return res.status(404).json({ error: `알 수 없는 장소: ${code}` });
   }
 
-  // QR URL: ?loc=lattoa_cafe → stars.origin_location & dt_kpi_events.extra->>'origin_location'
-  const kpiCode = KPI_ORIGIN_CODE[code] ?? code;
+  const kpiCode = registry.getKpiCode(code);
 
   const log = (label, err) =>
     console.error(`[admin/dt/location/${code}] ${label} 실패:`, err.code, err.message);
@@ -168,7 +149,7 @@ router.get('/:code', adminGuard, async (req, res) => {
 
     return res.json({
       // ── 구조화 응답 (SSOT) ──────────────────────────────
-      location: { code, ...meta },
+      location: { code: meta.code, name: meta.name_ko, emoji: meta.emoji, venue_type: meta.venue_type, status: meta.status },
       stats: {
         today_stars:          todayStars,
         total_stars:          totalStars,
@@ -183,7 +164,7 @@ router.get('/:code', adminGuard, async (req, res) => {
       emotion_top3: emotionRows.map(r => ({ emotion: r.emotion, count: parseInt(r.cnt, 10) })),
       recent_stars: recentFormatted,
       // ── flat 별칭 (LocationAdmin.jsx 컴포넌트 호환) ──────
-      place_label:          meta.name,
+      place_label:          meta.name_ko,
       today_count:          todayStars,
       total_count:          totalStars,
       resonance_total:      totalResonance,
@@ -199,25 +180,13 @@ router.get('/:code', adminGuard, async (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────
-// QR 이미지 경로 맵 (public/qr/ 기준)
-// ─────────────────────────────────────────────────────────────────────
-const LOCATION_QR = {
-  lattoa_cafe:      { image: '/qr/QR_라또아.png',       download: 'QR_라또아.png' },
-  forestland:       { image: '/qr/QR_포레스트랜드.png', download: 'QR_포레스트랜드.png' },
-  paransi:          { image: '/qr/QR_파란시.png',       download: 'QR_파란시.png' },
-  'yeosu-cablecar': { image: '/qr/QR_케이블카.png',     download: 'QR_케이블카.png' },
-  yeosu_cablecar:   { image: '/qr/QR_케이블카.png',     download: 'QR_케이블카.png' },
-};
-
-// ─────────────────────────────────────────────────────────────────────
 // GET /api/admin/dt/location/:code/today — 오늘 탄생 별 목록
 // ─────────────────────────────────────────────────────────────────────
 router.get('/:code/today', adminGuard, async (req, res) => {
   const { code } = req.params;
-  const meta = LOCATION_META[code];
-  if (!meta) return res.status(404).json({ error: `알 수 없는 장소: ${code}` });
+  if (!registry.resolve(code)) return res.status(404).json({ error: `알 수 없는 장소: ${code}` });
 
-  const kpiCode = KPI_ORIGIN_CODE[code] ?? code;
+  const kpiCode = registry.getKpiCode(code);
   try {
     const r = await db.query(`
       SELECT id,
@@ -241,10 +210,9 @@ router.get('/:code/today', adminGuard, async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────
 router.get('/:code/stars', adminGuard, async (req, res) => {
   const { code } = req.params;
-  const meta = LOCATION_META[code];
-  if (!meta) return res.status(404).json({ error: `알 수 없는 장소: ${code}` });
+  if (!registry.resolve(code)) return res.status(404).json({ error: `알 수 없는 장소: ${code}` });
 
-  const kpiCode = KPI_ORIGIN_CODE[code] ?? code;
+  const kpiCode = registry.getKpiCode(code);
   const limit  = Math.min(Number(req.query.limit)  || 100, 200);
   const offset = Math.max(Number(req.query.offset) || 0,   0);
   const status = req.query.status;
@@ -286,11 +254,10 @@ router.get('/:code/stars', adminGuard, async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────
 router.get('/:code/ops', adminGuard, async (req, res) => {
   const { code } = req.params;
-  const meta = LOCATION_META[code];
+  const meta = registry.resolve(code);
   if (!meta) return res.status(404).json({ error: `알 수 없는 장소: ${code}` });
 
-  const kpiCode = KPI_ORIGIN_CODE[code] ?? code;
-  const qrMeta  = LOCATION_QR[code] ?? {};
+  const kpiCode = registry.getKpiCode(code);
 
   try {
     const r = await db.query(`
@@ -305,12 +272,10 @@ router.get('/:code/ops', adminGuard, async (req, res) => {
     const row = r.rows[0];
     res.json({
       success:         true,
-      location:        { code, ...meta },
+      location:        { code: meta.code, name: meta.name_ko, emoji: meta.emoji, venue_type: meta.venue_type, status: meta.status },
       ssot_field:      'stars.origin_location',
       origin_location: kpiCode,
       qr_url:          `https://app.dailymiracles.kr/star-entry.html?loc=${kpiCode}`,
-      qr_image_path:   qrMeta.image ?? null,
-      qr_download_name: qrMeta.download ?? null,
       stats: {
         total_stars:   parseInt(row.total_stars, 10),
         activated:     parseInt(row.activated,   10),
