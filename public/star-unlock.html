@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>당신의 별이 깨어납니다 — 하루하루의 기적</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      color: #fff;
+    }
+    .container { max-width: 480px; width: 100%; text-align: center; }
+
+    .panel { display: block; }
+    .panel.hidden { display: none; }
+
+    /* ── Welcome ── */
+    .star-anim {
+      font-size: 72px;
+      display: block;
+      margin-bottom: 24px;
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50%       { transform: scale(1.12); opacity: 0.85; }
+    }
+    .welcome-title {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .welcome-sub {
+      font-size: 15px;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.8;
+    }
+
+    /* ── Reveal ── */
+    .reveal-label {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 24px;
+      line-height: 1.8;
+    }
+    .wish-card {
+      background: rgba(255,255,255,0.05);
+      border: 1.5px solid rgba(255,220,100,0.22);
+      border-radius: 20px;
+      padding: 28px 24px;
+      margin-bottom: 28px;
+      box-shadow: 0 0 40px rgba(255,200,80,0.06);
+    }
+    .emotion-badge {
+      display: inline-block;
+      padding: 6px 18px;
+      background: rgba(255,220,80,0.1);
+      border: 1px solid rgba(255,220,80,0.28);
+      border-radius: 20px;
+      font-size: 14px;
+      color: #ffe899;
+      margin-bottom: 18px;
+    }
+    .promise-text {
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.65;
+      margin-bottom: 16px;
+    }
+    .date-hint {
+      font-size: 12px;
+      color: rgba(255,255,255,0.3);
+    }
+    .btn-gold {
+      width: 100%;
+      padding: 17px;
+      background: transparent;
+      border: 1.5px solid rgba(255,220,80,0.4);
+      border-radius: 14px;
+      color: #ffe899;
+      font-size: 17px;
+      font-weight: 600;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      transition: background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-gold:active { background: rgba(255,220,80,0.08); }
+
+    /* ── Reflect ── */
+    .question {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.65;
+      margin-bottom: 36px;
+    }
+    .choice-list { display: flex; flex-direction: column; gap: 12px; }
+    .choice-btn {
+      padding: 18px 20px;
+      background: rgba(255,255,255,0.07);
+      border: 1.5px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 500;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .choice-btn.selected {
+      background: rgba(255,220,80,0.1);
+      border-color: rgba(255,220,80,0.4);
+      color: #ffe899;
+    }
+
+    /* ── Evolve ── */
+    .evolve-wrap {
+      position: relative;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+    .evolve-star {
+      font-size: 84px;
+      position: relative;
+      z-index: 2;
+      animation: evolve 2.8s ease-out forwards;
+    }
+    @keyframes evolve {
+      0%   { transform: scale(0.5);   filter: brightness(0.4); opacity: 0.4; }
+      35%  { transform: scale(1.5);   filter: brightness(2) drop-shadow(0 0 28px rgba(255,220,80,1)); opacity: 1; }
+      65%  { transform: scale(1.15);  filter: brightness(1.5) drop-shadow(0 0 18px rgba(255,200,80,0.7)); }
+      100% { transform: scale(1);     filter: brightness(1.2) drop-shadow(0 0 12px rgba(255,200,80,0.4)); }
+    }
+    .evolve-rings {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,220,80,0.28);
+      animation: ring-expand 2s ease-out forwards;
+    }
+    .ring:nth-child(1) { width: 120px; height: 120px; animation-delay: 0.3s; }
+    .ring:nth-child(2) { width: 190px; height: 190px; animation-delay: 0.65s; }
+    .ring:nth-child(3) { width: 260px; height: 260px; animation-delay: 1s; }
+    @keyframes ring-expand {
+      0%   { transform: scale(0); opacity: 0.9; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+    .evolve-msg {
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffe899;
+      text-shadow: 0 0 20px rgba(255,200,80,0.4);
+      line-height: 1.6;
+      animation: fadeInUp 0.5s ease 1.6s both;
+    }
+    .evolve-sub {
+      margin-top: 10px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.7;
+      animation: fadeInUp 0.5s ease 2.1s both;
+    }
+
+    /* ── Share ── */
+    .share-star { font-size: 56px; display: block; margin-bottom: 20px; }
+    .share-title {
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+    .share-sub {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+    .btn-kakao {
+      width: 100%;
+      padding: 16px;
+      background: #FEE500;
+      border: none;
+      border-radius: 14px;
+      color: #191919;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      transition: opacity 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-kakao:active { opacity: 0.85; }
+    .share-error {
+      display: none;
+      margin-bottom: 10px;
+      padding: 12px 16px;
+      background: rgba(255,220,80,0.07);
+      border-radius: 10px;
+      font-size: 12px;
+      color: rgba(255,220,80,0.65);
+      text-align: center;
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+    .btn-copy {
+      display: none;
+      width: 100%;
+      padding: 13px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 12px;
+      color: rgba(255,255,255,0.55);
+      font-size: 14px;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      margin-bottom: 8px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .copy-toast {
+      display: none;
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 8px;
+    }
+    .btn-view {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 12px;
+      color: rgba(255,255,255,0.65);
+      font-size: 15px;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .btn-view:active { opacity: 0.75; }
+
+    /* ── Utilities ── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeInUp 0.45s ease both; }
+    .error-page {
+      text-align: center;
+      color: rgba(255,255,255,0.55);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Panel 1: Welcome back -->
+    <div class="panel" id="panelWelcome">
+      <span class="star-anim">⭐</span>
+      <h1 class="welcome-title" id="welcomeTitle">이 마음이 다시<br>당신을 찾았어요</h1>
+      <p class="welcome-sub" id="welcomeSub">잠들어 있던 당신의 별이<br>깨어날 시간이에요</p>
+    </div>
+
+    <!-- Panel 2: Original wish reveal -->
+    <div class="panel hidden" id="panelReveal">
+      <p class="reveal-label">3개월 전, 이 순간의 당신이<br>남긴 마음이에요</p>
+      <div class="wish-card">
+        <span class="emotion-badge" id="emotionBadge">—</span>
+        <p class="promise-text" id="promiseText"></p>
+        <p class="date-hint" id="dateHint"></p>
+      </div>
+      <button class="btn-gold" id="btnToReflect">지금의 마음 담기 →</button>
+    </div>
+
+    <!-- Panel 3: Reflection choice -->
+    <div class="panel hidden" id="panelReflect">
+      <p class="question">그때의 당신과,<br>지금의 당신은 어떤가요?</p>
+      <div class="choice-list">
+        <button class="choice-btn" data-val="closer">🌱 조금 가까워졌어요</button>
+        <button class="choice-btn" data-val="same">🌙 그대로예요</button>
+        <button class="choice-btn" data-val="changed">🌀 생각이 달라졌어요</button>
+      </div>
+    </div>
+
+    <!-- Panel 4: Star evolution -->
+    <div class="panel hidden" id="panelEvolve">
+      <div class="evolve-wrap">
+        <div class="evolve-rings">
+          <div class="ring"></div>
+          <div class="ring"></div>
+          <div class="ring"></div>
+        </div>
+        <span class="evolve-star" id="evolveStar">⭐</span>
+      </div>
+      <p class="evolve-msg" id="evolveMsg"></p>
+      <p class="evolve-sub" id="evolveSub"></p>
+    </div>
+
+    <!-- Panel 5: Share -->
+    <div class="panel hidden" id="panelShare">
+      <span class="share-star">✨</span>
+      <p class="share-title">이 마음을, 누군가에게<br>전해보세요</p>
+      <p class="share-sub">당신의 별이 더 깊어진 이야기를<br>함께 나눠보세요</p>
+      <button class="btn-kakao" id="btnKakao">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M9 0C4.037 0 0 3.223 0 7.2c0 2.57 1.648 4.825 4.127 6.108l-1.05 3.894c-.092.342.305.608.603.396l4.684-3.127A10.9 10.9 0 009 14.4c4.963 0 9-3.223 9-7.2S13.963 0 9 0z"
+            fill="#191919"/>
+        </svg>
+        친구에게 공유하기
+      </button>
+      <div class="share-error" id="shareError"></div>
+      <button class="btn-copy" id="btnCopy">링크 복사</button>
+      <div class="copy-toast" id="copyToast">링크가 복사됐어요 ✓</div>
+      <a class="btn-view" id="btnView" href="#">내 별 보러 가기 →</a>
+    </div>
+
+  </div>
+
+  <script>
+    const KAKAO_KEY = '8557586f56efb74719c1738c31beda97';
+    const BASE_URL  = 'https://app.dailymiracles.kr';
+
+    const params    = new URLSearchParams(window.location.search);
+    const accessKey = params.get('key') || localStorage.getItem('access_key') || '';
+    const loc       = params.get('loc') || localStorage.getItem('origin_location') || '';
+
+    if (!accessKey) window.location.href = '/star-entry.html';
+
+    // ── Panels ──────────────────────────────────────────────
+    function showPanel(id) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden'));
+      const el = document.getElementById(id);
+      if (el) { el.classList.remove('hidden'); el.classList.add('fade-in'); }
+    }
+
+    // ── Data ─────────────────────────────────────────────────
+    let starId    = null;
+    let imageUrl  = '';
+    let originLoc = loc;
+
+    const RESPONSE_COPY = {
+      closer:  { msg: '당신의 별이, 더 깊어졌어요',       sub: '그 마음이 조금씩 현실이 되고 있어요' },
+      same:    { msg: '당신의 별이, 여전히 빛나고 있어요', sub: '그 자리에서 기다려온 마음이에요' },
+      changed: { msg: '당신의 별이, 새로워졌어요',         sub: '달라진 마음도, 별이 되어 남아요' },
+    };
+
+    function fmtDate(str) {
+      const d = new Date(str);
+      return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
+    }
+
+    // ── Load star ─────────────────────────────────────────────
+    (async () => {
+      try {
+        const res  = await fetch(`/api/star/${encodeURIComponent(accessKey)}`);
+        const data = await res.json();
+        if (!data.success) { showError(); return; }
+
+        const star = data.star;
+        starId     = star.id;
+        imageUrl   = data.image_url || '';
+        originLoc  = star.origin_location || loc;
+
+        document.getElementById('emotionBadge').textContent = star.emotion || '케이블카 별';
+
+        const latestPromise = data.promises?.[0];
+        document.getElementById('promiseText').textContent =
+          latestPromise?.content || `${star.emotion || '이 마음'}으로 남긴 별이에요`;
+
+        document.getElementById('dateHint').textContent = fmtDate(star.created_at);
+        document.getElementById('btnView').href = `/star-view.html?key=${encodeURIComponent(accessKey)}`;
+
+        // Returning visitor messaging
+        if (data.last_reflection) {
+          document.getElementById('welcomeTitle').textContent = '다시 만났네요 ✨';
+          document.getElementById('welcomeSub').textContent   = '당신의 별이 또다시 기다리고 있어요';
+        }
+      } catch { showError(); }
+    })();
+
+    function showError() {
+      document.querySelector('.container').innerHTML = `
+        <div class="error-page">
+          <p style="font-size:40px;margin-bottom:16px">🌌</p>
+          <p>별을 찾을 수 없어요.<br>처음부터 시작해볼까요?</p>
+          <a href="/star-entry.html" style="display:inline-block;margin-top:24px;color:#a8c8ff;font-size:14px">별 만들러 가기 →</a>
+        </div>`;
+    }
+
+    // ── Flow ─────────────────────────────────────────────────
+    showPanel('panelWelcome');
+    setTimeout(() => showPanel('panelReveal'), 2200);
+
+    document.getElementById('btnToReflect').addEventListener('click', () => showPanel('panelReflect'));
+
+    document.querySelectorAll('.choice-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.classList.contains('selected')) return;
+        btn.classList.add('selected');
+
+        const response = btn.dataset.val;
+
+        if (starId) {
+          fetch('/api/star/reflect', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ star_id: starId, status: response }),
+          }).catch(() => {});
+        }
+
+        const copy = RESPONSE_COPY[response] || RESPONSE_COPY.same;
+        document.getElementById('evolveMsg').textContent = copy.msg;
+        document.getElementById('evolveSub').textContent = copy.sub;
+
+        setTimeout(() => {
+          showPanel('panelEvolve');
+          // Restart CSS animation
+          const starEl = document.getElementById('evolveStar');
+          starEl.style.animation = 'none';
+          void starEl.offsetHeight;
+          starEl.style.animation = '';
+          setTimeout(() => showPanel('panelShare'), 4200);
+        }, 320);
+      });
+    });
+
+    // ── Kakao share ───────────────────────────────────────────
+    function initKakao() {
+      if (!window.Kakao) return false;
+      try {
+        if (!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_KEY);
+        return window.Kakao.isInitialized();
+      } catch { return false; }
+    }
+
+    function buildEntryUrl() {
+      const l = originLoc || 'direct';
+      return `${BASE_URL}/star-entry.html?loc=${encodeURIComponent(l)}&from=share&ref=${encodeURIComponent(accessKey)}`;
+    }
+
+    function toAbsoluteUrl(url) {
+      if (!url || url.startsWith('blob:') || url.startsWith('data:'))
+        return `${BASE_URL}/images/fallback/star-default.svg`;
+      if (url.startsWith('http://')) return url.replace('http://', 'https://');
+      if (url.startsWith('https://')) return url;
+      return `${BASE_URL}${url.startsWith('/') ? url : '/' + url}`;
+    }
+
+    function showFallback(msg) {
+      document.getElementById('shareError').textContent = msg;
+      document.getElementById('shareError').style.display = 'block';
+      document.getElementById('btnCopy').style.display = 'block';
+    }
+
+    document.getElementById('btnKakao').addEventListener('click', () => {
+      document.getElementById('shareError').style.display = 'none';
+      const entryUrl = buildEntryUrl();
+      if (!initKakao() || !window.Kakao?.Share) {
+        showFallback('카카오톡 공유가 열리지 않았어요.\n링크를 복사해서 보내주세요.');
+        return;
+      }
+      try {
+        window.Kakao.Share.sendDefault({
+          objectType: 'feed',
+          content: {
+            title:       '내 소원이 별이 됐어요 ✨',
+            description: '3개월이 지난 지금, 그 별이 더 깊어졌어요',
+            imageUrl:    toAbsoluteUrl(imageUrl),
+            link: { mobileWebUrl: entryUrl, webUrl: entryUrl },
+          },
+          buttons: [{ title: '나도 만들어보기', link: { mobileWebUrl: entryUrl, webUrl: entryUrl } }],
+        });
+      } catch {
+        showFallback('카카오톡 공유가 열리지 않았어요.\n링크를 복사해서 보내주세요.');
+      }
+    });
+
+    document.getElementById('btnCopy').addEventListener('click', async () => {
+      const url = buildEntryUrl();
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch {
+        const inp = document.createElement('input');
+        inp.value = url; document.body.appendChild(inp); inp.select();
+        document.execCommand('copy'); document.body.removeChild(inp);
+      }
+      const toast = document.getElementById('copyToast');
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 2200);
+    });
+  </script>
+</body>
+</html>

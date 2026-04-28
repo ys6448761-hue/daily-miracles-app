@@ -337,6 +337,25 @@
     const panelSelect  = document.getElementById('panelSelect');
     const panelPreview = document.getElementById('panelPreview');
 
+    // ── 3개월 재방문 감지 — 잠긴 별이 있으면 unlock 페이지로 ──
+    if (!isFromShare) {
+      const _existingKey = localStorage.getItem('access_key');
+      if (_existingKey && loc !== 'direct') {
+        fetch(`/api/star/${encodeURIComponent(_existingKey)}`)
+          .then(r => r.json())
+          .then(data => {
+            if (!data.success || !data.star) return;
+            const monthsElapsed = (Date.now() - new Date(data.star.created_at).getTime())
+                                  / (1000 * 60 * 60 * 24 * 30.44);
+            if (monthsElapsed >= 3) {
+              window.location.href =
+                `/star-unlock.html?key=${encodeURIComponent(_existingKey)}&loc=${encodeURIComponent(loc)}`;
+            }
+          })
+          .catch(() => {});
+      }
+    }
+
     // ── 공유 유입 인트로 ──────────────────────────────────
     if (isFromShare) {
       panelSelect.classList.add('hidden');
