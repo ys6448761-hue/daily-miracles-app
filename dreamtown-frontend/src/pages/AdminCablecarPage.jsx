@@ -1,12 +1,12 @@
 /**
- * AdminCablecarPage.jsx — 케이블카 오프라인 운영 관리
+ * AdminCablecarPage.jsx — 케이블카 별공방 운영 관리
  * 경로: /admin/cablecar
  *
- * Tab 1: 오늘 현황  — 신규 별, 각성, 최근 피드
- * Tab 2: 별 현황    — origin_type='cablecar' 별 전체 목록
+ * Tab 1: 오늘 현황  — 신규 별, 활성화, 최근 피드
+ * Tab 2: 별 현황    — stars.origin_location='yeosu_cablecar' 전체 목록
  * Tab 3: QR/운영    — QR 이미지, 연결 URL, 결제 상태
  *
- * 집계 SSOT: dt_stars.origin_type = 'cablecar'
+ * 집계 SSOT: stars.origin_location = 'yeosu_cablecar'
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -68,17 +68,10 @@ const S = {
     display: 'flex', alignItems: 'flex-start', gap: 10,
   },
   statusPill: (status) => {
-    const map = {
-      awakened: ['#4ade80', 'rgba(74,222,128,0.1)'],
-      growing:  ['#60a5fa', 'rgba(96,165,250,0.1)'],
-      created:  ['rgba(255,255,255,0.35)', 'rgba(255,255,255,0.05)'],
-    };
-    const [color, bg] = map[status] || map.created;
-    return {
-      fontSize: 10, fontWeight: 700, color, background: bg,
-      padding: '2px 8px', borderRadius: 10, flexShrink: 0,
-      border: `1px solid ${color}40`,
-    };
+    const s = (status || '').toUpperCase();
+    if (s === 'ON')     return { fontSize: 10, fontWeight: 700, color: '#4ade80', background: 'rgba(74,222,128,0.1)',  padding: '2px 8px', borderRadius: 10, flexShrink: 0, border: '1px solid rgba(74,222,128,0.25)' };
+    if (s === 'PRE-ON') return { fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: 10, flexShrink: 0, border: '1px solid rgba(255,255,255,0.1)' };
+    return               { fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.35)', background: 'rgba(255,255,255,0.04)', padding: '2px 8px', borderRadius: 10, flexShrink: 0, border: '1px solid rgba(255,255,255,0.08)' };
   },
   table: { width: '100%', borderCollapse: 'collapse', fontSize: 12 },
   th: {
@@ -187,8 +180,7 @@ function TodayTab({ token }) {
 
   const fmt = (d) => {
     if (!d) return '-';
-    const dt = new Date(d);
-    return dt.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+    return new Date(d).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
   };
 
   if (loading) return <div style={S.spin}>불러오는 중…</div>;
@@ -204,7 +196,7 @@ function TodayTab({ token }) {
       <div style={S.kpiRow}>
         {[
           { value: kpi.new_today,      label: '신규 별 생성',  accent: '#9B87F5' },
-          { value: kpi.awakened_today, label: '오늘 각성',     accent: '#4ade80' },
+          { value: kpi.awakened_today, label: '오늘 활성화',   accent: '#4ade80' },
         ].map(k => (
           <div key={k.label} style={{ ...S.kpiCard, borderColor: `${k.accent}30` }}>
             <div style={{ ...S.kpiValue, color: k.accent }}>{k.value}</div>
@@ -218,9 +210,8 @@ function TodayTab({ token }) {
       <div style={S.kpiRow}>
         {[
           { value: kpi.total_all,      label: '전체 별' },
-          { value: kpi.total_awakened, label: '각성 완료' },
-          { value: kpi.total_growing,  label: '성장 중' },
-          { value: kpi.total_pending,  label: '대기 중' },
+          { value: kpi.total_awakened, label: '활성화' },
+          { value: kpi.total_pending,  label: '미활성' },
         ].map(k => (
           <div key={k.label} style={S.kpiCard}>
             <div style={S.kpiValue}>{k.value}</div>
@@ -281,17 +272,16 @@ function StarsTab({ token }) {
   };
 
   const STATUS_OPTS = [
-    { key: 'all',      label: '전체' },
-    { key: 'awakened', label: '각성' },
-    { key: 'growing',  label: '성장' },
-    { key: 'created',  label: '대기' },
+    { key: 'all',    label: '전체' },
+    { key: 'ON',     label: '활성화' },
+    { key: 'PRE-ON', label: '미활성' },
   ];
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
         <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>
-          기준: <code style={{ color: '#9B87F5' }}>origin_type = 'cablecar'</code>
+          기준: <code style={{ color: '#9B87F5' }}>origin_location = 'yeosu_cablecar'</code>
         </div>
         {data && (
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
@@ -317,7 +307,7 @@ function StarsTab({ token }) {
           <table style={S.table}>
             <thead>
               <tr>
-                {['별 이름', '상태', '각성 횟수', '소원 (요약)', '생성일시'].map(h => (
+                {['별 이름', '상태', '소원 (요약)', '생성일시'].map(h => (
                   <th key={h} style={S.th}>{h}</th>
                 ))}
               </tr>
@@ -331,10 +321,7 @@ function StarsTab({ token }) {
                   <td style={S.td}>
                     <span style={S.statusPill(s.status)}>{s.status}</span>
                   </td>
-                  <td style={{ ...S.td, textAlign: 'center', color: '#9B87F5', fontWeight: 700 }}>
-                    {s.awaken_count ?? 0}
-                  </td>
-                  <td style={{ ...S.td, color: 'rgba(255,255,255,0.5)', maxWidth: 180 }}>
+                  <td style={{ ...S.td, color: 'rgba(255,255,255,0.5)', maxWidth: 200 }}>
                     {s.wish_preview
                       ? `"${s.wish_preview}${s.wish_preview.length >= 60 ? '…' : ''}"`
                       : <span style={{ opacity: 0.3 }}>-</span>}
@@ -346,7 +333,7 @@ function StarsTab({ token }) {
               ))}
               {data.stars.length === 0 && (
                 <tr>
-                  <td colSpan={5} style={{ ...S.td, textAlign: 'center', color: 'rgba(255,255,255,0.25)', padding: 24 }}>
+                  <td colSpan={4} style={{ ...S.td, textAlign: 'center', color: 'rgba(255,255,255,0.25)', padding: 24 }}>
                     해당 조건의 별이 없습니다
                   </td>
                 </tr>
@@ -398,7 +385,7 @@ function OpsTab({ token }) {
             accent: payment_enabled ? '#4ade80' : '#f87171',
           },
           { key: '집계 기준 필드 (SSOT)', val: ssot_field },
-          { key: '집계 값', val: `origin_type = 'cablecar'` },
+          { key: '집계 값', val: `origin_location = 'yeosu_cablecar'` },
           { key: 'QR 연결 URL', val: qr_url },
         ].map((r) => (
           <div key={r.key} style={S.opsRow}>
@@ -415,9 +402,8 @@ function OpsTab({ token }) {
       <div style={S.kpiRow}>
         {[
           { value: stats.total_stars, label: '전체 별' },
-          { value: stats.awakened,    label: '각성' },
-          { value: stats.growing,     label: '성장' },
-          { value: stats.pending,     label: '대기' },
+          { value: stats.awakened,    label: '활성화' },
+          { value: stats.pending,     label: '미활성' },
         ].map(k => (
           <div key={k.label} style={S.kpiCard}>
             <div style={S.kpiValue}>{k.value}</div>
@@ -427,14 +413,14 @@ function OpsTab({ token }) {
       </div>
 
       {/* 확장 가이드 */}
-      <div style={S.sectionTitle}>신규 장소 확장 방법</div>
+      <div style={S.sectionTitle}>신규 별공방 확장 방법</div>
       <div style={{ ...S.opsCard, fontSize: 12, lineHeight: 1.8, color: 'rgba(255,255,255,0.5)' }}>
-        <div style={{ marginBottom: 8, color: '#9B87F5', fontWeight: 700 }}>hamel / odongjae 추가 시</div>
-        <div>① <code style={{ color: '#E8E4F0' }}>cablecarRoutes.js</code> → <code style={{ color: '#E8E4F0' }}>ORIGIN_TYPE = 'hamel'</code> 로 신규 라우트 생성</div>
-        <div>② <code style={{ color: '#E8E4F0' }}>EntryPage.jsx LOC_CONFIG</code> 에 <code style={{ color: '#E8E4F0' }}>hamel: &#123;…&#125;</code> 키 추가</div>
-        <div>③ QR URL: <code style={{ color: '#E8E4F0' }}>/entry?loc=hamel</code></div>
-        <div>④ 이 관리 페이지: <code style={{ color: '#E8E4F0' }}>origin_type = 'hamel'</code> 필터만 변경</div>
-        <div style={{ marginTop: 8, color: 'rgba(255,255,255,0.3)' }}>→ 데이터 구조 변경 없음, API 파라미터화만으로 확장 가능</div>
+        <div style={{ marginBottom: 8, color: '#9B87F5', fontWeight: 700 }}>새 별공방 장소 추가 시 (예: hamel, odongjae)</div>
+        <div>① QR URL: <code style={{ color: '#E8E4F0' }}>/star-entry.html?loc=hamel</code></div>
+        <div>② <code style={{ color: '#E8E4F0' }}>star-entry.html</code> LOC_CONFIG에 <code style={{ color: '#E8E4F0' }}>hamel: &#123;…&#125;</code> 키 추가</div>
+        <div>③ <code style={{ color: '#E8E4F0' }}>AdminDashboardPage.jsx</code> WORKSHOP_CONFIGS에 <code style={{ color: '#E8E4F0' }}>locationCode: 'hamel'</code> 추가</div>
+        <div>④ 집계: <code style={{ color: '#E8E4F0' }}>stars WHERE origin_location = 'hamel'</code> — 별도 라우트 불필요</div>
+        <div style={{ marginTop: 8, color: 'rgba(255,255,255,0.3)' }}>→ stars.origin_location 기반 단일 테이블, 파라미터화만으로 확장 가능</div>
       </div>
     </div>
   );
@@ -446,7 +432,7 @@ function LoginScreen({ input, setInput, tryAuth }) {
     <div style={{ ...S.page, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ width: '100%', maxWidth: 320, textAlign: 'center' }}>
         <div style={{ fontSize: 32, marginBottom: 12 }}>🚡</div>
-        <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>케이블카 운영 관리</div>
+        <div style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>케이블카 별공방 운영</div>
         <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginBottom: 24 }}>
           관리자 토큰을 입력하세요
         </div>
@@ -474,9 +460,6 @@ function LoginScreen({ input, setInput, tryAuth }) {
         >
           접속
         </button>
-        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.2)', marginTop: 12 }}>
-          ADMIN_TOKEN 환경변수 미설정 시 자동 통과 (로컬 개발)
-        </div>
       </div>
     </div>
   );
@@ -501,16 +484,13 @@ export default function AdminCablecarPage() {
     <div style={S.page}>
       <div style={S.header}>
         <div>
-          <div style={S.title}>🚡 케이블카 운영 관리</div>
+          <div style={S.title}>🚡 케이블카 별공방 운영</div>
           <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 2 }}>
-            /admin/cablecar · origin_type = 'cablecar'
+            /admin/cablecar · stars.origin_location = 'yeosu_cablecar'
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <span style={S.badge}>DreamTown Admin</span>
-          <a href="/admin/qr-center" style={{ fontSize: 11, color: 'rgba(155,135,245,0.6)', textDecoration: 'none' }}>
-            QR 센터
-          </a>
+          <span style={S.badge}>별공방 Admin</span>
           <a href="/admin" style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', textDecoration: 'none' }}>
             대시보드
           </a>
