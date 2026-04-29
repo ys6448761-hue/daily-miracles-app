@@ -7,6 +7,7 @@
  * 사용법:
  *   node scripts/generate-star-images.js --dry-run
  *   node scripts/generate-star-images.js --location=yeosu_cablecar --gem=citrine --limit=5
+ *   node scripts/generate-star-images.js --location=yeosu_cablecar --emotion=anxiety --gem=citrine --force-regenerate
  *   node scripts/generate-star-images.js --location=yeosu_cablecar           [승인 후만]
  *
  * SSOT: docs/ssot/DreamTown_WishImage_GPT_v3.4_final.md
@@ -19,11 +20,13 @@ const https = require('https');
 const http  = require('http');
 
 // ── CLI 인자 파싱 ──────────────────────────────────────────────────
-const args     = process.argv.slice(2);
-const DRY_RUN  = args.includes('--dry-run');
-const LOCATION = (args.find(a => a.startsWith('--location=')) || '').replace('--location=', '') || 'yeosu_cablecar';
-const GEM_FILTER = (args.find(a => a.startsWith('--gem=')) || '').replace('--gem=', '') || null;
-const LIMIT    = parseInt((args.find(a => a.startsWith('--limit=')) || '').replace('--limit=', '') || '999', 10);
+const args            = process.argv.slice(2);
+const DRY_RUN         = args.includes('--dry-run');
+const FORCE_REGEN     = args.includes('--force-regenerate');
+const LOCATION        = (args.find(a => a.startsWith('--location='))  || '').replace('--location=',  '') || 'yeosu_cablecar';
+const GEM_FILTER      = (args.find(a => a.startsWith('--gem='))       || '').replace('--gem=',       '') || null;
+const EMOTION_FILTER  = (args.find(a => a.startsWith('--emotion='))   || '').replace('--emotion=',   '') || null;
+const LIMIT           = parseInt((args.find(a => a.startsWith('--limit=')) || '').replace('--limit=', '') || '999', 10);
 
 // ── 환경 설정 ──────────────────────────────────────────────────────
 const MODEL       = process.env.DREAMTOWN_IMAGE_MODEL  || 'gpt-image-1';
@@ -173,6 +176,187 @@ Not a beautiful scene — the moment when the heart unwinds.
 ${NEGATIVE_PROMPT}`;
 }
 
+// ── 커스텀 프롬프트 오버라이드 (코미 검수 후 보강 버전) ─────────────
+// 키: `${emotion}_${gem}` / 값: 직접 지정 프롬프트 (buildPrompt 대체)
+const PROMPT_OVERRIDES = {
+
+  'anxiety_citrine': `2D watercolor illustration, soft Ghibli-inspired Korean comic style,
+warm emotional atmosphere, gentle lighting, soft gradients,
+no photorealism, no 3D, no text, no captions, no watermarks.
+
+[SCENE]
+View from inside a cable car cabin (interior, NOT external/aerial),
+visible window frame with cable car handles on both sides,
+window framing the Yeosu night sea wrapped in soft mist,
+a single person seen from behind sitting in the center,
+hair tied up neatly in a small bun, facing forward,
+person occupies one-third of the lower frame, centered,
+9:16 vertical composition.
+The lower 20% stays visually calm and uncluttered.
+
+[STAR — soft 4-pointed]
+THE STAR IS THE EMOTIONAL FOCAL POINT,
+positioned upper-center directly above the person's head,
+a soft 4-pointed star (gentle cross shape, NOT sharp rays, NOT 8-pointed),
+distinctly the most luminous element,
+a star barely visible far in the distance, almost not yet emerged,
+faint hint of light through soft mist,
+gently glowing — not overly intense, not sharp,
+soft and slightly diffused warm golden citrine light,
+a wish has not yet found its form,
+quiet emergence rather than completed brilliance,
+no harsh light beams, no sharp cross-shaped rays,
+visual hierarchy: STAR (faint) > person > misty background.
+
+[CRITICAL — anxiety must remain anxiety]
+The atmosphere MUST stay heavy, melancholic, weighted,
+darkness and mist MUST dominate the scene,
+warmth is ONLY a faint undertone in the star itself,
+the city, sky, and air must NOT become warm,
+this is anxiety with a tiny golden hint, NOT calm or hope.
+
+[BACKGROUND RESTRAINT — strong]
+Distant city lights MUST be soft glowing warmth, NOT sharp distinct dots,
+mountains barely defined, almost dissolved into mist,
+distant bridges gently dissolved into atmosphere,
+city feels like a memory rather than a clear view,
+fog must drift across the city, softening all details,
+visual emptiness allows emotional fullness.
+
+[ATMOSPHERE]
+Deep night sky in muted dark blue with thin gentle fog,
+melancholic but never scary, healing silence rather than oppressive,
+the heavy quiet just before "it will be okay",
+distant lights blurred and dim (very subtle warm undertone, kept very dim),
+calm sea reflecting the dim night.
+
+[GEM — Citrine as faint star tone only]
+Subtle gemstone lighting from the star ONLY: warm golden citrine glow,
+used VERY sparingly as a faint warm halo around the star,
+the warmth must NOT spread to the city, sky, or atmosphere,
+just a quiet golden whisper inside the anxiety.
+
+[INTENT]
+The exact moment when a wish is JUST BEGINNING to become a star,
+even in mist, this is the beginning of light,
+just with a faint warm hue inside the heaviness.
+
+9:16 vertical aspect ratio, mobile portrait orientation.
+
+NEGATIVE:
+photorealistic, 3D render, hyper detailed, aerial view, exterior view,
+horror, dark fantasy, scary, oppressive, depressing, lifeless,
+landscape only without person, multiple people, mascot,
+commercial travel poster, tourism, hotel promotion,
+text, letters, numbers, captions, watermark, logo,
+square aspect, landscape orientation,
+sharp star rays, 8-pointed star, cross-shaped beams,
+overly intense star, completed star, fully formed star,
+sharp distinct city lights, clear bright dots, defined skyline,
+crisp mountain edges, oversaturated colors,
+landscape competing with star, postcard look, scenic photograph,
+hair flowing loose, person off-center,
+warmth dominating cold mood, golden glow spreading to city or sky,
+becoming hopeful or peaceful, becoming calm or comfort atmosphere,
+city lights becoming warm dots, sky becoming warm,
+oversaturated golden tone, the heaviness disappearing,
+emotion changed by gem temperature, mist disappearing,
+clear visibility, sunset or sunrise vibe`,
+
+  'hope_citrine': `2D watercolor illustration, soft Ghibli-inspired Korean comic style,
+warm emotional atmosphere, gentle lighting, soft gradients,
+no photorealism, no 3D, no text, no captions, no watermarks.
+
+[SCENE]
+View from inside a cable car cabin (interior, NOT external/aerial),
+visible window frame with cable car handles on both sides,
+window framing the Yeosu sea at pre-dawn,
+a single person seen from behind sitting in the center,
+hair tied up neatly in a small bun, facing forward,
+person occupies one-third of the lower frame, centered,
+9:16 vertical composition.
+The lower 20% stays visually calm and uncluttered.
+
+[STAR — soft 4-pointed, approaching]
+THE STAR IS THE EMOTIONAL FOCAL POINT,
+positioned upper-center directly above the person's head,
+a soft 4-pointed star (gentle cross shape, NOT 8-pointed, NOT explosive rays),
+distinctly the most luminous element,
+a star coming closer to the viewer, reaching softly,
+slightly brighter and clearer than calm but still gentle,
+gently glowing — not overly intense, not sharp,
+soft and slightly diffused warm golden citrine light,
+a star just being born, still in emergence,
+soft glowing light particles drifting upward from the star,
+sense of gentle rising and approaching possibility,
+no harsh light beams, no aggressive expansion,
+visual hierarchy: STAR (primary, approaching) > person > soft background.
+
+[CRITICAL — hope must remain hope, NOT courage]
+This is "the moment of being pulled upward",
+the star is APPROACHING but has NOT ARRIVED,
+NOT a sun, NOT a sunrise, NOT a completed brilliance,
+the star must NOT dominate the entire sky,
+the horizon must NOT compete with the star,
+this is hope (anticipation), NOT courage (decision/action).
+
+[BACKGROUND RESTRAINT — strong]
+Distant city lights soft glowing warmth, NOT sharp distinct dots,
+soften background details — mountains barely defined,
+distant bridges gently dissolved into atmosphere,
+city feels like a memory, visual emptiness allows emotional fullness,
+the horizon glow MUST be subtle, supporting the star not competing.
+
+[ATMOSPHERE]
+Pre-dawn sky transitioning from deep blue-purple to soft lavender,
+clear and uplifting atmosphere with sense of lightness rising,
+the sky is brighter than night but NOT yet dawn,
+soft glowing particles drifting gently upward — sense of "being pulled up",
+distant city lights softly fading as morning approaches (kept dim).
+
+[GEM — Citrine as approaching star tone]
+Subtle gemstone lighting from the star: warm golden citrine glow,
+the warm tone is in the star and its immediate halo,
+not in the sky, not in the city,
+just the gentle warmth of approaching possibility.
+
+[INTENT]
+The exact moment when a wish is JUST BEGINNING to become a star —
+not arrived, but approaching right now,
+this is "the moment of being pulled upward".
+
+9:16 vertical aspect ratio, mobile portrait orientation.
+
+NEGATIVE:
+photorealistic, 3D render, hyper detailed, aerial view, exterior view,
+landscape only without person, multiple people, mascot,
+commercial travel poster, tourism, hotel promotion,
+text, letters, numbers, captions, watermark, logo,
+square aspect, landscape orientation,
+sharp star rays, 8-pointed star, cross-shaped beams,
+overly intense star, completed star, fully formed star, explosive light,
+sharp distinct city lights, oversaturated colors,
+landscape competing with star, postcard look, travel brochure,
+weak invisible star, hair flowing loose, person off-center,
+hope becoming courage, hope becoming sunrise, star becoming a sun,
+horizon dominating the sky, golden flood overpowering composition,
+explosive light from star, 8-pointed sharp star,
+sky already fully bright, already arrived feeling,
+completed transformation, dramatic flare,
+warmth dominating coolness of pre-dawn, sunset vibe, heroic atmosphere`,
+
+};
+
+// ── 백업 함수 ─────────────────────────────────────────────────────
+function backupIfExists(filePath, cacheDir) {
+  if (!fs.existsSync(filePath)) return;
+  const backupDir = path.join(cacheDir, '_backup_v1');
+  if (!fs.existsSync(backupDir)) fs.mkdirSync(backupDir, { recursive: true });
+  const dest = path.join(backupDir, path.basename(filePath));
+  fs.copyFileSync(filePath, dest);
+  return dest;
+}
+
 // ── OpenAI 이미지 생성 ────────────────────────────────────────────
 async function generateImage(prompt) {
   const { OpenAI } = require('openai');
@@ -228,9 +412,10 @@ async function main() {
     }
   }
 
-  // 필터 적용 (--gem, --limit)
+  // 필터 적용 (--emotion, --gem, --limit)
   let targets = all;
-  if (GEM_FILTER) targets = targets.filter(t => t.gem === GEM_FILTER);
+  if (EMOTION_FILTER) targets = targets.filter(t => t.emotion === EMOTION_FILTER);
+  if (GEM_FILTER)     targets = targets.filter(t => t.gem     === GEM_FILTER);
   targets = targets.slice(0, LIMIT);
 
   // 통계
@@ -251,16 +436,22 @@ async function main() {
       continue;
     }
 
-    // 이미 파일 있으면 SKIP
+    // 이미 파일 있으면 SKIP (--force-regenerate 시 백업 후 진행)
     if (fs.existsSync(filePath)) {
-      log('SKIP', `${filename} (already exists)`);
-      stats.skipped++;
-      continue;
+      if (!FORCE_REGEN) {
+        log('SKIP', `${filename} (already exists)`);
+        stats.skipped++;
+        continue;
+      }
+      // --force-regenerate: 백업 후 덮어쓰기
+      backupIfExists(filePath, CACHE_DIR);
+      log('BACKUP', `${filename} → _backup_v1/${path.basename(filePath)}`);
     }
 
     // DRY-RUN
     if (DRY_RUN) {
-      log('DRY-RUN', `Would generate: ${filename}`);
+      const action = FORCE_REGEN ? 'Would force-regenerate' : 'Would generate';
+      log('DRY-RUN', `${action}: ${filename}`);
       stats.generated++;  // dry-run에서는 "예정"으로 카운트
       continue;
     }
@@ -271,8 +462,10 @@ async function main() {
       break;
     }
 
-    // 이미지 생성 (재시도)
-    const prompt = buildPrompt({ emotion, gem, location: LOCATION });
+    // 이미지 생성 (재시도) — 오버라이드 프롬프트 우선 사용
+    const overrideKey = `${emotion}_${gem}`;
+    const prompt = PROMPT_OVERRIDES[overrideKey] || buildPrompt({ emotion, gem, location: LOCATION });
+    if (PROMPT_OVERRIDES[overrideKey]) log('OVERRIDE', `${filename} (보강 프롬프트 적용)`);
     let   success = false;
     const genStart = Date.now();
 
