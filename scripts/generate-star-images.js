@@ -27,7 +27,7 @@ const LIMIT    = parseInt((args.find(a => a.startsWith('--limit=')) || '').repla
 
 // ── 환경 설정 ──────────────────────────────────────────────────────
 const MODEL       = process.env.DREAMTOWN_IMAGE_MODEL  || 'gpt-image-1';
-const IMAGE_SIZE  = process.env.DREAMTOWN_IMAGE_SIZE   || '1024x1792';
+const IMAGE_SIZE  = process.env.DREAMTOWN_IMAGE_SIZE   || '1024x1536';  // gpt-image-1 지원 최대 세로: 1024x1536
 const BATCH_SIZE  = parseInt(process.env.DREAMTOWN_BATCH_SIZE  || '5', 10);
 const RETRY_COUNT = parseInt(process.env.DREAMTOWN_RETRY_COUNT || '2', 10);
 const MAX_COST    = parseFloat(process.env.DREAMTOWN_MAX_COST  || '5.0');

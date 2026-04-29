@@ -134,7 +134,7 @@ async function generateWithGptImage1(prompt) {
   const response = await client.images.generate({
     model:  'gpt-image-1',
     prompt,
-    size:   '1024x1792',
+    size:   '1024x1536',  // gpt-image-1 지원 최대 세로 (1024x1792 미지원)
   });
 
   const b64 = response.data[0].b64_json;
@@ -151,7 +151,7 @@ async function generateWithDallE3(prompt) {
     model:           'dall-e-3',
     prompt,
     n:               1,
-    size:            '1024x1792',
+    size:            '1024x1536',
     response_format: 'b64_json',
     style:           'natural',
   });
