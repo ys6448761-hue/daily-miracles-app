@@ -97,9 +97,15 @@ function generatePrompt(emotionKey, gem) {
     .replace('[GEM_TONE]',   g.tone);
 }
 
-// ── 파일 저장 디렉토리 ─────────────────────────────────────────────
-const CACHE_DIR = path.join(__dirname, '..', 'public', 'images', 'star-cache');
-if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
+// ── 파일 저장 기본 디렉토리 (location별 서브폴더 사용) ─────────────
+const CACHE_BASE = path.join(__dirname, '..', 'public', 'images', 'star-cache');
+if (!fs.existsSync(CACHE_BASE)) fs.mkdirSync(CACHE_BASE, { recursive: true });
+
+function getCacheDir(location) {
+  const dir = path.join(CACHE_BASE, location);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  return dir;
+}
 
 // ── DB 테이블 자동 생성 ────────────────────────────────────────────
 ;(async () => {
@@ -176,6 +182,8 @@ router.post('/generate', async (req, res) => {
   const cacheKey    = `${emotionKey}_${gem}_${location}`;
   const sentence    = emotionMeta.sentence;
 
+  const cacheDir = getCacheDir(location);
+
   // ── 캐시 조회 ──────────────────────────────────────────────────
   try {
     const { rows } = await db.query(
@@ -184,7 +192,7 @@ router.post('/generate', async (req, res) => {
     );
     if (rows.length > 0) {
       const imageUrl  = rows[0].image_url;
-      const filePath  = path.join(CACHE_DIR, `${cacheKey}.png`);
+      const filePath  = path.join(cacheDir, `${cacheKey}.png`);
       if (fs.existsSync(filePath)) {
         return res.json({ success: true, image_url: imageUrl, sentence, from_cache: true });
       }
@@ -214,8 +222,8 @@ router.post('/generate', async (req, res) => {
 
   // ── 파일 저장 + DB 캐시 ────────────────────────────────────────
   const fileName = `${cacheKey}.png`;
-  const filePath = path.join(CACHE_DIR, fileName);
-  const imageUrl = `/images/star-cache/${fileName}`;
+  const filePath = path.join(cacheDir, fileName);
+  const imageUrl = `/images/star-cache/${location}/${fileName}`;
 
   try {
     fs.writeFileSync(filePath, imgBuf);
