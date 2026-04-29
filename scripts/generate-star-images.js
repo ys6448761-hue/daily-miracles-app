@@ -23,6 +23,7 @@ const http  = require('http');
 const args            = process.argv.slice(2);
 const DRY_RUN         = args.includes('--dry-run');
 const FORCE_REGEN     = args.includes('--force-regenerate');
+const PRINT_PROMPT    = args.includes('--print-prompt');
 const LOCATION        = (args.find(a => a.startsWith('--location='))  || '').replace('--location=',  '') || 'yeosu_cablecar';
 const GEM_FILTER      = (args.find(a => a.startsWith('--gem='))       || '').replace('--gem=',       '') || null;
 const EMOTION_FILTER  = (args.find(a => a.startsWith('--emotion='))   || '').replace('--emotion=',   '') || null;
@@ -74,279 +75,214 @@ const EXISTING_BASELINE = [
   'courage_ruby_yeosu_cablecar.png',
 ];
 
-// ── 감정 SSOT v3.4 ────────────────────────────────────────────────
-const EMOTION_KEYWORDS = {
+// ====================================================================
+// v3.4 SSOT 전체 적용 — 2026-04-29 업그레이드
+// 출처: docs/ssot/DreamTown_WishImage_GPT_v3.4_final.md
+// ====================================================================
+
+// ── 5감정 매트릭스 (별 상태 + 거리 + 방향 + 시간대 + 분위기 + 의도 + 본질 강제) ──
+const EMOTION_MATRIX = {
   anxiety: {
-    star:        'barely visible far in the distance, almost not yet emerged, faint hint through soft mist',
-    atmosphere:  'deep night sky muted blue-green, thin gentle fog, melancholic but never scary, healing silence',
+    star_state:   'barely visible far in the distance, almost not yet emerged, faint hint through soft mist',
+    distance:     'very far',
+    direction:    'downward weighted, heavy',
+    time:         'deep night with mist',
+    atmosphere:   'deep night sky muted blue-green, thin gentle fog drifting across distant lights, melancholic but never scary, healing silence rather than oppressive darkness',
+    intent:       "the heavy quiet just before 'it will be okay'",
+    must_remain:  'anxiety MUST stay heavy, melancholic, weighted, darkness and mist MUST dominate',
   },
   calm: {
-    star:        'small star just being born, gently emerging, soft diffused light',
-    atmosphere:  'deep night sky rich blue, very faint horizon afterglow, quiet introspective',
+    star_state:   'small star just being born, gently emerging, soft diffused light',
+    distance:     'distant but visible',
+    direction:    'still, paused',
+    time:         'deep night',
+    atmosphere:   'deep night sky rich blue, very faint horizon afterglow, quiet introspective mood',
+    intent:       'the moment of stillness, before anything begins',
+    must_remain:  'calm MUST stay still and quiet, NOT warm or hopeful',
   },
   comfort: {
-    star:        'settled star breathing softly, gentle warm glow, peaceful luminance like slow exhale',
-    atmosphere:  'twilight just after sunset, restrained orange-pink afterglow, peaceful and embracing',
+    star_state:   'settled star breathing softly, gentle warm glow, peaceful luminance like slow exhale',
+    distance:     'mid-distance',
+    direction:    'settled, stable',
+    time:         'twilight just after sunset',
+    atmosphere:   'twilight just after sunset, restrained orange-pink afterglow, peaceful and embracing',
+    intent:       'the moment when the heart unwinds',
+    must_remain:  'comfort MUST feel embraced, NOT explosive or expanding',
   },
   hope: {
-    star:        'star coming closer, reaching softly, light particles drifting upward',
-    atmosphere:  'pre-dawn deep blue to soft lavender, clear uplifting',
+    star_state:   'star coming closer, reaching softly, light particles drifting upward',
+    distance:     'closer than before',
+    direction:    'upward, ascending',
+    time:         'pre-dawn',
+    atmosphere:   'pre-dawn sky transitioning from deep blue to soft lavender, clear and uplifting atmosphere with sense of lightness rising',
+    intent:       'the moment of being pulled upward',
+    must_remain:  'hope MUST be approaching, NOT arrived. NOT a sun, NOT a sunrise',
   },
   courage: {
-    star:        'star about to expand, very soft light trails forming, quiet determination not explosive',
-    atmosphere:  'sky just before dawn, warm soft glow rising on horizon, forward movement',
+    star_state:   'star about to expand, very soft light trails forming, quiet determination not explosive',
+    distance:     'near',
+    direction:    'forward, decisive',
+    time:         'sky just before dawn',
+    atmosphere:   'sky just before dawn, warm soft glow rising on horizon (supportive role only), forward movement',
+    intent:       'the moment of quiet decision — about to move forward together with the star',
+    must_remain:  'courage MUST be quiet decision, NOT explosive heroic flare',
   },
 };
 
-// ── 보석 SSOT ─────────────────────────────────────────────────────
+// ── 5보석 톤 (별 색·온도만 변주, 분위기 절대 변경 금지) ──────────────
 const GEM_TONES = {
-  ruby:     'subtle warm red glow',
-  sapphire: 'deep blue light emphasis',
-  emerald:  'soft green healing tone',
-  diamond:  'soft white luminance (NOT sparkle)',
-  citrine:  'warm golden glow',
+  ruby:     'subtle warm red glow forming gentle halo around the star',
+  sapphire: 'deep blue light emphasis with soft diffusion',
+  emerald:  'soft green healing tone, very subtle',
+  diamond:  'soft white luminance (NOT crystalline sparkle, NOT diamond cut)',
+  citrine:  'warm golden glow, used VERY sparingly as a faint warm halo around the star ONLY',
 };
 
-// ── 장소 씬 (cablecar 고정) ───────────────────────────────────────
-const CABLECAR_SCENE =
+// ── 장소별 SCENE 블록 ──────────────────────────────────────────────
+const LOCATION_SCENE = {
+  yeosu_cablecar:
 `View from inside a cable car cabin (interior viewpoint, NOT external/aerial),
 visible window frame with cable car handles on both sides,
 window framing the Yeosu sea and distant city lights,
 a single person seen from behind sitting in the center,
 hair tied up neatly in a small bun, facing forward,
-person occupies one-third of the lower frame, centered,
+person occupies one-third of the lower frame, centered composition,
 9:16 vertical composition.
-The lower 20% stays visually calm and uncluttered.`;
+The lower 20% stays visually calm and uncluttered.`,
+};
 
-// ── Negative Prompt ───────────────────────────────────────────────
+// ── Negative Prompt (v3.4 전체 + 5감정 특화 함정 차단) ───────────
 const NEGATIVE_PROMPT =
-`Avoid: photorealistic, 3D render, hyper detailed, aerial view, exterior view,
-landscape only without person, multiple people, mascot, cartoon exaggeration,
+`photorealistic, 3D render, hyper detailed, aerial view, exterior view, drone shot,
+landscape only without person, multiple people, mascot character, cartoon exaggeration,
 commercial travel poster, tourism advertisement, hotel promotion,
-gloomy horror, dark fantasy, scary, text, letters, numbers, captions, watermark, logo,
-square aspect, landscape orientation,
-sharp star rays, cross-shaped beams, overly intense star, completed star,
-sharp distinct city lights, defined skyline, crisp mountain edges,
-oversaturated, postcard look, travel brochure,
-landscape competing with star, weak invisible star,
-hair flowing loose, person off-center,
-gemstone overpowering emotion, anxiety becoming hopeful,
-warmth dominating cold mood, citrine making anxiety bright,
-emotion changed by gem color, mood shifted by light temperature.`;
+gloomy horror, dark fantasy, scary, oppressive, depressing, lifeless atmosphere,
+text, letters, numbers, captions, words, watermark, signature, logo,
+square aspect ratio, landscape orientation, busy lower frame,
 
-// ── 프롬프트 빌더 (v3.4 SSOT) ─────────────────────────────────────
-function buildPrompt({ emotion, gem }) {
-  const ek      = EMOTION_KEYWORDS[emotion];
+★ STAR shape violations:
+sharp star rays, harsh cross-shaped light beams, 8-pointed star,
+overly intense star, completed star, fully formed brilliant star,
+explosive light, dramatic flare, laser-like beams, aggressive light,
+already arrived, completed transformation,
+
+★ BACKGROUND violations:
+sharp distinct city lights, clear bright dots, defined urban skyline,
+crisp mountain edges, detailed bridges, harbor lights as bright spots,
+oversaturated colors, vivid postcard look, travel brochure aesthetic,
+landscape competing with star, beautiful scenic photograph feeling,
+weak invisible star, multiple competing focal points,
+
+★ COMPOSITION violations:
+hair flowing loose, person facing sideways, person off-center,
+person too small or too large, exterior view of cable car,
+
+★ GEM VARIATION FUNCTION TRAPS (보석 변주 함정 — 가장 중요):
+gemstone color spreading to entire sky,
+gemstone color overpowering the emotion,
+warmth dominating cold mood,
+golden glow flooding the city,
+emotion changed by gem color,
+mood shifted by light temperature,
+anxiety becoming hopeful or peaceful,
+calm becoming warm or comforting,
+hope becoming sunrise or arrived,
+courage becoming explosive heroic,
+comfort becoming explosive joy,
+sky color matching gem color,
+city lights becoming gem-colored dots,
+
+★ ANXIETY-specific traps:
+anxiety becoming bright, anxiety becoming hopeful,
+mist disappearing, clear visibility,
+sunset or sunrise vibe in anxiety, anxiety atmosphere becoming warm,
+
+★ HOPE-specific traps:
+hope becoming courage, hope becoming sunrise,
+star becoming a sun, horizon dominating sky,
+explosive light from hope star, completed dawn,
+
+★ COURAGE-specific traps:
+heroic action movie atmosphere,
+explosive expansion, blood-red ruby,
+horizon overpowering star, completed sunrise,
+
+★ COMFORT-specific traps:
+comfort becoming hope or courage,
+explosive warmth, dramatic sunset,
+
+★ CALM-specific traps:
+calm becoming comfort, warmth in calm,
+already settled feeling, embracing atmosphere`;
+
+// ── 프롬프트 빌더 v3.4 SSOT 전체 적용 ────────────────────────────
+function buildPrompt({ emotion, gem, location }) {
+  const em     = EMOTION_MATRIX[emotion];
   const gemTone = GEM_TONES[gem];
+  const scene  = LOCATION_SCENE[location] || LOCATION_SCENE.yeosu_cablecar;
+
+  if (!em)      throw new Error(`Unknown emotion: ${emotion}`);
+  if (!gemTone) throw new Error(`Unknown gem: ${gem}`);
 
   return `2D watercolor illustration, soft Ghibli-inspired Korean comic style,
 warm emotional atmosphere, gentle lighting, soft gradients,
-no photorealism, no 3D, no text, no captions, no watermarks.
+no photorealism, no 3D, no excessive detail,
+no text, no letters, no captions, no watermarks.
 
-${CABLECAR_SCENE}
+[SCENE]
+${scene}
 
+[STAR — soft 4-pointed, the absolute focal point]
 THE STAR IS THE EMOTIONAL FOCAL POINT,
 positioned upper-center directly above the person's head,
+a soft 4-pointed star (gentle cross shape, NOT sharp 8-pointed rays, NOT explosive),
 distinctly the most luminous element in the frame,
-gently glowing — not overly intense, not sharp,
+${em.star_state},
+the star is gently glowing — not overly intense, not sharp,
 soft and slightly diffused ${gem} light,
-${ek.star},
 just being born, quiet emergence rather than completed brilliance,
 no harsh light beams, no sharp cross-shaped rays,
-visual hierarchy: STAR > person > soft background.
+visual hierarchy: STAR (primary) > person (secondary) > soft background (tertiary).
 
-Background restraint:
-soft glowing warmth not sharp dots,
-mountains barely defined,
-bridges gently dissolved into atmosphere,
-city feels like a memory, visual emptiness allows emotional fullness.
+[CRITICAL — emotion essence MUST be preserved]
+${em.must_remain},
+the gemstone color is ONLY in the star and its immediate halo,
+the gemstone tone MUST NOT spread to the city, sky, or atmosphere,
+the gemstone only changes the star's color/temperature,
+NOT the emotional atmosphere of the scene.
+This is ${emotion} with a ${gem} hint, NOT a different emotion.
 
-${ek.atmosphere}.
+[BACKGROUND RESTRAINT — beauty ≠ emotion, emptiness allows fullness]
+Slightly reduce visual clarity of city lights — soft glowing warmth, NOT sharp distinct dots,
+soften background details — mountains barely defined, almost dissolved,
+distant bridges gently dissolved into atmosphere,
+city feels like a memory rather than a clear view,
+visual emptiness allows emotional fullness.
 
-Subtle gemstone lighting accents emanating softly from the star: ${gemTone}.
-The gemstone only changes the star's color/temperature,
-NOT the emotional atmosphere.
+[ATMOSPHERE]
+${em.atmosphere}.
+${em.intent}.
 
-This is the exact moment when a wish is JUST BEGINNING to become a star —
-not arrived, but being born now.
+[GEM — color/temperature variation only]
+Subtle gemstone lighting accents emanating softly from the star itself: ${gemTone},
+the warmth/coolness is ONLY around the star,
+the rest of the scene preserves its ${emotion} mood.
+
+[INTENT — DreamTown essence]
+The exact moment when a wish is JUST BEGINNING to become a star —
+not a star that has arrived, but a star being born right now.
 Not a beautiful scene — the moment when the heart unwinds.
 
 9:16 vertical aspect ratio, mobile portrait orientation.
 
+NEGATIVE:
 ${NEGATIVE_PROMPT}`;
 }
 
-// ── 커스텀 프롬프트 오버라이드 (코미 검수 후 보강 버전) ─────────────
-// 키: `${emotion}_${gem}` / 값: 직접 지정 프롬프트 (buildPrompt 대체)
-const PROMPT_OVERRIDES = {
-
-  'anxiety_citrine': `2D watercolor illustration, soft Ghibli-inspired Korean comic style,
-warm emotional atmosphere, gentle lighting, soft gradients,
-no photorealism, no 3D, no text, no captions, no watermarks.
-
-[SCENE]
-View from inside a cable car cabin (interior, NOT external/aerial),
-visible window frame with cable car handles on both sides,
-window framing the Yeosu night sea wrapped in soft mist,
-a single person seen from behind sitting in the center,
-hair tied up neatly in a small bun, facing forward,
-person occupies one-third of the lower frame, centered,
-9:16 vertical composition.
-The lower 20% stays visually calm and uncluttered.
-
-[STAR — soft 4-pointed]
-THE STAR IS THE EMOTIONAL FOCAL POINT,
-positioned upper-center directly above the person's head,
-a soft 4-pointed star (gentle cross shape, NOT sharp rays, NOT 8-pointed),
-distinctly the most luminous element,
-a star barely visible far in the distance, almost not yet emerged,
-faint hint of light through soft mist,
-gently glowing — not overly intense, not sharp,
-soft and slightly diffused warm golden citrine light,
-a wish has not yet found its form,
-quiet emergence rather than completed brilliance,
-no harsh light beams, no sharp cross-shaped rays,
-visual hierarchy: STAR (faint) > person > misty background.
-
-[CRITICAL — anxiety must remain anxiety]
-The atmosphere MUST stay heavy, melancholic, weighted,
-darkness and mist MUST dominate the scene,
-warmth is ONLY a faint undertone in the star itself,
-the city, sky, and air must NOT become warm,
-this is anxiety with a tiny golden hint, NOT calm or hope.
-
-[BACKGROUND RESTRAINT — strong]
-Distant city lights MUST be soft glowing warmth, NOT sharp distinct dots,
-mountains barely defined, almost dissolved into mist,
-distant bridges gently dissolved into atmosphere,
-city feels like a memory rather than a clear view,
-fog must drift across the city, softening all details,
-visual emptiness allows emotional fullness.
-
-[ATMOSPHERE]
-Deep night sky in muted dark blue with thin gentle fog,
-melancholic but never scary, healing silence rather than oppressive,
-the heavy quiet just before "it will be okay",
-distant lights blurred and dim (very subtle warm undertone, kept very dim),
-calm sea reflecting the dim night.
-
-[GEM — Citrine as faint star tone only]
-Subtle gemstone lighting from the star ONLY: warm golden citrine glow,
-used VERY sparingly as a faint warm halo around the star,
-the warmth must NOT spread to the city, sky, or atmosphere,
-just a quiet golden whisper inside the anxiety.
-
-[INTENT]
-The exact moment when a wish is JUST BEGINNING to become a star,
-even in mist, this is the beginning of light,
-just with a faint warm hue inside the heaviness.
-
-9:16 vertical aspect ratio, mobile portrait orientation.
-
-NEGATIVE:
-photorealistic, 3D render, hyper detailed, aerial view, exterior view,
-horror, dark fantasy, scary, oppressive, depressing, lifeless,
-landscape only without person, multiple people, mascot,
-commercial travel poster, tourism, hotel promotion,
-text, letters, numbers, captions, watermark, logo,
-square aspect, landscape orientation,
-sharp star rays, 8-pointed star, cross-shaped beams,
-overly intense star, completed star, fully formed star,
-sharp distinct city lights, clear bright dots, defined skyline,
-crisp mountain edges, oversaturated colors,
-landscape competing with star, postcard look, scenic photograph,
-hair flowing loose, person off-center,
-warmth dominating cold mood, golden glow spreading to city or sky,
-becoming hopeful or peaceful, becoming calm or comfort atmosphere,
-city lights becoming warm dots, sky becoming warm,
-oversaturated golden tone, the heaviness disappearing,
-emotion changed by gem temperature, mist disappearing,
-clear visibility, sunset or sunrise vibe`,
-
-  'hope_citrine': `2D watercolor illustration, soft Ghibli-inspired Korean comic style,
-warm emotional atmosphere, gentle lighting, soft gradients,
-no photorealism, no 3D, no text, no captions, no watermarks.
-
-[SCENE]
-View from inside a cable car cabin (interior, NOT external/aerial),
-visible window frame with cable car handles on both sides,
-window framing the Yeosu sea at pre-dawn,
-a single person seen from behind sitting in the center,
-hair tied up neatly in a small bun, facing forward,
-person occupies one-third of the lower frame, centered,
-9:16 vertical composition.
-The lower 20% stays visually calm and uncluttered.
-
-[STAR — soft 4-pointed, approaching]
-THE STAR IS THE EMOTIONAL FOCAL POINT,
-positioned upper-center directly above the person's head,
-a soft 4-pointed star (gentle cross shape, NOT 8-pointed, NOT explosive rays),
-distinctly the most luminous element,
-a star coming closer to the viewer, reaching softly,
-slightly brighter and clearer than calm but still gentle,
-gently glowing — not overly intense, not sharp,
-soft and slightly diffused warm golden citrine light,
-a star just being born, still in emergence,
-soft glowing light particles drifting upward from the star,
-sense of gentle rising and approaching possibility,
-no harsh light beams, no aggressive expansion,
-visual hierarchy: STAR (primary, approaching) > person > soft background.
-
-[CRITICAL — hope must remain hope, NOT courage]
-This is "the moment of being pulled upward",
-the star is APPROACHING but has NOT ARRIVED,
-NOT a sun, NOT a sunrise, NOT a completed brilliance,
-the star must NOT dominate the entire sky,
-the horizon must NOT compete with the star,
-this is hope (anticipation), NOT courage (decision/action).
-
-[BACKGROUND RESTRAINT — strong]
-Distant city lights soft glowing warmth, NOT sharp distinct dots,
-soften background details — mountains barely defined,
-distant bridges gently dissolved into atmosphere,
-city feels like a memory, visual emptiness allows emotional fullness,
-the horizon glow MUST be subtle, supporting the star not competing.
-
-[ATMOSPHERE]
-Pre-dawn sky transitioning from deep blue-purple to soft lavender,
-clear and uplifting atmosphere with sense of lightness rising,
-the sky is brighter than night but NOT yet dawn,
-soft glowing particles drifting gently upward — sense of "being pulled up",
-distant city lights softly fading as morning approaches (kept dim).
-
-[GEM — Citrine as approaching star tone]
-Subtle gemstone lighting from the star: warm golden citrine glow,
-the warm tone is in the star and its immediate halo,
-not in the sky, not in the city,
-just the gentle warmth of approaching possibility.
-
-[INTENT]
-The exact moment when a wish is JUST BEGINNING to become a star —
-not arrived, but approaching right now,
-this is "the moment of being pulled upward".
-
-9:16 vertical aspect ratio, mobile portrait orientation.
-
-NEGATIVE:
-photorealistic, 3D render, hyper detailed, aerial view, exterior view,
-landscape only without person, multiple people, mascot,
-commercial travel poster, tourism, hotel promotion,
-text, letters, numbers, captions, watermark, logo,
-square aspect, landscape orientation,
-sharp star rays, 8-pointed star, cross-shaped beams,
-overly intense star, completed star, fully formed star, explosive light,
-sharp distinct city lights, oversaturated colors,
-landscape competing with star, postcard look, travel brochure,
-weak invisible star, hair flowing loose, person off-center,
-hope becoming courage, hope becoming sunrise, star becoming a sun,
-horizon dominating the sky, golden flood overpowering composition,
-explosive light from star, 8-pointed sharp star,
-sky already fully bright, already arrived feeling,
-completed transformation, dramatic flare,
-warmth dominating coolness of pre-dawn, sunset vibe, heroic atmosphere`,
-
-};
-
+// ── 커스텀 프롬프트 오버라이드 ─────────────────────────────────────
+// v3.4 buildPrompt()가 전체 커버하므로 현재 비어 있음
+// 특정 조합 수동 보강 필요 시 여기에 추가: { 'anxiety_citrine':  }
+const PROMPT_OVERRIDES = {};
 // ── 백업 함수 ─────────────────────────────────────────────────────
 function backupIfExists(filePath, cacheDir) {
   if (!fs.existsSync(filePath)) return;
@@ -436,9 +372,9 @@ async function main() {
       continue;
     }
 
-    // 이미 파일 있으면 SKIP (--force-regenerate 시 백업 후 진행)
+    // 이미 파일 있으면 SKIP (--force-regenerate 또는 dry+print-prompt 시 진행)
     if (fs.existsSync(filePath)) {
-      if (!FORCE_REGEN) {
+      if (!FORCE_REGEN && !(DRY_RUN && PRINT_PROMPT)) {
         log('SKIP', `${filename} (already exists)`);
         stats.skipped++;
         continue;
@@ -452,6 +388,17 @@ async function main() {
     if (DRY_RUN) {
       const action = FORCE_REGEN ? 'Would force-regenerate' : 'Would generate';
       log('DRY-RUN', `${action}: ${filename}`);
+
+      if (PRINT_PROMPT) {
+        const _overrideKey  = `${emotion}_${gem}`;
+        const _promptPreview = PROMPT_OVERRIDES[_overrideKey] || buildPrompt({ emotion, gem, location: LOCATION });
+        console.log('\n─────────────────────────────────────────');
+        console.log(`PROMPT [${filename}] (${_promptPreview.length}자):`);
+        console.log('─────────────────────────────────────────');
+        console.log(_promptPreview);
+        console.log('─────────────────────────────────────────\n');
+      }
+
       stats.generated++;  // dry-run에서는 "예정"으로 카운트
       continue;
     }
