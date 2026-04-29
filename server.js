@@ -2547,6 +2547,19 @@ if (starVoyageRoutes) {
   console.log('✅ Star Voyage 라우터 등록 완료 (/api/star-voyage)');
 }
 
+// ---------- Star Image Cache (/api/star-image) ----------
+let starImageRoutes = null;
+try {
+  starImageRoutes = require('./routes/starImageRoutes');
+  console.log('✅ Star Image 라우터 로드 성공');
+} catch (e) {
+  console.warn('⚠️ starImageRoutes 로드 실패:', e.message);
+}
+if (starImageRoutes) {
+  app.use('/api/star-image', starImageRoutes);
+  console.log('✅ Star Image 라우터 등록 완료 (/api/star-image)');
+}
+
 // ---------- 여수 미션 + 포인트 (/api/yeosu-missions) ----------
 let yeosuMissionRoutes = null;
 try {

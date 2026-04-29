@@ -180,41 +180,47 @@
       transition: width 2.5s linear;
     }
 
-    /* ── P5: 소원그림 미리보기 ── */
-    .preview-header { text-align: center; margin-bottom: 16px; }
-    .preview-header p { font-size: 14px; color: rgba(255,255,255,0.5); }
-    .preview-img-wrap {
-      width: 100%; aspect-ratio: 1/1; border-radius: 20px;
-      overflow: hidden; position: relative;
-      background: rgba(255,255,255,0.05); margin-bottom: 16px;
+    /* ── P5: 소원그림 — FULL SCREEN ── */
+    #panelPreview {
+      position: fixed; inset: 0; z-index: 100;
+      background: #000;
+      display: flex; flex-direction: column;
     }
-    .img-skeleton {
-      position: absolute; inset: 0;
-      background: linear-gradient(135deg,rgba(255,255,255,0.04) 0%,rgba(255,255,255,0.1) 50%,rgba(255,255,255,0.04) 100%);
+    #panelPreview.hidden { display: none; }
+    .preview-fullscreen-img {
+      flex: 1; width: 100%; object-fit: contain;
+      display: none;
+    }
+    .preview-fullscreen-img.ready { display: block; }
+    .preview-fullscreen-skeleton {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 14px;
+      background: linear-gradient(135deg,rgba(255,255,255,0.03) 0%,rgba(255,255,255,0.08) 50%,rgba(255,255,255,0.03) 100%);
       background-size: 200% 200%; animation: shimmer 1.8s ease-in-out infinite;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
     }
-    .img-skeleton.hidden { display: none; }
+    .preview-fullscreen-skeleton.hidden { display: none; }
     @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
     .skeleton-star { font-size: 44px; animation: pulse 1.6s ease-in-out infinite; }
-    .skeleton-hint { font-size: 13px; color: rgba(255,255,255,0.3); }
-    #previewImg { width: 100%; height: 100%; object-fit: cover; display: none; }
-    #previewImg.ready { display: block; }
-    .emotion-text-label {
-      text-align: center; font-size: 17px; font-weight: 600;
-      color: #a8c8ff; margin-bottom: 6px; min-height: 26px;
+    .skeleton-hint { font-size: 13px; color: rgba(255,255,255,0.35); }
+    .preview-bottom-overlay {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 24px 24px max(env(safe-area-inset-bottom), 24px);
+      background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, transparent 100%);
+      display: flex; flex-direction: column; align-items: center; gap: 14px;
     }
-    .loading-hint {
-      text-align: center; font-size: 13px; color: rgba(255,255,255,0.3); margin-bottom: 16px;
+    .preview-sentence {
+      font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.88);
+      text-align: center; letter-spacing: -0.01em;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.7);
+      min-height: 22px;
     }
-    .loading-hint.hidden { display: none; }
     .btn-commit {
-      width: 100%; padding: 18px;
+      width: 100%; max-width: 360px; padding: 18px;
       background: linear-gradient(90deg, #4f8ef7, #7b5ea7);
       border: none; border-radius: 14px;
       color: #fff; font-size: 17px; font-weight: 700;
       font-family: 'Noto Sans KR', sans-serif;
-      cursor: pointer; margin-bottom: 12px; transition: opacity 0.2s;
+      cursor: pointer; transition: opacity 0.2s;
       -webkit-tap-highlight-color: transparent;
     }
     .btn-commit:disabled { opacity: 0.35; cursor: not-allowed; }
@@ -264,10 +270,10 @@
         <p>케이블카에서 느낀 감정을 하나 골라주세요</p>
       </div>
       <div class="emotion-grid">
-        <button class="emotion-btn" data-emotion="설렘"><span class="emotion-emoji">🌟</span>설렘</button>
-        <button class="emotion-btn" data-emotion="편안함"><span class="emotion-emoji">🌿</span>편안함</button>
-        <button class="emotion-btn" data-emotion="기대"><span class="emotion-emoji">🌅</span>기대</button>
-        <button class="emotion-btn" data-emotion="정리됨"><span class="emotion-emoji">🪐</span>정리됨</button>
+        <button class="emotion-btn" data-emotion="숨이 놓였어요"><span class="emotion-emoji">🌙</span>숨이 놓였어요</button>
+        <button class="emotion-btn" data-emotion="믿고 싶어졌어요"><span class="emotion-emoji">🌟</span>믿고 싶어졌어요</button>
+        <button class="emotion-btn" data-emotion="정리됐어요"><span class="emotion-emoji">🪐</span>정리됐어요</button>
+        <button class="emotion-btn" data-emotion="용기났어요"><span class="emotion-emoji">🌱</span>용기났어요</button>
       </div>
       <button class="btn-primary" id="btnEmotionNext">다음 →</button>
     </div>
@@ -306,6 +312,11 @@
           <span class="gem-emoji">💙</span>
           <span class="gem-name">사파이어</span>
           <span class="gem-sub">성장의 소원</span>
+        </button>
+        <button class="gem-btn" data-gem="citrine" style="grid-column:1/-1">
+          <span class="gem-emoji">💛</span>
+          <span class="gem-name">황금 소원</span>
+          <span class="gem-sub">찬란하게 빛날 소원</span>
         </button>
       </div>
       <button class="btn-primary" id="btnGemNext">다음 →</button>
@@ -355,27 +366,18 @@
       <div class="aurum-progress"><div class="aurum-progress-bar" id="aurumBar"></div></div>
     </div>
 
-    <!-- ── P5: 소원그림 미리보기 ─────────────────────────── -->
+    <!-- ── P5: 소원그림 — FULL SCREEN ─────────────────── -->
     <div class="panel hidden" id="panelPreview">
-      <div class="step-bar">
-        <div class="step-dot done"></div>
-        <div class="step-dot done"></div>
-        <div class="step-dot done"></div>
-        <div class="step-dot done"></div>
-        <div class="step-dot active"></div>
+      <div class="preview-fullscreen-skeleton" id="imgSkeleton">
+        <span class="skeleton-star">✨</span>
+        <span class="skeleton-hint">별을 그리고 있어요...</span>
       </div>
-      <div class="preview-header"><p>이런 별이 만들어졌어요</p></div>
-      <div class="preview-img-wrap">
-        <div class="img-skeleton" id="imgSkeleton">
-          <span class="skeleton-star">✨</span>
-          <span class="skeleton-hint">별을 그리고 있어요...</span>
-        </div>
-        <img id="previewImg" alt="별 이미지">
+      <img class="preview-fullscreen-img" id="previewImg" alt="별 이미지">
+      <div class="preview-bottom-overlay">
+        <div class="preview-sentence" id="emotionTextLabel"></div>
+        <button class="btn-commit" id="btnPreviewNext" disabled>이 별을 남기기 →</button>
+        <button class="btn-restart" id="btnRestart">처음부터 다시</button>
       </div>
-      <div class="emotion-text-label" id="emotionTextLabel"></div>
-      <div class="loading-hint" id="loadingHint">잠깐, 별을 완성하고 있어요</div>
-      <button class="btn-commit" id="btnPreviewNext" disabled>다음 →</button>
-      <button class="btn-restart" id="btnRestart">처음부터 다시</button>
     </div>
 
     <!-- ── P6: 3개월 약속 + 별 남기기 ───────────────────────── -->
@@ -571,7 +573,6 @@
     const btnPreviewNext = document.getElementById('btnPreviewNext');
     const previewImg     = document.getElementById('previewImg');
     const imgSkeleton    = document.getElementById('imgSkeleton');
-    const loadingHint    = document.getElementById('loadingHint');
     const emotionLabel   = document.getElementById('emotionTextLabel');
 
     async function startPreviewGeneration() {
@@ -580,17 +581,16 @@
       localStorage.setItem('flow_step', FLOW.GENERATING);
 
       try {
-        const res  = await fetch('/api/star/preview', {
+        const res  = await fetch('/api/star-image/generate', {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ emotion: selectedEmotion, origin_location: loc, gem_type: selectedGem }),
+          body:    JSON.stringify({ emotion: selectedEmotion, gem: selectedGem, location: loc }),
         });
         const data = await res.json();
-        if (!data.success) throw new Error(data.error || 'preview 실패');
+        if (!data.success) throw new Error(data.error || '이미지 생성 실패');
 
         previewImageUrl          = data.image_url;
-        emotionLabel.textContent = data.emotion_text || '';
-        loadingHint.classList.add('hidden');
+        emotionLabel.textContent = data.sentence || '';
 
         previewImg.onload = () => {
           imgSkeleton.classList.add('hidden');
@@ -604,7 +604,6 @@
         previewImg.src = data.image_url;
       } catch {
         imgSkeleton.classList.add('hidden');
-        loadingHint.classList.add('hidden');
         btnPreviewNext.disabled = false;
       } finally {
         imageDone = true;
@@ -656,7 +655,7 @@
           body:    JSON.stringify({
             emotion:           selectedEmotion,
             origin_location:   loc,
-            preview_image_url: previewImageUrl,
+            preview_image_url: (previewImageUrl && !previewImageUrl.startsWith('data:')) ? previewImageUrl : null,
             wish_text:         wishText.trim(),
             gem_type:          selectedGem,
           }),
@@ -676,7 +675,7 @@
         localStorage.setItem('access_key',      data.access_key);
         localStorage.setItem('star_id',         data.star_id);
         localStorage.setItem('emotion_linked',  data.emotion_link?.linked ? '1' : '0');
-        localStorage.setItem('share_image_url', previewImageUrl || '');
+        localStorage.setItem('share_image_url', (previewImageUrl && !previewImageUrl.startsWith('data:')) ? previewImageUrl : '');
         localStorage.setItem('origin_location', loc);
         localStorage.setItem('flow_step',       FLOW.ASCEND);
 
