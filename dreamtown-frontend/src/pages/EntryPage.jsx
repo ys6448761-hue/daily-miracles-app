@@ -218,7 +218,13 @@ export default function EntryPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.45, duration: 0.5 }}
       >
-        <button style={S.ctaBtn} onClick={() => navigate(dest)}>
+        <button
+          style={S.ctaBtn}
+          onClick={() => hasStar
+            ? navigate(dest)
+            : navigate(dest, { state: { sourceEvent: loc === 'cablecar' ? 'cablecar' : 'wish' } })
+          }
+        >
           {btnLabel}
         </button>
 

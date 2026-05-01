@@ -843,6 +843,25 @@ app.get('/healthz', (req, res) => {
   }
 });
 
+// ─── /health — Render.com / 모니터링 헬스체크 전용 ──────────────────────────
+// 리다이렉트·DB·의존성 일절 없음. 항상 200.
+app.get('/health', (_req, res) => res.status(200).send('ok'));
+
+// ─── / — 루트 기본 응답 ────────────────────────────────────────────────────
+// Render가 / 로 헬스체크하는 경우 대비. SPA catch-all이 아닌 명시 응답.
+app.get('/', (_req, res) => res.status(200).send('DreamTown alive'));
+
+// ─── /star-entry.html → React SPA 진입 강제 ──────────────────────────────
+// QR 코드가 /star-entry.html?loc=yeosu_cablecar 로 인쇄되어 있을 경우 대비.
+// vanilla HTML을 직접 서빙하지 않고 React /entry 로 302 리다이렉트.
+app.get('/star-entry.html', (req, res) => {
+  const raw = req.query.loc;
+  // yeosu_cablecar → cablecar (QR 인쇄값과 React LOC_CONFIG 키를 맞춤)
+  const loc    = raw === 'yeosu_cablecar' ? 'cablecar' : raw;
+  const target = loc ? `/entry?loc=${loc}` : '/entry';
+  return res.redirect(302, target);
+});
+
 // ═══════════════════════════════════════════════════════════════════════════
 // onrender.com → app.dailymiracles.kr 리다이렉트 (HTML 페이지만)
 // API 요청은 하위 호환성을 위해 리다이렉트하지 않음
@@ -930,24 +949,12 @@ app.get('/star-entry', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'star-entry.html'));
 });
 
-// ── DreamTown Core Entry 단일화 ────────────────────────────────────
-// 모든 외부 유입 → star-entry.html (SSOT)
-// v1 EntryPage.jsx 수정 없음 — Express 레벨에서 차단
-app.get('/entry', (req, res) => {
-  const loc = req.query.loc;
-  if (loc === 'cablecar') {
-    return res.redirect(302, '/star-entry.html?loc=yeosu_cablecar&reset=1');
-  }
-  return res.redirect(302, '/star-entry.html?reset=1');
-});
-
-// ── v1 SPA 외부 진입 격리 ───────────────────────────────────────────
-// 직접 URL 접근 → star-entry (React Router 내부 nav는 영향 없음)
-app.get(['/wish', '/wish/select', '/wish/input'], (_req, res) => {
-  res.redirect(302, '/star-entry.html?reset=1');
-});
+// ── /cablecar → /entry?loc=cablecar (React SPA) ──────────────────────
+// /entry, /entry?loc=cablecar 은 DT_SPA_ROUTES 화이트리스트에 포함되어 있으므로
+// 별도 핸들러 없이 catch-all이 index.html을 서빙함.
+// /cablecar, /cablecar-landing 만 /entry 로 리다이렉트해서 통일.
 app.get(['/cablecar', '/cablecar-landing'], (_req, res) => {
-  res.redirect(302, '/star-entry.html?loc=yeosu_cablecar&reset=1');
+  res.redirect(302, '/entry?loc=cablecar');
 });
 // /star/:id → DreamTown SPA (StarDetail) 로 위임
 // 이전 star-view.html 서빙 라우트는 DT_SPA_ROUTES(/star/*) 보다 앞에 있어
@@ -963,11 +970,8 @@ app.get('/yeosu-travel', (req, res) => {
 });
 
 // ---------- Star Voyage 뷰 ----------
-// voyage-select 직접 접근 → star-entry (여행 선택 화면 격리)
-// React Router 내부 nav는 VoyageSelectPage.jsx 유지
-app.get('/voyage-select', (_req, res) => {
-  res.redirect(302, '/star-entry.html?reset=1');
-});
+// voyage-select: React SPA (VoyageSelectPage.jsx) — catch-all에 위임
+// (기존 reset=1 리다이렉트 제거)
 app.get('/voyage-detail', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'voyage-detail.html'));
 });
@@ -2294,6 +2298,12 @@ if (journeyContextRoutes) app.use('/api/journey-contexts', journeyContextRoutes)
 if (recommendationRoutes) app.use('/api/recommendation',   recommendationRoutes);
 if (wishJourneyRoutes)   app.use('/api/journeys',          wishJourneyRoutes);
 
+// ---------- 여수 소원여정 예약/문의 접수 ─────────────────────────────
+try {
+  app.use('/api/journey-inquiry', require('./routes/journeyInquiryRoutes'));
+  console.log('✅ journey-inquiry 라우터 등록 완료 (/api/journey-inquiry)');
+} catch (e) { console.error('❌ journey-inquiry 라우터 실패:', e.message); }
+
 // ---------- 추천 시스템 Routes (/api/referral) - Aurora5 v2.6 ----------
 if (referralRoutes) {
   app.use("/api/referral", referralRoutes);
@@ -2558,6 +2568,18 @@ try {
 if (starImageRoutes) {
   app.use('/api/star-image', starImageRoutes);
   console.log('✅ Star Image 라우터 등록 완료 (/api/star-image)');
+}
+
+// ---------- Star Public (공명/공유/피드/별자리/은하) (/api/stars) ----------
+let starPublicRoutes = null;
+try {
+  starPublicRoutes = require('./routes/starPublicRoutes');
+} catch (e) {
+  console.warn('⚠️ starPublicRoutes 로드 실패:', e.message);
+}
+if (starPublicRoutes) {
+  app.use('/api/stars', starPublicRoutes);
+  console.log('✅ Star Public 라우터 등록 완료 (/api/stars)');
 }
 
 // ---------- 여수 미션 + 포인트 (/api/yeosu-missions) ----------

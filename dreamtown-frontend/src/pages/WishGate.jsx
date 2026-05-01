@@ -23,8 +23,9 @@ const QR_PLACE_LABEL = {
 export default function WishGate() {
   const nav = useNavigate();
   const location = useLocation();
-  const prefillText   = location.state?.prefillText ?? '';
-  const emotionChoice = location.state?.emotionChoice ?? null;
+  const prefillText    = location.state?.prefillText  ?? '';
+  const emotionChoice  = location.state?.emotionChoice ?? null;
+  const incomingSource = location.state?.sourceEvent   ?? null;
   const [wishText, setWishText] = useState(prefillText);
   const prevStarId = localStorage.getItem('dt_prev_star_id') || null;
 
@@ -94,10 +95,11 @@ export default function WishGate() {
 
       const originPlace = new URLSearchParams(window.location.search).get('loc') || null;
       const star = await postStarCreate({ wishId: wishResult.wish_id, userId, phoneNumber: phoneNumber.trim() || null, originPlace });
+      if (!star?.star_id) throw new Error('별 생성에 실패했어요. 다시 시도해주세요.');
       saveStarId(star.star_id);
       localStorage.removeItem('dt_prev_star_id');
 
-      const starBirthState = { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy, gemType, userId, day1: star.day1, wishText: wishText.trim(), starRarity: star.star_rarity ?? 'standard', sourceEvent: star.source_event ?? 'standard', emotionChoice };
+      const starBirthState = { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy, gemType, userId, day1: star.day1, wishText: wishText.trim(), starRarity: star.star_rarity ?? 'standard', sourceEvent: incomingSource ?? 'wish', emotionChoice, imageUrl: star.image_url ?? null, constellation: star.constellation ?? null };
       try { sessionStorage.setItem('dt_recent_star', JSON.stringify(starBirthState)); } catch (_) {}
 
       // QR 경유 시 고향 자동 확정 (fire-and-forget)
