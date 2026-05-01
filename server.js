@@ -80,6 +80,34 @@ app.use('/api', (req, res, next) => {
 // ═══════════════════════════════════════════════════════════
 app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 app.use('/videos', express.static(path.join(__dirname, 'public', 'videos')));
+// ═══════════════════════════════════════════════════════════════════════════
+// [옛날 HTML 페이지 차단 — React SPA 단일 진입]
+// ⚠️ 반드시 express.static('public') 보다 앞에 위치해야 함
+// 새 옛날 페이지 발견 시 LEGACY_HTML_PAGES에 추가, 파일 자체는 보존
+// ═══════════════════════════════════════════════════════════════════════════
+const LEGACY_HTML_PAGES = [
+  'star-entry.html',   // → /entry    (QR 진입 React 흐름)
+  'complete.html',     // → /result   (React Result 화면)
+  'voyage-pay.html',   // → /journey  (여수 소원여정)
+  'voyage-select.html',// → /journey
+];
+
+const LEGACY_ROUTE_MAP = {
+  'star-entry.html':   '/entry',
+  'complete.html':     '/result',
+  'voyage-pay.html':   '/journey',
+  'voyage-select.html':'/journey',
+};
+
+LEGACY_HTML_PAGES.forEach(page => {
+  app.get(`/${page}`, (req, res) => {
+    const qs     = req.url.split('?')[1] || '';
+    const target = LEGACY_ROUTE_MAP[page] || '/';
+    return res.redirect(302, qs ? `${target}?${qs}` : target);
+  });
+});
+// ═══════════════════════════════════════════════════════════════════════════
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', (_req, res) => res.status(404).end()); // 파일 없으면 404로 끊음
 app.use('/videos', (_req, res) => res.status(404).end()); // 파일 없으면 404로 끊음

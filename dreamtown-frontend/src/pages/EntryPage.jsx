@@ -135,7 +135,9 @@ const S = {
 export default function EntryPage() {
   const navigate          = useNavigate();
   const [searchParams]    = useSearchParams();
-  const loc               = searchParams.get('loc') || DEFAULT_LOC;
+  const locRaw            = searchParams.get('loc') || DEFAULT_LOC;
+  // QR 인쇄값 정규화: yeosu_cablecar → cablecar
+  const loc               = locRaw === 'yeosu_cablecar' ? 'cablecar' : locRaw;
   const cfg               = LOC_CONFIG[loc];
 
   const starId  = readSavedStar();
