@@ -111,6 +111,8 @@ function loadRecentStar() {
 
 // ── Scene 1: 아우룸 ─────────────────────────────────────────────────
 function AurumScene() {
+  // eslint-disable-next-line no-console
+  console.log('[AurumScene] mounted');
   return (
     <div style={{
       position: 'fixed', inset: 0,
@@ -173,6 +175,8 @@ function AurumScene() {
 // ── Scene 2: 케이블카 ────────────────────────────────────────────────
 function CablecarScene({ onEnded }) {
   const videoRef = useRef(null);
+  // eslint-disable-next-line no-console
+  console.log('[CablecarScene] mounted');
 
   useEffect(() => {
     // 자동재생 실패 시 10s 후 강제 진행
@@ -322,6 +326,9 @@ export default function StarBirth() {
 
   const [resonanceCount] = useState(() => Math.floor(Math.random() * 10) + 3);
 
+  // eslint-disable-next-line no-console
+  console.log('[StarBirth] sourceEvent:', sourceEvent, '| initialScene will be:', sourceEvent === 'cablecar' ? 'aurum' : 'starbirth');
+
   // 케이블카 QR → 풀 시네마틱(aurum → cablecar → starbirth → result)
   // 일반 소원 → 별 탄생부터 (starbirth → result)
   const initialScene = sourceEvent === 'cablecar' ? 'aurum' : 'starbirth';
@@ -332,6 +339,9 @@ export default function StarBirth() {
   const [shareMsg,      setShareMsg]      = useState('');
   const [shareFeedback, setShareFeedback] = useState('');
   const shareFeedbackRef = useRef(null);
+
+  // eslint-disable-next-line no-console
+  console.log('[StarBirth] scene:', scene);
 
   // Scene 1 자동 진행 (2.5s)
   useEffect(() => {
