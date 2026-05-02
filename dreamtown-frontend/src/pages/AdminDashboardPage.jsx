@@ -9,19 +9,27 @@ import { useEffect, useState, useCallback } from 'react';
 // ── 별공방 Config — 새 별공방 추가 시 여기만 수정 ────────────────
 const WORKSHOP_CONFIGS = [
   {
+    name:         '기본 별공방',
+    locationCode: 'global_default_workshop',
+    userUrl:      '/entry',
+    adminUrl:     '/admin/location/global_default_workshop',
+    qrUrl:        '/entry',
+    status:       'running',
+  },
+  {
     name:         '케이블카 별공방',
-    locationCode: 'yeosu_cablecar',
-    userUrl:      '/star-entry.html?loc=yeosu_cablecar',
-    adminUrl:     '/admin/location/yeosu_cablecar',
-    qrUrl:        '/star-entry.html?loc=yeosu_cablecar&qr=1',
+    locationCode: 'yeosu_cablecar_workshop',
+    userUrl:      '/entry?loc=cablecar',
+    adminUrl:     '/admin/location/yeosu_cablecar_workshop',
+    qrUrl:        '/star-entry.html?loc=yeosu_cablecar_workshop',
     status:       'testing',
   },
   {
     name:         '라또아 별공방',
-    locationCode: 'lattoa_cafe',
-    userUrl:      '/star-entry.html?loc=lattoa_cafe',
-    adminUrl:     '/admin/location/lattoa_cafe',
-    qrUrl:        '/star-entry.html?loc=lattoa_cafe&qr=1',
+    locationCode: 'yeosu_lattoa_cafe',
+    userUrl:      '/entry?loc=lattoa',
+    adminUrl:     '/admin/location/yeosu_lattoa_cafe',
+    qrUrl:        '/star-entry.html?loc=yeosu_lattoa_cafe',
     status:       'testing',
   },
 ];

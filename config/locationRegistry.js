@@ -4,81 +4,100 @@
  *
  * ── 코드 명명 규칙 (origin_location 값은 절대 변경 금지) ──────────
  *
- *  국내 MVP    {descriptor}_{venue_type}
- *    yeosu_cablecar
- *    lattoa_cafe
- *
- *  전국 확장   {city}_{district}_{venue_type}{seq}
+ *  기본             global_default_workshop
+ *  국내 MVP         {city}_{descriptor}_{venue_type}
+ *    yeosu_cablecar_workshop
+ *    yeosu_lattoa_cafe
+ *  전국 확장        {city}_{district}_{venue_type}{seq}
  *    busan_gwanganri_cafe01
- *    seoul_hongdae_studio01
- *
- *  글로벌 확장 {country}_{city}_{district}_{venue_type}{seq}
- *    jp_tokyo_shibuya_cafe01
- *    us_la_santamonica_hotel01
+ *  글로벌 확장      {country}_{city}_{venue_type}{seq}
+ *    jp_tokyo_cafe01
  *
  * ── 필드 설명 ──────────────────────────────────────────────────
  *  code         stars.origin_location 저장값 — 불변
- *  name_ko      한국어 표시명
- *  city/region  도시·광역자치단체
- *  country_code ISO 3166-1 alpha-2
- *  venue_type   cafe / landmark / studio / hotel / resort / popup
- *  status       pending / testing / running / closed
- *  aliases      구 코드·하이픈 표기 등 (code 로 자동 해소됨)
+ *  display_name 운영판·UI 표시명
+ *  name_ko      한국어 표시명 (= display_name)
+ *  region       광역자치단체
+ *  partner      제휴 업체명
+ *  type         venue 타입 (landmark / cafe / resort / default)
+ *  stage        운영 단계 (workshop / retail / global)
+ *  status       운영 상태 (pending / testing / running / closed)
+ *  aliases      구 코드·하이픈 표기 등 — code 로 자동 해소
  * ────────────────────────────────────────────────────────────────
  */
 
 const REGISTRY = [
   {
-    code:         'global',
+    code:         'global_default_workshop',
+    display_name: '기본 별공방',
     name_ko:      '기본 별공방',
     city:         null,
     region:       null,
     country_code: 'KR',
+    type:         'default',
     venue_type:   'default',
+    partner:      null,
+    stage:        'workshop',
     status:       'running',
     emoji:        '✦',
-    aliases:      ['default'],
+    aliases:      ['global', 'default'],
   },
   {
-    code:         'yeosu_cablecar',
+    code:         'yeosu_cablecar_workshop',
+    display_name: '여수 해상 케이블카',
     name_ko:      '여수 해상 케이블카',
     city:         '여수',
     region:       '전남',
     country_code: 'KR',
+    type:         'landmark',
     venue_type:   'landmark',
+    partner:      '여수 해상 케이블카',
+    stage:        'workshop',
     status:       'testing',
     emoji:        '🚡',
-    aliases:      ['yeosu-cablecar'],
+    aliases:      ['yeosu_cablecar', 'yeosu-cablecar', 'cablecar'],
   },
   {
-    code:         'lattoa_cafe',
+    code:         'yeosu_lattoa_cafe',
+    display_name: '라또아 카페',
     name_ko:      '라또아 카페',
     city:         '여수',
     region:       '전남',
     country_code: 'KR',
+    type:         'cafe',
     venue_type:   'cafe',
+    partner:      '라또아',
+    stage:        'workshop',
     status:       'testing',
     emoji:        '☕',
-    aliases:      ['lattoa'],
+    aliases:      ['lattoa_cafe', 'lattoa', 'lattoa-cafe'],
   },
   {
     code:         'forestland',
+    display_name: '더 포레스트랜드',
     name_ko:      '더 포레스트랜드',
     city:         null,
     region:       null,
     country_code: 'KR',
+    type:         'resort',
     venue_type:   'resort',
+    partner:      '더 포레스트랜드',
+    stage:        'workshop',
     status:       'pending',
     emoji:        '🌿',
     aliases:      [],
   },
   {
     code:         'paransi',
+    display_name: '파란시',
     name_ko:      '파란시',
     city:         null,
     region:       null,
     country_code: 'KR',
+    type:         'cafe',
     venue_type:   'cafe',
+    partner:      '파란시',
+    stage:        'workshop',
     status:       'pending',
     emoji:        '🌊',
     aliases:      [],
@@ -102,7 +121,7 @@ function resolve(code) {
 
 /**
  * code → stars.origin_location 저장값
- * alias(yeosu-cablecar) → canonical(yeosu_cablecar)
+ * alias(yeosu_cablecar) → canonical(yeosu_cablecar_workshop)
  */
 function getKpiCode(code) {
   return _ALIAS_MAP[code] ?? code;

@@ -73,7 +73,7 @@ router.get('/:code', adminGuard, async (req, res) => {
         safeCount(
           `SELECT COUNT(*) AS n
            FROM   stars
-           WHERE  COALESCE(origin_location, 'global') = $1
+           WHERE  COALESCE(origin_location, 'global_default_workshop') = $1
              AND  created_at::date = CURRENT_DATE`,
           [kpiCode], '오늘별'
         ),
@@ -81,21 +81,21 @@ router.get('/:code', adminGuard, async (req, res) => {
         safeCount(
           `SELECT COUNT(*) AS n
            FROM   stars
-           WHERE  COALESCE(origin_location, 'global') = $1`,
+           WHERE  COALESCE(origin_location, 'global_default_workshop') = $1`,
           [kpiCode], '누적별'
         ),
         safeCount(
           `SELECT COUNT(*) AS n
            FROM   star_logs sl
            JOIN   stars     s ON s.id = sl.star_id
-           WHERE  COALESCE(s.origin_location, 'global') = $1 AND sl.action_type = 'resonance'`,
+           WHERE  COALESCE(s.origin_location, 'global_default_workshop') = $1 AND sl.action_type = 'resonance'`,
           [kpiCode], '총공명'
         ),
         safeRows(
           `SELECT s.id, s.wish_text, COUNT(sl.id) AS resonance_count
            FROM   stars     s
            LEFT JOIN star_logs sl ON sl.star_id = s.id AND sl.action_type = 'resonance'
-           WHERE  COALESCE(s.origin_location, 'global') = $1 AND s.wish_text IS NOT NULL
+           WHERE  COALESCE(s.origin_location, 'global_default_workshop') = $1 AND s.wish_text IS NOT NULL
            GROUP  BY s.id, s.wish_text, s.created_at
            ORDER  BY resonance_count DESC, s.created_at DESC
            LIMIT  1`,
@@ -104,7 +104,7 @@ router.get('/:code', adminGuard, async (req, res) => {
         safeRows(
           `SELECT emotion, COUNT(*) AS cnt
            FROM   stars
-           WHERE  COALESCE(origin_location, 'global') = $1 AND emotion IS NOT NULL AND emotion != ''
+           WHERE  COALESCE(origin_location, 'global_default_workshop') = $1 AND emotion IS NOT NULL AND emotion != ''
            GROUP  BY emotion ORDER BY cnt DESC LIMIT 10`,
           [kpiCode], '감정TOP10'
         ),
@@ -114,7 +114,7 @@ router.get('/:code', adminGuard, async (req, res) => {
                   COUNT(sl.id)          AS resonance_count
            FROM   stars     s
            LEFT JOIN star_logs sl ON sl.star_id = s.id AND sl.action_type = 'resonance'
-           WHERE  COALESCE(s.origin_location, 'global') = $1
+           WHERE  COALESCE(s.origin_location, 'global_default_workshop') = $1
            GROUP  BY s.id, s.access_key, s.emotion, s.gem_type, s.status, s.created_at, s.wish_text
            ORDER  BY s.created_at DESC LIMIT 5`,
           [kpiCode], '최근별5'
@@ -122,7 +122,7 @@ router.get('/:code', adminGuard, async (req, res) => {
         // 감정 미기록 수 (null 또는 빈 문자열)
         safeCount(
           `SELECT COUNT(*) AS n FROM stars
-           WHERE  COALESCE(origin_location, 'global') = $1 AND (emotion IS NULL OR emotion = '')`,
+           WHERE  COALESCE(origin_location, 'global_default_workshop') = $1 AND (emotion IS NULL OR emotion = '')`,
           [kpiCode], '감정미기록'
         ),
         // 공유 클릭 수 (dt_kpi_events)
@@ -194,7 +194,7 @@ router.get('/:code/today', adminGuard, async (req, res) => {
              emotion, gem_type, status, created_at,
              LEFT(wish_text, 40) AS wish_preview
       FROM   stars
-      WHERE  COALESCE(origin_location, 'global') = $1 AND created_at >= CURRENT_DATE
+      WHERE  COALESCE(origin_location, 'global_default_workshop') = $1 AND created_at >= CURRENT_DATE
       ORDER  BY created_at DESC
     `, [kpiCode]);
     res.json({ success: true, stars: r.rows });
@@ -229,11 +229,11 @@ router.get('/:code/stars', adminGuard, async (req, res) => {
                emotion, gem_type, status, created_at,
                LEFT(wish_text, 60) AS wish_preview
         FROM   stars
-        WHERE  COALESCE(origin_location, 'global') = $1 ${where}
+        WHERE  COALESCE(origin_location, 'global_default_workshop') = $1 ${where}
         ORDER  BY created_at DESC
         LIMIT  $2 OFFSET $3
       `, params),
-      db.query(`SELECT COUNT(*) AS n FROM stars WHERE COALESCE(origin_location, 'global') = $1`, [kpiCode]),
+      db.query(`SELECT COUNT(*) AS n FROM stars WHERE COALESCE(origin_location, 'global_default_workshop') = $1`, [kpiCode]),
     ]);
 
     res.json({
@@ -266,7 +266,7 @@ router.get('/:code/ops', adminGuard, async (req, res) => {
              COUNT(*) FILTER (WHERE activated_at IS NULL)     AS pending,
              MIN(created_at) AS first_star_at,
              MAX(created_at) AS last_star_at
-      FROM   stars WHERE COALESCE(origin_location, 'global') = $1
+      FROM   stars WHERE COALESCE(origin_location, 'global_default_workshop') = $1
     `, [kpiCode]);
 
     const row = r.rows[0];

@@ -14,10 +14,18 @@ const GEMS = [
 ];
 
 const QR_PLACE_LABEL = {
-  'lattoa':         '라또아 카페',
-  'forestland':     '더 포레스트랜드',
-  'paransi':        '파란시',
-  'yeosu-cablecar': '여수 해상 케이블카',
+  // canonical
+  'yeosu_cablecar_workshop': '여수 해상 케이블카',
+  'yeosu_lattoa_cafe':       '라또아 카페',
+  'global_default_workshop': '기본 별공방',
+  // aliases
+  'cablecar':        '여수 해상 케이블카',
+  'yeosu_cablecar':  '여수 해상 케이블카',
+  'yeosu-cablecar':  '여수 해상 케이블카',
+  'lattoa':          '라또아 카페',
+  'lattoa_cafe':     '라또아 카페',
+  'forestland':      '더 포레스트랜드',
+  'paransi':         '파란시',
 };
 
 export default function WishGate() {

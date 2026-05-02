@@ -74,8 +74,14 @@ function fmtRelative(iso) {
 
 // ── 장소 아이콘 ───────────────────────────────────────────────────
 const PLACE_EMOJI = {
+  // canonical
+  yeosu_cablecar_workshop:   '🚡',
+  yeosu_lattoa_cafe:         '☕',
+  global_default_workshop:   '✦',
+  forestland:                '🌿',
+  paransi:                   '🌊',
+  // aliases (구 코드 호환)
   lattoa_cafe: '☕', lattoa: '☕',
-  forestland: '🌿', paransi: '🌊',
   'yeosu-cablecar': '🚡', yeosu_cablecar: '🚡',
   global: '✦',
 };
@@ -555,12 +561,18 @@ export default function LocationAdmin() {
   const [activeTab, setActiveTab] = useState('dashboard');
 
   const emoji     = PLACE_EMOJI[loc] ?? '✦';
-  const placeName = loc === 'lattoa_cafe' || loc === 'lattoa' ? '라또아 카페'
-                  : loc === 'yeosu_cablecar' || loc === 'yeosu-cablecar' ? '여수 해상 케이블카'
-                  : loc === 'forestland'  ? '포레스트랜드'
-                  : loc === 'paransi'     ? '파란시'
-                  : loc === 'global'      ? '기본 별공방'
-                  : loc;
+  const PLACE_NAME = {
+    yeosu_cablecar_workshop: '여수 해상 케이블카',
+    yeosu_lattoa_cafe:       '라또아 카페',
+    global_default_workshop: '기본 별공방',
+    forestland:              '더 포레스트랜드',
+    paransi:                 '파란시',
+    // aliases
+    yeosu_cablecar: '여수 해상 케이블카', 'yeosu-cablecar': '여수 해상 케이블카',
+    lattoa_cafe: '라또아 카페', lattoa: '라또아 카페',
+    global: '기본 별공방',
+  };
+  const placeName = PLACE_NAME[loc] ?? loc;
 
   if (!authed) {
     return <LoginScreen emoji={emoji} placeName={placeName} input={input} setInput={setInput} tryAuth={tryAuth} />;

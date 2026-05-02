@@ -35,6 +35,24 @@ const LOC_CONFIG = {
       { icon: '🌟', text: '별의 여정 시작하기' },
     ],
   },
+  lattoa: {
+    badge_hasStar: '내 별이 기다리고 있어요',
+    badge_noStar:  '라또아 카페 × DreamTown',
+    headline_hasStar: '당신의 별이\n다시 깨어납니다',
+    headline_noStar:  '이 카페의 순간,\n별이 됩니다',
+    subline_hasStar:  '이미 만든 별이 있어요.\n다시 만나볼 수 있어요.',
+    subline_noStar:   '라또아에서의 이 시간을\n소원과 함께 별에 담아보세요.',
+    btn_hasStar: '별의 약속 보기 →',
+    btn_noStar:  '내 별 만들기 ✨',
+    dest_hasStar: (starId) => `/my-star/${starId}`,
+    dest_noStar:  () => '/wish',
+    features: [
+      { icon: '☕', text: '라또아에서의 이 순간 기록' },
+      { icon: '⭐', text: '나만의 별 탄생 + 기억 저장' },
+      { icon: '🌌', text: '도전 은하에 별 등록' },
+      { icon: '📍', text: '라또아 카페 방문 기록 영구 보존' },
+    ],
+  },
   cablecar: {
     badge_hasStar: '내 별이 기다리고 있어요',
     badge_noStar:  '여수 케이블카 캐빈 × DreamTown',
@@ -58,6 +76,19 @@ const LOC_CONFIG = {
 };
 
 const DEFAULT_LOC = 'global';
+
+// URL ?loc= 파라미터 → LOC_CONFIG 키 정규화 (구 QR 코드 / 신규 canonical 양쪽 지원)
+const LOC_NORMALIZE = {
+  'yeosu_cablecar_workshop': 'cablecar',
+  'yeosu_cablecar':          'cablecar',
+  'yeosu-cablecar':          'cablecar',
+  'cablecar':                'cablecar',
+  'yeosu_lattoa_cafe':       'lattoa',
+  'lattoa_cafe':             'lattoa',
+  'lattoa':                  'lattoa',
+  'global_default_workshop': 'global',
+  'global':                  'global',
+};
 
 const S = {
   page: {
@@ -154,8 +185,7 @@ export default function EntryPage() {
   const navigate          = useNavigate();
   const [searchParams]    = useSearchParams();
   const locRaw            = searchParams.get('loc') || DEFAULT_LOC;
-  // QR 인쇄값 정규화: yeosu_cablecar → cablecar
-  const loc               = locRaw === 'yeosu_cablecar' ? 'cablecar' : locRaw;
+  const loc               = LOC_NORMALIZE[locRaw] ?? locRaw;
   const cfg               = LOC_CONFIG[loc];
 
   const starId  = readSavedStar();
@@ -242,7 +272,7 @@ export default function EntryPage() {
           style={S.ctaBtn}
           onClick={() => hasStar
             ? navigate(dest)
-            : navigate(dest, { state: { sourceEvent: loc === 'cablecar' ? 'cablecar' : 'wish' } })
+            : navigate(dest, { state: { sourceEvent: ['cablecar', 'lattoa'].includes(loc) ? loc : 'wish' } })
           }
         >
           {btnLabel}

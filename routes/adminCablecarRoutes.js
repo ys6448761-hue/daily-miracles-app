@@ -16,7 +16,7 @@ const express = require('express');
 const router  = express.Router();
 const db      = require('../database/db');
 
-const ORIGIN_LOCATION = 'yeosu_cablecar'; // SSOT — star-entry.html ?loc=yeosu_cablecar 저장값과 동일
+const ORIGIN_LOCATION = 'yeosu_cablecar_workshop'; // SSOT — locationRegistry canonical
 
 // ── 관리자 인증 ─────────────────────────────────────────────────────
 function adminGuard(req, res, next) {

@@ -883,10 +883,21 @@ app.get('/', (_req, res) => res.status(200).send('DreamTown alive'));
 // QR 코드가 /star-entry.html?loc=yeosu_cablecar 로 인쇄되어 있을 경우 대비.
 // vanilla HTML을 직접 서빙하지 않고 React /entry 로 302 리다이렉트.
 app.get('/star-entry.html', (req, res) => {
-  const raw = req.query.loc;
-  // yeosu_cablecar → cablecar (QR 인쇄값과 React LOC_CONFIG 키를 맞춤)
-  const loc    = raw === 'yeosu_cablecar' ? 'cablecar' : raw;
-  const target = loc ? `/entry?loc=${loc}` : '/entry';
+  const raw = req.query.loc ?? '';
+  // canonical loc → EntryPage LOC_CONFIG 키 변환 (구 QR 코드 호환 포함)
+  const LOC_ENTRY_KEY = {
+    'yeosu_cablecar_workshop': 'cablecar',
+    'yeosu_cablecar':          'cablecar',
+    'yeosu-cablecar':          'cablecar',
+    'cablecar':                'cablecar',
+    'yeosu_lattoa_cafe':       'lattoa',
+    'lattoa_cafe':             'lattoa',
+    'lattoa':                  'lattoa',
+    'global_default_workshop': 'global',
+    'global':                  'global',
+  };
+  const loc    = LOC_ENTRY_KEY[raw] ?? raw;
+  const target = loc ? `/entry?loc=${encodeURIComponent(loc)}` : '/entry';
   return res.redirect(302, target);
 });
 
