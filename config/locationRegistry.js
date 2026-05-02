@@ -29,6 +29,17 @@
 
 const REGISTRY = [
   {
+    code:         'global',
+    name_ko:      '기본 별공방',
+    city:         null,
+    region:       null,
+    country_code: 'KR',
+    venue_type:   'default',
+    status:       'running',
+    emoji:        '✦',
+    aliases:      ['default'],
+  },
+  {
     code:         'yeosu_cablecar',
     name_ko:      '여수 해상 케이블카',
     city:         '여수',

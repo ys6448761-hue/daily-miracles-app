@@ -77,6 +77,7 @@ const PLACE_EMOJI = {
   lattoa_cafe: '☕', lattoa: '☕',
   forestland: '🌿', paransi: '🌊',
   'yeosu-cablecar': '🚡', yeosu_cablecar: '🚡',
+  global: '✦',
 };
 
 // ── 스타일 ────────────────────────────────────────────────────────
@@ -558,6 +559,7 @@ export default function LocationAdmin() {
                   : loc === 'yeosu_cablecar' || loc === 'yeosu-cablecar' ? '여수 해상 케이블카'
                   : loc === 'forestland'  ? '포레스트랜드'
                   : loc === 'paransi'     ? '파란시'
+                  : loc === 'global'      ? '기본 별공방'
                   : loc;
 
   if (!authed) {
@@ -575,6 +577,14 @@ export default function LocationAdmin() {
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <span style={S.badge}>별공방 Admin</span>
+          <a
+            href={loc === 'global' ? '/entry' : `/entry?loc=${loc}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontSize: 11, color: 'rgba(155,135,245,0.7)', textDecoration: 'none', border: '1px solid rgba(155,135,245,0.2)', padding: '3px 10px', borderRadius: 20 }}
+          >
+            사용자 페이지 →
+          </a>
           <a href="/admin" style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', textDecoration: 'none' }}>대시보드</a>
         </div>
       </div>

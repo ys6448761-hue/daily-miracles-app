@@ -17,6 +17,24 @@ import { readSavedStar } from '../lib/utils/starSession.js';
 
 // ── 장소별 설정 (추후 hamel, odongjae 등 추가) ──────────────────────
 const LOC_CONFIG = {
+  global: {
+    badge_hasStar: '내 별이 기다리고 있어요',
+    badge_noStar:  '별공방 × DreamTown',
+    headline_hasStar: '당신의 별이\n다시 깨어납니다',
+    headline_noStar:  '지금, 당신의 소원이\n별이 됩니다',
+    subline_hasStar:  '이미 만든 별이 있어요.\n다시 만나볼 수 있어요.',
+    subline_noStar:   '이 순간은, 그냥 지나가지 않습니다.\n소원을 담아 별을 탄생시키세요.',
+    btn_hasStar: '별의 약속 보기 →',
+    btn_noStar:  '내 별 만들기 ✨',
+    dest_hasStar: (starId) => `/my-star/${starId}`,
+    dest_noStar:  () => '/wish',
+    features: [
+      { icon: '✨', text: '소원을 담아 별 만들기' },
+      { icon: '⭐', text: '나만의 별 탄생 + 기억 저장' },
+      { icon: '🌌', text: '도전 은하에 별 등록' },
+      { icon: '🌟', text: '별의 여정 시작하기' },
+    ],
+  },
   cablecar: {
     badge_hasStar: '내 별이 기다리고 있어요',
     badge_noStar:  '여수 케이블카 캐빈 × DreamTown',
@@ -39,7 +57,7 @@ const LOC_CONFIG = {
   // odongjae: { ... },
 };
 
-const DEFAULT_LOC = 'cablecar';
+const DEFAULT_LOC = 'global';
 
 const S = {
   page: {
