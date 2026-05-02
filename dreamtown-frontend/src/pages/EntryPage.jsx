@@ -11,6 +11,7 @@
  *   noStar   → "내 별 만들기"   → /cablecar
  */
 
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { readSavedStar } from '../lib/utils/starSession.js';
@@ -181,9 +182,153 @@ const S = {
   },
 };
 
+const EMOTION_LABEL = {
+  calm: '편안함', peaceful: '편안함', relaxed: '편안함',
+  excited: '설렘', hopeful: '기대', hope: '기대',
+  happy: '행복', grateful: '감사', energetic: '활기',
+  joy: '기쁨', love: '사랑', proud: '뿌듯함',
+  longing: '그리움', nostalgia: '그리움', tired: '지침',
+  sad: '슬픔', anxious: '불안', clarity: '정리됨',
+};
+
+// ── 공유 유입 화면 ────────────────────────────────────────────────
+function ShareInflow({ sharedStarId, navigate }) {
+  const [star,    setStar]    = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!sharedStarId) { setLoading(false); return; }
+    fetch(`/api/stars/public/${sharedStarId}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => setStar(data?.success ? data : null))
+      .catch(() => setStar(null))
+      .finally(() => setLoading(false));
+  }, [sharedStarId]);
+
+  const emo     = star?.emotion ? (EMOTION_LABEL[star.emotion] ?? star.emotion) : null;
+  const preview = star?.wish_preview ?? null;
+
+  return (
+    <div style={S.page}>
+      <motion.div
+        style={S.heroSection}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <motion.div
+          style={S.starGlow}
+          animate={{ boxShadow: [
+            '0 0 30px 12px rgba(155,135,245,0.6), 0 0 60px 24px rgba(100,80,200,0.3)',
+            '0 0 50px 20px rgba(155,135,245,0.8), 0 0 90px 36px rgba(100,80,200,0.4)',
+            '0 0 30px 12px rgba(155,135,245,0.6), 0 0 60px 24px rgba(100,80,200,0.3)',
+          ]}}
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+        />
+
+        <div style={S.badge}>누군가의 마음이 당신을 초대했어요</div>
+
+        {loading ? (
+          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.25)', marginTop: 20 }}>
+            불러오는 중…
+          </div>
+        ) : (
+          <>
+            <div style={S.headline}>
+              {preview ? '이 마음이\n당신을 불렀습니다' : '이 별이\n당신을 기다렸어요'}
+            </div>
+
+            {preview && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25, duration: 0.5 }}
+                style={{
+                  fontSize: 15, color: 'rgba(255,215,106,0.9)',
+                  lineHeight: 1.75, marginBottom: 20,
+                  background: 'rgba(255,215,106,0.07)',
+                  border: '1px solid rgba(255,215,106,0.18)',
+                  borderRadius: 14, padding: '14px 18px',
+                  textAlign: 'left',
+                }}
+              >
+                "{preview}{preview.length >= 30 ? '…' : ''}"
+              </motion.div>
+            )}
+
+            {emo && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.4 }}
+                style={{
+                  display: 'inline-block',
+                  padding: '5px 16px',
+                  borderRadius: 20,
+                  background: 'rgba(155,135,245,0.12)',
+                  border: '1px solid rgba(155,135,245,0.25)',
+                  fontSize: 12, fontWeight: 700,
+                  color: '#C4BAE0', marginBottom: 8,
+                }}
+              >
+                {emo}의 마음으로 남겨진 별
+              </motion.div>
+            )}
+
+            {!preview && !loading && (
+              <div style={{ ...S.subline, marginTop: 12 }}>
+                소원이 별이 되는 곳입니다.<br />당신의 이야기도 여기에 남겨보세요.
+              </div>
+            )}
+          </>
+        )}
+      </motion.div>
+
+      <motion.div
+        style={{ width: '100%', maxWidth: 360 }}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.45, duration: 0.5 }}
+      >
+        <button
+          style={S.ctaBtn}
+          onClick={() => navigate('/wish', { state: { sourceEvent: 'share', sharedStarId } })}
+        >
+          나도 남겨볼게요 ✨
+        </button>
+
+        {sharedStarId && (
+          <button
+            style={{
+              width: '100%', maxWidth: 360, padding: '13px 0',
+              borderRadius: 16, border: '1px solid rgba(155,135,245,0.2)',
+              background: 'transparent', color: 'rgba(155,135,245,0.6)',
+              fontSize: 14, fontWeight: 600, cursor: 'pointer',
+              fontFamily: "'Noto Sans KR', sans-serif",
+            }}
+            onClick={() => navigate(`/star/${sharedStarId}`)}
+          >
+            이 별 먼저 보기
+          </button>
+        )}
+
+        <p style={{
+          marginTop: 20, fontSize: 11,
+          color: 'rgba(155,135,245,0.3)',
+          lineHeight: 1.7, textAlign: 'center',
+        }}>
+          이 서비스는 위치를 추적하지 않고,<br />선택한 순간만 기록합니다.
+        </p>
+      </motion.div>
+    </div>
+  );
+}
+
 export default function EntryPage() {
   const navigate          = useNavigate();
   const [searchParams]    = useSearchParams();
+  const from              = searchParams.get('from');
+  const sharedStarId      = searchParams.get('star');
   const locRaw            = searchParams.get('loc') || DEFAULT_LOC;
   const loc               = LOC_NORMALIZE[locRaw] ?? locRaw;
   const cfg               = LOC_CONFIG[loc];
@@ -191,7 +336,12 @@ export default function EntryPage() {
   const starId  = readSavedStar();
   const hasStar = !!starId;
 
-  // 미지원 loc → fallback
+  // ── 공유 유입 분기 ──────────────────────────────────────────────
+  if (from === 'share') {
+    return <ShareInflow sharedStarId={sharedStarId} navigate={navigate} />;
+  }
+
+  // ── 미지원 loc → fallback ───────────────────────────────────────
   if (!cfg) {
     return (
       <div style={S.page}>
@@ -199,9 +349,9 @@ export default function EntryPage() {
           알 수 없는 진입 경로입니다.<br />
           <button
             style={{ ...S.ctaBtn, marginTop: 32, maxWidth: 240 }}
-            onClick={() => navigate('/cablecar')}
+            onClick={() => navigate('/entry')}
           >
-            케이블카로 가기
+            기본 별공방으로 가기
           </button>
         </div>
       </div>

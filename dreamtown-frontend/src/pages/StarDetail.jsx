@@ -504,7 +504,7 @@ export default function StarDetail({ starId: propStarId, viewMode: propViewMode 
   ];
 
   async function handleShare() {
-    const starUrl = `https://app.dailymiracles.kr/star/${id}`;
+    const starUrl = `https://app.dailymiracles.kr/entry?from=share&star=${id}`;
     const truncated = (detail.wish_text ?? '').slice(0, 40);
     const shareText = truncated ? `"${truncated}"` : '이 순간이 별로 남았습니다.';
 

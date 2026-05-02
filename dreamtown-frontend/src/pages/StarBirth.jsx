@@ -387,7 +387,7 @@ export default function StarBirth() {
     logEvent('share_clicked', { star_id: starId, message_variant: shareMsg, platform: 'kakao' });
     const baseUrl      = 'https://app.dailymiracles.kr';
     const ogImage      = `${baseUrl}/images/dreamtown-og-v4.jpg`;
-    const linkUrl      = `${baseUrl}/star/${starId}?source=share`;
+    const linkUrl      = `${baseUrl}/entry?from=share&star=${starId}`;
     const emotionLabel = EMOTION_SHARE_LABEL[emotionChoice] ?? '이 마음';
     const shareTitle   = `여수에서 시작된 하루, ${emotionLabel} ✨`;
 
