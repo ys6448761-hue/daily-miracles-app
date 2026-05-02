@@ -112,10 +112,13 @@ export default function WishGate() {
         }).catch(() => {});
       }
 
-      // 케이블카 연출 최소 시간 보장 (3.5초)
-      const elapsed = Date.now() - (loadingStartRef.current ?? Date.now());
-      const remaining = CABLECAR_MIN_MS - elapsed;
-      if (remaining > 0) await new Promise(r => setTimeout(r, remaining));
+      // 케이블카 흐름(sourceEvent='cablecar')은 StarBirth가 Aurum+Cablecar 전체 연출 담당
+      // → 최소 대기 없이 즉시 이동. 그 외는 로딩 영상 최소 3.5초 보장.
+      if (incomingSource !== 'cablecar') {
+        const elapsed   = Date.now() - (loadingStartRef.current ?? Date.now());
+        const remaining = CABLECAR_MIN_MS - elapsed;
+        if (remaining > 0) await new Promise(r => setTimeout(r, remaining));
+      }
 
       nav(star.next ?? '/star-birth', { state: starBirthState });
     } catch (e) {
@@ -210,8 +213,25 @@ export default function WishGate() {
     );
   }
 
-  // ── 케이블카 변환 장면 (별 생성 로딩 중) ────────────────────────────
+  // ── 로딩 중 화면 ────────────────────────────────────────────────────
+  // cablecar 흐름: StarBirth에서 Aurum→Cablecar 연출 전담 → 여기서는 영상 재생 금지
+  // 그 외: 케이블카 변환 영상 + "조금 또렷해졌어요"
   if (loading) {
+    if (incomingSource === 'cablecar') {
+      return (
+        <div style={{ position: 'fixed', inset: 0, background: '#06040f', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            style={{ fontSize: 16, color: 'rgba(255,215,106,0.55)', letterSpacing: '0.04em' }}
+          >
+            별이 탄생하고 있어요...
+          </motion.p>
+        </div>
+      );
+    }
+
     return (
       <div style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {!cablecarVideoFailed ? (
