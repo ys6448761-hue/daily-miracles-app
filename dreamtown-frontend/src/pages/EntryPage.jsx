@@ -78,6 +78,13 @@ const LOC_CONFIG = {
 
 const DEFAULT_LOC = 'global';
 
+// LOC_CONFIG 키 → DB canonical origin_place 코드
+const LOC_TO_CANONICAL = {
+  'global':   'global_default_workshop',
+  'cablecar': 'yeosu_cablecar_workshop',
+  'lattoa':   'yeosu_lattoa_cafe',
+};
+
 // URL ?loc= 파라미터 → LOC_CONFIG 키 정규화 (구 QR 코드 / 신규 canonical 양쪽 지원)
 const LOC_NORMALIZE = {
   'yeosu_cablecar_workshop': 'cablecar',
@@ -422,7 +429,10 @@ export default function EntryPage() {
           style={S.ctaBtn}
           onClick={() => hasStar
             ? navigate(dest)
-            : navigate(dest, { state: { sourceEvent: ['cablecar', 'lattoa'].includes(loc) ? loc : 'wish' } })
+            : navigate(dest, { state: {
+                sourceEvent:    ['cablecar', 'lattoa'].includes(loc) ? loc : 'wish',
+                originLocation: LOC_TO_CANONICAL[loc] ?? loc,
+              }})
           }
         >
           {btnLabel}

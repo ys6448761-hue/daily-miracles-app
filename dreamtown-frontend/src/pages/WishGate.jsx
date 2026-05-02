@@ -81,7 +81,6 @@ export default function WishGate() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [careMessage, setCareMessage] = useState(''); // RED 신호 시 케어 메시지
-  const [cablecarVideoFailed, setCablecarVideoFailed] = useState(false);
   const loadingStartRef = useRef(null);
   const CABLECAR_MIN_MS = 3500; // 케이블카 연출 최소 보장 시간
 
@@ -101,7 +100,8 @@ export default function WishGate() {
         return;
       }
 
-      const originPlace = new URLSearchParams(window.location.search).get('loc') || null;
+      const incomingOrigin = location.state?.originLocation ?? null;
+      const originPlace = incomingOrigin || new URLSearchParams(window.location.search).get('loc') || null;
       const star = await postStarCreate({ wishId: wishResult.wish_id, userId, phoneNumber: phoneNumber.trim() || null, originPlace });
       if (!star?.star_id) throw new Error('별 생성에 실패했어요. 다시 시도해주세요.');
       saveStarId(star.star_id);
@@ -222,55 +222,27 @@ export default function WishGate() {
   }
 
   // ── 로딩 중 화면 ────────────────────────────────────────────────────
-  // cablecar 흐름: StarBirth에서 Aurum→Cablecar 연출 전담 → 여기서는 영상 재생 금지
-  // 그 외: 케이블카 변환 영상 + "조금 또렷해졌어요"
+  // cablecar: StarBirth에서 Aurum→Cablecar 연출 전담 → 간단 텍스트만
+  // 그 외: 공통 별 탄생 로딩 (cablecar 영상 금지)
   if (loading) {
-    if (incomingSource === 'cablecar') {
-      return (
-        <div style={{ position: 'fixed', inset: 0, background: '#06040f', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            style={{ fontSize: 16, color: 'rgba(255,215,106,0.55)', letterSpacing: '0.04em' }}
-          >
-            별이 탄생하고 있어요...
-          </motion.p>
-        </div>
-      );
-    }
-
     return (
-      <div style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        {!cablecarVideoFailed ? (
-          <video
-            autoPlay muted loop playsInline
-            src="/assets/brand/intro/cablecar-star-intro.mp4"
-            onError={() => setCablecarVideoFailed(true)}
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.72 }}
-          />
-        ) : (
-          <img
-            src="/assets/brand/core/cablecar-star-intro.png"
-            alt=""
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        )}
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.48)' }} />
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.5, duration: 0.9 }}
+      <div style={{ position: 'fixed', inset: 0, background: '#06040f', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
+        <motion.div
+          animate={{ scale: [1, 1.15, 1], opacity: [0.6, 1, 0.6] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           style={{
-            position: 'relative', zIndex: 1,
-            fontSize: 20, fontWeight: 300,
-            color: 'rgba(255,255,255,0.92)',
-            textAlign: 'center', whiteSpace: 'pre-line',
-            lineHeight: 1.8, letterSpacing: '-0.01em',
-            textShadow: '0 2px 20px rgba(0,0,0,0.7)',
+            width: 64, height: 64, borderRadius: '50%',
+            background: 'radial-gradient(circle, #fff 0%, #e8e0ff 25%, #9B87F5 55%, transparent 80%)',
+            boxShadow: '0 0 24px 10px rgba(155,135,245,0.5)',
           }}
+        />
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          style={{ fontSize: 16, color: 'rgba(255,215,106,0.55)', letterSpacing: '0.04em' }}
         >
-          {'조금 또렷해졌어요'}
+          별이 탄생하고 있어요...
         </motion.p>
       </div>
     );
