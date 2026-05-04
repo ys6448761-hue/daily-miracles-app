@@ -44,6 +44,29 @@
       margin-bottom: 32px;
     }
 
+    /* ── 포스트카드 이미지 ─────────────────────────── */
+    .postcard-wrap {
+      width: 100%; max-width: 360px;
+      margin: 0 auto 24px;
+      border-radius: 18px; overflow: hidden;
+      position: relative;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: none;
+    }
+    .postcard-wrap.visible { display: block; }
+    .postcard-img {
+      width: 100%; display: block;
+      object-fit: cover;
+    }
+    .postcard-skeleton {
+      width: 100%; aspect-ratio: 2/3;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 40px; opacity: .3;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .postcard-skeleton.hidden { display: none; }
+
     /* ── 감정 연결 배너 ─────────────────────────────── */
     .emotion-banner {
       margin-bottom: 24px;
@@ -111,15 +134,34 @@
       margin-bottom: 16px;
     }
 
-    .btn-kakao {
+    /* 1순위: 포스트카드 저장 */
+    .btn-download {
       width: 100%;
-      padding: 16px;
-      background: #FEE500;
+      padding: 17px;
+      background: linear-gradient(92deg, #4f8ef7 0%, #7b5ea7 100%);
       border: none;
       border-radius: 14px;
-      color: #191919;
-      font-size: 16px;
+      color: #fff;
+      font-size: 17px;
       font-weight: 700;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+      margin-bottom: 10px;
+    }
+    .btn-download:active { opacity: 0.88; transform: scale(.98); }
+
+    /* 2순위: 친구에게 공유 */
+    .btn-kakao {
+      width: 100%;
+      padding: 15px;
+      background: rgba(255,255,255,0.07);
+      border: 1.5px solid rgba(255,255,255,0.16);
+      border-radius: 14px;
+      color: rgba(255,255,255,0.8);
+      font-size: 15px;
+      font-weight: 600;
       font-family: 'Noto Sans KR', sans-serif;
       cursor: pointer;
       display: flex;
@@ -130,17 +172,17 @@
       -webkit-tap-highlight-color: transparent;
       margin-bottom: 10px;
     }
-    .btn-kakao:active { opacity: 0.85; }
+    .btn-kakao:active { opacity: 0.7; }
 
     .btn-copy {
       display: none;
       width: 100%;
       padding: 13px;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.10);
       border-radius: 12px;
-      color: rgba(255,255,255,0.55);
-      font-size: 14px;
+      color: rgba(255,255,255,0.4);
+      font-size: 13px;
       font-family: 'Noto Sans KR', sans-serif;
       cursor: pointer;
       transition: opacity 0.15s;
@@ -167,6 +209,14 @@
       text-align: center;
       line-height: 1.6;
       white-space: pre-line;
+    }
+
+    .save-hint {
+      font-size: 11px;
+      color: rgba(255,255,255,0.28);
+      text-align: center;
+      margin: -4px 0 14px;
+      line-height: 1.6;
     }
 
     /* ── 케이블카 영상 모달 ─────────────────────────────── */
@@ -308,6 +358,11 @@
       언제든 다시 별을 만날 수 있어요
     </p>
 
+    <div class="postcard-wrap" id="postcardWrap">
+      <div class="postcard-skeleton" id="postcardSkeleton">✨</div>
+      <img class="postcard-img" id="postcardImg" alt="별 포스트카드" style="display:none">
+    </div>
+
     <div class="emotion-banner" id="emotionBanner">
       <p class="banner-line1" id="bannerLine1"></p>
       <p class="banner-line2" id="bannerLine2"></p>
@@ -322,13 +377,10 @@
     <!-- 공유 섹션 (케이블카 영상 종료 후 표시) -->
     <div id="shareSection" style="display:none">
       <div class="share-area">
+        <button class="btn-download" id="btnDownload">📥 포스트카드 저장하기</button>
+        <div class="save-hint" id="saveHint">저장 후 카카오·인스타·문자로 바로 공유해보세요</div>
         <button class="btn-kakao" id="btnKakao">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path fill-rule="evenodd" clip-rule="evenodd"
-              d="M9 0C4.037 0 0 3.223 0 7.2c0 2.57 1.648 4.825 4.127 6.108l-1.05 3.894c-.092.342.305.608.603.396l4.684-3.127A10.9 10.9 0 009 14.4c4.963 0 9-3.223 9-7.2S13.963 0 9 0z"
-              fill="#191919"/>
-          </svg>
-          친구에게 공유하기
+          💬 친구에게 공유하기
         </button>
         <button class="btn-copy" id="btnCopy">링크 복사</button>
         <div class="copy-toast" id="copyToast">링크가 복사됐어요 ✓</div>
@@ -354,7 +406,9 @@
     // ── 진입 가드: ASCEND 미만이면 처음부터 ─────────────
     const accessKey = localStorage.getItem('access_key');
     const _flowStep = Number(localStorage.getItem('flow_step'));
+    console.log('[complete] 진입 진단 | flow_step:', _flowStep, '| access_key:', accessKey ? accessKey.slice(0,8)+'…' : 'null', '| share_image_url:', localStorage.getItem('share_image_url'));
     if (!accessKey || _flowStep < FLOW.ASCEND) {
+      console.warn('[complete] 가드 실패 — /star-entry.html 이동');
       window.location.replace('/star-entry.html');
     }
 
@@ -366,7 +420,7 @@
 
     // ── 기본 UI 세팅 ──────────────────────────────────
     document.getElementById('accessKey').textContent = accessKey;
-    document.getElementById('btnView').href = '/star-view.html?key=' + accessKey;
+    document.getElementById('btnView').href = '/star-view/' + encodeURIComponent(accessKey);
 
     // ── 감정 연결 배너 ────────────────────────────────
     const banner   = document.getElementById('emotionBanner');
@@ -429,6 +483,21 @@
       return `${BASE_URL}${url.startsWith('/') ? url : '/' + url}`;
     }
 
+    // ── 포스트카드 이미지 표시 ────────────────────────
+    function showPostcard(url) {
+      if (!url || url.startsWith('blob:') || url.startsWith('data:')) return;
+      const wrap = document.getElementById('postcardWrap');
+      const skel = document.getElementById('postcardSkeleton');
+      const img  = document.getElementById('postcardImg');
+      wrap.classList.add('visible');
+      img.onload  = () => { skel.classList.add('hidden'); img.style.display = 'block'; };
+      img.onerror = () => { skel.classList.add('hidden'); };
+      img.src = url;
+    }
+
+    // localStorage에 있으면 즉시 표시
+    if (imageUrl) showPostcard(imageUrl);
+
     // star API에서 emotion + image + origin_location 보완 (fire-and-forget)
     (async () => {
       try {
@@ -436,7 +505,10 @@
         const data = await res.json();
         if (data.success) {
           emotionText = EMOTION_MAP[data.star?.emotion] || emotionText;
-          if (data.image_url)               imageUrl       = data.image_url;
+          if (data.image_url) {
+            imageUrl = data.image_url;
+            showPostcard(imageUrl);
+          }
           if (data.star?.origin_location)   originLocation = data.star.origin_location;
         }
       } catch { /* fallback 유지 */ }
@@ -451,43 +523,105 @@
       copyBtn.style.display = 'block';
     }
 
+    // ── 이미지 파일 가져오기 (navigator.share files 용) ──
+    async function fetchImageFile(url) {
+      const absUrl = toAbsoluteUrl(url);
+      const res    = await fetch(absUrl);
+      if (!res.ok) throw new Error('fetch failed');
+      const blob = await res.blob();
+      const ext  = (blob.type === 'image/jpeg') ? 'jpg' : 'png';
+      return new File([blob], `my-star.${ext}`, { type: blob.type });
+    }
+
     // ── 카카오톡 공유 버튼 ────────────────────────────
-    document.getElementById('btnKakao').addEventListener('click', () => {
+    document.getElementById('btnKakao').addEventListener('click', async () => {
       document.getElementById('shareError').style.display = 'none';
 
       const _entryUrl = buildEntryUrl();
+      const _viewUrl  = accessKey
+        ? (BASE_URL + '/star-view/' + encodeURIComponent(accessKey))
+        : _entryUrl;
 
-      if (!initKakao() || !window.Kakao?.Share) {
-        showFallback('카카오톡 공유가 열리지 않았어요.\n링크를 복사해서 보내주세요.');
-        return;
+      // ① navigator.share (모바일 네이티브 공유 — 이미지 파일 포함 시도)
+      if (navigator.share) {
+        try {
+          const shareData = {
+            title: '나의 별 포스트카드',
+            text:  '지금 내 마음이 별이 되었어요',
+            url:   _viewUrl,
+          };
+
+          // 이미지 파일 공유 가능 여부 확인
+          if (imageUrl && navigator.canShare) {
+            try {
+              const file = await fetchImageFile(imageUrl);
+              const withFile = { ...shareData, files: [file] };
+              if (navigator.canShare(withFile)) {
+                await navigator.share(withFile);
+                return;
+              }
+            } catch (e) {
+              console.warn('[share] 이미지 파일 공유 실패, URL 공유로 fallback:', e.message);
+            }
+          }
+
+          // 파일 없이 URL 공유
+          await navigator.share(shareData);
+          return;
+        } catch (e) {
+          if (e.name === 'AbortError') return; // 사용자가 직접 닫음
+          console.warn('[share] navigator.share 실패:', e.message);
+        }
       }
 
+      // ② 카카오 SDK 공유
+      if (initKakao() && window.Kakao?.Share) {
+        try {
+          const _absImage = toAbsoluteUrl(imageUrl);
+          const _payload  = {
+            objectType: 'feed',
+            content: {
+              title:       '내 소원이 별이 됐어요 ✨',
+              description: '당신의 소원을, 별로 만들어보세요',
+              imageUrl:    _absImage,
+              link: {
+                mobileWebUrl: _entryUrl,
+                webUrl:       _entryUrl,
+              },
+            },
+            buttons: [{
+              title: '나도 만들어보기',
+              link: {
+                mobileWebUrl: _entryUrl,
+                webUrl:       _entryUrl,
+              },
+            }],
+          };
+          console.log('[Kakao] sendDefault payload:', JSON.stringify(_payload, null, 2));
+          window.Kakao.Share.sendDefault(_payload);
+          return;
+        } catch (e) {
+          console.warn('[Kakao] sendDefault 실패:', e.message);
+        }
+      }
+
+      // ③ 최종 fallback
+      showFallback('공유창이 열리지 않았어요.\n이미지를 저장하거나 링크를 복사해서 보내주세요.');
+    });
+
+    // ── 이미지 다운로드 버튼 ──────────────────────────
+    document.getElementById('btnDownload').addEventListener('click', async () => {
+      if (!imageUrl) return;
       try {
-        const _absImage = toAbsoluteUrl(imageUrl);
-        const _payload  = {
-          objectType: 'feed',
-          content: {
-            title:       '내 소원이 별이 됐어요 ✨',
-            description: '당신의 소원을, 별로 만들어보세요',
-            imageUrl:    _absImage,
-            link: {
-              mobileWebUrl: _entryUrl,
-              webUrl:       _entryUrl,
-            },
-          },
-          buttons: [{
-            title: '나도 만들어보기',
-            link: {
-              mobileWebUrl: _entryUrl,
-              webUrl:       _entryUrl,
-            },
-          }],
-        };
-        console.log('[Kakao] sendDefault payload:', JSON.stringify(_payload, null, 2));
-        window.Kakao.Share.sendDefault(_payload);
+        const file = await fetchImageFile(imageUrl);
+        const a    = document.createElement('a');
+        a.href     = URL.createObjectURL(file);
+        a.download = file.name;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 5000);
       } catch (e) {
-        console.warn('[Kakao] sendDefault 실패:', e.message);
-        showFallback('카카오톡 공유가 열리지 않았어요.\n링크를 복사해서 보내주세요.');
+        // fetch 실패 시 새 탭으로 열기 (iOS Safari 등)
+        window.open(toAbsoluteUrl(imageUrl), '_blank');
       }
     });
 

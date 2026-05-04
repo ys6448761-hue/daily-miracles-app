@@ -321,7 +321,7 @@ router.get('/:access_key', async (req, res) => {
     const { access_key } = req.params;
 
     const { rows: starRows } = await db.query(
-      `SELECT id, access_key, origin_location, emotion, is_public, status, created_at
+      `SELECT id, access_key, origin_location, emotion, gem_type, is_public, status, created_at
        FROM stars WHERE access_key = $1`,
       [access_key]
     );
@@ -464,8 +464,28 @@ router.post('/commit', async (req, res) => {
     // Journey + Moment (preview 이미지 직접 연결)
     const emotionText = EMOTION_TEXT_MAP[emotion] ?? '괜찮아졌어요 ✨';
     const image_url   = preview_image_url || '/images/fallback/star-default.svg';
-    const is_fallback = !preview_image_url || preview_image_url.startsWith('/');
+    const is_fallback = !preview_image_url || preview_image_url.startsWith('/images/fallback');
     _commitJourneyMoment(inserted.id, emotionText, origin_location, image_url, is_fallback).catch(() => {});
+
+    // star_images 등록 + OG 이미지 생성 (현장 포스트카드 흐름 — fire-and-forget)
+    if (preview_image_url && !preview_image_url.startsWith('/images/fallback')) {
+      db.query(
+        `INSERT INTO star_images (star_id, image_url, emotion_text, location, validation_pass)
+         VALUES ($1, $2, $3, $4, true)
+         ON CONFLICT DO NOTHING`,
+        [inserted.id, preview_image_url, emotionText, origin_location]
+      ).catch(e => console.warn('[star-mvp] star_images insert 실패:', e.message));
+
+      (async () => {
+        try {
+          const { makeOgImage } = require('../scripts/thumbnail/lib/makeOgImage');
+          const { og_url } = await makeOgImage(preview_image_url, inserted.access_key);
+          console.log(`[og] 생성 완료: ${og_url}`);
+        } catch (e) {
+          console.warn('[og] 생성 실패 (공유는 원본 사용):', e.message);
+        }
+      })();
+    }
 
     // Emotion Link
     let emotionLink = null;

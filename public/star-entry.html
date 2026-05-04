@@ -3,690 +3,296 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>별 만들기 — 하루하루의 기적</title>
+  <title>별 포스트카드 — 하루하루의 기적</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
       font-family: 'Noto Sans KR', sans-serif;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      background: linear-gradient(160deg, #0d0b1f 0%, #141030 55%, #0b1b38 100%);
       min-height: 100vh; min-height: 100dvh;
-      display: flex; align-items: center; justify-content: center;
-      padding: 24px; color: #fff;
+      color: #fff;
+      padding: 24px 20px max(env(safe-area-inset-bottom), 28px);
     }
-    .container { max-width: 480px; width: 100%; }
 
-    /* ── Panel system ── */
-    .panel { display: block; }
-    .panel.hidden { display: none; }
+    .wrap { max-width: 440px; margin: 0 auto; }
 
-    /* ── Header ── */
-    .header { text-align: center; margin-bottom: 32px; }
-    .star-icon { font-size: 52px; margin-bottom: 14px; display: block; }
-    .header h1 { font-size: 22px; font-weight: 600; line-height: 1.5; }
-    .header p  { margin-top: 8px; font-size: 13px; color: rgba(255,255,255,0.5); }
-
-    /* ── Step indicator ── */
-    .step-bar {
-      display: flex; justify-content: center; gap: 6px;
-      margin-bottom: 28px;
+    /* ── Brand ── */
+    .brand {
+      text-align: center;
+      font-size: 11px; letter-spacing: .14em;
+      color: rgba(255,255,255,0.22);
+      text-transform: uppercase;
+      padding: 4px 0 28px;
     }
-    .step-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: rgba(255,255,255,0.15);
-      transition: background 0.3s;
-    }
-    .step-dot.active { background: rgba(100,160,255,0.8); }
-    .step-dot.done   { background: rgba(255,220,80,0.5); }
 
-    /* ── Buttons ── */
-    .btn-primary {
-      width: 100%; padding: 16px;
-      background: linear-gradient(90deg, #4f8ef7, #7b5ea7);
-      border: none; border-radius: 14px;
-      color: #fff; font-size: 17px; font-weight: 600;
+    /* ── 감정 선택 ── */
+    .q-label {
+      font-size: 19px; font-weight: 700;
+      line-height: 1.45; margin-bottom: 18px;
+      letter-spacing: -.02em;
+    }
+    .emotion-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+    .emotion-btn {
+      background: rgba(255,255,255,0.055);
+      border: 1.5px solid rgba(255,255,255,0.11);
+      border-radius: 18px;
+      padding: 22px 14px 18px;
+      color: #fff;
       font-family: 'Noto Sans KR', sans-serif;
-      cursor: pointer; opacity: 0.38; pointer-events: none;
-      transition: opacity 0.2s; -webkit-tap-highlight-color: transparent;
-    }
-    .btn-primary.active { opacity: 1; pointer-events: auto; }
-    .btn-back-link {
-      display: block; width: 100%; padding: 10px;
-      background: none; border: none;
-      color: rgba(255,255,255,0.38); font-size: 14px;
-      font-family: 'Noto Sans KR', sans-serif;
-      cursor: pointer; text-align: center; margin-top: 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: background .16s, border-color .16s, box-shadow .16s;
       -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
-    .btn-back-link:active { color: rgba(255,255,255,0.7); }
+    .emotion-btn:active { transform: scale(.97); }
+    .emotion-btn.selected {
+      background: rgba(140,180,255,0.16);
+      border-color: #7ab0ff;
+      box-shadow: 0 0 20px rgba(120,170,255,0.16);
+    }
+    .e-icon { font-size: 30px; display: block; margin-bottom: 8px; }
+    .e-text { font-size: 15px; font-weight: 600; display: block; }
 
-    /* ── P0: 공유 유입 인트로 ── */
-    .intro-star-wrap {
-      width: 100%; max-width: 260px; margin: 0 auto 24px;
-      aspect-ratio: 1/1; border-radius: 22px; overflow: hidden;
-      position: relative; background: rgba(255,255,255,0.05);
+    /* ── 소원 입력 ── */
+    .wish-label {
+      font-size: 14px; color: rgba(255,255,255,0.45);
+      margin-bottom: 10px;
     }
-    .intro-star-img  { width: 100%; height: 100%; object-fit: cover; display: none; }
-    .intro-star-img.ready { display: block; }
-    .intro-skeleton {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 60px; opacity: 0.35;
-      animation: pulse 2s ease-in-out infinite;
+    .wish-box {
+      background: rgba(255,255,255,0.05);
+      border: 1.5px solid rgba(255,255,255,0.11);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 28px;
+      transition: border-color .16s;
     }
-    @keyframes pulse { 0%,100%{opacity:0.35} 50%{opacity:0.75} }
-    .intro-message { text-align: center; font-size: 19px; font-weight: 700; line-height: 1.65; margin-bottom: 10px; }
-    .intro-sub     { text-align: center; font-size: 13px; color: rgba(255,255,255,0.42); margin-bottom: 36px; line-height: 1.6; }
-    .btn-make-star {
-      width: 100%; padding: 18px;
-      background: linear-gradient(90deg, #4f8ef7, #7b5ea7);
-      border: none; border-radius: 14px;
-      color: #fff; font-size: 17px; font-weight: 700;
-      font-family: 'Noto Sans KR', sans-serif;
-      cursor: pointer; -webkit-tap-highlight-color: transparent;
+    .wish-box:focus-within {
+      border-color: rgba(255,255,255,0.28);
     }
-
-    /* ── P1: 소원 입력 ── */
-    .wish-wrap {
-      background: rgba(255,255,255,0.06);
-      border: 1.5px solid rgba(255,255,255,0.14);
-      border-radius: 16px; padding: 4px; margin-bottom: 16px;
-    }
-    .wish-wrap textarea {
-      width: 100%; min-height: 110px;
+    .wish-box textarea {
+      width: 100%; min-height: 96px;
       background: transparent; border: none; outline: none;
       color: #fff; font-size: 15px;
       font-family: 'Noto Sans KR', sans-serif;
-      line-height: 1.65; padding: 14px; resize: none;
+      line-height: 1.7; padding: 16px; resize: none;
     }
-    .wish-wrap textarea::placeholder { color: rgba(255,255,255,0.28); }
+    .wish-box textarea::placeholder { color: rgba(255,255,255,0.2); }
     .wish-count {
-      text-align: right; font-size: 12px;
-      color: rgba(255,255,255,0.3); padding: 0 14px 10px;
+      text-align: right; font-size: 11px;
+      color: rgba(255,255,255,0.22); padding: 0 14px 10px;
     }
 
-    /* ── P2: 감정 선택 ── */
-    .emotion-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; }
-    .emotion-btn {
-      background: rgba(255,255,255,0.07); border: 2px solid rgba(255,255,255,0.14);
-      border-radius: 16px; padding: 20px 16px;
-      color: #fff; font-size: 16px; font-weight: 500;
-      font-family: 'Noto Sans KR', sans-serif;
-      cursor: pointer; text-align: center; transition: all 0.2s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .emotion-btn.selected {
-      background: rgba(100,160,255,0.28); border-color: #64a0ff;
-      box-shadow: 0 0 16px rgba(100,160,255,0.22);
-    }
-    .emotion-emoji { font-size: 28px; display: block; margin-bottom: 6px; }
-
-    /* ── P3: 보석 선택 ── */
-    .gem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; }
-    .gem-btn {
-      background: rgba(255,255,255,0.07); border: 2px solid rgba(255,255,255,0.14);
-      border-radius: 16px; padding: 18px 14px;
-      color: #fff; font-family: 'Noto Sans KR', sans-serif;
-      cursor: pointer; text-align: center; transition: all 0.2s;
-      -webkit-tap-highlight-color: transparent;
-      display: flex; flex-direction: column; align-items: center; gap: 6px;
-    }
-    .gem-btn.selected {
-      background: rgba(255,210,60,0.15); border-color: rgba(255,210,60,0.6);
-      box-shadow: 0 0 16px rgba(255,210,60,0.15);
-    }
-    .gem-emoji { font-size: 30px; display: block; }
-    .gem-name  { font-size: 16px; font-weight: 600; }
-    .gem-sub   { font-size: 11px; color: rgba(255,255,255,0.45); }
-
-    /* ── P4: 아우룸 전달 ── */
-    .aurum-video-wrap {
-      width: 100%; aspect-ratio: 16/9; border-radius: 18px;
-      overflow: hidden; margin-bottom: 28px; position: relative;
-      background: rgba(0,0,0,0.5);
-    }
-    .aurum-video-wrap video {
-      width: 100%; height: 100%; object-fit: cover; display: block;
-    }
-    .aurum-video-overlay {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      pointer-events: none;
-    }
-    .aurum-star-core {
-      font-size: 64px; position: relative; z-index: 2;
-      animation: aurum-pulse 1.6s ease-in-out infinite;
-      filter: drop-shadow(0 0 18px rgba(255,210,60,0.7));
-    }
-    @keyframes aurum-pulse {
-      0%,100% { transform: scale(1); filter: drop-shadow(0 0 18px rgba(255,210,60,0.7)); }
-      50% { transform: scale(1.14); filter: drop-shadow(0 0 32px rgba(255,210,60,1)); }
-    }
-    .aurum-title {
-      text-align: center; font-size: 20px; font-weight: 700;
-      line-height: 1.6; margin-bottom: 10px;
-    }
-    .aurum-sub {
-      text-align: center; font-size: 13px;
-      color: rgba(255,255,255,0.42); line-height: 1.7;
-    }
-    .aurum-progress {
-      margin-top: 28px; height: 2px;
-      background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden;
-    }
-    .aurum-progress-bar {
-      height: 100%; background: rgba(255,210,60,0.6);
-      border-radius: 2px; width: 0%;
-      transition: width 2.5s linear;
-    }
-
-    /* ── P5: 소원그림 — FULL SCREEN ── */
-    #panelPreview {
-      position: fixed; inset: 0; z-index: 100;
-      background: #000;
-      display: flex; flex-direction: column;
-    }
-    #panelPreview.hidden { display: none; }
-    .preview-fullscreen-img {
-      flex: 1; width: 100%; object-fit: contain;
-      display: none;
-    }
-    .preview-fullscreen-img.ready { display: block; }
-    .preview-fullscreen-skeleton {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 14px;
-      background: linear-gradient(135deg,rgba(255,255,255,0.03) 0%,rgba(255,255,255,0.08) 50%,rgba(255,255,255,0.03) 100%);
-      background-size: 200% 200%; animation: shimmer 1.8s ease-in-out infinite;
-    }
-    .preview-fullscreen-skeleton.hidden { display: none; }
-    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-    .skeleton-star { font-size: 44px; animation: pulse 1.6s ease-in-out infinite; }
-    .skeleton-hint { font-size: 13px; color: rgba(255,255,255,0.35); }
-    .preview-bottom-overlay {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 24px 24px max(env(safe-area-inset-bottom), 24px);
-      background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, transparent 100%);
-      display: flex; flex-direction: column; align-items: center; gap: 14px;
-    }
-    .preview-sentence {
-      font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.88);
-      text-align: center; letter-spacing: -0.01em;
-      text-shadow: 0 1px 8px rgba(0,0,0,0.7);
-      min-height: 22px;
-    }
-    .btn-commit {
-      width: 100%; max-width: 360px; padding: 18px;
-      background: linear-gradient(90deg, #4f8ef7, #7b5ea7);
-      border: none; border-radius: 14px;
+    /* ── CTA ── */
+    .btn-cta {
+      width: 100%; padding: 19px;
+      background: linear-gradient(92deg, #4f8ef7 0%, #7b5ea7 100%);
+      border: none; border-radius: 16px;
       color: #fff; font-size: 17px; font-weight: 700;
       font-family: 'Noto Sans KR', sans-serif;
-      cursor: pointer; transition: opacity 0.2s;
+      cursor: pointer;
+      transition: opacity .18s, transform .1s;
       -webkit-tap-highlight-color: transparent;
+      margin-bottom: 10px;
     }
-    .btn-commit:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-cta:disabled { opacity: .28; cursor: not-allowed; }
+    .btn-cta:not(:disabled):active { transform: scale(.98); opacity: .92; }
+
     .error-msg {
-      margin-top: 12px; padding: 12px 16px;
-      background: rgba(255,80,80,0.2); border-radius: 10px;
-      font-size: 13px; color: #ff9999; text-align: center; display: none;
+      font-size: 13px; color: #ff9a9a;
+      text-align: center; min-height: 18px;
     }
-    .btn-restart {
-      display: block; text-align: center;
-      font-size: 13px; color: rgba(255,255,255,0.35);
-      padding: 8px; cursor: pointer; background: none; border: none;
-      font-family: 'Noto Sans KR', sans-serif;
-      -webkit-tap-highlight-color: transparent;
+
+    /* ── 생성 오버레이 ── */
+    .overlay {
+      position: fixed; inset: 0; z-index: 999;
+      background: rgba(9, 7, 22, 0.93);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 18px;
     }
+    .overlay.hidden { display: none; }
+    .ov-star {
+      font-size: 56px;
+      animation: glow 1.8s ease-in-out infinite;
+    }
+    @keyframes glow {
+      0%,100% { opacity: .7; transform: scale(1); filter: drop-shadow(0 0 8px rgba(255,220,80,.3)); }
+      50%      { opacity: 1; transform: scale(1.1); filter: drop-shadow(0 0 22px rgba(255,220,80,.8)); }
+    }
+    .ov-text { font-size: 15px; color: rgba(255,255,255,0.55); }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="wrap">
 
-    <!-- ── P0: 공유 유입 인트로 ─────────────────────────────── -->
-    <div class="panel hidden" id="panelIntro">
-      <div style="text-align:center;margin-bottom:28px">
-        <span style="font-size:13px;color:rgba(255,255,255,0.3);letter-spacing:.05em">✦ DAILY MIRACLES</span>
-      </div>
-      <div class="intro-star-wrap">
-        <div class="intro-skeleton" id="introSkeleton">✨</div>
-        <img class="intro-star-img" id="introStarImg" alt="누군가의 별">
-      </div>
-      <p class="intro-message">이건, 누군가의 소원이<br>만든 별이에요</p>
-      <p class="intro-sub">지금 이 순간의 마음을<br>당신도 별로 남겨보세요</p>
-      <button class="btn-make-star" id="btnMakeStar">나도 내 별 만들어보기 →</button>
+    <div class="brand">Daily Miracles · 여수 케이블카</div>
+
+    <!-- ① 감정 -->
+    <div class="q-label">지금 이 순간,<br>어떤 마음인가요?</div>
+    <div class="emotion-grid">
+      <button class="emotion-btn" data-emotion="숨이 놓였어요" data-gem="emerald">
+        <span class="e-icon">🌙</span>
+        <span class="e-text">숨이 놓였어요</span>
+      </button>
+      <button class="emotion-btn" data-emotion="믿고 싶어졌어요" data-gem="diamond">
+        <span class="e-icon">🌟</span>
+        <span class="e-text">믿고 싶어졌어요</span>
+      </button>
+      <button class="emotion-btn" data-emotion="정리됐어요" data-gem="sapphire">
+        <span class="e-icon">🪐</span>
+        <span class="e-text">정리됐어요</span>
+      </button>
+      <button class="emotion-btn" data-emotion="용기났어요" data-gem="citrine">
+        <span class="e-icon">🌱</span>
+        <span class="e-text">용기났어요</span>
+      </button>
     </div>
 
-    <!-- ── P1: 감정 선택 ──────────────────────────────────── -->
-    <div class="panel hidden" id="panelSelect">
-      <div class="step-bar">
-        <div class="step-dot active"></div>
-        <div class="step-dot"></div>
-        <div class="step-dot"></div>
-        <div class="step-dot"></div>
-        <div class="step-dot"></div>
-      </div>
-      <div class="header">
-        <span class="star-icon">✨</span>
-        <h1>지금 이 순간,<br>당신의 마음은 어떤가요</h1>
-        <p>케이블카에서 느낀 감정을 하나 골라주세요</p>
-      </div>
-      <div class="emotion-grid">
-        <button class="emotion-btn" data-emotion="숨이 놓였어요"><span class="emotion-emoji">🌙</span>숨이 놓였어요</button>
-        <button class="emotion-btn" data-emotion="믿고 싶어졌어요"><span class="emotion-emoji">🌟</span>믿고 싶어졌어요</button>
-        <button class="emotion-btn" data-emotion="정리됐어요"><span class="emotion-emoji">🪐</span>정리됐어요</button>
-        <button class="emotion-btn" data-emotion="용기났어요"><span class="emotion-emoji">🌱</span>용기났어요</button>
-      </div>
-      <button class="btn-primary" id="btnEmotionNext">다음 →</button>
+    <!-- ② 소원 -->
+    <div class="wish-label">지금 별에 담고 싶은 소원은요?</div>
+    <div class="wish-box">
+      <textarea id="wishInput" maxlength="100"
+        placeholder="이 소원이 별이 됩니다..."></textarea>
+      <div class="wish-count"><span id="wishCount">0</span>/100</div>
     </div>
 
-    <!-- ── P2: 보석 선택 ──────────────────────────────────── -->
-    <div class="panel hidden" id="panelGem">
-      <div class="step-bar">
-        <div class="step-dot done"></div>
-        <div class="step-dot active"></div>
-        <div class="step-dot"></div>
-        <div class="step-dot"></div>
-        <div class="step-dot"></div>
-      </div>
-      <div class="header">
-        <span class="star-icon">💎</span>
-        <h1>이 소원을 담을<br>보석을 고르세요</h1>
-        <p>별의 빛깔이 달라져요</p>
-      </div>
-      <div class="gem-grid">
-        <button class="gem-btn" data-gem="diamond">
-          <span class="gem-emoji">💎</span>
-          <span class="gem-name">다이아몬드</span>
-          <span class="gem-sub">맑은 소원</span>
-        </button>
-        <button class="gem-btn" data-gem="ruby">
-          <span class="gem-emoji">❤️</span>
-          <span class="gem-name">루비</span>
-          <span class="gem-sub">간절한 소원</span>
-        </button>
-        <button class="gem-btn" data-gem="emerald">
-          <span class="gem-emoji">💚</span>
-          <span class="gem-name">에메랄드</span>
-          <span class="gem-sub">사랑의 소원</span>
-        </button>
-        <button class="gem-btn" data-gem="sapphire">
-          <span class="gem-emoji">💙</span>
-          <span class="gem-name">사파이어</span>
-          <span class="gem-sub">성장의 소원</span>
-        </button>
-        <button class="gem-btn" data-gem="citrine" style="grid-column:1/-1">
-          <span class="gem-emoji">💛</span>
-          <span class="gem-name">황금 소원</span>
-          <span class="gem-sub">찬란하게 빛날 소원</span>
-        </button>
-      </div>
-      <button class="btn-primary" id="btnGemNext">다음 →</button>
-      <button class="btn-back-link" id="btnBackToEmotion">← 이전</button>
-    </div>
-
-    <!-- ── P3: 소원 입력 ──────────────────────────────────── -->
-    <div class="panel hidden" id="panelWish">
-      <div class="step-bar">
-        <div class="step-dot done"></div>
-        <div class="step-dot done"></div>
-        <div class="step-dot active"></div>
-        <div class="step-dot"></div>
-        <div class="step-dot"></div>
-      </div>
-      <div class="header">
-        <span class="star-icon">🌟</span>
-        <h1>지금, 마음속에<br>담아온 소원은 무엇인가요</h1>
-        <p>이 순간의 소원을 별에 담아요</p>
-      </div>
-      <div class="wish-wrap">
-        <textarea id="wishInput" maxlength="100" placeholder="이 소원이 별이 됩니다..."></textarea>
-        <div class="wish-count"><span id="wishCount">0</span> / 100</div>
-      </div>
-      <button class="btn-primary" id="btnWishNext">다음 →</button>
-      <button class="btn-back-link" id="btnBackToGem">← 이전</button>
-    </div>
-
-    <!-- ── P4: 아우룸 전달 (필수, 자동 전환) ────────────────── -->
-    <div class="panel hidden" id="panelAurum">
-      <div class="step-bar">
-        <div class="step-dot done"></div>
-        <div class="step-dot done"></div>
-        <div class="step-dot done"></div>
-        <div class="step-dot active"></div>
-        <div class="step-dot"></div>
-      </div>
-      <div class="aurum-video-wrap">
-        <video id="aurumVideo" src="/videos/cablecar-star-intro.mp4"
-               muted playsinline preload="auto"></video>
-        <div class="aurum-video-overlay">
-          <div class="aurum-star-core">⭐</div>
-        </div>
-      </div>
-      <h2 class="aurum-title">당신의 소원이<br>별이 되고 있어요</h2>
-      <p class="aurum-sub">아우룸이 담기는 중이에요</p>
-      <div class="aurum-progress"><div class="aurum-progress-bar" id="aurumBar"></div></div>
-    </div>
-
-    <!-- ── P5: 소원그림 — FULL SCREEN ─────────────────── -->
-    <div class="panel hidden" id="panelPreview">
-      <div class="preview-fullscreen-skeleton" id="imgSkeleton">
-        <span class="skeleton-star">✨</span>
-        <span class="skeleton-hint">별이 조용히 만들어지고 있어요...</span>
-      </div>
-      <img class="preview-fullscreen-img" id="previewImg" alt="별 이미지">
-      <div class="preview-bottom-overlay">
-        <div class="preview-sentence" id="emotionTextLabel"></div>
-        <button class="btn-commit" id="btnPreviewNext" disabled>이 순간을 남겨둘게요</button>
-        <button class="btn-restart" id="btnRestart">처음부터 다시</button>
-      </div>
-    </div>
-
-    <!-- ── P6: 3개월 약속 + 별 남기기 ───────────────────────── -->
-    <div class="panel hidden" id="panelPromise">
-      <div style="text-align:center;margin-bottom:24px">
-        <span style="font-size:48px">🔒</span>
-      </div>
-      <div class="header" style="margin-bottom:20px">
-        <h1 style="font-size:20px">이 마음을<br>3개월 뒤 다시 만나볼까요?</h1>
-        <p>지금의 소원을 미래의 당신에게 남겨도 좋아요<br><span style="opacity:.7">(선택 사항)</span></p>
-      </div>
-      <div class="wish-wrap" style="margin-bottom:20px">
-        <textarea id="promiseInput" maxlength="100" placeholder="3개월 뒤의 나에게..."></textarea>
-        <div class="wish-count"><span id="promiseCount">0</span> / 100</div>
-      </div>
-      <button class="btn-primary active" id="btnCommit">✨ 이 마음 봉인하고 별 만들기 🔒</button>
-      <button class="btn-back-link" id="btnSkipPromise">그냥 별 만들기 →</button>
-      <div class="error-msg" id="errorMsg">잠시 후 다시 시도해주세요</div>
-    </div>
+    <!-- ③ CTA -->
+    <button class="btn-cta" id="btnCreate" disabled>
+      내 별 포스트카드 만들기 ✨
+    </button>
+    <div class="error-msg" id="errorMsg"></div>
 
   </div>
 
+  <!-- 생성 중 오버레이 -->
+  <div class="overlay hidden" id="overlay">
+    <div class="ov-star">✨</div>
+    <div class="ov-text">별이 만들어지고 있어요...</div>
+  </div>
+
   <script>
-    // ── FLOW: 단 하나의 진실 (SSOT 확정 순서) ──────────────
-    const FLOW = { EMOTION:1, GEM:2, WISH:3, AURUM:4, GENERATING:5, RESULT:6, PROMISE:7, ASCEND:8, SHARE:9 };
+    const FLOW_ASCEND = 8;
+    const loc = new URLSearchParams(location.search).get('loc') || 'direct';
 
-    // ── reset=1: 테스트/재시작용 — localStorage 전체 초기화 ──
-    const _urlParams = new URLSearchParams(window.location.search);
-    if (_urlParams.get('reset') === '1') {
-      ['flow_step','access_key','star_id','emotion_linked','share_image_url','origin_location'].forEach(k => localStorage.removeItem(k));
+    // 역진입 차단
+    if (Number(localStorage.getItem('flow_step') || 0) >= FLOW_ASCEND) {
+      location.replace('/complete.html');
     }
+    localStorage.setItem('flow_step', '1');
 
-    // ── 역진입 차단: 이미 완성된 흐름이면 complete로 복귀 ──
-    // (뒤로가기/새로고침 시 감정 패널 재등장 방지)
-    const _existingStep = Number(localStorage.getItem('flow_step') || 0);
-    if (_existingStep >= FLOW.ASCEND) {
-      window.location.replace('/complete.html');
-    }
-    // 새 흐름 — 처음부터 초기화
-    localStorage.setItem('flow_step', FLOW.EMOTION);
-
-    // ── 뒤로가기 방어 ────────────────────────────────────────
     window.addEventListener('popstate', () => {
-      const _step = Number(localStorage.getItem('flow_step') || 0);
-      if (_step >= FLOW.ASCEND) window.location.replace('/complete.html');
+      if (Number(localStorage.getItem('flow_step') || 0) >= FLOW_ASCEND)
+        location.replace('/complete.html');
     });
 
-    const params      = new URLSearchParams(window.location.search);
-    const loc         = params.get('loc')  || 'direct';
-    const isFromShare = params.get('from') === 'share';
-    const refKey      = params.get('ref')  || '';
-
-    // ── 흐름 상태 (guard 기준) ──────────────────────────────
-    let wishText         = '';
-    let selectedEmotion  = null;
-    let selectedGem      = null;
-    let promiseContent   = '';
-    let previewImageUrl  = null;
-    let previewStarted   = false;
-    let aurumDone        = false;
-    let imageDone        = false;
-
-    // ── Panel helper ─────────────────────────────────────────
-    function showPanel(id) {
-      document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden'));
-      document.getElementById(id)?.classList.remove('hidden');
-    }
-
-    // ── 진입 분기 ────────────────────────────────────────────
-    if (isFromShare) {
-      showPanel('panelIntro');
-    } else {
-      showPanel('panelSelect');
-    }
-
-    // ── 3개월 재방문 감지 ─────────────────────────────────────
-    if (!isFromShare) {
-      const _ek = localStorage.getItem('access_key');
-      if (_ek && loc !== 'direct') {
-        fetch(`/api/star/${encodeURIComponent(_ek)}`)
-          .then(r => r.json())
-          .then(data => {
-            if (!data.success || !data.star) return;
-            const months = (Date.now() - new Date(data.star.created_at).getTime())
-                           / (1000 * 60 * 60 * 24 * 30.44);
-            if (months >= 3) {
-              window.location.href =
-                `/star-unlock.html?key=${encodeURIComponent(_ek)}&loc=${encodeURIComponent(loc)}`;
-            }
-          }).catch(() => {});
-      }
-    }
-
-    // ── P0: 인트로 → P1: 소원 ────────────────────────────────
-    if (refKey) {
-      fetch(`/api/star/${encodeURIComponent(refKey)}`)
+    // 3개월 재방문 감지
+    const _ek = localStorage.getItem('access_key');
+    if (_ek && loc !== 'direct') {
+      fetch('/api/star/' + encodeURIComponent(_ek))
         .then(r => r.json())
-        .then(data => {
-          const imgUrl = data.image_url || data.star?.preview_image_url;
-          if (imgUrl) {
-            const img  = document.getElementById('introStarImg');
-            const skel = document.getElementById('introSkeleton');
-            img.onload  = () => { skel.style.display = 'none'; img.classList.add('ready'); };
-            img.onerror = () => {};
-            img.src = imgUrl;
-          }
+        .then(d => {
+          if (!d.success || !d.star) return;
+          const months = (Date.now() - new Date(d.star.created_at).getTime())
+                         / (1000 * 60 * 60 * 24 * 30.44);
+          if (months >= 3)
+            location.href = '/star-unlock.html?key=' + encodeURIComponent(_ek)
+                            + '&loc=' + encodeURIComponent(loc);
         }).catch(() => {});
     }
-    document.getElementById('btnMakeStar').addEventListener('click', () => showPanel('panelSelect'));
 
-    // ── P1: 감정 선택 → P2: 보석 ─────────────────────────────
-    const btnEmotionNext = document.getElementById('btnEmotionNext');
+    let selectedEmotion = null;
+    let selectedGem     = null;
+    let wishText        = '';
 
+    const btnCreate = document.getElementById('btnCreate');
+    const errorMsg  = document.getElementById('errorMsg');
+    const overlay   = document.getElementById('overlay');
+
+    function refreshCTA() {
+      btnCreate.disabled = !(selectedEmotion && wishText.trim().length > 0);
+    }
+
+    // 감정 선택
     document.querySelectorAll('.emotion-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.emotion-btn').forEach(b => b.classList.remove('selected'));
+        document.querySelectorAll('.emotion-btn')
+          .forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
         selectedEmotion = btn.dataset.emotion;
-        btnEmotionNext.classList.add('active');
+        selectedGem     = btn.dataset.gem;
+        refreshCTA();
       });
     });
-    btnEmotionNext.addEventListener('click', () => {
-      if (!selectedEmotion) return;
-      localStorage.setItem('flow_step', FLOW.GEM);
-      showPanel('panelGem');
-    });
 
-    // ── P2: 보석 선택 → P3: 소원 ─────────────────────────────
-    const btnGemNext = document.getElementById('btnGemNext');
-
-    document.querySelectorAll('.gem-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.gem-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        selectedGem = btn.dataset.gem;
-        btnGemNext.classList.add('active');
-      });
-    });
-    btnGemNext.addEventListener('click', () => {
-      if (!selectedGem || !selectedEmotion) return;
-      localStorage.setItem('flow_step', FLOW.WISH);
-      showPanel('panelWish');
-    });
-    document.getElementById('btnBackToEmotion').addEventListener('click', () => showPanel('panelSelect'));
-
-    // ── P3: 소원 입력 → P4: 아우룸 ───────────────────────────
-    const wishInput   = document.getElementById('wishInput');
-    const wishCount   = document.getElementById('wishCount');
-    const btnWishNext = document.getElementById('btnWishNext');
-
+    // 소원 입력
+    const wishInput = document.getElementById('wishInput');
+    const wishCount = document.getElementById('wishCount');
     wishInput.addEventListener('input', () => {
       wishText = wishInput.value;
       wishCount.textContent = wishText.length;
-      btnWishNext.classList.toggle('active', wishText.trim().length > 0);
+      refreshCTA();
     });
-    btnWishNext.addEventListener('click', () => {
-      if (!wishText.trim() || !selectedEmotion || !selectedGem) return;
-      localStorage.setItem('flow_step', FLOW.AURUM);
-      showPanel('panelAurum');
-      startAurum();
-    });
-    document.getElementById('btnBackToGem').addEventListener('click', () => showPanel('panelGem'));
 
-    // ── P4: 아우룸 전달 (2.5s 필수 노출 + 이미지 생성 병렬) ──
-    function startAurum() {
-      // 비디오 재생 시작
-      const aurumVideo = document.getElementById('aurumVideo');
-      if (aurumVideo) aurumVideo.play().catch(() => {});
+    // CTA
+    btnCreate.addEventListener('click', async () => {
+      if (!selectedEmotion || !wishText.trim()) return;
 
-      // 이미지 생성 즉시 시작 (병렬)
-      startPreviewGeneration();
-
-      // 진행 바 애니메이션 (CSS transition으로)
-      requestAnimationFrame(() => {
-        document.getElementById('aurumBar').style.width = '100%';
-      });
-
-      // 2.5초 후 aurum 완료 플래그 → 이미지도 준비됐으면 preview로 전환
-      setTimeout(() => {
-        aurumDone = true;
-        checkAdvanceToPreview();
-      }, 2500);
-    }
-
-    function checkAdvanceToPreview() {
-      if (aurumDone && imageDone) {
-        localStorage.setItem('flow_step', FLOW.RESULT);
-        showPanel('panelPreview');
-      }
-    }
-
-    // ── P5: 소원그림 생성 (아우룸 시작 시 병렬 실행) ───────────
-    const btnPreviewNext = document.getElementById('btnPreviewNext');
-    const previewImg     = document.getElementById('previewImg');
-    const imgSkeleton    = document.getElementById('imgSkeleton');
-    const emotionLabel   = document.getElementById('emotionTextLabel');
-
-    async function startPreviewGeneration() {
-      if (previewStarted) return;
-      previewStarted = true;
-      localStorage.setItem('flow_step', FLOW.GENERATING);
+      btnCreate.disabled   = true;
+      errorMsg.textContent = '';
+      overlay.classList.remove('hidden');
 
       try {
-        const res  = await fetch('/api/star-image/generate', {
-          method:  'POST',
+        // 1. 이미지 생성
+        const genRes  = await fetch('/api/star-image/generate', {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ emotion: selectedEmotion, gem: selectedGem, location: loc }),
+          body: JSON.stringify({
+            emotion:  selectedEmotion,
+            gem:      selectedGem,
+            location: loc,
+          }),
         });
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error || '이미지 생성 실패');
+        const genData = await genRes.json();
+        if (!genData.success) throw new Error(genData.error || '이미지 생성 실패');
 
-        previewImageUrl          = data.image_url;
-        emotionLabel.textContent = data.sentence || '';
-
-        previewImg.onload = () => {
-          imgSkeleton.classList.add('hidden');
-          previewImg.classList.add('ready');
-          btnPreviewNext.disabled = false;
-        };
-        previewImg.onerror = () => {
-          imgSkeleton.classList.add('hidden');
-          btnPreviewNext.disabled = false;
-        };
-        previewImg.src = data.image_url;
-      } catch {
-        imgSkeleton.classList.add('hidden');
-        btnPreviewNext.disabled = false;
-      } finally {
-        imageDone = true;
-        checkAdvanceToPreview();
-      }
-    }
-
-    // ── 처음부터 버튼 ─────────────────────────────────────────
-    document.getElementById('btnRestart').addEventListener('click', () => window.location.reload());
-
-    // ── P5 → P6: 결과 확인 후 약속 패널로 ────────────────────
-    btnPreviewNext.addEventListener('click', () => {
-      localStorage.setItem('flow_step', FLOW.PROMISE);
-      showPanel('panelPromise');
-    });
-
-    // ── P6: 3개월 약속 입력 ───────────────────────────────────
-    const promiseInput = document.getElementById('promiseInput');
-    const promiseCount = document.getElementById('promiseCount');
-    promiseInput.addEventListener('input', () => {
-      promiseContent = promiseInput.value;
-      promiseCount.textContent = promiseContent.length;
-    });
-
-    // ── 약속 건너뛰기 → commit ────────────────────────────────
-    document.getElementById('btnSkipPromise').addEventListener('click', () => doCommit());
-
-    // ── Commit 실행 (봉인 또는 건너뛰기 공통) ─────────────────
-    const btnCommit = document.getElementById('btnCommit');
-    const errorMsg  = document.getElementById('errorMsg');
-
-    btnCommit.addEventListener('click', () => doCommit());
-
-    async function doCommit() {
-      if (!wishText.trim() || !selectedEmotion || !selectedGem) {
-        errorMsg.textContent   = '모든 단계를 완료해주세요';
-        errorMsg.style.display = 'block';
-        return;
-      }
-
-      btnCommit.disabled    = true;
-      btnCommit.textContent = '별로 남기는 중...';
-      errorMsg.style.display = 'none';
-
-      try {
-        const res  = await fetch('/api/star/commit', {
-          method:  'POST',
+        // 2. 별 저장
+        const commitRes  = await fetch('/api/star/commit', {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({
+          body: JSON.stringify({
             emotion:           selectedEmotion,
             origin_location:   loc,
-            preview_image_url: (previewImageUrl && !previewImageUrl.startsWith('data:')) ? previewImageUrl : null,
+            preview_image_url: genData.image_url,
             wish_text:         wishText.trim(),
             gem_type:          selectedGem,
           }),
         });
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error || '별 저장 실패');
+        const commitData = await commitRes.json();
+        if (!commitData.success) throw new Error(commitData.error || '별 저장 실패');
 
-        // 3개월 약속 저장 (선택, fire-and-forget)
-        if (promiseContent.trim()) {
-          fetch('/api/star/promise', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ star_id: data.star_id, type: '3m', content: promiseContent.trim() }),
-          }).catch(() => {});
-        }
-
-        localStorage.setItem('access_key',      data.access_key);
-        localStorage.setItem('star_id',         data.star_id);
-        localStorage.setItem('emotion_linked',  data.emotion_link?.linked ? '1' : '0');
-        localStorage.setItem('share_image_url', (previewImageUrl && !previewImageUrl.startsWith('data:')) ? previewImageUrl : '');
+        // 3. 저장 → complete.html
+        localStorage.setItem('access_key',      commitData.access_key);
+        localStorage.setItem('star_id',         commitData.star_id || '');
+        localStorage.setItem('emotion_linked',  commitData.emotion_link?.linked ? '1' : '0');
+        localStorage.setItem('share_image_url', genData.image_url || '');
         localStorage.setItem('origin_location', loc);
-        localStorage.setItem('flow_step',       FLOW.ASCEND);
+        localStorage.setItem('flow_step',       String(FLOW_ASCEND));
 
-        window.location.href = '/complete.html';
-      } catch {
-        errorMsg.textContent   = '잠시 후 다시 시도해주세요';
-        errorMsg.style.display = 'block';
-        btnCommit.disabled     = false;
-        btnCommit.textContent  = '✨ 이 마음 봉인하고 별 만들기 🔒';
+        location.href = '/complete.html';
+
+      } catch (err) {
+        overlay.classList.add('hidden');
+        btnCreate.disabled   = false;
+        errorMsg.textContent = err.message || '잠시 후 다시 시도해주세요';
       }
-    }
+    });
   </script>
 </body>
 </html>

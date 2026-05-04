@@ -97,6 +97,72 @@ function generatePrompt(emotionKey, gem) {
     .replace('[GEM_TONE]',   g.tone);
 }
 
+// ── Stage 1 yeosu_cablecar 사전 생성 이미지 SSOT ──────────────────
+// 파일명 형식: {index}_{emotion}_{gem}_yeosu_cablecar_stage1.png
+// 인덱스 구조: gem 먼저 고정, emotion이 순환 (stage2와 반대)
+//   01~05: citrine×(confusion,pause,calm,curiosity,fragile_hope)
+//   06~10: sapphire×(...), 11~15: emerald×(...), 16~20: ruby×(...), 21~25: diamond×(...)
+// UI 4-emotion 키 → stage1 5-emotion 키 최근접 매핑
+const CABLECAR_STAGE1_EMOTION_REMAP = {
+  comfort:  'calm',
+  hope:     'fragile_hope',
+  calm:     'calm',
+  courage:  'curiosity',
+  anxiety:  'confusion',
+};
+
+const CABLECAR_STAGE1_GEM_BASE = {
+  citrine:  1,
+  sapphire: 6,
+  emerald:  11,
+  ruby:     16,
+  diamond:  21,
+};
+
+const CABLECAR_STAGE1_EMOTION_OFFSET = {
+  confusion:    0,
+  pause:        1,
+  calm:         2,
+  curiosity:    3,
+  fragile_hope: 4,
+};
+
+function getCablecarStage1Image(emotionKey, gem) {
+  const mapped     = CABLECAR_STAGE1_EMOTION_REMAP[emotionKey];
+  const gemBase    = CABLECAR_STAGE1_GEM_BASE[gem];
+  const emoOffset  = CABLECAR_STAGE1_EMOTION_OFFSET[mapped];
+  if (gemBase === undefined || emoOffset === undefined) return null;
+  const index = String(gemBase + emoOffset).padStart(2, '0');
+  return `/images/star-cache/yeosu_cablecar/${index}_${mapped}_${gem}_yeosu_cablecar_stage1.png`;
+}
+
+// ── Stage 2 yeosu_cafe 사전 생성 이미지 SSOT ───────────────────────
+// 파일명 형식: {index}_{emotion}_{gem}_yeosu_cafe_stage2.png
+// index = EMOTION_BASE + GEM_OFFSET (01~25)
+const STAGE2_EMOTION_BASE = {
+  confusion:    1,
+  pause:        6,
+  calm:         11,
+  curiosity:    16,
+  fragile_hope: 21,
+};
+
+const STAGE2_GEM_OFFSET = {
+  citrine:  0,
+  sapphire: 1,
+  emerald:  2,
+  ruby:     3,
+  diamond:  4,
+};
+
+function getStarImage(emotion, gem) {
+  const base   = STAGE2_EMOTION_BASE[emotion];
+  const offset = STAGE2_GEM_OFFSET[gem];
+  if (base === undefined || offset === undefined) return null;
+  const index = String(base + offset).padStart(2, '0');
+  return `/images/star-cache/yeosu_cafe/${index}_${emotion}_${gem}_yeosu_cafe_stage2.png`;
+}
+
 // ── 파일 저장 기본 디렉토리 (location별 서브폴더 사용) ─────────────
 const CACHE_BASE = path.join(__dirname, '..', 'public', 'images', 'star-cache');
 if (!fs.existsSync(CACHE_BASE)) fs.mkdirSync(CACHE_BASE, { recursive: true });
@@ -184,6 +250,29 @@ router.post('/generate', async (req, res) => {
 
   const cacheDir = getCacheDir(location);
 
+  // ── yeosu_cablecar 사전 생성 이미지 우선 조회 ────────────────────
+  if (location === 'cablecar' || location === 'yeosu_cablecar') {
+    const pregenUrl = getCablecarStage1Image(emotionKey, gem);
+    if (pregenUrl) {
+      const filePath = path.join(CACHE_BASE, 'yeosu_cablecar', path.basename(pregenUrl));
+      if (fs.existsSync(filePath)) {
+        return res.json({ success: true, image_url: pregenUrl, sentence, from_cache: true });
+      }
+    }
+  }
+
+  // ── yeosu_cafe 사전 생성 이미지 우선 조회 ─────────────────────
+  if (location === 'yeosu_cafe') {
+    const emotionNorm = emotionKey.replace(/\s+/g, '_');
+    const pregenUrl   = getStarImage(emotionNorm, gem);
+    if (pregenUrl) {
+      const filePath = path.join(CACHE_BASE, 'yeosu_cafe', path.basename(pregenUrl));
+      if (fs.existsSync(filePath)) {
+        return res.json({ success: true, image_url: pregenUrl, sentence, from_cache: true });
+      }
+    }
+  }
+
   // ── 캐시 조회 ──────────────────────────────────────────────────
   try {
     const { rows } = await db.query(
@@ -241,4 +330,49 @@ router.post('/generate', async (req, res) => {
   return res.json({ success: true, image_url: imageUrl, sentence, from_cache: false });
 });
 
+// ── GET /resolve ─────────────────────────────────────────────────
+// yeosu_cafe 사전 생성 이미지 URL 반환
+// ?emotion=confusion&gem=citrine
+router.get('/resolve', (req, res) => {
+  const { emotion, gem } = req.query;
+  if (!emotion || !gem) {
+    return res.status(400).json({ success: false, error: 'emotion, gem 필수' });
+  }
+
+  const imageUrl = getStarImage(emotion, gem);
+  if (!imageUrl) {
+    return res.status(404).json({ success: false, error: '알 수 없는 emotion/gem' });
+  }
+
+  const filePath = path.join(CACHE_BASE, 'yeosu_cafe', path.basename(imageUrl));
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ success: false, error: '이미지 파일 없음', image_url: imageUrl });
+  }
+
+  return res.json({ success: true, image_url: imageUrl });
+});
+
+// ── GET /list ─────────────────────────────────────────────────────
+// 사전 생성 이미지 목록 — index 기준 정렬
+// ?location=yeosu_cafe
+router.get('/list', (req, res) => {
+  const { location = 'yeosu_cafe' } = req.query;
+  const dir = path.join(CACHE_BASE, location);
+
+  if (!fs.existsSync(dir)) {
+    return res.json({ success: true, location, images: [] });
+  }
+
+  const images = fs.readdirSync(dir)
+    .filter(f => f.endsWith('.png'))
+    .sort()
+    .map(f => ({
+      file_name: f,
+      url: `/images/star-cache/${location}/${f}`,
+    }));
+
+  return res.json({ success: true, location, images });
+});
+
 module.exports = router;
+module.exports.getStarImage = getStarImage;

@@ -87,14 +87,13 @@ app.use('/videos', express.static(path.join(__dirname, 'public', 'videos')));
 // ═══════════════════════════════════════════════════════════════════════════
 const LEGACY_HTML_PAGES = [
   'star-entry.html',   // → /entry    (QR 진입 React 흐름)
-  'complete.html',     // → /result   (React Result 화면)
+  // complete.html → static 직접 서빙 (LEGACY 제거: /result 라우트 없음)
   'voyage-pay.html',   // → /journey  (여수 소원여정)
   'voyage-select.html',// → /journey
 ];
 
 const LEGACY_ROUTE_MAP = {
   'star-entry.html':   '/entry',
-  'complete.html':     '/result',
   'voyage-pay.html':   '/journey',
   'voyage-select.html':'/journey',
 };
@@ -107,6 +106,93 @@ LEGACY_HTML_PAGES.forEach(page => {
   });
 });
 // ═══════════════════════════════════════════════════════════════════════════
+
+// ── /star-view.html?key=... → /star-view/:key (301 영구 redirect) ─────────
+app.get('/star-view.html', (req, res) => {
+  const key = req.query.key ? String(req.query.key).slice(0, 40).replace(/[^a-zA-Z0-9_-]/g, '') : null;
+  if (key) return res.redirect(301, `/star-view/${encodeURIComponent(key)}`);
+  return res.redirect(301, '/');
+});
+
+// ── /star-view/:id — SSR HTML + OG 태그 주입 ──────────────────────────────
+// 크롤러는 JS 미실행 → 서버에서 <head>에 OG 삽입.
+// star-view.html JS는 이미 pathname.split('/').pop() 으로 key 추출 가능.
+// SPA catch-all(line ~3670)보다 먼저 등록해야 함 — express.static 직전 위치 유지.
+// ─────────────────────────────────────────────────────────────────────────
+app.get('/star-view/:id', async (req, res) => {
+  const _fs  = require('fs');
+  const _db  = require('./database/db');
+  const _BASE = 'https://app.dailymiracles.kr';
+  const _DEFAULT_IMG = `${_BASE}/images/star-cache/yeosu_hamel/03_connection_emerald_yeosu_hamel_stage3.png`;
+
+  const id = String(req.params.id).slice(0, 40).replace(/[^a-zA-Z0-9_-]/g, '');
+
+  let ogImage = _DEFAULT_IMG;
+  let ogTitle = '내 소원이 별이 됐어요 ✨';
+  let ogDesc  = '당신의 소원을, 별로 만들어보세요';
+  let ogV     = Date.now();
+
+  if (id) {
+    try {
+      const { rows } = await _db.query(
+        `SELECT s.emotion, s.created_at, si.image_url
+         FROM stars s
+         LEFT JOIN star_images si
+           ON si.star_id = s.id AND si.validation_pass = true
+         WHERE s.access_key = $1
+         ORDER BY si.created_at DESC
+         LIMIT 1`,
+        [id]
+      );
+      if (rows.length) {
+        const { emotion, created_at, image_url } = rows[0];
+        ogV = new Date(created_at).getTime();
+
+        // OG 전용 이미지가 존재하면 우선 사용, 없으면 원본으로 fallback
+        const _ogPath = path.join(__dirname, 'public', 'images', 'postcards', `${id}_og.png`);
+        if (_fs.existsSync(_ogPath)) {
+          ogImage = `${_BASE}/images/postcards/${id}_og.png?v=${ogV}`;
+        } else if (image_url && !image_url.startsWith('/images/fallback')) {
+          ogImage = image_url.startsWith('http') ? image_url : `${_BASE}${image_url}`;
+        }
+
+        if (emotion) {
+          const _emoMap = {
+            '숨이 놓였어요':   '마음이 조금 놓였어요 🌙',
+            '믿고 싶어졌어요': '믿음이 별이 됐어요 🌟',
+            '정리됐어요':     '마음이 정리됐어요 🪐',
+            '용기났어요':     '용기가 별이 됐어요 🌱',
+          };
+          ogTitle = (_emoMap[emotion] || `${emotion}이 별이 됐어요`) + ' — 하루하루의 기적';
+        }
+      }
+    } catch (e) { /* fallback to default */ }
+  }
+
+  const _pageUrl = `${_BASE}/star-view/${encodeURIComponent(id)}`;
+
+  const _ogBlock = [
+    `<meta property="og:type"         content="website">`,
+    `<meta property="og:title"        content="${ogTitle}">`,
+    `<meta property="og:description"  content="${ogDesc}">`,
+    `<meta property="og:image"        content="${ogImage}">`,
+    `<meta property="og:image:width"  content="1200">`,
+    `<meta property="og:image:height" content="630">`,
+    `<meta property="og:url"          content="${_pageUrl}">`,
+    `<meta name="twitter:card"        content="summary_large_image">`,
+    `<meta name="twitter:image"       content="${ogImage}">`,
+  ].join('\n  ');
+
+  try {
+    const html     = _fs.readFileSync(path.join(__dirname, 'public', 'star-view.html'), 'utf-8');
+    const modified = html.replace('</head>', `  ${_ogBlock}\n</head>`);
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.type('html').send(modified);
+  } catch (e) {
+    res.status(500).send('star-view.html 로드 실패');
+  }
+});
+// ─────────────────────────────────────────────────────────────────────────
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', (_req, res) => res.status(404).end()); // 파일 없으면 404로 끊음

@@ -11,10 +11,192 @@
  *   noStar   → "내 별 만들기"   → /cablecar
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { readSavedStar } from '../lib/utils/starSession.js';
+
+// ── 현장 포스트카드 UX 적용 장소 목록 (WishGate 우회) ──────────────
+const POSTCARD_LOCATIONS = ['cablecar', 'hamel'];
+
+// ── 장소별 브랜드 문구 ─────────────────────────────────────────────
+const POSTCARD_LOC_BRAND = {
+  cablecar: 'Daily Miracles · 여수 케이블카',
+  hamel:    'Daily Miracles · 하멜 등대마을',
+};
+
+// ── 감정 → 보석 자동 매핑 (현장 UX SSOT) ──────────────────────────
+const CABLECAR_EMOTIONS = [
+  { label: '숨이 놓였어요',   icon: '🌙', gem: 'emerald'  },
+  { label: '믿고 싶어졌어요', icon: '🌟', gem: 'diamond'  },
+  { label: '정리됐어요',     icon: '🪐', gem: 'sapphire' },
+  { label: '용기났어요',     icon: '🌱', gem: 'citrine'  },
+];
+
+// ── 현장 포스트카드 폼 (WishGate 우회 — cablecar / hamel 공용) ────
+function CablecarPostcardForm({ loc }) {
+  const [emotion,  setEmotion]  = useState(null);
+  const [gem,      setGem]      = useState(null);
+  const [wishText, setWishText] = useState('');
+  const [loading,  setLoading]  = useState(false);
+  const [error,    setError]    = useState('');
+  const textareaRef = useRef(null);
+
+  const canSubmit = !!emotion && wishText.trim().length > 0;
+
+  function selectEmotion(e) {
+    setEmotion(e.label);
+    setGem(e.gem);
+    setError('');
+    setTimeout(() => textareaRef.current?.focus(), 80);
+  }
+
+  async function handleCreate() {
+    if (!canSubmit || loading) return;
+    setLoading(true);
+    setError('');
+    try {
+      const genRes  = await fetch('/api/star-image/generate', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ emotion, gem, location: loc }),
+      });
+      const genData = await genRes.json();
+      if (!genData.success) throw new Error(genData.error || '이미지 생성 실패');
+
+      const commitRes  = await fetch('/api/star/commit', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          emotion,
+          origin_location:   loc,
+          preview_image_url: genData.image_url,
+          wish_text:         wishText.trim(),
+          gem_type:          gem,
+        }),
+      });
+      const commitData = await commitRes.json();
+      if (!commitData.success) throw new Error(commitData.error || '별 저장 실패');
+
+      localStorage.setItem('access_key',      commitData.access_key);
+      localStorage.setItem('star_id',         commitData.star_id || '');
+      localStorage.setItem('emotion_linked',  commitData.emotion_link?.linked ? '1' : '0');
+      localStorage.setItem('share_image_url', genData.image_url || '');
+      localStorage.setItem('origin_location', loc);
+      localStorage.setItem('flow_step',       '8');
+
+      window.location.href = '/complete.html';
+    } catch (e) {
+      setError(e.message || '잠시 후 다시 시도해주세요');
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div style={{
+        position: 'fixed', inset: 0,
+        background: 'rgba(9,7,22,0.95)',
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center', gap: 18,
+      }}>
+        <motion.div
+          animate={{ scale: [1, 1.12, 1], opacity: [0.6, 1, 0.6] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ fontSize: 52 }}
+        >✨</motion.div>
+        <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)' }}>
+          별이 만들어지고 있어요...
+        </p>
+      </div>
+    );
+  }
+
+  const F = {
+    page: {
+      minHeight: '100vh',
+      background: 'linear-gradient(160deg, #0d0b1f 0%, #141030 55%, #0b1b38 100%)',
+      color: '#fff',
+      fontFamily: "'Noto Sans KR', sans-serif",
+      padding: '24px 20px 40px',
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+    },
+    wrap:  { width: '100%', maxWidth: 440 },
+    brand: { textAlign: 'center', fontSize: 11, letterSpacing: '.13em', color: 'rgba(255,255,255,0.22)', textTransform: 'uppercase', paddingBottom: 28 },
+    qLabel: { fontSize: 19, fontWeight: 700, lineHeight: 1.45, marginBottom: 18, letterSpacing: '-.02em' },
+    grid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 32 },
+    eBtn: (selected) => ({
+      background:   selected ? 'rgba(140,180,255,0.16)' : 'rgba(255,255,255,0.055)',
+      border:       selected ? '1.5px solid #7ab0ff'    : '1.5px solid rgba(255,255,255,0.11)',
+      boxShadow:    selected ? '0 0 20px rgba(120,170,255,0.16)' : 'none',
+      borderRadius: 18, padding: '22px 14px 18px',
+      color: '#fff', fontFamily: "'Noto Sans KR', sans-serif",
+      cursor: 'pointer', textAlign: 'center',
+      transition: 'all .16s', userSelect: 'none',
+    }),
+    wishLabel: { fontSize: 14, color: 'rgba(255,255,255,0.45)', marginBottom: 10 },
+    wishBox: {
+      background: 'rgba(255,255,255,0.05)',
+      border: '1.5px solid rgba(255,255,255,0.11)',
+      borderRadius: 16, overflow: 'hidden', marginBottom: 28,
+    },
+    textarea: {
+      width: '100%', minHeight: 96,
+      background: 'transparent', border: 'none', outline: 'none',
+      color: '#fff', fontSize: 15,
+      fontFamily: "'Noto Sans KR', sans-serif",
+      lineHeight: 1.7, padding: 16, resize: 'none',
+    },
+    count: { textAlign: 'right', fontSize: 11, color: 'rgba(255,255,255,0.22)', padding: '0 14px 10px' },
+    cta: (on) => ({
+      width: '100%', padding: 19,
+      background: on ? 'linear-gradient(92deg,#4f8ef7,#7b5ea7)' : 'rgba(255,255,255,0.1)',
+      border: 'none', borderRadius: 16,
+      color: '#fff', fontSize: 17, fontWeight: 700,
+      fontFamily: "'Noto Sans KR', sans-serif",
+      cursor: on ? 'pointer' : 'not-allowed',
+      opacity: on ? 1 : 0.3,
+      marginBottom: 10, transition: 'all .18s',
+    }),
+    err: { fontSize: 13, color: '#ff9a9a', textAlign: 'center', minHeight: 18 },
+  };
+
+  return (
+    <div style={F.page}>
+      <div style={F.wrap}>
+        <div style={F.brand}>{POSTCARD_LOC_BRAND[loc] ?? 'Daily Miracles'}</div>
+
+        <div style={F.qLabel}>지금 이 순간,<br />어떤 마음인가요?</div>
+        <div style={F.grid}>
+          {CABLECAR_EMOTIONS.map(e => (
+            <button key={e.label} style={F.eBtn(emotion === e.label)} onClick={() => selectEmotion(e)}>
+              <span style={{ fontSize: 30, display: 'block', marginBottom: 8 }}>{e.icon}</span>
+              <span style={{ fontSize: 15, fontWeight: 600 }}>{e.label}</span>
+            </button>
+          ))}
+        </div>
+
+        <div style={F.wishLabel}>지금 별에 담고 싶은 소원은요?</div>
+        <div style={F.wishBox}>
+          <textarea
+            ref={textareaRef}
+            value={wishText}
+            onChange={e => setWishText(e.target.value)}
+            maxLength={100}
+            placeholder="이 소원이 별이 됩니다..."
+            style={F.textarea}
+          />
+          <div style={F.count}>{wishText.length}/100</div>
+        </div>
+
+        <button style={F.cta(canSubmit)} disabled={!canSubmit} onClick={handleCreate}>
+          내 별 포스트카드 만들기 ✨
+        </button>
+        <div style={F.err}>{error}</div>
+      </div>
+    </div>
+  );
+}
 
 // ── 장소별 설정 (추후 hamel, odongjae 등 추가) ──────────────────────
 const LOC_CONFIG = {
@@ -94,6 +276,9 @@ const LOC_NORMALIZE = {
   'yeosu_lattoa_cafe':       'lattoa',
   'lattoa_cafe':             'lattoa',
   'lattoa':                  'lattoa',
+  'hamel':                   'hamel',
+  'yeosu_hamel':             'hamel',
+  'hamel_village':           'hamel',
   'global_default_workshop': 'global',
   'global':                  'global',
 };
@@ -342,6 +527,11 @@ export default function EntryPage() {
 
   const starId  = readSavedStar();
   const hasStar = !!starId;
+
+  // ── 현장 포스트카드 UX → WishGate 우회 (POSTCARD_LOCATIONS 기준) ──
+  if (POSTCARD_LOCATIONS.includes(loc) && !hasStar) {
+    return <CablecarPostcardForm loc={loc} />;
+  }
 
   // ── 공유 유입 분기 ──────────────────────────────────────────────
   if (from === 'share') {
