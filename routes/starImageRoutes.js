@@ -78,23 +78,58 @@ const GEM_MAP = {
   citrine:  { tone: 'Warm golden light, optimistic and bright, glowing like first light of dawn' },
 };
 
-// ── 프롬프트 템플릿 SSOT ───────────────────────────────────────────
-const PROMPT_TEMPLATE =
+// ── 프롬프트 템플릿 SSOT (location별) ────────────────────────────
+const PROMPT_TEMPLATES = {
+  cablecar:
 `A soft 2D Korean watercolor webtoon illustration.
 Inside a modern Yeosu marine cable car cabin at night, a person is sitting quietly by the window, seen from behind, wearing simple modern casual clothes.
 They gently hold [STAR_STATE].
 The atmosphere conveys [EMOTION].
 The star seed emits [GEM_TONE].
 Outside the window, the Yeosu night sea, cable car line, harbor lights, and distant coastline are visible.
-Strictly avoid Japanese traditional clothing, anime exaggeration, travel poster feeling, backpacks, suitcases, tourist pose, 3D, photorealism.`;
+Strictly avoid Japanese traditional clothing, anime exaggeration, travel poster feeling, backpacks, suitcases, tourist pose, 3D, photorealism.`,
 
-function generatePrompt(emotionKey, gem) {
-  const emo = EMOTION_MAP[emotionKey] || EMOTION_MAP.comfort;
-  const g   = GEM_MAP[gem]           || GEM_MAP.diamond;
-  return PROMPT_TEMPLATE
+  hamel:
+`A soft 2D Korean watercolor webtoon illustration.
+At the Hamel Lighthouse Village waterfront in Yeosu at dusk, a person stands quietly near the old stone lighthouse, seen from behind, wearing simple modern casual clothes.
+They gently hold [STAR_STATE].
+The atmosphere conveys [EMOTION].
+The star seed emits [GEM_TONE].
+The background shows the historic red-brick lighthouse, calm harbor water, and gentle golden-hour light reflecting off the sea.
+Strictly avoid Japanese traditional clothing, anime exaggeration, travel poster feeling, backpacks, suitcases, tourist pose, 3D, photorealism.`,
+};
+// default = cablecar (기존 동작 유지)
+PROMPT_TEMPLATES.default       = PROMPT_TEMPLATES.cablecar;
+PROMPT_TEMPLATES.yeosu_cablecar = PROMPT_TEMPLATES.cablecar;
+PROMPT_TEMPLATES.yeosu_hamel    = PROMPT_TEMPLATES.hamel;
+
+function generatePrompt(emotionKey, gem, location) {
+  const emo      = EMOTION_MAP[emotionKey] || EMOTION_MAP.comfort;
+  const g        = GEM_MAP[gem]           || GEM_MAP.diamond;
+  const template = PROMPT_TEMPLATES[location] || PROMPT_TEMPLATES.default;
+  return template
     .replace('[EMOTION]',    emo.core)
     .replace('[STAR_STATE]', emo.star)
     .replace('[GEM_TONE]',   g.tone);
+}
+
+// ── Stage 3 yeosu_hamel 사전 생성 이미지 SSOT ────────────────────
+// 파일명: {index}_{emotion}_{gem}_yeosu_hamel_stage3.png
+// 감정×보석 고정쌍: calm+citrine(01), curiosity+sapphire(02),
+//   connection+emerald(03), quiet_expansion+ruby(04), fragile_hope+diamond(05)
+// UI gem auto-map이 이미 4가지 보석을 결정하므로 gem → index 단순 매핑
+const HAMEL_STAGE3_BY_GEM = {
+  citrine:  '01_calm_citrine',
+  sapphire: '02_curiosity_sapphire',
+  emerald:  '03_connection_emerald',
+  ruby:     '04_quiet_expansion_ruby',
+  diamond:  '05_fragile_hope_diamond',
+};
+
+function getHamelStage3Image(gem) {
+  const name = HAMEL_STAGE3_BY_GEM[gem];
+  if (!name) return null;
+  return `/images/star-cache/yeosu_hamel/${name}_yeosu_hamel_stage3.png`;
 }
 
 // ── Stage 1 yeosu_cablecar 사전 생성 이미지 SSOT ──────────────────
@@ -272,7 +307,20 @@ router.post('/generate', async (req, res) => {
     if (pregenUrl) {
       const postcardUrl = await copyPregenToPostcards(pregenUrl).catch(() => null);
       if (postcardUrl) {
-        return res.json({ success: true, image_url: postcardUrl, sentence, from_cache: true });
+        return res.json({ success: true, image_url: postcardUrl, sentence, from_cache: true,
+          requested_location: location, resolved_location: 'cablecar', source_image: pregenUrl });
+      }
+    }
+  }
+
+  // ── yeosu_hamel 사전 생성 이미지 우선 조회 ───────────────────────
+  if (location === 'hamel' || location === 'yeosu_hamel') {
+    const pregenUrl = getHamelStage3Image(gem);
+    if (pregenUrl) {
+      const postcardUrl = await copyPregenToPostcards(pregenUrl).catch(() => null);
+      if (postcardUrl) {
+        return res.json({ success: true, image_url: postcardUrl, sentence, from_cache: true,
+          requested_location: location, resolved_location: 'hamel', source_image: pregenUrl });
       }
     }
   }
@@ -284,7 +332,8 @@ router.post('/generate', async (req, res) => {
     if (pregenUrl) {
       const postcardUrl = await copyPregenToPostcards(pregenUrl).catch(() => null);
       if (postcardUrl) {
-        return res.json({ success: true, image_url: postcardUrl, sentence, from_cache: true });
+        return res.json({ success: true, image_url: postcardUrl, sentence, from_cache: true,
+          requested_location: location, resolved_location: 'yeosu_cafe', source_image: pregenUrl });
       }
     }
   }
@@ -308,7 +357,7 @@ router.post('/generate', async (req, res) => {
   }
 
   // ── 이미지 생성 ────────────────────────────────────────────────
-  const prompt = generatePrompt(emotionKey, gem);
+  const prompt = generatePrompt(emotionKey, gem, location);
   let   imgBuf = null;
 
   try {
@@ -345,7 +394,8 @@ router.post('/generate', async (req, res) => {
     console.warn('[star-image] 저장 실패 (이미지는 반환):', e.message);
   }
 
-  return res.json({ success: true, image_url: imageUrl, sentence, from_cache: false });
+  return res.json({ success: true, image_url: imageUrl, sentence, from_cache: false,
+    requested_location: location, resolved_location: location, source_image: 'ai_generated' });
 });
 
 // ── GET /resolve ─────────────────────────────────────────────────
