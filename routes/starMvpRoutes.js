@@ -467,7 +467,8 @@ router.post('/commit', async (req, res) => {
     const is_fallback = !preview_image_url || preview_image_url.startsWith('/images/fallback');
     _commitJourneyMoment(inserted.id, emotionText, origin_location, image_url, is_fallback).catch(() => {});
 
-    // star_images 등록 + OG 이미지 생성 (현장 포스트카드 흐름 — fire-and-forget)
+    // star_images 등록 + OG 이미지 생성 (현장 포스트카드 흐름 — await)
+    let postcardImageUrl = preview_image_url || null;
     if (preview_image_url && !preview_image_url.startsWith('/images/fallback')) {
       db.query(
         `INSERT INTO star_images (star_id, image_url, emotion_text, location, validation_pass)
@@ -476,15 +477,14 @@ router.post('/commit', async (req, res) => {
         [inserted.id, preview_image_url, emotionText, origin_location]
       ).catch(e => console.warn('[star-mvp] star_images insert 실패:', e.message));
 
-      (async () => {
-        try {
-          const { makeOgImage } = require('../scripts/thumbnail/lib/makeOgImage');
-          const { og_url } = await makeOgImage(preview_image_url, inserted.access_key);
-          console.log(`[og] 생성 완료: ${og_url}`);
-        } catch (e) {
-          console.warn('[og] 생성 실패 (공유는 원본 사용):', e.message);
-        }
-      })();
+      try {
+        const { makeOgImage } = require('../scripts/thumbnail/lib/makeOgImage');
+        const { full_url } = await makeOgImage(preview_image_url, inserted.access_key);
+        postcardImageUrl = full_url; // /images/postcards/{access_key}.png
+        console.log(`[og] 생성 완료: ${full_url}`);
+      } catch (e) {
+        console.warn('[og] 생성 실패 (원본 URL 유지):', e.message);
+      }
     }
 
     // Emotion Link
@@ -515,6 +515,7 @@ router.post('/commit', async (req, res) => {
       star_id:      inserted.id,
       access_key:   inserted.access_key,
       created_at:   inserted.created_at,
+      image_url:    postcardImageUrl,
       emotion_link: emotionLink,
     });
   } catch (err) {

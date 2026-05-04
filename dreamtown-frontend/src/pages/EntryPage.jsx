@@ -81,7 +81,7 @@ function CablecarPostcardForm({ loc }) {
       localStorage.setItem('access_key',      commitData.access_key);
       localStorage.setItem('star_id',         commitData.star_id || '');
       localStorage.setItem('emotion_linked',  commitData.emotion_link?.linked ? '1' : '0');
-      localStorage.setItem('share_image_url', genData.image_url || '');
+      localStorage.setItem('share_image_url', commitData.image_url || genData.image_url || '');
       localStorage.setItem('origin_location', loc);
       localStorage.setItem('flow_step',       '8');
 

@@ -173,6 +173,22 @@ function getCacheDir(location) {
   return dir;
 }
 
+// ── postcards/tmp_ 임시 저장 디렉토리 (generate → commit 이관용) ───
+const POSTCARDS_BASE = path.join(__dirname, '..', 'public', 'images', 'postcards');
+if (!fs.existsSync(POSTCARDS_BASE)) fs.mkdirSync(POSTCARDS_BASE, { recursive: true });
+
+// 프리젠 소스 이미지를 postcards/tmp_{id}.png 로 복사 → URL 반환
+// source 파일이 없으면 null 반환 (DALL-E fallback 유도)
+async function copyPregenToPostcards(sourceRelPath) {
+  const sharp      = require('sharp');
+  const sourcePath = path.join(__dirname, '..', 'public', sourceRelPath.replace(/^\//, ''));
+  if (!fs.existsSync(sourcePath)) return null;
+  const tmpId   = require('crypto').randomUUID().slice(0, 12);
+  const destPath = path.join(POSTCARDS_BASE, `tmp_${tmpId}.png`);
+  await sharp(sourcePath).png().toFile(destPath);
+  return `/images/postcards/tmp_${tmpId}.png`;
+}
+
 // ── DB 테이블 자동 생성 ────────────────────────────────────────────
 ;(async () => {
   try {
@@ -254,9 +270,9 @@ router.post('/generate', async (req, res) => {
   if (location === 'cablecar' || location === 'yeosu_cablecar') {
     const pregenUrl = getCablecarStage1Image(emotionKey, gem);
     if (pregenUrl) {
-      const filePath = path.join(CACHE_BASE, 'yeosu_cablecar', path.basename(pregenUrl));
-      if (fs.existsSync(filePath)) {
-        return res.json({ success: true, image_url: pregenUrl, sentence, from_cache: true });
+      const postcardUrl = await copyPregenToPostcards(pregenUrl).catch(() => null);
+      if (postcardUrl) {
+        return res.json({ success: true, image_url: postcardUrl, sentence, from_cache: true });
       }
     }
   }
@@ -266,9 +282,9 @@ router.post('/generate', async (req, res) => {
     const emotionNorm = emotionKey.replace(/\s+/g, '_');
     const pregenUrl   = getStarImage(emotionNorm, gem);
     if (pregenUrl) {
-      const filePath = path.join(CACHE_BASE, 'yeosu_cafe', path.basename(pregenUrl));
-      if (fs.existsSync(filePath)) {
-        return res.json({ success: true, image_url: pregenUrl, sentence, from_cache: true });
+      const postcardUrl = await copyPregenToPostcards(pregenUrl).catch(() => null);
+      if (postcardUrl) {
+        return res.json({ success: true, image_url: postcardUrl, sentence, from_cache: true });
       }
     }
   }
@@ -309,22 +325,24 @@ router.post('/generate', async (req, res) => {
     }
   }
 
-  // ── 파일 저장 + DB 캐시 ────────────────────────────────────────
-  const fileName = `${cacheKey}.png`;
-  const filePath = path.join(cacheDir, fileName);
-  const imageUrl = `/images/star-cache/${location}/${fileName}`;
+  // ── 파일 저장 → postcards/tmp_ (star-cache 경로 클라이언트 노출 금지) ──
+  const tmpId    = require('crypto').randomUUID().slice(0, 12);
+  const tmpFile  = `tmp_${tmpId}.png`;
+  const filePath = path.join(POSTCARDS_BASE, tmpFile);
+  const imageUrl = `/images/postcards/${tmpFile}`;
 
   try {
     fs.writeFileSync(filePath, imgBuf);
+    // DB 캐시는 내부 cacheKey로만 관리 (image_url은 이제 postcards 경로)
     await db.query(
       `INSERT INTO star_image_cache (cache_key, image_url, emotion, gem, location)
        VALUES ($1, $2, $3, $4, $5)
        ON CONFLICT (cache_key) DO UPDATE SET image_url = EXCLUDED.image_url`,
       [cacheKey, imageUrl, emotionKey, gem, location]
     );
-    console.log(`[star-image] 캐시 저장 완료 | ${cacheKey}`);
+    console.log(`[star-image] 저장 완료 | ${imageUrl}`);
   } catch (e) {
-    console.warn('[star-image] 캐시 저장 실패 (이미지는 반환):', e.message);
+    console.warn('[star-image] 저장 실패 (이미지는 반환):', e.message);
   }
 
   return res.json({ success: true, image_url: imageUrl, sentence, from_cache: false });
