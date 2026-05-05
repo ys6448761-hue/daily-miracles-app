@@ -182,6 +182,15 @@
     const loc = new URLSearchParams(location.search).get('loc') || 'direct';
     const ref = new URLSearchParams(location.search).get('ref') || null;
 
+    // ?ref= 방문 이벤트 기록
+    if (ref) {
+      fetch('/api/star/visit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ref_access_key: ref }),
+      }).catch(() => {});
+    }
+
     // 역진입 차단
     if (Number(localStorage.getItem('flow_step') || 0) >= FLOW_ASCEND) {
       location.replace('/complete.html');

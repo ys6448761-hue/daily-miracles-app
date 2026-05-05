@@ -22,6 +22,21 @@
       padding: 40px 0 32px;
     }
     .star-icon { font-size: 60px; display: block; margin-bottom: 14px; }
+    .star-image-wrap {
+      width: 160px;
+      height: 240px;
+      margin: 0 auto 16px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 0 32px rgba(100,160,255,0.2);
+    }
+    .star-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
     .date-badge {
       display: inline-block;
       font-size: 12px;
@@ -114,8 +129,7 @@
 
     /* ── 블록 3: 다음 ── */
     #block3 { display: none; }
-    .next-grid { display: flex; flex-direction: column; gap: 10px; }
-    .btn-travel {
+    .btn-primary {
       display: block;
       width: 100%;
       padding: 18px 20px;
@@ -127,51 +141,43 @@
       font-weight: 600;
       font-family: 'Noto Sans KR', sans-serif;
       cursor: pointer;
-      text-decoration: none;
       text-align: center;
+      margin-bottom: 10px;
     }
-    .btn-exit {
+    .btn-secondary {
       display: block;
       width: 100%;
-      padding: 14px;
-      background: transparent;
-      border: 1.5px solid rgba(255,255,255,0.18);
+      padding: 16px 20px;
+      background: rgba(255,255,255,0.07);
+      border: 1.5px solid rgba(255,255,255,0.2);
       border-radius: 14px;
-      color: rgba(255,255,255,0.5);
+      color: rgba(255,255,255,0.8);
+      font-size: 15px;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .btn-ghost-link {
+      display: block;
+      width: 100%;
+      padding: 14px 20px;
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      color: rgba(255,255,255,0.4);
       font-size: 14px;
       font-family: 'Noto Sans KR', sans-serif;
       cursor: pointer;
       text-align: center;
       text-decoration: none;
     }
-    .voyage-nudge {
-      margin-top: 6px;
-      font-size: 13px;
-      color: rgba(255,255,255,0.38);
-      line-height: 1.7;
+    .share-toast {
+      display: none;
+      font-size: 12px;
+      color: #7bc67e;
       text-align: center;
-      margin-bottom: 12px;
-    }
-    .btn-voyage {
-      display: inline-block;
-      padding: 10px 22px;
-      background: transparent;
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 20px;
-      color: rgba(255,255,255,0.5);
-      font-size: 13px;
-      font-family: 'Noto Sans KR', sans-serif;
-      cursor: pointer;
-      text-decoration: none;
-      text-align: center;
-      transition: all 0.2s;
-    }
-    .btn-voyage:hover { border-color: rgba(255,255,255,0.4); color: rgba(255,255,255,0.7); }
-    .travel-copy {
-      font-size: 13px;
-      color: rgba(255,255,255,0.55);
-      line-height: 1.6;
-      margin-bottom: 16px;
+      margin-top: 8px;
     }
 
     /* ── 로딩 / 에러 ── */
@@ -213,11 +219,18 @@
 
   <script>
     const TYPE_LABELS  = { '3m': '3개월 후', '6m': '6개월 후', '12m': '1년 후' };
-    const TRAVEL_COPY  = {
-      '3m':  '조금 더 가볍게,\n다시 한번 떠나볼까요',
-      '6m':  '계절이 바뀌었어요.\n그때의 당신을 다시 만나러 갈 시간이에요',
-      '12m': '1년 전의 당신과\n지금의 당신이 만나는 날이에요',
-    };
+
+    // 소원그림 경로 계산 (서버 getStarImage와 동일한 로직)
+    const EMOTION_BASE = { confusion: 1, pause: 6, calm: 11, curiosity: 16, fragile_hope: 21 };
+    const GEM_OFFSET   = { citrine: 0, sapphire: 1, emerald: 2, ruby: 3, amethyst: 4 };
+
+    function getStarImagePath(emotion, gem) {
+      const base   = EMOTION_BASE[emotion];
+      const offset = GEM_OFFSET[gem];
+      if (base == null || offset == null) return null;
+      const idx = String(base + offset).padStart(2, '0');
+      return `/images/star-cache/yeosu_cafe/${idx}_${emotion}_${gem}_yeosu_cafe_stage2.png`;
+    }
 
     function formatDate(iso) {
       if (!iso) return '';
@@ -239,29 +252,38 @@
       return promises[0].type;
     }
 
-    let globalStarId = null;
+    let globalStarId   = null;
+    let globalImageUrl = null;
+    let globalEmotion  = null;
+    let globalAccessKey = null;
 
     async function loadStar() {
       const _qp = new URLSearchParams(window.location.search);
       const accessKey = _qp.get('key') || window.location.pathname.split('/').filter(Boolean).pop();
       if (!accessKey) return renderNotFound();
+      globalAccessKey = accessKey;
 
       try {
         const res  = await fetch(`/api/star/${accessKey}`);
         const data = await res.json();
         if (!data.success) return renderNotFound();
-        render(data.star, data.promises, data.last_reflection);
+        render(data.star, data.promises, data.last_reflection, data.image_url ?? null);
       } catch {
         renderNotFound();
       }
     }
 
-    function render(star, promises, lastReflection) {
-      globalStarId = star.id;
-      const primaryType  = getPrimaryType(promises);
-      const travelCopy   = TRAVEL_COPY[primaryType] || TRAVEL_COPY['3m'];
-      const travelUrl    = `/travel?type=${primaryType || '3m'}&star_id=${star.id}`;
-      const alreadyRefl  = !!lastReflection;
+    function render(star, promises, lastReflection, image_url) {
+      globalStarId  = star.id;
+      globalEmotion = star.emotion || null;
+      globalImageUrl = image_url || getStarImagePath(star.emotion, star.gem_type) || null;
+
+      const primaryType = getPrimaryType(promises);
+      const alreadyRefl = !!lastReflection;
+
+      const headerMedia = globalImageUrl
+        ? `<div class="star-image-wrap"><img class="star-img" src="${escHtml(globalImageUrl)}" alt="소원그림" /></div>`
+        : `<span class="star-icon">⭐</span>`;
 
       const promisesHtml = promises.length > 0
         ? promises.map(p => `
@@ -276,9 +298,13 @@
         ? `<div style="font-size:13px;color:rgba(255,255,255,0.4);padding:8px 0">이미 기록했어요 — ${escHtml(lastReflection.status)}</div>`
         : '';
 
+      const downloadBtn = globalImageUrl
+        ? `<button class="btn-primary" onclick="downloadStarImage()">소원그림 받기</button>`
+        : '';
+
       document.getElementById('app').innerHTML = `
         <div class="page-header">
-          <span class="star-icon">⭐</span>
+          ${headerMedia}
           <div class="date-badge">${formatDate(star.created_at)} · 케이블카</div>
         </div>
 
@@ -310,26 +336,110 @@
         <!-- 블록 3: 다음 선택 -->
         <div class="block" id="block3" ${alreadyRefl ? 'style="display:block"' : ''}>
           <div class="block-label">이제, 다음을 선택해보세요</div>
-          <div class="next-grid">
-            <a class="btn-exit" href="javascript:history.back()">그냥 나가기</a>
-          </div>
-          <div style="text-align:center;margin-top:20px;">
-            <p class="voyage-nudge">여수에서 이 흐름을 이어볼 수도 있어요</p>
-            <a class="btn-voyage" href="/voyage-select?star_id=${encodeURIComponent(star.id)}">한번 볼까</a>
-          </div>
+          ${downloadBtn}
+          <button class="btn-secondary" onclick="shareWish()">이 이야기를 나누기</button>
+          <a class="btn-ghost-link" href="/journey">여수 소원여정 보기</a>
+          <div class="share-toast" id="shareToast">링크가 복사됐어요</div>
         </div>
       `;
 
-      // reflection 버튼 이벤트
       document.querySelectorAll('.reflect-btn:not(.disabled)').forEach(btn => {
         btn.addEventListener('click', () => handleReflect(btn.dataset.status));
       });
     }
 
+    async function downloadStarImage() {
+      if (!globalImageUrl) return;
+
+      const canvas = document.createElement('canvas');
+      canvas.width  = 1024;
+      canvas.height = 1536;
+      const ctx = canvas.getContext('2d');
+
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, 1024, 1536);
+
+        // 하단 브랜드 밴드
+        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        ctx.fillRect(0, 1456, 1024, 80);
+        ctx.fillStyle = 'rgba(255,255,255,0.65)';
+        ctx.font = '28px serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('하루하루의 기적', 512, 1502);
+
+        const link = document.createElement('a');
+        link.download = 'dreamtown_wish.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      };
+
+      img.onerror = () => {
+        // 이미지 로드 실패 시 직접 열기
+        window.open(globalImageUrl, '_blank');
+      };
+
+      img.src = globalImageUrl;
+    }
+
+    async function shareWish() {
+      const shareUrl = globalAccessKey
+        ? `${location.origin}/star-entry.html?ref=${encodeURIComponent(globalAccessKey)}`
+        : window.location.href;
+      const text = globalEmotion
+        ? `나의 별 — ${globalEmotion}의 기적`
+        : '나의 별 — 하루하루의 기적';
+
+      let channel = 'clipboard';
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: '하루하루의 기적', text, url: shareUrl });
+          channel = 'native';
+          recordShare(channel);
+          return;
+        } catch (e) {
+          if (e.name === 'AbortError') return;
+        }
+      }
+
+      // 클립보드 fallback
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = shareUrl;
+        ta.style.position = 'fixed';
+        ta.style.opacity  = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+
+      recordShare(channel);
+
+      const toast = document.getElementById('shareToast');
+      if (toast) {
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 2000);
+      }
+    }
+
+    function recordShare(channel) {
+      if (!globalAccessKey) return;
+      fetch(`/api/star/share/${encodeURIComponent(globalAccessKey)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ channel }),
+      }).catch(() => {});
+    }
+
     async function handleReflect(status) {
       if (!globalStarId) return;
 
-      // 즉시 시각 피드백
       document.querySelectorAll('.reflect-btn').forEach(b => {
         b.classList.add('disabled');
         if (b.dataset.status === status) b.classList.add('selected');
@@ -345,7 +455,6 @@
 
       document.getElementById('savedBadge').style.display = 'block';
 
-      // Block 3 노출
       setTimeout(() => {
         const b3 = document.getElementById('block3');
         if (b3) {

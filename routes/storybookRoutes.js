@@ -1893,7 +1893,7 @@ function buildStorybook(sorted, mainStar, flowLine1, flowLine2, closingText, isF
  */
 router.post('/generate', (req, res) => {
   try {
-    const { stars = [] } = req.body;
+    const { stars = [], ref_access_key } = req.body;
 
     if (!Array.isArray(stars) || stars.length < 2) {
       return res.status(400).json({ success: false, error: '최소 2개의 카드가 필요합니다' });
@@ -1924,10 +1924,11 @@ router.post('/generate', (req, res) => {
     return res.json({
       success: true,
       meta: {
-        card_count:    sorted.length,
-        first_emotion: firstEmotion,
-        last_emotion:  lastEmotion,
-        flow_type:     isFull ? 'full' : 'compact',
+        card_count:      sorted.length,
+        first_emotion:   firstEmotion,
+        last_emotion:    lastEmotion,
+        flow_type:       isFull ? 'full' : 'compact',
+        ref_access_key:  ref_access_key || null,
       },
       storybook: buildStorybook(sorted, mainStar, flowLine1, flowLine2, closingText, isFull),
     });

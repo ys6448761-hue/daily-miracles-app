@@ -316,18 +316,107 @@ router.post('/reflect', async (req, res) => {
 });
 
 // ── GET /connections/:access_key ─────────────────────────────────
-// 이 별의 공유 링크로 유입된 별 개수 (parent_ref = access_key)
+// 이 별의 공유 링크로 유입된 별 개수 + 자식 목록
 router.get('/connections/:access_key', async (req, res) => {
   try {
     const { access_key } = req.params;
     const { rows } = await db.query(
-      'SELECT COUNT(*) AS n FROM stars WHERE parent_ref = $1',
+      `SELECT access_key, emotion, origin_location, created_at
+       FROM stars WHERE parent_ref = $1 ORDER BY created_at DESC`,
       [access_key]
     );
-    return res.json({ success: true, count: parseInt(rows[0].n, 10) });
+    return res.json({ success: true, count: rows.length, children: rows });
   } catch (err) {
-    if (err.code === '42703') return res.json({ success: true, count: 0 }); // migration 139 미실행
+    if (err.code === '42703') return res.json({ success: true, count: 0, children: [] });
     console.error('[star-mvp] GET /connections error:', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ── POST /share/:access_key ───────────────────────────────────────
+// 공유 버튼 클릭 이벤트 기록
+router.post('/share/:access_key', async (req, res) => {
+  try {
+    const { access_key } = req.params;
+    const { channel = 'link' } = req.body;
+    await db.query(
+      'INSERT INTO star_share_events (access_key, channel) VALUES ($1, $2)',
+      [access_key, channel]
+    ).catch(() => {}); // migration 158 미실행 시 조용히 skip
+    return res.json({ success: true });
+  } catch (err) {
+    return res.json({ success: true }); // 추적 실패는 무시
+  }
+});
+
+// ── POST /visit ───────────────────────────────────────────────────
+// ?ref= 공유 링크 방문 이벤트 기록
+router.post('/visit', async (req, res) => {
+  try {
+    const { ref_access_key } = req.body;
+    if (!ref_access_key) return res.json({ success: true });
+    await db.query(
+      'INSERT INTO star_visit_events (ref_access_key) VALUES ($1)',
+      [ref_access_key]
+    ).catch(() => {}); // migration 159 미실행 시 skip
+    return res.json({ success: true });
+  } catch (err) {
+    return res.json({ success: true });
+  }
+});
+
+// ── GET /admin/connection-tree ────────────────────────────────────
+// 공명 트리: 특정 별 → 하위 별 재귀 조회 (관리자용)
+// ?root=ACCESS_KEY → 해당 별 기준 트리
+// root 없으면 직접 자식이 있는 별 TOP 50
+router.get('/admin/connection-tree', async (req, res) => {
+  try {
+    const { root } = req.query;
+
+    if (root) {
+      const { rows } = await db.query(
+        `WITH RECURSIVE tree AS (
+           SELECT access_key, parent_ref, emotion, origin_location, created_at, 0 AS depth
+           FROM stars WHERE access_key = $1
+           UNION ALL
+           SELECT s.access_key, s.parent_ref, s.emotion, s.origin_location, s.created_at, t.depth + 1
+           FROM stars s JOIN tree t ON s.parent_ref = t.access_key
+           WHERE t.depth < 10
+         )
+         SELECT * FROM tree ORDER BY depth, created_at`,
+        [root]
+      );
+      return res.json({ success: true, root, tree: rows });
+    }
+
+    // root 없음 → 바이럴 TOP 50
+    const { rows } = await db.query(
+      `SELECT
+         p.access_key,
+         p.emotion,
+         p.origin_location,
+         p.created_at,
+         COUNT(c.id) AS child_count,
+         COALESCE(sv.visits, 0) AS visit_count,
+         COALESCE(se.shares, 0) AS share_count
+       FROM stars p
+       JOIN stars c ON c.parent_ref = p.access_key
+       LEFT JOIN (
+         SELECT ref_access_key, COUNT(*) AS visits FROM star_visit_events GROUP BY ref_access_key
+       ) sv ON sv.ref_access_key = p.access_key
+       LEFT JOIN (
+         SELECT access_key, COUNT(*) AS shares FROM star_share_events GROUP BY access_key
+       ) se ON se.access_key = p.access_key
+       GROUP BY p.access_key, p.emotion, p.origin_location, p.created_at, sv.visits, se.shares
+       ORDER BY child_count DESC
+       LIMIT 50`
+    );
+    return res.json({ success: true, top_stars: rows });
+  } catch (err) {
+    if (err.code === '42P01' || err.code === '42703') {
+      return res.json({ success: true, top_stars: [], note: 'migration 미실행' });
+    }
+    console.error('[star-mvp] admin/connection-tree error:', err.message);
     res.status(500).json({ success: false, error: err.message });
   }
 });
