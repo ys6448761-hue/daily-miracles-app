@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>나의 별 이야기 — Daily Miracles</title>
+  <meta property="og:title"       content="나의 별 이야기">
+  <meta property="og:description" content="하루하루의 기적 — 공명 스토리북">
+  <meta property="og:type"        content="website">
+  <style>
+    :root {
+      --bg: #080814;
+      --surface: #0f0f1e;
+      --primary: #9B87F5;
+      --secondary: #F5A7C6;
+      --text: #e8e8f0;
+      --text-dim: #6666aa;
+      --border: rgba(155,135,245,0.15);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', -apple-system, sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    }
+
+    /* Header */
+    .hdr {
+      width: 100%; padding: 18px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .hdr-logo { font-size: 14px; color: var(--text-dim); }
+    .hdr-meta { font-size: 12px; color: var(--text-dim); }
+
+    /* Page body */
+    .page { width: 100%; max-width: 480px; padding: 32px 20px 60px; }
+
+    /* Hero */
+    .hero {
+      text-align: center; margin-bottom: 32px;
+      padding: 24px; background: linear-gradient(135deg, rgba(155,135,245,0.08), rgba(245,167,198,0.05));
+      border: 1px solid var(--border); border-radius: 20px;
+    }
+    .hero-emotion { font-size: 30px; margin-bottom: 8px; }
+    .hero-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+    .hero-sub { font-size: 13px; color: var(--text-dim); }
+
+    /* Slides */
+    .slides { display: flex; flex-direction: column; gap: 16px; }
+
+    /* Image slide */
+    .slide-image {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      overflow: hidden; aspect-ratio: 4/3;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .slide-image img { width: 100%; height: 100%; object-fit: cover; }
+    .slide-image-ph {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      padding: 32px;
+    }
+    .slide-loc-icon { font-size: 40px; }
+    .slide-loc-name { font-size: 14px; color: var(--text-dim); }
+    .slide-em-tag {
+      padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    }
+    .em-confusion    { background: rgba(155,135,245,0.15); color: #b8a8f8; }
+    .em-calm         { background: rgba(100,180,255,0.15); color: #80c8f5; }
+    .em-fragile_hope { background: rgba(245,200,90,0.15);  color: #f5d070; }
+    .em-curiosity    { background: rgba(90,245,180,0.15);  color: #70f5c0; }
+    .em-pause        { background: rgba(245,120,120,0.15); color: #f58888; }
+
+    /* Text slide */
+    .slide-text {
+      padding: 28px 24px; text-align: center;
+      border-left: 3px solid var(--primary);
+      background: rgba(155,135,245,0.04);
+    }
+    .slide-text p {
+      font-size: 17px; font-weight: 600; line-height: 1.8; color: var(--text);
+      white-space: pre-line;
+    }
+
+    /* Main star slide */
+    .slide-main-star {
+      background: linear-gradient(135deg, rgba(155,135,245,0.12), rgba(245,167,198,0.08));
+      border: 1px solid rgba(155,135,245,0.3); border-radius: 16px;
+      overflow: hidden; aspect-ratio: 4/3;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .slide-main-star-ph {
+      text-align: center; padding: 32px;
+    }
+    .slide-main-star-ph .star-glow {
+      font-size: 56px; display: block; margin-bottom: 12px;
+      filter: drop-shadow(0 0 16px rgba(155,135,245,0.8));
+    }
+    .slide-main-star-ph p { font-size: 14px; color: var(--text-dim); }
+
+    /* CTA */
+    .cta-wrap { margin-top: 36px; text-align: center; }
+    .cta-text { font-size: 15px; color: var(--text-dim); margin-bottom: 16px; line-height: 1.6; }
+    .cta-btn {
+      display: inline-block; padding: 14px 32px; background: var(--primary);
+      color: #fff; border-radius: 12px; font-size: 15px; font-weight: 700;
+      text-decoration: none; transition: opacity .2s;
+    }
+    .cta-btn:hover { opacity: .88; }
+
+    /* Loading */
+    .loading { text-align: center; padding: 80px 20px; color: var(--text-dim); font-size: 15px; }
+    .loading::after { content: ''; display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin .7s linear infinite; margin-left: 10px; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error { text-align: center; padding: 80px 20px; color: var(--text-dim); }
+  </style>
+</head>
+<body>
+
+<div class="hdr">
+  <span class="hdr-logo">하루하루의 기적 ✦</span>
+  <span class="hdr-meta" id="hdr-meta"></span>
+</div>
+
+<div class="page">
+  <div id="loading" class="loading">이야기를 불러오는 중</div>
+  <div id="content" style="display:none">
+    <div class="hero" id="hero"></div>
+    <div class="slides" id="slides"></div>
+    <div class="cta-wrap">
+      <p class="cta-text">당신만의 별 이야기를<br>지금 시작해보세요</p>
+      <a class="cta-btn" id="cta-link" href="/star-entry.html">나의 별 만들기 →</a>
+    </div>
+  </div>
+  <div id="error" class="error" style="display:none">이야기를 찾을 수 없어요 🌙</div>
+</div>
+
+<script>
+const STORYBOOK_ID = window.location.pathname.split('/').pop();
+
+const EM_KO  = { confusion:'혼란', calm:'고요', fragile_hope:'희망', curiosity:'호기심', pause:'멈춤' };
+const LOC_KO = { cablecar:'케이블카', cafe:'카페', hamel:'하멜', stay:'숙소' };
+const LOC_IC = { cablecar:'🚡', cafe:'☕', hamel:'⚓', stay:'🏠' };
+
+async function load() {
+  try {
+    const res  = await fetch(`/api/storybook/s/${STORYBOOK_ID}`);
+    const data = await res.json();
+    if (!data.success) throw new Error('not found');
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = '';
+
+    const meta = data.meta || {};
+
+    // header meta
+    document.getElementById('hdr-meta').textContent =
+      `${meta.card_count || ''}개 카드 · ${meta.flow_type === 'full' ? 'full' : 'compact'}`;
+
+    // hero
+    const flowKey = `${meta.first_emotion}→${meta.last_emotion}`;
+    document.getElementById('hero').innerHTML = `
+      <div class="hero-emotion">✦</div>
+      <div class="hero-title">나의 여수 이야기</div>
+      <div class="hero-sub">${EM_KO[meta.first_emotion]||''} → ${EM_KO[meta.last_emotion]||''}</div>`;
+
+    // CTA ref link
+    if (data.access_key) {
+      document.getElementById('cta-link').href =
+        `/star-entry.html?ref=${encodeURIComponent(data.access_key)}`;
+    }
+
+    // slides
+    const slides = data.storybook || [];
+    document.getElementById('slides').innerHTML = slides.map(s => renderSlide(s)).join('');
+  } catch (_) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error').style.display = '';
+  }
+}
+
+function renderSlide(s) {
+  if (s.type === 'text') {
+    return `<div class="slide-text"><p>${escHtml(s.content)}</p></div>`;
+  }
+  if (s.role === 'main_star') {
+    const imgHtml = s.image_url
+      ? `<img src="${escHtml(s.image_url)}" alt="별" onerror="this.parentElement.innerHTML=mainStarPh('${escHtml(s.emotion||'')}');">`
+      : mainStarPh(s.emotion);
+    return `<div class="slide-main-star">${imgHtml}</div>`;
+  }
+  // normal image slide
+  const ph = `
+    <div class="slide-image-ph">
+      <span class="slide-loc-icon">${LOC_IC[s.location]||'⭐'}</span>
+      <span class="slide-loc-name">${LOC_KO[s.location]||s.location||''}</span>
+      <span class="slide-em-tag em-${s.emotion||'calm'}">${EM_KO[s.emotion]||s.emotion||''}</span>
+    </div>`;
+  const imgHtml = s.image_url
+    ? `<img src="${escHtml(s.image_url)}" alt="${escHtml(s.location||'')}" onerror="this.parentElement.innerHTML='${ph.replace(/'/g,"\\'")}';">`
+    : ph;
+  return `<div class="slide-image">${imgHtml}</div>`;
+}
+
+function mainStarPh(emotion) {
+  return `<div class="slide-main-star-ph"><span class="star-glow">⭐</span><p>${EM_KO[emotion]||''}</p></div>`;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+load();
+</script>
+</body>
+</html>

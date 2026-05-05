@@ -350,19 +350,34 @@ router.post('/share/:access_key', async (req, res) => {
 });
 
 // ── POST /visit ───────────────────────────────────────────────────
-// ?ref= 공유 링크 방문 이벤트 기록
+// ?ref= 공유 링크 방문 이벤트 기록 + 집계 + resonance_score 갱신
 router.post('/visit', async (req, res) => {
-  try {
-    const { ref_access_key } = req.body;
-    if (!ref_access_key) return res.json({ success: true });
-    await db.query(
-      'INSERT INTO star_visit_events (ref_access_key) VALUES ($1)',
-      [ref_access_key]
-    ).catch(() => {}); // migration 159 미실행 시 skip
-    return res.json({ success: true });
-  } catch (err) {
-    return res.json({ success: true });
-  }
+  const { ref_access_key } = req.body;
+  if (!ref_access_key) return res.json({ success: true });
+
+  // raw 방문 로그 (migration 159)
+  db.query('INSERT INTO star_visit_events (ref_access_key) VALUES ($1)', [ref_access_key])
+    .catch(() => {});
+
+  // 집계 UPSERT: first_seen 유지, last_seen 갱신, revisit +1 (migration 161)
+  db.query(`
+    INSERT INTO star_connections_agg (ref_access_key)
+    VALUES ($1)
+    ON CONFLICT (ref_access_key) DO UPDATE SET
+      last_seen_at  = NOW(),
+      revisit_count = star_connections_agg.revisit_count + 1
+  `, [ref_access_key]).then(() => {
+    // resonance_score = view*1 + conversion*10 + revisit*3 (migration 160)
+    db.query(`
+      UPDATE stars SET resonance_score = (
+          COALESCE((SELECT COUNT(*) FROM star_visit_events   WHERE ref_access_key = $1), 0)
+        + COALESCE((SELECT COUNT(*) FROM stars               WHERE parent_ref      = $1), 0) * 10
+        + COALESCE((SELECT revisit_count FROM star_connections_agg WHERE ref_access_key = $1), 0) * 3
+      ) WHERE access_key = $1
+    `, [ref_access_key]).catch(() => {});
+  }).catch(() => {});
+
+  return res.json({ success: true });
 });
 
 // ── GET /admin/connection-tree ────────────────────────────────────
@@ -525,6 +540,15 @@ router.post('/commit', async (req, res) => {
     const _wishText = (wish_text && wish_text.trim()) || emotion || '케이블카 별';
     const _gemType  = gem_type || 'cablecar';
 
+    // journey_id: parent 있으면 상속, 없으면 새 UUID (migration 160)
+    let journey_id = crypto.randomUUID();
+    if (parent_ref) {
+      const { rows: pRows } = await db.query(
+        'SELECT journey_id FROM stars WHERE access_key = $1', [parent_ref]
+      ).catch(() => ({ rows: [] }));
+      if (pRows[0]?.journey_id) journey_id = pRows[0].journey_id;
+    }
+
     // Star 생성 (access_key 충돌 시 최대 3회 재시도)
     let access_key, inserted;
     for (let i = 0; i < 3; i++) {
@@ -532,11 +556,11 @@ router.post('/commit', async (req, res) => {
       try {
         const { rows } = await db.query(
           `INSERT INTO stars
-             (id, user_id, wish_text, gem_type, status, access_key, origin_location, emotion, is_public, phone_number, parent_ref)
+             (id, user_id, wish_text, gem_type, status, access_key, origin_location, emotion, is_public, phone_number, parent_ref, journey_id)
            VALUES
-             (gen_random_uuid(), $1, $2, $3, 'PRE-ON', $4, $5, $6, false, $7, $8)
+             (gen_random_uuid(), $1, $2, $3, 'PRE-ON', $4, $5, $6, false, $7, $8, $9)
            RETURNING id, access_key, created_at`,
-          [crypto.randomUUID(), _wishText, _gemType, access_key, origin_location, emotion || null, phone_number || null, parent_ref || null]
+          [crypto.randomUUID(), _wishText, _gemType, access_key, origin_location, emotion || null, phone_number || null, parent_ref || null, journey_id]
         );
         inserted = rows[0];
         break;

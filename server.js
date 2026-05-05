@@ -2521,6 +2521,11 @@ app.get('/admin/star/:access_key', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin', 'star-detail.html'));
 });
 
+// ---------- 스토리북 공유 페이지 (/storybook/:id) ----------
+app.get('/storybook/:id', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'storybook-share.html'));
+});
+
 // ---------- 별들의 고향 Routes (/api/hometown) ----------
 let hometownRoutes = null;
 try {

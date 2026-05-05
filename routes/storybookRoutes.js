@@ -1891,7 +1891,7 @@ function buildStorybook(sorted, mainStar, flowLine1, flowLine2, closingText, isF
  * DreamTown 포스트카드 → 스토리북 슬라이드 변환
  * Body: { stars: [{ location, emotion, image_url }] }
  */
-router.post('/generate', (req, res) => {
+router.post('/generate', async (req, res) => {
   try {
     const { stars = [], ref_access_key } = req.body;
 
@@ -1919,21 +1919,70 @@ router.post('/generate', (req, res) => {
       sorted[sorted.length - 1];
 
     const closingText = CLOSING_TEXT[lastEmotion] || '다시 시작해도 괜찮아요';
-    const isFull = sorted.length >= 4;
+    const isFull      = sorted.length >= 4;
+    const slides      = buildStorybook(sorted, mainStar, flowLine1, flowLine2, closingText, isFull);
+    const meta = {
+      card_count:     sorted.length,
+      first_emotion:  firstEmotion,
+      last_emotion:   lastEmotion,
+      flow_type:      isFull ? 'full' : 'compact',
+      ref_access_key: ref_access_key || null,
+    };
 
-    return res.json({
-      success: true,
-      meta: {
-        card_count:      sorted.length,
-        first_emotion:   firstEmotion,
-        last_emotion:    lastEmotion,
-        flow_type:       isFull ? 'full' : 'compact',
-        ref_access_key:  ref_access_key || null,
-      },
-      storybook: buildStorybook(sorted, mainStar, flowLine1, flowLine2, closingText, isFull),
-    });
+    // 스토리북 저장 → 공유 링크 발급 (migration 162)
+    let storybookId  = null;
+    let share_url    = null;
+    if (db) {
+      try {
+        // ref_access_key의 journey_id 조회
+        let journey_id = null;
+        if (ref_access_key) {
+          const { rows: jr } = await db.query(
+            'SELECT journey_id FROM stars WHERE access_key = $1', [ref_access_key]
+          ).catch(() => ({ rows: [] }));
+          journey_id = jr[0]?.journey_id || null;
+        }
+        const { rows: sbRows } = await db.query(
+          `INSERT INTO storybooks (access_key, journey_id, slides, meta)
+           VALUES ($1, $2, $3, $4) RETURNING id`,
+          [ref_access_key || null, journey_id, JSON.stringify(slides), JSON.stringify(meta)]
+        );
+        storybookId = sbRows[0]?.id;
+        if (storybookId) share_url = `/storybook/${storybookId}`;
+      } catch (_) { /* migration 162 미실행 시 무시 */ }
+    }
+
+    return res.json({ success: true, id: storybookId, share_url, meta, storybook: slides });
   } catch (err) {
     console.error('[storybook] /generate error:', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ── GET /s/:id — 저장된 스토리북 조회 (공유 링크용) ───────────────
+router.get('/s/:id', async (req, res) => {
+  const { id } = req.params;
+  if (!db) return res.status(503).json({ success: false, error: 'DB unavailable' });
+  try {
+    const { rows } = await db.query(
+      'SELECT id, access_key, journey_id, slides, meta, created_at FROM storybooks WHERE id = $1',
+      [id]
+    );
+    if (!rows.length) return res.status(404).json({ success: false, error: 'not found' });
+    const row = rows[0];
+    return res.json({
+      success:    true,
+      id:         row.id,
+      access_key: row.access_key,
+      journey_id: row.journey_id,
+      meta:       row.meta,
+      storybook:  row.slides,
+      created_at: row.created_at,
+      share_url:  `/storybook/${id}`,
+    });
+  } catch (err) {
+    if (err.code === '42P01') return res.status(404).json({ success: false, error: 'not found' });
+    console.error('[storybook] GET /s/:id error:', err.message);
     res.status(500).json({ success: false, error: err.message });
   }
 });

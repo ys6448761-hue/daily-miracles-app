@@ -50,56 +50,54 @@ router.get('/star/:access_key', adminGuard, async (req, res) => {
   try {
     // 별 기본 정보
     const { rows: starRows } = await db.query(
+      `SELECT access_key, emotion, origin_location, parent_ref, status,
+              journey_id, resonance_score, created_at
+       FROM stars WHERE access_key = $1`,
+      [access_key]
+    ).catch(() => db.query(
       `SELECT access_key, emotion, origin_location, parent_ref, status, created_at
        FROM stars WHERE access_key = $1`,
       [access_key]
-    );
+    ));
     if (!starRows.length) {
       return res.status(404).json({ success: false, error: '별을 찾을 수 없습니다' });
     }
     const star = starRows[0];
 
     // 병렬 통계 조회
-    const [shareRes, viewRes, convRes, returnRes] = await Promise.all([
-      // share_count: 공유 클릭 횟수
+    const [shareRes, viewRes, convRes, returnRes, connAggRes] = await Promise.all([
+      db.query('SELECT COUNT(*) AS n FROM star_share_events WHERE access_key = $1', [access_key])
+        .catch(() => ({ rows: [{ n: 0 }] })),
+      db.query('SELECT COUNT(*) AS n FROM star_visit_events WHERE ref_access_key = $1', [access_key])
+        .catch(() => ({ rows: [{ n: 0 }] })),
+      db.query('SELECT COUNT(*) AS n FROM stars WHERE parent_ref = $1', [access_key])
+        .catch(() => ({ rows: [{ n: 0 }] })),
       db.query(
-        'SELECT COUNT(*) AS n FROM star_share_events WHERE access_key = $1',
-        [access_key]
-      ).catch(() => ({ rows: [{ n: 0 }] })),
-
-      // view_count: ?ref= 로 방문된 횟수
-      db.query(
-        'SELECT COUNT(*) AS n FROM star_visit_events WHERE ref_access_key = $1',
-        [access_key]
-      ).catch(() => ({ rows: [{ n: 0 }] })),
-
-      // conversion_count: 이 별의 ref로 생성된 자식 별
-      db.query(
-        'SELECT COUNT(*) AS n FROM stars WHERE parent_ref = $1',
-        [access_key]
-      ).catch(() => ({ rows: [{ n: 0 }] })),
-
-      // return_count: 자식 중 자신도 자식을 낳은 별 (바이럴 체인 지속)
-      db.query(
-        `SELECT COUNT(DISTINCT c.access_key) AS n
-         FROM stars c
+        `SELECT COUNT(DISTINCT c.access_key) AS n FROM stars c
          WHERE c.parent_ref = $1
-           AND EXISTS (
-             SELECT 1 FROM stars gc WHERE gc.parent_ref = c.access_key
-           )`,
+           AND EXISTS (SELECT 1 FROM stars gc WHERE gc.parent_ref = c.access_key)`,
         [access_key]
       ).catch(() => ({ rows: [{ n: 0 }] })),
+      // first/last seen + revisit from aggregated table (migration 161)
+      db.query(
+        'SELECT first_seen_at, last_seen_at, revisit_count FROM star_connections_agg WHERE ref_access_key = $1',
+        [access_key]
+      ).catch(() => ({ rows: [] })),
     ]);
+
+    const connAgg = connAggRes.rows[0] || null;
 
     return res.json({
       success: true,
       star: {
-        access_key: star.access_key,
-        emotion:    star.emotion,
-        location:   star.origin_location,
-        parent_ref: star.parent_ref || null,
-        status:     star.status,
-        created_at: star.created_at,
+        access_key:      star.access_key,
+        emotion:         star.emotion,
+        location:        star.origin_location,
+        parent_ref:      star.parent_ref || null,
+        journey_id:      star.journey_id || null,
+        resonance_score: toInt(star.resonance_score),
+        status:          star.status,
+        created_at:      star.created_at,
       },
       stats: {
         share_count:      toInt(shareRes.rows[0].n),
@@ -109,7 +107,13 @@ router.get('/star/:access_key', adminGuard, async (req, res) => {
         conversion_rate:  toInt(viewRes.rows[0].n) > 0
           ? Math.round((toInt(convRes.rows[0].n) / toInt(viewRes.rows[0].n)) * 100)
           : null,
+        resonance_score:  toInt(star.resonance_score),
       },
+      connections: connAgg ? {
+        first_seen_at: connAgg.first_seen_at,
+        last_seen_at:  connAgg.last_seen_at,
+        revisit_count: toInt(connAgg.revisit_count),
+      } : null,
     });
   } catch (err) {
     console.error('[adminResonance] GET /star error:', err.message);
