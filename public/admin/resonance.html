@@ -186,10 +186,20 @@
     <h1>공명 대시보드</h1>
     <div class="header-sub">별 공유 · 유입 · 연결 흐름 관리자</div>
   </div>
-  <div class="key-input">
-    <input type="password" id="adminKeyInput" placeholder="Admin Key" autocomplete="off">
-    <button class="btn-sm" onclick="saveKey()">확인</button>
-    <button class="btn-sm btn-ghost" onclick="loadList()">새로고침</button>
+  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+    <!-- access_key 직접 검색 -->
+    <div style="display:flex; gap:6px; align-items:center;">
+      <input type="text" id="searchKeyInput" placeholder="access_key 검색..."
+        style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+               border-radius:8px; padding:7px 12px; color:#fff; font-size:13px; width:200px;"
+        onkeydown="if(event.key==='Enter') searchStar()">
+      <button class="btn-sm" onclick="searchStar()">조회</button>
+    </div>
+    <div class="key-input">
+      <input type="password" id="adminKeyInput" placeholder="Admin Key" autocomplete="off">
+      <button class="btn-sm" onclick="saveKey()">확인</button>
+      <button class="btn-sm btn-ghost" onclick="loadList()">새로고침</button>
+    </div>
   </div>
 </div>
 
@@ -248,8 +258,8 @@
           <div id="detail-created" style="font-size:12px; color:var(--text-dim);"></div>
           <div id="detail-sb" style="margin-top:12px;"></div>
         </div>
-        <div class="connection-badge" style="margin-top:16px;">
-          이 별은 <span id="detail-conn-n">0</span>개의 마음과 이어졌어요
+        <div class="connection-badge" style="margin-top:16px;" id="detail-conn-badge">
+          아직 이어진 마음은 없어요
         </div>
         <div id="detail-parent" class="card" style="margin-top:16px; display:none">
           <div class="card-title">출발한 별</div>
@@ -449,7 +459,10 @@ async function openDetail(key) {
         : `<span class="sb-badge sb-no">스토리북 대기 중</span>`;
 
     // 연결 배지
-    document.getElementById('detail-conn-n').textContent = stats.conversion_count || 0;
+    const connN = stats.conversion_count || 0;
+    document.getElementById('detail-conn-badge').innerHTML = connN > 0
+      ? `이 별은 <span style="color:var(--primary); font-weight:700">${connN}</span>개의 마음과 이어졌어요`
+      : '아직 이어진 마음은 없어요';
 
     // 부모 별
     const parent = storyData.parent;
@@ -648,6 +661,13 @@ function showTreeNodeDetail(node) {
       <button class="btn-sm" style="flex:1" onclick="openDetail('${node.access_key}'); switchTab('detail')">상세 보기</button>
       <button class="btn-sm btn-ghost" style="flex:1" onclick="document.getElementById('tree-key-input').value='${node.access_key}'; loadTree()">이 별 기준 트리</button>
     </div>`;
+}
+
+// ── Search ────────────────────────────────────────────────────
+function searchStar() {
+  const key = document.getElementById('searchKeyInput').value.trim();
+  if (!key) return;
+  openDetail(key);
 }
 
 // ── Init ───────────────────────────────────────────────────────
