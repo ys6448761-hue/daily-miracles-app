@@ -180,6 +180,7 @@
   <script>
     const FLOW_ASCEND = 8;
     const loc = new URLSearchParams(location.search).get('loc') || 'direct';
+    const ref = new URLSearchParams(location.search).get('ref') || null;
 
     // 역진입 차단
     if (Number(localStorage.getItem('flow_step') || 0) >= FLOW_ASCEND) {
@@ -272,6 +273,7 @@
             preview_image_url: genData.image_url,
             wish_text:         wishText.trim(),
             gem_type:          selectedGem,
+            parent_ref:        ref,
           }),
         });
         const commitData = await commitRes.json();

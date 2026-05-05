@@ -315,6 +315,23 @@ router.post('/reflect', async (req, res) => {
   }
 });
 
+// ── GET /connections/:access_key ─────────────────────────────────
+// 이 별의 공유 링크로 유입된 별 개수 (parent_ref = access_key)
+router.get('/connections/:access_key', async (req, res) => {
+  try {
+    const { access_key } = req.params;
+    const { rows } = await db.query(
+      'SELECT COUNT(*) AS n FROM stars WHERE parent_ref = $1',
+      [access_key]
+    );
+    return res.json({ success: true, count: parseInt(rows[0].n, 10) });
+  } catch (err) {
+    if (err.code === '42703') return res.json({ success: true, count: 0 }); // migration 139 미실행
+    console.error('[star-mvp] GET /connections error:', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // ── GET /:access_key ──────────────────────────────────────────────
 router.get('/:access_key', async (req, res) => {
   try {
@@ -413,7 +430,7 @@ router.post('/preview', async (req, res) => {
 router.post('/commit', async (req, res) => {
   try {
     const { emotion, origin_location = 'cablecar', preview_image_url, phone_number,
-            wish_text, gem_type } = req.body;
+            wish_text, gem_type, parent_ref } = req.body;
     if (!emotion) return res.status(400).json({ success: false, error: 'emotion 필수' });
 
     const _wishText = (wish_text && wish_text.trim()) || emotion || '케이블카 별';
@@ -426,17 +443,18 @@ router.post('/commit', async (req, res) => {
       try {
         const { rows } = await db.query(
           `INSERT INTO stars
-             (id, user_id, wish_text, gem_type, status, access_key, origin_location, emotion, is_public, phone_number)
+             (id, user_id, wish_text, gem_type, status, access_key, origin_location, emotion, is_public, phone_number, parent_ref)
            VALUES
-             (gen_random_uuid(), $1, $2, $3, 'PRE-ON', $4, $5, $6, false, $7)
+             (gen_random_uuid(), $1, $2, $3, 'PRE-ON', $4, $5, $6, false, $7, $8)
            RETURNING id, access_key, created_at`,
-          [crypto.randomUUID(), _wishText, _gemType, access_key, origin_location, emotion || null, phone_number || null]
+          [crypto.randomUUID(), _wishText, _gemType, access_key, origin_location, emotion || null, phone_number || null, parent_ref || null]
         );
         inserted = rows[0];
         break;
       } catch (e) {
         if (e.code === '23505' && i < 2) continue;
-        if (e.code === '42703' && e.message.includes('phone_number')) {
+        if (e.code === '42703') {
+          // 컬럼 미존재 (migration 미실행) → 최소 컬럼으로 재시도
           const { rows: rows2 } = await db.query(
             `INSERT INTO stars
                (id, user_id, wish_text, gem_type, status, access_key, origin_location, emotion, is_public)

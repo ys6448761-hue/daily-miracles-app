@@ -219,6 +219,23 @@
       line-height: 1.6;
     }
 
+    /* ── 공유 연결 카운트 ───────────────────────────────── */
+    .connection-count {
+      display: none;
+      margin-bottom: 16px;
+      padding: 16px 20px;
+      background: rgba(100, 160, 255, 0.07);
+      border: 1px solid rgba(100, 160, 255, 0.18);
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      color: rgba(200, 220, 255, 0.85);
+      text-align: center;
+      line-height: 1.6;
+      animation: fadeInUp 0.5s ease both;
+    }
+    .connection-count.visible { display: block; }
+
     /* ── 케이블카 영상 모달 ─────────────────────────────── */
     .video-modal {
       display: none;
@@ -368,6 +385,8 @@
       <p class="banner-line2" id="bannerLine2"></p>
     </div>
 
+    <div class="connection-count" id="connectionCount"></div>
+
     <div class="access-card">
       <div class="access-label">내 별 접근 코드</div>
       <div class="access-key" id="accessKey">—</div>
@@ -512,6 +531,19 @@
           if (data.star?.origin_location)   originLocation = data.star.origin_location;
         }
       } catch { /* fallback 유지 */ }
+    })();
+
+    // ── 공유 연결 추적 (이 별에서 유입된 별 개수) ─────────
+    (async () => {
+      try {
+        const res  = await fetch(`/api/star/connections/${encodeURIComponent(accessKey)}`);
+        const data = await res.json();
+        if (data.success && data.count > 0) {
+          const el = document.getElementById('connectionCount');
+          el.textContent = `당신의 별은 ${data.count}개의 마음과 이어졌어요`;
+          el.classList.add('visible');
+        }
+      } catch { /* 조용히 실패 */ }
     })();
 
     // ── 공유 실패 → fallback 노출 ─────────────────────

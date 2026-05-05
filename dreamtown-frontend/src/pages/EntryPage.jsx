@@ -34,7 +34,7 @@ const CABLECAR_EMOTIONS = [
 ];
 
 // ── 현장 포스트카드 폼 (WishGate 우회 — cablecar / hamel 공용) ────
-function CablecarPostcardForm({ loc }) {
+function CablecarPostcardForm({ loc, refParam }) {
   const [emotion,  setEmotion]  = useState(null);
   const [gem,      setGem]      = useState(null);
   const [wishText, setWishText] = useState('');
@@ -73,6 +73,7 @@ function CablecarPostcardForm({ loc }) {
           preview_image_url: genData.image_url,
           wish_text:         wishText.trim(),
           gem_type:          gem,
+          parent_ref:        refParam || null,
         }),
       });
       const commitData = await commitRes.json();
@@ -521,6 +522,7 @@ export default function EntryPage() {
   const [searchParams]    = useSearchParams();
   const from              = searchParams.get('from');
   const sharedStarId      = searchParams.get('star');
+  const refParam          = searchParams.get('ref') || null;
   const locRaw            = searchParams.get('loc') || DEFAULT_LOC;
   const loc               = LOC_NORMALIZE[locRaw] ?? locRaw;
   const cfg               = LOC_CONFIG[loc];
@@ -530,7 +532,7 @@ export default function EntryPage() {
 
   // ── 현장 포스트카드 UX → WishGate 우회 (POSTCARD_LOCATIONS 기준) ──
   if (POSTCARD_LOCATIONS.includes(loc) && !hasStar) {
-    return <CablecarPostcardForm loc={loc} />;
+    return <CablecarPostcardForm loc={loc} refParam={refParam} />;
   }
 
   // ── 공유 유입 분기 ──────────────────────────────────────────────
