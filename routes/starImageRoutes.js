@@ -113,23 +113,31 @@ function generatePrompt(emotionKey, gem, location) {
     .replace('[GEM_TONE]',   g.tone);
 }
 
-// ── Stage 3 yeosu_hamel 사전 생성 이미지 SSOT ────────────────────
-// 파일명: {index}_{emotion}_{gem}_yeosu_hamel_stage3.png
-// 감정×보석 고정쌍: calm+citrine(01), curiosity+sapphire(02),
-//   connection+emerald(03), quiet_expansion+ruby(04), fragile_hope+diamond(05)
-// UI gem auto-map이 이미 4가지 보석을 결정하므로 gem → index 단순 매핑
-const HAMEL_STAGE3_BY_GEM = {
-  citrine:  '01_calm_citrine',
-  sapphire: '02_curiosity_sapphire',
-  emerald:  '03_connection_emerald',
-  ruby:     '04_quiet_expansion_ruby',
-  diamond:  '05_fragile_hope_diamond',
+// ── Hamel 썸네일 파이프라인 SSOT ─────────────────────────────────────
+// 소스: public/images/thumbnails/hamel/generated/full/ (manifest.json 기반)
+// UI 4-emotion 키 → hamel thumbnail emotion 최근접 매핑
+const HAMEL_THUMBNAIL_EMOTION_MAP = {
+  comfort:  'calm',
+  hope:     'fragile_hope',
+  calm:     'calm',
+  courage:  'curiosity',
+  anxiety:  'confusion',
 };
 
-function getHamelStage3Image(gem) {
-  const name = HAMEL_STAGE3_BY_GEM[gem];
-  if (!name) return null;
-  return `/images/star-cache/yeosu_hamel/${name}_yeosu_hamel_stage3.png`;
+// hamel 썸네일 emotion별 고정 보석 (manifest SSOT 기준)
+const HAMEL_THUMBNAIL_GEM_MAP = {
+  confusion:    'moonstone',
+  pause:        'sapphire',
+  calm:         'emerald',
+  curiosity:    'topaz',
+  fragile_hope: 'diamond',
+};
+
+// base03 = hamel_base_04_low.png 기반, 구도 가장 안정적
+function getHamelThumbnailImage(emotionKey) {
+  const hamelEmotion = HAMEL_THUMBNAIL_EMOTION_MAP[emotionKey] || 'calm';
+  const gemstone     = HAMEL_THUMBNAIL_GEM_MAP[hamelEmotion];
+  return `/images/thumbnails/hamel/generated/full/hamel_${hamelEmotion}_${gemstone}_base03.png`;
 }
 
 // ── Stage 1 yeosu_cablecar 사전 생성 이미지 SSOT ──────────────────
@@ -313,15 +321,13 @@ router.post('/generate', async (req, res) => {
     }
   }
 
-  // ── yeosu_hamel 사전 생성 이미지 우선 조회 ───────────────────────
+  // ── yeosu_hamel 썸네일 이미지 우선 조회 ────────────────────────
   if (location === 'hamel' || location === 'yeosu_hamel') {
-    const pregenUrl = getHamelStage3Image(gem);
-    if (pregenUrl) {
-      const postcardUrl = await copyPregenToPostcards(pregenUrl).catch(() => null);
-      if (postcardUrl) {
-        return res.json({ success: true, image_url: postcardUrl, sentence, from_cache: true,
-          requested_location: location, resolved_location: 'hamel', source_image: pregenUrl });
-      }
+    const pregenUrl   = getHamelThumbnailImage(emotionKey);
+    const postcardUrl = await copyPregenToPostcards(pregenUrl).catch(() => null);
+    if (postcardUrl) {
+      return res.json({ success: true, image_url: postcardUrl, sentence, from_cache: true,
+        requested_location: location, resolved_location: 'hamel', source_image: pregenUrl });
     }
   }
 
