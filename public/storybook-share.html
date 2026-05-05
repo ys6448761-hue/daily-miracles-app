@@ -117,33 +117,80 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .error { text-align: center; padding: 80px 20px; color: var(--text-dim); }
 
-    /* Impact */
-    .impact-section {
-      margin-top: 36px; padding: 28px 24px;
-      background: linear-gradient(135deg, rgba(155,135,245,0.07), rgba(245,167,198,0.04));
-      border: 1px solid var(--border); border-radius: 20px;
+    /* ── Impact Flow ── */
+    .impact-flow { margin-top: 48px; min-height: 300px; position: relative; }
+
+    .impact-step { display: none; }
+    .impact-step.active { display: block; animation: stepIn .44s cubic-bezier(.25,.46,.45,.94) both; }
+    .impact-step.exit   { animation: stepOut .28s ease both; pointer-events: none;
+                          position: absolute; inset: 0; }
+
+    @keyframes stepIn  { from { opacity:0; transform: translateY(20px); }
+                         to   { opacity:1; transform: translateY(0);    } }
+    @keyframes stepOut { from { opacity:1; transform: translateY(0);    }
+                         to   { opacity:0; transform: translateY(-12px);} }
+
+    .step-dots {
+      display: flex; justify-content: center; gap: 8px; margin-bottom: 30px;
     }
-    .impact-title { font-size: 17px; font-weight: 700; text-align: center; margin-bottom: 6px; }
-    .impact-sub   { font-size: 13px; color: var(--text-dim); text-align: center; margin-bottom: 22px; }
-    .impact-label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
-    .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-    .chip {
-      padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer;
-      border: 1px solid var(--border); background: transparent; color: var(--text-dim);
-      transition: all .15s;
+    .step-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(155,135,245,0.18); transition: background .3s, transform .3s;
     }
-    .chip:hover { border-color: var(--primary); color: var(--primary); }
-    .chip.selected { background: rgba(155,135,245,0.18); border-color: var(--primary); color: var(--text); }
-    .star-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 24px; }
-    .star-btn { font-size: 28px; cursor: pointer; opacity: .3; transition: opacity .15s; }
-    .star-btn.lit { opacity: 1; }
-    .impact-submit {
-      width: 100%; padding: 14px; background: var(--primary); color: #fff;
-      border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer;
-      transition: opacity .2s;
+    .step-dot.on { background: var(--primary); transform: scale(1.4); }
+
+    .step-q {
+      font-size: 20px; font-weight: 700; text-align: center;
+      line-height: 1.65; margin-bottom: 28px; color: var(--text); letter-spacing: -.01em;
     }
-    .impact-submit:disabled { opacity: .4; cursor: default; }
-    .impact-done { text-align: center; padding: 20px; color: var(--text-dim); font-size: 15px; }
+
+    .ic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .ic-card {
+      background: rgba(155,135,245,0.05); border: 1px solid rgba(155,135,245,0.13);
+      border-radius: 18px; padding: 22px 12px 18px;
+      text-align: center; cursor: pointer; user-select: none;
+      transition: background .16s, border-color .16s, transform .14s;
+    }
+    .ic-card:hover  { background: rgba(155,135,245,0.1); border-color: rgba(155,135,245,0.3); }
+    .ic-card:active { transform: scale(.95); }
+    .ic-card.picked { background: rgba(155,135,245,0.2); border-color: var(--primary);
+                      animation: cardPick .22s ease; }
+    @keyframes cardPick { 0%{transform:scale(1)} 50%{transform:scale(.94)} 100%{transform:scale(.97)} }
+    .ic-icon  { font-size: 30px; display: block; margin-bottom: 9px; }
+    .ic-label { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.35; }
+
+    .star-flow { display: flex; justify-content: center; gap: 16px; padding: 8px 0 6px; }
+    .sf-star {
+      font-size: 40px; cursor: pointer; opacity: .18; line-height: 1;
+      transition: opacity .14s, transform .14s, filter .14s;
+    }
+    .sf-star:hover { opacity: .6; }
+    .sf-star.lit   { opacity: 1; filter: drop-shadow(0 0 9px rgba(255,210,60,.85)); }
+    .sf-star:active { transform: scale(.84); }
+    .star-hint {
+      text-align: center; font-size: 13px; color: var(--text-dim);
+      margin-top: 14px; min-height: 20px; transition: opacity .25s;
+    }
+
+    .impact-final { display: none; text-align: center; padding: 16px 0 4px; }
+    .impact-final.active { display: block; animation: stepIn .55s ease both; }
+    .final-glyph {
+      font-size: 52px; display: block; margin-bottom: 22px;
+      animation: glowPulse 2.8s ease-in-out infinite;
+    }
+    @keyframes glowPulse {
+      0%,100% { filter: drop-shadow(0 0 14px rgba(155,135,245,.55)); }
+      50%      { filter: drop-shadow(0 0 26px rgba(155,135,245,1)); }
+    }
+    .final-l1 {
+      font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 10px;
+      opacity: 0; animation: fadeUp .5s .25s ease both;
+    }
+    .final-l2 {
+      font-size: 14px; color: var(--text-dim); line-height: 1.7;
+      opacity: 0; animation: fadeUp .5s .55s ease both;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(9px)} to{opacity:1;transform:none} }
   </style>
 </head>
 <body>
@@ -159,37 +206,75 @@
     <div class="hero" id="hero"></div>
     <div class="slides" id="slides"></div>
     <!-- Impact Flow -->
-    <div class="impact-section" id="impact-section">
-      <div class="impact-title">이 이야기가 마음에 닿았나요?</div>
-      <div class="impact-sub">느낀 것을 남겨두세요</div>
+    <div class="impact-flow" id="impact-flow">
 
-      <div class="impact-label">지금 어떤 마음인가요</div>
-      <div class="chip-row" id="emotion-chips">
-        <button class="chip" data-val="moved"       onclick="selectEmotion(this)">감동받았어요</button>
-        <button class="chip" data-val="resonated"   onclick="selectEmotion(this)">공명했어요</button>
-        <button class="chip" data-val="encouraged"  onclick="selectEmotion(this)">용기를 얻었어요</button>
-        <button class="chip" data-val="reflective"  onclick="selectEmotion(this)">돌아보게 됐어요</button>
-        <button class="chip" data-val="calm"        onclick="selectEmotion(this)">차분해졌어요</button>
+      <div class="step-dots" id="step-dots">
+        <div class="step-dot on"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
       </div>
 
-      <div class="impact-label">이 이야기를 보고 어떻게 하시겠어요</div>
-      <div class="chip-row" id="action-chips">
-        <button class="chip" data-val="create_star" onclick="selectAction(this)">나도 별 만들게요</button>
-        <button class="chip" data-val="share"       onclick="selectAction(this)">이야기 나눌게요</button>
-        <button class="chip" data-val="reflect"     onclick="selectAction(this)">오늘을 돌아볼게요</button>
-        <button class="chip" data-val="just_felt"   onclick="selectAction(this)">그냥 느꼈어요</button>
+      <!-- Step 1: Emotion -->
+      <div class="impact-step active" id="impact-step-1">
+        <div class="step-q">이 이야기가<br>어떤 마음을 주었나요</div>
+        <div class="ic-grid">
+          <div class="ic-card" onclick="pickEmotion('moved',this)">
+            <span class="ic-icon">🌊</span><span class="ic-label">감동받았어요</span>
+          </div>
+          <div class="ic-card" onclick="pickEmotion('resonated',this)">
+            <span class="ic-icon">✦</span><span class="ic-label">공명했어요</span>
+          </div>
+          <div class="ic-card" onclick="pickEmotion('encouraged',this)">
+            <span class="ic-icon">🌿</span><span class="ic-label">용기를 얻었어요</span>
+          </div>
+          <div class="ic-card" onclick="pickEmotion('reflective',this)">
+            <span class="ic-icon">🌙</span><span class="ic-label">돌아보게 됐어요</span>
+          </div>
+          <div class="ic-card" style="grid-column:span 2" onclick="pickEmotion('calm',this)">
+            <span class="ic-icon">🫧</span><span class="ic-label">차분해졌어요</span>
+          </div>
+        </div>
       </div>
 
-      <div class="impact-label" style="text-align:center;">울림의 크기</div>
-      <div class="star-row" id="star-row">
-        <span class="star-btn" data-val="1" onclick="selectLevel(1)">⭐</span>
-        <span class="star-btn" data-val="2" onclick="selectLevel(2)">⭐</span>
-        <span class="star-btn" data-val="3" onclick="selectLevel(3)">⭐</span>
-        <span class="star-btn" data-val="4" onclick="selectLevel(4)">⭐</span>
-        <span class="star-btn" data-val="5" onclick="selectLevel(5)">⭐</span>
+      <!-- Step 2: Action -->
+      <div class="impact-step" id="impact-step-2">
+        <div class="step-q">이 이야기를 보고<br>어떻게 하시겠어요</div>
+        <div class="ic-grid">
+          <div class="ic-card" onclick="pickAction('create_star',this)">
+            <span class="ic-icon">✨</span><span class="ic-label">나도 별<br>만들게요</span>
+          </div>
+          <div class="ic-card" onclick="pickAction('share',this)">
+            <span class="ic-icon">🌐</span><span class="ic-label">이야기<br>나눌게요</span>
+          </div>
+          <div class="ic-card" onclick="pickAction('reflect',this)">
+            <span class="ic-icon">🌿</span><span class="ic-label">오늘을<br>돌아볼게요</span>
+          </div>
+          <div class="ic-card" onclick="pickAction('just_felt',this)">
+            <span class="ic-icon">🌊</span><span class="ic-label">그냥<br>느꼈어요</span>
+          </div>
+        </div>
       </div>
 
-      <button class="impact-submit" id="impact-submit" onclick="submitImpact()" disabled>마음 남기기</button>
+      <!-- Step 3: Level -->
+      <div class="impact-step" id="impact-step-3">
+        <div class="step-q">얼마나 깊이<br>닿았나요</div>
+        <div class="star-flow" id="impact-stars">
+          <span class="sf-star" onmouseenter="previewLevel(1)" onmouseleave="clearPreview()" onclick="pickLevel(1)">★</span>
+          <span class="sf-star" onmouseenter="previewLevel(2)" onmouseleave="clearPreview()" onclick="pickLevel(2)">★</span>
+          <span class="sf-star" onmouseenter="previewLevel(3)" onmouseleave="clearPreview()" onclick="pickLevel(3)">★</span>
+          <span class="sf-star" onmouseenter="previewLevel(4)" onmouseleave="clearPreview()" onclick="pickLevel(4)">★</span>
+          <span class="sf-star" onmouseenter="previewLevel(5)" onmouseleave="clearPreview()" onclick="pickLevel(5)">★</span>
+        </div>
+        <div class="star-hint" id="star-hint"> </div>
+      </div>
+
+      <!-- Final -->
+      <div class="impact-final" id="impact-final">
+        <span class="final-glyph">✦</span>
+        <div class="final-l1" id="final-l1"></div>
+        <div class="final-l2" id="final-l2"></div>
+      </div>
+
     </div>
 
     <div class="cta-wrap">
@@ -303,60 +388,94 @@ function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ── Impact ─────────────────────────────────────────────────────
-function _refreshSubmit() {
-  const btn = document.getElementById('impact-submit');
-  if (btn) btn.disabled = !(_impactEmotion || _impactAction || _impactLevel);
+// ── Impact Flow ────────────────────────────────────────────────
+const FINAL_LINES = {
+  moved:      ['파도처럼 밀려온 마음이에요', '이 별이 오래 기억할 거예요'],
+  resonated:  ['같은 하늘 아래 있었네요', '우리는 이미 이어져 있어요'],
+  encouraged: ['작은 용기가 별이 됐어요', '한 걸음 더 나아가도 돼요'],
+  reflective: ['잠깐 멈춰 바라본 오늘이에요', '이미 충분히 살고 있어요'],
+  calm:       ['고요함이 마음에 닿았어요', '이 순간을 오래 기억하세요'],
+};
+const STAR_HINTS = ['잠깐 스쳤어요', '조금 남았어요', '마음 깊이 닿았어요', '오래 머물렀어요', '잊을 수 없어요'];
+
+function _goStep(n) {
+  const flow = document.getElementById('impact-flow');
+  const cur  = flow.querySelector('.impact-step.active');
+
+  if (cur) {
+    cur.classList.add('exit');
+    setTimeout(() => { cur.classList.remove('active', 'exit'); cur.style.animation = ''; }, 300);
+  }
+
+  setTimeout(() => {
+    if (n === 'final') {
+      document.getElementById('step-dots').style.visibility = 'hidden';
+      document.getElementById('impact-final').classList.add('active');
+    } else {
+      const next = document.getElementById(`impact-step-${n}`);
+      if (next) next.classList.add('active');
+      document.querySelectorAll('#step-dots .step-dot').forEach((d, i) => {
+        d.classList.toggle('on', i < n);
+      });
+    }
+  }, 170);
 }
 
-function selectEmotion(el) {
-  document.querySelectorAll('#emotion-chips .chip').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
-  _impactEmotion = el.dataset.val;
-  _refreshSubmit();
+function pickEmotion(val, el) {
+  _impactEmotion = val;
+  el.classList.add('picked');
+  setTimeout(() => _goStep(2), 340);
 }
 
-function selectAction(el) {
-  document.querySelectorAll('#action-chips .chip').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
-  _impactAction = el.dataset.val;
-  _refreshSubmit();
+function pickAction(val, el) {
+  _impactAction = val;
+  el.classList.add('picked');
+  setTimeout(() => _goStep(3), 340);
 }
 
-function selectLevel(n) {
+function previewLevel(n) {
+  document.querySelectorAll('#impact-stars .sf-star').forEach((s, i) => {
+    s.style.opacity = i < n ? '.75' : '';
+  });
+  const hint = document.getElementById('star-hint');
+  if (hint) hint.textContent = STAR_HINTS[n - 1];
+}
+
+function clearPreview() {
+  if (_impactLevel) return;
+  document.querySelectorAll('#impact-stars .sf-star').forEach(s => { s.style.opacity = ''; });
+  const hint = document.getElementById('star-hint');
+  if (hint) hint.textContent = ' ';
+}
+
+function pickLevel(n) {
   _impactLevel = n;
-  document.querySelectorAll('#star-row .star-btn').forEach((s, i) => {
+  const stars = document.querySelectorAll('#impact-stars .sf-star');
+  stars.forEach((s, i) => {
+    s.style.opacity = '';
     s.classList.toggle('lit', i < n);
   });
-  _refreshSubmit();
-}
+  const hint = document.getElementById('star-hint');
+  if (hint) hint.textContent = STAR_HINTS[n - 1];
 
-async function submitImpact() {
-  const btn = document.getElementById('impact-submit');
-  btn.disabled = true;
-  btn.textContent = '남기는 중...';
+  // 배경 저장 (non-blocking)
+  fetch('/api/impact', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      journey_id:     _impactJourneyId,
+      storybook_id:   _impactStorybookId,
+      access_key:     _impactAccessKey,
+      emotion_result: _impactEmotion,
+      action_type:    _impactAction,
+      impact_level:   n,
+    }),
+  }).catch(() => {});
 
-  try {
-    const r = await fetch('/api/impact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        journey_id:     _impactJourneyId,
-        storybook_id:   _impactStorybookId,
-        access_key:     _impactAccessKey,
-        emotion_result: _impactEmotion,
-        action_type:    _impactAction,
-        impact_level:   _impactLevel,
-      }),
-    });
-    const d = await r.json();
-    if (!d.success) throw new Error(d.error);
-    document.getElementById('impact-section').innerHTML =
-      '<div class="impact-done">마음이 별에 닿았어요 ✦</div>';
-  } catch (_) {
-    btn.disabled  = false;
-    btn.textContent = '마음 남기기';
-  }
+  const lines = FINAL_LINES[_impactEmotion] || ['마음이 별에 닿았어요', '이 여정을 기억할게요'];
+  document.getElementById('final-l1').textContent = lines[0];
+  document.getElementById('final-l2').textContent = lines[1];
+  setTimeout(() => _goStep('final'), 520);
 }
 
 function shareStorybook() {
