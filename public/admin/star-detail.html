@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>별 상세 — Daily Miracles Admin</title>
+  <style>
+    :root {
+      --primary: #9B87F5;
+      --secondary: #F5A7C6;
+      --accent: #6E59A5;
+      --bg: #0d0d1a;
+      --surface: #161628;
+      --surface2: #1e1e35;
+      --border: rgba(155,135,245,0.18);
+      --text: #e8e8f0;
+      --text-dim: #8888aa;
+      --success: #5cf5a0;
+      --warn: #f5c85c;
+      --danger: #f55c5c;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, var(--accent) 0%, #2d1b69 100%);
+      padding: 16px 28px; display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .header-nav { display: flex; align-items: center; gap: 14px; }
+    .back { font-size: 13px; color: rgba(255,255,255,0.6); text-decoration: none; }
+    .back:hover { color: #fff; }
+    .header-key { font-family: monospace; font-size: 16px; font-weight: 700; color: #fff; }
+    .header-sub { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+    .key-chip { font-size: 11px; color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.08); padding: 3px 10px; border-radius: 12px; margin-left: 8px; }
+
+    /* ── Layout ── */
+    .page { max-width: 1100px; margin: 0 auto; padding: 28px 24px; }
+    .top-grid { display: grid; grid-template-columns: 200px 1fr; gap: 24px; margin-bottom: 24px; }
+    @media (max-width: 700px) { .top-grid { grid-template-columns: 1fr; } }
+    .bottom-grid { display: grid; grid-template-columns: 1fr 320px; gap: 20px; align-items: start; }
+    @media (max-width: 900px) { .bottom-grid { grid-template-columns: 1fr; } }
+
+    /* ── Card ── */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+    .card-title { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dim); margin-bottom: 8px; }
+
+    /* ── Postcard ── */
+    .postcard {
+      width: 100%; aspect-ratio: 9/16; border-radius: 12px; overflow: hidden;
+      background: var(--surface2); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .postcard img { width: 100%; height: 100%; object-fit: cover; }
+    .postcard-ph { font-size: 52px; }
+
+    /* ── Star Info ── */
+    .info-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+    .tag { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .em-confusion    { background: rgba(155,135,245,0.15); color: #b8a8f8; }
+    .em-calm         { background: rgba(100,180,255,0.15); color: #80c8f5; }
+    .em-fragile_hope { background: rgba(245,200,90,0.15);  color: #f5d070; }
+    .em-curiosity    { background: rgba(90,245,180,0.15);  color: #70f5c0; }
+    .em-pause        { background: rgba(245,120,120,0.15); color: #f58888; }
+    .tag-loc { background: rgba(255,255,255,0.07); color: var(--text-dim); }
+
+    /* ── Connection Badge ── */
+    .conn-badge {
+      padding: 20px 24px; margin: 20px 0;
+      background: linear-gradient(135deg, rgba(155,135,245,0.1), rgba(245,167,198,0.07));
+      border: 1px solid rgba(155,135,245,0.25); border-radius: 14px;
+      text-align: center;
+    }
+    .conn-number { font-size: 48px; font-weight: 800; color: var(--primary); line-height: 1; margin-bottom: 6px; }
+    .conn-text { font-size: 15px; color: var(--text); }
+    .conn-empty { font-size: 15px; color: var(--text-dim); }
+
+    /* ── Stats Row ── */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+    @media (max-width: 600px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+    .stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+    .stat-label { font-size: 11px; color: var(--text-dim); margin-bottom: 4px; }
+    .stat-val { font-size: 24px; font-weight: 700; }
+    .stat-sub { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+    .v-share { color: var(--primary); }
+    .v-view  { color: var(--warn); }
+    .v-conv  { color: var(--success); }
+    .v-ret   { color: var(--secondary); }
+
+    /* ── Storybook Status ── */
+    .sb-status { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-radius: 10px; margin-bottom: 12px; }
+    .sb-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .sb-draft       { background: var(--surface2); border: 1px solid var(--border); }
+    .sb-draft .sb-dot { background: var(--text-dim); }
+    .sb-inprogress  { background: rgba(245,200,90,0.08); border: 1px solid rgba(245,200,90,0.2); }
+    .sb-inprogress .sb-dot { background: var(--warn); }
+    .sb-ready       { background: rgba(92,245,160,0.08); border: 1px solid rgba(92,245,160,0.2); }
+    .sb-ready .sb-dot { background: var(--success); }
+    .sb-label { font-size: 13px; font-weight: 600; }
+    .sb-desc { font-size: 12px; color: var(--text-dim); margin-top: 1px; }
+    .sb-cta { margin-top: 12px; }
+    .btn { padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: opacity .2s; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-dim); }
+    .btn:hover { opacity: .85; }
+
+    /* ── Tree ── */
+    .tree-node { }
+    .tree-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 10px; border-radius: 8px; cursor: pointer; transition: background .15s;
+    }
+    .tree-item:hover { background: var(--surface2); }
+    .tree-item.selected { background: rgba(155,135,245,0.12); }
+    .tree-toggle {
+      width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border);
+      background: var(--surface2); color: var(--text-dim); font-size: 11px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer;
+    }
+    .tree-children { padding-left: 26px; border-left: 1px solid var(--border); margin-left: 16px; }
+    .tree-key { font-family: monospace; font-size: 12px; color: var(--primary); }
+    .tree-chips { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; flex: 1; }
+    .tree-chip { font-size: 11px; padding: 2px 7px; border-radius: 10px; background: rgba(255,255,255,0.06); color: var(--text-dim); }
+    .tree-chip.hot { background: rgba(245,200,90,0.12); color: var(--warn); }
+    .tree-chip.new { background: rgba(92,245,160,0.1); color: var(--success); }
+
+    /* ── Parent ref ── */
+    .parent-ref { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--surface2); border-radius: 10px; margin-bottom: 12px; }
+    .parent-label { font-size: 11px; color: var(--text-dim); }
+
+    /* ── Loading / Error ── */
+    .loading { color: var(--text-dim); font-size: 14px; padding: 40px 0; text-align: center; }
+    .loading::after { content: ''; display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin .7s linear infinite; margin-left: 8px; vertical-align: middle; }
+    .error-msg { color: var(--danger); font-size: 13px; padding: 20px 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-nav">
+    <a class="back" href="/admin/resonance">← 공명 대시보드</a>
+    <div>
+      <div style="display:flex; align-items:center;">
+        <span class="header-key" id="hdr-key">—</span>
+        <span class="key-chip">admin</span>
+      </div>
+      <div class="header-sub" id="hdr-sub">별 상세 · 공명 흐름</div>
+    </div>
+  </div>
+  <a href="/star-view.html" id="hdr-view-link" target="_blank" style="font-size:12px; color:rgba(255,255,255,0.5); text-decoration:none;">
+    별 보기 →
+  </a>
+</div>
+
+<div class="page">
+  <div id="main-loading" class="loading">데이터 불러오는 중</div>
+  <div id="main-content" style="display:none">
+
+    <!-- Top: 포스트카드 + 기본 정보 -->
+    <div class="top-grid">
+      <div class="postcard" id="postcard">
+        <img id="postcard-img" src="" alt="포스트카드" style="display:none" onerror="this.style.display='none';document.getElementById('postcard-ph').style.display='block'">
+        <div id="postcard-ph" class="postcard-ph">⭐</div>
+      </div>
+      <div>
+        <div id="parent-ref-row" style="display:none" class="parent-ref">
+          <span class="parent-label">출발한 별</span>
+          <a id="parent-ref-link" href="#" style="font-family:monospace; font-size:12px; color:var(--primary); text-decoration:none;"></a>
+          <span id="parent-ref-tags"></span>
+        </div>
+        <div class="info-row">
+          <span id="info-loc"  class="tag tag-loc"></span>
+          <span id="info-em"   class="tag"></span>
+          <span id="info-date" style="font-size:12px; color:var(--text-dim);"></span>
+        </div>
+        <div style="font-size:13px; color:var(--text-dim); margin-bottom:20px;" id="info-status"></div>
+
+        <!-- Connection Badge -->
+        <div class="conn-badge" id="conn-badge">
+          <div class="conn-number" id="conn-n">—</div>
+          <div class="conn-text"   id="conn-text">확인 중...</div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">공유 클릭</div>
+            <div class="stat-val v-share" id="stat-share">—</div>
+            <div class="stat-sub">share events</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">?ref= 유입</div>
+            <div class="stat-val v-view" id="stat-view">—</div>
+            <div class="stat-sub">visit events</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">별 생성</div>
+            <div class="stat-val v-conv" id="stat-conv">—</div>
+            <div class="stat-sub">conversion</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">재공유</div>
+            <div class="stat-val v-ret" id="stat-ret">—</div>
+            <div class="stat-sub">chain 지속</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom: 트리 + 스토리북 -->
+    <div class="bottom-grid">
+      <!-- 트리 -->
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px;">공명 트리</div>
+        <div id="tree-loading" class="loading" style="padding:20px 0;">트리 불러오는 중</div>
+        <div id="tree-content"></div>
+        <div id="tree-empty" style="display:none; color:var(--text-dim); font-size:13px; padding:12px 0;">아직 이어진 마음은 없어요</div>
+        <div id="tree-meta" style="display:none; font-size:11px; color:var(--text-dim); padding: 10px 0 0; border-top:1px solid var(--border); margin-top:10px;"></div>
+      </div>
+
+      <!-- 스토리북 + 링크 -->
+      <div>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title">스토리북 상태</div>
+          <div id="sb-block" style="margin-top:10px;"></div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">연결된 자식 별</div>
+          <div id="children-list"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+  <div id="main-error" class="error-msg" style="display:none"></div>
+</div>
+
+<script>
+// ── Setup ──────────────────────────────────────────────────────
+const ACCESS_KEY  = window.location.pathname.split('/').filter(Boolean).pop();
+const ADMIN_KEY   = localStorage.getItem('resonance_admin_key') || '';
+
+document.getElementById('hdr-key').textContent       = ACCESS_KEY;
+document.getElementById('hdr-view-link').href        = `/star-view.html?key=${ACCESS_KEY}`;
+
+function ah() {
+  const h = { 'Content-Type': 'application/json' };
+  if (ADMIN_KEY) h['x-admin-key'] = ADMIN_KEY;
+  return h;
+}
+
+// ── Helpers ────────────────────────────────────────────────────
+const EM_KO  = { confusion:'혼란', calm:'고요', fragile_hope:'희망', curiosity:'호기심', pause:'멈춤' };
+const LOC_KO = { cablecar:'케이블카', cafe:'카페', hamel:'하멜', stay:'숙소' };
+const LOC_IC = { cablecar:'🚡', cafe:'☕', hamel:'⚓', stay:'🏠' };
+
+function emTag(e) {
+  return `<span class="tag em-${e||'confusion'}">${EM_KO[e]||e}</span>`;
+}
+function locStr(l) {
+  return `${LOC_IC[l]||''} ${LOC_KO[l]||l}`;
+}
+function fmtDate(s) {
+  if (!s) return '—';
+  return new Date(s).toLocaleDateString('ko-KR', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+
+// ── Main Load ──────────────────────────────────────────────────
+async function load() {
+  try {
+    const [starRes, statsRes, storyRes] = await Promise.all([
+      fetch(`/api/star/${ACCESS_KEY}`),
+      fetch(`/api/admin/star/${ACCESS_KEY}`, { headers: ah() }),
+      fetch(`/api/admin/storybook/${ACCESS_KEY}`, { headers: ah() }),
+    ]);
+
+    if (!starRes.ok && !statsRes.ok) throw new Error('별을 찾을 수 없습니다');
+
+    const [starData, statsData, storyData] = await Promise.all([
+      starRes.json(), statsRes.json(), storyRes.json(),
+    ]);
+
+    document.getElementById('main-loading').style.display = 'none';
+    document.getElementById('main-content').style.display = '';
+
+    renderTop(starData, statsData, storyData);
+    renderStorybook(storyData);
+    renderChildren(storyData);
+    loadTree(); // async separately
+  } catch (e) {
+    document.getElementById('main-loading').style.display = 'none';
+    const errEl = document.getElementById('main-error');
+    errEl.style.display = '';
+    errEl.textContent = `오류: ${e.message}`;
+  }
+}
+
+// ── Render: Top Section ────────────────────────────────────────
+function renderTop(starData, statsData, storyData) {
+  const star  = statsData.star  || starData.star  || {};
+  const stats = statsData.stats || {};
+
+  // postcard image
+  if (starData.image_url) {
+    const img = document.getElementById('postcard-img');
+    img.src = starData.image_url;
+    img.style.display = 'block';
+    document.getElementById('postcard-ph').style.display = 'none';
+  }
+
+  // location / emotion / date
+  document.getElementById('info-loc').textContent  = locStr(star.location || star.origin_location);
+  const emEl = document.getElementById('info-em');
+  emEl.className = `tag em-${star.emotion||'confusion'}`;
+  emEl.textContent = EM_KO[star.emotion] || star.emotion || '';
+  document.getElementById('info-date').textContent = fmtDate(star.created_at);
+  document.getElementById('info-status').textContent =
+    star.status ? `status: ${star.status}` : '';
+  document.getElementById('hdr-sub').textContent =
+    `${LOC_KO[star.location||star.origin_location]||''} · ${EM_KO[star.emotion]||star.emotion||''} · 별 상세`;
+
+  // parent ref
+  const parent = storyData.parent;
+  if (parent) {
+    document.getElementById('parent-ref-row').style.display = 'flex';
+    const link = document.getElementById('parent-ref-link');
+    link.textContent = parent.access_key;
+    link.href = `/admin/star/${parent.access_key}`;
+    document.getElementById('parent-ref-tags').innerHTML =
+      `${locStr(parent.origin_location)} <small style="color:var(--text-dim)">${fmtDate(parent.created_at)}</small>`;
+  }
+
+  // connection badge
+  const convCount = stats.conversion_count ?? storyData.child_count ?? 0;
+  document.getElementById('conn-n').textContent = convCount;
+  if (convCount > 0) {
+    document.getElementById('conn-text').textContent = '개의 마음과 이어졌어요';
+  } else {
+    document.getElementById('conn-n').style.fontSize = '22px';
+    document.getElementById('conn-n').style.color = 'var(--text-dim)';
+    document.getElementById('conn-n').textContent = '';
+    document.getElementById('conn-text').className = 'conn-empty';
+    document.getElementById('conn-text').textContent = '아직 이어진 마음은 없어요';
+  }
+
+  // stats
+  document.getElementById('stat-share').textContent = stats.share_count      ?? '—';
+  document.getElementById('stat-view').textContent  = stats.view_count        ?? '—';
+  document.getElementById('stat-conv').textContent  = stats.conversion_count  ?? '—';
+  document.getElementById('stat-ret').textContent   = stats.return_count      ?? '—';
+}
+
+// ── Render: Storybook Status ───────────────────────────────────
+function renderStorybook(storyData) {
+  const childCount = storyData.child_count || 0;
+  let cls, dot_cls, label, desc;
+
+  if (childCount === 0) {
+    cls = 'sb-draft'; label = 'Draft';
+    desc = '연결된 별이 없어요 (공유 후 생성 가능)';
+  } else if (childCount < 2) {
+    cls = 'sb-draft'; label = 'Draft';
+    desc = `${childCount}개 연결 · 2개부터 스토리북 가능`;
+  } else if (childCount < 4) {
+    cls = 'sb-inprogress'; label = 'In Progress';
+    desc = `${childCount}개 연결 · compact 스토리북 생성 가능`;
+  } else {
+    cls = 'sb-ready'; label = 'Ready';
+    desc = `${childCount}개 연결 · full 스토리북 생성 가능`;
+  }
+
+  let ctaHtml = '';
+  if (storyData.storybook_ready && storyData.storybook_payload) {
+    ctaHtml = `<div class="sb-cta">
+      <button class="btn btn-primary" onclick="generateStorybook()">스토리북 생성 →</button>
+    </div>`;
+  }
+
+  document.getElementById('sb-block').innerHTML = `
+    <div class="sb-status ${cls}">
+      <div class="sb-dot"></div>
+      <div>
+        <div class="sb-label">${label}</div>
+        <div class="sb-desc">${desc}</div>
+      </div>
+    </div>
+    ${ctaHtml}`;
+}
+
+// ── Render: Children List ──────────────────────────────────────
+function renderChildren(storyData) {
+  const children = storyData.children || [];
+  if (!children.length) {
+    document.getElementById('children-list').innerHTML =
+      '<div style="color:var(--text-dim); font-size:13px;">없음</div>';
+    return;
+  }
+  document.getElementById('children-list').innerHTML = children.slice(0, 6).map(c => `
+    <a href="/admin/star/${c.access_key}" style="display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--border); text-decoration:none; cursor:pointer;">
+      <span style="font-family:monospace; font-size:11px; color:var(--primary)">${c.access_key}</span>
+      ${emTag(c.emotion)}
+      <span style="font-size:11px; color:var(--text-dim); margin-left:auto">${fmtDate(c.created_at)}</span>
+    </a>`).join('')
+    + (children.length > 6
+      ? `<div style="font-size:12px; color:var(--text-dim); padding:8px 0;">+${children.length - 6}개 더</div>`
+      : '');
+}
+
+// ── Load Tree ──────────────────────────────────────────────────
+async function loadTree() {
+  try {
+    const res  = await fetch(`/api/admin/connections/tree/${ACCESS_KEY}`, { headers: ah() });
+    const data = await res.json();
+
+    document.getElementById('tree-loading').style.display = 'none';
+
+    if (!data.success || !data.tree) {
+      document.getElementById('tree-empty').style.display = '';
+      return;
+    }
+
+    const children = data.tree.children || [];
+    if (!children.length) {
+      document.getElementById('tree-empty').style.display = '';
+      return;
+    }
+
+    const wrap = document.createElement('div');
+    // root node (self)
+    wrap.appendChild(renderRootChip(data.tree));
+    // children subtree
+    children.forEach(c => wrap.appendChild(renderNode(c, 1)));
+    document.getElementById('tree-content').appendChild(wrap);
+
+    const metaEl = document.getElementById('tree-meta');
+    metaEl.style.display = '';
+    metaEl.textContent = `총 ${data.total_nodes}개 노드 · 최대 깊이 ${data.max_depth}`;
+  } catch (e) {
+    document.getElementById('tree-loading').style.display = 'none';
+    document.getElementById('tree-empty').style.display = '';
+  }
+}
+
+function renderRootChip(node) {
+  const div = document.createElement('div');
+  div.style.cssText = 'display:flex; align-items:center; gap:8px; padding:8px 10px; background:rgba(155,135,245,0.12); border-radius:8px; margin-bottom:4px;';
+  div.innerHTML = `
+    <span style="font-size:10px; background:var(--primary); color:#fff; padding:2px 7px; border-radius:10px; font-weight:700;">ROOT</span>
+    <span class="tree-key">${node.access_key}</span>
+    ${locStr(node.origin_location)} <span>${EM_KO[node.emotion]||node.emotion||''}</span>`;
+  return div;
+}
+
+function renderNode(node, depth) {
+  const wrap = document.createElement('div');
+  wrap.className = 'tree-node';
+  wrap.style.marginLeft = `${depth * 20}px`;
+
+  const item = document.createElement('div');
+  item.className = 'tree-item';
+
+  const hasChildren = node.children && node.children.length > 0;
+  const toggle = document.createElement('div');
+  toggle.className = 'tree-toggle';
+  toggle.textContent = hasChildren ? '−' : '·';
+
+  const chips = document.createElement('div');
+  chips.className = 'tree-chips';
+
+  const childN = parseInt(node.child_count || 0);
+  const viewN  = parseInt(node.view_count  || 0);
+  const shareN = parseInt(node.share_count || 0);
+
+  chips.innerHTML = `
+    <a href="/admin/star/${node.access_key}" class="tree-key" onclick="event.stopPropagation()" style="text-decoration:none;">${node.access_key}</a>
+    <span style="font-size:11px; color:var(--text-dim)">${LOC_IC[node.origin_location]||''}</span>
+    <span style="font-size:11px; color:var(--text-dim)">${EM_KO[node.emotion]||node.emotion||''}</span>
+    ${childN ? `<span class="tree-chip hot">연결 ${childN}</span>` : ''}
+    ${shareN ? `<span class="tree-chip">공유 ${shareN}</span>` : ''}
+    ${viewN  ? `<span class="tree-chip">유입 ${viewN}</span>` : ''}
+    <span style="font-size:11px; color:var(--text-dim); margin-left:auto">${fmtDate(node.created_at)}</span>`;
+
+  item.appendChild(toggle);
+  item.appendChild(chips);
+  wrap.appendChild(item);
+
+  if (hasChildren) {
+    const childWrap = document.createElement('div');
+    childWrap.className = 'tree-children';
+    node.children.forEach(c => childWrap.appendChild(renderNode(c, 0)));
+
+    let collapsed = false;
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      collapsed = !collapsed;
+      childWrap.style.display = collapsed ? 'none' : '';
+      toggle.textContent = collapsed ? '+' : '−';
+    });
+    wrap.appendChild(childWrap);
+  }
+
+  return wrap;
+}
+
+// ── Storybook Generate ─────────────────────────────────────────
+async function generateStorybook() {
+  try {
+    const sbRes  = await fetch(`/api/admin/storybook/${ACCESS_KEY}`, { headers: ah() });
+    const sbData = await sbRes.json();
+    if (!sbData.storybook_payload) return alert('스토리북 페이로드 없음');
+
+    const res  = await fetch('/api/storybook/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(sbData.storybook_payload),
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert(`스토리북 생성 완료 (${data.storybook.length}개 슬라이드)\nflow: ${data.meta.first_emotion} → ${data.meta.last_emotion}`);
+    } else {
+      alert('오류: ' + data.error);
+    }
+  } catch (e) {
+    alert('오류: ' + e.message);
+  }
+}
+
+// ── Init ───────────────────────────────────────────────────────
+if (!ACCESS_KEY || ACCESS_KEY === 'star') {
+  document.getElementById('main-loading').style.display = 'none';
+  document.getElementById('main-error').style.display = '';
+  document.getElementById('main-error').textContent = 'access_key가 필요합니다 (/admin/star/{access_key})';
+} else {
+  load();
+}
+</script>
+</body>
+</html>

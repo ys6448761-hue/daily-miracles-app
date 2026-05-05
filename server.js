@@ -2516,6 +2516,11 @@ app.get('/admin/resonance', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin', 'resonance.html'));
 });
 
+// ---------- 별 상세 관리자 페이지 (/admin/star/:access_key) ----------
+app.get('/admin/star/:access_key', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin', 'star-detail.html'));
+});
+
 // ---------- 별들의 고향 Routes (/api/hometown) ----------
 let hometownRoutes = null;
 try {
