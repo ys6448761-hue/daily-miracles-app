@@ -1819,4 +1819,122 @@ if (process.env.NODE_ENV !== 'production') {
   });
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// DreamTown 스토리북 생성 (포스트카드 → 슬라이드 흐름)
+// ═══════════════════════════════════════════════════════════════════════════
+
+const LOCATION_ORDER = ['cablecar', 'cafe', 'hamel', 'stay'];
+
+const EMOTION_FLOW_TEXT = {
+  'confusion→confusion':       ['길을 잃은 채로 걸었어요', '그래도 멈추지 않았어요'],
+  'confusion→calm':            ['처음엔 아무것도 보이지 않았어요', '조금씩 고요해졌어요'],
+  'confusion→fragile_hope':    ['어디로 가야 할지 몰랐지만', '다시 믿고 싶어졌어요'],
+  'confusion→curiosity':       ['흔들리며 시작했지만', '조금씩 궁금해졌어요'],
+  'confusion→pause':           ['모든 게 뒤엉켰던 순간', '잠시 멈춰 숨을 골랐어요'],
+  'calm→calm':                 ['조용히 걸어왔어요', '그 걸음이 여기까지 닿았어요'],
+  'calm→fragile_hope':         ['고요한 마음으로 걸었어요', '끝에서 작은 빛을 만났어요'],
+  'calm→curiosity':            ['천천히, 서두르지 않고', '새로운 게 보이기 시작했어요'],
+  'calm→confusion':            ['잔잔하게 흘렀지만', '어느 순간 길이 흐릿해졌어요'],
+  'calm→pause':                ['모든 걸 내려놓고 걸었어요', '잠시 여기 머물렀어요'],
+  'fragile_hope→fragile_hope': ['작은 희망을 안고 왔어요', '아직 사라지지 않았어요'],
+  'fragile_hope→calm':         ['떨리는 마음으로 시작했지만', '어느새 안정되었어요'],
+  'fragile_hope→curiosity':    ['희미한 빛을 따라왔어요', '조금 더 알고 싶어졌어요'],
+  'fragile_hope→confusion':    ['믿고 싶었지만', '다시 안개 속에 섰어요'],
+  'fragile_hope→pause':        ['작은 희망을 붙들고', '잠시 숨을 고르는 중이에요'],
+  'curiosity→curiosity':       ['궁금한 것들을 따라왔어요', '아직 답이 보이지 않아요'],
+  'curiosity→calm':            ['많은 걸 물으며 걸었어요', '결국 고요가 남았어요'],
+  'curiosity→fragile_hope':    ['찾고 싶은 게 있었어요', '아직 찾는 중이에요'],
+  'curiosity→confusion':       ['알고 싶어서 걸었지만', '더 복잡해진 것 같아요'],
+  'curiosity→pause':           ['많은 걸 보고 들었어요', '잠시 멈추고 싶어졌어요'],
+  'pause→pause':               ['멈춰 있어도 괜찮아요', '여기도 길이에요'],
+  'pause→calm':                ['충분히 쉬었어요', '이제 조금 가벼워졌어요'],
+  'pause→fragile_hope':        ['한동안 서 있었지만', '다시 한 걸음을 내딛고 싶어요'],
+  'pause→curiosity':           ['멈춰서 바라봤어요', '그러자 새로운 게 눈에 들어왔어요'],
+  'pause→confusion':           ['쉬고 싶었지만', '마음은 여전히 흔들렸어요'],
+};
+
+const CLOSING_TEXT = {
+  confusion:    '다시 시작해도 괜찮아요',
+  calm:         '이 고요함을 기억하세요',
+  fragile_hope: '그 빛은 아직 여기 있어요',
+  curiosity:    '궁금한 건 계속 따라가도 돼요',
+  pause:        '멈춤도 여정의 일부예요',
+};
+
+function buildStorybook(sorted, mainStar, flowLine1, flowLine2, closingText, isFull) {
+  const toSlide = s => ({ type: 'image', location: s.location, image_url: s.image_url, emotion: s.emotion });
+  const mainSlide = { type: 'image', role: 'main_star', location: mainStar.location, image_url: mainStar.image_url, emotion: mainStar.emotion };
+
+  if (isFull) {
+    return [
+      ...sorted.slice(0, 4).map(toSlide),
+      { type: 'text', content: `${flowLine1}\n${flowLine2}` },
+      mainSlide,
+      { type: 'text', content: '당신의 별은 여기까지 왔어요' },
+      toSlide(sorted[sorted.length - 1]),
+      { type: 'text', content: closingText },
+    ];
+  }
+
+  // compact (2-3 cards)
+  return [
+    ...sorted.map(toSlide),
+    { type: 'text', content: `${flowLine1}\n${flowLine2}` },
+    mainSlide,
+    { type: 'text', content: closingText },
+  ];
+}
+
+/**
+ * POST /api/storybook/generate
+ *
+ * DreamTown 포스트카드 → 스토리북 슬라이드 변환
+ * Body: { stars: [{ location, emotion, image_url }] }
+ */
+router.post('/generate', (req, res) => {
+  try {
+    const { stars = [] } = req.body;
+
+    if (!Array.isArray(stars) || stars.length < 2) {
+      return res.status(400).json({ success: false, error: '최소 2개의 카드가 필요합니다' });
+    }
+
+    // 1. location 기준 정렬 (cablecar → cafe → hamel → stay)
+    const sorted = [...stars].sort((a, b) => {
+      const ai = LOCATION_ORDER.indexOf(a.location);
+      const bi = LOCATION_ORDER.indexOf(b.location);
+      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    });
+
+    // 2. 감정 흐름 추출
+    const firstEmotion = sorted[0].emotion;
+    const lastEmotion  = sorted[sorted.length - 1].emotion;
+    const [flowLine1, flowLine2] = EMOTION_FLOW_TEXT[`${firstEmotion}→${lastEmotion}`]
+      || ['처음엔 흔들렸지만', '조금씩 또렷해졌어요'];
+
+    // 3. 대표 이미지 선택 (hamel > stay > 마지막)
+    const mainStar =
+      sorted.find(s => s.location === 'hamel') ||
+      sorted.find(s => s.location === 'stay')  ||
+      sorted[sorted.length - 1];
+
+    const closingText = CLOSING_TEXT[lastEmotion] || '다시 시작해도 괜찮아요';
+    const isFull = sorted.length >= 4;
+
+    return res.json({
+      success: true,
+      meta: {
+        card_count:    sorted.length,
+        first_emotion: firstEmotion,
+        last_emotion:  lastEmotion,
+        flow_type:     isFull ? 'full' : 'compact',
+      },
+      storybook: buildStorybook(sorted, mainStar, flowLine1, flowLine2, closingText, isFull),
+    });
+  } catch (err) {
+    console.error('[storybook] /generate error:', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 module.exports = router;
