@@ -359,6 +359,16 @@ router.post('/visit', async (req, res) => {
   db.query('INSERT INTO star_visit_events (ref_access_key) VALUES ($1)', [ref_access_key])
     .catch(() => {});
 
+  // 정식 visits 기록 (migration 164) — journey_id 포함
+  db.query('SELECT journey_id FROM stars WHERE access_key = $1', [ref_access_key])
+    .then(({ rows }) => {
+      const journey_id = rows[0]?.journey_id || null;
+      db.query(
+        'INSERT INTO visits (ref_access_key, journey_id) VALUES ($1, $2)',
+        [ref_access_key, journey_id]
+      ).catch(() => {});
+    }).catch(() => {});
+
   // 집계 UPSERT: first_seen 유지, last_seen 갱신, revisit +1 (migration 161)
   db.query(`
     INSERT INTO star_connections_agg (ref_access_key)
@@ -590,6 +600,32 @@ router.post('/commit', async (req, res) => {
         source:    'qr_star_commit',
         extra:     { origin_location, table: 'stars' },
       }).catch(() => {});
+    }
+
+    // journeys 테이블 기록 (migration 163)
+    if (!parent_ref) {
+      // 루트 별 → 새 여정 생성
+      db.query(
+        `INSERT INTO journeys (id, root_access_key, origin_location)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (root_access_key) DO NOTHING`,
+        [journey_id, access_key, origin_location]
+      ).catch(() => {});
+    } else {
+      // 자식 별 → 기존 여정 star_count 증가 + last_active_at 갱신
+      db.query(
+        `UPDATE journeys SET star_count = star_count + 1, last_active_at = NOW()
+         WHERE id = $1`,
+        [journey_id]
+      ).catch(() => {});
+      // connections 테이블 기록 (migration 165)
+      db.query(
+        `INSERT INTO connections (parent_access_key, child_access_key, journey_id, first_visit_at)
+         VALUES ($1, $2, $3,
+           (SELECT first_seen_at FROM star_connections_agg WHERE ref_access_key = $1 LIMIT 1))
+         ON CONFLICT (child_access_key) DO NOTHING`,
+        [parent_ref, access_key, journey_id]
+      ).catch(() => {});
     }
 
     // Journey + Moment (preview 이미지 직접 연결)

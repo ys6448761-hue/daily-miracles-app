@@ -1948,8 +1948,23 @@ router.post('/generate', async (req, res) => {
           [ref_access_key || null, journey_id, JSON.stringify(slides), JSON.stringify(meta)]
         );
         storybookId = sbRows[0]?.id;
-        if (storybookId) share_url = `/storybook/${storybookId}`;
-      } catch (_) { /* migration 162 미실행 시 무시 */ }
+        if (storybookId) {
+          share_url = `/storybook/${storybookId}`;
+          // storybook_items 저장 (migration 166)
+          const itemValues = slides.map((s, i) => [
+            storybookId, i, s.type, s.role || null,
+            s.location || null, s.emotion || null, s.image_url || null, s.content || null,
+          ]);
+          Promise.all(itemValues.map(v =>
+            db.query(
+              `INSERT INTO storybook_items
+                 (storybook_id, slide_order, type, role, location, emotion, image_url, content)
+               VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+              v
+            )
+          )).catch(() => {});
+        }
+      } catch (_) { /* migration 162/166 미실행 시 무시 */ }
     }
 
     return res.json({ success: true, id: storybookId, share_url, meta, storybook: slides });
