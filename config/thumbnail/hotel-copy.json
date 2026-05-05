@@ -1,0 +1,7 @@
+[
+  {"emotion": "confusion",     "lines": ["조용히 견디고 있던",       "밤"]},
+  {"emotion": "pause",         "lines": ["혼자서 버티고 있던",       "시간"]},
+  {"emotion": "calm",          "lines": ["말하지 못했던",             "마음"]},
+  {"emotion": "curiosity",     "lines": ["이해받고 싶었던",           "순간"]},
+  {"emotion": "fragile_hope",  "lines": ["괜찮은 척하고 있었던",     "나"]}
+]

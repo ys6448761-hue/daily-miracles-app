@@ -1,0 +1,9 @@
+{
+  "_rule": "1:1 고정 매핑. 매트릭스 방식 금지. 감정당 보석 1개 고정.",
+  "confusion":    { "gemstone": "moonstone",  "label_ko": "문스톤" },
+  "pause":        { "gemstone": "sapphire",   "label_ko": "사파이어" },
+  "calm":         { "gemstone": "emerald",    "label_ko": "에메랄드" },
+  "curiosity":    { "gemstone": "topaz",      "label_ko": "토파즈" },
+  "fragile_hope": { "gemstone": "diamond",    "label_ko": "다이아몬드" },
+  "passion":      { "gemstone": "ruby",       "label_ko": "루비", "_reserved": true }
+}

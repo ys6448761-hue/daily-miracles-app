@@ -1,0 +1,8 @@
+{
+  "confusion":    { "radius": 40, "blur": 8,  "opacity": 0.72 },
+  "pause":        { "radius": 48, "blur": 10, "opacity": 0.80 },
+  "calm":         { "radius": 52, "blur": 9,  "opacity": 0.82 },
+  "curiosity":    { "radius": 50, "blur": 10, "opacity": 0.85 },
+  "fragile_hope": { "radius": 38, "blur": 6,  "opacity": 0.50 },
+  "passion":      { "_reserved": true, "radius": 60, "blur": 12, "opacity": 0.90 }
+}

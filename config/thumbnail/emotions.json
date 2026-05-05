@@ -1,0 +1,35 @@
+{
+  "order": ["confusion", "pause", "calm", "curiosity", "fragile_hope"],
+  "emotions": {
+    "confusion": {
+      "label_ko": "혼란",
+      "description": "uncertain, directionless, quietly unsettled",
+      "star_state": "faint and distant, barely visible through soft mist",
+      "atmosphere": "heavy quiet, muted tones, hesitant stillness"
+    },
+    "pause": {
+      "label_ko": "멈춤",
+      "description": "stopped, held breath, suspended in time",
+      "star_state": "still and small, not yet moving, holding",
+      "atmosphere": "deep stillness, no movement, suspended moment"
+    },
+    "calm": {
+      "label_ko": "고요",
+      "description": "settled, quiet, at rest",
+      "star_state": "soft steady glow, unhurried, breathing",
+      "atmosphere": "peaceful quiet, balanced, introspective"
+    },
+    "curiosity": {
+      "label_ko": "설레임",
+      "description": "drawn forward, gently curious, light anticipation",
+      "star_state": "slightly brighter, beginning to reach, warm invitation",
+      "atmosphere": "open warmth, soft upward energy, gentle pull"
+    },
+    "fragile_hope": {
+      "label_ko": "연한 희망",
+      "description": "tender, not yet certain, delicate beginning",
+      "star_state": "growing slowly, soft light expanding, not yet arrived",
+      "atmosphere": "quiet lift, careful brightness, feeling before dawn"
+    }
+  }
+}

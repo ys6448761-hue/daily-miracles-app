@@ -1,0 +1,37 @@
+[
+  {
+    "emotion": "confusion",
+    "lines": [
+      "어디로 가야 할지 몰랐던",
+      "밤"
+    ]
+  },
+  {
+    "emotion": "pause",
+    "lines": [
+      "잠시 멈춰 서 있었던",
+      "파도 앞에서"
+    ]
+  },
+  {
+    "emotion": "calm",
+    "lines": [
+      "바다가 말없이 있어줬던",
+      "밤"
+    ]
+  },
+  {
+    "emotion": "curiosity",
+    "lines": [
+      "저 빛이 궁금했던",
+      "순간"
+    ]
+  },
+  {
+    "emotion": "fragile_hope",
+    "lines": [
+      "다시 출발할 수 있을 것 같았던",
+      "새벽"
+    ]
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "confusion":    { "hex": "#D6E4F0", "glow": "#F2F7FB", "label": "moonstone grey",  "prompt_desc": "soft pearl-grey shimmer, quietly uncertain. No glow trails." },
+  "pause":        { "hex": "#1B5299", "glow": "#6FA8DC", "label": "sapphire blue",   "prompt_desc": "deep sapphire blue, single calm glow. Still, not pulsing." },
+  "calm":         { "hex": "#2D8653", "glow": "#7ED9A3", "label": "emerald green",   "prompt_desc": "steady emerald green, soft inner light. Unhurried." },
+  "curiosity":    { "hex": "#E6B85C", "glow": "#F5DFA3", "label": "topaz gold",      "prompt_desc": "warm topaz gold, gentle forward warmth. Not glaring." },
+  "fragile_hope": { "hex": "#F5F7FA", "glow": "#FFFFFF", "label": "diamond white",   "prompt_desc": "clear diamond-white shimmer, barely visible. Quiet and tender." },
+  "growth":       { "hex": "#E4B84A", "glow": "#F5E09A", "label": "citrine golden",  "prompt_desc": "warm citrine gold, slow upward radiance. Not bright." },
+  "passion":      { "_reserved": true, "hex": "#9B1B30", "glow": "#D45A7A", "label": "ruby red", "prompt_desc": "deep ruby red, contained fire. Intense but not neon." }
+}

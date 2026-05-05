@@ -1,0 +1,54 @@
+{
+  "location": "yeosu_hotel",
+  "core_rule": "장소는 고정하고, 감정만 바꾼다.",
+  "scene": {
+    "description": "A quiet hotel room in Yeosu at night with a large window overlooking the city.",
+    "must_include": [
+      "large window",
+      "city night view",
+      "minimal interior lighting",
+      "bed or chair",
+      "curtain or soft shadow"
+    ]
+  },
+  "style": {
+    "required": [
+      "2D illustration",
+      "watercolor texture",
+      "soft grain",
+      "Ghibli-inspired",
+      "Korean emotional illustration"
+    ],
+    "forbidden": [
+      "photorealistic",
+      "3D render",
+      "ultra detail",
+      "cinematic lens"
+    ]
+  },
+  "color": {
+    "inside": "dark / low light",
+    "outside": "city lights (warm yellow)",
+    "sky": "deep blue",
+    "star": "bright white / gold"
+  },
+  "star": {
+    "position": "above city skyline, outside window",
+    "brightness": "strongest element (150%)",
+    "glow": "soft and wide halo"
+  },
+  "character": {
+    "name": "Sowoni",
+    "identity": "22-year-old Korean woman",
+    "position": "left or lower area",
+    "pose": "standing or sitting near window, looking outside",
+    "emotion": "quiet, introspective"
+  },
+  "composition": {
+    "flow": "Sowoni → window → city → star",
+    "focus": "inner reflection"
+  },
+  "text": {
+    "bottom": "저 별은 당신을 기억합니다"
+  }
+}

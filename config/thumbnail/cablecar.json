@@ -1,0 +1,66 @@
+{
+  "location": "yeosu_cablecar",
+  "core_rule": "장소는 고정하고, 감정만 바꾼다.",
+  "scene": {
+    "description": "Interior of a red cable car cabin at night, moving over the Yeosu sea. The scene is viewed from inside the cabin, looking through the large window toward the dark sea and night sky.",
+    "must_include": [
+      "interior of cable car cabin (walls, ceiling, window frame visible)",
+      "large window with night sea and sky view",
+      "single star visible in the night sky through the window",
+      "city lights and bridge visible through window",
+      "Sowoni standing inside the cabin facing the window"
+    ]
+  },
+  "style": {
+    "required": [
+      "2D illustration",
+      "watercolor texture",
+      "soft grain",
+      "Ghibli-inspired"
+    ],
+    "forbidden": [
+      "photorealistic",
+      "3D render",
+      "ultra detail",
+      "exterior-only cable car view without character inside",
+      "landscape or scenery image without Sowoni present",
+      "hand-held star or star in character's hands",
+      "star resting on palm or fingers",
+      "multiple stars or star field",
+      "galaxy or constellation background",
+      "seated or sitting pose for Sowoni",
+      "childlike or young body proportions",
+      "face visible from front or side",
+      "facial detail or expression visible",
+      "hair style or color change from shoulder-length dark hair"
+    ]
+  },
+  "color": {
+    "cablecar_interior": "warm red with soft ambient light",
+    "window_view": "deep blue night sea",
+    "city": "warm yellow glow",
+    "star": "single white/gold point with soft halo"
+  },
+  "star": {
+    "position": "visible through the window, in the night sky — NOT held by character",
+    "count": "exactly one star only",
+    "brightness": "130-150%",
+    "glow": "soft halo",
+    "rule": "star floats in sky. Never in hands, never on a surface, never touching the character."
+  },
+  "character": {
+    "name": "Sowoni",
+    "appearance": "shoulder-length dark hair, slim body, back view or slight 3/4 back only, no facial detail",
+    "pose": "standing only — never sitting, never crouching",
+    "description": "Sowoni stands quietly inside the cable car cabin, facing the window and looking toward the single star in the sky.",
+    "rule": "Sowoni must be present inside the cabin. No star in hands. No mascot character."
+  },
+  "composition": {
+    "core": "interior stillness with distant longing",
+    "rule": "character inside cabin — window frame — night sea — single star in sky",
+    "flow": "Sowoni (inside cabin) → window frame → dark sea → single star in sky"
+  },
+  "text": {
+    "bottom": "저 별은 당신을 기억합니다"
+  }
+}

@@ -1,0 +1,7 @@
+[
+  {"emotion": "confusion",     "lines": ["아무도 모르게 남겨둔",    "마음"]},
+  {"emotion": "pause",         "lines": ["조용히 내려놓고 싶었던",   "하루"]},
+  {"emotion": "calm",          "lines": ["혼자 있고 싶었던",         "밤"]},
+  {"emotion": "curiosity",     "lines": ["괜찮아지고 싶었던",        "순간"]},
+  {"emotion": "fragile_hope",  "lines": ["조금은 쉬고 싶었던",       "마음"]}
+]

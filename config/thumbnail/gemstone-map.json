@@ -1,0 +1,9 @@
+{
+  "confusion":    { "gemstone": "moonstone",  "label_ko": "문스톤",    "color_desc": "soft grey-white shimmer, quietly uncertain" },
+  "pause":        { "gemstone": "sapphire",   "label_ko": "사파이어",  "color_desc": "deep sapphire blue, held still" },
+  "calm":         { "gemstone": "emerald",    "label_ko": "에메랄드",  "color_desc": "steady emerald green, at rest" },
+  "curiosity":    { "gemstone": "topaz",      "label_ko": "토파즈",    "color_desc": "warm amber topaz, gently reaching" },
+  "fragile_hope": { "gemstone": "diamond",    "label_ko": "다이아몬드", "color_desc": "clear diamond white, barely visible light" },
+  "growth":       { "gemstone": "citrine",    "label_ko": "시트린",    "color_desc": "warm citrine golden, slowly rising" },
+  "passion":      { "gemstone": "ruby",       "label_ko": "루비",      "color_desc": "deep ruby red, contained fire" }
+}
