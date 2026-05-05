@@ -2473,6 +2473,15 @@ if (adminDashboardRoutes) {
   console.log('✅ 운영 관제 대시보드 등록 완료 (/api/admin/dashboard)');
 }
 
+// ---------- 공명 트래킹 관리자 API (/api/admin) ----------
+try {
+  const adminResonanceRoutes = require('./routes/adminResonanceRoutes');
+  app.use('/api/admin', adminResonanceRoutes);
+  console.log('✅ 공명 관리자 API 등록 완료 (/api/admin/star, /api/admin/connections/tree, /api/admin/storybook)');
+} catch (e) {
+  console.warn('⚠️ adminResonanceRoutes 로드 실패:', e.message);
+}
+
 // ---------- 슈퍼어드민 파트너 관리 Routes (/api/admin/partners) ----------
 let adminPartnerRoutes = null;
 try {
