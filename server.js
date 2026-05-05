@@ -2511,6 +2511,11 @@ app.get('/dreamtown/admin/location/:code', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin', 'location.html'));
 });
 
+// ---------- 공명 관리자 대시보드 (/admin/resonance) ----------
+app.get('/admin/resonance', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin', 'resonance.html'));
+});
+
 // ---------- 별들의 고향 Routes (/api/hometown) ----------
 let hometownRoutes = null;
 try {

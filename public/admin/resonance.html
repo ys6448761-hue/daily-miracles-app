@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>공명 대시보드 — Daily Miracles Admin</title>
+  <style>
+    :root {
+      --primary: #9B87F5;
+      --secondary: #F5A7C6;
+      --accent: #6E59A5;
+      --bg: #0d0d1a;
+      --surface: #161628;
+      --surface2: #1e1e35;
+      --border: rgba(155,135,245,0.18);
+      --text: #e8e8f0;
+      --text-dim: #8888aa;
+      --success: #5cf5a0;
+      --warn: #f5c85c;
+      --danger: #f55c5c;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, var(--accent) 0%, #2d1b69 100%);
+      padding: 20px 30px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .header h1 { font-size: 20px; font-weight: 700; color: #fff; }
+    .header-sub { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+    .key-input { display: flex; gap: 8px; align-items: center; }
+    .key-input input {
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px; padding: 7px 12px; color: #fff; font-size: 13px; width: 220px;
+    }
+    .key-input input::placeholder { color: rgba(255,255,255,0.4); }
+    .btn-sm {
+      padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+      border: none; background: var(--primary); color: #fff; transition: opacity .2s;
+    }
+    .btn-sm:hover { opacity: .85; }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-dim); }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex; gap: 0; border-bottom: 1px solid var(--border);
+      background: var(--surface); padding: 0 30px;
+    }
+    .tab {
+      padding: 14px 22px; font-size: 14px; font-weight: 500; cursor: pointer;
+      color: var(--text-dim); border-bottom: 2px solid transparent;
+      transition: color .2s, border-color .2s;
+    }
+    .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .tab:hover:not(.active) { color: var(--text); }
+
+    /* ── Container ── */
+    .container { max-width: 1280px; margin: 0 auto; padding: 28px 30px; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 22px;
+    }
+    .card-title { font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+    .card-value { font-size: 28px; font-weight: 700; color: var(--text); }
+    .card-sub { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+
+    /* ── Grid ── */
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    @media (max-width: 900px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    /* ── Table ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left; padding: 10px 14px;
+      font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+      color: var(--text-dim); border-bottom: 1px solid var(--border);
+    }
+    td { padding: 11px 14px; border-bottom: 1px solid rgba(155,135,245,0.08); vertical-align: middle; }
+    tr:hover td { background: var(--surface2); }
+    tr { cursor: pointer; }
+    .tag {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+    }
+
+    /* ── Emotion colors ── */
+    .em-confusion    { background: rgba(155,135,245,0.15); color: #b8a8f8; }
+    .em-calm         { background: rgba(100,180,255,0.15); color: #80c8f5; }
+    .em-fragile_hope { background: rgba(245,200,90,0.15);  color: #f5d070; }
+    .em-curiosity    { background: rgba(90,245,180,0.15);  color: #70f5c0; }
+    .em-pause        { background: rgba(245,120,120,0.15); color: #f58888; }
+
+    /* ── Location icons ── */
+    .loc::before { margin-right: 5px; }
+    .loc-cablecar::before { content: '🚡'; }
+    .loc-cafe::before     { content: '☕'; }
+    .loc-hamel::before    { content: '⚓'; }
+    .loc-stay::before     { content: '🏠'; }
+
+    /* ── Metric bars ── */
+    .metric-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .metric-label { width: 80px; font-size: 12px; color: var(--text-dim); flex-shrink: 0; }
+    .bar-track { flex: 1; height: 8px; background: rgba(255,255,255,0.07); border-radius: 4px; overflow: hidden; }
+    .bar-fill  { height: 100%; border-radius: 4px; transition: width .5s ease; }
+    .bar-share { background: var(--primary); }
+    .bar-view  { background: var(--warn); }
+    .bar-conv  { background: var(--success); }
+    .bar-ret   { background: var(--secondary); }
+    .metric-val { width: 36px; text-align: right; font-size: 13px; font-weight: 600; color: var(--text); }
+
+    /* ── Connection badge ── */
+    .connection-badge {
+      padding: 16px 20px; background: linear-gradient(135deg, rgba(155,135,245,0.12), rgba(245,167,198,0.08));
+      border: 1px solid var(--border); border-radius: 12px; margin: 20px 0;
+      font-size: 16px; font-weight: 600; color: var(--text); text-align: center;
+    }
+    .connection-badge span { color: var(--primary); }
+
+    /* ── Postcard img ── */
+    .postcard-wrap {
+      width: 100%; aspect-ratio: 9/16; max-width: 220px;
+      border-radius: 12px; overflow: hidden; border: 1px solid var(--border);
+      background: var(--surface2); display: flex; align-items: center; justify-content: center;
+    }
+    .postcard-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .postcard-placeholder { color: var(--text-dim); font-size: 40px; }
+
+    /* ── Storybook badge ── */
+    .sb-badge {
+      display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    }
+    .sb-ready  { background: rgba(92,245,160,0.15); color: var(--success); }
+    .sb-no     { background: rgba(255,255,255,0.07); color: var(--text-dim); }
+
+    /* ── Tree ── */
+    .tree-wrap { font-family: monospace; font-size: 13px; }
+    .tree-node { margin: 0; }
+    .tree-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: 8px; cursor: pointer;
+      transition: background .15s;
+    }
+    .tree-item:hover { background: var(--surface2); }
+    .tree-item.selected { background: rgba(155,135,245,0.15); }
+    .tree-children { padding-left: 28px; border-left: 1px solid var(--border); margin-left: 18px; }
+    .tree-toggle { width: 18px; height: 18px; border-radius: 4px; border: 1px solid var(--border);
+      background: var(--surface2); color: var(--text-dim); font-size: 11px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .tree-key { color: var(--primary); font-size: 12px; }
+    .tree-chips { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .tree-chip { font-size: 11px; padding: 2px 7px; border-radius: 10px; background: rgba(255,255,255,0.07); color: var(--text-dim); }
+    .tree-chip.hot { background: rgba(245,200,90,0.12); color: var(--warn); }
+
+    /* ── Empty / Loading ── */
+    .empty { text-align: center; padding: 60px; color: var(--text-dim); font-size: 15px; }
+    .loading { text-align: center; padding: 40px; color: var(--text-dim); }
+    .loading::after { content: ''; display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin .7s linear infinite; margin-left: 8px; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Back button ── */
+    .back-btn { font-size: 13px; color: var(--text-dim); cursor: pointer; margin-bottom: 18px; display: inline-flex; align-items: center; gap: 6px; }
+    .back-btn:hover { color: var(--text); }
+
+    /* ── Rate badge ── */
+    .rate { font-size: 12px; color: var(--text-dim); }
+    .rate-good { color: var(--success); }
+    .rate-warn { color: var(--warn); }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div>
+    <h1>공명 대시보드</h1>
+    <div class="header-sub">별 공유 · 유입 · 연결 흐름 관리자</div>
+  </div>
+  <div class="key-input">
+    <input type="password" id="adminKeyInput" placeholder="Admin Key" autocomplete="off">
+    <button class="btn-sm" onclick="saveKey()">확인</button>
+    <button class="btn-sm btn-ghost" onclick="loadList()">새로고침</button>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" id="tab-list"   onclick="switchTab('list')">별 목록</div>
+  <div class="tab"        id="tab-detail" onclick="switchTab('detail')">별 상세</div>
+  <div class="tab"        id="tab-tree"   onclick="switchTab('tree')">공명 트리</div>
+</div>
+
+<!-- VIEW: List -->
+<div id="view-list" class="container">
+  <div id="list-loading" class="loading">데이터 불러오는 중</div>
+  <div id="list-content" style="display:none">
+    <div id="list-summary" class="grid-4" style="margin-bottom:24px"></div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>접근 코드</th>
+              <th>장소</th>
+              <th>감정</th>
+              <th>공유</th>
+              <th>유입</th>
+              <th>생성</th>
+              <th>재공유</th>
+              <th>전환율</th>
+              <th>생성일</th>
+            </tr>
+          </thead>
+          <tbody id="star-tbody"></tbody>
+        </table>
+      </div>
+      <div id="list-empty" class="empty" style="display:none">공명 연결된 별이 없습니다</div>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW: Detail -->
+<div id="view-detail" class="container" style="display:none">
+  <div class="back-btn" onclick="switchTab('list')">← 목록으로</div>
+  <div id="detail-loading" class="loading">불러오는 중</div>
+  <div id="detail-content" style="display:none">
+    <div class="grid-2">
+      <!-- 왼쪽: 포스트카드 + 기본 정보 -->
+      <div>
+        <div class="card" style="text-align:center; padding: 28px 22px;">
+          <div class="postcard-wrap" style="margin: 0 auto 18px;">
+            <img id="detail-img" src="" alt="포스트카드" style="display:none" onerror="this.style.display='none'; document.getElementById('detail-img-ph').style.display='block'">
+            <div id="detail-img-ph" class="postcard-placeholder">⭐</div>
+          </div>
+          <div id="detail-key" style="font-size:13px; color:var(--text-dim); margin-bottom:8px;"></div>
+          <div id="detail-loc" style="font-size:15px; font-weight:600; margin-bottom:6px;"></div>
+          <div id="detail-em"  style="margin-bottom:12px;"></div>
+          <div id="detail-created" style="font-size:12px; color:var(--text-dim);"></div>
+          <div id="detail-sb" style="margin-top:12px;"></div>
+        </div>
+        <div class="connection-badge" style="margin-top:16px;">
+          이 별은 <span id="detail-conn-n">0</span>개의 마음과 이어졌어요
+        </div>
+        <div id="detail-parent" class="card" style="margin-top:16px; display:none">
+          <div class="card-title">출발한 별</div>
+          <div id="detail-parent-info" style="margin-top:8px;"></div>
+        </div>
+      </div>
+      <!-- 오른쪽: 통계 + 자식 별 -->
+      <div>
+        <div class="card" style="margin-bottom:16px;">
+          <div style="font-size:15px; font-weight:600; margin-bottom:18px;">공유 · 유입 · 생성 흐름</div>
+          <div id="detail-metrics"></div>
+        </div>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="grid-4" id="detail-stat-cards" style="grid-template-columns:repeat(2,1fr);"></div>
+        </div>
+        <div class="card">
+          <div style="font-size:14px; font-weight:600; margin-bottom:14px;">연결된 자식 별 <span id="detail-child-n" style="color:var(--primary)"></span></div>
+          <div id="detail-children"></div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:20px; text-align:right;">
+      <button class="btn-sm" id="btn-goto-tree" onclick="">트리 보기 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW: Tree -->
+<div id="view-tree" class="container" style="display:none">
+  <div class="back-btn" onclick="switchTab('list')">← 목록으로</div>
+  <div id="tree-key-row" style="display:flex; gap:10px; align-items:center; margin-bottom:20px;">
+    <input type="text" id="tree-key-input" placeholder="access_key 입력"
+      style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:9px 14px; color:var(--text); font-size:14px; flex:1; max-width:320px;">
+    <button class="btn-sm" onclick="loadTree()">조회</button>
+  </div>
+  <div class="grid-2" style="gap:20px; align-items:start;">
+    <div class="card">
+      <div id="tree-loading" class="loading" style="display:none">트리 불러오는 중</div>
+      <div id="tree-content"><div class="empty">위에서 access_key를 입력하세요</div></div>
+    </div>
+    <div class="card" id="tree-detail-panel" style="display:none">
+      <div style="font-size:13px; color:var(--text-dim); margin-bottom:14px;">선택된 노드</div>
+      <div id="tree-node-detail"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────
+let adminKey = localStorage.getItem('resonance_admin_key') || '';
+let currentStarKey = null;
+
+document.getElementById('adminKeyInput').value = adminKey;
+
+function saveKey() {
+  adminKey = document.getElementById('adminKeyInput').value.trim();
+  localStorage.setItem('resonance_admin_key', adminKey);
+  loadList();
+}
+
+function apiHeaders() {
+  const h = { 'Content-Type': 'application/json' };
+  if (adminKey) h['x-admin-key'] = adminKey;
+  return h;
+}
+
+// ── Tabs ───────────────────────────────────────────────────────
+function switchTab(tab) {
+  ['list','detail','tree'].forEach(t => {
+    document.getElementById(`view-${t}`).style.display = t === tab ? '' : 'none';
+    document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+  });
+  if (tab === 'list' && !document.getElementById('star-tbody').children.length) loadList();
+}
+
+// ── Helpers ────────────────────────────────────────────────────
+const EMOTION_KO = { confusion: '혼란', calm: '고요', fragile_hope: '희망', curiosity: '호기심', pause: '멈춤' };
+const LOC_KO = { cablecar: '케이블카', cafe: '카페', hamel: '하멜', stay: '숙소' };
+const LOC_ICON = { cablecar: '🚡', cafe: '☕', hamel: '⚓', stay: '🏠' };
+
+function emTag(e) {
+  return `<span class="tag em-${e || 'confusion'}">${EMOTION_KO[e] || e}</span>`;
+}
+function locTag(l) {
+  return `<span class="loc loc-${l}">${LOC_KO[l] || l}</span>`;
+}
+function fmtDate(s) {
+  if (!s) return '—';
+  return new Date(s).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+function rateBadge(rate) {
+  if (rate == null) return '<span class="rate">—</span>';
+  const cls = rate >= 20 ? 'rate-good' : rate >= 5 ? 'rate-warn' : 'rate';
+  return `<span class="${cls}">${rate}%</span>`;
+}
+
+// ── VIEW: List ─────────────────────────────────────────────────
+async function loadList() {
+  document.getElementById('list-loading').style.display = '';
+  document.getElementById('list-content').style.display = 'none';
+
+  try {
+    const res  = await fetch('/api/star/admin/connection-tree', { headers: apiHeaders() });
+    const data = await res.json();
+
+    document.getElementById('list-loading').style.display = 'none';
+    document.getElementById('list-content').style.display = '';
+
+    const stars = data.top_stars || [];
+
+    // Summary cards
+    const totalChildren = stars.reduce((s, r) => s + parseInt(r.child_count || 0), 0);
+    const totalViews    = stars.reduce((s, r) => s + parseInt(r.visit_count || 0), 0);
+    const totalShares   = stars.reduce((s, r) => s + parseInt(r.share_count || 0), 0);
+    document.getElementById('list-summary').innerHTML = [
+      { label: '공명 별', value: stars.length, sub: '자식 있는 별' },
+      { label: '총 연결', value: totalChildren, sub: '생성된 자식 별' },
+      { label: '총 유입', value: totalViews, sub: '?ref= 방문' },
+      { label: '총 공유', value: totalShares, sub: '공유 클릭' },
+    ].map(c => `
+      <div class="card">
+        <div class="card-title">${c.label}</div>
+        <div class="card-value">${c.value.toLocaleString()}</div>
+        <div class="card-sub">${c.sub}</div>
+      </div>`).join('');
+
+    if (!stars.length) {
+      document.getElementById('list-empty').style.display = '';
+      return;
+    }
+
+    const maxChild = Math.max(...stars.map(r => parseInt(r.child_count || 0)), 1);
+
+    document.getElementById('star-tbody').innerHTML = stars.map(r => {
+      const cc = parseInt(r.child_count || 0);
+      const vc = parseInt(r.visit_count || 0);
+      const sc = parseInt(r.share_count || 0);
+      const rate = vc > 0 ? Math.round((cc / vc) * 100) : null;
+      return `
+        <tr onclick="openDetail('${r.access_key}')">
+          <td style="font-family:monospace; font-size:12px; color:var(--primary)">${r.access_key}</td>
+          <td>${locTag(r.origin_location)}</td>
+          <td>${emTag(r.emotion)}</td>
+          <td>${sc}</td>
+          <td>${vc}</td>
+          <td style="font-weight:600; color:var(--success)">${cc}</td>
+          <td style="color:var(--secondary)">—</td>
+          <td>${rateBadge(rate)}</td>
+          <td style="color:var(--text-dim); font-size:12px">${fmtDate(r.created_at)}</td>
+        </tr>`;
+    }).join('');
+  } catch (e) {
+    document.getElementById('list-loading').innerHTML = `<div style="color:var(--danger)">오류: ${e.message}</div>`;
+  }
+}
+
+// ── VIEW: Detail ───────────────────────────────────────────────
+async function openDetail(key) {
+  currentStarKey = key;
+  switchTab('detail');
+  document.getElementById('detail-loading').style.display = '';
+  document.getElementById('detail-content').style.display = 'none';
+
+  try {
+    const [statsRes, storyRes, starRes] = await Promise.all([
+      fetch(`/api/admin/star/${key}`,       { headers: apiHeaders() }),
+      fetch(`/api/admin/storybook/${key}`,  { headers: apiHeaders() }),
+      fetch(`/api/star/${key}`),
+    ]);
+    const [statsData, storyData, starData] = await Promise.all([
+      statsRes.json(), storyRes.json(), starRes.json(),
+    ]);
+
+    document.getElementById('detail-loading').style.display = 'none';
+    document.getElementById('detail-content').style.display = '';
+
+    const star  = statsData.star  || {};
+    const stats = statsData.stats || {};
+    const conn  = storyData.child_count || 0;
+
+    // 포스트카드 이미지
+    const imgUrl = starData.image_url;
+    if (imgUrl) {
+      const img = document.getElementById('detail-img');
+      img.src = imgUrl; img.style.display = 'block';
+      document.getElementById('detail-img-ph').style.display = 'none';
+    }
+
+    // 기본 정보
+    document.getElementById('detail-key').textContent = key;
+    document.getElementById('detail-loc').innerHTML   = locTag(star.location);
+    document.getElementById('detail-em').innerHTML    = emTag(star.emotion);
+    document.getElementById('detail-created').textContent = fmtDate(star.created_at);
+    document.getElementById('detail-sb').innerHTML =
+      storyData.storybook_ready
+        ? `<span class="sb-badge sb-ready">스토리북 생성 가능 ✓</span>`
+        : `<span class="sb-badge sb-no">스토리북 대기 중</span>`;
+
+    // 연결 배지
+    document.getElementById('detail-conn-n').textContent = stats.conversion_count || 0;
+
+    // 부모 별
+    const parent = storyData.parent;
+    if (parent) {
+      document.getElementById('detail-parent').style.display = '';
+      document.getElementById('detail-parent-info').innerHTML =
+        `<span style="font-family:monospace; font-size:12px; color:var(--primary)">${parent.access_key}</span>
+         &nbsp; ${locTag(parent.origin_location)} ${emTag(parent.emotion)}
+         <span style="font-size:12px; color:var(--text-dim); margin-left:8px">${fmtDate(parent.created_at)}</span>`;
+    }
+
+    // 지표 바
+    const maxVal = Math.max(stats.share_count, stats.view_count, stats.conversion_count, stats.return_count, 1);
+    const bars = [
+      { label: '공유', key: 'share_count',      cls: 'bar-share' },
+      { label: '유입', key: 'view_count',        cls: 'bar-view'  },
+      { label: '생성', key: 'conversion_count',  cls: 'bar-conv'  },
+      { label: '재공유', key: 'return_count',    cls: 'bar-ret'   },
+    ];
+    document.getElementById('detail-metrics').innerHTML = bars.map(b => {
+      const v = stats[b.key] || 0;
+      const w = Math.round((v / maxVal) * 100);
+      return `
+        <div class="metric-row">
+          <div class="metric-label">${b.label}</div>
+          <div class="bar-track"><div class="bar-fill ${b.cls}" style="width:${w}%"></div></div>
+          <div class="metric-val">${v}</div>
+        </div>`;
+    }).join('');
+
+    // stat cards
+    document.getElementById('detail-stat-cards').innerHTML = [
+      { label: '전환율',  value: stats.conversion_rate != null ? stats.conversion_rate + '%' : '—', sub: 'view → star' },
+      { label: '재공유',  value: stats.return_count || 0,  sub: '바이럴 체인' },
+    ].map(c => `
+      <div class="card" style="padding:14px 16px;">
+        <div class="card-title">${c.label}</div>
+        <div class="card-value" style="font-size:22px">${c.value}</div>
+        <div class="card-sub">${c.sub}</div>
+      </div>`).join('');
+
+    // 자식 별
+    const children = storyData.children || [];
+    document.getElementById('detail-child-n').textContent = children.length;
+    document.getElementById('detail-children').innerHTML = children.length
+      ? children.slice(0, 8).map(c => `
+          <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); cursor:pointer;"
+               onclick="openDetail('${c.access_key}')">
+            <span style="font-family:monospace; font-size:12px; color:var(--primary)">${c.access_key}</span>
+            ${locTag(c.origin_location)} ${emTag(c.emotion)}
+            <span style="font-size:12px; color:var(--text-dim); margin-left:auto">${fmtDate(c.created_at)}</span>
+          </div>`).join('')
+        + (children.length > 8 ? `<div style="font-size:12px; color:var(--text-dim); padding:10px 0;">+${children.length - 8}개 더</div>` : '')
+      : '<div style="color:var(--text-dim); font-size:13px;">아직 자식 별이 없어요</div>';
+
+    // 트리 버튼
+    document.getElementById('btn-goto-tree').onclick = () => {
+      document.getElementById('tree-key-input').value = key;
+      switchTab('tree');
+      loadTree();
+    };
+  } catch (e) {
+    document.getElementById('detail-loading').innerHTML = `<div style="color:var(--danger)">오류: ${e.message}</div>`;
+  }
+}
+
+// ── VIEW: Tree ─────────────────────────────────────────────────
+async function loadTree() {
+  const key = document.getElementById('tree-key-input').value.trim();
+  if (!key) return;
+
+  document.getElementById('tree-loading').style.display = '';
+  document.getElementById('tree-content').innerHTML = '';
+  document.getElementById('tree-detail-panel').style.display = 'none';
+
+  try {
+    const res  = await fetch(`/api/admin/connections/tree/${key}`, { headers: apiHeaders() });
+    const data = await res.json();
+
+    document.getElementById('tree-loading').style.display = 'none';
+
+    if (!data.success || !data.tree) {
+      document.getElementById('tree-content').innerHTML = '<div class="empty">별을 찾을 수 없습니다</div>';
+      return;
+    }
+
+    const el = renderTreeNode(data.tree, true);
+    document.getElementById('tree-content').innerHTML = '';
+    document.getElementById('tree-content').appendChild(el);
+
+    // 요약
+    const info = document.createElement('div');
+    info.style.cssText = 'font-size:12px; color:var(--text-dim); padding:10px 0 0; border-top:1px solid var(--border); margin-top:12px;';
+    info.textContent = `총 ${data.total_nodes}개 노드 · 최대 깊이 ${data.max_depth}`;
+    document.getElementById('tree-content').appendChild(info);
+  } catch (e) {
+    document.getElementById('tree-loading').style.display = 'none';
+    document.getElementById('tree-content').innerHTML = `<div style="color:var(--danger)">오류: ${e.message}</div>`;
+  }
+}
+
+function renderTreeNode(node, isRoot = false) {
+  const wrap = document.createElement('div');
+  wrap.className = 'tree-node';
+
+  const item = document.createElement('div');
+  item.className = 'tree-item' + (isRoot ? ' selected' : '');
+
+  const hasChildren = node.children && node.children.length > 0;
+  const toggle = document.createElement('div');
+  toggle.className = 'tree-toggle';
+  toggle.textContent = hasChildren ? '−' : '·';
+
+  const info = document.createElement('div');
+  info.style.flex = '1';
+  const share = parseInt(node.share_count || 0);
+  const view  = parseInt(node.view_count  || 0);
+  const child = parseInt(node.child_count || 0);
+
+  info.innerHTML = `
+    <div class="tree-chips">
+      <span class="tree-key">${node.access_key}</span>
+      ${locTag(node.origin_location)}
+      ${emTag(node.emotion)}
+      ${child  ? `<span class="tree-chip hot">연결 ${child}</span>` : ''}
+      ${share  ? `<span class="tree-chip">공유 ${share}</span>` : ''}
+      ${view   ? `<span class="tree-chip">유입 ${view}</span>`  : ''}
+      <span style="font-size:11px; color:var(--text-dim); margin-left:4px">${fmtDate(node.created_at)}</span>
+    </div>`;
+
+  item.appendChild(toggle);
+  item.appendChild(info);
+  item.addEventListener('click', (e) => {
+    e.stopPropagation();
+    showTreeNodeDetail(node);
+    document.querySelectorAll('.tree-item').forEach(el => el.classList.remove('selected'));
+    item.classList.add('selected');
+  });
+  wrap.appendChild(item);
+
+  if (hasChildren) {
+    const childWrap = document.createElement('div');
+    childWrap.className = 'tree-children';
+    let collapsed = false;
+
+    node.children.forEach(c => {
+      childWrap.appendChild(renderTreeNode(c));
+    });
+
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      collapsed = !collapsed;
+      childWrap.style.display = collapsed ? 'none' : '';
+      toggle.textContent = collapsed ? '+' : '−';
+    });
+
+    wrap.appendChild(childWrap);
+  }
+
+  return wrap;
+}
+
+function showTreeNodeDetail(node) {
+  const panel = document.getElementById('tree-detail-panel');
+  const detailEl = document.getElementById('tree-node-detail');
+  panel.style.display = '';
+
+  const child = parseInt(node.child_count || 0);
+  const view  = parseInt(node.view_count  || 0);
+  const share = parseInt(node.share_count || 0);
+  const rate  = view > 0 ? Math.round((child / view) * 100) : null;
+
+  detailEl.innerHTML = `
+    <div style="font-family:monospace; font-size:13px; color:var(--primary); margin-bottom:10px;">${node.access_key}</div>
+    <div style="margin-bottom:10px; display:flex; gap:8px; flex-wrap:wrap;">${locTag(node.origin_location)} ${emTag(node.emotion)}</div>
+    <div style="font-size:12px; color:var(--text-dim); margin-bottom:16px;">생성: ${fmtDate(node.created_at)} · depth ${node.depth}</div>
+    <div class="grid-4" style="grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:16px;">
+      <div class="card" style="padding:12px 14px;">
+        <div class="card-title">공유</div>
+        <div class="card-value" style="font-size:20px">${share}</div>
+      </div>
+      <div class="card" style="padding:12px 14px;">
+        <div class="card-title">유입</div>
+        <div class="card-value" style="font-size:20px">${view}</div>
+      </div>
+      <div class="card" style="padding:12px 14px;">
+        <div class="card-title">연결</div>
+        <div class="card-value" style="font-size:20px; color:var(--success)">${child}</div>
+      </div>
+      <div class="card" style="padding:12px 14px;">
+        <div class="card-title">전환율</div>
+        <div class="card-value" style="font-size:20px">${rate != null ? rate + '%' : '—'}</div>
+      </div>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn-sm" style="flex:1" onclick="openDetail('${node.access_key}'); switchTab('detail')">상세 보기</button>
+      <button class="btn-sm btn-ghost" style="flex:1" onclick="document.getElementById('tree-key-input').value='${node.access_key}'; loadTree()">이 별 기준 트리</button>
+    </div>`;
+}
+
+// ── Init ───────────────────────────────────────────────────────
+loadList();
+</script>
+</body>
+</html>
