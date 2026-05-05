@@ -2521,9 +2521,47 @@ app.get('/admin/star/:access_key', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin', 'star-detail.html'));
 });
 
-// ---------- 스토리북 공유 페이지 (/storybook/:id) ----------
-app.get('/storybook/:id', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'storybook-share.html'));
+// ---------- 스토리북 공유 페이지 (/storybook/:key) — OG SSR ----------
+app.get('/storybook/:key', async (req, res) => {
+  const { key } = req.params;
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+  let ogImage = `${baseUrl}/images/fallback/star-default.svg`;
+  let ogTitle = '나의 별 이야기 — 하루하루의 기적';
+  let ogDesc  = '여수에서 만든 나만의 별 스토리북';
+
+  try {
+    const dbMod = require('./database/db');
+    const isUuid = UUID_RE.test(key);
+    const { rows } = await dbMod.query(
+      `SELECT slides FROM storybooks WHERE ${isUuid ? 'id = $1' : 'share_key = $1'}`, [key]
+    );
+    if (rows.length) {
+      const slides = typeof rows[0].slides === 'string'
+        ? JSON.parse(rows[0].slides) : rows[0].slides;
+      const OG_PRIO = ['hamel', 'stay', 'cablecar', 'cafe'];
+      for (const loc of OG_PRIO) {
+        const s = (slides || []).find(sl => sl.location === loc && sl.image_url);
+        if (s) {
+          ogImage = s.image_url.startsWith('http') ? s.image_url : `${baseUrl}${s.image_url}`;
+          break;
+        }
+      }
+    }
+  } catch (_) {}
+
+  const fs = require('fs');
+  try {
+    let html = fs.readFileSync(path.join(__dirname, 'public', 'storybook-share.html'), 'utf8');
+    html = html
+      .replace(/PLACEHOLDER_OG_TITLE/g, ogTitle)
+      .replace(/PLACEHOLDER_OG_DESC/g,  ogDesc)
+      .replace(/PLACEHOLDER_OG_IMAGE/g, ogImage);
+    res.send(html);
+  } catch (_) {
+    res.sendFile(path.join(__dirname, 'public', 'storybook-share.html'));
+  }
 });
 
 // ---------- 별들의 고향 Routes (/api/hometown) ----------

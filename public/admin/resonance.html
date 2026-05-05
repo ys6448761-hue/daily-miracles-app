@@ -474,7 +474,8 @@ async function openDetail(key) {
          <span style="font-size:12px; color:var(--text-dim); margin-left:8px">${fmtDate(parent.created_at)}</span>`;
     }
 
-    // 지표 바
+    // 포스트카드 공유 지표 바
+    const sbStats = statsData.storybook_stats || {};
     const maxVal = Math.max(stats.share_count, stats.view_count, stats.conversion_count, stats.return_count, 1);
     const bars = [
       { label: '공유', key: 'share_count',      cls: 'bar-share' },
@@ -482,21 +483,40 @@ async function openDetail(key) {
       { label: '생성', key: 'conversion_count',  cls: 'bar-conv'  },
       { label: '재공유', key: 'return_count',    cls: 'bar-ret'   },
     ];
-    document.getElementById('detail-metrics').innerHTML = bars.map(b => {
-      const v = stats[b.key] || 0;
-      const w = Math.round((v / maxVal) * 100);
-      return `
-        <div class="metric-row">
-          <div class="metric-label">${b.label}</div>
-          <div class="bar-track"><div class="bar-fill ${b.cls}" style="width:${w}%"></div></div>
-          <div class="metric-val">${v}</div>
-        </div>`;
-    }).join('');
+    const sbMaxVal = Math.max(sbStats.share_count || 0, sbStats.view_count || 0, sbStats.conversion_count || 0, 1);
+    const sbBars = [
+      { label: 'SB공유', val: sbStats.share_count || 0,      cls: 'bar-share' },
+      { label: 'SB유입', val: sbStats.view_count || 0,        cls: 'bar-view'  },
+      { label: 'SB생성', val: sbStats.conversion_count || 0,  cls: 'bar-conv'  },
+    ];
+
+    document.getElementById('detail-metrics').innerHTML =
+      `<div style="font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-dim); margin-bottom:8px;">포스트카드 공유</div>` +
+      bars.map(b => {
+        const v = stats[b.key] || 0;
+        const w = Math.round((v / maxVal) * 100);
+        return `
+          <div class="metric-row">
+            <div class="metric-label">${b.label}</div>
+            <div class="bar-track"><div class="bar-fill ${b.cls}" style="width:${w}%"></div></div>
+            <div class="metric-val">${v}</div>
+          </div>`;
+      }).join('') +
+      `<div style="font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-dim); margin:14px 0 8px;">스토리북 공유</div>` +
+      sbBars.map(b => {
+        const w = Math.round((b.val / sbMaxVal) * 100);
+        return `
+          <div class="metric-row">
+            <div class="metric-label">${b.label}</div>
+            <div class="bar-track"><div class="bar-fill ${b.cls}" style="width:${w}%; opacity:.7;"></div></div>
+            <div class="metric-val">${b.val}</div>
+          </div>`;
+      }).join('');
 
     // stat cards
     document.getElementById('detail-stat-cards').innerHTML = [
-      { label: '전환율',  value: stats.conversion_rate != null ? stats.conversion_rate + '%' : '—', sub: 'view → star' },
-      { label: '재공유',  value: stats.return_count || 0,  sub: '바이럴 체인' },
+      { label: '포스트카드 전환율', value: stats.conversion_rate != null ? stats.conversion_rate + '%' : '—', sub: 'view → star' },
+      { label: '스토리북 전환율',   value: sbStats.conversion_rate != null ? sbStats.conversion_rate + '%' : '—', sub: 'SB view → star' },
     ].map(c => `
       <div class="card" style="padding:14px 16px;">
         <div class="card-title">${c.label}</div>

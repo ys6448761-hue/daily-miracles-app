@@ -4,9 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>나의 별 이야기 — Daily Miracles</title>
-  <meta property="og:title"       content="나의 별 이야기">
-  <meta property="og:description" content="하루하루의 기적 — 공명 스토리북">
+  <meta property="og:title"       content="PLACEHOLDER_OG_TITLE">
+  <meta property="og:description" content="PLACEHOLDER_OG_DESC">
+  <meta property="og:image"       content="PLACEHOLDER_OG_IMAGE">
   <meta property="og:type"        content="website">
+  <meta name="twitter:card"       content="summary_large_image">
+  <meta name="twitter:image"      content="PLACEHOLDER_OG_IMAGE">
   <style>
     :root {
       --bg: #080814;
@@ -130,6 +133,11 @@
     <div class="cta-wrap">
       <p class="cta-text">당신만의 별 이야기를<br>지금 시작해보세요</p>
       <a class="cta-btn" id="cta-link" href="/star-entry.html">나의 별 만들기 →</a>
+      <div style="margin-top:18px;">
+        <button class="cta-btn" id="share-btn"
+          style="background:transparent; border:1px solid var(--primary); color:var(--primary); width:100%; margin-top:0;"
+          onclick="shareStorybook()">이 이야기 공유하기 ✦</button>
+      </div>
     </div>
   </div>
   <div id="error" class="error" style="display:none">이야기를 찾을 수 없어요 🌙</div>
@@ -137,10 +145,19 @@
 
 <script>
 const STORYBOOK_ID = window.location.pathname.split('/').pop();
+const URL_PARAMS   = new URLSearchParams(window.location.search);
+const REF_KEY      = URL_PARAMS.get('ref') || null;
 
 const EM_KO  = { confusion:'혼란', calm:'고요', fragile_hope:'희망', curiosity:'호기심', pause:'멈춤' };
 const LOC_KO = { cablecar:'케이블카', cafe:'카페', hamel:'하멜', stay:'숙소' };
 const LOC_IC = { cablecar:'🚡', cafe:'☕', hamel:'⚓', stay:'🏠' };
+
+// 방문 기록 (non-blocking)
+fetch('/api/storybook/view', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ share_key: STORYBOOK_ID, ref_access_key: REF_KEY }),
+}).catch(() => {});
 
 async function load() {
   try {
@@ -158,17 +175,18 @@ async function load() {
       `${meta.card_count || ''}개 카드 · ${meta.flow_type === 'full' ? 'full' : 'compact'}`;
 
     // hero
-    const flowKey = `${meta.first_emotion}→${meta.last_emotion}`;
     document.getElementById('hero').innerHTML = `
       <div class="hero-emotion">✦</div>
       <div class="hero-title">나의 여수 이야기</div>
       <div class="hero-sub">${EM_KO[meta.first_emotion]||''} → ${EM_KO[meta.last_emotion]||''}</div>`;
 
-    // CTA ref link
-    if (data.access_key) {
-      document.getElementById('cta-link').href =
-        `/star-entry.html?ref=${encodeURIComponent(data.access_key)}`;
-    }
+    // CTA ref link — ref + from_storybook 추가
+    const ctaParams = new URLSearchParams();
+    if (data.access_key) ctaParams.set('ref', data.access_key);
+    if (data.share_key)  ctaParams.set('from_storybook', data.share_key);
+    else if (STORYBOOK_ID) ctaParams.set('from_storybook', STORYBOOK_ID);
+    document.getElementById('cta-link').href =
+      `/star-entry.html?${ctaParams.toString()}`;
 
     // slides
     const slides = data.storybook || [];
@@ -208,6 +226,28 @@ function mainStarPh(emotion) {
 
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function shareStorybook() {
+  const shareUrl = window.location.href;
+  fetch('/api/storybook/share-click', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ share_key: STORYBOOK_ID, channel: 'link' }),
+  }).catch(() => {});
+
+  if (navigator.share) {
+    navigator.share({ title: '나의 여수 이야기', url: shareUrl }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      const btn = document.getElementById('share-btn');
+      const orig = btn.textContent;
+      btn.textContent = '링크가 복사됐어요 ✓';
+      setTimeout(() => { btn.textContent = orig; }, 2000);
+    }).catch(() => {
+      prompt('이 링크를 복사하세요:', shareUrl);
+    });
+  }
 }
 
 load();

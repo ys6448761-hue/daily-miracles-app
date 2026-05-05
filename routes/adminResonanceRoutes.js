@@ -64,8 +64,10 @@ router.get('/star/:access_key', adminGuard, async (req, res) => {
     }
     const star = starRows[0];
 
-    // 병렬 통계 조회
-    const [shareRes, viewRes, convRes, returnRes, connAggRes] = await Promise.all([
+    // 병렬 통계 조회 (포스트카드 + 스토리북)
+    const [shareRes, viewRes, convRes, returnRes, connAggRes,
+           sbViewRes, sbShareRes, sbConvRes] = await Promise.all([
+      // 포스트카드 공유 퍼널
       db.query('SELECT COUNT(*) AS n FROM star_share_events WHERE access_key = $1', [access_key])
         .catch(() => ({ rows: [{ n: 0 }] })),
       db.query('SELECT COUNT(*) AS n FROM star_visit_events WHERE ref_access_key = $1', [access_key])
@@ -78,14 +80,32 @@ router.get('/star/:access_key', adminGuard, async (req, res) => {
            AND EXISTS (SELECT 1 FROM stars gc WHERE gc.parent_ref = c.access_key)`,
         [access_key]
       ).catch(() => ({ rows: [{ n: 0 }] })),
-      // first/last seen + revisit from aggregated table (migration 161)
       db.query(
         'SELECT first_seen_at, last_seen_at, revisit_count FROM star_connections_agg WHERE ref_access_key = $1',
         [access_key]
       ).catch(() => ({ rows: [] })),
+      // 스토리북 공유 퍼널 (migrations 168-170)
+      db.query(
+        `SELECT COUNT(*) AS n FROM storybook_view_events
+         WHERE storybook_id IN (SELECT id FROM storybooks WHERE access_key = $1)`,
+        [access_key]
+      ).catch(() => ({ rows: [{ n: 0 }] })),
+      db.query(
+        `SELECT COUNT(*) AS n FROM storybook_share_events
+         WHERE storybook_id IN (SELECT id FROM storybooks WHERE access_key = $1)`,
+        [access_key]
+      ).catch(() => ({ rows: [{ n: 0 }] })),
+      db.query(
+        `SELECT COUNT(*) AS n FROM stars
+         WHERE source_storybook_id IN (SELECT id FROM storybooks WHERE access_key = $1)`,
+        [access_key]
+      ).catch(() => ({ rows: [{ n: 0 }] })),
     ]);
 
     const connAgg = connAggRes.rows[0] || null;
+    const sbView  = toInt(sbViewRes.rows[0].n);
+    const sbShare = toInt(sbShareRes.rows[0].n);
+    const sbConv  = toInt(sbConvRes.rows[0].n);
 
     return res.json({
       success: true,
@@ -108,6 +128,12 @@ router.get('/star/:access_key', adminGuard, async (req, res) => {
           ? Math.round((toInt(convRes.rows[0].n) / toInt(viewRes.rows[0].n)) * 100)
           : null,
         resonance_score:  toInt(star.resonance_score),
+      },
+      storybook_stats: {
+        view_count:       sbView,
+        share_count:      sbShare,
+        conversion_count: sbConv,
+        conversion_rate:  sbView > 0 ? Math.round((sbConv / sbView) * 100) : null,
       },
       connections: connAgg ? {
         first_seen_at: connAgg.first_seen_at,

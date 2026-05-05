@@ -1825,6 +1825,17 @@ if (process.env.NODE_ENV !== 'production') {
 
 const LOCATION_ORDER = ['cablecar', 'cafe', 'hamel', 'stay'];
 
+// OG 이미지용 우선순위 (대표 포스트카드 선택)
+const OG_PRIORITY = ['hamel', 'stay', 'cablecar', 'cafe'];
+
+function generateShareKey() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  return Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+
+// UUID 형식 판별 (36자리 하이픈 포함)
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 const EMOTION_FLOW_TEXT = {
   'confusion→confusion':       ['길을 잃은 채로 걸었어요', '그래도 멈추지 않았어요'],
   'confusion→calm':            ['처음엔 아무것도 보이지 않았어요', '조금씩 고요해졌어요'],
@@ -1942,14 +1953,24 @@ router.post('/generate', async (req, res) => {
           ).catch(() => ({ rows: [] }));
           journey_id = jr[0]?.journey_id || null;
         }
+        // share_key 생성 (충돌 시 재시도 최대 3회)
+        let share_key = null;
+        for (let i = 0; i < 3; i++) {
+          const candidate = generateShareKey();
+          const { rows: ck } = await db.query(
+            'SELECT 1 FROM storybooks WHERE share_key = $1', [candidate]
+          ).catch(() => ({ rows: [] }));
+          if (!ck.length) { share_key = candidate; break; }
+        }
+
         const { rows: sbRows } = await db.query(
-          `INSERT INTO storybooks (access_key, journey_id, slides, meta)
-           VALUES ($1, $2, $3, $4) RETURNING id`,
-          [ref_access_key || null, journey_id, JSON.stringify(slides), JSON.stringify(meta)]
+          `INSERT INTO storybooks (access_key, journey_id, slides, meta, share_key)
+           VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+          [ref_access_key || null, journey_id, JSON.stringify(slides), JSON.stringify(meta), share_key]
         );
         storybookId = sbRows[0]?.id;
         if (storybookId) {
-          share_url = `/storybook/${storybookId}`;
+          share_url = share_key ? `/storybook/${share_key}` : `/storybook/${storybookId}`;
           // storybook_items 저장 (migration 166)
           const itemValues = slides.map((s, i) => [
             storybookId, i, s.type, s.role || null,
@@ -1964,7 +1985,7 @@ router.post('/generate', async (req, res) => {
             )
           )).catch(() => {});
         }
-      } catch (_) { /* migration 162/166 미실행 시 무시 */ }
+      } catch (_) { /* migration 162/166/167 미실행 시 무시 */ }
     }
 
     return res.json({ success: true, id: storybookId, share_url, meta, storybook: slides });
@@ -1974,17 +1995,20 @@ router.post('/generate', async (req, res) => {
   }
 });
 
-// ── GET /s/:id — 저장된 스토리북 조회 (공유 링크용) ───────────────
-router.get('/s/:id', async (req, res) => {
-  const { id } = req.params;
+// ── GET /s/:key — 저장된 스토리북 조회 (share_key 또는 UUID) ────────
+router.get('/s/:key', async (req, res) => {
+  const { key } = req.params;
   if (!db) return res.status(503).json({ success: false, error: 'DB unavailable' });
   try {
+    const isUuid = UUID_RE.test(key);
     const { rows } = await db.query(
-      'SELECT id, access_key, journey_id, slides, meta, created_at FROM storybooks WHERE id = $1',
-      [id]
+      `SELECT id, access_key, journey_id, slides, meta, share_key, created_at
+       FROM storybooks WHERE ${isUuid ? 'id = $1' : 'share_key = $1'}`,
+      [key]
     );
     if (!rows.length) return res.status(404).json({ success: false, error: 'not found' });
     const row = rows[0];
+    const shareKey = row.share_key || row.id;
     return res.json({
       success:    true,
       id:         row.id,
@@ -1992,14 +2016,83 @@ router.get('/s/:id', async (req, res) => {
       journey_id: row.journey_id,
       meta:       row.meta,
       storybook:  row.slides,
+      share_key:  row.share_key,
       created_at: row.created_at,
-      share_url:  `/storybook/${id}`,
+      share_url:  `/storybook/${shareKey}`,
     });
   } catch (err) {
     if (err.code === '42P01') return res.status(404).json({ success: false, error: 'not found' });
-    console.error('[storybook] GET /s/:id error:', err.message);
+    console.error('[storybook] GET /s/:key error:', err.message);
     res.status(500).json({ success: false, error: err.message });
   }
+});
+
+// ── POST /view — 스토리북 공유 링크 방문 기록 (migration 168) ─────
+router.post('/view', async (req, res) => {
+  const { share_key, storybook_id, ref_access_key } = req.body;
+  if (!share_key && !storybook_id) return res.json({ success: true });
+  if (!db) return res.json({ success: true });
+
+  try {
+    let sbId = storybook_id || null;
+    if (!sbId && share_key) {
+      const { rows } = await db.query(
+        'SELECT id FROM storybooks WHERE share_key = $1 LIMIT 1', [share_key]
+      ).catch(() => ({ rows: [] }));
+      sbId = rows[0]?.id || null;
+    }
+    if (sbId) {
+      db.query(
+        'INSERT INTO storybook_view_events (storybook_id, share_key, ref_access_key) VALUES ($1,$2,$3)',
+        [sbId, share_key || null, ref_access_key || null]
+      ).catch(() => {});
+    }
+  } catch (_) {}
+  return res.json({ success: true });
+});
+
+// ── POST /share-click — 스토리북 공유 버튼 클릭 기록 (migration 169)
+router.post('/share-click', async (req, res) => {
+  const { share_key, storybook_id, channel = 'link' } = req.body;
+  if (!share_key && !storybook_id) return res.json({ success: true });
+  if (!db) return res.json({ success: true });
+
+  try {
+    let sbId = storybook_id || null;
+    if (!sbId && share_key) {
+      const { rows } = await db.query(
+        'SELECT id FROM storybooks WHERE share_key = $1 LIMIT 1', [share_key]
+      ).catch(() => ({ rows: [] }));
+      sbId = rows[0]?.id || null;
+    }
+    if (sbId) {
+      db.query(
+        'INSERT INTO storybook_share_events (storybook_id, share_key, channel) VALUES ($1,$2,$3)',
+        [sbId, share_key || null, channel]
+      ).catch(() => {});
+    }
+  } catch (_) {}
+  return res.json({ success: true });
+});
+
+// ── GET /og/:key — OG 메타 (서버에서 대표 이미지 결정) ────────────
+router.get('/og/:key', async (req, res) => {
+  const { key } = req.params;
+  if (!db) return res.json({ og_image: null });
+  try {
+    const isUuid = UUID_RE.test(key);
+    const { rows } = await db.query(
+      `SELECT slides FROM storybooks WHERE ${isUuid ? 'id = $1' : 'share_key = $1'}`, [key]
+    ).catch(() => ({ rows: [] }));
+    if (!rows.length) return res.json({ og_image: null });
+    const slides = typeof rows[0].slides === 'string' ? JSON.parse(rows[0].slides) : rows[0].slides;
+    let og_image = null;
+    for (const loc of OG_PRIORITY) {
+      const s = slides.find(sl => sl.location === loc && sl.image_url);
+      if (s) { og_image = s.image_url; break; }
+    }
+    return res.json({ og_image });
+  } catch (_) { return res.json({ og_image: null }); }
 });
 
 module.exports = router;

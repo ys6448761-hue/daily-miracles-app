@@ -544,8 +544,17 @@ router.post('/preview', async (req, res) => {
 router.post('/commit', async (req, res) => {
   try {
     const { emotion, origin_location = 'cablecar', preview_image_url, phone_number,
-            wish_text, gem_type, parent_ref } = req.body;
+            wish_text, gem_type, parent_ref, from_storybook } = req.body;
     if (!emotion) return res.status(400).json({ success: false, error: 'emotion 필수' });
+
+    // source_storybook_id: from_storybook(share_key) → UUID 조회 (migration 170)
+    let source_storybook_id = null;
+    if (from_storybook) {
+      const { rows: sbRows } = await db.query(
+        'SELECT id FROM storybooks WHERE share_key = $1 LIMIT 1', [from_storybook]
+      ).catch(() => ({ rows: [] }));
+      source_storybook_id = sbRows[0]?.id || null;
+    }
 
     const _wishText = (wish_text && wish_text.trim()) || emotion || '케이블카 별';
     const _gemType  = gem_type || 'cablecar';
@@ -566,11 +575,11 @@ router.post('/commit', async (req, res) => {
       try {
         const { rows } = await db.query(
           `INSERT INTO stars
-             (id, user_id, wish_text, gem_type, status, access_key, origin_location, emotion, is_public, phone_number, parent_ref, journey_id)
+             (id, user_id, wish_text, gem_type, status, access_key, origin_location, emotion, is_public, phone_number, parent_ref, journey_id, source_storybook_id)
            VALUES
-             (gen_random_uuid(), $1, $2, $3, 'PRE-ON', $4, $5, $6, false, $7, $8, $9)
+             (gen_random_uuid(), $1, $2, $3, 'PRE-ON', $4, $5, $6, false, $7, $8, $9, $10)
            RETURNING id, access_key, created_at`,
-          [crypto.randomUUID(), _wishText, _gemType, access_key, origin_location, emotion || null, phone_number || null, parent_ref || null, journey_id]
+          [crypto.randomUUID(), _wishText, _gemType, access_key, origin_location, emotion || null, phone_number || null, parent_ref || null, journey_id, source_storybook_id]
         );
         inserted = rows[0];
         break;

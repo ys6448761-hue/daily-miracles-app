@@ -179,8 +179,10 @@
 
   <script>
     const FLOW_ASCEND = 8;
-    const loc = new URLSearchParams(location.search).get('loc') || 'direct';
-    const ref = new URLSearchParams(location.search).get('ref') || null;
+    const _sp           = new URLSearchParams(location.search);
+    const loc           = _sp.get('loc')            || 'direct';
+    const ref           = _sp.get('ref')            || null;
+    const fromStorybook = _sp.get('from_storybook') || null;
 
     // ?ref= 방문 이벤트 기록
     if (ref) {
@@ -277,12 +279,13 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            emotion:           selectedEmotion,
-            origin_location:   loc,
-            preview_image_url: genData.image_url,
-            wish_text:         wishText.trim(),
-            gem_type:          selectedGem,
-            parent_ref:        ref,
+            emotion:             selectedEmotion,
+            origin_location:     loc,
+            preview_image_url:   genData.image_url,
+            wish_text:           wishText.trim(),
+            gem_type:            selectedGem,
+            parent_ref:          ref,
+            from_storybook:      fromStorybook,
           }),
         });
         const commitData = await commitRes.json();
