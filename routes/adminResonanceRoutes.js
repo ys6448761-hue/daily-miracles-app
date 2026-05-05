@@ -67,7 +67,6 @@ router.get('/star/:access_key', adminGuard, async (req, res) => {
     // 병렬 통계 조회 (포스트카드 + 스토리북)
     const [shareRes, viewRes, convRes, returnRes, connAggRes,
            sbViewRes, sbShareRes, sbConvRes] = await Promise.all([
-      // 포스트카드 공유 퍼널
       db.query('SELECT COUNT(*) AS n FROM star_share_events WHERE access_key = $1', [access_key])
         .catch(() => ({ rows: [{ n: 0 }] })),
       db.query('SELECT COUNT(*) AS n FROM star_visit_events WHERE ref_access_key = $1', [access_key])
@@ -84,7 +83,6 @@ router.get('/star/:access_key', adminGuard, async (req, res) => {
         'SELECT first_seen_at, last_seen_at, revisit_count FROM star_connections_agg WHERE ref_access_key = $1',
         [access_key]
       ).catch(() => ({ rows: [] })),
-      // 스토리북 공유 퍼널 (migrations 168-170)
       db.query(
         `SELECT COUNT(*) AS n FROM storybook_view_events
          WHERE storybook_id IN (SELECT id FROM storybooks WHERE access_key = $1)`,
@@ -100,6 +98,27 @@ router.get('/star/:access_key', adminGuard, async (req, res) => {
          WHERE source_storybook_id IN (SELECT id FROM storybooks WHERE access_key = $1)`,
         [access_key]
       ).catch(() => ({ rows: [{ n: 0 }] })),
+    ]);
+
+    // impact 통계 (migration 171) — journey_id 기준
+    const [impactCntRes, actionCntRes, impactAvgRes] = await Promise.all([
+      db.query(
+        `SELECT COUNT(*) AS n FROM impacts
+         WHERE journey_id = (SELECT journey_id FROM stars WHERE access_key = $1 LIMIT 1)`,
+        [access_key]
+      ).catch(() => ({ rows: [{ n: 0 }] })),
+      db.query(
+        `SELECT COUNT(*) AS n FROM impacts
+         WHERE action_type IS NOT NULL
+           AND journey_id = (SELECT journey_id FROM stars WHERE access_key = $1 LIMIT 1)`,
+        [access_key]
+      ).catch(() => ({ rows: [{ n: 0 }] })),
+      db.query(
+        `SELECT ROUND(AVG(impact_level)::numeric, 1) AS avg FROM impacts
+         WHERE impact_level IS NOT NULL
+           AND journey_id = (SELECT journey_id FROM stars WHERE access_key = $1 LIMIT 1)`,
+        [access_key]
+      ).catch(() => ({ rows: [{ avg: null }] })),
     ]);
 
     const connAgg = connAggRes.rows[0] || null;
@@ -134,6 +153,11 @@ router.get('/star/:access_key', adminGuard, async (req, res) => {
         share_count:      sbShare,
         conversion_count: sbConv,
         conversion_rate:  sbView > 0 ? Math.round((sbConv / sbView) * 100) : null,
+      },
+      impact_stats: {
+        impact_count: toInt(impactCntRes.rows[0].n),
+        action_count: toInt(actionCntRes.rows[0].n),
+        avg_level:    impactAvgRes.rows[0]?.avg ? parseFloat(impactAvgRes.rows[0].avg) : null,
       },
       connections: connAgg ? {
         first_seen_at: connAgg.first_seen_at,

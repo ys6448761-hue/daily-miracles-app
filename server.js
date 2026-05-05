@@ -2511,6 +2511,15 @@ app.get('/dreamtown/admin/location/:code', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin', 'location.html'));
 });
 
+// ---------- Impact Routes (/api/impact) ----------
+try {
+  const impactRoutes = require('./routes/impactRoutes');
+  app.use('/api/impact', impactRoutes);
+  console.log('✅ Impact 라우터 등록 완료 (/api/impact)');
+} catch (e) {
+  console.warn('⚠️ impactRoutes 로드 실패:', e.message);
+}
+
 // ---------- 공명 관리자 대시보드 (/admin/resonance) ----------
 app.get('/admin/resonance', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin', 'resonance.html'));

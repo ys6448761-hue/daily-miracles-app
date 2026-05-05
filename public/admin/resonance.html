@@ -273,7 +273,7 @@
           <div id="detail-metrics"></div>
         </div>
         <div class="card" style="margin-bottom:16px;">
-          <div class="grid-4" id="detail-stat-cards" style="grid-template-columns:repeat(2,1fr);"></div>
+          <div class="grid-4" id="detail-stat-cards" style="grid-template-columns:repeat(3,1fr); gap:10px;"></div>
         </div>
         <div class="card">
           <div style="font-size:14px; font-weight:600; margin-bottom:14px;">연결된 자식 별 <span id="detail-child-n" style="color:var(--primary)"></span></div>
@@ -514,9 +514,13 @@ async function openDetail(key) {
       }).join('');
 
     // stat cards
+    const impStats = statsData.impact_stats || {};
     document.getElementById('detail-stat-cards').innerHTML = [
       { label: '포스트카드 전환율', value: stats.conversion_rate != null ? stats.conversion_rate + '%' : '—', sub: 'view → star' },
       { label: '스토리북 전환율',   value: sbStats.conversion_rate != null ? sbStats.conversion_rate + '%' : '—', sub: 'SB view → star' },
+      { label: '임팩트 수',        value: impStats.impact_count || 0,  sub: '완독 후 마음 남김' },
+      { label: '행동 선언',        value: impStats.action_count || 0,  sub: '행동 유형 선택' },
+      { label: '평균 울림',        value: impStats.avg_level   != null ? '★ ' + impStats.avg_level : '—', sub: '임팩트 레벨 (5점)' },
     ].map(c => `
       <div class="card" style="padding:14px 16px;">
         <div class="card-title">${c.label}</div>
