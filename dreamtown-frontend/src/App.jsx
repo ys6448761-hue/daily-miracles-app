@@ -44,12 +44,17 @@ import PartnerApplyResult from './pages/PartnerApplyResult.jsx';
 import PartnerLogin from './pages/PartnerLogin.jsx';
 import PartnerDashboard from './pages/PartnerDashboard.jsx';
 import OnboardingPage from './pages/OnboardingPage.jsx';
+import FeedPage from './pages/FeedPage.jsx';
+import ConstellationPage from './pages/ConstellationPage.jsx';
+import DreamTownMapPage from './pages/DreamTownMapPage.jsx';
+import GalaxyPage from './pages/GalaxyPage.jsx';
 import AdminBenefitPage from './pages/AdminBenefitPage.jsx';
 import AdminExperimentPage from './pages/AdminExperimentPage.jsx';
 import AdminKpiPage from './pages/AdminKpiPage.jsx';
 import AdminAiDashboard from './pages/AdminAiDashboard.jsx';
 import VoyageAdmin from './pages/VoyageAdmin.jsx';
 import JourneyWishPage from './pages/JourneyWishPage.jsx';
+import YeosuJourneyPage from './pages/YeosuJourneyPage.jsx';
 import JourneyContextPage from './pages/JourneyContextPage.jsx';
 import JourneyRecommendPage from './pages/JourneyRecommendPage.jsx';
 import StarJourneyPage from './pages/StarJourneyPage.jsx';
@@ -114,6 +119,10 @@ export default function App() {
           <Route path="/story-draft-mvp"     element={<StoryDraftMVP />} />
           <Route path="/star/:id"    element={<StarDetail />} />
           <Route path="/galaxy"      element={<Galaxy />} />
+          <Route path="/feed"                    element={<FeedPage />} />
+          <Route path="/constellation/:id"       element={<ConstellationPage />} />
+          <Route path="/dreamtown-map"           element={<DreamTownMapPage />} />
+          <Route path="/galaxy/:id"              element={<GalaxyPage />} />
           <Route path="/day"              element={<Day />} />
           <Route path="/day7-complete"   element={<Day7Complete />} />
           <Route path="/history"     element={<History />} />
@@ -170,8 +179,10 @@ export default function App() {
           <Route path="/admin/location/:loc"       element={<LocationAdmin />} />
           {/* /admin/* catch-all — catch-all → / → AppLaunch 경로 차단 */}
           <Route path="/admin/*"                   element={<VoyageAdmin />} />
-          {/* Core Journey Flow */}
-          <Route path="/journey"                   element={<JourneyWishPage />} />
+          {/* 여수 소원여정 Soft Pay 랜딩 */}
+          <Route path="/journey"                   element={<YeosuJourneyPage />} />
+          {/* Core Journey AI Flow */}
+          <Route path="/journey/ai"                element={<JourneyWishPage />} />
           <Route path="/journey/context"           element={<JourneyContextPage />} />
           <Route path="/journey/recommend"         element={<JourneyRecommendPage />} />
           {/* Star Journey — 파트너 방문 동선 탐색 */}

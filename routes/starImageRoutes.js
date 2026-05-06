@@ -99,9 +99,26 @@ The background shows the historic red-brick lighthouse, calm harbor water, and g
 Strictly avoid Japanese traditional clothing, anime exaggeration, travel poster feeling, backpacks, suitcases, tourist pose, 3D, photorealism.`,
 };
 // default = cablecar (기존 동작 유지)
-PROMPT_TEMPLATES.default       = PROMPT_TEMPLATES.cablecar;
-PROMPT_TEMPLATES.yeosu_cablecar = PROMPT_TEMPLATES.cablecar;
-PROMPT_TEMPLATES.yeosu_hamel    = PROMPT_TEMPLATES.hamel;
+PROMPT_TEMPLATES.default = PROMPT_TEMPLATES.cablecar;
+
+// ── Location SSOT — canonical: cablecar / hamel ─────────────────────
+// alias (yeosu_cablecar/yeosu_hamel/yeosu-*) 입력 허용, deprecation warning
+const LOCATION_ALIAS = {
+  'yeosu_cablecar':  'cablecar',
+  'yeosu-cablecar':  'cablecar',
+  'yeosu_hamel':     'hamel',
+  'yeosu-hamel':     'hamel',
+  'hamel_village':   'hamel',
+};
+
+function normalizeLocation(loc) {
+  if (!loc) return 'direct';
+  if (LOCATION_ALIAS[loc]) {
+    console.warn(`[star-image] location alias deprecated: "${loc}" → "${LOCATION_ALIAS[loc]}". 호출자는 canonical key 사용 필요.`);
+    return LOCATION_ALIAS[loc];
+  }
+  return loc;
+}
 
 function generatePrompt(emotionKey, gem, location) {
   const emo      = EMOTION_MAP[emotionKey] || EMOTION_MAP.comfort;
@@ -288,7 +305,7 @@ async function generateWithDallE3(prompt) {
 
 // ── POST /generate ────────────────────────────────────────────────
 router.post('/generate', async (req, res) => {
-  const { emotion, gem, location = 'direct' } = req.body || {};
+  const { emotion, gem, location: rawLocation = 'direct' } = req.body || {};
 
   if (!emotion || !gem) {
     return res.status(400).json({ success: false, error: 'emotion, gem 필수' });
@@ -303,58 +320,89 @@ router.post('/generate', async (req, res) => {
     return res.status(400).json({ success: false, error: '알 수 없는 보석' });
   }
 
+  // location SSOT — canonical 1종만 내부 사용
+  const requestedLocation = rawLocation;
+  const location          = normalizeLocation(rawLocation);
+
   const emotionMeta = EMOTION_MAP[emotionKey];
   const cacheKey    = `${emotionKey}_${gem}_${location}`;
   const sentence    = emotionMeta.sentence;
+  const cacheDir    = getCacheDir(location);
 
-  const cacheDir = getCacheDir(location);
+  // 모든 응답에 공통으로 들어가는 운영 로그 필드
+  const buildPayload = (extra) => ({
+    success: true,
+    sentence,
+    requested_location: requestedLocation,
+    resolved_location:  location,
+    ...extra,
+  });
 
-  // ── yeosu_cablecar 사전 생성 이미지 우선 조회 ────────────────────
-  if (location === 'cablecar' || location === 'yeosu_cablecar') {
+  // ── cablecar 사전 생성 이미지 우선 조회 ──────────────────────────
+  if (location === 'cablecar') {
     const pregenUrl = getCablecarStage1Image(emotionKey, gem);
     if (pregenUrl) {
       const postcardUrl = await copyPregenToPostcards(pregenUrl).catch(() => null);
       if (postcardUrl) {
-        return res.json({ success: true, image_url: postcardUrl, sentence, from_cache: true,
-          requested_location: location, resolved_location: 'cablecar', source_image: pregenUrl });
+        return res.json(buildPayload({
+          image_url:     postcardUrl,
+          from_cache:    true,
+          source_image:  pregenUrl,
+          fallback_used: false,
+        }));
       }
     }
+    // pregen 미스 → AI 생성 fallback (location 강제 매칭은 PROMPT_TEMPLATES.cablecar)
   }
 
-  // ── yeosu_hamel 썸네일 이미지 우선 조회 ────────────────────────
-  if (location === 'hamel' || location === 'yeosu_hamel') {
+  // ── hamel 썸네일 이미지 우선 조회 ────────────────────────────────
+  if (location === 'hamel') {
     const pregenUrl   = getHamelThumbnailImage(emotionKey);
     const postcardUrl = await copyPregenToPostcards(pregenUrl).catch(() => null);
     if (postcardUrl) {
-      return res.json({ success: true, image_url: postcardUrl, sentence, from_cache: true,
-        requested_location: location, resolved_location: 'hamel', source_image: pregenUrl });
+      return res.json(buildPayload({
+        image_url:     postcardUrl,
+        from_cache:    true,
+        source_image:  pregenUrl,
+        fallback_used: false,
+      }));
     }
+    // pregen 미스 → AI 생성 fallback (PROMPT_TEMPLATES.hamel 사용)
   }
 
-  // ── yeosu_cafe 사전 생성 이미지 우선 조회 ─────────────────────
+  // ── yeosu_cafe 사전 생성 이미지 (legacy stage2) ──────────────────
   if (location === 'yeosu_cafe') {
     const emotionNorm = emotionKey.replace(/\s+/g, '_');
     const pregenUrl   = getStarImage(emotionNorm, gem);
     if (pregenUrl) {
       const postcardUrl = await copyPregenToPostcards(pregenUrl).catch(() => null);
       if (postcardUrl) {
-        return res.json({ success: true, image_url: postcardUrl, sentence, from_cache: true,
-          requested_location: location, resolved_location: 'yeosu_cafe', source_image: pregenUrl });
+        return res.json(buildPayload({
+          image_url:     postcardUrl,
+          from_cache:    true,
+          source_image:  pregenUrl,
+          fallback_used: false,
+        }));
       }
     }
   }
 
-  // ── 캐시 조회 ──────────────────────────────────────────────────
+  // ── DB 캐시 조회 ───────────────────────────────────────────────
   try {
     const { rows } = await db.query(
       'SELECT image_url FROM star_image_cache WHERE cache_key = $1',
       [cacheKey]
     );
     if (rows.length > 0) {
-      const imageUrl  = rows[0].image_url;
-      const filePath  = path.join(cacheDir, `${cacheKey}.png`);
+      const imageUrl = rows[0].image_url;
+      const filePath = path.join(cacheDir, `${cacheKey}.png`);
       if (fs.existsSync(filePath)) {
-        return res.json({ success: true, image_url: imageUrl, sentence, from_cache: true });
+        return res.json(buildPayload({
+          image_url:     imageUrl,
+          from_cache:    true,
+          source_image:  'db-cache',
+          fallback_used: false,
+        }));
       }
       // 파일 없으면 (ephemeral 재시작) → 재생성
     }
@@ -363,20 +411,35 @@ router.post('/generate', async (req, res) => {
   }
 
   // ── 이미지 생성 ────────────────────────────────────────────────
-  const prompt = generatePrompt(emotionKey, gem, location);
-  let   imgBuf = null;
+  // location이 cablecar/hamel인데 pregen이 비어 떨어진 경우 — 'pregen-miss' fallback
+  const pregenMissed = (location === 'cablecar' || location === 'hamel');
+  const prompt       = generatePrompt(emotionKey, gem, location);
+  let   imgBuf       = null;
+  let   sourceModel  = null;
+  let   fallbackUsed = pregenMissed ? 'pregen-miss' : false;
 
   try {
     imgBuf = await generateWithGptImage1(prompt);
+    sourceModel = 'gpt-image-1';
     console.log(`[star-image] gpt-image-1 생성 완료 | ${cacheKey}`);
   } catch (e1) {
     console.warn(`[star-image] gpt-image-1 실패, DALL-E 3 fallback | ${e1.message}`);
     try {
       imgBuf = await generateWithDallE3(prompt);
+      sourceModel = 'dall-e-3';
+      fallbackUsed = fallbackUsed
+        ? `${fallbackUsed},gpt-to-dalle`
+        : 'gpt-to-dalle';
       console.log(`[star-image] DALL-E 3 fallback 성공 | ${cacheKey}`);
     } catch (e2) {
       console.error(`[star-image] DALL-E 3 fallback도 실패 | ${e2.message}`);
-      return res.status(500).json({ success: false, error: '이미지 생성 실패', sentence });
+      return res.status(500).json({
+        success: false,
+        error: '이미지 생성 실패',
+        sentence,
+        requested_location: requestedLocation,
+        resolved_location:  location,
+      });
     }
   }
 
@@ -388,7 +451,6 @@ router.post('/generate', async (req, res) => {
 
   try {
     fs.writeFileSync(filePath, imgBuf);
-    // DB 캐시는 내부 cacheKey로만 관리 (image_url은 이제 postcards 경로)
     await db.query(
       `INSERT INTO star_image_cache (cache_key, image_url, emotion, gem, location)
        VALUES ($1, $2, $3, $4, $5)
@@ -400,8 +462,12 @@ router.post('/generate', async (req, res) => {
     console.warn('[star-image] 저장 실패 (이미지는 반환):', e.message);
   }
 
-  return res.json({ success: true, image_url: imageUrl, sentence, from_cache: false,
-    requested_location: location, resolved_location: location, source_image: 'ai_generated' });
+  return res.json(buildPayload({
+    image_url:     imageUrl,
+    from_cache:    false,
+    source_image:  sourceModel,
+    fallback_used: fallbackUsed,
+  }));
 });
 
 // ── GET /resolve ─────────────────────────────────────────────────

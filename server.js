@@ -122,8 +122,13 @@ app.get('/star-view.html', (req, res) => {
 app.get('/star-view/:id', async (req, res) => {
   const _fs  = require('fs');
   const _db  = require('./database/db');
-  const _BASE = 'https://app.dailymiracles.kr';
-  const _DEFAULT_IMG = `${_BASE}/images/star-cache/yeosu_hamel/03_connection_emerald_yeosu_hamel_stage3.png`;
+  // PUBLIC_BASE_URL — 환경별 production URL 강제 (localhost OG 방지)
+  const _BASE = process.env.PUBLIC_BASE_URL || 'https://app.dailymiracles.kr';
+  if (/^http:\/\/(localhost|127\.0\.0\.1|.*\.preview)/i.test(_BASE)) {
+    console.warn(`[star-view] PUBLIC_BASE_URL 부적합 (${_BASE}) — production URL 필요. 카카오 공유 시 깨질 수 있음`);
+  }
+  // hamel canonical thumbnail (실제 파일과 경로 일치)
+  const _DEFAULT_IMG = `${_BASE}/images/thumbnails/hamel/generated/full/hamel_calm_emerald_base03.png`;
 
   const id = String(req.params.id).slice(0, 40).replace(/[^a-zA-Z0-9_-]/g, '');
 
@@ -193,6 +198,28 @@ app.get('/star-view/:id', async (req, res) => {
   }
 });
 // ─────────────────────────────────────────────────────────────────────────
+
+// ── /postcard/:id → /star-view/:access_key (301 redirect) ────────────────
+// star id(uuid) 또는 access_key 둘 다 입력 허용 (lookup 후 canonical로 정규화)
+// 기존 /star-view/:access_key SSR + OG 인프라를 그대로 사용 (E1)
+app.get('/postcard/:id', async (req, res) => {
+  const _db = require('./database/db');
+  const raw = String(req.params.id || '').slice(0, 64).replace(/[^a-zA-Z0-9_-]/g, '');
+  if (!raw) return res.redirect(301, '/');
+
+  try {
+    // access_key 우선 매칭 → 없으면 uuid id 로 매칭 후 access_key 조회
+    const { rows } = await _db.query(
+      `SELECT access_key FROM stars WHERE access_key = $1 OR id::text = $1 LIMIT 1`,
+      [raw]
+    );
+    const accessKey = rows[0]?.access_key || raw;
+    return res.redirect(301, `/star-view/${encodeURIComponent(accessKey)}`);
+  } catch (e) {
+    console.warn('[postcard/:id] lookup 실패 — raw로 redirect:', e.message);
+    return res.redirect(301, `/star-view/${encodeURIComponent(raw)}`);
+  }
+});
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', (_req, res) => res.status(404).end()); // 파일 없으면 404로 끊음

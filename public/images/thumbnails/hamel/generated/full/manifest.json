@@ -1,0 +1,196 @@
+{
+  "location": "hamel",
+  "generated": "2026-05-04T06:55:06.031Z",
+  "count": 25,
+  "emotions": [
+    "confusion",
+    "pause",
+    "calm",
+    "curiosity",
+    "fragile_hope"
+  ],
+  "bases": [
+    "hamel_base_02_left.png",
+    "hamel_base_03_right.png",
+    "hamel_base_04_low.png",
+    "hamel_base_05_wide.png",
+    "hamel_pause_sapphire_01.png"
+  ],
+  "items": [
+    {
+      "emotion": "confusion",
+      "gemstone": "moonstone",
+      "base": "base01",
+      "sourceFile": "hamel_base_02_left.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_confusion_moonstone_base01.png"
+    },
+    {
+      "emotion": "pause",
+      "gemstone": "sapphire",
+      "base": "base01",
+      "sourceFile": "hamel_base_02_left.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_pause_sapphire_base01.png"
+    },
+    {
+      "emotion": "calm",
+      "gemstone": "emerald",
+      "base": "base01",
+      "sourceFile": "hamel_base_02_left.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_calm_emerald_base01.png"
+    },
+    {
+      "emotion": "curiosity",
+      "gemstone": "topaz",
+      "base": "base01",
+      "sourceFile": "hamel_base_02_left.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_curiosity_topaz_base01.png"
+    },
+    {
+      "emotion": "fragile_hope",
+      "gemstone": "diamond",
+      "base": "base01",
+      "sourceFile": "hamel_base_02_left.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_fragile_hope_diamond_base01.png"
+    },
+    {
+      "emotion": "confusion",
+      "gemstone": "moonstone",
+      "base": "base02",
+      "sourceFile": "hamel_base_03_right.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_confusion_moonstone_base02.png"
+    },
+    {
+      "emotion": "pause",
+      "gemstone": "sapphire",
+      "base": "base02",
+      "sourceFile": "hamel_base_03_right.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_pause_sapphire_base02.png"
+    },
+    {
+      "emotion": "calm",
+      "gemstone": "emerald",
+      "base": "base02",
+      "sourceFile": "hamel_base_03_right.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_calm_emerald_base02.png"
+    },
+    {
+      "emotion": "curiosity",
+      "gemstone": "topaz",
+      "base": "base02",
+      "sourceFile": "hamel_base_03_right.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_curiosity_topaz_base02.png"
+    },
+    {
+      "emotion": "fragile_hope",
+      "gemstone": "diamond",
+      "base": "base02",
+      "sourceFile": "hamel_base_03_right.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_fragile_hope_diamond_base02.png"
+    },
+    {
+      "emotion": "confusion",
+      "gemstone": "moonstone",
+      "base": "base03",
+      "sourceFile": "hamel_base_04_low.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_confusion_moonstone_base03.png"
+    },
+    {
+      "emotion": "pause",
+      "gemstone": "sapphire",
+      "base": "base03",
+      "sourceFile": "hamel_base_04_low.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_pause_sapphire_base03.png"
+    },
+    {
+      "emotion": "calm",
+      "gemstone": "emerald",
+      "base": "base03",
+      "sourceFile": "hamel_base_04_low.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_calm_emerald_base03.png"
+    },
+    {
+      "emotion": "curiosity",
+      "gemstone": "topaz",
+      "base": "base03",
+      "sourceFile": "hamel_base_04_low.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_curiosity_topaz_base03.png"
+    },
+    {
+      "emotion": "fragile_hope",
+      "gemstone": "diamond",
+      "base": "base03",
+      "sourceFile": "hamel_base_04_low.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_fragile_hope_diamond_base03.png"
+    },
+    {
+      "emotion": "confusion",
+      "gemstone": "moonstone",
+      "base": "base04",
+      "sourceFile": "hamel_base_05_wide.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_confusion_moonstone_base04.png"
+    },
+    {
+      "emotion": "pause",
+      "gemstone": "sapphire",
+      "base": "base04",
+      "sourceFile": "hamel_base_05_wide.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_pause_sapphire_base04.png"
+    },
+    {
+      "emotion": "calm",
+      "gemstone": "emerald",
+      "base": "base04",
+      "sourceFile": "hamel_base_05_wide.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_calm_emerald_base04.png"
+    },
+    {
+      "emotion": "curiosity",
+      "gemstone": "topaz",
+      "base": "base04",
+      "sourceFile": "hamel_base_05_wide.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_curiosity_topaz_base04.png"
+    },
+    {
+      "emotion": "fragile_hope",
+      "gemstone": "diamond",
+      "base": "base04",
+      "sourceFile": "hamel_base_05_wide.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_fragile_hope_diamond_base04.png"
+    },
+    {
+      "emotion": "confusion",
+      "gemstone": "moonstone",
+      "base": "base05",
+      "sourceFile": "hamel_pause_sapphire_01.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_confusion_moonstone_base05.png"
+    },
+    {
+      "emotion": "pause",
+      "gemstone": "sapphire",
+      "base": "base05",
+      "sourceFile": "hamel_pause_sapphire_01.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_pause_sapphire_base05.png"
+    },
+    {
+      "emotion": "calm",
+      "gemstone": "emerald",
+      "base": "base05",
+      "sourceFile": "hamel_pause_sapphire_01.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_calm_emerald_base05.png"
+    },
+    {
+      "emotion": "curiosity",
+      "gemstone": "topaz",
+      "base": "base05",
+      "sourceFile": "hamel_pause_sapphire_01.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_curiosity_topaz_base05.png"
+    },
+    {
+      "emotion": "fragile_hope",
+      "gemstone": "diamond",
+      "base": "base05",
+      "sourceFile": "hamel_pause_sapphire_01.png",
+      "imageUrl": "/images/thumbnails/hamel/generated/full/hamel_fragile_hope_diamond_base05.png"
+    }
+  ]
+}

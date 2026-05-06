@@ -12,8 +12,10 @@ const express = require('express');
 const router  = express.Router();
 const db      = require('../database/db');
 
-const VALID_EMOTIONS = ['moved', 'resonated', 'encouraged', 'reflective', 'calm'];
-const VALID_ACTIONS  = ['create_star', 'share', 'reflect', 'just_felt'];
+const VALID_EMOTIONS = ['moved', 'resonated', 'encouraged', 'reflective', 'calm',
+                        'light', 'clear', 'unknown', 'hope'];
+const VALID_ACTIONS  = ['create_star', 'share', 'reflect', 'just_felt',
+                        'continue', 'action', 'connect', 'rest'];
 
 // ── POST / — 임팩트 저장 ──────────────────────────────────────────
 router.post('/', async (req, res) => {

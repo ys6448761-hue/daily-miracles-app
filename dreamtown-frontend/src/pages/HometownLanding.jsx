@@ -302,6 +302,7 @@ export default function HometownLanding() {
       if (wishResult.safety === 'RED') { setWishError(wishResult.care_message || '입력 내용을 확인해주세요.'); return; }
 
       const star = await postStarCreate({ wishId: wishResult.wish_id, userId, phoneNumber: null });
+      if (!star?.star_id) throw new Error('별 생성에 실패했어요. 다시 시도해주세요.');
       saveStarId(star.star_id);
 
       // 고향 자동 확정 (fire-and-forget)
@@ -314,7 +315,7 @@ export default function HometownLanding() {
       }
 
       nav(star.next ?? '/star-birth', {
-        state: { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy, gemType: 'sapphire', userId, day1: star.day1, wishText: wishText.trim() },
+        state: { starId: star.star_id, starName: star.star_name, galaxy: star.galaxy, gemType: 'sapphire', userId, day1: star.day1, wishText: wishText.trim(), sourceEvent: 'wish' },
       });
     } catch (err) {
       setWishError(err.message || '별 탄생에 실패했어요. 다시 시도해주세요.');

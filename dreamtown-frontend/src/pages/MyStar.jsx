@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
-import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message, getTodaySchedule, getStarStats, getStarDetail, getArtifactJob, getGrowthSummary, getRouteRecommendation, startJourneyFromRecommendation, getWisdom, logFlowEvent, getJourneyStory, putJourneyStory } from '../api/dreamtown.js';
+import { getStar, getGalaxyStars, getResonance, postGrowthLog, getVoyageLogs, createGift, getOrCreateUserId, postAurora5Message, getTodaySchedule, getStarStats, getStarDetail, getArtifactJob, getGrowthSummary, getRouteRecommendation, startJourneyFromRecommendation, getWisdom, logFlowEvent, getJourneyStory, putJourneyStory, createSeed } from '../api/dreamtown.js';
 import { saveStarId, clearStarId, readSavedStar } from '../lib/utils/starSession.js';
 import MilestoneBar from '../components/MilestoneBar';
 import { useDreamtownStore } from '../store/dreamtownStore';
@@ -10,6 +10,17 @@ import { sharePostcard } from '../utils/kakaoShare';
 import { gaGrowthLogged, gaMilestoneDay7, gaResonanceReceived } from '../utils/gtag';
 import { logEvent } from '../lib/events.js';
 import StarDetail from './StarDetail';
+
+// origin_place (DB) → Seed location (canonical) — Seed 발행 가능한 장소만 등록
+// canonical 외 origin_place는 Seed 버튼 비노출
+const ORIGIN_PLACE_TO_SEED_LOC = {
+  yeosu_cablecar_workshop: 'cablecar',
+  yeosu_cablecar:          'cablecar',
+  cablecar:                'cablecar',
+  yeosu_hamel_village:     'hamel',
+  yeosu_hamel:             'hamel',
+  hamel:                   'hamel',
+};
 
 // 은하 → 항해 방향 (StarBirth와 동일 매핑)
 const GALAXY_TO_DIRECTION = {
@@ -213,6 +224,11 @@ export default function MyStar() {
   const [giftCopyType, setGiftCopyType] = useState(null);
   const [giftPosting, setGiftPosting] = useState(false);
   const [giftDone, setGiftDone] = useState(false);
+
+  // Seed 만들기 상태 (공식 시작점 발행 — 명시 클릭 시에만)
+  const [seedPosting, setSeedPosting] = useState(false);
+  const [seedResult,  setSeedResult]  = useState(null);  // { share_url, ref_code, image_url, ... }
+  const [seedError,   setSeedError]   = useState(null);
   // ── AI 트리거 (Day3/Day7 리텐션) ────────────────────────────
   const [lumi, setLumi] = useState(null);
   const [showMore, setShowMore] = useState(false);
@@ -432,6 +448,48 @@ export default function MyStar() {
       console.error('[Gift]', err.message);
     } finally {
       setGiftPosting(false);
+    }
+  }
+
+  // ── Seed 만들기 — "이 별을 공식 시작점으로" ──────────────────────
+  // 명시 클릭 시에만 발행. 자동 발행 금지 (SSOT 원칙)
+  async function handleCreateSeed() {
+    if (seedPosting || seedResult) return;
+    setSeedError(null);
+    const seedLoc = ORIGIN_PLACE_TO_SEED_LOC[star?.origin_place];
+    if (!seedLoc || !star?.wish_image_url) {
+      setSeedError('이 별은 아직 Seed로 발행할 수 없어요.');
+      return;
+    }
+    setSeedPosting(true);
+    logEvent('conversion_action', { action_type: 'seed_create', value: null });
+    try {
+      const { seed } = await createSeed({
+        location:       seedLoc,
+        image_url:      star.wish_image_url,
+        title:          star.star_name ? `${star.star_name}` : null,
+        parent_star_id: star.star_id,
+      });
+      setSeedResult(seed);
+
+      // 곧바로 공유 시도 (가능하면 native share, 아니면 클립보드)
+      const absoluteShareUrl = window.location.origin + seed.share_url;
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: `${star.star_name || '내 별'} — 누군가의 시작점이 됩니다`,
+            text:  '이 별에서 시작된 이야기',
+            url:   absoluteShareUrl,
+          });
+        } catch (_) { /* AbortError 무시 */ }
+      } else {
+        await navigator.clipboard.writeText(absoluteShareUrl).catch(() => {});
+      }
+    } catch (err) {
+      console.error('[Seed]', err.message);
+      setSeedError(err.message || 'Seed 생성에 실패했어요.');
+    } finally {
+      setSeedPosting(false);
     }
   }
 
@@ -1395,6 +1453,45 @@ export default function MyStar() {
               <p className="text-white/60 text-sm">소원별이 두 사람의 하늘에 닿았어요 ✦</p>
             </div>
           )
+        )}
+
+        {/* ── Seed 만들기 (cablecar/hamel 별만 노출) ──────────────── */}
+        {ORIGIN_PLACE_TO_SEED_LOC[star?.origin_place] && star?.wish_image_url && (
+          !seedResult ? (
+            <button
+              onClick={handleCreateSeed}
+              disabled={seedPosting}
+              className="w-full bg-white/5 border border-white/10 text-white/70 font-medium py-4 rounded-2xl hover:bg-white/10 transition-colors disabled:opacity-40"
+            >
+              {seedPosting ? 'Seed 만드는 중…' : '이 별로 Seed 만들기 🌱'}
+            </button>
+          ) : (
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+              <p className="text-white/60 text-xs text-center mb-3">
+                Seed 발행 완료 — 외부 공유 가능 링크입니다
+              </p>
+              <div
+                className="bg-black/30 border border-white/10 rounded-lg px-3 py-2.5 text-white/80 text-xs text-center mb-3 break-all select-all"
+                style={{ fontFamily: 'monospace' }}
+              >
+                {window.location.origin + seedResult.share_url}
+              </div>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.origin + seedResult.share_url).catch(() => {});
+                }}
+                className="w-full bg-white/8 border border-white/15 text-white/80 text-sm py-2.5 rounded-xl hover:bg-white/12 transition-colors"
+              >
+                링크 복사
+              </button>
+              <p className="text-white/30 text-[10px] text-center mt-2">
+                초대 코드 · {seedResult.ref_code}
+              </p>
+            </div>
+          )
+        )}
+        {seedError && (
+          <p className="text-rose-300/80 text-xs text-center">{seedError}</p>
         )}
 
         <div className="flex gap-3">

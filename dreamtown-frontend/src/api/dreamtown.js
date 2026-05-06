@@ -107,18 +107,6 @@ export async function getStarPublic(starId) {
   }
 }
 
-export async function getGalaxies() {
-  const res = await fetch(`${BASE}/galaxies`);
-  if (!res.ok) throw new Error('은하 조회 실패');
-  return res.json();
-}
-
-export async function getGalaxy(code) {
-  const res = await fetch(`${BASE}/galaxies/${code}`);
-  if (!res.ok) throw new Error('은하 상세 조회 실패');
-  return res.json();
-}
-
 export async function getGalaxyStars(galaxyCode, { limit = 5, exclude = null } = {}) {
   const params = new URLSearchParams({ limit });
   if (exclude) params.set('exclude', exclude);
@@ -627,4 +615,64 @@ export async function requestDay8Payment(userId) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ user_id: userId }),
   });
+}
+
+// ── Star Feed / Share / Resonate ──────────────────────────────────
+
+export async function getStarFeed({ limit = 20, offset = 0 } = {}) {
+  const res = await fetch(`/api/stars/public/feed?limit=${limit}&offset=${offset}`);
+  if (!res.ok) throw new Error('피드 조회 실패');
+  return res.json(); // { success, stars: [{ id, emotion, gem, image_url, public_message, resonance_count }] }
+}
+
+export async function postStarShare(starId, publicMessage) {
+  const res = await fetch(`/api/stars/${starId}/share`, {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ public_message: publicMessage }),
+  });
+  if (!res.ok) throw new Error('공유 실패');
+  return res.json();
+}
+
+export async function postResonate(starId) {
+  const res = await fetch(`/api/stars/public/${starId}/resonate`, {
+    method: 'POST',
+  });
+  if (!res.ok) throw new Error('공명 실패');
+  return res.json(); // { success, resonance_count }
+}
+
+export async function getConstellation(id) {
+  const res = await fetch(`/api/stars/constellations/${encodeURIComponent(id)}`);
+  if (!res.ok) throw new Error('별자리 조회 실패');
+  return res.json(); // { success, constellation, stars }
+}
+
+export async function getGalaxies() {
+  const res = await fetch('/api/stars/galaxies');
+  if (!res.ok) throw new Error('은하 목록 조회 실패');
+  return res.json(); // { success, galaxies: [{ id, name, description, direction }] }
+}
+
+export async function getGalaxy(id) {
+  const res = await fetch(`/api/stars/galaxies/${encodeURIComponent(id)}`);
+  if (!res.ok) throw new Error('은하 조회 실패');
+  return res.json(); // { success, galaxy, constellations }
+}
+
+// ── Seed Library (공유 진입점 SSOT) ──────────────────────────────
+// 별 → Seed 발행은 명시 클릭에서만. 자동 발행 금지.
+// 응답: { success, seed: { id, location, image_url, share_url, ref_code, ... } }
+export async function createSeed({ location, image_url, title = null, parent_star_id = null }) {
+  const res = await fetch('/api/seeds', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ location, image_url, title, parent_star_id }),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body?.error || 'Seed 생성 실패');
+  }
+  return res.json();
 }

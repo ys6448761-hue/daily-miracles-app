@@ -118,14 +118,16 @@ export default function WishInputScreen({ onBack }) {
         userId,
         phoneNumber: null,
       });
+      if (!star?.star_id) throw new Error('별 생성에 실패했어요. 다시 시도해주세요.');
       saveStarId(star.star_id);
 
       const starBirthState = {
-        starId:   star.star_id,
-        starName: star.star_name,
-        galaxy:   star.galaxy,
-        gemType:  'sapphire',
-        wishText: trimmed,
+        starId:      star.star_id,
+        starName:    star.star_name,
+        galaxy:      star.galaxy,
+        gemType:     'sapphire',
+        wishText:    trimmed,
+        sourceEvent: 'wish',
       };
       try { sessionStorage.setItem('dt_recent_star', JSON.stringify(starBirthState)); } catch (_) {}
 

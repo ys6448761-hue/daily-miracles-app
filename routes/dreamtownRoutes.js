@@ -23,7 +23,49 @@ const { getDay1Prompt }                   = require('../services/day1OnboardingS
 const { retentionCheck }                  = require('../middleware/retentionMiddleware');
 const { determineStarMeta }               = require('../services/expoStarService');
 const wishEmotionService                  = require('../services/dt/wishEmotionService');
+const { getStarImage }                    = require('./starImageRoutes');
 const crypto = require('crypto');
+
+// galaxy → Stage 2 yeosu_cafe 감정 매핑
+const GALAXY_TO_STAGE2_EMOTION = {
+  challenge:    'curiosity',
+  growth:       'calm',
+  healing:      'pause',
+  relationship: 'fragile_hope',
+  miracle:      'confusion',
+};
+
+// 감정 흐름 다음 단계 (confusion → pause → calm → curiosity → fragile_hope)
+const EMOTION_NEXT = {
+  confusion:    'pause',
+  pause:        'calm',
+  calm:         'curiosity',
+  curiosity:    'fragile_hope',
+  fragile_hope: 'fragile_hope',
+};
+
+// 별자리 감정 흐름 요약 문장
+const CONSTELLATION_SUMMARY = {
+  confusion_to_pause:          '흔들리다 멈추는 흐름',
+  pause_to_calm:               '멈춤이 고요가 되는 흐름',
+  calm_to_curiosity:           '고요 속에서 피어나는 호기심',
+  curiosity_to_fragile_hope:   '조금씩 괜찮아지는 흐름',
+  fragile_hope_to_fragile_hope:'여전히 희망을 품는 흐름',
+};
+
+function getConstellationKey(startEmotion, endEmotion) {
+  return `${startEmotion}_to_${endEmotion}`;
+}
+
+// endEmotion → galaxy 매핑 (Day 4)
+function mapToGalaxy(endEmotion) {
+  if (endEmotion === 'fragile_hope') return 'healing';
+  if (endEmotion === 'curiosity')    return 'growth';
+  if (endEmotion === 'calm')         return 'relationship';
+  if (endEmotion === 'pause')        return 'healing';
+  if (endEmotion === 'confusion')    return 'challenge';
+  return 'growth';
+}
 
 function dtHashWishId(input) {
   return parseInt(
@@ -535,16 +577,47 @@ router.post('/stars/create', async (req, res) => {
     flow.log({ userId: String(user_id), stage: 'growth', action: 'day1_prompt_shown',
       value: { star_id: star.id }, refId: String(star.id) }).catch(() => {});
 
+    // Stage 2 yeosu_cafe 사전 생성 이미지 연결 (결정론적, 지연 없음)
+    const stage2Emotion = GALAXY_TO_STAGE2_EMOTION[galaxyCode] || 'calm';
+    const imageUrl = getStarImage(stage2Emotion, wish.gem_type) || null;
+
+    // Constellation 자동 분류 (fire-and-forget)
+    const endEmotion  = EMOTION_NEXT[stage2Emotion] || stage2Emotion;
+    const constKey    = getConstellationKey(stage2Emotion, endEmotion);
+    const constSummary = CONSTELLATION_SUMMARY[constKey] || null;
+    const galaxyId = mapToGalaxy(endEmotion);
+    Promise.all([
+      db.query(
+        `INSERT INTO constellations (id, start_emotion, end_emotion, summary)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (id) DO NOTHING`,
+        [constKey, stage2Emotion, endEmotion, constSummary]
+      ),
+      db.query(
+        `INSERT INTO constellation_stars (constellation_id, star_id)
+         VALUES ($1, $2)
+         ON CONFLICT DO NOTHING`,
+        [constKey, star.id]
+      ),
+      db.query(
+        `INSERT INTO galaxy_constellations (galaxy_id, constellation_id)
+         VALUES ($1, $2)
+         ON CONFLICT DO NOTHING`,
+        [galaxyId, constKey]
+      ),
+    ]).catch(e => console.error('[DT] constellation/galaxy 자동 분류 실패 (별 생성은 유지):', e.message));
+
     res.status(201).json({
       star_id:              star.id,
       star_name:            star.star_name,
       star_slug:            star.star_slug,
       galaxy:               galaxyCode,
-      constellation:        null,
+      constellation:        constKey,
       birth_scene_version:  'v1',
       star_stage:           star.star_stage,
       star_rarity:          star.star_rarity,
       source_event:         star.source_event,
+      image_url:            imageUrl,
       day1,
       next:                 `/star-birth`,
     });
