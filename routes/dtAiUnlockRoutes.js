@@ -348,7 +348,10 @@ router.post('/payment-success', async (req, res) => {
 // ── GET /admin/stats ── 관리자 통계 ──────────────────────────────────
 router.get('/admin/stats', async (req, res) => {
   const adminKey = req.headers['x-admin-key'] ?? req.query.admin_key;
-  if (adminKey !== (process.env.ADMIN_API_KEY ?? 'dt-admin-2025')) {
+  if (!process.env.ADMIN_API_KEY) {
+    return res.status(503).json({ error: 'admin disabled — ADMIN_API_KEY not configured' });
+  }
+  if (adminKey !== process.env.ADMIN_API_KEY) {
     return res.status(401).json({ error: '관리자 인증 필요' });
   }
 

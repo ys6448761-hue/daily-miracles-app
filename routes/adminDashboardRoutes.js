@@ -18,7 +18,9 @@ const SERVER_START = new Date().toISOString();
 // ── 인증 가드 ─────────────────────────────────────────────────────
 function adminGuard(req, res, next) {
   const key = req.headers['x-admin-key'] || req.query.key;
-  if (!process.env.ADMIN_API_KEY) return next();            // 로컬: 무조건 통과
+  if (!process.env.ADMIN_API_KEY) {
+    return res.status(503).json({ success: false, error: 'admin disabled — ADMIN_API_KEY not configured' });
+  }
   if (key === process.env.ADMIN_API_KEY) return next();
   return res.status(401).json({ success: false, error: '관리자 인증 필요 (?key=...)' });
 }

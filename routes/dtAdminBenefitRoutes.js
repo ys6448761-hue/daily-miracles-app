@@ -28,7 +28,10 @@ const log = makeLogger('dtAdminBenefit');
 // ── 간단 관리자 인증 (X-Admin-Key 헤더) ──────────────────────────────
 function adminAuth(req, res, next) {
   const key = req.headers['x-admin-key'] ?? req.query.admin_key;
-  if (!key || key !== (process.env.ADMIN_API_KEY ?? 'dt-admin-2025')) {
+  if (!process.env.ADMIN_API_KEY) {
+    return res.status(503).json({ error: 'admin disabled — ADMIN_API_KEY not configured' });
+  }
+  if (!key || key !== process.env.ADMIN_API_KEY) {
     return res.status(401).json({ error: '관리자 인증 필요' });
   }
   next();

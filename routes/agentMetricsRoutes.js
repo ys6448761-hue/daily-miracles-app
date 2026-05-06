@@ -17,11 +17,13 @@ const db      = require('../database/db');
 const { makeLogger } = require('../utils/logger');
 
 const log      = makeLogger('agentMetrics');
-const ADMIN_KEY = process.env.ADMIN_API_KEY ?? 'dt-admin-2025';
 
 function requireAdmin(req, res, next) {
   const key = req.headers['x-admin-key'] ?? req.query.admin_key;
-  if (key !== ADMIN_KEY) return res.status(401).json({ error: '관리자 인증 필요' });
+  if (!process.env.ADMIN_API_KEY) {
+    return res.status(503).json({ error: 'admin disabled — ADMIN_API_KEY not configured' });
+  }
+  if (key !== process.env.ADMIN_API_KEY) return res.status(401).json({ error: '관리자 인증 필요' });
   next();
 }
 
