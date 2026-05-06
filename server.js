@@ -221,6 +221,70 @@ app.get('/postcard/:id', async (req, res) => {
   }
 });
 
+// ── /seed/:id — Seed Library SSR + OG 주입 (비로그인 외부 접근 진입점) ──
+// SPA가 본문 렌더링을 담당하지만, 카카오/페북 크롤러는 JS 미실행 → SSR 필수
+app.get('/seed/:id', async (req, res) => {
+  const _fs   = require('fs');
+  const _db   = require('./database/db');
+  const _BASE = process.env.PUBLIC_BASE_URL || 'https://app.dailymiracles.kr';
+
+  // localhost / preview 도메인 사용 시 OG 차단 (카카오 외부 접근 가드)
+  if (/^http:\/\/(localhost|127\.0\.0\.1|.*\.preview)/i.test(_BASE)) {
+    console.warn(`[seed/:id] PUBLIC_BASE_URL 부적합 (${_BASE}) — production URL 필요`);
+  }
+
+  const id = String(req.params.id || '').slice(0, 40).replace(/[^a-zA-Z0-9-]/g, '');
+  if (!id) return res.status(404).send('Seed 없음');
+
+  let seed = null;
+  try {
+    const { rows } = await _db.query(
+      `SELECT id, location, title, image_url, ref_code
+       FROM   seeds
+       WHERE  id = $1 AND status = 'active'
+       LIMIT  1`,
+      [id]
+    );
+    seed = rows[0] || null;
+  } catch (e) {
+    console.warn('[seed/:id] DB 조회 실패:', e.message);
+  }
+
+  if (!seed) return res.status(404).send('Seed 없음 또는 비공개입니다.');
+
+  // OG 메타 — 절대 URL 강제
+  const ogImageRel = seed.image_url || '/images/postcards/default.png';
+  const ogImage    = ogImageRel.startsWith('http') ? ogImageRel : `${_BASE}${ogImageRel}`;
+  const ogTitle    = (seed.title || '누군가의 별이 당신을 초대했어요') + ' — 하루하루의 기적';
+  const ogDesc     = '소원이 별이 되는 곳, DreamTown';
+  const pageUrl    = `${_BASE}/seed/${encodeURIComponent(id)}?ref=${encodeURIComponent(seed.ref_code)}`;
+
+  const ogBlock = [
+    `<meta property="og:type"         content="website">`,
+    `<meta property="og:title"        content="${ogTitle}">`,
+    `<meta property="og:description"  content="${ogDesc}">`,
+    `<meta property="og:image"        content="${ogImage}">`,
+    `<meta property="og:image:width"  content="1024">`,
+    `<meta property="og:image:height" content="1024">`,
+    `<meta property="og:url"          content="${pageUrl}">`,
+    `<meta name="twitter:card"        content="summary_large_image">`,
+    `<meta name="twitter:image"       content="${ogImage}">`,
+  ].join('\n  ');
+
+  // SPA index.html에 OG 주입 — JS 비활성 환경에서도 카드 정상 노출
+  try {
+    const indexPath = path.join(__dirname, 'dreamtown-frontend', 'dist', 'index.html');
+    const html      = _fs.readFileSync(indexPath, 'utf-8');
+    const modified  = html.replace('</head>', `  ${ogBlock}\n</head>`);
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.type('html').send(modified);
+  } catch (e) {
+    console.error('[seed/:id] index.html 로드 실패:', e.message);
+    res.status(500).send('Seed 페이지 로드 실패');
+  }
+});
+// ─────────────────────────────────────────────────────────────────────────
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', (_req, res) => res.status(404).end()); // 파일 없으면 404로 끊음
 app.use('/videos', (_req, res) => res.status(404).end()); // 파일 없으면 404로 끊음
@@ -2745,6 +2809,18 @@ if (shareImageRoutes) {
   console.log('✅ Share Image 라우터 등록 완료 (/api/generate-share-image)');
 }
 
+// ---------- Seed Library (/api/seeds) ----------
+let seedRoutes = null;
+try {
+  seedRoutes = require('./routes/seedRoutes');
+} catch (e) {
+  console.warn('⚠️ seedRoutes 로드 실패:', e.message);
+}
+if (seedRoutes) {
+  app.use('/api/seeds', seedRoutes);
+  console.log('✅ Seed Library 라우터 등록 완료 (/api/seeds)');
+}
+
 // ---------- Star Journey + Moment (/api/star/journeys, /api/moments) ----------
 let starJourneyRoutes = null;
 try {
@@ -3426,6 +3502,8 @@ const DT_SPA_ROUTES = [
   '/dreamtown', '/dreamtown/*',
   '/galaxy', '/day', '/star', '/star-growth',
   '/postcard', '/history', '/intro',
+  // Seed Library — 비로그인 외부 진입 (SSR로 OG 주입한 뒤 SPA가 이어서 렌더)
+  '/seed/*',
   '/star-birth', '/my-star', '/my-star/*', '/home',
   '/star/*', '/dashboard', '/wish', '/wish/*',
   '/story-draft-mvp',

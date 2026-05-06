@@ -65,6 +65,7 @@ import CablecarLandingPage from './pages/CablecarLandingPage.jsx';
 import VoyageSelectPage from './pages/VoyageSelectPage.jsx';
 import VoyageReflectPage from './pages/VoyageReflectPage.jsx';
 import EntryPage from './pages/EntryPage.jsx';
+import SeedLandingPage from './pages/SeedLandingPage.jsx';
 import AurumCreatePage from './pages/AurumCreatePage.jsx';
 import AurumViewPage from './pages/AurumViewPage.jsx';
 import PromiseLocationPage from './pages/PromiseLocationPage.jsx';
@@ -150,6 +151,8 @@ export default function App() {
           <Route path="/cablecar-landing"          element={<CablecarLandingPage />} />
           {/* 장소별 공통 진입 */}
           <Route path="/entry"                     element={<EntryPage />} />
+          {/* Seed 공유 진입점 — 비로그인 외부 사용자 */}
+          <Route path="/seed/:id"                  element={<SeedLandingPage />} />
           {/* 여수 숙박/레저 선택 — 앱 전용, QR 흐름에서 미사용 */}
           <Route path="/voyage-select"             element={<VoyageSelectPage />} />
           {/* 여행 이후 별 변화 기록 */}
