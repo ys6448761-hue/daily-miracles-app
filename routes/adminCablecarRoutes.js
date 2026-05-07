@@ -155,9 +155,9 @@ router.get('/ops', async (req, res) => {
       origin_location:  ORIGIN_LOCATION,
       ssot_field:       'stars.origin_location',
       payment_enabled:  process.env.CABLECAR_PAYMENT_ENABLED === 'true',
-      qr_url:           'https://app.dailymiracles.kr/star-entry.html?loc=yeosu_cablecar', // DB 저장값 yeosu_cablecar
-      qr_image_path:    '/qr/QR_케이블카_체험입장.png',
-      qr_download_name: 'QR_케이블카_체험입장.png',
+      qr_url:           `https://app.dailymiracles.kr/entry?loc=${ORIGIN_LOCATION}`,
+      qr_image_path:    `/qr/QR_${ORIGIN_LOCATION}.png`,
+      qr_download_name: `QR_${ORIGIN_LOCATION}.png`,
       stats: {
         total_stars:   Number(row.total_stars),
         awakened:      Number(row.awakened),
