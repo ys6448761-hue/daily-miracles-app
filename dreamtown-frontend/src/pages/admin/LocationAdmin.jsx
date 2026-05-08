@@ -14,6 +14,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import QRCode from 'qrcode';
+import { getCanonicalLocation, getEntryUrl } from '../../config/locationAliases.js';
 
 // ── 감정값 정규화 ─────────────────────────────────────────────────
 const EMOTION_KO = {
@@ -507,11 +508,11 @@ function OpsTab({ loc, token }) {
       {/* 확장 가이드 */}
       <div style={S.section}>신규 별공방 확장 방법</div>
       <div style={{ ...S.card, fontSize: 12, lineHeight: 1.9, color: 'rgba(255,255,255,0.5)' }}>
-        <div style={{ marginBottom: 8, color: '#FFD76A', fontWeight: 700 }}>새 별공방 장소 추가 시 (예: hamel, odongjae)</div>
-        <div>① QR URL: <code style={{ color: '#E8E4F0' }}>/star-entry.html?loc=hamel</code></div>
-        <div>② <code style={{ color: '#E8E4F0' }}>adminLocationRoutes.js</code> LOCATION_META에 <code style={{ color: '#E8E4F0' }}>hamel: &#123;…&#125;</code> 키 추가</div>
-        <div>③ 집계: <code style={{ color: '#E8E4F0' }}>stars WHERE origin_location = 'hamel'</code> — 별도 라우트 불필요</div>
-        <div style={{ marginTop: 8, color: 'rgba(255,255,255,0.3)' }}>→ stars.origin_location 기반 단일 테이블, 파라미터화만으로 확장 가능</div>
+        <div style={{ marginBottom: 8, color: '#FFD76A', fontWeight: 700 }}>새 별공방 장소 추가 시 (예: yeosu_hamel_workshop)</div>
+        <div>① QR URL: <code style={{ color: '#E8E4F0' }}>/entry?loc=&lt;canonical&gt;</code> (alias 금지, canonical만)</div>
+        <div>② <code style={{ color: '#E8E4F0' }}>config/locationRegistry.js</code> + <code style={{ color: '#E8E4F0' }}>src/config/locationAliases.js</code> 양쪽에 canonical 등록</div>
+        <div>③ 집계: <code style={{ color: '#E8E4F0' }}>stars WHERE origin_location = &lt;canonical&gt;</code> — 별도 라우트 불필요</div>
+        <div style={{ marginTop: 8, color: 'rgba(255,255,255,0.3)' }}>→ stars.origin_location 기반 단일 테이블, alias→canonical 변환은 SSOT 함수만 사용</div>
       </div>
     </div>
   );
@@ -590,7 +591,7 @@ export default function LocationAdmin() {
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <span style={S.badge}>별공방 Admin</span>
           <a
-            href={loc === 'global' ? '/entry' : `/entry?loc=${loc}`}
+            href={getEntryUrl(loc)}
             target="_blank"
             rel="noopener noreferrer"
             style={{ fontSize: 11, color: 'rgba(155,135,245,0.7)', textDecoration: 'none', border: '1px solid rgba(155,135,245,0.2)', padding: '3px 10px', borderRadius: 20 }}
