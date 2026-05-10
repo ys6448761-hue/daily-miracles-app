@@ -1,16 +1,17 @@
 /**
- * AurumOpenScene.jsx — DreamTown 입장 연출 (3초)
+ * AurumOpenScene.jsx — DreamTown 입장 연출 (5초)
  *
- * 자산: /videos/intro-yeosu-entry-v1.mp4 (공식 승인, 1.5MB)
- * 타이밍: 0.0~3.0s 비디오 재생 → 감정 질문 전환
+ * 자산: /videos/intro-yeosu-entry-v1.mp4 (공식 승인, 1.5MB, 실측 4.90s)
+ * 타이밍: 0.0~5.0s 비디오 전체 재생 → 감정 질문 전환
+ *   (3초 컷 시 영상 후반 1.9s가 잘려 아우룸이 "왔다가 사라짐" 체감 → 5초 노출로 해소)
  * 모바일: autoplay + muted + playsInline (iOS 자동재생 정책 충족)
- * 빛 layer는 비디오 위 subtle overlay 로만 유지 (분위기 보강)
+ * loop 미설정 — 영상 끝나면 마지막 프레임 유지 (paused), 5s 후 onComplete
  */
 
 import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 
-const D = 3.0;
+const D = 5.0;
 const t = (sec) => sec / D;
 const INTRO_VIDEO = '/videos/intro-yeosu-entry-v1.mp4';
 
@@ -21,14 +22,14 @@ export default function AurumOpenScene({ onComplete, fallbackMs, onFallback }) {
   const videoRef  = useRef(null);
 
   useEffect(() => {
-    // minDuration guard — 무조건 3000ms 이후에만 onComplete
+    // minDuration guard — 무조건 5000ms 이후에만 onComplete (영상 4.90s 전체 노출)
     // video onEnded / onError / framer-motion onAnimationComplete 등 조기 종료 경로 차단
     const timer = setTimeout(() => {
       if (!calledRef.current) {
         calledRef.current = true;
         onComplete?.();
       }
-    }, 3000);
+    }, 5000);
 
     // iOS Safari 자동재생 보강 — play() 명시 호출 (실패해도 timer 영향 없음)
     if (videoRef.current) {
