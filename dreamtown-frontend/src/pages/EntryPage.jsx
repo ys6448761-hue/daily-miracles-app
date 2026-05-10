@@ -15,6 +15,7 @@ import { useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { readSavedStar } from '../lib/utils/starSession.js';
+import AurumOpenScene from '../components/AurumOpenScene.jsx';
 
 // ── 현장 포스트카드 UX 적용 장소 목록 (WishGate 우회) ──────────────
 const POSTCARD_LOCATIONS = ['cablecar', 'hamel'];
@@ -34,13 +35,34 @@ const CABLECAR_EMOTIONS = [
 ];
 
 // ── 현장 포스트카드 폼 (WishGate 우회 — cablecar / hamel 공용) ────
+//   진입 시 AurumOpenScene 3초 노출 → 감정 질문 (세션당 1회, 재방문 skip)
 function CablecarPostcardForm({ loc, refParam }) {
+  const aurumKey = `aurum_seen_${loc}`;
+  const [showAurum, setShowAurum] = useState(() => {
+    try { return typeof window !== 'undefined' && !sessionStorage.getItem(aurumKey); }
+    catch { return true; }
+  });
   const [emotion,  setEmotion]  = useState(null);
   const [gem,      setGem]      = useState(null);
   const [wishText, setWishText] = useState('');
   const [loading,  setLoading]  = useState(false);
   const [error,    setError]    = useState('');
   const textareaRef = useRef(null);
+
+  function finishAurum() {
+    try { sessionStorage.setItem(aurumKey, '1'); } catch {}
+    setShowAurum(false);
+  }
+
+  if (showAurum) {
+    return (
+      <AurumOpenScene
+        onComplete={finishAurum}
+        fallbackMs={4500}
+        onFallback={finishAurum}
+      />
+    );
+  }
 
   const canSubmit = !!emotion && wishText.trim().length > 0;
 
