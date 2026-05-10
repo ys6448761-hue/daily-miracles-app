@@ -26,6 +26,30 @@ const ALLOWED_LOCATIONS = new Set(['cablecar', 'hamel']);
 const ALLOWED_STATUS    = new Set(['active', 'disabled']);
 const ALLOWED_EVENTS    = new Set(['view', 'click', 'wish_started']);
 
+// location → OG-suitable base image (Kakao 5MB 권장 이내, 1200x1200 JPEG)
+// 미제공 또는 default OG 입력 시 location별 자동 매핑. 파일 부재 시 DEFAULT_OG fallback.
+const DEFAULT_OG = '/images/dreamtown-og-v4.jpg';
+const LOCATION_BASE_IMAGE = {
+  cablecar:                '/images/og/cablecar.jpg',
+  yeosu_cablecar:          '/images/og/cablecar.jpg',
+  yeosu_cablecar_workshop: '/images/og/cablecar.jpg',
+  hamel:                   '/images/og/hamel.jpg',
+  yeosu_hamel:             '/images/og/hamel.jpg',
+};
+
+function resolveBaseImage(inputUrl, location) {
+  // 1) 명시 입력이 default OG 아니면 그대로 사용
+  if (inputUrl && inputUrl !== DEFAULT_OG) return inputUrl;
+  // 2) location 매핑 시도 (파일 존재 확인)
+  const mapped = LOCATION_BASE_IMAGE[location];
+  if (mapped) {
+    const abs = path.join(__dirname, '..', 'public', mapped.replace(/^\/+/, ''));
+    if (fs.existsSync(abs)) return mapped;
+  }
+  // 3) 최종 fallback
+  return inputUrl || DEFAULT_OG;
+}
+
 const POSTCARDS_DIR = path.join(__dirname, '..', 'public', 'images', 'postcards');
 if (!fs.existsSync(POSTCARDS_DIR)) fs.mkdirSync(POSTCARDS_DIR, { recursive: true });
 
@@ -73,14 +97,16 @@ router.post('/', async (req, res) => {
       allowed: [...ALLOWED_LOCATIONS],
     });
   }
-  if (!image_url || typeof image_url !== 'string') {
-    return res.status(400).json({ success: false, error: 'image_url 필수' });
-  }
+  // image_url 미제공 또는 default OG → location 매핑으로 자동 대체
+  const sourceImage = resolveBaseImage(
+    typeof image_url === 'string' && image_url.trim() ? image_url : null,
+    location
+  );
 
   try {
     const seedId   = crypto.randomUUID();
     const refCode  = await uniqueRefCode();
-    const persisted = await persistSeedImage(image_url, seedId);
+    const persisted = await persistSeedImage(sourceImage, seedId);
     const shareUrl  = `/seed/${seedId}?ref=${refCode}`;
 
     const { rows } = await db.query(
