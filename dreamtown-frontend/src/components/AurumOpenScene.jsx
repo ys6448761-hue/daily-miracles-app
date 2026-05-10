@@ -15,36 +15,27 @@ const t = (sec) => sec / D;
 const INTRO_VIDEO = '/videos/intro-yeosu-entry-v1.mp4';
 
 export default function AurumOpenScene({ onComplete, fallbackMs, onFallback }) {
+  // eslint-disable-next-line no-unused-vars
+  const _unused = { fallbackMs, onFallback }; // 호환 — 더 이상 사용 안 함 (조기 종료 차단)
   const calledRef = useRef(false);
   const videoRef  = useRef(null);
 
-  const done = () => {
-    if (!calledRef.current) {
-      calledRef.current = true;
-      onComplete?.();
-    }
-  };
-
   useEffect(() => {
-    // 정상 종료: 비디오 3초 후 전환 (끝까지 재생 안 함)
-    const tid = setTimeout(done, D * 1000 + 100);
-    // 안전망: fallbackMs 내 onComplete 미호출 시 강제 전환 (영상 로드 실패 대비)
-    const fid = fallbackMs ? setTimeout(() => {
+    // minDuration guard — 무조건 3000ms 이후에만 onComplete
+    // video onEnded / onError / framer-motion onAnimationComplete 등 조기 종료 경로 차단
+    const timer = setTimeout(() => {
       if (!calledRef.current) {
         calledRef.current = true;
-        (onFallback ?? onComplete)?.();
+        onComplete?.();
       }
-    }, fallbackMs) : null;
+    }, 3000);
 
-    // iOS Safari 자동재생 보강 — play() 명시 호출
+    // iOS Safari 자동재생 보강 — play() 명시 호출 (실패해도 timer 영향 없음)
     if (videoRef.current) {
       videoRef.current.play().catch(() => {});
     }
 
-    return () => {
-      clearTimeout(tid);
-      if (fid) clearTimeout(fid);
-    };
+    return () => clearTimeout(timer);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
