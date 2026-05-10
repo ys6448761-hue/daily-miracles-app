@@ -142,6 +142,13 @@ export default function SharePostcard({
         </p>
       </div>
 
+      {/* 감정 문장 — SSOT: dreamtown-postcard-emotion-copy-ssot.md v1 */}
+      <div className="absolute inset-x-0 text-center" style={{ top: '80%' }}>
+        <p style={{ fontSize: 10, color: 'rgba(200,192,224,0.50)', letterSpacing: '0.08em' }}>
+          오늘의 마음도 별이 되었어요
+        </p>
+      </div>
+
     </div>
   );
 }

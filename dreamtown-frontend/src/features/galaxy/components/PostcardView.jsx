@@ -139,6 +139,13 @@ export default function PostcardView({
         </p>
       </div>
 
+      {/* 감정 문장 — SSOT: dreamtown-postcard-emotion-copy-ssot.md v1 */}
+      <div className="absolute inset-x-0 text-center" style={{ top: '79%' }}>
+        <p style={{ fontSize: 10, color: 'rgba(200,192,224,0.50)', letterSpacing: '0.08em' }}>
+          오늘의 마음도 별이 되었어요
+        </p>
+      </div>
+
       {/* 브랜드 하단 */}
       <div className="absolute inset-x-0 flex justify-center" style={{ top: '84%' }}>
         <p style={{ fontSize: 10, letterSpacing: '0.18em', color: 'rgba(155,135,245,0.45)', textTransform: 'uppercase' }}>
