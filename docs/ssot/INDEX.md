@@ -98,6 +98,16 @@ docs/ssot/
 
 ---
 
+## Copy System SSOT
+
+포스트카드·공유·결과 화면의 문구 기준.
+
+| 파일 | 핵심 내용 | 필독 시점 |
+|------|----------|----------|
+| `dreamtown-postcard-emotion-copy-ssot.md` | 포스트카드 감정 문장 20개, 루미 TOP 5, 톤 기준 | 포스트카드·카카오 공유·별공방 문구 작업 전 |
+
+---
+
 ## 변경 이력
 
 | 버전 | 날짜 | 내용 |
@@ -106,3 +116,4 @@ docs/ssot/
 | v3.0 | 2026-03-09 | AIL-SSOT-001 적용 — ssot/13개 + design/ 구조 |
 | v3.1 | 2026-03-09 | World_Architecture_SSOT 추가 |
 | v4.0 | 2026-03-13 | 3계층 재편 — core/13 + support/25 + archive/47 |
+| v4.1 | 2026-05-11 | Copy System SSOT 섹션 추가 — 포스트카드 감정 문장 v1 |

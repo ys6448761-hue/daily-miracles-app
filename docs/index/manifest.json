@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-05-10T22:59:49.754Z",
+  "generated_at": "2026-05-10T23:13:21.286Z",
   "generator": "generate-manifest.js",
-  "total_count": 268,
+  "total_count": 269,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -320,6 +320,24 @@
       "checksum": "6f22a0bf"
     },
     {
+      "id": "DOC-dreamtown-postcard-emotion-cop",
+      "path": "docs/ssot/dreamtown-postcard-emotion-copy-ssot.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "DreamTown 포스트카드 감정 문장 SSOT v1",
+      "created_at": "내용",
+      "checksum": "97bdb81c"
+    },
+    {
       "id": "DOC-INDEX",
       "path": "docs/ssot/INDEX.md",
       "type": "document",
@@ -331,11 +349,11 @@
         "소원",
         "aurora"
       ],
-      "owner": "code",
+      "owner": "rumi",
       "status": "archived",
       "title": "DreamTown SSOT Index",
       "created_at": "내용",
-      "checksum": "4eb359dc"
+      "checksum": "8899c3bb"
     },
     {
       "id": "DOC-SSOT_Registry_v2",

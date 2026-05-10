@@ -12,6 +12,7 @@
     "DOC-tag_taxonomy",
     "DOC-소원놀이터_종합문서_v10",
     "DOC-AURORA-STATUS",
+    "DOC-dreamtown-postcard-emotion-cop",
     "DOC-INDEX",
     "DOC-SSOT_Registry_v2",
     "DOC-DreamTown_Galaxy_Mode_SSOT",
@@ -188,6 +189,7 @@
     "DOC-AURORA5_CHARACTER_PROMPTS_V3",
     "DOC-DreamTown_Event_SSOT",
     "DOC-AURORA-STATUS",
+    "DOC-dreamtown-postcard-emotion-cop",
     "DOC-INDEX",
     "DOC-SSOT_Registry_v2",
     "DOC-DreamTown_Galaxy_Mode_SSOT",
@@ -588,6 +590,7 @@
     "DOC-20251229-PFO"
   ],
   "ssot": [
+    "DOC-dreamtown-postcard-emotion-cop",
     "DOC-INDEX",
     "DOC-SSOT_Registry_v2",
     "DOC-AIL-SSOT-001_Storage_Rules",
