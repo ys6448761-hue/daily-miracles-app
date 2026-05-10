@@ -150,11 +150,12 @@ const HAMEL_THUMBNAIL_GEM_MAP = {
   fragile_hope: 'diamond',
 };
 
-// base03 = hamel_base_04_low.png 기반, 구도 가장 안정적
+// base01~05 중 랜덤 선택 — 동일 감정 반복 체감 감소
 function getHamelThumbnailImage(emotionKey) {
   const hamelEmotion = HAMEL_THUMBNAIL_EMOTION_MAP[emotionKey] || 'calm';
   const gemstone     = HAMEL_THUMBNAIL_GEM_MAP[hamelEmotion];
-  return `/images/thumbnails/hamel/generated/full/hamel_${hamelEmotion}_${gemstone}_base03.png`;
+  const baseNum      = String(Math.floor(Math.random() * 5) + 1).padStart(2, '0');
+  return `/images/thumbnails/hamel/generated/full/hamel_${hamelEmotion}_${gemstone}_base${baseNum}.png`;
 }
 
 // ── Stage 1 yeosu_cablecar 사전 생성 이미지 SSOT ──────────────────
