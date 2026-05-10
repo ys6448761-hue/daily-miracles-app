@@ -271,11 +271,15 @@ app.get('/seed/:id', async (req, res) => {
     `<meta name="twitter:image"       content="${ogImage}">`,
   ].join('\n  ');
 
-  // SPA index.html에 OG 주입 — JS 비활성 환경에서도 카드 정상 노출
+  // SPA index.html에 OG 주입 — default OG/twitter meta 제거 후 seed 전용 메타 주입
+  // (default OG가 먼저 매칭되어 카카오 카드가 default로 노출되는 문제 방지)
   try {
     const indexPath = path.join(__dirname, 'dreamtown-frontend', 'dist', 'index.html');
     const html      = _fs.readFileSync(indexPath, 'utf-8');
-    const modified  = html.replace('</head>', `  ${ogBlock}\n</head>`);
+    const stripped  = html
+      .replace(/<meta\s+property="og:[^"]+"\s+content="[^"]*"\s*\/?>/gi, '')
+      .replace(/<meta\s+name="twitter:[^"]+"\s+content="[^"]*"\s*\/?>/gi, '');
+    const modified  = stripped.replace('</head>', `  ${ogBlock}\n</head>`);
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.type('html').send(modified);
   } catch (e) {
