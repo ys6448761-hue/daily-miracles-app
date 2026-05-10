@@ -56,7 +56,7 @@ export default function AurumOpenScene({ onComplete, fallbackMs, onFallback }) {
       overflow: 'hidden',
     }}>
 
-      {/* 0. 공식 입장 영상 (intro-yeosu-entry-v1) */}
+      {/* 0. 공식 입장 영상 (intro-yeosu-entry-v1) — 주인공, zIndex 2로 빛 위 노출 */}
       <video
         ref={videoRef}
         src={INTRO_VIDEO}
@@ -71,16 +71,18 @@ export default function AurumOpenScene({ onComplete, fallbackMs, onFallback }) {
           height: '100%',
           objectFit: 'cover',
           background: '#05040a',
+          zIndex: 2,
         }}
       />
 
-      {/* 1. 배경 글로우 (금빛 공간감 — 영상 위 subtle overlay) */}
+      {/* 1. 배경 글로우 — 영상 뒤 subtle 분위기 (zIndex 1) */}
       <motion.div
         style={{
           position: 'absolute',
           inset: 0,
           background: 'radial-gradient(circle at 50% 50%, rgba(255,215,106,0.18) 0%, rgba(200,150,20,0.06) 40%, transparent 65%)',
           pointerEvents: 'none',
+          zIndex: 1,
         }}
         animate={{ opacity: [0, 0, 0.1, 0.30, 0.45, 0.35, 0.1, 0] }}
         transition={{
@@ -90,68 +92,8 @@ export default function AurumOpenScene({ onComplete, fallbackMs, onFallback }) {
         }}
       />
 
-      {/* 2. 외곽 글로우 (확장) */}
-      <motion.div
-        style={{
-          position: 'absolute',
-          top: '50%', left: '50%',
-          width: 120, height: 120,
-          marginTop: -60, marginLeft: -60,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(255,215,106,0.4) 0%, transparent 70%)',
-          filter: 'blur(10px)',
-        }}
-        animate={{
-          scale:   [0, 0, 0.1, 0.6, 2.0, 5.0, 14,  30],
-          opacity: [0, 0, 0.4, 0.7, 0.9, 0.7, 0.3,  0],
-        }}
-        transition={{
-          duration: D,
-          times: [0, t(0.4), t(1.0), t(1.6), t(2.1), t(2.4), t(2.7), 1],
-          ease: [0.2, 0.0, 0.8, 1.0],
-        }}
-      />
-
-      {/* 3. 핵심 — 금빛 구슬 */}
-      <motion.div
-        style={{
-          position: 'absolute',
-          top: '50%', left: '50%',
-          width: 52, height: 52,
-          marginTop: -26, marginLeft: -26,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, #fffde0 0%, #FFD76A 30%, #d4a000 60%, transparent 80%)',
-          boxShadow: [
-            '0 0 16px 6px rgba(255,215,106,0.9)',
-            '0 0 40px 14px rgba(255,180,0,0.5)',
-            '0 0 70px 24px rgba(200,140,0,0.3)',
-          ].join(', '),
-        }}
-        animate={{
-          scale:   [0, 0, 0.02, 0.12, 0.35, 1.0, 3.5, 16],
-          opacity: [0, 0, 0.6, 0.9,  1,    1,   1,   0],
-        }}
-        transition={{
-          duration: D,
-          times: [0, t(0.4), t(1.1), t(1.6), t(2.0), t(2.3), t(2.7), 1],
-          ease: [0.2, 0.0, 0.9, 1.0],
-        }}
-      />
-
-      {/* 4. 플래시 */}
-      <motion.div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'radial-gradient(circle at 50% 50%, rgba(255,248,220,1) 0%, rgba(255,215,106,0.5) 50%, transparent 80%)',
-        }}
-        animate={{ opacity: [0, 0, 0, 0.8, 0] }}
-        transition={{
-          duration: D,
-          times: [0, t(2.3), t(2.5), t(2.65), 1],
-          ease: 'linear',
-        }}
-      />
+      {/* 2~4 빛 layer 제거 — 영상이 주인공, 빛은 #1 배경 분위기만 유지
+           기존 외곽 글로우/핵심 구슬/플래시는 영상 가림 원인이라 미사용 */}
 
     </div>
   );
