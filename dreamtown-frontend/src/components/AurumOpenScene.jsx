@@ -1,13 +1,10 @@
 /**
- * AurumOpenScene.jsx — 아우룸 열림 연출 (3초)
+ * AurumOpenScene.jsx — DreamTown 입장 연출 (3초)
  *
- * 타이밍:
- *   0.0~0.4s  정지          (어두운 배경)
- *   0.4~1.2s  금빛 등장     (중심 글로우)
- *   1.2~2.2s  확장          (빛이 퍼짐)
- *   2.2~3.0s  플래시 + 전환 (화면 통과)
- *
- * 컬러: 금빛 (FFD76A / FFC300 / amber)
+ * 자산: /videos/intro-yeosu-entry-v1.mp4 (공식 승인, 1.5MB)
+ * 타이밍: 0.0~3.0s 비디오 재생 → 감정 질문 전환
+ * 모바일: autoplay + muted + playsInline (iOS 자동재생 정책 충족)
+ * 빛 layer는 비디오 위 subtle overlay 로만 유지 (분위기 보강)
  */
 
 import { useEffect, useRef } from 'react';
@@ -15,9 +12,11 @@ import { motion } from 'framer-motion';
 
 const D = 3.0;
 const t = (sec) => sec / D;
+const INTRO_VIDEO = '/videos/intro-yeosu-entry-v1.mp4';
 
 export default function AurumOpenScene({ onComplete, fallbackMs, onFallback }) {
   const calledRef = useRef(false);
+  const videoRef  = useRef(null);
 
   const done = () => {
     if (!calledRef.current) {
@@ -27,15 +26,20 @@ export default function AurumOpenScene({ onComplete, fallbackMs, onFallback }) {
   };
 
   useEffect(() => {
-    // 정상 종료: 연출 끝나면 전환
+    // 정상 종료: 비디오 3초 후 전환 (끝까지 재생 안 함)
     const tid = setTimeout(done, D * 1000 + 100);
-    // 안전망: fallbackMs 내 onComplete 미호출 시 강제 전환 (연출 실패 대비)
+    // 안전망: fallbackMs 내 onComplete 미호출 시 강제 전환 (영상 로드 실패 대비)
     const fid = fallbackMs ? setTimeout(() => {
       if (!calledRef.current) {
         calledRef.current = true;
         (onFallback ?? onComplete)?.();
       }
     }, fallbackMs) : null;
+
+    // iOS Safari 자동재생 보강 — play() 명시 호출
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {});
+    }
 
     return () => {
       clearTimeout(tid);
@@ -52,14 +56,33 @@ export default function AurumOpenScene({ onComplete, fallbackMs, onFallback }) {
       overflow: 'hidden',
     }}>
 
-      {/* 1. 배경 글로우 (금빛 공간감) */}
+      {/* 0. 공식 입장 영상 (intro-yeosu-entry-v1) */}
+      <video
+        ref={videoRef}
+        src={INTRO_VIDEO}
+        autoPlay
+        muted
+        playsInline
+        preload="auto"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width:  '100%',
+          height: '100%',
+          objectFit: 'cover',
+          background: '#05040a',
+        }}
+      />
+
+      {/* 1. 배경 글로우 (금빛 공간감 — 영상 위 subtle overlay) */}
       <motion.div
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'radial-gradient(circle at 50% 50%, rgba(255,215,106,0.45) 0%, rgba(200,150,20,0.12) 40%, transparent 65%)',
+          background: 'radial-gradient(circle at 50% 50%, rgba(255,215,106,0.18) 0%, rgba(200,150,20,0.06) 40%, transparent 65%)',
+          pointerEvents: 'none',
         }}
-        animate={{ opacity: [0, 0, 0.1, 0.45, 0.75, 0.6, 0.1, 0] }}
+        animate={{ opacity: [0, 0, 0.1, 0.30, 0.45, 0.35, 0.1, 0] }}
         transition={{
           duration: D,
           times: [0, t(0.4), t(0.8), t(1.4), t(2.0), t(2.4), t(2.7), 1],
