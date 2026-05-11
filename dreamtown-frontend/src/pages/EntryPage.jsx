@@ -189,6 +189,33 @@ function CablecarPostcardForm({ loc, refParam }) {
       <div style={F.wrap}>
         <div style={F.brand}>{POSTCARD_LOC_BRAND[loc] ?? 'Daily Miracles'}</div>
 
+        {/* 케이블카 Star Route 히어로 이미지 — star-cache MASTER 01 */}
+        {loc === 'cablecar' && (
+          <div style={{
+            width: '100%', borderRadius: 16, overflow: 'hidden',
+            marginBottom: 22, position: 'relative', flexShrink: 0,
+          }}>
+            <img
+              src="/images/star-cache/yeosu_cablecar/01_confusion_citrine_yeosu_cablecar_stage1.png"
+              alt=""
+              style={{
+                width: '100%', height: 220,
+                objectFit: 'cover', objectPosition: 'center 22%',
+                display: 'block',
+              }}
+            />
+            <div style={{
+              position: 'absolute', bottom: 0, left: 0, right: 0,
+              padding: '32px 16px 12px',
+              background: 'linear-gradient(transparent, rgba(4,3,14,0.65))',
+              fontSize: 11, color: 'rgba(255,255,255,0.40)',
+              letterSpacing: '0.1em', textAlign: 'center',
+            }}>
+              YEOSU CABLE CAR · STAR ROUTE
+            </div>
+          </div>
+        )}
+
         <div style={F.qLabel}>지금 이 순간,<br />어떤 마음인가요?</div>
         <div style={F.grid}>
           {CABLECAR_EMOTIONS.map(e => (
@@ -595,15 +622,32 @@ export default function EntryPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <motion.div
-          style={S.starGlow}
-          animate={{ boxShadow: [
-            '0 0 30px 12px rgba(155,135,245,0.6), 0 0 60px 24px rgba(100,80,200,0.3)',
-            '0 0 50px 20px rgba(155,135,245,0.8), 0 0 90px 36px rgba(100,80,200,0.4)',
-            '0 0 30px 12px rgba(155,135,245,0.6), 0 0 60px 24px rgba(100,80,200,0.3)',
-          ]}}
-          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-        />
+        {loc === 'cablecar' ? (
+          <div style={{
+            width: '100%', borderRadius: 20, overflow: 'hidden',
+            marginBottom: 24, position: 'relative',
+          }}>
+            <img
+              src="/images/star-cache/yeosu_cablecar/21_confusion_diamond_yeosu_cablecar_stage1.png"
+              alt=""
+              style={{
+                width: '100%', height: 200,
+                objectFit: 'cover', objectPosition: 'center 22%',
+                display: 'block',
+              }}
+            />
+          </div>
+        ) : (
+          <motion.div
+            style={S.starGlow}
+            animate={{ boxShadow: [
+              '0 0 30px 12px rgba(155,135,245,0.6), 0 0 60px 24px rgba(100,80,200,0.3)',
+              '0 0 50px 20px rgba(155,135,245,0.8), 0 0 90px 36px rgba(100,80,200,0.4)',
+              '0 0 30px 12px rgba(155,135,245,0.6), 0 0 60px 24px rgba(100,80,200,0.3)',
+            ]}}
+            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        )}
         <div style={S.badge}>{badge}</div>
         <div style={S.headline}>
           {headline.split('\n').map((line, i, arr) => (
