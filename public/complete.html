@@ -285,6 +285,20 @@
     }
     .video-skip:active { background: rgba(255,255,255,0.2); }
 
+    /* ── 포스트카드 감정문구 오버레이 ─────────────────────── */
+    #postcardSentenceOverlay {
+      display: none;
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 28px 20px 18px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.62));
+      font-size: 14px;
+      color: rgba(255,255,255,0.90);
+      letter-spacing: 0.07em;
+      text-align: center;
+      pointer-events: none;
+    }
+
     /* ── 3개월 봉인 섹션 ─────────────────────────────── */
     .seal-section {
       display: none;
@@ -384,6 +398,7 @@
     <div class="postcard-wrap" id="postcardWrap">
       <div class="postcard-skeleton" id="postcardSkeleton">✨</div>
       <img class="postcard-img" id="postcardImg" alt="별 포스트카드" style="display:none">
+      <div id="postcardSentenceOverlay"></div>
     </div>
 
     <div class="emotion-banner" id="emotionBanner">
@@ -445,6 +460,7 @@
     let rawEmotion = '';
     let currentSentence = pickEmotionCopy('');
     document.getElementById('staticSentence').textContent = currentSentence;
+    document.getElementById('postcardSentenceOverlay').textContent = currentSentence;
 
     // ── FLOW 상수 (star-entry.html과 동일) ─────────────
     const FLOW = { EMOTION:1, GEM:2, WISH:3, AURUM:4, GENERATING:5, RESULT:6, PROMISE:7, ASCEND:8, SHARE:9 };
@@ -536,7 +552,13 @@
       const skel = document.getElementById('postcardSkeleton');
       const img  = document.getElementById('postcardImg');
       wrap.classList.add('visible');
-      img.onload  = () => { skel.classList.add('hidden'); img.style.display = 'block'; };
+      img.onload  = () => {
+        skel.classList.add('hidden');
+        img.style.display = 'block';
+        const ov = document.getElementById('postcardSentenceOverlay');
+        ov.textContent = currentSentence;
+        ov.style.display = 'block';
+      };
       img.onerror = () => { skel.classList.add('hidden'); };
       img.src = url;
     }
@@ -555,6 +577,7 @@
             rawEmotion = data.star.emotion;
             currentSentence = pickEmotionCopy(rawEmotion);
             document.getElementById('staticSentence').textContent = currentSentence;
+            document.getElementById('postcardSentenceOverlay').textContent = currentSentence;
           }
           if (data.image_url) {
             imageUrl = data.image_url;
@@ -606,39 +629,7 @@
         ? (BASE_URL + '/star-view/' + encodeURIComponent(accessKey))
         : _entryUrl;
 
-      // ① navigator.share (모바일 네이티브 공유 — 이미지 파일 포함 시도)
-      if (navigator.share) {
-        try {
-          const shareData = {
-            title: '나의 별 포스트카드',
-            text:  '지금 내 마음이 별이 되었어요',
-            url:   _viewUrl,
-          };
-
-          // 이미지 파일 공유 가능 여부 확인
-          if (imageUrl && navigator.canShare) {
-            try {
-              const file = await fetchImageFile(imageUrl);
-              const withFile = { ...shareData, files: [file] };
-              if (navigator.canShare(withFile)) {
-                await navigator.share(withFile);
-                return;
-              }
-            } catch (e) {
-              console.warn('[share] 이미지 파일 공유 실패, URL 공유로 fallback:', e.message);
-            }
-          }
-
-          // 파일 없이 URL 공유
-          await navigator.share(shareData);
-          return;
-        } catch (e) {
-          if (e.name === 'AbortError') return; // 사용자가 직접 닫음
-          console.warn('[share] navigator.share 실패:', e.message);
-        }
-      }
-
-      // ② 카카오 SDK 공유
+      // ① Kakao SDK 우선 — 친구/채팅방 선택 공유 UI
       if (initKakao() && window.Kakao?.Share) {
         try {
           const _absImage = toAbsoluteUrl(imageUrl);
@@ -646,7 +637,7 @@
             objectType: 'feed',
             content: {
               title:       '내 소원이 별이 됐어요 ✨',
-              description: '당신의 소원을, 별로 만들어보세요',
+              description: currentSentence,
               imageUrl:    _absImage,
               link: {
                 mobileWebUrl: _entryUrl,
@@ -669,23 +660,75 @@
         }
       }
 
+      // ② navigator.share 폴백 (Kakao SDK 미가용 환경)
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: '나의 별 포스트카드',
+            text:  currentSentence,
+            url:   _viewUrl,
+          });
+          return;
+        } catch (e) {
+          if (e.name === 'AbortError') return;
+          console.warn('[share] navigator.share 실패:', e.message);
+        }
+      }
+
       // ③ 최종 fallback
       showFallback('공유창이 열리지 않았어요.\n이미지를 저장하거나 링크를 복사해서 보내주세요.');
     });
 
-    // ── 이미지 다운로드 버튼 ──────────────────────────
+    // ── 이미지 다운로드 버튼 (canvas composite — 감정문구 포함) ──
     document.getElementById('btnDownload').addEventListener('click', async () => {
       if (!imageUrl) return;
+      const absUrl = toAbsoluteUrl(imageUrl);
       try {
-        const file = await fetchImageFile(imageUrl);
-        const a    = document.createElement('a');
-        a.href     = URL.createObjectURL(file);
-        a.download = file.name;
+        const blob = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => {
+            const canvas  = document.createElement('canvas');
+            canvas.width  = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            // 하단 그라디언트
+            const gh   = Math.round(canvas.height * 0.24);
+            const grad = ctx.createLinearGradient(0, canvas.height - gh, 0, canvas.height);
+            grad.addColorStop(0, 'rgba(0,0,0,0)');
+            grad.addColorStop(1, 'rgba(0,0,0,0.62)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, canvas.height - gh, canvas.width, gh);
+            // 감정문구 텍스트
+            const fs = Math.max(22, Math.round(canvas.width * 0.042));
+            ctx.font          = `${fs}px 'Noto Sans KR', sans-serif`;
+            ctx.fillStyle     = 'rgba(255,255,255,0.92)';
+            ctx.textAlign     = 'center';
+            ctx.textBaseline  = 'bottom';
+            ctx.fillText(currentSentence, canvas.width / 2, canvas.height - Math.round(fs * 0.65));
+            canvas.toBlob(b => b ? resolve(b) : reject(new Error('toBlob null')), 'image/jpeg', 0.92);
+          };
+          img.onerror = reject;
+          img.src = absUrl;
+        });
+        const a = document.createElement('a');
+        a.href     = URL.createObjectURL(blob);
+        a.download = 'my-star.jpg';
         a.click();
         setTimeout(() => URL.revokeObjectURL(a.href), 5000);
       } catch (e) {
-        // fetch 실패 시 새 탭으로 열기 (iOS Safari 등)
-        window.open(toAbsoluteUrl(imageUrl), '_blank');
+        console.warn('[download] canvas 실패, 원본 다운로드:', e.message);
+        try {
+          const file = await fetchImageFile(imageUrl);
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(file);
+          a.download = file.name;
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+        } catch {
+          window.open(absUrl, '_blank');
+        }
       }
     });
 
