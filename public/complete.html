@@ -367,7 +367,7 @@
     <button class="video-skip" id="videoSkip">건너뛰기</button>
     <!-- 감정 여운 — 영상 종료 후 4초 (헌법 UX 5번) -->
     <div id="emotionReveal" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;z-index:10;">
-      <p style="font-size:20px;color:rgba(255,255,255,0.82);letter-spacing:0.07em;line-height:1.9;text-align:center;padding:0 36px;animation:fadeInUp 0.8s ease both;">오늘의 마음도<br>별이 되었어요</p>
+      <p id="revealSentence" style="font-size:20px;color:rgba(255,255,255,0.82);letter-spacing:0.07em;line-height:1.9;text-align:center;padding:0 36px;animation:fadeInUp 0.8s ease both;">오늘의 마음도 별이 되었어요</p>
       <p style="margin-top:22px;font-size:14px;color:rgba(255,255,255,0.25);animation:fadeInUp 0.8s ease 0.4s both;">✦</p>
     </div>
   </div>
@@ -375,7 +375,7 @@
   <div class="container">
     <span class="star-anim">⭐</span>
     <h1>당신의 별이 기록되었습니다</h1>
-    <p style="font-size:13px;color:rgba(255,255,255,0.38);letter-spacing:0.07em;margin-bottom:10px;">오늘의 마음도 별이 되었어요</p>
+    <p id="staticSentence" style="font-size:13px;color:rgba(255,255,255,0.38);letter-spacing:0.07em;margin-bottom:10px;">오늘의 마음도 별이 되었어요</p>
     <p class="sub">
       이 코드를 저장해두면<br>
       언제든 다시 별을 만날 수 있어요
@@ -424,6 +424,27 @@
       '기대':   '기대가 별이 됐어요',
       '정리됨': '지금이 괜찮아요',
     };
+
+    // ── 감정 문구 SSOT (dreamtown-postcard-emotion-copy-ssot.md v1) ──
+    const EMOTION_COPY = {
+      위로:  ['오늘의 마음도 별이 되었어요','작은 소원 하나가 밤하늘에 남았어요','여수의 밤바다에 작은 빛이 떠올랐어요','아주 작은 마음도 빛이 될 수 있어요'],
+      쉼:    ['오늘의 바람이 조용히 닿았어요','당신의 오늘도 충분히 반짝였어요','조용한 바다 위로 작은 별 하나','마음이 조금 가벼워졌다면 좋겠어요'],
+      연결:  ['당신의 마음은 사라지지 않아요','조금은 믿고 싶어졌어요','여수의 밤하늘이 당신을 기억할 거예요','이 밤의 바람이 당신에게 닿기를'],
+      정리:  ['오늘의 마음을 이 밤에 남겨둘게요','오늘의 소원은 바람처럼 흘러갔어요','당신의 오늘을 별빛으로 남겨둘게요','오늘도 마음속 별 하나를 만났어요'],
+      용기:  ['별빛은 아주 작은 마음에서 시작돼요','당신의 소원은 아직 끝나지 않았어요','오늘의 용기를 별에 담아두었어요','작은 빛 하나가 길이 되어줄 거예요'],
+    };
+    const EMOTION_CATEGORY_MAP = {
+      '숨이 놓였어요': '쉼', '믿고 싶어졌어요': '연결', '정리됐어요': '정리', '용기났어요': '용기',
+      comfort: '쉼', hope: '연결', calm: '정리', courage: '용기', anxiety: '위로',
+      '설렘': '연결', '편안함': '쉼', '기대': '연결', '정리됨': '정리',
+    };
+    function pickEmotionCopy(emo) {
+      const list = EMOTION_COPY[EMOTION_CATEGORY_MAP[emo] || '위로'];
+      return list[Math.floor(Math.random() * list.length)];
+    }
+    let rawEmotion = '';
+    let currentSentence = pickEmotionCopy('');
+    document.getElementById('staticSentence').textContent = currentSentence;
 
     // ── FLOW 상수 (star-entry.html과 동일) ─────────────
     const FLOW = { EMOTION:1, GEM:2, WISH:3, AURUM:4, GENERATING:5, RESULT:6, PROMISE:7, ASCEND:8, SHARE:9 };
@@ -530,6 +551,11 @@
         const data = await res.json();
         if (data.success) {
           emotionText = EMOTION_MAP[data.star?.emotion] || emotionText;
+          if (data.star?.emotion) {
+            rawEmotion = data.star.emotion;
+            currentSentence = pickEmotionCopy(rawEmotion);
+            document.getElementById('staticSentence').textContent = currentSentence;
+          }
           if (data.image_url) {
             imageUrl = data.image_url;
             showPostcard(imageUrl);
@@ -678,6 +704,7 @@
         skip.style.display = 'none';
         // 2. 감정 여운 문장 노출
         const revealEl = document.getElementById('emotionReveal');
+        document.getElementById('revealSentence').textContent = currentSentence;
         revealEl.style.display = 'flex';
         // 3. 4초 후 모달 닫고 공유 섹션 표시
         setTimeout(() => {
