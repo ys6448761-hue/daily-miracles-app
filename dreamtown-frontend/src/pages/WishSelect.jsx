@@ -50,14 +50,17 @@ export default function WishSelect() {
   const [loading, setLoading]           = useState(false);
   const [careMessage, setCareMessage]   = useState('');
   const [error, setError]               = useState('');
+  const [rippling, setRippling]         = useState(null); // { id, key } — one-shot gold ripple
 
-  // 카드 선택 — 공감 메시지 0.9초 표시
+  // 카드 선택 — 공감 메시지 1.4초 + gold ripple 900ms
   function handleSelect(id) {
     if (loading) return;
     setSelected(id);
     setError('');
     setCareMessage('');
     setEchoVisible(true);
+    setRippling({ id, key: Date.now() });
+    setTimeout(() => setRippling(null), 900);
     setTimeout(() => setEchoVisible(false), 1400);
   }
 
@@ -195,7 +198,7 @@ export default function WishSelect() {
                 transition: 'all 0.22s ease',
               }}
             >
-              {/* 선택 시 글로우 레이어 */}
+              {/* 선택 시 persistent 글로우 레이어 */}
               {isSelected && (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -205,6 +208,23 @@ export default function WishSelect() {
                     position: 'absolute', inset: 0,
                     background: `radial-gradient(ellipse at 20% 50%, ${c.accent}20 0%, transparent 65%)`,
                     pointerEvents: 'none',
+                  }}
+                />
+              )}
+
+              {/* 선택 순간 one-shot gold ripple — 750ms easeOut, 조용한 전달 반응 */}
+              {rippling?.id === c.id && (
+                <motion.div
+                  key={rippling.key}
+                  initial={{ opacity: 0.24, scale: 1 }}
+                  animate={{ opacity: 0, scale: 1.55 }}
+                  transition={{ duration: 0.75, ease: 'easeOut' }}
+                  style={{
+                    position: 'absolute', inset: 0,
+                    borderRadius: 20,
+                    background: `radial-gradient(ellipse at 50% 50%, ${c.accent}45 0%, transparent 65%)`,
+                    pointerEvents: 'none',
+                    zIndex: 2,
                   }}
                 />
               )}
