@@ -365,6 +365,11 @@
     </video>
     <p class="video-caption">당신의 소원이,<br>하늘로 올라가고 있어요</p>
     <button class="video-skip" id="videoSkip">건너뛰기</button>
+    <!-- 감정 여운 — 영상 종료 후 4초 (헌법 UX 5번) -->
+    <div id="emotionReveal" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;z-index:10;">
+      <p style="font-size:20px;color:rgba(255,255,255,0.82);letter-spacing:0.07em;line-height:1.9;text-align:center;padding:0 36px;animation:fadeInUp 0.8s ease both;">오늘의 마음도<br>별이 되었어요</p>
+      <p style="margin-top:22px;font-size:14px;color:rgba(255,255,255,0.25);animation:fadeInUp 0.8s ease 0.4s both;">✦</p>
+    </div>
   </div>
 
   <div class="container">
@@ -666,12 +671,26 @@
       let   canPlay = false;
 
       function closeModal() {
-        modal.classList.remove('active');
-        video.pause();
-        localStorage.setItem('flow_step', FLOW.SHARE);
-        const shareEl = document.getElementById('shareSection');
-        shareEl.style.display = 'block';
-        setTimeout(() => shareEl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+        // 1. 영상 페이드 아웃 + 자막·건너뛰기 숨김
+        video.style.transition = 'opacity 0.8s';
+        video.style.opacity = '0';
+        document.querySelector('.video-caption').style.visibility = 'hidden';
+        skip.style.display = 'none';
+        // 2. 감정 여운 문장 노출
+        const revealEl = document.getElementById('emotionReveal');
+        revealEl.style.display = 'flex';
+        // 3. 4초 후 모달 닫고 공유 섹션 표시
+        setTimeout(() => {
+          modal.classList.remove('active');
+          video.pause();
+          video.style.opacity = '';
+          video.style.transition = '';
+          document.querySelector('.video-caption').style.visibility = '';
+          localStorage.setItem('flow_step', FLOW.SHARE);
+          const shareEl = document.getElementById('shareSection');
+          shareEl.style.display = 'block';
+          setTimeout(() => shareEl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+        }, 4000);
       }
 
       video.addEventListener('ended', closeModal);
