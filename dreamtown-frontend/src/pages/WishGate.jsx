@@ -50,6 +50,18 @@ export default function WishGate() {
     const t = setTimeout(() => setQrIntro(false), 500);
     return () => clearTimeout(t);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // 아우룸 텍스트 인트로: 세션 첫 진입 1회 (2.5초)
+  const [showAurumWg, setShowAurumWg] = useState(() => {
+    try { return !sessionStorage.getItem('aurum_seen_wg'); } catch { return false; }
+  });
+  useEffect(() => {
+    if (!showAurumWg) return;
+    const t = setTimeout(() => {
+      try { sessionStorage.setItem('aurum_seen_wg', '1'); } catch {}
+      setShowAurumWg(false);
+    }, 2500);
+    return () => clearTimeout(t);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleCancel() {
     if (prevStarId) {
@@ -168,6 +180,44 @@ export default function WishGate() {
             style={{ position: 'absolute', width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,215,106,0.9)' }}
           />
         ))}
+      </div>
+    );
+  }
+
+  // ── 아우룸 텍스트 인트로 (세션 첫 진입 1회, 2.5초) ──────────────────
+  if (showAurumWg) {
+    return (
+      <div style={{
+        position: 'fixed', inset: 0,
+        background: 'radial-gradient(ellipse at 50% 60%, #0c0820 0%, #060410 100%)',
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        zIndex: 10,
+      }}>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.6 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          style={{
+            width: 64, height: 64, borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(255,215,106,0.18) 0%, transparent 70%)',
+            border: '1.5px solid rgba(255,215,106,0.35)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 24, color: 'rgba(255,215,106,0.8)',
+            marginBottom: 28,
+          }}
+        >✦</motion.div>
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.4 }}
+          style={{
+            fontSize: 16, color: 'rgba(255,255,255,0.75)',
+            textAlign: 'center', lineHeight: 1.65, letterSpacing: '0.02em',
+          }}
+        >
+          아우룸이 당신의 소원을<br />담고 있어요
+        </motion.p>
       </div>
     );
   }
