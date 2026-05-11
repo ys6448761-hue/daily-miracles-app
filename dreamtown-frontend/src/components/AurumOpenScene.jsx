@@ -11,7 +11,7 @@
 import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 
-const D = 3.0;
+const D = 5.0;
 const t = (sec) => sec / D;
 const INTRO_VIDEO = '/videos/intro-yeosu-entry-v1.mp4';
 
@@ -29,7 +29,7 @@ export default function AurumOpenScene({ onComplete, fallbackMs, onFallback }) {
         calledRef.current = true;
         onComplete?.();
       }
-    }, 3000);
+    }, 5000);
 
     // iOS Safari 자동재생 보강 — play() 명시 호출 (실패해도 timer 영향 없음)
     if (videoRef.current) {
