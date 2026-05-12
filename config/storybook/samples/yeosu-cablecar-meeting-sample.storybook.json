@@ -1,0 +1,199 @@
+{
+  "_meta": {
+    "sample_id": "yeosu-cablecar-meeting-sample-v1",
+    "purpose": "케이블카 QR 이후 사용자가 받게 될 감정 Storybook 경험 미팅 시연용",
+    "created": "2026-05-12",
+    "status": "MEETING_SAMPLE — 정식 Storybook Engine 완성본 아님",
+    "scope": "4~5페이지 감정 흐름 시나리오. 이미지 없음. 카피 + 장소 역할 + 희미한 희망 흐름 중심.",
+    "entry_trigger": "케이블카 QR 스캔 → 소원 입력 완료 → Storybook 진입",
+    "note": "hamel-storybook.json은 참조만. 각 장소 카피는 이 여정을 위해 새로 작성됨."
+  },
+
+  "journey": {
+    "title": "땅을 떠난 순간부터",
+    "subtitle": "케이블카 위에서 시작된 당신의 이야기",
+    "emotional_arc": "머무름 → 상승 → 연결 → 밤의 정리 → 희미한 희망",
+    "hope_curve": [0.3, 0.6, 0.5, 0.4, 0.65],
+    "total_pages": 5
+  },
+
+  "pages": [
+
+    {
+      "page_index": 1,
+      "page_id": "cafe_pause",
+      "page_type": "scene_intro",
+      "location": "yeosu_cafe",
+      "route": "Pause Route",
+      "emotional_role": "머무름 / 정리 / 쉼",
+      "hope_intensity": 0.3,
+
+      "visual_concept": {
+        "scene": "카페 창가. 밤바다가 유리 너머로 보임. 커피컵이 테이블 위에.",
+        "character": "소원이 뒷모습. 창을 향해 앉아 있음. 손이 테이블 위에 놓임.",
+        "light": "따뜻한 실내 앰버 + 창 너머 차가운 야경. 두 빛이 교차하는 경계.",
+        "star": "창 너머 하늘에 희미하게 하나."
+      },
+
+      "copy": {
+        "location_label": "여수 카페",
+        "lines": [
+          "잠깐 앉아서",
+          "마음을 내려놓은 자리"
+        ],
+        "echo": "서두르지 않아도 돼요.",
+        "scene_note": "케이블카에 오르기 전, 잠시 멈추는 시간."
+      },
+
+      "transition_to_next": {
+        "cue": "창 너머 케이블카 불빛이 보임.",
+        "copy": "그래도 가보고 싶었어요."
+      }
+    },
+
+    {
+      "page_index": 2,
+      "page_id": "cablecar_ascent",
+      "page_type": "star_moment",
+      "location": "yeosu_cablecar",
+      "route": "Star Route",
+      "emotional_role": "상승 / 전환 / 떠오름",
+      "hope_intensity": 0.6,
+
+      "visual_concept": {
+        "scene": "케이블카 안 또는 케이블카에서 내려다보는 여수 밤바다 전경. 공중. 넓은 시야.",
+        "character": "소원이 뒷모습. 유리 너머 야경을 바라봄. 땅에서 떨어진 공간.",
+        "light": "케이블카 내부 은은한 조명 + 아래로 펼쳐지는 여수 도시 불빛들.",
+        "star": "하늘에 하나, 선명하게. 아래 도시 불빛과 대비."
+      },
+
+      "copy": {
+        "location_label": "여수 케이블카",
+        "lines": [
+          "땅을 떠난 순간",
+          "모든 게 작아졌어요"
+        ],
+        "echo": "높이에서 보면 달라 보여요.",
+        "scene_note": "상승. 시야가 열리는 순간. 소원이 별이 되는 지점."
+      },
+
+      "star_birth_note": "이 페이지가 별 탄생의 감정적 정점. 기술적 star_birth는 이미 완료됐지만, 이 장면에서 사용자가 감정적으로 별의 탄생을 체감한다.",
+
+      "transition_to_next": {
+        "cue": "케이블카가 천천히 내려옴. 바다가 다시 가까워짐.",
+        "copy": "내려오면서, 기억 하나가 떠올랐어요."
+      }
+    },
+
+    {
+      "page_index": 3,
+      "page_id": "hamel_memory",
+      "page_type": "reflection",
+      "location": "yeosu_hamel",
+      "route": "Memory Route",
+      "emotional_role": "회고 / 연결 / 기억",
+      "hope_intensity": 0.5,
+
+      "visual_concept": {
+        "scene": "하멜 등대 항구. 밤. 케이블카에서 내려온 후 항구 가장자리에 서 있음.",
+        "character": "소원이 뒷모습. 바다를 바라봄. 아까보다 조금 더 고요한 자세.",
+        "light": "등대 불빛 + 먼 수평선 빛. 케이블카에서 봤던 불빛들이 이제 수평선에 있음.",
+        "star": "하늘에. 케이블카 위에서 봤던 그 별인 듯."
+      },
+
+      "copy": {
+        "location_label": "여수 하멜 등대",
+        "lines": [
+          "그때와 지금이",
+          "여기서 연결됐어요"
+        ],
+        "echo": "잊은 게 아니었어요.",
+        "scene_note": "케이블카 상승 직후의 감정이 기억과 연결되는 순간."
+      },
+
+      "transition_to_next": {
+        "cue": "밤이 깊어짐. 항구의 불빛이 하나씩 꺼짐.",
+        "copy": "혼자 남겨진 것 같았어요. 하지만 괜찮았어요."
+      }
+    },
+
+    {
+      "page_index": 4,
+      "page_id": "hotel_night",
+      "page_type": "emotion_card",
+      "location": "yeosu_hotel",
+      "route": "Night Route",
+      "emotional_role": "혼자 있는 밤 / 기다림 / 정리",
+      "hope_intensity": 0.4,
+
+      "visual_concept": {
+        "scene": "호텔 창가. 밤. 창 너머로 여수 야경이 보임. 방 안은 어둡고 조용함.",
+        "character": "소원이 창가에 서 있거나 앉아 있음. 야경을 바라봄. 혼자.",
+        "light": "창 너머 도시 불빛만. 방 안 조명 없거나 매우 희미.",
+        "star": "창 너머 하늘. 아까보다 별이 더 가깝게 느껴짐."
+      },
+
+      "copy": {
+        "location_label": "여수 밤, 숙소",
+        "lines": [
+          "혼자였지만",
+          "혼자만은 아니었던 밤"
+        ],
+        "echo": "이 밤도 별은 있었어요.",
+        "scene_note": "내면 정리의 시간. 감정이 가라앉고 선명해지는 밤."
+      },
+
+      "transition_to_next": {
+        "cue": "창 너머 별이 조금 더 밝아지는 것 같은 느낌.",
+        "copy": "아주 작은 빛이 남았어요."
+      }
+    },
+
+    {
+      "page_index": 5,
+      "page_id": "faint_hope_closing",
+      "page_type": "closing",
+      "location": "faint_hope",
+      "route": null,
+      "emotional_role": "희미한 희망 / 작은 빛 / 유지",
+      "hope_intensity": 0.65,
+      "optional": true,
+
+      "visual_concept": {
+        "scene": "장소 없음. 추상. 어두운 배경 위 작은 별 하나.",
+        "character": "없음. 또는 매우 작게 멀리.",
+        "light": "작은 별 하나. 어둠이 크지만 빛이 있다.",
+        "star": "중앙. 작고 고요하게."
+      },
+
+      "copy": {
+        "location_label": null,
+        "lines": [
+          "작은 빛이",
+          "어두운 바다 위에 남았어요"
+        ],
+        "echo": "이 빛이 당신의 소원이에요.",
+        "scene_note": "전체 여정의 마무리. 별이 남아있다는 사실 자체가 희망."
+      },
+
+      "closing_note": "이 페이지는 optional. 미팅 흐름에 따라 4페이지로 마감하거나 5페이지로 확장 가능."
+    }
+
+  ],
+
+  "meeting_notes": {
+    "flow_summary": "카페(멈춤) → 케이블카(상승+별탄생) → 하멜(기억연결) → 호텔(밤의 정리) → 작은 빛(마무리)",
+    "key_design_decisions": [
+      "케이블카 페이지를 star_moment로 지정 — 별 탄생의 감정적 정점",
+      "하멜은 여정 중간 기억 연결 역할 — 출발점(hamel-storybook)과 다른 역할",
+      "호텔은 정서적 하강(0.4) — 감정 수렴을 위한 의도적 내리막",
+      "faint_hope_closing은 optional — 미팅 맥락에 따라 조절 가능"
+    ],
+    "questions_for_meeting": [
+      "케이블카 페이지에서 star_birth를 명시적으로 보여줄지, 암시로 처리할지",
+      "호텔 페이지 hope_intensity 0.4가 너무 낮은지 — 기다림으로 재해석 여지",
+      "faint_hope_closing 포함 여부 — 4페이지 완결 vs 5페이지 열린 마무리",
+      "각 페이지 전환 카피 톤 조율 — 지금은 서술체, 감탄체/질문체 검토 가능"
+    ]
+  }
+}
