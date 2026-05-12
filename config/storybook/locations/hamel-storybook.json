@@ -1,0 +1,218 @@
+{
+  "location_id": "yeosu_hamel",
+  "route_name": "Memory Route",
+  "emotional_role": "회고 / 연결 / 기억",
+  "story_function": "과거와 현재를 잇는 공간. 기억이 남아있다는 것을 확인하는 장소. 소원은 여기서 처음 꺼내진다.",
+
+  "visual_grammar": {
+    "scene_type": "outdoor_harbor_night",
+    "space_openness": "wide horizontal / open sea horizon / vast sky above",
+    "dominant_mood": "quiet nostalgia merging into fragile hope",
+    "scene_must_include": [
+      "Hamel Lighthouse silhouette",
+      "open sea horizon",
+      "harbor edge or low stone wall",
+      "night sky with single star",
+      "distant city lights reflected on water"
+    ],
+    "scene_may_include": [
+      "subtle fog near water surface",
+      "faint moonlight",
+      "distant ships at anchor"
+    ]
+  },
+
+  "character_rules": {
+    "sowoni": {
+      "default_pose": "standing at harbor edge, facing the open sea",
+      "emotional_center": true,
+      "view_direction": "toward open sea and star",
+      "emotion_variants": {
+        "confusion": "standing still, shoulders slightly down, gaze drifting",
+        "pause": "standing, weight shifted to one side, watching the waves",
+        "calm": "standing upright, relaxed shoulders, looking at the sea",
+        "curiosity": "slight lean forward, head tilted up toward the star",
+        "fragile_hope": "standing straight, one step forward, horizon gaze"
+      }
+    },
+    "aurum": {
+      "presence": "subtle",
+      "role": "동반자. 소원이 뒤 먼 거리에서 지켜봄. 개입하지 않음.",
+      "form": "별 또는 빛의 형태. 배경에 희미하게."
+    }
+  },
+
+  "star_rules": {
+    "position": "open sky above the sea, slightly right of center",
+    "brightness": "140% — visible but not blinding",
+    "glow": "soft wide halo over water surface",
+    "color_source": "emotion_gem_map",
+    "emotion_overrides": {
+      "fragile_hope": "brighter than default — this is the arrival emotion"
+    }
+  },
+
+  "camera_rules": {
+    "default": {
+      "type": "wide shot",
+      "distance": "far — shows Sowoni small against the sea",
+      "angle": "eye level from behind",
+      "note": "공간이 인물을 담는다. 인물보다 공간이 크다."
+    },
+    "confusion": {
+      "type": "wide shot",
+      "distance": "far",
+      "framing": "Sowoni in lower third, sea and sky dominant",
+      "angle": "slightly above eye level",
+      "note": "방향 없음. 어디로 가야 할지 모르는 구도."
+    },
+    "pause": {
+      "type": "medium-wide shot",
+      "distance": "medium-far",
+      "framing": "Sowoni centered, waves in foreground",
+      "angle": "eye level",
+      "note": "멈춤. 파도가 발 앞에 있다."
+    },
+    "calm": {
+      "type": "medium shot",
+      "distance": "medium",
+      "framing": "Sowoni and sea in balance",
+      "angle": "eye level, slight push in",
+      "note": "바다와 소원이가 같은 무게. 조용한 공존."
+    },
+    "curiosity": {
+      "type": "medium shot",
+      "distance": "medium",
+      "framing": "Sowoni in lower half, star prominent in upper half",
+      "angle": "slightly low — looking up toward star",
+      "note": "별이 궁금해지기 시작. 시선이 위로."
+    },
+    "fragile_hope": {
+      "type": "wide shot",
+      "distance": "medium-far",
+      "framing": "Sowoni centered, horizon line at mid-frame, star bright above",
+      "angle": "eye level",
+      "note": "지평선이 보인다. 갈 수 있을 것 같다."
+    }
+  },
+
+  "color_temperature": {
+    "indoor": "N/A",
+    "outdoor": "deep navy blue (#1C2B3A) to dark reflective sea (#0D1A26)",
+    "star_accent": "soft gold / white — varies by emotion gem",
+    "dominant": "cold blue night + warm amber city glow on horizon"
+  },
+
+  "hope_intensity": "ascending",
+
+  "page_templates": [
+    {
+      "page_id": "hamel_intro",
+      "page_type": "scene_intro",
+      "visual_cue": "하멜 등대 실루엣. 밤바다. 소원이 등장 전.",
+      "copy": {
+        "headline": "여수 하멜 등대, 밤",
+        "body": "기억이 남는 곳에는 이유가 있다."
+      }
+    },
+    {
+      "page_id": "hamel_emotion_confusion",
+      "page_type": "emotion_card",
+      "emotion": "confusion",
+      "visual_cue": "소원이 항구 끝에 서 있음. 어깨가 약간 내려간 자세.",
+      "copy": {
+        "lines": ["어디로 가야 할지 몰랐던", "밤"],
+        "echo": "그 밤은 아직 여기 있어요."
+      }
+    },
+    {
+      "page_id": "hamel_emotion_pause",
+      "page_type": "emotion_card",
+      "emotion": "pause",
+      "visual_cue": "소원이 파도 앞에 멈춰 서 있음. 발 앞에 파도.",
+      "copy": {
+        "lines": ["잠시 멈춰 서 있었던", "파도 앞에서"],
+        "echo": "멈추는 것도 움직임이에요."
+      }
+    },
+    {
+      "page_id": "hamel_emotion_calm",
+      "page_type": "emotion_card",
+      "emotion": "calm",
+      "visual_cue": "소원이와 바다가 같은 무게로. 바다가 조용히 옆에 있음.",
+      "copy": {
+        "lines": ["바다가 말없이 있어줬던", "밤"],
+        "echo": "말 없이 있어주는 것도 위로예요."
+      }
+    },
+    {
+      "page_id": "hamel_emotion_curiosity",
+      "page_type": "emotion_card",
+      "emotion": "curiosity",
+      "visual_cue": "소원이 시선이 위로. 별이 하늘에 보임.",
+      "copy": {
+        "lines": ["저 빛이 궁금했던", "순간"],
+        "echo": "궁금함이 시작이었어요."
+      }
+    },
+    {
+      "page_id": "hamel_emotion_fragile_hope",
+      "page_type": "emotion_card",
+      "emotion": "fragile_hope",
+      "visual_cue": "소원이 한 발 앞으로. 지평선이 보임. 별이 밝게.",
+      "copy": {
+        "lines": ["다시 출발할 수 있을 것 같았던", "새벽"],
+        "echo": "그 새벽이 당신을 여기까지 데려왔어요."
+      }
+    },
+    {
+      "page_id": "hamel_star_moment",
+      "page_type": "star_moment",
+      "visual_cue": "소원이 앞에 별이 나타남. 하늘의 별이 아래로 내려오듯.",
+      "copy": {
+        "headline": "그 마음이 별이 되었습니다",
+        "body": "여수 밤하늘에, 당신의 기억이 빛이 됩니다."
+      }
+    },
+    {
+      "page_id": "hamel_reflection",
+      "page_type": "reflection",
+      "visual_cue": "소원이 뒷모습. 바다와 별. 거리감 없이.",
+      "copy": {
+        "body": "기억은 사라지지 않아요. 별이 되어 남아있어요."
+      }
+    },
+    {
+      "page_id": "hamel_closing",
+      "page_type": "closing",
+      "visual_cue": "하멜 등대 실루엣. 별 하나. 소원이는 사라지고 별만 남음.",
+      "copy": {
+        "headline": "저 별은 당신을 기억합니다"
+      }
+    }
+  ],
+
+  "transition_copy": {
+    "entry": "기억이 남는 곳에는 이유가 있다.",
+    "star_birth": "그 마음이 별이 되었습니다.",
+    "closing": "저 별은 당신을 기억합니다.",
+    "between_pages": [
+      "항구 끝에 서서",
+      "파도는 묻지 않는다",
+      "별은 기다린다",
+      "밤은 지나가지만 기억은 남는다",
+      "빛이 되기 전, 마음이 먼저였다"
+    ]
+  },
+
+  "forbidden_rules": [
+    "관광지 소개 언어 — 여수는 배경이지 목적지가 아님",
+    "점술·운세 언어 — '좋은 일이 올 것이다' 류 금지",
+    "강요된 감정 해석 — '이 감정은 ~을 의미한다' 단정 금지",
+    "소원이 정면 얼굴 노출 — 공감 차단",
+    "소원이 앉은 자세 — hamel은 서 있는 출발의 공간",
+    "아우룸 주인공화 — 아우룸은 배경 빛으로만 존재",
+    "복수의 별 — 별은 하나, 소원 하나",
+    "대사로 감정을 설명하는 나레이션"
+  ]
+}

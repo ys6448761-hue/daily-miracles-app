@@ -1,0 +1,248 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "dreamtown-storybook-location-schema-v1",
+  "title": "DreamTown Storybook Location Config",
+  "description": "스토리북 엔진용 장소 설정 스키마. config/storybook/locations/*.json이 이 스키마를 따른다. config/thumbnail/*.json과 독립적으로 존재한다.",
+  "type": "object",
+  "required": [
+    "location_id",
+    "route_name",
+    "emotional_role",
+    "story_function",
+    "visual_grammar",
+    "character_rules",
+    "star_rules",
+    "camera_rules",
+    "color_temperature",
+    "hope_intensity",
+    "page_templates",
+    "transition_copy",
+    "forbidden_rules"
+  ],
+  "properties": {
+
+    "location_id": {
+      "type": "string",
+      "description": "고유 장소 식별자. thumbnail config의 location 필드와 일치해야 함.",
+      "examples": ["yeosu_hamel", "yeosu_cablecar", "yeosu_cafe", "yeosu_hotel", "yeosu_jangdo", "yeosu_odongdo", "yeosu_hyangiram", "yeosu_dolsan"]
+    },
+
+    "route_name": {
+      "type": "string",
+      "description": "스토리 경로 영문명. DreamTown 공식 라우트 이름.",
+      "examples": ["Memory Route", "Star Route", "Pause Route", "Night Route"]
+    },
+
+    "emotional_role": {
+      "type": "string",
+      "description": "이 장소가 담당하는 감정 역할. 슬래시 구분 한국어.",
+      "examples": ["회고 / 연결 / 기억", "상승 / 전환 / 떠오름", "머무름 / 정리 / 쉼"]
+    },
+
+    "story_function": {
+      "type": "string",
+      "description": "전체 DreamTown 감정 흐름 안에서 이 장소가 수행하는 서사 기능."
+    },
+
+    "visual_grammar": {
+      "type": "object",
+      "description": "장면 시각 문법. thumbnail config의 scene 블록과 달리 스토리북 연출 관점에서 정의한다.",
+      "required": ["scene_type", "space_openness", "dominant_mood", "scene_must_include"],
+      "properties": {
+        "scene_type": {
+          "type": "string",
+          "description": "장면 유형 (outdoor_harbor / indoor_cafe / elevated_cable / cliff_temple 등)"
+        },
+        "space_openness": {
+          "type": "string",
+          "description": "공간 개방감. 감정 비유 포함.",
+          "examples": ["wide horizontal / open sea horizon", "enclosed warmth / window-framed sea"]
+        },
+        "dominant_mood": {
+          "type": "string",
+          "description": "장면의 지배적 감정 분위기. emotion-system 감정어와 연결."
+        },
+        "scene_must_include": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "스토리북 장면에 반드시 포함되어야 하는 시각 요소"
+        },
+        "scene_may_include": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "선택적으로 포함 가능한 시각 요소"
+        }
+      }
+    },
+
+    "character_rules": {
+      "type": "object",
+      "description": "소원이 / 아우룸 스토리북 등장 규칙. thumbnail config의 character 블록보다 상세함.",
+      "required": ["sowoni", "aurum"],
+      "properties": {
+        "sowoni": {
+          "type": "object",
+          "required": ["default_pose", "emotional_center"],
+          "properties": {
+            "default_pose": { "type": "string" },
+            "emotional_center": {
+              "type": "boolean",
+              "description": "소원이가 이 장소의 감정 중심인지 여부. 항상 true."
+            },
+            "view_direction": { "type": "string" },
+            "emotion_variants": {
+              "type": "object",
+              "description": "감정별 자세 변형. key = emotion_id, value = 자세 설명.",
+              "additionalProperties": { "type": "string" }
+            }
+          }
+        },
+        "aurum": {
+          "type": "object",
+          "required": ["presence", "role"],
+          "properties": {
+            "presence": {
+              "type": "string",
+              "enum": ["none", "subtle", "optional", "present"],
+              "description": "none: 등장 금지 / subtle: 배경 희미하게 / optional: 장면에 따라 / present: 명확히 존재"
+            },
+            "role": { "type": "string" },
+            "form": {
+              "type": "string",
+              "description": "아우룸이 어떤 형태로 존재하는지 (별 / 빛 / 실루엣 등)"
+            }
+          }
+        }
+      }
+    },
+
+    "star_rules": {
+      "type": "object",
+      "description": "별 표현 규칙. emotion-gem-map 참조 여부 포함.",
+      "required": ["position", "brightness", "color_source"],
+      "properties": {
+        "position": { "type": "string" },
+        "brightness": { "type": "string" },
+        "glow": { "type": "string" },
+        "color_source": {
+          "type": "string",
+          "enum": ["emotion_gem_map", "location_override", "fixed"],
+          "description": "emotion_gem_map: config/thumbnail/emotion-gem-map.json 기준 / location_override: 이 파일 내 재정의 / fixed: 단일 색 고정"
+        },
+        "emotion_overrides": {
+          "type": "object",
+          "description": "특정 감정에서만 별 색/위치를 재정의. key = emotion_id.",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+
+    "camera_rules": {
+      "type": "object",
+      "description": "감정별 카메라 구도. default + 감정별 override.",
+      "properties": {
+        "default": {
+          "type": "object",
+          "properties": {
+            "type": { "type": "string" },
+            "distance": { "type": "string" },
+            "angle": { "type": "string" },
+            "note": { "type": "string" }
+          }
+        }
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string" },
+          "distance": { "type": "string" },
+          "framing": { "type": "string" },
+          "angle": { "type": "string" },
+          "note": { "type": "string" }
+        }
+      }
+    },
+
+    "color_temperature": {
+      "type": "object",
+      "description": "장소 색온도 정의. 실내/실외 구분.",
+      "required": ["outdoor", "star_accent", "dominant"],
+      "properties": {
+        "indoor": {
+          "type": "string",
+          "description": "실내 공간 색온도. 실외 전용 장소는 'N/A'."
+        },
+        "outdoor": { "type": "string" },
+        "star_accent": { "type": "string" },
+        "dominant": { "type": "string" }
+      }
+    },
+
+    "hope_intensity": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "ascending", "stable", "descending"],
+      "description": "장소 전체의 희망 강도 흐름. ascending=혼란→희망 / stable=유지 / descending=내려놓음"
+    },
+
+    "page_templates": {
+      "type": "array",
+      "description": "스토리북 페이지 구성 순서와 내용 정의",
+      "items": {
+        "type": "object",
+        "required": ["page_id", "page_type"],
+        "properties": {
+          "page_id": { "type": "string" },
+          "page_type": {
+            "type": "string",
+            "enum": ["scene_intro", "emotion_card", "star_moment", "reflection", "closing", "transition"],
+            "description": "scene_intro: 장소 첫 등장 / emotion_card: 감정별 카드 / star_moment: 별 탄생 / reflection: 되돌아봄 / closing: 마지막 페이지 / transition: 페이지간 전환"
+          },
+          "emotion": {
+            "type": "string",
+            "description": "emotion_card 타입일 때만 사용. emotion_id."
+          },
+          "visual_cue": { "type": "string" },
+          "copy": {
+            "type": "object",
+            "properties": {
+              "headline": { "type": "string" },
+              "body": { "type": "string" },
+              "lines": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "2줄 카드 카피. hamel-copy.json lines 형식과 동일."
+              },
+              "echo": {
+                "type": "string",
+                "description": "감정 선택 후 표시되는 공명 한 줄. WishSelect.jsx의 echo와 동일 역할."
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "transition_copy": {
+      "type": "object",
+      "description": "장면/페이지 전환 시 사용하는 텍스트. 장소별로 고유한 어조.",
+      "required": ["entry", "closing"],
+      "properties": {
+        "entry": { "type": "string", "description": "장소 진입 시 첫 텍스트" },
+        "star_birth": { "type": "string", "description": "별 탄생 순간 텍스트" },
+        "closing": { "type": "string", "description": "장소 마지막 텍스트" },
+        "between_pages": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "페이지 전환 시 사용할 수 있는 짧은 문구 풀"
+        }
+      }
+    },
+
+    "forbidden_rules": {
+      "type": "array",
+      "description": "이 장소 스토리북에서 절대 금지하는 연출, 텍스트, 구도",
+      "items": { "type": "string" }
+    }
+
+  }
+}
