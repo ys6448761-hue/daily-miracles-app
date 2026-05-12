@@ -1,0 +1,57 @@
+scene_id: small_light
+scene_name: 작은 빛
+
+core_emotion:
+  primary: tiny_hope
+  description: >
+    거대하지 않지만 꺼지지 않는 것.
+    어둠이 크고 빛이 작아도, 빛이 있다는 사실 자체.
+    무너지지 않은 것 — 그것이 이미 충분하다.
+
+flow_stage: 유지 — 성장이 느릴 때, 존재 자체를 확인하는 단계
+
+space_design:
+  openness: 어둡고 닫힌 느낌이지만 완전히 막히지 않음
+  distance: 가까움. 내면에 집중하는 거리
+  scale: 빛이 작고, 어둠이 크다. 하지만 빛이 중심
+  texture: 어두운 방 또는 밤 외부. 빛 하나가 공간을 정의함
+
+light_design:
+  source: 단일 작은 광원 — 초 / 랜턴 / 작은 별 하나
+  intensity: 매우 낮음. 주변을 다 밝히지 못함
+  direction: 중심에서 사방으로 약하게 퍼짐
+  quality: 일정함. 흔들릴 수 있지만 꺼지지 않음
+  color_tone: 따뜻한 앰버 또는 연한 금빛. 주변은 딥 블루-블랙
+
+movement:
+  camera_flow: 고정 또는 매우 천천히 빛에 가까이 다가옴
+  emotional_speed: 정적. 거의 멈춰있음
+  key_motion: 빛이 미세하게 흔들림. 하지만 꺼지지 않음
+  transition: 없음. 이 순간 자체가 목적
+
+symbolism:
+  primary_symbol: 작은 빛 하나 — 꺼지지 않았다는 사실
+  secondary_symbol: 어둠의 크기 — 빛이 작아도 어둠을 완전히 이기지 않아도 됨
+  implicit: 지속성. 결과가 아니라 유지 자체
+  avoid: 빛이 점점 커지는 연출 (성장 강요), 승리 서사
+
+character_usage:
+  sowoni:
+    presence: 선택적. 있다면 빛 옆에 조용히 앉아있음
+    position: 빛 가까이. 빛에 기대거나 빛을 바라봄
+    posture: 앉거나 웅크린 자세. 긴장보다 안도에 가까움
+    action: 정지. 빛을 바라보거나 빛과 함께 있음
+
+  aurum:
+    presence: 없음. 이 장면은 혼자의 시간
+    position: 없음
+    role: 없음. 소원이 혼자 빛 앞에 있을 것
+    action: 없음
+
+forbidden:
+  - over_explanation
+  - dramatic_dialogue
+  - forced_symbolism
+  - 빛이 점점 커지는 성장 강요 연출
+  - "포기하지 마" "희망을 가져" 류 내레이션
+  - 아우룸 개입 (이 장면은 혼자다)

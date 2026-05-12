@@ -1,0 +1,57 @@
+scene_id: dawn_transition
+scene_name: 새벽 전환
+
+core_emotion:
+  primary: healing
+  description: >
+    밤이 끝나는 것이 아니라 낮이 시작되는 감각.
+    무언가가 사라지는 것이 아니라 천천히 채워지는 느낌.
+    강한 전환이 아니라 스며드는 변화.
+
+flow_stage: 전환 — 감정 수렴 후, 성장 인식 이전
+
+space_design:
+  openness: 수평으로 넓음. 수직은 위로 열림
+  distance: 수평선까지 멀다. 하지만 공간이 적대적이지 않음
+  scale: 인물과 공간이 균형. 혼자지만 압도되지 않음
+  texture: 새벽 바다 또는 새벽 도시. 아직 아무도 없는 시간
+
+light_design:
+  source: 수평선 너머 새벽 확산광
+  intensity: 낮음에서 중간으로 천천히 증가
+  direction: 수평선에서 퍼지는 방향. 위로 번짐
+  quality: 부드럽게 확산. 그림자가 점점 사라짐
+  color_tone: 밤 블루(배경) → 새벽 핑크-라벤더 → 연한 금빛(수평선)
+
+movement:
+  camera_flow: 고정 또는 매우 느린 줌아웃. 빛의 퍼짐이 주 움직임
+  emotional_speed: 느림. 하지만 멈추지 않음. 자연스러운 흐름
+  key_motion: 빛이 천천히 수평선에서 퍼져나옴. 하늘이 조금씩 밝아짐
+  transition: 어둠 → 새벽. 극적이지 않음. 알아채기 전에 이미 변해 있음
+
+symbolism:
+  primary_symbol: 수평선의 첫 빛 — 아직 완전히 오지 않았지만 오고 있음
+  secondary_symbol: 점점 사라지는 별 — 끝이 아니라 자리를 비워줌
+  implicit: 새벽 공기의 차가움 + 빛의 따뜻함 교차
+  avoid: 해돋이 클리셰, 극적인 색 폭발, "새 시작" 자막
+
+character_usage:
+  sowoni:
+    presence: 선택적. 있다면 수평선을 바라보는 자세
+    position: 화면 중앙 또는 아래. 빛을 향해 있음
+    posture: 서 있거나 앉아서 바라봄. 긴장 풀린 자세
+    action: 정지. 새벽빛을 받고 있음
+
+  aurum:
+    presence: 선택적. 있다면 수평선 빛 안에 녹아있음
+    position: 수평선. 빛의 일부
+    role: 전환을 안내하지 않음. 빛과 함께 존재
+    action: 없음. 빛이 됨
+
+forbidden:
+  - over_explanation
+  - dramatic_dialogue
+  - forced_symbolism
+  - 해돋이를 "희망의 순간"으로 명시하는 연출
+  - 극적인 색 변화 (치유는 폭발하지 않는다)
+  - 음악 없이는 전달 안 되는 구성

@@ -1,0 +1,56 @@
+scene_id: wish_departure
+scene_name: 소원 출발
+
+core_emotion:
+  primary: quiet_hope
+  description: >
+    마음속에 담아두었던 것을 처음 꺼내는 순간.
+    확신보다 두려움이 많지만, 그래도 내보내는 첫 발.
+    거대한 결심이 아니라 조용한 시작.
+
+flow_stage: 시작 — 소원 입력 직후, 별 탄생 전
+
+space_design:
+  openness: 매우 넓음. 앞이 열려있고 끝이 보이지 않음
+  distance: 인물과 수평선 사이 거리가 멀다
+  scale: 인물이 작다. 공간이 인물을 담는다
+  texture: 넓은 바다 또는 항구 가장자리. 밤 또는 새벽
+
+light_design:
+  source: 손에 든 랜턴 + 먼 수평선 빛
+  intensity: 낮음. 주변이 어둡고 두 빛만 존재
+  direction: 아래(랜턴) + 수평(수평선). 교차
+  quality: 흔들리는 랜턴 빛과 고요한 수평선 빛의 대비
+  color_tone: 따뜻한 호박색(랜턴) ↔ 연한 금빛(수평선)
+
+movement:
+  camera_flow: 뒤에서 천천히 인물에게 다가옴. 또는 인물과 함께 수평선을 바라봄
+  emotional_speed: 매우 느림. 서두르지 않는다
+  key_motion: 인물이 손을 조심스럽게 앞으로 내밀거나 랜턴을 들어 올림
+  transition: 정지 → 첫 움직임. 시작의 순간 포착
+
+symbolism:
+  primary_symbol: 랜턴 — 아직 작지만 혼자 켜져 있는 빛
+  secondary_symbol: 넓은 어두운 바다 — 아직 알 수 없는 여정
+  implicit: 인물의 등 — 이미 출발했다는 사실
+  avoid: 화려한 불꽃, 별똥별, 극적인 빛줄기
+
+character_usage:
+  sowoni:
+    presence: 필수
+    position: 중앙 또는 약간 아래. 화면에서 작게
+    posture: 뒷모습. 수평선을 향해 서 있음
+    action: 랜턴을 들고 있거나 한 발 내딛는 중
+
+  aurum:
+    presence: 선택적. 있다면 배경에 희미하게
+    position: 인물 뒤 먼 거리 또는 하늘
+    role: 동반자. 주인공이 아님
+    action: 정지. 지켜봄
+
+forbidden:
+  - over_explanation
+  - dramatic_dialogue
+  - forced_symbolism
+  - 폭죽이나 불꽃 연출 (출발을 축제로 만들지 않음)
+  - 인물이 카메라를 향해 웃거나 포즈

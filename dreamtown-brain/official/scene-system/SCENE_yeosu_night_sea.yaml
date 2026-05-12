@@ -1,0 +1,57 @@
+scene_id: yeosu_night_sea
+scene_name: 여수 밤바다
+
+core_emotion:
+  primary: loneliness
+  secondary: quiet_hope
+  description: >
+    혼자지만 연결되어 있다는 감각.
+    외롭지만 그 외로움이 전부는 아닌 순간.
+    먼 불빛들이 나를 모르지만 같은 밤 아래 있다는 공명.
+
+flow_stage: 몰입 — 별 생성 후, 감정 수렴 단계
+
+space_design:
+  openness: 완전히 열림. 바다가 끝없이 펼쳐짐
+  distance: 인물과 불빛들 사이 거리가 매우 멀다
+  scale: 인물은 작고, 바다와 하늘이 압도적으로 크다
+  texture: 여수 밤바다. 도시 불빛 반영. 물결 미세함
+
+light_design:
+  source: 먼 별빛 + 수면 반영 도시 불빛들
+  intensity: 낮음. 전체적으로 어둡지만 여러 빛이 점점이
+  direction: 위(별) + 수평(도시 불빛). 인물에게 직접 닿지 않음
+  quality: 고요함. 깜빡이지 않고 일정하게 빛남
+  color_tone: 딥 블루(바다) + 점점이 금빛(불빛) + 차가운 은빛(별)
+
+movement:
+  camera_flow: 매우 천천히 후퇴하거나 수평 이동. 공간의 넓이를 드러냄
+  emotional_speed: 느림. 바다의 시간
+  key_motion: 물결의 미세한 움직임. 불빛 반영의 흔들림
+  transition: 정적인 장면. 변화보다 현재의 감각에 집중
+
+symbolism:
+  primary_symbol: 흔들리는 수면 위 불빛 반영 — 연결되었지만 닿지 않음
+  secondary_symbol: 먼 별 하나 — 보이지만 멀다
+  implicit: 도시 불빛들 — 알지 못하는 누군가의 밤
+  avoid: 파도 소리 자막, 낭만적 조명 과잉, 커플 구도
+
+character_usage:
+  sowoni:
+    presence: 선택적. 있다면 화면 아래쪽 작게
+    position: 해변 끝 또는 방파제. 공간 안에 작게 위치
+    posture: 뒷모습. 바다를 바라봄
+    action: 정지. 바라보고 있음
+
+  aurum:
+    presence: 없음 또는 하늘에 별로만 존재
+    position: 하늘 — 별의 형태
+    role: 보이지 않지만 함께 있음
+    action: 없음. 존재로만 있음
+
+forbidden:
+  - over_explanation
+  - dramatic_dialogue
+  - forced_symbolism
+  - 관광지 소개 연출 (여수는 배경이지 주인공이 아님)
+  - 낭만적 영화 클리셰 (석양, 커플, BGM 자막)

@@ -1,0 +1,57 @@
+scene_id: growth_path
+scene_name: 성장 길
+
+core_emotion:
+  primary: courage
+  description: >
+    두려움을 없앤 것이 아니라 두려움과 함께 가는 것.
+    완성되지 않은 길. 아직 보이지 않는 앞.
+    하지만 한 발은 이미 내딛었다.
+
+flow_stage: 전진 — 전환 이후, 행동으로 이어지는 단계
+
+space_design:
+  openness: 위로 열림. 길이 앞으로 이어짐
+  distance: 앞이 멀지만 보임. 닿을 수 없는 거리가 아님
+  scale: 인물과 공간이 균형. 인물이 너무 작지 않음
+  texture: 오르막 또는 이어지는 길. 해안 절벽 / 언덕 / 도시 외곽
+
+light_design:
+  source: 앞 또는 위에서 오는 방향성 있는 빛
+  intensity: 중간. 길을 비추기에 충분함
+  direction: 인물이 향하는 방향 — 앞 또는 대각선 위
+  quality: 선명함. 흔들리지 않음. 방향이 명확함
+  color_tone: 따뜻한 금빛(앞) + 중간 블루(배경)
+
+movement:
+  camera_flow: 인물과 함께 앞으로 이동. 또는 인물 뒤에서 앞을 향해 걸음
+  emotional_speed: 중간. 급하지 않지만 멈추지 않음
+  key_motion: 인물이 걷거나 걸음을 시작함. 한 발 한 발
+  transition: 멈춤 → 첫 걸음. 결심 후의 시작
+
+symbolism:
+  primary_symbol: 이어지는 길 — 끝을 모르지만 방향이 있음
+  secondary_symbol: 앞에서 오는 빛 — 가야 할 방향을 보여줌
+  implicit: 인물의 등 — 이미 앞을 향하고 있다
+  avoid: 정상 도달 연출, 우승 포즈, 폭발적 에너지
+
+character_usage:
+  sowoni:
+    presence: 필수
+    position: 화면 중앙 또는 약간 아래. 앞을 향함
+    posture: 서 있음. 한 발 내딛거나 걷기 시작
+    action: 앞으로 걷기 시작. 뒤를 돌아보지 않음
+
+  aurum:
+    presence: 선택적. 있다면 앞쪽 빛 속에
+    position: 인물 앞 먼 거리. 길 끝 또는 빛 안
+    role: 안내자. 끌어당기지 않음. 먼저 가 있음
+    action: 멀리서 기다림. 또는 빛의 일부
+
+forbidden:
+  - over_explanation
+  - dramatic_dialogue
+  - forced_symbolism
+  - 영웅 도착 장면 연출 (성장은 과정이다)
+  - 배경 음악으로만 전달되는 감동
+  - 아우룸이 소원이를 이끄는 구도 (자기 발견이 우선)
