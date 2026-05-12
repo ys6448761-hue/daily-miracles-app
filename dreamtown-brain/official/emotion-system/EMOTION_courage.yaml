@@ -1,0 +1,55 @@
+emotion_id: courage
+name_ko: 용기
+summary: >
+  두려움이 없는 것이 아니라, 두려움에도 한 발 나아가는 것.
+  위로 향하는 구도. 먼 곳을 바라보는 시선.
+  전진하는 흐름 속에 조용한 결심.
+
+visual_mapping:
+  light:
+    type: 전방 또는 위에서 오는 집중광
+    intensity: 중간-높음. 방향이 명확함
+    direction: 위 또는 앞. 인물이 향하는 방향에 빛
+    quality: 선명함. 흔들리지 않음
+
+  color:
+    primary: "#C0392B"   # 루비 레드 (에너지)
+    secondary: "#E8A020" # 따뜻한 금빛 (의지)
+    accent: "#1A2A4A"    # 깊은 다크 블루 (배경 대비)
+    avoid: 흐릿한 파스텔, 차가운 회색, 무채색
+
+  space:
+    type: 위로 열린 공간
+    scale: 인물이 공간 안에서 중심. 너무 작지 않음
+    depth: 앞이 보임. 방향이 있는 공간
+    enclosure: 열려 있음. 가로막힌 것이 없음
+
+  movement:
+    type: 위 또는 앞으로 향하는 흐름
+    speed: 중간. 급하지 않지만 멈추지 않음
+    pattern: 일정한 전진. 파도가 아니라 걸음
+    quality: 단단함. 흔들려도 방향은 유지
+
+  symbol:
+    primary: 계단 / 오르막 / 먼 빛
+    secondary: 별을 향한 시선 / 손을 뻗는 동작
+    texture: 단단한 재질 / 거친 결 / 빛의 방향선
+    avoid: 날개, 슈퍼히어로 상징, 극적인 승리 포즈
+
+dreamtown_usage:
+  - image_generation
+  - scene_design
+  - growth_timeline
+
+generation_notes: >
+  인물은 서 있거나 앞을 향하는 자세.
+  시선은 위 또는 앞. 숙이지 않음.
+  빛은 인물이 향하는 방향에서 온다.
+  배경은 약간 어두워도 좋다 — 용기는 어둠 속에서 의미가 있다.
+
+forbidden:
+  - forced_interpretation
+  - fortune_telling_language
+  - "반드시 성공한다"류 단정
+  - 극적인 승리/영웅 연출
+  - 폭발적 에너지 이미지 (용기는 조용하다)

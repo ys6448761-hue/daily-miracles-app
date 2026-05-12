@@ -1,0 +1,53 @@
+emotion_id: quiet_hope
+name_ko: 조용한 희망
+summary: >
+  아직 오지 않은 것을 기다리는 마음.
+  확신은 없지만 믿고 싶은 방향이 있다.
+  새벽이 오기 직전, 바다 위 가장 얇은 빛.
+
+visual_mapping:
+  light:
+    type: 새벽빛 / 수평선 직후의 얇은 금빛
+    intensity: 낮음-중간. 강하지 않고 멀리 퍼짐
+    direction: 수평 방향. 아래서 위가 아닌 수평선에서 퍼짐
+    quality: 흩어지지 않음. 가늘고 일정함
+
+  color:
+    primary: "#B8D4E8"   # 새벽 하늘 연한 블루
+    secondary: "#F2D98A" # 수평선 금빛
+    accent: "#E8F4F0"    # 흰 빛 번짐
+    avoid: 진한 채도, 선명한 원색
+
+  space:
+    type: 열린 수평 공간
+    scale: 넓고 멀리 보임. 인물보다 공간이 크다
+    depth: 깊은 원근감. 수평선이 멀다
+    enclosure: 없음. 열려있다
+
+  movement:
+    type: 천천히 퍼지는 빛
+    speed: 매우 느림
+    pattern: 파문처럼 퍼짐. 강제적이지 않음
+    quality: 조용함. 들리지 않는 움직임
+
+  symbol:
+    primary: 수평선 위 작은 별 하나
+    secondary: 새벽 바다 / 멀리 보이는 불빛
+    texture: 잔잔한 파도 / 미세한 빛 입자
+    avoid: 빛줄기, 후광, 폭발적 빛
+
+dreamtown_usage:
+  - image_generation
+  - scene_design
+  - growth_timeline
+
+generation_notes: >
+  인물이 있을 경우 수평선을 바라보는 뒷모습.
+  별은 하나, 작게, 선명하지만 조용하게.
+  금빛을 과하게 쓰지 않는다. 새벽 직전의 절제된 색.
+
+forbidden:
+  - forced_interpretation
+  - fortune_telling_language
+  - "좋은 일이 올 것이다"류 단정
+  - 과도한 밝기 (희망을 강요하는 빛)

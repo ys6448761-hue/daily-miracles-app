@@ -1,0 +1,55 @@
+emotion_id: healing
+name_ko: 치유
+summary: >
+  무언가가 천천히 녹는 느낌.
+  강한 전환이 아니라 스며드는 따뜻함.
+  공간이 나를 감싸고, 잠시 내려놓아도 괜찮은 자리.
+
+visual_mapping:
+  light:
+    type: 확산광 / 간접광
+    intensity: 중간. 눈부시지 않고 공간 전체에 퍼짐
+    direction: 사방. 한 방향이 아니라 감싸는 방향
+    quality: 부드럽고 고름. 그림자가 강하지 않음
+
+  color:
+    primary: "#D4956A"   # 따뜻한 앰버
+    secondary: "#F5E6C8" # 연한 크림 금빛
+    accent: "#8FC4B4"    # 차가운 청록 (대비로 따뜻함 강조)
+    avoid: 강한 원색, 차가운 블루, 어두운 채도
+
+  space:
+    type: 감싸는 실내 공간
+    scale: 인간 스케일. 너무 넓지도 좁지도 않음
+    depth: 아늑함. 공간이 나를 보호하는 느낌
+    enclosure: 부드럽게 닫혀 있음. 안전한 경계
+
+  movement:
+    type: 천천히 스며들고 퍼짐
+    speed: 매우 느림. 강제하지 않음
+    pattern: 물이 스며드는 것처럼 자연스럽게
+    quality: 저항 없음. 부드럽게 흐름
+
+  symbol:
+    primary: 따뜻한 음료 (커피/차) / 창가 빛
+    secondary: 담요 / 손의 온기 / 조용한 식물
+    texture: 부드러운 직물 / 따뜻한 나무 / 흐릿한 빛 입자
+    avoid: 의료적 상징, 극적인 치료 이미지, 백색광 후광
+
+dreamtown_usage:
+  - image_generation
+  - scene_design
+  - growth_timeline
+
+generation_notes: >
+  카페 창가, 실내 따뜻한 공간이 자연스러운 배경.
+  인물은 긴장이 풀린 자세. 손이 테이블 위에 놓임.
+  빛은 창문으로 들어오는 오후 햇빛 또는 조명.
+  공간이 인물을 감싸는 구도.
+
+forbidden:
+  - forced_interpretation
+  - fortune_telling_language
+  - "이제 다 나았다"류 단정
+  - 극적인 변화 연출 (치유는 조용하게 온다)
+  - 종교적 상징

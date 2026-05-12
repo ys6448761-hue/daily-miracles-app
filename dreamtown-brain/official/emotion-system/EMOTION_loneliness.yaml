@@ -1,0 +1,57 @@
+emotion_id: loneliness
+name_ko: 고독
+summary: >
+  혼자라는 사실보다, 그 상태가 느껴지는 방식.
+  넓은 공간에 작은 존재.
+  연결되고 싶지만 거리가 있는 감각.
+  슬픔이 아니라 조용한 거리감.
+
+visual_mapping:
+  light:
+    type: 단일 광원 / 먼 별빛
+    intensity: 낮음. 주변을 다 채우지 못함
+    direction: 멀리서 옴. 닿을 듯 닿지 않음
+    quality: 고요함. 흔들리지 않지만 차갑지 않음
+
+  color:
+    primary: "#1C2B3A"   # 깊은 밤 블루
+    secondary: "#3D5A78" # 중간 바다색
+    accent: "#F0E68C"    # 멀리 있는 작은 별빛 (노란 금빛)
+    avoid: 따뜻한 앰버 주조, 붉은 계열, 활기찬 채도
+
+  space:
+    type: 넓고 열린 공간
+    scale: 인물이 작다. 공간이 인물보다 훨씬 크다
+    depth: 매우 깊음. 끝이 보이지 않는 바다나 하늘
+    enclosure: 없음. 사방이 열려있고 인물만 있음
+
+  movement:
+    type: 정적. 거의 움직임 없음
+    speed: 멈춰있거나 매우 느림
+    pattern: 바다의 잔물결 / 조용한 호흡
+    quality: 정지에 가까운 고요. 공허하지 않음
+
+  symbol:
+    primary: 넓은 바다 위 작은 인물 / 먼 불빛 하나
+    secondary: 창문 너머 야경 / 홀로 켜진 가로등
+    texture: 깊은 물 / 밤하늘 질감 / 광활한 원근감
+    avoid: 눈물, 슬픔의 직접 상징, 극적인 고통 표현
+
+dreamtown_usage:
+  - image_generation
+  - scene_design
+  - growth_timeline
+
+generation_notes: >
+  인물은 뒷모습. 넓은 공간 안에 작게 위치.
+  바다 또는 야경을 바라봄. 시선이 멀다.
+  빛은 멀리 있는 별 또는 도시 불빛 하나.
+  고독은 부정적이지 않다. 조용한 자기와의 거리.
+  "슬픈 장면"이 아닌 "혼자 있는 장면"으로 연출.
+
+forbidden:
+  - forced_interpretation
+  - fortune_telling_language
+  - "이 사람은 외롭다"류 단정 서술
+  - 눈물, 통증, 절망의 직접 시각화
+  - 고독을 결핍으로 해석하는 연출

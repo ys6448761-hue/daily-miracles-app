@@ -1,0 +1,55 @@
+emotion_id: anxiety
+name_ko: 불안
+summary: >
+  어디서 왔는지 알 수 없는 무거움.
+  앞이 보이지 않거나, 보여도 닿지 않는 느낌.
+  차갑고 먼 거리. 빛이 있지만 내 것이 아닌 것 같은.
+
+visual_mapping:
+  light:
+    type: 희미하고 흩어지는 광원
+    intensity: 낮음. 공간을 채우지 못함
+    direction: 불명확. 어디서 오는지 모름
+    quality: 흔들리거나 번짐. 윤곽이 뚜렷하지 않음
+
+  color:
+    primary: "#2B3F5C"   # 깊은 차가운 블루
+    secondary: "#6B7FA8" # 흐릿한 회청색
+    accent: "#A8B8CC"    # 멀리 있는 희미한 빛
+    avoid: 따뜻한 앰버, 금빛, 선명한 채도
+
+  space:
+    type: 닫히거나 거리가 먼 공간
+    scale: 인물이 작거나, 공간이 압도적으로 넓음
+    depth: 앞이 안 보이는 깊이. 또는 닫힌 공간
+    enclosure: 모호함. 열린 것 같지만 막힌 느낌
+
+  movement:
+    type: 흔들림 또는 진동
+    speed: 불규칙. 빠르지도 느리지도 않음
+    pattern: 일정하지 않음. 예측 불가
+    quality: 긴장감. 정지하지 못함
+
+  symbol:
+    primary: 안개 속 먼 불빛
+    secondary: 흐릿한 경계선 / 불분명한 윤곽
+    texture: 안개 / 불투명한 유리 / 번진 반영
+    avoid: 선명한 별, 따뜻한 조명, 열린 수평선
+
+dreamtown_usage:
+  - image_generation
+  - scene_design
+  - growth_timeline
+
+generation_notes: >
+  인물이 있다면 몸을 약간 웅크리거나 시선이 아래로.
+  배경은 흐릿하고 먼 거리감. 안개 또는 야간 차가운 공기.
+  불빛은 있지만 닿지 않는다는 느낌.
+  감정을 과장하지 않는다. 조용한 불안.
+
+forbidden:
+  - forced_interpretation
+  - fortune_telling_language
+  - "나쁜 일이 올 것이다"류 단정
+  - 위협적인 어둠 (공포로 해석되지 않게)
+  - 극적인 폭풍/재난 이미지
