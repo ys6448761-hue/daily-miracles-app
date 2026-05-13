@@ -112,6 +112,7 @@
     "DOC-DreamTown_Yeosu_Galaxy_SSOT",
     "DOC-agents-index",
     "DOC-소원놀이터_퀵레퍼런스",
+    "DOC-TASK-silent-response-layer-v1",
     "DOC-Aurora5_토론시스템_안내문",
     "DOC-alimtalk-templates-design",
     "DOC-video-promo-30sec-template",
@@ -777,6 +778,10 @@
   "v1.1": [
     "DOC-VIDEO_MASTER"
   ],
+  "tasks": [
+    "DOC-TASK-silent-response-layer-v1",
+    "DOC-TASK-2026-0413-001_SSOT_반영_MVP"
+  ],
   "team": [
     "DOC-Aurora5_토론시스템_안내문"
   ],
@@ -788,9 +793,6 @@
   ],
   "experiments": [
     "DOC-AIL-STORY-2026-0404-001_story-"
-  ],
-  "tasks": [
-    "DOC-TASK-2026-0413-001_SSOT_반영_MVP"
   ],
   "deploy": [
     "DOC-DEPLOY-PACKET-2026-03-02"

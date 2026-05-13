@@ -12,6 +12,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
 const { classifyWish, notifyRedSignal } = require('../services/safetyFilter');
+const { analyzeEmotionalIntensity, getSilentConfig, generateRequestId } = require('../services/silentResponseService');
 const { createStarLocation } = require('../services/starLocationService');
 const { getEmotionTag }      = require('../services/emotionService');
 const { generateStarMeaning } = require('../services/starMeaningService');
@@ -184,6 +185,7 @@ const GEM_GALAXY_MAP = {
 router.post('/wishes', async (req, res) => {
   console.log('[DT] POST /wishes 진입 | body:', JSON.stringify(req.body));
   try {
+    const requestId = generateRequestId();
     const { user_id, wish_text, gem_type, yeosu_theme } = req.body;
 
     if (!user_id || !wish_text || !gem_type) {
@@ -201,11 +203,13 @@ router.post('/wishes', async (req, res) => {
     if (safety.level === 'RED') {
       // RED: DB 저장 안 함, 운영 알림 발송, 케어 메시지 반환
       notifyRedSignal('dreamtown', wish_text, safety.reason).catch(() => {});
-      console.warn('[DT] RED signal — wish blocked:', safety.reason);
+      console.warn(`[DT] requestId=${requestId} RED signal — wish blocked:`, safety.reason);
       return res.status(200).json({
         ok:           false,
         safety:       'RED',
         care_message: '지금 많이 힘드신가요? 이 소원은 별로 만들어지지 않았어요. 혼자 감당하기 어려운 마음이라면 가까운 사람이나 전문 상담(☎️ 1393)에 연락해보세요.',
+        silent:       getSilentConfig('red'),
+        requestId,
       });
     }
 
@@ -229,7 +233,7 @@ router.post('/wishes', async (req, res) => {
 
     const wish = result.rows[0];
     if (safety.level === 'YELLOW') {
-      console.warn('[DT] YELLOW signal — wish saved with safety flag:', safety.reason);
+      console.warn(`[DT] requestId=${requestId} YELLOW signal — wish saved with safety flag:`, safety.reason);
     }
 
     // ── flow 계측 (wish/create) ──────────────────────────────────
@@ -240,7 +244,15 @@ router.post('/wishes', async (req, res) => {
     // 감정 한 줄 생성 (fire-and-forget — 응답 지연 없음)
     wishEmotionService.generateAndSave(wish.id, wish_text).catch(() => {});
 
-    res.status(201).json({ wish_id: wish.id, status: wish.status, safety: wish.safety_level });
+    // ── Silent Response Layer ──────────────────────────────────────
+    const emotionLevel = analyzeEmotionalIntensity(safety.level, wish_text);
+    const silentConfig = getSilentConfig(emotionLevel);
+    if (silentConfig.isVip) {
+      console.log(`[DT] requestId=${requestId} VIP wish candidate. wish_id=${wish.id}`);
+    }
+    console.log(`[DT] requestId=${requestId} emotionLevel=${emotionLevel}`);
+
+    res.status(201).json({ wish_id: wish.id, status: wish.status, safety: wish.safety_level, silent: silentConfig, requestId });
 
   } catch (err) {
     console.error('[DT] POST /wishes error:', err.message, '| code:', err.code, '| stack:', err.stack?.split('\n')[1]);
@@ -255,6 +267,7 @@ router.post('/wishes', async (req, res) => {
 // ─────────────────────────────────────────────
 router.post('/wishes/with-star', async (req, res) => {
   try {
+    const requestId = generateRequestId();
     const { user_id, content, gem_type } = req.body;
     const wish_text = content; // 요청 카드 필드명 매핑
 
@@ -271,10 +284,13 @@ router.post('/wishes/with-star', async (req, res) => {
     const safety = classifyWish(wish_text);
     if (safety.level === 'RED') {
       notifyRedSignal('dreamtown', wish_text, safety.reason).catch(() => {});
+      console.warn(`[DT] requestId=${requestId} RED signal (with-star) — wish blocked:`, safety.reason);
       return res.status(200).json({
         ok: false,
         safety: 'RED',
         care_message: '지금 많이 힘드신가요? 이 소원은 별로 만들어지지 않았어요.',
+        silent: getSilentConfig('red'),
+        requestId,
       });
     }
 
@@ -381,12 +397,21 @@ router.post('/wishes/with-star', async (req, res) => {
     // ── AI 트리거 추천 (after_star) — 일일 상한 적용 ──────────
     const lumi = await getTriggerRecommendation(String(user_id), 'after_star');
 
+    const wsEmotionLevel = analyzeEmotionalIntensity(safety.level, wish_text);
+    const wsSilentConfig = getSilentConfig(wsEmotionLevel);
+    if (wsSilentConfig.isVip) {
+      console.log(`[DT] requestId=${requestId} VIP wish candidate (with-star). wish_id=${wish.id}`);
+    }
+    console.log(`[DT] requestId=${requestId} emotionLevel=${wsEmotionLevel}`);
+
     res.status(201).json({
       wish,
       star,
       day1,   // 별 생성 직후 Day1 시작 화면으로 연결 — 선택지 1개
       ux:   { variant: expVariant, ctaPosition: ux.ctaPosition, emotionStep: ux.emotionStep, ctaText: CTA_TEXT[expVariant] },
       lumi,
+      silent: wsSilentConfig,
+      requestId,
     });
 
   } catch (err) {

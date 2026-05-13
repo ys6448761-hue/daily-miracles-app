@@ -5,6 +5,103 @@ import { postWish, postStarCreate, getOrCreateUserId } from '../api/dreamtown.js
 import { readSavedStar, saveStarId } from '../lib/utils/starSession.js';
 import { logEvent } from '../lib/events.js';
 
+// ── Silent Response Layer ────────────────────────────────────────────────
+function SilentLayer({ config, onProceed }) {
+  const [showMessage, setShowMessage] = useState(false);
+  const [showCta,     setShowCta]     = useState(false);
+
+  useEffect(() => {
+    const delay = config.delayMs ?? 3500;
+    const ctaDelay = delay + (config.cta?.delay_after_message_ms ?? 1200);
+    const t1 = setTimeout(() => setShowMessage(true), delay);
+    const t2 = setTimeout(() => setShowCta(true), ctaDelay);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0,
+      background: 'radial-gradient(ellipse at 50% 55%, #0c0820 0%, #060410 100%)',
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      zIndex: 20, padding: '0 32px',
+    }}>
+      {/* 별 호흡 */}
+      <motion.div
+        animate={{ scale: [1, 1.18, 1], opacity: [0.5, 0.8, 0.5] }}
+        transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+        style={{
+          width: 56, height: 56, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(255,215,106,0.2) 0%, transparent 70%)',
+          border: '1.5px solid rgba(255,215,106,0.28)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 22, color: 'rgba(255,215,106,0.65)',
+          marginBottom: 28,
+        }}
+      >✦</motion.div>
+
+      {/* 기본 대기 문구 */}
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.3 }}
+        style={{
+          fontSize: 14, color: 'rgba(255,255,255,0.4)',
+          textAlign: 'center', lineHeight: 1.75, letterSpacing: '0.03em',
+          marginBottom: 36,
+        }}
+      >
+        아우룸이 소원이의 마음을<br />조용히 듣고 있어요.
+      </motion.p>
+
+      {/* 아우룸 메시지 (delayMs 후 등장) */}
+      {showMessage && config.message && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: (config.fadeInMs ?? 600) / 1000 }}
+          style={{ textAlign: 'center', maxWidth: 280 }}
+        >
+          <p style={{
+            fontSize: 18, fontWeight: 500,
+            color: 'rgba(255,255,255,0.88)',
+            lineHeight: 1.65, marginBottom: 10,
+          }}>
+            {config.message}
+          </p>
+          {config.subMessage && (
+            <p style={{
+              fontSize: 14, color: 'rgba(255,255,255,0.45)', lineHeight: 1.7,
+            }}>
+              {config.subMessage}
+            </p>
+          )}
+        </motion.div>
+      )}
+
+      {/* Soft CTA */}
+      {showCta && config.cta?.show && (
+        <motion.button
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          onClick={onProceed}
+          style={{
+            marginTop: 36, padding: '12px 32px',
+            background: 'transparent',
+            border: '1px solid rgba(255,215,106,0.32)',
+            borderRadius: 24,
+            color: 'rgba(255,215,106,0.7)',
+            fontSize: 14, cursor: 'pointer', letterSpacing: '0.04em',
+          }}
+        >
+          {config.cta.label ?? '계속하기'}
+        </motion.button>
+      )}
+    </div>
+  );
+}
+
 const GEMS = [
   { type: 'ruby',     label: '루비',      emoji: '🔴', galaxy: '도전 은하',    detail: '용기를 내어 앞으로 나아가려는 마음이에요' },
   { type: 'sapphire', label: '사파이어',  emoji: '🔵', galaxy: '성장 은하',    detail: '더 나은 나를 향해 배우고 싶은 마음이에요' },
@@ -93,6 +190,7 @@ export default function WishGate() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [careMessage, setCareMessage] = useState(''); // RED 신호 시 케어 메시지
+  const [silentMode, setSilentMode] = useState(null); // { config, starPromise }
   const loadingStartRef = useRef(null);
   const CABLECAR_MIN_MS = 3500; // 케이블카 연출 최소 보장 시간
 
@@ -114,6 +212,20 @@ export default function WishGate() {
 
       const incomingOrigin = location.state?.originLocation ?? null;
       const originPlace = incomingOrigin || new URLSearchParams(window.location.search).get('loc') || null;
+
+      // ── Silent Response Layer: YELLOW/VIP ────────────────────────────
+      const silentCfg = wishResult.silent;
+      if (silentCfg && (silentCfg.level === 'yellow' || silentCfg.level === 'vip')) {
+        // 별 생성을 백그라운드에서 미리 시작 — 3.5초 침묵 동안 병렬 처리
+        const starPromise = postStarCreate({
+          wishId: wishResult.wish_id, userId,
+          phoneNumber: phoneNumber.trim() || null, originPlace,
+        });
+        setSilentMode({ config: silentCfg, starPromise });
+        return;
+      }
+      // ─────────────────────────────────────────────────────────────────
+
       const star = await postStarCreate({ wishId: wishResult.wish_id, userId, phoneNumber: phoneNumber.trim() || null, originPlace });
       if (!star?.star_id) throw new Error('별 생성에 실패했어요. 다시 시도해주세요.');
       saveStarId(star.star_id);
@@ -142,6 +254,35 @@ export default function WishGate() {
 
       nav(star.next ?? '/star-birth', { state: starBirthState });
     } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ── Silent Response Layer: 침묵 완료 후 별 탄생으로 이동 ───────────
+  async function handleSilentProceed() {
+    if (!silentMode) return;
+    try {
+      setLoading(true);
+      const star = await silentMode.starPromise;
+      if (!star?.star_id) throw new Error('별 생성에 실패했어요. 다시 시도해주세요.');
+      saveStarId(star.star_id);
+      localStorage.removeItem('dt_prev_star_id');
+      const starBirthState = {
+        starId: star.star_id, starName: star.star_name,
+        galaxy: star.galaxy, gemType, userId: getOrCreateUserId(),
+        day1: star.day1, wishText: wishText.trim(),
+        starRarity: star.star_rarity ?? 'standard',
+        sourceEvent: incomingSource ?? 'wish',
+        emotionChoice, imageUrl: star.image_url ?? null,
+        constellation: star.constellation ?? null,
+      };
+      try { sessionStorage.setItem('dt_recent_star', JSON.stringify(starBirthState)); } catch (_) {}
+      setSilentMode(null);
+      nav(star.next ?? '/star-birth', { state: starBirthState });
+    } catch (e) {
+      setSilentMode(null);
       setError(e.message);
     } finally {
       setLoading(false);
@@ -219,6 +360,16 @@ export default function WishGate() {
           아우룸이 당신의 소원을<br />담고 있어요
         </motion.p>
       </div>
+    );
+  }
+
+  // ── Silent Response Layer 화면 ──────────────────────────────────────
+  if (silentMode) {
+    return (
+      <SilentLayer
+        config={silentMode.config}
+        onProceed={handleSilentProceed}
+      />
     );
   }
 

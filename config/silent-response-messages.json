@@ -1,0 +1,67 @@
+{
+  "_meta": {
+    "version": "v1",
+    "created": "2026-05-14",
+    "purpose": "Silent Response Layer — 감정 강도별 아우룸 응답 문구 SSOT",
+    "usage": "services/silentResponseService.js에서 로드. 하드코딩 금지.",
+    "rules": [
+      "아우룸은 주인공처럼 말하지 않는다 — 짧고 조용히 등장",
+      "해결/조언/보장 어투 금지",
+      "콘텐츠 4단계: 감정인식 → 공간 → (전환 없음) → 존재 확인 순",
+      "VIP는 YELLOW 문구 pool에서 선택 + isVip 플래그만 별도 처리"
+    ]
+  },
+
+  "yellow": [
+    {
+      "id": "y01",
+      "main": "많이 버티고 있었군요.",
+      "sub": "오늘은 답을 찾지 않아도 괜찮아요."
+    },
+    {
+      "id": "y02",
+      "main": "천천히 말해도 괜찮아요.",
+      "sub": "아우룸이 조용히 듣고 있어요."
+    },
+    {
+      "id": "y03",
+      "main": "이 마음, 알고 있어요.",
+      "sub": "여기에 잠깐 두어도 좋아요."
+    },
+    {
+      "id": "y04",
+      "main": "서두르지 않아도 돼요.",
+      "sub": "소원은 사라지지 않아요."
+    },
+    {
+      "id": "y05",
+      "main": "혼자 갖고 있던 마음이군요.",
+      "sub": "별이 같이 있을게요."
+    }
+  ],
+
+  "red": [
+    {
+      "id": "r01",
+      "main": "지금은 혼자 두지 않을게요.",
+      "sub": "조금 더 안전한 도움으로 연결할게요."
+    },
+    {
+      "id": "r02",
+      "main": "이 마음, 혼자 감당하지 않아도 돼요.",
+      "sub": "가까운 사람이나 전문 상담(☎ 1393)과 함께해요."
+    }
+  ],
+
+  "timing": {
+    "yellow_delay_ms": 3500,
+    "red_delay_ms": 0,
+    "message_fade_in_ms": 600
+  },
+
+  "cta_modes": {
+    "normal": { "show": true, "style": "default", "label": "별 만들기" },
+    "soft":   { "show": true, "style": "soft",    "label": "계속하기", "delay_after_message_ms": 1200 },
+    "hidden": { "show": false }
+  }
+}
