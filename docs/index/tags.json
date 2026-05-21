@@ -27,6 +27,7 @@
     "DOC-airtable-wishes-inbox-schema",
     "DOC-online-wish-problem-api",
     "DOC-online-wish-voyage-api-design",
+    "DOC-HAMEL_REFERENCE_AUDIT",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
     "DOC-CONSTITUTION",
     "DOC-DEC-20260201-포인트추천예고편-정책구현",
@@ -65,11 +66,27 @@
     "DOC-DreamTown_KPI_Checklist",
     "DOC-sens-setup-guide",
     "DOC-service-flow",
+    "DOC-GATE2_Canonical_Asset_Verifica",
+    "DOC-PLAN_2026_0516_16x9_CANONICAL_",
     "DOC-가격표_퀵레퍼런스",
+    "DOC-GATE6_Hamel_Full25_Result_Repo",
+    "DOC-GATE6_Hamel_Regeneration_Promp",
     "DOC-REVIEW_COLLECTION_SYSTEM",
     "DOC-ROADMAP_API",
     "DOC-GA4_SETUP_GUIDE",
     "DOC-VIDEO_MASTER",
+    "DOC-01_DreamTown_Air_Constitution",
+    "DOC-04_DreamTown_Canonical_Air_Reg",
+    "DOC-06_OUTPUT_STRATEGY",
+    "DOC-CODE_TEST_01_CHANNEL_POLICY",
+    "DOC-CODE_TEST_01_CONTINUITY_GRAMMA",
+    "DOC-CODE_TEST_01_PROMPT_BUILDER",
+    "DOC-CODE_TEST_01_REGISTRY_SCHEMA",
+    "DOC-DreamTown_Canonical_Foundation",
+    "DOC-HUMAN_FIRST",
+    "DOC-NO_EMOTIONAL_ADDICTION",
+    "DOC-REALITY_RECONNECTION",
+    "DOC-UNFINISHED_TIME",
     "DOC-DreamTown_Aurora5_System_SSOT",
     "DOC-DreamTown_Character_SSOT",
     "DOC-DreamTown_Core_Philosophy_SSOT",
@@ -118,6 +135,7 @@
     "DOC-video-promo-30sec-template",
     "DOC-WIX_TEAM_PAGE_CONTENT",
     "DOC-프로젝트지식_수동정리_가이드",
+    "DOC-REGISTRY_v1_verified_2026-0516",
     "DOC-AIL-STORY-2026-0404-001_story-",
     "DOC-SSOT-2026-0413-001_별_고향_로그_세계관",
     "DOC-DEPLOY-PACKET-2026-03-02",
@@ -529,10 +547,27 @@
   "storybook": [
     "DOC-소원놀이터_종합문서_v10",
     "DOC-AURORA-STATUS",
+    "DOC-INDEX",
+    "DOC-DEC_2026_0516_CANONICAL_RATIO_",
+    "DOC-DEC_2026_0516_OUTPUT_STRATEGY",
+    "DOC-HAMEL_ASSET_INVENTORY",
+    "DOC-HAMEL_MIGRATION_EXECUTION_REPO",
+    "DOC-HAMEL_MIGRATION_PLAN",
+    "DOC-HAMEL_REFERENCE_AUDIT",
     "DOC-DT_API_Registry",
+    "DOC-GATE2_Canonical_Asset_Verifica",
     "DOC-GA4_SETUP_GUIDE",
+    "DOC-01_DreamTown_Air_Constitution",
+    "DOC-02_DreamTown_Echo_Physics",
+    "DOC-04_DreamTown_Canonical_Air_Reg",
+    "DOC-05_DERIVATION_PIPELINE",
+    "DOC-06_OUTPUT_STRATEGY",
+    "DOC-CODE_TEST_01_CHANNEL_POLICY",
+    "DOC-CODE_TEST_01_REGISTRY_SCHEMA",
+    "DOC-DreamTown_Canonical_Foundation",
     "DOC-DreamTown_Tech_Architecture_SS",
     "DOC-manifest-system",
+    "DOC-REGISTRY_v1_verified_2026-0516",
     "DOC-20260101-4PA",
     "DOC-20260101-ICN",
     "DOC-20260101-K7C",
@@ -627,22 +662,9 @@
     "DOC-NOTION_PROFILE_GATE",
     "DOC-SOURCES_INDEX"
   ],
-  "최수민": [
-    "DOC-최수민방식_치트시트",
-    "DOC-최수민방식_완전정리",
-    "DOC-2025-12-29_Part1_최수민방식QA",
-    "DOC-2025-12-29_Part2_컨텍스트관리",
-    "DOC-2025-12-29_Part3_자가검증",
-    "DOC-2025-12-29_Part7_전략수정",
-    "DOC-2025-12-29_최수민방식적용"
-  ],
-  "빠른참조": [
-    "DOC-최수민방식_치트시트"
-  ],
-  "cheatsheets": [
-    "DOC-최수민방식_치트시트"
-  ],
   "decisions": [
+    "DOC-DEC_2026_0516_CANONICAL_RATIO_",
+    "DOC-DEC_2026_0516_OUTPUT_STRATEGY",
     "DOC-DEC-20260201-포인트추천예고편-정책구현",
     "DOC-index",
     "DEC-2026-0413-001",
@@ -664,6 +686,27 @@
     "DEC-2025-1230-001",
     "DEC-2025-1230-002",
     "DEC-2025-1230-003"
+  ],
+  "hamel": [
+    "DOC-HAMEL_ASSET_INVENTORY",
+    "DOC-HAMEL_MIGRATION_EXECUTION_REPO",
+    "DOC-HAMEL_MIGRATION_PLAN",
+    "DOC-HAMEL_REFERENCE_AUDIT"
+  ],
+  "최수민": [
+    "DOC-최수민방식_치트시트",
+    "DOC-최수민방식_완전정리",
+    "DOC-2025-12-29_Part1_최수민방식QA",
+    "DOC-2025-12-29_Part2_컨텍스트관리",
+    "DOC-2025-12-29_Part3_자가검증",
+    "DOC-2025-12-29_Part7_전략수정",
+    "DOC-2025-12-29_최수민방식적용"
+  ],
+  "빠른참조": [
+    "DOC-최수민방식_치트시트"
+  ],
+  "cheatsheets": [
+    "DOC-최수민방식_치트시트"
   ],
   "deployment": [
     "DOC-deployment-checklist"
@@ -752,9 +795,15 @@
     "DOC-PLAN"
   ],
   "plans": [
-    "DOC-phase3-quantum-walkthrough"
+    "DOC-GATE2_Canonical_Asset_Verifica",
+    "DOC-phase3-quantum-walkthrough",
+    "DOC-PLAN_2026_0516_16x9_CANONICAL_"
   ],
   "reports": [
+    "DOC-GATE4_Cafe_Warmth_Reduction_Re",
+    "DOC-GATE5_Hotel_Fragile_Hope_Star_",
+    "DOC-GATE6_Hamel_Full25_Result_Repo",
+    "DOC-GATE6_Hamel_Regeneration_Promp",
     "DOC-tax-accounting-ai-tools-analys",
     "DOC-CEO-WEEKLY-2026-W17",
     "DOC-CEO-WEEKLY-2026-W16",
@@ -777,6 +826,26 @@
   ],
   "v1.1": [
     "DOC-VIDEO_MASTER"
+  ],
+  "air-engine": [
+    "DOC-01_DreamTown_Air_Constitution",
+    "DOC-02_DreamTown_Echo_Physics",
+    "DOC-03_DreamTown_Air_Taxonomy",
+    "DOC-04_DreamTown_Canonical_Air_Reg",
+    "DOC-05_DERIVATION_PIPELINE",
+    "DOC-06_OUTPUT_STRATEGY",
+    "DOC-CODE_TEST_01_CHANNEL_POLICY",
+    "DOC-CODE_TEST_01_CONTINUITY_GRAMMA",
+    "DOC-CODE_TEST_01_PROMPT_BUILDER",
+    "DOC-CODE_TEST_01_REGISTRY_SCHEMA",
+    "DOC-REGISTRY_v1_verified_2026-0516"
+  ],
+  "constitution": [
+    "DOC-DreamTown_Canonical_Foundation",
+    "DOC-HUMAN_FIRST",
+    "DOC-NO_EMOTIONAL_ADDICTION",
+    "DOC-REALITY_RECONNECTION",
+    "DOC-UNFINISHED_TIME"
   ],
   "tasks": [
     "DOC-TASK-silent-response-layer-v1",
