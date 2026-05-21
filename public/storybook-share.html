@@ -118,7 +118,8 @@
     .error { text-align: center; padding: 80px 20px; color: var(--text-dim); }
 
     /* ── Impact Flow ── */
-    .impact-flow { margin-top: 48px; min-height: 300px; position: relative; }
+    .impact-flow { margin-top: 48px; min-height: 300px; position: relative; display: none; }
+    .impact-flow.revealed { display: block; animation: stepIn .55s ease both; }
 
     .impact-step { display: none; }
     .impact-step.active { display: block; animation: stepIn .44s cubic-bezier(.25,.46,.45,.94) both; }
@@ -351,6 +352,18 @@ async function load() {
     // slides
     const slides = data.storybook || [];
     document.getElementById('slides').innerHTML = slides.map(s => renderSlide(s)).join('');
+
+    // CTA 노출 시 impact-flow 자동 reveal
+    const ctaEl = document.querySelector('.cta-wrap');
+    if (ctaEl) {
+      const obs = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          obs.disconnect();
+          document.getElementById('impact-flow').classList.add('revealed');
+        }
+      }, { threshold: 0.5 });
+      obs.observe(ctaEl);
+    }
   } catch (_) {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('error').style.display = '';

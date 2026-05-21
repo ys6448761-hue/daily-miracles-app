@@ -176,6 +176,16 @@
     .rate { font-size: 12px; color: var(--text-dim); }
     .rate-good { color: var(--success); }
     .rate-warn { color: var(--warn); }
+
+    /* ── Result narrative ── */
+    .result-line {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 0; font-size: 16px; font-weight: 600;
+      border-bottom: 1px solid var(--border);
+    }
+    .result-line:last-child { border-bottom: none; }
+    .result-check { color: var(--success); font-size: 15px; flex-shrink: 0; }
+    .result-line b { color: var(--primary); }
   </style>
 </head>
 <body>
@@ -274,6 +284,10 @@
         </div>
         <div class="card" style="margin-bottom:16px;">
           <div class="grid-4" id="detail-stat-cards" style="grid-template-columns:repeat(3,1fr); gap:10px;"></div>
+        </div>
+        <div class="card" id="detail-result-card" style="margin-bottom:16px; display:none;">
+          <div style="font-size:15px; font-weight:600; margin-bottom:14px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.06em;">이 별의 결과</div>
+          <div id="detail-result-text"></div>
         </div>
         <div class="card">
           <div style="font-size:14px; font-weight:600; margin-bottom:14px;">연결된 자식 별 <span id="detail-child-n" style="color:var(--primary)"></span></div>
@@ -527,6 +541,21 @@ async function openDetail(key) {
         <div class="card-value" style="font-size:22px">${c.value}</div>
         <div class="card-sub">${c.sub}</div>
       </div>`).join('');
+
+    // 이 별의 결과 (narrative)
+    const convN  = stats.conversion_count || 0;
+    const impN   = (statsData.impact_stats || {}).impact_count || 0;
+    const actN   = (statsData.impact_stats || {}).action_count || 0;
+    const resultLines = [];
+    if (impN  > 0) resultLines.push(`<div class="result-line"><span class="result-check">✔</span> <b>${impN}명</b>이 공감했고</div>`);
+    if (convN > 0) resultLines.push(`<div class="result-line"><span class="result-check">✔</span> <b>${convN}명</b>이 별을 만들었고</div>`);
+    if (actN  > 0) resultLines.push(`<div class="result-line"><span class="result-check">✔</span> <b>${actN}명</b>이 실제로 움직였어요</div>`);
+    if (resultLines.length) {
+      document.getElementById('detail-result-text').innerHTML = resultLines.join('');
+      document.getElementById('detail-result-card').style.display = '';
+    } else {
+      document.getElementById('detail-result-card').style.display = 'none';
+    }
 
     // 자식 별
     const children = storyData.children || [];
