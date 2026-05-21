@@ -808,6 +808,7 @@
   "reports": [
     "DOC-D2_D3_FUNCTIONAL_REVIEW",
     "DOC-DEFERRED_CHANGES_TRIAGE",
+    "DOC-DISCARD_CLEANUP_PLAN",
     "DOC-GATE4_Cafe_Warmth_Reduction_Re",
     "DOC-GATE5_Hotel_Fragile_Hope_Star_",
     "DOC-GATE6_Hamel_Full25_Result_Repo",

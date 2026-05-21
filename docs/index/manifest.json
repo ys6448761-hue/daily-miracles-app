@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-05-21T23:16:31.647Z",
+  "generated_at": "2026-05-21T23:31:38.876Z",
   "generator": "generate-manifest.js",
-  "total_count": 302,
+  "total_count": 303,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2028,6 +2028,22 @@
       "title": "DEFERRED_CHANGES_TRIAGE.md",
       "created_at": "2026-05-21",
       "checksum": "98c26ea9"
+    },
+    {
+      "id": "DOC-DISCARD_CLEANUP_PLAN",
+      "path": "docs/reports/DISCARD_CLEANUP_PLAN.md",
+      "type": "report",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "reports",
+      "tags": [
+        "reports"
+      ],
+      "owner": "team",
+      "status": "archived",
+      "title": "DISCARD_CLEANUP_PLAN.md",
+      "created_at": "2026-05-21",
+      "checksum": "4baba8c0"
     },
     {
       "id": "DOC-GATE4_Cafe_Warmth_Reduction_Re",
