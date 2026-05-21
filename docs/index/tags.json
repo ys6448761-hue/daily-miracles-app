@@ -69,6 +69,7 @@
     "DOC-GATE2_Canonical_Asset_Verifica",
     "DOC-PLAN_2026_0516_16x9_CANONICAL_",
     "DOC-가격표_퀵레퍼런스",
+    "DOC-DEFERRED_CHANGES_TRIAGE",
     "DOC-GATE6_Hamel_Full25_Result_Repo",
     "DOC-GATE6_Hamel_Regeneration_Promp",
     "DOC-REMAINING_CHANGES_COMMIT_SCOPE",
@@ -557,6 +558,7 @@
     "DOC-HAMEL_REFERENCE_AUDIT",
     "DOC-DT_API_Registry",
     "DOC-GATE2_Canonical_Asset_Verifica",
+    "DOC-DEFERRED_CHANGES_TRIAGE",
     "DOC-REMAINING_CHANGES_COMMIT_SCOPE",
     "DOC-GA4_SETUP_GUIDE",
     "DOC-01_DreamTown_Air_Constitution",
@@ -802,6 +804,7 @@
     "DOC-PLAN_2026_0516_16x9_CANONICAL_"
   ],
   "reports": [
+    "DOC-DEFERRED_CHANGES_TRIAGE",
     "DOC-GATE4_Cafe_Warmth_Reduction_Re",
     "DOC-GATE5_Hotel_Fragile_Hope_Star_",
     "DOC-GATE6_Hamel_Full25_Result_Repo",

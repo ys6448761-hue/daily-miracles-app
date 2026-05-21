@@ -258,6 +258,124 @@ Soft sunlight bloom
 
 ---
 
+## 8. 장소별 Visual SSOT (Place-specific Anchors)
+
+각 장소는 단순 배경이 아니라 감정·역할·시각 규칙이 함께 잠긴 앵커다.
+향후 케이블카·아쿠아플라넷 등의 장소 SSOT는 동일 위계(8-N)에 추가한다.
+
+### 8-1. Hamel Lighthouse (하멜등대)
+
+#### 핵심 정의
+
+```
+하멜등대 = 별들이 서로를 기억하는 감정의 항구
+```
+
+DreamTown에서 하멜은 상승 시작점·이동 단계·관광 배경이 **아니다**.
+하멜은 **정리 / 공명 / 연결 / 기억 / 별천지**의 장소다.
+
+#### DreamTown 여정 구조 내 역할
+
+```
+케이블카 = 상승  (하늘로 이동, 별이 되기 시작하는 단계)
+하멜등대 = 연결  (여정 정리, 감정 공명, 별 연결, 별천지)
+```
+
+#### 하멜 핵심 감정
+
+- "마음이 향하는 빛"
+- "별들이 서로를 기억하는 항구"
+
+사용자는 하멜에서 **위로받고 / 정리되고 / 연결되고 / 기억된다**.
+
+#### 시각 SSOT — 반드시 유지
+
+- 선명한 빨간 하멜등대
+- 방파제
+- 양쪽 난간
+- 등대까지 이어지는 직선 원근
+- 밤바다
+- 별빛
+- 여수 밤 풍경
+
+#### 등대 색상 SSOT
+
+하멜등대는 반드시 **강한 감정의 빨강**이어야 한다.
+
+- 권장 표현: `vivid emotional red`, `warm glowing red`, `beacon-like red`
+- 금지: 흐린 빨강 / 갈색 / 주황 / 채도 낮은 붉은색
+
+#### 등대 글자 SSOT — Overlay 정책
+
+등대 글자 `하멜등대`는 DreamTown 기억 앵커이지만, **현재 AI 이미지 생성 모델의 한글(Korean text) 렌더링은 일관성을 보장하기 어렵다**.
+
+- 이미지 생성 단계: 한글 생성 금지 / 텍스트 생성 금지 / 등대 몸체는 깨끗하게 유지
+- 후처리 단계: 세로 "하멜등대" overlay 삽입 (sharp + opentype.js 또는 정적 PNG asset)
+
+본 정책은 §3 TEXT ZERO 원칙과 일관되며, 하멜 글자는 후편집(post-production) 자막과 동일한 사후 합성 채널로 관리된다.
+
+#### 별빛 SSOT — 보석 감정 색상 연동
+
+별빛은 단순 광원이 아니라 **감정의 색**이다.
+
+| 보석     | 별빛                |
+| -------- | ------------------- |
+| Ruby     | warm crimson gold   |
+| Sapphire | deep blue glow      |
+| Emerald  | teal green glow     |
+| Citrine  | warm golden glow    |
+| Diamond  | silver white glow   |
+
+별빛은 **감정 기억 / 공명 / 연결 / 별천지**를 상징한다.
+
+#### 소원이 역할 SSOT (하멜)
+
+- ❌ 등대를 향해 달려가는 존재 / 상승하는 존재 — 아님
+- ⭕ 머무르고 / 정리하고 / 별들을 바라보고 / 감정을 연결하는 존재
+
+권장 상태: `quietly standing` / `sitting and reflecting` / `gently looking upward` / `emotionally connected to the stars`
+금지: `dramatic running` / `cinematic action` / `adventure mood` / `destination-seeking motion`
+
+#### 방파제 SSOT
+
+방파제는 단순 구조물이 아니라 **감정의 길**이다.
+양쪽 난간은 사용자의 시선을 별과 등대로 연결하는 **감정 흐름선** 역할을 한다.
+
+#### thumbnail vs Wish Image — 자산 역할 분리
+
+| 자산 | 정의 | 비율 | 특징 |
+|------|------|------|------|
+| **하멜 thumbnail** | DreamTown 감정 오리진 카드 | 1:1 | 경량 · 장소 인식 · 빨간 등대 중심 · 감정 문구 variation |
+| **하멜 Wish Image** | 별들이 서로 연결되는 감정 원본 | 9:16 세로 | 감정 몰입 · 소원이 중심 · 관광 포스터 금지 · thumbnail 문법 금지 |
+
+#### 핵심 SSOT 문장
+
+- 하멜등대는 별들이 서로를 기억하는 감정의 항구다.
+- 케이블카는 상승이고, 하멜은 연결이다.
+- 별빛은 단순 조명이 아니라 감정의 색이다.
+- 하멜의 빨간 등대는 DreamTown의 '마음이 향하는 빛'으로 유지한다.
+- 방파제는 단순 구조물이 아니라 감정의 길이다.
+
+#### 금지 사항 (Hamel-specific)
+
+- 관광 포스터 느낌
+- 풍경 소개형 구성
+- thumbnail 문법을 Wish Image에 재사용
+- 등대를 갈색/주황 계열로 생성
+- 한글을 AI 이미지 생성에 직접 의존
+- cinematic adventure mood
+- "등대를 향한 모험" 구조
+
+#### 현재 확정 사항
+
+- 하멜 25장 = thumbnail 라이브러리
+- 하멜 Wish Image = 재생성 진행 중
+- 등대 글자 = overlay 전략 채택
+- 별빛 = 보석 감정 색상 연동
+- 하멜 = 연결 / 공명 / 별천지 역할 고정
+
+---
+
 ## 참조
 
 - 캐릭터 정의: `DreamTown_Character_SSOT.md`

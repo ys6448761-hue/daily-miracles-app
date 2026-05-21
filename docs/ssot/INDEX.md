@@ -1,11 +1,32 @@
 # DreamTown SSOT Index
 
-Version: v4.0
+Version: v5.0
 Owner: Aurora5
 Status: Confirmed
-Purpose: SSOT 3계층 구조 — 파일 목록 및 작업 규칙
+Purpose: 인수인계 3계층 구조 — 담당자가 바뀌어도 방향이 안 흔들리는 구조
 
-Last Updated: 2026-03-13
+Last Updated: 2026-05-16
+
+---
+
+## 인수인계 3계층 구조
+
+```
+LAYER 1 — Constitution (docs/ssot/constitution/)
+  "왜 존재하는가" — 절대 불변. CEO만 변경 가능.
+
+LAYER 2 — Operational SSOT (docs/ssot/core/ + air-engine/)
+  "지금 어떻게 만들고 있는가" — 변경 시 업데이트.
+
+LAYER 3 — Decision Archive (docs/archive/decisions/)
+  "왜 그렇게 결정했는가" — 결정만 짧게 저장.
+```
+
+**새 담당자 / 새 세션 시작 시 읽는 순서:**
+1. `constitution/` 4개 파일 (5분)
+2. `DREAMTOWN_STATUS.md` (루트)
+3. `air-engine/04_CANONICAL_REGISTRY.md` (현재 이미지 현황)
+4. 해당 작업 관련 SSOT 파일
 
 ---
 
@@ -24,14 +45,54 @@ SSOT에 없는 새로운 결정이 생기면 해당 SSOT 파일을 먼저 업데
 
 ```
 docs/ssot/
- ├── core/      ← DreamTown 절대 기준 (헌법) — 14개
- ├── support/   ← 구현·설계·UX 가이드 — 25개
- ├── archive/   ← 중복·구버전 보관 — 47개
+ ├── core/        ← DreamTown 절대 기준 (헌법) — 14개
+ ├── support/     ← 구현·설계·UX 가이드 — 25개
+ ├── archive/     ← 중복·구버전 보관 — 47개
+ ├── air-engine/  ← 공기 기반 결과물 생성 엔진 SSOT — 11개 (CODE_TEST_01 2026-05-17 추가)
  │
  ├── INDEX.md              ← 이 파일
  ├── SSOT_Registry_v2.md   ← 전체 분류표 (v2)
  └── AIL-SSOT-001_Storage_Rules.md  ← 저장 규칙
 ```
+
+---
+
+## Constitution SSOT (4개) — `docs/ssot/constitution/` ← LAYER 1
+
+**절대 불변. 담당자 교체 시에도 유지. CEO만 변경 가능.**
+
+| 파일 | 핵심 내용 |
+|------|----------|
+| `DreamTown_Canonical_Foundation_v1.md` | **통합 헌법** — 모든 에이전트 공통 기준. 3:4 canonical, lingering 정의, Curator 운영 지침 |
+| `HUMAN_FIRST.md` | 인간이 먼저 — 알고리즘보다 소원이 |
+| `REALITY_RECONNECTION.md` | 현실 재연결 — 탈출이 아닌 귀환 |
+| `NO_EMOTIONAL_ADDICTION.md` | 감정 의존 금지 — 착취 패턴 목록 포함 |
+| `UNFINISHED_TIME.md` | 미완성의 시간 — fragile_hope는 weak hope다 |
+
+---
+
+## Air Engine SSOT (6개) — `docs/ssot/air-engine/` ← LAYER 2
+
+**공기(Air) 기반 파생 결과물 생성 시스템. 기존 이미지 재분류 + 파생 관계 정의.**
+
+| 파일 | 핵심 내용 | 필독 시점 |
+|------|----------|----------|
+| `01_DreamTown_Air_Constitution.md` | 공기 엔진 운영 헌법 5원칙 | 스토리북·기적영상·쇼츠 작업 전 |
+| `02_DreamTown_Echo_Physics.md` | 파생 관계 정의 (storybook/miracle_video/shorts/postcard) | 파생 결과물 제작 전 |
+| `03_DreamTown_Air_Taxonomy.md` | 4클래스 분류 (memory_anchor/echo_fragment/transitional_air/weak_survival) | 이미지 분류·신규 생성 전 |
+| `04_DreamTown_Canonical_Air_Registry.md` | 현행 76장 전체 분류 목록 + echo_potential | Registry 조회·파생 착수 전 |
+| `05_DERIVATION_PIPELINE.md` | canonical_air → 16:9 master → 파생 단계별 구조 | 파생 제작 착수 전 |
+| `06_OUTPUT_STRATEGY.md` | 채널별 역할 (YouTube=canonical / Shorts=파생) + 제작 우선순위 | 결과물 채널 결정 전 |
+
+---
+
+## Decision Archive — `docs/archive/decisions/` ← LAYER 3
+
+**"왜 그렇게 결정했는가" 짧게 저장.**
+
+| 파일 | 결정 내용 |
+|------|----------|
+| `DEC_2026_0516_OUTPUT_STRATEGY.md` | 16:9 canonical / Shorts-first 금지 결정 배경 |
 
 ---
 

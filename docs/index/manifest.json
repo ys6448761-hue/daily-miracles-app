@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-05-21T06:09:57.057Z",
+  "generated_at": "2026-05-21T06:38:52.877Z",
   "generator": "generate-manifest.js",
-  "total_count": 300,
+  "total_count": 301,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1992,6 +1992,24 @@
       "title": "하루하루의 기적 - 문서 센터",
       "created_at": "2026-05-21",
       "checksum": "8a1b6b11"
+    },
+    {
+      "id": "DOC-DEFERRED_CHANGES_TRIAGE",
+      "path": "docs/reports/DEFERRED_CHANGES_TRIAGE.md",
+      "type": "report",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "reports",
+      "tags": [
+        "reports",
+        "소원",
+        "storybook"
+      ],
+      "owner": "code",
+      "status": "파일",
+      "title": "DEFERRED_CHANGES_TRIAGE.md",
+      "created_at": "2026-05-21",
+      "checksum": "98c26ea9"
     },
     {
       "id": "DOC-GATE4_Cafe_Warmth_Reduction_Re",

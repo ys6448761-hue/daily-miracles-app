@@ -39,12 +39,17 @@ API prefix: `/api/dt/`
 - Antigravity 허용: 읽기/분석/조언/docs 작성만
 - Antigravity 금지: .js .html .css 수정, 파일 생성, package.json 변경
 - 메시지 발송: 반드시 `messageProvider.js` 경유
-- 금지 단어: 사주, 점술, 관상, 운세, 대운, 궁합
+- 금지 단어 (17개): 사주, 점술, 관상, 운세, 대운, 궁합, 타로, 역술, 신점, 무속, 팔자, 명리, 예언, 점괘, 점쟁이, 운명감정, 신탁 → 전체 목록·영문·대체어: `AGENTS.md §15`
 
 ## 🗂 저장소
-- 백엔드: `C:\DEV\daily-miracles-mvp` (이 repo)
-- 프론트: `C:\DEV\sowon-dreamtown` (Next.js, 별도 CLAUDE.md)
+
+| 레포 | 경로 | 역할 |
+|------|------|------|
+| `daily-miracles-mvp` | `C:\DEV\daily-miracles-mvp` | **백엔드 + DreamTown 프론트엔드 (이 레포)** |
+| `sowon-dreamtown` | `C:\DEV\sowon-dreamtown` | Next.js 분리 프론트 (별도 CLAUDE.md) |
+
 - 스킬허브: `claude --add-dir C:\DEV\antigravity-notebooklm`
+- Codex 협업 가이드: `AGENTS.md` (루트) — §15-24 SSOT 가드레일 포함
 
 ## 🔧 기술 스택 (핵심)
 - Node.js 20 / Express / PostgreSQL(운영) / SQLite(로컬)
@@ -87,3 +92,4 @@ point_ledger, harbor_wishes, settlement_events, ops_events
 | SSOT 인덱스 | `docs/ssot/INDEX.md` | 전체 SSOT 목록 |
 | 드림타운 지식맵 | `docs/dreamtown/DreamTown_Knowledge_Map.md` | 시스템 전체 개요 |
 | 마케팅 | `docs/04-marketing/` | 홈페이지 재구성 등 |
+| **Codex 협업** | `AGENTS.md` | 금지어·디자인·콘텐츠·VERDICT 형식 §15-24 |
