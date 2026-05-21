@@ -1,0 +1,66 @@
+DreamTown yeosu_cafe Storybook Page05 illustration.
+Type: reality_reconnection (현실 재연결)
+
+Scene:
+A warm indoor cafe in Yeosu, late evening. The journey has been real — and now ordinary life is quietly present alongside it. On the chair beside Sowoni, a coat is folded. A bag sits nearby. These ordinary things were always here, and they are still here. Sowoni sits at the window, both in the journey and in the everyday.
+
+Must include:
+- coat folded on adjacent chair or draped over seat arm (ordinary personal item, not staged)
+- cafe table with cup — ordinary surface
+- large window with night city view outside
+- single star visible through glass
+- Sowoni seated at window table, back view, posture slightly upright
+
+Style:
+- 2D watercolor illustration
+- Korean manhwa softness, Ghibli-inspired
+- warm interior light balanced with cool exterior
+- the ordinary-ness of the scene is important — not romanticized
+
+Do NOT:
+- photorealistic or 3D render
+- cinematic staging — items should feel casually present, not arranged
+- heavy or oppressive atmosphere
+- inspirational or healing framing
+- Sowoni facing camera or any facial expression visible
+- Sowoni standing — always seated
+- childlike proportions
+- multiple stars or dramatic star effects
+- text in image
+
+Color:
+interior: warm amber, lived-in — like the end of an evening
+window_view: cool night city lights and dark sea
+personal_items: muted natural colors — coat in gray or dark tone, ordinary
+star: soft white-warm point in sky, steady
+
+Star:
+position: visible through window, upper portion of glass
+count: exactly one
+brightness: quiet and present — the same star that has been there all evening
+glow: minimal soft halo
+rule: the star's continuity matters more than its brightness. It simply persists.
+
+Composition:
+Type note: reality_reconnection — 여정 이후 일상의 접점, 현실로 돌아오는 몸짓
+Flow: ordinary items present (coat, bag) → Sowoni at table → window frame → night city → star continuing
+
+Character:
+Sowoni sits at a cafe window. Her ordinary belongings are visible beside her — the coat she wore to get here, the bag that holds her everyday things. Both the journey and the daily life are present in the same frame.
+Appearance: young adult Korean woman, shoulder-length dark hair, slim silhouette, back view
+Face: 85-90% hidden
+Pose: posture gently upright — the slight lift of someone who is preparing, not rushing. Not slumped. Not dramatically poised. Simply present with a sense of what comes next.
+
+Camera:
+Type: WIDE
+Distance: wider than medium — enough to show the coat on adjacent chair, the table, the window
+Framing: Sowoni left-of-center, window on right, adjacent chair visible
+Angle: eye level from behind and slightly to the left
+Note: The frame should include enough context to feel like ordinary life is present, not just the emotional moment.
+
+DreamTown Page05 consistency requirements:
+- Preserve open upper area for text overlay
+- The ordinary items (coat, bag) must feel genuinely casual — not placed for effect
+- Outside world continues in its own rhythm regardless of Sowoni's state
+- The reconnection is not dramatic — it is quiet and natural
+- 2D watercolor style throughout — soft textures, gentle edges

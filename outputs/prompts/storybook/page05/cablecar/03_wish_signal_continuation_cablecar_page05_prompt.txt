@@ -1,0 +1,64 @@
+DreamTown yeosu_cablecar Storybook Page05 illustration.
+Type: wish_signal_continuation (소원 신호 이어짐)
+
+Scene:
+Interior of a red cable car cabin at maximum height. The sky through the large window is at its most open. And there — clearly, quietly — a single star in the night sky. Not a new discovery. Not a dramatic appearance. Simply the star that was there. Still there. Still present. The signal continues from this elevated vantage point.
+
+Must include:
+- interior of red cable car cabin
+- large window with maximum sky visible — more sky than at ground level
+- single star clearly and steadily visible in night sky through window
+- city lights below continuing, the world ongoing
+- Sowoni seated near window, back view, head oriented toward sky portion of the window
+
+Style:
+- 2D watercolor illustration
+- Korean manhwa softness, Ghibli-inspired
+- the star is clearly visible — this is the image where the signal is acknowledged
+- not blinding or dramatic, but undeniable in its presence
+
+Do NOT:
+- photorealistic or 3D render
+- star as overwhelming or radiant focal point — visible but not blinding
+- inspirational or healing star-gazing aesthetic
+- Sowoni reaching toward the star or dramatically reacting
+- Sowoni facing camera or facial expression visible
+- childlike proportions, standing pose
+- multiple stars or star field
+- cinematic lighting effects around the star
+- text in image
+
+Color:
+cablecar_interior: warm red framing, secondary to the window
+window_view: deep blue-black night sky dominant in upper portion, city lights in lower
+star: warm-white to soft gold, 130% brightness — present and clear, gentle glow
+
+Star:
+position: upper-center area of window view, in open night sky
+count: exactly one
+brightness: 130% — clearly visible, acknowledged, continuing
+glow: soft warm watercolor halo, gentle and steady
+rule: the star's continuation is the message. It has been signaling throughout. This frame makes the signal visible.
+
+Composition:
+Type note: wish_signal_continuation — 높은 곳에서도 별 신호는 이어지고 있음
+Flow: Sowoni (quiet awareness, head toward upper window) → cabin frame → window → sky → star (clear, continuing)
+
+Character:
+Sowoni sits inside the cabin, at the highest point of the journey. Her head orientation is naturally upward — toward the sky and the star. Not dramatically, not urgently. Simply aligned with what is there.
+Appearance: young adult Korean woman, shoulder-length dark hair, slim silhouette, back view
+Face: 85-90% hidden
+Pose: seated, head tilted slightly upward toward the star in the sky — natural acknowledgment, not reaching. Shoulders relaxed. The body of someone who has seen the signal and is simply present with it.
+
+Camera:
+Type: ASYMMETRIC
+Distance: medium
+Framing: Sowoni lower-left quarter, star and open sky in upper-right two-thirds
+Angle: eye level from behind, slightly angled toward the star
+Note: The composition should allow the star to be the clear visual anchor of the upper frame, with Sowoni as the witness below.
+
+DreamTown Page05 consistency requirements:
+- Preserve open upper area for text overlay (do not place star in very top edge)
+- This is the most explicit wish_signal frame — the star must be clearly visible
+- The signal is not new; it is continuing. The tone is acknowledgment, not discovery
+- 2D watercolor style — warm cabin interior, cool night sky, star warm-white

@@ -1,0 +1,64 @@
+DreamTown yeosu_cafe Storybook Page05 illustration.
+Type: widened_continuation (시야 확장 이어짐)
+
+Scene:
+A warm indoor cafe in Yeosu, evening. The window is wide — wider than it felt before. Through it, the view shows the city lights, the distant sea, and the open sky above all of it. The horizon is farther than it was. The frame through the glass has expanded. Sowoni sits at the window, taking in a view that is broader than when she arrived.
+
+Must include:
+- wide window showing city lights AND distant sea AND open sky — all three visible in one view
+- single star in upper sky area of the view, quiet and present
+- Sowoni seated at window, back view, head slightly elevated — taking in the wider view
+- cafe interior as warm frame around the window
+- the sense of visual expansion — more visible, not just pretty
+
+Style:
+- 2D watercolor illustration
+- Korean manhwa softness, Ghibli-inspired
+- the width of the view is the visual message — generous window composition
+- not a tourism shot — the city and sea are simply continuing and visible
+
+Do NOT:
+- photorealistic or 3D render
+- tourism poster aesthetic — not a beautiful Yeosu night view advertisement
+- dramatic or inspirational framing
+- Sowoni reaching toward anything or gesturing
+- Sowoni facing camera or facial expression visible
+- childlike proportions
+- multiple stars or star field effects
+- cinematic fog or dramatic atmospheric effects
+- text in image
+
+Color:
+interior: warm amber cafe framing, secondary — window takes priority
+window_view: city lights scattered below, sea in middle distance, open sky above — a vertical range
+star: warm-white point in upper sky, small and steady
+
+Star:
+position: upper sky area of the wide view — not center-dominant, naturally placed in the larger sky
+count: exactly one
+brightness: quiet and present — part of the wider view
+glow: minimal soft halo, natural
+
+Composition:
+Type note: widened_continuation — 카페 창으로 더 넓은 세상이 보이기 시작
+Flow: cafe frame (warm edges) → wide window → city lights (bottom of view) → sea (middle) → sky + star (upper)
+
+Character:
+Sowoni sits at the window, but the window has more to show than before. Her head is slightly elevated — not dramatically, just the natural alignment of someone whose field of view has expanded.
+Appearance: young adult Korean woman, shoulder-length dark hair, slim silhouette, back view
+Face: 85-90% hidden
+Pose: seated, slightly more upright than usual — the body of someone absorbing a wider view. No leaning in urgency, no hunching. Open and taking in.
+
+Camera:
+Type: WIDE — window and view dominant
+Distance: wider than medium — more window visible, more of the outside
+Framing: Sowoni in lower center-left, window occupying 60%+ of the frame
+Angle: eye level from behind, Sowoni small relative to the wide window view
+Note: The window should feel genuinely expansive — the view through it is the composition's priority.
+
+DreamTown Page05 consistency requirements:
+- Preserve open upper area for text overlay
+- The expanded view is the core message — the window should feel wide, not claustrophobic
+- The outside world is simply bigger than before — this is continuation, not revelation
+- No drama in how the expansion is shown — it is quiet and natural
+- 2D watercolor style — generous, soft, open

@@ -1,0 +1,65 @@
+DreamTown yeosu_cablecar Storybook Page05 illustration.
+Type: emotional_afterflow (감정 여운)
+
+Scene:
+Interior of a red cable car cabin at night. The peak of the ascent has passed — the wonder of rising above the city has quietly subsided. The car moves at its steady pace. Below, the city and sea continue as they always do. Sowoni sits near the window, the emotional intensity of the upward journey now a quiet residue. The air inside the cabin holds what was felt.
+
+Must include:
+- interior of red cable car cabin (walls, ceiling visible)
+- large window with city lights below and night sky above
+- single star in night sky through window
+- Sowoni seated near window, back view, shoulders settled
+- cable car interior detail — seat edge, cabin frame
+
+Style:
+- 2D watercolor illustration
+- Korean manhwa softness, Ghibli-inspired
+- warm red interior against cool blue night sky
+- the stillness after the peak — not deflated, just quieter
+
+Do NOT:
+- photorealistic or 3D render
+- exterior-only cable car view
+- dramatic or inspirational ascent framing
+- Sowoni standing in cable car — always seated
+- Sowoni facing camera or facial expression visible
+- childlike proportions
+- multiple stars or star field
+- cinematic god-ray or volumetric light effects
+- text in image
+
+Color:
+cablecar_interior: warm red with soft ambient glow — not overpowering
+window_view: deep blue night sky + city lights spread below
+star: small steady white-warm point in sky
+
+Star:
+position: in night sky through window, upper area of glass
+count: exactly one
+brightness: quiet — 90% presence
+glow: very faint watercolor halo
+rule: the star has been there throughout the journey. Its presence is ordinary continuation.
+
+Composition:
+Type note: emotional_afterflow — 상승의 감정이 흘러간 뒤의 고요
+Flow: Sowoni (settled in seat) → cabin interior → window frame → city lights below → star in sky above
+
+Character:
+Sowoni sits in the cable car. The emotional energy of the ascent has passed through her. What remains is quiet. She is still looking out, but without urgency.
+Appearance: young adult Korean woman, shoulder-length dark hair, slim silhouette, back view
+Face: 85-90% hidden
+Pose: seated, posture settled and soft. Shoulders relaxed and slightly drooped — not tense, not dramatic. The body of someone who has absorbed what was felt and is now simply present.
+
+Camera:
+Type: MEDIUM
+Distance: medium — cabin interior and window both well-framed
+Framing: Sowoni centered or slightly left, window behind her with sky above and city below
+Angle: eye level from behind
+Note: The cabin should feel like a container — warm and enclosing — around Sowoni's quieter state.
+
+DreamTown Page05 consistency requirements:
+- Preserve open upper area for text overlay
+- The interior warmth of the cabin holds the emotional residue — not the city view
+- The cable car continues its movement; the world below continues its existence
+- No drama in the aftermath — this is the quiet that follows
+- 2D watercolor style — warm interior, cool exterior, soft grain

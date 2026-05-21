@@ -1,0 +1,73 @@
+DreamTown yeosu_hamel Storybook Page05 illustration.
+Type: emotional_afterflow (감정 여운)
+
+Scene:
+Hamel harbor at night, after the emotional peak has passed. The waves maintain the rhythm they always had. The harbor lights reflect on water. In the background, the red Hamel Lighthouse stands — silhouette against the night sky, as it has always stood. A single star is visible in the sky above. Sowoni stands at the harbor edge, the emotional intensity of the memory and connection has gently subsided. What remains is the quiet weight of something that was real.
+
+Must include:
+- Hamel harbor edge or low harbor walkway
+- red Hamel Lighthouse visible as background silhouette (left or right of frame, NOT center)
+- open sea horizon extending beyond the harbor
+- single star in night sky (above the sea, upper area)
+- Sowoni standing at harbor edge, back view, posture settled
+- harbor reflections or water surface with ordinary light
+
+DoD requirement: red lighthouse (background) + single star (sky) — BOTH must be present
+
+Style:
+- 2D watercolor illustration
+- Korean manhwa softness, Ghibli-inspired
+- deep harbor night palette — navy blue, dark water, amber harbor lights
+- the emotional residue is in the quietness, not in dramatic visual language
+
+Do NOT:
+- photorealistic or 3D render
+- lighthouse as compositional center or directional beam — it is background only
+- Sowoni walking toward the lighthouse or star
+- inspirational harbor scene
+- tourism or travel brochure aesthetic
+- dramatic weather or cinematic fog
+- healing warmth or nostalgic coziness
+- Sowoni seated — hamel is always standing outdoor
+- Sowoni facing camera or facial expression visible
+- childlike proportions
+- multiple stars
+- text in image
+
+Color:
+sky: deep navy blue with open harbor night quality
+sea_harbor: dark reflective — ordinary water, not beautiful-for-beauty's sake
+lighthouse: rust-red or deep red silhouette against sky — structural, not glowing
+harbor_lights: ordinary amber and utility white scattered — the harbor is working
+star: warm-white to soft gold in sky, 140% presence — visible and steady
+
+Star:
+position: open sky above the sea, slightly right of center or upper area
+count: exactly one
+brightness: 140% — clearly present, this is the hamel star role
+glow: soft warm halo over water surface
+rule: the star must be visible and present. It is the signal that continues from the harbor. Not held, not on a surface — in the sky.
+
+Composition:
+Type note: emotional_afterflow — 항구에서 감정이 흘러간 뒤의 고요
+Flow: Sowoni (standing, settled) → harbor edge → open sea → lighthouse (background) / star (sky above)
+
+Character:
+Sowoni stands at the Hamel harbor. The emotional journey — the memory, the connection — has passed through her and left its residue. She stands still. The harbor continues. The lighthouse stands. The star is there.
+Appearance: young adult Korean woman, shoulder-length dark hair, slim silhouette, back view
+Face: 85-90% hidden
+Pose: standing, weight distributed evenly. Shoulders relaxed and settled. Arms at sides or slightly relaxed. The posture of someone who has been here a while and is not yet ready to leave — the emotion has passed but the place still holds something.
+
+Camera:
+Type: WIDE
+Distance: medium-far — Sowoni visible but small relative to harbor and sky
+Framing: Sowoni lower-center, lighthouse in background left or right, star in upper sky
+Angle: eye level from behind Sowoni, harbor expanse visible around her
+Note: Both lighthouse and star must be visible in frame. Sowoni is between them in the middle ground.
+
+DreamTown Page05 consistency requirements:
+- Preserve open upper area for text overlay
+- RED Hamel Lighthouse is required — must be visually distinguishable as red-toned
+- The star and lighthouse both present — neither centers the composition exclusively
+- The harbor is continuing as it always does — Sowoni is inside it, not commanding it
+- 2D watercolor style — deep harbor night, warm lighthouse accent, star warm-white

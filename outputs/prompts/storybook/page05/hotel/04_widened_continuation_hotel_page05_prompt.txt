@@ -1,0 +1,67 @@
+DreamTown yeosu_hotel Storybook Page05 illustration.
+Type: widened_continuation (시야 확장 이어짐)
+
+Scene:
+A hotel room in Yeosu, night. The window is wide — it shows more than a glimpse of the city. The full coastal night panorama is visible: city lights spreading below, the sea in the middle distance, and the open sky above. Sowoni stands at the window, taking in the view that is larger than the room. From above — from the hotel floor above the city — the perspective is broader. The world outside is wide and continuing.
+
+Must include:
+- wide hotel window showing full panorama: city lights below + sea in middle distance + open sky above
+- single star in upper sky area of the view
+- Sowoni standing at the window, back view, small relative to the window view
+- hotel room framing visible at edges — the room is the context for the widened view
+- the Yeosu coastal city visible in the view — both inland lights and coastal darkness
+
+Style:
+- 2D watercolor illustration
+- Korean manhwa softness, Ghibli-inspired
+- the width of the view is the visual statement — from the elevated hotel perspective
+- NOT a promotional view — the city simply exists and is wide
+
+Do NOT:
+- photorealistic or 3D render
+- tourism promotional cityscape aesthetic
+- dramatic or inspirational atmosphere
+- Sowoni dramatically posed with arms wide
+- Sowoni facing camera or facial expression visible
+- childlike proportions
+- multiple stars or star field
+- cinematic atmospheric effects
+- text in image
+
+Color:
+room_edges: dark framing at sides
+window_view: wide and layered — city lights (lower), sea darkness (middle), sky (upper)
+city_lights: warm yellow/white scattered across the wide view
+star: warm-white, steady — small in the wide view but clearly present
+
+Star:
+position: upper sky area, naturally placed in the wide panorama
+count: exactly one
+brightness: 110% — present in the expanded view, not dominant
+glow: soft minimal halo
+rule: in the widened view from the hotel, the star remains. It is simply there — one point in the larger continuing sky.
+
+Composition:
+Type note: widened_continuation — 호텔 창으로 더 넓은 여수를 바라봄
+Flow: room edges (dark frame) → Sowoni (small, lower) → window (wide) → city lights (lower) → sea (middle) → sky + star (upper)
+
+Character:
+Sowoni stands at the hotel window. The view through the glass is wide — wider than the room, wider than expected. She is small against it.
+Appearance: young adult Korean woman, shoulder-length dark hair, slim silhouette, back view
+Face: 85-90% hidden
+Pose: standing at the window, posture open — not pressed against the glass, positioned to absorb the full view. The body is slightly at rest — standing back enough to take in the whole.
+
+Camera:
+Type: WIDE
+Distance: wider than usual — Sowoni in lower 25-30% of frame, window and panorama dominant
+Framing: Sowoni lower-center, hotel room frame at edges, full panorama through window
+Angle: eye level from behind Sowoni, emphasizing the height and width of the view
+Note: From the hotel floor above the city, the perspective elevation matters — more of the city is visible than from ground level. The sea is visible beyond the city lights.
+
+DreamTown Page05 consistency requirements:
+- Preserve open upper area for text overlay
+- This is the widest hotel frame — the city panorama should feel genuinely expansive
+- Sowoni is smaller in this image — the view is wider than her
+- The sea visible beyond the city lights is important for this widened perspective
+- No drama in how the width is presented — the city simply continues, wide and ordinary
+- 2D watercolor style — city lights warmth, dark sea, deep sky, warm star

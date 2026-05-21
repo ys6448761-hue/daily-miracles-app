@@ -1,0 +1,67 @@
+DreamTown yeosu_hotel Storybook Page05 illustration.
+Type: emotional_afterflow (감정 여운)
+
+Scene:
+A quiet hotel room in Yeosu, late night. The day's journey — the cafe, the cable car, the harbor — has passed. In the room, the emotional current of all of it has gently subsided to a low warmth. The room is dark and still. Through the large window, the city night continues outside. Sowoni stands or sits near the window, the day's emotional residue present as a quiet weight in the room's stillness.
+
+Must include:
+- hotel room interior — dark, minimal, quiet
+- large window with city night view outside
+- single star in sky beyond the window — steady and continuing
+- Sowoni near window, back view, posture settled and resting
+- bed or low chair visible in background — the room's ordinary presence
+
+Style:
+- 2D watercolor illustration
+- Korean manhwa softness, Ghibli-inspired
+- the room is a container for quiet — not decorative, just still
+- deep night palette — dark interior, city lights through glass
+
+Do NOT:
+- photorealistic or 3D render
+- warm cozy bedroom aesthetic — this is quiet, not comfort-performing
+- inspirational or healing atmosphere
+- dramatic room staging or cinematic mood lighting
+- Sowoni facing camera or facial expression visible
+- childlike proportions
+- standing dramatically at window with arms extended — posture should be ordinary
+- multiple stars or dramatic star effects
+- text in image
+
+Color:
+room_interior: dark — near black, very low ambient light
+city_outside: warm yellow and white city lights, ordinary night
+sky: deep blue-black night
+star: warm-white, soft gold — steady in the dark sky
+
+Star:
+position: in sky visible through the window, upper portion
+count: exactly one
+brightness: quiet and steady — 100-110%, a presence rather than a spectacle
+glow: soft watercolor halo, gentle
+rule: the star was there all day. It is still there. The room is quiet but the star continues.
+
+Composition:
+Type note: emotional_afterflow — 방 안에서 오늘의 감정이 가라앉는 시간
+Flow: room interior (dark frame) → Sowoni (near window, settled) → window → city night → star in sky
+
+Character:
+Sowoni is near the hotel room window. The day is done. The emotions have passed through and left their residue. She is still. The room holds the quiet that follows a full day.
+Appearance: young adult Korean woman, shoulder-length dark hair, slim silhouette, back view
+Face: 85-90% hidden
+Pose: standing or sitting near the window, posture settled and low-energy — not collapsed, but at rest. Shoulders gently down. The body of someone at the end of the day, present but no longer active.
+
+Camera:
+Type: MEDIUM
+Distance: medium — Sowoni and window both in frame
+Framing: Sowoni left or lower-left, window right and dominant
+Angle: eye level from behind, slightly to the side
+Note: The dark room around Sowoni should be part of the composition — the room is not empty but quiet.
+
+DreamTown Page05 consistency requirements:
+- Preserve open upper area for text overlay
+- The room's darkness is intentional — it holds the quiet
+- The star outside is the continuation thread — present even in the room's stillness
+- The bed or chair in background reinforces the room as an inhabited, ordinary space
+- No drama. The emotional afterflow is quiet, not visible, just present as stillness.
+- 2D watercolor style — deep night, dark room, soft city glow through glass

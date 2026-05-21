@@ -1,0 +1,65 @@
+DreamTown yeosu_cablecar Storybook Page05 illustration.
+Type: reality_reconnection (현실 재연결)
+
+Scene:
+Interior of a red cable car cabin, descending. The car is on its way back toward the ground. Through the large window, the city lights are closer now — the ground is approaching. The journey upward was transforming; the return is ordinary. Sowoni sits inside, watching the descent. The world below is the same world she came from, and she is returning to it.
+
+Must include:
+- interior of red cable car cabin
+- large window showing descent perspective — city lights visible below, slightly closer than at peak
+- night sky with single star still visible in upper portion of glass
+- Sowoni seated near window, back view
+- cable car ceiling and walls framing the view
+
+Style:
+- 2D watercolor illustration
+- Korean manhwa softness, Ghibli-inspired
+- the descent should feel gentle and ordinary — not dramatic, not heavy
+- the city coming closer is simply what happens on the way down
+
+Do NOT:
+- photorealistic or 3D render
+- dramatic descent framing — no steep angle or vertigo effect
+- exterior-only view without interior cabin context
+- Sowoni standing or moving dramatically
+- Sowoni facing camera or facial expression visible
+- childlike proportions
+- multiple stars
+- inspirational or healing atmosphere
+- text in image
+
+Color:
+cablecar_interior: warm red, unchanged from ascent
+window_view: city lights closer and more defined, night sky above
+star: soft white-warm in upper sky — still there, still continuing
+
+Star:
+position: upper portion of window view, in night sky
+count: exactly one
+brightness: quiet and continuing — same as throughout the journey
+glow: faint soft halo
+rule: the star was there on the way up, and it is still there on the way down. Continuity.
+
+Composition:
+Type note: reality_reconnection — 땅으로 내려오는 순간, 현실로의 귀환
+Flow: Sowoni (seated, returning posture) → cabin interior → window → city lights closer → sky + star still above
+
+Character:
+Sowoni sits as the cable car descends. The city is coming back. The ground is approaching. She remains seated, watching through the window.
+Appearance: young adult Korean woman, shoulder-length dark hair, slim silhouette, back view
+Face: 85-90% hidden
+Pose: seated, posture with slight forward awareness — not leaning anxiously, but the body of someone attentive to what is coming back into view. Back is upright. Hands resting normally.
+
+Camera:
+Type: MEDIUM-WIDE
+Distance: wider than usual — showing more of the cabin and the window view below
+Framing: Sowoni centered, window below and around her with city lights prominent in lower portion
+Angle: slightly elevated — looking over Sowoni's shoulder at the view below
+Note: The perspective should convey descent — city slightly closer, more defined than at peak height.
+
+DreamTown Page05 consistency requirements:
+- Preserve open upper area for text overlay
+- The descent is ordinary — not a falling, just returning
+- The city below has been continuing all along; now it is simply closer
+- The star remains in the upper sky — it does not descend with the car
+- 2D watercolor style — consistent warm red interior, cool blue night exterior

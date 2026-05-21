@@ -1,0 +1,72 @@
+DreamTown yeosu_hamel Storybook Page05 illustration.
+Type: widened_continuation (시야 확장 이어짐)
+
+Scene:
+Hamel harbor at night, wide view. The full harbor expanse is visible — boats at rest or in slow motion, harbor edge, city lights in the distance, and the open sea extending to the horizon. The red Hamel Lighthouse stands to one edge of the frame — background structure, marking the territory. In the wide open sky above, a single star. Sowoni stands in the lower portion, small against the harbor expanse. The view is simply wider than before — more of the harbor, more of the sea, more of the sky.
+
+Must include:
+- wide harbor panorama — harbor surface, boats, dock elements, city lights in distance
+- red Hamel Lighthouse at one edge of the background (left or right, NOT center)
+- open sea extending to far horizon
+- wide open sky above with single star
+- Sowoni standing in lower frame, back view — visibly small relative to the harbor expanse
+
+DoD requirement: red lighthouse (background) + single star (sky) — BOTH must be present
+
+Style:
+- 2D watercolor illustration
+- Korean manhwa softness, Ghibli-inspired
+- the widened harbor is the message — generous, open, more visible than usual
+- NOT a tourism harbor shot — the harbor simply continues in its ordinary way, and it is wide
+
+Do NOT:
+- photorealistic or 3D render
+- tourism or scenic harbor poster aesthetic
+- lighthouse as compositional center
+- dramatic staging of the harbor
+- Sowoni large in frame — she is small against the harbor
+- Sowoni facing camera or facial expression visible
+- childlike proportions or seated pose
+- dramatic weather or fog
+- multiple stars
+- text in image
+
+Color:
+sky: wide open deep navy — more sky visible than in other frames
+sea_harbor: dark reflective water extending wide
+lighthouse: rust-red silhouette at one edge — structural anchor of the harbor
+harbor_lights: scattered amber/utility white dots across the wide frame
+city_distance: warm amber glow at horizon, ordinary
+star: warm-white, 140% presence — in the wide open sky above
+
+Star:
+position: upper sky area, naturally placed in the wide composition
+count: exactly one
+brightness: 140% — present and visible in the expanded view
+glow: soft warm halo
+rule: in the widened view, the star is part of the larger sky — still clearly there, not isolated
+
+Composition:
+Type note: widened_continuation — 먼 수평선이 가능성으로 읽히기 시작
+Flow: harbor environment (wide foreground and middle ground) → Sowoni (small, lower frame) → lighthouse (background side) → sea horizon → wide sky + star (upper)
+
+Character:
+Sowoni stands at the harbor in the widened frame. The harbor is large around her. The sea goes far. The sky is open above. She is a small presence in the larger continuing world.
+Appearance: young adult Korean woman, shoulder-length dark hair, slim silhouette, back view
+Face: 85-90% hidden
+Pose: standing with slightly open body posture — shoulders not hunched, arms relaxed at sides. The body of someone absorbing the wider view. Not stiff, not posed — simply standing in the open.
+
+Camera:
+Type: WIDE-PANORAMIC
+Distance: far — Sowoni in lower 20-25% of frame, harbor environment dominant 75%+
+Framing: Sowoni lower-center, lighthouse background to one side, star upper sky, sea horizon visible
+Angle: eye level from behind, wide and taking in the full harbor scene
+Note: This is the widest shot of the hamel series. Sowoni should be noticeably small against the harbor expanse.
+
+DreamTown Page05 consistency requirements:
+- Preserve open upper area for text overlay
+- RED Hamel Lighthouse required as background structural element
+- Star present in upper sky portion of the wide frame
+- Sowoni notably smaller in this image — the harbor expanse is the message
+- The sea horizon should be visible — the widened perspective extends to it
+- 2D watercolor style — wide harbor night, generous sky, warm lighthouse red accent

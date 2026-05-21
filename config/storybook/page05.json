@@ -1,0 +1,214 @@
+{
+  "_meta": {
+    "config_id": "storybook-page05-source-v1",
+    "version": "v1",
+    "created": "2026-05-18",
+    "status": "ACTIVE",
+    "purpose": "Storybook 5페이지 원본소스 SSOT — 4 locations × 4 types = 16 sources",
+    "narrative_scope": "소원 여정의 이어짐 — 여정이 끝난 것이 아니라 계속되고 있음을 보여주는 5번째 챕터",
+    "ratio": "3:4 portrait",
+    "resolution": "1536x2048",
+    "model": "gpt-image-1",
+    "style_base": "2D watercolor, Korean manhwa softness, Ghibli-inspired",
+    "output_base": "public/images/storybook/sources/page05/",
+    "prompt_base": "outputs/prompts/storybook/page05/"
+  },
+
+  "page05_concept": {
+    "chapter_title": "이어짐",
+    "narrative_role": "소원 여정의 이어짐 — 4개 장소를 통해 경험한 여정이 끝이 아니라 계속됨",
+    "emotional_arc": "여운 → 현실 재연결 → 소원 신호 이어짐 → 시야 확장",
+    "hope_curve": [0.50, 0.55, 0.60, 0.65],
+    "continuation_principle": "소원은 별이 되었고, 그 별은 여전히 여기 있다",
+    "dod_global": "각 장소의 고유 역할이 시각적으로 명확해야 한다"
+  },
+
+  "types": {
+    "emotional_afterflow": {
+      "korean": "감정 여운",
+      "index": 1,
+      "definition": "감정이 흘러간 뒤의 정서적 잔류. 무거운 감정이 아닌, 이미 지나간 감정의 조용한 흔적.",
+      "visual_language": "soft residue, lingering stillness, the moment after the feeling passed",
+      "hope_intensity": 0.50,
+      "anti_pattern": "감정 해소 장면 — 여운은 해결이 아닌 잔류"
+    },
+    "reality_reconnection": {
+      "korean": "현실 재연결",
+      "index": 2,
+      "definition": "여정 이후 일상과 다시 접촉하는 순간. 변화했지만 현실로 돌아가는 접점.",
+      "visual_language": "grounded presence, ordinary continuation, return without loss",
+      "hope_intensity": 0.55,
+      "anti_pattern": "일상이 무겁거나 억압적으로 보이면 안 됨"
+    },
+    "wish_signal_continuation": {
+      "korean": "소원 신호 이어짐",
+      "index": 3,
+      "definition": "소원이 별이 되었고 그 별은 여전히 빛난다. 소원의 유효성 지속.",
+      "visual_language": "star still present and continuing, signal not faded, wish remembered",
+      "hope_intensity": 0.60,
+      "anti_pattern": "별이 사라지거나 희미해지는 방향 금지"
+    },
+    "widened_continuation": {
+      "korean": "시야 확장 이어짐",
+      "index": 4,
+      "definition": "여정을 통해 넓어진 시야로 일상을 다시 보기 시작함. 이전보다 더 넓은 시야.",
+      "visual_language": "broader perspective, expanded frame, more visible than before",
+      "hope_intensity": 0.65,
+      "anti_pattern": "시야 확장이 드라마틱하거나 과도하게 밝으면 안 됨"
+    }
+  },
+
+  "locations": {
+    "cafe": {
+      "location_id": "yeosu_cafe",
+      "role": "emotional_pause",
+      "korean": "카페 — 멈춤과 내면 고요",
+      "dod": "pause/inner quiet 필수",
+      "star_policy": "창 너머 별, 여전히 거기 있음 — 조용하지만 존재",
+      "star_visibility": "visible through window, soft and steady",
+      "lighthouse": "N/A — indoor location",
+      "sowoni_pose_base": "seated at window table, back view",
+      "color_base": "warm interior amber + cool night sea through glass"
+    },
+    "cablecar": {
+      "location_id": "yeosu_cablecar",
+      "role": "widened_perspective",
+      "korean": "케이블카 — 넓어진 시야",
+      "dod": "widened perspective 필수 — 시야의 넓음이 전달되어야 함",
+      "star_policy": "하늘에 별, 넓은 창 너머로 보임",
+      "star_visibility": "visible in expanded sky, small and steady",
+      "lighthouse": "N/A",
+      "sowoni_pose_base": "seated inside cabin, back view",
+      "color_base": "red interior + deep blue night sky + city lights below"
+    },
+    "hamel": {
+      "location_id": "yeosu_hamel",
+      "role": "wish_signal",
+      "korean": "하멜 — 소원 신호와 등대",
+      "dod": "red lighthouse + star 필수 — 두 요소 모두 반드시 존재",
+      "star_policy": "하늘에 별, 140% brightness — visible and steady",
+      "star_visibility": "clearly present in night sky, not peripheral",
+      "lighthouse": "REQUIRED — red Hamel Lighthouse, background silhouette, NOT centered, NOT directional beam",
+      "lighthouse_spec": "Hamel Lighthouse is red/rust-colored. Background element — silhouette or soft background presence. Left or right of frame. Sowoni does NOT face it or move toward it.",
+      "sowoni_pose_base": "standing at harbor edge, back view",
+      "color_base": "deep navy harbor night + city lights reflected on water + red lighthouse accent"
+    },
+    "hotel": {
+      "location_id": "yeosu_hotel",
+      "role": "quiet_reset",
+      "korean": "호텔 — 조용한 리셋",
+      "dod": "quiet reset 필수 — 내면 재정비, 고요한 밤의 공간",
+      "star_policy": "창 너머 별, 조용하고 안정적",
+      "star_visibility": "visible through window, steady and calming",
+      "lighthouse": "N/A",
+      "sowoni_pose_base": "standing or seated near window, back view",
+      "color_base": "dark quiet room + city night lights through window + single star"
+    }
+  },
+
+  "source_manifest": [
+    {
+      "id": 1, "location": "cafe", "type": "emotional_afterflow",
+      "filename": "cafe_page05_emotional_afterflow_base.png",
+      "prompt_file": "outputs/prompts/storybook/page05/cafe/01_emotional_afterflow_cafe_page05_prompt.txt",
+      "output_path": "public/images/storybook/sources/page05/cafe/"
+    },
+    {
+      "id": 2, "location": "cafe", "type": "reality_reconnection",
+      "filename": "cafe_page05_reality_reconnection_base.png",
+      "prompt_file": "outputs/prompts/storybook/page05/cafe/02_reality_reconnection_cafe_page05_prompt.txt",
+      "output_path": "public/images/storybook/sources/page05/cafe/"
+    },
+    {
+      "id": 3, "location": "cafe", "type": "wish_signal_continuation",
+      "filename": "cafe_page05_wish_signal_continuation_base.png",
+      "prompt_file": "outputs/prompts/storybook/page05/cafe/03_wish_signal_continuation_cafe_page05_prompt.txt",
+      "output_path": "public/images/storybook/sources/page05/cafe/"
+    },
+    {
+      "id": 4, "location": "cafe", "type": "widened_continuation",
+      "filename": "cafe_page05_widened_continuation_base.png",
+      "prompt_file": "outputs/prompts/storybook/page05/cafe/04_widened_continuation_cafe_page05_prompt.txt",
+      "output_path": "public/images/storybook/sources/page05/cafe/"
+    },
+    {
+      "id": 5, "location": "cablecar", "type": "emotional_afterflow",
+      "filename": "cablecar_page05_emotional_afterflow_base.png",
+      "prompt_file": "outputs/prompts/storybook/page05/cablecar/01_emotional_afterflow_cablecar_page05_prompt.txt",
+      "output_path": "public/images/storybook/sources/page05/cablecar/"
+    },
+    {
+      "id": 6, "location": "cablecar", "type": "reality_reconnection",
+      "filename": "cablecar_page05_reality_reconnection_base.png",
+      "prompt_file": "outputs/prompts/storybook/page05/cablecar/02_reality_reconnection_cablecar_page05_prompt.txt",
+      "output_path": "public/images/storybook/sources/page05/cablecar/"
+    },
+    {
+      "id": 7, "location": "cablecar", "type": "wish_signal_continuation",
+      "filename": "cablecar_page05_wish_signal_continuation_base.png",
+      "prompt_file": "outputs/prompts/storybook/page05/cablecar/03_wish_signal_continuation_cablecar_page05_prompt.txt",
+      "output_path": "public/images/storybook/sources/page05/cablecar/"
+    },
+    {
+      "id": 8, "location": "cablecar", "type": "widened_continuation",
+      "filename": "cablecar_page05_widened_continuation_base.png",
+      "prompt_file": "outputs/prompts/storybook/page05/cablecar/04_widened_continuation_cablecar_page05_prompt.txt",
+      "output_path": "public/images/storybook/sources/page05/cablecar/"
+    },
+    {
+      "id": 9, "location": "hamel", "type": "emotional_afterflow",
+      "filename": "hamel_page05_emotional_afterflow_base.png",
+      "prompt_file": "outputs/prompts/storybook/page05/hamel/01_emotional_afterflow_hamel_page05_prompt.txt",
+      "output_path": "public/images/storybook/sources/page05/hamel/"
+    },
+    {
+      "id": 10, "location": "hamel", "type": "reality_reconnection",
+      "filename": "hamel_page05_reality_reconnection_base.png",
+      "prompt_file": "outputs/prompts/storybook/page05/hamel/02_reality_reconnection_hamel_page05_prompt.txt",
+      "output_path": "public/images/storybook/sources/page05/hamel/"
+    },
+    {
+      "id": 11, "location": "hamel", "type": "wish_signal_continuation",
+      "filename": "hamel_page05_wish_signal_continuation_base.png",
+      "prompt_file": "outputs/prompts/storybook/page05/hamel/03_wish_signal_continuation_hamel_page05_prompt.txt",
+      "output_path": "public/images/storybook/sources/page05/hamel/"
+    },
+    {
+      "id": 12, "location": "hamel", "type": "widened_continuation",
+      "filename": "hamel_page05_widened_continuation_base.png",
+      "prompt_file": "outputs/prompts/storybook/page05/hamel/04_widened_continuation_hamel_page05_prompt.txt",
+      "output_path": "public/images/storybook/sources/page05/hamel/"
+    },
+    {
+      "id": 13, "location": "hotel", "type": "emotional_afterflow",
+      "filename": "hotel_page05_emotional_afterflow_base.png",
+      "prompt_file": "outputs/prompts/storybook/page05/hotel/01_emotional_afterflow_hotel_page05_prompt.txt",
+      "output_path": "public/images/storybook/sources/page05/hotel/"
+    },
+    {
+      "id": 14, "location": "hotel", "type": "reality_reconnection",
+      "filename": "hotel_page05_reality_reconnection_base.png",
+      "prompt_file": "outputs/prompts/storybook/page05/hotel/02_reality_reconnection_hotel_page05_prompt.txt",
+      "output_path": "public/images/storybook/sources/page05/hotel/"
+    },
+    {
+      "id": 15, "location": "hotel", "type": "wish_signal_continuation",
+      "filename": "hotel_page05_wish_signal_continuation_base.png",
+      "prompt_file": "outputs/prompts/storybook/page05/hotel/03_wish_signal_continuation_hotel_page05_prompt.txt",
+      "output_path": "public/images/storybook/sources/page05/hotel/"
+    },
+    {
+      "id": 16, "location": "hotel", "type": "widened_continuation",
+      "filename": "hotel_page05_widened_continuation_base.png",
+      "prompt_file": "outputs/prompts/storybook/page05/hotel/04_widened_continuation_hotel_page05_prompt.txt",
+      "output_path": "public/images/storybook/sources/page05/hotel/"
+    }
+  ],
+
+  "generation_plan": {
+    "phase1_samples": ["cafe_01", "cablecar_04", "hamel_03", "hotel_01"],
+    "phase2_remaining": "CEO 시각 검수 통과 후 나머지 12장",
+    "execution_order": "cafe → cablecar → hamel → hotel (각 4장 순서)",
+    "dry_run_check": "16개 source_manifest 목록 확인 후 실행"
+  }
+}

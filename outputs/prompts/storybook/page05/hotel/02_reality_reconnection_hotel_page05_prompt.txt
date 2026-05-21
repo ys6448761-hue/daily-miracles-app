@@ -1,0 +1,66 @@
+DreamTown yeosu_hotel Storybook Page05 illustration.
+Type: reality_reconnection (현실 재연결)
+
+Scene:
+A hotel room in Yeosu, very late night or pre-dawn. The night is still present but there is a subtle quality of the next day approaching. The city lights outside continue. Sowoni stands at the window, upright. The ordinary preparation for what comes next — not packed and leaving, not dramatic. Simply the quiet alignment of someone whose inner journey has been real, and who is standing in the ordinary world preparing to continue in it.
+
+Must include:
+- hotel room window with city night view
+- single star visible in sky — still present
+- Sowoni standing at window, back view, posture upright with quiet readiness
+- room interior with minimal ordinary detail — a surface with something set down (phone, bag, ordinary item)
+- the quality of the hour: still night but no longer the middle of it
+
+Style:
+- 2D watercolor illustration
+- Korean manhwa softness, Ghibli-inspired
+- not bright or dawn-lit — the light quality is still night, but with a subtle forward quality
+- the ordinary preparation is not dramatic
+
+Do NOT:
+- photorealistic or 3D render
+- dramatic dawn or sunrise lighting
+- inspirational or healing atmosphere
+- cinematic or staged room scene
+- Sowoni dramatically posed at window (arms out, theatrical gesture)
+- Sowoni facing camera
+- childlike proportions
+- multiple stars or dramatic star lighting
+- text in image
+
+Color:
+room: slightly lighter than emotional_afterflow — not daylight, but the night is further along
+city_outside: city lights continuing, ordinary
+sky: deep blue but with very subtle softening in one corner — not dawn, just the quality of late-late night
+star: warm-white, steady — the same star, still there
+
+Star:
+position: sky through window, upper area
+count: exactly one
+brightness: 110% — steady and present
+glow: soft halo, continuing
+rule: the star's continuity is its message in this frame. Still there. What was wished continues.
+
+Composition:
+Type note: reality_reconnection — 창가에서 내일을 준비하는 조용한 마음
+Flow: ordinary room detail (background) → Sowoni at window (upright) → window → city outside → star
+
+Character:
+Sowoni stands at the hotel window, posture upright with a quiet sense of preparation. The journey was real. The ordinary world is here. Both are present.
+Appearance: young adult Korean woman, shoulder-length dark hair, slim silhouette, back view
+Face: 85-90% hidden
+Pose: standing with good posture — shoulders up slightly from earlier, back straight, the quiet lift of someone who has rested and is orienting toward what comes next. Not rushed, not dramatic. Simply upright.
+
+Camera:
+Type: MEDIUM
+Distance: medium — Sowoni and window well framed
+Framing: Sowoni centered or slightly left, window on right, room detail visible in background
+Angle: eye level from behind, straight
+Note: The posture of readiness in Sowoni's silhouette is the key visual element. The room behind her should suggest ordinary inhabited space.
+
+DreamTown Page05 consistency requirements:
+- Preserve open upper area for text overlay
+- The ordinary item in the room (phone, bag) reinforces that ordinary life is present
+- The star is still there — the wish continues into the next ordinary day
+- No drama — this is the quiet before the next ordinary thing begins
+- 2D watercolor style — deep night room, steady city lights, warm star

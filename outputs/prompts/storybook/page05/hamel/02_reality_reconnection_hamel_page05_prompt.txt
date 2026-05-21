@@ -1,0 +1,73 @@
+DreamTown yeosu_hamel Storybook Page05 illustration.
+Type: reality_reconnection (현실 재연결)
+
+Scene:
+Hamel harbor at night. The stone walkway surface is under Sowoni's feet. The harbor — boats, lights, water — operates as it always does. Ordinary coastal activity continues around the edges of the frame. The red Hamel Lighthouse stands in the background. A single star is in the sky. Sowoni stands on the stone surface, connected to the solid ground of the harbor. The ordinary world of Yeosu's harbor is here, and she is standing in it.
+
+Must include:
+- harbor stone walkway or paved surface visible (ground connection)
+- red Hamel Lighthouse visible in background (left or right, NOT center)
+- ordinary harbor activity indicators — boat outlines at distance, harbor edge, dock detail
+- single star in night sky (upper area, clearly present)
+- Sowoni standing on the ground, back view, posture grounded
+
+DoD requirement: red lighthouse (background) + single star (sky) — BOTH must be present
+
+Style:
+- 2D watercolor illustration
+- Korean manhwa softness, Ghibli-inspired
+- the harbor is working — it is not beautiful-for-show, it is ordinary and real
+- the ground is important in this frame — Sowoni's feet on solid stone
+
+Do NOT:
+- photorealistic or 3D render
+- lighthouse as compositional center or dramatic focal element
+- tourism harbor aesthetic
+- inspirational or healing framing
+- Sowoni walking toward the lighthouse or gesturing
+- Sowoni seated — hamel is always standing outdoor
+- Sowoni facing camera
+- childlike proportions
+- multiple stars or dramatic star effects
+- cinematic fog or dramatic weather
+- text in image
+
+Color:
+sky: deep navy with night harbor quality
+sea_harbor: dark reflective water, ordinary
+ground: stone or pavement texture in subtle foreground — darker, grounded
+lighthouse: rust-red silhouette — background structural presence
+harbor_lights: scattered amber and utility white
+star: warm-white, 140% presence — visible and continuing
+
+Star:
+position: open sky above the sea, upper area of composition
+count: exactly one
+brightness: 140% — present and clear, the harbor's star
+glow: soft warm halo
+rule: the star continues, grounded in the same sky above the ordinary harbor
+
+Composition:
+Type note: reality_reconnection — 항구 땅을 밟으며 현실로 돌아오는 감각
+Flow: stone ground (below Sowoni) → Sowoni standing → harbor environment → lighthouse (background) + star (sky)
+
+Character:
+Sowoni stands at the harbor. The ground is under her feet. The ordinary world is present — the harbor, the lights, the sound of water. She is standing in it. Returned to solid ground.
+Appearance: young adult Korean woman, shoulder-length dark hair, slim silhouette, back view
+Face: 85-90% hidden
+Pose: standing with feet apart — grounded, weight distributed on both feet equally. Back straight. Shoulders level. The posture of someone who has landed — not searching, not reaching, simply standing on solid ground.
+
+Camera:
+Type: MEDIUM-WIDE
+Distance: medium-far — enough to see the ground below, Sowoni's full standing figure, and the background
+Framing: Sowoni centered, ground visible in very bottom of frame, lighthouse in background, star in sky
+Angle: eye level from behind, slightly lower to suggest the ground connection
+Note: Including the stone walkway in the bottom of the frame reinforces the reality_reconnection — the ground is here.
+
+DreamTown Page05 consistency requirements:
+- Preserve open upper area for text overlay
+- RED Hamel Lighthouse background presence required
+- Star clearly present in sky
+- The ground in the frame is important for this type — grounded, solid, real
+- Harbor continues in its ordinary way — boats, lights, water — all present and ongoing
+- 2D watercolor style — harbor night, stone ground texture, warm lighthouse accent

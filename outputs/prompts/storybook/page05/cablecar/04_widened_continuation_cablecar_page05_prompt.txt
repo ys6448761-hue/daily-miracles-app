@@ -1,0 +1,67 @@
+DreamTown yeosu_cablecar Storybook Page05 illustration.
+Type: widened_continuation (시야 확장 이어짐)
+
+Scene:
+Interior of a red cable car cabin at full height. Through the large window — the full expanse: city lights spreading below, the Yeosu coastline visible, the sea extending toward the horizon, and the open sky above. All of this in one view. The cable car window has revealed the widened perspective. This is the defining expanded view. Sowoni sits inside, the full panorama available to her through the glass.
+
+Must include:
+- interior of red cable car cabin (ceiling, walls, seat frame visible)
+- wide window showing full panorama: city lights below + Yeosu coastline + sea to horizon + open sky
+- single star in upper sky area — small and present in the wide view
+- Sowoni seated in lower portion of frame, back view — small relative to the vast window view
+- cable car interior as framing device around the panorama
+
+Style:
+- 2D watercolor illustration
+- Korean manhwa softness, Ghibli-inspired
+- the widened view is the visual statement — generous, expansive but not exaggerated
+- NOT a tourism advertisement — the city and sea simply exist, wide and continuing
+
+Do NOT:
+- photorealistic or 3D render
+- tourism poster aesthetic — not a "Beautiful Yeosu at Night" promotional shot
+- dramatic panoramic staging — the width is natural, not performed
+- Sowoni standing or gesturing at the view
+- Sowoni facing camera or facial expression visible
+- childlike proportions
+- multiple stars or star field
+- crescent moon or moon shape of any kind — if a star is shown, it must be a single distant star point, not a crescent or lunar shape
+- cinematic fog or dramatic atmospheric effects
+- text in image
+
+Color:
+cablecar_interior: warm red walls and ceiling framing — present but secondary
+window_view: city lights scattered below (warm yellow dots), coastal sea middle distance (dark reflective), sky above (deep blue-black)
+star: small steady warm-white in upper sky, natural part of the wide view
+
+Star:
+position: upper sky area of the panorama, naturally placed — not centered, not dominant
+count: exactly one — a single distant star point, NOT a crescent moon, NOT a moon shape
+brightness: quiet and natural within the wider view
+glow: minimal — the star is one element among many in the expanded frame
+shape: circular point of light only — no crescent, no arc, no lunar form
+rule: in the widened view, the star is still present as a small quiet point. It does not need to be the largest element. If a star cannot be placed convincingly, omit it — the city/sea/coastline panorama is the primary subject.
+
+Composition:
+Type note: widened_continuation — 케이블카 위에서 전체가 보이는 순간
+Flow: cabin interior frame (red edges) → wide window → city (bottom layer) → coastline and sea (middle) → open sky + star (upper)
+
+Character:
+Sowoni sits in the cable car at the point of maximum view. The world below is wide and continuing. She is small in the lower portion of the frame. The expanse is what the eye reads first.
+Appearance: young adult Korean woman, shoulder-length dark hair, slim silhouette, back view
+Face: 85-90% hidden
+Pose: seated, posture open — shoulders neither hunched nor dramatically squared. The body of someone absorbing the wide view without urgency. Head level or slightly elevated.
+
+Camera:
+Type: WIDE — the defining widened perspective shot
+Distance: wide — Sowoni in lower 20-25% of frame, window and panorama dominant 75%+
+Framing: Sowoni lower-center, enormous window view behind her
+Angle: eye level from behind Sowoni, showing both her small seated form and the full panorama
+Note: Sowoni should be noticeably small relative to the window and the view. The frame emphasizes that the world is larger than the individual.
+
+DreamTown Page05 consistency requirements:
+- Preserve open upper area for text overlay
+- This is the widened perspective image — Sowoni must be visually smaller than the view
+- The city, sea, and sky should all be readable in the frame
+- The view is simply wide and continuing — not beautiful-for-beauty's-sake
+- 2D watercolor style — wide, generous, warm interior framing cold expansive exterior

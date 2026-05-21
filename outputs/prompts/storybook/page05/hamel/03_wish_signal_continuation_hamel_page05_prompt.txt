@@ -1,0 +1,72 @@
+DreamTown yeosu_hamel Storybook Page05 illustration.
+Type: wish_signal_continuation (소원 신호 이어짐)
+
+Scene:
+Hamel harbor at night. In the background, the red Hamel Lighthouse stands as a quiet signal — its red structure present but its light soft and undemonstrative, not blazing or cinematic. In the sky, a single star. The lighthouse has always been there; the star holds Sowoni's wish and continues. Both signals are present, quiet and continuing, neither overwhelming the other. Sowoni stands at the harbor, facing the horizon where lighthouse and star share the same sky.
+
+Must include:
+- red Hamel Lighthouse visible in background — silhouette, one side of frame (left or right, NOT center)
+- single star in night sky — clearly present, upper area, NOT overlapping the lighthouse
+- open sea horizon
+- Sowoni standing at harbor, back view, gaze toward horizon
+- harbor water reflecting both the lighthouse glow and the ambient night
+
+DoD requirement: red lighthouse (background) + single star (sky) — BOTH must be present and clearly distinguishable
+
+Style:
+- 2D watercolor illustration
+- Korean manhwa softness, Ghibli-inspired
+- the dual presence of lighthouse and star is the visual composition — both are signals
+- neither dominates; both continue
+
+Do NOT:
+- photorealistic or 3D render
+- lighthouse as dramatic compositional center — it is background, to the side
+- lighthouse beam sweeping dramatically
+- overly bright or cinematic lighthouse light — the lighthouse is a quiet signal, not a dramatic beacon
+- lighthouse glow that dominates the frame or overwhelms the star
+- Sowoni walking toward the lighthouse
+- Sowoni facing camera or facial expression visible
+- childlike proportions or seated pose
+- star and lighthouse overlapping in composition
+- inspirational or healing atmosphere
+- tourism aesthetic
+- text in image
+
+Color:
+sky: deep navy blue
+lighthouse: rust-red or deep red structure — quiet signal glow, soft and muted. NOT a bright beacon. The red color of the lighthouse body is what identifies it, not its light intensity. Light from the lighthouse is dim and ambient, not projecting.
+sea: dark reflective harbor water — soft reflection of both the lighthouse structure and the star
+star: warm-white to soft gold, 130% brightness — present and continuing above the sea, the primary warm light element in the sky
+
+Star:
+position: open sky above sea horizon, upper area — clearly visible, NOT overlapping lighthouse silhouette
+count: exactly one
+brightness: 140% — the wish signal is clearly present from the harbor
+glow: soft warm halo extending toward the water surface
+rule: the star and the lighthouse are both background signals. The star is in the sky; the lighthouse is on the land. Both continue.
+
+Composition:
+Type note: wish_signal_continuation — 등대와 별이 함께 지속됨, 소원 신호 이어짐
+Flow: Sowoni (standing, looking toward horizon) → harbor water → sea horizon → lighthouse (one side background) / star (upper sky other side)
+
+Character:
+Sowoni stands at the harbor, looking toward the horizon. Both the lighthouse and the star are visible from where she stands. She is not addressing either of them specifically — she is present in the space where both signals exist.
+Appearance: young adult Korean woman, shoulder-length dark hair, slim silhouette, back view
+Face: 85-90% hidden
+Pose: standing with steady weight, gaze toward the horizon. Neither reaching toward the lighthouse nor the star. Simply standing where both are visible.
+
+Camera:
+Type: WIDE
+Distance: medium-far — Sowoni in lower frame, lighthouse background, star in upper sky
+Framing: Sowoni lower-center, lighthouse in background left-third, star in upper sky right-third — a triangular composition
+Angle: eye level from behind, allowing both background elements to be visible above Sowoni
+Note: The triangular composition (Sowoni at bottom, lighthouse upper-left, star upper-right) is the natural arrangement that shows both signals continuing.
+
+DreamTown Page05 consistency requirements:
+- Preserve open upper area for text overlay
+- RED Hamel Lighthouse clearly required — positioned to one side, not center
+- Star clearly in sky — separate from the lighthouse visually
+- Both signals are background elements — Sowoni is the foreground human presence
+- The harbor water should hint at reflection of both elements below
+- 2D watercolor style — deep harbor night, warm lighthouse red, star warm gold-white

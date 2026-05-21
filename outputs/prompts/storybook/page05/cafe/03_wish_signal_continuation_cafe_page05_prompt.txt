@@ -1,0 +1,65 @@
+DreamTown yeosu_cafe Storybook Page05 illustration.
+Type: wish_signal_continuation (소원 신호 이어짐)
+
+Scene:
+A warm indoor cafe in Yeosu, evening. The window is the focus. Beyond the glass, the night sea and city are continuing. And there — in the upper portion of the sky beyond the glass — a single star. It was there before the coffee was ordered. It will be there when Sowoni leaves. The star is not a revelation; it is a continuation.
+
+Must include:
+- large window as the dominant visual element
+- single star clearly visible in sky through glass — quiet but present, not peripheral
+- night sea and city lights outside, continuing
+- Sowoni facing the window, seated, back view
+- cafe interior present but secondary — window is the primary frame
+
+Style:
+- 2D watercolor illustration
+- Korean manhwa softness, Ghibli-inspired
+- the window should feel like a stage — the star's signal is the quiet statement
+- not dramatic, not inspirational — simply present and continuing
+
+Do NOT:
+- photorealistic or 3D render
+- star as overpowering focal point — it should be clearly visible but not blinding
+- inspirational mood or healing atmosphere
+- Sowoni reaching toward the window or star
+- Sowoni facing camera or any facial expression visible
+- childlike proportions or standing pose
+- multiple stars
+- dramatic lighting, god-ray, or volumetric effects
+- text in image
+
+Color:
+interior: warm low amber fading into background
+window_view: deep blue-black night, city lights steady below
+star: warm-white to soft gold — clearly visible, gentle glow, not harsh
+
+Star:
+position: visible in sky through window, upper-center or slightly right of center of the glass pane
+count: exactly one
+brightness: 120% — visible and acknowledged, the signal is clear but not dominant
+glow: soft watercolor halo, warm edges dissolving into night sky
+rule: the star's presence is the point of this image. It continues. The wish it represents continues.
+
+Composition:
+Type note: wish_signal_continuation — 소원의 별이 창 너머에 여전히 있음
+Flow: Sowoni (seated, gaze toward window) → window frame → star in sky → city and sea continuing around it
+
+Character:
+Sowoni sits at the window. Her gaze is toward the glass — not longing, not reaching. Simply looking at what is there. The star is there. That is the fact being held.
+Appearance: young adult Korean woman, shoulder-length dark hair, slim silhouette, back view
+Face: 85-90% hidden
+Pose: seated, upright and still. Head oriented toward the window. The posture of quiet acknowledgment — not reaching, not turning away.
+
+Camera:
+Type: ASYMMETRIC — window and star dominant
+Distance: medium
+Framing: Sowoni in lower-left third, window and star in right two-thirds and upper portion
+Angle: eye level from behind and to the right, angled slightly toward window
+Note: The star and window should hold more visual weight than Sowoni. Her presence is the witness; the star is the subject.
+
+DreamTown Page05 consistency requirements:
+- Preserve open upper area for text overlay
+- The star's continuity is the core message of this frame — it must be clearly visible
+- The cafe fades into warmth; the window and star carry the meaning
+- No drama in how the star is presented — it simply is
+- 2D watercolor style — soft, warm, quiet edges

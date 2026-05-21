@@ -1,0 +1,178 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "dreamtown-asset-registry-schema-v1",
+  "title": "DreamTown Asset Registry Schema",
+  "description": "소원이의 여정 자산을 역할별로 등록·분류하는 Registry 스키마. 새 이미지 생성이 아닌 기존 원천소스 분류가 목적.",
+  "version": "v1",
+  "created": "2026-05-18",
+
+  "type": "object",
+  "required": ["_meta", "assets"],
+
+  "properties": {
+
+    "_meta": {
+      "type": "object",
+      "description": "Registry 메타 정보",
+      "properties": {
+        "version":       { "type": "string" },
+        "built_at":      { "type": "string", "description": "YYYY-MM-DDTHH:mm:ss" },
+        "total_assets":  { "type": "number" },
+        "sources_scanned": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "file_path", "location", "location_role", "page_role", "status"],
+
+        "properties": {
+
+          "id": {
+            "type": "string",
+            "description": "고유 자산 식별자. 파일명 기반 생성. 불변.",
+            "examples": ["cablecar_confusion_citrine_01", "hamel_calm_emerald_base03", "page05_cafe_emotional_afterflow"]
+          },
+
+          "file_path": {
+            "type": "string",
+            "description": "프로젝트 루트 기준 상대 경로"
+          },
+
+          "location": {
+            "type": "string",
+            "enum": ["cafe", "cablecar", "hamel", "hotel"],
+            "description": "DreamTown 4대 여수 장소"
+          },
+
+          "location_role": {
+            "type": "string",
+            "enum": ["emotional_pause", "widened_perspective", "wish_signal", "quiet_reset"],
+            "description": "스토리북 여정에서 이 장소가 맡는 역할"
+          },
+
+          "page_role": {
+            "type": "string",
+            "enum": [
+              "canonical_core",
+              "base_master",
+              "continuity_connector",
+              "page05_afterflow_candidate",
+              "text_overlay",
+              "unknown"
+            ],
+            "description": "이 자산이 스토리북 파이프라인에서 차지하는 역할 계층"
+          },
+
+          "emotion": {
+            "type": "string",
+            "enum": ["confusion", "pause", "calm", "curiosity", "fragile_hope", null],
+            "description": "이미지에 대응하는 DreamTown 감정 5단계. page05 자산은 null 가능."
+          },
+
+          "page05_type": {
+            "type": ["string", "null"],
+            "enum": [
+              "emotional_afterflow",
+              "reality_reconnection",
+              "wish_signal_continuation",
+              "widened_continuation",
+              null
+            ],
+            "description": "page05 continuity_connector 자산의 세부 타입. 비page05 자산은 null."
+          },
+
+          "gem": {
+            "type": ["string", "null"],
+            "enum": ["moonstone", "sapphire", "emerald", "topaz", "diamond", "citrine", "ruby", null],
+            "description": "이 이미지에 적용된 보석 색상. Air Seed 3축 (장소×감정×보석)."
+          },
+
+          "wish_type": {
+            "type": ["string", "null"],
+            "description": "소원 유형 태그 (선택). 향후 소원 분류 연동 시 사용.",
+            "examples": ["rest_wish", "connection_wish", "growth_wish", "healing_wish"]
+          },
+
+          "weather": {
+            "type": ["string", "null"],
+            "enum": ["night", "overcast", "evening", "late_afternoon", "dawn", null],
+            "description": "장면 시간/날씨 컨텍스트"
+          },
+
+          "time": {
+            "type": ["string", "null"],
+            "enum": ["night", "late_evening", "early_evening", "late_afternoon", "dawn", null]
+          },
+
+          "continuity_type": {
+            "type": ["string", "null"],
+            "enum": [
+              "temporal_asymmetry",
+              "room_lag",
+              "exterior_indifference",
+              "unfinished_object_residue",
+              "mixed",
+              null
+            ],
+            "description": "AIR-GRAM-007 기준 이 자산의 주요 continuity grammar 유형"
+          },
+
+          "myth_layer": {
+            "type": "string",
+            "enum": ["strong", "medium", "low"],
+            "description": "DreamTown 신화층 강도. hamel=strong(등대/소원), cablecar=medium, cafe/hotel=low."
+          },
+
+          "visual_style": {
+            "type": "string",
+            "enum": ["watercolor_manhwa", "watercolor_ghibli", "2d_illustration", "unknown"],
+            "description": "시각 스타일 분류"
+          },
+
+          "derived_from": {
+            "type": ["string", "null"],
+            "description": "이 자산이 파생된 원본 자산 ID. 원천 자산이면 null."
+          },
+
+          "has_text_overlay": {
+            "type": "boolean",
+            "description": "텍스트 오버레이가 합성된 이미지인지 여부"
+          },
+
+          "usable_for": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "storybook",
+                "storybook_page05",
+                "storybook_page05_candidate",
+                "postcard",
+                "miracle_video",
+                "thumbnail",
+                "ambient",
+                "sharing"
+              ]
+            },
+            "description": "이 자산을 사용할 수 있는 출력 채널 목록"
+          },
+
+          "status": {
+            "type": "string",
+            "enum": ["active", "candidate", "archived", "text_overlay_only"],
+            "description": "자산 운영 상태"
+          },
+
+          "notes": {
+            "type": ["string", "null"],
+            "description": "분류 판단 근거 또는 특이사항"
+          }
+
+        }
+      }
+    }
+  }
+}

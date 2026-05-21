@@ -1,0 +1,67 @@
+DreamTown yeosu_hotel Storybook Page05 illustration.
+Type: wish_signal_continuation (소원 신호 이어짐)
+
+Scene:
+A hotel room at night. The room is dark and very still. Through the window, the city exists outside. And there — in the night sky beyond the glass — a single star. Small. Steady. It has been there all evening. It will be there tomorrow. The room is dark, but the star is not. The wish continues. Sowoni stands near the window, simply present with the star in view.
+
+Must include:
+- hotel window with clear night sky view
+- single star clearly visible in sky beyond glass — quiet, steady, present
+- city lights below the star (city continuing, world ongoing)
+- room interior dark and still — very low ambient light
+- Sowoni standing near or at the window, back view, simply present
+
+Style:
+- 2D watercolor illustration
+- Korean manhwa softness, Ghibli-inspired
+- the star is the visual anchor of this frame — quiet but clear
+- the dark room frames the lit window; the window frames the star
+
+Do NOT:
+- photorealistic or 3D render
+- star as overly radiant or dramatically glowing — present and clear, not theatrical
+- warm cozy room atmosphere — the room is quiet and dark
+- inspirational or healing framing
+- Sowoni reaching toward the window or star
+- Sowoni facing camera
+- childlike proportions
+- multiple stars
+- dramatic lighting effects (god-ray, volumetric)
+- text in image
+
+Color:
+room: very dark — almost all shadow, only window light
+city_outside: ordinary city lights, continuing
+sky: deep blue-black night, clear
+star: warm-white with soft gold halo — 130% brightness, clearly present in the dark sky
+
+Star:
+position: center-upper area of the window view, clearly in the sky
+count: exactly one
+brightness: 130% — in the dark room and dark city, the star is the clear point of light
+glow: soft warm halo, the most luminous element in the frame
+rule: in the dark room, the star is the continuation signal. Clear and steady. This is the hotel's wish_signal frame.
+
+Composition:
+Type note: wish_signal_continuation — 창 너머 별이 여전히 빛나고 있음
+Flow: dark room interior → Sowoni (dark silhouette against window light) → window frame → city lights → star (clear, central to window view)
+
+Character:
+Sowoni stands near the window in the dark room. The window is the source of light in the frame. The star is in the window. She is present with it.
+Appearance: young adult Korean woman, shoulder-length dark hair, slim silhouette, back view
+Face: 85-90% hidden — the dark room behind her creates silhouette contrast
+Pose: standing still, completely at rest. Head oriented naturally toward the star in the window. No urgency, no reaching. Simply present with the signal that continues.
+
+Camera:
+Type: MEDIUM
+Distance: medium — Sowoni and window both present
+Framing: Sowoni centered or slightly right, window on the left and dominant — the star clearly in the window
+Angle: eye level from behind
+Note: The dark room behind Sowoni and the lit window ahead create the contrast. The star in the window is the visual destination of the composition.
+
+DreamTown Page05 consistency requirements:
+- Preserve open upper area for text overlay (star should be in upper-middle of window, not top edge)
+- The dark room is essential — it makes the star in the window more present
+- This is the clearest wish_signal frame in the hotel series
+- The star is clear and continuing — not dramatic, not healing — simply there
+- 2D watercolor style — high contrast between dark room and lit window, soft star glow

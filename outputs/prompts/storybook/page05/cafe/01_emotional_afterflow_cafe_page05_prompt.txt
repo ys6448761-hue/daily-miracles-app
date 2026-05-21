@@ -1,0 +1,68 @@
+DreamTown yeosu_cafe Storybook Page05 illustration.
+Type: emotional_afterflow (감정 여운)
+
+Scene:
+A warm indoor cafe in Yeosu, late evening. The moment after — the intensity of what was felt has gently passed. The coffee has been sipped, the thoughts have come and gone. What remains is a quiet, low warmth. The cafe continues as it always does. Sowoni sits at the window table, posture settled and still.
+
+Must include:
+- indoor cafe table with cup (nearly empty or just set down)
+- large window facing night sea — city lights outside continuing
+- single star visible through the window glass, soft and steady
+- warm interior ambient light, present but not dominant
+- Sowoni seated at window table, back view, shoulders settled
+
+Style:
+- 2D watercolor illustration
+- soft grain texture
+- Ghibli-inspired Korean manhwa softness
+- muted warm tones — no bright saturated palette
+- quiet emotional atmosphere — not melancholy, not cheerful, just still
+
+Do NOT:
+- photorealistic or 3D render
+- healing warmth or cozy nostalgia aesthetic
+- inspirational atmosphere or travel brochure framing
+- star as dramatic focal point
+- Sowoni facing camera or facial expression visible
+- Sowoni standing — always seated at cafe
+- childlike body proportions
+- dramatic lighting or god-ray effects
+- multiple stars
+- text, captions, watermarks in image
+
+Color:
+interior: warm low amber, not dominant — like a lamp that has been on all evening
+window_view: deep blue night sea, city lights scattered and continuing
+star: soft warm white point, barely luminous, fades into the dark sky naturally
+
+Star:
+position: visible through the window in night sky, upper area of glass — NOT held by character
+count: exactly one
+brightness: soft and quiet — 90% presence, not calling attention
+glow: very faint watercolor halo, almost dissolved into the sky
+rule: star exists as continuation, not as symbol. It was there before and will be there after.
+
+Composition:
+Type note: emotional_afterflow — 감정이 흘러간 뒤, 조용히 남아 있는 상태
+Flow: Sowoni (seated, settled) → table surface with cup → window frame → night sea continuing → single star
+
+Character:
+Sowoni sits at a window table in the cafe. The day's emotional journey has passed. Her posture reflects that passage — not heavy, not resolved, simply quieter.
+Appearance: young adult Korean woman, shoulder-length dark hair, slim silhouette, back view
+Face: 85-90% hidden — back of head and shoulders only. No jawline, no eyes.
+Pose: shoulders relaxed and slightly settled, back upright but without tension. Hands resting on table or in lap. The posture of someone who has been here a while and is not rushing to leave.
+
+Camera:
+Type: MEDIUM
+Distance: medium — table, Sowoni, window all in frame
+Framing: Sowoni centered-left, window occupying right two-thirds of frame
+Angle: eye level from behind and slightly to the right
+Note: The window and what's outside it should be equally weighted with Sowoni's presence.
+
+DreamTown Page05 consistency requirements:
+- This is a storybook source image — preserve open space in upper area for text overlay
+- Sowoni's posture must convey settled quiet, not active emotion
+- The cup on the table is the room_lag anchor — it was already there, will remain
+- The outside world (city, sea, star) continues independently of Sowoni's state
+- No drama. No healing crescendo. Just the quiet of what has already passed.
+- 2D watercolor DreamTown style throughout — soft edges, no harsh lines
