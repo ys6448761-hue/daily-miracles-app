@@ -1,0 +1,35 @@
+DreamTown hotel thumbnail illustration.
+
+Scene:
+A quiet hotel room in Yeosu at night with a large window overlooking the city.
+
+Must include:
+large window, city night view, minimal interior lighting, bed or chair, curtain or soft shadow
+
+Style:
+2D illustration, watercolor texture, soft grain, Ghibli-inspired, Korean emotional illustration
+
+Do NOT:
+photorealistic, 3D render, ultra detail, cinematic lens
+
+Color:
+Inside: dark / low light
+Outside: city lights (warm yellow)
+
+Star:
+above city skyline, outside window, brightness strongest element (150%)
+
+Composition:
+Sowoni → window → city → star
+
+Emotion:
+curiosity
+
+Character:
+Sowoni near window, emotional state: quiet, introspective.
+
+Text:
+"이해받고 싶었던"
+"순간"
+
+"저 별은 당신을 기억합니다"

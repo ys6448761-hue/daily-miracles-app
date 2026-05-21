@@ -1,0 +1,133 @@
+DreamTown yeosu_cablecar thumbnail illustration.
+
+Scene:
+Interior of a red cable car cabin at night, moving over the Yeosu sea. The scene is viewed from inside the cabin, looking through the large window toward the dark sea and night sky.
+
+Must include:
+- interior of cable car cabin (walls, ceiling, window frame visible)
+- large window with night sea and sky view
+- single star visible in the night sky through the window
+- city lights and bridge visible through window
+- Sowoni seated inside the cabin near the window
+
+Style:
+- 2D illustration
+- watercolor texture
+- soft grain
+- Ghibli-inspired
+- Korean webtoon feeling
+- gentle emotional lighting
+
+Do NOT:
+- photorealistic
+- 3D render
+- ultra detail
+- exterior-only cable car view without character inside
+- landscape or scenery image without Sowoni present
+- hand-held star or star in character's hands
+- star resting on palm or fingers
+- multiple stars or star field
+- galaxy or constellation background
+- standing pose for Sowoni
+- childlike or young body proportions
+- face visible from front or side
+- profile view — jawline or eye visible
+- facial expression readable
+- emotional overacting or exaggerated gesture
+- hair style or color change from shoulder-length dark hair
+- large or bright star dominating the frame
+- star larger than a small glowing point in the sky
+- animal character
+- bear-like character
+- mascot character
+
+Color:
+cablecar_interior: warm red with soft ambient light
+window_view: deep blue night sea
+city: warm yellow glow
+star: single colored point matching gem type, with soft halo
+
+Star:
+position: visible through the window in the night sky, exactly along Sowoni's line of sight — NOT held by character
+count: exactly one star only
+brightness: 100-110% — quiet and understated, not glowing intensely
+size: small point of light — like a distant star, NOT large or prominent
+glow: very soft watercolor halo, barely visible at edges, fades into night sky naturally
+rule: star floats in sky. Never in hands, never on a surface, never touching the character. Star color must exactly match the gem assigned to this image. Star is the end of the gaze, not the subject of the image.
+balance_rule: Star visual weight must be consistent across gem types. Yellow (citrine/topaz) stars must be slightly smaller or less intense to compensate for higher perceived brightness. Stars must guide the gaze, not dominate the frame.
+presence_rule: The star should feel distant and quiet. It is a guide, not a spotlight. Reduce star size and glow intensity by 15-20% compared to standard.
+Star color: emerald green (#2D8653). steady emerald green, soft inner light. Unhurried.
+No color mixing. No neon effects. No rainbow colors.
+
+Composition:
+Rule: character seated inside cabin — window frame — night sea — single star in sky
+Flow: Sowoni (seated inside cabin) → window frame → dark sea → single star in sky
+
+Character:
+Sowoni sits quietly inside the cable car cabin. Her gaze leads directly to the single star visible through the window. Silence and stillness are her emotional language.
+Appearance: human young adult female silhouette, around 22 years old feeling, shoulder-length dark hair, slim body. Camera must show predominantly back — show more back than side. Jawline must NOT be readable. Eyes must NOT be visible.
+Pose: always seated — never standing. Pose varies by emotion (see per-emotion pose below).
+Sowoni must be a human young adult female silhouette inside the cabin, always seated. No star in hands. No mascot character. No animal or bear-like character. No visible face or expression.
+
+Pose for this emotion (calm):
+Sowoni sits quietly at the window seat, hands resting gently in her lap, gazing out at the single star in calm stillness. Shoulders are relaxed and open. Back is straight but soft. The overall posture communicates settled peace.
+
+Camera composition for this emotion (calm):
+Type: WIDE
+Distance: wide shot — most of the cabin interior visible: seats, ceiling, walls, floor
+Framing: centered — Sowoni in lower-center, large window behind her fills upper two-thirds of frame
+Angle: straight-on — level with seated Sowoni, zero tilt
+Interior framing: ceiling clearly visible at top. Both sides of cabin wall visible. Floor or seat edge at bottom. Window occupies full upper half. Interior emphasizes space and emptiness around her.
+Composition note: Emphasize the emptiness of the cabin space around her. Spaciousness is the mood.
+
+Emotion: calm
+
+CRITICAL CONSISTENCY REQUIREMENTS:
+
+The following MUST be IDENTICAL across all 5 emotion variants:
+- Sowoni's body pose and orientation
+- Cable car cabin interior framing
+- Window position and size
+- City lights composition below
+- Sea horizon line
+- Camera angle and viewpoint
+- Lighting direction (warm interior, cool exterior)
+- Overall color palette except star
+
+ONLY these may subtly vary by emotion (calm):
+- Subtle facial expression mood (back view)
+- Slight body tension/relaxation
+- Star presence/absence (or position by emotion stage)
+
+NEVER (absolute prohibitions):
+- Number of stars (always exactly 1)
+- Star in hand (forbidden)
+- Character facing camera (always back view)
+- Cable car exterior view
+
+
+Consistency requirements (must follow strictly):
+Sowoni must be exactly the same person across all images.
+Same young adult Korean woman, same shoulder-length dark hair, same slim silhouette.
+Sowoni is ALWAYS seated. Never standing.
+Show only back view or very slight 3/4 back. Face must be 85-90% hidden. Jawline and eyes must NOT be readable.
+Emotion comes from posture and body language only — never from facial expression.
+There must be exactly one star.
+The star must NOT be in Sowoni's hand.
+The star must be placed exactly along Sowoni's line of sight through the window.
+The star is SMALL and DISTANT — a quiet point of light in the night sky, not a spotlight.
+Star size: reduce by 15-20% from default. Glow: very soft watercolor halo only.
+The star color must strictly match the gem type assigned to this image:
+- Ruby: red glowing star
+- Sapphire: blue glowing star
+- Emerald: green glowing star
+- Diamond: bright white or golden star
+- Citrine: warm yellow star
+No default white star allowed (except diamond).
+Yellow (citrine/topaz) stars must be slightly smaller or less intense to compensate for higher perceived brightness.
+Stars must guide the gaze, not dominate the frame. The star is the end of the gaze, not the subject.
+Cable car interior perspective only.
+Each image must show a different cabin interior framing (ceiling/floor/window ratio must vary).
+No animals, no mascot, no turtle.
+Keep open space near upper window area for text overlay.
+DreamTown mood: quiet, watercolor, Ghibli-inspired. No drama, no exaggeration, no bright effects.

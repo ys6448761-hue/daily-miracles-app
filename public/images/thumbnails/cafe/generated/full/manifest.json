@@ -1,0 +1,243 @@
+{
+  "location": "yeosu_cafe",
+  "stage": 2,
+  "route": "pause_route",
+  "generated": "2026-05-11T00:00:00.000Z",
+  "count": 25,
+  "masterCount": 5,
+  "reviewCount": 2,
+  "sourceDir": "public/images/thumbnails/cafe/generated/full",
+  "note": "star-cache/yeosu_cafe 원본 보존. thumbnails/cafe/generated/full 기준 관리.",
+  "routeEmotions": {
+    "머무름": "pause",
+    "쉼": "calm",
+    "혼자 있는 시간": "confusion",
+    "조용한 용기": "fragile_hope",
+    "밤의 정리": "curiosity"
+  },
+  "emotions": ["confusion", "pause", "calm", "curiosity", "fragile_hope"],
+  "gemstones": ["citrine", "sapphire", "emerald", "ruby", "diamond"],
+  "gemBase": {
+    "citrine": 1,
+    "sapphire": 6,
+    "emerald": 11,
+    "ruby": 16,
+    "diamond": 21
+  },
+  "emotionOffset": {
+    "confusion": 0,
+    "pause": 1,
+    "calm": 2,
+    "curiosity": 3,
+    "fragile_hope": 4
+  },
+  "items": [
+    {
+      "index": "01",
+      "emotion": "confusion",
+      "gemstone": "citrine",
+      "status": "master",
+      "masterReason": "대표 구도. 창틀+해변 전체뷰. 따뜻한 조명. 진입/히어로 최적.",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/01_confusion_citrine_yeosu_cafe_stage2.png",
+      "sourceFile": "01_confusion_citrine_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "02",
+      "emotion": "pause",
+      "gemstone": "citrine",
+      "status": "candidate",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/02_pause_citrine_yeosu_cafe_stage2.png",
+      "sourceFile": "02_pause_citrine_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "03",
+      "emotion": "calm",
+      "gemstone": "citrine",
+      "status": "candidate",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/03_calm_citrine_yeosu_cafe_stage2.png",
+      "sourceFile": "03_calm_citrine_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "04",
+      "emotion": "curiosity",
+      "gemstone": "citrine",
+      "status": "candidate",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/04_curiosity_citrine_yeosu_cafe_stage2.png",
+      "sourceFile": "04_curiosity_citrine_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "05",
+      "emotion": "fragile_hope",
+      "gemstone": "citrine",
+      "status": "candidate",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/05_fragile_hope_citrine_yeosu_cafe_stage2.png",
+      "sourceFile": "05_fragile_hope_citrine_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "06",
+      "emotion": "confusion",
+      "gemstone": "sapphire",
+      "status": "candidate",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/06_confusion_sapphire_yeosu_cafe_stage2.png",
+      "sourceFile": "06_confusion_sapphire_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "07",
+      "emotion": "pause",
+      "gemstone": "sapphire",
+      "status": "master",
+      "masterReason": "포니테일, 손 모음. pause/쉼 감정 가장 정확. 정적 몰입 세계관 일치.",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/07_pause_sapphire_yeosu_cafe_stage2.png",
+      "sourceFile": "07_pause_sapphire_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "08",
+      "emotion": "calm",
+      "gemstone": "sapphire",
+      "status": "candidate",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/08_calm_sapphire_yeosu_cafe_stage2.png",
+      "sourceFile": "08_calm_sapphire_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "09",
+      "emotion": "curiosity",
+      "gemstone": "sapphire",
+      "status": "candidate",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/09_curiosity_sapphire_yeosu_cafe_stage2.png",
+      "sourceFile": "09_curiosity_sapphire_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "10",
+      "emotion": "fragile_hope",
+      "gemstone": "sapphire",
+      "status": "candidate",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/10_fragile_hope_sapphire_yeosu_cafe_stage2.png",
+      "sourceFile": "10_fragile_hope_sapphire_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "11",
+      "emotion": "confusion",
+      "gemstone": "emerald",
+      "status": "candidate",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/11_confusion_emerald_yeosu_cafe_stage2.png",
+      "sourceFile": "11_confusion_emerald_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "12",
+      "emotion": "pause",
+      "gemstone": "emerald",
+      "status": "candidate",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/12_pause_emerald_yeosu_cafe_stage2.png",
+      "sourceFile": "12_pause_emerald_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "13",
+      "emotion": "calm",
+      "gemstone": "emerald",
+      "status": "candidate",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/13_calm_emerald_yeosu_cafe_stage2.png",
+      "sourceFile": "13_calm_emerald_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "14",
+      "emotion": "curiosity",
+      "gemstone": "emerald",
+      "status": "candidate",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/14_curiosity_emerald_yeosu_cafe_stage2.png",
+      "sourceFile": "14_curiosity_emerald_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "15",
+      "emotion": "fragile_hope",
+      "gemstone": "emerald",
+      "status": "candidate",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/15_fragile_hope_emerald_yeosu_cafe_stage2.png",
+      "sourceFile": "15_fragile_hope_emerald_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "16",
+      "emotion": "confusion",
+      "gemstone": "ruby",
+      "status": "review",
+      "reviewReason": "손가락으로 별을 가리키는 제스처. 25장 중 유일한 지시 행동. 정적 몰입 세계관 이질감. 대표컷 부적합.",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/16_confusion_ruby_yeosu_cafe_stage2.png",
+      "sourceFile": "16_confusion_ruby_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "17",
+      "emotion": "pause",
+      "gemstone": "ruby",
+      "status": "master",
+      "masterReason": "커피컵 + 창에 손. 카페 공간감 가장 강함. 해변 산책로 전체 뷰.",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/17_pause_ruby_yeosu_cafe_stage2.png",
+      "sourceFile": "17_pause_ruby_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "18",
+      "emotion": "calm",
+      "gemstone": "ruby",
+      "status": "candidate",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/18_calm_ruby_yeosu_cafe_stage2.png",
+      "sourceFile": "18_calm_ruby_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "19",
+      "emotion": "curiosity",
+      "gemstone": "ruby",
+      "status": "review",
+      "reviewReason": "창틀에 팔 뻗음. 구도 불균형. 타 컷 대비 자연스러움 낮음.",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/19_curiosity_ruby_yeosu_cafe_stage2.png",
+      "sourceFile": "19_curiosity_ruby_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "20",
+      "emotion": "fragile_hope",
+      "gemstone": "ruby",
+      "status": "master",
+      "masterReason": "원형 테이블 + 커피컵. 카페 인테리어 디테일 최고. fragile_hope 감정 따뜻한 연출.",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/20_fragile_hope_ruby_yeosu_cafe_stage2.png",
+      "sourceFile": "20_fragile_hope_ruby_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "21",
+      "emotion": "confusion",
+      "gemstone": "diamond",
+      "status": "master",
+      "masterReason": "인물 클로즈업, 손 모음. 감정 밀도 최고. 다이아몬드 별빛 선명. 감정 여운 강함.",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/21_confusion_diamond_yeosu_cafe_stage2.png",
+      "sourceFile": "21_confusion_diamond_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "22",
+      "emotion": "pause",
+      "gemstone": "diamond",
+      "status": "candidate",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/22_pause_diamond_yeosu_cafe_stage2.png",
+      "sourceFile": "22_pause_diamond_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "23",
+      "emotion": "calm",
+      "gemstone": "diamond",
+      "status": "candidate",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/23_calm_diamond_yeosu_cafe_stage2.png",
+      "sourceFile": "23_calm_diamond_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "24",
+      "emotion": "curiosity",
+      "gemstone": "diamond",
+      "status": "candidate",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/24_curiosity_diamond_yeosu_cafe_stage2.png",
+      "sourceFile": "24_curiosity_diamond_yeosu_cafe_stage2.png"
+    },
+    {
+      "index": "25",
+      "emotion": "fragile_hope",
+      "gemstone": "diamond",
+      "status": "candidate",
+      "imageUrl": "/images/thumbnails/cafe/generated/full/25_fragile_hope_diamond_yeosu_cafe_stage2.png",
+      "sourceFile": "25_fragile_hope_diamond_yeosu_cafe_stage2.png"
+    }
+  ]
+}

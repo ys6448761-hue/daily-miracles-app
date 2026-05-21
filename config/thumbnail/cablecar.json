@@ -8,7 +8,7 @@
       "large window with night sea and sky view",
       "single star visible in the night sky through the window",
       "city lights and bridge visible through window",
-      "Sowoni standing inside the cabin facing the window"
+      "Sowoni seated inside the cabin near the window"
     ]
   },
   "style": {
@@ -16,7 +16,9 @@
       "2D illustration",
       "watercolor texture",
       "soft grain",
-      "Ghibli-inspired"
+      "Ghibli-inspired",
+      "Korean webtoon feeling",
+      "gentle emotional lighting"
     ],
     "forbidden": [
       "photorealistic",
@@ -28,39 +30,149 @@
       "star resting on palm or fingers",
       "multiple stars or star field",
       "galaxy or constellation background",
-      "seated or sitting pose for Sowoni",
+      "standing pose for Sowoni",
       "childlike or young body proportions",
       "face visible from front or side",
-      "facial detail or expression visible",
-      "hair style or color change from shoulder-length dark hair"
+      "profile view — jawline or eye visible",
+      "facial expression readable",
+      "emotional overacting or exaggerated gesture",
+      "hair style or color change from shoulder-length dark hair",
+      "large or bright star dominating the frame",
+      "star larger than a small glowing point in the sky",
+      "animal character",
+      "bear-like character",
+      "mascot character"
     ]
   },
   "color": {
     "cablecar_interior": "warm red with soft ambient light",
     "window_view": "deep blue night sea",
     "city": "warm yellow glow",
-    "star": "single white/gold point with soft halo"
+    "star": "single colored point matching gem type, with soft halo"
   },
   "star": {
-    "position": "visible through the window, in the night sky — NOT held by character",
+    "position": "visible through the window in the night sky, exactly along Sowoni's line of sight — NOT held by character",
     "count": "exactly one star only",
-    "brightness": "130-150%",
-    "glow": "soft halo",
-    "rule": "star floats in sky. Never in hands, never on a surface, never touching the character."
+    "brightness": "100-110% — quiet and understated, not glowing intensely",
+    "size": "small point of light — like a distant star, NOT large or prominent",
+    "glow": "very soft watercolor halo, barely visible at edges, fades into night sky naturally",
+    "rule": "star floats in sky. Never in hands, never on a surface, never touching the character. Star color must exactly match the gem assigned to this image. Star is the end of the gaze, not the subject of the image.",
+    "balance_rule": "Star visual weight must be consistent across gem types. Yellow (citrine/topaz) stars must be slightly smaller or less intense to compensate for higher perceived brightness. Stars must guide the gaze, not dominate the frame.",
+    "presence_rule": "The star should feel distant and quiet. It is a guide, not a spotlight. Reduce star size and glow intensity by 15-20% compared to standard."
   },
   "character": {
     "name": "Sowoni",
-    "appearance": "shoulder-length dark hair, slim body, back view or slight 3/4 back only, no facial detail",
-    "pose": "standing only — never sitting, never crouching",
-    "description": "Sowoni stands quietly inside the cable car cabin, facing the window and looking toward the single star in the sky.",
-    "rule": "Sowoni must be present inside the cabin. No star in hands. No mascot character."
+    "appearance": "human young adult female silhouette, around 22 years old feeling, shoulder-length dark hair, slim body. Camera must show predominantly back — show more back than side. Jawline must NOT be readable. Eyes must NOT be visible.",
+    "face_rule": "Back view or very slight 3/4 back only. Face should be 85-90% hidden. Emotion is communicated through posture and body language, never through facial expression.",
+    "pose": "always seated — never standing. Pose varies by emotion (see per-emotion pose below).",
+    "description": "Sowoni sits quietly inside the cable car cabin. Her gaze leads directly to the single star visible through the window. Silence and stillness are her emotional language.",
+    "rule": "Sowoni must be a human young adult female silhouette inside the cabin, always seated. No star in hands. No mascot character. No animal or bear-like character. No visible face or expression."
+  },
+  "poses": {
+    "calm": "Sowoni sits quietly at the window seat, hands resting gently in her lap, gazing out at the single star in calm stillness. Shoulders are relaxed and open. Back is straight but soft. The overall posture communicates settled peace.",
+    "pause": "Sowoni leans her shoulder lightly against the window frame, head tilted slightly to one side. One hand rests near her face or collar — a quiet thinking gesture. Weight rests on the frame. The body is completely still.",
+    "confusion": "Sowoni sits with both hands on her knees, body slightly hunched inward, head lowered toward the floor. Shoulders curve inward. The posture closes in on itself. No dramatic movement — just quiet contraction.",
+    "curiosity": "Sowoni leans her upper body slightly forward toward the window glass, attention directed toward the star outside. Posture is attentive and alert, not tense. The lean is gentle — a leaning-in without urgency.",
+    "fragile_hope": "Sowoni has turned her body slightly away from the window, paused, and now gently begins to turn back. Mid-turn. Gaze moves upward toward the star with subtle openness. The posture is cautious but not closed."
+  },
+  "camera": {
+    "rule": "Each of the 5 images MUST use a completely different camera type. Do not repeat distance, framing, or angle across any two images.",
+    "calm": {
+      "type": "WIDE",
+      "distance": "wide shot — most of the cabin interior visible: seats, ceiling, walls, floor",
+      "framing": "centered — Sowoni in lower-center, large window behind her fills upper two-thirds of frame",
+      "angle": "straight-on — level with seated Sowoni, zero tilt",
+      "interior": "ceiling clearly visible at top. Both sides of cabin wall visible. Floor or seat edge at bottom. Window occupies full upper half. Interior emphasizes space and emptiness around her.",
+      "note": "Emphasize the emptiness of the cabin space around her. Spaciousness is the mood."
+    },
+    "pause": {
+      "type": "MEDIUM",
+      "distance": "medium shot — mid-thigh upward, stable body framing",
+      "framing": "slightly left-biased — window frame on left third, Sowoni slightly right of center",
+      "angle": "slight side angle — camera positioned 15-20 degrees to Sowoni's right side. Camera height slightly below ceiling, showing window frame edge clearly.",
+      "interior": "Window frame on left side visible at close range. Cabin wall texture on right. No ceiling visible. The window frame itself acts as a structural element of the composition.",
+      "note": "Not perfectly centered. The lean into the window frame is the focal gesture."
+    },
+    "confusion": {
+      "type": "CLOSE-UP",
+      "distance": "close shot — upper body only, lower body not visible",
+      "framing": "centered — tight on Sowoni's back and hunched shoulders, window edge just barely visible at top corners",
+      "angle": "slightly above eye level — 10-15 degree downward tilt, slight diagonal. Camera is higher than usual, looking slightly down.",
+      "interior": "Only the top edge of the window is visible. Cabin interior fills the bottom and sides. No floor visible. The compressed framing creates a sense of enclosure.",
+      "note": "Window is cut off at frame edges. Weight is on the character's posture, not the outside view."
+    },
+    "curiosity": {
+      "type": "ASYMMETRIC",
+      "distance": "medium shot — full seated silhouette visible but off-balance",
+      "framing": "extreme right-biased — Sowoni in far-left 25% of frame, window and star dominate right 75%. Center line deliberately broken.",
+      "angle": "slight diagonal — camera slightly to Sowoni's left, dynamic tension toward the window. Camera height at seated eye level.",
+      "interior": "Full window visible on right side, with night sea and star. Sowoni is squeezed to left edge. The asymmetry makes the composition feel alive and directional. Cabin wall barely visible behind Sowoni on far left.",
+      "note": "Nothing is centered or balanced. The composition pulls toward the star. Deliberately unbalanced."
+    },
+    "fragile_hope": {
+      "type": "OFF-CENTER",
+      "distance": "medium-close — upper body to hip, Sowoni pushed to right edge of frame",
+      "framing": "strongly left-biased — left half is open cabin and window space, Sowoni occupies only right 30% of frame",
+      "angle": "straight-on — no rotation, but extreme off-center placement creates emotional tension. Camera slightly lower than eye level, looking slightly upward.",
+      "interior": "Left half of frame is open: shows window, a glimpse of night sky, star. Right 30% shows Sowoni's back at the edge. Large negative space on left creates weight of absence and longing.",
+      "note": "Sowoni is at the very edge of frame. The open left space creates longing and distance."
+    }
   },
   "composition": {
     "core": "interior stillness with distant longing",
-    "rule": "character inside cabin — window frame — night sea — single star in sky",
-    "flow": "Sowoni (inside cabin) → window frame → dark sea → single star in sky"
+    "rule": "character seated inside cabin — window frame — night sea — single star in sky",
+    "flow": "Sowoni (seated inside cabin) → window frame → dark sea → single star in sky"
   },
   "text": {
     "bottom": "저 별은 당신을 기억합니다"
+  },
+  "consistency_block": [
+    "Sowoni must be exactly the same person across all images.",
+    "Same young adult Korean woman, same shoulder-length dark hair, same slim silhouette.",
+    "Sowoni is ALWAYS seated. Never standing.",
+    "Show only back view or very slight 3/4 back. Face must be 85-90% hidden. Jawline and eyes must NOT be readable.",
+    "Emotion comes from posture and body language only — never from facial expression.",
+    "There must be exactly one star.",
+    "The star must NOT be in Sowoni's hand.",
+    "The star must be placed exactly along Sowoni's line of sight through the window.",
+    "The star is SMALL and DISTANT — a quiet point of light in the night sky, not a spotlight.",
+    "Star size: reduce by 15-20% from default. Glow: very soft watercolor halo only.",
+    "The star color must strictly match the gem type assigned to this image:",
+    "- Ruby: red glowing star",
+    "- Sapphire: blue glowing star",
+    "- Emerald: green glowing star",
+    "- Diamond: bright white or golden star",
+    "- Citrine: warm yellow star",
+    "No default white star allowed (except diamond).",
+    "Yellow (citrine/topaz) stars must be slightly smaller or less intense to compensate for higher perceived brightness.",
+    "Stars must guide the gaze, not dominate the frame. The star is the end of the gaze, not the subject.",
+    "Cable car interior perspective only.",
+    "Each image must show a different cabin interior framing (ceiling/floor/window ratio must vary).",
+    "No animals, no mascot, no turtle.",
+    "Keep open space near upper window area for text overlay.",
+    "DreamTown mood: quiet, watercolor, Ghibli-inspired. No drama, no exaggeration, no bright effects."
+  ],
+  "consistency_anchor": {
+    "MUST_BE_IDENTICAL_ACROSS_ALL_5_EMOTIONS": [
+      "Sowoni's body pose and orientation",
+      "Cable car cabin interior framing",
+      "Window position and size",
+      "City lights composition below",
+      "Sea horizon line",
+      "Camera angle and viewpoint",
+      "Lighting direction (warm interior, cool exterior)",
+      "Overall color palette except star"
+    ],
+    "ONLY_THESE_MAY_VARY_BY_EMOTION": [
+      "Subtle facial expression mood (back view)",
+      "Slight body tension/relaxation",
+      "Star presence/absence (or position by emotion stage)"
+    ],
+    "NEVER_CHANGE": [
+      "Number of stars (always exactly 1)",
+      "Star in hand (forbidden)",
+      "Character facing camera (always back view)",
+      "Cable car exterior view"
+    ]
   }
 }

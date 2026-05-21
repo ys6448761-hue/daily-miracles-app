@@ -1,0 +1,32 @@
+DreamTown cafe thumbnail illustration.
+
+Scene:
+A warm indoor cafe in Yeosu at night, with a large window facing the sea.
+
+Must include:
+indoor table and chair, large window, night ocean view, city lights, warm indoor lighting
+
+Style:
+2D illustration, watercolor texture, soft grain, Ghibli-inspired
+
+Do NOT:
+photorealistic, 3D render, ultra detail
+
+Color:
+Inside: warm yellow/orange
+Outside: deep blue
+
+Star:
+outside the window sky, brightness 130%
+
+Emotion:
+curiosity
+
+Character:
+Sowoni sitting at table looking outside.
+
+Text:
+"괜찮아지고 싶었던"
+"순간"
+
+"저 별은 당신을 기억합니다"

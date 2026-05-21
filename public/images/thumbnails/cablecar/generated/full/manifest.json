@@ -1,0 +1,221 @@
+{
+  "location": "cablecar",
+  "generated": "2026-05-05T08:53:55.227Z",
+  "count": 25,
+  "emotions": [
+    "confusion",
+    "pause",
+    "calm",
+    "curiosity",
+    "fragile_hope"
+  ],
+  "bases": [
+    "cablecar_calm_emerald_03.png",
+    "cablecar_confusion_moonstone_01.png",
+    "cablecar_curiosity_topaz_04.png",
+    "cablecar_fragile_hope_diamond_05.png",
+    "cablecar_pause_sapphire_02.png"
+  ],
+  "items": [
+    {
+      "emotion": "confusion",
+      "gemstone": "moonstone",
+      "base": "base01",
+      "sourceFile": "cablecar_calm_emerald_03.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_confusion_moonstone_base01.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_confusion_moonstone_base01_text.png"
+    },
+    {
+      "emotion": "pause",
+      "gemstone": "sapphire",
+      "base": "base01",
+      "sourceFile": "cablecar_calm_emerald_03.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_pause_sapphire_base01.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_pause_sapphire_base01_text.png"
+    },
+    {
+      "emotion": "calm",
+      "gemstone": "emerald",
+      "base": "base01",
+      "sourceFile": "cablecar_calm_emerald_03.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_calm_emerald_base01.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_calm_emerald_base01_text.png"
+    },
+    {
+      "emotion": "curiosity",
+      "gemstone": "topaz",
+      "base": "base01",
+      "sourceFile": "cablecar_calm_emerald_03.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_curiosity_topaz_base01.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_curiosity_topaz_base01_text.png"
+    },
+    {
+      "emotion": "fragile_hope",
+      "gemstone": "diamond",
+      "base": "base01",
+      "sourceFile": "cablecar_calm_emerald_03.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_fragile_hope_diamond_base01.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_fragile_hope_diamond_base01_text.png"
+    },
+    {
+      "emotion": "confusion",
+      "gemstone": "moonstone",
+      "base": "base02",
+      "sourceFile": "cablecar_confusion_moonstone_01.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_confusion_moonstone_base02.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_confusion_moonstone_base02_text.png"
+    },
+    {
+      "emotion": "pause",
+      "gemstone": "sapphire",
+      "base": "base02",
+      "sourceFile": "cablecar_confusion_moonstone_01.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_pause_sapphire_base02.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_pause_sapphire_base02_text.png"
+    },
+    {
+      "emotion": "calm",
+      "gemstone": "emerald",
+      "base": "base02",
+      "sourceFile": "cablecar_confusion_moonstone_01.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_calm_emerald_base02.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_calm_emerald_base02_text.png"
+    },
+    {
+      "emotion": "curiosity",
+      "gemstone": "topaz",
+      "base": "base02",
+      "sourceFile": "cablecar_confusion_moonstone_01.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_curiosity_topaz_base02.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_curiosity_topaz_base02_text.png"
+    },
+    {
+      "emotion": "fragile_hope",
+      "gemstone": "diamond",
+      "base": "base02",
+      "sourceFile": "cablecar_confusion_moonstone_01.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_fragile_hope_diamond_base02.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_fragile_hope_diamond_base02_text.png"
+    },
+    {
+      "emotion": "confusion",
+      "gemstone": "moonstone",
+      "base": "base03",
+      "sourceFile": "cablecar_curiosity_topaz_04.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_confusion_moonstone_base03.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_confusion_moonstone_base03_text.png"
+    },
+    {
+      "emotion": "pause",
+      "gemstone": "sapphire",
+      "base": "base03",
+      "sourceFile": "cablecar_curiosity_topaz_04.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_pause_sapphire_base03.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_pause_sapphire_base03_text.png"
+    },
+    {
+      "emotion": "calm",
+      "gemstone": "emerald",
+      "base": "base03",
+      "sourceFile": "cablecar_curiosity_topaz_04.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_calm_emerald_base03.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_calm_emerald_base03_text.png"
+    },
+    {
+      "emotion": "curiosity",
+      "gemstone": "topaz",
+      "base": "base03",
+      "sourceFile": "cablecar_curiosity_topaz_04.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_curiosity_topaz_base03.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_curiosity_topaz_base03_text.png"
+    },
+    {
+      "emotion": "fragile_hope",
+      "gemstone": "diamond",
+      "base": "base03",
+      "sourceFile": "cablecar_curiosity_topaz_04.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_fragile_hope_diamond_base03.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_fragile_hope_diamond_base03_text.png"
+    },
+    {
+      "emotion": "confusion",
+      "gemstone": "moonstone",
+      "base": "base04",
+      "sourceFile": "cablecar_fragile_hope_diamond_05.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_confusion_moonstone_base04.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_confusion_moonstone_base04_text.png"
+    },
+    {
+      "emotion": "pause",
+      "gemstone": "sapphire",
+      "base": "base04",
+      "sourceFile": "cablecar_fragile_hope_diamond_05.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_pause_sapphire_base04.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_pause_sapphire_base04_text.png"
+    },
+    {
+      "emotion": "calm",
+      "gemstone": "emerald",
+      "base": "base04",
+      "sourceFile": "cablecar_fragile_hope_diamond_05.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_calm_emerald_base04.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_calm_emerald_base04_text.png"
+    },
+    {
+      "emotion": "curiosity",
+      "gemstone": "topaz",
+      "base": "base04",
+      "sourceFile": "cablecar_fragile_hope_diamond_05.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_curiosity_topaz_base04.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_curiosity_topaz_base04_text.png"
+    },
+    {
+      "emotion": "fragile_hope",
+      "gemstone": "diamond",
+      "base": "base04",
+      "sourceFile": "cablecar_fragile_hope_diamond_05.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_fragile_hope_diamond_base04.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_fragile_hope_diamond_base04_text.png"
+    },
+    {
+      "emotion": "confusion",
+      "gemstone": "moonstone",
+      "base": "base05",
+      "sourceFile": "cablecar_pause_sapphire_02.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_confusion_moonstone_base05.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_confusion_moonstone_base05_text.png"
+    },
+    {
+      "emotion": "pause",
+      "gemstone": "sapphire",
+      "base": "base05",
+      "sourceFile": "cablecar_pause_sapphire_02.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_pause_sapphire_base05.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_pause_sapphire_base05_text.png"
+    },
+    {
+      "emotion": "calm",
+      "gemstone": "emerald",
+      "base": "base05",
+      "sourceFile": "cablecar_pause_sapphire_02.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_calm_emerald_base05.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_calm_emerald_base05_text.png"
+    },
+    {
+      "emotion": "curiosity",
+      "gemstone": "topaz",
+      "base": "base05",
+      "sourceFile": "cablecar_pause_sapphire_02.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_curiosity_topaz_base05.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_curiosity_topaz_base05_text.png"
+    },
+    {
+      "emotion": "fragile_hope",
+      "gemstone": "diamond",
+      "base": "base05",
+      "sourceFile": "cablecar_pause_sapphire_02.png",
+      "cleanImageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_fragile_hope_diamond_base05.png",
+      "imageUrl": "/images/thumbnails/cablecar/generated/full/cablecar_fragile_hope_diamond_base05_text.png"
+    }
+  ]
+}

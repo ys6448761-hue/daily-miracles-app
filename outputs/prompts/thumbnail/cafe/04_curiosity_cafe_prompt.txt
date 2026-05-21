@@ -1,0 +1,60 @@
+DreamTown yeosu_cafe thumbnail illustration.
+
+Scene:
+A warm indoor cafe in Yeosu at night, with a large window facing the sea. Sowoni is seated at a window table, slightly leaning, in quiet inward thought.
+
+Must include:
+- indoor table and chair
+- large window with night sea and sky view
+- single star visible through the window
+- city lights and warm indoor ambient light
+- Sowoni seated at the table, facing the window
+
+Style:
+- 2D illustration
+- watercolor texture
+- soft grain
+- Ghibli-inspired
+
+Do NOT:
+- photorealistic
+- 3D render
+- ultra detail
+- hand-held star or star in character's hands
+- multiple stars or star field
+- standing pose for Sowoni
+- childlike or young body proportions
+- face visible from front or side
+- facial detail or expression visible
+- hair style or color change from shoulder-length dark hair
+
+Color:
+cafe_interior: warm yellow/orange ambient light
+window_view: deep blue night sea
+star: warm white with soft halo
+
+Star:
+position: visible through the window, in the night sky — NOT held by character
+count: exactly one star only
+brightness: 130%
+glow: soft halo
+rule: star floats in sky outside the window. Never in hands, never on table surface.
+Star color: topaz gold (#E6B85C). warm topaz gold, gentle forward warmth. Not glaring.
+No color mixing. No neon effects. No rainbow colors.
+
+Composition:
+Sowoni (seated) → table surface → window frame → dark sea → single star in sky
+
+Character:
+Sowoni sits quietly at a window table, slightly leaning forward, looking toward the single star visible through the glass.
+Appearance: shoulder-length dark hair, slim body, back view or slight 3/4 back only, no facial detail
+Pose: seated at window table — slightly leaning or resting posture, inward thinking. Never standing.
+Sowoni must be present, seated. No star in hands. No mascot character.
+
+Emotion: curiosity
+
+Copy (to be overlaid — do NOT render in image):
+"괜찮아지고 싶었던"
+"순간"
+
+Bottom (to be overlaid — do NOT render in image): "저 별은 당신을 기억합니다"

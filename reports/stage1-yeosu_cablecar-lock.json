@@ -1,0 +1,140 @@
+{
+  "stage": 1,
+  "location": "yeosu_cablecar",
+  "locked_at": "2026-04-30T04:06:54.477Z",
+  "code_status": "complete",
+  "validate_status": "blocked_429_billing",
+  "images": {
+    "anxiety_ruby_yeosu_cablecar.png": {
+      "emotion": "anxiety",
+      "gem": "ruby",
+      "status": "missing"
+    },
+    "anxiety_sapphire_yeosu_cablecar.png": {
+      "emotion": "anxiety",
+      "gem": "sapphire",
+      "status": "missing"
+    },
+    "anxiety_emerald_yeosu_cablecar.png": {
+      "emotion": "anxiety",
+      "gem": "emerald",
+      "status": "baseline_present"
+    },
+    "anxiety_diamond_yeosu_cablecar.png": {
+      "emotion": "anxiety",
+      "gem": "diamond",
+      "status": "missing"
+    },
+    "anxiety_citrine_yeosu_cablecar.png": {
+      "emotion": "anxiety",
+      "gem": "citrine",
+      "status": "missing"
+    },
+    "calm_ruby_yeosu_cablecar.png": {
+      "emotion": "calm",
+      "gem": "ruby",
+      "status": "missing"
+    },
+    "calm_sapphire_yeosu_cablecar.png": {
+      "emotion": "calm",
+      "gem": "sapphire",
+      "status": "baseline_present"
+    },
+    "calm_emerald_yeosu_cablecar.png": {
+      "emotion": "calm",
+      "gem": "emerald",
+      "status": "missing"
+    },
+    "calm_diamond_yeosu_cablecar.png": {
+      "emotion": "calm",
+      "gem": "diamond",
+      "status": "missing"
+    },
+    "calm_citrine_yeosu_cablecar.png": {
+      "emotion": "calm",
+      "gem": "citrine",
+      "status": "missing"
+    },
+    "comfort_ruby_yeosu_cablecar.png": {
+      "emotion": "comfort",
+      "gem": "ruby",
+      "status": "missing"
+    },
+    "comfort_sapphire_yeosu_cablecar.png": {
+      "emotion": "comfort",
+      "gem": "sapphire",
+      "status": "missing"
+    },
+    "comfort_emerald_yeosu_cablecar.png": {
+      "emotion": "comfort",
+      "gem": "emerald",
+      "status": "missing"
+    },
+    "comfort_diamond_yeosu_cablecar.png": {
+      "emotion": "comfort",
+      "gem": "diamond",
+      "status": "missing"
+    },
+    "comfort_citrine_yeosu_cablecar.png": {
+      "emotion": "comfort",
+      "gem": "citrine",
+      "status": "baseline_present"
+    },
+    "hope_ruby_yeosu_cablecar.png": {
+      "emotion": "hope",
+      "gem": "ruby",
+      "status": "missing"
+    },
+    "hope_sapphire_yeosu_cablecar.png": {
+      "emotion": "hope",
+      "gem": "sapphire",
+      "status": "missing"
+    },
+    "hope_emerald_yeosu_cablecar.png": {
+      "emotion": "hope",
+      "gem": "emerald",
+      "status": "missing"
+    },
+    "hope_diamond_yeosu_cablecar.png": {
+      "emotion": "hope",
+      "gem": "diamond",
+      "status": "baseline_present"
+    },
+    "hope_citrine_yeosu_cablecar.png": {
+      "emotion": "hope",
+      "gem": "citrine",
+      "status": "missing"
+    },
+    "courage_ruby_yeosu_cablecar.png": {
+      "emotion": "courage",
+      "gem": "ruby",
+      "status": "baseline_missing"
+    },
+    "courage_sapphire_yeosu_cablecar.png": {
+      "emotion": "courage",
+      "gem": "sapphire",
+      "status": "missing"
+    },
+    "courage_emerald_yeosu_cablecar.png": {
+      "emotion": "courage",
+      "gem": "emerald",
+      "status": "missing"
+    },
+    "courage_diamond_yeosu_cablecar.png": {
+      "emotion": "courage",
+      "gem": "diamond",
+      "status": "missing"
+    },
+    "courage_citrine_yeosu_cablecar.png": {
+      "emotion": "courage",
+      "gem": "citrine",
+      "status": "missing"
+    }
+  },
+  "summary": {
+    "total": 25,
+    "present": 4,
+    "baseline": 5,
+    "missing": 21
+  }
+}
