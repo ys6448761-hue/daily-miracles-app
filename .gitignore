@@ -126,3 +126,22 @@ routes/maltbotRoutes.js
 public/maltbot.html
 database/migrate-007-maltbot.js
 database/migrations/007_maltbot_cases_table.sql
+
+# ── 사용자 업로드 (개인정보 — 절대 커밋 금지) ──────────────────────────
+uploads/
+
+# ── 대용량 자산 (git 비적합 — Group X) ─────────────────────────────────
+# 632MB zip — 생성 결과물 전체 묶음
+public/images/thumbnails/thumbnails.zip
+# 테스트 결과물
+public/images/thumbnails/_test/
+# star-cache: 대용량 캐시/백업 (309MB/79MB/77MB/227MB)
+public/images/star-cache/_backup/
+public/images/star-cache/sowonpicture.zip
+public/images/star-cache/yeosu_cafe/
+public/images/star-cache/yeosu_hotel/
+# canonical: generated/full 의 255MB 중복 사본
+public/images/canonical/
+
+# ── 폰트 바이너리 ───────────────────────────────────────────────────────
+public/fonts/
