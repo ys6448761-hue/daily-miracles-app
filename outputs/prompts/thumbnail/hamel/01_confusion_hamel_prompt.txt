@@ -1,0 +1,109 @@
+DreamTown yeosu_hamel thumbnail illustration.
+
+Scene:
+Ordinary harbor area near Hamel district in Yeosu. The harbor is already continuing normally — quietly, without attention, without anyone waiting. Cloudy or overcast, humid late afternoon or early evening. The world outside does not stop for anyone.
+
+Must include:
+- outdoor harbor setting with ordinary harbor residue
+- Sowoni seen from behind (standing, passive posture, not walking toward anything)
+- harbor surface reflections or wet pavement
+- distant ordinary harbor lights or boat outlines
+- overcast or cloudy sky — no dramatic clear night
+- open compositional space that feels unresolved, not scenic
+
+Style:
+- 2D watercolor Korean animation background
+- soft grain texture
+- overcast coastal humidity
+- asymmetrical natural brightness
+- passive non-cinematic framing
+- unresolved daily continuation atmosphere
+
+Do NOT:
+- photorealistic
+- 3D render
+- ultra detail
+- tourism poster or travel brochure aesthetic
+- inspirational harbor scene
+- cinematic fog or dramatic weather
+- healing warmth or nostalgic coziness
+- symbolic lighthouse at center of frame
+- fantasy light effects
+- seated pose for Sowoni (hamel = standing outdoor)
+- childlike or young body proportions
+- face visible from front or side
+- facial detail or expression readable
+- text, letters, numbers, captions, watermarks, logos
+
+Color:
+sky: overcast pale gray-blue or heavy cloud cover, no dramatic blue
+sea_harbor: muted reflective dark — not beautiful, just there
+harbor_lights: ordinary amber or utility white, scattered, not picturesque
+atmosphere: humid coastal gray-tone — continuity, not mood
+
+Star:
+policy: almost_unnoticed — star is a faint continuity trace, NOT a symbolic hope
+brightness: 60-70% — barely visible, peripheral presence preferred
+size: very small — one of many light sources, not the focal point
+position: upper peripheral — NOT centered, NOT directly above Sowoni's head
+glow: minimal — faint warm or cool point only, no wide halo
+rule: The star must NOT read as meaningful or symbolic. It exists as ordinary sky detail. Viewer may notice it only after extended looking. Never in hands, never a focal point.
+Star color: moonstone grey (#D6E4F0). soft pearl-grey shimmer, quietly uncertain. No glow trails.
+No color mixing. No neon effects. No rainbow colors.
+
+Composition:
+Rule: environment precedes character. The harbor is the subject. Sowoni is inside the harbor, not commanding it.
+Flow: harbor residue → ordinary continuation → Sowoni present inside it → continuity pressure
+
+Character:
+Sowoni stands at the harbor edge or nearby. She is not watching for something. The harbor simply continues around her. She is present but not the emotional center — the continuing world is.
+Appearance: shoulder-length dark hair, slim body, back view — back must be 85% visible, no facial detail
+Pose: standing passively — not walking toward anything, not gesturing, not reaching. Standing as if time has passed and she is simply still there.
+Sowoni must be human young adult female silhouette. Back view only. No star in hands. No mascot. No emotional overacting. Standing — hamel is outdoor, not seated.
+
+Pose for this emotion (confusion):
+Sowoni stands slightly turned, weight shifted — not sure which direction, not committed to any view. Arms at sides, head slightly lowered. The posture communicates uncertain presence, not dramatic confusion.
+
+Camera composition for this emotion (confusion):
+Type: MEDIUM-CLOSE
+Distance: medium close — upper body and environment visible but tightly framed
+Framing: slightly off-center — Sowoni not in perfect center, creating slight imbalance
+Angle: eye level, slight diagonal — unsettled framing without drama
+Composition note: Framing should feel like the viewer arrived mid-scene, not set up for it.
+
+Emotion: confusion
+
+CRITICAL CONSISTENCY REQUIREMENTS:
+
+The following MUST be IDENTICAL across all 5 emotion variants:
+- Harbor district setting — same location, same general hour
+- Sowoni's body type and hair — shoulder-length dark hair, slim back-view silhouette
+- Overcast or cloudy atmosphere — no clear night sky across variants
+- Ordinary harbor palette — muted, no dramatic color
+- Star as peripheral trace — not focal point in any variant
+- Lighthouse policy — suppressed in all variants equally
+
+ONLY these may subtly vary by emotion (confusion):
+- Sowoni's standing posture and body weight distribution
+- Camera distance and framing (see per-emotion camera)
+- Specific harbor detail visible (boats, equipment, surface)
+- Degree of openness in composition
+
+NEVER (absolute prohibitions):
+- Lighthouse as compositional center (always suppressed)
+- Star as symbolic focal point (always almost_unnoticed)
+- Text in image (always forbidden)
+- Sowoni facing camera (always back view)
+- Tourism or inspirational harbor reading (always forbidden)
+
+
+Consistency requirements (must follow strictly):
+Sowoni must be the same young adult Korean woman across all 5 emotion variants.
+Same shoulder-length dark hair. Same slim standing silhouette. Back view — 85%+ hidden.
+Sowoni is ALWAYS standing outdoors. Never seated. This is hamel — outdoor harbor.
+Back view only. Jawline and eyes must NOT be visible in any variant.
+The star is a continuity trace, NOT a meaningful focal point. It should be barely noticeable.
+The lighthouse is NOT a compositional element. It may exist only as background detail.
+NO text, captions, subtitles, or watermarks in any generated image.
+The harbor should feel like it was already there, will continue after, and does not care about Sowoni's presence.
+DreamTown feeling: ordinary watercolor continuation. No drama, no inspiration, no healing.

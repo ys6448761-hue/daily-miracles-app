@@ -1,0 +1,35 @@
+DreamTown yeosu_hamel thumbnail illustration.
+
+Scene:
+A quiet outdoor harbor in Yeosu at night, near Hamel Lighthouse and the Hamel Exhibition Hall, overlooking the open sea.
+
+Must include:
+Hamel Lighthouse silhouette, open sea horizon, harbor edge or low stone wall, night sky with stars, distant city lights reflected on water, open space above for thumbnail text
+
+Style:
+2D illustration, Korean webtoon feeling, watercolor texture, soft grain, Ghibli-inspired mood, gentle emotional lighting
+
+Do NOT:
+photorealistic, 3D render, ultra detail, tourism poster, realistic photography, busy composition
+
+Color:
+sky: deep navy blue
+sea: dark reflective blue
+city: warm amber glow on horizon
+Structural elements (lighthouse, walls, architecture): do NOT recolor
+
+Star:
+open sky above the sea, brightness 140%
+Star color: citrine golden (#E4B84A). warm citrine gold, slow upward radiance. Not bright.
+Single star only. No color mixing. No neon effects. No rainbow colors.
+
+Character:
+Sowoni: lower center or lower left, standing alone, facing the sea
+
+Emotion: growth
+
+Copy (to be overlaid — do NOT render in image):
+"멀리서 천천히"
+"자라던 소망"
+
+Bottom (to be overlaid — do NOT render in image): "저 별은 당신을 기억합니다"

@@ -1,63 +1,190 @@
 {
   "location": "yeosu_hamel",
-  "core_rule": "장소는 고정하고, 감정만 바꾼다.",
+  "core_rule": "장소는 고정하고, 감정만 바꾼다. 등대는 의미 장치가 아니다.",
+  "gate": "GATE 6 — Hamel Continuity Regeneration (2026-05-17)",
+
   "scene": {
-    "description": "A quiet outdoor harbor in Yeosu at night, near Hamel Lighthouse and the Hamel Exhibition Hall, overlooking the open sea.",
+    "description": "Ordinary harbor area near Hamel district in Yeosu. The harbor is already continuing normally — quietly, without attention, without anyone waiting. Cloudy or overcast, humid late afternoon or early evening. The world outside does not stop for anyone.",
     "must_include": [
-      "Hamel Lighthouse silhouette",
-      "open sea horizon",
-      "harbor edge or low stone wall",
-      "night sky with stars",
-      "distant city lights reflected on water",
-      "open space above for thumbnail text"
+      "outdoor harbor setting with ordinary harbor residue",
+      "Sowoni seen from behind (standing, passive posture, not walking toward anything)",
+      "harbor surface reflections or wet pavement",
+      "distant ordinary harbor lights or boat outlines",
+      "overcast or cloudy sky — no dramatic clear night",
+      "open compositional space that feels unresolved, not scenic"
+    ],
+    "must_NOT_include": [
+      "Hamel Lighthouse as compositional center or focal point",
+      "lighthouse silhouette as symbolic element",
+      "directional light beam or beacon suggesting meaning or direction",
+      "hopeful or cinematic harbor panorama",
+      "tourism or postcard framing",
+      "warm healing atmosphere",
+      "text overlay of any kind",
+      "star larger than a small continuity trace",
+      "star dominating the composition"
     ]
   },
+
   "style": {
     "required": [
-      "2D illustration",
-      "Korean webtoon feeling",
-      "watercolor texture",
-      "soft grain",
-      "Ghibli-inspired mood",
-      "gentle emotional lighting"
+      "2D watercolor Korean animation background",
+      "soft grain texture",
+      "overcast coastal humidity",
+      "asymmetrical natural brightness",
+      "passive non-cinematic framing",
+      "unresolved daily continuation atmosphere"
     ],
     "forbidden": [
       "photorealistic",
       "3D render",
       "ultra detail",
-      "tourism poster",
-      "realistic photography",
-      "busy composition",
-      "seated or sitting pose for Sowoni",
+      "tourism poster or travel brochure aesthetic",
+      "inspirational harbor scene",
+      "cinematic fog or dramatic weather",
+      "healing warmth or nostalgic coziness",
+      "symbolic lighthouse at center of frame",
+      "fantasy light effects",
+      "seated pose for Sowoni (hamel = standing outdoor)",
       "childlike or young body proportions",
       "face visible from front or side",
-      "facial detail or expression visible",
-      "hair style or color change from shoulder-length dark hair"
+      "facial detail or expression readable",
+      "text, letters, numbers, captions, watermarks, logos"
     ]
   },
+
   "color": {
-    "sky": "deep navy blue",
-    "sea": "dark reflective blue",
-    "city": "warm amber glow on horizon",
-    "star": "white / soft gold"
+    "sky": "overcast pale gray-blue or heavy cloud cover, no dramatic blue",
+    "sea_harbor": "muted reflective dark — not beautiful, just there",
+    "harbor_lights": "ordinary amber or utility white, scattered, not picturesque",
+    "atmosphere": "humid coastal gray-tone — continuity, not mood"
   },
+
   "star": {
-    "position": "open sky above the sea",
-    "brightness": "140%",
-    "glow": "soft wide halo over water"
+    "policy": "almost_unnoticed — star is a faint continuity trace, NOT a symbolic hope",
+    "brightness": "60-70% — barely visible, peripheral presence preferred",
+    "size": "very small — one of many light sources, not the focal point",
+    "position": "upper peripheral — NOT centered, NOT directly above Sowoni's head",
+    "glow": "minimal — faint warm or cool point only, no wide halo",
+    "rule": "The star must NOT read as meaningful or symbolic. It exists as ordinary sky detail. Viewer may notice it only after extended looking. Never in hands, never a focal point."
   },
+
   "character": {
     "name": "Sowoni",
-    "appearance": "shoulder-length dark hair, slim body, back view or slight 3/4 back only, no facial detail",
-    "pose": "standing only — never sitting, never crouching",
-    "description": "Sowoni stands quietly at the harbor edge, facing the open sea, looking toward the single star in the sky.",
-    "rule": "Sowoni is the emotional center. No mascot character. No star in hands."
+    "appearance": "shoulder-length dark hair, slim body, back view — back must be 85% visible, no facial detail",
+    "pose": "standing passively — not walking toward anything, not gesturing, not reaching. Standing as if time has passed and she is simply still there.",
+    "description": "Sowoni stands at the harbor edge or nearby. She is not watching for something. The harbor simply continues around her. She is present but not the emotional center — the continuing world is.",
+    "rule": "Sowoni must be human young adult female silhouette. Back view only. No star in hands. No mascot. No emotional overacting. Standing — hamel is outdoor, not seated."
   },
+
+  "poses": {
+    "confusion": "Sowoni stands slightly turned, weight shifted — not sure which direction, not committed to any view. Arms at sides, head slightly lowered. The posture communicates uncertain presence, not dramatic confusion.",
+    "pause": "Sowoni stands very still, facing the harbor. Arms loose at sides. Head at rest level. The body is simply stopped — no intention visible. A pause in the middle of nothing in particular.",
+    "calm": "Sowoni stands with slight distance from the harbor edge. Arms relaxed, posture settled but not dramatic. The stillness is ordinary — the harbor has always been there, she is simply in it.",
+    "curiosity": "Sowoni's head is turned slightly — 20-30 degrees from straight ahead, as if something ordinary caught her attention but not urgently. Posture remains relaxed. No leaning, no reaching.",
+    "fragile_hope": "Sowoni stands at a slight angle to the harbor. Weight shifted to one leg. Head at a neutral level — not uplifted, not downcast. The posture reads as pause mid-movement, not decision or direction."
+  },
+
+  "camera": {
+    "confusion": {
+      "type": "MEDIUM-CLOSE",
+      "distance": "medium close — upper body and environment visible but tightly framed",
+      "framing": "slightly off-center — Sowoni not in perfect center, creating slight imbalance",
+      "angle": "eye level, slight diagonal — unsettled framing without drama",
+      "exterior": "Harbor surface partially visible. Sky partially visible. No clear horizon line — composition feels cut off.",
+      "note": "Framing should feel like the viewer arrived mid-scene, not set up for it."
+    },
+    "pause": {
+      "type": "WIDE",
+      "distance": "wide — harbor environment dominates, Sowoni is smaller presence",
+      "framing": "centered but environment-weighted — harbor and sky take most of the frame",
+      "angle": "neutral eye level, completely still",
+      "exterior": "Harbor surface, distant boat silhouettes, sky all visible. Sowoni occupies lower 25% of frame.",
+      "note": "Emphasize that the harbor exists independently of Sowoni. She is inside it, not commanding it."
+    },
+    "calm": {
+      "type": "LONG-WIDE",
+      "distance": "long — maximum environment, Sowoni smallest, almost peripheral",
+      "framing": "environment-first. Sowoni at lower edge, slightly left or right of center.",
+      "angle": "very slightly elevated — looking across the harbor, not at Sowoni",
+      "exterior": "Full harbor sweep visible. Overcast sky. Distant lights. Wet surface. Continuity is the subject.",
+      "note": "The scene should feel like it would exist exactly this way whether or not Sowoni is present."
+    },
+    "curiosity": {
+      "type": "ASYMMETRIC",
+      "distance": "medium — environment and Sowoni in balance but unresolved",
+      "framing": "Sowoni slightly left, something ordinary (harbor equipment, distant boat) visible right",
+      "angle": "eye level, gentle diagonal",
+      "exterior": "One part of the harbor fills the right portion. No obvious focal point. Multiple ordinary details co-exist.",
+      "note": "The composition should not point at anything. Curiosity without direction."
+    },
+    "fragile_hope": {
+      "type": "OFF-EDGE",
+      "distance": "medium-long — Sowoni pushed toward one edge of frame",
+      "framing": "large open harbor space on opposite side of Sowoni. No destination visible.",
+      "angle": "slight downward tilt — 10 degrees — makes harbor feel close and present",
+      "exterior": "Open harbor on 60% of frame. Sowoni on 40%. The open space is not invitation — it is simply there.",
+      "note": "Absence of destination. The space is open but not inviting."
+    }
+  },
+
   "composition": {
-    "flow": "Sowoni → harbor edge → sea → star in sky",
-    "core": "departure — beginning from outside"
+    "core": "ordinary world continuation — the harbor exists without needing anyone to witness it",
+    "rule": "environment precedes character. The harbor is the subject. Sowoni is inside the harbor, not commanding it.",
+    "flow": "harbor residue → ordinary continuation → Sowoni present inside it → continuity pressure",
+    "forbidden_flows": [
+      "Sowoni → destination",
+      "Sowoni → lighthouse",
+      "Sowoni → star (as meaning)",
+      "viewer → inspired"
+    ]
   },
-  "text": {
-    "bottom": "저 별은 당신을 기억합니다"
-  }
+
+  "lighthouse_policy": {
+    "status": "SUPPRESS",
+    "rule": "Lighthouse must NOT appear as compositional center or symbolic focal point. If visible at all, it is one ordinary harbor structure among others — small, unlit, background only. It does not light the frame. It does not guide anyone.",
+    "allowed": "Lighthouse as distant background object only — smaller than 5% of frame, not lit dramatically, not centered",
+    "forbidden": [
+      "lighthouse centered in composition",
+      "lighthouse as primary silhouette",
+      "lighthouse beam or directional light",
+      "Sowoni walking toward lighthouse"
+    ]
+  },
+
+  "consistency_anchor": {
+    "MUST_BE_IDENTICAL_ACROSS_ALL_5_EMOTIONS": [
+      "Harbor district setting — same location, same general hour",
+      "Sowoni's body type and hair — shoulder-length dark hair, slim back-view silhouette",
+      "Overcast or cloudy atmosphere — no clear night sky across variants",
+      "Ordinary harbor palette — muted, no dramatic color",
+      "Star as peripheral trace — not focal point in any variant",
+      "Lighthouse policy — suppressed in all variants equally"
+    ],
+    "ONLY_THESE_MAY_VARY_BY_EMOTION": [
+      "Sowoni's standing posture and body weight distribution",
+      "Camera distance and framing (see per-emotion camera)",
+      "Specific harbor detail visible (boats, equipment, surface)",
+      "Degree of openness in composition"
+    ],
+    "NEVER_CHANGE": [
+      "Lighthouse as compositional center (always suppressed)",
+      "Star as symbolic focal point (always almost_unnoticed)",
+      "Text in image (always forbidden)",
+      "Sowoni facing camera (always back view)",
+      "Tourism or inspirational harbor reading (always forbidden)"
+    ]
+  },
+
+  "consistency_block": [
+    "Sowoni must be the same young adult Korean woman across all 5 emotion variants.",
+    "Same shoulder-length dark hair. Same slim standing silhouette. Back view — 85%+ hidden.",
+    "Sowoni is ALWAYS standing outdoors. Never seated. This is hamel — outdoor harbor.",
+    "Back view only. Jawline and eyes must NOT be visible in any variant.",
+    "The star is a continuity trace, NOT a meaningful focal point. It should be barely noticeable.",
+    "The lighthouse is NOT a compositional element. It may exist only as background detail.",
+    "NO text, captions, subtitles, or watermarks in any generated image.",
+    "The harbor should feel like it was already there, will continue after, and does not care about Sowoni's presence.",
+    "DreamTown feeling: ordinary watercolor continuation. No drama, no inspiration, no healing."
+  ]
 }

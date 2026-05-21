@@ -1,0 +1,36 @@
+DreamTown hamel thumbnail illustration.
+
+Scene:
+A quiet outdoor harbor in Yeosu at night, near the Hamel Exhibition Hall, overlooking the open sea.
+
+Must include:
+open sea horizon, harbor edge or low stone wall, night sky with stars, distant city lights on water, open space above
+
+Style:
+2D illustration, watercolor texture, soft grain, Ghibli-inspired
+
+Do NOT:
+photorealistic, 3D render, ultra detail, tourism poster
+
+Color:
+Sky: deep navy blue
+Sea: dark reflective blue
+City: warm amber glow on horizon
+
+Star:
+open sky above the sea, brightness 140%
+
+Composition:
+Sowoni → harbor edge → sea → star in sky
+
+Emotion:
+confusion
+
+Character:
+Sowoni standing alone facing the sea, quiet and open.
+
+Text:
+"어디로 가야 할지 몰랐던"
+"밤"
+
+"저 별은 당신을 기억합니다"

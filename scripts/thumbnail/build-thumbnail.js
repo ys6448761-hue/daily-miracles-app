@@ -154,23 +154,64 @@ function buildPrompt(ssot, emotion, lines) {
     '',
   ];
 
-  if (ssot.composition?.flow) {
-    parts.push('Composition:', ssot.composition.flow, '');
+  if (ssot.composition?.rule || ssot.composition?.flow) {
+    parts.push('Composition:');
+    if (ssot.composition.rule) parts.push(`Rule: ${ssot.composition.rule}`);
+    if (ssot.composition.flow) parts.push(`Flow: ${ssot.composition.flow}`);
+    parts.push('');
   }
 
   if (charBlock) {
     parts.push(charBlock, '');
   }
 
-  parts.push(
-    `Emotion: ${emotion}`,
-    '',
-    'Copy (to be overlaid — do NOT render in image):',
-    `"${lines[0]}"`,
-    `"${lines[1]}"`,
-    '',
-    `Bottom (to be overlaid — do NOT render in image): "${ssot.text?.bottom ?? ''}"`,
-  );
+  // 감정별 포즈 주입 (ssot.poses 있을 때만)
+  if (ssot.poses?.[emotion]) {
+    parts.push(`Pose for this emotion (${emotion}):`, ssot.poses[emotion], '');
+  }
+
+  // 감정별 카메라 구도 주입 (ssot.camera 있을 때만)
+  const cam = ssot.camera?.[emotion];
+  if (cam) {
+    const camLines = [`Camera composition for this emotion (${emotion}):`];
+    if (cam.type)     camLines.push(`Type: ${cam.type}`);
+    if (cam.distance) camLines.push(`Distance: ${cam.distance}`);
+    if (cam.framing)  camLines.push(`Framing: ${cam.framing}`);
+    if (cam.angle)    camLines.push(`Angle: ${cam.angle}`);
+    if (cam.interior) camLines.push(`Interior framing: ${cam.interior}`);
+    if (cam.note)     camLines.push(`Composition note: ${cam.note}`);
+    camLines.push('');
+    parts.push(...camLines);
+  }
+
+  parts.push(`Emotion: ${emotion}`);
+
+  // CRITICAL CONSISTENCY REQUIREMENTS — 5감정 변형 간 흔들림 방지 SSOT
+  const anchor = ssot.consistency_anchor;
+  if (anchor && typeof anchor === 'object') {
+    parts.push('', 'CRITICAL CONSISTENCY REQUIREMENTS:', '');
+    if (Array.isArray(anchor.MUST_BE_IDENTICAL_ACROSS_ALL_5_EMOTIONS)) {
+      parts.push('The following MUST be IDENTICAL across all 5 emotion variants:');
+      anchor.MUST_BE_IDENTICAL_ACROSS_ALL_5_EMOTIONS.forEach(line => parts.push(`- ${line}`));
+      parts.push('');
+    }
+    if (Array.isArray(anchor.ONLY_THESE_MAY_VARY_BY_EMOTION)) {
+      parts.push(`ONLY these may subtly vary by emotion (${emotion}):`);
+      anchor.ONLY_THESE_MAY_VARY_BY_EMOTION.forEach(line => parts.push(`- ${line}`));
+      parts.push('');
+    }
+    if (Array.isArray(anchor.NEVER_CHANGE)) {
+      parts.push('NEVER (absolute prohibitions):');
+      anchor.NEVER_CHANGE.forEach(line => parts.push(`- ${line}`));
+      parts.push('');
+    }
+  }
+
+  // location별 일관성 강제 블록 (ssot.consistency_block 있으면 끝에 추가)
+  if (Array.isArray(ssot.consistency_block) && ssot.consistency_block.length) {
+    parts.push('', 'Consistency requirements (must follow strictly):');
+    ssot.consistency_block.forEach(line => parts.push(line));
+  }
 
   return parts
     .filter(p => p !== undefined && p !== null)
@@ -273,7 +314,8 @@ async function runSample5(location) {
 // base의 기존 별을 gemstone glow color로 재색상
 // ─────────────────────────────────────────────────────────
 async function runSample5v2(location) {
-  const { recolorStar } = require('./lib/recolorStar');
+  const { recolorStar }        = require('./lib/recolorStar');
+  const { applyThumbnailText, getCopy } = require('../../services/thumbnailTextService');
 
   const baseDir   = path.join(ROOT, 'public', 'images', 'thumbnails', location, 'base');
   const sampleDir = path.join(ROOT, 'public', 'images', 'thumbnails', location, 'generated', 'sample_v2');
@@ -315,9 +357,18 @@ async function runSample5v2(location) {
     const imgBuf = fs.readFileSync(path.join(baseDir, baseFile));
     const out    = await recolorStar(imgBuf, emotion);
 
-    const outName = `${location}_${emotion}_${gemstone}_${baseId}_v2.png`;
-    fs.writeFileSync(path.join(sampleDir, outName), out);
-    console.log(`✅ ${outName}  glow:[${glow}]`);
+    const cleanName = `${location}_${emotion}_${gemstone}_${baseId}_v2.png`;
+    const textName  = `${location}_${emotion}_${gemstone}_${baseId}_v2_text.png`;
+    const cleanPath = path.join(sampleDir, cleanName);
+    const textPath  = path.join(sampleDir, textName);
+
+    fs.writeFileSync(cleanPath, out);
+
+    const copy = getCopy(location, emotion);
+    await applyThumbnailText(cleanPath, textPath, copy);
+
+    console.log(`✅ ${cleanName}  glow:[${glow}]`);
+    console.log(`   └─ text: ${textName}`);
   }
 
   // MD5 검증
@@ -340,7 +391,8 @@ async function runSample5v2(location) {
 // full25 — 5 base × 5 emotion = 25장 (recolor, 정식)
 // ─────────────────────────────────────────────────────────
 async function runFull25(location) {
-  const { recolorStar } = require('./lib/recolorStar');
+  const { recolorStar }        = require('./lib/recolorStar');
+  const { applyThumbnailText, getCopy } = require('../../services/thumbnailTextService');
 
   const baseDir  = path.join(ROOT, 'public', 'images', 'thumbnails', location, 'base');
   const fullDir  = path.join(ROOT, 'public', 'images', 'thumbnails', location, 'generated', 'full');
@@ -383,19 +435,28 @@ async function runFull25(location) {
       const glow     = (colorMap[emotion] || {}).glow    || '?';
       const outName  = `${location}_${emotion}_${gemstone}_${baseId}.png`;
 
+      const cleanPath = path.join(fullDir, outName);
+      const textName  = outName.replace('.png', '_text.png');
+      const textFilePath = path.join(fullDir, textName);
+
       const out = await recolorStar(imgBuf, emotion);
-      fs.writeFileSync(path.join(fullDir, outName), out);
+      fs.writeFileSync(cleanPath, out);
+
+      const copy = getCopy(location, emotion);
+      await applyThumbnailText(cleanPath, textFilePath, copy);
       count++;
 
       manifestItems.push({
         emotion,
         gemstone,
         base: baseId,
-        sourceFile: baseFile,
-        imageUrl: `/images/thumbnails/${location}/generated/full/${outName}`,
+        sourceFile:    baseFile,
+        cleanImageUrl: `/images/thumbnails/${location}/generated/full/${outName}`,
+        imageUrl:      `/images/thumbnails/${location}/generated/full/${textName}`,
       });
 
       console.log(`✅ [${String(count).padStart(2, '0')}/25] ${outName}  glow:[${glow}]`);
+      console.log(`   └─ text: ${textName}`);
     }
     console.log();
   }
