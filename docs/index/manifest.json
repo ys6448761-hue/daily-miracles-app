@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-05-21T04:00:40.353Z",
+  "generated_at": "2026-05-21T04:09:31.297Z",
   "generator": "generate-manifest.js",
   "total_count": 299,
   "documents": [
@@ -3570,7 +3570,7 @@
       "status": "|------",
       "title": "Canonical Asset Registry v1 — Verified",
       "created_at": "2026-05-01",
-      "checksum": "162d419f"
+      "checksum": "b65d88ba"
     },
     {
       "id": "DOC-CEO-WEEKLY-2026-W17",
