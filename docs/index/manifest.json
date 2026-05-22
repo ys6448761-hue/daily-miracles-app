@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-05-22T00:07:58.055Z",
+  "generated_at": "2026-05-22T01:02:51.823Z",
   "generator": "generate-manifest.js",
-  "total_count": 304,
+  "total_count": 307,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -213,6 +213,45 @@
       "title": "DreamTown Event SSOT v1",
       "created_at": "변경",
       "checksum": "ac9d176d"
+    },
+    {
+      "id": "DOC-DreamTown_Channel_Rendering_Ru",
+      "path": "docs/ssot/media/DreamTown_Channel_Rendering_Rules_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "media",
+        "소원",
+        "storybook",
+        "aurora",
+        "가격"
+      ],
+      "owner": "rumi",
+      "status": "superseded",
+      "title": "DreamTown Channel Rendering Rules SSOT",
+      "created_at": "변경",
+      "checksum": "e9478bc1"
+    },
+    {
+      "id": "DOC-DreamTown_Media_Architecture_S",
+      "path": "docs/ssot/media/DreamTown_Media_Architecture_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "media",
+        "소원",
+        "storybook",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "superseded",
+      "title": "DreamTown Media Architecture SSOT",
+      "created_at": "변경",
+      "checksum": "55250632"
     },
     {
       "id": "DOC-tag_taxonomy",
@@ -2044,6 +2083,26 @@
       "title": "DISCARD_CLEANUP_PLAN.md",
       "created_at": "2026-05-22",
       "checksum": "4baba8c0"
+    },
+    {
+      "id": "DOC-DREAMTOWN_PLAN_ALIGNMENT_AUDIT",
+      "path": "docs/reports/DREAMTOWN_PLAN_ALIGNMENT_AUDIT.md",
+      "type": "report",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "reports",
+      "tags": [
+        "reports",
+        "소원",
+        "storybook",
+        "aurora",
+        "결제"
+      ],
+      "owner": "rumi",
+      "status": "|------",
+      "title": "DREAMTOWN_PLAN_ALIGNMENT_AUDIT.md",
+      "created_at": "2026-05-22",
+      "checksum": "34082e5b"
     },
     {
       "id": "DOC-GATE4_Cafe_Warmth_Reduction_Re",

@@ -9,6 +9,8 @@
     "DOC-상품유형별_가격표_v12",
     "DOC-전체상품_가격표_종합_v12",
     "DOC-DreamTown_Event_SSOT",
+    "DOC-DreamTown_Channel_Rendering_Ru",
+    "DOC-DreamTown_Media_Architecture_S",
     "DOC-tag_taxonomy",
     "DOC-소원놀이터_종합문서_v10",
     "DOC-AURORA-STATUS",
@@ -71,6 +73,7 @@
     "DOC-가격표_퀵레퍼런스",
     "DOC-D2_D3_FUNCTIONAL_REVIEW",
     "DOC-DEFERRED_CHANGES_TRIAGE",
+    "DOC-DREAMTOWN_PLAN_ALIGNMENT_AUDIT",
     "DOC-GATE6_Hamel_Full25_Result_Repo",
     "DOC-GATE6_Hamel_Regeneration_Promp",
     "DOC-REMAINING_CHANGES_COMMIT_SCOPE",
@@ -212,6 +215,8 @@
     "DOC-AIL-정산-v2-final",
     "DOC-AURORA5_CHARACTER_PROMPTS_V3",
     "DOC-DreamTown_Event_SSOT",
+    "DOC-DreamTown_Channel_Rendering_Ru",
+    "DOC-DreamTown_Media_Architecture_S",
     "DOC-AURORA-STATUS",
     "DOC-dreamtown-postcard-emotion-cop",
     "DOC-INDEX",
@@ -251,6 +256,7 @@
     "DOC-drive-github-sync-setup",
     "DOC-sens-setup-guide",
     "DOC-README",
+    "DOC-DREAMTOWN_PLAN_ALIGNMENT_AUDIT",
     "DOC-README",
     "DOC-ROADMAP_API",
     "DOC-VIDEO_MASTER",
@@ -403,6 +409,7 @@
     "DOC-AIL-정산-v2-final",
     "DOC-상품유형별_가격표_v12",
     "DOC-전체상품_가격표_종합_v12",
+    "DOC-DreamTown_Channel_Rendering_Ru",
     "DOC-AURORA-STATUS",
     "DOC-SSOT_Registry_v2",
     "DOC-DreamTown_Galaxy_Mode_SSOT",
@@ -450,6 +457,7 @@
     "DOC-JAEMI_ONBOARDING_v12",
     "DOC-04_Onboarding_7Day",
     "DOC-05_Deal_Registration",
+    "DOC-DREAMTOWN_PLAN_ALIGNMENT_AUDIT",
     "DOC-tax-accounting-ai-tools-analys",
     "DOC-GA4_SETUP_GUIDE",
     "DOC-DreamTown_DB_Schema_Design",
@@ -533,22 +541,13 @@
     "DOC-DreamTown_Miracle_System_SSOT",
     "DOC-DreamTown_Wish_System_SSOT"
   ],
-  "standards": [
-    "DOC-tag_taxonomy",
-    "DOC-quantum-planning-method"
-  ],
-  "system": [
-    "DOC-GATE_BidDoc_Compliance",
-    "DOC-agents-index",
-    "DOC-conversation-workflow",
-    "DOC-manifest-system",
-    "DOC-SYS-2025-1230-LUMI-001_Airtabl"
-  ],
-  "systems": [
-    "DOC-소원놀이터_종합문서_v10",
-    "DOC-소원놀이터_퀵레퍼런스"
+  "media": [
+    "DOC-DreamTown_Channel_Rendering_Ru",
+    "DOC-DreamTown_Media_Architecture_S"
   ],
   "storybook": [
+    "DOC-DreamTown_Channel_Rendering_Ru",
+    "DOC-DreamTown_Media_Architecture_S",
     "DOC-소원놀이터_종합문서_v10",
     "DOC-AURORA-STATUS",
     "DOC-INDEX",
@@ -562,6 +561,7 @@
     "DOC-GATE2_Canonical_Asset_Verifica",
     "DOC-D2_D3_FUNCTIONAL_REVIEW",
     "DOC-DEFERRED_CHANGES_TRIAGE",
+    "DOC-DREAMTOWN_PLAN_ALIGNMENT_AUDIT",
     "DOC-REMAINING_CHANGES_COMMIT_SCOPE",
     "DOC-GA4_SETUP_GUIDE",
     "DOC-01_DreamTown_Air_Constitution",
@@ -582,6 +582,21 @@
     "DOC-20260101-99J",
     "DOC-2025-12-29_Part6_소원착지전략",
     "DOC-20251229-SRH"
+  ],
+  "standards": [
+    "DOC-tag_taxonomy",
+    "DOC-quantum-planning-method"
+  ],
+  "system": [
+    "DOC-GATE_BidDoc_Compliance",
+    "DOC-agents-index",
+    "DOC-conversation-workflow",
+    "DOC-manifest-system",
+    "DOC-SYS-2025-1230-LUMI-001_Airtabl"
+  ],
+  "systems": [
+    "DOC-소원놀이터_종합문서_v10",
+    "DOC-소원놀이터_퀵레퍼런스"
   ],
   "templates": [
     "DOC-knowledge_card_template",
@@ -810,6 +825,7 @@
     "DOC-D2_D3_FUNCTIONAL_REVIEW",
     "DOC-DEFERRED_CHANGES_TRIAGE",
     "DOC-DISCARD_CLEANUP_PLAN",
+    "DOC-DREAMTOWN_PLAN_ALIGNMENT_AUDIT",
     "DOC-GATE4_Cafe_Warmth_Reduction_Re",
     "DOC-GATE5_Hotel_Fragile_Hope_Star_",
     "DOC-GATE6_Hamel_Full25_Result_Repo",
