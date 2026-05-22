@@ -1,11 +1,11 @@
 # DreamTown SSOT Index
 
-Version: v5.0
+Version: v5.1
 Owner: Aurora5
 Status: Confirmed
 Purpose: 인수인계 3계층 구조 — 담당자가 바뀌어도 방향이 안 흔들리는 구조
 
-Last Updated: 2026-05-16
+Last Updated: 2026-05-22
 
 ---
 
@@ -49,6 +49,7 @@ docs/ssot/
  ├── support/     ← 구현·설계·UX 가이드 — 25개
  ├── archive/     ← 중복·구버전 보관 — 47개
  ├── air-engine/  ← 공기 기반 결과물 생성 엔진 SSOT — 11개 (CODE_TEST_01 2026-05-17 추가)
+ ├── emotion/     ← 소원→감정 번역 시스템 SSOT — 1개 (EMOT-TRANS-001 2026-05-22 추가)
  │
  ├── INDEX.md              ← 이 파일
  ├── SSOT_Registry_v2.md   ← 전체 분류표 (v2)
@@ -83,6 +84,16 @@ docs/ssot/
 | `04_DreamTown_Canonical_Air_Registry.md` | 현행 76장 전체 분류 목록 + echo_potential | Registry 조회·파생 착수 전 |
 | `05_DERIVATION_PIPELINE.md` | canonical_air → 16:9 master → 파생 단계별 구조 | 파생 제작 착수 전 |
 | `06_OUTPUT_STRATEGY.md` | 채널별 역할 (YouTube=canonical / Shorts=파생) + 제작 우선순위 | 결과물 채널 결정 전 |
+
+---
+
+## Emotion SSOT (1개) — `docs/ssot/emotion/` ← LAYER 2
+
+**소원 문장 → DreamTown 장면 물리값 번역 시스템.**
+
+| 파일 | 코드 | 핵심 내용 | Status | 필독 시점 |
+|------|------|----------|--------|----------|
+| `DreamTown_Emotional_Translation_SSOT.md` | EMOT-TRANS-001 | 7 gravity type · 2단계 해석 구조 · keyword scoring · 종결어미 규칙 · confusion→fragile_hope 강제 · gem palette × pacing × render_fit 매핑 | Review | 영상 시퀀스·렌더 파이프라인·gravity 해석 작업 전 |
 
 ---
 
@@ -178,3 +189,4 @@ docs/ssot/
 | v3.1 | 2026-03-09 | World_Architecture_SSOT 추가 |
 | v4.0 | 2026-03-13 | 3계층 재편 — core/13 + support/25 + archive/47 |
 | v4.1 | 2026-05-11 | Copy System SSOT 섹션 추가 — 포스트카드 감정 문장 v1 |
+| v5.1 | 2026-05-22 | Emotion SSOT 섹션 추가 — EMOT-TRANS-001 (gravity interpreter v1 승격) |

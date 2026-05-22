@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-05-22T01:45:59.605Z",
+  "generated_at": "2026-05-22T06:29:00.488Z",
   "generator": "generate-manifest.js",
-  "total_count": 308,
+  "total_count": 314,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -377,6 +377,24 @@
       "checksum": "97bdb81c"
     },
     {
+      "id": "DOC-DreamTown_Emotional_Translatio",
+      "path": "docs/ssot/emotion/DreamTown_Emotional_Translation_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "emotion",
+        "소원",
+        "aurora"
+      ],
+      "owner": "code",
+      "status": "| 결심형",
+      "title": "DreamTown Emotional Translation SSOT",
+      "created_at": "내용",
+      "checksum": "09227235"
+    },
+    {
       "id": "DOC-INDEX",
       "path": "docs/ssot/INDEX.md",
       "type": "document",
@@ -393,7 +411,7 @@
       "status": "archived",
       "title": "DreamTown SSOT Index",
       "created_at": "내용",
-      "checksum": "30170bea"
+      "checksum": "67151fe6"
     },
     {
       "id": "DOC-SSOT_Registry_v2",
@@ -2105,6 +2123,23 @@
       "checksum": "34082e5b"
     },
     {
+      "id": "DOC-EMOTIONAL_GRAVITY_INTERPRETER_",
+      "path": "docs/reports/EMOTIONAL_GRAVITY_INTERPRETER_V1.md",
+      "type": "report",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "reports",
+      "tags": [
+        "reports",
+        "소원"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "EMOTIONAL_GRAVITY_INTERPRETER_V1.md",
+      "created_at": "2026-05-22",
+      "checksum": "936c7442"
+    },
+    {
       "id": "DOC-FIRST_RESONANCE_FLOW_PROTOTYPE",
       "path": "docs/reports/FIRST_RESONANCE_FLOW_PROTOTYPE.md",
       "type": "report",
@@ -2120,7 +2155,7 @@
       "status": "| F2",
       "title": "FIRST_RESONANCE_FLOW_PROTOTYPE.md",
       "created_at": "2026-05-22",
-      "checksum": "a29a1307"
+      "checksum": "34ed1f94"
     },
     {
       "id": "DOC-GATE4_Cafe_Warmth_Reduction_Re",
@@ -2207,6 +2242,60 @@
       "checksum": "109cb01e"
     },
     {
+      "id": "DOC-RESONANCE_PREVIEW_W1_REVIEW",
+      "path": "docs/reports/RESONANCE_PREVIEW_W1_REVIEW.md",
+      "type": "report",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "reports",
+      "tags": [
+        "reports",
+        "소원",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "비고",
+      "title": "RESONANCE_PREVIEW_W1_REVIEW.md",
+      "created_at": "2026-05-22",
+      "checksum": "da727d36"
+    },
+    {
+      "id": "DOC-RESONANCE_W1_V2_FINAL_CHECK",
+      "path": "docs/reports/RESONANCE_W1_V2_FINAL_CHECK.md",
+      "type": "report",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "reports",
+      "tags": [
+        "reports",
+        "소원",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "RESONANCE_W1_V2_FINAL_CHECK.md",
+      "created_at": "2026-05-22",
+      "checksum": "63bf041a"
+    },
+    {
+      "id": "DOC-RESONANCE_W1_V3_FINAL_REVIEW",
+      "path": "docs/reports/RESONANCE_W1_V3_FINAL_REVIEW.md",
+      "type": "report",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "reports",
+      "tags": [
+        "reports",
+        "소원",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "판정",
+      "title": "RESONANCE_W1_V3_FINAL_REVIEW.md",
+      "created_at": "2026-05-22",
+      "checksum": "529acfed"
+    },
+    {
       "id": "DOC-tax-accounting-ai-tools-analys",
       "path": "docs/reports/tax-accounting-ai-tools-analysis.md",
       "type": "report",
@@ -2240,6 +2329,24 @@
       "title": "WISH_IMAGE_HOLD_REVIEW.md",
       "created_at": "2026-05-22",
       "checksum": "5ca40d35"
+    },
+    {
+      "id": "DOC-WISH_TO_RENDER_PROTOTYPE",
+      "path": "docs/reports/WISH_TO_RENDER_PROTOTYPE.md",
+      "type": "report",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "reports",
+      "tags": [
+        "reports",
+        "소원",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "WISH_TO_RENDER_PROTOTYPE.md",
+      "created_at": "2026-05-22",
+      "checksum": "079cfa0c"
     },
     {
       "id": "DOC-REVIEW_COLLECTION_SYSTEM",
