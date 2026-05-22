@@ -1,0 +1,116 @@
+{
+  "location": "yeosu_hamel",
+  "intent": "wish_image",
+  "core_rule": "장소·캐릭터 SSOT는 thumbnail과 동일하나, 텍스트 영역·overlay는 일체 사용하지 않는다.",
+  "scene": {
+    "description": "A quiet outdoor harbor in Yeosu at night, beside the red Hamel Lighthouse standing on the harbor breakwater, overlooking the open sea.",
+    "must_include": [
+      "solid vivid red Hamel Lighthouse — saturated bold beacon-like red, never faded, never orange-red, never pink-red",
+      "lighthouse positioned right-of-center as the emotional anchor",
+      "harbor breakwater (방파제) — the emotional walking path, straight or natural perspective",
+      "metal/concrete railings on BOTH sides of the breakwater — clearly visible as emotional flow lines",
+      "leading-line walking path on the breakwater leading toward the red lighthouse",
+      "open sea horizon",
+      "night sky with stars",
+      "distant Yeosu city lights reflected softly on water"
+    ]
+  },
+  "style": {
+    "required": [
+      "2D illustration",
+      "Korean webtoon feeling",
+      "watercolor texture",
+      "soft grain",
+      "Ghibli-inspired mood",
+      "gentle emotional lighting"
+    ],
+    "forbidden": [
+      "photorealistic",
+      "3D render",
+      "CGI",
+      "ultra detail",
+      "tourism poster",
+      "travel advertisement",
+      "tourism photography mood",
+      "realistic photography",
+      "busy composition",
+      "thumbnail layout",
+      "epic landscape composition",
+      "cinematic landscape dominance",
+      "overly dramatic lighthouse framing",
+      "environment-focused composition",
+      "any Korean text, hangul characters, or letters anywhere in the image",
+      "any text overlay",
+      "any caption or subtitle",
+      "logo or watermark",
+      "UI element",
+      "weak red, faded red, orange-red, or pink-red lighthouse",
+      "missing breakwater railings",
+      "curved or distorted breakwater",
+      "lighthouse at left edge or far background",
+      "scenic landscape framing",
+      "square aspect ratio composition",
+      "dramatic running pose for Sowoni",
+      "cinematic adventure mood",
+      "destination-seeking motion",
+      "childlike or young body proportions",
+      "face visible from front or side",
+      "facial detail or expression visible",
+      "hair style or color change from shoulder-length dark hair"
+    ]
+  },
+  "color": {
+    "sky": "deep navy blue",
+    "sea": "dark reflective blue",
+    "city": "warm amber glow on horizon",
+    "star": "white / soft gold"
+  },
+  "star": {
+    "position": "open sky above the sea",
+    "brightness": "140%",
+    "glow": "soft wide halo over water"
+  },
+  "character": {
+    "name": "Sowoni",
+    "appearance": "shoulder-length dark hair, slim body, back view or slight 3/4 back only, no facial detail",
+    "pose": "quietly standing on the breakwater path — never running, never seeking, never crouching",
+    "description": "Sowoni stands quietly in the left-foreground on the breakwater path, back view or 3/4 back, gently looking toward the red lighthouse light — emotionally connected, not actively walking, never running.",
+    "rule": "Sowoni is the emotional and visual center, not visually dominant. No mascot character. No star in hands. SSOT §8-1: 머무르고 / 정리하고 / 별들을 바라보고 / 감정을 연결하는 존재."
+  },
+  "composition": {
+    "flow": "Sowoni quietly standing in left-foreground on breakwater path → railings as emotional flow lines on both sides → red lighthouse anchor at right-center → sea horizon → single star above",
+    "core": "vertical 9:16 portrait orientation, low eye-level camera at breakwater entrance, Sowoni emotionally central but not visually dominant",
+    "viewpoint": "camera positioned at the start of the breakwater, eye-level just above the path, looking toward the red lighthouse",
+    "aspect_ratio": "9:16 vertical portrait — never square, never landscape",
+    "mood": [
+      "The breakwater feels like a quiet emotional journey.",
+      "The lighthouse supports the emotional scene but does not dominate the composition.",
+      "The scene should feel emotionally intimate rather than scenic.",
+      "The emotional atmosphere is more important than environmental detail.",
+      "Sowoni feels emotionally connected to the lighthouse light.",
+      "The red lighthouse light reads as a hopeful beacon, not a tourist landmark.",
+      "Sowoni is quietly present — not running, not seeking, not pursuing destination."
+    ]
+  },
+  "text_strategy": {
+    "policy": "do not generate any Korean text inside the image",
+    "name_plate": "rendered as post-processing overlay (sharp + opentype.js with assets/fonts/NotoSansKR-*.ttf, or static PNG asset)",
+    "rationale": "current AI image generation models cannot reliably render Korean text consistently — see Visual_Style_SSOT §8-1",
+    "lighthouse_body": "must remain clean of any text or markings to allow post-processing overlay"
+  },
+  "emotion_overrides": {
+    "_note": "wish-image 전용 emotion → gem/starlight 매핑. thumbnail 매핑과 별개. 미정의 emotion은 thumbnail utils의 기본값으로 fallback.",
+    "confusion": {
+      "gem": "sapphire",
+      "starlight": "deep sapphire blue tinged with quiet uncertainty — calm but searching, not pulsing — 푸른 별빛, 깊은 사색"
+    }
+  },
+  "asset_routing": {
+    "_note": "검수/QA는 outputs/wish-image/, 확정 자산은 star-cache로. production overwrite 금지 — star-cache는 local only (push 대상 아님).",
+    "qa_dir":      "outputs/wish-image/hamel",
+    "final_dir":   "public/images/star-cache/yeosu_hamel",
+    "filename_pattern": "{NN}_{emotion}_{gem}_{origin}_{location_short}.png",
+    "origin":      "yeosu",
+    "location_short": "hamel"
+  }
+}

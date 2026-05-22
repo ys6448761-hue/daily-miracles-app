@@ -1,0 +1,61 @@
+DreamTown Hamel Wish Image illustration. Sowoni-centered, no text overlay.
+
+Aspect ratio: 9:16 vertical portrait — never square, never landscape. Tall composition. NEVER square, NEVER landscape.
+
+Scene:
+A quiet outdoor harbor in Yeosu at night, beside the red Hamel Lighthouse standing on the harbor breakwater, overlooking the open sea.
+
+Must include:
+solid vivid red Hamel Lighthouse — saturated bold beacon-like red, never faded, never orange-red, never pink-red, lighthouse positioned right-of-center as the emotional anchor, harbor breakwater (방파제) — the emotional walking path, straight or natural perspective, metal/concrete railings on BOTH sides of the breakwater — clearly visible as emotional flow lines, leading-line walking path on the breakwater leading toward the red lighthouse, open sea horizon, night sky with stars, distant Yeosu city lights reflected softly on water
+
+Reference SSOT (must follow strictly — Visual_Style §8-1):
+- Lighthouse color: solid vivid red — saturated, bold, beacon-like (never faded, never orange-red)
+- Lighthouse position: right-of-center as the emotional anchor, prominent but not overwhelming
+- Breakwater: straight or natural perspective, with railings on BOTH sides as emotional flow lines
+- Camera: low eye-level at breakwater entrance, looking toward the red lighthouse
+- Sowoni: in left-foreground on the breakwater path, back view, quietly present (never running, never seeking destination)
+
+Style:
+2D illustration, Korean webtoon feeling, watercolor texture, soft grain, Ghibli-inspired mood, gentle emotional lighting
+
+Do NOT:
+photorealistic, 3D render, CGI, ultra detail, tourism poster, travel advertisement, tourism photography mood, realistic photography, busy composition, thumbnail layout, epic landscape composition, cinematic landscape dominance, overly dramatic lighthouse framing, environment-focused composition, any Korean text, hangul characters, or letters anywhere in the image, any text overlay, any caption or subtitle, logo or watermark, UI element, weak red, faded red, orange-red, or pink-red lighthouse, missing breakwater railings, curved or distorted breakwater, lighthouse at left edge or far background, scenic landscape framing, square aspect ratio composition, dramatic running pose for Sowoni, cinematic adventure mood, destination-seeking motion, childlike or young body proportions, face visible from front or side, facial detail or expression visible, hair style or color change from shoulder-length dark hair
+
+Text policy (CRITICAL):
+- Do NOT generate any Korean text, hangul characters, or letters anywhere in the image.
+- The lighthouse name plate "하멜등대" will be added as a separate post-processing overlay.
+- The lighthouse body must remain clean of any text or markings.
+
+Color:
+Sky: deep navy blue
+Sea: dark reflective blue
+City: warm amber glow on horizon
+
+Star (emotion-anchored — Visual_Style §8-1 별빛 = 보석 감정색):
+position: open sky above the sea, brightness 140%, soft wide halo over water.
+emotion: calm  →  gemstone: emerald  →  starlight: steady emerald green, soft inner light. Unhurried..
+The starlight is the emotional color of this scene — not just a light source.
+
+Composition:
+Sowoni quietly standing in left-foreground on breakwater path → railings as emotional flow lines on both sides → red lighthouse anchor at right-center → sea horizon → single star above.
+vertical 9:16 portrait orientation, low eye-level camera at breakwater entrance, Sowoni emotionally central but not visually dominant.
+camera positioned at the start of the breakwater, eye-level just above the path, looking toward the red lighthouse
+The breakwater feels like a quiet emotional journey.
+The lighthouse supports the emotional scene but does not dominate the composition.
+The scene should feel emotionally intimate rather than scenic.
+The emotional atmosphere is more important than environmental detail.
+Sowoni feels emotionally connected to the lighthouse light.
+The red lighthouse light reads as a hopeful beacon, not a tourist landmark.
+Sowoni is quietly present — not running, not seeking, not pursuing destination.
+
+Emotion:
+calm.
+
+Character:
+Sowoni stands quietly in the left-foreground on the breakwater path, back view or 3/4 back, gently looking toward the red lighthouse light — emotionally connected, not actively walking, never running.
+Sowoni is the emotional and visual center, not visually dominant. No mascot character. No star in hands. SSOT §8-1: 머무르고 / 정리하고 / 별들을 바라보고 / 감정을 연결하는 존재.
+
+Output rules:
+No text overlay. No Korean characters. No caption. No subtitle. No logo. No watermark. No UI element.
+2D watercolor illustration only — no 3D, no photorealism.
+Vertical 9:16 portrait orientation — tall composition, never square.
