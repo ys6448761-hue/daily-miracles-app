@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-05-30T01:14:06.774Z",
+  "generated_at": "2026-05-30T01:38:48.350Z",
   "generator": "generate-manifest.js",
-  "total_count": 334,
+  "total_count": 335,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -427,7 +427,7 @@
       "status": "다음 목표",
       "title": "DreamTown SSOT Index",
       "created_at": "내용",
-      "checksum": "fc855a03"
+      "checksum": "17a94cf0"
     },
     {
       "id": "DOC-SSOT_Registry_v2",
@@ -3445,6 +3445,23 @@
       "title": "STATE-EP01 — 내 마음이 별이 된 곳",
       "created_at": "2026-05-30",
       "checksum": "4ca499de"
+    },
+    {
+      "id": "DOC-STATE-EP02_The_Heart_Begins_To",
+      "path": "docs/ssot/episodes/STATE-EP02_The_Heart_Begins_To_Open.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "episodes",
+        "소원"
+      ],
+      "owner": "team",
+      "status": "In Production",
+      "title": "STATE-EP02 — 마음이 열리기 시작하다",
+      "created_at": "2026-05-30",
+      "checksum": "c88ab665"
     },
     {
       "id": "DOC-SSOT-IMG-001_DreamTown_Image_G",

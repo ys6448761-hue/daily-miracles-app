@@ -153,6 +153,7 @@ docs/ssot/
 | 파일 | 에피소드 | 감정 상태 | 다음 목표 |
 |------|---------|----------|----------|
 | `STATE-EP01_Where_My_Heart_Became_A_Star.md` | EP01 완료 | 슬픔 60 / 희망 40 | 마음을 열기 |
+| `STATE-EP02_The_Heart_Begins_To_Open.md` | EP02 제작중 | 슬픔 40 / 희망 60 (목표) | 소원을 말하기 |
 
 ---
 
