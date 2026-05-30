@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-05-30T01:07:48.887Z",
+  "generated_at": "2026-05-30T01:14:06.774Z",
   "generator": "generate-manifest.js",
-  "total_count": 332,
+  "total_count": 334,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -427,7 +427,7 @@
       "status": "다음 목표",
       "title": "DreamTown SSOT Index",
       "created_at": "내용",
-      "checksum": "345c7850"
+      "checksum": "fc855a03"
     },
     {
       "id": "DOC-SSOT_Registry_v2",
@@ -3447,6 +3447,24 @@
       "checksum": "4ca499de"
     },
     {
+      "id": "DOC-SSOT-IMG-001_DreamTown_Image_G",
+      "path": "docs/ssot/media/SSOT-IMG-001_DreamTown_Image_Generation_Guide.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "media",
+        "소원",
+        "aurora"
+      ],
+      "owner": "Aurora5",
+      "status": "Confirmed",
+      "title": "SSOT-IMG-001 — DreamTown 이미지 생성 가이드",
+      "created_at": "2026-05-30",
+      "checksum": "ce4122d5"
+    },
+    {
       "id": "DOC-SSOT-OPS-001_DreamTown_Video_P",
       "path": "docs/ssot/media/SSOT-OPS-001_DreamTown_Video_Pipeline.md",
       "type": "document",
@@ -3462,7 +3480,25 @@
       "status": "Confirmed",
       "title": "SSOT-OPS-001 — DreamTown 영상 제작 운영 파이프라인",
       "created_at": "2026-05-30",
-      "checksum": "66138ae7"
+      "checksum": "b81b9b29"
+    },
+    {
+      "id": "DOC-SSOT-VID-002_Kling_Animation_G",
+      "path": "docs/ssot/media/SSOT-VID-002_Kling_Animation_Guide.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "media",
+        "소원",
+        "aurora"
+      ],
+      "owner": "Aurora5",
+      "status": "Confirmed",
+      "title": "SSOT-VID-002 — DreamTown 영상 생성 가이드",
+      "created_at": "2026-05-30",
+      "checksum": "843db734"
     },
     {
       "id": "DOC-DreamTown_API_Spec_Design",

@@ -140,7 +140,9 @@ docs/ssot/
 |------|----------|----------|
 | `DreamTown_Media_Architecture_SSOT.md` | 미디어 아키텍처 전체 | 미디어 기획 전 |
 | `DreamTown_Channel_Rendering_Rules_SSOT.md` | 채널별 렌더링 규칙 | 채널 배포 전 |
-| `SSOT-OPS-001_DreamTown_Video_Pipeline.md` | **영상 제작 운영 파이프라인** — 이미지→영상→OST→편집→배포 전 과정 | 영상 제작 착수 전 |
+| `SSOT-OPS-001_DreamTown_Video_Pipeline.md` | **영상 제작 운영 파이프라인 v2** — 이미지 70% 원칙 + SSOT 적용 순서 | 영상 제작 착수 전 |
+| `SSOT-IMG-001_DreamTown_Image_Generation_Guide.md` | **이미지 생성 가이드** — 비주얼 스타일·카메라 원칙·감정 버전(Original/Positive) | 이미지 생성 전 (최우선) |
+| `SSOT-VID-002_Kling_Animation_Guide.md` | **영상 생성 가이드** — 금지 목록·권장 움직임·EP01 기준·도구별 메모 | 영상 생성 전 |
 
 ---
 

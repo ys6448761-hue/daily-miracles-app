@@ -131,7 +131,9 @@
     "DOC-DreamTown_MyStar_Visualization",
     "DOC-DREAMTOWN_WORLD_CANVAS_SSOT",
     "DOC-STATE-EP01_Where_My_Heart_Beca",
+    "DOC-SSOT-IMG-001_DreamTown_Image_G",
     "DOC-SSOT-OPS-001_DreamTown_Video_P",
+    "DOC-SSOT-VID-002_Kling_Animation_G",
     "DOC-DreamTown_API_Spec_Design",
     "DOC-DreamTown_Aurum_System_Design",
     "DOC-DreamTown_Character_Style_Guid",
@@ -301,7 +303,9 @@
     "DOC-DreamTown_Intelligence_Agent_v",
     "DOC-DreamTown_Master_Roadmap_v1",
     "DOC-DreamTown_MyStar_Visualization",
+    "DOC-SSOT-IMG-001_DreamTown_Image_G",
     "DOC-SSOT-OPS-001_DreamTown_Video_P",
+    "DOC-SSOT-VID-002_Kling_Animation_G",
     "DOC-DreamTown_API_Spec_Design",
     "DOC-DreamTown_Aurum_System_Design",
     "DOC-DreamTown_Character_Style_Guid",
@@ -584,7 +588,9 @@
   "media": [
     "DOC-DreamTown_Channel_Rendering_Ru",
     "DOC-DreamTown_Media_Architecture_S",
-    "DOC-SSOT-OPS-001_DreamTown_Video_P"
+    "DOC-SSOT-IMG-001_DreamTown_Image_G",
+    "DOC-SSOT-OPS-001_DreamTown_Video_P",
+    "DOC-SSOT-VID-002_Kling_Animation_G"
   ],
   "storybook": [
     "DOC-DreamTown_Channel_Rendering_Ru",

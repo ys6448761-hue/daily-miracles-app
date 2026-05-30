@@ -4,6 +4,8 @@ title: DreamTown 영상 제작 운영 파이프라인
 status: Confirmed
 owner: Aurora5
 created: 2026-05-30
+updated: 2026-05-30
+version: v2
 layer: LAYER 2 — Operational SSOT
 ---
 
@@ -53,6 +55,31 @@ OST (Mureka / Suno)
 ```
 
 각 단계는 독립적으로 교체 가능하나, **감정 흐름 일관성**은 반드시 유지한다.
+
+### 제작 영향도 (EP01 발견)
+
+| 단계 | 감정 전달 기여도 |
+|------|----------------|
+| 이미지 | **70%** |
+| 영상 | 20% |
+| 편집 | 10% |
+
+> 감정 품질은 편집이 아닌 이미지 설계에서 결정된다.
+> 이미지 SSOT를 가장 먼저, 가장 꼼꼼히 따른다.
+
+### SSOT 적용 순서
+
+모든 에피소드는 아래 순서로 SSOT를 읽고 제작한다.
+
+```
+1. SSOT-IMG-001 (이미지 생성 가이드)
+   ↓
+2. SSOT-VID-002 (영상 생성 가이드)
+   ↓
+3. OST SSOT (본 문서 §5)
+   ↓
+4. 편집 SSOT (본 문서 §6)
+```
 
 ---
 
@@ -185,7 +212,11 @@ OST (Mureka / Suno)
 
 ## 9. 관련 SSOT
 
-- [[SSOT-CHAR-001_Sowoni_Character_Bible]] — 소원이 캐릭터 기준
-- `media/DreamTown_Media_Architecture_SSOT.md` — 미디어 아키텍처
-- `media/DreamTown_Channel_Rendering_Rules_SSOT.md` — 채널별 렌더링 규칙
-- `air-engine/05_DERIVATION_PIPELINE.md` — canonical → 파생 파이프라인
+| 코드 | 파일 | 역할 |
+|------|------|------|
+| SSOT-CHAR-001 | [[SSOT-CHAR-001_Sowoni_Character_Bible]] | 소원이 캐릭터 기준 |
+| SSOT-IMG-001 | [[SSOT-IMG-001_DreamTown_Image_Generation_Guide]] | 이미지 생성 원칙 |
+| SSOT-VID-002 | [[SSOT-VID-002_Kling_Animation_Guide]] | 영상 생성 원칙 |
+| — | `media/DreamTown_Media_Architecture_SSOT.md` | 미디어 아키텍처 |
+| — | `media/DreamTown_Channel_Rendering_Rules_SSOT.md` | 채널별 렌더링 규칙 |
+| — | `air-engine/05_DERIVATION_PIPELINE.md` | canonical → 파생 파이프라인 |
