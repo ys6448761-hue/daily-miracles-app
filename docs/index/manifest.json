@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-05-30T01:38:48.350Z",
+  "generated_at": "2026-05-30T02:19:38.962Z",
   "generator": "generate-manifest.js",
-  "total_count": 335,
+  "total_count": 337,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -427,7 +427,7 @@
       "status": "다음 목표",
       "title": "DreamTown SSOT Index",
       "created_at": "내용",
-      "checksum": "17a94cf0"
+      "checksum": "0f94d653"
     },
     {
       "id": "DOC-SSOT_Registry_v2",
@@ -1152,11 +1152,11 @@
         "ssot",
         "소원"
       ],
-      "owner": "team",
+      "owner": "code",
       "status": "다음 목표",
-      "title": "DreamTown 영상·캐릭터 SSOT 인덱스",
+      "title": "DreamTown 영상·세계관 SSOT 인덱스",
       "created_at": "2026-05-30",
-      "checksum": "207f1ddd"
+      "checksum": "c42460b4"
     },
     {
       "id": "DOC-playground-events",
@@ -3430,6 +3430,24 @@
       "checksum": "34c70e05"
     },
     {
+      "id": "DOC-SSOT-ROUTE-001_EP01_Wish_Journ",
+      "path": "docs/ssot/episodes/SSOT-ROUTE-001_EP01_Wish_Journey.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "episodes",
+        "소원",
+        "aurora"
+      ],
+      "owner": "Aurora5",
+      "status": "Confirmed",
+      "title": "SSOT-ROUTE-001 — EP01 소원 여정 항로",
+      "created_at": "2026-05-30",
+      "checksum": "02fd90c7"
+    },
+    {
       "id": "DOC-STATE-EP01_Where_My_Heart_Beca",
       "path": "docs/ssot/episodes/STATE-EP01_Where_My_Heart_Became_A_Star.md",
       "type": "document",
@@ -3480,6 +3498,24 @@
       "title": "SSOT-IMG-001 — DreamTown 이미지 생성 가이드",
       "created_at": "2026-05-30",
       "checksum": "ce4122d5"
+    },
+    {
+      "id": "DOC-SSOT-LOC-001_DreamTown_Yeosu_L",
+      "path": "docs/ssot/media/SSOT-LOC-001_DreamTown_Yeosu_Locations.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "media",
+        "소원",
+        "aurora"
+      ],
+      "owner": "Aurora5",
+      "status": "Confirmed",
+      "title": "SSOT-LOC-001 — DreamTown 여수 장소 SSOT",
+      "created_at": "2026-05-30",
+      "checksum": "c933083c"
     },
     {
       "id": "DOC-SSOT-OPS-001_DreamTown_Video_P",

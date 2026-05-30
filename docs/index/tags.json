@@ -130,9 +130,11 @@
     "DOC-DreamTown_Master_Roadmap_v1",
     "DOC-DreamTown_MyStar_Visualization",
     "DOC-DREAMTOWN_WORLD_CANVAS_SSOT",
+    "DOC-SSOT-ROUTE-001_EP01_Wish_Journ",
     "DOC-STATE-EP01_Where_My_Heart_Beca",
     "DOC-STATE-EP02_The_Heart_Begins_To",
     "DOC-SSOT-IMG-001_DreamTown_Image_G",
+    "DOC-SSOT-LOC-001_DreamTown_Yeosu_L",
     "DOC-SSOT-OPS-001_DreamTown_Video_P",
     "DOC-SSOT-VID-002_Kling_Animation_G",
     "DOC-DreamTown_API_Spec_Design",
@@ -304,7 +306,9 @@
     "DOC-DreamTown_Intelligence_Agent_v",
     "DOC-DreamTown_Master_Roadmap_v1",
     "DOC-DreamTown_MyStar_Visualization",
+    "DOC-SSOT-ROUTE-001_EP01_Wish_Journ",
     "DOC-SSOT-IMG-001_DreamTown_Image_G",
+    "DOC-SSOT-LOC-001_DreamTown_Yeosu_L",
     "DOC-SSOT-OPS-001_DreamTown_Video_P",
     "DOC-SSOT-VID-002_Kling_Animation_G",
     "DOC-DreamTown_API_Spec_Design",
@@ -590,6 +594,7 @@
     "DOC-DreamTown_Channel_Rendering_Ru",
     "DOC-DreamTown_Media_Architecture_S",
     "DOC-SSOT-IMG-001_DreamTown_Image_G",
+    "DOC-SSOT-LOC-001_DreamTown_Yeosu_L",
     "DOC-SSOT-OPS-001_DreamTown_Video_P",
     "DOC-SSOT-VID-002_Kling_Animation_G"
   ],
@@ -949,6 +954,7 @@
     "DOC-UNFINISHED_TIME"
   ],
   "episodes": [
+    "DOC-SSOT-ROUTE-001_EP01_Wish_Journ",
     "DOC-STATE-EP01_Where_My_Heart_Beca",
     "DOC-STATE-EP02_The_Heart_Begins_To"
   ],
