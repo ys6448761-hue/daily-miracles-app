@@ -128,6 +128,29 @@ docs/ssot/
 | `DreamTown_Safety_Ethics_SSOT.md` | 신호등, 금지 조언, 위기 대응 | 안전·윤리 관련 모든 작업 전 |
 | `DreamTown_Aurora5_System_SSOT.md` | Aurora5 팀, 메시지 시스템 | AI 동행 시스템 작업 전 |
 | `DreamTown_Miracle_System_SSOT.md` | 기적 카드, 기적지수, 별 성장 | 기적·신호등·기적지수 전 |
+| `SSOT-CHAR-001_Sowoni_Character_Bible.md` | 소원이 캐릭터 바이블 — 고정 비주얼·감정 표현·금지 항목 | 이미지·영상·캐릭터 제작 전 |
+
+---
+
+## Media SSOT (4개) — `docs/ssot/media/`
+
+**영상·채널·파이프라인 운영 기준.**
+
+| 파일 | 핵심 내용 | 필독 시점 |
+|------|----------|----------|
+| `DreamTown_Media_Architecture_SSOT.md` | 미디어 아키텍처 전체 | 미디어 기획 전 |
+| `DreamTown_Channel_Rendering_Rules_SSOT.md` | 채널별 렌더링 규칙 | 채널 배포 전 |
+| `SSOT-OPS-001_DreamTown_Video_Pipeline.md` | **영상 제작 운영 파이프라인** — 이미지→영상→OST→편집→배포 전 과정 | 영상 제작 착수 전 |
+
+---
+
+## Episode States — `docs/ssot/episodes/`
+
+**에피소드별 감정 진행도 상태. 다음 제작자가 반드시 이어받는다.**
+
+| 파일 | 에피소드 | 감정 상태 | 다음 목표 |
+|------|---------|----------|----------|
+| `STATE-EP01_Where_My_Heart_Became_A_Star.md` | EP01 완료 | 슬픔 60 / 희망 40 | 마음을 열기 |
 
 ---
 
