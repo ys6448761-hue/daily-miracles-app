@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-05-31T01:07:39.147Z",
+  "generated_at": "2026-05-31T01:12:19.463Z",
   "generator": "generate-manifest.js",
-  "total_count": 337,
+  "total_count": 340,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -427,7 +427,7 @@
       "status": "다음 목표",
       "title": "DreamTown SSOT Index",
       "created_at": "내용",
-      "checksum": "0f94d653"
+      "checksum": "84d06d23"
     },
     {
       "id": "DOC-SSOT_Registry_v2",
@@ -3290,6 +3290,42 @@
       "checksum": "d2a80bc7"
     },
     {
+      "id": "DOC-SSOT-EXP-001_DreamTown_Expansi",
+      "path": "docs/ssot/core/SSOT-EXP-001_DreamTown_Expansion_Guide.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "core",
+        "소원",
+        "aurora"
+      ],
+      "owner": "Aurora5",
+      "status": "Confirmed",
+      "title": "SSOT-EXP-001 — DreamTown 확장 가이드",
+      "created_at": "2026-05-31",
+      "checksum": "24cbb5f3"
+    },
+    {
+      "id": "DOC-SSOT-WORLD-001_DreamTown_Philo",
+      "path": "docs/ssot/core/SSOT-WORLD-001_DreamTown_Philosophy.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "core",
+        "소원",
+        "aurora"
+      ],
+      "owner": "Aurora5",
+      "status": "Confirmed",
+      "title": "SSOT-WORLD-001 — DreamTown 철학 선언",
+      "created_at": "2026-05-31",
+      "checksum": "6eb8974b"
+    },
+    {
       "id": "DOC-DreamTown_Asset_Taxonomy_v1",
       "path": "docs/ssot/dreamtown/DreamTown_Asset_Taxonomy_v1.md",
       "type": "document",
@@ -3445,7 +3481,7 @@
       "status": "Confirmed",
       "title": "SSOT-ROUTE-001 — EP01 소원 여정 항로",
       "created_at": "2026-05-31",
-      "checksum": "02fd90c7"
+      "checksum": "5ce50c53"
     },
     {
       "id": "DOC-STATE-EP01_Where_My_Heart_Beca",
@@ -3482,6 +3518,24 @@
       "checksum": "c88ab665"
     },
     {
+      "id": "DOC-SSOT-DESIGN-001_Reverse_Emotio",
+      "path": "docs/ssot/media/SSOT-DESIGN-001_Reverse_Emotional_Design.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "media",
+        "소원",
+        "aurora"
+      ],
+      "owner": "Aurora5",
+      "status": "Confirmed",
+      "title": "SSOT-DESIGN-001 — DreamTown 역순 감정 설계",
+      "created_at": "2026-05-31",
+      "checksum": "ab83e21f"
+    },
+    {
       "id": "DOC-SSOT-IMG-001_DreamTown_Image_G",
       "path": "docs/ssot/media/SSOT-IMG-001_DreamTown_Image_Generation_Guide.md",
       "type": "document",
@@ -3497,7 +3551,7 @@
       "status": "Confirmed",
       "title": "SSOT-IMG-001 — DreamTown 이미지 생성 가이드",
       "created_at": "2026-05-31",
-      "checksum": "61d200b2"
+      "checksum": "2cd9bb86"
     },
     {
       "id": "DOC-SSOT-LOC-001_DreamTown_Yeosu_L",
@@ -3551,7 +3605,7 @@
       "status": "Confirmed",
       "title": "SSOT-VID-002 — DreamTown 영상 생성 가이드",
       "created_at": "2026-05-31",
-      "checksum": "843db734"
+      "checksum": "95ecd828"
     },
     {
       "id": "DOC-DreamTown_API_Spec_Design",

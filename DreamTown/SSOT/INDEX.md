@@ -9,14 +9,33 @@
 새 파트너 / 새 세션은 아래 순서대로 읽는다.
 
 ```
+0. SSOT-WORLD-001  DreamTown 철학을 이해한다 ← 반드시 먼저
 1. SSOT-CHAR-001   소원이를 이해한다
 2. SSOT-LOC-001    여수 장소의 감정 역할을 이해한다
 3. SSOT-ROUTE-001  EP01 항로 순서를 이해한다
-4. SSOT-IMG-001    이미지 생성 기준을 확인한다 ← 감정 품질 70%
-5. SSOT-VID-002    영상 생성 기준을 확인한다
-6. SSOT-OPS-001    전체 파이프라인을 확인한다
-7. STATE-EP0X      직전 에피소드 감정 상태를 이어받는다
+4. SSOT-DESIGN-001 역순 감정 설계 방법론을 이해한다
+5. SSOT-IMG-001    이미지 생성 기준을 확인한다 ← 감정 품질 70%
+6. SSOT-VID-002    영상 생성 기준을 확인한다
+7. SSOT-OPS-001    전체 파이프라인을 확인한다
+8. STATE-EP0X      직전 에피소드 감정 상태를 이어받는다
 ```
+
+---
+
+## <a name="world"></a> 철학 SSOT
+
+| 코드 | 파일 | 핵심 |
+|------|------|------|
+| SSOT-WORLD-001 | [DreamTown_Philosophy](../../docs/ssot/core/SSOT-WORLD-001_DreamTown_Philosophy.md) | 감정 회복 설계 프로젝트 선언 / 5대 원칙 / 제작 판단 기준 |
+| SSOT-EXP-001 | [DreamTown_Expansion_Guide](../../docs/ssot/core/SSOT-EXP-001_DreamTown_Expansion_Guide.md) | Level 1~5 확장 방향 / 감정 네비게이션 / Universe 기준 |
+
+---
+
+## <a name="design"></a> 설계 방법론 SSOT
+
+| 코드 | 파일 | 핵심 |
+|------|------|------|
+| SSOT-DESIGN-001 | [Reverse_Emotional_Design](../../docs/ssot/media/SSOT-DESIGN-001_Reverse_Emotional_Design.md) | 역순 감정 설계 / 엔딩 문장 먼저 / EP01 적용 사례 |
 
 ---
 

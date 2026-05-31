@@ -128,6 +128,8 @@ docs/ssot/
 | `DreamTown_Safety_Ethics_SSOT.md` | 신호등, 금지 조언, 위기 대응 | 안전·윤리 관련 모든 작업 전 |
 | `DreamTown_Aurora5_System_SSOT.md` | Aurora5 팀, 메시지 시스템 | AI 동행 시스템 작업 전 |
 | `DreamTown_Miracle_System_SSOT.md` | 기적 카드, 기적지수, 별 성장 | 기적·신호등·기적지수 전 |
+| `SSOT-WORLD-001_DreamTown_Philosophy.md` | **DreamTown 철학** — 감정 회복 설계 선언·5대 원칙·제작 판단 기준 | **모든 작업 전 (최우선)** |
+| `SSOT-EXP-001_DreamTown_Expansion_Guide.md` | **확장 가이드** — Level 1~5 방향·감정 네비게이션·Universe 기준 | 신규 에피소드·기능 기획 전 |
 | `SSOT-CHAR-001_Sowoni_Character_Bible.md` | 소원이 캐릭터 바이블 — 고정 비주얼·감정 표현·금지 항목 | 이미지·영상·캐릭터 제작 전 |
 
 ---
@@ -140,6 +142,7 @@ docs/ssot/
 |------|----------|----------|
 | `DreamTown_Media_Architecture_SSOT.md` | 미디어 아키텍처 전체 | 미디어 기획 전 |
 | `DreamTown_Channel_Rendering_Rules_SSOT.md` | 채널별 렌더링 규칙 | 채널 배포 전 |
+| `SSOT-DESIGN-001_Reverse_Emotional_Design.md` | **역순 감정 설계** — 엔딩에서 역산·EP01 적용 사례·에피소드별 엔딩 기준 | 새 에피소드 항로 설계 전 |
 | `SSOT-OPS-001_DreamTown_Video_Pipeline.md` | **영상 제작 운영 파이프라인 v2** — 이미지 70% 원칙 + SSOT 적용 순서 | 영상 제작 착수 전 |
 | `SSOT-IMG-001_DreamTown_Image_Generation_Guide.md` | **이미지 생성 가이드** — 비주얼 스타일·카메라 원칙·감정 버전(Original/Positive) | 이미지 생성 전 (최우선) |
 | `SSOT-VID-002_Kling_Animation_Guide.md` | **영상 생성 가이드** — 금지 목록·권장 움직임·EP01 기준·도구별 메모 | 영상 생성 전 |

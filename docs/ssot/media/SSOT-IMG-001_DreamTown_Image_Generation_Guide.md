@@ -163,8 +163,35 @@ DreamTown은 캐릭터 중심 콘텐츠가 아니다.
 
 ---
 
-## 7. 관련 SSOT
+## 7. 엔딩 이미지 규칙
 
+DreamTown의 엔딩은 상실이 아니라 **회복**이다.
+
+소원이는 별이 되는 존재가 아니라,
+**별을 발견하고 다시 걸어가는 존재**다.
+
+### 금지
+
+- 주인공 완전 소멸
+- 죽음으로 해석되는 연출
+- 등대 불빛 소멸
+- 도시 불빛 소멸
+- 별만 남는 엔딩 (소원이 없는 엔딩)
+
+### 허용
+
+- 소원이 뒷모습
+- 하늘 또는 별을 바라봄
+- 작은 미소
+- 등대 불빛 유지
+- 새로운 별 등장
+- 희망의 여운이 남는 장면
+
+---
+
+## 8. 관련 SSOT
+
+- [[SSOT-WORLD-001_DreamTown_Philosophy]] — DreamTown 철학 (상위 기준)
 - [[SSOT-CHAR-001_Sowoni_Character_Bible]] — 소원이 캐릭터 원칙
 - [[SSOT-OPS-001_DreamTown_Video_Pipeline]] — 전체 제작 파이프라인
 - [[SSOT-VID-002_Kling_Animation_Guide]] — 이미지 → 영상 변환 기준
