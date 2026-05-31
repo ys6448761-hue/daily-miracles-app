@@ -130,6 +130,7 @@ docs/ssot/
 | `DreamTown_Miracle_System_SSOT.md` | 기적 카드, 기적지수, 별 성장 | 기적·신호등·기적지수 전 |
 | `SSOT-WORLD-001_DreamTown_Philosophy.md` | **DreamTown 철학** — 감정 회복 설계 선언·5대 원칙·제작 판단 기준 | **모든 작업 전 (최우선)** |
 | `SSOT-EXP-001_DreamTown_Expansion_Guide.md` | **확장 가이드** — Level 1~5 방향·감정 네비게이션·Universe 기준 | 신규 에피소드·기능 기획 전 |
+| `SSOT-BIZ-001_DreamTown_Business_Model.md` | **비즈니스 모델** — 케이블카·유람선 가격 체계 (판매가/입금가/마진) | 결제·예약 가격 설정 전 |
 | `SSOT-CHAR-001_Sowoni_Character_Bible.md` | 소원이 캐릭터 바이블 — 고정 비주얼·감정 표현·금지 항목 | 이미지·영상·캐릭터 제작 전 |
 
 ---
@@ -143,6 +144,7 @@ docs/ssot/
 | `DreamTown_Media_Architecture_SSOT.md` | 미디어 아키텍처 전체 | 미디어 기획 전 |
 | `DreamTown_Channel_Rendering_Rules_SSOT.md` | 채널별 렌더링 규칙 | 채널 배포 전 |
 | `SSOT-DESIGN-001_Reverse_Emotional_Design.md` | **역순 감정 설계** — 엔딩에서 역산·EP01 적용 사례·에피소드별 엔딩 기준 | 새 에피소드 항로 설계 전 |
+| `SSOT-BIZ-004_DreamTown_Operating_Model.md` | **운영 모델** — 하멜등대 이후 자유선택 원칙·안내 문구·강제 일정 금지 | 운영·결제 안내 전 |
 | `SSOT-OPS-001_DreamTown_Video_Pipeline.md` | **영상 제작 운영 파이프라인 v2** — 이미지 70% 원칙 + SSOT 적용 순서 | 영상 제작 착수 전 |
 | `SSOT-IMG-001_DreamTown_Image_Generation_Guide.md` | **이미지 생성 가이드** — 비주얼 스타일·카메라 원칙·감정 버전(Original/Positive) | 이미지 생성 전 (최우선) |
 | `SSOT-VID-002_Kling_Animation_Guide.md` | **영상 생성 가이드** — 금지 목록·권장 움직임·EP01 기준·도구별 메모 | 영상 생성 전 |
@@ -159,6 +161,7 @@ docs/ssot/
 | `STATE-EP01_Where_My_Heart_Became_A_Star.md` | EP01 완료 | 슬픔 60 / 희망 40 | 마음을 열기 |
 | `STATE-EP02_The_Heart_Begins_To_Open.md` | EP02 제작중 | 슬픔 40 / 희망 60 (목표) | 소원을 말하기 |
 | `SSOT-ROUTE-001_EP01_Wish_Journey.md` | EP01 항로 확정 | 7개 장소 순서 고정 | — |
+| `SSOT-TIME-001_EP01_Timeflow.md` | EP01 운영 시간 기준 | 케이블카~하멜등대~자유선택 / 가격 포함 | 예약·결제 운영 전 |
 
 ---
 

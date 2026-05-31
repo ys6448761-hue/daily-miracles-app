@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-05-31T01:12:19.463Z",
+  "generated_at": "2026-05-31T06:25:27.974Z",
   "generator": "generate-manifest.js",
-  "total_count": 340,
+  "total_count": 343,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -421,13 +421,15 @@
         "ssot",
         "소원",
         "storybook",
-        "aurora"
+        "aurora",
+        "가격",
+        "결제"
       ],
       "owner": "rumi",
       "status": "다음 목표",
       "title": "DreamTown SSOT Index",
       "created_at": "내용",
-      "checksum": "84d06d23"
+      "checksum": "cc4addec"
     },
     {
       "id": "DOC-SSOT_Registry_v2",
@@ -3272,6 +3274,25 @@
       "checksum": "c3eeb3f1"
     },
     {
+      "id": "DOC-SSOT-BIZ-001_DreamTown_Busines",
+      "path": "docs/ssot/core/SSOT-BIZ-001_DreamTown_Business_Model.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "core",
+        "aurora",
+        "가격",
+        "결제"
+      ],
+      "owner": "Aurora5",
+      "status": "Confirmed",
+      "title": "SSOT-BIZ-001 — DreamTown 비즈니스 모델",
+      "created_at": "2026-05-31",
+      "checksum": "a15acb6a"
+    },
+    {
       "id": "DOC-SSOT-CHAR-001_Sowoni_Character",
       "path": "docs/ssot/core/SSOT-CHAR-001_Sowoni_Character_Bible.md",
       "type": "document",
@@ -3482,6 +3503,25 @@
       "title": "SSOT-ROUTE-001 — EP01 소원 여정 항로",
       "created_at": "2026-05-31",
       "checksum": "5ce50c53"
+    },
+    {
+      "id": "DOC-SSOT-TIME-001_EP01_Timeflow",
+      "path": "docs/ssot/episodes/SSOT-TIME-001_EP01_Timeflow.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "episodes",
+        "소원",
+        "aurora",
+        "가격"
+      ],
+      "owner": "Aurora5",
+      "status": "Confirmed",
+      "title": "SSOT-TIME-001 — EP01 별빛항로 타임플로우",
+      "created_at": "2026-05-31",
+      "checksum": "8a639d16"
     },
     {
       "id": "DOC-STATE-EP01_Where_My_Heart_Beca",
@@ -4039,6 +4079,25 @@
       "title": "DreamTown Yeosu Galaxy SSOT",
       "created_at": "2026-05-31",
       "checksum": "fb61049e"
+    },
+    {
+      "id": "DOC-SSOT-BIZ-004_DreamTown_Operati",
+      "path": "docs/ssot/support/SSOT-BIZ-004_DreamTown_Operating_Model.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "support",
+        "aurora",
+        "가격",
+        "결제"
+      ],
+      "owner": "Aurora5",
+      "status": "Confirmed",
+      "title": "SSOT-BIZ-004 — DreamTown 운영 모델",
+      "created_at": "2026-05-31",
+      "checksum": "9cd5ac6e"
     },
     {
       "id": "DOC-quantum-planning-method",
