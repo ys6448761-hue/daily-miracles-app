@@ -133,6 +133,7 @@
     "DOC-DreamTown_MyStar_Visualization",
     "DOC-DREAMTOWN_WORLD_CANVAS_SSOT",
     "DOC-SSOT-ROUTE-001_EP01_Wish_Journ",
+    "DOC-SSOT-ROUTE-002_EP01_Experience",
     "DOC-SSOT-TIME-001_EP01_Timeflow",
     "DOC-STATE-EP01_Where_My_Heart_Beca",
     "DOC-STATE-EP02_The_Heart_Begins_To",
@@ -315,6 +316,7 @@
     "DOC-DreamTown_Master_Roadmap_v1",
     "DOC-DreamTown_MyStar_Visualization",
     "DOC-SSOT-ROUTE-001_EP01_Wish_Journ",
+    "DOC-SSOT-ROUTE-002_EP01_Experience",
     "DOC-SSOT-TIME-001_EP01_Timeflow",
     "DOC-SSOT-DESIGN-001_Reverse_Emotio",
     "DOC-SSOT-IMG-001_DreamTown_Image_G",
@@ -468,6 +470,7 @@
     "DOC-tax-accounting-ai-tools-analys",
     "DOC-06_External_Sharing_Guide",
     "DOC-SSOT-BIZ-001_DreamTown_Busines",
+    "DOC-SSOT-ROUTE-002_EP01_Experience",
     "DOC-SSOT-TIME-001_EP01_Timeflow",
     "DOC-DreamTown_Product_Structure_SS",
     "DOC-DreamTown_Travel_System_SSOT",
@@ -978,6 +981,7 @@
   ],
   "episodes": [
     "DOC-SSOT-ROUTE-001_EP01_Wish_Journ",
+    "DOC-SSOT-ROUTE-002_EP01_Experience",
     "DOC-SSOT-TIME-001_EP01_Timeflow",
     "DOC-STATE-EP01_Where_My_Heart_Beca",
     "DOC-STATE-EP02_The_Heart_Begins_To"

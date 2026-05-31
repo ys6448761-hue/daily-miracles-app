@@ -160,7 +160,8 @@ docs/ssot/
 |------|---------|----------|----------|
 | `STATE-EP01_Where_My_Heart_Became_A_Star.md` | EP01 완료 | 슬픔 60 / 희망 40 | 마음을 열기 |
 | `STATE-EP02_The_Heart_Begins_To_Open.md` | EP02 제작중 | 슬픔 40 / 희망 60 (목표) | 소원을 말하기 |
-| `SSOT-ROUTE-001_EP01_Wish_Journey.md` | EP01 항로 확정 | 7개 장소 순서 고정 | — |
+| `SSOT-ROUTE-001_EP01_Wish_Journey.md` | EP01 **영상 콘텐츠용** 항로 | 하멜등대 종료 / 7개 장소 순서 고정 | 영상 제작 전 |
+| `SSOT-ROUTE-002_EP01_Experience_Route.md` | EP01 **실제 체험** Route | 1박 2일 / Day 2 귀가까지 / 오동도·모이핀·장도 포함 | 체험 운영 전 |
 | `SSOT-TIME-001_EP01_Timeflow.md` | EP01 운영 시간 기준 | 케이블카~하멜등대~자유선택 / 가격 포함 | 예약·결제 운영 전 |
 
 ---

@@ -1,16 +1,27 @@
 ---
 code: SSOT-ROUTE-001
-title: EP01 소원 여정 항로
+title: EP01 소원 여정 항로 — 영상 콘텐츠용
 episode: EP01
 status: Confirmed
 owner: Aurora5
 created: 2026-05-30
+updated: 2026-06-01
 layer: LAYER 2 — Operational SSOT
 ---
 
-# SSOT-ROUTE-001 — EP01 소원 여정 항로
+# SSOT-ROUTE-001 — EP01 영상 콘텐츠용 감정 항로
 
 ## 목적
+
+이 문서는 **영상 콘텐츠 제작용** 감정 항로 기준이다.
+
+> **실제 체험 1박 2일 Route → SSOT-ROUTE-002 참조**
+
+| 구분 | 이 문서 | SSOT-ROUTE-002 |
+|------|---------|----------------|
+| 용도 | 영상 콘텐츠 | 실제 고객 체험 |
+| 종료 지점 | **하멜등대** | Day 2 귀가 |
+| 최종 감정 | 여수에서, 내 소원이 다시 빛나기 시작했다 | 집으로 돌아가도 괜찮을 것 같다 |
 
 같은 장소라도 순서가 바뀌면 감정이 완전히 달라진다.
 
@@ -155,8 +166,20 @@ EP01은 시작점이 아니라 **엔딩 감정**에서 설계됐다.
 
 ---
 
+## 영상 Route 종료 원칙
+
+영상 Route는 **하멜등대에서 종료**한다.
+
+> 최종 감정: "여수에서, 내 소원이 다시 빛나기 시작했다."
+
+하멜등대 이후(Day 2 귀가까지)는 SSOT-ROUTE-002에서 관리한다.
+영상 Route는 하멜등대 이후를 다루지 않는다.
+
+---
+
 ## 관련 SSOT
 
+- [[SSOT-ROUTE-002_EP01_Experience_Route]] — EP01 실제 체험 Route (1박 2일, Day 2 귀가까지)
 - [[SSOT-LOC-001_DreamTown_Yeosu_Locations]] — 장소 감정 역할 정의
 - [[STATE-EP01_Where_My_Heart_Became_A_Star]] — EP01 감정 상태 로그
 - [[SSOT-IMG-001_DreamTown_Image_Generation_Guide]] — 이미지 생성 원칙

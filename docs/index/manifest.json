@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-05-31T06:30:35.546Z",
+  "generated_at": "2026-05-31T21:13:16.477Z",
   "generator": "generate-manifest.js",
-  "total_count": 343,
+  "total_count": 344,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -429,7 +429,7 @@
       "status": "다음 목표",
       "title": "DreamTown SSOT Index",
       "created_at": "내용",
-      "checksum": "cc4addec"
+      "checksum": "46417fbc"
     },
     {
       "id": "DOC-SSOT_Registry_v2",
@@ -3290,7 +3290,7 @@
       "status": "Confirmed",
       "title": "SSOT-BIZ-001 — DreamTown 비즈니스 모델",
       "created_at": "2026-05-31",
-      "checksum": "f528af9e"
+      "checksum": "7fa51508"
     },
     {
       "id": "DOC-SSOT-CHAR-001_Sowoni_Character",
@@ -3344,7 +3344,7 @@
       "status": "Confirmed",
       "title": "SSOT-WORLD-001 — DreamTown 철학 선언",
       "created_at": "2026-05-31",
-      "checksum": "6eb8974b"
+      "checksum": "382f069b"
     },
     {
       "id": "DOC-DreamTown_Asset_Taxonomy_v1",
@@ -3500,9 +3500,28 @@
       ],
       "owner": "Aurora5",
       "status": "Confirmed",
-      "title": "SSOT-ROUTE-001 — EP01 소원 여정 항로",
+      "title": "SSOT-ROUTE-001 — EP01 영상 콘텐츠용 감정 항로",
       "created_at": "2026-05-31",
-      "checksum": "5ce50c53"
+      "checksum": "bd083db0"
+    },
+    {
+      "id": "DOC-SSOT-ROUTE-002_EP01_Experience",
+      "path": "docs/ssot/episodes/SSOT-ROUTE-002_EP01_Experience_Route.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "episodes",
+        "소원",
+        "aurora",
+        "가격"
+      ],
+      "owner": "Aurora5",
+      "status": "Confirmed",
+      "title": "SSOT-ROUTE-002 — EP01 별빛항로 실제 체험 Route",
+      "created_at": "2026-05-31",
+      "checksum": "5f8b23b0"
     },
     {
       "id": "DOC-SSOT-TIME-001_EP01_Timeflow",
