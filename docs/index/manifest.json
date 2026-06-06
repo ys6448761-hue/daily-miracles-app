@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-06T20:32:40.301Z",
+  "generated_at": "2026-06-06T20:49:48.399Z",
   "generator": "generate-manifest.js",
   "total_count": 345,
   "documents": [
@@ -4080,7 +4080,7 @@
       "status": "|------",
       "title": "DreamTown Travel System SSOT",
       "created_at": "2026-06-06",
-      "checksum": "90d9f9e1"
+      "checksum": "71701edc"
     },
     {
       "id": "DOC-DreamTown_Video_Pipeline_Desig",
