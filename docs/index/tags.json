@@ -142,6 +142,7 @@
     "DOC-SSOT-LOC-001_DreamTown_Yeosu_L",
     "DOC-SSOT-OPS-001_DreamTown_Video_P",
     "DOC-SSOT-VID-002_Kling_Animation_G",
+    "DOC-SSOT-PRICE-001",
     "DOC-DreamTown_API_Spec_Design",
     "DOC-DreamTown_Aurum_System_Design",
     "DOC-DreamTown_Character_Style_Guid",
@@ -323,6 +324,7 @@
     "DOC-SSOT-LOC-001_DreamTown_Yeosu_L",
     "DOC-SSOT-OPS-001_DreamTown_Video_P",
     "DOC-SSOT-VID-002_Kling_Animation_G",
+    "DOC-SSOT-PRICE-001",
     "DOC-DreamTown_API_Spec_Design",
     "DOC-DreamTown_Aurum_System_Design",
     "DOC-DreamTown_Character_Style_Guid",
@@ -472,6 +474,7 @@
     "DOC-SSOT-BIZ-001_DreamTown_Busines",
     "DOC-SSOT-ROUTE-002_EP01_Experience",
     "DOC-SSOT-TIME-001_EP01_Timeflow",
+    "DOC-SSOT-PRICE-001",
     "DOC-DreamTown_Product_Structure_SS",
     "DOC-DreamTown_Travel_System_SSOT",
     "DOC-SSOT-BIZ-004_DreamTown_Operati",
@@ -551,6 +554,7 @@
     "DOC-DreamTown_KPI_Checklist",
     "DOC-drive-github-sync-setup",
     "DOC-sens-setup-guide",
+    "DOC-SSOT-PRICE-001",
     "DOC-INCIDENT-20260302-001"
   ],
   "ops-bundle": [
