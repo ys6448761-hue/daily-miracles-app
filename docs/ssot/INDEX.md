@@ -236,3 +236,4 @@ docs/ssot/
 | v4.1 | 2026-05-11 | Copy System SSOT 섹션 추가 — 포스트카드 감정 문장 v1 |
 | v5.1 | 2026-05-22 | Emotion SSOT 섹션 추가 — EMOT-TRANS-001 (gravity interpreter v1 승격) |
 | v5.2 | 2026-06-06 | Ops SSOT 섹션 신설 — SSOT-PRICE-001 별빛항로 가격체계 v1.0 등록 |
+| v5.3 | 2026-06-06 | SSOT-PRICE-001 rev.3 — 단체 35,000 / 원가구조 명시 (재료 10,000 + 인건비 15,000) |
