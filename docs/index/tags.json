@@ -261,6 +261,7 @@
     "DOC-code-guide-v3",
     "DOC-정산-v2-CEO-요약",
     "DOC-CHANGELOG",
+    "DOC-DEC-OPS-001_Partner_Master_SSO",
     "DOC-SOURCES_INDEX",
     "DOC-AURORA5_CHARACTER_PROMPTS",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
@@ -778,6 +779,7 @@
     "DOC-SOURCES_INDEX"
   ],
   "decisions": [
+    "DOC-DEC-OPS-001_Partner_Master_SSO",
     "DOC-DEC_2026_0516_CANONICAL_RATIO_",
     "DOC-DEC_2026_0516_OUTPUT_STRATEGY",
     "DOC-DEC-20260201-포인트추천예고편-정책구현",

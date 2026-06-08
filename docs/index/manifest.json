@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-08T01:04:31.728Z",
+  "generated_at": "2026-06-08T01:14:21.859Z",
   "generator": "generate-manifest.js",
-  "total_count": 346,
+  "total_count": 347,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -429,7 +429,7 @@
       "status": "다음 목표",
       "title": "DreamTown SSOT Index",
       "created_at": "내용",
-      "checksum": "73a462f4"
+      "checksum": "4a9a7925"
     },
     {
       "id": "DOC-SSOT_Registry_v2",
@@ -742,6 +742,23 @@
       "title": "SSOT 변경 로그 (CHANGELOG)",
       "created_at": "2026-06-08",
       "checksum": "457ae6bf"
+    },
+    {
+      "id": "DOC-DEC-OPS-001_Partner_Master_SSO",
+      "path": "docs/archive/decisions/DEC-OPS-001_Partner_Master_SSOT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "archive",
+      "tags": [
+        "decisions",
+        "aurora"
+      ],
+      "owner": "Aurora5 / (주)여수여행센터",
+      "status": "Confirmed",
+      "title": "DEC-OPS-001 — Partner Master Single Source of Truth",
+      "created_at": "2026-06-08",
+      "checksum": "f392e418"
     },
     {
       "id": "DOC-DEC_2026_0516_CANONICAL_RATIO_",
@@ -3682,7 +3699,7 @@
       "status": "Template (데이터 미입력)",
       "title": "PARTNER-MASTER-V1 — DreamTown 제휴처 마스터 데이터 명세",
       "created_at": "2026-06-08",
-      "checksum": "fad800b5"
+      "checksum": "75b9929b"
     },
     {
       "id": "DOC-SSOT-PRICE-001",

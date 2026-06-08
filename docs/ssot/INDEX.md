@@ -104,6 +104,7 @@ docs/ssot/
 | 파일 | 결정 내용 |
 |------|----------|
 | `DEC_2026_0516_OUTPUT_STRATEGY.md` | 16:9 canonical / Shorts-first 금지 결정 배경 |
+| `DEC-OPS-001_Partner_Master_SSOT.md` | **제휴처 데이터 원본 = PARTNER_MASTER** — DB 조회로 운영 원본 사용 금지 |
 
 ---
 
@@ -238,3 +239,4 @@ docs/ssot/
 | v5.1 | 2026-05-22 | Emotion SSOT 섹션 추가 — EMOT-TRANS-001 (gravity interpreter v1 승격) |
 | v5.2 | 2026-06-06 | Ops SSOT 섹션 신설 — SSOT-PRICE-001 별빛항로 가격체계 v1.0 등록 |
 | v5.3 | 2026-06-06 | SSOT-PRICE-001 rev.3 — 단체 35,000 / 원가구조 명시 (재료 10,000 + 인건비 15,000) |
+| v5.4 | 2026-06-08 | DEC-OPS-001 — PARTNER_MASTER를 제휴처 단일 원본으로 확정 |

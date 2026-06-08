@@ -10,6 +10,10 @@ layer: LAYER 2 — Operational SSOT
 
 # PARTNER-MASTER-V1 — DreamTown 제휴처 마스터 데이터 명세
 
+> **[DEC-OPS-001]** 제휴처 데이터의 원본은 이 문서(`partner_master.csv`)다.
+> DB는 파생물이다. 탐색 시 DB 조회 전 이 파일을 먼저 확인한다.
+> 상세 결정: `docs/archive/decisions/DEC-OPS-001_Partner_Master_SSOT.md`
+
 > 이 문서는 Benefit Engine 운영을 위한 제휴처 데이터의 **단일 진실 소스**다.
 > 업체 등록 전 이 명세를 먼저 완성하고, `partner_master_seed.sql`로 DB에 적재한다.
 > AdminBenefitPage(`/admin/benefit`)의 입력 항목과 1:1 매핑된다.
