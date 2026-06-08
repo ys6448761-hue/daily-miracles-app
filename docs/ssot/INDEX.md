@@ -222,6 +222,7 @@ docs/ssot/
 | 파일 | 코드 | 핵심 내용 | Status | 필독 시점 |
 |------|------|----------|--------|----------|
 | `SSOT-PRICE-001.md` | SSOT-PRICE-001 | 별빛항로 가격 체계 v1.0 — 3층 가격 구조·숙박/교통/식사/차량 단가·FIT/단체 판매가·마진 배분·채널 정책 | Confirmed (일부 TBD) | 상품 가격 설정·견적·결제 안내 전 |
+| `PARTNER_MASTER_V1.md` | PARTNER-MASTER-V1 | 제휴처 마스터 명세 — partner_code 규칙·카테고리·benefit_type·route_code·settlement 표준·카테고리별 필수입력 체크리스트 | Template (데이터 미입력) | 제휴처 DB 등록 전 반드시 참조 |
 
 ---
 
