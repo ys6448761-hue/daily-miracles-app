@@ -1,0 +1,13 @@
+partner_code,partner_name,category,city_code,address,lat,lng,phone,description,benefit_type,benefit_title,benefit_description,benefit_display_copy,benefit_location_hint,route_code,settlement_policy_type,commission_rate,net_amount,status
+YS-CF-001,프롬나드,cafe,yeosu,전남 여수시 돌산읍 우두3길 98,,,061-641-1248,TBD,free,아메리카노 1인 무료,2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료,TBD,TBD,starlit,TBD,,,active
+YS-CF-002,더 포레스트랜드,cafe,yeosu,전남 여수시 돌산읍 월암길 144,,,0507-1367-6458,TBD,free,아메리카노 1인 무료,2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료,TBD,TBD,starlit,TBD,,,active
+YS-CF-003,엘리스테이 카페,cafe,yeosu,전남 여수시 돌산읍 백초길 28-52,,,0507-1371-2956,TBD,free,아메리카노 1인 무료,2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료,TBD,TBD,starlit,TBD,,,active
+YS-CF-004,라또아 카페,cafe,yeosu,전남 여수시 공화남3길 32 5층 전층,,,061-666-5811,TBD,free,아메리카노 1인 무료,2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료,TBD,TBD,starlit,TBD,,,active
+YS-CF-005,카프아일랜드,cafe,yeosu,전남 여수시 망양로 192,,,0507-1312-4005,TBD,free,아메리카노 1인 무료,2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료,TBD,TBD,starlit,TBD,,,active
+YS-CF-006,메리엘 카페,cafe,yeosu,전남 여수시 만성리길 62,,,0507-1306-5679,TBD,free,아메리카노 1인 무료,2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료,TBD,TBD,starlit,TBD,,,active
+YS-CF-007,카페하루,cafe,yeosu,전남 여수시 돌산읍 강남해안로 61,,,010-8878-2905,TBD,free,아메리카노 1인 무료,2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료,TBD,TBD,starlit,TBD,,,active
+YS-CF-008,모이핀,cafe,yeosu,전남 여수시 돌산읍 무술목길 50,,,061-641-8300,TBD,free,아메리카노 1인 무료,2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료,TBD,TBD,starlit,TBD,,,active
+YS-NT-001,해공 노래방,night,yeosu,여수시 이순신광장로 165,,,TBD,TBD,discount,20% 할인,TBD,TBD,TBD,moonlight,TBD,,,active
+YS-RS-001,범앗간,restaurant,yeosu,여수시 이순신광장로 159,,,0507-1436-1486,TBD,gift,음료 1병 무료,TBD,TBD,TBD,moonlight,TBD,,,active
+YS-NT-002,인생네컷 오락실,night,yeosu,여수시 이순신광장로 159,,,010-8608-3005,TBD,gift,2000원 지급,TBD,TBD,TBD,moonlight,TBD,,,active
+YS-ET-001,풍선터트리기,etc,yeosu,여수시 이순신광장로 159,,,010-8608-3005,TBD,discount,2000원 할인,TBD,TBD,TBD,moonlight,TBD,,,active
