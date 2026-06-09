@@ -1,5 +1,5 @@
 /**
- * DreamTown Asset OS — Google Apps Script
+ * DreamTown Asset OS — Google Apps Script  v2
  * 시트: Asset_Master / Video_Master / SSOT / Partner
  *
  * 설치 방법:
@@ -18,10 +18,10 @@
 
 // ── 컬럼 헤더 정의 ─────────────────────────────────────────────
 const HEADERS = {
-  Asset_Master: ['File Name','Country','Route','EP','Location','Type','Sub-Type','Version','Extension','Drive Link','Created Date','Last Synced','Status'],
-  Video_Master: ['File Name','Country','Route','EP','Location','Type','Sub-Type','Version','Extension','Drive Link','Created Date','Last Synced','Status'],
-  SSOT:         ['File Name','Country','Route','EP','Location','Type','Version','Extension','Drive Link','Created Date','Last Synced','Status'],
-  Partner:      ['Partner Code','Partner Name','Category','Region','Address','Phone','Benefit','Route','Drive Link','Status','Notes'],
+  Asset_Master: ['Asset Code','Country','Route','EP','Location','Type','Version','Drive Link','Status','Created Date'],
+  Video_Master: ['Video Code','Source Asset','Tool','Duration','Drive Link','Final Link','Status'],
+  SSOT:         ['SSOT Code','Category','Title','Version','Status','Link','Updated Date'],
+  Partner:      ['Partner Code','Type','Company','Country','Contact','Status','Materials Sent','Next Action','Note'],
 };
 
 // ── 헤더 색상 ──────────────────────────────────────────────────
@@ -79,6 +79,9 @@ function setupSheets() {
 }
 
 function _setHeader(sheet, headers, color) {
+  // 기존 데이터 행 제거 (헤더 재설정 시 샘플 데이터 포함 전체 삭제)
+  if (sheet.getLastRow() > 1) sheet.deleteRows(2, sheet.getLastRow() - 1);
+
   const range = sheet.getRange(1, 1, 1, headers.length);
   range.setValues([headers])
        .setBackground(color)
@@ -86,11 +89,19 @@ function _setHeader(sheet, headers, color) {
        .setFontWeight('bold')
        .setFontSize(11);
   sheet.setFrozenRows(1);
-  // 파일명 컬럼 넓게
-  sheet.setColumnWidth(1, 340);
-  // Drive Link 컬럼
-  const linkCol = headers.indexOf('Drive Link') + 1;
-  if (linkCol > 0) sheet.setColumnWidth(linkCol, 280);
+
+  // Code 컬럼 (1번) 넓게
+  sheet.setColumnWidth(1, 320);
+  // Drive Link / Link / Final Link 컬럼
+  ['Drive Link','Final Link','Link'].forEach(colName => {
+    const idx = headers.indexOf(colName) + 1;
+    if (idx > 0) sheet.setColumnWidth(idx, 260);
+  });
+  // Note / Next Action 컬럼
+  ['Note','Next Action','Contact'].forEach(colName => {
+    const idx = headers.indexOf(colName) + 1;
+    if (idx > 0) sheet.setColumnWidth(idx, 200);
+  });
 }
 
 // ── 개별 시트 초기화 ──────────────────────────────────────────
@@ -176,34 +187,82 @@ function _processFile(file, rows, existing, now) {
   const category = _getCategory(parsed);
   if (!category) return; // 미분류 스킵
 
-  const url  = file.getUrl();
+  // Asset Code / Video Code / SSOT Code = 확장자 제거한 파일 기본명
+  const code    = name.replace(/\.[^.]+$/, '');
+  const url     = file.getUrl();
   const created = Utilities.formatDate(file.getDateCreated(), 'Asia/Seoul', 'yyyy-MM-dd');
-  const synced  = Utilities.formatDate(now, 'Asia/Seoul', 'yyyy-MM-dd HH:mm');
 
-  if (category === 'asset' && !existing.asset.has(name)) {
+  // ── Asset_Master ─────────────────────────────────────────────
+  // Asset Code | Country | Route | EP | Location | Type | Version | Drive Link | Status | Created Date
+  if (category === 'asset' && !existing.asset.has(code)) {
     rows.asset.push([
-      name, parsed.country, parsed.route, parsed.ep, parsed.location,
-      parsed.type, parsed.subType, parsed.version, parsed.ext,
-      url, created, synced, 'Active'
-    ]);
-  } else if (category === 'video' && !existing.video.has(name)) {
-    rows.video.push([
-      name, parsed.country, parsed.route, parsed.ep, parsed.location,
-      parsed.type, parsed.subType, parsed.version, parsed.ext,
-      url, created, synced, 'Active'
-    ]);
-  } else if (category === 'ssot' && !existing.ssot.has(name)) {
-    rows.ssot.push([
-      name, parsed.country, parsed.route, parsed.ep, parsed.location,
-      parsed.type, parsed.version, parsed.ext,
-      url, created, synced, 'Active'
+      code,
+      parsed.country,
+      parsed.route,
+      parsed.ep,
+      parsed.location,
+      parsed.type,
+      parsed.version,
+      url,
+      'Active',
+      created,
     ]);
   }
+
+  // ── Video_Master ─────────────────────────────────────────────
+  // Video Code | Source Asset | Tool | Duration | Drive Link | Final Link | Status
+  else if (category === 'video' && !existing.video.has(code)) {
+    // Tool: subType이 KLING/DAVINCI 등이면 그대로, 없으면 확장자로 추정
+    const tool = parsed.subType || _inferTool(parsed.ext);
+    rows.video.push([
+      code,
+      '',        // Source Asset — 수동 입력
+      tool,
+      '',        // Duration — 수동 입력
+      url,
+      '',        // Final Link — 수동 입력
+      'Draft',
+    ]);
+  }
+
+  // ── SSOT ──────────────────────────────────────────────────────
+  // SSOT Code | Category | Title | Version | Status | Link | Updated Date
+  else if (category === 'ssot' && !existing.ssot.has(code)) {
+    // Category: Type 파트 사용 (SSOT/DOC/PPT 등)
+    // Title: 파일명에서 DT 접두사·버전 제거해 가독성 확보
+    const title = _makeTitle(parsed);
+    rows.ssot.push([
+      code,
+      parsed.type || 'DOC',
+      title,
+      parsed.version,
+      'Active',
+      url,
+      created,
+    ]);
+  }
+}
+
+// Tool 추정 (확장자 기반 fallback)
+function _inferTool(ext) {
+  const e = ext.toLowerCase();
+  if (e === 'drp' || e === 'drt') return 'DaVinci';
+  if (e === 'prproj') return 'Premiere';
+  if (['mp4','mov'].includes(e)) return 'Unknown';
+  return '';
+}
+
+// SSOT Title 생성: EP + Location + Type 조합
+function _makeTitle(parsed) {
+  const parts = [parsed.ep, parsed.location, parsed.type, parsed.subType]
+    .filter(p => p && p.length > 0);
+  return parts.join(' · ') || 'Untitled';
 }
 
 // ── 파일명 파싱 ───────────────────────────────────────────────
 // DT-KR-SR-EP01-HAMEL-IMG-MASTER-V01.png
 // [0]DT [1]Country [2]Route [3]EP [4]Location [5]Type [6]SubType [7]Version
+// Asset/Video/SSOT Code = 확장자 제거 기본명 (중복 방지 키)
 function _parseFileName(name) {
   const extMatch = name.match(/\.([^.]+)$/);
   const ext = extMatch ? extMatch[1].toUpperCase() : '';
