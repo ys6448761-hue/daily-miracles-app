@@ -133,6 +133,7 @@ docs/ssot/
 | `SSOT-EXP-001_DreamTown_Expansion_Guide.md` | **확장 가이드** — Level 1~5 방향·감정 네비게이션·Universe 기준 | 신규 에피소드·기능 기획 전 |
 | `SSOT-BIZ-001_DreamTown_Business_Model.md` | **비즈니스 모델** — 케이블카·유람선 가격 체계 (판매가/입금가/마진) | 결제·예약 가격 설정 전 |
 | `SSOT-CHAR-001_Sowoni_Character_Bible.md` | 소원이 캐릭터 바이블 — 고정 비주얼·감정 표현·금지 항목 | 이미지·영상·캐릭터 제작 전 |
+| `SSOT-LOOP-001_Seal_Return_Unlock_Loop_Guide.md` | **핵심 사업 루프** — 봉인→시간잠금→장소 재방문→해제. 모든 제품 판단 기준. 금지 사항·검증 지표 포함 | **모든 제품·콘텐츠·KPI 판단 전 (최우선)** |
 
 ---
 
@@ -240,3 +241,4 @@ docs/ssot/
 | v5.2 | 2026-06-06 | Ops SSOT 섹션 신설 — SSOT-PRICE-001 별빛항로 가격체계 v1.0 등록 |
 | v5.3 | 2026-06-06 | SSOT-PRICE-001 rev.3 — 단체 35,000 / 원가구조 명시 (재료 10,000 + 인건비 15,000) |
 | v5.4 | 2026-06-08 | DEC-OPS-001 — PARTNER_MASTER를 제휴처 단일 원본으로 확정 |
+| v5.5 | 2026-06-10 | SSOT-LOOP-001 — 봉인·재방문·해제 핵심 루프 SSOT 확정 |
