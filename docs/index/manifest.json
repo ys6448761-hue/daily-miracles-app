@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-06-10T02:04:04.456Z",
+  "generated_at": "2026-06-10T02:15:40.569Z",
   "generator": "generate-manifest.js",
-  "total_count": 348,
+  "total_count": 349,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -430,7 +430,7 @@
       "status": "다음 목표",
       "title": "DreamTown SSOT Index",
       "created_at": "내용",
-      "checksum": "f1c0b7c6"
+      "checksum": "c5f53e67"
     },
     {
       "id": "DOC-SSOT_Registry_v2",
@@ -3365,6 +3365,25 @@
       "title": "SSOT-LOOP-001_Seal_Return_Unlock_Loop_Guide",
       "created_at": "2026-06-10",
       "checksum": "5becb5c1"
+    },
+    {
+      "id": "DOC-SSOT-METRIC-001_Loop_Measureme",
+      "path": "docs/ssot/core/SSOT-METRIC-001_Loop_Measurement_Framework.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "core",
+        "소원",
+        "aurora",
+        "kpi"
+      ],
+      "owner": "Aurora5 / (주)여수여행센터",
+      "status": "Confirmed",
+      "title": "SSOT-METRIC-001_Loop_Measurement_Framework",
+      "created_at": "2026-06-10",
+      "checksum": "485b1be5"
     },
     {
       "id": "DOC-SSOT-WORLD-001_DreamTown_Philo",
