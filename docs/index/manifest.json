@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-07-09T03:26:37.146Z",
+  "generated_at": "2026-07-09T04:09:40.532Z",
   "generator": "generate-manifest.js",
-  "total_count": 352,
+  "total_count": 355,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2400,6 +2400,23 @@
       "checksum": "109cb01e"
     },
     {
+      "id": "DOC-REPORT-Legacy_Video_Frame_Syst",
+      "path": "docs/reports/REPORT-Legacy_Video_Frame_System.md",
+      "type": "report",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "reports",
+      "tags": [
+        "reports",
+        "storybook"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "REPORT — Legacy Video Frame System (5-Frame, assemble-miracle-video.js)",
+      "created_at": "2026-07-09",
+      "checksum": "b77fc3ff"
+    },
+    {
       "id": "DOC-REPORT-StoryBook_Code_Analysis",
       "path": "docs/reports/REPORT-StoryBook_Code_Analysis.md",
       "type": "report",
@@ -4250,7 +4267,24 @@
       "status": "Draft (미승인 — REPORT-StoryBook_Code_Analysis.md 기반 초안, 대표 확정 전까지 구현 적용 금지)",
       "title": "SSOT-ENGINE-001 — DreamTown Core Story Engine (Draft)",
       "created_at": "2026-07-09",
-      "checksum": "40a53d17"
+      "checksum": "2d629fe8"
+    },
+    {
+      "id": "DOC-SSOT-ENGINE-002_WishArt_Adapte",
+      "path": "docs/ssot/support/SSOT-ENGINE-002_WishArt_Adapter_Plan.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "support",
+        "aurora"
+      ],
+      "owner": "Aurora5 / Claude Code",
+      "status": "Draft (설계안 — 실제 통합/코드 연결은 아직 수행하지 않음)",
+      "title": "SSOT-ENGINE-002 — WishArt Adapter Plan",
+      "created_at": "2026-07-09",
+      "checksum": "a2dbc7b2"
     },
     {
       "id": "DOC-quantum-planning-method",
@@ -4355,6 +4389,23 @@
       "title": "TASK: Silent Response Layer v1 구현 지시서",
       "created_at": "2026-07-09",
       "checksum": "cad9fc05"
+    },
+    {
+      "id": "DOC-TODO-Core_Engine_Integration",
+      "path": "docs/tasks/TODO-Core_Engine_Integration.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "tasks",
+      "tags": [
+        "tasks",
+        "소원"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "TODO — Core Engine Integration",
+      "created_at": "2026-07-09",
+      "checksum": "b65b55a3"
     },
     {
       "id": "DOC-TODO-StoryBook_Refactor",
