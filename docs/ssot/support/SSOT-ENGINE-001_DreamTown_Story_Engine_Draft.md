@@ -1,10 +1,10 @@
 ---
 code: SSOT-ENGINE-001
 title: DreamTown Core Story Engine (Draft)
-version: v0.1
-status: Draft (미승인 — REPORT-StoryBook_Code_Analysis.md 기반 초안, 대표 확정 전까지 구현 적용 금지)
+version: v0.2
+status: Draft (미승인 — 대표 확정 전까지 구현 적용 금지)
 owner: Aurora5 / Claude Code
-based_on: 기존 dreamtown-wishart 엔진 코드 + 소원그림 GPTS V4(인라인 제공 기준) 비교 분석
+based_on: WishArt V4 Original(SSOT-WISHART-001) — 최상위 입력. 기존 dreamtown-wishart 엔진 코드 비교 분석
 updated: 2026-07-09
 ---
 
@@ -12,6 +12,15 @@ updated: 2026-07-09
 
 > 이 문서는 **초안**이다. 기존 코드를 폐기하지 않고 복원·추출·통합하는 것을 목표로 하며, 새로운 연구/철학을 추가하지 않는다.
 > 근거: `REPORT-StoryBook_Code_Analysis.md`
+
+## 0. 최상위 입력 (2026-07-09 갱신)
+
+`SSOT-WISHART-001_WishArt_V4_Core_Guide.md`(원본: `docs/originals/WishArt-GPTS-V4-Original.md`)를 본 엔진의 **최상위 입력(Top-level Input)**으로 반영한다.
+
+- 본 문서의 §2 Story Data 구조, §3 4P Master Asset 구조는 SSOT-WISHART-001과 **원칙적으로 일치**하나, 아래 항목은 두 문서 간 수치·범위가 달라 **하나로 확정하지 않고 병기**한다(대표 확인 필요, 상세는 `REPORT-WishArt_V4_Gap.md` §4).
+  - Identity Lock 보존율: SSOT-WISHART-001(V4 원문) "80~90%" vs 본 문서 기존 서술(코드 기준) "85~95%"
+  - 캔버스 비율: SSOT-WISHART-001(V4 원문) "9:16" vs 코드 실제 출력 "1024x1536(≈2:3)"
+- V4 원문은 1P/2P/3P 3막만 명시적으로 정의하며, 본 문서 §2/§3의 "4P 참여"는 **코드(dreamtown-wishart)에서 확인된 것**이지 V4 원문에 있는 것이 아니다 — 이 차이를 아래 §2/§3에도 표기한다.
 
 ---
 
@@ -62,7 +71,7 @@ StoryData {
     { act: "1P", role: "발견",  camera: front_view, world_response: 10%, star: OFF },
     { act: "2P", role: "응답",  camera: side_view,  world_response: 60%, star: OFF },
     { act: "3P", role: "기록",  camera: back_view,  world_response: 100%, star: ON(최초 등장) },
-    { act: "4P", role: "참여",  camera: brand/CTA,  character: 없음, star: ON }
+    { act: "4P", role: "참여",  camera: brand/CTA,  character: 없음, star: ON }  // ⚠️ 코드에만 존재, WishArt V4 원문에는 4P 정의 없음(SSOT-WISHART-001 §② 참조)
   ]
   qc: {
     reveal_rule_passed: bool,   // check_reveal_rule()
@@ -114,5 +123,7 @@ DreamTown Story Data (위 §2 스키마)
 - 소원그림/기적영상/기적쇼츠/스토리북이 Master Asset을 "확장 출력"하는 정확한 변환 규칙 — 미설계.
 - `assemble-miracle-video.js`의 7-중력-유형 체계를 `dreamtown-wishart`의 5-Canon-감정 체계로 통합할지, 병존시킬지 — 미결정.
 - 3D/CGI 얼굴 금지 원칙을 코드 레벨에서 직접 검증하는 게이트 존재 여부 — 확인 필요(현재는 이미지 편집 방식이라 간접적으로만 부합 추정).
+- Identity Lock 보존율(80~90% vs 85~95%)과 캔버스 비율(9:16 vs 1024x1536) 불일치 — 대표 확인 후 통일 필요. 상세: `REPORT-WishArt_V4_Gap.md` §4.
+- V4 원문에 명시되지 않은 "4P 참여"를 계속 사용할지 — 코드 구현이 V4보다 앞서 있는 부분이므로 대표 확인 필요. 상세: `REPORT-WishArt_V4_Gap.md` §2.
 
 이 문서는 **Draft**이며, 위 TBD 항목과 상품별 출력 구조가 대표 승인을 받기 전까지 실제 구현에 적용하지 않는다.

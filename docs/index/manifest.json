@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-07-09T04:09:40.532Z",
+  "generated_at": "2026-07-09T05:15:03.972Z",
   "generator": "generate-manifest.js",
-  "total_count": 355,
+  "total_count": 363,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1954,6 +1954,39 @@
       "checksum": "d42aba10"
     },
     {
+      "id": "DOC-README",
+      "path": "docs/originals/README.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "originals",
+      "tags": [
+        "originals"
+      ],
+      "owner": "team",
+      "status": "archived",
+      "title": "docs/originals — Original Archive",
+      "created_at": "2026-07-09",
+      "checksum": "4a0bc5d6"
+    },
+    {
+      "id": "DOC-WishArt-GPTS-V4-Original",
+      "path": "docs/originals/WishArt-GPTS-V4-Original.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "originals",
+      "tags": [
+        "originals",
+        "소원"
+      ],
+      "owner": "team",
+      "status": "superseded",
+      "title": "DreamTown 소원그림 SSOT v3.7 (압축본)",
+      "created_at": "2026-07-09",
+      "checksum": "f1d1ff12"
+    },
+    {
       "id": "DOC-service-flow",
       "path": "docs/overview/service-flow.md",
       "type": "overview",
@@ -2417,6 +2450,24 @@
       "checksum": "b77fc3ff"
     },
     {
+      "id": "DOC-REPORT-Original_Document_Inven",
+      "path": "docs/reports/REPORT-Original_Document_Inventory.md",
+      "type": "report",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "reports",
+      "tags": [
+        "reports",
+        "소원",
+        "aurora"
+      ],
+      "owner": "rumi",
+      "status": "active",
+      "title": "REPORT — Original Document Inventory",
+      "created_at": "2026-07-09",
+      "checksum": "085f5e25"
+    },
+    {
       "id": "DOC-REPORT-StoryBook_Code_Analysis",
       "path": "docs/reports/REPORT-StoryBook_Code_Analysis.md",
       "type": "report",
@@ -2435,6 +2486,40 @@
       "title": "REPORT — StoryBook Code Analysis",
       "created_at": "2026-07-09",
       "checksum": "826c195c"
+    },
+    {
+      "id": "DOC-REPORT-WishArt_V4_Architecture",
+      "path": "docs/reports/REPORT-WishArt_V4_Architecture.md",
+      "type": "report",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "reports",
+      "tags": [
+        "reports",
+        "소원"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "REPORT — WishArt V4 Architecture",
+      "created_at": "2026-07-09",
+      "checksum": "4945ceb6"
+    },
+    {
+      "id": "DOC-REPORT-WishArt_V4_Gap",
+      "path": "docs/reports/REPORT-WishArt_V4_Gap.md",
+      "type": "report",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "reports",
+      "tags": [
+        "reports",
+        "storybook"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "REPORT — WishArt V4 Gap Analysis",
+      "created_at": "2026-07-09",
+      "checksum": "58999fe7"
     },
     {
       "id": "DOC-RESONANCE_PREVIEW_W1_REVIEW",
@@ -3671,6 +3756,24 @@
       "checksum": "c88ab665"
     },
     {
+      "id": "DOC-SSOT-BG-001_Starlight_Route_Ba",
+      "path": "docs/ssot/media/SSOT-BG-001_Starlight_Route_Background_Guide.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "media",
+        "소원",
+        "aurora"
+      ],
+      "owner": "Aurora5",
+      "status": "LOCKED",
+      "title": "SSOT-BG-001 — DreamTown 별빛항로 배경 가이드",
+      "created_at": "2026-07-09",
+      "checksum": "9320b67d"
+    },
+    {
       "id": "DOC-SSOT-DESIGN-001_Reverse_Emotio",
       "path": "docs/ssot/media/SSOT-DESIGN-001_Reverse_Emotional_Design.md",
       "type": "document",
@@ -3796,6 +3899,25 @@
       "title": "SSOT-PRICE-001 — DreamTown 별빛항로 가격 체계 v1.0",
       "created_at": "2026-07-09",
       "checksum": "96e8722a"
+    },
+    {
+      "id": "DOC-SSOT-WISHART-001_WishArt_V4_Co",
+      "path": "docs/ssot/SSOT-WISHART-001_WishArt_V4_Core_Guide.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "storybook",
+        "aurora"
+      ],
+      "owner": "Aurora5 / Claude Code",
+      "status": "LOCKED",
+      "title": "SSOT-WISHART-001 — WishArt V4 Core Guide",
+      "created_at": "2026-07-09",
+      "checksum": "72966558"
     },
     {
       "id": "DOC-DreamTown_API_Spec_Design",
@@ -4251,6 +4373,23 @@
       "checksum": "ded79fcf"
     },
     {
+      "id": "DOC-SSOT-DOC-001_Document_Governan",
+      "path": "docs/ssot/support/SSOT-DOC-001_Document_Governance.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "support",
+        "aurora"
+      ],
+      "owner": "Aurora5",
+      "status": "LOCKED",
+      "title": "SSOT-DOC-001 — Document Governance",
+      "created_at": "2026-07-09",
+      "checksum": "a20e3f9e"
+    },
+    {
       "id": "DOC-SSOT-ENGINE-001_DreamTown_Stor",
       "path": "docs/ssot/support/SSOT-ENGINE-001_DreamTown_Story_Engine_Draft.md",
       "type": "document",
@@ -4264,10 +4403,10 @@
         "aurora"
       ],
       "owner": "Aurora5 / Claude Code",
-      "status": "Draft (미승인 — REPORT-StoryBook_Code_Analysis.md 기반 초안, 대표 확정 전까지 구현 적용 금지)",
+      "status": "Draft (미승인 — 대표 확정 전까지 구현 적용 금지)",
       "title": "SSOT-ENGINE-001 — DreamTown Core Story Engine (Draft)",
       "created_at": "2026-07-09",
-      "checksum": "2d629fe8"
+      "checksum": "24385dc2"
     },
     {
       "id": "DOC-SSOT-ENGINE-002_WishArt_Adapte",
