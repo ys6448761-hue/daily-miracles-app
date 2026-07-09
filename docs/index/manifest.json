@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-07-09T05:15:03.972Z",
+  "generated_at": "2026-07-09T05:36:30.455Z",
   "generator": "generate-manifest.js",
-  "total_count": 363,
+  "total_count": 365,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2468,6 +2468,24 @@
       "checksum": "085f5e25"
     },
     {
+      "id": "DOC-REPORT-Route_Product_Alignment",
+      "path": "docs/reports/REPORT-Route_Product_Alignment.md",
+      "type": "report",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "reports",
+      "tags": [
+        "reports",
+        "소원",
+        "storybook"
+      ],
+      "owner": "code",
+      "status": "superseded",
+      "title": "REPORT — Route × Product Alignment",
+      "created_at": "2026-07-09",
+      "checksum": "090820e7"
+    },
+    {
       "id": "DOC-REPORT-StoryBook_Code_Analysis",
       "path": "docs/reports/REPORT-StoryBook_Code_Analysis.md",
       "type": "report",
@@ -3681,7 +3699,7 @@
       "status": "Confirmed",
       "title": "SSOT-ROUTE-001 — EP01 영상 콘텐츠용 감정 항로",
       "created_at": "2026-07-09",
-      "checksum": "bd083db0"
+      "checksum": "45b95a15"
     },
     {
       "id": "DOC-SSOT-ROUTE-002_EP01_Experience",
@@ -3771,7 +3789,7 @@
       "status": "LOCKED",
       "title": "SSOT-BG-001 — DreamTown 별빛항로 배경 가이드",
       "created_at": "2026-07-09",
-      "checksum": "9320b67d"
+      "checksum": "68702ac7"
     },
     {
       "id": "DOC-SSOT-DESIGN-001_Reverse_Emotio",
@@ -3899,6 +3917,24 @@
       "title": "SSOT-PRICE-001 — DreamTown 별빛항로 가격 체계 v1.0",
       "created_at": "2026-07-09",
       "checksum": "96e8722a"
+    },
+    {
+      "id": "DOC-SSOT-PRODUCT-001_DreamTown_Pro",
+      "path": "docs/ssot/SSOT-PRODUCT-001_DreamTown_Product_Architecture.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "소원",
+        "aurora"
+      ],
+      "owner": "Aurora5 / Claude Code",
+      "status": "LOCKED",
+      "title": "SSOT-PRODUCT-001 — DreamTown Product Architecture",
+      "created_at": "2026-07-09",
+      "checksum": "0e795622"
     },
     {
       "id": "DOC-SSOT-WISHART-001_WishArt_V4_Co",
@@ -4406,7 +4442,7 @@
       "status": "Draft (미승인 — 대표 확정 전까지 구현 적용 금지)",
       "title": "SSOT-ENGINE-001 — DreamTown Core Story Engine (Draft)",
       "created_at": "2026-07-09",
-      "checksum": "24385dc2"
+      "checksum": "1af1d806"
     },
     {
       "id": "DOC-SSOT-ENGINE-002_WishArt_Adapte",
@@ -4544,7 +4580,7 @@
       "status": "active",
       "title": "TODO — Core Engine Integration",
       "created_at": "2026-07-09",
-      "checksum": "b65b55a3"
+      "checksum": "4ab9743c"
     },
     {
       "id": "DOC-TODO-StoryBook_Refactor",
