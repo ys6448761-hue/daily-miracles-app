@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-07-11T00:38:07.458Z",
+  "generated_at": "2026-07-11T01:00:57.315Z",
   "generator": "generate-manifest.js",
   "total_count": 373,
   "documents": [
@@ -3693,13 +3693,14 @@
         "ssot",
         "소원",
         "aurora",
-        "가격"
+        "가격",
+        "결제"
       ],
       "owner": "대표(푸르미르) / Aurora5 / Claude Code",
-      "status": "FROZEN (V1)",
+      "status": "APPROVED",
       "title": "DreamTown V1 Architecture Freeze",
       "created_at": "2026-07-11",
-      "checksum": "a2ab9e15"
+      "checksum": "ac58a8b7"
     },
     {
       "id": "DOC-DreamTown_V2_Backlog",
@@ -3718,7 +3719,7 @@
       "status": "Active (living document)",
       "title": "DreamTown V2 Backlog",
       "created_at": "2026-07-11",
-      "checksum": "8aad94d9"
+      "checksum": "7d6a8d45"
     },
     {
       "id": "DOC-DREAMTOWN_WORLD_CANVAS_SSOT",
@@ -4479,7 +4480,7 @@
       "status": "LOCKED",
       "title": "SSOT-ARCH-001 — WishArt Platform Architecture",
       "created_at": "2026-07-11",
-      "checksum": "33666b00"
+      "checksum": "6cfea761"
     },
     {
       "id": "DOC-SSOT-BIZ-004_DreamTown_Operati",

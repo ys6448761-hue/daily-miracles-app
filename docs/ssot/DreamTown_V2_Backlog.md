@@ -12,24 +12,22 @@ purpose: DreamTown_V1_Architecture_Freeze.md 확정 이후의 모든 신규 아�
 
 ---
 
-## 구조 미정 (Architecture Freeze에서 이월)
+> **2026-07-12 갱신**: `DreamTown_V1_Architecture_Freeze.md`가 APPROVED v1.0으로 확정되면서, 아래 항목 중 Booking 최소모델/Product Code/QR 2축/Identity 구조/"별들의 가족 되기"는 **해소되었다**(Freeze 문서 §3~§6 참조). 이 백로그에서 제거하고, 여전히 남은 미정 항목만 유지한다.
 
-- Booking 통합 레이어(채널→Booking→Entitlement→Journey→Identity) — 대응 스키마/코드 없음
-- "Wish Platform" 계층의 정확한 역할
-- "Wish" 축(Platform §2, QR §5)과 기존 `wish_entries`/`wish_tracking_requests`/`PRG_WISH_30`의 관계
-- Service 4단계(Basic/Hotel/Premium/Option)의 정확한 가격·포함범위, 기존 가격 SSOT와의 정합
-- QR 3종 체계(Wish/WishArt/DreamTown) 정식 재편
-- WishArt 서비스 모드의 `HOTEL_LOBBY` 위치(별도 모드 vs Service §3의 `Hotel` 티어로 흡수)
-- Data 모델에서 "Identity"와 "Resident"를 별도 테이블로 분리할지 여부
-- "별들의 가족 되기" 단계의 정의 및 데이터 모델 대응
+## 구조 미정 (Freeze v1.0 이후에도 남은 것)
+
+- "Wish Platform" 계층의 정확한 역할 (Freeze §2에서 V2_BACKLOG로 명시 분류됨)
+- "Wish" 축(Platform §2, QR Domain §5)과 기존 `wish_entries`/`wish_tracking_requests`/`PRG_WISH_30`의 관계
+- `DT-PREMIUM` Product Code의 정확한 가격·구성(Freeze §3, V1_FOUNDATION_ONLY)
+- Booking의 HOTEL/OTA 채널 실제 자동 연동(PMS/OTA API) — 스키마는 확정, 구현은 V2(Freeze §4)
+- QR Purpose: Content, Domain: Wish (Freeze §5, V2_BACKLOG)
 
 ## 기능 미정 (스펙 없음, 추측 구현 금지)
 
-- 별공방 실제 등록 로직(현재는 프롬프트 토큰 개념뿐)
-- 재회(Reunion) 시스템 — 트리거/동작 전부 미정
+- 별공방 실제 등록 UI/로직 전체(현재는 최소 `wishart_image_path` 기록만 V1_FOUNDATION_ONLY)
+- 재회(Reunion) 시스템 — 트리거/동작 전부 미정(`reunion_status` 컬럼만 존재)
 - Promise 단계의 사용자 흐름(필드는 존재, UI/트리거 없음)
-- Festival/Event 서비스 세부(행사코드, 브랜드 프레임 합성 방식)
-- Hotel Lobby 서비스 세부
+- Festival/Event 서비스 세부(행사코드, 브랜드 프레임 합성 방식) — WishArt enum에는 존재(Freeze §7), 실제 서비스 미오픈
 
 ## 코드 정리 (리팩토링 백로그)
 

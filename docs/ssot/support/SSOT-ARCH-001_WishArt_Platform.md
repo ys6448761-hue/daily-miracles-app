@@ -104,7 +104,14 @@ def generate_wishart(
 
 ## 6. DreamTown Route 데이터 모델 (확정)
 
+> ⚠️ **2026-07-12 갱신**: `DreamTown_V1_Architecture_Freeze.md`(APPROVED v1.0) §4/§8에서 `bookings` 테이블과 `resident_journeys.booking_id` 컬럼이 추가로 확정되었다. 아래 스키마는 그 최신 상태를 반영한다 — 최종 기준은 Freeze 문서다.
+
 ```sql
+bookings
+  booking_id, channel, channel_ref, product_code, option_codes,
+  customer_name, contact, origin_hotel_id, partner_code,
+  entitlement_code, booking_status, created_at, updated_at
+
 residents
   resident_id, customer_name, join_date, origin_hotel_id, origin_hotel_name,
   partner_code, resident_status, created_at, updated_at, consent_version
@@ -114,7 +121,8 @@ resident_assets
   -- asset_type: STARTER_CARD | PORTRAIT_ORIGINAL | WISHART_IMAGE | RESIDENT_PROFILE | RESIDENT_CARD
 
 resident_journeys
-  journey_id, resident_id, route_code, route_name, route_status, started_at, completed_at
+  journey_id, resident_id, booking_id(신규, nullable FK), route_code, route_name,
+  route_status, started_at, completed_at
 
 atelier_records
   atelier_id, resident_id, wishart_image_path, promise_text, reunion_status,
