@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-07-11T01:27:21.641Z",
+  "generated_at": "2026-07-11T23:25:28.975Z",
   "generator": "generate-manifest.js",
   "total_count": 373,
   "documents": [
@@ -3196,7 +3196,7 @@
       "status": "사용 씬",
       "title": "DreamTown Character SSOT",
       "created_at": "2026-07-11",
-      "checksum": "080dc640"
+      "checksum": "87aa55c1"
     },
     {
       "id": "DOC-DreamTown_Core_Philosophy_SSOT",
