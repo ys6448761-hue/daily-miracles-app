@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-07-11T01:00:57.315Z",
+  "generated_at": "2026-07-11T01:27:21.641Z",
   "generator": "generate-manifest.js",
   "total_count": 373,
   "documents": [
@@ -3700,7 +3700,7 @@
       "status": "APPROVED",
       "title": "DreamTown V1 Architecture Freeze",
       "created_at": "2026-07-11",
-      "checksum": "ac58a8b7"
+      "checksum": "c86b5ce5"
     },
     {
       "id": "DOC-DreamTown_V2_Backlog",
@@ -4480,7 +4480,7 @@
       "status": "LOCKED",
       "title": "SSOT-ARCH-001 — WishArt Platform Architecture",
       "created_at": "2026-07-11",
-      "checksum": "6cfea761"
+      "checksum": "96332dc6"
     },
     {
       "id": "DOC-SSOT-BIZ-004_DreamTown_Operati",
@@ -4722,13 +4722,14 @@
       "topic": "tasks",
       "tags": [
         "tasks",
-        "소원"
+        "소원",
+        "가격"
       ],
       "owner": "code",
-      "status": "active",
-      "title": "TODO — DreamTown Route Service (Phase B)",
+      "status": "superseded",
+      "title": "TODO — DreamTown Route Service (V1 Implementation)",
       "created_at": "2026-07-11",
-      "checksum": "0df7dce9"
+      "checksum": "75f0ce17"
     },
     {
       "id": "DOC-TODO-StoryBook_Refactor",

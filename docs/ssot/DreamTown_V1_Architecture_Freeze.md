@@ -74,6 +74,8 @@ Option Code  = DT-OPT-{NAME}     (기본 상품과 분리된 추가 권한 — �
 
 ## 4. Booking (최소 모델 확정)
 
+> ✅ **구현 완료(2026-07-12, Phase 1, dreamtown-wishart 커밋 `6aaa819`)**: 아래 스키마·상태 전이·API가 실제로 구현·테스트되었다. 상세는 `TODO-DreamTown_Route_Service.md` Phase 1 참조.
+
 ```
 채널(Direct/Hotel/OTA/Partner)
   ↓

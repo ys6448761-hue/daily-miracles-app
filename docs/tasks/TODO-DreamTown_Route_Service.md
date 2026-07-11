@@ -1,73 +1,64 @@
 ---
 Document: TODO-DreamTown_Route_Service
-Based On: SSOT-ARCH-001, SSOT-WISHART-002, SSOT-IDENTITY-001, REPORT-WishArt_Platform_Refactor_Impact.md
-Date: 2026-07-11
-Status: Phase B — 설계 승인 전까지 구현 착수하지 않음
+Based On: DreamTown_V1_Architecture_Freeze.md (APPROVED v1.0), DreamTown V1 Implementation Directive
+Date: 2026-07-12 (갱신, 원문 2026-07-11)
+Status: Implementation in progress — Phase 1 완료
 ---
 
-# TODO — DreamTown Route Service (Phase B)
+# TODO — DreamTown Route Service (V1 Implementation)
 
-> 이 문서의 모든 항목은 **설계 승인 후에만 착수한다.** 이번 작업(Phase A)에서는 실행하지 않았다.
-
----
-
-## P0 — Core Engine 추출 (선행 조건, 다른 모든 작업의 전제)
-
-1. `_run_generation()`을 `generate_wishart(portrait_image, service_mode, story_data=None, partner_context=None)` 형태로 리팩토링 — DB 쓰기를 함수 밖으로 분리.
-   - **완료 조건**: 함수가 `stars`/`residents` 등 어떤 테이블도 직접 쓰지 않고, `{status, image_path, story_data, qc, error}`를 반환한다.
-   - **테스트**: PhotoZone Quick 경로가 리팩토링 후에도 기존과 동일하게 동작하는지 회귀 테스트(사진 필수 검증, 생성 성공/실패, `stars.image_path` 저장까지 확인).
-2. `precheck_photo()` 중복 정의(`prompt_builder.py` vs `ssot_world.py`) 확인 및 정리.
-   - **의존성**: 없음. P0-1과 독립적으로 먼저 해도 됨.
-
-## P1 — DreamTown Route 데이터 모델 구현
-
-3. `residents`, `resident_assets`, `resident_journeys`, `atelier_records` 마이그레이션 작성(`SSOT-ARCH-001` §6 스키마).
-   - **의존성**: 없음.
-   - **완료 조건**: 4개 테이블이 생성되고, `stars` 테이블은 전혀 변경되지 않았음을 확인.
-   - **테스트**: 마이그레이션 적용 후 기존 `stars`/`partners` 조회가 영향받지 않는지 확인.
-4. `origin_hotel_id`/`partner_code` 검증 로직 — 이번 QR 버그 수정(`PLACE_TO_PARTNER`)과 동일한 문제(코드 체계 불일치)가 호텔 코드에서도 발생할 수 있으므로, 호텔 코드 시딩 전에 검증 체계를 먼저 설계한다.
-   - **의존성**: P1-3.
-
-## P2 — DreamTown Route 라우트/폼/생성 연결
-
-5. `/dreamtown/route` (GET, 안내), `/dreamtown/route/register` (POST, 이름/가입일/스타터카드사진/정면사진/호텔·파트너코드/동의 입력) 라우트 작성.
-   - **의존성**: P1-3.
-   - **완료 조건**: 스타터카드 사진과 정면사진이 동일 `resident_id`로 `resident_assets`에 저장됨.
-   - **테스트**: 두 사진이 실제로 같은 `resident_id`를 참조하는지 DB 조회로 확인.
-6. 소원그림 생성 연결(`generate_wishart(service_mode="DREAMTOWN_ROUTE")` 호출, 결과를 `resident_assets.asset_type=WISHART_IMAGE`에 저장).
-   - **의존성**: P0-1, P2-5.
-   - **완료 조건**: 정면사진 1장으로 Identity Lock이 적용된 소원그림이 생성되고 `resident_id`에 연결됨.
-7. 주민 프로필(2D 수채화 얼굴) 생성 + 주민카드 고정 템플릿 합성(이름/가입일/Resident ID/호텔/첫 항로/QR).
-   - **의존성**: P2-6.
-   - **완료 조건**: 주민카드의 텍스트/QR 영역이 AI 생성이 아니라 고정 템플릿 합성으로 만들어졌는지 확인(지시서 §11 금지사항 준수).
-   - **테스트**: 동일 인물의 소원그림과 주민 프로필 얼굴이 Identity Lock 기준으로 일치하는지 확인.
-8. `/dreamtown/route/result/{resident_id}` 결과 화면.
-   - **의존성**: P2-6, P2-7.
-
-## P3 — 별공방 / 관리자 / 재회 (스펙 확정 후)
-
-9. 별공방 MVP 저장 — **별도 스펙 없이는 착수하지 않는다**(지시서 §11 금지사항). 스펙 확정 시 `atelier_records`에 실제 등록 로직 구현.
-10. `/dreamtown/atelier/{resident_id}` 화면 — P3-9에 의존.
-11. DreamTown Route 관리자 화면(이름/가입일/스타터카드/정면사진/소원그림/route_status/atelier_record 조회) — PhotoZone Quick 관리자 화면(`/admin`)과 분리된 별도 화면.
-    - **의존성**: P2-5, P2-6, P2-7.
-12. 재회 시스템 — **스펙 없음, 착수하지 않는다.** `atelier_records.reunion_status` 컬럼만 존재(P1-3에서 생성), 트리거/동작은 별도 지시 대기.
+> 2026-07-12: Architecture Freeze가 APPROVED v1.0으로 승인되고 Implementation Directive가 접수되면서, 이 문서의 우선순위를 Directive의 Phase 1~4 구조로 갱신했다(기존 P0~P3 계획을 대체).
 
 ---
 
-## 완료 기준 (지시서 §12, 전체 Phase B 완료 시 재검증)
+## Phase 1 — Booking / Journey / Credential(Entitlement) ✅ 완료 (2026-07-12, dreamtown-wishart 커밋 `6aaa819`)
 
-- [ ] 기존 포토존 기능이 유지되는가?
-- [ ] DreamTown Route가 별도 서비스로 분리되는가?
-- [ ] 두 서비스가 동일 Core Engine을 공유하는가?
-- [ ] 정면사진 한 장으로 소원그림과 주민카드를 만들 수 있는가?
-- [ ] DreamTown 데이터가 포토존 데이터와 혼합되지 않는가?
-- [ ] 향후 축제·행사 서비스를 추가할 때 엔진 수정 없이 서비스만 추가할 수 있는가?
+```
+[완료]
+작업명: DreamTown V1 Phase 1 — Booking/Journey/Entitlement
+영향 파일: dreamtown-wishart/db.py, dreamtown-wishart/app.py, dreamtown-wishart/test_booking_flow.py
+Migration: db.py _create_tables()에 bookings/residents/resident_assets/resident_journeys/atelier_records 5개 테이블 추가(SQLite, idempotent CREATE TABLE IF NOT EXISTS 방식 — 이 저장소의 기존 관례를 따름, 별도 migrations 폴더 없음)
+API: POST/GET /api/bookings, GET /api/bookings/{id}, POST /api/bookings/{id}/confirm, POST /api/bookings/{id}/entitlement, POST /api/bookings/{id}/redeem, GET /api/journeys/{id}, POST /api/journeys/{id}/complete
+Test: test_booking_flow.py 20/20 통과(상태 전이, 잘못된 채널/전이 거부, cascade completion). FastAPI TestClient로 HTTP 레이어도 별도 확인(create/get/confirm/list 200, 잘못된 channel 400, credential 서비스 미가용 시 503 — 정상 동작)
+SSOT 일치 여부: DreamTown_V1_Architecture_Freeze.md §4 상태 전이표·Entitlement 재사용 결정과 일치. Entitlement는 신규 테이블을 만들지 않고 기존 credential_code/dm_client 시스템을 그대로 재사용함(Freeze 문서 결정 그대로 구현).
+남은 작업: HOTEL/OTA 채널 자동 연동(PMS/OTA API)은 V1_FOUNDATION_ONLY로 스키마만 존재, 구현하지 않음(Freeze §9 분류 그대로). residents/resident_assets/atelier_records 테이블은 스키마만 생성했고, 이번 Phase에서는 create_resident/get_resident 최소 함수만 구현(Journey의 FK 의존성 해소 목적) — 전체 등록 API/폼은 Phase 4 대상, 이번 범위 아님.
+```
 
-## 하지 않는 것 (지시서 §11, 전체 Phase B 공통)
+## Phase 2 — Product Code 적용 (대기)
 
-- 기존 PhotoZone 흐름 삭제
-- `/partner-workshop`을 DreamTown 전용으로 변경
-- 기존 `stars` 데이터 임의 마이그레이션
+- `DT-BASIC`/`DT-HOTEL`/`DT-PREMIUM` 표준 코드 및 `DT-OPT-*` Option 적용.
+- 가격은 수정하지 않는다 — `SSOT-PRICE-001`만 기준.
+- **의존성**: Phase 1의 `bookings.product_code` 필드(이미 스키마 존재, Phase 1에서 생성 완료) — Phase 2는 이 필드에 실제 `DT-*` 코드값을 채우는 검증/시딩 작업.
+
+## Phase 3 — QR 2축 처리 (대기)
+
+- Service Domain(DreamTown/WishArt/Wish) × Purpose(Activation/Location/Partner/Content).
+- 기존 라우트 유지: 파트너 QR=WishArt+Partner, 장소 QR=DreamTown+Location.
+- **의존성**: 없음(기존 라우트 코드 변경 없이 분류/문서화 작업 위주).
+
+## Phase 4 — Identity (대기)
+
+- "별들의 가족 되기" = 기존 `consent_version` 절차 재사용(신규 컬럼 없음).
+- Identity/Resident 개념적 구분, 물리 구조는 기존 `residents` 유지.
+- 스타터카드+정면사진 업로드 라우트/폼, 소원그림 생성 연결, 주민 프로필/주민카드 합성, 결과 화면.
+- **의존성**: Phase 1의 `residents`/`resident_assets` 스키마(이미 생성 완료) + WishArt Core Engine 추출(`generate_wishart` 인터페이스, 아직 미구현 — `_run_generation()`이 여전히 `stars` 전용으로 결합되어 있음, `REPORT-WishArt_Platform_Refactor_Impact.md` §1 참조).
+
+---
+
+## 구현 금지 (Directive 기준, 전체 Phase 공통)
+
+- OTA API, OTA Webhook, 호텔 PMS 연동, 자동 정산
+- Wish Platform 구현, Wish 독립 서비스
+- Dynamic Pricing, Marketplace, Community, AI 추천 기능
 - 별공방·재회 기능을 추측으로 구현
 - 주민카드 전체를 생성형 AI에 맡김
 - 두 서비스 데이터를 동일 폼·동일 결과 화면에 혼합
+
+## 완료 기준 (Freeze §9 MVP 분류 기준, 전체 완료 시 재검증)
+
+- [x] 기존 포토존 기능이 유지되는가? (회귀 테스트로 확인, Phase 1)
+- [ ] DreamTown Route가 별도 서비스로 분리되는가?
+- [x] Booking/Journey/Entitlement가 동일 Core Engine·DB와 독립적으로 동작하는가? (Phase 1)
+- [ ] 정면사진 한 장으로 소원그림과 주민카드를 만들 수 있는가? (Phase 4 대상)
+- [ ] DreamTown 데이터가 포토존 데이터와 혼합되지 않는가? (스키마 분리는 완료, 전체 검증은 Phase 4 이후)
+- [ ] 향후 축제·행사 서비스를 추가할 때 엔진 수정 없이 서비스만 추가할 수 있는가?

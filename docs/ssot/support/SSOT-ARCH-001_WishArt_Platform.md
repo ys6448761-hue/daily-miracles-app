@@ -105,6 +105,8 @@ def generate_wishart(
 ## 6. DreamTown Route 데이터 모델 (확정)
 
 > ⚠️ **2026-07-12 갱신**: `DreamTown_V1_Architecture_Freeze.md`(APPROVED v1.0) §4/§8에서 `bookings` 테이블과 `resident_journeys.booking_id` 컬럼이 추가로 확정되었다. 아래 스키마는 그 최신 상태를 반영한다 — 최종 기준은 Freeze 문서다.
+>
+> **구현 상태(2026-07-12)**: 5개 테이블 전부 `dreamtown-wishart/db.py`에 실제 생성됨(커밋 `6aaa819`). `bookings`/`resident_journeys`(Journey 생성·완료)는 CRUD + 상태 전이까지 구현·테스트 완료(Phase 1). `residents`는 Journey의 FK 의존성 해소를 위한 최소 함수(`create_resident`/`get_resident`)만 존재 — 전체 등록 API는 Phase 4 대상. `resident_assets`/`atelier_records`는 테이블만 생성되고 CRUD 함수는 아직 없음(스키마 선반영, `TODO-DreamTown_Route_Service.md` 참조).
 
 ```sql
 bookings
