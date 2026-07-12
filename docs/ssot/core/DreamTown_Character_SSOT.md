@@ -8,6 +8,8 @@ Purpose: Canonical reference for all DreamTown character definitions
 Last Updated: 2026-07-12
 Updated By: Code (Claude Code) — 아우룸 "화면 속 존재"/"안내 음성" 역할 분리 추가(기존 "말 없이 행동으로" 원칙 유지)
 
+> 상위 Experience Architecture는 `CAND-EXP-001_DreamTown_Experience_Architecture.md`(Candidate)를 참조한다.
+
 ---
 
 ## 규칙

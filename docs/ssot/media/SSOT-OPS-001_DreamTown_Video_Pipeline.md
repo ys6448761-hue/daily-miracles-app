@@ -11,6 +11,8 @@ layer: LAYER 2 — Operational SSOT
 
 # SSOT-OPS-001 — DreamTown 영상 제작 운영 파이프라인
 
+> 상위 Experience Architecture는 `CAND-EXP-001_DreamTown_Experience_Architecture.md`(Candidate)를 참조한다.
+
 ## 목적
 
 DreamTown 영상 제작은 담당자, AI 도구, 제작 파트너가 변경되어도
