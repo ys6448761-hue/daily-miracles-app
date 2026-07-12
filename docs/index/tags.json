@@ -842,6 +842,9 @@
   "v7.0": [
     "DOC-MIRACLE_MASTER_GUIDELINES"
   ],
+  "adr": [
+    "DOC-ADR-001_Journey_Guide_Started_"
+  ],
   "api": [
     "DOC-online-wish-problem-api",
     "DOC-online-wish-voyage-api-design",

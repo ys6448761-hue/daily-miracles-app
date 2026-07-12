@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-07-12T05:35:38.132Z",
+  "generated_at": "2026-07-12T21:14:11.352Z",
   "generator": "generate-manifest.js",
-  "total_count": 375,
+  "total_count": 376,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -625,6 +625,22 @@
       "title": "MIRACLE MASTER GUIDELINES v7.0",
       "created_at": "2026-07-12",
       "checksum": "63b3e84a"
+    },
+    {
+      "id": "DOC-ADR-001_Journey_Guide_Started_",
+      "path": "docs/adr/ADR-001_Journey_Guide_Started_State.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "adr",
+      "tags": [
+        "adr"
+      ],
+      "owner": "code",
+      "status": "Proposed (구현됨, 승인 대기 — Freeze §11 절차에 따름)",
+      "title": "ADR-001 — Journey Guide Started State",
+      "created_at": "2026-07-12",
+      "checksum": "9af0f0d4"
     },
     {
       "id": "DOC-정산-v2-CEO-요약",
