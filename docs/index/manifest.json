@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-07-12T04:38:25.699Z",
+  "generated_at": "2026-07-12T05:35:38.132Z",
   "generator": "generate-manifest.js",
-  "total_count": 374,
+  "total_count": 375,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -980,7 +980,24 @@
       "status": "Candidate",
       "title": "CAND-EXP-001 — DreamTown Experience Architecture (Candidate)",
       "created_at": "2026-07-12",
-      "checksum": "975d10cd"
+      "checksum": "9b719568"
+    },
+    {
+      "id": "DOC-CONSTITUTION_GOVERNANCE",
+      "path": "docs/constitution/CONSTITUTION_GOVERNANCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "constitution",
+      "tags": [
+        "constitution",
+        "aurora"
+      ],
+      "owner": "대표(푸르미르) / Aurora5 / Claude Code",
+      "status": "Active",
+      "title": "Constitution Governance",
+      "created_at": "2026-07-12",
+      "checksum": "34ea0981"
     },
     {
       "id": "DOC-CONSTITUTION",

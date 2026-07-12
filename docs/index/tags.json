@@ -288,6 +288,7 @@
     "DOC-AURORA5_CHARACTER_PROMPTS",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
     "DOC-CAND-EXP-001_DreamTown_Experie",
+    "DOC-CONSTITUTION_GOVERNANCE",
     "DOC-CONSTITUTION",
     "DOC-DreamTown_Knowledge_Map",
     "DOC-DreamTown_GPT_Knowledge_Pack",
@@ -901,6 +902,14 @@
   "candidate": [
     "DOC-CAND-EXP-001_DreamTown_Experie"
   ],
+  "constitution": [
+    "DOC-CONSTITUTION_GOVERNANCE",
+    "DOC-DreamTown_Canonical_Foundation",
+    "DOC-HUMAN_FIRST",
+    "DOC-NO_EMOTIONAL_ADDICTION",
+    "DOC-REALITY_RECONNECTION",
+    "DOC-UNFINISHED_TIME"
+  ],
   "deployment": [
     "DOC-deployment-checklist"
   ],
@@ -1067,13 +1076,6 @@
     "DOC-CODE_TEST_01_PROMPT_BUILDER",
     "DOC-CODE_TEST_01_REGISTRY_SCHEMA",
     "DOC-REGISTRY_v1_verified_2026-0516"
-  ],
-  "constitution": [
-    "DOC-DreamTown_Canonical_Foundation",
-    "DOC-HUMAN_FIRST",
-    "DOC-NO_EMOTIONAL_ADDICTION",
-    "DOC-REALITY_RECONNECTION",
-    "DOC-UNFINISHED_TIME"
   ],
   "episodes": [
     "DOC-SSOT-ROUTE-001_EP01_Wish_Journ",

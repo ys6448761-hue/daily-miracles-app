@@ -9,6 +9,8 @@ promotion_path: Research → Candidate → Constitution (본 문서는 Candidate
 ---
 
 > 본 문서는 기존 Constitution/SSOT/Manifesto를 대체하지 않는다. 실제 오픈 테스트에서 반복 검증된 이후에만 승격을 검토한다.
+>
+> Candidate Lifecycle는 `CONSTITUTION_GOVERNANCE.md`를 따른다.
 
 ---
 
