@@ -5,7 +5,7 @@ episode: EP01
 status: Confirmed
 owner: Aurora5
 created: 2026-05-30
-updated: 2026-07-09 (미남크루즈/항해의 항로 추가 — DreamTown 공식 8개 항로 반영, SSOT-BG-001과 정합)
+updated: 2026-07-13 (EP01 Main Route 6개로 확정 — 미남크루즈는 Optional Experience로, 호텔은 Experience Stage로 재분류. 대표 승인)
 layer: LAYER 2 — Operational SSOT
 ---
 
@@ -32,9 +32,9 @@ layer: LAYER 2 — Operational SSOT
 
 ---
 
-## EP01 항로 전체 구조
+## EP01 Main Starlight Route (6개, 2026-07-13 확정 — 대표 승인)
 
-> **2026-07-09 갱신**: DreamTown 공식 별빛항로(8개 장면, `SSOT-BG-001`)를 반영해 [5] 미남크루즈(항해)를 추가했다. 이하 종포해양공원/하멜등대/호텔은 각각 한 단계씩 밀렸다.
+> **2026-07-13 재분류**: EP01 Main Route는 **6개 장소**로 확정한다. 미남크루즈는 **Optional Experience**로, 호텔은 **Route Location이 아니라 Experience Stage**로 재분류했다(§Optional Experience, §Experience Stage 참조). 2026-07-09에 추가했던 미남크루즈 Route 편입은 이번 결정으로 대체된다(과거 기록은 아래에 보존).
 
 ```
 [1] 여수엑스포역       — 시작 / 도착
@@ -45,13 +45,9 @@ layer: LAYER 2 — Operational SSOT
         ↓
 [4] 케이블카           — 상승 / 희망 확장
         ↓
-[5] 미남크루즈         — 항해 / 희망을 품고 나아감
+[5] 종포해양공원       — 쉼 / 정리
         ↓
-[6] 종포해양공원       — 쉼 / 정리
-        ↓
-[7] 하멜등대           — 소원 / 별
-        ↓
-[8] 호텔               — 안식 / 내려놓음
+[6] 하멜등대           — 소원 / 별
 ```
 
 ---
@@ -104,20 +100,7 @@ layer: LAYER 2 — Operational SSOT
 
 ---
 
-### [5] 미남크루즈 — 항해
-
-| 항목 | 내용 |
-|------|------|
-| 감정 상태 | 미정 — 케이블카(50/50)와 종포해양공원(55/45) 사이 값으로 추정되나, 확정된 수치는 별도 지시 필요 |
-| 소원이 행동 | 미정 — 별도 지시 필요 |
-| 카메라 | 미정 — 별도 지시 필요 |
-| 핵심 감정 | 희망을 품고 앞으로 나아간다. 미남크루즈는 관광 유람선이 아니라 "기억을 싣고 앞으로 나아가는 배"다(`SSOT-BG-001` BG-05 참조). |
-
-> ⚠️ 이 장면은 2026-07-09 지시("DreamTown 별빛항로 및 상품 구조 최종 확정")로 8개 공식 항로에 편입되었으나, 감정 상태 수치·소원이 행동·카메라 구도는 이번 지시에 포함되지 않아 **추측으로 채우지 않았다.** 확정 필요.
-
----
-
-### [6] 종포해양공원 — 쉼
+### [5] 종포해양공원 — 쉼
 
 | 항목 | 내용 |
 |------|------|
@@ -128,7 +111,7 @@ layer: LAYER 2 — Operational SSOT
 
 ---
 
-### [7] 하멜등대 — 소원
+### [6] 하멜등대 — 소원
 
 | 항목 | 내용 |
 |------|------|
@@ -139,23 +122,40 @@ layer: LAYER 2 — Operational SSOT
 
 ---
 
-### [8] 호텔 — 안식
+## Optional Experience — 미남크루즈 (2026-07-13 재분류, Main Route 아님)
 
 | 항목 | 내용 |
 |------|------|
-| 감정 상태 | 슬픔 35 / 희망 65 |
-| 소원이 행동 | 창가에 선다. 야경을 바라본다. |
-| 카메라 | 실내에서 창밖을 향해 |
-| 핵심 감정 | 오늘 하루를 내려놓는다. |
+| 감정 상태 | 미정 — 별도 지시 필요 |
+| 소원이 행동 | 미정 — 별도 지시 필요 |
+| 카메라 | 미정 — 별도 지시 필요 |
+| 핵심 감정 | 희망을 품고 앞으로 나아간다. 미남크루즈는 관광 유람선이 아니라 "기억을 싣고 앞으로 나아가는 배"다(`SSOT-BG-001` BG-05 참조). |
+
+> 2026-07-09에는 이 장면이 Main Route [5]번으로 편입되어 있었으나, 2026-07-13 결정으로 **Optional Experience**로 재분류되어 EP01 Main Route에서 제외되었다. 감정 상태 수치 등 세부는 여전히 미정이며, Optional Experience 상품으로 실제 설계될 때 확정한다.
+
+---
+
+## Experience Stage — 호텔 (2026-07-13 재분류, Route Location 아님)
+
+호텔은 EP01 Main Route의 장소(scene)가 아니라, Route 전체를 감싸는 **Experience Stage**다.
+
+역할: **체크인 / First Promise / 안식 / 재진입**
+
+| 항목 | 내용 |
+|------|------|
+| 이전 역할(참고, 2026-07-09 이전 기록) | 안식 — 창가에 서서 야경을 바라보며 오늘 하루를 내려놓는다(슬픔35/희망65) |
+| 현재 역할(2026-07-13) | Route Location이 아닌 별도 단계. 상세 설계는 `SSOT-APP-002_DreamTown_First_Promise_Flow.md`(Draft) 참조 |
+
+> 이 재분류는 아래 "영상 Route 종료 원칙" 섹션에 있던 기존 표기 불일치(하멜등대에서 종료 vs 호텔이 항상 마지막 장면)를 실질적으로 해소한다 — 호텔이 Route Location이 아니게 되면서, "영상 Route는 하멜등대에서 종료한다"는 원칙과 자연스럽게 정합된다.
 
 ---
 
 ## 항로 설계 원칙
 
-1. 항로는 반드시 **도착 → 전환 → 연결 → 상승 → 항해 → 쉼 → 소원 → 안식** 순서를 따른다 (2026-07-09: "항해" 추가)
+1. Main Route는 반드시 **도착 → 전환 → 연결 → 상승 → 쉼 → 소원** 순서를 따른다 (2026-07-13: 6단계로 확정, "항해"는 Optional Experience로 이동, "안식"은 Experience Stage로 이동)
 2. 장면을 생략할 수 있으나 순서를 역행할 수 없다
-3. 하멜등대는 항상 클라이맥스 위치(마지막에서 두 번째)를 유지한다
-4. 호텔(안식)은 항상 마지막 장면이다
+3. 하멜등대는 항상 Main Route의 마지막(클라이맥스) 장면이다
+4. 호텔(안식)은 Main Route의 장면이 아니다 — Experience Stage로서 Route 전체를 감싼다(체크인/First Promise/안식/재진입)
 
 ---
 
@@ -169,15 +169,15 @@ EP01은 시작점이 아니라 **엔딩 감정**에서 설계됐다.
 이 감정에 도달하기 위해 항로는 역산으로 배치됐다.
 
 ```
-안식 (엔딩)
-  ← 소원
+소원 (Main Route 엔딩)
   ← 쉼
-  ← 항해
   ← 상승
   ← 연결
   ← 호흡
   ← 도착 (시작)
 ```
+
+> 안식(호텔)은 2026-07-13 재분류로 Experience Stage가 되어 이 역산 다이어그램에서 제외했다. Main Route 자체의 엔딩 감정은 "소원"(하멜등대)이다.
 
 정방향 실행 순서는 위의 역순이다.
 다음 에피소드도 반드시 **엔딩 감정 문장을 먼저 정의**한 뒤 항로를 역산한다.
@@ -193,7 +193,7 @@ EP01은 시작점이 아니라 **엔딩 감정**에서 설계됐다.
 하멜등대 이후(Day 2 귀가까지)는 SSOT-ROUTE-002에서 관리한다.
 영상 Route는 하멜등대 이후를 다루지 않는다.
 
-> ⚠️ **기존 문서 내 표기 확인 필요(이번 작업에서 임의로 수정하지 않음)**: 위 원칙은 "영상 Route가 하멜등대에서 종료"한다고 명시하지만, 바로 위 "EP01 항로 전체 구조"와 "항로 설계 원칙 4번"은 호텔(안식)을 항상 마지막 장면으로 정의하고 있다. 이 문서에 이미 존재하던 표기 차이이며, 이번 8개 항로 반영 작업의 범위를 벗어나 임의로 정정하지 않았다. `REPORT-Route_Product_Alignment.md`에 별도 기록.
+> ✅ **2026-07-13 해소**: 이전에는 "영상 Route가 하멜등대에서 종료"한다는 이 원칙과 "호텔(안식)이 항상 마지막 장면"이라는 옛 원칙이 서로 모순되어 있었다(`REPORT-Route_Product_Alignment.md`에 기록됨). 2026-07-13 재분류로 **호텔이 더 이상 Main Route의 장면이 아니게 되어** 이 모순이 해소되었다 — Main Route는 여전히 하멜등대에서 종료하고, 호텔은 별도의 Experience Stage로 그 바깥을 감싼다.
 
 ---
 
@@ -201,7 +201,8 @@ EP01은 시작점이 아니라 **엔딩 감정**에서 설계됐다.
 
 - [[SSOT-ROUTE-002_EP01_Experience_Route]] — EP01 실제 체험 Route (1박 2일, Day 2 귀가까지)
 - [[SSOT-LOC-001_DreamTown_Yeosu_Locations]] — 장소 감정 역할 정의
-- [[SSOT-BG-001_Starlight_Route_Background_Guide]] — DreamTown 공식 8개 항로(별빛항로) Background Asset, BG-05(항해의 항로/미남크루즈) 정의
+- [[SSOT-BG-001_Starlight_Route_Background_Guide]] — DreamTown 공식 Background Asset 8종(Main Route 6 + Optional 1 + Experience Stage 1)
+- [[SSOT-APP-002_DreamTown_First_Promise_Flow]] — 호텔 Experience Stage(체크인/First Promise/안식/재진입) 상세 설계
 - [[STATE-EP01_Where_My_Heart_Became_A_Star]] — EP01 감정 상태 로그
 - [[SSOT-IMG-001_DreamTown_Image_Generation_Guide]] — 이미지 생성 원칙
 - [[SSOT-VID-002_Kling_Animation_Guide]] — 영상 생성 원칙

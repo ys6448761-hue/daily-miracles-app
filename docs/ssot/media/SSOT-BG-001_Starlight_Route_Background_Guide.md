@@ -4,7 +4,7 @@ title: DreamTown 별빛항로 배경 가이드 (Starlight Route Background Guide
 status: LOCKED
 owner: Aurora5
 created: 2026-07-09
-updated: 2026-07-09 (BG-01~08 최종 확정 반영, BG-05 명칭 변경)
+updated: 2026-07-13 (EP01 Main Route 6개 확정, BG-05/BG-08 재분류 — 대표 승인)
 layer: LAYER 2 — Operational SSOT
 ---
 
@@ -74,9 +74,26 @@ LOCK
 
 ---
 
-## Background Asset 목록
+## EP01 Main Starlight Route (2026-07-13 확정, 대표 승인)
 
-> 8개 장소의 감정 역할·순서는 `SSOT-LOC-001_DreamTown_Yeosu_Locations`에서 이미 확정(Confirmed)된 것과 동일하다. 본 문서는 그 역할을 재정의하지 않고, 각 장소에 대응하는 **Background Asset(고정 이미지 자산)** 계층만 추가한다.
+**Main Route는 6개 장소로 확정한다.** BG-05(미남크루즈)와 BG-08(호텔)은 Main Route에서 제외하고 아래처럼 재분류한다.
+
+```
+1. 여수엑스포역   (BG-01)
+2. 엑스포 바닷길  (BG-02)
+3. 이순신광장     (BG-03)
+4. 케이블카       (BG-04)
+5. 종포해양공원   (BG-06)
+6. 하멜등대       (BG-07)
+```
+
+- **BG-05 미남크루즈 → Optional Experience로 재분류.** EP01 Main Route에는 포함하지 않는다. Background Asset 자체(정의·고정규칙)는 폐기하지 않고 그대로 유지한다 — Optional Experience 상품에서 재사용 가능.
+- **BG-08 호텔 → Route Location이 아니라 Experience Stage로 재분류.** 역할: 체크인, First Promise, 안식, 재진입. 상세는 `SSOT-APP-002_DreamTown_First_Promise_Flow.md`(Draft) 참조.
+- Part 3 모바일 별빛항로 안내 화면(`dreamtown-wishart` `STARLIGHT_ROUTE_EP01`)은 이미 이 6개 장소 기준으로 구현되어 있다(2026-07-13 승인으로 사후 확정됨).
+
+## Background Asset 목록 (전체, BG-01~08)
+
+> 8개 장소의 감정 역할·순서는 `SSOT-LOC-001_DreamTown_Yeosu_Locations`에서 이미 확정(Confirmed)된 것과 동일하다. 본 문서는 그 역할을 재정의하지 않고, 각 장소에 대응하는 **Background Asset(고정 이미지 자산)** 계층만 추가한다. 아래 목록은 8개 Background Asset 전체(Main Route 6개 + Optional 1개 + Experience Stage 1개)이며, Main Route 여부는 위 섹션을 기준으로 한다.
 > **2026-07-09 최종 확정**: "DreamTown 별빛항로(Route) 및 상품 구조 최종 확정" 지시에 따라 BG-01~08의 감정 문구를 확정판으로 갱신하고, **BG-05의 명칭을 "상승의 항로"에서 "항해의 항로"로 변경**했다(이전 버전에서 BG-04와 BG-05가 동일하게 "상승의 항로"로 중복 표기되어 있었으며, 이번 확정으로 그 중복이 해소되었다).
 
 ### BG-01 — 도착의 항로
@@ -115,7 +132,7 @@ LOCK
 | 시간 | 낮 |
 | 역할 | 더 넓게 보다 |
 
-### BG-05 — 항해의 항로 (2026-07-09 명칭 확정, 이전: 상승의 항로)
+### BG-05 — 항해의 항로 (2026-07-09 명칭 확정, 이전: 상승의 항로) — **Optional Experience (2026-07-13, EP01 Main Route 아님)**
 
 | 항목 | 내용 |
 |---|---|
@@ -123,6 +140,7 @@ LOCK
 | 감정 | 희망을 품고 앞으로 나아간다 |
 | 시간 | 노을 |
 | 역할 | 바다 위에서 마음이 열린다 |
+| 분류 | Optional Experience (EP01 Main Route 제외) |
 
 **미남크루즈 정의(확정)**: 미남크루즈는 관광 유람선이 아니라, DreamTown의 **"기억을 싣고 앞으로 나아가는 배"**이다.
 
@@ -153,14 +171,15 @@ LOCK
 - 케이블카
 - 도시 야경
 
-### BG-08 — 안식의 항로
+### BG-08 — 안식의 항로 — **Experience Stage (2026-07-13, Route Location 아님)**
 
 | 항목 | 내용 |
 |---|---|
 | 장소 | 여수 호텔 |
 | 감정 | 오늘을 마무리한다. 회복한다. |
 | 시간 | 밤 |
-| 역할 | 오늘을 마무리하다 |
+| 역할 | 오늘을 마무리하다 → **체크인 / First Promise / 안식 / 재진입**(2026-07-13 재정의) |
+| 분류 | Experience Stage (EP01 Main Route의 "장소"가 아니라, 여정을 감싸는 별도 단계). 상세: `SSOT-APP-002_DreamTown_First_Promise_Flow.md` |
 
 ---
 

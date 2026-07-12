@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-07-12T21:14:11.352Z",
+  "generated_at": "2026-07-12T22:37:14.784Z",
   "generator": "generate-manifest.js",
-  "total_count": 376,
+  "total_count": 378,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -996,7 +996,7 @@
       "status": "Candidate",
       "title": "CAND-EXP-001 — DreamTown Experience Architecture (Candidate)",
       "created_at": "2026-07-12",
-      "checksum": "9b719568"
+      "checksum": "1c9e8ac9"
     },
     {
       "id": "DOC-CONSTITUTION_GOVERNANCE",
@@ -3806,7 +3806,7 @@
       "status": "Confirmed",
       "title": "SSOT-ROUTE-001 — EP01 영상 콘텐츠용 감정 항로",
       "created_at": "2026-07-12",
-      "checksum": "45b95a15"
+      "checksum": "134c6d48"
     },
     {
       "id": "DOC-SSOT-ROUTE-002_EP01_Experience",
@@ -3896,7 +3896,7 @@
       "status": "LOCKED",
       "title": "SSOT-BG-001 — DreamTown 별빛항로 배경 가이드",
       "created_at": "2026-07-12",
-      "checksum": "68702ac7"
+      "checksum": "e0ae7757"
     },
     {
       "id": "DOC-SSOT-DESIGN-001_Reverse_Emotio",
@@ -4513,6 +4513,41 @@
       "title": "DreamTown Yeosu Galaxy SSOT",
       "created_at": "2026-07-12",
       "checksum": "fb61049e"
+    },
+    {
+      "id": "DOC-SSOT-APP-001_DreamTown_Mobile_",
+      "path": "docs/ssot/support/SSOT-APP-001_DreamTown_Mobile_Journey_Guide.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "support",
+        "소원",
+        "aurora"
+      ],
+      "owner": "대표(푸르미르) / Aurora5 / Claude Code",
+      "status": "Confirmed (구현 완료, 2026-07-13 대표 승인)",
+      "title": "SSOT-APP-001 — DreamTown Mobile Journey Guide (Part 3)",
+      "created_at": "2026-07-12",
+      "checksum": "c71c4d09"
+    },
+    {
+      "id": "DOC-SSOT-APP-002_DreamTown_First_P",
+      "path": "docs/ssot/support/SSOT-APP-002_DreamTown_First_Promise_Flow.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "support",
+        "aurora"
+      ],
+      "owner": "대표(푸르미르) / Aurora5 / Claude Code",
+      "status": "Draft (다음 스프린트 설계 — 이번 턴에서 코드 구현하지 않음)",
+      "title": "SSOT-APP-002 — DreamTown First Promise Flow (Part 2)",
+      "created_at": "2026-07-12",
+      "checksum": "ff33ff3d"
     },
     {
       "id": "DOC-SSOT-ARCH-001_WishArt_Platform",

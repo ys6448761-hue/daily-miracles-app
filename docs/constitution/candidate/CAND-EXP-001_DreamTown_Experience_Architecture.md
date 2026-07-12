@@ -69,10 +69,10 @@ Wish → Welcome → Check-in → Journey → Return → Reconnection
 | 단계 | 목적 | 사용자 감정 | 사용자 행동 | DreamTown 역할 |
 |---|---|---|---|---|
 | **Wish** | 소원을 발견하고 표현한다 | 아직 응답 전(1P 발견, `SSOT-WISHART-001` ②) | 소원 작성, 스타터카드·정면사진 제출 | WishArt Engine이 1P(소원그림) 생성 |
-| **Welcome** | 별들의 가족이 된다 | 낯섦 → 기대 | 개인정보·이미지 저장 동의(`consent_version`) | 주민등록(`residents`), 주민증 발급, Booking→Entitlement 발급 |
-| **Check-in** | 여정의 시작을 확인한다 | 도착의 항로(BG-01, 새로운 시작) | 스타터키트 수령, QR 스캔 | `origin_hotel_id` 확인, Booking REDEEMED 전이, Journey 생성 |
-| **Journey** | 별빛항로 8개 장면을 체험한다 | 도착→호흡→연결→상승→항해→쉼→소원→안식(`SSOT-BG-001` BG-01~08) | 걷기·바라보기·쉬기(`DreamTown_Character_SSOT.md` 소원이 담당 행동) | Background Asset 제공, WishArt 2P/3P 생성, Reveal Rule(별·별씨앗·별공방은 3P부터) |
-| **Return** | 오늘을 마무리하고 일상으로 돌아간다 | 안식(BG-08) | 결과(소원그림+주민카드) 확인, 다운로드/공유 | 결과 전달, `atelier_records` 저장(별공방), Promise 기록 |
+| **Welcome**(= First Promise, `SSOT-APP-002` Draft) | 별들의 가족이 된다 | 낯섦 → 기대 | 가족선택→스타터카드→정면사진→동의(First Promise 화면 순서) | Activation(권한검증·Check-in Session) → First Promise(사용자화면) → System Registration Transaction(Journey 연결, Route Ready). **동의·사진 제출 완료 전까지 Resident/Atelier는 PENDING 유지** |
+| **Check-in** | 여정의 시작을 확인한다 | 도착의 항로(BG-01, 새로운 시작) | 스타터키트 수령, QR/Activation Token 오픈 | Activation 레이어가 Booking/Product/Hotel/Token 권한 검증 + 재진입 가능한 Check-in Session 생성(`SSOT-APP-002`) |
+| **Journey** | EP01 Main Starlight Route **6개 장면**을 체험한다(2026-07-13 확정) | 도착→호흡→연결→상승→쉼→소원(`SSOT-BG-001`/`SSOT-ROUTE-001` Main Route) | 걷기·바라보기·쉬기(`DreamTown_Character_SSOT.md` 소원이 담당 행동) | Background Asset 제공(Main Route 6개), 모바일 안내 화면(`SSOT-APP-001`), Reveal Rule(별·별씨앗·별공방은 3P부터). 미남크루즈는 Optional Experience로 별도 제공 |
+| **Return** | 오늘을 마무리하고 일상으로 돌아간다 | 안식(호텔 Experience Stage, `SSOT-APP-002`) | 결과(소원그림+주민카드) 확인, 다운로드/공유 | 결과 전달, `atelier_records` 저장(별공방), Promise 기록. 호텔은 Route Location이 아니라 Experience Stage(체크인/First Promise/안식/재진입)로 관리 |
 | **Reconnection** | 시간이 지난 뒤 다시 연결된다 | 그리움 → 재회 | 재방문 또는 알림 수신 | **미정 — 자료 없음.** 재회(Reunion) 트리거·동작은 `SSOT-IDENTITY-001` §5, `DreamTown_V1_Architecture_Freeze.md` §6에서 이미 스펙 없음으로 확인됨. 이 문서에서도 추측하지 않는다. |
 
 각 단계에서 **아우룸의 안내 음성**(보이스오버/시스템 내레이션)이 전환을 알리고, **소원이**는 감정 장면만 담당한다(`DreamTown_Character_SSOT.md` v2.1 역할 분리 원칙).
@@ -164,8 +164,9 @@ DreamTown에서 충분히 검증된 뒤, Project Phoenix의 다른 프로젝트�
 ## 관련 문서 (참조만, 변경하지 않음)
 
 - `SSOT-WISHART-001_WishArt_V4_Core_Guide.md`
-- `SSOT-ROUTE-001_EP01_Wish_Journey.md`, `SSOT-BG-001_Starlight_Route_Background_Guide.md`
+- `SSOT-ROUTE-001_EP01_Wish_Journey.md`, `SSOT-BG-001_Starlight_Route_Background_Guide.md`(2026-07-13: EP01 Main Route 6개 확정)
 - `SSOT-PRODUCT-001_DreamTown_Product_Architecture.md`
+- `SSOT-APP-001_DreamTown_Mobile_Journey_Guide.md`(Part 3, 구현됨) / `SSOT-APP-002_DreamTown_First_Promise_Flow.md`(Part 2, Draft)
 - `DreamTown_V1_Architecture_Freeze.md`(APPROVED v1.0)
 - `docs/ssot/media/SSOT-OPS-001_DreamTown_Video_Pipeline.md`
 - `docs/ssot/core/DreamTown_Character_SSOT.md`
