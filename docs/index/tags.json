@@ -298,6 +298,7 @@
     "DOC-CAND-OS-001_Lumi_OS_v2_Phase1_",
     "DOC-CAND-OS-002_Lumi_OS_v21_Memor",
     "DOC-CONSTITUTION_GOVERNANCE",
+    "DOC-OP-CONSTITUTION-001_Pilot_Rese",
     "DOC-CONSTITUTION",
     "DOC-DreamTown_Knowledge_Map",
     "DOC-DreamTown_GPT_Knowledge_Pack",
@@ -924,6 +925,7 @@
   ],
   "constitution": [
     "DOC-CONSTITUTION_GOVERNANCE",
+    "DOC-OP-CONSTITUTION-001_Pilot_Rese",
     "DOC-DreamTown_Canonical_Foundation",
     "DOC-HUMAN_FIRST",
     "DOC-NO_EMOTIONAL_ADDICTION",
@@ -935,6 +937,8 @@
     "DOC-RESEARCH-011_Evidence_Collecti",
     "DOC-RESEARCH-012_Participant_Journ",
     "DOC-RESEARCH-013_EP01_End-to-End_U",
+    "DOC-RESEARCH-014_EP01_Operator_Pla",
+    "DOC-RESEARCH-015_EP01_Pilot_Readin",
     "DOC-RESEARCH-GEUMO-001_Turtle_Lege",
     "DOC-STATUS_Pilot_Research"
   ],

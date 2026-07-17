@@ -6,7 +6,10 @@
 
 **Current Branch:** Pilot Research
 **Current Status:** EP01 Pilot preparation
-**Last Updated:** 2026-07-18
+**Last Updated:** 2026-07-18 (OP-CONSTITUTION-001 채택 반영)
+**Active Constitution:** `docs/constitution/OP-CONSTITUTION-001_Pilot_Research_Execution_Rules.md`
+(Pilot Only — Claude Code가 지금부터 항상 따라야 하는 10개 규칙. 파일럿
+종료 후 개정 전제)
 
 ---
 
@@ -17,6 +20,8 @@
 - RESEARCH-011
 - RESEARCH-012
 - RESEARCH-013
+- RESEARCH-014
+- RESEARCH-015
 
 ## Current Objective
 
@@ -37,6 +42,12 @@ DreamTown EP01 파일럿을 실제 운영 가능한 수준으로 준비한다.
 - 참가자 경험 해석 금지
 - Evidence 자동 생성 금지
 
+이 규칙들은 이제 `OP-CONSTITUTION-001`(Rule 5~8)이 공식 근거다 — 이후
+이 목록이 아니라 그 문서를 1차 기준으로 참조한다.
+
 ## Next Task
 
-`RESEARCH-014_EP01_Operator_Playbook` (아직 생성 안 함)
+미정 — `RESEARCH-015_EP01_Pilot_Readiness_Checklist` 완료, 다음 지시
+대기 중. RESEARCH-010~015로 EP01 파일럿 준비 문서 세트(연구/여정/운영자
+가이드/준비 체크리스트)가 갖춰졌다 — 다음은 문서 설계가 아니라 실제
+파일럿 실행 단계일 가능성이 높다.

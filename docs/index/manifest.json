@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-07-17T23:19:53.800Z",
+  "generated_at": "2026-07-17T23:31:57.638Z",
   "generator": "generate-manifest.js",
-  "total_count": 401,
+  "total_count": 404,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1086,6 +1086,23 @@
       "checksum": "34ea0981"
     },
     {
+      "id": "DOC-OP-CONSTITUTION-001_Pilot_Rese",
+      "path": "docs/constitution/OP-CONSTITUTION-001_Pilot_Research_Execution_Rules.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "constitution",
+      "tags": [
+        "constitution",
+        "aurora"
+      ],
+      "owner": "대표(푸르미르) / Aurora5 / Claude Code",
+      "status": "Constitution (Active Operational Constitution — Pilot Only)",
+      "title": "OP-CONSTITUTION-001 — Pilot Research Execution Rules",
+      "created_at": "2026-07-17",
+      "checksum": "8e7c1e4b"
+    },
+    {
       "id": "DOC-RESEARCH-010_Pilot_Study_EP01",
       "path": "docs/constitution/research/RESEARCH-010_Pilot_Study_EP01.md",
       "type": "document",
@@ -1150,6 +1167,38 @@
       "checksum": "7b9f4701"
     },
     {
+      "id": "DOC-RESEARCH-014_EP01_Operator_Pla",
+      "path": "docs/constitution/research/RESEARCH-014_EP01_Operator_Playbook.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "EP01 Pilot Operator Guide",
+      "tags": [
+        "research"
+      ],
+      "owner": "team",
+      "status": "Operational Draft",
+      "title": "RESEARCH-014 — EP01 Operator Playbook",
+      "created_at": "2026-07-17",
+      "checksum": "c6e2fd0c"
+    },
+    {
+      "id": "DOC-RESEARCH-015_EP01_Pilot_Readin",
+      "path": "docs/constitution/research/RESEARCH-015_EP01_Pilot_Readiness_Checklist.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "EP01 Pilot Readiness Assessment",
+      "tags": [
+        "research"
+      ],
+      "owner": "team",
+      "status": "Pre-Pilot Checklist",
+      "title": "RESEARCH-015 — EP01 Pilot Readiness Checklist",
+      "created_at": "2026-07-17",
+      "checksum": "d16de6d4"
+    },
+    {
       "id": "DOC-RESEARCH-GEUMO-001_Turtle_Lege",
       "path": "docs/constitution/research/RESEARCH-GEUMO-001_Turtle_Legend_Symbol_Interpretation.md",
       "type": "document",
@@ -1179,7 +1228,7 @@
       "status": "superseded",
       "title": "Project Phoenix — Current Working State (Pilot Research)",
       "created_at": "2026-07-17",
-      "checksum": "595591a9"
+      "checksum": "e58a84d5"
     },
     {
       "id": "DOC-CONSTITUTION",

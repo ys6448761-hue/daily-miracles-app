@@ -56,6 +56,18 @@ DreamTown은 항로(Route)를 통해 사람들이 **자기 안의 희망을 다�
 
 ---
 
+## Active Operational Constitution (Pilot Only)
+
+아래 문서는 위 "미승인" 표와 다르다 — Research/Candidate 검증 대상이
+아니라, **Claude Code가 지금 즉시 따라야 하는 운영 규칙**으로 채택된
+Constitution 등급 문서다. 단, 적용 범위는 **DreamTown EP01 파일럿
+기간으로 한정**되며, 파일럿 종료 후 운영 경험을 반영한 개정을
+전제로 한다 — 영구 확정판이 아니다.
+
+| 문서 | Status | 위치 |
+|---|---|---|
+| OP-CONSTITUTION-001 (Pilot Research Execution Rules) | Constitution (Active, Pilot Only) | `docs/constitution/OP-CONSTITUTION-001_Pilot_Research_Execution_Rules.md` |
+
 ## Candidates & Research (미승인 — 참고용)
 
 아래 문서는 **아직 SSOT나 Constitution으로 승인되지 않았다.** 위
@@ -70,9 +82,10 @@ Constitution 순서 중 앞 두 단계에 있는 진행 중 자료다.
 | RESEARCH-011 (Evidence Collection Protocol) | Research | `docs/constitution/research/RESEARCH-011_Evidence_Collection_Protocol.md` — RESEARCH-010의 인터뷰 수집 형식을 표준화 |
 | RESEARCH-012 (Participant Journey) | Research | `docs/constitution/research/RESEARCH-012_Participant_Journey.md` — §4에 "EP01 End-to-End 경험 시나리오 미작성" 공백을 기록 |
 | RESEARCH-013 (EP01 End-to-End User Journey) | Experience Scenario | `docs/constitution/research/RESEARCH-013_EP01_End-to-End_User_Journey.md` — RESEARCH-012 §4의 공백을 채움 |
+| RESEARCH-014 (EP01 Operator Playbook) | Operational Draft | `docs/constitution/research/RESEARCH-014_EP01_Operator_Playbook.md` — 파일럿 운영자용 최소 운영 기준 |
+| RESEARCH-015 (EP01 Pilot Readiness Checklist) | Pre-Pilot Checklist | `docs/constitution/research/RESEARCH-015_EP01_Pilot_Readiness_Checklist.md` — 파일럿 시작 전 준비 상태 점검 |
 
-**현재 작업 상태:** `docs/constitution/research/STATUS_Pilot_Research.md`
-참조 (Next Task: `RESEARCH-014_EP01_Operator_Playbook`, 아직 생성 안 함)
+**현재 작업 상태:** `docs/constitution/research/STATUS_Pilot_Research.md` 참조
 
 ## 신규 파트너 / 새 세션 시작 순서
 
