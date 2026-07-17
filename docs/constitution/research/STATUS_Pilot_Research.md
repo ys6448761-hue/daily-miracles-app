@@ -24,6 +24,7 @@ Evidence 검토 → Candidate 검토, 각 화살표는 승인 필요 지점)
 - RESEARCH-013
 - RESEARCH-014
 - RESEARCH-015
+- RESEARCH-016
 
 ## Current Objective
 
