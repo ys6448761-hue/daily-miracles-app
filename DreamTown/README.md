@@ -85,6 +85,7 @@ Constitution 순서 중 앞 두 단계에 있는 진행 중 자료다.
 | RESEARCH-014 (EP01 Operator Playbook) | Operational Draft | `docs/constitution/research/RESEARCH-014_EP01_Operator_Playbook.md` — 파일럿 운영자용 최소 운영 기준 |
 | RESEARCH-015 (EP01 Pilot Readiness Checklist) | Pre-Pilot Checklist | `docs/constitution/research/RESEARCH-015_EP01_Pilot_Readiness_Checklist.md` — 파일럿 시작 전 준비 상태 점검 |
 | RESEARCH-016 (Observation Promotion Criteria) | Draft | `docs/constitution/research/RESEARCH-016_Observation_Promotion_Criteria.md` — Raw Interview → Observation 승격 기준 (Non-Criteria 포함), OP-CONSTITUTION-001 Rule 6/8 Gate의 판단 기준 상세본 |
+| RESEARCH-017 (Evidence Promotion Criteria) | Draft | `docs/constitution/research/RESEARCH-017_Evidence_Promotion_Criteria.md` — Observation → Evidence 승격 기준 (Non-Criteria 포함), RESEARCH-016의 다음 단계 |
 
 **현재 작업 상태:** `docs/constitution/research/STATUS_Pilot_Research.md` 참조
 
