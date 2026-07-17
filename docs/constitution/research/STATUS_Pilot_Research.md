@@ -6,7 +6,9 @@
 
 **Current Branch:** Pilot Research
 **Current Status:** EP01 Pilot preparation
-**Last Updated:** 2026-07-18 (OP-CONSTITUTION-001 채택 반영)
+**Last Updated:** 2026-07-18 (OP-CONSTITUTION-001 Rule 8에 Governance
+Gate 추가 — Threshold Reached → 질문 → 대표 승인 → Observation 생성 →
+Evidence 검토 → Candidate 검토, 각 화살표는 승인 필요 지점)
 **Active Constitution:** `docs/constitution/OP-CONSTITUTION-001_Pilot_Research_Execution_Rules.md`
 (Pilot Only — Claude Code가 지금부터 항상 따라야 하는 10개 규칙. 파일럿
 종료 후 개정 전제)

@@ -5,6 +5,7 @@ status: Constitution (Active Operational Constitution — Pilot Only)
 category: Operating Rules
 owner: 대표(푸르미르) / Aurora5 / Claude Code
 created: 2026-07-18
+last_updated: 2026-07-18 (Rule 4 Pilot Flow에 Pilot Log Update / Threshold Check 단계 추가, Rule 6에 Threshold Check 연동 명시, Rule 8에 Governance Gate — 대표 승인 체크포인트 — 추가)
 scope: "Pilot Only — DreamTown EP01 파일럿 연구 운영 기간 중에만 적용되는 Claude Code의 행동 규칙 (DreamTown 세계관/철학 Constitution과는 별개, 영구 Constitution 아님)"
 revision_premise: 파일럿 종료 후 실제 운영 경험을 반영해 개정하는 것을 전제로 한다 — 이 문서를 파일럿 종료 시점의 최종 확정판으로 취급하지 않는다.
 related_research:
@@ -73,16 +74,56 @@ DreamTown의 목적은 참가자의 경험이다.
 
 ## Rule 4. Pilot Flow
 
-연구 참여자가 동의한 경우 다음 순서를 따른다.
+연구 참여자가 동의한 경우 다음 순서를 따른다(2026-07-18 갱신 — Pilot
+Log Update와 Threshold Check 단계 추가).
 
-1. 연구 참여 안내
-2. 참여 동의
-3. 사전 체크
-4. DreamTown 항로 체험
-5. 사후 체크
-6. 선택 인터뷰
-7. 감사 선물 제공
-8. Raw Interview 저장
+```
+Participant Arrives
+  ↓
+Route Experience
+  ↓
+Research Consent
+  ↓
+Pre Check
+  ↓
+EP01 Experience
+  ↓
+Post Check
+  ↓
+Interview (Optional)
+  ↓
+Raw Interview Save
+  ↓
+Pilot Log Update
+  ↓
+Threshold Check
+  ↓
+(조건 충족 시) "Observation 검토를 시작하시겠습니까?"
+```
+
+이전 버전(1~8단계 목록)과 대응:
+
+1. 연구 참여 안내 = Research Consent 이전 단계
+2. 참여 동의 = Research Consent
+3. 사전 체크 = Pre Check
+4. DreamTown 항로 체험 = Route Experience / EP01 Experience
+5. 사후 체크 = Post Check
+6. 선택 인터뷰 = Interview (Optional)
+7. 감사 선물 제공 = (이 다이어그램에는 명시되지 않음 — 기존 순서 유지,
+   Raw Interview Save 전후 어디든 가능)
+8. Raw Interview 저장 = Raw Interview Save
+
+**신규 단계:**
+
+- **Pilot Log Update** — 매 참가자 종료 후 Raw Interview 저장과 별개로
+  파일럿 운영 로그를 갱신한다(예: 누적 참가자 수, 반복 표현 후보 수).
+- **Threshold Check** — 로그 갱신 후, Observation 후보 생성 기준(Rule 6,
+  예: 유사 표현 3~5건 이상 반복)이 충족되었는지 확인한다.
+- **조건 충족 시 질문** — 기준이 충족되면 Claude Code는 Observation을
+  **자동으로 생성하지 않고**, 반드시 다음과 같이 사용자에게 먼저
+  묻는다: **"Observation 검토를 시작하시겠습니까?"** 사용자가 승인한
+  뒤에만 Observation 검토를 시작한다. 이는 Rule 6(No Automatic
+  Observation)을 실행 절차로 구체화한 것이다.
 
 ---
 
@@ -101,6 +142,10 @@ Claude Code는 참가자의 감정을 해석하지 않는다.
 Raw Interview가 저장되더라도 Observation을 자동 생성하지 않는다.
 
 Observation은 반복성이 확인될 때만 생성 후보가 된다.
+
+Rule 4의 Threshold Check에서 기준이 충족되어도, Claude Code는 즉시
+Observation을 만들지 않고 "Observation 검토를 시작하시겠습니까?"라고
+먼저 묻는다 — 사용자 승인 이후에만 검토를 시작한다.
 
 ---
 
@@ -129,6 +174,39 @@ SSOT
 ```
 
 어느 단계도 건너뛰지 않는다.
+
+### Governance Gate (2026-07-18 추가)
+
+Rule 4의 Threshold Check 이후 실제로 단계를 밟아 올라가는 절차는
+다음과 같다 — 각 화살표는 자동 진행이 아니라 승인이 필요한 지점이다.
+
+```
+Threshold Reached
+  ↓
+Claude Code: "Observation 검토를 시작하시겠습니까?"
+  ↓
+대표 승인
+  ↓
+Observation 생성
+  ↓
+Evidence 검토
+  ↓
+Candidate 검토
+```
+
+- **Threshold Reached → 질문:** Rule 6과 동일 — Claude Code는 자동으로
+  넘어가지 않고 먼저 묻는다.
+- **질문 → 대표 승인:** 사용자(대표)가 명시적으로 승인해야 다음
+  단계로 진행한다. 승인 없이는 Observation을 생성하지 않는다.
+- **Observation 생성 → Evidence 검토:** Observation이 만들어졌다고
+  자동으로 Evidence가 되지 않는다(Rule 7) — Evidence 승격 여부도
+  별도로 검토·확인받는다.
+- **Evidence 검토 → Candidate 검토:** 마찬가지로 Evidence가 쌓였다고
+  자동으로 Candidate가 되지 않는다 — Candidate 승격도 별도 검토
+  대상이다.
+- 이 Gate를 통과한 뒤에도 `CONSTITUTION_GOVERNANCE.md`의 정식
+  Candidate → Review → Constitution/SSOT 절차(대표 승인, Approval
+  Gate 등)를 그대로 따른다 — 이 Gate가 그 절차를 대체하지 않는다.
 
 ---
 

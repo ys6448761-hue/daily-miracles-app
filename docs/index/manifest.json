@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-07-17T23:31:57.638Z",
+  "generated_at": "2026-07-17T23:37:34.142Z",
   "generator": "generate-manifest.js",
   "total_count": 404,
   "documents": [
@@ -1100,7 +1100,7 @@
       "status": "Constitution (Active Operational Constitution — Pilot Only)",
       "title": "OP-CONSTITUTION-001 — Pilot Research Execution Rules",
       "created_at": "2026-07-17",
-      "checksum": "8e7c1e4b"
+      "checksum": "6958147a"
     },
     {
       "id": "DOC-RESEARCH-010_Pilot_Study_EP01",
@@ -1228,7 +1228,7 @@
       "status": "superseded",
       "title": "Project Phoenix — Current Working State (Pilot Research)",
       "created_at": "2026-07-17",
-      "checksum": "e58a84d5"
+      "checksum": "d73744be"
     },
     {
       "id": "DOC-CONSTITUTION",
