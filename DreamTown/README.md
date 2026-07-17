@@ -56,6 +56,17 @@ DreamTown은 항로(Route)를 통해 사람들이 **자기 안의 희망을 다�
 
 ---
 
+## Candidates & Research (미승인 — 참고용)
+
+아래 문서는 **아직 SSOT나 Constitution으로 승인되지 않았다.** 위
+"핵심 자산" 표와 같은 층위로 취급하지 않는다 — Research → Candidate →
+Constitution 순서 중 앞 두 단계에 있는 진행 중 자료다.
+
+| 문서 | Status | 위치 |
+|---|---|---|
+| CAND-CONSTITUTION-001 (Geumo Legend Heart Mirror) | Candidate | `docs/constitution/candidate/CAND-CONSTITUTION-001_Geumo_Legend_Heart_Mirror.md` |
+| RESEARCH-GEUMO-001 (Turtle Legend Symbol Interpretation) | Research Note | `docs/constitution/research/RESEARCH-GEUMO-001_Turtle_Legend_Symbol_Interpretation.md` |
+
 ## 신규 파트너 / 새 세션 시작 순서
 
 1. 이 README를 읽는다
@@ -65,6 +76,28 @@ DreamTown은 항로(Route)를 통해 사람들이 **자기 안의 희망을 다�
 
 ---
 
+## Production / Operations 역할 분리 (2026-07-17)
+
+`dreamtown-assets`(별도 저장소)와 이 `DreamTown/` 폴더는 역할이 다르다.
+
+```
+dreamtown-assets  → Production (제작)
+  ├─ 03_KLING      생성 소스
+  ├─ 04_DAVINCI    편집 중
+  └─ 05_FINAL      완성본 (Source of Truth)
+
+DreamTown/        → Operations (운영)
+  ├─ 07_YOUTUBE    YouTube 운영 (영상 재저장 없음)
+  ├─ 08_SNS        SNS 운영 (영상/이미지 재저장 없음)
+  └─ 09_CUSTOMER   고객 패키지 운영 (예: Starter Kit)
+```
+
+**절대 원칙:** `07_YOUTUBE`에는 영상을 중복 저장하지 않는다. 영상
+원본은 항상 `dreamtown-assets/05_FINAL`을 참조한다. `08_SNS`,
+`09_CUSTOMER`도 동일한 원칙을 따른다 — 원본은 항상 `dreamtown-assets`를
+참조하고, 이 폴더들은 운영 문서(업로드 기록/게시 기록/고객 패키지
+실행 문서)만 담는다.
+
 ## 디렉토리 구조
 
 ```
@@ -72,8 +105,11 @@ DreamTown/
 ├─ README.md          ← 지금 이 파일
 ├─ SSOT/
 │  └─ INDEX.md        ← 전체 SSOT 진입점 (원본은 docs/ssot/ 에 있음)
-└─ Assets/
-   ├─ EP01/ (Images/ Videos/ OST/)
-   ├─ EP02/
-   └─ EP03/
+├─ Assets/
+│  ├─ EP01/ (Images/ Videos/ OST/)
+│  ├─ EP02/
+│  └─ EP03/
+├─ 07_YOUTUBE/         ← Operations: YouTube 운영 기록
+├─ 08_SNS/             ← Operations: SNS 운영 기록
+└─ 09_CUSTOMER/        ← Operations: 고객 패키지 (Starter Kit 등)
 ```

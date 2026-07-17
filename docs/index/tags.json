@@ -32,7 +32,10 @@
     "DOC-online-wish-voyage-api-design",
     "DOC-HAMEL_REFERENCE_AUDIT",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
+    "DOC-CAND-CONSTITUTION-001_Geumo_Le",
     "DOC-CAND-EXP-001_DreamTown_Experie",
+    "DOC-CAND-OS-001_Lumi_OS_v2_Phase1_",
+    "DOC-CAND-OS-002_Lumi_OS_v21_Memor",
     "DOC-CONSTITUTION",
     "DOC-DEC-20260201-포인트추천예고편-정책구현",
     "DOC-index",
@@ -54,6 +57,8 @@
     "DOC-JUDGE_PROMPTS",
     "DOC-README",
     "DOC-LAUNCH-DECLARATION",
+    "DOC-README",
+    "DOC-MILESTONE-001_Phase1_Operating",
     "DOC-설계구조-루미기획-충돌분석",
     "DOC-소원이야기-책-구조-설명",
     "DOC-ad-creative-growth-high-v1",
@@ -288,7 +293,10 @@
     "DOC-SOURCES_INDEX",
     "DOC-AURORA5_CHARACTER_PROMPTS",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
+    "DOC-CAND-BRAND-001_Haruharu_Miracl",
     "DOC-CAND-EXP-001_DreamTown_Experie",
+    "DOC-CAND-OS-001_Lumi_OS_v2_Phase1_",
+    "DOC-CAND-OS-002_Lumi_OS_v21_Memor",
     "DOC-CONSTITUTION_GOVERNANCE",
     "DOC-CONSTITUTION",
     "DOC-DreamTown_Knowledge_Map",
@@ -908,7 +916,11 @@
     "DOC-최수민방식_치트시트"
   ],
   "candidate": [
-    "DOC-CAND-EXP-001_DreamTown_Experie"
+    "DOC-CAND-BRAND-001_Haruharu_Miracl",
+    "DOC-CAND-CONSTITUTION-001_Geumo_Le",
+    "DOC-CAND-EXP-001_DreamTown_Experie",
+    "DOC-CAND-OS-001_Lumi_OS_v2_Phase1_",
+    "DOC-CAND-OS-002_Lumi_OS_v21_Memor"
   ],
   "constitution": [
     "DOC-CONSTITUTION_GOVERNANCE",
@@ -917,6 +929,9 @@
     "DOC-NO_EMOTIONAL_ADDICTION",
     "DOC-REALITY_RECONNECTION",
     "DOC-UNFINISHED_TIME"
+  ],
+  "research": [
+    "DOC-RESEARCH-GEUMO-001_Turtle_Lege"
   ],
   "deployment": [
     "DOC-deployment-checklist"
@@ -978,6 +993,31 @@
   ],
   "learnings": [
     "DOC-최수민방식_완전정리"
+  ],
+  "evidence": [
+    "DOC-TEMPLATE_Evidence"
+  ],
+  "highlight": [
+    "DOC-README",
+    "DOC-TEMPLATE_Highlight"
+  ],
+  "_pilot-test-samples": [
+    "DOC-HLT-001",
+    "DOC-HLT-002",
+    "DOC-HLT-003",
+    "DOC-HLT-004",
+    "DOC-HLT-005",
+    "DOC-README"
+  ],
+  "operations": [
+    "DOC-MILESTONE-001_Phase1_Operating",
+    "DOC-README"
+  ],
+  "observations": [
+    "DOC-TEMPLATE_Observation"
+  ],
+  "weekly-review": [
+    "DOC-TEMPLATE_Weekly_Review"
   ],
   "lumi": [
     "DOC-설계구조-루미기획-충돌분석",
