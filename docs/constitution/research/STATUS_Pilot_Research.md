@@ -26,6 +26,7 @@ Evidence 검토 → Candidate 검토, 각 화살표는 승인 필요 지점)
 - RESEARCH-015
 - RESEARCH-016
 - RESEARCH-017
+- RESEARCH-018
 
 ## Current Objective
 
@@ -51,7 +52,7 @@ DreamTown EP01 파일럿을 실제 운영 가능한 수준으로 준비한다.
 
 ## Next Task
 
-미정 — `RESEARCH-015_EP01_Pilot_Readiness_Checklist` 완료, 다음 지시
-대기 중. RESEARCH-010~015로 EP01 파일럿 준비 문서 세트(연구/여정/운영자
-가이드/준비 체크리스트)가 갖춰졌다 — 다음은 문서 설계가 아니라 실제
-파일럿 실행 단계일 가능성이 높다.
+미정 — `RESEARCH-016~018`(Observation → Evidence → Candidate 승격
+기준 3부작)이 완료되어, Raw Interview부터 Candidate 제안까지 전체
+승격 파이프라인의 판단 기준이 모두 문서화되었다. 다음은 문서 설계가
+아니라 실제 파일럿 실행(참가자 모집·운영) 단계일 가능성이 높다.

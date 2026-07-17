@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-07-17T23:46:08.605Z",
+  "generated_at": "2026-07-17T23:48:51.828Z",
   "generator": "generate-manifest.js",
-  "total_count": 406,
+  "total_count": 407,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1231,6 +1231,22 @@
       "checksum": "e279479b"
     },
     {
+      "id": "DOC-RESEARCH-018_Candidate_Promoti",
+      "path": "docs/constitution/research/RESEARCH-018_Candidate_Promotion_Criteria.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "Candidate Promotion Criteria",
+      "tags": [
+        "research"
+      ],
+      "owner": "team",
+      "status": "Draft",
+      "title": "RESEARCH-018 — Candidate Promotion Criteria",
+      "created_at": "2026-07-17",
+      "checksum": "e1246783"
+    },
+    {
       "id": "DOC-RESEARCH-GEUMO-001_Turtle_Lege",
       "path": "docs/constitution/research/RESEARCH-GEUMO-001_Turtle_Legend_Symbol_Interpretation.md",
       "type": "document",
@@ -1260,7 +1276,7 @@
       "status": "superseded",
       "title": "Project Phoenix — Current Working State (Pilot Research)",
       "created_at": "2026-07-17",
-      "checksum": "302a5526"
+      "checksum": "19d6da6a"
     },
     {
       "id": "DOC-CONSTITUTION",
