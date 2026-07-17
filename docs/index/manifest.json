@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-07-17T21:22:11.862Z",
+  "generated_at": "2026-07-17T23:19:53.800Z",
   "generator": "generate-manifest.js",
-  "total_count": 396,
+  "total_count": 401,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1086,6 +1086,70 @@
       "checksum": "34ea0981"
     },
     {
+      "id": "DOC-RESEARCH-010_Pilot_Study_EP01",
+      "path": "docs/constitution/research/RESEARCH-010_Pilot_Study_EP01.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "DreamTown EP01 사용자 경험 1차 검증",
+      "tags": [
+        "research"
+      ],
+      "owner": "team",
+      "status": "Pilot Study",
+      "title": "RESEARCH-010 — Pilot Study EP01",
+      "created_at": "2026-07-17",
+      "checksum": "a024a096"
+    },
+    {
+      "id": "DOC-RESEARCH-011_Evidence_Collecti",
+      "path": "docs/constitution/research/RESEARCH-011_Evidence_Collection_Protocol.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "인터뷰 원자료 수집·저장 형식 표준화 (Observation/Evidence 생성 이전 단계)",
+      "tags": [
+        "research"
+      ],
+      "owner": "team",
+      "status": "Research",
+      "title": "RESEARCH-011 — Evidence Collection Protocol",
+      "created_at": "2026-07-17",
+      "checksum": "5c0eae44"
+    },
+    {
+      "id": "DOC-RESEARCH-012_Participant_Journ",
+      "path": "docs/constitution/research/RESEARCH-012_Participant_Journey.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "RESEARCH-010 파일럿 연구의 참가자 경험 흐름 및 DreamTown 체험/연구 참여 분리 원칙",
+      "tags": [
+        "research"
+      ],
+      "owner": "team",
+      "status": "Research",
+      "title": "RESEARCH-012 — Participant Journey (파일럿 운영안)",
+      "created_at": "2026-07-17",
+      "checksum": "af8d7018"
+    },
+    {
+      "id": "DOC-RESEARCH-013_EP01_End-to-End_U",
+      "path": "docs/constitution/research/RESEARCH-013_EP01_End-to-End_User_Journey.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "DreamTown EP01 End-to-End Participant Journey",
+      "tags": [
+        "research"
+      ],
+      "owner": "team",
+      "status": "Experience Scenario",
+      "title": "RESEARCH-013 — EP01 End-to-End User Journey",
+      "created_at": "2026-07-17",
+      "checksum": "7b9f4701"
+    },
+    {
       "id": "DOC-RESEARCH-GEUMO-001_Turtle_Lege",
       "path": "docs/constitution/research/RESEARCH-GEUMO-001_Turtle_Legend_Symbol_Interpretation.md",
       "type": "document",
@@ -1100,6 +1164,22 @@
       "title": "RESEARCH-GEUMO-001 — Turtle Legend Symbol Interpretation",
       "created_at": "2026-07-17",
       "checksum": "ff9e9af6"
+    },
+    {
+      "id": "DOC-STATUS_Pilot_Research",
+      "path": "docs/constitution/research/STATUS_Pilot_Research.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "constitution",
+      "tags": [
+        "research"
+      ],
+      "owner": "team",
+      "status": "superseded",
+      "title": "Project Phoenix — Current Working State (Pilot Research)",
+      "created_at": "2026-07-17",
+      "checksum": "595591a9"
     },
     {
       "id": "DOC-CONSTITUTION",

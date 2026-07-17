@@ -931,7 +931,12 @@
     "DOC-UNFINISHED_TIME"
   ],
   "research": [
-    "DOC-RESEARCH-GEUMO-001_Turtle_Lege"
+    "DOC-RESEARCH-010_Pilot_Study_EP01",
+    "DOC-RESEARCH-011_Evidence_Collecti",
+    "DOC-RESEARCH-012_Participant_Journ",
+    "DOC-RESEARCH-013_EP01_End-to-End_U",
+    "DOC-RESEARCH-GEUMO-001_Turtle_Lege",
+    "DOC-STATUS_Pilot_Research"
   ],
   "deployment": [
     "DOC-deployment-checklist"

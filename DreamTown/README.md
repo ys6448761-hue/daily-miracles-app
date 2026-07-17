@@ -66,6 +66,13 @@ Constitution 순서 중 앞 두 단계에 있는 진행 중 자료다.
 |---|---|---|
 | CAND-CONSTITUTION-001 (Geumo Legend Heart Mirror) | Candidate | `docs/constitution/candidate/CAND-CONSTITUTION-001_Geumo_Legend_Heart_Mirror.md` |
 | RESEARCH-GEUMO-001 (Turtle Legend Symbol Interpretation) | Research Note | `docs/constitution/research/RESEARCH-GEUMO-001_Turtle_Legend_Symbol_Interpretation.md` |
+| RESEARCH-010 (Pilot Study EP01) | Pilot Study | `docs/constitution/research/RESEARCH-010_Pilot_Study_EP01.md` — 참조하는 `RESEARCH-009_User_Validation_Protocol`는 아직 저장소에 없음 |
+| RESEARCH-011 (Evidence Collection Protocol) | Research | `docs/constitution/research/RESEARCH-011_Evidence_Collection_Protocol.md` — RESEARCH-010의 인터뷰 수집 형식을 표준화 |
+| RESEARCH-012 (Participant Journey) | Research | `docs/constitution/research/RESEARCH-012_Participant_Journey.md` — §4에 "EP01 End-to-End 경험 시나리오 미작성" 공백을 기록 |
+| RESEARCH-013 (EP01 End-to-End User Journey) | Experience Scenario | `docs/constitution/research/RESEARCH-013_EP01_End-to-End_User_Journey.md` — RESEARCH-012 §4의 공백을 채움 |
+
+**현재 작업 상태:** `docs/constitution/research/STATUS_Pilot_Research.md`
+참조 (Next Task: `RESEARCH-014_EP01_Operator_Playbook`, 아직 생성 안 함)
 
 ## 신규 파트너 / 새 세션 시작 순서
 
