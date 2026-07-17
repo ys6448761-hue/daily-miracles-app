@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-07-17T23:48:51.828Z",
+  "generated_at": "2026-07-17T23:59:33.878Z",
   "generator": "generate-manifest.js",
-  "total_count": 407,
+  "total_count": 408,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1247,6 +1247,22 @@
       "checksum": "e1246783"
     },
     {
+      "id": "DOC-RESEARCH-019_Raw_Interview_Col",
+      "path": "docs/constitution/research/RESEARCH-019_Raw_Interview_Collection_Protocol.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "Raw Interview Collection Protocol",
+      "tags": [
+        "research"
+      ],
+      "owner": "team",
+      "status": "Draft",
+      "title": "RESEARCH-019 — Raw Interview Collection Protocol",
+      "created_at": "2026-07-17",
+      "checksum": "9c76b2b9"
+    },
+    {
       "id": "DOC-RESEARCH-GEUMO-001_Turtle_Lege",
       "path": "docs/constitution/research/RESEARCH-GEUMO-001_Turtle_Legend_Symbol_Interpretation.md",
       "type": "document",
@@ -1276,7 +1292,7 @@
       "status": "superseded",
       "title": "Project Phoenix — Current Working State (Pilot Research)",
       "created_at": "2026-07-17",
-      "checksum": "19d6da6a"
+      "checksum": "fe830c9c"
     },
     {
       "id": "DOC-CONSTITUTION",
