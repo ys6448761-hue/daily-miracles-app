@@ -33,6 +33,7 @@
     "DOC-HAMEL_REFERENCE_AUDIT",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
     "DOC-CAND-CONSTITUTION-001_Geumo_Le",
+    "DOC-CAND-CONSTITUTION-002_DreamTow",
     "DOC-CAND-EXP-001_DreamTown_Experie",
     "DOC-CAND-OS-001_Lumi_OS_v2_Phase1_",
     "DOC-CAND-OS-002_Lumi_OS_v21_Memor",
@@ -294,6 +295,7 @@
     "DOC-AURORA5_CHARACTER_PROMPTS",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
     "DOC-CAND-BRAND-001_Haruharu_Miracl",
+    "DOC-CAND-CONSTITUTION-002_DreamTow",
     "DOC-CAND-EXP-001_DreamTown_Experie",
     "DOC-CAND-OS-001_Lumi_OS_v2_Phase1_",
     "DOC-CAND-OS-002_Lumi_OS_v21_Memor",
@@ -805,6 +807,7 @@
     "DOC-AURORA-STATUS",
     "DOC-INDEX",
     "DOC-소원드림광장_홈페이지재구성_현황브리핑",
+    "DOC-CAND-CONSTITUTION-002_DreamTow",
     "DOC-kpi-event-schema",
     "DOC-DT_API_Registry",
     "DOC-DT_React_Architecture",
@@ -919,6 +922,7 @@
   "candidate": [
     "DOC-CAND-BRAND-001_Haruharu_Miracl",
     "DOC-CAND-CONSTITUTION-001_Geumo_Le",
+    "DOC-CAND-CONSTITUTION-002_DreamTow",
     "DOC-CAND-EXP-001_DreamTown_Experie",
     "DOC-CAND-OS-001_Lumi_OS_v2_Phase1_",
     "DOC-CAND-OS-002_Lumi_OS_v21_Memor"
