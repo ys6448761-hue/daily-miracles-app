@@ -9,6 +9,7 @@ related_ssot:
   - daily-miracles-mvp/docs/ssot/core/SSOT-LOOP-001_Seal_Return_Unlock_Loop_Guide.md (봉인-재방문-해제 루프와 "성장 영양분" 개념이 정합적 — 충돌 아님, §Conflict Check 참조)
   - daily-miracles-mvp/docs/ssot/core/DreamTown_Character_SSOT.md (§105 "아우룸은 여행을 안내하고, 소원이는 여행을 살아간다" — 이번 문서 Core Principle 3과 정합적)
   - daily-miracles-mvp/docs/ops/DreamTown_KPI_Checklist.md ("push: 푸시 알림 미구현 — 0이 정상" — Core Principle 4와 충돌 없이 일치)
+  - daily-miracles-mvp/docs/constitution/candidate/CAND-EXP-002_DreamTown_Orchestra_of_Sowonis_Life.md (본 문서를 오케스트라 은유로 보강하는 후속 Candidate)
 promotion_path: Research → Candidate → Review → Constitution (본 저장소 CONSTITUTION_GOVERNANCE.md 절차를 따른다, 아직 승격하지 않음)
 ---
 

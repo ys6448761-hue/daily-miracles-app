@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-07-20T08:25:06.757Z",
+  "generated_at": "2026-07-20T20:22:12.777Z",
   "generator": "generate-manifest.js",
-  "total_count": 409,
+  "total_count": 410,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1031,7 +1031,7 @@
       "status": "Candidate",
       "title": "CAND-CONSTITUTION-002 — DreamTown Experience Constitution: Companion Growth Platform",
       "created_at": "2026-07-20",
-      "checksum": "8cd8fb7e"
+      "checksum": "0b62e16d"
     },
     {
       "id": "DOC-CAND-EXP-001_DreamTown_Experie",
@@ -1050,6 +1050,24 @@
       "title": "CAND-EXP-001 — DreamTown Experience Architecture (Candidate)",
       "created_at": "2026-07-20",
       "checksum": "1c9e8ac9"
+    },
+    {
+      "id": "DOC-CAND-EXP-002_DreamTown_Orchest",
+      "path": "docs/constitution/candidate/CAND-EXP-002_DreamTown_Orchestra_of_Sowonis_Life.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "Level 4 (Experience / Design Perspective)",
+      "topic": "constitution",
+      "tags": [
+        "candidate",
+        "소원",
+        "aurora"
+      ],
+      "owner": "대표(푸르미르) / Aurora5 / Claude Code",
+      "status": "Candidate",
+      "title": "CAND-EXP-002 — DreamTown Orchestra: 소원이의 삶의 오케스트라",
+      "created_at": "2026-07-20",
+      "checksum": "599260ac"
     },
     {
       "id": "DOC-CAND-OS-001_Lumi_OS_v2_Phase1_",
