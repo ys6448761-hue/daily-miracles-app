@@ -1056,6 +1056,18 @@ app.get('/healthz', (req, res) => {
 // 리다이렉트·DB·의존성 일절 없음. 항상 200.
 app.get('/health', (_req, res) => res.status(200).send('ok'));
 
+// ─── /qr/checkin — QR 카드 고정 Redirect ─────────────────────────────────
+// 카드에 인쇄된 URL: https://app.dailymiracles.kr/qr/checkin
+// Runtime 위치가 변경될 때 DREAMTOWN_CHECKIN_URL 환경변수만 수정하면 됨.
+// 목적지 미설정 시 503으로 명시적 실패 (사일런트 오류 방지).
+app.get('/qr/checkin', (req, res) => {
+  const target = process.env.DREAMTOWN_CHECKIN_URL;
+  if (!target) {
+    return res.status(503).send('Check-in URL not configured');
+  }
+  res.redirect(302, target);
+});
+
 // ─── / — 루트 기본 응답 ────────────────────────────────────────────────────
 // Render가 / 로 헬스체크하는 경우 대비. SPA catch-all이 아닌 명시 응답.
 app.get('/', (_req, res) => res.status(200).send('DreamTown alive'));
