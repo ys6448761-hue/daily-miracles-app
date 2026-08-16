@@ -392,6 +392,18 @@ router.post('/:code/verify', async (req, res) => {
       return res.status(400).json({ error: '유효기간이 지난 이용권입니다', status: 'EXPIRED' });
     }
 
+    // GAP-03: partner_uuid 조회 (optional, LEFT JOIN via partner_code)
+    let partner_uuid = null;
+    try {
+      const partnerResult = await db.query(
+        `SELECT id FROM dt_partners WHERE partner_code = $1`,
+        [partner_code]
+      );
+      partner_uuid = partnerResult.rows[0]?.id || null;
+    } catch (err) {
+      log.warn('partner_uuid 조회 실패 (무시)', { partner_code, err: err.message });
+    }
+
     await db.query(
       `UPDATE benefit_credentials
        SET status = 'VERIFIED', partner_code = $2, verified_by = $3,
@@ -405,12 +417,12 @@ router.post('/:code/verify', async (req, res) => {
     // benefit_verified 이벤트
     db.query(
       `INSERT INTO dt_events (event_name, params) VALUES ('benefit_verified', $1::jsonb)`,
-      [JSON.stringify({ credential_code: code, benefit_type: c.benefit_type, partner_code })]
+      [JSON.stringify({ credential_code: code, benefit_type: c.benefit_type, partner_code, partner_uuid })]
     ).catch(() => {});
 
-    log.info('credential verified', { code, partner_code });
+    log.info('credential verified', { code, partner_code, partner_uuid });
 
-    res.json({ ok: true, status: 'VERIFIED', verified_at: new Date().toISOString() });
+    res.json({ ok: true, status: 'VERIFIED', verified_at: new Date().toISOString(), partner_uuid });
 
   } catch (err) {
     log.error('verify 실패', { code, err: err.message });
@@ -451,6 +463,18 @@ router.post('/:code/redeem', async (req, res) => {
 
     const redeemedAt = new Date();
 
+    // GAP-03: partner_uuid 조회 (optional, LEFT JOIN via partner_code)
+    let partner_uuid = null;
+    try {
+      const partnerResult = await db.query(
+        `SELECT id FROM dt_partners WHERE partner_code = $1`,
+        [partner_code]
+      );
+      partner_uuid = partnerResult.rows[0]?.id || null;
+    } catch (err) {
+      log.warn('partner_uuid 조회 실패 (무시)', { partner_code, err: err.message });
+    }
+
     await db.query(
       `UPDATE benefit_credentials
        SET status = 'REDEEMED', redeemed_at = $2, updated_at = NOW()
@@ -461,6 +485,8 @@ router.post('/:code/redeem', async (req, res) => {
     await logCredentialAction(c.id, 'redeemed', partner_code);
 
     // benefit_redemptions 상세 로그
+    // NOTE: partner_id는 VARCHAR로 partner_code를 저장 (soft reference)
+    // 향후 hard FK 전환 시: REFERENCES dt_partners(partner_code) 추가 (Phase 2)
     db.query(
       `INSERT INTO benefit_redemptions
          (credential_id, partner_id, verified_at, redeemed_at, status)
@@ -468,7 +494,7 @@ router.post('/:code/redeem', async (req, res) => {
       [c.id, partner_code, redeemedAt]
     ).catch(() => {});
 
-    // benefit_redeemed 이벤트
+    // benefit_redeemed 이벤트 (GAP-03: partner_uuid 포함)
     const toastMessage = pickToast(c.galaxy_code);
     db.query(
       `INSERT INTO dt_events (event_name, params) VALUES ('benefit_redeemed', $1::jsonb)`,
@@ -480,6 +506,7 @@ router.post('/:code/redeem', async (req, res) => {
         galaxy_code:     c.galaxy_code,
         journey_id:      c.journey_id,
         partner_code,
+        partner_uuid,
         toast_message:   toastMessage,
       })]
     ).catch(() => {});
@@ -530,13 +557,14 @@ router.post('/:code/redeem', async (req, res) => {
       })();
     }
 
-    log.info('credential redeemed', { code, partner_code, benefit_type: c.benefit_type });
+    log.info('credential redeemed', { code, partner_code, partner_uuid, benefit_type: c.benefit_type });
 
     res.json({
       ok:            true,
       status:        'REDEEMED',
       redeemed_at:   new Date().toISOString(),
       toast_message: toastMessage,
+      partner_uuid:  partner_uuid || null,
     });
 
   } catch (err) {
