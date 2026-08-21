@@ -40,7 +40,15 @@ class SessionService {
       ]);
       return result.rows[0].session_id;
     } catch (error) {
-      console.error('Failed to create session:', error);
+      console.error('[TRAVEL_SESSION_ERROR] PostgreSQL error:', {
+        message: error.message,
+        code: error.code,
+        detail: error.detail,
+        constraint: error.constraint,
+        severity: error.severity,
+        table: error.table,
+        column: error.column,
+      });
       throw new Error('Session creation failed');
     }
   }
@@ -160,7 +168,7 @@ class SessionService {
    */
   async getSessionInfo(sessionId) {
     const query = `
-      SELECT session_id, created_at, last_activity_at, expires_at, is_valid
+      SELECT session_id, created_at, last_activity_at, expires_at
       FROM travel_guide_sessions
       WHERE session_id = $1
     `;
@@ -168,7 +176,10 @@ class SessionService {
     try {
       const result = await db.query(query, [sessionId]);
       if (result.rows.length === 0) return null;
-      return result.rows[0];
+      const session = result.rows[0];
+      // Compute is_valid at application level
+      const isValid = new Date() < new Date(session.expires_at);
+      return { ...session, is_valid: isValid };
     } catch (error) {
       console.error('Failed to get session info:', error);
       return null;
