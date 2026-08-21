@@ -9,6 +9,7 @@ import TravelGuideHome from '../components/TravelGuide/TravelGuideHome';
 import TravelRecommendCard from '../components/TravelGuide/TravelRecommendCard';
 import TravelMapView from '../components/TravelGuide/TravelMapView';
 import TravelFallbackUI from '../components/TravelGuide/TravelFallbackUI';
+import '../styles/travel-guide.css';
 
 function TravelGuidePage() {
   const location = useLocation();
