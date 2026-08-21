@@ -119,8 +119,7 @@ export default function App() {
           <Route path="/wish/select" element={<WishSelect />} />
           <Route path="/wish/input"  element={<WishInputScreen />} />
           <Route path="/star-birth"  element={<StarBirth />} />
-          {/* DIAGNOSTIC: Test if this route matches */}
-          <Route path="/travel-guide" element={<div style={{padding: '40px', textAlign: 'center', color: '#FFD76A', fontSize: '24px', background: '#060c17', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>{console.log('[TRAVEL_ROUTE_MATCHED]')}✅ TRAVEL_GUIDE_ROUTE_MATCHED</div>} />
+          <Route path="/travel-guide" element={<TravelGuidePage />} />
           <Route path="/my-star"     element={<MyStarReturn />} />
           <Route path="/my-star/:id" element={<MyStar />} />
           <Route path="/my-star/:id/book"     element={<DigitalBook />} />
