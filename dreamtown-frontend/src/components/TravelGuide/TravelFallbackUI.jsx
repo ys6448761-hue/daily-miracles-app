@@ -42,7 +42,7 @@ function TravelFallbackUI({ fallback, onSelectFallback }) {
           <p className="fallback-detail">
             {fallback.reason && `💡 ${fallback.reason}`}
           </p>
-          <button onClick={handleSelectFallback} className="fallback-cta">
+          <button type="button" onClick={handleSelectFallback} className="fallback-cta">
             이 장소로 변경
           </button>
         </div>
