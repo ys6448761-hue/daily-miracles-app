@@ -22,6 +22,24 @@ async function runTravelGuideMigration() {
     await client.connect();
     console.log('✅ Connected to database\n');
 
+    // Get DB identity
+    const identity = await client.query(`
+      SELECT
+        current_database() AS database_name,
+        current_schema() AS schema_name,
+        current_user AS db_user
+    `);
+    const db = identity.rows[0];
+
+    const searchPath = await client.query('SHOW search_path');
+    const path = searchPath.rows[0].search_path;
+
+    console.log('📊 Database Identity:');
+    console.log(`   Database: ${db.database_name}`);
+    console.log(`   Schema: ${db.schema_name}`);
+    console.log(`   User: ${db.db_user}`);
+    console.log(`   Search Path: ${path}\n`);
+
     // Migration files (in order)
     const migrations = [
       '200_travel_places.sql',

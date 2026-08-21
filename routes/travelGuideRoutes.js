@@ -147,6 +147,19 @@ router.get('/health-check', async (req, res) => {
       });
     }
 
+    // Get DB identity
+    const identityResult = await db.query(`
+      SELECT
+        current_database() AS database_name,
+        current_schema() AS schema_name,
+        current_user AS db_user
+    `);
+    const identity = identityResult.rows[0] || {};
+
+    // Get search_path
+    const searchPathResult = await db.query('SHOW search_path');
+    const searchPath = searchPathResult.rows[0]?.search_path || '';
+
     // Count places (V1: KR/YEOSU)
     const placesResult = await db.query(
       `SELECT COUNT(*) as count FROM travel_places
@@ -171,6 +184,12 @@ router.get('/health-check', async (req, res) => {
     res.json({
       status: 'healthy',
       database: 'connected',
+      db_identity: {
+        database: identity.database_name,
+        schema: identity.schema_name,
+        user: identity.db_user,
+        search_path: searchPath,
+      },
       data: {
         places: placesCount,
         restaurants: restaurantsCount,
