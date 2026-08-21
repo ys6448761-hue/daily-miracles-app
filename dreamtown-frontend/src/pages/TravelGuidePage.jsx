@@ -20,6 +20,7 @@ function TravelGuidePage() {
   const [recommendations, setRecommendations] = useState(null);
   const [showMap, setShowMap] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // Parse entry point from location or default
   useEffect(() => {
@@ -40,6 +41,7 @@ function TravelGuidePage() {
   // Handle recommendation request
   const handleGetRecommendations = async (userInput) => {
     setLoading(true);
+    setError(null);
     try {
       const payload = {
         context: {
@@ -49,6 +51,8 @@ function TravelGuidePage() {
         },
       };
 
+      console.log('[TRAVEL_SUBMIT] request payload:', payload);
+
       const response = await fetch('/api/dt/travel/recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -57,16 +61,23 @@ function TravelGuidePage() {
 
       const data = await response.json();
 
+      console.log('[TRAVEL_SUBMIT] response status:', response.status, 'body:', data);
+
       if (response.ok) {
         setSessionId(data.session_id);
         setRecommendations(data);
+        console.log('[TRAVEL_SUBMIT] render recommendations count:', data.places?.length);
         // Log event
         logEvent('recommendation_received', { places_count: data.places.length });
       } else {
-        console.error('Recommendation failed:', data);
+        const errorMsg = `추천 요청 실패 (${response.status}): ${data.message || '알 수 없는 오류'}`;
+        console.error('[TRAVEL_SUBMIT] error:', errorMsg);
+        setError(errorMsg);
       }
     } catch (error) {
-      console.error('Error fetching recommendations:', error);
+      const errorMsg = `네트워크 오류: ${error.message}`;
+      console.error('[TRAVEL_SUBMIT] catch error:', errorMsg);
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -175,6 +186,7 @@ function TravelGuidePage() {
       context={context}
       onGetRecommendations={handleGetRecommendations}
       loading={loading}
+      error={error}
     />
   );
 }

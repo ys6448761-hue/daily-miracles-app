@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 
-function TravelGuideHome({ context, onGetRecommendations, loading }) {
+function TravelGuideHome({ context, onGetRecommendations, loading, error }) {
   const [formData, setFormData] = useState({
     people_type: 'family_with_kids',
     time_available_minutes: 180,
@@ -24,6 +24,12 @@ function TravelGuideHome({ context, onGetRecommendations, loading }) {
         <h1>🌟 여수, 어디 갈까요?</h1>
         <p>당신의 여정에 맞춘 추천을 받아보세요</p>
       </header>
+
+      {error && (
+        <div className="error-alert">
+          <p>⚠️ {error}</p>
+        </div>
+      )}
 
       <section className="menu-grid">
         <div className="menu-item">

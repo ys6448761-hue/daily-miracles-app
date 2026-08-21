@@ -41,6 +41,22 @@
   font-weight: 300;
 }
 
+/* Error alert */
+.error-alert {
+  margin: 0;
+  padding: 16px 24px;
+  background: rgba(244, 67, 54, 0.1);
+  border-bottom: 1px solid rgba(244, 67, 54, 0.2);
+}
+
+.error-alert p {
+  font-size: 13px;
+  margin: 0;
+  color: rgba(244, 67, 54, 0.9);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
 /* Menu grid */
 .travel-guide-home .menu-grid {
   display: grid;
