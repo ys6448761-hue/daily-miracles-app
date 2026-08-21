@@ -2,7 +2,7 @@ services:
   - type: web
     name: daily-miracles-mvp
     runtime: node
-    buildCommand: npm install --no-audit --no-fund && npm run build
+    buildCommand: npm install --no-audit --no-fund && npm --prefix dreamtown-frontend install && npm --prefix dreamtown-frontend run build
     startCommand: npm start
     envVars:
       # 기본 설정

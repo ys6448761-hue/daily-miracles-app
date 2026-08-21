@@ -4,6 +4,27 @@ import App from './App.jsx';
 import './index.css';
 import { initKakao } from './utils/kakaoShare.js';
 
+// [DIAGNOSTIC] History API tracking — client redirect 추적
+const originalReplaceState = history.replaceState;
+history.replaceState = function (...args) {
+  console.trace('[HISTORY_REPLACE]', {
+    from: window.location.pathname,
+    to: args[2]
+  });
+  return originalReplaceState.apply(this, args);
+};
+
+const originalPushState = history.pushState;
+history.pushState = function (...args) {
+  console.trace('[HISTORY_PUSH]', {
+    from: window.location.pathname,
+    to: args[2]
+  });
+  return originalPushState.apply(this, args);
+};
+
+console.log('[BOOT_PATH]', window.location.pathname);
+
 // Kakao SDK 선제 초기화 — 공유 버튼 클릭 전에 준비
 // Kakao.Share는 도메인 오류 시 'KakaoSDKError' 를 window.onerror 로 던짐
 window.addEventListener('error', (e) => {

@@ -97,6 +97,11 @@ if (window.location.pathname.startsWith('//')) {
 // dt_star_id → dt_active_star_id 1회 마이그레이션
 migrateStarId();
 
+// [DIAGNOSTIC] Route mismatch diagnostic component
+function RouteMissDiagnostic() {
+  console.trace('[ROUTE_MISS]', window.location.pathname);
+  return <Navigate to="/" replace />;
+}
 
 export default function App() {
   return (
@@ -106,6 +111,7 @@ export default function App() {
         <ResonanceCard />
         <ConnectionStageCard />
         <RecallWhisperCard />
+        {console.log('[APP_PATH]', window.location.pathname)}
         <Routes>
           <Route path="/" element={<AppLaunch />} />
           <Route path="/intro"       element={<Intro />} />
@@ -114,7 +120,7 @@ export default function App() {
           <Route path="/wish/input"  element={<WishInputScreen />} />
           <Route path="/star-birth"  element={<StarBirth />} />
           {/* DIAGNOSTIC: Test if this route matches */}
-          <Route path="/travel-guide" element={<div style={{padding: '40px', textAlign: 'center', color: '#FFD76A', fontSize: '24px', background: '#060c17', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>✅ TRAVEL_GUIDE_ROUTE_MATCHED</div>} />
+          <Route path="/travel-guide" element={<div style={{padding: '40px', textAlign: 'center', color: '#FFD76A', fontSize: '24px', background: '#060c17', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>{console.log('[TRAVEL_ROUTE_MATCHED]')}✅ TRAVEL_GUIDE_ROUTE_MATCHED</div>} />
           <Route path="/my-star"     element={<MyStarReturn />} />
           <Route path="/my-star/:id" element={<MyStar />} />
           <Route path="/my-star/:id/book"     element={<DigitalBook />} />
@@ -213,7 +219,7 @@ export default function App() {
               <PartnerVerify />
             </Suspense>
           } />
-          <Route path="*"                          element={<Navigate to="/" replace />} />
+          <Route path="*"                          element={<RouteMissDiagnostic />} />
         </Routes>
       </div>
     </BrowserRouter>
