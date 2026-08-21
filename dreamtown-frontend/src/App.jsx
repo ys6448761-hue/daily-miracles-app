@@ -107,14 +107,14 @@ export default function App() {
         <ConnectionStageCard />
         <RecallWhisperCard />
         <Routes>
-          <Route path="/"            element={<AppLaunch />} />
+          <Route path="/" element={<AppLaunch />} />
           <Route path="/intro"       element={<Intro />} />
           <Route path="/wish"        element={<WishGate />} />
           <Route path="/wish/select" element={<WishSelect />} />
           <Route path="/wish/input"  element={<WishInputScreen />} />
           <Route path="/star-birth"  element={<StarBirth />} />
-          {/* 여수 travel guide — PUBLIC 진입 및 소원여정 동안의 여행지 추천 */}
-          <Route path="/travel-guide"              element={<TravelGuidePage />} />
+          {/* DIAGNOSTIC: Test if this route matches */}
+          <Route path="/travel-guide" element={<div style={{padding: '40px', textAlign: 'center', color: '#FFD76A', fontSize: '24px', background: '#060c17', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>✅ TRAVEL_GUIDE_ROUTE_MATCHED</div>} />
           <Route path="/my-star"     element={<MyStarReturn />} />
           <Route path="/my-star/:id" element={<MyStar />} />
           <Route path="/my-star/:id/book"     element={<DigitalBook />} />
