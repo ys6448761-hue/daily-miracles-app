@@ -534,6 +534,15 @@ try {
   console.error("❌ 여정 파이프라인 라우터 로드 실패:", error.message);
 }
 
+// 여수 Travel Guide 라우터 로딩
+let travelGuideRoutes = null;
+try {
+  travelGuideRoutes = require("./routes/travelGuideRoutes");
+  console.log("✅ Travel Guide 라우터 로드 성공");
+} catch (error) {
+  console.error("❌ Travel Guide 라우터 로드 실패:", error.message);
+}
+
 // Aurora 5 에이전트 라우터 로딩
 let agentRoutes = null;
 try {
@@ -2810,6 +2819,12 @@ if (travelClickRoutes) {
   console.log('✅ Travel Click 라우터 등록 완료 (/api/travel)');
 }
 
+// ---------- DreamTown Travel Guide (/api/dt/travel) ----------
+if (travelGuideRoutes) {
+  app.use('/api/dt/travel', travelGuideRoutes);
+  console.log('✅ Travel Guide 라우터 등록 완료 (/api/dt/travel)');
+}
+
 // ---------- Star MVP (/api/star) ----------
 let starMvpRoutes = null;
 try {
@@ -3568,6 +3583,8 @@ const DT_SPA_ROUTES = [
   '/stars',
   // 여행 이후 별 변화 기록
   '/voyage-reflect',
+  // 여수 travel guide — PUBLIC 진입 + WISH_TRAVELER flow
+  '/travel-guide',
 ];
 app.get(DT_SPA_ROUTES, (req, res) => {
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
