@@ -31,14 +31,14 @@ async function runTravelGuideMigration() {
     `);
     const db = identity.rows[0];
 
-    const searchPath = await client.query('SHOW search_path');
-    const path = searchPath.rows[0].search_path;
+    const searchPathResult = await client.query('SHOW search_path');
+    const dbSearchPath = searchPathResult.rows[0].search_path;
 
     console.log('📊 Database Identity:');
     console.log(`   Database: ${db.database_name}`);
     console.log(`   Schema: ${db.schema_name}`);
     console.log(`   User: ${db.db_user}`);
-    console.log(`   Search Path: ${path}\n`);
+    console.log(`   Search Path: ${dbSearchPath}\n`);
 
     // Migration files (in order)
     const migrations = [
