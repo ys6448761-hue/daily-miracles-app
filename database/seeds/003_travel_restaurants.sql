@@ -1,0 +1,33 @@
+-- Seed 003: travel_restaurants
+-- V0 Policy: Curated restaurants only (verified, real businesses)
+-- Created: 2026-08-21
+--
+-- ⚠️ VERIFICATION REQUIRED
+-- This seed file is currently empty pending Curated Food verification.
+-- Insert only real, verified restaurant data when available.
+--
+-- Expected: 10 Curated restaurants
+-- Criteria:
+--   - Must exist (real business, not fictional name)
+--   - Must be operational (verified opening hours)
+--   - Must serve specific meal contexts (lunch, dinner, breakfast, etc.)
+--   - Should be accessible (bus/car available)
+--   - Should be kid-friendly OR elderly-accessible OR special dietary (not all three)
+--
+-- Data sources:
+--   - Naver Map / Google Maps (confirmed operational)
+--   - Yeosu travel center recommendations (local knowledge)
+--   - In-person verification (trusted)
+--
+-- Placeholder structure for reference:
+-- INSERT INTO travel_restaurants (
+--   code, country_code, city_code,
+--   name, cuisine_type, address, lat, lng, phone,
+--   meal_context, suitable_for, avg_price_range,
+--   opening_hours_json, closed_day, last_order_time,
+--   features, nearby_places,
+--   source, naver_rating, source_url
+-- ) VALUES
+-- ('restaurant_001', 'KR', 'YEOSU', 'REAL_NAME', '한식/해산물', ..., ARRAY['lunch'], ARRAY['family'], '30,000~50,000', ...);
+--
+-- TODO: Awaiting Curated Food V0 finalization

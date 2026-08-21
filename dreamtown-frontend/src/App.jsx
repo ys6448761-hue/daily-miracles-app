@@ -86,6 +86,7 @@ import AdminPartners from './pages/admin/AdminPartners.jsx';
 import AdminQRCenter from './pages/admin/AdminQRCenter.jsx';
 import AdminCablecarPage from './pages/AdminCablecarPage.jsx';
 import LocationAdmin from './pages/admin/LocationAdmin.jsx';
+import TravelGuidePage from './pages/TravelGuidePage.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
 if (window.location.pathname.startsWith('//')) {
@@ -182,6 +183,8 @@ export default function App() {
           <Route path="/admin/location/:loc"       element={<LocationAdmin />} />
           {/* /admin/* catch-all — catch-all → / → AppLaunch 경로 차단 */}
           <Route path="/admin/*"                   element={<VoyageAdmin />} />
+          {/* 여수 travel guide — 공개 진입 및 소원여정 동안의 여행지 추천 */}
+          <Route path="/travel-guide"              element={<TravelGuidePage />} />
           {/* 여수 소원여정 Soft Pay 랜딩 */}
           <Route path="/journey"                   element={<YeosuJourneyPage />} />
           {/* Core Journey AI Flow */}

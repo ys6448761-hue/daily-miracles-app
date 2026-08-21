@@ -2627,6 +2627,15 @@ try {
   console.warn('⚠️ impactRoutes 로드 실패:', e.message);
 }
 
+// ---------- Travel Guide Routes (/api/dt/travel) ----------
+try {
+  const travelGuideRoutes = require('./routes/travelGuideRoutes');
+  app.use('/api/dt/travel', travelGuideRoutes);
+  console.log('✅ Travel Guide 라우터 등록 완료 (/api/dt/travel)');
+} catch (e) {
+  console.warn('⚠️ travelGuideRoutes 로드 실패:', e.message);
+}
+
 // ---------- 공명 관리자 대시보드 (/admin/resonance) ----------
 app.get('/admin/resonance', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin', 'resonance.html'));
@@ -4028,6 +4037,48 @@ function startServer(port) {
       console.log('✅ Star Care Engine cron 등록 완료 (매일 KST 10:00)');
     } catch (e) {
       console.warn('⚠️ Star Care Engine cron 등록 실패:', e.message);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // Guardian Dispatch V0 — SMS 자동 발송 (매일 21:00 KST)
+    // ═══════════════════════════════════════════════════════════
+    // Phase 1: Dry Run (로깅만, SMS 발송 안 함)
+    // Phase 2: 실제 SMS 발송 (수동 승인 후 활성화)
+    try {
+      const cron = require('node-cron');
+      const GuardianDispatchService = require('./aurora5/services/guardianDispatchService');
+      const config = require('./config/dispatchConfig');
+
+      // ENABLED 플래그 확인
+      if (!config.GUARDIAN_DISPATCH_ENABLED) {
+        console.log('⏸️  Guardian Dispatch V0 비활성화 (GUARDIAN_DISPATCH_ENABLED=false)');
+      } else if (!db) {
+        console.warn('⚠️ Guardian Dispatch: DB 미연결 — 스케줄러 미등록');
+      } else {
+        // 21:00 KST = 12:00 UTC
+        cron.schedule('0 12 * * *', async () => {
+          console.log('[Guardian Dispatch] 배치 시작 (21:00 KST)');
+          const service = new GuardianDispatchService(db);
+          try {
+            const report = await service.runGuardianDispatchBatch();
+            console.log('[Guardian Dispatch] 배치 완료:', {
+              phase: report.phase,
+              eligible: report.summary?.totalEligible,
+              sent: report.dispatch?.sent,
+              dryRun: report.dispatch?.dryRun
+            });
+          } catch (error) {
+            console.error('[Guardian Dispatch] 배치 오류:', error.message);
+          }
+        }, { timezone: 'UTC' });
+
+        console.log(`✅ Guardian Dispatch V0 스케줄러 등록 완료`);
+        console.log(`   - 실행 시간: 매일 21:00 KST (12:00 UTC)`);
+        console.log(`   - 현재 모드: ${config.GUARDIAN_DISPATCH_DRY_RUN ? 'DRY_RUN' : 'LIVE'}`);
+        console.log(`   - Cutoff: ${config.GUARDIAN_DISPATCH_CUTOFF_AT}`);
+      }
+    } catch (e) {
+      console.warn('⚠️ Guardian Dispatch 스케줄러 등록 실패:', e.message);
     }
   });
 

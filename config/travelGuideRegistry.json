@@ -1,0 +1,41 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-08-21",
+  "registry": {
+    "KR": {
+      "country_name": "South Korea",
+      "cities": {
+        "YEOSU": {
+          "city_name": "Yeosu",
+          "entry_points": {
+            "RAMADA_YEOSU": {
+              "name": "RAMADA Yeosu",
+              "region": "Yeosu Downtown",
+              "type": "HOTEL",
+              "lat": 34.7455,
+              "lng": 127.7370,
+              "supported_modes": ["PUBLIC", "WISH_TRAVELER"],
+              "v1_active": true,
+              "v1_notes": "Initial MVP: single hotel, fixed entry point for both PUBLIC and WISH_TRAVELER"
+            }
+          },
+          "available_for_v1_5": [
+            "MAJESTIC_YEOSU",
+            "SHINHWA_YEOSU",
+            "LEGOLAND_YEOSU"
+          ],
+          "notes": "V1.5: Support multi-hotel selection via UI. V1: Single RAMADA_YEOSU only."
+        }
+      }
+    }
+  },
+  "future_expansion": {
+    "v1_5": "Add multi-hotel selection UI, international cities (JP, CN, SG, TH)",
+    "v2": "Dynamic route optimization, real-time traffic integration, booking pipeline"
+  },
+  "defaults": {
+    "country_code": "KR",
+    "city_code": "YEOSU",
+    "entry_point": "RAMADA_YEOSU"
+  }
+}
