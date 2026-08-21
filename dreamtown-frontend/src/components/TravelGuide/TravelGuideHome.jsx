@@ -56,7 +56,9 @@ function TravelGuideHome({ context, onGetRecommendations, loading, error }) {
             }
           >
             <option value="solo">혼자</option>
-            <option value="couple">연인</option>
+            <option value="couple">연인 / 부부</option>
+            <option value="friends">친구</option>
+            <option value="family">가족</option>
             <option value="family_with_kids">아이와</option>
             <option value="family_elderly">부모님과</option>
             <option value="group">단체</option>
