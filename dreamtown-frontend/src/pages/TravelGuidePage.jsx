@@ -108,6 +108,21 @@ function TravelGuidePage() {
     }
   };
 
+  const handleSelectFallback = (fallbackPlace) => {
+    logEvent('fallback_selected', {
+      place_code: fallbackPlace.place_code,
+      place_name: fallbackPlace.name_ko
+    });
+    // Re-request recommendations excluding the selected fallback
+    // For now, just show the fallback as if it was selected from recommendations
+    const updatedRecommendations = {
+      ...recommendations,
+      places: [fallbackPlace, ...recommendations.places.slice(1)],
+      fallback: null
+    };
+    setRecommendations(updatedRecommendations);
+  };
+
   if (!context) return <div>로딩 중...</div>;
 
   // Show map if requested
@@ -131,18 +146,6 @@ function TravelGuidePage() {
     return (
       <div className="travel-guide-results">
         <h2>추천 여행지</h2>
-
-        {/* Diagnostic: render raw text first */}
-        <div style={{ padding: '12px', background: 'rgba(255,215,106,0.1)', marginBottom: '16px', borderRadius: '4px' }}>
-          <p style={{ fontSize: '12px', margin: '0 0 8px 0', color: 'rgba(255,215,106,0.8)' }}>
-            📊 진단: {recommendations.places?.length}개 장소 준비됨
-          </p>
-          {recommendations.places?.slice(0, 3).map((place, i) => (
-            <div key={i} style={{ fontSize: '11px', margin: '4px 0', color: 'rgba(255,255,255,0.6)' }}>
-              {i+1}. {place.name_ko || place.name || place.code}
-            </div>
-          ))}
-        </div>
 
         {/* Places */}
         <div className="recommendations-list">
@@ -174,14 +177,17 @@ function TravelGuidePage() {
                 <p>{recommendations.food.name}</p>
               </div>
             ) : (
-              <p>{recommendations.food.message}</p>
+              <p>검증된 식사 정보를 준비 중이에요.</p>
             )}
           </div>
         )}
 
         {/* Fallback */}
         {recommendations.fallback && (
-          <TravelFallbackUI fallback={recommendations.fallback} />
+          <TravelFallbackUI
+            fallback={recommendations.fallback}
+            onSelectFallback={handleSelectFallback}
+          />
         )}
 
         <button onClick={() => {

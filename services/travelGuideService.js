@@ -123,10 +123,13 @@ class TravelGuideService {
     let fallbackRecommendation = null;
     if (fallbackAvailable && topPlaces.length > 0) {
       const firstPlace = candidates[0];
+      // Exclude places already in top recommendations to prevent duplicates
+      const topPlaceCodes = topPlaces.map(p => p.place_code);
       fallbackRecommendation = await fallbackService.getFallback(
         firstPlace,
         context,
-        "User changed mind or place unavailable"
+        "Primary place unavailable",
+        topPlaceCodes
       );
     }
 

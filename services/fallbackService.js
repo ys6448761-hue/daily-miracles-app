@@ -12,9 +12,10 @@ class FallbackService {
    * @param {Place} primaryPlace
    * @param {TravelGuideContext} context
    * @param {string} failureReason - Why primary was unavailable
+   * @param {Array<string>} excludePlaceCodes - Place codes already in top recommendations (prevent duplicates)
    * @returns {Promise<PlaceRecommendation | null>}
    */
-  async getFallback(primaryPlace, context, failureReason) {
+  async getFallback(primaryPlace, context, failureReason, excludePlaceCodes = []) {
     // Fetch all eligible candidates (same as recommendation engine)
     const candidates = await this._getAllCandidates(context);
 
@@ -33,7 +34,7 @@ class FallbackService {
 
     // Re-score by reality conditions (not emotion)
     // Priority: Time → Transport → Accessibility → Companion → Weather
-    filtered = this._rescore(filtered, context, primaryPlace);
+    filtered = this._rescore(filtered, context, primaryPlace, excludePlaceCodes);
 
     // Select top fallback
     const fallback = filtered[0];
@@ -47,7 +48,7 @@ class FallbackService {
       travel_time_minutes:
         fallback.travel_time === Infinity ? "unknown" : fallback.travel_time,
       total_required_time: fallback.total_required_time,
-      reason: `Alternative due to: ${failureReason}`,
+      reason: fallback.name_ko,
       safety_pass: true,
       live_status: fallback.live_status || "unknown",
       accessibility: {
@@ -129,12 +130,18 @@ class FallbackService {
   /**
    * Re-score fallback candidates (reality first, no emotion)
    * Priority: Time → Transport → Accessibility → Companion → Weather
+   * Excludes places already in top recommendations (prevent duplicates)
    * @private
    */
-  _rescore(candidates, context, primaryPlace) {
+  _rescore(candidates, context, primaryPlace, excludePlaceCodes = []) {
     // Score each candidate
     const scored = candidates.map((candidate) => {
       let score = 0;
+
+      // Exclude places already in top recommendations
+      if (excludePlaceCodes.includes(candidate.code)) {
+        return { ...candidate, fallback_score: 0 };
+      }
 
       // 1. Time: Prefer similar or shorter stay
       const timeDiff = Math.abs(
@@ -197,8 +204,8 @@ class FallbackService {
       return { ...candidate, fallback_score: score };
     });
 
-    // Sort by score, highest first
-    return scored.sort((a, b) => b.fallback_score - a.fallback_score);
+    // Sort by score, highest first (filter out 0-score excluded places)
+    return scored.filter(s => s.fallback_score > 0).sort((a, b) => b.fallback_score - a.fallback_score);
   }
 
   /**

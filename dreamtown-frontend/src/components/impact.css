@@ -1,0 +1,65 @@
+.impact-container {
+  background: #0b1020;
+  color: #f5f7fa;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.fade {
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.title {
+  font-size: 28px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 18px;
+  color: #aab3c5;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 300px;
+}
+
+.grid.small {
+  grid-template-columns: 1fr;
+}
+
+.card {
+  background: #1a2238;
+  border: none;
+  padding: 16px;
+  border-radius: 16px;
+  color: #f5f7fa;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  transform: scale(1.03);
+  background: #222b45;
+}
+
+.card.small {
+  padding: 12px;
+}
+
+.center {
+  text-align: center;
+}
