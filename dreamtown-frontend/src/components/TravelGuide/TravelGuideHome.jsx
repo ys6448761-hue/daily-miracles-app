@@ -4,7 +4,6 @@
  */
 
 import React, { useState } from 'react';
-import './TravelGuideHome.css';
 
 function TravelGuideHome({ context, onGetRecommendations, loading }) {
   const [formData, setFormData] = useState({
