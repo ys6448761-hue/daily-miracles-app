@@ -253,6 +253,11 @@ export default function AppLaunch() {
       return;
     }
 
+    // Travel Guide should not auto-redirect to saved star
+    if (pathname === '/travel-guide') {
+      return;
+    }
+
     const starId = readSavedStar();
     if (starId) {
       nav(`/my-star/${starId}`, { replace: true });
