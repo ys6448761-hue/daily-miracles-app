@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "node server.js",
     "start": "node server.js",
+    "build": "npm --prefix dreamtown-frontend install && npm --prefix dreamtown-frontend run build",
     "report:bottleneck": "node scripts/bottleneck-report.js",
     "report:slack": "node scripts/send-slack-report.js",
     "retention:cron": "node scripts/retention-cron.js",
