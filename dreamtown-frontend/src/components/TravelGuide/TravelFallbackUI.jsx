@@ -8,13 +8,24 @@ import React from 'react';
 function TravelFallbackUI({ fallback, onSelectFallback }) {
   if (!fallback) return null;
 
+  console.log('[FALLBACK_COMPONENT_RENDER]', {
+    fallback_exists: !!fallback,
+    callback_exists: !!onSelectFallback,
+    place_code: fallback?.place_code,
+    place_name: fallback?.name_ko
+  });
+
   const handleSelectFallback = () => {
+    console.log('[FALLBACK_BUTTON_CLICK_RAW]');
     console.log('[FALLBACK_CLICK]', {
       place_code: fallback.place_code,
       place_name: fallback.name_ko
     });
     if (onSelectFallback) {
+      console.log('[FALLBACK_CALLBACK_CALLED]');
       onSelectFallback(fallback);
+    } else {
+      console.error('[FALLBACK_CALLBACK_MISSING] - onSelectFallback is not a function');
     }
   };
 

@@ -109,10 +109,20 @@ function TravelGuidePage() {
   };
 
   const handleSelectFallback = (fallbackPlace) => {
+    console.log('[FALLBACK_HANDLER_CALLED]', {
+      fallback_place: fallbackPlace
+    });
+
+    console.log('[FALLBACK_BEFORE]', {
+      places_count: recommendations?.places?.length,
+      has_fallback: !!recommendations?.fallback
+    });
+
     logEvent('fallback_selected', {
       place_code: fallbackPlace.place_code,
       place_name: fallbackPlace.name_ko
     });
+
     // Re-request recommendations excluding the selected fallback
     // For now, just show the fallback as if it was selected from recommendations
     const updatedRecommendations = {
@@ -120,6 +130,13 @@ function TravelGuidePage() {
       places: [fallbackPlace, ...recommendations.places.slice(1)],
       fallback: null
     };
+
+    console.log('[FALLBACK_AFTER]', {
+      places_count: updatedRecommendations.places.length,
+      first_place: updatedRecommendations.places[0].name_ko,
+      has_fallback: !!updatedRecommendations.fallback
+    });
+
     setRecommendations(updatedRecommendations);
   };
 
