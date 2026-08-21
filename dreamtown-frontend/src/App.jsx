@@ -113,6 +113,8 @@ export default function App() {
           <Route path="/wish/select" element={<WishSelect />} />
           <Route path="/wish/input"  element={<WishInputScreen />} />
           <Route path="/star-birth"  element={<StarBirth />} />
+          {/* 여수 travel guide — PUBLIC 진입 및 소원여정 동안의 여행지 추천 */}
+          <Route path="/travel-guide"              element={<TravelGuidePage />} />
           <Route path="/my-star"     element={<MyStarReturn />} />
           <Route path="/my-star/:id" element={<MyStar />} />
           <Route path="/my-star/:id/book"     element={<DigitalBook />} />
@@ -183,8 +185,6 @@ export default function App() {
           <Route path="/admin/location/:loc"       element={<LocationAdmin />} />
           {/* /admin/* catch-all — catch-all → / → AppLaunch 경로 차단 */}
           <Route path="/admin/*"                   element={<VoyageAdmin />} />
-          {/* 여수 travel guide — 공개 진입 및 소원여정 동안의 여행지 추천 */}
-          <Route path="/travel-guide"              element={<TravelGuidePage />} />
           {/* 여수 소원여정 Soft Pay 랜딩 */}
           <Route path="/journey"                   element={<YeosuJourneyPage />} />
           {/* Core Journey AI Flow */}
