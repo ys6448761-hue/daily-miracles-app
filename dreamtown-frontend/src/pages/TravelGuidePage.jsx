@@ -64,9 +64,14 @@ function TravelGuidePage() {
       console.log('[TRAVEL_SUBMIT] response status:', response.status, 'body:', data);
 
       if (response.ok) {
+        console.log('[TRAVEL_RESPONSE_SHAPE]', Object.keys(data), data);
         setSessionId(data.session_id);
         setRecommendations(data);
-        console.log('[TRAVEL_SUBMIT] render recommendations count:', data.places?.length);
+        console.log('[TRAVEL_STATE_SET]', data);
+        console.log('[TRAVEL_RENDER]', {
+          count: data.places?.length,
+          first: data.places?.[0]
+        });
         // Log event
         logEvent('recommendation_received', { places_count: data.places.length });
       } else {
@@ -117,9 +122,27 @@ function TravelGuidePage() {
 
   // Show recommendations if received
   if (recommendations && !showMap) {
+    console.log('[TRAVEL_RENDER_DIRECT]', {
+      hasProp: !!recommendations,
+      placesArray: recommendations.places,
+      placesCount: recommendations.places?.length,
+      firstPlace: recommendations.places?.[0]
+    });
     return (
       <div className="travel-guide-results">
         <h2>추천 여행지</h2>
+
+        {/* Diagnostic: render raw text first */}
+        <div style={{ padding: '12px', background: 'rgba(255,215,106,0.1)', marginBottom: '16px', borderRadius: '4px' }}>
+          <p style={{ fontSize: '12px', margin: '0 0 8px 0', color: 'rgba(255,215,106,0.8)' }}>
+            📊 진단: {recommendations.places?.length}개 장소 준비됨
+          </p>
+          {recommendations.places?.slice(0, 3).map((place, i) => (
+            <div key={i} style={{ fontSize: '11px', margin: '4px 0', color: 'rgba(255,255,255,0.6)' }}>
+              {i+1}. {place.name_ko || place.name || place.code}
+            </div>
+          ))}
+        </div>
 
         {/* Places */}
         <div className="recommendations-list">
