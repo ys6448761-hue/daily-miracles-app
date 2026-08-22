@@ -128,7 +128,11 @@ function generateAccessKey() {
 // ── POST /create ─────────────────────────────────────────────────
 router.post('/create', async (req, res) => {
   try {
-    const { emotion, origin_location = 'cablecar', phone_number } = req.body;
+    const { emotion, origin_location = 'cablecar', phone_number, user_id } = req.body;
+    // user_id: unified identity from frontend (dt_user_id)
+    // fallback to random UUID for backward compatibility
+
+    const stars_user_id = user_id || crypto.randomUUID();
 
     // access_key 충돌 시 재시도 (최대 3회)
     let access_key, inserted;
@@ -142,7 +146,7 @@ router.post('/create', async (req, res) => {
              (gen_random_uuid(), $1, $2, 'cablecar', 'PRE-ON', $3, $4, $5, false, $6)
            RETURNING id, access_key, created_at`,
           [
-            crypto.randomUUID(),
+            stars_user_id,
             emotion || '케이블카 별',
             access_key,
             origin_location,
@@ -162,7 +166,7 @@ router.post('/create', async (req, res) => {
              VALUES
                (gen_random_uuid(), $1, $2, 'cablecar', 'PRE-ON', $3, $4, $5, false)
              RETURNING id, access_key, created_at`,
-            [crypto.randomUUID(), emotion || '케이블카 별', access_key, origin_location, emotion || null]
+            [stars_user_id, emotion || '케이블카 별', access_key, origin_location, emotion || null]
           );
           inserted = rows2[0];
           break;

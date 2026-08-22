@@ -25,14 +25,15 @@ class SessionService {
 
     const query = `
       INSERT INTO travel_guide_sessions (
-        session_id, context, created_at, last_activity_at, expires_at
-      ) VALUES ($1, $2, $3, $4, $5)
+        session_id, user_id, context, created_at, last_activity_at, expires_at
+      ) VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING session_id
     `;
 
     try {
       const result = await db.query(query, [
         sessionId,
+        context.user_id || null,
         JSON.stringify(context),
         now,
         now,

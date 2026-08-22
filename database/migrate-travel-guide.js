@@ -47,6 +47,7 @@ async function runTravelGuideMigration() {
       '202_travel_live_status.sql',
       '203_travel_guide_sessions.sql',
       '204_travel_guide_events.sql',
+      '205_travel_guide_user_id.sql',
     ];
 
     console.log('📝 Running Travel Guide Migrations...\n');

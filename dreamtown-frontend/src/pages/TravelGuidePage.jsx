@@ -9,6 +9,7 @@ import TravelGuideHome from '../components/TravelGuide/TravelGuideHome';
 import TravelRecommendCard from '../components/TravelGuide/TravelRecommendCard';
 import TravelMapView from '../components/TravelGuide/TravelMapView';
 import TravelFallbackUI from '../components/TravelGuide/TravelFallbackUI';
+import { getOrCreateUserId } from '../api/dreamtown.js';
 import '../styles/travel-guide.css';
 
 function TravelGuidePage() {
@@ -43,9 +44,11 @@ function TravelGuidePage() {
     setLoading(true);
     setError(null);
     try {
+      const userId = getOrCreateUserId();
       const payload = {
         context: {
           ...context,
+          user_id: userId,
           session_id: sessionId,
           ...userInput, // time_available_minutes, people_type, has_car, etc.
         },
