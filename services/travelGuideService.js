@@ -8,6 +8,12 @@ const db = require('../database/db');
 const fallbackService = require('./fallbackService');
 const sessionService = require('./sessionService');
 
+// Experience cluster configuration
+// Prevents geographic monopoly in top-3 recommendations
+const EXPERIENCE_CLUSTERS = {
+  dolsan_area: ['dolsan_daegyo', 'dolsan_nightscape', 'cablecar']
+};
+
 class TravelGuideService {
   /**
    * Main recommendation endpoint
@@ -120,6 +126,9 @@ class TravelGuideService {
     if (context.user_mode === "WISH_TRAVELER" && context.wish_context) {
       candidates = candidates.sort((a, b) => this._scoreEmotion(a, b, context));
     }
+
+    // 9. Experience Cluster Diversity (prevent geographic monopoly)
+    candidates = this._applyClusterDiversity(candidates);
 
     // Select top 3 places
     const topPlaces = candidates.slice(0, 3).map((p) => ({
@@ -608,6 +617,63 @@ class TravelGuideService {
       console.error("Failed to fetch benefits:", error);
       return [];
     }
+  }
+
+  /**
+   * Helper: Get cluster membership for a place code
+   * Returns cluster name or null if no cluster
+   * @private
+   */
+  _getCluster(placeCode) {
+    for (const [clusterName, members] of Object.entries(EXPERIENCE_CLUSTERS)) {
+      if (members.includes(placeCode)) {
+        return clusterName;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Helper: Apply experience cluster diversity to recommendations
+   * Prevents same geographic area from monopolizing multiple top-3 slots
+   * Rule: Max 1 candidate per cluster in top-3 (unless unavoidable due to limited inventory)
+   * @private
+   */
+  _applyClusterDiversity(candidates) {
+    const selected = [];
+    const seenClusters = new Set();
+
+    // First pass: select best from each cluster
+    for (const candidate of candidates) {
+      const cluster = this._getCluster(candidate.code);
+
+      if (cluster === null) {
+        // No cluster, always eligible
+        selected.push(candidate);
+      } else if (!seenClusters.has(cluster)) {
+        // Cluster not yet seen, add first occurrence
+        selected.push(candidate);
+        seenClusters.add(cluster);
+      }
+      // else: cluster already represented, skip
+
+      if (selected.length === 3) {
+        break;
+      }
+    }
+
+    // Fallback: if diversity reduced results below 3, fill remaining slots
+    if (selected.length < 3 && candidates.length > selected.length) {
+      for (const candidate of candidates) {
+        if (selected.includes(candidate)) continue;
+        selected.push(candidate);
+        if (selected.length === 3) break;
+      }
+      // Mark that diversity constraint was relaxed due to limited inventory
+      selected._cluster_diversity_relaxed = true;
+    }
+
+    return selected;
   }
 }
 
