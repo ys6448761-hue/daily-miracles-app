@@ -166,12 +166,20 @@ class TravelGuideService {
     // Get Food Recommendation (if meal_context specified)
     const foodRec = await this._getFoodRecommendation(context);
 
+    // Optional: Get Cafe Partners (max 2 Yeosu cafes)
+    const cafes = await this._getCafePartners(context.country_code, context.city_code);
+
+    // Optional: Get Benefits (matched to Yeosu partners)
+    const benefits = await this._getBenefits(context.country_code, context.city_code);
+
     return {
       session_id: context.session_id,
       entry_point: context.entry_point,
       user_mode: context.user_mode,
       places: topPlaces,
       food: foodRec,
+      cafes: cafes.length > 0 ? cafes : undefined,
+      benefits: benefits.length > 0 ? benefits : undefined,
       total_required_time: topPlaces[0]?.total_required_time || 0,
       fallback_available: fallbackAvailable,
       fallback: fallbackRecommendation,
@@ -359,7 +367,8 @@ class TravelGuideService {
   }
 
   /**
-   * Food recommendation based on meal_context
+   * Food recommendation V0 — Priority: traveler fit > cuisine > curated confidence
+   * Max 3 results; benefits never boost food ranking
    * @private
    */
   async _getFoodRecommendation(context) {
@@ -396,18 +405,61 @@ class TravelGuideService {
       };
     }
 
-    const restaurant = restaurants[0];
+    // Score by traveler fit
+    const scored = restaurants.map((rest) => {
+      let score = 0;
+
+      // Priority 1: Traveler fit (people_type match)
+      const suitableFor = rest.suitable_for || [];
+      if (context.people_type === "family_with_kids" && suitableFor.includes("family")) {
+        score += 10;
+      }
+      if (context.people_type === "couple" && suitableFor.includes("couple")) {
+        score += 10;
+      }
+      if (context.people_type === "solo" && suitableFor.includes("solo")) {
+        score += 10;
+      }
+      if (suitableFor.includes("groups")) {
+        score += 5;
+      }
+
+      // Priority 2: Companion constraints
+      if (context.companion_constraints?.has_kids && suitableFor.includes("family")) {
+        score += 5;
+      }
+      if (context.companion_constraints?.has_elderly && suitableFor.includes("elderly")) {
+        score += 3;
+      }
+
+      // Priority 3: Curated confidence (source='local_curated' boost)
+      if (rest.source === "local_curated") {
+        score += 2;
+      }
+
+      return { ...rest, _score: score };
+    });
+
+    // Sort by score descending, cap at 3
+    const topRestaurants = scored
+      .sort((a, b) => b._score - a._score)
+      .slice(0, 3)
+      .map((rest) => ({
+        restaurant_code: rest.code,
+        name: rest.name,
+        cuisine_type: rest.cuisine_type,
+        meal_context: rest.meal_context,
+        suitable_for: rest.suitable_for,
+        accessibility: {
+          kids_ok: (rest.suitable_for || []).includes("family"),
+          elderly_ok: (rest.suitable_for || []).includes("elderly"),
+        },
+      }));
+
     return {
-      restaurant_code: restaurant.code,
-      name: restaurant.name,
-      type: "primary",
-      meal_context: context.meal_context,
-      accessibility: {
-        kids_ok: (restaurant.suitable_for || []).includes("kids_ok"),
-        elderly_ok: (restaurant.suitable_for || []).includes("elderly_ok"),
-      },
-      data_status: "verified",
-      message: "Curated restaurant recommendation",
+      restaurants: topRestaurants,
+      data_status: "v0_curated",
+      message: "Curated local recommendations based on traveler profile",
     };
   }
 
@@ -451,7 +503,7 @@ class TravelGuideService {
   }
 
   /**
-   * Helper: Fetch restaurants by meal context
+   * Helper: Fetch restaurants by meal context (all matching for ranking)
    * @private
    */
   async _getRestaurants(countryCode, cityCode, mealContext) {
@@ -459,7 +511,7 @@ class TravelGuideService {
       SELECT * FROM travel_restaurants
       WHERE country_code = $1 AND city_code = $2
       AND meal_context @> $3::text[]
-      LIMIT 5
+      ORDER BY source DESC, code ASC
     `;
 
     try {
@@ -497,6 +549,53 @@ class TravelGuideService {
       fallback_available: false,
       message: `No recommendations available: ${reason}`,
     };
+  }
+
+  /**
+   * Helper: Get cafe partners (max 2, optional field)
+   * @private
+   */
+  async _getCafePartners(countryCode, cityCode) {
+    const query = `
+      SELECT id, name, category, phone, address
+      FROM dt_partners
+      WHERE LOWER(city_code) = LOWER($1)
+      AND category IN ('cafe', 'beverage', 'coffee')
+      AND is_active = true
+      ORDER BY name
+      LIMIT 2
+    `;
+
+    try {
+      const result = await db.query(query, [cityCode]);
+      return result.rows || [];
+    } catch (error) {
+      console.error("Failed to fetch cafes:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Helper: Get benefits for city partners (optional field)
+   * @private
+   */
+  async _getBenefits(countryCode, cityCode) {
+    const query = `
+      SELECT b.id, b.partner_id, b.benefit_type, b.title, b.description, p.name as partner_name
+      FROM dt_benefits b
+      JOIN dt_partners p ON b.partner_id = p.id
+      WHERE LOWER(p.city_code) = LOWER($1) AND b.is_active = true
+      ORDER BY p.name, b.benefit_type
+      LIMIT 5
+    `;
+
+    try {
+      const result = await db.query(query, [cityCode]);
+      return result.rows || [];
+    } catch (error) {
+      console.error("Failed to fetch benefits:", error);
+      return [];
+    }
   }
 }
 
