@@ -165,41 +165,85 @@ function TravelGuidePage() {
     });
     return (
       <div className="travel-guide-results">
-        <h2>추천 여행지</h2>
+        <h2>오늘의 여수 추천</h2>
 
         {/* Places */}
-        <div className="recommendations-list">
-          {recommendations.places.map((place, idx) => (
-            <TravelRecommendCard
-              key={idx}
-              place={place}
-              onViewMap={() => {
-                logEvent('map_open', { place_code: place.place_code });
-                setShowMap(true);
-              }}
-              onGetDirections={() => {
-                logEvent('directions_click', { place_code: place.place_code });
-                window.open(
-                  `https://map.kakao.com/link/to/${place.place_code},${place.lat},${place.lng}`,
-                  '_blank'
-                );
-              }}
-            />
-          ))}
-        </div>
+        <section className="results-section">
+          <h3>🌟 가볼 곳</h3>
+          <div className="recommendations-list">
+            {recommendations.places.map((place, idx) => (
+              <TravelRecommendCard
+                key={idx}
+                place={place}
+                onViewMap={() => {
+                  logEvent('map_open', { place_code: place.place_code });
+                  setShowMap(true);
+                }}
+                onGetDirections={() => {
+                  logEvent('directions_click', { place_code: place.place_code });
+                  window.open(
+                    `https://map.kakao.com/link/to/${place.place_code},${place.lat},${place.lng}`,
+                    '_blank'
+                  );
+                }}
+              />
+            ))}
+          </div>
+        </section>
 
         {/* Food */}
-        {recommendations.food && (
-          <div className="food-section">
-            <h3>🍽️ 식사</h3>
-            {recommendations.food.data_status === 'verified' ? (
-              <div className="food-card">
-                <p>{recommendations.food.name}</p>
-              </div>
-            ) : (
-              <p>검증된 식사 정보를 준비 중이에요.</p>
-            )}
-          </div>
+        {recommendations.food && recommendations.food.restaurants && recommendations.food.restaurants.length > 0 && (
+          <section className="results-section">
+            <h3>🍽️ 먹을 곳</h3>
+            <div className="food-list">
+              {recommendations.food.restaurants.map((rest, idx) => (
+                <div key={idx} className="food-card">
+                  <h4>{rest.name}</h4>
+                  <p className="cuisine">{rest.cuisine_type}</p>
+                  {rest.meal_context && (
+                    <p className="meal-context">
+                      {Array.isArray(rest.meal_context)
+                        ? rest.meal_context.join(', ')
+                        : rest.meal_context}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Cafes */}
+        {recommendations.cafes && recommendations.cafes.length > 0 && (
+          <section className="results-section">
+            <h3>☕ 쉬어갈 곳</h3>
+            <div className="cafe-list">
+              {recommendations.cafes.map((cafe, idx) => (
+                <div key={idx} className="cafe-card">
+                  <h4>{cafe.name}</h4>
+                  {cafe.phone && <p className="cafe-phone">📞 {cafe.phone}</p>}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Benefits */}
+        {recommendations.benefits && recommendations.benefits.length > 0 && (
+          <section className="results-section">
+            <h3>⭐ 별빛혜택</h3>
+            <div className="benefits-list">
+              {recommendations.benefits.map((benefit, idx) => (
+                <div key={idx} className="benefit-card">
+                  <h4>{benefit.title}</h4>
+                  <p className="benefit-partner">{benefit.partner_name}</p>
+                  {benefit.description && (
+                    <p className="benefit-description">{benefit.description}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
         )}
 
         {/* Fallback */}

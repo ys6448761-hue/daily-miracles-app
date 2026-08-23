@@ -1,6 +1,8 @@
 /**
  * TravelGuideHome
- * First screen: question-driven recommendation
+ * Day-1 MVP: Integrated journey experience
+ * Hero: "소원이님, 오늘의 여수를 만나볼까요?"
+ * Four cards: 가볼 곳 → 먹을 곳 → 쉬어갈 곳 → 별빛혜택
  */
 
 import React, { useState } from 'react';
@@ -21,8 +23,8 @@ function TravelGuideHome({ context, onGetRecommendations, loading, error }) {
   return (
     <div className="travel-guide-home">
       <header className="hero">
-        <h1>🌟 여수, 어디 갈까요?</h1>
-        <p>당신의 여정에 맞춘 추천을 받아보세요</p>
+        <h1>소원이님,<br />오늘의 여수를 만나볼까요?</h1>
+        <p className="hero-supporting">어디를 가야 할지, 무엇을 먹을지, 어디서 잠시 쉬어갈지, 받을 수 있는 작은 혜택까지<br />Lumi가 지금 여행에 맞춰 찾아드릴게요.</p>
       </header>
 
       {error && (
@@ -31,22 +33,34 @@ function TravelGuideHome({ context, onGetRecommendations, loading, error }) {
         </div>
       )}
 
-      <section className="menu-grid">
-        <div className="menu-item">
-          <span>📍</span>
-          <p>어디 갈까요?</p>
+      <section className="experience-cards">
+        <div className="experience-card">
+          <div className="card-icon">📍</div>
+          <h3>가볼 곳</h3>
+          <p>소원이에게 맞는<br />여수의 장소</p>
         </div>
-        <div className="menu-item">
-          <span>🍚</span>
-          <p>뭐 먹을까요?</p>
+        <div className="experience-card">
+          <div className="card-icon">🍽️</div>
+          <h3>먹을 곳</h3>
+          <p>지금 동선에 맞는<br />한 끼</p>
         </div>
-        <div className="menu-item">
-          <span>🚕</span>
-          <p>어떻게 갈까요?</p>
+        <div className="experience-card">
+          <div className="card-icon">☕</div>
+          <h3>쉬어갈 곳</h3>
+          <p>여행 중 잠깐<br />숨 고르기</p>
+        </div>
+        <div className="experience-card">
+          <div className="card-icon">⭐</div>
+          <h3>별빛혜택</h3>
+          <p>지금 받을 수 있는<br />작은 혜택</p>
         </div>
       </section>
 
       <form onSubmit={handleSubmit} className="recommendation-form">
+        <div className="form-intro">
+          <p>몇 가지만 알려주시면 Lumi가 지금 여행에 맞게 골라드려요.</p>
+        </div>
+
         <div className="form-group">
           <label>누구와 함께 가나요?</label>
           <select
@@ -95,15 +109,10 @@ function TravelGuideHome({ context, onGetRecommendations, loading, error }) {
           </label>
         </div>
 
-        <button type="submit" disabled={loading}>
-          {loading ? '추천 받는 중...' : '추천 받기'}
+        <button type="submit" disabled={loading} className="btn-primary">
+          {loading ? '추천 받는 중...' : '오늘의 여수 추천받기'}
         </button>
       </form>
-
-      <footer className="footer">
-        <p>✨ 지금 내 마음에 맞는 여수</p>
-        <p>💬 궁금한 것이 있으신가요?</p>
-      </footer>
     </div>
   );
 }
