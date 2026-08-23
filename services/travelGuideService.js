@@ -319,6 +319,7 @@ class TravelGuideService {
 
   /**
    * Companion requirements (kids, elderly, special needs)
+   * Uses canonical suitable_for vocabulary (Phase 1B normalized)
    * @private
    */
   _passesCompanion(place, context) {
@@ -330,7 +331,8 @@ class TravelGuideService {
       return suitableFor.includes("kids_ok");
     }
     if (people_type === "family_elderly" && companion_constraints?.has_elderly) {
-      return suitableFor.includes("elderly_ok");
+      // Note: DB uses "elderly" not "elderly_ok" (vocabulary alignment fix)
+      return suitableFor.includes("elderly");
     }
     if (companion_constraints?.disability === "wheelchair") {
       return suitableFor.includes("wheelchair_accessible");
