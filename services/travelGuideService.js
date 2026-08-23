@@ -127,7 +127,16 @@ class TravelGuideService {
       candidates = candidates.sort((a, b) => this._scoreEmotion(a, b, context));
     }
 
-    // 9. Experience Cluster Diversity (prevent geographic monopoly)
+    // 9. Traveler Fit Scoring (Phase 1B: evidence-based traveler personalization)
+    // Score based on suitable_for tags, not demographics assumptions
+    candidates = candidates.sort((a, b) => {
+      const scoreA = this._calculateTravelerFitScore(a, context);
+      const scoreB = this._calculateTravelerFitScore(b, context);
+      // Higher score first
+      return scoreB - scoreA;
+    });
+
+    // 10. Experience Cluster Diversity (prevent geographic monopoly)
     candidates = this._applyClusterDiversity(candidates);
 
     // Select top 3 places
@@ -617,6 +626,40 @@ class TravelGuideService {
       console.error("Failed to fetch benefits:", error);
       return [];
     }
+  }
+
+  /**
+   * Helper: Get normalized tags for traveler type
+   * Evidence-based only (no demographic assumptions)
+   * @private
+   */
+  _getNormalizedTravelerTags(people_type) {
+    const mapping = {
+      family_with_kids: ['family', 'kids_ok'],
+      couple: ['couples'],
+      solo: [], // No explicit tags in current DB
+      family_elderly: ['elderly']
+      // Other types: no mapping (no score boost)
+    };
+    return mapping[people_type] || [];
+  }
+
+  /**
+   * Helper: Calculate traveler fit score
+   * Based on suitable_for tags, not demographic assumptions
+   * Score = 10 points per tag match
+   * @private
+   */
+  _calculateTravelerFitScore(place, context) {
+    if (!context.people_type) return 0; // No personalization without people_type
+
+    const suitableFor = place.suitable_for || [];
+    const expectedTags = this._getNormalizedTravelerTags(context.people_type);
+
+    // Count how many expected tags match
+    const matchCount = expectedTags.filter(tag => suitableFor.includes(tag)).length;
+
+    return matchCount > 0 ? matchCount * 10 : 0;
   }
 
   /**
