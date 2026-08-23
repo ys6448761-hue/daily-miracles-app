@@ -577,6 +577,8 @@ class TravelGuideService {
 
   /**
    * Helper: Get benefits for city partners (optional field)
+   * Day-1 MVP: Only expose contractually confirmed benefits
+   * Exclusions: Moipin free Americano (not contracted for DreamTown free-travel)
    * @private
    */
   async _getBenefits(countryCode, cityCode) {
@@ -591,7 +593,17 @@ class TravelGuideService {
 
     try {
       const result = await db.query(query, [cityCode]);
-      return result.rows || [];
+
+      // Filter out unconfirmed benefits (Day-1 MVP business rules)
+      const confirmedBenefits = (result.rows || []).filter(benefit => {
+        // Exclude: Moipin free Americano (not contracted for DreamTown)
+        if (benefit.partner_name === '모이핀' && benefit.benefit_type === 'free') {
+          return false;
+        }
+        return true;
+      });
+
+      return confirmedBenefits;
     } catch (error) {
       console.error("Failed to fetch benefits:", error);
       return [];
