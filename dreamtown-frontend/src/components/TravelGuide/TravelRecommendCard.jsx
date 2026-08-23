@@ -1,6 +1,7 @@
 /**
  * TravelRecommendCard
  * Display single place recommendation
+ * Phase 1: null travel times shown as "확인 중" (not as 0 or null값)
  */
 
 import React from 'react';
@@ -18,6 +19,13 @@ function TravelRecommendCard({ place, onViewMap, onGetDirections }) {
     return place.live_status === 'open' ? 'green' : 'red';
   };
 
+  const getTotalTimeLabel = () => {
+    if (place.total_required_time === null || place.total_required_time === undefined) {
+      return '이동시간 확인 중';
+    }
+    return `${place.total_required_time}분`;
+  };
+
   return (
     <div className="recommend-card">
       <div className="card-header">
@@ -29,7 +37,7 @@ function TravelRecommendCard({ place, onViewMap, onGetDirections }) {
         <p className="reason">💡 {place.reason}</p>
 
         <div className="info-row">
-          <span>⏱️ 예상 시간</span>
+          <span>⏱️ 장소 체류시간</span>
           <span>{place.stay_minutes}분</span>
         </div>
 
@@ -41,12 +49,10 @@ function TravelRecommendCard({ place, onViewMap, onGetDirections }) {
           </span>
         </div>
 
-        {place.total_required_time && (
-          <div className="info-row">
-            <span>🕐 총 소요 시간</span>
-            <span>{place.total_required_time}분</span>
-          </div>
-        )}
+        <div className="info-row">
+          <span>🕐 총 소요 시간</span>
+          <span>{getTotalTimeLabel()}</span>
+        </div>
       </div>
 
       <div className="card-actions">
