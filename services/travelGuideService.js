@@ -51,16 +51,38 @@ class TravelGuideService {
     }));
 
     // 3. Total Required Time (travel + stay)
+    // RULE: unknown travel_time MUST NOT be treated as 0
     candidates = candidates.map((p) => {
-      const travelTime = this._estimateTravelTime(p, context);
-      const totalRequired = travelTime + p.avg_stay_minutes;
-      return { ...p, travel_time: travelTime, total_required_time: totalRequired };
+      const travelTimeObj = this._estimateTravelTime(p, context);
+
+      // Preserve null as null; do NOT convert to 0
+      const travelMinutes = travelTimeObj.minutes;
+      const totalRequired = travelMinutes === null
+        ? null  // Unknown travel time → unknown total time
+        : travelMinutes + p.avg_stay_minutes;
+
+      return {
+        ...p,
+        travel_time_minutes: travelMinutes,
+        travel_time_status: travelTimeObj.status || 'unknown',
+        total_required_time: totalRequired,
+        total_required_time_status: travelMinutes === null ? 'unknown' : 'verified',
+        _travel_time_unknown: travelTimeObj.status === 'unknown'
+      };
     });
 
-    // Filter by time constraint
-    candidates = candidates.filter(
-      (p) => p.total_required_time <= context.time_available_minutes
-    );
+    // Filter by time constraint with fail-safe for unknown times
+    // RULE: unknown total_time MUST NOT be silently accepted
+    candidates = candidates.filter((p) => {
+      // If total_required_time is unknown, include with warning (fail-safe)
+      if (p.total_required_time === null) {
+        if (!p._warnings) p._warnings = [];
+        p._warnings.push('total_required_time_unverified');
+        return true; // Include but flag
+      }
+      // Verified time: filter by constraint
+      return p.total_required_time <= context.time_available_minutes;
+    });
 
     if (candidates.length === 0) {
       return this._noPlacesResponse(context, "Insufficient time available");
@@ -105,17 +127,25 @@ class TravelGuideService {
       name_ko: p.name_ko,
       type: "primary",
       stay_minutes: p.avg_stay_minutes,
-      travel_time_minutes: p.travel_time === Infinity ? "unknown" : p.travel_time,
+      travel_time_minutes: p.travel_time_minutes,
+      travel_time_status: p.travel_time_status,
       total_required_time: p.total_required_time,
+      total_required_time_status: p.total_required_time_status || 'unknown',
       reason: this._generateReason(p, context),
       safety_pass: true,
       live_status: p.live_status,
       accessibility: {
+        // NEW: Status fields (Phase 1)
+        wheelchair_status: p.accessibility_wheelchair_status || 'unknown',
+        stroller_status: p.accessibility_stroller_status || 'unknown',
+        bus_accessible_status: p.bus_accessible_status || 'unknown',
+        // DEPRECATED: Old fields (backward compat, Phase 2 removal)
         wheelchair: p.accessibility_wheelchair || false,
         stroller: p.accessibility_stroller || false,
         bus_accessible: (p.access_by_bus || []).length > 0,
         car_accessible: p.access_by_car !== false,
       },
+      warnings: p._warnings && p._warnings.length > 0 ? p._warnings : [],
     }));
 
     // Prepare fallback (only first 3 can have fallback)
@@ -160,46 +190,102 @@ class TravelGuideService {
 
   /**
    * Estimate travel time (no unverified data)
+   * Returns { minutes: number|null, status: 'verified'|'unknown' }
    * @private
    */
   _estimateTravelTime(place, context) {
     // V0: No verified travel time data
-    // Return 0 as placeholder (live transit time unknown, not impossible)
-    return 0;
+    // Return status='unknown', NOT 0 (which implies same location)
+    return {
+      minutes: null,
+      status: 'unknown',
+      source: 'not_available'
+    };
   }
 
   /**
-   * Transportation accessibility
+   * Transportation accessibility (fail-safe for unknown status)
+   * RULE: unknown status does NOT filter out — surfaces warning instead
    * @private
    */
   _passesTransport(place, context) {
     if (context.has_car) {
       return place.access_by_car !== false;
     } else {
-      // Bus required
-      return place.access_by_bus && place.access_by_bus.length > 0;
+      // No-car traveler needs bus
+      const busStatus = place.bus_accessible_status || 'unknown';
+
+      if (busStatus === 'verified_yes') {
+        return true; // Confirmed bus accessible
+      }
+      if (busStatus === 'verified_no') {
+        return false; // Confirmed NOT bus accessible, exclude
+      }
+      if (busStatus === 'unknown') {
+        // FAIL-SAFE: Include but flag warning
+        if (!place._warnings) place._warnings = [];
+        place._warnings.push('bus_accessibility_unverified');
+        return true; // Do NOT reject
+      }
     }
   }
 
   /**
-   * Physical accessibility (wheelchair, stroller, etc.)
+   * Physical accessibility (fail-safe for unknown status)
+   * RULE: unknown status does NOT filter out — surfaces warning instead
+   * RULE: verified_yes > unknown (warning) > verified_no (exclude)
    * @private
    */
   _passesAccessibility(place, context) {
     const { companion_constraints } = context;
     if (!companion_constraints) return true;
 
+    // Wheelchair accessibility
     if (companion_constraints.disability === "wheelchair") {
-      return place.accessibility_wheelchair === true;
+      const wheelchairStatus = place.accessibility_wheelchair_status || 'unknown';
+
+      if (wheelchairStatus === 'verified_yes') {
+        return true; // Confirmed accessible
+      }
+      if (wheelchairStatus === 'verified_no') {
+        return false; // Confirmed inaccessible, exclude
+      }
+      if (wheelchairStatus === 'unknown') {
+        // FAIL-SAFE: Include but flag warning
+        if (!place._warnings) place._warnings = [];
+        place._warnings.push('wheelchair_accessibility_unverified');
+        return true; // Do NOT reject
+      }
     }
+
+    // Stroller accessibility (kids under 3)
     if (companion_constraints.has_kids && companion_constraints.kids_age < 3) {
-      return place.accessibility_stroller === true;
+      const strollerStatus = place.accessibility_stroller_status || 'unknown';
+
+      if (strollerStatus === 'verified_yes') {
+        return true;
+      }
+      if (strollerStatus === 'verified_no') {
+        return false;
+      }
+      if (strollerStatus === 'unknown') {
+        // FAIL-SAFE: Include but flag warning
+        if (!place._warnings) place._warnings = [];
+        place._warnings.push('stroller_accessibility_unverified');
+        return true; // Do NOT reject
+      }
     }
+
+    // Elderly: check physical difficulty only if available
     if (companion_constraints.has_elderly) {
-      // Elderly: prefer not too difficult
-      return (
-        place.physical_difficulty === "easy" || place.physical_difficulty === "moderate"
-      );
+      // Only filter if physical_difficulty is explicitly set
+      if (place.physical_difficulty) {
+        return (
+          place.physical_difficulty === "easy" || place.physical_difficulty === "moderate"
+        );
+      }
+      // If unknown, allow (don't reject)
+      return true;
     }
 
     return true;

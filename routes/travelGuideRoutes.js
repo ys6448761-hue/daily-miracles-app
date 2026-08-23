@@ -30,6 +30,16 @@ router.post('/recommend', async (req, res) => {
       });
     }
 
+    // PHASE 1B: Add origin if not provided
+    // Rule: Do NOT infer from generic entry_point
+    // Origin must have explicit source: partner_entry, station_entry, previous_place, manual_location, unknown
+    if (!context.origin) {
+      context.origin = {
+        type: 'unknown',
+        label: 'Origin not specified',
+      };
+    }
+
     // Validate or create session
     let sessionId = context.session_id;
 
