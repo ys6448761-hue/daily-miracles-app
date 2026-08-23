@@ -2114,6 +2114,29 @@ app.get("/diag/files", (req, res) => {
   }
 });
 
+// ═══════════════════════════════════════════════════════════════════════════
+// ┌─ DREAMTOWN CANONICAL PRODUCTION ROUTES (Do Not Modify Routing) ──────────┐
+// │                                                                           │
+// │ CANONICAL IDENTITY & DATABASE:                                          │
+// │   - dt_user_id (UUID v4, localStorage['dt_user_id'], unified)           │
+// │   - dt_wishes table (migration 029_dreamtown_p0.sql)                     │
+// │   - dt_stars table (migration 029_dreamtown_p0.sql)                      │
+// │   - Unified flow: Travel Guide → Wish → Star (user_id continuity)        │
+// │                                                                           │
+// │ CANONICAL ROUTES (/api/dt prefix):                                      │
+// │   app.use('/api/dt', dreamtownRoutes)       [LINE ~3266]                 │
+// │   app.use('/api/dt/flow', dreamtownFlowRoutes)        [LINE ~2405]       │
+// │   app.use('/api/dt/wish-checkin', wishCheckinRoutes)  [LINE ~2417]       │
+// │   app.use('/api/dt/star', dtStarTrajectoryRoutes)     [LINE ~3381]       │
+// │                                                                           │
+// │ FRONTEND ONLY CALLS CANONICAL ROUTES:                                   │
+// │   - dreamtown-frontend/src/api/dreamtown.js: const BASE = '/api/dt'      │
+// │   - All 50+ API calls via ${BASE} prefix                                │
+// │                                                                           │
+// │ DO NOT REMOVE CANONICAL ROUTES OR MODIFY USER IDENTITY FLOW               │
+// └───────────────────────────────────────────────────────────────────────────┘
+// ═══════════════════════════════════════════════════════════════════════════
+
 // ---------- 인증 API Routes ----------
 if (authRoutes) {
   app.use("/api/auth", authRoutes);
@@ -2152,12 +2175,16 @@ if (inquiryRoutes) {
   console.warn("⚠️ 간편 접수 API 라우터 로드 실패 - 라우트 미등록");
 }
 
-// ---------- 소원실현 폼 API Routes ----------
+// ---------- [LEGACY] 소원실현 폼 API Routes (/api/wishes) ----------
+// NOTE: JourneyWishPage still uses POST /api/wishes (journey system, wishes table)
+//       wishCoreRoutes (line ~2560) conditionally mounts on same path.
+//       If both present, Express processes in registration order.
+//       To avoid confusion, consider migrating JourneyWishPage to canonical /api/dt/wishes
 if (wishRoutes) {
   app.use("/api/wishes", wishRoutes);
-  console.log("✅ 소원실현 API 라우터 등록 완료");
+  console.log("✅ [LEGACY] 소원실현 API 라우터 등록 완료");
 } else {
-  console.warn("⚠️ 소원실현 API 라우터 로드 실패 - 라우트 미등록");
+  console.warn("⚠️ [LEGACY] 소원실현 API 라우터 로드 실패 - 라우트 미등록");
 }
 
 // ---------- Wish Intake 7문항 API Routes (P0-02) ----------
@@ -2533,7 +2560,11 @@ if (rewardRoutes) {
   console.warn("⚠️ 리워드(예고편) 라우터 로드 실패 - 라우트 미등록");
 }
 
-// ---------- Core Journey Flow Routes ─────────────────────────────────
+// ---------- [LEGACY] Core Journey Flow Routes ────────────────────────────
+// NOTE: wishCoreRoutes mounts on /api/wishes (same path as wishRoutes line ~2180)
+//       Journey system uses wishes table (not canonical dt_wishes)
+//       User identity: user_key (not canonical dt_user_id)
+//       Status: JourneyWishPage still depends on this
 if (wishCoreRoutes)      app.use('/api/wishes',           wishCoreRoutes);
 if (journeyContextRoutes) app.use('/api/journey-contexts', journeyContextRoutes);
 if (recommendationRoutes) app.use('/api/recommendation',   recommendationRoutes);
@@ -2730,8 +2761,13 @@ try {
   console.warn('⚠️ starsRoutes 로드 실패:', e.message);
 }
 if (starsRoutes) {
+  // [LEGACY] HTTP routes from starsRoutes (POST /, GET /featured, GET /:id, GET /:id/day30)
+  // are not called by current DreamTown frontend (uses /api/dt/stars/* instead)
+  // HOWEVER: starsRoutes utility methods (latestStarByUser, calcDay, dayMessage)
+  // are still used internally for /api/messages endpoint (below)
+  // DO NOT REMOVE starsRoutes entirely — only HTTP routes are unused
   app.use('/api/stars', starsRoutes);
-  console.log('✅ 별 시스템 라우터 등록 완료 (/api/stars)');
+  console.log('✅ [LEGACY] 별 시스템 라우터 등록 완료 (/api/stars)');
 
   // GET /api/messages?user_id= — user 기반 day 메시지 (Issue 4 편의 엔드포인트)
   app.get('/api/messages', async (req, res) => {
@@ -2909,16 +2945,20 @@ if (starImageRoutes) {
   console.log('✅ Star Image 라우터 등록 완료 (/api/star-image)');
 }
 
-// ---------- Star Public (공명/공유/피드/별자리/은하) (/api/stars) ----------
+// ---------- [LEGACY] Star Public (공명/공유/피드/별자리/은하) (/api/stars) ----------
+// NOTE: This module handles legacy /api/stars/* endpoints (not canonical /api/dt/*)
+// STILL USED: dreamtown-frontend calls /api/stars/galaxies (getGalaxies function)
+// Identity: Does not use canonical dt_user_id
+// Status: Partially deprecated but still required for public feed & constellation endpoints
 let starPublicRoutes = null;
 try {
   starPublicRoutes = require('./routes/starPublicRoutes');
 } catch (e) {
-  console.warn('⚠️ starPublicRoutes 로드 실패:', e.message);
+  console.warn('⚠️ [LEGACY] starPublicRoutes 로드 실패:', e.message);
 }
 if (starPublicRoutes) {
   app.use('/api/stars', starPublicRoutes);
-  console.log('✅ Star Public 라우터 등록 완료 (/api/stars)');
+  console.log('✅ [LEGACY] Star Public 라우터 등록 완료 (/api/stars - galaxies, constellations, resonance, feed)');
 }
 
 // ---------- 여수 미션 + 포인트 (/api/yeosu-missions) ----------
@@ -3261,10 +3301,28 @@ if (experimentEventRoutes) {
   console.warn("⚠️ Experiment Event 라우터 미등록");
 }
 
-// ---------- DreamTown Routes ----------
+// ═══════════════════════════════════════════════════════════════════════════
+// ┌─ CANONICAL PRODUCTION ROUTE MOUNT ──────────────────────────────────────┐
+// │                                                                           │
+// │ PRODUCTION PRIMARY MOUNT (DO NOT MODIFY):                               │
+// │   /api/dt → dreamtownRoutes.js (52 routes)                              │
+// │                                                                           │
+// │ REQUIRED FOR:                                                           │
+// │   - Travel Guide → Wish → Star unified flow                             │
+// │   - Unified dt_user_id (UUID v4) continuity                             │
+// │   - All DreamTown frontend operations                                   │
+// │   - dt_wishes & dt_stars tables                                         │
+// │                                                                           │
+// │ DO NOT:                                                                 │
+// │   - Modify user_id handling or parameter names                          │
+// │   - Remove this mount                                                   │
+// │   - Redirect to legacy routes                                           │
+// └───────────────────────────────────────────────────────────────────────────┘
+// ═══════════════════════════════════════════════════════════════════════════
+
 const dreamtownRoutes = require('./routes/dreamtownRoutes');
 app.use('/api/dt', dreamtownRoutes);
-console.log('✅ DreamTown 라우터 등록 완료 (/api/dt)');
+console.log('✅ [CANONICAL] DreamTown 라우터 등록 완료 (/api/dt - PRODUCTION PRIMARY)');
 
 // ---------- 실물책 제작 신청 API ----------
 // POST /api/book/upgrade — 디지털북 → 실물책 전환 신청 (관심 등록)
