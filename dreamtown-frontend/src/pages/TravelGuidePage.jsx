@@ -9,6 +9,7 @@ import TravelGuideHome from '../components/TravelGuide/TravelGuideHome';
 import TravelRecommendCard from '../components/TravelGuide/TravelRecommendCard';
 import TravelMapView from '../components/TravelGuide/TravelMapView';
 import TravelFallbackUI from '../components/TravelGuide/TravelFallbackUI';
+import CourseDisplay from '../components/TravelGuide/CourseDisplay';
 import { getOrCreateUserId } from '../api/dreamtown.js';
 import '../styles/travel-guide.css';
 
@@ -166,6 +167,11 @@ function TravelGuidePage() {
     return (
       <div className="travel-guide-results">
         <h2>오늘의 여수 추천</h2>
+
+        {/* Journey Course (V0) */}
+        {recommendations.course && (
+          <CourseDisplay course={recommendations.course} />
+        )}
 
         {/* Places */}
         <section className="results-section">

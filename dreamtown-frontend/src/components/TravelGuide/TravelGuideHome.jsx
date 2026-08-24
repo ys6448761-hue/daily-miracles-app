@@ -15,6 +15,8 @@ function TravelGuideHome({ context, onGetRecommendations, loading, error }) {
     weather: { condition: 'clear', temperature_celsius: 25 },
   });
 
+  const [timeMode, setTimeMode] = useState('half_day'); // 'half_day' | 'full_day' | 'custom'
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onGetRecommendations(formData);
@@ -81,19 +83,53 @@ function TravelGuideHome({ context, onGetRecommendations, loading, error }) {
 
         <div className="form-group">
           <label>얼마나 여유가 있나요?</label>
-          <input
-            type="number"
-            min="30"
-            max="480"
-            value={formData.time_available_minutes}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                time_available_minutes: parseInt(e.target.value),
-              })
-            }
-          />
-          <span>분</span>
+          <div className="time-selector">
+            <button
+              type="button"
+              className={`time-button ${timeMode === 'half_day' ? 'active' : ''}`}
+              onClick={() => {
+                setTimeMode('half_day');
+                setFormData({ ...formData, time_available_minutes: 180 });
+              }}
+            >
+              반나절
+            </button>
+            <button
+              type="button"
+              className={`time-button ${timeMode === 'full_day' ? 'active' : ''}`}
+              onClick={() => {
+                setTimeMode('full_day');
+                setFormData({ ...formData, time_available_minutes: 480 });
+              }}
+            >
+              하루
+            </button>
+            <button
+              type="button"
+              className={`time-button ${timeMode === 'custom' ? 'active' : ''}`}
+              onClick={() => setTimeMode('custom')}
+            >
+              직접 시간 선택
+            </button>
+          </div>
+
+          {timeMode === 'custom' && (
+            <div className="custom-time-input">
+              <input
+                type="number"
+                min="30"
+                max="480"
+                value={formData.time_available_minutes}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    time_available_minutes: parseInt(e.target.value),
+                  })
+                }
+              />
+              <span>분</span>
+            </div>
+          )}
         </div>
 
         <div className="form-group">

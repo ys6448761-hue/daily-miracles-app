@@ -139,8 +139,11 @@ class TravelGuideService {
     // 10. Experience Cluster Diversity (prevent geographic monopoly)
     candidates = this._applyClusterDiversity(candidates);
 
-    // Select top 3 places
-    const topPlaces = candidates.slice(0, 3).map((p) => ({
+    // JOURNEY COMPOSITION V0: Variable stop count based on available time
+    const journeyComposition = await this._composeJourney(candidates, context);
+
+    // BACKWARD COMPATIBILITY: Also generate Top-3 for legacy clients
+    const topPlaces = journeyComposition.selectedPlaces.slice(0, 3).map((p) => ({
       place_code: p.code,
       name_ko: p.name_ko,
       type: "primary",
@@ -194,6 +197,7 @@ class TravelGuideService {
       session_id: context.session_id,
       entry_point: context.entry_point,
       user_mode: context.user_mode,
+      // BACKWARD COMPATIBILITY: Old fields
       places: topPlaces,
       food: foodRec,
       cafes: cafes.length > 0 ? cafes : undefined,
@@ -202,7 +206,231 @@ class TravelGuideService {
       fallback_available: fallbackAvailable,
       fallback: fallbackRecommendation,
       message: "Recommendations based on your travel context",
+
+      // NEW: Journey Composer V0 (integrated course with variable stops)
+      course: journeyComposition.course,
     };
+  }
+
+  /**
+   * Journey Composer V0
+   * Constructs variable-stop courses based on available time
+   * - 반나절 (180 min): 2-3 stops + 1 meal + 1 cafe
+   * - 하루 (480 min): 4-5 stops + 2 meals + 1-2 cafes
+   * - 직접선택: Scaled by time_available_minutes
+   *
+   * Returns blocks WITHOUT exact times (no false precision)
+   * Uses duration ranges + stay_minutes for planning
+   * @private
+   */
+  async _composeJourney(candidates, context) {
+    const timeMinutes = context.time_available_minutes;
+
+    // Determine time slot and target stop count
+    const timeSlot = this._detectTimeSlot(timeMinutes);
+    const targetStops = this._getTargetStopCount(timeSlot, timeMinutes);
+
+    // Select places that fit available time (greedy: fit as many as possible)
+    const selectedPlaces = this._selectPlacesByTime(candidates, targetStops, timeMinutes);
+
+    // Fetch meal recommendations for journey
+    const mealOptions = await this._getFoodRecommendation(context);
+    const cafeOptions = await this._getCafePartners(context.country_code, context.city_code);
+
+    // Compose journey blocks
+    const blocks = this._buildJourneyBlocks(selectedPlaces, mealOptions, cafeOptions, context);
+
+    // Calculate total time and fit assessment
+    const totalStayMinutes = selectedPlaces.reduce((sum, p) => sum + p.avg_stay_minutes, 0);
+    const mealTimeMinutes = selectedPlaces.length > 0 ? 60 : 0; // 1 meal if any places
+    const cafeTimeMinutes = selectedPlaces.length > 2 ? 30 : 0; // 1 cafe if 3+ places
+
+    // P0-2 FIX: Fit status must reflect unknown travel time
+    // Cannot claim "fits_comfortably" when travel duration is unverified
+    const travelTransitionCount = blocks.filter(b => b.type === 'travel_transition').length;
+    const travelUnknown = travelTransitionCount > 0;
+    const fitStatus = travelUnknown ? 'travel_time_unverified' : 'fits_comfortably';
+
+    return {
+      selectedPlaces,
+      course: {
+        type: 'course',
+        version: 'v0',
+        time_slot: timeSlot,
+        available_minutes: timeMinutes,
+        target_stop_count: targetStops,
+        actual_stop_count: selectedPlaces.length,
+        blocks: blocks,
+        summary: {
+          total_known_activity_minutes: totalStayMinutes + mealTimeMinutes + cafeTimeMinutes,  // P0-2: clarify what's known
+          total_stay_minutes: totalStayMinutes,
+          estimated_meal_time: selectedPlaces.length > 0 ? 60 : 0,
+          estimated_cafe_time: selectedPlaces.length > 2 ? 30 : 0,
+          unknown_travel_segments: travelTransitionCount,  // P0-2: explicit unknown count
+          estimated_total_range: travelUnknown ? null : {  // P0-2: null when unknown
+            min: totalStayMinutes + (selectedPlaces.length > 0 ? 60 : 0),
+            max: totalStayMinutes + (selectedPlaces.length > 0 ? 60 : 0) + (selectedPlaces.length > 2 ? 30 : 0)
+          },
+          fit_status: fitStatus  // P0-2: 'travel_time_unverified' when unknown
+        },
+        message_ko: travelUnknown
+          ? '관광·식사·휴식 기준으로 구성했어요. 장소 간 이동시간은 현재 확인 중입니다.'
+          : '시간 범위 내에서 편안하게 둘러볼 수 있어요.',  // P0-2: Honest user message
+        notes: `${timeSlot} course with ${selectedPlaces.length} places`
+      }
+    };
+  }
+
+  /**
+   * Detect time slot from available minutes
+   * 반나절: 150-240 min → 180 min target
+   * 하루: 360-540 min → 480 min target
+   * 직접선택: other values
+   * @private
+   */
+  _detectTimeSlot(timeMinutes) {
+    if (timeMinutes >= 150 && timeMinutes <= 240) {
+      return 'half_day';
+    } else if (timeMinutes >= 360 && timeMinutes <= 540) {
+      return 'full_day';
+    } else {
+      return 'custom';
+    }
+  }
+
+  /**
+   * Get target stop count based on time slot
+   * 반나절 (180 min): 2-3 stops
+   * 하루 (480 min): 4-5 stops
+   * 직접선택: Scale by minutes (1 stop per ~120 minutes)
+   * @private
+   */
+  _getTargetStopCount(timeSlot, timeMinutes) {
+    if (timeSlot === 'half_day') {
+      return 3; // 3 stops for 반나절 (was always 3 anyway)
+    } else if (timeSlot === 'full_day') {
+      return 5; // 5 stops for 하루 (more than current Top-3)
+    } else {
+      // 직접선택: Scale (60 min = 1 stop, 180 min = 2-3, 480 min = 4-5)
+      return Math.max(2, Math.min(5, Math.ceil(timeMinutes / 120)));
+    }
+  }
+
+  /**
+   * Select places that fit available time (greedy selection)
+   * Respects ranking but also respects time constraint
+   *
+   * TIME BUDGET CALCULATION:
+   * - Reserve 60 min for 1 meal (if places exist)
+   * - Reserve 30 min for 1 cafe (if 2+ places)
+   * - Use remaining time for places (no exact travel time, just stay time)
+   *
+   * @private
+   */
+  _selectPlacesByTime(candidates, targetCount, timeMinutes) {
+    const selected = [];
+
+    // Calculate time reserves
+    const mealReserveMinutes = 60;    // 1 meal for typical half/full day
+    const cafeReserveMinutes = 30;    // 1 cafe for multi-place courses
+    const availableForPlaces = timeMinutes - mealReserveMinutes - cafeReserveMinutes;
+
+    // Greedy: select as many places as fit
+    let placesTimeUsed = 0;
+    for (const place of candidates) {
+      if (selected.length >= targetCount) break;
+
+      const timeNeeded = place.avg_stay_minutes;
+
+      // Check if this place fits in remaining time budget
+      if (placesTimeUsed + timeNeeded <= availableForPlaces) {
+        selected.push(place);
+        placesTimeUsed += timeNeeded;
+      }
+    }
+
+    return selected;
+  }
+
+  /**
+   * Build journey blocks integrating places, meals, cafes
+   * Sequence: Place → [Travel time indicator] → Place → ... → Meal → [Cafe]
+   * P0 FIX: No numeric estimates when travel_time_status='unknown'
+   * @private
+   */
+  _buildJourneyBlocks(places, mealOptions, cafeOptions, context) {
+    const blocks = [];
+    let sequence = 1;
+
+    // Add place blocks with travel time indicators
+    places.forEach((place, index) => {
+      // Add the place
+      blocks.push({
+        sequence: sequence++,
+        type: 'place',
+        place_code: place.code,
+        name_ko: place.name_ko,
+        stay_minutes: place.avg_stay_minutes,
+        warnings: place._warnings || [],
+        reason: this._generateReason(place, context),
+        accessibility: {
+          wheelchair_status: place.accessibility_wheelchair_status || 'unknown',
+          stroller_status: place.accessibility_stroller_status || 'unknown',
+          bus_accessible_status: place.bus_accessible_status || 'unknown',
+        }
+      });
+
+      // Add travel time indicator (if not last place)
+      // P0-1 FIX: Only show duration_range when travel time is verified
+      if (index < places.length - 1) {
+        blocks.push({
+          sequence: sequence++,
+          type: 'travel_transition',
+          estimated_duration_range: null,  // P0-1: null when status='unknown'
+          status: 'unknown', // V0: No verified travel time data
+          message_ko: '이동시간 확인 중', // P0-1: User-facing message
+          note: 'Travel time will be calculated when route data becomes available'
+        });
+      }
+    });
+
+    // Add meal block if places exist and meal context provided
+    if (places.length > 0 && context.meal_context && context.meal_context !== 'none') {
+      const meals = mealOptions?.restaurants || [];
+      if (meals.length > 0) {
+        blocks.push({
+          sequence: sequence++,
+          type: 'meal',
+          meal_context: context.meal_context,
+          restaurants: meals.slice(0, 2).map(r => ({
+            restaurant_code: r.restaurant_code,
+            name: r.name,
+            cuisine_type: r.cuisine_type,
+            accessibility: r.accessibility
+          })),
+          estimated_duration_minutes: 60,
+          note: 'Typical meal duration; adjust based on restaurant service'
+        });
+      }
+    }
+
+    // Add cafe block if multiple places (2+ stops)
+    if (places.length >= 2 && cafeOptions.length > 0) {
+      blocks.push({
+        sequence: sequence++,
+        type: 'cafe',
+        cafes: cafeOptions.slice(0, 2).map(c => ({
+          cafe_id: c.id,
+          name: c.name,
+          category: c.category,
+          address: c.address
+        })),
+        estimated_duration_minutes: 30,
+        note: 'Brief cafe break between places'
+      });
+    }
+
+    return blocks;
   }
 
   /**

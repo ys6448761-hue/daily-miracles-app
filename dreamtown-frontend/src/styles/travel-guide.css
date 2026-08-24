@@ -5,6 +5,216 @@
  */
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* CourseDisplay (Journey Composer V0) */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.course-display {
+  background: linear-gradient(135deg, rgba(30, 50, 80, 0.6), rgba(20, 35, 60, 0.6));
+  border: 1px solid rgba(255, 215, 106, 0.15);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.course-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.course-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #FFD76A;
+}
+
+.course-meta {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.course-time {
+  background: rgba(255, 215, 106, 0.15);
+  color: #FFD76A;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.course-fit {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 500;
+  background: rgba(100, 200, 150, 0.2);
+  color: #64c896;
+}
+
+.course-fit[data-status="fits_tight"] {
+  background: rgba(255, 180, 100, 0.2);
+  color: #ffb464;
+}
+
+.course-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.course-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 3px solid rgba(255, 215, 106, 0.3);
+  border-radius: 8px;
+  position: relative;
+}
+
+.course-block.course-block-place {
+  border-left-color: #FFD76A;
+  background: rgba(255, 215, 106, 0.08);
+}
+
+.course-block.course-block-travel {
+  border-left-color: rgba(100, 200, 150, 0.5);
+  background: rgba(100, 200, 150, 0.05);
+}
+
+.course-block.course-block-meal {
+  border-left-color: rgba(255, 150, 100, 0.5);
+  background: rgba(255, 150, 100, 0.08);
+}
+
+.course-block.course-block-cafe {
+  border-left-color: rgba(120, 180, 200, 0.5);
+  background: rgba(120, 180, 200, 0.08);
+}
+
+.block-icon {
+  font-size: 20px;
+  min-width: 24px;
+  text-align: center;
+  margin-top: 2px;
+}
+
+.block-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.block-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 4px;
+}
+
+.block-subtitle {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-bottom: 6px;
+}
+
+.block-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.option-tag {
+  display: inline-block;
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.block-warnings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.warning-tag {
+  display: inline-block;
+  font-size: 11px;
+  background: rgba(255, 180, 100, 0.15);
+  color: rgba(255, 180, 100, 0.9);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 180, 100, 0.3);
+}
+
+.block-arrow {
+  display: none;
+}
+
+.course-timeline .course-block:not(:last-child) .block-arrow {
+  display: block;
+  position: absolute;
+  bottom: -18px;
+  left: 20px;
+  color: rgba(100, 200, 150, 0.4);
+  font-size: 12px;
+}
+
+.course-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+}
+
+.summary-item .label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+}
+
+.summary-item .value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #FFD76A;
+}
+
+.course-message {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(100, 200, 150, 0.1);
+  border-left: 3px solid rgba(100, 200, 150, 0.4);
+  padding: 12px;
+  border-radius: 6px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.course-notes {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 /* TravelGuideHome */
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
@@ -208,6 +418,67 @@
   font-size: 12px;
   color: rgba(255, 255, 255, 0.5);
   margin-top: -4px;
+}
+
+/* Time selector buttons */
+.travel-guide-home .time-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.travel-guide-home .time-button {
+  padding: 12px 8px;
+  border: 2px solid rgba(255, 215, 106, 0.3);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.travel-guide-home .time-button:hover {
+  border-color: rgba(255, 215, 106, 0.6);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.travel-guide-home .time-button.active {
+  background: #FFD76A;
+  color: #0D1B2A;
+  border-color: #FFD76A;
+  font-weight: 700;
+}
+
+/* Custom time input */
+.travel-guide-home .custom-time-input {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.travel-guide-home .custom-time-input input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.travel-guide-home .custom-time-input input:focus {
+  outline: none;
+  border-color: #FFD76A;
+  background: rgba(255, 215, 106, 0.1);
+}
+
+.travel-guide-home .custom-time-input span {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* Submit button / Primary button */
