@@ -17,15 +17,28 @@ const EXPERIENCE_CLUSTERS = {
 class TravelGuideService {
   /**
    * Main recommendation endpoint
-   * @param {TravelGuideContext} context
+   * @param {TravelGuideContext} context with optional journey preferences
    * @returns {Promise<RecommendationResponse>}
    */
   async recommend(context) {
     // Touch session to update activity
     await sessionService.touchSession(context.session_id);
 
+    // Journey preferences (session-level state)
+    const excludePlaceIds = context.exclude_place_ids || [];
+    const mustVisitPlaceIds = context.must_visit_place_ids || [];
+
     // Fetch all places
-    const places = await this._getPlaces(context.country_code, context.city_code);
+    let places = await this._getPlaces(context.country_code, context.city_code);
+
+    // Apply user exclusions: filter out explicitly rejected places
+    places = places.filter(p => !excludePlaceIds.includes(p.code));
+
+    // P0 Ramada Field Test: Exclude jaisan_park from default rotation
+    // Keep in DB for seasonal recommendations (autumn foliage), but not in default courses
+    if (context.entry_point && context.entry_point.includes('RAMADA')) {
+      places = places.filter(p => p.code !== 'jaisan_park');
+    }
 
     if (!places || places.length === 0) {
       return {
@@ -140,7 +153,8 @@ class TravelGuideService {
     candidates = this._applyClusterDiversity(candidates);
 
     // JOURNEY COMPOSITION V0: Variable stop count based on available time
-    const journeyComposition = await this._composeJourney(candidates, context);
+    // Pass user preferences (must-visit) to composition
+    const journeyComposition = await this._composeJourney(candidates, context, mustVisitPlaceIds);
 
     // BACKWARD COMPATIBILITY: Also generate Top-3 for legacy clients
     const topPlaces = journeyComposition.selectedPlaces.slice(0, 3).map((p) => ({
@@ -209,6 +223,13 @@ class TravelGuideService {
 
       // NEW: Journey Composer V0 (integrated course with variable stops)
       course: journeyComposition.course,
+
+      // User preferences applied to this course
+      journey_preferences: {
+        excluded_place_ids: excludePlaceIds,
+        must_visit_place_ids: mustVisitPlaceIds,
+        applied: excludePlaceIds.length > 0 || mustVisitPlaceIds.length > 0
+      }
     };
   }
 
@@ -219,11 +240,15 @@ class TravelGuideService {
    * - 하루 (480 min): 4-5 stops + 2 meals + 1-2 cafes
    * - 직접선택: Scaled by time_available_minutes
    *
+   * Respects user preferences:
+   * - Excludes explicitly rejected places
+   * - Anchors must-visit places in composition
+   *
    * Returns blocks WITHOUT exact times (no false precision)
    * Uses duration ranges + stay_minutes for planning
    * @private
    */
-  async _composeJourney(candidates, context) {
+  async _composeJourney(candidates, context, mustVisitPlaceIds = []) {
     const timeMinutes = context.time_available_minutes;
 
     // Determine time slot and target stop count
@@ -231,14 +256,18 @@ class TravelGuideService {
     const targetStops = this._getTargetStopCount(timeSlot, timeMinutes);
 
     // Select places that fit available time (greedy: fit as many as possible)
-    const selectedPlaces = this._selectPlacesByTime(candidates, targetStops, timeMinutes);
+    // Must-visit places are anchored in composition
+    const selectedPlaces = this._selectPlacesByTime(candidates, targetStops, timeMinutes, mustVisitPlaceIds);
 
     // Fetch meal recommendations for journey
     const mealOptions = await this._getFoodRecommendation(context);
     const cafeOptions = await this._getCafePartners(context.country_code, context.city_code);
 
-    // Compose journey blocks
-    const blocks = this._buildJourneyBlocks(selectedPlaces, mealOptions, cafeOptions, context);
+    // Fetch benefits for cafe display
+    const benefitsData = await this._getBenefitsForCafes(context.country_code, context.city_code);
+
+    // Compose journey blocks (with cafe benefits)
+    const blocks = this._buildJourneyBlocks(selectedPlaces, mealOptions, cafeOptions, benefitsData, context);
 
     // Calculate total time and fit assessment
     const totalStayMinutes = selectedPlaces.reduce((sum, p) => sum + p.avg_stay_minutes, 0);
@@ -275,8 +304,7 @@ class TravelGuideService {
         },
         message_ko: travelUnknown
           ? '관광·식사·휴식 기준으로 구성했어요. 장소 간 이동시간은 현재 확인 중입니다.'
-          : '시간 범위 내에서 편안하게 둘러볼 수 있어요.',  // P0-2: Honest user message
-        notes: `${timeSlot} course with ${selectedPlaces.length} places`
+          : '시간 범위 내에서 편안하게 둘러볼 수 있어요.'
       }
     };
   }
@@ -327,7 +355,7 @@ class TravelGuideService {
    *
    * @private
    */
-  _selectPlacesByTime(candidates, targetCount, timeMinutes) {
+  _selectPlacesByTime(candidates, targetCount, timeMinutes, mustVisitPlaceIds = []) {
     const selected = [];
 
     // Calculate time reserves
@@ -335,16 +363,32 @@ class TravelGuideService {
     const cafeReserveMinutes = 30;    // 1 cafe for multi-place courses
     const availableForPlaces = timeMinutes - mealReserveMinutes - cafeReserveMinutes;
 
-    // Greedy: select as many places as fit
     let placesTimeUsed = 0;
+
+    // Step 1: Include must-visit places first (they anchor the journey)
+    for (const placeCode of mustVisitPlaceIds) {
+      const mustVisitPlace = candidates.find(c => c.code === placeCode);
+      if (!mustVisitPlace) continue; // Must-visit place not in candidates (excluded by safety/accessibility)
+
+      const timeNeeded = mustVisitPlace.avg_stay_minutes;
+      if (placesTimeUsed + timeNeeded <= availableForPlaces) {
+        selected.push(mustVisitPlace);
+        placesTimeUsed += timeNeeded;
+      }
+    }
+
+    // Step 2: Fill remaining slots with top-ranked candidates (excluding must-visit already selected)
+    const selectedCodes = new Set(selected.map(p => p.code));
     for (const place of candidates) {
       if (selected.length >= targetCount) break;
+      if (selectedCodes.has(place.code)) continue; // Already selected
 
       const timeNeeded = place.avg_stay_minutes;
 
       // Check if this place fits in remaining time budget
       if (placesTimeUsed + timeNeeded <= availableForPlaces) {
         selected.push(place);
+        selectedCodes.add(place.code);
         placesTimeUsed += timeNeeded;
       }
     }
@@ -356,9 +400,10 @@ class TravelGuideService {
    * Build journey blocks integrating places, meals, cafes
    * Sequence: Place → [Travel time indicator] → Place → ... → Meal → [Cafe]
    * P0 FIX: No numeric estimates when travel_time_status='unknown'
+   * P0: Cafe blocks include partner benefits (display_copy)
    * @private
    */
-  _buildJourneyBlocks(places, mealOptions, cafeOptions, context) {
+  _buildJourneyBlocks(places, mealOptions, cafeOptions, benefitsData, context) {
     const blocks = [];
     let sequence = 1;
 
@@ -419,12 +464,21 @@ class TravelGuideService {
       blocks.push({
         sequence: sequence++,
         type: 'cafe',
-        cafes: cafeOptions.slice(0, 2).map(c => ({
-          cafe_id: c.id,
-          name: c.name,
-          category: c.category,
-          address: c.address
-        })),
+        cafes: cafeOptions.slice(0, 2).map(c => {
+          // Look up benefit for this cafe
+          const cafeBenefit = benefitsData ? benefitsData.find(b => b.partner_id === c.id && b.is_active) : null;
+          return {
+            cafe_id: c.id,
+            name: c.name,
+            category: c.category,
+            address: c.address,
+            // P0: Include benefit if available
+            benefit: cafeBenefit ? {
+              title: cafeBenefit.title,
+              display_copy: cafeBenefit.display_copy
+            } : null
+          };
+        }),
         estimated_duration_minutes: 30,
         note: 'Brief cafe break between places'
       });
@@ -777,7 +831,7 @@ class TravelGuideService {
     if (context.user_mode === "WISH_TRAVELER" && context.wish_context?.emotion_primary) {
       return `${context.wish_context.emotion_primary} 감정과 잘 맞는 장소`;
     }
-    return "Your travel context matches this place";
+    return "현재 여행 조건에 맞는 장소예요";
   }
 
   /**
@@ -822,9 +876,33 @@ class TravelGuideService {
   }
 
   /**
+   * Helper: Get cafe-specific benefits for CourseDisplay
+   * P0: Returns benefits for cafe partners only with display_copy
+   * @private
+   */
+  async _getBenefitsForCafes(countryCode, cityCode) {
+    const query = `
+      SELECT b.partner_id, b.title, b.display_copy, b.is_active
+      FROM dt_benefits b
+      JOIN dt_partners p ON b.partner_id = p.id
+      WHERE LOWER(p.city_code) = LOWER($1)
+      AND p.category IN ('cafe', 'beverage', 'coffee')
+      AND b.is_active = true
+      ORDER BY p.name, b.created_at DESC
+    `;
+
+    try {
+      const result = await db.query(query, [cityCode]);
+      return result.rows || [];
+    } catch (error) {
+      console.error("Failed to fetch cafe benefits:", error);
+      return [];
+    }
+  }
+
+  /**
    * Helper: Get benefits for city partners (optional field)
    * Day-1 MVP: Only expose contractually confirmed benefits
-   * Exclusions: Moipin free Americano (not contracted for DreamTown free-travel)
    * @private
    */
   async _getBenefits(countryCode, cityCode) {

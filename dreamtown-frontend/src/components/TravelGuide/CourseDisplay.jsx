@@ -2,9 +2,10 @@
  * CourseDisplay
  * Displays Journey Composer V0 course blocks in visual sequence
  * Shows: places → travel transitions → meals → cafes
+ * P0: Cafe blocks show partner benefits when available
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function CourseDisplay({ course }) {
   if (!course || !course.blocks || course.blocks.length === 0) {
@@ -41,7 +42,7 @@ export default function CourseDisplay({ course }) {
           title: block.message_ko || '이동',
           subtitle: block.estimated_duration_range
             ? `약 ${block.estimated_duration_range.min}-${block.estimated_duration_range.max}분`
-            : '교통상황에 따라 달라집니다',
+            : '이동시간 확인 중',
           className: 'course-block-travel'
         };
       case 'meal':
@@ -52,10 +53,18 @@ export default function CourseDisplay({ course }) {
           className: 'course-block-meal'
         };
       case 'cafe':
+        // Build subtitle with benefit if available
+        let subtitle = `약 ${block.estimated_duration_minutes}분`;
+        if (block.cafes && block.cafes.length > 0) {
+          const firstCafe = block.cafes[0];
+          if (firstCafe.benefit?.display_copy) {
+            subtitle = `⭐ ${firstCafe.benefit.display_copy}`;
+          }
+        }
         return {
           icon: '☕',
           title: '카페 휴식',
-          subtitle: `약 ${block.estimated_duration_minutes}분`,
+          subtitle: subtitle,
           className: 'course-block-cafe'
         };
       default:
@@ -136,12 +145,14 @@ export default function CourseDisplay({ course }) {
           <span className="label">체류 시간</span>
           <span className="value">{course.summary?.total_stay_minutes}분</span>
         </div>
-        <div className="summary-item">
-          <span className="label">총 예상 시간</span>
-          <span className="value">
-            {course.summary?.estimated_total_range?.min}-{course.summary?.estimated_total_range?.max}분
-          </span>
-        </div>
+        {course.summary?.estimated_total_range && (
+          <div className="summary-item">
+            <span className="label">총 예상 시간</span>
+            <span className="value">
+              {course.summary.estimated_total_range.min}-{course.summary.estimated_total_range.max}분
+            </span>
+          </div>
+        )}
       </div>
 
       {course.message_ko && (
