@@ -27,6 +27,10 @@ try {
   console.warn('⚠️ [YeosuWish] nicepayService 로드 실패 — 결제 기능 비활성화');
 }
 
+// Experience Identity 서비스
+const { validateExperiences, getDefaultExperiences } = require('../services/experienceValidator');
+const { resolveScene } = require('../services/sceneResolver');
+
 // DB 연결
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -234,8 +238,19 @@ router.get('/products', (req, res) => {
 /**
  * POST /api/yeosu/wish
  * 소원 접수 (무료 또는 결제 대기)
+ *
+ * Body:
+ * - customer_name, customer_phone, wish_text (required)
+ * - customer_email (optional)
+ * - sku (optional): FREE|YW_BASIC_7|YW_PREMIUM_30 (default: FREE)
+ * - photo_url (optional)
+ * - is_group, group_size, group_name (optional)
+ * - source (optional): WEB|APP (default: WEB)
+ * - experiences (optional): Experience Identity 배열 (향후 DB 저장 전제)
  */
 router.post('/', async (req, res) => {
+  const rid = req.id || req.requestId || require('crypto').randomUUID().substring(0, 8);
+
   try {
     const {
       customer_name,
@@ -247,7 +262,8 @@ router.post('/', async (req, res) => {
       is_group = false,
       group_size = 1,
       group_name,
-      source = 'WEB'
+      source = 'WEB',
+      experiences = []
     } = req.body;
 
     // 유효성 검사
@@ -314,11 +330,27 @@ router.post('/', async (req, res) => {
 
     const wish = result.rows[0];
 
+    // Experience 검증 (선택사항이지만, 제공되면 검증)
+    let validatedExperiences = [];
+    if (experiences && experiences.length > 0) {
+      const validationResult = await validateExperiences(experiences, rid);
+      if (validationResult.valid) {
+        validatedExperiences = validationResult.validated;
+        console.log(`[YeosuWish] [${rid}] wish_id=${wish_id} validated ${validatedExperiences.length} experiences`);
+      } else {
+        console.warn(`[YeosuWish] [${rid}] Experience validation failed:`, validationResult.errors);
+      }
+    } else {
+      // 기본값: SKU에서 결정
+      validatedExperiences = getDefaultExperiences(sku, 'SYSTEM_DEFAULT');
+      console.log(`[YeosuWish] [${rid}] wish_id=${wish_id} using default experience from sku=${sku}`);
+    }
+
     // 무료인 경우 즉시 이미지 생성 시작 (비동기)
     if (product.price === 0) {
       // 비동기로 이미지 생성 시작
-      processWishImage(wish_id).catch(err => {
-        console.error(`[YeosuWish] Background image generation failed for ${wish_id}:`, err);
+      processWishImage(wish_id, validatedExperiences, rid).catch(err => {
+        console.error(`[YeosuWish] [${rid}] Background image generation failed for ${wish_id}:`, err);
       });
     }
 
@@ -348,8 +380,11 @@ router.post('/', async (req, res) => {
 
 /**
  * 이미지 생성 처리 (비동기)
+ * @param {string} wishId - 소원 ID
+ * @param {Array} experiences - Experience Identity 배열
+ * @param {string} rid - Request ID (로깅용)
  */
-async function processWishImage(wishId) {
+async function processWishImage(wishId, experiences = [], rid = 'unknown') {
   try {
     // 상태를 GENERATING으로 변경
     await pool.query(
@@ -369,6 +404,10 @@ async function processWishImage(wishId) {
 
     const wishText = wishResult.rows[0].wish_text;
 
+    // Experience 기반 Scene 결정 (현재는 YEOSU_ORIGIN만 사용)
+    const sceneResolution = resolveScene(experiences, rid);
+    console.log(`[YeosuWish] [${rid}] ${wishId} scene resolution: ${sceneResolution.scene}`);
+
     // DALL-E 이미지 생성
     const imageResult = await generateWishImage(wishText, wishId);
 
@@ -382,11 +421,11 @@ async function processWishImage(wishId) {
       [imageResult.imageUrl, wishId]
     );
 
-    console.log(`[YeosuWish] Image generation completed for ${wishId}`);
+    console.log(`[YeosuWish] [${rid}] Image generation completed for ${wishId}, scene=${sceneResolution.scene}`);
     return imageResult;
 
   } catch (error) {
-    console.error(`[YeosuWish] Image generation failed for ${wishId}:`, error);
+    console.error(`[YeosuWish] [${rid}] Image generation failed for ${wishId}:`, error);
 
     // 실패 상태로 변경
     await pool.query(

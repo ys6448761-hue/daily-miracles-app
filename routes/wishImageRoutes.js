@@ -20,6 +20,8 @@ const openai = new OpenAI({
 });
 
 const db = require('../database/db');
+const { validateExperiences, getDefaultExperiences } = require('../services/experienceValidator');
+const { resolveScene } = require('../services/sceneResolver');
 
 // 소원그림 패키지 서비스 (tolerant loading)
 let postcardService = null;
@@ -161,10 +163,19 @@ async function autoCreateWishPost(wishEntryId, imageUrl) {
 /**
  * POST /api/wish-image/generate
  * 소원그림 생성 + 영구 저장
+ *
+ * Body:
+ * - wish_content (required): 소원 내용
+ * - gem_type (required): ruby|sapphire|emerald|diamond|citrine
+ * - style (optional): miracle_fusion (default)
+ * - wish_entry_id (optional): wish_entries.id
+ * - experiences (optional): Experience Identity 배열 (향후 DB 저장 전제)
  */
 router.post('/generate', async (req, res) => {
+  const rid = req.id || req.requestId || randomUUID().substring(0, 8);
+
   try {
-    const { wish_content, gem_type, style = 'miracle_fusion', wish_entry_id } = req.body;
+    const { wish_content, gem_type, style = 'miracle_fusion', wish_entry_id, experiences = [] } = req.body;
 
     // 유효성 검사
     if (!wish_content) {
@@ -174,8 +185,32 @@ router.post('/generate', async (req, res) => {
       });
     }
 
+    // Experience 검증 (선택사항이지만, 제공되면 검증)
+    let validatedExperiences = [];
+    let experienceResolution = { scene: 'YEOSU_ORIGIN', appliedExperience: null };
+
+    if (experiences && experiences.length > 0) {
+      const validationResult = await validateExperiences(experiences, rid);
+      if (validationResult.valid) {
+        validatedExperiences = validationResult.validated;
+        experienceResolution = resolveScene(validatedExperiences, rid);
+        console.log(`[WishImage] [${rid}] Scene resolved: ${experienceResolution.scene}`);
+      } else {
+        console.warn(`[WishImage] [${rid}] Experience validation failed:`, validationResult.errors);
+        // Validation 실패해도 계속 진행 (무시)
+      }
+    } else {
+      // 기본값: STARLIGHT_ROUTE
+      validatedExperiences = getDefaultExperiences(gem_type, 'SYSTEM_DEFAULT');
+      experienceResolution = resolveScene(validatedExperiences, rid);
+      console.log(`[WishImage] [${rid}] Using default STARLIGHT_ROUTE`);
+    }
+
     const colors = gemColors[gem_type] || gemColors.ruby;
 
+    // NOTE: 현재는 Scene과 무관하게 gem 기반 프롬프트만 사용
+    // YEOSU_ORIGIN은 yeosuWishRoutes에서 관리
+    // 향후 AQUA_SCENE 등 추가 시 여기서 프롬프트 선택 로직 추가
     const prompt = `
       A hopeful, magical illustration representing: "${wish_content}"
 
@@ -222,6 +257,8 @@ router.post('/generate', async (req, res) => {
           // AIL-112: Plaza WISH 카드 자동 생성 (fail-open)
           await autoCreateWishPost(wish_entry_id, permanentUrl);
 
+          console.log(`[WishImage] [${rid}] Image saved: ${filename}, scene=${experienceResolution.scene}`);
+
           return res.json({
             success: true,
             image_url: permanentUrl,
@@ -230,7 +267,11 @@ router.post('/generate', async (req, res) => {
             prompt_used: prompt,
             gem_type: gem_type,
             attempt: attempt,
-            permanent: true
+            permanent: true,
+            experience_identity: {
+              scene: experienceResolution.scene,
+              applied_experience: experienceResolution.appliedExperience
+            }
           });
         } catch (saveError) {
           console.error(`[WishImage] Failed to save image:`, saveError.message);
