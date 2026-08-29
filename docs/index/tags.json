@@ -413,6 +413,7 @@
     "DOC-Aurora5_토론시스템_안내문",
     "DOC-WIX_TEAM_PAGE_CONTENT",
     "DOC-프로젝트지식_수동정리_가이드",
+    "DOC-CEO-WEEKLY-2026-W34",
     "DOC-DreamTown_Miracle_Video_Automa",
     "DOC-CEO-WEEKLY-2026-W17",
     "DOC-CEO-WEEKLY-2026-W16",
@@ -729,6 +730,10 @@
     "DOC-HAMEL_REFERENCE_AUDIT",
     "DOC-DT_API_Registry",
     "DOC-GATE2_Canonical_Asset_Verifica",
+    "DOC-README",
+    "DOC-V23_ARCHIVE_MANIFEST",
+    "DOC-V23_DEPENDENCIES",
+    "DOC-V23_PRODUCTION_BASELINE",
     "DOC-D2_D3_FUNCTIONAL_REVIEW",
     "DOC-DEFERRED_CHANGES_TRIAGE",
     "DOC-DREAMTOWN_PLAN_ALIGNMENT_AUDIT",
@@ -791,6 +796,7 @@
   "automation": [
     "DOC-WIX_INTEGRATION_GUIDE",
     "DOC-NOTION_PROFILE_GATE",
+    "DOC-CAND-OPS-002_Hotel_Hub_Travel_",
     "DOC-AUTO_PREVIEW_VISUAL_QA_V1",
     "DOC-DREAMTOWN_AUTOMATION_DIRECTION",
     "DOC-WISH_TEXT_TO_PREVIEW_PIPELINE_",
@@ -928,6 +934,7 @@
     "DOC-CAND-CONSTITUTION-002_DreamTow",
     "DOC-CAND-EXP-001_DreamTown_Experie",
     "DOC-CAND-EXP-002_DreamTown_Orchest",
+    "DOC-CAND-OPS-002_Hotel_Hub_Travel_",
     "DOC-CAND-OS-001_Lumi_OS_v2_Phase1_",
     "DOC-CAND-OS-002_Lumi_OS_v21_Memor",
     "DOC-CAND-WISH-001_Happy_Memory_Fir"
@@ -1033,7 +1040,11 @@
   ],
   "operations": [
     "DOC-MILESTONE-001_Phase1_Operating",
-    "DOC-README"
+    "DOC-README",
+    "DOC-AIL_GATE_BYPASS_RECORD_GAP-03",
+    "DOC-GAP-03_OPERATIONAL_LOCK",
+    "DOC-GAP-03_OPERATIONAL_VERIFICATIO",
+    "DOC-GAP-03_PARTNER_MAPPING_SHEET"
   ],
   "observations": [
     "DOC-TEMPLATE_Observation"
@@ -1079,6 +1090,14 @@
     "DOC-phase3-quantum-walkthrough",
     "DOC-PLAN_2026_0516_16x9_CANONICAL_"
   ],
+  "ramada-v23-baseline": [
+    "DOC-README",
+    "DOC-V23_ARCHIVE_MANIFEST",
+    "DOC-V23_BACKUP_RECORD",
+    "DOC-V23_DEPENDENCIES",
+    "DOC-V23_PRODUCTION_BASELINE",
+    "DOC-V23_SCHEMA_REFERENCE"
+  ],
   "reports": [
     "DOC-AUTO_PREVIEW_VISUAL_QA_V1",
     "DOC-D2_D3_FUNCTIONAL_REVIEW",
@@ -1111,6 +1130,7 @@
     "DOC-WISH_IMAGE_HOLD_REVIEW",
     "DOC-WISH_TEXT_TO_PREVIEW_PIPELINE_",
     "DOC-WISH_TO_RENDER_PROTOTYPE",
+    "DOC-CEO-WEEKLY-2026-W34",
     "DOC-DreamTown_Miracle_Video_Automa",
     "DOC-CEO-WEEKLY-2026-W17",
     "DOC-CEO-WEEKLY-2026-W16",
