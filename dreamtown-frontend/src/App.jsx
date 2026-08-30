@@ -87,6 +87,10 @@ import AdminQRCenter from './pages/admin/AdminQRCenter.jsx';
 import AdminCablecarPage from './pages/AdminCablecarPage.jsx';
 import LocationAdmin from './pages/admin/LocationAdmin.jsx';
 import TravelGuidePage from './pages/TravelGuidePage.jsx';
+import StorybookLanding from './pages/storybook/StorybookLanding.jsx';
+import StorybookRestore from './pages/storybook/StorybookRestore.jsx';
+import StorybookUpload from './pages/storybook/StorybookUpload.jsx';
+import StorybookView from './components/storybook/StorybookView.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
 if (window.location.pathname.startsWith('//')) {
@@ -218,6 +222,11 @@ export default function App() {
               <PartnerVerify />
             </Suspense>
           } />
+          {/* RAMADA Storybook C2-C5 */}
+          <Route path="/storybook"                 element={<StorybookLanding />} />
+          <Route path="/storybook/restore"         element={<StorybookRestore />} />
+          <Route path="/storybook/:journey_id/upload" element={<StorybookUpload />} />
+          <Route path="/storybook/:journey_id"     element={<StorybookView />} />
           <Route path="*"                          element={<RouteMissDiagnostic />} />
         </Routes>
       </div>

@@ -1,0 +1,77 @@
+.storybook-restore {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.restore-container {
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+}
+
+.restore-loading,
+.restore-error,
+.restore-success {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 40px 20px;
+  backdrop-filter: blur(10px);
+  color: white;
+}
+
+.restore-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.restore-loading p,
+.restore-success p {
+  font-size: 16px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.restore-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+}
+
+.error-icon,
+.success-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.restore-error p {
+  font-size: 14px;
+  margin: 0 0 16px 0;
+}
+
+.restore-error button {
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.restore-error button:hover {
+  background: rgba(239, 68, 68, 1);
+}
