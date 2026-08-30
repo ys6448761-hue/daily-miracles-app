@@ -11,12 +11,25 @@
  *   4. 따뜻하지만 현실적
  */
 
-const { OpenAI } = require('openai');
 const db = require('../../database/db');
 const { makeLogger } = require('../../utils/logger');
 
-const log    = makeLogger('wishEmotionService');
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const log = makeLogger('wishEmotionService');
+
+// Lazy initialization: OpenAI client created only when needed
+// Allows module to load without OPENAI_API_KEY, deferring error to runtime if function called
+let openai = null;
+
+function getOpenAI() {
+  if (!openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY required for wish emotion generation');
+    }
+    const { OpenAI } = require('openai');
+    openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return openai;
+}
 
 const PROMPT = (wish) => `다음 소원을 보고, 사람들이 공감하고 응원하고 싶어지도록 "한 줄 이유"를 만들어주세요.
 
@@ -30,7 +43,8 @@ const PROMPT = (wish) => `다음 소원을 보고, 사람들이 공감하고 응
 출력: 한 줄 문장만`;
 
 async function generateWishEmotion(wishText) {
-  const res = await openai.chat.completions.create({
+  const client = getOpenAI();
+  const res = await client.chat.completions.create({
     model:       'gpt-4o-mini',
     messages:    [{ role: 'user', content: PROMPT(wishText) }],
     max_tokens:  80,
