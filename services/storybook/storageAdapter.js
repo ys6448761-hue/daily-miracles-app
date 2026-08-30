@@ -35,8 +35,22 @@
 const fs = require('fs').promises;
 const path = require('path');
 const sharp = require('sharp');
-const { S3Client, PutObjectCommand, GetObjectCommand, HeadObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
-const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+
+// Optional: AWS S3 SDK (production only, not required for Supabase)
+let S3Client, PutObjectCommand, GetObjectCommand, HeadObjectCommand, DeleteObjectCommand, getSignedUrl;
+try {
+  const s3 = require('@aws-sdk/client-s3');
+  const presigner = require('@aws-sdk/s3-request-presigner');
+  S3Client = s3.S3Client;
+  PutObjectCommand = s3.PutObjectCommand;
+  GetObjectCommand = s3.GetObjectCommand;
+  HeadObjectCommand = s3.HeadObjectCommand;
+  DeleteObjectCommand = s3.DeleteObjectCommand;
+  getSignedUrl = presigner.getSignedUrl;
+} catch (e) {
+  // S3 not available (staging/dev can use Supabase instead)
+  console.warn('⚠️ AWS S3 SDK not installed. S3StorageAdapter unavailable. Use STORAGE_TYPE=supabase or local.');
+}
 
 class LocalStorageAdapter {
   constructor() {
