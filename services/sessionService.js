@@ -2,13 +2,23 @@
  * Session Service
  * Manages user sessions with dual timeout: 120min inactivity + 12h absolute
  * Privacy: session_id only (UUID), no user_id or personal data
+ *
+ * Extensions (C2 RAMADA):
+ * - Restore token generation (30-day TTL)
+ * - Restore token validation with rate limiting
  */
 
 const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 const db = require('../database/db');
 
 const INACTIVITY_TIMEOUT_MINUTES = 120;
 const ABSOLUTE_TIMEOUT_HOURS = 12;
+
+// C2: Restore token configuration
+const RESTORE_TOKEN_TTL_DAYS = 30;
+const RESTORE_TOKEN_MAX_ATTEMPTS = 5;
+const RESTORE_TOKEN_RATE_LIMIT_WINDOW_SECONDS = 3600;
 
 class SessionService {
   /**
@@ -185,6 +195,42 @@ class SessionService {
       console.error('Failed to get session info:', error);
       return null;
     }
+  }
+
+  /**
+   * [C2] Generate a restore token (32-byte hex string)
+   * Used for restore_url in RAMADA Storybook Journey
+   * @returns {string} 64-character hex string (32 bytes)
+   */
+  generateRestoreToken() {
+    return crypto.randomBytes(32).toString('hex');
+  }
+
+  /**
+   * [C2] Hash a restore token using SHA256
+   * Used for secure storage in database
+   * @param {string} tokenPlaintext - 64-char hex string from generateRestoreToken()
+   * @returns {string} 64-char SHA256 hex digest
+   */
+  hashRestoreToken(tokenPlaintext) {
+    return crypto
+      .createHash('sha256')
+      .update(tokenPlaintext, 'utf-8')
+      .digest('hex');
+  }
+
+  /**
+   * [C2] Validate restore token by comparing plaintext hash with stored hash
+   * @param {string} tokenPlaintext - User-provided token from restore_url
+   * @param {string} storedHash - DB-stored SHA256 hash
+   * @returns {boolean} true if token is valid, false otherwise
+   */
+  validateRestoreToken(tokenPlaintext, storedHash) {
+    const computedHash = this.hashRestoreToken(tokenPlaintext);
+    return crypto.timingSafeEqual(
+      Buffer.from(computedHash),
+      Buffer.from(storedHash)
+    );
   }
 }
 

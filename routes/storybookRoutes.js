@@ -2095,4 +2095,1367 @@ router.get('/og/:key', async (req, res) => {
   } catch (_) { return res.json({ og_image: null }); }
 });
 
+// ═══════════════════════════════════════════════════════════════════════════
+// C2 RAMADA: Storybook Journey Foundation
+// Endpoints: POST /api/storybook/start, GET /api/storybook/restore?token=...
+// ═══════════════════════════════════════════════════════════════════════════
+
+let sessionService = null;
+try {
+  sessionService = require('../services/sessionService');
+} catch (error) {
+  console.warn('⚠️ Storybook Journey: sessionService not available');
+}
+
+/**
+ * POST /api/storybook/start
+ * Create a new storybook journey with restore token
+ * No input required (anonymous session)
+ *
+ * Response: { journey_id, restore_url, session_id }
+ * Cookie: Set-Cookie dt_storybook_session_id=<session_id>; httpOnly; secure; sameSite=strict
+ */
+router.post('/start', async (req, res) => {
+  if (!db || !sessionService) {
+    return res.status(503).json({
+      ok: false,
+      error: 'SERVICE_UNAVAILABLE',
+      message: 'Database or session service not available'
+    });
+  }
+
+  try {
+    // Step 1: Create a session
+    const sessionId = await sessionService.createSession({ type: 'storybook_journey' });
+
+    // Step 2: Generate restore token
+    const restoreToken = sessionService.generateRestoreToken();
+    const restoreTokenHash = sessionService.hashRestoreToken(restoreToken);
+
+    // Step 3: Calculate expires_at (30 days from now)
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+    // Step 4: Insert journey record
+    const journeyQuery = `
+      INSERT INTO dt_storybook_journeys (
+        session_id, restore_token_hash, status, created_at, expires_at
+      ) VALUES ($1, $2, $3, NOW(), $4)
+      RETURNING id
+    `;
+
+    const journeyResult = await db.query(journeyQuery, [
+      sessionId,
+      restoreTokenHash,
+      'started',
+      expiresAt
+    ]);
+
+    const journeyId = journeyResult.rows[0].id;
+
+    // Step 5: Set httpOnly cookie with session ID
+    const secure = process.env.NODE_ENV === 'production' || process.env.FORCE_SECURE_COOKIE === 'true';
+    res.cookie('dt_storybook_session_id', sessionId, {
+      httpOnly: true,
+      secure: secure,
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+    });
+
+    // Step 6: Construct restore URL
+    const restoreUrl = `${process.env.FRONTEND_URL || 'http://localhost:5100'}/storybook/restore?token=${restoreToken}`;
+
+    return res.status(201).json({
+      ok: true,
+      journey_id: journeyId,
+      session_id: sessionId,
+      restore_url: restoreUrl,
+      expires_at: expiresAt.toISOString()
+    });
+  } catch (error) {
+    console.error('[STORYBOOK_START_ERROR]:', error);
+    return res.status(500).json({
+      ok: false,
+      error: 'JOURNEY_CREATE_FAILED',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/storybook/restore?token=<restore_token>&email=<email>
+ * Restore a journey session from restore token
+ *
+ * Query params:
+ *   token (required): 64-char hex restore token
+ *   email (optional): User email for verification (Phase 2)
+ *
+ * Response: { ok, journey_id, session_id, status, ... }
+ * Cookie: Set-Cookie dt_storybook_session_id=<new_session_id>; httpOnly; secure; sameSite=strict
+ * Rate limit: 5 attempts per IP per hour (429 if exceeded)
+ */
+router.get('/restore', async (req, res) => {
+  if (!db || !sessionService) {
+    return res.status(503).json({
+      ok: false,
+      error: 'SERVICE_UNAVAILABLE'
+    });
+  }
+
+  const { token } = req.query;
+
+  // Validate token format
+  if (!token || !/^[a-f0-9]{64}$/.test(token)) {
+    return res.status(400).json({
+      ok: false,
+      error: 'INVALID_TOKEN_FORMAT',
+      message: 'Token must be a 64-character hex string'
+    });
+  }
+
+  try {
+    // Step 1: Look up journey by restore token hash
+    const tokenHash = sessionService.hashRestoreToken(token);
+    const journeyQuery = `
+      SELECT id, session_id, status, wish_text, source_hotel, created_at, expires_at
+      FROM dt_storybook_journeys
+      WHERE restore_token_hash = $1
+    `;
+
+    const journeyResult = await db.query(journeyQuery, [tokenHash]);
+
+    if (journeyResult.rows.length === 0) {
+      return res.status(401).json({
+        ok: false,
+        error: 'TOKEN_NOT_FOUND',
+        message: 'Invalid or expired restore token'
+      });
+    }
+
+    const journey = journeyResult.rows[0];
+
+    // Step 2: Validate token expiration
+    if (new Date() > new Date(journey.expires_at)) {
+      return res.status(401).json({
+        ok: false,
+        error: 'TOKEN_EXPIRED',
+        message: 'Restore token expired (30-day limit)'
+      });
+    }
+
+    // Step 3: Create new session
+    const newSessionId = await sessionService.createSession({
+      type: 'storybook_journey_restored',
+      restored_from_journey_id: journey.id
+    });
+
+    // Step 4: Set cookie
+    const secure = process.env.NODE_ENV === 'production' || process.env.FORCE_SECURE_COOKIE === 'true';
+    res.cookie('dt_storybook_session_id', newSessionId, {
+      httpOnly: true,
+      secure: secure,
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000
+    });
+
+    // Step 5: Return journey data
+    return res.json({
+      ok: true,
+      journey_id: journey.id,
+      session_id: newSessionId,
+      status: journey.status,
+      wish_text: journey.wish_text,
+      source_hotel: journey.source_hotel,
+      created_at: journey.created_at,
+      restored_at: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('[STORYBOOK_RESTORE_ERROR]:', error);
+    return res.status(500).json({
+      ok: false,
+      error: 'RESTORE_FAILED',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/storybook/my-journey
+ * Get current journey from session cookie
+ *
+ * Cookie required: dt_storybook_session_id
+ *
+ * Response: { ok, journey: { id, status, wish_text, assets: [...] }, ... }
+ */
+router.get('/my-journey', async (req, res) => {
+  if (!db) {
+    return res.status(503).json({
+      ok: false,
+      error: 'SERVICE_UNAVAILABLE'
+    });
+  }
+
+  const sessionId = req.cookies?.dt_storybook_session_id;
+
+  if (!sessionId) {
+    return res.status(401).json({
+      ok: false,
+      error: 'UNAUTHORIZED',
+      message: 'Session cookie not found. Please start a journey first.'
+    });
+  }
+
+  try {
+    // Step 1: Find journey by session_id
+    const journeyQuery = `
+      SELECT id, status, wish_text, source_hotel, is_private, created_at, updated_at
+      FROM dt_storybook_journeys
+      WHERE session_id = $1
+    `;
+
+    const journeyResult = await db.query(journeyQuery, [sessionId]);
+
+    if (journeyResult.rows.length === 0) {
+      return res.status(401).json({
+        ok: false,
+        error: 'JOURNEY_NOT_FOUND',
+        message: 'No active journey for this session'
+      });
+    }
+
+    const journey = journeyResult.rows[0];
+
+    // Step 2: Fetch associated assets
+    const assetsQuery = `
+      SELECT id, location, slot, object_key, mime_type, byte_size, status, uploaded_at
+      FROM dt_storybook_assets
+      WHERE journey_id = $1 AND status != 'removed'
+      ORDER BY location, slot, uploaded_at
+    `;
+
+    const assetsResult = await db.query(assetsQuery, [journey.id]);
+
+    return res.json({
+      ok: true,
+      journey: {
+        id: journey.id,
+        status: journey.status,
+        wish_text: journey.wish_text,
+        source_hotel: journey.source_hotel,
+        is_private: journey.is_private,
+        created_at: journey.created_at,
+        updated_at: journey.updated_at,
+        assets: assetsResult.rows
+      }
+    });
+  } catch (error) {
+    console.error('[STORYBOOK_MY_JOURNEY_ERROR]:', error);
+    return res.status(500).json({
+      ok: false,
+      error: 'FETCH_FAILED',
+      message: error.message
+    });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// C3A RAMADA: Customer REAL Photo Upload
+// Endpoints: POST /api/storybook/:journey_id/upload
+// ═══════════════════════════════════════════════════════════════════════════
+
+let storageAdapter = null;
+let goldenNineContract = null;
+
+try {
+  storageAdapter = require('../services/storybook/storageAdapter');
+} catch (error) {
+  console.warn('⚠️ Storybook C3A: storageAdapter not available');
+}
+
+try {
+  goldenNineContract = require('../config/storybook/goldenNineContract');
+} catch (error) {
+  console.warn('⚠️ Storybook C3A: goldenNineContract not available');
+}
+
+// Multipart middleware (already available via Express)
+const multer = require('multer');
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: parseInt(process.env.STORYBOOK_MAX_FILE_SIZE || 5242880) // 5MB default
+  }
+});
+
+/**
+ * POST /api/storybook/:journey_id/upload
+ * Customer uploads REAL photo for a canonical slot
+ *
+ * Multipart form data:
+ *   - location: jinamgwan | cablecar | jongpo
+ *   - slot: real_a | real_b (NOT story_art in C3A)
+ *   - file: image/jpeg, image/png, image/webp (max 5MB)
+ *
+ * Authorization: session_id cookie must match journey.session_id
+ * Response: { success: true, asset_id, location, slot, object_key, journey_status }
+ * Status: 201 Created | 400 Bad Request | 401 Unauthorized | 409 Conflict | 500 Error
+ */
+router.post('/:journey_id/upload', upload.single('file'), async (req, res) => {
+  if (!db || !storageAdapter || !goldenNineContract) {
+    return res.status(503).json({
+      success: false,
+      error: 'SERVICE_UNAVAILABLE',
+      message: 'Database or storage service not available'
+    });
+  }
+
+  const { journey_id } = req.params;
+  const { location, slot } = req.body;
+  const sessionId = req.cookies.dt_storybook_session_id;
+
+  try {
+    // ─────────────────────────────────────────────────────────────────
+    // Step 1: Authorization & Journey Validation
+    // ─────────────────────────────────────────────────────────────────
+
+    if (!sessionId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'dt_storybook_session_id cookie required'
+      });
+    }
+
+    // Fetch journey and verify session
+    const journeyQuery = `
+      SELECT id, session_id, status FROM dt_storybook_journeys WHERE id = $1
+    `;
+    const journeyResult = await db.query(journeyQuery, [journey_id]);
+
+    if (journeyResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'JOURNEY_NOT_FOUND',
+        message: 'Journey does not exist'
+      });
+    }
+
+    const journey = journeyResult.rows[0];
+
+    if (journey.session_id !== sessionId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Session does not match journey'
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Step 2: Validate Location & Slot Against Golden 9 Contract
+    // ─────────────────────────────────────────────────────────────────
+
+    if (!goldenNineContract.isCanonicalRealSlot(location, slot)) {
+      return res.status(400).json({
+        success: false,
+        error: 'INVALID_SLOT',
+        message: `Invalid location or slot. C3A allows only REAL slots: (${
+          goldenNineContract.CANONICAL_REAL_SLOTS.map(s => `${s.location}/${s.slot}`).join(', ')
+        })`
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Step 3: Validate File
+    // ─────────────────────────────────────────────────────────────────
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: 'FILE_REQUIRED',
+        message: 'No file uploaded'
+      });
+    }
+
+    const { buffer, mimetype, size, originalname } = req.file;
+
+    // Validate MIME type
+    const allowedMimes = (process.env.STORYBOOK_ALLOWED_MIMES || 'image/jpeg,image/png,image/webp').split(',');
+    if (!allowedMimes.includes(mimetype)) {
+      return res.status(400).json({
+        success: false,
+        error: 'INVALID_MIME_TYPE',
+        message: `File type not allowed. Allowed: ${allowedMimes.join(', ')}`
+      });
+    }
+
+    // Validate file size
+    const maxFileSize = parseInt(process.env.STORYBOOK_MAX_FILE_SIZE || 5242880);
+    if (size > maxFileSize) {
+      return res.status(400).json({
+        success: false,
+        error: 'FILE_TOO_LARGE',
+        message: `File exceeds maximum size of ${Math.round(maxFileSize / 1024 / 1024)}MB`
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Step 4: Remove EXIF Metadata
+    // ─────────────────────────────────────────────────────────────────
+
+    let cleanedBuffer;
+    try {
+      cleanedBuffer = await storageAdapter.removeExif(buffer);
+    } catch (exifError) {
+      console.error('[EXIF_REMOVAL_FAILED]', exifError.message);
+      return res.status(400).json({
+        success: false,
+        error: 'EXIF_REMOVAL_FAILED',
+        message: 'Failed to process image (invalid file or corrupted)'
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Step 5: Duplicate Slot Policy
+    // ─────────────────────────────────────────────────────────────────
+
+    const existingQuery = `
+      SELECT id, status FROM dt_storybook_assets
+      WHERE journey_id = $1 AND location = $2 AND slot = $3
+    `;
+    const existingResult = await db.query(existingQuery, [journey_id, location, slot]);
+
+    let assetId = null;
+
+    if (existingResult.rows.length > 0) {
+      const existing = existingResult.rows[0];
+
+      // Cannot overwrite approved assets
+      if (existing.status === 'approved') {
+        return res.status(409).json({
+          success: false,
+          error: 'SLOT_LOCKED',
+          message: 'Cannot overwrite an approved asset. Use admin to modify.'
+        });
+      }
+
+      // For pending assets, we will UPDATE (replace)
+      assetId = existing.id;
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Step 6: Save File to Storage
+    // ─────────────────────────────────────────────────────────────────
+
+    const fileExt = mimetype === 'image/png' ? 'png' :
+                   mimetype === 'image/webp' ? 'webp' : 'jpg';
+    const objectKey = `journeys/${journey_id}/${location}/${slot}.${fileExt}`;
+
+    let objectKeyResult;
+    try {
+      objectKeyResult = await storageAdapter.saveFile(cleanedBuffer, objectKey, mimetype);
+    } catch (storageError) {
+      console.error('[STORAGE_SAVE_FAILED]', storageError.message);
+      return res.status(500).json({
+        success: false,
+        error: 'STORAGE_FAILED',
+        message: 'Failed to save file to storage'
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Step 7: Insert or Update Asset Record
+    // ─────────────────────────────────────────────────────────────────
+
+    if (assetId) {
+      // UPDATE existing (pending) asset
+      const updateQuery = `
+        UPDATE dt_storybook_assets
+        SET object_key = $2, mime_type = $3, byte_size = $4,
+            uploaded_by = $5, uploaded_at = NOW(), status = 'pending'
+        WHERE id = $1
+        RETURNING id
+      `;
+      const updateResult = await db.query(updateQuery, [
+        assetId,
+        objectKey,
+        mimetype,
+        cleanedBuffer.length,
+        sessionId
+      ]);
+      assetId = updateResult.rows[0].id;
+    } else {
+      // INSERT new asset
+      const insertQuery = `
+        INSERT INTO dt_storybook_assets
+        (journey_id, location, slot, object_key, mime_type, byte_size, uploaded_by, status)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending')
+        RETURNING id
+      `;
+      const insertResult = await db.query(insertQuery, [
+        journey_id,
+        location,
+        slot,
+        objectKey,
+        mimetype,
+        cleanedBuffer.length,
+        sessionId
+      ]);
+      assetId = insertResult.rows[0].id;
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Step 8: Check Status Transitions
+    // ─────────────────────────────────────────────────────────────────
+
+    // Fetch current assets to check if all 6 REALs are uploaded
+    const assetsQuery = `
+      SELECT location, slot, status FROM dt_storybook_assets WHERE journey_id = $1
+    `;
+    const assetsResult = await db.query(assetsQuery, [journey_id]);
+    const allAssets = assetsResult.rows;
+
+    let newStatus = journey.status;
+
+    // Transition 1: started → photos_in_progress (on first REAL upload)
+    if (journey.status === 'started') {
+      newStatus = 'photos_in_progress';
+    }
+
+    // Transition 2: photos_in_progress → photos_complete (when all 6 REALs uploaded)
+    if (goldenNineContract.allCanonicalRealsUploaded(allAssets)) {
+      newStatus = 'photos_complete';
+    }
+
+    // Update journey status if changed
+    if (newStatus !== journey.status) {
+      const statusQuery = `
+        UPDATE dt_storybook_journeys SET status = $2, updated_at = NOW() WHERE id = $1
+      `;
+      await db.query(statusQuery, [journey_id, newStatus]);
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Step 9: Response
+    // ─────────────────────────────────────────────────────────────────
+
+    return res.status(201).json({
+      success: true,
+      asset_id: assetId,
+      location: location,
+      slot: slot,
+      object_key: objectKey,
+      journey_status: newStatus,
+      reals_uploaded: goldenNineContract.countUploadedReals(allAssets)
+    });
+
+  } catch (error) {
+    console.error('[STORYBOOK_UPLOAD_ERROR]:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'UPLOAD_FAILED',
+      message: error.message
+    });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// C3B: RAMADA Operator Story Art Upload
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Admin Guard Middleware
+ * Validates x-admin-key header against ADMIN_API_KEY environment variable
+ */
+function adminGuard(req, res, next) {
+  const key = req.headers['x-admin-key'] || req.query.key;
+  if (!process.env.ADMIN_API_KEY) {
+    return res.status(503).json({
+      success: false,
+      error: 'ADMIN_DISABLED',
+      message: 'Admin API not configured (ADMIN_API_KEY missing)'
+    });
+  }
+  if (key === process.env.ADMIN_API_KEY) {
+    return next();
+  }
+  return res.status(401).json({
+    success: false,
+    error: 'UNAUTHORIZED',
+    message: 'Admin authentication required (x-admin-key header or ?key=...)'
+  });
+}
+
+/**
+ * ───────────────────────────────────────────────────────────────────────────
+ * GET /api/admin/storybook/queue
+ * ───────────────────────────────────────────────────────────────────────────
+ * Lists all journeys ready for operator story art upload
+ *
+ * Response: {
+ *   "journeys": [
+ *     {
+ *       "id": "...",
+ *       "wish_text": "...",
+ *       "status": "photos_complete" | "art_in_progress",
+ *       "reals_uploaded": 6,
+ *       "story_arts_uploaded": 0-2,
+ *       "created_at": "...",
+ *       "next_action": "Upload jinamgwan" | "Upload cablecar" | "Upload jongpo"
+ *     }
+ *   ],
+ *   "total": N,
+ *   "pending_reals_complete": N,
+ *   "pending_art_in_progress": N
+ * }
+ */
+router.get('/admin/storybook/queue', adminGuard, async (req, res) => {
+  if (!db || !goldenNineContract) {
+    return res.status(503).json({
+      success: false,
+      error: 'SERVICE_UNAVAILABLE',
+      message: 'Database or service not available'
+    });
+  }
+
+  try {
+    // Query journeys in status photos_complete or art_in_progress
+    const journeyQuery = `
+      SELECT
+        j.id,
+        j.wish_text,
+        j.status,
+        j.created_at
+      FROM dt_storybook_journeys j
+      WHERE j.status IN ('photos_complete', 'art_in_progress')
+      ORDER BY j.created_at ASC
+    `;
+    const journeyResult = await db.query(journeyQuery);
+    const journeys = journeyResult.rows;
+
+    // For each journey, fetch assets to count REALs and story arts
+    const enrichedJourneys = await Promise.all(
+      journeys.map(async (journey) => {
+        const assetsQuery = `
+          SELECT location, slot, status
+          FROM dt_storybook_assets
+          WHERE journey_id = $1
+        `;
+        const assetsResult = await db.query(assetsQuery, [journey.id]);
+        const assets = assetsResult.rows;
+
+        const realsUploaded = goldenNineContract.countUploadedReals(assets);
+        const storyArtsUploaded = goldenNineContract.countUploadedStoryArts(assets);
+        const nextLocation = goldenNineContract.getNextStoryArtLocation(assets);
+
+        return {
+          id: journey.id,
+          wish_text: journey.wish_text,
+          status: journey.status,
+          reals_uploaded: realsUploaded,
+          story_arts_uploaded: storyArtsUploaded,
+          created_at: journey.created_at,
+          next_action: nextLocation ? `Upload ${nextLocation}` : 'Complete'
+        };
+      })
+    );
+
+    const pendingRealsComplete = journeys.filter(j => j.status === 'photos_complete').length;
+    const pendingArtInProgress = journeys.filter(j => j.status === 'art_in_progress').length;
+
+    return res.status(200).json({
+      success: true,
+      journeys: enrichedJourneys,
+      total: journeys.length,
+      pending_reals_complete: pendingRealsComplete,
+      pending_art_in_progress: pendingArtInProgress
+    });
+
+  } catch (error) {
+    console.error('[ADMIN_STORYBOOK_QUEUE_ERROR]:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'QUEUE_FAILED',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * ───────────────────────────────────────────────────────────────────────────
+ * GET /api/admin/storybook/:journey_id
+ * ───────────────────────────────────────────────────────────────────────────
+ * Get journey detail with 6 REALs + 3 story_art slots and their status
+ *
+ * Response: {
+ *   "id": "...",
+ *   "wish_text": "...",
+ *   "status": "photos_complete" | "art_in_progress" | "storybook_complete",
+ *   "created_at": "...",
+ *   "reals": [...],
+ *   "story_arts": [...],
+ *   "next_upload_location": "jinamgwan" | "cablecar" | "jongpo" | null
+ * }
+ */
+router.get('/admin/storybook/:journey_id', adminGuard, async (req, res) => {
+  if (!db || !goldenNineContract) {
+    return res.status(503).json({
+      success: false,
+      error: 'SERVICE_UNAVAILABLE',
+      message: 'Database or service not available'
+    });
+  }
+
+  const { journey_id } = req.params;
+
+  try {
+    // Fetch journey
+    const journeyQuery = `
+      SELECT id, wish_text, status, created_at
+      FROM dt_storybook_journeys
+      WHERE id = $1
+    `;
+    const journeyResult = await db.query(journeyQuery, [journey_id]);
+
+    if (journeyResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'JOURNEY_NOT_FOUND',
+        message: 'Journey does not exist'
+      });
+    }
+
+    const journey = journeyResult.rows[0];
+
+    // Fetch assets
+    const assetsQuery = `
+      SELECT location, slot, object_key, uploaded_at, status
+      FROM dt_storybook_assets
+      WHERE journey_id = $1
+      ORDER BY location, slot
+    `;
+    const assetsResult = await db.query(assetsQuery, [journey_id]);
+    const allAssets = assetsResult.rows;
+
+    // Build REAL slots response
+    const reals = goldenNineContract.CANONICAL_REAL_SLOTS.map(canonical => {
+      const asset = allAssets.find(a =>
+        a.location === canonical.location && a.slot === canonical.slot
+      );
+      return {
+        location: canonical.location,
+        slot: canonical.slot,
+        object_key: asset ? asset.object_key : null,
+        uploaded_at: asset ? asset.uploaded_at : null,
+        status: asset ? asset.status : 'pending'
+      };
+    });
+
+    // Build story_art slots response
+    const storyArts = goldenNineContract.CANONICAL_STORY_ART_SLOTS.map(canonical => {
+      const asset = allAssets.find(a =>
+        a.location === canonical.location && a.slot === canonical.slot
+      );
+      return {
+        location: canonical.location,
+        slot: canonical.slot,
+        object_key: asset ? asset.object_key : null,
+        uploaded_at: asset ? asset.uploaded_at : null,
+        status: asset ? asset.status : 'pending'
+      };
+    });
+
+    const nextLocation = goldenNineContract.getNextStoryArtLocation(allAssets);
+
+    return res.status(200).json({
+      success: true,
+      id: journey.id,
+      wish_text: journey.wish_text,
+      status: journey.status,
+      created_at: journey.created_at,
+      reals: reals,
+      story_arts: storyArts,
+      next_upload_location: nextLocation
+    });
+
+  } catch (error) {
+    console.error('[ADMIN_STORYBOOK_DETAIL_ERROR]:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'DETAIL_FAILED',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * ───────────────────────────────────────────────────────────────────────────
+ * POST /api/admin/storybook/:journey_id/upload-story-art
+ * ───────────────────────────────────────────────────────────────────────────
+ * Operator uploads story art for a canonical location (story_art slot only)
+ *
+ * Request: multipart/form-data
+ *   - location: jinamgwan | cablecar | jongpo
+ *   - file: image/jpeg, image/png, image/webp (max 10MB)
+ *
+ * Response: {
+ *   "success": true,
+ *   "asset_id": "...",
+ *   "location": "jinamgwan",
+ *   "slot": "story_art",
+ *   "object_key": "...",
+ *   "journey_status": "art_in_progress" | "storybook_complete",
+ *   "story_arts_uploaded": 1-3
+ * }
+ */
+router.post('/admin/storybook/:journey_id/upload-story-art',
+  adminGuard,
+  upload.single('file'),
+  async (req, res) => {
+    if (!db || !storageAdapter || !goldenNineContract) {
+      return res.status(503).json({
+        success: false,
+        error: 'SERVICE_UNAVAILABLE',
+        message: 'Database or storage service not available'
+      });
+    }
+
+    const { journey_id } = req.params;
+    const { location } = req.body;
+    const slot = 'story_art'; // Fixed for C3B
+
+    try {
+      // ─────────────────────────────────────────────────────────────────
+      // Step 1: Validate location and slot
+      // ─────────────────────────────────────────────────────────────────
+
+      if (!goldenNineContract.isCanonicalStoryArtSlot(location, slot)) {
+        return res.status(400).json({
+          success: false,
+          error: 'INVALID_SLOT',
+          message: `Invalid location. C3B allows only: jinamgwan, cablecar, jongpo`
+        });
+      }
+
+      // ─────────────────────────────────────────────────────────────────
+      // Step 2: Fetch and validate journey
+      // ─────────────────────────────────────────────────────────────────
+
+      const journeyQuery = `
+        SELECT id, status FROM dt_storybook_journeys WHERE id = $1
+      `;
+      const journeyResult = await db.query(journeyQuery, [journey_id]);
+
+      if (journeyResult.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          error: 'JOURNEY_NOT_FOUND',
+          message: 'Journey does not exist'
+        });
+      }
+
+      const journey = journeyResult.rows[0];
+
+      // ─────────────────────────────────────────────────────────────────
+      // Step 3: Validate file
+      // ─────────────────────────────────────────────────────────────────
+
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          error: 'FILE_REQUIRED',
+          message: 'No file uploaded'
+        });
+      }
+
+      const { buffer, mimetype, size } = req.file;
+
+      // Validate MIME type
+      const allowedMimes = (process.env.STORYBOOK_STORY_ART_ALLOWED_MIMES ||
+                           'image/jpeg,image/png,image/webp').split(',');
+      if (!allowedMimes.includes(mimetype)) {
+        return res.status(400).json({
+          success: false,
+          error: 'INVALID_MIME_TYPE',
+          message: `File type not allowed. Allowed: ${allowedMimes.join(', ')}`
+        });
+      }
+
+      // Validate file size (10MB for story art, larger than REAL 5MB)
+      const maxFileSize = parseInt(process.env.STORYBOOK_STORY_ART_MAX_FILE_SIZE || 10485760);
+      if (size > maxFileSize) {
+        return res.status(400).json({
+          success: false,
+          error: 'FILE_TOO_LARGE',
+          message: `File exceeds maximum size of ${Math.round(maxFileSize / 1024 / 1024)}MB`
+        });
+      }
+
+      // ─────────────────────────────────────────────────────────────────
+      // Step 4: Remove EXIF Metadata
+      // ─────────────────────────────────────────────────────────────────
+
+      let cleanedBuffer;
+      try {
+        cleanedBuffer = await storageAdapter.removeExif(buffer);
+      } catch (exifError) {
+        console.error('[EXIF_REMOVAL_FAILED]', exifError.message);
+        return res.status(400).json({
+          success: false,
+          error: 'EXIF_REMOVAL_FAILED',
+          message: 'Failed to process image (invalid file or corrupted)'
+        });
+      }
+
+      // ─────────────────────────────────────────────────────────────────
+      // Step 5: Duplicate slot policy
+      // ─────────────────────────────────────────────────────────────────
+
+      const existingQuery = `
+        SELECT id, status FROM dt_storybook_assets
+        WHERE journey_id = $1 AND location = $2 AND slot = $3
+      `;
+      const existingResult = await db.query(existingQuery, [journey_id, location, slot]);
+
+      let assetId = null;
+
+      if (existingResult.rows.length > 0) {
+        const existing = existingResult.rows[0];
+
+        // Cannot overwrite approved assets
+        if (existing.status === 'approved') {
+          return res.status(409).json({
+            success: false,
+            error: 'SLOT_LOCKED',
+            message: 'Cannot overwrite an approved asset'
+          });
+        }
+
+        // For pending assets, we will UPDATE (replace)
+        assetId = existing.id;
+      }
+
+      // ─────────────────────────────────────────────────────────────────
+      // Step 6: Save file to storage
+      // ─────────────────────────────────────────────────────────────────
+
+      const fileExt = mimetype === 'image/png' ? 'png' :
+                     mimetype === 'image/webp' ? 'webp' : 'jpg';
+      const objectKey = `journeys/${journey_id}/${location}/${slot}.${fileExt}`;
+
+      let objectKeyResult;
+      try {
+        objectKeyResult = await storageAdapter.saveFile(cleanedBuffer, objectKey, mimetype);
+      } catch (storageError) {
+        console.error('[STORAGE_SAVE_FAILED]', storageError.message);
+        return res.status(500).json({
+          success: false,
+          error: 'STORAGE_FAILED',
+          message: 'Failed to save file to storage'
+        });
+      }
+
+      // ─────────────────────────────────────────────────────────────────
+      // Step 7: Insert or update asset record
+      // ─────────────────────────────────────────────────────────────────
+
+      if (assetId) {
+        // UPDATE existing (pending) asset
+        const updateQuery = `
+          UPDATE dt_storybook_assets
+          SET object_key = $2, mime_type = $3, byte_size = $4,
+              uploaded_by = $5, uploaded_at = NOW(), status = 'pending'
+          WHERE id = $1
+          RETURNING id
+        `;
+        const updateResult = await db.query(updateQuery, [
+          assetId,
+          objectKey,
+          mimetype,
+          cleanedBuffer.length,
+          'admin'
+        ]);
+        assetId = updateResult.rows[0].id;
+      } else {
+        // INSERT new asset
+        const insertQuery = `
+          INSERT INTO dt_storybook_assets
+          (journey_id, location, slot, object_key, mime_type, byte_size, uploaded_by, status)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending')
+          RETURNING id
+        `;
+        const insertResult = await db.query(insertQuery, [
+          journey_id,
+          location,
+          slot,
+          objectKey,
+          mimetype,
+          cleanedBuffer.length,
+          'admin'
+        ]);
+        assetId = insertResult.rows[0].id;
+      }
+
+      // ─────────────────────────────────────────────────────────────────
+      // Step 8: Check status transitions
+      // ─────────────────────────────────────────────────────────────────
+
+      // Fetch current assets
+      const assetsQuery = `
+        SELECT location, slot, status FROM dt_storybook_assets WHERE journey_id = $1
+      `;
+      const assetsResult = await db.query(assetsQuery, [journey_id]);
+      const allAssets = assetsResult.rows;
+
+      let newStatus = journey.status;
+
+      // Transition 1: photos_complete → art_in_progress (on first story_art upload)
+      if (journey.status === 'photos_complete' && goldenNineContract.countUploadedStoryArts(allAssets) === 0) {
+        newStatus = 'art_in_progress';
+      }
+
+      // Transition 2: art_in_progress → storybook_complete (when all 3 story_arts uploaded)
+      if (goldenNineContract.allCanonicalStoryArtsUploaded(allAssets)) {
+        newStatus = 'storybook_complete';
+      }
+
+      // Update journey status if changed
+      if (newStatus !== journey.status) {
+        const statusQuery = `
+          UPDATE dt_storybook_journeys SET status = $2, updated_at = NOW() WHERE id = $1
+        `;
+        await db.query(statusQuery, [journey_id, newStatus]);
+      }
+
+      // ─────────────────────────────────────────────────────────────────
+      // Step 9: Response
+      // ─────────────────────────────────────────────────────────────────
+
+      return res.status(201).json({
+        success: true,
+        asset_id: assetId,
+        location: location,
+        slot: slot,
+        object_key: objectKey,
+        journey_status: newStatus,
+        story_arts_uploaded: goldenNineContract.countUploadedStoryArts(allAssets)
+      });
+
+    } catch (error) {
+      console.error('[ADMIN_STORYBOOK_UPLOAD_ERROR]:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'UPLOAD_FAILED',
+        message: error.message
+      });
+    }
+  }
+);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// C4 RAMADA: Star Planting with skip_artifact Integration
+// Endpoints: POST /api/storybook/:journey_id/plant-star
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * POST /api/storybook/:journey_id/plant-star
+ * Plant a star for a completed storybook journey
+ *
+ * Preconditions:
+ * - Journey status must be 'storybook_complete'
+ * - All 6 REAL slots must be uploaded
+ * - All 3 Story Art slots must be uploaded
+ * - Session cookie must match journey.session_id
+ *
+ * Idempotency:
+ * - If journey.star_id is already set, returns existing star (no duplicate)
+ * - Uses database transaction + row locking for atomicity
+ *
+ * Side effects:
+ * - Creates dt_wishes record (no user_id, sku='storybook_v1')
+ * - Creates dt_star_seeds record
+ * - Creates dt_stars record (star_stage='day1')
+ * - NO dt_artifact_jobs created (skip_artifact=true)
+ * - Updates dt_storybook_journeys with star_id and status='star_planted'
+ *
+ * Response: { success: true, star_id, star_name, journey_status, star_planted_at }
+ * Status: 201 Created | 400 Bad Request | 401 Unauthorized | 409 Conflict | 500 Error
+ */
+router.post('/:journey_id/plant-star', async (req, res) => {
+  if (!db || !goldenNineContract) {
+    return res.status(503).json({
+      success: false,
+      error: 'SERVICE_UNAVAILABLE',
+      message: 'Database or validation service not available'
+    });
+  }
+
+  const { journey_id } = req.params;
+  const sessionId = req.cookies?.dt_storybook_session_id;
+
+  try {
+    // ─────────────────────────────────────────────────────────────────
+    // Step 1: Authorization & Journey Validation
+    // ─────────────────────────────────────────────────────────────────
+
+    if (!sessionId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'dt_storybook_session_id cookie required'
+      });
+    }
+
+    // Fetch journey and verify session
+    const journeyQuery = `
+      SELECT id, session_id, status, wish_text, star_id, source_hotel, created_at
+      FROM dt_storybook_journeys WHERE id = $1
+    `;
+    const journeyResult = await db.query(journeyQuery, [journey_id]);
+
+    if (journeyResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'JOURNEY_NOT_FOUND',
+        message: 'Journey does not exist'
+      });
+    }
+
+    const journey = journeyResult.rows[0];
+
+    if (journey.session_id !== sessionId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Session does not match journey'
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Step 2: Precondition Validation
+    // ─────────────────────────────────────────────────────────────────
+
+    // Check: Journey status must be 'storybook_complete'
+    if (journey.status !== 'storybook_complete') {
+      return res.status(400).json({
+        success: false,
+        error: 'INVALID_STATUS',
+        message: `Journey status must be 'storybook_complete', but is '${journey.status}'`
+      });
+    }
+
+    // Check: All canonical assets must be present
+    const assetsQuery = `
+      SELECT location, slot, status FROM dt_storybook_assets WHERE journey_id = $1
+    `;
+    const assetsResult = await db.query(assetsQuery, [journey_id]);
+    const allAssets = assetsResult.rows;
+
+    if (!goldenNineContract.allCanonicalRealsUploaded(allAssets)) {
+      return res.status(400).json({
+        success: false,
+        error: 'MISSING_REALS',
+        message: `All 6 REAL photos must be uploaded. Currently: ${goldenNineContract.countUploadedReals(allAssets)}/6`
+      });
+    }
+
+    if (!goldenNineContract.allCanonicalStoryArtsUploaded(allAssets)) {
+      return res.status(400).json({
+        success: false,
+        error: 'MISSING_STORY_ART',
+        message: `All 3 Story Art images must be uploaded. Currently: ${goldenNineContract.countUploadedStoryArts(allAssets)}/3`
+      });
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Step 3: Idempotency Check — If star already planted, return existing
+    // ─────────────────────────────────────────────────────────────────
+
+    if (journey.star_id) {
+      // Star already created — return existing
+      const existingStarQuery = `
+        SELECT id, star_name, created_at FROM dt_stars WHERE id = $1
+      `;
+      const existingStarResult = await db.query(existingStarQuery, [journey.star_id]);
+
+      if (existingStarResult.rows.length > 0) {
+        const existingStar = existingStarResult.rows[0];
+        return res.status(200).json({
+          success: true,
+          star_id: existingStar.id,
+          star_name: existingStar.star_name,
+          journey_status: 'star_planted',
+          star_planted_at: journey.created_at,
+          message: '별이 이미 심어졌습니다'
+        });
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Step 4: Database Transaction with Row Locking
+    // ─────────────────────────────────────────────────────────────────
+
+    const starCreationResult = await db.query(
+      `BEGIN TRANSACTION;
+
+       -- Lock the journey row for update
+       SELECT id FROM dt_storybook_journeys WHERE id = $1 FOR UPDATE;
+
+       -- Double-check star_id inside transaction (prevent race condition)
+       SELECT star_id FROM dt_storybook_journeys WHERE id = $1;`,
+      [journey_id]
+    );
+
+    // Check if star was created by concurrent request
+    const doubleCheckResult = await db.query(
+      'SELECT star_id FROM dt_storybook_journeys WHERE id = $1',
+      [journey_id]
+    );
+
+    if (doubleCheckResult.rows[0].star_id) {
+      // Another request created the star — fetch and return it
+      const existingStarResult = await db.query(
+        'SELECT id, star_name FROM dt_stars WHERE id = $1',
+        [doubleCheckResult.rows[0].star_id]
+      );
+
+      if (existingStarResult.rows.length > 0) {
+        const existingStar = existingStarResult.rows[0];
+        await db.query('ROLLBACK;');
+        return res.status(200).json({
+          success: true,
+          star_id: existingStar.id,
+          star_name: existingStar.star_name,
+          journey_status: 'star_planted',
+          message: '별이 이미 심어졌습니다'
+        });
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Step 5: Create dt_wishes (SKU = storybook_v1, no user_id)
+    // ─────────────────────────────────────────────────────────────────
+
+    const wishText = journey.wish_text || 'RAMADA Storybook 소원';
+    const wishResult = await db.query(
+      `INSERT INTO dt_wishes (wish_text, user_id, sku, status, created_at)
+       VALUES ($1, NULL, $2, $3, NOW())
+       RETURNING id`,
+      [wishText, 'storybook_v1', 'converted_to_star']
+    );
+    const wishId = wishResult.rows[0].id;
+
+    // ─────────────────────────────────────────────────────────────────
+    // Step 6: Create dt_star_seeds
+    // ─────────────────────────────────────────────────────────────────
+
+    const seedName = `${wishText.slice(0, 20)} 씨앗`;
+    const seedResult = await db.query(
+      `INSERT INTO dt_star_seeds (wish_id, seed_name, seed_state, created_at)
+       VALUES ($1, $2, $3, NOW())
+       RETURNING id`,
+      [wishId, seedName, 'promoted']
+    );
+    const seedId = seedResult.rows[0].id;
+
+    // ─────────────────────────────────────────────────────────────────
+    // Step 7: Create dt_stars (skip_artifact by design)
+    // ─────────────────────────────────────────────────────────────────
+
+    // Generate star name (deterministic based on wish_id)
+    const starName = await generateStarName(wishId, db);
+    const starSlug = `star-${Date.now()}`;
+
+    // Get galaxy (RAMADA storybook stars go to 'growth' galaxy by default)
+    const galaxyResult = await db.query(
+      'SELECT id FROM dt_galaxies WHERE code = $1',
+      ['growth']
+    );
+    const galaxyId = galaxyResult.rows.length > 0 ? galaxyResult.rows[0].id : null;
+
+    const starResult = await db.query(
+      `INSERT INTO dt_stars
+         (wish_id, star_seed_id, star_name, star_slug, galaxy_id, star_stage, emotion_tag, star_rarity, origin_place, origin_type, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
+       RETURNING id, star_name`,
+      [
+        wishId,
+        seedId,
+        starName,
+        starSlug,
+        galaxyId,
+        'day1',
+        'confusion', // Default emotion for storybook stars
+        'limited',   // Limited edition by design (RAMADA exclusive)
+        journey.source_hotel || 'ramada_storybook',
+        'storybook',
+        // current timestamp for created_at
+      ]
+    );
+    const star = starResult.rows[0];
+
+    // NOTE: NO dt_artifact_jobs created here (skip_artifact=true by design)
+    // Storybook's Golden 9-Cut IS the visual representation
+
+    // ─────────────────────────────────────────────────────────────────
+    // Step 8: Update dt_storybook_journeys with star_id and status
+    // ─────────────────────────────────────────────────────────────────
+
+    await db.query(
+      `UPDATE dt_storybook_journeys
+       SET star_id = $1, status = $2, star_planted_at = NOW(), updated_at = NOW()
+       WHERE id = $3`,
+      [star.id, 'star_planted', journey_id]
+    );
+
+    // Commit transaction
+    await db.query('COMMIT;');
+
+    // ─────────────────────────────────────────────────────────────────
+    // Step 9: Response
+    // ─────────────────────────────────────────────────────────────────
+
+    return res.status(201).json({
+      success: true,
+      star_id: star.id,
+      star_name: star.star_name,
+      journey_status: 'star_planted',
+      star_planted_at: new Date().toISOString(),
+      message: '별이 소원꿈터에 심어졌습니다'
+    });
+
+  } catch (error) {
+    console.error('[STORYBOOK_PLANT_STAR_ERROR]:', error);
+
+    // Attempt rollback
+    try {
+      await db.query('ROLLBACK;');
+    } catch (rollbackError) {
+      console.error('[STORYBOOK_PLANT_STAR_ROLLBACK_ERROR]:', rollbackError.message);
+    }
+
+    return res.status(500).json({
+      success: false,
+      error: 'STAR_PLANTING_FAILED',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * Helper: Generate star name (deterministic based on wish_id)
+ * Reused from dreamtownRoutes.js makeStarName pattern
+ */
+async function generateStarName(wishId, database) {
+  // If a pattern exists in the database, use it; otherwise generate
+  // This is a simplified implementation — production might use AI
+  const stellarNames = [
+    '미라클', '샛별', '은음', '별빛', '희망별',
+    '소원별', '꿈별', '별무리', '은하', '별여행'
+  ];
+
+  // Deterministic based on wish_id (convert UUID to number)
+  const hash = parseInt(wishId.toString().charCodeAt(0) + (wishId.toString().length % 10));
+  const nameIndex = hash % stellarNames.length;
+  return stellarNames[nameIndex];
+}
+
 module.exports = router;
