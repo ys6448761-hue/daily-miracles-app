@@ -1,0 +1,260 @@
+/* GoldenNineCut.css */
+
+.golden-nine-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1rem;
+  max-width: 100%;
+}
+
+/* Header */
+.golden-nine-header {
+  text-align: center;
+}
+
+.golden-nine-title {
+  margin: 0 0 1rem 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2d2d2d;
+  line-height: 1.2;
+}
+
+.golden-nine-status {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.status-badge.complete {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.planted {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+/* Grid Container */
+.golden-nine-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+}
+
+.golden-nine-grid.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.grid-loading-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #007bff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  z-index: 10;
+}
+
+@keyframes spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Grid Row */
+.grid-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.row-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  min-width: 50px;
+  text-align: center;
+}
+
+.location-emoji {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.location-korean {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #555;
+  line-height: 1;
+}
+
+.row-cells {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  flex: 1;
+}
+
+/* Cell */
+.golden-nine-cell {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  background: #f5f5f5;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cell-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cell-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.05);
+  pointer-events: none;
+}
+
+.cell-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f5f5 0%, #efefef 100%);
+  gap: 0.5rem;
+  color: #999;
+}
+
+.placeholder-icon {
+  font-size: 2rem;
+}
+
+.placeholder-text {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+/* Legend */
+.golden-nine-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border-left: 4px solid #007bff;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  color: #333;
+}
+
+.legend-emoji {
+  font-size: 1.25rem;
+  line-height: 1;
+  min-width: 30px;
+  text-align: center;
+}
+
+.legend-text {
+  line-height: 1.4;
+}
+
+/* Mobile: Stack legend vertically, reduce gaps */
+@media (max-width: 480px) {
+  .golden-nine-container {
+    padding: 0.75rem;
+    gap: 1.5rem;
+  }
+
+  .golden-nine-title {
+    font-size: 1.5rem;
+  }
+
+  .grid-row {
+    gap: 0.75rem;
+  }
+
+  .row-cells {
+    gap: 0.5rem;
+  }
+
+  .row-label {
+    min-width: 45px;
+  }
+
+  .location-emoji {
+    font-size: 1.5rem;
+  }
+
+  .location-korean {
+    font-size: 0.7rem;
+  }
+}
+
+/* Tablet */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .golden-nine-container {
+    padding: 2rem;
+  }
+
+  .row-cells {
+    gap: 1rem;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1025px) {
+  .golden-nine-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .row-cells {
+    gap: 1rem;
+  }
+
+  .golden-nine-cell {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .golden-nine-cell:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+}
