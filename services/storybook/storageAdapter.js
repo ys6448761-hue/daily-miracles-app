@@ -432,13 +432,17 @@ class S3StorageAdapter {
 
 /**
  * Factory: Create appropriate adapter based on STORAGE_TYPE
- * @returns {LocalStorageAdapter|S3StorageAdapter}
+ * @returns {LocalStorageAdapter|S3StorageAdapter|SupabaseStorageAdapter}
  */
 function createStorageAdapter() {
   const storageType = process.env.STORAGE_TYPE || 'local';
 
   if (storageType === 's3') {
     return new S3StorageAdapter();
+  }
+
+  if (storageType === 'supabase') {
+    return new SupabaseStorageAdapter();
   }
 
   if (storageType === 'local') {
