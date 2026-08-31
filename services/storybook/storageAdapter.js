@@ -478,9 +478,15 @@ class SupabaseStorageAdapter {
       throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY required for Supabase Storage');
     }
 
+    const WebSocket = require('ws');
     const { createClient } = require('@supabase/supabase-js');
     // Service role key: backend-only, full permissions, no RLS restrictions
-    this.supabase = createClient(this.supabaseUrl, this.supabaseServiceRoleKey);
+    // Explicit WebSocket transport for Node 20 compatibility (native WebSocket in Node 22+)
+    this.supabase = createClient(this.supabaseUrl, this.supabaseServiceRoleKey, {
+      realtime: {
+        transport: WebSocket
+      }
+    });
   }
 
   async saveFile(buffer, objectKey, mimeType) {
