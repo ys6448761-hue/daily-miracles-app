@@ -487,6 +487,24 @@ class SupabaseStorageAdapter {
         transport: WebSocket
       }
     });
+
+    // Diagnostic: Capture Storage client configuration
+    try {
+      const storageClient = this.supabase.storage;
+      const storageUrl = storageClient._client?.options?.url || storageClient.url || 'unknown';
+      const pkgPath = require.resolve('@supabase/supabase-js/package.json');
+      const supabasePkg = require(pkgPath);
+      console.log('[C7A_SUPABASE_CLIENT_INIT]', JSON.stringify({
+        supabaseUrl: this.supabaseUrl,
+        storageBucket: this.storageBucket,
+        storageClientUrl: storageUrl,
+        supabaseJsVersion: supabasePkg.version || 'unknown'
+      }));
+    } catch (diagErr) {
+      console.log('[C7A_SUPABASE_CLIENT_INIT_ERROR]', JSON.stringify({
+        error: diagErr.message
+      }));
+    }
   }
 
   async saveFile(buffer, objectKey, mimeType) {
@@ -511,6 +529,16 @@ class SupabaseStorageAdapter {
     }));
 
     try {
+      // Diagnostic: Capture storage client state before upload
+      const storageClient = this.supabase.storage;
+      console.log('[C7A_SUPABASE_UPLOAD_ATTEMPT]', JSON.stringify({
+        bucketName: this.storageBucket,
+        objectKeyLength: objectKey.length,
+        mimeType: mimeType,
+        bufferSize: buffer.length,
+        storageClientType: storageClient?.constructor?.name || 'unknown'
+      }));
+
       const { data, error } = await this.supabase.storage
         .from(this.storageBucket)
         .upload(objectKey, buffer, {
@@ -519,12 +547,21 @@ class SupabaseStorageAdapter {
         });
 
       if (error) {
-        console.log('[C7A_SUPABASE_DIAG_ERROR_DETAIL]', JSON.stringify({
+        // Capture full error object structure
+        const errorDetail = {
           errorName: error.name,
           errorMessage: error.message,
           errorStatus: error.status || error.statusCode || 'none',
           errorCode: error.code || 'none'
-        }));
+        };
+
+        // Try to extract request details if available
+        if (error.originalError) {
+          errorDetail.originalErrorName = error.originalError.name;
+          errorDetail.originalErrorMessage = error.originalError.message;
+        }
+
+        console.log('[C7A_SUPABASE_DIAG_ERROR_DETAIL]', JSON.stringify(errorDetail));
         throw new Error(`Supabase Storage upload failed: ${error.message}`);
       }
 
