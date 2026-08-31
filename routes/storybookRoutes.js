@@ -2386,6 +2386,20 @@ const upload = multer({
   }
 });
 
+// ─────────────────────────────────────────────────────────────────
+// Multer error handler for file size limits
+// ─────────────────────────────────────────────────────────────────
+const multerErrorHandler = (err, req, res, next) => {
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({
+      success: false,
+      error: 'FILE_TOO_LARGE',
+      message: `파일이 ${Math.floor(parseInt(process.env.STORYBOOK_MAX_FILE_SIZE || 5242880) / 1024 / 1024)}MB를 초과했습니다`
+    });
+  }
+  next(err);
+};
+
 /**
  * POST /api/storybook/:journey_id/upload
  * Customer uploads REAL photo for a canonical slot
@@ -2399,7 +2413,7 @@ const upload = multer({
  * Response: { success: true, asset_id, location, slot, object_key, journey_status }
  * Status: 201 Created | 400 Bad Request | 401 Unauthorized | 409 Conflict | 500 Error
  */
-router.post('/:journey_id/upload', upload.single('file'), async (req, res) => {
+router.post('/:journey_id/upload', upload.single('file'), multerErrorHandler, async (req, res) => {
   if (!db || !storageAdapter || !goldenNineContract) {
     return res.status(503).json({
       success: false,
