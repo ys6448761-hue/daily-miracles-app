@@ -494,6 +494,22 @@ class SupabaseStorageAdapter {
       throw new Error('buffer, objectKey, and mimeType are required');
     }
 
+    // Diagnostic: Capture URL domain only (no secrets)
+    let supabaseDomain = 'unknown';
+    try {
+      supabaseDomain = new URL(this.supabaseUrl).hostname;
+    } catch (e) {
+      // Fallback if URL parsing fails
+    }
+
+    console.log('[C7A_SUPABASE_DIAG_INIT]', JSON.stringify({
+      bucket: this.storageBucket,
+      objectKey: objectKey,
+      mimeType: mimeType,
+      bufferSize: buffer.length,
+      supabaseDomain: supabaseDomain
+    }));
+
     try {
       const { data, error } = await this.supabase.storage
         .from(this.storageBucket)
@@ -503,8 +519,19 @@ class SupabaseStorageAdapter {
         });
 
       if (error) {
+        console.log('[C7A_SUPABASE_DIAG_ERROR_DETAIL]', JSON.stringify({
+          errorName: error.name,
+          errorMessage: error.message,
+          errorStatus: error.status || error.statusCode || 'none',
+          errorCode: error.code || 'none'
+        }));
         throw new Error(`Supabase Storage upload failed: ${error.message}`);
       }
+
+      console.log('[C7A_SUPABASE_DIAG_SUCCESS]', JSON.stringify({
+        objectKey: objectKey,
+        dataKeys: data ? Object.keys(data).join(',') : 'null'
+      }));
 
       return objectKey;
     } catch (error) {
@@ -573,6 +600,59 @@ class SupabaseStorageAdapter {
       if (error) throw error;
       return data.metadata.size || 0;
     } catch (error) {
+      throw error;
+    }
+  }
+
+  // Diagnostic-only: Smoke test with trivial path
+  async smokeTest() {
+    const trivialKey = `diagnostics/test-${Date.now()}.jpg`;
+    const trivialBuffer = Buffer.from('test data' + Math.random()); // ~20 bytes
+
+    console.log('[C7A_SMOKE_TEST_START]', JSON.stringify({
+      trivialKey: trivialKey,
+      bufferSize: trivialBuffer.length
+    }));
+
+    try {
+      const { data, error } = await this.supabase.storage
+        .from(this.storageBucket)
+        .upload(trivialKey, trivialBuffer, {
+          contentType: 'image/jpeg',
+          upsert: false
+        });
+
+      if (error) {
+        console.log('[C7A_SMOKE_TEST_FAILED]', JSON.stringify({
+          trivialKey: trivialKey,
+          errorName: error.name,
+          errorMessage: error.message,
+          errorStatus: error.status || error.statusCode || 'none'
+        }));
+        throw error;
+      }
+
+      console.log('[C7A_SMOKE_TEST_SUCCESS]', JSON.stringify({
+        trivialKey: trivialKey,
+        dataKeys: data ? Object.keys(data).join(',') : 'null'
+      }));
+
+      // Cleanup: Delete test file
+      try {
+        await this.supabase.storage
+          .from(this.storageBucket)
+          .remove([trivialKey]);
+        console.log('[C7A_SMOKE_TEST_CLEANUP]', JSON.stringify({ trivialKey: trivialKey }));
+      } catch (cleanupErr) {
+        console.log('[C7A_SMOKE_TEST_CLEANUP_ERROR]', JSON.stringify({
+          trivialKey: trivialKey,
+          error: cleanupErr.message
+        }));
+      }
+
+      return true;
+    } catch (error) {
+      console.error('[C7A_SMOKE_TEST_ERROR]', { trivialKey, error: error.message });
       throw error;
     }
   }
