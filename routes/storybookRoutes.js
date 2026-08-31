@@ -2420,13 +2420,13 @@ const multerErrorHandler = (err, req, res, next) => {
  */
 router.post('/:journey_id/upload', upload.single('file'), multerErrorHandler, async (req, res) => {
   if (!db || !storageAdapter || !goldenNineContract) {
-    console.log('[C7A_UPLOAD_DIAG]', {
+    console.log('[C7A_UPLOAD_DIAG]', JSON.stringify({
       stage: 'SERVICE_CHECK',
       db_present: !!db,
       storage_adapter_present: !!storageAdapter,
       contract_present: !!goldenNineContract,
       response_status: 503
-    });
+    }));
     return res.status(503).json({
       success: false,
       error: 'SERVICE_UNAVAILABLE',
@@ -2438,14 +2438,14 @@ router.post('/:journey_id/upload', upload.single('file'), multerErrorHandler, as
   const { location, slot } = req.body;
   const sessionId = req.cookies?.dt_storybook_session_id;
 
-  console.log('[C7A_UPLOAD_DIAG]', {
+  console.log('[C7A_UPLOAD_DIAG]', JSON.stringify({
     stage: 'REQUEST_START',
     journey_id: journey_id,
     session_cookie_present: !!sessionId,
     file_present: !!req.file,
     file_size: req.file?.size || null,
     file_mime: req.file?.mimetype || null
-  });
+  }));
 
   try {
     // ─────────────────────────────────────────────────────────────────
@@ -2453,7 +2453,7 @@ router.post('/:journey_id/upload', upload.single('file'), multerErrorHandler, as
     // ─────────────────────────────────────────────────────────────────
 
     if (!sessionId) {
-      console.log('[C7A_UPLOAD_DIAG]', { stage: 'AUTH_FAIL', reason: 'no_session_cookie', response_status: 401 });
+      console.log('[C7A_UPLOAD_DIAG]', JSON.stringify({ stage: 'AUTH_FAIL', reason: 'no_session_cookie', response_status: 401 }));
       return res.status(401).json({
         success: false,
         error: 'UNAUTHORIZED',
@@ -2468,7 +2468,7 @@ router.post('/:journey_id/upload', upload.single('file'), multerErrorHandler, as
     const journeyResult = await db.query(journeyQuery, [journey_id]);
 
     if (journeyResult.rows.length === 0) {
-      console.log('[C7A_UPLOAD_DIAG]', { stage: 'JOURNEY_LOOKUP', found: false, response_status: 404 });
+      console.log('[C7A_UPLOAD_DIAG]', JSON.stringify({ stage: 'JOURNEY_LOOKUP', found: false, response_status: 404 }));
       return res.status(404).json({
         success: false,
         error: 'JOURNEY_NOT_FOUND',
@@ -2480,7 +2480,7 @@ router.post('/:journey_id/upload', upload.single('file'), multerErrorHandler, as
     const session_valid = journey.session_id === sessionId;
 
     if (!session_valid) {
-      console.log('[C7A_UPLOAD_DIAG]', { stage: 'SESSION_VALIDATION', valid: false, response_status: 401 });
+      console.log('[C7A_UPLOAD_DIAG]', JSON.stringify({ stage: 'SESSION_VALIDATION', valid: false, response_status: 401 }));
       return res.status(401).json({
         success: false,
         error: 'UNAUTHORIZED',
@@ -2488,17 +2488,17 @@ router.post('/:journey_id/upload', upload.single('file'), multerErrorHandler, as
       });
     }
 
-    console.log('[C7A_UPLOAD_DIAG]', { stage: 'SESSION_VALIDATION', valid: true });
+    console.log('[C7A_UPLOAD_DIAG]', JSON.stringify({ stage: 'SESSION_VALIDATION', valid: true }));
 
     // ─────────────────────────────────────────────────────────────────
     // Step 2: Validate Location & Slot Against Golden 9 Contract
     // ─────────────────────────────────────────────────────────────────
 
     const contract_valid = goldenNineContract.isCanonicalRealSlot(location, slot);
-    console.log('[C7A_UPLOAD_DIAG]', { stage: 'CONTRACT_VALIDATION', location, slot, valid: contract_valid });
+    console.log('[C7A_UPLOAD_DIAG]', JSON.stringify({ stage: 'CONTRACT_VALIDATION', location, slot, valid: contract_valid }));
 
     if (!contract_valid) {
-      console.log('[C7A_UPLOAD_DIAG]', { stage: 'CONTRACT_VALIDATION', valid: false, response_status: 400 });
+      console.log('[C7A_UPLOAD_DIAG]', JSON.stringify({ stage: 'CONTRACT_VALIDATION', valid: false, response_status: 400 }));
       return res.status(400).json({
         success: false,
         error: 'INVALID_SLOT',
@@ -2594,18 +2594,18 @@ router.post('/:journey_id/upload', upload.single('file'), multerErrorHandler, as
                    mimetype === 'image/webp' ? 'webp' : 'jpg';
     const objectKey = `journeys/${journey_id}/${location}/${slot}.${fileExt}`;
 
-    console.log('[C7A_UPLOAD_DIAG]', { stage: 'STORAGE_SAVE_START', objectKey });
+    console.log('[C7A_UPLOAD_DIAG]', JSON.stringify({ stage: 'STORAGE_SAVE_START', objectKey }));
     let objectKeyResult;
     try {
       objectKeyResult = await storageAdapter.saveFile(cleanedBuffer, objectKey, mimetype);
-      console.log('[C7A_UPLOAD_DIAG]', { stage: 'STORAGE_SAVE_SUCCESS', objectKey });
+      console.log('[C7A_UPLOAD_DIAG]', JSON.stringify({ stage: 'STORAGE_SAVE_SUCCESS', objectKey }));
     } catch (storageError) {
       console.error('[STORAGE_SAVE_FAILED]', storageError.message);
-      console.log('[C7A_UPLOAD_DIAG]', {
+      console.log('[C7A_UPLOAD_DIAG]', JSON.stringify({
         stage: 'STORAGE_SAVE_FAILED',
         error: storageError.message,
         response_status: 500
-      });
+      }));
       return res.status(500).json({
         success: false,
         error: 'STORAGE_FAILED',
@@ -2617,7 +2617,7 @@ router.post('/:journey_id/upload', upload.single('file'), multerErrorHandler, as
     // Step 7: Insert or Update Asset Record
     // ─────────────────────────────────────────────────────────────────
 
-    console.log('[C7A_UPLOAD_DIAG]', { stage: 'DB_OPERATION_START', operation: assetId ? 'UPDATE' : 'INSERT' });
+    console.log('[C7A_UPLOAD_DIAG]', JSON.stringify({ stage: 'DB_OPERATION_START', operation: assetId ? 'UPDATE' : 'INSERT' }));
     try {
       if (assetId) {
         // UPDATE existing (pending) asset
@@ -2636,7 +2636,7 @@ router.post('/:journey_id/upload', upload.single('file'), multerErrorHandler, as
           sessionId
         ]);
         assetId = updateResult.rows[0].id;
-        console.log('[C7A_UPLOAD_DIAG]', { stage: 'DB_OPERATION_SUCCESS', operation: 'UPDATE', asset_id: assetId });
+        console.log('[C7A_UPLOAD_DIAG]', JSON.stringify({ stage: 'DB_OPERATION_SUCCESS', operation: 'UPDATE', asset_id: assetId }));
       } else {
         // INSERT new asset
         const insertQuery = `
@@ -2655,11 +2655,11 @@ router.post('/:journey_id/upload', upload.single('file'), multerErrorHandler, as
           sessionId
         ]);
         assetId = insertResult.rows[0].id;
-        console.log('[C7A_UPLOAD_DIAG]', { stage: 'DB_OPERATION_SUCCESS', operation: 'INSERT', asset_id: assetId });
+        console.log('[C7A_UPLOAD_DIAG]', JSON.stringify({ stage: 'DB_OPERATION_SUCCESS', operation: 'INSERT', asset_id: assetId }));
       }
     } catch (dbError) {
       console.error('[DB_OPERATION_FAILED]', dbError.message);
-      console.log('[C7A_UPLOAD_DIAG]', { stage: 'DB_OPERATION_FAILED', error: dbError.message });
+      console.log('[C7A_UPLOAD_DIAG]', JSON.stringify({ stage: 'DB_OPERATION_FAILED', error: dbError.message }));
       throw dbError;
     }
 
@@ -2698,7 +2698,7 @@ router.post('/:journey_id/upload', upload.single('file'), multerErrorHandler, as
     // Step 9: Response
     // ─────────────────────────────────────────────────────────────────
 
-    console.log('[C7A_UPLOAD_DIAG]', { stage: 'RESPONSE_SUCCESS', status: 201, asset_id: assetId });
+    console.log('[C7A_UPLOAD_DIAG]', JSON.stringify({ stage: 'RESPONSE_SUCCESS', status: 201, asset_id: assetId }));
     return res.status(201).json({
       success: true,
       asset_id: assetId,
@@ -2711,7 +2711,7 @@ router.post('/:journey_id/upload', upload.single('file'), multerErrorHandler, as
 
   } catch (error) {
     console.error('[STORYBOOK_UPLOAD_ERROR]:', error);
-    console.log('[C7A_UPLOAD_DIAG]', { stage: 'UNHANDLED_ERROR', error: error.message, response_status: 500 });
+    console.log('[C7A_UPLOAD_DIAG]', JSON.stringify({ stage: 'UNHANDLED_ERROR', error: error.message, response_status: 500 }));
     return res.status(500).json({
       success: false,
       error: 'UPLOAD_FAILED',
