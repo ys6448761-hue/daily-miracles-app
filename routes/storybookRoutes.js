@@ -2368,7 +2368,12 @@ let goldenNineContract = null;
 try {
   storageAdapter = require('../services/storybook/storageAdapter');
 } catch (error) {
-  console.warn('⚠️ Storybook C3A: storageAdapter not available');
+  console.warn('⚠️ Storybook C3A: storageAdapter not available', {
+    error: error.message,
+    supabaseUrlPresent: Boolean(process.env.SUPABASE_URL),
+    serviceRoleKeyPresent: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+    storageType: process.env.STORAGE_TYPE
+  });
 }
 
 try {
