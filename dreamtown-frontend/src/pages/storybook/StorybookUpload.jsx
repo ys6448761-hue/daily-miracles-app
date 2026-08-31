@@ -189,23 +189,7 @@ function StorybookUpload() {
       setOverallStatus('uploading');
       setError(null);
 
-      const fileInputs = document.querySelectorAll('.upload-input');
-      let completedCount = 0;
-
-      for (const input of fileInputs) {
-        if (input.files && input.files[0]) {
-          const location = input.dataset.location;
-          const slot = input.dataset.slot;
-          await handleFileUpload(location, slot, input.files[0]);
-          completedCount++;
-        }
-      }
-
-      if (completedCount !== 6) {
-        throw new Error(`업로드된 사진이 부족합니다 (${completedCount}/6)`);
-      }
-
-      // Verify status = photos_complete
+      // Verify all six canonical REAL slots are uploaded on server (no re-upload)
       const verifyResponse = await fetch('/api/storybook/my-journey', {
         credentials: 'include'
       });
@@ -253,6 +237,8 @@ function StorybookUpload() {
                   const optimizedBlob = await optimizeImageForStorybook(file);
                   const optimizedFile = new File([optimizedBlob], file.name, { type: 'image/jpeg' });
                   await handleFileUpload(location, slot, optimizedFile);
+                  // Clear input to prevent accidental re-uploads
+                  e.target.value = '';
                 } catch (err) {
                   console.error('Optimization error:', err);
                   setUploadStatus(prev => ({ ...prev, [slotKey]: 'error' }));

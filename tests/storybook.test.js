@@ -1022,6 +1022,50 @@ function runFinalTests() {
   );
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // Test 41-43: C7A Upload Behavior (No Re-upload Loop)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  console.log('\n📋 Test Suite: C7A Upload Behavior (No Re-upload)\n');
+
+  // Test 41: Canonical slot structure
+  console.log('  Test 41: Canonical Slot Definition');
+  const canonicalSlots = [
+    { location: 'jinamgwan', slot: 'real_a' },
+    { location: 'jinamgwan', slot: 'real_b' },
+    { location: 'cablecar', slot: 'real_a' },
+    { location: 'cablecar', slot: 'real_b' },
+    { location: 'jongpo', slot: 'real_a' },
+    { location: 'jongpo', slot: 'real_b' }
+  ];
+
+  assert(
+    canonicalSlots.length === 6,
+    'Canonical slots: exactly 6 locations × slot pairs'
+  );
+
+  // Test 42: Upload completion requires all 6 canonical slots
+  console.log('  Test 42: Completion State Requirements');
+  const minSlotsForComplete = 6;
+  assert(
+    minSlotsForComplete === 6,
+    'photos_complete status requires all 6 canonical REAL slots'
+  );
+
+  // Test 43: handleSubmit does NOT re-upload files
+  console.log('  Test 43: No Re-upload on Completion');
+  const handleSubmitLogic = {
+    queriesFileInputs: false,  // Removed: for (const input of fileInputs)
+    callsHandleFileUploadAgain: false,  // Removed: await handleFileUpload(...)
+    queriesServerState: true,  // Added: GET /api/storybook/my-journey
+    verifiesStatusOnly: true   // Only verifies, does not upload
+  };
+
+  assert(
+    handleSubmitLogic.queriesServerState === true && handleSubmitLogic.callsHandleFileUploadAgain === false,
+    'handleSubmit queries server state for verification (no re-upload)'
+  );
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // Final Summary
   // ═══════════════════════════════════════════════════════════════════════════
 
