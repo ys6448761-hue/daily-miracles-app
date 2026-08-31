@@ -198,10 +198,11 @@ function StorybookUpload() {
         throw new Error('상태 확인 실패');
       }
 
-      const verifyData = await verifyResponse.json();
+      const data = await verifyResponse.json();
+      const journeyStatus = data?.journey?.status;
 
-      if (verifyData.status !== 'photos_complete') {
-        throw new Error(`예상치 못한 상태: ${verifyData.status}`);
+      if (journeyStatus !== 'photos_complete') {
+        throw new Error(`예상치 못한 상태: ${journeyStatus ?? 'missing'}`);
       }
 
       setOverallStatus('complete');

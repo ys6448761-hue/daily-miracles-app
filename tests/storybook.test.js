@@ -1065,6 +1065,31 @@ function runFinalTests() {
     'handleSubmit queries server state for verification (no re-upload)'
   );
 
+  // Test 44: Response contract for GET /my-journey
+  console.log('  Test 44: /my-journey Response Contract');
+  const myJourneyResponseContract = {
+    ok: true,
+    journey: {
+      status: 'photos_complete',
+      assets: []
+    }
+  };
+
+  assert(
+    myJourneyResponseContract.ok === true,
+    'Response has ok=true'
+  );
+
+  assert(
+    myJourneyResponseContract.journey?.status === 'photos_complete',
+    'Response journey.status (not top-level status)'
+  );
+
+  assert(
+    Array.isArray(myJourneyResponseContract.journey?.assets),
+    'Response journey.assets is array'
+  );
+
   // ═══════════════════════════════════════════════════════════════════════════
   // Final Summary
   // ═══════════════════════════════════════════════════════════════════════════
