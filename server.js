@@ -1163,6 +1163,11 @@ app.use((req, _res, next) => {
   next();
 });
 
+// ---------- Cookie Parsing ----------
+// C7A Storybook: req.cookies parsing for session-based auth
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
 // ---------- Request ID ----------
 const requestIdMiddleware = require('./middleware/requestId');
 app.use(requestIdMiddleware);

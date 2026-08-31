@@ -2429,7 +2429,7 @@ router.post('/:journey_id/upload', upload.single('file'), multerErrorHandler, as
 
   const { journey_id } = req.params;
   const { location, slot } = req.body;
-  const sessionId = req.cookies.dt_storybook_session_id;
+  const sessionId = req.cookies?.dt_storybook_session_id;
 
   try {
     // ─────────────────────────────────────────────────────────────────
