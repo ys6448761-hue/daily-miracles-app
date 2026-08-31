@@ -118,25 +118,29 @@ function StorybookUpload() {
         <p className="upload-subtitle">6장의 사진을 올려주세요 (2장 × 3곳)</p>
 
         <div className="upload-grid">
-          {CANONICAL_SLOTS.map(({ location, slot, label, emoji }) => (
-            <div key={`${location}/${slot}`} className="upload-slot">
-              <div className="slot-emoji">{emoji}</div>
-              <label className="slot-label">{label}</label>
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className="upload-input"
-                data-location={location}
-                data-slot={slot}
-                disabled={overallStatus === 'uploading' || overallStatus === 'complete'}
-              />
-              <div className={`slot-status ${uploadStatus[`${location}/${slot}`]}`}>
-                {uploadStatus[`${location}/${slot}`] === 'success' && '✅'}
-                {uploadStatus[`${location}/${slot}`] === 'uploading' && '⏳'}
-                {uploadStatus[`${location}/${slot}`] === 'error' && '❌'}
+          {CANONICAL_SLOTS.map(({ location, slot, label, emoji }) => {
+            const inputId = `file-${location}-${slot}`;
+            return (
+              <div key={`${location}/${slot}`} className="upload-slot">
+                <div className="slot-emoji">{emoji}</div>
+                <label className="slot-label" htmlFor={inputId}>{label}</label>
+                <input
+                  id={inputId}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="upload-input"
+                  data-location={location}
+                  data-slot={slot}
+                  disabled={overallStatus === 'uploading' || overallStatus === 'complete'}
+                />
+                <div className={`slot-status ${uploadStatus[`${location}/${slot}`]}`}>
+                  {uploadStatus[`${location}/${slot}`] === 'success' && '✅'}
+                  {uploadStatus[`${location}/${slot}`] === 'uploading' && '⏳'}
+                  {uploadStatus[`${location}/${slot}`] === 'error' && '❌'}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="upload-progress">
