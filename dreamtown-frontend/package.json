@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "daily-miracles-mvp": "file:..",
     "framer-motion": "^11.0.0",
     "html2canvas": "^1.4.1",
     "html5-qrcode": "^2.3.8",

@@ -56,6 +56,12 @@
   border-color: rgba(16, 185, 129, 0.5);
 }
 
+.upload-slot.optimizing {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.5);
+  opacity: 0.8;
+}
+
 .slot-emoji {
   font-size: 32px;
   margin-bottom: 8px;
