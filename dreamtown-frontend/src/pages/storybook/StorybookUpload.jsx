@@ -120,6 +120,12 @@ function StorybookUpload() {
         <div className="upload-grid">
           {CANONICAL_SLOTS.map(({ location, slot, label, emoji }) => {
             const inputId = `file-${location}-${slot}`;
+            const handleFileChange = async (e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                await handleFileUpload(location, slot, file);
+              }
+            };
             return (
               <div key={`${location}/${slot}`} className="upload-slot">
                 <div className="slot-emoji">{emoji}</div>
@@ -131,6 +137,7 @@ function StorybookUpload() {
                   className="upload-input"
                   data-location={location}
                   data-slot={slot}
+                  onChange={handleFileChange}
                   disabled={overallStatus === 'uploading' || overallStatus === 'complete'}
                 />
                 <div className={`slot-status ${uploadStatus[`${location}/${slot}`]}`}>
