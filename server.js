@@ -2314,6 +2314,21 @@ if (batchRoutes) {
   console.warn("⚠️ 배치 처리 라우터 로드 실패 - 라우트 미등록");
 }
 
+// ---------- C7A Diagnostic: Pre-router middleware for C3B path ----------
+app.use('/api/storybook/admin/storybook', (req, res, next) => {
+  // C7A Diagnostic: Request reaches this point before storybook router
+  if (req.method === 'POST' && req.path.includes('upload-story-art')) {
+    console.log('[C7A_PREROUTER_C3B]', JSON.stringify({
+      reached: true,
+      method: req.method,
+      path: req.path,
+      fullUrl: req.originalUrl,
+      contentType: req.get('content-type') || 'none'
+    }));
+  }
+  next();
+});
+
 // ---------- 스토리북 E2E Commerce Routes ----------
 if (storybookRoutes) {
   app.use("/api/storybook", storybookRoutes);

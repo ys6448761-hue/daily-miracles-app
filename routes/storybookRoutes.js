@@ -2415,13 +2415,28 @@ const multerErrorHandler = (err, req, res, next) => {
 
 // Story Art specific error handler (10MB limit)
 const multerStoryArtErrorHandler = (err, req, res, next) => {
+  // C7A Diagnostic: Multer error handler
+  console.log('[C7A_MULTER_ERROR_HANDLER]', JSON.stringify({
+    errName: err.name,
+    errCode: err.code,
+    errMessage: err.message,
+    path: req.path
+  }));
+
   if (err.code === 'LIMIT_FILE_SIZE') {
+    console.log('[C7A_MULTER_FILE_TOO_LARGE]', JSON.stringify({
+      message: `File size exceeded for ${req.path}`
+    }));
     return res.status(400).json({
       success: false,
       error: 'FILE_TOO_LARGE',
       message: `파일이 ${Math.floor(parseInt(process.env.STORYBOOK_STORY_ART_MAX_FILE_SIZE || 10485760) / 1024 / 1024)}MB를 초과했습니다`
     });
   }
+  console.log('[C7A_MULTER_ERROR_PASSTHROUGH]', JSON.stringify({
+    errCode: err.code,
+    willPassToNext: true
+  }));
   next(err);
 };
 
@@ -2749,8 +2764,21 @@ router.post('/:journey_id/upload', upload.single('file'), multerErrorHandler, as
  * Validates x-admin-key header against ADMIN_API_KEY environment variable
  */
 function adminGuard(req, res, next) {
+  // C7A Diagnostic: adminGuard entry
+  const keyPresent = !!(req.headers['x-admin-key'] || req.query.key);
+  const envConfigured = !!process.env.ADMIN_API_KEY;
+  console.log('[C7A_ADMIN_GUARD_ENTRY]', JSON.stringify({
+    route: req.path,
+    method: req.method,
+    keyPresent: keyPresent,
+    envConfigured: envConfigured
+  }));
+
   const key = req.headers['x-admin-key'] || req.query.key;
   if (!process.env.ADMIN_API_KEY) {
+    console.log('[C7A_ADMIN_GUARD_DISABLED]', JSON.stringify({
+      result: 'ADMIN_API_KEY_NOT_CONFIGURED'
+    }));
     return res.status(503).json({
       success: false,
       error: 'ADMIN_DISABLED',
@@ -2758,8 +2786,15 @@ function adminGuard(req, res, next) {
     });
   }
   if (key === process.env.ADMIN_API_KEY) {
+    console.log('[C7A_ADMIN_GUARD_AUTHORIZED]', JSON.stringify({
+      result: 'AUTHORIZED'
+    }));
     return next();
   }
+  console.log('[C7A_ADMIN_GUARD_UNAUTHORIZED]', JSON.stringify({
+    result: 'UNAUTHORIZED',
+    keySupplied: keyPresent
+  }));
   return res.status(401).json({
     success: false,
     error: 'UNAUTHORIZED',
@@ -2994,7 +3029,24 @@ router.post('/admin/storybook/:journey_id/upload-story-art',
   uploadStoryArt.single('file'),
   multerStoryArtErrorHandler,
   async (req, res) => {
+    // C7A Diagnostic: Handler entry
+    console.log('[C7A_C3B_HANDLER_ENTRY]', JSON.stringify({
+      journey_id: req.params.journey_id,
+      filePresent: !!req.file,
+      fileName: req.file?.originalname || null,
+      fileSize: req.file?.size || null,
+      fileMime: req.file?.mimetype || null,
+      bodyKeys: req.body ? Object.keys(req.body).join(',') : 'null',
+      locationValue: req.body?.location || null,
+      bodyLocationPresent: 'location' in (req.body || {})
+    }));
+
     if (!db || !storageAdapter || !goldenNineContract) {
+      console.log('[C7A_C3B_SERVICE_UNAVAILABLE]', JSON.stringify({
+        db: !!db,
+        storageAdapter: !!storageAdapter,
+        goldenNineContract: !!goldenNineContract
+      }));
       return res.status(503).json({
         success: false,
         error: 'SERVICE_UNAVAILABLE',
