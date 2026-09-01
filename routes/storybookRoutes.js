@@ -2387,7 +2387,15 @@ const multer = require('multer');
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: parseInt(process.env.STORYBOOK_MAX_FILE_SIZE || 5242880) // 5MB default
+    fileSize: parseInt(process.env.STORYBOOK_MAX_FILE_SIZE || 5242880) // 5MB default (C3A REAL photos)
+  }
+});
+
+// C3B Story Art upload (10MB limit, separate instance)
+const uploadStoryArt = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: parseInt(process.env.STORYBOOK_STORY_ART_MAX_FILE_SIZE || 10485760) // 10MB default
   }
 });
 
@@ -2400,6 +2408,18 @@ const multerErrorHandler = (err, req, res, next) => {
       success: false,
       error: 'FILE_TOO_LARGE',
       message: `파일이 ${Math.floor(parseInt(process.env.STORYBOOK_MAX_FILE_SIZE || 5242880) / 1024 / 1024)}MB를 초과했습니다`
+    });
+  }
+  next(err);
+};
+
+// Story Art specific error handler (10MB limit)
+const multerStoryArtErrorHandler = (err, req, res, next) => {
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({
+      success: false,
+      error: 'FILE_TOO_LARGE',
+      message: `파일이 ${Math.floor(parseInt(process.env.STORYBOOK_STORY_ART_MAX_FILE_SIZE || 10485760) / 1024 / 1024)}MB를 초과했습니다`
     });
   }
   next(err);
@@ -2971,7 +2991,8 @@ router.get('/admin/storybook/:journey_id', adminGuard, async (req, res) => {
  */
 router.post('/admin/storybook/:journey_id/upload-story-art',
   adminGuard,
-  upload.single('file'),
+  uploadStoryArt.single('file'),
+  multerStoryArtErrorHandler,
   async (req, res) => {
     if (!db || !storageAdapter || !goldenNineContract) {
       return res.status(503).json({

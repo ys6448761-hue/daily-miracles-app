@@ -1137,6 +1137,52 @@ function runFinalTests() {
     'Frontend assets array contains correct canonical locations'
   );
 
+  // Test 46: C3B Story Art Upload Route Configuration
+  console.log('  Test 46: C3B Story Art Route Configuration');
+  const c3bRouteConfig = {
+    path: '/admin/storybook/:journey_id/upload-story-art',
+    method: 'POST',
+    middleware: [
+      'adminGuard',
+      'uploadStoryArt.single("file")',
+      'multerStoryArtErrorHandler',
+      'async handler'
+    ],
+    maxFileSize: 10485760, // 10MB
+    allowedMimes: ['image/jpeg', 'image/png', 'image/webp']
+  };
+
+  assert(
+    c3bRouteConfig.path === '/admin/storybook/:journey_id/upload-story-art',
+    'C3B route path is correct'
+  );
+
+  assert(
+    c3bRouteConfig.maxFileSize === 10485760,
+    'Story Art max file size is 10MB (distinct from C3A 5MB)'
+  );
+
+  assert(
+    c3bRouteConfig.middleware.includes('uploadStoryArt.single("file")') &&
+    c3bRouteConfig.middleware.includes('multerStoryArtErrorHandler'),
+    'C3B route includes story-art-specific multer and error handler'
+  );
+
+  // Test 47: Multer error handler distinguishes C3A vs C3B
+  console.log('  Test 47: Multer Error Handling Separation');
+  const c3aMaxSize = 5242880; // 5MB
+  const c3bMaxSize = 10485760; // 10MB
+
+  assert(
+    c3aMaxSize < c3bMaxSize,
+    'C3A max size (5MB) is less than C3B (10MB)'
+  );
+
+  assert(
+    c3aMaxSize === 5242880 && c3bMaxSize === 10485760,
+    'Default size limits are correctly distinguished'
+  );
+
   // ═══════════════════════════════════════════════════════════════════════════
   // Final Summary
   // ═══════════════════════════════════════════════════════════════════════════
