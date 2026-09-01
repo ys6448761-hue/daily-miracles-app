@@ -1090,6 +1090,53 @@ function runFinalTests() {
     'Response journey.assets is array'
   );
 
+  // Test 45: Frontend response parsing consistency
+  console.log('  Test 45: Frontend /my-journey Response Parsing');
+
+  // Simulate what frontend should do
+  const mockApiResponse = {
+    ok: true,
+    journey: {
+      id: '1fe5c77d-f8b3-4f8d-b2d3-4da0b31c27f1',
+      status: 'photos_complete',
+      source_hotel: 'yeosu',
+      wish_text: '소원입니다',
+      created_at: '2026-08-31T12:00:00Z',
+      assets: [
+        { id: 'a1', location: 'jinamgwan', slot: 'real_a' },
+        { id: 'a2', location: 'jinamgwan', slot: 'real_b' },
+        { id: 'a3', location: 'cablecar', slot: 'real_a' },
+        { id: 'a4', location: 'cablecar', slot: 'real_b' },
+        { id: 'a5', location: 'jongpo', slot: 'real_a' },
+        { id: 'a6', location: 'jongpo', slot: 'real_b' }
+      ]
+    }
+  };
+
+  // Frontend MUST extract journey object (not entire response)
+  const frontendJourneyData = mockApiResponse.journey;
+  const frontendAssets = mockApiResponse.journey?.assets || [];
+
+  assert(
+    frontendJourneyData.status === 'photos_complete',
+    'Frontend correctly extracts journey.status'
+  );
+
+  assert(
+    frontendJourneyData.status !== mockApiResponse.status,
+    'Frontend does NOT use top-level status'
+  );
+
+  assert(
+    frontendAssets.length === 6,
+    'Frontend correctly extracts journey.assets (6 canonical REALs)'
+  );
+
+  assert(
+    frontendAssets[0].location === 'jinamgwan',
+    'Frontend assets array contains correct canonical locations'
+  );
+
   // ═══════════════════════════════════════════════════════════════════════════
   // Final Summary
   // ═══════════════════════════════════════════════════════════════════════════

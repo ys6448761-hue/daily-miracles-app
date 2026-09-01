@@ -50,8 +50,8 @@ function StorybookView() {
       }
 
       const data = await response.json();
-      setJourney(data);
-      setAssets(data.assets || []);
+      setJourney(data.journey);
+      setAssets(data.journey?.assets || []);
     } catch (err) {
       setError(err.message || '스토리북을 불러올 수 없습니다');
       console.error('Fetch error:', err);
