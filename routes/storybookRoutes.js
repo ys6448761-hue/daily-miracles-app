@@ -2433,9 +2433,10 @@ const multerStoryArtErrorHandler = (err, req, res, next) => {
       message: `파일이 ${Math.floor(parseInt(process.env.STORYBOOK_STORY_ART_MAX_FILE_SIZE || 10485760) / 1024 / 1024)}MB를 초과했습니다`
     });
   }
-  console.log('[C7A_MULTER_ERROR_PASSTHROUGH]', JSON.stringify({
+  console.log('[C7A_MULTER_PASSTHROUGH_ERROR]', JSON.stringify({
     errCode: err.code,
-    willPassToNext: true
+    errMessage: err.message,
+    errName: err.name
   }));
   next(err);
 };
