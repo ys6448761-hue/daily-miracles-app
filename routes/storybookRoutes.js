@@ -2248,6 +2248,33 @@ router.get('/restore', async (req, res) => {
       restored_from_journey_id: journey.id
     });
 
+    // Step 3.5: CRITICAL — Update journey ownership to new session
+    // Without this, my-journey will not resolve the journey (session_id mismatch)
+    const updateJourneySessionQuery = `
+      UPDATE dt_storybook_journeys
+      SET session_id = $1, updated_at = NOW()
+      WHERE id = $2
+    `;
+    const updateResult = await db.query(updateJourneySessionQuery, [newSessionId, journey.id]);
+
+    if (updateResult.rowCount === 0) {
+      console.error('[C7A_RESTORE_SESSION_SYNC_FAILED]', {
+        journey_id: journey.id,
+        newSessionId: newSessionId,
+        reason: 'UPDATE affected 0 rows'
+      });
+      return res.status(500).json({
+        ok: false,
+        error: 'SESSION_SYNC_FAILED',
+        message: 'Failed to restore session ownership'
+      });
+    }
+
+    console.log('[C7A_RESTORE_SESSION_SYNC_SUCCESS]', {
+      journey_id: journey.id,
+      sync_status: 'ownership_transferred'
+    });
+
     // Step 4: Set cookie
     const secure = process.env.NODE_ENV === 'production' || process.env.FORCE_SECURE_COOKIE === 'true';
     res.cookie('dt_storybook_session_id', newSessionId, {
