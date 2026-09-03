@@ -22,6 +22,9 @@ function StorybookRestore() {
   // Guard against duplicate restore requests for the same token
   const restoreAttemptedRef = useRef(null);
 
+  // Extract token in component scope (before useEffect)
+  const token = searchParams.get('token');
+
   // Diagnostic: Confirm StorybookRestore component is actually rendering
   useEffect(() => {
     console.log('[C7A_RESTORE_ROUTE_MATCHED] StorybookRestore component mounted');
@@ -29,8 +32,6 @@ function StorybookRestore() {
   }, []);
 
   useEffect(() => {
-    const token = searchParams.get('token');
-
     const restore = async () => {
       try {
         console.log('[C7A_RESTORE_START]', { token: token ? 'present' : 'missing' });

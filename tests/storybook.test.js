@@ -1452,6 +1452,25 @@ function runFinalTests() {
       'Error catch block still sets error state'
     );
 
+    // Test 74: Token declared in component scope (NOT in effect scope)
+    console.log('  Test 74: Token scope — component-level declaration');
+    const tokenInComponentScope = restoreCode.includes('const token = searchParams.get(\'token\')') &&
+                                  restoreCode.indexOf('const token = searchParams.get(\'token\')') <
+                                  restoreCode.indexOf('useEffect(() => {');
+    assert(
+      tokenInComponentScope,
+      'token extracted in component scope BEFORE useEffect (not inside effect)'
+    );
+
+    // Test 75: useEffect dependency array references component-scoped token
+    console.log('  Test 75: Dependency array closure safety');
+    const effectWithTokenDep = /\}, \[token,\s*navigate\]\);/.test(restoreCode) ||
+                               /\}, \[token\]\);/.test(restoreCode);
+    assert(
+      effectWithTokenDep && tokenInComponentScope,
+      'useEffect dependency [token, navigate] references component-scoped token (not closure error)'
+    );
+
   } catch (e) {
     console.warn('  ⚠️ Could not verify StorybookRestore.jsx:', e.message);
   }
