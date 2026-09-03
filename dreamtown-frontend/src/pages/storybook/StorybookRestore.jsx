@@ -19,10 +19,17 @@ function StorybookRestore() {
   const [status, setStatus] = useState('restoring');
   const [error, setError] = useState(null);
 
+  // Diagnostic: Confirm StorybookRestore component is actually rendering
+  useEffect(() => {
+    console.log('[C7A_RESTORE_ROUTE_MATCHED] StorybookRestore component mounted');
+    console.log('[C7A_URL]', window.location.href);
+  }, []);
+
   useEffect(() => {
     const restore = async () => {
       try {
         const token = searchParams.get('token');
+        console.log('[C7A_RESTORE_START]', { token: token ? 'present' : 'missing' });
 
         if (!token) {
           setError('복구 토큰이 없습니다');

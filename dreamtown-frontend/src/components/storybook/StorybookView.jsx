@@ -21,10 +21,26 @@ import './StorybookView.css';
 
 function StorybookView() {
   const navigate = useNavigate();
+  const { journey_id } = useParams();
   const [journey, setJourney] = useState(null);
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Guard: If route collision occurred and journey_id = "restore", redirect to restore route
+  useEffect(() => {
+    if (journey_id === 'restore') {
+      console.warn('[C7A_ROUTE_COLLISION_DETECTED] journey_id is "restore", redirecting to /storybook/restore');
+      // Extract token from window location if available
+      const token = new URLSearchParams(window.location.search).get('token');
+      if (token) {
+        navigate(`/storybook/restore?token=${encodeURIComponent(token)}`);
+      } else {
+        navigate('/storybook/restore');
+      }
+      return;
+    }
+  }, [journey_id, navigate]);
 
   useEffect(() => {
     fetchMyJourney();

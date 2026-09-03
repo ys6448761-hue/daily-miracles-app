@@ -222,10 +222,12 @@ export default function App() {
               <PartnerVerify />
             </Suspense>
           } />
-          {/* RAMADA Storybook C2-C5 */}
+          {/* RAMADA Storybook C2-C5 — Order matters! Specific routes BEFORE dynamic :journey_id */}
           <Route path="/storybook"                 element={<StorybookLanding />} />
+          {/* Explicit routes before dynamic parameter routes */}
           <Route path="/storybook/restore"         element={<StorybookRestore />} />
           <Route path="/storybook/:journey_id/upload" element={<StorybookUpload />} />
+          {/* Dynamic route LAST (will match any /storybook/xxx) */}
           <Route path="/storybook/:journey_id"     element={<StorybookView />} />
           <Route path="*"                          element={<RouteMissDiagnostic />} />
         </Routes>
