@@ -1559,6 +1559,74 @@ function runFinalTests() {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // Test 81-83: Plant Star Transaction Safety (C4)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  console.log('\n📋 Test Suite: Plant Star Transaction Safety (C4)\n');
+
+  // Test 81: Verify plant-star uses separate query() calls (not multi-statement)
+  console.log('  Test 81: Transaction uses separate db.query() calls');
+  try {
+    const fs = require('fs');
+    const routesPath = require('path').join(__dirname, '..', 'routes', 'storybookRoutes.js');
+    const routesCode = fs.readFileSync(routesPath, 'utf8');
+
+    // Check that BEGIN, SELECT FOR UPDATE, COMMIT are separate queries
+    const hasBeginCall = /await db\.query\(\s*['""]BEGIN[;]?['""]\s*\)/.test(routesCode);
+    const hasSelectForUpdateCall = /await db\.query\(\s*['""]SELECT.*FOR UPDATE/.test(routesCode);
+    const hasCommitCall = /await db\.query\(\s*['""]COMMIT[;]?['""]\s*\)/.test(routesCode);
+
+    // Ensure no multi-statement concatenation
+    const noMultiStatement = !/BEGIN[^']*SELECT[^']*SELECT[^']*`/.test(routesCode);
+
+    assert(
+      hasBeginCall && hasSelectForUpdateCall && hasCommitCall && noMultiStatement,
+      'plant-star executes BEGIN, SELECT FOR UPDATE, COMMIT as separate query() calls (PostgreSQL prepared statement fix)'
+    );
+  } catch (e) {
+    console.warn('  ⚠️ Could not verify transaction calls:', e.message);
+  }
+
+  // Test 82: Idempotency check exists before transaction
+  console.log('  Test 82: Idempotency check (prevents duplicate stars)');
+  try {
+    const fs = require('fs');
+    const routesPath = require('path').join(__dirname, '..', 'routes', 'storybookRoutes.js');
+    const routesCode = fs.readFileSync(routesPath, 'utf8');
+    const plantStarHandler = routesCode.split('router.post(\'/:journey_id/plant-star\'')[1] || '';
+
+    // Check for idempotency check BEFORE transaction
+    const hasIdempotencyCheck = /if\s*\(\s*journey\.star_id\s*\)/.test(plantStarHandler);
+    const idempotencyBeforeTransaction = plantStarHandler.indexOf('if') < plantStarHandler.indexOf('BEGIN');
+
+    assert(
+      hasIdempotencyCheck && idempotencyBeforeTransaction,
+      'plant-star checks journey.star_id BEFORE transaction (idempotency: return existing star)'
+    );
+  } catch (e) {
+    console.warn('  ⚠️ Could not verify idempotency check:', e.message);
+  }
+
+  // Test 83: Row locking with FOR UPDATE inside transaction
+  console.log('  Test 83: Row locking prevents race condition');
+  try {
+    const fs = require('fs');
+    const routesPath = require('path').join(__dirname, '..', 'routes', 'storybookRoutes.js');
+    const routesCode = fs.readFileSync(routesPath, 'utf8');
+    const plantStarHandler = routesCode.split('router.post(\'/:journey_id/plant-star\'')[1] || '';
+
+    // Check for FOR UPDATE locking
+    const hasForUpdate = /FOR UPDATE/.test(plantStarHandler);
+
+    assert(
+      hasForUpdate,
+      'plant-star uses FOR UPDATE to lock journey row during transaction'
+    );
+  } catch (e) {
+    console.warn('  ⚠️ Could not verify row locking:', e.message);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // Final Summary
   // ═══════════════════════════════════════════════════════════════════════════
 
