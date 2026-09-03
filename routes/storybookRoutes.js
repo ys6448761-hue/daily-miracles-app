@@ -2279,6 +2279,137 @@ router.get('/restore', async (req, res) => {
 });
 
 /**
+ * POST /api/storybook/admin/debug/rotate-restore-token
+ * [STAGING-ONLY] Generate a fresh restore token for a journey
+ *
+ * Purpose: Testing E2E flow when browser session is lost
+ * Security: adminGuard required, staging-only, NODE_ENV checked
+ *
+ * Request body: { journey_id }
+ * Response: { success, journey_id, restore_token, restore_url, expires_at }
+ *
+ * Side effects:
+ * - Old restore token is invalidated (hash is replaced)
+ * - Journey status/assets unchanged
+ * - plaintext token returned 1 time only
+ */
+router.post('/admin/debug/rotate-restore-token', adminGuard, async (req, res) => {
+  // Staging-only gate
+  if (process.env.NODE_ENV !== 'staging') {
+    console.log('[C7A_ROTATE_TOKEN_STAGING_GATE]', JSON.stringify({
+      result: 'BLOCKED_NOT_STAGING',
+      node_env: process.env.NODE_ENV
+    }));
+    return res.status(404).json({
+      success: false,
+      error: 'NOT_FOUND'
+    });
+  }
+
+  if (!db || !sessionService) {
+    return res.status(503).json({
+      success: false,
+      error: 'SERVICE_UNAVAILABLE'
+    });
+  }
+
+  const { journey_id } = req.body;
+
+  if (!journey_id) {
+    return res.status(400).json({
+      success: false,
+      error: 'MISSING_JOURNEY_ID',
+      message: 'Request body must include journey_id'
+    });
+  }
+
+  try {
+    // Step 1: Find journey by id
+    console.log('[C7A_ROTATE_TOKEN_LOOKUP]', JSON.stringify({
+      stage: 'FINDING_JOURNEY'
+    }));
+
+    const journeyQuery = `
+      SELECT id, session_id, status, expires_at
+      FROM dt_storybook_journeys
+      WHERE id = $1
+    `;
+
+    const journeyResult = await db.query(journeyQuery, [journey_id]);
+
+    if (journeyResult.rows.length === 0) {
+      console.log('[C7A_ROTATE_TOKEN_NOT_FOUND]', JSON.stringify({
+        stage: 'JOURNEY_NOT_FOUND'
+      }));
+      return res.status(404).json({
+        success: false,
+        error: 'JOURNEY_NOT_FOUND',
+        message: 'No journey found with this ID'
+      });
+    }
+
+    const journey = journeyResult.rows[0];
+
+    // Step 2: Generate fresh restore token
+    console.log('[C7A_ROTATE_TOKEN_GENERATE]', JSON.stringify({
+      stage: 'GENERATING_TOKEN'
+    }));
+
+    const restoreToken = sessionService.generateRestoreToken();
+    const tokenHash = sessionService.hashRestoreToken(restoreToken);
+
+    // Step 3: Update DB with new token hash
+    console.log('[C7A_ROTATE_TOKEN_DB_UPDATE]', JSON.stringify({
+      stage: 'UPDATING_DB_HASH'
+    }));
+
+    const updateQuery = `
+      UPDATE dt_storybook_journeys
+      SET restore_token_hash = $1, updated_at = NOW()
+      WHERE id = $2
+      RETURNING id, status, expires_at
+    `;
+
+    const updateResult = await db.query(updateQuery, [tokenHash, journey_id]);
+
+    if (updateResult.rows.length === 0) {
+      throw new Error('Failed to update journey restore token');
+    }
+
+    const updatedJourney = updateResult.rows[0];
+
+    // Step 4: Construct restore URL
+    const restoreUrl = `${process.env.FRONTEND_URL || 'http://localhost:5100'}/storybook/restore?token=${restoreToken}`;
+
+    // Step 5: Return response (plaintext token 1 time only)
+    console.log('[C7A_ROTATE_TOKEN_SUCCESS]', JSON.stringify({
+      stage: 'ROTATION_SUCCESS',
+      journey_id: journey_id
+    }));
+
+    return res.status(200).json({
+      success: true,
+      journey_id: updatedJourney.id,
+      restore_token: restoreToken,
+      restore_url: restoreUrl,
+      expires_at: updatedJourney.expires_at
+    });
+
+  } catch (error) {
+    console.error('[STORYBOOK_ROTATE_TOKEN_ERROR]:', error);
+    console.log('[C7A_ROTATE_TOKEN_UNHANDLED_ERROR]', JSON.stringify({
+      stage: 'UNHANDLED_ERROR',
+      error_message: error.message
+    }));
+    return res.status(500).json({
+      success: false,
+      error: 'ROTATION_FAILED',
+      message: error.message
+    });
+  }
+});
+
+/**
  * GET /api/storybook/my-journey
  * Get current journey from session cookie
  *

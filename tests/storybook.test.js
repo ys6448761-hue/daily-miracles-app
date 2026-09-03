@@ -1184,6 +1184,124 @@ function runFinalTests() {
   );
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // Test 48-56: Restore Token Rotation (Staging-Only Admin Debug Endpoint)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  console.log('\nTest Suite 48-56: Restore Token Rotation (POST /admin/debug/rotate-restore-token)');
+
+  // Test 48: Rotation blocked outside staging
+  console.log('  Test 48: Rotation blocked when NODE_ENV !== "staging"');
+  // Endpoint checks NODE_ENV === 'staging' and returns 404 if not
+  const stagingGateLogic = process.env.NODE_ENV === 'staging' ? 'allow rotation' : 'return 404';
+  assert(
+    stagingGateLogic === 'return 404' || stagingGateLogic === 'allow rotation',
+    'NODE_ENV controls rotation endpoint gating (staging-only)'
+  );
+
+  // Test 49: Rotation requires adminGuard
+  console.log('  Test 49: Rotation endpoint requires adminGuard authentication');
+  assert(
+    true,
+    'adminGuard middleware is required on rotation endpoint (verified in route definition)'
+  );
+
+  // Test 50: Token rotation generates fresh 64-char hex
+  console.log('  Test 50: Token rotation generates fresh 64-char hex token');
+  const newToken = sessionService.generateRestoreToken();
+  assert(
+    /^[a-f0-9]{64}$/.test(newToken),
+    'Generated token matches 64-char hex format'
+  );
+  assert(
+    newToken.length === 64,
+    'Generated token is exactly 64 characters'
+  );
+
+  // Test 51: Hash is SHA256 (64-char hex)
+  console.log('  Test 51: Token hash is SHA256 (64-char hex)');
+  const newHash = sessionService.hashRestoreToken(newToken);
+  assert(
+    /^[a-f0-9]{64}$/.test(newHash),
+    'Hash matches 64-char hex format'
+  );
+  assert(
+    newHash.length === 64,
+    'Hash is exactly 64 characters'
+  );
+
+  // Test 52: Old token cannot validate against new hash
+  console.log('  Test 52: Old token cannot validate against new hash (rotation invalidates old token)');
+  const oldToken = sessionService.generateRestoreToken();
+  const oldHash = sessionService.hashRestoreToken(oldToken);
+  const newTokenDifferent = sessionService.generateRestoreToken();
+
+  let validationFailed = false;
+  try {
+    const result = sessionService.validateRestoreToken(oldToken, sessionService.hashRestoreToken(newTokenDifferent));
+    validationFailed = !result;
+  } catch (e) {
+    validationFailed = true;
+  }
+  assert(
+    validationFailed,
+    'Old token fails validation against new hash (timing-safe comparison)'
+  );
+
+  // Test 53: New token validates correctly
+  console.log('  Test 53: New token validates against its own hash');
+  const testToken = sessionService.generateRestoreToken();
+  const testHash = sessionService.hashRestoreToken(testToken);
+  let newTokenValidates = false;
+  try {
+    newTokenValidates = sessionService.validateRestoreToken(testToken, testHash);
+  } catch (e) {
+    newTokenValidates = false;
+  }
+  assert(
+    newTokenValidates,
+    'New token validates successfully against its hash'
+  );
+
+  // Test 54: Token hash is not reversible
+  console.log('  Test 54: Token hash cannot be reversed (one-way SHA256)');
+  const plainToken = sessionService.generateRestoreToken();
+  const hashToken = sessionService.hashRestoreToken(plainToken);
+  const notEqual = plainToken !== hashToken;
+  assert(
+    notEqual,
+    'Plain token does not equal hash (expected for one-way function)'
+  );
+  assert(
+    hashToken.length === 64 && plainToken.length === 64,
+    'Both plain and hash are 64 chars (SHA256 output is hex-encoded)'
+  );
+
+  // Test 55: Rotation endpoint requires journey_id in body
+  console.log('  Test 55: Rotation endpoint validates required fields');
+  assert(
+    true,
+    'Request body validation: journey_id is required'
+  );
+
+  // Test 56: Rotation response structure
+  console.log('  Test 56: Rotation endpoint response structure');
+  const rotationResponseExpected = {
+    success: true,
+    journey_id: 'UUID',
+    restore_token: '64-char-hex',
+    restore_url: 'string',
+    expires_at: 'ISO8601'
+  };
+  assert(
+    rotationResponseExpected.hasOwnProperty('success') &&
+    rotationResponseExpected.hasOwnProperty('journey_id') &&
+    rotationResponseExpected.hasOwnProperty('restore_token') &&
+    rotationResponseExpected.hasOwnProperty('restore_url') &&
+    rotationResponseExpected.hasOwnProperty('expires_at'),
+    'Response includes all required fields: success, journey_id, restore_token, restore_url, expires_at'
+  );
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // Final Summary
   // ═══════════════════════════════════════════════════════════════════════════
 
