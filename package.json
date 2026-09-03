@@ -32,6 +32,8 @@
     "travel-guide:migrate": "node database/migrate-travel-guide.js",
     "test:attendance": "node tests/attendance/attendanceService.test.js",
     "test:storybook": "node tests/storybook.test.js",
+    "test:storybook-routing": "node tests/storybook-routing-e2e.test.js",
+    "test:storybook-all": "node tests/storybook.test.js && node tests/storybook-routing-e2e.test.js",
     "test:kst": "node tests/utils/kstDate.test.js",
     "test:p0": "node tests/utils/kstDate.test.js && node tests/attendance/attendanceService.test.js",
     "prisma:generate": "npx prisma generate --schema=prisma/schema.prisma",

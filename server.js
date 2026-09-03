@@ -2706,6 +2706,29 @@ app.get('/admin/star/:access_key', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin', 'star-detail.html'));
 });
 
+// ═══════════════════════════════════════════════════════════════════════════
+// C7A Restore Route Guard — MUST come BEFORE /storybook/:key
+// ═══════════════════════════════════════════════════════════════════════════
+// Route: GET /storybook/restore?token=...
+// Purpose: Serve React SPA (index.html) instead of storybook-share.html
+// The SPA's StorybookRestore component will handle token validation via API
+// Query string (?token=...) is preserved and passed to frontend
+// ═══════════════════════════════════════════════════════════════════════════
+app.get('/storybook/restore', (req, res) => {
+  // Use same SPA serving pattern as DT_SPA_ROUTES
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
+  const dtFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist');
+  res.sendFile(path.join(dtFrontendPath, 'index.html'), (err) => {
+    if (err) {
+      console.error('[C7A_RESTORE_SPA_ERROR]', 'Failed to serve SPA for /storybook/restore', err.message);
+      res.status(503).send('<html><body><h2>DreamTown 준비 중입니다. 잠시 후 다시 시도해주세요.</h2></body></html>');
+    }
+  });
+});
+
 // ---------- 스토리북 공유 페이지 (/storybook/:key) — OG SSR ----------
 app.get('/storybook/:key', async (req, res) => {
   const { key } = req.params;
