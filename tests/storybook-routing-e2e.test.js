@@ -164,6 +164,76 @@ try {
   console.warn('  ⚠️ Could not verify App.jsx routes:', e.message);
 }
 
+// Test 11: Backend route precedence — UUID journey route before legacy share route
+console.log('  Test 11: Backend route order (UUID journey before legacy share)');
+try {
+  // serverCode already loaded in Test 2, reuse it
+
+  // Check for C7A UUID journey route
+  const uuidJourneyRoutePos = serverCode.indexOf("app.get('/storybook/:journey_id([0-9a-f\\\\-]{36})'");
+  const legacyShareRoutePos = serverCode.indexOf("app.get('/storybook/:key'");
+
+  assert(
+    uuidJourneyRoutePos > 0,
+    'C7A UUID journey route exists: app.get(\'/storybook/:journey_id([0-9a-f\\\\-]{36})\')'
+  );
+
+  assert(
+    legacyShareRoutePos > 0,
+    'Legacy share route exists: app.get(\'/storybook/:key\')'
+  );
+
+  assert(
+    uuidJourneyRoutePos < legacyShareRoutePos,
+    'C7A UUID journey route is registered BEFORE legacy share route (takes precedence)'
+  );
+} catch (e) {
+  console.warn('  ⚠️ Could not verify server.js route order:', e.message);
+}
+
+// Test 12: C7A UUID journey route serves DreamTown SPA (index.html)
+console.log('  Test 12: C7A UUID journey route serves DreamTown SPA');
+try {
+  const uuidRoutePattern = /app\.get\('\/storybook\/:journey_id\(\[0-9a-f\\\\-\]\{36\}\)'.+?res\.sendFile\(.+?index\.html/s;
+  const servesUuidSPA = uuidRoutePattern.test(serverCode);
+  assert(
+    servesUuidSPA,
+    'C7A UUID journey route calls res.sendFile(...index.html)'
+  );
+} catch (e) {
+  console.warn('  ⚠️ Could not verify UUID route serves SPA:', e.message);
+}
+
+// Test 13: UUID route has cache-control headers (same as restore route)
+console.log('  Test 13: Cache control on UUID journey route');
+try {
+  const uuidRouteStart = serverCode.indexOf("app.get('/storybook/:journey_id");
+  const uuidRouteEnd = serverCode.indexOf('});', uuidRouteStart);
+  const uuidRouteBody = serverCode.substring(uuidRouteStart, uuidRouteEnd);
+  const hasCacheHeaders = /Cache-Control.*no-cache|no-store/.test(uuidRouteBody);
+  assert(
+    hasCacheHeaders,
+    'UUID journey route sets Cache-Control: no-cache, no-store headers'
+  );
+} catch (e) {
+  console.warn('  ⚠️ Could not verify UUID route cache headers:', e.message);
+}
+
+// Test 14: Legacy share route is preserved (still handles non-UUID keys)
+console.log('  Test 14: Legacy share route preserved for non-UUID keys');
+try {
+  const legacyRouteStart = serverCode.indexOf("app.get('/storybook/:key'");
+  const legacyRouteEnd = serverCode.indexOf('});', legacyRouteStart + 100);
+  const legacyRouteBody = serverCode.substring(legacyRouteStart, legacyRouteEnd);
+  const servesShareHtml = /storybook-share\.html/.test(legacyRouteBody);
+  assert(
+    servesShareHtml,
+    'Legacy share route still serves storybook-share.html'
+  );
+} catch (e) {
+  console.warn('  ⚠️ Could not verify legacy share route:', e.message);
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Summary
 // ═══════════════════════════════════════════════════════════════════════════

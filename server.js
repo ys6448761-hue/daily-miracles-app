@@ -2729,6 +2729,27 @@ app.get('/storybook/restore', (req, res) => {
   });
 });
 
+// ═══════════════════════════════════════════════════════════════════════════
+// C7A Journey View — UUID path serves DreamTown React SPA
+// Route: GET /storybook/:journey_id (where journey_id is a UUID)
+// Purpose: Serve React SPA (index.html) for direct journey access
+// Must come BEFORE legacy /storybook/:key route (route precedence)
+// ═══════════════════════════════════════════════════════════════════════════
+app.get('/storybook/:journey_id([0-9a-f\\-]{36})', (req, res) => {
+  // Route only matches if journey_id is exactly 36 characters (UUID format)
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
+  const dtFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist');
+  res.sendFile(path.join(dtFrontendPath, 'index.html'), (err) => {
+    if (err) {
+      console.error('[C7A_JOURNEY_SPA_ERROR]', 'Failed to serve SPA for C7A journey UUID', req.params.journey_id, err.message);
+      res.status(503).send('<html><body><h2>DreamTown 준비 중입니다. 잠시 후 다시 시도해주세요.</h2></body></html>');
+    }
+  });
+});
+
 // ---------- 스토리북 공유 페이지 (/storybook/:key) — OG SSR ----------
 app.get('/storybook/:key', async (req, res) => {
   const { key } = req.params;
