@@ -3611,43 +3611,52 @@ router.post('/:journey_id/plant-star', async (req, res) => {
 
     // ─────────────────────────────────────────────────────────────────
     // Step 4: Database Transaction with Row Locking
+    // Execute each statement separately (PostgreSQL prepared statement limit)
     // ─────────────────────────────────────────────────────────────────
 
-    const starCreationResult = await db.query(
-      `BEGIN TRANSACTION;
+    try {
+      // Step 4a: BEGIN transaction (must be separate query call)
+      await db.query('BEGIN;');
 
-       -- Lock the journey row for update
-       SELECT id FROM dt_storybook_journeys WHERE id = $1 FOR UPDATE;
-
-       -- Double-check star_id inside transaction (prevent race condition)
-       SELECT star_id FROM dt_storybook_journeys WHERE id = $1;`,
-      [journey_id]
-    );
-
-    // Check if star was created by concurrent request
-    const doubleCheckResult = await db.query(
-      'SELECT star_id FROM dt_storybook_journeys WHERE id = $1',
-      [journey_id]
-    );
-
-    if (doubleCheckResult.rows[0].star_id) {
-      // Another request created the star — fetch and return it
-      const existingStarResult = await db.query(
-        'SELECT id, star_name FROM dt_stars WHERE id = $1',
-        [doubleCheckResult.rows[0].star_id]
+      // Step 4b: Lock the journey row for update (separate query)
+      await db.query(
+        'SELECT id FROM dt_storybook_journeys WHERE id = $1 FOR UPDATE;',
+        [journey_id]
       );
 
-      if (existingStarResult.rows.length > 0) {
-        const existingStar = existingStarResult.rows[0];
-        await db.query('ROLLBACK;');
-        return res.status(200).json({
-          success: true,
-          star_id: existingStar.id,
-          star_name: existingStar.star_name,
-          journey_status: 'star_planted',
-          message: '별이 이미 심어졌습니다'
-        });
+      // Step 4c: Double-check star_id inside transaction (prevent race condition)
+      const doubleCheckResult = await db.query(
+        'SELECT star_id FROM dt_storybook_journeys WHERE id = $1;',
+        [journey_id]
+      );
+
+      if (doubleCheckResult.rows[0].star_id) {
+        // Another request created the star — fetch and return it
+        const existingStarResult = await db.query(
+          'SELECT id, star_name FROM dt_stars WHERE id = $1;',
+          [doubleCheckResult.rows[0].star_id]
+        );
+
+        if (existingStarResult.rows.length > 0) {
+          const existingStar = existingStarResult.rows[0];
+          await db.query('ROLLBACK;');
+          return res.status(200).json({
+            success: true,
+            star_id: existingStar.id,
+            star_name: existingStar.star_name,
+            journey_status: 'star_planted',
+            message: '별이 이미 심어졌습니다'
+          });
+        }
       }
+    } catch (txError) {
+      // Transaction error — rollback
+      try {
+        await db.query('ROLLBACK;');
+      } catch (rollbackErr) {
+        // Ignore rollback error if already rolled back
+      }
+      throw txError;
     }
 
     // ─────────────────────────────────────────────────────────────────
