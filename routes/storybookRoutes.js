@@ -2492,6 +2492,31 @@ router.get('/my-journey', async (req, res) => {
 
     const assetsResult = await db.query(assetsQuery, [journey.id]);
 
+    // Step 2.5: Generate signed URLs for Supabase assets
+    let assetsWithUrls = assetsResult.rows;
+    if (storageAdapter && process.env.STORAGE_TYPE === 'supabase') {
+      try {
+        assetsWithUrls = await Promise.all(
+          assetsResult.rows.map(async (asset) => {
+            try {
+              const signedUrl = await storageAdapter.getSignedUrl(asset.object_key);
+              return { ...asset, signed_url: signedUrl };
+            } catch (err) {
+              console.warn('[C7A_SIGNED_URL_WARN]', {
+                objectKey: asset.object_key,
+                error: err.message
+              });
+              // Return asset without URL — frontend will use fallback
+              return asset;
+            }
+          })
+        );
+      } catch (err) {
+        console.warn('[C7A_SIGNED_URL_BATCH_ERROR]', err.message);
+        // If URL generation fails entirely, return assets as-is (frontend fallback)
+      }
+    }
+
     return res.json({
       ok: true,
       journey: {
@@ -2502,7 +2527,7 @@ router.get('/my-journey', async (req, res) => {
         is_private: journey.is_private,
         created_at: journey.created_at,
         updated_at: journey.updated_at,
-        assets: assetsResult.rows
+        assets: assetsWithUrls
       }
     });
   } catch (error) {

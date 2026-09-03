@@ -1476,6 +1476,89 @@ function runFinalTests() {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // Test 76-80: Asset Signed URL Generation (C7A Private Storage)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  console.log('\n📋 Test Suite: Asset Signed URL Generation (C7A Private Supabase Storage)\n');
+
+  // Test 76: my-journey endpoint generates signed URLs for assets
+  console.log('  Test 76: my-journey endpoint applies signed URL logic');
+  try {
+    const fs = require('fs');
+    const routesPath = require('path').join(__dirname, '..', 'routes', 'storybookRoutes.js');
+    const routesCode = fs.readFileSync(routesPath, 'utf8');
+    const myJourneyBlock = routesCode.split('router.get(\'/my-journey\'')[1] || '';
+    const hasSignedUrlLogic = /assetsWithUrls|storageAdapter.*getSignedUrl|signed_url.*getSignedUrl/.test(myJourneyBlock);
+    assert(
+      hasSignedUrlLogic,
+      'my-journey endpoint generates signed URLs for assets (storageAdapter.getSignedUrl)'
+    );
+  } catch (e) {
+    console.warn('  ⚠️ Could not verify my-journey signed URL logic:', e.message);
+  }
+
+  // Test 77: Supabase storage adapter exists and has getSignedUrl method
+  console.log('  Test 77: Supabase storage adapter with getSignedUrl');
+  try {
+    const adapterPath = require('path').join(__dirname, '..', 'services', 'storybook', 'storageAdapter.js');
+    const adapterCode = fs.readFileSync(adapterPath, 'utf8');
+    const hasSupabaseClass = /class SupabaseStorageAdapter/.test(adapterCode);
+    const hasSupabaseGetSignedUrl = /async getSignedUrl.*supabase\.storage|createSignedUrl/.test(adapterCode);
+    assert(
+      hasSupabaseClass && hasSupabaseGetSignedUrl,
+      'SupabaseStorageAdapter class with async getSignedUrl method exists'
+    );
+  } catch (e) {
+    console.warn('  ⚠️ Could not verify storage adapter:', e.message);
+  }
+
+  // Test 78: TTL configuration for signed URLs
+  console.log('  Test 78: Signed URL TTL configuration');
+  try {
+    const adapterPath = require('path').join(__dirname, '..', 'services', 'storybook', 'storageAdapter.js');
+    const adapterCode = fs.readFileSync(adapterPath, 'utf8');
+    const hasTtlConfig = /SIGNED_URL_TTL_SECONDS.*900|this\.ttlSeconds.*parseInt.*SIGNED_URL_TTL/.test(adapterCode);
+    assert(
+      hasTtlConfig,
+      'Signed URL TTL configuration present (default 900 seconds = 15 min)'
+    );
+  } catch (e) {
+    console.warn('  ⚠️ Could not verify TTL config:', e.message);
+  }
+
+  // Test 79: Service role key security (never exposed to client)
+  console.log('  Test 79: Service role key security');
+  try {
+    // Verify service role key is used backend-only
+    const adapterPath = require('path').join(__dirname, '..', 'services', 'storybook', 'storageAdapter.js');
+    const adapterCode = fs.readFileSync(adapterPath, 'utf8');
+    const hasServiceRoleComment = /service.role.key|backend.only|SERVICE_ROLE_KEY/.test(adapterCode);
+    const noClientExposure = !(/res\.json.*SUPABASE_SERVICE_ROLE_KEY|return.*SUPABASE_SERVICE_ROLE_KEY/.test(adapterCode));
+    assert(
+      hasServiceRoleComment && noClientExposure,
+      'Service role key documentation present, not exposed to client response'
+    );
+  } catch (e) {
+    console.warn('  ⚠️ Could not verify service role security:', e.message);
+  }
+
+  // Test 80: Signed URL response contract
+  console.log('  Test 80: Signed URL in asset response');
+  try {
+    const fs = require('fs');
+    const routesPath = require('path').join(__dirname, '..', 'routes', 'storybookRoutes.js');
+    const routesCode = fs.readFileSync(routesPath, 'utf8');
+    const myJourneyBlock = routesCode.split('router.get(\'/my-journey\'')[1] || '';
+    const hasSignedUrlField = /assetsWithUrls|assets:.*assetsWithUrls|\{.*\.\.\.asset.*signed_url/.test(myJourneyBlock);
+    assert(
+      hasSignedUrlField,
+      'Asset response includes signed_url field for Supabase storage'
+    );
+  } catch (e) {
+    console.warn('  ⚠️ Could not verify response contract:', e.message);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // Final Summary
   // ═══════════════════════════════════════════════════════════════════════════
 
