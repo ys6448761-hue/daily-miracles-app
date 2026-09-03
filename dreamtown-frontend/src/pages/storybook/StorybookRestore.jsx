@@ -9,7 +9,7 @@
  * 4. Navigate to /storybook/:journey_id (view completed storybook)
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import './StorybookRestore.css';
 
@@ -19,6 +19,9 @@ function StorybookRestore() {
   const [status, setStatus] = useState('restoring');
   const [error, setError] = useState(null);
 
+  // Guard against duplicate restore requests for the same token
+  const restoreAttemptedRef = useRef(null);
+
   // Diagnostic: Confirm StorybookRestore component is actually rendering
   useEffect(() => {
     console.log('[C7A_RESTORE_ROUTE_MATCHED] StorybookRestore component mounted');
@@ -26,9 +29,10 @@ function StorybookRestore() {
   }, []);
 
   useEffect(() => {
+    const token = searchParams.get('token');
+
     const restore = async () => {
       try {
-        const token = searchParams.get('token');
         console.log('[C7A_RESTORE_START]', { token: token ? 'present' : 'missing' });
 
         if (!token) {
@@ -36,6 +40,13 @@ function StorybookRestore() {
           setStatus('error');
           return;
         }
+
+        // Guard: skip if we've already attempted restore for this token
+        if (restoreAttemptedRef.current === token) {
+          console.log('[C7A_RESTORE_DEDUP] Skipping duplicate restore for same token');
+          return;
+        }
+        restoreAttemptedRef.current = token;
 
         const response = await fetch(`/api/storybook/restore?token=${encodeURIComponent(token)}`, {
           method: 'GET',
@@ -67,7 +78,7 @@ function StorybookRestore() {
     };
 
     restore();
-  }, [searchParams, navigate]);
+  }, [token, navigate]);
 
   return (
     <div className="storybook-restore">

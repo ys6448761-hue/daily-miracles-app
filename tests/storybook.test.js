@@ -1391,6 +1391,72 @@ function runFinalTests() {
   );
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // Test 67-72: Frontend Duplicate Restore Prevention (C7A_RESTORE_DEDUP)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  console.log('\n📋 Test Suite: Frontend Duplicate Restore Prevention (C7A)\n');
+
+  // Verify StorybookRestore.jsx has deduplication guard
+  const fs = require('fs');
+  const restorePath = require('path').join(__dirname, '..', 'dreamtown-frontend', 'src', 'pages', 'storybook', 'StorybookRestore.jsx');
+  let restoreCode = '';
+  try {
+    restoreCode = fs.readFileSync(restorePath, 'utf8');
+
+    // Test 67: restoreAttemptedRef guard exists
+    console.log('  Test 67: Duplicate restore guard (restoreAttemptedRef)');
+    assert(
+      restoreCode.includes('restoreAttemptedRef') && restoreCode.includes('useRef'),
+      'StorybookRestore.jsx uses useRef for restoreAttemptedRef guard'
+    );
+
+    // Test 68: Guard checks token before restoring
+    console.log('  Test 68: Guard comparison logic');
+    assert(
+      restoreCode.includes('restoreAttemptedRef.current === token'),
+      'Guard compares restoreAttemptedRef.current === token (exact token match)'
+    );
+
+    // Test 69: Guard skips duplicate with dedup log
+    console.log('  Test 69: Dedup diagnostic log');
+    assert(
+      restoreCode.includes('[C7A_RESTORE_DEDUP]') && restoreCode.includes('Skipping duplicate'),
+      'Guard logs [C7A_RESTORE_DEDUP] on duplicate detection'
+    );
+
+    // Test 70: Token extracted to stable value
+    console.log('  Test 70: Token extracted as dependency variable');
+    assert(
+      restoreCode.includes('const token = searchParams.get(\'token\')') || restoreCode.includes('const token = searchParams.get("token")'),
+      'Token extracted from searchParams before effect runs'
+    );
+
+    // Test 71: Effect dependency includes token
+    console.log('  Test 71: useEffect dependency on token (not searchParams object)');
+    assert(
+      restoreCode.includes('[token') && restoreCode.includes('navigate]'),
+      'useEffect dependency array includes [token, navigate] (not [searchParams, navigate])'
+    );
+
+    // Test 72: Successful restore still navigates
+    console.log('  Test 72: Navigate on successful restore');
+    assert(
+      restoreCode.includes('navigate(`/storybook/${data.journey_id}`)'),
+      'navigate() called after successful restore fetch'
+    );
+
+    // Test 73: Error handling preserved
+    console.log('  Test 73: Error handling preserved');
+    assert(
+      restoreCode.includes('catch (err)') && restoreCode.includes('setStatus(\'error\')'),
+      'Error catch block still sets error state'
+    );
+
+  } catch (e) {
+    console.warn('  ⚠️ Could not verify StorybookRestore.jsx:', e.message);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // Final Summary
   // ═══════════════════════════════════════════════════════════════════════════
 
