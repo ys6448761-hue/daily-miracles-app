@@ -1,0 +1,102 @@
+{
+  "wish_id": "wish_W03_att",
+  "wish_text": "새로운 일을 시작해보고 싶어요",
+  "wish_type": "결심형",
+  "primary_gravity": "curiosity",
+  "gem_palette": {
+    "cafe": "citrine",
+    "hamel": "topaz"
+  },
+  "render_mode": "attraction_social",
+  "ratio": "9:16",
+  "total_duration_sec": 43,
+  "method": "layered_temporal_composition",
+  "moments": [
+    {
+      "id": "M1",
+      "role": "도착의 순간",
+      "file": "../../wish-render-prototype/W2/frames/F1_curiosity_cafe.png",
+      "emotion": "curiosity",
+      "start": 0,
+      "end": 12,
+      "duration": 12,
+      "subtitle": "오늘의 용기를 별에 담아두었어요",
+      "subtitle_offset": 0.3,
+      "has_water": false,
+      "water_y": 0.88,
+      "sky_h": 0.55
+    },
+    {
+      "id": "M2",
+      "role": "머무름의 순간",
+      "file": "../../wish-render-prototype/W2/frames/F3_calm_cafe.png",
+      "emotion": "calm",
+      "start": 14,
+      "end": 26,
+      "duration": 12,
+      "subtitle": "조금은 믿고 싶어졌어요",
+      "subtitle_offset": 0.3,
+      "has_water": false,
+      "water_y": 0.88,
+      "sky_h": 0.55
+    },
+    {
+      "id": "M3",
+      "role": "잔향의 순간",
+      "file": "../../wish-render-prototype/W2/frames/F5_curiosity_hamel.png",
+      "emotion": "curiosity",
+      "start": 28,
+      "end": 41,
+      "duration": 13,
+      "subtitle": "작은 빛 하나가 길이 되어줄 거예요",
+      "subtitle_offset": 0.3,
+      "has_water": true,
+      "water_y": 0.55,
+      "sky_h": 0.55
+    }
+  ],
+  "transitions": [
+    {
+      "id": "T1",
+      "start": 12,
+      "end": 14,
+      "duration": 2,
+      "type": "pure_dissolve",
+      "from_moment": 0,
+      "to_moment": 1
+    },
+    {
+      "id": "T2",
+      "start": 26,
+      "end": 28,
+      "duration": 2,
+      "type": "pure_dissolve",
+      "from_moment": 1,
+      "to_moment": 2
+    }
+  ],
+  "ending": {
+    "start": 41,
+    "end": 43,
+    "duration": 2,
+    "type": "fade_to_black"
+  },
+  "presence_layers": {
+    "P0": [
+      "star_pulse",
+      "water_shimmer",
+      "air_grain"
+    ],
+    "P1_active": [
+      "light_breathing"
+    ]
+  },
+  "drift_guard": {
+    "camera_fixed": true,
+    "person_fixed": true,
+    "structure_fixed": true,
+    "ken_burns": false,
+    "cinematic_zoom": false
+  },
+  "generated_at": "2026-05-23T22:53:46.196Z"
+}

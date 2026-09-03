@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DreamTown Presence v0.2 — Human Micro Presence Test</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>DREAMTOWN PRESENCE PROTOTYPE v0.2 — HUMAN MICRO PRESENCE TEST</h1>
+  <p class="tagline">"사람을 움직이되, '공기 속에 머문다'로 느껴져야 한다."</p>
+</header>
+
+<main>
+  <div class="layout">
+
+    <!-- ─── Stage ─── -->
+    <div class="stage-col">
+      <div id="stage">
+        <canvas id="base-cvs"></canvas>
+        <canvas id="human-cvs"></canvas>
+        <canvas id="shimmer-cvs"></canvas>
+        <div    id="light-layer"></div>
+        <canvas id="grain-cvs"></canvas>
+        <canvas id="star-cvs"></canvas>
+      </div>
+      <div class="stage-note">
+        camera: fixed · structure: fixed · person: micro-presence only<br>
+        P0 layers: star · water · grain · always on
+      </div>
+    </div>
+
+    <!-- ─── Controls ─── -->
+    <div class="ctrl-col">
+
+      <!-- Variant A / B / C -->
+      <div class="sec">
+        <div class="sec-t">VARIANT</div>
+        <div class="btn-group" id="variant-btns">
+          <button class="vbtn"        data-v="A">A — World Only</button>
+          <button class="vbtn active" data-v="B">B — Micro</button>
+          <button class="vbtn"        data-v="C">C — Risk</button>
+        </div>
+        <div id="variant-desc" class="desc-text"></div>
+      </div>
+
+      <!-- Emotion State -->
+      <div class="sec">
+        <div class="sec-t">EMOTION STATE</div>
+        <div class="btn-group" id="emotion-btns">
+          <button class="ebtn active" data-e="calm">고요함</button>
+          <button class="ebtn"        data-e="hope">희망</button>
+          <button class="ebtn"        data-e="lonely">고독</button>
+        </div>
+      </div>
+
+      <!-- Base Image -->
+      <div class="sec">
+        <div class="sec-t">BASE IMAGE</div>
+        <select id="img-select"></select>
+        <div id="water-note" style="font-size:.6rem;color:#252548;margin-top:4px">(이미지에 물 없음 — water layer 비활성)</div>
+      </div>
+
+      <!-- Layers -->
+      <div class="sec">
+        <div class="sec-t">PRESENCE LAYERS</div>
+        <div id="layer-rows"></div>
+      </div>
+
+      <!-- Live status -->
+      <div class="sec">
+        <div class="sec-t">LIVE</div>
+        <div id="live-status" class="mono">loading…</div>
+      </div>
+
+      <!-- Drift guard -->
+      <div class="drift-guard">
+        <div class="dg-t">DRIFT GUARD — NEVER</div>
+        <div id="drift-items"></div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- ─── Test Questions ─── -->
+<section class="test-qs">
+  <h2>AURORA5 평가 질문</h2>
+  <div id="qa-grid"></div>
+</section>
+
+<footer>
+  SSOT: docs/ssot/dreamtown/SSOT-DreamTown-Core-Philosophy-v1.0.md ·
+  Drift Guard: D-02 character animation · D-07 emotional manipulation ·
+  DreamTown Presence v0.2 · 2026-05-24
+</footer>
+
+<script src="presence.js"></script>
+</body>
+</html>

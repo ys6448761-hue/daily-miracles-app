@@ -1,0 +1,105 @@
+{
+  "metadata": {
+    "phase": "2B",
+    "stage": "public_transport_schema_design",
+    "date": "2026-08-23",
+    "note": "SCHEMA DESIGN ONLY — no data collection in Phase 2B",
+    "deferred": "true"
+  },
+  "public_transport_collection_schema": {
+    "description": "Structure for no-car travelers using buses, ferries, local transit",
+    "scope": "Phase 2C+ (after car routes verified)",
+    "fields": {
+      "origin": {
+        "type": "string",
+        "example": "RAMADA_PLAZA_YEOSU or YEOSU_EXPO_STATION",
+        "required": true
+      },
+      "destination": {
+        "type": "string",
+        "example": "cablecar (travel_places.code)",
+        "required": true
+      },
+      "route_options": {
+        "type": "array",
+        "description": "Multiple possible routes (bus line varies)",
+        "items": {
+          "route_id": "string",
+          "sequence": "integer",
+          "bus_line_number": "string or number",
+          "bus_line_name": "string",
+          "boarding_stop": {
+            "name": "string",
+            "address": "string",
+            "lat": "number",
+            "lng": "number",
+            "walking_distance_m": "integer",
+            "walking_time_min": "integer"
+          },
+          "destination_stop": {
+            "name": "string",
+            "address": "string",
+            "lat": "number",
+            "lng": "number"
+          },
+          "ride_minutes": {
+            "typical": "integer",
+            "min": "integer",
+            "max": "integer"
+          },
+          "transfers_required": "integer (0, 1, 2, etc.)",
+          "transfer_stops": "array of intermediate bus exchanges",
+          "accessibility": {
+            "low_floor_bus": "boolean",
+            "wheelchair_access": "boolean",
+            "stroller_friendly": "boolean"
+          },
+          "service_limitations": {
+            "weekday_only": "boolean",
+            "no_night_service": "boolean",
+            "seasonal": "string (e.g., 'summer peak only')"
+          },
+          "source": "string (Yeosu City Transit Authority, Naver Map, OpenStreetMap)",
+          "verification_status": "UNKNOWN | SINGLE_SOURCE | CROSS_VERIFIED | FIELD_VERIFIED | REVIEW_REQUIRED",
+          "verified_at": "ISO 8601 date",
+          "notes": "string"
+        }
+      },
+      "total_travel_time": {
+        "description": "Walking + riding + transfers",
+        "boarding_walk_time": "integer minutes",
+        "ride_time": "integer minutes",
+        "alighting_walk_time": "integer minutes",
+        "transfer_wait_time": "integer minutes (if transfers)",
+        "total_minutes": "sum of above"
+      },
+      "reliability": {
+        "schedule_adherence": "high | medium | low",
+        "weather_impact": "none | minor | severe",
+        "seasonal_variation": "none | minor | major"
+      }
+    }
+  },
+  "yeosu_bus_system_notes": {
+    "status": "NOT YET VERIFIED",
+    "data_source": "Pending Yeosu City Transit Authority contact",
+    "required_before_collection": [
+      "Official Yeosu bus route map",
+      "Bus stop database with coordinates",
+      "Accessibility information from transit authority",
+      "Service schedules (weekday/weekend/seasonal)"
+    ]
+  },
+  "phase_2c_preconditions": [
+    "Car routes (Phase 2B) fully verified",
+    "Ramada + Expo origin locations confirmed",
+    "Yeosu transit authority data available",
+    "Decision: public transport priority for V1?"
+  ],
+  "defer_reasons": [
+    "Car-first recommendations sufficient for Phase 2B launch",
+    "Yeosu bus data not yet available from city",
+    "No-car traveler warning already in place (Phase 1)",
+    "Can launch with 'bus status: unknown + warning' first"
+  ]
+}

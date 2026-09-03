@@ -1,0 +1,68 @@
+{
+  "_ssot_version": "v1.0",
+  "_date": "2026-05-24",
+  "_principle": "miracle → world-canvas / storybook → star-cache. 교차 사용 금지.",
+
+  "routing_rules": {
+    "storybook": {
+      "source": "star-cache",
+      "base_path": "/images/star-cache",
+      "description": "감정 클로즈업. 인물 중심. 별과의 친밀감."
+    },
+    "miracle": {
+      "source": "world-canvas",
+      "base_path": "/images/world-canvas/miracle",
+      "description": "세계 와이드샷. 환경 중심. 인물은 실루엣으로만."
+    }
+  },
+
+  "gravity_to_scene": {
+    "pause":                  "yeosu_harbor",
+    "emotional_afterflow":    "yeosu_harbor",
+    "calm":                   "yeosu_harbor",
+    "reality_reconnection":   "yeosu_dolsan",
+    "curiosity":              "yeosu_cablecar_night",
+    "fragile_hope":           "yeosu_harbor",
+    "confusion":              "yeosu_harbor"
+  },
+
+  "wish_type_to_scene": {
+    "위로형": "yeosu_harbor",
+    "결심형": "yeosu_cablecar_night",
+    "회복형": "yeosu_dolsan",
+    "관계형": "yeosu_dolsan",
+    "불안형": "yeosu_harbor",
+    "희망형": "yeosu_cablecar_night"
+  },
+
+  "scene_fallback_order": [
+    "yeosu_harbor",
+    "yeosu_cablecar_night",
+    "yeosu_dolsan"
+  ],
+
+  "filename_pattern": "{scene_id}_world_canvas.png",
+
+  "miracle_frame_policy": {
+    "F1": {
+      "source": "world-canvas",
+      "note": "첫 프레임 즉시 구분 — 세계 와이드샷으로 시작"
+    },
+    "F2": {
+      "source": "storybook_sources",
+      "note": "breathing gap — 현행 유지"
+    },
+    "F3": {
+      "source": "wish-render-prototype",
+      "note": "현행 유지"
+    },
+    "F4": {
+      "source": "storybook_sources",
+      "note": "breathing gap — 현행 유지"
+    },
+    "F5": {
+      "source": "wish-render-prototype",
+      "note": "현행 유지"
+    }
+  }
+}

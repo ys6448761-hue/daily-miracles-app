@@ -3611,35 +3611,38 @@ router.post('/:journey_id/plant-star', async (req, res) => {
 
     // ─────────────────────────────────────────────────────────────────
     // Step 4: Database Transaction with Row Locking
-    // Execute each statement separately (PostgreSQL prepared statement limit)
+    // Use dedicated client to guarantee all operations on ONE connection
     // ─────────────────────────────────────────────────────────────────
 
-    try {
-      // Step 4a: BEGIN transaction (must be separate query call)
-      await db.query('BEGIN;');
+    const client = await db.connect();
 
-      // Step 4b: Lock the journey row for update (separate query)
-      await db.query(
+    try {
+      // Step 4a: BEGIN transaction on dedicated client
+      await client.query('BEGIN;');
+
+      // Step 4b: Lock the journey row for update
+      await client.query(
         'SELECT id FROM dt_storybook_journeys WHERE id = $1 FOR UPDATE;',
         [journey_id]
       );
 
       // Step 4c: Double-check star_id inside transaction (prevent race condition)
-      const doubleCheckResult = await db.query(
+      const doubleCheckResult = await client.query(
         'SELECT star_id FROM dt_storybook_journeys WHERE id = $1;',
         [journey_id]
       );
 
       if (doubleCheckResult.rows[0].star_id) {
         // Another request created the star — fetch and return it
-        const existingStarResult = await db.query(
+        const existingStarResult = await client.query(
           'SELECT id, star_name FROM dt_stars WHERE id = $1;',
           [doubleCheckResult.rows[0].star_id]
         );
 
         if (existingStarResult.rows.length > 0) {
           const existingStar = existingStarResult.rows[0];
-          await db.query('ROLLBACK;');
+          // Commit empty transaction (no changes)
+          await client.query('COMMIT;');
           return res.status(200).json({
             success: true,
             star_id: existingStar.id,
@@ -3652,19 +3655,22 @@ router.post('/:journey_id/plant-star', async (req, res) => {
     } catch (txError) {
       // Transaction error — rollback
       try {
-        await db.query('ROLLBACK;');
+        await client.query('ROLLBACK;');
       } catch (rollbackErr) {
         // Ignore rollback error if already rolled back
       }
       throw txError;
+    } finally {
+      // Always release client back to pool
+      client.release();
     }
 
     // ─────────────────────────────────────────────────────────────────
-    // Step 5: Create dt_wishes (SKU = storybook_v1, no user_id)
+    // Step 5: Create dt_wishes (inside transaction on same client)
     // ─────────────────────────────────────────────────────────────────
 
     const wishText = journey.wish_text || 'RAMADA Storybook 소원';
-    const wishResult = await db.query(
+    const wishResult = await client.query(
       `INSERT INTO dt_wishes (wish_text, user_id, sku, status, created_at)
        VALUES ($1, NULL, $2, $3, NOW())
        RETURNING id`,
@@ -3673,11 +3679,11 @@ router.post('/:journey_id/plant-star', async (req, res) => {
     const wishId = wishResult.rows[0].id;
 
     // ─────────────────────────────────────────────────────────────────
-    // Step 6: Create dt_star_seeds
+    // Step 6: Create dt_star_seeds (inside transaction)
     // ─────────────────────────────────────────────────────────────────
 
     const seedName = `${wishText.slice(0, 20)} 씨앗`;
-    const seedResult = await db.query(
+    const seedResult = await client.query(
       `INSERT INTO dt_star_seeds (wish_id, seed_name, seed_state, created_at)
        VALUES ($1, $2, $3, NOW())
        RETURNING id`,
@@ -3686,21 +3692,21 @@ router.post('/:journey_id/plant-star', async (req, res) => {
     const seedId = seedResult.rows[0].id;
 
     // ─────────────────────────────────────────────────────────────────
-    // Step 7: Create dt_stars (skip_artifact by design)
+    // Step 7: Create dt_stars (inside transaction, skip_artifact by design)
     // ─────────────────────────────────────────────────────────────────
 
     // Generate star name (deterministic based on wish_id)
     const starName = await generateStarName(wishId, db);
     const starSlug = `star-${Date.now()}`;
 
-    // Get galaxy (RAMADA storybook stars go to 'growth' galaxy by default)
+    // Get galaxy (use pool for read-only lookup, not part of transaction)
     const galaxyResult = await db.query(
       'SELECT id FROM dt_galaxies WHERE code = $1',
       ['growth']
     );
     const galaxyId = galaxyResult.rows.length > 0 ? galaxyResult.rows[0].id : null;
 
-    const starResult = await db.query(
+    const starResult = await client.query(
       `INSERT INTO dt_stars
          (wish_id, star_seed_id, star_name, star_slug, galaxy_id, star_stage, emotion_tag, star_rarity, origin_place, origin_type, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
@@ -3712,31 +3718,27 @@ router.post('/:journey_id/plant-star', async (req, res) => {
         starSlug,
         galaxyId,
         'day1',
-        'confusion', // Default emotion for storybook stars
-        'limited',   // Limited edition by design (RAMADA exclusive)
+        'confusion',
+        'limited',
         journey.source_hotel || 'ramada_storybook',
         'storybook',
-        // current timestamp for created_at
       ]
     );
     const star = starResult.rows[0];
 
-    // NOTE: NO dt_artifact_jobs created here (skip_artifact=true by design)
-    // Storybook's Golden 9-Cut IS the visual representation
-
     // ─────────────────────────────────────────────────────────────────
-    // Step 8: Update dt_storybook_journeys with star_id and status
+    // Step 8: Update dt_storybook_journeys with star_id (inside transaction)
     // ─────────────────────────────────────────────────────────────────
 
-    await db.query(
+    await client.query(
       `UPDATE dt_storybook_journeys
        SET star_id = $1, status = $2, star_planted_at = NOW(), updated_at = NOW()
        WHERE id = $3`,
       [star.id, 'star_planted', journey_id]
     );
 
-    // Commit transaction
-    await db.query('COMMIT;');
+    // Commit transaction (already handled in try-finally, confirmed here)
+    await client.query('COMMIT;');
 
     // ─────────────────────────────────────────────────────────────────
     // Step 9: Response

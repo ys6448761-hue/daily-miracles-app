@@ -1,0 +1,61 @@
+{
+  "wish": "W2", "type": "결심형",
+  "text": "새로운 일을 시작해보고 싶어요",
+  "render_mode": "resonance",
+  "duration_model": "Micro Resonance",
+  "total_duration_sec": 30,
+  "gravity_sequence": ["curiosity","emotional_afterflow","calm","reality_reconnection","curiosity"],
+  "hope_curve": [0.55, 0.55, 0.58, 0.62, 0.70],
+  "gem_palette": { "cafe": "citrine", "hamel": "topaz" },
+  "frames": [
+    {
+      "id": "F1", "emotion": "curiosity", "location": "cafe", "gem": "citrine",
+      "file": "frames/F1_curiosity_cafe.png",
+      "asset": "04_curiosity_citrine_yeosu_cafe_stage2.png",
+      "gravity_role": "opening curiosity — 새로운 가능성을 바라보는 순간",
+      "timing": { "start": 0, "end": 5, "duration": 5 },
+      "subtitle": "오늘의 용기를 별에 담아두었어요",
+      "subtitle_copy": "#13", "subtitle_start_offset": 1.0,
+      "motion": { "type": "ken_burns", "direction": "top_to_bottom", "speed": 0.3, "duration_sec": 5 }
+    },
+    {
+      "id": "F2", "emotion": "emotional_afterflow", "location": "cafe", "gem": null,
+      "file": "frames/F2_afterflow_cafe.png",
+      "asset": "cafe_page05_emotional_afterflow_base.png",
+      "gravity_role": "breathing gap #1 — 결심 전의 고요",
+      "timing": { "start": 5, "end": 10, "duration": 5 },
+      "subtitle": null, "breathing_gap": true,
+      "motion": { "type": "still", "speed": 0, "duration_sec": 5 }
+    },
+    {
+      "id": "F3", "emotion": "calm", "location": "cafe", "gem": "citrine",
+      "file": "frames/F3_calm_cafe.png",
+      "asset": "03_calm_citrine_yeosu_cafe_stage2.png",
+      "gravity_role": "grounded resolve — 흔들리지 않는 내면",
+      "timing": { "start": 10, "end": 15, "duration": 5 },
+      "subtitle": "조금은 믿고 싶어졌어요",
+      "subtitle_copy": "#6", "subtitle_start_offset": 1.0,
+      "motion": { "type": "cross_dissolve_then_still", "dissolve_sec": 1.0, "speed": 0, "duration_sec": 5 }
+    },
+    {
+      "id": "F4", "emotion": "reality_reconnection", "location": "hamel", "gem": null,
+      "file": "frames/F4_reconnection_hamel.png",
+      "asset": "hamel_page05_reality_reconnection_base.png",
+      "gravity_role": "breathing gap #2 — 현실 속으로",
+      "timing": { "start": 15, "end": 20, "duration": 5 },
+      "subtitle": null, "breathing_gap": true,
+      "motion": { "type": "cross_dissolve_then_ken_burns", "direction": "left_to_right", "dissolve_sec": 1.0, "speed": 0.3, "duration_sec": 5 }
+    },
+    {
+      "id": "F5", "emotion": "curiosity", "location": "hamel", "gem": "topaz",
+      "file": "frames/F5_curiosity_hamel.png",
+      "asset": "hamel_curiosity_topaz_base01.png",
+      "gravity_role": "wish signal — 길이 보이기 시작하는 순간 (curiosity loop)",
+      "timing": { "start": 20, "end": 30, "duration": 10 },
+      "subtitle": "작은 빛 하나가 길이 되어줄 거예요",
+      "subtitle_copy": "#17", "subtitle_start_offset": 1.0,
+      "motion": { "type": "cross_dissolve_then_still_fadeout", "dissolve_sec": 1.0, "fadeout_sec": 2, "speed": 0, "duration_sec": 10 }
+    }
+  ],
+  "render_spec": { "ratio": "3:4", "resolution": "1024x1536", "dissolve": "1.0s", "subtitle_opacity": 0.7, "subtitle_weight": "thin", "breathing_gap_ratio": "40%", "new_ai_images": 0 }
+}

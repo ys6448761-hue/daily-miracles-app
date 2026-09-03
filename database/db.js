@@ -37,5 +37,7 @@ pool.on('error', (err) => {
 
 module.exports = {
     query: (text, params) => pool.query(text, params),
+    // Acquire dedicated client for transaction-safe operations
+    connect: () => pool.connect(),
     pool
 };

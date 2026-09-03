@@ -1564,27 +1564,28 @@ function runFinalTests() {
 
   console.log('\n📋 Test Suite: Plant Star Transaction Safety (C4)\n');
 
-  // Test 81: Verify plant-star uses separate query() calls (not multi-statement)
-  console.log('  Test 81: Transaction uses separate db.query() calls');
+  // Test 81: Verify plant-star uses dedicated client for transactions
+  console.log('  Test 81: Transaction uses dedicated client connection');
   try {
     const fs = require('fs');
     const routesPath = require('path').join(__dirname, '..', 'routes', 'storybookRoutes.js');
     const routesCode = fs.readFileSync(routesPath, 'utf8');
+    const plantStarBlock = routesCode.split('router.post(\'/:journey_id/plant-star\'')[1] || '';
 
-    // Check that BEGIN, SELECT FOR UPDATE, COMMIT are separate queries
-    const hasBeginCall = /await db\.query\(\s*['""]BEGIN[;]?['""]\s*\)/.test(routesCode);
-    const hasSelectForUpdateCall = /await db\.query\(\s*['""]SELECT.*FOR UPDATE/.test(routesCode);
-    const hasCommitCall = /await db\.query\(\s*['""]COMMIT[;]?['""]\s*\)/.test(routesCode);
-
-    // Ensure no multi-statement concatenation
-    const noMultiStatement = !/BEGIN[^']*SELECT[^']*SELECT[^']*`/.test(routesCode);
+    // Check for dedicated client connection
+    const hasConnectCall = /const client = await db\.connect\(\)/.test(plantStarBlock);
+    const hasClientBegin = /await client\.query\(\s*['""]BEGIN[;]?['""]\s*\)/.test(plantStarBlock);
+    const hasClientSelectForUpdate = /await client\.query\(\s*['""]SELECT.*FOR UPDATE/.test(plantStarBlock);
+    const hasClientInsert = /await client\.query\(\s*`?INSERT/.test(plantStarBlock);
+    const hasClientUpdate = /await client\.query\(\s*`?UPDATE/.test(plantStarBlock);
+    const hasClientRelease = /client\.release\(\)/.test(plantStarBlock);
 
     assert(
-      hasBeginCall && hasSelectForUpdateCall && hasCommitCall && noMultiStatement,
-      'plant-star executes BEGIN, SELECT FOR UPDATE, COMMIT as separate query() calls (PostgreSQL prepared statement fix)'
+      hasConnectCall && hasClientBegin && hasClientSelectForUpdate && hasClientInsert && hasClientUpdate && hasClientRelease,
+      'plant-star uses dedicated client (db.connect) for all transaction operations with client.release() cleanup'
     );
   } catch (e) {
-    console.warn('  ⚠️ Could not verify transaction calls:', e.message);
+    console.warn('  ⚠️ Could not verify client transaction:', e.message);
   }
 
   // Test 82: Idempotency check exists before transaction

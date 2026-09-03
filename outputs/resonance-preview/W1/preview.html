@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W1 위로형 — Resonance Preview</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --border: #1e1e2e;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --accent: #7c6af7;
+    --pause: #5b8fa8;
+    --calm: #6aada8;
+    --fragile: #9b8fc4;
+    --afterflow: #8a9bb0;
+    --reconnect: #7a9990;
+    --subtitle-bg: rgba(0,0,0,0.62);
+    --timeline-h: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 40px 24px 80px;
+  }
+
+  /* ── header ── */
+  .header {
+    max-width: 1100px;
+    margin: 0 auto 40px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+  }
+  .header-meta { display: flex; gap: 16px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+  .badge {
+    font-size: 11px;
+    letter-spacing: .06em;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .badge.resonance { border-color: var(--accent); color: var(--accent); }
+  .header h1 { font-size: 22px; font-weight: 400; color: var(--text); margin-bottom: 6px; }
+  .header .wish { font-size: 14px; color: var(--muted); }
+
+  /* ── emotion arc ── */
+  .arc-bar {
+    max-width: 1100px;
+    margin: 0 auto 36px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .arc-step {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .arc-step .label { font-size: 10px; color: var(--muted); margin-bottom: 2px; letter-spacing: .08em; }
+  .arc-step .emo { font-size: 13px; }
+  .arc-arrow {
+    padding: 0 8px;
+    color: var(--muted);
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .arc-step.pause { border-color: var(--pause); }
+  .arc-step.pause .emo { color: var(--pause); }
+  .arc-step.afterflow { border-color: var(--afterflow); }
+  .arc-step.afterflow .emo { color: var(--afterflow); }
+  .arc-step.calm { border-color: var(--calm); }
+  .arc-step.calm .emo { color: var(--calm); }
+  .arc-step.reconnect { border-color: var(--reconnect); }
+  .arc-step.reconnect .emo { color: var(--reconnect); }
+  .arc-step.fragile { border-color: var(--fragile); }
+  .arc-step.fragile .emo { color: var(--fragile); }
+
+  /* ── frame strip ── */
+  .frame-strip {
+    max-width: 1100px;
+    margin: 0 auto 40px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+  }
+
+  .frame-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: border-color .2s;
+  }
+  .frame-card:hover { border-color: var(--accent); }
+
+  /* image area — 3:4 ratio */
+  .frame-img-wrap {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: #05050a;
+    flex-shrink: 0;
+  }
+  .frame-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* subtitle overlay */
+  .subtitle-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 28px 12px 14px;
+    background: linear-gradient(transparent, var(--subtitle-bg) 60%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    min-height: 72px;
+    pointer-events: none;
+  }
+  .subtitle-text {
+    color: rgba(255,255,255,0.90);
+    font-size: 12.5px;
+    font-weight: 300;
+    text-align: center;
+    line-height: 1.6;
+    letter-spacing: .04em;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  }
+  .subtitle-empty {
+    color: rgba(255,255,255,0.22);
+    font-size: 11px;
+    font-style: italic;
+  }
+
+  /* frame number badge */
+  .frame-num {
+    position: absolute;
+    top: 10px; left: 10px;
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 6px;
+    color: rgba(255,255,255,0.75);
+    font-size: 11px;
+    padding: 3px 8px;
+    letter-spacing: .06em;
+  }
+
+  /* timing label */
+  .timing-label {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    color: rgba(255,255,255,0.55);
+    font-size: 10px;
+    padding: 3px 7px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* card meta section */
+  .frame-meta {
+    padding: 12px 12px 10px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .meta-row { display: flex; align-items: flex-start; gap: 8px; }
+  .meta-icon { font-size: 11px; color: var(--muted); flex-shrink: 0; padding-top: 1px; }
+  .meta-val { font-size: 11px; color: var(--text); line-height: 1.5; }
+  .meta-val.muted { color: var(--muted); }
+
+  .emotion-chip {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 1px solid;
+    letter-spacing: .06em;
+  }
+  .chip-pause { border-color: var(--pause); color: var(--pause); }
+  .chip-afterflow { border-color: var(--afterflow); color: var(--afterflow); }
+  .chip-calm { border-color: var(--calm); color: var(--calm); }
+  .chip-reconnect { border-color: var(--reconnect); color: var(--reconnect); }
+  .chip-fragile { border-color: var(--fragile); color: var(--fragile); }
+
+  .source-chip {
+    display: inline-block;
+    font-size: 9px;
+    padding: 2px 7px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    letter-spacing: .04em;
+    margin-top: 2px;
+  }
+
+  /* ── timeline ── */
+  .timeline-section {
+    max-width: 1100px;
+    margin: 0 auto 40px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .section-title {
+    font-size: 11px;
+    letter-spacing: .1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .timeline-bar {
+    position: relative;
+    height: var(--timeline-h);
+    background: var(--border);
+    border-radius: 3px;
+    margin-bottom: 10px;
+  }
+  .timeline-segment {
+    position: absolute;
+    top: 0; height: 100%;
+    border-radius: 3px;
+    opacity: 0.85;
+  }
+  .seg-pause { background: var(--pause); }
+  .seg-afterflow { background: var(--afterflow); }
+  .seg-calm { background: var(--calm); }
+  .seg-reconnect { background: var(--reconnect); }
+  .seg-fragile { background: var(--fragile); }
+
+  .timeline-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 20px;
+  }
+
+  .timeline-rows { display: flex; flex-direction: column; gap: 12px; }
+  .trow { display: grid; grid-template-columns: 60px 1fr 2fr; gap: 12px; align-items: center; }
+  .trow-id { font-size: 11px; color: var(--muted); }
+  .trow-timing {
+    font-size: 11px;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .trow-desc { font-size: 11px; color: var(--muted); }
+
+  /* ── sound section ── */
+  .sound-section {
+    max-width: 1100px;
+    margin: 0 auto 40px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .sound-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+  }
+  .sound-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-off { background: var(--border); }
+  .dot-on { background: var(--accent); }
+  .sound-bar {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .sound-fill {
+    position: absolute;
+    top: 0; height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, transparent 0%, #5577dd 20%, #5577dd 88%, transparent 100%);
+  }
+  .sound-label { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+  /* ── render spec ── */
+  .spec-section {
+    max-width: 1100px;
+    margin: 0 auto 40px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .spec-item { }
+  .spec-key { font-size: 10px; color: var(--muted); letter-spacing: .08em; margin-bottom: 3px; }
+  .spec-val { font-size: 12px; color: var(--text); }
+
+  /* ── continuity ── */
+  .check-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+  .check-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .check-list li { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text); }
+  .check-ok { color: #5bbd8a; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<div class="header">
+  <div class="header-meta">
+    <span class="badge resonance">render_mode: resonance</span>
+    <span class="badge">W1 · 위로형</span>
+    <span class="badge">5 frames · 0 AI generated</span>
+    <span class="badge">1분 20초</span>
+  </div>
+  <h1>W1 — 위로형</h1>
+  <p class="wish">"지쳐있는 나를 보듬어주고 싶어요"</p>
+</div>
+
+<!-- ── Emotion Arc ── -->
+<div class="arc-bar">
+  <div class="arc-step pause">
+    <div class="label">F1</div>
+    <div class="emo">pause</div>
+  </div>
+  <div class="arc-arrow">→</div>
+  <div class="arc-step afterflow">
+    <div class="label">F2</div>
+    <div class="emo">여운</div>
+  </div>
+  <div class="arc-arrow">→</div>
+  <div class="arc-step calm">
+    <div class="label">F3</div>
+    <div class="emo">calm</div>
+  </div>
+  <div class="arc-arrow">→</div>
+  <div class="arc-step reconnect">
+    <div class="label">F4</div>
+    <div class="emo">재연결</div>
+  </div>
+  <div class="arc-arrow">→</div>
+  <div class="arc-step fragile">
+    <div class="label">F5</div>
+    <div class="emo">fragile_hope</div>
+  </div>
+</div>
+
+<!-- ── Frame Strip ── -->
+<div class="frame-strip">
+
+  <!-- F1 -->
+  <div class="frame-card">
+    <div class="frame-img-wrap">
+      <img src="frames/F1_pause_cafe.png" alt="F1 pause cafe">
+      <span class="frame-num">F1</span>
+      <span class="timing-label">0:00 – 0:15</span>
+      <div class="subtitle-overlay">
+        <span class="subtitle-text">지쳐도 괜찮아요</span>
+      </div>
+    </div>
+    <div class="frame-meta">
+      <div class="meta-row">
+        <span class="meta-icon">◈</span>
+        <span class="emotion-chip chip-pause">pause</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-icon">↕</span>
+        <span class="meta-val">Ken Burns ↓ · 0.3x · 15s</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-icon">⊙</span>
+        <span class="meta-val">카페 창가 — 지쳐있음 인정</span>
+      </div>
+      <div class="meta-row">
+        <span class="source-chip">thumbnails / full</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- F2 -->
+  <div class="frame-card">
+    <div class="frame-img-wrap">
+      <img src="frames/F2_afterflow_cafe.png" alt="F2 afterflow cafe">
+      <span class="frame-num">F2</span>
+      <span class="timing-label">0:15 – 0:30</span>
+      <div class="subtitle-overlay">
+        <span class="subtitle-text subtitle-empty">( 자막 없음 — 여운 여백 )</span>
+      </div>
+    </div>
+    <div class="frame-meta">
+      <div class="meta-row">
+        <span class="meta-icon">◈</span>
+        <span class="emotion-chip chip-afterflow">emotional_afterflow</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-icon">↕</span>
+        <span class="meta-val">정적 (still) · 15s</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-icon">⊙</span>
+        <span class="meta-val">감정이 흘러간 잔류</span>
+      </div>
+      <div class="meta-row">
+        <span class="source-chip">storybook / page05</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- F3 -->
+  <div class="frame-card">
+    <div class="frame-img-wrap">
+      <img src="frames/F3_calm_cafe.png" alt="F3 calm cafe">
+      <span class="frame-num">F3</span>
+      <span class="timing-label">0:30 – 0:45</span>
+      <div class="subtitle-overlay">
+        <span class="subtitle-text">마음이 조금<br>가벼워졌다면 좋겠어요</span>
+      </div>
+    </div>
+    <div class="frame-meta">
+      <div class="meta-row">
+        <span class="meta-icon">◈</span>
+        <span class="emotion-chip chip-calm">calm</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-icon">↕</span>
+        <span class="meta-val">dissolve in 2s → 정적 · 15s</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-icon">⊙</span>
+        <span class="meta-val">내면 고요 시작 (copy #11)</span>
+      </div>
+      <div class="meta-row">
+        <span class="source-chip">thumbnails / full</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- F4 -->
+  <div class="frame-card">
+    <div class="frame-img-wrap">
+      <img src="frames/F4_reconnection_hamel.png" alt="F4 reconnection hamel">
+      <span class="frame-num">F4</span>
+      <span class="timing-label">0:45 – 1:00</span>
+      <div class="subtitle-overlay">
+        <span class="subtitle-text subtitle-empty">( 자막 없음 — 현실 재연결 침묵 )</span>
+      </div>
+    </div>
+    <div class="frame-meta">
+      <div class="meta-row">
+        <span class="meta-icon">◈</span>
+        <span class="emotion-chip chip-reconnect">reality_reconnection</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-icon">↕</span>
+        <span class="meta-val">dissolve in 2s → pan ← · 0.2x · 15s</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-icon">⊙</span>
+        <span class="meta-val">하멜 등대 — 현실과 다시 닿음</span>
+      </div>
+      <div class="meta-row">
+        <span class="source-chip">storybook / page05</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- F5 -->
+  <div class="frame-card">
+    <div class="frame-img-wrap">
+      <img src="frames/F5_fragile_hope_hamel.png" alt="F5 fragile_hope hamel">
+      <span class="frame-num">F5</span>
+      <span class="timing-label">1:00 – 1:20</span>
+      <div class="subtitle-overlay">
+        <span class="subtitle-text">작은 소원 하나가<br>밤하늘에 남았어요</span>
+      </div>
+    </div>
+    <div class="frame-meta">
+      <div class="meta-row">
+        <span class="meta-icon">◈</span>
+        <span class="emotion-chip chip-fragile">fragile_hope</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-icon">↕</span>
+        <span class="meta-val">dissolve in 2s → 정적 → fade-out 5s</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-icon">⊙</span>
+        <span class="meta-val">하멜 등대 빛 — 작고 조심스러운 희망 (copy #2)</span>
+      </div>
+      <div class="meta-row">
+        <span class="source-chip">thumbnails / full</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /frame-strip -->
+
+<!-- ── Timeline ── -->
+<div class="timeline-section">
+  <div class="section-title">Timeline — 총 1분 20초</div>
+  <div class="timeline-bar">
+    <!-- F1: 0–15s = 0–18.75% -->
+    <div class="timeline-segment seg-pause" style="left:0%;width:18.75%"></div>
+    <!-- F2: 15–30s = 18.75–37.5% -->
+    <div class="timeline-segment seg-afterflow" style="left:18.75%;width:18.75%"></div>
+    <!-- F3: 30–45s = 37.5–56.25% -->
+    <div class="timeline-segment seg-calm" style="left:37.5%;width:18.75%"></div>
+    <!-- F4: 45–60s = 56.25–75% -->
+    <div class="timeline-segment seg-reconnect" style="left:56.25%;width:18.75%"></div>
+    <!-- F5: 60–80s = 75–100% -->
+    <div class="timeline-segment seg-fragile" style="left:75%;width:25%"></div>
+  </div>
+  <div class="timeline-labels">
+    <span>0:00</span>
+    <span>0:15</span>
+    <span>0:30</span>
+    <span>0:45</span>
+    <span>1:00</span>
+    <span>1:20</span>
+  </div>
+  <div class="timeline-rows">
+    <div class="trow">
+      <span class="trow-id">F1 / 0:00</span>
+      <span class="trow-timing">15s · Ken Burns ↓ 0.3x</span>
+      <span class="trow-desc">자막: "지쳐도 괜찮아요" (+2s)</span>
+    </div>
+    <div class="trow">
+      <span class="trow-id">F2 / 0:15</span>
+      <span class="trow-timing">15s · 정적</span>
+      <span class="trow-desc">자막 없음 — 여운 여백 유지</span>
+    </div>
+    <div class="trow">
+      <span class="trow-id">F3 / 0:30</span>
+      <span class="trow-timing">15s · dissolve 2s → 정적</span>
+      <span class="trow-desc">자막: "마음이 조금 가벼워졌다면 좋겠어요" copy #11</span>
+    </div>
+    <div class="trow">
+      <span class="trow-id">F4 / 0:45</span>
+      <span class="trow-timing">15s · dissolve 2s → pan ← 0.2x</span>
+      <span class="trow-desc">자막 없음 — 현실 재연결 침묵</span>
+    </div>
+    <div class="trow">
+      <span class="trow-id">F5 / 1:00</span>
+      <span class="trow-timing">20s · dissolve 2s → fade-out 5s</span>
+      <span class="trow-desc">자막: "작은 소원 하나가 밤하늘에 남았어요" copy #2</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Sound ── -->
+<div class="sound-section">
+  <div class="section-title">Sound Cue</div>
+  <div class="sound-row" style="margin-bottom: 10px;">
+    <div class="sound-dot dot-off"></div>
+    <span style="font-size:11px;color:var(--muted);width:60px">무음</span>
+    <div class="sound-bar" style="flex:none;width:150px;">
+      <div class="sound-fill" style="left:0%;width:0%"></div>
+    </div>
+    <span class="sound-label">F1 시작 ~ F1+2s 전</span>
+  </div>
+  <div class="sound-row">
+    <div class="sound-dot dot-on"></div>
+    <span style="font-size:11px;color:var(--muted);width:60px">-22dB</span>
+    <div class="sound-bar">
+      <div class="sound-fill" style="left:5%;width:88%"></div>
+    </div>
+    <span class="sound-label">바다 파도 앰비언트 · F1+2s ~ F5 종료 3s 전 fade-out</span>
+  </div>
+</div>
+
+<!-- ── Render Spec ── -->
+<div class="spec-section">
+  <div class="section-title">Render Spec</div>
+  <div class="spec-grid">
+    <div class="spec-item"><div class="spec-key">RENDER MODE</div><div class="spec-val">resonance</div></div>
+    <div class="spec-item"><div class="spec-key">RATIO</div><div class="spec-val">3:4 portrait</div></div>
+    <div class="spec-item"><div class="spec-key">RESOLUTION</div><div class="spec-val">1024 × 1536</div></div>
+    <div class="spec-item"><div class="spec-key">TRANSITION</div><div class="spec-val">cross-dissolve</div></div>
+    <div class="spec-item"><div class="spec-key">SUBTITLE FONT</div><div class="spec-val">Noto Sans KR / thin</div></div>
+    <div class="spec-item"><div class="spec-key">SUBTITLE OPACITY</div><div class="spec-val">70%</div></div>
+    <div class="spec-item"><div class="spec-key">SUBTITLE POSITION</div><div class="spec-val">bottom-center</div></div>
+    <div class="spec-item"><div class="spec-key">MAX CHARS / LINE</div><div class="spec-val">20자</div></div>
+    <div class="spec-item"><div class="spec-key">NEW AI IMAGES</div><div class="spec-val" style="color:#5bbd8a">0장</div></div>
+    <div class="spec-item"><div class="spec-key">TOTAL FRAMES</div><div class="spec-val">5장</div></div>
+    <div class="spec-item"><div class="spec-key">TOTAL DURATION</div><div class="spec-val">80s (1분 20초)</div></div>
+    <div class="spec-item"><div class="spec-key">SSOT REF</div><div class="spec-val">MEDIA-CHAN-002</div></div>
+  </div>
+</div>
+
+<!-- ── Continuity Check ── -->
+<div class="check-section">
+  <div class="section-title">Continuity Check</div>
+  <ul class="check-list">
+    <li><span class="check-ok">✓</span> Sowoni 뒷모습 유지 — 카페(seated back) / 하멜(standing back) · 기존 자산</li>
+    <li><span class="check-ok">✓</span> 감정 좌표 이탈 없음 — pause → calm → fragile_hope 순서 준수</li>
+    <li><span class="check-ok">✓</span> 신규 AI 이미지 생성: 0건</li>
+    <li><span class="check-ok">✓</span> registry 외부 자산 직접 삽입: 없음</li>
+    <li><span class="check-ok">✓</span> 총 길이 7분 미만 — 1분 20초</li>
+    <li><span class="check-ok">✓</span> CTA 없음, 훅 없음, 컷 편집 없음</li>
+  </ul>
+</div>
+
+</body>
+</html>

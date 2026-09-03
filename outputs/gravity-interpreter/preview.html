@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emotional Gravity Interpreter v1 — DreamTown</title>
+<style>
+:root{
+  --bg:#07070d;--s1:#101018;--s2:#161622;--s3:#1e1e2e;
+  --border:#252534;--border2:#303045;
+  --text:#e0e0ee;--dim:#7070a0;--faint:#383850;
+  --mono:'SF Mono','Consolas',monospace;
+  --body:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+
+  --g-pause:#ffd080;
+  --g-afterflow:#9090b8;
+  --g-calm:#80c4a0;
+  --g-curiosity:#ffe060;
+  --g-hope:#c8d4ff;
+  --g-reconnect:#80b8e0;
+  --g-confusion:#c0b4d8;
+
+  --res:#6b8fff;
+  --att:#ff8c40;
+  --pass:#50d090;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:13px;line-height:1.6;padding:28px 20px;max-width:1520px;margin:0 auto;}
+
+/* ── Header ── */
+.hd{margin-bottom:36px;padding-bottom:18px;border-bottom:1px solid var(--border);}
+.hd h1{font-size:19px;font-weight:700;margin-bottom:4px;}
+.hd .sub{font-size:12px;color:var(--dim);font-family:var(--mono);}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.badge{padding:2px 9px;border-radius:10px;font-size:10px;font-weight:700;font-family:var(--mono);text-transform:uppercase;}
+.b-proto{background:rgba(255,107,107,.1);color:#ff6b6b;border:1px solid rgba(255,107,107,.25);}
+.b-rule{background:rgba(80,208,144,.1);color:var(--pass);border:1px solid rgba(80,208,144,.25);}
+.b-n{background:rgba(255,255,255,.06);color:var(--dim);border:1px solid var(--border);}
+
+/* ── Section ── */
+.sec{margin-bottom:48px;}
+.sec-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:16px;font-family:var(--mono);}
+
+/* ── Gravity chips ── */
+.gc{display:inline-block;padding:2px 9px;border-radius:10px;font-size:10px;font-family:var(--mono);font-weight:600;}
+.gc-pause     {background:rgba(255,208,128,.14);color:var(--g-pause);border:1px solid rgba(255,208,128,.3);}
+.gc-afterflow {background:rgba(144,144,184,.12);color:var(--g-afterflow);border:1px solid rgba(144,144,184,.25);}
+.gc-calm      {background:rgba(128,196,160,.12);color:var(--g-calm);border:1px solid rgba(128,196,160,.25);}
+.gc-curiosity {background:rgba(255,224,96,.12);color:var(--g-curiosity);border:1px solid rgba(255,224,96,.25);}
+.gc-hope      {background:rgba(200,212,255,.1);color:var(--g-hope);border:1px solid rgba(200,212,255,.25);}
+.gc-reconnect {background:rgba(128,184,224,.1);color:var(--g-reconnect);border:1px solid rgba(128,184,224,.25);}
+.gc-confusion {background:rgba(192,180,216,.1);color:var(--g-confusion);border:1px solid rgba(192,180,216,.25);}
+
+/* ── Gem chips ── */
+.gem{display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-family:var(--mono);}
+.gem-citrine  {background:rgba(255,208,64,.14);color:#ffd040;border:1px solid rgba(255,208,64,.3);}
+.gem-sapphire {background:rgba(80,140,255,.12);color:#80b0ff;border:1px solid rgba(80,140,255,.25);}
+.gem-emerald  {background:rgba(80,200,100,.1);color:#80c870;border:1px solid rgba(80,200,100,.25);}
+.gem-topaz    {background:rgba(255,220,80,.12);color:#ffdc50;border:1px solid rgba(255,220,80,.25);}
+.gem-diamond  {background:rgba(200,210,255,.1);color:#c8d2ff;border:1px solid rgba(200,210,255,.25);}
+.gem-moonstone{background:rgba(200,190,220,.1);color:#c8bedd;border:1px solid rgba(200,190,220,.25);}
+.gem-none     {background:rgba(255,255,255,.04);color:var(--dim);border:1px solid var(--border);font-style:italic;}
+
+/* ── Rule engine table ── */
+.rtab{width:100%;border-collapse:collapse;font-size:12px;}
+.rtab th{padding:7px 12px;background:var(--s2);color:var(--dim);font-size:10px;font-family:var(--mono);font-weight:700;border-bottom:1px solid var(--border);text-align:left;}
+.rtab td{padding:7px 12px;border-bottom:1px solid rgba(37,37,52,.6);vertical-align:middle;}
+.rtab tr:last-child td{border-bottom:none;}
+.rtab tr:hover td{background:rgba(255,255,255,.015);}
+.kw-tag{display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-family:var(--mono);background:rgba(107,143,255,.1);color:var(--res);margin:1px;}
+.w-num{display:inline-block;width:18px;height:18px;border-radius:50%;text-align:center;line-height:18px;font-size:9px;font-family:var(--mono);font-weight:700;}
+
+/* ── Distribution chart ── */
+.dist-chart{display:flex;flex-direction:column;gap:10px;}
+.dist-row{display:flex;align-items:center;gap:12px;}
+.dist-label{width:160px;flex-shrink:0;font-size:11px;font-family:var(--mono);}
+.dist-bar-wrap{flex:1;background:var(--s2);border-radius:4px;overflow:hidden;height:28px;position:relative;}
+.dist-bar{height:100%;border-radius:4px;display:flex;align-items:center;padding:0 8px;font-size:10px;font-weight:700;font-family:var(--mono);transition:width .3s;}
+.dist-wishes{display:flex;gap:4px;flex-wrap:wrap;margin-left:8px;}
+.dist-wish-tag{padding:1px 6px;border-radius:6px;font-size:9px;font-family:var(--mono);background:var(--s3);color:var(--dim);}
+
+/* ── Cluster groups ── */
+.cluster-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.cluster-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.cluster-header{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.cluster-count{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:var(--mono);flex-shrink:0;}
+.cluster-body{padding:10px 14px;}
+.cluster-wish{padding:5px 0;font-size:11px;color:var(--dim);border-bottom:1px solid rgba(37,37,52,.5);display:flex;gap:6px;align-items:flex-start;}
+.cluster-wish:last-child{border-bottom:none;}
+.cluster-wish-id{font-family:var(--mono);font-size:10px;color:var(--faint);flex-shrink:0;}
+
+/* ── Heatmap ── */
+.heatmap{border-collapse:collapse;width:100%;font-size:11px;}
+.heatmap th{padding:6px 10px;font-size:10px;font-family:var(--mono);color:var(--dim);text-align:center;border-bottom:1px solid var(--border);}
+.heatmap td{padding:6px 8px;border-bottom:1px solid rgba(37,37,52,.5);text-align:center;vertical-align:middle;}
+.heatmap tr:last-child td{border-bottom:none;}
+.heatmap tr:hover td{background:rgba(255,255,255,.01);}
+.heat-cell{display:inline-block;width:52px;height:22px;border-radius:4px;font-size:10px;font-family:var(--mono);font-weight:700;line-height:22px;text-align:center;}
+.heat-res{background:rgba(107,143,255,var(--op));color:#fff;}
+.heat-att{background:rgba(255,140,64,var(--op));color:#fff;}
+.td-wish{text-align:left;font-family:var(--mono);font-size:11px;padding:6px 12px;}
+.td-type{font-size:10px;color:var(--dim);}
+
+/* ── Wish cards ── */
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.wcard{background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.wcard:hover{border-color:var(--border2);}
+.wcard-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;}
+.wcard-id-type{display:flex;align-items:center;gap:8px;}
+.wcard-id{font-size:11px;font-weight:700;font-family:var(--mono);}
+.wcard-text{font-size:12px;padding:10px 16px;color:var(--text);line-height:1.55;border-bottom:1px solid var(--border);}
+.wcard-body{padding:12px 16px;}
+.field{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:11px;}
+.field:last-child{margin-bottom:0;}
+.field-label{color:var(--faint);font-family:var(--mono);width:80px;flex-shrink:0;padding-top:1px;}
+.field-val{flex:1;line-height:1.5;}
+.reasoning{background:var(--s2);border-radius:6px;padding:8px 10px;font-size:11px;color:var(--dim);line-height:1.55;margin-top:8px;}
+.fit-row{display:flex;gap:8px;align-items:center;}
+.fit-bar-wrap{flex:1;background:var(--s3);border-radius:3px;height:6px;overflow:hidden;}
+.fit-bar-res{height:100%;border-radius:3px;background:var(--res);}
+.fit-bar-att{height:100%;border-radius:3px;background:var(--att);}
+.fit-num{font-family:var(--mono);font-size:10px;width:28px;text-align:right;}
+.fit-res{color:var(--res);}
+.fit-att{color:var(--att);}
+.rec-chip{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-family:var(--mono);font-weight:700;}
+.rec-res{background:rgba(107,143,255,.14);color:var(--res);}
+.rec-att{background:rgba(255,140,64,.14);color:var(--att);}
+.rec-both{background:rgba(80,208,144,.1);color:var(--pass);}
+.keyword-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px;}
+.kw-match{display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:8px;font-size:10px;font-family:var(--mono);background:var(--s3);border:1px solid var(--border);}
+.kw-match-w{color:var(--dim);font-size:9px;margin-left:2px;}
+.tiebreak-note{font-size:10px;color:#ffb060;font-family:var(--mono);padding:3px 8px;background:rgba(255,176,96,.08);border-radius:4px;border-left:2px solid #ffb060;margin-top:4px;}
+
+/* ── Score bars (keyword) ── */
+.score-row{display:flex;align-items:center;gap:6px;margin-bottom:3px;font-size:10px;font-family:var(--mono);}
+.score-label{width:120px;flex-shrink:0;color:var(--dim);}
+.score-bar-wrap{flex:1;background:var(--s3);border-radius:2px;height:5px;}
+.score-bar{height:5px;border-radius:2px;}
+.score-val{width:20px;text-align:right;color:var(--dim);}
+
+/* ── Footer ── */
+.footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:10px;color:var(--faint);font-family:var(--mono);}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hd">
+  <h1>Emotional Gravity Interpreter v1 &nbsp;·&nbsp; DreamTown</h1>
+  <div class="sub">wish text → emotional gravity → palette → location → render recommendation</div>
+  <div class="badges">
+    <span class="badge b-proto">prototype / no commit</span>
+    <span class="badge b-rule">rule-based + heuristic</span>
+    <span class="badge b-n">12 test wishes</span>
+    <span class="badge b-n">7 gravity types</span>
+    <span class="badge b-n">0 AI freeform</span>
+  </div>
+</div>
+
+
+<!-- §1 Rule Engine -->
+<div class="sec">
+  <div class="sec-title">§1 · Rule Engine — Keyword → Gravity 매핑</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <table class="rtab">
+        <thead><tr><th>gravity</th><th>주요 키워드 (weight)</th><th>팔레트</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="gc gc-pause">pause</span></td>
+            <td>
+              <span class="kw-tag">지쳐×3</span><span class="kw-tag">힘들×3</span>
+              <span class="kw-tag">지친×3</span><span class="kw-tag">쉬고×2</span>
+              <span class="kw-tag">피곤×2</span>
+            </td>
+            <td><span class="gem gem-citrine">citrine</span> + <span class="gem gem-sapphire">sapphire</span></td>
+          </tr>
+          <tr>
+            <td><span class="gc gc-afterflow">afterflow</span></td>
+            <td>
+              <span class="kw-tag">보듬×3</span><span class="kw-tag">위로×2</span>
+              <span class="kw-tag">생각나×2</span><span class="kw-tag">그리워×2</span>
+            </td>
+            <td><span class="gem gem-none">page05 고정</span></td>
+          </tr>
+          <tr>
+            <td><span class="gc gc-calm">calm</span></td>
+            <td>
+              <span class="kw-tag">회복×3</span><span class="kw-tag">치유×3</span>
+              <span class="kw-tag">나아×2</span><span class="kw-tag">안정×2</span>
+              <span class="kw-tag">평온×2</span>
+            </td>
+            <td><span class="gem gem-sapphire">sapphire</span> + <span class="gem gem-emerald">emerald</span></td>
+          </tr>
+          <tr>
+            <td><span class="gc gc-curiosity">curiosity</span></td>
+            <td>
+              <span class="kw-tag">시작×3</span><span class="kw-tag">도전×3</span>
+              <span class="kw-tag">새로운×2</span><span class="kw-tag">해보고×2</span>
+              <span class="kw-tag">설레×2</span>
+            </td>
+            <td><span class="gem gem-citrine">citrine</span> + <span class="gem gem-topaz">topaz</span></td>
+          </tr>
+          <tr>
+            <td><span class="gc gc-hope">fragile_hope</span></td>
+            <td>
+              <span class="kw-tag">이루×3</span><span class="kw-tag">소원×2</span>
+              <span class="kw-tag">바라×2</span><span class="kw-tag">해낼×2</span>
+              <span class="kw-tag">나은×2</span>
+            </td>
+            <td><span class="gem gem-diamond">diamond</span></td>
+          </tr>
+          <tr>
+            <td><span class="gc gc-reconnect">reconnection</span></td>
+            <td>
+              <span class="kw-tag">가까워×3</span><span class="kw-tag">연락×2</span>
+              <span class="kw-tag">다시×2</span><span class="kw-tag">만나×2</span>
+              <span class="kw-tag">돌아×2</span>
+            </td>
+            <td><span class="gem gem-none">page05 고정</span></td>
+          </tr>
+          <tr>
+            <td><span class="gc gc-confusion">confusion</span></td>
+            <td>
+              <span class="kw-tag">불확실×3</span><span class="kw-tag">막막×3</span>
+              <span class="kw-tag">의심×3</span><span class="kw-tag">불안×3</span>
+              <span class="kw-tag">걱정×2</span>
+            </td>
+            <td><span class="gem gem-moonstone">moonstone</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <table class="rtab">
+        <thead><tr><th>gravity</th><th>resonance fit</th><th>attraction fit</th><th>장소</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="gc gc-pause">pause</span></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="flex:1;background:var(--s3);border-radius:2px;height:5px;"><div style="width:90%;height:5px;border-radius:2px;background:var(--res);"></div></div>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--res);">90</span>
+              </div>
+            </td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="flex:1;background:var(--s3);border-radius:2px;height:5px;"><div style="width:50%;height:5px;border-radius:2px;background:var(--att);"></div></div>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--att);">50</span>
+              </div>
+            </td>
+            <td style="font-family:var(--mono);font-size:10px;">cafe → hamel</td>
+          </tr>
+          <tr>
+            <td><span class="gc gc-afterflow">afterflow</span></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="flex:1;background:var(--s3);border-radius:2px;height:5px;"><div style="width:85%;height:5px;border-radius:2px;background:var(--res);"></div></div>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--res);">85</span>
+              </div>
+            </td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="flex:1;background:var(--s3);border-radius:2px;height:5px;"><div style="width:48%;height:5px;border-radius:2px;background:var(--att);"></div></div>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--att);">48</span>
+              </div>
+            </td>
+            <td style="font-family:var(--mono);font-size:10px;">cafe 고정</td>
+          </tr>
+          <tr>
+            <td><span class="gc gc-calm">calm</span></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="flex:1;background:var(--s3);border-radius:2px;height:5px;"><div style="width:82%;height:5px;border-radius:2px;background:var(--res);"></div></div>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--res);">82</span>
+              </div>
+            </td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="flex:1;background:var(--s3);border-radius:2px;height:5px;"><div style="width:65%;height:5px;border-radius:2px;background:var(--att);"></div></div>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--att);">65</span>
+              </div>
+            </td>
+            <td style="font-family:var(--mono);font-size:10px;">cafe → hamel</td>
+          </tr>
+          <tr>
+            <td><span class="gc gc-curiosity">curiosity</span></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="flex:1;background:var(--s3);border-radius:2px;height:5px;"><div style="width:72%;height:5px;border-radius:2px;background:var(--res);"></div></div>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--res);">72</span>
+              </div>
+            </td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="flex:1;background:var(--s3);border-radius:2px;height:5px;"><div style="width:85%;height:5px;border-radius:2px;background:var(--att);"></div></div>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--att);">85</span>
+              </div>
+            </td>
+            <td style="font-family:var(--mono);font-size:10px;">cafe → hamel</td>
+          </tr>
+          <tr>
+            <td><span class="gc gc-hope">fragile_hope</span></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="flex:1;background:var(--s3);border-radius:2px;height:5px;"><div style="width:85%;height:5px;border-radius:2px;background:var(--res);"></div></div>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--res);">85</span>
+              </div>
+            </td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="flex:1;background:var(--s3);border-radius:2px;height:5px;"><div style="width:65%;height:5px;border-radius:2px;background:var(--att);"></div></div>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--att);">65</span>
+              </div>
+            </td>
+            <td style="font-family:var(--mono);font-size:10px;">hamel 선호</td>
+          </tr>
+          <tr>
+            <td><span class="gc gc-reconnect">reconnection</span></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="flex:1;background:var(--s3);border-radius:2px;height:5px;"><div style="width:78%;height:5px;border-radius:2px;background:var(--res);"></div></div>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--res);">78</span>
+              </div>
+            </td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="flex:1;background:var(--s3);border-radius:2px;height:5px;"><div style="width:72%;height:5px;border-radius:2px;background:var(--att);"></div></div>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--att);">72</span>
+              </div>
+            </td>
+            <td style="font-family:var(--mono);font-size:10px;">hamel → cafe</td>
+          </tr>
+          <tr>
+            <td><span class="gc gc-confusion">confusion</span></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="flex:1;background:var(--s3);border-radius:2px;height:5px;"><div style="width:92%;height:5px;border-radius:2px;background:var(--res);"></div></div>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--res);">92</span>
+              </div>
+            </td>
+            <td>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="flex:1;background:var(--s3);border-radius:2px;height:5px;"><div style="width:28%;height:5px;border-radius:2px;background:var(--att);"></div></div>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--att);">28</span>
+              </div>
+            </td>
+            <td style="font-family:var(--mono);font-size:10px;">cafe (안전)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- §2 Gravity Distribution -->
+<div class="sec">
+  <div class="sec-title">§2 · Gravity Distribution — 12 wishes primary gravity</div>
+
+  <div class="dist-chart">
+    <div class="dist-row">
+      <div class="dist-label"><span class="gc gc-hope">fragile_hope</span></div>
+      <div class="dist-bar-wrap">
+        <div class="dist-bar" style="width:25%;background:rgba(200,212,255,.22);color:var(--g-hope);">3 / 12</div>
+      </div>
+      <div class="dist-wishes">
+        <span class="dist-wish-tag">W04</span><span class="dist-wish-tag">W11</span><span class="dist-wish-tag">W12</span>
+      </div>
+    </div>
+    <div class="dist-row">
+      <div class="dist-label"><span class="gc gc-pause">pause</span></div>
+      <div class="dist-bar-wrap">
+        <div class="dist-bar" style="width:16.7%;background:rgba(255,208,128,.18);color:var(--g-pause);">2 / 12</div>
+      </div>
+      <div class="dist-wishes">
+        <span class="dist-wish-tag">W01</span><span class="dist-wish-tag">W02</span>
+      </div>
+    </div>
+    <div class="dist-row">
+      <div class="dist-label"><span class="gc gc-calm">calm</span></div>
+      <div class="dist-bar-wrap">
+        <div class="dist-bar" style="width:16.7%;background:rgba(128,196,160,.16);color:var(--g-calm);">2 / 12</div>
+      </div>
+      <div class="dist-wishes">
+        <span class="dist-wish-tag">W05</span><span class="dist-wish-tag">W06</span>
+      </div>
+    </div>
+    <div class="dist-row">
+      <div class="dist-label"><span class="gc gc-reconnect">reality_reconnection</span></div>
+      <div class="dist-bar-wrap">
+        <div class="dist-bar" style="width:16.7%;background:rgba(128,184,224,.14);color:var(--g-reconnect);">2 / 12</div>
+      </div>
+      <div class="dist-wishes">
+        <span class="dist-wish-tag">W07</span><span class="dist-wish-tag">W08</span>
+      </div>
+    </div>
+    <div class="dist-row">
+      <div class="dist-label"><span class="gc gc-confusion">confusion</span></div>
+      <div class="dist-bar-wrap">
+        <div class="dist-bar" style="width:16.7%;background:rgba(192,180,216,.16);color:var(--g-confusion);">2 / 12</div>
+      </div>
+      <div class="dist-wishes">
+        <span class="dist-wish-tag">W09</span><span class="dist-wish-tag">W10</span>
+      </div>
+    </div>
+    <div class="dist-row">
+      <div class="dist-label"><span class="gc gc-curiosity">curiosity</span></div>
+      <div class="dist-bar-wrap">
+        <div class="dist-bar" style="width:8.3%;background:rgba(255,224,96,.16);color:var(--g-curiosity);">1 / 12</div>
+      </div>
+      <div class="dist-wishes">
+        <span class="dist-wish-tag">W03</span>
+      </div>
+    </div>
+    <div class="dist-row">
+      <div class="dist-label"><span class="gc gc-afterflow">emotional_afterflow</span></div>
+      <div class="dist-bar-wrap">
+        <div class="dist-bar" style="width:4%;background:rgba(144,144,184,.12);color:var(--g-afterflow);">0 / 12</div>
+      </div>
+      <div class="dist-wishes">
+        <span style="font-size:10px;color:var(--faint);font-family:var(--mono);">F2/F4 전용 — primary 없음</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- §3 Clustering -->
+<div class="sec">
+  <div class="sec-title">§3 · Clustering — 같은 gravity 그룹</div>
+
+  <div class="cluster-grid">
+    <div class="cluster-card">
+      <div class="cluster-header">
+        <div class="cluster-count" style="background:rgba(200,212,255,.18);color:var(--g-hope);">3</div>
+        <span class="gc gc-hope">fragile_hope</span>
+      </div>
+      <div class="cluster-body">
+        <div class="cluster-wish"><span class="cluster-wish-id">W04</span><span>이번엔 꼭 해낼 수 있을 것 같아요</span></div>
+        <div class="cluster-wish"><span class="cluster-wish-id">W11</span><span>작은 소원이 이루어졌으면 좋겠어요</span></div>
+        <div class="cluster-wish"><span class="cluster-wish-id">W12</span><span>내년 이맘때는 더 나은 내가 되어있을 거예요</span></div>
+        <div style="margin-top:10px;font-size:10px;color:var(--faint);font-family:var(--mono);">공통: 조심스러운 자기 믿음<br>gem: diamond (맑은 희망)</div>
+      </div>
+    </div>
+
+    <div class="cluster-card">
+      <div class="cluster-header">
+        <div class="cluster-count" style="background:rgba(255,208,128,.14);color:var(--g-pause);">2</div>
+        <span class="gc gc-pause">pause</span>
+      </div>
+      <div class="cluster-body">
+        <div class="cluster-wish"><span class="cluster-wish-id">W01</span><span>지쳐있는 나를 보듬어주고 싶어요</span></div>
+        <div class="cluster-wish"><span class="cluster-wish-id">W02</span><span>오늘 너무 힘들었어요, 그냥 쉬고 싶어요</span></div>
+        <div style="margin-top:10px;font-size:10px;color:var(--faint);font-family:var(--mono);">공통: 멈춤 욕구<br>W01: citrine→diamond<br>W02: citrine→sapphire</div>
+      </div>
+    </div>
+
+    <div class="cluster-card">
+      <div class="cluster-header">
+        <div class="cluster-count" style="background:rgba(128,196,160,.14);color:var(--g-calm);">2</div>
+        <span class="gc gc-calm">calm</span>
+      </div>
+      <div class="cluster-body">
+        <div class="cluster-wish"><span class="cluster-wish-id">W05</span><span>지친 몸과 마음을 회복하고 싶어요</span></div>
+        <div class="cluster-wish"><span class="cluster-wish-id">W06</span><span>상처받은 마음이 조금씩 나아지길 바라요</span></div>
+        <div style="margin-top:10px;font-size:10px;color:var(--faint);font-family:var(--mono);">공통: 회복 목적지<br>gem: sapphire+emerald</div>
+      </div>
+    </div>
+
+    <div class="cluster-card">
+      <div class="cluster-header">
+        <div class="cluster-count" style="background:rgba(128,184,224,.12);color:var(--g-reconnect);">2</div>
+        <span class="gc gc-reconnect">reconnection</span>
+      </div>
+      <div class="cluster-body">
+        <div class="cluster-wish"><span class="cluster-wish-id">W07</span><span>소중한 사람과 더 가까워지고 싶어요</span></div>
+        <div class="cluster-wish"><span class="cluster-wish-id">W08</span><span>오랫동안 연락 못 한 친구가 생각나요</span></div>
+        <div style="margin-top:10px;font-size:10px;color:var(--faint);font-family:var(--mono);">W07: 적극적 연결<br>W08: 그리움+연결<br>등대 = 방향 신호 자산</div>
+      </div>
+    </div>
+
+    <div class="cluster-card">
+      <div class="cluster-header">
+        <div class="cluster-count" style="background:rgba(192,180,216,.14);color:var(--g-confusion);">2</div>
+        <span class="gc gc-confusion">confusion</span>
+      </div>
+      <div class="cluster-body">
+        <div class="cluster-wish"><span class="cluster-wish-id">W09</span><span>앞날이 너무 불확실하고 막막해요</span></div>
+        <div class="cluster-wish"><span class="cluster-wish-id">W10</span><span>이 선택이 맞는지 자꾸 의심이 돼요</span></div>
+        <div style="margin-top:10px;font-size:10px;color:var(--faint);font-family:var(--mono);">resonance 전용 (attraction ✗)<br>F5: 반드시 fragile_hope 마감</div>
+      </div>
+    </div>
+
+    <div class="cluster-card">
+      <div class="cluster-header">
+        <div class="cluster-count" style="background:rgba(255,224,96,.14);color:var(--g-curiosity);">1</div>
+        <span class="gc gc-curiosity">curiosity</span>
+      </div>
+      <div class="cluster-body">
+        <div class="cluster-wish"><span class="cluster-wish-id">W03</span><span>새로운 일을 시작해보고 싶어요</span></div>
+        <div style="margin-top:10px;font-size:10px;color:var(--faint);font-family:var(--mono);">단일. 결심형 기본 gravity.<br>attraction-compatible</div>
+      </div>
+    </div>
+
+    <div class="cluster-card" style="grid-column:span 2;">
+      <div class="cluster-header">
+        <div class="cluster-count" style="background:rgba(255,176,80,.12);color:#ffb050;">tiebreak</div>
+        <span style="font-size:11px;font-family:var(--mono);color:var(--dim);">type heuristic 적용 3건</span>
+      </div>
+      <div class="cluster-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+          <div style="padding:8px;background:var(--s2);border-radius:6px;font-size:10px;font-family:var(--mono);">
+            <div style="color:#ffb050;margin-bottom:4px;">W01</div>
+            pause=3 / afterflow=3 →<br>위로형 heuristic: pause 우선
+          </div>
+          <div style="padding:8px;background:var(--s2);border-radius:6px;font-size:10px;font-family:var(--mono);">
+            <div style="color:#ffb050;margin-bottom:4px;">W05</div>
+            pause=3 / calm=3 →<br>회복형 heuristic: calm 우선
+          </div>
+          <div style="padding:8px;background:var(--s2);border-radius:6px;font-size:10px;font-family:var(--mono);">
+            <div style="color:#ffb050;margin-bottom:4px;">W06</div>
+            calm=2 / hope=2 →<br>회복형 heuristic: calm 우선
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- §4 Resonance / Attraction Heatmap -->
+<div class="sec">
+  <div class="sec-title">§4 · Render Fit Heatmap — 12 wishes × resonance / attraction</div>
+
+  <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+    <table class="heatmap">
+      <thead>
+        <tr>
+          <th style="text-align:left;padding-left:16px;">ID</th>
+          <th style="text-align:left;">type</th>
+          <th style="text-align:left;">소원</th>
+          <th>primary gravity</th>
+          <th>resonance</th>
+          <th>attraction</th>
+          <th>recommendation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-wish" style="font-weight:700;">W01</td>
+          <td class="td-type">위로형</td>
+          <td style="font-size:11px;text-align:left;padding:6px 8px;">지쳐있는 나를 보듬어주고 싶어요</td>
+          <td style="text-align:center;"><span class="gc gc-pause">pause</span></td>
+          <td><span class="heat-cell" style="--op:.7;background:rgba(107,143,255,.7);color:#fff;">90</span></td>
+          <td><span class="heat-cell" style="--op:.3;background:rgba(255,140,64,.3);color:#fff;">55</span></td>
+          <td><span class="rec-chip rec-res">resonance</span></td>
+        </tr>
+        <tr>
+          <td class="td-wish" style="font-weight:700;">W02</td>
+          <td class="td-type">위로형</td>
+          <td style="font-size:11px;text-align:left;padding:6px 8px;">오늘 너무 힘들었어요, 그냥 쉬고 싶어요</td>
+          <td style="text-align:center;"><span class="gc gc-pause">pause</span></td>
+          <td><span class="heat-cell" style="background:rgba(107,143,255,.75);color:#fff;">92</span></td>
+          <td><span class="heat-cell" style="background:rgba(255,140,64,.25);color:#fff;">48</span></td>
+          <td><span class="rec-chip rec-res">resonance</span></td>
+        </tr>
+        <tr>
+          <td class="td-wish" style="font-weight:700;">W03</td>
+          <td class="td-type">결심형</td>
+          <td style="font-size:11px;text-align:left;padding:6px 8px;">새로운 일을 시작해보고 싶어요</td>
+          <td style="text-align:center;"><span class="gc gc-curiosity">curiosity</span></td>
+          <td><span class="heat-cell" style="background:rgba(107,143,255,.5);color:#fff;">75</span></td>
+          <td><span class="heat-cell" style="background:rgba(255,140,64,.7);color:#fff;">83</span></td>
+          <td><span class="rec-chip rec-both">both</span></td>
+        </tr>
+        <tr>
+          <td class="td-wish" style="font-weight:700;">W04</td>
+          <td class="td-type">결심형</td>
+          <td style="font-size:11px;text-align:left;padding:6px 8px;">이번엔 꼭 해낼 수 있을 것 같아요</td>
+          <td style="text-align:center;"><span class="gc gc-hope">fragile_hope</span></td>
+          <td><span class="heat-cell" style="background:rgba(107,143,255,.6);color:#fff;">80</span></td>
+          <td><span class="heat-cell" style="background:rgba(255,140,64,.5);color:#fff;">72</span></td>
+          <td><span class="rec-chip rec-res">resonance</span></td>
+        </tr>
+        <tr>
+          <td class="td-wish" style="font-weight:700;">W05</td>
+          <td class="td-type">회복형</td>
+          <td style="font-size:11px;text-align:left;padding:6px 8px;">지친 몸과 마음을 회복하고 싶어요</td>
+          <td style="text-align:center;"><span class="gc gc-calm">calm</span></td>
+          <td><span class="heat-cell" style="background:rgba(107,143,255,.7);color:#fff;">88</span></td>
+          <td><span class="heat-cell" style="background:rgba(255,140,64,.3);color:#fff;">55</span></td>
+          <td><span class="rec-chip rec-res">resonance</span></td>
+        </tr>
+        <tr>
+          <td class="td-wish" style="font-weight:700;">W06</td>
+          <td class="td-type">회복형</td>
+          <td style="font-size:11px;text-align:left;padding:6px 8px;">상처받은 마음이 조금씩 나아지길 바라요</td>
+          <td style="text-align:center;"><span class="gc gc-calm">calm</span></td>
+          <td><span class="heat-cell" style="background:rgba(107,143,255,.68);color:#fff;">87</span></td>
+          <td><span class="heat-cell" style="background:rgba(255,140,64,.32);color:#fff;">58</span></td>
+          <td><span class="rec-chip rec-res">resonance</span></td>
+        </tr>
+        <tr>
+          <td class="td-wish" style="font-weight:700;">W07</td>
+          <td class="td-type">관계형</td>
+          <td style="font-size:11px;text-align:left;padding:6px 8px;">소중한 사람과 더 가까워지고 싶어요</td>
+          <td style="text-align:center;"><span class="gc gc-reconnect">reconnection</span></td>
+          <td><span class="heat-cell" style="background:rgba(107,143,255,.6);color:#fff;">80</span></td>
+          <td><span class="heat-cell" style="background:rgba(255,140,64,.5);color:#fff;">72</span></td>
+          <td><span class="rec-chip rec-both">both</span></td>
+        </tr>
+        <tr>
+          <td class="td-wish" style="font-weight:700;">W08</td>
+          <td class="td-type">관계형</td>
+          <td style="font-size:11px;text-align:left;padding:6px 8px;">오랫동안 연락 못 한 친구가 생각나요</td>
+          <td style="text-align:center;"><span class="gc gc-reconnect">reconnection</span></td>
+          <td><span class="heat-cell" style="background:rgba(107,143,255,.67);color:#fff;">85</span></td>
+          <td><span class="heat-cell" style="background:rgba(255,140,64,.32);color:#fff;">58</span></td>
+          <td><span class="rec-chip rec-res">resonance</span></td>
+        </tr>
+        <tr>
+          <td class="td-wish" style="font-weight:700; color:#ff8080;">W09</td>
+          <td class="td-type">불안형</td>
+          <td style="font-size:11px;text-align:left;padding:6px 8px;">앞날이 너무 불확실하고 막막해요</td>
+          <td style="text-align:center;"><span class="gc gc-confusion">confusion</span></td>
+          <td><span class="heat-cell" style="background:rgba(107,143,255,.8);color:#fff;">92</span></td>
+          <td><span class="heat-cell" style="background:rgba(255,140,64,.12);color:#aaa;">25</span></td>
+          <td><span class="rec-chip rec-res">resonance only</span></td>
+        </tr>
+        <tr>
+          <td class="td-wish" style="font-weight:700;">W10</td>
+          <td class="td-type">불안형</td>
+          <td style="font-size:11px;text-align:left;padding:6px 8px;">이 선택이 맞는지 자꾸 의심이 돼요</td>
+          <td style="text-align:center;"><span class="gc gc-confusion">confusion</span></td>
+          <td><span class="heat-cell" style="background:rgba(107,143,255,.72);color:#fff;">88</span></td>
+          <td><span class="heat-cell" style="background:rgba(255,140,64,.18);color:#bbb;">35</span></td>
+          <td><span class="rec-chip rec-res">resonance</span></td>
+        </tr>
+        <tr>
+          <td class="td-wish" style="font-weight:700;">W11</td>
+          <td class="td-type">희망형</td>
+          <td style="font-size:11px;text-align:left;padding:6px 8px;">작은 소원이 이루어졌으면 좋겠어요</td>
+          <td style="text-align:center;"><span class="gc gc-hope">fragile_hope</span></td>
+          <td><span class="heat-cell" style="background:rgba(107,143,255,.68);color:#fff;">87</span></td>
+          <td><span class="heat-cell" style="background:rgba(255,140,64,.48);color:#fff;">70</span></td>
+          <td><span class="rec-chip rec-res">resonance</span></td>
+        </tr>
+        <tr>
+          <td class="td-wish" style="font-weight:700;">W12</td>
+          <td class="td-type">희망형</td>
+          <td style="font-size:11px;text-align:left;padding:6px 8px;">내년 이맘때는 더 나은 내가 되어있을 거예요</td>
+          <td style="text-align:center;"><span class="gc gc-hope">fragile_hope</span></td>
+          <td><span class="heat-cell" style="background:rgba(107,143,255,.5);color:#fff;">72</span></td>
+          <td><span class="heat-cell" style="background:rgba(255,140,64,.72);color:#fff;">85</span></td>
+          <td><span class="rec-chip rec-att">attraction</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- §5 12 Wish Cards -->
+<div class="sec">
+  <div class="sec-title">§5 · Per-Wish Interpretation Cards</div>
+
+  <div class="cards-grid">
+
+    <!-- W01 -->
+    <div class="wcard">
+      <div class="wcard-header">
+        <div class="wcard-id-type">
+          <span class="wcard-id">W01</span>
+          <span style="font-size:10px;color:var(--dim);">위로형</span>
+          <span class="gc gc-pause">pause</span>
+        </div>
+        <span class="rec-chip rec-res">resonance 90</span>
+      </div>
+      <div class="wcard-text">"지쳐있는 나를 보듬어주고 싶어요"</div>
+      <div class="wcard-body">
+        <div class="field">
+          <span class="field-label">keywords</span>
+          <div>
+            <div class="keyword-row">
+              <span class="kw-match"><span class="gc gc-pause" style="font-size:9px;padding:1px 5px;">pause</span>&nbsp;지쳐<span class="kw-match-w">×3</span></span>
+              <span class="kw-match"><span class="gc gc-afterflow" style="font-size:9px;padding:1px 5px;">afterflow</span>&nbsp;보듬<span class="kw-match-w">×3</span></span>
+            </div>
+            <div class="tiebreak-note">tiebreak: 위로형 → pause 우선</div>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">palette</span>
+          <div><span class="gem gem-citrine">citrine</span> <span style="color:var(--faint);">cafe</span> &nbsp;+&nbsp; <span class="gem gem-diamond">diamond</span> <span style="color:var(--faint);">hamel</span></div>
+        </div>
+        <div class="field">
+          <span class="field-label">location</span>
+          <div style="font-family:var(--mono);font-size:11px;">cafe → hamel</div>
+        </div>
+        <div class="reasoning">'지쳐있는' = 멈춤(pause). '보듬어주고' = 감정 처리 여운(afterflow). 위로형 heuristic으로 pause 확정. 따뜻한 citrine이 위안을 전달하고 diamond가 작은 희망으로 마감.</div>
+      </div>
+    </div>
+
+    <!-- W02 -->
+    <div class="wcard">
+      <div class="wcard-header">
+        <div class="wcard-id-type">
+          <span class="wcard-id">W02</span>
+          <span style="font-size:10px;color:var(--dim);">위로형</span>
+          <span class="gc gc-pause">pause</span>
+        </div>
+        <span class="rec-chip rec-res">resonance 92</span>
+      </div>
+      <div class="wcard-text">"오늘 너무 힘들었어요, 그냥 쉬고 싶어요"</div>
+      <div class="wcard-body">
+        <div class="field">
+          <span class="field-label">keywords</span>
+          <div class="keyword-row">
+            <span class="kw-match"><span class="gc gc-pause" style="font-size:9px;padding:1px 5px;">pause</span>&nbsp;힘들<span class="kw-match-w">×3</span></span>
+            <span class="kw-match"><span class="gc gc-pause" style="font-size:9px;padding:1px 5px;">pause</span>&nbsp;쉬고<span class="kw-match-w">×2</span></span>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">palette</span>
+          <div><span class="gem gem-citrine">citrine</span> <span style="color:var(--faint);">cafe</span> &nbsp;+&nbsp; <span class="gem gem-sapphire">sapphire</span> <span style="color:var(--faint);">hamel</span></div>
+        </div>
+        <div class="field">
+          <span class="field-label">location</span>
+          <div style="font-family:var(--mono);font-size:11px;">cafe → cafe</div>
+        </div>
+        <div class="reasoning">pause 단독 지배(5점). tiebreak 불필요. '그냥 쉬고 싶어요' = 희망 없이 순수한 안식 욕구 → 마감 감정은 fragile_hope가 아닌 calm. W01보다 더 기본적인 멈춤.</div>
+      </div>
+    </div>
+
+    <!-- W03 -->
+    <div class="wcard">
+      <div class="wcard-header">
+        <div class="wcard-id-type">
+          <span class="wcard-id">W03</span>
+          <span style="font-size:10px;color:var(--dim);">결심형</span>
+          <span class="gc gc-curiosity">curiosity</span>
+        </div>
+        <span class="rec-chip rec-both">both 75/83</span>
+      </div>
+      <div class="wcard-text">"새로운 일을 시작해보고 싶어요"</div>
+      <div class="wcard-body">
+        <div class="field">
+          <span class="field-label">keywords</span>
+          <div class="keyword-row">
+            <span class="kw-match"><span class="gc gc-curiosity" style="font-size:9px;padding:1px 5px;">curiosity</span>&nbsp;시작<span class="kw-match-w">×3</span></span>
+            <span class="kw-match"><span class="gc gc-curiosity" style="font-size:9px;padding:1px 5px;">curiosity</span>&nbsp;새로운<span class="kw-match-w">×2</span></span>
+            <span class="kw-match"><span class="gc gc-curiosity" style="font-size:9px;padding:1px 5px;">curiosity</span>&nbsp;해보고<span class="kw-match-w">×2</span></span>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">palette</span>
+          <div><span class="gem gem-citrine">citrine</span> <span style="color:var(--faint);">cafe</span> &nbsp;+&nbsp; <span class="gem gem-topaz">topaz</span> <span style="color:var(--faint);">hamel</span></div>
+        </div>
+        <div class="field">
+          <span class="field-label">location</span>
+          <div style="font-family:var(--mono);font-size:11px;">cafe → hamel</div>
+        </div>
+        <div class="reasoning">curiosity 단일 지배(7점). 3개 키워드 동시 발화. topaz hamel = 탐구 에너지가 지평선으로 향하는 이미지. attraction-compatible: 에너지가 짧은 시간에도 잘 전달됨.</div>
+      </div>
+    </div>
+
+    <!-- W04 -->
+    <div class="wcard">
+      <div class="wcard-header">
+        <div class="wcard-id-type">
+          <span class="wcard-id">W04</span>
+          <span style="font-size:10px;color:var(--dim);">결심형</span>
+          <span class="gc gc-hope">fragile_hope</span>
+        </div>
+        <span class="rec-chip rec-res">resonance 80</span>
+      </div>
+      <div class="wcard-text">"이번엔 꼭 해낼 수 있을 것 같아요"</div>
+      <div class="wcard-body">
+        <div class="field">
+          <span class="field-label">keywords</span>
+          <div class="keyword-row">
+            <span class="kw-match"><span class="gc gc-hope" style="font-size:9px;padding:1px 5px;">hope</span>&nbsp;해낼<span class="kw-match-w">×2</span></span>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">palette</span>
+          <div><span class="gem gem-diamond">diamond</span> <span style="color:var(--faint);">cafe+hamel</span></div>
+        </div>
+        <div class="field">
+          <span class="field-label">location</span>
+          <div style="font-family:var(--mono);font-size:11px;">hamel 선호</div>
+        </div>
+        <div class="reasoning">'꼭 해낼 수 있을 것 같아요' — '것 같아요'라는 유보적 종결어미가 핵심. 강한 확신이 아닌 조심스러운 자기 믿음. '이번엔' = 이전 실패 암시. diamond = 겸손한 희망의 보석.</div>
+      </div>
+    </div>
+
+    <!-- W05 -->
+    <div class="wcard">
+      <div class="wcard-header">
+        <div class="wcard-id-type">
+          <span class="wcard-id">W05</span>
+          <span style="font-size:10px;color:var(--dim);">회복형</span>
+          <span class="gc gc-calm">calm</span>
+        </div>
+        <span class="rec-chip rec-res">resonance 88</span>
+      </div>
+      <div class="wcard-text">"지친 몸과 마음을 회복하고 싶어요"</div>
+      <div class="wcard-body">
+        <div class="field">
+          <span class="field-label">keywords</span>
+          <div>
+            <div class="keyword-row">
+              <span class="kw-match"><span class="gc gc-pause" style="font-size:9px;padding:1px 5px;">pause</span>&nbsp;지친<span class="kw-match-w">×3</span></span>
+              <span class="kw-match"><span class="gc gc-calm" style="font-size:9px;padding:1px 5px;">calm</span>&nbsp;회복<span class="kw-match-w">×3</span></span>
+            </div>
+            <div class="tiebreak-note">tiebreak: 회복형 → calm 우선 (목적지 감정)</div>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">palette</span>
+          <div><span class="gem gem-sapphire">sapphire</span> <span style="color:var(--faint);">cafe</span> &nbsp;+&nbsp; <span class="gem gem-emerald">emerald</span> <span style="color:var(--faint);">hamel</span></div>
+        </div>
+        <div class="field">
+          <span class="field-label">location</span>
+          <div style="font-family:var(--mono);font-size:11px;">cafe → hamel</div>
+        </div>
+        <div class="reasoning">pause(지친)=3 / calm(회복)=3 동점. 회복형 heuristic: 현재 상태가 아닌 원하는 목적지(calm)를 primary로. sapphire+emerald = W01 citrine과 구분되는 서늘한 회복 팔레트.</div>
+      </div>
+    </div>
+
+    <!-- W06 -->
+    <div class="wcard">
+      <div class="wcard-header">
+        <div class="wcard-id-type">
+          <span class="wcard-id">W06</span>
+          <span style="font-size:10px;color:var(--dim);">회복형</span>
+          <span class="gc gc-calm">calm</span>
+        </div>
+        <span class="rec-chip rec-res">resonance 87</span>
+      </div>
+      <div class="wcard-text">"상처받은 마음이 조금씩 나아지길 바라요"</div>
+      <div class="wcard-body">
+        <div class="field">
+          <span class="field-label">keywords</span>
+          <div>
+            <div class="keyword-row">
+              <span class="kw-match"><span class="gc gc-calm" style="font-size:9px;padding:1px 5px;">calm</span>&nbsp;나아<span class="kw-match-w">×2</span></span>
+              <span class="kw-match"><span class="gc gc-hope" style="font-size:9px;padding:1px 5px;">hope</span>&nbsp;바라<span class="kw-match-w">×2</span></span>
+            </div>
+            <div class="tiebreak-note">tiebreak: 회복형 → calm 우선</div>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">palette</span>
+          <div><span class="gem gem-sapphire">sapphire</span> <span style="color:var(--faint);">cafe</span> &nbsp;+&nbsp; <span class="gem gem-emerald">emerald</span> <span style="color:var(--faint);">hamel</span></div>
+        </div>
+        <div class="field">
+          <span class="field-label">location</span>
+          <div style="font-family:var(--mono);font-size:11px;">cafe → hamel</div>
+        </div>
+        <div class="reasoning">'조금씩' 이 핵심 단어 — 급격하지 않은 회복 = calm. '상처받은'은 rule에 없지만 implicit pause 신호(치유의 전제). '나아지길 바라요' = calm+hope 복합.</div>
+      </div>
+    </div>
+
+    <!-- W07 -->
+    <div class="wcard">
+      <div class="wcard-header">
+        <div class="wcard-id-type">
+          <span class="wcard-id">W07</span>
+          <span style="font-size:10px;color:var(--dim);">관계형</span>
+          <span class="gc gc-reconnect">reconnection</span>
+        </div>
+        <span class="rec-chip rec-both">both 80/72</span>
+      </div>
+      <div class="wcard-text">"소중한 사람과 더 가까워지고 싶어요"</div>
+      <div class="wcard-body">
+        <div class="field">
+          <span class="field-label">keywords</span>
+          <div class="keyword-row">
+            <span class="kw-match"><span class="gc gc-reconnect" style="font-size:9px;padding:1px 5px;">reconnect</span>&nbsp;가까워<span class="kw-match-w">×3</span></span>
+            <span class="kw-match"><span class="gc gc-reconnect" style="font-size:9px;padding:1px 5px;">reconnect</span>&nbsp;사람<span class="kw-match-w">×1</span></span>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">palette</span>
+          <div><span class="gem gem-diamond">diamond</span> <span style="color:var(--faint);">hamel</span></div>
+        </div>
+        <div class="field">
+          <span class="field-label">location</span>
+          <div style="font-family:var(--mono);font-size:11px;">hamel 선호 (등대 = 연결 신호)</div>
+        </div>
+        <div class="reasoning">'가까워지고 싶어요' = 아직 이루어지지 않은 연결 욕구. 등대 = 방향과 신호의 자산. diamond = 맑고 투명한 연결의 이미지. attraction도 가능(관계 에너지는 짧은 화면에서도 전달).</div>
+      </div>
+    </div>
+
+    <!-- W08 -->
+    <div class="wcard">
+      <div class="wcard-header">
+        <div class="wcard-id-type">
+          <span class="wcard-id">W08</span>
+          <span style="font-size:10px;color:var(--dim);">관계형</span>
+          <span class="gc gc-reconnect">reconnection</span>
+        </div>
+        <span class="rec-chip rec-res">resonance 85</span>
+      </div>
+      <div class="wcard-text">"오랫동안 연락 못 한 친구가 생각나요"</div>
+      <div class="wcard-body">
+        <div class="field">
+          <span class="field-label">keywords</span>
+          <div class="keyword-row">
+            <span class="kw-match"><span class="gc gc-reconnect" style="font-size:9px;padding:1px 5px;">reconnect</span>&nbsp;연락<span class="kw-match-w">×2</span></span>
+            <span class="kw-match"><span class="gc gc-reconnect" style="font-size:9px;padding:1px 5px;">reconnect</span>&nbsp;친구<span class="kw-match-w">×1</span></span>
+            <span class="kw-match"><span class="gc gc-afterflow" style="font-size:9px;padding:1px 5px;">afterflow</span>&nbsp;생각나<span class="kw-match-w">×2</span></span>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">palette</span>
+          <div><span class="gem gem-sapphire">sapphire</span> <span style="color:var(--faint);">cafe</span></div>
+        </div>
+        <div class="field">
+          <span class="field-label">location</span>
+          <div style="font-family:var(--mono);font-size:11px;">cafe → hamel</div>
+        </div>
+        <div class="reasoning">reconnection(3) > afterflow(2). '생각나요' = 그리움(afterflow). '연락 못 한' = 단절 상태 = reconnection 욕구. 그리움이 연결 욕구를 감싸는 구조. sapphire = 그리움의 청색.</div>
+      </div>
+    </div>
+
+    <!-- W09 -->
+    <div class="wcard" style="border-color:rgba(255,107,107,.25);">
+      <div class="wcard-header" style="background:rgba(255,107,107,.04);">
+        <div class="wcard-id-type">
+          <span class="wcard-id" style="color:#ff8080;">W09</span>
+          <span style="font-size:10px;color:var(--dim);">불안형</span>
+          <span class="gc gc-confusion">confusion</span>
+        </div>
+        <span class="rec-chip rec-res" style="background:rgba(107,143,255,.22);">resonance ONLY</span>
+      </div>
+      <div class="wcard-text">"앞날이 너무 불확실하고 막막해요"</div>
+      <div class="wcard-body">
+        <div class="field">
+          <span class="field-label">keywords</span>
+          <div class="keyword-row">
+            <span class="kw-match"><span class="gc gc-confusion" style="font-size:9px;padding:1px 5px;">confusion</span>&nbsp;불확실<span class="kw-match-w">×3</span></span>
+            <span class="kw-match"><span class="gc gc-confusion" style="font-size:9px;padding:1px 5px;">confusion</span>&nbsp;막막<span class="kw-match-w">×3</span></span>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">palette</span>
+          <div><span class="gem gem-moonstone">moonstone</span> <span style="color:var(--faint);">cafe+hamel</span></div>
+        </div>
+        <div class="field">
+          <span class="field-label">F5 규칙</span>
+          <div style="font-size:11px;color:#ff8080;">confusion → 반드시 fragile_hope 마감</div>
+        </div>
+        <div class="reasoning">confusion 최강 신호(6점). attraction 비권장(att=25) — 혼란은 공간이 필요. moonstone = 불확실성의 시각화. F5는 반드시 fragile_hope — 혼란을 혼란으로 끝내지 않는다.</div>
+      </div>
+    </div>
+
+    <!-- W10 -->
+    <div class="wcard">
+      <div class="wcard-header">
+        <div class="wcard-id-type">
+          <span class="wcard-id">W10</span>
+          <span style="font-size:10px;color:var(--dim);">불안형</span>
+          <span class="gc gc-confusion">confusion</span>
+        </div>
+        <span class="rec-chip rec-res">resonance 88</span>
+      </div>
+      <div class="wcard-text">"이 선택이 맞는지 자꾸 의심이 돼요"</div>
+      <div class="wcard-body">
+        <div class="field">
+          <span class="field-label">keywords</span>
+          <div class="keyword-row">
+            <span class="kw-match"><span class="gc gc-confusion" style="font-size:9px;padding:1px 5px;">confusion</span>&nbsp;의심<span class="kw-match-w">×3</span></span>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">palette</span>
+          <div><span class="gem gem-moonstone">moonstone</span> → <span class="gem gem-topaz">topaz</span></div>
+        </div>
+        <div class="field">
+          <span class="field-label">location</span>
+          <div style="font-family:var(--mono);font-size:11px;">cafe → hamel (등대 방향)</div>
+        </div>
+        <div class="reasoning">'의심' 단독(3점). W09(6점)보다 강도 낮음. secondary heuristic: '선택' = 아직 가능성이 열려있다 = curiosity 약한 신호. hamel 등대 = 불안 속 방향 신호. moonstone→topaz 전환이 핵심.</div>
+      </div>
+    </div>
+
+    <!-- W11 -->
+    <div class="wcard">
+      <div class="wcard-header">
+        <div class="wcard-id-type">
+          <span class="wcard-id">W11</span>
+          <span style="font-size:10px;color:var(--dim);">희망형</span>
+          <span class="gc gc-hope">fragile_hope</span>
+        </div>
+        <span class="rec-chip rec-res">resonance 87</span>
+      </div>
+      <div class="wcard-text">"작은 소원이 이루어졌으면 좋겠어요"</div>
+      <div class="wcard-body">
+        <div class="field">
+          <span class="field-label">keywords</span>
+          <div class="keyword-row">
+            <span class="kw-match"><span class="gc gc-hope" style="font-size:9px;padding:1px 5px;">hope</span>&nbsp;이루<span class="kw-match-w">×3</span></span>
+            <span class="kw-match"><span class="gc gc-hope" style="font-size:9px;padding:1px 5px;">hope</span>&nbsp;소원<span class="kw-match-w">×2</span></span>
+            <span class="kw-match"><span class="gc gc-hope" style="font-size:9px;padding:1px 5px;">hope</span>&nbsp;좋겠<span class="kw-match-w">×1</span></span>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">palette</span>
+          <div><span class="gem gem-diamond">diamond</span> <span style="color:var(--faint);">hamel 선호</span></div>
+        </div>
+        <div class="field">
+          <span class="field-label">location</span>
+          <div style="font-family:var(--mono);font-size:11px;">hamel → hamel</div>
+        </div>
+        <div class="reasoning">fragile_hope 단일 지배(6점). '작은 소원'은 DreamTown SSOT 언어와 직접 연결. diamond = 작고 맑은 희망. W12와의 차이: W11은 조용한 바람, W12는 적극적 미래 그림.</div>
+      </div>
+    </div>
+
+    <!-- W12 -->
+    <div class="wcard">
+      <div class="wcard-header">
+        <div class="wcard-id-type">
+          <span class="wcard-id">W12</span>
+          <span style="font-size:10px;color:var(--dim);">희망형</span>
+          <span class="gc gc-hope">fragile_hope</span>
+        </div>
+        <span class="rec-chip rec-att">attraction 85</span>
+      </div>
+      <div class="wcard-text">"내년 이맘때는 더 나은 내가 되어있을 거예요"</div>
+      <div class="wcard-body">
+        <div class="field">
+          <span class="field-label">keywords</span>
+          <div>
+            <div class="keyword-row">
+              <span class="kw-match"><span class="gc gc-hope" style="font-size:9px;padding:1px 5px;">hope</span>&nbsp;나은<span class="kw-match-w">×2</span></span>
+              <span class="kw-match"><span class="gc gc-hope" style="font-size:9px;padding:1px 5px;">hope</span>&nbsp;되어있<span class="kw-match-w">×2</span></span>
+            </div>
+            <div class="tiebreak-note" style="border-color:#ffe060;color:#ffe060;background:rgba(255,224,96,.08);">future_signal: '내년' → curiosity +1 보정</div>
+          </div>
+        </div>
+        <div class="field">
+          <span class="field-label">palette</span>
+          <div><span class="gem gem-citrine">citrine</span> + <span class="gem gem-topaz">topaz</span></div>
+        </div>
+        <div class="field">
+          <span class="field-label">location</span>
+          <div style="font-family:var(--mono);font-size:11px;">cafe → hamel</div>
+        </div>
+        <div class="reasoning">fragile_hope(4) + future_signal 보정으로 curiosity 추가. '내년 이맘때' = 미래를 현재처럼 시각화하는 전진 에너지. W11과 달리 적극적이어서 attraction 권장. citrine+topaz = 열린 방향성.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- FOOTER -->
+<div class="footer">
+  <span>outputs/gravity-interpreter/ &nbsp;·&nbsp; prototype / no commit &nbsp;·&nbsp; 2026-05-22</span>
+  <span>12 wishes · 7 gravity types · rule-based + heuristic · 0 AI freeform</span>
+</div>
+
+</body>
+</html>

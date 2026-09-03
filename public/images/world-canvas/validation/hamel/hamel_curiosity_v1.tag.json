@@ -1,0 +1,12 @@
+{
+  "place": "hamel_lighthouse",
+  "emotion": "curiosity",
+  "emotion_ko": "호기심",
+  "purpose": "validation",
+  "distance": "wide",
+  "motion_safe": true,
+  "phase": "phase_2",
+  "generated_at": "2026-05-25T00:05:09.873Z",
+  "image": "hamel_curiosity_v1.png",
+  "ssot_ref": "docs/ssot/dreamtown/DreamTown_Emotion_Grammar_v1.md"
+}

@@ -1,6 +1,7 @@
 // Day-1 MVP End-to-End Test
 // Manual verification: Food ranking, cafe inclusion, regression checks
 
+require('dotenv').config();
 const db = require('../database/db');
 const travelGuideService = require('../services/travelGuideService');
 

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DreamTown Presence v0.3 — Emotional Event System</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>DREAMTOWN PRESENCE v0.3 — EMOTIONAL EVENT SYSTEM</h1>
+  <p class="tagline">"캐릭터가 연기하는 영상" 이 아니라 "공간이 감정을 기억하는 영상"</p>
+</header>
+
+<main>
+  <div class="layout">
+
+    <!-- ─── Stage ─── -->
+    <div class="stage-col">
+      <!-- stage-wrapper receives camera grammar transform -->
+      <div id="stage-wrapper">
+        <div id="stage">
+          <canvas id="base-cvs"></canvas>
+          <canvas id="human-cvs"></canvas>
+          <canvas id="shimmer-cvs"></canvas>
+          <canvas id="particle-cvs"></canvas>
+          <div    id="light-layer"></div>
+          <canvas id="grain-cvs"></canvas>
+          <canvas id="star-cvs"></canvas>
+        </div>
+      </div>
+
+      <!-- Breakpoint Phase Indicator -->
+      <div class="bp-block">
+        <div class="bp-track">
+          <div class="bp-bar-bg">
+            <div id="bp-bar" class="bp-bar-fill"></div>
+          </div>
+        </div>
+        <div class="bp-meta">
+          <span id="bp-phase" class="bp-phase">● 정적</span>
+          <span id="bp-int"   class="bp-int">0%</span>
+        </div>
+        <div class="bp-labels">
+          <span>정적</span><span>깨어남</span><span>공명</span><span>잔향</span>
+        </div>
+      </div>
+
+      <!-- Wind compass -->
+      <div class="wind-block">
+        <span class="wind-label">WIND</span>
+        <div class="wind-compass">
+          <div id="wind-angle" class="wind-arrow">↑</div>
+        </div>
+      </div>
+
+      <div class="stage-note">
+        camera: observer grammar · person: directional micro · structure: fixed<br>
+        P0: star · water · grain · always on · Breakpoint: MASTER control
+      </div>
+    </div>
+
+    <!-- ─── Controls ─── -->
+    <div class="ctrl-col">
+
+      <!-- Variant -->
+      <div class="sec">
+        <div class="sec-t">VARIANT</div>
+        <div class="btn-group">
+          <button class="vbtn"        data-v="A">A</button>
+          <button class="vbtn active" data-v="B">B</button>
+          <button class="vbtn"        data-v="C">C</button>
+        </div>
+        <div id="variant-desc" class="desc-text"></div>
+      </div>
+
+      <!-- Emotion — 5 states -->
+      <div class="sec">
+        <div class="sec-t">EMOTION STATE</div>
+        <div class="btn-group">
+          <button class="ebtn active" data-e="calm">고요함</button>
+          <button class="ebtn"        data-e="hope">희망</button>
+          <button class="ebtn"        data-e="lonely">고독</button>
+        </div>
+        <div class="btn-group" style="margin-top:4px">
+          <button class="ebtn"        data-e="healing">치유</button>
+          <button class="ebtn"        data-e="resonance">공명</button>
+        </div>
+      </div>
+
+      <!-- Image -->
+      <div class="sec">
+        <div class="sec-t">BASE IMAGE</div>
+        <select id="img-select"></select>
+        <div id="water-note" class="small-note">(카페 — water layer 비활성)</div>
+      </div>
+
+      <!-- Layers -->
+      <div class="sec">
+        <div class="sec-t">PRESENCE LAYERS</div>
+        <div id="layer-rows"></div>
+      </div>
+
+      <!-- Live -->
+      <div class="sec">
+        <div class="sec-t">LIVE</div>
+        <div id="live-status" class="mono">loading…</div>
+      </div>
+
+      <!-- Drift guard -->
+      <div class="drift-guard">
+        <div class="dg-t">DRIFT GUARD — NEVER</div>
+        <div id="drift-items"></div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- Test Questions -->
+<section class="test-qs">
+  <h2>AURORA5 평가 질문 — v0.3</h2>
+  <div id="qa-grid"></div>
+</section>
+
+<footer>
+  SSOT: docs/ssot/DREAMTOWN_PRESENCE_GRAMMAR_SSOT.md ·
+  5 Systems: Breakpoint · Directional · EventTimeline · HandMicro · CameraGrammar ·
+  DreamTown Presence v0.3 · 2026-05-24
+</footer>
+
+<script src="presence3.js"></script>
+</body>
+</html>

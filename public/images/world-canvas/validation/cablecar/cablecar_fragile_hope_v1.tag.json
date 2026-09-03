@@ -1,0 +1,12 @@
+{
+  "place": "cablecar",
+  "emotion": "fragile_hope",
+  "emotion_ko": "연약한 희망",
+  "purpose": "validation",
+  "distance": "detail",
+  "motion_safe": true,
+  "phase": "phase_0",
+  "generated_at": "2026-05-24T07:53:53.110Z",
+  "image": "cablecar_fragile_hope_v1.png",
+  "ssot_ref": "docs/ssot/dreamtown/DreamTown_Emotion_Grammar_v1.md"
+}

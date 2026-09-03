@@ -1,0 +1,12 @@
+{
+  "place": "hamel_lighthouse",
+  "emotion": "fragile_hope",
+  "emotion_ko": "연약한 희망",
+  "purpose": "validation",
+  "distance": "detail",
+  "motion_safe": true,
+  "phase": "phase_2",
+  "generated_at": "2026-05-25T00:06:05.486Z",
+  "image": "hamel_fragile_hope_v1.png",
+  "ssot_ref": "docs/ssot/dreamtown/DreamTown_Emotion_Grammar_v1.md"
+}

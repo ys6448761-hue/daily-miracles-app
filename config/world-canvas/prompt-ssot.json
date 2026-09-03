@@ -1,0 +1,83 @@
+{
+  "_ssot_version": "v1.0",
+  "_date": "2026-05-24",
+  "_principle": "세계가 주인공. 캐릭터가 주인공이 아니다.",
+
+  "identity": {
+    "product":    "miracle",
+    "role":       "당신의 별이 살아가는 세계",
+    "camera":     "wide / environmental",
+    "focus":      "세계 / 항로 / 하늘 / 여수 풍경",
+    "vs_storybook": {
+      "storybook": "당신과 별의 감정 — close / emotional / 클로즈업",
+      "miracle":   "당신의 별이 살아가는 세계 — wide / environmental / 와이드샷"
+    }
+  },
+
+  "visual_grammar": {
+    "style":          "2D watercolor, Korean animation style, Ghibli emotional tone",
+    "lighting":       "moonlight, harbor glow, soft water reflection",
+    "composition":    "wide cinematic watercolor frame, harbor visible, sky breathing",
+    "character":      "small silhouette only, emotional trace remains — NOT the focal point",
+    "emotion_density": "MEDIUM (세계 몰입)",
+    "aspect_ratio":   "9:16 portrait (1024x1536)"
+  },
+
+  "base_prompt": "A dreamy watercolor night view of Yeosu harbor, soft glowing stars above the sea, wide environmental composition, small girl silhouette quietly watching the sky, Korean emotional animation style, 2D watercolor texture, soft harbor lights reflecting on water, gentle magical atmosphere, calm cinematic framing, NOT photorealistic, NOT 3D",
+
+  "negative_prompt": "photorealistic, 3D render, hyper detailed, close-up face, large character, person as focal point, mascot character, cartoon exaggeration, commercial travel poster, tourism advertisement, cinematic lens flare, excessive particle FX, text, letters, numbers, watermark, signature, logo, multiple people, busy composition, harsh lighting, dark horror, gloomy, oppressive",
+
+  "never": [
+    "storybook 이미지 재사용",
+    "단순 zoom-out",
+    "motion만 추가",
+    "실사 스타일",
+    "3D 스타일",
+    "과한 cinematic lens flare",
+    "과한 particle FX"
+  ],
+
+  "future_expansion": {
+    "note": "현재 MVP에서는 구현 금지. 구조만 확보.",
+    "elements": [
+      "Galaxy Route",
+      "harbor particles",
+      "constellation movement",
+      "route glow",
+      "star navigation"
+    ]
+  },
+
+  "scenes": {
+    "yeosu_harbor": {
+      "scene_id":    "TEST_A",
+      "label":       "여수 항구 파노라마",
+      "emotion":     "calm hope",
+      "character_visibility": "LOW",
+      "scene_description": "Yeosu harbor night panorama, wide open sky above calm dark sea, distant city lights softly reflected, harbor silhouette and boats in the distance",
+      "character_instruction": "tiny girl silhouette standing at harbor edge, facing the sea, occupies bottom 8% of frame, centered",
+      "atmosphere": "calm harbor silence, moonlight on water, soft star glow above the sea horizon",
+      "must_remain": "wide open space dominates — sky and sea are the world, person is a whisper"
+    },
+    "yeosu_cablecar_night": {
+      "scene_id":    "TEST_B",
+      "label":       "케이블카 야경",
+      "emotion":     "floating dream",
+      "character_visibility": "VERY LOW",
+      "scene_description": "Yeosu cable car skyline at night, aerial view showing the city lights below and stars above, cable wires extending across the dark sky",
+      "character_instruction": "barely visible tiny silhouette near cable car station, occupies bottom 5% of frame, slightly off-center",
+      "atmosphere": "floating above the city lights, dreamlike suspension between earth and sky, stars feel reachable",
+      "must_remain": "the world viewed from above — vastness of night sky and harbor city is the protagonist"
+    },
+    "yeosu_dolsan": {
+      "scene_id":    "TEST_C",
+      "label":       "돌산 야경",
+      "emotion":     "quiet miracle",
+      "character_visibility": "LOW",
+      "scene_description": "Dolsan bridge night lights reflecting on Yeosu sea, wide panoramic view of the illuminated bridge arching over dark calm water, city lights in the background",
+      "character_instruction": "small girl silhouette on bridge walkway or nearby shore, occupies bottom 10% of frame, centered",
+      "atmosphere": "bridge lights create a soft golden path on water, quiet miracle feeling — the world built for this moment",
+      "must_remain": "bridge and sea are the world — the person witnesses, not performs"
+    }
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "wish": "W2", "type": "결심형",
+  "text": "새로운 일을 시작해보고 싶어요",
+  "render_mode": "attraction_social",
+  "duration_model": "Attraction Shorts",
+  "total_duration_sec": 21,
+  "gravity_sequence": ["curiosity","emotional_afterflow","calm","reality_reconnection","curiosity"],
+  "hope_curve": [0.55, 0.55, 0.58, 0.62, 0.70],
+  "gem_palette": { "cafe": "citrine", "hamel": "topaz" },
+  "frames": [
+    {
+      "id": "F1", "emotion": "curiosity", "location": "cafe", "gem": "citrine",
+      "file": "frames/F1_curiosity_cafe.png",
+      "asset": "04_curiosity_citrine_yeosu_cafe_stage2.png",
+      "attraction_role": "hook — 설레는 에너지로 즉시 관심 획득",
+      "timing": { "start": 0, "end": 4, "duration": 4 },
+      "subtitle": "오늘의 용기를 별에 담아두었어요",
+      "subtitle_copy": "#13", "subtitle_start_offset": 0.3,
+      "motion": { "type": "ken_burns", "direction": "top_to_bottom", "speed": 0.4, "duration_sec": 4 }
+    },
+    {
+      "id": "F2", "emotion": "emotional_afterflow", "location": "cafe", "gem": null,
+      "file": "frames/F2_afterflow_cafe.png",
+      "asset": "cafe_page05_emotional_afterflow_base.png",
+      "attraction_role": "compressed breath",
+      "timing": { "start": 4, "end": 7, "duration": 3 },
+      "subtitle": null, "breathing_gap": true,
+      "motion": { "type": "still", "speed": 0, "duration_sec": 3 }
+    },
+    {
+      "id": "F3", "emotion": "calm", "location": "cafe", "gem": "citrine",
+      "file": "frames/F3_calm_cafe.png",
+      "asset": "03_calm_citrine_yeosu_cafe_stage2.png",
+      "attraction_role": "mid_build — 결심이 차오르는 순간",
+      "timing": { "start": 7, "end": 10, "duration": 3 },
+      "subtitle": "조금은 믿고 싶어졌어요",
+      "subtitle_copy": "#6", "subtitle_start_offset": 0.3,
+      "motion": { "type": "cross_dissolve_then_still", "dissolve_sec": 0.7, "speed": 0, "duration_sec": 3 }
+    },
+    {
+      "id": "F4", "emotion": "reality_reconnection", "location": "hamel", "gem": null,
+      "file": "frames/F4_reconnection_hamel.png",
+      "asset": "hamel_page05_reality_reconnection_base.png",
+      "attraction_role": "visual_surprise — 카페→항구: 내면에서 세상으로",
+      "timing": { "start": 10, "end": 13, "duration": 3 },
+      "subtitle": null, "breathing_gap": true,
+      "motion": { "type": "cross_dissolve_then_ken_burns", "direction": "left_to_right", "dissolve_sec": 0.7, "speed": 0.4, "duration_sec": 3 }
+    },
+    {
+      "id": "F5", "emotion": "curiosity", "location": "hamel", "gem": "topaz",
+      "file": "frames/F5_curiosity_hamel.png",
+      "asset": "hamel_curiosity_topaz_base01.png",
+      "attraction_role": "curiosity_ending — topaz 빛 + '길이 되어줄' = 팔로우 유도",
+      "timing": { "start": 13, "end": 21, "duration": 8 },
+      "subtitle": "작은 빛 하나가 길이 되어줄 거예요",
+      "subtitle_copy": "#17", "subtitle_start_offset": 0.5,
+      "motion": { "type": "cross_dissolve_then_still_fadeout", "dissolve_sec": 0.7, "fadeout_sec": 2, "speed": 0, "duration_sec": 8 }
+    }
+  ],
+  "render_spec": { "ratio": "9:16", "resolution": "1080x1920", "dissolve": "0.7s", "subtitle_opacity": 0.9, "subtitle_weight": "regular", "breathing_gap_ratio": "28.5%", "new_ai_images": 0 }
+}

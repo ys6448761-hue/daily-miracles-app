@@ -1,0 +1,126 @@
+{
+  "_doc": "DreamTown Emotional Gravity Interpreter — Rule Set v1",
+  "_method": "rule-based keyword matching + type heuristics. LLM freeform 금지.",
+  "_gravity_types": ["pause","emotional_afterflow","calm","curiosity","fragile_hope","reality_reconnection","confusion"],
+
+  "keyword_gravity_rules": [
+    { "keyword": "지쳐",     "gravity": "pause",                "weight": 3 },
+    { "keyword": "지친",     "gravity": "pause",                "weight": 3 },
+    { "keyword": "힘들",     "gravity": "pause",                "weight": 3 },
+    { "keyword": "피곤",     "gravity": "pause",                "weight": 2 },
+    { "keyword": "무거",     "gravity": "pause",                "weight": 2 },
+    { "keyword": "쉬고",     "gravity": "pause",                "weight": 2 },
+    { "keyword": "쉬고싶",   "gravity": "pause",                "weight": 3 },
+    { "keyword": "쉬어",     "gravity": "pause",                "weight": 2 },
+    { "keyword": "멈추",     "gravity": "pause",                "weight": 2 },
+
+    { "keyword": "보듬",     "gravity": "emotional_afterflow",  "weight": 3 },
+    { "keyword": "위로",     "gravity": "emotional_afterflow",  "weight": 2 },
+    { "keyword": "그립",     "gravity": "emotional_afterflow",  "weight": 2 },
+    { "keyword": "그리워",   "gravity": "emotional_afterflow",  "weight": 2 },
+    { "keyword": "생각나",   "gravity": "emotional_afterflow",  "weight": 2 },
+    { "keyword": "보고싶",   "gravity": "emotional_afterflow",  "weight": 2 },
+    { "keyword": "남아있",   "gravity": "emotional_afterflow",  "weight": 1 },
+
+    { "keyword": "회복",     "gravity": "calm",                 "weight": 3 },
+    { "keyword": "치유",     "gravity": "calm",                 "weight": 3 },
+    { "keyword": "나아",     "gravity": "calm",                 "weight": 2 },
+    { "keyword": "안정",     "gravity": "calm",                 "weight": 2 },
+    { "keyword": "평온",     "gravity": "calm",                 "weight": 2 },
+    { "keyword": "가벼워",   "gravity": "calm",                 "weight": 2 },
+    { "keyword": "낫고",     "gravity": "calm",                 "weight": 2 },
+
+    { "keyword": "시작",     "gravity": "curiosity",            "weight": 3 },
+    { "keyword": "새로운",   "gravity": "curiosity",            "weight": 2 },
+    { "keyword": "도전",     "gravity": "curiosity",            "weight": 3 },
+    { "keyword": "해보고",   "gravity": "curiosity",            "weight": 2 },
+    { "keyword": "설레",     "gravity": "curiosity",            "weight": 2 },
+    { "keyword": "변화",     "gravity": "curiosity",            "weight": 2 },
+    { "keyword": "탐험",     "gravity": "curiosity",            "weight": 2 },
+    { "keyword": "해보려",   "gravity": "curiosity",            "weight": 2 },
+
+    { "keyword": "소원",     "gravity": "fragile_hope",         "weight": 2 },
+    { "keyword": "이루",     "gravity": "fragile_hope",         "weight": 3 },
+    { "keyword": "바라",     "gravity": "fragile_hope",         "weight": 2 },
+    { "keyword": "해낼",     "gravity": "fragile_hope",         "weight": 2 },
+    { "keyword": "나은",     "gravity": "fragile_hope",         "weight": 2 },
+    { "keyword": "좋겠",     "gravity": "fragile_hope",         "weight": 1 },
+    { "keyword": "희망",     "gravity": "fragile_hope",         "weight": 2 },
+    { "keyword": "되어있",   "gravity": "fragile_hope",         "weight": 2 },
+    { "keyword": "빛이",     "gravity": "fragile_hope",         "weight": 1 },
+
+    { "keyword": "가까워",   "gravity": "reality_reconnection", "weight": 3 },
+    { "keyword": "연락",     "gravity": "reality_reconnection", "weight": 2 },
+    { "keyword": "다시",     "gravity": "reality_reconnection", "weight": 2 },
+    { "keyword": "돌아",     "gravity": "reality_reconnection", "weight": 2 },
+    { "keyword": "만나",     "gravity": "reality_reconnection", "weight": 2 },
+    { "keyword": "함께",     "gravity": "reality_reconnection", "weight": 1 },
+    { "keyword": "사람",     "gravity": "reality_reconnection", "weight": 1 },
+    { "keyword": "친구",     "gravity": "reality_reconnection", "weight": 1 },
+
+    { "keyword": "불확실",   "gravity": "confusion",            "weight": 3 },
+    { "keyword": "막막",     "gravity": "confusion",            "weight": 3 },
+    { "keyword": "의심",     "gravity": "confusion",            "weight": 3 },
+    { "keyword": "모르겠",   "gravity": "confusion",            "weight": 2 },
+    { "keyword": "걱정",     "gravity": "confusion",            "weight": 2 },
+    { "keyword": "두려",     "gravity": "confusion",            "weight": 2 },
+    { "keyword": "불안",     "gravity": "confusion",            "weight": 3 },
+    { "keyword": "헷갈",     "gravity": "confusion",            "weight": 2 }
+  ],
+
+  "gravity_palette_map": {
+    "pause":                { "cafe_gem": "citrine",  "hamel_gem": "sapphire",  "color": "#ffd080", "rationale": "따뜻한 멈춤(citrine) → 차분한 전환(sapphire)" },
+    "emotional_afterflow":  { "cafe_gem": null,       "hamel_gem": null,        "color": "#9090b0", "rationale": "page05 고정 자산 사용. 보석 없음." },
+    "calm":                 { "cafe_gem": "sapphire", "hamel_gem": "emerald",   "color": "#80b4ff", "rationale": "차분한 청색(sapphire) → 싱그러운 녹색(emerald)" },
+    "curiosity":            { "cafe_gem": "citrine",  "hamel_gem": "topaz",     "color": "#ffe070", "rationale": "따뜻한 설레임(citrine) → 탐구 에너지(topaz)" },
+    "fragile_hope":         { "cafe_gem": "diamond",  "hamel_gem": "diamond",   "color": "#d8e4ff", "rationale": "맑고 투명한 희망. 작고 소중한 빛." },
+    "reality_reconnection": { "cafe_gem": null,       "hamel_gem": null,        "color": "#80c0e0", "rationale": "page05 고정 자산 사용. 보석 없음." },
+    "confusion":            { "cafe_gem": "moonstone","hamel_gem": "moonstone", "color": "#c0b8d8", "rationale": "희뿌연 불확실성. 밝지도 어둡지도 않음." }
+  },
+
+  "gravity_location_map": {
+    "pause":                { "primary": "cafe",  "secondary": "hamel", "rationale": "실내 따뜻함이 멈춤과 안전을 제공" },
+    "emotional_afterflow":  { "primary": "cafe",  "secondary": null,    "rationale": "page05 카페 고정" },
+    "calm":                 { "primary": "cafe",  "secondary": "hamel", "rationale": "실내 고요 → 야외 고요로 확장" },
+    "curiosity":            { "primary": "cafe",  "secondary": "hamel", "rationale": "카페(내면) → 하멜(지평선)으로 에너지 발산" },
+    "fragile_hope":         { "primary": "hamel", "secondary": "cafe",  "rationale": "항구 밤하늘 = 작은 희망의 자연 배경" },
+    "reality_reconnection": { "primary": "hamel", "secondary": "cafe",  "rationale": "page05 하멜 고정 + 등대=방향 신호" },
+    "confusion":            { "primary": "cafe",  "secondary": "hamel", "rationale": "안전한 실내에서 혼란을 처리. 등대는 방향 신호." }
+  },
+
+  "gravity_render_fit": {
+    "pause":                { "resonance": 90, "attraction": 50, "note": "긴 정적이 필요. attraction 가능하나 breathing gap 필수." },
+    "emotional_afterflow":  { "resonance": 85, "attraction": 48, "note": "여운은 속도와 반비례. attraction에서 압축되면 효과 반감." },
+    "calm":                 { "resonance": 82, "attraction": 65, "note": "calm은 attraction에서도 작동. 단 F5 길이 확보 필요." },
+    "curiosity":            { "resonance": 72, "attraction": 85, "note": "에너지가 짧은 화면에서 더 강하게 전달됨." },
+    "fragile_hope":         { "resonance": 85, "attraction": 65, "note": "fragile = 여유 필요. attraction 가능하나 F5 단축 위험." },
+    "reality_reconnection": { "resonance": 78, "attraction": 72, "note": "장소 전환 서프라이즈가 attraction에서도 효과적." },
+    "confusion":            { "resonance": 92, "attraction": 28, "note": "혼란은 공간이 필요. attraction에서는 감정 과부하 위험." }
+  },
+
+  "gravity_pacing_map": {
+    "pause":                "slow   (F1–F4: 5s, F5: 10s)",
+    "emotional_afterflow":  "slow   (breathing 중심, 자막 없음)",
+    "calm":                 "slow   (F1–F4: 5s, F5: 10s)",
+    "curiosity":            "medium (F1–F4: 4–5s, F5: 8–10s)",
+    "fragile_hope":         "slow   (F5 최소 8s 확보)",
+    "reality_reconnection": "medium (장소 전환 임팩트 최소 3s)",
+    "confusion":            "very slow (breathing gap 최대화)"
+  },
+
+  "type_heuristics": {
+    "_doc": "keyword score 동점 시 wish_type으로 우선순위 조정",
+    "위로형":  { "tiebreak_favor": "pause",                "override_notes": "위로 = 멈춤 우선" },
+    "결심형":  { "tiebreak_favor": "curiosity",            "override_notes": "결심 = 에너지 우선" },
+    "회복형":  { "tiebreak_favor": "calm",                 "override_notes": "회복 = 고요 우선" },
+    "관계형":  { "tiebreak_favor": "reality_reconnection", "override_notes": "관계 = 연결 우선" },
+    "불안형":  { "tiebreak_favor": "confusion",            "override_notes": "불안 = 혼란 우선" },
+    "희망형":  { "tiebreak_favor": "fragile_hope",         "override_notes": "희망 = 조심스러운 희망 우선" }
+  },
+
+  "future_signal_heuristic": {
+    "_doc": "미래 시제(내년, 될 거예요, 되어있을) = curiosity+fragile_hope 복합 신호",
+    "keywords": ["내년", "될 거예요", "되어있을", "언젠가", "앞으로"],
+    "effect": "curiosity +1 / fragile_hope +1 보정"
+  }
+}

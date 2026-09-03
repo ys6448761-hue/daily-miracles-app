@@ -14,6 +14,7 @@
  * - Dolsan cluster collision observations
  */
 
+require('dotenv').config();
 const db = require('./database/db');
 const crypto = require('crypto');
 

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DreamTown Auto Preview — 결심형 · attraction_social</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#080810;color:#d8d4ee;font-family:'Noto Sans KR',-apple-system,sans-serif;line-height:1.6;padding:24px}
+header{text-align:center;padding:32px 0 20px;border-bottom:1px solid #181828;margin-bottom:32px}
+header h1{font-size:1.3rem;color:#9090b8;font-weight:300;letter-spacing:.06em}
+.wt{font-size:1.15rem;color:#ede8ff;margin:12px 0 6px}
+.meta{font-size:.75rem;color:#444}
+.sec{max-width:900px;margin:0 auto 48px}
+.sec h2{font-size:.9rem;color:#7878a0;font-weight:400;margin-bottom:14px;border-bottom:1px solid #181828;padding-bottom:7px;letter-spacing:.04em}
+.note{font-size:.8rem;color:#555;margin-bottom:12px}
+.badge{background:#201a50;color:#9080ee;padding:1px 8px;border-radius:10px;font-size:.7rem;margin-left:4px}
+.badge-g{background:#102010;color:#60b870;padding:2px 8px;border-radius:10px;font-size:.75rem;margin-left:6px}
+.modeB{display:inline-block;padding:3px 10px;border-radius:4px;font-size:.7rem;margin-left:8px}
+.res-m{background:#101828;color:#5070b0}.att-m{background:#1a0e1e;color:#a060b0}
+.warn{background:#1a1008;border:1px solid #383010;border-radius:8px;padding:12px 16px;font-size:.8rem;color:#b89040;margin-bottom:16px}
+/* gravity */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.gbox{background:#0e0e1a;border-radius:10px;padding:18px}
+.pg{font-size:1.5rem;color:#c8c0ff;font-weight:300;margin-bottom:6px}
+.wtb{display:inline-block;background:#181830;padding:3px 10px;border-radius:16px;font-size:.75rem;color:#9090c0;margin-bottom:14px}
+.gems{display:flex;gap:10px;margin-top:10px}
+.gem{background:#14142a;border-radius:7px;padding:5px 12px;font-size:.78rem;color:#b0a8e0}
+.gem .loc{color:#555;font-size:.65rem;display:block}
+.fitrow{display:flex;gap:10px;margin-top:12px}
+.fitb{background:#0c0c18;border-radius:7px;padding:10px;flex:1;text-align:center}
+.fitb.rec{border:1px solid #282050}
+.fv{font-size:1.4rem;color:#9090c8;font-weight:300}
+.fl{font-size:.65rem;color:#444;margin-top:2px}
+.fitb.rec .fv{color:#b0a0ff}
+.sr{display:flex;align-items:center;gap:7px;margin:5px 0;font-size:.75rem}
+.sr.prim .gn{color:#c0b0ff}
+.gn{width:110px;color:#7070a0}
+.gb{flex:1;height:5px;background:#181828;border-radius:3px;overflow:hidden}
+.gf{height:100%;background:#4040880;border-radius:3px}
+.sr.prim .gf{background:#8070e8}
+.gv{width:18px;text-align:right;color:#444}
+.kwchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.kw{background:#14142a;border-radius:6px;padding:3px 9px;font-size:.72rem}
+.kw .kt{color:#c8c0f0}
+.kw .km{color:#444;font-size:.62rem;margin-left:3px}
+/* player */
+.pw{display:flex;justify-content:center;padding:16px 0}
+.player{position:relative;width:280px;aspect-ratio:9/16;background:#000;border-radius:14px;overflow:hidden;box-shadow:0 0 50px rgba(60,50,120,.25)}
+.fl{position:absolute;inset:0;opacity:0;transition:opacity .9s ease;z-index:1}
+.fl.act{opacity:1;z-index:2}
+.fl img{width:100%;height:100%;object-fit:cover;transform-origin:center}
+@keyframes kbDown{from{transform:scale(1.08) translateY(-2%)}to{transform:scale(1) translateY(0)}}
+@keyframes kbPan {from{transform:scale(1.05) translateX(-2%)}to{transform:scale(1) translateX(0)}}
+.kbd{animation:kbDown 12s ease-out forwards}
+.kbp{animation:kbPan 5s ease-out forwards}
+.psub{position:absolute;bottom:40px;left:0;right:0;text-align:center;color:rgba(255,255,255,0.9);font-size:1.05rem;font-weight:400;letter-spacing:.05em;padding:0 18px;opacity:0;transition:opacity .6s;z-index:10;text-shadow:0 1px 6px rgba(0,0,0,.9)}
+.psub.vis{opacity:1}
+.pbar{position:absolute;top:0;left:0;right:0;height:2px;background:rgba(255,255,255,.08);z-index:20}
+.pbf{height:100%;background:rgba(140,120,255,.55);width:0%;transition:width .1s linear}
+.pctl{position:absolute;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:linear-gradient(transparent,rgba(0,0,0,.65));z-index:20}
+.pbtn{background:none;border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:50%;width:26px;height:26px;font-size:.65rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.pbtn:hover{background:rgba(255,255,255,.1)}
+.tdsp{font-size:.65rem;color:rgba(255,255,255,.4);font-variant-numeric:tabular-nums}
+.fcnt{font-size:.6rem;color:rgba(255,255,255,.25)}
+/* frame strip */
+.fstrip{display:flex;gap:8px;overflow-x:auto;padding:4px 0}
+.fc{flex:0 0 155px;background:#0e0e1a;border-radius:9px;overflow:hidden;border:1px solid #181828}
+.fc.gap{opacity:.55}
+.fi{position:relative;aspect-ratio:3/4;background:#080816}
+.fi img{width:100%;height:100%;object-fit:cover}
+.fsub{position:absolute;bottom:7px;left:0;right:0;text-align:center;font-size:.6rem;color:rgba(255,255,255,.7);padding:0 6px}
+.flbl{position:absolute;top:5px;left:5px;background:rgba(0,0,0,.7);padding:2px 5px;border-radius:3px;font-size:.58rem;color:#aaa}
+.fm{display:flex;gap:3px;flex-wrap:wrap;padding:5px 6px}
+.tag{background:#141428;padding:2px 5px;border-radius:3px;font-size:.6rem;color:#6060a0}
+.tag.cp{color:#9080c8}
+.tag.dim{color:#333}
+/* compare table */
+.ctbl{width:100%;border-collapse:collapse;font-size:.82rem}
+.ctbl th{background:#0e0e1a;padding:7px 11px;text-align:left;color:#7070a0;font-weight:400;border-bottom:1px solid #181828}
+.ctbl td{padding:7px 11px;border-bottom:1px solid #0e0e18;color:#b8b4d8}
+.ctbl .em{color:#d0cce8;font-size:.8rem}
+.ctbl tr:hover td{background:#0c0c16}
+/* json */
+pre{background:#080816;border-radius:8px;padding:14px;overflow-x:auto;font-size:.68rem;color:#6070a0;max-height:280px;border:1px solid #141428}
+footer{text-align:center;padding:28px 0;color:#2a2a3a;font-size:.7rem;border-top:1px solid #141424;margin-top:32px}
+/* asset error */
+#asset-err{display:none;max-width:900px;margin:0 auto 16px;background:#1a0808;border:1px solid #4a1010;color:#e06060;padding:10px 16px;border-radius:8px;font-size:.8rem;text-align:center}
+.fc.img-err .fi::after{content:'⚠ 이미지 없음';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(180,20,20,.25);color:#e06060;font-size:.62rem;border:1px solid #802020}
+.fl.img-err{background:#1a0808}
+.fl.img-err::after{content:'⚠';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#e06060;font-size:2rem;z-index:3}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>DreamTown Auto Preview<span class="modeB att-m">attraction_social</span></h1>
+  <div class="wt">"새로운 일을 시작해보고 싶어요"</div>
+  <div class="meta">auto_generated · 2026-05-23 · wish_W03_att · wish-render-prototype/W2</div>
+</header>
+
+<div id="asset-err"></div>
+
+
+
+<section class="sec">
+  <h2>Gravity 분석</h2>
+  <div class="g2">
+    <div class="gbox">
+      <div class="pg">curiosity</div>
+      <div class="wtb">결심형</div>
+      <div class="gems">
+        <div class="gem"><span class="loc">cafe</span>citrine</div>
+        <div class="gem"><span class="loc">hamel</span>topaz</div>
+      </div>
+      <div class="fitrow">
+        <div class="fitb ">
+          <div class="fv">72</div>
+          <div class="fl">resonance</div>
+        </div>
+        <div class="fitb rec">
+          <div class="fv">85</div>
+          <div class="fl">attraction</div>
+        </div>
+      </div>
+    </div>
+    <div class="gbox">
+      <div style="font-size:.75rem;color:#555;margin-bottom:8px">Gravity Scores</div>
+      <div class="sr prim">
+        <span class="gn">curiosity</span>
+        <div class="gb"><div class="gf" style="width:100%"></div></div>
+        <span class="gv">7</span>
+        <span class="badge">primary</span>
+      </div>
+      <div class="kwchips"><div class="kw"><span class="kt">시작</span><span class="km">→curiosity +3</span></div><div class="kw"><span class="kt">새로운</span><span class="km">→curiosity +2</span></div><div class="kw"><span class="kt">해보고</span><span class="km">→curiosity +2</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>Preview Player <span style="font-size:.72rem;color:#444">21s · 9:16</span></h2>
+  <div class="pw">
+    <div class="player" id="player">
+      <div class="pbar"><div class="pbf" id="pbf"></div></div>
+      <div class="fl" id="fl0"><img src="../../wish-render-prototype/W2/frames/F1_curiosity_cafe.png" alt="curiosity" id="fi0" onerror="this.closest('.fl')?.classList.add('img-err')"></div>
+      <div class="fl" id="fl1"><img src="../../../public/images/storybook/sources/page05/cafe/cafe_page05_emotional_afterflow_base.png" alt="emotional_afterflow" id="fi1" onerror="this.closest('.fl')?.classList.add('img-err')"></div>
+      <div class="fl" id="fl2"><img src="../../wish-render-prototype/W2/frames/F3_calm_cafe.png" alt="calm" id="fi2" onerror="this.closest('.fl')?.classList.add('img-err')"></div>
+      <div class="fl" id="fl3"><img src="../../../public/images/storybook/sources/page05/hamel/hamel_page05_reality_reconnection_base.png" alt="reality_reconnection" id="fi3" onerror="this.closest('.fl')?.classList.add('img-err')"></div>
+      <div class="fl" id="fl4"><img src="../../wish-render-prototype/W2/frames/F5_curiosity_hamel.png" alt="curiosity" id="fi4" onerror="this.closest('.fl')?.classList.add('img-err')"></div>
+      <div class="psub" id="psub"></div>
+      <div class="pctl">
+        <button class="pbtn" id="pbtn" onclick="togglePlay()">▶</button>
+        <span class="fcnt" id="fcnt">F1/5</span>
+        <span class="tdsp" id="tdsp">0:00 / 0:21</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <h2>Emotion Arc (5 Frames)</h2>
+  <div class="fstrip"><div class="fc ">
+      <div class="fi">
+        <img src="../../wish-render-prototype/W2/frames/F1_curiosity_cafe.png" alt="F1" loading="lazy" onerror="this.closest('.fc')?.classList.add('img-err')">
+        <div class="fsub">오늘의 용기를 별에 담아두었어요</div>
+        <div class="flbl">F1 · curiosity</div>
+      </div>
+      <div class="fm">
+        <span class="tag">0s–4s</span>
+        <span class="tag">ken burns</span>
+        <span class="tag cp">#13</span>
+        
+      </div>
+    </div>
+<div class="fc gap">
+      <div class="fi">
+        <img src="../../../public/images/storybook/sources/page05/cafe/cafe_page05_emotional_afterflow_base.png" alt="F2" loading="lazy" onerror="this.closest('.fc')?.classList.add('img-err')">
+        
+        <div class="flbl">F2 · emotional_afterflow</div>
+      </div>
+      <div class="fm">
+        <span class="tag">4s–7s</span>
+        <span class="tag">still</span>
+        <span class="tag dim">—</span>
+        <span class="tag dim">breathing</span>
+      </div>
+    </div>
+<div class="fc ">
+      <div class="fi">
+        <img src="../../wish-render-prototype/W2/frames/F3_calm_cafe.png" alt="F3" loading="lazy" onerror="this.closest('.fc')?.classList.add('img-err')">
+        <div class="fsub">조금은 믿고 싶어졌어요</div>
+        <div class="flbl">F3 · calm</div>
+      </div>
+      <div class="fm">
+        <span class="tag">7s–10s</span>
+        <span class="tag">dissolve still</span>
+        <span class="tag cp">#6</span>
+        
+      </div>
+    </div>
+<div class="fc gap">
+      <div class="fi">
+        <img src="../../../public/images/storybook/sources/page05/hamel/hamel_page05_reality_reconnection_base.png" alt="F4" loading="lazy" onerror="this.closest('.fc')?.classList.add('img-err')">
+        
+        <div class="flbl">F4 · reality_reconnection</div>
+      </div>
+      <div class="fm">
+        <span class="tag">10s–13s</span>
+        <span class="tag">dissolve pan</span>
+        <span class="tag dim">—</span>
+        <span class="tag dim">breathing</span>
+      </div>
+    </div>
+<div class="fc ">
+      <div class="fi">
+        <img src="../../wish-render-prototype/W2/frames/F5_curiosity_hamel.png" alt="F5" loading="lazy" onerror="this.closest('.fc')?.classList.add('img-err')">
+        <div class="fsub">작은 빛 하나가 길이 되어줄 거예요</div>
+        <div class="flbl">F5 · curiosity</div>
+      </div>
+      <div class="fm">
+        <span class="tag">13s–21s</span>
+        <span class="tag">dissolve fadeout</span>
+        <span class="tag cp">#17</span>
+        
+      </div>
+    </div></div>
+  <div style="margin-top:10px;font-size:.75rem;color:#444">
+    emotion arc: curiosity → emotional_afterflow → calm → reality_reconnection → curiosity
+    &nbsp;·&nbsp; frame_set: wish-render-prototype/W2
+    &nbsp;·&nbsp; ratio: 9:16
+    &nbsp;·&nbsp; breathing_gap: 28.5%
+  </div>
+</section>
+
+
+
+<section class="sec">
+  <h2>sequence.json</h2>
+  <pre>{
+  "wish_id": "wish_W03_att",
+  "wish_text": "새로운 일을 시작해보고 싶어요",
+  "wish_type": "결심형",
+  "primary_gravity": "curiosity",
+  "gem_palette": {
+    "cafe": "citrine",
+    "hamel": "topaz"
+  },
+  "render_mode": "attraction_social",
+  "total_duration_sec": 21,
+  "ratio": "9:16",
+  "emotion_arc": [
+    "curiosity",
+    "emotional_afterflow",
+    "calm",
+    "reality_reconnection",
+    "curiosity"
+  ],
+  "auto_generated": true,
+  "generated_at": "2026-05-23T01:00:36.399Z",
+  "frame_set_source": "wish-render-prototype/W2",
+  "confusion_f5_override": false,
+  "render_spec": {
+    "ratio": "9:16",
+    "breathing_gap_ratio": "28.5%",
+    "subtitle_opacity": 0.9,
+    "subtitle_weight": "regular",
+    "viewer_intent": "save_share_follow",
+    "new_ai_images": 0
+  },
+  "frames": [
+    {
+      "id": "F1",
+      "index": 1,
+      "emotion": "curiosity",
+      "file": "../../wish-render-prototype/W2/frames/F1_curiosity_cafe.png",
+      "timing": {
+        "start": 0,
+        "end": 4,
+        "duration": 4
+      },
+      "subtitle": "오늘의 용기를 별에 담아두었어요",
+      "subtitle_copy": "#13",
+      "subtitle_start_offset": 0.3,
+      "breathing_gap": false,
+      "motion": {
+        "type": "ken_burns",
+        "direction": "top_to_bottom",
+        "speed": 0.4
+      }
+    },
+    {
+      "id": "F2",
+      "index": 2,
+      "emotion": "emotional_afterflow",
+      "file": "../../../public/images/storybook/sources/page05/cafe/cafe_page05_emotional_afterflow_base.png",
+      "timing": {
+        "start": 4,
+        "end": 7,
+        "duration": 3
+      },
+      "subtitle": null,
+      "subtitle_copy": null,
+      "subtitle_start_offset": null,
+      "breathing_gap": true,
+      "motion": {
+        "type": "still",
+        "speed": 0
+      }
+    },
+    {
+      "id": "F3",
+      "index": 3,
+      "emotion": "calm",
+      "file": "../../wish-render-prototype/W2/frames/F3_calm_cafe.png",
+      "timing": {
+        "start": 7,
+        "end": 10,
+        "duration": 3
+      },
+      "subtitle": "조금은 믿고 싶어졌어요",
+      "subtitle_copy": "#6",
+      "subtitle_start_offset": 0.3,
+      "breathing_gap": false,
+      "motion": {
+        "type": "dissolve_still",
+        "dissolve_sec": 0.7,
+        "speed": 0
+      }
+    },
+    {
+      "id": "F4",
+      "index": 4,
+      "emotion": "reality_reconnection",
+      "file": "../../../public/images/storybook/sources/page05/hamel/hamel_page05_reality_reconnection_base.png",
+      "timing": {
+        "start": 10,
+        "end": 13,
+        "duration": 3
+      },
+      "subtitle": null,
+      "subtitle_copy": null,
+      "subtitle_start_offset": null,
+      "breathing_gap": true,
+      "motion": {
+        "type": "dissolve_pan",
+        "direction": "left_to_right",
+        "dissolve_sec": 0.7,
+        "speed": 0.4
+      }
+    },
+    {
+      "id": "F5",
+      "index": 5,
+      "emotion": "curiosity",
+      "file": "../../wish-render-prototype/W2/frames/F5_curiosity_hamel.png",
+      "timing": {
+        "start": 13,
+        "end": 21,
+        "duration": 8
+      },
+      "subtitle": "작은 빛 하나가 길이 되어줄 거예요",
+      "subtitle_copy": "#17",
+      "subtitle_start_offset": 0.3,
+      "breathing_gap": false,
+      "motion": {
+        "type": "dissolve_fadeout",
+        "dissolve_sec": 0.7,
+        "fadeout_sec": 2,
+        "speed": 0
+      }
+    }
+  ]
+}</pre>
+</section>
+
+<footer>
+  DreamTown Auto Preview · assemble-miracle-video.js v1 · 2026-05-23T01:00:36.399Z<br>
+  기존 자산 재사용 · 신규 이미지 0건 · LLM freeform 없음 · EMOT-TRANS-001 준수
+</footer>
+
+<script>
+const FR=[{"start":0,"end":4,"sub":"오늘의 용기를 별에 담아두었어요","subOffset":0.3,"motion":"ken_burns","isGap":false},{"start":4,"end":7,"sub":null,"subOffset":0,"motion":"still","isGap":true},{"start":7,"end":10,"sub":"조금은 믿고 싶어졌어요","subOffset":0.3,"motion":"dissolve_still","isGap":false},{"start":10,"end":13,"sub":null,"subOffset":0,"motion":"dissolve_pan","isGap":true},{"start":13,"end":21,"sub":"작은 빛 하나가 길이 되어줄 거예요","subOffset":0.3,"motion":"dissolve_fadeout","isGap":false}];
+const TOTAL=21;
+let t=0,playing=false,last=null,raf=null;
+
+function fmt(s){return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0')}
+
+function active(t){
+  for(let i=FR.length-1;i>=0;i--) if(t>=FR[i].start) return i;
+  return 0;
+}
+
+function render(t){
+  document.getElementById('pbf').style.width=Math.min(t/TOTAL*100,100)+'%';
+  document.getElementById('tdsp').textContent=fmt(t)+' / '+fmt(TOTAL);
+  const fi=active(t);
+  document.getElementById('fcnt').textContent='F'+(fi+1)+'/5';
+  for(let i=0;i<FR.length;i++){
+    const el=document.getElementById('fl'+i);
+    if(i===fi){
+      if(!el.classList.contains('act')){
+        el.classList.add('act');
+        const img=document.getElementById('fi'+i);
+        img.classList.remove('kbd','kbp');
+        if(FR[i].motion==='ken_burns') img.classList.add('kbd');
+        if(FR[i].motion==='dissolve_pan') img.classList.add('kbp');
+      }
+    } else el.classList.remove('act');
+  }
+  const f=FR[fi];
+  const tif=t-f.start;
+  const sub=document.getElementById('psub');
+  if(f.sub&&tif>=f.subOffset){sub.textContent=f.sub;sub.classList.add('vis')}
+  else{sub.classList.remove('vis')}
+  if(t>=TOTAL-2){
+    const last=document.getElementById('fl'+(FR.length-1));
+    last.style.opacity=Math.max(0,1-(t-(TOTAL-2))/2);
+  }
+}
+
+function tick(ts){
+  if(!playing) return;
+  if(last!==null) t=Math.min(t+(ts-last)/1000,TOTAL);
+  last=ts; render(t);
+  if(t>=TOTAL){playing=false;document.getElementById('pbtn').textContent='↺';last=null;return}
+  raf=requestAnimationFrame(tick);
+}
+
+function togglePlay(){
+  if(t>=TOTAL){t=0;render(0)}
+  playing=!playing;
+  document.getElementById('pbtn').textContent=playing?'⏸':'▶';
+  if(playing){last=null;raf=requestAnimationFrame(tick)}
+  else{cancelAnimationFrame(raf);last=null}
+}
+
+render(0);
+document.getElementById('fl0').classList.add('act');
+
+window.addEventListener('load', function() {
+  const errs = document.querySelectorAll('.img-err');
+  if (errs.length) {
+    const b = document.getElementById('asset-err');
+    b.style.display = 'block';
+    b.textContent = '⚠ 이미지 로딩 실패 ' + errs.length + '개 — Network 탭에서 404 경로를 확인하세요';
+  }
+});
+</script>
+</body>
+</html>

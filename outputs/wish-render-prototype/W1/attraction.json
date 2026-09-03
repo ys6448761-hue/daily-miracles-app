@@ -1,0 +1,61 @@
+{
+  "wish": "W1", "type": "위로형",
+  "text": "지쳐있는 나를 보듬어주고 싶어요",
+  "render_mode": "attraction_social",
+  "duration_model": "Attraction Shorts",
+  "total_duration_sec": 21,
+  "gravity_sequence": ["pause","emotional_afterflow","calm","reality_reconnection","fragile_hope"],
+  "hope_curve": [0.50, 0.50, 0.52, 0.55, 0.62],
+  "gem_palette": { "cafe": "citrine", "hamel": "diamond" },
+  "frames": [
+    {
+      "id": "F1", "emotion": "pause", "location": "cafe", "gem": "citrine",
+      "file": "frames/F1_pause_cafe.png",
+      "asset": "02_pause_citrine_yeosu_cafe_stage2.png",
+      "attraction_role": "hook — 즉시 자막으로 스크롤 멈춤",
+      "timing": { "start": 0, "end": 4, "duration": 4 },
+      "subtitle": "오늘의 마음을 이 밤에 남겨둘게요",
+      "subtitle_copy": "#9", "subtitle_start_offset": 0.3,
+      "motion": { "type": "ken_burns", "direction": "top_to_bottom", "speed": 0.4, "duration_sec": 4 }
+    },
+    {
+      "id": "F2", "emotion": "emotional_afterflow", "location": "cafe", "gem": null,
+      "file": "frames/F2_afterflow_cafe.png",
+      "asset": "cafe_page05_emotional_afterflow_base.png",
+      "attraction_role": "compressed breath — 최소 여운 유지",
+      "timing": { "start": 4, "end": 7, "duration": 3 },
+      "subtitle": null, "breathing_gap": true,
+      "motion": { "type": "still", "speed": 0, "duration_sec": 3 }
+    },
+    {
+      "id": "F3", "emotion": "calm", "location": "cafe", "gem": "citrine",
+      "file": "frames/F3_calm_cafe.png",
+      "asset": "03_calm_citrine_yeosu_cafe_stage2.png",
+      "attraction_role": "mid_build — 감정 축적",
+      "timing": { "start": 7, "end": 10, "duration": 3 },
+      "subtitle": "마음이 조금 가벼워졌다면 좋겠어요",
+      "subtitle_copy": "#11", "subtitle_start_offset": 0.3,
+      "motion": { "type": "cross_dissolve_then_still", "dissolve_sec": 0.7, "speed": 0, "duration_sec": 3 }
+    },
+    {
+      "id": "F4", "emotion": "reality_reconnection", "location": "hamel", "gem": null,
+      "file": "frames/F4_reconnection_hamel.png",
+      "asset": "hamel_page05_reality_reconnection_base.png",
+      "attraction_role": "visual_surprise — 카페→항구 전환",
+      "timing": { "start": 10, "end": 13, "duration": 3 },
+      "subtitle": null, "breathing_gap": true,
+      "motion": { "type": "cross_dissolve_then_ken_burns", "direction": "left_to_right", "dissolve_sec": 0.7, "speed": 0.4, "duration_sec": 3 }
+    },
+    {
+      "id": "F5", "emotion": "fragile_hope", "location": "hamel", "gem": "diamond",
+      "file": "frames/F5_fragile_hope_hamel.png",
+      "asset": "hamel_fragile_hope_diamond_base02.png",
+      "attraction_role": "curiosity_ending — 열린 결말, 저장 유도",
+      "timing": { "start": 13, "end": 21, "duration": 8 },
+      "subtitle": "작은 소원 하나가 밤하늘에 남았어요",
+      "subtitle_copy": "#2", "subtitle_start_offset": 0.5,
+      "motion": { "type": "cross_dissolve_then_still_fadeout", "dissolve_sec": 0.7, "fadeout_sec": 2, "speed": 0, "duration_sec": 8 }
+    }
+  ],
+  "render_spec": { "ratio": "9:16", "resolution": "1080x1920", "dissolve": "0.7s", "subtitle_opacity": 0.9, "subtitle_weight": "regular", "breathing_gap_ratio": "28.5%", "new_ai_images": 0 }
+}

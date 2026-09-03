@@ -1,0 +1,885 @@
+[
+  {
+    "timestamp": "2026-08-23T23:08:50.232Z",
+    "context": {
+      "people_type": "family_with_kids",
+      "time_available_minutes": 180,
+      "has_car": true,
+      "entry_point": "RAMADA_YEOSU",
+      "companion_constraints": {
+        "has_kids": true,
+        "kids_age": 5
+      }
+    },
+    "execution": {
+      "success": true,
+      "placesReturned": 3,
+      "message": "Recommendations based on your travel context",
+      "foodStatus": "unavailable"
+    },
+    "topRecommendations": [
+      {
+        "code": "cablecar",
+        "name": "케이블카",
+        "cluster": "dolsan_area",
+        "stayMinutes": 45,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "hyangiram",
+        "name": "향일암",
+        "cluster": null,
+        "stayMinutes": 90,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "jaisan_park",
+        "name": "자산공원",
+        "cluster": null,
+        "stayMinutes": 30,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      }
+    ],
+    "clusterCollision": 0
+  },
+  {
+    "timestamp": "2026-08-23T23:08:51.577Z",
+    "context": {
+      "people_type": "couple",
+      "time_available_minutes": 180,
+      "has_car": true,
+      "entry_point": "RAMADA_YEOSU"
+    },
+    "execution": {
+      "success": true,
+      "placesReturned": 3,
+      "message": "Recommendations based on your travel context",
+      "foodStatus": "unavailable"
+    },
+    "topRecommendations": [
+      {
+        "code": "dolsan_nightscape",
+        "name": "돌산 야경",
+        "cluster": "dolsan_area",
+        "stayMinutes": 45,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "hyangiram",
+        "name": "향일암",
+        "cluster": null,
+        "stayMinutes": 90,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "jaisan_park",
+        "name": "자산공원",
+        "cluster": null,
+        "stayMinutes": 30,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      }
+    ],
+    "clusterCollision": 0
+  },
+  {
+    "timestamp": "2026-08-23T23:08:52.008Z",
+    "context": {
+      "people_type": "solo",
+      "time_available_minutes": 120,
+      "has_car": false,
+      "entry_point": "RAMADA_YEOSU"
+    },
+    "execution": {
+      "success": true,
+      "placesReturned": 3,
+      "message": "Recommendations based on your travel context",
+      "foodStatus": "unavailable"
+    },
+    "topRecommendations": [
+      {
+        "code": "cablecar",
+        "name": "케이블카",
+        "cluster": "dolsan_area",
+        "stayMinutes": 45,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified",
+          "bus_accessibility_unverified"
+        ]
+      },
+      {
+        "code": "hyangiram",
+        "name": "향일암",
+        "cluster": null,
+        "stayMinutes": 90,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified",
+          "bus_accessibility_unverified"
+        ]
+      },
+      {
+        "code": "jaisan_park",
+        "name": "자산공원",
+        "cluster": null,
+        "stayMinutes": 30,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified",
+          "bus_accessibility_unverified"
+        ]
+      }
+    ],
+    "clusterCollision": 0
+  },
+  {
+    "timestamp": "2026-08-23T23:08:52.449Z",
+    "context": {
+      "people_type": "family_elderly",
+      "time_available_minutes": 120,
+      "has_car": true,
+      "entry_point": "RAMADA_YEOSU",
+      "companion_constraints": {
+        "has_elderly": true
+      }
+    },
+    "execution": {
+      "success": true,
+      "placesReturned": 3,
+      "message": "Recommendations based on your travel context",
+      "foodStatus": "unavailable"
+    },
+    "topRecommendations": [
+      {
+        "code": "hyangiram",
+        "name": "향일암",
+        "cluster": null,
+        "stayMinutes": 90,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "jaisan_park",
+        "name": "자산공원",
+        "cluster": null,
+        "stayMinutes": 30,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "jungang_market",
+        "name": "중앙시장",
+        "cluster": null,
+        "stayMinutes": 75,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      }
+    ],
+    "clusterCollision": 0
+  },
+  {
+    "timestamp": "2026-08-23T23:08:52.878Z",
+    "context": {
+      "people_type": "solo",
+      "time_available_minutes": 120,
+      "has_car": true,
+      "entry_point": "RAMADA_YEOSU",
+      "companion_constraints": {
+        "disability": "wheelchair"
+      }
+    },
+    "execution": {
+      "success": true,
+      "placesReturned": 3,
+      "message": "Recommendations based on your travel context",
+      "foodStatus": "unavailable"
+    },
+    "topRecommendations": [
+      {
+        "code": "cablecar",
+        "name": "케이블카",
+        "cluster": "dolsan_area",
+        "stayMinutes": 45,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified",
+          "wheelchair_accessibility_unverified"
+        ]
+      },
+      {
+        "code": "hyangiram",
+        "name": "향일암",
+        "cluster": null,
+        "stayMinutes": 90,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified",
+          "wheelchair_accessibility_unverified"
+        ]
+      },
+      {
+        "code": "jaisan_park",
+        "name": "자산공원",
+        "cluster": null,
+        "stayMinutes": 30,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified",
+          "wheelchair_accessibility_unverified"
+        ]
+      }
+    ],
+    "clusterCollision": 0
+  },
+  {
+    "timestamp": "2026-08-23T23:08:53.307Z",
+    "context": {
+      "people_type": "family_with_kids",
+      "time_available_minutes": 240,
+      "has_car": false,
+      "entry_point": "RAMADA_YEOSU"
+    },
+    "execution": {
+      "success": true,
+      "placesReturned": 3,
+      "message": "Recommendations based on your travel context",
+      "foodStatus": "unavailable"
+    },
+    "topRecommendations": [
+      {
+        "code": "cablecar",
+        "name": "케이블카",
+        "cluster": "dolsan_area",
+        "stayMinutes": 45,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified",
+          "bus_accessibility_unverified"
+        ]
+      },
+      {
+        "code": "hyangiram",
+        "name": "향일암",
+        "cluster": null,
+        "stayMinutes": 90,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified",
+          "bus_accessibility_unverified"
+        ]
+      },
+      {
+        "code": "jaisan_park",
+        "name": "자산공원",
+        "cluster": null,
+        "stayMinutes": 30,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified",
+          "bus_accessibility_unverified"
+        ]
+      }
+    ],
+    "clusterCollision": 0
+  },
+  {
+    "timestamp": "2026-08-23T23:08:53.731Z",
+    "context": {
+      "people_type": "family_with_kids",
+      "time_available_minutes": 180,
+      "has_car": true,
+      "entry_point": "RAMADA_PLAZA_YEOSU"
+    },
+    "execution": {
+      "success": true,
+      "placesReturned": 3,
+      "message": "Recommendations based on your travel context",
+      "foodStatus": "unavailable"
+    },
+    "topRecommendations": [
+      {
+        "code": "cablecar",
+        "name": "케이블카",
+        "cluster": "dolsan_area",
+        "stayMinutes": 45,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "hyangiram",
+        "name": "향일암",
+        "cluster": null,
+        "stayMinutes": 90,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "jaisan_park",
+        "name": "자산공원",
+        "cluster": null,
+        "stayMinutes": 30,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      }
+    ],
+    "clusterCollision": 0
+  },
+  {
+    "timestamp": "2026-08-23T23:08:54.155Z",
+    "context": {
+      "people_type": "family_with_kids",
+      "time_available_minutes": 180,
+      "has_car": true,
+      "entry_point": "YEOSU_EXPO_STATION"
+    },
+    "execution": {
+      "success": true,
+      "placesReturned": 3,
+      "message": "Recommendations based on your travel context",
+      "foodStatus": "unavailable"
+    },
+    "topRecommendations": [
+      {
+        "code": "cablecar",
+        "name": "케이블카",
+        "cluster": "dolsan_area",
+        "stayMinutes": 45,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "hyangiram",
+        "name": "향일암",
+        "cluster": null,
+        "stayMinutes": 90,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "jaisan_park",
+        "name": "자산공원",
+        "cluster": null,
+        "stayMinutes": 30,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      }
+    ],
+    "clusterCollision": 0
+  },
+  {
+    "timestamp": "2026-08-23T23:08:54.575Z",
+    "context": {
+      "people_type": "family_with_kids",
+      "time_available_minutes": 60,
+      "has_car": true,
+      "entry_point": "RAMADA_YEOSU",
+      "companion_constraints": {
+        "has_kids": true,
+        "kids_age": 5
+      }
+    },
+    "execution": {
+      "success": true,
+      "placesReturned": 3,
+      "message": "Recommendations based on your travel context",
+      "foodStatus": "unavailable"
+    },
+    "topRecommendations": [
+      {
+        "code": "cablecar",
+        "name": "케이블카",
+        "cluster": "dolsan_area",
+        "stayMinutes": 45,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "hyangiram",
+        "name": "향일암",
+        "cluster": null,
+        "stayMinutes": 90,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "jaisan_park",
+        "name": "자산공원",
+        "cluster": null,
+        "stayMinutes": 30,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      }
+    ],
+    "clusterCollision": 0
+  },
+  {
+    "timestamp": "2026-08-23T23:08:55.001Z",
+    "context": {
+      "people_type": "family_with_kids",
+      "time_available_minutes": 120,
+      "has_car": true,
+      "entry_point": "RAMADA_YEOSU",
+      "companion_constraints": {
+        "has_kids": true,
+        "kids_age": 5
+      }
+    },
+    "execution": {
+      "success": true,
+      "placesReturned": 3,
+      "message": "Recommendations based on your travel context",
+      "foodStatus": "unavailable"
+    },
+    "topRecommendations": [
+      {
+        "code": "cablecar",
+        "name": "케이블카",
+        "cluster": "dolsan_area",
+        "stayMinutes": 45,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "hyangiram",
+        "name": "향일암",
+        "cluster": null,
+        "stayMinutes": 90,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "jaisan_park",
+        "name": "자산공원",
+        "cluster": null,
+        "stayMinutes": 30,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      }
+    ],
+    "clusterCollision": 0
+  },
+  {
+    "timestamp": "2026-08-23T23:08:55.445Z",
+    "context": {
+      "people_type": "family_with_kids",
+      "time_available_minutes": 180,
+      "has_car": true,
+      "entry_point": "RAMADA_YEOSU",
+      "companion_constraints": {
+        "has_kids": true,
+        "kids_age": 5
+      }
+    },
+    "execution": {
+      "success": true,
+      "placesReturned": 3,
+      "message": "Recommendations based on your travel context",
+      "foodStatus": "unavailable"
+    },
+    "topRecommendations": [
+      {
+        "code": "cablecar",
+        "name": "케이블카",
+        "cluster": "dolsan_area",
+        "stayMinutes": 45,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "hyangiram",
+        "name": "향일암",
+        "cluster": null,
+        "stayMinutes": 90,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "jaisan_park",
+        "name": "자산공원",
+        "cluster": null,
+        "stayMinutes": 30,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      }
+    ],
+    "clusterCollision": 0
+  },
+  {
+    "timestamp": "2026-08-23T23:08:55.877Z",
+    "context": {
+      "people_type": "family_with_kids",
+      "time_available_minutes": 240,
+      "has_car": true,
+      "entry_point": "RAMADA_YEOSU",
+      "companion_constraints": {
+        "has_kids": true,
+        "kids_age": 5
+      }
+    },
+    "execution": {
+      "success": true,
+      "placesReturned": 3,
+      "message": "Recommendations based on your travel context",
+      "foodStatus": "unavailable"
+    },
+    "topRecommendations": [
+      {
+        "code": "cablecar",
+        "name": "케이블카",
+        "cluster": "dolsan_area",
+        "stayMinutes": 45,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "hyangiram",
+        "name": "향일암",
+        "cluster": null,
+        "stayMinutes": 90,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "jaisan_park",
+        "name": "자산공원",
+        "cluster": null,
+        "stayMinutes": 30,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      }
+    ],
+    "clusterCollision": 0
+  },
+  {
+    "timestamp": "2026-08-23T23:08:56.303Z",
+    "context": {
+      "people_type": "family_with_kids",
+      "time_available_minutes": 360,
+      "has_car": true,
+      "entry_point": "RAMADA_YEOSU",
+      "companion_constraints": {
+        "has_kids": true,
+        "kids_age": 5
+      }
+    },
+    "execution": {
+      "success": true,
+      "placesReturned": 3,
+      "message": "Recommendations based on your travel context",
+      "foodStatus": "unavailable"
+    },
+    "topRecommendations": [
+      {
+        "code": "cablecar",
+        "name": "케이블카",
+        "cluster": "dolsan_area",
+        "stayMinutes": 45,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "hyangiram",
+        "name": "향일암",
+        "cluster": null,
+        "stayMinutes": 90,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "jaisan_park",
+        "name": "자산공원",
+        "cluster": null,
+        "stayMinutes": 30,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      }
+    ],
+    "clusterCollision": 0
+  },
+  {
+    "timestamp": "2026-08-23T23:08:56.738Z",
+    "context": {
+      "people_type": "family_with_kids",
+      "time_available_minutes": 480,
+      "has_car": true,
+      "entry_point": "RAMADA_YEOSU",
+      "companion_constraints": {
+        "has_kids": true,
+        "kids_age": 5
+      }
+    },
+    "execution": {
+      "success": true,
+      "placesReturned": 3,
+      "message": "Recommendations based on your travel context",
+      "foodStatus": "unavailable"
+    },
+    "topRecommendations": [
+      {
+        "code": "cablecar",
+        "name": "케이블카",
+        "cluster": "dolsan_area",
+        "stayMinutes": 45,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "hyangiram",
+        "name": "향일암",
+        "cluster": null,
+        "stayMinutes": 90,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      },
+      {
+        "code": "jaisan_park",
+        "name": "자산공원",
+        "cluster": null,
+        "stayMinutes": 30,
+        "travelTimeMinutes": null,
+        "travelTimeStatus": "unknown",
+        "totalRequiredTime": null,
+        "totalTimeStatus": "unknown",
+        "reason": "Your travel context matches this place",
+        "warnings": [
+          "total_required_time_unverified"
+        ]
+      }
+    ],
+    "clusterCollision": 0
+  }
+]

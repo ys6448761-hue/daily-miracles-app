@@ -1,0 +1,12 @@
+{
+  "place": "hamel_lighthouse",
+  "emotion": "confusion",
+  "emotion_ko": "혼란",
+  "purpose": "validation",
+  "distance": "medium",
+  "motion_safe": true,
+  "phase": "phase_2",
+  "generated_at": "2026-05-25T00:02:35.119Z",
+  "image": "hamel_confusion_v1.png",
+  "ssot_ref": "docs/ssot/dreamtown/DreamTown_Emotion_Grammar_v1.md"
+}

@@ -1,0 +1,157 @@
+{
+  "_doc": "wish-to-render 감정 중력 엔진 — prototype v1",
+  "_philosophy": "소원 텍스트 → 감정 중력 추출 → 자산 선택 → 렌더 모드 분기",
+  "_constraint": "신규 AI 이미지 생성 금지 / 등록된 카피만 사용 / DreamTown 세계관 유지",
+
+  "wish_type_classifier": {
+    "위로형": {
+      "keywords": ["지쳐", "힘들다", "보듬", "위로", "쉬고싶다", "피곤", "지쳐있는", "힘든"],
+      "detect_tone": "exhaustion + seeking comfort",
+      "gravity_sequence": [
+        "pause",
+        "emotional_afterflow",
+        "calm",
+        "reality_reconnection",
+        "fragile_hope"
+      ],
+      "hope_curve": [0.50, 0.50, 0.52, 0.55, 0.62],
+      "hope_direction": "gentle rise from stillness to small hope",
+      "gem_palette": {
+        "cafe": "citrine",
+        "hamel": "diamond",
+        "rationale": "citrine = 따뜻한 위안 / diamond = 맑고 조용한 희망"
+      },
+      "lead_location": "cafe",
+      "end_location": "hamel"
+    },
+
+    "결심형": {
+      "keywords": ["시작", "결심", "도전", "해보고싶다", "변화", "새로운", "용기", "해보려", "시도"],
+      "detect_tone": "emerging determination + forward energy",
+      "gravity_sequence": [
+        "curiosity",
+        "emotional_afterflow",
+        "calm",
+        "reality_reconnection",
+        "curiosity"
+      ],
+      "hope_curve": [0.55, 0.55, 0.58, 0.62, 0.70],
+      "hope_direction": "curiosity loop — opening energy returns at end",
+      "gem_palette": {
+        "cafe": "citrine",
+        "hamel": "topaz",
+        "rationale": "citrine = 따뜻한 시작 에너지 / topaz = 호기심과 탐구"
+      },
+      "lead_location": "cafe",
+      "end_location": "hamel"
+    },
+
+    "회복형": {
+      "keywords": ["회복", "치유", "다시", "건강", "상처", "지쳐서", "돌아오고", "쉬고"],
+      "detect_tone": "fatigue + need for restoration",
+      "gravity_sequence": [
+        "pause",
+        "emotional_afterflow",
+        "calm",
+        "reality_reconnection",
+        "calm"
+      ],
+      "hope_curve": [0.48, 0.50, 0.53, 0.57, 0.63],
+      "hope_direction": "recovery arc — ends on calm not hope (grounded healing)",
+      "gem_palette": {
+        "cafe": "sapphire",
+        "hamel": "emerald",
+        "rationale": "sapphire = 차분한 회복 / emerald = 싱그러운 치유"
+      },
+      "lead_location": "cafe",
+      "end_location": "hamel"
+    }
+  },
+
+  "asset_selection_rules": {
+    "_rule": "emotion + gem + location → asset_registry에서 1개 선택",
+    "F1": {
+      "slot": "hook / opening emotion",
+      "source": "thumbnails/generated/full",
+      "select": "emotion[0] + gem_palette[cafe] + location[cafe]",
+      "page05_eligible": false
+    },
+    "F2": {
+      "slot": "breathing gap #1",
+      "source": "storybook/sources/page05",
+      "select": "fixed: cafe_page05_emotional_afterflow_base.png",
+      "page05_eligible": true,
+      "subtitle": null
+    },
+    "F3": {
+      "slot": "mid emotion",
+      "source": "thumbnails/generated/full",
+      "select": "calm + gem_palette[cafe] + location[cafe]",
+      "page05_eligible": false
+    },
+    "F4": {
+      "slot": "breathing gap #2 / location transition",
+      "source": "storybook/sources/page05",
+      "select": "fixed: hamel_page05_reality_reconnection_base.png",
+      "page05_eligible": true,
+      "subtitle": null
+    },
+    "F5": {
+      "slot": "closing emotion / wish signal",
+      "source": "thumbnails/generated/full",
+      "select": "emotion[4] + gem_palette[hamel] + location[hamel]",
+      "page05_eligible": false,
+      "preferred_base": "base02"
+    }
+  },
+
+  "subtitle_mapping": {
+    "_rule": "wish_type → F1/F3/F5 각 1개 카피 배정 / postcard-emotion-copy-ssot.md 정본",
+    "위로형": {
+      "F1": { "copy": "#9",  "text": "오늘의 마음을 이 밤에 남겨둘게요", "tone": "조용한 여운" },
+      "F3": { "copy": "#11", "text": "마음이 조금 가벼워졌다면 좋겠어요",  "tone": "조용한 여운" },
+      "F5": { "copy": "#2",  "text": "작은 소원 하나가 밤하늘에 남았어요", "tone": "작은 믿음" }
+    },
+    "결심형": {
+      "F1": { "copy": "#13", "text": "오늘의 용기를 별에 담아두었어요",    "tone": "작은 믿음" },
+      "F3": { "copy": "#6",  "text": "조금은 믿고 싶어졌어요",             "tone": "작은 믿음" },
+      "F5": { "copy": "#17", "text": "작은 빛 하나가 길이 되어줄 거예요",  "tone": "작은 믿음" }
+    },
+    "회복형": {
+      "F1": { "copy": "#8",  "text": "별빛은 아주 작은 마음에서 시작돼요", "tone": "조용한 여운" },
+      "F3": { "copy": "#11", "text": "마음이 조금 가벼워졌다면 좋겠어요",  "tone": "조용한 여운" },
+      "F5": { "copy": "#7",  "text": "당신의 오늘도 충분히 반짝였어요",    "tone": "조용한 여운" }
+    }
+  },
+
+  "render_modes": {
+    "resonance": {
+      "total_sec": 30,
+      "frame_durations": { "F1": 5, "F2": 5, "F3": 5, "F4": 5, "F5": 10 },
+      "subtitle_offset_sec": 1.0,
+      "subtitle_opacity": 0.7,
+      "subtitle_weight": "thin",
+      "dissolve_sec": 1.0,
+      "ken_burns_speed": 0.3,
+      "breathing_gap_ratio": "40%",
+      "aspect_ratio": "3:4",
+      "philosophy": "not_long_attention / but_long_emotional_residue",
+      "viewer_intent": "emotional_residue",
+      "sound_db": -22
+    },
+    "attraction": {
+      "total_sec": 21,
+      "frame_durations": { "F1": 4, "F2": 3, "F3": 3, "F4": 3, "F5": 8 },
+      "subtitle_offset_sec": 0.3,
+      "subtitle_opacity": 0.9,
+      "subtitle_weight": "regular",
+      "dissolve_sec": 0.7,
+      "ken_burns_speed": 0.4,
+      "breathing_gap_ratio": "28.5%",
+      "aspect_ratio": "9:16",
+      "philosophy": "hook_first / curiosity_over_closure / save_share_intent",
+      "viewer_intent": "save_share_follow",
+      "sound_db": -18
+    }
+  }
+}

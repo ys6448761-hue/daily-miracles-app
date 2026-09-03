@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motion Prototype — wish_W03_att</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #08080f;
+  color: #ccc;
+  font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  min-height: 100vh;
+  padding-bottom: 32px;
+}
+
+header {
+  text-align: center;
+  padding: 24px 16px 8px;
+}
+header h1 {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: #444;
+  text-transform: uppercase;
+  font-weight: 300;
+}
+header .wish-text {
+  font-size: 13px;
+  color: #777;
+  margin-top: 8px;
+  font-weight: 300;
+}
+header .meta {
+  font-size: 10px;
+  color: #3a3a50;
+  margin-top: 6px;
+  letter-spacing: 0.08em;
+}
+
+.comparison {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px 16px 8px;
+  flex-wrap: wrap;
+}
+
+.player-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.player-label {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: #3a3a55;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+.player {
+  position: relative;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid #1a1a28;
+  flex-shrink: 0;
+}
+.ratio-3-4  { width: 270px; height: 360px; }
+.ratio-9-16 { width: 202px; height: 360px; }
+
+.frame-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.7s ease-in-out;
+  will-change: transform, opacity;
+}
+.frame-img.active { opacity: 1; }
+
+/* overlays */
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.overlay.visible { opacity: 1; }
+
+.water-shimmer {
+  background: radial-gradient(ellipse 130% 55% at 50% 88%,
+    rgba(160, 210, 255, 0.10) 0%,
+    rgba(140, 190, 255, 0.04) 45%,
+    transparent 70%);
+  animation: shimmer 5.5s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0%, 100% { opacity: 0.35; transform: scaleX(0.94); }
+  50%       { opacity: 1;    transform: scaleX(1.06); }
+}
+
+.fog-drift {
+  background: linear-gradient(
+    148deg,
+    rgba(195, 212, 235, 0.09) 0%,
+    transparent 42%,
+    rgba(195, 212, 235, 0.06) 100%
+  );
+  animation: fog 9s ease-in-out infinite;
+}
+@keyframes fog {
+  0%, 100% { opacity: 0.45; transform: translateX(-2.5%); }
+  50%       { opacity: 1;    transform: translateX(2.5%);  }
+}
+
+/* subtitle */
+.subtitle {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 14px 18px 22px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.38));
+  text-align: center;
+  font-size: 12.5px;
+  line-height: 1.75;
+  color: transparent;
+  transition: color 0.9s ease;
+  letter-spacing: 0.06em;
+  font-weight: 400;
+  pointer-events: none;
+}
+.subtitle.visible { color: rgba(255,255,255,0.70); }
+.subtitle.bold-mode.visible { color: rgba(255,255,255,0.90); }
+
+/* subtitle breathing — motion player only */
+#motion-subtitle.visible {
+  animation: sub-breathe 3.8s ease-in-out infinite;
+}
+@keyframes sub-breathe {
+  0%, 100% { opacity: 0.82; }
+  50%       { opacity: 1;    }
+}
+
+/* hud */
+.hud {
+  position: absolute;
+  top: 7px; left: 7px;
+  font-size: 9px;
+  color: rgba(255,255,255,0.22);
+  letter-spacing: 0.07em;
+  background: rgba(0,0,0,0.28);
+  padding: 2px 6px;
+  border-radius: 2px;
+  pointer-events: none;
+}
+.motion-badge {
+  position: absolute;
+  top: 7px; right: 7px;
+  font-size: 8px;
+  color: rgba(100,150,255,0.35);
+  letter-spacing: 0.12em;
+  background: rgba(0,0,0,0.28);
+  padding: 2px 6px;
+  border-radius: 2px;
+  pointer-events: none;
+}
+.emotion-tag {
+  position: absolute;
+  bottom: 6px; right: 8px;
+  font-size: 8px;
+  color: rgba(255,255,255,0.18);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+/* controls */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  padding: 16px 24px 0;
+  max-width: 640px;
+  margin: 0 auto;
+}
+.play-btn {
+  background: none;
+  border: 1px solid #2a2a40;
+  color: #666;
+  padding: 6px 18px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  transition: border-color 0.2s, color 0.2s;
+}
+.play-btn:hover { border-color: #555; color: #aaa; }
+
+.progress-bar {
+  flex: 1;
+  height: 1px;
+  background: #1e1e2e;
+  border-radius: 1px;
+  cursor: pointer;
+  position: relative;
+}
+.progress-fill {
+  height: 100%;
+  background: #334;
+  border-radius: 1px;
+  width: 0%;
+  transition: width 0.08s linear;
+}
+.time-display {
+  font-size: 10px;
+  color: #333;
+  min-width: 72px;
+  text-align: right;
+  letter-spacing: 0.05em;
+}
+
+/* legend */
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 18px 0 0;
+  flex-wrap: wrap;
+}
+.legend-item {
+  font-size: 9.5px;
+  color: #2e2e48;
+  letter-spacing: 0.08em;
+}
+.legend-item span { color: #3a3a60; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>DreamTown · Micro Motion Prototype</h1>
+  <p class="wish-text">"새로운 일을 시작해보고 싶어요"</p>
+  <p class="meta">결심형 · curiosity · attraction_social · 9:16 · 21s</p>
+</header>
+
+<div class="comparison">
+
+  <!-- LEFT: STATIC -->
+  <div class="player-col">
+    <div class="player-label">Static</div>
+    <div class="player ratio-9-16" id="static-player">
+      <img class="frame-img active" id="s-img-0" src="../../wish-render-prototype/W2/frames/F1_curiosity_cafe.png" alt="curiosity" draggable="false">
+        <img class="frame-img" id="s-img-1" src="../../../public/images/storybook/sources/page05/cafe/cafe_page05_emotional_afterflow_base.png" alt="emotional_afterflow" draggable="false">
+        <img class="frame-img" id="s-img-2" src="../../wish-render-prototype/W2/frames/F3_calm_cafe.png" alt="calm" draggable="false">
+        <img class="frame-img" id="s-img-3" src="../../../public/images/storybook/sources/page05/hamel/hamel_page05_reality_reconnection_base.png" alt="reality_reconnection" draggable="false">
+        <img class="frame-img" id="s-img-4" src="../../wish-render-prototype/W2/frames/F5_curiosity_hamel.png" alt="curiosity" draggable="false">
+      <div class="hud" id="s-hud">F1</div>
+      <div class="emotion-tag" id="s-emotion"></div>
+      <div class="subtitle" id="s-sub"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: MICRO MOTION -->
+  <div class="player-col">
+    <div class="player-label">Micro Motion</div>
+    <div class="player ratio-9-16" id="motion-player">
+      <img class="frame-img active" id="m-img-0" src="../../wish-render-prototype/W2/frames/F1_curiosity_cafe.png" alt="curiosity" draggable="false">
+        <img class="frame-img" id="m-img-1" src="../../../public/images/storybook/sources/page05/cafe/cafe_page05_emotional_afterflow_base.png" alt="emotional_afterflow" draggable="false">
+        <img class="frame-img" id="m-img-2" src="../../wish-render-prototype/W2/frames/F3_calm_cafe.png" alt="calm" draggable="false">
+        <img class="frame-img" id="m-img-3" src="../../../public/images/storybook/sources/page05/hamel/hamel_page05_reality_reconnection_base.png" alt="reality_reconnection" draggable="false">
+        <img class="frame-img" id="m-img-4" src="../../wish-render-prototype/W2/frames/F5_curiosity_hamel.png" alt="curiosity" draggable="false">
+      <div class="overlay water-shimmer" id="ov-shimmer"></div>
+      <div class="overlay fog-drift"    id="ov-fog"></div>
+      <div class="motion-badge">✦ MOTION</div>
+      <div class="emotion-tag" id="m-emotion"></div>
+      <div class="subtitle" id="m-sub"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="controls">
+  <button class="play-btn" id="play-btn">▶ Play</button>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+  <div class="time-display" id="time-display">0.0 / 21s</div>
+</div>
+
+<div class="legend">
+  <div class="legend-item">zoom slow: <span>pause / calm</span></div>
+  <div class="legend-item">zoom + pan: <span>curiosity / reconnection</span></div>
+  <div class="legend-item">shimmer: <span>fragile_hope / reconnection</span></div>
+  <div class="legend-item">fog: <span>confusion</span></div>
+  <div class="legend-item">breathe only: <span>emotional_afterflow</span></div>
+</div>
+
+<script>
+const SEQ = {"wish_id":"wish_W03_att","wish_text":"새로운 일을 시작해보고 싶어요","wish_type":"결심형","primary_gravity":"curiosity","gem_palette":{"cafe":"citrine","hamel":"topaz"},"render_mode":"attraction_social","total_duration_sec":21,"ratio":"9:16","emotion_arc":["curiosity","emotional_afterflow","calm","reality_reconnection","curiosity"],"auto_generated":true,"generated_at":"2026-05-23T01:00:36.399Z","frame_set_source":"wish-render-prototype/W2","confusion_f5_override":false,"render_spec":{"ratio":"9:16","breathing_gap_ratio":"28.5%","subtitle_opacity":0.9,"subtitle_weight":"regular","viewer_intent":"save_share_follow","new_ai_images":0},"frames":[{"id":"F1","index":1,"emotion":"curiosity","file":"../../wish-render-prototype/W2/frames/F1_curiosity_cafe.png","timing":{"start":0,"end":4,"duration":4},"subtitle":"오늘의 용기를 별에 담아두었어요","subtitle_copy":"#13","subtitle_start_offset":0.3,"breathing_gap":false,"motion":{"type":"ken_burns","direction":"top_to_bottom","speed":0.4}},{"id":"F2","index":2,"emotion":"emotional_afterflow","file":"../../../public/images/storybook/sources/page05/cafe/cafe_page05_emotional_afterflow_base.png","timing":{"start":4,"end":7,"duration":3},"subtitle":null,"subtitle_copy":null,"subtitle_start_offset":null,"breathing_gap":true,"motion":{"type":"still","speed":0}},{"id":"F3","index":3,"emotion":"calm","file":"../../wish-render-prototype/W2/frames/F3_calm_cafe.png","timing":{"start":7,"end":10,"duration":3},"subtitle":"조금은 믿고 싶어졌어요","subtitle_copy":"#6","subtitle_start_offset":0.3,"breathing_gap":false,"motion":{"type":"dissolve_still","dissolve_sec":0.7,"speed":0}},{"id":"F4","index":4,"emotion":"reality_reconnection","file":"../../../public/images/storybook/sources/page05/hamel/hamel_page05_reality_reconnection_base.png","timing":{"start":10,"end":13,"duration":3},"subtitle":null,"subtitle_copy":null,"subtitle_start_offset":null,"breathing_gap":true,"motion":{"type":"dissolve_pan","direction":"left_to_right","dissolve_sec":0.7,"speed":0.4}},{"id":"F5","index":5,"emotion":"curiosity","file":"../../wish-render-prototype/W2/frames/F5_curiosity_hamel.png","timing":{"start":13,"end":21,"duration":8},"subtitle":"작은 빛 하나가 길이 되어줄 거예요","subtitle_copy":"#17","subtitle_start_offset":0.3,"breathing_gap":false,"motion":{"type":"dissolve_fadeout","dissolve_sec":0.7,"fadeout_sec":2,"speed":0}}]};
+const MP  = {"pause":{"zoom":[1,1.06],"pan":[0,0],"overlay":"none"},"calm":{"zoom":[1,1.04],"pan":[0,0],"overlay":"none"},"curiosity":{"zoom":[1,1.055],"pan":[-0.8,0.8],"overlay":"none"},"fragile_hope":{"zoom":[1,1.05],"pan":[0,0],"overlay":"shimmer"},"reality_reconnection":{"zoom":[1,1.02],"pan":[-1.2,1.2],"overlay":"shimmer"},"emotional_afterflow":{"zoom":[1,1],"pan":[0,0],"overlay":"none","breathe":true},"confusion":{"zoom":[1,1.03],"pan":[0,0],"overlay":"fog"}};
+const SPEED = 1.3;
+
+const totalSec = SEQ.total_duration_sec;
+const frames   = SEQ.frames;
+
+const sImgs    = Array.from(document.querySelectorAll('#static-player .frame-img'));
+const mImgs    = Array.from(document.querySelectorAll('#motion-player .frame-img'));
+const sHud     = document.getElementById('s-hud');
+const sEmotion = document.getElementById('s-emotion');
+const mEmotion = document.getElementById('m-emotion');
+const sSub     = document.getElementById('s-sub');
+const mSub     = document.getElementById('m-sub');
+const shimmer  = document.getElementById('ov-shimmer');
+const fog      = document.getElementById('ov-fog');
+const playBtn  = document.getElementById('play-btn');
+const pFill    = document.getElementById('progress-fill');
+const tDisp    = document.getElementById('time-display');
+
+const isBold = SEQ.render_mode === 'attraction_social';
+
+let playing = false;
+let startTs  = null;
+let rafId    = null;
+let prevIdx  = -1;
+
+function frameAt(t) {
+  for (let i = frames.length - 1; i >= 0; i--) {
+    if (t >= frames[i].timing.start) return i;
+  }
+  return 0;
+}
+
+function showFrame(idx) {
+  sImgs.forEach((img, i) => img.classList.toggle('active', i === idx));
+  mImgs.forEach((img, i) => img.classList.toggle('active', i === idx));
+  sHud.textContent     = frames[idx].id;
+  sEmotion.textContent = frames[idx].emotion;
+  mEmotion.textContent = frames[idx].emotion;
+  // reset transform on leaving frames
+  mImgs.forEach((img, i) => { if (i !== idx) img.style.transform = ''; });
+}
+
+function applyMotion(idx, fp) {
+  const em  = frames[idx].emotion;
+  const p   = MP[em] || MP['pause'];
+  const img = mImgs[idx];
+  if (!img) return;
+
+  // zoom
+  const z0 = p.zoom[0], z1 = p.zoom[1];
+  const scale = z0 + (z1 - z0) * fp;
+
+  // pan — array means [startX, endX], number means fixed
+  let panX = 0;
+  if (Array.isArray(p.pan)) {
+    panX = p.pan[0] + (p.pan[1] - p.pan[0]) * fp;
+  }
+
+  img.style.transform       = 'scale(' + scale.toFixed(4) + ') translateX(' + panX.toFixed(2) + '%)';
+  img.style.transformOrigin = 'center center';
+
+  // overlays
+  shimmer.classList.toggle('visible', p.overlay === 'shimmer');
+  fog.classList.toggle(    'visible', p.overlay === 'fog');
+
+  // breathing gap: extra opacity pulse for afterflow
+  if (p.breathe) {
+    const phase = (Math.sin(Date.now() / 1800) + 1) / 2;
+    img.style.opacity = (0.85 + phase * 0.12).toFixed(3);
+  } else {
+    img.style.opacity = '';
+  }
+}
+
+function applySub(idx, t) {
+  const f   = frames[idx];
+  const off = f.subtitle_start_offset || 0;
+  const vis = f.subtitle && t >= f.timing.start + off && t < f.timing.end;
+
+  if (vis) {
+    sSub.textContent = f.subtitle;
+    mSub.textContent = f.subtitle;
+    sSub.classList.add('visible');
+    mSub.classList.add('visible');
+    if (isBold) { sSub.classList.add('bold-mode'); mSub.classList.add('bold-mode'); }
+  } else {
+    sSub.textContent = '';
+    mSub.textContent = '';
+    sSub.classList.remove('visible', 'bold-mode');
+    mSub.classList.remove('visible', 'bold-mode');
+  }
+}
+
+function tick(ts) {
+  if (!startTs) startTs = ts;
+  const t = Math.min((ts - startTs) / 1000, totalSec);
+
+  pFill.style.width = (t / totalSec * 100).toFixed(2) + '%';
+  tDisp.textContent = t.toFixed(1) + ' / ' + totalSec + 's';
+
+  const idx = frameAt(t);
+  if (idx !== prevIdx) { showFrame(idx); prevIdx = idx; }
+
+  const f  = frames[idx];
+  const fp = Math.min((t - f.timing.start) / f.timing.duration, 1.0);
+  applyMotion(idx, fp);
+  applySub(idx, t);
+
+  if (t < totalSec) {
+    rafId = requestAnimationFrame(tick);
+  } else {
+    playing = false;
+    playBtn.textContent = '↺ Restart';
+  }
+}
+
+function reset() {
+  if (rafId) cancelAnimationFrame(rafId);
+  startTs = null; prevIdx = -1;
+  sImgs.forEach(img => { img.classList.remove('active'); img.style.transform = ''; img.style.opacity = ''; });
+  mImgs.forEach(img => { img.classList.remove('active'); img.style.transform = ''; img.style.opacity = ''; });
+  shimmer.classList.remove('visible');
+  fog.classList.remove('visible');
+  sSub.classList.remove('visible','bold-mode');
+  mSub.classList.remove('visible','bold-mode');
+  sSub.textContent = '';
+  mSub.textContent = '';
+  pFill.style.width = '0%';
+  tDisp.textContent = '0.0 / ' + totalSec + 's';
+}
+
+playBtn.addEventListener('click', () => {
+  if (!playing) {
+    playing = true;
+    playBtn.textContent = '⏸ Pause';
+    reset();
+    showFrame(0);
+    rafId = requestAnimationFrame(tick);
+  } else {
+    playing = false;
+    playBtn.textContent = '▶ Play';
+    if (rafId) cancelAnimationFrame(rafId);
+  }
+});
+
+// init
+showFrame(0);
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+{
+  "wish": "W1", "type": "위로형",
+  "text": "지쳐있는 나를 보듬어주고 싶어요",
+  "render_mode": "resonance",
+  "duration_model": "Micro Resonance",
+  "total_duration_sec": 30,
+  "gravity_sequence": ["pause","emotional_afterflow","calm","reality_reconnection","fragile_hope"],
+  "hope_curve": [0.50, 0.50, 0.52, 0.55, 0.62],
+  "gem_palette": { "cafe": "citrine", "hamel": "diamond" },
+  "frames": [
+    {
+      "id": "F1", "emotion": "pause", "location": "cafe", "gem": "citrine",
+      "file": "frames/F1_pause_cafe.png",
+      "asset": "02_pause_citrine_yeosu_cafe_stage2.png",
+      "gravity_role": "opening stillness — 지친 채로 앉아있는 순간",
+      "timing": { "start": 0, "end": 5, "duration": 5 },
+      "subtitle": "오늘의 마음을 이 밤에 남겨둘게요",
+      "subtitle_copy": "#9", "subtitle_start_offset": 1.0,
+      "motion": { "type": "ken_burns", "direction": "top_to_bottom", "speed": 0.3, "duration_sec": 5 }
+    },
+    {
+      "id": "F2", "emotion": "emotional_afterflow", "location": "cafe", "gem": null,
+      "file": "frames/F2_afterflow_cafe.png",
+      "asset": "cafe_page05_emotional_afterflow_base.png",
+      "gravity_role": "breathing gap #1 — 감정이 흘러간 뒤의 잔류",
+      "timing": { "start": 5, "end": 10, "duration": 5 },
+      "subtitle": null, "breathing_gap": true,
+      "motion": { "type": "still", "speed": 0, "duration_sec": 5 }
+    },
+    {
+      "id": "F3", "emotion": "calm", "location": "cafe", "gem": "citrine",
+      "file": "frames/F3_calm_cafe.png",
+      "asset": "03_calm_citrine_yeosu_cafe_stage2.png",
+      "gravity_role": "mid settle — 마음이 조금 내려앉는 순간",
+      "timing": { "start": 10, "end": 15, "duration": 5 },
+      "subtitle": "마음이 조금 가벼워졌다면 좋겠어요",
+      "subtitle_copy": "#11", "subtitle_start_offset": 1.0,
+      "motion": { "type": "cross_dissolve_then_still", "dissolve_sec": 1.0, "speed": 0, "duration_sec": 5 }
+    },
+    {
+      "id": "F4", "emotion": "reality_reconnection", "location": "hamel", "gem": null,
+      "file": "frames/F4_reconnection_hamel.png",
+      "asset": "hamel_page05_reality_reconnection_base.png",
+      "gravity_role": "breathing gap #2 — 현실로 돌아오는 침묵",
+      "timing": { "start": 15, "end": 20, "duration": 5 },
+      "subtitle": null, "breathing_gap": true,
+      "motion": { "type": "cross_dissolve_then_ken_burns", "direction": "left_to_right", "dissolve_sec": 1.0, "speed": 0.3, "duration_sec": 5 }
+    },
+    {
+      "id": "F5", "emotion": "fragile_hope", "location": "hamel", "gem": "diamond",
+      "file": "frames/F5_fragile_hope_hamel.png",
+      "asset": "hamel_fragile_hope_diamond_base02.png",
+      "gravity_role": "wish signal — 작고 조심스러운 희망이 남아있다",
+      "timing": { "start": 20, "end": 30, "duration": 10 },
+      "subtitle": "작은 소원 하나가 밤하늘에 남았어요",
+      "subtitle_copy": "#2", "subtitle_start_offset": 1.0,
+      "motion": { "type": "cross_dissolve_then_still_fadeout", "dissolve_sec": 1.0, "fadeout_sec": 2, "speed": 0, "duration_sec": 10 }
+    }
+  ],
+  "render_spec": { "ratio": "3:4", "resolution": "1024x1536", "dissolve": "1.0s", "subtitle_opacity": 0.7, "subtitle_weight": "thin", "breathing_gap_ratio": "40%", "new_ai_images": 0 }
+}

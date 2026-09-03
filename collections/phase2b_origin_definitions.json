@@ -1,0 +1,61 @@
+{
+  "metadata": {
+    "phase": "2B",
+    "stage": "origin_definition",
+    "date": "2026-08-23",
+    "note": "READ-ONLY proposal — not yet written to DB"
+  },
+  "origins": [
+    {
+      "origin_code": "RAMADA_PLAZA_YEOSU",
+      "origin_type": "partner_entry",
+      "name_ko": "여수 라마다 플라자",
+      "name_en": "Ramada Plaza Yeosu",
+      "category": "hotel",
+      "address": "전남 여수시 중앙동 ... (requires partner confirmation)",
+      "latitude": null,
+      "longitude": null,
+      "verification_status": "REVIEW_REQUIRED",
+      "source": "partner_confirmation_pending",
+      "source_type": "partner",
+      "verified_at": null,
+      "notes": "BLOCKED: exact GPS coordinates must be confirmed with Ramada property management before use in travel time matrix"
+    },
+    {
+      "origin_code": "YEOSU_EXPO_STATION",
+      "origin_type": "station_entry",
+      "name_ko": "여수역 (여수엑스포역)",
+      "name_en": "Yeosu Expo Station",
+      "category": "public_transportation",
+      "address": "전남 여수시 박람회장길 ... (verify exact address)",
+      "latitude": 34.75204,
+      "longitude": 127.74504,
+      "latitude_source": "yeosu_expo_park travel_places record (proxy, verify actual station)",
+      "verification_status": "SINGLE_SOURCE",
+      "source": "travel_places.yeosu_expo_park location (not exact station exit)",
+      "source_type": "travel_places",
+      "verified_at": "2026-08-21",
+      "notes": "CAUTION: Using yeosu_expo_park coordinates as proxy. Actual station entrance/exit may differ. Requires map verification for passenger boarding location."
+    },
+    {
+      "origin_code": "YEOSU_EXPO_MAIN_GATE",
+      "origin_type": "station_entry",
+      "name_ko": "여수 엑스포 공원 (관광객 진입점)",
+      "name_en": "Yeosu Expo Park Main Gate",
+      "category": "tourist_entry",
+      "address": "전남 여수시 박람회장길 ...",
+      "latitude": 34.75204,
+      "longitude": 127.74504,
+      "verification_status": "SINGLE_SOURCE",
+      "source": "travel_places.yeosu_expo_park",
+      "source_type": "seeded_data",
+      "verified_at": "2026-08-21",
+      "notes": "Park entrance for tourists. May differ from train station exit. Use if travel involves park first, not station arrival."
+    }
+  ],
+  "collection_notes": {
+    "ramada_action": "CONTACT RAMADA PROPERTY FOR: exact address, GPS coordinates, guest amenities location, recommended departure point for tours",
+    "expo_action": "VERIFY ACTUAL TRAIN STATION LOCATION (vs. park main gate) using Kakao Maps / Naver Maps official station exit coordinates",
+    "status": "AWAITING PARTNER + MAP VERIFICATION"
+  }
+}

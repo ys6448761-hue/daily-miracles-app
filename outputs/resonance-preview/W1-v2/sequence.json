@@ -1,0 +1,170 @@
+{
+  "wish": "W1",
+  "version": "v2",
+  "type": "위로형",
+  "text": "지쳐있는 나를 보듬어주고 싶어요",
+  "duration_model": "Micro Resonance",
+  "total_duration_sec": 30,
+  "target_duration_range": "20–35초",
+  "emotion_arc": ["pause", "emotional_afterflow", "calm", "reality_reconnection", "fragile_hope"],
+  "render_mode": "resonance",
+  "philosophy": "not_long_attention / but_long_emotional_residue",
+  "frames": [
+    {
+      "index": 1,
+      "id": "F1",
+      "file": "frames/F1_pause_cafe.png",
+      "source": "thumbnails/generated/full",
+      "emotion": "pause",
+      "location": "cafe",
+      "gem": "citrine",
+      "timing": { "start": 0, "end": 5, "duration": 5 },
+      "subtitle": "오늘의 마음을 이 밤에 남겨둘게요",
+      "subtitle_copy_ref": "copy #9",
+      "subtitle_start_offset": 1,
+      "v1_subtitle": "지쳐도 괜찮아요",
+      "v1_issue": "SSOT 미등록 + 위로 금지 위반",
+      "motion": {
+        "type": "ken_burns",
+        "direction": "top_to_bottom",
+        "speed": 0.3,
+        "duration_sec": 5,
+        "description": "Ken Burns ↓ 0.3x · 5s"
+      }
+    },
+    {
+      "index": 2,
+      "id": "F2",
+      "file": "frames/F2_afterflow_cafe.png",
+      "source": "storybook/sources/page05",
+      "emotion": "emotional_afterflow",
+      "location": "cafe",
+      "gem": null,
+      "timing": { "start": 5, "end": 10, "duration": 5 },
+      "subtitle": null,
+      "breathing_gap": true,
+      "breathing_note": "gap #1 — 감정이 흘러간 잔류. 침묵으로 유지.",
+      "motion": {
+        "type": "still",
+        "speed": 0,
+        "duration_sec": 5,
+        "description": "정적 (still) · 5s"
+      }
+    },
+    {
+      "index": 3,
+      "id": "F3",
+      "file": "frames/F3_calm_cafe.png",
+      "source": "thumbnails/generated/full",
+      "emotion": "calm",
+      "location": "cafe",
+      "gem": "citrine",
+      "timing": { "start": 10, "end": 15, "duration": 5 },
+      "subtitle": "마음이 조금 가벼워졌다면 좋겠어요",
+      "subtitle_copy_ref": "copy #11",
+      "subtitle_start_offset": 1,
+      "motion": {
+        "type": "cross_dissolve_then_still",
+        "dissolve_sec": 1,
+        "speed": 0,
+        "duration_sec": 5,
+        "description": "dissolve 1s → 정적 · 5s"
+      }
+    },
+    {
+      "index": 4,
+      "id": "F4",
+      "file": "frames/F4_reconnection_hamel.png",
+      "source": "storybook/sources/page05",
+      "emotion": "reality_reconnection",
+      "location": "hamel",
+      "gem": null,
+      "timing": { "start": 15, "end": 20, "duration": 5 },
+      "subtitle": null,
+      "breathing_gap": true,
+      "breathing_note": "gap #2 — 현실 재연결. 침묵으로 장소 전환.",
+      "motion": {
+        "type": "cross_dissolve_then_ken_burns",
+        "direction": "left_to_right",
+        "dissolve_sec": 1,
+        "speed": 0.3,
+        "duration_sec": 5,
+        "description": "dissolve 1s → pan → 0.3x · 5s",
+        "v1_issue_fixed": "v1: 0.2x (SSOT 하한 미달) → v2: 0.3x / v1: ← 표기 오기 → v2: → 정정"
+      }
+    },
+    {
+      "index": 5,
+      "id": "F5",
+      "file": "frames/F5_fragile_hope_hamel.png",
+      "source": "thumbnails/generated/full",
+      "emotion": "fragile_hope",
+      "location": "hamel",
+      "gem": "diamond",
+      "timing": { "start": 20, "end": 30, "duration": 10 },
+      "subtitle": "작은 소원 하나가 밤하늘에 남았어요",
+      "subtitle_copy_ref": "copy #2",
+      "subtitle_start_offset": 1,
+      "motion": {
+        "type": "cross_dissolve_then_still_fadeout",
+        "dissolve_sec": 1,
+        "fadeout_sec": 2,
+        "speed": 0,
+        "duration_sec": 10,
+        "description": "dissolve 1s → 정적 → fade-out 2s · 10s"
+      }
+    }
+  ],
+  "sound": {
+    "base": "무음",
+    "ambient": {
+      "type": "바다 파도 앰비언트",
+      "volume_db": -22,
+      "fade_in": { "trigger": "F1 시작 1초 후" },
+      "fade_out": { "trigger": "F5 종료 2초 전" }
+    }
+  },
+  "inspection": {
+    "subtitle_density": {
+      "text_frames": ["F1", "F3", "F5"],
+      "silent_frames": ["F2", "F4"],
+      "text_ratio": "60%",
+      "silence_ratio": "40%",
+      "pattern": "text-silence-text-silence-text",
+      "verdict": "alternating rhythm — breathing gap confirmed"
+    },
+    "breathing_gaps": [
+      { "gap": 1, "frame": "F2", "duration": "5s", "role": "감정 여운 정착" },
+      { "gap": 2, "frame": "F4", "duration": "5s", "role": "장소 전환 + 현실 재연결 침묵" }
+    ],
+    "emotional_flow": {
+      "arc": "pause → afterflow → calm → reconnection → fragile_hope",
+      "hope_curve": [0.50, 0.50, 0.52, 0.55, 0.62],
+      "direction": "gentle rise — 급격한 전환 없음"
+    },
+    "continuity": {
+      "sowoni_cafe": "seated at window table, back view (page05.json 확인)",
+      "sowoni_hamel": "standing at harbor edge, back view (page05.json 확인)",
+      "new_ai_images": 0,
+      "registry_external": false
+    }
+  },
+  "v1_vs_v2": {
+    "F1_subtitle": { "v1": "지쳐도 괜찮아요 (SSOT 위반)", "v2": "오늘의 마음을 이 밤에 남겨둘게요 (copy #9)" },
+    "frame_duration": { "v1": "15s × 4 + 20s = 80s", "v2": "5s × 4 + 10s = 30s" },
+    "dissolve": { "v1": "2–3s", "v2": "1s" },
+    "F4_motion_speed": { "v1": "0.2x (SSOT 미달)", "v2": "0.3x" },
+    "F4_pan_direction": { "v1": "← 표기 오기", "v2": "→ left_to_right" }
+  },
+  "render_spec": {
+    "ratio": "3:4",
+    "resolution": "1024x1536",
+    "transition": "cross-dissolve 1s",
+    "subtitle_font": "Noto Sans KR / thin",
+    "subtitle_opacity": 0.7,
+    "subtitle_position": "bottom-center",
+    "subtitle_max_chars": 20,
+    "new_ai_images": 0,
+    "continuity_checked": true
+  }
+}

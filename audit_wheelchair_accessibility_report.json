@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-08-23T23:02:55.313Z",
+  "wheelchairStatus": {
+    "verified_yes": 0,
+    "verified_no": 0,
+    "unknown": 12
+  },
+  "wheelchairAccessibleTagExists": false,
+  "accessibility_fields_correct": true,
+  "companion_filter_broken": true,
+  "safety_risk": "CRITICAL",
+  "wheelchair_users_affected": "ALL (100%)",
+  "stroller_users_affected": "ALL if kids under 3 (100%)",
+  "root_cause": "Two conflicting wheelchair checks with different field assumptions"
+}

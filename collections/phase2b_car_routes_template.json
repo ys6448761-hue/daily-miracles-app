@@ -1,0 +1,174 @@
+{
+  "metadata": {
+    "phase": "2B",
+    "stage": "car_route_collection",
+    "date_started": "2026-08-23",
+    "routes_planned": 24,
+    "note": "Ramada (12) + Expo Station (12) → core places",
+    "verification_scheme": "SINGLE_SOURCE | CROSS_VERIFIED | FIELD_VERIFIED"
+  },
+  "collection_rules": {
+    "acceptable_sources": [
+      "official_map_api (Google, Naver, Kakao)",
+      "taxi_service_api (TaxiGo time estimates)",
+      "partner_confirmation (hotel concierge, local operator)",
+      "field_verification (actual drive/taxi ride)"
+    ],
+    "verification_levels": {
+      "UNKNOWN": "No data collected",
+      "SINGLE_SOURCE": "One source provides data",
+      "CROSS_VERIFIED": "2+ independent sources agree within ±5 min",
+      "FIELD_VERIFIED": "Actual observed/tested drive",
+      "REVIEW_REQUIRED": "Sources conflict, needs human decision"
+    },
+    "traffic_handling": {
+      "rule": "Travel times vary by traffic; record range if possible",
+      "typical_minutes": "average/normal conditions",
+      "range_min": "best case (light traffic, no delays)",
+      "range_max": "worst case (peak hour, construction)",
+      "note": "Do NOT invent a range — only record what sources provide"
+    },
+    "when_to_use_null": [
+      "No source available → null + 'unknown'",
+      "Sources conflict beyond reconciliation → null + 'review_required'",
+      "Data quality suspect → null + 'review_required'"
+    ]
+  },
+  "ramada_plaza_routes": [
+    {
+      "collection_id": "RAMADA_001",
+      "origin_code": "RAMADA_PLAZA_YEOSU",
+      "destination_code": "cablecar",
+      "destination_name_ko": "케이블카",
+      "transport_mode": "car",
+      "typical_minutes": null,
+      "range_min": null,
+      "range_max": null,
+      "verification_status": "unknown",
+      "sources": [
+        {
+          "source_name": "TaxiGo API",
+          "source_type": "routing_service",
+          "minutes": null,
+          "confidence": "unknown",
+          "collected_at": null,
+          "traffic_context": null
+        },
+        {
+          "source_name": "Ramada concierge",
+          "source_type": "partner_confirmation",
+          "minutes": null,
+          "confidence": "unknown",
+          "collected_at": null,
+          "notes": null
+        }
+      ],
+      "observed_traffic": null,
+      "notes": "DATA NOT YET COLLECTED"
+    },
+    {
+      "collection_id": "RAMADA_002",
+      "origin_code": "RAMADA_PLAZA_YEOSU",
+      "destination_code": "dolsan_daegyo",
+      "destination_name_ko": "돌산대교",
+      "transport_mode": "car",
+      "typical_minutes": null,
+      "range_min": null,
+      "range_max": null,
+      "verification_status": "unknown",
+      "sources": [
+        {
+          "source_name": "TaxiGo API",
+          "source_type": "routing_service",
+          "minutes": null,
+          "confidence": "unknown",
+          "collected_at": null,
+          "traffic_context": null
+        },
+        {
+          "source_name": "Ramada concierge",
+          "source_type": "partner_confirmation",
+          "minutes": null,
+          "confidence": "unknown",
+          "collected_at": null,
+          "notes": null
+        }
+      ],
+      "observed_traffic": null,
+      "notes": "DATA NOT YET COLLECTED"
+    }
+  ],
+  "expo_station_routes": [
+    {
+      "collection_id": "EXPO_001",
+      "origin_code": "YEOSU_EXPO_STATION",
+      "destination_code": "cablecar",
+      "destination_name_ko": "케이블카",
+      "transport_mode": "car",
+      "typical_minutes": null,
+      "range_min": null,
+      "range_max": null,
+      "verification_status": "unknown",
+      "sources": [
+        {
+          "source_name": "Kakao Map API",
+          "source_type": "routing_service",
+          "minutes": null,
+          "confidence": "unknown",
+          "collected_at": null,
+          "traffic_context": null
+        },
+        {
+          "source_name": "Google Maps API",
+          "source_type": "routing_service",
+          "minutes": null,
+          "confidence": "unknown",
+          "collected_at": null,
+          "traffic_context": null
+        }
+      ],
+      "observed_traffic": null,
+      "notes": "DATA NOT YET COLLECTED"
+    },
+    {
+      "collection_id": "EXPO_002",
+      "origin_code": "YEOSU_EXPO_STATION",
+      "destination_code": "dolsan_daegyo",
+      "destination_name_ko": "돌산대교",
+      "transport_mode": "car",
+      "typical_minutes": null,
+      "range_min": null,
+      "range_max": null,
+      "verification_status": "unknown",
+      "sources": [
+        {
+          "source_name": "Kakao Map API",
+          "source_type": "routing_service",
+          "minutes": null,
+          "confidence": "unknown",
+          "collected_at": null,
+          "traffic_context": null
+        },
+        {
+          "source_name": "Google Maps API",
+          "source_type": "routing_service",
+          "minutes": null,
+          "confidence": "unknown",
+          "collected_at": null,
+          "traffic_context": null
+        }
+      ],
+      "observed_traffic": null,
+      "notes": "DATA NOT YET COLLECTED"
+    }
+  ],
+  "collection_status": {
+    "ramada_complete": false,
+    "expo_complete": false,
+    "total_routes": 24,
+    "routes_collected": 0,
+    "routes_cross_verified": 0,
+    "routes_review_required": 0,
+    "routes_unknown": 24
+  }
+}

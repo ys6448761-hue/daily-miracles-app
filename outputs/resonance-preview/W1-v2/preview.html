@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W1-v2 Micro Resonance Preview</title>
+<style>
+  :root {
+    --bg: #080810;
+    --surface: #10101a;
+    --surface2: #14141f;
+    --border: #1a1a2a;
+    --text: #e6e6f0;
+    --muted: #606078;
+    --dim: #3a3a50;
+    --accent: #7060e8;
+    --green: #52b87a;
+    --amber: #c8943a;
+    --red: #c05060;
+    --pause: #4e7d9a;
+    --calm: #5a9e9a;
+    --fragile: #8878b8;
+    --afterflow: #7888a8;
+    --reconnect: #6a8888;
+    --v1: #8b5050;
+    --v2: #4a7850;
+    --sub-bg: rgba(0,0,0,0.65);
+    --gap-bg: rgba(10,10,30,0.7);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    font-weight: 300;
+    padding: 36px 20px 100px;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* ─── header ─── */
+  .header {
+    max-width: 1120px; margin: 0 auto 8px;
+    display: flex; align-items: flex-start; justify-content: space-between;
+    border-bottom: 1px solid var(--border); padding-bottom: 20px;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .header-left h1 { font-size: 20px; font-weight: 400; margin-bottom: 5px; }
+  .header-left .wish { font-size: 13px; color: var(--muted); }
+  .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .badge {
+    font-size: 10px; letter-spacing: .07em;
+    padding: 3px 9px; border-radius: 16px;
+    border: 1px solid var(--border); color: var(--muted);
+  }
+  .badge.hi { border-color: var(--accent); color: var(--accent); }
+  .badge.ok { border-color: var(--green); color: var(--green); }
+  .v-tag {
+    font-size: 11px; padding: 4px 12px;
+    border-radius: 6px; background: var(--v2);
+    color: #fff; letter-spacing: .04em; font-weight: 500;
+    align-self: flex-start;
+  }
+
+  /* ─── v1 vs v2 diff bar ─── */
+  .diff-bar {
+    max-width: 1120px; margin: 20px auto 32px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 20px;
+  }
+  .diff-bar-title { font-size: 10px; letter-spacing: .1em; color: var(--muted); margin-bottom: 12px; }
+  .diff-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+    gap: 10px;
+  }
+  .diff-item { }
+  .diff-key { font-size: 10px; color: var(--muted); margin-bottom: 4px; }
+  .diff-vals { display: flex; flex-direction: column; gap: 2px; }
+  .diff-v1 { font-size: 11px; color: var(--v1); text-decoration: line-through; }
+  .diff-v2 { font-size: 11px; color: var(--v2); }
+
+  /* ─── emotion arc ─── */
+  .arc-wrap { max-width: 1120px; margin: 0 auto 28px; }
+  .arc { display: flex; align-items: center; gap: 0; }
+  .arc-step {
+    flex: 1; padding: 8px 10px; border-radius: 7px;
+    font-size: 11px; text-align: center; border: 1px solid var(--border);
+    position: relative;
+  }
+  .arc-step .lbl { font-size: 9px; color: var(--muted); letter-spacing: .07em; margin-bottom: 2px; }
+  .arc-step .emo { font-size: 12px; }
+  .arc-step .gap-indicator {
+    position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+    font-size: 9px; color: var(--accent); letter-spacing: .04em; white-space: nowrap;
+  }
+  .arc-arrow { padding: 0 6px; color: var(--dim); font-size: 12px; flex-shrink: 0; }
+  .arc-step.pause  { border-color: var(--pause); }    .arc-step.pause  .emo { color: var(--pause); }
+  .arc-step.flow   { border-color: var(--afterflow); } .arc-step.flow   .emo { color: var(--afterflow); }
+  .arc-step.calm   { border-color: var(--calm); }     .arc-step.calm   .emo { color: var(--calm); }
+  .arc-step.recon  { border-color: var(--reconnect); } .arc-step.recon  .emo { color: var(--reconnect); }
+  .arc-step.fragile{ border-color: var(--fragile); }  .arc-step.fragile .emo { color: var(--fragile); }
+
+  /* ─── frame strip ─── */
+  .strip {
+    max-width: 1120px; margin: 0 auto 32px;
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
+  }
+  .card {
+    border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--border); background: var(--surface2);
+    display: flex; flex-direction: column;
+    transition: border-color .2s;
+  }
+  .card:hover { border-color: var(--accent); }
+
+  /* image */
+  .img-wrap {
+    position: relative; aspect-ratio: 3/4;
+    overflow: hidden; background: #04040a; flex-shrink: 0;
+  }
+  .img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  /* subtitle overlay */
+  .sub-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 32px 10px 12px;
+    background: linear-gradient(transparent, var(--sub-bg) 55%);
+    display: flex; align-items: flex-end; justify-content: center;
+    min-height: 68px; pointer-events: none;
+  }
+  .sub-text {
+    color: rgba(255,255,255,.88); font-size: 12px; font-weight: 300;
+    text-align: center; line-height: 1.65; letter-spacing: .04em;
+    text-shadow: 0 1px 5px rgba(0,0,0,.85);
+  }
+
+  /* breathing gap overlay */
+  .gap-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0; top: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--gap-bg); pointer-events: none;
+    flex-direction: column; gap: 6px;
+  }
+  .gap-label { font-size: 10px; color: var(--accent); letter-spacing: .08em; }
+  .gap-desc { font-size: 9px; color: var(--muted); text-align: center; padding: 0 8px; line-height: 1.5; }
+
+  /* frame badge */
+  .f-num {
+    position: absolute; top: 8px; left: 8px;
+    background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.15);
+    border-radius: 5px; color: rgba(255,255,255,.7);
+    font-size: 10px; padding: 2px 7px; letter-spacing: .05em;
+  }
+  .timing-badge {
+    position: absolute; top: 8px; right: 8px;
+    background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.1);
+    border-radius: 5px; color: rgba(255,255,255,.5);
+    font-size: 9px; padding: 2px 6px; font-variant-numeric: tabular-nums;
+  }
+
+  /* card meta */
+  .meta { padding: 10px 11px 9px; flex: 1; display: flex; flex-direction: column; gap: 7px; }
+  .meta-row { display: flex; align-items: flex-start; gap: 7px; }
+  .meta-ic { font-size: 10px; color: var(--muted); flex-shrink: 0; padding-top: 1px; }
+  .meta-val { font-size: 10px; color: var(--text); line-height: 1.5; }
+  .chip {
+    display: inline-block; font-size: 9px; padding: 2px 7px;
+    border-radius: 9px; border: 1px solid;
+  }
+  .chip-pause   { border-color: var(--pause);     color: var(--pause); }
+  .chip-flow    { border-color: var(--afterflow);  color: var(--afterflow); }
+  .chip-calm    { border-color: var(--calm);       color: var(--calm); }
+  .chip-recon   { border-color: var(--reconnect);  color: var(--reconnect); }
+  .chip-fragile { border-color: var(--fragile);    color: var(--fragile); }
+  .src-chip {
+    display: inline-block; font-size: 8px; padding: 2px 6px;
+    border-radius: 7px; background: rgba(255,255,255,.03);
+    border: 1px solid var(--border); color: var(--muted);
+    margin-top: 1px;
+  }
+  .fix-note {
+    display: inline-block; font-size: 9px; padding: 2px 6px;
+    border-radius: 5px; background: rgba(74,120,80,.15);
+    border: 1px solid var(--v2); color: var(--v2);
+    margin-top: 1px;
+  }
+
+  /* ─── inspection panels ─── */
+  .panels {
+    max-width: 1120px; margin: 0 auto 32px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  }
+  .panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 20px;
+  }
+  .panel-title {
+    font-size: 10px; letter-spacing: .1em; color: var(--muted);
+    text-transform: uppercase; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .panel-title .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .dot-ok { background: var(--green); }
+  .dot-warn { background: var(--amber); }
+  .dot-info { background: var(--accent); }
+
+  /* subtitle density */
+  .density-strip { display: flex; height: 28px; border-radius: 5px; overflow: hidden; margin-bottom: 10px; }
+  .density-seg { display: flex; align-items: center; justify-content: center; font-size: 9px; }
+  .seg-text { background: rgba(112,96,232,.35); color: rgba(200,190,255,.8); }
+  .seg-gap  { background: rgba(10,10,30,.6); color: var(--accent); border: 1px solid rgba(112,96,232,.2); }
+  .density-row { display: flex; gap: 16px; font-size: 11px; }
+  .density-label { color: var(--muted); }
+  .density-val { color: var(--text); }
+
+  /* breathing gaps */
+  .gap-row { display: flex; gap: 10px; margin-bottom: 8px; }
+  .gap-card {
+    flex: 1; background: rgba(112,96,232,.06); border: 1px solid rgba(112,96,232,.2);
+    border-radius: 7px; padding: 10px 12px;
+  }
+  .gap-card .gap-n { font-size: 10px; color: var(--accent); margin-bottom: 4px; }
+  .gap-card .gap-d { font-size: 11px; color: var(--text); margin-bottom: 3px; }
+  .gap-card .gap-r { font-size: 10px; color: var(--muted); }
+
+  /* emotional flow */
+  .flow-curve {
+    display: flex; align-items: flex-end;
+    height: 48px; gap: 4px; margin-bottom: 10px;
+  }
+  .flow-bar {
+    flex: 1; border-radius: 3px 3px 0 0;
+    display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 3px; font-size: 8px; color: rgba(255,255,255,.5);
+    transition: opacity .2s;
+  }
+  .flow-label-row { display: flex; gap: 4px; margin-bottom: 2px; }
+  .flow-label { flex: 1; font-size: 8px; text-align: center; color: var(--muted); }
+  .flow-arrow { font-size: 10px; color: var(--muted); margin-bottom: 8px; }
+  .flow-desc { font-size: 11px; color: var(--text); }
+
+  /* continuity */
+  .cont-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .cont-list li { display: flex; align-items: flex-start; gap: 8px; font-size: 11px; }
+  .c-ok { color: var(--green); font-size: 13px; flex-shrink: 0; }
+  .c-warn { color: var(--amber); font-size: 13px; flex-shrink: 0; }
+  .cont-note { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  /* ─── timeline ─── */
+  .tl-section {
+    max-width: 1120px; margin: 0 auto 32px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 22px;
+  }
+  .tl-title { font-size: 10px; letter-spacing: .1em; color: var(--muted); margin-bottom: 14px; }
+  .tl-bar {
+    position: relative; height: 8px; background: var(--border);
+    border-radius: 4px; margin-bottom: 6px;
+  }
+  .tl-seg {
+    position: absolute; top: 0; height: 100%; border-radius: 4px; opacity: .85;
+  }
+  .tl-labels {
+    display: flex; justify-content: space-between;
+    font-size: 9px; color: var(--muted); font-variant-numeric: tabular-nums;
+    margin-bottom: 18px;
+  }
+  .tl-rows { display: flex; flex-direction: column; gap: 10px; }
+  .tl-row { display: grid; grid-template-columns: 52px 120px 1fr; gap: 12px; align-items: baseline; }
+  .tl-id { font-size: 10px; color: var(--muted); }
+  .tl-time { font-size: 10px; color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .tl-desc { font-size: 10px; color: var(--muted); }
+  .tl-desc .sub { color: var(--text); }
+  .tl-desc .gap-tag {
+    display: inline-block; font-size: 9px; padding: 1px 6px;
+    border-radius: 4px; background: rgba(112,96,232,.12);
+    border: 1px solid rgba(112,96,232,.25); color: var(--accent);
+    margin-left: 4px;
+  }
+
+  /* ─── sound ─── */
+  .sound-section {
+    max-width: 1120px; margin: 0 auto 32px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 22px;
+  }
+  .sound-row { display: flex; align-items: center; gap: 12px; font-size: 11px; margin-bottom: 8px; }
+  .sound-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .dot-off { background: var(--border); }
+  .dot-on { background: var(--accent); }
+  .sound-bar { flex: 1; height: 4px; border-radius: 2px; background: var(--border); position: relative; overflow: hidden; }
+  .sound-fill { position: absolute; top: 0; height: 100%; border-radius: 2px;
+    background: linear-gradient(90deg, transparent 0%, #4455cc 15%, #4455cc 85%, transparent 100%); }
+  .sound-tag { font-size: 10px; color: var(--muted); white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<div class="header">
+  <div class="header-left">
+    <div class="badge-row">
+      <span class="badge hi">Micro Resonance</span>
+      <span class="badge">W1 · 위로형</span>
+      <span class="badge ok">~30초</span>
+      <span class="badge ok">5 frames · 0 AI</span>
+    </div>
+    <h1>W1-v2 — 위로형</h1>
+    <p class="wish">"지쳐있는 나를 보듬어주고 싶어요"</p>
+  </div>
+  <span class="v-tag">v2</span>
+</div>
+
+<!-- ─── v1 vs v2 diff ─── -->
+<div class="diff-bar">
+  <div class="diff-bar-title">V1 → V2 변경사항</div>
+  <div class="diff-grid">
+    <div class="diff-item">
+      <div class="diff-key">F1 SUBTITLE</div>
+      <div class="diff-vals">
+        <span class="diff-v1">지쳐도 괜찮아요 (위로 금지 + SSOT 미등록)</span>
+        <span class="diff-v2">오늘의 마음을 이 밤에 남겨둘게요 (copy #9)</span>
+      </div>
+    </div>
+    <div class="diff-item">
+      <div class="diff-key">FRAME DURATION</div>
+      <div class="diff-vals">
+        <span class="diff-v1">15s × 4 + 20s = 80s</span>
+        <span class="diff-v2">5s × 4 + 10s = 30s</span>
+      </div>
+    </div>
+    <div class="diff-item">
+      <div class="diff-key">DISSOLVE</div>
+      <div class="diff-vals">
+        <span class="diff-v1">2–3s</span>
+        <span class="diff-v2">1s</span>
+      </div>
+    </div>
+    <div class="diff-item">
+      <div class="diff-key">F4 MOTION SPEED</div>
+      <div class="diff-vals">
+        <span class="diff-v1">0.2x (SSOT 하한 미달)</span>
+        <span class="diff-v2">0.3x</span>
+      </div>
+    </div>
+    <div class="diff-item">
+      <div class="diff-key">F4 PAN DIRECTION</div>
+      <div class="diff-vals">
+        <span class="diff-v1">← 표기 오기</span>
+        <span class="diff-v2">→ left_to_right</span>
+      </div>
+    </div>
+    <div class="diff-item">
+      <div class="diff-key">DURATION MODEL</div>
+      <div class="diff-vals">
+        <span class="diff-v1">80초 (pacing 과다)</span>
+        <span class="diff-v2">30초 (Micro Resonance)</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Emotion Arc ─── -->
+<div class="arc-wrap">
+  <div class="arc">
+    <div class="arc-step pause">
+      <div class="lbl">F1 · 0:00</div>
+      <div class="emo">pause</div>
+    </div>
+    <div class="arc-arrow">→</div>
+    <div class="arc-step flow" style="position:relative;">
+      <div class="gap-indicator">gap #1 ·5s</div>
+      <div class="lbl">F2 · 0:05</div>
+      <div class="emo">여운</div>
+    </div>
+    <div class="arc-arrow">→</div>
+    <div class="arc-step calm">
+      <div class="lbl">F3 · 0:10</div>
+      <div class="emo">calm</div>
+    </div>
+    <div class="arc-arrow">→</div>
+    <div class="arc-step recon" style="position:relative;">
+      <div class="gap-indicator">gap #2 · 5s</div>
+      <div class="lbl">F4 · 0:15</div>
+      <div class="emo">재연결</div>
+    </div>
+    <div class="arc-arrow">→</div>
+    <div class="arc-step fragile">
+      <div class="lbl">F5 · 0:20</div>
+      <div class="emo">fragile_hope</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Frame Strip ─── -->
+<div class="strip">
+
+  <!-- F1 -->
+  <div class="card">
+    <div class="img-wrap">
+      <img src="frames/F1_pause_cafe.png" alt="F1 pause cafe">
+      <span class="f-num">F1</span>
+      <span class="timing-badge">0:00–0:05</span>
+      <div class="sub-overlay">
+        <span class="sub-text">오늘의 마음을<br>이 밤에 남겨둘게요</span>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="meta-row"><span class="chip chip-pause">pause</span></div>
+      <div class="meta-row">
+        <span class="meta-ic">↕</span>
+        <span class="meta-val">Ken Burns ↓ · 0.3x · 5s</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-ic">⊙</span>
+        <span class="meta-val">카페 창가</span>
+      </div>
+      <div class="meta-row"><span class="fix-note">copy #9 ← M1 수정</span></div>
+      <div class="meta-row"><span class="src-chip">thumbnails / full</span></div>
+    </div>
+  </div>
+
+  <!-- F2 — breathing gap -->
+  <div class="card">
+    <div class="img-wrap">
+      <img src="frames/F2_afterflow_cafe.png" alt="F2 afterflow cafe" style="opacity:.45">
+      <span class="f-num">F2</span>
+      <span class="timing-badge">0:05–0:10</span>
+      <div class="gap-overlay">
+        <span class="gap-label">BREATHING GAP #1</span>
+        <span class="gap-desc">감정 여운 잔류<br>자막 없음 · 정적</span>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="meta-row"><span class="chip chip-flow">emotional_afterflow</span></div>
+      <div class="meta-row">
+        <span class="meta-ic">↕</span>
+        <span class="meta-val">정적 (still) · 5s</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-ic">⊙</span>
+        <span class="meta-val">감정이 흘러간 잔류</span>
+      </div>
+      <div class="meta-row"><span class="src-chip">storybook / page05</span></div>
+    </div>
+  </div>
+
+  <!-- F3 -->
+  <div class="card">
+    <div class="img-wrap">
+      <img src="frames/F3_calm_cafe.png" alt="F3 calm cafe">
+      <span class="f-num">F3</span>
+      <span class="timing-badge">0:10–0:15</span>
+      <div class="sub-overlay">
+        <span class="sub-text">마음이 조금<br>가벼워졌다면 좋겠어요</span>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="meta-row"><span class="chip chip-calm">calm</span></div>
+      <div class="meta-row">
+        <span class="meta-ic">↕</span>
+        <span class="meta-val">dissolve 1s → 정적 · 5s</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-ic">⊙</span>
+        <span class="meta-val">내면 고요 (copy #11)</span>
+      </div>
+      <div class="meta-row"><span class="src-chip">thumbnails / full</span></div>
+    </div>
+  </div>
+
+  <!-- F4 — breathing gap -->
+  <div class="card">
+    <div class="img-wrap">
+      <img src="frames/F4_reconnection_hamel.png" alt="F4 reconnection hamel" style="opacity:.45">
+      <span class="f-num">F4</span>
+      <span class="timing-badge">0:15–0:20</span>
+      <div class="gap-overlay">
+        <span class="gap-label">BREATHING GAP #2</span>
+        <span class="gap-desc">현실 재연결 · 장소 전환<br>자막 없음 · pan → 0.3x</span>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="meta-row"><span class="chip chip-recon">reality_reconnection</span></div>
+      <div class="meta-row">
+        <span class="meta-ic">↕</span>
+        <span class="meta-val">dissolve 1s → pan → · 0.3x · 5s</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-ic">⊙</span>
+        <span class="meta-val">하멜 등대 — 현실 재연결</span>
+      </div>
+      <div class="meta-row"><span class="fix-note">0.3x + → 방향 ← S1+S2 수정</span></div>
+      <div class="meta-row"><span class="src-chip">storybook / page05</span></div>
+    </div>
+  </div>
+
+  <!-- F5 -->
+  <div class="card">
+    <div class="img-wrap">
+      <img src="frames/F5_fragile_hope_hamel.png" alt="F5 fragile_hope hamel">
+      <span class="f-num">F5</span>
+      <span class="timing-badge">0:20–0:30</span>
+      <div class="sub-overlay">
+        <span class="sub-text">작은 소원 하나가<br>밤하늘에 남았어요</span>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="meta-row"><span class="chip chip-fragile">fragile_hope</span></div>
+      <div class="meta-row">
+        <span class="meta-ic">↕</span>
+        <span class="meta-val">dissolve 1s → 정적 → fade 2s · 10s</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-ic">⊙</span>
+        <span class="meta-val">하멜 등대 빛 (copy #2)</span>
+      </div>
+      <div class="meta-row"><span class="src-chip">thumbnails / full</span></div>
+    </div>
+  </div>
+
+</div><!-- /strip -->
+
+<!-- ─── Inspection Panels ─── -->
+<div class="panels">
+
+  <!-- 1. Subtitle Density -->
+  <div class="panel">
+    <div class="panel-title">
+      <div class="dot dot-ok"></div>
+      Subtitle Density
+    </div>
+    <div class="density-strip" style="margin-bottom:10px;">
+      <!-- F1: 5/30 = 16.7% text -->
+      <div class="density-seg seg-text" style="flex:5;">F1</div>
+      <!-- F2: 5/30 = 16.7% gap -->
+      <div class="density-seg seg-gap" style="flex:5;">·</div>
+      <!-- F3: 5/30 text -->
+      <div class="density-seg seg-text" style="flex:5;">F3</div>
+      <!-- F4: 5/30 gap -->
+      <div class="density-seg seg-gap" style="flex:5;">·</div>
+      <!-- F5: 10/30 text -->
+      <div class="density-seg seg-text" style="flex:10;">F5</div>
+    </div>
+    <div class="density-row" style="margin-bottom: 8px;">
+      <span class="density-label">자막 있는 프레임</span>
+      <span class="density-val">3 / 5 (60%)</span>
+    </div>
+    <div class="density-row" style="margin-bottom: 8px;">
+      <span class="density-label">침묵 프레임 (breathing gap)</span>
+      <span class="density-val">2 / 5 (40%)</span>
+    </div>
+    <div class="density-row">
+      <span class="density-label">패턴</span>
+      <span class="density-val">text · gap · text · gap · text</span>
+    </div>
+    <div style="margin-top:10px;font-size:10px;color:var(--muted);border-top:1px solid var(--border);padding-top:8px;">
+      검수: F2/F4의 침묵이 조급하지 않고 충분히 느껴지는지 확인
+    </div>
+  </div>
+
+  <!-- 2. Breathing Gap -->
+  <div class="panel">
+    <div class="panel-title">
+      <div class="dot dot-info"></div>
+      Breathing Gap
+    </div>
+    <div class="gap-row">
+      <div class="gap-card">
+        <div class="gap-n">GAP #1 — F2</div>
+        <div class="gap-d">5초 · 정적 (still)</div>
+        <div class="gap-r">감정이 흘러간 잔류<br>카페 emotional_afterflow</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-n">GAP #2 — F4</div>
+        <div class="gap-d">5초 · pan → 0.3x</div>
+        <div class="gap-r">현실 재연결 침묵<br>카페→하멜 장소 전환</div>
+      </div>
+    </div>
+    <div style="font-size:10px;color:var(--muted);border-top:1px solid var(--border);padding-top:8px;margin-top:4px;">
+      검수: 30초 전체에서 10초(33%)가 침묵 — 공기 비율 충분한지 확인
+    </div>
+  </div>
+
+  <!-- 3. Emotional Flow -->
+  <div class="panel">
+    <div class="panel-title">
+      <div class="dot dot-ok"></div>
+      Emotional Flow
+    </div>
+    <!-- hope curve bars: 0.50 / 0.50 / 0.52 / 0.55 / 0.62 -->
+    <div class="flow-curve">
+      <div class="flow-bar" style="height:65%;background:var(--pause);">50</div>
+      <div class="flow-bar" style="height:65%;background:var(--afterflow);opacity:.7;">50</div>
+      <div class="flow-bar" style="height:68%;background:var(--calm);">52</div>
+      <div class="flow-bar" style="height:72%;background:var(--reconnect);">55</div>
+      <div class="flow-bar" style="height:84%;background:var(--fragile);">62</div>
+    </div>
+    <div class="flow-label-row">
+      <div class="flow-label" style="color:var(--pause);">pause</div>
+      <div class="flow-label" style="color:var(--afterflow);">여운</div>
+      <div class="flow-label" style="color:var(--calm);">calm</div>
+      <div class="flow-label" style="color:var(--reconnect);">재연결</div>
+      <div class="flow-label" style="color:var(--fragile);">f.hope</div>
+    </div>
+    <div style="font-size:11px;color:var(--text);margin-top:10px;">
+      완만한 상승 — 급격한 전환 없음
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-top:4px;border-top:1px solid var(--border);padding-top:8px;">
+      검수: pause에서 fragile_hope로 억지스럽지 않게 흐르는지 확인
+    </div>
+  </div>
+
+  <!-- 4. Continuity Check -->
+  <div class="panel">
+    <div class="panel-title">
+      <div class="dot dot-ok"></div>
+      Continuity Check
+    </div>
+    <ul class="cont-list">
+      <li>
+        <span class="c-ok">✓</span>
+        <div>
+          <div>Sowoni 카페 포즈 — seated at window, back view</div>
+          <div class="cont-note">page05.json cafe.sowoni_pose_base 확인</div>
+        </div>
+      </li>
+      <li>
+        <span class="c-ok">✓</span>
+        <div>
+          <div>Sowoni 하멜 포즈 — standing at harbor edge, back view</div>
+          <div class="cont-note">page05.json hamel.sowoni_pose_base 확인</div>
+        </div>
+      </li>
+      <li>
+        <span class="c-ok">✓</span>
+        <div>
+          <div>신규 AI 이미지 생성 0건</div>
+        </div>
+      </li>
+      <li>
+        <span class="c-ok">✓</span>
+        <div>
+          <div>감정 순서 — pause → calm → fragile_hope (SSOT 부분집합)</div>
+        </div>
+      </li>
+      <li>
+        <span class="c-warn">⚠</span>
+        <div>
+          <div>F2 / F4 page05 프레임 — 실물 육안 검수 미완</div>
+          <div class="cont-note">이 페이지에서 이미지 직접 확인 요망 (S3)</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+</div><!-- /panels -->
+
+<!-- ─── Timeline ─── -->
+<div class="tl-section">
+  <div class="tl-title">Timeline — 총 30초 · Micro Resonance</div>
+  <div class="tl-bar">
+    <!-- F1: 0–5s = 0–16.7% -->
+    <div class="tl-seg" style="left:0%;width:16.7%;background:var(--pause);"></div>
+    <!-- F2: 5–10s = 16.7–33.3% -->
+    <div class="tl-seg" style="left:16.7%;width:16.7%;background:var(--afterflow);opacity:.5;"></div>
+    <!-- F3: 10–15s = 33.3–50% -->
+    <div class="tl-seg" style="left:33.3%;width:16.7%;background:var(--calm);"></div>
+    <!-- F4: 15–20s = 50–66.7% -->
+    <div class="tl-seg" style="left:50%;width:16.7%;background:var(--reconnect);opacity:.5;"></div>
+    <!-- F5: 20–30s = 66.7–100% -->
+    <div class="tl-seg" style="left:66.7%;width:33.3%;background:var(--fragile);"></div>
+  </div>
+  <div class="tl-labels">
+    <span>0:00</span><span>0:05</span><span>0:10</span>
+    <span>0:15</span><span>0:20</span><span>0:30</span>
+  </div>
+  <div class="tl-rows">
+    <div class="tl-row">
+      <span class="tl-id">F1 / 0:00</span>
+      <span class="tl-time">5s · Ken Burns ↓ 0.3x</span>
+      <span class="tl-desc"><span class="sub">"오늘의 마음을 이 밤에 남겨둘게요"</span> copy #9 · +1s</span>
+    </div>
+    <div class="tl-row">
+      <span class="tl-id">F2 / 0:05</span>
+      <span class="tl-time">5s · 정적</span>
+      <span class="tl-desc">자막 없음<span class="gap-tag">gap #1</span></span>
+    </div>
+    <div class="tl-row">
+      <span class="tl-id">F3 / 0:10</span>
+      <span class="tl-time">5s · dissolve 1s → 정적</span>
+      <span class="tl-desc"><span class="sub">"마음이 조금 가벼워졌다면 좋겠어요"</span> copy #11 · +1s</span>
+    </div>
+    <div class="tl-row">
+      <span class="tl-id">F4 / 0:15</span>
+      <span class="tl-time">5s · dissolve 1s → pan → 0.3x</span>
+      <span class="tl-desc">자막 없음<span class="gap-tag">gap #2</span></span>
+    </div>
+    <div class="tl-row">
+      <span class="tl-id">F5 / 0:20</span>
+      <span class="tl-time">10s · dissolve 1s → 정적 → fade 2s</span>
+      <span class="tl-desc"><span class="sub">"작은 소원 하나가 밤하늘에 남았어요"</span> copy #2 · +1s</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Sound ─── -->
+<div class="sound-section">
+  <div class="tl-title">Sound Cue</div>
+  <div class="sound-row">
+    <div class="sound-dot dot-off"></div>
+    <span style="font-size:10px;color:var(--muted);width:56px">무음</span>
+    <div class="sound-bar" style="flex:none;width:56px;"></div>
+    <span class="sound-tag">F1 시작 → +1s</span>
+  </div>
+  <div class="sound-row">
+    <div class="sound-dot dot-on"></div>
+    <span style="font-size:10px;color:var(--muted);width:56px">-22dB</span>
+    <div class="sound-bar">
+      <div class="sound-fill" style="left:6%;width:87%"></div>
+    </div>
+    <span class="sound-tag">바다 파도 앰비언트 · F1+1s ~ F5 종료 2s 전 fade-out</span>
+  </div>
+</div>
+
+</body>
+</html>

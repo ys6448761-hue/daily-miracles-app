@@ -1,0 +1,85 @@
+{
+  "version": "v0.2",
+  "stage": { "w": 280, "h": 373 },
+
+  "variants": {
+    "A": {
+      "label": "World Only",
+      "label_ko": "세계만",
+      "human_motion_pct": 0,
+      "world_multiplier": 1.0,
+      "color": "#2060a0",
+      "description": "인간 모션 없음. 세계의 시간만 흐른다. 기존 DreamTown 철학 안전안."
+    },
+    "B": {
+      "label": "Human Micro Presence",
+      "label_ko": "미세 존재",
+      "human_motion_pct": 0.75,
+      "world_multiplier": 1.0,
+      "color": "#406080",
+      "description": "공기 때문에 아주 조금 흔들린다. 사람이 행동하지 않는다."
+    },
+    "C": {
+      "label": "Human Perceptible Risk",
+      "label_ko": "감지 위험",
+      "human_motion_pct": 2.5,
+      "world_multiplier": 1.35,
+      "color": "#802030",
+      "description": "어디서 캐릭터화/drift가 시작되는지 탐지. 한계선 실험."
+    }
+  },
+
+  "emotions": {
+    "calm": {
+      "label": "고요함",
+      "world_motion_pct": 3,
+      "human_motion_pct": 0.5,
+      "star_period":  [8, 12],
+      "star_opacity": [0.70, 0.90],
+      "water_opacity_max": 0.018,
+      "grain_opacity": [0.040, 0.060],
+      "light_opacity": [0.020, 0.040],
+      "human_period":  [5.5, 8.1],
+      "human_phase_scatter": 2.0
+    },
+    "hope": {
+      "label": "희망",
+      "world_motion_pct": 6,
+      "human_motion_pct": 1.0,
+      "star_period":  [5, 8],
+      "star_opacity": [0.75, 1.00],
+      "water_opacity_max": 0.030,
+      "grain_opacity": [0.040, 0.070],
+      "light_opacity": [0.025, 0.055],
+      "human_period":  [3.7, 6.2],
+      "human_phase_scatter": 3.0
+    },
+    "lonely": {
+      "label": "고독",
+      "world_motion_pct": 2,
+      "human_motion_pct": 0.5,
+      "star_period":  [10, 15],
+      "star_opacity": [0.60, 0.80],
+      "water_opacity_max": 0.012,
+      "grain_opacity": [0.050, 0.070],
+      "light_opacity": [0.015, 0.030],
+      "human_period":  [6.2, 9.8],
+      "human_phase_scatter": 1.5
+    }
+  },
+
+  "drift_guard": {
+    "human_region": { "top": 0.30, "bottom": 0.88 },
+    "hair_region":  { "top": 0.30, "bottom": 0.52 },
+    "cloth_region": { "top": 0.50, "bottom": 0.88 },
+    "fade_band": 0.05,
+    "never": [
+      "gaze_shift", "facial_expression_change", "head_turn",
+      "gesture", "lip_motion", "emotional_acting",
+      "cinematic_pan", "zoom_toward_subject",
+      "dramatic_sync", "viewer_directed_motion"
+    ],
+    "judgement_good": "공기 때문에 아주 조금 흔들린다로 느껴짐",
+    "judgement_bad": "저 사람이 살아서 행동한다로 느껴짐"
+  }
+}

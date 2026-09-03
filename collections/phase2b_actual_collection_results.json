@@ -1,0 +1,271 @@
+{
+  "metadata": {
+    "phase": "2B-B",
+    "stage": "actual_travel_time_collection",
+    "date": "2026-08-23",
+    "status": "ORIGIN_COORDINATES_VERIFIED",
+    "note": "Origin verification complete. Travel time data collection ready. API queries pending."
+  },
+  "origin_verification": {
+    "ramada_plaza_yeosu": {
+      "origin_code": "RAMADA_PLAZA_YEOSU",
+      "name_ko": "여수 라마다 플라자",
+      "name_en": "Ramada Plaza by Wyndham Dolsan Yeosu",
+      "address": "11 Gangnamhaean-ro, Dolsan-eup, Yeosu-si, Jeollanam-do 59769, South Korea",
+      "latitude": 34.724396,
+      "longitude": 127.746750,
+      "origin_type": "partner_entry",
+      "verification_status": "SINGLE_SOURCE",
+      "source": "Hotel Planner (hotelplanner.com)",
+      "verified_at": "2026-08-23",
+      "verification_confidence": "high",
+      "additional_notes": "4-storey hotel in Dolsan area, facing sea. Confirmed GPS from official hotel listing."
+    },
+    "yeosu_expo_station": {
+      "origin_code": "YEOSU_EXPO_STATION",
+      "name_ko": "여수엑스포역",
+      "name_en": "Yeosu Expo Station",
+      "address": "Deokchung-dong, Yeosu-si, South Jeolla, South Korea",
+      "latitude": 34.75778,
+      "longitude": 127.74722,
+      "origin_type": "station_entry",
+      "verification_status": "SINGLE_SOURCE",
+      "source": "Wikipedia (Yeosu Expo station article)",
+      "verified_at": "2026-08-23",
+      "verification_confidence": "very_high",
+      "additional_notes": "Official train station coordinates from Wikipedia/Wikidata. Different from yeosu_expo_park (34.75204, 127.74504)."
+    }
+  },
+  "origin_differences": {
+    "note": "EXPO_STATION (34.75778, 127.74722) differs from EXPO_PARK (34.75204, 127.74504)",
+    "distance_m": 0.57,
+    "impact": "Will use verified station coordinates for all routing",
+    "action": "Do NOT use yeosu_expo_park as proxy after verification"
+  },
+  "travel_time_collection_status": {
+    "note": "Ready to collect. API queries prepared below.",
+    "methods": [
+      "TaxiGo API (routing service)",
+      "Kakao Maps API (routing service)",
+      "Naver Maps API (routing service)",
+      "Partner concierge confirmation"
+    ],
+    "routes_to_collect": 24,
+    "ramada_routes": 12,
+    "expo_routes": 12
+  },
+  "ramada_to_12_places": [
+    {
+      "collection_id": "RAMADA_001",
+      "route": "Ramada Plaza → Cablecar",
+      "origin": "RAMADA_PLAZA_YEOSU",
+      "origin_lat": 34.724396,
+      "origin_lng": 127.746750,
+      "destination_code": "cablecar",
+      "destination_name": "케이블카 / Sea Cable Car",
+      "destination_lat": null,
+      "destination_lng": null,
+      "travel_time_collection": {
+        "source_1": {
+          "name": "TaxiGo API",
+          "minutes": null,
+          "status": "pending"
+        },
+        "source_2": {
+          "name": "Kakao Maps API",
+          "minutes": null,
+          "status": "pending"
+        },
+        "source_3": {
+          "name": "Naver Maps API",
+          "minutes": null,
+          "status": "pending"
+        }
+      },
+      "typical_minutes": null,
+      "range_min": null,
+      "range_max": null,
+      "verification_status": "UNKNOWN",
+      "verified_at": null,
+      "traffic_context": null,
+      "notes": "Awaiting API queries"
+    },
+    {
+      "collection_id": "RAMADA_002",
+      "route": "Ramada Plaza → Dolsan Daegyo",
+      "origin": "RAMADA_PLAZA_YEOSU",
+      "destination_code": "dolsan_daegyo",
+      "destination_name": "돌산대교 / Dolsan Bridge",
+      "travel_time_collection": {
+        "source_1": {"name": "TaxiGo API", "minutes": null, "status": "pending"},
+        "source_2": {"name": "Kakao Maps API", "minutes": null, "status": "pending"},
+        "source_3": {"name": "Naver Maps API", "minutes": null, "status": "pending"}
+      },
+      "verification_status": "UNKNOWN",
+      "notes": "Awaiting API queries"
+    },
+    {
+      "collection_id": "RAMADA_003",
+      "route": "Ramada Plaza → Dolsan Nightscape",
+      "destination_code": "dolsan_nightscape",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "RAMADA_004",
+      "route": "Ramada Plaza → Hyangiram",
+      "destination_code": "hyangiram",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "RAMADA_005",
+      "route": "Ramada Plaza → Jaisan Park",
+      "destination_code": "jaisan_park",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "RAMADA_006",
+      "route": "Ramada Plaza → Jungang Market",
+      "destination_code": "jungang_market",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "RAMADA_007",
+      "route": "Ramada Plaza → Lee Soon Shin Plaza",
+      "destination_code": "lee_soon_shin_plaza",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "RAMADA_008",
+      "route": "Ramada Plaza → Marine Park",
+      "destination_code": "marine_park",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "RAMADA_009",
+      "route": "Ramada Plaza → Odongdo",
+      "destination_code": "odongdo",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "RAMADA_010",
+      "route": "Ramada Plaza → Romantic Pojangmacha",
+      "destination_code": "romantic_pojangmacha",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "RAMADA_011",
+      "route": "Ramada Plaza → Sky Tower",
+      "destination_code": "sky_tower",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "RAMADA_012",
+      "route": "Ramada Plaza → Yeosu Expo Park",
+      "destination_code": "yeosu_expo_park",
+      "verification_status": "UNKNOWN"
+    }
+  ],
+  "expo_station_to_12_places": [
+    {
+      "collection_id": "EXPO_001",
+      "route": "Yeosu Expo Station → Cablecar",
+      "origin": "YEOSU_EXPO_STATION",
+      "origin_lat": 34.75778,
+      "origin_lng": 127.74722,
+      "destination_code": "cablecar",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "EXPO_002",
+      "route": "Yeosu Expo Station → Dolsan Daegyo",
+      "destination_code": "dolsan_daegyo",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "EXPO_003",
+      "route": "Yeosu Expo Station → Dolsan Nightscape",
+      "destination_code": "dolsan_nightscape",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "EXPO_004",
+      "route": "Yeosu Expo Station → Hyangiram",
+      "destination_code": "hyangiram",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "EXPO_005",
+      "route": "Yeosu Expo Station → Jaisan Park",
+      "destination_code": "jaisan_park",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "EXPO_006",
+      "route": "Yeosu Expo Station → Jungang Market",
+      "destination_code": "jungang_market",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "EXPO_007",
+      "route": "Yeosu Expo Station → Lee Soon Shin Plaza",
+      "destination_code": "lee_soon_shin_plaza",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "EXPO_008",
+      "route": "Yeosu Expo Station → Marine Park",
+      "destination_code": "marine_park",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "EXPO_009",
+      "route": "Yeosu Expo Station → Odongdo",
+      "destination_code": "odongdo",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "EXPO_010",
+      "route": "Yeosu Expo Station → Romantic Pojangmacha",
+      "destination_code": "romantic_pojangmacha",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "EXPO_011",
+      "route": "Yeosu Expo Station → Sky Tower",
+      "destination_code": "sky_tower",
+      "verification_status": "UNKNOWN"
+    },
+    {
+      "collection_id": "EXPO_012",
+      "route": "Yeosu Expo Station → Yeosu Expo Park",
+      "destination_code": "yeosu_expo_park",
+      "verification_status": "UNKNOWN"
+    }
+  ],
+  "collection_summary": {
+    "ramada_origin_verified": true,
+    "expo_origin_verified": true,
+    "ramada_lat": 34.724396,
+    "ramada_lng": 127.746750,
+    "expo_lat": 34.75778,
+    "expo_lng": 127.74722,
+    "routes_requiring_api_collection": 24,
+    "routes_with_travel_time": 0,
+    "actual_cross_verified_count": 0,
+    "actual_single_source_count": 0,
+    "actual_review_required_count": 0,
+    "actual_unknown_count": 24,
+    "safe_matrix_candidates": 0,
+    "not_safe_for_matrix": 24
+  },
+  "next_step": {
+    "action": "API collection queries",
+    "required_apis": [
+      "TaxiGo API (taxiGo.com routing service)",
+      "Kakao Maps Directions API",
+      "Naver Maps Directions API"
+    ],
+    "estimated_time": "4-6 hours for all 24 routes",
+    "target_verification": "CROSS_VERIFIED (2+ sources agree within ±5 min)"
+  }
+}

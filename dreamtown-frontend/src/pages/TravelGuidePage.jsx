@@ -23,6 +23,11 @@ function TravelGuidePage() {
   const [showMap, setShowMap] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [lastUserInput, setLastUserInput] = useState(null);
+
+  // Journey preferences (session-level state)
+  const [excludePlaceIds, setExcludePlaceIds] = useState([]);
+  const [mustVisitPlaceIds, setMustVisitPlaceIds] = useState([]);
 
   // Parse entry point from location or default
   useEffect(() => {
@@ -46,12 +51,18 @@ function TravelGuidePage() {
     setError(null);
     try {
       const userId = getOrCreateUserId();
+      // Save user input for potential recomposition
+      setLastUserInput(userInput);
+
       const payload = {
         context: {
           ...context,
           user_id: userId,
           session_id: sessionId,
           ...userInput, // time_available_minutes, people_type, has_car, etc.
+          // Include journey preferences (session-level state)
+          exclude_place_ids: excludePlaceIds,
+          must_visit_place_ids: mustVisitPlaceIds,
         },
       };
 
@@ -89,6 +100,39 @@ function TravelGuidePage() {
       setError(errorMsg);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle journey preference actions
+  const handleExcludePlace = (placeCode) => {
+    const updated = [...excludePlaceIds, placeCode];
+    setExcludePlaceIds(updated);
+    logEvent('place_excluded', { place_code: placeCode });
+    // Recompose journey without this place
+    if (lastUserInput) {
+      handleGetRecommendations(lastUserInput);
+    }
+  };
+
+  const handleMustVisitPlace = (placeCode) => {
+    if (mustVisitPlaceIds.includes(placeCode)) {
+      setMustVisitPlaceIds(mustVisitPlaceIds.filter(id => id !== placeCode));
+      logEvent('must_visit_removed', { place_code: placeCode });
+    } else {
+      setMustVisitPlaceIds([...mustVisitPlaceIds, placeCode]);
+      logEvent('must_visit_added', { place_code: placeCode });
+    }
+    // Recompose journey with/without this anchor
+    if (lastUserInput) {
+      setTimeout(() => handleGetRecommendations(lastUserInput), 100);
+    }
+  };
+
+  const handleAlternativePlace = () => {
+    logEvent('alternative_requested', {});
+    // For now, just trigger recomposition which will find next best matches
+    if (lastUserInput) {
+      handleGetRecommendations(lastUserInput);
     }
   };
 
@@ -192,6 +236,11 @@ function TravelGuidePage() {
                     '_blank'
                   );
                 }}
+                onExclude={handleExcludePlace}
+                onMustVisit={handleMustVisitPlace}
+                onAlternative={handleAlternativePlace}
+                isExcluded={excludePlaceIds.includes(place.place_code)}
+                isMustVisit={mustVisitPlaceIds.includes(place.place_code)}
               />
             ))}
           </div>

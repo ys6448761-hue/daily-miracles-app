@@ -1,0 +1,135 @@
+{
+  "wish_id": "wish_W09_res",
+  "wish_text": "앞날이 너무 불확실하고 막막해요",
+  "wish_type": "불안형",
+  "primary_gravity": "confusion",
+  "gem_palette": {
+    "cafe": "moonstone",
+    "hamel": "moonstone"
+  },
+  "render_mode": "resonance_personal",
+  "total_duration_sec": 30,
+  "ratio": "3:4",
+  "emotion_arc": [
+    "confusion",
+    "emotional_afterflow",
+    "calm",
+    "reality_reconnection",
+    "fragile_hope"
+  ],
+  "auto_generated": true,
+  "generated_at": "2026-05-23T01:00:38.355Z",
+  "frame_set_source": "wish-render-prototype/W3",
+  "confusion_f5_override": true,
+  "render_spec": {
+    "ratio": "3:4",
+    "breathing_gap_ratio": "40%",
+    "subtitle_opacity": 0.7,
+    "subtitle_weight": "thin",
+    "viewer_intent": "emotional_residue",
+    "new_ai_images": 0
+  },
+  "frames": [
+    {
+      "id": "F1",
+      "index": 1,
+      "emotion": "confusion",
+      "file": "../../wish-render-prototype/W3/frames/F1_pause_cafe.png",
+      "timing": {
+        "start": 0,
+        "end": 5,
+        "duration": 5
+      },
+      "subtitle": "별빛은 아주 작은 마음에서 시작돼요",
+      "subtitle_copy": "#8",
+      "subtitle_start_offset": 1,
+      "breathing_gap": false,
+      "motion": {
+        "type": "ken_burns",
+        "direction": "top_to_bottom",
+        "speed": 0.3
+      }
+    },
+    {
+      "id": "F2",
+      "index": 2,
+      "emotion": "emotional_afterflow",
+      "file": "../../../public/images/storybook/sources/page05/cafe/cafe_page05_emotional_afterflow_base.png",
+      "timing": {
+        "start": 5,
+        "end": 10,
+        "duration": 5
+      },
+      "subtitle": null,
+      "subtitle_copy": null,
+      "subtitle_start_offset": null,
+      "breathing_gap": true,
+      "motion": {
+        "type": "still",
+        "speed": 0
+      }
+    },
+    {
+      "id": "F3",
+      "index": 3,
+      "emotion": "calm",
+      "file": "../../wish-render-prototype/W3/frames/F3_calm_cafe.png",
+      "timing": {
+        "start": 10,
+        "end": 15,
+        "duration": 5
+      },
+      "subtitle": "마음이 조금 가벼워졌다면 좋겠어요",
+      "subtitle_copy": "#11",
+      "subtitle_start_offset": 1,
+      "breathing_gap": false,
+      "motion": {
+        "type": "dissolve_still",
+        "dissolve_sec": 1,
+        "speed": 0
+      }
+    },
+    {
+      "id": "F4",
+      "index": 4,
+      "emotion": "reality_reconnection",
+      "file": "../../../public/images/storybook/sources/page05/hamel/hamel_page05_reality_reconnection_base.png",
+      "timing": {
+        "start": 15,
+        "end": 20,
+        "duration": 5
+      },
+      "subtitle": null,
+      "subtitle_copy": null,
+      "subtitle_start_offset": null,
+      "breathing_gap": true,
+      "motion": {
+        "type": "dissolve_pan",
+        "direction": "left_to_right",
+        "dissolve_sec": 1,
+        "speed": 0.3
+      }
+    },
+    {
+      "id": "F5",
+      "index": 5,
+      "emotion": "fragile_hope",
+      "file": "../../wish-render-prototype/W1/frames/F5_fragile_hope_hamel.png",
+      "timing": {
+        "start": 20,
+        "end": 30,
+        "duration": 10
+      },
+      "subtitle": "작은 소원 하나가 밤하늘에 남았어요",
+      "subtitle_copy": "#2",
+      "subtitle_start_offset": 1,
+      "breathing_gap": false,
+      "motion": {
+        "type": "dissolve_fadeout",
+        "dissolve_sec": 1,
+        "fadeout_sec": 2,
+        "speed": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DreamTown Presence v0.2 vs v0.3 — Side-by-Side</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#02020a;color:#a0a0c8;font-family:'Noto Sans KR',-apple-system,sans-serif;padding:20px}
+header{text-align:center;padding:14px 0 20px;border-bottom:1px solid #0a0a18;margin-bottom:24px}
+h1{font-size:.72rem;color:#282840;letter-spacing:.15em;font-weight:300}
+.tagline{font-size:.7rem;color:#1e1e34;margin-top:6px;font-style:italic}
+.grid{display:flex;gap:20px;justify-content:center;align-items:flex-start;flex-wrap:wrap}
+.col{display:flex;flex-direction:column;gap:10px;width:340px}
+.col-hdr{text-align:center;padding:8px;background:#06060f;border:1px solid #0e0e1e;border-radius:8px}
+.ver{font-size:.95rem;font-weight:300;margin-bottom:3px}
+.ver.v2{color:#304870}.ver.v3{color:#405090}
+.features{font-size:.6rem;color:#282848;line-height:1.85}
+.features li{margin:0;padding-left:0;list-style:none}
+.features .new{color:#505080;font-style:italic}
+iframe{width:100%;height:600px;border:1px solid #0e0e1e;border-radius:10px;background:#000}
+.eval-col{background:#06060f;border:1px solid #0c0c1a;border-radius:8px;padding:12px}
+.eval-t{font-size:.6rem;color:#282848;letter-spacing:.1em;margin-bottom:8px}
+.qa{margin:6px 0;padding-bottom:6px;border-bottom:1px solid #080816}
+.qa:last-of-type{border-bottom:none}
+.qtext{font-size:.68rem;color:#383860;margin-bottom:4px}
+.qans{display:flex;gap:10px;font-size:.62rem;flex-wrap:wrap}
+.qans label{display:flex;align-items:center;gap:3px;cursor:pointer;color:#222240}
+.qans label:has(input:checked){color:#8080d0}
+.qans input{accent-color:#5050c0}
+.summary-btn{display:block;width:100%;max-width:280px;margin:16px auto 0;background:#0a0a1c;
+  border:1px solid #181838;color:#404080;border-radius:6px;padding:6px 12px;font-size:.7rem;
+  cursor:pointer;font-family:inherit;transition:all .15s}
+.summary-btn:hover{background:#121230;color:#9090e0}
+#sum-out{display:none;margin-top:12px;background:#060610;border:1px solid #0e0e1e;border-radius:8px;
+  padding:12px;font-size:.62rem;color:#6868a0;white-space:pre;line-height:1.8}
+.diff-table{width:100%;max-width:700px;margin:28px auto 0;border-collapse:collapse;font-size:.68rem}
+.diff-table th{font-size:.58rem;color:#282848;letter-spacing:.1em;padding:6px 10px;border-bottom:1px solid #0c0c1c;text-align:left;font-weight:400}
+.diff-table td{padding:5px 10px;border-bottom:1px solid #080818;color:#3a3a60}
+.diff-table tr:last-child td{border-bottom:none}
+.tag-new{background:#141408;color:#706040;padding:1px 5px;border-radius:3px;font-size:.56rem}
+.tag-upd{background:#081814;color:#406040;padding:1px 5px;border-radius:3px;font-size:.56rem}
+footer{text-align:center;font-size:.58rem;color:#141428;font-style:italic;padding:24px 0 10px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>DREAMTOWN PRESENCE — v0.2 vs v0.3 COMPARISON</h1>
+  <p class="tagline">"움직이는 영상" vs "살아나는 순간" — 체감 차이 측정</p>
+</header>
+
+<!-- Diff table -->
+<table class="diff-table">
+  <tr>
+    <th>시스템</th>
+    <th>v0.2</th>
+    <th>v0.3</th>
+    <th>변화</th>
+  </tr>
+  <tr>
+    <td>Human Motion</td>
+    <td>Random wave displacement</td>
+    <td>Directional wind field displacement</td>
+    <td><span class="tag-upd">UPGRADED</span></td>
+  </tr>
+  <tr>
+    <td>Motion Timing</td>
+    <td>항상 활성 (always-on)</td>
+    <td>Stillness Breakpoint: 정적→깨어남→공명→잔향</td>
+    <td><span class="tag-new">NEW</span></td>
+  </tr>
+  <tr>
+    <td>Hand Acting</td>
+    <td>없음</td>
+    <td>finger tremble + grip relax + sleeve drift</td>
+    <td><span class="tag-new">NEW</span></td>
+  </tr>
+  <tr>
+    <td>Camera</td>
+    <td>고정</td>
+    <td>Observer Grammar: emotional push + observer drift</td>
+    <td><span class="tag-new">NEW</span></td>
+  </tr>
+  <tr>
+    <td>Particles</td>
+    <td>없음</td>
+    <td>희망/공명 감정에서 sparse_upward 활성</td>
+    <td><span class="tag-new">NEW</span></td>
+  </tr>
+  <tr>
+    <td>Layer Event Timing</td>
+    <td>동시 활성</td>
+    <td>motion→light(+0.4s)→particle(+0.9s)→star(+1.4s) staggered</td>
+    <td><span class="tag-new">NEW</span></td>
+  </tr>
+  <tr>
+    <td>Emotions</td>
+    <td>3 (calm/hope/lonely)</td>
+    <td>5 (+ healing / resonance)</td>
+    <td><span class="tag-upd">EXPANDED</span></td>
+  </tr>
+</table>
+
+<div class="grid" style="margin-top:28px">
+
+  <!-- v0.2 -->
+  <div class="col">
+    <div class="col-hdr">
+      <div class="ver v2">v0.2 — Human Micro Presence</div>
+      <ul class="features">
+        <li>Random wave displacement</li>
+        <li>Always-on motion</li>
+        <li>3 emotions: calm / hope / lonely</li>
+        <li>Camera: fixed</li>
+      </ul>
+    </div>
+    <iframe src="../../prototype/dreamtown-presence-v0.2/index.html" loading="lazy"></iframe>
+  </div>
+
+  <!-- v0.3 -->
+  <div class="col">
+    <div class="col-hdr">
+      <div class="ver v3">v0.3 — Emotional Event System</div>
+      <ul class="features">
+        <li class="new">★ Stillness Breakpoint (정적→살아남)</li>
+        <li class="new">★ Directional wind field</li>
+        <li class="new">★ Hand micro acting</li>
+        <li class="new">★ Observer camera grammar</li>
+        <li class="new">★ Particle event layer</li>
+        <li class="new">★ 5 emotions (+healing/resonance)</li>
+      </ul>
+    </div>
+    <iframe src="../../prototype/dreamtown-presence-v0.3/index.html" loading="lazy"></iframe>
+  </div>
+
+</div>
+
+<!-- Eval questions (both versions) -->
+<div style="max-width:700px;margin:28px auto 0">
+  <div class="eval-col">
+    <div class="eval-t">AURORA5 COMPARISON 평가</div>
+
+    <div class="qa"><div class="qtext">1. 살아 있다고 느껴졌는가?</div>
+      <div class="qans">
+        <label><input type="radio" name="q0" value="v2-only"> v0.2만</label>
+        <label><input type="radio" name="q0" value="v3-only"> v0.3만</label>
+        <label><input type="radio" name="q0" value="both">  둘 다</label>
+        <label><input type="radio" name="q0" value="neither"> 둘 다 아님</label>
+      </div>
+    </div>
+
+    <div class="qa"><div class="qtext">2. "살아나는 순간"이 있었는가? (Stillness Breakpoint 효과)</div>
+      <div class="qans">
+        <label><input type="radio" name="q1" value="v2"> v0.2</label>
+        <label><input type="radio" name="q1" value="v3"> v0.3</label>
+        <label><input type="radio" name="q1" value="neither"> 없음</label>
+      </div>
+    </div>
+
+    <div class="qa"><div class="qtext">3. 바람 방향성이 느껴졌는가? (vs 전체 출렁임)</div>
+      <div class="qans">
+        <label><input type="radio" name="q2" value="yes"> 예</label>
+        <label><input type="radio" name="q2" value="no">  아니오</label>
+      </div>
+    </div>
+
+    <div class="qa"><div class="qtext">4. 사람이 캐릭터처럼 느껴졌는가? (↑나쁨)</div>
+      <div class="qans">
+        <label><input type="radio" name="q3" value="v2-only"> v0.2만</label>
+        <label><input type="radio" name="q3" value="v3-only"> v0.3만</label>
+        <label><input type="radio" name="q3" value="both">  둘 다</label>
+        <label><input type="radio" name="q3" value="neither"> 둘 다 아님</label>
+      </div>
+    </div>
+
+    <div class="qa"><div class="qtext">5. 스토리북과 다른 체감이 있었는가?</div>
+      <div class="qans">
+        <label><input type="radio" name="q4" value="v2"> v0.2 더 차이남</label>
+        <label><input type="radio" name="q4" value="v3"> v0.3 더 차이남</label>
+        <label><input type="radio" name="q4" value="neither"> 차이 없음</label>
+      </div>
+    </div>
+
+    <div class="qa"><div class="qtext">6. DreamTown다운 것은?</div>
+      <div class="qans">
+        <label><input type="radio" name="q5" value="v2"> v0.2</label>
+        <label><input type="radio" name="q5" value="v3"> v0.3</label>
+        <label><input type="radio" name="q5" value="both"> 둘 다</label>
+      </div>
+    </div>
+
+    <button class="summary-btn" onclick="summarize()">비교 평가 요약</button>
+    <pre id="sum-out"></pre>
+  </div>
+</div>
+
+<footer>
+  outputs/presence-v0.3/comparison.html ·
+  MP4 export: 각 프로토타입의 Record WebM 버튼 사용 (FFmpeg 변환은 Phase 2) ·
+  DreamTown Presence v0.3 · 2026-05-24
+</footer>
+
+<script>
+function summarize() {
+  const QS = [
+    '살아 있다고 느껴졌는가?',
+    '"살아나는 순간"이 있었는가?',
+    '바람 방향성이 느껴졌는가?',
+    '사람이 캐릭터처럼?',
+    '스토리북과 다른 체감?',
+    'DreamTown다운 것은?',
+  ];
+  let txt = 'v0.2 vs v0.3 비교 평가\n' + '─'.repeat(30) + '\n\n';
+  QS.forEach((q, qi) => {
+    const sel = document.querySelector('input[name="q' + qi + '"]:checked');
+    txt += (qi + 1) + '. ' + q + '\n   → ' + (sel ? sel.value : '—') + '\n';
+  });
+  const out = document.getElementById('sum-out');
+  out.style.display = 'block'; out.textContent = txt;
+}
+</script>
+</body>
+</html>

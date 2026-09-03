@@ -1,6 +1,29 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
+Last Updated: 2026-08-24
+
+---
+
+## 🔍 AUDIT COMPLETE: Travel Business Capability (2026-08-24)
+
+**Current Status:** Ramada MVP Preparation  
+**Decision Point:** Hotel Hub direction validated as Candidate (CAND-OPS-002) — awaiting Review Committee  
+**Evidence-Driven Roadmap:** Group/MICE/Incentive features deferred until field Evidence proves necessity
+
+**Audit Summary:**
+- ✅ FIT travel (Phase 1B production)
+- ✅ Benefit/shopping/MICE reporting infrastructure
+- ❌ Group operations (vehicle/room/meal allocation)
+- ❌ Incentive pre-qualification
+- ❌ Multi-hotel architecture
+
+**Next:** Launch Ramada FIT MVP → Observe customer needs → Evidence-driven development
+
+**Reference:** See DREAMTOWN_AUDIT_FINAL_STATUS.md, CAND-OPS-002
+
+---
+
 Last Updated: 2026-04-04
 담당: Claude Code (Antigravity)
 
@@ -75,6 +98,8 @@ Last Updated: 2026-04-04
 | **P0 결제 게이트** | **결제 전 소원그림 생성 차단** | **✅ 완료 (실 DB 검증)** |
 | Journey Scene Engine | 앱 진입 장면 카드 (3장면, 하루 1회, localStorage) | ✅ 완료 |
 | Story Draft MVP | /story-draft-mvp 감정 서사 검증 페이지 | ✅ 완료 |
+| yeosu_hamel Star Cache | 25장 FREEZE — anchors 5장 원본유지 + 생성 20장, curiosity 판타지드리프트 0 | ✅ 완료 (2026-05-26) |
+| Storybook Image Routing v1 | 3항로(소망/주중/별빛) 큐레이션 리포트 | ✅ 완료 (2026-05-26) |
 
 ### ⏳ Phase 2 — 미시작
 

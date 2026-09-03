@@ -1,0 +1,12 @@
+{
+  "place": "cablecar",
+  "emotion": "confusion",
+  "emotion_ko": "혼란",
+  "purpose": "validation",
+  "distance": "medium",
+  "motion_safe": true,
+  "phase": "phase_0",
+  "generated_at": "2026-05-24T07:50:47.730Z",
+  "image": "cablecar_confusion_v1.png",
+  "ssot_ref": "docs/ssot/dreamtown/DreamTown_Emotion_Grammar_v1.md"
+}

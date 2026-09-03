@@ -1,0 +1,209 @@
+{
+  "wish": "W1",
+  "version": "S",
+  "type": "위로형",
+  "text": "지쳐있는 나를 보듬어주고 싶어요",
+  "duration_model": "Attraction Shorts",
+  "total_duration_sec": 21,
+  "target_duration_range": "15–25초",
+  "emotion_arc": ["pause", "emotional_afterflow", "calm", "reality_reconnection", "fragile_hope"],
+  "render_mode": "attraction_social",
+  "philosophy": "hook_first / curiosity_over_closure / save_share_intent",
+  "source_resonance": "outputs/resonance-preview/W1-v3/",
+  "frames_reused": 5,
+  "frames_new": 0,
+
+  "vs_resonance": {
+    "W1_v3": {
+      "render_mode": "resonance",
+      "duration_sec": 30,
+      "subtitle_offset_sec": 1.0,
+      "dissolve_sec": 1.0,
+      "breathing_gap_ratio": "40%",
+      "breathing_gap_sec": 10,
+      "frame_durations": { "F1": 5, "F2": 5, "F3": 5, "F4": 5, "F5": 10 },
+      "F1_ken_burns_speed": 0.3,
+      "emotional_direction": "memory",
+      "viewer_intent": "emotional_residue"
+    },
+    "W1_S": {
+      "render_mode": "attraction_social",
+      "duration_sec": 21,
+      "subtitle_offset_sec": 0.3,
+      "dissolve_sec": 0.7,
+      "breathing_gap_ratio": "28.5%",
+      "breathing_gap_sec": 6,
+      "frame_durations": { "F1": 4, "F2": 3, "F3": 3, "F4": 3, "F5": 8 },
+      "F1_ken_burns_speed": 0.4,
+      "emotional_direction": "curiosity",
+      "viewer_intent": "save_share_follow"
+    },
+    "shared": {
+      "frames": ["F1", "F2", "F3", "F4", "F5"],
+      "assets": "identical — 0 new AI images",
+      "emotion_arc": "identical",
+      "subtitle_copies": "identical (copy #9 / #11 / #2)",
+      "dreamtown_continuity": "maintained",
+      "ssot_copy_compliance": "pass",
+      "sowoni_back_view": "pass"
+    }
+  },
+
+  "frames": [
+    {
+      "index": 1,
+      "id": "F1",
+      "file": "frames/F1_pause_cafe.png",
+      "source_reused_from": "resonance/W1-v3/frames/F1_pause_cafe.png",
+      "asset": "02_pause_citrine_yeosu_cafe_stage2.png",
+      "emotion": "pause",
+      "location": "cafe",
+      "gem": "citrine",
+      "timing": { "start": 0, "end": 4, "duration": 4 },
+      "subtitle": "오늘의 마음을 이 밤에 남겨둘게요",
+      "subtitle_copy_ref": "copy #9",
+      "subtitle_start_offset": 0.3,
+      "attraction_role": "hook",
+      "hook_note": "자막 0.3초 선착 — 관심 즉시 획득. Ken Burns 0.4x로 약간 더 역동적",
+      "motion": {
+        "type": "ken_burns",
+        "direction": "top_to_bottom",
+        "speed": 0.4,
+        "duration_sec": 4,
+        "description": "Ken Burns ↓ 0.4x · 4s (resonance 0.3x → 0.4x)",
+        "vs_resonance": "speed 0.3x → 0.4x / duration 5s → 4s"
+      }
+    },
+    {
+      "index": 2,
+      "id": "F2",
+      "file": "frames/F2_afterflow_cafe.png",
+      "source_reused_from": "resonance/W1-v3/frames/F2_afterflow_cafe.png",
+      "asset": "cafe_page05_emotional_afterflow_base.png",
+      "emotion": "emotional_afterflow",
+      "location": "cafe",
+      "gem": null,
+      "timing": { "start": 4, "end": 7, "duration": 3 },
+      "subtitle": null,
+      "breathing_gap": true,
+      "breathing_note": "breathing 유지 — 단 5s → 3s 압축. DreamTown 감정 여운 최소 보존",
+      "motion": {
+        "type": "still",
+        "speed": 0,
+        "duration_sec": 3,
+        "description": "정적 · 3s (resonance 5s → 3s)",
+        "vs_resonance": "duration 5s → 3s"
+      }
+    },
+    {
+      "index": 3,
+      "id": "F3",
+      "file": "frames/F3_calm_cafe.png",
+      "source_reused_from": "resonance/W1-v3/frames/F3_calm_cafe.png",
+      "asset": "03_calm_citrine_yeosu_cafe_stage2.png",
+      "emotion": "calm",
+      "location": "cafe",
+      "gem": "citrine",
+      "timing": { "start": 7, "end": 10, "duration": 3 },
+      "subtitle": "마음이 조금 가벼워졌다면 좋겠어요",
+      "subtitle_copy_ref": "copy #11",
+      "subtitle_start_offset": 0.3,
+      "attraction_role": "mid_build",
+      "motion": {
+        "type": "cross_dissolve_then_still",
+        "dissolve_sec": 0.7,
+        "speed": 0,
+        "duration_sec": 3,
+        "description": "dissolve 0.7s → 정적 · 3s (resonance dissolve 1s → 0.7s / duration 5s → 3s)",
+        "vs_resonance": "dissolve 1s → 0.7s / duration 5s → 3s"
+      }
+    },
+    {
+      "index": 4,
+      "id": "F4",
+      "file": "frames/F4_reconnection_hamel.png",
+      "source_reused_from": "resonance/W1-v3/frames/F4_reconnection_hamel.png",
+      "asset": "hamel_page05_reality_reconnection_base.png",
+      "emotion": "reality_reconnection",
+      "location": "hamel",
+      "gem": null,
+      "timing": { "start": 10, "end": 13, "duration": 3 },
+      "subtitle": null,
+      "breathing_gap": true,
+      "breathing_note": "장소 전환 시각 서프라이즈 — 침묵 3s로 카페→항구 전환 흡수",
+      "attraction_role": "visual_surprise",
+      "visual_surprise_note": "카페 → 항구 급전환. 짧은 침묵이 오히려 장면 차이를 극대화",
+      "motion": {
+        "type": "cross_dissolve_then_ken_burns",
+        "direction": "left_to_right",
+        "dissolve_sec": 0.7,
+        "speed": 0.4,
+        "duration_sec": 3,
+        "description": "dissolve 0.7s → pan → 0.4x · 3s",
+        "vs_resonance": "dissolve 1s → 0.7s / speed 0.3x → 0.4x / duration 5s → 3s"
+      }
+    },
+    {
+      "index": 5,
+      "id": "F5",
+      "file": "frames/F5_fragile_hope_hamel.png",
+      "source_reused_from": "resonance/W1-v3/frames/F5_fragile_hope_hamel.png",
+      "asset": "hamel_fragile_hope_diamond_base02.png",
+      "emotion": "fragile_hope",
+      "location": "hamel",
+      "gem": "diamond",
+      "timing": { "start": 13, "end": 21, "duration": 8 },
+      "subtitle": "작은 소원 하나가 밤하늘에 남았어요",
+      "subtitle_copy_ref": "copy #2",
+      "subtitle_start_offset": 0.5,
+      "attraction_role": "curiosity_ending",
+      "curiosity_note": "밤 안개 항구 + '남았어요' — 열린 결말 느낌. 저장/공유 유도 의도. 공명보다 짧아 여운을 강제로 끊음으로써 오히려 더 저장하고 싶게 만드는 구조",
+      "motion": {
+        "type": "cross_dissolve_then_still_fadeout",
+        "dissolve_sec": 0.7,
+        "fadeout_sec": 2,
+        "speed": 0,
+        "duration_sec": 8,
+        "description": "dissolve 0.7s → 정적 → fade-out 2s · 8s",
+        "vs_resonance": "dissolve 1s → 0.7s / duration 10s → 8s"
+      }
+    }
+  ],
+
+  "sound": {
+    "base": "무음",
+    "ambient": {
+      "type": "바다 파도 앰비언트",
+      "volume_db": -18,
+      "note": "resonance -22dB보다 약간 높음 — attraction에서 환경음을 더 선명하게",
+      "fade_in": { "trigger": "F1 시작 즉시" },
+      "fade_out": { "trigger": "F5 종료 2초 전" }
+    }
+  },
+
+  "render_spec": {
+    "ratio": "9:16",
+    "note": "resonance 3:4 → attraction 9:16 (Shorts/Reels/TikTok 세로형)",
+    "resolution": "1080x1920",
+    "transition": "cross-dissolve 0.7s",
+    "subtitle_font": "Noto Sans KR / regular",
+    "subtitle_weight_note": "resonance thin → attraction regular (시인성 강화)",
+    "subtitle_opacity": 0.9,
+    "subtitle_opacity_note": "resonance 0.7 → attraction 0.9 (stronger)",
+    "subtitle_position": "bottom-center",
+    "subtitle_max_chars": 20,
+    "new_ai_images": 0,
+    "continuity_checked": true,
+    "vs_resonance_ratio": "resonance 3:4 → attraction 9:16"
+  },
+
+  "attraction_principles_applied": {
+    "hook_first": "F1 자막 0.3초 선착 + Ken Burns 0.4x — 즉시 관심 획득",
+    "pacing_faster": "전체 21s / F1–F4 각 3–4s / dissolve 0.7s",
+    "subtitle_stronger": "offset 0.3s + opacity 0.9 + weight regular",
+    "curiosity_ending": "F5 = 열린 결말 — '남았어요' + 밤 안개 항구 미스터리",
+    "motion_tighter": "Ken Burns 0.4x (resonance 0.3x + 5s → 4s/3s)",
+    "dreamtown_continuity": "동일 프레임 5장 / 동일 카피 3개 / Sowoni 뒷모습 원칙 유지",
+    "no_aggressive_effects": "cross-dissolve만 사용 / 급격한 컷 없음 / 플래시 없음"
+  }
+}

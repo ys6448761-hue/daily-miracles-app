@@ -1,0 +1,135 @@
+{
+  "wish_id": "wish_W03_att",
+  "wish_text": "새로운 일을 시작해보고 싶어요",
+  "wish_type": "결심형",
+  "primary_gravity": "curiosity",
+  "gem_palette": {
+    "cafe": "citrine",
+    "hamel": "topaz"
+  },
+  "render_mode": "attraction_social",
+  "total_duration_sec": 21,
+  "ratio": "9:16",
+  "emotion_arc": [
+    "curiosity",
+    "emotional_afterflow",
+    "calm",
+    "reality_reconnection",
+    "curiosity"
+  ],
+  "auto_generated": true,
+  "generated_at": "2026-05-23T01:00:36.399Z",
+  "frame_set_source": "wish-render-prototype/W2",
+  "confusion_f5_override": false,
+  "render_spec": {
+    "ratio": "9:16",
+    "breathing_gap_ratio": "28.5%",
+    "subtitle_opacity": 0.9,
+    "subtitle_weight": "regular",
+    "viewer_intent": "save_share_follow",
+    "new_ai_images": 0
+  },
+  "frames": [
+    {
+      "id": "F1",
+      "index": 1,
+      "emotion": "curiosity",
+      "file": "../../wish-render-prototype/W2/frames/F1_curiosity_cafe.png",
+      "timing": {
+        "start": 0,
+        "end": 4,
+        "duration": 4
+      },
+      "subtitle": "오늘의 용기를 별에 담아두었어요",
+      "subtitle_copy": "#13",
+      "subtitle_start_offset": 0.3,
+      "breathing_gap": false,
+      "motion": {
+        "type": "ken_burns",
+        "direction": "top_to_bottom",
+        "speed": 0.4
+      }
+    },
+    {
+      "id": "F2",
+      "index": 2,
+      "emotion": "emotional_afterflow",
+      "file": "../../../public/images/storybook/sources/page05/cafe/cafe_page05_emotional_afterflow_base.png",
+      "timing": {
+        "start": 4,
+        "end": 7,
+        "duration": 3
+      },
+      "subtitle": null,
+      "subtitle_copy": null,
+      "subtitle_start_offset": null,
+      "breathing_gap": true,
+      "motion": {
+        "type": "still",
+        "speed": 0
+      }
+    },
+    {
+      "id": "F3",
+      "index": 3,
+      "emotion": "calm",
+      "file": "../../wish-render-prototype/W2/frames/F3_calm_cafe.png",
+      "timing": {
+        "start": 7,
+        "end": 10,
+        "duration": 3
+      },
+      "subtitle": "조금은 믿고 싶어졌어요",
+      "subtitle_copy": "#6",
+      "subtitle_start_offset": 0.3,
+      "breathing_gap": false,
+      "motion": {
+        "type": "dissolve_still",
+        "dissolve_sec": 0.7,
+        "speed": 0
+      }
+    },
+    {
+      "id": "F4",
+      "index": 4,
+      "emotion": "reality_reconnection",
+      "file": "../../../public/images/storybook/sources/page05/hamel/hamel_page05_reality_reconnection_base.png",
+      "timing": {
+        "start": 10,
+        "end": 13,
+        "duration": 3
+      },
+      "subtitle": null,
+      "subtitle_copy": null,
+      "subtitle_start_offset": null,
+      "breathing_gap": true,
+      "motion": {
+        "type": "dissolve_pan",
+        "direction": "left_to_right",
+        "dissolve_sec": 0.7,
+        "speed": 0.4
+      }
+    },
+    {
+      "id": "F5",
+      "index": 5,
+      "emotion": "curiosity",
+      "file": "../../wish-render-prototype/W2/frames/F5_curiosity_hamel.png",
+      "timing": {
+        "start": 13,
+        "end": 21,
+        "duration": 8
+      },
+      "subtitle": "작은 빛 하나가 길이 되어줄 거예요",
+      "subtitle_copy": "#17",
+      "subtitle_start_offset": 0.3,
+      "breathing_gap": false,
+      "motion": {
+        "type": "dissolve_fadeout",
+        "dissolve_sec": 0.7,
+        "fadeout_sec": 2,
+        "speed": 0
+      }
+    }
+  ]
+}

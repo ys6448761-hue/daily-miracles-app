@@ -60,11 +60,11 @@ render_mode: resonance
 ### Subtitle Plan
 
 ```
-F1 (0:00–0:15)  →  "지쳐도 괜찮아요"
-F2 (0:15–0:30)  →  (자막 없음 — 감정 여운 프레임은 여백 유지)
-F3 (0:30–0:45)  →  "마음이 조금 가벼워졌다면 좋겠어요"  (copy #11)
-F4 (0:45–1:00)  →  (자막 없음 — 현실 재연결은 침묵)
-F5 (1:00–1:20)  →  "작은 소원 하나가 밤하늘에 남았어요"  (copy #2)
+F1 (0:00–0:05)  →  "지쳐도 괜찮아요"
+F2 (0:05–0:10)  →  (자막 없음 — 감정 여운 프레임은 여백 유지)
+F3 (0:10–0:15)  →  "마음이 조금 가벼워졌다면 좋겠어요"  (copy #11)
+F4 (0:15–0:20)  →  (자막 없음 — 현실 재연결은 침묵)
+F5 (0:20–0:30)  →  "작은 소원 하나가 밤하늘에 남았어요"  (copy #2)
 ```
 
 ### Motion Plan
@@ -72,19 +72,19 @@ F5 (1:00–1:20)  →  "작은 소원 하나가 밤하늘에 남았어요"  (cop
 ```
 render_mode: resonance / breathing
 
-F1: Ken Burns — 매우 느린 위→아래 pan (0.3x), 15초
-F2: 완전 정적 (still), 15초 — 여운은 움직이지 않는다
-F3: cross-dissolve in (2초), 정적 유지, 15초
-F4: cross-dissolve in (2초), 매우 느린 좌→우 pan (0.2x), 15초
-F5: cross-dissolve in (2초), 정적, 20초 → fade-out 5초
+F1: Ken Burns — 매우 느린 위→아래 pan (0.3x), 5초
+F2: 완전 정적 (still), 5초 — 여운은 움직이지 않는다
+F3: cross-dissolve in (1초), 정적 유지, 5초
+F4: cross-dissolve in (1초), 매우 느린 좌→우 pan (0.3x), 5초
+F5: cross-dissolve in (1초), 정적, 8초 → fade-out 2초
 ```
 
 ### Sound Cue
 
 ```
 전체: 무음 기준
-F1 시작 2초 후: 조용한 바다 파도 앰비언트 fade-in (볼륨 -22dB)
-F5 종료 3초 전: 앰비언트 fade-out
+F1 시작 1초 후: 조용한 바다 파도 앰비언트 fade-in (볼륨 -22dB)
+F5 종료 2초 전: 앰비언트 fade-out
 ```
 
 ### Continuity Check
@@ -93,7 +93,7 @@ F5 종료 3초 전: 앰비언트 fade-out
 - [ ] 감정 좌표 이탈 없음 — pause→calm→fragile_hope 순서 준수 ✅
 - [ ] 신규 AI 이미지 생성: 0건 ✅
 - [ ] registry 외부 자산 직접 삽입: 없음 ✅
-- [ ] 7분 초과: 없음 (총 1분 20초) ✅
+- [ ] 총 길이: 약 30초 (Micro Resonance) ✅
 
 ---
 
@@ -127,11 +127,11 @@ F5 종료 3초 전: 앰비언트 fade-out
 ### Subtitle Plan
 
 ```
-F1 (0:00–0:15)  →  (자막 없음 — confusion은 먼저 침묵으로 인정)
-F2 (0:15–0:30)  →  "아주 작은 마음도 빛이 될 수 있어요"  (copy #14)
-F3 (0:30–0:45)  →  (자막 없음)
-F4 (0:45–1:00)  →  "당신의 소원은 아직 끝나지 않았어요"  (copy #12)
-F5 (1:00–1:20)  →  "오늘의 용기를 별에 담아두었어요"  (copy #13)
+F1 (0:00–0:05)  →  (자막 없음 — confusion은 먼저 침묵으로 인정)
+F2 (0:05–0:10)  →  "아주 작은 마음도 빛이 될 수 있어요"  (copy #14)
+F3 (0:10–0:15)  →  (자막 없음)
+F4 (0:15–0:20)  →  "당신의 소원은 아직 끝나지 않았어요"  (copy #12)
+F5 (0:20–0:30)  →  "오늘의 용기를 별에 담아두었어요"  (copy #13)
 ```
 
 ### Motion Plan
@@ -139,11 +139,11 @@ F5 (1:00–1:20)  →  "오늘의 용기를 별에 담아두었어요"  (copy #1
 ```
 render_mode: resonance / breathing
 
-F1: 완전 정적, 15초 — confusion은 움직이지 않는다
-F2: cross-dissolve in (2초), 매우 느린 아래→위 pan (0.3x) — 시야가 올라감, 15초
-F3: cross-dissolve in (2초), 정적, 15초
-F4: cross-dissolve in (2초), 매우 느린 중앙 정렬 pan (0.2x), 15초
-F5: cross-dissolve in (2초), 정적, 20초 → fade-out 5초
+F1: 완전 정적, 5초 — confusion은 움직이지 않는다
+F2: cross-dissolve in (1초), 매우 느린 아래→위 pan (0.3x) — 시야가 올라감, 5초
+F3: cross-dissolve in (1초), 정적, 5초
+F4: cross-dissolve in (1초), 매우 느린 중앙 정렬 pan (0.3x), 5초
+F5: cross-dissolve in (1초), 정적, 8초 → fade-out 2초
 ```
 
 ### Sound Cue
@@ -151,7 +151,7 @@ F5: cross-dissolve in (2초), 정적, 20초 → fade-out 5초
 ```
 F1: 무음
 F2 시작 1초 후: 매우 조용한 바람 앰비언트 fade-in (-22dB)
-F5 종료 3초 전: fade-out
+F5 종료 2초 전: fade-out
 ```
 
 ### Continuity Check
@@ -160,7 +160,7 @@ F5 종료 3초 전: fade-out
 - [ ] 감정 좌표 이탈 없음 — confusion→curiosity→fragile_hope ✅
 - [ ] 신규 AI 이미지 생성: 0건 ✅
 - [ ] registry 외부 자산: 없음 ✅
-- [ ] 총 길이: 약 1분 20초 ✅
+- [ ] 총 길이: 약 27초 (Micro Resonance) ✅
 
 ---
 
@@ -194,11 +194,11 @@ F5 종료 3초 전: fade-out
 ### Subtitle Plan
 
 ```
-F1 (0:00–0:18)  →  "오늘의 마음을 이 밤에 남겨둘게요"  (copy #9)
-F2 (0:18–0:33)  →  (자막 없음 — 여운 프레임 침묵)
-F3 (0:33–0:48)  →  "당신의 마음은 사라지지 않아요"  (copy #3)
-F4 (0:48–1:03)  →  (자막 없음)
-F5 (1:03–1:25)  →  "작은 빛 하나가 길이 되어줄 거예요"  (copy #17)
+F1 (0:00–0:05)  →  "오늘의 마음을 이 밤에 남겨둘게요"  (copy #9)
+F2 (0:05–0:10)  →  (자막 없음 — 여운 프레임 침묵)
+F3 (0:10–0:15)  →  "당신의 마음은 사라지지 않아요"  (copy #3)
+F4 (0:15–0:20)  →  (자막 없음)
+F5 (0:20–0:30)  →  "작은 빛 하나가 길이 되어줄 거예요"  (copy #17)
 ```
 
 ### Motion Plan
@@ -206,11 +206,11 @@ F5 (1:03–1:25)  →  "작은 빛 하나가 길이 되어줄 거예요"  (copy 
 ```
 render_mode: resonance / breathing
 
-F1: 완전 정적, 18초 — 긴 정적으로 멈춤 인정
-F2: cross-dissolve in (3초), 완전 정적, 15초
-F3: cross-dissolve in (2초), 매우 느린 pan (0.3x, 우→좌), 15초
-F4: cross-dissolve in (2초), 정적, 15초
-F5: cross-dissolve in (2초), 매우 느린 위→아래 pan (0.2x), 22초 → fade-out 5초
+F1: 완전 정적, 5초 — 정적으로 멈춤 인정
+F2: cross-dissolve in (1초), 완전 정적, 5초
+F3: cross-dissolve in (1초), 매우 느린 pan (0.3x, 우→좌), 5초
+F4: cross-dissolve in (1초), 정적, 5초
+F5: cross-dissolve in (1초), 매우 느린 위→아래 pan (0.3x), 8초 → fade-out 2초
 ```
 
 ### Sound Cue
@@ -218,7 +218,7 @@ F5: cross-dissolve in (2초), 매우 느린 위→아래 pan (0.2x), 22초 → f
 ```
 F1: 무음 (멈춤 강조)
 F2 끝 → F3 시작: 바다 파도 앰비언트 매우 조용히 fade-in (-24dB)
-F5 종료 4초 전: fade-out
+F5 종료 2초 전: fade-out
 ```
 
 ### Continuity Check
@@ -227,7 +227,7 @@ F5 종료 4초 전: fade-out
 - [ ] 감정 좌표 이탈 없음 — pause→calm→curiosity ✅
 - [ ] 신규 AI 이미지 생성: 0건 ✅
 - [ ] registry 외부 자산: 없음 ✅
-- [ ] 총 길이: 약 1분 25초 ✅
+- [ ] 총 길이: 약 27초 (Micro Resonance) ✅
 
 ---
 
@@ -235,20 +235,29 @@ F5 종료 4초 전: fade-out
 
 ```yaml
 render_mode: resonance
+duration_model: Micro Resonance   # 현재 기본형 — 20–35초
 ratio: "3:4 portrait (원본 유지)"
 resolution: "1024×1536"
-frame_duration: "15–22초"
-transition: cross-dissolve (2–3초)
-motion_speed: "0.2–0.3x (Ken Burns 또는 정적)"
+frame_pacing:
+  F1_to_F4: "5초"
+  F5: "7–10초 (fade-out 2초 포함)"
+transition: cross-dissolve (1초)
+motion_speed: "0.3x (Ken Burns 또는 정적)"
 subtitle_font: "Noto Sans KR / thin weight"
 subtitle_opacity: 70%
 subtitle_position: "하단 1/4 중앙"
 subtitle_max_chars: 20
 sound: "무음 또는 -22dB 이하 앰비언트"
 total_duration:
-  W1: "약 1분 20초"
-  W2: "약 1분 20초"
-  W3: "약 1분 25초"
+  target: "20–35초"
+  W1: "약 30초"
+  W2: "약 27초"
+  W3: "약 27초"
+
+# DreamTown resonance 철학
+# not_long_attention — but_long_emotional_residue
+# breathing = pause_density + subtitle_spacing + motion_restraint
+# NOT duration 증가
 ```
 
 ---

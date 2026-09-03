@@ -1,0 +1,124 @@
+{
+  "wish": "W1",
+  "type": "위로형",
+  "text": "지쳐있는 나를 보듬어주고 싶어요",
+  "emotion_arc": ["pause", "emotional_afterflow", "calm", "reality_reconnection", "fragile_hope"],
+  "render_mode": "resonance",
+  "total_duration_sec": 80,
+  "frames": [
+    {
+      "index": 1,
+      "id": "F1",
+      "file": "frames/F1_pause_cafe.png",
+      "source": "thumbnails/generated/full",
+      "emotion": "pause",
+      "location": "cafe",
+      "gem": "citrine",
+      "timing": { "start": 0, "end": 15, "duration": 15 },
+      "subtitle": "지쳐도 괜찮아요",
+      "subtitle_start_offset": 2,
+      "motion": {
+        "type": "ken_burns",
+        "direction": "top_to_bottom",
+        "speed": 0.3,
+        "description": "위→아래 pan (0.3x)"
+      }
+    },
+    {
+      "index": 2,
+      "id": "F2",
+      "file": "frames/F2_afterflow_cafe.png",
+      "source": "storybook/sources/page05",
+      "emotion": "emotional_afterflow",
+      "location": "cafe",
+      "gem": null,
+      "timing": { "start": 15, "end": 30, "duration": 15 },
+      "subtitle": null,
+      "subtitle_start_offset": null,
+      "motion": {
+        "type": "still",
+        "direction": null,
+        "speed": 0,
+        "description": "완전 정적 — 여운은 움직이지 않는다"
+      }
+    },
+    {
+      "index": 3,
+      "id": "F3",
+      "file": "frames/F3_calm_cafe.png",
+      "source": "thumbnails/generated/full",
+      "emotion": "calm",
+      "location": "cafe",
+      "gem": "citrine",
+      "timing": { "start": 30, "end": 45, "duration": 15 },
+      "subtitle": "마음이 조금 가벼워졌다면 좋겠어요",
+      "subtitle_copy_ref": "copy #11",
+      "subtitle_start_offset": 2,
+      "motion": {
+        "type": "cross_dissolve_in_then_still",
+        "dissolve_sec": 2,
+        "speed": 0,
+        "description": "cross-dissolve in (2초) → 정적"
+      }
+    },
+    {
+      "index": 4,
+      "id": "F4",
+      "file": "frames/F4_reconnection_hamel.png",
+      "source": "storybook/sources/page05",
+      "emotion": "reality_reconnection",
+      "location": "hamel",
+      "gem": null,
+      "timing": { "start": 45, "end": 60, "duration": 15 },
+      "subtitle": null,
+      "subtitle_start_offset": null,
+      "motion": {
+        "type": "ken_burns",
+        "direction": "left_to_right",
+        "dissolve_sec": 2,
+        "speed": 0.2,
+        "description": "cross-dissolve in (2초) → 좌→우 pan (0.2x)"
+      }
+    },
+    {
+      "index": 5,
+      "id": "F5",
+      "file": "frames/F5_fragile_hope_hamel.png",
+      "source": "thumbnails/generated/full",
+      "emotion": "fragile_hope",
+      "location": "hamel",
+      "gem": "diamond",
+      "timing": { "start": 60, "end": 80, "duration": 20 },
+      "subtitle": "작은 소원 하나가 밤하늘에 남았어요",
+      "subtitle_copy_ref": "copy #2",
+      "subtitle_start_offset": 2,
+      "motion": {
+        "type": "cross_dissolve_in_then_still_fadeout",
+        "dissolve_sec": 2,
+        "fadeout_sec": 5,
+        "speed": 0,
+        "description": "cross-dissolve in (2초) → 정적 → fade-out (5초)"
+      }
+    }
+  ],
+  "sound": {
+    "base": "무음",
+    "ambient": {
+      "type": "바다 파도 앰비언트",
+      "volume_db": -22,
+      "fade_in": { "trigger": "F1 시작 2초 후" },
+      "fade_out": { "trigger": "F5 종료 3초 전" }
+    }
+  },
+  "render_spec": {
+    "ratio": "3:4",
+    "resolution": "1024x1536",
+    "transition": "cross-dissolve",
+    "subtitle_font": "Noto Sans KR / thin",
+    "subtitle_opacity": 0.7,
+    "subtitle_position": "bottom-center",
+    "subtitle_max_chars": 20,
+    "new_ai_images": 0,
+    "continuity_checked": true
+  }
+}

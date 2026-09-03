@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W1-v3 Micro Resonance Preview</title>
+<style>
+  :root {
+    --bg: #080810;
+    --surface: #0f0f1a;
+    --surface2: #13131e;
+    --border: #1a1a2c;
+    --text: #e4e4ee;
+    --muted: #5a5a75;
+    --dim: #363650;
+    --accent: #6858e0;
+    --green: #4aac72;
+    --amber: #c08830;
+    --red: #b84858;
+    --pause: #4a7898;
+    --calm: #529898;
+    --fragile: #8070b0;
+    --afterflow: #6878a0;
+    --reconnect: #608080;
+    --v1col: #804848;
+    --v2col: #486870;
+    --v3col: #507850;
+    --sub-bg: rgba(0,0,0,0.68);
+    --gap-bg: rgba(8,8,28,0.72);
+    --fix-bg: rgba(80,120,80,.12);
+    --fix-bd: #507850;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+    font-weight: 300;
+    padding: 36px 20px 100px;
+  }
+
+  /* ─── header ─── */
+  .header {
+    max-width: 1120px; margin: 0 auto 0;
+    display: flex; align-items: flex-start; justify-content: space-between;
+    border-bottom: 1px solid var(--border); padding-bottom: 20px;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .badge { font-size: 10px; letter-spacing:.07em; padding: 3px 9px; border-radius:16px; border:1px solid var(--border); color:var(--muted); }
+  .badge.hi { border-color:var(--accent); color:var(--accent); }
+  .badge.ok { border-color:var(--green); color:var(--green); }
+  .badge.fix { border-color:var(--v3col); color:var(--v3col); }
+  .h1 { font-size:20px; font-weight:400; margin-bottom:5px; }
+  .wish { font-size:13px; color:var(--muted); }
+  .v-tag { font-size:11px; padding:4px 12px; border-radius:6px; background:var(--v3col); color:#fff; letter-spacing:.04em; font-weight:500; align-self:flex-start; }
+
+  /* ─── version history ─── */
+  .ver-bar {
+    max-width:1120px; margin:20px auto 28px;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:10px; padding:16px 20px;
+  }
+  .ver-title { font-size:10px; letter-spacing:.1em; color:var(--muted); margin-bottom:12px; }
+  .ver-row { display:flex; gap:0; align-items:stretch; }
+  .ver-step {
+    flex:1; padding:10px 14px; border-radius:7px; font-size:11px;
+    border:1px solid var(--border); position:relative;
+  }
+  .ver-step .vn { font-size:9px; letter-spacing:.08em; margin-bottom:4px; }
+  .ver-step .vd { font-size:11px; }
+  .ver-step .vi { font-size:10px; color:var(--muted); margin-top:4px; line-height:1.5; }
+  .ver-arrow { display:flex; align-items:center; padding:0 8px; color:var(--dim); flex-shrink:0; }
+  .ver-step.v1 { border-color:var(--v1col); }  .ver-step.v1 .vn { color:var(--v1col); }
+  .ver-step.v2 { border-color:var(--v2col); }  .ver-step.v2 .vn { color:var(--v2col); }
+  .ver-step.v3 { border-color:var(--v3col); }  .ver-step.v3 .vn { color:var(--v3col); }
+  .ver-step.v3 .vd { color:var(--v3col); }
+
+  /* ─── F5 candidate panel ─── */
+  .cand-section {
+    max-width:1120px; margin:0 auto 28px;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:10px; padding:18px 20px;
+  }
+  .cand-title { font-size:10px; letter-spacing:.1em; color:var(--muted); margin-bottom:14px; }
+  .cand-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .cand-card {
+    border-radius:8px; overflow:hidden; border:1px solid var(--border);
+    position:relative;
+  }
+  .cand-card.selected { border-color:var(--v3col); }
+  .cand-card.rejected { opacity:.5; }
+  .cand-img-wrap { position:relative; aspect-ratio:3/4; overflow:hidden; background:#06060e; }
+  .cand-img-wrap img { width:100%; height:100%; object-fit:cover; display:block; }
+  .cand-verdict {
+    position:absolute; top:8px; right:8px;
+    font-size:10px; padding:3px 8px; border-radius:5px;
+  }
+  .verdict-ok  { background:rgba(80,120,80,.8); color:#c8e8c0; }
+  .verdict-no  { background:rgba(80,40,40,.8);  color:#e8c0c0; }
+  .cand-meta { padding:10px 12px; }
+  .cand-name { font-size:10px; color:var(--muted); margin-bottom:4px; font-variant-numeric:tabular-nums; }
+  .cand-desc { font-size:11px; color:var(--text); line-height:1.5; margin-bottom:4px; }
+  .cand-reason { font-size:10px; color:var(--muted); line-height:1.4; }
+
+  /* ─── emotion arc ─── */
+  .arc-wrap { max-width:1120px; margin:0 auto 26px; }
+  .arc { display:flex; align-items:center; gap:0; }
+  .arc-step { flex:1; padding:8px 10px; border-radius:7px; font-size:11px; text-align:center; border:1px solid var(--border); position:relative; }
+  .arc-step .lbl { font-size:9px; color:var(--muted); letter-spacing:.07em; margin-bottom:2px; }
+  .arc-step .emo { font-size:12px; }
+  .arc-step .gi { position:absolute; top:-18px; left:50%; transform:translateX(-50%); font-size:9px; color:var(--accent); white-space:nowrap; }
+  .arc-arrow { padding:0 6px; color:var(--dim); font-size:12px; flex-shrink:0; }
+  .arc-step.pause   { border-color:var(--pause); }   .arc-step.pause   .emo { color:var(--pause); }
+  .arc-step.flow    { border-color:var(--afterflow); }.arc-step.flow    .emo { color:var(--afterflow); }
+  .arc-step.calm    { border-color:var(--calm); }    .arc-step.calm    .emo { color:var(--calm); }
+  .arc-step.recon   { border-color:var(--reconnect); }.arc-step.recon   .emo { color:var(--reconnect); }
+  .arc-step.fragile { border-color:var(--fragile); } .arc-step.fragile .emo { color:var(--fragile); }
+
+  /* ─── strip ─── */
+  .strip { max-width:1120px; margin:0 auto 28px; display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+  .card { border-radius:10px; overflow:hidden; border:1px solid var(--border); background:var(--surface2); display:flex; flex-direction:column; transition:border-color .2s; }
+  .card:hover { border-color:var(--accent); }
+  .card.changed { border-color:var(--v3col); }
+
+  .img-wrap { position:relative; aspect-ratio:3/4; overflow:hidden; background:#04040a; flex-shrink:0; }
+  .img-wrap img { width:100%; height:100%; object-fit:cover; display:block; }
+
+  .sub-ov { position:absolute; bottom:0; left:0; right:0; padding:32px 10px 12px; background:linear-gradient(transparent,var(--sub-bg) 55%); display:flex; align-items:flex-end; justify-content:center; min-height:68px; pointer-events:none; }
+  .sub-text { color:rgba(255,255,255,.88); font-size:12px; font-weight:300; text-align:center; line-height:1.65; letter-spacing:.04em; text-shadow:0 1px 5px rgba(0,0,0,.9); }
+
+  .gap-ov { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:var(--gap-bg); pointer-events:none; flex-direction:column; gap:6px; }
+  .gap-lbl { font-size:10px; color:var(--accent); letter-spacing:.08em; }
+  .gap-desc { font-size:9px; color:var(--muted); text-align:center; padding:0 8px; line-height:1.5; }
+
+  .f-num { position:absolute; top:8px; left:8px; background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.15); border-radius:5px; color:rgba(255,255,255,.7); font-size:10px; padding:2px 7px; letter-spacing:.05em; }
+  .timing-b { position:absolute; top:8px; right:8px; background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.1); border-radius:5px; color:rgba(255,255,255,.5); font-size:9px; padding:2px 6px; font-variant-numeric:tabular-nums; }
+  .changed-b { position:absolute; bottom:56px; left:50%; transform:translateX(-50%); background:rgba(80,120,80,.75); border:1px solid var(--v3col); border-radius:5px; color:#c8e8c0; font-size:9px; padding:2px 8px; white-space:nowrap; }
+
+  .meta { padding:10px 11px 9px; flex:1; display:flex; flex-direction:column; gap:7px; }
+  .mrow { display:flex; align-items:flex-start; gap:7px; }
+  .mic { font-size:10px; color:var(--muted); flex-shrink:0; padding-top:1px; }
+  .mval { font-size:10px; color:var(--text); line-height:1.5; }
+  .chip { display:inline-block; font-size:9px; padding:2px 7px; border-radius:9px; border:1px solid; }
+  .chip-pause   { border-color:var(--pause);     color:var(--pause); }
+  .chip-flow    { border-color:var(--afterflow);  color:var(--afterflow); }
+  .chip-calm    { border-color:var(--calm);       color:var(--calm); }
+  .chip-recon   { border-color:var(--reconnect);  color:var(--reconnect); }
+  .chip-fragile { border-color:var(--fragile);    color:var(--fragile); }
+  .src { display:inline-block; font-size:8px; padding:2px 6px; border-radius:7px; background:rgba(255,255,255,.03); border:1px solid var(--border); color:var(--muted); }
+  .fix { display:inline-block; font-size:9px; padding:2px 6px; border-radius:5px; background:var(--fix-bg); border:1px solid var(--fix-bd); color:var(--v3col); margin-top:1px; }
+
+  /* ─── continuity check ─── */
+  .cont-section { max-width:1120px; margin:0 auto 28px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:18px 20px; }
+  .cont-title { font-size:10px; letter-spacing:.1em; color:var(--muted); margin-bottom:14px; }
+  .cont-list { list-style:none; display:flex; flex-direction:column; gap:9px; }
+  .cont-list li { display:flex; align-items:flex-start; gap:9px; font-size:11px; }
+  .c-ok { color:var(--green); font-size:13px; flex-shrink:0; }
+  .c-warn { color:var(--amber); font-size:13px; flex-shrink:0; }
+  .c-fix { color:var(--v3col); font-size:13px; flex-shrink:0; }
+  .cnote { font-size:10px; color:var(--muted); margin-top:2px; }
+
+  /* ─── palette continuity ─── */
+  .palette-section { max-width:1120px; margin:0 auto 28px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:18px 20px; }
+  .pal-title { font-size:10px; letter-spacing:.1em; color:var(--muted); margin-bottom:14px; }
+  .pal-row { display:flex; gap:4px; align-items:stretch; margin-bottom:12px; }
+  .pal-seg { flex:1; border-radius:5px; padding:8px 10px; font-size:10px; text-align:center; }
+  .pal-arrow { display:flex; align-items:center; padding:0 4px; color:var(--dim); font-size:11px; flex-shrink:0; }
+  .pal-note { font-size:11px; color:var(--text); }
+  .pal-note span { color:var(--v3col); }
+
+  /* ─── timeline ─── */
+  .tl-section { max-width:1120px; margin:0 auto 28px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:18px 22px; }
+  .tl-title { font-size:10px; letter-spacing:.1em; color:var(--muted); margin-bottom:14px; }
+  .tl-bar { position:relative; height:8px; background:var(--border); border-radius:4px; margin-bottom:6px; }
+  .tl-seg { position:absolute; top:0; height:100%; border-radius:4px; opacity:.85; }
+  .tl-labels { display:flex; justify-content:space-between; font-size:9px; color:var(--muted); margin-bottom:18px; }
+  .tl-rows { display:flex; flex-direction:column; gap:10px; }
+  .tl-row { display:grid; grid-template-columns:52px 130px 1fr; gap:12px; align-items:baseline; }
+  .tl-id { font-size:10px; color:var(--muted); }
+  .tl-t { font-size:10px; color:var(--text); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .tl-d { font-size:10px; color:var(--muted); }
+  .tl-d .sub { color:var(--text); }
+  .tl-d .gap-tag { display:inline-block; font-size:9px; padding:1px 6px; border-radius:4px; background:rgba(104,88,224,.12); border:1px solid rgba(104,88,224,.25); color:var(--accent); margin-left:4px; }
+  .tl-d .fix-tag { display:inline-block; font-size:9px; padding:1px 6px; border-radius:4px; background:var(--fix-bg); border:1px solid var(--fix-bd); color:var(--v3col); margin-left:4px; }
+</style>
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<div class="header">
+  <div>
+    <div class="badge-row">
+      <span class="badge hi">Micro Resonance</span>
+      <span class="badge">W1 · 위로형</span>
+      <span class="badge ok">~30초</span>
+      <span class="badge ok">5 frames · 0 AI</span>
+      <span class="badge fix">F5 base02 교체</span>
+    </div>
+    <p class="h1">W1-v3 — 위로형</p>
+    <p class="wish">"지쳐있는 나를 보듬어주고 싶어요"</p>
+  </div>
+  <span class="v-tag">v3</span>
+</div>
+
+<!-- ─── Version History ─── -->
+<div class="ver-bar" style="margin-top:20px;">
+  <div class="ver-title">VERSION HISTORY</div>
+  <div class="ver-row">
+    <div class="ver-step v1">
+      <div class="vn">V1</div>
+      <div class="vd">80초 · base03</div>
+      <div class="vi">F1 자막 SSOT 위반<br>pacing 과다<br>base03 밤하늘 없음</div>
+    </div>
+    <div class="ver-arrow">→</div>
+    <div class="ver-step v2">
+      <div class="vn">V2</div>
+      <div class="vd">30초 · base03</div>
+      <div class="vi">F1 자막 copy #9 수정<br>pacing 5s 조정<br>base03 자막 충돌 잔존</div>
+    </div>
+    <div class="ver-arrow">→</div>
+    <div class="ver-step v3">
+      <div class="vn">V3</div>
+      <div class="vd">30초 · base02 ✓</div>
+      <div class="vi">F5 base02 교체<br>밤 항구 + 수면 불빛<br>자막-이미지 충돌 해소</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── F5 Candidate Review ─── -->
+<div class="cand-section">
+  <div class="cand-title">F5 ASSET CANDIDATE REVIEW — fragile_hope · hamel</div>
+  <div class="cand-grid">
+
+    <div class="cand-card rejected">
+      <div class="cand-img-wrap">
+        <img src="../W1-v2/frames/F5_fragile_hope_hamel.png" alt="base03">
+        <span class="cand-verdict verdict-no">❌ 기각 (v2)</span>
+      </div>
+      <div class="cand-meta">
+        <div class="cand-name">base03</div>
+        <div class="cand-desc">회색 안개, 낮/새벽 분위기</div>
+        <div class="cand-reason">밤하늘 없음, 별 없음, F4 심야와 조명 불연속, 자막 "밤하늘에" 충돌</div>
+      </div>
+    </div>
+
+    <div class="cand-card rejected">
+      <div class="cand-img-wrap">
+        <!-- base01은 로컬 확인용 — frames 폴더에 미복사 -->
+        <img src="../../../public/images/thumbnails/hamel/generated/full/hamel_fragile_hope_diamond_base01.png" alt="base01" onerror="this.parentElement.style.background='#1a1a2a';this.style.display='none'">
+        <span class="cand-verdict verdict-no">❌ 기각</span>
+      </div>
+      <div class="cand-meta">
+        <div class="cand-name">base01</div>
+        <div class="cand-desc">회색 안개, base03과 동일 문제</div>
+        <div class="cand-reason">낮/새벽 분위기, 밤하늘 없음, base03과 사실상 동일</div>
+      </div>
+    </div>
+
+    <div class="cand-card selected">
+      <div class="cand-img-wrap">
+        <img src="frames/F5_fragile_hope_hamel.png" alt="base02">
+        <span class="cand-verdict verdict-ok">✓ 채택 (v3)</span>
+      </div>
+      <div class="cand-meta">
+        <div class="cand-name">base02</div>
+        <div class="cand-desc">어두운 밤 항구 · 안개 · 수면 불빛</div>
+        <div class="cand-reason">밤 분위기 ✓ / 항구 불빛 수면 반사 = 작은 빛 신호 ✓ / F4→F5 야간 연속성 ✓</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── Palette Continuity ─── -->
+<div class="palette-section">
+  <div class="pal-title">PALETTE CONTINUITY CHECK — F4 → F5</div>
+  <div class="pal-row">
+    <div class="pal-seg" style="background:rgba(20,40,80,.6); border:1px solid rgba(74,120,152,.3);">
+      <div style="font-size:9px;color:#6a90b8;margin-bottom:4px;">F4 · reality_reconnection</div>
+      <div style="font-size:10px;color:#a0c0e0;">딥 네이비 심야<br>별 + 빨간 등대</div>
+    </div>
+    <div class="pal-arrow">→</div>
+    <div class="pal-seg" style="background:rgba(20,30,50,.6); border:1px solid rgba(128,112,176,.4);">
+      <div style="font-size:9px;color:#9080c8;margin-bottom:4px;">F5-v3 · fragile_hope (base02)</div>
+      <div style="font-size:10px;color:#b0a8d8;">어두운 밤 안개<br>항구 불빛 수면 반사</div>
+    </div>
+  </div>
+  <div class="pal-note">
+    v3: 두 프레임 모두 <span>어두운 밤 색온도</span> 유지 — F4(청색) → F5(청회색 안개) 자연스러운 전환<br>
+    <span style="color:var(--v1col);font-size:10px;">v2 문제: F4 딥 네이비 → F5 회색 낮 안개 → 시간대 역전 인상</span>
+  </div>
+</div>
+
+<!-- ─── Emotion Arc ─── -->
+<div class="arc-wrap">
+  <div class="arc">
+    <div class="arc-step pause"><div class="lbl">F1 · 0:00</div><div class="emo">pause</div></div>
+    <div class="arc-arrow">→</div>
+    <div class="arc-step flow" style="position:relative;"><div class="gi">gap #1 · 5s</div><div class="lbl">F2 · 0:05</div><div class="emo">여운</div></div>
+    <div class="arc-arrow">→</div>
+    <div class="arc-step calm"><div class="lbl">F3 · 0:10</div><div class="emo">calm</div></div>
+    <div class="arc-arrow">→</div>
+    <div class="arc-step recon" style="position:relative;"><div class="gi">gap #2 · 5s</div><div class="lbl">F4 · 0:15</div><div class="emo">재연결</div></div>
+    <div class="arc-arrow">→</div>
+    <div class="arc-step fragile"><div class="lbl">F5 · 0:20</div><div class="emo">fragile_hope</div></div>
+  </div>
+</div>
+
+<!-- ─── Frame Strip ─── -->
+<div class="strip">
+
+  <!-- F1 -->
+  <div class="card">
+    <div class="img-wrap">
+      <img src="frames/F1_pause_cafe.png" alt="F1">
+      <span class="f-num">F1</span><span class="timing-b">0:00–0:05</span>
+      <div class="sub-ov"><span class="sub-text">오늘의 마음을<br>이 밤에 남겨둘게요</span></div>
+    </div>
+    <div class="meta">
+      <div class="mrow"><span class="chip chip-pause">pause</span></div>
+      <div class="mrow"><span class="mic">↕</span><span class="mval">Ken Burns ↓ 0.3x · 5s</span></div>
+      <div class="mrow"><span class="mic">⊙</span><span class="mval">심야 카페 창가 · 별 우측 상단</span></div>
+      <div class="mrow"><span class="fix">copy #9</span></div>
+      <div class="mrow"><span class="src">thumbnails / full</span></div>
+    </div>
+  </div>
+
+  <!-- F2 breathing gap -->
+  <div class="card">
+    <div class="img-wrap">
+      <img src="frames/F2_afterflow_cafe.png" alt="F2" style="opacity:.42">
+      <span class="f-num">F2</span><span class="timing-b">0:05–0:10</span>
+      <div class="gap-ov">
+        <span class="gap-lbl">BREATHING GAP #1</span>
+        <span class="gap-desc">감정 여운<br>커피컵 정착 · 정적</span>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="mrow"><span class="chip chip-flow">emotional_afterflow</span></div>
+      <div class="mrow"><span class="mic">↕</span><span class="mval">정적 · 5s</span></div>
+      <div class="mrow"><span class="mic">⊙</span><span class="mval">창 너머 별 · DoD ✓</span></div>
+      <div class="mrow"><span class="src">storybook / page05</span></div>
+    </div>
+  </div>
+
+  <!-- F3 -->
+  <div class="card">
+    <div class="img-wrap">
+      <img src="frames/F3_calm_cafe.png" alt="F3">
+      <span class="f-num">F3</span><span class="timing-b">0:10–0:15</span>
+      <div class="sub-ov"><span class="sub-text">마음이 조금<br>가벼워졌다면 좋겠어요</span></div>
+    </div>
+    <div class="meta">
+      <div class="mrow"><span class="chip chip-calm">calm</span></div>
+      <div class="mrow"><span class="mic">↕</span><span class="mval">dissolve 1s → 정적 · 5s</span></div>
+      <div class="mrow"><span class="mic">⊙</span><span class="mval">이완된 자세 · 따뜻한 호박색</span></div>
+      <div class="mrow"><span class="fix">copy #11</span></div>
+      <div class="mrow"><span class="src">thumbnails / full</span></div>
+    </div>
+  </div>
+
+  <!-- F4 breathing gap -->
+  <div class="card">
+    <div class="img-wrap">
+      <img src="frames/F4_reconnection_hamel.png" alt="F4" style="opacity:.42">
+      <span class="f-num">F4</span><span class="timing-b">0:15–0:20</span>
+      <div class="gap-ov">
+        <span class="gap-lbl">BREATHING GAP #2</span>
+        <span class="gap-desc">현실 재연결<br>등대+별 확인 · pan → 0.3x</span>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="mrow"><span class="chip chip-recon">reality_reconnection</span></div>
+      <div class="mrow"><span class="mic">↕</span><span class="mval">dissolve 1s → pan → 0.3x · 5s</span></div>
+      <div class="mrow"><span class="mic">⊙</span><span class="mval">등대(우) + 별(좌 상단) · DoD ✓</span></div>
+      <div class="mrow"><span class="src">storybook / page05</span></div>
+    </div>
+  </div>
+
+  <!-- F5 — v3 교체 -->
+  <div class="card changed">
+    <div class="img-wrap">
+      <img src="frames/F5_fragile_hope_hamel.png" alt="F5 v3 base02">
+      <span class="f-num">F5</span><span class="timing-b">0:20–0:30</span>
+      <span class="changed-b">v3 교체</span>
+      <div class="sub-ov"><span class="sub-text">작은 소원 하나가<br>밤하늘에 남았어요</span></div>
+    </div>
+    <div class="meta">
+      <div class="mrow"><span class="chip chip-fragile">fragile_hope</span></div>
+      <div class="mrow"><span class="mic">↕</span><span class="mval">dissolve 1s → 정적 → fade 2s · 10s</span></div>
+      <div class="mrow"><span class="mic">⊙</span><span class="mval">밤 항구 안개 · 수면 불빛 반사</span></div>
+      <div class="mrow"><span class="fix">base02 — 밤 분위기 ✓</span></div>
+      <div class="mrow"><span class="src">thumbnails / full</span></div>
+    </div>
+  </div>
+
+</div><!-- /strip -->
+
+<!-- ─── Continuity Check ─── -->
+<div class="cont-section">
+  <div class="cont-title">CONTINUITY CHECK — v3 최종</div>
+  <ul class="cont-list">
+    <li>
+      <span class="c-ok">✓</span>
+      <div><div>Sowoni 뒷모습 전 프레임 — 얼굴 미노출 (F3 약간 측면이나 위반 아님)</div></div>
+    </li>
+    <li>
+      <span class="c-ok">✓</span>
+      <div><div>F2 page05 DoD — 착석 뒷모습, 커피컵(정착 신호), 창 너머 별</div></div>
+    </li>
+    <li>
+      <span class="c-ok">✓</span>
+      <div><div>F4 page05 DoD — 빨간 등대(우측 배경) + 별(좌 상단) 두 요소 확인</div></div>
+    </li>
+    <li>
+      <span class="c-fix">✓</span>
+      <div>
+        <div>F5 자막-이미지 충돌 해소 — base02 어두운 밤 항구, "밤하늘에 남았어요" 충돌 없음</div>
+        <div class="cnote">v2 issue: base03 회색 안개 낮 + "밤하늘" 자막 충돌 → v3에서 해결</div>
+      </div>
+    </li>
+    <li>
+      <span class="c-fix">✓</span>
+      <div>
+        <div>F4→F5 조명 연속성 — 딥 네이비 심야 → 어두운 밤 안개 (색온도 연속)</div>
+        <div class="cnote">v2 issue: 심야 → 회색 낮으로 역전 → v3에서 해결</div>
+      </div>
+    </li>
+    <li>
+      <span class="c-ok">✓</span>
+      <div><div>신규 AI 이미지 생성: 0건 · 감정 순서: pause→calm→fragile_hope (SSOT 부분집합)</div></div>
+    </li>
+  </ul>
+</div>
+
+<!-- ─── Timeline ─── -->
+<div class="tl-section">
+  <div class="tl-title">Timeline — 총 30초 · Micro Resonance</div>
+  <div class="tl-bar">
+    <div class="tl-seg" style="left:0%;width:16.7%;background:var(--pause);"></div>
+    <div class="tl-seg" style="left:16.7%;width:16.7%;background:var(--afterflow);opacity:.45;"></div>
+    <div class="tl-seg" style="left:33.3%;width:16.7%;background:var(--calm);"></div>
+    <div class="tl-seg" style="left:50%;width:16.7%;background:var(--reconnect);opacity:.45;"></div>
+    <div class="tl-seg" style="left:66.7%;width:33.3%;background:var(--fragile);"></div>
+  </div>
+  <div class="tl-labels">
+    <span>0:00</span><span>0:05</span><span>0:10</span>
+    <span>0:15</span><span>0:20</span><span>0:30</span>
+  </div>
+  <div class="tl-rows">
+    <div class="tl-row">
+      <span class="tl-id">F1 / 0:00</span>
+      <span class="tl-t">5s · Ken Burns ↓ 0.3x</span>
+      <span class="tl-d"><span class="sub">"오늘의 마음을 이 밤에 남겨둘게요"</span> copy #9</span>
+    </div>
+    <div class="tl-row">
+      <span class="tl-id">F2 / 0:05</span>
+      <span class="tl-t">5s · 정적</span>
+      <span class="tl-d">자막 없음<span class="gap-tag">gap #1</span></span>
+    </div>
+    <div class="tl-row">
+      <span class="tl-id">F3 / 0:10</span>
+      <span class="tl-t">5s · dissolve 1s → 정적</span>
+      <span class="tl-d"><span class="sub">"마음이 조금 가벼워졌다면 좋겠어요"</span> copy #11</span>
+    </div>
+    <div class="tl-row">
+      <span class="tl-id">F4 / 0:15</span>
+      <span class="tl-t">5s · dissolve 1s → pan → 0.3x</span>
+      <span class="tl-d">자막 없음<span class="gap-tag">gap #2</span></span>
+    </div>
+    <div class="tl-row">
+      <span class="tl-id">F5 / 0:20</span>
+      <span class="tl-t">10s · dissolve 1s → 정적 → fade 2s</span>
+      <span class="tl-d"><span class="sub">"작은 소원 하나가 밤하늘에 남았어요"</span> copy #2<span class="fix-tag">base02 v3</span></span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,113 @@
+{
+  "version": "v0.3",
+  "stage": { "w": 280, "h": 373 },
+
+  "variants": {
+    "A": {
+      "label": "World Only",        "label_ko": "세계만",
+      "human_motion_pct": 0,        "world_multiplier": 1.0,
+      "color": "#2060a0",
+      "description": "인간 모션 없음. Stillness Breakpoint가 세계 레이어만 제어."
+    },
+    "B": {
+      "label": "Human Micro",       "label_ko": "미세 존재",
+      "human_motion_pct": 0.75,     "world_multiplier": 1.0,
+      "color": "#406080",
+      "description": "방향성 바람 + 손 미세 반응. 공기 속에 머문다."
+    },
+    "C": {
+      "label": "Risk Zone",         "label_ko": "드리프트 위험",
+      "human_motion_pct": 2.5,      "world_multiplier": 1.35,
+      "color": "#802030",
+      "description": "캐릭터화 경계 탐지. 어디서 저가 AI 느낌이 시작되는가."
+    }
+  },
+
+  "emotions": {
+    "calm": {
+      "label": "고요함",
+      "world": {
+        "star_period": [8, 12], "star_opacity": [0.70, 0.90],
+        "water_opacity_max": 0.018, "grain_opacity": [0.040, 0.060],
+        "light_opacity": [0.020, 0.040], "particles": "minimal"
+      },
+      "breakpoint": { "awaken": 2.0, "resonate": 6.0, "afterglow": 10.0, "cycle": 18.0 },
+      "directional": { "angle": 35,  "speed": 0.25, "turbulence": 0.15 },
+      "hand_micro":  { "tremble": 0.20, "grip_relax": 0.50, "sleeve": 0.60, "period": 4.8 },
+      "camera":      { "push": 0.8, "drift_x": 0.15, "drift_y": 0.08, "drift_period": 22 }
+    },
+    "hope": {
+      "label": "희망",
+      "world": {
+        "star_period": [5, 8],  "star_opacity": [0.75, 1.00],
+        "water_opacity_max": 0.030, "grain_opacity": [0.040, 0.070],
+        "light_opacity": [0.025, 0.055], "particles": "sparse_upward"
+      },
+      "breakpoint": { "awaken": 1.5, "resonate": 4.5, "afterglow": 8.0, "cycle": 14.0 },
+      "directional": { "angle": 20,  "speed": 0.45, "turbulence": 0.25 },
+      "hand_micro":  { "tremble": 0.40, "grip_relax": 0.80, "sleeve": 0.90, "period": 3.2 },
+      "camera":      { "push": 1.2, "drift_x": 0.20, "drift_y": 0.12, "drift_period": 16 }
+    },
+    "lonely": {
+      "label": "고독",
+      "world": {
+        "star_period": [10, 15], "star_opacity": [0.60, 0.80],
+        "water_opacity_max": 0.012, "grain_opacity": [0.050, 0.070],
+        "light_opacity": [0.015, 0.030], "particles": "sparse"
+      },
+      "breakpoint": { "awaken": 3.0, "resonate": 8.0, "afterglow": 14.0, "cycle": 22.0 },
+      "directional": { "angle": 290, "speed": 0.15, "turbulence": 0.08 },
+      "hand_micro":  { "tremble": 0.30, "grip_relax": 0.30, "sleeve": 0.40, "period": 6.5 },
+      "camera":      { "push": 0.4, "drift_x": 0.08, "drift_y": 0.15, "drift_period": 30 }
+    },
+    "healing": {
+      "label": "치유",
+      "world": {
+        "star_period": [6, 10], "star_opacity": [0.72, 0.92],
+        "water_opacity_max": 0.022, "grain_opacity": [0.038, 0.062],
+        "light_opacity": [0.022, 0.046], "particles": "sparse"
+      },
+      "breakpoint": { "awaken": 2.5, "resonate": 7.0, "afterglow": 11.0, "cycle": 18.0 },
+      "directional": { "angle": 45,  "speed": 0.30, "turbulence": 0.18 },
+      "hand_micro":  { "tremble": 0.30, "grip_relax": 0.70, "sleeve": 0.70, "period": 4.2 },
+      "camera":      { "push": 0.9, "drift_x": 0.12, "drift_y": 0.10, "drift_period": 25 }
+    },
+    "resonance": {
+      "label": "공명",
+      "world": {
+        "star_period": [4, 7],  "star_opacity": [0.80, 1.00],
+        "water_opacity_max": 0.035, "grain_opacity": [0.038, 0.068],
+        "light_opacity": [0.028, 0.060], "particles": "sparse_upward"
+      },
+      "breakpoint": { "awaken": 1.0, "resonate": 3.5, "afterglow": 7.0, "cycle": 12.0 },
+      "directional": { "angle": 10,  "speed": 0.55, "turbulence": 0.30 },
+      "hand_micro":  { "tremble": 0.50, "grip_relax": 0.90, "sleeve": 1.00, "period": 2.8 },
+      "camera":      { "push": 1.4, "drift_x": 0.25, "drift_y": 0.15, "drift_period": 14 }
+    }
+  },
+
+  "drift_guard": {
+    "human_region": { "top": 0.28, "bottom": 0.88 },
+    "hair_region":  { "top": 0.28, "bottom": 0.50 },
+    "cloth_region": { "top": 0.48, "bottom": 0.88 },
+    "hand_region":  { "top": 0.62, "bottom": 0.88, "left": 0.25, "right": 0.75 },
+    "fade_band": 0.05,
+    "never": [
+      "gaze_shift", "facial_expression_change", "head_turn",
+      "gesture", "lip_motion", "emotional_acting",
+      "cinematic_pan", "zoom_toward_subject",
+      "dramatic_sync", "viewer_directed_motion",
+      "fast_pan", "handheld_shake", "tiktok_motion",
+      "drone_movement", "cinematic_sweep",
+      "waving", "large_movement"
+    ],
+    "camera_allowed": [
+      "emotional_push", "memory_pullback", "observer_drift", "side_breathing"
+    ],
+    "hand_allowed": [
+      "finger_pressure", "cup_grip_relaxation", "fingertip_tremble", "sleeve_shift"
+    ],
+    "judgement_good": "공기 때문에 아주 조금 흔들린다. 공간이 감정을 기억한다.",
+    "judgement_bad":  "저 사람이 살아서 행동한다. 저가 AI 영상 느낌."
+  }
+}

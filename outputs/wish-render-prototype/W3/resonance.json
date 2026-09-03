@@ -1,0 +1,64 @@
+{
+  "wish": "W3", "type": "회복형",
+  "text": "지친 몸과 마음을 회복하고 싶어요",
+  "render_mode": "resonance",
+  "duration_model": "Micro Resonance",
+  "total_duration_sec": 30,
+  "gravity_sequence": ["pause","emotional_afterflow","calm","reality_reconnection","calm"],
+  "hope_curve": [0.48, 0.50, 0.53, 0.57, 0.63],
+  "gem_palette": { "cafe": "sapphire", "hamel": "emerald" },
+  "frames": [
+    {
+      "id": "F1", "emotion": "pause", "location": "cafe", "gem": "sapphire",
+      "file": "frames/F1_pause_cafe.png",
+      "asset": "07_pause_sapphire_yeosu_cafe_stage2.png",
+      "gravity_role": "opening pause — 차분한 멈춤, 회복의 시작점",
+      "palette_note": "sapphire = 차분한 청색 회복 에너지 (위로형 citrine과 구분)",
+      "timing": { "start": 0, "end": 5, "duration": 5 },
+      "subtitle": "별빛은 아주 작은 마음에서 시작돼요",
+      "subtitle_copy": "#8", "subtitle_start_offset": 1.0,
+      "motion": { "type": "ken_burns", "direction": "top_to_bottom", "speed": 0.3, "duration_sec": 5 }
+    },
+    {
+      "id": "F2", "emotion": "emotional_afterflow", "location": "cafe", "gem": null,
+      "file": "frames/F2_afterflow_cafe.png",
+      "asset": "cafe_page05_emotional_afterflow_base.png",
+      "gravity_role": "breathing gap #1 — 지친 감정의 잔류",
+      "timing": { "start": 5, "end": 10, "duration": 5 },
+      "subtitle": null, "breathing_gap": true,
+      "motion": { "type": "still", "speed": 0, "duration_sec": 5 }
+    },
+    {
+      "id": "F3", "emotion": "calm", "location": "cafe", "gem": "sapphire",
+      "file": "frames/F3_calm_cafe.png",
+      "asset": "08_calm_sapphire_yeosu_cafe_stage2.png",
+      "gravity_role": "recovery mid — 서서히 차오르는 안정감",
+      "palette_note": "sapphire calm = 회복의 고요, 아직 완전하지 않은 안정",
+      "timing": { "start": 10, "end": 15, "duration": 5 },
+      "subtitle": "마음이 조금 가벼워졌다면 좋겠어요",
+      "subtitle_copy": "#11", "subtitle_start_offset": 1.0,
+      "motion": { "type": "cross_dissolve_then_still", "dissolve_sec": 1.0, "speed": 0, "duration_sec": 5 }
+    },
+    {
+      "id": "F4", "emotion": "reality_reconnection", "location": "hamel", "gem": null,
+      "file": "frames/F4_reconnection_hamel.png",
+      "asset": "hamel_page05_reality_reconnection_base.png",
+      "gravity_role": "breathing gap #2 — 회복한 채로 현실로",
+      "timing": { "start": 15, "end": 20, "duration": 5 },
+      "subtitle": null, "breathing_gap": true,
+      "motion": { "type": "cross_dissolve_then_ken_burns", "direction": "left_to_right", "dissolve_sec": 1.0, "speed": 0.3, "duration_sec": 5 }
+    },
+    {
+      "id": "F5", "emotion": "calm", "location": "hamel", "gem": "emerald",
+      "file": "frames/F5_calm_hamel.png",
+      "asset": "hamel_calm_emerald_base01.png",
+      "gravity_role": "wish signal — 회복된 고요 (fragile_hope 아닌 grounded calm)",
+      "palette_note": "emerald = 싱그러운 치유 / calm으로 끝맺음 = 안정 회복의 완성",
+      "timing": { "start": 20, "end": 30, "duration": 10 },
+      "subtitle": "당신의 오늘도 충분히 반짝였어요",
+      "subtitle_copy": "#7", "subtitle_start_offset": 1.0,
+      "motion": { "type": "cross_dissolve_then_still_fadeout", "dissolve_sec": 1.0, "fadeout_sec": 2, "speed": 0, "duration_sec": 10 }
+    }
+  ],
+  "render_spec": { "ratio": "3:4", "resolution": "1024x1536", "dissolve": "1.0s", "subtitle_opacity": 0.7, "subtitle_weight": "thin", "breathing_gap_ratio": "40%", "new_ai_images": 0 }
+}

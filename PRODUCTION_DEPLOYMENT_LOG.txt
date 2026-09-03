@@ -1,0 +1,112 @@
+═══════════════════════════════════════════════════════════════════════════════
+EXPERIENCE RESOLVER P0 — PRODUCTION DEPLOYMENT LOG
+═══════════════════════════════════════════════════════════════════════════════
+
+DEPLOYMENT START TIME: 2026-08-25 (시간 기록 필요)
+COMMIT: 36fe6e2 (Experience Resolver P0 — Production Ready)
+BRANCH: main
+
+DEPLOYMENT TIMELINE
+─────────────────────────────────────────────────────────────────────────────
+
+T+0min: ✅ Git Push to Production
+  Status: SUCCESS
+  Commit pushed to: origin/main (GitHub)
+  Auto-deployment triggered on Render.com
+
+T+2-3min: ⏳ Render Deployment In Progress
+  Expected: Server restart, code deployment
+  Monitor: https://dashboard.render.com/
+
+T+3min: ⏳ POST-DEPLOYMENT VERIFICATION (START)
+  Action: Run production smoke tests
+  Command:
+    PRODUCTION_API_URL=https://daily-miracles-mvp.onrender.com \
+    node tests/experienceIdentity/production-smoke-test.js
+
+EXPECTED SMOKE TEST RESULTS (8/8 PASS)
+─────────────────────────────────────────────────────────────────────────────
+
+[1] ✅ Backward Compatibility — No experiences parameter
+    Expected: Image generated, API works
+
+[2] ✅ YEOSU_ORIGIN Fallback
+    Expected: Default scene without experiences
+
+[3] ✅ AQUA_SCENE Resolution
+    Expected: AQUA_ADDON → AQUA_SCENE (or safe fallback)
+
+[4] ✅ CABLECAR Future Guard
+    Expected: CABLECAR_TICKET handled safely
+
+[5] ✅ Invalid Experience Fallback
+    Expected: Invalid experiences safely ignored
+
+[6] ✅ Yeosu API Integration
+    Expected: POST /api/yeosu/wish works
+
+[7] ✅ Logging Safety
+    Expected: No sensitive data in response
+
+[8] ✅ Response Structure Validation
+    Expected: { success, image_url, experience_identity }
+
+DEPLOYMENT STATUS
+─────────────────────────────────────────────────────────────────────────────
+
+Production Push: ✅ COMPLETE
+Render Deployment: ⏳ IN PROGRESS (waiting 2-3 min)
+Smoke Test Execution: ⏳ READY
+Monitoring: ⏳ READY
+
+CRITICAL CHECKS
+─────────────────────────────────────────────────────────────────────────────
+
+After deployment completes:
+
+1. API Health Check
+   curl https://daily-miracles-mvp.onrender.com/api/wish-image/status
+   Expected: { "status": "ok" }
+
+2. Backward Compatibility Check
+   curl -X POST https://daily-miracles-mvp.onrender.com/api/wish-image/generate \
+     -H "Content-Type: application/json" \
+     -d '{"wish_content":"test","gem_type":"ruby"}'
+   Expected: { "success": true, "image_url": "..." }
+
+3. Experience Parameter Check
+   curl -X POST https://daily-miracles-mvp.onrender.com/api/wish-image/generate \
+     -H "Content-Type: application/json" \
+     -d '{"wish_content":"test","gem_type":"ruby","experiences":[{"type":"AQUA_ADDON","source":"SYSTEM_DEFAULT"}]}'
+   Expected: { "success": true, "experience_identity": { "scene": ... } }
+
+4. Production Logs Check
+   https://dashboard.render.com/ → daily-miracles-mvp → Logs
+   Expected: [SceneResolver], [ExperienceValidator], [WishImage] logs
+   No errors, no warnings
+
+NEXT STEPS
+─────────────────────────────────────────────────────────────────────────────
+
+✅ After Render deployment completes (T+3min):
+   1. Verify API is responding
+   2. Run 8 smoke tests
+   3. Report results (PASS/FAIL for each)
+   4. Monitor logs for 24 hours
+
+⚠️ IMPORTANT:
+   - Do NOT implement Phase 2 (AQUA_SCENE prompt) yet
+   - Do NOT modify YEOSU_ORIGIN prompt
+   - Next: Wish Art Base Asset Lock (P1)
+
+ROLLBACK PLAN
+─────────────────────────────────────────────────────────────────────────────
+
+If any critical test fails:
+   git revert 36fe6e2
+   git push origin main
+   Wait 2-3 min for Render re-deployment
+
+Rollback is safe: zero DB changes, instant revert possible
+
+═══════════════════════════════════════════════════════════════════════════════

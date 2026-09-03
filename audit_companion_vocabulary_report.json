@@ -1,0 +1,144 @@
+{
+  "timestamp": "2026-08-23T22:13:09.076Z",
+  "codeExpectations": {
+    "family_with_kids": {
+      "trigger": "people_type === \"family_with_kids\" && companion_constraints?.has_kids",
+      "checks": [
+        {
+          "field": "suitable_for",
+          "method": "includes",
+          "value": "kids_ok"
+        }
+      ],
+      "lineNumber": 321
+    },
+    "family_elderly": {
+      "trigger": "people_type === \"family_elderly\" && companion_constraints?.has_elderly",
+      "checks": [
+        {
+          "field": "suitable_for",
+          "method": "includes",
+          "value": "elderly_ok"
+        }
+      ],
+      "lineNumber": 324
+    },
+    "wheelchair": {
+      "trigger": "companion_constraints?.disability === \"wheelchair\"",
+      "checks": [
+        {
+          "field": "suitable_for",
+          "method": "includes",
+          "value": "wheelchair_accessible"
+        }
+      ],
+      "lineNumber": 327
+    }
+  },
+  "databaseTags": [
+    "couples",
+    "elderly",
+    "family",
+    "foodies",
+    "friends",
+    "groups",
+    "kids_ok",
+    "pilgrimage",
+    "young_adults"
+  ],
+  "mismatchMatrix": [
+    {
+      "inputType": "family_with_kids",
+      "field": "suitable_for",
+      "codeExpects": "kids_ok",
+      "dbActual": "kids_ok",
+      "foundInDB": true,
+      "status": "✅ MATCH",
+      "action": "NONE"
+    },
+    {
+      "inputType": "family_elderly",
+      "field": "suitable_for",
+      "codeExpects": "elderly_ok",
+      "dbActual": "elderly",
+      "foundInDB": false,
+      "status": "❌ MISMATCH",
+      "action": "NORMALIZE"
+    },
+    {
+      "inputType": "wheelchair",
+      "field": "suitable_for",
+      "codeExpects": "wheelchair_accessible",
+      "dbActual": "wheelchair_accessible",
+      "foundInDB": false,
+      "status": "❌ MISMATCH",
+      "action": "INVESTIGATE"
+    }
+  ],
+  "phase1bNormalization": {
+    "family_with_kids": [
+      "family",
+      "kids_ok"
+    ],
+    "couple": [
+      "couples"
+    ],
+    "solo": [],
+    "family_elderly": [
+      "elderly"
+    ]
+  },
+  "conflicts": [
+    {
+      "component": "Companion filter (family_elderly)",
+      "codeExpects": "elderly_ok",
+      "dbActual": "elderly",
+      "phase1bUses": "elderly",
+      "severity": "HIGH",
+      "affectedTravelers": "family_elderly",
+      "affectedPlaces": 6,
+      "issue": "Code filter and Phase 1B normalization use different tag names"
+    },
+    {
+      "component": "Companion filter (wheelchair)",
+      "codeExpects": "wheelchair_accessible",
+      "dbActual": "NOT FOUND",
+      "phase1bUses": "N/A (not in Phase 1B)",
+      "severity": "CRITICAL",
+      "affectedTravelers": "wheelchair users",
+      "affectedPlaces": "0 (none would pass)",
+      "issue": "Tag expected by code does not exist in DB; accessibility_wheelchair_status field exists instead"
+    }
+  ],
+  "canonicalMapping": {
+    "comment": "Single source of truth for tag vocabulary",
+    "format": "Normalize code expectations to DB reality",
+    "mappings": {
+      "family_with_kids": {
+        "codeFieldName": "suitable_for",
+        "normalizedTags": [
+          "kids_ok"
+        ],
+        "confidence": "HIGH (tag exists, exact match)"
+      },
+      "family_elderly": {
+        "codeFieldName": "suitable_for",
+        "normalizedTags": [
+          "elderly"
+        ],
+        "confidence": "HIGH (tag exists, code used wrong name)",
+        "shouldNotUse": [
+          "elderly_ok"
+        ],
+        "phase1bConflict": "Phase 1B normalization already uses \"elderly\" correctly"
+      },
+      "wheelchair": {
+        "codeFieldName": "suitable_for",
+        "normalizedTags": [],
+        "confidence": "NONE (tag does not exist)",
+        "alternativeField": "accessibility_wheelchair_status",
+        "note": "Should use separate accessibility field, not suitable_for"
+      }
+    }
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "wish_id": "wish_W01_res",
+  "wish_text": "지쳐있는 나를 보듬어주고 싶어요",
+  "wish_type": "위로형",
+  "primary_gravity": "pause",
+  "gem_palette": {
+    "cafe": "citrine",
+    "hamel": "diamond"
+  },
+  "render_mode": "resonance_personal",
+  "ratio": "3:4",
+  "total_duration_sec": 43,
+  "method": "layered_temporal_composition",
+  "moments": [
+    {
+      "id": "M1",
+      "role": "도착의 순간",
+      "file": "../../wish-render-prototype/W1/frames/F1_pause_cafe.png",
+      "emotion": "pause",
+      "start": 0,
+      "end": 12,
+      "duration": 12,
+      "subtitle": "오늘의 마음을 이 밤에 남겨둘게요",
+      "subtitle_offset": 1,
+      "has_water": false,
+      "water_y": 0.88,
+      "sky_h": 0.55
+    },
+    {
+      "id": "M2",
+      "role": "머무름의 순간",
+      "file": "../../wish-render-prototype/W1/frames/F3_calm_cafe.png",
+      "emotion": "calm",
+      "start": 14,
+      "end": 26,
+      "duration": 12,
+      "subtitle": "마음이 조금 가벼워졌다면 좋겠어요",
+      "subtitle_offset": 1,
+      "has_water": false,
+      "water_y": 0.88,
+      "sky_h": 0.55
+    },
+    {
+      "id": "M3",
+      "role": "잔향의 순간",
+      "file": "../../wish-render-prototype/W1/frames/F5_fragile_hope_hamel.png",
+      "emotion": "fragile_hope",
+      "start": 28,
+      "end": 41,
+      "duration": 13,
+      "subtitle": "작은 소원 하나가 밤하늘에 남았어요",
+      "subtitle_offset": 1,
+      "has_water": true,
+      "water_y": 0.55,
+      "sky_h": 0.55
+    }
+  ],
+  "transitions": [
+    {
+      "id": "T1",
+      "start": 12,
+      "end": 14,
+      "duration": 2,
+      "type": "pure_dissolve",
+      "from_moment": 0,
+      "to_moment": 1
+    },
+    {
+      "id": "T2",
+      "start": 26,
+      "end": 28,
+      "duration": 2,
+      "type": "pure_dissolve",
+      "from_moment": 1,
+      "to_moment": 2
+    }
+  ],
+  "ending": {
+    "start": 41,
+    "end": 43,
+    "duration": 2,
+    "type": "fade_to_black"
+  },
+  "presence_layers": {
+    "P0": [
+      "star_pulse",
+      "water_shimmer",
+      "air_grain"
+    ],
+    "P1_active": [
+      "light_breathing"
+    ]
+  },
+  "drift_guard": {
+    "camera_fixed": true,
+    "person_fixed": true,
+    "structure_fixed": true,
+    "ken_burns": false,
+    "cinematic_zoom": false
+  },
+  "generated_at": "2026-05-23T22:53:40.758Z"
+}
