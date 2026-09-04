@@ -234,6 +234,43 @@ try {
   console.warn('  ⚠️ Could not verify legacy share route:', e.message);
 }
 
+// Test 15: C4 plant-star route is registered
+console.log('  Test 15: C4 plant-star route is registered in storybook router');
+try {
+  const storybookPath = require('path').join(__dirname, '..', 'routes', 'storybookRoutes.js');
+  const storybookRoutes = require(storybookPath);
+
+  const plantStarRoutes = storybookRoutes.stack
+    ? storybookRoutes.stack.filter(r => r.route && r.route.path && r.route.path.includes('plant-star'))
+    : [];
+
+  assert(
+    plantStarRoutes.length > 0 && plantStarRoutes[0].route.methods.post === true,
+    'plant-star POST route is registered in storybook router'
+  );
+} catch (e) {
+  console.warn('  ⚠️ Could not verify plant-star route registration:', e.message);
+}
+
+// Test 16: Diagnostic markers are present
+console.log('  Test 16: Diagnostic markers for C4 plant-star in code');
+try {
+  const serverPath = require('path').join(__dirname, '..', 'server.js');
+  const serverCode = fs.readFileSync(serverPath, 'utf8');
+  const routesPath = require('path').join(__dirname, '..', 'routes', 'storybookRoutes.js');
+  const routesCode = fs.readFileSync(routesPath, 'utf8');
+
+  const hasRouteEntryMarker = /\[C4_ROUTE_ENTRY\]/.test(serverCode);
+  const hasHandlerEntryMarker = /\[C4_PLANT_STAR_HANDLER_ENTERED\]/.test(routesCode);
+
+  assert(
+    hasRouteEntryMarker && hasHandlerEntryMarker,
+    'Diagnostic markers C4_ROUTE_ENTRY and C4_PLANT_STAR_HANDLER_ENTERED are present'
+  );
+} catch (e) {
+  console.warn('  ⚠️ Could not verify diagnostic markers:', e.message);
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Summary
 // ═══════════════════════════════════════════════════════════════════════════

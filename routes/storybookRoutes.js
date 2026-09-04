@@ -3500,6 +3500,8 @@ router.post('/admin/storybook/:journey_id/upload-story-art',
  * Status: 201 Created | 400 Bad Request | 401 Unauthorized | 409 Conflict | 500 Error
  */
 router.post('/:journey_id/plant-star', async (req, res) => {
+  console.log('[C4_PLANT_STAR_HANDLER_ENTERED]');
+
   if (!db || !goldenNineContract) {
     return res.status(503).json({
       success: false,
@@ -3643,6 +3645,7 @@ router.post('/:journey_id/plant-star', async (req, res) => {
           const existingStar = existingStarResult.rows[0];
           // Commit empty transaction (no changes)
           await client.query('COMMIT;');
+          client.release();
           return res.status(200).json({
             success: true,
             star_id: existingStar.id,
@@ -3652,6 +3655,96 @@ router.post('/:journey_id/plant-star', async (req, res) => {
           });
         }
       }
+
+      // ─────────────────────────────────────────────────────────────────
+      // Step 5: Create dt_wishes (inside transaction on same client)
+      // ─────────────────────────────────────────────────────────────────
+
+      const wishText = journey.wish_text || 'RAMADA Storybook 소원';
+      const wishResult = await client.query(
+        `INSERT INTO dt_wishes (wish_text, user_id, sku, status, created_at)
+         VALUES ($1, NULL, $2, $3, NOW())
+         RETURNING id`,
+        [wishText, 'storybook_v1', 'converted_to_star']
+      );
+      const wishId = wishResult.rows[0].id;
+
+      // ─────────────────────────────────────────────────────────────────
+      // Step 6: Create dt_star_seeds (inside transaction)
+      // ─────────────────────────────────────────────────────────────────
+
+      const seedName = `${wishText.slice(0, 20)} 씨앗`;
+      const seedResult = await client.query(
+        `INSERT INTO dt_star_seeds (wish_id, seed_name, seed_state, created_at)
+         VALUES ($1, $2, $3, NOW())
+         RETURNING id`,
+        [wishId, seedName, 'promoted']
+      );
+      const seedId = seedResult.rows[0].id;
+
+      // ─────────────────────────────────────────────────────────────────
+      // Step 7: Create dt_stars (inside transaction, skip_artifact by design)
+      // ─────────────────────────────────────────────────────────────────
+
+      // Generate star name (deterministic based on wish_id)
+      const starName = await generateStarName(wishId, db);
+      const starSlug = `star-${Date.now()}`;
+
+      // Get galaxy (use pool for read-only lookup, not part of transaction)
+      const galaxyResult = await db.query(
+        'SELECT id FROM dt_galaxies WHERE code = $1',
+        ['growth']
+      );
+      const galaxyId = galaxyResult.rows.length > 0 ? galaxyResult.rows[0].id : null;
+
+      const starResult = await client.query(
+        `INSERT INTO dt_stars
+           (wish_id, star_seed_id, star_name, star_slug, galaxy_id, star_stage, emotion_tag, star_rarity, origin_place, origin_type, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
+         RETURNING id, star_name`,
+        [
+          wishId,
+          seedId,
+          starName,
+          starSlug,
+          galaxyId,
+          'day1',
+          'confusion',
+          'limited',
+          journey.source_hotel || 'ramada_storybook',
+          'storybook',
+        ]
+      );
+      const star = starResult.rows[0];
+
+      // ─────────────────────────────────────────────────────────────────
+      // Step 8: Update dt_storybook_journeys with star_id (inside transaction)
+      // ─────────────────────────────────────────────────────────────────
+
+      await client.query(
+        `UPDATE dt_storybook_journeys
+         SET star_id = $1, status = $2, star_planted_at = NOW(), updated_at = NOW()
+         WHERE id = $3`,
+        [star.id, 'star_planted', journey_id]
+      );
+
+      // Commit transaction on the dedicated client
+      await client.query('COMMIT;');
+
+      // ─────────────────────────────────────────────────────────────────
+      // Step 9: Response
+      // ─────────────────────────────────────────────────────────────────
+
+      client.release();
+      return res.status(201).json({
+        success: true,
+        star_id: star.id,
+        star_name: star.star_name,
+        journey_status: 'star_planted',
+        star_planted_at: new Date().toISOString(),
+        message: '별이 소원꿈터에 심어졌습니다'
+      });
+
     } catch (txError) {
       // Transaction error — rollback
       try {
@@ -3659,99 +3752,9 @@ router.post('/:journey_id/plant-star', async (req, res) => {
       } catch (rollbackErr) {
         // Ignore rollback error if already rolled back
       }
-      throw txError;
-    } finally {
-      // Always release client back to pool
       client.release();
+      throw txError;
     }
-
-    // ─────────────────────────────────────────────────────────────────
-    // Step 5: Create dt_wishes (inside transaction on same client)
-    // ─────────────────────────────────────────────────────────────────
-
-    const wishText = journey.wish_text || 'RAMADA Storybook 소원';
-    const wishResult = await client.query(
-      `INSERT INTO dt_wishes (wish_text, user_id, sku, status, created_at)
-       VALUES ($1, NULL, $2, $3, NOW())
-       RETURNING id`,
-      [wishText, 'storybook_v1', 'converted_to_star']
-    );
-    const wishId = wishResult.rows[0].id;
-
-    // ─────────────────────────────────────────────────────────────────
-    // Step 6: Create dt_star_seeds (inside transaction)
-    // ─────────────────────────────────────────────────────────────────
-
-    const seedName = `${wishText.slice(0, 20)} 씨앗`;
-    const seedResult = await client.query(
-      `INSERT INTO dt_star_seeds (wish_id, seed_name, seed_state, created_at)
-       VALUES ($1, $2, $3, NOW())
-       RETURNING id`,
-      [wishId, seedName, 'promoted']
-    );
-    const seedId = seedResult.rows[0].id;
-
-    // ─────────────────────────────────────────────────────────────────
-    // Step 7: Create dt_stars (inside transaction, skip_artifact by design)
-    // ─────────────────────────────────────────────────────────────────
-
-    // Generate star name (deterministic based on wish_id)
-    const starName = await generateStarName(wishId, db);
-    const starSlug = `star-${Date.now()}`;
-
-    // Get galaxy (use pool for read-only lookup, not part of transaction)
-    const galaxyResult = await db.query(
-      'SELECT id FROM dt_galaxies WHERE code = $1',
-      ['growth']
-    );
-    const galaxyId = galaxyResult.rows.length > 0 ? galaxyResult.rows[0].id : null;
-
-    const starResult = await client.query(
-      `INSERT INTO dt_stars
-         (wish_id, star_seed_id, star_name, star_slug, galaxy_id, star_stage, emotion_tag, star_rarity, origin_place, origin_type, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
-       RETURNING id, star_name`,
-      [
-        wishId,
-        seedId,
-        starName,
-        starSlug,
-        galaxyId,
-        'day1',
-        'confusion',
-        'limited',
-        journey.source_hotel || 'ramada_storybook',
-        'storybook',
-      ]
-    );
-    const star = starResult.rows[0];
-
-    // ─────────────────────────────────────────────────────────────────
-    // Step 8: Update dt_storybook_journeys with star_id (inside transaction)
-    // ─────────────────────────────────────────────────────────────────
-
-    await client.query(
-      `UPDATE dt_storybook_journeys
-       SET star_id = $1, status = $2, star_planted_at = NOW(), updated_at = NOW()
-       WHERE id = $3`,
-      [star.id, 'star_planted', journey_id]
-    );
-
-    // Commit transaction (already handled in try-finally, confirmed here)
-    await client.query('COMMIT;');
-
-    // ─────────────────────────────────────────────────────────────────
-    // Step 9: Response
-    // ─────────────────────────────────────────────────────────────────
-
-    return res.status(201).json({
-      success: true,
-      star_id: star.id,
-      star_name: star.star_name,
-      journey_status: 'star_planted',
-      star_planted_at: new Date().toISOString(),
-      message: '별이 소원꿈터에 심어졌습니다'
-    });
 
   } catch (error) {
     console.error('[STORYBOOK_PLANT_STAR_ERROR]:', error);

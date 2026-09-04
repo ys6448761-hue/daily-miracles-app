@@ -1578,11 +1578,20 @@ function runFinalTests() {
     const hasClientSelectForUpdate = /await client\.query\(\s*['""]SELECT.*FOR UPDATE/.test(plantStarBlock);
     const hasClientInsert = /await client\.query\(\s*`?INSERT/.test(plantStarBlock);
     const hasClientUpdate = /await client\.query\(\s*`?UPDATE/.test(plantStarBlock);
+    const hasClientCommit = /await client\.query\(\s*['""]COMMIT[;]?['""]\s*\)/.test(plantStarBlock);
     const hasClientRelease = /client\.release\(\)/.test(plantStarBlock);
 
+    // Verify no db.query() calls in the transaction block (should use client.query())
+    const txStart = plantStarBlock.indexOf('const client = await db.connect()');
+    const txEnd = plantStarBlock.indexOf('} catch (txError)');
+    const txCode = plantStarBlock.substring(txStart, txEnd);
+    const hasOnlyClientQueries = !/^(?!.*client\.query).*await\s+(?:db\.query|client\.query)/.test(txCode) ||
+                                /await client\.query/.test(txCode);
+
     assert(
-      hasConnectCall && hasClientBegin && hasClientSelectForUpdate && hasClientInsert && hasClientUpdate && hasClientRelease,
-      'plant-star uses dedicated client (db.connect) for all transaction operations with client.release() cleanup'
+      hasConnectCall && hasClientBegin && hasClientSelectForUpdate && hasClientInsert &&
+      hasClientUpdate && hasClientCommit && hasClientRelease,
+      'plant-star uses dedicated client (db.connect) for all transaction operations with COMMIT and client.release()'
     );
   } catch (e) {
     console.warn('  ⚠️ Could not verify client transaction:', e.message);

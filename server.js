@@ -2329,6 +2329,18 @@ app.use('/api/storybook/admin/storybook', (req, res, next) => {
   next();
 });
 
+// ---------- C7A Storybook Diagnostic (Request Entry Logging) ----------
+app.use('/api/storybook', (req, res, next) => {
+  // Log that request reached this mount point (no sensitive data)
+  if (req.method === 'POST' && req.path.includes('plant-star')) {
+    console.log('[C4_ROUTE_ENTRY]', JSON.stringify({
+      method: req.method,
+      path: req.path
+    }));
+  }
+  next();
+});
+
 // ---------- 스토리북 E2E Commerce Routes ----------
 if (storybookRoutes) {
   app.use("/api/storybook", storybookRoutes);
