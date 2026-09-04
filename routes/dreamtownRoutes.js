@@ -1288,6 +1288,7 @@ router.get('/stars/:id', async (req, res) => {
     });
 
   } catch (err) {
+    console.error('[DT_STAR_DETAIL_CATCH_ENTERED]');
     const pgDiag = {
       code: err?.code || 'NO_CODE',
       message: err?.message || 'unknown error',
