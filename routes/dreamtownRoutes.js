@@ -1288,7 +1288,17 @@ router.get('/stars/:id', async (req, res) => {
     });
 
   } catch (err) {
-    console.error('[DT] GET /stars/:id error:', err);
+    const pgDiag = {
+      code: err?.code || 'NO_CODE',
+      message: err?.message || 'unknown error',
+      table: err?.table || null,
+      column: err?.column || null,
+      routine: err?.routine || null,
+    };
+    console.error(
+      '[DT] GET /stars/:id error:',
+      JSON.stringify(pgDiag)
+    );
     res.status(500).json({ error: 'Internal server error' });
   }
 });
