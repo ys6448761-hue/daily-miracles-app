@@ -2465,7 +2465,7 @@ router.get('/my-journey', async (req, res) => {
   try {
     // Step 1: Find journey by session_id
     const journeyQuery = `
-      SELECT id, status, wish_text, source_hotel, is_private, created_at, updated_at
+      SELECT id, status, wish_text, source_hotel, is_private, created_at, updated_at, star_id
       FROM dt_storybook_journeys
       WHERE session_id = $1
     `;
@@ -2527,6 +2527,7 @@ router.get('/my-journey', async (req, res) => {
         is_private: journey.is_private,
         created_at: journey.created_at,
         updated_at: journey.updated_at,
+        star_id: journey.star_id,
         assets: assetsWithUrls
       }
     });

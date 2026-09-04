@@ -7,10 +7,12 @@
  * - Handles idempotency (no duplicate stars on retry)
  * - Prevents multiple clicks
  * - Shows success state (status transitions to star_planted)
+ * - Navigates to /star/:starId when planted (fresh or restored)
  *
  * Props:
  *   journeyId: UUID (required)
  *   status: storybook_complete | star_planted
+ *   starId?: UUID (available in restored/already-planted state)
  *   onSuccess?: (starId) => void
  *   onError?: (error) => void
  *   disabled?: boolean
@@ -23,6 +25,7 @@ import './PlantStarButton.css';
 function PlantStarButton({
   journeyId,
   status = 'storybook_complete',
+  starId = null,
   onSuccess = null,
   onError = null,
   disabled = false
@@ -88,14 +91,16 @@ function PlantStarButton({
             {isAlreadyPlanted ? '이미 별이 심어졌습니다' : '별이 심어졌습니다!'}
           </div>
           <div className="success-subtitle">소원꿈터에서 당신의 별을 볼 수 있습니다</div>
-          <button
-            onClick={() => navigate('/dreamtown')}
-            className="success-cta-button"
-            aria-label="소원꿈터로 이동"
-          >
-            <span className="success-button-emoji">✦</span>
-            <span>소원꿈터에서 내 별 보기</span>
-          </button>
+          {starId && (
+            <button
+              onClick={() => navigate(`/star/${starId}`)}
+              className="success-cta-button"
+              aria-label="내 별 보기"
+            >
+              <span className="success-button-emoji">✦</span>
+              <span>소원꿈터에서 내 별 보기</span>
+            </button>
+          )}
         </div>
       ) : (
         <>

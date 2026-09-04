@@ -225,6 +225,7 @@ function StorybookView() {
             <PlantStarButton
               journeyId={journey.id}
               status={journey.status}
+              starId={journey.star_id}
               onSuccess={handleStarSuccess}
             />
           </section>
