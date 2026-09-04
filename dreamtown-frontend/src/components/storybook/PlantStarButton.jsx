@@ -17,6 +17,7 @@
  */
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './PlantStarButton.css';
 
 function PlantStarButton({
@@ -26,6 +27,7 @@ function PlantStarButton({
   onError = null,
   disabled = false
 }) {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -86,6 +88,14 @@ function PlantStarButton({
             {isAlreadyPlanted ? '이미 별이 심어졌습니다' : '별이 심어졌습니다!'}
           </div>
           <div className="success-subtitle">소원꿈터에서 당신의 별을 볼 수 있습니다</div>
+          <button
+            onClick={() => navigate('/dreamtown')}
+            className="success-cta-button"
+            aria-label="소원꿈터로 이동"
+          >
+            <span className="success-button-emoji">✦</span>
+            <span>소원꿈터에서 내 별 보기</span>
+          </button>
         </div>
       ) : (
         <>

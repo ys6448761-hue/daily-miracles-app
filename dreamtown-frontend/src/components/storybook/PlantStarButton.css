@@ -102,6 +102,43 @@
   opacity: 0.8;
 }
 
+/* Success CTA Button */
+.success-cta-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.25rem;
+  background: linear-gradient(135deg, #ffc857 0%, #ffb700 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 184, 0, 0.3);
+  margin-top: 0.5rem;
+}
+
+.success-cta-button:hover {
+  background: linear-gradient(135deg, #ffb700 0%, #ff9500 100%);
+  box-shadow: 0 6px 16px rgba(255, 184, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.success-cta-button:active {
+  transform: translateY(0);
+}
+
+.success-button-emoji {
+  font-size: 1rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Warning */
 .button-warning {
   padding: 0.75rem;
