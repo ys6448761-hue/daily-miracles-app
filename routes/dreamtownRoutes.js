@@ -1063,7 +1063,8 @@ router.get('/stars/:id', async (req, res) => {
     const { id } = req.params;
 
     // growth_log_text는 migration 035에서 추가 — 미적용 환경 graceful fallback
-    // artifact_jobs LEFT JOIN — 최신 image job의 result_url + status 포함
+    // artifact_jobs LEFT JOIN — 최신 image job의 result_url + status 포함 (migration 045)
+    // 둘 다 없으면 core star query만 실행
     let result;
     let growthLogText = null;
     try {
@@ -1098,34 +1099,116 @@ router.get('/stars/:id', async (req, res) => {
       );
       if (result.rowCount > 0) growthLogText = result.rows[0].growth_log_text ?? null;
     } catch (colErr) {
-      if (colErr.code !== '42703') throw colErr; // 42703 = undefined_column
-      // migration 035 미적용 — growth_log_text 없이 재조회
-      result = await db.query(
-        `SELECT
-           s.id              AS star_id,
-           s.star_name,
-           s.star_slug,
-           s.star_stage,
-           s.created_at,
-           w.wish_text,
-           w.wish_emotion,
-           g.code            AS galaxy_code,
-           g.name_ko         AS galaxy_name_ko,
-           aj.result_url     AS wish_image_url,
-           aj.status         AS artifact_status
-         FROM dt_stars s
-         LEFT JOIN dt_wishes   w  ON w.id = s.wish_id
-         JOIN      dt_galaxies g  ON g.id = s.galaxy_id
-         LEFT JOIN LATERAL (
-           SELECT result_url, status
-             FROM dt_artifact_jobs
-            WHERE star_id = s.id AND type = 'image'
-            ORDER BY created_at DESC
-            LIMIT 1
-         ) aj ON true
-         WHERE s.id = $1`,
-        [id]
-      );
+      // 42703 = undefined_column (migration 035)
+      // 42P01 = relation does not exist (migration 045)
+      if (colErr.code === '42703') {
+        // migration 035 미적용 — growth_log_text 없이 재조회 (artifact_jobs는 여전히 시도)
+        try {
+          result = await db.query(
+            `SELECT
+               s.id              AS star_id,
+               s.star_name,
+               s.star_slug,
+               s.star_stage,
+               s.created_at,
+               w.wish_text,
+               w.wish_emotion,
+               g.code            AS galaxy_code,
+               g.name_ko         AS galaxy_name_ko,
+               aj.result_url     AS wish_image_url,
+               aj.status         AS artifact_status
+             FROM dt_stars s
+             LEFT JOIN dt_wishes   w  ON w.id = s.wish_id
+             JOIN      dt_galaxies g  ON g.id = s.galaxy_id
+             LEFT JOIN LATERAL (
+               SELECT result_url, status
+                 FROM dt_artifact_jobs
+                WHERE star_id = s.id AND type = 'image'
+                ORDER BY created_at DESC
+                LIMIT 1
+             ) aj ON true
+             WHERE s.id = $1`,
+            [id]
+          );
+        } catch (artifactErr) {
+          if (artifactErr.code !== '42P01') throw artifactErr; // 42P01 = relation (dt_artifact_jobs) does not exist
+          // migration 045 미적용 — artifact_jobs 없이 core query만 실행
+          result = await db.query(
+            `SELECT
+               s.id              AS star_id,
+               s.star_name,
+               s.star_slug,
+               s.star_stage,
+               s.created_at,
+               s.star_rarity,
+               s.source_event,
+               w.wish_text,
+               w.wish_emotion,
+               g.code            AS galaxy_code,
+               g.name_ko         AS galaxy_name_ko,
+               NULL              AS wish_image_url,
+               NULL              AS artifact_status
+             FROM dt_stars s
+             LEFT JOIN dt_wishes   w  ON w.id = s.wish_id
+             JOIN      dt_galaxies g  ON g.id = s.galaxy_id
+             WHERE s.id = $1`,
+            [id]
+          );
+        }
+      } else if (colErr.code === '42P01') {
+        // migration 045 미적용 (dt_artifact_jobs 미존재) — artifact_jobs 없이 core query 실행
+        try {
+          result = await db.query(
+            `SELECT
+               s.id              AS star_id,
+               s.star_name,
+               s.star_slug,
+               s.star_stage,
+               s.created_at,
+               s.growth_log_text,
+               s.star_rarity,
+               s.source_event,
+               w.wish_text,
+               w.wish_emotion,
+               g.code            AS galaxy_code,
+               g.name_ko         AS galaxy_name_ko,
+               NULL              AS wish_image_url,
+               NULL              AS artifact_status
+             FROM dt_stars s
+             LEFT JOIN dt_wishes   w  ON w.id = s.wish_id
+             JOIN      dt_galaxies g  ON g.id = s.galaxy_id
+             WHERE s.id = $1`,
+            [id]
+          );
+          if (result.rowCount > 0) growthLogText = result.rows[0].growth_log_text ?? null;
+        } catch (coreErr) {
+          if (coreErr.code !== '42703') throw coreErr; // growth_log_text also missing
+          // 둘 다 없음: growth_log_text도 없이 최종 쿼리
+          result = await db.query(
+            `SELECT
+               s.id              AS star_id,
+               s.star_name,
+               s.star_slug,
+               s.star_stage,
+               s.created_at,
+               s.star_rarity,
+               s.source_event,
+               w.wish_text,
+               w.wish_emotion,
+               g.code            AS galaxy_code,
+               g.name_ko         AS galaxy_name_ko,
+               NULL              AS wish_image_url,
+               NULL              AS artifact_status
+             FROM dt_stars s
+             LEFT JOIN dt_wishes   w  ON w.id = s.wish_id
+             JOIN      dt_galaxies g  ON g.id = s.galaxy_id
+             WHERE s.id = $1`,
+            [id]
+          );
+        }
+      } else {
+        throw colErr; // 다른 에러는 전파
+      }
     }
 
     if (result.rowCount === 0) {
@@ -1135,21 +1218,33 @@ router.get('/stars/:id', async (req, res) => {
     const row = result.rows[0];
 
     // ── 성장 단계 계산 (DB 저장 금지 — 항상 계산형) ─────────────
-    const [impactResult, logResult] = await Promise.all([
-      db.query(
-        'SELECT COALESCE(SUM(count), 0)::int AS total FROM impact WHERE star_id = $1::text',
-        [row.star_id]
-      ),
-      db.query(
-        'SELECT COUNT(*)::int AS total FROM dt_voyage_logs WHERE star_id = $1',
-        [row.star_id]
-      ),
-    ]);
-    const growthStage = getStarStage({
-      created_at:   row.created_at,
-      impact_count: impactResult.rows[0].total,
-      log_count:    logResult.rows[0].total,
-    });
+    // impact (migration 030) + dt_voyage_logs (migration 037) 선택
+    let growthStage = { stage: 1, days: 0, message: null };
+    try {
+      const [impactResult, logResult] = await Promise.all([
+        db.query(
+          'SELECT COALESCE(SUM(count), 0)::int AS total FROM impact WHERE star_id = $1::text',
+          [row.star_id]
+        ),
+        db.query(
+          'SELECT COUNT(*)::int AS total FROM dt_voyage_logs WHERE star_id = $1',
+          [row.star_id]
+        ),
+      ]);
+      growthStage = getStarStage({
+        created_at:   row.created_at,
+        impact_count: impactResult.rows[0].total,
+        log_count:    logResult.rows[0].total,
+      });
+    } catch (growthErr) {
+      // 42P01 = migration 030 또는 037 미적용 (tables 미존재)
+      if (growthErr.code === '42P01') {
+        console.warn('[C7A] Growth calculation skipped (migration 030/037 missing):', growthErr.message);
+        // Safe defaults already set above
+      } else {
+        throw growthErr; // 다른 에러는 전파
+      }
+    }
 
     // ── 각성 상태 조회 (migration 117 — 없으면 null graceful) ─────
     let awakeningData = { status: null, awakened_at: null, awakened_place: null, awaken_count: 0, origin_type: null, origin_place: null };
