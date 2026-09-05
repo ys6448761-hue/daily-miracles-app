@@ -140,6 +140,47 @@ reference. It does not replace this Project State.
 
 ---
 
+## 🔴 PR #28 Check Review — HOLD
+
+**PR:** #28  
+**Branch:** `security/request-logging-backport` → `main`
+
+**Date:** 2026-09-05
+
+**Check Results Summary:**
+```
+✅ PASS:    8 checks (docker-smoke ×4, AIL Gate ×3, Vercel Preview Comments ×1)
+❌ FAIL:    3 checks (AIL Gate ×1, Vercel Production ×1, Vercel C7A ×1)
+⏳ PENDING: 0 checks
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Merge State: BLOCKED (failed checks)
+```
+
+**Confirmed Failures:**
+- ❌ **AIL Gate:** 1 failed instance, 3 passed instances (same commit)
+- ❌ **Vercel – daily-miracles-app:** Deployment failed
+- ❌ **Vercel – daily-miracles-app-21z3:** Deployment failed
+
+**Root Cause Classification:**
+
+**Vercel Failures:**
+- Status: ⚠️ **UNDETERMINED** (logs require CLI authentication)
+- Evidence: Accessible GitHub API data does not explicitly report server.js uncompressed size, 886.27 MB, or 250 MB limit
+- Hypothesis: Same 886.27 MB function size issue as PR #27 is a strong hypothesis, not Confirmed Evidence
+- **Important boundary:** Vercel preview checks are separate infrastructure from Render Production or Render C7A staging
+
+**AIL Gate Failure:**
+- Status: ⚠️ **UNDETERMINED** (logs not available)
+- Pattern: 1 failure, 3 successes on same commit suggests flaky/infrastructure issue, not code defect
+- Cannot confirm root cause without logs
+
+**Security Patch Impact:**
+- ✅ Docker-smoke tests pass (core functionality intact)
+- ✅ No evidence that security patch caused any failures
+- Failures appear to be pre-existing infrastructure/build issues
+
+---
+
 ## 📋 C7A INVESTIGATION STATE — Preserved
 
 **Investigation:** GET /api/dt/stars/:id HTTP 500 error  
@@ -159,9 +200,9 @@ reference. It does not replace this Project State.
 
 **Single explicit action:**
 
-> Create a new Production pull request from `security/request-logging-backport` to `main` without merging or deploying.
+> Investigate the single failed AIL Gate on PR #28 using existing read-only GitHub evidence, without rerunning checks or changing infrastructure.
 
-**Context:** Security backport has passed production review (commit acd92c74). PR should be created for code review and merge approval only. Do not merge to main or deploy until explicit sign-off.
+**Context:** PR #28 is blocked by check failures: 1 AIL Gate failure (3 passes), 2 Vercel failures (root cause UNDETERMINED). The AIL Gate flaky pattern (1 fail, 3 pass) requires investigation to determine whether it is a transient CI issue or a real code defect blocking this security backport.
 
 ---
 
