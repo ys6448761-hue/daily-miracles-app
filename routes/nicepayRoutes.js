@@ -177,9 +177,6 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
     console.log(`   - MID: ${req.body.MID}`);
     console.log(`   - Moid: ${req.body.Moid}`);
     console.log(`   - Amt: ${req.body.Amt}`);
-    console.log(`   - AuthToken: ${req.body.AuthToken?.substring(0, 30)}...`);
-    console.log(`   - Signature: ${req.body.Signature?.substring(0, 30)}...`);
-    console.log(`   - NextAppURL: ${req.body.NextAppURL}`);
     console.log('─'.repeat(60));
 
     const {
@@ -255,7 +252,6 @@ router.post('/nicepay/return', express.urlencoded({ extended: true }), async (re
     // 승인용 SignData: SHA256(AuthToken + MID + Amt + EdiDate + MerchantKey)
     const { ediDate, signData } = nicepayService.regenerateSignData(Amt, AuthToken);
     // NextAppURL: 나이스페이 IDC 라우팅 (dc1/dc2) 대응
-    console.log(`📡 NextAppURL from callback: ${NextAppURL}`);
     const approvalResult = await nicepayService.requestApproval(
       AuthToken, Amt, ediDate, signData, Moid, actualTID, NextAppURL
     );

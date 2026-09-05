@@ -8,7 +8,6 @@ const router = express.Router();
 router.post('/create-story', async (req, res) => {
   try {
     console.log('📝 새로운 스토리 요청 받음');
-    console.log('폼 데이터:', req.body);
 
     // 스토리 + 이미지 생성
     const result = await generateStoryWithImages(req.body);
