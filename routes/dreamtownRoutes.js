@@ -2307,14 +2307,32 @@ router.get('/stars/:id/logs', async (req, res) => {
   try {
     const { id }  = req.params;
     const limit   = Math.min(parseInt(req.query.limit ?? 20, 10), 50);
-    const { rows } = await db.query(
-      `SELECT id, action_type, message, payload, created_at
-         FROM star_logs
-        WHERE star_id = $1
-        ORDER BY created_at DESC
-        LIMIT $2`,
-      [id, limit]
-    );
+    let rows;
+    try {
+      ({ rows } = await db.query(
+        `SELECT id, action_type, message, payload, created_at
+           FROM star_logs
+          WHERE star_id = $1
+          ORDER BY created_at DESC
+          LIMIT $2`,
+        [id, limit]
+      ));
+    } catch (colErr) {
+      // 42703: message 컬럼 없음 (migration 143 미실행) → NULL 대체
+      if (colErr.code === '42703' && typeof colErr.message === 'string' && colErr.message.includes('column "message" does not exist')) {
+        console.warn('[DT] star_logs.message 컬럼 없음 — migration 143 미실행, NULL 대체');
+        ({ rows } = await db.query(
+          `SELECT id, action_type, NULL AS message, payload, created_at
+             FROM star_logs
+            WHERE star_id = $1
+            ORDER BY created_at DESC
+            LIMIT $2`,
+          [id, limit]
+        ));
+      } else {
+        throw colErr;
+      }
+    }
     const logs = rows.map(r => ({
       id:          r.id,
       action_type: r.action_type,
