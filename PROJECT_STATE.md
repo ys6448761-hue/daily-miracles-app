@@ -181,6 +181,57 @@ Merge State: BLOCKED (failed checks)
 
 ---
 
+## 🔍 PR #28 AIL Gate Investigation — Confirmed
+
+**Failed Workflow:**
+- Workflow: `AIL Gate` (`.github/workflows/ail-gate.yml`)
+- Run ID: 33941348249
+- Job ID: 101239271758
+
+**Failed Step:**
+```
+Step 7: "Check AIL Section in PR Body"
+Location: lines 56-107 of ail-gate.yml
+```
+
+**Exact Failure:**
+```
+❌ AIL Gate 실패
+
+PR 본문에 [AIL] 섹션이 없습니다.
+
+필수 조건:
+1. [AIL] 섹션 또는 ```ail 코드블록 포함
+2. Source ID (Issue # 또는 외부 티켓) 명시
+
+(Translation: PR body is missing required [AIL] section)
+```
+
+**Workflow Requirement:**
+- PR body must contain `[AIL]` section, `AIL:` marker, or ` ```ail ` code block
+- PR body must include a Source ID (Issue number, external ticket, or explicit "Source ID")
+
+**Classification:**
+✅ **CONFIRMED PR GOVERNANCE / METADATA VALIDATION FAILURE**
+
+**Evidence:**
+
+- ✅ Failed step is PR body validation logic (not code execution)
+- ✅ Failure occurs before any security patch code evaluation
+- ✅ All prior steps (checkout, setup-node, install, AIL gate script, docs-check) passed
+- ✅ 3 other AIL Gate runs on the same commit passed successfully
+- ✅ Security patch code unchanged; failure is not code-caused
+- ✅ Failure is governance requirement (documentation metadata), not infrastructure error
+
+**Why 3 Pass / 1 Fails on Same Commit:**
+
+- Temporal gap: 3 successful runs at 01:18-01:50 UTC; failed run at 03:15 UTC (~1.5 hour gap)
+- Hypothesis: PR body was edited between runs (adding/removing [AIL] section) OR GitHub metadata sync race
+- **Confirmed:** This difference remains UNDETERMINED without direct evidence of PR state changes
+- **Not confirmed:** Calling earlier passes "flaky" would mischaracterize a governance rule validation
+
+---
+
 ## 📋 C7A INVESTIGATION STATE — Preserved
 
 **Investigation:** GET /api/dt/stars/:id HTTP 500 error  
@@ -200,9 +251,9 @@ Merge State: BLOCKED (failed checks)
 
 **Single explicit action:**
 
-> Investigate the single failed AIL Gate on PR #28 using existing read-only GitHub evidence, without rerunning checks or changing infrastructure.
+> Update PR #28 body to satisfy the existing AIL Gate requirements, without changing code, merging, or deploying.
 
-**Context:** PR #28 is blocked by check failures: 1 AIL Gate failure (3 passes), 2 Vercel failures (root cause UNDETERMINED). The AIL Gate flaky pattern (1 fail, 3 pass) requires investigation to determine whether it is a transient CI issue or a real code defect blocking this security backport.
+**Context:** AIL Gate failure root cause is CONFIRMED: PR #28 body is missing the required `[AIL]` section. This is a PR governance metadata validation (not a security patch code defect). Resolution: add `[AIL]` section and Source ID to PR #28 body. Vercel failures remain UNDETERMINED. Once AIL Gate passes, evaluate whether Vercel failures block production promotion.
 
 ---
 
