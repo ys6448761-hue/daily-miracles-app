@@ -1122,7 +1122,7 @@ app.use((req, res, next) => {
 
     // HTML 페이지 요청은 새 도메인으로 리다이렉트
     const newUrl = `${NEW_DOMAIN}${req.originalUrl}`;
-    console.log(`🔄 Redirect: ${host}${req.originalUrl} → ${newUrl}`);
+    console.log(`🔄 Redirect: ${host}${req.path} → ${NEW_DOMAIN}${req.path}`);
     return res.redirect(301, newUrl);
   }
 
@@ -1359,16 +1359,11 @@ app.get("/points", (_req, res) => {
 });
 
 // ---------- Request Logging (가시화) ----------
-if (String(process.env.REQUEST_LOG || "1") === "1") {
+// Fail-closed: disabled by default. Enable only with explicit REQUEST_LOG=1
+if (String(process.env.REQUEST_LOG || "0") === "1") {
   app.use((req, _res, next) => {
     const ts = new Date().toISOString();
-    console.log(`[${ts}] ${req.method} ${req.originalUrl}`);
-    if (req.method !== "GET") {
-      try {
-        console.log(`  headers: ${JSON.stringify(req.headers)}`);
-        console.log(`  body   : ${JSON.stringify(req.body)}`);
-      } catch { /* ignore */ }
-    }
+    console.log(`[${ts}] ${req.method} ${req.path}`);
     next();
   });
 }
