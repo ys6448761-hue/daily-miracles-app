@@ -309,6 +309,80 @@ CLASSIFICATION: VERCEL CHECKS ARE NOT REQUIRED MERGE BLOCKERS
 
 ---
 
+## 🚀 PR #28 Production Promotion Decision — GO
+
+**Date:** 2026-09-05  
+**Decision:** ✅ **GO — APPROVED FOR CONTROLLED PRODUCTION PROMOTION**
+
+**Approved Target:**
+- PR: #28
+- Branch: `security/request-logging-backport` → `main`
+- Head SHA: `acd92c74ac1674b345ebe53fe853ad6e81937f62`
+
+**Confirmed Basis:**
+
+**1. Patch Scope:**
+- ✅ Exactly 5 intended files
+- ✅ 7 insertions / 17 deletions
+- ✅ Security logging hardening only
+- ✅ No Storybook/C7A feature code
+- ✅ No DB/schema/migration changes
+- ✅ No package/dependency changes
+- ✅ No environment/config changes
+
+**2. Security Intent:**
+- ✅ REQUEST_LOG fail-closed (default "0")
+- ✅ Full request header/body dumps removed
+- ✅ Credential-bearing logging removed (AuthToken, Signature, NextAppURL, full body)
+- ✅ Pathname-only logging where applicable
+- ✅ Request/payment/redirect behavior unchanged apart from logging
+
+**3. Baseline & Dependencies:**
+- ✅ Semantic backport based directly on Production main: cc577d2c45e5412b80a2a73d50264f960de44a0f
+- ✅ No C7A Storybook dependency
+- ✅ No C7A staging-schema dependency
+- ✅ No hidden migration dependency identified
+
+**4. Required Gates:**
+- ✅ AIL Gate (only required check): SUCCESS (run 91993530793, 04:42:51Z)
+- ✅ Vercel checks: NOT required merge blockers
+- ✅ docker-smoke: Not required, observed SUCCESS
+- ✅ Repository rulesets: None found
+
+**5. Deployment Boundary:**
+- ✅ Render Production (daily-miracles-app): Isolated on main branch
+- ✅ Render C7A staging (daily-miracles-app-1): Remains on staging/storybook-c7a
+- ✅ Vercel failures: Separate preview/integration infrastructure (root cause UNDETERMINED)
+
+**Safety Conditions for Controlled Promotion:**
+
+```
+✅ Merge ONLY PR #28
+✅ No admin bypass or "Merge without waiting"
+✅ AIL Gate must still be SUCCESS immediately before merge
+✅ PR head must still be: acd92c74ac1674b345ebe53fe853ad6e81937f62
+✅ PR scope must still be approved 5-file security-only diff
+✅ No additional commits may have entered the PR
+✅ No C7A branch/schema changes
+```
+
+**Post-Promotion Verification (Do NOT assume merge commit SHA):**
+
+GitHub merge strategy may create a different merge commit. Instead verify:
+- ✅ PR #28 reached MERGED state
+- ✅ Resulting main commit contains approved PR #28 semantic patch
+- ✅ Render Production deploys expected main commit
+- ✅ Production reaches Live/healthy state
+- ✅ One already-known safe public Production runtime request succeeds
+- ✅ REQUEST_LOG remains fail-closed (without reading/exposing secrets)
+- ✅ No sensitive request/header/body credential logging appears
+- ✅ C7A staging branch/service remains unchanged
+
+**Constraints:**
+- Do NOT expose: Authorization, Cookie, AuthToken, Signature, NextAppURL values, DATABASE_URL, service-role keys, signed URL tokens, or other credentials
+
+---
+
 ## 📋 C7A INVESTIGATION STATE — Preserved
 
 **Investigation:** GET /api/dt/stars/:id HTTP 500 error  
@@ -328,9 +402,9 @@ CLASSIFICATION: VERCEL CHECKS ARE NOT REQUIRED MERGE BLOCKERS
 
 **Single explicit action:**
 
-> Perform a final Production promotion decision review for PR #28 using the already-confirmed security backport evidence, branch protection result, and deployment boundary, without merging or deploying.
+> Execute the controlled merge of PR #28 only after re-verifying the approved head SHA, exact 5-file scope, and required AIL Gate SUCCESS; do not perform post-merge actions until the merge result is reported.
 
-**Context:** All branch protection gates are verified CLEAR. Vercel checks are confirmed NOT required merge blockers. Security backport is confirmed SAFE. Deployment mapping is confirmed ACCURATE. Decision point: Does confirmed evidence support promotion of security/request-logging-backport → main to production?
+**Context:** GO decision confirmed. All safety conditions documented. Ready for controlled promotion. Merge must re-verify approved head (acd92c74), exact scope (5 files, 7+/17-), and final AIL Gate SUCCESS before merge button. Post-merge verification separate task.
 
 ---
 
