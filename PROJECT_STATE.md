@@ -383,6 +383,50 @@ GitHub merge strategy may create a different merge commit. Instead verify:
 
 ---
 
+## ✅ PR #28 Controlled Merge — COMPLETED
+
+**Date:** 2026-09-05  
+**Merge Status:** MERGED
+
+**Merge Evidence:**
+- PR #28 state: MERGED
+- MergedAt: 2026-09-05T07:32:16Z
+- MergedBy: ys6448761-hue
+- Merge commit SHA: `14e1ec7a83e57d9e3f815f7f43bafa5f4a738348`
+- origin/main: `14e1ec7a83e57d9e3f815f7f43bafa5f4a738348`
+- Approved head SHA (acd92c74) included: ✅
+
+---
+
+## 🔄 PR #28 Post-Merge Production Verification — HOLD
+
+**Date:** 2026-09-05  
+**Status:** PARTIAL / UNDETERMINED
+
+**Confirmed Verification Results:**
+
+| Result | Status | Evidence |
+|--------|--------|----------|
+| Merge commit deployed to main | ✅ CONFIRMED | origin/main = 14e1ec7a83e57d9e3f815f7f43bafa5f4a738348 |
+| Production endpoint responding | ✅ CONFIRMED | https://app.dailymiracles.kr/health = HTTP 200 OK |
+| Code: REQUEST_LOG fail-closed | ✅ CONFIRMED | Merged server.js line 1358: `REQUEST_LOG \|\| "0"` |
+| Code: Sensitive logging removed | ✅ CONFIRMED | No full body/header/credential dumps in merged code |
+| C7A staging isolated | ✅ CONFIRMED | origin/staging/storybook-c7a = 21d86fbe3f9aecece82195e44b8e6297cdf27e6f |
+
+**Unconfirmed / Awaiting Direct Verification:**
+
+| Item | Status | Reason |
+|------|--------|--------|
+| Render deployed commit SHA | ⏳ UNDETERMINED | Auto-deploy + main SHA is NOT direct Render deployment evidence |
+| Production REQUEST_LOG runtime state | ⏳ UNDETERMINED | Code default "0" does NOT prove Production env has not set REQUEST_LOG=1 |
+| Production log safety | ⏳ UNDETERMINED | Code inspection confirms unsafe code removed, but direct Production log evidence not yet collected |
+
+**Classification: HOLD — PRODUCTION VERIFICATION INCOMPLETE**
+
+**Reason:** Code-level security (fail-closed default, logging statements removed) is verified. Application runtime (endpoint responding 200 OK) is verified. But direct Render deployment evidence (exact deployed commit SHA) and runtime logging state (REQUEST_LOG env value, actual Production logs) have not yet been directly verified.
+
+---
+
 ## 📋 C7A INVESTIGATION STATE — Preserved
 
 **Investigation:** GET /api/dt/stars/:id HTTP 500 error  
@@ -402,9 +446,9 @@ GitHub merge strategy may create a different merge commit. Instead verify:
 
 **Single explicit action:**
 
-> Execute the controlled merge of PR #28 only after re-verifying the approved head SHA, exact 5-file scope, and required AIL Gate SUCCESS; do not perform post-merge actions until the merge result is reported.
+> Using existing read-only Render access only, verify the deployed commit for daily-miracles-app and determine whether REQUEST_LOG is absent/zero and whether recent Production logs show any sensitive request logging, without exposing any secret values.
 
-**Context:** GO decision confirmed. All safety conditions documented. Ready for controlled promotion. Merge must re-verify approved head (acd92c74), exact scope (5 files, 7+/17-), and final AIL Gate SUCCESS before merge button. Post-merge verification separate task.
+**Context:** Code-level security hardening confirmed. Application responding. Awaiting direct Render deployment evidence (deployed commit SHA matches 14e1ec7a83e57d9e3f815f7f43bafa5f4a738348) and runtime logging state verification (REQUEST_LOG env value, Production logs free of sensitive patterns).
 
 ---
 
