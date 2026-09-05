@@ -170,7 +170,7 @@ router.get('/photo/:filename', (req, res) => {
 //         photo_url?, created_lat?, created_lng?, open_at? }
 router.post('/', async (req, res) => {
   try {
-    console.log('[promise] POST body:', JSON.stringify(req.body));
+    console.log('[promise] POST 진입');
     const {
       user_id, location_id, emotion_text,
       message_to_future = null,

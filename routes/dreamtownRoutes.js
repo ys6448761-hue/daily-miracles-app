@@ -183,7 +183,7 @@ const GEM_GALAXY_MAP = {
 // POST /api/dt/wishes — 소원 생성
 // ─────────────────────────────────────────────
 router.post('/wishes', async (req, res) => {
-  console.log('[DT] POST /wishes 진입 | body:', JSON.stringify(req.body));
+  console.log('[DT] POST /wishes 진입');
   try {
     const requestId = generateRequestId();
     const { user_id, wish_text, gem_type, yeosu_theme } = req.body;
@@ -424,7 +424,7 @@ router.post('/wishes/with-star', async (req, res) => {
 // POST /api/dt/stars/create — 별 생성
 // ─────────────────────────────────────────────
 router.post('/stars/create', async (req, res) => {
-  console.log('[DT] POST /stars/create 진입 | body:', JSON.stringify(req.body));
+  console.log('[DT] POST /stars/create 진입');
   try {
     const { wish_id, user_id, phone_number, origin_place } = req.body;
 
