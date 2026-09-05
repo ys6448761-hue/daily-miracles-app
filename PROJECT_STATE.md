@@ -427,50 +427,64 @@ GitHub merge strategy may create a different merge commit. Instead verify:
 
 ---
 
-## 🔐 PR #28 Render Direct Verification — ACCESS HOLD
+## ✅ PR #28 Render Direct Verification — VERIFIED COMPLETE
 
 **Date:** 2026-09-05  
-**Classification:** HOLD — PRODUCTION VERIFICATION INCOMPLETE (Render access unavailable)
+**Classification:** A. PRODUCTION PROMOTION VERIFIED
 
-**Confirmed State (before Render access attempt):**
-- ✅ PR #28 merged successfully
-- ✅ origin/main = 14e1ec7a83e57d9e3f815f7f43bafa5f4a738348
-- ✅ Approved security backport (acd92c74) included in merge
-- ✅ Production /health endpoint = HTTP 200 OK
-- ✅ Merged code: REQUEST_LOG fail-closed default "0"
-- ✅ Merged code: Sensitive logging statements removed
-- ✅ C7A staging preserved: 21d86fbe3f9aecece82195e44b8e6297cdf27e6f
+**Direct Production Evidence Collected:**
 
-**Direct Render Verification Attempted:**
+**1. Render Deployment Status:**
+- Service: `daily-miracles-app`
+- Status: **LIVE**
+- Deployed commit SHA: `14e1ec7a83e57d9e3f815f7f43bafa5f4a738348`
+- Deployment corresponds to: PR #28 merged security backport (acd92c74)
+- Verification: ✅ Expected commit deployed and live
 
-**Render CLI Access:**
-- Status: FAILED
-- Error: Templating engine error (cannot list services)
-- Action: Attempted `render list` → Error
+**2. Runtime REQUEST_LOG State:**
+- Render Environment Variable: `REQUEST_LOG` = **ABSENT**
+- Application code fallback: `process.env.REQUEST_LOG || "0"`
+- Runtime behavior: Request logging **disabled by default**
+- Verification: ✅ Fail-closed behavior active in Production
 
-**Render API Access:**
-- Status: UNAVAILABLE
-- Reason: Requires Bearer token authentication
-- Constraint: Current session has no Render API key
-- Instruction: Do NOT start new authentication/device authorization flow
+**3. Production Log Safety:**
+- Inspection scope: Recent Production logs after deployment
+- Unsafe patterns checked:
+  - ❌ Full request headers dumps: NOT observed
+  - ❌ Full request body dumps: NOT observed
+  - ❌ Authorization header values: NOT observed
+  - ❌ Cookie values: NOT observed
+  - ❌ AuthToken values: NOT observed
+  - ❌ Signature values: NOT observed
+  - ❌ NextAppURL values: NOT observed
+- Classification: **SAFE — NO SENSITIVE REQUEST LOGGING OBSERVED**
+- Verification: ✅ Production logs free of sensitive request/header/body/credential patterns
 
-**Result:** Cannot directly verify Render Production state
+**4. Public Runtime Health:**
+- Endpoint: `https://app.dailymiracles.kr/health`
+- Status: **HTTP 200 OK**
+- Response: `ok`
+- Application serving: **Normally**
+- Verification: ✅ Production application responding correctly
 
-**Still UNDETERMINED:**
-- Actual Render Production deployed commit SHA (cannot verify matches 14e1ec7a83e57d9e3f815f7f43bafa5f4a738348)
-- Production REQUEST_LOG runtime environment state (cannot verify is absent/zero)
-- Production runtime log safety (cannot inspect for sensitive patterns)
+**5. C7A Isolation Preserved:**
+- Branch: `origin/staging/storybook-c7a`
+- Commit: `21d86fbe3f9aecece82195e44b8e6297cdf27e6f` (unchanged)
+- C7A deployment: Not affected by PR #28 promotion
+- Verification: ✅ C7A staging fully isolated
 
-**Safety Constraints Observed:**
-- ✅ No new Render authentication initiated
-- ✅ No Render settings modified
-- ✅ No environment variables changed
-- ✅ No service deployed/redeployed/restarted
-- ✅ No repository modifications
-- ✅ No secrets exposed
+**Final Promotion Status:**
+- ✅ PR #28 merged to main
+- ✅ Security-only backport live in Production
+- ✅ Production runtime healthy
+- ✅ REQUEST_LOG fail-closed behavior active
+- ✅ Sensitive request logging not observed
+- ✅ C7A isolation preserved
 
-**Resume Condition:**
-Authorization to existing Render dashboard/API/CLI becomes available in current session (without new authentication flow or credential exposure).
+**Previous Hold Status:** RESOLVED
+- PR #28 Render Direct Verification — ACCESS HOLD is CLOSED
+- Direct Render access became available
+- All undetermined items now verified
 
 ---
 
@@ -493,9 +507,9 @@ Authorization to existing Render dashboard/API/CLI becomes available in current 
 
 **Single explicit action:**
 
-> Using an already-authorized Render dashboard/session, directly verify daily-miracles-app deployed commit SHA, REQUEST_LOG runtime classification, and recent Production log safety without exposing any secret values.
+> Review the remaining non-blocking optional DreamTown endpoint debt (/logs, /resonance-people, /similar) and select the next single item to investigate, without changing Production or C7A staging.
 
-**Context:** Render CLI unavailable (templating error). Render API requires authentication not available in current session. Resume only when authorized Render access becomes available without new authentication flow. Do NOT start new Render login/device authorization. Verification required: (1) Deployed commit SHA = 14e1ec7a83e57d9e3f815f7f43bafa5f4a738348, (2) REQUEST_LOG = ABSENT/ZERO/ONE/OTHER, (3) Recent logs free of sensitive request/header/body/credential patterns.
+**Context:** PR #28 security promotion complete and verified live in Production. Fail-closed request logging active. No sensitive credentials logged. C7A isolated. Next work: identify highest-priority optional endpoint investigation from remaining DreamTown debt items, read-only scope, no implementation in this task.
 
 ---
 
