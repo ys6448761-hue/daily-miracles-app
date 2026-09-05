@@ -263,6 +263,52 @@ PR #28 body was updated with workflow-compatible AIL metadata:
 
 ---
 
+## ✅ PR #28 Merge Requirement Review — VERIFIED
+
+**PR:** #28  
+**Branch:** `security/request-logging-backport` → `main`
+
+**Date:** 2026-09-05
+
+**Applicable Main Branch Protection:**
+- Required status checks: ENABLED (strict mode)
+- Required check contexts:
+  - `AIL Gate`
+- Enforce admins: false
+- GitHub repository rulesets: None
+
+**Required-Check Classification:**
+
+| Check | Required? | Latest Status | Conclusion |
+|-------|-----------|---|---|
+| **AIL Gate** | **YES** ✅ | SUCCESS (run 91993530793, 04:42:51Z) | **Required gate satisfied** |
+| docker-smoke | NO | SUCCESS (4/4 runs) | Non-required |
+| Vercel Preview Comments | NO | SUCCESS | Non-required |
+| Vercel – daily-miracles-app | **NO** | FAILURE | **Not a required blocker** |
+| Vercel – daily-miracles-app-21z3 | **NO** | FAILURE | **Not a required blocker** |
+
+**Critical Evidence:**
+
+- ✅ Required status checks contexts = `["AIL Gate"]` only
+- ✅ Vercel checks absent from `required_status_checks.contexts`
+- ✅ No GitHub repository rulesets apply to main
+- ✅ Latest required check (AIL Gate) = SUCCESS
+- ✅ PR #28 merge state = MERGEABLE
+
+**Verified Classification:**
+
+```
+CLASSIFICATION: VERCEL CHECKS ARE NOT REQUIRED MERGE BLOCKERS
+```
+
+**Important Boundaries:**
+- ✅ Distinguish: Vercel failed check ≠ required failed check
+- ✅ Vercel root cause remains UNDETERMINED (preview infrastructure)
+- ✅ Vercel previews are separate from Render Production/C7A
+- ✅ No PR deployment has occurred
+
+---
+
 ## 📋 C7A INVESTIGATION STATE — Preserved
 
 **Investigation:** GET /api/dt/stars/:id HTTP 500 error  
@@ -282,9 +328,9 @@ PR #28 body was updated with workflow-compatible AIL metadata:
 
 **Single explicit action:**
 
-> Determine whether the two remaining failed Vercel preview checks are required merge blockers for PR #28 under the current main branch protection/ruleset, using existing read-only GitHub evidence only.
+> Perform a final Production promotion decision review for PR #28 using the already-confirmed security backport evidence, branch protection result, and deployment boundary, without merging or deploying.
 
-**Context:** AIL Gate is now RESOLVED. PR #28 AIL metadata validation passes. Remaining blocker: 2 Vercel preview deployments (root cause UNDETERMINED). Decision required: Do main branch protection rules require Vercel checks to pass before merge? If yes, diagnose Vercel failures. If no, PR #28 is clear for promotion decision.
+**Context:** All branch protection gates are verified CLEAR. Vercel checks are confirmed NOT required merge blockers. Security backport is confirmed SAFE. Deployment mapping is confirmed ACCURATE. Decision point: Does confirmed evidence support promotion of security/request-logging-backport → main to production?
 
 ---
 
