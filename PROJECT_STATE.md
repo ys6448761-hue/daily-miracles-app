@@ -232,6 +232,37 @@ PR 본문에 [AIL] 섹션이 없습니다.
 
 ---
 
+## ✅ PR #28 AIL Gate Resolution — VERIFIED
+
+**PR:** #28  
+**Branch:** `security/request-logging-backport` → `main`
+
+**Resolution Applied:**
+PR #28 body was updated with workflow-compatible AIL metadata:
+- Section header: `## [AIL] Security-Only Production Backport`
+- Source ID: `Production security audit — fail-closed logging hardening`
+
+**Automatic Validation Run (triggered by PR body edit):**
+- Run ID: 91993530793
+- Job ID: 101250116240
+- Head SHA: acd92c74ac1674b345ebe53fe853ad6e81937f62
+- Status: COMPLETED
+- Conclusion: ✅ **SUCCESS**
+- Duration: 32 seconds (2026-09-05 04:42:19Z → 04:42:51Z)
+
+**Confirmed Resolution:**
+- ✅ AIL metadata validation now passes
+- ✅ Previous AIL Gate failure root cause is resolved
+- ✅ No security backport code change was required
+- ✅ Security backport head SHA remained unchanged
+- ✅ AIL Gate is no longer a blocker for PR #28
+
+**Remaining Blockers:**
+- ❌ Vercel failures: 2 (status UNDETERMINED)
+- 🔴 AIL Gate: RESOLVED
+
+---
+
 ## 📋 C7A INVESTIGATION STATE — Preserved
 
 **Investigation:** GET /api/dt/stars/:id HTTP 500 error  
@@ -251,9 +282,9 @@ PR 본문에 [AIL] 섹션이 없습니다.
 
 **Single explicit action:**
 
-> Update PR #28 body to satisfy the existing AIL Gate requirements, without changing code, merging, or deploying.
+> Determine whether the two remaining failed Vercel preview checks are required merge blockers for PR #28 under the current main branch protection/ruleset, using existing read-only GitHub evidence only.
 
-**Context:** AIL Gate failure root cause is CONFIRMED: PR #28 body is missing the required `[AIL]` section. This is a PR governance metadata validation (not a security patch code defect). Resolution: add `[AIL]` section and Source ID to PR #28 body. Vercel failures remain UNDETERMINED. Once AIL Gate passes, evaluate whether Vercel failures block production promotion.
+**Context:** AIL Gate is now RESOLVED. PR #28 AIL metadata validation passes. Remaining blocker: 2 Vercel preview deployments (root cause UNDETERMINED). Decision required: Do main branch protection rules require Vercel checks to pass before merge? If yes, diagnose Vercel failures. If no, PR #28 is clear for promotion decision.
 
 ---
 
