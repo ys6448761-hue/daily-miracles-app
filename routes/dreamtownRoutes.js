@@ -1288,29 +1288,7 @@ router.get('/stars/:id', async (req, res) => {
     });
 
   } catch (err) {
-    res.setHeader('X-DT-Star-Catch', '1');
-    res.setHeader('X-DT-Star-Error-Code', String(err?.code || 'NO_CODE'));
-    if (err?.table) {
-      res.setHeader('X-DT-Star-Error-Table', String(err.table));
-    }
-    if (err?.column) {
-      res.setHeader('X-DT-Star-Error-Column', String(err.column));
-    }
-    if (err?.routine) {
-      res.setHeader('X-DT-Star-Error-Routine', String(err.routine));
-    }
-    console.error('[DT_STAR_DETAIL_CATCH_ENTERED]');
-    const pgDiag = {
-      code: err?.code || 'NO_CODE',
-      message: err?.message || 'unknown error',
-      table: err?.table || null,
-      column: err?.column || null,
-      routine: err?.routine || null,
-    };
-    console.error(
-      '[DT] GET /stars/:id error:',
-      JSON.stringify(pgDiag)
-    );
+    console.error('[DT] GET /stars/:id error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
