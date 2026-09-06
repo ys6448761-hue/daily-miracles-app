@@ -488,6 +488,73 @@ GitHub merge strategy may create a different merge commit. Instead verify:
 
 ---
 
+## 🔧 C7A GET /logs — Strategy-B Hardening Patch Implementation
+
+**Date:** 2026-09-06  
+**Status:** HOLD — Runtime verification inconclusive
+
+**Implementation Summary:**
+
+GET /api/dt/stars/:id/logs endpoint hardened to degrade gracefully when PostgreSQL column `star_logs.message` is absent (migration 143 not applied in C7A staging).
+
+**Strategy-B Approach:**
+- Narrow 42703 error matching: `colErr.code === '42703' && typeof colErr.message === 'string' && colErr.message.includes('column "message" does not exist')`
+- Fallback query: `SELECT id, action_type, NULL AS message, payload, created_at FROM star_logs WHERE star_id = $1 ORDER BY created_at DESC LIMIT $2`
+- Response mapping unchanged: `message: r.message ?? deriveLogMessage(r)` — when message is NULL, deriveLogMessage generates Korean text based on action_type
+- Other 42703 errors (e.g., payload, action_type missing) are rethrown to outer catch
+
+**Patch Details:**
+- File: `routes/dreamtownRoutes.js` (lines 2211-2252)
+- Diff stat: 1 file changed, 26 insertions(+), 8 deletions(-)
+- Commit: `e3bdb87020c87694f7cd37d1c898c2dde11c1463`
+- Branch: `staging/storybook-c7a`
+
+**Push to Remote:**
+- Remote prior: `21d86fbe3f9aecece82195e44b8e6297cdf27e6f`
+- Remote after: `e3bdb87020c87694f7cd37d1c898c2dde11c1463`
+- Deployment: Auto-deploy triggered on Render daily-miracles-app-1
+- Verification: ✅ Commit successfully pushed to origin/staging/storybook-c7a
+
+**Runtime Verification Attempt:**
+- Endpoint: `GET https://daily-miracles-app-1.onrender.com/api/dt/stars/:id/logs`
+- Test query: Executed on C7A staging
+- Response: HTTP 500 `{"error":"Internal server error"}`
+- Root cause: UNDETERMINED (cannot confirm whether 500 is deployment-related or patch-related without direct Render deployment evidence)
+
+**Classification:**
+
+```
+STATUS: HOLD
+REASON: Runtime HTTP 500 observed; direct Render deployment confirmation required
+BLOCKER: Unknown if e3bdb87 is currently LIVE on daily-miracles-app-1
+```
+
+**Pending Verification:**
+
+Direct Render Dashboard check required to:
+1. Confirm whether daily-miracles-app-1 deployed commit `e3bdb87020c87694f7cd37d1c898c2dde11c1463`
+2. Determine deployment status (complete/in-progress/failed)
+3. Distinguish patch-related errors from infrastructure issues
+
+**If Deployed and Live:**
+- Verify GET /logs succeeds with fallback behavior (message: NULL, derived Korean text)
+- Verify response structure unchanged
+- Verify StarDetail.jsx FeedPage render still succeeds with empty logs (existing safety code)
+
+**If Not Deployed:**
+- Investigate Render build/deploy logs
+- Assess whether buildpack/package changes needed
+
+**Code Safety — Pre-Deployment Verification:**
+- ✅ Fallback query is well-formed SQL (no injection risk)
+- ✅ NULL fallback matches existing database schema (known state)
+- ✅ deriveLogMessage is deterministic, requires only action_type (safe mapping)
+- ✅ No new migrations introduced
+- ✅ No Production main branch involvement
+- ✅ Isolated to C7A staging branch
+
+---
+
 ## 📋 C7A INVESTIGATION STATE — Preserved
 
 **Investigation:** GET /api/dt/stars/:id HTTP 500 error  
@@ -505,11 +572,20 @@ GitHub merge strategy may create a different merge commit. Instead verify:
 
 ## 🎯 CURRENT NEXT ACTION
 
-**Single explicit action:**
+**Primary Blocker:**
 
-> Review the remaining non-blocking optional DreamTown endpoint debt (/logs, /resonance-people, /similar) and select the next single item to investigate, without changing Production or C7A staging.
+> Using an authorized Render Dashboard session, verify whether `daily-miracles-app-1` is currently LIVE on commit `e3bdb87020c87694f7cd37d1c898c2dde11c1463` (C7A GET /logs patch).
+>
+> **Then:**
+> - If deployed and live: Diagnose HTTP 500 root cause via Render logs and C7A database state
+> - If not yet deployed: Monitor deployment completion and re-test GET /logs when live
+> - If deployment failed: Investigate build/deploy logs; assess whether buildpack/package changes needed
 
-**Context:** PR #28 security promotion complete and verified live in Production. Fail-closed request logging active. No sensitive credentials logged. C7A isolated. Next work: identify highest-priority optional endpoint investigation from remaining DreamTown debt items, read-only scope, no implementation in this task.
+**Context:** 
+- PR #28 Production security promotion complete and verified live 
+- C7A /logs Strategy-B patch implemented and pushed to origin/staging/storybook-c7a
+- Runtime verification returned HTTP 500; classification: HOLD pending deployment confirmation
+- No Production or C7A staging branch changes until Render verification resolves blocker
 
 ---
 
