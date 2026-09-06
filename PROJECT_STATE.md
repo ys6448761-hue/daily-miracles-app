@@ -515,35 +515,57 @@ GET /api/dt/stars/:id/logs endpoint hardened to degrade gracefully when PostgreS
 - Deployment: Auto-deploy triggered on Render daily-miracles-app-1
 - Verification: ✅ Commit successfully pushed to origin/staging/storybook-c7a
 
-**Runtime Verification Attempt:**
-- Endpoint: `GET https://daily-miracles-app-1.onrender.com/api/dt/stars/:id/logs`
-- Test query: Executed on C7A staging
-- Response: HTTP 500 `{"error":"Internal server error"}`
-- Root cause: UNDETERMINED (cannot confirm whether 500 is deployment-related or patch-related without direct Render deployment evidence)
+**Confirmed Render Deployment:**
+- Service: `daily-miracles-app-1`
+- Branch: `staging/storybook-c7a`
+- LIVE commit: `e3bdb87020c87694f7cd37d1c898c2dde11c1463` ✅ CONFIRMED
+- Status: Live (verified via Render Dashboard)
+
+**Latest Runtime Re-Test (2026-09-06):**
+
+Known C7A star: `fc7154b5-a253-4257-9bf2-37a68d843123`
+
+| Endpoint | HTTP Status | Response | Status |
+|----------|-------------|----------|--------|
+| GET /api/dt/stars/:id/logs | 500 | `{"error":"Internal server error"}` | 🔴 FAILED |
+| GET /api/dt/stars/:id | 200 | Complete star object (wish_emotion: null) | ✅ SUCCESS |
+
+**Key Observation:** Core StarDetail endpoint succeeds; /logs failure is isolated to GET /logs path, not schema-wide.
+
+**Root Cause Status:**
+
+Status: UNDETERMINED
+
+Current evidence does NOT confirm:
+- PostgreSQL 42703 (undefined_column: message)
+- PostgreSQL 42P01 (undefined_table)
+- Fallback condition mismatch
+- Fallback query failure
+- Database connectivity issue
+- Application/runtime error
+
+**Fallback Execution Evidence:**
+
+The server-side fallback warning `[DT] star_logs.message 컬럼 없음 — migration 143 미실행, NULL 대체` does NOT appear in HTTP response body, but this is expected (server logs are not returned in error responses).
+
+Absence from HTTP response is NOT evidence that fallback failed. Only direct Render application logs can establish whether that code path executed.
 
 **Classification:**
 
 ```
-STATUS: HOLD
-REASON: Runtime HTTP 500 observed; direct Render deployment confirmation required
-BLOCKER: Unknown if e3bdb87 is currently LIVE on daily-miracles-app-1
+B. PARTIAL EVIDENCE — C7A /logs ROOT CAUSE NOT YET CONFIRMED
+
+Confirmed:
+✅ LIVE deployment identity (e3bdb87020c87694f7cd37d1c898c2dde11c1463)
+✅ /logs endpoint HTTP 500
+✅ Core StarDetail endpoint HTTP 200
+✅ Current failure isolated to /logs path
+
+Unconfirmed:
+❌ Actual database/runtime error thrown
+❌ Whether narrow fallback condition matched the error
+❌ Whether fallback query executed or failed
 ```
-
-**Pending Verification:**
-
-Direct Render Dashboard check required to:
-1. Confirm whether daily-miracles-app-1 deployed commit `e3bdb87020c87694f7cd37d1c898c2dde11c1463`
-2. Determine deployment status (complete/in-progress/failed)
-3. Distinguish patch-related errors from infrastructure issues
-
-**If Deployed and Live:**
-- Verify GET /logs succeeds with fallback behavior (message: NULL, derived Korean text)
-- Verify response structure unchanged
-- Verify StarDetail.jsx FeedPage render still succeeds with empty logs (existing safety code)
-
-**If Not Deployed:**
-- Investigate Render build/deploy logs
-- Assess whether buildpack/package changes needed
 
 **Code Safety — Pre-Deployment Verification:**
 - ✅ Fallback query is well-formed SQL (no injection risk)
@@ -572,20 +594,25 @@ Direct Render Dashboard check required to:
 
 ## 🎯 CURRENT NEXT ACTION
 
-**Primary Blocker:**
+**Single explicit action:**
 
-> Using an authorized Render Dashboard session, verify whether `daily-miracles-app-1` is currently LIVE on commit `e3bdb87020c87694f7cd37d1c898c2dde11c1463` (C7A GET /logs patch).
+> Using the already-authorized Render Dashboard, inspect the application logs for daily-miracles-app-1 and capture only the safe runtime error evidence for a recently reproduced GET /logs request.
 >
-> **Then:**
-> - If deployed and live: Diagnose HTTP 500 root cause via Render logs and C7A database state
-> - If not yet deployed: Monitor deployment completion and re-test GET /logs when live
-> - If deployment failed: Investigate build/deploy logs; assess whether buildpack/package changes needed
+> Return only:
+> - Error class/type
+> - PostgreSQL error code if present (e.g., 42703, 42P01)
+> - Missing relation/column name if applicable
+> - Safe server error message (no credentials, headers, tokens, connection strings)
+> - Timestamp/request correlation if non-sensitive
 
-**Context:** 
-- PR #28 Production security promotion complete and verified live 
-- C7A /logs Strategy-B patch implemented and pushed to origin/staging/storybook-c7a
-- Runtime verification returned HTTP 500; classification: HOLD pending deployment confirmation
-- No Production or C7A staging branch changes until Render verification resolves blocker
+**Do NOT perform this log inspection in PROJECT_STATE.md documentation tasks.** Execute separately, then update PROJECT_STATE.md with findings.
+
+**Context:**
+- PR #28 Production security promotion complete and verified live in Production
+- C7A /logs Strategy-B patch deployed and LIVE on commit e3bdb87 (Render Dashboard verified)
+- Core StarDetail succeeds; /logs isolated HTTP 500 observed
+- Root cause UNDETERMINED pending direct Render application logs
+- No Production or C7A staging branch changes; read-only diagnostics only
 
 ---
 
