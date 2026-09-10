@@ -23,22 +23,24 @@ let EMOTION_TEXT_MAP   = {};
 try { ({ generateStarImage, generateShareImage, EMOTION_TEXT_MAP } = require('../services/imageGenerationService')); } catch (_) {}
 
 // ── star_reflections 테이블 자동 생성 (migration 136 미실행 환경 안전망) ──
-;(async () => {
-  try {
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS star_reflections (
-        id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-        star_id    UUID        NOT NULL,
-        status     VARCHAR(20) NOT NULL CHECK (status IN ('closer', 'same', 'changed')),
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      )
-    `);
-    await db.query(`CREATE INDEX IF NOT EXISTS idx_star_reflections_star_id ON star_reflections (star_id)`);
-    console.log('[star-mvp] star_reflections 테이블 확인/생성 완료');
-  } catch (e) {
-    console.warn('[star-mvp] star_reflections 테이블 초기화 실패 (SQLite 환경 무시):', e.message);
-  }
-})();
+if (process.env.APP_MODE !== 'storybook') {
+  ;(async () => {
+    try {
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS star_reflections (
+          id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+          star_id    UUID        NOT NULL,
+          status     VARCHAR(20) NOT NULL CHECK (status IN ('closer', 'same', 'changed')),
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `);
+      await db.query(`CREATE INDEX IF NOT EXISTS idx_star_reflections_star_id ON star_reflections (star_id)`);
+      console.log('[star-mvp] star_reflections 테이블 확인/생성 완료');
+    } catch (e) {
+      console.warn('[star-mvp] star_reflections 테이블 초기화 실패 (SQLite 환경 무시):', e.message);
+    }
+  })();
+}
 
 // ── Journey + Moment 자동 생성 (별 생성 시 fire-and-forget) ───────
 // "기존 image 생성 코드를 moment로 감싼다" — Star → Journey → Moment

@@ -251,23 +251,25 @@ async function copyPregenToPostcards(sourceRelPath) {
 }
 
 // ── DB 테이블 자동 생성 ────────────────────────────────────────────
-;(async () => {
-  try {
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS star_image_cache (
-        cache_key  TEXT        PRIMARY KEY,
-        image_url  TEXT        NOT NULL,
-        emotion    TEXT,
-        gem        TEXT,
-        location   TEXT,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      )
-    `);
-    console.log('[star-image] star_image_cache 테이블 확인/생성 완료');
-  } catch (e) {
-    console.warn('[star-image] 테이블 초기화 실패 (무시):', e.message);
-  }
-})();
+if (process.env.APP_MODE !== 'storybook') {
+  ;(async () => {
+    try {
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS star_image_cache (
+          cache_key  TEXT        PRIMARY KEY,
+          image_url  TEXT        NOT NULL,
+          emotion    TEXT,
+          gem        TEXT,
+          location   TEXT,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `);
+      console.log('[star-image] star_image_cache 테이블 확인/생성 완료');
+    } catch (e) {
+      console.warn('[star-image] 테이블 초기화 실패 (무시):', e.message);
+    }
+  })();
+}
 
 // ── gpt-image-1 생성 ──────────────────────────────────────────────
 async function generateWithGptImage1(prompt) {
