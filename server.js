@@ -3070,11 +3070,15 @@ if (starsRoutes) {
 }
 
 let logsRoutes = null;
-try {
-  logsRoutes = require('./routes/logsRoutes');
-} catch (e) {
-  console.warn('⚠️ logsRoutes 로드 실패:', e.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    logsRoutes = require('./routes/logsRoutes');
+  } catch (e) {
+    console.warn('⚠️ logsRoutes 로드 실패:', e.message);
+  }
 }
+
 if (logsRoutes) {
   app.use('/api/logs', logsRoutes);
   console.log('✅ 로그 라우터 등록 완료 (/api/logs)');
@@ -3082,11 +3086,15 @@ if (logsRoutes) {
 
 // ---------- 약속 기록 (/api/promise) ----------
 let promiseRoutes = null;
-try {
-  promiseRoutes = require('./routes/promiseRoutes');
-} catch (e) {
-  console.warn('⚠️ promiseRoutes 로드 실패:', e.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    promiseRoutes = require('./routes/promiseRoutes');
+  } catch (e) {
+    console.warn('⚠️ promiseRoutes 로드 실패:', e.message);
+  }
 }
+
 if (promiseRoutes) {
   app.use('/api/promise', promiseRoutes);
   console.log('✅ 약속 기록 라우터 등록 완료 (/api/promise)');
@@ -3094,11 +3102,15 @@ if (promiseRoutes) {
 
 // ---------- 케이블카 캐빈 QR 진입 엔진 (/api/cablecar) ----------
 let cablecarRoutes = null;
-try {
-  cablecarRoutes = require('./routes/cablecarRoutes');
-} catch (e) {
-  console.warn('⚠️ cablecarRoutes 로드 실패:', e.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    cablecarRoutes = require('./routes/cablecarRoutes');
+  } catch (e) {
+    console.warn('⚠️ cablecarRoutes 로드 실패:', e.message);
+  }
 }
+
 if (cablecarRoutes) {
   app.use('/api/cablecar', cablecarRoutes);
   console.log('✅ 케이블카 라우터 등록 완료 (/api/cablecar)');
@@ -3106,11 +3118,15 @@ if (cablecarRoutes) {
 
 // ---------- Travel Click 로그 (/api/travel) ----------
 let travelClickRoutes = null;
-try {
-  travelClickRoutes = require('./routes/travelClickRoutes');
-} catch (e) {
-  console.warn('⚠️ travelClickRoutes 로드 실패:', e.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    travelClickRoutes = require('./routes/travelClickRoutes');
+  } catch (e) {
+    console.warn('⚠️ travelClickRoutes 로드 실패:', e.message);
+  }
 }
+
 if (travelClickRoutes) {
   app.use('/api/travel', travelClickRoutes);
   console.log('✅ Travel Click 라우터 등록 완료 (/api/travel)');
@@ -3124,11 +3140,15 @@ if (travelGuideRoutes) {
 
 // ---------- Star MVP (/api/star) ----------
 let starMvpRoutes = null;
-try {
-  starMvpRoutes = require('./routes/starMvpRoutes');
-} catch (e) {
-  console.warn('⚠️ starMvpRoutes 로드 실패:', e.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    starMvpRoutes = require('./routes/starMvpRoutes');
+  } catch (e) {
+    console.warn('⚠️ starMvpRoutes 로드 실패:', e.message);
+  }
 }
+
 if (starMvpRoutes) {
   app.use('/api/star', starMvpRoutes);
   console.log('✅ Star MVP 라우터 등록 완료 (/api/star)');
@@ -3136,11 +3156,15 @@ if (starMvpRoutes) {
 
 // ---------- Share Image Generation (/api/generate-share-image) ----------
 let shareImageRoutes = null;
-try {
-  shareImageRoutes = require('./routes/shareImageRoutes');
-} catch (e) {
-  console.warn('⚠️ shareImageRoutes 로드 실패:', e.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    shareImageRoutes = require('./routes/shareImageRoutes');
+  } catch (e) {
+    console.warn('⚠️ shareImageRoutes 로드 실패:', e.message);
+  }
 }
+
 if (shareImageRoutes) {
   app.use('/api', shareImageRoutes);
   console.log('✅ Share Image 라우터 등록 완료 (/api/generate-share-image)');
@@ -3148,11 +3172,15 @@ if (shareImageRoutes) {
 
 // ---------- Seed Library (/api/seeds) ----------
 let seedRoutes = null;
-try {
-  seedRoutes = require('./routes/seedRoutes');
-} catch (e) {
-  console.warn('⚠️ seedRoutes 로드 실패:', e.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    seedRoutes = require('./routes/seedRoutes');
+  } catch (e) {
+    console.warn('⚠️ seedRoutes 로드 실패:', e.message);
+  }
 }
+
 if (seedRoutes) {
   app.use('/api/seeds', seedRoutes);
   console.log('✅ Seed Library 라우터 등록 완료 (/api/seeds)');
@@ -3160,22 +3188,30 @@ if (seedRoutes) {
 
 // ---------- Star Journey + Moment (/api/star/journeys, /api/moments) ----------
 let starJourneyRoutes = null;
-try {
-  starJourneyRoutes = require('./routes/starJourneyRoutes');
-} catch (e) {
-  console.warn('⚠️ starJourneyRoutes 로드 실패:', e.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    starJourneyRoutes = require('./routes/starJourneyRoutes');
+  } catch (e) {
+    console.warn('⚠️ starJourneyRoutes 로드 실패:', e.message);
+  }
 }
+
 if (starJourneyRoutes) {
   app.use('/api/star/journeys', starJourneyRoutes);
   console.log('✅ Star Journey 라우터 등록 완료 (/api/star/journeys)');
 }
 
 let momentRoutes = null;
-try {
-  momentRoutes = require('./routes/momentRoutes');
-} catch (e) {
-  console.warn('⚠️ momentRoutes 로드 실패:', e.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    momentRoutes = require('./routes/momentRoutes');
+  } catch (e) {
+    console.warn('⚠️ momentRoutes 로드 실패:', e.message);
+  }
 }
+
 if (momentRoutes) {
   app.use('/api/moments', momentRoutes);
   console.log('✅ Moment 라우터 등록 완료 (/api/moments)');
@@ -3183,11 +3219,15 @@ if (momentRoutes) {
 
 // ---------- Star Voyage (/api/star-voyage) ----------
 let starVoyageRoutes = null;
-try {
-  starVoyageRoutes = require('./routes/starVoyageRoutes');
-} catch (e) {
-  console.warn('⚠️ starVoyageRoutes 로드 실패:', e.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    starVoyageRoutes = require('./routes/starVoyageRoutes');
+  } catch (e) {
+    console.warn('⚠️ starVoyageRoutes 로드 실패:', e.message);
+  }
 }
+
 if (starVoyageRoutes) {
   app.use('/api/star-voyage', starVoyageRoutes);
   console.log('✅ Star Voyage 라우터 등록 완료 (/api/star-voyage)');
@@ -3195,12 +3235,16 @@ if (starVoyageRoutes) {
 
 // ---------- Star Image Cache (/api/star-image) ----------
 let starImageRoutes = null;
-try {
-  starImageRoutes = require('./routes/starImageRoutes');
-  console.log('✅ Star Image 라우터 로드 성공');
-} catch (e) {
-  console.warn('⚠️ starImageRoutes 로드 실패:', e.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    starImageRoutes = require('./routes/starImageRoutes');
+    console.log('✅ Star Image 라우터 로드 성공');
+  } catch (e) {
+    console.warn('⚠️ starImageRoutes 로드 실패:', e.message);
+  }
 }
+
 if (starImageRoutes) {
   app.use('/api/star-image', starImageRoutes);
   console.log('✅ Star Image 라우터 등록 완료 (/api/star-image)');
@@ -3212,11 +3256,15 @@ if (starImageRoutes) {
 // Identity: Does not use canonical dt_user_id
 // Status: Partially deprecated but still required for public feed & constellation endpoints
 let starPublicRoutes = null;
-try {
-  starPublicRoutes = require('./routes/starPublicRoutes');
-} catch (e) {
-  console.warn('⚠️ [LEGACY] starPublicRoutes 로드 실패:', e.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    starPublicRoutes = require('./routes/starPublicRoutes');
+  } catch (e) {
+    console.warn('⚠️ [LEGACY] starPublicRoutes 로드 실패:', e.message);
+  }
 }
+
 if (starPublicRoutes) {
   app.use('/api/stars', starPublicRoutes);
   console.log('✅ [LEGACY] Star Public 라우터 등록 완료 (/api/stars - galaxies, constellations, resonance, feed)');
@@ -3224,11 +3272,15 @@ if (starPublicRoutes) {
 
 // ---------- 여수 미션 + 포인트 (/api/yeosu-missions) ----------
 let yeosuMissionRoutes = null;
-try {
-  yeosuMissionRoutes = require('./routes/yeosuMissionRoutes');
-} catch (e) {
-  console.warn('⚠️ yeosuMissionRoutes 로드 실패:', e.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    yeosuMissionRoutes = require('./routes/yeosuMissionRoutes');
+  } catch (e) {
+    console.warn('⚠️ yeosuMissionRoutes 로드 실패:', e.message);
+  }
 }
+
 if (yeosuMissionRoutes) {
   app.use('/api/yeosu-missions', yeosuMissionRoutes);
   console.log('✅ 여수 미션 라우터 등록 완료 (/api/yeosu-missions)');
@@ -3236,11 +3288,15 @@ if (yeosuMissionRoutes) {
 
 // ---------- 파트너 어드민 인증 Routes (/api/partner) ----------
 let partnerAuthRoutes = null;
-try {
-  partnerAuthRoutes = require('./routes/partnerAuthRoutes');
-} catch (e) {
-  console.warn('⚠️ partnerAuthRoutes 로드 실패:', e.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    partnerAuthRoutes = require('./routes/partnerAuthRoutes');
+  } catch (e) {
+    console.warn('⚠️ partnerAuthRoutes 로드 실패:', e.message);
+  }
 }
+
 if (partnerAuthRoutes) {
   app.use('/api/partner', partnerAuthRoutes);
   console.log('✅ 파트너 어드민 라우터 등록 완료 (/api/partner)');
@@ -3248,11 +3304,15 @@ if (partnerAuthRoutes) {
 
 // ---------- 파트너 주문·정산 Routes (/api/partner) ----------
 let partnerOrderRoutes = null;
-try {
-  partnerOrderRoutes = require('./routes/partnerOrderRoutes');
-} catch (e) {
-  console.warn('⚠️ partnerOrderRoutes 로드 실패:', e.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    partnerOrderRoutes = require('./routes/partnerOrderRoutes');
+  } catch (e) {
+    console.warn('⚠️ partnerOrderRoutes 로드 실패:', e.message);
+  }
 }
+
 if (partnerOrderRoutes) {
   app.use('/api/partner', partnerOrderRoutes);
   console.log('✅ 파트너 주문·정산 라우터 등록 완료 (/api/partner/orders, /api/partner/settlement)');
@@ -3260,11 +3320,15 @@ if (partnerOrderRoutes) {
 
 // ---------- 파트너 구독 Routes (/api/partner) ----------
 let partnerSubscriptionRoutes = null;
-try {
-  partnerSubscriptionRoutes = require('./routes/partnerSubscriptionRoutes');
-} catch (e) {
-  console.warn('⚠️ partnerSubscriptionRoutes 로드 실패:', e.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    partnerSubscriptionRoutes = require('./routes/partnerSubscriptionRoutes');
+  } catch (e) {
+    console.warn('⚠️ partnerSubscriptionRoutes 로드 실패:', e.message);
+  }
 }
+
 if (partnerSubscriptionRoutes) {
   app.use('/api/partner', partnerSubscriptionRoutes);
   console.log('✅ 파트너 구독 라우터 등록 완료 (/api/partner/subscription)');
@@ -3272,11 +3336,15 @@ if (partnerSubscriptionRoutes) {
 
 // ---------- 파트너 셀프 온보딩 (신청 + 심사) ----------
 let partnerApplyRoutes = null;
-try {
-  partnerApplyRoutes = require('./routes/partnerApplyRoutes');
-} catch (e) {
-  console.warn('⚠️ partnerApplyRoutes 로드 실패:', e.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    partnerApplyRoutes = require('./routes/partnerApplyRoutes');
+  } catch (e) {
+    console.warn('⚠️ partnerApplyRoutes 로드 실패:', e.message);
+  }
 }
+
 if (partnerApplyRoutes) {
   app.use('/api/partner', partnerApplyRoutes);
   console.log('✅ 파트너 신청 라우터 등록 완료 (/api/partner/apply)');
@@ -3284,11 +3352,15 @@ if (partnerApplyRoutes) {
 
 // ---------- 특산품 쇼핑 Routes (/api/shop) ----------
 let shopRoutes = null;
-try {
-  shopRoutes = require('./routes/shopRoutes');
-} catch (e) {
-  console.warn('⚠️ shopRoutes 로드 실패:', e.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    shopRoutes = require('./routes/shopRoutes');
+  } catch (e) {
+    console.warn('⚠️ shopRoutes 로드 실패:', e.message);
+  }
 }
+
 if (shopRoutes) {
   app.use('/api/shop', shopRoutes);
   console.log('✅ 특산품 쇼핑 라우터 등록 완료 (/api/shop)');
