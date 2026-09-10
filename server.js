@@ -310,58 +310,61 @@ app.use(require('./middleware/gateMiddleware'));
 
 // 메트릭스 서비스 로딩
 let metricsService = null;
-try {
-  metricsService = require("./services/metricsService");
-  console.log("✅ 메트릭스 서비스 로드 성공");
-} catch (error) {
-  console.warn("⚠️ 메트릭스 서비스 로드 실패:", error.message);
-}
-
-// Ops Agent 서비스 로딩
 let opsAgentService = null;
-try {
-  opsAgentService = require("./services/opsAgentService");
-  console.log("✅ Ops Agent 서비스 로드 성공");
-} catch (error) {
-  console.warn("⚠️ Ops Agent 서비스 로드 실패:", error.message);
-}
-
-// Admin 인증 미들웨어 로딩
 let verifyAdmin = null;
-try {
-  const authMiddleware = require("./aurora5/middleware/auth");
-  verifyAdmin = authMiddleware.verifyAdmin;
-  console.log("✅ Admin 인증 미들웨어 로드 성공");
-} catch (error) {
-  console.warn("⚠️ Admin 인증 미들웨어 로드 실패:", error.message);
-  // Fallback: 기본 검증 함수
-  verifyAdmin = (req, res, next) => {
-    const adminKey = req.headers['x-admin-key'] || req.query.key;
-    const expectedKey = process.env.ADMIN_API_KEY;
-
-    if (expectedKey && adminKey !== expectedKey) {
-      return res.status(401).json({ success: false, error: 'Admin authentication required' });
-    }
-    next();
-  };
-}
-
-// Airtable 서비스 로딩
 let airtableService = null;
-try {
-  airtableService = require("./services/airtableService");
-  console.log("✅ Airtable 서비스 로드 성공");
-} catch (error) {
-  console.warn("⚠️ Airtable 서비스 로드 실패:", error.message);
-}
-
-// Slack Bot 서비스 로딩
 let slackBotService = null;
-try {
-  slackBotService = require("./services/slackBotService");
-  console.log("✅ Slack Bot 서비스 로드 성공");
-} catch (error) {
-  console.warn("⚠️ Slack Bot 서비스 로드 실패:", error.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    metricsService = require("./services/metricsService");
+    console.log("✅ 메트릭스 서비스 로드 성공");
+  } catch (error) {
+    console.warn("⚠️ 메트릭스 서비스 로드 실패:", error.message);
+  }
+
+  // Ops Agent 서비스 로딩
+  try {
+    opsAgentService = require("./services/opsAgentService");
+    console.log("✅ Ops Agent 서비스 로드 성공");
+  } catch (error) {
+    console.warn("⚠️ Ops Agent 서비스 로드 실패:", error.message);
+  }
+
+  // Admin 인증 미들웨어 로딩
+  try {
+    const authMiddleware = require("./aurora5/middleware/auth");
+    verifyAdmin = authMiddleware.verifyAdmin;
+    console.log("✅ Admin 인증 미들웨어 로드 성공");
+  } catch (error) {
+    console.warn("⚠️ Admin 인증 미들웨어 로드 실패:", error.message);
+    // Fallback: 기본 검증 함수
+    verifyAdmin = (req, res, next) => {
+      const adminKey = req.headers['x-admin-key'] || req.query.key;
+      const expectedKey = process.env.ADMIN_API_KEY;
+
+      if (expectedKey && adminKey !== expectedKey) {
+        return res.status(401).json({ success: false, error: 'Admin authentication required' });
+      }
+      next();
+    };
+  }
+
+  // Airtable 서비스 로딩
+  try {
+    airtableService = require("./services/airtableService");
+    console.log("✅ Airtable 서비스 로드 성공");
+  } catch (error) {
+    console.warn("⚠️ Airtable 서비스 로드 실패:", error.message);
+  }
+
+  // Slack Bot 서비스 로딩
+  try {
+    slackBotService = require("./services/slackBotService");
+    console.log("✅ Slack Bot 서비스 로드 성공");
+  } catch (error) {
+    console.warn("⚠️ Slack Bot 서비스 로드 실패:", error.message);
+  }
 }
 
 // Slack Heartbeat 서비스 로딩 (운영 헬스 모니터링)
@@ -390,16 +393,19 @@ if (slackHeartbeatService) {
 
 // 8-Mode SSOT Registry (P1-SSOT — modes.registry.json)
 let modesLoader = null;
-try {
-  modesLoader = require("./config/modesLoader");
-  const { modes, errors } = modesLoader.loadRegistry({ failFast: IS_PRODUCTION });
-  if (errors.length > 0) {
-    console.warn("⚠️ Mode Registry 검증 경고:", errors.join('; '));
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    modesLoader = require("./config/modesLoader");
+    const { modes, errors } = modesLoader.loadRegistry({ failFast: IS_PRODUCTION });
+    if (errors.length > 0) {
+      console.warn("⚠️ Mode Registry 검증 경고:", errors.join('; '));
+    }
+    console.log(`✅ Mode Registry 로드 성공 (${modes.length}개 모드)`);
+  } catch (error) {
+    console.error("❌ Mode Registry 로드 실패:", error.message);
+    if (IS_PRODUCTION) process.exit(1);
   }
-  console.log(`✅ Mode Registry 로드 성공 (${modes.length}개 모드)`);
-} catch (error) {
-  console.error("❌ Mode Registry 로드 실패:", error.message);
-  if (IS_PRODUCTION) process.exit(1);
 }
 
 // 빌드 정보 (디버깅용)
@@ -410,174 +416,182 @@ const BUILD_INFO = {
   version: 'v3.1-metrics'
 };
 
-// 인증 라우터 로딩
+// FULL_ONLY Routes Block (Storybook skips these)
 let authRoutes = null;
-try {
-  authRoutes = require("./routes/authRoutes");
-  console.log("✅ 인증 라우터 로드 성공");
-} catch (error) {
-  console.error("❌ 인증 라우터 로드 실패:", error.message);
-}
-
-// 여수 라우터 로딩 (에러 처리)
 let yeosuRoutes = null;
-try {
-  yeosuRoutes = require("./routes/yeosuRoutes");
-  console.log("✅ 여수 라우터 로드 성공");
-} catch (error) {
-  console.error("❌ 여수 라우터 로드 실패:", error.message);
-}
-// 소원항해 라우터 로딩
 let wishVoyageRoutes = null;
-try {
-  wishVoyageRoutes = require("./routes/wishVoyageRoutes");
-  console.log("✅ 소원항해 라우터 로드 성공");
-} catch (error) {
-  console.error("❌ 소원항해 라우터 로드 실패:", error.message);
-}
-// 문제 해결 라우터 로딩
 let problemRoutes = null;
-try {
-  problemRoutes = require("./routes/problemRoutes");
-  console.log("✅ 문제 해결 라우터 로드 성공");
-} catch (error) {
-  console.error("❌ 문제 해결 라우터 로드 실패:", error.message);
+
+if (!IS_STORYBOOK_MODE) {
+  // 인증 라우터 로딩
+  try {
+    authRoutes = require("./routes/authRoutes");
+    console.log("✅ 인증 라우터 로드 성공");
+  } catch (error) {
+    console.error("❌ 인증 라우터 로드 실패:", error.message);
+  }
+
+  // 여수 라우터 로딩 (에러 처리)
+  try {
+    yeosuRoutes = require("./routes/yeosuRoutes");
+    console.log("✅ 여수 라우터 로드 성공");
+  } catch (error) {
+    console.error("❌ 여수 라우터 로드 실패:", error.message);
+  }
+  // 소원항해 라우터 로딩
+  try {
+    wishVoyageRoutes = require("./routes/wishVoyageRoutes");
+    console.log("✅ 소원항해 라우터 로드 성공");
+  } catch (error) {
+    console.error("❌ 소원항해 라우터 로드 실패:", error.message);
+  }
+  // 문제 해결 라우터 로딩
+  try {
+    problemRoutes = require("./routes/problemRoutes");
+    console.log("✅ 문제 해결 라우터 로드 성공");
+  } catch (error) {
+    console.error("❌ 문제 해결 라우터 로드 실패:", error.message);
+  }
 }
 
-// MVP 1차 폼 (간편 접수) 라우터 로딩
+// FULL_ONLY Routes (Batch 2) — Storybook skips these
 let inquiryRoutes = null;
-try {
-  inquiryRoutes = require("./routes/inquiryRoutes");
-  console.log("✅ 간편 접수 라우터 로드 성공");
-} catch (error) {
-  console.error("❌ 간편 접수 라우터 로드 실패:", error.message);
-}
-
-// 소원실현 폼 라우터 로딩
 let wishRoutes = null;
-try {
-  wishRoutes = require("./routes/wishRoutes");
-  console.log("✅ 소원실현 라우터 로드 성공");
-} catch (error) {
-  console.error("❌ 소원실현 라우터 로드 실패:", error.message);
-  console.error("❌ 스택 트레이스:", error.stack);
-}
-
-// Wish Intake 7문항 라우터 로딩 (P0-02)
 let wishIntakeRoutes = null;
-try {
-  wishIntakeRoutes = require("./routes/wishIntakeRoutes");
-  console.log("✅ Wish Intake 라우터 로드 성공");
-} catch (error) {
-  console.error("❌ Wish Intake 라우터 로드 실패:", error.message);
-}
-
-// 소원그림 생성 라우터 로딩
 let wishImageRoutes = null;
-try {
-  wishImageRoutes = require("./routes/wishImageRoutes");
-  console.log("✅ 소원그림 라우터 로드 성공");
-} catch (error) {
-  console.error("❌ 소원그림 라우터 로드 실패:", error.message);
-}
-
-// 성장필름 챌린지 라우터 로딩 (AIL-105-P0)
 let challengeRoutes = null;
-try {
-  challengeRoutes = require('./routes/challengeRoutes');
-  console.log('✅ 성장필름 챌린지 라우터 로드 성공');
-} catch (error) {
-  console.error('❌ 성장필름 챌린지 라우터 로드 실패:', error.message);
-}
-
-// 입항 증명서 라우터 로딩
 let certificateRoutes = null;
-try {
-  certificateRoutes = require("./routes/certificateRoutes");
-  console.log("✅ 입항 증명서 라우터 로드 성공");
-} catch (error) {
-  console.error("❌ 입항 증명서 라우터 로드 실패:", error.message);
-}
-
-// 메시지 발송 진단 라우터 로딩
 let notifyRoutes = null;
-try {
-  notifyRoutes = require("./routes/notifyRoutes");
-  console.log("✅ 메시지 진단 라우터 로드 성공");
-} catch (error) {
-  console.error("❌ 메시지 진단 라우터 로드 실패:", error.message);
-}
-
-// Aurora5 자동화 엔진 라우터 로딩
 let aurora5Routes = null;
-try {
-  aurora5Routes = require("./aurora5/routes/aurora5Routes");
-  console.log("✅ Aurora5 라우터 로드 성공");
-} catch (error) {
-  console.error("❌ Aurora5 라우터 로드 실패:", error.message);
-}
-
-// 토론 자동화 라우터 로딩
 let debateRoutes = null;
-try {
-  debateRoutes = require("./routes/debateRoutes");
-  console.log("✅ 토론 자동화 라우터 로드 성공");
-} catch (error) {
-  console.error("❌ 토론 자동화 라우터 로드 실패:", error.message);
-}
-
-// 웹훅 라우터 로딩
 let webhookRoutes = null;
-try {
-  webhookRoutes = require("./routes/webhookRoutes");
-  console.log("✅ 웹훅 라우터 로드 성공");
-} catch (error) {
-  console.error("❌ 웹훅 라우터 로드 실패:", error.message);
-}
-
-// 여정 파이프라인 라우터 로딩
 let journeyRoutes = null;
-try {
-  journeyRoutes = require("./routes/journeyRoutes");
-  console.log("✅ 여정 파이프라인 라우터 로드 성공");
-} catch (error) {
-  console.error("❌ 여정 파이프라인 라우터 로드 실패:", error.message);
-}
-
-// 여수 Travel Guide 라우터 로딩
 let travelGuideRoutes = null;
-try {
-  travelGuideRoutes = require("./routes/travelGuideRoutes");
-  console.log("✅ Travel Guide 라우터 로드 성공");
-} catch (error) {
-  console.error("❌ Travel Guide 라우터 로드 실패:", error.message);
-}
-
-// Aurora 5 에이전트 라우터 로딩
 let agentRoutes = null;
-try {
-  agentRoutes = require("./routes/agentRoutes");
-  console.log("✅ Aurora 5 에이전트 라우터 로드 성공");
-} catch (error) {
-  console.error("❌ Aurora 5 에이전트 라우터 로드 실패:", error.message);
-}
-
-// 배치 처리 라우터 로딩
 let batchRoutes = null;
-try {
-  batchRoutes = require("./routes/batchRoutes");
-  console.log("✅ 배치 처리 라우터 로드 성공");
-} catch (error) {
-  console.error("❌ 배치 처리 라우터 로드 실패:", error.message);
-}
-
-// Shorts 자동 생성 라우터 로딩
 let shortsRoutes = null;
-try {
-  shortsRoutes = require("./routes/shortsRoutes");
-  console.log("✅ Shorts 라우터 로드 성공");
-} catch (error) {
-  console.error("❌ Shorts 라우터 로드 실패:", error.message);
+
+if (!IS_STORYBOOK_MODE) {
+  // MVP 1차 폼 (간편 접수) 라우터 로딩
+  try {
+    inquiryRoutes = require("./routes/inquiryRoutes");
+    console.log("✅ 간편 접수 라우터 로드 성공");
+  } catch (error) {
+    console.error("❌ 간편 접수 라우터 로드 실패:", error.message);
+  }
+
+  // 소원실현 폼 라우터 로딩
+  try {
+    wishRoutes = require("./routes/wishRoutes");
+    console.log("✅ 소원실현 라우터 로드 성공");
+  } catch (error) {
+    console.error("❌ 소원실현 라우터 로드 실패:", error.message);
+    console.error("❌ 스택 트레이스:", error.stack);
+  }
+
+  // Wish Intake 7문항 라우터 로딩 (P0-02)
+  try {
+    wishIntakeRoutes = require("./routes/wishIntakeRoutes");
+    console.log("✅ Wish Intake 라우터 로드 성공");
+  } catch (error) {
+    console.error("❌ Wish Intake 라우터 로드 실패:", error.message);
+  }
+
+  // 소원그림 생성 라우터 로딩
+  try {
+    wishImageRoutes = require("./routes/wishImageRoutes");
+    console.log("✅ 소원그림 라우터 로드 성공");
+  } catch (error) {
+    console.error("❌ 소원그림 라우터 로드 실패:", error.message);
+  }
+
+  // 성장필름 챌린지 라우터 로딩 (AIL-105-P0)
+  try {
+    challengeRoutes = require('./routes/challengeRoutes');
+    console.log('✅ 성장필름 챌린지 라우터 로드 성공');
+  } catch (error) {
+    console.error('❌ 성장필름 챌린지 라우터 로드 실패:', error.message);
+  }
+
+  // 입항 증명서 라우터 로딩
+  try {
+    certificateRoutes = require("./routes/certificateRoutes");
+    console.log("✅ 입항 증명서 라우터 로드 성공");
+  } catch (error) {
+    console.error("❌ 입항 증명서 라우터 로드 실패:", error.message);
+  }
+
+  // 메시지 발송 진단 라우터 로딩
+  try {
+    notifyRoutes = require("./routes/notifyRoutes");
+    console.log("✅ 메시지 진단 라우터 로드 성공");
+  } catch (error) {
+    console.error("❌ 메시지 진단 라우터 로드 실패:", error.message);
+  }
+
+  // Aurora5 자동화 엔진 라우터 로딩
+  try {
+    aurora5Routes = require("./aurora5/routes/aurora5Routes");
+    console.log("✅ Aurora5 라우터 로드 성공");
+  } catch (error) {
+    console.error("❌ Aurora5 라우터 로드 실패:", error.message);
+  }
+
+  // 토론 자동화 라우터 로딩
+  try {
+    debateRoutes = require("./routes/debateRoutes");
+    console.log("✅ 토론 자동화 라우터 로드 성공");
+  } catch (error) {
+    console.error("❌ 토론 자동화 라우터 로드 실패:", error.message);
+  }
+
+  // 웹훅 라우터 로딩
+  try {
+    webhookRoutes = require("./routes/webhookRoutes");
+    console.log("✅ 웹훅 라우터 로드 성공");
+  } catch (error) {
+    console.error("❌ 웹훅 라우터 로드 실패:", error.message);
+  }
+
+  // 여정 파이프라인 라우터 로딩
+  try {
+    journeyRoutes = require("./routes/journeyRoutes");
+    console.log("✅ 여정 파이프라인 라우터 로드 성공");
+  } catch (error) {
+    console.error("❌ 여정 파이프라인 라우터 로드 실패:", error.message);
+  }
+
+  // 여수 Travel Guide 라우터 로딩
+  try {
+    travelGuideRoutes = require("./routes/travelGuideRoutes");
+    console.log("✅ Travel Guide 라우터 로드 성공");
+  } catch (error) {
+    console.error("❌ Travel Guide 라우터 로드 실패:", error.message);
+  }
+
+  // Aurora 5 에이전트 라우터 로딩
+  try {
+    agentRoutes = require("./routes/agentRoutes");
+    console.log("✅ Aurora 5 에이전트 라우터 로드 성공");
+  } catch (error) {
+    console.error("❌ Aurora 5 에이전트 라우터 로드 실패:", error.message);
+  }
+
+  // 배치 처리 라우터 로딩
+  try {
+    batchRoutes = require("./routes/batchRoutes");
+    console.log("✅ 배치 처리 라우터 로드 성공");
+  } catch (error) {
+    console.error("❌ 배치 처리 라우터 로드 실패:", error.message);
+  }
+
+  // Shorts 자동 생성 라우터 로딩
+  try {
+    shortsRoutes = require("./routes/shortsRoutes");
+    console.log("✅ Shorts 라우터 로드 성공");
+  } catch (error) {
+    console.error("❌ Shorts 라우터 로드 실패:", error.message);
+  }
 }
 
 // 스토리북 E2E Commerce 라우터 로딩
