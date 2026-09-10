@@ -3610,19 +3610,23 @@ app.get('/dt-events-dashboard', (_req, res) => {
 });
 
 // ---------- DreamTown Artifact Worker (DB 기반 큐) ----------
-try {
-  const dtArtifactWorker = require('./services/dtArtifactWorker');
-  dtArtifactWorker.start();
-} catch (err) {
-  console.warn('⚠️ dtArtifactWorker 시작 실패:', err.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const dtArtifactWorker = require('./services/dtArtifactWorker');
+    dtArtifactWorker.start();
+  } catch (err) {
+    console.warn('⚠️ dtArtifactWorker 시작 실패:', err.message);
+  }
 }
 
 // ---------- DreamTown Narrative Worker (DB 기반 큐) ----------
-try {
-  const dtNarrativeWorker = require('./services/dtNarrativeWorker');
-  dtNarrativeWorker.start();
-} catch (err) {
-  console.warn('⚠️ dtNarrativeWorker 시작 실패:', err.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const dtNarrativeWorker = require('./services/dtNarrativeWorker');
+    dtNarrativeWorker.start();
+  } catch (err) {
+    console.warn('⚠️ dtNarrativeWorker 시작 실패:', err.message);
+  }
 }
 
 // ---------- Aurora5 Orchestrator Worker (이벤트 기반 자동화) ----------
