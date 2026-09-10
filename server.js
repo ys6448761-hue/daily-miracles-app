@@ -16,6 +16,8 @@ let envValidator = null;
 let exportPipelineStatus = null;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const IS_SERVERLESS = !!(process.env.VERCEL || process.env.NOW_REGION || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const APP_MODE = process.env.APP_MODE || 'full';
+const IS_STORYBOOK_MODE = APP_MODE === 'storybook';
 try {
   envValidator = require("./utils/envValidator");
   const validationResult = envValidator.validateEnv({ failFast: IS_PRODUCTION });
@@ -29,6 +31,14 @@ try {
   exportPipelineStatus = envValidator.printExportStatus();
 } catch (error) {
   console.warn("⚠️ 환경변수 검증기 로드 실패:", error.message);
+}
+
+// ═══════════════════════════════════════════════════════════
+// Server Startup Configuration (APP_MODE)
+// ═══════════════════════════════════════════════════════════
+console.log(`📌 Server Mode: ${IS_STORYBOOK_MODE ? 'STORYBOOK (workers disabled)' : 'FULL (all services enabled)'}`);
+if (IS_STORYBOOK_MODE) {
+  console.log('ℹ️  Background workers disabled: dtOrchestrator, Aurora, StarCare, Guardian, ReportScheduler');
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -3617,8 +3627,9 @@ try {
 
 // ---------- Aurora5 Orchestrator Worker (이벤트 기반 자동화) ----------
 // Guard: DT_ORCHESTRATOR_ENABLED controls whether this core feature runs
-// Production: default enabled | Storybook Staging: DT_ORCHESTRATOR_ENABLED=false
-const orchestratorEnabled = process.env.DT_ORCHESTRATOR_ENABLED !== 'false';
+// Also respects APP_MODE (disabled in storybook mode)
+// Production: default enabled | Storybook Staging: DT_ORCHESTRATOR_ENABLED=false or APP_MODE=storybook
+const orchestratorEnabled = process.env.DT_ORCHESTRATOR_ENABLED !== 'false' && !IS_STORYBOOK_MODE;
 if (orchestratorEnabled) {
   try {
     const dtOrchestratorWorker = require('./services/dtOrchestratorWorker');
@@ -4074,16 +4085,18 @@ try {
 }
 
 // ---------- Report Scheduler Initialization ----------
-try {
-  if (db && process.env.DATABASE_URL) {
-    const reportScheduler = require('./services/reportScheduler');
-    reportScheduler.init(db);
-    console.log('✅ Report Scheduler initialization called');
-  } else {
-    console.log('⚠️ db module not loaded, skipping Report Scheduler init');
+if (!IS_STORYBOOK_MODE) {
+  try {
+    if (db && process.env.DATABASE_URL) {
+      const reportScheduler = require('./services/reportScheduler');
+      reportScheduler.init(db);
+      console.log('✅ Report Scheduler initialization called');
+    } else {
+      console.log('⚠️ db module not loaded, skipping Report Scheduler init');
+    }
+  } catch (e) {
+    console.error('❌ Report Scheduler init failed:', e.message);
   }
-} catch (e) {
-  console.error('❌ Report Scheduler init failed:', e.message);
 }
 
 // ---------- Start (with fallback port) ----------
@@ -4170,26 +4183,30 @@ function startServer(port) {
 
 
     // Aurora Video Job Worker 시작 (AIL-2026-0301-VIDJOB-001)
-    try {
-      const AuroraWorker = require('./services/aurora/AuroraWorker');
-      auroraWorkerInstance = new AuroraWorker();
-      auroraWorkerInstance.start();
-      console.log("✅ Aurora Job Worker 시작 (5초 폴링)");
-    } catch (workerErr) {
-      console.warn("⚠️ Aurora Job Worker 시작 실패:", workerErr.message);
+    if (!IS_STORYBOOK_MODE) {
+      try {
+        const AuroraWorker = require('./services/aurora/AuroraWorker');
+        auroraWorkerInstance = new AuroraWorker();
+        auroraWorkerInstance.start();
+        console.log("✅ Aurora Job Worker 시작 (5초 폴링)");
+      } catch (workerErr) {
+        console.warn("⚠️ Aurora Job Worker 시작 실패:", workerErr.message);
+      }
     }
 
     // Star Care Engine — 7일 케어 cron (매일 오전 10시 KST)
-    try {
-      const cron          = require('node-cron');
-      const starCare      = require('./services/dt/starCareService');
-      cron.schedule('0 1 * * *', async () => {   // UTC 01:00 = KST 10:00
-        console.log('[StarCare] 케어 cron 실행');
-        await starCare.runStarCare();
-      }, { timezone: 'UTC' });
-      console.log('✅ Star Care Engine cron 등록 완료 (매일 KST 10:00)');
-    } catch (e) {
-      console.warn('⚠️ Star Care Engine cron 등록 실패:', e.message);
+    if (!IS_STORYBOOK_MODE) {
+      try {
+        const cron          = require('node-cron');
+        const starCare      = require('./services/dt/starCareService');
+        cron.schedule('0 1 * * *', async () => {   // UTC 01:00 = KST 10:00
+          console.log('[StarCare] 케어 cron 실행');
+          await starCare.runStarCare();
+        }, { timezone: 'UTC' });
+        console.log('✅ Star Care Engine cron 등록 완료 (매일 KST 10:00)');
+      } catch (e) {
+        console.warn('⚠️ Star Care Engine cron 등록 실패:', e.message);
+      }
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -4197,17 +4214,18 @@ function startServer(port) {
     // ═══════════════════════════════════════════════════════════
     // Phase 1: Dry Run (로깅만, SMS 발송 안 함)
     // Phase 2: 실제 SMS 발송 (수동 승인 후 활성화)
-    try {
-      const cron = require('node-cron');
-      const GuardianDispatchService = require('./aurora5/services/guardianDispatchService');
-      const config = require('./config/dispatchConfig');
+    if (!IS_STORYBOOK_MODE) {
+      try {
+        const cron = require('node-cron');
+        const GuardianDispatchService = require('./aurora5/services/guardianDispatchService');
+        const config = require('./config/dispatchConfig');
 
-      // ENABLED 플래그 확인
-      if (!config.GUARDIAN_DISPATCH_ENABLED) {
-        console.log('⏸️  Guardian Dispatch V0 비활성화 (GUARDIAN_DISPATCH_ENABLED=false)');
-      } else if (!db) {
-        console.warn('⚠️ Guardian Dispatch: DB 미연결 — 스케줄러 미등록');
-      } else {
+        // ENABLED 플래그 확인
+        if (!config.GUARDIAN_DISPATCH_ENABLED) {
+          console.log('⏸️  Guardian Dispatch V0 비활성화 (GUARDIAN_DISPATCH_ENABLED=false)');
+        } else if (!db) {
+          console.warn('⚠️ Guardian Dispatch: DB 미연결 — 스케줄러 미등록');
+        } else {
         // 21:00 KST = 12:00 UTC
         cron.schedule('0 12 * * *', async () => {
           console.log('[Guardian Dispatch] 배치 시작 (21:00 KST)');
@@ -4230,8 +4248,9 @@ function startServer(port) {
         console.log(`   - 현재 모드: ${config.GUARDIAN_DISPATCH_DRY_RUN ? 'DRY_RUN' : 'LIVE'}`);
         console.log(`   - Cutoff: ${config.GUARDIAN_DISPATCH_CUTOFF_AT}`);
       }
-    } catch (e) {
-      console.warn('⚠️ Guardian Dispatch 스케줄러 등록 실패:', e.message);
+      } catch (e) {
+        console.warn('⚠️ Guardian Dispatch 스케줄러 등록 실패:', e.message);
+      }
     }
   });
 
