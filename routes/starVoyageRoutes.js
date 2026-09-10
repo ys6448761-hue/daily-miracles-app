@@ -23,29 +23,31 @@ const AMOUNT      = 35000;
 const GOODS_NAME  = '항해 프로그램 — 나만의 시간';
 
 // ── voyages 테이블 자동 생성 (migration 138 미실행 환경 안전망) ────
-;(async () => {
-  try {
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS voyages (
-        id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-        star_id      UUID,
-        type         VARCHAR(20) NOT NULL CHECK (type IN ('rest', 'reflect', 'move')),
-        status       VARCHAR(20) NOT NULL DEFAULT 'pending',
-        phone_number VARCHAR(20),
-        name         VARCHAR(50),
-        pg_order_id  VARCHAR(64),
-        created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        paid_at      TIMESTAMPTZ
-      )
-    `);
-    await db.query(`CREATE INDEX IF NOT EXISTS idx_voyages_star_id     ON voyages (star_id)`);
-    await db.query(`CREATE INDEX IF NOT EXISTS idx_voyages_pg_order_id ON voyages (pg_order_id)`);
-    await db.query(`CREATE INDEX IF NOT EXISTS idx_voyages_status      ON voyages (status)`);
-    console.log('[StarVoyage] voyages 테이블 확인/생성 완료');
-  } catch (e) {
-    console.warn('[StarVoyage] voyages 테이블 초기화 실패 (SQLite 환경 무시):', e.message);
-  }
-})();
+if (process.env.APP_MODE !== 'storybook') {
+  ;(async () => {
+    try {
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS voyages (
+          id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+          star_id      UUID,
+          type         VARCHAR(20) NOT NULL CHECK (type IN ('rest', 'reflect', 'move')),
+          status       VARCHAR(20) NOT NULL DEFAULT 'pending',
+          phone_number VARCHAR(20),
+          name         VARCHAR(50),
+          pg_order_id  VARCHAR(64),
+          created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          paid_at      TIMESTAMPTZ
+        )
+      `);
+      await db.query(`CREATE INDEX IF NOT EXISTS idx_voyages_star_id     ON voyages (star_id)`);
+      await db.query(`CREATE INDEX IF NOT EXISTS idx_voyages_pg_order_id ON voyages (pg_order_id)`);
+      await db.query(`CREATE INDEX IF NOT EXISTS idx_voyages_status      ON voyages (status)`);
+      console.log('[StarVoyage] voyages 테이블 확인/생성 완료');
+    } catch (e) {
+      console.warn('[StarVoyage] voyages 테이블 초기화 실패 (SQLite 환경 무시):', e.message);
+    }
+  })();
+}
 
 // ── POST /create ──────────────────────────────────────────────────
 router.post('/create', async (req, res) => {
