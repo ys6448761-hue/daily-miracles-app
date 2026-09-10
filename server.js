@@ -3545,12 +3545,19 @@ try {
 }
 
 // ---------- Aurora5 Orchestrator Worker (이벤트 기반 자동화) ----------
-try {
-  const dtOrchestratorWorker = require('./services/dtOrchestratorWorker');
-  dtOrchestratorWorker.start();
-  console.log('✅ Aurora5 Orchestrator Worker 시작 완료');
-} catch (err) {
-  console.warn('⚠️ dtOrchestratorWorker 시작 실패:', err.message);
+// Guard: DT_ORCHESTRATOR_ENABLED controls whether this core feature runs
+// Production: default enabled | Storybook Staging: DT_ORCHESTRATOR_ENABLED=false
+const orchestratorEnabled = process.env.DT_ORCHESTRATOR_ENABLED !== 'false';
+if (orchestratorEnabled) {
+  try {
+    const dtOrchestratorWorker = require('./services/dtOrchestratorWorker');
+    dtOrchestratorWorker.start();
+    console.log('✅ Aurora5 Orchestrator Worker 시작 완료');
+  } catch (err) {
+    console.warn('⚠️ dtOrchestratorWorker 시작 실패:', err.message);
+  }
+} else {
+  console.log('ℹ️ Aurora5 Orchestrator Worker 비활성화 (DT_ORCHESTRATOR_ENABLED=false)');
 }
 
 // ---------- Resonance & Impact Routes ----------
