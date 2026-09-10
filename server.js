@@ -2773,10 +2773,12 @@ if (recommendationRoutes) app.use('/api/recommendation',   recommendationRoutes)
 if (wishJourneyRoutes)   app.use('/api/journeys',          wishJourneyRoutes);
 
 // ---------- 여수 소원여정 예약/문의 접수 ─────────────────────────────
-try {
-  app.use('/api/journey-inquiry', require('./routes/journeyInquiryRoutes'));
-  console.log('✅ journey-inquiry 라우터 등록 완료 (/api/journey-inquiry)');
-} catch (e) { console.error('❌ journey-inquiry 라우터 실패:', e.message); }
+if (!IS_STORYBOOK_MODE) {
+  try {
+    app.use('/api/journey-inquiry', require('./routes/journeyInquiryRoutes'));
+    console.log('✅ journey-inquiry 라우터 등록 완료 (/api/journey-inquiry)');
+  } catch (e) { console.error('❌ journey-inquiry 라우터 실패:', e.message); }
+}
 
 // ---------- 추천 시스템 Routes (/api/referral) - Aurora5 v2.6 ----------
 if (referralRoutes) {
