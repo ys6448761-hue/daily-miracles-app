@@ -2795,21 +2795,25 @@ if (voyageAdminRoutes) {
 }
 
 // ---------- 장소 관리자 로그인 (/api/admin/login) ----------
-try {
-  const locationAdminAuthRoutes = require('./routes/locationAdminAuthRoutes');
-  app.use('/api/admin', locationAdminAuthRoutes);
-  console.log('✅ 장소 관리자 로그인 라우터 등록 완료 (/api/admin/login)');
-} catch (e) {
-  console.warn('⚠️ locationAdminAuthRoutes 로드 실패:', e.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const locationAdminAuthRoutes = require('./routes/locationAdminAuthRoutes');
+    app.use('/api/admin', locationAdminAuthRoutes);
+    console.log('✅ 장소 관리자 로그인 라우터 등록 완료 (/api/admin/login)');
+  } catch (e) {
+    console.warn('⚠️ locationAdminAuthRoutes 로드 실패:', e.message);
+  }
 }
 
 // ---------- 케이블카 운영 관리 Routes (/api/admin/cablecar) ----------
-try {
-  const adminCablecarRoutes = require('./routes/adminCablecarRoutes');
-  app.use('/api/admin/cablecar', adminCablecarRoutes);
-  console.log('✅ 케이블카 어드민 라우터 등록 완료 (/api/admin/cablecar)');
-} catch (e) {
-  console.warn('⚠️ adminCablecarRoutes 로드 실패:', e.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const adminCablecarRoutes = require('./routes/adminCablecarRoutes');
+    app.use('/api/admin/cablecar', adminCablecarRoutes);
+    console.log('✅ 케이블카 어드민 라우터 등록 완료 (/api/admin/cablecar)');
+  } catch (e) {
+    console.warn('⚠️ adminCablecarRoutes 로드 실패:', e.message);
+  }
 }
 
 // ---------- 운영 관제 대시보드 (/api/admin/dashboard) — 반드시 /api/admin 광역 마운트보다 앞에 위치 ----------
@@ -2828,12 +2832,14 @@ if (adminDashboardRoutes) {
 }
 
 // ---------- 공명 트래킹 관리자 API (/api/admin) ----------
-try {
-  const adminResonanceRoutes = require('./routes/adminResonanceRoutes');
-  app.use('/api/admin', adminResonanceRoutes);
-  console.log('✅ 공명 관리자 API 등록 완료 (/api/admin/star, /api/admin/connections/tree, /api/admin/storybook)');
-} catch (e) {
-  console.warn('⚠️ adminResonanceRoutes 로드 실패:', e.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const adminResonanceRoutes = require('./routes/adminResonanceRoutes');
+    app.use('/api/admin', adminResonanceRoutes);
+    console.log('✅ 공명 관리자 API 등록 완료 (/api/admin/star, /api/admin/connections/tree, /api/admin/storybook)');
+  } catch (e) {
+    console.warn('⚠️ adminResonanceRoutes 로드 실패:', e.message);
+  }
 }
 
 // ---------- 슈퍼어드민 파트너 관리 Routes (/api/admin/partners) ----------
@@ -2872,21 +2878,25 @@ app.get('/dreamtown/admin/location/:code', (req, res) => {
 });
 
 // ---------- Impact Routes (/api/impact) ----------
-try {
-  const impactRoutes = require('./routes/impactRoutes');
-  app.use('/api/impact', impactRoutes);
-  console.log('✅ Impact 라우터 등록 완료 (/api/impact)');
-} catch (e) {
-  console.warn('⚠️ impactRoutes 로드 실패:', e.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const impactRoutes = require('./routes/impactRoutes');
+    app.use('/api/impact', impactRoutes);
+    console.log('✅ Impact 라우터 등록 완료 (/api/impact)');
+  } catch (e) {
+    console.warn('⚠️ impactRoutes 로드 실패:', e.message);
+  }
 }
 
 // ---------- Travel Guide Routes (/api/dt/travel) ----------
-try {
-  const travelGuideRoutes = require('./routes/travelGuideRoutes');
-  app.use('/api/dt/travel', travelGuideRoutes);
-  console.log('✅ Travel Guide 라우터 등록 완료 (/api/dt/travel)');
-} catch (e) {
-  console.warn('⚠️ travelGuideRoutes 로드 실패:', e.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const travelGuideRoutes = require('./routes/travelGuideRoutes');
+    app.use('/api/dt/travel', travelGuideRoutes);
+    console.log('✅ Travel Guide 라우터 등록 완료 (/api/dt/travel)');
+  } catch (e) {
+    console.warn('⚠️ travelGuideRoutes 로드 실패:', e.message);
+  }
 }
 
 // ---------- 공명 관리자 대시보드 (/admin/resonance) ----------
@@ -3664,9 +3674,11 @@ if (experimentEventRoutes) {
 // └───────────────────────────────────────────────────────────────────────────┘
 // ═══════════════════════════════════════════════════════════════════════════
 
-const dreamtownRoutes = require('./routes/dreamtownRoutes');
-app.use('/api/dt', dreamtownRoutes);
-console.log('✅ [CANONICAL] DreamTown 라우터 등록 완료 (/api/dt - PRODUCTION PRIMARY)');
+if (!IS_STORYBOOK_MODE) {
+  const dreamtownRoutes = require('./routes/dreamtownRoutes');
+  app.use('/api/dt', dreamtownRoutes);
+  console.log('✅ [CANONICAL] DreamTown 라우터 등록 완료 (/api/dt - PRODUCTION PRIMARY)');
+}
 
 // ---------- 실물책 제작 신청 API ----------
 // POST /api/book/upgrade — 디지털북 → 실물책 전환 신청 (관심 등록)
@@ -3749,122 +3761,148 @@ app.post('/api/book/inquiry', async (req, res) => {
 });
 
 // ---------- DreamTown Core Engine Routes (DEC-2026-0331-001) ----------
-try {
-  const dtEngineRoutes = require('./routes/dtEngineRoutes');
-  app.use('/api/dt/engine', dtEngineRoutes);
-  console.log('✅ DreamTown Core Engine 라우터 등록 완료 (/api/dt/engine)');
-} catch (err) {
-  console.warn('⚠️ DreamTown Core Engine 라우터 등록 실패:', err.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const dtEngineRoutes = require('./routes/dtEngineRoutes');
+    app.use('/api/dt/engine', dtEngineRoutes);
+    console.log('✅ DreamTown Core Engine 라우터 등록 완료 (/api/dt/engine)');
+  } catch (err) {
+    console.warn('⚠️ DreamTown Core Engine 라우터 등록 실패:', err.message);
+  }
 }
 
 // ---------- DreamTown Life Spot Routes ----------
-try {
-  const dtLifeSpotRoutes = require('./routes/dtLifeSpotRoutes');
-  app.use('/api/dt/life-spots', dtLifeSpotRoutes);
-  console.log('✅ DreamTown Life Spot 라우터 등록 완료 (/api/dt/life-spots)');
-} catch (err) {
-  console.warn('⚠️ DreamTown Life Spot 라우터 등록 실패:', err.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const dtLifeSpotRoutes = require('./routes/dtLifeSpotRoutes');
+    app.use('/api/dt/life-spots', dtLifeSpotRoutes);
+    console.log('✅ DreamTown Life Spot 라우터 등록 완료 (/api/dt/life-spots)');
+  } catch (err) {
+    console.warn('⚠️ DreamTown Life Spot 라우터 등록 실패:', err.message);
+  }
 }
 
 // ---------- DreamTown User Event Routes ----------
-try {
-  const dtUserEventRoutes = require('./routes/dtUserEventRoutes');
-  app.use('/api/dt/user-events', dtUserEventRoutes);
-  console.log('✅ DreamTown User Event 라우터 등록 완료 (/api/dt/user-events)');
-} catch (err) {
-  console.warn('⚠️ DreamTown User Event 라우터 등록 실패:', err.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const dtUserEventRoutes = require('./routes/dtUserEventRoutes');
+    app.use('/api/dt/user-events', dtUserEventRoutes);
+    console.log('✅ DreamTown User Event 라우터 등록 완료 (/api/dt/user-events)');
+  } catch (err) {
+    console.warn('⚠️ DreamTown User Event 라우터 등록 실패:', err.message);
+  }
 }
 
 // ---------- DreamTown Star Trajectory + Summary Routes ----------
-try {
-  const dtStarTrajectoryRoutes = require('./routes/dtStarTrajectoryRoutes');
-  app.use('/api/dt/trajectory', dtStarTrajectoryRoutes);
-  // 스펙 명시 경로 /api/dt/star/summary 도 동일 라우터로 연결
-  app.use('/api/dt/star', dtStarTrajectoryRoutes);
-  console.log('✅ DreamTown Star Trajectory 라우터 등록 완료 (/api/dt/trajectory, /api/dt/star)');
-} catch (err) {
-  console.warn('⚠️ DreamTown Star Trajectory 라우터 등록 실패:', err.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const dtStarTrajectoryRoutes = require('./routes/dtStarTrajectoryRoutes');
+    app.use('/api/dt/trajectory', dtStarTrajectoryRoutes);
+    // 스펙 명시 경로 /api/dt/star/summary 도 동일 라우터로 연결
+    app.use('/api/dt/star', dtStarTrajectoryRoutes);
+    console.log('✅ DreamTown Star Trajectory 라우터 등록 완료 (/api/dt/trajectory, /api/dt/star)');
+  } catch (err) {
+    console.warn('⚠️ DreamTown Star Trajectory 라우터 등록 실패:', err.message);
+  }
 }
 
 // ---------- DreamTown Payment Routes (Day 8 Flow 플랜 결제) ----------
-try {
-  const dtPaymentRoutes = require('./routes/dtPaymentRoutes');
-  app.use('/api/payment/nicepay', dtPaymentRoutes);
-  console.log('✅ DreamTown Payment 라우터 등록 완료 (/api/payment/nicepay)');
-} catch (err) {
-  console.warn('⚠️ DreamTown Payment 라우터 등록 실패:', err.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const dtPaymentRoutes = require('./routes/dtPaymentRoutes');
+    app.use('/api/payment/nicepay', dtPaymentRoutes);
+    console.log('✅ DreamTown Payment 라우터 등록 완료 (/api/payment/nicepay)');
+  } catch (err) {
+    console.warn('⚠️ DreamTown Payment 라우터 등록 실패:', err.message);
+  }
 }
 
 // ---------- DreamTown Event Routes (SSOT: DreamTown_Event_SSOT v1) ----------
-try {
-  const dtEventRoutes = require('./routes/dtEventRoutes');
-  app.use('/api/dt/events', dtEventRoutes);
-  console.log('✅ DreamTown Event 라우터 등록 완료 (/api/dt/events)');
-} catch (err) {
-  console.warn('⚠️ DreamTown Event 라우터 등록 실패:', err.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const dtEventRoutes = require('./routes/dtEventRoutes');
+    app.use('/api/dt/events', dtEventRoutes);
+    console.log('✅ DreamTown Event 라우터 등록 완료 (/api/dt/events)');
+  } catch (err) {
+    console.warn('⚠️ DreamTown Event 라우터 등록 실패:', err.message);
+  }
 }
 
 // ---------- 별들의 속삭임 Journey Log Routes ----------
-try {
-  const journeyLogRoutes = require('./routes/journeyLogRoutes');
-  app.use('/api/dt/journey-logs', journeyLogRoutes);
-  console.log('✅ Journey Log 라우터 등록 완료 (/api/dt/journey-logs)');
-} catch (err) {
-  console.warn('⚠️ Journey Log 라우터 등록 실패:', err.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const journeyLogRoutes = require('./routes/journeyLogRoutes');
+    app.use('/api/dt/journey-logs', journeyLogRoutes);
+    console.log('✅ Journey Log 라우터 등록 완료 (/api/dt/journey-logs)');
+  } catch (err) {
+    console.warn('⚠️ Journey Log 라우터 등록 실패:', err.message);
+  }
 }
 
 // ---------- 공명(Resonance) 피드 Routes ----------
-try {
-  const resonanceFeedRoutes = require('./routes/resonanceFeedRoutes');
-  app.use('/api/dt/resonance-feed', resonanceFeedRoutes);
-  console.log('✅ Resonance Feed 라우터 등록 완료 (/api/dt/resonance-feed)');
-} catch (err) {
-  console.warn('⚠️ Resonance Feed 라우터 등록 실패:', err.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const resonanceFeedRoutes = require('./routes/resonanceFeedRoutes');
+    app.use('/api/dt/resonance-feed', resonanceFeedRoutes);
+    console.log('✅ Resonance Feed 라우터 등록 완료 (/api/dt/resonance-feed)');
+  } catch (err) {
+    console.warn('⚠️ Resonance Feed 라우터 등록 실패:', err.message);
+  }
 }
 
 // ---------- 연결(Connection) 단계 Routes ----------
-try {
-  const connectionStageRoutes = require('./routes/connectionStageRoutes');
-  app.use('/api/dt/connection-stage', connectionStageRoutes);
-  console.log('✅ Connection Stage 라우터 등록 완료 (/api/dt/connection-stage)');
-} catch (err) {
-  console.warn('⚠️ Connection Stage 라우터 등록 실패:', err.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const connectionStageRoutes = require('./routes/connectionStageRoutes');
+    app.use('/api/dt/connection-stage', connectionStageRoutes);
+    console.log('✅ Connection Stage 라우터 등록 완료 (/api/dt/connection-stage)');
+  } catch (err) {
+    console.warn('⚠️ Connection Stage 라우터 등록 실패:', err.message);
+  }
 }
 
 // ---------- 과거 속삭임 재등장 Routes ----------
-try {
-  const recallWhisperRoutes = require('./routes/recallWhisperRoutes');
-  app.use('/api/dt/recall-whisper', recallWhisperRoutes);
-  console.log('✅ Recall Whisper 라우터 등록 완료 (/api/dt/recall-whisper)');
-} catch (err) {
-  console.warn('⚠️ Recall Whisper 라우터 등록 실패:', err.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const recallWhisperRoutes = require('./routes/recallWhisperRoutes');
+    app.use('/api/dt/recall-whisper', recallWhisperRoutes);
+    console.log('✅ Recall Whisper 라우터 등록 완료 (/api/dt/recall-whisper)');
+  } catch (err) {
+    console.warn('⚠️ Recall Whisper 라우터 등록 실패:', err.message);
+  }
 }
 
 // ---------- Galaxy Signal Routes ----------
-try {
-  const galaxySignalRoutes = require('./routes/galaxySignalRoutes');
-  app.use('/api/dt/galaxy-signal', galaxySignalRoutes);
-  console.log('✅ Galaxy Signal 라우터 등록 완료 (/api/dt/galaxy-signal)');
-} catch (err) {
-  console.warn('⚠️ Galaxy Signal 라우터 등록 실패:', err.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const galaxySignalRoutes = require('./routes/galaxySignalRoutes');
+    app.use('/api/dt/galaxy-signal', galaxySignalRoutes);
+    console.log('✅ Galaxy Signal 라우터 등록 완료 (/api/dt/galaxy-signal)');
+  } catch (err) {
+    console.warn('⚠️ Galaxy Signal 라우터 등록 실패:', err.message);
+  }
 }
 
 // ---------- Recommendation Routes ----------
-try {
-  const recommendationRoutes = require('./routes/recommendationRoutes');
-  app.use('/api/dt/recommendation', recommendationRoutes);
-  console.log('✅ Recommendation 라우터 등록 완료 (/api/dt/recommendation)');
-} catch (err) {
-  console.warn('⚠️ Recommendation 라우터 등록 실패:', err.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const recommendationRoutes = require('./routes/recommendationRoutes');
+    app.use('/api/dt/recommendation', recommendationRoutes);
+    console.log('✅ Recommendation 라우터 등록 완료 (/api/dt/recommendation)');
+  } catch (err) {
+    console.warn('⚠️ Recommendation 라우터 등록 실패:', err.message);
+  }
 }
 
 // ---------- AI Trigger Routes ----------
-try {
-  const aiTriggerRoutes = require('./routes/aiTriggerRoutes');
-  app.use('/api/dt/ai-trigger', aiTriggerRoutes);
-  console.log('✅ AI Trigger 라우터 등록 완료 (/api/dt/ai-trigger)');
-} catch (err) {
-  console.warn('⚠️ AI Trigger 라우터 등록 실패:', err.message);
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const aiTriggerRoutes = require('./routes/aiTriggerRoutes');
+    app.use('/api/dt/ai-trigger', aiTriggerRoutes);
+    console.log('✅ AI Trigger 라우터 등록 완료 (/api/dt/ai-trigger)');
+  } catch (err) {
+    console.warn('⚠️ AI Trigger 라우터 등록 실패:', err.message);
+  }
 }
 
 // DreamTown KPI 대시보드
@@ -3910,19 +3948,25 @@ if (orchestratorEnabled) {
 }
 
 // ---------- Resonance & Impact Routes ----------
-const resonanceRoutes = require('./routes/resonanceRoutes');
-app.use('/api/resonance', resonanceRoutes);
-console.log('✅ 공명 & 나눔 라우터 등록 완료 (/api/resonance)');
+if (!IS_STORYBOOK_MODE) {
+  const resonanceRoutes = require('./routes/resonanceRoutes');
+  app.use('/api/resonance', resonanceRoutes);
+  console.log('✅ 공명 & 나눔 라우터 등록 완료 (/api/resonance)');
+}
 
 // ---------- KPI Dashboard Routes ----------
-const kpiRoutes = require('./routes/kpiRoutes');
-app.use('/api/kpi', kpiRoutes);
-console.log('✅ KPI 대시보드 라우터 등록 완료 (/api/kpi)');
+if (!IS_STORYBOOK_MODE) {
+  const kpiRoutes = require('./routes/kpiRoutes');
+  app.use('/api/kpi', kpiRoutes);
+  console.log('✅ KPI 대시보드 라우터 등록 완료 (/api/kpi)');
+}
 
 // ---------- Feedback Routes ----------
-const feedbackRoutes = require('./routes/feedbackRoutes');
-app.use('/api/feedback', feedbackRoutes);
-console.log('✅ 피드백 라우터 등록 완료 (/api/feedback)');
+if (!IS_STORYBOOK_MODE) {
+  const feedbackRoutes = require('./routes/feedbackRoutes');
+  app.use('/api/feedback', feedbackRoutes);
+  console.log('✅ 피드백 라우터 등록 완료 (/api/feedback)');
+}
 
 // ---------- 장소별 관리자 — /dreamtown/:code/admin (SPA fallback보다 먼저 등록) ----------
 // /dreamtown/* SPA 라우트가 이 경로도 잡아버리기 때문에 반드시 그 앞에 위치해야 함
@@ -3931,25 +3975,27 @@ app.get('/dreamtown/:code/admin', (req, res) => {
 });
 
 // ---------- DreamTown Frontend (Prototype) ----------
-const dtFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist');
-app.use('/dreamtown', express.static(dtFrontendPath, {
-  setHeaders: (res, filePath) => {
-    // index.html은 절대 캐시 안 함 — 구버전 JS/CSS 해시 참조 방지
-    if (filePath.endsWith('index.html')) {
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
-    } else if (filePath.includes('/images/')) {
-      // 이미지는 파일명 해시 없음 → 교체 시 브라우저가 재검증하도록
-      res.setHeader('Cache-Control', 'public, max-age=3600, must-revalidate');
-    } else {
-      // 해시된 JS/CSS assets — 장기 캐시 OK (파일명에 해시 포함)
-      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-    }
-  },
-}));
-// 루트 경로에서도 JS/CSS/이미지 assets 직접 접근 가능하도록
-app.use(express.static(dtFrontendPath));
+if (!IS_STORYBOOK_MODE) {
+  const dtFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist');
+  app.use('/dreamtown', express.static(dtFrontendPath, {
+    setHeaders: (res, filePath) => {
+      // index.html은 절대 캐시 안 함 — 구버전 JS/CSS 해시 참조 방지
+      if (filePath.endsWith('index.html')) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+      } else if (filePath.includes('/images/')) {
+        // 이미지는 파일명 해시 없음 → 교체 시 브라우저가 재검증하도록
+        res.setHeader('Cache-Control', 'public, max-age=3600, must-revalidate');
+      } else {
+        // 해시된 JS/CSS assets — 장기 캐시 OK (파일명에 해시 포함)
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      }
+    },
+  }));
+  // 루트 경로에서도 JS/CSS/이미지 assets 직접 접근 가능하도록
+  app.use(express.static(dtFrontendPath));
+}
 
 // DreamTown SPA 라우트 — React Router 직접 경로 (새로고침/직접 URL 진입)
 const DT_SPA_ROUTES = [
