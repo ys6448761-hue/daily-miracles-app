@@ -365,13 +365,16 @@ if (!IS_STORYBOOK_MODE) {
   }
 }
 
-// Slack Heartbeat 서비스 로딩 (운영 헬스 모니터링)
+// Slack Heartbeat 서비스 로딩 (운영 헬스 모니터링, Storybook 제외)
 let slackHeartbeatService = null;
-try {
-  slackHeartbeatService = require("./services/slackHeartbeatService");
-  console.log("✅ Slack Heartbeat 서비스 로드 성공");
-} catch (error) {
-  console.warn("⚠️ Slack Heartbeat 서비스 로드 실패:", error.message);
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    slackHeartbeatService = require("./services/slackHeartbeatService");
+    console.log("✅ Slack Heartbeat 서비스 로드 성공");
+  } catch (error) {
+    console.warn("⚠️ Slack Heartbeat 서비스 로드 실패:", error.message);
+  }
 }
 
 // Stability Score service (P2.3 — /healthz, rolling counters)
@@ -4419,7 +4422,18 @@ process.on('unhandledRejection', (reason, promise) => {
   sendCrashAlert('Unhandled Rejection', reason?.stack || String(reason));
 });
 
-const { verifySchema } = require('./services/schemaVerifier');
+// DB 스키마 자동 검증 (Storybook 제외)
+let verifySchema = null;
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const schemaVerifierMod = require('./services/schemaVerifier');
+    verifySchema = schemaVerifierMod.verifySchema;
+    console.log("✅ SchemaVerifier 로드 성공");
+  } catch (error) {
+    console.warn("⚠️ SchemaVerifier 로드 실패:", error.message);
+  }
+}
 
 function startServer(port) {
   app.set('runtime_port', port); // 실제 리슨 포트 저장
@@ -4428,7 +4442,9 @@ function startServer(port) {
     printStartupBanner(port);
 
     // DB 스키마 자동 검증 (부팅 직후)
-    await verifySchema();
+    if (verifySchema) {
+      await verifySchema();
+    }
 
     // Slack Heartbeat 서비스 초기화 (09:00 KST 일일 알림)
     if (slackHeartbeatService) {
@@ -4436,8 +4452,8 @@ function startServer(port) {
       console.log("✅ Slack Heartbeat 스케줄러 시작");
     }
 
-    // P2.3: Stability proactive monitor (5분마다 score 평가 → Slack 선제 경고)
-    if (stabilityService && slackHeartbeatService) {
+    // P2.3: Stability proactive monitor (5분마다 score 평가 → Slack 선제 경고, Storybook 제외)
+    if (!IS_STORYBOOK_MODE && stabilityService && slackHeartbeatService) {
       stabilityService.startProactiveMonitor(
         (msg) => slackHeartbeatService.sendSlackMessage(msg),
       );
