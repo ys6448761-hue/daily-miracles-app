@@ -3998,66 +3998,68 @@ if (!IS_STORYBOOK_MODE) {
 }
 
 // DreamTown SPA 라우트 — React Router 직접 경로 (새로고침/직접 URL 진입)
-const DT_SPA_ROUTES = [
-  '/dreamtown', '/dreamtown/*',
-  '/galaxy', '/day', '/star', '/star-growth',
-  '/postcard', '/history', '/intro',
-  // Seed Library — 비로그인 외부 진입 (SSR로 OG 주입한 뒤 SPA가 이어서 렌더)
-  '/seed/*',
-  '/star-birth', '/my-star', '/my-star/*', '/home',
-  '/star/*', '/dashboard', '/wish', '/wish/*',
-  '/story-draft-mvp',
-  // 항해 MVP
-  '/voyage', '/voyage/*',
-  // Core Journey Flow
-  '/journey', '/journey/*',
-  // 모바일 이용권
-  '/ticket/*',
-  // 온보딩
-  '/onboarding',
-  // Day7 완료
-  '/day7-complete',
-  // 별들의 고향
-  '/hometown',
-  // 케이블카
-  '/cablecar',
-  '/cablecar-landing',
-  '/entry',
-  '/admin/cablecar',
-  // 아우룸
-  '/aurum/create',
-  '/aurum/*',
-  // 약속 기록 (/promise/* 가 create, list, :id 모두 커버)
-  '/promise/*',
-  // 여수 미션
-  '/missions',
-  // 어드민
-  '/admin', '/admin/*',
-  // 파트너
-  '/partner/agreement',
-  '/partner/subscribe',
-  '/partner/*',
-  // 특산품 쇼핑
-  '/shop', '/shop/*',
-  // 전체 별 목록
-  '/stars',
-  // 여행 이후 별 변화 기록
-  '/voyage-reflect',
-  // 여수 travel guide — PUBLIC 진입 + WISH_TRAVELER flow
-  '/travel-guide',
-];
-app.get(DT_SPA_ROUTES, (req, res) => {
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
-  res.sendFile(path.join(dtFrontendPath, 'index.html'), (err) => {
-    if (err) {
-      console.error('[DT] SPA sendFile 실패 — dist 미존재 가능:', err.message);
-      res.status(503).send('<html><body><h2>DreamTown 준비 중입니다. 잠시 후 다시 시도해주세요.</h2></body></html>');
-    }
+if (!IS_STORYBOOK_MODE) {
+  const DT_SPA_ROUTES = [
+    '/dreamtown', '/dreamtown/*',
+    '/galaxy', '/day', '/star', '/star-growth',
+    '/postcard', '/history', '/intro',
+    // Seed Library — 비로그인 외부 진입 (SSR로 OG 주입한 뒤 SPA가 이어서 렌더)
+    '/seed/*',
+    '/star-birth', '/my-star', '/my-star/*', '/home',
+    '/star/*', '/dashboard', '/wish', '/wish/*',
+    '/story-draft-mvp',
+    // 항해 MVP
+    '/voyage', '/voyage/*',
+    // Core Journey Flow
+    '/journey', '/journey/*',
+    // 모바일 이용권
+    '/ticket/*',
+    // 온보딩
+    '/onboarding',
+    // Day7 완료
+    '/day7-complete',
+    // 별들의 고향
+    '/hometown',
+    // 케이블카
+    '/cablecar',
+    '/cablecar-landing',
+    '/entry',
+    '/admin/cablecar',
+    // 아우룸
+    '/aurum/create',
+    '/aurum/*',
+    // 약속 기록 (/promise/* 가 create, list, :id 모두 커버)
+    '/promise/*',
+    // 여수 미션
+    '/missions',
+    // 어드민
+    '/admin', '/admin/*',
+    // 파트너
+    '/partner/agreement',
+    '/partner/subscribe',
+    '/partner/*',
+    // 특산품 쇼핑
+    '/shop', '/shop/*',
+    // 전체 별 목록
+    '/stars',
+    // 여행 이후 별 변화 기록
+    '/voyage-reflect',
+    // 여수 travel guide — PUBLIC 진입 + WISH_TRAVELER flow
+    '/travel-guide',
+  ];
+  app.get(DT_SPA_ROUTES, (req, res) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.sendFile(path.join(dtFrontendPath, 'index.html'), (err) => {
+      if (err) {
+        console.error('[DT] SPA sendFile 실패 — dist 미존재 가능:', err.message);
+        res.status(503).send('<html><body><h2>DreamTown 준비 중입니다. 잠시 후 다시 시도해주세요.</h2></body></html>');
+      }
+    });
   });
-});
-console.log('✅ DreamTown 프론트 등록 완료 (SPA 라우트 전체 확장)');
+  console.log('✅ DreamTown 프론트 등록 완료 (SPA 라우트 전체 확장)');
+}
 
 // ---------- Entitlement 보호 라우트 (/api/daily-messages, /api/roadmap) ----------
 // P0 요구사항: Trial 또는 Paid 권한이 있어야만 접근 가능
@@ -4360,16 +4362,18 @@ app.get("/", (_req, res) => {
 
 // ---------- SPA catch-all — /api/* 제외한 모든 GET을 index.html로 -------
 // DT_SPA_ROUTES 화이트리스트에 없는 신규 SPA 경로(/entry 등) 404 방지
-app.get(/^(?!\/api\/).*$/, (req, res) => {
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
-  res.sendFile(path.join(dtFrontendPath, 'index.html'), (err) => {
-    if (err) {
-      res.status(503).send('<html><body><h2>DreamTown 준비 중입니다.</h2></body></html>');
-    }
+if (!IS_STORYBOOK_MODE) {
+  app.get(/^(?!\/api\/).*$/, (req, res) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.sendFile(path.join(dtFrontendPath, 'index.html'), (err) => {
+      if (err) {
+        res.status(503).send('<html><body><h2>DreamTown 준비 중입니다.</h2></body></html>');
+      }
+    });
   });
-});
+}
 
 // ---------- 404 & Error (middleware/errorHandler.js) ----------
 app.use(notFoundHandler);
