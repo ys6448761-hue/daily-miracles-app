@@ -3312,7 +3312,7 @@ if (playgroundRoutes && playgroundEngine) {
 // ---------- Settlement v2 라우트 등록 ----------
 if (settlementRoutes && settlementEngine) {
   // DB 연결 시 엔진 초기화
-  if (db) {
+  if (db && process.env.APP_MODE !== 'storybook') {
     settlementEngine.init(db).catch(err => {
       console.error("❌ Settlement 엔진 초기화 실패:", err.message);
     });

@@ -76,7 +76,7 @@ function dtHashWishId(input) {
 }
 
 // ── 044 startup migration (기적 은하 추가) — PostgreSQL 환경에서만 실행 ──
-if (process.env.DATABASE_URL) {
+if (process.env.DATABASE_URL && process.env.APP_MODE !== 'storybook') {
   try {
     const INSERT_MIRACLE = `
       INSERT INTO dt_galaxies (code, name_ko, name_en, direction, description, sort_order)
