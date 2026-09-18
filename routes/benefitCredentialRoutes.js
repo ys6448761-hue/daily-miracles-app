@@ -20,7 +20,8 @@ const crypto          = require('crypto');
 const QRCode          = require('qrcode');
 const db              = require('../database/db');
 const { makeLogger }  = require('../utils/logger');
-const messageProvider = require('../services/messageProvider');
+const messageProvider    = require('../services/messageProvider');
+const { verifyPartnerPin } = require('../services/partnerPinService');
 
 const log = makeLogger('benefitCredentialRoutes');
 
@@ -584,36 +585,20 @@ router.post('/:code/manual-redeem', async (req, res) => {
   if (!partner_pin)  return res.status(400).json({ error: 'partner_pin 필요' });
 
   try {
-    // ① 파트너 PIN 검증
-    const pinHash = crypto.createHash('sha256').update(String(partner_pin)).digest('hex');
-
-    // 연속 실패 5회 이상 시 1분 잠금
-    const recentFails = await db.query(
-      `SELECT COUNT(*) AS cnt FROM partner_pin_attempts
-       WHERE partner_code = $1 AND failed_at > NOW() - INTERVAL '1 minute'`,
-      [partner_code]
-    );
-    if (parseInt(recentFails.rows[0].cnt, 10) >= 5) {
-      return res.status(429).json({ error: 'PIN 시도 횟수 초과. 잠시 후 다시 시도해주세요.' });
-    }
-
-    const partnerRow = await db.query(
-      `SELECT id, pin_hash, is_active FROM partner_configs
-       WHERE partner_code = $1`,
-      [partner_code]
-    );
-
-    if (partnerRow.rowCount === 0 || !partnerRow.rows[0].is_active) {
-      return res.status(403).json({ error: '등록되지 않은 파트너 코드입니다' });
-    }
-
-    if (partnerRow.rows[0].pin_hash !== pinHash) {
-      // 실패 기록
-      db.query(
-        `INSERT INTO partner_pin_attempts (partner_code) VALUES ($1)`,
-        [partner_code]
-      ).catch(() => {});
-      return res.status(403).json({ error: 'PIN이 일치하지 않아요', code: 'WRONG_PIN' });
+    // ① 파트너 PIN 검증 (공통 정책: partnerPinService)
+    try {
+      await verifyPartnerPin(db, partner_code, partner_pin);
+    } catch (pinErr) {
+      if (pinErr.code === 'PIN_RATE_LIMITED') {
+        return res.status(429).json({ error: pinErr.message });
+      }
+      if (pinErr.code === 'PARTNER_NOT_AUTHORIZED') {
+        return res.status(403).json({ error: pinErr.message });
+      }
+      if (pinErr.code === 'WRONG_PIN') {
+        return res.status(403).json({ error: pinErr.message, code: 'WRONG_PIN' });
+      }
+      throw pinErr;
     }
 
     // ② 이용권 조회

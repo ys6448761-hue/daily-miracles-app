@@ -12,6 +12,9 @@ const router   = require('express').Router();
 const QRCode   = require('qrcode');
 const archiver = require('archiver');
 const db       = require('../database/db');
+const { requireAdmin } = require('../middleware/adminGuard');
+
+router.use(requireAdmin);
 
 const APP_BASE = process.env.APP_BASE_URL || 'https://app.dailymiracles.kr';
 

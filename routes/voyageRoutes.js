@@ -15,6 +15,8 @@ const express = require('express');
 const router  = express.Router();
 const db      = require('../database/db');
 const crypto  = require('crypto');
+const { requireAuthenticatedPrincipal } = require('../middleware/authenticatedPrincipal');
+const { resolveOwnerForCreation, verifyWishAccess } = require('../services/wishOwnershipService');
 
 // NicePay 서비스 (기존 여수 소원빌기와 동일)
 let nicepayService = null;
@@ -44,22 +46,32 @@ function calcAmount(date) {
 
 // ─────────────────────────────────────────────────────────────────
 // POST /api/voyage/wish — 소원 생성
-// Body: { wish_text, session_key? }
+// Requires: verified credential → req.sowon_id set by middleware
+// owner_sowon_id is set from server-verified SOWON context only
 // ─────────────────────────────────────────────────────────────────
-router.post('/wish', async (req, res) => {
+router.post('/wish', requireAuthenticatedPrincipal, async (req, res) => {
+  const ownerResolution = resolveOwnerForCreation(req);
+  if (!ownerResolution.ok) {
+    return res.status(403).json({
+      error: 'FORBIDDEN',
+      code: ownerResolution.reason,
+      message: 'Authenticated identity cannot be resolved to a SOWON_ID for wish ownership.',
+    });
+  }
+
   const { wish_text } = req.body;
   if (!wish_text?.trim()) {
     return res.status(400).json({ error: '소원을 입력해주세요.' });
   }
   try {
-    const sessionKey = getSessionKey(req) || crypto.randomUUID();
+    const sessionKey = crypto.randomUUID(); // server-generated; not client-controlled
     const { rows } = await db.query(
-      `INSERT INTO voyage_wishes (session_key, wish_text, status)
-       VALUES ($1, $2, 'draft_created')
+      `INSERT INTO voyage_wishes (session_key, wish_text, status, owner_sowon_id)
+       VALUES ($1, $2, 'draft_created', $3)
        RETURNING id, wish_text, status, created_at`,
-      [sessionKey, wish_text.trim()]
+      [sessionKey, wish_text.trim(), ownerResolution.owner_sowon_id]
     );
-    res.status(201).json({ ok: true, wish: rows[0], session_key: sessionKey });
+    res.status(201).json({ ok: true, wish: rows[0] });
   } catch (err) {
     console.error('[Voyage] POST /wish error:', err.message);
     res.status(500).json({ error: 'Internal server error' });
@@ -67,15 +79,21 @@ router.post('/wish', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────────
-// GET /api/voyage/wish/:id — 소원 + 예약 + 상태 조회
+// GET /api/voyage/wish/:id — 소원 + 예약 + 상태 조회 (owner-protected)
+// Requires: verified credential + matching SOWON_ID
 // ─────────────────────────────────────────────────────────────────
-router.get('/wish/:id', async (req, res) => {
+router.get('/wish/:id', requireAuthenticatedPrincipal, async (req, res) => {
   try {
-    const { rows: wishes } = await db.query(
-      `SELECT id, wish_text, status, star_id, created_at FROM voyage_wishes WHERE id = $1`,
-      [req.params.id]
-    );
-    if (wishes.length === 0) return res.status(404).json({ error: '소원을 찾을 수 없습니다.' });
+    const { allowed, wish, reason } = await verifyWishAccess(req.params.id, req.sowon_id, db);
+
+    if (!allowed) {
+      if (reason === 'NOT_FOUND') return res.status(404).json({ error: '소원을 찾을 수 없습니다.' });
+      if (reason === 'SOWON_ID_UNRESOLVED') {
+        return res.status(403).json({ error: 'FORBIDDEN', code: 'SOWON_ID_UNRESOLVED' });
+      }
+      // CROSS_OWNER or LEGACY_OWNER_NULL: do not expose resource existence
+      return res.status(403).json({ error: 'FORBIDDEN', code: reason });
+    }
 
     const { rows: bookings } = await db.query(
       `SELECT id, customer_name, booking_date, session, amount, status AS booking_status
@@ -83,7 +101,7 @@ router.get('/wish/:id', async (req, res) => {
       [req.params.id]
     );
 
-    res.json({ wish: wishes[0], booking: bookings[0] ?? null });
+    res.json({ wish, booking: bookings[0] ?? null });
   } catch (err) {
     console.error('[Voyage] GET /wish/:id error:', err.message);
     res.status(500).json({ error: 'Internal server error' });
@@ -91,10 +109,11 @@ router.get('/wish/:id', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────────
-// POST /api/voyage/booking — 예약 생성
+// POST /api/voyage/booking — 예약 생성 (P0-2 ownership enforced)
+// Invariant: req.sowon_id === wish.owner_sowon_id before booking creation
 // Body: { wish_id, customer_name, phone, booking_date, session }
 // ─────────────────────────────────────────────────────────────────
-router.post('/booking', async (req, res) => {
+router.post('/booking', requireAuthenticatedPrincipal, async (req, res) => {
   const { wish_id, customer_name, phone, booking_date, session } = req.body;
   if (!wish_id || !customer_name || !phone || !booking_date || !session) {
     return res.status(400).json({ error: 'wish_id, customer_name, phone, booking_date, session 필수' });
@@ -103,8 +122,17 @@ router.post('/booking', async (req, res) => {
     return res.status(400).json({ error: 'session은 morning 또는 evening' });
   }
   try {
-    const wishRow = await db.query('SELECT id, status FROM voyage_wishes WHERE id = $1', [wish_id]);
-    if (wishRow.rowCount === 0) return res.status(404).json({ error: '소원을 찾을 수 없습니다.' });
+    // P0-2: ownership check BEFORE any booking logic
+    // verifyWishAccess loads the wish and compares req.sowon_id vs wish.owner_sowon_id
+    const { allowed, wish, reason } = await verifyWishAccess(wish_id, req.sowon_id, db);
+
+    if (!allowed) {
+      if (reason === 'NOT_FOUND') return res.status(404).json({ error: '소원을 찾을 수 없습니다.' });
+      if (reason === 'SOWON_ID_UNRESOLVED') {
+        return res.status(403).json({ error: 'FORBIDDEN', code: 'SOWON_ID_UNRESOLVED' });
+      }
+      return res.status(403).json({ error: 'FORBIDDEN', code: reason });
+    }
 
     const amount = calcAmount(booking_date);
 

@@ -27,6 +27,7 @@
 
 const express = require('express');
 const router = express.Router();
+const { verifyAdminToken } = require('../middleware/adminGuard');
 
 // 견적 엔진 (필수)
 const quoteEngine = require('../services/quoteEngine');
@@ -691,8 +692,9 @@ router.get('/:quoteId', async (req, res) => {
       });
     }
 
-    // 민감 정보 마스킹 (비관리자)
-    const isAdmin = req.query.admin === 'true'; // 실제로는 인증 필요
+    // 민감 정보 마스킹: X-Admin-Token 헤더 검증으로만 해제 가능
+    // req.query.admin, body.admin, body.isAdmin 등 클라이언트 제어 필드는 효과 없음
+    const isAdmin = verifyAdminToken(req);
     if (!isAdmin && quote.customer_phone) {
       quote.customer_phone = quote.customer_phone.slice(0, -4) + '****';
     }

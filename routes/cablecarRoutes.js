@@ -18,6 +18,7 @@ const router  = express.Router();
 const { v4: uuidv4 } = require('uuid');
 const crypto  = require('crypto');
 const db      = require('../database/db');
+const { resolveQRPrincipal, performQRBootstrap } = require('../services/qrCredentialBootstrap');
 
 let nicepayService = null;
 try { nicepayService = require('../services/nicepayService'); } catch (_) {}
@@ -76,6 +77,29 @@ async function validateCredential(credentialCode) {
 // POST /api/cablecar/enter
 // ─────────────────────────────────────────────────────────────────────
 router.post('/enter', async (req, res) => {
+  // ── Credential Resolution (3-path) ────────────────────────────────────
+  const qrPrincipal = await resolveQRPrincipal(req);
+
+  if (qrPrincipal.path === 'INVALID') {
+    return res.status(401).json({
+      success: false,
+      error: 'UNAUTHORIZED',
+      code: 'INVALID_CREDENTIAL',
+    });
+  }
+
+  // PATH A: first-time QR visitor — bootstrap anonymous identity + credential
+  let bootstrapCredential = null;
+  if (qrPrincipal.path === 'A') {
+    try {
+      bootstrapCredential = await performQRBootstrap();
+    } catch (err) {
+      console.error('[cablecar/enter] credential bootstrap error:', err.message);
+      return res.status(500).json({ success: false, error: '자격증명 발급 실패' });
+    }
+  }
+
+  // ── Business logic (star operations) — user_id is NOT authentication ──
   const {
     user_id,
     star_id,
@@ -83,6 +107,15 @@ router.post('/enter', async (req, res) => {
     place = 'yeosu_cablecar_cabin',
     credential_code,
   } = req.body;
+
+  // PATH A with no user_id: return bootstrap credential only — no star ops
+  if (qrPrincipal.path === 'A' && !user_id) {
+    return res.json({
+      success: true,
+      mode: 'credential_bootstrap',
+      ...bootstrapCredential,
+    });
+  }
 
   if (!user_id) {
     return res.status(400).json({ success: false, error: 'user_id가 필요합니다.' });
