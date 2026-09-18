@@ -20,6 +20,10 @@ const RESTORE_TOKEN_TTL_DAYS = 30;
 const RESTORE_TOKEN_MAX_ATTEMPTS = 5;
 const RESTORE_TOKEN_RATE_LIMIT_WINDOW_SECONDS = 3600;
 
+// Canonical partner_code pattern: uppercase letter start, uppercase alphanumeric + underscore, 1-30 chars
+// Accepts KENNY, RAMADA, HOTEL_ABC — rejects free text, lowercase, spaces, SQL fragments
+const ENTRY_POINT_PATTERN = /^[A-Z][A-Z0-9_]{0,29}$/;
+
 class SessionService {
   /**
    * Create a new session
@@ -194,6 +198,55 @@ class SessionService {
     } catch (error) {
       console.error('Failed to get session info:', error);
       return null;
+    }
+  }
+
+  /**
+   * Write SODAM OFFER hotel context into session entry_point.
+   * Merges only entry_point into existing context JSONB (PostgreSQL || operator).
+   * All other context fields are preserved — no full overwrite.
+   *
+   * entry_point must be a canonical partner_code (e.g. 'KENNY', 'RAMADA').
+   * Accepts uppercase letters, digits, underscore — 1 to 30 chars, letter-start.
+   * Rejects free text, lowercase, spaces, empty string.
+   *
+   * @param {string} sessionId
+   * @param {string} entryPoint — canonical partner_code from a verified SODAM OFFER
+   * @returns {Promise<{ updated: boolean, reason?: string }>}
+   */
+  async updateEntryPoint(sessionId, entryPoint) {
+    if (!entryPoint || !ENTRY_POINT_PATTERN.test(entryPoint)) {
+      return { updated: false, reason: 'INVALID_ENTRY_POINT' };
+    }
+
+    try {
+      // Check existence and expiry (mirrors isSessionValid pattern)
+      const checkResult = await db.query(
+        `SELECT expires_at FROM travel_guide_sessions WHERE session_id = $1`,
+        [sessionId]
+      );
+      if (!checkResult.rows.length) {
+        return { updated: false, reason: 'NOT_FOUND' };
+      }
+      if (new Date() > new Date(checkResult.rows[0].expires_at)) {
+        return { updated: false, reason: 'EXPIRED' };
+      }
+
+      // Merge entry_point into context JSONB — right operand wins on key conflict
+      // All other context fields (time_available_minutes, people_type, _provenance …) preserved
+      const mergeResult = await db.query(
+        `UPDATE travel_guide_sessions
+         SET context    = context || $1::jsonb,
+             updated_at = NOW()
+         WHERE session_id = $2
+         RETURNING session_id`,
+        [JSON.stringify({ entry_point: entryPoint }), sessionId]
+      );
+
+      return { updated: mergeResult.rows.length > 0 };
+    } catch (error) {
+      console.error('[SESSION_UPDATE_ENTRY_POINT_ERROR]', { message: error.message });
+      return { updated: false, reason: 'DB_ERROR' };
     }
   }
 

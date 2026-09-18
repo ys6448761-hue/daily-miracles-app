@@ -19,6 +19,7 @@
  */
 
 const priceData = require('../config/quotePriceData');
+const { getKSTDateString } = require('../utils/kstDate');
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 유틸리티 함수
@@ -30,15 +31,19 @@ const priceData = require('../config/quotePriceData');
  * @returns {string} dayType
  */
 function getDayType(date) {
-  const d = new Date(date);
-  const dateStr = d.toISOString().split('T')[0];
+  // Convert input to Korea-local (KST, UTC+9) calendar date string.
+  // Handles both YYYY-MM-DD strings and Date objects correctly regardless of
+  // server timezone (Render runs UTC; Korea is UTC+9).
+  const kstDateStr = getKSTDateString(new Date(date));
 
-  // 공휴일 체크
-  if (priceData.holidays.includes(dateStr)) {
+  // 공휴일 체크 — compared against KST calendar date
+  if (priceData.holidays.includes(kstDateStr)) {
     return 'holiday';
   }
 
-  const dayOfWeek = d.getDay();
+  // Parse KST date string as UTC midnight to get the correct day-of-week
+  // for that Korean calendar date without any local-timezone interference
+  const dayOfWeek = new Date(kstDateStr + 'T00:00:00Z').getDay();
   switch (dayOfWeek) {
     case 0: return 'sun';
     case 1:
