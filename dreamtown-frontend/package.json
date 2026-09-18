@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --port 3000",
     "build": "vite build",
+    "build:muyeojeong": "vite build --config vite.config.muyeojeong.js && node -e \"const fs=require('fs'); if(fs.existsSync('dist-muyeojeong/index.muyeojeong.html')) fs.renameSync('dist-muyeojeong/index.muyeojeong.html','dist-muyeojeong/index.html')\"",
     "preview": "vite preview"
   },
   "dependencies": {
