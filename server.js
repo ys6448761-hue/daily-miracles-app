@@ -18,6 +18,7 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const IS_SERVERLESS = !!(process.env.VERCEL || process.env.NOW_REGION || process.env.AWS_LAMBDA_FUNCTION_NAME);
 const APP_MODE = process.env.APP_MODE || 'full';
 const IS_STORYBOOK_MODE = APP_MODE === 'storybook';
+const IS_MUYEOJEONG_MODE = APP_MODE === 'muyeojeong';
 try {
   envValidator = require("./utils/envValidator");
   const validationResult = envValidator.validateEnv({ failFast: IS_PRODUCTION });
@@ -36,8 +37,8 @@ try {
 // ═══════════════════════════════════════════════════════════
 // Server Startup Configuration (APP_MODE)
 // ═══════════════════════════════════════════════════════════
-console.log(`📌 Server Mode: ${IS_STORYBOOK_MODE ? 'STORYBOOK (workers disabled)' : 'FULL (all services enabled)'}`);
-if (IS_STORYBOOK_MODE) {
+console.log(`📌 Server Mode: ${IS_STORYBOOK_MODE ? 'STORYBOOK (workers disabled)' : IS_MUYEOJEONG_MODE ? 'MUYEOJEONG (travel runtime only)' : 'FULL (all services enabled)'}`);
+if (IS_STORYBOOK_MODE || IS_MUYEOJEONG_MODE) {
   console.log('ℹ️  Background workers disabled: dtOrchestrator, Aurora, StarCare, Guardian, ReportScheduler');
 }
 
@@ -323,7 +324,7 @@ let verifyAdmin = (req, res, next) => {
 let airtableService = null;
 let slackBotService = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     metricsService = require("./services/metricsService");
     console.log("✅ 메트릭스 서비스 로드 성공");
@@ -368,7 +369,7 @@ if (!IS_STORYBOOK_MODE) {
 // Slack Heartbeat 서비스 로딩 (운영 헬스 모니터링, Storybook 제외)
 let slackHeartbeatService = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     slackHeartbeatService = require("./services/slackHeartbeatService");
     console.log("✅ Slack Heartbeat 서비스 로드 성공");
@@ -395,7 +396,7 @@ if (slackHeartbeatService) {
 // 8-Mode SSOT Registry (P1-SSOT — modes.registry.json)
 let modesLoader = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     modesLoader = require("./config/modesLoader");
     const { modes, errors } = modesLoader.loadRegistry({ failFast: IS_PRODUCTION });
@@ -423,7 +424,7 @@ let yeosuRoutes = null;
 let wishVoyageRoutes = null;
 let problemRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   // 인증 라우터 로딩
   try {
     authRoutes = require("./routes/authRoutes");
@@ -472,7 +473,7 @@ let agentRoutes = null;
 let batchRoutes = null;
 let shortsRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   // MVP 1차 폼 (간편 접수) 라우터 로딩
   try {
     inquiryRoutes = require("./routes/inquiryRoutes");
@@ -597,17 +598,19 @@ if (!IS_STORYBOOK_MODE) {
 
 // 스토리북 E2E Commerce 라우터 로딩
 let storybookRoutes = null;
-try {
-  storybookRoutes = require("./routes/storybookRoutes");
-  console.log("✅ 스토리북 라우터 로드 성공");
-} catch (error) {
-  console.error("❌ 스토리북 라우터 로드 실패:", error.message);
+if (!IS_MUYEOJEONG_MODE) {
+  try {
+    storybookRoutes = require("./routes/storybookRoutes");
+    console.log("✅ 스토리북 라우터 로드 성공");
+  } catch (error) {
+    console.error("❌ 스토리북 라우터 로드 실패:", error.message);
+  }
 }
 
 // 여수 소원항해 견적 시스템 v2.0 라우터 로딩
 let quoteRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     quoteRoutes = require("./routes/quoteRoutes");
     console.log("✅ 견적 시스템 라우터 로드 성공");
@@ -619,7 +622,7 @@ if (!IS_STORYBOOK_MODE) {
 // 4인 이하 자동 일정 생성 라우터 로딩
 let itineraryRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     itineraryRoutes = require("./routes/itineraryRoutes");
     console.log("✅ 일정 생성 라우터 로드 성공");
@@ -631,7 +634,7 @@ if (!IS_STORYBOOK_MODE) {
 // Wix 자유여행 견적 요청 라우터 로딩
 let quoteRequestRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     quoteRequestRoutes = require("./routes/quoteRequestRoutes");
     console.log("✅ Wix 견적 요청 라우터 로드 성공");
@@ -643,7 +646,7 @@ if (!IS_STORYBOOK_MODE) {
 // 단축 링크 라우터 로딩 (/r/{token})
 let shortLinkRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     shortLinkRoutes = require("./routes/shortLinkRoutes");
     console.log("✅ 단축 링크 라우터 로드 성공");
@@ -655,7 +658,7 @@ if (!IS_STORYBOOK_MODE) {
 // 운영 시스템 라우터 로딩 (헬스체크, 비상알림)
 let opsRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     opsRoutes = require("./routes/opsRoutes");
     console.log("✅ 운영 시스템 라우터 로드 성공");
@@ -667,7 +670,7 @@ if (!IS_STORYBOOK_MODE) {
 // Entitlement 미들웨어 로딩 (Trial 권한 검증)
 let entitlementMiddleware = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     entitlementMiddleware = require("./middleware/entitlement");
     console.log("✅ Entitlement 미들웨어 로드 성공");
@@ -679,7 +682,7 @@ if (!IS_STORYBOOK_MODE) {
 // 30일 프로그램 결제 라우터 로딩
 let programRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     programRoutes = require("./routes/programRoutes");
     console.log("✅ 30일 프로그램 라우터 로드 성공");
@@ -691,7 +694,7 @@ if (!IS_STORYBOOK_MODE) {
 // 여수 소원빌기 체험 라우터 로딩
 let yeosuWishRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     yeosuWishRoutes = require("./routes/yeosuWishRoutes");
     console.log("✅ 여수 소원빌기 라우터 로드 성공");
@@ -703,7 +706,7 @@ if (!IS_STORYBOOK_MODE) {
 // 북은하 항해 MVP 라우터
 let voyageRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     voyageRoutes = require("./routes/voyageRoutes");
     console.log("✅ 북은하 항해 라우터 로드 성공");
@@ -715,7 +718,7 @@ if (!IS_STORYBOOK_MODE) {
 // 모바일 이용권 (증명 시스템)
 let benefitCredentialRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     benefitCredentialRoutes = require("./routes/benefitCredentialRoutes");
     console.log("✅ 모바일 이용권 라우터 로드 성공");
@@ -727,7 +730,7 @@ if (!IS_STORYBOOK_MODE) {
 // DreamTown 핵심 퍼널 (소원 → 추천 → 별 생성)
 let dtFunnelRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     dtFunnelRoutes = require("./routes/dtFunnelRoutes");
     console.log("✅ DreamTown 퍼널 라우터 로드 성공");
@@ -739,7 +742,7 @@ if (!IS_STORYBOOK_MODE) {
 // DreamTown 파트너 정산
 let dtSettlementRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     dtSettlementRoutes = require("./routes/dtSettlementRoutes");
     console.log("✅ DreamTown 정산 라우터 로드 성공");
@@ -751,7 +754,7 @@ if (!IS_STORYBOOK_MODE) {
 // DreamTown Benefit Engine — 상품/혜택/지역
 let dtProductRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     dtProductRoutes = require("./routes/dtProductRoutes");
     console.log("✅ DreamTown 상품 라우터 로드 성공");
@@ -762,7 +765,7 @@ if (!IS_STORYBOOK_MODE) {
 
 let dtAdminBenefitRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     dtAdminBenefitRoutes = require("./routes/dtAdminBenefitRoutes");
     console.log("✅ DreamTown 혜택 관리자 라우터 로드 성공");
@@ -774,7 +777,7 @@ if (!IS_STORYBOOK_MODE) {
 // DreamTown AI Unlock 모네타이제이션
 let dtAiUnlockRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     dtAiUnlockRoutes = require("./routes/dtAiUnlockRoutes");
     console.log("✅ DreamTown AI Unlock 라우터 로드 성공");
@@ -786,7 +789,7 @@ if (!IS_STORYBOOK_MODE) {
 // Aurora 5 Agent KPI 메트릭
 let agentMetricsRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     agentMetricsRoutes = require("./routes/agentMetricsRoutes");
     console.log("✅ Agent KPI 메트릭 라우터 로드 성공");
@@ -798,7 +801,7 @@ if (!IS_STORYBOOK_MODE) {
 // RepoPulse 라우터 로딩
 let repoPulseRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     repoPulseRoutes = require("./routes/repoPulseRoutes");
     console.log("✅ RepoPulse 라우터 로드 성공");
@@ -810,7 +813,7 @@ if (!IS_STORYBOOK_MODE) {
 // Chat Log 라우터 로딩
 let chatLogRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     chatLogRoutes = require("./routes/chatLogRoutes");
     console.log("✅ Chat Log 라우터 로드 성공");
@@ -822,7 +825,7 @@ if (!IS_STORYBOOK_MODE) {
 // RAW Process 라우터 로딩
 let rawProcessRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     rawProcessRoutes = require("./routes/rawProcessRoutes");
     console.log("✅ RAW Process 라우터 로드 성공");
@@ -834,7 +837,7 @@ if (!IS_STORYBOOK_MODE) {
 // Drive→GitHub Sync 라우터 로딩
 let driveGitHubSyncRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     driveGitHubSyncRoutes = require("./routes/driveGitHubSyncRoutes");
     console.log("✅ Drive→GitHub Sync 라우터 로드 성공");
@@ -846,7 +849,7 @@ if (!IS_STORYBOOK_MODE) {
 // Storyboard 배치 라우터 로딩
 let storyboardRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     storyboardRoutes = require("./routes/storyboardRoutes");
     console.log("✅ Storyboard 배치 라우터 로드 성공");
@@ -858,7 +861,7 @@ if (!IS_STORYBOOK_MODE) {
 // Hero8 8초 영상 생성 라우터 로딩
 let hero8Routes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     hero8Routes = require("./routes/hero8Routes");
     console.log("✅ Hero8 영상 라우터 로드 성공");
@@ -870,7 +873,7 @@ if (!IS_STORYBOOK_MODE) {
 // VideoJob 오케스트레이터 라우터 로딩 (AIL-2026-0219-VID-003)
 let videoJobRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     videoJobRoutes = require("./routes/videoJobRoutes");
     console.log("✅ VideoJob 라우터 로드 성공");
@@ -883,7 +886,7 @@ if (!IS_STORYBOOK_MODE) {
 let auroraJobRoutes = null;
 let auroraWorkerInstance = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     auroraJobRoutes = require("./routes/auroraJobRoutes");
     console.log("✅ Aurora Job 라우터 로드 성공");
@@ -895,7 +898,7 @@ if (!IS_STORYBOOK_MODE) {
 // 기적 금고 (Finance) 라우터 로딩
 let financeRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     financeRoutes = require("./routes/financeRoutes");
     console.log("✅ 기적 금고(Finance) 라우터 로드 성공");
@@ -907,7 +910,7 @@ if (!IS_STORYBOOK_MODE) {
 // 포인트 시스템 라우터 로딩 (Aurora5 v2.6)
 let pointRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     pointRoutes = require("./routes/pointRoutes");
     console.log("✅ 포인트 시스템 라우터 로드 성공");
@@ -919,7 +922,7 @@ if (!IS_STORYBOOK_MODE) {
 // 리워드(예고편 교환) 라우터 로딩 (Aurora5 v2.6)
 let rewardRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     rewardRoutes = require("./routes/rewardRoutes");
     console.log("✅ 리워드(예고편) 라우터 로드 성공");
@@ -931,7 +934,7 @@ if (!IS_STORYBOOK_MODE) {
 // 추천 시스템 라우터 로딩 (Aurora5 v2.6)
 let referralRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     referralRoutes = require("./routes/referralRoutes");
     console.log("✅ 추천 시스템 라우터 로드 성공");
@@ -943,7 +946,7 @@ if (!IS_STORYBOOK_MODE) {
 // 항해 예약 어드민 라우터 로딩
 let voyageAdminRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     voyageAdminRoutes = require('./routes/voyageAdminRoutes');
     console.log('✅ 항해 예약 어드민 라우터 로드 성공');
@@ -953,7 +956,7 @@ if (!IS_STORYBOOK_MODE) {
 // AI 비용 대시보드 라우터 로딩
 let adminAiCostRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     adminAiCostRoutes = require("./routes/adminAiCostRoutes");
     console.log("✅ AI 비용 대시보드 라우터 로드 성공");
@@ -965,7 +968,7 @@ if (!IS_STORYBOOK_MODE) {
 // ── Core Journey Flow 라우터 로딩 ────────────────────────────────────
 let wishCoreRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     wishCoreRoutes = require('./routes/wishCoreRoutes');
     console.log('✅ wishCore 라우터 로드 성공');
@@ -974,7 +977,7 @@ if (!IS_STORYBOOK_MODE) {
 
 let journeyContextRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     journeyContextRoutes = require('./routes/journeyContextRoutes');
     console.log('✅ journeyContext 라우터 로드 성공');
@@ -983,7 +986,7 @@ if (!IS_STORYBOOK_MODE) {
 
 let recommendationRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     recommendationRoutes = require('./routes/recommendationRoutes');
     console.log('✅ recommendation 라우터 로드 성공');
@@ -992,7 +995,7 @@ if (!IS_STORYBOOK_MODE) {
 
 let wishJourneyRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     wishJourneyRoutes = require('./routes/wishJourneyRoutes');
     console.log('✅ wishJourney 라우터 로드 성공');
@@ -1002,7 +1005,7 @@ if (!IS_STORYBOOK_MODE) {
 // 어드민 포인트/추천 관리 라우터 로딩 (Aurora5 v2.6)
 let adminPointRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     adminPointRoutes = require("./routes/adminPointRoutes");
     console.log("✅ 어드민 포인트 라우터 로드 성공");
@@ -1014,7 +1017,7 @@ if (!IS_STORYBOOK_MODE) {
 // 일일 체크 (출석/실행/기록) 라우터 로딩 (Aurora5 v2.6 Gap)
 let dailyCheckRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     dailyCheckRoutes = require("./routes/dailyCheckRoutes");
     console.log("✅ 일일 체크 라우터 로드 성공");
@@ -1026,7 +1029,7 @@ if (!IS_STORYBOOK_MODE) {
 // 몰트봇 (고객응대 Draft 생성기)
 let maltbotRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     maltbotRoutes = require("./routes/maltbotRoutes");
     console.log("✅ 몰트봇 라우터 로드 성공");
@@ -1038,7 +1041,7 @@ if (!IS_STORYBOOK_MODE) {
 // 나이스페이 결제 라우터 로딩
 let nicepayRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     nicepayRoutes = require("./routes/nicepayRoutes");
     console.log("✅ 나이스페이 라우터 로드 성공");
@@ -1051,7 +1054,7 @@ if (!IS_STORYBOOK_MODE) {
 let wishTrackingRoutes = null;
 let wishTrackingMessageProvider = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     wishTrackingRoutes = require("./routes/wishTrackingRoutes");
     console.log("✅ 소원 추적 라우터 로드 성공");
@@ -1068,7 +1071,7 @@ if (!IS_STORYBOOK_MODE) {
 // 실시간 카운터 라우터 로딩 (바이럴 루프 #4: 네트워크 효과)
 let liveCounterRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     liveCounterRoutes = require("./routes/liveCounterRoutes");
     console.log("✅ 실시간 카운터 라우터 로드 성공");
@@ -1080,7 +1083,7 @@ if (!IS_STORYBOOK_MODE) {
 // 소원항해단 v3.1-MVP 라우터 로딩
 let harborRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     harborRoutes = require("./routes/harborRoutes");
     console.log("✅ 소원항해단(Harbor) 라우터 로드 성공");
@@ -1092,7 +1095,7 @@ if (!IS_STORYBOOK_MODE) {
 // 여수여행센터 운영 컨트롤타워 OS v0 라우터 로딩
 let yeosuOpsRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     yeosuOpsRoutes = require("./routes/yeosuOpsRoutes");
     console.log("✅ 여수 운영 컨트롤타워(Ops Center) 라우터 로드 성공");
@@ -1105,7 +1108,7 @@ if (!IS_STORYBOOK_MODE) {
 let playgroundRoutes = null;
 let playgroundEngine = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     playgroundRoutes = require("./routes/playgroundRoutes");
     playgroundEngine = require("./services/playground");
@@ -1119,7 +1122,7 @@ if (!IS_STORYBOOK_MODE) {
 let settlementRoutes = null;
 let settlementEngine = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     settlementRoutes = require("./routes/settlementRoutes");
     settlementEngine = require("./services/settlement");
@@ -1132,7 +1135,7 @@ if (!IS_STORYBOOK_MODE) {
 // WU (Aurora5 통합 엔진) 라우터 로딩
 let wuRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     wuRoutes = require("./routes/wuRoutes");
     console.log("✅ WU API 라우터 로드 성공");
@@ -1144,7 +1147,7 @@ if (!IS_STORYBOOK_MODE) {
 // Attendance (Living Wisdom 출석/체온) 라우터 로딩
 let attendanceRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     attendanceRoutes = require("./routes/attendanceRoutes");
     console.log("✅ Attendance 라우터 로드 성공");
@@ -1156,7 +1159,7 @@ if (!IS_STORYBOOK_MODE) {
 // Experiment Event 라우터 로딩
 let experimentEventRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     experimentEventRoutes = require("./routes/experimentEventRoutes");
     console.log("✅ Experiment Event 라우터 로드 성공");
@@ -2589,7 +2592,7 @@ if (dtProductRoutes) {
 // /api/admin/dt/location 은 반드시 그 앞에 위치해야 함
 let adminLocationRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     adminLocationRoutes = require('./routes/adminLocationRoutes');
   } catch (e) {
@@ -2619,7 +2622,7 @@ if (agentMetricsRoutes) {
 
 let dreamtownFlowRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     dreamtownFlowRoutes = require("./routes/dreamtownFlowRoutes");
     console.log("✅ DreamTown Flow 라우터 로드 성공");
@@ -2635,7 +2638,7 @@ if (dreamtownFlowRoutes) {
 // ---------- FLOW Kenny Availability (/api/dt/flow/availability, /hold, /book) ----------
 let flowKennyRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     flowKennyRoutes = require("./routes/flowRoutes");
     console.log("✅ FLOW Kenny 라우터 로드 성공");
@@ -2651,7 +2654,7 @@ if (flowKennyRoutes) {
 // ---------- FLOW Confirm (/api/dt/flow/confirm) ----------
 let flowConfirmKennyRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     flowConfirmKennyRoutes = require("./routes/flowConfirmRoutes");
     console.log("✅ FLOW Confirm 라우터 로드 성공");
@@ -2665,7 +2668,7 @@ if (flowConfirmKennyRoutes) {
 }
 
 let sodamKennyRoutes = null;
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     sodamKennyRoutes = require("./routes/sodamRoutes");
     console.log("✅ SODAM 결정 라우터 로드 성공");
@@ -2694,7 +2697,7 @@ if (identityRoutes) {
 
 let wishCheckinRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     wishCheckinRoutes = require("./routes/wishCheckinRoutes");
     console.log("✅ 소원 상태 체크인 라우터 로드 성공");
@@ -2833,7 +2836,7 @@ if (recommendationRoutes) app.use('/api/recommendation',   recommendationRoutes)
 if (wishJourneyRoutes)   app.use('/api/journeys',          wishJourneyRoutes);
 
 // ---------- 여수 소원여정 예약/문의 접수 ─────────────────────────────
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     app.use('/api/journey-inquiry', require('./routes/journeyInquiryRoutes'));
     console.log('✅ journey-inquiry 라우터 등록 완료 (/api/journey-inquiry)');
@@ -2855,7 +2858,7 @@ if (voyageAdminRoutes) {
 }
 
 // ---------- 장소 관리자 로그인 (/api/admin/login) ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const locationAdminAuthRoutes = require('./routes/locationAdminAuthRoutes');
     app.use('/api/admin', locationAdminAuthRoutes);
@@ -2866,7 +2869,7 @@ if (!IS_STORYBOOK_MODE) {
 }
 
 // ---------- 케이블카 운영 관리 Routes (/api/admin/cablecar) ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const adminCablecarRoutes = require('./routes/adminCablecarRoutes');
     app.use('/api/admin/cablecar', adminCablecarRoutes);
@@ -2879,7 +2882,7 @@ if (!IS_STORYBOOK_MODE) {
 // ---------- 운영 관제 대시보드 (/api/admin/dashboard) — 반드시 /api/admin 광역 마운트보다 앞에 위치 ----------
 let adminDashboardRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     adminDashboardRoutes = require('./routes/adminDashboardRoutes');
   } catch (e) {
@@ -2892,7 +2895,7 @@ if (adminDashboardRoutes) {
 }
 
 // ---------- 공명 트래킹 관리자 API (/api/admin) ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const adminResonanceRoutes = require('./routes/adminResonanceRoutes');
     app.use('/api/admin', adminResonanceRoutes);
@@ -2905,7 +2908,7 @@ if (!IS_STORYBOOK_MODE) {
 // ---------- 슈퍼어드민 파트너 관리 Routes (/api/admin/partners) ----------
 let adminPartnerRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     adminPartnerRoutes = require('./routes/adminPartnerRoutes');
   } catch (e) {
@@ -2920,7 +2923,7 @@ if (adminPartnerRoutes) {
 // ---------- FLOW Admin Routes (/api/admin/flow/inventory) ----------
 let flowAdminKennyRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     flowAdminKennyRoutes = require('./routes/flowAdminRoutes');
     console.log('✅ FLOW Admin 라우터 로드 성공');
@@ -2936,7 +2939,7 @@ if (flowAdminKennyRoutes) {
 // ---------- 파트너 QR 코드 센터 (/admin/partner-qr-*) ----------
 let adminQRRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     adminQRRoutes = require('./routes/adminQRRoutes');
   } catch (e) {
@@ -2954,7 +2957,7 @@ app.get('/dreamtown/admin/location/:code', (req, res) => {
 });
 
 // ---------- Impact Routes (/api/impact) ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const impactRoutes = require('./routes/impactRoutes');
     app.use('/api/impact', impactRoutes);
@@ -3086,7 +3089,7 @@ app.get('/storybook/:key', async (req, res) => {
 // ---------- 별들의 고향 Routes (/api/hometown) ----------
 let hometownRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     hometownRoutes = require('./routes/hometownRoutes');
   } catch (e) {
@@ -3101,7 +3104,7 @@ if (hometownRoutes) {
 // ---------- 아우룸 위치 잠금 기억 (/api/aurum) ----------
 let aurumRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     aurumRoutes = require('./routes/aurumRoutes');
   } catch (e) {
@@ -3116,7 +3119,7 @@ if (aurumRoutes) {
 // ---------- 단순 별 시스템 (/api/stars, /api/logs) ----------
 let starsRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     starsRoutes = require('./routes/starsRoutes');
   } catch (e) {
@@ -3173,7 +3176,7 @@ if (starsRoutes) {
 
 let logsRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     logsRoutes = require('./routes/logsRoutes');
   } catch (e) {
@@ -3189,7 +3192,7 @@ if (logsRoutes) {
 // ---------- 약속 기록 (/api/promise) ----------
 let promiseRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     promiseRoutes = require('./routes/promiseRoutes');
   } catch (e) {
@@ -3205,7 +3208,7 @@ if (promiseRoutes) {
 // ---------- 케이블카 캐빈 QR 진입 엔진 (/api/cablecar) ----------
 let cablecarRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     cablecarRoutes = require('./routes/cablecarRoutes');
   } catch (e) {
@@ -3221,7 +3224,7 @@ if (cablecarRoutes) {
 // ---------- Travel Click 로그 (/api/travel) ----------
 let travelClickRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     travelClickRoutes = require('./routes/travelClickRoutes');
   } catch (e) {
@@ -3243,7 +3246,7 @@ if (travelGuideRoutes) {
 // ---------- Star MVP (/api/star) ----------
 let starMvpRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     starMvpRoutes = require('./routes/starMvpRoutes');
   } catch (e) {
@@ -3259,7 +3262,7 @@ if (starMvpRoutes) {
 // ---------- Share Image Generation (/api/generate-share-image) ----------
 let shareImageRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     shareImageRoutes = require('./routes/shareImageRoutes');
   } catch (e) {
@@ -3275,7 +3278,7 @@ if (shareImageRoutes) {
 // ---------- Seed Library (/api/seeds) ----------
 let seedRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     seedRoutes = require('./routes/seedRoutes');
   } catch (e) {
@@ -3291,7 +3294,7 @@ if (seedRoutes) {
 // ---------- Star Journey + Moment (/api/star/journeys, /api/moments) ----------
 let starJourneyRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     starJourneyRoutes = require('./routes/starJourneyRoutes');
   } catch (e) {
@@ -3306,7 +3309,7 @@ if (starJourneyRoutes) {
 
 let momentRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     momentRoutes = require('./routes/momentRoutes');
   } catch (e) {
@@ -3322,7 +3325,7 @@ if (momentRoutes) {
 // ---------- Star Voyage (/api/star-voyage) ----------
 let starVoyageRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     starVoyageRoutes = require('./routes/starVoyageRoutes');
   } catch (e) {
@@ -3338,7 +3341,7 @@ if (starVoyageRoutes) {
 // ---------- Star Image Cache (/api/star-image) ----------
 let starImageRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     starImageRoutes = require('./routes/starImageRoutes');
     console.log('✅ Star Image 라우터 로드 성공');
@@ -3359,7 +3362,7 @@ if (starImageRoutes) {
 // Status: Partially deprecated but still required for public feed & constellation endpoints
 let starPublicRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     starPublicRoutes = require('./routes/starPublicRoutes');
   } catch (e) {
@@ -3375,7 +3378,7 @@ if (starPublicRoutes) {
 // ---------- 여수 미션 + 포인트 (/api/yeosu-missions) ----------
 let yeosuMissionRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     yeosuMissionRoutes = require('./routes/yeosuMissionRoutes');
   } catch (e) {
@@ -3391,7 +3394,7 @@ if (yeosuMissionRoutes) {
 // ---------- 파트너 어드민 인증 Routes (/api/partner) ----------
 let partnerAuthRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     partnerAuthRoutes = require('./routes/partnerAuthRoutes');
   } catch (e) {
@@ -3407,7 +3410,7 @@ if (partnerAuthRoutes) {
 // ---------- 파트너 주문·정산 Routes (/api/partner) ----------
 let partnerOrderRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     partnerOrderRoutes = require('./routes/partnerOrderRoutes');
   } catch (e) {
@@ -3423,7 +3426,7 @@ if (partnerOrderRoutes) {
 // ---------- 파트너 구독 Routes (/api/partner) ----------
 let partnerSubscriptionRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     partnerSubscriptionRoutes = require('./routes/partnerSubscriptionRoutes');
   } catch (e) {
@@ -3439,7 +3442,7 @@ if (partnerSubscriptionRoutes) {
 // ---------- 파트너 셀프 온보딩 (신청 + 심사) ----------
 let partnerApplyRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     partnerApplyRoutes = require('./routes/partnerApplyRoutes');
   } catch (e) {
@@ -3455,7 +3458,7 @@ if (partnerApplyRoutes) {
 // ---------- 특산품 쇼핑 Routes (/api/shop) ----------
 let shopRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     shopRoutes = require('./routes/shopRoutes');
   } catch (e) {
@@ -3689,7 +3692,7 @@ if (wuRoutes) {
 // ---------- 8-Mode Diagnostic + Marketing Segment (P1-SSOT) ----------
 let modeDiagnosticRoutes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     modeDiagnosticRoutes = require("./routes/modeDiagnosticRoutes");
     console.log("✅ Mode Diagnostic 라우터 로드 성공");
@@ -3709,7 +3712,7 @@ if (modeDiagnosticRoutes) {
 // ---------- Diagnostic API v1 (SSOT-locked, weight-matrix scoring) ----------
 let diagnosticV1Routes = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     diagnosticV1Routes = require("./routes/diagnosticV1Routes");
     console.log("✅ Diagnostic v1 라우터 로드 성공");
@@ -3761,7 +3764,7 @@ if (experimentEventRoutes) {
 // └───────────────────────────────────────────────────────────────────────────┘
 // ═══════════════════════════════════════════════════════════════════════════
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   const dreamtownRoutes = require('./routes/dreamtownRoutes');
   app.use('/api/dt', dreamtownRoutes);
   console.log('✅ [CANONICAL] DreamTown 라우터 등록 완료 (/api/dt - PRODUCTION PRIMARY)');
@@ -3848,7 +3851,7 @@ app.post('/api/book/inquiry', async (req, res) => {
 });
 
 // ---------- DreamTown Core Engine Routes (DEC-2026-0331-001) ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const dtEngineRoutes = require('./routes/dtEngineRoutes');
     app.use('/api/dt/engine', dtEngineRoutes);
@@ -3859,7 +3862,7 @@ if (!IS_STORYBOOK_MODE) {
 }
 
 // ---------- DreamTown Life Spot Routes ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const dtLifeSpotRoutes = require('./routes/dtLifeSpotRoutes');
     app.use('/api/dt/life-spots', dtLifeSpotRoutes);
@@ -3870,7 +3873,7 @@ if (!IS_STORYBOOK_MODE) {
 }
 
 // ---------- DreamTown User Event Routes ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const dtUserEventRoutes = require('./routes/dtUserEventRoutes');
     app.use('/api/dt/user-events', dtUserEventRoutes);
@@ -3881,7 +3884,7 @@ if (!IS_STORYBOOK_MODE) {
 }
 
 // ---------- DreamTown Star Trajectory + Summary Routes ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const dtStarTrajectoryRoutes = require('./routes/dtStarTrajectoryRoutes');
     app.use('/api/dt/trajectory', dtStarTrajectoryRoutes);
@@ -3894,7 +3897,7 @@ if (!IS_STORYBOOK_MODE) {
 }
 
 // ---------- DreamTown Payment Routes (Day 8 Flow 플랜 결제) ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const dtPaymentRoutes = require('./routes/dtPaymentRoutes');
     app.use('/api/payment/nicepay', dtPaymentRoutes);
@@ -3905,7 +3908,7 @@ if (!IS_STORYBOOK_MODE) {
 }
 
 // ---------- DreamTown Event Routes (SSOT: DreamTown_Event_SSOT v1) ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const dtEventRoutes = require('./routes/dtEventRoutes');
     app.use('/api/dt/events', dtEventRoutes);
@@ -3916,7 +3919,7 @@ if (!IS_STORYBOOK_MODE) {
 }
 
 // ---------- 별들의 속삭임 Journey Log Routes ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const journeyLogRoutes = require('./routes/journeyLogRoutes');
     app.use('/api/dt/journey-logs', journeyLogRoutes);
@@ -3927,7 +3930,7 @@ if (!IS_STORYBOOK_MODE) {
 }
 
 // ---------- 공명(Resonance) 피드 Routes ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const resonanceFeedRoutes = require('./routes/resonanceFeedRoutes');
     app.use('/api/dt/resonance-feed', resonanceFeedRoutes);
@@ -3938,7 +3941,7 @@ if (!IS_STORYBOOK_MODE) {
 }
 
 // ---------- 연결(Connection) 단계 Routes ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const connectionStageRoutes = require('./routes/connectionStageRoutes');
     app.use('/api/dt/connection-stage', connectionStageRoutes);
@@ -3949,7 +3952,7 @@ if (!IS_STORYBOOK_MODE) {
 }
 
 // ---------- 과거 속삭임 재등장 Routes ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const recallWhisperRoutes = require('./routes/recallWhisperRoutes');
     app.use('/api/dt/recall-whisper', recallWhisperRoutes);
@@ -3960,7 +3963,7 @@ if (!IS_STORYBOOK_MODE) {
 }
 
 // ---------- Galaxy Signal Routes ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const galaxySignalRoutes = require('./routes/galaxySignalRoutes');
     app.use('/api/dt/galaxy-signal', galaxySignalRoutes);
@@ -3971,7 +3974,7 @@ if (!IS_STORYBOOK_MODE) {
 }
 
 // ---------- Recommendation Routes ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const recommendationRoutes = require('./routes/recommendationRoutes');
     app.use('/api/dt/recommendation', recommendationRoutes);
@@ -3982,7 +3985,7 @@ if (!IS_STORYBOOK_MODE) {
 }
 
 // ---------- AI Trigger Routes ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const aiTriggerRoutes = require('./routes/aiTriggerRoutes');
     app.use('/api/dt/ai-trigger', aiTriggerRoutes);
@@ -3998,7 +4001,7 @@ app.get('/dt-events-dashboard', (_req, res) => {
 });
 
 // ---------- DreamTown Artifact Worker (DB 기반 큐) ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const dtArtifactWorker = require('./services/dtArtifactWorker');
     dtArtifactWorker.start();
@@ -4008,7 +4011,7 @@ if (!IS_STORYBOOK_MODE) {
 }
 
 // ---------- DreamTown Narrative Worker (DB 기반 큐) ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const dtNarrativeWorker = require('./services/dtNarrativeWorker');
     dtNarrativeWorker.start();
@@ -4021,7 +4024,7 @@ if (!IS_STORYBOOK_MODE) {
 // Guard: DT_ORCHESTRATOR_ENABLED controls whether this core feature runs
 // Also respects APP_MODE (disabled in storybook mode)
 // Production: default enabled | Storybook Staging: DT_ORCHESTRATOR_ENABLED=false or APP_MODE=storybook
-const orchestratorEnabled = process.env.DT_ORCHESTRATOR_ENABLED !== 'false' && !IS_STORYBOOK_MODE;
+const orchestratorEnabled = process.env.DT_ORCHESTRATOR_ENABLED !== 'false' && !IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE;
 if (orchestratorEnabled) {
   try {
     const dtOrchestratorWorker = require('./services/dtOrchestratorWorker');
@@ -4035,21 +4038,21 @@ if (orchestratorEnabled) {
 }
 
 // ---------- Resonance & Impact Routes ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   const resonanceRoutes = require('./routes/resonanceRoutes');
   app.use('/api/resonance', resonanceRoutes);
   console.log('✅ 공명 & 나눔 라우터 등록 완료 (/api/resonance)');
 }
 
 // ---------- KPI Dashboard Routes ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   const kpiRoutes = require('./routes/kpiRoutes');
   app.use('/api/kpi', kpiRoutes);
   console.log('✅ KPI 대시보드 라우터 등록 완료 (/api/kpi)');
 }
 
 // ---------- Feedback Routes ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   const feedbackRoutes = require('./routes/feedbackRoutes');
   app.use('/api/feedback', feedbackRoutes);
   console.log('✅ 피드백 라우터 등록 완료 (/api/feedback)');
@@ -4063,7 +4066,7 @@ app.get('/dreamtown/:code/admin', (req, res) => {
 
 // ---------- DreamTown Frontend (Prototype) ----------
 const dtFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist');
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   app.use('/dreamtown', express.static(dtFrontendPath, {
     setHeaders: (res, filePath) => {
       // index.html은 절대 캐시 안 함 — 구버전 JS/CSS 해시 참조 방지
@@ -4085,7 +4088,7 @@ if (!IS_STORYBOOK_MODE) {
 }
 
 // DreamTown SPA 라우트 — React Router 직접 경로 (새로고침/직접 URL 진입)
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   const DT_SPA_ROUTES = [
     '/dreamtown', '/dreamtown/*',
     '/galaxy', '/day', '/star', '/star-growth',
@@ -4451,7 +4454,7 @@ app.get("/", (_req, res) => {
 
 // ---------- SPA catch-all — /api/* 제외한 모든 GET을 index.html로 -------
 // DT_SPA_ROUTES 화이트리스트에 없는 신규 SPA 경로(/entry 등) 404 방지
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   app.get(/^(?!\/api\/).*$/, (req, res) => {
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.setHeader('Pragma', 'no-cache');
@@ -4491,7 +4494,7 @@ try {
 }
 
 // ---------- Report Scheduler Initialization ----------
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     if (db && process.env.DATABASE_URL) {
       const reportScheduler = require('./services/reportScheduler');
@@ -4566,7 +4569,7 @@ process.on('unhandledRejection', (reason, promise) => {
 // DB 스키마 자동 검증 (Storybook 제외)
 let verifySchema = null;
 
-if (!IS_STORYBOOK_MODE) {
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   try {
     const schemaVerifierMod = require('./services/schemaVerifier');
     verifySchema = schemaVerifierMod.verifySchema;
@@ -4594,7 +4597,7 @@ function startServer(port) {
     }
 
     // P2.3: Stability proactive monitor (5분마다 score 평가 → Slack 선제 경고, Storybook 제외)
-    if (!IS_STORYBOOK_MODE && stabilityService && slackHeartbeatService) {
+    if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE && stabilityService && slackHeartbeatService) {
       stabilityService.startProactiveMonitor(
         (msg) => slackHeartbeatService.sendSlackMessage(msg),
       );
@@ -4602,7 +4605,7 @@ function startServer(port) {
 
 
     // Aurora Video Job Worker 시작 (AIL-2026-0301-VIDJOB-001)
-    if (!IS_STORYBOOK_MODE) {
+    if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
       try {
         const AuroraWorker = require('./services/aurora/AuroraWorker');
         auroraWorkerInstance = new AuroraWorker();
@@ -4614,7 +4617,7 @@ function startServer(port) {
     }
 
     // Star Care Engine — 7일 케어 cron (매일 오전 10시 KST)
-    if (!IS_STORYBOOK_MODE) {
+    if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
       try {
         const cron          = require('node-cron');
         const starCare      = require('./services/dt/starCareService');
@@ -4633,7 +4636,7 @@ function startServer(port) {
     // ═══════════════════════════════════════════════════════════
     // Phase 1: Dry Run (로깅만, SMS 발송 안 함)
     // Phase 2: 실제 SMS 발송 (수동 승인 후 활성화)
-    if (!IS_STORYBOOK_MODE) {
+    if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
       try {
         const cron = require('node-cron');
         const GuardianDispatchService = require('./aurora5/services/guardianDispatchService');
