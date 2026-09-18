@@ -2632,6 +2632,66 @@ if (dreamtownFlowRoutes) {
   console.log("✅ DreamTown Flow 라우터 등록 완료 (/api/dt/flow)");
 }
 
+// ---------- FLOW Kenny Availability (/api/dt/flow/availability, /hold, /book) ----------
+let flowKennyRoutes = null;
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    flowKennyRoutes = require("./routes/flowRoutes");
+    console.log("✅ FLOW Kenny 라우터 로드 성공");
+  } catch (e) {
+    console.warn("⚠️ FLOW Kenny 라우터 로드 실패:", e.message);
+  }
+}
+if (flowKennyRoutes) {
+  app.use("/api/dt/flow", flowKennyRoutes);
+  console.log("✅ FLOW Kenny 라우터 등록 완료 (/api/dt/flow/availability, /hold, /book)");
+}
+
+// ---------- FLOW Confirm (/api/dt/flow/confirm) ----------
+let flowConfirmKennyRoutes = null;
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    flowConfirmKennyRoutes = require("./routes/flowConfirmRoutes");
+    console.log("✅ FLOW Confirm 라우터 로드 성공");
+  } catch (e) {
+    console.warn("⚠️ FLOW Confirm 라우터 로드 실패:", e.message);
+  }
+}
+if (flowConfirmKennyRoutes) {
+  app.use("/api/dt/flow", flowConfirmKennyRoutes);
+  console.log("✅ FLOW Confirm 라우터 등록 완료 (/api/dt/flow/confirm)");
+}
+
+let sodamKennyRoutes = null;
+if (!IS_STORYBOOK_MODE) {
+  try {
+    sodamKennyRoutes = require("./routes/sodamRoutes");
+    console.log("✅ SODAM 결정 라우터 로드 성공");
+  } catch (e) {
+    console.warn("⚠️ SODAM 결정 라우터 로드 실패:", e.message);
+  }
+}
+if (sodamKennyRoutes) {
+  app.use("/api/dt/sodam", sodamKennyRoutes);
+  console.log("✅ SODAM 결정 라우터 등록 완료 (/api/dt/sodam/decide, /hold)");
+}
+
+let identityRoutes = null;
+if (!IS_STORYBOOK_MODE) {
+  try {
+    identityRoutes = require("./routes/identityRoutes");
+    console.log("✅ Identity Bootstrap 라우터 로드 성공");
+  } catch (e) {
+    console.warn("⚠️ Identity Bootstrap 라우터 로드 실패:", e.message);
+  }
+}
+if (identityRoutes) {
+  app.use("/api/dt/identity", identityRoutes);
+  console.log("✅ Identity Bootstrap 라우터 등록 완료 (/api/dt/identity/bootstrap)");
+}
+
 let wishCheckinRoutes = null;
 
 if (!IS_STORYBOOK_MODE) {
@@ -2857,6 +2917,22 @@ if (adminPartnerRoutes) {
   console.log('✅ 파트너 어드민 라우터 등록 완료 (/api/admin/partners, /api/admin/evaluate-all)');
 }
 
+// ---------- FLOW Admin Routes (/api/admin/flow/inventory) ----------
+let flowAdminKennyRoutes = null;
+
+if (!IS_STORYBOOK_MODE) {
+  try {
+    flowAdminKennyRoutes = require('./routes/flowAdminRoutes');
+    console.log('✅ FLOW Admin 라우터 로드 성공');
+  } catch (e) {
+    console.warn('⚠️ FLOW Admin 라우터 로드 실패:', e.message);
+  }
+}
+if (flowAdminKennyRoutes) {
+  app.use('/api/admin/flow', flowAdminKennyRoutes);
+  console.log('✅ FLOW Admin 라우터 등록 완료 (/api/admin/flow/inventory)');
+}
+
 // ---------- 파트너 QR 코드 센터 (/admin/partner-qr-*) ----------
 let adminQRRoutes = null;
 
@@ -2896,6 +2972,17 @@ if (!IS_STORYBOOK_MODE) {
     console.log('✅ Travel Guide 라우터 등록 완료 (/api/dt/travel)');
   } catch (e) {
     console.warn('⚠️ travelGuideRoutes 로드 실패:', e.message);
+  }
+}
+
+// ---------- LUMI Travel Input Routes (/api/dt/travel/input/text) ----------
+if (!IS_STORYBOOK_MODE) {
+  try {
+    const travelInputRoutes = require('./routes/travelInputRoutes');
+    app.use('/api/dt/travel', travelInputRoutes);
+    console.log('✅ LUMI Travel Input 라우터 등록 완료 (/api/dt/travel/input/text)');
+  } catch (e) {
+    console.warn('⚠️ travelInputRoutes 로드 실패:', e.message);
   }
 }
 
@@ -4046,6 +4133,8 @@ if (!IS_STORYBOOK_MODE) {
     '/voyage-reflect',
     // 여수 travel guide — PUBLIC 진입 + WISH_TRAVELER flow
     '/travel-guide',
+    // LUMI 여행 자연어 입력 (SOYEOWOOL 여행 채널)
+    '/lumi',
   ];
   app.get(DT_SPA_ROUTES, (req, res) => {
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
