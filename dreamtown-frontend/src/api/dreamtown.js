@@ -676,3 +676,13 @@ export async function createSeed({ location, image_url, title = null, parent_sta
   }
   return res.json();
 }
+
+// ── Guest Credential Lifecycle ─────────────────────────────────────────────
+// Anonymous SOWON identity for protected-domain actions (on-demand, localStorage).
+import {
+  getOrEnsureGuestCredential,
+  clearGuestCredential,
+  isGuestTokenValid,
+} from './guestCredentialUtil.js';
+
+export { getOrEnsureGuestCredential, clearGuestCredential, isGuestTokenValid };
