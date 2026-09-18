@@ -4062,8 +4062,8 @@ app.get('/dreamtown/:code/admin', (req, res) => {
 });
 
 // ---------- DreamTown Frontend (Prototype) ----------
+const dtFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist');
 if (!IS_STORYBOOK_MODE) {
-  const dtFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist');
   app.use('/dreamtown', express.static(dtFrontendPath, {
     setHeaders: (res, filePath) => {
       // index.html은 절대 캐시 안 함 — 구버전 JS/CSS 해시 참조 방지
