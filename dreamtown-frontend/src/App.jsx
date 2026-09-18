@@ -87,6 +87,7 @@ import AdminQRCenter from './pages/admin/AdminQRCenter.jsx';
 import AdminCablecarPage from './pages/AdminCablecarPage.jsx';
 import LocationAdmin from './pages/admin/LocationAdmin.jsx';
 import TravelGuidePage from './pages/TravelGuidePage.jsx';
+import LumiTravelPage from './pages/LumiTravelPage.jsx';
 import StorybookLanding from './pages/storybook/StorybookLanding.jsx';
 import StorybookRestore from './pages/storybook/StorybookRestore.jsx';
 import StorybookUpload from './pages/storybook/StorybookUpload.jsx';
@@ -124,6 +125,7 @@ export default function App() {
           <Route path="/wish/input"  element={<WishInputScreen />} />
           <Route path="/star-birth"  element={<StarBirth />} />
           <Route path="/travel-guide" element={<TravelGuidePage />} />
+          <Route path="/lumi"        element={<LumiTravelPage />} />
           <Route path="/my-star"     element={<MyStarReturn />} />
           <Route path="/my-star/:id" element={<MyStar />} />
           <Route path="/my-star/:id/book"     element={<DigitalBook />} />
