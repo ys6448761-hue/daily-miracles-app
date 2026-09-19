@@ -58,6 +58,7 @@ Thumbs.db
 # Build output
 dist/
 dist-muyeojeong/
+dist-storybook/
 build/
 
 # Coverage reports
