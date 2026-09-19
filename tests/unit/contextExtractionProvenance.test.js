@@ -317,13 +317,14 @@ describe('contextExtractionProvenance — SOYEOWOOL D2', () => {
     expect(Object.keys(ctx._provenance)).toHaveLength(10);
   });
 
-  // ── T-CE01: 부모님과 → family_elderly + has_elderly + time ──────────────────
-  test('T-CE01: "부모님과 왔는데 3시간 정도 남았어" → family_elderly, has_elderly=true, time=180', async () => {
+  // ── T-CG01: guard corrects wrong GPT classification — parents phrase ──────────
+  test('T-CG01: "부모님과 왔는데 3시간 정도 남았어" — GPT returns family_with_kids → guard corrects to family_elderly', async () => {
+    // GPT returned the WRONG category (actual production failure pattern)
     mockCreate.mockResolvedValue(gptResponse({
       time_available_minutes: 180,
-      people_type: 'family_elderly',
+      people_type: 'family_with_kids', // WRONG — guard must correct
       has_kids: false,
-      has_elderly: true,
+      has_elderly: false,              // WRONG — guard must correct
       disability: null,
       meal_context: null,
       emotion_primary: null,
@@ -334,7 +335,44 @@ describe('contextExtractionProvenance — SOYEOWOOL D2', () => {
         time_available_minutes: 'explicit',
         people_type:            'explicit',
         has_kids:               'unknown',
-        has_elderly:            'explicit',
+        has_elderly:            'unknown',
+        disability:             'unknown',
+        meal_context:           'unknown',
+        has_car:                'unknown',
+        mobility_type:          'unknown',
+        emotion_primary:        'unknown',
+        emotion_tags:           'unknown'
+      }
+    }));
+
+    const ctx = await svc.parseUserMessage('부모님과 왔는데 3시간 정도 남았어');
+
+    expect(ctx.people_type).toBe('family_elderly');
+    expect(ctx.companion_constraints.has_elderly).toBe(true);
+    expect(ctx.time_available_minutes).toBe(180);              // GPT time preserved
+    expect(ctx._provenance.people_type).toBe('USER_EXPLICIT');
+    expect(ctx._provenance.has_elderly).toBe('USER_EXPLICIT');
+    expect(ctx._provenance.time_available_minutes).toBe('USER_EXPLICIT');
+  });
+
+  // ── T-CG02: guard corrects null GPT output — parents phrase ──────────────────
+  test('T-CG02: "부모님과 왔는데 3시간 정도 남았어" — GPT returns null → guard sets family_elderly', async () => {
+    mockCreate.mockResolvedValue(gptResponse({
+      time_available_minutes: 180,
+      people_type: null,   // NULL — guard must set
+      has_kids: null,
+      has_elderly: null,   // NULL — guard must set
+      disability: null,
+      meal_context: null,
+      emotion_primary: null,
+      emotion_tags: [],
+      has_car: null,
+      mobility_type: null,
+      _source: {
+        time_available_minutes: 'explicit',
+        people_type:            'unknown',
+        has_kids:               'unknown',
+        has_elderly:            'unknown',
         disability:             'unknown',
         meal_context:           'unknown',
         has_car:                'unknown',
@@ -351,11 +389,227 @@ describe('contextExtractionProvenance — SOYEOWOOL D2', () => {
     expect(ctx.time_available_minutes).toBe(180);
     expect(ctx._provenance.people_type).toBe('USER_EXPLICIT');
     expect(ctx._provenance.has_elderly).toBe('USER_EXPLICIT');
-    expect(ctx._provenance.time_available_minutes).toBe('USER_EXPLICIT');
   });
 
-  // ── T-CE02: 아이랑 → family_with_kids + has_kids ─────────────────────────────
-  test('T-CE02: "아이랑 여수 왔어요" → family_with_kids, has_kids=true', async () => {
+  // ── T-CG03: guard corrects solo GPT output — kids phrase ─────────────────────
+  test('T-CG03: "아이랑 여수 왔어요" — GPT returns solo/false → guard corrects to family_with_kids', async () => {
+    // Mirrors the actual Scenario B production failure
+    mockCreate.mockResolvedValue(gptResponse({
+      time_available_minutes: null,
+      people_type: 'solo',   // WRONG — actual production failure value
+      has_kids: false,        // WRONG
+      has_elderly: false,
+      disability: null,
+      meal_context: null,
+      emotion_primary: null,
+      emotion_tags: [],
+      has_car: null,
+      mobility_type: null,
+      _source: {
+        time_available_minutes: 'unknown',
+        people_type:            'explicit',
+        has_kids:               'unknown',
+        has_elderly:            'unknown',
+        disability:             'unknown',
+        meal_context:           'unknown',
+        has_car:                'unknown',
+        mobility_type:          'unknown',
+        emotion_primary:        'unknown',
+        emotion_tags:           'unknown'
+      }
+    }));
+
+    const ctx = await svc.parseUserMessage('아이랑 여수 왔어요');
+
+    expect(ctx.people_type).toBe('family_with_kids');
+    expect(ctx.companion_constraints.has_kids).toBe(true);
+    expect(ctx.companion_constraints.has_elderly).toBe(false);
+    expect(ctx._provenance.people_type).toBe('USER_EXPLICIT');
+    expect(ctx._provenance.has_kids).toBe('USER_EXPLICIT');
+  });
+
+  // ── T-CG04: guard corrects null GPT output — kids phrase ─────────────────────
+  test('T-CG04: "아이랑 여수 왔어요" — GPT returns null → guard sets family_with_kids', async () => {
+    mockCreate.mockResolvedValue(gptResponse({
+      time_available_minutes: null,
+      people_type: null,   // NULL — guard must set
+      has_kids: null,      // NULL — guard must set
+      has_elderly: null,
+      disability: null,
+      meal_context: null,
+      emotion_primary: null,
+      emotion_tags: [],
+      has_car: null,
+      mobility_type: null,
+      _source: {
+        time_available_minutes: 'unknown',
+        people_type:            'unknown',
+        has_kids:               'unknown',
+        has_elderly:            'unknown',
+        disability:             'unknown',
+        meal_context:           'unknown',
+        has_car:                'unknown',
+        mobility_type:          'unknown',
+        emotion_primary:        'unknown',
+        emotion_tags:           'unknown'
+      }
+    }));
+
+    const ctx = await svc.parseUserMessage('아이랑 여수 왔어요');
+
+    expect(ctx.people_type).toBe('family_with_kids');
+    expect(ctx.companion_constraints.has_kids).toBe(true);
+    expect(ctx._provenance.people_type).toBe('USER_EXPLICIT');
+    expect(ctx._provenance.has_kids).toBe('USER_EXPLICIT');
+  });
+
+  // ── T-CG05: guard corrects null — friends phrase ──────────────────────────────
+  test('T-CG05: "친구랑 여수 왔어요" — GPT returns null → guard sets group', async () => {
+    mockCreate.mockResolvedValue(gptResponse({
+      time_available_minutes: null,
+      people_type: null,
+      has_kids: null,
+      has_elderly: null,
+      disability: null,
+      meal_context: null,
+      emotion_primary: null,
+      emotion_tags: [],
+      has_car: null,
+      mobility_type: null,
+      _source: {
+        time_available_minutes: 'unknown',
+        people_type:            'unknown',
+        has_kids:               'unknown',
+        has_elderly:            'unknown',
+        disability:             'unknown',
+        meal_context:           'unknown',
+        has_car:                'unknown',
+        mobility_type:          'unknown',
+        emotion_primary:        'unknown',
+        emotion_tags:           'unknown'
+      }
+    }));
+
+    const ctx = await svc.parseUserMessage('친구랑 여수 왔어요');
+
+    expect(ctx.people_type).toBe('group');
+    expect(ctx.companion_constraints.has_kids).toBe(false);
+    expect(ctx.companion_constraints.has_elderly).toBe(false);
+    expect(ctx._provenance.people_type).toBe('USER_EXPLICIT');
+  });
+
+  // ── T-CG06: guard corrects null — solo phrase ─────────────────────────────────
+  test('T-CG06: "혼자 여수 왔어요" — GPT returns null → guard sets solo', async () => {
+    mockCreate.mockResolvedValue(gptResponse({
+      time_available_minutes: null,
+      people_type: null,
+      has_kids: null,
+      has_elderly: null,
+      disability: null,
+      meal_context: null,
+      emotion_primary: null,
+      emotion_tags: [],
+      has_car: null,
+      mobility_type: null,
+      _source: {
+        time_available_minutes: 'unknown',
+        people_type:            'unknown',
+        has_kids:               'unknown',
+        has_elderly:            'unknown',
+        disability:             'unknown',
+        meal_context:           'unknown',
+        has_car:                'unknown',
+        mobility_type:          'unknown',
+        emotion_primary:        'unknown',
+        emotion_tags:           'unknown'
+      }
+    }));
+
+    const ctx = await svc.parseUserMessage('혼자 여수 왔어요');
+
+    expect(ctx.people_type).toBe('solo');
+    expect(ctx.companion_constraints.has_kids).toBe(false);
+    expect(ctx.companion_constraints.has_elderly).toBe(false);
+    expect(ctx._provenance.people_type).toBe('USER_EXPLICIT');
+  });
+
+  // ── T-CG07: mixed elderly + kids — PHASE_1_MIXED_COMPANION_LIMITATION ─────────
+  test('T-CG07: "부모님이랑 아이랑 왔어요" — elderly wins people_type, both flags set (PHASE_1_MIXED_COMPANION_LIMITATION)', async () => {
+    mockCreate.mockResolvedValue(gptResponse({
+      time_available_minutes: null,
+      people_type: null,
+      has_kids: null,
+      has_elderly: null,
+      disability: null,
+      meal_context: null,
+      emotion_primary: null,
+      emotion_tags: [],
+      has_car: null,
+      mobility_type: null,
+      _source: {
+        time_available_minutes: 'unknown',
+        people_type:            'unknown',
+        has_kids:               'unknown',
+        has_elderly:            'unknown',
+        disability:             'unknown',
+        meal_context:           'unknown',
+        has_car:                'unknown',
+        mobility_type:          'unknown',
+        emotion_primary:        'unknown',
+        emotion_tags:           'unknown'
+      }
+    }));
+
+    const ctx = await svc.parseUserMessage('부모님이랑 아이랑 왔어요');
+
+    // Elderly wins people_type (single-category contract limitation)
+    expect(ctx.people_type).toBe('family_elderly');
+    // Both companion booleans must be true — companion_constraints is independent
+    expect(ctx.companion_constraints.has_elderly).toBe(true);
+    expect(ctx.companion_constraints.has_kids).toBe(true);
+    expect(ctx._provenance.people_type).toBe('USER_EXPLICIT');
+    expect(ctx._provenance.has_elderly).toBe('USER_EXPLICIT');
+    expect(ctx._provenance.has_kids).toBe('USER_EXPLICIT');
+  });
+
+  // ── T-CG08: guard silent — no recognized phrase, GPT output preserved ─────────
+  test('T-CG08: "여수 여행 어디 갈까요" — no companion phrase → guard silent, GPT output preserved', async () => {
+    mockCreate.mockResolvedValue(gptResponse({
+      time_available_minutes: null,
+      people_type: 'couple',   // GPT inferred — guard must NOT touch this
+      has_kids: false,
+      has_elderly: false,
+      disability: null,
+      meal_context: null,
+      emotion_primary: null,
+      emotion_tags: [],
+      has_car: null,
+      mobility_type: null,
+      _source: {
+        time_available_minutes: 'unknown',
+        people_type:            'inferred',  // GPT inferred, not explicit
+        has_kids:               'unknown',
+        has_elderly:            'unknown',
+        disability:             'unknown',
+        meal_context:           'unknown',
+        has_car:                'unknown',
+        mobility_type:          'unknown',
+        emotion_primary:        'unknown',
+        emotion_tags:           'unknown'
+      }
+    }));
+
+    const ctx = await svc.parseUserMessage('여수 여행 어디 갈까요');
+
+    // Guard is silent — GPT's couple must survive unchanged
+    expect(ctx.people_type).toBe('couple');
+    expect(ctx._provenance.people_type).toBe('AI_INFERENCE');  // GPT 'inferred' maps to AI_INFERENCE
+  });
+
+  // ── T-CG09: guard silent — phrase present, GPT already correct ───────────────
+  test('T-CG09: "아이랑 여수 왔어요" — GPT already correct → values preserved, provenance from guard (USER_EXPLICIT)', async () => {
+    // GPT happens to return the right answer — guard still fires (phrase present)
+    // Result must be identical to what guard would set
     mockCreate.mockResolvedValue(gptResponse({
       time_available_minutes: null,
       people_type: 'family_with_kids',
@@ -386,78 +640,9 @@ describe('contextExtractionProvenance — SOYEOWOOL D2', () => {
     expect(ctx.people_type).toBe('family_with_kids');
     expect(ctx.companion_constraints.has_kids).toBe(true);
     expect(ctx.companion_constraints.has_elderly).toBe(false);
+    // Guard sets 'explicit' — same as GPT marked; USER_EXPLICIT either way
     expect(ctx._provenance.people_type).toBe('USER_EXPLICIT');
     expect(ctx._provenance.has_kids).toBe('USER_EXPLICIT');
-  });
-
-  // ── T-CE03: 친구랑 → group ──────────────────────────────────────────────────
-  test('T-CE03: "친구랑 여수 왔어요" → group', async () => {
-    mockCreate.mockResolvedValue(gptResponse({
-      time_available_minutes: null,
-      people_type: 'group',
-      has_kids: false,
-      has_elderly: false,
-      disability: null,
-      meal_context: null,
-      emotion_primary: null,
-      emotion_tags: [],
-      has_car: null,
-      mobility_type: null,
-      _source: {
-        time_available_minutes: 'unknown',
-        people_type:            'explicit',
-        has_kids:               'unknown',
-        has_elderly:            'unknown',
-        disability:             'unknown',
-        meal_context:           'unknown',
-        has_car:                'unknown',
-        mobility_type:          'unknown',
-        emotion_primary:        'unknown',
-        emotion_tags:           'unknown'
-      }
-    }));
-
-    const ctx = await svc.parseUserMessage('친구랑 여수 왔어요');
-
-    expect(ctx.people_type).toBe('group');
-    expect(ctx.companion_constraints.has_kids).toBe(false);
-    expect(ctx.companion_constraints.has_elderly).toBe(false);
-    expect(ctx._provenance.people_type).toBe('USER_EXPLICIT');
-  });
-
-  // ── T-CE04: 혼자 → solo (no companion flags set) ─────────────────────────────
-  test('T-CE04: "혼자 여수 왔어요" → solo, has_kids=false, has_elderly=false', async () => {
-    mockCreate.mockResolvedValue(gptResponse({
-      time_available_minutes: null,
-      people_type: 'solo',
-      has_kids: false,
-      has_elderly: false,
-      disability: null,
-      meal_context: null,
-      emotion_primary: null,
-      emotion_tags: [],
-      has_car: null,
-      mobility_type: null,
-      _source: {
-        time_available_minutes: 'unknown',
-        people_type:            'explicit',
-        has_kids:               'unknown',
-        has_elderly:            'unknown',
-        disability:             'unknown',
-        meal_context:           'unknown',
-        has_car:                'unknown',
-        mobility_type:          'unknown',
-        emotion_primary:        'unknown',
-        emotion_tags:           'unknown'
-      }
-    }));
-
-    const ctx = await svc.parseUserMessage('혼자 여수 왔어요');
-
-    expect(ctx.people_type).toBe('solo');
-    expect(ctx.companion_constraints.has_kids).toBe(false);
-    expect(ctx.companion_constraints.has_elderly).toBe(false);
-    expect(ctx._provenance.people_type).toBe('USER_EXPLICIT');
   });
 
   // ── T-CP08: has_car null → context.has_car=true (backward compat) ────────────

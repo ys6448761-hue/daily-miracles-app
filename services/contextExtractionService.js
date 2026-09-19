@@ -41,11 +41,14 @@ class ContextExtractionService {
         return { error: '좀 더 자세히 말씀해주세요.' };
       }
 
-      const extracted = await this._extractWithGPT4(message);
+      const rawExtracted = await this._extractWithGPT4(message);
 
-      if (!extracted) {
+      if (!rawExtracted) {
         return { error: '죄송합니다. 다시 물어봐주세요.' };
       }
+
+      // Deterministic guard: correct explicit Korean companion phrases before defaults
+      const extracted = this._applyExplicitCompanionGuard(message, rawExtracted);
 
       // Build _provenance from GPT _source (D2 compliance)
       const src = extracted._source || {};
@@ -144,6 +147,63 @@ class ContextExtractionService {
       console.error('[GPT4_EXTRACTION_ERROR]', { message: error.message });
       return null;
     }
+  }
+
+  /**
+   * Deterministic guard for explicit Korean companion phrases.
+   * Overrides GPT people_type/companion booleans when the raw user message
+   * contains an unambiguous phrase from the approved explicit list.
+   * Guard is SILENT (returns extracted unchanged) when no known phrase found.
+   * @private
+   */
+  _applyExplicitCompanionGuard(message, extracted) {
+    const ELDERLY  = ['부모님과', '부모님이랑', '어머니와', '엄마랑', '아버지와', '아빠랑'];
+    const KIDS     = ['아이랑', '아이와', '아이들과', '아이들이랑', '자녀와', '자녀랑', '애기랑', '아기랑'];
+    const FRIENDS  = ['친구랑', '친구와', '친구들과'];
+    const SOLO     = ['혼자', '혼자서'];
+    const COUPLE   = ['둘이서', '커플', '남자친구', '여자친구', '남편', '아내'];
+
+    const hasElderly = ELDERLY.some(p => message.includes(p));
+    const hasKids    = KIDS.some(p => message.includes(p));
+    const hasFriends = FRIENDS.some(p => message.includes(p));
+    const isSolo     = SOLO.some(p => message.includes(p));
+    const isCouple   = COUPLE.some(p => message.includes(p));
+
+    if (!hasElderly && !hasKids && !hasFriends && !isSolo && !isCouple) {
+      return extracted; // guard silent — no recognized explicit phrase
+    }
+
+    const result = Object.assign({}, extracted);
+    const source = Object.assign({}, extracted._source || {});
+
+    if (hasElderly) {
+      // PHASE_1_MIXED_COMPANION_LIMITATION: elderly wins people_type when both present
+      result.people_type = 'family_elderly';
+      result.has_elderly = true;
+      source.people_type = 'explicit';
+      source.has_elderly = 'explicit';
+      if (hasKids) {
+        result.has_kids = true;
+        source.has_kids = 'explicit';
+      }
+    } else if (hasKids) {
+      result.people_type = 'family_with_kids';
+      result.has_kids = true;
+      source.people_type = 'explicit';
+      source.has_kids = 'explicit';
+    } else if (hasFriends) {
+      result.people_type = 'group';
+      source.people_type = 'explicit';
+    } else if (isSolo) {
+      result.people_type = 'solo';
+      source.people_type = 'explicit';
+    } else if (isCouple) {
+      result.people_type = 'couple';
+      source.people_type = 'explicit';
+    }
+
+    result._source = source;
+    return result;
   }
 
   /**
