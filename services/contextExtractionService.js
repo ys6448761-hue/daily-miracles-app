@@ -182,6 +182,13 @@ class ContextExtractionService {
   }
 }
 
+한국어 동반자 표현 → people_type 매핑 (엄격히 적용):
+- "부모님과", "부모님이랑", "어머니와", "엄마랑", "아버지와", "아빠랑" → people_type: "family_elderly", has_elderly: true
+- "아이랑", "아이와", "아이들과", "아이들이랑", "자녀와", "자녀랑", "애기랑", "아기랑" → people_type: "family_with_kids", has_kids: true
+- "친구랑", "친구와", "친구들과" → people_type: "group"
+- "혼자", "혼자서" → people_type: "solo"
+- "둘이서", "커플", "남자친구", "여자친구", "남편", "아내" → people_type: "couple"
+
 _source 분류 기준:
 - "explicit": 사용자가 해당 값을 직접 말한 경우
 - "inferred": 직접 말하지 않았지만 문맥으로 합리적으로 추론 가능한 경우
