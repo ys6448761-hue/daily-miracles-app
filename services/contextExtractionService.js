@@ -62,7 +62,13 @@ class ContextExtractionService {
         has_car:                mapSource(src.has_car),
         mobility_type:          mapSource(src.mobility_type),
         emotion_primary:        mapSource(src.emotion_primary),
-        emotion_tags:           mapSource(src.emotion_tags)
+        emotion_tags:           mapSource(src.emotion_tags),
+        time_of_day:            mapSource(src.time_of_day),
+        preference_type:        mapSource(src.preference_type),
+        budget_constraint:      mapSource(src.budget_constraint),
+        group_size:             mapSource(src.group_size),
+        requested_count:        mapSource(src.requested_count),
+        mobility_constraint:    mapSource(src.mobility_constraint)
       };
 
       // Build TravelGuideContext — existing fields UNCHANGED
@@ -86,6 +92,13 @@ class ContextExtractionService {
         wish_context: this._buildWishContext(extracted),
         exclude_place_ids: [],
         must_visit_place_ids: [],
+        // Phase 2 additive fields
+        time_of_day:          extracted.time_of_day ?? null,
+        preference_type:      extracted.preference_type ?? null,
+        budget_constraint:    extracted.budget_constraint ?? null,
+        group_size:           extracted.group_size ?? null,
+        requested_count:      extracted.requested_count ?? null,
+        mobility_constraint:  extracted.mobility_constraint ?? null,
         _provenance // additive — does not replace any existing field
       };
 
@@ -141,6 +154,12 @@ class ContextExtractionService {
         emotion_tags:           Array.isArray(parsed.emotion_tags) ? parsed.emotion_tags : [],
         has_car:                typeof parsed.has_car === 'boolean' ? parsed.has_car : null,
         mobility_type:          parsed.mobility_type ?? null,
+        time_of_day:            parsed.time_of_day ?? null,
+        preference_type:        parsed.preference_type ?? null,
+        budget_constraint:      parsed.budget_constraint ?? null,
+        group_size:             typeof parsed.group_size === 'number' ? parsed.group_size : null,
+        requested_count:        typeof parsed.requested_count === 'number' ? parsed.requested_count : null,
+        mobility_constraint:    parsed.mobility_constraint ?? null,
         _source:                parsed._source || {}
       };
     } catch (error) {
@@ -217,7 +236,7 @@ class ContextExtractionService {
 
 다음 필드를 JSON으로 응답해주세요:
 {
-  "time_available_minutes": 숫자 또는 null (언급한 시간을 분으로, 언급 없으면 null),
+  "time_available_minutes": 숫자 또는 null (언급한 시간을 분으로. "두 시간"=120, "반나절"=180, "1박2일"=null(숙박포함이므로 미적용). 언급 없으면 null),
   "people_type": "solo" | "couple" | "family_with_kids" | "family_elderly" | "group" | null,
   "has_kids": true/false/null,
   "kids_age": 숫자 또는 null,
@@ -228,6 +247,12 @@ class ContextExtractionService {
   "emotion_tags": ["태그1"] (없으면 []),
   "has_car": true/false/null (언급 없으면 null),
   "mobility_type": "walk" | "bus" | "car" | "mixed" | null,
+  "time_of_day": "morning" | "afternoon" | "evening" | "night" | null ("밤", "저녁", "야간" 등 언급 시 추출. 언급 없으면 null),
+  "preference_type": "photo" | "food" | "relaxation" | "history" | "nature" | "shopping" | null (핵심 선호가 명확할 때만),
+  "budget_constraint": "free" | "low" | "normal" | null ("무료", "공짜", "돈 없는", "저렴", "싸게" 등. 언급 없으면 null),
+  "group_size": 숫자 또는 null (명확한 인원수 언급 시. "12명"=12, "우리 둘"=2. 언급 없으면 null),
+  "requested_count": 숫자 또는 null (사용자가 결과 개수를 명시한 경우만. "세 군데"=3, "두 곳"=2, "다섯 개"=5. 추론하지 말고 명시적 언급만. 언급 없으면 null),
+  "mobility_constraint": "low_walking" | null ("많이 안 걷는", "걷기 힘든", "편한 코스", "체력이 약한", "이동 부담 없는" 등 명시적 보행 부담 감소 요청 시. 추론 말고 명시적 언급만. 언급 없으면 null),
   "_source": {
     "time_available_minutes": "explicit" | "inferred" | "unknown",
     "people_type": "explicit" | "inferred" | "unknown",
@@ -238,14 +263,20 @@ class ContextExtractionService {
     "has_car": "explicit" | "inferred" | "unknown",
     "mobility_type": "explicit" | "inferred" | "unknown",
     "emotion_primary": "explicit" | "inferred" | "unknown",
-    "emotion_tags": "explicit" | "inferred" | "unknown"
+    "emotion_tags": "explicit" | "inferred" | "unknown",
+    "time_of_day": "explicit" | "inferred" | "unknown",
+    "preference_type": "explicit" | "inferred" | "unknown",
+    "budget_constraint": "explicit" | "inferred" | "unknown",
+    "group_size": "explicit" | "inferred" | "unknown",
+    "requested_count": "explicit" | "inferred" | "unknown",
+    "mobility_constraint": "explicit" | "inferred" | "unknown"
   }
 }
 
 한국어 동반자 표현 → people_type 매핑 (엄격히 적용):
 - "부모님과", "부모님이랑", "어머니와", "엄마랑", "아버지와", "아빠랑" → people_type: "family_elderly", has_elderly: true
 - "아이랑", "아이와", "아이들과", "아이들이랑", "자녀와", "자녀랑", "애기랑", "아기랑" → people_type: "family_with_kids", has_kids: true
-- "친구랑", "친구와", "친구들과" → people_type: "group"
+- "친구랑", "친구와", "친구들과", "친구 X명" → people_type: "group"
 - "혼자", "혼자서" → people_type: "solo"
 - "둘이서", "커플", "남자친구", "여자친구", "남편", "아내" → people_type: "couple"
 

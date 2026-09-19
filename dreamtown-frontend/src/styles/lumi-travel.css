@@ -280,218 +280,236 @@
 }
 
 /* ═══════════════════════════════════════════════════════════
-   Result Screen (preserved)
+   Result Screen — Phase 2 Hotel-Ready
 ═══════════════════════════════════════════════════════════ */
 
 .lumi-result {
-  padding: 20px 0;
+  padding: 16px 0 24px;
 }
 
-.lumi-understood-context {
-  background: #f0f8ff;
-  padding: 16px;
-  border-radius: 8px;
-  margin-bottom: 24px;
-  border-left: 4px solid #007aff;
-  text-align: center;
+/* SOUL situation acknowledgement */
+.lumi-soul-message {
+  margin: 0 12px 14px;
+  padding: 14px 16px;
+  background: #fff;
+  border-radius: 14px;
+  border-left: 3px solid #1A7BAF;
+  box-shadow: 0 1px 6px rgba(15, 30, 61, 0.07);
 }
 
-.lumi-understood-context p {
+.lumi-soul-message p {
   margin: 0;
-  color: #333;
-  font-size: 15px;
-  line-height: 1.5;
-}
-
-.lumi-choices-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.lumi-choice-card {
-  background: #f9f9f9;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 16px;
-  transition: all 0.2s;
-}
-
-.lumi-choice-card:hover {
-  border-color: #ccc;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.lumi-place-name {
-  margin: 0 0 12px;
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-}
-
-.lumi-reasons {
-  margin: 12px 0;
-  font-size: 13px;
-  color: #666;
+  font-size: 14px;
+  color: #0F1E3D;
   line-height: 1.6;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
-.lumi-reasons p {
-  margin: 4px 0;
-}
-
-.lumi-live-status {
-  margin: 12px 0;
-  padding: 12px;
-  background: white;
-  border-left: 4px solid #ffa500;
-  border-radius: 4px;
-  font-size: 13px;
-}
-
-.lumi-live-status p {
-  margin: 0 0 4px;
-}
-
-.lumi-status-unknown {
-  color: #666;
-  border-left-color: #999 !important;
-}
-
-.lumi-status-open {
-  color: #107c41;
-  border-left-color: #107c41 !important;
-}
-
-.lumi-status-unknown small,
-.lumi-status-open small {
-  display: block;
-  color: #999;
-  font-size: 11px;
+.lumi-soul-message p + p {
   margin-top: 4px;
 }
 
-.lumi-hours {
-  color: #666;
-  font-size: 12px !important;
-  margin: 8px 0 0 !important;
-}
-
-.lumi-actions {
+/* Place cards */
+.lumi-choices-container {
   display: flex;
-  gap: 8px;
-  margin-top: 12px;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 0 12px;
 }
 
-.lumi-map-btn,
-.lumi-detail-btn,
-.lumi-why-btn {
-  flex: 1;
-  padding: 10px 8px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
+.lumi-choice-card {
+  background: #fff;
+  border: 1px solid #E2EBF0;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 1px 6px rgba(15, 30, 61, 0.06);
+}
+
+.lumi-place-name {
+  margin: 0 0 8px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #0F1E3D;
+  letter-spacing: -0.02em;
+}
+
+.lumi-place-reason {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: #3D5A73;
+  line-height: 1.55;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* Practical facts strip */
+.lumi-fact-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.lumi-fact-tag {
+  padding: 3px 9px;
+  background: #EFF8F6;
+  border: 1px solid #C5DFD8;
+  border-radius: 20px;
+  font-size: 11px;
+  color: #1A5C4F;
   font-weight: 500;
-  transition: all 0.2s;
-  font-family: inherit;
 }
 
-.lumi-map-btn:hover,
-.lumi-detail-btn:hover,
-.lumi-why-btn:hover {
-  background: #f5f5f5;
-  border-color: #999;
+/* Notices — live status + warnings */
+.lumi-notices {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+
+.lumi-notice-ok {
+  color: #2D7D4F;
+  font-weight: 500;
+}
+
+.lumi-notice-warn {
+  color: #7A6030;
+  background: #FFF8EC;
+  border: 1px solid #F0D88A;
+  border-radius: 5px;
+  padding: 3px 7px;
+  display: inline-block;
+  font-size: 11px;
+}
+
+/* Why expand */
+.lumi-why-section {
+  border-top: 1px solid #EEF3F7;
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.lumi-why-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 12px;
+  color: #1A7BAF;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
 }
 
 .lumi-why-detail {
-  margin-top: 12px;
-  padding: 12px;
-  background: #f0f8ff;
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: #F4F9FC;
   border-radius: 8px;
-  border-left: 4px solid #007aff;
-  text-align: left;
-  font-size: 13px;
-}
-
-.lumi-why-detail h4 {
-  margin: 0 0 10px;
-  color: #333;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
 }
 
 .lumi-why-label {
-  margin: 8px 0 6px;
-  color: #333;
+  margin: 0 0 4px;
+  color: #1A3A5C;
   font-weight: 600;
-  font-size: 12px;
-}
-
-.lumi-why-label strong {
-  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .lumi-why-list {
-  margin: 0 0 10px 20px;
+  margin: 0 0 8px 0;
   padding: 0;
   list-style: none;
-  color: #666;
+  color: #4A6070;
   font-size: 12px;
-  line-height: 1.6;
+  line-height: 1.55;
 }
 
 .lumi-why-list li {
-  margin: 2px 0;
-  padding-left: 8px;
+  padding-left: 12px;
   position: relative;
+  margin: 2px 0;
 }
 
 .lumi-why-list li::before {
-  content: '◦';
+  content: '·';
   position: absolute;
-  left: 0;
-  color: #007aff;
+  left: 2px;
+  color: #1A7BAF;
+  font-weight: 700;
 }
 
-.lumi-confidence {
-  margin: 10px 0 0;
-  color: #666;
-  font-size: 12px;
+/* Next options */
+.lumi-next-options {
+  padding: 0 12px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
 }
 
+.lumi-next-option-btn {
+  padding: 10px 14px;
+  background: #F4F9FC;
+  border: 1.5px solid #C5DDE8;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #1A3A5C;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  font-weight: 500;
+  word-break: keep-all;
+  transition: background 0.12s;
+}
+
+.lumi-next-option-btn:hover {
+  background: #E8F3FA;
+}
+
+/* No results */
 .lumi-no-results {
+  margin: 0 12px;
+  padding: 28px 16px;
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #E2EBF0;
   text-align: center;
-  padding: 40px 20px;
-  color: #999;
+  color: #7A8FA0;
 }
 
 .lumi-no-results p {
-  margin: 8px 0;
-  font-size: 14px;
+  margin: 6px 0;
+  font-size: 13px;
+  line-height: 1.6;
+  word-break: keep-all;
 }
 
+/* New question button */
 .lumi-new-question-btn {
   display: block;
-  width: 100%;
-  padding: 14px;
-  margin-top: 20px;
-  background: #007aff;
+  width: calc(100% - 24px);
+  margin: 0 12px;
+  padding: 13px;
+  background: #0F1E3D;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
-  transition: all 0.2s;
   font-family: inherit;
+  letter-spacing: -0.01em;
+  transition: background 0.15s;
 }
 
 .lumi-new-question-btn:hover {
-  background: #0051d5;
-  transform: translateY(-1px);
+  background: #1A3A6B;
 }
 
 /* ═══════════════════════════════════════════════════════════

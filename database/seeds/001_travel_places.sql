@@ -116,3 +116,10 @@ INSERT INTO travel_places (
 -- TOTAL UNIQUE: 14 places (12 from star_zones + 2 from ORIGIN, net 14)
 -- ALL trust_level values: 2 ORIGIN, 12 VERIFIED
 -- Status all: unknown (set by travel_live_status seed)
+
+-- Founder-authorized physical difficulty data (2026-09-20)
+-- Hyangiram: verified high physical difficulty (steep stone steps, incline path)
+-- Context: standard pilgrimage/group-tour destination, but explicitly unsuitable for
+--          free travelers requesting low-walking routes (mobility_constraint='low_walking')
+-- suitable_for=['elderly'] is preserved — elderly suitability ≠ low-mobility suitability
+UPDATE travel_places SET physical_difficulty = 'high' WHERE code = 'hyangiram';

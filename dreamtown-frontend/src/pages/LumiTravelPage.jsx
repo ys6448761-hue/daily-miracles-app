@@ -180,127 +180,174 @@ export default function LumiTravelPage() {
 }
 
 function RecommendationResult({ recommendations, onNewQuestion }) {
-  const [expandedWhy, setExpandedWhy] = useState(null);
+  const status = recommendations.status;
+  const places = recommendations.places || [];
+  const nextOptions = recommendations.next_options || [];
+  const ctx = recommendations.understood_context || {};
+
+  // GROUP_CONSULTATION_REQUIRED — special path, no place cards
+  if (status === 'GROUP_CONSULTATION_REQUIRED') {
+    return (
+      <div className="lumi-result">
+        <div className="lumi-soul-message">
+          {recommendations.message_ko.split('\n').map((line, i) =>
+            line ? <p key={i}>{line}</p> : <br key={i} />
+          )}
+        </div>
+        {nextOptions.length > 0 && (
+          <div className="lumi-next-options">
+            {nextOptions.map((opt, i) => (
+              <button key={i} className="lumi-next-option-btn" type="button" onClick={onNewQuestion}>
+                {opt}
+              </button>
+            ))}
+          </div>
+        )}
+        <button className="lumi-new-question-btn" onClick={onNewQuestion} type="button">
+          처음으로
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="lumi-result">
-      <div className="lumi-understood-context">
-        <p>{generateContextMessage(recommendations)}</p>
-      </div>
+      {/* SOUL situation acknowledgement */}
+      {recommendations.message_ko && (
+        <div className="lumi-soul-message">
+          {recommendations.message_ko.split('\n').map((line, i) =>
+            line ? <p key={i}>{line}</p> : <br key={i} />
+          )}
+        </div>
+      )}
 
+      {/* Place cards */}
       <div className="lumi-choices-container">
-        {recommendations.places && recommendations.places.length > 0 ? (
-          recommendations.places.map((place, idx) => (
-            <div key={idx} className="lumi-choice-card">
-              <h3 className="lumi-place-name">{place.name_ko}</h3>
-
-              <div className="lumi-reasons">
-                {place.reason && place.reason.split('\n').map((r, i) => (
-                  <p key={i}>• {r}</p>
-                ))}
-              </div>
-
-              <div className="lumi-live-status">
-                {place.live_status === 'open' ? (
-                  <p className="lumi-status-open">
-                    ✓ 운영 중
-                    <br />
-                    <small>
-                      {place.live_status_checked
-                        ? `마지막 확인: ${place.live_status_checked}`
-                        : ''}
-                    </small>
-                  </p>
-                ) : (
-                  <p className="lumi-status-unknown">
-                    ⚠️ 운영 여부 확인이 필요해요.
-                    <br />
-                    <small>
-                      {place.live_status_checked
-                        ? `마지막 확인: ${place.live_status_checked}`
-                        : '정보를 수집 중입니다.'}
-                    </small>
-                  </p>
-                )}
-                {place.operating_hours && (
-                  <p className="lumi-hours">운영시간: {place.operating_hours}</p>
-                )}
-              </div>
-
-              <div className="lumi-actions">
-                <button className="lumi-map-btn">🗺️ 길찾기</button>
-                <button className="lumi-detail-btn">📖 자세히</button>
-                <button
-                  className="lumi-why-btn"
-                  onClick={() => setExpandedWhy(expandedWhy === idx ? null : idx)}
-                  type="button"
-                >
-                  ❓ 왜?
-                </button>
-              </div>
-
-              {expandedWhy === idx && (
-                <WhyDetail
-                  place={place}
-                  whyDetails={recommendations.why_details?.[idx]}
-                />
-              )}
-            </div>
+        {places.length > 0 ? (
+          places.map((place, idx) => (
+            <PlaceCard key={idx} place={place} whyDetail={recommendations.why_details?.[idx]} ctx={ctx} />
           ))
         ) : (
           <div className="lumi-no-results">
-            <p>죄송합니다. 현재 추천할 수 있는 장소가 없습니다.</p>
-            <p>다시 물어봐주세요.</p>
+            <p>지금 조건에 맞는 장소를 찾지 못했어요.</p>
+            <p>질문을 조금 바꿔서 다시 물어봐 주세요.</p>
           </div>
         )}
       </div>
 
+      {/* Next options */}
+      {nextOptions.length > 0 && (
+        <div className="lumi-next-options">
+          {nextOptions.map((opt, i) => (
+            <button key={i} className="lumi-next-option-btn" type="button" onClick={onNewQuestion}>
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
+
       <button className="lumi-new-question-btn" onClick={onNewQuestion} type="button">
-        다른 추천 받기
+        다른 질문 하기
       </button>
+    </div>
+  );
+}
+
+function PlaceCard({ place, whyDetail, ctx }) {
+  const [showWhy, setShowWhy] = useState(false);
+  const suitableFor = place.suitable_for || [];
+  const emotionTags = place.emotion_tags || [];
+
+  // Practical facts — only show supported data
+  const facts = [];
+  if (place.avg_stay_minutes) {
+    facts.push(`약 ${place.avg_stay_minutes}분 소요`);
+  }
+  if (place.indoor_outdoor === 'indoor') facts.push('실내');
+  else if (place.indoor_outdoor === 'outdoor') facts.push('야외');
+  else if (place.indoor_outdoor === 'mixed') facts.push('실내·야외');
+
+  if (place.admission_fee_json === null && place.live_status_required) {
+    // No fee data available — don't claim free
+  }
+
+  // Accessibility facts (only when verified)
+  if (place.accessibility?.wheelchair_status === 'verified_yes') facts.push('휠체어 가능');
+  if (place.accessibility?.stroller_status === 'verified_yes') facts.push('유모차 가능');
+
+  // Live status handling
+  const liveStatus = place.live_status;
+  const liveRequired = place.live_status_required;
+
+  return (
+    <div className="lumi-choice-card">
+      <h3 className="lumi-place-name">{place.name_ko}</h3>
+
+      {/* Why it fits */}
+      {place.reason && (
+        <p className="lumi-place-reason">{place.reason}</p>
+      )}
+
+      {/* Practical facts strip */}
+      {facts.length > 0 && (
+        <div className="lumi-fact-strip">
+          {facts.map((f, i) => <span key={i} className="lumi-fact-tag">{f}</span>)}
+        </div>
+      )}
+
+      {/* Warnings — honest uncertainty notices */}
+      <div className="lumi-notices">
+        {liveStatus === 'open' ? (
+          <span className="lumi-notice-ok">● 운영 확인됨</span>
+        ) : liveRequired ? (
+          <span className="lumi-notice-warn">방문 전 운영 여부를 확인하세요.</span>
+        ) : null}
+        {(place.warnings || []).includes('walking_burden_unknown') && (
+          <span className="lumi-notice-warn">보행 난이도 정보 없음 — 현장 확인 권장</span>
+        )}
+      </div>
+
+      {/* Why expand */}
+      {whyDetail && (
+        <div className="lumi-why-section">
+          <button
+            className="lumi-why-toggle"
+            onClick={() => setShowWhy(!showWhy)}
+            type="button"
+          >
+            {showWhy ? '접기' : '왜 이 곳인가요?'}
+          </button>
+          {showWhy && <WhyDetail place={place} whyDetails={whyDetail} />}
+        </div>
+      )}
     </div>
   );
 }
 
 function WhyDetail({ place, whyDetails }) {
   if (!whyDetails) return null;
+  const conditions = (whyDetails.user_conditions || []).filter(Boolean);
+  const features = (whyDetails.place_features || []).filter(Boolean);
+  if (conditions.length === 0 && features.length === 0) return null;
 
   return (
     <div className="lumi-why-detail">
-      <h4>왜 추천했어요?</h4>
-      <div className="lumi-why-content">
-        {whyDetails.user_conditions && whyDetails.user_conditions.length > 0 && (
-          <>
-            <p className="lumi-why-label"><strong>당신의 조건:</strong></p>
-            <ul className="lumi-why-list">
-              {whyDetails.user_conditions.map((c, i) => <li key={i}>{c}</li>)}
-            </ul>
-          </>
-        )}
-        {whyDetails.place_features && whyDetails.place_features.length > 0 && (
-          <>
-            <p className="lumi-why-label"><strong>이 장소:</strong></p>
-            <ul className="lumi-why-list">
-              {whyDetails.place_features.map((f, i) => <li key={i}>{f}</li>)}
-            </ul>
-          </>
-        )}
-        {whyDetails.confidence && (
-          <p className="lumi-confidence">신뢰도: {renderStars(whyDetails.confidence)}</p>
-        )}
-      </div>
+      {conditions.length > 0 && (
+        <>
+          <p className="lumi-why-label">당신의 상황</p>
+          <ul className="lumi-why-list">
+            {conditions.map((c, i) => <li key={i}>{c}</li>)}
+          </ul>
+        </>
+      )}
+      {features.length > 0 && (
+        <>
+          <p className="lumi-why-label">이 장소 특징</p>
+          <ul className="lumi-why-list">
+            {features.map((f, i) => <li key={i}>{f}</li>)}
+          </ul>
+        </>
+      )}
     </div>
   );
-}
-
-function generateContextMessage(recommendations) {
-  if (!recommendations.message_ko) return '지금 상황에 맞는 곳으로 골라볼게요.';
-  return recommendations.message_ko;
-}
-
-function renderStars(confidence) {
-  const stars = Math.round(confidence * 5);
-  const filled = '⭐'.repeat(Math.max(0, Math.min(5, stars)));
-  const empty = '☆'.repeat(Math.max(0, 5 - stars));
-  return filled + empty;
 }

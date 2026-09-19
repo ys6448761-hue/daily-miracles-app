@@ -52,6 +52,13 @@ function _buildDomainContext(soulContext, sessionId, hotelId) {
     wish_context: soulContext.wish_context,
     exclude_place_ids: soulContext.exclude_place_ids || [],
     must_visit_place_ids: soulContext.must_visit_place_ids || [],
+    // Phase 2 additive fields
+    time_of_day: soulContext.time_of_day || null,
+    preference_type: soulContext.preference_type || null,
+    budget_constraint: soulContext.budget_constraint || null,
+    group_size: soulContext.group_size || null,
+    requested_count: soulContext.requested_count || null,
+    mobility_constraint: soulContext.mobility_constraint || null,
     _domainFallbacks: _identifyDomainFallbacks(soulContext._provenance)
     // D5: sowon_id, phone, name, wish_text excluded — not forwarded to domain
   };
@@ -165,6 +172,28 @@ function _buildWhyDetails(tgResult, domainContext) {
   }));
 }
 
+// ─── Private: Group quote detection ─────────────────────────────────────────
+
+function _isGroupQuoteRequest(soulContext) {
+  const groupSize = soulContext.group_size;
+  const pt = soulContext.people_type;
+  // 5+ people AND a quote/cost intent → human consultation territory
+  if (!groupSize) return false;
+  return groupSize >= 5 && (pt === 'group');
+}
+
+function _buildGroupQuoteMessage(soulContext) {
+  const size = soulContext.group_size;
+  return [
+    `친구 ${size}명이시군요.`,
+    `5명 이상 단체 여행 비용은 숙소·코스·식사 조합에 따라 크게 달라져서,`,
+    `정확한 견적은 담당자와 직접 확인하는 편이 좋아요.`,
+    ``,
+    `지금 여수 관광지를 먼저 둘러보시겠어요?`,
+    `아니면 단체 여행 상담을 연결해드릴까요?`
+  ].join('\n');
+}
+
 // ─── Private: D7 Soul message ────────────────────────────────────────────────
 
 function _generateSoulMessage(soulContext, status) {
@@ -172,41 +201,88 @@ function _generateSoulMessage(soulContext, status) {
   const pt = soulContext.people_type;
   const timeMinutes = soulContext.time_available_minutes;
   const timeKnown = provenance.time_available_minutes !== 'UNKNOWN';
+  const timeOfDay = soulContext.time_of_day;
+  const pref = soulContext.preference_type;
+  const budget = soulContext.budget_constraint;
 
+  // Companion acknowledgement
   let companionLine;
-  if (pt === 'family_elderly') companionLine = '어르신과 함께';
+  if (pt === 'family_elderly') companionLine = '부모님과 함께';
   else if (pt === 'family_with_kids') companionLine = '아이들과 함께';
   else if (pt === 'couple') companionLine = '둘이 함께';
-  else if (pt === 'group') companionLine = '단체로';
-  else companionLine = '혼자';
+  else if (pt === 'group') companionLine = '일행과 함께';
+  else companionLine = null; // solo — omit companion line, use situation instead
 
-  let firstLine;
-  if (timeKnown && timeMinutes) {
-    if (timeMinutes < 60) {
-      firstLine = `${companionLine} ${timeMinutes}분이시군요.`;
-    } else {
-      const hours = Math.round(timeMinutes / 60);
-      firstLine = `${companionLine} ${hours}시간이시군요.`;
-    }
+  // Build situation line
+  let situationLine;
+  if (timeOfDay === 'night' || timeOfDay === 'evening') {
+    situationLine = companionLine
+      ? `${companionLine} 밤 시간이 남으셨군요.`
+      : '밤에 시간이 남으셨군요.';
+  } else if (pref === 'photo') {
+    situationLine = companionLine
+      ? `${companionLine} 사진 찍기 좋은 곳을 찾으시는군요.`
+      : '사진 찍기 좋은 곳을 찾으시는군요.';
+  } else if (budget === 'free' || budget === 'low') {
+    situationLine = companionLine
+      ? `${companionLine} 가볍게 즐길 수 있는 곳을 찾으시는군요.`
+      : '부담 없이 즐길 수 있는 곳을 찾으시는군요.';
+  } else if (timeKnown && timeMinutes) {
+    const timeLabel = timeMinutes < 60
+      ? `${timeMinutes}분`
+      : `${Math.round(timeMinutes / 60)}시간`;
+    situationLine = companionLine
+      ? `${companionLine} ${timeLabel} 정도 시간이 있으시군요.`
+      : `${timeLabel} 정도 시간이 있으시군요.`;
+  } else if (companionLine) {
+    situationLine = `${companionLine} 여행이시군요.`;
   } else {
-    firstLine = `${companionLine} 여행이시군요.`;
+    situationLine = '지금 상황에 맞는 곳을 찾아볼게요.';
   }
 
+  const mobilityConstraint = soulContext.mobility_constraint;
+  const requestedCount = soulContext.requested_count;
+
   if (status === 'NO_RESULT') {
-    return `${firstLine}\n조건에 맞는 장소를 찾지 못했어요. 시간이나 조건을 조정해보실래요?`;
+    return `${situationLine}\n조건에 맞는 장소를 찾지 못했어요. 시간이나 조건을 조정해보실래요?`;
   }
 
   // D6 soft clarification for UNKNOWN time (PARTIAL)
   if (status === 'PARTIAL') {
-    return `${firstLine}\n대략 2시간 기준으로 편하게 갈 곳을 골라봤어요.\n시간이 얼마나 남으셨어요?`;
+    if (pref === 'photo') {
+      const countNote = requestedCount ? `${requestedCount}곳 요청하셨는데, ` : '';
+      return `${situationLine}\n${countNote}사진 찍기 좋은 곳 위주로 골라봤어요.`;
+    }
+    if (mobilityConstraint === 'low_walking') {
+      return `${situationLine}\n걷기 부담이 적은 곳을 고르려 했는데, 지금 장소 데이터에 보행 난이도 정보가 없어요.\n방문 전 각 장소의 도보 거리를 꼭 확인해보세요.`;
+    }
+    if (timeOfDay === 'night' || timeOfDay === 'evening') {
+      return `${situationLine}\n지금 갈 수 있는 야간 명소를 골라봤어요.`;
+    }
+    if (budget === 'free' || budget === 'low') {
+      return `${situationLine}\n부담 적은 곳 위주로 골라봤는데, 입장료는 직접 확인이 필요해요.`;
+    }
+    return `${situationLine}\n대략 2시간 기준으로 편하게 갈 곳을 골라봤어요.\n시간이 얼마나 남으셨어요?`;
   }
 
-  const secondLine =
-    pt === 'family_elderly'
-      ? '편하게 다니실 수 있는 곳으로 골라봤어요.'
-      : '지금 상황에 맞는 곳으로 골라봤어요.';
+  // SUCCESS — second line based on companion + situation
+  let secondLine;
+  if (mobilityConstraint === 'low_walking') {
+    secondLine = '걷기 부담이 적은 곳으로 골라봤는데, 보행 난이도 정보가 없어 방문 전 확인을 권장해요.';
+  } else if (pt === 'family_elderly') {
+    secondLine = '이동 부담이 적은 곳으로 골라봤어요.';
+  } else if (pref === 'photo') {
+    const countNote = requestedCount ? `${requestedCount}곳 ` : '';
+    secondLine = `사진 잘 나오는 ${countNote}뷰 포인트를 골라봤어요.`;
+  } else if (budget === 'free' || budget === 'low') {
+    secondLine = '부담 적은 곳 위주로 골라봤는데, 입장료는 방문 전 확인을 권장해요.';
+  } else if (timeOfDay === 'night' || timeOfDay === 'evening') {
+    secondLine = '지금 가도 분위기 좋은 곳으로 골라봤어요.';
+  } else {
+    secondLine = '이동 시간까지 생각해서 편하게 갈 수 있는 곳으로 골라봐요.';
+  }
 
-  return `${firstLine}\n${secondLine}`;
+  return `${situationLine}\n${secondLine}`;
 }
 
 // ─── Private: Result envelope ────────────────────────────────────────────────
@@ -266,7 +342,14 @@ function _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionI
       people_type: soulContext.people_type,
       time_available_minutes: soulContext.time_available_minutes,
       meal_context: soulContext.meal_context,
-      companion_constraints: soulContext.companion_constraints
+      companion_constraints: soulContext.companion_constraints,
+      // Phase 2 additive
+      time_of_day: soulContext.time_of_day || null,
+      preference_type: soulContext.preference_type || null,
+      budget_constraint: soulContext.budget_constraint || null,
+      group_size: soulContext.group_size || null,
+      requested_count: soulContext.requested_count || null,
+      mobility_constraint: soulContext.mobility_constraint || null
     },
     places: (tgResult && tgResult.places) ? tgResult.places : [],
     why_details: whyDetails,
@@ -291,6 +374,29 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
     return { ok: false, httpStatus: 400, error: understandResult.error };
   }
   const { soulContext } = understandResult;
+
+  // GROUP QUOTE ROUTING — 5+ people with cost/quote intent → human consultation
+  if (_isGroupQuoteRequest(soulContext)) {
+    const quoteMessage = _buildGroupQuoteMessage(soulContext);
+    const payload = {
+      session_id: sessionId,
+      understood_context: {
+        people_type: soulContext.people_type,
+        time_available_minutes: soulContext.time_available_minutes,
+        meal_context: soulContext.meal_context,
+        companion_constraints: soulContext.companion_constraints,
+        group_size: soulContext.group_size
+      },
+      places: [],
+      why_details: [],
+      message_ko: quoteMessage,
+      status: 'GROUP_CONSULTATION_REQUIRED',
+      next_options: ['여수 관광지 먼저 둘러보기', '단체 여행 상담 연결'],
+      group_size: soulContext.group_size,
+      timestamp: new Date().toISOString()
+    };
+    return { ok: true, payload };
+  }
 
   // CONSTRUCT REQUEST ENVELOPE (internal audit — not returned to client directly)
   const request = _buildRequestEnvelope(principal, soulContext, sessionId);

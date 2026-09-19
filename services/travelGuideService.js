@@ -135,6 +135,22 @@ class TravelGuideService {
       return this._noPlacesResponse(context, "Weather constraints unmet");
     }
 
+    // G2: Low-walking constraint
+    // RULE 1: physical_difficulty='high' → exclude (verified unsuitable for low-walking requests)
+    // RULE 2: physical_difficulty=null → UNKNOWN, warn but do not exclude (fail-safe)
+    if (context.mobility_constraint === 'low_walking') {
+      candidates = candidates.filter(p => p.physical_difficulty !== 'high');
+      candidates = candidates.map(p => {
+        if (!p.physical_difficulty) {
+          if (!p._warnings) p._warnings = [];
+          if (!p._warnings.includes('walking_burden_unknown')) {
+            p._warnings.push('walking_burden_unknown');
+          }
+        }
+        return p;
+      });
+    }
+
     // 8. Emotion/Connection (WISH_TRAVELER only, LAST priority, cannot override reality)
     if (context.user_mode === "WISH_TRAVELER" && context.wish_context) {
       candidates = candidates.sort((a, b) => this._scoreEmotion(a, b, context));
@@ -162,6 +178,7 @@ class TravelGuideService {
       name_ko: p.name_ko,
       type: "primary",
       stay_minutes: p.avg_stay_minutes,
+      avg_stay_minutes: p.avg_stay_minutes,
       travel_time_minutes: p.travel_time_minutes,
       travel_time_status: p.travel_time_status,
       total_required_time: p.total_required_time,
@@ -169,6 +186,13 @@ class TravelGuideService {
       reason: this._generateReason(p, context),
       safety_pass: true,
       live_status: p.live_status,
+      live_status_required: p.live_status_required || false,
+      suitable_for: p.suitable_for || [],
+      emotion_tags: p.emotion_tags || [],
+      indoor_outdoor: p.indoor_outdoor || null,
+      physical_difficulty: p.physical_difficulty || null,
+      admission_fee_json: p.admission_fee_json || null,
+      operating_hours: p.opening_hours_json ? JSON.stringify(p.opening_hours_json) : null,
       accessibility: {
         // NEW: Status fields (Phase 1)
         wheelchair_status: p.accessibility_wheelchair_status || 'unknown',
@@ -181,6 +205,7 @@ class TravelGuideService {
         car_accessible: p.access_by_car !== false,
       },
       warnings: p._warnings && p._warnings.length > 0 ? p._warnings : [],
+      mobility_constraint_applied: !!(p._warnings && p._warnings.includes('walking_burden_unknown')),
     }));
 
     // Prepare fallback (only first 3 can have fallback)
@@ -253,11 +278,15 @@ class TravelGuideService {
 
     // Determine time slot and target stop count
     const timeSlot = this._detectTimeSlot(timeMinutes);
-    const targetStops = this._getTargetStopCount(timeSlot, timeMinutes);
+    // G1: respect explicit requested_count — capped at 5 and floored at 1
+    const rawTarget = this._getTargetStopCount(timeSlot, timeMinutes);
+    const targetStops = context.requested_count
+      ? Math.max(1, Math.min(5, context.requested_count))
+      : rawTarget;
 
     // Select places that fit available time (greedy: fit as many as possible)
     // Must-visit places are anchored in composition
-    const selectedPlaces = this._selectPlacesByTime(candidates, targetStops, timeMinutes, mustVisitPlaceIds);
+    const selectedPlaces = this._selectPlacesByTime(candidates, targetStops, timeMinutes, mustVisitPlaceIds, context);
 
     // Fetch meal recommendations for journey
     const mealOptions = await this._getFoodRecommendation(context);
@@ -349,18 +378,20 @@ class TravelGuideService {
    * Respects ranking but also respects time constraint
    *
    * TIME BUDGET CALCULATION:
-   * - Reserve 60 min for 1 meal (if places exist)
-   * - Reserve 30 min for 1 cafe (if 2+ places)
+   * - Reserve 60 min for 1 meal only when meal_context is requested
+   * - Reserve 30 min for 1 cafe only for half/full day (>= 180 min) with meal
    * - Use remaining time for places (no exact travel time, just stay time)
    *
    * @private
    */
-  _selectPlacesByTime(candidates, targetCount, timeMinutes, mustVisitPlaceIds = []) {
+  _selectPlacesByTime(candidates, targetCount, timeMinutes, mustVisitPlaceIds = [], context = {}) {
     const selected = [];
 
-    // Calculate time reserves
-    const mealReserveMinutes = 60;    // 1 meal for typical half/full day
-    const cafeReserveMinutes = 30;    // 1 cafe for multi-place courses
+    // Only reserve meal time when meal is actually requested
+    const hasMeal = context.meal_context && context.meal_context !== 'none';
+    const mealReserveMinutes = hasMeal ? 60 : 0;
+    // Cafe reserve only when there's a meal and enough time for a full-day outing
+    const cafeReserveMinutes = (hasMeal && timeMinutes >= 180) ? 30 : 0;
     const availableForPlaces = timeMinutes - mealReserveMinutes - cafeReserveMinutes;
 
     let placesTimeUsed = 0;
@@ -825,13 +856,72 @@ class TravelGuideService {
 
   /**
    * Helper: Generate reason for recommendation
+   * Derives meaningful reason from actual place data + context — never a generic fallback.
    * @private
    */
   _generateReason(place, context) {
-    if (context.user_mode === "WISH_TRAVELER" && context.wish_context?.emotion_primary) {
-      return `${context.wish_context.emotion_primary} 감정과 잘 맞는 장소`;
+    const parts = [];
+    const suitable = place.suitable_for || [];
+    const emotions = place.emotion_tags || [];
+    const pt = context.people_type;
+    const timeMin = context.time_available_minutes;
+    const pref = context.preference_type;
+    const budget = context.budget_constraint;
+    const timeOfDay = context.time_of_day;
+
+    // Budget signal — only claim free when fee data is verified present and zero
+    // admission_fee_json === null means NO DATA, NOT free
+    if (budget === 'free' || budget === 'low') {
+      if (place.admission_fee_json && place.admission_fee_json.adult === 0) {
+        parts.push('무료 입장');
+      }
+      // Do not claim "입장료 없는 공간" when admission_fee_json is null (no data)
     }
-    return "현재 여행 조건에 맞는 장소예요";
+
+    // Companion fit — suppress suitability claim when walking burden is unknown (G2)
+    const walkingUnknown = (place._warnings || []).includes('walking_burden_unknown');
+    if (pt === 'family_elderly' && suitable.includes('elderly')) {
+      if (walkingUnknown) {
+        parts.push('어르신 방문 가능 (보행 난이도 미확인)');
+      } else {
+        parts.push('어르신과 함께 방문하기 좋아요');
+      }
+    } else if (pt === 'family_with_kids' && suitable.includes('kids_ok')) {
+      parts.push('아이와 함께 즐기기 좋아요');
+    } else if (pt === 'couple' && (suitable.includes('couples') || emotions.includes('date'))) {
+      parts.push('둘이 함께 걷기 좋은 분위기예요');
+    } else if (pt === 'group' && (suitable.includes('groups') || suitable.includes('friends'))) {
+      parts.push('단체가 함께 즐기기 좋아요');
+    }
+
+    // Time fit
+    if (timeMin && place.avg_stay_minutes) {
+      if (place.avg_stay_minutes <= 45) parts.push(`${place.avg_stay_minutes}분이면 충분히 둘러볼 수 있어요`);
+      else if (place.avg_stay_minutes <= 90) parts.push(`느긋하게 ${place.avg_stay_minutes}분 정도`);
+    }
+
+    // Photo preference
+    if (pref === 'photo') {
+      if (emotions.includes('night_view') || emotions.includes('view') || emotions.includes('architecture')) {
+        parts.push('사진 찍기 좋은 뷰가 있어요');
+      }
+    }
+
+    // Night
+    if (timeOfDay === 'night' || timeOfDay === 'evening') {
+      if (emotions.includes('night_view') || suitable.includes('young_adults')) {
+        parts.push('밤에 분위기가 좋아요');
+      }
+    }
+
+    // Emotion tags as fallback
+    if (parts.length === 0 && emotions.length > 0) {
+      const TAG_KO = { view: '뷰가 좋아요', history: '역사적인 장소예요', nature: '자연 속에서 쉴 수 있어요', local_food: '현지 먹거리를 즐길 수 있어요', night_view: '야경이 아름다워요', social: '함께 즐기기 좋아요', culture: '문화 공간이에요', quiet: '조용하게 산책할 수 있어요', seasonal: '계절감을 느낄 수 있어요', adventure: '색다른 경험을 할 수 있어요' };
+      const firstTag = TAG_KO[emotions[0]];
+      if (firstTag) parts.push(firstTag);
+    }
+
+    return parts.length > 0 ? parts.join(' · ') : '지금 상황에 추천할 수 있는 곳이에요';
   }
 
   /**
