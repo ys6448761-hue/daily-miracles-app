@@ -1,9 +1,3 @@
-/**
- * LUMI Travel Page
- * ASK-FIRST natural language input for travel recommendations
- * Unified entry point: text input → context extraction → recommendations
- */
-
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { getOrEnsureGuestCredential } from '../api/dreamtown.js';
@@ -18,30 +12,27 @@ export default function LumiTravelPage() {
   const [error, setError] = useState(null);
   const [sessionId, setSessionId] = useState(null);
 
-  // Example questions for ASK-FIRST screen
   const exampleQuestions = [
-    '아이랑 2시간 어디 갈까?',
-    '부모님 모시고 저녁 뭐 먹지?',
-    '체크아웃 후 3시간 남았어'
+    '🌊 지금 두 시간 붕 떴는데 뭐 하지?',
+    '🌙 밤인데 숙소 들어가긴 아쉬워',
+    '📸 사진 잘 나오는 곳 세 군데만',
+    '👨‍👩‍👧 부모님과 많이 안 걷는 코스는?',
+    '💸 돈 많이 안 쓰고 오늘 놀 수 있어?',
+    '👥 친구 12명, 1박2일 비용은?',
   ];
 
-  // No session restore from localStorage — stale session IDs cause 401.
-  // Sessions are created fresh by the backend when session_id is absent.
-
-  // Handle natural language input submission
-  const handleAsk = async (e) => {
-    e.preventDefault();
-    if (!textInput.trim()) return;
+  // Shared submit logic — used by both manual input and example question tap
+  const submitQuestion = async (text) => {
+    if (!text.trim() || loading) return;
 
     setLoading(true);
     setError(null);
 
     try {
-      // Obtain (or reuse) guest credential — must succeed before sending request
       let credential;
       try {
         credential = await getOrEnsureGuestCredential();
-      } catch (credErr) {
+      } catch {
         setError('인증 준비 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
         return;
       }
@@ -54,25 +45,18 @@ export default function LumiTravelPage() {
       const params = new URLSearchParams(location.search);
       const hotelId = params.get('hotel_id');
 
-      const payload = {
-        message: textInput,
-        session_id: sessionId,
-        hotel_id: hotelId
-      };
-
       const response = await fetch('/api/dt/travel/input/text', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${credential.guest_token}`
+          'Authorization': `Bearer ${credential.guest_token}`,
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ message: text, session_id: sessionId, hotel_id: hotelId }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         if (response.status === 401) {
-          // Stale session — clear it so next request starts fresh
           localStorage.removeItem('lumi_session_id');
           setSessionId(null);
         }
@@ -80,12 +64,7 @@ export default function LumiTravelPage() {
       }
 
       const data = await response.json();
-
-      // Track session within this page visit only
-      if (data.session_id) {
-        setSessionId(data.session_id);
-      }
-
+      if (data.session_id) setSessionId(data.session_id);
       setRecommendations(data);
       setTextInput('');
     } catch (err) {
@@ -95,71 +74,103 @@ export default function LumiTravelPage() {
     }
   };
 
-  // Handle example question click
-  const handleExampleClick = (question) => {
-    setTextInput(question);
+  const handleAsk = (e) => {
+    e.preventDefault();
+    submitQuestion(textInput);
   };
 
-  // Handle new question (back to input screen)
+  // Tap example → immediate submit (no double-submit if already loading)
+  const handleExampleClick = (question) => {
+    submitQuestion(question);
+  };
+
   const handleNewQuestion = () => {
     setRecommendations(null);
     setError(null);
   };
 
-  // ASK-FIRST Screen
+  // ASK-FIRST Entry Screen
   if (!recommendations) {
     return (
       <div className="lumi-container">
         <div className="lumi-ask-first">
-          <h1 className="lumi-title">🌟 LUMI 🌟</h1>
-          <p className="lumi-tagline">여수여행, 그냥 물어보세요.</p>
 
-          <div className="lumi-examples">
-            <p className="examples-label">예시 질문:</p>
-            {exampleQuestions.map((q, i) => (
-              <button
-                key={i}
-                className="lumi-example-btn"
-                onClick={() => handleExampleClick(q)}
-                type="button"
-              >
-                • {q}
-              </button>
-            ))}
+          {/* Hero */}
+          <div className="lumi-hero">
+            <div className="lumi-eyebrow">무료여행정보</div>
+            <div className="lumi-brand">무여정</div>
+            <h1 className="lumi-headline">여수가 궁금하면, 무여정.</h1>
+            <p className="lumi-tagline">그냥 말하듯 물어보세요.</p>
           </div>
 
-          <form onSubmit={handleAsk} className="lumi-form">
-            <input
-              type="text"
-              value={textInput}
-              onChange={(e) => setTextInput(e.target.value)}
-              placeholder="무엇이 궁금하세요?"
-              autoFocus
-              className="lumi-input"
-              disabled={loading}
-            />
-            <button
-              type="submit"
-              disabled={loading || !textInput.trim()}
-              className="lumi-submit-btn"
-            >
-              {loading ? '생각 중...' : '→ 보내기'}
-            </button>
-          </form>
+          {/* Service status */}
+          <div className="lumi-intro-card">
+            <span className="lumi-intro-name">여수 현지 친구, 무여정</span>
+            <span className="lumi-intro-status">● 지금 물어볼 수 있어요</span>
+          </div>
 
-          {error && (
-            <div className="lumi-error">
-              <p>{error}</p>
+          {/* Interaction card */}
+          <div className="lumi-interaction-card">
+            <p className="lumi-q-heading">지금 뭐가 궁금하세요?</p>
+            <p className="lumi-q-sub">
+              정해진 질문은 없어요. 지금 상황을 그대로 말해 주세요.
+            </p>
+
+            <div className="lumi-chips">
+              {exampleQuestions.map((q, i) => (
+                <button
+                  key={i}
+                  className="lumi-chip"
+                  onClick={() => handleExampleClick(q)}
+                  disabled={loading}
+                  type="button"
+                >
+                  {q}
+                </button>
+              ))}
             </div>
-          )}
+
+            {error && (
+              <div className="lumi-error">
+                <p>{error}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleAsk} className="lumi-form">
+              <input
+                type="text"
+                value={textInput}
+                onChange={(e) => setTextInput(e.target.value)}
+                placeholder="예: 지금 비 오는데 어디 가지?"
+                autoFocus
+                className="lumi-input"
+                disabled={loading}
+              />
+              <button
+                type="submit"
+                disabled={loading || !textInput.trim()}
+                className="lumi-send-btn"
+                aria-label="보내기"
+              >
+                {loading ? (
+                  <span className="lumi-sending-dot" />
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M12 19V5M5 12l7-7 7 7" />
+                  </svg>
+                )}
+              </button>
+            </form>
+          </div>
+
         </div>
       </div>
     );
   }
 
-  // Recommendation Result Screen
+  // Result Screen
   return (
-    <div className="lumi-container">
+    <div className="lumi-container lumi-container--result">
       <RecommendationResult
         recommendations={recommendations}
         onNewQuestion={handleNewQuestion}
@@ -168,9 +179,6 @@ export default function LumiTravelPage() {
   );
 }
 
-/**
- * Recommendation Result Component
- */
 function RecommendationResult({ recommendations, onNewQuestion }) {
   const [expandedWhy, setExpandedWhy] = useState(null);
 
@@ -214,7 +222,6 @@ function RecommendationResult({ recommendations, onNewQuestion }) {
                     </small>
                   </p>
                 )}
-
                 {place.operating_hours && (
                   <p className="lumi-hours">운영시간: {place.operating_hours}</p>
                 )}
@@ -225,9 +232,7 @@ function RecommendationResult({ recommendations, onNewQuestion }) {
                 <button className="lumi-detail-btn">📖 자세히</button>
                 <button
                   className="lumi-why-btn"
-                  onClick={() =>
-                    setExpandedWhy(expandedWhy === idx ? null : idx)
-                  }
+                  onClick={() => setExpandedWhy(expandedWhy === idx ? null : idx)}
                   type="button"
                 >
                   ❓ 왜?
@@ -250,20 +255,13 @@ function RecommendationResult({ recommendations, onNewQuestion }) {
         )}
       </div>
 
-      <button
-        className="lumi-new-question-btn"
-        onClick={onNewQuestion}
-        type="button"
-      >
+      <button className="lumi-new-question-btn" onClick={onNewQuestion} type="button">
         다른 추천 받기
       </button>
     </div>
   );
 }
 
-/**
- * Why Detail Component
- */
 function WhyDetail({ place, whyDetails }) {
   if (!whyDetails) return null;
 
@@ -273,51 +271,33 @@ function WhyDetail({ place, whyDetails }) {
       <div className="lumi-why-content">
         {whyDetails.user_conditions && whyDetails.user_conditions.length > 0 && (
           <>
-            <p className="lumi-why-label">
-              <strong>당신의 조건:</strong>
-            </p>
+            <p className="lumi-why-label"><strong>당신의 조건:</strong></p>
             <ul className="lumi-why-list">
-              {whyDetails.user_conditions.map((c, i) => (
-                <li key={i}>{c}</li>
-              ))}
+              {whyDetails.user_conditions.map((c, i) => <li key={i}>{c}</li>)}
             </ul>
           </>
         )}
-
         {whyDetails.place_features && whyDetails.place_features.length > 0 && (
           <>
-            <p className="lumi-why-label">
-              <strong>이 장소:</strong>
-            </p>
+            <p className="lumi-why-label"><strong>이 장소:</strong></p>
             <ul className="lumi-why-list">
-              {whyDetails.place_features.map((f, i) => (
-                <li key={i}>{f}</li>
-              ))}
+              {whyDetails.place_features.map((f, i) => <li key={i}>{f}</li>)}
             </ul>
           </>
         )}
-
         {whyDetails.confidence && (
-          <p className="lumi-confidence">
-            신뢰도: {renderStars(whyDetails.confidence)}
-          </p>
+          <p className="lumi-confidence">신뢰도: {renderStars(whyDetails.confidence)}</p>
         )}
       </div>
     </div>
   );
 }
 
-/**
- * Helper: Generate context message
- */
 function generateContextMessage(recommendations) {
   if (!recommendations.message_ko) return '지금 상황에 맞는 곳으로 골라볼게요.';
   return recommendations.message_ko;
 }
 
-/**
- * Helper: Render star rating
- */
 function renderStars(confidence) {
   const stars = Math.round(confidence * 5);
   const filled = '⭐'.repeat(Math.max(0, Math.min(5, stars)));

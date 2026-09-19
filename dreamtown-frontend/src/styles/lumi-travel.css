@@ -1,157 +1,286 @@
-/* LUMI Travel Page Styles */
+/* 무여정 Travel Page — Hotel-Ready Entry V1 */
+
+/* ═══════════════════════════════════════════════════════════
+   Base
+═══════════════════════════════════════════════════════════ */
 
 .lumi-container {
-  max-width: 600px;
+  max-width: 560px;
   margin: 0 auto;
-  padding: 20px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: white;
+  padding: 0;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  background: #EFF8F6;
+  min-height: 100dvh;
+}
+
+/* scoped box-sizing so children don't escape container width */
+.lumi-container *,
+.lumi-container *::before,
+.lumi-container *::after {
+  box-sizing: border-box;
+}
+
+/* Result-screen variant adds readable padding */
+.lumi-container--result {
+  padding: 0 16px;
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ASK-FIRST Screen
+   ASK-FIRST Entry Screen
 ═══════════════════════════════════════════════════════════ */
 
 .lumi-ask-first {
-  text-align: center;
-  padding: 40px 20px;
-  min-height: 70vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  padding-bottom: 20px;
 }
 
-.lumi-title {
-  font-size: 36px;
+/* ── Hero ── */
+
+.lumi-hero {
+  padding: 20px 16px 10px;
+}
+
+.lumi-eyebrow {
+  font-size: 11px;
+  font-weight: 500;
+  color: #7AA9BF;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+/* Gowun Dodum wordmark — warm, story-like brand character */
+.lumi-brand {
+  font-family: 'Gowun Dodum', 'Noto Sans KR', sans-serif;
+  font-size: 40px;
+  font-weight: 400;
+  color: #0F1E3D;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  margin-bottom: 6px;
+  word-break: keep-all;
+}
+
+.lumi-headline {
+  font-size: 20px;
   font-weight: 700;
-  margin: 20px 0;
-  color: #333;
-  letter-spacing: 2px;
+  color: #0F1E3D;
+  line-height: 1.3;
+  margin: 0 0 4px;
+  letter-spacing: -0.02em;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 .lumi-tagline {
-  font-size: 18px;
-  color: #666;
-  margin-bottom: 40px;
-  font-weight: 500;
-}
-
-.lumi-examples {
-  text-align: left;
-  max-width: 400px;
-  margin: 0 auto 30px;
-}
-
-.lumi-examples .examples-label {
-  color: #999;
   font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 12px;
+  color: #718096;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Service status card ── */
+
+.lumi-intro-card {
+  margin: 8px 12px 8px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 12px;
+  border: 1px solid #D1E4F0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.lumi-intro-name {
+  font-size: 12px;
   font-weight: 600;
+  color: #1A3A5C;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.lumi-example-btn {
-  display: block;
+.lumi-intro-status {
+  font-size: 11px;
+  color: #38A169;
+  font-weight: 500;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ── Interaction card ── */
+
+.lumi-interaction-card {
+  margin: 0 12px;
+  padding: 14px 14px 14px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(15, 30, 61, 0.07);
+  overflow: hidden;
+  min-width: 0;
+}
+
+.lumi-q-heading {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0F1E3D;
+  margin: 0 0 3px;
+  letter-spacing: -0.01em;
+}
+
+.lumi-q-sub {
+  font-size: 11px;
+  color: #A0AEC0;
+  margin: 0 0 10px;
+  line-height: 1.5;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ── 2-column chip grid ── */
+
+.lumi-chips {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
   width: 100%;
-  padding: 14px 16px;
-  margin: 8px 0;
+}
+
+.lumi-chip {
+  padding: 9px 10px;
   text-align: left;
-  background: #f5f5f5;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  background: #F4F9FC;
+  border: 1.5px solid #D1E4F0;
+  border-radius: 9px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 14px;
-  color: #333;
+  font-size: 12px;
+  color: #1A3A5C;
   font-family: inherit;
+  line-height: 1.45;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  transition: background 0.12s, border-color 0.12s;
+  min-height: 44px;
+  max-width: 100%;
+  overflow: hidden;
 }
 
-.lumi-example-btn:hover {
-  background: #efefef;
-  border-color: #999;
-  transform: translateX(2px);
+.lumi-chip:hover:not(:disabled) {
+  background: #E8F4FB;
+  border-color: #90C5E0;
 }
 
-.lumi-example-btn:active {
-  background: #e8e8e8;
+.lumi-chip:active:not(:disabled) {
+  background: #D7EDF8;
+}
+
+.lumi-chip:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── Input form ── */
+
+.lumi-error {
+  padding: 10px 12px;
+  background: #FFF0F0;
+  color: #C53030;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  border-left: 3px solid #FC8181;
+}
+
+.lumi-error p {
+  margin: 0;
 }
 
 .lumi-form {
   display: flex;
-  gap: 10px;
-  margin: 30px 0;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
+  gap: 7px;
+  align-items: center;
 }
 
 .lumi-input {
   flex: 1;
-  padding: 14px;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  font-size: 15px;
+  min-width: 0;
+  padding: 11px 13px;
+  border: 1.5px solid #D1D9E6;
+  border-radius: 10px;
+  font-size: 14px;
   font-family: inherit;
-  transition: border-color 0.2s;
-  color: #333;
-  background-color: #fff;
-  caret-color: #007aff;
+  color: #0F1E3D;
+  background: #F7FBFD;
+  caret-color: #1A7BAF;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.lumi-input::placeholder {
+  color: #A0AEC0;
 }
 
 .lumi-input:focus {
   outline: none;
-  border-color: #007aff;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+  border-color: #1A7BAF;
+  box-shadow: 0 0 0 3px rgba(26, 123, 175, 0.1);
+  background: #fff;
 }
 
 .lumi-input:disabled {
-  background: #f5f5f5;
-  color: #999;
+  background: #F0F4F8;
+  color: #A0AEC0;
 }
 
-.lumi-submit-btn {
-  padding: 14px 24px;
-  background: #007aff;
-  color: white;
+.lumi-send-btn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  background: #1A7BAF;
+  color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-  transition: all 0.2s;
-  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, transform 0.12s;
 }
 
-.lumi-submit-btn:hover:not(:disabled) {
-  background: #0051d5;
+.lumi-send-btn:hover:not(:disabled) {
+  background: #145F8A;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
 }
 
-.lumi-submit-btn:active:not(:disabled) {
+.lumi-send-btn:active:not(:disabled) {
   transform: translateY(0);
 }
 
-.lumi-submit-btn:disabled {
-  background: #999;
+.lumi-send-btn:disabled {
+  background: #CBD5E0;
   cursor: not-allowed;
-  opacity: 0.6;
 }
 
-.lumi-error {
-  padding: 14px;
-  background: #ffe0e0;
-  color: #d00;
-  border-radius: 8px;
-  margin-top: 20px;
-  font-size: 14px;
-  text-align: left;
-  border-left: 4px solid #d00;
+.lumi-sending-dot {
+  width: 6px;
+  height: 6px;
+  background: #fff;
+  border-radius: 50%;
+  animation: lumi-pulse 1s ease-in-out infinite;
+}
+
+@keyframes lumi-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   Result Screen
+   Result Screen (preserved)
 ═══════════════════════════════════════════════════════════ */
 
 .lumi-result {
@@ -369,43 +498,59 @@
    Responsive
 ═══════════════════════════════════════════════════════════ */
 
-@media (max-width: 480px) {
-  .lumi-container {
-    padding: 12px;
+/* Very small phones — slightly tighter brand */
+@media (max-width: 360px) {
+  .lumi-brand {
+    font-size: 34px;
   }
-
-  .lumi-ask-first {
-    padding: 20px 12px;
+  .lumi-headline {
+    font-size: 18px;
   }
-
-  .lumi-title {
-    font-size: 28px;
+  .lumi-chip {
+    font-size: 11px;
+    padding: 8px 9px;
   }
+}
 
-  .lumi-tagline {
-    font-size: 15px;
-    margin-bottom: 24px;
+/* Standard mobile 361–480px — primary target */
+@media (min-width: 361px) and (max-width: 480px) {
+  .lumi-brand {
+    font-size: 38px;
   }
+}
 
-  .lumi-form {
-    flex-direction: column;
+/* Tablet — form row, wider chips */
+@media (min-width: 600px) {
+  .lumi-hero {
+    padding: 28px 20px 14px;
   }
-
-  .lumi-input {
-    width: 100%;
+  .lumi-intro-card {
+    margin: 10px 20px 10px;
   }
-
-  .lumi-submit-btn {
-    width: 100%;
+  .lumi-interaction-card {
+    margin: 0 20px;
+    padding: 18px 18px 18px;
   }
+  .lumi-brand {
+    font-size: 46px;
+  }
+  .lumi-headline {
+    font-size: 24px;
+  }
+}
 
+/* Desktop */
+@media (min-width: 900px) {
+  .lumi-hero {
+    padding: 36px 24px 16px;
+  }
+  .lumi-brand {
+    font-size: 52px;
+  }
+  .lumi-headline {
+    font-size: 26px;
+  }
   .lumi-actions {
-    flex-direction: column;
-  }
-
-  .lumi-map-btn,
-  .lumi-detail-btn,
-  .lumi-why-btn {
-    width: 100%;
+    flex-direction: row;
   }
 }
