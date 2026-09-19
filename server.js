@@ -3006,42 +3006,48 @@ app.get('/admin/star/:access_key', (req, res) => {
 // Purpose: Serve React SPA (index.html) instead of storybook-share.html
 // The SPA's StorybookRestore component will handle token validation via API
 // Query string (?token=...) is preserved and passed to frontend
+// FULL mode only — dedicated STORYBOOK runtime uses SPA catch-all instead
 // ═══════════════════════════════════════════════════════════════════════════
-app.get('/storybook/restore', (req, res) => {
-  // Use same SPA serving pattern as DT_SPA_ROUTES
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
+  app.get('/storybook/restore', (req, res) => {
+    // Use same SPA serving pattern as DT_SPA_ROUTES
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
 
-  const dtFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist');
-  res.sendFile(path.join(dtFrontendPath, 'index.html'), (err) => {
-    if (err) {
-      console.error('[C7A_RESTORE_SPA_ERROR]', 'Failed to serve SPA for /storybook/restore', err.message);
-      res.status(503).send('<html><body><h2>DreamTown 준비 중입니다. 잠시 후 다시 시도해주세요.</h2></body></html>');
-    }
+    const dtFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist');
+    res.sendFile(path.join(dtFrontendPath, 'index.html'), (err) => {
+      if (err) {
+        console.error('[C7A_RESTORE_SPA_ERROR]', 'Failed to serve SPA for /storybook/restore', err.message);
+        res.status(503).send('<html><body><h2>DreamTown 준비 중입니다. 잠시 후 다시 시도해주세요.</h2></body></html>');
+      }
+    });
   });
-});
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // C7A Journey View — UUID path serves DreamTown React SPA
 // Route: GET /storybook/:journey_id (where journey_id is a UUID)
 // Purpose: Serve React SPA (index.html) for direct journey access
 // Must come BEFORE legacy /storybook/:key route (route precedence)
+// FULL mode only — dedicated STORYBOOK runtime uses SPA catch-all instead
 // ═══════════════════════════════════════════════════════════════════════════
-app.get('/storybook/:journey_id([0-9a-f\\-]{36})', (req, res) => {
-  // Route only matches if journey_id is exactly 36 characters (UUID format)
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
+if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
+  app.get('/storybook/:journey_id([0-9a-f\\-]{36})', (req, res) => {
+    // Route only matches if journey_id is exactly 36 characters (UUID format)
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
 
-  const dtFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist');
-  res.sendFile(path.join(dtFrontendPath, 'index.html'), (err) => {
-    if (err) {
-      console.error('[C7A_JOURNEY_SPA_ERROR]', 'Failed to serve SPA for C7A journey UUID', req.params.journey_id, err.message);
-      res.status(503).send('<html><body><h2>DreamTown 준비 중입니다. 잠시 후 다시 시도해주세요.</h2></body></html>');
-    }
+    const dtFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist');
+    res.sendFile(path.join(dtFrontendPath, 'index.html'), (err) => {
+      if (err) {
+        console.error('[C7A_JOURNEY_SPA_ERROR]', 'Failed to serve SPA for C7A journey UUID', req.params.journey_id, err.message);
+        res.status(503).send('<html><body><h2>DreamTown 준비 중입니다. 잠시 후 다시 시도해주세요.</h2></body></html>');
+      }
+    });
   });
-});
+}
 
 // ---------- 스토리북 공유 페이지 (/storybook/:key) — OG SSR ----------
 app.get('/storybook/:key', async (req, res) => {
@@ -4087,6 +4093,40 @@ if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   app.use(express.static(dtFrontendPath));
 }
 
+// ---------- Storybook Frontend (dedicated artifact) ----------
+if (IS_STORYBOOK_MODE) {
+  const sbFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist-storybook');
+  app.use(express.static(sbFrontendPath, {
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('index.html')) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+      } else {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      }
+    },
+  }));
+  console.log('✅ Storybook 프론트 등록 완료 (dist-storybook)');
+}
+
+// ---------- MUYEOJEONG Frontend (dedicated artifact) ----------
+if (IS_MUYEOJEONG_MODE) {
+  const myFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist-muyeojeong');
+  app.use(express.static(myFrontendPath, {
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('index.html')) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+      } else {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      }
+    },
+  }));
+  console.log('✅ MUYEOJEONG 프론트 등록 완료 (dist-muyeojeong)');
+}
+
 // DreamTown SPA 라우트 — React Router 직접 경로 (새로고침/직접 URL 진입)
 if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
   const DT_SPA_ROUTES = [
@@ -4462,6 +4502,38 @@ if (!IS_STORYBOOK_MODE && !IS_MUYEOJEONG_MODE) {
     res.sendFile(path.join(dtFrontendPath, 'index.html'), (err) => {
       if (err) {
         res.status(503).send('<html><body><h2>DreamTown 준비 중입니다.</h2></body></html>');
+      }
+    });
+  });
+}
+
+// ---------- Storybook SPA catch-all (dedicated runtime) ----------
+if (IS_STORYBOOK_MODE) {
+  const sbFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist-storybook');
+  app.get(/^(?!\/api\/).*$/, (req, res) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.sendFile(path.join(sbFrontendPath, 'index.html'), (err) => {
+      if (err) {
+        console.error('[SB] SPA sendFile 실패 — dist-storybook 미존재 가능:', err.message);
+        res.status(503).send('<html><body><h2>Storybook 준비 중입니다.</h2></body></html>');
+      }
+    });
+  });
+}
+
+// ---------- MUYEOJEONG SPA catch-all (dedicated runtime) ----------
+if (IS_MUYEOJEONG_MODE) {
+  const myFrontendPath = path.join(__dirname, 'dreamtown-frontend', 'dist-muyeojeong');
+  app.get(/^(?!\/api\/).*$/, (req, res) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.sendFile(path.join(myFrontendPath, 'index.html'), (err) => {
+      if (err) {
+        console.error('[MY] SPA sendFile 실패 — dist-muyeojeong 미존재 가능:', err.message);
+        res.status(503).send('<html><body><h2>MUYEOJEONG 준비 중입니다.</h2></body></html>');
       }
     });
   });
