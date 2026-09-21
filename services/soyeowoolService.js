@@ -15,6 +15,9 @@
 const { v4: uuidv4 } = require('uuid');
 const contextExtractionService = require('./contextExtractionService');
 const travelGuideService = require('./travelGuideService');
+const sharedJourneyService = require('./sharedJourneyService');
+const quoteContextService = require('./quoteContextService');
+const quoteEngine = require('./quoteEngine');
 
 const CAPABILITY = 'TRAVEL_INTELLIGENCE';
 const SOURCE = 'travelGuideService/8-filter-cascade';
@@ -27,6 +30,47 @@ async function _understand(message) {
     return { ok: false, error: soulContext.error };
   }
   return { ok: true, soulContext };
+}
+
+// ─── Private: Shared Journey (V0.2) ──────────────────────────────────────────
+
+async function _extractSharedJourney(message) {
+  return sharedJourneyService.extractSharedJourney(message);
+}
+
+/**
+ * Derive minimum domain-relevant signals from sharedJourney.
+ * Rules:
+ *   - EXPERIENCED items → NEVER added to exclude_place_ids (EXPERIENCED ≠ EXCLUDE)
+ *   - repeat_intent night condition → supplement time_of_day if not already set
+ *   - companion mobility_hint=low_walking → supplement mobility_constraint if not already set
+ *   - Companion relationship labels not forwarded to domain
+ */
+function _supplementDomainFromSharedJourney(domainContext, sharedJourney) {
+  if (!sharedJourney) return domainContext;
+
+  const supplemented = Object.assign({}, domainContext);
+
+  // Supplement time_of_day from repeat_intent conditions
+  if (!supplemented.time_of_day && sharedJourney.repeat_intent) {
+    const conds = sharedJourney.repeat_intent.conditions || [];
+    if (conds.includes('night'))   supplemented.time_of_day = 'night';
+    else if (conds.includes('morning')) supplemented.time_of_day = 'morning';
+    else if (conds.includes('evening')) supplemented.time_of_day = 'evening';
+  }
+
+  // Supplement mobility_constraint from companion voices
+  if (!supplemented.mobility_constraint) {
+    const hasLowWalking = (sharedJourney.companion_voices || []).some(
+      cv => cv.mobility_hint === 'low_walking'
+    );
+    if (hasLowWalking) supplemented.mobility_constraint = 'low_walking';
+  }
+
+  // EXPERIENCED ≠ EXCLUDE: explicitly do not add experienced to exclude_place_ids
+  // (no-op guard — just documents the invariant)
+
+  return supplemented;
 }
 
 // ─── Private: Domain context (D5 + DOMAIN_FALLBACK) ─────────────────────────
@@ -334,7 +378,7 @@ function _buildResultEnvelope(request, tgResult, domainContext, status) {
 
 // ─── Private: Client payload ─────────────────────────────────────────────────
 
-function _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionId, soulContext) {
+function _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionId, soulContext, sharedJourney, quoteResult) {
   return {
     // Backward-compatible — LumiTravelPage contract preserved
     session_id: sessionId,
@@ -361,15 +405,24 @@ function _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionI
     confidence: result.confidence,
     source: result.source,
     next_options: result.next_options,
-    timestamp: result.timestamp
+    timestamp: result.timestamp,
+    // V0.2: Shared Journey context (SOUL preserves; domain only got minimum signals)
+    shared_journey: sharedJourney || null,
+    // Commerce: Route→Quote bridge result (null if not quotable)
+    // COST/margin excluded by sanitizeForCustomer()
+    quote: quoteResult || null
   };
 }
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
-  // UNDERSTAND
-  const understandResult = await _understand(message);
+  // UNDERSTAND + SHARED JOURNEY EXTRACTION (parallel — independent AI calls)
+  const [understandResult, sharedJourney] = await Promise.all([
+    _understand(message),
+    _extractSharedJourney(message)
+  ]);
+
   if (!understandResult.ok) {
     return { ok: false, httpStatus: 400, error: understandResult.error };
   }
@@ -393,7 +446,8 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
       status: 'GROUP_CONSULTATION_REQUIRED',
       next_options: ['여수 관광지 먼저 둘러보기', '단체 여행 상담 연결'],
       group_size: soulContext.group_size,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      shared_journey: sharedJourney || null
     };
     return { ok: true, payload };
   }
@@ -402,7 +456,11 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
   const request = _buildRequestEnvelope(principal, soulContext, sessionId);
 
   // D5 DOMAIN CONTEXT + DOMAIN_FALLBACK labeling
-  const domainContext = _buildDomainContext(soulContext, sessionId, hotelId);
+  const baseDomainContext = _buildDomainContext(soulContext, sessionId, hotelId);
+
+  // V0.2: Supplement domain context with minimum Shared Journey signals
+  // EXPERIENCED items are NEVER added to exclude_place_ids
+  const domainContext = _supplementDomainFromSharedJourney(baseDomainContext, sharedJourney);
 
   // ROUTE TO TRAVEL_INTELLIGENCE
   const routeResult = await _routeToTravelIntelligence(domainContext);
@@ -410,6 +468,36 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
     return { ok: false, httpStatus: 500, error: routeResult.error };
   }
   const { tgResult } = routeResult;
+
+  // ─── ROUTE → QUOTE BRIDGE (minimum, Phase 1) ────────────────────────────────
+  // Prices come exclusively from quoteEngine/quotePriceData — GPT never generates prices.
+  // sanitizeForCustomer() ensures COST/margin never reach the client payload.
+  let quoteResult = null;
+  try {
+    const quoteCtx = quoteContextService.extractQuoteContext(message, soulContext);
+    // Complex group hotel check runs BEFORE isQuotable — PENDING_HUMAN_QUOTE
+    // is valid even without a travel_date (human confirms all conditions anyway).
+    const complexCheck = quoteContextService.isComplexGroupHotel(quoteCtx, message);
+    if (complexCheck.complex) {
+      quoteResult = {
+        status: 'PENDING_HUMAN_QUOTE',
+        reason: complexCheck.reason,
+        quoteCtx
+      };
+    } else if (quoteContextService.isQuotable(quoteCtx)) {
+      const raw = quoteEngine.calculateQuote(quoteContextService.buildQuoteInput(quoteCtx));
+      if (raw.success) {
+        const clean = quoteEngine.sanitizeForCustomer(raw);
+        clean.status = 'CALCULATED';
+        quoteResult = clean;
+      } else {
+        quoteResult = { status: 'CALCULATION_ERROR', error: raw.error, message: raw.message };
+      }
+    }
+  } catch (err) {
+    console.error('[SOUL_QUOTE_BRIDGE_ERROR]', err.message);
+    // Non-fatal: travel recommendations still returned
+  }
 
   // STATUS
   const status = _deriveStatus(tgResult, domainContext);
@@ -424,7 +512,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
   const result = _buildResultEnvelope(request, tgResult, domainContext, status);
 
   // CLIENT PAYLOAD
-  const payload = _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionId, soulContext);
+  const payload = _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionId, soulContext, sharedJourney, quoteResult);
 
   return { ok: true, payload };
 }
