@@ -55,12 +55,18 @@ export default function LumiTravelPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        if (response.status === 401) {
-          localStorage.removeItem('lumi_session_id');
-          setSessionId(null);
+        let errorMsg = '요청 처리에 실패했습니다.';
+        try {
+          const errorData = await response.json();
+          if (response.status === 401) {
+            localStorage.removeItem('lumi_session_id');
+            setSessionId(null);
+          }
+          errorMsg = typeof errorData.error === 'string' ? errorData.error : errorMsg;
+        } catch {
+          // non-JSON error body (HTML 502/503 from proxy) — keep default message
         }
-        throw new Error(errorData.error || '요청 처리에 실패했습니다.');
+        throw new Error(errorMsg);
       }
 
       const data = await response.json();
@@ -179,6 +185,48 @@ export default function LumiTravelPage() {
   );
 }
 
+function QuoteSummary({ quote }) {
+  if (!quote) return null;
+
+  if (quote.status === 'PENDING_HUMAN_QUOTE') {
+    return (
+      <div className="lumi-quote-summary lumi-quote-pending">
+        <p className="lumi-quote-pending-msg">
+          견적 담당자가 직접 안내드릴게요. 잠시 후 연락 드리겠습니다.
+        </p>
+      </div>
+    );
+  }
+
+  if (quote.status !== 'CALCULATED' || !quote.pricing) return null;
+
+  const { totalSell, totalList, totalSavings } = quote.pricing;
+  const fmt = n => n != null ? n.toLocaleString('ko-KR') + '원' : '-';
+
+  return (
+    <div className="lumi-quote-summary">
+      <p className="lumi-quote-label">예상 비용 ({quote.guestCount}명 기준)</p>
+      {Array.isArray(quote.breakdown) && quote.breakdown.map((item, i) => (
+        <div key={i} className="lumi-quote-item">
+          <span className="lumi-quote-item-name">{item.name}</span>
+          <span className="lumi-quote-item-sell">{fmt(item.sell)}</span>
+          {item.list > item.sell && (
+            <span className="lumi-quote-item-list">{fmt(item.list)}</span>
+          )}
+        </div>
+      ))}
+      <div className="lumi-quote-total">
+        <span>총 예상 금액</span>
+        <span className="lumi-quote-total-sell">{fmt(totalSell)}</span>
+      </div>
+      {totalSavings > 0 && (
+        <p className="lumi-quote-savings">정상가 대비 {fmt(totalSavings)} 절약</p>
+      )}
+      <p className="lumi-quote-valid">유효기간: {quote.validUntil}까지</p>
+    </div>
+  );
+}
+
 function RecommendationResult({ recommendations, onNewQuestion }) {
   const status = recommendations.status;
   const places = recommendations.places || [];
@@ -220,6 +268,9 @@ function RecommendationResult({ recommendations, onNewQuestion }) {
           )}
         </div>
       )}
+
+      {/* Quote summary (Commerce Bridge — null when not a commerce query) */}
+      <QuoteSummary quote={recommendations.quote} />
 
       {/* Place cards */}
       <div className="lumi-choices-container">

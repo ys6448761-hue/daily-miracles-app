@@ -491,6 +491,51 @@
 }
 
 /* New question button */
+/* ─── Quote Summary ─────────────────────────────────────────────────────────── */
+.lumi-quote-summary {
+  margin: 12px;
+  padding: 16px;
+  background: #f8f9ff;
+  border: 1px solid #e0e4f8;
+  border-radius: 12px;
+}
+.lumi-quote-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 10px;
+}
+.lumi-quote-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  font-size: 14px;
+  border-bottom: 1px solid #eef0fa;
+  gap: 8px;
+}
+.lumi-quote-item:last-of-type { border-bottom: none; }
+.lumi-quote-item-name { flex: 1; color: #333; }
+.lumi-quote-item-sell { font-weight: 600; color: #1a1a2e; white-space: nowrap; }
+.lumi-quote-item-list { font-size: 12px; color: #aaa; text-decoration: line-through; white-space: nowrap; }
+.lumi-quote-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 2px solid #1a1a2e;
+  font-size: 15px;
+  font-weight: 700;
+}
+.lumi-quote-total-sell { color: #1a1a2e; }
+.lumi-quote-savings { font-size: 13px; color: #e84393; font-weight: 600; margin-top: 6px; }
+.lumi-quote-valid { font-size: 11px; color: #aaa; margin-top: 6px; }
+.lumi-quote-pending { background: #fffbf0; border-color: #f0e0a0; }
+.lumi-quote-pending-msg { font-size: 14px; color: #7a6000; }
+
 .lumi-new-question-btn {
   display: block;
   width: calc(100% - 24px);
