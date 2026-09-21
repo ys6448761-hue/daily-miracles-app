@@ -418,7 +418,7 @@ function _buildResultEnvelope(request, tgResult, domainContext, status) {
 
 // ─── Private: Client payload ─────────────────────────────────────────────────
 
-function _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionId, soulContext, sharedJourney, quoteResult) {
+function _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionId, soulContext, sharedJourney, quoteResult, routeSkeleton) {
   return {
     // Backward-compatible — LumiTravelPage contract preserved
     session_id: sessionId,
@@ -450,7 +450,9 @@ function _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionI
     shared_journey: sharedJourney || null,
     // Commerce: Route→Quote bridge result (null if not quotable)
     // COST/margin excluded by sanitizeForCustomer()
-    quote: quoteResult || null
+    quote: quoteResult || null,
+    // MY ROUTE: deterministic skeleton (null for single-day trips)
+    route: routeSkeleton || null
   };
 }
 
@@ -513,8 +515,9 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
   // Prices come exclusively from quoteEngine/quotePriceData — GPT never generates prices.
   // sanitizeForCustomer() ensures COST/margin never reach the client payload.
   let quoteResult = null;
+  let quoteCtx = null;
   try {
-    const quoteCtx = quoteContextService.extractQuoteContext(message, soulContext);
+    quoteCtx = quoteContextService.extractQuoteContext(message, soulContext);
     // Complex group hotel check runs BEFORE isQuotable — PENDING_HUMAN_QUOTE
     // is valid even without a travel_date (human confirms all conditions anyway).
     const complexCheck = quoteContextService.isComplexGroupHotel(quoteCtx, message);
@@ -539,6 +542,26 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
     // Non-fatal: travel recommendations still returned
   }
 
+  // ─── MY ROUTE SKELETON (multi-day trips only) ───────────────────────────────
+  // Pure deterministic skeleton — LOCKED items always present, AI cannot remove them.
+  // Only runs when user message contains overnight stay pattern (1박2일 etc.)
+  let routeSkeleton = null;
+  if (_isMultiDayTrip(message) && quoteCtx && quoteCtx.travel_date) {
+    try {
+      const { buildSkeleton } = require('./routeSkeletonService');
+      routeSkeleton = buildSkeleton({
+        start_date: quoteCtx.travel_date,
+        hotel_code: quoteCtx.hotel_code || null,
+        leisure_code: quoteCtx.leisure || null,
+        guest_count: quoteCtx.guest_count || domainContext.group_size || 2,
+        candidates: tgResult.places || []
+      });
+    } catch (err) {
+      console.error('[SOUL_ROUTE_SKELETON_ERROR]', err.message);
+      // Non-fatal: recommendations + quote still returned
+    }
+  }
+
   // STATUS
   const status = _deriveStatus(tgResult, domainContext);
 
@@ -552,7 +575,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
   const result = _buildResultEnvelope(request, tgResult, domainContext, status);
 
   // CLIENT PAYLOAD
-  const payload = _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionId, soulContext, sharedJourney, quoteResult);
+  const payload = _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionId, soulContext, sharedJourney, quoteResult, routeSkeleton);
 
   return { ok: true, payload };
 }
