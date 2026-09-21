@@ -63,11 +63,12 @@ try {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const QUOTE_STATUS = {
-  CALCULATED: 'calculated',   // 견적 계산됨
-  REQUESTED: 'requested',     // 예약 요청됨
-  CONFIRMED: 'confirmed',     // 확정
-  CANCELLED: 'cancelled',     // 취소
-  EXPIRED: 'expired'          // 만료
+  CALCULATED: 'calculated',            // 견적 계산됨
+  REQUESTED: 'requested',              // 예약 요청됨
+  CONFIRMED: 'confirmed',              // 확정
+  CANCELLED: 'cancelled',              // 취소
+  EXPIRED: 'expired',                  // 만료
+  PENDING_HUMAN_QUOTE: 'pending_human_quote'  // 단체 복합조건 — 담당자 수동 견적 대기
 };
 
 // 인메모리 저장소 (DB 없을 때 폴백)
@@ -367,16 +368,19 @@ router.post('/calculate', async (req, res) => {
       leadGrade: leadInfo.grade
     });
 
+    // 고객 노출 금지 필드 제거 (COST/MARGIN)
+    const customerResult = quoteEngine.sanitizeForCustomer(result);
+
     // 응답
     res.json({
       success: true,
-      quoteId: result.quoteId,
-      validUntil: result.validUntil,
-      isGroup: result.isGroup,
-      pricing: result.pricing,
-      breakdown: result.breakdown,
-      voucher: result.voucher,
-      freeBenefits: result.freeBenefits,
+      quoteId: customerResult.quoteId,
+      validUntil: customerResult.validUntil,
+      isGroup: customerResult.isGroup,
+      pricing: customerResult.pricing,
+      breakdown: customerResult.breakdown,
+      voucher: customerResult.voucher,
+      freeBenefits: customerResult.freeBenefits,
       lead: leadInfo,
       tags
     });
@@ -2148,6 +2152,87 @@ router.post('/:quoteId/incentive-flags', async (req, res) => {
       success: false,
       error: error.message
     });
+  }
+});
+
+/**
+ * POST /api/v2/quote/:quoteId/human-handoff
+ * 단체 복합조건 견적 — 담당자 수동 견적 대기 등록
+ *
+ * 5인+ 단체에서 객실구성/전망/조식/세미나실 등 복합조건이 있는 경우
+ * SOUL이 가격을 추측하지 않고 Human Handoff로 전환한다.
+ *
+ * Input: { room_config, view, breakfast, seminar_room, special_requests, guest_message }
+ * Output: ops_summary 운영 요약 + PENDING_HUMAN_QUOTE 상태 전환
+ */
+router.post('/:quoteId/human-handoff', async (req, res) => {
+  try {
+    const { quoteId } = req.params;
+    const {
+      room_config,       // e.g. "2인실 6 / 4인실 2"
+      view,              // e.g. "풀오션뷰"
+      breakfast,         // true/false
+      seminar_room,      // true/false
+      special_requests,  // 기타 요청사항
+      guest_message      // 고객 원문 또는 요약
+    } = req.body;
+
+    const quote = await getQuote(quoteId);
+    if (!quote) {
+      return res.status(404).json({ success: false, error: 'QUOTE_NOT_FOUND' });
+    }
+
+    const hotelName = quote.hotel_name || quote.hotel_code || '호텔';
+    const guestCount = quote.guest_count || 0;
+    const travelDate = quote.travel_date
+      ? new Date(quote.travel_date).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })
+      : '날짜 미정';
+
+    // 운영 요약 생성
+    const opsSummaryLines = [
+      '[단체숙박 견적 확인 필요]',
+      hotelName,
+      `${guestCount}명`,
+      room_config || '객실구성 미정',
+      view || '전망 미정',
+      breakfast ? '조식 포함' : '조식 미포함',
+      seminar_room ? '세미나실 필요' : null,
+      travelDate,
+      special_requests ? `요청사항: ${special_requests}` : null
+    ].filter(Boolean).join('\n');
+
+    const handoffPayload = {
+      room_config: room_config || null,
+      view: view || null,
+      breakfast: !!breakfast,
+      seminar_room: !!seminar_room,
+      special_requests: special_requests || null,
+      guest_message: guest_message || null,
+      ops_summary: opsSummaryLines,
+      handoff_at: new Date().toISOString()
+    };
+
+    // 상태 전환 + handoff 데이터 저장
+    await updateQuote(quoteId, {
+      status: QUOTE_STATUS.PENDING_HUMAN_QUOTE,
+      memo: [quote.memo, opsSummaryLines].filter(Boolean).join('\n\n---\n\n')
+    });
+
+    // 이벤트 로깅 (messageProvider SMS 없음 — HandoffEvent Record만 저장)
+    await logEvent('HumanHandoffRequested', quoteId, handoffPayload, 'human_handoff');
+
+    res.json({
+      success: true,
+      quoteId,
+      status: QUOTE_STATUS.PENDING_HUMAN_QUOTE,
+      ops_summary: opsSummaryLines,
+      message: '담당자 수동 견적 대기로 전환되었습니다. 담당자가 확인 후 연락드립니다.',
+      note: 'SMS 자동발송 미구현 — HandoffEvent 기록만 저장됨. 담당자 수동 확인 필요.'
+    });
+
+  } catch (error) {
+    console.error('[Quote] Human Handoff 오류:', error);
+    res.status(500).json({ success: false, error: 'HANDOFF_ERROR', message: error.message });
   }
 });
 

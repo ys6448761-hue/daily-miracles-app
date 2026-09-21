@@ -117,36 +117,45 @@ function getActiveWishVoyagePrices(region) {
 }
 
 /**
- * 운영비 계산 (단체 할인 적용)
+ * Handling Charge 계산 (MVP Commerce 정책 2026-09-21)
+ * 1~4인: 0원 / 5인+: 20,000원/인
  * @param {number} guestCount
  * @param {Object} fees
- * @returns {{ total, perPerson, negotiable, note }}
+ * @returns {{ total, perPerson }}
  */
-function calculateOperationFee(guestCount, fees) {
-  // 단체 할인 룰 확인
-  const discountRule = fees.group_discount_rules.find(
-    rule => guestCount >= rule.min && (rule.max === null || guestCount <= rule.max)
-  );
+function calculateHandlingCharge(guestCount, fees) {
+  const hc = fees.handling_charge;
+  if (guestCount >= hc.group.min_guests) {
+    const perPerson = hc.group.fee_per_person;
+    return { total: perPerson * guestCount, perPerson };
+  }
+  return { total: 0, perPerson: 0 };
+}
 
-  if (discountRule) {
-    if (discountRule.operation_fee_per_person === null) {
-      return { total: null, perPerson: null, negotiable: true, note: discountRule.note };
-    }
-    return {
-      total: discountRule.operation_fee_per_person * guestCount,
-      perPerson: discountRule.operation_fee_per_person,
-      negotiable: false,
-      note: discountRule.note
-    };
+/**
+ * 고객 노출 금지 필드 제거 (COST / MARGIN / 내부 원가)
+ * @param {Object} result - calculateQuote() 반환값
+ * @returns {Object} 고객 안전 결과 (cost/margin 제거)
+ */
+function sanitizeForCustomer(result) {
+  if (!result || !result.success) return result;
+  const sanitized = { ...result };
+
+  // pricing에서 내부 필드 제거
+  if (sanitized.pricing) {
+    const { totalCost, totalMargin, ...customerPricing } = sanitized.pricing;
+    sanitized.pricing = customerPricing;
   }
 
-  // 기본 운영비
-  return {
-    total: fees.operation_fee_per_person * guestCount,
-    perPerson: fees.operation_fee_per_person,
-    negotiable: false,
-    note: null
-  };
+  // breakdown 각 항목에서 cost 제거
+  if (Array.isArray(sanitized.breakdown)) {
+    sanitized.breakdown = sanitized.breakdown.map(item => {
+      const { cost, ...customerItem } = item;
+      return customerItem;
+    });
+  }
+
+  return sanitized;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -364,25 +373,24 @@ function calculateQuote(options) {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // 4. 운영비 (단체 할인 적용)
+  // 4. Handling Charge (MVP: 1~4인=0, 5인+=20,000원/인)
   // ─────────────────────────────────────────────────────────────────────────
-  const operationFee = calculateOperationFee(guestCount, region.fees);
+  const handlingCharge = calculateHandlingCharge(guestCount, region.fees);
 
-  if (!operationFee.negotiable) {
+  if (handlingCharge.total > 0) {
     breakdown.push({
-      category: 'operation',
-      code: 'operation_fee',
-      name: '여행 운영비 (플래너/운영)',
-      perPerson: operationFee.perPerson,
+      category: 'handling',
+      code: 'handling_charge',
+      name: '단체 운영 핸들링',
+      perPerson: handlingCharge.perPerson,
       guests: guestCount,
-      cost: 0,  // 운영비는 마진으로 포함
-      sell: operationFee.total,
-      list: operationFee.total,
-      quantity: guestCount,
-      note: operationFee.note
+      cost: 0,
+      sell: handlingCharge.total,
+      list: handlingCharge.total,
+      quantity: guestCount
     });
-    totalSell += operationFee.total;
-    totalList += operationFee.total;
+    totalSell += handlingCharge.total;
+    totalList += handlingCharge.total;
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -455,7 +463,7 @@ function calculateQuote(options) {
       totalList: totalList,
       totalMargin: totalMargin,
       totalSavings: totalSavings,
-      operationFee: operationFee.negotiable ? null : operationFee.total
+      handlingCharge: handlingCharge.total
     },
 
     breakdown: breakdown,
@@ -480,10 +488,10 @@ function calculateQuote(options) {
       }
     }),
 
-    // 협의 필요 시
-    ...(operationFee.negotiable && {
+    // (reserved for future flags
+    ...(false && {
       negotiable: true,
-      negotiableReason: '13인 이상 단체는 맞춤 견적이 필요합니다.'
+      negotiableReason: '담당자 상담 필요'
     })
   };
 }
@@ -569,6 +577,7 @@ module.exports = {
   generateQuoteId,
   validatePolicy,
   calculateQuote,
+  sanitizeForCustomer,
 
   // CRM 함수
   calculateLeadScore,
@@ -581,5 +590,5 @@ module.exports = {
   getValidUntil,
   getRegionData,
   getActiveWishVoyagePrices,
-  calculateOperationFee
+  calculateHandlingCharge
 };

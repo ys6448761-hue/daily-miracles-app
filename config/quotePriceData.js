@@ -81,17 +81,15 @@ module.exports = {
       // 운영비 / 여행사 차지 (분리!)
       // ═══════════════════════════════════════════════════════════════════════
       fees: {
-        // 우리 운영/진행비 (플래너 비용) - v1.2 패치: 20,000 → 10,000 (2026-01-12)
-        operation_fee_per_person: 10000,
+        // MVP Commerce 정책 (2026-09-21 Founder 확정)
+        // 1~4인: Handling 0원 / 5인+: 20,000원/인
+        handling_charge: {
+          individual: { max_guests: 4, fee_per_person: 0 },
+          group: { min_guests: 5, fee_per_person: 20000 }
+        },
 
         // 여행사 인계/대행 성격일 때만 (B2B용, 기본 미사용)
-        agency_charge_per_person: 30000,
-
-        // 단체 할인 규칙
-        group_discount_rules: [
-          { min: 9, max: 12, operation_fee_per_person: 18000, note: "인센티브" },
-          { min: 13, max: null, operation_fee_per_person: null, note: "협의" }
-        ]
+        agency_charge_per_person: 30000
       },
 
       // ═══════════════════════════════════════════════════════════════════════
@@ -263,9 +261,11 @@ module.exports = {
         cable: {
           name: "케이블카",
           costChannel: "paper",  // 지류권 기본 (추후 mobile/center 확장 가능)
-          // weekday: 월~목, weekend: 금~일+공휴일
+          // weekday: 월~목, weekend: 금~일+공휴일 (개인/왕복)
           weekday: { cost: 15000, sell: 16000, list: 20000 },
-          weekend: { cost: 15000, sell: 16000, list: 20000 }
+          weekend: { cost: 15000, sell: 16000, list: 20000 },
+          // 단체 편도 (2026-09-21 Founder 확정)
+          group_oneway: { cost: 11000, sell: 12000, list: 14000 }
         },
         aqua: {
           name: "아쿠아플라넷",
