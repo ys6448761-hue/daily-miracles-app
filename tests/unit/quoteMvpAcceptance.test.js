@@ -175,6 +175,48 @@ describe('D. Group Cable Car — group_oneway price', () => {
   });
 });
 
+// ─── D-ext. Group Cable Car wire-up (engine) ─────────────────────────────────
+
+describe('D-ext. Group Cable Car — quoteEngine wire-up', () => {
+  test('D-ext-1: 5인 + cableCarType=group_oneway → LIST=70,000 SELL=60,000', () => {
+    const r = calc({ guestCount: 5, leisure: 'cable', cableCarType: 'group_oneway', travelDate: '2026-09-26', region: 'yeosu' });
+    expect(r.success).toBe(true);
+    const cableItem = r.breakdown.find(b => b.category === 'leisure');
+    expect(cableItem).toBeDefined();
+    expect(cableItem.list).toBe(14000 * 5);   // 70,000
+    expect(cableItem.sell).toBe(12000 * 5);   // 60,000
+    expect(cableItem.cost).toBe(11000 * 5);   // 55,000 (internal)
+    expect(cableItem.variant).toBe('group_oneway');
+  });
+
+  test('D-ext-2: sanitized group_oneway cable — no cost in customer output', () => {
+    const r = calc({ guestCount: 5, leisure: 'cable', cableCarType: 'group_oneway', travelDate: '2026-09-26', region: 'yeosu' });
+    const s = quoteEngine.sanitizeForCustomer(r);
+    expect(s.breakdown.every(b => !('cost' in b))).toBe(true);
+    const cableItem = s.breakdown.find(b => b.category === 'leisure');
+    expect(cableItem.sell).toBe(60000);
+    expect(cableItem.list).toBe(70000);
+  });
+
+  test('D-ext-3: 10인 group_oneway + handling → totals correct', () => {
+    const r = calc({ guestCount: 10, leisure: 'cable', cableCarType: 'group_oneway', travelDate: '2026-09-26', region: 'yeosu' });
+    const cableItem = r.breakdown.find(b => b.category === 'leisure');
+    const handlingItem = r.breakdown.find(b => b.category === 'handling');
+    expect(cableItem.sell).toBe(12000 * 10);   // 120,000
+    expect(cableItem.list).toBe(14000 * 10);   // 140,000
+    expect(handlingItem.sell).toBe(20000 * 10); // 200,000
+    expect(r.pricing.totalSell).toBe(120000 + 200000);
+    expect(r.pricing.totalSavings).toBe(r.pricing.totalList - r.pricing.totalSell);
+  });
+
+  test('D-ext-4: individual cable (4인, no cableCarType) still uses weekday/weekend price', () => {
+    const r = calc({ guestCount: 4, hotel: 'ramada', leisure: 'cable', travelDate: '2026-09-22', region: 'yeosu' });
+    const cableItem = r.breakdown.find(b => b.category === 'leisure');
+    expect(cableItem.sell).toBe(16000 * 4); // individual price, not group_oneway
+    expect(cableItem.list).toBe(20000 * 4);
+  });
+});
+
 // ─── E. Complex Group Hotel → PENDING_HUMAN_QUOTE ─────────────────────────────
 
 describe('E. Complex Group Hotel — no invented price', () => {

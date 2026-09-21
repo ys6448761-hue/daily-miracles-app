@@ -288,12 +288,22 @@ function calculateQuote(options) {
   if (leisure && region.leisure[leisure]) {
     const leisureData = region.leisure[leisure];
     const priceType = isWeekend(dayType) ? 'weekend' : 'weekday';
-    const leisurePrice = leisureData[priceType];
+
+    // 단체 편도 분기: cable + group_oneway + 5인 이상
+    const useGroupOneway = leisure === 'cable'
+      && options.cableCarType === 'group_oneway'
+      && isGroup;
+
+    const leisurePrice = useGroupOneway
+      ? leisureData.group_oneway
+      : leisureData[priceType];
 
     if (leisurePrice) {
-      // variant 결정 (요트/유람선: weekday vs weekend_fireworks)
+      // variant 결정 (요트/유람선: weekday vs weekend_fireworks; 단체편도는 고정)
       let variant = null;
-      if (leisureData.variant) {
+      if (useGroupOneway) {
+        variant = 'group_oneway';
+      } else if (leisureData.variant) {
         variant = typeof leisureData.variant === 'object'
           ? leisureData.variant[priceType]
           : leisureData.variant;
