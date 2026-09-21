@@ -165,7 +165,8 @@ function _deriveStatus(tgResult, domainContext) {
 function _buildUserConditions(domainContext) {
   const conditions = [];
 
-  if (domainContext.time_available_minutes) {
+  const timeIsDefault = domainContext._domainFallbacks && domainContext._domainFallbacks.includes('time_available_minutes');
+  if (domainContext.time_available_minutes && !timeIsDefault) {
     conditions.push(`${domainContext.time_available_minutes}분 가능`);
   }
 
@@ -192,13 +193,23 @@ function _buildUserConditions(domainContext) {
   return conditions;
 }
 
+const PLACE_TAG_KO = {
+  family: '가족 여행', kids_ok: '아이와 함께', couple: '커플 추천',
+  solo: '혼자 여행', elderly: '어르신 동반', group: '단체 여행',
+  view: '전망 좋음', adventure: '액티비티', photo: '사진 명소',
+  food: '맛집 인근', history: '역사·문화', nature: '자연', night: '야경',
+  walking: '산책', waterfront: '해변·바다', indoor: '실내', outdoor: '야외',
+};
+
 function _buildPlaceFeatures(place) {
   const features = [];
   if (place.suitable_for && place.suitable_for.length > 0) {
-    features.push(...place.suitable_for.slice(0, 2));
+    const translated = place.suitable_for.slice(0, 2).map(t => PLACE_TAG_KO[t] || null).filter(Boolean);
+    features.push(...translated);
   }
   if (place.emotion_tags && place.emotion_tags.length > 0) {
-    features.push(...place.emotion_tags.slice(0, 2));
+    const translated = place.emotion_tags.slice(0, 2).map(t => PLACE_TAG_KO[t] || null).filter(Boolean);
+    features.push(...translated);
   }
   if (place.avg_stay_minutes) {
     features.push(`${place.avg_stay_minutes}분 체류`);
@@ -240,7 +251,11 @@ function _buildGroupQuoteMessage(soulContext) {
 
 // ─── Private: D7 Soul message ────────────────────────────────────────────────
 
-function _generateSoulMessage(soulContext, status) {
+function _isMultiDayTrip(message) {
+  return /\d박\d일|\d박\s*\d일|1박|2박|3박/.test(message || '');
+}
+
+function _generateSoulMessage(soulContext, status, message) {
   const provenance = soulContext._provenance || {};
   const pt = soulContext.people_type;
   const timeMinutes = soulContext.time_available_minutes;
@@ -305,6 +320,9 @@ function _generateSoulMessage(soulContext, status) {
     }
     if (budget === 'free' || budget === 'low') {
       return `${situationLine}\n부담 적은 곳 위주로 골라봤는데, 입장료는 직접 확인이 필요해요.`;
+    }
+    if (_isMultiDayTrip(message)) {
+      return `${situationLine}\n여수에서 가볼 만한 곳을 골라봤어요.`;
     }
     return `${situationLine}\n대략 2시간 기준으로 편하게 갈 곳을 골라봤어요.\n시간이 얼마나 남으셨어요?`;
   }
@@ -503,7 +521,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
   const status = _deriveStatus(tgResult, domainContext);
 
   // D7 SOUL MESSAGE
-  const soulMessage = _generateSoulMessage(soulContext, status);
+  const soulMessage = _generateSoulMessage(soulContext, status, message);
 
   // WHY DETAILS
   const whyDetails = _buildWhyDetails(tgResult, domainContext);
