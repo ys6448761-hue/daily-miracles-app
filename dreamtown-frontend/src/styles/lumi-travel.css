@@ -536,6 +536,102 @@
 .lumi-quote-pending { background: #fffbf0; border-color: #f0e0a0; }
 .lumi-quote-pending-msg { font-size: 14px; color: #7a6000; }
 
+/* ─── MY ROUTE ──────────────────────────────────────────────────────────────── */
+.lumi-route {
+  margin: 0 12px 12px;
+  background: #fff;
+  border: 1px solid #E2EBF0;
+  border-radius: 14px;
+  box-shadow: 0 1px 6px rgba(15, 30, 61, 0.06);
+  overflow: hidden;
+}
+.lumi-route-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid #EEF3F7;
+}
+.lumi-route-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #1A7BAF;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.lumi-route-meta {
+  font-size: 13px;
+  color: #4A6070;
+  font-weight: 500;
+  word-break: keep-all;
+}
+.lumi-route-day {
+  padding: 12px 16px 4px;
+  border-bottom: 1px solid #EEF3F7;
+}
+.lumi-route-day:last-child {
+  border-bottom: none;
+  padding-bottom: 14px;
+}
+.lumi-route-day-header {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1A3A5C;
+  letter-spacing: 0.02em;
+  margin-bottom: 8px;
+}
+.lumi-route-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.lumi-route-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  font-size: 13px;
+}
+.lumi-route-item--locked {
+  background: #F0F7FF;
+  border: 1px solid #C5D9F0;
+}
+.lumi-route-item--suggested {
+  background: #F4F9FC;
+  border: 1px solid #DCE9F0;
+}
+.lumi-route-item-icon {
+  flex-shrink: 0;
+  font-size: 15px;
+  line-height: 1;
+}
+.lumi-route-item-name {
+  flex: 1;
+  color: #0F1E3D;
+  font-weight: 500;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.lumi-route-item-badge {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.lumi-route-item--locked .lumi-route-item-badge {
+  background: #1A7BAF;
+  color: #fff;
+}
+.lumi-route-item--suggested .lumi-route-item-badge {
+  background: #EFF8F6;
+  color: #1A5C4F;
+  border: 1px solid #C5DFD8;
+}
+
 .lumi-new-question-btn {
   display: block;
   width: calc(100% - 24px);

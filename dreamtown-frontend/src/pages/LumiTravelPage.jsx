@@ -227,6 +227,54 @@ function QuoteSummary({ quote }) {
   );
 }
 
+const TYPE_ICON = { hotel: '🏨', leisure: '🎡', attraction: '🗺️', meal: '🍽️' };
+
+function MyRoute({ route }) {
+  if (!route || !Array.isArray(route.days) || route.days.length === 0) return null;
+
+  const formatDate = (iso) => {
+    if (!iso) return '';
+    const [, m, d] = iso.split('-');
+    return `${parseInt(m, 10)}월 ${parseInt(d, 10)}일`;
+  };
+
+  const partyLabel = (party) => {
+    if (!party) return '';
+    const typeMap = { couple: '연인', family: '가족', friends: '친구', adults: '일행' };
+    const label = typeMap[party.type] || '일행';
+    return `${label} ${party.count}명`;
+  };
+
+  return (
+    <div className="lumi-route">
+      <div className="lumi-route-header">
+        <span className="lumi-route-title">MY ROUTE</span>
+        <span className="lumi-route-meta">
+          {formatDate(route.start_date)}{route.end_date ? ` ~ ${formatDate(route.end_date)}` : ''}
+          {route.party ? ` · ${partyLabel(route.party)}` : ''}
+        </span>
+      </div>
+      {route.days.map((day) => (
+        <div key={day.day} className="lumi-route-day">
+          <div className="lumi-route-day-header">DAY {day.day} · {formatDate(day.date)}</div>
+          <div className="lumi-route-items">
+            {(day.items || []).map((item, i) => {
+              const isLocked = item.selection_status === 'LOCKED';
+              return (
+                <div key={i} className={`lumi-route-item ${isLocked ? 'lumi-route-item--locked' : 'lumi-route-item--suggested'}`}>
+                  <span className="lumi-route-item-icon">{TYPE_ICON[item.type] || '📍'}</span>
+                  <span className="lumi-route-item-name">{item.name}</span>
+                  <span className="lumi-route-item-badge">{isLocked ? '선택한 일정' : 'SOUL 추천'}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function RecommendationResult({ recommendations, onNewQuestion }) {
   const status = recommendations.status;
   const places = recommendations.places || [];
@@ -268,6 +316,9 @@ function RecommendationResult({ recommendations, onNewQuestion }) {
           )}
         </div>
       )}
+
+      {/* MY ROUTE — Day 1 / Day 2 skeleton (only for multi-day trips) */}
+      <MyRoute route={recommendations.route} />
 
       {/* Quote summary (Commerce Bridge — null when not a commerce query) */}
       <QuoteSummary quote={recommendations.quote} />
