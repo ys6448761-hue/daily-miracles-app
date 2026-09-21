@@ -24,12 +24,33 @@ const SOURCE = 'travelGuideService/8-filter-cascade';
 
 // ─── Private: Understand ─────────────────────────────────────────────────────
 
+// Deterministic post-extraction correction for couple/partner language.
+// contextExtractionService._applyExplicitCompanionGuard checks message.includes('친구랑'),
+// which is a substring of '여자친구랑' and '남자친구랑' — causing those to be
+// misclassified as people_type='group'. This guard corrects after extraction,
+// without modifying the locked contextExtractionService.
+const PARTNER_PHRASES = ['여자친구', '남자친구', '와이프', '남편', '아내', '배우자', '연인'];
+
+function _correctCoupleClassification(message, soulContext) {
+  if (soulContext.people_type !== 'group') return soulContext;
+  const isPartner = PARTNER_PHRASES.some(p => message.includes(p));
+  if (!isPartner) return soulContext;
+  return {
+    ...soulContext,
+    people_type: 'couple',
+    _provenance: {
+      ...(soulContext._provenance || {}),
+      people_type: 'USER_EXPLICIT'
+    }
+  };
+}
+
 async function _understand(message) {
   const soulContext = await contextExtractionService.parseUserMessage(message);
   if (soulContext.error) {
     return { ok: false, error: soulContext.error };
   }
-  return { ok: true, soulContext };
+  return { ok: true, soulContext: _correctCoupleClassification(message, soulContext) };
 }
 
 // ─── Private: Shared Journey (V0.2) ──────────────────────────────────────────
@@ -181,7 +202,8 @@ function _buildUserConditions(domainContext) {
   } else if (pt === 'family_elderly') {
     conditions.push('어르신과 함께');
   } else if (pt === 'group') {
-    conditions.push('단체 여행');
+    const gs = domainContext.group_size;
+    conditions.push(gs && gs >= 5 ? '단체 여행' : '친구와 함께');
   } else {
     conditions.push('혼자');
   }
