@@ -875,7 +875,10 @@ class TravelGuideService {
       if (place.admission_fee_json && place.admission_fee_json.adult === 0) {
         parts.push('무료 입장');
       }
-      // Do not claim "입장료 없는 공간" when admission_fee_json is null (no data)
+      // Null fee data → honest note rather than silence
+      else if (!place.admission_fee_json) {
+        parts.push('입장료는 방문 전 확인해 보세요');
+      }
     }
 
     // Companion fit — suppress suitability claim when walking burden is unknown (G2)
@@ -894,23 +897,29 @@ class TravelGuideService {
       parts.push('단체가 함께 즐기기 좋아요');
     }
 
-    // Time fit
-    if (timeMin && place.avg_stay_minutes) {
-      if (place.avg_stay_minutes <= 45) parts.push(`${place.avg_stay_minutes}분이면 충분히 둘러볼 수 있어요`);
-      else if (place.avg_stay_minutes <= 90) parts.push(`느긋하게 ${place.avg_stay_minutes}분 정도`);
+    // Time fit — only emit when time is the user's primary query intent
+    // Suppressed when intent is night/photo/budget (those have their own reason signals)
+    const timeIsMainIntent = !pref && !timeOfDay && !budget;
+    if (timeIsMainIntent && timeMin && place.avg_stay_minutes) {
+      if (place.avg_stay_minutes <= 45) parts.push(`${place.avg_stay_minutes}분이면 부담 없이 둘러볼 수 있어요`);
+      else if (place.avg_stay_minutes <= 90) parts.push(`느긋하게 ${place.avg_stay_minutes}분 정도 즐길 수 있어요`);
     }
 
-    // Photo preference
+    // Photo preference — specific to photo intent only
     if (pref === 'photo') {
-      if (emotions.includes('night_view') || emotions.includes('view') || emotions.includes('architecture')) {
+      if (emotions.includes('view') || emotions.includes('architecture')) {
         parts.push('사진 찍기 좋은 뷰가 있어요');
+      } else if (emotions.includes('night_view')) {
+        parts.push('야경 사진 명소예요');
       }
     }
 
-    // Night
+    // Night — use night_view evidence, not young_adults (separate concern)
     if (timeOfDay === 'night' || timeOfDay === 'evening') {
-      if (emotions.includes('night_view') || suitable.includes('young_adults')) {
-        parts.push('밤에 분위기가 좋아요');
+      if (emotions.includes('night_view')) {
+        parts.push('야경이 아름다운 곳이에요');
+      } else if (emotions.includes('food') || emotions.includes('social')) {
+        parts.push('저녁에 분위기가 살아나는 곳이에요');
       }
     }
 
@@ -1044,18 +1053,49 @@ class TravelGuideService {
    * Helper: Calculate traveler fit score
    * Based on suitable_for tags, not demographic assumptions
    * Score = 10 points per tag match
+   * Intent dimensions: night/photo/budget/time-fit add evidence-based bonus
    * @private
    */
   _calculateTravelerFitScore(place, context) {
-    if (!context.people_type) return 0; // No personalization without people_type
+    if (!context.people_type) return 0;
 
     const suitableFor = place.suitable_for || [];
     const expectedTags = this._getNormalizedTravelerTags(context.people_type);
-
-    // Count how many expected tags match
     const matchCount = expectedTags.filter(tag => suitableFor.includes(tag)).length;
+    let score = matchCount > 0 ? matchCount * 10 : 0;
 
-    return matchCount > 0 ? matchCount * 10 : 0;
+    const emotionTags    = place.emotion_tags    || [];
+    const weatherSuitable = place.weather_suitable || [];
+
+    // Night query → boost night-view/evening places with actual night evidence
+    if (context.time_of_day === 'night') {
+      if (emotionTags.includes('night_view'))                                score += 8;
+      if (weatherSuitable.includes('night') || weatherSuitable.includes('evening')) score += 4;
+    }
+
+    // Photo preference → boost scenic/architectural places
+    if (context.preference_type === 'photo') {
+      if (emotionTags.includes('view'))         score += 8;
+      if (emotionTags.includes('architecture')) score += 6;
+      if (emotionTags.includes('night_view'))   score += 4;
+    }
+
+    // Budget constraint → boost confirmed zero-admission places (data-gated)
+    if (context.budget_constraint === 'free' || context.budget_constraint === 'low') {
+      const feeJson = place.admission_fee_json;
+      if (feeJson && typeof feeJson.adult === 'number' && feeJson.adult === 0) score += 6;
+    }
+
+    // Time fitness — only when user explicitly stated available time
+    const timeAvail     = context.time_available_minutes;
+    const timeProvenance = context._provenance?.time_available_minutes;
+    if (timeAvail && timeProvenance === 'USER_EXPLICIT') {
+      const stayMin = place.avg_stay_minutes;
+      if (stayMin && stayMin > timeAvail * 0.8)  score -= 4; // stay fills most of available time
+      else if (stayMin && stayMin <= timeAvail * 0.5) score += 3; // comfortable fit with room to travel
+    }
+
+    return score;
   }
 
   /**
