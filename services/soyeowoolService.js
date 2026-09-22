@@ -242,7 +242,7 @@ function _buildPlaceLookupMessage(place) {
 
 /**
  * Client payload for a successfully resolved PLACE_LOOKUP.
- * Single place in `places[]` — backward-compatible with card-based frontend.
+ * presentation_mode='PLACE_KNOWLEDGE' — frontend suppresses generic recommendation cards.
  */
 function _buildPlaceLookupClientPayload(place, sessionId) {
   return {
@@ -253,6 +253,7 @@ function _buildPlaceLookupClientPayload(place, sessionId) {
     message_ko: _buildPlaceLookupMessage(place),
     status: 'PLACE_LOOKUP',
     intent: 'PLACE_LOOKUP',
+    presentation_mode: 'PLACE_KNOWLEDGE',
     resolved_code: place.code,
     next_options: [],
     timestamp: new Date().toISOString(),
@@ -264,7 +265,7 @@ function _buildPlaceLookupClientPayload(place, sessionId) {
 
 /**
  * Client payload for an UNKNOWN named-place query.
- * DO NOT substitute an unrelated place — return PLACE_UNKNOWN.
+ * presentation_mode='PLACE_KNOWLEDGE' — suppresses unrelated recommendation substitution.
  */
 function _buildUnknownPlacePayload(placeName, sessionId) {
   const safeName = (placeName || '').replace(/[<>]/g, '').trim();
@@ -280,6 +281,7 @@ function _buildUnknownPlacePayload(placeName, sessionId) {
     ].join('\n'),
     status: 'PLACE_UNKNOWN',
     intent: 'PLACE_LOOKUP',
+    presentation_mode: 'PLACE_KNOWLEDGE',
     resolved_code: null,
     next_options: ['가고 싶은 분위기를 알려주세요'],
     timestamp: new Date().toISOString(),
@@ -695,6 +697,15 @@ function _buildResultEnvelope(request, tgResult, domainContext, status) {
 // ─── Private: Client payload ─────────────────────────────────────────────────
 
 function _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionId, soulContext, sharedJourney, quoteResult, routeSkeleton) {
+  // Derive presentation_mode from authoritative backend artifacts.
+  // Priority: QUOTE_READY > ROUTE_READY > DISCOVERING
+  // PLACE_KNOWLEDGE is set in _buildPlaceLookupClientPayload / _buildUnknownPlacePayload (never reaches here).
+  const presentationMode = (() => {
+    if (quoteResult && quoteResult.status === 'CALCULATED') return 'QUOTE_READY';
+    if (routeSkeleton && routeSkeleton.days && routeSkeleton.days.length > 0) return 'ROUTE_READY';
+    return 'DISCOVERING';
+  })();
+
   return {
     // Backward-compatible — LumiTravelPage contract preserved
     session_id: sessionId,
@@ -722,6 +733,8 @@ function _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionI
     source: result.source,
     next_options: result.next_options,
     timestamp: result.timestamp,
+    // Front-of-house Journey mode — controls which blocks the frontend renders as primary
+    presentation_mode: presentationMode,
     // V0.2: Shared Journey context (SOUL preserves; domain only got minimum signals)
     shared_journey: sharedJourney || null,
     // Commerce: Route→Quote bridge result (null if not quotable)

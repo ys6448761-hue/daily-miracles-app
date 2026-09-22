@@ -325,7 +325,7 @@ function RecommendationResult({ recommendations, onNewQuestion }) {
   const nextOptions = recommendations.next_options || [];
   const ctx = recommendations.understood_context || {};
 
-  // GROUP_CONSULTATION_REQUIRED — special path, no place cards
+  // GROUP_CONSULTATION_REQUIRED — special path, no mode, no place cards
   if (status === 'GROUP_CONSULTATION_REQUIRED') {
     return (
       <div className="lumi-result">
@@ -358,9 +358,17 @@ function RecommendationResult({ recommendations, onNewQuestion }) {
     );
   }
 
+  // ── Presentation mode — controls which artifacts render as primary ─────────
+  // Safe fallback: unknown future modes show SOUL message only (not all blocks).
+  const mode = recommendations.presentation_mode || 'DISCOVERING';
+  const showPlaceCards  = mode === 'DISCOVERING';
+  const showRoute       = mode === 'ROUTE_READY' || mode === 'QUOTE_READY';
+  const showQuote       = mode === 'QUOTE_READY';
+  const showHospitality = mode === 'QUOTE_READY';
+
   return (
     <div className="lumi-result">
-      {/* SOUL situation acknowledgement */}
+      {/* SOUL message — always shown */}
       {recommendations.message_ko && (
         <div className="lumi-soul-message">
           {recommendations.message_ko.split('\n').map((line, i) =>
@@ -369,30 +377,32 @@ function RecommendationResult({ recommendations, onNewQuestion }) {
         </div>
       )}
 
-      {/* MY ROUTE — Day 1 / Day 2 skeleton (only for multi-day trips) */}
-      <MyRoute route={recommendations.route} />
-      <DownloadRouteButton route={recommendations.route} quote={recommendations.quote} />
+      {/* MY ROUTE — ROUTE_READY and QUOTE_READY (handles null route internally) */}
+      {showRoute && <MyRoute route={recommendations.route} />}
+      {showRoute && <DownloadRouteButton route={recommendations.route} quote={recommendations.quote} />}
 
-      {/* Quote summary (Commerce Bridge — null when not a commerce query) */}
-      <QuoteSummary quote={recommendations.quote} />
-      <DownloadQuoteButton quote={recommendations.quote} routeContext={recommendations.route} />
+      {/* MY QUOTE — QUOTE_READY only */}
+      {showQuote && <QuoteSummary quote={recommendations.quote} />}
+      {showQuote && <DownloadQuoteButton quote={recommendations.quote} routeContext={recommendations.route} />}
 
-      {/* Hospitality — INDIVIDUAL only, below MY QUOTE, above place cards */}
-      <HospitalitySection quote={recommendations.quote} />
+      {/* Hospitality PREVIEW — QUOTE_READY, eligible individual 1–4 (HospitalitySection gates internally) */}
+      {showHospitality && <HospitalitySection quote={recommendations.quote} />}
 
-      {/* Place cards */}
-      <div className="lumi-choices-container">
-        {places.length > 0 ? (
-          places.map((place, idx) => (
-            <PlaceCard key={idx} place={place} whyDetail={recommendations.why_details?.[idx]} ctx={ctx} />
-          ))
-        ) : (
-          <div className="lumi-no-results">
-            <p>지금 조건에 맞는 장소를 찾지 못했어요.</p>
-            <p>질문을 조금 바꿔서 다시 물어봐 주세요.</p>
-          </div>
-        )}
-      </div>
+      {/* Place cards — DISCOVERING only */}
+      {showPlaceCards && (
+        <div className="lumi-choices-container">
+          {places.length > 0 ? (
+            places.map((place, idx) => (
+              <PlaceCard key={idx} place={place} whyDetail={recommendations.why_details?.[idx]} ctx={ctx} />
+            ))
+          ) : (
+            <div className="lumi-no-results">
+              <p>지금 조건에 맞는 장소를 찾지 못했어요.</p>
+              <p>질문을 조금 바꿔서 다시 물어봐 주세요.</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Next options */}
       {nextOptions.length > 0 && (
