@@ -251,6 +251,7 @@ function _buildPlaceLookupClientPayload(place, sessionId) {
     places: [place],
     why_details: [],
     message_ko: _buildPlaceLookupMessage(place),
+    place_identity_ko: place.description_short || PLACE_IDENTITY_KO[place.code] || null,
     status: 'PLACE_LOOKUP',
     intent: 'PLACE_LOOKUP',
     presentation_mode: 'PLACE_KNOWLEDGE',

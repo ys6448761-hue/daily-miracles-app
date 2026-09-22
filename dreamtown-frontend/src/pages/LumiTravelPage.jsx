@@ -365,16 +365,30 @@ function RecommendationResult({ recommendations, onNewQuestion }) {
   const showRoute       = mode === 'ROUTE_READY' || mode === 'QUOTE_READY';
   const showQuote       = mode === 'QUOTE_READY';
   const showHospitality = mode === 'QUOTE_READY';
+  // Known place lookup: structured card replaces soul message text blob
+  const showPlaceKnowledge = mode === 'PLACE_KNOWLEDGE'
+    && recommendations.status === 'PLACE_LOOKUP'
+    && places.length > 0;
+  // Show soul message text for all modes EXCEPT known PLACE_LOOKUP (which has its own card)
+  const showSoulMessage = !showPlaceKnowledge;
 
   return (
     <div className="lumi-result">
-      {/* SOUL message — always shown */}
-      {recommendations.message_ko && (
+      {/* SOUL message — all modes except known PLACE_LOOKUP */}
+      {showSoulMessage && recommendations.message_ko && (
         <div className="lumi-soul-message">
           {recommendations.message_ko.split('\n').map((line, i) =>
             line ? <p key={i}>{line}</p> : <br key={i} />
           )}
         </div>
+      )}
+
+      {/* PLACE_KNOWLEDGE structured card — known place lookup */}
+      {showPlaceKnowledge && (
+        <PlaceKnowledgeCard
+          place={places[0]}
+          identityKo={recommendations.place_identity_ko}
+        />
       )}
 
       {/* MY ROUTE — ROUTE_READY and QUOTE_READY (handles null route internally) */}
@@ -515,6 +529,125 @@ function DownloadQuoteButton({ quote, routeContext }) {
         {loading ? '생성 중...' : '내 견적서 PDF 저장'}
       </button>
       {error && <p className="lumi-pdf-error">{error}</p>}
+    </div>
+  );
+}
+
+// ── PlaceKnowledgeCard ──────────────────────────────────────────────────────
+// Structured place presentation for PLACE_KNOWLEDGE + known place (PLACE_LOOKUP).
+// Sections are conditional — only rendered when verified data is available.
+// Data source: places[0] (raw travel_places row) + place_identity_ko (backend-resolved).
+
+const SUITABLE_KO_MAP = {
+  pilgrimage: '순례·기도', foodies: '미식 여행', couples: '커플',
+  friends: '친구끼리', solo: '혼자', young_adults: '2030',
+  family: '가족', kids_ok: '아이 동반', elderly: '어르신 동반', groups: '단체',
+};
+const SUITABLE_ORDER = ['pilgrimage', 'foodies', 'couples', 'friends', 'solo', 'young_adults', 'family', 'kids_ok', 'elderly', 'groups'];
+
+function PlaceKnowledgeCard({ place, identityKo }) {
+  // Suitable-for: up to 4 labels, priority order
+  const suitableFor = place.suitable_for || [];
+  const suitableLabels = SUITABLE_ORDER.filter(k => suitableFor.includes(k)).slice(0, 4).map(k => SUITABLE_KO_MAP[k]);
+
+  // Stay duration label
+  const t = place.avg_stay_minutes;
+  const stayLabel = t ? (t < 60 ? `약 ${t}분` : t % 60 === 0 ? `약 ${t / 60}시간` : `약 ${Math.round(t / 60)}시간`) : null;
+
+  // Opening hours — use first non-null weekday value
+  const hours = place.opening_hours_json || {};
+  const hourStr = hours.mon || hours.tue || hours.wed || hours.thu || hours.fri || hours.sat || hours.sun || null;
+  const hasVerifiedHours = !!hourStr;
+
+  // Admission fee
+  const fee = place.admission_fee_json;
+  const feeText = (() => {
+    if (!fee || typeof fee.adult !== 'number') {
+      return place.code === 'cablecar' ? '이용 요금이 있어요' : null;
+    }
+    if (fee.adult === 0) return '무료';
+    const parts = [`성인 ${fee.adult.toLocaleString()}원`];
+    if (typeof fee.youth === 'number')  parts.push(`청소년 ${fee.youth.toLocaleString()}원`);
+    if (typeof fee.senior === 'number') parts.push(`경로 ${fee.senior.toLocaleString()}원`);
+    if (typeof fee.child === 'number')  parts.push(`어린이 ${fee.child.toLocaleString()}원`);
+    return parts.join(' · ');
+  })();
+
+  // Timing hint from weather_suitable
+  const weather = place.weather_suitable || [];
+  const timingHint = (() => {
+    if (weather.includes('sunrise'))                              return '특히 일출 무렵이 아름다워요.';
+    if (weather.includes('sunset'))                              return '석양이 질 무렵이 특히 아름다워요.';
+    if (weather.includes('night') && weather.includes('evening')) return '저녁부터 밤까지 분위기가 좋아요.';
+    if (weather.includes('night'))                               return '밤에도 분위기가 좋아요.';
+    if (weather.includes('evening'))                             return '저녁 시간대가 특히 좋아요.';
+    if (weather.includes('spring'))                              return '봄에 특히 아름다운 곳이에요.';
+    return null;
+  })();
+
+  const isHighDifficulty = place.physical_difficulty === 'high';
+  const showLiveWarning = place.live_status_required && !hasVerifiedHours;
+
+  const hasFacts = stayLabel || feeText || hourStr;
+
+  return (
+    <div className="lumi-pk">
+      {/* Header: place name + identity description */}
+      <div className="lumi-pk-header">
+        <h2 className="lumi-pk-name">{place.name_ko}</h2>
+        {identityKo && <p className="lumi-pk-identity">{identityKo}</p>}
+      </div>
+
+      {/* Suitable-for tags */}
+      {suitableLabels.length > 0 && (
+        <div className="lumi-pk-section">
+          <p className="lumi-pk-section-label">이런 여행에 잘 어울려요</p>
+          <div className="lumi-pk-tags">
+            {suitableLabels.map((label, i) => (
+              <span key={i} className="lumi-pk-tag">{label}</span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Practical facts: stay / fee / hours */}
+      {hasFacts && (
+        <div className="lumi-pk-facts">
+          {stayLabel && (
+            <div className="lumi-pk-fact">
+              <span className="lumi-pk-fact-label">머무는 시간</span>
+              <span className="lumi-pk-fact-value">{stayLabel} 정도</span>
+            </div>
+          )}
+          {feeText && (
+            <div className="lumi-pk-fact">
+              <span className="lumi-pk-fact-label">입장료</span>
+              <span className="lumi-pk-fact-value">{feeText}</span>
+            </div>
+          )}
+          {hourStr && (
+            <div className="lumi-pk-fact">
+              <span className="lumi-pk-fact-label">운영시간</span>
+              <span className="lumi-pk-fact-value">{hourStr}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Physical difficulty */}
+      {isHighDifficulty && (
+        <div className="lumi-pk-caution">경사와 계단이 많아요. 올라가는 데 체력이 필요해요.</div>
+      )}
+
+      {/* Timing hint */}
+      {timingHint && <div className="lumi-pk-tip">{timingHint}</div>}
+
+      {/* Live status warning — only when place could actually be closed */}
+      {showLiveWarning && (
+        <div className="lumi-pk-warning">방문 전 운영 여부를 꼭 확인해보세요.</div>
+      )}
+
+      <div className="lumi-pk-footer" />
     </div>
   );
 }
