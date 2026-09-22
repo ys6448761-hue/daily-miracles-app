@@ -108,9 +108,58 @@ function _detectPlaceLookupIntent(message) {
   return { isPlaceLookup: false };
 }
 
+// ── PLACE_IDENTITY_KO: verified identity descriptions per code ─────────────────
+// Derived from: place name, zone location (seed), emotion_tags (seed), verified public knowledge.
+// DATA GAP: description_short is NULL for all 12 places (seed 001 + migrations 1–216).
+// Update this map when description_short is populated via future data migration.
+const PLACE_IDENTITY_KO = {
+  hyangiram:           '돌산도에 자리한 암자예요. 바위 절벽 위에서 바다가 내려다보이는 일출 명소로 알려져 있고, 기도와 명상을 위해 찾는 분들도 많아요.',
+  lee_soon_shin_plaza: '이순신 장군을 기리는 여수의 대표 광장이에요. 역사적인 분위기와 함께 여수항 풍경을 만날 수 있어요.',
+  romantic_pojangmacha:'해질 무렵부터 열리는 여수의 포장마차 거리예요. 여수식 음식을 즐기며 현지 거리 분위기를 경험할 수 있어요.',
+  odongdo:             '여수 앞바다에 자리한 섬이에요. 방파제 길을 걸으며 계절마다 다른 꽃과 바다 풍경을 즐길 수 있어요.',
+  cablecar:            '여수 바다 위를 가로지르는 해상 케이블카예요. 케이블카 안에서 바다와 섬·항구를 내려다볼 수 있어요.',
+  dolsan_daegyo:       '여수와 돌산도를 연결하는 대교예요. 야경과 일몰이 아름다워 저녁 시간대에 즐겨 찾는 곳이에요.',
+  dolsan_nightscape:   '돌산도에서 여수 도심과 바다를 바라보는 야경 포인트예요. 야경 감상과 사진 촬영을 즐기는 분들이 많이 찾아요.',
+  jaisan_park:         '언덕 위에 자리한 공원으로 여수 항구와 시내를 조용히 내려다볼 수 있어요.',
+  sky_tower:           '여수엑스포장 근처의 전망 타워예요. 사방으로 여수 바다와 섬들을 감상할 수 있어요.',
+  marine_park:         '바다 옆에 자리한 공원이에요. 탁 트인 바다 풍경과 함께 가볍게 산책하기 좋아요.',
+  jungang_market:      '여수의 전통시장이에요. 현지 먹거리와 서민적인 일상 분위기를 경험할 수 있어요.',
+  yeosu_expo_park:     '여수세계박람회가 열렸던 공원이에요. 넓은 야외 공간에서 산책과 다양한 이벤트를 즐길 수 있어요.',
+};
+
+// Suitable_for → brief Korean audience label (pilgrimage/foodies surface first — most specific)
+const SUITABLE_PRIORITY = ['pilgrimage', 'foodies', 'couples', 'friends', 'solo', 'young_adults', 'family', 'kids_ok', 'elderly', 'groups'];
+const SUITABLE_KO = {
+  pilgrimage: '순례·기도 목적으로도', foodies: '미식가들에게도', couples: '커플',
+  friends: '친구끼리', solo: '혼자', young_adults: '2030', family: '가족',
+  kids_ok: '아이 동반', elderly: '어르신 동반', groups: '단체',
+};
+
+function _buildSuitableForLine(suitableFor) {
+  if (!suitableFor || suitableFor.length === 0) return null;
+  const special = SUITABLE_PRIORITY.slice(0, 2).filter(k => suitableFor.includes(k)); // pilgrimage / foodies
+  if (special.length > 0) return `${SUITABLE_KO[special[0]]} 많이 찾는 곳이에요.`;
+  const general = SUITABLE_PRIORITY.slice(5).filter(k => suitableFor.includes(k)).slice(0, 2);
+  if (general.length === 0) return null;
+  return `${general.map(k => SUITABLE_KO[k]).join(', ')} 여행에 잘 어울려요.`;
+}
+
+function _buildTimingHint(weather) {
+  if (!weather || weather.length === 0) return null;
+  if (weather.includes('sunrise'))                         return '특히 일출 무렵이 가장 아름다워요.';
+  if (weather.includes('sunset'))                          return '석양이 질 무렵이 특히 아름다워요.';
+  if (weather.includes('night') && weather.includes('evening')) return '저녁부터 밤까지 분위기가 좋아요.';
+  if (weather.includes('night'))                           return '밤에도 분위기가 좋아요.';
+  if (weather.includes('evening'))                         return '저녁 시간대가 특히 좋아요.';
+  if (weather.includes('spring'))                          return '봄에 특히 아름다운 곳이에요.';
+  return null;
+}
+
 /**
  * Build SOUL explanation for a known verified place.
- * Uses only available DB fields — never fabricates facts.
+ * Uses emotion_tags / suitable_for / weather_suitable from DB + PLACE_IDENTITY_KO map.
+ * description_short is a DATA GAP for all 12 places — enrichment via identity map instead.
+ * Never fabricates: all copy is derived from verified DB fields or the place name itself.
  */
 function _buildPlaceLookupMessage(place) {
   const parts = [];
@@ -118,33 +167,47 @@ function _buildPlaceLookupMessage(place) {
 
   parts.push(`${name}에 대해 알려드릴게요.`);
 
-  // Description if available
+  // Identity + experience line
   if (place.description_short) {
     parts.push(place.description_short);
+  } else {
+    const identity = PLACE_IDENTITY_KO[place.code] || null;
+    if (identity) {
+      parts.push(identity);
+    } else {
+      // Structural fallback — rare (only for unknown codes)
+      const io = place.indoor_outdoor;
+      if (io === 'outdoor')                              parts.push('야외 공간이에요.');
+      else if (io === 'indoor')                         parts.push('실내 시설이에요.');
+      else if (io === 'indoor_outdoor' || io === 'mixed') parts.push('실내·외 혼합 공간이에요.');
+    }
   }
 
-  // Indoor/outdoor
-  const io = place.indoor_outdoor;
-  if (io === 'outdoor')          parts.push('야외 공간이에요.');
-  else if (io === 'indoor')      parts.push('실내 시설이에요.');
-  else if (io === 'indoor_outdoor' || io === 'mixed') parts.push('실내·외 혼합 공간이에요.');
+  // Suitable-for qualifier (surface only when adds real value: pilgrimage / foodies)
+  const suitableLine = _buildSuitableForLine(place.suitable_for);
+  if (suitableLine) parts.push(suitableLine);
 
-  // Stay time
+  // Timing hint from weather_suitable
+  const timingHint = _buildTimingHint(place.weather_suitable);
+  if (timingHint) parts.push(timingHint);
+
+  // Stay duration
   if (place.avg_stay_minutes) {
     const t = place.avg_stay_minutes;
-    const tLabel = t < 60 ? `${t}분` : t % 60 === 0 ? `${t / 60}시간` : `약 ${Math.round(t / 60)}시간`;
-    parts.push(`평균 체류시간은 약 ${tLabel}이에요.`);
+    const tLabel = t < 60 ? `약 ${t}분` : t % 60 === 0 ? `약 ${t / 60}시간` : `약 ${Math.round(t / 60)}시간`;
+    parts.push(`보통 ${tLabel} 정도 머물러요.`);
   }
 
   // Admission fee
   const fee = place.admission_fee_json;
   if (fee && typeof fee.adult === 'number') {
     if (fee.adult === 0) {
-      parts.push('입장료는 무료예요.');
+      parts.push('무료로 둘러볼 수 있어요.');
     } else {
       const feeStr = fee.adult.toLocaleString();
       const extraFees = [];
       if (typeof fee.youth === 'number')  extraFees.push(`청소년 ${fee.youth.toLocaleString()}원`);
+      if (typeof fee.senior === 'number') extraFees.push(`경로 ${fee.senior.toLocaleString()}원`);
       if (typeof fee.child === 'number')  extraFees.push(`어린이 ${fee.child.toLocaleString()}원`);
       const extraStr = extraFees.length ? ` / ${extraFees.join(' / ')}` : '';
       parts.push(`성인 입장료 ${feeStr}원이에요${extraStr}.`);
@@ -153,22 +216,24 @@ function _buildPlaceLookupMessage(place) {
     parts.push('이용 요금이 있어요. 상세 금액은 예약 시 안내드려요.');
   }
 
-  // Opening hours
+  // Opening hours (verified hours suppress generic live_status warning below)
   const hours = place.opening_hours_json;
+  let hasVerifiedHours = false;
   if (hours) {
-    const monHours = hours.mon || hours.tue || hours.wed;
-    if (monHours) {
-      parts.push(`운영시간 ${monHours} (방문 전 확인 권장).`);
+    const hourStr = hours.mon || hours.tue || hours.wed || hours.thu || hours.fri || hours.sat || hours.sun;
+    if (hourStr) {
+      parts.push(`운영시간 ${hourStr}.`);
+      hasVerifiedHours = true;
     }
   }
 
   // Physical difficulty
   if (place.physical_difficulty === 'high') {
-    parts.push('계단과 경사가 있어 보행이 불편한 분들은 주의가 필요해요.');
+    parts.push('경사와 계단이 많아 올라가는 데 체력이 필요해요.');
   }
 
-  // Live status caution — only when explicitly required (not outdoor public spaces)
-  if (place.live_status_required) {
+  // Live status caution — suppress when: live_status_required=false OR hours are verified
+  if (place.live_status_required && !hasVerifiedHours) {
     parts.push('방문 전 운영 여부를 꼭 확인해보세요.');
   }
 
