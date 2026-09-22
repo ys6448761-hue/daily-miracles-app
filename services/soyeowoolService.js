@@ -549,6 +549,26 @@ function _isMultiDayTrip(message) {
   return /\d박\d일|\d박\s*\d일|1박|2박|3박/.test(message || '');
 }
 
+// Detect explicit itinerary-building intent.
+// "일정 짜줘", "1박2일 일정 만들어줘", "2박3일 코스 짜줘" → true
+// "일정 추천해줘", "야경 좋은 곳 알려줘" → false (추천해 is a recommendation override, not a construction verb)
+function _isJourneyPlanningIntent(message) {
+  if (!message) return false;
+  // Overnight stay pattern always implies journey planning
+  if (/\d박\s*\d일|\d박/.test(message)) return true;
+  // Explicit construction verb attached to a planning noun
+  if (/(일정|코스|여행|계획).*(짜줘|짜주세요|만들어줘|만들어주세요|세워줘|구성해줘)/.test(message)) return true;
+  if (/(짜줘|짜주세요|만들어줘|만들어주세요).*(일정|코스|여행)/.test(message)) return true;
+  return false;
+}
+
+// Extract number of overnight stays from message.
+// "1박2일" → 1, "2박3일" → 2. Caps at 7.
+function _extractNights(message) {
+  const m = (message || '').match(/(\d)박/);
+  return m ? Math.min(parseInt(m[1], 10), 7) : 1;
+}
+
 function _generateSoulMessage(soulContext, status, message) {
   const provenance = soulContext._provenance || {};
   const pt = soulContext.people_type;
@@ -845,19 +865,22 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
     // Non-fatal: travel recommendations still returned
   }
 
-  // ─── MY ROUTE SKELETON (multi-day trips only) ───────────────────────────────
-  // Pure deterministic skeleton — LOCKED items always present, AI cannot remove them.
-  // Only runs when user message contains overnight stay pattern (1박2일 etc.)
+  // ─── MY ROUTE SKELETON (journey planning requests) ──────────────────────────
+  // Fires for explicit itinerary-building intent regardless of whether a travel
+  // date is provided. When travel_date is absent, the skeleton uses null dates
+  // and the frontend renders "N일차" labels instead of calendar dates.
+  // LOCKED items (hotel/leisure) are always present; AI cannot remove them.
   let routeSkeleton = null;
-  if (_isMultiDayTrip(message) && quoteCtx && quoteCtx.travel_date) {
+  if (_isJourneyPlanningIntent(message) && quoteCtx) {
     try {
       const { buildSkeleton } = require('./routeSkeletonService');
       routeSkeleton = buildSkeleton({
-        start_date: quoteCtx.travel_date,
+        start_date: quoteCtx.travel_date || null,
         hotel_code: quoteCtx.hotel_code || null,
         leisure_code: quoteCtx.leisure || null,
         guest_count: quoteCtx.guest_count || domainContext.group_size || 2,
-        candidates: tgResult.places || []
+        candidates: tgResult.places || [],
+        nights: _extractNights(message),
       });
     } catch (err) {
       console.error('[SOUL_ROUTE_SKELETON_ERROR]', err.message);
@@ -865,13 +888,10 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
     }
   }
 
-  // For valid multi-day routes: suppress "시간이 얼마나 남으셨어요?" PARTIAL and
-  // "120분 가능" condition. A user who said "1박2일" has defined their trip scope;
-  // a remaining-time default is irrelevant. Flag _isMultiDayTrip on domainContext
-  // so _deriveStatus() and _buildUserConditions() both respect it without
-  // mutating _domainFallbacks (which would flip timeIsDefault to false and re-show
-  // the synthetic time string).
-  if (routeSkeleton !== null && _isMultiDayTrip(message)) {
+  // For journey-planning requests: suppress "시간이 얼마나 남으셨어요?" PARTIAL and
+  // "120분 가능" condition. Flag _isMultiDayTrip so _deriveStatus() and
+  // _buildUserConditions() treat this as a multi-day context.
+  if (routeSkeleton !== null && (_isMultiDayTrip(message) || _isJourneyPlanningIntent(message))) {
     domainContext._isMultiDayTrip = true;
   }
 

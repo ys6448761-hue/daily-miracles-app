@@ -276,7 +276,9 @@ function RouteDay({ day, formatDate }) {
 
   return (
     <div className="lumi-route-day">
-      <div className="lumi-route-day-header">DAY {day.day} · {formatDate(day.date)}</div>
+      <div className="lumi-route-day-header">
+        {day.date ? `DAY ${day.day} · ${formatDate(day.date)}` : `${day.day}일차`}
+      </div>
       {orderedSlots.map(slot => (
         <div key={slot} className="lumi-route-slot">
           {TIME_SLOT_LABEL[slot] && (
