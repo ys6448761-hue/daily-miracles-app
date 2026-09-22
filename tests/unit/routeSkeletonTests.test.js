@@ -156,4 +156,105 @@ describe('routeSkeletonService', () => {
     const checkout = day2.find(it => it.name && it.name.includes('체크아웃'));
     expect(checkout).toBeUndefined();
   });
+
+  // ── V0.2 tests ───────────────────────────────────────────────────────────────
+
+  // V02_HOTEL_CHECKIN_time_null — Founder correction: no assumed convention time
+  test('V02: hotel check-in time === null (no verified hotel data)', () => {
+    const s = buildSkeleton(BASE);
+    const checkin = s.days[0].items.find(it => it.commerce_code === 'ramada');
+    expect(checkin).toBeDefined();
+    expect(checkin.time).toBeNull();
+    expect(checkin.time_slot).toBe('evening');
+  });
+
+  // V02_HOTEL_CHECKOUT_time_null — Founder correction: no assumed convention time
+  test('V02: hotel checkout time === null (no verified hotel data)', () => {
+    const s = buildSkeleton(BASE);
+    const checkout = s.days[1].items.find(it => it.name && it.name.includes('체크아웃'));
+    expect(checkout).toBeDefined();
+    expect(checkout.time).toBeNull();
+    expect(checkout.time_slot).toBe('morning');
+  });
+
+  // V02_CABLE_TIME_SLOT
+  test('V02: cable car time_slot === afternoon', () => {
+    const s = buildSkeleton(BASE);
+    const cable = allItems(s).find(it => it.commerce_code === 'cable');
+    expect(cable.time_slot).toBe('afternoon');
+    expect(cable.time).toBeNull();
+  });
+
+  // V02_ARRIVAL_MARKER
+  test('V02: Day 1 has arrival marker as first item', () => {
+    const s = buildSkeleton(BASE);
+    const first = s.days[0].items[0];
+    expect(first.type).toBe('arrival');
+    expect(first.source).toBe('ROUTE_DEFAULT');
+    expect(first.time_slot).toBe('arrival');
+    expect(first.quotable).toBe(false);
+  });
+
+  // V02_DEPARTURE_MARKER
+  test('V02: Day 2 has departure marker as last item', () => {
+    const s = buildSkeleton(BASE);
+    const day2Items = s.days[1].items;
+    const last = day2Items[day2Items.length - 1];
+    expect(last.type).toBe('departure');
+    expect(last.source).toBe('ROUTE_DEFAULT');
+    expect(last.time_slot).toBe('departure');
+    expect(last.quotable).toBe(false);
+  });
+
+  // V02_SUGGESTED_time_null — SOUL_RECOMMENDED items must never have a time
+  test('V02: all SOUL_RECOMMENDED items have time === null', () => {
+    const s = buildSkeleton({
+      ...BASE,
+      candidates: [
+        { name_ko: '장소A', type: 'attraction', place_code: 'A1' },
+        { name_ko: '장소B', type: 'attraction', place_code: 'B1' }
+      ]
+    });
+    const suggested = allItems(s).filter(it => it.source === 'SOUL_RECOMMENDED');
+    expect(suggested.length).toBeGreaterThan(0);
+    suggested.forEach(it => expect(it.time).toBeNull());
+  });
+
+  // V02_NO_HARDCODED_PLACES — empty candidates → no SOUL_RECOMMENDED items
+  test('V02: with empty candidates, no SOUL_RECOMMENDED items appear', () => {
+    const s = buildSkeleton({ ...BASE, candidates: [] });
+    const soulRec = allItems(s).filter(it => it.source === 'SOUL_RECOMMENDED');
+    expect(soulRec).toHaveLength(0);
+  });
+
+  // V02_SUGGESTED_DISTRIBUTION — 4 candidates → 2 Day1, 2 Day2
+  test('V02: 4 candidates distribute 2 to Day1, 2 to Day2', () => {
+    const s = buildSkeleton({
+      ...BASE,
+      candidates: [
+        { name_ko: '장소1', type: 'attraction', place_code: 'P1' },
+        { name_ko: '장소2', type: 'attraction', place_code: 'P2' },
+        { name_ko: '장소3', type: 'attraction', place_code: 'P3' },
+        { name_ko: '장소4', type: 'attraction', place_code: 'P4' }
+      ]
+    });
+    const d1Soul = s.days[0].items.filter(it => it.source === 'SOUL_RECOMMENDED');
+    const d2Soul = s.days[1].items.filter(it => it.source === 'SOUL_RECOMMENDED');
+    expect(d1Soul).toHaveLength(2);
+    expect(d2Soul).toHaveLength(2);
+    expect(d1Soul.map(i => i.name)).toContain('장소1');
+    expect(d2Soul.map(i => i.name)).toContain('장소3');
+  });
+
+  // V02_ALL_ITEMS_HAVE_TIME_SLOT — every item must have time_slot defined
+  test('V02: every item has time_slot defined', () => {
+    const s = buildSkeleton({
+      ...BASE,
+      candidates: [{ name_ko: '장소X', type: 'attraction', place_code: 'X1' }]
+    });
+    allItems(s).forEach(it => {
+      expect(it.time_slot).toBeDefined();
+      expect(typeof it.time_slot).toBe('string');
+    });
+  });
 });

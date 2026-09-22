@@ -25,9 +25,7 @@ function _randomSuffix() {
 
 function _isDuplicateOfLocked(candidate, leisure_code) {
   if (!candidate.name_ko) return false;
-  // De-duplicate cable car by keyword
   if (LEISURE_DEDUP_KEYWORDS.some(kw => candidate.name_ko.includes(kw))) return true;
-  // De-duplicate by place_code
   if (leisure_code && CABLE_PLACE_CODES.includes(candidate.place_code)) return true;
   return false;
 }
@@ -47,15 +45,16 @@ function buildSkeleton({ start_date, hotel_code, leisure_code, guest_count, cand
   const day1Date = _makeDate(start_date, 0);
   const day2Date = _makeDate(start_date, 1);
 
-  // ── SUGGESTED items from travelGuideService (DB-backed) ─────────────────────
-  // Filter out any that duplicate LOCKED leisure items.
+  // ── SUGGESTED items from travelGuideService (DB-backed, no hardcoded names) ──
   const eligible = candidates.filter(p => !_isDuplicateOfLocked(p, leisure_code));
 
-  // Split: first 2 → Day 1, next 2 → Day 2
+  // Day 1: first 2 eligible, Day 2: next 2
   const day1Suggestions = eligible.slice(0, 2).map((p, i) => ({
     day: 1,
     date: day1Date,
-    sequence: i + 1,
+    sequence: i + 2,        // sequence 2, 3 (after arrival at 1)
+    time_slot: 'morning',
+    time: null,
     type: p.type || 'attraction',
     name: p.name_ko,
     source: 'SOUL_RECOMMENDED',
@@ -67,7 +66,9 @@ function buildSkeleton({ start_date, hotel_code, leisure_code, guest_count, cand
   const day2Suggestions = eligible.slice(2, 4).map((p, i) => ({
     day: 2,
     date: day2Date,
-    sequence: i + 1,
+    sequence: i + 2,        // sequence 2, 3 (after checkout at 1)
+    time_slot: 'morning',
+    time: null,
     type: p.type || 'attraction',
     name: p.name_ko,
     source: 'SOUL_RECOMMENDED',
@@ -76,15 +77,34 @@ function buildSkeleton({ start_date, hotel_code, leisure_code, guest_count, cand
     quotable: false
   }));
 
-  // ── LOCKED: leisure (cable car) → Day 1 after suggestions ───────────────────
-  const day1Items = [...day1Suggestions];
+  // ── Day 1 items ──────────────────────────────────────────────────────────────
 
+  // Arrival marker — always first
+  const arrivalMarker = {
+    day: 1,
+    date: day1Date,
+    sequence: 1,
+    time_slot: 'arrival',
+    time: null,
+    type: 'arrival',
+    name: '여수 도착',
+    source: 'ROUTE_DEFAULT',
+    selection_status: 'SUGGESTED',
+    commerce_code: null,
+    quotable: false
+  };
+
+  const day1Items = [arrivalMarker, ...day1Suggestions];
+
+  // LOCKED: leisure (cable car) → afternoon
   if (leisure_code && COMMERCE_MAP[leisure_code]) {
     const lm = COMMERCE_MAP[leisure_code];
     day1Items.push({
       day: 1,
       date: day1Date,
-      sequence: day1Items.length + 1,
+      sequence: 10,
+      time_slot: 'afternoon',
+      time: null,
       type: lm.type,
       name: lm.name,
       source: 'USER_SELECTED',
@@ -94,13 +114,16 @@ function buildSkeleton({ start_date, hotel_code, leisure_code, guest_count, cand
     });
   }
 
-  // ── LOCKED: hotel check-in → Day 1 last (sequence 99) ───────────────────────
+  // LOCKED: hotel check-in → evening, sequence 99
+  // time = null — no verified source for exact check-in time
   if (hotel_code && COMMERCE_MAP[hotel_code]) {
     const hm = COMMERCE_MAP[hotel_code];
     day1Items.push({
       day: 1,
       date: day1Date,
       sequence: 99,
+      time_slot: 'evening',
+      time: null,   // Founder correction: null until verified from hotel data
       type: hm.type,
       name: hm.name,
       source: 'USER_SELECTED',
@@ -111,14 +134,18 @@ function buildSkeleton({ start_date, hotel_code, leisure_code, guest_count, cand
   }
 
   // ── Day 2 items ──────────────────────────────────────────────────────────────
-  const day2Items = [...day2Suggestions];
 
-  // LOCKED: hotel checkout marker → Day 2 last (not a new charge)
+  // LOCKED: hotel checkout marker → morning, sequence 1
+  // time = null — no verified source for exact checkout time
+  const day2Items = [];
+
   if (hotel_code && COMMERCE_MAP[hotel_code]) {
     day2Items.push({
       day: 2,
       date: day2Date,
-      sequence: 99,
+      sequence: 1,
+      time_slot: 'morning',
+      time: null,   // Founder correction: null until verified from hotel data
       type: 'hotel',
       name: COMMERCE_MAP[hotel_code].name + ' 체크아웃',
       source: 'USER_SELECTED',
@@ -127,6 +154,23 @@ function buildSkeleton({ start_date, hotel_code, leisure_code, guest_count, cand
       quotable: false
     });
   }
+
+  day2Items.push(...day2Suggestions);
+
+  // Departure marker — always last
+  day2Items.push({
+    day: 2,
+    date: day2Date,
+    sequence: 99,
+    time_slot: 'departure',
+    time: null,
+    type: 'departure',
+    name: '여행 마무리',
+    source: 'ROUTE_DEFAULT',
+    selection_status: 'SUGGESTED',
+    commerce_code: null,
+    quotable: false
+  });
 
   // Sort each day by sequence
   day1Items.sort((a, b) => a.sequence - b.sequence);

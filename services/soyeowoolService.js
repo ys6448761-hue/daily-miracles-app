@@ -562,6 +562,21 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
     }
   }
 
+  // Suppress time_available_minutes PARTIAL for valid multi-day routes.
+  // A user who said "1박2일" has implicitly defined their time; asking
+  // "시간이 얼마나 남으셨어요?" is contradictory in that context.
+  // Only removes time_available_minutes — other PARTIAL causes are preserved.
+  if (
+    routeSkeleton !== null &&
+    _isMultiDayTrip(message) &&
+    domainContext._domainFallbacks &&
+    domainContext._domainFallbacks.includes('time_available_minutes')
+  ) {
+    domainContext._domainFallbacks = domainContext._domainFallbacks.filter(
+      f => f !== 'time_available_minutes'
+    );
+  }
+
   // STATUS
   const status = _deriveStatus(tgResult, domainContext);
 

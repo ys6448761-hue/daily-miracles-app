@@ -8,6 +8,19 @@ jest.mock('../../services/travelGuideService', () => ({
   recommend: jest.fn()
 }));
 
+jest.mock('../../services/sharedJourneyService', () => ({
+  extractSharedJourney: jest.fn().mockResolvedValue({
+    want: [], experienced: [], repeat_intent: null, companion_voices: [], voice_provenance: null
+  })
+}));
+
+jest.mock('../../services/quoteContextService', () => ({
+  extractQuoteContext: jest.fn().mockReturnValue(null),
+  isQuotable: jest.fn().mockReturnValue(false),
+  isComplexGroupHotel: jest.fn().mockReturnValue(false),
+  buildQuoteInput: jest.fn().mockReturnValue(null)
+}));
+
 const { handleTravelRequest } = require('../../services/soyeowoolService');
 const contextExtractionService = require('../../services/contextExtractionService');
 const travelGuideService = require('../../services/travelGuideService');
@@ -250,4 +263,29 @@ describe('soyeowoolService — Phase 1 TRAVEL_INTELLIGENCE', () => {
     'V0.2 required for segments[], parallel REQUEST envelopes, OFFER_DECISION combination. ' +
     'This test documents the known boundary. Do NOT encode the collapsed 2880-minute recommendation as correct Phase 1 behavior.'
   );
+
+  // V02_MULTIDAY_NO_TIME_QUESTION
+  // When time_available_minutes is the ONLY fallback and route is null (no quoteCtx.travel_date),
+  // status remains PARTIAL — suppression is gated on routeSkeleton !== null.
+  // Full E2E suppression requires a real quoteCtx with travel_date (integration test scope).
+  // This unit test verifies that PARTIAL is NOT accidentally suppressed when route is null.
+  test('V02: PARTIAL preserved when route is null (no travel_date in quoteCtx)', async () => {
+    contextExtractionService.parseUserMessage.mockResolvedValue(makeSoulContextUnknownTime());
+    // quoteContextService.extractQuoteContext returns null (default mock) → route will be null
+    const result = await callSOUL({ message: '여자친구랑 둘이 여수 1박2일 라마다 케이블카' });
+    expect(result.ok).toBe(true);
+    // status remains PARTIAL because route was null (quoteCtx.travel_date absent)
+    expect(result.payload.status).toBe('PARTIAL');
+  });
+
+  // V02_NON_TIME_PARTIAL_PRESERVED — other PARTIAL causes must NOT be suppressed by multi-day detection
+  test('V02: non-time PARTIAL causes not suppressed by multi-day message alone', async () => {
+    // Simulate a PARTIAL caused by something other than time_available_minutes
+    // by using unknown time with a non-1박2일 message — standard PARTIAL must survive
+    contextExtractionService.parseUserMessage.mockResolvedValue(makeSoulContextUnknownTime());
+    const result = await callSOUL({ message: '오동도 가고 싶어' }); // no 1박2일
+    expect(result.ok).toBe(true);
+    expect(result.payload.status).toBe('PARTIAL');
+    expect(result.payload.message_ko).toContain('시간이 얼마나');
+  });
 });

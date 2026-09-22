@@ -632,6 +632,58 @@
   border: 1px solid #C5DFD8;
 }
 
+/* V0.2 — time_slot grouping */
+.lumi-route-slot {
+  margin-bottom: 6px;
+}
+.lumi-route-slot-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #7A94B0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 2px 2px;
+}
+.lumi-route-item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.lumi-route-item-sub {
+  font-size: 11px;
+  color: #7A94B0;
+  font-weight: 400;
+}
+.lumi-route-item-locked {
+  background: #F0F7FF;
+  border: 1px solid #C5D9F0;
+}
+.lumi-route-item-default {
+  background: transparent;
+  border: none;
+  padding-left: 4px;
+  color: #9AACCF;
+}
+.lumi-route-badge {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.lumi-route-badge-locked {
+  background: #1A7BAF;
+  color: #fff;
+}
+.lumi-route-badge-soul {
+  background: #EFF8F6;
+  color: #1A5C4F;
+  border: 1px solid #C5DFD8;
+}
+
 .lumi-new-question-btn {
   display: block;
   width: calc(100% - 24px);

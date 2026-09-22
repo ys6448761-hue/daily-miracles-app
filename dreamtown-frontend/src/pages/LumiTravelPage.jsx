@@ -227,7 +227,10 @@ function QuoteSummary({ quote }) {
   );
 }
 
-const TYPE_ICON = { hotel: '🏨', leisure: '🎡', attraction: '🗺️', meal: '🍽️' };
+const TYPE_ICON = { hotel: '🏨', leisure: '🎡', attraction: '🗺️', meal: '🍽️', arrival: '📍', departure: '🏁' };
+const TIME_SLOT_ORDER = ['arrival', 'morning', 'lunch', 'afternoon', 'evening', 'night', 'departure'];
+const TIME_SLOT_LABEL = { morning: '오전', lunch: '점심', afternoon: '오후', evening: '저녁', night: '밤' };
+// arrival / departure have no heading — structural markers shown inline
 
 function MyRoute({ route }) {
   if (!route || !Array.isArray(route.days) || route.days.length === 0) return null;
@@ -255,22 +258,63 @@ function MyRoute({ route }) {
         </span>
       </div>
       {route.days.map((day) => (
-        <div key={day.day} className="lumi-route-day">
-          <div className="lumi-route-day-header">DAY {day.day} · {formatDate(day.date)}</div>
-          <div className="lumi-route-items">
-            {(day.items || []).map((item, i) => {
-              const isLocked = item.selection_status === 'LOCKED';
-              return (
-                <div key={i} className={`lumi-route-item ${isLocked ? 'lumi-route-item--locked' : 'lumi-route-item--suggested'}`}>
-                  <span className="lumi-route-item-icon">{TYPE_ICON[item.type] || '📍'}</span>
-                  <span className="lumi-route-item-name">{item.name}</span>
-                  <span className="lumi-route-item-badge">{isLocked ? '선택한 일정' : 'SOUL 추천'}</span>
-                </div>
-              );
-            })}
-          </div>
+        <RouteDay key={day.day} day={day} formatDate={formatDate} />
+      ))}
+    </div>
+  );
+}
+
+function RouteDay({ day, formatDate }) {
+  // Group items by time_slot
+  const groups = {};
+  (day.items || []).forEach(item => {
+    const slot = item.time_slot || 'morning';
+    if (!groups[slot]) groups[slot] = [];
+    groups[slot].push(item);
+  });
+  const orderedSlots = TIME_SLOT_ORDER.filter(s => groups[s]);
+
+  return (
+    <div className="lumi-route-day">
+      <div className="lumi-route-day-header">DAY {day.day} · {formatDate(day.date)}</div>
+      {orderedSlots.map(slot => (
+        <div key={slot} className="lumi-route-slot">
+          {TIME_SLOT_LABEL[slot] && (
+            <div className="lumi-route-slot-label">{TIME_SLOT_LABEL[slot]}</div>
+          )}
+          {groups[slot].map((item, i) => (
+            <RouteItem key={i} item={item} day={day.day} />
+          ))}
         </div>
       ))}
+    </div>
+  );
+}
+
+function RouteItem({ item, day }) {
+  const icon = TYPE_ICON[item.type] || '📍';
+  const isLocked = item.selection_status === 'LOCKED';
+  const isSoulRec = item.source === 'SOUL_RECOMMENDED';
+  const isDefault = item.source === 'ROUTE_DEFAULT';
+
+  // Hotel sub-text: show 체크인/체크아웃 without time (time=null until verified)
+  let subText = null;
+  if (item.type === 'hotel' && item.time_slot === 'evening') {
+    subText = item.time ? `체크인 · ${item.time}` : '체크인';
+  }
+  if (item.type === 'hotel' && item.time_slot === 'morning') {
+    subText = item.time ? `체크아웃 · ${item.time}` : '체크아웃';
+  }
+
+  return (
+    <div className={`lumi-route-item${isLocked ? ' lumi-route-item-locked' : ''}${isDefault ? ' lumi-route-item-default' : ''}`}>
+      <span className="lumi-route-item-icon">{icon}</span>
+      <div className="lumi-route-item-content">
+        <span className="lumi-route-item-name">{item.name}</span>
+        {subText && <span className="lumi-route-item-sub">{subText}</span>}
+      </div>
+      {isLocked && <span className="lumi-route-badge lumi-route-badge-locked">선택한 일정</span>}
+      {isSoulRec && <span className="lumi-route-badge lumi-route-badge-soul">SOUL 추천</span>}
     </div>
   );
 }
