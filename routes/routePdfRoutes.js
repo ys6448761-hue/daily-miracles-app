@@ -29,10 +29,11 @@ router.post('/route-pdf', async (req, res) => {
   }
 
   try {
-    const pdfBuffer = await generateRoutePdf(route, quote);
+    const pdfResult = await generateRoutePdf(route, quote);
+    const pdfBuffer = Buffer.isBuffer(pdfResult) ? pdfResult : Buffer.from(pdfResult);
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', buildContentDisposition(route.start_date));
-    res.send(pdfBuffer);
+    res.end(pdfBuffer);
   } catch (err) {
     console.error('[routePdfRoutes] PDF generation failed:', err.message);
     res.status(500).json({ error: 'PDF 생성에 실패했습니다.' });

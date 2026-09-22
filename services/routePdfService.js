@@ -317,12 +317,13 @@ async function generateRoutePdf(routeData, quoteData) {
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'domcontentloaded' });
     await page.evaluateHandle('document.fonts.ready');
-    const pdfBuffer = await page.pdf({
+    const pdfResult = await page.pdf({
       format: 'A4',
       printBackground: true,
       margin: { top: '15mm', right: '15mm', bottom: '15mm', left: '15mm' }
     });
-    return pdfBuffer;
+    // Newer Puppeteer returns Uint8Array; normalize to Node Buffer for correct binary HTTP response.
+    return Buffer.isBuffer(pdfResult) ? pdfResult : Buffer.from(pdfResult);
   } finally {
     if (browser) await browser.close();
   }

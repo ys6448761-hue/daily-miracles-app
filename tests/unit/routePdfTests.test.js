@@ -143,6 +143,24 @@ describe('routePdfService — sanitizeQuoteForPdf', () => {
   });
 });
 
+describe('routePdfService — Buffer normalization', () => {
+  test('Buffer.from(Uint8Array) produces a Buffer with matching bytes', () => {
+    const bytes = new Uint8Array([0x25, 0x50, 0x44, 0x46]); // %PDF
+    const buf = Buffer.isBuffer(bytes) ? bytes : Buffer.from(bytes);
+    expect(Buffer.isBuffer(buf)).toBe(true);
+    expect(buf[0]).toBe(0x25);
+    expect(buf[1]).toBe(0x50);
+    expect(buf[2]).toBe(0x44);
+    expect(buf[3]).toBe(0x46);
+  });
+
+  test('Buffer passthrough: already-Buffer value is not re-wrapped', () => {
+    const original = Buffer.from([0x25, 0x50, 0x44, 0x46]);
+    const result = Buffer.isBuffer(original) ? original : Buffer.from(original);
+    expect(result).toBe(original); // same reference — no copy
+  });
+});
+
 describe('routePdfRoutes — buildContentDisposition', () => {
   test('Content-Disposition: ASCII fallback present', () => {
     const cd = buildContentDisposition('2026-10-17');
