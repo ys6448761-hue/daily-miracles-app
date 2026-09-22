@@ -515,15 +515,25 @@ function HospitalitySection({ quote }) {
   const isIndividual = Number.isFinite(guestCount) && guestCount >= 1 && guestCount <= 4;
   const isCalculated = quote?.status === 'CALCULATED' && quote?.pricing;
 
+  // Extract product codes from quote breakdown — passed to server for eligibility filtering.
+  // Codes are internal quote item identifiers (hotel/leisure codes from quoteEngine).
+  // Server resolves these against dt_products.product_code via dt_product_benefits.
+  const productCodesParam = React.useMemo(() => {
+    const codes = Array.isArray(quote?.breakdown)
+      ? quote.breakdown.map(item => item.code).filter(Boolean)
+      : [];
+    return codes.length > 0 ? `&product_codes=${encodeURIComponent(codes.join(','))}` : '';
+  }, [quote?.breakdown]);
+
   React.useEffect(() => {
     if (!isIndividual || !isCalculated) return;
     let cancelled = false;
-    fetch(`/api/dt/lumi/hospitality?guest_count=${guestCount}&city=yeosu`)
+    fetch(`/api/dt/lumi/hospitality?guest_count=${guestCount}&city=yeosu${productCodesParam}`)
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (!cancelled) setData(d); })
       .catch(() => { if (!cancelled) setError(true); });
     return () => { cancelled = true; };
-  }, [guestCount, isIndividual, isCalculated]);
+  }, [guestCount, isIndividual, isCalculated, productCodesParam]);
 
   // Group → nothing
   if (!isIndividual || !isCalculated) return null;

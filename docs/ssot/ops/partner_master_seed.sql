@@ -1,7 +1,9 @@
 -- =============================================================
--- partner_master_seed.sql  v2 — DreamTown 제휴처 마스터 데이터
--- 기준: partner_master.csv v2 / Benefit Display Copy V1 (2026-06-08)
--- 업체: 카페투어 8개(starlit) + 달빛혜택 4개(moonlight)
+-- partner_master_seed.sql  v3 — DreamTown 제휴처 마스터 데이터
+-- 기준: partner_master.csv v3 / Benefit Display Copy V1 (2026-06-08)
+-- 업체: 카페투어 8개(starlit) + 달빛혜택 3개(moonlight) +
+--        별빛혜택 1개(starlit = 강순희 K바삭치킨 범앗간) +
+--        맛집 6개(restaurant, FOUNDER_CONFIRMATION_REQUIRED)
 --
 -- 사전 조건:
 --   migration 173_moonlight_route.sql 적재 완료 필수
@@ -9,29 +11,48 @@
 --
 -- 적재 순서: STEP 1 → STEP 2 → STEP 3 → STEP 4
 -- 잔여 TBD: lat/lng / settlement_policy_type / benefit_location_hint
+--
+-- HOLD 항목:
+--   모이핀(YS-CF-008): is_active=false — 계약 여부 미확인, Founder 결정 대기
+--
+-- BLOCKED 항목 (dt_benefits INSERT 불가):
+--   YS-RS-002 ~ YS-RS-007: display_copy, address, phone, route_code 미확인
+--   → FOUNDER_CONFIRMATION_REQUIRED
 -- =============================================================
 
 -- =============================================================
--- STEP 1. dt_partners — 12개 업체 등록
+-- STEP 1. dt_partners — 18개 업체 등록
 -- =============================================================
 
 INSERT INTO dt_partners
   (city_code, name, category, address, lat, lng, phone, description, is_active)
 VALUES
   -- 카페투어 (starlit) ─────────────────────────────────────────
-  ('yeosu', '프롬나드',       'cafe', '전남 여수시 돌산읍 우두3길 98',         NULL, NULL, '061-641-1248',   NULL, true),
-  ('yeosu', '더 포레스트랜드', 'cafe', '전남 여수시 돌산읍 월암길 144',         NULL, NULL, '0507-1367-6458', NULL, true),
-  ('yeosu', '엘리스테이 카페', 'cafe', '전남 여수시 돌산읍 백초길 28-52',       NULL, NULL, '0507-1371-2956', NULL, true),
-  ('yeosu', '라또아 카페',    'cafe', '전남 여수시 공화남3길 32 5층 전층',      NULL, NULL, '061-666-5811',   NULL, true),
-  ('yeosu', '카프아일랜드',   'cafe', '전남 여수시 망양로 192',                NULL, NULL, '0507-1312-4005', NULL, true),
-  ('yeosu', '메리엘 카페',    'cafe', '전남 여수시 만성리길 62',               NULL, NULL, '0507-1306-5679', NULL, true),
-  ('yeosu', '카페하루',       'cafe', '전남 여수시 돌산읍 강남해안로 61',       NULL, NULL, '010-8878-2905',  NULL, true),
-  ('yeosu', '모이핀',         'cafe', '전남 여수시 돌산읍 무술목길 50',         NULL, NULL, '061-641-8300',   NULL, true),
+  ('yeosu', '프롬나드',         'cafe', '전남 여수시 돌산읍 우두3길 98',         NULL, NULL, '061-641-1248',   NULL, true),
+  ('yeosu', '더 포레스트랜드',   'cafe', '전남 여수시 돌산읍 월암길 144',         NULL, NULL, '0507-1367-6458', NULL, true),
+  ('yeosu', '엘리스테이 카페',   'cafe', '전남 여수시 돌산읍 백초길 28-52',       NULL, NULL, '0507-1371-2956', NULL, true),
+  ('yeosu', '라또아 카페',       'cafe', '전남 여수시 공화남3길 32 5층 전층',      NULL, NULL, '061-666-5811',   NULL, true),
+  ('yeosu', '카프아일랜드',      'cafe', '전남 여수시 망양로 192',                NULL, NULL, '0507-1312-4005', NULL, true),
+  ('yeosu', '메리엘 카페',       'cafe', '전남 여수시 만성리길 62',               NULL, NULL, '0507-1306-5679', NULL, true),
+  ('yeosu', '카페하루',          'cafe', '전남 여수시 돌산읍 강남해안로 61',       NULL, NULL, '010-8878-2905',  NULL, true),
+  -- HOLD: 모이핀 — 계약 여부 미확인. is_active=false. Founder 결정 전 노출 불가.
+  ('yeosu', '모이핀',            'cafe', '전남 여수시 돌산읍 무술목길 50',         NULL, NULL, '061-641-8300',   NULL, false),
+  -- 별빛혜택 (starlit) ─────────────────────────────────────────
+  -- 강순희 K바삭치킨 범앗간: STARLIGHT BENEFIT (별빛혜택). moonlight 아님.
+  ('yeosu', '강순희 K바삭치킨 범앗간', 'restaurant', '여수시 이순신광장로 159', NULL, NULL, '0507-1436-1486', NULL, true),
   -- 달빛혜택 (moonlight) ───────────────────────────────────────
-  ('yeosu', '해공 노래방',    'night',      '여수시 이순신광장로 165', NULL, NULL, NULL,             NULL, true),
-  ('yeosu', '범앗간',         'restaurant', '여수시 이순신광장로 159', NULL, NULL, '0507-1436-1486', NULL, true),
-  ('yeosu', '인생네컷 오락실', 'night',      '여수시 이순신광장로 159', NULL, NULL, '010-8608-3005',  NULL, true),
-  ('yeosu', '풍선터트리기',   'etc',        '여수시 이순신광장로 159', NULL, NULL, '010-8608-3005',  NULL, true)
+  ('yeosu', '해공 노래방',       'night',      '여수시 이순신광장로 165', NULL, NULL, NULL,             NULL, true),
+  ('yeosu', '인생네컷 오락실',   'night',      '여수시 이순신광장로 159', NULL, NULL, '010-8608-3005',  NULL, true),
+  ('yeosu', '풍선터트리기',      'etc',        '여수시 이순신광장로 159', NULL, NULL, '010-8608-3005',  NULL, true),
+  -- 맛집 (restaurant) — FOUNDER_CONFIRMATION_REQUIRED ──────────
+  -- address, phone, display_copy, route_code 미확인.
+  -- dt_benefits INSERT 불가. Founder 확인 후 STEP 2 추가 예정.
+  ('yeosu', '백천선어마을',      'restaurant', NULL, NULL, NULL, NULL, NULL, true),
+  ('yeosu', '돌산게장명가',      'restaurant', NULL, NULL, NULL, NULL, NULL, true),
+  ('yeosu', '희망선어',          'restaurant', NULL, NULL, NULL, NULL, NULL, true),
+  ('yeosu', '섬마을 선어',       'restaurant', NULL, NULL, NULL, NULL, NULL, true),
+  ('yeosu', '궁전횟집',          'restaurant', NULL, NULL, NULL, NULL, NULL, true),
+  ('yeosu', '거북선횟집',        'restaurant', NULL, NULL, NULL, NULL, NULL, true)
 ON CONFLICT DO NOTHING;
 
 
@@ -90,26 +111,25 @@ SELECT p.id, 'free', '아메리카노 1인 무료',
   NULL, true
 FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '카페하루';
 
-INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active)
-SELECT p.id, 'free', '아메리카노 1인 무료',
-  '2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료',
-  'DreamTown 별빛항로의 첫 번째 쉼. 모이핀에서 잠시 숨을 고르고 소원과 다시 만날 준비를 해보세요.',
-  NULL, true
-FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '모이핀';
+-- HOLD: 모이핀 — is_active=false이므로 쿼리에 노출 안 됨. Founder 결정 보류.
+-- INSERT INTO dt_benefits ... WHERE name = '모이핀'  ← 실행하지 않음
 
--- ── 달빛혜택 4개 ─────────────────────────────────────────────
+-- ── 별빛혜택 — 강순희 K바삭치킨 범앗간 ─────────────────────────
+-- STARLIGHT BENEFIT: sp_fireworks_bundle + sp_fireworks_cruise에 연결
+
+INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active)
+SELECT p.id, 'gift', '음료 1병 무료', NULL,
+  '이순신광장에서 만나는 작은 선물. 음료 1병 무료 제공.',
+  NULL, true
+FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '강순희 K바삭치킨 범앗간';
+
+-- ── 달빛혜택 3개 ─────────────────────────────────────────────
 
 INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active)
 SELECT p.id, 'discount', '20% 할인', NULL,
   '여행의 즐거움을 조금 더 가볍게. 노래방 20% 할인 혜택.',
   NULL, true
 FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '해공 노래방';
-
-INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active)
-SELECT p.id, 'gift', '음료 1병 무료', NULL,
-  '이순신광장에서 만나는 작은 선물. 음료 1병 무료 제공.',
-  NULL, true
-FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '범앗간';
 
 INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active)
 SELECT p.id, 'gift', '2000원 지급', NULL,
@@ -122,6 +142,17 @@ SELECT p.id, 'discount', '2000원 할인', NULL,
   '작은 즐거움 하나 더. 2000원 할인 혜택 제공.',
   NULL, true
 FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '풍선터트리기';
+
+-- ── 맛집 6개 — BLOCKED (FOUNDER_CONFIRMATION_REQUIRED) ──────────
+-- 필요 필드 미제공: display_copy(NOT NULL), address, phone, route_code
+-- 아래 INSERT는 실행하지 않음. Founder 확인 후 추가.
+--
+-- 백천선어마을   → display_copy: MISSING, address: MISSING, phone: MISSING, route_code: MISSING
+-- 돌산게장명가   → display_copy: MISSING, address: MISSING, phone: MISSING, route_code: MISSING
+-- 희망선어       → display_copy: MISSING, address: MISSING, phone: MISSING, route_code: MISSING
+-- 섬마을 선어   → display_copy: MISSING, address: MISSING, phone: MISSING, route_code: MISSING
+-- 궁전횟집       → display_copy: MISSING, address: MISSING, phone: MISSING, route_code: MISSING
+-- 거북선횟집     → display_copy: MISSING, address: MISSING, phone: MISSING, route_code: MISSING
 
 
 -- =============================================================
@@ -136,7 +167,8 @@ FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '풍선터트리기'
 -- 사전 조건: migration 173 실행 완료 (moonlight_pass 존재)
 -- =============================================================
 
--- ── starlit 카페 8개 → sp_fireworks_bundle + sp_fireworks_cruise ──
+-- ── starlit 카페 7개 → sp_fireworks_bundle + sp_fireworks_cruise ──
+-- (모이핀 제외: is_active=false HOLD)
 INSERT INTO dt_product_benefits (product_id, benefit_id, display_order)
 SELECT pr.id, b.id, 0
 FROM dt_products pr
@@ -147,11 +179,24 @@ WHERE pr.product_code IN ('sp_fireworks_bundle', 'sp_fireworks_cruise')
   AND p.category = 'cafe'
   AND p.name IN (
     '프롬나드', '더 포레스트랜드', '엘리스테이 카페', '라또아 카페',
-    '카프아일랜드', '메리엘 카페', '카페하루', '모이핀'
+    '카프아일랜드', '메리엘 카페', '카페하루'
   )
 ON CONFLICT (product_id, benefit_id) DO NOTHING;
 
--- ── moonlight 4개 → moonlight_pass ───────────────────────────
+-- ── 별빛혜택: 강순희 K바삭치킨 범앗간 → sp_fireworks_bundle + sp_fireworks_cruise ──
+-- STARLIGHT BENEFIT — 범앗간(구)에서 이름 변경 및 moonlight→starlit 재분류
+INSERT INTO dt_product_benefits (product_id, benefit_id, display_order)
+SELECT pr.id, b.id, 0
+FROM dt_products pr
+CROSS JOIN dt_benefits b
+JOIN dt_partners p ON p.id = b.partner_id
+WHERE pr.product_code IN ('sp_fireworks_bundle', 'sp_fireworks_cruise')
+  AND p.city_code = 'yeosu'
+  AND p.name = '강순희 K바삭치킨 범앗간'
+ON CONFLICT (product_id, benefit_id) DO NOTHING;
+
+-- ── moonlight 3개 → moonlight_pass ───────────────────────────
+-- 강순희 K바삭치킨 범앗간은 moonlight에서 제외됨 (starlit으로 이동)
 INSERT INTO dt_product_benefits (product_id, benefit_id, display_order)
 SELECT pr.id, b.id, 0
 FROM dt_products pr
@@ -159,14 +204,18 @@ CROSS JOIN dt_benefits b
 JOIN dt_partners p ON p.id = b.partner_id
 WHERE pr.product_code = 'moonlight_pass'
   AND p.city_code = 'yeosu'
-  AND p.name IN ('해공 노래방', '범앗간', '인생네컷 오락실', '풍선터트리기')
+  AND p.name IN ('해공 노래방', '인생네컷 오락실', '풍선터트리기')
 ON CONFLICT (product_id, benefit_id) DO NOTHING;
+
+-- ── 맛집 6개 — BLOCKED (dt_product_benefits INSERT 불가) ────────
+-- product_codes 결정 FOUNDER_CONFIRMATION_REQUIRED
+-- 실행하지 않음.
 
 
 -- =============================================================
 -- 적재 완료 확인 쿼리
 -- =============================================================
--- SELECT p.name, p.category, p.phone,
+-- SELECT p.name, p.category, p.phone, p.is_active,
 --        b.benefit_type, b.title, b.display_copy
 -- FROM dt_partners p
 -- LEFT JOIN dt_benefits b ON b.partner_id = p.id

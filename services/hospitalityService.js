@@ -41,10 +41,22 @@ function checkHospitalityEligibility({ guestCount }) {
 // ── DB query ──────────────────────────────────────────────────────────────────
 
 /**
- * Fetch active hospitality benefits for a city.
- * Returns empty array when no data exists — safe empty state.
+ * Fetch active hospitality benefits for a city, filtered by product eligibility.
+ *
+ * Product filter rules:
+ *   - Generic benefit (no dt_product_benefits rows): shown for all individual journeys
+ *   - Product-specific benefit: shown only when journey includes a matching product_code
+ *
+ * product_codes = []  → only generic benefits (safe default — prevents leakage)
+ * product_codes = ['sp_fireworks_bundle'] → generic + starlit benefits
+ *
+ * Returns empty array when no data exists or DB unreachable — safe empty state.
+ *
+ * @param {string} city_code
+ * @param {string[]} product_codes — from journey/quote (dt_products.product_code values)
  */
-async function fetchActiveBenefits(city_code = 'yeosu') {
+async function fetchActiveBenefits(city_code = 'yeosu', product_codes = []) {
+  const codes = Array.isArray(product_codes) ? product_codes : [];
   const sql = `
     SELECT
       b.id            AS benefit_id,
@@ -64,10 +76,24 @@ async function fetchActiveBenefits(city_code = 'yeosu') {
       AND b.is_active  = true
       AND p.is_active  = true
       AND (b.valid_to IS NULL OR b.valid_to >= CURRENT_DATE)
+      AND (
+        -- Generic: no product restriction — shown to all eligible journeys
+        NOT EXISTS (
+          SELECT 1 FROM dt_product_benefits pb WHERE pb.benefit_id = b.id
+        )
+        OR
+        -- Product-specific: journey contains a qualifying product
+        EXISTS (
+          SELECT 1 FROM dt_product_benefits pb
+          JOIN dt_products pr ON pr.id = pb.product_id
+          WHERE pb.benefit_id = b.id
+            AND pr.product_code = ANY($2::text[])
+        )
+      )
     ORDER BY b.created_at ASC
   `;
   try {
-    const { rows } = await db.query(sql, [city_code]);
+    const { rows } = await db.query(sql, [city_code, codes]);
     return rows.map(r => ({
       benefit_id:   r.benefit_id,
       benefit_type: r.benefit_type,
@@ -105,7 +131,7 @@ async function fetchActiveBenefits(city_code = 'yeosu') {
  * @param {string} [opts.city_code] — defaults to 'yeosu'
  * @returns {Promise<HospitalityResponse>}
  */
-async function getHospitalityPreview({ guestCount, city_code = 'yeosu' }) {
+async function getHospitalityPreview({ guestCount, city_code = 'yeosu', product_codes = [] }) {
   const eligibility = checkHospitalityEligibility({ guestCount });
   if (!eligibility.eligible) {
     return {
@@ -117,7 +143,8 @@ async function getHospitalityPreview({ guestCount, city_code = 'yeosu' }) {
     };
   }
 
-  const benefits = await fetchActiveBenefits(city_code);
+  const codes = Array.isArray(product_codes) ? product_codes : [];
+  const benefits = await fetchActiveBenefits(city_code, codes);
 
   return {
     eligible: true,

@@ -18,7 +18,7 @@ const express = require('express');
 const router = express.Router();
 const { getHospitalityPreview, checkHospitalityEligibility } = require('../services/hospitalityService');
 
-// GET /api/dt/lumi/hospitality?guest_count=2&city=yeosu
+// GET /api/dt/lumi/hospitality?guest_count=2&city=yeosu&product_codes=sp_fireworks_bundle,sp_fireworks_cruise
 router.get('/hospitality', async (req, res) => {
   const rawGuestCount = req.query.guest_count;
   const city_code = (req.query.city || 'yeosu').replace(/[^a-z]/gi, '').toLowerCase() || 'yeosu';
@@ -32,8 +32,15 @@ router.get('/hospitality', async (req, res) => {
     });
   }
 
+  // product_codes: comma-separated dt_products.product_code values from the journey.
+  // Only alphanumeric + underscore allowed. Empty array = only generic benefits returned.
+  const product_codes = (req.query.product_codes || '')
+    .split(',')
+    .map(s => s.trim().replace(/[^a-z0-9_]/gi, ''))
+    .filter(Boolean);
+
   try {
-    const result = await getHospitalityPreview({ guestCount, city_code });
+    const result = await getHospitalityPreview({ guestCount, city_code, product_codes });
     return res.json(result);
   } catch (err) {
     console.error('[hospitalityRoutes] getHospitalityPreview failed:', err.message);
