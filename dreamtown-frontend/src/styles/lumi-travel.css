@@ -765,3 +765,33 @@
     flex-direction: row;
   }
 }
+
+/* PDF Download Button */
+.lumi-pdf-download {
+  margin: 12px 0 4px;
+}
+.lumi-pdf-btn {
+  width: 100%;
+  padding: 12px 20px;
+  background: #1a1a2e;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.lumi-pdf-btn:hover:not(:disabled) {
+  background: #2d2d6b;
+}
+.lumi-pdf-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.lumi-pdf-error {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #c0392b;
+  text-align: center;
+}

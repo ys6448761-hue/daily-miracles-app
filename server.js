@@ -2989,6 +2989,15 @@ if (!IS_STORYBOOK_MODE) {
   }
 }
 
+// ---------- Route PDF Routes (/api/dt/lumi/route-pdf) ----------
+try {
+  const routePdfRoutes = require('./routes/routePdfRoutes');
+  app.use('/api/dt/lumi', routePdfRoutes);
+  console.log('✅ Route PDF 라우터 등록 완료 (/api/dt/lumi/route-pdf)');
+} catch (e) {
+  console.warn('⚠️ routePdfRoutes 로드 실패:', e.message);
+}
+
 // ---------- 공명 관리자 대시보드 (/admin/resonance) ----------
 app.get('/admin/resonance', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin', 'resonance.html'));

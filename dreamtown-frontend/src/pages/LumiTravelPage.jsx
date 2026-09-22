@@ -363,6 +363,7 @@ function RecommendationResult({ recommendations, onNewQuestion }) {
 
       {/* MY ROUTE — Day 1 / Day 2 skeleton (only for multi-day trips) */}
       <MyRoute route={recommendations.route} />
+      <DownloadRouteButton route={recommendations.route} quote={recommendations.quote} />
 
       {/* Quote summary (Commerce Bridge — null when not a commerce query) */}
       <QuoteSummary quote={recommendations.quote} />
@@ -395,6 +396,54 @@ function RecommendationResult({ recommendations, onNewQuestion }) {
       <button className="lumi-new-question-btn" onClick={onNewQuestion} type="button">
         다른 질문 하기
       </button>
+    </div>
+  );
+}
+
+function DownloadRouteButton({ route, quote }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  if (!route || !quote) return null;
+
+  const handleDownload = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/dt/lumi/route-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ route, quote })
+      });
+      if (!res.ok) throw new Error('PDF 생성 실패');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      a.download = `여수-여정-${today}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      setError('PDF 저장에 실패했습니다. 다시 시도해 주세요.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="lumi-pdf-download">
+      <button
+        className="lumi-pdf-btn"
+        onClick={handleDownload}
+        disabled={loading}
+        type="button"
+      >
+        {loading ? '생성 중...' : '내 일정 PDF 저장'}
+      </button>
+      {error && <p className="lumi-pdf-error">{error}</p>}
     </div>
   );
 }
