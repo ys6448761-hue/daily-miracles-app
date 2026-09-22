@@ -12,20 +12,29 @@ const fs = require('fs');
 const path = require('path');
 
 // ── Font CSS (loaded once, reused) ─────────────────────────────────────────
+// Embeds only Korean subset woff2 as base64 — no Google Fonts, no file:// URLs.
+// Throws explicitly if font file is missing (do not silently fall back).
 
 let _fontCssCache = null;
 function buildFontFaceCSS() {
   if (_fontCssCache) return _fontCssCache;
-  const fontsDir = path.join(__dirname, '..', 'node_modules', '@fontsource', 'noto-sans-kr');
-  const filesAbsolute = path.join(fontsDir, 'files').replace(/\\/g, '/');
-  const fileUrl = `file:///${filesAbsolute}`;
-
-  const css400 = fs.readFileSync(path.join(fontsDir, '400.css'), 'utf8')
-    .replace(/url\(\.\/files\//g, `url(${fileUrl}/`);
-  const css700 = fs.readFileSync(path.join(fontsDir, '700.css'), 'utf8')
-    .replace(/url\(\.\/files\//g, `url(${fileUrl}/`);
-
-  _fontCssCache = css400 + '\n' + css700;
+  const pkgRoot = path.dirname(require.resolve('@fontsource/noto-sans-kr/package.json'));
+  const woff2Path = path.join(pkgRoot, 'files', 'noto-sans-kr-korean-400-normal.woff2');
+  let fontBase64;
+  try {
+    fontBase64 = fs.readFileSync(woff2Path).toString('base64');
+  } catch (e) {
+    throw new Error(
+      `[routePdfService] Korean font not found at ${woff2Path}. ` +
+      `Ensure @fontsource/noto-sans-kr is in production dependencies. Original: ${e.message}`
+    );
+  }
+  _fontCssCache = `@font-face {
+  font-family: 'Noto Sans KR';
+  font-weight: 400;
+  font-style: normal;
+  src: url('data:font/woff2;base64,${fontBase64}') format('woff2');
+}`;
   return _fontCssCache;
 }
 
@@ -182,10 +191,12 @@ function buildRoutePdfHtml(route, quote) {
       </div>`;
   }
 
-  const partyLabel = route.party === 'couple' ? '2인 커플'
-    : route.party === 'family' ? '가족'
-    : route.party === 'group' ? '단체'
-    : route.party ? route.party : '';
+  const partyType = route.party?.type || route.party;
+  const partyCount = route.party?.count;
+  const partyLabel = partyType === 'couple' ? `${partyCount || 2}인 커플`
+    : partyType === 'family' ? `가족 ${partyCount ? partyCount + '인' : ''}`
+    : partyType === 'group' ? `단체 ${partyCount ? partyCount + '인' : ''}`
+    : partyCount ? `${partyCount}인` : '';
 
   const dateRange = route.start_date
     ? `${fmtDate(route.start_date)}${route.end_date ? ` ~ ${fmtDate(route.end_date)}` : ''}`
@@ -304,7 +315,7 @@ async function generateRoutePdf(routeData, quoteData) {
       headless: chromium.headless
     });
     const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0' });
+    await page.setContent(html, { waitUntil: 'domcontentloaded' });
     await page.evaluateHandle('document.fonts.ready');
     const pdfBuffer = await page.pdf({
       format: 'A4',
