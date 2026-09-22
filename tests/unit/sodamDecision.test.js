@@ -114,7 +114,7 @@ describe('sodamDecisionService.decide()', () => {
     expect(result.candidate.inventory_id).toBe(INV_DBL_ID);
     expect(result.preference_basis).toBe('USER_EXPLICIT');
     expect(result.candidate.price_source).toBe('STATIC_CONFIG');
-    expect(result.candidate.price_source_version).toBe('v1.2_20260112');
+    expect(result.candidate.price_source_version).toBe('v1.3_20260922');
     expect(typeof result.candidate.price_sell).toBe('number');
     expect(result.candidate.price_sell).toBeGreaterThan(0);
     expect(result.decision_id).toBeTruthy();
@@ -347,7 +347,7 @@ describe('sodamDecisionService.decide()', () => {
     );
 
     expect(result.candidate.price_source).toBe('STATIC_CONFIG');
-    expect(result.candidate.price_source_version).toBe('v1.2_20260112');
+    expect(result.candidate.price_source_version).toBe('v1.3_20260922');
     expect(typeof result.candidate.price_sell).toBe('number');
     expect(result.candidate.price_sell).toBeGreaterThan(0);
     expect(typeof result.candidate.price_list).toBe('number');
@@ -382,7 +382,7 @@ describe('sodamRoutes', () => {
         inventory_id: INV_DBL_ID,
         price_sell: 50000,
         price_source: 'STATIC_CONFIG',
-        price_source_version: 'v1.2_20260112'
+        price_source_version: 'v1.3_20260922'
       },
       preference_basis: 'USER_EXPLICIT',
       sowon_id: SOWON_A,

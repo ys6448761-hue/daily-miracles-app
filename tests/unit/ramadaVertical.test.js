@@ -127,7 +127,7 @@ describe('sodamDecisionService.decide() — Ramada', () => {
     expect(result.candidate.price_list).toBe(90000);  // quotePriceData.js Ramada mon-thu 2인 list
     expect(result.candidate.day_type).toBe('mon-thu');
     expect(result.candidate.price_source).toBe('STATIC_CONFIG');
-    expect(result.candidate.price_source_version).toBe('v1.2_20260112');
+    expect(result.candidate.price_source_version).toBe('v1.3_20260922');
     // DB query must use RAMADA_PARTNER_ID (not KENNY_PARTNER_ID)
     expect(localDb.query.mock.calls[0][1][0]).toBe(RAMADA_PARTNER_ID);
   });

@@ -124,10 +124,10 @@ test('TEST 1 — RAMADA+cable 2인 2026-10-17: quote CALCULATED, prices match en
   expect(q.pricing.totalList).toBe(expected.pricing.totalList);
   expect(q.pricing.totalSavings).toBe(expected.pricing.totalSavings);
 
-  // Confirm baseline (sat 2인 ramada=140K + cable×2=32K = 172K)
+  // Confirm baseline (sat 2인 ramada=140K + cable×2=32K = 172K, list=209K, savings=37K)
   expect(q.pricing.totalSell).toBe(172000);
-  expect(q.pricing.totalList).toBe(215000);
-  expect(q.pricing.totalSavings).toBe(43000);
+  expect(q.pricing.totalList).toBe(209000);
+  expect(q.pricing.totalSavings).toBe(37000);
 });
 
 // ─── TEST 2: Hotel change — RAMADA → KENNY (full re-statement) ───────────────

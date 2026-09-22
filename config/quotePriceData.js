@@ -22,11 +22,11 @@ module.exports = {
   // ═══════════════════════════════════════════════════════════════════════════
   meta: {
     schemaVersion: "1.0.0",
-    priceVersion: "v1.2_20260112",  // 가격/정책 패치 버전 (필수 표기)
+    priceVersion: "v1.3_20260922",  // 가격/정책 패치 버전 (필수 표기)
     defaultRegion: "yeosu",
     currency: "KRW",
-    lastUpdated: "2026-01-12",
-    updatedBy: "푸르미르 CEO 확정 (v1.2 운영비 10,000원/인)"
+    lastUpdated: "2026-09-22",
+    updatedBy: "푸르미르 CEO 확정 (v1.3 케이블카 LIST 17,000 정렬)"
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -262,8 +262,8 @@ module.exports = {
           name: "케이블카",
           costChannel: "paper",  // 지류권 기본 (추후 mobile/center 확장 가능)
           // weekday: 월~목, weekend: 금~일+공휴일 (개인/왕복)
-          weekday: { cost: 15000, sell: 16000, list: 20000 },
-          weekend: { cost: 15000, sell: 16000, list: 20000 },
+          weekday: { cost: 15000, sell: 16000, list: 17000 },
+          weekend: { cost: 15000, sell: 16000, list: 17000 },
           // 단체 편도 (2026-09-21 Founder 확정)
           group_oneway: { cost: 11000, sell: 12000, list: 14000 }
         },

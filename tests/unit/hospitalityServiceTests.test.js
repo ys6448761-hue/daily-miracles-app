@@ -73,10 +73,10 @@ function makeGenericRestaurantBenefit(overrides = {}) {
 const FOUNDER_QUOTE = {
   guestCount: 2,
   status: 'CALCULATED',
-  pricing: { totalList: 215000, totalSell: 172000, totalSavings: 43000 },
+  pricing: { totalList: 209000, totalSell: 172000, totalSavings: 37000 },
   breakdown: [
     { name: '라마다 호텔 여수', list: 175000, sell: 140000, code: 'ramada', category: 'hotel' },
-    { name: '여수 해상케이블카', list: 40000,  sell: 32000,  code: 'cable',  category: 'leisure' },
+    { name: '여수 해상케이블카', list: 34000,  sell: 32000,  code: 'cable',  category: 'leisure' },
   ],
 };
 
@@ -213,11 +213,11 @@ test('T9: PREVIEW benefit → QR/credential/secret 없음', async () => {
 
 // ── T10: Hospitality가 MY QUOTE 금액을 변경하지 않음 ─────────────────────────
 
-test('T10: Hospitality는 totalSell=172,000 / savings=43,000을 변경하지 않음', async () => {
+test('T10: Hospitality는 totalSell=172,000 / savings=37,000을 변경하지 않음', async () => {
   // Hospitality는 quote pricing을 입력/출력으로 받지 않음
   const quotePayload = { ...FOUNDER_QUOTE };
   expect(quotePayload.pricing.totalSell).toBe(172000);
-  expect(quotePayload.pricing.totalSavings).toBe(43000);
+  expect(quotePayload.pricing.totalSavings).toBe(37000);
 
   // getHospitalityPreview signature에 pricing/totalSell/savings 없음
   const paramStr = getHospitalityPreview.toString().match(/\{([^}]+)\}/)?.[1] || '';

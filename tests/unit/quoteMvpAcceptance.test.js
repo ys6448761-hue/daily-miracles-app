@@ -150,7 +150,7 @@ describe('D. Group Cable Car — group_oneway price', () => {
   test('D-2: individual cable car pricing unchanged', () => {
     const cable = priceData.regions.yeosu.leisure.cable;
     expect(cable.weekday.sell).toBe(16000);
-    expect(cable.weekday.list).toBe(20000);
+    expect(cable.weekday.list).toBe(17000);
     expect(cable.weekend.sell).toBe(16000);
   });
 
@@ -213,7 +213,7 @@ describe('D-ext. Group Cable Car — quoteEngine wire-up', () => {
     const r = calc({ guestCount: 4, hotel: 'ramada', leisure: 'cable', travelDate: '2026-09-22', region: 'yeosu' });
     const cableItem = r.breakdown.find(b => b.category === 'leisure');
     expect(cableItem.sell).toBe(16000 * 4); // individual price, not group_oneway
-    expect(cableItem.list).toBe(20000 * 4);
+    expect(cableItem.list).toBe(17000 * 4);
   });
 });
 
