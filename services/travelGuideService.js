@@ -1154,6 +1154,21 @@ class TravelGuideService {
 
     return selected;
   }
+
+  /**
+   * Fetch a single place by code for PLACE_LOOKUP intent.
+   * Returns null when code not found or DB unavailable.
+   */
+  async getPlaceByCode(code) {
+    const query = 'SELECT * FROM travel_places WHERE code = $1 LIMIT 1';
+    try {
+      const result = await db.query(query, [code]);
+      return result.rows[0] || null;
+    } catch (err) {
+      console.error('[TG_PLACE_LOOKUP_ERROR]', { code, message: err.message });
+      return null;
+    }
+  }
 }
 
 module.exports = new TravelGuideService();

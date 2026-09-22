@@ -22,6 +22,208 @@ const quoteEngine = require('./quoteEngine');
 const CAPABILITY = 'TRAVEL_INTELLIGENCE';
 const SOURCE = 'travelGuideService/8-filter-cascade';
 
+// ─── PLACE_LOOKUP: alias map ──────────────────────────────────────────────────
+// Maps Korean name/alias → travel_places.code
+// Only verified travel_places codes. Alias ≠ unverified place name.
+const PLACE_ALIAS_MAP = {
+  '이순신광장':     'lee_soon_shin_plaza',
+  '이순신 광장':    'lee_soon_shin_plaza',
+  '오동도':         'odongdo',
+  '향일암':         'hyangiram',
+  '케이블카':       'cablecar',
+  '해상케이블카':   'cablecar',
+  '여수 해상케이블카': 'cablecar',
+  '자산공원':       'jaisan_park',
+  '돌산대교':       'dolsan_daegyo',
+  '돌산공원':       'dolsan_nightscape',
+  '낭만포차거리':   'romantic_pojangmacha',
+  '포차거리':       'romantic_pojangmacha',
+  '낭만포차':       'romantic_pojangmacha',
+  '중앙시장':       'jungang_market',
+  '여수중앙시장':   'jungang_market',
+  '스카이타워':     'sky_tower',
+  '해양공원':       'marine_park',
+  '종포해양공원':   'marine_park',
+  '엑스포공원':     'yeosu_expo_park',
+  '여수엑스포장':   'yeosu_expo_park',
+  '엑스포장':       'yeosu_expo_park',
+};
+
+// Strong lookup verbs — unambiguously signal "tell me ABOUT this place"
+// 20-char proximity window from alias end
+const STRONG_LOOKUP = /에 대해|설명해줘|설명해주세요|어떤 곳이야|이란 뭐|뭐야/;
+const STRONG_PROXIMITY = 20;
+
+// Medium lookup verbs — need tight proximity (≤ 6 chars) to avoid false positives
+// e.g. "케이블카 포함해서 알려줘" → "알려줘" is 9+ chars away → NOT lookup
+const MEDIUM_LOOKUP = /알려줘|알려주세요|어때\??|어떤가요|은\?|는\?|이야\??/;
+const MEDIUM_PROXIMITY = 6;
+
+// DISCOVERY overrides — when any of these appear, treat as DISCOVERY
+// even if a known place alias is present in the message
+const DISCOVERY_OVERRIDES = /근처|어디 갈|어디가 좋|갈만|가볼 만|추천해|뭐 할까|어디서|같이 갈|같이 어디|타고 싶|가고 싶|하고 싶|일정|비용|얼마|포함/;
+
+// Place-like noun suffixes — for unknown place detection
+const PLACE_SUFFIX_RE = /공원|시장|광장|대교|타워|암자|향일암|해변|마을|포차거리|케이블카|전망대|박물관|기념관|해수욕/;
+
+// Strong lookup for full-message unknown-place check
+const STRONG_LOOKUP_ANY = /에 대해|설명해줘|설명해주세요/;
+
+/**
+ * Detect PLACE_LOOKUP intent from raw message.
+ * Returns { isPlaceLookup, placeName, resolvedCode }
+ *
+ * Rules:
+ * 1. No DISCOVERY override signals → otherwise DISCOVERY wins.
+ * 2. KNOWN alias: STRONG lookup within 20 chars OR MEDIUM lookup within 6 chars of alias end.
+ * 3. UNKNOWN place (no alias): PLACE_SUFFIX + STRONG_LOOKUP_ANY anywhere in message.
+ */
+function _detectPlaceLookupIntent(message) {
+  if (!message) return { isPlaceLookup: false };
+
+  // DISCOVERY override always wins
+  if (DISCOVERY_OVERRIDES.test(message)) return { isPlaceLookup: false };
+
+  // Try to match a known alias (longest-first for specificity)
+  const aliases = Object.keys(PLACE_ALIAS_MAP).sort((a, b) => b.length - a.length);
+  for (const alias of aliases) {
+    const idx = message.indexOf(alias);
+    if (idx === -1) continue;
+    const afterAlias = message.slice(idx + alias.length);
+    if (STRONG_LOOKUP.test(afterAlias.slice(0, STRONG_PROXIMITY))) {
+      return { isPlaceLookup: true, placeName: alias, resolvedCode: PLACE_ALIAS_MAP[alias] };
+    }
+    if (MEDIUM_LOOKUP.test(afterAlias.slice(0, MEDIUM_PROXIMITY))) {
+      return { isPlaceLookup: true, placeName: alias, resolvedCode: PLACE_ALIAS_MAP[alias] };
+    }
+  }
+
+  // No known alias — check if message mentions an unknown place-like noun with a strong lookup verb
+  if (PLACE_SUFFIX_RE.test(message) && STRONG_LOOKUP_ANY.test(message)) {
+    const verbMatch = message.match(/^(.+?)\s*(에 대해|설명해줘|설명해주세요)/);
+    const placeName = verbMatch ? verbMatch[1].trim() : message.replace(/[?!。，,.]/g, '').trim();
+    return { isPlaceLookup: true, placeName, resolvedCode: null };
+  }
+
+  return { isPlaceLookup: false };
+}
+
+/**
+ * Build SOUL explanation for a known verified place.
+ * Uses only available DB fields — never fabricates facts.
+ */
+function _buildPlaceLookupMessage(place) {
+  const parts = [];
+  const name = place.name_ko;
+
+  parts.push(`${name}에 대해 알려드릴게요.`);
+
+  // Description if available
+  if (place.description_short) {
+    parts.push(place.description_short);
+  }
+
+  // Indoor/outdoor
+  const io = place.indoor_outdoor;
+  if (io === 'outdoor')          parts.push('야외 공간이에요.');
+  else if (io === 'indoor')      parts.push('실내 시설이에요.');
+  else if (io === 'indoor_outdoor' || io === 'mixed') parts.push('실내·외 혼합 공간이에요.');
+
+  // Stay time
+  if (place.avg_stay_minutes) {
+    const t = place.avg_stay_minutes;
+    const tLabel = t < 60 ? `${t}분` : t % 60 === 0 ? `${t / 60}시간` : `약 ${Math.round(t / 60)}시간`;
+    parts.push(`평균 체류시간은 약 ${tLabel}이에요.`);
+  }
+
+  // Admission fee
+  const fee = place.admission_fee_json;
+  if (fee && typeof fee.adult === 'number') {
+    if (fee.adult === 0) {
+      parts.push('입장료는 무료예요.');
+    } else {
+      const feeStr = fee.adult.toLocaleString();
+      const extraFees = [];
+      if (typeof fee.youth === 'number')  extraFees.push(`청소년 ${fee.youth.toLocaleString()}원`);
+      if (typeof fee.child === 'number')  extraFees.push(`어린이 ${fee.child.toLocaleString()}원`);
+      const extraStr = extraFees.length ? ` / ${extraFees.join(' / ')}` : '';
+      parts.push(`성인 입장료 ${feeStr}원이에요${extraStr}.`);
+    }
+  } else if (fee === null && place.code === 'cablecar') {
+    parts.push('이용 요금이 있어요. 상세 금액은 예약 시 안내드려요.');
+  }
+
+  // Opening hours
+  const hours = place.opening_hours_json;
+  if (hours) {
+    const monHours = hours.mon || hours.tue || hours.wed;
+    if (monHours) {
+      parts.push(`운영시간 ${monHours} (방문 전 확인 권장).`);
+    }
+  }
+
+  // Physical difficulty
+  if (place.physical_difficulty === 'high') {
+    parts.push('계단과 경사가 있어 보행이 불편한 분들은 주의가 필요해요.');
+  }
+
+  // Live status caution — only when explicitly required (not outdoor public spaces)
+  if (place.live_status_required) {
+    parts.push('방문 전 운영 여부를 꼭 확인해보세요.');
+  }
+
+  return parts.join('\n');
+}
+
+/**
+ * Client payload for a successfully resolved PLACE_LOOKUP.
+ * Single place in `places[]` — backward-compatible with card-based frontend.
+ */
+function _buildPlaceLookupClientPayload(place, sessionId) {
+  return {
+    session_id: sessionId,
+    understood_context: {},
+    places: [place],
+    why_details: [],
+    message_ko: _buildPlaceLookupMessage(place),
+    status: 'PLACE_LOOKUP',
+    intent: 'PLACE_LOOKUP',
+    resolved_code: place.code,
+    next_options: [],
+    timestamp: new Date().toISOString(),
+    shared_journey: null,
+    quote: null,
+    route: null,
+  };
+}
+
+/**
+ * Client payload for an UNKNOWN named-place query.
+ * DO NOT substitute an unrelated place — return PLACE_UNKNOWN.
+ */
+function _buildUnknownPlacePayload(placeName, sessionId) {
+  const safeName = (placeName || '').replace(/[<>]/g, '').trim();
+  return {
+    session_id: sessionId,
+    understood_context: {},
+    places: [],
+    why_details: [],
+    message_ko: [
+      `${safeName}에 대해 물어보셨군요.`,
+      `현재 제가 가진 검증된 장소 정보에서는 찾을 수 없어요.`,
+      `가고 싶은 분위기나 조건을 알려주시면, 맞는 곳을 찾아드릴게요.`,
+    ].join('\n'),
+    status: 'PLACE_UNKNOWN',
+    intent: 'PLACE_LOOKUP',
+    resolved_code: null,
+    next_options: ['가고 싶은 분위기를 알려주세요'],
+    timestamp: new Date().toISOString(),
+    shared_journey: null,
+    quote: null,
+    route: null,
+  };
+}
+
 // ─── Private: Understand ─────────────────────────────────────────────────────
 
 // Deterministic post-extraction correction for couple/partner language.
@@ -468,6 +670,19 @@ function _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionI
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
+  // PLACE_LOOKUP DETECTION (deterministic, pre-GPT)
+  // Exact/alias match → skip ranking. Unknown → PLACE_UNKNOWN (no substitution).
+  const placeLookup = _detectPlaceLookupIntent(message);
+  if (placeLookup.isPlaceLookup) {
+    if (placeLookup.resolvedCode) {
+      const place = await travelGuideService.getPlaceByCode(placeLookup.resolvedCode);
+      if (place) {
+        return { ok: true, payload: _buildPlaceLookupClientPayload(place, sessionId) };
+      }
+    }
+    return { ok: true, payload: _buildUnknownPlacePayload(placeLookup.placeName, sessionId) };
+  }
+
   // UNDERSTAND + SHARED JOURNEY EXTRACTION (parallel — independent AI calls)
   const [understandResult, sharedJourney] = await Promise.all([
     _understand(message),
