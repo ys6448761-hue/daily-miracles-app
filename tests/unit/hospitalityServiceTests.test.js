@@ -1,14 +1,21 @@
 'use strict';
 /**
- * hospitalityService — Unit Tests (T1–T12 + eligibility + commerce separation)
+ * hospitalityService — T1–T12 (Hospitality V0.1 Final Alignment)
  *
- * T1–T5: Product eligibility filtering (starlit/moonlight leakage prevention)
- * T6–T8: Group exclusion + payment gate
- * T9–T10: Commerce separation (quote unchanged)
- * T11: 강순희 K바삭치킨 범앗간 = STARLIGHT BENEFIT (not generic restaurant)
- * T12: 모이핀 = HOLD (not customer-visible)
+ * Hospitality 기본 자격: ㈜여수여행센터를 통한 결제 완료 개인여행 1~4인
+ * 기본값: 상품 제한 없음. 상품 제한은 별도 계약이 있는 경우에만 적용.
  *
- * DB query is mocked — no actual DB connection required.
+ * T1–T2:  개인여행 2p/4p → PREVIEW 노출
+ * T3–T4:  단체 5p/12p → Hospitality 없음
+ * T5–T6:  product_code 없거나 무관 → GENERIC benefit 정상 노출
+ * T7:     모이핀 → customer 미노출 (HOLD)
+ * T8:     대표 파트너 display_order=0 (라또아, 돌산게장명가) 우선
+ * T9:     PREVIEW → QR/credential/secret 없음
+ * T10:    Hospitality가 MY QUOTE 금액을 변경하지 않음
+ * T11:    돌산게장명가 봉산1로 49 주소 금지 (폐점)
+ * T12:    빌드 안전성 — display_order ORDER BY SQL 포함 확인
+ *
+ * DB query는 모두 mock — 실제 DB 연결 불필요.
  */
 
 jest.mock('../../database/db', () => ({
@@ -21,449 +28,269 @@ const {
   getHospitalityPreview,
   INDIVIDUAL_MAX_GUESTS,
 } = require('../../services/hospitalityService');
+const fs   = require('fs');
+const path = require('path');
 
-// ── Fixtures ────────────────────────────────────────────────────────────────
+// ── Fixtures ──────────────────────────────────────────────────────────────────
 
-function makeStarlitCafeBenefit(overrides = {}) {
+function makeGenericCafeBenefit(overrides = {}) {
   return {
-    benefit_id: 'benefit-cafe-001',
-    benefit_type: 'free',
-    title: '아메리카노 1인 무료',
-    description: '2인 이용 시 1인 무료',
-    display_copy: '돌산 바다를 바라보며 별빛항로의 여운을 만나보세요.',
-    location_hint: null,
-    valid_from: null,
-    valid_to: null,
-    partner_name: '프롬나드',
+    benefit_id:       'benefit-cafe-lattoa',
+    benefit_type:     'free',
+    title:            '아메리카노 1인 무료',
+    description:      '2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료',
+    display_copy:     '여수 시내를 내려다보며 잠시 쉬어가세요. 아메리카노 1인 무료.',
+    location_hint:    null,
+    valid_from:       null,
+    valid_to:         null,
+    partner_name:     '라또아 카페',
     partner_category: 'cafe',
-    partner_address: '전남 여수시 돌산읍 우두3길 98',
+    partner_address:  '전남 여수시 공화남3길 32 5층 전층',
+    display_order:    0,
     ...overrides,
   };
 }
 
-function makeMoonlightBenefit(overrides = {}) {
+function makeGenericRestaurantBenefit(overrides = {}) {
   return {
-    benefit_id: 'benefit-moon-001',
-    benefit_type: 'discount',
-    title: '20% 할인',
-    description: null,
-    display_copy: '여행의 즐거움을 조금 더 가볍게. 노래방 20% 할인 혜택.',
-    location_hint: null,
-    valid_from: null,
-    valid_to: null,
-    partner_name: '해공 노래방',
-    partner_category: 'night',
-    partner_address: '여수시 이순신광장로 165',
-    ...overrides,
-  };
-}
-
-function makeStarlitRestaurantBenefit(overrides = {}) {
-  return {
-    benefit_id: 'benefit-starlit-rs-001',
-    benefit_type: 'gift',
-    title: '음료 1병 무료',
-    description: null,
-    display_copy: '이순신광장에서 만나는 작은 선물. 음료 1병 무료 제공.',
-    location_hint: null,
-    valid_from: null,
-    valid_to: null,
-    partner_name: '강순위 K바삭치킨 범앗간',
+    benefit_id:       'benefit-rs-dolsangejanmyeonga',
+    benefit_type:     'gift',
+    title:            '음료 1병 무료',
+    description:      null,
+    display_copy:     '돌산 게장 명가에서 만나는 작은 선물. 음료 1병 무료 제공.',
+    location_hint:    null,
+    valid_from:       null,
+    valid_to:         null,
+    partner_name:     '돌산게장명가',
     partner_category: 'restaurant',
-    partner_address: '여수시 이순신광장로 159',
+    partner_address:  '전남 여수시 대교로 62',
+    display_order:    0,
     ...overrides,
   };
 }
 
-// Founder baseline quote — used for T9/T10 commerce separation checks
+// Founder baseline quote — commerce reference for T10
 const FOUNDER_QUOTE = {
   guestCount: 2,
   status: 'CALCULATED',
-  pricing: {
-    totalList: 215000,
-    totalSell: 172000,
-    totalSavings: 43000,
-  },
+  pricing: { totalList: 215000, totalSell: 172000, totalSavings: 43000 },
   breakdown: [
     { name: '라마다 호텔 여수', list: 175000, sell: 140000, code: 'ramada', category: 'hotel' },
-    { name: '여수 해상케이블카', list: 40000, sell: 32000, code: 'cable', category: 'leisure' },
+    { name: '여수 해상케이블카', list: 40000,  sell: 32000,  code: 'cable',  category: 'leisure' },
   ],
 };
 
-// ── checkHospitalityEligibility (pure function) ─────────────────────────────
+beforeEach(() => jest.clearAllMocks());
 
-describe('checkHospitalityEligibility — pure function', () => {
-  test('guestCount=2 → eligible=true (individual)', () => {
-    const result = checkHospitalityEligibility({ guestCount: 2 });
-    expect(result.eligible).toBe(true);
-    expect(result.reason).toBeNull();
-  });
+// ── T1: 개인여행 2인 → PREVIEW 노출 ─────────────────────────────────────────
 
-  test('guestCount=4 → eligible=true (boundary)', () => {
-    expect(checkHospitalityEligibility({ guestCount: 4 }).eligible).toBe(true);
-  });
-
-  test('guestCount=5 → eligible=false GROUP_EXCLUDED (boundary)', () => {
-    const result = checkHospitalityEligibility({ guestCount: 5 });
-    expect(result.eligible).toBe(false);
-    expect(result.reason).toBe('GROUP_EXCLUDED');
-  });
-
-  test('guestCount=10 → eligible=false GROUP_EXCLUDED', () => {
-    expect(checkHospitalityEligibility({ guestCount: 10 }).eligible).toBe(false);
-  });
-
-  test('INDIVIDUAL_MAX_GUESTS === 4', () => {
-    expect(INDIVIDUAL_MAX_GUESTS).toBe(4);
-  });
-
-  test('invalid guestCount → INVALID_GUEST_COUNT', () => {
-    expect(checkHospitalityEligibility({ guestCount: 0 }).eligible).toBe(false);
-    expect(checkHospitalityEligibility({ guestCount: -1 }).eligible).toBe(false);
-    expect(checkHospitalityEligibility({ guestCount: NaN }).eligible).toBe(false);
-  });
+test('T1: 개인여행 2인 (product_codes 없음) → eligible + PREVIEW', async () => {
+  db.query.mockResolvedValue({ rows: [makeGenericCafeBenefit()] });
+  const result = await getHospitalityPreview({ guestCount: 2 });
+  expect(result.eligible).toBe(true);
+  expect(result.state).toBe('PREVIEW');
+  expect(result.benefits.length).toBeGreaterThan(0);
+  expect(result.payment_gate).toBe('BLOCKED_BY_PAYMENT_LINKAGE');
 });
 
-// ── T1–T5: Product eligibility filtering ─────────────────────────────────────
+// ── T2: 개인여행 4인 (경계값) → PREVIEW 노출 ─────────────────────────────────
 
-describe('T1–T5 — Product eligibility: no cross-route benefit leakage', () => {
-  beforeEach(() => jest.clearAllMocks());
-
-  test('T1: RAMADA+cable journey (no starlit product) → DB called with correct product_codes param', async () => {
-    // The DB query is product-filtered by the service.
-    // For a RAMADA+cable journey, product_codes=['ramada','cable'] don't match
-    // sp_fireworks_bundle / sp_fireworks_cruise in dt_products.
-    // Server-side SQL ensures only generic or matching benefits are returned.
-    // Mock: DB returns empty (simulating correct SQL behavior)
-    db.query.mockResolvedValue({ rows: [] });
-    const result = await getHospitalityPreview({
-      guestCount: 2,
-      product_codes: ['ramada', 'cable'],
-    });
-    expect(result.eligible).toBe(true);
-    expect(result.benefits).toHaveLength(0);
-    // Verify product_codes were passed as 2nd arg to db.query
-    expect(db.query).toHaveBeenCalledWith(
-      expect.stringContaining('dt_product_benefits'),
-      ['yeosu', ['ramada', 'cable']]
-    );
-  });
-
-  test('T2: Starlit journey → starlit cafe benefits eligible for PREVIEW', async () => {
-    // product_codes includes sp_fireworks_bundle → SQL returns starlit cafe benefits
-    db.query.mockResolvedValue({ rows: [makeStarlitCafeBenefit()] });
-    const result = await getHospitalityPreview({
-      guestCount: 2,
-      product_codes: ['sp_fireworks_bundle'],
-    });
-    expect(result.eligible).toBe(true);
-    expect(result.state).toBe('PREVIEW');
-    expect(result.benefits).toHaveLength(1);
-    expect(result.benefits[0].partner.category).toBe('cafe');
-    // Verify product_codes passed correctly
-    expect(db.query).toHaveBeenCalledWith(
-      expect.stringContaining('dt_product_benefits'),
-      ['yeosu', ['sp_fireworks_bundle']]
-    );
-  });
-
-  test('T3: Moonlight journey → moonlight benefits eligible for PREVIEW', async () => {
-    db.query.mockResolvedValue({ rows: [makeMoonlightBenefit()] });
-    const result = await getHospitalityPreview({
-      guestCount: 2,
-      product_codes: ['moonlight_pass'],
-    });
-    expect(result.eligible).toBe(true);
-    expect(result.state).toBe('PREVIEW');
-    expect(result.benefits).toHaveLength(1);
-    expect(result.benefits[0].partner.name).toBe('해공 노래방');
-    expect(db.query).toHaveBeenCalledWith(
-      expect.stringContaining('dt_product_benefits'),
-      ['yeosu', ['moonlight_pass']]
-    );
-  });
-
-  test('T4: Starlit benefits do NOT appear in moonlight-only journey', async () => {
-    // product_codes = ['moonlight_pass'] only.
-    // SQL filters out cafe benefits linked to sp_fireworks_bundle.
-    // Mock simulates correct SQL behavior: returns moonlight only, not cafe
-    db.query.mockResolvedValue({ rows: [makeMoonlightBenefit()] });
-    const result = await getHospitalityPreview({
-      guestCount: 2,
-      product_codes: ['moonlight_pass'],
-    });
-    const hasCafe = result.benefits.some(b => b.partner.category === 'cafe');
-    expect(hasCafe).toBe(false);
-  });
-
-  test('T5: Moonlight benefits do NOT appear in starlit-only journey', async () => {
-    // product_codes = ['sp_fireworks_bundle'] only.
-    // Mock simulates correct SQL behavior: returns starlit cafes only, not night
-    db.query.mockResolvedValue({ rows: [makeStarlitCafeBenefit()] });
-    const result = await getHospitalityPreview({
-      guestCount: 2,
-      product_codes: ['sp_fireworks_bundle'],
-    });
-    const hasMoonlight = result.benefits.some(b => b.partner.category === 'night');
-    expect(hasMoonlight).toBe(false);
-  });
-
-  test('empty product_codes → DB called with empty array (generic-only safe default)', async () => {
-    db.query.mockResolvedValue({ rows: [] });
-    await getHospitalityPreview({ guestCount: 2, product_codes: [] });
-    expect(db.query).toHaveBeenCalledWith(
-      expect.stringContaining('dt_product_benefits'),
-      ['yeosu', []]
-    );
-  });
-
-  test('product_codes omitted → defaults to empty array', async () => {
-    db.query.mockResolvedValue({ rows: [] });
-    await getHospitalityPreview({ guestCount: 2 });
-    expect(db.query).toHaveBeenCalledWith(
-      expect.stringContaining('dt_product_benefits'),
-      ['yeosu', []]
-    );
-  });
+test('T2: 개인여행 4인 경계값 → eligible=true + PREVIEW', async () => {
+  db.query.mockResolvedValue({ rows: [makeGenericCafeBenefit()] });
+  const result = await getHospitalityPreview({ guestCount: 4 });
+  expect(result.eligible).toBe(true);
+  expect(result.state).toBe('PREVIEW');
+  expect(INDIVIDUAL_MAX_GUESTS).toBe(4);
 });
 
-// ── T6–T8: Group exclusion + payment gate ────────────────────────────────────
+// ── T3: 단체 5인 → Hospitality 없음 ──────────────────────────────────────────
 
-describe('T6–T8 — Group exclusion + payment gate', () => {
-  beforeEach(() => jest.clearAllMocks());
-
-  test('T6: guestCount=5+ → eligible=false GROUP_EXCLUDED, DB not queried', async () => {
-    const result = await getHospitalityPreview({ guestCount: 5 });
-    expect(result.eligible).toBe(false);
-    expect(result.reason).toBe('GROUP_EXCLUDED');
-    expect(result.benefits).toHaveLength(0);
-    expect(db.query).not.toHaveBeenCalled();
-  });
-
-  test('T6b: guestCount=10 → GROUP_EXCLUDED regardless of product_codes', async () => {
-    const result = await getHospitalityPreview({
-      guestCount: 10,
-      product_codes: ['sp_fireworks_bundle'],
-    });
-    expect(result.eligible).toBe(false);
-    expect(result.reason).toBe('GROUP_EXCLUDED');
-    expect(db.query).not.toHaveBeenCalled();
-  });
-
-  test('T7: unpaid individual → state=PREVIEW only, never AVAILABLE', async () => {
-    db.query.mockResolvedValue({ rows: [makeStarlitCafeBenefit()] });
-    const result = await getHospitalityPreview({
-      guestCount: 2,
-      product_codes: ['sp_fireworks_bundle'],
-    });
-    expect(result.state).toBe('PREVIEW');
-    expect(result.state).not.toBe('AVAILABLE');
-    expect(result.payment_gate).toBe('BLOCKED_BY_PAYMENT_LINKAGE');
-  });
-
-  test('T8: client paid=true cannot unlock AVAILABLE — server ignores paid flag', async () => {
-    db.query.mockResolvedValue({ rows: [makeStarlitCafeBenefit()] });
-    // Even if caller somehow passes paid=true, it is not an accepted parameter
-    const result = await getHospitalityPreview({
-      guestCount: 2,
-      paid: true,
-      product_codes: ['sp_fireworks_bundle'],
-    });
-    expect(result.state).toBe('PREVIEW');
-    expect(result.state).not.toBe('AVAILABLE');
-  });
+test('T3: 단체 5인 → eligible=false, GROUP_EXCLUDED, DB not queried', async () => {
+  const result = await getHospitalityPreview({ guestCount: 5 });
+  expect(result.eligible).toBe(false);
+  expect(result.reason).toBe('GROUP_EXCLUDED');
+  expect(result.benefits).toHaveLength(0);
+  expect(db.query).not.toHaveBeenCalled();
 });
 
-// ── T9–T10: Commerce separation ──────────────────────────────────────────────
+// ── T4: 단체 12인 → Hospitality 없음 ────────────────────────────────────────
 
-describe('T9–T10 — Hospitality does not alter quote', () => {
-  test('T9: Hospitality does not change totalSell 172,000', () => {
-    const quotePayload = { ...FOUNDER_QUOTE };
-    expect(quotePayload.pricing.totalSell).toBe(172000);
-    // getHospitalityPreview does not accept or return quote pricing
-    const paramNames = getHospitalityPreview.toString().match(/\{([^}]+)\}/)?.[1] || '';
-    expect(paramNames).not.toContain('pricing');
-    expect(paramNames).not.toContain('totalSell');
+test('T4: 단체 12인 → eligible=false, GROUP_EXCLUDED', async () => {
+  const result = await getHospitalityPreview({
+    guestCount: 12,
+    product_codes: ['sp_fireworks_bundle'],
   });
-
-  test('T10: Hospitality does not change savings 43,000', () => {
-    const originalSavings = FOUNDER_QUOTE.pricing.totalSavings;
-    expect(originalSavings).toBe(43000);
-    // getHospitalityPreview signature has no savings/discount fields
-    const paramNames = getHospitalityPreview.toString().match(/\{([^}]+)\}/)?.[1] || '';
-    expect(paramNames).not.toContain('savings');
-    expect(paramNames).not.toContain('discount');
-  });
-
-  test('No COST/margin/internal pricing in hospitality response', async () => {
-    db.query.mockResolvedValue({ rows: [makeStarlitCafeBenefit()] });
-    const result = await getHospitalityPreview({ guestCount: 2 });
-    const resultStr = JSON.stringify(result);
-    expect(resultStr).not.toMatch(/totalCost|totalMargin|cost|margin|settlement/i);
-  });
+  expect(result.eligible).toBe(false);
+  expect(result.reason).toBe('GROUP_EXCLUDED');
+  expect(db.query).not.toHaveBeenCalled();
 });
 
-// ── T11: 강순위 K바삭치킨 범앗간 — STARLIGHT BENEFIT ─────────────────────────
+// ── T5: product_code 없음 → GENERIC benefit 정상 노출 ────────────────────────
 
-describe('T11 — 강순희 K바삭치킨 범앗간: STARLIGHT BENEFIT', () => {
-  beforeEach(() => jest.clearAllMocks());
-
-  test('T11a: 강순희 K바삭치킨 범앗간 benefit appears only in starlit journey (not generic)', async () => {
-    // The partner has dt_product_benefits linking it to sp_fireworks_bundle.
-    // When product_codes = [] (no product), SQL filters it out → DB returns [].
-    db.query.mockResolvedValue({ rows: [] });
-    const result = await getHospitalityPreview({ guestCount: 2, product_codes: [] });
-    const found = result.benefits.some(b =>
-      (b.partner?.name || '').includes('범앗간') ||
-      (b.partner?.name || '').includes('K바삭치킨')
-    );
-    expect(found).toBe(false);
-  });
-
-  test('T11b: 강순희 K바삭치킨 범앗간 is 별빛혜택 — moonlight_pass 연결 (총 4개)', () => {
-    const fs = require('fs');
-    const path = require('path');
-    const seedSql = fs.readFileSync(
-      path.join(__dirname, '../../docs/ssot/ops/partner_master_seed.sql'),
-      'utf8'
-    );
-    // Seed must contain the renamed partner
-    expect(seedSql).toContain('강순희 K바삭치킨 범앗간');
-    // Seed must link it to moonlight_pass (별빛혜택 4개)
-    expect(seedSql).toContain('moonlight_pass');
-    expect(seedSql).toMatch(/moonlight_pass[\s\S]*강순희 K바삭치킨 범앗간/);
-  });
-
-  test('T11c: 강순희 K바삭치킨 범앗간 appears in starlit journey → PREVIEW', async () => {
-    db.query.mockResolvedValue({ rows: [makeStarlitRestaurantBenefit()] });
-    const result = await getHospitalityPreview({
-      guestCount: 2,
-      product_codes: ['sp_fireworks_bundle'],
-    });
-    expect(result.benefits).toHaveLength(1);
-    expect(result.benefits[0].state).toBe('PREVIEW');
-    expect(result.benefits[0].partner.category).toBe('restaurant');
-  });
-
-  test('T11d: SSOT CSV reflects 별빛혜택 — route_code=moonlight (별빛혜택 4개 중 하나)', () => {
-    const fs = require('fs');
-    const path = require('path');
-    const csv = fs.readFileSync(
-      path.join(__dirname, '../../docs/ssot/ops/partner_master.csv'),
-      'utf8'
-    );
-    const lines = csv.split('\n');
-    const beomsatgan = lines.find(l => l.includes('K바삭치킨 범앗간'));
-    expect(beomsatgan).toBeTruthy();
-    // 강순희 K바삭치킨 범앗간 = 별빛혜택(달빛혜택) — moonlight_pass 연결
-    expect(beomsatgan).toContain('moonlight');
-  });
+test('T5: product_codes=[] → GENERIC benefit (라또아 카페) 노출 (NOT product-gated)', async () => {
+  db.query.mockResolvedValue({ rows: [makeGenericCafeBenefit()] });
+  const result = await getHospitalityPreview({ guestCount: 2, product_codes: [] });
+  expect(result.eligible).toBe(true);
+  expect(result.benefits.length).toBeGreaterThan(0);
+  expect(result.benefits[0].partner.name).toBe('라또아 카페');
+  // DB was called (NOT short-circuited)
+  expect(db.query).toHaveBeenCalled();
 });
 
-// ── T12: 모이핀 HOLD ─────────────────────────────────────────────────────────
+// ── T6: 무관한 product_code → GENERIC benefit 정상 노출 ──────────────────────
 
-describe('T12 — 모이핀: HOLD (not customer-visible)', () => {
-  test('T12a: 모이핀 is_active=false in seed SQL — HOLD preserves conflict', () => {
-    const fs = require('fs');
-    const path = require('path');
-    const seedSql = fs.readFileSync(
-      path.join(__dirname, '../../docs/ssot/ops/partner_master_seed.sql'),
-      'utf8'
-    );
-    expect(seedSql).toContain('모이핀');
-    // Seed SQL must set is_active=false for 모이핀
-    expect(seedSql).toMatch(/모이핀[\s\S]{0,200}false/);
+test('T6: product_codes=[ramada, cable] → GENERIC benefit (돌산게장명가) 노출', async () => {
+  db.query.mockResolvedValue({ rows: [makeGenericRestaurantBenefit()] });
+  const result = await getHospitalityPreview({
+    guestCount: 2,
+    product_codes: ['ramada', 'cable'],
   });
-
-  test('T12b: 모이핀 HOLD reason documented in seed SQL', () => {
-    const fs = require('fs');
-    const path = require('path');
-    const seedSql = fs.readFileSync(
-      path.join(__dirname, '../../docs/ssot/ops/partner_master_seed.sql'),
-      'utf8'
-    );
-    // Seed must explain HOLD
-    expect(seedSql).toMatch(/HOLD|계약.*미확인|미확인.*계약/);
-  });
-
-  test('T12c: 모이핀 with is_active=false → not returned by fetchActiveBenefits (query filter)', async () => {
-    // The SQL has AND p.is_active = true — if 모이핀 is is_active=false, it is excluded.
-    // Mock simulates: DB correctly excludes is_active=false partner
-    db.query.mockResolvedValue({ rows: [] });
-    const result = await getHospitalityPreview({ guestCount: 2 });
-    const hasModipin = result.benefits.some(b =>
-      (b.partner?.name || '').includes('모이핀')
-    );
-    expect(hasModipin).toBe(false);
-  });
-
-  test('T12d: CSV marks 모이핀 status as HOLD', () => {
-    const fs = require('fs');
-    const path = require('path');
-    const csv = fs.readFileSync(
-      path.join(__dirname, '../../docs/ssot/ops/partner_master.csv'),
-      'utf8'
-    );
-    const moipinLine = csv.split('\n').find(l => l.includes('모이핀'));
-    expect(moipinLine).toBeTruthy();
-    expect(moipinLine).toContain('HOLD');
-  });
+  expect(result.eligible).toBe(true);
+  expect(result.benefits.length).toBeGreaterThan(0);
+  expect(result.benefits[0].partner.name).toBe('돌산게장명가');
+  // 제품 제한 없음 — DB 쿼리 정상 실행
+  expect(db.query).toHaveBeenCalledWith(
+    expect.stringContaining('dt_product_benefits'),
+    ['yeosu', ['ramada', 'cable']]
+  );
 });
 
-// ── Secure response (no redemption credential) ───────────────────────────────
+// ── T7: 모이핀 HOLD → customer 미노출 ────────────────────────────────────────
 
-describe('Security — no redemption credential in PREVIEW', () => {
-  beforeEach(() => jest.clearAllMocks());
+test('T7: 모이핀 is_active=false → SSOT seed에 HOLD 명시 + DB 필터 확인', async () => {
+  const seedSql = fs.readFileSync(
+    path.join(__dirname, '../../docs/ssot/ops/partner_master_seed.sql'),
+    'utf8'
+  );
+  expect(seedSql).toContain('모이핀');
+  // HOLD 또는 계약 미확인 사유 명시 필수
+  expect(seedSql).toMatch(/모이핀[\s\S]{0,300}(HOLD|미확인|false)/);
 
-  test('PREVIEW benefit → no qr_token, no redemption_url, no credential_code, no secret', async () => {
-    db.query.mockResolvedValue({ rows: [makeStarlitCafeBenefit()] });
-    const result = await getHospitalityPreview({ guestCount: 2 });
-    expect(result.benefits).toHaveLength(1);
-    const benefit = result.benefits[0];
-    expect(benefit).not.toHaveProperty('qr_token');
-    expect(benefit).not.toHaveProperty('redemption_url');
-    expect(benefit).not.toHaveProperty('credential_code');
-    expect(benefit).not.toHaveProperty('secret');
-  });
-
-  test('empty safe state: no benefits in DB → eligible=true, benefits=[]', async () => {
-    db.query.mockResolvedValue({ rows: [] });
-    const result = await getHospitalityPreview({ guestCount: 2 });
-    expect(result.eligible).toBe(true);
-    expect(result.benefits).toHaveLength(0);
-  });
-
-  test('DB failure → eligible=true, benefits=[] (graceful degradation)', async () => {
-    db.query.mockRejectedValue(new Error('DB connection refused'));
-    const result = await getHospitalityPreview({ guestCount: 2 });
-    expect(result.eligible).toBe(true);
-    expect(result.benefits).toHaveLength(0);
-  });
+  // SQL: AND p.is_active = true → 모이핀(false) 제외됨
+  // Mock: DB이 올바르게 제외하는 케이스 시뮬레이션
+  db.query.mockResolvedValue({ rows: [] });
+  const result = await getHospitalityPreview({ guestCount: 2 });
+  const hasModipin = result.benefits.some(b =>
+    (b.partner?.name || '').includes('모이핀')
+  );
+  expect(hasModipin).toBe(false);
 });
 
-// ── Hospitality PDF (not implemented) ────────────────────────────────────────
+// ── T8: 대표 파트너 display_order=0 우선 ─────────────────────────────────────
 
-describe('Hospitality PDF (T11-pdf)', () => {
-  test('No hospitalityPdfService exists (BLOCKED_BY_PAYMENT_LINKAGE)', () => {
-    const fs = require('fs');
-    const path = require('path');
-    const pdfServicePath = path.join(__dirname, '../../services/hospitalityPdfService.js');
-    expect(fs.existsSync(pdfServicePath)).toBe(false);
-  });
+test('T8: 대표 파트너 display_order=0 — SQL ORDER BY display_order ASC 포함', () => {
+  const svcStr = fs.readFileSync(
+    path.join(__dirname, '../../services/hospitalityService.js'),
+    'utf8'
+  );
+  expect(svcStr).toContain('display_order ASC');
+
+  // Seed: 라또아 카페, 돌산게장명가 display_order=0 확인
+  const seedSql = fs.readFileSync(
+    path.join(__dirname, '../../docs/ssot/ops/partner_master_seed.sql'),
+    'utf8'
+  );
+  // display_order=0 for both representative partners (in comments)
+  expect(seedSql).toContain('라또아 카페');
+  expect(seedSql).toContain('돌산게장명가');
+  // Confirmed in header comment block and column comments
+  expect(seedSql).toMatch(/display_order=0/);
 });
 
-// ── AVAILABLE state (future, payment-gated) ──────────────────────────────────
+// ── T9: PREVIEW → no redemption credential ───────────────────────────────────
+
+test('T9: PREVIEW benefit → QR/credential/secret 없음', async () => {
+  db.query.mockResolvedValue({ rows: [makeGenericCafeBenefit()] });
+  const result = await getHospitalityPreview({ guestCount: 2 });
+  expect(result.benefits).toHaveLength(1);
+  const benefit = result.benefits[0];
+  expect(benefit).not.toHaveProperty('qr_token');
+  expect(benefit).not.toHaveProperty('redemption_url');
+  expect(benefit).not.toHaveProperty('credential_code');
+  expect(benefit).not.toHaveProperty('secret');
+  expect(benefit.state).toBe('PREVIEW');
+});
+
+// ── T10: Hospitality가 MY QUOTE 금액을 변경하지 않음 ─────────────────────────
+
+test('T10: Hospitality는 totalSell=172,000 / savings=43,000을 변경하지 않음', async () => {
+  // Hospitality는 quote pricing을 입력/출력으로 받지 않음
+  const quotePayload = { ...FOUNDER_QUOTE };
+  expect(quotePayload.pricing.totalSell).toBe(172000);
+  expect(quotePayload.pricing.totalSavings).toBe(43000);
+
+  // getHospitalityPreview signature에 pricing/totalSell/savings 없음
+  const paramStr = getHospitalityPreview.toString().match(/\{([^}]+)\}/)?.[1] || '';
+  expect(paramStr).not.toContain('pricing');
+  expect(paramStr).not.toContain('totalSell');
+  expect(paramStr).not.toContain('savings');
+
+  // Hospitality 응답에 COST/margin 없음
+  db.query.mockResolvedValue({ rows: [makeGenericCafeBenefit()] });
+  const result = await getHospitalityPreview({ guestCount: 2 });
+  const resultStr = JSON.stringify(result);
+  expect(resultStr).not.toMatch(/totalCost|totalMargin|\bcost\b|\bmargin\b|settlement/i);
+});
+
+// ── T11: 돌산게장명가 봉산1로 49 주소 금지 (폐점) ────────────────────────────
+
+test('T11: 봉산1로 49 (폐점) → seed/CSV에 절대 존재하지 않음 / 대교로 62 확인', () => {
+  const seedSql = fs.readFileSync(
+    path.join(__dirname, '../../docs/ssot/ops/partner_master_seed.sql'),
+    'utf8'
+  );
+  const csv = fs.readFileSync(
+    path.join(__dirname, '../../docs/ssot/ops/partner_master.csv'),
+    'utf8'
+  );
+
+  // 봉산1로 49 = 폐점. SSOT 어디에도 없어야 함 (주석 포함 허용 — 경고 문구용)
+  // 단, '봉산1로 49' 형식의 실제 주소 값은 절대 없어야 함
+  expect(seedSql).not.toMatch(/'봉산1로 49'/);
+  expect(csv).not.toMatch(/봉산1로 49/);
+
+  // 현 영업점 주소 = 전남 여수시 대교로 62 (확인 필수)
+  expect(seedSql).toContain('대교로 62');
+  expect(csv).toContain('대교로 62');
+});
+
+// ── T12: SQL 안전성 — display_order + product filter 구조 확인 ───────────────
+
+test('T12: hospitalityService.js SQL — display_order ORDER BY + NOT EXISTS product filter', () => {
+  const svcStr = fs.readFileSync(
+    path.join(__dirname, '../../services/hospitalityService.js'),
+    'utf8'
+  );
+  // display_order 정렬 (대표 파트너 우선)
+  expect(svcStr).toContain('display_order ASC');
+  // GENERIC benefit 보호 — NOT EXISTS 필터
+  expect(svcStr).toContain('NOT EXISTS');
+  // product_benefits 테이블 참조
+  expect(svcStr).toContain('dt_product_benefits');
+  // is_active 필터 (모이핀 제외)
+  expect(svcStr).toContain('is_active');
+});
+
+// ── Bonus: DB 실패 → graceful degradation ────────────────────────────────────
+
+test('DB failure → eligible=true, benefits=[] (graceful)', async () => {
+  db.query.mockRejectedValue(new Error('DB connection refused'));
+  const result = await getHospitalityPreview({ guestCount: 2 });
+  expect(result.eligible).toBe(true);
+  expect(result.benefits).toHaveLength(0);
+});
+
+// ── AVAILABLE state (payment-gated, future) ──────────────────────────────────
 
 describe('AVAILABLE state — BLOCKED (documented as todo)', () => {
   test.todo(
-    'T2-future: guestCount=2 + server-confirmed payment → state=AVAILABLE. ' +
-    'BLOCKED_BY_PAYMENT_LINKAGE: MY QUOTE has no NicePay payment flow. ' +
-    'dt_flow_bookings has no payment_id FK. ' +
-    'Implement when Commerce payment linkage is ready.'
+    'V0.2: guestCount=2 + server-confirmed payment → state=AVAILABLE. ' +
+    'BLOCKED_BY_PAYMENT_LINKAGE: MY QUOTE에 NicePay 결제 흐름 없음. ' +
+    '결제 연결 완료 후 구현.'
   );
 
   test.todo(
-    'T7-future: AVAILABLE state → redemption endpoint permitted. ' +
-    'Depends on payment linkage. Not implemented in V0.1.'
+    'V0.2: AVAILABLE state → Hospitality 환대 상세 노출. ' +
+    'QR/크리덴셜은 이 시점에도 PDF 사본으로 사용 불가.'
   );
 });

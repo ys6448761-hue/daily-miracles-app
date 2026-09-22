@@ -557,7 +557,7 @@ function HospitalitySection({ quote }) {
         <div>
           <p className="lumi-hospitality-title">여수에서 준비한 환대</p>
           <p className="lumi-hospitality-subtitle">
-            이 여행을 예약하면 여수에서 준비한 환대를 함께 받을 수 있어요.
+            여수여행센터와 함께하는 여행이라면, 여행 중 만나는 파트너들이 작은 환대를 준비해드려요.
           </p>
         </div>
       </div>
