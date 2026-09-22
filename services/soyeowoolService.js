@@ -592,7 +592,7 @@ function _mergeJourneyQuoteCtx(journeyCtx, messageCtx) {
 }
 
 // Build a CLARIFICATION payload — not DISCOVERING, no place cards.
-function _buildClarificationPayload(sessionId, messageKo) {
+function _buildClarificationPayload(sessionId, messageKo, sharedJourney) {
   return {
     session_id: sessionId,
     understood_context: {},
@@ -603,10 +603,78 @@ function _buildClarificationPayload(sessionId, messageKo) {
     presentation_mode: 'CLARIFICATION',
     quote: null,
     route: null,
-    shared_journey: null,
+    shared_journey: sharedJourney || null,
     timestamp: new Date().toISOString(),
     next_options: [],
   };
+}
+
+// Detect POSITIVE discovery intent — recommendation/exploration verbs required.
+// Discovery fires ONLY on positive evidence. Default is NO DISCOVERY.
+// "추천해줘", "어디 갈까", "갈 만한 곳" → true
+// "케이블카 타고 싶어", "일정 괜찮아?", "안녕" → false
+function _isDiscoveryIntent(message) {
+  if (!message) return false;
+  // Explicit recommendation verbs
+  if (/(추천해|추천해줘|추천해주|추천좀|추천 좀|알려줘|알려주세요|보여줘|보여주세요|찾아줘|찾아주세요)/.test(message)) return true;
+  // Discovery question forms — "어디 갈까", "어디가 좋아", "갈 곳 뭐 있어?"
+  if (/(어디 갈까|어디갈까|어디 가면|어디가면|어디가 좋|어디 가도|어디에 가|근처에 어디|어디 뭐|갈 곳 뭐|갈곳 뭐)/.test(message)) return true;
+  // Activity-seeking — "뭐 할까?" (post-plan discovery of what to do)
+  if (/(뭐 할까|뭐할까|무얼 할까|무엇을 할까)/.test(message)) return true;
+  // Discovery noun phrases — "갈 만한 곳", "가볼 만한 곳", "좋은 곳"
+  if (/(갈 만한|갈만한|가볼 만한|가볼만한|좋은 곳|좋은곳|가봐야|가야 할 곳|볼 곳|볼곳)/.test(message)) return true;
+  // Sightseeing intent
+  if (/(구경하고 싶|구경하고싶|구경 하고 싶)/.test(message)) return true;
+  return false;
+}
+
+// Generate a meaningful SOUL clarification response for non-discovery contexts.
+// SOUL is always responsible for the next turn — never silent, never blank.
+function _generateClarificationMessage(soulContext, message) {
+  const msg = message || '';
+  const pt = (soulContext && soulContext.people_type) || null;
+
+  // Walking constraint about companion
+  if (/(걷는 걸 싫어|걷기 싫어|걷기 힘들|걷지 못|걷기 어려|보행 어려)/.test(msg)) {
+    return '걷는 게 부담스럽지 않은 일정이 필요하시군요.\n현재 일정에서 덜 걷는 코스로 바꿔드릴까요?';
+  }
+
+  // Cable car intent without discovery verb
+  if (/케이블카|케이블 카/.test(msg)) {
+    if (/(꼭|반드시|타고 싶|타야|태워)/.test(msg)) {
+      return '케이블카를 꼭 타고 싶으시군요.\n날짜와 인원을 알려주시면 일정에 바로 포함해 드릴게요.';
+    }
+    return '케이블카에 대해 알고 싶으신 게 있으신가요?';
+  }
+
+  // Journey feedback — "이 일정 괜찮아?", "그거 괜찮아?"
+  if (/(이 일정|이 코스|이거|그거|그 일정).*(괜찮|좋아|어때)/.test(msg) ||
+      /^(괜찮아|어때|좋아)\??\s*$/.test(msg.trim())) {
+    return '어떤 부분이 마음에 걸리시나요?\n말씀해 주시면 함께 살펴볼게요.';
+  }
+
+  // Greeting
+  if (/^(안녕|안녕하세요|반가워|하이|hello|hi)\s*[!.?]?\s*$/i.test(msg.trim())) {
+    return '안녕하세요! 여수 여행을 도와드릴게요.\n어떤 여행을 생각하고 계신가요?';
+  }
+
+  // Indecision / open
+  if (/(잘 모르겠|모르겠어|뭐가 좋을|뭐 해야|어떡하|어쩌)/.test(msg)) {
+    return '괜찮아요. 천천히 얘기해주세요.\n여수에서 어떤 경험을 하고 싶으신가요?';
+  }
+
+  // Companion-aware generic fallback
+  if (pt === 'family_with_kids') {
+    return '아이와 함께하는 여행이시군요.\n어떤 경험을 찾고 계신지 조금 더 말씀해 주실 수 있나요?';
+  }
+  if (pt === 'couple') {
+    return '둘이 함께하는 여행이시군요.\n어디를 가고 싶으신지, 또는 일정 도움이 필요하신가요?';
+  }
+  if (pt === 'family_elderly') {
+    return '부모님과 함께하는 여행이시군요.\n어떤 도움이 필요하신가요?';
+  }
+
+  return '여수 여행을 더 잘 도와드릴 수 있도록, 어떤 여행을 계획하고 계신지 말씀해 주세요.';
 }
 
 function _generateSoulMessage(soulContext, status, message) {
@@ -936,6 +1004,41 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
       shared_journey: sharedJourney || null
     };
     return { ok: true, payload };
+  }
+
+  // ─── DISCOVERY GATE ──────────────────────────────────────────────────────────
+  // Travel Intelligence fires ONLY on positive discovery or journey-planning intent.
+  // Everything else → SOUL clarification. SOUL never goes silent.
+  //
+  //   DISCOVERY  = "추천해줘", "어디 갈까?", "갈 만한 곳" (positive verb/phrase required)
+  //   JOURNEY    = "1박2일 일정 짜줘" → handled by skeleton gate inside Travel Intelligence
+  //   EVERYTHING ELSE → clarification with meaningful message_ko
+  //
+  // DO NOT add negative exclusion patterns. Absence of positive evidence = no Discovery.
+  const needsTravelIntelligence = _isDiscoveryIntent(message) || _isJourneyPlanningIntent(message);
+
+  if (!needsTravelIntelligence) {
+    const clarificationMsg = _generateClarificationMessage(soulContext, message);
+    return {
+      ok: true,
+      payload: {
+        session_id: sessionId,
+        understood_context: {
+          people_type: soulContext.people_type || null,
+          group_size: soulContext.group_size || null,
+        },
+        places: [],
+        why_details: [],
+        message_ko: clarificationMsg,
+        status: 'CLARIFICATION',
+        presentation_mode: 'CLARIFICATION',
+        quote: null,
+        route: null,
+        shared_journey: sharedJourney || null,
+        timestamp: new Date().toISOString(),
+        next_options: [],
+      }
+    };
   }
 
   // CONSTRUCT REQUEST ENVELOPE (internal audit — not returned to client directly)
