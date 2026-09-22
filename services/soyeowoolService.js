@@ -174,7 +174,8 @@ function _deriveStatus(tgResult, domainContext) {
   }
   if (
     domainContext._domainFallbacks &&
-    domainContext._domainFallbacks.includes('time_available_minutes')
+    domainContext._domainFallbacks.includes('time_available_minutes') &&
+    !domainContext._isMultiDayTrip
   ) {
     return 'PARTIAL';
   }
@@ -186,7 +187,7 @@ function _deriveStatus(tgResult, domainContext) {
 function _buildUserConditions(domainContext) {
   const conditions = [];
 
-  const timeIsDefault = domainContext._domainFallbacks && domainContext._domainFallbacks.includes('time_available_minutes');
+  const timeIsDefault = (domainContext._domainFallbacks && domainContext._domainFallbacks.includes('time_available_minutes')) || domainContext._isMultiDayTrip;
   if (domainContext.time_available_minutes && !timeIsDefault) {
     conditions.push(`${domainContext.time_available_minutes}분 가능`);
   }
@@ -569,19 +570,14 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
     }
   }
 
-  // Suppress time_available_minutes PARTIAL for valid multi-day routes.
-  // A user who said "1박2일" has implicitly defined their time; asking
-  // "시간이 얼마나 남으셨어요?" is contradictory in that context.
-  // Only removes time_available_minutes — other PARTIAL causes are preserved.
-  if (
-    routeSkeleton !== null &&
-    _isMultiDayTrip(message) &&
-    domainContext._domainFallbacks &&
-    domainContext._domainFallbacks.includes('time_available_minutes')
-  ) {
-    domainContext._domainFallbacks = domainContext._domainFallbacks.filter(
-      f => f !== 'time_available_minutes'
-    );
+  // For valid multi-day routes: suppress "시간이 얼마나 남으셨어요?" PARTIAL and
+  // "120분 가능" condition. A user who said "1박2일" has defined their trip scope;
+  // a remaining-time default is irrelevant. Flag _isMultiDayTrip on domainContext
+  // so _deriveStatus() and _buildUserConditions() both respect it without
+  // mutating _domainFallbacks (which would flip timeIsDefault to false and re-show
+  // the synthetic time string).
+  if (routeSkeleton !== null && _isMultiDayTrip(message)) {
+    domainContext._isMultiDayTrip = true;
   }
 
   // STATUS

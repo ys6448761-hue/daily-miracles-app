@@ -30,6 +30,15 @@ function _isDuplicateOfLocked(candidate, leisure_code) {
   return false;
 }
 
+// Detect night/evening-oriented places using existing metadata only.
+// Uses emotion_tags (night_view) and name_ko pattern — no hardcoded place names.
+function _isNightOriented(candidate) {
+  const tags = candidate.emotion_tags || [];
+  if (tags.some(t => ['night_view', '야경', '야간', 'night'].includes(t))) return true;
+  if (/야경|야간|밤/u.test(candidate.name_ko || '')) return true;
+  return false;
+}
+
 /**
  * Build a deterministic MY ROUTE skeleton.
  *
@@ -49,11 +58,12 @@ function buildSkeleton({ start_date, hotel_code, leisure_code, guest_count, cand
   const eligible = candidates.filter(p => !_isDuplicateOfLocked(p, leisure_code));
 
   // Day 1: first 2 eligible, Day 2: next 2
+  // Night-oriented places (야경/night_view) go to afternoon, not morning.
   const day1Suggestions = eligible.slice(0, 2).map((p, i) => ({
     day: 1,
     date: day1Date,
     sequence: i + 2,        // sequence 2, 3 (after arrival at 1)
-    time_slot: 'morning',
+    time_slot: _isNightOriented(p) ? 'afternoon' : 'morning',
     time: null,
     type: p.type || 'attraction',
     name: p.name_ko,

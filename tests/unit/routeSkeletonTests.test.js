@@ -257,4 +257,33 @@ describe('routeSkeletonService', () => {
       expect(typeof it.time_slot).toBe('string');
     });
   });
+
+  // V02_NIGHT_PLACE_NOT_IN_MORNING — night-oriented place must not appear in morning slot
+  test('V02: night-oriented place (emotion_tags: night_view) not assigned morning slot', () => {
+    const s = buildSkeleton({
+      ...BASE,
+      candidates: [
+        { name_ko: '돌산 야경', type: 'attraction', place_code: 'DOLSAN_NIGHT', emotion_tags: ['night_view'] },
+        { name_ko: '오동도', type: 'attraction', place_code: 'ODONGDO', emotion_tags: ['힐링'] }
+      ]
+    });
+    const day1Items = s.days[0].items;
+    const nightInMorning = day1Items.find(it => it.name === '돌산 야경' && it.time_slot === 'morning');
+    expect(nightInMorning).toBeUndefined();
+  });
+
+  // V02_NIGHT_NAME_PATTERN_NOT_IN_MORNING — 야경 in name_ko triggers afternoon slot
+  test('V02: place with 야경 in name_ko assigned afternoon, not morning', () => {
+    const s = buildSkeleton({
+      ...BASE,
+      candidates: [
+        { name_ko: '자산공원 야경', type: 'attraction', place_code: 'JASAN_NIGHT', emotion_tags: [] }
+      ]
+    });
+    const day1Items = s.days[0].items;
+    const nightPlace = day1Items.find(it => it.name === '자산공원 야경');
+    expect(nightPlace).toBeDefined();
+    expect(nightPlace.time_slot).toBe('afternoon');
+    expect(nightPlace.time_slot).not.toBe('morning');
+  });
 });

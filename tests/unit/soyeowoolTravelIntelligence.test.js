@@ -288,4 +288,20 @@ describe('soyeowoolService — Phase 1 TRAVEL_INTELLIGENCE', () => {
     expect(result.payload.status).toBe('PARTIAL');
     expect(result.payload.message_ko).toContain('시간이 얼마나');
   });
+
+  // V02_NO_SYNTHETIC_120MIN_FOR_MULTIDAY
+  // When _isMultiDayTrip=true and route is built, "120분 가능" must not appear in why_details
+  test('V02: 1박2일 with date+hotel — why_details does not contain 120분 가능', async () => {
+    contextExtractionService.parseUserMessage.mockResolvedValue(makeSoulContextUnknownTime());
+    travelGuideService.recommend.mockResolvedValue(makeTgResultWithPlaces());
+    // Message includes date + hotel + 1박2일 so quoteContextService can build quoteCtx
+    // and routeSkeleton will be assembled → _isMultiDayTrip=true → suppress time condition
+    const result = await callSOUL({
+      message: '10월 17일 여자친구랑 둘이 여수 1박2일 가는데 라마다에서 자고 케이블카도 타고 싶어'
+    });
+    expect(result.ok).toBe(true);
+    // why_details must not include "120분 가능" for any place
+    const allConditions = (result.payload.why_details || []).flatMap(d => d.user_conditions || []);
+    expect(allConditions).not.toContain('120분 가능');
+  });
 });
