@@ -367,6 +367,7 @@ function RecommendationResult({ recommendations, onNewQuestion }) {
 
       {/* Quote summary (Commerce Bridge — null when not a commerce query) */}
       <QuoteSummary quote={recommendations.quote} />
+      <DownloadQuoteButton quote={recommendations.quote} routeContext={recommendations.route} />
 
       {/* Place cards */}
       <div className="lumi-choices-container">
@@ -442,6 +443,55 @@ function DownloadRouteButton({ route, quote }) {
         type="button"
       >
         {loading ? '생성 중...' : '내 일정 PDF 저장'}
+      </button>
+      {error && <p className="lumi-pdf-error">{error}</p>}
+    </div>
+  );
+}
+
+function DownloadQuoteButton({ quote, routeContext }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Only show for INDIVIDUAL CALCULATED quotes (1–4 persons, group handled separately)
+  if (!quote || quote.status !== 'CALCULATED' || !quote.pricing) return null;
+
+  const handleDownload = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/dt/lumi/quote-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quote, routeContext })
+      });
+      if (!res.ok) throw new Error('PDF 생성 실패');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const dateStr = (routeContext?.start_date || new Date().toISOString().slice(0, 10)).replace(/-/g, '');
+      a.download = `여수-견적서-${dateStr}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      setError('견적서 저장에 실패했습니다. 다시 시도해 주세요.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="lumi-pdf-download">
+      <button
+        className="lumi-pdf-btn lumi-pdf-btn--quote"
+        onClick={handleDownload}
+        disabled={loading}
+        type="button"
+      >
+        {loading ? '생성 중...' : '내 견적서 PDF 저장'}
       </button>
       {error && <p className="lumi-pdf-error">{error}</p>}
     </div>

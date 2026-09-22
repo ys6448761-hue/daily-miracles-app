@@ -2998,6 +2998,15 @@ try {
   console.warn('⚠️ routePdfRoutes 로드 실패:', e.message);
 }
 
+// ---------- Quote PDF Routes (/api/dt/lumi/quote-pdf) ----------
+try {
+  const quotePdfRoutes = require('./routes/quotePdfRoutes');
+  app.use('/api/dt/lumi', quotePdfRoutes);
+  console.log('✅ Quote PDF 라우터 등록 완료 (/api/dt/lumi/quote-pdf)');
+} catch (e) {
+  console.warn('⚠️ quotePdfRoutes 로드 실패:', e.message);
+}
+
 // ---------- 공명 관리자 대시보드 (/admin/resonance) ----------
 app.get('/admin/resonance', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin', 'resonance.html'));
