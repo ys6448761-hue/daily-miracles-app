@@ -251,6 +251,33 @@ class SessionService {
   }
 
   /**
+   * Persist minimum journey context after MY ROUTE is built.
+   * Merges journey_ctx into session context JSONB (right operand wins).
+   * Non-blocking by design — callers fire-and-forget with .catch().
+   *
+   * @param {string} sessionId
+   * @param {object} journeyCtx - { route_id, nights, hotel_code, leisure_code, guest_count, travel_date }
+   * @returns {Promise<{ updated: boolean }>}
+   */
+  async updateJourneyContext(sessionId, journeyCtx) {
+    if (!sessionId || !journeyCtx) return { updated: false };
+    try {
+      const result = await db.query(
+        `UPDATE travel_guide_sessions
+         SET context    = context || $1::jsonb,
+             updated_at = NOW()
+         WHERE session_id = $2
+         RETURNING session_id`,
+        [JSON.stringify({ journey_ctx: journeyCtx }), sessionId]
+      );
+      return { updated: result.rows.length > 0 };
+    } catch (err) {
+      console.error('[SESSION_JOURNEY_CTX_ERROR]', err.message);
+      return { updated: false };
+    }
+  }
+
+  /**
    * [C2] Generate a restore token (32-byte hex string)
    * Used for restore_url in RAMADA Storybook Journey
    * @returns {string} 64-character hex string (32 bytes)

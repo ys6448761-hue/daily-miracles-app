@@ -18,6 +18,7 @@ const travelGuideService = require('./travelGuideService');
 const sharedJourneyService = require('./sharedJourneyService');
 const quoteContextService = require('./quoteContextService');
 const quoteEngine = require('./quoteEngine');
+const sessionService = require('./sessionService');
 
 const CAPABILITY = 'TRAVEL_INTELLIGENCE';
 const SOURCE = 'travelGuideService/8-filter-cascade';
@@ -569,6 +570,45 @@ function _extractNights(message) {
   return m ? Math.min(parseInt(m[1], 10), 7) : 1;
 }
 
+// Detect explicit price/quote follow-up intent.
+// "이 정도면 얼마야?", "견적 보여줘", "가격 알려줘" → true
+// "야경 추천해줘", "일정 짜줘" → false
+function _isCommerceFollowUpIntent(message) {
+  if (!message) return false;
+  return /(얼마야|얼마에요|얼마예요|얼마 들|얼마나 들|가격 알려|견적 보여|견적 뽑|견적 알려|이 정도면|이 일정.*(얼마|가격)|이 코스.*(얼마|가격)|가격이 어)/.test(message);
+}
+
+// Merge stored journey_ctx with message-extracted overrides.
+// Explicit current-message values always win over stored journey values.
+function _mergeJourneyQuoteCtx(journeyCtx, messageCtx) {
+  return {
+    hotel_code:  messageCtx.hotel_code  || journeyCtx.hotel_code   || null,
+    leisure:     messageCtx.leisure     || journeyCtx.leisure_code  || null,
+    travel_date: messageCtx.travel_date || journeyCtx.travel_date   || null,
+    guest_count: messageCtx.guest_count || journeyCtx.guest_count   || null,
+    cable_car_type: messageCtx.cable_car_type || null,
+    region: 'yeosu',
+  };
+}
+
+// Build a CLARIFICATION payload — not DISCOVERING, no place cards.
+function _buildClarificationPayload(sessionId, messageKo) {
+  return {
+    session_id: sessionId,
+    understood_context: {},
+    places: [],
+    why_details: [],
+    message_ko: messageKo,
+    status: 'CLARIFICATION',
+    presentation_mode: 'CLARIFICATION',
+    quote: null,
+    route: null,
+    shared_journey: null,
+    timestamp: new Date().toISOString(),
+    next_options: [],
+  };
+}
+
 function _generateSoulMessage(soulContext, status, message) {
   const provenance = soulContext._provenance || {};
   const pt = soulContext.people_type;
@@ -782,6 +822,87 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
     return { ok: true, payload: _buildUnknownPlacePayload(placeLookup.placeName, sessionId) };
   }
 
+  // ─── COMMERCE FOLLOW-UP (pre-GPT, uses stored journey_ctx) ──────────────────
+  // "이 정도면 얼마야?", "견적 보여줘" etc. — never routes to DISCOVERY.
+  // Merges stored Journey with explicit message overrides (message wins on conflict).
+  if (_isCommerceFollowUpIntent(message)) {
+    let journeyCtx = null;
+    try {
+      const sessionCtx = await sessionService.getSession(sessionId);
+      journeyCtx = sessionCtx && sessionCtx.journey_ctx ? sessionCtx.journey_ctx : null;
+    } catch (_) {}
+
+    if (!journeyCtx) {
+      // No journey context at all → ask for minimum to build a quote
+      return {
+        ok: true,
+        payload: _buildClarificationPayload(sessionId,
+          '견적을 만들어드릴게요. 여행 인원과 숙소가 정해졌나요?'
+        )
+      };
+    }
+
+    // Merge stored context with explicit message overrides
+    const msgCtx = quoteContextService.extractQuoteContext(message, {});
+    const mergedCtx = _mergeJourneyQuoteCtx(journeyCtx, msgCtx);
+
+    // No hotel in either stored or message → can't quote; ask for hotel
+    if (!mergedCtx.hotel_code) {
+      return {
+        ok: true,
+        payload: _buildClarificationPayload(sessionId,
+          '어느 숙소로 견적을 드릴까요? 라마다 또는 켄싱턴 호텔 중 선택해주세요.'
+        )
+      };
+    }
+
+    // Hotel known but date unknown → ask for date (needed for room pricing)
+    if (!mergedCtx.travel_date) {
+      return {
+        ok: true,
+        payload: _buildClarificationPayload(sessionId,
+          '여행 날짜를 알려주시면 정확한 견적을 계산해 드릴게요.'
+        )
+      };
+    }
+
+    // All required fields present → compute quote
+    const guestCount = mergedCtx.guest_count || 2;
+    mergedCtx.guest_count = guestCount;
+    const complexCheck = quoteContextService.isComplexGroupHotel(mergedCtx, message);
+    let quoteResult;
+    if (complexCheck.complex) {
+      quoteResult = { status: 'PENDING_HUMAN_QUOTE', reason: complexCheck.reason };
+    } else {
+      const raw = quoteEngine.calculateQuote(quoteContextService.buildQuoteInput(mergedCtx));
+      if (raw.success) {
+        const clean = quoteEngine.sanitizeForCustomer(raw);
+        clean.status = 'CALCULATED';
+        quoteResult = clean;
+      } else {
+        quoteResult = { status: 'CALCULATION_ERROR', error: raw.error };
+      }
+    }
+
+    return {
+      ok: true,
+      payload: {
+        session_id: sessionId,
+        understood_context: { group_size: guestCount },
+        places: [],
+        why_details: [],
+        message_ko: '견적을 계산했어요.',
+        status: 'QUOTE_READY',
+        presentation_mode: 'QUOTE_READY',
+        quote: quoteResult,
+        route: null,
+        shared_journey: null,
+        timestamp: new Date().toISOString(),
+        next_options: [],
+      }
+    };
+  }
+
   // UNDERSTAND + SHARED JOURNEY EXTRACTION (parallel — independent AI calls)
   const [understandResult, sharedJourney] = await Promise.all([
     _understand(message),
@@ -893,6 +1014,21 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
   // _buildUserConditions() treat this as a multi-day context.
   if (routeSkeleton !== null && (_isMultiDayTrip(message) || _isJourneyPlanningIntent(message))) {
     domainContext._isMultiDayTrip = true;
+  }
+
+  // ─── JOURNEY CONTEXT WRITE-BACK ─────────────────────────────────────────────
+  // After a successful MY ROUTE build, persist minimum journey context so the
+  // next commerce follow-up ("이 정도면 얼마야?") can resolve without DISCOVERY.
+  // Fire-and-forget — session write failure never blocks the response.
+  if (routeSkeleton !== null && quoteCtx) {
+    sessionService.updateJourneyContext(sessionId, {
+      route_id:     routeSkeleton.route_id,
+      nights:       _extractNights(message),
+      hotel_code:   quoteCtx.hotel_code   || null,
+      leisure_code: quoteCtx.leisure      || null,
+      guest_count:  quoteCtx.guest_count  || domainContext.group_size || 2,
+      travel_date:  quoteCtx.travel_date  || null,
+    }).catch(err => console.error('[JOURNEY_CTX_WRITE_ERROR]', err.message));
   }
 
   // STATUS
