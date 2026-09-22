@@ -6,6 +6,7 @@
  */
 
 const { sanitizeRouteForPdf, sanitizeQuoteForPdf } = require('../../services/routePdfService');
+const { buildContentDisposition } = require('../../routes/routePdfRoutes');
 
 // ── Fixtures ────────────────────────────────────────────────────────────────
 
@@ -139,5 +140,24 @@ describe('routePdfService — sanitizeQuoteForPdf', () => {
 
   test('sanitizeQuoteForPdf returns null for null input', () => {
     expect(sanitizeQuoteForPdf(null)).toBeNull();
+  });
+});
+
+describe('routePdfRoutes — buildContentDisposition', () => {
+  test('Content-Disposition: ASCII fallback present', () => {
+    const cd = buildContentDisposition('2026-10-17');
+    expect(cd).toContain('filename="my-route-20261017.pdf"');
+  });
+
+  test('Content-Disposition: UTF-8 encoded filename* present, no raw Korean', () => {
+    const cd = buildContentDisposition('2026-10-17');
+    expect(cd).toContain("filename*=UTF-8''");
+    expect(cd).not.toMatch(/[가-힯]/);
+  });
+
+  test('Content-Disposition: no CR/LF injection', () => {
+    const cd = buildContentDisposition('2026-10-17\r\nX-Injected: evil');
+    expect(cd).not.toContain('\r');
+    expect(cd).not.toContain('\n');
   });
 });
