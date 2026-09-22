@@ -295,8 +295,14 @@ function _generateSoulMessage(soulContext, status, message) {
   else companionLine = null; // solo — omit companion line, use situation instead
 
   // Build situation line
+  // Multi-day trips: time_of_day from GPT may reflect hotel "overnight" context,
+  // not the user's desired activity time. Guard before timeOfDay check.
   let situationLine;
-  if (timeOfDay === 'night' || timeOfDay === 'evening') {
+  if (_isMultiDayTrip(message)) {
+    situationLine = companionLine
+      ? `${companionLine} 여행이시군요.`
+      : '여수 여행을 계획하고 계시군요.';
+  } else if (timeOfDay === 'night' || timeOfDay === 'evening') {
     situationLine = companionLine
       ? `${companionLine} 밤 시간이 남으셨군요.`
       : '밤에 시간이 남으셨군요.';
@@ -330,6 +336,10 @@ function _generateSoulMessage(soulContext, status, message) {
 
   // D6 soft clarification for UNKNOWN time (PARTIAL)
   if (status === 'PARTIAL') {
+    // Multi-day first: "1박2일" makes time_available clarification contradictory.
+    if (_isMultiDayTrip(message)) {
+      return `${situationLine}\n여수에서 가볼 만한 곳을 골라봤어요.`;
+    }
     if (pref === 'photo') {
       const countNote = requestedCount ? `${requestedCount}곳 요청하셨는데, ` : '';
       return `${situationLine}\n${countNote}사진 찍기 좋은 곳 위주로 골라봤어요.`;
@@ -342,9 +352,6 @@ function _generateSoulMessage(soulContext, status, message) {
     }
     if (budget === 'free' || budget === 'low') {
       return `${situationLine}\n부담 적은 곳 위주로 골라봤는데, 입장료는 직접 확인이 필요해요.`;
-    }
-    if (_isMultiDayTrip(message)) {
-      return `${situationLine}\n여수에서 가볼 만한 곳을 골라봤어요.`;
     }
     return `${situationLine}\n대략 2시간 기준으로 편하게 갈 곳을 골라봤어요.\n시간이 얼마나 남으셨어요?`;
   }
