@@ -60,87 +60,97 @@ ON CONFLICT DO NOTHING;
 -- STEP 2. dt_benefits — 혜택 + display_copy 등록
 -- =============================================================
 
--- ── 카페투어 8개 — 각각 개별 display_copy ────────────────────
+-- ── 카페투어 8개 — display_order: 라또아 카페=0(대표), 나머지=1 ──────
 
-INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active)
-SELECT p.id, 'free', '아메리카노 1인 무료',
-  '2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료',
-  '돌산 바다를 바라보며 별빛항로의 여운을 만나보세요.',
-  NULL, true
-FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '프롬나드';
-
-INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active)
-SELECT p.id, 'free', '아메리카노 1인 무료',
-  '2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료',
-  '숲과 바다가 만나는 곳. 잠시 머물며 마음을 쉬어가세요.',
-  NULL, true
-FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '더 포레스트랜드';
-
-INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active)
-SELECT p.id, 'free', '아메리카노 1인 무료',
-  '2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료',
-  '여수의 풍경과 함께 소중한 사람과 조용한 시간을 보내보세요.',
-  NULL, true
-FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '엘리스테이 카페';
-
-INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active)
+-- 대표 카페: 라또아 (여수엑스포역 앞, 빵 풍부) — display_order=0
+INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active, display_order)
 SELECT p.id, 'free', '아메리카노 1인 무료',
   '2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료',
   '여수 시내를 내려다보며 별빛항로의 이야기를 이어가세요.',
-  NULL, true
+  NULL, true, 0
 FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '라또아 카페';
 
-INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active)
+INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active, display_order)
+SELECT p.id, 'free', '아메리카노 1인 무료',
+  '2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료',
+  '돌산 바다를 바라보며 별빛항로의 여운을 만나보세요.',
+  NULL, true, 1
+FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '프롬나드';
+
+INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active, display_order)
+SELECT p.id, 'free', '아메리카노 1인 무료',
+  '2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료',
+  '숲과 바다가 만나는 곳. 잠시 머물며 마음을 쉬어가세요.',
+  NULL, true, 1
+FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '더 포레스트랜드';
+
+INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active, display_order)
+SELECT p.id, 'free', '아메리카노 1인 무료',
+  '2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료',
+  '여수의 풍경과 함께 소중한 사람과 조용한 시간을 보내보세요.',
+  NULL, true, 1
+FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '엘리스테이 카페';
+
+INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active, display_order)
 SELECT p.id, 'free', '아메리카노 1인 무료',
   '2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료',
   '바다와 가장 가까운 쉼. 여수의 바람을 느껴보세요.',
-  NULL, true
+  NULL, true, 1
 FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '카프아일랜드';
 
-INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active)
+INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active, display_order)
 SELECT p.id, 'free', '아메리카노 1인 무료',
   '2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료',
   '만성리의 풍경과 함께 천천히 하루를 즐겨보세요.',
-  NULL, true
+  NULL, true, 1
 FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '메리엘 카페';
 
-INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active)
+INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active, display_order)
 SELECT p.id, 'free', '아메리카노 1인 무료',
   '2인 이용 시 1인 무료 / 3인 이용 시 1인 무료 / 4인 이용 시 1인 무료',
   '오늘 하루를 위한 쉼. 따뜻한 커피 한 잔과 함께하세요.',
-  NULL, true
+  NULL, true, 1
 FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '카페하루';
 
 -- HOLD: 모이핀 — is_active=false이므로 쿼리에 노출 안 됨. Founder 결정 보류.
 -- INSERT INTO dt_benefits ... WHERE name = '모이핀'  ← 실행하지 않음
 
+-- ── 대표 맛집: 돌산게장명가 (GENERIC — 제품 제한 없음, 개인 여정 전체 노출) ──
+-- Founder 지정 대표 Restaurant Hospitality — display_order=0
+-- GENERIC: dt_product_benefits 미연결 → 모든 개인 여정에 노출
+INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active, display_order)
+SELECT p.id, 'gift', '음료 1병 무료', NULL,
+  '돌산 게장 명가에서 만나는 작은 선물. 음료 1병 무료 제공.',
+  NULL, true, 0
+FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '돌산게장명가';
+
 -- ── 별빛혜택 — 강순희 K바삭치킨 범앗간 ─────────────────────────
 -- STARLIGHT BENEFIT: sp_fireworks_bundle + sp_fireworks_cruise에 연결
 
-INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active)
+INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active, display_order)
 SELECT p.id, 'gift', '음료 1병 무료', NULL,
   '이순신광장에서 만나는 작은 선물. 음료 1병 무료 제공.',
-  NULL, true
+  NULL, true, 1
 FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '강순희 K바삭치킨 범앗간';
 
--- ── 달빛혜택 3개 ─────────────────────────────────────────────
+-- ── 달빛혜택 3개 (display_order=1) ─────────────────────────────
 
-INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active)
+INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active, display_order)
 SELECT p.id, 'discount', '20% 할인', NULL,
   '여행의 즐거움을 조금 더 가볍게. 노래방 20% 할인 혜택.',
-  NULL, true
+  NULL, true, 1
 FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '해공 노래방';
 
-INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active)
+INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active, display_order)
 SELECT p.id, 'gift', '2000원 지급', NULL,
   '오늘의 순간을 기록하세요. 2000원 혜택 제공.',
-  NULL, true
+  NULL, true, 1
 FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '인생네컷 오락실';
 
-INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active)
+INSERT INTO dt_benefits (partner_id, benefit_type, title, description, display_copy, location_hint, is_active, display_order)
 SELECT p.id, 'discount', '2000원 할인', NULL,
   '작은 즐거움 하나 더. 2000원 할인 혜택 제공.',
-  NULL, true
+  NULL, true, 1
 FROM dt_partners p WHERE p.city_code = 'yeosu' AND p.name = '풍선터트리기';
 
 -- ── 맛집 6개 — BLOCKED (FOUNDER_CONFIRMATION_REQUIRED) ──────────

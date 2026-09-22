@@ -264,11 +264,12 @@ function _buildGroupQuoteMessage(soulContext) {
   const size = soulContext.group_size;
   return [
     `친구 ${size}명이시군요.`,
-    `5명 이상 단체 여행 비용은 숙소·코스·식사 조합에 따라 크게 달라져서,`,
-    `정확한 견적은 담당자와 직접 확인하는 편이 좋아요.`,
     ``,
-    `지금 여수 관광지를 먼저 둘러보시겠어요?`,
-    `아니면 단체 여행 상담을 연결해드릴까요?`
+    `5명 이상 단체여행은 숙소·차량·식사와 일정에 따라`,
+    `견적이 달라져요.`,
+    ``,
+    `무여정이 정확한 여행 준비를 위해`,
+    `여수여행센터 담당자에게 연결해드릴게요.`
   ].join('\n');
 }
 
@@ -494,7 +495,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
       why_details: [],
       message_ko: quoteMessage,
       status: 'GROUP_CONSULTATION_REQUIRED',
-      next_options: ['여수 관광지 먼저 둘러보기', '단체 여행 상담 연결'],
+      next_options: ['여수 관광지 먼저 둘러보기'],
       group_size: soulContext.group_size,
       timestamp: new Date().toISOString(),
       shared_journey: sharedJourney || null

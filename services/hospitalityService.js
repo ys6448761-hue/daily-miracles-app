@@ -90,7 +90,7 @@ async function fetchActiveBenefits(city_code = 'yeosu', product_codes = []) {
             AND pr.product_code = ANY($2::text[])
         )
       )
-    ORDER BY b.created_at ASC
+    ORDER BY b.display_order ASC, p.category ASC, b.created_at ASC
   `;
   try {
     const { rows } = await db.query(sql, [city_code, codes]);
@@ -109,7 +109,7 @@ async function fetchActiveBenefits(city_code = 'yeosu', product_codes = []) {
         address:  r.partner_address,
       },
       state:           'PREVIEW',
-      payment_notice:  '결제 완료 후 이용 가능',
+      payment_notice:  '결제 완료 후 이용할 수 있어요',
     }));
   } catch (err) {
     // DB not reachable (e.g. local SQLite without tables) → safe empty state
@@ -151,7 +151,7 @@ async function getHospitalityPreview({ guestCount, city_code = 'yeosu', product_
     reason: null,
     state: 'PREVIEW',
     payment_gate: 'BLOCKED_BY_PAYMENT_LINKAGE',
-    payment_notice: '결제 완료 후 이용 가능',
+    payment_notice: '결제 완료 후 이용할 수 있어요',
     benefits,
   };
 }

@@ -334,6 +334,14 @@ function RecommendationResult({ recommendations, onNewQuestion }) {
             line ? <p key={i}>{line}</p> : <br key={i} />
           )}
         </div>
+        {/* Direct phone consultation — tel: href opens dialer on mobile */}
+        <a
+          href="tel:1899-6117"
+          className="lumi-tel-consultation-btn"
+        >
+          📞 1899-6117 단체여행 상담하기
+        </a>
+        {/* Server-provided options (e.g. 여수 관광지 먼저 둘러보기) */}
         {nextOptions.length > 0 && (
           <div className="lumi-next-options">
             {nextOptions.map((opt, i) => (
@@ -574,7 +582,7 @@ function HospitalityCard({ benefit }) {
           {benefit.display_copy && (
             <p className="lumi-hospitality-display-copy">{benefit.display_copy}</p>
           )}
-          <span className="lumi-hospitality-status-badge">결제 완료 후 이용 가능</span>
+          <span className="lumi-hospitality-status-badge">결제 완료 후 이용할 수 있어요</span>
         </div>
       </div>
       <button
@@ -582,7 +590,7 @@ function HospitalityCard({ benefit }) {
         type="button"
         onClick={() => setExpanded(v => !v)}
       >
-        {expanded ? '접기' : '자세히 보기'}
+        {expanded ? '접기' : '환대 내용 보기'}
       </button>
       {expanded && (
         <div className="lumi-hospitality-detail">

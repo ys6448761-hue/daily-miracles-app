@@ -139,7 +139,7 @@ test('E: 10명 단체 → GROUP_CONSULTATION_REQUIRED (not misclassified as coup
   // 10명 group → human consultation path, NOT couple correction
   expect(result.payload.status).toBe('GROUP_CONSULTATION_REQUIRED');
   expect(result.payload.understood_context.people_type).toBe('group');
-  expect(result.payload.message_ko).toContain('단체 여행');
+  expect(result.payload.message_ko).toContain('단체여행');
 });
 
 // F: 혼자 → 혼자 여행 label
