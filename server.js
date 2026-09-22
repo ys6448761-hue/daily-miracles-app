@@ -3007,6 +3007,15 @@ try {
   console.warn('⚠️ quotePdfRoutes 로드 실패:', e.message);
 }
 
+// ---------- Hospitality Routes (/api/dt/lumi/hospitality) ----------
+try {
+  const hospitalityRoutes = require('./routes/hospitalityRoutes');
+  app.use('/api/dt/lumi', hospitalityRoutes);
+  console.log('✅ Hospitality 라우터 등록 완료 (/api/dt/lumi/hospitality)');
+} catch (e) {
+  console.warn('⚠️ hospitalityRoutes 로드 실패:', e.message);
+}
+
 // ---------- 공명 관리자 대시보드 (/admin/resonance) ----------
 app.get('/admin/resonance', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin', 'resonance.html'));

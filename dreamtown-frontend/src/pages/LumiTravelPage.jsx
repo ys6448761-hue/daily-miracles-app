@@ -369,6 +369,9 @@ function RecommendationResult({ recommendations, onNewQuestion }) {
       <QuoteSummary quote={recommendations.quote} />
       <DownloadQuoteButton quote={recommendations.quote} routeContext={recommendations.route} />
 
+      {/* Hospitality — INDIVIDUAL only, below MY QUOTE, above place cards */}
+      <HospitalitySection quote={recommendations.quote} />
+
       {/* Place cards */}
       <div className="lumi-choices-container">
         {places.length > 0 ? (
@@ -494,6 +497,108 @@ function DownloadQuoteButton({ quote, routeContext }) {
         {loading ? '생성 중...' : '내 견적서 PDF 저장'}
       </button>
       {error && <p className="lumi-pdf-error">{error}</p>}
+    </div>
+  );
+}
+
+// ── Hospitality Section ─────────────────────────────────────────────────────
+// Individual journey (1–4인) only. GROUP (5+) receives nothing.
+// State V0.1: PREVIEW only. AVAILABLE requires payment confirmation (not yet built).
+
+function HospitalitySection({ quote }) {
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+
+  const guestCount = quote?.guestCount;
+  // Commerce group boundary: 1–4 = INDIVIDUAL, 5+ = GROUP
+  // Relationship type (couple/friends) is NOT the authority — guestCount is.
+  const isIndividual = Number.isFinite(guestCount) && guestCount >= 1 && guestCount <= 4;
+  const isCalculated = quote?.status === 'CALCULATED' && quote?.pricing;
+
+  React.useEffect(() => {
+    if (!isIndividual || !isCalculated) return;
+    let cancelled = false;
+    fetch(`/api/dt/lumi/hospitality?guest_count=${guestCount}&city=yeosu`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (!cancelled) setData(d); })
+      .catch(() => { if (!cancelled) setError(true); });
+    return () => { cancelled = true; };
+  }, [guestCount, isIndividual, isCalculated]);
+
+  // Group → nothing
+  if (!isIndividual || !isCalculated) return null;
+  // Loading
+  if (!data && !error) return null;
+  // No eligible benefits (group excluded server-side or empty data)
+  if (!data || !data.eligible || data.benefits.length === 0) return null;
+
+  return (
+    <div className="lumi-hospitality">
+      <div className="lumi-hospitality-header">
+        <span className="lumi-hospitality-icon">🌿</span>
+        <div>
+          <p className="lumi-hospitality-title">여수에서 준비한 환대</p>
+          <p className="lumi-hospitality-subtitle">
+            이 여행을 예약하면 여수에서 준비한 환대를 함께 받을 수 있어요.
+          </p>
+        </div>
+      </div>
+      <div className="lumi-hospitality-cards">
+        {data.benefits.map(b => (
+          <HospitalityCard key={b.benefit_id} benefit={b} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function HospitalityCard({ benefit }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="lumi-hospitality-card">
+      <div className="lumi-hospitality-card-top">
+        <div className="lumi-hospitality-card-info">
+          <p className="lumi-hospitality-partner">{benefit.partner?.name || ''}</p>
+          <p className="lumi-hospitality-benefit-title">{benefit.title}</p>
+          {benefit.display_copy && (
+            <p className="lumi-hospitality-display-copy">{benefit.display_copy}</p>
+          )}
+          <span className="lumi-hospitality-status-badge">결제 완료 후 이용 가능</span>
+        </div>
+      </div>
+      <button
+        className="lumi-hospitality-expand-btn"
+        type="button"
+        onClick={() => setExpanded(v => !v)}
+      >
+        {expanded ? '접기' : '자세히 보기'}
+      </button>
+      {expanded && (
+        <div className="lumi-hospitality-detail">
+          {benefit.description && (
+            <p className="lumi-hospitality-detail-item">
+              <span className="lumi-hospitality-detail-label">제공 내용</span>
+              <span>{benefit.description}</span>
+            </p>
+          )}
+          {benefit.partner?.address && (
+            <p className="lumi-hospitality-detail-item">
+              <span className="lumi-hospitality-detail-label">위치</span>
+              <span>{benefit.partner.address}</span>
+            </p>
+          )}
+          {benefit.location_hint && (
+            <p className="lumi-hospitality-detail-item">
+              <span className="lumi-hospitality-detail-label">위치 참고</span>
+              <span>{benefit.location_hint}</span>
+            </p>
+          )}
+          <p className="lumi-hospitality-detail-notice">
+            ※ 결제 완료 후 이용 방법을 안내해 드립니다.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
