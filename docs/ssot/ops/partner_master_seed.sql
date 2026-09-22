@@ -193,20 +193,9 @@ WHERE pr.product_code IN ('sp_fireworks_bundle', 'sp_fireworks_cruise')
   )
 ON CONFLICT (product_id, benefit_id) DO NOTHING;
 
--- ── 별빛혜택: 강순희 K바삭치킨 범앗간 → sp_fireworks_bundle + sp_fireworks_cruise ──
--- STARLIGHT BENEFIT — 범앗간(구)에서 이름 변경 및 moonlight→starlit 재분류
-INSERT INTO dt_product_benefits (product_id, benefit_id, display_order)
-SELECT pr.id, b.id, 0
-FROM dt_products pr
-CROSS JOIN dt_benefits b
-JOIN dt_partners p ON p.id = b.partner_id
-WHERE pr.product_code IN ('sp_fireworks_bundle', 'sp_fireworks_cruise')
-  AND p.city_code = 'yeosu'
-  AND p.name = '강순희 K바삭치킨 범앗간'
-ON CONFLICT (product_id, benefit_id) DO NOTHING;
-
--- ── moonlight 3개 → moonlight_pass ───────────────────────────
--- 강순희 K바삭치킨 범앗간은 moonlight에서 제외됨 (starlit으로 이동)
+-- ── 별빛혜택 4개 → moonlight_pass ───────────────────────────
+-- 강순희 K바삭치킨 범앗간은 별빛혜택(달빛혜택)에 속함 — moonlight_pass 연결
+-- 별빛혜택 총 4개: 해공 노래방, 강순희 K바삭치킨 범앗간, 인생네컷 오락실, 풍선터트리기
 INSERT INTO dt_product_benefits (product_id, benefit_id, display_order)
 SELECT pr.id, b.id, 0
 FROM dt_products pr
@@ -214,7 +203,7 @@ CROSS JOIN dt_benefits b
 JOIN dt_partners p ON p.id = b.partner_id
 WHERE pr.product_code = 'moonlight_pass'
   AND p.city_code = 'yeosu'
-  AND p.name IN ('해공 노래방', '인생네컷 오락실', '풍선터트리기')
+  AND p.name IN ('해공 노래방', '강순희 K바삭치킨 범앗간', '인생네컷 오락실', '풍선터트리기')
 ON CONFLICT (product_id, benefit_id) DO NOTHING;
 
 -- ── 맛집 6개 — BLOCKED (dt_product_benefits INSERT 불가) ────────

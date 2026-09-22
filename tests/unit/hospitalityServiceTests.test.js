@@ -320,7 +320,7 @@ describe('T11 — 강순희 K바삭치킨 범앗간: STARLIGHT BENEFIT', () => {
     expect(found).toBe(false);
   });
 
-  test('T11b: 강순희 K바삭치킨 범앗간 is NOT generic restaurant — has product restriction in seed SQL', () => {
+  test('T11b: 강순희 K바삭치킨 범앗간 is 별빛혜택 — moonlight_pass 연결 (총 4개)', () => {
     const fs = require('fs');
     const path = require('path');
     const seedSql = fs.readFileSync(
@@ -329,8 +329,9 @@ describe('T11 — 강순희 K바삭치킨 범앗간: STARLIGHT BENEFIT', () => {
     );
     // Seed must contain the renamed partner
     expect(seedSql).toContain('강순희 K바삭치킨 범앗간');
-    // Seed must link it to starlit products (sp_fireworks_*)
-    expect(seedSql).toMatch(/강순희 K바삭치킨 범앗간[\s\S]*sp_fireworks/);
+    // Seed must link it to moonlight_pass (별빛혜택 4개)
+    expect(seedSql).toContain('moonlight_pass');
+    expect(seedSql).toMatch(/moonlight_pass[\s\S]*강순희 K바삭치킨 범앗간/);
   });
 
   test('T11c: 강순희 K바삭치킨 범앗간 appears in starlit journey → PREVIEW', async () => {
@@ -344,7 +345,7 @@ describe('T11 — 강순희 K바삭치킨 범앗간: STARLIGHT BENEFIT', () => {
     expect(result.benefits[0].partner.category).toBe('restaurant');
   });
 
-  test('T11d: SSOT CSV reflects reclassification — route_code=starlit, not moonlight', () => {
+  test('T11d: SSOT CSV reflects 별빛혜택 — route_code=moonlight (별빛혜택 4개 중 하나)', () => {
     const fs = require('fs');
     const path = require('path');
     const csv = fs.readFileSync(
@@ -354,8 +355,8 @@ describe('T11 — 강순희 K바삭치킨 범앗간: STARLIGHT BENEFIT', () => {
     const lines = csv.split('\n');
     const beomsatgan = lines.find(l => l.includes('K바삭치킨 범앗간'));
     expect(beomsatgan).toBeTruthy();
-    expect(beomsatgan).toContain('starlit');
-    expect(beomsatgan).not.toContain('moonlight');
+    // 강순희 K바삭치킨 범앗간 = 별빛혜택(달빛혜택) — moonlight_pass 연결
+    expect(beomsatgan).toContain('moonlight');
   });
 });
 
