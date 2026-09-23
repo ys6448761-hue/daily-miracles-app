@@ -570,6 +570,16 @@ function _extractNights(message) {
   return m ? Math.min(parseInt(m[1], 10), 7) : 1;
 }
 
+// Detect a pure date provision message — user responding with just a date.
+// "10월 17일", "10월17일이에요", "10월 17일로 해줘" → true
+// Disqualified when competing journey/discovery signals are present.
+function _isDateProvisionMessage(message) {
+  if (!message) return false;
+  if (!/\d{1,2}월\s*\d{1,2}일/.test(message)) return false;
+  if (/추천해|일정 짜|코스 짜|어디 갈|갈 만한|\d박/.test(message)) return false;
+  return true;
+}
+
 // Detect explicit price/quote follow-up intent.
 // "이 정도면 얼마야?", "견적 보여줘", "가격 알려줘" → true
 // "야경 추천해줘", "일정 짜줘" → false
@@ -767,7 +777,11 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx) {
     const hotelName   = quoteCtx.hotel_code ? (HOTEL_NAME_KO[quoteCtx.hotel_code] || null) : null;
     const leisureName = quoteCtx.leisure    ? (LEISURE_NAME_KO[quoteCtx.leisure]  || null) : null;
     if (hotelName && leisureName) {
-      return `좋아요. ${hotelName}에서 묵고 ${leisureName}를 타는 일정으로 잡아볼게요.`;
+      const base = `좋아요. ${hotelName}에서 묵고 ${leisureName}를 타는 일정으로 잡아볼게요.`;
+      if (!quoteCtx.travel_date && /비용|얼마|가격|견적/.test(message)) {
+        return `${base}\n날짜를 알려주시면 숙박비와 ${leisureName} 요금도 바로 계산해 드릴게요.`;
+      }
+      return base;
     }
     if (hotelName) {
       return `좋아요. ${hotelName} 일정으로 잡아볼게요.`;
@@ -1016,6 +1030,91 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
         next_options: [],
       }
     };
+  }
+
+  // ─── DATE PROVISION FOLLOW-UP ─────────────────────────────────────────────
+  // Handles user providing a date in direct response to SOUL's date-ask.
+  // Fires ONLY when stored journey_ctx has hotel_code but no travel_date.
+  if (_isDateProvisionMessage(message)) {
+    let storedCtx = null;
+    try {
+      const sessionData = await sessionService.getSession(sessionId);
+      storedCtx = sessionData && sessionData.journey_ctx ? sessionData.journey_ctx : null;
+    } catch (_) {}
+
+    if (storedCtx && storedCtx.hotel_code && !storedCtx.travel_date) {
+      const extractedDate = quoteContextService._extractDate(message);
+      if (extractedDate) {
+        const mergedCtx = {
+          hotel_code:  storedCtx.hotel_code,
+          leisure:     storedCtx.leisure_code || null,
+          guest_count: storedCtx.guest_count  || 2,
+          travel_date: extractedDate,
+          region:      'yeosu',
+        };
+
+        let quoteResult = null;
+        const complexCheck = quoteContextService.isComplexGroupHotel(mergedCtx, message);
+        if (complexCheck.complex) {
+          quoteResult = { status: 'PENDING_HUMAN_QUOTE', reason: complexCheck.reason };
+        } else if (quoteContextService.isQuotable(mergedCtx)) {
+          const raw = quoteEngine.calculateQuote(quoteContextService.buildQuoteInput(mergedCtx));
+          if (raw.success) {
+            const clean = quoteEngine.sanitizeForCustomer(raw);
+            clean.status = 'CALCULATED';
+            quoteResult = clean;
+          } else {
+            quoteResult = { status: 'CALCULATION_ERROR', error: raw.error };
+          }
+        }
+
+        // Rebuild route skeleton with confirmed date — LOCKED items only (no fresh TG call)
+        let routeSkeleton = null;
+        try {
+          const { buildSkeleton } = require('./routeSkeletonService');
+          routeSkeleton = buildSkeleton({
+            start_date:     extractedDate,
+            hotel_code:     mergedCtx.hotel_code,
+            leisure_code:   mergedCtx.leisure,
+            leisure_source: 'USER_SELECTED',
+            guest_count:    mergedCtx.guest_count,
+            candidates:     [],
+            nights:         storedCtx.nights || 1,
+          });
+        } catch (err) {
+          console.error('[DATE_PROVISION_SKELETON_ERROR]', err.message);
+        }
+
+        // Persist confirmed date into session journey_ctx
+        sessionService.updateJourneyContext(sessionId, {
+          ...storedCtx,
+          travel_date: extractedDate,
+        }).catch(err => console.error('[DATE_PROVISION_CTX_WRITE]', err.message));
+
+        const presentationMode = (quoteResult && quoteResult.status === 'CALCULATED') ? 'QUOTE_READY' : 'ROUTE_READY';
+        const soulMsg = (quoteResult && quoteResult.status === 'CALCULATED')
+          ? '날짜를 확인했어요. 숙박비와 케이블카 요금을 계산했어요.'
+          : '날짜를 확인했어요.';
+
+        return {
+          ok: true,
+          payload: {
+            session_id: sessionId,
+            understood_context: { group_size: mergedCtx.guest_count },
+            places: [],
+            why_details: [],
+            message_ko: soulMsg,
+            status: presentationMode,
+            presentation_mode: presentationMode,
+            quote: quoteResult,
+            route: routeSkeleton,
+            shared_journey: null,
+            timestamp: new Date().toISOString(),
+            next_options: [],
+          }
+        };
+      }
+    }
   }
 
   // UNDERSTAND + SHARED JOURNEY EXTRACTION (parallel — independent AI calls)

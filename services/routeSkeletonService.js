@@ -115,7 +115,7 @@ function buildSkeleton({ start_date, hotel_code, leisure_code, leisure_source, g
         items.push({
           day: dayNum, date: dateStr, sequence: 1,
           time_slot: 'morning', time: null, type: 'hotel',
-          name: COMMERCE_MAP[hotel_code].name + ' 체크아웃',
+          name: COMMERCE_MAP[hotel_code].name,
           source: 'USER_SELECTED', selection_status: 'LOCKED', commerce_code: null, quotable: false,
         });
       }

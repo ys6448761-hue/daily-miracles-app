@@ -233,8 +233,9 @@ describe('AT-6: 와이프 guest_count extraction', () => {
 // ─── AT-7 ────────────────────────────────────────────────────────────────────
 // Key acceptance: SOUL naturally acknowledges Ramada + cablecar.
 // Must NOT ask place-knowledge question. Must NOT return CLARIFICATION.
+// With Fix B: message has "비용" + no date → acknowledgement includes date-ask.
 
-test('AT-7: Full message → SOUL acknowledges Ramada+cablecar, not place-knowledge question', async () => {
+test('AT-7: Full message → SOUL acknowledges Ramada+cablecar, asks for date (비용 + no date)', async () => {
   const result = await handleTravelRequest({
     message: '와이프랑 1박2일 라마다에서 자고 케이블카 탈거야 일정과 비용 알려줘',
     sessionId: TEST_SESSION,
@@ -257,4 +258,59 @@ test('AT-7: Full message → SOUL acknowledges Ramada+cablecar, not place-knowle
   expect(result.payload.presentation_mode).not.toBe('CLARIFICATION');
   expect(result.payload.presentation_mode).not.toBe('PLACE_KNOWLEDGE');
   expect(result.payload.presentation_mode).not.toBe('DISCOVERING');
+
+  // Fix B: message has "비용" + no date → SOUL should append date-ask
+  expect(msg).toContain('날짜');
+});
+
+// ─── AT-8 ────────────────────────────────────────────────────────────────────
+// Two-turn continuity: Turn 2 "10월 17일" → QUOTE_READY
+// Session has journey_ctx from Turn 1 (hotel+leisure+guests, no date).
+
+const sessionService = require('../../services/sessionService');
+
+describe('AT-8: Two-turn continuity — date provision', () => {
+  test('Turn 2 "10월 17일" → QUOTE_READY when session has hotel+leisure+guests', async () => {
+    sessionService.getSession.mockResolvedValueOnce({
+      journey_ctx: {
+        hotel_code:  'ramada',
+        leisure_code: 'cable',
+        guest_count: 2,
+        travel_date: null,
+        nights:      1,
+        route_id:    'ROUTE-DATELESS-TEST',
+      }
+    });
+
+    const result = await handleTravelRequest({
+      message: '10월 17일',
+      sessionId: TEST_SESSION,
+      hotelId: null,
+      principal: TEST_PRINCIPAL
+    });
+    expect(result.ok).toBe(true);
+    expect(result.payload.presentation_mode).toBe('QUOTE_READY');
+    expect(result.payload.quote).not.toBeNull();
+    expect(result.payload.quote.status).toBe('CALCULATED');
+    // Route rebuilt with hotel+leisure preserved
+    expect(result.payload.route).not.toBeNull();
+    const allItems = result.payload.route.days.flatMap(d => d.items || []);
+    expect(allItems.some(i => i.type === 'hotel' && i.selection_status === 'LOCKED')).toBe(true);
+  });
+
+  test('Turn 2 without stored hotel → does NOT enter date provision path', async () => {
+    sessionService.getSession.mockResolvedValueOnce({
+      journey_ctx: { hotel_code: null, travel_date: null }
+    });
+
+    const result = await handleTravelRequest({
+      message: '10월 17일',
+      sessionId: TEST_SESSION,
+      hotelId: null,
+      principal: TEST_PRINCIPAL
+    });
+    // Without hotel stored, date provision skips → falls through to normal path
+    expect(result.ok).toBe(true);
+    expect(result.payload.presentation_mode).not.toBe('QUOTE_READY');
+  });
 });

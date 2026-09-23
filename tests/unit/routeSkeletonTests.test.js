@@ -96,7 +96,7 @@ describe('routeSkeletonService', () => {
   test('Day 2 includes hotel checkout marker (quotable=false)', () => {
     const s = buildSkeleton(BASE);
     const day2 = s.days[1].items;
-    const checkout = day2.find(it => it.type === 'hotel' && it.name.includes('체크아웃'));
+    const checkout = day2.find(it => it.type === 'hotel' && it.time_slot === 'morning');
     expect(checkout).toBeDefined();
     expect(checkout.quotable).toBe(false);
     expect(checkout.commerce_code).toBeNull();
@@ -153,7 +153,7 @@ describe('routeSkeletonService', () => {
   test('no hotel_code → no checkout marker in Day 2', () => {
     const s = buildSkeleton({ ...BASE, hotel_code: null });
     const day2 = s.days[1].items;
-    const checkout = day2.find(it => it.name && it.name.includes('체크아웃'));
+    const checkout = day2.find(it => it.type === 'hotel' && it.time_slot === 'morning');
     expect(checkout).toBeUndefined();
   });
 
@@ -171,7 +171,7 @@ describe('routeSkeletonService', () => {
   // V02_HOTEL_CHECKOUT_time_null — Founder correction: no assumed convention time
   test('V02: hotel checkout time === null (no verified hotel data)', () => {
     const s = buildSkeleton(BASE);
-    const checkout = s.days[1].items.find(it => it.name && it.name.includes('체크아웃'));
+    const checkout = s.days[1].items.find(it => it.type === 'hotel' && it.time_slot === 'morning');
     expect(checkout).toBeDefined();
     expect(checkout.time).toBeNull();
     expect(checkout.time_slot).toBe('morning');
