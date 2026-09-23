@@ -630,21 +630,48 @@ function _isDiscoveryIntent(message) {
 
 // Generate a meaningful SOUL clarification response for non-discovery contexts.
 // SOUL is always responsible for the next turn — never silent, never blank.
-function _generateClarificationMessage(soulContext, message) {
-  const msg = message || '';
-  const pt = (soulContext && soulContext.people_type) || null;
+function _generateClarificationMessage(soulContext, message, journeyCtx) {
+  const msg  = message || '';
+  const pt   = (soulContext && soulContext.people_type) || null;
+  const jctx = journeyCtx || {};
+
+  const guestKnown   = !!(jctx.guest_count && jctx.guest_count >= 1);
+  const dateKnown    = !!jctx.travel_date;
+  const cableInRoute = (jctx.leisure_code === 'cable') && !!jctx.route_id;
+
+  // Build cable-car clarification with known-field suppression
+  const _cableClar = () => {
+    if (cableInRoute) {
+      return dateKnown
+        ? '케이블카는 현재 일정에 포함되어 있어요.'
+        : '케이블카는 현재 일정에 포함되어 있어요.\n날짜를 확정하시면 더 정확한 일정을 잡아드릴게요.';
+    }
+    const asks = [];
+    if (!guestKnown) asks.push('인원');
+    if (!dateKnown)  asks.push('날짜');
+    if (asks.length === 0) return '케이블카를 꼭 타고 싶으시군요. 일정을 새로 구성해 드릴까요?';
+    return `케이블카를 꼭 타고 싶으시군요.\n${asks.join('와 ')}을 알려주시면 일정에 바로 포함해 드릴게요.`;
+  };
+
+  // Cable car explicit negation ("케이블카는 빼고 싶어")
+  if (/케이블카|케이블 카/.test(msg) && /빼고|빼줘|제외|없이|빼겠|뺄/.test(msg)) {
+    if (jctx.route_id) {
+      return '현재 일정을 직접 수정하는 기능은 아직 준비 중이에요.\n케이블카 없이 새 일정을 다시 짜드릴까요?';
+    }
+    return '알겠어요. 케이블카 없이 일정을 구성해 드릴게요.\n출발 날짜와 인원을 알려주세요.';
+  }
+
+  // Cable car positive intent (or "일정에 넣어줘" reference)
+  if (/케이블카|케이블 카/.test(msg)) {
+    if (/(꼭|반드시|타고 싶|타야|태워|일정에 넣|일정에 포함|일정에 추가)/.test(msg)) {
+      return _cableClar();
+    }
+    return '케이블카에 대해 알고 싶으신 게 있으신가요?';
+  }
 
   // Walking constraint about companion
   if (/(걷는 걸 싫어|걷기 싫어|걷기 힘들|걷지 못|걷기 어려|보행 어려)/.test(msg)) {
     return '걷는 게 부담스럽지 않은 일정이 필요하시군요.\n현재 일정에서 덜 걷는 코스로 바꿔드릴까요?';
-  }
-
-  // Cable car intent without discovery verb
-  if (/케이블카|케이블 카/.test(msg)) {
-    if (/(꼭|반드시|타고 싶|타야|태워)/.test(msg)) {
-      return '케이블카를 꼭 타고 싶으시군요.\n날짜와 인원을 알려주시면 일정에 바로 포함해 드릴게요.';
-    }
-    return '케이블카에 대해 알고 싶으신 게 있으신가요?';
   }
 
   // Journey feedback — "이 일정 괜찮아?", "그거 괜찮아?"
@@ -1018,7 +1045,32 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
   const needsTravelIntelligence = _isDiscoveryIntent(message) || _isJourneyPlanningIntent(message);
 
   if (!needsTravelIntelligence) {
-    const clarificationMsg = _generateClarificationMessage(soulContext, message);
+    // Load journey_ctx for context-aware clarification (known-field suppression)
+    let journeyCtxForClar = null;
+    try {
+      const sessionCtx = await sessionService.getSession(sessionId);
+      journeyCtxForClar = sessionCtx && sessionCtx.journey_ctx ? sessionCtx.journey_ctx : null;
+    } catch (_) {}
+
+    const clarificationMsg = _generateClarificationMessage(soulContext, message, journeyCtxForClar);
+
+    // Persist explicit leisure preference to session (fire-and-forget)
+    // _extractLeisure returns null on negation — so we only write on genuine preference
+    const pendingLeisure = quoteContextService._extractLeisure(message);
+    const cableNegated   = /케이블카|케이블 카/.test(message) && /빼고|빼줘|제외|없이|빼겠|뺄/.test(message);
+    if (pendingLeisure) {
+      sessionService.updateJourneyContext(sessionId, {
+        ...(journeyCtxForClar || {}),
+        preferred_leisure: pendingLeisure,
+      }).catch(() => {});
+    } else if (cableNegated && journeyCtxForClar && journeyCtxForClar.preferred_leisure) {
+      // Explicit negation clears stale preference so next route build excludes cablecar
+      sessionService.updateJourneyContext(sessionId, {
+        ...journeyCtxForClar,
+        preferred_leisure: null,
+      }).catch(() => {});
+    }
+
     return {
       ok: true,
       payload: {
@@ -1095,17 +1147,48 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
   // and the frontend renders "N일차" labels instead of calendar dates.
   // LOCKED items (hotel/leisure) are always present; AI cannot remove them.
   let routeSkeleton = null;
+  let _resolvedLeisure = null;
+  let _leisureSource   = null;
   if (_isJourneyPlanningIntent(message) && quoteCtx) {
+    // Load session to carry forward traveler's explicit leisure preference
+    let journeyCtxForSkeleton = null;
+    try {
+      const sessionCtx = await sessionService.getSession(sessionId);
+      journeyCtxForSkeleton = sessionCtx && sessionCtx.journey_ctx ? sessionCtx.journey_ctx : null;
+    } catch (_) {}
+
+    // Priority: current message > stored traveler preference > null
+    _resolvedLeisure = quoteCtx.leisure
+      || (journeyCtxForSkeleton && journeyCtxForSkeleton.preferred_leisure)
+      || null;
+    _leisureSource = quoteCtx.leisure
+      ? 'USER_SELECTED'
+      : (_resolvedLeisure ? 'TRAVELER_REQUESTED' : null);
+
     try {
       const { buildSkeleton } = require('./routeSkeletonService');
+      const nights = _extractNights(message);
       routeSkeleton = buildSkeleton({
-        start_date: quoteCtx.travel_date || null,
-        hotel_code: quoteCtx.hotel_code || null,
-        leisure_code: quoteCtx.leisure || null,
-        guest_count: quoteCtx.guest_count || domainContext.group_size || 2,
-        candidates: tgResult.places || [],
-        nights: _extractNights(message),
+        start_date:     quoteCtx.travel_date || null,
+        hotel_code:     quoteCtx.hotel_code || null,
+        leisure_code:   _resolvedLeisure,
+        leisure_source: _leisureSource,
+        guest_count:    quoteCtx.guest_count || domainContext.group_size || 2,
+        candidates:     tgResult.places || [],
+        nights,
       });
+
+      // Write-back: preserve existing journey_ctx fields + update route fields
+      sessionService.updateJourneyContext(sessionId, {
+        ...(journeyCtxForSkeleton || {}),
+        route_id:         routeSkeleton.route_id,
+        nights,
+        hotel_code:       quoteCtx.hotel_code   || null,
+        leisure_code:     _resolvedLeisure,
+        guest_count:      quoteCtx.guest_count  || domainContext.group_size || 2,
+        travel_date:      quoteCtx.travel_date  || null,
+      }).catch(err => console.error('[JOURNEY_CTX_WRITE_ERROR]', err.message));
+
     } catch (err) {
       console.error('[SOUL_ROUTE_SKELETON_ERROR]', err.message);
       // Non-fatal: recommendations + quote still returned
@@ -1117,21 +1200,6 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
   // _buildUserConditions() treat this as a multi-day context.
   if (routeSkeleton !== null && (_isMultiDayTrip(message) || _isJourneyPlanningIntent(message))) {
     domainContext._isMultiDayTrip = true;
-  }
-
-  // ─── JOURNEY CONTEXT WRITE-BACK ─────────────────────────────────────────────
-  // After a successful MY ROUTE build, persist minimum journey context so the
-  // next commerce follow-up ("이 정도면 얼마야?") can resolve without DISCOVERY.
-  // Fire-and-forget — session write failure never blocks the response.
-  if (routeSkeleton !== null && quoteCtx) {
-    sessionService.updateJourneyContext(sessionId, {
-      route_id:     routeSkeleton.route_id,
-      nights:       _extractNights(message),
-      hotel_code:   quoteCtx.hotel_code   || null,
-      leisure_code: quoteCtx.leisure      || null,
-      guest_count:  quoteCtx.guest_count  || domainContext.group_size || 2,
-      travel_date:  quoteCtx.travel_date  || null,
-    }).catch(err => console.error('[JOURNEY_CTX_WRITE_ERROR]', err.message));
   }
 
   // STATUS

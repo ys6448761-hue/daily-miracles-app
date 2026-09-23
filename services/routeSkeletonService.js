@@ -55,7 +55,7 @@ function _isNightOriented(candidate) {
  * When start_date is null: day.date = null, route_id = ROUTE-DATELESS-XXXX.
  * Frontend renders "N일차" labels instead of calendar dates.
  */
-function buildSkeleton({ start_date, hotel_code, leisure_code, guest_count, candidates = [], nights = 1 }) {
+function buildSkeleton({ start_date, hotel_code, leisure_code, leisure_source, guest_count, candidates = [], nights = 1 }) {
   const totalDays = Math.max(2, nights + 1);
   const dayDate = (offset) => _makeDate(start_date, offset); // returns null when start_date is null
 
@@ -86,13 +86,17 @@ function buildSkeleton({ start_date, hotel_code, leisure_code, guest_count, cand
         source: 'SOUL_RECOMMENDED', selection_status: 'SUGGESTED', commerce_code: null, quotable: false,
       }));
 
-      // LOCKED: leisure (cable car) → afternoon
+      // LOCKED/TRAVELER_REQUESTED: leisure (cable car) → afternoon
       if (leisure_code && COMMERCE_MAP[leisure_code]) {
         const lm = COMMERCE_MAP[leisure_code];
+        const isPreference = leisure_source === 'TRAVELER_REQUESTED';
         items.push({
           day: dayNum, date: dateStr, sequence: 10,
           time_slot: 'afternoon', time: null, type: lm.type, name: lm.name,
-          source: 'USER_SELECTED', selection_status: 'LOCKED', commerce_code: leisure_code, quotable: true,
+          source: isPreference ? 'TRAVELER_PREFERENCE' : 'USER_SELECTED',
+          selection_status: isPreference ? 'TRAVELER_REQUESTED' : 'LOCKED',
+          commerce_code: leisure_code,
+          quotable: !isPreference,
         });
       }
 
