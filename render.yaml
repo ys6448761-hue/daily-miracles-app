@@ -1,4 +1,30 @@
 services:
+  # ─── MUYEOJEONG STAGING (staging/storybook-c7a branch only) ──────────────────
+  # Dedicated staging service. Never merges to production.
+  # DATABASE_URL must be set to staging Supabase in Render Dashboard.
+  - type: web
+    name: daily-miracles-muyeojeong-staging
+    runtime: node
+    branch: staging/storybook-c7a
+    buildCommand: npm install --no-audit --no-fund && npm --prefix dreamtown-frontend install && npm --prefix dreamtown-frontend run build:muyeojeong
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "5000"
+      - key: NODE_VERSION
+        value: "20"
+      - key: APP_MODE
+        value: muyeojeong
+      - key: npm_config_optional
+        value: "true"
+      - key: npm_config_build_from_source
+        value: "false"
+      # DATABASE_URL: set in Render Dashboard → staging Supabase only
+      # OPENAI_API_KEY: set in Render Dashboard
+
+  # ─── PRODUCTION ──────────────────────────────────────────────────────────────
   - type: web
     name: daily-miracles-mvp
     runtime: node

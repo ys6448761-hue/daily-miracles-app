@@ -1054,21 +1054,31 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
 
     const clarificationMsg = _generateClarificationMessage(soulContext, message, journeyCtxForClar);
 
-    // Persist explicit leisure preference to session (fire-and-forget)
-    // _extractLeisure returns null on negation — so we only write on genuine preference
+    // Persist explicit leisure preference BEFORE returning response.
+    // Awaited so Turn N+1 session read is guaranteed to see the written preference.
+    // _extractLeisure returns null on negation — so we only write on genuine preference.
     const pendingLeisure = quoteContextService._extractLeisure(message);
     const cableNegated   = /케이블카|케이블 카/.test(message) && /빼고|빼줘|제외|없이|빼겠|뺄/.test(message);
     if (pendingLeisure) {
-      sessionService.updateJourneyContext(sessionId, {
-        ...(journeyCtxForClar || {}),
-        preferred_leisure: pendingLeisure,
-      }).catch(() => {});
+      try {
+        await sessionService.updateJourneyContext(sessionId, {
+          ...(journeyCtxForClar || {}),
+          preferred_leisure: pendingLeisure,
+        });
+      } catch (err) {
+        console.error('[JOURNEY_PREF_WRITE_ERROR]', err.message);
+        // Non-fatal: log and continue — preference not persisted, next turn lacks continuity
+      }
     } else if (cableNegated && journeyCtxForClar && journeyCtxForClar.preferred_leisure) {
       // Explicit negation clears stale preference so next route build excludes cablecar
-      sessionService.updateJourneyContext(sessionId, {
-        ...journeyCtxForClar,
-        preferred_leisure: null,
-      }).catch(() => {});
+      try {
+        await sessionService.updateJourneyContext(sessionId, {
+          ...journeyCtxForClar,
+          preferred_leisure: null,
+        });
+      } catch (err) {
+        console.error('[JOURNEY_PREF_CLEAR_ERROR]', err.message);
+      }
     }
 
     return {
