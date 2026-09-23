@@ -112,7 +112,7 @@ function _extractGuestCount(message, domainContext) {
   if (/넷이|네명|4명/.test(message)) return 4;
 
   // couple implied
-  if (/여자친구|남자친구|부부|커플|남편|아내/.test(message)) return 2;
+  if (/여자친구|남자친구|부부|커플|남편|아내|와이프/.test(message)) return 2;
 
   return null;
 }

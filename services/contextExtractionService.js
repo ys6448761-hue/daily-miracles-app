@@ -180,7 +180,7 @@ class ContextExtractionService {
     const KIDS     = ['아이랑', '아이와', '아이들과', '아이들이랑', '자녀와', '자녀랑', '애기랑', '아기랑'];
     const FRIENDS  = ['친구랑', '친구와', '친구들과'];
     const SOLO     = ['혼자', '혼자서'];
-    const COUPLE   = ['둘이서', '커플', '남자친구', '여자친구', '남편', '아내'];
+    const COUPLE   = ['둘이서', '커플', '남자친구', '여자친구', '남편', '아내', '와이프'];
 
     const hasElderly = ELDERLY.some(p => message.includes(p));
     const hasKids    = KIDS.some(p => message.includes(p));

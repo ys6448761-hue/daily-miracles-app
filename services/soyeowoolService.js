@@ -662,8 +662,9 @@ function _generateClarificationMessage(soulContext, message, journeyCtx) {
   }
 
   // Cable car positive intent (or "일정에 넣어줘" reference)
+  // Strong-intent verbs: explicit desire or future-plan ("탈거야" = will ride = intent, not curiosity)
   if (/케이블카|케이블 카/.test(msg)) {
-    if (/(꼭|반드시|타고 싶|타야|태워|일정에 넣|일정에 포함|일정에 추가)/.test(msg)) {
+    if (/(꼭|반드시|타고 싶|타야|태워|일정에 넣|일정에 포함|일정에 추가|탈거야|탈 거야|탈거예요|탈려고|타러|탈 예정)/.test(msg)) {
       return _cableClar();
     }
     return '케이블카에 대해 알고 싶으신 게 있으신가요?';
@@ -704,7 +705,7 @@ function _generateClarificationMessage(soulContext, message, journeyCtx) {
   return '여수 여행을 더 잘 도와드릴 수 있도록, 어떤 여행을 계획하고 계신지 말씀해 주세요.';
 }
 
-function _generateSoulMessage(soulContext, status, message) {
+function _generateSoulMessage(soulContext, status, message, quoteCtx) {
   const provenance = soulContext._provenance || {};
   const pt = soulContext.people_type;
   const timeMinutes = soulContext.time_available_minutes;
@@ -756,6 +757,25 @@ function _generateSoulMessage(soulContext, status, message) {
 
   const mobilityConstraint = soulContext.mobility_constraint;
   const requestedCount = soulContext.requested_count;
+
+  // Fix 2: Narrow journey acknowledgement — grounded, only when both hotel+leisure resolved.
+  // Acknowledges explicit resolved choices naturally. Does NOT enumerate every field.
+  // Only fires for journey planning intent — NOT Discovery, NOT clarification.
+  const HOTEL_NAME_KO   = { ramada: '라마다', kenny: '켄싱턴 호텔' };
+  const LEISURE_NAME_KO = { cable: '케이블카' };
+  if (quoteCtx && _isJourneyPlanningIntent(message) && status !== 'NO_RESULT' && status !== 'ERROR') {
+    const hotelName   = quoteCtx.hotel_code ? (HOTEL_NAME_KO[quoteCtx.hotel_code] || null) : null;
+    const leisureName = quoteCtx.leisure    ? (LEISURE_NAME_KO[quoteCtx.leisure]  || null) : null;
+    if (hotelName && leisureName) {
+      return `좋아요. ${hotelName}에서 묵고 ${leisureName}를 타는 일정으로 잡아볼게요.`;
+    }
+    if (hotelName) {
+      return `좋아요. ${hotelName} 일정으로 잡아볼게요.`;
+    }
+    if (leisureName) {
+      return `좋아요. ${leisureName}를 포함해서 일정을 잡아볼게요.`;
+    }
+  }
 
   if (status === 'NO_RESULT') {
     return `${situationLine}\n조건에 맞는 장소를 찾지 못했어요. 시간이나 조건을 조정해보실래요?`;
@@ -1216,7 +1236,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
   const status = _deriveStatus(tgResult, domainContext);
 
   // D7 SOUL MESSAGE
-  const soulMessage = _generateSoulMessage(soulContext, status, message);
+  const soulMessage = _generateSoulMessage(soulContext, status, message, quoteCtx);
 
   // WHY DETAILS
   const whyDetails = _buildWhyDetails(tgResult, domainContext);
