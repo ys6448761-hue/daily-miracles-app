@@ -119,7 +119,7 @@ export default function LumiTravelPage() {
           <div className="lumi-interaction-card">
             <p className="lumi-q-heading">지금 뭐가 궁금하세요?</p>
             <p className="lumi-q-sub">
-              정해진 질문은 없어요. 지금 상황을 그대로 말해 주세요.
+              저는 소여울이에요. 편하게 '소울'이라고 불러주세요. 지금 궁금한 걸 말하듯 물어보세요.
             </p>
 
             <div className="lumi-chips">
