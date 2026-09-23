@@ -1059,6 +1059,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
     // _extractLeisure returns null on negation — so we only write on genuine preference.
     const pendingLeisure = quoteContextService._extractLeisure(message);
     const cableNegated   = /케이블카|케이블 카/.test(message) && /빼고|빼줘|제외|없이|빼겠|뺄/.test(message);
+    // TRACE — remove after mobile acceptance of Journey Continuity V0.1
     console.log('[SOUL_TRACE_T1]', JSON.stringify({
       sessionId,
       pendingLeisure,
@@ -1182,6 +1183,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
     _leisureSource = quoteCtx.leisure
       ? 'USER_SELECTED'
       : (_resolvedLeisure ? 'TRAVELER_REQUESTED' : null);
+    // TRACE — remove after mobile acceptance of Journey Continuity V0.1
     console.log('[SOUL_TRACE_T2_SKELETON]', JSON.stringify({
       sessionId,
       quoteCtxLeisure: quoteCtx.leisure,
@@ -1204,6 +1206,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
         nights,
       });
 
+      // TRACE — remove after mobile acceptance of Journey Continuity V0.1
       console.log('[SOUL_TRACE_T2_SKELETON_OUT]', JSON.stringify({
         route_id: routeSkeleton.route_id,
         day1_items: routeSkeleton.days && routeSkeleton.days[0] && routeSkeleton.days[0].items.map(i => ({

@@ -12,6 +12,16 @@ const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
 const db = require('../database/db');
 
+// pg returns JSONB columns as JS objects when the OID is recognised.
+// If the column is text/varchar or an older pg version returns a string,
+// we fall back to JSON.parse. Never call JSON.parse on a plain object.
+function _parseJsonbContext(raw) {
+  if (raw === null || raw === undefined) return null;
+  if (typeof raw === 'object') return raw;           // already deserialized by pg
+  if (typeof raw === 'string') return JSON.parse(raw); // text fallback
+  return null;
+}
+
 const INACTIVITY_TIMEOUT_MINUTES = 120;
 const ABSOLUTE_TIMEOUT_HOURS = 12;
 
@@ -92,7 +102,7 @@ class SessionService {
         return null; // Session expired
       }
 
-      return JSON.parse(session.context);
+      return _parseJsonbContext(session.context);
     } catch (error) {
       console.error('Failed to retrieve session:', error);
       return null;
