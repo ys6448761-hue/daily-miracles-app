@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — **Geumodo SOUL Utility A/B Execution SAVED / READY FOR BLIND EVALUATION**  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — **CAND-OPS-003 V0.2 Revision SAVED / READY FOR REVIEW**  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -61,22 +61,20 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**CAND-OPS-003 Blind Test — Geumodo SOUL Utility Blind Evaluation**
+**CAND-OPS-003 V0.2 Revision Review**
 
 ```
-A/B Execution: docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_GEUMODO_SOUL_UTILITY_AB_EXECUTION_V0_1.md
-               SAVED / READY FOR BLIND EVALUATION (평가자는 열람 금지)
-Blind Package: docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_GEUMODO_SOUL_UTILITY_BLIND_PACKAGE_V0_1.md
-               SAVED / READY FOR EVALUATION
-Mapping Record: AB_EXECUTION 파일 내 포함 (평가 완료 전 비공개)
+V0.2 File: docs/constitution/candidate/CAND-OPS-003_SOUL_Place_Knowledge_Authoring_Framework_V0_2.md
+           SAVED / READY FOR REVIEW
+V0.1 File: docs/constitution/candidate/CAND-OPS-003_SOUL_Place_Knowledge_Authoring_Framework.md
+           PRESERVED (immutable)
 CAND-OPS-003:   Candidate / Draft (변경 없음)
 DreamTown Philosophy: HOLD / NOT CREATED
+Findings: FA-01/FA-02/FA-NI-01/MR-01/MR-02/MR-03 = RESOLVED (V0.2)
 
-다음 단계: Blind Package 기준으로 D1~D12 + CF-U1~CF-U7 평가
-결과 저장: CAND-OPS-003_BLIND_TEST_GEUMODO_SOUL_UTILITY_REPORT_V0_1.md (미생성)
-주의: 평가 전 Execution Record(Mapping) 열람 금지
-      숫자 총점/Winner 미리 산정 금지
-      Candidate mod / Promotion / SSOT 변경 금지 (평가 단계에서도)
+다음 단계: V0.2 Revision Review
+리뷰 대상: RR-01~04 반영 여부 / 구조 보존 확인 / Self-Check 검증
+주의: Candidate Approval / SSOT Promotion 금지 (Review 단계)
 ```
 
 ---

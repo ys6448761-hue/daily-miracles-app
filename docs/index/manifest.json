@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-24T21:29:09.800Z",
+  "generated_at": "2026-09-24T21:44:23.881Z",
   "generator": "generate-manifest.js",
-  "total_count": 484,
+  "total_count": 485,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "active",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-24",
-      "checksum": "3e753449"
+      "checksum": "447a38a5"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -1625,6 +1625,23 @@
       "title": "CAND-OPS-003 — SOUL Place Knowledge Authoring Framework",
       "created_at": "2026-09-24",
       "checksum": "7d7f8b6f"
+    },
+    {
+      "id": "DOC-CAND-OPS-003_SOUL_Place_Knowle",
+      "path": "docs/constitution/candidate/CAND-OPS-003_SOUL_Place_Knowledge_Authoring_Framework_V0_2.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "constitution",
+      "tags": [
+        "candidate",
+        "소원"
+      ],
+      "owner": "team",
+      "status": "superseded",
+      "title": "CAND-OPS-003 — SOUL Place Knowledge Authoring Framework V0.2",
+      "created_at": "2026-09-24",
+      "checksum": "829a0253"
     },
     {
       "id": "DOC-CAND-OS-001_Lumi_OS_v2_Phase1_",
