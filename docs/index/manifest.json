@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-24T07:00:50.840Z",
+  "generated_at": "2026-09-24T07:04:06.753Z",
   "generator": "generate-manifest.js",
-  "total_count": 475,
+  "total_count": 476,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "active",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-24",
-      "checksum": "070c1feb"
+      "checksum": "ce2422b6"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -1426,6 +1426,22 @@
       "title": "금오도 비렁길 — CAND-OPS-003 Blind Test Research Report",
       "created_at": "2026-09-24",
       "checksum": "73f275a7"
+    },
+    {
+      "id": "DOC-CAND-OPS-003_BLIND_TEST_GEUMOD",
+      "path": "docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_GEUMODO_WE_CORRECTIONS_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "constitution",
+      "tags": [
+        "candidate"
+      ],
+      "owner": "team",
+      "status": "superseded",
+      "title": "CAND-OPS-003 Blind Test — 금오도 비렁길 WE Corrections V0.1",
+      "created_at": "2026-09-24",
+      "checksum": "e074b9c5"
     },
     {
       "id": "DOC-CAND-OPS-003_BLIND_TEST_GEUMOD",
