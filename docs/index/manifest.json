@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-24T23:02:59.639Z",
+  "generated_at": "2026-09-24T23:27:06.800Z",
   "generator": "generate-manifest.js",
-  "total_count": 489,
+  "total_count": 490,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1607,6 +1607,22 @@
       "title": "CAND-OPS-003 — Founder Approval V0.1",
       "created_at": "2026-09-24",
       "checksum": "d67c0785"
+    },
+    {
+      "id": "DOC-CAND-OPS-003_OPERATIONAL_VALID",
+      "path": "docs/constitution/candidate/CAND-OPS-003_OPERATIONAL_VALIDATION_SCOPE_REVIEW_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "constitution",
+      "tags": [
+        "candidate"
+      ],
+      "owner": "code",
+      "status": "superseded",
+      "title": "CAND-OPS-003 — Operational Validation Scope Review V0.1",
+      "created_at": "2026-09-24",
+      "checksum": "86d623d3"
     },
     {
       "id": "DOC-CAND-OPS-003_POST_APPROVAL_OPE",
