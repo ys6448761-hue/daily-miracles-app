@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — **Review Plan SAVED / READY**  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — **Geumodo Blind Test Research SAVED / READY FOR REVIEW**  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -61,16 +61,18 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**CAND-OPS-003 Blind Test — 금오도 비렁길 World Experience Review**
+**CAND-OPS-003 Blind Test — Geumodo WE Review / Evaluation Matrix**
 
 ```
-선정 장소:  금오도 비렁길 (Geumodo Bireonggil)
-선정 근거:  섬+장거리 탐방로 구조 — Place/Route/Movement/Entity Boundary 동시 검증
-            Anti-Selection Bias Rule 충족 (Challenge Conditions 9/9)
-Selection:  docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_FIFTH_PLACE_SELECTION.md
-주의:       Blind Test Phase 1부터 순서대로 진행
-            Official Layer → World Experience → Conflict → Entity → …
-            Founder/DreamTown 의미를 WE 이전에 주입하지 않는다
+Research:   docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_GEUMODO_RESEARCH_V0_1.md
+Status:     SAVED / READY FOR REVIEW
+다음 단계:  CAND-OPS-003 Review Plan (CAND-OPS-003_REVIEW_PLAN_V0_1.md) 기준으로
+            Blind Test Research 평가 수행
+            - 7 Critical Failure Conditions 확인
+            - 15-dimension Evaluation Matrix
+            - WE Review Decision (PASS / PASS WITH CORRECTIONS / REVISE / HOLD)
+주의:       Review 수행 전 Founder/DreamTown 의미 주입 금지
+            Review Plan 저장 이후 기준 변경 금지
 ```
 
 ---
