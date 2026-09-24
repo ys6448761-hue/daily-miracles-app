@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25) — **Post-Approval Operational Validation Scope SAVED / READY WITH DEPENDENCIES**  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25) — Post-Approval Operational Validation Scope V0.2 SAVED / READY — **Operational Validation Execution Design SAVED / EXECUTION READY**  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -61,27 +61,38 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**CAND-OPS-003 Operational Validation Scope Review**
+**CAND-OPS-003 Operational Validation Response Generation**
 
 ```
 CAND-OPS-003 V0.2 Status: Candidate / Approved (2026-09-25)
 Approver: Founder / 대표 푸르미르
-Approval Evidence: docs/constitution/candidate/CAND-OPS-003_FOUNDER_APPROVAL_V0_1.md
 
-Post-Approval Operational Validation Scope: SAVED
-Scope File: docs/constitution/candidate/CAND-OPS-003_POST_APPROVAL_OPERATIONAL_VALIDATION_SCOPE_V0_1.md
-Execution Readiness: READY WITH DEPENDENCIES
+Execution Design: SAVED / EXECUTION READY
+Design File: docs/constitution/candidate/CAND-OPS-003_OPERATIONAL_VALIDATION_EXECUTION_DESIGN_V0_1.md
 
-Required Dependencies (3):
-  VD-01: Knowledge 주입 방식 확정
-  VD-03: Provenance Metadata 포함 방식 확정
-  VD-04: 독립 Evaluator 역할 지정
+Scenario Set: SCN-01~SCN-08 FROZEN (8개)
+OV Coverage: OV-01~08 ALL COVERED
+CF Coverage: CF-OV-01~08 ALL TRIGGERED
+Place Coverage: P1~P5 ALL USED
+Generator Instruction: FROZEN
+Knowledge Injection Package: FROZEN (per Scenario)
+Utility Threshold: FROZEN (Scope V0.2 Section 7.4)
+CF Definitions: FROZEN
 
-OGQ-001: "Minimum 3 independent validations" 기준 미정의 — Constitution 승격 전 명확화 필요
-RL-01~04: OPEN — 현장 확인 미완료
-DreamTown Philosophy: HOLD / NOT CREATED
+Execution Sequence:
+  Phase 1: Package Freeze DONE
+  Phase 2: Response Generation — NEXT
+  Phase 3: Raw Response Save
+  Phase 4: Independent Partially Blind Evaluation
+  Phase 5: Evaluation Save
+  Phase 6: Result Review
 
-다음 단계: Scope Review (OV-01~08 / Scenario Family / Success Criteria 검토)
+Evaluator 배정: Execution 시작 직전 결정 (Partially Blind 방식 확정됨)
+
+OGQ-001: "Minimum 3 independent validations" — OPEN
+RL-01~04: OPEN
+DreamTown Philosophy: HOLD
+
 주의: LOCKED 전환 금지 / Constitution 승격 금지 / Production 연결 금지
 ```
 
