@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — **Geumodo SOUL Utility Protocol SAVED / READY**  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — **Geumodo SOUL Utility A/B Execution SAVED / READY FOR BLIND EVALUATION**  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -61,21 +61,22 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**CAND-OPS-003 Blind Test — Geumodo SOUL Utility A/B Execution**
+**CAND-OPS-003 Blind Test — Geumodo SOUL Utility Blind Evaluation**
 
 ```
-SOUL Utility Protocol: docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_GEUMODO_SOUL_UTILITY_PROTOCOL_V0_1.md
-                       SAVED / READY
+A/B Execution: docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_GEUMODO_SOUL_UTILITY_AB_EXECUTION_V0_1.md
+               SAVED / READY FOR BLIND EVALUATION (평가자는 열람 금지)
+Blind Package: docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_GEUMODO_SOUL_UTILITY_BLIND_PACKAGE_V0_1.md
+               SAVED / READY FOR EVALUATION
+Mapping Record: AB_EXECUTION 파일 내 포함 (평가 완료 전 비공개)
 CAND-OPS-003:   Candidate / Draft (변경 없음)
 DreamTown Philosophy: HOLD / NOT CREATED
-"자기 속도": REPEATED FOUNDER PHILOSOPHY EVIDENCE — HOLD (3 places)
-Previous Dimension 12 판정: Authoring-level observation ONLY — 실제 Utility Evidence 아님
 
-다음 단계: A/B 응답 생성 (6개 시나리오) + 12 Dimension 평가
-Protocol 파일: 위 경로 참조
-주의: Critical Failure CF-U1~CF-U7 기준은 이미 고정됨 — 실행 전 재확인
-      Founder Intent Rule 준수 — 철학 직접 인용 금지
-      Live Knowledge Rule 준수 — 배편/날씨 값 추측 금지
+다음 단계: Blind Package 기준으로 D1~D12 + CF-U1~CF-U7 평가
+결과 저장: CAND-OPS-003_BLIND_TEST_GEUMODO_SOUL_UTILITY_REPORT_V0_1.md (미생성)
+주의: 평가 전 Execution Record(Mapping) 열람 금지
+      숫자 총점/Winner 미리 산정 금지
+      Candidate mod / Promotion / SSOT 변경 금지 (평가 단계에서도)
 ```
 
 ---

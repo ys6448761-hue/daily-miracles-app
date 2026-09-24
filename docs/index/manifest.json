@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-24T20:47:52.669Z",
+  "generated_at": "2026-09-24T20:53:26.074Z",
   "generator": "generate-manifest.js",
-  "total_count": 479,
+  "total_count": 481,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "active",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-24",
-      "checksum": "9af704d3"
+      "checksum": "3e753449"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -1460,6 +1460,38 @@
       "title": "금오도 비렁길 — CAND-OPS-003 Blind Test Research Report",
       "created_at": "2026-09-24",
       "checksum": "73f275a7"
+    },
+    {
+      "id": "DOC-CAND-OPS-003_BLIND_TEST_GEUMOD",
+      "path": "docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_GEUMODO_SOUL_UTILITY_AB_EXECUTION_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "constitution",
+      "tags": [
+        "candidate"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "CAND-OPS-003 Blind Test — 금오도 비렁길 SOUL Utility A/B Execution V0.1",
+      "created_at": "2026-09-24",
+      "checksum": "90470463"
+    },
+    {
+      "id": "DOC-CAND-OPS-003_BLIND_TEST_GEUMOD",
+      "path": "docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_GEUMODO_SOUL_UTILITY_BLIND_PACKAGE_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "constitution",
+      "tags": [
+        "candidate"
+      ],
+      "owner": "team",
+      "status": "archived",
+      "title": "CAND-OPS-003 Blind Test — 금오도 비렁길 SOUL Utility Blind Evaluation Package V0.1",
+      "created_at": "2026-09-24",
+      "checksum": "e5cd4637"
     },
     {
       "id": "DOC-CAND-OPS-003_BLIND_TEST_GEUMOD",
