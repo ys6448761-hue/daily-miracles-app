@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE Review SAVED / GREEN  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -35,7 +35,7 @@ VERIFY_REQUIRED, LIVE_CHECK, DO_NOT_PROMOTE 항목은 명시적으로 분리.
 | 3 | 하멜등대 | hamel_lighthouse (신규) | DONE | DONE | DONE | **SAVED / GREEN** | WE: `docs/knowledge/YEOSU_PLACE_KNOWLEDGE_HAMEL_LIGHTHOUSE_WE_V0_1.md` / Founder: `docs/knowledge/YEOSU_PLACE_KNOWLEDGE_HAMEL_LIGHTHOUSE_FOUNDER_V0_1.md` |
 | 4 | 오동도 | odongdo | — | — | — | QUEUED | — |
 | 5 | 향일암 | hyangiram | — | — | — | QUEUED | — |
-| 6 | 케이블카 | cablecar | IN PROGRESS | **NEXT** | DONE | WE REVIEW COMPLETE / Founder Review PENDING | `docs/knowledge/YEOSU_PLACE_KNOWLEDGE_CABLE_CAR_WE_V0_1.md` |
+| 6 | 케이블카 | cablecar | DONE | DONE | DONE | **SAVED / GREEN** | WE: `docs/knowledge/YEOSU_PLACE_KNOWLEDGE_CABLE_CAR_WE_V0_1.md` / Founder: `docs/knowledge/YEOSU_PLACE_KNOWLEDGE_CABLE_CAR_FOUNDER_V0_1.md` |
 | 7 | 자산공원 | jaisan_park | — | — | — | QUEUED | — |
 | 8 | 돌산공원 | dolsan_nightscape | — | — | — | QUEUED | — |
 | 9 | 낭만포차거리 | romantic_pojangmacha | — | — | — | QUEUED | — |
@@ -61,17 +61,18 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Yeosu Maritime Cable Car Founder Review**
+**SOUL Place Knowledge Authoring Framework — Candidate Readiness Review**
 
 ```
-place_code: cablecar
-name_ko:    여수 해상케이블카
-목적:       World Experience 결과 검토 + Founder Intent 독립 수신
-            + View+Movement ↔ DreamTown 상승/희망 연결 여부 Founder로 확인
-핵심 질문:  Founder에게 케이블카는 소원이에게 어떤 감정적 전환을 의미하는가?
-주의:       Founder에게 World Experience 결론을 정답처럼 먼저 설명하지 않는다.
-            먼저 Founder의 독립적인 의도를 받는다.
-WE 기반:    docs/knowledge/YEOSU_PLACE_KNOWLEDGE_CABLE_CAR_WE_V0_1.md
+목적:       4개 장소(이순신광장/종포해양공원/하멜등대/케이블카) 완료 Evidence를
+            비교하여 Authoring Framework SSOT Candidate 제안 여부 판단
+평가 대상:
+  A. Knowledge Authoring Framework Candidate Readiness
+     (Official → WE → Founder → DreamTown → SOUL)
+  B. DreamTown-Wide Founder Philosophy Candidate Readiness
+     (혼자가 아님 + 작은 희망 + 다시 자신의 삶으로 돌아감)
+주의:       두 Candidate Family를 자동 병합하지 않는다.
+            Readiness Review이지 Candidate 자동 생성이 아니다.
 ```
 
 ---
@@ -116,6 +117,13 @@ SOUL             → compose what this traveler needs now
 | Hamel — Physical End / Emotional Beginning | 공간적 끝 = 감정적 새 시작 (FOUNDER_INTENT / DREAMTOWN) |
 | Hamel — Founder Promise | DreamTown과 여수는 소원이를 혼자 두지 않음 — FOUNDER_INTENT Evidence, Manifesto 미승격 |
 | 빨간/흰 등대 항로표지 의미 | FOUNDER_LOCAL → VERIFY_REQUIRED, Official 미승격 |
+| Cable Car — 상승의 의미 | distance for reflection (탈출 아님) — FOUNDER_INTENT_SYNTHESIS |
+| Cable Car — 내려옴 | 희망을 가지고 삶으로 돌아가는 순간 — FOUNDER_INTENT_SYNTHESIS |
+| Cable Car — Small Change Principle | 잠깐의 연결감 + 작은 희망 → 내일은 이미 달라짐 — PHILOSOPHY EVIDENCE / HOLD |
+| Cable Car — 삶 속에 있되 매이지 않음 | 핵심 Founder 철학 표현 — HOLD |
+| Hamel ↔ Cable Car 반복 | 혼자가 아님 / 작은 희망 / 다시 나아감 / 현실로 돌아감 — 2개 장소 반복 |
+| Potential DreamTown-Wide Philosophy | MODEL SYNTHESIS — Candidate-Worthy OBSERVATION, HOLD |
+| Candidate Readiness | A(Authoring Framework) + B(DreamTown Philosophy) — Readiness Review 단계 |
 
 ---
 
