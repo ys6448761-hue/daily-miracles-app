@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE Review SAVED / GREEN  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE Review SAVED / GREEN — Hamel Lighthouse Founder Review V0.1 SAVED / GREEN  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -32,7 +32,7 @@ VERIFY_REQUIRED, LIVE_CHECK, DO_NOT_PROMOTE 항목은 명시적으로 분리.
 |---|---|---|---|---|---|---|---|
 | 1 | 이순신광장 | lee_soon_shin_plaza | DONE | DONE | DONE | **SAVED / GREEN** | `docs/knowledge/YEOSU_PLACE_KNOWLEDGE_LEE_SOON_SHIN_PLAZA_V0_1.md` |
 | 2 | 종포해양공원 | marine_park | DONE | DONE | DONE | **SAVED / GREEN** | `docs/knowledge/YEOSU_PLACE_KNOWLEDGE_MARINE_PARK_V0_1.md` |
-| 3 | 하멜등대 | hamel_lighthouse (신규) | IN PROGRESS | **NEXT** | DONE | WE REVIEW COMPLETE / Founder Review PENDING | `docs/knowledge/YEOSU_PLACE_KNOWLEDGE_HAMEL_LIGHTHOUSE_WE_V0_1.md` |
+| 3 | 하멜등대 | hamel_lighthouse (신규) | DONE | DONE | DONE | **SAVED / GREEN** | WE: `docs/knowledge/YEOSU_PLACE_KNOWLEDGE_HAMEL_LIGHTHOUSE_WE_V0_1.md` / Founder: `docs/knowledge/YEOSU_PLACE_KNOWLEDGE_HAMEL_LIGHTHOUSE_FOUNDER_V0_1.md` |
 | 4 | 오동도 | odongdo | — | — | — | QUEUED | — |
 | 5 | 향일암 | hyangiram | — | — | — | QUEUED | — |
 | 6 | 케이블카 | cablecar | — | — | — | QUEUED | — |
@@ -52,24 +52,26 @@ VERIFY_REQUIRED, LIVE_CHECK, DO_NOT_PROMOTE 항목은 명시적으로 분리.
 | travel_places migration 초안 | ✗ OPEN |
 | `등대` → PLACE_SUFFIX_RE 추가 (code change) | ✗ OPEN |
 
-World Experience Review 완료. Founder Review 진행 시 위 blocker 병행 해소.  
-Conflict Register A–D (접근성/낚시/주차/Route 거리) → Founder Review 에서 확정 필요.
+World Experience Review + Founder Review V0.1 완료.  
+Conflict Register A–D 전체 OPEN 유지 — Official Verification 미완료.  
+신규 VERIFY_REQUIRED: 빨간/흰 등대 항로표지 공식 의미.  
+blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ---
 
 ## Current Next Action
 
-**Hamel Lighthouse Founder Review**
+**Yeosu Maritime Cable Car Place Knowledge Authoring Pilot — World Experience Review V0.1**
 
 ```
-place_code:  hamel_lighthouse (travel_places 미등록 — 신규 onboarding 대상)
-name_ko:     하멜등대
-목적:        World Experience 결과 검토 + Founder Local Knowledge 추가
-             + Core Identity 확정 + Conflict Register A–D 해소
-             + lat/lng / admission_fee / 접근성 사실 확인
-검토 기반:   docs/knowledge/YEOSU_PLACE_KNOWLEDGE_HAMEL_LIGHTHOUSE_WE_V0_1.md
-핵심 질문:   사람들이 걸어가서 도착한다는 World Experience 패턴이
-             Founder Local 관찰과 일치하는가?
+place_code: cablecar
+name_ko:    여수 해상케이블카
+목적:       기존 3개 장소(해안 산책형)에서 발견한 Authoring Pattern이
+            이동형 / 전망형 / 상승 경험 장소에서도 반복되는지 관찰
+핵심 질문:  사람들은 여수 케이블카에서 어떤 경험을 하는가?
+주의:       기존 DreamTown SSOT의 Cable Car 역할(상승/희망·확장)을
+            World Experience 조사에 정답처럼 주입하지 않는다.
+            World Experience 결과를 먼저 독립적으로 보존한 뒤 DreamTown과 비교.
 ```
 
 ---
@@ -107,7 +109,11 @@ SOUL             → compose what this traveler needs now
 | Provenance | 모든 field에 source_type + confidence + do_not_promote 필수 |
 | World Experience | Truth Source 아님 — 반복 패턴 발견용 Knowledge Input |
 | 종포해양공원 ≠ 여수해양공원 | 별도 Entity — alias 금지, 공식 관계 VERIFY_REQUIRED |
+| 하멜전시관 ≠ 하멜등대 | 별도 Entity — alias 금지 |
 | Conflict Register | 낚시(SOUL 안내 금지) / 주차(과거 정보 사용 금지) / 명칭 혼용 — 문서 내 관리 |
+| Hamel — Physical End / Emotional Beginning | 공간적 끝 = 감정적 새 시작 (FOUNDER_INTENT / DREAMTOWN) |
+| Hamel — Founder Promise | DreamTown과 여수는 소원이를 혼자 두지 않음 — FOUNDER_INTENT Evidence, Manifesto 미승격 |
+| 빨간/흰 등대 항로표지 의미 | FOUNDER_LOCAL → VERIFY_REQUIRED, Official 미승격 |
 
 ---
 
