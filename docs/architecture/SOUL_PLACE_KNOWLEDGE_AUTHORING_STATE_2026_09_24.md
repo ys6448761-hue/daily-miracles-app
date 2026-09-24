@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — **Geumodo Blind Test Research SAVED / READY FOR REVIEW**  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — **Geumodo WE Review SAVED / PASS WITH CORRECTIONS**  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -61,18 +61,24 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**CAND-OPS-003 Blind Test — Geumodo WE Review / Evaluation Matrix**
+**CAND-OPS-003 Blind Test — Geumodo WE Corrections**
 
 ```
-Research:   docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_GEUMODO_RESEARCH_V0_1.md
-Status:     SAVED / READY FOR REVIEW
-다음 단계:  CAND-OPS-003 Review Plan (CAND-OPS-003_REVIEW_PLAN_V0_1.md) 기준으로
-            Blind Test Research 평가 수행
-            - 7 Critical Failure Conditions 확인
-            - 15-dimension Evaluation Matrix
-            - WE Review Decision (PASS / PASS WITH CORRECTIONS / REVISE / HOLD)
-주의:       Review 수행 전 Founder/DreamTown 의미 주입 금지
-            Review Plan 저장 이후 기준 변경 금지
+WE Review:   docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_GEUMODO_WE_REVIEW_V0_1.md
+Decision:    PASS WITH CORRECTIONS
+Corrections: 2건 — Research 재수행 불필요
+
+CORRECTION-01:
+  대상: Research Section 2.7 (유모차/어린이 항목)
+  조치: "구조 상 판단" → OPERATOR_INFERENCE / STRUCTURAL_INFERENCE 라벨 추가
+        또는 WE Layer로 이동
+
+CORRECTION-02:
+  대상: Research Section 2.6 (추락 경고판 / 비 올 때 위험 / 강풍)
+  조치: WE 출처임에도 Official Section에 있는 이유 명시
+        또는 WE Layer로 이동 + Official에 참조 표시
+
+Corrections 완료 후: Geumodo Founder Review 진행 가능
 ```
 
 ---
