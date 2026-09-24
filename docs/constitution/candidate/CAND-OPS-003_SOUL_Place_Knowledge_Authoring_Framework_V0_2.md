@@ -3,8 +3,11 @@
 **Candidate ID:** CAND-OPS-003  
 **Category:** Operations / Framework  
 **Title:** SOUL Place Knowledge Authoring Framework  
-**Status:** Candidate / Draft  
-**Lifecycle:** Idea → **Draft** → Review → Approved → LOCKED  
+**Status:** Candidate / Approved  
+**Lifecycle:** Idea → Draft → Review → **Approved** → LOCKED  
+**Approval Date:** 2026-09-25  
+**Approver:** Founder / 대표 푸르미르  
+**Approval Evidence:** `docs/constitution/candidate/CAND-OPS-003_FOUNDER_APPROVAL_V0_1.md`  
 **Importance:** Level 4  
 **생성일:** 2026-09-24 (V0.1)  
 **개정일:** 2026-09-25 (V0.2)  

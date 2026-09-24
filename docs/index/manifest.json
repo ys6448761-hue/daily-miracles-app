@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-24T22:48:35.195Z",
+  "generated_at": "2026-09-24T22:56:24.803Z",
   "generator": "generate-manifest.js",
-  "total_count": 487,
+  "total_count": 488,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "active",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-24",
-      "checksum": "447a38a5"
+      "checksum": "ba8bbc5e"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -1592,6 +1592,23 @@
       "checksum": "99d0ece2"
     },
     {
+      "id": "DOC-CAND-OPS-003_FOUNDER_APPROVAL_",
+      "path": "docs/constitution/candidate/CAND-OPS-003_FOUNDER_APPROVAL_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "constitution",
+      "tags": [
+        "candidate",
+        "aurora"
+      ],
+      "owner": "ceo",
+      "status": "|---",
+      "title": "CAND-OPS-003 — Founder Approval V0.1",
+      "created_at": "2026-09-24",
+      "checksum": "d67c0785"
+    },
+    {
       "id": "DOC-CAND-OPS-003_PROMOTION_REVIEW_",
       "path": "docs/constitution/candidate/CAND-OPS-003_PROMOTION_REVIEW_V0_1.md",
       "type": "document",
@@ -1654,11 +1671,11 @@
         "candidate",
         "소원"
       ],
-      "owner": "team",
+      "owner": "ceo",
       "status": "superseded",
       "title": "CAND-OPS-003 — SOUL Place Knowledge Authoring Framework V0.2",
       "created_at": "2026-09-24",
-      "checksum": "829a0253"
+      "checksum": "c795f86c"
     },
     {
       "id": "DOC-CAND-OPS-003_V0_2_REVISION_REV",
