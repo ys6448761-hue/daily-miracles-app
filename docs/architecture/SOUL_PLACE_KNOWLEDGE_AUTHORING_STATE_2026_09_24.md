@@ -61,17 +61,16 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**CAND-OPS-003 Blind Test — Fifth Place Selection**
+**CAND-OPS-003 Blind Test — 금오도 비렁길 World Experience Review**
 
 ```
-목적:       Review Plan에 정의된 기준으로 Blind Test를 시작할
-            다섯 번째 장소를 선정
-주의:       장소 선정 단계 — 실제 Research 시작 아님
-            Anti-Selection Bias Rule 적용 (Section 4 참조)
-            다음 도전 유형 포함 권장:
-              conflicting traveler reports / changing operating info /
-              accessibility issue / weather/companion dependence
-기준:       CAND-OPS-003_REVIEW_PLAN_V0_1.md Section 4
+선정 장소:  금오도 비렁길 (Geumodo Bireonggil)
+선정 근거:  섬+장거리 탐방로 구조 — Place/Route/Movement/Entity Boundary 동시 검증
+            Anti-Selection Bias Rule 충족 (Challenge Conditions 9/9)
+Selection:  docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_FIFTH_PLACE_SELECTION.md
+주의:       Blind Test Phase 1부터 순서대로 진행
+            Official Layer → World Experience → Conflict → Entity → …
+            Founder/DreamTown 의미를 WE 이전에 주입하지 않는다
 ```
 
 ---
