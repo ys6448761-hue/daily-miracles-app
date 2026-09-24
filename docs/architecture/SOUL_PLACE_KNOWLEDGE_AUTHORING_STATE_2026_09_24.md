@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE Review SAVED / GREEN  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -32,7 +32,7 @@ VERIFY_REQUIRED, LIVE_CHECK, DO_NOT_PROMOTE 항목은 명시적으로 분리.
 |---|---|---|---|---|---|---|---|
 | 1 | 이순신광장 | lee_soon_shin_plaza | DONE | DONE | DONE | **SAVED / GREEN** | `docs/knowledge/YEOSU_PLACE_KNOWLEDGE_LEE_SOON_SHIN_PLAZA_V0_1.md` |
 | 2 | 종포해양공원 | marine_park | DONE | DONE | DONE | **SAVED / GREEN** | `docs/knowledge/YEOSU_PLACE_KNOWLEDGE_MARINE_PARK_V0_1.md` |
-| 3 | 하멜등대 | hamel_lighthouse (신규) | — | **NEXT** | — | BLOCKED (lat/lng 미확인) | — |
+| 3 | 하멜등대 | hamel_lighthouse (신규) | IN PROGRESS | **NEXT** | DONE | WE REVIEW COMPLETE / Founder Review PENDING | `docs/knowledge/YEOSU_PLACE_KNOWLEDGE_HAMEL_LIGHTHOUSE_WE_V0_1.md` |
 | 4 | 오동도 | odongdo | — | — | — | QUEUED | — |
 | 5 | 향일암 | hyangiram | — | — | — | QUEUED | — |
 | 6 | 케이블카 | cablecar | — | — | — | QUEUED | — |
@@ -52,28 +52,31 @@ VERIFY_REQUIRED, LIVE_CHECK, DO_NOT_PROMOTE 항목은 명시적으로 분리.
 | travel_places migration 초안 | ✗ OPEN |
 | `등대` → PLACE_SUFFIX_RE 추가 (code change) | ✗ OPEN |
 
-하멜등대는 위 blocker 해소 전까지 authoring 시작 불가.
+World Experience Review 완료. Founder Review 진행 시 위 blocker 병행 해소.  
+Conflict Register A–D (접근성/낚시/주차/Route 거리) → Founder Review 에서 확정 필요.
 
 ---
 
 ## Current Next Action
 
-**Hamel Lighthouse World Experience Review V0.1**
+**Hamel Lighthouse Founder Review**
 
 ```
-place_code: hamel_lighthouse (travel_places 미등록 — 신규 onboarding 대상)
-name_ko:    하멜등대
-목적:       DreamTown SSOT 선입견 없이 독립 World Experience 패턴 확인
-           + place_knowledge draft 작성 → Founder Review
-           + lat/lng / 공식 정보 blocker 해소 병행
-핵심 질문:  "사람들은 왜 작은 빨간 등대 하나를 보러 여기까지 걸어가는가?"
+place_code:  hamel_lighthouse (travel_places 미등록 — 신규 onboarding 대상)
+name_ko:     하멜등대
+목적:        World Experience 결과 검토 + Founder Local Knowledge 추가
+             + Core Identity 확정 + Conflict Register A–D 해소
+             + lat/lng / admission_fee / 접근성 사실 확인
+검토 기반:   docs/knowledge/YEOSU_PLACE_KNOWLEDGE_HAMEL_LIGHTHOUSE_WE_V0_1.md
+핵심 질문:   사람들이 걸어가서 도착한다는 World Experience 패턴이
+             Founder Local 관찰과 일치하는가?
 ```
 
 ---
 
-## Emerging Authoring Pattern (2 Cases Observed — Not Yet SSOT)
+## Emerging Authoring Pattern (3 Cases Observed — Not Yet SSOT)
 
-두 장소(이순신광장 + 종포해양공원)에서 반복 관찰된 지식 구성 패턴:
+세 장소(이순신광장 + 종포해양공원 + **하멜등대**)에서 반복 관찰된 지식 구성 패턴:
 
 ```
 Official         → factual skeleton
@@ -83,7 +86,9 @@ DreamTown        → emotional meaning
 SOUL             → compose what this traveler needs now
 ```
 
-SSOT Candidate 승격 조건: 하멜등대 / 케이블카에서 추가 반복 확인 후 결정.
+추가 반복 패턴: `Place Knowledge + Route/Relationship Knowledge 분리 필요` — 3회 반복 확인.
+
+**SSOT Candidate 승격 조건:** 케이블카에서 추가 반복 확인 후 결정. 현재 상태: `OBSERVATION — 3rd repetition`.
 
 ---
 
