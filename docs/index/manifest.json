@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-24T21:56:49.315Z",
+  "generated_at": "2026-09-24T22:48:35.195Z",
   "generator": "generate-manifest.js",
-  "total_count": 486,
+  "total_count": 487,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1590,6 +1590,23 @@
       "title": "CAND-OPS-003 Blind Test — 금오도 비렁길 WE Review V0.1",
       "created_at": "2026-09-24",
       "checksum": "99d0ece2"
+    },
+    {
+      "id": "DOC-CAND-OPS-003_PROMOTION_REVIEW_",
+      "path": "docs/constitution/candidate/CAND-OPS-003_PROMOTION_REVIEW_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "constitution",
+      "tags": [
+        "candidate",
+        "aurora"
+      ],
+      "owner": "ceo",
+      "status": "|---",
+      "title": "CAND-OPS-003 — Promotion Review V0.1",
+      "created_at": "2026-09-24",
+      "checksum": "af2ef196"
     },
     {
       "id": "DOC-CAND-OPS-003_REVIEW_PLAN_V0_1",
