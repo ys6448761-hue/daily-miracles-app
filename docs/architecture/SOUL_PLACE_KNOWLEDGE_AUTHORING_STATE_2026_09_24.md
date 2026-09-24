@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — **CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25)**  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25) — **Post-Approval Operational Validation Scope SAVED / READY WITH DEPENDENCIES**  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -61,24 +61,27 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**CAND-OPS-003 Post-Approval Operational Validation Scope**
+**CAND-OPS-003 Operational Validation Scope Review**
 
 ```
 CAND-OPS-003 V0.2 Status: Candidate / Approved (2026-09-25)
 Approver: Founder / 대표 푸르미르
 Approval Evidence: docs/constitution/candidate/CAND-OPS-003_FOUNDER_APPROVAL_V0_1.md
 
-V0.2 File: docs/constitution/candidate/CAND-OPS-003_SOUL_Place_Knowledge_Authoring_Framework_V0_2.md
-           Status = Candidate / Approved
-V0.1 File: docs/constitution/candidate/CAND-OPS-003_SOUL_Place_Knowledge_Authoring_Framework.md
-           PRESERVED (immutable)
+Post-Approval Operational Validation Scope: SAVED
+Scope File: docs/constitution/candidate/CAND-OPS-003_POST_APPROVAL_OPERATIONAL_VALIDATION_SCOPE_V0_1.md
+Execution Readiness: READY WITH DEPENDENCIES
 
-Findings: FA-01/FA-02/FA-NI-01/MR-01/MR-02/MR-03 = RESOLVED (V0.2)
-DreamTown Philosophy: HOLD / NOT CREATED
+Required Dependencies (3):
+  VD-01: Knowledge 주입 방식 확정
+  VD-03: Provenance Metadata 포함 방식 확정
+  VD-04: 독립 Evaluator 역할 지정
+
+OGQ-001: "Minimum 3 independent validations" 기준 미정의 — Constitution 승격 전 명확화 필요
 RL-01~04: OPEN — 현장 확인 미완료
-Constitution Gate: NOT YET (minimum 3 validations 미충족)
+DreamTown Philosophy: HOLD / NOT CREATED
 
-다음 단계: Post-Approval Operational Validation Scope 정의
+다음 단계: Scope Review (OV-01~08 / Scenario Family / Success Criteria 검토)
 주의: LOCKED 전환 금지 / Constitution 승격 금지 / Production 연결 금지
 ```
 
