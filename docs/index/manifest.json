@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-24T06:08:35.704Z",
+  "generated_at": "2026-09-24T06:14:09.195Z",
   "generator": "generate-manifest.js",
-  "total_count": 471,
+  "total_count": 472,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "active",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-24",
-      "checksum": "276ddd84"
+      "checksum": "b208b4d4"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -1394,6 +1394,24 @@
       "title": "CAND-OPS-002: Hotel Hub & Travel Operations Architecture",
       "created_at": "2026-09-24",
       "checksum": "fca6b903"
+    },
+    {
+      "id": "DOC-CAND-OPS-003_REVIEW_PLAN_V0_1",
+      "path": "docs/constitution/candidate/CAND-OPS-003_REVIEW_PLAN_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "constitution",
+      "tags": [
+        "candidate",
+        "소원",
+        "가격"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "CAND-OPS-003 — SOUL Place Knowledge Authoring Framework Review Plan V0.1",
+      "created_at": "2026-09-24",
+      "checksum": "cb942165"
     },
     {
       "id": "DOC-CAND-OPS-003_SOUL_Place_Knowle",

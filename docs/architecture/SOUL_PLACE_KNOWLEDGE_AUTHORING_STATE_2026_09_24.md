@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — **CAND-OPS-003 CREATED / DRAFT**  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — **Review Plan SAVED / READY**  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -61,19 +61,17 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**SOUL Place Knowledge Authoring Framework Candidate V0.1 — Review Plan**
+**CAND-OPS-003 Blind Test — Fifth Place Selection**
 
 ```
-Candidate:  CAND-OPS-003_SOUL_Place_Knowledge_Authoring_Framework.md
-목적:       Candidate를 SSOT 승격 전 테스트할 Review Plan 정의
-Review 질문:
-  1. 새 운영자가 원 대화 없이 Framework 사용 가능한가?
-  2. 다섯 번째 장소를 이 Framework로 작성할 수 있는가?
-  3. Runtime answer quality 개선이 측정 가능한가?
-  4. SSOT vs Operations Guide 경계는 어디인가?
-  5. Yeosu 이외에서도 유효한가?
-주의:       Review Plan 작성 단계 — 다섯 번째 장소 시작 아님
-            Candidate 승인 아님
+목적:       Review Plan에 정의된 기준으로 Blind Test를 시작할
+            다섯 번째 장소를 선정
+주의:       장소 선정 단계 — 실제 Research 시작 아님
+            Anti-Selection Bias Rule 적용 (Section 4 참조)
+            다음 도전 유형 포함 권장:
+              conflicting traveler reports / changing operating info /
+              accessibility issue / weather/companion dependence
+기준:       CAND-OPS-003_REVIEW_PLAN_V0_1.md Section 4
 ```
 
 ---
@@ -83,9 +81,11 @@ Review 질문:
 | 항목 | 값 |
 |---|---|
 | Candidate ID | CAND-OPS-003 |
-| File | `docs/constitution/candidate/CAND-OPS-003_SOUL_Place_Knowledge_Authoring_Framework.md` |
+| Candidate File | `docs/constitution/candidate/CAND-OPS-003_SOUL_Place_Knowledge_Authoring_Framework.md` |
+| Review Plan | `docs/constitution/candidate/CAND-OPS-003_REVIEW_PLAN_V0_1.md` |
 | Status | Candidate / Draft |
 | Lifecycle | Idea → **Draft** → Review → Approved → LOCKED |
+| Review Plan Status | SAVED / READY |
 | DreamTown Philosophy | REPEATED FOUNDER PHILOSOPHY EVIDENCE — HOLD (별도 Candidate Family) |
 
 ---
