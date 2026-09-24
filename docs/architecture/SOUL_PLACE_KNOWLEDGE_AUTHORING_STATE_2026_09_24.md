@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — **Geumodo DreamTown Comparison SAVED / GREEN**  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — **Geumodo SOUL Utility Protocol SAVED / READY**  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -61,19 +61,21 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**CAND-OPS-003 Blind Test — Geumodo SOUL Utility Test**
+**CAND-OPS-003 Blind Test — Geumodo SOUL Utility A/B Execution**
 
 ```
-DreamTown Comparison: docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_GEUMODO_DREAMTOWN_COMPARISON_V0_1.md
-                      SAVED / GREEN
+SOUL Utility Protocol: docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_GEUMODO_SOUL_UTILITY_PROTOCOL_V0_1.md
+                       SAVED / READY
 CAND-OPS-003:   Candidate / Draft (변경 없음)
 DreamTown Philosophy: HOLD / NOT CREATED
 "자기 속도": REPEATED FOUNDER PHILOSOPHY EVIDENCE — HOLD (3 places)
+Previous Dimension 12 판정: Authoring-level observation ONLY — 실제 Utility Evidence 아님
 
-다음 단계: SOUL Utility Test (Review Plan Phase 9)
-근거: Review Plan §5 Phase 9 — minimum 5 situation questions
-주의: SOUL이 금오도를 실제 상황에서 유용하게 사용할 수 있는지 판단
-      Utility Test는 이번 작업에서 실행하지 않음 — 다음 세션에서 시작
+다음 단계: A/B 응답 생성 (6개 시나리오) + 12 Dimension 평가
+Protocol 파일: 위 경로 참조
+주의: Critical Failure CF-U1~CF-U7 기준은 이미 고정됨 — 실행 전 재확인
+      Founder Intent Rule 준수 — 철학 직접 인용 금지
+      Live Knowledge Rule 준수 — 배편/날씨 값 추측 금지
 ```
 
 ---
