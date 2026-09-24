@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-24T21:05:48.413Z",
+  "generated_at": "2026-09-24T21:20:20.347Z",
   "generator": "generate-manifest.js",
-  "total_count": 482,
+  "total_count": 483,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1525,6 +1525,22 @@
       "title": "CAND-OPS-003 Blind Test — 금오도 비렁길 SOUL Utility Test Protocol V0.1",
       "created_at": "2026-09-24",
       "checksum": "f62b029e"
+    },
+    {
+      "id": "DOC-CAND-OPS-003_BLIND_TEST_GEUMOD",
+      "path": "docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_GEUMODO_SOUL_UTILITY_UNBLINDING_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "constitution",
+      "tags": [
+        "candidate"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "CAND-OPS-003 Blind Test — 금오도 비렁길 SOUL Utility Unblinding V0.1",
+      "created_at": "2026-09-24",
+      "checksum": "28a975cf"
     },
     {
       "id": "DOC-CAND-OPS-003_BLIND_TEST_GEUMOD",
