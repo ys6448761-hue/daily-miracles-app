@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — **CAND-OPS-003 CREATED / DRAFT**  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -61,25 +61,38 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**SOUL Place Knowledge Authoring Framework — Candidate Readiness Review**
+**SOUL Place Knowledge Authoring Framework Candidate V0.1 — Review Plan**
 
 ```
-목적:       4개 장소(이순신광장/종포해양공원/하멜등대/케이블카) 완료 Evidence를
-            비교하여 Authoring Framework SSOT Candidate 제안 여부 판단
-평가 대상:
-  A. Knowledge Authoring Framework Candidate Readiness
-     (Official → WE → Founder → DreamTown → SOUL)
-  B. DreamTown-Wide Founder Philosophy Candidate Readiness
-     (혼자가 아님 + 작은 희망 + 다시 자신의 삶으로 돌아감)
-주의:       두 Candidate Family를 자동 병합하지 않는다.
-            Readiness Review이지 Candidate 자동 생성이 아니다.
+Candidate:  CAND-OPS-003_SOUL_Place_Knowledge_Authoring_Framework.md
+목적:       Candidate를 SSOT 승격 전 테스트할 Review Plan 정의
+Review 질문:
+  1. 새 운영자가 원 대화 없이 Framework 사용 가능한가?
+  2. 다섯 번째 장소를 이 Framework로 작성할 수 있는가?
+  3. Runtime answer quality 개선이 측정 가능한가?
+  4. SSOT vs Operations Guide 경계는 어디인가?
+  5. Yeosu 이외에서도 유효한가?
+주의:       Review Plan 작성 단계 — 다섯 번째 장소 시작 아님
+            Candidate 승인 아님
 ```
 
 ---
 
-## Emerging Authoring Pattern (4 Cases Observed — Not Yet SSOT)
+## Authoring Framework Candidate
 
-네 장소(이순신광장 + 종포해양공원 + 하멜등대 + **케이블카**)에서 반복 관찰된 지식 구성 패턴:
+| 항목 | 값 |
+|---|---|
+| Candidate ID | CAND-OPS-003 |
+| File | `docs/constitution/candidate/CAND-OPS-003_SOUL_Place_Knowledge_Authoring_Framework.md` |
+| Status | Candidate / Draft |
+| Lifecycle | Idea → **Draft** → Review → Approved → LOCKED |
+| DreamTown Philosophy | REPEATED FOUNDER PHILOSOPHY EVIDENCE — HOLD (별도 Candidate Family) |
+
+---
+
+## Authoring Pattern — Now Candidate (4 Cases Confirmed)
+
+네 장소(이순신광장 + 종포해양공원 + 하멜등대 + 케이블카)에서 반복 확인. **Candidate CREATED.**
 
 ```
 Official         → factual skeleton
@@ -89,11 +102,12 @@ DreamTown        → emotional meaning
 SOUL             → compose what this traveler needs now
 ```
 
-추가 반복 패턴: `Place Knowledge + Route/Relationship Knowledge 분리 필요` — 4회 확인.  
-케이블카 신규 관찰: `이동 자체가 Experience Knowledge가 될 수 있다` — Architecture Evidence.
+추가 확인 패턴:
+- `Place Knowledge + Route/Relationship Knowledge 분리 필요` — 4회
+- `이동 자체가 Experience Knowledge` — Cable Car (Architecture Evidence)
+- `Situation Knowledge 필요` — Cable Car (강하게 확인)
 
-**SSOT Candidate 승격 조건:** Cable Car Founder Review 완료 후 네 장소 전체 비교하여 Candidate 여부 판단.  
-현재 상태: `OBSERVATION — 4th repetition`.
+**Status:** `CANDIDATE / DRAFT — CAND-OPS-003`
 
 ---
 
