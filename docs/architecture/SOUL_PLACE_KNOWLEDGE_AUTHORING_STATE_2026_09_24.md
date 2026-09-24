@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE Review SAVED / GREEN — Hamel Lighthouse Founder Review V0.1 SAVED / GREEN  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE Review SAVED / GREEN  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -35,7 +35,7 @@ VERIFY_REQUIRED, LIVE_CHECK, DO_NOT_PROMOTE 항목은 명시적으로 분리.
 | 3 | 하멜등대 | hamel_lighthouse (신규) | DONE | DONE | DONE | **SAVED / GREEN** | WE: `docs/knowledge/YEOSU_PLACE_KNOWLEDGE_HAMEL_LIGHTHOUSE_WE_V0_1.md` / Founder: `docs/knowledge/YEOSU_PLACE_KNOWLEDGE_HAMEL_LIGHTHOUSE_FOUNDER_V0_1.md` |
 | 4 | 오동도 | odongdo | — | — | — | QUEUED | — |
 | 5 | 향일암 | hyangiram | — | — | — | QUEUED | — |
-| 6 | 케이블카 | cablecar | — | — | — | QUEUED | — |
+| 6 | 케이블카 | cablecar | IN PROGRESS | **NEXT** | DONE | WE REVIEW COMPLETE / Founder Review PENDING | `docs/knowledge/YEOSU_PLACE_KNOWLEDGE_CABLE_CAR_WE_V0_1.md` |
 | 7 | 자산공원 | jaisan_park | — | — | — | QUEUED | — |
 | 8 | 돌산공원 | dolsan_nightscape | — | — | — | QUEUED | — |
 | 9 | 낭만포차거리 | romantic_pojangmacha | — | — | — | QUEUED | — |
@@ -61,24 +61,24 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Yeosu Maritime Cable Car Place Knowledge Authoring Pilot — World Experience Review V0.1**
+**Yeosu Maritime Cable Car Founder Review**
 
 ```
 place_code: cablecar
 name_ko:    여수 해상케이블카
-목적:       기존 3개 장소(해안 산책형)에서 발견한 Authoring Pattern이
-            이동형 / 전망형 / 상승 경험 장소에서도 반복되는지 관찰
-핵심 질문:  사람들은 여수 케이블카에서 어떤 경험을 하는가?
-주의:       기존 DreamTown SSOT의 Cable Car 역할(상승/희망·확장)을
-            World Experience 조사에 정답처럼 주입하지 않는다.
-            World Experience 결과를 먼저 독립적으로 보존한 뒤 DreamTown과 비교.
+목적:       World Experience 결과 검토 + Founder Intent 독립 수신
+            + View+Movement ↔ DreamTown 상승/희망 연결 여부 Founder로 확인
+핵심 질문:  Founder에게 케이블카는 소원이에게 어떤 감정적 전환을 의미하는가?
+주의:       Founder에게 World Experience 결론을 정답처럼 먼저 설명하지 않는다.
+            먼저 Founder의 독립적인 의도를 받는다.
+WE 기반:    docs/knowledge/YEOSU_PLACE_KNOWLEDGE_CABLE_CAR_WE_V0_1.md
 ```
 
 ---
 
-## Emerging Authoring Pattern (3 Cases Observed — Not Yet SSOT)
+## Emerging Authoring Pattern (4 Cases Observed — Not Yet SSOT)
 
-세 장소(이순신광장 + 종포해양공원 + **하멜등대**)에서 반복 관찰된 지식 구성 패턴:
+네 장소(이순신광장 + 종포해양공원 + 하멜등대 + **케이블카**)에서 반복 관찰된 지식 구성 패턴:
 
 ```
 Official         → factual skeleton
@@ -88,9 +88,11 @@ DreamTown        → emotional meaning
 SOUL             → compose what this traveler needs now
 ```
 
-추가 반복 패턴: `Place Knowledge + Route/Relationship Knowledge 분리 필요` — 3회 반복 확인.
+추가 반복 패턴: `Place Knowledge + Route/Relationship Knowledge 분리 필요` — 4회 확인.  
+케이블카 신규 관찰: `이동 자체가 Experience Knowledge가 될 수 있다` — Architecture Evidence.
 
-**SSOT Candidate 승격 조건:** 케이블카에서 추가 반복 확인 후 결정. 현재 상태: `OBSERVATION — 3rd repetition`.
+**SSOT Candidate 승격 조건:** Cable Car Founder Review 완료 후 네 장소 전체 비교하여 Candidate 여부 판단.  
+현재 상태: `OBSERVATION — 4th repetition`.
 
 ---
 

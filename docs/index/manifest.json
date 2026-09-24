@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-24T05:20:39.046Z",
+  "generated_at": "2026-09-24T05:37:34.161Z",
   "generator": "generate-manifest.js",
-  "total_count": 468,
+  "total_count": 469,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "active",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-24",
-      "checksum": "283bfecc"
+      "checksum": "b0a38cc7"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -2366,6 +2366,23 @@
       "title": "Yeosu Founder Route #001 — Time Evidence",
       "created_at": "2026-09-24",
       "checksum": "5a7703c8"
+    },
+    {
+      "id": "DOC-YEOSU_PLACE_KNOWLEDGE_CABLE_CA",
+      "path": "docs/knowledge/YEOSU_PLACE_KNOWLEDGE_CABLE_CAR_WE_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "가격"
+      ],
+      "owner": "jemi",
+      "status": "active",
+      "title": "YEOSU Place Knowledge — 여수해상케이블카 (Yeosu Maritime Cable Car) World Experience Review V0.1",
+      "created_at": "2026-09-24",
+      "checksum": "94d0a44e"
     },
     {
       "id": "DOC-YEOSU_PLACE_KNOWLEDGE_HAMEL_LI",
