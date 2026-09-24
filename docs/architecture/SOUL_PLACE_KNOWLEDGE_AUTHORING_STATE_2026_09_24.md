@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park 대기 중  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -31,8 +31,8 @@ VERIFY_REQUIRED, LIVE_CHECK, DO_NOT_PROMOTE 항목은 명시적으로 분리.
 | # | Place | place_code | Authoring | Founder Review | World Exp Review | Status | Document |
 |---|---|---|---|---|---|---|---|
 | 1 | 이순신광장 | lee_soon_shin_plaza | DONE | DONE | DONE | **SAVED / GREEN** | `docs/knowledge/YEOSU_PLACE_KNOWLEDGE_LEE_SOON_SHIN_PLAZA_V0_1.md` |
-| 2 | 종포해양공원 | marine_park | — | — | **NEXT** | PENDING | — |
-| 3 | 하멜등대 | hamel_lighthouse (신규) | — | — | — | BLOCKED (lat/lng 미확인) | — |
+| 2 | 종포해양공원 | marine_park | DONE | DONE | DONE | **SAVED / GREEN** | `docs/knowledge/YEOSU_PLACE_KNOWLEDGE_MARINE_PARK_V0_1.md` |
+| 3 | 하멜등대 | hamel_lighthouse (신규) | — | **NEXT** | — | BLOCKED (lat/lng 미확인) | — |
 | 4 | 오동도 | odongdo | — | — | — | QUEUED | — |
 | 5 | 향일암 | hyangiram | — | — | — | QUEUED | — |
 | 6 | 케이블카 | cablecar | — | — | — | QUEUED | — |
@@ -58,14 +58,32 @@ VERIFY_REQUIRED, LIVE_CHECK, DO_NOT_PROMOTE 항목은 명시적으로 분리.
 
 ## Current Next Action
 
-**Jongpo Marine Park World Experience Review V0.1**
+**Hamel Lighthouse World Experience Review V0.1**
 
 ```
-place_code: marine_park
-name_ko:    종포해양공원
-목적:       이순신광장과의 연결 관계를 포함한 World Experience 패턴 확인
+place_code: hamel_lighthouse (travel_places 미등록 — 신규 onboarding 대상)
+name_ko:    하멜등대
+목적:       DreamTown SSOT 선입견 없이 독립 World Experience 패턴 확인
            + place_knowledge draft 작성 → Founder Review
+           + lat/lng / 공식 정보 blocker 해소 병행
+핵심 질문:  "사람들은 왜 작은 빨간 등대 하나를 보러 여기까지 걸어가는가?"
 ```
+
+---
+
+## Emerging Authoring Pattern (2 Cases Observed — Not Yet SSOT)
+
+두 장소(이순신광장 + 종포해양공원)에서 반복 관찰된 지식 구성 패턴:
+
+```
+Official         → factual skeleton
+World Experience → how travelers actually experience the place
+Founder          → current local reality / correction of outdated info
+DreamTown        → emotional meaning
+SOUL             → compose what this traveler needs now
+```
+
+SSOT Candidate 승격 조건: 하멜등대 / 케이블카에서 추가 반복 확인 후 결정.
 
 ---
 
@@ -83,6 +101,8 @@ name_ko:    종포해양공원
 | Travel Time Matrix | Founder 검수 미완료 — runtime 연결 금지 |
 | Provenance | 모든 field에 source_type + confidence + do_not_promote 필수 |
 | World Experience | Truth Source 아님 — 반복 패턴 발견용 Knowledge Input |
+| 종포해양공원 ≠ 여수해양공원 | 별도 Entity — alias 금지, 공식 관계 VERIFY_REQUIRED |
+| Conflict Register | 낚시(SOUL 안내 금지) / 주차(과거 정보 사용 금지) / 명칭 혼용 — 문서 내 관리 |
 
 ---
 
