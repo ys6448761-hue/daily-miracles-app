@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — **Geumodo WE Corrections SAVED / GREEN**  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — **Geumodo Founder Review SAVED / GREEN**  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -61,19 +61,19 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**CAND-OPS-003 Blind Test — Geumodo Founder Review**
+**CAND-OPS-003 Blind Test — Geumodo DreamTown Comparison**
 
 ```
-Corrections: docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_GEUMODO_WE_CORRECTIONS_V0_1.md
-             SAVED / GREEN
-Raw Evidence: UNCHANGED (immutable)
-Framework Findings: FA-01 / FA-02 / MR-01 / MR-02 = OPEN
-WE Review Decision: PASS WITH CORRECTIONS (변경 없음)
-CAND-OPS-003: Candidate / Draft (변경 없음)
+Founder Review: docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_GEUMODO_FOUNDER_V0_1.md
+                SAVED / GREEN
+CAND-OPS-003:   Candidate / Draft (변경 없음)
+DreamTown Philosophy: HOLD / NOT CREATED
 
-다음 단계: Founder Review (Phase 7 — Review Plan §5 참조)
-주의: World Experience Review 완료 기준으로 Founder Review 진행
-      DreamTown 의미를 Founder Review 이전에 주입하지 않는다
+다음 단계: DreamTown Comparison (Review Plan Phase 8)
+근거: Review Plan §5 Phase 8 — "Founder Review 이후에만 기존 DreamTown SSOT와 비교"
+주의: independent convergence / divergence / possible continuity / conflict 분리
+      "World Experience proves DreamTown" 표현 금지
+      "Founder proves traveler consensus" 표현 금지
 ```
 
 ---
