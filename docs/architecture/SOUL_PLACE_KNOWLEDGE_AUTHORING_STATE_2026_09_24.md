@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — **Geumodo Founder Review SAVED / GREEN**  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — **Geumodo DreamTown Comparison SAVED / GREEN**  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -61,19 +61,19 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**CAND-OPS-003 Blind Test — Geumodo DreamTown Comparison**
+**CAND-OPS-003 Blind Test — Geumodo SOUL Utility Test**
 
 ```
-Founder Review: docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_GEUMODO_FOUNDER_V0_1.md
-                SAVED / GREEN
+DreamTown Comparison: docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_GEUMODO_DREAMTOWN_COMPARISON_V0_1.md
+                      SAVED / GREEN
 CAND-OPS-003:   Candidate / Draft (변경 없음)
 DreamTown Philosophy: HOLD / NOT CREATED
+"자기 속도": REPEATED FOUNDER PHILOSOPHY EVIDENCE — HOLD (3 places)
 
-다음 단계: DreamTown Comparison (Review Plan Phase 8)
-근거: Review Plan §5 Phase 8 — "Founder Review 이후에만 기존 DreamTown SSOT와 비교"
-주의: independent convergence / divergence / possible continuity / conflict 분리
-      "World Experience proves DreamTown" 표현 금지
-      "Founder proves traveler consensus" 표현 금지
+다음 단계: SOUL Utility Test (Review Plan Phase 9)
+근거: Review Plan §5 Phase 9 — minimum 5 situation questions
+주의: SOUL이 금오도를 실제 상황에서 유용하게 사용할 수 있는지 판단
+      Utility Test는 이번 작업에서 실행하지 않음 — 다음 세션에서 시작
 ```
 
 ---

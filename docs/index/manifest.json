@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-24T07:18:08.278Z",
+  "generated_at": "2026-09-24T20:31:51.674Z",
   "generator": "generate-manifest.js",
-  "total_count": 477,
+  "total_count": 478,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "active",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-24",
-      "checksum": "2e8b1ffe"
+      "checksum": "dac000aa"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -1410,6 +1410,23 @@
       "title": "CAND-OPS-003 Blind Test — Fifth Place Selection",
       "created_at": "2026-09-24",
       "checksum": "5ed784fd"
+    },
+    {
+      "id": "DOC-CAND-OPS-003_BLIND_TEST_GEUMOD",
+      "path": "docs/constitution/candidate/CAND-OPS-003_BLIND_TEST_GEUMODO_DREAMTOWN_COMPARISON_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "constitution",
+      "tags": [
+        "candidate",
+        "소원"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "CAND-OPS-003 Blind Test — 금오도 비렁길 DreamTown Comparison V0.1",
+      "created_at": "2026-09-24",
+      "checksum": "3f755a31"
     },
     {
       "id": "DOC-CAND-OPS-003_BLIND_TEST_GEUMOD",
