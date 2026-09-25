@@ -61,38 +61,26 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**CAND-OPS-003 Operational Validation Result Review**
+**P3→P4 Relationship Knowledge Authoring**
 
 ```
 CAND-OPS-003 V0.2 Status: Candidate / Approved (2026-09-25)
 Approver: Founder / 대표 푸르미르
 
-Independent Evaluation: COMPLETE (2026-09-25)
-Result: SIMULATION PASS WITH FINDINGS
-Evaluation File: docs/constitution/candidate/CAND-OPS-003_OPERATIONAL_VALIDATION_INDEPENDENT_EVALUATION_V0_1.md
+Operational Validation Simulation Phase: CLOSED — PASS WITH FINDINGS (ba83e4a)
+Post-Simulation Decision: COMPLETE (2026-09-25)
+Decision File: docs/constitution/candidate/CAND-OPS-003_POST_SIMULATION_VALIDATION_DECISION_V0_1.md
 
-Execution Sequence:
-  Phase 1: Package Freeze DONE
-  Phase 2: Response Generation DONE — Raw Evidence Committed (cf440bf)
-  Phase 3: Raw Response Save DONE
-  Phase 4: Independent Partially Blind Evaluation DONE
-  Phase 5: Evaluation Save DONE
-  Phase 6: Result Review — NEXT
+Decision Summary:
+  NOF-01: RESOLVED (남면사무소 번호 Knowledge Package 확인)
+  NOF-02 (P3→P4 Route Knowledge): BACKLOG / OBSERVE — 다음 Authoring Pass 우선순위 1번
+  NOF-03 (P3 접근 VERIFY_REQUIRED 미명시): BACKLOG / OBSERVE — P3 Knowledge 다음 수정 시
+  Runtime Validation: DEFER — Technical Prerequisites Absent (migration/retrieval/integration 미구현)
+  Additional Simulation: NO ADDITIONAL SIMULATION NOW
+  Framework Revision: NO REVISION REQUIRED
+  OGQ-001: OPEN — Governance / Constitution Review Stage에서 해결
 
-CF Triggered: 0 / 8
-OV-01~08: ALL PASS
-Utility: D3/D6/D12 Critical PASS | D1/D7 100% | D10 3 PASS | D8 100%
-
-New Operational Findings (3개):
-  NOF-01: SCN-02 남면사무소 phone number — verify against Research document
-  NOF-02: SCN-06 P3→P4 Route Knowledge absence exposed (design gap, not CF)
-  NOF-03: SCN-04 P3 access inference — add VERIFY_REQUIRED to Knowledge Package
-
-Result Review Items:
-  1. NOF-01 factual verification
-  2. NOF-02/03 authoring gap decisions (P3→P4 Relationship Knowledge priority)
-  3. OGQ-001 — does this Simulation count as 1/3 validations?
-  4. Post-Validation Next Steps gate decision
+Post-Simulation Decision Status: POST-SIMULATION DECISION COMPLETE WITH OPEN GOVERNANCE QUESTION
 
 OGQ-001: "Minimum 3 independent validations" — OPEN
 RL-01~04: OPEN
