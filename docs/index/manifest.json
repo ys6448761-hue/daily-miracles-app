@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-25T00:21:13.173Z",
+  "generated_at": "2026-09-25T00:28:44.869Z",
   "generator": "generate-manifest.js",
-  "total_count": 494,
+  "total_count": 495,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1660,6 +1660,23 @@
       "title": "CAND-OPS-003 — Operational Validation Raw Responses V0.1",
       "created_at": "2026-09-25",
       "checksum": "13ef9c06"
+    },
+    {
+      "id": "DOC-CAND-OPS-003_OPERATIONAL_VALID",
+      "path": "docs/constitution/candidate/CAND-OPS-003_OPERATIONAL_VALIDATION_RESULT_REVIEW_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "constitution",
+      "tags": [
+        "candidate",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "|---",
+      "title": "CAND-OPS-003 — Operational Validation Result Review V0.1",
+      "created_at": "2026-09-25",
+      "checksum": "fc9667a1"
     },
     {
       "id": "DOC-CAND-OPS-003_OPERATIONAL_VALID",
