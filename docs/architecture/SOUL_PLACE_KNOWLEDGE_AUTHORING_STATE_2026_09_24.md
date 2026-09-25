@@ -61,15 +61,22 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**First Sample Repository Persistence — YTC-001~006 Raw Corpus 저장**
+**[NEXT ACTION TO BE DETERMINED — Founder 결정 필요]**
 
 ```
-Second Sample: PASS WITH CORRECTIONS / SAVED (2026-09-25)
+First Sample Repository Persistence: COMPLETE (2026-09-25)
+First Sample File: docs/research/YEOSU_TRAVEL_SCHEDULE_CORPUS_PILOT_FIRST_SAMPLE_V0_1.md
+YTC-001~006: RAW EVIDENCE SAVED
+
+Second Sample: PASS WITH CORRECTIONS / REPOSITORY SAVED (2026-09-25)
 Second Sample File: docs/research/YEOSU_TRAVEL_SCHEDULE_CORPUS_PILOT_SECOND_SAMPLE_V0_1.md
 
-Corpus Status:
-  First Sample (YTC-001~006): completed in research context / repository persistence pending
-  Second Sample (YTC-007~014): SAVED / YTC-007~014 preserved: YES
+Provenance Note: Original First Sample Research Evidence recovered and persisted; no reconstruction from memory was used.
+
+Corpus Repository Status:
+  First Sample (YTC-001~006): REPOSITORY PERSISTED (f83dab2 → next commit)
+  Second Sample (YTC-007~014): REPOSITORY PERSISTED (f83dab2)
+  Total Corpus Repository-Persisted: YTC-001~014 = 14
 
 FH-01 — Yeosu → Gwangyang lodging: MIXED / OBSERVATION EXISTS / WHY NOT CONFIRMED
 FH-02 — fixed Dolsan → Jasan → Odongdo direction: MIXED

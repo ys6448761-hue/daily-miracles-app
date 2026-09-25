@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-25T05:30:43.044Z",
+  "generated_at": "2026-09-25T05:58:23.483Z",
   "generator": "generate-manifest.js",
-  "total_count": 504,
+  "total_count": 505,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "active",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-25",
-      "checksum": "f2e8001d"
+      "checksum": "7a7c0e6d"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -4512,6 +4512,23 @@
       "title": "하멜등대 → 여수해상케이블카 Physical Access Field Evidence",
       "created_at": "2026-09-25",
       "checksum": "cbc22d7c"
+    },
+    {
+      "id": "DOC-YEOSU_TRAVEL_SCHEDULE_CORPUS_P",
+      "path": "docs/research/YEOSU_TRAVEL_SCHEDULE_CORPUS_PILOT_FIRST_SAMPLE_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "|---",
+      "title": "Yeosu Travel Schedule Corpus Pilot V0.1 — First Sample Repository Persistence",
+      "created_at": "2026-09-25",
+      "checksum": "049bd0dd"
     },
     {
       "id": "DOC-YEOSU_TRAVEL_SCHEDULE_CORPUS_P",
