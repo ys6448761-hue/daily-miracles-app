@@ -61,27 +61,38 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**CAND-OPS-003 Operational Validation Independent Evaluation**
+**CAND-OPS-003 Operational Validation Result Review**
 
 ```
 CAND-OPS-003 V0.2 Status: Candidate / Approved (2026-09-25)
 Approver: Founder / 대표 푸르미르
 
-Response Generation: COMPLETE / RAW EVIDENCE SAVED (2026-09-25)
-Raw Response File: docs/constitution/candidate/CAND-OPS-003_OPERATIONAL_VALIDATION_RAW_RESPONSES_V0_1.md
-Scenarios Generated: SCN-01~SCN-08 (8개 전부)
+Independent Evaluation: COMPLETE (2026-09-25)
+Result: SIMULATION PASS WITH FINDINGS
+Evaluation File: docs/constitution/candidate/CAND-OPS-003_OPERATIONAL_VALIDATION_INDEPENDENT_EVALUATION_V0_1.md
 
 Execution Sequence:
   Phase 1: Package Freeze DONE
-  Phase 2: Response Generation DONE — Raw Evidence Committed
+  Phase 2: Response Generation DONE — Raw Evidence Committed (cf440bf)
   Phase 3: Raw Response Save DONE
-  Phase 4: Independent Partially Blind Evaluation — NEXT
-  Phase 5: Evaluation Save
-  Phase 6: Result Review
+  Phase 4: Independent Partially Blind Evaluation DONE
+  Phase 5: Evaluation Save DONE
+  Phase 6: Result Review — NEXT
 
-Evaluator: 새 독립 세션 — Partially Blind (Framework 존재 인지 / 예상 답변·CF 정의·Founder 선호 미제공)
-Evaluator 세션 시작 전 제공할 것: Raw Response 파일 + Scope V0.2 + Execution Design (CF 정의 포함)
-Evaluator 세션에서 금지: 현재 세션 전달 컨텍스트 공유
+CF Triggered: 0 / 8
+OV-01~08: ALL PASS
+Utility: D3/D6/D12 Critical PASS | D1/D7 100% | D10 3 PASS | D8 100%
+
+New Operational Findings (3개):
+  NOF-01: SCN-02 남면사무소 phone number — verify against Research document
+  NOF-02: SCN-06 P3→P4 Route Knowledge absence exposed (design gap, not CF)
+  NOF-03: SCN-04 P3 access inference — add VERIFY_REQUIRED to Knowledge Package
+
+Result Review Items:
+  1. NOF-01 factual verification
+  2. NOF-02/03 authoring gap decisions (P3→P4 Relationship Knowledge priority)
+  3. OGQ-001 — does this Simulation count as 1/3 validations?
+  4. Post-Validation Next Steps gate decision
 
 OGQ-001: "Minimum 3 independent validations" — OPEN
 RL-01~04: OPEN
