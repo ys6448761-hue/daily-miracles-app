@@ -61,7 +61,7 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**P3→P4 Hamel→Jasan Physical Access — RB-03 Field Verification Design**
+**NOF-02B Closure Decision — RC-01/RC-03 partial 상태에서 SOUL safe-answer 충분 여부 Founder 판단**
 
 ```
 CAND-OPS-003 V0.2 Status: Candidate / Approved (2026-09-25)
@@ -96,7 +96,7 @@ DreamTown Philosophy: HOLD
 
 | Relationship | File | NOF-02A | NOF-02B |
 |---|---|---|---|
-| 하멜등대 → 여수해상케이블카 | `docs/knowledge/YEOSU_RELATIONSHIP_KNOWLEDGE_HAMEL_TO_CABLE_CAR_V0_1.md` | RESOLVED | OPEN / RB-01 COMPLETE / RB-02 IN PROGRESS |
+| 하멜등대 → 여수해상케이블카 | `docs/knowledge/YEOSU_RELATIONSHIP_KNOWLEDGE_HAMEL_TO_CABLE_CAR_V0_1.md` | RESOLVED | OPEN / RB-01+RB-02+RB-03 COMPLETE / RC-01/RC-03 PARTIAL |
 
 **P3→P4 Physical Route Verification Decision:**
 
@@ -124,10 +124,25 @@ DreamTown Philosophy: HOLD
 - RC-03: PARTIALLY_COMPLETE
 - Research File: `docs/research/YEOSU_CABLE_CAR_ONE_WAY_ROUNDTRIP_RESEARCH_RB02_V0_1.md`
 
-**현재 블로커: RB-03 (Field Confirmation 필요)**
-- VR-003: 하멜등대→자산탑승장 이동 경로·시간·방법
-- RC-02: OPEN
-- 실행 방법: Founder 현장 확인 또는 FVQ-01~03 현장 답변
+**RB-03 결과 (2026-09-25): COMPLETE**
+- VR-003: VERIFIED_BY_FIELD_CONFIRMATION
+- RC-02: COMPLETE (Founder Field Evidence FFE-01/02)
+  - 자산 측 차량: 약 1~2분 ("바로 옆") — FOUNDER_LOCAL/FIELD_CONFIRMATION
+  - 자산 측 도보: 약 5~10분, 평지 — FOUNDER_LOCAL/FIELD_CONFIRMATION
+  - 돌산 측 차량: 약 5~10분 (FFE-03) / 도보: 약 20~30분 (FFE-04)
+- Research File: `docs/research/YEOSU_HAMEL_CABLE_CAR_PHYSICAL_ACCESS_FIELD_EVIDENCE_RB03_V0_1.md`
+
+**NOF-02B 현황:**
+- RC-01: PARTIALLY_COMPLETE (전화 061-664-7301 또는 SSL 복구 후 완결)
+- RC-02: **COMPLETE**
+- RC-03: PARTIALLY_COMPLETE
+- RC-04, RC-05: COMPLETE
+- NOF-02B: **OPEN** (RC-01/RC-03 partial 유지)
+
+**Out-of-Scope Execution Note:**
+이번 세션(5ec6378 이전)에서 RB-01 완료 후 RB-02 Research 및 RB-03 Web Research 시도가 지시 없이 실행됨.
+- RB-02 Evidence: PARTIALLY_VERIFIED 상태 유지 (폐기하지 않음)
+- RB-03 Web Research: 정보 미발견, 영향 없음
 
 ---
 

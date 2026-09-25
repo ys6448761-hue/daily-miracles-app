@@ -326,10 +326,11 @@ Provenance: `OPERATOR_INFERENCE`
 
 | 명칭 | 상태 |
 |---|---|
-| 자산탑승장 | Travel Matrix/Founder Route Evidence에서 사용 — 공식 명칭 VERIFY_REQUIRED |
-| 자산역 / 자산정류장 / 해야정류장 / 자산공원 | 관계 VERIFY_REQUIRED |
+| 자산탑승장 | Travel Matrix/Founder Route Evidence에서 사용 — 실용 표기 유지 |
+| 해야정류장 | 브랜드명 PARTIALLY_VERIFIED (RB-01 2026-09-25) — 공식 확정은 RC-01 완료 후 |
+| 자산역 / 자산정류장 / 자산공원 | 관계 VERIFY_REQUIRED |
 
-Provenance: `WORLD_EXPERIENCE` (Cable Car WE Section 16-17)
+Provenance: `WORLD_EXPERIENCE` (Cable Car WE Section 16-17) + `RB-01 PARTIALLY_VERIFIED`
 
 ### 9-2. Existing Evidence
 
@@ -338,25 +339,31 @@ Provenance: `WORLD_EXPERIENCE` (Cable Car WE Section 16-17)
 | 하멜 권역 기준 Access Point | 자산탑승장 선택 (Founder Route #001) | FOUNDER_LOCAL | STABLE |
 | 원도심 권역 → 자산 선택 | "원도심→양쪽 후보" (Founder Local) | FOUNDER_LOCAL | STABLE |
 | 하멜전시관→자산탑승장 (CAR) | 약 10분 (참조값, E6 ROUTE_SOURCE_DERIVED LOW) | ROUTE_SOURCE_DERIVED | VERIFY |
+| 하멜등대 방파제 입구→자산탑승장 (CAR) | **약 1~2분** (FFE-01, Founder approximate range) | FOUNDER_LOCAL / FIELD_CONFIRMATION | VERIFY (정확값 미측정) |
+| 하멜등대 방파제 입구→자산탑승장 (도보) | **약 5~10분**, 평지 (FFE-02, Founder approximate range) | FOUNDER_LOCAL / FIELD_CONFIRMATION | VERIFY (정확값 미측정) |
+
+**주의:** FFE-01/02는 Founder 1인 현장 체감. 공식 이동시간 아님. 교통상황 미통제.  
+**E6와 FFE-01의 관계:** E6 출발점=하멜전시관. FFE-01 출발점=하멜등대 방파제 입구. 직접 비교 금지.
 
 ### 9-3. Movement Knowledge
 
 ```
-하멜등대
-  → (방파제 끝에서 입구까지 도보로 되돌아옴)
-  → [이동 수단 선택]
-    - CAR: 하멜전시관 권역 기준 약 10분 (VERIFY — 하멜등대 직접값 아님)
-    - 도보: VERIFY_REQUIRED
-    - 버스: VERIFY_REQUIRED
-  → 자산탑승장
+하멜등대 방파제 끝 (등대 위치)
+  → 도보로 방파제 입구까지 되돌아옴 (추가 시간 — OI-03 참조)
+  → 하멜등대 방파제 입구
+    → CAR: 약 1~2분 (FFE-01 — Founder approximate, "바로 옆")
+    → 도보: 약 5~10분 평지 (FFE-02 — Founder approximate)
+    → 버스: VERIFY_REQUIRED
+  → 자산탑승장 (해야정류장 PARTIALLY_VERIFIED)
 ```
 
 ### 9-4. Branch A 특징
 
 Founder Route #001 기준 이 경로가 표준 개인 자차 이용 방향.  
-돌산공원을 방문 후 자산탑승장으로 되돌아오는 왕복 구조가 Founder 개인 여행 패턴과 일치.
+돌산공원을 방문 후 자산탑승장으로 되돌아오는 왕복 구조가 Founder 개인 여행 패턴과 일치.  
+FFE-01: "바로 옆" 체감 — 하멜등대와 자산탑승장의 근접성 Founder 확인.
 
-Volatility: STABLE (구조) / VERIFY (이동 시간) / LIVE (운행 현황)
+Volatility: STABLE (구조 + 접근 가능성) / VERIFY (정확한 이동 시간) / LIVE (운행 현황)
 
 ---
 
@@ -366,25 +373,32 @@ Volatility: STABLE (구조) / VERIFY (이동 시간) / LIVE (운행 현황)
 
 | 명칭 | 상태 |
 |---|---|
-| 돌산공원탑승장 | Travel Matrix CSV에서 사용 — 공식 명칭 VERIFY_REQUIRED |
-| 돌산역 / 돌산정류장 / 놀아정류장 / 돌산공원 | 관계 VERIFY_REQUIRED |
+| 돌산공원탑승장 | Travel Matrix CSV에서 사용 — 실용 표기 유지 |
+| 놀아정류장 | 브랜드명 PARTIALLY_VERIFIED (RB-01 2026-09-25) — 공식 확정은 RC-01 완료 후 |
+| 돌산역 / 돌산정류장 / 돌산공원 | 관계 VERIFY_REQUIRED |
 
-Provenance: `WORLD_EXPERIENCE` (Cable Car WE Section 16-17)
+Provenance: `WORLD_EXPERIENCE` (Cable Car WE Section 16-17) + `RB-01 PARTIALLY_VERIFIED`
 
 ### 10-2. Existing Evidence
 
 | 항목 | 값 | Provenance | Volatility |
 |---|---|---|---|
 | 돌산 측 탑승장 존재 | Travel Matrix CSV 확인 | WORLD_EXPERIENCE | STABLE |
-| 하멜→돌산 접근 방법 | VERIFY_REQUIRED (도보/차량/버스 미확인) | — | VERIFY |
-| 하멜등대→돌산탑승장 이동 시간 | VERIFY_REQUIRED | — | VERIFY |
+| 하멜등대 방파제 입구→돌산탑승장 (CAR) | **약 5~10분** (FFE-03, Founder approximate range) | FOUNDER_LOCAL / FIELD_CONFIRMATION | VERIFY (정확값 미측정) |
+| 하멜등대 방파제 입구→돌산탑승장 (도보) | **약 20~30분** (FFE-04, Founder approximate range) | FOUNDER_LOCAL / FIELD_CONFIRMATION | VERIFY (정확값 미측정) |
+| 하멜→돌산 버스 | VERIFY_REQUIRED | — | VERIFY |
+
+**주의:** FFE-03/04는 Founder 1인 현장 체감. 공식 이동시간 아님. RC-02 필수 조건 외 부가 Evidence.
 
 ### 10-3. Movement Knowledge
 
-하멜등대 → 돌산공원탑승장 이동:
-
-- 모든 이동 방법 VERIFY_REQUIRED (도보/버스/택시/차량)
-- 이동 시간 VERIFY_REQUIRED
+```
+하멜등대 방파제 입구
+  → CAR: 약 5~10분 (FFE-03 — Founder approximate)
+  → 도보: 약 20~30분 (FFE-04 — Founder approximate)
+  → 버스: VERIFY_REQUIRED
+  → 돌산공원탑승장 (놀아정류장 PARTIALLY_VERIFIED)
+```
 
 ### 10-4. Branch B 특징
 
@@ -754,24 +768,26 @@ Resolution Conditions 확인:
 
 | 항목 | 상태 |
 |---|---|
-| 하멜등대→자산탑승장 정확한 이동 시간 및 경로 | OPEN / VERIFY_REQUIRED (RB-03 필요) |
-| 하멜등대→돌산탑승장 이동 방법 | OPEN / VERIFY_REQUIRED |
+| 하멜등대→자산탑승장 접근 가능 여부 | **VERIFIED_BY_FIELD_CONFIRMATION (RB-03 2026-09-25)** — 차량 1~2분 / 도보 5~10분 |
+| 하멜등대→자산탑승장 정확한 이동 시간 | VERIFY — Founder approximate. 공식 측정값 아님. |
+| 하멜등대→돌산탑승장 이동 방법 | 차량 5~10분 / 도보 20~30분 (FFE-03/04 Founder approximate) |
 | 공식 요금 (편도/왕복) | PARTIALLY_VERIFIED — 블로그 2개 소스. LIVE_CHECK 유지. |
 | 공식 탑승장 명칭 | PARTIALLY_VERIFIED — 해야/놀아 브랜드명 2개 소스. RC-01 OPEN. |
-| 편도/왕복 자유 선택 여부 | **PARTIALLY_VERIFIED (RB-02 2026-09-25)** — 제약 없음 확인 |
-| 단체 편도 현재 정책 | OPEN / VERIFY_REQUIRED (단체 할인 존재하나 편도 강제 여부 미확인) |
+| 편도/왕복 자유 선택 여부 | PARTIALLY_VERIFIED (RB-02 2026-09-25) — 제약 없음 확인 |
+| 단체 편도 현재 정책 | OPEN / VERIFY_REQUIRED |
 
 **RC 상태:**
 - RC-01 (명칭): PARTIALLY_COMPLETE — RB-01 완료, 전화 확인 필요
-- RC-02 (물리적 접근): OPEN — RB-03 Field Confirmation 필요
+- RC-02 (물리적 접근): **COMPLETE** — RB-03 Founder Field Confirmation (FFE-01/02)
 - RC-03 (편도/왕복): PARTIALLY_COMPLETE — RB-02 완료
 - RC-04, RC-05: COMPLETE
 
-**NOF-02B: OPEN / RB-01+RB-02 COMPLETE / RB-03 PENDING**
+**NOF-02B: OPEN** — RC-01(PARTIAL) / RC-03(PARTIAL) 미완료
 
 Research Files:
 - RB-01: `docs/research/YEOSU_CABLE_CAR_ENTITY_IDENTITY_OFFICIAL_RESEARCH_RB01_V0_1.md`
 - RB-02: `docs/research/YEOSU_CABLE_CAR_ONE_WAY_ROUNDTRIP_RESEARCH_RB02_V0_1.md`
+- RB-03: `docs/research/YEOSU_HAMEL_CABLE_CAR_PHYSICAL_ACCESS_FIELD_EVIDENCE_RB03_V0_1.md`
 
 ---
 
