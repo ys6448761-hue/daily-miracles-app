@@ -61,33 +61,27 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**CAND-OPS-003 Operational Validation Response Generation**
+**CAND-OPS-003 Operational Validation Independent Evaluation**
 
 ```
 CAND-OPS-003 V0.2 Status: Candidate / Approved (2026-09-25)
 Approver: Founder / 대표 푸르미르
 
-Execution Design: SAVED / EXECUTION READY
-Design File: docs/constitution/candidate/CAND-OPS-003_OPERATIONAL_VALIDATION_EXECUTION_DESIGN_V0_1.md
-
-Scenario Set: SCN-01~SCN-08 FROZEN (8개)
-OV Coverage: OV-01~08 ALL COVERED
-CF Coverage: CF-OV-01~08 ALL TRIGGERED
-Place Coverage: P1~P5 ALL USED
-Generator Instruction: FROZEN
-Knowledge Injection Package: FROZEN (per Scenario)
-Utility Threshold: FROZEN (Scope V0.2 Section 7.4)
-CF Definitions: FROZEN
+Response Generation: COMPLETE / RAW EVIDENCE SAVED (2026-09-25)
+Raw Response File: docs/constitution/candidate/CAND-OPS-003_OPERATIONAL_VALIDATION_RAW_RESPONSES_V0_1.md
+Scenarios Generated: SCN-01~SCN-08 (8개 전부)
 
 Execution Sequence:
   Phase 1: Package Freeze DONE
-  Phase 2: Response Generation — NEXT
-  Phase 3: Raw Response Save
-  Phase 4: Independent Partially Blind Evaluation
+  Phase 2: Response Generation DONE — Raw Evidence Committed
+  Phase 3: Raw Response Save DONE
+  Phase 4: Independent Partially Blind Evaluation — NEXT
   Phase 5: Evaluation Save
   Phase 6: Result Review
 
-Evaluator 배정: Execution 시작 직전 결정 (Partially Blind 방식 확정됨)
+Evaluator: 새 독립 세션 — Partially Blind (Framework 존재 인지 / 예상 답변·CF 정의·Founder 선호 미제공)
+Evaluator 세션 시작 전 제공할 것: Raw Response 파일 + Scope V0.2 + Execution Design (CF 정의 포함)
+Evaluator 세션에서 금지: 현재 세션 전달 컨텍스트 공유
 
 OGQ-001: "Minimum 3 independent validations" — OPEN
 RL-01~04: OPEN
