@@ -61,7 +61,7 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**P3→P4 Relationship Knowledge Authoring**
+**다음 QUEUED Place Knowledge 진행 (Case B)**
 
 ```
 CAND-OPS-003 V0.2 Status: Candidate / Approved (2026-09-25)
@@ -73,7 +73,9 @@ Decision File: docs/constitution/candidate/CAND-OPS-003_POST_SIMULATION_VALIDATI
 
 Decision Summary:
   NOF-01: RESOLVED (남면사무소 번호 Knowledge Package 확인)
-  NOF-02 (P3→P4 Route Knowledge): BACKLOG / OBSERVE — 다음 Authoring Pass 우선순위 1번
+  NOF-02 (P3→P4 Route Knowledge): RESOLVED — Relationship Knowledge 작성 완료 (2026-09-25)
+    File: docs/knowledge/YEOSU_RELATIONSHIP_KNOWLEDGE_HAMEL_TO_CABLE_CAR_V0_1.md
+    Resolution: Conditions A~E 모두 충족
   NOF-03 (P3 접근 VERIFY_REQUIRED 미명시): BACKLOG / OBSERVE — P3 Knowledge 다음 수정 시
   Runtime Validation: DEFER — Technical Prerequisites Absent (migration/retrieval/integration 미구현)
   Additional Simulation: NO ADDITIONAL SIMULATION NOW
@@ -88,6 +90,12 @@ DreamTown Philosophy: HOLD
 
 주의: LOCKED 전환 금지 / Constitution 승격 금지 / Production 연결 금지
 ```
+
+**Relationship Knowledge 완료 현황:**
+
+| Relationship | File | Status |
+|---|---|---|
+| 하멜등대 → 여수해상케이블카 | `docs/knowledge/YEOSU_RELATIONSHIP_KNOWLEDGE_HAMEL_TO_CABLE_CAR_V0_1.md` | COMPLETE — NOF-02 RESOLVED |
 
 ---
 

@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-25T00:44:39.565Z",
+  "generated_at": "2026-09-25T02:10:58.700Z",
   "generator": "generate-manifest.js",
-  "total_count": 496,
+  "total_count": 497,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "active",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-25",
-      "checksum": "f581c687"
+      "checksum": "a5a4dd78"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -2749,6 +2749,22 @@
       "title": "Yeosu Founder Route #001 — Time Evidence",
       "created_at": "2026-09-25",
       "checksum": "5a7703c8"
+    },
+    {
+      "id": "DOC-YEOSU_RELATIONSHIP_KNOWLEDGE_H",
+      "path": "docs/knowledge/YEOSU_RELATIONSHIP_KNOWLEDGE_HAMEL_TO_CABLE_CAR_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "team",
+      "status": "archived",
+      "title": "YEOSU Relationship Knowledge — 하멜등대 → 여수해상케이블카 V0.1",
+      "created_at": "2026-09-25",
+      "checksum": "4785eab7"
     },
     {
       "id": "DOC-YEOSU_ROUTE_CORPUS_V0_1",
