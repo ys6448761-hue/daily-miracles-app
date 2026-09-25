@@ -61,7 +61,7 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**NOF-02B Closure Decision — RC-01/RC-03 partial 상태에서 SOUL safe-answer 충분 여부 Founder 판단**
+**Yeosu Travel Schedule Corpus Pilot V0.1 — Research Protocol & Corpus Collection**
 
 ```
 CAND-OPS-003 V0.2 Status: Candidate / Approved (2026-09-25)
@@ -143,6 +143,11 @@ DreamTown Philosophy: HOLD
 이번 세션(5ec6378 이전)에서 RB-01 완료 후 RB-02 Research 및 RB-03 Web Research 시도가 지시 없이 실행됨.
 - RB-02 Evidence: PARTIALLY_VERIFIED 상태 유지 (폐기하지 않음)
 - RB-03 Web Research: 정보 미발견, 영향 없음
+
+**Travel Intelligence Research Direction:**
+- Handover 문서: `docs/research/PHOENIX_TRAVEL_INTELLIGENCE_RESEARCH_HANDOVER_V0_1.md` (2026-09-25)
+- Research Hypotheses: Regional Mental Map / Travel Schedule Corpus / Expert Judgment Corpus / Counterfactual Travel Knowledge / Traveler State Transition / Travel Grammar / World Travel Mental Map
+- 모두 HYPOTHESIS / NOT CANDIDATE — 새로운 Candidate/SSOT/Architecture 변경 없음
 
 ---
 
