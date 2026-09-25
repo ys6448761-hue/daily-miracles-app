@@ -61,9 +61,29 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Third Sample Collection Target — Package Cable Car Protocol V0.1**
+**Founder + Lumi Strategic Review — Package Cable Car Association Horizon**
 
-Purpose: 케이블카 direction + Odongdo sequence 검증 가능한 독립 package-product 사례 수집을 위한 protocol 설계
+```
+Third Sample Failure + V0.2 Operational Validation: PERSISTED (2026-09-25)
+  File: docs/research/PACKAGE_CABLE_CAR_THIRD_SAMPLE_FAILURE_V0_2_OPERATIONAL_VALIDATION_V0_1.md
+
+  YTC-015~019: EXCLUDED — SOURCE_NOT_REPRODUCIBLE
+  Provisional 3/2/0: INVALIDATED
+  Provisional cumulative 6/4/0: INVALIDATED
+
+  V0.2 Re-Collection Screening:
+    Discovered 12 / Included 0 / Duplicate 5 / Not Reproducible 4 / Other 3
+    Result: TARGET NOT MET — NO NEW REPRODUCIBLE INDEPENDENT CASES FOUND
+
+  Protocol Status: OPERATIONALLY FUNCTIONAL — ONE EXECUTION OBSERVED
+
+  Canonical Baseline (unchanged):
+    N=5 / DOLSAN→JASAN+AFTER=3 / JASAN→DOLSAN+BEFORE=2 / Contradictory=0
+    Assessment: EARLY ASSOCIATION SIGNAL — SAMPLE BOUNDED
+
+  WHY: NOT ASSESSED / Travel Grammar: NOT CONCLUDED / Mental Map: NOT CONFIRMED
+  Candidate: NO / Architecture: NO / DB/Runtime/Production: NO CHANGE
+```
 
 ```
 Package Direction Association — Evidence Sufficiency Decision V0.1: COMPLETE / SAVED (2026-09-25)

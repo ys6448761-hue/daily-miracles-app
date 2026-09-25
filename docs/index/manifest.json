@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-25T06:46:51.040Z",
+  "generated_at": "2026-09-25T07:06:34.408Z",
   "generator": "generate-manifest.js",
-  "total_count": 509,
+  "total_count": 510,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "active",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-25",
-      "checksum": "ed80a795"
+      "checksum": "ef76c2e4"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -4459,6 +4459,23 @@
       "title": "Package Cable Car Conditional Directionality",
       "created_at": "2026-09-25",
       "checksum": "74ddaab5"
+    },
+    {
+      "id": "DOC-PACKAGE_CABLE_CAR_THIRD_SAMPLE",
+      "path": "docs/research/PACKAGE_CABLE_CAR_THIRD_SAMPLE_FAILURE_V0_2_OPERATIONAL_VALIDATION_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "|---",
+      "title": "Package Cable Car — Third Sample Failure & V0.2 Operational Validation Evidence",
+      "created_at": "2026-09-25",
+      "checksum": "84c2a416"
     },
     {
       "id": "DOC-PACKAGE_DIRECTION_ASSOCIATION_",
