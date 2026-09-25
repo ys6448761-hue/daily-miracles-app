@@ -61,7 +61,38 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Yeosu Travel Schedule Corpus Pilot V0.1 — Research Protocol & First Sample Collection**
+**First Sample Repository Persistence — YTC-001~006 Raw Corpus 저장**
+
+```
+Second Sample: PASS WITH CORRECTIONS / SAVED (2026-09-25)
+Second Sample File: docs/research/YEOSU_TRAVEL_SCHEDULE_CORPUS_PILOT_SECOND_SAMPLE_V0_1.md
+
+Corpus Status:
+  First Sample (YTC-001~006): completed in research context / repository persistence pending
+  Second Sample (YTC-007~014): SAVED / YTC-007~014 preserved: YES
+
+FH-01 — Yeosu → Gwangyang lodging: MIXED / OBSERVATION EXISTS / WHY NOT CONFIRMED
+FH-02 — fixed Dolsan → Jasan → Odongdo direction: MIXED
+FH-02 Refined — Conditional Directionality V0.1: HYPOTHESIS / EARLY SUPPORT FOR CONDITIONAL STRUCTURE / CAUSAL CONDITIONS NOT CONFIRMED
+FH-03 — package one-way operation: EARLY SUPPORT / SAMPLE-BOUNDED / NOT RULE
+FH-04 — individual Traveler State influence: EARLY SUPPORT
+
+Conditional Directionality: HYPOTHESIS / NOT RULE / NOT CANDIDATE
+Travel Grammar: NOT CONCLUDED
+Mental Map: NOT CONFIRMED
+Candidate Generated: NO
+Architecture Changed: NO
+
+Lumi Corrections Applied:
+  Correction 1: FH-03 `100%` → OBSERVATION / EARLY SUPPORT / SAMPLE-BOUNDED
+  Correction 2: Vehicle Tethering Trap → NEW_OBSERVATION_SIGNAL — Return/Round-trip Friction
+  Correction 3: Hyangiram Physical Threshold → NEW_OBSERVATION_SIGNAL — Hyangiram Physical-Friction
+  Correction 4: FH-01 Provenance Separation (A/B/C 분리)
+  Correction 5: Conditional Directionality HYPOTHESIS V0.1 추가 (FH-02 MIXED 유지)
+```
+
+**[PREVIOUS NEXT ACTION — COMPLETED]**  
+Yeosu Travel Schedule Corpus Pilot V0.1 — Research Protocol & First Sample Collection
 
 ```
 CAND-OPS-003 V0.2 Status: Candidate / Approved (2026-09-25)
