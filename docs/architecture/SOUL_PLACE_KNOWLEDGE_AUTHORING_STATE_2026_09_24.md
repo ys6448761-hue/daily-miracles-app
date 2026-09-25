@@ -61,9 +61,21 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Package Direction Association — Evidence Sufficiency Decision V0.1**
+**Third Sample Collection Target — Package Cable Car Protocol V0.1**
 
-Purpose: direction-known 5건의 clean association signal을 보고 STOP / COLLECT MORE EVIDENCE / OPEN LIMITED WHY TEST 중 적절한 단계 판단
+Purpose: 케이블카 direction + Odongdo sequence 검증 가능한 독립 package-product 사례 수집을 위한 protocol 설계
+
+```
+Package Direction Association — Evidence Sufficiency Decision V0.1: COMPLETE / SAVED (2026-09-25)
+  File: docs/research/PACKAGE_DIRECTION_ASSOCIATION_EVIDENCE_SUFFICIENCY_DECISION_V0_1.md
+  Decision: COLLECT MORE EVIDENCE
+  Current Association: EARLY ASSOCIATION SIGNAL — SAMPLE BOUNDED
+  Collection Target: 3–5 independent package-product cases (operational target / NOT sufficiency threshold)
+  WHY: NOT ASSESSED
+  Travel Grammar: NOT CONCLUDED
+  Mental Map: NOT CONFIRMED
+  Candidate: NO / Architecture: NO
+```
 
 ```
 YTC Package Direction Correlation Matrix V0.1: COMPLETE / CANONICAL INTEGRITY REVIEWED / SAVED (2026-09-25)
