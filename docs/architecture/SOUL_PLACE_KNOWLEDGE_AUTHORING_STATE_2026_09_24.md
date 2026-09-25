@@ -61,7 +61,7 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**다음 QUEUED Place Knowledge 진행 (Case B)**
+**P3→P4 Cable Car Entity Identity Official Research (RB-01)**
 
 ```
 CAND-OPS-003 V0.2 Status: Candidate / Approved (2026-09-25)
@@ -73,9 +73,10 @@ Decision File: docs/constitution/candidate/CAND-OPS-003_POST_SIMULATION_VALIDATI
 
 Decision Summary:
   NOF-01: RESOLVED (남면사무소 번호 Knowledge Package 확인)
-  NOF-02 (P3→P4 Route Knowledge): RESOLVED — Relationship Knowledge 작성 완료 (2026-09-25)
+  NOF-02 (P3→P4 Route Knowledge): SPLIT → NOF-02A / NOF-02B
     File: docs/knowledge/YEOSU_RELATIONSHIP_KNOWLEDGE_HAMEL_TO_CABLE_CAR_V0_1.md
-    Resolution: Conditions A~E 모두 충족
+    NOF-02A (Relationship Authoring Gap): RESOLVED — Branch structure + Traveler conditions + Experience/Navigation separation
+    NOF-02B (Physical Route Verification): OPEN — 하멜등대→탑승장 이동 시간·경로·요금 미검증
   NOF-03 (P3 접근 VERIFY_REQUIRED 미명시): BACKLOG / OBSERVE — P3 Knowledge 다음 수정 시
   Runtime Validation: DEFER — Technical Prerequisites Absent (migration/retrieval/integration 미구현)
   Additional Simulation: NO ADDITIONAL SIMULATION NOW
@@ -91,11 +92,23 @@ DreamTown Philosophy: HOLD
 주의: LOCKED 전환 금지 / Constitution 승격 금지 / Production 연결 금지
 ```
 
-**Relationship Knowledge 완료 현황:**
+**Relationship Knowledge 현황:**
 
-| Relationship | File | Status |
-|---|---|---|
-| 하멜등대 → 여수해상케이블카 | `docs/knowledge/YEOSU_RELATIONSHIP_KNOWLEDGE_HAMEL_TO_CABLE_CAR_V0_1.md` | COMPLETE — NOF-02 RESOLVED |
+| Relationship | File | NOF-02A | NOF-02B |
+|---|---|---|---|
+| 하멜등대 → 여수해상케이블카 | `docs/knowledge/YEOSU_RELATIONSHIP_KNOWLEDGE_HAMEL_TO_CABLE_CAR_V0_1.md` | RESOLVED | OPEN / VERIFICATION DECISION COMPLETE |
+
+**P3→P4 Physical Route Verification Decision:**
+
+`docs/knowledge/YEOSU_RELATIONSHIP_HAMEL_CABLE_CAR_PHYSICAL_ROUTE_VERIFICATION_DECISION_V0_1.md`
+
+결정 요약:
+- P1 항목: VR-001/002/012/013 (Entity Identity) → RB-01 Official Research 필요
+- P1 항목: VR-003 (하멜등대→자산탑승장 이동) → RB-03 + FVQ-01~03 Field Confirmation 필요
+- P1 항목: VR-006 (편도/왕복 판매 조건) → RB-02 Official Research 필요
+- LIVE_CHECK_ONLY: 요금, 운영시간
+- FOUNDER_LOCAL_ACCEPTABLE: 단체 편도 정책 (FL-03)
+- DO_NOT_NEED: 가시성 (VR-011)
 
 ---
 
