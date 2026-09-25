@@ -61,12 +61,36 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Package Cable Car Conditional Directionality — Independent WHY Research V0.1**
+**YTC Package Direction Correlation Matrix V0.1**
 
-Research Question:
-"여수 패키지 일정에서 케이블카 편도 운용과 탑승 방향(돌산→자산 vs 자산→돌산)은 전후 목적지 순서, 버스 이동/주차 동선, 숙박 위치 중 어떤 운영 조건에 가장 종속적인가?"
+Scope: YTC-001, YTC-002, YTC-006, YTC-007, YTC-008, YTC-009, YTC-013 (package-product Corpus only)  
+Purpose: 오동도 탐방 순서(선행/후행/없음/불명)와 Cable Car Direction 사이의 관계를 단순 기술  
+Web search: NO / New Corpus: NO / Founder rationale: NO / WHY inference: NO
 
-Status: `RESEARCH REQUIRED`
+```
+Package Cable Car Conditional Directionality — Independent WHY Research V0.1:
+  Status: AUDITED / SAVED (2026-09-25)
+  Audit File: docs/research/PACKAGE_CABLE_CAR_CONDITIONAL_DIRECTIONALITY_SOURCE_PROVENANCE_AUDIT_V0_1.md
+  Source & Provenance Audit: COMPLETE
+
+  DIR-01~05: EXCLUDED (SOURCE_NOT_REPRODUCIBLE)
+  Unidentified sources: EXCLUDED
+  Non-reproducible claims removed: Through-pass standard / Zero-buffer / Legal prohibition
+
+  Ticket / Operating Policy: NOT TESTABLE
+    Note: Official one-way group fare = Operating Possibility, NOT causal WHY.
+  Founder Rationale: PARTIALLY SUPPORTED
+  WHY Assessment: WHY REMAINS MIXED
+
+  Variable Assessments:
+    Previous Destination: EARLY SUPPORT
+    Next Destination: EARLY SUPPORT
+    Bus Repositioning: EARLY SUPPORT
+    Parking: INSUFFICIENT
+    Accommodation: MIXED
+    Schedule / Time: INSUFFICIENT
+    Ticket / Operating Policy: NOT TESTABLE
+```
 
 ```
 14-Sample Corpus: First Sample + Second Sample + Cross-Corpus Review persisted
