@@ -61,7 +61,29 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Founder + Lumi Strategic Review — Package Cable Car Association Horizon**
+**Plan-Change Event Pattern Review V0.1**
+
+```
+Traveler Plan-Change Blind Extraction + Reconciliation: PERSISTED (2026-09-25)
+  File: docs/research/TRAVELER_PLAN_CHANGE_BLIND_EXTRACTION_RECONCILIATION_V0_1.md
+  Canonical Status: PASS WITH MINOR TEXT CORRECTION — CANONICAL READY
+
+  YTC-Level (14 screened):
+    PLAN_CHANGE_FOUND = 4 (YTC-005, YTC-010, YTC-011, YTC-012)
+    INCOMPLETE = 5 / NO_EVIDENCE = 5 / Arithmetic: 4+5+5=14 PASS
+
+  Event-Level: 6 validated PCEU
+    YTC-005: PCEU-002A/B/C (3 events)
+    YTC-010: PCEU-003 / YTC-011: PCEU-004 / YTC-012: PCEU-005 (text refined)
+
+  Invalidated: PCEU-001 (YTC-004 MISSING_DATA) / Old PCEU-002 SPLIT & SUPERSEDED
+
+  Traveler State Transition: HYPOTHESIS ONLY
+  Travel Grammar: NOT CONCLUDED / Mental Map: NOT CONFIRMED
+  Candidate: NO / Architecture: NO / DB/Runtime/Production: NO CHANGE
+```
+
+**[PREVIOUS NEXT ACTION — Founder + Lumi Strategic Review — Package Cable Car Association Horizon]**
 
 ```
 Third Sample Failure + V0.2 Operational Validation: PERSISTED (2026-09-25)
