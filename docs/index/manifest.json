@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-25T02:21:12.031Z",
+  "generated_at": "2026-09-25T02:39:23.575Z",
   "generator": "generate-manifest.js",
-  "total_count": 498,
+  "total_count": 499,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "active",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-25",
-      "checksum": "c6141c75"
+      "checksum": "1743bdd8"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -2780,7 +2780,7 @@
       "status": "archived",
       "title": "YEOSU Relationship Knowledge — 하멜등대 → 여수해상케이블카 V0.1",
       "created_at": "2026-09-25",
-      "checksum": "4785eab7"
+      "checksum": "2f177e67"
     },
     {
       "id": "DOC-YEOSU_ROUTE_CORPUS_V0_1",
@@ -4425,6 +4425,23 @@
       "title": "WISH_TO_RENDER_PROTOTYPE.md",
       "created_at": "2026-09-25",
       "checksum": "39bff25c"
+    },
+    {
+      "id": "DOC-YEOSU_CABLE_CAR_ENTITY_IDENTIT",
+      "path": "docs/research/YEOSU_CABLE_CAR_ENTITY_IDENTITY_OFFICIAL_RESEARCH_RB01_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "IN_DB (cablecar)",
+      "title": "여수해상케이블카 Entity Identity 공식 Research",
+      "created_at": "2026-09-25",
+      "checksum": "042eee7f"
     },
     {
       "id": "DOC-REVIEW_COLLECTION_SYSTEM",

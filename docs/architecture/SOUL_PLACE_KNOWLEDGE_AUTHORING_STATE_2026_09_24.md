@@ -61,7 +61,7 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**P3→P4 Cable Car Entity Identity Official Research (RB-01)**
+**P3→P4 One-way/Round-trip Current Structure Verification (RB-02)**
 
 ```
 CAND-OPS-003 V0.2 Status: Candidate / Approved (2026-09-25)
@@ -96,19 +96,27 @@ DreamTown Philosophy: HOLD
 
 | Relationship | File | NOF-02A | NOF-02B |
 |---|---|---|---|
-| 하멜등대 → 여수해상케이블카 | `docs/knowledge/YEOSU_RELATIONSHIP_KNOWLEDGE_HAMEL_TO_CABLE_CAR_V0_1.md` | RESOLVED | OPEN / VERIFICATION DECISION COMPLETE |
+| 하멜등대 → 여수해상케이블카 | `docs/knowledge/YEOSU_RELATIONSHIP_KNOWLEDGE_HAMEL_TO_CABLE_CAR_V0_1.md` | RESOLVED | OPEN / RB-01 COMPLETE / RB-02 IN PROGRESS |
 
 **P3→P4 Physical Route Verification Decision:**
 
 `docs/knowledge/YEOSU_RELATIONSHIP_HAMEL_CABLE_CAR_PHYSICAL_ROUTE_VERIFICATION_DECISION_V0_1.md`
 
 결정 요약:
-- P1 항목: VR-001/002/012/013 (Entity Identity) → RB-01 Official Research 필요
+- P1 항목: VR-001/002/012/013 (Entity Identity) → **RB-01 COMPLETE (PASS WITH FINDINGS, 2026-09-25)**
 - P1 항목: VR-003 (하멜등대→자산탑승장 이동) → RB-03 + FVQ-01~03 Field Confirmation 필요
-- P1 항목: VR-006 (편도/왕복 판매 조건) → RB-02 Official Research 필요
+- P1 항목: VR-006 (편도/왕복 판매 조건) → **RB-02 IN PROGRESS**
 - LIVE_CHECK_ONLY: 요금, 운영시간
 - FOUNDER_LOCAL_ACCEPTABLE: 단체 편도 정책 (FL-03)
 - DO_NOT_NEED: 가시성 (VR-011)
+
+**RB-01 결과 요약 (2026-09-25):**
+- VR-001: 자산 측 브랜드명 "해야정류장" — PARTIALLY_VERIFIED (2개 SUPPORTING 소스)
+- VR-002: 돌산 측 브랜드명 "놀아정류장" — PARTIALLY_VERIFIED (2개 SUPPORTING 소스)
+- VR-012: 자산공원↔탑승장 = LOCATED_WITHIN/ADJACENT — PARTIALLY_VERIFIED
+- VR-013: 돌산공원↔탑승장 = LOCATED_WITHIN/ADJACENT — PARTIALLY_VERIFIED
+- RC-01: PARTIALLY_COMPLETE (OFFICIAL_PRIMARY SSL 오류 지속, 전화 확인 미완료)
+- Research File: `docs/research/YEOSU_CABLE_CAR_ENTITY_IDENTITY_OFFICIAL_RESEARCH_RB01_V0_1.md`
 
 ---
 
