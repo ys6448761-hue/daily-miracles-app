@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-25T06:26:53.866Z",
+  "generated_at": "2026-09-25T06:40:01.069Z",
   "generator": "generate-manifest.js",
-  "total_count": 507,
+  "total_count": 508,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "active",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-25",
-      "checksum": "8b1c9119"
+      "checksum": "95f19309"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -4582,6 +4582,23 @@
       "title": "Yeosu Travel Schedule Corpus Pilot V0.1 — Second Sample Research Evidence Report",
       "created_at": "2026-09-25",
       "checksum": "e2010002"
+    },
+    {
+      "id": "DOC-YTC_PACKAGE_DIRECTION_CORRELAT",
+      "path": "docs/research/YTC_PACKAGE_DIRECTION_CORRELATION_MATRIX_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "|---",
+      "title": "YTC Package Direction Correlation Matrix V0.1",
+      "created_at": "2026-09-25",
+      "checksum": "d3c873a3"
     },
     {
       "id": "DOC-REVIEW_COLLECTION_SYSTEM",

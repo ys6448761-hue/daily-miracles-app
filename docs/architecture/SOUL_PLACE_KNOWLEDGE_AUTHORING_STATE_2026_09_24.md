@@ -61,11 +61,34 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**YTC Package Direction Correlation Matrix V0.1**
+**Package Direction Association — Evidence Sufficiency Decision V0.1**
 
-Scope: YTC-001, YTC-002, YTC-006, YTC-007, YTC-008, YTC-009, YTC-013 (package-product Corpus only)  
-Purpose: 오동도 탐방 순서(선행/후행/없음/불명)와 Cable Car Direction 사이의 관계를 단순 기술  
-Web search: NO / New Corpus: NO / Founder rationale: NO / WHY inference: NO
+Purpose: direction-known 5건의 clean association signal을 보고 STOP / COLLECT MORE EVIDENCE / OPEN LIMITED WHY TEST 중 적절한 단계 판단
+
+```
+YTC Package Direction Correlation Matrix V0.1: COMPLETE / CANONICAL INTEGRITY REVIEWED / SAVED (2026-09-25)
+  File: docs/research/YTC_PACKAGE_DIRECTION_CORRELATION_MATRIX_V0_1.md
+
+  Package Cases: 7 (YTC-001, YTC-002, YTC-006, YTC-007, YTC-008, YTC-009, YTC-013)
+  Direction Integrity: PASS (3 DOLSAN→JASAN / 2 JASAN→DOLSAN / 2 MISSING_DATA)
+  Odongdo Timing Integrity: PASS (4 AFTER / 3 BEFORE)
+
+  Core Association:
+    DOLSAN→JASAN + Odongdo AFTER: 3 — YTC-001, YTC-007, YTC-008
+    JASAN→DOLSAN + Odongdo BEFORE: 2 — YTC-009, YTC-013
+    Contradictory Direction-Known Cases: 0
+    Direction Missing: 2 — YTC-002, YTC-006
+
+  Assessment: EARLY ASSOCIATION SIGNAL — SAMPLE BOUNDED
+  WHY: NOT ASSESSED
+  Founder Rationale: NOT USED
+  Travel Grammar: NOT CONCLUDED
+  Mental Map: NOT CONFIRMED
+  Candidate Generated: NO
+  Architecture Changed: NO
+```
+
+Next Research guardrails: Web search NO / New Corpus NO / Founder rationale NO / WHY inference NO / Missing direction inference NO
 
 ```
 Package Cable Car Conditional Directionality — Independent WHY Research V0.1:
