@@ -61,7 +61,26 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Plan-Change Event Pattern Review V0.1**
+**Plan-Change Structural Signal Sufficiency Decision V0.1**
+
+```
+Plan-Change Event Pattern Review V0.1: PERSISTED (2026-09-25)
+  File: docs/research/PLAN_CHANGE_EVENT_PATTERN_REVIEW_V0_1.md
+  Review: PASS WITH MINOR REVISION
+
+  Signal A — PLANNED_ACTIVITY_DROPPED_WITH_SUBSTITUTION:
+    Events=3 / YTC=3 / Assessment: REPEATED STRUCTURAL SIGNAL — SAMPLE BOUNDED
+  Signal B — PLANNED_ACTIVITY_DROPPED:
+    Events=2 / YTC=2 / Assessment: REPEATED STRUCTURAL SIGNAL — SAMPLE BOUNDED
+  Single-Event — UNPLANNED_ADDITION:
+    Events=1 / YTC=1 / Assessment: SINGLE-EVENT SIGNAL
+
+  Pattern Assessment: REPEATED STRUCTURAL SIGNAL(S) OBSERVED — SAMPLE BOUNDED
+  Taxonomy: NOT CREATED / Trigger grouping: FROZEN
+  Traveler State Transition: HYPOTHESIS ONLY
+  Travel Grammar: NOT CONCLUDED / Mental Map: NOT CONFIRMED
+  Candidate: NO / Architecture: NO / DB/Runtime/Production: NO CHANGE
+```
 
 ```
 Traveler Plan-Change Blind Extraction + Reconciliation: PERSISTED (2026-09-25)
