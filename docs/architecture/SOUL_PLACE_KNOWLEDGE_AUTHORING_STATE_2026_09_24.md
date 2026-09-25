@@ -61,7 +61,7 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**P3→P4 One-way/Round-trip Current Structure Verification (RB-02)**
+**P3→P4 Hamel→Jasan Physical Access — RB-03 Field Verification Design**
 
 ```
 CAND-OPS-003 V0.2 Status: Candidate / Approved (2026-09-25)
@@ -104,8 +104,8 @@ DreamTown Philosophy: HOLD
 
 결정 요약:
 - P1 항목: VR-001/002/012/013 (Entity Identity) → **RB-01 COMPLETE (PASS WITH FINDINGS, 2026-09-25)**
-- P1 항목: VR-003 (하멜등대→자산탑승장 이동) → RB-03 + FVQ-01~03 Field Confirmation 필요
-- P1 항목: VR-006 (편도/왕복 판매 조건) → **RB-02 IN PROGRESS**
+- P1 항목: VR-003 (하멜등대→자산탑승장 이동) → **RB-03 PENDING — Field Confirmation 필요**
+- P1 항목: VR-006 (편도/왕복 판매 조건) → **RB-02 COMPLETE (PASS WITH FINDINGS, 2026-09-25)**
 - LIVE_CHECK_ONLY: 요금, 운영시간
 - FOUNDER_LOCAL_ACCEPTABLE: 단체 편도 정책 (FL-03)
 - DO_NOT_NEED: 가시성 (VR-011)
@@ -117,6 +117,17 @@ DreamTown Philosophy: HOLD
 - VR-013: 돌산공원↔탑승장 = LOCATED_WITHIN/ADJACENT — PARTIALLY_VERIFIED
 - RC-01: PARTIALLY_COMPLETE (OFFICIAL_PRIMARY SSL 오류 지속, 전화 확인 미완료)
 - Research File: `docs/research/YEOSU_CABLE_CAR_ENTITY_IDENTITY_OFFICIAL_RESEARCH_RB01_V0_1.md`
+
+**RB-02 결과 요약 (2026-09-25):**
+- VR-006: 편도/왕복 자유 선택 — PARTIALLY_VERIFIED (나무위키 + 블로그 2개 소스)
+- 핵심 확인: 제약 없이 자유 선택 가능. 단체 20인+ 할인 존재하나 편도 강제 아님.
+- RC-03: PARTIALLY_COMPLETE
+- Research File: `docs/research/YEOSU_CABLE_CAR_ONE_WAY_ROUNDTRIP_RESEARCH_RB02_V0_1.md`
+
+**현재 블로커: RB-03 (Field Confirmation 필요)**
+- VR-003: 하멜등대→자산탑승장 이동 경로·시간·방법
+- RC-02: OPEN
+- 실행 방법: Founder 현장 확인 또는 FVQ-01~03 현장 답변
 
 ---
 

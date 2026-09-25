@@ -754,13 +754,24 @@ Resolution Conditions 확인:
 
 | 항목 | 상태 |
 |---|---|
-| 하멜등대→자산탑승장 정확한 이동 시간 및 경로 | OPEN / VERIFY_REQUIRED |
+| 하멜등대→자산탑승장 정확한 이동 시간 및 경로 | OPEN / VERIFY_REQUIRED (RB-03 필요) |
 | 하멜등대→돌산탑승장 이동 방법 | OPEN / VERIFY_REQUIRED |
-| 공식 요금 (편도/왕복) | OPEN / LIVE |
-| 공식 탑승장 명칭 | OPEN / VERIFY_REQUIRED |
-| 단체 편도 현재 정책 | OPEN / VERIFY_REQUIRED |
+| 공식 요금 (편도/왕복) | PARTIALLY_VERIFIED — 블로그 2개 소스. LIVE_CHECK 유지. |
+| 공식 탑승장 명칭 | PARTIALLY_VERIFIED — 해야/놀아 브랜드명 2개 소스. RC-01 OPEN. |
+| 편도/왕복 자유 선택 여부 | **PARTIALLY_VERIFIED (RB-02 2026-09-25)** — 제약 없음 확인 |
+| 단체 편도 현재 정책 | OPEN / VERIFY_REQUIRED (단체 할인 존재하나 편도 강제 여부 미확인) |
 
-**NOF-02B: OPEN / VERIFY_REQUIRED**
+**RC 상태:**
+- RC-01 (명칭): PARTIALLY_COMPLETE — RB-01 완료, 전화 확인 필요
+- RC-02 (물리적 접근): OPEN — RB-03 Field Confirmation 필요
+- RC-03 (편도/왕복): PARTIALLY_COMPLETE — RB-02 완료
+- RC-04, RC-05: COMPLETE
+
+**NOF-02B: OPEN / RB-01+RB-02 COMPLETE / RB-03 PENDING**
+
+Research Files:
+- RB-01: `docs/research/YEOSU_CABLE_CAR_ENTITY_IDENTITY_OFFICIAL_RESEARCH_RB01_V0_1.md`
+- RB-02: `docs/research/YEOSU_CABLE_CAR_ONE_WAY_ROUNDTRIP_RESEARCH_RB02_V0_1.md`
 
 ---
 
