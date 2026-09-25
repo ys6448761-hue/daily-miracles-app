@@ -61,7 +61,34 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Select Next Travel Intelligence Research Question**
+**RQ-MEAL-001 Evidence Sufficiency Review — Pattern Review Decision**
+
+```
+RQ-MEAL-001 Final Reconciliation: PERSISTED (2026-09-26)
+  File: docs/research/RQ_MEAL_001_FINAL_RECONCILIATION_V0_1.md
+
+  Blind Extraction: COMPLETE
+  Canonical Reconciliation: COMPLETE
+  Source-Locator Integrity Audit: COMPLETE
+  MEU-015 Actual Meal Provenance Check: COMPLETE
+
+  Final Validated MEU: 14
+  Meal Evidence YTC: FOUND 11 / INCOMPLETE 3 / NO EVIDENCE 0
+  Arithmetic: 11 + 3 + 0 = 14 PASS
+
+  Corrections Applied:
+    MEU-002: REMOVED (YTC-001 free dinner — consumption not verified)
+    MEU-008: CORRECTED (YTC-006 Day 1 → Day 2)
+    MEU-015: REMOVED FROM MEAL EVIDENCE (YTC-012 plan-change only)
+  Intermediate counts 23/16/15: INVALIDATED
+
+  Meal Pattern: NOT CONCLUDED
+  Meal Recommendation: NOT CREATED / Meal Timing Taxonomy: NOT CREATED
+  Travel Grammar: NOT CONCLUDED / Mental Map: NOT CONFIRMED
+  Candidate: NO / Architecture: NO / DB/Runtime/Production: NO CHANGE
+```
+
+**[PREVIOUS NEXT ACTION — Select Next Travel Intelligence Research Question]**
 
 ```
 Plan-Change Structural Signal Sufficiency Decision V0.1: PERSISTED (2026-09-26)
