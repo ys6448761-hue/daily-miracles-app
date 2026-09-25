@@ -61,7 +61,7 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Yeosu Travel Schedule Corpus Pilot V0.1 — Research Protocol & Corpus Collection**
+**Yeosu Travel Schedule Corpus Pilot V0.1 — Research Protocol & First Sample Collection**
 
 ```
 CAND-OPS-003 V0.2 Status: Candidate / Approved (2026-09-25)
@@ -96,7 +96,7 @@ DreamTown Philosophy: HOLD
 
 | Relationship | File | NOF-02A | NOF-02B |
 |---|---|---|---|
-| 하멜등대 → 여수해상케이블카 | `docs/knowledge/YEOSU_RELATIONSHIP_KNOWLEDGE_HAMEL_TO_CABLE_CAR_V0_1.md` | RESOLVED | OPEN / RB-01+RB-02+RB-03 COMPLETE / RC-01/RC-03 PARTIAL |
+| 하멜등대 → 여수해상케이블카 | `docs/knowledge/YEOSU_RELATIONSHIP_KNOWLEDGE_HAMEL_TO_CABLE_CAR_V0_1.md` | RESOLVED | **OPERATIONALLY CLOSED** (RC-01/RC-03 PARTIAL → Verification Backlog) |
 
 **P3→P4 Physical Route Verification Decision:**
 
@@ -133,11 +133,12 @@ DreamTown Philosophy: HOLD
 - Research File: `docs/research/YEOSU_HAMEL_CABLE_CAR_PHYSICAL_ACCESS_FIELD_EVIDENCE_RB03_V0_1.md`
 
 **NOF-02B 현황:**
-- RC-01: PARTIALLY_COMPLETE (전화 061-664-7301 또는 SSL 복구 후 완결)
+- RC-01: PARTIALLY_COMPLETE → Verification Backlog (non-blocking)
 - RC-02: **COMPLETE**
-- RC-03: PARTIALLY_COMPLETE
+- RC-03: PARTIALLY_COMPLETE → Verification Backlog (non-blocking)
 - RC-04, RC-05: COMPLETE
-- NOF-02B: **OPEN** (RC-01/RC-03 partial 유지)
+- NOF-02B: **OPERATIONALLY CLOSED** (2026-09-25)
+- Closure Decision: `docs/knowledge/YEOSU_RELATIONSHIP_HAMEL_CABLE_CAR_NOF02B_CLOSURE_DECISION_V0_1.md`
 
 **Out-of-Scope Execution Note:**
 이번 세션(5ec6378 이전)에서 RB-01 완료 후 RB-02 Research 및 RB-03 Web Research 시도가 지시 없이 실행됨.
