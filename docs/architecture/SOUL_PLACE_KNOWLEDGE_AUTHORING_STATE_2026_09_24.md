@@ -61,22 +61,32 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**[NEXT ACTION TO BE DETERMINED — Founder 결정 필요]**
+**Package Cable Car Conditional Directionality — Independent WHY Research V0.1**
+
+Research Question:
+"여수 패키지 일정에서 케이블카 편도 운용과 탑승 방향(돌산→자산 vs 자산→돌산)은 전후 목적지 순서, 버스 이동/주차 동선, 숙박 위치 중 어떤 운영 조건에 가장 종속적인가?"
+
+Status: `RESEARCH REQUIRED`
 
 ```
-First Sample Repository Persistence: COMPLETE (2026-09-25)
-First Sample File: docs/research/YEOSU_TRAVEL_SCHEDULE_CORPUS_PILOT_FIRST_SAMPLE_V0_1.md
-YTC-001~006: RAW EVIDENCE SAVED
+14-Sample Corpus: First Sample + Second Sample + Cross-Corpus Review persisted
 
-Second Sample: PASS WITH CORRECTIONS / REPOSITORY SAVED (2026-09-25)
-Second Sample File: docs/research/YEOSU_TRAVEL_SCHEDULE_CORPUS_PILOT_SECOND_SAMPLE_V0_1.md
+First Sample (YTC-001~006): REPOSITORY PERSISTED
+  File: docs/research/YEOSU_TRAVEL_SCHEDULE_CORPUS_PILOT_FIRST_SAMPLE_V0_1.md
+  Note: Original First Sample Research Evidence recovered and persisted; no reconstruction from memory was used.
 
-Provenance Note: Original First Sample Research Evidence recovered and persisted; no reconstruction from memory was used.
+Second Sample (YTC-007~014): REPOSITORY PERSISTED / PASS WITH CORRECTIONS
+  File: docs/research/YEOSU_TRAVEL_SCHEDULE_CORPUS_PILOT_SECOND_SAMPLE_V0_1.md
 
-Corpus Repository Status:
-  First Sample (YTC-001~006): REPOSITORY PERSISTED (f83dab2 → next commit)
-  Second Sample (YTC-007~014): REPOSITORY PERSISTED (f83dab2)
-  Total Corpus Repository-Persisted: YTC-001~014 = 14
+Cross-Corpus Review V0.2.1: COMPLETE / SAVED
+  File: docs/research/YEOSU_TRAVEL_SCHEDULE_CORPUS_14_SAMPLE_CROSS_CORPUS_REVIEW_V0_2_1.md
+  YTC-014 Lodging: YEOSU (corrected from Multi-Region)
+  Lodging Arithmetic: 4 + 8 + 1 + 1 = 14 / PASS
+  Count Integrity: PASS
+  Denominator Integrity: PASS
+  Canonical ID Integrity: PASS
+
+Total Corpus Repository-Persisted: YTC-001~014 = 14
 
 FH-01 — Yeosu → Gwangyang lodging: MIXED / OBSERVATION EXISTS / WHY NOT CONFIRMED
 FH-02 — fixed Dolsan → Jasan → Odongdo direction: MIXED
