@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-25T08:52:39.245Z",
+  "generated_at": "2026-09-25T20:37:41.644Z",
   "generator": "generate-manifest.js",
-  "total_count": 512,
+  "total_count": 513,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "active",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-25",
-      "checksum": "6913cc87"
+      "checksum": "a28a048f"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -4528,6 +4528,23 @@
       "title": "Plan-Change Event Pattern Review V0.1",
       "created_at": "2026-09-25",
       "checksum": "3495f6bc"
+    },
+    {
+      "id": "DOC-PLAN_CHANGE_STRUCTURAL_SIGNAL_",
+      "path": "docs/research/PLAN_CHANGE_STRUCTURAL_SIGNAL_SUFFICIENCY_DECISION_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "|---",
+      "title": "Plan-Change Structural Signal Sufficiency Decision V0.1",
+      "created_at": "2026-09-25",
+      "checksum": "a2827274"
     },
     {
       "id": "DOC-TRAVELER_PLAN_CHANGE_BLIND_EXT",

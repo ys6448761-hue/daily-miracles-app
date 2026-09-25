@@ -61,7 +61,20 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Plan-Change Structural Signal Sufficiency Decision V0.1**
+**Select Next Travel Intelligence Research Question**
+
+```
+Plan-Change Structural Signal Sufficiency Decision V0.1: PERSISTED (2026-09-26)
+  File: docs/research/PLAN_CHANGE_STRUCTURAL_SIGNAL_SUFFICIENCY_DECISION_V0_1.md
+  Decision: HOLD AS SAMPLE-BOUNDED OBSERVATION — MOVE TO NEXT RESEARCH QUESTION
+  Collection Horizon: CLOSED for Plan-Change same-kind counting
+
+  Preserved: 6 events / 4 YTC / Signal A(3) + Signal B(2) + UNPLANNED_ADDITION(1)
+  Trigger→Change Form: NOT ESTABLISHED
+  Traveler State Transition: HYPOTHESIS ONLY
+  Travel Grammar: NOT CONCLUDED / Mental Map: NOT CONFIRMED
+  Candidate: NO / Architecture: NO / DB/Runtime/Production: NO CHANGE
+```
 
 ```
 Plan-Change Event Pattern Review V0.1: PERSISTED (2026-09-25)
