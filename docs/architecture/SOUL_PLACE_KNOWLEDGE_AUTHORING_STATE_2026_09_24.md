@@ -61,7 +61,45 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Perform the RQ-CABLECAR-CONDITION-001 Research-Horizon Decision Review using RH-01 through RH-07 to decide whether to close at descriptive findings or open one narrowly scoped follow-up RQ.**
+**Return from RQ-CABLECAR-CONDITION-001 research to the highest-priority SOUL Travel Intelligence MVP work using the now-closed research findings as bounded evidence, without opening a new WHY RQ.**
+
+```
+RQ-CABLECAR-CONDITION-001 Research Horizon: CLOSED / FOLLOW-UP HOLD (2026-09-26)
+  Decision File: docs/research/RQ_CABLECAR_CONDITION_001_RESEARCH_HORIZON_DECISION_V0_1.md
+
+  Decision: RH-D-C — HOLD FOLLOW-UP UNTIL NEW INDEPENDENT EVIDENCE SURFACE APPEARS
+  Independent Review: APPROVED WITH EVIDENTIARY LANGUAGE CORRECTIONS
+
+  Gate Results:
+    RH-01 Signal Strength = PASS
+    RH-02 Missingness Risk = PARTIAL
+    RH-03 Decision-Maker Confounding = FAIL (decisive)
+    RH-04 Condition Availability = FAIL (decisive)
+    RH-05 New Information Potential = FAIL (decisive)
+    RH-06 Causal Restraint = PASS
+    RH-07 MVP Utility = PARTIAL
+
+  Closure Reason: Current corpus supports repeated sample-bounded descriptive co-occurrence
+    but does not contain sufficient within-stratum variation or source-stated explanatory
+    conditions for a meaningful WHY-oriented follow-up.
+
+  Reopen Conditions (NOT authorizing active collection):
+    RC-01: New actual-trip evidence with explicit VISIT_TYPE + source-stated condition
+    RC-02: Source-stated traveler rationale for one-way/round-trip choice
+    RC-03: Operator-authored rationale for package one-way structure (with provenance)
+    RC-04: Materially improved vehicle/parking context coverage (cross-group comparison)
+
+  Preserved Findings:
+    OA-C = CONFIRMED / P-C2-01 ONE_WAY+Package = PRESERVED / P-C2-02 ROUND_TRIP+Individual = PRESERVED
+    S-C2-01 ONE_WAY+오동도 = PRESERVED (SECONDARY/WEAK)
+    WHY = NOT CONCLUDED / Causality = NOT TESTABLE / Recommendation Logic = NOT CREATED
+
+  Phoenix Learnings (L-01~L-06): PERSISTED
+  New RQ = NOT REGISTERED / Candidate = NO / Architecture = NO
+  DB/Schema/Runtime/Production = NO CHANGE / place_knowledge migration = NOT APPROVED / HOLD
+```
+
+**[PREVIOUS NEXT ACTION — Perform the RQ-CABLECAR-CONDITION-001 Research-Horizon Decision Review]**
 
 ```
 RQ-CABLECAR-CONDITION-001 Limited Co-occurrence Analysis: COMPLETE / REVIEWED / PERSISTED (2026-09-26)
