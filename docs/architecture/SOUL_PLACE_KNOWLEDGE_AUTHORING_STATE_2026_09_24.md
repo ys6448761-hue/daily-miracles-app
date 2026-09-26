@@ -61,7 +61,30 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**RQ-MEAL-001 Evidence Sufficiency Review — Pattern Review Decision**
+**Select exactly one next Travel Intelligence research question from the existing deferred / eligible research backlog**
+
+```
+RQ-TRANSPORT-001 Limited / Sample-Bounded Pattern Review: COMPLETE / PERSISTED (2026-09-26)
+  File: docs/research/RQ_TRANSPORT_001_LIMITED_PATTERN_REVIEW_DECISION_V0_1.md
+
+  Evidence Baseline: FROZEN
+  Documented Journey Edges: 139 / EXPLICIT: 78 / UNMENTIONED: 60 / AMBIGUOUS: 1
+  Evidence Sufficiency: SUFFICIENT FOR LIMITED / SAMPLE-BOUNDED REVIEW
+  Limited Pattern Review: COMPLETE
+  Result: REPEATED RAW STRUCTURAL FORM(S) OBSERVED WITHIN CURRENT SAMPLE
+
+  REPEATED/SAMPLE-BOUNDED: WALK(18/5) CAR_PRIVATE(15/4) CABLE_CAR(11/9)
+    TRAIN_KTX(9/5) BUS_PACKAGE(7/6) CAR_GENERIC(6/3) TAXI(4/2)
+  WITHIN-CORPUS ONLY: BUS_PUBLIC(4/1) CAR_RENTAL(3/1)
+  SINGLE-EVENT: OTHER_EXPLICIT(1/1)
+
+  Transport Pattern: NOT CONCLUDED / Transport Grammar: NOT CREATED
+  Travel Grammar: NOT CONCLUDED / Mobility Pattern: NOT CONCLUDED
+  Mental Map: NOT CONFIRMED / Candidate: NO / Architecture: NO
+  DB/Runtime/Production: NO CHANGE / place_knowledge migration: HOLD
+```
+
+**[PREVIOUS NEXT ACTION — RQ-MEAL-001 Evidence Sufficiency Review — Pattern Review Decision]**
 
 ```
 RQ-MEAL-001 Final Reconciliation: PERSISTED (2026-09-26)
