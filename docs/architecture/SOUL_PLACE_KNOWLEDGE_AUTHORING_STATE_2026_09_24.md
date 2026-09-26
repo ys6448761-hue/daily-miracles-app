@@ -61,7 +61,34 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Perform RQ-SEQUENCE-001 Post-Pattern Research Decision Review to determine whether the Sequence research horizon should close at the current sample-bounded findings or whether a narrowly scoped WHY-oriented research question is justified by existing evidence.**
+**Execute RQ-CABLECAR-CONDITION-001 source-stated condition extraction on the existing persisted corpus under the frozen non-causal protocol, without adding external evidence or inferring missing conditions.**
+
+```
+RQ-SEQUENCE-001 Post-Pattern Research Decision: COMPLETE / PERSISTED (2026-09-26)
+  File: docs/research/RQ_SEQUENCE_001_POST_PATTERN_RESEARCH_DECISION_V0_1.md
+
+  Decision B: CLOSE RQ-SEQUENCE-001 AND OPEN ONE NARROW WHY-ORIENTED EXPLORATORY RQ
+  Lumi Review: APPROVED WITH SCOPE REFINEMENT
+
+  W-01 Structural Variation = PASS
+  W-02 Cross-Case Comparability = PARTIAL
+  W-03 Condition Evidence Availability = PARTIAL
+  W-04 Causal Restraint = PASS
+  W-05 Question-Opening Sufficiency = PARTIAL
+  W-06 Research Value = PASS
+
+  RQ-SEQUENCE-001 Research Horizon: CLOSED
+  Closure Boundary: Closed at sample-bounded structural findings
+  Route Pattern: NOT CONCLUDED / WHY: NOT CONCLUDED
+  Travel Grammar: NOT CONCLUDED / Mental Map: NOT CONFIRMED
+
+  RQ-CABLECAR-CONDITION-001: REGISTERED / NOT YET EXECUTED
+  Protocol File: docs/research/RQ_CABLECAR_CONDITION_001_PROTOCOL_V0_1.md
+  Comparison Unit: YTC / Allowed Condition Fields: 5 frozen
+  Causal claim: FORBIDDEN / source-stated-only rule: FROZEN
+```
+
+**[PREVIOUS NEXT ACTION — Perform RQ-SEQUENCE-001 Post-Pattern Research Decision Review]**
 
 ```
 RQ-SEQUENCE-001 Limited Sequence Pattern Review: COMPLETE / PERSISTED (2026-09-26)
