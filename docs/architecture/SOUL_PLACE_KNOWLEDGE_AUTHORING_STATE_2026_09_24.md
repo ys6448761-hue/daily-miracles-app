@@ -61,7 +61,38 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Select exactly one next Travel Intelligence research question from the existing deferred / eligible research backlog after RQ-JOURNEY-BOUNDARY-001 closure.**
+**Perform RQ-SEQUENCE-001 Evidence Sufficiency Review on the persisted corrected 104-SEU baseline, without performing sequence-pattern analysis.**
+
+```
+RQ-SEQUENCE-001 Protocol / Screening / Integrity Review: COMPLETE / PERSISTED (2026-09-26)
+  Protocol File: docs/research/RQ_SEQUENCE_001_PROTOCOL_AND_SCREENING_LEDGER_V0_1.md
+  Review File:   docs/research/RQ_SEQUENCE_001_INTEGRITY_REVIEW_DECISION_V0_1.md
+
+  YTC Screened: 14 / 14
+  Total SEU: 104 / First Sample: 78 / Second Sample: 26
+  Inference-created SEU: 0 / Unsupported inter-day adjacency: 0
+
+  Scope: FULL=5 / SEGMENT=7 / PARTIAL_ITINERARY=1 / UNCLEAR=1
+  Quality (corrected): CONTINUOUS=11 / PARTIAL=1 / COMPRESSED=0 / INCOMPLETE=2
+
+  Corrections Applied:
+    C-01 APPROVED: YTC-010 PARTIAL_SEQUENCE → CONTINUOUS_SEQUENCE (SEU delta=0)
+    C-02 APPROVED: YTC-013 COMPRESSED_SEQUENCE → PARTIAL_SEQUENCE (SEU delta=0)
+
+  MOVEMENT_EVENT Flag Preserved:
+    투어버스(YTC-006) / 버스(YTC-007) — source-stated elements; MOVEMENT_EVENT ≠ PLACE_NODE
+    No Gap Filling 원칙에 따라 보존; 향후 Pattern Review에서 무비판적 합산 금지
+
+  Integrity Review Verdict: PASS WITH CORRECTIONS
+  Pattern Review: NOT PERFORMED
+  Sufficiency Decision: NOT PERFORMED
+  Sequence Pattern: NOT CONCLUDED / Journey Grammar: NOT CONCLUDED
+  Gateway/Hub: NOT CONCLUDED / Mental Map: NOT CONFIRMED
+  Candidate: NO / Architecture: NO / DB/Runtime/Production: NO CHANGE
+  place_knowledge migration: NOT APPROVED / HOLD
+```
+
+**[PREVIOUS NEXT ACTION — Select exactly one next Travel Intelligence research question after RQ-JOURNEY-BOUNDARY-001 closure]**
 
 ```
 RQ-JOURNEY-BOUNDARY-001 Limited Stratified Pattern Review: COMPLETE / PERSISTED (2026-09-26)
