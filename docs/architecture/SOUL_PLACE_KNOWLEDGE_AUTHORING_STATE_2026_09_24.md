@@ -61,7 +61,33 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Perform RQ-JOURNEY-BOUNDARY-001 Evidence Sufficiency Review on the persisted Boundary Ledger V0.1, separately evaluating Layer A COMPLETE evidence and Layer B COMPLETE/PARTIAL evidence before authorizing any limited pattern review.**
+**Select exactly one next Travel Intelligence research question from the existing deferred / eligible research backlog after RQ-JOURNEY-BOUNDARY-001 closure.**
+
+```
+RQ-JOURNEY-BOUNDARY-001 Limited Stratified Pattern Review: COMPLETE / PERSISTED (2026-09-26)
+  File: docs/research/RQ_JOURNEY_BOUNDARY_001_LIMITED_PATTERN_REVIEW_DECISION_V0_1.md
+
+  Evidence Sufficiency: PASS — LIMITED / SAMPLE-BOUNDED / STRATIFIED ONLY
+  Pattern Result: REPEATED RAW BOUNDARY FORM(S) OBSERVED WITHIN CURRENT SAMPLE
+
+  Layer A COMPLETE n=5:
+    용산역 First repetition: 2 independent YTC
+    용산역 Last repetition: 2 independent YTC
+  Layer B COMPLETE n=5:
+    오동도 Last repetition: 2 independent YTC
+  Layer B PARTIAL n=6:
+    돌산탑승장 First: 3 independent YTC
+    자산탑승장 First: 2 independent YTC
+    오동도 Last: 3 independent YTC
+  Cross-Stratum 오동도 Last: BOTH strata — denominator 합산 금지
+
+  Generalized Journey Boundary Pattern: NOT CONCLUDED
+  Gateway / Hub: NOT CONCLUDED / Journey Grammar: NOT CONCLUDED
+  Travel Grammar: NOT CONCLUDED / Mental Map: NOT CONFIRMED
+  Traveler State Transition: NOT CONFIRMED
+  Candidate: NO / Architecture: NO / DB/Runtime/Production: NO CHANGE
+  place_knowledge migration: NOT APPROVED / HOLD
+```
 
 ```
 RQ-JOURNEY-BOUNDARY-001 Protocol + Boundary Ledger V0.1: COMPLETE / PERSISTED (2026-09-26)
@@ -81,12 +107,6 @@ RQ-JOURNEY-BOUNDARY-001 Protocol + Boundary Ledger V0.1: COMPLETE / PERSISTED (2
   PARTIAL_BOUNDARY ≠ COMPLETE_BOUNDARY — 합산 금지
   YTC-004: sequence MISSING_DATA 유지 / YTC-013: compressed/incomplete 유지
   YTC-014: one-sided/truncated 유지
-
-  Gateway Pattern: NOT CONCLUDED / Hub Pattern: NOT CONCLUDED
-  Entry/Exit Pattern: NOT CONCLUDED / Journey Grammar: NOT CREATED
-  Travel Grammar: NOT CONCLUDED / Mental Map: NOT CONFIRMED
-  Candidate: NO / Architecture: NO / DB/Runtime/Production: NO CHANGE
-  place_knowledge migration: NOT APPROVED / HOLD
 ```
 
 **[PREVIOUS NEXT ACTION — Select exactly one next Travel Intelligence research question]**
