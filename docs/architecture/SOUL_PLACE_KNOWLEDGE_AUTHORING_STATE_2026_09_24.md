@@ -61,7 +61,53 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Execute RQ-CABLECAR-CONDITION-001 source-stated condition extraction on the existing persisted corpus under the frozen non-causal protocol, without adding external evidence or inferring missing conditions.**
+**Perform RQ-CABLECAR-CONDITION-001 limited co-occurrence analysis using only the persisted extraction, frozen variables, field-specific denominators, and non-causal sample-bounded reporting rules.**
+
+```
+RQ-CABLECAR-CONDITION-001 Source-Stated Condition Extraction: COMPLETE / PERSISTED (2026-09-26)
+  File: docs/research/RQ_CABLECAR_CONDITION_001_SOURCE_STATED_EXTRACTION_V0_1.md
+
+  Extraction Verdict: E-B — EXTRACTION COMPLETE WITH MATERIAL MISSINGNESS
+  Independent Integrity Review: PASS WITH MATERIAL MISSINGNESS
+  Analysis Readiness: READY WITH FIELD-SPECIFIC DENOMINATORS
+  Missing Values: MUST REMAIN MISSING
+
+  Eligible YTC: 10 / 10
+  Comparison Unit: YTC / Structural Variables: 2 / Condition Fields: 5
+
+  VISIT_TYPE: 7/10 documented (ONE_WAY=5, ROUND_TRIP=2, MISSING=3)
+  ONE_WAY_DIRECTION: 4/5 documented (DOLSAN_TO_JASAN=2, JASAN_TO_DOLSAN=2, MISSING=1)
+  PREDECESSOR_NODE: 6/10 documented
+  SUCCESSOR_NODE: 10/10 documented
+  TRAVEL_TYPE: 10/10 documented
+  EXPLICIT_VEHICLE_CONTEXT: 2/10 documented (YTC-011=자가용, YTC-012=렌터카)
+  LODGING_DIRECTION: 5/10 documented
+
+  Material Missingness: CONFIRMED / NON-BLOCKING
+    EXPLICIT_VEHICLE_CONTEXT = 80% missing
+    LODGING_DIRECTION = 50% missing
+    PREDECESSOR_NODE = 40% missing
+
+  Edge-Case Dispositions (Integrity Review APPROVED):
+    YTC-001/002/005 VISIT_TYPE = MISSING (no qualifier in source)
+    YTC-007 SUCCESSOR_NODE = 버스*(MOVEMENT_EVENT)* (MOVEMENT_EVENT preserved)
+    YTC-011 EXPLICIT_VEHICLE_CONTEXT = 자가용 (corpus label + "주차")
+    YTC-012 EXPLICIT_VEHICLE_CONTEXT = 렌터카 (corpus label)
+    YTC-013 LODGING_DIRECTION = MISSING (광양 successor ≠ 광양 숙박)
+
+  Frozen Rules:
+    FIELD-SPECIFIC DENOMINATOR REQUIRED
+    MISSING ≠ NEGATIVE
+    Vehicle Guardrail: 2/10 vehicle cases — no cross-group comparison supported
+    No node normalization / No route ontology / No V-04 normalization
+
+  Co-occurrence Analysis: NOT YET EXECUTED
+  Causality: FORBIDDEN / External Evidence: FORBIDDEN
+  Candidate: NO / Architecture: NO / DB/Schema/Runtime/Production: NO CHANGE
+  place_knowledge migration: NOT APPROVED / HOLD
+```
+
+**[PREVIOUS NEXT ACTION — Execute RQ-CABLECAR-CONDITION-001 source-stated condition extraction]**
 
 ```
 RQ-SEQUENCE-001 Post-Pattern Research Decision: COMPLETE / PERSISTED (2026-09-26)
