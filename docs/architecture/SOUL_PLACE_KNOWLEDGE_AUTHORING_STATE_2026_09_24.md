@@ -61,7 +61,51 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Perform RQ-CABLECAR-CONDITION-001 limited co-occurrence analysis using only the persisted extraction, frozen variables, field-specific denominators, and non-causal sample-bounded reporting rules.**
+**Perform the RQ-CABLECAR-CONDITION-001 Research-Horizon Decision Review using RH-01 through RH-07 to decide whether to close at descriptive findings or open one narrowly scoped follow-up RQ.**
+
+```
+RQ-CABLECAR-CONDITION-001 Limited Co-occurrence Analysis: COMPLETE / REVIEWED / PERSISTED (2026-09-26)
+  File: docs/research/RQ_CABLECAR_CONDITION_001_LIMITED_COOCCURRENCE_REVIEW_V0_1.md
+
+  Overall Verdict: OA-C — ONE OR MORE REPEATED SAMPLE-BOUNDED CO-OCCURRENCE SIGNALS OBSERVED
+  Independent Review: CONFIRMED WITH SIGNAL-TIER DISTINCTION
+
+  Primary C-2:
+    P-C2-01: ONE_WAY + Package/Group
+             (YTC-006/007/008/009 / 4 independent YTC / 7/10 analyzable denominator)
+    P-C2-02: ROUND_TRIP + Individual/Personal
+             (YTC-011/012 / 2 independent YTC / 7/10 analyzable denominator)
+    Boundary: Package/Individual = different decision-maker contexts / travel type ≠ cause
+
+  Secondary C-2:
+    S-C2-01: ONE_WAY + 오동도 as immediate SUCCESSOR_NODE
+             (YTC-006/008 / 2 independent YTC / SECONDARY/WEAK / 오동도 ≠ Hub or Gateway)
+
+  C-1/C-0:
+    Direction × SUCCESSOR = C-1 (all direction-successor pairs unique)
+    Direction × PREDECESSOR = C-0 (insufficient documented overlap)
+    VISIT_TYPE × VEHICLE = C-1 (2/10 vehicle documented / too sparse for cross-group)
+    Structural × LODGING = C-1 (all analyzable lodging combinations unique)
+
+  Research Pivot Observation:
+    Stronger descriptive surface for VISIT_TYPE × TRAVEL_TYPE than direction × conditions
+    NOT rewritten as cause or preference
+
+  WHY = NOT CONCLUDED / Causality = NOT TESTABLE
+  Research Horizon Decision = PENDING / No new RQ opened
+  Candidate: NO / Architecture: NO / DB/Schema/Runtime/Production: NO CHANGE
+  place_knowledge migration: NOT APPROVED / HOLD
+
+  Research-Horizon Decision Question:
+    "Do the current repeated sample-bounded co-occurrence signals justify opening one narrowly
+     scoped follow-up research question, or should RQ-CABLECAR-CONDITION-001 close at
+     descriptive findings given current corpus limitations?"
+  Decision Gates: RH-01 Signal Strength / RH-02 Missingness Risk / RH-03 Decision-Maker
+    Confounding / RH-04 Condition Availability / RH-05 New Information Potential /
+    RH-06 Causal Restraint / RH-07 MVP Utility
+```
+
+**[PREVIOUS NEXT ACTION — Perform RQ-CABLECAR-CONDITION-001 limited co-occurrence analysis]**
 
 ```
 RQ-CABLECAR-CONDITION-001 Source-Stated Condition Extraction: COMPLETE / PERSISTED (2026-09-26)
