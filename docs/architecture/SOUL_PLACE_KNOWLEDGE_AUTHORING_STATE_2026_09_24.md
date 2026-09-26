@@ -61,7 +61,35 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Select exactly one next Travel Intelligence research question from the existing deferred / eligible research backlog**
+**Perform RQ-JOURNEY-BOUNDARY-001 Evidence Sufficiency Review on the persisted Boundary Ledger V0.1, separately evaluating Layer A COMPLETE evidence and Layer B COMPLETE/PARTIAL evidence before authorizing any limited pattern review.**
+
+```
+RQ-JOURNEY-BOUNDARY-001 Protocol + Boundary Ledger V0.1: COMPLETE / PERSISTED (2026-09-26)
+  File: docs/research/RQ_JOURNEY_BOUNDARY_001_PROTOCOL_AND_LEDGER_V0_1.md
+
+  Layer A COMPLETE_BOUNDARY: 5 (YTC-001, 002, 003, 005, 006)
+  Layer A ONE_SIDED_BOUNDARY: 2 (YTC-013, 014)
+  Layer A BOUNDARY_INCOMPLETE: 7 (YTC-004, 007, 008, 009, 010, 011, 012)
+  Layer A Arithmetic: 5+2+7=14 PASS
+
+  Layer B COMPLETE_BOUNDARY: 5 (YTC-001, 002, 003, 005, 006)
+  Layer B PARTIAL_BOUNDARY: 6 (YTC-007, 008, 009, 010, 011, 012)
+  Layer B ONE_SIDED_BOUNDARY: 1 (YTC-014)
+  Layer B BOUNDARY_INCOMPLETE: 2 (YTC-004, 013)
+  Layer B Arithmetic: 5+6+1+2=14 PASS
+
+  PARTIAL_BOUNDARY ≠ COMPLETE_BOUNDARY — 합산 금지
+  YTC-004: sequence MISSING_DATA 유지 / YTC-013: compressed/incomplete 유지
+  YTC-014: one-sided/truncated 유지
+
+  Gateway Pattern: NOT CONCLUDED / Hub Pattern: NOT CONCLUDED
+  Entry/Exit Pattern: NOT CONCLUDED / Journey Grammar: NOT CREATED
+  Travel Grammar: NOT CONCLUDED / Mental Map: NOT CONFIRMED
+  Candidate: NO / Architecture: NO / DB/Runtime/Production: NO CHANGE
+  place_knowledge migration: NOT APPROVED / HOLD
+```
+
+**[PREVIOUS NEXT ACTION — Select exactly one next Travel Intelligence research question]**
 
 ```
 RQ-TRANSPORT-001 Limited / Sample-Bounded Pattern Review: COMPLETE / PERSISTED (2026-09-26)
