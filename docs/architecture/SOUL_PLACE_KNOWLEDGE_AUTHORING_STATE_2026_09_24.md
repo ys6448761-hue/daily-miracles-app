@@ -61,7 +61,28 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Perform RQ-SEQUENCE-001 Evidence Sufficiency Review on the persisted corrected 104-SEU baseline, without performing sequence-pattern analysis.**
+**Perform RQ-SEQUENCE-001 Limited Sequence Pattern Review on the persisted corrected 104-SEU baseline under frozen restrictions R-01 through R-05.**
+
+```
+RQ-SEQUENCE-001 Evidence Sufficiency Review + Pre-Pattern Restriction Set: COMPLETE / PERSISTED (2026-09-26)
+  Sufficiency File: docs/research/RQ_SEQUENCE_001_EVIDENCE_SUFFICIENCY_DECISION_V0_1.md
+  Restriction File: docs/research/RQ_SEQUENCE_001_PRE_PATTERN_RESTRICTION_SET_V0_1.md
+
+  Decision B Approved: SUFFICIENT WITH PRE-PATTERN RESTRICTIONS
+  Gate Result: 0 FAIL / 0 BLOCKING / conditional limitations handled by R-01~R-05
+
+  R-01 FROZEN: Independence Unit = YTC (not SEU) / SEU frequency ≠ independent-case frequency
+  R-02 FROZEN: Source-Type Stratification / Package ≠ Individual / Travel-agency sequence ≠ Traveler behavior
+  R-03 FROZEN: MOVEMENT_EVENT Handling / 투어버스(YTC-006) / 버스(YTC-007) / MOVEMENT_EVENT ≠ PLACE_NODE / NON-BLOCKING
+  R-04 FROZEN: Scope Stratification / FULL ≠ SEGMENT denominator / SEGMENT_ONLY evidence ≠ full-itinerary evidence
+  R-05 FROZEN: Quality Label Preservation / YTC-013=PARTIAL / YTC-014=INCOMPLETE / YTC-004=0 SEU EXCLUDED
+
+  Pattern Review: NOT YET PERFORMED
+  Candidate: NO / Architecture Changed: NO
+  DB/Schema/Runtime/Production: NO CHANGE / place_knowledge migration: NOT APPROVED / HOLD
+```
+
+**[PREVIOUS NEXT ACTION — Perform RQ-SEQUENCE-001 Evidence Sufficiency Review on the persisted corrected 104-SEU baseline, without performing sequence-pattern analysis.]**
 
 ```
 RQ-SEQUENCE-001 Protocol / Screening / Integrity Review: COMPLETE / PERSISTED (2026-09-26)
