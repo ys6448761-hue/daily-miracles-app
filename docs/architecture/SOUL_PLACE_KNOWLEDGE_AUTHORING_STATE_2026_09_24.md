@@ -64,7 +64,8 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 **Return from RQ-CABLECAR-CONDITION-001 research to the highest-priority SOUL Travel Intelligence MVP work using the now-closed research findings as bounded evidence, without opening a new WHY RQ.**
 
 ```
-RQ-CABLECAR-CONDITION-001 Research Horizon: CLOSED / FOLLOW-UP HOLD (2026-09-26)
+RQ-CABLECAR-CONDITION-001 Research COMPLETE (2026-09-26)
+  Completion Report: docs/research/RQ_CABLECAR_CONDITION_001_RESEARCH_COMPLETION_REPORT_V0_1.md
   Decision File: docs/research/RQ_CABLECAR_CONDITION_001_RESEARCH_HORIZON_DECISION_V0_1.md
 
   Decision: RH-D-C — HOLD FOLLOW-UP UNTIL NEW INDEPENDENT EVIDENCE SURFACE APPEARS
