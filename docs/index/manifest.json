@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-26T05:45:05.595Z",
+  "generated_at": "2026-09-26T06:35:53.753Z",
   "generator": "generate-manifest.js",
-  "total_count": 521,
+  "total_count": 522,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "active",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-26",
-      "checksum": "94c6c5c1"
+      "checksum": "75e6004a"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -4598,6 +4598,23 @@
       "title": "RQ-SEQUENCE-001 — Journey Sequence Evidence Surface",
       "created_at": "2026-09-26",
       "checksum": "068c7e38"
+    },
+    {
+      "id": "DOC-RQ_SEQUENCE_001_LIMITED_PATTER",
+      "path": "docs/research/RQ_SEQUENCE_001_LIMITED_PATTERN_REVIEW_DECISION_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "|---",
+      "title": "RQ-SEQUENCE-001 — Journey Sequence Evidence Surface",
+      "created_at": "2026-09-26",
+      "checksum": "06886dfd"
     },
     {
       "id": "DOC-RQ_SEQUENCE_001_PRE_PATTERN_RE",

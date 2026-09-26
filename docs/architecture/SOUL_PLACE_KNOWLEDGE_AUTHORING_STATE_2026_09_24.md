@@ -61,7 +61,40 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Perform RQ-SEQUENCE-001 Limited Sequence Pattern Review on the persisted corrected 104-SEU baseline under frozen restrictions R-01 through R-05.**
+**Perform RQ-SEQUENCE-001 Post-Pattern Research Decision Review to determine whether the Sequence research horizon should close at the current sample-bounded findings or whether a narrowly scoped WHY-oriented research question is justified by existing evidence.**
+
+```
+RQ-SEQUENCE-001 Limited Sequence Pattern Review: COMPLETE / PERSISTED (2026-09-26)
+  File: docs/research/RQ_SEQUENCE_001_LIMITED_PATTERN_REVIEW_DECISION_V0_1.md
+
+  Verdict C — REPEATED EXACT MULTI-STEP SEQUENCE SIGNAL(S) OBSERVED — SAMPLE-BOUNDED
+  Lumi Review: CONFIRMED WITH STRICT BOUNDARY
+
+  Level 1 — Repeated Exact Adjacency:
+    A-01: 용산역 → 순천역 (2 YTC: YTC-001, 006 / PACKAGE-ONLY / FULL / CONTINUOUS / P1)
+    A-02: 순천역 → 용산역 (2 YTC: YTC-001, 006 / PACKAGE-ONLY / FULL / CONTINUOUS / P1)
+    A-03: 자산탑승장 → 케이블카 편도 (2 YTC: YTC-009, 013 / CROSS-SOURCE / SEGMENT / CONT+PARTIAL / P2)
+    A-04: 케이블카 편도 → 돌산탑승장 (2 YTC: YTC-009, 013 / CROSS-SOURCE / SEGMENT / CONT+PARTIAL / P2)
+
+  Level 2 — Repeated Exact Multi-Step Sequence:
+    S-01: 자산탑승장 → 케이블카 편도 → 돌산탑승장
+          (3 nodes / 2 YTC: YTC-009, 013 / CROSS-SOURCE / SEGMENT / P2 / contiguity VERIFIED)
+    Maximum repeated exact multi-step sequence length = 3 nodes (current corpus only)
+
+  Variation Surface:
+    V-01: Cable-car direction — BIDIRECTIONAL OBSERVATION (돌산→자산: YTC-007/008; 자산→돌산: YTC-009/013)
+    V-02: 오동도 successor variation — VARIATION OBSERVED (8 YTC / 모두 상이)
+    V-03: 향일암 predecessor/successor variation — VARIATION OBSERVED
+    V-04: Cable-car boarding-station typographic variant — NOT NORMALIZED / DEFERRED
+
+  Route Pattern: NOT CONCLUDED / WHY: NOT OPENED
+  Travel Grammar: NOT CONCLUDED / Mental Map: NOT CONFIRMED
+  Traveler State Transition: NOT CONFIRMED
+  Candidate: NO / Architecture: NO / DB/Runtime/Production: NO CHANGE
+  place_knowledge migration: NOT APPROVED / HOLD
+```
+
+**[PREVIOUS NEXT ACTION — Perform RQ-SEQUENCE-001 Limited Sequence Pattern Review on the persisted corrected 104-SEU baseline under frozen restrictions R-01 through R-05.]**
 
 ```
 RQ-SEQUENCE-001 Evidence Sufficiency Review + Pre-Pattern Restriction Set: COMPLETE / PERSISTED (2026-09-26)
