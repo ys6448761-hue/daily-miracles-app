@@ -61,7 +61,38 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Prepare SOUL Travel Intelligence Blind MVP Test Execution Package V0.1 from the approved Blind MVP Test Design, including participant-facing test materials, randomized A/B presentation sheets, response forms, and Founder/Lumi observation sheet — without executing the test or collecting participant data.**
+**Conduct Facilitator Dry Run V0.1 of the approved Blind MVP Test Execution Package as NON-EVIDENTIARY process verification only, checking profile assignment, card handling, Layer 2 Round-2 conceal/reveal timing, response-form flow, observer-blinding feasibility, and facilitator script — without recruiting real participants, generating Participant Evidence, or assigning any BT verdict.**
+
+```
+SOUL Travel Intelligence Blind MVP Test Execution Package V0.1: APPROVED / PERSISTED (2026-09-26)
+  File: docs/research/SOUL_TRAVEL_INTELLIGENCE_BLIND_MVP_TEST_EXECUTION_PACKAGE_V0_1.md
+  Base: ef9e301
+
+  Package Verdict: EP-A — EXECUTION PACKAGE READY FOR PERSISTENCE
+  Independent Review: EP-A — CONFIRMED
+  BTD-A: CONFIRMED (canonical design basis)
+
+  Randomization:
+    PROVISIONAL MVP POSITION COUNTERBALANCE (not statistical guarantee)
+    4 profiles × 3 participants (12-person target)
+    Within-profile split: 4/3 or 3/4 SOUL=A/B
+    Per-scenario balance: 2A/2B across all 4 profiles
+    Aggregate: 14/28 SOUL=A / 14/28 SOUL=B
+    Layer 2 R1/R2 identity consistency: VERIFIED
+
+  Cross-scenario questions: BQ1–BQ8 = QUALITATIVE / BEHAVIOR-LEVEL CONTEXT ONLY
+  Condition-level evidence source: scenario-level Forced Choice + 6 independent Likert ratings
+  Canonical stimuli: FROZEN / UNCHANGED
+  Observer blinding: preferred A/B-only recording; Observer_Condition_Aware flag if necessary
+  Participant Evidence: NONE
+  Blind MVP Test: NOT YET EXECUTED
+  BT Verdict: NOT ASSIGNED
+
+  New RQ = NOT OPENED / Candidate = NO / Architecture = NO
+  DB/Schema/Runtime/Production = NO CHANGE / place_knowledge migration = NOT APPROVED / HOLD
+```
+
+**[PREVIOUS NEXT ACTION — Prepare SOUL Travel Intelligence Blind MVP Test Execution Package V0.1 from the approved Blind MVP Test Design, including participant-facing test materials, randomized A/B presentation sheets, response forms, and Founder/Lumi observation sheet — without executing the test or collecting participant data.]**
 
 ```
 SOUL Travel Intelligence Blind MVP Test Design V0.1: APPROVED / PERSISTED (2026-09-26)
@@ -72,28 +103,9 @@ SOUL Travel Intelligence Blind MVP Test Design V0.1: APPROVED / PERSISTED (2026-
   Independent Review: BTD-A — CONFIRMED
 
   RP Status: RP-A — CONFIRMED (Response Prototype basis)
-  F-01: CLOSED BY NEUTRALIZATION (S3 proximity — no external verification required)
-  F-02: CLOSED BY NEUTRALIZATION (S7 travel time — no external verification required)
+  F-01: CLOSED BY NEUTRALIZATION / F-02: CLOSED BY NEUTRALIZATION
   External verification dependency: 0
-
-  Test Structure:
-    Layer 1 (single-turn): S1 / S3 / S5 / S6
-    Layer 2 (multi-turn, equal opportunity): S2 / S4 / S7
-    Equal-opportunity: both conditions receive identical simulated update + Round 2
-
-  Evidence Boundaries Frozen:
-    OA-C = DESCRIPTIVE ONLY / NOT converted to rules
-    car → visit-type = NOT ESTABLISHED
-    next destination → direction = NOT ESTABLISHED
-    Travel Time Matrix = NOT USED
-    DreamTown emotional knowledge = EXPERIENCE FRAMING ONLY
-
-  Evaluation: 6 dimensions (no composite score), PROVISIONAL thresholds labeled
-  Post-test decision framework: BT-A / BT-B / BT-C / BT-D
-  Knowledge-gap classification: 4 types (KNOWLEDGE / RESPONSE / TECHNICAL / INTERACTION)
-  S6 style leakage: recorded as test limitation (not corrected)
-  BT Verdict: NOT YET ASSIGNED
-  Blind MVP Test: NOT YET EXECUTED
+  BT Verdict: NOT YET ASSIGNED / Blind MVP Test: NOT YET EXECUTED
 
   New RQ = NOT OPENED / Candidate = NO / Architecture = NO
   DB/Schema/Runtime/Production = NO CHANGE / place_knowledge migration = NOT APPROVED / HOLD
