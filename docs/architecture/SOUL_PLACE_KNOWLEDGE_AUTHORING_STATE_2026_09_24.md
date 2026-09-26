@@ -61,7 +61,45 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Return from RQ-CABLECAR-CONDITION-001 research to the highest-priority SOUL Travel Intelligence MVP work using the now-closed research findings as bounded evidence, without opening a new WHY RQ.**
+**Design SOUL Travel Intelligence MVP Response Prototype V0.1 using the approved Judgment Flow, explicitly testing ANSWER / ASK / LIVE VERIFY / INSUFFICIENT behaviors before any runtime implementation.**
+
+```
+SOUL Travel Intelligence MVP Judgment Flow V0.1: PERSISTED (2026-09-26)
+  File: docs/research/SOUL_TRAVEL_INTELLIGENCE_MVP_JUDGMENT_FLOW_V0_1.md
+  Base: 09d1511
+
+  Verdict: JF-B — READY WITH SPECIFIC EVIDENCE GAPS
+  Independent Review: CONFIRMED WITH JUDGMENT-BOUNDARY CORRECTIONS
+
+  Key Structures:
+    - Judgment Flow 8-step with SUFFICIENT STATE? gate
+    - Clarification Mode (ASK) added alongside Judgment Mode
+    - INPUT-ACCEPTABLE ≠ DECISION-RULE-SUPPORTED distinction enforced
+    - DECISION EVIDENCE vs EXPERIENCE FRAMING separation
+
+  Judgment-Boundary Corrections Applied:
+    - Cable-car co-occurrence = DESCRIPTIVE ONLY / NOT converted to rules
+    - car/rental→round-trip rule: NOT ESTABLISHED
+    - next-destination→direction rule: NOT ESTABLISHED
+    - lodging→boarding-station inference: REMOVED
+    - DreamTown emotional layer = EXPERIENCE FRAMING (not DECISION EVIDENCE)
+    - Scenario 7 specific substitution (향일암→이순신광장/케이블카): REMOVED
+
+  Positive Judgment Surface:
+    - 하멜등대 → 케이블카 physical access (RB-03): SUPPORTED (DECISION EVIDENCE)
+    - ONLY ONE STRONG POSITIVE JUDGMENT SURFACE CURRENTLY CONFIRMED
+
+  Evaluation Behavior Coverage:
+    - ANSWER: Scenarios 1(partial) / 3(partial) / 6
+    - ASK: Scenarios 1 / 2 / 4 / 7
+    - LIVE VERIFY: Scenario 5
+    - DECLINE/INSUFFICIENT: Scenarios 3(child-ranking) / 4 / 7(prior)
+
+  New RQ = NOT OPENED / Candidate = NO / Architecture = NO
+  DB/Schema/Runtime/Production = NO CHANGE / place_knowledge migration = NOT APPROVED / HOLD
+```
+
+**[PREVIOUS NEXT ACTION — Return from RQ-CABLECAR-CONDITION-001 research to SOUL Travel Intelligence MVP work]**
 
 ```
 RQ-CABLECAR-CONDITION-001 Research COMPLETE (2026-09-26)
