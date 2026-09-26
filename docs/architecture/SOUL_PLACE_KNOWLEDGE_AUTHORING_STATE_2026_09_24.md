@@ -61,7 +61,35 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Conduct Facilitator Dry Run V0.1 of the approved Blind MVP Test Execution Package as NON-EVIDENTIARY process verification only, checking profile assignment, card handling, Layer 2 Round-2 conceal/reveal timing, response-form flow, observer-blinding feasibility, and facilitator script — without recruiting real participants, generating Participant Evidence, or assigning any BT verdict.**
+**Prepare real-participant recruitment and session scheduling for Blind MVP Test V0.1, targeting the approved 8–12 participant MVP range and applying the approved Group A/B/C participant criteria — without yet conducting participant sessions, collecting Participant Evidence, or assigning a BT verdict.**
+
+```
+Facilitator Dry Run V0.1: COMPLETE / DR-B CONFIRMED / PROCEDURAL CORRECTIONS RESOLVED (2026-09-27)
+  File: docs/research/SOUL_TRAVEL_INTELLIGENCE_BLIND_MVP_FACILITATOR_DRY_RUN_V0_1.md
+  Base: 20368ec
+
+  Dry Run = NON-EVIDENTIARY
+  Selected Profile: P2 (DRYRUN-001)
+  DR-B Verdict: CONFIRMED
+
+  OI-201 = RESOLVED — Participant Card Preparation Rule added to Execution Package §E
+  OI-202 = RESOLVED — Physical Round-2 Separation Rule added to §G + Preflight item 7
+  OI-203 = RESOLVED — A-Q1–A-Q6 / B-Q1–B-Q6 labeling added to §F response form spec
+  OI-204 = RESOLVED — "이게 실제 앱인가요?" added to §H facilitator script table
+  OI-3 = NONE / OI-4 = NONE
+
+  BTD-A = CONFIRMED (unchanged)
+  EP-A = CONFIRMED (procedural corrections applied — stimuli/randomization/constructs unchanged)
+  Canonical Stimuli = FROZEN / UNCHANGED
+  Participant Evidence = NONE
+  Blind MVP Test = NOT YET EXECUTED
+  BT Verdict = NOT ASSIGNED
+
+  New RQ = NOT OPENED / Candidate = NO / Architecture = NO
+  DB/Schema/Runtime/Production = NO CHANGE / place_knowledge migration = NOT APPROVED / HOLD
+```
+
+**[PREVIOUS NEXT ACTION — Conduct Facilitator Dry Run V0.1 of the approved Blind MVP Test Execution Package as NON-EVIDENTIARY process verification only]**
 
 ```
 SOUL Travel Intelligence Blind MVP Test Execution Package V0.1: APPROVED / PERSISTED (2026-09-26)

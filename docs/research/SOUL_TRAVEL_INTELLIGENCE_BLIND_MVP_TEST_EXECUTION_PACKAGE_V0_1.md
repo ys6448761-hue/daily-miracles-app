@@ -16,6 +16,15 @@
 This package operationalizes BTD-A.
 It does not supersede or rewrite BTD-A.
 
+**Post-Dry-Run Procedural Corrections Applied (2026-09-27):**
+`OI-201 — Participant Card Preparation Rule added to §E`
+`OI-202 — Physical Round-2 Separation Rule added to §G + Preflight item 7`
+`OI-203 — Response Form A-Q/B-Q explicit labeling added to §F`
+`OI-204 — "이게 실제 앱인가요?" added to §H facilitator script table`
+
+Dry Run Verdict: `DR-B — CONFIRMED / PASS WITH PROCEDURAL CORRECTIONS`
+Canonical stimuli: UNCHANGED / Randomization: UNCHANGED / Evaluation constructs: UNCHANGED
+
 ---
 
 ## A. Package Overview
@@ -170,6 +179,28 @@ Final cross-scenario questions (BQ1–BQ8):
 각 시나리오는 Version α (SOUL=Response A, Baseline=Response B)와 Version β (Baseline=Response A, SOUL=Response B) 두 버전으로 존재한다. 진행자가 랜덤화 시트에 따라 해당 참여자에게 적절한 버전을 배포한다. 카드 뒷면에 진행자 전용으로 α/β 표기.
 
 *아래에서 [α: X] / [β: X]는 진행자 참조용이며 카드 인쇄에서 제외한다.*
+
+---
+
+### §E 진행자 카드 준비 규칙 (OI-201 — Post-Dry-Run Procedural Correction)
+
+```
+PARTICIPANT CARD PREPARATION RULE
+
+α / β 는 진행자 전용 준비 레이블이다.
+[α:] / [β:] 주석은 참여자 배포 자료에 절대 포함되지 않는다.
+
+참여자 카드 인쇄 방법:
+  1. 각 시나리오별로 α버전 카드와 β버전 카드를 별도 물리적 카드로 준비한다.
+  2. 해당 참여자의 프로파일에 따라 올바른 버전을 선택한다.
+  3. 인쇄 전 [α:] / [β:] 레이블을 모두 제거한다.
+  4. 참여자 카드에 표시되는 항목:
+       - 상황 (Situation)
+       - 질문 (Question)
+       - Response A
+       - Response B
+  5. SOUL / Baseline / α / β / 내부 레이블은 참여자 카드에 표시하지 않는다.
+```
 
 ---
 
@@ -441,7 +472,11 @@ Q5. 이 응답이 자연스러운 대화처럼 느껴졌다.
 Q6. 실제 여행 중이라면 이 답변을 참고해 다음 행동을 해볼 것 같다.
 1□ 2□ 3□ 4□ 5□
 
-**Response B 평가** — 동일 Q1~Q6 반복
+**Response B 평가** (OI-203 — Post-Dry-Run Procedural Correction)
+
+물리적 폼 인쇄 시 반드시 명시적 섹션 헤더와 독립 번호를 사용한다:
+
+**Response B 평가** — B-Q1~B-Q6 (A 평가와 혼동 방지를 위한 독립 번호 체계)
 
 **Forced Choice**
 지금 실제로 여수 여행 중이라면 어느 답변을 더 받고 싶으세요?
@@ -469,8 +504,8 @@ S6 전용 (평가 완료 후): 두 응답이 서로 다른 종류의 여행 도�
 
 #### PART 1 — Round 1 평가
 
-**Response A (Round 1) 평가** — Q1~Q6 (동일 6개 항목)
-**Response B (Round 1) 평가** — Q1~Q6 (동일 6개 항목)
+**Response A (Round 1) 평가** — A-Q1~A-Q6 (명시적 A-Q 번호 사용)
+**Response B (Round 1) 평가** — B-Q1~B-Q6 (명시적 B-Q 번호 사용, OI-203)
 
 **Round 1 즉각 선호**
 Round 1 응답만 보았을 때, 어느 쪽이 더 즉각적으로 도움이 됐나요?
@@ -487,8 +522,8 @@ Round 1 응답만 보았을 때, 어느 쪽이 더 즉각적으로 도움이 됐
 
 #### PART 2 — Round 2 평가
 
-**Response A (Round 2) 평가** — Q1~Q6 (동일 6개 항목)
-**Response B (Round 2) 평가** — Q1~Q6 (동일 6개 항목)
+**Response A (Round 2) 평가** — A-Q1~A-Q6 (동일 6개 항목, 명시적 A-Q 번호 사용)
+**Response B (Round 2) 평가** — B-Q1~B-Q6 (동일 6개 항목, 명시적 B-Q 번호 사용)
 
 **Round 2 Forced Choice**
 새로운 상황 업데이트 이후, 어느 응답을 더 받고 싶었나요?
@@ -582,6 +617,23 @@ Step 6  [수집] 참여자가 Layer 2 폼 PART 2 완성 (Q1~Q6 × 2 + Forced Cho
 
 A/B 정체성 일관성: Round 1에서 SOUL이 Response A인 시나리오는 Round 2에서도 SOUL이 Response A. 랜덤화 시트 프로파일이 이를 보장. 진행자가 Round 2 카드 배포 시 프로파일 재확인 필수.
 
+### §G Layer 2 물리적 카드 분리 규칙 (OI-202 — Post-Dry-Run Procedural Correction)
+
+```
+ROUND 2 PHYSICAL SEPARATION RULE
+
+Layer 2 시나리오(S2 / S4 / S7)에서:
+Round 2 카드는 Round 1 카드와 물리적으로 분리된 상태로 준비한다.
+
+허용 방법:
+  - 별도 봉인 또는 레이블이 붙은 진행자 전용 봉투 (시나리오별 1개)
+  또는
+  - 물리적으로 분리된 진행자 전용 카드 묶음
+
+참여자는 Round 1 평가 완료 전까지 Round 2 카드를 볼 수 없어야 한다.
+Preflight 항목 7번에서 물리적 분리 상태를 확인한다.
+```
+
 ---
 
 ## H. 진행자 스크립트
@@ -605,6 +657,7 @@ A/B 정체성 일관성: Round 1에서 SOUL이 Response A인 시나리오는 Rou
 | "어느 답변이 맞는 거예요?" | "정답을 찾는 테스트라기보다 실제 여행 중 어떤 답변이 더 도움이 되는지 느낀 그대로 말씀해주시면 됩니다." |
 | "이 도우미가 왜 그런 질문을 한 건가요?" | "느끼신 그대로 평가해주시면 됩니다. 저는 응답이 어떤 의도로 만들어졌는지는 설명하지 않아요." |
 | "어느 쪽이 더 좋은 AI예요?" | "두 가지 모두 그냥 다른 방식으로 설계된 도우미예요. 어느 게 더 낫다는 답은 오늘 여러분이 알려주시는 거예요." |
+| "이게 실제 사용 가능한 앱인가요?" / "어디서 사용할 수 있어요?" | "오늘은 응답 방식에 대한 피드백을 수집하는 자리예요. 서비스 출시 관련 내용은 오늘 범위 밖이에요." *(이 이상 설명 금지 — 개발 현황 / 출시 일정 / SOUL / Phoenix / DreamTown 언급 금지)* |
 
 ### 진행자 금지 행동
 
@@ -765,8 +818,9 @@ FACILITATOR PREFLIGHT CHECKLIST
         LIVE_VERIFY / INSUFFICIENT 등 내부 레이블이 인쇄되지 않았는가?
      → 진행자 내부 메모가 참여자 시야에 노출되지 않는가?
 
-□ 7. Round 2 은닉
+□ 7. Round 2 은닉 (OI-202 — Post-Dry-Run Procedural Correction)
      → Layer 2에서 Round 2 카드는 Round 1 평가 완료 전까지 물리적으로 분리되어 있는가?
+     → S2 / S4 / S7 각각의 R2 카드가 별도 봉투 또는 물리적으로 분리된 카드 묶음으로 준비되어 있는가?
 
 □ 8. 응답 폼 상태
      → 모든 폼이 빈 상태인가?
