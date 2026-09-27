@@ -564,7 +564,7 @@ For each of 29 ERs: which assets cover it, and is existing coverage sufficient?
 |---|---|---|
 | ER-HY-001 | NONE | NOT_ADDRESSED |
 | ER-HY-002 | NONE | NOT_ADDRESSED |
-| ER-HY-003 | EI-HY-003-A through D + NEG-HY-003-1/2/3/4 | FULL_GAP → CLOSED (PROVISIONALLY_SUPPORTED 2026-09-28) — Targeted upgrade 2026-09-28: EP-3 still PARTIAL_PASS; TripAdvisor HTTP 403; no qualifying new account found; status unchanged: PROVISIONALLY_SUPPORTED |
+| ER-HY-003 | EI-HY-003-A through D + NEG-HY-003-1/2/3/4 + EI-HY-003-E (LOCAL_OPERATOR SUPPORTING) | FULL_GAP → CLOSED (PROVISIONALLY_SUPPORTED 2026-09-28) — Targeted upgrade #1 (dc5f458): EP-3 PARTIAL_PASS; TripAdvisor 403; FAILED. Targeted upgrade #2 (2026-09-28): Naver Blog BLOCKED; Naver Map NO_ACCESS; Naver Cafe NO_RESULT; new EI-HY-003-E (walking stick service, LOCAL_OPERATOR SUPPORTING); no HIGH-confidence firsthand elder descent account found; SECOND_TARGETED_ATTEMPT_FAILED; HY-003 remains PROVISIONALLY_SUPPORTED. No further web search authorized. Next: Founder/governance disposition decision. |
 | ER-HY-004 | NONE | NOT_ADDRESSED |
 | ER-HY-005 | NONE | NOT_ADDRESSED |
 | ER-HY-006 | NONE | NOT_ADDRESSED |

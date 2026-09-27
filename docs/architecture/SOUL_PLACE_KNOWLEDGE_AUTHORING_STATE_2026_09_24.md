@@ -61,7 +61,7 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**HY-003 Targeted Upgrade ATTEMPTED (2026-09-28) — PROVISIONALLY_SUPPORTED PRESERVED. Controlled Collection Cycles: 15 (unchanged — targeted upgrade per canonical methodology). WAVE_3_COLLECTION_EXECUTION_COMPLETE = TRUE. ALL_WAVE_3_ERS_VERIFIED = FALSE (HY-003 blocks). ONE NEXT ACTION: HY-003 targeted upgrade (second attempt) — Korean-language domestic review platforms not yet searched (Naver Blog, Naver Map reviews, NaverCafe); TripAdvisor remains HTTP 403 blocked; elder descent friction EP-3 gap remains open; WE primary; EXPERIENCE_PATTERN_SUFFICIENT EP-3 required. DO NOT EXECUTE until authorized.**
+**HY-003 Targeted Upgrade Second Attempt (2026-09-28) — SECOND_TARGETED_ATTEMPT_FAILED. PROVISIONALLY_SUPPORTED PRESERVED. Controlled Collection Cycles: 15 (unchanged). WAVE_3_COLLECTION_EXECUTION_COMPLETE = TRUE. ALL_WAVE_3_ERS_VERIFIED = FALSE. New finding: EI-HY-003-E (LOCAL_OPERATOR walking stick service — SUPPORTING only). No HIGH-confidence firsthand elder descent account found. Naver Blog: BLOCKED. Naver Map: NO_ACCESS. Naver Cafe: NO_RESULT. NO FURTHER WEB SEARCH AUTHORIZED. ONE NEXT ACTION: HY-003 Governance Disposition Decision — Founder decision required: (A) Accept PROVISIONALLY_SUPPORTED with documented EP-3 limitation and proceed (SOUL uses ASK behavior for H-2), OR (B) Schedule Founder field validation for EP-3 closure (one field-observed elder descent account closes EP-3). DO NOT EXECUTE until Founder decision received.**
 
 ```
 Wave 3 ER-REL-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
@@ -243,6 +243,30 @@ HY-003 Targeted Upgrade (2026-09-28)
   Upgrade path remaining: One HIGH-confidence elder descent friction account from Korean domestic platforms
   Files created: SOUL_YEOSU_ER_HY_003_TARGETED_UPGRADE_V0_1.md
   Files modified: Wave 0 gap register (HY-003 upgrade attempt noted) | Project State
+  DB / Schema / Runtime / Production: NO CHANGE
+```
+
+**HY-003 Targeted Upgrade Second Attempt: SECOND_TARGETED_ATTEMPT_FAILED (2026-09-28)**
+
+```
+HY-003 Targeted Upgrade Second Attempt (2026-09-28)
+  Base: dc5f458 (HY-003 Targeted Upgrade #1)
+  Target: EP-3 — elder-specific DESCENT friction
+  Platforms: Naver Blog (BLOCKED) / Naver Map (NO_ACCESS) / Naver Cafe (NO_RESULT) / Korean web (SEARCHED)
+  Query Families: 8 Korean query variants + 2 Naver Cafe site-specific + 2 English
+  Sources directly accessed: ajunews.com (walking stick service), hankookilbo.com (2016 route diff), kr.trip.com/moments (review)
+  New Evidence: EI-HY-003-E (LOCAL_OPERATOR walking stick service — SUPPORTING ONLY; not EP-3 closure)
+    EI-HY-003-E: 임포상가번영회 free walking stick rental; 노약자 target; 하산 후 반납; confirms institutional recognition of elder burden including descent; NOT firsthand WE evidence
+  EP-3 Result: PARTIAL_PASS (unchanged) — no HIGH-confidence firsthand elder descent friction account found
+  Final HY-003 Status: PROVISIONALLY_SUPPORTED (unchanged)
+  WAVE_3_COLLECTION_EXECUTION_COMPLETE: TRUE
+  ALL_WAVE_3_ERS_VERIFIED: FALSE (HY-003 blocks)
+  Controlled Collection Cycles: 15 (not incremented — targeted upgrade)
+  No further web search authorized
+  Governance note: HY-003 "Behavior if Missing: ASK" — SOUL can serve H-2 with qualified response; PROVISIONALLY_SUPPORTED does not block preparation
+  Next: Founder/governance disposition decision (A: proceed with documented limitation, or B: Founder field validation)
+  Files created: SOUL_YEOSU_ER_HY_003_TARGETED_UPGRADE_SECOND_ATTEMPT_V0_1.md
+  Files modified: Wave 0 gap register (HY-003 row — second attempt noted) | Project State
   DB / Schema / Runtime / Production: NO CHANGE
 ```
 
