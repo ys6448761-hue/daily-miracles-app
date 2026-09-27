@@ -61,7 +61,49 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Wave 3 Readiness Check COMPLETE (2026-09-27). Controlled Collection Cycles Completed: 9. WAVE_2_COMPLETE. Wave 3: READINESS_CONFIRMED — all 6 Wave 3 ERs dependencies verified (CC-003/HY-003/HY-007/REL-002/OD-006/CC-005 all READY). First Wave 3 ER selected: ER-REL-002 (Route/Connection from Each Cable Car Exit to Odongdo). Starting state: PARTIAL_GAP — EI-REL-001-C (자산→오동도 도보 5분) and EI-REL-001-E (돌산→오동도 거북선대교 택시 10~12분) are PARTIALLY_REUSABLE. Source: MAP_ROUTE primary / FOUNDER+WE secondary. Stop Condition: RELATIONSHIP_SUFFICIENT. DO NOT EXECUTE until authorized. Readiness artifact: docs/research/SOUL_YEOSU_WAVE_3_READINESS_CHECK_V0_1.md**
+**Wave 3 ER-REL-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27). Controlled Collection Cycles Completed: 10. Wave 3 IN_PROGRESS (1 of 6 ERs complete). ONE NEXT ACTION: ER-CC-003 (P0, Vehicle Access + Parking per Station; dependencies CC-001 ✓ + CC-002 ✓ met; CONFLICT-F active; LOCAL_OPERATOR/FOUNDER primary; EXPERIENCE_PATTERN_SUFFICIENT stop condition). DO NOT EXECUTE until authorized.**
+
+```
+Wave 3 ER-REL-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
+  File: docs/research/SOUL_YEOSU_ER_REL_002_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+  Base: 9251378 (Wave 3 Readiness Check)
+
+  ER: ER-REL-002 — 케이블카 출구별 오동도 경로/연결
+  Stop Condition: RELATIONSHIP_SUFFICIENT — 10/10 PASS
+
+  Starting State: PARTIAL_GAP (EI-REL-001-C + EI-REL-001-E PARTIALLY_REUSABLE)
+
+  Reused Items:
+    EI-REL-001-C: 자산정류장 → 오동도 입구 도보 ~5분 (MAP_ROUTE) — PARTIALLY_REUSABLE
+    EI-REL-001-E: 돌산정류장 → 오동도: 거북선대교 경유 택시 10~12분 (DERIVED) — PARTIALLY_REUSABLE
+    NEG-REL-001-001: 자산→돌산 편도 오동도 비효율 — SUPPORTING_ONLY
+    EI-OD-003-A: 오동도 입구/방파제 15분 도보 (OFFICIAL) — CONTEXT_ONLY
+
+  New Evidence Items:
+    EI-REL-002-A: 자산정류장 = 오동도 입구 구내 위치 (WORLD_EXPERIENCE, neoplats.com)
+    EI-REL-002-B: 자산→오동도 섬 내부 도보 ~20분 (MAP_ROUTE, South of Seoul blog)
+    EI-REL-002-C: 거북선대교 744m 4차로 — 보행자 통로 미확인 (OFFICIAL, yeosu.go.kr)
+    EI-REL-002-D: 돌산정류장 직통 버스 오동도 미확인 (MAP_ROUTE synthesized)
+
+  NEG Items:
+    NEG-REL-002-001: 자산→돌산 편도는 오동도 반대편 하차 — 오동도 도보 불가
+    NEG-REL-002-002: 돌산정류장 → 오동도 도보 NOT PRACTICAL (다리=차도)
+    NEG-REL-002-003: 5분=입구; 20분=섬 내부 — 범위 구분 필수 (SCOPE integrity)
+
+  Conflicts:
+    CONFLICT-REL-002-01: 5분 vs 20분 — SCOPE_DIFFERENCE RESOLVED
+      5분 = 자산→방파제 입구; 20분 = 자산→섬 내부 (5분+15분 방파제 도보)
+
+  Relationship Model:
+    자산 EXIT → 오동도: DIRECT (같은 구내, 평지 도보, 차량 불필요)
+    돌산 EXIT → 오동도: INDIRECT (거북선대교 차량 경유 필수, 택시 주모드)
+
+  Unlocks: ER-REL-005 (dependencies: REL-001 ✓ + REL-002 ✓ now met)
+  Gap Register Update: ER-REL-002 PARTIAL_GAP → CLOSED (VERIFIED_FOR_PREPARATION)
+  Controlled Collection Cycles: 9 → 10
+  Wave 3 Status: IN_PROGRESS (REL-002 ✓; remaining: CC-003, HY-003, HY-007, OD-006, CC-005)
+  DB / Schema / Runtime / Production: NO CHANGE
+```
 
 **Wave 2 ER-REL-001 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)**
 
