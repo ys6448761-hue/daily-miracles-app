@@ -61,7 +61,72 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Conduct an independent pre-execution review of Prepared Knowledge vs Prepared Context 3-Place Pilot Protocol V0.1, focusing on experimental fairness, anti-leakage, reverse-design validity, Integrity Gate, Preparation Boundary measurability, and whether the protocol can distinguish preparation benefit from merely shifted complexity; do not yet collect Yeosu knowledge or execute the pilot.**
+**Verify Protocol V0.2 correction closure against the five findings from the Independent Pre-execution Review; if all five are closed, produce the 3-place Evidence Requirement Matrix by reverse-designing required evidence from the frozen scenarios and judgment needs, without yet collecting actual Yeosu evidence or executing the pilot.**
+
+```
+Prepared Knowledge vs Prepared Context 3-Place Pilot Protocol V0.2: DESIGNED / PERSISTED (2026-09-27)
+  File: docs/research/SOUL_YEOSU_PREPARED_KNOWLEDGE_3_PLACE_PILOT_PROTOCOL_V0_2.md
+  Base: f93cec7
+
+  Source: Independent Pre-execution Review of Protocol V0.1
+  Prior verdict: PASS WITH CORRECTIONS
+  Scope: Five corrections only
+
+  Corrections applied:
+    C1: Preparation Boundary operationalization
+        — PREPARED/RUNTIME/LIVE Knowledge Unit Execution-State Classification
+        — Per-unit recording fields (Unit ID / category / state / model / scenario / used / unavailable)
+        — Observation mechanism for Preparation Boundary (remains RESEARCH VARIABLE)
+    C2: Preparation Reuse Ledger
+        — Minimum fields: Unit ID / model / prep type / prepared once / scenarios used / use count /
+          distinct scenario count / hidden transfer use / multi-turn reuse / maintenance event
+        — Distinguishes GENUINE REUSE from SHIFTED COMPLEXITY
+        — One-time vs per-query cost separation added (PRE-RUNTIME / PER-EVENT / MAINTENANCE)
+        — Model A not assumed zero preparation cost
+    C3: Context Availability Rule
+        — Traveler context signal available to both A and B at same logical moment
+        — B may activate only on already-received context (not future context)
+        — A not forced to forget prior context
+        — Same Context Availability ≠ Same Preparation Behavior — made explicit
+        — B Trigger Clarification: trigger occurs only when information actually provided/observed
+        — Allowed trigger categories listed (abstract — no Yeosu facts)
+    C4: Hidden Transfer NEAR/FARTHER distinction + semantic leakage control
+        — NEAR TRANSFER: novel expression within familiar traveler-state × place territory
+        — FARTHER TRANSFER: different combination/application of prepared knowledge
+        — "Farther" relativized to this small pilot (no general domain transfer claim)
+        — Three collision types: DIRECT / SEMANTIC / COMBINATION
+        — Collision review applied to BOTH A and B preparation artifacts before Hidden Transfer finalized
+        — Collision record: type / replacement YES/NO / replacement item not exposed before preparation frozen
+        — Evaluation Order §Q: step 5 Transfer updated to "NEAR and FARTHER"
+    C5: Single/Multi-turn consistency
+        — All 9 Core Scenarios labeled Single-turn in §G matrix
+        — "7 of 9" wording removed entirely
+        — MT-1 = separate Multi-Turn Context Variant (not Core Scenario)
+        — §H summary: Core Scenario count = 9 / MT-1 = 1 separate variant / Total = 9 + 1
+        — 9 Core Scenario questions unchanged
+
+  V0.1 preserved (historical evidence):
+    File: docs/research/SOUL_YEOSU_PREPARED_KNOWLEDGE_3_PLACE_PILOT_PROTOCOL_V0_1.md
+
+  V0.2 Self-review: C1/C2/C3/C4/C5 all CLOSED
+  No real Yeosu facts introduced / No Hidden Transfer generated / No execution / No Candidate / No Architecture Decision
+
+  Pilot: NOT EXECUTED
+  Actual Yeosu evidence: NOT COLLECTED
+  A/B result: NONE
+  Participant Evidence: NONE
+  BT Verdict: NOT ASSIGNED
+  Candidate: NONE
+  Architecture Decision: NONE
+  Preparation Boundary: RESEARCH VARIABLE
+  Prepared Knowledge: RESEARCH HYPOTHESIS
+  Prepared Context: RESEARCH HYPOTHESIS
+  Expert Anticipation: RESEARCH HYPOTHESIS
+  place_knowledge migration: NOT APPROVED / HOLD
+  DB / Schema / Runtime / Production: NO CHANGE
+```
+
+**[PREVIOUS NEXT ACTION — Conduct an independent pre-execution review of Prepared Knowledge vs Prepared Context 3-Place Pilot Protocol V0.1]**
 
 ```
 Prepared Knowledge vs Prepared Context 3-Place Pilot Protocol V0.1: DESIGNED / PERSISTED (2026-09-27)
