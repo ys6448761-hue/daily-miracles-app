@@ -61,7 +61,7 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**HY-003 Targeted Upgrade Second Attempt (2026-09-28) — SECOND_TARGETED_ATTEMPT_FAILED. PROVISIONALLY_SUPPORTED PRESERVED. Controlled Collection Cycles: 15 (unchanged). WAVE_3_COLLECTION_EXECUTION_COMPLETE = TRUE. ALL_WAVE_3_ERS_VERIFIED = FALSE. New finding: EI-HY-003-E (LOCAL_OPERATOR walking stick service — SUPPORTING only). No HIGH-confidence firsthand elder descent account found. Naver Blog: BLOCKED. Naver Map: NO_ACCESS. Naver Cafe: NO_RESULT. NO FURTHER WEB SEARCH AUTHORIZED. ONE NEXT ACTION: HY-003 Governance Disposition Decision — Founder decision required: (A) Accept PROVISIONALLY_SUPPORTED with documented EP-3 limitation and proceed (SOUL uses ASK behavior for H-2), OR (B) Schedule Founder field validation for EP-3 closure (one field-observed elder descent account closes EP-3). DO NOT EXECUTE until Founder decision received.**
+**HY-003 Governance Disposition: ACCEPT_PROVISIONAL_WITH_BOUNDARY (2026-09-28). Traveler Condition × Experience Requirement hypothesis captured (RESEARCH_HYPOTHESIS). Controlled Collection Cycles: 15 (unchanged). WAVE_3_COLLECTION_EXECUTION_COMPLETE = TRUE. ALL_WAVE_3_ERS_VERIFIED = FALSE (HY-003 PROVISIONALLY_SUPPORTED). SOUL behavior for H-2: ASK (capability, not age) + QUALIFY (EP-3 KNOWN_LIMIT). ER-HY-008 BLOCKED (needs HY-003 VERIFIED). Founder field validation remains open upgrade path. ONE NEXT ACTION: Wave 4 Readiness Check — verify dependency states for all 11 Wave 4 ERs; identify which can proceed despite HY-003 PROVISIONALLY_SUPPORTED; confirm Wave 4 entry conditions per Collection Plan V0.2 §Wave 4. DO NOT EXECUTE Wave 4 ERs until readiness check complete.**
 
 ```
 Wave 3 ER-REL-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
@@ -267,6 +267,33 @@ HY-003 Targeted Upgrade Second Attempt (2026-09-28)
   Next: Founder/governance disposition decision (A: proceed with documented limitation, or B: Founder field validation)
   Files created: SOUL_YEOSU_ER_HY_003_TARGETED_UPGRADE_SECOND_ATTEMPT_V0_1.md
   Files modified: Wave 0 gap register (HY-003 row — second attempt noted) | Project State
+  DB / Schema / Runtime / Production: NO CHANGE
+```
+
+**HY-003 Governance Disposition + Traveler Condition Hypothesis (2026-09-28)**
+
+```
+HY-003 Governance Disposition: ACCEPT_PROVISIONAL_WITH_BOUNDARY (2026-09-28)
+  Base: 4530172 (HY-003 Second Targeted Upgrade Attempt)
+  EP-3 with Founder input: PARTIAL_PASS (unchanged)
+    Founder "descent = return burden" = FOUNDER_FIELD_KNOWLEDGE (structural, not elder-specific experience)
+    Outcome B+C: Founder input useful for judgment; does NOT satisfy existing EP-3 evidence requirement;
+    EP-3 requirement uses age-proxy where capability is the actual decision variable (Outcome C)
+  Final HY-003 Status: PROVISIONALLY_SUPPORTED (unchanged — no forced upgrade)
+  Web upgrade paths: EXHAUSTED (2 attempts)
+  Canonical Matrix "Behavior if Missing: ASK" → SOUL may serve H-2 with ASK + QUALIFY
+  SOUL behavior for H-2: ASK (capability-specific: stairs/slope) + QUALIFY (EP-3 KNOWN_LIMIT + alternative route)
+  ER-HY-008: BLOCKED (requires HY-003 VERIFIED_FOR_PREPARATION per Plan V0.2 §Wave 4)
+  Open upgrade path: Founder field validation (one observed elder descent account closes EP-3 at HIGH confidence)
+  New Research Hypothesis: TRAVELER_CONDITION_X_EXPERIENCE_REQUIREMENT (RESEARCH_HYPOTHESIS — NOT Candidate)
+  Hypothesis: SOUL compares traveler capability × experience friction → conditional judgment (not demographic label)
+  JF V0.1 compatibility: Compatible; "Companion-specific constraints" node should surface capability, not age proxy
+  Candidate gate: NOT YET — promotion evidence needed (multi-place verified, pilot evidence, Minimum ASK improvement)
+  WAVE_3_COLLECTION_EXECUTION_COMPLETE: TRUE
+  ALL_WAVE_3_ERS_VERIFIED: FALSE (HY-003 PROVISIONALLY_SUPPORTED)
+  Controlled Collection Cycles: 15 (unchanged — governance disposition, no new collection cycle)
+  Files created: SOUL_YEOSU_TRAVELER_CONDITION_EXPERIENCE_REQUIREMENT_HYPOTHESIS_V0_1.md
+  Files modified: Wave 0 gap register (HY-003 disposition noted) | Project State
   DB / Schema / Runtime / Production: NO CHANGE
 ```
 
