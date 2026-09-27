@@ -61,7 +61,56 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Design the controlled Evidence Collection Plan for the 3-place Evidence Requirement Matrix V0.1, assigning collection order, source roles, verification rules, provenance capture, conflict handling, and stop conditions for each requirement; do not yet collect actual Odongdo, Hyangiram, or Yeosu Maritime Cable Car evidence or execute the pilot.**
+**Conduct a pre-collection readiness review of Controlled Evidence Collection Plan V0.1 against all 29 Evidence Requirements, testing source-claim fit, dependency-aware collection order, provenance completeness, conflict handling, stop conditions, escalation rules, and protection against over-collection; do not yet collect actual Odongdo, Hyangiram, or Yeosu Maritime Cable Car evidence or execute the pilot.**
+
+```
+Controlled Evidence Collection Plan V0.1: DESIGNED / PERSISTED (2026-09-27)
+  File: docs/research/SOUL_YEOSU_3_PLACE_CONTROLLED_EVIDENCE_COLLECTION_PLAN_V0_1.md
+  Base: c4e8b8b
+
+  Scope: All 29 Evidence Requirements from Matrix V0.1
+  Collection Waves: 6 waves (Wave 0 Infrastructure through Wave 5 Supporting Depth)
+  Requirements per wave:
+    Wave 0: Collection Infrastructure / Provenance Readiness (no ERs collected)
+    Wave 1: ER-CC-001, ER-HY-001, ER-OD-001, ER-OD-003 (4 — high-reuse P0 foundations)
+    Wave 2: ER-CC-002, ER-HY-002, ER-REL-001, ER-OD-004, ER-HY-006 (5 — first-level dependents)
+    Wave 3: ER-CC-003, ER-HY-003, ER-HY-007, ER-REL-002, ER-OD-006, ER-CC-005 (6 — second-level + volatile boundary)
+    Wave 4: ER-REL-005, ER-OD-002, ER-OD-005, ER-OD-007, ER-HY-004, ER-HY-005, ER-HY-008,
+             ER-CC-004, ER-REL-003, ER-REL-004, ER-REL-006 (11 — relationship judgment + experience deepening)
+    Wave 5: ER-HY-009, ER-CX-001 (2 — supporting depth + context system)
+
+  Source Role Assignment: all 29 requirements
+  Stop Condition Types: AUTHORITATIVE_FACT_SUFFICIENT / EXPERIENCE_PATTERN_SUFFICIENT /
+    RELATIONSHIP_SUFFICIENT / LIVE_BOUNDARY_SUFFICIENT / EXPERT_JUDGMENT_SUFFICIENT / SYSTEM_TEST
+  Provenance Schema: 16-field minimum (Evidence Item ID through Notes/Limitations)
+  Conflict Taxonomy: 8 types (FACT / TEMPORAL / SCOPE / EXPERIENCE / CONTEXT / INTERPRETATION / STALE / UNKNOWN)
+  Conflict Handling: defined per conflict type
+  Escalation Triggers: 7 (MATERIAL_UNRESOLVED_CONFLICT / NO_SUITABLE_SOURCE / EVIDENCE_TOO_STALE /
+    REPEATED_DISAGREEMENT / RELATIONSHIP_UNSUPPORTED / SCOPE_AMBIGUOUS / REQUIREMENT_MALFORMED)
+  Escalation Outcomes: 6 (MORE_EVIDENCE / FOUNDER_REVIEW / LOCAL_OPERATOR_REVIEW /
+    LIVE_VERIFY / REQUIREMENT_REVISION / UNKNOWN)
+  Diminishing-Return Rule: defined (stop when pattern established — do not reward volume)
+  Requirement Revision Guard: defined (freeze requirement, record challenge, separate revision run)
+  Wave Exit Criteria: defined per wave
+  Plan Completeness Audit: A through L — all PASS
+
+  Existing Assets Mapped: RB-01/02/03 mapped to relevant ERs in Wave 0 instructions
+  MT-1 (ER-CX-001) Handling: SYSTEM_TEST (not place evidence — verified at pilot execution only)
+  Relationship Evidence: first-class object, Wave 1 anchors → Wave 2-3 connection → Wave 4 judgment
+  Collection Lifecycle Statuses: NOT_STARTED / IN_COLLECTION / PROVISIONALLY_SUPPORTED /
+    CONFLICTED / BLOCKED / VERIFIED_FOR_PREPARATION / LIVE_ONLY / UNKNOWN
+  All Plan Collection Statuses: NOT_STARTED
+  All Matrix Evidence Slots: NOT_COLLECTED
+
+  Actual Evidence Collection: NOT STARTED
+  Pilot: NOT EXECUTED / A/B Result: NONE
+  Participant Evidence: NONE / BT Verdict: NOT ASSIGNED
+  Candidate: NONE / Architecture Decision: NONE
+  place_knowledge migration: NOT APPROVED / HOLD
+  DB / Schema / Runtime / Production: NO CHANGE
+```
+
+**[PREVIOUS NEXT ACTION — Design the controlled Evidence Collection Plan for the 3-place Evidence Requirement Matrix V0.1]**
 
 ```
 3-Place Evidence Requirement Matrix V0.1: DESIGNED / PERSISTED (2026-09-27)
