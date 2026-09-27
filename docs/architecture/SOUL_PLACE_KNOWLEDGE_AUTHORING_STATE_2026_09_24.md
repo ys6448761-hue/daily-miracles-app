@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25) — Post-Approval Operational Validation Scope V0.2 SAVED / READY — Operational Validation Execution Design SAVED / EXECUTION READY — **Wave 1 ER-OD-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-HY-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-CC-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **WAVE_1_COMPLETE (2026-09-27)**  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25) — Post-Approval Operational Validation Scope V0.2 SAVED / READY — Operational Validation Execution Design SAVED / EXECUTION READY — **Wave 1 ER-OD-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-HY-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-CC-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **WAVE_1_COMPLETE (2026-09-27)** — **Wave 2 ER-OD-004 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 IN_PROGRESS / Cycles Completed: 5**  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -61,7 +61,7 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**WAVE_1_COMPLETE (2026-09-27). Next: Wave 2 collection — ER-OD-004 (Odongdo Parking). OFFICIAL primary. Stop condition: AUTHORITATIVE_FACT_SUFFICIENT + SEMI_STABLE live trigger design. Dependency: ER-OD-003 VERIFIED ✓. Gap: FULL_GAP. Collect: parking lot location, capacity, access approach, seasonal conditions. Exclude: vehicle prohibition (OD-003 DONE), walking/train (OD-003 DONE), general experience (OD-001 DONE).**
+**Wave 2 ER-OD-004 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27). Controlled Collection Cycles Completed: 5. Wave 2 IN_PROGRESS (4 remaining: ER-CC-002, ER-HY-002, ER-REL-001, ER-HY-006). Next: ER-HY-002 — Hyangiram Experiential Burden. WORLD_EXPERIENCE primary; FOUNDER secondary. Stop condition: EXPERIENCE_PATTERN_SUFFICIENT. Dependency: ER-HY-001 VERIFIED ✓. Gap: FULL_GAP. Collect: physical/experiential burden of ascent — effort level, stamina requirement, difficulty conditions. Exclude: structural facts (HY-001 DONE), hours/fees (BATCH_01 assets), summit trail beyond hermitage.**
 
 **Wave 1 ER-CC-001 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)**
 
@@ -109,6 +109,53 @@ Wave 1 ER-CC-001 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
   Collection Cycle Audit: A–V all PASS (22/22)
   Controlled Collection Cycles Completed: 4
   Wave 1: COMPLETE (all 4 ERs VERIFIED_FOR_PREPARATION)
+  DB / Schema / Runtime / Production: NO CHANGE
+```
+
+**Wave 2 ER-OD-004 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)**
+
+```
+Wave 2 ER-OD-004 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
+  File: docs/research/SOUL_YEOSU_ER_OD_004_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+  Base: 45d8a38 (Wave 1 ER-CC-001)
+
+  ER: ER-OD-004 — 오동도 주차 구조 (Odongdo Parking Evidence)
+  Stop Conditions: AUTHORITATIVE_FACT_SUFFICIENT (13/13) + LIVE_TRIGGER_DESIGN_COMPLETE (10/10) — both PASS
+
+  Evidence Items Registered: 5
+    EI-OD-004-A: yumcorp.or.kr (OFFICIAL OPERATOR) — 237 spaces; 1급지; small vehicle: 1hr free, 200 won/10 min, 5,000 won daily max; hours 08:00–20:00
+    EI-OD-004-B: polinews.co.kr + nspna.com (OFFICIAL/municipal) — always paid; excluded from 35-lot holiday free program; concentrated demand cited
+    EI-OD-004-C: forourtour.com (WE) — ~2–3 min walk from breakwater entrance; first hour free confirmed; weekend adequate space (single observation)
+    EI-OD-004-D: koreabycar.com (LOCAL_OPERATOR guide) — causeway entrance lot; ~1,000 KRW/hour (simplified approximation; superseded by EI-OD-004-A)
+    EI-OD-004-E: multiple Korean WE accounts (WORLD_EXPERIENCE) — camellia season (late Feb–March) weekend after ~10am = high congestion; early arrival recommended; parking tower preferred over ground lots
+
+  Core Structural Facts Established:
+    - Facility: 오동도 공영주차장 / 주차타워; 116 Odongdo-ro; managed by 여수시도시관리공단, Grade 1 (1급지)
+    - Location: ~2–3 min walk from Odongdo breakwater entrance
+    - Capacity: 237 spaces (official operator; designed capacity); 60-vehicle OD-003 incidental reference = SUPPORTING_ONLY
+    - Fee: small vehicle — first hour FREE; then 200 won/10 min; daily max 5,000 won
+    - Hours: 08:00–20:00
+    - Always paid (no free holiday exceptions — explicitly excluded from Yeosu city holiday free program)
+    - Peak congestion pattern: camellia season (late Feb–March) + holiday weekends = HIGH demand
+    - No distinct "Dongbaek parking lot" confirmed (OD-003 note was contextual reference to train, not a separate lot)
+
+  SEMI_STABLE Live Trigger Design:
+    Stable core: facility identity; location; fee structure type; always-paid policy; 237-space capacity; camellia season friction pattern
+    Volatile: current availability; specific rates (may change with municipal revision); temporary closures
+    Trigger: traveler asks about parking "now/today"; same-day decision; camellia season + weekend; major holiday; temporary restriction signal
+    Verify source: yumcorp.or.kr / parking.yumcorp.or.kr (official operator portal)
+    Fallback: state structural facts + recommend arriving before 10am during peak season + direct to verify official portal
+    7 fallback scenarios defined (LIVE_SOURCE_AVAILABLE_AND_CLEAR → CAPACITY_VALUE_CONFLICT)
+
+  Capacity Conflict: CONFLICT-OD-004-01 (60 vs 237) — PARTIALLY_RESOLVED
+    Resolution: 237 = official operator managed capacity (authoritative); 60 = lower-scope or older reference; yumcorp authoritative
+    Both preserved with scope annotations
+
+  Dependency Unlocked: ER-OD-005 prerequisite partially satisfied (OD-001 + OD-003 + OD-004 all VERIFIED)
+  Gap Register Update: ER-OD-004 FULL_GAP → CLOSED (VERIFIED_FOR_PREPARATION)
+  Collection Cycle Audit: 24/24 PASS
+  Controlled Collection Cycles Completed: 5
+  Wave 2 Status: IN_PROGRESS (1 of 5 Wave 2 ERs complete; CC-002, HY-002, REL-001, HY-006 remaining)
   DB / Schema / Runtime / Production: NO CHANGE
 ```
 

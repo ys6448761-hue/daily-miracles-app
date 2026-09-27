@@ -551,7 +551,7 @@ For each of 29 ERs: which assets cover it, and is existing coverage sufficient?
 | ER-OD-001 | NONE | NOT_ADDRESSED |
 | ER-OD-002 | NONE | NOT_ADDRESSED |
 | ER-OD-003 | NONE | NOT_ADDRESSED |
-| ER-OD-004 | NONE | NOT_ADDRESSED |
+| ER-OD-004 | EI-OD-004-A/B/C/D/E | **VERIFIED_FOR_PREPARATION (Wave 2, 2026-09-27)** |
 | ER-OD-005 | NONE | NOT_ADDRESSED |
 | ER-OD-006 | NONE | NOT_ADDRESSED |
 | ER-OD-007 | NONE | NOT_ADDRESSED |
@@ -619,7 +619,7 @@ For each of 29 ERs: which assets cover it, and is existing coverage sufficient?
 |---|---|---|---|
 | ER-OD-001 | P0 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 1, 2026-09-27)** | Stop condition EXPERIENCE_PATTERN_SUFFICIENT MET. EI-OD-001-A/B/C/D/E. See: `docs/research/SOUL_YEOSU_ER_OD_001_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-OD-003 | P0 | FULL GAP | No Odongdo assets exist |
-| ER-OD-004 | P0 | FULL GAP | No Odongdo assets exist |
+| ER-OD-004 | P0 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 2, 2026-09-27)** | Stop conditions AUTHORITATIVE_FACT_SUFFICIENT + LIVE_TRIGGER_DESIGN_COMPLETE MET. EI-OD-004-A/B/C/D/E registered. Operator: 여수시도시관리공단; 237 spaces; always paid; camellia season congestion pattern established. See: `docs/research/SOUL_YEOSU_ER_OD_004_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-HY-001 | P0 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 1, 2026-09-27)** | Stop condition STRUCTURAL_FACT_WITH_WE_CORROBORATION MET. EI-HY-001-A/B/C/D/E. See: `docs/research/SOUL_YEOSU_ER_HY_001_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-HY-002 | P0 | FULL GAP | No Hyangiram assets exist |
 | ER-HY-006 | P0 | FULL GAP | No Hyangiram assets exist |
@@ -726,7 +726,7 @@ All 29 ERs initialized with current status per V0.2 lifecycle.
 | ER-OD-001 | **VERIFIED_FOR_PREPARATION** | N/A (no deps) | P0; Wave 1 COMPLETE (2026-09-27) |
 | ER-OD-002 | NOT_STARTED | Awaits ER-OD-001 | P1; Wave 2 |
 | ER-OD-003 | NOT_STARTED | N/A (no deps) | P0; Wave 1 |
-| ER-OD-004 | NOT_STARTED | N/A (no deps) | P0; Wave 1 |
+| ER-OD-004 | **VERIFIED_FOR_PREPARATION** | N/A (no deps) | P0; Wave 2 COMPLETE (2026-09-27) |
 | ER-OD-005 | NOT_STARTED | Awaits ER-OD-001, ER-OD-003 | P1; Wave 3/4a |
 | ER-OD-006 | NOT_STARTED | Awaits ER-OD-001 | P1; Wave 2 |
 | ER-OD-007 | NOT_STARTED | N/A | P1; Wave 4a |
@@ -854,7 +854,7 @@ Wave 1 collects evidence for P0 ERs with no dependency blockers.
 |---|---|---|
 | ER-OD-001 | **VERIFIED_FOR_PREPARATION** | Wave 1 COMPLETE (2026-09-27) — visitor experience profile established. EI-OD-001-A/B/C/D/E registered. |
 | ER-OD-003 | NOT_STARTED | Collect from scratch — Odongdo access structure |
-| ER-OD-004 | NOT_STARTED | Collect from scratch — Odongdo operating information |
+| ER-OD-004 | **VERIFIED_FOR_PREPARATION** | Wave 2 COMPLETE (2026-09-27) — parking evidence established. EI-OD-004-A/B/C/D/E registered. |
 | ER-HY-001 | **VERIFIED_FOR_PREPARATION** | Wave 1 COMPLETE (2026-09-27) — physical access structure established. EI-HY-001-A/B/C/D/E registered. |
 | ER-HY-002 | NOT_STARTED | Collect from scratch — Hyangiram second P0 ER |
 | ER-HY-006 | NOT_STARTED | Collect from scratch — Hyangiram third P0 ER |
