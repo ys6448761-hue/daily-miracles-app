@@ -61,7 +61,7 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Wave 3 ER-OD-006 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28). Controlled Collection Cycles Completed: 14. Wave 3 IN_PROGRESS (5 of 6 ERs complete: REL-002 ✓ + CC-003 ✓ + HY-003 [PS] + HY-007 ✓ + OD-006 ✓). ONE NEXT ACTION: CC-005 (P1, Cable Car Operating Status Volatility Classification; dependency CC-001 ✓; OFFICIAL/LOCAL_OPERATOR primary; FOUNDER secondary; FULL_GAP; Stop Condition: LIVE_BOUNDARY_SUFFICIENT; Method: OFFICIAL_WEB_REVIEW + LOCAL_OPERATOR_INQUIRY). DO NOT EXECUTE until authorized.**
+**Wave 3 ER-CC-005 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28). Controlled Collection Cycles Completed: 15. WAVE_3_COLLECTION_EXECUTION_COMPLETE (all 6 cycles executed). NOT ALL_WAVE_3_ERS_VERIFIED — HY-003 = PROVISIONALLY_SUPPORTED (upgrade condition preserved). ONE NEXT ACTION: HY-003 targeted upgrade (upgrade condition: one HIGH-confidence elder descent friction account OR direct verification of TripAdvisor synthesis items; WE primary; EXPERIENCE_PATTERN_SUFFICIENT EP-3 required; HY-003 upgrade path documented in ER-HY-003 artifact). DO NOT EXECUTE until authorized.**
 
 ```
 Wave 3 ER-REL-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
@@ -220,6 +220,40 @@ Wave 3 ER-OD-006 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28)
   Updated files: SOUL_YEOSU_ER_OD_006_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md (CREATED) | Wave 0 gap register (3 OD-006 rows) | Project State
   Controlled Collection Cycles: 13 → 14
   Wave 3 Status: IN_PROGRESS (REL-002 ✓ + CC-003 ✓ + HY-003 [PS] + HY-007 ✓ + OD-006 ✓; remaining: CC-005)
+  DB / Schema / Runtime / Production: NO CHANGE
+```
+
+**Wave 3 ER-CC-005 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28)**
+
+```
+Wave 3 ER-CC-005 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28)
+  ER: ER-CC-005 — Yeosu Maritime Cable Car Live / Volatility Boundary
+  Base: a19a639 (Wave 3 ER-OD-006)
+  Wave: 3 | Cycle: 15
+  Stop Condition: LIVE_BOUNDARY_SUFFICIENT — 13/13 PASS
+  Source Roles: OFFICIAL/LOCAL_OPERATOR primary / FOUNDER secondary
+  Founder Evidence: OPERATIONAL_DOMAIN_ABSENT (philosophical evidence present; operational parameters absent)
+  Gap Transition: FULL_GAP → CLOSED
+  Evidence Items: EI-CC-005-A through E (5 items, incl. BATCH_01 reused) + 9 NEG items
+  Reused: EI-CC-001-A/B (STABLE station identity/route) + EI-CC-005-CTX-A (CONTEXT_ONLY)
+  Knowledge Fields: 25 classified (STABLE: 5 / SEMI_STABLE: 12 / VOLATILE: 4 / CONTEXTUAL: 4)
+    STABLE: service existence, station identity, route endpoints, weather suspension rule (강풍주의보/경보), rain≠suspension exception
+    SEMI_STABLE: ticket categories, ticket prices (CONFLICT-CC-005-01 OPEN), operating hours (~09:30–21:30), Saturday extension, maintenance Wednesday pattern, year-round operation, online ticket condition, online same-day restriction, discount categories, last boarding rule, crystal cabin capacity (CONFLICT-B), maintenance schedule
+    VOLATILE: current operation status, current weather suspension, current queue/wait, current ticket availability
+    CONTEXTUAL: peak wait pattern (weekends/golden-hour), ride duration range (10–15min), speed adjustment (crowd management)
+  Key rules:
+    Weather suspension: 강풍주의보/경보 issued by official weather authority → STABLE rule; current state VOLATILE
+    Rain: does NOT stop operations → STABLE exception
+    Prices: CONFLICT-CC-005-01 (₩13k vs ₩17k standard round-trip; ₩20k vs ₩24k crystal) → SEMI_STABLE; VERIFY_REQUIRED
+    Fallback: NO_VERIFIED_FALLBACK for operational suspension (cable car IS cross-sea route)
+    Verification path: yeosucablecar.com 운행현황 (SSL issue noted) + 061-664-7301
+  CONFLICTS registered: CONFLICT-CC-005-01 (PRICE_VARIATION; unresolved; corroborates WE CONFLICT-A) + CONFLICT-CC-005-02 (SCHEDULE_VARIATION opening time 09:00 vs 09:30; 09:30 majority-supported)
+  Stale-state: Wave 0 dep table showed "Wave 2" for CC-005 — corrected to Wave 3 (canonical)
+  Updated files: SOUL_YEOSU_ER_CC_005_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md (CREATED) | Wave 0 gap register (2 CC-005 rows) | Project State
+  Controlled Collection Cycles: 14 → 15
+  Wave 3 Collection Execution: WAVE_3_COLLECTION_EXECUTION_COMPLETE (all 6 cycles executed)
+  Wave 3 Verification Status: 5 VERIFIED_FOR_PREPARATION + 1 PROVISIONALLY_SUPPORTED — NOT ALL_WAVE_3_ERS_VERIFIED
+  HY-003: PROVISIONALLY_SUPPORTED — upgrade condition preserved (EP-3 requires direct elder descent friction account)
   DB / Schema / Runtime / Production: NO CHANGE
 ```
 

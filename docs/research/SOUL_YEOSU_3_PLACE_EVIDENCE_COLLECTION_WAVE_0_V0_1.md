@@ -582,7 +582,7 @@ For each of 29 ERs: which assets cover it, and is existing coverage sufficient?
 | ER-CC-002 | EI-CC-002-A, EI-CC-002-B (ASSET-005, Hamel→자산 only) | PARTIALLY_SUPPORTED — scope-limited | Full per-station access structure required (Map/Official level). Current evidence covers Hamel→자산 approach only, founder-level. 돌산 side general access not covered. Bus access VERIFY_REQUIRED for both. |
 | ER-CC-003 | EI-CC-003-CTX-A + EI-CC-003-A/B/C/D/E (5 new items) + EI-OD-004 (REUSED) + EI-CC-002-I (REUSED) | **VERIFIED_FOR_PREPARATION (Wave 3, 2026-09-27)** | 자산: 4개 공영주차장 (PRIMARY: 오동도로 116, 237 spaces, 엘리베이터 직결); 돌산: 250-space primary (max 5,000원/day) + 2 무료 대안. 차량 압력: 자산 HIGH / 돌산 LOWER. CONFLICT-F RESOLVED (SCOPE_DIFFERENCE). EXPERIENCE_PATTERN_SUFFICIENT 8/8 PASS. See: `docs/research/SOUL_YEOSU_ER_CC_003_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-CC-004 | EI-CC-004-CTX-A (ASSET-001, experience pattern only) | PARTIALLY_SUPPORTED — pattern level | Per-station physical child suitability (boarding process, waiting area) not evidenced. WE provides general Crystal Cabin age context only. |
-| ER-CC-005 | EI-CC-005-CTX-A (ASSET-001, VERIFY_REQUIRED context) | CONTEXT_ONLY | No formal volatility classification. Official + operational pattern evidence required. |
+| ER-CC-005 | EI-CC-005-CTX-A (REUSED CONTEXT_ONLY) + EI-CC-005-A/B/C/D (new) + EI-CC-005-E (BATCH_01 reused) + 9 NEG items | **VERIFIED_FOR_PREPARATION (Wave 3, 2026-09-28)** | 25 fields classified (STABLE:5 / SEMI_STABLE:12 / VOLATILE:4 / CONTEXTUAL:4). Weather suspension rule STABLE (강풍주의보/경보 → suspend; rain ≠ suspend). Prices/hours SEMI_STABLE (CONFLICT-CC-005-01: ₩13k vs ₩17k unresolved; VERIFY_REQUIRED). Current operation VOLATILE (Live Verify: yeosucablecar.com 운행현황 / 061-664-7301). NO_VERIFIED_FALLBACK for suspension. LIVE_BOUNDARY_SUFFICIENT 13/13 PASS. Founder: OPERATIONAL_DOMAIN_ABSENT. See: `docs/research/SOUL_YEOSU_ER_CC_005_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 
 ### Relationship ERs (ER-REL-001 through ER-REL-006)
 
@@ -753,7 +753,7 @@ All 29 ERs initialized with current status per V0.2 lifecycle.
 | ER-CC-002 | NOT_STARTED | **ER-CC-001 VERIFIED ✓** — prerequisite met | P0; Wave 2 — may now proceed |
 | ER-CC-003 | **VERIFIED_FOR_PREPARATION (2026-09-27)** | ER-CC-001 ✓ + ER-CC-002 ✓ | P0; Wave 3 CLOSED — EXPERIENCE_PATTERN_SUFFICIENT 8/8. CONFLICT-F RESOLVED. Unlocks CC-004. See: `docs/research/SOUL_YEOSU_ER_CC_003_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-CC-004 | NOT_STARTED | Awaits ER-CC-001, ER-CC-002, ER-CC-003 | P1; Wave 4a |
-| ER-CC-005 | NOT_STARTED | Awaits ER-CC-001 | P1; Wave 2 |
+| ER-CC-005 | **VERIFIED_FOR_PREPARATION (2026-09-28)** | ER-CC-001 ✓ VERIFIED | P1; Wave 3 CLOSED (stale dep entry: showed "Wave 2" — canonical Wave 3). LIVE_BOUNDARY_SUFFICIENT 13/13 PASS. 25 fields classified. CC-005 unlocks REL-003 (one of 4 deps; OD-002 still needed). |
 
 **BLOCKED-DEPENDENCY trigger assessment:** ER-CC-001 is IN_COLLECTION (not BLOCKED/CONFLICTED/UNKNOWN). Therefore BLOCKED-DEPENDENCY does not propagate to ER-CC-002 at this stage. Per V0.2 §5: BLOCKED-DEPENDENCY triggers only when prerequisite is BLOCKED/CONFLICTED/UNKNOWN.
 
