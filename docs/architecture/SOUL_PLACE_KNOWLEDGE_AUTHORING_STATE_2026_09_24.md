@@ -61,7 +61,51 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Verify Protocol V0.2 correction closure against the five findings from the Independent Pre-execution Review; if all five are closed, produce the 3-place Evidence Requirement Matrix by reverse-designing required evidence from the frozen scenarios and judgment needs, without yet collecting actual Yeosu evidence or executing the pilot.**
+**Design the controlled Evidence Collection Plan for the 3-place Evidence Requirement Matrix V0.1, assigning collection order, source roles, verification rules, provenance capture, conflict handling, and stop conditions for each requirement; do not yet collect actual Odongdo, Hyangiram, or Yeosu Maritime Cable Car evidence or execute the pilot.**
+
+```
+3-Place Evidence Requirement Matrix V0.1: DESIGNED / PERSISTED (2026-09-27)
+  File: docs/research/SOUL_YEOSU_3_PLACE_EVIDENCE_REQUIREMENT_MATRIX_V0_1.md
+  Base: a7cdaae
+
+  Gate A — Protocol V0.2 Correction Closure: PASS
+    C1 (Preparation Boundary operationalization): CLOSED
+    C2 (Preparation Reuse Ledger): CLOSED
+    C3 (Context Availability Rule): CLOSED
+    C4 (Hidden Transfer leakage control): CLOSED
+    C5 (Single/Multi-turn consistency): CLOSED
+
+  Matrix scope: 오동도 / 향일암 / 여수해상케이블카
+  Core Scenarios covered: O-1, O-2, O-3, H-1, H-2, H-3, C-1, C-2, C-3
+  Multi-Turn Variant: MT-1 (context system requirement ER-CX-001)
+
+  Evidence Requirements: 28 place/relationship requirements + 1 context system requirement
+    ER-OD-001 ~ ER-OD-007: 오동도 (7 requirements)
+    ER-HY-001 ~ ER-HY-009: 향일암 (9 requirements)
+    ER-CC-001 ~ ER-CC-005: 여수해상케이블카 (5 requirements)
+    ER-REL-001 ~ ER-REL-006: Relationship evidence for O-3 / C-3 (6 requirements)
+    ER-CX-001: MT-1 context system requirement (1 requirement)
+
+  Reverse-design chain applied: Desired Answer Properties → Judgment → Knowledge → Evidence
+  Source roles defined: OFFICIAL / MAP_ROUTE / WORLD_EXPERIENCE / LOCAL_OPERATOR / FOUNDER / LIVE
+  Stability classification: STABLE / SEMI_STABLE / VOLATILE / CONTEXTUAL
+  FACT / EXPERIENCE / JUDGMENT layers separated per requirement
+  Missing-evidence behavior defined per requirement: ANSWER / QUALIFY / ASK / LIVE_VERIFY / UNKNOWN
+  Collection priority: P0 (14 requirements) / P1 (12 requirements) / P2 (1 requirement)
+  Relationship evidence: ER-REL-001~006 explicitly distinct from place facts
+  Deduplication: ER-CC-001 (4 scenarios) / ER-REL-001+002 (2 scenarios each) / ER-HY-001 (3 scenarios)
+  Completeness audit: A/B/C/D/E/F/G/H — all PASS
+  All evidence slots: NOT_COLLECTED
+
+  Actual Evidence Collection: NOT STARTED
+  Pilot: NOT EXECUTED / A/B Result: NONE
+  Participant Evidence: NONE / BT Verdict: NOT ASSIGNED
+  Candidate: NONE / Architecture Decision: NONE
+  place_knowledge migration: NOT APPROVED / HOLD
+  DB / Schema / Runtime / Production: NO CHANGE
+```
+
+**[PREVIOUS NEXT ACTION — Verify Protocol V0.2 correction closure + produce 3-place Evidence Requirement Matrix]**
 
 ```
 Prepared Knowledge vs Prepared Context 3-Place Pilot Protocol V0.2: DESIGNED / PERSISTED (2026-09-27)
