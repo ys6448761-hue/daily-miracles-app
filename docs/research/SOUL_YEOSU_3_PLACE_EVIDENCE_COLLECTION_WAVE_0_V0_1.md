@@ -617,7 +617,7 @@ For each of 29 ERs: which assets cover it, and is existing coverage sufficient?
 
 | ER | Priority | Gap Type | Specific Gap |
 |---|---|---|---|
-| ER-OD-001 | P0 | FULL GAP | No Odongdo assets exist |
+| ER-OD-001 | P0 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 1, 2026-09-27)** | Stop condition EXPERIENCE_PATTERN_SUFFICIENT MET. EI-OD-001-A/B/C/D/E. See: `docs/research/SOUL_YEOSU_ER_OD_001_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-OD-003 | P0 | FULL GAP | No Odongdo assets exist |
 | ER-OD-004 | P0 | FULL GAP | No Odongdo assets exist |
 | ER-HY-001 | P0 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 1, 2026-09-27)** | Stop condition STRUCTURAL_FACT_WITH_WE_CORROBORATION MET. EI-HY-001-A/B/C/D/E. See: `docs/research/SOUL_YEOSU_ER_HY_001_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
@@ -723,7 +723,7 @@ All 29 ERs initialized with current status per V0.2 lifecycle.
 
 | ER | Initial Status | Dependency Met? | Note |
 |---|---|---|---|
-| ER-OD-001 | NOT_STARTED | N/A (no deps) | P0; Wave 1 |
+| ER-OD-001 | **VERIFIED_FOR_PREPARATION** | N/A (no deps) | P0; Wave 1 COMPLETE (2026-09-27) |
 | ER-OD-002 | NOT_STARTED | Awaits ER-OD-001 | P1; Wave 2 |
 | ER-OD-003 | NOT_STARTED | N/A (no deps) | P0; Wave 1 |
 | ER-OD-004 | NOT_STARTED | N/A (no deps) | P0; Wave 1 |
@@ -852,7 +852,7 @@ Wave 1 collects evidence for P0 ERs with no dependency blockers.
 
 | ER | Status | Wave 1 Action |
 |---|---|---|
-| ER-OD-001 | NOT_STARTED | Collect from scratch — Odongdo basic identity (access point, official name, entity boundary) |
+| ER-OD-001 | **VERIFIED_FOR_PREPARATION** | Wave 1 COMPLETE (2026-09-27) — visitor experience profile established. EI-OD-001-A/B/C/D/E registered. |
 | ER-OD-003 | NOT_STARTED | Collect from scratch — Odongdo access structure |
 | ER-OD-004 | NOT_STARTED | Collect from scratch — Odongdo operating information |
 | ER-HY-001 | **VERIFIED_FOR_PREPARATION** | Wave 1 COMPLETE (2026-09-27) — physical access structure established. EI-HY-001-A/B/C/D/E registered. |

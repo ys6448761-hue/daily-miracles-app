@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25) — Post-Approval Operational Validation Scope V0.2 SAVED / READY — Operational Validation Execution Design SAVED / EXECUTION READY — **Wave 1 ER-HY-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)**  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25) — Post-Approval Operational Validation Scope V0.2 SAVED / READY — Operational Validation Execution Design SAVED / EXECUTION READY — **Wave 1 ER-OD-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-HY-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)**  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -61,7 +61,7 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Next Wave 1 collection: ER-OD-001 (오동도 장소 성격 / 방문자 경험 프로파일). Source role: WORLD_EXPERIENCE (primary). Stop condition: EXPERIENCE_PATTERN_SUFFICIENT. Scope: 오동도 방문 경험의 분위기·규모·성격·특수성. 제외: 차량 접근(ER-OD-003), 운영 시간, Route Corpus. Provenance: 독립 WE 소스 복수 + URL/접근일 필수.**
+**Next Wave 1 collection: ER-OD-003 (오동도 차량/교통 접근 구조). Source role: OFFICIAL (primary). Stop condition: STRUCTURAL_FACT (official access policy + approach logistics). Scope: 오동도 접근 교통 수단, 주차, 동백열차. 제외: 섬 내부 경험(OD-001 완료), 운영 시간 세부(OD-004). Provenance: OFFICIAL sources, SEMI_STABLE live trigger 설계 포함.**
 
 ```
 Wave 1 ER-HY-001 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
@@ -95,6 +95,38 @@ Wave 1 ER-HY-001 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
 
   Gap Register Update: ER-HY-001 FULL_GAP → CLOSED (VERIFIED_FOR_PREPARATION)
   Wave 0 Gap Register: updated (HY-001 row only)
+  DB / Schema / Runtime / Production: NO CHANGE
+```
+
+```
+Wave 1 ER-OD-001 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
+  File: docs/research/SOUL_YEOSU_ER_OD_001_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+  Base: 4140b3d (Wave 1 ER-HY-001)
+
+  ER: ER-OD-001 — 오동도 방문자 경험 프로파일
+  Stop Condition: EXPERIENCE_PATTERN_SUFFICIENT — ALL 3 CRITERIA PASS
+
+  Evidence Items Registered: 5
+    EI-OD-001-A: kidsfuninseoul.wordpress.com — family visit, named landmarks, child-accessible (WE, EXPERIENCE_PATTERN)
+    EI-OD-001-B: kupi.com visitor guide — atmosphere, flora, boardwalks, 2-3h scale (WE, EXPERIENCE_PATTERN)
+    EI-OD-001-C: kosmedi.co.kr — 0.12 km², 2.5km trails, named rock formations (WE, STRUCTURAL_FACT+EXPERIENCE_PATTERN)
+    EI-OD-001-D: thisis-southkorea.com (Aug 2025) — serene, small island, coastal trails (WE, EXPERIENCE_PATTERN)
+    EI-OD-001-E: yeosu.go.kr OFFICIAL — 2.5km trail, Dragon Cave, bamboo tunnel, lighthouse, barefoot park (OFFICIAL, STRUCTURAL_FACT corroboration)
+
+  Three Dimensions Established:
+    ATMOSPHERE: tranquil/serene/nature-immersive; sea breeze + botanical scent; seasonal variation (bloom vs. non-bloom)
+    PHYSICAL_SCALE: ~0.12 km² island; ~2.5 km internal trail network; circular route; accessible (5+); content-dense
+    EXPERIENTIAL_DISTINCTIVENESS: camellia identity (3000 trees); named geology (Dragon Cave, Elephant Rock, etc.); forest+coastal integration; multi-mode visit (walk/photography/fountain/train)
+
+  Distinction vs. Hyangiram: Odongdo = moderate/family-accessible/botanical+coastal / Hyangiram = physically demanding/pilgrimage/steep passage
+
+  Conflict Register: CONFLICT-OD-001-01 (bloom season dates) — MINOR_VARIATION, LOW impact, resolved (use OFFICIAL Jan–March)
+
+  Reuse Available For: OD-002 (scale context), OD-006, any inside-island ER
+  Dependency Unlocked: OD-002 (awaits OD-001 — now satisfied), OD-006 (awaits OD-001 — now satisfied)
+
+  Gap Register Update: ER-OD-001 FULL_GAP → CLOSED (VERIFIED_FOR_PREPARATION)
+  Wave 0 Gap Register: updated (OD-001 row — 3 locations)
   DB / Schema / Runtime / Production: NO CHANGE
 ```
 
