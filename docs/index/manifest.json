@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-27T21:46:57.879Z",
+  "generated_at": "2026-09-27T22:06:21.702Z",
   "generator": "generate-manifest.js",
-  "total_count": 557,
+  "total_count": 558,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "superseded",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-27",
-      "checksum": "130092ae"
+      "checksum": "d68a3187"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -4903,7 +4903,7 @@
       "status": "active",
       "title": "SOUL Yeosu 3-Place Evidence Collection",
       "created_at": "2026-09-27",
-      "checksum": "364775b9"
+      "checksum": "2adff883"
     },
     {
       "id": "DOC-SOUL_YEOSU_3_PLACE_EVIDENCE_RE",
@@ -5040,6 +5040,23 @@
       "title": "ER-HY-003 Controlled Evidence Collection V0.1",
       "created_at": "2026-09-27",
       "checksum": "d900461d"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_ER_HY_003_TARGETED_",
+      "path": "docs/research/SOUL_YEOSU_ER_HY_003_TARGETED_UPGRADE_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "ER-HY-003 Targeted Upgrade V0.1",
+      "created_at": "2026-09-27",
+      "checksum": "01430067"
     },
     {
       "id": "DOC-SOUL_YEOSU_ER_HY_006_CONTROLLE",

@@ -61,7 +61,7 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Wave 3 ER-CC-005 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28). Controlled Collection Cycles Completed: 15. WAVE_3_COLLECTION_EXECUTION_COMPLETE (all 6 cycles executed). NOT ALL_WAVE_3_ERS_VERIFIED — HY-003 = PROVISIONALLY_SUPPORTED (upgrade condition preserved). ONE NEXT ACTION: HY-003 targeted upgrade (upgrade condition: one HIGH-confidence elder descent friction account OR direct verification of TripAdvisor synthesis items; WE primary; EXPERIENCE_PATTERN_SUFFICIENT EP-3 required; HY-003 upgrade path documented in ER-HY-003 artifact). DO NOT EXECUTE until authorized.**
+**HY-003 Targeted Upgrade ATTEMPTED (2026-09-28) — PROVISIONALLY_SUPPORTED PRESERVED. Controlled Collection Cycles: 15 (unchanged — targeted upgrade per canonical methodology). WAVE_3_COLLECTION_EXECUTION_COMPLETE = TRUE. ALL_WAVE_3_ERS_VERIFIED = FALSE (HY-003 blocks). ONE NEXT ACTION: HY-003 targeted upgrade (second attempt) — Korean-language domestic review platforms not yet searched (Naver Blog, Naver Map reviews, NaverCafe); TripAdvisor remains HTTP 403 blocked; elder descent friction EP-3 gap remains open; WE primary; EXPERIENCE_PATTERN_SUFFICIENT EP-3 required. DO NOT EXECUTE until authorized.**
 
 ```
 Wave 3 ER-REL-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
@@ -220,6 +220,29 @@ Wave 3 ER-OD-006 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28)
   Updated files: SOUL_YEOSU_ER_OD_006_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md (CREATED) | Wave 0 gap register (3 OD-006 rows) | Project State
   Controlled Collection Cycles: 13 → 14
   Wave 3 Status: IN_PROGRESS (REL-002 ✓ + CC-003 ✓ + HY-003 [PS] + HY-007 ✓ + OD-006 ✓; remaining: CC-005)
+  DB / Schema / Runtime / Production: NO CHANGE
+```
+
+**HY-003 Targeted Upgrade: PROVISIONALLY_SUPPORTED PRESERVED (2026-09-28)**
+
+```
+HY-003 Targeted Upgrade (2026-09-28)
+  Base: 3be9d70 (Wave 3 ER-CC-005)
+  Target: EP-3 — elder-specific DESCENT friction
+  Method: EI-HY-003-C/D direct verification + targeted external search (5 Korean queries, 4 English queries, 7 sources attempted)
+  Direct Verification Results:
+    EI-HY-003-C (TripAdvisor r957655598): HTTP 403 BLOCKED — FAILED
+    EI-HY-003-D (TripAdvisor parents+wife): HTTP 403 BLOCKED — FAILED
+  New Evidence Found: NONE qualifying (synthesis-only items, not elder-specific descent, or unreachable)
+  EP-3 Result: PARTIAL_PASS (unchanged) — no direct HIGH-confidence elder descent friction account
+  Final HY-003 Status: PROVISIONALLY_SUPPORTED (unchanged)
+  WAVE_3_COLLECTION_EXECUTION_COMPLETE: TRUE
+  ALL_WAVE_3_ERS_VERIFIED: FALSE (HY-003 blocks)
+  Controlled Collection Cycles: 15 (not incremented — targeted upgrade, not a new collection cycle)
+  Sources not yet searched: Naver Blog, Naver Map reviews, NaverCafe (Korean-language domestic platforms)
+  Upgrade path remaining: One HIGH-confidence elder descent friction account from Korean domestic platforms
+  Files created: SOUL_YEOSU_ER_HY_003_TARGETED_UPGRADE_V0_1.md
+  Files modified: Wave 0 gap register (HY-003 upgrade attempt noted) | Project State
   DB / Schema / Runtime / Production: NO CHANGE
 ```
 
