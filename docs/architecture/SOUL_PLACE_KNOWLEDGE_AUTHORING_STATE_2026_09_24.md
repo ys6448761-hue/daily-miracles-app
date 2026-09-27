@@ -61,7 +61,60 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Prepare real-participant recruitment and session scheduling for Blind MVP Test V0.1, targeting the approved 8–12 participant MVP range and applying the approved Group A/B/C participant criteria — without yet conducting participant sessions, collecting Participant Evidence, or assigning a BT verdict.**
+**Design Prepared Knowledge vs Prepared Context 3-Place Pilot Protocol V0.1 for Odongdo, Hyangiram, and Yeosu Maritime Cable Car, using reverse design from desired SOUL answers to required judgment, prepared knowledge, and evidence; do not yet collect new knowledge, execute the pilot, recruit participants, or create/promote any Candidate.**
+
+```
+Prepared Travel Knowledge Research Direction: OPENED (2026-09-27)
+  Handover: docs/research/SOUL_YEOSU_PREPARED_TRAVEL_KNOWLEDGE_RESEARCH_HANDOVER_V0_1.md
+  Base: 5f5aca2
+
+  Reason:
+    Before participant sessions, product observation found risk that SOUL may
+    reach generic fallback before its prepared Relationship/Judgment knowledge.
+    Knowledge Foundation and orchestration readiness needs parallel assessment.
+
+  Blind MVP HOLD:
+    Participant recruitment and session execution ON HOLD
+    Blind MVP design and canonical stimuli remain VALID and UNCHANGED
+    HOLD removes when Pilot Protocol is designed and Founder decides go/no-go
+
+  Working Models (RESEARCH HYPOTHESIS ONLY — not Architecture Decision):
+    Model A: Prepared Knowledge Model
+             Question → Prepared Knowledge retrieval → minimal verify/ask → judgment → answer
+    Model B: Prepared Context / Expert Anticipation Model
+             Traveler State → Prepared Context → Expert Anticipation → Decision-ready Knowledge → SOUL
+
+  3-Place Pilot Scope (working scope, not Yeosu priority):
+    1. 오동도 / 2. 향일암 / 3. 여수해상케이블카
+
+  Knowledge Source Roles: recorded in Handover §8 (HYPOTHESIS)
+  External vs Phoenix-Owned Boundary: recorded in Handover §9 (HYPOTHESIS)
+  Reverse-Design candidate elements: recorded in Handover §6 (HYPOTHESIS)
+
+  Candidate Generated: NO / Architecture Decision: NONE
+  Participant Evidence: NONE / Blind MVP Test: NOT YET EXECUTED
+  BT Verdict: NOT ASSIGNED / Canonical Stimuli: FROZEN / UNCHANGED
+  place_knowledge migration: NOT APPROVED / HOLD
+  DB / Schema / Runtime / Production: NO CHANGE
+
+  Prohibited in this research direction until approved:
+    New Yeosu knowledge collection / Pilot execution / Runtime modification
+    Participant recruitment / Candidate creation / SSOT promotion
+```
+
+**[PREVIOUS NEXT ACTION — Prepare real-participant recruitment and session scheduling for Blind MVP Test V0.1]**
+
+```
+Recruitment & Session Preparation Package V0.1: RR-A CONFIRMED (2026-09-27)
+  Status: RETURNED FOR FOUNDER/LUMI INDEPENDENT REVIEW — NOT YET PERSISTED
+  Participant recruitment: ON HOLD (Prepared Knowledge research direction pending)
+  Group A/B/C criteria: confirmed from BTD §E / no conflict
+  P1–P4 profile cycle: confirmed / no redesign
+  Contact/data separation rule: defined
+  Cancellation/replacement rule: defined
+  Canonical stimuli: UNCHANGED
+  Participant Evidence: NONE / BT Verdict: NOT ASSIGNED
+```
 
 ```
 Facilitator Dry Run V0.1: COMPLETE / DR-B CONFIRMED / PROCEDURAL CORRECTIONS RESOLVED (2026-09-27)
