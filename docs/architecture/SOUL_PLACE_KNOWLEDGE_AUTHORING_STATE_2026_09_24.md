@@ -61,7 +61,46 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Execute Wave 0 of Controlled Evidence Collection Plan V0.2 by preparing the provenance capture mechanism, ER-to-Evidence linkage, conflict and reuse tracking, dependency-state tracking, and mapping existing RB-01/RB-02/RB-03 assets to applicable Evidence Requirements; assess existing-asset sufficiency and identify gaps only, without collecting new Odongdo, Hyangiram, or Yeosu Maritime Cable Car evidence.**
+**Execute pre-Wave 1 batch file asset survey (YEOSU_2026_VERIFICATION_BATCH_01~06 + YEOSU_ROUTE_CORPUS + YEOSU_TIME_KNOWLEDGE + YEOSU_TRAVEL_TIME_MATRIX) to check for existing evidence relevant to Wave 1 ERs before beginning Wave 1 collection. Then begin Wave 1 collection for: ER-OD-001, ER-OD-003, ER-OD-004, ER-HY-001, ER-HY-002, ER-HY-006 (full gap — collect from scratch), ER-CC-001 (partial gap — official source completion attempt), ER-REL-001 (full gap — directional geography via MAP_ROUTE). Collection must follow V0.2 provenance schema and stop conditions.**
+
+```
+Evidence Collection Wave 0: COMPLETE / WAVE_0_PASS (2026-09-27)
+  File: docs/research/SOUL_YEOSU_3_PLACE_EVIDENCE_COLLECTION_WAVE_0_V0_1.md
+  Base: 99f839e (Collection Plan V0.2)
+
+  Wave 0 Exit Conditions: ALL 6 PASS
+    1. Provenance capture mechanism (20-field template): READY
+    2. ER-to-Evidence linkage (all 29 ERs): COMPLETE
+    3. Conflict tracking (8 conflicts from WE inherited): READY
+    4. Reuse tracking (cross-ER asset sharing): COMPLETE
+    5. Dependency states (all 29 ERs initialized): COMPLETE
+    6. Gap Register: COMPLETE
+
+  RB Asset Mapping Results:
+    ASSET-003 (RB-01) → ER-CC-001: PARTIALLY_SUPPORTED (2 non-official sources; official SSL error)
+    ASSET-004 (RB-02) → No ER primary need: CONTEXT_ONLY (ticket structure not in 29 ERs)
+    ASSET-005 (RB-03) → ER-CC-002: PARTIALLY_SUPPORTED (자산 side from Hamel approach; FOUNDER_LOCAL)
+    ASSET-001 (Cable Car WE) → ER-CC-003/005: CONTEXT_ONLY; ER-CC-004: PARTIAL_PATTERN
+    ASSET-002 (Cable Car Founder) → ER-REL-005: CONTEXT_FRAME only
+
+  Gap Register Summary:
+    FULL GAP: 22 ERs (all OD + all HY + REL-001 through REL-006 except CC context items)
+    PARTIAL GAP: 3 ERs (ER-CC-001, ER-CC-002, ER-CC-004)
+    CONTEXT_ONLY — not sufficient: 2 ERs (ER-CC-003, ER-CC-005)
+    VERIFIED_FOR_PREPARATION: 0 ERs
+    SYSTEM_TEST_DEFERRED: 1 ER (ER-CX-001)
+
+  Pre-Wave 1 Survey Required:
+    YEOSU_2026_VERIFICATION_BATCH_01~06 — inspect for OD/HY/CC content
+    YEOSU_ROUTE_CORPUS_V0_1, YEOSU_TIME_KNOWLEDGE_V0_1, YEOSU_TRAVEL_TIME_MATRIX_V0_1
+    Potential: BATCH_03_TRANSPORT → ER-CC-002/REL-002; BATCH_04_ISLAND_ACCESS → ER-OD-003
+
+  No new Odongdo/Hyangiram/Cable Car evidence collected in Wave 0
+  All 29 Evidence Slots: NOT_COLLECTED (Wave 0 mapping only)
+  DB / Schema / Runtime / Production: NO CHANGE
+```
+
+**[PREVIOUS NEXT ACTION — Execute Wave 0]**
 
 ```
 Controlled Evidence Collection Plan V0.2: COMPLETE / GATE B PASS (2026-09-27)
