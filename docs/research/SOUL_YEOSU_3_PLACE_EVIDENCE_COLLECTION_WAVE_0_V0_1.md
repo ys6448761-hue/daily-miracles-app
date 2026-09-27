@@ -724,7 +724,7 @@ All 29 ERs initialized with current status per V0.2 lifecycle.
 | ER | Initial Status | Dependency Met? | Note |
 |---|---|---|---|
 | ER-OD-001 | **VERIFIED_FOR_PREPARATION** | N/A (no deps) | P0; Wave 1 COMPLETE (2026-09-27) |
-| ER-OD-002 | NOT_STARTED | Awaits ER-OD-001 | P1; Wave 2 |
+| ER-OD-002 | **VERIFIED_FOR_PREPARATION (2026-09-28)** | ER-OD-001 ✓ VERIFIED | P1; Wave 4 Cycle 16 CLOSED — EXPERIENCE_PATTERN_SUFFICIENT 4/4 WE sources. Duration: 1-hour loop / 1-2 hrs thorough / half-day combined. Value drivers: forest trail + lighthouse + camellia season + named features. Unlocks REL-003 (all 4 deps now satisfied). |
 | ER-OD-003 | NOT_STARTED | N/A (no deps) | P0; Wave 1 |
 | ER-OD-004 | **VERIFIED_FOR_PREPARATION** | N/A (no deps) | P0; Wave 2 COMPLETE (2026-09-27) |
 | ER-OD-005 | NOT_STARTED | Awaits ER-OD-001, ER-OD-003 | P1; Wave 3/4a |
@@ -763,7 +763,7 @@ All 29 ERs initialized with current status per V0.2 lifecycle.
 |---|---|---|---|
 | ER-REL-001 | **VERIFIED_FOR_PREPARATION (2026-09-27)** | ER-CC-001 ✓ VERIFIED | P0; Wave 2 CLOSED — AUTHORITATIVE_FACT_SUFFICIENT 10/10 |
 | ER-REL-002 | **VERIFIED_FOR_PREPARATION (2026-09-27)** | ER-REL-001 ✓ VERIFIED, ER-CC-001 ✓ VERIFIED, ER-OD-003 ✓ VERIFIED | P0; Wave 3 CLOSED — RELATIONSHIP_SUFFICIENT 10/10. Unlocks REL-005 (awaits REL-001 + REL-002). |
-| ER-REL-003 | NOT_STARTED | Awaits ER-REL-001, ER-REL-002, ER-OD-002, ER-CC-005 | P1; Wave 3/4b |
+| ER-REL-003 | **READY_FOR_COLLECTION (2026-09-28)** | REL-001 ✓ REL-002 ✓ OD-002 ✓ CC-005 ✓ — ALL 4 deps SATISFIED | P1; Wave 4b — all dependency gates now cleared. Proceed to REL-003 collection after separate authorization. |
 | ER-REL-004 | NOT_STARTED | Awaits ER-REL-001, ER-REL-002, ER-REL-003 | P1; Wave 4b |
 | ER-REL-005 | NOT_STARTED | Awaits ER-REL-001, ER-REL-002 | P0; Wave 4a |
 | ER-REL-006 | NOT_STARTED | Awaits ER-REL-001, ER-REL-002, ER-REL-005, ER-OD-003 | P1; Wave 4b |

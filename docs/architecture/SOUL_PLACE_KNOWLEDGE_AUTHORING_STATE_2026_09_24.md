@@ -63,7 +63,51 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 **Wave 4 Readiness Check: COMPLETE (2026-09-28). Wave 4 entry condition MET — all Wave 3 ERs in terminal states (HY-003 = ACCEPT_PROVISIONAL_WITH_BOUNDARY qualifies as BLOCKED with escalation recorded). Wave 4a: 7/7 READY (OD-002, OD-005, OD-007, HY-004, HY-005, CC-004 immediately executable; REL-005 execute last — Founder PRIMARY). Wave 4b: 4/4 BLOCKED (REL-003 awaits OD-002; REL-006 awaits REL-005; REL-004 awaits REL-003; HY-008 HARD BLOCKED — HY-003 ACCEPT_PROVISIONAL ≠ VERIFIED_FOR_PREPARATION per Plan §658). BATCH_01 reuse confirmed for HY-005 (향일암 무료 + 04:00~19:00 OFFICIAL). Controlled Collection Cycles: 15 (Readiness Check is not a collection cycle). WAVE_3_COLLECTION_EXECUTION_COMPLETE = TRUE. ALL_WAVE_3_ERS_VERIFIED = FALSE (HY-003 ACCEPT_PROVISIONAL — HY-008 hard block). ONE NEXT ACTION: Execute ER-OD-002 Controlled Evidence Collection (Wave 4, Cycle 16) — WE primary / FOUNDER secondary / EXPERIENCE_PATTERN_SUFFICIENT; unlocks REL-003 chain. Readiness artifact: docs/research/SOUL_YEOSU_WAVE_4_READINESS_CHECK_V0_1.md. DO NOT EXECUTE until user authorization.**
 
+**Wave 4 ER-OD-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28). EXPERIENCE_PATTERN_SUFFICIENT MET — 4 independent WE sources (EI-OD-002-A kidsfuninseoul WP family account; EI-OD-002-B Trip.com 2026 traveler moments; EI-OD-002-C TripAdvisor+guides synthesis; EI-OD-002-D Route Corpus R028+R040). Duration pattern: 30-60min minimum / 1-hour standard loop / 1-2 hours thorough / half-day if combined with Cable Car. Value drivers converged: forest trail immersion + lighthouse panoramic viewpoint + camellia season (Jan-March) + named features (Dragon Cave, Bamboo Tunnel, Musical Fountain). Physical scope: compact 0.12km²; 2.5km trail loop; family-accessible; single-visit completable. FOUNDER secondary not collected (not required for stop condition; gap noted). DOWNSTREAM: REL-003 all 4 dependencies now satisfied (REL-001 ✓ REL-002 ✓ OD-002 ✓ CC-005 ✓) → REL-003 = READY_FOR_COLLECTION. Controlled Collection Cycles: 15 → 16. Artifact: docs/research/SOUL_YEOSU_ER_OD_002_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md. ONE NEXT ACTION: Execute remaining Wave 4a ERs (OD-005, OD-007, HY-004, HY-005, CC-004) OR proceed to REL-003 Wave 4b — Founder authorization required.**
+
 ```
+Wave 4 ER-OD-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28)
+  File: docs/research/SOUL_YEOSU_ER_OD_002_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+  Base: b038e2a (Wave 4 Readiness Check)
+
+  ER: ER-OD-002 — Odongdo Visitor Experience Patterns
+  Stop Condition: EXPERIENCE_PATTERN_SUFFICIENT — 4/4 independent WE sources
+
+  Starting State: FULL_GAP (OD-002 not started; OD-001-A duration deferred content available)
+
+  Reused Items:
+    EI-OD-001-A (deferred duration content): Family WP blog — half-day duration — REUSED as EI-OD-002-A
+    Route Corpus R028: 60분 tour bus allocation — REUSED as EI-OD-002-D
+    Route Corpus R040: 30~60분 소요 independent traveler — REUSED as EI-OD-002-D
+
+  New Evidence Items:
+    EI-OD-002-B: Trip.com traveler moments 2026 — "한 바퀴는 대체로 1시간 내외로 충분하다"; wooden deck trail; Dragon Cave/Wind Valley photo spots
+    EI-OD-002-C: TripAdvisor+travel guide synthesis — 1-2 hours standard; 2+ hours photography; lighthouse panoramic view highlight
+
+  Duration Pattern Synthesized:
+    30-60 min: minimum purposeful (rushed/independent)
+    ~1 hour: standard one-loop (tour bus standard)
+    1-2 hours: recommended thorough visit
+    2+ hours: unhurried with photography
+    Half-day: combined Odongdo + Cable Car
+
+  Value Drivers Converged:
+    1. Forest trail immersion (2.5km canopy walk — thermal + sensory)
+    2. Ocean panorama revelation (forest → cliff contrast)
+    3. Lighthouse viewpoint (25m, panoramic Hallyeohaesang views)
+    4. Camellia season (Jan-March, 3,000 trees — peak Feb-March)
+    5. Named features: Dragon Cave, Bamboo Tunnel, Musical Fountain
+    6. Accessibility: family-friendly, well-marked, compact completable
+
+  Downstream Effect:
+    REL-003: All 4 deps satisfied → REL-003 = READY_FOR_COLLECTION
+    Unlocked: REL-003 → REL-004 chain (after REL-003 collection)
+
+  FOUNDER Secondary: Not collected — not required for stop condition; gap noted for optional enrichment
+
+  Controlled Collection Cycles: 15 → 16
+```
+
 Wave 3 ER-REL-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
   File: docs/research/SOUL_YEOSU_ER_REL_002_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
   Base: 9251378 (Wave 3 Readiness Check)
