@@ -61,7 +61,9 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Next Wave 1 collection: ER-OD-003 (오동도 차량/교통 접근 구조). Source role: OFFICIAL (primary). Stop condition: STRUCTURAL_FACT (official access policy + approach logistics). Scope: 오동도 접근 교통 수단, 주차, 동백열차. 제외: 섬 내부 경험(OD-001 완료), 운영 시간 세부(OD-004). Provenance: OFFICIAL sources, SEMI_STABLE live trigger 설계 포함.**
+**Next Wave 1 collection: ER-CC-001 (케이블카 방문자 경험 프로파일). Source role: OFFICIAL+WE. Stop condition: EXPERIENCE_PATTERN_SUFFICIENT. Pre-Wave 1 survey = PARTIAL_GAP (RB-01 yeosu.go.kr 데이터 부분 커버). 수집 전 RB-01 재평가 → 잔여 갭 식별 → OFFICIAL+WE primary 수집.**
+
+**Wave 1 ER-OD-003 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)**
 
 ```
 Wave 1 ER-HY-001 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
@@ -127,6 +129,46 @@ Wave 1 ER-OD-001 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
 
   Gap Register Update: ER-OD-001 FULL_GAP → CLOSED (VERIFIED_FOR_PREPARATION)
   Wave 0 Gap Register: updated (OD-001 row — 3 locations)
+  DB / Schema / Runtime / Production: NO CHANGE
+```
+
+```
+Wave 1 ER-OD-003 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
+  File: docs/research/SOUL_YEOSU_ER_OD_003_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+  Base: 474ca82 (Wave 1 ER-OD-001)
+
+  ER: ER-OD-003 — 오동도 차량/교통 접근 구조
+  Stop Conditions: AUTHORITATIVE_FACT_SUFFICIENT (10/10) + LIVE_TRIGGER_DESIGN_COMPLETE (10/10) — both PASS
+
+  Evidence Items Registered: 4
+    EI-OD-003-A: yeosu.go.kr (Korean) — vehicle prohibition on causeway + 60-vehicle parking at entrance + 15-min walk (OFFICIAL)
+    EI-OD-003-B: yeosu.go.kr Dongbaek Train page — hours 09:30–17:30, 1,000 won, capacity 192, wheelchair lift (OFFICIAL)
+    EI-OD-003-C: comple.co.kr — 15-min departure frequency, boarding past dock, winter hours 17:00 cutoff (LOCAL_OPERATOR)
+    EI-OD-003-D: Wikipedia EN — 768m causeway built 1935, paid shuttle confirmation (OFFICIAL SECONDARY)
+
+  Core Structural Facts Established:
+    - VEHICLE PROHIBITION: private vehicles not permitted on causeway (OFFICIAL, explicit)
+    - Parking: Odongdo entrance, 60 vehicles (main lot)
+    - Access Option A: Walk 768m causeway (~15 min, free, scenic — Korea's 100 Most Beautiful Roads)
+    - Access Option B: Dongbaek Train (1,200m route, ~4 min, 1,000 won one-way, every 15 min)
+    - Train suspension condition: heavy rain
+    - Boarding location: past main information center + dock (~1.2km into park)
+    - Round-trip: separate ticket purchase required each direction
+
+  SEMI_STABLE Live Trigger Design:
+    Stable core: vehicle prohibition policy; existence of walk + train options; 768m distance
+    Volatile: train hours, prices, frequency; parking fees
+    Verify source: yeosu.go.kr Dongbaek Train page (URL known) + 061-659-1821
+    SOUL trigger: traveler asks specifically about current hours/price; rain conditions; Oct/Nov transition
+    Fallback: state structural range → recommend verification; walk always available if train suspended
+
+  Negative/Exception Knowledge: rain suspension → walk only; 60-car lot small for peak season; prohibition absolute (no exceptions); boarding 1.2km from entrance; round-trip = separate purchase
+
+  Conflict Register: CONFLICT-OD-003-01 (train route 1,200m vs walking 768m — MINOR_VARIATION, resolved); CONFLICT-OD-003-02 (operating hours discrepancy — MINOR_VARIATION, seasonal split, resolved)
+
+  Dependency Unlocked: ER-OD-004 prerequisite satisfied (parking detail wave)
+  Gap Register Update: ER-OD-003 FULL_GAP → CLOSED (VERIFIED_FOR_PREPARATION)
+  Collection Cycle Audit: 21/21 PASS
   DB / Schema / Runtime / Production: NO CHANGE
 ```
 
