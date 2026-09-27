@@ -580,7 +580,7 @@ For each of 29 ERs: which assets cover it, and is existing coverage sufficient?
 |---|---|---|---|
 | ER-CC-001 | EI-CC-001-A, EI-CC-001-B, EI-CC-001-C (ASSET-003) | PARTIALLY_SUPPORTED | Official confirmation (yeosucablecar.com) remains inaccessible. Two non-official sources agree on names but cannot replace OFFICIAL_PRIMARY. |
 | ER-CC-002 | EI-CC-002-A, EI-CC-002-B (ASSET-005, Hamel→자산 only) | PARTIALLY_SUPPORTED — scope-limited | Full per-station access structure required (Map/Official level). Current evidence covers Hamel→자산 approach only, founder-level. 돌산 side general access not covered. Bus access VERIFY_REQUIRED for both. |
-| ER-CC-003 | EI-CC-003-CTX-A (ASSET-001, conflict documentation only) | CONTEXT_ONLY | No field-confirmed vehicle access/parking per station. CONFLICT-F (parking) OPEN. |
+| ER-CC-003 | EI-CC-003-CTX-A + EI-CC-003-A/B/C/D/E (5 new items) + EI-OD-004 (REUSED) + EI-CC-002-I (REUSED) | **VERIFIED_FOR_PREPARATION (Wave 3, 2026-09-27)** | 자산: 4개 공영주차장 (PRIMARY: 오동도로 116, 237 spaces, 엘리베이터 직결); 돌산: 250-space primary (max 5,000원/day) + 2 무료 대안. 차량 압력: 자산 HIGH / 돌산 LOWER. CONFLICT-F RESOLVED (SCOPE_DIFFERENCE). EXPERIENCE_PATTERN_SUFFICIENT 8/8 PASS. See: `docs/research/SOUL_YEOSU_ER_CC_003_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-CC-004 | EI-CC-004-CTX-A (ASSET-001, experience pattern only) | PARTIALLY_SUPPORTED — pattern level | Per-station physical child suitability (boarding process, waiting area) not evidenced. WE provides general Crystal Cabin age context only. |
 | ER-CC-005 | EI-CC-005-CTX-A (ASSET-001, VERIFY_REQUIRED context) | CONTEXT_ONLY | No formal volatility classification. Official + operational pattern evidence required. |
 
@@ -751,7 +751,7 @@ All 29 ERs initialized with current status per V0.2 lifecycle.
 |---|---|---|---|
 | ER-CC-001 | **VERIFIED_FOR_PREPARATION** | N/A (no deps) | P0; Wave 1 CLOSED 2026-09-27 — AUTHORITATIVE_FACT_SUFFICIENT. Official naming confirmed: 자산[해야]정류장 / 돌산[놀아]정류장. Unlocks CC-002, CC-005, REL-001. |
 | ER-CC-002 | NOT_STARTED | **ER-CC-001 VERIFIED ✓** — prerequisite met | P0; Wave 2 — may now proceed |
-| ER-CC-003 | NOT_STARTED | Awaits ER-CC-001, ER-CC-002 | P0; Wave 4a |
+| ER-CC-003 | **VERIFIED_FOR_PREPARATION (2026-09-27)** | ER-CC-001 ✓ + ER-CC-002 ✓ | P0; Wave 3 CLOSED — EXPERIENCE_PATTERN_SUFFICIENT 8/8. CONFLICT-F RESOLVED. Unlocks CC-004. See: `docs/research/SOUL_YEOSU_ER_CC_003_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-CC-004 | NOT_STARTED | Awaits ER-CC-001, ER-CC-002, ER-CC-003 | P1; Wave 4a |
 | ER-CC-005 | NOT_STARTED | Awaits ER-CC-001 | P1; Wave 2 |
 
@@ -787,7 +787,7 @@ All existing conflicts from WE and RB assets are inherited here. New conflicts d
 | CONFLICT-C | ASSET-001 (WE §15) | None | Crystal Cabin count: sources disagree | OPEN |
 | CONFLICT-D | ASSET-001 (WE §15) | ER-CC-005 (operating access) | Reservation method: 현장 vs 온라인 conflict | OPEN |
 | CONFLICT-E | ASSET-001 (WE §15) | None | Premium ticket price: multiple values | OPEN |
-| CONFLICT-F | ASSET-001 (WE §15) | ER-CC-003 | Parking: 무료/유료/시간별 요금 conflict | OPEN — blocks ER-CC-003 |
+| CONFLICT-F | ASSET-001 (WE §15) + EI-CC-003-A (Wave 3) | ER-CC-003 | Parking: 무료/유료/시간별 요금 conflict | **RESOLVED (2026-09-27) — SCOPE_DIFFERENCE + INTERPRETATION_DIFFERENCE. Multiple facilities have different rate structures. Not a FACT_CONFLICT. ER-CC-003 VERIFIED_FOR_PREPARATION.** |
 | CONFLICT-G | ASSET-001 (WE §15) | ER-CC-005 | Ride duration: ~12분 vs ~15분 | OPEN |
 | CONFLICT-H | ASSET-001 (WE §15) | ER-CC-005 | Operating start time: conflict | OPEN |
 

@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25) — Post-Approval Operational Validation Scope V0.2 SAVED / READY — Operational Validation Execution Design SAVED / EXECUTION READY — **Wave 1 ER-OD-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-HY-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-CC-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **WAVE_1_COMPLETE (2026-09-27)** — **Wave 2 ER-OD-004 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-HY-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-HY-006 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-CC-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-REL-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **WAVE_2_COMPLETE (2026-09-27) — Cycles Completed: 9**  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25) — Post-Approval Operational Validation Scope V0.2 SAVED / READY — Operational Validation Execution Design SAVED / EXECUTION READY — **Wave 1 ER-OD-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-HY-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-CC-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **WAVE_1_COMPLETE (2026-09-27)** — **Wave 2 ER-OD-004 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-HY-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-HY-006 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-CC-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-REL-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **WAVE_2_COMPLETE (2026-09-27) — Cycles Completed: 9** — **Wave 3 ER-REL-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 3 ER-CC-003 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27) — Cycles Completed: 11**  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -61,7 +61,7 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Wave 3 ER-REL-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27). Controlled Collection Cycles Completed: 10. Wave 3 IN_PROGRESS (1 of 6 ERs complete). ONE NEXT ACTION: ER-CC-003 (P0, Vehicle Access + Parking per Station; dependencies CC-001 ✓ + CC-002 ✓ met; CONFLICT-F active; LOCAL_OPERATOR/FOUNDER primary; EXPERIENCE_PATTERN_SUFFICIENT stop condition). DO NOT EXECUTE until authorized.**
+**Wave 3 ER-CC-003 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27). Controlled Collection Cycles Completed: 11. Wave 3 IN_PROGRESS (2 of 6 ERs complete: REL-002 ✓ + CC-003 ✓). ONE NEXT ACTION: HY-003 (P1, Elder/Mobility-Limited Access at 향일암; dependency HY-001 ✓ met; LOCAL_OPERATOR/FOUNDER primary; STRUCTURAL_FACT_WITH_WE_CORROBORATION stop condition). DO NOT EXECUTE until authorized.**
 
 ```
 Wave 3 ER-REL-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
@@ -102,6 +102,52 @@ Wave 3 ER-REL-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
   Gap Register Update: ER-REL-002 PARTIAL_GAP → CLOSED (VERIFIED_FOR_PREPARATION)
   Controlled Collection Cycles: 9 → 10
   Wave 3 Status: IN_PROGRESS (REL-002 ✓; remaining: CC-003, HY-003, HY-007, OD-006, CC-005)
+  DB / Schema / Runtime / Production: NO CHANGE
+```
+
+**Wave 3 ER-CC-003 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)**
+
+```
+Wave 3 ER-CC-003 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
+  File: docs/research/SOUL_YEOSU_ER_CC_003_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+  Base: cb700b0 (Wave 3 ER-REL-002)
+
+  ER: ER-CC-003 — Per-Station Vehicle Access and Parking
+  Stop Condition: EXPERIENCE_PATTERN_SUFFICIENT — 8/8 PASS
+
+  Starting State: FULL_GAP — CONFLICT-F OPEN (blocking)
+
+  CONFLICT-F Resolution:
+    SCOPE_DIFFERENCE + INTERPRETATION_DIFFERENCE (CLOSED)
+    Multiple facilities in 자산 compound have different rate structures.
+    "무료/유료/시간별 요금" all describe SAME layered structure at different addresses.
+    NOT a FACT_CONFLICT about any single facility.
+
+  Reused Items:
+    EI-CC-002-I: 자산 엘리베이터 탑 직결 (OFFICIAL, CC-002) — DIRECT_REUSE
+    EI-OD-004: 오동도로 116, 237 spaces, 1hr free, 200원/10분 (LOCAL_OPERATOR) — DIRECT_REUSE
+
+  New Evidence Items:
+    EI-CC-003-A: 자산 4-lot compound map (oh-my-post, NON_OFFICIAL_AGGREGATOR)
+    EI-CC-003-B: 자산 HIGH vehicle pressure (WE synthesis)
+    EI-CC-003-C: 돌산 250-space primary lot, max 5,000원/day (oh-my-post)
+    EI-CC-003-D: 돌산 2 free alternatives, 5–10분 walk (oh-my-post)
+    EI-CC-003-E: 돌산 LOWER pressure than 자산 — comparative WE pattern
+
+  Negative Items:
+    NEG-CC-003-001: 자산 완전 무료 없음 (all lots paid after free window)
+    NEG-CC-003-002: 엑스포 주차장 (777-4) = 12-15분 도보 (far from boarding)
+
+  Key Structural Model:
+    자산: PRIMARY = 오동도로 116 (237 spaces, 엘리베이터 직결); HIGH pressure; 4 lots total
+    돌산: PRIMARY = 돌산로 3600-1 (250 spaces, max 5,000원/day); LOWER pressure; 2 free lots nearby
+    SOUL Judgment: 오동도 목적 → 자산 권장; 주차비/여유 → 돌산 가능
+
+  Unlocks: ER-CC-004 (dependency CC-003 now met)
+  Gap Register Update: ER-CC-003 FULL_GAP → CLOSED (VERIFIED_FOR_PREPARATION)
+  CONFLICT-F: OPEN → RESOLVED
+  Controlled Collection Cycles: 10 → 11
+  Wave 3 Status: IN_PROGRESS (REL-002 ✓ + CC-003 ✓; remaining: HY-003, HY-007, OD-006, CC-005)
   DB / Schema / Runtime / Production: NO CHANGE
 ```
 
