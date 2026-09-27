@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-27T07:18:18.230Z",
+  "generated_at": "2026-09-27T07:29:37.351Z",
   "generator": "generate-manifest.js",
-  "total_count": 549,
+  "total_count": 550,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "superseded",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-27",
-      "checksum": "b806213f"
+      "checksum": "df175748"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -4903,7 +4903,7 @@
       "status": "active",
       "title": "SOUL Yeosu 3-Place Evidence Collection",
       "created_at": "2026-09-27",
-      "checksum": "9a1bbf60"
+      "checksum": "12f05235"
     },
     {
       "id": "DOC-SOUL_YEOSU_3_PLACE_EVIDENCE_RE",
@@ -5056,6 +5056,23 @@
       "title": "SOUL Yeosu ER-OD-004 Controlled Evidence Collection V0.1",
       "created_at": "2026-09-27",
       "checksum": "5dc0c67d"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_ER_REL_001_CONTROLL",
+      "path": "docs/research/SOUL_YEOSU_ER_REL_001_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu ER-REL-001 Controlled Evidence Collection V0.1",
+      "created_at": "2026-09-27",
+      "checksum": "64768cae"
     },
     {
       "id": "DOC-SOUL_YEOSU_PREPARED_KNOWLEDGE_",

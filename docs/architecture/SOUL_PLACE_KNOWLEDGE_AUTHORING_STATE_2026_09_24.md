@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25) — Post-Approval Operational Validation Scope V0.2 SAVED / READY — Operational Validation Execution Design SAVED / EXECUTION READY — **Wave 1 ER-OD-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-HY-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-CC-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **WAVE_1_COMPLETE (2026-09-27)** — **Wave 2 ER-OD-004 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-HY-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-HY-006 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-CC-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 IN_PROGRESS / Cycles Completed: 8 / Next: ER-REL-001 (FULL GAP, Wave 2, dependency CC-001 ✓)**  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25) — Post-Approval Operational Validation Scope V0.2 SAVED / READY — Operational Validation Execution Design SAVED / EXECUTION READY — **Wave 1 ER-OD-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-HY-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-CC-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **WAVE_1_COMPLETE (2026-09-27)** — **Wave 2 ER-OD-004 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-HY-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-HY-006 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-CC-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-REL-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **WAVE_2_COMPLETE (2026-09-27) — Cycles Completed: 9**  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -61,7 +61,35 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Wave 2 ER-CC-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27). Controlled Collection Cycles Completed: 8. Wave 2 IN_PROGRESS (1 remaining: ER-REL-001). Next: ER-REL-001 — Directional Geography. MAP_ROUTE / OFFICIAL primary; FOUNDER secondary. Stop condition: AUTHORITATIVE_FACT_SUFFICIENT. Dependency: CC-001 VERIFIED ✓. Gap: FULL_GAP. Collect: which cable car direction corresponds to which physical exit station, and how this relates to 오동도 access (C-3, O-3 scenarios).**
+**Wave 2 ER-REL-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27). Controlled Collection Cycles Completed: 9. WAVE_2_COMPLETE. Next: Wave 3 — first Wave 3 ER per Collection Plan V0.2. Wave 3 ERs: OD-001 (now VERIFIED ✓, unlock Wave 3 dependents), HY-003 (suitability judgment), OD-002 (duration), OD-003 (capacity/peak), CC-003 (vehicle parking), CC-005 (operating volatility). Founder must confirm which Wave 3 ER to prioritize next.**
+
+**Wave 2 ER-REL-001 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)**
+
+```
+Wave 2 ER-REL-001 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
+  File: docs/research/SOUL_YEOSU_ER_REL_001_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+  Base: 1ca995b (Wave 2 ER-CC-002)
+
+  ER: ER-REL-001 — 케이블카 방향별 도착지 및 지리적 관계
+  Stop Condition: AUTHORITATIVE_FACT_SUFFICIENT — 10/10 PASS
+
+  Evidence Items: 5 new (EI-REL-001-A through E) + 2 NEG items
+    EI-REL-001-A: 자산정류장 = MAINLAND (오동도 주차타워 앞) — OFFICIAL yeosu.go.kr
+    EI-REL-001-B: 돌산정류장 = DOLSAN ISLAND (돌산공원) — OFFICIAL yeosu.go.kr
+    EI-REL-001-C: 자산정류장 → 오동도 입구 도보 ~5분 — MAP_ROUTE
+    EI-REL-001-D: 방향A(자산→돌산) WE 확인: 오동도 방문 후 자산 탑승→돌산 하차 — WE
+    EI-REL-001-E: 돌산정류장 → 오동도: 거북선대교 경유 (택시 10~12분) — MAP_ROUTE
+    NEG-REL-001-001: 자산→돌산 편도는 오동도 접근에 비효율적
+    NEG-REL-001-002: 돌산→자산 편도는 돌산 관광지 접근에 비효율적
+
+  Conflicts: 2 resolved
+    CONFLICT-REL-001-01: 자산정류장 주소 3종 — SCOPE_DIFFERENCE (같은 단지 내 건물별 주소)
+    CONFLICT-REL-001-02: Route Corpus 돌산측을 오동도권으로 분류 — INTERPRETATION_DIFFERENCE (corpus 레이블 오류; OFFICIAL 우선)
+
+  Unlocks: ER-REL-002 (gated on REL-001 + OD-003), ER-REL-005 (gated on REL-001 + REL-002)
+  Controlled Collection Cycles: 8 → 9
+  Wave 2 Status: COMPLETE (OD-004 ✓ + HY-002 ✓ + HY-006 ✓ + CC-002 ✓ + REL-001 ✓)
+```
 
 **Wave 2 ER-CC-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)**
 

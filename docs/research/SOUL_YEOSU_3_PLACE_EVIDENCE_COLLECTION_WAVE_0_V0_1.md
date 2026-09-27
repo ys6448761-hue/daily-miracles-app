@@ -588,7 +588,7 @@ For each of 29 ERs: which assets cover it, and is existing coverage sufficient?
 
 | ER | Asset Coverage | Sufficiency | Gap |
 |---|---|---|---|
-| ER-REL-001 | EI-CC-001-A~C (station identity context); EI-CC-RB02-A (one-way option confirmed) | CONTEXT_ONLY | Directional geography (which exit station = which physical location, Cable Car ↔ Odongdo direction) NOT addressed by any existing asset. |
+| ER-REL-001 | EI-CC-001-A~C (station identity context); EI-CC-RB02-A (one-way option confirmed); **EI-REL-001-A/B/C/D/E (5 new items, VERIFIED_FOR_PREPARATION 2026-09-27)** | **VERIFIED_FOR_PREPARATION** | 자산=MAINLAND near 오동도(도보 5분); 돌산=DOLSAN ISLAND. Direction A(자산→돌산)=mainland→island. Direction B(돌산→자산)=island→mainland near 오동도. 2 NEG items. See: `docs/research/SOUL_YEOSU_ER_REL_001_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-REL-002 | NONE | NOT_ADDRESSED | Exit station → Odongdo route connection: zero evidence. |
 | ER-REL-003 | NONE | NOT_ADDRESSED | Combined time estimate: zero evidence. |
 | ER-REL-004 | NONE | NOT_ADDRESSED | Sequence friction: zero evidence. |
@@ -624,7 +624,7 @@ For each of 29 ERs: which assets cover it, and is existing coverage sufficient?
 | ER-HY-002 | P0 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 2, 2026-09-27)** | Stop condition EXPERIENCE_PATTERN_SUFFICIENT MET. 4 reused from HY-001-WE + 5 new items (EI-HY-002-A/B/C/D/E). Core burden pattern: steep sustained staircase → breathlessness/sweat; fitness-dependent variation preserved; summer heat multiplier; flat road ascent alternative; mobility-impaired exception. See: `docs/research/SOUL_YEOSU_ER_HY_002_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-HY-006 | P0 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 2, 2026-09-27)** | Stop condition EXPERIENCE_PATTERN_SUFFICIENT MET. 6 items registered (EI-HY-006-A/B/C/D/E/F). Standard visit: 45–90min typical; up to 120min leisurely. Ascent (stair) 10–20min. Dwell 30–60min. Descent 10–15min (inferred). H-3 judgment: 2-hour window SUFFICIENT. 2 conflicts resolved (SCOPE_DIFFERENCE + CONTEXT_CONDITIONAL). Geomosan + sunrise scope bounded. See: `docs/research/SOUL_YEOSU_ER_HY_006_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-CC-001 | P0 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 1, 2026-09-27)** | Stop condition AUTHORITATIVE_FACT_SUFFICIENT MET. Reused EI-CC-001-A/B/C (RB-01). New: EI-CC-001-D (yeosucablecar.com OFFICIAL, search-indexed), EI-CC-001-E (디지털여수문화대전 OFFICIAL_PUBLIC), EI-CC-001-F (ko.wikipedia.org SUPPORTING). Official naming: 자산[해야]정류장 / 돌산[놀아]정류장. CONFLICT-CC-001-01 resolved. See: `docs/research/SOUL_YEOSU_ER_CC_001_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
-| ER-REL-001 | P0 | FULL GAP | Directional geography (cable car direction → physical exit location relationship) not addressed by any asset. Station identity (ER-CC-001 partial) is prerequisite context but distinct evidence. |
+| ER-REL-001 | P0 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 2, 2026-09-27)** | Stop condition AUTHORITATIVE_FACT_SUFFICIENT MET — 10/10 PASS. 5 new items (EI-REL-001-A/B/C/D/E) + 2 NEG items. 자산=MAINLAND(오동도 주차타워 앞, 도보 5분); 돌산=DOLSAN ISLAND(돌산공원). Direction A(자산→돌산)=육지→섬; Direction B(돌산→자산)=섬→육지(오동도 인근). NEG-REL-001-001: 자산→돌산 DOES NOT efficiently serve 오동도. 2 conflicts resolved. See: `docs/research/SOUL_YEOSU_ER_REL_001_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-REL-002 | P0 | FULL GAP | Exit-to-Odongdo connection not addressed |
 | ER-REL-005 | P0 | FULL GAP | Direction selection judgment (cable car direction for Odongdo access) not addressed. Founder preference required. |
 
@@ -761,7 +761,7 @@ All 29 ERs initialized with current status per V0.2 lifecycle.
 
 | ER | Initial Status | Dependency Met? | Note |
 |---|---|---|---|
-| ER-REL-001 | NOT_STARTED | Awaits ER-CC-001 (IN_COLLECTION, not BLOCKED) | P0; Wave 1 |
+| ER-REL-001 | **VERIFIED_FOR_PREPARATION (2026-09-27)** | ER-CC-001 ✓ VERIFIED | P0; Wave 2 CLOSED — AUTHORITATIVE_FACT_SUFFICIENT 10/10 |
 | ER-REL-002 | NOT_STARTED | Awaits ER-REL-001, ER-CC-001, ER-OD-003 | P0; Wave 2 (gated) |
 | ER-REL-003 | NOT_STARTED | Awaits ER-REL-001, ER-REL-002, ER-OD-002, ER-CC-005 | P1; Wave 3/4b |
 | ER-REL-004 | NOT_STARTED | Awaits ER-REL-001, ER-REL-002, ER-REL-003 | P1; Wave 4b |
