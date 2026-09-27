@@ -61,7 +61,53 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Produce Collection Plan V0.2 incorporating all five MAJOR corrections from Readiness Review V0.1: (F1) Blocked-Dependency Propagation rule, (F2) Intra-Wave-4 dependency order enforcement, (F3) SEMI_STABLE live trigger design protocol for nine requirements, (F4) ER-HY-001 composite stop condition requiring WE corroboration, (F5) Founder Review Output Constraint prohibiting pre-written SOUL answer text; and apply all thirteen MINOR corrections; preserve Collection Plan V0.1 unchanged; do not yet collect actual Odongdo, Hyangiram, or Yeosu Maritime Cable Car evidence.**
+**Execute Wave 0 of Controlled Evidence Collection Plan V0.2 by preparing the provenance capture mechanism, ER-to-Evidence linkage, conflict and reuse tracking, dependency-state tracking, and mapping existing RB-01/RB-02/RB-03 assets to applicable Evidence Requirements; assess existing-asset sufficiency and identify gaps only, without collecting new Odongdo, Hyangiram, or Yeosu Maritime Cable Car evidence.**
+
+```
+Controlled Evidence Collection Plan V0.2: COMPLETE / GATE B PASS (2026-09-27)
+  File: docs/research/SOUL_YEOSU_3_PLACE_CONTROLLED_EVIDENCE_COLLECTION_PLAN_V0_2.md
+  Base: 92e6276 (Readiness Review V0.1)
+
+  Gate B Verdict: PASS — all 18 readiness findings CLOSED
+    MAJOR CLOSED: 5 (F1–F5)
+    MINOR CLOSED: 13 (F6–F18)
+    New MAJOR defects: 0
+    29 Evidence Requirements: ALL PRESERVED / NOT_COLLECTED
+
+  V0.2 Key Changes vs V0.1:
+    §5 Lifecycle: BLOCKED-DEPENDENCY status added; SYSTEM_TEST_DEFERRED status added;
+      explicit PROVISIONALLY_SUPPORTED → VERIFIED_FOR_PREPARATION transition rule
+    §6 Provenance: 18 fields (added Fields 17 Superseded By + 18 Recommended Refresh Window)
+    §7 FOUNDER: FOUNDER REVIEW OUTPUT CONSTRAINT added (MAY produce judgment ingredients;
+      MUST NOT produce final SOUL answer text or pre-written recommendation paragraphs)
+    §9 Stop Conditions: STRUCTURAL_FACT_WITH_WE_CORROBORATION added (ER-HY-001 only)
+    §15 Wave 0: Concrete 6-condition exit definition; general 5-step gap-collection procedure
+    §15 Wave 4: Split into Wave 4a (7 independent) and Wave 4b (4 intra-wave dependents)
+      Wave 4a: OD-002, OD-005, OD-007, HY-004, HY-005, CC-004, REL-005
+      Wave 4b: HY-008, REL-003 (needs OD-002 from 4a), REL-004 (needs REL-003),
+               REL-006 (needs REL-005 from 4a)
+    §15 Wave 5: CX-001 removed; Wave 5 = HY-009 only
+    §15 System Test Requirements: ER-CX-001 separate section; prerequisites expanded to 7 ERs
+    §16 Matrix: ER-HY-001 stop condition = STRUCTURAL_FACT_WITH_WE_CORROBORATION
+    §16 Matrix: ER-CX-001 prerequisites expanded (OD-003, OD-004, OD-007, CC-002, CC-003, CC-004)
+    §17 Notes: SEMI_STABLE live trigger designs for 9 ERs (OD-003, OD-004, CC-002, CC-003,
+      HY-004, HY-005, HY-007, REL-003, HY-009); elder-specific note for HY-003;
+      RB-01 directional research link for REL-001; REL-001 stop condition scope boundary;
+      OD-002/OD-007 scope boundary; HY-007 two representative starting locations;
+      FOUNDER OUTPUT CONSTRAINT reiterated for HY-008/REL-005/REL-006
+    §3 RB-02 description: corrected (ticket choice scope, not vehicle/parking)
+    §0 Correction Summary Table: 18-row closure table (all CLOSED)
+
+  V0.1 Collection Plan: PRESERVED UNCHANGED
+  Evidence Requirement Matrix V0.1: PRESERVED UNCHANGED
+  Protocol V0.2: PRESERVED UNCHANGED
+  Actual Evidence Collection: NOT STARTED
+  All 29 Evidence Slots: NOT_COLLECTED
+  Pilot: NOT EXECUTED
+  DB / Schema / Runtime / Production: NO CHANGE
+```
+
+**[PREVIOUS NEXT ACTION — Produce Collection Plan V0.2 incorporating all five MAJOR corrections from Readiness Review V0.1]**
 
 ```
 Readiness Review V0.1: COMPLETE / READY_WITH_CORRECTIONS (2026-09-27)
