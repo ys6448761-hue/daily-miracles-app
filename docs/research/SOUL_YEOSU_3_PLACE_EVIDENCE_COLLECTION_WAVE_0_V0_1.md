@@ -623,7 +623,7 @@ For each of 29 ERs: which assets cover it, and is existing coverage sufficient?
 | ER-HY-001 | P0 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 1, 2026-09-27)** | Stop condition STRUCTURAL_FACT_WITH_WE_CORROBORATION MET. EI-HY-001-A/B/C/D/E. See: `docs/research/SOUL_YEOSU_ER_HY_001_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-HY-002 | P0 | FULL GAP | No Hyangiram assets exist |
 | ER-HY-006 | P0 | FULL GAP | No Hyangiram assets exist |
-| ER-CC-001 | P0 | PARTIAL GAP | Official confirmation required; OFFICIAL_PRIMARY SSL inaccessible; 2 SUPPORTING sources agree but insufficient for OFFICIAL confidence level |
+| ER-CC-001 | P0 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 1, 2026-09-27)** | Stop condition AUTHORITATIVE_FACT_SUFFICIENT MET. Reused EI-CC-001-A/B/C (RB-01). New: EI-CC-001-D (yeosucablecar.com OFFICIAL, search-indexed), EI-CC-001-E (디지털여수문화대전 OFFICIAL_PUBLIC), EI-CC-001-F (ko.wikipedia.org SUPPORTING). Official naming: 자산[해야]정류장 / 돌산[놀아]정류장. CONFLICT-CC-001-01 resolved. See: `docs/research/SOUL_YEOSU_ER_CC_001_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-REL-001 | P0 | FULL GAP | Directional geography (cable car direction → physical exit location relationship) not addressed by any asset. Station identity (ER-CC-001 partial) is prerequisite context but distinct evidence. |
 | ER-REL-002 | P0 | FULL GAP | Exit-to-Odongdo connection not addressed |
 | ER-REL-005 | P0 | FULL GAP | Direction selection judgment (cable car direction for Odongdo access) not addressed. Founder preference required. |
@@ -749,8 +749,8 @@ All 29 ERs initialized with current status per V0.2 lifecycle.
 
 | ER | Initial Status | Dependency Met? | Note |
 |---|---|---|---|
-| ER-CC-001 | IN_COLLECTION | N/A (no deps) | P0; Wave 1 — RB-01 PARTIALLY_VERIFIED; gap: official confirmation |
-| ER-CC-002 | IN_COLLECTION | Awaits ER-CC-001 (IN_COLLECTION, not BLOCKED) | P0; Wave 2 — partial Founder evidence exists; cannot advance to VERIFIED until CC-001 confirmed |
+| ER-CC-001 | **VERIFIED_FOR_PREPARATION** | N/A (no deps) | P0; Wave 1 CLOSED 2026-09-27 — AUTHORITATIVE_FACT_SUFFICIENT. Official naming confirmed: 자산[해야]정류장 / 돌산[놀아]정류장. Unlocks CC-002, CC-005, REL-001. |
+| ER-CC-002 | NOT_STARTED | **ER-CC-001 VERIFIED ✓** — prerequisite met | P0; Wave 2 — may now proceed |
 | ER-CC-003 | NOT_STARTED | Awaits ER-CC-001, ER-CC-002 | P0; Wave 4a |
 | ER-CC-004 | NOT_STARTED | Awaits ER-CC-001, ER-CC-002, ER-CC-003 | P1; Wave 4a |
 | ER-CC-005 | NOT_STARTED | Awaits ER-CC-001 | P1; Wave 2 |

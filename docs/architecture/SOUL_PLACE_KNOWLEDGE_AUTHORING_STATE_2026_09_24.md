@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25) — Post-Approval Operational Validation Scope V0.2 SAVED / READY — Operational Validation Execution Design SAVED / EXECUTION READY — **Wave 1 ER-OD-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-HY-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)**  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25) — Post-Approval Operational Validation Scope V0.2 SAVED / READY — Operational Validation Execution Design SAVED / EXECUTION READY — **Wave 1 ER-OD-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-HY-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-CC-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **WAVE_1_COMPLETE (2026-09-27)**  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -61,7 +61,56 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Next Wave 1 collection: ER-CC-001 (케이블카 방문자 경험 프로파일). Source role: OFFICIAL+WE. Stop condition: EXPERIENCE_PATTERN_SUFFICIENT. Pre-Wave 1 survey = PARTIAL_GAP (RB-01 yeosu.go.kr 데이터 부분 커버). 수집 전 RB-01 재평가 → 잔여 갭 식별 → OFFICIAL+WE primary 수집.**
+**WAVE_1_COMPLETE (2026-09-27). Next: Wave 2 collection — ER-OD-004 (Odongdo Parking). OFFICIAL primary. Stop condition: AUTHORITATIVE_FACT_SUFFICIENT + SEMI_STABLE live trigger design. Dependency: ER-OD-003 VERIFIED ✓. Gap: FULL_GAP. Collect: parking lot location, capacity, access approach, seasonal conditions. Exclude: vehicle prohibition (OD-003 DONE), walking/train (OD-003 DONE), general experience (OD-001 DONE).**
+
+**Wave 1 ER-CC-001 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)**
+
+```
+Wave 1 ER-CC-001 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
+  File: docs/research/SOUL_YEOSU_ER_CC_001_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+  Base: b76a686 (Wave 1 ER-OD-003)
+
+  ER: ER-CC-001 — 케이블카 스테이션 정체성
+  Stop Condition: AUTHORITATIVE_FACT_SUFFICIENT — ALL 12 CRITERIA PASS
+
+  Evidence Items: 6 total (3 reused RB-01 + 3 newly collected)
+  REUSED (RB-01):
+    EI-CC-001-A: Namu Wiki — 자산 측 해야정류장, 돌산 측 놀아정류장 (SUPPORTING)
+    EI-CC-001-B: oh-my-post.com — 자산정류장/해야, 돌산정류장/놀아 (NON_OFFICIAL_BLOG)
+    EI-CC-001-C: Derived entity distinction — 자산공원≠탑승장, 돌산공원≠탑승장 (DERIVED)
+  NEWLY COLLECTED (Wave 1 Phase B):
+    EI-CC-001-D: yeosucablecar.com (OFFICIAL, search-indexed) — 자산[해야]정류장 / 돌산[놀아]정류장; etymology 해야="station where sun rises"
+    EI-CC-001-E: 디지털여수문화대전 (OFFICIAL_PUBLIC) — "돌산공원 내 여수해상케이블카 돌산[놀아]정류장과 자산공원 내 자산[해야]정류장"
+    EI-CC-001-F: ko.wikipedia.org (SUPPORTING) — 자산공원=오동도 entrance side; 돌산공원=돌산도 island side
+
+  Station Identity Model Established:
+    자산정류장 [해야] — 자산공원 내/인접, mainland 측 (육지)
+    돌산정류장 [놀아] — 돌산공원 내/인접, island 측 (돌산도)
+    Combined official form: 자산[해야]정류장 / 돌산[놀아]정류장
+    Etymology: 해야 = "해가 뜨는 정류장" (official operator)
+
+  Naming Hierarchy:
+    Primary: 자산정류장 / 돌산정류장 (location-based, operator URL-level)
+    Sub-brand: 해야 / 놀아 (brand identifiers in bracket/parentheses notation)
+    NOT standalone primary: 해야정류장 / 놀아정류장 (sub-brand only form)
+
+  Conflict: CONFLICT-CC-001-01 (해야정류장 vs 자산정류장 primacy) — RESOLVED
+    Resolution: operator URL structure confirms 자산정류장 is primary
+
+  RB-01 Admissibility:
+    Fully reusable: 0 / Partially reusable: 3 (A, B, C) / Not admissible: 1 (INACCESSIBLE)
+    Components avoided from re-collection: locally-used names (already in RB-01)
+    Components newly collected: OFFICIAL naming confirmation + hierarchy resolution
+
+  Reuse-Cycle Assessment: EXISTING KNOWLEDGE → REUSE → GAP ISOLATION → GAP-ONLY COLLECTION — ACHIEVED
+
+  Dependencies Unlocked: ER-CC-002, ER-CC-005, ER-REL-001 (all Wave 2 — prerequisites met)
+  Gap Register Update: ER-CC-001 PARTIAL_GAP → CLOSED (VERIFIED_FOR_PREPARATION)
+  Collection Cycle Audit: A–V all PASS (22/22)
+  Controlled Collection Cycles Completed: 4
+  Wave 1: COMPLETE (all 4 ERs VERIFIED_FOR_PREPARATION)
+  DB / Schema / Runtime / Production: NO CHANGE
+```
 
 **Wave 1 ER-OD-003 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)**
 
