@@ -622,7 +622,7 @@ For each of 29 ERs: which assets cover it, and is existing coverage sufficient?
 | ER-OD-004 | P0 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 2, 2026-09-27)** | Stop conditions AUTHORITATIVE_FACT_SUFFICIENT + LIVE_TRIGGER_DESIGN_COMPLETE MET. EI-OD-004-A/B/C/D/E registered. Operator: 여수시도시관리공단; 237 spaces; always paid; camellia season congestion pattern established. See: `docs/research/SOUL_YEOSU_ER_OD_004_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-HY-001 | P0 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 1, 2026-09-27)** | Stop condition STRUCTURAL_FACT_WITH_WE_CORROBORATION MET. EI-HY-001-A/B/C/D/E. See: `docs/research/SOUL_YEOSU_ER_HY_001_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-HY-002 | P0 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 2, 2026-09-27)** | Stop condition EXPERIENCE_PATTERN_SUFFICIENT MET. 4 reused from HY-001-WE + 5 new items (EI-HY-002-A/B/C/D/E). Core burden pattern: steep sustained staircase → breathlessness/sweat; fitness-dependent variation preserved; summer heat multiplier; flat road ascent alternative; mobility-impaired exception. See: `docs/research/SOUL_YEOSU_ER_HY_002_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
-| ER-HY-006 | P0 | FULL GAP | No Hyangiram assets exist |
+| ER-HY-006 | P0 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 2, 2026-09-27)** | Stop condition EXPERIENCE_PATTERN_SUFFICIENT MET. 6 items registered (EI-HY-006-A/B/C/D/E/F). Standard visit: 45–90min typical; up to 120min leisurely. Ascent (stair) 10–20min. Dwell 30–60min. Descent 10–15min (inferred). H-3 judgment: 2-hour window SUFFICIENT. 2 conflicts resolved (SCOPE_DIFFERENCE + CONTEXT_CONDITIONAL). Geomosan + sunrise scope bounded. See: `docs/research/SOUL_YEOSU_ER_HY_006_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-CC-001 | P0 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 1, 2026-09-27)** | Stop condition AUTHORITATIVE_FACT_SUFFICIENT MET. Reused EI-CC-001-A/B/C (RB-01). New: EI-CC-001-D (yeosucablecar.com OFFICIAL, search-indexed), EI-CC-001-E (디지털여수문화대전 OFFICIAL_PUBLIC), EI-CC-001-F (ko.wikipedia.org SUPPORTING). Official naming: 자산[해야]정류장 / 돌산[놀아]정류장. CONFLICT-CC-001-01 resolved. See: `docs/research/SOUL_YEOSU_ER_CC_001_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-REL-001 | P0 | FULL GAP | Directional geography (cable car direction → physical exit location relationship) not addressed by any asset. Station identity (ER-CC-001 partial) is prerequisite context but distinct evidence. |
 | ER-REL-002 | P0 | FULL GAP | Exit-to-Odongdo connection not addressed |
@@ -740,7 +740,7 @@ All 29 ERs initialized with current status per V0.2 lifecycle.
 | ER-HY-003 | NOT_STARTED | Awaits ER-HY-001 | P1; Wave 2 |
 | ER-HY-004 | NOT_STARTED | N/A | P1; Wave 4a |
 | ER-HY-005 | NOT_STARTED | N/A | P1; Wave 4a |
-| ER-HY-006 | NOT_STARTED | N/A | P0; Wave 1 |
+| ER-HY-006 | **VERIFIED_FOR_PREPARATION** | N/A | P0; Wave 2 COMPLETE (2026-09-27) |
 | ER-HY-007 | NOT_STARTED | Awaits ER-HY-001 | P1; Wave 3/5 |
 | ER-HY-008 | NOT_STARTED | Awaits ER-HY-001 (Wave 4b gated) | P1; Wave 4b |
 | ER-HY-009 | NOT_STARTED | Awaits ER-HY-001 | P1; Wave 2 |
@@ -857,7 +857,7 @@ Wave 1 collects evidence for P0 ERs with no dependency blockers.
 | ER-OD-004 | **VERIFIED_FOR_PREPARATION** | Wave 2 COMPLETE (2026-09-27) — parking evidence established. EI-OD-004-A/B/C/D/E registered. |
 | ER-HY-001 | **VERIFIED_FOR_PREPARATION** | Wave 1 COMPLETE (2026-09-27) — physical access structure established. EI-HY-001-A/B/C/D/E registered. |
 | ER-HY-002 | **VERIFIED_FOR_PREPARATION** | Wave 2 COMPLETE (2026-09-27) — experiential burden pattern established. 4 reused + 5 new EI-HY-002-A/B/C/D/E registered. |
-| ER-HY-006 | NOT_STARTED | Collect from scratch — Hyangiram third P0 ER |
+| ER-HY-006 | **VERIFIED_FOR_PREPARATION** | Wave 2 COMPLETE (2026-09-27) — visit duration pattern established. EI-HY-006-A/B/C/D/E/F registered. |
 | ER-CC-001 | IN_COLLECTION | Gap completion — official site retry; alternate OFFICIAL source; LOCAL_OPERATOR if needed |
 | ER-REL-001 | NOT_STARTED | Collect directional geography (which cable car direction → which exit station → what geography) |
 
