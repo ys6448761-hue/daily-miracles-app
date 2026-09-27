@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-27T00:02:14.922Z",
+  "generated_at": "2026-09-27T00:38:05.859Z",
   "generator": "generate-manifest.js",
-  "total_count": 533,
+  "total_count": 534,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "active",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-27",
-      "checksum": "5f4cd98d"
+      "checksum": "0a4bb8fd"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -4836,6 +4836,23 @@
       "title": "SOUL Travel Intelligence MVP",
       "created_at": "2026-09-27",
       "checksum": "5919f7d5"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_PREPARED_KNOWLEDGE_",
+      "path": "docs/research/SOUL_YEOSU_PREPARED_KNOWLEDGE_3_PLACE_PILOT_PROTOCOL_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu Prepared Knowledge",
+      "created_at": "2026-09-27",
+      "checksum": "590941b3"
     },
     {
       "id": "DOC-SOUL_YEOSU_PREPARED_TRAVEL_KNO",

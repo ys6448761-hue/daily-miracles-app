@@ -61,7 +61,56 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Design Prepared Knowledge vs Prepared Context 3-Place Pilot Protocol V0.1 for Odongdo, Hyangiram, and Yeosu Maritime Cable Car, using reverse design from desired SOUL answers to required judgment, prepared knowledge, and evidence; do not yet collect new knowledge, execute the pilot, recruit participants, or create/promote any Candidate.**
+**Conduct an independent pre-execution review of Prepared Knowledge vs Prepared Context 3-Place Pilot Protocol V0.1, focusing on experimental fairness, anti-leakage, reverse-design validity, Integrity Gate, Preparation Boundary measurability, and whether the protocol can distinguish preparation benefit from merely shifted complexity; do not yet collect Yeosu knowledge or execute the pilot.**
+
+```
+Prepared Knowledge vs Prepared Context 3-Place Pilot Protocol V0.1: DESIGNED / PERSISTED (2026-09-27)
+  File: docs/research/SOUL_YEOSU_PREPARED_KNOWLEDGE_3_PLACE_PILOT_PROTOCOL_V0_1.md
+  Base: 0fe8052
+
+  Primary Research Question:
+    How far should Phoenix prepare knowledge in advance vs. assemble at runtime
+    while maintaining local-expert-level answer quality?
+  Working variable: Preparation Boundary (RESEARCH VARIABLE)
+
+  Models compared:
+    Model A: Prepared Knowledge — retrieval + runtime assembly
+    Model B: Prepared Context / Expert Anticipation — pre-activated context blocks
+
+  Experimental fairness: SAME EVIDENCE POOL / SAME USER CONTEXT / SAME AVAILABLE FACTS
+  Anti-Cheating Rule: B prepares decision ingredients only — not final answers
+  3-Place scope: 오동도 / 향일암 / 여수해상케이블카
+
+  9 Core Scenarios (design metadata only — no Yeosu facts filled):
+    O-1 Odongdo Basic / O-2 Odongdo Situation / O-3 Odongdo Relationship
+    H-1 Hyangiram Basic / H-2 Hyangiram Situation / H-3 Hyangiram Judgment
+    C-1 Cable Car Basic / C-2 Cable Car Situation / C-3 Cable Car Relationship
+
+  Multi-turn context continuity design: MT-1 (3-turn structure)
+  Reverse-design method: Desired Answer → Judgment → Prepared Knowledge → Evidence
+  Hidden Transfer: 2–4 items / freeze after preparation locked / external generation
+  Integrity Gate: FACTUAL_GROUNDING / EVIDENCE_BOUNDARY / CONTEXT_FIDELITY / LIVE_CORRECTNESS
+  ASK evaluation: UNNECESSARY / CONTEXT_REASK / MISSED_NECESSARY (independent)
+  Live Verify evaluation: REQUIRED / UNNECESSARY / MISSED / WRONG_SOURCE (independent)
+  Expert Anticipation Boundary: PREPARE BROADLY / SPEAK SELECTIVELY
+  Cost Model: Pre-runtime preparation cost vs Runtime assembly cost (separate)
+  Failure Taxonomy: EVIDENCE / PREPARATION / ROUTING / CONTEXT / VERIFICATION / JUDGMENT / EXPRESSION / ANTICIPATION_OVERREACH / MULTI_CAUSE
+  Evaluation order: Integrity → Usefulness → Runtime → Preparation → Transfer → Traceability
+  Result language: PROMISING / MIXED / NO_OBSERVED_ADVANTAGE / REQUIRES_REVISION
+
+  Self-review: 14 checks PASS / No corrections required
+  Actual Yeosu knowledge: NOT COLLECTED / Protocol is design-only
+  Pilot: NOT EXECUTED / No A/B scoring
+
+  Candidate Generated: NO / Architecture Decision: NONE
+  Participant Evidence: NONE / Blind MVP Test: NOT YET EXECUTED
+  BT Verdict: NOT ASSIGNED / Canonical Stimuli: FROZEN / UNCHANGED
+  Blind MVP participant recruitment: ON HOLD
+  place_knowledge migration: NOT APPROVED / HOLD
+  DB / Schema / Runtime / Production: NO CHANGE
+```
+
+**[PREVIOUS NEXT ACTION — Design Prepared Knowledge vs Prepared Context 3-Place Pilot Protocol V0.1]**
 
 ```
 Prepared Travel Knowledge Research Direction: OPENED (2026-09-27)
