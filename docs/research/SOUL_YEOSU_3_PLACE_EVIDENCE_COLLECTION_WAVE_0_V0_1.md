@@ -620,7 +620,7 @@ For each of 29 ERs: which assets cover it, and is existing coverage sufficient?
 | ER-OD-001 | P0 | FULL GAP | No Odongdo assets exist |
 | ER-OD-003 | P0 | FULL GAP | No Odongdo assets exist |
 | ER-OD-004 | P0 | FULL GAP | No Odongdo assets exist |
-| ER-HY-001 | P0 | FULL GAP | No Hyangiram assets exist |
+| ER-HY-001 | P0 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 1, 2026-09-27)** | Stop condition STRUCTURAL_FACT_WITH_WE_CORROBORATION MET. EI-HY-001-A/B/C/D/E. See: `docs/research/SOUL_YEOSU_ER_HY_001_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-HY-002 | P0 | FULL GAP | No Hyangiram assets exist |
 | ER-HY-006 | P0 | FULL GAP | No Hyangiram assets exist |
 | ER-CC-001 | P0 | PARTIAL GAP | Official confirmation required; OFFICIAL_PRIMARY SSL inaccessible; 2 SUPPORTING sources agree but insufficient for OFFICIAL confidence level |
@@ -735,7 +735,7 @@ All 29 ERs initialized with current status per V0.2 lifecycle.
 
 | ER | Initial Status | Dependency Met? | Note |
 |---|---|---|---|
-| ER-HY-001 | NOT_STARTED | N/A (no deps) | P0; Wave 1 |
+| ER-HY-001 | **VERIFIED_FOR_PREPARATION** | N/A (no deps) | P0; Wave 1 COMPLETE (2026-09-27) |
 | ER-HY-002 | NOT_STARTED | N/A | P0; Wave 1 |
 | ER-HY-003 | NOT_STARTED | Awaits ER-HY-001 | P1; Wave 2 |
 | ER-HY-004 | NOT_STARTED | N/A | P1; Wave 4a |
@@ -855,7 +855,7 @@ Wave 1 collects evidence for P0 ERs with no dependency blockers.
 | ER-OD-001 | NOT_STARTED | Collect from scratch — Odongdo basic identity (access point, official name, entity boundary) |
 | ER-OD-003 | NOT_STARTED | Collect from scratch — Odongdo access structure |
 | ER-OD-004 | NOT_STARTED | Collect from scratch — Odongdo operating information |
-| ER-HY-001 | NOT_STARTED | Collect from scratch — Hyangiram basic identity (access structure, official name) |
+| ER-HY-001 | **VERIFIED_FOR_PREPARATION** | Wave 1 COMPLETE (2026-09-27) — physical access structure established. EI-HY-001-A/B/C/D/E registered. |
 | ER-HY-002 | NOT_STARTED | Collect from scratch — Hyangiram second P0 ER |
 | ER-HY-006 | NOT_STARTED | Collect from scratch — Hyangiram third P0 ER |
 | ER-CC-001 | IN_COLLECTION | Gap completion — official site retry; alternate OFFICIAL source; LOCAL_OPERATOR if needed |

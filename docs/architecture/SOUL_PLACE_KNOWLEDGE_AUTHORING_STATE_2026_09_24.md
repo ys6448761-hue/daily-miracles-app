@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25) — Post-Approval Operational Validation Scope V0.2 SAVED / READY — **Operational Validation Execution Design SAVED / EXECUTION READY**  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25) — Post-Approval Operational Validation Scope V0.2 SAVED / READY — Operational Validation Execution Design SAVED / EXECUTION READY — **Wave 1 ER-HY-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)**  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -61,7 +61,42 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Begin Wave 1 Collection — First Unit: ER-HY-001 (향일암 물리적 접근 구조). Collect OFFICIAL source structural description (계단/암벽/암문/등반 경로) + WE corroboration. Stop Condition: STRUCTURAL_FACT_WITH_WE_CORROBORATION. Do NOT re-collect already-documented operational facts (시간/요금/주차/버스). Then continue with ER-HY-002, ER-HY-006 (gated on HY-001), and parallel: ER-OD-001, ER-OD-003, ER-OD-004, ER-CC-001 (전화 확인 061-664-7301).**
+**Next Wave 1 collection: ER-OD-001 (오동도 장소 성격 / 방문자 경험 프로파일). Source role: WORLD_EXPERIENCE (primary). Stop condition: EXPERIENCE_PATTERN_SUFFICIENT. Scope: 오동도 방문 경험의 분위기·규모·성격·특수성. 제외: 차량 접근(ER-OD-003), 운영 시간, Route Corpus. Provenance: 독립 WE 소스 복수 + URL/접근일 필수.**
+
+```
+Wave 1 ER-HY-001 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
+  File: docs/research/SOUL_YEOSU_ER_HY_001_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+  Base: eef19a8 (Pre-Wave 1 Survey)
+
+  ER: ER-HY-001 — 향일암 물리적 접근 구조
+  Stop Condition: STRUCTURAL_FACT_WITH_WE_CORROBORATION — ALL 10 CRITERIA PASS
+
+  Evidence Items Registered: 5
+    EI-HY-001-A: yeosu.go.kr/en — staircase approach (OFFICIAL, STRUCTURAL_FACT)
+    EI-HY-001-B: yeosu.go.kr/en + Daum article — rock gate passages + Haetalmun (OFFICIAL+MEDIA, STRUCTURAL_FACT)
+    EI-HY-001-C: yeosu.go.kr/en — route sequence parking→forest→gates→main hall (OFFICIAL, STRUCTURAL_FACT)
+    EI-HY-001-D: travel-stained.com — 7 passageways + fairly vertical stairs + child completed (WE, EXPERIENCE_PATTERN)
+    EI-HY-001-E: seoulsearching.net — shuffle sideways passages + alternative descent + families observed (WE, EXPERIENCE_PATTERN)
+
+  Key Structural Facts Established:
+    - Multi-segment steep staircase approach (begins at entrance, continues throughout)
+    - Haetalmun (해탈문): one-person width, bend at waist required — most constrained passage
+    - Second stone gate: smaller, forward-bend required
+    - 7 passage structures total (temple tradition + 2 independent WE sources)
+    - Route: parking lot → forested ascent → successive stone gates → Gwaneumjeon main hall
+    - Scope boundary: Geomosan summit trail is distinct from/beyond hermitage access
+
+  Negative/Exception Knowledge: alternative descent path exists (winding, less steep); children with adults can complete; summit trail is distinct and more demanding
+
+  Conflict Register: EXPERIENCE_VARIATION only (difficulty perception varies by fitness; structural facts consistent across all sources)
+
+  Reuse Available For: ER-HY-002 (context), ER-HY-003 (structural foundation), ER-HY-008 (prerequisite satisfied)
+  Audit: A–Q all PASS / 17 criteria verified
+
+  Gap Register Update: ER-HY-001 FULL_GAP → CLOSED (VERIFIED_FOR_PREPARATION)
+  Wave 0 Gap Register: updated (HY-001 row only)
+  DB / Schema / Runtime / Production: NO CHANGE
+```
 
 ```
 Pre-Wave 1 Existing Asset Survey: COMPLETE / NO_GAP_CHANGES (2026-09-27)
