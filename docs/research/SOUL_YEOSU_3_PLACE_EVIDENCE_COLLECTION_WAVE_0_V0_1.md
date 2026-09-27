@@ -553,7 +553,7 @@ For each of 29 ERs: which assets cover it, and is existing coverage sufficient?
 | ER-OD-003 | NONE | NOT_ADDRESSED |
 | ER-OD-004 | EI-OD-004-A/B/C/D/E | **VERIFIED_FOR_PREPARATION (Wave 2, 2026-09-27)** |
 | ER-OD-005 | NONE | NOT_ADDRESSED |
-| ER-OD-006 | NONE | NOT_ADDRESSED |
+| ER-OD-006 | EI-OD-006-A/B/C/D/E + NEG-OD-006-1 through 6 | **VERIFIED_FOR_PREPARATION (Wave 3, 2026-09-28)** |
 | ER-OD-007 | NONE | NOT_ADDRESSED |
 
 **Finding:** No existing assets exist for any Odongdo ER. All 7 Odongdo ERs require collection from scratch.
@@ -633,7 +633,7 @@ For each of 29 ERs: which assets cover it, and is existing coverage sufficient?
 | ER | Priority | Gap Type | Specific Gap |
 |---|---|---|---|
 | ER-OD-002 | P1 | FULL GAP | No Odongdo assets |
-| ER-OD-006 | P1 | FULL GAP | No Odongdo assets |
+| ER-OD-006 | P1 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 3, 2026-09-28)** | LIVE_BOUNDARY_SUFFICIENT MET. 11/11 PASS. 5 evidence items (EI-OD-006-A through E) + 6 NEG items. Island access STABLE (24hr/free). Train fare/schedule SEMI_STABLE. Fountain season SEMI_STABLE / daily VOLATILE. Lighthouse Monday closure SEMI_STABLE. Bloom pattern CONTEXTUAL / today VOLATILE. CONFLICT-OD-006-01 (train winter last departure 17:00 vs 17:30 SCHEDULE_VARIATION, resolved). See: `docs/research/SOUL_YEOSU_ER_OD_006_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-HY-003 | P1 | FULL GAP | No Hyangiram assets |
 | ER-HY-009 | P1 | FULL GAP | No Hyangiram assets |
 | ER-CC-002 | P0 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 2, 2026-09-27)** | Stop condition AUTHORITATIVE_FACT_SUFFICIENT MET. 15/15 PASS. 4 existing items A–D (PARTIALLY_REUSABLE, Hamel-specific). 8 new items E–L (MAP_ROUTE/OFFICIAL). 자산: 수정동 777-4, bus 2/68/76/333/555, walk 1.5 km, taxi. 돌산: 돌산로 3600-1, bus 100-series+999, taxi, bridge crossing mandatory. Elevator tower at 자산 confirmed. CONFLICT-CC-002-01 resolved (SCOPE_DIFFERENCE). See: `docs/research/SOUL_YEOSU_ER_CC_002_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
@@ -728,7 +728,7 @@ All 29 ERs initialized with current status per V0.2 lifecycle.
 | ER-OD-003 | NOT_STARTED | N/A (no deps) | P0; Wave 1 |
 | ER-OD-004 | **VERIFIED_FOR_PREPARATION** | N/A (no deps) | P0; Wave 2 COMPLETE (2026-09-27) |
 | ER-OD-005 | NOT_STARTED | Awaits ER-OD-001, ER-OD-003 | P1; Wave 3/4a |
-| ER-OD-006 | NOT_STARTED | Awaits ER-OD-001 | P1; Wave 2 |
+| ER-OD-006 | **VERIFIED_FOR_PREPARATION** | None (canonical Matrix: no deps; "Awaits ER-OD-001" was stale) | P1; Wave 3 COMPLETE (2026-09-28) |
 | ER-OD-007 | NOT_STARTED | N/A | P1; Wave 4a |
 
 ### Hyangiram

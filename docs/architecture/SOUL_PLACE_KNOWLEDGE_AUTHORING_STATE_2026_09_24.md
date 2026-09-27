@@ -61,7 +61,7 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Wave 3 ER-HY-007 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28). Controlled Collection Cycles Completed: 13. Wave 3 IN_PROGRESS (4 of 6 ERs complete: REL-002 ✓ + CC-003 ✓ + HY-003 [PS] + HY-007 ✓). ONE NEXT ACTION: OD-006 (P1, Odongdo Operating Hours / Seasonal Status Volatility Classification; no dependency; OFFICIAL primary; FULL_GAP; Stop Condition: LIVE_BOUNDARY_SUFFICIENT). DO NOT EXECUTE until authorized.**
+**Wave 3 ER-OD-006 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28). Controlled Collection Cycles Completed: 14. Wave 3 IN_PROGRESS (5 of 6 ERs complete: REL-002 ✓ + CC-003 ✓ + HY-003 [PS] + HY-007 ✓ + OD-006 ✓). ONE NEXT ACTION: CC-005 (P1, Cable Car Operating Status Volatility Classification; dependency CC-001 ✓; OFFICIAL/LOCAL_OPERATOR primary; FOUNDER secondary; FULL_GAP; Stop Condition: LIVE_BOUNDARY_SUFFICIENT; Method: OFFICIAL_WEB_REVIEW + LOCAL_OPERATOR_INQUIRY). DO NOT EXECUTE until authorized.**
 
 ```
 Wave 3 ER-REL-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
@@ -194,6 +194,32 @@ Wave 3 ER-HY-007 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28)
   Updated files: SOUL_YEOSU_ER_HY_007_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md (CREATED) | Wave 0 gap register (4 HY-007 rows) | Project State
   Controlled Collection Cycles: 12 → 13
   Wave 3 Status: IN_PROGRESS (REL-002 ✓ + CC-003 ✓ + HY-003 [PS] + HY-007 ✓; remaining: OD-006, CC-005)
+  DB / Schema / Runtime / Production: NO CHANGE
+```
+
+**Wave 3 ER-OD-006 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28)**
+
+```
+Wave 3 ER-OD-006 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28)
+  ER: ER-OD-006 — Odongdo Live / Volatility Boundary
+  Base: 898a6b0 (Wave 3 ER-HY-007)
+  Wave: 3 | Cycle: 14
+  Stop Condition: LIVE_BOUNDARY_SUFFICIENT — 11/11 PASS
+  Source Roles: OFFICIAL primary / LOCAL_OPERATOR secondary
+  Gap Transition: FULL_GAP → CLOSED
+  Evidence Items: EI-OD-006-A through E (5 items) + NEG-OD-006-1 through 6 (6 NEG items)
+  Reused: EI-OD-003-B/C (Dongbaek Train CONTEXT); OD-001/004 (CONTEXT_ONLY)
+  Knowledge Fields: 15 classified (STABLE: 7 / SEMI_STABLE: 5 / VOLATILE: 4 / CONTEXTUAL: 2)
+    STABLE: island access 24hr/연중무휴/free, walking route, vehicle restriction, train existence, fountain existence, lighthouse existence, no seasonal island closure
+    SEMI_STABLE: train fare, train seasonal schedule, train lunch break structure, fountain season (March–Oct), lighthouse Monday closure + hours
+    VOLATILE: train suspension now, fountain today, bloom today, extraordinary closure
+    CONTEXTUAL: camellia bloom pattern, peak congestion seasonal pattern
+  Live Boundary Table: per-field trigger/source/failure/fallback defined
+  CONFLICT registered: CONFLICT-OD-006-01 (Dongbaek Train winter last departure 17:00 vs 17:30 — SCHEDULE_VARIATION, resolved in favor of 17:00)
+  Stale-state correction: Wave 0 dep table "Awaits ER-OD-001" → canonical: None (corrected in Wave 0)
+  Updated files: SOUL_YEOSU_ER_OD_006_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md (CREATED) | Wave 0 gap register (3 OD-006 rows) | Project State
+  Controlled Collection Cycles: 13 → 14
+  Wave 3 Status: IN_PROGRESS (REL-002 ✓ + CC-003 ✓ + HY-003 [PS] + HY-007 ✓ + OD-006 ✓; remaining: CC-005)
   DB / Schema / Runtime / Production: NO CHANGE
 ```
 
