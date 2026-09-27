@@ -61,7 +61,7 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Wave 2 ER-REL-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27). Controlled Collection Cycles Completed: 9. WAVE_2_COMPLETE. Next: Wave 3 — first Wave 3 ER per Collection Plan V0.2. Wave 3 ERs: OD-001 (now VERIFIED ✓, unlock Wave 3 dependents), HY-003 (suitability judgment), OD-002 (duration), OD-003 (capacity/peak), CC-003 (vehicle parking), CC-005 (operating volatility). Founder must confirm which Wave 3 ER to prioritize next.**
+**Wave 3 Readiness Check COMPLETE (2026-09-27). Controlled Collection Cycles Completed: 9. WAVE_2_COMPLETE. Wave 3: READINESS_CONFIRMED — all 6 Wave 3 ERs dependencies verified (CC-003/HY-003/HY-007/REL-002/OD-006/CC-005 all READY). First Wave 3 ER selected: ER-REL-002 (Route/Connection from Each Cable Car Exit to Odongdo). Starting state: PARTIAL_GAP — EI-REL-001-C (자산→오동도 도보 5분) and EI-REL-001-E (돌산→오동도 거북선대교 택시 10~12분) are PARTIALLY_REUSABLE. Source: MAP_ROUTE primary / FOUNDER+WE secondary. Stop Condition: RELATIONSHIP_SUFFICIENT. DO NOT EXECUTE until authorized. Readiness artifact: docs/research/SOUL_YEOSU_WAVE_3_READINESS_CHECK_V0_1.md**
 
 **Wave 2 ER-REL-001 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)**
 
