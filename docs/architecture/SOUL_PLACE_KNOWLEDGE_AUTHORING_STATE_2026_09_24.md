@@ -61,7 +61,7 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Wave 3 ER-CC-003 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27). Controlled Collection Cycles Completed: 11. Wave 3 IN_PROGRESS (2 of 6 ERs complete: REL-002 ✓ + CC-003 ✓). ONE NEXT ACTION: HY-003 (P1, Elder/Mobility-Limited Access at 향일암; dependency HY-001 ✓ met; LOCAL_OPERATOR/FOUNDER primary; STRUCTURAL_FACT_WITH_WE_CORROBORATION stop condition). DO NOT EXECUTE until authorized.**
+**Wave 3 ER-HY-003 Collection COMPLETE / PROVISIONALLY_SUPPORTED (2026-09-28). Controlled Collection Cycles Completed: 12. Wave 3 IN_PROGRESS (3 of 6 ERs complete: REL-002 ✓ + CC-003 ✓ + HY-003 ✓). ONE NEXT ACTION: HY-007 (P1, Travel Time Evidence to Hyangiram; dependency HY-006 ✓ met; MAP_ROUTE primary; SEMI_STABLE; PARTIAL_GAP — 낭만버스1코스 bus leg available). DO NOT EXECUTE until authorized.**
 
 ```
 Wave 3 ER-REL-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
@@ -102,6 +102,50 @@ Wave 3 ER-REL-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
   Gap Register Update: ER-REL-002 PARTIAL_GAP → CLOSED (VERIFIED_FOR_PREPARATION)
   Controlled Collection Cycles: 9 → 10
   Wave 3 Status: IN_PROGRESS (REL-002 ✓; remaining: CC-003, HY-003, HY-007, OD-006, CC-005)
+  DB / Schema / Runtime / Production: NO CHANGE
+```
+
+**Wave 3 ER-HY-003 Collection: COMPLETE / PROVISIONALLY_SUPPORTED (2026-09-28)**
+
+```
+Wave 3 ER-HY-003 Collection: COMPLETE / PROVISIONALLY_SUPPORTED (2026-09-28)
+  File: docs/research/SOUL_YEOSU_ER_HY_003_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+  Base: 997ba01 (Wave 3 ER-CC-003)
+
+  ER: ER-HY-003 — Hyangiram Elder Mobility Friction
+  Stop Condition: EXPERIENCE_PATTERN_SUFFICIENT — PARTIAL (EP-3 partial; 2 of 4 items MEDIUM confidence)
+  ER Status: PROVISIONALLY_SUPPORTED (not VERIFIED — upgrade when EP-3 confirmed by direct elder descent account)
+
+  Source Roles: WORLD_EXPERIENCE primary / FOUNDER secondary
+  FOUNDER: NO_ASSETS_FOUND
+
+  Starting State: FULL_GAP (Wave 0 line 567: NOT_ADDRESSED)
+
+  Evidence Items:
+    EI-HY-003-A: comple.co.kr — "무릎 관절을 생각해야 하는 그룹은 살방살방 걸어 평길로" (HIGH, direct WE)
+    EI-HY-003-B: airial.travel — road route accessible but not all areas (HIGH, multi-WE aggregate)
+    EI-HY-003-C: TripAdvisor r957655598 — mother-in-law couldn't walk steep vantage point (MEDIUM, synthesized)
+    EI-HY-003-D: TripAdvisor (parents + wife) — completed via stair up / flat down (MEDIUM, synthesized)
+
+  Negative Items:
+    NEG-HY-003-1: FOUNDER NO_ASSETS_FOUND
+    NEG-HY-003-2: No direct elder stone-gate account
+    NEG-HY-003-3: Road route excludes stone gate passages entirely
+    NEG-HY-003-4: No explicit elder descent friction account (inferred via route behavior)
+
+  Key Pattern:
+    Mobility-concerned visitors demonstrably self-select flat road path (EI-A direct observation)
+    Flat road path: navigable but stone gate passages inaccessible (EI-B)
+    Elder failure case: walking-difficulty elder could not manage steep section (EI-C)
+    Elder completion case: parents completed with stair-up/flat-down strategy (EI-D)
+    Mobility threshold: stone gates require stair route; road route = abbreviated visit
+
+  Structural Context Reused: HY-001 path structure (CONTEXT) + HY-002-E official exception (CONTEXT)
+  Stability: STABLE (no live trigger)
+  CONFLICT registered: NONE
+  Gap Register Update: ER-HY-003 FULL_GAP → CLOSED (PROVISIONALLY_SUPPORTED)
+  Controlled Collection Cycles: 11 → 12
+  Wave 3 Status: IN_PROGRESS (REL-002 ✓ + CC-003 ✓ + HY-003 ✓; remaining: HY-007, OD-006, CC-005)
   DB / Schema / Runtime / Production: NO CHANGE
 ```
 

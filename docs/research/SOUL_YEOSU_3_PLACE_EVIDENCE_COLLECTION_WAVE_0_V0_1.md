@@ -564,7 +564,7 @@ For each of 29 ERs: which assets cover it, and is existing coverage sufficient?
 |---|---|---|
 | ER-HY-001 | NONE | NOT_ADDRESSED |
 | ER-HY-002 | NONE | NOT_ADDRESSED |
-| ER-HY-003 | NONE | NOT_ADDRESSED |
+| ER-HY-003 | EI-HY-003-A through D + NEG-HY-003-1/2/3/4 | FULL_GAP → CLOSED (PROVISIONALLY_SUPPORTED 2026-09-28) |
 | ER-HY-004 | NONE | NOT_ADDRESSED |
 | ER-HY-005 | NONE | NOT_ADDRESSED |
 | ER-HY-006 | NONE | NOT_ADDRESSED |
@@ -737,7 +737,7 @@ All 29 ERs initialized with current status per V0.2 lifecycle.
 |---|---|---|---|
 | ER-HY-001 | **VERIFIED_FOR_PREPARATION** | N/A (no deps) | P0; Wave 1 COMPLETE (2026-09-27) |
 | ER-HY-002 | **VERIFIED_FOR_PREPARATION** | N/A | P0; Wave 2 COMPLETE (2026-09-27) |
-| ER-HY-003 | NOT_STARTED | Awaits ER-HY-001 | P1; Wave 2 |
+| ER-HY-003 | **PROVISIONALLY_SUPPORTED** | ER-HY-001 ✓ ER-HY-002 ✓ | P0; Wave 3 Cycle 12 COMPLETE (2026-09-28) |
 | ER-HY-004 | NOT_STARTED | N/A | P1; Wave 4a |
 | ER-HY-005 | NOT_STARTED | N/A | P1; Wave 4a |
 | ER-HY-006 | **VERIFIED_FOR_PREPARATION** | N/A | P0; Wave 2 COMPLETE (2026-09-27) |
