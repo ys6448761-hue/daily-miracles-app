@@ -61,7 +61,35 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Conduct a pre-collection readiness review of Controlled Evidence Collection Plan V0.1 against all 29 Evidence Requirements, testing source-claim fit, dependency-aware collection order, provenance completeness, conflict handling, stop conditions, escalation rules, and protection against over-collection; do not yet collect actual Odongdo, Hyangiram, or Yeosu Maritime Cable Car evidence or execute the pilot.**
+**Produce Collection Plan V0.2 incorporating all five MAJOR corrections from Readiness Review V0.1: (F1) Blocked-Dependency Propagation rule, (F2) Intra-Wave-4 dependency order enforcement, (F3) SEMI_STABLE live trigger design protocol for nine requirements, (F4) ER-HY-001 composite stop condition requiring WE corroboration, (F5) Founder Review Output Constraint prohibiting pre-written SOUL answer text; and apply all thirteen MINOR corrections; preserve Collection Plan V0.1 unchanged; do not yet collect actual Odongdo, Hyangiram, or Yeosu Maritime Cable Car evidence.**
+
+```
+Readiness Review V0.1: COMPLETE / READY_WITH_CORRECTIONS (2026-09-27)
+  File: docs/research/SOUL_YEOSU_3_PLACE_EVIDENCE_COLLECTION_READINESS_REVIEW_V0_1.md
+  Starting HEAD: c5701d5
+
+  Verdict: READY_WITH_CORRECTIONS
+  MAJOR Findings: 5 (F1–F5)
+    F1: Blocked-Dependency Propagation — no rule for downstream ERs when prerequisite BLOCKED
+    F2: Intra-Wave-4 Dependency Order Not Enforced — REL-003→OD-002; REL-004→REL-003; REL-006→REL-005
+    F3: SEMI_STABLE Live Trigger Design Gap — 9 requirements (OD-003, OD-004, CC-002, CC-003,
+        HY-004, HY-005, HY-007, REL-003, HY-009) have Matrix live triggers with no collection design
+    F4: ER-HY-001 Stop Condition Mismatch — Matrix requires WE corroboration; Plan assigns
+        AUTHORITATIVE_FACT_SUFFICIENT only; premature closure risk
+    F5: Judgment Contamination in Founder Synthesis — no rule prevents Founder review from
+        producing pre-written SOUL answer text during HY-008, REL-005, REL-006 collection
+  MINOR Findings: 13 (F6–F18) — details in Readiness Review V0.1 document
+
+  Collection Plan V0.1: PRESERVED UNCHANGED
+  Evidence Requirement Matrix V0.1: PRESERVED UNCHANGED
+  Protocol V0.2: PRESERVED UNCHANGED
+  Actual Evidence Collection: NOT STARTED
+  All 29 Evidence Slots: NOT_COLLECTED
+  Pilot: NOT EXECUTED
+  DB / Schema / Runtime / Production: NO CHANGE
+```
+
+**[PREVIOUS NEXT ACTION — Conduct a pre-collection readiness review of Controlled Evidence Collection Plan V0.1]**
 
 ```
 Controlled Evidence Collection Plan V0.1: DESIGNED / PERSISTED (2026-09-27)

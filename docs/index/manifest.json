@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-27T01:44:17.597Z",
+  "generated_at": "2026-09-27T02:26:08.126Z",
   "generator": "generate-manifest.js",
-  "total_count": 537,
+  "total_count": 538,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "active",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-27",
-      "checksum": "22e62a95"
+      "checksum": "9357f0b8"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -4853,6 +4853,23 @@
       "title": "SOUL Yeosu 3-Place",
       "created_at": "2026-09-27",
       "checksum": "a9f2f948"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_3_PLACE_EVIDENCE_CO",
+      "path": "docs/research/SOUL_YEOSU_3_PLACE_EVIDENCE_COLLECTION_READINESS_REVIEW_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu 3-Place",
+      "created_at": "2026-09-27",
+      "checksum": "451bd5e5"
     },
     {
       "id": "DOC-SOUL_YEOSU_3_PLACE_EVIDENCE_RE",
