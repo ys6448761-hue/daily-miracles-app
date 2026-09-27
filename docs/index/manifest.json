@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-27T03:15:09.080Z",
+  "generated_at": "2026-09-27T03:57:57.634Z",
   "generator": "generate-manifest.js",
-  "total_count": 540,
+  "total_count": 541,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "active",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-27",
-      "checksum": "39afe0ee"
+      "checksum": "0c45727f"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -4972,6 +4972,24 @@
       "title": "SOUL Yeosu Prepared Travel Knowledge",
       "created_at": "2026-09-27",
       "checksum": "d58057bb"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_PRE_WAVE_1_EXISTING",
+      "path": "docs/research/SOUL_YEOSU_PRE_WAVE_1_EXISTING_ASSET_SURVEY_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook",
+        "가격"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "SOUL Yeosu — Pre-Wave 1 Existing Asset Survey V0.1",
+      "created_at": "2026-09-27",
+      "checksum": "542f7499"
     },
     {
       "id": "DOC-TRAVELER_PLAN_CHANGE_BLIND_EXT",

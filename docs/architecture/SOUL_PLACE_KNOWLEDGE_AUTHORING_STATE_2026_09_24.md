@@ -61,7 +61,38 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Execute pre-Wave 1 batch file asset survey (YEOSU_2026_VERIFICATION_BATCH_01~06 + YEOSU_ROUTE_CORPUS + YEOSU_TIME_KNOWLEDGE + YEOSU_TRAVEL_TIME_MATRIX) to check for existing evidence relevant to Wave 1 ERs before beginning Wave 1 collection. Then begin Wave 1 collection for: ER-OD-001, ER-OD-003, ER-OD-004, ER-HY-001, ER-HY-002, ER-HY-006 (full gap — collect from scratch), ER-CC-001 (partial gap — official source completion attempt), ER-REL-001 (full gap — directional geography via MAP_ROUTE). Collection must follow V0.2 provenance schema and stop conditions.**
+**Begin Wave 1 Collection — First Unit: ER-HY-001 (향일암 물리적 접근 구조). Collect OFFICIAL source structural description (계단/암벽/암문/등반 경로) + WE corroboration. Stop Condition: STRUCTURAL_FACT_WITH_WE_CORROBORATION. Do NOT re-collect already-documented operational facts (시간/요금/주차/버스). Then continue with ER-HY-002, ER-HY-006 (gated on HY-001), and parallel: ER-OD-001, ER-OD-003, ER-OD-004, ER-CC-001 (전화 확인 061-664-7301).**
+
+```
+Pre-Wave 1 Existing Asset Survey: COMPLETE / NO_GAP_CHANGES (2026-09-27)
+  File: docs/research/SOUL_YEOSU_PRE_WAVE_1_EXISTING_ASSET_SURVEY_V0_1.md
+  Base: ba478a5 (Wave 0 완료)
+
+  Survey Coverage: 10개 파일 전수 조사 (BATCH_01~06, ROUTE_CORPUS, TIME_MATRIX, ENTITY_MANIFEST, TIME_KNOWLEDGE)
+
+  Per-ER Outcome:
+    ER-OD-001: NO_RELEVANT_EXISTING_CLAIM — 오동도 Route 출현 10회 모두 CONTEXT_ONLY
+    ER-OD-003: SECONDARY_CLAIM_ONLY — R040(tourtoctoc 2023) "동백열차" 언급, 갭 유형 변경 불가
+    ER-HY-001: CONTEXT_ONLY_CONFIRMED — 운영 정보(시간/요금/버스) OFFICIAL 확보; 물리 구조 없음
+    ER-CC-001: NO_NEW_OFFICIAL_SOURCE — Time Matrix 탑승장명 = ROUTE_SOURCE_DERIVED (OFFICIAL 아님)
+
+  Gap Register: Wave 0 대비 변경 없음
+    ER-OD-001: FULL_GAP (unchanged)
+    ER-OD-003: FULL_GAP (unchanged; R040 corroboration candidate 기록됨)
+    ER-HY-001: FULL_GAP (unchanged; operational facts already documented)
+    ER-CC-001: PARTIAL_GAP (unchanged)
+
+  Key Reuse Opportunities Identified:
+    향일암 운영시간/요금/버스 → HY-005/HY-004/HY-006 수집 시 재사용 (신규 수집 불필요)
+    R040 "동백열차" → ER-OD-003 Wave 1 코로보레이션 후보
+    061-664-7301 → ER-CC-001 Wave 1 전화 확인 경로
+
+  Over-collection Warning:
+    향일암 운영 정보(Batch 01 OFFICIAL 확보) Wave 1에서 재수집 금지
+
+  신규 Yeosu 증거 수집: 없음
+  DB / Schema / Runtime / Production: NO CHANGE
+```
 
 ```
 Evidence Collection Wave 0: COMPLETE / WAVE_0_PASS (2026-09-27)
