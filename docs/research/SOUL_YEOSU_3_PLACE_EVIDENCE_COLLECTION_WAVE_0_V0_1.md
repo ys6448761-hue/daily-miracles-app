@@ -568,7 +568,7 @@ For each of 29 ERs: which assets cover it, and is existing coverage sufficient?
 | ER-HY-004 | NONE | NOT_ADDRESSED |
 | ER-HY-005 | NONE | NOT_ADDRESSED |
 | ER-HY-006 | NONE | NOT_ADDRESSED |
-| ER-HY-007 | NONE | NOT_ADDRESSED |
+| ER-HY-007 | EI-HY-007-A through E (5 items: bus schedule, car MAP_ROUTE, official route confirmation, last-mile walk, 낭만버스 leg reused) + 6 NEG items | PARTIAL_GAP → CLOSED (VERIFIED_FOR_PREPARATION 2026-09-28) |
 | ER-HY-008 | NONE | NOT_ADDRESSED |
 | ER-HY-009 | NONE | NOT_ADDRESSED |
 
@@ -644,7 +644,7 @@ For each of 29 ERs: which assets cover it, and is existing coverage sufficient?
 | ER | Priority | Gap Type | Specific Gap |
 |---|---|---|---|
 | ER-OD-005 | P1 | FULL GAP | No Odongdo assets |
-| ER-HY-007 | P1 | FULL GAP | No Hyangiram assets |
+| ER-HY-007 | P0 | CLOSED (VERIFIED_FOR_PREPARATION 2026-09-28) | Car ~35-40min + Bus ~1h-1h28m + last-mile 11min walk established; RELATIONSHIP_SUFFICIENT PASS |
 | ER-HY-008 | P1 | FULL GAP | No Hyangiram assets |
 | ER-REL-003 | P1 | FULL GAP | No combined time estimate evidence |
 | ER-REL-004 | P1 | FULL GAP | No sequence friction evidence |
@@ -674,7 +674,7 @@ For each of 29 ERs: which assets cover it, and is existing coverage sufficient?
 | ER | Priority | Gap Type | Specific Gap |
 |---|---|---|---|
 | ER-OD-005 | P1 | FULL GAP (also Wave 3) | No Odongdo assets |
-| ER-HY-007 | P1 | FULL GAP | No Hyangiram assets |
+| ER-HY-007 | P0 | CLOSED (VERIFIED_FOR_PREPARATION 2026-09-28) | Collected in Wave 3 cycle 13. Wave 5 entry is stale (canonical: Wave 3 only per Plan). |
 
 ### Deferred
 
@@ -741,7 +741,7 @@ All 29 ERs initialized with current status per V0.2 lifecycle.
 | ER-HY-004 | NOT_STARTED | N/A | P1; Wave 4a |
 | ER-HY-005 | NOT_STARTED | N/A | P1; Wave 4a |
 | ER-HY-006 | **VERIFIED_FOR_PREPARATION** | N/A | P0; Wave 2 COMPLETE (2026-09-27) |
-| ER-HY-007 | NOT_STARTED | Awaits ER-HY-001 | P1; Wave 3/5 |
+| ER-HY-007 | **VERIFIED_FOR_PREPARATION** | N/A (dependency was ER-HY-006 per canonical Matrix; stale entry corrected) | P0; Wave 3 COMPLETE (2026-09-28) |
 | ER-HY-008 | NOT_STARTED | Awaits ER-HY-001 (Wave 4b gated) | P1; Wave 4b |
 | ER-HY-009 | NOT_STARTED | Awaits ER-HY-001 | P1; Wave 2 |
 

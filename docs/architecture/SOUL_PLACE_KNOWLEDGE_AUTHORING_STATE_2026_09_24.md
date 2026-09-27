@@ -61,7 +61,7 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Wave 3 ER-HY-003 Collection COMPLETE / PROVISIONALLY_SUPPORTED (2026-09-28). Controlled Collection Cycles Completed: 12. Wave 3 IN_PROGRESS (3 of 6 ERs complete: REL-002 ✓ + CC-003 ✓ + HY-003 ✓). ONE NEXT ACTION: HY-007 (P1, Travel Time Evidence to Hyangiram; dependency HY-006 ✓ met; MAP_ROUTE primary; SEMI_STABLE; PARTIAL_GAP — 낭만버스1코스 bus leg available). DO NOT EXECUTE until authorized.**
+**Wave 3 ER-HY-007 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28). Controlled Collection Cycles Completed: 13. Wave 3 IN_PROGRESS (4 of 6 ERs complete: REL-002 ✓ + CC-003 ✓ + HY-003 [PS] + HY-007 ✓). ONE NEXT ACTION: OD-006 (P1, Odongdo Operating Hours / Seasonal Status Volatility Classification; no dependency; OFFICIAL primary; FULL_GAP; Stop Condition: LIVE_BOUNDARY_SUFFICIENT). DO NOT EXECUTE until authorized.**
 
 ```
 Wave 3 ER-REL-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
@@ -146,6 +146,54 @@ Wave 3 ER-HY-003 Collection: COMPLETE / PROVISIONALLY_SUPPORTED (2026-09-28)
   Gap Register Update: ER-HY-003 FULL_GAP → CLOSED (PROVISIONALLY_SUPPORTED)
   Controlled Collection Cycles: 11 → 12
   Wave 3 Status: IN_PROGRESS (REL-002 ✓ + CC-003 ✓ + HY-003 ✓; remaining: HY-007, OD-006, CC-005)
+  DB / Schema / Runtime / Production: NO CHANGE
+```
+
+**Wave 3 ER-HY-007 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28)**
+
+```
+Wave 3 ER-HY-007 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28)
+  File: docs/research/SOUL_YEOSU_ER_HY_007_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+  Base: 4067e23 (Wave 3 ER-HY-003)
+
+  ER: ER-HY-007 — Travel Time Evidence to Hyangiram
+  Stop Condition: RELATIONSHIP_SUFFICIENT — ALL 13 ITEMS PASS
+  ER Status: VERIFIED_FOR_PREPARATION
+
+  Source Roles: MAP_ROUTE primary / FOUNDER secondary (NO_ASSETS_FOUND)
+  Starting State: PARTIAL_GAP (낭만버스 leg 전남해양수산과학관→향일암 25min PARTIALLY_REUSABLE)
+
+  Evidence Items:
+    EI-HY-007-A: Bus 111번 여수엑스포역→향일암(임포): ~1h-1h28m; 30-80분 배차 (SCHEDULE_DERIVED + WE)
+    EI-HY-007-B: Car/Taxi 여수→향일암: ~36min, 32.6km via 돌산대교 (MAP_ROUTE_ESTIMATE, rome2rio)
+    EI-HY-007-C: Official bus route structure confirmed 111/111-1/116 (OFFICIAL, yeosu.go.kr)
+    EI-HY-007-D: Last-mile 임포 정류장→향일암 매표소: ~11분 도보 (WORLD_EXPERIENCE, walkview)
+    EI-HY-007-E: 낭만버스1코스 전남해양수산과학관→향일암: 25분 (ROUTE_SOURCE, REUSED)
+
+  Negative Items: 6 (NEG-HY-007-1 through 6)
+    NEG-1: 낭만버스1코스 is TOUR format — NOT point-to-point transit; cumulative ~2h+ from 엑스포역
+    NEG-2: Bus total = ~1h11m-1h39m door-to-entrance (bus + 11min last-mile walk)
+    NEG-3: Car ~36min does NOT include parking search or hermitage ascent (HY-001 scope)
+    NEG-4: HY-006 visit duration NOT combined with HY-007 (HY-008 synthesis scope)
+    NEG-5: Bus frequency (30-80분 배차) adds 0-80min planning buffer
+    NEG-6: Peak/holiday traffic unquantified; potentially adds 15-30+ min
+
+  Stale-State Corrections Applied:
+    Project State P1 → Matrix P0 (canonical)
+    Wave 0 dep "Awaits HY-001" → Matrix ER-HY-006 (canonical)
+    Readiness Check AUTHORITATIVE_FACT_SUFFICIENT → Plan RELATIONSHIP_SUFFICIENT (canonical)
+    Wave 0 dual Wave 3/5 entry → Wave 3 only (canonical)
+
+  Normalized Routes:
+    Route 1: 여수엑스포역→향일암 BUS: ~1h11m-1h39m (bus + walk)
+    Route 2: 여수 시내→향일암 CAR/TAXI: ~35-40min normal / +15-30min peak
+    Route 3: 전남해양수산과학관→향일암 TOUR_BUS: 25min (CONTEXT leg only)
+
+  Stability: SEMI_STABLE (route structure STABLE; timetable VOLATILE; traffic CONTEXTUAL)
+  CONFLICT registered: CONFLICT-HY-007-01 ESTIMATE_VARIATION on bus time (RESOLVED)
+  Updated files: SOUL_YEOSU_ER_HY_007_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md (CREATED) | Wave 0 gap register (4 HY-007 rows) | Project State
+  Controlled Collection Cycles: 12 → 13
+  Wave 3 Status: IN_PROGRESS (REL-002 ✓ + CC-003 ✓ + HY-003 [PS] + HY-007 ✓; remaining: OD-006, CC-005)
   DB / Schema / Runtime / Production: NO CHANGE
 ```
 
