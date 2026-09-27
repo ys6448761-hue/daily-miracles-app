@@ -636,7 +636,7 @@ For each of 29 ERs: which assets cover it, and is existing coverage sufficient?
 | ER-OD-006 | P1 | FULL GAP | No Odongdo assets |
 | ER-HY-003 | P1 | FULL GAP | No Hyangiram assets |
 | ER-HY-009 | P1 | FULL GAP | No Hyangiram assets |
-| ER-CC-002 | P0 | PARTIAL GAP | General per-station access structure (MAP_ROUTE/OFFICIAL level) missing. Existing evidence covers Hamel→자산 side (FOUNDER_LOCAL, one approach direction only). 돌산 side general access not covered. |
+| ER-CC-002 | P0 | **CLOSED — VERIFIED_FOR_PREPARATION (Wave 2, 2026-09-27)** | Stop condition AUTHORITATIVE_FACT_SUFFICIENT MET. 15/15 PASS. 4 existing items A–D (PARTIALLY_REUSABLE, Hamel-specific). 8 new items E–L (MAP_ROUTE/OFFICIAL). 자산: 수정동 777-4, bus 2/68/76/333/555, walk 1.5 km, taxi. 돌산: 돌산로 3600-1, bus 100-series+999, taxi, bridge crossing mandatory. Elevator tower at 자산 confirmed. CONFLICT-CC-002-01 resolved (SCOPE_DIFFERENCE). See: `docs/research/SOUL_YEOSU_ER_CC_002_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-CC-005 | P1 | FULL GAP | Operating volatility classification not established. WE confirms volatility factors exist (weather, wind) but no formal classification from OFFICIAL or LOCAL_OPERATOR source. |
 
 ### Wave 3 ERs

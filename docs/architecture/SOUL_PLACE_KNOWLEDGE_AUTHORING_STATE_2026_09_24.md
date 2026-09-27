@@ -2,7 +2,7 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25) — Post-Approval Operational Validation Scope V0.2 SAVED / READY — Operational Validation Execution Design SAVED / EXECUTION READY — **Wave 1 ER-OD-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-HY-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-CC-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **WAVE_1_COMPLETE (2026-09-27)** — **Wave 2 ER-OD-004 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-HY-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-HY-006 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 IN_PROGRESS / Cycles Completed: 7 / Next: ER-CC-002 or ER-REL-001**  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25) — Post-Approval Operational Validation Scope V0.2 SAVED / READY — Operational Validation Execution Design SAVED / EXECUTION READY — **Wave 1 ER-OD-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-HY-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-CC-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **WAVE_1_COMPLETE (2026-09-27)** — **Wave 2 ER-OD-004 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-HY-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-HY-006 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-CC-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 IN_PROGRESS / Cycles Completed: 8 / Next: ER-REL-001 (FULL GAP, Wave 2, dependency CC-001 ✓)**  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
@@ -61,7 +61,51 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Wave 2 ER-HY-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27). Controlled Collection Cycles Completed: 6. Wave 2 IN_PROGRESS (3 remaining: ER-CC-002, ER-REL-001, ER-HY-006). Next: ER-HY-006 — Hyangiram Visit Duration. WORLD_EXPERIENCE primary; FOUNDER secondary. Stop condition: EXPERIENCE_PATTERN_SUFFICIENT. Dependency: ER-HY-001 VERIFIED ✓. Gap: FULL_GAP. Collect: how long a typical Hyangiram visit takes — approach, time at top, descent; whether a 2-hour window works. Exclude: admission/hours (BATCH_01 done), transport to Hyangiram (other ERs), experiential burden (HY-002 done).**
+**Wave 2 ER-CC-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27). Controlled Collection Cycles Completed: 8. Wave 2 IN_PROGRESS (1 remaining: ER-REL-001). Next: ER-REL-001 — Directional Geography. MAP_ROUTE / OFFICIAL primary; FOUNDER secondary. Stop condition: AUTHORITATIVE_FACT_SUFFICIENT. Dependency: CC-001 VERIFIED ✓. Gap: FULL_GAP. Collect: which cable car direction corresponds to which physical exit station, and how this relates to 오동도 access (C-3, O-3 scenarios).**
+
+**Wave 2 ER-CC-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)**
+
+```
+Wave 2 ER-CC-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)
+  File: docs/research/SOUL_YEOSU_ER_CC_002_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+  Base: 7c00202 (Wave 2 ER-HY-006)
+
+  ER: ER-CC-002 — 케이블카 정류장별 접근 구조
+  Stop Condition: AUTHORITATIVE_FACT_SUFFICIENT — ALL 15 CRITERIA PASS
+
+  Evidence Items: 12 total (4 existing PARTIALLY_REUSABLE RB-03/Founder + 8 newly collected MAP_ROUTE/OFFICIAL)
+  EXISTING (RB-03/Founder, PARTIALLY_REUSABLE — Hamel-specific approach):
+    EI-CC-002-A: 자산 차량 (하멜등대→자산 1~2분)
+    EI-CC-002-B: 자산 도보 (하멜등대→자산 5~10분, 평지)
+    EI-CC-002-C: 돌산 차량 (하멜등대→돌산 5~10분)
+    EI-CC-002-D: 돌산 도보 (하멜등대→돌산 20~30분)
+  NEWLY COLLECTED (MAP_ROUTE / OFFICIAL):
+    EI-CC-002-E: 자산 위치 (수정동 777-4; 여수엑스포역에서 1.5km) — OFFICIAL
+    EI-CC-002-F: 자산 버스 (2·68·76·333·555번, 5~10분, ₩1,400~1,500) — MAP_ROUTE
+    EI-CC-002-G: 자산 도보 (엑스포역→자산 1.5km/15~20분, 해안 평지) — MAP_ROUTE
+    EI-CC-002-H: 자산 택시 (5~7분, ₩5,000~7,000) — MAP_ROUTE
+    EI-CC-002-I: 자산 구조적 접근 (엘리베이터 타워, 무료, 09:00~22:00; 목조계단 대안 가파름) — OFFICIAL_PUBLIC
+    EI-CC-002-J: 돌산 위치 (돌산읍 돌산로 3600-1, 돌산공원; 엑스포역에서 약 10km, 거북선대교 경유) — OFFICIAL
+    EI-CC-002-K: 돌산 버스 (100·102·103·105·106·109·111·112·113·114·115·116·999번 등 돌산도 방면 다수) — OFFICIAL_PUBLIC
+    EI-CC-002-L: 돌산 택시 (10~12분, ₩8,000~10,000) — MAP_ROUTE
+
+  Key Access Asymmetry:
+    자산정류장: 도보/버스/택시 모두 실용적 (엑스포역에서 1.5km)
+    돌산정류장: 버스·택시 필요, 거북선대교 경유 필수 (엑스포역에서 10km)
+
+  Conflict: CONFLICT-CC-002-01 (수정동 332-55 vs 수정동 777-4) — SCOPE_DIFFERENCE_RESOLVED (다른 건물, 같은 구내)
+  Source Role Corrections: NONE (계약과 수집이 일치)
+
+  SEMI_STABLE Live Trigger:
+    안정 코어: 주소·버스 노선번호·도보거리·엘리베이터 존재·다리 경유 필수성
+    변동: 버스 시간표·요금·공사 정보
+    트리거 이벤트: 거북선대교 공사/폐쇄 / 자산 접근로 공사 / 버스 노선 개편 / 엘리베이터 운영 변경
+
+  Dependencies Unlocked: ER-CC-003 (CC-001+CC-002 완료), ER-CX-001 requires CC-002 ✓
+  Gap Register Update: ER-CC-002 PARTIAL_GAP → CLOSED (VERIFIED_FOR_PREPARATION)
+  Controlled Collection Cycles: 7 → 8
+  DB / Schema / Runtime / Production: NO CHANGE
+```
 
 **Wave 1 ER-CC-001 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)**
 
