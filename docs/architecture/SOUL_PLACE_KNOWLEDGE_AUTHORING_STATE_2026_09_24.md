@@ -77,7 +77,30 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 **[SUPERSEDED] PREVIOUS ONE NEXT ACTION (2026-09-28 — post EP-A V0.1): Execute DR-B — Facilitator Dry Run V0.1. EP_A_STATUS: READY_FOR_DR_B. DR-B scope: facilitator readiness / leakage check / counterbalancing verification / stimulus display / rating form navigability / MT-1 flow / invalid session procedure / H-2 boundary enforcement / timing calibration / end-to-end rehearsal with internal stand-in. Do NOT recruit participants. Do NOT run HBT. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
 
-**CURRENT ONE NEXT ACTION (2026-09-28 — post DR-B V0.1): Design participant recruitment protocol V0.1 — define recruitment channels, screening procedure, scheduling approach, and consent framework. Founder decision required before any actual participant contact. DR_B_STATUS: READY_FOR_RECRUITMENT. RECRUITMENT_READINESS: READY. 7 MINOR EP-A clarifications recommended before first session (presentation format / 3 clarification replies / single-item completeness / mid-session break / MT-1 incomplete / ASSIGN_ERR severity). 0 BLOCKING / 0 MAJOR issues. HBT Executed: FALSE. Participant Evidence: NONE. BT Verdict: NOT_ASSIGNED. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
+**[SUPERSEDED] PREVIOUS ONE NEXT ACTION (2026-09-28 — post DR-B V0.1): Design participant recruitment protocol V0.1 — define recruitment channels, screening procedure, scheduling approach, and consent framework. Founder decision required before any actual participant contact. DR_B_STATUS: READY_FOR_RECRUITMENT. RECRUITMENT_READINESS: READY. 7 MINOR EP-A clarifications recommended before first session (presentation format / 3 clarification replies / single-item completeness / mid-session break / MT-1 incomplete / ASSIGN_ERR severity). 0 BLOCKING / 0 MAJOR issues. HBT Executed: FALSE. Participant Evidence: NONE. BT Verdict: NOT_ASSIGNED. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
+
+**CURRENT ONE NEXT ACTION (2026-09-28 — post Recruitment Protocol V0.1): Founder review and Go-No-Go decision for participant contact — including resolution of: (1) compensation policy (REQUIRES_FOUNDER_DECISION), (2) all 7 DR-B MINOR PRE_SESSION_BLOCKER issues (Session Addendum creation before first real session), (3) explicit participant contact authorization (FOUNDER_PARTICIPANT_CONTACT_DECISION: NOT_REQUESTED → GO). RECRUITMENT_PROTOCOL_STATUS: READY_FOR_FOUNDER_CONTACT_DECISION. No participants contacted. HBT Executed: FALSE. Participant Evidence: NONE. BT Verdict: NOT_ASSIGNED. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
+
+**Participant Recruitment Protocol V0.1 (2026-09-28)**
+
+```
+BTD-A: CREATED / BTD_A_DESIGN_STATUS: READY_FOR_EP_A (preserved)
+EP-A: CREATED / EP_A_STATUS: READY_FOR_DR_B (preserved)
+DR-B: COMPLETED / DR_B_STATUS: READY_FOR_RECRUITMENT (preserved)
+Recruitment_Protocol: CREATED
+RECRUITMENT_PROTOCOL_STATUS: READY_FOR_FOUNDER_CONTACT_DECISION
+FOUNDER_PARTICIPANT_CONTACT_DECISION: NOT_REQUESTED
+COMPENSATION_DECISION: REQUIRES_FOUNDER_DECISION
+PRE_CONTACT_BLOCKERS: 0
+PRE_SESSION_BLOCKERS: 7 (DR-B-M-001 through DR-B-M-007 — all dispositioned, resolved before first session)
+HBT Executed: FALSE
+Participant Evidence: NONE
+BT Verdict: NOT_ASSIGNED
+HY-003: PROVISIONALLY_SUPPORTED (unchanged)
+HY-008: HARD_BLOCKED + TERMINAL_FOR_CURRENT_COLLECTION_PHASE (unchanged)
+Controlled Collection Cycles: 25 (unchanged)
+DB / Schema / Runtime / Production: NO CHANGE
+```
 
 **DR-B Facilitator Dry Run V0.1 (2026-09-28)**
 

@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-28T04:40:46.324Z",
+  "generated_at": "2026-09-28T04:50:47.839Z",
   "generator": "generate-manifest.js",
-  "total_count": 590,
+  "total_count": 591,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -940,7 +940,7 @@
       "status": "superseded",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-28",
-      "checksum": "509f5d36"
+      "checksum": "69c1ad2b"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -5651,6 +5651,23 @@
       "title": "SOUL Yeosu — Human Blind Test Founder Go/No-Go Decision V0.1",
       "created_at": "2026-09-28",
       "checksum": "bf2e8d26"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_HUMAN_BLIND_TEST_PA",
+      "path": "docs/research/SOUL_YEOSU_HUMAN_BLIND_TEST_PARTICIPANT_RECRUITMENT_PROTOCOL_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu Human Blind Test — Participant Recruitment Protocol V0.1",
+      "created_at": "2026-09-28",
+      "checksum": "2c5db5b0"
     },
     {
       "id": "DOC-SOUL_YEOSU_HY_008_FOUNDER_GOVE",
