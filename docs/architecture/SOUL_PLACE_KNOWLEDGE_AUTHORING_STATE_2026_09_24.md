@@ -65,7 +65,86 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 **[SUPERSEDED] PREVIOUS ONE NEXT ACTION (2026-09-28 — post HY-008 Option B decision): Begin Prepared Knowledge construction for the 3-place pilot (오동도, 향일암, 케이블카) using VERIFIED evidence. HY-003 KNOWN_LIMIT must be explicitly documented within Hyangiram prepared knowledge. Wave 4 operationally CLOSED. Controlled Collection Cycles: 25.**
 
-**CURRENT ONE NEXT ACTION (2026-09-28 — post PK Construction V0.1): Founder authorization for Internal 3-Place Pilot execution — 9 scenarios (O-1/2/3, H-1/2/3, C-1/2/3) + MT-1, Model A vs Model B, per Pilot Protocol V0.2. PREPARATION_READY: YES. Controlled Collection Cycles: 25 (UNCHANGED).**
+**[SUPERSEDED] PREVIOUS ONE NEXT ACTION (2026-09-28 — post PK Construction V0.1): Founder authorization for Internal 3-Place Pilot execution — 9 scenarios (O-1/2/3, H-1/2/3, C-1/2/3) + MT-1, Model A vs Model B, per Pilot Protocol V0.2. PREPARATION_READY: YES. Controlled Collection Cycles: 25 (UNCHANGED).**
+
+**CURRENT ONE NEXT ACTION (2026-09-28 — post Internal Pilot V0.1): Founder authorization for Integrity Gate execution — formal evaluation of Pilot responses against 4-dimensional gate per Pilot Protocol V0.2. PILOT_STATUS: READY_FOR_INTEGRITY_GATE. H-2 PRIMARY DIAGNOSTIC: PASS (both arms). ALL 10 SCENARIOS: INTEGRITY PASS. Controlled Collection Cycles: 25 (UNCHANGED).**
+
+**Internal 3-Place Pilot A/B Execution: COMPLETE (2026-09-28)**
+
+```
+Internal 3-Place Pilot V0.1 — Execution Complete (2026-09-28)
+  Starting HEAD: 498ab14 | Branch: staging/storybook-c7a
+  Protocol: Pilot Protocol V0.2
+  Arms: Model A (post-question retrieval) vs Model B (pre-question activation)
+  Evidence Pool: 21 PUs (identical for both arms)
+  Controlled Collection Cycles: 25 (UNCHANGED — Pilot ≠ evidence cycle)
+
+  Scenarios executed:
+    O-1: "오동도 어떤 곳이에요?" — PASS (A+B)
+    O-2: "오동도 몇 시간 있으면 돼요?" — PASS (A+B)
+    O-3: "케이블카 타고 오동도 가려고 해요" — PASS (A+B)
+    H-1: "향일암 어떤 곳이에요?" — PASS (A+B)
+    H-2: "부모님 모시고 가도 괜찮을까?" — PASS (A+B) [PRIMARY DIAGNOSTIC]
+    H-3: "향일암 2시간이면 충분할까요?" — PASS (A+B)
+    C-1: "케이블카 어디서 타요?" — PASS (A+B)
+    C-2: "차 있는데 케이블카 어디서 타야 해요?" — PASS (A+B)
+    C-3: "케이블카 타고 오동도도 가려고요" — PASS (A+B)
+    MT-1: Multi-turn (C-1 base + vehicle reveal T3) — PASS (A+B)
+
+  H-2 Primary Diagnostic Result: PASS (both arms)
+    MISSED_NECESSARY_ASK failure: NOT triggered (correct behavior)
+    Both arms triggered capability-based ASK before suitability answer
+    No yes/no verdict issued; no age-only inference from "부모님"
+    QUALIFY REGISTER correctly applied (known friction + alternatives)
+    KL-001 + KL-002: FULL COMPLIANCE
+
+  Integrity Gate (post-execution):
+    FACTUAL_GROUNDING: PASS (A+B) — all claims traceable to admitted ERs via PUs
+    EVIDENCE_BOUNDARY: PASS (A+B) — no fabricated facts; no out-of-evidence claims
+    CONTEXT_FIDELITY: PASS (A+B) — MT-1 context maintained; no CONTEXT_REASK
+    LIVE_CORRECTNESS: PASS (A+B) — volatile items flagged; stable items stated correctly
+
+  ASK Evaluation:
+    UNNECESSARY_ASK: 0 (A+B)
+    CONTEXT_REASK: 0 (A+B)
+    MISSED_NECESSARY_ASK: 0 (A+B)
+    Correct ASK H-2: 1+1 triggered
+    Correct ASK H-3: 1+1 triggered (departure location)
+
+  Failure Taxonomy: Zero critical failures (both arms)
+  Minor observations (all non-blocking): OBS-001 through OBS-005 (positive anticipation)
+
+  Model A vs Model B:
+    Integrity criteria: Tied (all PASS)
+    H-2 diagnostic: Tied (both PASS)
+    Richness/depth: Model B advantage in 5/10 scenarios (H-1 proactive rest+travel; C-1 pricing; H-3 bus calc; MT-1 explicit reference)
+    Over-activation risk: None observed (Model B)
+
+  Hypothesis Evaluations:
+    Prepared Knowledge: SUPPORTED (21 PUs sufficient for all 10 scenarios; 0 evidence gaps blocked)
+    Prepared Context (Model B): PARTIALLY_SUPPORTED (richness advantage observed; HBT required for confirmation)
+    Traveler Condition × Experience Requirement: RESEARCH_HYPOTHESIS / OBSERVABLE_IN_PILOT
+    EARLY_REPEAT_SIGNAL: OBSERVATION continued (Pilot required 0 new evidence; pattern 0→3→2→0)
+
+  HY-008 Reopen Conditions: None triggered (R1-R5 all NOT triggered)
+  HY-008 remains: HARD_BLOCKED / TERMINAL_FOR_CURRENT_COLLECTION_PHASE (UNCHANGED)
+  KL-001 + KL-002: PRESERVED and correctly operational in both arms
+
+  5 Pilot artifacts created:
+    docs/research/SOUL_YEOSU_3_PLACE_PILOT_EXECUTION_V0_1.md
+    docs/research/SOUL_YEOSU_3_PLACE_PILOT_RESULTS_V0_1.md
+    docs/research/SOUL_YEOSU_3_PLACE_PILOT_TRACE_MATRIX_V0_1.md
+    docs/research/SOUL_YEOSU_3_PLACE_PILOT_INTEGRITY_REVIEW_V0_1.md
+    docs/research/SOUL_YEOSU_3_PLACE_PILOT_REUSE_FAILURE_LEDGER_V0_1.md
+
+  PILOT_STATUS: READY_FOR_INTEGRITY_GATE
+  Human Blind Test: HOLD (UNCHANGED — Pilot completion does NOT release HBT)
+  HY-003 field validation: OPEN reopen path (UNCHANGED)
+  place_knowledge migration: NOT APPROVED
+  DB / Schema / Runtime / Production: NO CHANGE
+
+  ONE NEXT ACTION: Founder authorization for Integrity Gate execution (formal 4-dimensional gate per Pilot Protocol V0.2).
+```
 
 **Founder HY-008 Governance Decision: OPTION_B_APPROVED (2026-09-28)**
 

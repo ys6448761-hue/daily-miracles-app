@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-28T02:46:50.893Z",
+  "generated_at": "2026-09-28T03:05:43.473Z",
   "generator": "generate-manifest.js",
-  "total_count": 579,
+  "total_count": 584,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -940,7 +940,7 @@
       "status": "superseded",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-28",
-      "checksum": "e21e6722"
+      "checksum": "b25b19a8"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -4972,6 +4972,91 @@
       "title": "SOUL Yeosu — 3-Place Model B Package V0.1",
       "created_at": "2026-09-28",
       "checksum": "3481a439"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_3_PLACE_PILOT_EXECU",
+      "path": "docs/research/SOUL_YEOSU_3_PLACE_PILOT_EXECUTION_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu — Internal 3-Place Pilot Execution V0.1",
+      "created_at": "2026-09-28",
+      "checksum": "824d4565"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_3_PLACE_PILOT_INTEG",
+      "path": "docs/research/SOUL_YEOSU_3_PLACE_PILOT_INTEGRITY_REVIEW_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu — Internal 3-Place Pilot Integrity Review V0.1",
+      "created_at": "2026-09-28",
+      "checksum": "8324ce9b"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_3_PLACE_PILOT_RESUL",
+      "path": "docs/research/SOUL_YEOSU_3_PLACE_PILOT_RESULTS_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu — Internal 3-Place Pilot Results V0.1",
+      "created_at": "2026-09-28",
+      "checksum": "dddadf3e"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_3_PLACE_PILOT_REUSE",
+      "path": "docs/research/SOUL_YEOSU_3_PLACE_PILOT_REUSE_FAILURE_LEDGER_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu — Internal 3-Place Pilot Reuse & Failure Ledger V0.1",
+      "created_at": "2026-09-28",
+      "checksum": "e6e6b200"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_3_PLACE_PILOT_TRACE",
+      "path": "docs/research/SOUL_YEOSU_3_PLACE_PILOT_TRACE_MATRIX_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu — Internal 3-Place Pilot Trace Matrix V0.1",
+      "created_at": "2026-09-28",
+      "checksum": "c2c577c2"
     },
     {
       "id": "DOC-SOUL_YEOSU_3_PLACE_PREPARATION",
