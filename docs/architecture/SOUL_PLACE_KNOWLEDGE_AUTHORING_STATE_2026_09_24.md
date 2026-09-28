@@ -83,7 +83,32 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 **[SUPERSEDED] PREVIOUS ONE NEXT ACTION (2026-09-28 — post Founder Contact Decision GO): Create Human Blind Test Session Addendum V0.1 to resolve DR-B-M-001 through DR-B-M-007 (all PRE_SESSION_BLOCKERs). FOUNDER_PARTICIPANT_CONTACT_DECISION: GO. CONTACT_AUTHORIZATION: GO. SESSION_EXECUTION_AUTHORIZATION: BLOCKED. RECRUITMENT_CONTACT_READINESS: AUTHORIZED. HBT_SESSION_READINESS: BLOCKED_PRE_SESSION_ADDENDUM. COMPENSATION_DECISION: REQUIRES_FOUNDER_DECISION (does not block contact). Session Addendum: NOT_YET_CREATED. HBT Executed: FALSE. Participant Evidence: NONE. BT Verdict: NOT_ASSIGNED. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
 
-**CURRENT ONE NEXT ACTION (2026-09-28 — post Light HBT V0.1 Scope Amendment): Create Light HBT V0.1 Execution Package — frozen scenario contexts for O-1/O-2/H-1/H-3, stimulus generation procedure, facilitator script (~10 min), clarification rules resolving DR-B-M-001/002/003/007, simplified data capture template, invalid session rules. CONTACT_AUTHORIZATION: GO (preserved). SESSION_EXECUTION_AUTHORIZATION: BLOCKED until package validated. HBT_SESSION_READINESS: BLOCKED_LIGHT_HBT_PACKAGE_NOT_CREATED. Participant Evidence: NONE. BT Verdict: NOT_ASSIGNED. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
+**[SUPERSEDED] PREVIOUS ONE NEXT ACTION (2026-09-28 — post Light HBT V0.1 Scope Amendment): Create Light HBT V0.1 Execution Package — frozen scenario contexts for O-1/O-2/H-1/H-3, stimulus generation procedure, facilitator script (~10 min), clarification rules resolving DR-B-M-001/002/003/007, simplified data capture template, invalid session rules. CONTACT_AUTHORIZATION: GO (preserved). SESSION_EXECUTION_AUTHORIZATION: BLOCKED until package validated. HBT_SESSION_READINESS: BLOCKED_LIGHT_HBT_PACKAGE_NOT_CREATED. Participant Evidence: NONE. BT Verdict: NOT_ASSIGNED. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
+
+**CURRENT ONE NEXT ACTION (2026-09-28 — post Light HBT V0.1 Stimulus Freeze): Founder Go/No-Go for Light HBT session execution — explicit SESSION_EXECUTION_AUTHORIZATION: GO required before any participant sessions begin. Also: COMPENSATION_DECISION (amount or explicit NO_COMPENSATION) must be confirmed before participant scheduling. STIMULUS_FREEZE_STATUS: FROZEN_READY. Light HBT Execution Package: READY. All 8 stimuli integrity checks: PASS. Researcher-side arm mapping: FROZEN. CONTACT_AUTHORIZATION: GO (preserved). SESSION_EXECUTION_AUTHORIZATION: BLOCKED (awaiting Founder GO). COMPENSATION_DECISION: REQUIRES_FOUNDER_DECISION. Participant Evidence: NONE. BT Verdict: NOT_ASSIGNED. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
+
+**Light HBT V0.1 Stimulus Freeze (2026-09-28)**
+
+```
+STIMULUS_FREEZE_STATUS: FROZEN_READY
+Scenarios Frozen: O-1, O-2, H-1, H-3
+Condition A (사후 선택형): FROZEN (4 responses)
+Condition B (사전 활성화형): FROZEN (4 responses)
+Integrity Checks: 8/8 PASS (FACTUAL_GROUNDING / EVIDENCE_BOUNDARY / CONTEXT_FIDELITY / LIVE_CORRECTNESS / KL-001 / KL-002 / BLINDING / LENGTH_BALANCE)
+Researcher Arm Mapping: FROZEN (P01–P08 × 2 slots)
+Arm Balance: A=가 50% / A=나 50% CONFIRMED
+Artifact: docs/research/SOUL_YEOSU_LIGHT_HBT_V0_1_STIMULUS_FREEZE.md
+SESSION_EXECUTION_AUTHORIZATION: BLOCKED (Founder GO required)
+CONTACT_AUTHORIZATION: GO (preserved)
+COMPENSATION_DECISION: REQUIRES_FOUNDER_DECISION
+HBT Executed: FALSE
+Participant Evidence: NONE
+BT Verdict: NOT_ASSIGNED
+HY-003: PROVISIONALLY_SUPPORTED (unchanged)
+HY-008: HARD_BLOCKED + TERMINAL_FOR_CURRENT_COLLECTION_PHASE (unchanged)
+Controlled Collection Cycles: 25 (unchanged)
+DB / Schema / Runtime / Production: NO CHANGE
+```
 
 **Light HBT V0.1 Scope Amendment (2026-09-28)**
 

@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-28T05:48:02.446Z",
+  "generated_at": "2026-09-28T06:22:24.210Z",
   "generator": "generate-manifest.js",
-  "total_count": 594,
+  "total_count": 595,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -940,7 +940,7 @@
       "status": "superseded",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-28",
-      "checksum": "63643550"
+      "checksum": "624591d5"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -5770,6 +5770,23 @@
       "title": "SOUL Yeosu — Light HBT V0.1 Scope Amendment",
       "created_at": "2026-09-28",
       "checksum": "8359b692"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_LIGHT_HBT_V0_1_STIM",
+      "path": "docs/research/SOUL_YEOSU_LIGHT_HBT_V0_1_STIMULUS_FREEZE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu — Light HBT V0.1 Stimulus Freeze",
+      "created_at": "2026-09-28",
+      "checksum": "d020e18a"
     },
     {
       "id": "DOC-SOUL_YEOSU_PREPARED_KNOWLEDGE_",
