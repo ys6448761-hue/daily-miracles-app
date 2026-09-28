@@ -75,7 +75,35 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 **[SUPERSEDED] PREVIOUS ONE NEXT ACTION (2026-09-28 — post BTD-A V0.1): Create EP-A — Human Blind Test Execution Package V0.1. BTD_A_DESIGN_STATUS: READY_FOR_EP_A. EP_A_STATUS: READY_FOR_DR_B. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
 
-**CURRENT ONE NEXT ACTION (2026-09-28 — post EP-A V0.1): Execute DR-B — Facilitator Dry Run V0.1. EP_A_STATUS: READY_FOR_DR_B. DR-B scope: facilitator readiness / leakage check / counterbalancing verification / stimulus display / rating form navigability / MT-1 flow / invalid session procedure / H-2 boundary enforcement / timing calibration / end-to-end rehearsal with internal stand-in. Do NOT recruit participants. Do NOT run HBT. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
+**[SUPERSEDED] PREVIOUS ONE NEXT ACTION (2026-09-28 — post EP-A V0.1): Execute DR-B — Facilitator Dry Run V0.1. EP_A_STATUS: READY_FOR_DR_B. DR-B scope: facilitator readiness / leakage check / counterbalancing verification / stimulus display / rating form navigability / MT-1 flow / invalid session procedure / H-2 boundary enforcement / timing calibration / end-to-end rehearsal with internal stand-in. Do NOT recruit participants. Do NOT run HBT. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
+
+**CURRENT ONE NEXT ACTION (2026-09-28 — post DR-B V0.1): Design participant recruitment protocol V0.1 — define recruitment channels, screening procedure, scheduling approach, and consent framework. Founder decision required before any actual participant contact. DR_B_STATUS: READY_FOR_RECRUITMENT. RECRUITMENT_READINESS: READY. 7 MINOR EP-A clarifications recommended before first session (presentation format / 3 clarification replies / single-item completeness / mid-session break / MT-1 incomplete / ASSIGN_ERR severity). 0 BLOCKING / 0 MAJOR issues. HBT Executed: FALSE. Participant Evidence: NONE. BT Verdict: NOT_ASSIGNED. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
+
+**DR-B Facilitator Dry Run V0.1 (2026-09-28)**
+
+```
+BTD-A: CREATED / BTD_A_DESIGN_STATUS: READY_FOR_EP_A (preserved)
+EP-A: CREATED / EP_A_STATUS: READY_FOR_DR_B (preserved)
+DR-B: COMPLETED
+DR_B_STATUS: READY_FOR_RECRUITMENT
+RECRUITMENT_READINESS: READY
+BLOCKING issues: 0
+MAJOR issues: 0
+MINOR issues: 7 (EP-A Section 9 / Section 12 clarifications — recommended before first session)
+OBSERVATIONS: 3
+Founder GO: GO (preserved)
+Human Blind Test HOLD: RELEASED_FOR_PREPARATION (preserved)
+Human Blind Test Executed: FALSE
+Participant Evidence: NONE
+BT Verdict: NOT_ASSIGNED
+HY-003: PROVISIONALLY_SUPPORTED (unchanged)
+HY-008: HARD_BLOCKED + TERMINAL_FOR_CURRENT_COLLECTION_PHASE (unchanged)
+KL-001: ACTIVE (preserved)
+KL-002: ACTIVE (preserved)
+Controlled Collection Cycles: 25 (unchanged)
+DB / Schema / Runtime / Production: NO CHANGE
+Artifact: docs/research/SOUL_YEOSU_HUMAN_BLIND_TEST_FACILITATOR_DRY_RUN_DR_B_V0_1.md
+```
 
 **EP-A Human Blind Test Execution Package V0.1 (2026-09-28)**
 
