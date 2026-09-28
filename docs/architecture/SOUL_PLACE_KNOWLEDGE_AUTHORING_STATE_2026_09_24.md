@@ -71,7 +71,32 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 **[SUPERSEDED] PREVIOUS ONE NEXT ACTION (2026-09-28 — post Integrity Gate V0.1): Founder Go/No-Go decision — INTEGRITY_GATE_VERDICT: ALL PASS (both arms). 4 dimensions PASS. H-2 MISSED_NECESSARY_ASK NOT triggered. Model B richness 5/10 scenarios advantage (all SUPPORTED_AND_RELEVANT or SUPPORTED_BUT_UNNECESSARY — 0 violations). Human Blind Test remains HOLD pending explicit Founder release. Controlled Collection Cycles: 25 (UNCHANGED).**
 
-**CURRENT ONE NEXT ACTION (2026-09-28 — post Founder GO decision): Design Human Blind Test architecture — BTD-A (Blind Test Design). Founder GO: CONFIRMED. Human Blind Test HOLD: RELEASED_FOR_PREPARATION (NOT released for execution). BTD-A/EP-A/DR-B: NOT_YET_CREATED — HBT execution is BLOCKED until BTD-A exists and is Founder-approved. BTD-A scope: stimulus design / blinding protocol / evaluation criteria / control conditions / participant profile requirements. KL-001/KL-002 must be preserved in BTD-A design. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
+**[SUPERSEDED] PREVIOUS ONE NEXT ACTION (2026-09-28 — post Founder GO decision): Design Human Blind Test architecture — BTD-A (Blind Test Design). Founder GO: CONFIRMED. Human Blind Test HOLD: RELEASED_FOR_PREPARATION (NOT released for execution). BTD-A/EP-A/DR-B: NOT_YET_CREATED — HBT execution is BLOCKED until BTD-A exists and is Founder-approved. BTD-A scope: stimulus design / blinding protocol / evaluation criteria / control conditions / participant profile requirements. KL-001/KL-002 must be preserved in BTD-A design. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
+
+**CURRENT ONE NEXT ACTION (2026-09-28 — post BTD-A V0.1): Create EP-A — Human Blind Test Execution Package V0.1. BTD_A_DESIGN_STATUS: READY_FOR_EP_A. EP-A scope: stimulus generation procedure / frozen response artifacts for all 9 scenarios + MT-1 / participant assignment table / counterbalancing assignment table / facilitator script / rating form (Korean) / leakage check form / session recording template / invalid session procedure / frozen live state documentation. Do NOT execute HBT. Do NOT recruit participants. Do NOT create DR-B in the same run as EP-A. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
+
+**BTD-A Human Blind Test Design V0.1 (2026-09-28)**
+
+```
+BTD-A: CREATED
+BTD_A_DESIGN_STATUS: READY_FOR_EP_A
+EP-A: NOT_YET_CREATED
+DR-B: NOT_YET_CREATED
+Founder GO: GO (preserved)
+Human Blind Test HOLD: RELEASED_FOR_PREPARATION (preserved)
+Human Blind Test Executed: FALSE
+Participant Evidence: NONE
+BT Verdict: NOT_ASSIGNED
+HY-003: PROVISIONALLY_SUPPORTED (unchanged)
+HY-008: HARD_BLOCKED + TERMINAL_FOR_CURRENT_COLLECTION_PHASE (unchanged)
+KL-001: ACTIVE (preserved)
+KL-002: ACTIVE (preserved)
+Controlled Collection Cycles: 25 (unchanged)
+Prepared Knowledge: SUPPORTED_IN_PILOT (preserved)
+Prepared Context: PARTIALLY_SUPPORTED (preserved)
+DB / Schema / Runtime / Production: NO CHANGE
+Artifact: docs/research/SOUL_YEOSU_HUMAN_BLIND_TEST_DESIGN_BTD_A_V0_1.md
+```
 
 **Founder GO/NO-GO Decision: GO (2026-09-28)**
 
