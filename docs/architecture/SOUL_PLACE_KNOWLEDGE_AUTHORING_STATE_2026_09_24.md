@@ -61,7 +61,9 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 ## Current Next Action
 
-**Wave 4 Readiness Check: COMPLETE (2026-09-28). Wave 4 entry condition MET — all Wave 3 ERs in terminal states (HY-003 = ACCEPT_PROVISIONAL_WITH_BOUNDARY qualifies as BLOCKED with escalation recorded). Wave 4a: 7/7 READY (OD-002, OD-005, OD-007, HY-004, HY-005, CC-004 immediately executable; REL-005 execute last — Founder PRIMARY). Wave 4b: 4/4 BLOCKED (REL-003 awaits OD-002; REL-006 awaits REL-005; REL-004 awaits REL-003; HY-008 HARD BLOCKED — HY-003 ACCEPT_PROVISIONAL ≠ VERIFIED_FOR_PREPARATION per Plan §658). BATCH_01 reuse confirmed for HY-005 (향일암 무료 + 04:00~19:00 OFFICIAL). Controlled Collection Cycles: 15 (Readiness Check is not a collection cycle). WAVE_3_COLLECTION_EXECUTION_COMPLETE = TRUE. ALL_WAVE_3_ERS_VERIFIED = FALSE (HY-003 ACCEPT_PROVISIONAL — HY-008 hard block). ONE NEXT ACTION: Execute ER-OD-002 Controlled Evidence Collection (Wave 4, Cycle 16) — WE primary / FOUNDER secondary / EXPERIENCE_PATTERN_SUFFICIENT; unlocks REL-003 chain. Readiness artifact: docs/research/SOUL_YEOSU_WAVE_4_READINESS_CHECK_V0_1.md. DO NOT EXECUTE until user authorization.**
+**[SUPERSEDED — see latest checkpoint below] Wave 4 Readiness Check: COMPLETE (2026-09-28). Wave 4 entry condition MET. ONE NEXT ACTION (at that time): Execute ER-OD-002. Controlled Collection Cycles: 15.**
+
+**CURRENT ONE NEXT ACTION (2026-09-28 — post REL-006 Cycle 25): Wave 4 HY-008 Governance Decision. WAVE_4_COLLECTION_EXECUTION_COMPLETE = TRUE. ALL_WAVE_4_ERS_VERIFIED = FALSE (HY-008 HARD BLOCKED). Controlled Collection Cycles: 25. Founder chooses: (A) Founder field validation for HY-003 — one elder descent observation closes EP-3 → HY-003 VERIFIED → HY-008 unblocks, OR (B) Wave 4 closure with HY-008 in terminal HARD_BLOCKED state → proceed to Wave 5 scope (HY-009) and Pilot preparation gates. DO NOT execute either without Founder authorization.**
 
 **Wave 4 ER-OD-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28). EXPERIENCE_PATTERN_SUFFICIENT MET — 4 independent WE sources (EI-OD-002-A kidsfuninseoul WP family account; EI-OD-002-B Trip.com 2026 traveler moments; EI-OD-002-C TripAdvisor+guides synthesis; EI-OD-002-D Route Corpus R028+R040). Duration pattern: 30-60min minimum / 1-hour standard loop / 1-2 hours thorough / half-day if combined with Cable Car. Value drivers converged: forest trail immersion + lighthouse panoramic viewpoint + camellia season (Jan-March) + named features (Dragon Cave, Bamboo Tunnel, Musical Fountain). Physical scope: compact 0.12km²; 2.5km trail loop; family-accessible; single-visit completable. FOUNDER secondary not collected (not required for stop condition; gap noted). DOWNSTREAM: REL-003 all 4 dependencies now satisfied (REL-001 ✓ REL-002 ✓ OD-002 ✓ CC-005 ✓) → REL-003 = READY_FOR_COLLECTION. Controlled Collection Cycles: 15 → 16. Artifact: docs/research/SOUL_YEOSU_ER_OD_002_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md.**
 
@@ -129,6 +131,65 @@ REL-003 Controlled Evidence Collection — Cycle 23 (2026-09-28)
   Files modified: docs/research/SOUL_YEOSU_3_PLACE_EVIDENCE_COLLECTION_WAVE_0_V0_1.md | docs/architecture/SOUL_PLACE_KNOWLEDGE_AUTHORING_STATE_2026_09_24.md
 
   ONE NEXT ACTION: Wave 4b — execute ER-REL-004 (READY_FOR_COLLECTION, all 3 deps satisfied) OR ER-REL-006 (READY_FOR_COLLECTION, all 4 deps satisfied). REL-004 recommended first (canonical Wave 4b dependency chain: REL-003 → REL-004; REL-006 is independent). Founder authorization required before proceeding.
+```
+
+**Wave 4b ER-REL-006 Collection: VERIFIED_FOR_PREPARATION (2026-09-28)**
+
+```
+REL-006 Controlled Evidence Collection — Cycle 25 (2026-09-28)
+  ER: ER-REL-006 — Vehicle Impact on Cable Car Direction/Exit Choice
+  Starting HEAD: 87c3e59 | Branch: staging/storybook-c7a
+  Final Status: VERIFIED_FOR_PREPARATION
+  Stop Condition: EXPERT_JUDGMENT_SUFFICIENT — PASS
+  Collection Method: 7 reused items (DIRECT/PARTIAL from deps) + 2 new LOCAL_OPERATOR sources
+
+  REL-005 Admissibility: PARTIAL_REUSE — no-vehicle baseline judgment reused as reference point; vehicle condition not addressed in REL-005
+
+  Evidence Accepted:
+    EI-REL-006-R1 through R7: REL-001/002/005/OD-003/004 spatial + parking foundation (DIRECT/PARTIAL_REUSE)
+    EI-REL-006-A: yeosucablecar.com/kr/information/guide (LOCAL_OPERATOR OFFICIAL) — two parking options for vehicles: 돌산 station lot OR 오동도 입구 lot (자산-adjacent); both stations valid boarding; "이용하기 편한 정류장에서 탑승"
+    EI-REL-006-B: oh-my-post.com/yeosu-cable-car-parking/ (NON_OFFICIAL_AGGREGATOR) — 자산 area recommended for Odongdo+CC vehicle combination; 오동도 parking = elevator direct to 자산 boarding; round-trip from 자산 assumed for vehicle users
+
+  Relationship Pattern (Vehicle Impact):
+    Vehicle presence IS material to direction/station choice.
+    With vehicle (자산/Odongdo area parking): 자산 = natural boarding station; round-trip from 자산 or 자산→돌산 one-way viable; 오동도 parking → elevator direct to 자산 탑승장
+    With vehicle (돌산 parking): 돌산→자산 still logical, but car retrieval after Odongdo adds ~10-12min taxi back to 돌산
+    Without vehicle (REL-005 baseline): 돌산→자산 one-way STRONGLY PREFERRED — no taxi needed; 자산 exit = 5min to Odongdo
+    Exception: vehicle at 돌산 = no directional change from no-vehicle; impact is parking-location-dependent
+    Peak qualifier: 자산 area nearly full weekend 14:00-20:00 → 돌산 parking viable alternative
+
+  Stability: STABLE (vehicle-impact judgment); parking fees = SEMI_STABLE (not affecting directional judgment)
+  Live Trigger: None for vehicle-impact judgment itself (CC-005 trigger applies to operating state — preserved)
+
+  Reuse Metrics: 7 reused / 2 new; Prepared-Evidence Reuse Observation = EARLY_REPEAT_SIGNAL
+  Traveler Condition: POTENTIAL_RESEARCH_RELEVANCE (vehicle = traveler state that directly changes directional recommendation — clearest ER-corpus example)
+  Journey Knowledge: POTENTIAL_RESEARCH_RELEVANCE (Transport Logistics, Day Budget, Plan Change/Counterfactual)
+
+  Dependency transitions: NONE (REL-006 has no downstream ER dependencies per Matrix)
+  HY-008: HARD BLOCKED (unchanged)
+  HY-003: PROVISIONALLY_SUPPORTED / ACCEPT_PROVISIONAL_WITH_BOUNDARY (unchanged)
+
+  WAVE_4_COLLECTION_EXECUTION_COMPLETE: TRUE (all executable Wave 4 ERs in VERIFIED or terminal HARD_BLOCKED state)
+  ALL_WAVE_4_ERS_VERIFIED: FALSE (HY-008 = HARD BLOCKED, not VERIFIED_FOR_PREPARATION)
+
+  HY-008 Governance: Canonical options = (1) Founder field validation for HY-003 → EP-3 → HY-008 unblock, OR (2) Wave 4 closure with terminal block disposition. No field validation in this run.
+
+  Controlled Collection Cycles: 24 → 25
+  Wave 4b Status: REL-003 VERIFIED; REL-004 VERIFIED; REL-006 VERIFIED; HY-008 HARD BLOCKED
+
+  Files created: docs/research/SOUL_YEOSU_ER_REL_006_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+  Files modified: docs/research/SOUL_YEOSU_3_PLACE_EVIDENCE_COLLECTION_WAVE_0_V0_1.md | docs/architecture/SOUL_PLACE_KNOWLEDGE_AUTHORING_STATE_2026_09_24.md
+
+  ALL_WAVE_3_ERS_VERIFIED: FALSE (unchanged — HY-003 ACCEPT_PROVISIONAL blocks)
+  Traveler Condition × Experience Requirement: RESEARCH_HYPOTHESIS (POTENTIAL_RESEARCH_RELEVANCE confirmed for REL-006 as clearest example)
+  Human Blind Test: HOLD
+  BT Verdict: NOT ASSIGNED
+  Prepared Knowledge: RESEARCH_HYPOTHESIS ONLY
+  Prepared Context: RESEARCH_HYPOTHESIS ONLY
+  place_knowledge migration: NOT APPROVED
+  DB / Schema / Runtime / Production: NO CHANGE
+
+  ONE NEXT ACTION: Wave 4 HY-008 Governance Decision — Founder chooses between (A) Founder field validation for HY-003 (open upgrade path, one field observation closes EP-3) or (B) Wave 4 closure with HY-008 in terminal HARD_BLOCKED state. Do NOT execute either option without Founder authorization.
 ```
 
 **Wave 4b ER-REL-004 Collection: VERIFIED_FOR_PREPARATION (2026-09-28)**
