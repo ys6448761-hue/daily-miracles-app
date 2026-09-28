@@ -131,6 +131,67 @@ REL-003 Controlled Evidence Collection — Cycle 23 (2026-09-28)
   ONE NEXT ACTION: Wave 4b — execute ER-REL-004 (READY_FOR_COLLECTION, all 3 deps satisfied) OR ER-REL-006 (READY_FOR_COLLECTION, all 4 deps satisfied). REL-004 recommended first (canonical Wave 4b dependency chain: REL-003 → REL-004; REL-006 is independent). Founder authorization required before proceeding.
 ```
 
+**Wave 4b ER-REL-004 Collection: VERIFIED_FOR_PREPARATION (2026-09-28)**
+
+```
+REL-004 Controlled Evidence Collection — Cycle 24 (2026-09-28)
+  ER: ER-REL-004 — Sequence Friction for Cable Car + Odongdo
+  Starting HEAD: 75e3064 | Branch: staging/storybook-c7a
+  Final Status: VERIFIED_FOR_PREPARATION
+  Stop Condition: EXPERIENCE_PATTERN_SUFFICIENT — PASS
+  Collection Method: 3 new WE sources + 2 PARTIAL_REUSE from OD-007 + OD-002 §5.1
+
+  REL-005 Admissibility: CONTEXT_ONLY — direction preference ≠ friction character
+
+  Evidence Accepted:
+    EI-REL-004-R1: OD-007 causeway WE (PARTIAL_REUSE) — 768m flat deck; "누구나 부담 없이"; "바다 위를 걷는 느낌"; 10-15 min
+    EI-REL-004-R2: OD-002 §5.1 (PARTIAL_REUSE) — "half-day natural pairing" 4-source WE convergence
+    EI-REL-004-R3: REL-003 exception conditions (PARTIAL_REUSE) — <1hr, suspension, late arrival
+    EI-REL-004-A: searchingkorea.com — "아주 편리합니다"; Odongdo daytime → cable car at sunset recommended
+    EI-REL-004-B: neoplats.com/37 (first-person) — nighttime Odongdo dark; 자산역 elevator until 22:00; reverse-direction return logistics anxiety; taxi resolution
+    EI-REL-004-C: Trip.com users — "반나절 여행코스로 딱"; sunset cable car quality
+
+  Relationship Pattern (Sequence Friction):
+    Standard direction (돌산→자산, Odongdo follows): LOW friction — spatial proximity "아주 편리"; direct 5 min walk; causeway enjoyable
+    Optimal timing: Odongdo daytime + cable car at sunset — experiential contrast; endorsed across 3 WE sources
+    Physical transition: causeway 768m flat deck, "누구나 부담 없이" — no burden for most travelers
+    Friction conditions:
+      - Nighttime Odongdo: dark canopy ("컴컴한 숲") — trail experience significantly degraded
+      - 자산역 elevator: operates until 22:00 only; 11-story stair after hours
+      - Reverse direction (자산→돌산) one-way: return logistics anxiety; taxi required from 돌산
+      - <1 hour available: impractical for combination
+      - Cable car suspended: sequence collapses; Odongdo-only possible
+    Variation: VAR-REL-004-01 (order: cable car first vs. Odongdo first — EXPERIENCE_VARIATION by timing)
+               VAR-REL-004-02 (direction-specific return friction — CONDITION_VARIATION)
+
+  Stability: STABLE (friction character); SEMI_STABLE (elevator timing policy)
+  Live Trigger: None for friction character (CC-005 handles operating status per Matrix)
+
+  Traveler Condition: POTENTIAL_RESEARCH_RELEVANCE (elevator accessibility, nighttime visual conditions)
+  Journey Knowledge: POTENTIAL_RESEARCH_RELEVANCE (Day Budget, Transport Logistics, Counterfactual)
+
+  Dependency transitions:
+    REL-006: READY_FOR_COLLECTION (UNCHANGED — was already READY; REL-004 has no downstream deps)
+    HY-008: HARD BLOCKED (unchanged)
+    HY-003: PROVISIONALLY_SUPPORTED / ACCEPT_PROVISIONAL_WITH_BOUNDARY (unchanged)
+
+  Controlled Collection Cycles: 23 → 24
+  Wave 4b Status: REL-003 VERIFIED; REL-004 VERIFIED; REL-006 READY; HY-008 HARD BLOCKED
+  ALL_WAVE_3_ERS_VERIFIED: FALSE (unchanged — HY-003 ACCEPT_PROVISIONAL blocks)
+  Traveler Condition × Experience Requirement: RESEARCH_HYPOTHESIS (POTENTIAL_RESEARCH_RELEVANCE noted for REL-004)
+  Human Blind Test: HOLD
+  BT Verdict: NOT ASSIGNED
+  Prepared Knowledge: RESEARCH_HYPOTHESIS ONLY
+  Prepared Context: RESEARCH_HYPOTHESIS ONLY
+  place_knowledge migration: NOT APPROVED
+  DB / Schema / Runtime / Production: NO CHANGE
+
+  Files created: docs/research/SOUL_YEOSU_ER_REL_004_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+  Files modified: docs/research/SOUL_YEOSU_3_PLACE_EVIDENCE_COLLECTION_WAVE_0_V0_1.md | docs/architecture/SOUL_PLACE_KNOWLEDGE_AUTHORING_STATE_2026_09_24.md
+
+  ONE NEXT ACTION: Wave 4b — execute ER-REL-006 (READY_FOR_COLLECTION, all 4 deps: REL-001 ✓ REL-002 ✓ REL-005 ✓ OD-003 ✓). Only remaining executable Wave 4b ER. Founder authorization required before proceeding.
+```
+
 ```
 Wave 4a ALL ERs COMPLETE — VERIFIED_FOR_PREPARATION (2026-09-28)
   Cycles: 17 (HY-005) → 18 (HY-004) → 19 (OD-005) → 20 (OD-007) → 21 (CC-004) → 22 (REL-005)
