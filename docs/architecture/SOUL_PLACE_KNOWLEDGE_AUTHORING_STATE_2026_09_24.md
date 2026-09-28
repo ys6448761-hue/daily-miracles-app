@@ -67,7 +67,9 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 **[SUPERSEDED] PREVIOUS ONE NEXT ACTION (2026-09-28 — post PK Construction V0.1): Founder authorization for Internal 3-Place Pilot execution — 9 scenarios (O-1/2/3, H-1/2/3, C-1/2/3) + MT-1, Model A vs Model B, per Pilot Protocol V0.2. PREPARATION_READY: YES. Controlled Collection Cycles: 25 (UNCHANGED).**
 
-**CURRENT ONE NEXT ACTION (2026-09-28 — post Internal Pilot V0.1): Founder authorization for Integrity Gate execution — formal evaluation of Pilot responses against 4-dimensional gate per Pilot Protocol V0.2. PILOT_STATUS: READY_FOR_INTEGRITY_GATE. H-2 PRIMARY DIAGNOSTIC: PASS (both arms). ALL 10 SCENARIOS: INTEGRITY PASS. Controlled Collection Cycles: 25 (UNCHANGED).**
+**[SUPERSEDED] PREVIOUS ONE NEXT ACTION (2026-09-28 — post Internal Pilot V0.1): Founder authorization for Integrity Gate execution — formal evaluation of Pilot responses against 4-dimensional gate per Pilot Protocol V0.2. PILOT_STATUS: READY_FOR_INTEGRITY_GATE. H-2 PRIMARY DIAGNOSTIC: PASS (both arms). ALL 10 SCENARIOS: INTEGRITY PASS. Controlled Collection Cycles: 25 (UNCHANGED).**
+
+**CURRENT ONE NEXT ACTION (2026-09-28 — post Integrity Gate V0.1): Founder Go/No-Go decision — INTEGRITY_GATE_VERDICT: ALL PASS (both arms). 4 dimensions PASS. H-2 MISSED_NECESSARY_ASK NOT triggered. Model B richness 5/10 scenarios advantage (all SUPPORTED_AND_RELEVANT or SUPPORTED_BUT_UNNECESSARY — 0 violations). Human Blind Test remains HOLD pending explicit Founder release. Controlled Collection Cycles: 25 (UNCHANGED).**
 
 **Internal 3-Place Pilot A/B Execution: COMPLETE (2026-09-28)**
 
@@ -144,6 +146,48 @@ Internal 3-Place Pilot V0.1 — Execution Complete (2026-09-28)
   DB / Schema / Runtime / Production: NO CHANGE
 
   ONE NEXT ACTION: Founder authorization for Integrity Gate execution (formal 4-dimensional gate per Pilot Protocol V0.2).
+```
+
+**Internal 3-Place Pilot Integrity Gate V0.1: COMPLETE (2026-09-28)**
+
+```
+Integrity Gate V0.1 — Formal Gate Complete (2026-09-28)
+  Starting HEAD: 448d5c8 | Branch: staging/storybook-c7a
+  Protocol: Pilot Protocol V0.2 — Section 5
+  Gate Type: Independent canonical gate (distinct from embedded Pilot review)
+
+  4-Dimensional Gate Results:
+    FACTUAL_GROUNDING: PASS (A+B) — all claims traceable to admitted ERs via PUs
+    EVIDENCE_BOUNDARY: PASS (A+B) — no fabricated facts; no out-of-evidence claims
+    CONTEXT_FIDELITY: PASS (A+B) — MT-1 maintained; Model B explicit reference noted
+    LIVE_CORRECTNESS: PASS (A+B) — volatile flagged; stable stated correctly
+
+  Supplementary Gate Results:
+    H2_A_BOUNDARY: PASS — MISSED_NECESSARY_ASK NOT triggered
+    H2_B_BOUNDARY: PASS — MISSED_NECESSARY_ASK NOT triggered
+    Known Limit KL-001: PASS (A+B)
+    Known Limit KL-002: PASS (A+B)
+    A/B Fairness: PASS — same 21 PUs, same constraints, same stimuli
+    HY-008 Reopen Conditions (R1-R5): NONE triggered
+
+  Model B Richness Classification (Gate-Independent):
+    CONTEXT_LEAKAGE: 0 cases
+    EVIDENCE_OVERREACH: 0 cases
+    SUPPORTED_AND_RELEVANT: 7 cases
+    SUPPORTED_BUT_UNNECESSARY: 1 case (OBS-G-001: O-1 vehicle prohibition — non-blocking)
+
+  Gate-Discovered Failures: NONE
+  Gate-Discovered Non-blocking Observations: OBS-G-001 (O-1 vehicle prohibition over-inclusion)
+
+  INTEGRITY_GATE_VERDICT: ALL PASS (both arms)
+
+  Artifact: docs/research/SOUL_YEOSU_INTERNAL_3_PLACE_PILOT_INTEGRITY_GATE_V0_1.md
+  Human Blind Test: HOLD (UNCHANGED — Gate PASS does NOT release HBT)
+  HY-008: HARD_BLOCKED / TERMINAL_FOR_CURRENT_COLLECTION_PHASE (UNCHANGED)
+  Controlled Collection Cycles: 25 (UNCHANGED)
+  DB / Schema / Runtime / Production: NO CHANGE
+
+  ONE NEXT ACTION: Founder Go/No-Go decision.
 ```
 
 **Founder HY-008 Governance Decision: OPTION_B_APPROVED (2026-09-28)**
