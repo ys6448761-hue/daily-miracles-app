@@ -2511,4 +2511,14 @@ PK Construction Checkpoint (2026-09-28)
 | PLACE_ALIAS_MAP 하멜등대 추가 | **BLOCKED — 하멜등대 blocker 해소 후** |
 | runtime 코드 변경 | **현재 LOCKED** |
 | DB write / migration 적용 | **현재 LOCKED** |
+
+---
+
+## Research Hypotheses Register
+
+| Hypothesis | Level | Status | Artifact |
+|---|---|---|---|
+| Flawless Travel Learning Loop / 무결점 여행 학습 루프 | Level 3 — RESEARCH_HYPOTHESIS | PERSISTED (2026-09-28) — NOT Candidate | `docs/research/SOUL_YEOSU_FLAWLESS_TRAVEL_LEARNING_LOOP_RESEARCH_HANDOVER_V0_1.md` |
+
+**CURRENT ONE NEXT ACTION: UNCHANGED** — Design BTD-A (Blind Test Design). This research hypothesis entry does NOT change the canonical next action.
 | Production 변경 | **PROHIBITED** |

@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-28T03:35:22.075Z",
+  "generated_at": "2026-09-28T03:53:21.765Z",
   "generator": "generate-manifest.js",
-  "total_count": 586,
+  "total_count": 587,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -940,7 +940,7 @@
       "status": "superseded",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-28",
-      "checksum": "473c28ee"
+      "checksum": "4b8da2c2"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -5566,6 +5566,23 @@
       "title": "SOUL Yeosu Evidence Collection — ER-REL-006",
       "created_at": "2026-09-28",
       "checksum": "283d8a45"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_FLAWLESS_TRAVEL_LEA",
+      "path": "docs/research/SOUL_YEOSU_FLAWLESS_TRAVEL_LEARNING_LOOP_RESEARCH_HANDOVER_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu — Flawless Travel Learning Loop Research Handover V0.1",
+      "created_at": "2026-09-28",
+      "checksum": "b900eb71"
     },
     {
       "id": "DOC-SOUL_YEOSU_HUMAN_BLIND_TEST_FO",
