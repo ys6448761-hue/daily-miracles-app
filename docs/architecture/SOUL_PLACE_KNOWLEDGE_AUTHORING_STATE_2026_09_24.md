@@ -67,6 +67,70 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 **Wave 4a COMPLETE — ALL 6 REMAINING ERs VERIFIED_FOR_PREPARATION (2026-09-28). Cycles 17-22 executed. Phase 4-α (HY-005 Cycle 17, HY-004 Cycle 18, OD-005 Cycle 19, OD-007 Cycle 20, CC-004 Cycle 21) + Phase 4-β (REL-005 Cycle 22, executed LAST per Plan ordering). HY-005: 평지길 exists (WE 2 sources); starts ticket office; ~15 min; full temple access; BATCH_01 NOT_APPLICABLE; AUTHORITATIVE_FACT_SUFFICIENT. HY-004: No designated ascent rest stops (4 WE sources — informative negative); within-temple 경내 shade; flat route informal rest; EXPERIENCE_PATTERN_SUFFICIENT. OD-005: Causeway stroller-accessible; some island stair sections; playground/stamp tour/Dongbaek Train alternatives; "가족 산책 코스"; EXPERIENCE_PATTERN_SUFFICIENT. OD-007: Causeway 768m flat deck; ~10-15 min; "바다 위를 걷는 느낌"; minimal friction; "누구나 부담 없이"; EXPERIENCE_PATTERN_SUFFICIENT. CC-004: Regular cabin child-friendly (stroller folded); Crystal = glass floor anxiety + stroller restriction; 자산 = elevator+판타지뉴월드; 돌산 = elevator+café; no nursing rooms documented; under-36m free (OFFICIAL); EXPERIENCE_PATTERN_SUFFICIENT. REL-005: 돌산→자산 PREFERRED for Odongdo-combined itinerary (geographic + one-way ticket logic from REL-001/002 facts); EXPERT_JUDGMENT_SUFFICIENT. DOWNSTREAM: REL-006 transitions READY_FOR_COLLECTION (all 4 deps: REL-001 ✓ REL-002 ✓ REL-005 ✓ OD-003 ✓). Controlled Collection Cycles: 16 → 22. Wave 0 gap register updated. ONE NEXT ACTION: Wave 4b — execute REL-003 (READY_FOR_COLLECTION, all 4 deps satisfied) — Founder authorization required before proceeding.**
 
+**Wave 4b ER-REL-003 Collection: VERIFIED_FOR_PREPARATION (2026-09-28)**
+
+```
+REL-003 Controlled Evidence Collection — Cycle 23 (2026-09-28)
+  ER: ER-REL-003 — Time Estimate for Cable Car + Odongdo Combined Sequence
+  Starting HEAD: be12cea | Branch: staging/storybook-c7a
+  Final Status: VERIFIED_FOR_PREPARATION
+  Stop Condition: SEMI_STABLE_PATTERN_WITH_TRIGGER — PASS (both deliverables complete)
+  Collection Method: FULL REUSE — no new external evidence collection
+
+  Evidence Components (all from admissible reuse):
+    EI-REL-003-A: Cable car ride ~10 min one-way (CC-005-C, CONTEXTUAL)
+    EI-REL-003-B: 자산→오동도 입구 ~5 min walk (REL-001-C / REL-002-A, STABLE)
+    EI-REL-003-C: Causeway ~768m, ~10-15 min, flat deck (OD-007 WE, STABLE)
+    EI-REL-003-D: Odongdo one-loop ~1 hour (OD-002-B Trip.com, STABLE)
+    EI-REL-003-E: Odongdo 1-2 hr standard; 2+ hr photography (OD-002-C aggregated, STABLE)
+    EI-REL-003-F: Tour bus 60 min; minimalist 30-60 min (OD-002-D Route Corpus, STABLE)
+    EI-REL-003-G: "Combined Cable Car + Odongdo: half-day (3-4 hours)" (OD-002 §5.1, 4-source WE convergence, HIGH)
+    EI-REL-003-H: 돌산 exit → 오동도 = taxi required (~10-12 min, exception case) (REL-002 MAP_ROUTE)
+    EI-REL-003-I: Live trigger design — CC-005 operating status (OFFICIAL suspension rule)
+  REL-005: PARTIAL_REUSE — identifies standard-case direction (자산 exit = 5 min connection) without importing direction judgment
+
+  Combined Sequence Time Pattern (standard direction: 돌산→자산 one-way + Odongdo):
+    Overhead: ride ~10 min + connection ~5 min + causeway ~10-15 min = ~25-30 min
+    Minimum visit: ~1 to 1.5 hours total (30-60 min Odongdo + ~30 min overhead)
+    Standard visit: ~2 to 2.5 hours total (1-2 hr Odongdo + ~30 min overhead)
+    Thorough/photography: ~2.5 hours+ total
+    WE half-day pattern: ~3-4 hours total (4-source convergence, HIGH confidence)
+
+  Negative/Exception Knowledge:
+    Available time < 1 hour → impractical
+    Cable car suspended → sequence collapses; Odongdo-only possible
+    Non-preferred direction (자산→돌산) → adds taxi overhead (~10-12 min); less efficient
+    Late arrival (after ~17:00) → reduced content at Odongdo (train/lighthouse closure risk)
+
+  Live Trigger Design (COMPLETE):
+    Stale condition: CC-005 live trigger fires (강풍주의보/경보) OR Odongdo access point change
+    Verification: CC-005 live-check (운행현황 / 061-664-7301) + OFFICIAL
+    Fallback: describe sequence without time framing; QUALIFY; defer to CC-005 status
+
+  Dependency transitions:
+    REL-004: NOT_STARTED → READY_FOR_COLLECTION (all 3 deps: REL-001 ✓ REL-002 ✓ REL-003 ✓)
+    REL-006: READY_FOR_COLLECTION (unchanged)
+    HY-008: HARD BLOCKED (unchanged)
+    HY-003: PROVISIONALLY_SUPPORTED / ACCEPT_PROVISIONAL_WITH_BOUNDARY (unchanged)
+
+  Controlled Collection Cycles: 22 → 23
+  Wave 4b Status: REL-003 VERIFIED; REL-004 READY; REL-006 READY; HY-008 HARD BLOCKED
+  ALL_WAVE_3_ERS_VERIFIED: FALSE (unchanged — HY-003 ACCEPT_PROVISIONAL blocks)
+  Traveler Condition × Experience Requirement: RESEARCH_HYPOTHESIS (POTENTIAL_RESEARCH_RELEVANCE noted for REL-003)
+  Journey Knowledge: POTENTIAL_RESEARCH_RELEVANCE noted (Day Budget / Transport Logistics / Counterfactual)
+  Human Blind Test: HOLD
+  BT Verdict: NOT ASSIGNED
+  Prepared Knowledge: RESEARCH_HYPOTHESIS ONLY
+  Prepared Context: RESEARCH_HYPOTHESIS ONLY
+  place_knowledge migration: NOT APPROVED
+  DB / Schema / Runtime / Production: NO CHANGE
+
+  Files created: docs/research/SOUL_YEOSU_ER_REL_003_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+  Files modified: docs/research/SOUL_YEOSU_3_PLACE_EVIDENCE_COLLECTION_WAVE_0_V0_1.md | docs/architecture/SOUL_PLACE_KNOWLEDGE_AUTHORING_STATE_2026_09_24.md
+
+  ONE NEXT ACTION: Wave 4b — execute ER-REL-004 (READY_FOR_COLLECTION, all 3 deps satisfied) OR ER-REL-006 (READY_FOR_COLLECTION, all 4 deps satisfied). REL-004 recommended first (canonical Wave 4b dependency chain: REL-003 → REL-004; REL-006 is independent). Founder authorization required before proceeding.
+```
+
 ```
 Wave 4a ALL ERs COMPLETE — VERIFIED_FOR_PREPARATION (2026-09-28)
   Cycles: 17 (HY-005) → 18 (HY-004) → 19 (OD-005) → 20 (OD-007) → 21 (CC-004) → 22 (REL-005)

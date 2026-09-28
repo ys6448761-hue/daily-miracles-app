@@ -763,8 +763,8 @@ All 29 ERs initialized with current status per V0.2 lifecycle.
 |---|---|---|---|
 | ER-REL-001 | **VERIFIED_FOR_PREPARATION (2026-09-27)** | ER-CC-001 ✓ VERIFIED | P0; Wave 2 CLOSED — AUTHORITATIVE_FACT_SUFFICIENT 10/10 |
 | ER-REL-002 | **VERIFIED_FOR_PREPARATION (2026-09-27)** | ER-REL-001 ✓ VERIFIED, ER-CC-001 ✓ VERIFIED, ER-OD-003 ✓ VERIFIED | P0; Wave 3 CLOSED — RELATIONSHIP_SUFFICIENT 10/10. Unlocks REL-005 (awaits REL-001 + REL-002). |
-| ER-REL-003 | **READY_FOR_COLLECTION (2026-09-28)** | REL-001 ✓ REL-002 ✓ OD-002 ✓ CC-005 ✓ — ALL 4 deps SATISFIED | P1; Wave 4b — all dependency gates now cleared. Proceed to REL-003 collection after separate authorization. |
-| ER-REL-004 | NOT_STARTED | Awaits ER-REL-001, ER-REL-002, ER-REL-003 | P1; Wave 4b |
+| ER-REL-003 | **VERIFIED_FOR_PREPARATION (2026-09-28)** | REL-001 ✓ REL-002 ✓ OD-002 ✓ CC-005 ✓ — ALL 4 deps SATISFIED | P1; Wave 4b Cycle 23 CLOSED — SEMI_STABLE_PATTERN_WITH_TRIGGER PASS. Full reuse (no new external collection). Combined sequence: ~1-1.5 hr minimum / ~2-3 hr standard / ~3-4 hr half-day (WE 4-source convergence). Live trigger: CC-005 operating status + Odongdo access change. Unlocks REL-004. See: `docs/research/SOUL_YEOSU_ER_REL_003_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
+| ER-REL-004 | **READY_FOR_COLLECTION (2026-09-28)** | ER-REL-001 ✓, ER-REL-002 ✓, ER-REL-003 ✓ — ALL 3 deps SATISFIED | P1; Wave 4b — REL-003 VERIFIED unlocks REL-004. Not authorized in this session. Proceed after separate Wave 4b authorization. |
 | ER-REL-005 | **VERIFIED_FOR_PREPARATION (2026-09-28)** | ER-REL-001 ✓, ER-REL-002 ✓ | P0; Phase 4-β CLOSED — Cycle 22 EXPERT_JUDGMENT_SUFFICIENT. 돌산→자산 PREFERRED for Odongdo-combined itinerary (one-way ticket efficient; ~5 min walk to Odongdo from 자산). Unlocks REL-006. See: `docs/research/SOUL_YEOSU_ER_REL_005_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-REL-006 | **READY_FOR_COLLECTION (2026-09-28)** | ER-REL-001 ✓, ER-REL-002 ✓, ER-REL-005 ✓, ER-OD-003 ✓ — ALL 4 deps SATISFIED | P1; Wave 4b — all dependency gates now cleared. Not authorized in this session. Proceed after separate Wave 4b authorization. |
 
