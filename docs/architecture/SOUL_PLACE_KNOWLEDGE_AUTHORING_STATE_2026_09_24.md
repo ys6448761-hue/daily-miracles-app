@@ -69,7 +69,45 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 **[SUPERSEDED] PREVIOUS ONE NEXT ACTION (2026-09-28 — post Internal Pilot V0.1): Founder authorization for Integrity Gate execution — formal evaluation of Pilot responses against 4-dimensional gate per Pilot Protocol V0.2. PILOT_STATUS: READY_FOR_INTEGRITY_GATE. H-2 PRIMARY DIAGNOSTIC: PASS (both arms). ALL 10 SCENARIOS: INTEGRITY PASS. Controlled Collection Cycles: 25 (UNCHANGED).**
 
-**CURRENT ONE NEXT ACTION (2026-09-28 — post Integrity Gate V0.1): Founder Go/No-Go decision — INTEGRITY_GATE_VERDICT: ALL PASS (both arms). 4 dimensions PASS. H-2 MISSED_NECESSARY_ASK NOT triggered. Model B richness 5/10 scenarios advantage (all SUPPORTED_AND_RELEVANT or SUPPORTED_BUT_UNNECESSARY — 0 violations). Human Blind Test remains HOLD pending explicit Founder release. Controlled Collection Cycles: 25 (UNCHANGED).**
+**[SUPERSEDED] PREVIOUS ONE NEXT ACTION (2026-09-28 — post Integrity Gate V0.1): Founder Go/No-Go decision — INTEGRITY_GATE_VERDICT: ALL PASS (both arms). 4 dimensions PASS. H-2 MISSED_NECESSARY_ASK NOT triggered. Model B richness 5/10 scenarios advantage (all SUPPORTED_AND_RELEVANT or SUPPORTED_BUT_UNNECESSARY — 0 violations). Human Blind Test remains HOLD pending explicit Founder release. Controlled Collection Cycles: 25 (UNCHANGED).**
+
+**CURRENT ONE NEXT ACTION (2026-09-28 — post Founder GO decision): Design Human Blind Test architecture — BTD-A (Blind Test Design). Founder GO: CONFIRMED. Human Blind Test HOLD: RELEASED_FOR_PREPARATION (NOT released for execution). BTD-A/EP-A/DR-B: NOT_YET_CREATED — HBT execution is BLOCKED until BTD-A exists and is Founder-approved. BTD-A scope: stimulus design / blinding protocol / evaluation criteria / control conditions / participant profile requirements. KL-001/KL-002 must be preserved in BTD-A design. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
+
+**Founder GO/NO-GO Decision: GO (2026-09-28)**
+
+```
+Founder GO Decision — Human Blind Test Track (2026-09-28)
+  Starting HEAD: 49500e4 | Branch: staging/storybook-c7a
+  Decision: GO
+  Basis: Integrity Gate ALL PASS (4/4 dimensions × 2 arms) + H-2 PASS (KL-001/KL-002 compliant)
+
+  HBT Asset Revalidation:
+    BTD-A: NOT_YET_CREATED
+    EP-A: NOT_YET_CREATED
+    DR-B: NOT_YET_CREATED
+
+  HOLD Release Semantics:
+    Previous: HOLD
+    New: RELEASED_FOR_PREPARATION (NOT RELEASED_FOR_EXECUTION)
+    HBT Execution: BLOCKED (BTD-A prerequisite)
+
+  Non-Claims:
+    - Model B NOT definitively superior (HBT required for confirmation)
+    - No traveler access to SOUL conversations
+    - No place_knowledge DB migration approved
+    - No production readiness established
+
+  Known Limits:
+    KL-001: PRESERVED (must be included in BTD-A stimulus design)
+    KL-002: PRESERVED (HY-008 boundary maintained in BTD-A)
+    HY-008 Reopen Conditions R1-R5: NONE triggered (INACTIVE)
+
+  Artifact: docs/research/SOUL_YEOSU_HUMAN_BLIND_TEST_FOUNDER_GO_DECISION_V0_1.md
+  Controlled Collection Cycles: 25 (UNCHANGED)
+  DB / Schema / Runtime / Production: NO CHANGE
+
+  ONE NEXT ACTION: Design BTD-A (Blind Test Design) — stimulus, blinding protocol, evaluation criteria, participant profile.
+```
 
 **Internal 3-Place Pilot A/B Execution: COMPLETE (2026-09-28)**
 
