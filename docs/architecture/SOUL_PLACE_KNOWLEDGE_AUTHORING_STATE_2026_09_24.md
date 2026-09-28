@@ -2682,3 +2682,39 @@ PK Construction Checkpoint (2026-09-28)
 
 **CURRENT ONE NEXT ACTION: UNCHANGED** — Design BTD-A (Blind Test Design). This research hypothesis entry does NOT change the canonical next action.
 | Production 변경 | **PROHIBITED** |
+
+---
+
+## Light HBT V0.1 Execution Package (2026-09-28)
+
+```
+LIGHT_HBT_EXECUTION_PACKAGE: CREATED
+LIGHT_HBT_EXECUTION_PACKAGE_STATUS: READY_FOR_SESSION_AUTHORIZATION
+LIGHT_HBT_SESSION_READINESS: AWAITING_FOUNDER_AUTHORIZATION
+
+Scenarios frozen: O-1 / O-2 / H-1 / H-3
+DR-B-M-001: RESOLVED_FOR_LIGHT_HBT (stimulus presentation format)
+DR-B-M-002: RESOLVED_FOR_LIGHT_HBT (AI clarification script)
+DR-B-M-003: RESOLVED_FOR_LIGHT_HBT (place unfamiliarity clarification)
+DR-B-M-007: RESOLVED_FOR_LIGHT_HBT (ASSIGN_ERR invalidation rule)
+DR-B-M-004/005/006: NOT_APPLICABLE_TO_LIGHT_HBT / DEFERRED_TO_DEEP_HBT
+
+FOUNDER_PARTICIPANT_CONTACT_DECISION: GO (preserved)
+CONTACT_AUTHORIZATION: GO (preserved)
+SESSION_EXECUTION_AUTHORIZATION: BLOCKED — awaiting Founder GO
+COMPENSATION_DECISION: REQUIRES_FOUNDER_DECISION
+
+Deep HBT (BTD-A / EP-A / DR-B): PRESERVED as reference — not executed
+Participant Evidence: NONE
+BT Verdict: NOT_ASSIGNED
+HBT Executed: FALSE
+HY-003: PROVISIONALLY_SUPPORTED (unchanged)
+HY-008: HARD_BLOCKED + TERMINAL_FOR_CURRENT_COLLECTION_PHASE (unchanged)
+Controlled Collection Cycles: 25 (unchanged)
+DB / Schema / Runtime / Production: NO CHANGE
+
+CURRENT ONE NEXT ACTION:
+Founder Go/No-Go for Light HBT session execution —
+including compensation policy decision and explicit session execution authorization.
+Do NOT execute sessions until Founder GO received.
+```
