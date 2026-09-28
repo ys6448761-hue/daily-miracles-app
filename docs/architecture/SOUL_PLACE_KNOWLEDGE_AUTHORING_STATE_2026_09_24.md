@@ -63,7 +63,78 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 **Wave 4 Readiness Check: COMPLETE (2026-09-28). Wave 4 entry condition MET — all Wave 3 ERs in terminal states (HY-003 = ACCEPT_PROVISIONAL_WITH_BOUNDARY qualifies as BLOCKED with escalation recorded). Wave 4a: 7/7 READY (OD-002, OD-005, OD-007, HY-004, HY-005, CC-004 immediately executable; REL-005 execute last — Founder PRIMARY). Wave 4b: 4/4 BLOCKED (REL-003 awaits OD-002; REL-006 awaits REL-005; REL-004 awaits REL-003; HY-008 HARD BLOCKED — HY-003 ACCEPT_PROVISIONAL ≠ VERIFIED_FOR_PREPARATION per Plan §658). BATCH_01 reuse confirmed for HY-005 (향일암 무료 + 04:00~19:00 OFFICIAL). Controlled Collection Cycles: 15 (Readiness Check is not a collection cycle). WAVE_3_COLLECTION_EXECUTION_COMPLETE = TRUE. ALL_WAVE_3_ERS_VERIFIED = FALSE (HY-003 ACCEPT_PROVISIONAL — HY-008 hard block). ONE NEXT ACTION: Execute ER-OD-002 Controlled Evidence Collection (Wave 4, Cycle 16) — WE primary / FOUNDER secondary / EXPERIENCE_PATTERN_SUFFICIENT; unlocks REL-003 chain. Readiness artifact: docs/research/SOUL_YEOSU_WAVE_4_READINESS_CHECK_V0_1.md. DO NOT EXECUTE until user authorization.**
 
-**Wave 4 ER-OD-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28). EXPERIENCE_PATTERN_SUFFICIENT MET — 4 independent WE sources (EI-OD-002-A kidsfuninseoul WP family account; EI-OD-002-B Trip.com 2026 traveler moments; EI-OD-002-C TripAdvisor+guides synthesis; EI-OD-002-D Route Corpus R028+R040). Duration pattern: 30-60min minimum / 1-hour standard loop / 1-2 hours thorough / half-day if combined with Cable Car. Value drivers converged: forest trail immersion + lighthouse panoramic viewpoint + camellia season (Jan-March) + named features (Dragon Cave, Bamboo Tunnel, Musical Fountain). Physical scope: compact 0.12km²; 2.5km trail loop; family-accessible; single-visit completable. FOUNDER secondary not collected (not required for stop condition; gap noted). DOWNSTREAM: REL-003 all 4 dependencies now satisfied (REL-001 ✓ REL-002 ✓ OD-002 ✓ CC-005 ✓) → REL-003 = READY_FOR_COLLECTION. Controlled Collection Cycles: 15 → 16. Artifact: docs/research/SOUL_YEOSU_ER_OD_002_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md. ONE NEXT ACTION: Execute remaining Wave 4a ERs (OD-005, OD-007, HY-004, HY-005, CC-004) OR proceed to REL-003 Wave 4b — Founder authorization required.**
+**Wave 4 ER-OD-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28). EXPERIENCE_PATTERN_SUFFICIENT MET — 4 independent WE sources (EI-OD-002-A kidsfuninseoul WP family account; EI-OD-002-B Trip.com 2026 traveler moments; EI-OD-002-C TripAdvisor+guides synthesis; EI-OD-002-D Route Corpus R028+R040). Duration pattern: 30-60min minimum / 1-hour standard loop / 1-2 hours thorough / half-day if combined with Cable Car. Value drivers converged: forest trail immersion + lighthouse panoramic viewpoint + camellia season (Jan-March) + named features (Dragon Cave, Bamboo Tunnel, Musical Fountain). Physical scope: compact 0.12km²; 2.5km trail loop; family-accessible; single-visit completable. FOUNDER secondary not collected (not required for stop condition; gap noted). DOWNSTREAM: REL-003 all 4 dependencies now satisfied (REL-001 ✓ REL-002 ✓ OD-002 ✓ CC-005 ✓) → REL-003 = READY_FOR_COLLECTION. Controlled Collection Cycles: 15 → 16. Artifact: docs/research/SOUL_YEOSU_ER_OD_002_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md.**
+
+**Wave 4a COMPLETE — ALL 6 REMAINING ERs VERIFIED_FOR_PREPARATION (2026-09-28). Cycles 17-22 executed. Phase 4-α (HY-005 Cycle 17, HY-004 Cycle 18, OD-005 Cycle 19, OD-007 Cycle 20, CC-004 Cycle 21) + Phase 4-β (REL-005 Cycle 22, executed LAST per Plan ordering). HY-005: 평지길 exists (WE 2 sources); starts ticket office; ~15 min; full temple access; BATCH_01 NOT_APPLICABLE; AUTHORITATIVE_FACT_SUFFICIENT. HY-004: No designated ascent rest stops (4 WE sources — informative negative); within-temple 경내 shade; flat route informal rest; EXPERIENCE_PATTERN_SUFFICIENT. OD-005: Causeway stroller-accessible; some island stair sections; playground/stamp tour/Dongbaek Train alternatives; "가족 산책 코스"; EXPERIENCE_PATTERN_SUFFICIENT. OD-007: Causeway 768m flat deck; ~10-15 min; "바다 위를 걷는 느낌"; minimal friction; "누구나 부담 없이"; EXPERIENCE_PATTERN_SUFFICIENT. CC-004: Regular cabin child-friendly (stroller folded); Crystal = glass floor anxiety + stroller restriction; 자산 = elevator+판타지뉴월드; 돌산 = elevator+café; no nursing rooms documented; under-36m free (OFFICIAL); EXPERIENCE_PATTERN_SUFFICIENT. REL-005: 돌산→자산 PREFERRED for Odongdo-combined itinerary (geographic + one-way ticket logic from REL-001/002 facts); EXPERT_JUDGMENT_SUFFICIENT. DOWNSTREAM: REL-006 transitions READY_FOR_COLLECTION (all 4 deps: REL-001 ✓ REL-002 ✓ REL-005 ✓ OD-003 ✓). Controlled Collection Cycles: 16 → 22. Wave 0 gap register updated. ONE NEXT ACTION: Wave 4b — execute REL-003 (READY_FOR_COLLECTION, all 4 deps satisfied) — Founder authorization required before proceeding.**
+
+```
+Wave 4a ALL ERs COMPLETE — VERIFIED_FOR_PREPARATION (2026-09-28)
+  Cycles: 17 (HY-005) → 18 (HY-004) → 19 (OD-005) → 20 (OD-007) → 21 (CC-004) → 22 (REL-005)
+  Base: a7d35c9 (Wave 4a entry)
+  Branch: staging/storybook-c7a
+
+  Wave 4a ERs Completed:
+    ER-HY-005 — Hyangiram Alternative Access Route (Cycle 17)
+      Stop Condition: AUTHORITATIVE_FACT_SUFFICIENT
+      Key: 평지길 exists; starts at ticket office; ~15 min; full temple access (대웅전/용왕전/관음전);
+           gentle slope; bypasses stone gates; WE sources brunch.co.kr + comple.co.kr
+      BATCH_01 reuse: NOT_APPLICABLE (admission/hours ≠ alternative route)
+      File: docs/research/SOUL_YEOSU_ER_HY_005_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+
+    ER-HY-004 — Hyangiram Rest Point Evidence (Cycle 18)
+      Stop Condition: EXPERIENCE_PATTERN_SUFFICIENT
+      Key: No designated ascent rest stops (4 independent WE sources — informative negative);
+           within-temple 경내 shade/seating after ascent; flat route enables informal pausing
+      File: docs/research/SOUL_YEOSU_ER_HY_004_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+
+    ER-OD-005 — Odongdo Child Suitability (Cycle 19)
+      Stop Condition: EXPERIENCE_PATTERN_SUFFICIENT
+      Key: Causeway stroller-accessible (flat deck); some island stair sections (stroller must park);
+           children's playground + stamp tour + Dongbaek Train alternatives;
+           "가족 산책 코스"; best for 5+; under-5 manageable with Train
+      File: docs/research/SOUL_YEOSU_ER_OD_005_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+
+    ER-OD-007 — Odongdo Walking Friction from Access Point (Cycle 20)
+      Stop Condition: EXPERIENCE_PATTERN_SUFFICIENT
+      Key: Causeway ~768m flat deck; ~10-15 min at leisurely pace; "바다 위를 걷는 느낌";
+           "누구나 부담 없이"; Dongbaek Train alternative for those who cannot walk
+      File: docs/research/SOUL_YEOSU_ER_OD_007_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+
+    ER-CC-004 — Cable Car Per-Station Child Suitability (Cycle 21)
+      Stop Condition: EXPERIENCE_PATTERN_SUFFICIENT
+      Key: Regular cabin = child-friendly (stroller folded OK);
+           Crystal cabin = glass floor anxiety + stroller restriction (NOT recommended for young children);
+           자산역: elevator + 판타지뉴월드 3F; 돌산역: elevator + large café;
+           No nursing rooms documented at either station;
+           Under-36m free (OFFICIAL — EI-CC-001-I REUSE)
+      File: docs/research/SOUL_YEOSU_ER_CC_004_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+
+    ER-REL-005 — Cable Car Direction Selection Judgment (Cycle 22) [Phase 4-β — executed LAST]
+      Stop Condition: EXPERT_JUDGMENT_SUFFICIENT
+      Key: 돌산 탑승 → 자산 하차 PREFERRED for Odongdo-combined itinerary;
+           자산역 is ~5 min walk from 오동도 entrance (REL-001 fact);
+           One-way ticket efficient in this direction (REL-002 fact);
+           Exception: if not combining with Odongdo, direction is itinerary-neutral
+      Downstream: REL-006 transitions → READY_FOR_COLLECTION
+      File: docs/research/SOUL_YEOSU_ER_REL_005_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md
+
+  Gap Register Updates:
+    HY-004: NOT_STARTED → CLOSED (VERIFIED_FOR_PREPARATION)
+    HY-005: NOT_STARTED → CLOSED (VERIFIED_FOR_PREPARATION)
+    OD-005: NOT_STARTED → CLOSED (VERIFIED_FOR_PREPARATION)
+    OD-007: NOT_STARTED → CLOSED (VERIFIED_FOR_PREPARATION)
+    CC-004: PARTIALLY_SUPPORTED → CLOSED (VERIFIED_FOR_PREPARATION)
+    REL-005: CONTEXT_ONLY → CLOSED (VERIFIED_FOR_PREPARATION)
+    REL-006: NOT_STARTED → READY_FOR_COLLECTION
+
+  Wave 4a Summary:
+    Total ERs in Wave 4a: 7 (including OD-002 from prior cycle)
+    OD-002: VERIFIED_FOR_PREPARATION (Cycle 16)
+    Remaining 6: VERIFIED_FOR_PREPARATION (Cycles 17-22)
+    Wave 4a Status: ALL COMPLETE
+
+  Controlled Collection Cycles: 16 → 22
+```
 
 ```
 Wave 4 ER-OD-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28)

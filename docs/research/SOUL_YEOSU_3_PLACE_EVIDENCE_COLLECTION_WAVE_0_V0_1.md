@@ -727,9 +727,9 @@ All 29 ERs initialized with current status per V0.2 lifecycle.
 | ER-OD-002 | **VERIFIED_FOR_PREPARATION (2026-09-28)** | ER-OD-001 ✓ VERIFIED | P1; Wave 4 Cycle 16 CLOSED — EXPERIENCE_PATTERN_SUFFICIENT 4/4 WE sources. Duration: 1-hour loop / 1-2 hrs thorough / half-day combined. Value drivers: forest trail + lighthouse + camellia season + named features. Unlocks REL-003 (all 4 deps now satisfied). |
 | ER-OD-003 | NOT_STARTED | N/A (no deps) | P0; Wave 1 |
 | ER-OD-004 | **VERIFIED_FOR_PREPARATION** | N/A (no deps) | P0; Wave 2 COMPLETE (2026-09-27) |
-| ER-OD-005 | NOT_STARTED | Awaits ER-OD-001, ER-OD-003 | P1; Wave 3/4a |
+| ER-OD-005 | **VERIFIED_FOR_PREPARATION (2026-09-28)** | ER-OD-001 ✓, ER-OD-003 ✓ | P1; Wave 4a CLOSED — Cycle 19 EXPERIENCE_PATTERN_SUFFICIENT. Causeway stroller-accessible; some island stair sections; playground/stamp tour/Dongbaek Train alternatives; "가족 산책 코스". See: `docs/research/SOUL_YEOSU_ER_OD_005_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-OD-006 | **VERIFIED_FOR_PREPARATION** | None (canonical Matrix: no deps; "Awaits ER-OD-001" was stale) | P1; Wave 3 COMPLETE (2026-09-28) |
-| ER-OD-007 | NOT_STARTED | N/A | P1; Wave 4a |
+| ER-OD-007 | **VERIFIED_FOR_PREPARATION (2026-09-28)** | ER-OD-003 ✓ | P1; Wave 4a CLOSED — Cycle 20 EXPERIENCE_PATTERN_SUFFICIENT. Causeway 768m flat deck; ~10-15 min; "바다 위를 걷는 느낌"; minimal friction; "누구나 부담 없이". Dongbaek Train alternative available. See: `docs/research/SOUL_YEOSU_ER_OD_007_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 
 ### Hyangiram
 
@@ -738,8 +738,8 @@ All 29 ERs initialized with current status per V0.2 lifecycle.
 | ER-HY-001 | **VERIFIED_FOR_PREPARATION** | N/A (no deps) | P0; Wave 1 COMPLETE (2026-09-27) |
 | ER-HY-002 | **VERIFIED_FOR_PREPARATION** | N/A | P0; Wave 2 COMPLETE (2026-09-27) |
 | ER-HY-003 | **PROVISIONALLY_SUPPORTED** | ER-HY-001 ✓ ER-HY-002 ✓ | P0; Wave 3 Cycle 12 COMPLETE (2026-09-28) |
-| ER-HY-004 | NOT_STARTED | N/A | P1; Wave 4a |
-| ER-HY-005 | NOT_STARTED | N/A | P1; Wave 4a |
+| ER-HY-004 | **VERIFIED_FOR_PREPARATION (2026-09-28)** | ER-HY-001 ✓ | P1; Wave 4a CLOSED — Cycle 18 EXPERIENCE_PATTERN_SUFFICIENT. No designated ascent rest stops (4 WE sources); within-temple shade/seating (경내); flat route enables informal rest. See: `docs/research/SOUL_YEOSU_ER_HY_004_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
+| ER-HY-005 | **VERIFIED_FOR_PREPARATION (2026-09-28)** | ER-HY-001 ✓ | P1; Wave 4a CLOSED — Cycle 17 AUTHORITATIVE_FACT_SUFFICIENT. 평지길 exists; starts at ticket office; ~15 min (vs 10 min stairs); full temple access (대웅전/용왕전/관음전); gentler slope; bypasses stone gates. BATCH_01 NOT_APPLICABLE. See: `docs/research/SOUL_YEOSU_ER_HY_005_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-HY-006 | **VERIFIED_FOR_PREPARATION** | N/A | P0; Wave 2 COMPLETE (2026-09-27) |
 | ER-HY-007 | **VERIFIED_FOR_PREPARATION** | N/A (dependency was ER-HY-006 per canonical Matrix; stale entry corrected) | P0; Wave 3 COMPLETE (2026-09-28) |
 | ER-HY-008 | NOT_STARTED | Awaits ER-HY-001 (Wave 4b gated) | P1; Wave 4b |
@@ -752,7 +752,7 @@ All 29 ERs initialized with current status per V0.2 lifecycle.
 | ER-CC-001 | **VERIFIED_FOR_PREPARATION** | N/A (no deps) | P0; Wave 1 CLOSED 2026-09-27 — AUTHORITATIVE_FACT_SUFFICIENT. Official naming confirmed: 자산[해야]정류장 / 돌산[놀아]정류장. Unlocks CC-002, CC-005, REL-001. |
 | ER-CC-002 | NOT_STARTED | **ER-CC-001 VERIFIED ✓** — prerequisite met | P0; Wave 2 — may now proceed |
 | ER-CC-003 | **VERIFIED_FOR_PREPARATION (2026-09-27)** | ER-CC-001 ✓ + ER-CC-002 ✓ | P0; Wave 3 CLOSED — EXPERIENCE_PATTERN_SUFFICIENT 8/8. CONFLICT-F RESOLVED. Unlocks CC-004. See: `docs/research/SOUL_YEOSU_ER_CC_003_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
-| ER-CC-004 | NOT_STARTED | Awaits ER-CC-001, ER-CC-002, ER-CC-003 | P1; Wave 4a |
+| ER-CC-004 | **VERIFIED_FOR_PREPARATION (2026-09-28)** | ER-CC-001 ✓, ER-CC-002 ✓, ER-CC-003 ✓ | P1; Wave 4a CLOSED — Cycle 21 EXPERIENCE_PATTERN_SUFFICIENT. Regular: stroller(folded) OK; Crystal: glass floor anxiety + stroller restriction. 자산: elevator+판타지뉴월드; 돌산: elevator+café. No nursing rooms documented. Under-36m free (OFFICIAL). See: `docs/research/SOUL_YEOSU_ER_CC_004_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
 | ER-CC-005 | **VERIFIED_FOR_PREPARATION (2026-09-28)** | ER-CC-001 ✓ VERIFIED | P1; Wave 3 CLOSED (stale dep entry: showed "Wave 2" — canonical Wave 3). LIVE_BOUNDARY_SUFFICIENT 13/13 PASS. 25 fields classified. CC-005 unlocks REL-003 (one of 4 deps; OD-002 still needed). |
 
 **BLOCKED-DEPENDENCY trigger assessment:** ER-CC-001 is IN_COLLECTION (not BLOCKED/CONFLICTED/UNKNOWN). Therefore BLOCKED-DEPENDENCY does not propagate to ER-CC-002 at this stage. Per V0.2 §5: BLOCKED-DEPENDENCY triggers only when prerequisite is BLOCKED/CONFLICTED/UNKNOWN.
@@ -765,8 +765,8 @@ All 29 ERs initialized with current status per V0.2 lifecycle.
 | ER-REL-002 | **VERIFIED_FOR_PREPARATION (2026-09-27)** | ER-REL-001 ✓ VERIFIED, ER-CC-001 ✓ VERIFIED, ER-OD-003 ✓ VERIFIED | P0; Wave 3 CLOSED — RELATIONSHIP_SUFFICIENT 10/10. Unlocks REL-005 (awaits REL-001 + REL-002). |
 | ER-REL-003 | **READY_FOR_COLLECTION (2026-09-28)** | REL-001 ✓ REL-002 ✓ OD-002 ✓ CC-005 ✓ — ALL 4 deps SATISFIED | P1; Wave 4b — all dependency gates now cleared. Proceed to REL-003 collection after separate authorization. |
 | ER-REL-004 | NOT_STARTED | Awaits ER-REL-001, ER-REL-002, ER-REL-003 | P1; Wave 4b |
-| ER-REL-005 | NOT_STARTED | Awaits ER-REL-001, ER-REL-002 | P0; Wave 4a |
-| ER-REL-006 | NOT_STARTED | Awaits ER-REL-001, ER-REL-002, ER-REL-005, ER-OD-003 | P1; Wave 4b |
+| ER-REL-005 | **VERIFIED_FOR_PREPARATION (2026-09-28)** | ER-REL-001 ✓, ER-REL-002 ✓ | P0; Phase 4-β CLOSED — Cycle 22 EXPERT_JUDGMENT_SUFFICIENT. 돌산→자산 PREFERRED for Odongdo-combined itinerary (one-way ticket efficient; ~5 min walk to Odongdo from 자산). Unlocks REL-006. See: `docs/research/SOUL_YEOSU_ER_REL_005_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md` |
+| ER-REL-006 | **READY_FOR_COLLECTION (2026-09-28)** | ER-REL-001 ✓, ER-REL-002 ✓, ER-REL-005 ✓, ER-OD-003 ✓ — ALL 4 deps SATISFIED | P1; Wave 4b — all dependency gates now cleared. Not authorized in this session. Proceed after separate Wave 4b authorization. |
 
 ### System Test
 
