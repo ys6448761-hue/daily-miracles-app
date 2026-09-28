@@ -79,7 +79,34 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 **[SUPERSEDED] PREVIOUS ONE NEXT ACTION (2026-09-28 — post DR-B V0.1): Design participant recruitment protocol V0.1 — define recruitment channels, screening procedure, scheduling approach, and consent framework. Founder decision required before any actual participant contact. DR_B_STATUS: READY_FOR_RECRUITMENT. RECRUITMENT_READINESS: READY. 7 MINOR EP-A clarifications recommended before first session (presentation format / 3 clarification replies / single-item completeness / mid-session break / MT-1 incomplete / ASSIGN_ERR severity). 0 BLOCKING / 0 MAJOR issues. HBT Executed: FALSE. Participant Evidence: NONE. BT Verdict: NOT_ASSIGNED. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
 
-**CURRENT ONE NEXT ACTION (2026-09-28 — post Recruitment Protocol V0.1): Founder review and Go-No-Go decision for participant contact — including resolution of: (1) compensation policy (REQUIRES_FOUNDER_DECISION), (2) all 7 DR-B MINOR PRE_SESSION_BLOCKER issues (Session Addendum creation before first real session), (3) explicit participant contact authorization (FOUNDER_PARTICIPANT_CONTACT_DECISION: NOT_REQUESTED → GO). RECRUITMENT_PROTOCOL_STATUS: READY_FOR_FOUNDER_CONTACT_DECISION. No participants contacted. HBT Executed: FALSE. Participant Evidence: NONE. BT Verdict: NOT_ASSIGNED. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
+**[SUPERSEDED] PREVIOUS ONE NEXT ACTION (2026-09-28 — post Recruitment Protocol V0.1): Founder review and Go-No-Go decision for participant contact — including resolution of: (1) compensation policy (REQUIRES_FOUNDER_DECISION), (2) all 7 DR-B MINOR PRE_SESSION_BLOCKER issues (Session Addendum creation before first real session), (3) explicit participant contact authorization (FOUNDER_PARTICIPANT_CONTACT_DECISION: NOT_REQUESTED → GO). RECRUITMENT_PROTOCOL_STATUS: READY_FOR_FOUNDER_CONTACT_DECISION. No participants contacted. HBT Executed: FALSE. Participant Evidence: NONE. BT Verdict: NOT_ASSIGNED. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
+
+**CURRENT ONE NEXT ACTION (2026-09-28 — post Founder Contact Decision GO): Create Human Blind Test Session Addendum V0.1 to resolve DR-B-M-001 through DR-B-M-007 (all PRE_SESSION_BLOCKERs). FOUNDER_PARTICIPANT_CONTACT_DECISION: GO. CONTACT_AUTHORIZATION: GO. SESSION_EXECUTION_AUTHORIZATION: BLOCKED. RECRUITMENT_CONTACT_READINESS: AUTHORIZED. HBT_SESSION_READINESS: BLOCKED_PRE_SESSION_ADDENDUM. COMPENSATION_DECISION: REQUIRES_FOUNDER_DECISION (does not block contact). Session Addendum: NOT_YET_CREATED. HBT Executed: FALSE. Participant Evidence: NONE. BT Verdict: NOT_ASSIGNED. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
+
+**Founder Participant Contact Decision V0.1 (2026-09-28)**
+
+```
+FOUNDER_PARTICIPANT_CONTACT_DECISION: GO
+CONTACT_AUTHORIZATION: GO
+SESSION_EXECUTION_AUTHORIZATION: BLOCKED
+RECRUITMENT_CONTACT_READINESS: AUTHORIZED
+HBT_SESSION_READINESS: BLOCKED_PRE_SESSION_ADDENDUM
+Pre-contact blockers: 0
+Pre-session blockers: 7 (DR-B-M-001 through DR-B-M-007 — all PRE_SESSION_BLOCKER, none PRE_CONTACT_BLOCKER)
+COMPENSATION_DECISION: REQUIRES_FOUNDER_DECISION (does not block contact)
+Session Addendum: NOT_YET_CREATED
+BTD-A: CREATED (preserved)
+EP-A: CREATED (preserved)
+DR-B: COMPLETED (preserved)
+Recruitment Protocol: CREATED (preserved)
+HBT Executed: FALSE
+Participant Evidence: NONE
+BT Verdict: NOT_ASSIGNED
+HY-003: PROVISIONALLY_SUPPORTED (unchanged)
+HY-008: HARD_BLOCKED + TERMINAL_FOR_CURRENT_COLLECTION_PHASE (unchanged)
+Controlled Collection Cycles: 25 (unchanged)
+DB / Schema / Runtime / Production: NO CHANGE
+```
 
 **Participant Recruitment Protocol V0.1 (2026-09-28)**
 

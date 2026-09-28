@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-28T04:50:47.839Z",
+  "generated_at": "2026-09-28T05:01:51.710Z",
   "generator": "generate-manifest.js",
-  "total_count": 591,
+  "total_count": 592,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -940,7 +940,7 @@
       "status": "superseded",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-28",
-      "checksum": "69c1ad2b"
+      "checksum": "2b1c6b49"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -5634,6 +5634,23 @@
       "title": "SOUL Yeosu — Human Blind Test Facilitator Dry Run DR-B V0.1",
       "created_at": "2026-09-28",
       "checksum": "4570c343"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_HUMAN_BLIND_TEST_FO",
+      "path": "docs/research/SOUL_YEOSU_HUMAN_BLIND_TEST_FOUNDER_CONTACT_DECISION_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu Human Blind Test — Founder Participant Contact Decision V0.1",
+      "created_at": "2026-09-28",
+      "checksum": "26626011"
     },
     {
       "id": "DOC-SOUL_YEOSU_HUMAN_BLIND_TEST_FO",
