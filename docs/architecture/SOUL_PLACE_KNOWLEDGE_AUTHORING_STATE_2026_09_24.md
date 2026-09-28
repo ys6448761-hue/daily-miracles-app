@@ -63,7 +63,54 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 **[SUPERSEDED — see latest checkpoint below] Wave 4 Readiness Check: COMPLETE (2026-09-28). Wave 4 entry condition MET. ONE NEXT ACTION (at that time): Execute ER-OD-002. Controlled Collection Cycles: 15.**
 
-**CURRENT ONE NEXT ACTION (2026-09-28 — post REL-006 Cycle 25): Wave 4 HY-008 Governance Decision. WAVE_4_COLLECTION_EXECUTION_COMPLETE = TRUE. ALL_WAVE_4_ERS_VERIFIED = FALSE (HY-008 HARD BLOCKED). Controlled Collection Cycles: 25. Founder chooses: (A) Founder field validation for HY-003 — one elder descent observation closes EP-3 → HY-003 VERIFIED → HY-008 unblocks, OR (B) Wave 4 closure with HY-008 in terminal HARD_BLOCKED state → proceed to Wave 5 scope (HY-009) and Pilot preparation gates. DO NOT execute either without Founder authorization.**
+**CURRENT ONE NEXT ACTION (2026-09-28 — post HY-008 Option B decision): Begin Prepared Knowledge construction for the 3-place pilot (오동도, 향일암, 케이블카) using VERIFIED evidence. HY-003 KNOWN_LIMIT must be explicitly documented within Hyangiram prepared knowledge. Wave 4 operationally CLOSED. Controlled Collection Cycles: 25.**
+
+**Founder HY-008 Governance Decision: OPTION_B_APPROVED (2026-09-28)**
+
+```
+Decision: Option B — Proceed with documented KNOWN_LIMIT
+Artifact: docs/research/SOUL_YEOSU_HY_008_FOUNDER_GOVERNANCE_DECISION_V0_1.md
+Starting HEAD: 53035d5 | Branch: staging/storybook-c7a
+
+HY-003: PROVISIONALLY_SUPPORTED (UNCHANGED)
+HY-003 disposition: ACCEPT_PROVISIONAL_WITH_BOUNDARY
+HY-003 EP-3: PARTIAL_PASS (UNCHANGED)
+HY-003 web upgrade path: EXHAUSTED
+HY-003 reopen path: OPEN (Founder field validation — one elder descent observation closes EP-3)
+
+HY-008: HARD_BLOCKED + TERMINAL_FOR_CURRENT_COLLECTION_PHASE
+KNOWN_LIMIT: Elder-specific descent-friction pattern not sufficiently established to
+  support a strong negative/suitability boundary. SOUL must ASK capability (not age),
+  QUALIFY uncertainty, and NOT fabricate a non-recommendation threshold.
+H-2 diagnostic contract: SOUL must NOT infer suitability from "부모님". Must trigger
+  necessary ASK. Pilot tests MISSED_NECESSARY_ASK behavior (primary research question).
+
+WAVE_4_COLLECTION_EXECUTION_COMPLETE: TRUE
+ALL_WAVE_4_ERS_VERIFIED: FALSE (HY-008 TERMINAL_FOR_CURRENT_COLLECTION_PHASE)
+Controlled Collection Cycles: 25 (UNCHANGED — governance decision ≠ evidence cycle)
+
+Reopen conditions: OPEN (R1=Pilot H-2 integrity fail / R2=Founder natural field obs /
+  R3=H-2 unsafe under QUALIFY / R4=Integrity Gate requires HY-008 / R5=new contradictory evidence)
+
+Wave 5 (HY-009 + CX-001): NOT required before 3-place Pilot.
+  HY-009 = P2 supporting depth (independent Wave 5 exit condition).
+  CX-001 = system behavioral test verified during Pilot execution itself.
+  Neither blocks Prepared Knowledge construction.
+
+Canonical next phase: Prepared Knowledge construction → Internal Pilot → Integrity Gate → Founder Go/No-Go → Human Blind Test (HOLD)
+YTC Coverage Check: NOT the immediate next action.
+
+Prepared-Evidence Reuse Observation: EARLY_REPEAT_SIGNAL (Cycle 23: 0 new / Cycle 24: 3 new / Cycle 25: 2 new) — supports transition to preparation phase. NOT promoted.
+Traveler Condition × Experience Requirement: RESEARCH_HYPOTHESIS (UNCHANGED)
+Human Blind Test: HOLD (UNCHANGED — Option B does NOT release HBT)
+BT Verdict: NOT ASSIGNED
+Participant Evidence: NONE
+Prepared Knowledge: RESEARCH_HYPOTHESIS ONLY → NEXT ACTION: begin construction
+Prepared Context: RESEARCH_HYPOTHESIS ONLY
+place_knowledge migration: NOT APPROVED
+DB / Schema / Runtime / Production: NO CHANGE
+ALL_WAVE_3_ERS_VERIFIED: FALSE (UNCHANGED)
+```
 
 **Wave 4 ER-OD-002 Collection: COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-28). EXPERIENCE_PATTERN_SUFFICIENT MET — 4 independent WE sources (EI-OD-002-A kidsfuninseoul WP family account; EI-OD-002-B Trip.com 2026 traveler moments; EI-OD-002-C TripAdvisor+guides synthesis; EI-OD-002-D Route Corpus R028+R040). Duration pattern: 30-60min minimum / 1-hour standard loop / 1-2 hours thorough / half-day if combined with Cable Car. Value drivers converged: forest trail immersion + lighthouse panoramic viewpoint + camellia season (Jan-March) + named features (Dragon Cave, Bamboo Tunnel, Musical Fountain). Physical scope: compact 0.12km²; 2.5km trail loop; family-accessible; single-visit completable. FOUNDER secondary not collected (not required for stop condition; gap noted). DOWNSTREAM: REL-003 all 4 dependencies now satisfied (REL-001 ✓ REL-002 ✓ OD-002 ✓ CC-005 ✓) → REL-003 = READY_FOR_COLLECTION. Controlled Collection Cycles: 15 → 16. Artifact: docs/research/SOUL_YEOSU_ER_OD_002_CONTROLLED_EVIDENCE_COLLECTION_V0_1.md.**
 

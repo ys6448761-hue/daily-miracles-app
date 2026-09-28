@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-28T02:12:31.948Z",
+  "generated_at": "2026-09-28T02:22:29.624Z",
   "generator": "generate-manifest.js",
-  "total_count": 572,
+  "total_count": 573,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,7 +923,7 @@
       "status": "superseded",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-28",
-      "checksum": "43cd177c"
+      "checksum": "a7eada4c"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -5379,6 +5379,23 @@
       "title": "SOUL Yeosu Evidence Collection — ER-REL-006",
       "created_at": "2026-09-28",
       "checksum": "283d8a45"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_HY_008_FOUNDER_GOVE",
+      "path": "docs/research/SOUL_YEOSU_HY_008_FOUNDER_GOVERNANCE_DECISION_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu Research Pilot",
+      "created_at": "2026-09-28",
+      "checksum": "47354e42"
     },
     {
       "id": "DOC-SOUL_YEOSU_HY_008_GOVERNANCE_D",
