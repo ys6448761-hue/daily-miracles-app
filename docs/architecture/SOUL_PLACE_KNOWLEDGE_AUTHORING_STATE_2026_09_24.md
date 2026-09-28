@@ -81,7 +81,38 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 **[SUPERSEDED] PREVIOUS ONE NEXT ACTION (2026-09-28 — post Recruitment Protocol V0.1): Founder review and Go-No-Go decision for participant contact — including resolution of: (1) compensation policy (REQUIRES_FOUNDER_DECISION), (2) all 7 DR-B MINOR PRE_SESSION_BLOCKER issues (Session Addendum creation before first real session), (3) explicit participant contact authorization (FOUNDER_PARTICIPANT_CONTACT_DECISION: NOT_REQUESTED → GO). RECRUITMENT_PROTOCOL_STATUS: READY_FOR_FOUNDER_CONTACT_DECISION. No participants contacted. HBT Executed: FALSE. Participant Evidence: NONE. BT Verdict: NOT_ASSIGNED. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
 
-**CURRENT ONE NEXT ACTION (2026-09-28 — post Founder Contact Decision GO): Create Human Blind Test Session Addendum V0.1 to resolve DR-B-M-001 through DR-B-M-007 (all PRE_SESSION_BLOCKERs). FOUNDER_PARTICIPANT_CONTACT_DECISION: GO. CONTACT_AUTHORIZATION: GO. SESSION_EXECUTION_AUTHORIZATION: BLOCKED. RECRUITMENT_CONTACT_READINESS: AUTHORIZED. HBT_SESSION_READINESS: BLOCKED_PRE_SESSION_ADDENDUM. COMPENSATION_DECISION: REQUIRES_FOUNDER_DECISION (does not block contact). Session Addendum: NOT_YET_CREATED. HBT Executed: FALSE. Participant Evidence: NONE. BT Verdict: NOT_ASSIGNED. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
+**[SUPERSEDED] PREVIOUS ONE NEXT ACTION (2026-09-28 — post Founder Contact Decision GO): Create Human Blind Test Session Addendum V0.1 to resolve DR-B-M-001 through DR-B-M-007 (all PRE_SESSION_BLOCKERs). FOUNDER_PARTICIPANT_CONTACT_DECISION: GO. CONTACT_AUTHORIZATION: GO. SESSION_EXECUTION_AUTHORIZATION: BLOCKED. RECRUITMENT_CONTACT_READINESS: AUTHORIZED. HBT_SESSION_READINESS: BLOCKED_PRE_SESSION_ADDENDUM. COMPENSATION_DECISION: REQUIRES_FOUNDER_DECISION (does not block contact). Session Addendum: NOT_YET_CREATED. HBT Executed: FALSE. Participant Evidence: NONE. BT Verdict: NOT_ASSIGNED. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
+
+**CURRENT ONE NEXT ACTION (2026-09-28 — post Light HBT V0.1 Scope Amendment): Create Light HBT V0.1 Execution Package — frozen scenario contexts for O-1/O-2/H-1/H-3, stimulus generation procedure, facilitator script (~10 min), clarification rules resolving DR-B-M-001/002/003/007, simplified data capture template, invalid session rules. CONTACT_AUTHORIZATION: GO (preserved). SESSION_EXECUTION_AUTHORIZATION: BLOCKED until package validated. HBT_SESSION_READINESS: BLOCKED_LIGHT_HBT_PACKAGE_NOT_CREATED. Participant Evidence: NONE. BT Verdict: NOT_ASSIGNED. Controlled Collection Cycles: 25 (UNCHANGED). DB / Schema / Runtime / Production: NO CHANGE.**
+
+**Light HBT V0.1 Scope Amendment (2026-09-28)**
+
+```
+LIGHT_HBT_SCOPE_AMENDMENT: CREATED
+Light HBT Research Question: "사람은 SOUL의 준비된 여행 응답에서 의미 있는 차이를 인식하는가?"
+Light HBT Duration: ~10 min
+Light HBT Participants: 8
+Light HBT Scenarios per Participant: 2
+Light HBT Selected Scenarios: O-1, O-2, H-1, H-3
+Light HBT Participant Questions: Q1 (Forced Choice) + Q2 (Why — free text, 1-3 sentences)
+Light HBT Execution Package: NOT_YET_CREATED
+Deep HBT (BTD-A/EP-A/DR-B): PRESERVED as reference — not executed
+DR-B-M-STILL_REQUIRED: DR-B-M-001 (stimulus format) / DR-B-M-002 (AI clarification) / DR-B-M-003 (place unfamiliarity) / DR-B-M-007 (ASSIGN_ERR severity)
+DR-B-M-NOT_APPLICABLE: DR-B-M-004 (6-dim missing) / DR-B-M-005 (break protocol) / DR-B-M-006 (MT-1 incomplete)
+DR-B-M-DEFERRED: None
+FOUNDER_PARTICIPANT_CONTACT_DECISION: GO (preserved)
+CONTACT_AUTHORIZATION: GO (preserved)
+SESSION_EXECUTION_AUTHORIZATION: BLOCKED (until Light HBT Execution Package validated)
+HBT_SESSION_READINESS: BLOCKED_LIGHT_HBT_PACKAGE_NOT_CREATED
+COMPENSATION_DECISION: REQUIRES_FOUNDER_DECISION (does not block contact)
+Participant Evidence: NONE
+BT Verdict: NOT_ASSIGNED
+HBT Executed: FALSE
+HY-003: PROVISIONALLY_SUPPORTED (unchanged)
+HY-008: HARD_BLOCKED + TERMINAL_FOR_CURRENT_COLLECTION_PHASE (unchanged)
+Controlled Collection Cycles: 25 (unchanged)
+DB / Schema / Runtime / Production: NO CHANGE
+```
 
 **Founder Participant Contact Decision V0.1 (2026-09-28)**
 

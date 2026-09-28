@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-28T05:01:51.710Z",
+  "generated_at": "2026-09-28T05:08:06.352Z",
   "generator": "generate-manifest.js",
-  "total_count": 592,
+  "total_count": 593,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -940,7 +940,7 @@
       "status": "superseded",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-28",
-      "checksum": "2b1c6b49"
+      "checksum": "d30e7164"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -5736,6 +5736,23 @@
       "title": "SOUL Yeosu — Internal 3-Place Pilot Integrity Gate V0.1",
       "created_at": "2026-09-28",
       "checksum": "73062ba0"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_LIGHT_HBT_V0_1_SCOP",
+      "path": "docs/research/SOUL_YEOSU_LIGHT_HBT_V0_1_SCOPE_AMENDMENT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu — Light HBT V0.1 Scope Amendment",
+      "created_at": "2026-09-28",
+      "checksum": "8359b692"
     },
     {
       "id": "DOC-SOUL_YEOSU_PREPARED_KNOWLEDGE_",
