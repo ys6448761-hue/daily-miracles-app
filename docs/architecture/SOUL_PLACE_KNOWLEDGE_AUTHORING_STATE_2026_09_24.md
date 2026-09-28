@@ -63,7 +63,9 @@ blocker (lat/lng / admission_fee / PLACE_SUFFIX_RE / PLACE_ALIAS_MAP) 미해소.
 
 **[SUPERSEDED — see latest checkpoint below] Wave 4 Readiness Check: COMPLETE (2026-09-28). Wave 4 entry condition MET. ONE NEXT ACTION (at that time): Execute ER-OD-002. Controlled Collection Cycles: 15.**
 
-**CURRENT ONE NEXT ACTION (2026-09-28 — post HY-008 Option B decision): Begin Prepared Knowledge construction for the 3-place pilot (오동도, 향일암, 케이블카) using VERIFIED evidence. HY-003 KNOWN_LIMIT must be explicitly documented within Hyangiram prepared knowledge. Wave 4 operationally CLOSED. Controlled Collection Cycles: 25.**
+**[SUPERSEDED] PREVIOUS ONE NEXT ACTION (2026-09-28 — post HY-008 Option B decision): Begin Prepared Knowledge construction for the 3-place pilot (오동도, 향일암, 케이블카) using VERIFIED evidence. HY-003 KNOWN_LIMIT must be explicitly documented within Hyangiram prepared knowledge. Wave 4 operationally CLOSED. Controlled Collection Cycles: 25.**
+
+**CURRENT ONE NEXT ACTION (2026-09-28 — post PK Construction V0.1): Founder authorization for Internal 3-Place Pilot execution — 9 scenarios (O-1/2/3, H-1/2/3, C-1/2/3) + MT-1, Model A vs Model B, per Pilot Protocol V0.2. PREPARATION_READY: YES. Controlled Collection Cycles: 25 (UNCHANGED).**
 
 **Founder HY-008 Governance Decision: OPTION_B_APPROVED (2026-09-28)**
 
@@ -105,8 +107,12 @@ Traveler Condition × Experience Requirement: RESEARCH_HYPOTHESIS (UNCHANGED)
 Human Blind Test: HOLD (UNCHANGED — Option B does NOT release HBT)
 BT Verdict: NOT ASSIGNED
 Participant Evidence: NONE
-Prepared Knowledge: RESEARCH_HYPOTHESIS ONLY → NEXT ACTION: begin construction
-Prepared Context: RESEARCH_HYPOTHESIS ONLY
+Prepared Knowledge: CONSTRUCTION_COMPLETE (2026-09-28)
+  Artifacts: Evidence Manifest, Preparation Units (21 PUs), Model A Package, Model B Package, Integrity Review, Gap/Reuse Ledger
+  PREPARATION_READY: YES — all 4 Integrity Gate criteria PASS, 0 BLOCKING gaps, 10/10 scenarios PILOT_READY
+  KL-001 + KL-002: fully propagated across all 4 preparation artifacts
+  H-2 PILOT CONTRACT: enforced (no yes/no suitability verdict; MANDATORY ASK TRIGGER defined)
+Prepared Context: CONSTRUCTION_COMPLETE (2026-09-28) — Model B CABLECAR_FULL / ODONGDO_FULL / HYANGIRAM_FULL pre-activation blocks defined
 place_knowledge migration: NOT APPROVED
 DB / Schema / Runtime / Production: NO CHANGE
 ALL_WAVE_3_ERS_VERIFIED: FALSE (UNCHANGED)
@@ -2275,6 +2281,61 @@ SOUL             → compose what this traveler needs now
 --            zone_co_visit, source_origin, verified_date, confidence,
 --            authoring_notes
 -- 상세 스키마: SOUL Place Knowledge Schema + Authoring Plan V0.1 참조
+```
+
+---
+
+**3-Place Prepared Knowledge Construction V0.1: COMPLETE / PREPARATION_READY (2026-09-28)**
+
+```
+PK Construction Checkpoint (2026-09-28)
+  Starting HEAD: 62107bb | Branch: staging/storybook-c7a
+  Authorization: Founder (post HY-008 Option B decision)
+  Phase: Prepared Knowledge Construction V0.1 — COMPLETE
+
+  Artifacts Created:
+    1. docs/research/SOUL_YEOSU_3_PLACE_PREPARED_EVIDENCE_MANIFEST_V0_1.md
+       - 26 ERs included / 1 excluded (HY-008 HARD_BLOCKED)
+       - KNOWN_LIMIT KL-001 + KL-002 declared and propagation rules stated
+       - Scenario-to-ER mapping complete (all 10 scenarios)
+
+    2. docs/research/SOUL_YEOSU_3_PLACE_PREPARATION_UNITS_V0_1.md
+       - 21 Preparation Units (7 OD + 6 HY + 5 CC + 3 REL)
+       - State labels: PREPARED / SEMI_STABLE / LIVE / RUNTIME per field
+       - KL-001: PU-HY-002 (burden), PU-HY-003 (suitability frame)
+       - KL-002 + H-2 PILOT CONTRACT: PU-HY-003 (mandatory ASK structure, no yes/no)
+
+    3. docs/research/SOUL_YEOSU_3_PLACE_MODEL_A_PACKAGE_V0_1.md
+       - Model A: post-question retrieval; per-scenario PU selection index
+       - All 10 scenarios + MT-1 covered; H-2 yes/no verdict absent
+
+    4. docs/research/SOUL_YEOSU_3_PLACE_MODEL_B_PACKAGE_V0_1.md
+       - Model B: pre-question context activation from Traveler State
+       - 5 activation blocks: ODONGDO_FULL / HYANGIRAM_FULL / CABLECAR_FULL / REL_CONTEXT / VEHICLE_EXTENSION
+       - Same Evidence Pool as Model A; KL-002 activation condition defined
+
+    5. docs/research/SOUL_YEOSU_3_PLACE_PREPARATION_INTEGRITY_REVIEW_V0_1.md
+       - FACTUAL_GROUNDING: PASS
+       - EVIDENCE_BOUNDARY: PASS (H-2 yes/no absent; MANDATORY ASK confirmed)
+       - CONTEXT_FIDELITY (setup): PASS (MT-1 extension documented)
+       - LIVE_CORRECTNESS: PASS (all field labels verified)
+       - BLOCKING gap count: 0
+       - PREPARATION_READY: YES
+
+    6. docs/research/SOUL_YEOSU_3_PLACE_PREPARATION_GAP_REUSE_LEDGER_V0_1.md
+       - 21 PU reuse tracked; avg 2.5 scenarios per PU
+       - Highest-reuse PUs: PU-CC-001 (5), PU-REL-003 (4)
+       - 7 PK-level gaps; 0 BLOCKING
+       - 10/10 scenarios: PILOT_READY
+
+  Controlled Collection Cycles: 25 (UNCHANGED — PK construction ≠ evidence cycle)
+  DB / Schema / Runtime / Production: NO CHANGE
+
+  CURRENT ONE NEXT ACTION: Founder authorization for Internal 3-Place Pilot execution
+    - Pilot Protocol V0.2, 9 scenarios (O-1/2/3, H-1/2/3, C-1/2/3) + MT-1
+    - Model A vs Model B comparison
+    - H-2 = MISSED_NECESSARY_ASK primary diagnostic
+    - Do NOT execute Pilot without Founder authorization
 ```
 
 ---

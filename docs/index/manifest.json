@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-28T02:22:29.624Z",
+  "generated_at": "2026-09-28T02:46:50.893Z",
   "generator": "generate-manifest.js",
-  "total_count": 573,
+  "total_count": 579,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -20,6 +20,23 @@
       "title": "📜 Aurora5 결정문 로그 (DECISIONS_LOG)",
       "created_at": "Status",
       "checksum": "32be1bf8"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_3_PLACE_PREPARATION",
+      "path": "docs/research/SOUL_YEOSU_3_PLACE_PREPARATION_GAP_REUSE_LEDGER_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu — 3-Place Preparation Gap & Reuse Ledger V0.1",
+      "created_at": "PU-OD-006",
+      "checksum": "ad9fb118"
     },
     {
       "id": "DOC-DreamTown_Frontend_Screen_Map_",
@@ -923,7 +940,7 @@
       "status": "superseded",
       "title": "SOUL Place Knowledge Authoring — Project State",
       "created_at": "2026-09-28",
-      "checksum": "a7eada4c"
+      "checksum": "e21e6722"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",
@@ -4921,6 +4938,91 @@
       "title": "SOUL Yeosu 3-Place",
       "created_at": "2026-09-28",
       "checksum": "2b3314bc"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_3_PLACE_MODEL_A_PAC",
+      "path": "docs/research/SOUL_YEOSU_3_PLACE_MODEL_A_PACKAGE_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu — 3-Place Model A Package V0.1",
+      "created_at": "2026-09-28",
+      "checksum": "dac3a0d7"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_3_PLACE_MODEL_B_PAC",
+      "path": "docs/research/SOUL_YEOSU_3_PLACE_MODEL_B_PACKAGE_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu — 3-Place Model B Package V0.1",
+      "created_at": "2026-09-28",
+      "checksum": "3481a439"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_3_PLACE_PREPARATION",
+      "path": "docs/research/SOUL_YEOSU_3_PLACE_PREPARATION_INTEGRITY_REVIEW_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu — 3-Place Preparation Integrity Review V0.1",
+      "created_at": "2026-09-28",
+      "checksum": "f9bdd1ee"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_3_PLACE_PREPARATION",
+      "path": "docs/research/SOUL_YEOSU_3_PLACE_PREPARATION_UNITS_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu — 3-Place Preparation Units V0.1",
+      "created_at": "2026-09-28",
+      "checksum": "3472bec2"
+    },
+    {
+      "id": "DOC-SOUL_YEOSU_3_PLACE_PREPARED_EV",
+      "path": "docs/research/SOUL_YEOSU_3_PLACE_PREPARED_EVIDENCE_MANIFEST_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "research",
+      "tags": [
+        "research",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Yeosu — 3-Place Prepared Evidence Manifest V0.1",
+      "created_at": "2026-09-28",
+      "checksum": "81bcfd74"
     },
     {
       "id": "DOC-SOUL_YEOSU_ER_CC_001_CONTROLLE",
