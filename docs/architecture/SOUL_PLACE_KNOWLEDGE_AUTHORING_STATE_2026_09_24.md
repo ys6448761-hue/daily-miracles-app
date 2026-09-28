@@ -192,6 +192,58 @@ REL-006 Controlled Evidence Collection — Cycle 25 (2026-09-28)
   ONE NEXT ACTION: Wave 4 HY-008 Governance Decision — Founder chooses between (A) Founder field validation for HY-003 (open upgrade path, one field observation closes EP-3) or (B) Wave 4 closure with HY-008 in terminal HARD_BLOCKED state. Do NOT execute either option without Founder authorization.
 ```
 
+**HY-008 Governance Decision Review: COMPLETE (2026-09-28)**
+
+```
+HY-008 Governance Decision Review (2026-09-28)
+  Review Status: COMPLETE — Awaiting Founder Decision (A or B)
+  Artifact: docs/research/SOUL_YEOSU_HY_008_GOVERNANCE_DECISION_REVIEW_V0_1.md
+  Starting HEAD: ba2cc31 | Branch: staging/storybook-c7a
+
+  HY-003: PROVISIONALLY_SUPPORTED / ACCEPT_PROVISIONAL_WITH_BOUNDARY (UNCHANGED)
+  HY-003 EP-3: PARTIAL_PASS (UNCHANGED)
+  HY-008: HARD BLOCKED (UNCHANGED)
+  Controlled Collection Cycles: 25 (NO INCREMENT — governance review ≠ evidence cycle)
+  Option A / B: AWAITING_FOUNDER_DECISION
+
+  Key Findings:
+    HY-008 Necessity Matrix:
+      Prepared Knowledge construction: NOT_REQUIRED
+      Internal Pilot execution: CONDITIONAL (valid under QUALIFY behavior)
+      Integrity Gate: CONDITIONAL (PASS achievable with KNOWN_LIMIT)
+      Founder Go/No-Go: NOT_REQUIRED (Wave 4 exit condition = BLOCKED with escalation = SATISFIED)
+      Human Blind Test: NOT_REQUIRED for current state (HBT on HOLD)
+    → HY-008 is NOT a hard prerequisite for any downstream gate under canonical contracts.
+
+    Existing safe behavior (H-2): ASK capability + QUALIFY descent KNOWN_LIMIT — operable now.
+    Founder judgment ingredients available as JUDGMENT_INGREDIENT: safety boundary ("consider not visiting") present.
+
+    Option A benefits: Resolves EP-3 → HY-003 VERIFIED → HY-008 unblocks → expert non-recommendation boundary established.
+    Option A cost: Requires Founder field observation at Hyangiram with elder traveler; timing uncertain; delays Pilot.
+    Option B benefits: Pilot executes immediately; H-2 tests SOUL evidence-boundary discipline (diagnostic value); EARLY_REPEAT_SIGNAL supports moving to Pilot phase.
+    Option B condition: HY-008 documented as KNOWN_LIMIT; reopen conditions defined.
+
+    Pilot Diagnostic Value: HIGH under Option B — H-2 becomes canonical test of MISSED_NECESSARY_ASK behavior.
+    Traveler Condition Hypothesis: POTENTIAL_RESEARCH_RELEVANCE confirmed — HY-003/HY-008 is the clearest 5-layer hypothesis demonstration in corpus.
+
+    Reopen conditions (if Option B): Pilot failure on H-2 integrity / Founder natural field observation / H-2 unsafe under QUALIFY / Integrity Gate demands HY-008 / new contradictory evidence.
+    Wave 4 closure semantics: WAVE_4_COLLECTION_EXECUTION_COMPLETE=TRUE (HY-008 BLOCKED with escalation satisfies Plan exit condition) / ALL_WAVE_4_ERS_VERIFIED=FALSE.
+
+    Governance Recommendation: Option B (proceed with documented KNOWN_LIMIT) — Pilot executes now; Option A remains open for post-Pilot or natural field observation.
+    Founder must confirm selection. Neither option executed.
+
+  Invariants preserved:
+    HY-003: PROVISIONALLY_SUPPORTED (UNCHANGED)
+    ALL_WAVE_3_ERS_VERIFIED: FALSE (UNCHANGED)
+    Traveler Condition × Experience Requirement: RESEARCH_HYPOTHESIS (UNCHANGED)
+    Human Blind Test: HOLD (UNCHANGED)
+    Prepared Knowledge / Context: RESEARCH_HYPOTHESIS ONLY (UNCHANGED)
+    place_knowledge migration: NOT APPROVED (UNCHANGED)
+    DB / Schema / Runtime / Production: NO CHANGE (UNCHANGED)
+
+  ONE NEXT ACTION: Founder HY-008 Governance Decision — select Option A (field validation) or Option B (documented KNOWN_LIMIT, proceed to Pilot preparation). Do NOT execute downstream work without authorization.
+```
+
 **Wave 4b ER-REL-004 Collection: VERIFIED_FOR_PREPARATION (2026-09-28)**
 
 ```
