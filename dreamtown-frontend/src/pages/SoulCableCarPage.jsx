@@ -365,10 +365,10 @@ export default function SoulCableCarPage() {
         )}
 
         {/* ── PLACE HERO ── */}
-        {/* REUSE: cablecar-hero.jpg copied from public/images/og/cablecar.jpg */}
+        {/* PREPARED: SOUL_YEOSU_CABLECAR_PLACE_HERO_V01.png — Founder visual asset */}
         <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '200px' }}>
           <img
-            src="/dreamtown/images/cablecar-hero.jpg"
+            src="/dreamtown/images/soul/cable-car/hero.png"
             alt="여수해상케이블카"
             className="absolute inset-0 w-full h-full object-cover"
             onError={(e) => {
@@ -476,7 +476,7 @@ export default function SoulCableCarPage() {
         {stateIndex >= 2 && (
           <div className="rounded-2xl overflow-hidden" style={{ minHeight: '140px' }}>
             <img
-              src="/dreamtown/images/cablecar-wish-scene.png"
+              src="/dreamtown/images/soul/cable-car/wish-scene.png"
               alt=""
               className="w-full object-cover"
               style={{ minHeight: '140px', maxHeight: '200px' }}
