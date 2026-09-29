@@ -111,7 +111,7 @@ function RouteMissDiagnostic() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/dreamtown">
       <div className="min-h-screen bg-night-sky max-w-md mx-auto relative">
         <JourneySceneEngine />
         <ResonanceCard />
