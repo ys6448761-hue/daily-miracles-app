@@ -2,7 +2,49 @@
 # 2026-09-24
 
 **Branch:** staging/storybook-c7a  
-**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25) — Post-Approval Operational Validation Scope V0.2 SAVED / READY — Operational Validation Execution Design SAVED / EXECUTION READY — **Wave 1 ER-OD-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-HY-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-CC-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **WAVE_1_COMPLETE (2026-09-27)** — **Wave 2 ER-OD-004 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-HY-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-HY-006 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-CC-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-REL-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **WAVE_2_COMPLETE (2026-09-27) — Cycles Completed: 9** — **Wave 3 ER-REL-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 3 ER-CC-003 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27) — Cycles Completed: 11**  
+**Status:** Yi Sun-sin Square SAVED / GREEN — Jongpo Marine Park SAVED / GREEN — Hamel Lighthouse WE+Founder SAVED / GREEN — Cable Car WE+Founder SAVED / GREEN — CAND-OPS-003 CREATED / DRAFT — Review Plan SAVED / READY — Geumodo Blind Test Research SAVED / GREEN — Geumodo WE Review SAVED / PASS WITH CORRECTIONS — Geumodo WE Corrections SAVED / GREEN — Geumodo Founder Review SAVED / GREEN — Geumodo DreamTown Comparison SAVED / GREEN — Geumodo SOUL Utility Protocol SAVED / READY — Geumodo SOUL Utility A/B Execution SAVED / GREEN — Geumodo Blind Evaluation SAVED / GREEN — Geumodo Unblinding SAVED / GREEN — Blind Test Final Review SAVED / PASS (REVISION RECOMMENDED) — CAND-OPS-003 V0.2 Revision SAVED / PASS — Promotion Review SAVED / PASS — CAND-OPS-003 V0.2 = Candidate / Approved (Founder Approval 2026-09-25) — Post-Approval Operational Validation Scope V0.2 SAVED / READY — Operational Validation Execution Design SAVED / EXECUTION READY — **Wave 1 ER-OD-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-HY-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 1 ER-CC-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **WAVE_1_COMPLETE (2026-09-27)** — **Wave 2 ER-OD-004 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-HY-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-HY-006 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-CC-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 2 ER-REL-001 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **WAVE_2_COMPLETE (2026-09-27) — Cycles Completed: 9** — **Wave 3 ER-REL-002 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27)** — **Wave 3 ER-CC-003 Collection COMPLETE / VERIFIED_FOR_PREPARATION (2026-09-27) — Cycles Completed: 11** — **SOUL Cable Car Detail Page V0.1 CREATED / BUILD_PASS (2026-09-29)**
+
+---
+
+## SOUL Cable Car Detail Page V0.1 (2026-09-29)
+
+**SOUL_DETAIL_PAGE_CABLE_CAR_V01:** CREATED  
+**Route:** `/soul/cable-car`  
+**Implementation:** `dreamtown-frontend/src/pages/SoulCableCarPage.jsx`  
+**State Machine:** STATE 0→1→2→3 (hasVehicle / nextPlace:odongdo / companion:parents|family)  
+**Context Parsing:** keyword-based (no LLM) — triggers on 차/자차/드라이브/렌트, 오동도, 부모/어르신/어머니/아버지, 아이/아기/유모차/어린이  
+**Quick Shortcuts:** 3 pre-built shortcut chips for STATE 0 entry  
+
+**Evidence Used:**
+- PU-CC-001: 자산정류장↔돌산정류장 명칭, 위치 (PREPARED)
+- PU-CC-002: 각 정류장 접근 방법 (PREPARED/RUNTIME)
+- PU-CC-003: 자산측 주차 1,000+대 (PREPARED/LIVE)
+- PU-CC-004: 일반캐빈(8인, ₩17,000) / 크리스탈캐빈(6인 투명바닥, ₩24,000) (PREPARED, SEMI_STABLE)
+- PU-CC-005: 운영시간 09:30~21:30, 강풍 중단, ☎ 061-664-7301 (PREPARED/SEMI_STABLE/LIVE)
+- PU-REL-001: 방향 지리 (자산→돌산 / 돌산→자산) (PREPARED)
+- PU-REL-002: 돌산정류장→오동도 = MAJOR DETOUR (NEGATIVE KNOWLEDGE)
+- PU-REL-003: 자산 출발 권장 (오동도 연계 시) (PREPARED)
+- PU-REL-004: 케이블카+오동도 합산 3~4시간 (PREPARED)
+- PU-OD-001: 오동도 experiential character (referenced in Odongdo chip context)
+
+**Prototype Placeholders:**
+- 소원이 이야기: [연결 예정]
+- 현지 전문가 코멘트: [Evidence 연결 예정]
+- 이 여행의 장면 (WishArt): [소원그림 연결 예정]
+- 예약/이용권 확인: [비활성화]
+- 저장/공유 버튼: [아이콘만, 비활성]
+- 내 여정에 담기 CTA: [비활성화]
+
+**Evidence Gaps (not built due to missing confirmed evidence):**
+- 정확한 편도 탑승 시간 (15분 = from PU-CC-004 area references; confirmed adequate)
+- 정기 점검 정확 요일 (수요일 패턴 — SEMI_STABLE, noted as verify-required)
+- 실시간 대기시간 (LIVE — not shown, noted as live verification required)
+- 돌산측 주차 상세 (PU-CC-003에 간략히 있음, 자산측만 상세 표시)
+
+**Build Status:** PASS (706 modules transformed, 30.39s)  
+**CURRENT ONE NEXT ACTION:** Founder + Lumi UX Review of 여수해상케이블카 SOUL Detail Page V0.1  
+  Navigate to: http://localhost:5100/soul/cable-car (dev server) or deploy to staging  
+**DB / Schema / Runtime / Production: NO CHANGE**  
 **관련 설계:** SOUL Place Knowledge Schema + Authoring Plan V0.1 (대화 컨텍스트 기록)  
 **Constraint:** Production / runtime / DB 변경 금지
 
