@@ -19,15 +19,15 @@ import { useNavigate } from 'react-router-dom';
 const SOUL_DISCOVERY = {
   /* STATE 0 */
   default:
-    '자산정류장에서 타고, 돌산정류장에서 내리는 게 일반적인 방향이에요. 어디 가실지 알려주시면 더 잘 안내드릴 수 있어요.',
+    '자산과 돌산, 어느 쪽에서도 이용할 수 있어요. 어디서 출발하고 케이블카 다음에 어디로 가실지 알려주시면, 여행 동선에 맞는 쪽을 같이 볼게요.',
 
   /* STATE 1 — vehicle */
   vehicle:
     '자산정류장 주차장에 차를 두고 타시면 편해요. 왕복 운행이라 원하는 방향으로 타고 내리실 수 있어요.',
 
-  /* STATE 2 — odongdo (primary judgment) */
+  /* STATE 2 — odongdo (routing candidate, not a command) */
   odongdo:
-    '오동도를 함께 보신다면 자산에서 타세요. 돌산에서 내린 뒤 오동도로 이동하는 건 차 없이 어렵습니다.',
+    '오동도까지 이어가신다면 자산 쪽을 동선 후보로 먼저 볼 만해요. 다만 차를 어디에 둘지와 케이블카를 왕복할지에 따라 더 편한 동선은 달라질 수 있어요.',
 
   /* STATE 3 — parents layer (added on top) */
   parents:
@@ -160,15 +160,15 @@ function JourneyFlow({ ctx }) {
         )}
       </div>
 
-      {/* Cable car segment */}
+      {/* Cable car segment — bidirectional (⇄) in STATE 0, directional when context confirms */}
       <div className="flex-1 flex flex-col items-center min-w-[56px]">
         <div className="w-full flex items-center gap-0.5">
           <div className="flex-1 h-px bg-dream-purple opacity-40" />
           <span className="text-base flex-shrink-0">🚡</span>
-          <div className="flex-1 h-px bg-star-gold opacity-30" />
+          <div className="flex-1 h-px bg-dream-purple opacity-40" />
         </div>
         {/* PREPARED: PU-CC-005 ride duration — traveler language */}
-        <div className="text-xs text-white opacity-30 mt-1">편도 10분</div>
+        <div className="text-xs text-white opacity-30 mt-1">편도 약 10분</div>
       </div>
 
       {/* 돌산 node */}
@@ -193,7 +193,7 @@ function JourneyFlow({ ctx }) {
               🌿
             </div>
             <div className="text-xs text-white opacity-70 mt-1">오동도</div>
-            <div className="text-xs text-white opacity-30 mt-0.5">다음</div>
+            <div className="text-xs text-white opacity-25 mt-0.5">동선 확인 중</div>
           </div>
         </>
       )}
