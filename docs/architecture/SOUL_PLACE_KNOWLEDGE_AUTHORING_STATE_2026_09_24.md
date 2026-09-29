@@ -50,6 +50,34 @@
 
 ---
 
+## SOUL Cable Car Detail Page — Prototype Review Status (2026-09-29)
+
+**SOUL_DETAIL_PAGE_CABLE_CAR_V03_STRUCTURAL_REVIEW:** COMPLETE
+- V0.1 (HEAD 8d4ff86): STATE 0→3 state machine, zero-LLM, keyword parsing
+- V0.2 (HEAD af4e335): Judgment-first Discovery, FOR ME section, repetition removal, placeholders hidden
+- V0.3 (HEAD 6cd4fc2): Real hero image (og/cablecar.jpg), PLACE/FOR ME/SOUL/JOURNEY/DEPTH role separation, Wish Scene conditional
+
+**Routing fix (HEAD 80a6e1e):** BrowserRouter `basename="/dreamtown"` — route `/dreamtown/soul/cable-car`  
+**Local review URL:** `http://localhost:3001/dreamtown/soul/cable-car`
+
+**VISUAL_HOSPITALITY_VALIDATION:** INCOMPLETE
+- Reason: `C:\DREAM TOWN\Assets\SOUL\Yeosu_Cable_Car\` not found in repository
+- Substitute images used: og/cablecar.jpg (Hero), storybook wish_signal (Wish Scene)
+- Founder Visual Assets NOT yet connected to repository
+
+**JUDGMENT_PRIORITY:** OPEN — evidence gathered, NOT yet Candidate
+**ODONGDO_HYANGIRAM_EXPANSION:** HOLD
+**PLACE_KNOWLEDGE_MIGRATION:** HOLD (기존 유지)
+**DB_SCHEMA_RUNTIME_PRODUCTION:** NO CHANGE
+
+**Product Review Evidence:** `docs/research/SOUL_DETAIL_PAGE_V01_V03_FOUNDER_LUMI_PRODUCT_REVIEW_2026_09_29.md`
+
+**CURRENT ONE NEXT ACTION:** Cable Car V0.3 Prepared Visual Asset Integration + Visual Hospitality Validation
+- 목적: Founder 준비 자산 연결 후 Visual Hospitality 검증 (동일 Cable Car prototype)
+- Judgment Priority 수정 / Odongdo/Hyangiram 확장과 섞지 않는다
+
+---
+
 ## Authoring Pilot Overview
 
 ### Goal
