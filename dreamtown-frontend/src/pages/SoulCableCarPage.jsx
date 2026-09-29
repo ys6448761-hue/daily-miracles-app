@@ -312,7 +312,7 @@ export default function SoulCableCarPage() {
 
       <div className="max-w-md mx-auto px-4 space-y-4 pt-4">
 
-        {/* ── SOUL QUESTION BAR ── */}
+        {/* ── QUESTION COMPOSER (Input + Chips + Quick Context) ── */}
         <Card>
           <form onSubmit={handleSubmit} className="flex gap-2 items-center">
             <input
@@ -329,40 +329,64 @@ export default function SoulCableCarPage() {
               전달
             </button>
           </form>
-          <p className="text-xs text-white opacity-30 mt-2">
-            예: "차가 있어요" · "오동도도 갈 거예요" · "부모님도 같이 가요"
-          </p>
-        </Card>
 
-        {/* ── CONTEXT CHIPS ── */}
-        {hasContext && (
-          <div className="flex flex-wrap gap-2">
-            {travelerContext.hasVehicle && (
-              <ContextChip
-                label="🚗 자차"
-                onRemove={() => setTravelerContext((c) => ({ ...c, hasVehicle: false }))}
-              />
-            )}
-            {travelerContext.nextPlace === 'odongdo' && (
-              <ContextChip
-                label="🌿 오동도"
-                onRemove={() => setTravelerContext((c) => ({ ...c, nextPlace: null }))}
-              />
-            )}
-            {travelerContext.companion === 'parents' && (
-              <ContextChip
-                label="👨‍👩‍👧 부모님"
-                onRemove={() => setTravelerContext((c) => ({ ...c, companion: null }))}
-              />
-            )}
-            {travelerContext.companion === 'family' && (
-              <ContextChip
-                label="👨‍👩‍👦 가족"
-                onRemove={() => setTravelerContext((c) => ({ ...c, companion: null }))}
-              />
-            )}
-          </div>
-        )}
+          {/* Active context chips — inside composer */}
+          {hasContext && (
+            <div className="flex flex-wrap gap-2 mt-3">
+              {travelerContext.hasVehicle && (
+                <ContextChip
+                  label="🚗 자차"
+                  onRemove={() => setTravelerContext((c) => ({ ...c, hasVehicle: false }))}
+                />
+              )}
+              {travelerContext.nextPlace === 'odongdo' && (
+                <ContextChip
+                  label="🌿 오동도"
+                  onRemove={() => setTravelerContext((c) => ({ ...c, nextPlace: null }))}
+                />
+              )}
+              {travelerContext.companion === 'parents' && (
+                <ContextChip
+                  label="👨‍👩‍👧 부모님"
+                  onRemove={() => setTravelerContext((c) => ({ ...c, companion: null }))}
+                />
+              )}
+              {travelerContext.companion === 'family' && (
+                <ContextChip
+                  label="👨‍👩‍👦 가족"
+                  onRemove={() => setTravelerContext((c) => ({ ...c, companion: null }))}
+                />
+              )}
+            </div>
+          )}
+
+          {/* Quick Context — progressive, hides when all active */}
+          {(() => {
+            const allOptions = [
+              { label: '🚗 자차로 가요', query: '차가 있어요', active: travelerContext.hasVehicle },
+              { label: '🌿 오동도도요', query: '오동도도 갈 거예요', active: travelerContext.nextPlace === 'odongdo' },
+              { label: '👨‍👩‍👧 부모님과요', query: '부모님도 같이 가요', active: travelerContext.companion === 'parents' },
+            ];
+            const remaining = allOptions.filter((o) => !o.active);
+            if (remaining.length === 0) return null;
+            return (
+              <div className="mt-3 pt-3 border-t border-white border-opacity-10">
+                <p className="text-xs text-white opacity-30 mb-2">내 상황을 더하면 더 정확하게 알려드려요</p>
+                <div className="flex flex-wrap gap-2">
+                  {remaining.map((s) => (
+                    <button
+                      key={s.query}
+                      onClick={() => setTravelerContext((c) => parseContext(s.query, c))}
+                      className="px-3 py-1.5 rounded-full text-xs border border-white border-opacity-20 text-white opacity-70 hover:opacity-100 hover:border-dream-purple transition-all"
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+        </Card>
 
         {/* ── PLACE HERO ── */}
         {/* PREPARED: SOUL_YEOSU_CABLECAR_PLACE_HERO_V01.png — Founder visual asset */}
@@ -487,32 +511,6 @@ export default function SoulCableCarPage() {
           </div>
         )}
 
-        {/* ── QUICK CONTEXT SHORTCUTS — hide only when all 3 active ── */}
-        {(() => {
-          const allOptions = [
-            { label: '🚗 자차로 가요', query: '차가 있어요', active: travelerContext.hasVehicle },
-            { label: '🌿 오동도도요', query: '오동도도 갈 거예요', active: travelerContext.nextPlace === 'odongdo' },
-            { label: '👨‍👩‍👧 부모님과요', query: '부모님도 같이 가요', active: travelerContext.companion === 'parents' },
-          ];
-          const remaining = allOptions.filter((o) => !o.active);
-          if (remaining.length === 0) return null;
-          return (
-            <div className="pt-1">
-              <p className="text-xs text-white opacity-30 mb-2 text-center">내 상황을 알려주세요</p>
-              <div className="flex flex-wrap justify-center gap-2">
-                {remaining.map((s) => (
-                  <button
-                    key={s.query}
-                    onClick={() => setTravelerContext((c) => parseContext(s.query, c))}
-                    className="px-3 py-1.5 rounded-full text-xs border border-white border-opacity-20 text-white opacity-70 hover:opacity-100 hover:border-dream-purple transition-all"
-                  >
-                    {s.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          );
-        })()}
       </div>
 
       {/* ── BOTTOM CTA ── */}
