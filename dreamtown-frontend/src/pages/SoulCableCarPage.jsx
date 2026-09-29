@@ -487,27 +487,32 @@ export default function SoulCableCarPage() {
           </div>
         )}
 
-        {/* ── QUICK CONTEXT SHORTCUTS (STATE 0 only) ── */}
-        {!hasContext && (
-          <div className="pt-1">
-            <p className="text-xs text-white opacity-30 mb-2 text-center">내 상황을 알려주세요</p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {[
-                { label: '🚗 자차로 가요', query: '차가 있어요' },
-                { label: '🌿 오동도도요', query: '오동도도 갈 거예요' },
-                { label: '👨‍👩‍👧 부모님과요', query: '부모님도 같이 가요' },
-              ].map((s) => (
-                <button
-                  key={s.query}
-                  onClick={() => setTravelerContext((c) => parseContext(s.query, c))}
-                  className="px-3 py-1.5 rounded-full text-xs border border-white border-opacity-20 text-white opacity-70 hover:opacity-100 hover:border-dream-purple transition-all"
-                >
-                  {s.label}
-                </button>
-              ))}
+        {/* ── QUICK CONTEXT SHORTCUTS — hide only when all 3 active ── */}
+        {(() => {
+          const allOptions = [
+            { label: '🚗 자차로 가요', query: '차가 있어요', active: travelerContext.hasVehicle },
+            { label: '🌿 오동도도요', query: '오동도도 갈 거예요', active: travelerContext.nextPlace === 'odongdo' },
+            { label: '👨‍👩‍👧 부모님과요', query: '부모님도 같이 가요', active: travelerContext.companion === 'parents' },
+          ];
+          const remaining = allOptions.filter((o) => !o.active);
+          if (remaining.length === 0) return null;
+          return (
+            <div className="pt-1">
+              <p className="text-xs text-white opacity-30 mb-2 text-center">내 상황을 알려주세요</p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {remaining.map((s) => (
+                  <button
+                    key={s.query}
+                    onClick={() => setTravelerContext((c) => parseContext(s.query, c))}
+                    className="px-3 py-1.5 rounded-full text-xs border border-white border-opacity-20 text-white opacity-70 hover:opacity-100 hover:border-dream-purple transition-all"
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
 
       {/* ── BOTTOM CTA ── */}
