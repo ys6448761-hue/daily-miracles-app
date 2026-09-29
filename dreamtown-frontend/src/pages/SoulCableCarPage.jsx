@@ -1,36 +1,49 @@
 /**
- * SOUL Cable Car Detail Page V0.2
+ * SOUL Cable Car Detail Page V0.3
  * 여수해상케이블카 — Living Travel Detail Page
- * Route: /soul/cable-car
  *
- * Evidence sources (internal — not shown in traveler UI):
- *   PU-CC-001~005 (케이블카 기본 정보)
- *   PU-REL-001~006 (오동도 연계 관계 지식)
- * Volatile/SEMI_STABLE items tagged with freshness notes.
+ * V0.3 changes: real Place Hero image, FOR ME section, repetition removed,
+ *   internal evidence tags hidden from traveler UI, page length stable across states.
+ *
+ * Evidence (internal — not shown in traveler UI):
+ *   PU-CC-001~005 · PU-REL-001~006
  * DB / Schema / Runtime / Production: NO CHANGE
  */
 
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// ── Canonical evidence — judgment-first texts ────────────────────────────────
+// ── Canonical judgment texts ─────────────────────────────────────────────────
+// Internal — role: SOUL JUDGMENT ("그래서 지금 어떻게 판단하는가")
 
 const SOUL_DISCOVERY = {
-  /* STATE 0 — no traveler context */
+  /* STATE 0 */
   default:
-    '자산정류장에서 타고, 돌산정류장에서 내리는 게 일반적인 방향이에요. 타는 위치에 따라 다음 여행지 동선이 달라지니, 어디 가실지 알려주시면 더 잘 안내드릴 수 있어요.',
+    '자산정류장에서 타고, 돌산정류장에서 내리는 게 일반적인 방향이에요. 어디 가실지 알려주시면 더 잘 안내드릴 수 있어요.',
 
-  /* STATE 1 — vehicle only */
+  /* STATE 1 — vehicle */
   vehicle:
-    '차가 있으시면 자산정류장 주차장이 편해요. 여기서 타고 돌산에서 내리면, 돌아오실 때 다시 자산까지 케이블카로 올 수 있어요.',
+    '자산정류장 주차장에 차를 두고 타시면 편해요. 왕복 운행이라 원하는 방향으로 타고 내리실 수 있어요.',
 
-  /* STATE 2 — odongdo (regardless of vehicle) */
+  /* STATE 2 — odongdo (primary judgment) */
   odongdo:
-    '오동도와 함께 보실 거라면 자산에서 타시는 걸 권해드려요. 돌산에서 내리면 오동도 쪽으로 다시 오는 동선이 복잡해져요. 케이블카와 오동도를 함께 보면 보통 3~4시간 정도 잡으세요.',
+    '오동도를 함께 보신다면 자산에서 타세요. 돌산에서 내린 뒤 오동도로 이동하는 건 차 없이 어렵습니다.',
 
-  /* STATE 3 — parents layer (added on top of previous judgment) */
+  /* STATE 3 — parents layer (added on top) */
   parents:
-    '어르신과 함께하신다면 크리스탈 캐빈(바닥 투명)이 놀랍긴 하지만, 고소 불편이 있으실 경우 일반 캐빈이 더 편하실 수 있어요. 운행 전 현장에서 선택하시면 돼요.',
+    '크리스탈 캐빈은 바닥이 투명해요. 고소 불편이 있으신 분이라면 일반 캐빈이 더 편하실 수 있어요. 탑승 전 현장에서 선택하실 수 있습니다.',
+};
+
+// ── FOR ME texts — internal ──────────────────────────────────────────────────
+// Role: "내 상황에서 무엇이 중요해졌나" (one critical practical fact per context)
+
+const FOR_ME = {
+  /* STATE 1 */
+  vehicle: '자산정류장 주차장(1,000+대)을 이용하세요. 성수기 주말엔 오전 일찍 도착하면 여유 있습니다.',
+  /* STATE 2 */
+  odongdo: '자산 하차 후 오동도 입구까지 도보 약 5분. 케이블카 + 오동도 합산 반나절(3~4시간) 코스입니다.',
+  /* STATE 3 */
+  parents: '일반/크리스탈 캐빈은 당일 매표소에서 선택하시면 돼요. 미리 예약하실 필요 없습니다.',
 };
 
 // ── Context parser — keyword-based, zero LLM ────────────────────────────────
@@ -113,91 +126,113 @@ function ExpandableSection({ title, children, defaultOpen = false }) {
   );
 }
 
-function FactRow({ label, value, freshness }) {
+function FactRow({ label, value, note }) {
   return (
     <div className="flex items-start justify-between gap-3 text-sm py-2 border-b border-white border-opacity-5 last:border-0">
       <span className="text-white opacity-50 whitespace-nowrap flex-shrink-0">{label}</span>
       <div className="text-right">
         <span className="text-white opacity-90">{value}</span>
-        {freshness && (
-          <div className="text-xs text-yellow-400 opacity-70 mt-0.5">{freshness}</div>
+        {note && (
+          <div className="text-xs text-white opacity-30 mt-0.5">{note}</div>
         )}
       </div>
     </div>
   );
 }
 
-// ── Journey Flow ─────────────────────────────────────────────────────────────
+// ── Journey Flow — visual only, no repetition of SOUL text ──────────────────
+// Role: "그 판단을 이동/경험으로 어떻게 이해할까" (visual, not text summary)
 
 function JourneyFlow({ ctx }) {
   /* COMPOSE: structure based on travelerContext */
   const showOdongdo = ctx.nextPlace === 'odongdo';
 
   return (
-    <Card>
-      <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">
-        여정 흐름
-      </p>
-
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
-        {/* 자산 node */}
-        <div className="flex-shrink-0 text-center min-w-0">
-          <div className="w-8 h-8 rounded-full bg-dream-purple bg-opacity-40 border border-dream-purple border-opacity-60 flex items-center justify-center mx-auto text-sm">
-            {ctx.hasVehicle ? '🚗' : '🚶'}
-          </div>
-          <div className="text-xs text-white opacity-70 mt-1">자산</div>
-          {ctx.hasVehicle && (
-            <div className="text-xs text-star-gold mt-0.5">주차장</div>
-          )}
+    <div className="flex items-center gap-2 overflow-x-auto py-1">
+      {/* 자산 node */}
+      <div className="flex-shrink-0 text-center min-w-0">
+        <div className="w-9 h-9 rounded-full bg-dream-purple bg-opacity-40 border border-dream-purple border-opacity-60 flex items-center justify-center mx-auto text-base">
+          {ctx.hasVehicle ? '🚗' : '🚶'}
         </div>
-
-        {/* Cable car segment */}
-        <div className="flex-1 flex flex-col items-center min-w-[60px]">
-          <div className="w-full flex items-center gap-0.5">
-            <div className="flex-1 h-px bg-gradient-to-r from-dream-purple to-dream-purple opacity-40" />
-            <span className="text-base flex-shrink-0">🚡</span>
-            <div className="flex-1 h-px bg-gradient-to-r from-dream-purple to-star-gold opacity-40" />
-          </div>
-          {/* PREPARED: ride duration — SEMI_STABLE */}
-          <div className="text-xs text-white opacity-40 mt-1">편도 약 10분</div>
-        </div>
-
-        {/* 돌산 node */}
-        <div className="flex-shrink-0 text-center min-w-0">
-          <div className="w-8 h-8 rounded-full bg-white bg-opacity-10 border border-white border-opacity-20 flex items-center justify-center mx-auto text-sm">
-            🏔️
-          </div>
-          <div className="text-xs text-white opacity-70 mt-1">돌산</div>
-        </div>
-
-        {/* Odongdo extension */}
-        {showOdongdo && (
-          <>
-            <div className="flex-shrink-0 text-white opacity-30 text-sm">→</div>
-            <div className="flex-shrink-0 text-center min-w-0">
-              <div className="w-8 h-8 rounded-full bg-green-900 bg-opacity-50 border border-green-600 border-opacity-40 flex items-center justify-center mx-auto text-sm">
-                🌿
-              </div>
-              <div className="text-xs text-white opacity-70 mt-1">오동도</div>
-              <div className="text-xs text-yellow-400 mt-0.5">자산 출발 권장</div>
-            </div>
-          </>
+        <div className="text-xs text-white opacity-70 mt-1">자산</div>
+        {ctx.hasVehicle && (
+          <div className="text-xs text-star-gold mt-0.5">주차</div>
         )}
       </div>
 
-      {/* PREPARED: NEGATIVE KNOWLEDGE — PU-REL detour warning */}
-      {showOdongdo && (
-        <div className="mt-3 p-3 rounded-xl bg-yellow-900 bg-opacity-20 border border-yellow-700 border-opacity-30 text-xs text-yellow-200 leading-relaxed">
-          돌산 하차 후 오동도로 이동하려면 돌산대교를 건너야 합니다 (도보 불가, 차량/택시). 오동도를 함께 보실 계획이라면 자산에서 출발하세요.
+      {/* Cable car segment */}
+      <div className="flex-1 flex flex-col items-center min-w-[56px]">
+        <div className="w-full flex items-center gap-0.5">
+          <div className="flex-1 h-px bg-dream-purple opacity-40" />
+          <span className="text-base flex-shrink-0">🚡</span>
+          <div className="flex-1 h-px bg-star-gold opacity-30" />
         </div>
+        {/* PREPARED: PU-CC-005 ride duration — traveler language */}
+        <div className="text-xs text-white opacity-30 mt-1">편도 10분</div>
+      </div>
+
+      {/* 돌산 node */}
+      <div className="flex-shrink-0 text-center min-w-0">
+        <div className="w-9 h-9 rounded-full bg-white bg-opacity-10 border border-white border-opacity-20 flex items-center justify-center mx-auto text-base">
+          🏔️
+        </div>
+        <div className="text-xs text-white opacity-70 mt-1">돌산</div>
+      </div>
+
+      {/* Odongdo — visual extension only, no text repeating SOUL judgment */}
+      {showOdongdo && (
+        <>
+          <div className="flex-shrink-0 flex flex-col items-center min-w-[40px]">
+            <div className="w-full flex items-center gap-0.5">
+              <div className="flex-1 h-px border-t border-dashed border-white border-opacity-20" />
+            </div>
+            <div className="text-xs text-white opacity-20 mt-1">···</div>
+          </div>
+          <div className="flex-shrink-0 text-center min-w-0">
+            <div className="w-9 h-9 rounded-full bg-green-900 bg-opacity-50 border border-green-600 border-opacity-40 flex items-center justify-center mx-auto text-base">
+              🌿
+            </div>
+            <div className="text-xs text-white opacity-70 mt-1">오동도</div>
+            <div className="text-xs text-white opacity-30 mt-0.5">다음</div>
+          </div>
+        </>
       )}
 
-      {/* Parents — cabin suggestion in Journey context */}
+      {/* Parents — accessibility note in journey context */}
       {ctx.companion === 'parents' && (
-        <div className="mt-3 p-3 rounded-xl bg-dream-purple bg-opacity-15 border border-dream-purple border-opacity-25 text-xs text-white opacity-80 leading-relaxed">
-          어르신 동반 시: 크리스탈 캐빈(바닥 투명)과 일반 캐빈 중 현장에서 선택하실 수 있어요.
+        <div className="flex-shrink-0 text-center min-w-0 ml-1">
+          <div className="w-9 h-9 rounded-full bg-dream-purple bg-opacity-20 border border-dream-purple border-opacity-30 flex items-center justify-center mx-auto text-base">
+            👨‍👩‍👧
+          </div>
+          <div className="text-xs text-white opacity-50 mt-1">캐빈 선택</div>
         </div>
       )}
+    </div>
+  );
+}
+
+// ── FOR ME section — context-aware, SHORT ────────────────────────────────────
+
+function ForMeSection({ ctx, stateIndex, prevJourneyNote }) {
+  if (stateIndex === 0) return null;
+
+  const primaryText =
+    stateIndex === 3
+      ? FOR_ME.parents
+      : stateIndex === 2
+      ? FOR_ME.odongdo
+      : FOR_ME.vehicle;
+
+  return (
+    <Card className="border-dream-purple border-opacity-30">
+      <p className="text-xs text-dream-purple font-semibold mb-2 uppercase tracking-wider">나에게 중요한 것</p>
+
+      {/* STATE 3: show compact previous context note */}
+      {stateIndex === 3 && prevJourneyNote && (
+        <p className="text-xs text-white opacity-40 mb-2">{prevJourneyNote}</p>
+      )}
+
+      <p className="text-sm text-white leading-relaxed">{primaryText}</p>
     </Card>
   );
 }
@@ -217,10 +252,8 @@ export default function SoulCableCarPage() {
 
   const hasContext =
     travelerContext.hasVehicle || travelerContext.nextPlace || travelerContext.companion;
-
   const hasParents = travelerContext.companion === 'parents';
 
-  /* Derive state index */
   const stateIndex = hasParents
     ? 3
     : travelerContext.nextPlace
@@ -229,17 +262,17 @@ export default function SoulCableCarPage() {
     ? 1
     : 0;
 
-  /* Derive previous journey judgment for STATE 3 accumulation */
+  /* Previous journey note for STATE 3 accumulation — compact */
   const prevJourneyNote =
     stateIndex === 3
       ? travelerContext.nextPlace === 'odongdo'
-        ? '오동도 연계 — 자산 출발 권장'
+        ? '오동도 연계 · 자산 출발 · 3~4시간 코스'
         : travelerContext.hasVehicle
-        ? '자차 — 자산정류장 주차 후 탑승'
+        ? '자차 · 자산정류장 주차 후 탑승'
         : null
       : null;
 
-  /* Primary SOUL Discovery text */
+  /* Primary SOUL Discovery — changes per state */
   const primaryDiscovery =
     stateIndex === 3
       ? SOUL_DISCOVERY.parents
@@ -332,25 +365,36 @@ export default function SoulCableCarPage() {
         )}
 
         {/* ── PLACE HERO ── */}
-        {/* REUSE: CSS gradient hero — cablecar-star-intro.png served by Express at /assets/brand/core/ */}
-        <div
-          className="rounded-2xl overflow-hidden relative"
-          style={{
-            background: 'linear-gradient(160deg, #0a1628 0%, #1a2d5a 40%, #0e3a5c 70%, #153347 100%)',
-            minHeight: '160px',
-          }}
-        >
-          {/* subtle overlay lines suggesting cable */}
-          <div
-            className="absolute inset-0 opacity-10"
-            style={{
-              backgroundImage:
-                'repeating-linear-gradient(135deg, transparent, transparent 40px, rgba(155,135,245,0.3) 40px, rgba(155,135,245,0.3) 41px)',
+        {/* REUSE: cablecar-hero.jpg copied from public/images/og/cablecar.jpg */}
+        <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '200px' }}>
+          <img
+            src="/dreamtown/images/cablecar-hero.jpg"
+            alt="여수해상케이블카"
+            className="absolute inset-0 w-full h-full object-cover"
+            onError={(e) => {
+              /* fallback to CSS gradient if image fails */
+              e.currentTarget.style.display = 'none';
             }}
           />
-          <div className="relative z-10 p-5 flex flex-col justify-end h-full" style={{ minHeight: '160px' }}>
+          {/* Gradient overlay for text readability */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(to top, rgba(10,22,40,0.90) 0%, rgba(10,22,40,0.45) 50%, rgba(10,22,40,0.15) 100%)',
+            }}
+          />
+          {/* CSS gradient background (shows when image fails) */}
+          <div
+            className="absolute inset-0 -z-10"
+            style={{
+              background:
+                'linear-gradient(160deg, #0a1628 0%, #1a2d5a 40%, #0e3a5c 70%, #153347 100%)',
+            }}
+          />
+          <div className="relative z-10 p-5 flex flex-col justify-end" style={{ minHeight: '200px' }}>
             <div className="mt-auto">
-              <p className="text-xs text-white opacity-40 mb-1 font-medium tracking-widest uppercase">
+              <p className="text-xs text-white opacity-50 mb-1 tracking-widest uppercase">
                 여수 · 해상 케이블카
               </p>
               <h2 className="text-2xl font-bold text-white leading-tight">
@@ -358,111 +402,90 @@ export default function SoulCableCarPage() {
               </h2>
               {/* PREPARED: PU-CC-001 */}
               <p className="text-sm text-white opacity-60 mt-1">
-                자산(시내) ↔ 돌산(섬) · 왕복 운행 · 해상 구간
+                도시와 섬 사이 · 바다 위 10분
               </p>
             </div>
           </div>
         </div>
 
-        {/* ── ESSENTIAL FACTS (always visible) ── */}
-        {/* PREPARED: PU-CC-001~005 */}
+        {/* ── ESSENTIAL INFO (always visible) ── */}
+        {/* PREPARED: PU-CC-001~005 — internal tags removed from traveler UI */}
         <Card>
           <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">알아야 할 것</p>
-          <FactRow
-            label="탑승 구조"
-            value="자산(시내) ↔ 돌산(섬) 왕복"
-          />
-          <FactRow
-            label="소요시간"
-            value="편도 약 10분"
-            freshness="SEMI_STABLE — 현장 확인 권장"
-          />
-          <FactRow
-            label="요금"
-            value="일반 캐빈 / 크리스탈 캐빈 구분"
-            freshness="연간 조정 가능 — 현장·공식 확인"
-          />
-          <FactRow
-            label="운영 시간"
-            value="09:30~21:30 · 강풍 시 중단"
-            freshness="LIVE — 방문 전 확인 권장"
-          />
-          <FactRow
-            label="주차"
-            value="자산정류장 측 주차장 이용"
-          />
+          {/* PU-CC-001: 두 정류장 */}
+          <FactRow label="탑승 구조" value="자산(시내) ↔ 돌산(섬) 왕복" />
+          {/* PU-CC-005: 소요시간 — freshness as traveler language */}
+          <FactRow label="소요시간" value="편도 약 10분" note="현장 확인 권장" />
+          {/* PU-CC-004: 요금 */}
+          <FactRow label="요금" value="일반 · 크리스탈 캐빈 구분" note="현장·공식 확인" />
+          {/* PU-CC-005: 운영 */}
+          <FactRow label="운영 시간" value="09:30~21:30 · 강풍 시 중단" note="당일 변경 가능" />
+          {/* PU-CC-003: 주차 */}
+          <FactRow label="주차" value="자산정류장 측 주차장" />
         </Card>
 
-        {/* ── SOUL DISCOVERY — judgment first ── */}
-        {/* COMPOSE: text recomposes with context state */}
+        {/* ── FOR ME — context-aware, short, does NOT append per state ── */}
+        {/* COMPOSE: content changes by stateIndex, section height stays stable */}
+        <ForMeSection
+          ctx={travelerContext}
+          stateIndex={stateIndex}
+          prevJourneyNote={prevJourneyNote}
+        />
+
+        {/* ── SOUL JUDGMENT — judgment first, role-separated from Journey ── */}
+        {/* Role: "그래서 지금 어떻게 판단하는가" */}
+        {/* COMPOSE: recomposes with context */}
         <Card>
           <p className="text-xs text-dream-purple font-semibold mb-3 uppercase tracking-wider">
-            SOUL Discovery
+            SOUL
           </p>
-
-          {/* STATE 3: show preserved previous journey judgment */}
-          {stateIndex === 3 && prevJourneyNote && (
-            <div className="mb-3 px-3 py-1.5 rounded-xl bg-white bg-opacity-5 border border-white border-opacity-10">
-              <p className="text-xs text-white opacity-50">이전 여정 판단</p>
-              <p className="text-xs text-white opacity-80 mt-0.5">{prevJourneyNote}</p>
-            </div>
-          )}
-
           <p className="text-sm text-white leading-relaxed">{primaryDiscovery}</p>
         </Card>
 
-        {/* ── JOURNEY FLOW ── */}
-        <JourneyFlow ctx={travelerContext} />
-
-        {/* ── LINKED JOURNEY (context-gated) ── */}
-        {/* COMPOSE: visible only when multi-place or vehicle context exists */}
-        {(travelerContext.nextPlace === 'odongdo' || travelerContext.hasVehicle) && (
-          <Card>
-            <p className="text-xs text-green-400 font-semibold mb-3 uppercase tracking-wider">
-              연계 여정
-            </p>
-            <div className="space-y-3 text-sm text-white">
-              {travelerContext.nextPlace === 'odongdo' && (
-                <>
-                  {/* PREPARED: PU-REL-004 */}
-                  <p className="leading-relaxed">
-                    케이블카 + 오동도 합산 <strong>약 3~4시간</strong>. 여유 있게 반나절 일정으로 잡으시면 됩니다.
-                  </p>
-                  {/* PREPARED: PU-REL-006 자산 → 오동도 도보 */}
-                  <p className="text-white opacity-70 leading-relaxed">
-                    자산정류장 하차 후 오동도 방파제 입구까지 도보 약 5분 거리예요.
-                  </p>
-                </>
-              )}
-              {travelerContext.hasVehicle && !travelerContext.nextPlace && (
-                <>
-                  {/* PREPARED: PU-CC-003 */}
-                  <p className="leading-relaxed">
-                    자산정류장 측 주차장(1,000+대)을 이용하시면 됩니다. 성수기 주말 오전 10시 이후 혼잡 가능성이 있으니 조기 도착을 권장해요.
-                  </p>
-                </>
-              )}
-            </div>
-          </Card>
-        )}
-
-        {/* ── CRYSTAL CABIN (collapsible) ── */}
-        {/* PREPARED: PU-CC-004 */}
-        <ExpandableSection title="크리스탈 캐빈이 궁금하다면">
-          <p className="text-sm text-white opacity-80 leading-relaxed">
-            6인승. 바닥과 측면 일부가 투명하여 아래 바다를 내려다볼 수 있어요. 일반 캐빈보다 요금이 높습니다.
+        {/* ── JOURNEY — visual only, does NOT repeat SOUL text ── */}
+        {/* Role: "그 판단을 이동/경험으로 어떻게 이해할까" */}
+        <Card>
+          <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">
+            여정
           </p>
-          {hasParents && (
-            <div className="mt-2 p-3 rounded-xl bg-dream-purple bg-opacity-15 border border-dream-purple border-opacity-25 text-xs text-white opacity-90 leading-relaxed">
-              고소 불편이 있으신 어르신께는 일반 캐빈이 더 편하실 수 있어요. 탑승 전 현장에서 선택 가능합니다.
-            </div>
-          )}
-          <div className="mt-3 pt-2 border-t border-white border-opacity-10">
-            <p className="text-xs text-white opacity-40">
+          <JourneyFlow ctx={travelerContext} />
+        </Card>
+
+        {/* ── DEPTH (expandable) — "왜 그런가 / 더 알고 싶을 때" ── */}
+        {/* PREPARED: PU-CC-004 (crystal cabin), PU-REL-004/006 (timing/walk) */}
+        <ExpandableSection title="더 알고 싶을 때">
+          <div className="space-y-3 text-sm text-white opacity-80 leading-relaxed">
+            <p>
+              <span className="text-white opacity-50 text-xs block mb-0.5">크리스탈 캐빈</span>
+              6인승. 바닥과 측면 일부가 투명해 아래 바다를 내려다볼 수 있어요. 일반 캐빈보다 요금이 높습니다. 탑승 전 현장에서 선택하실 수 있어요.
+            </p>
+            {travelerContext.nextPlace === 'odongdo' && (
+              <p>
+                <span className="text-white opacity-50 text-xs block mb-0.5">오동도 연계 동선</span>
+                자산 하차 후 오동도 방파제 입구까지 도보 약 5분. 케이블카 + 오동도 합산 약 3~4시간. 돌산 하차 후 오동도 이동은 도보 불가(차량/택시 필요).
+              </p>
+            )}
+            <p className="text-white opacity-40 text-xs">
               ☎ 운행 문의: 061-664-7301
             </p>
           </div>
         </ExpandableSection>
+
+        {/* ── WISH SCENE — STATE 2+ only, image only, no caption ── */}
+        {/* Conditional: shows only when traveler has meaningful multi-context */}
+        {stateIndex >= 2 && (
+          <div className="rounded-2xl overflow-hidden" style={{ minHeight: '140px' }}>
+            <img
+              src="/dreamtown/images/cablecar-wish-scene.png"
+              alt=""
+              className="w-full object-cover"
+              style={{ minHeight: '140px', maxHeight: '200px' }}
+              onError={(e) => {
+                e.currentTarget.parentElement.style.display = 'none';
+              }}
+            />
+          </div>
+        )}
 
         {/* ── QUICK CONTEXT SHORTCUTS (STATE 0 only) ── */}
         {!hasContext && (
@@ -476,9 +499,7 @@ export default function SoulCableCarPage() {
               ].map((s) => (
                 <button
                   key={s.query}
-                  onClick={() =>
-                    setTravelerContext((c) => parseContext(s.query, c))
-                  }
+                  onClick={() => setTravelerContext((c) => parseContext(s.query, c))}
                   className="px-3 py-1.5 rounded-full text-xs border border-white border-opacity-20 text-white opacity-70 hover:opacity-100 hover:border-dream-purple transition-all"
                 >
                   {s.label}
@@ -503,7 +524,7 @@ export default function SoulCableCarPage() {
           >
             내 여정에 담기
           </button>
-          <p className="text-center text-xs text-white opacity-20 mt-1">여정 저장 — 소원꿈터 연결 예정</p>
+          <p className="text-center text-xs text-white opacity-20 mt-1">소원꿈터 연결 예정</p>
         </div>
       </div>
     </div>
