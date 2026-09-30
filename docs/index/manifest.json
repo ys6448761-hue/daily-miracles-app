@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-09-30T08:42:21.181Z",
+  "generated_at": "2026-09-30T21:51:19.211Z",
   "generator": "generate-manifest.js",
-  "total_count": 598,
+  "total_count": 599,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -923,6 +923,22 @@
       "title": "Phoenix Handover — 2026-09-21",
       "created_at": "2026-09-30",
       "checksum": "71b45dc0"
+    },
+    {
+      "id": "DOC-PHOENIX_HANDOVER_2026_10_01_SO",
+      "path": "docs/architecture/PHOENIX_HANDOVER_2026_10_01_SOUL_READINESS_AUDIT_ENTRY.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture"
+      ],
+      "owner": "team",
+      "status": "|---",
+      "title": "Project Phoenix — Handover: SOUL Readiness Audit Entry State",
+      "created_at": "2026-09-30",
+      "checksum": "9a7772eb"
     },
     {
       "id": "DOC-SOUL_MAEK_SODAM_RESPONSIBILITY",
