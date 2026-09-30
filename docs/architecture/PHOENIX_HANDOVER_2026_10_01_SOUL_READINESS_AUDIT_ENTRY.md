@@ -218,6 +218,114 @@ SOUL Readiness Audit V0.1
 
 ---
 
+## 9. SOUL ↔ Yeouiju ↔ Dream Space — ROLE BOUNDARY
+
+**STATUS: VERIFY EXISTING DECISION — Architecture Decision 아님**
+
+### 확인된 Working Role Separation
+
+| Agent | Role |
+|---|---|
+| **SOUL** | Travel Intelligence / Travel Friend |
+| **Yeouiju** | Daily Life / Life Memory |
+| **Dream Space (소원꿈터)** | 개인 Home — 삶의 기억·소원·여정 기억·소원 이미지·의미 있는 개인 오브젝트가 쌓이는 공간 |
+
+### 중요 수정 — 현재 세션에서 발생한 오류
+
+> 현재 논의 중 SOUL이 여행 + 일상 대화를 모두 담당하는 것으로 일시적으로 기술되었다.  
+> **이를 확정된 결정으로 계승하지 않는다.**
+
+현재 선호 경계 (canonical repository 대조 필요):
+- 일상 대화는 주로 Yeouiju 담당
+- 여행 대화는 주로 SOUL 담당
+- SOUL이 자동으로 일상 상담/기억 어시스턴트로 확장되어서는 안 됨
+- Dream Space는 대화 Agent가 아니라 공유 개인 목적지/Home
+
+---
+
+## 10. CONTEXT BRIDGE — OPEN
+
+**STATUS: OPEN — VERIFY, not approve**
+
+Working hypothesis (검증 필요, 구현 아님):
+
+```
+Yeouiju
+→ relevant Life Context
+→ Context Bridge
+→ SOUL
+→ Travel Judgment
+
+SOUL
+→ meaningful Travel Outcome / Journey Snapshot
+→ Dream Space / Yeouiju memory context
+```
+
+원칙: 전체 대화 이력이 아닌, 목적에 필요한 context만 전달.
+
+예시 (illustrative only — 필드 확정 아님):
+```
+Yeouiju knows: "요즘 많이 지쳐 있고 조용히 바다를 보고 싶다."
+→ Context Bridge 전달 후보:
+  travel_intent = REST
+  desired_experience = QUIET / SEA
+  pace_preference = LOW_INTENSITY
+→ SOUL: Phoenix Travel Intelligence로 여행 판단
+```
+
+---
+
+## 11. CONVERSATION / MEMORY OWNERSHIP — OPEN
+
+미래 검증/설계 필요 항목:
+
+- 일상 대화 이력 소유권
+- 여행 대화 이력 소유권
+- Life Memory
+- Traveler/Journey Context
+- Journey Snapshot
+- Wish
+- Dream Space 표현
+- 에이전트 간 context 권한
+- 사용자 동의 / 개인정보 경계
+- 삭제/보존 정책
+
+**가정 금지:**
+> `Conversation History = Life Memory = Dream Space Object`  
+> 이 세 개는 별개 레이어일 수 있으며 명시적 계약이 필요하다.
+
+---
+
+## 12. WISH OWNERSHIP — OPEN
+
+Wish 발견을 단일 Agent에 배타적으로 할당하지 않는다.
+
+Wish가 발생할 수 있는 경로:
+- Yeouiju 일상 대화
+- SOUL 여행 경험
+- Dream Space에서 사용자 직접 생성
+
+Canonical ownership / lifecycle은 설계 전 검증이 필요하다.
+
+---
+
+## 13. CONTINUITY WARNING
+
+후속 Lumi / 개발자는 다음을 확정된 프로젝트 결정으로 계승하지 않는다:
+
+> ~~"SOUL이 일상 대화 + 여행 대화를 모두 담당한다"~~
+
+Agent 역할 변경 전 필수 순서:
+1. 최신 Project State 읽기
+2. 기존 SOUL / Yeouiju / Dream Space 역할 정의 확인
+3. 관련 Architecture Decision / SSOT 확인
+4. 현재 Working Hypothesis와 비교
+5. 충돌 또는 호환성 보고
+
+검증 없이 역할 확장을 구현하지 않는다.
+
+---
+
 ## 8. 새 개발자 / Lumi를 위한 시작 위치
 
 이 Handover를 읽은 새 세션은:
@@ -225,7 +333,20 @@ SOUL Readiness Audit V0.1
 1. `SoulCableCarPage.jsx` — b9b37d6 기준 파악 완료
 2. Golden Question 01 Execution Trace를 사실로 수용
 3. Product Direction (Section 3)을 방향으로 수용 (SSOT/Architecture Decision 아님)
-4. HOLD 목록을 준수
-5. CURRENT NEXT ACTION = SOUL Readiness Audit V0.1 착수
+4. SOUL = Travel Intelligence 전용 — 일상 대화 확장은 확정 결정이 아님
+5. SOUL ↔ Yeouiju Role Boundary = OPEN (canonical repository 대조 필요)
+6. Context Bridge / Memory Ownership / Wish Ownership = 모두 OPEN
+7. HOLD 목록을 준수
+8. CURRENT NEXT ACTION = SOUL Readiness Audit V0.1 착수
 
 구현 시작 전 반드시 Readiness Audit 결과를 먼저 받는다.
+
+**Current Next Action은 하나다:**
+
+```
+SOUL Readiness Audit V0.1
+— Knowledge · Relationship · Forms · Failure Safety
+```
+
+SOUL ↔ Yeouiju Role Boundary / Context Bridge는 OPEN 상태로 보존되며,  
+현재 Readiness Audit을 중단하거나 대체하지 않는다.
