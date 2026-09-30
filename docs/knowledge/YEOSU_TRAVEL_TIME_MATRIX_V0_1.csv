@@ -1,0 +1,51 @@
+from_entity,to_entity,transport_mode,travel_time_min,travel_time_max,distance_note,time_character,evidence_status,source,verified_at,notes
+여수엑스포역,오동도,TOUR_BUS,10,10,UNKNOWN,STATIC,ROUTE_SOURCE,yeosu.go.kr 낭만버스1코스 R028,2026-09-21,낭만버스 기준. 일반버스 상이 가능. MEDIUM confidence.
+여수엑스포역,오동도,CAR,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,-,-,Evidence 없음 — 향후 지도 조회 필요
+여수엑스포역,오동도,PUBLIC_TRANSIT,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,-,-,2번버스 노선 존재 확인(나무위키). 구간 소요시간 미확인.
+여수엑스포역,이순신광장,WALK,35,35,UNKNOWN,STATIC,ROUTE_SOURCE_LOW,trip.com R039,2026-09-21,단일 Web Source. 독립 검증 필요. LOW confidence.
+여수엑스포역,이순신광장,PUBLIC_TRANSIT,12,12,UNKNOWN,STATIC,ROUTE_SOURCE_LOW,trip.com "버스 12분" R039,2026-09-21,노선번호·환승 여부 미확인. LOW confidence.
+여수엑스포역,이순신광장,TAXI,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,-,-,Evidence 없음 — 향후 조사 필요
+여수엑스포역,아쿠아플라넷,TOUR_BUS,2,2,UNKNOWN,STATIC,OFFICIAL,2층버스 정류장 간격 R032 (yeosu.go.kr),2026-09-21,2층버스 노선 기준. HIGH confidence.
+아쿠아플라넷,자산탑승장,TOUR_BUS,3,3,UNKNOWN,STATIC,OFFICIAL,2층버스 "이동 3분" R032 (yeosu.go.kr),2026-09-21,자산탑승장=케이블카주차타워 권역. HIGH confidence.
+자산탑승장,오동도,TOUR_BUS,5,5,UNKNOWN,STATIC,OFFICIAL,2층버스 "이동 5분" R032 (yeosu.go.kr),2026-09-21,HIGH confidence.
+오동도,엠블호텔,TOUR_BUS,5,5,UNKNOWN,STATIC,OFFICIAL,2층버스 "이동 5분" R032 (yeosu.go.kr),2026-09-21,중간 경유 정류장. 참고용.
+엠블호텔,하멜전시관,TOUR_BUS,2,2,UNKNOWN,STATIC,OFFICIAL,2층버스 "이동 2분" R032 (yeosu.go.kr),2026-09-21,HIGH confidence.
+하멜전시관,이순신광장,TOUR_BUS,3,3,UNKNOWN,STATIC,OFFICIAL,2층버스 "이동 3분" R032 (yeosu.go.kr),2026-09-21,HIGH confidence.
+이순신광장,수산물특화시장,TOUR_BUS,5,5,UNKNOWN,STATIC,OFFICIAL,2층버스 "이동 5분" R032 (yeosu.go.kr),2026-09-21,HIGH confidence.
+수산물특화시장,돌산공원탑승장,TOUR_BUS,5,5,UNKNOWN,STATIC,OFFICIAL,2층버스 "이동 5분" R032 (yeosu.go.kr),2026-09-21,돌산공원입구=돌산공원탑승장 권역. HIGH confidence.
+돌산공원탑승장,여수엑스포역,TOUR_BUS,5,5,UNKNOWN,STATIC,OFFICIAL,2층버스 "이동 5분" R032 (yeosu.go.kr),2026-09-21,HIGH confidence.
+오동도,진남관,TOUR_BUS,10,10,UNKNOWN,STATIC,ROUTE_SOURCE,낭만버스1코스 R028 "이동 10분" (yeosu.go.kr),2026-09-21,낭만버스 기준. MEDIUM confidence.
+진남관,전남해양수산과학관,TOUR_BUS,20,20,UNKNOWN,STATIC,ROUTE_SOURCE,낭만버스1코스 R028 "이동 20분" (yeosu.go.kr),2026-09-21,낭만버스 기준. MEDIUM confidence.
+전남해양수산과학관,향일암,TOUR_BUS,25,25,UNKNOWN,STATIC,ROUTE_SOURCE,낭만버스1코스 R028 "이동 25분" (yeosu.go.kr),2026-09-21,MEDIUM confidence. 낭만버스 기준.
+전남해양수산과학관,향일암,CAR,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,-,-,Evidence 없음 — 향후 지도 조회 필요
+향일암,수산물특화시장,TOUR_BUS,40,40,UNKNOWN,STATIC,ROUTE_SOURCE,낭만버스1코스 R028 "이동 40분" (yeosu.go.kr),2026-09-21,MEDIUM confidence. 낭만버스 기준.
+향일암,수산물특화시장,CAR,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,-,-,Evidence 없음 — 향후 지도 조회 필요
+수산물특화시장,여수엑스포역,TOUR_BUS,10,10,UNKNOWN,STATIC,ROUTE_SOURCE,낭만버스1코스 R028 "이동 10분" (yeosu.go.kr),2026-09-21,MEDIUM confidence.
+이순신광장,고소동(천사벽화골목),WALK,15,15,UNKNOWN,STATIC,ROUTE_SOURCE_LOW,trip.com "도보 15분" R039,2026-09-21,LOW confidence. 단일 Source.
+이순신광장,천사벽화골목(고소동),WALK,15,15,UNKNOWN,STATIC,ROUTE_SOURCE_LOW,trip.com "도보 15분" R039,2026-09-21,E4: Founder Route #001. LOW confidence.
+고소동(천사벽화골목),이순신광장,WALK,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,-,-,역방향. Evidence 없음. 동일 원도심.
+고소동(천사벽화골목),자산탑승장,PUBLIC_TRANSIT,30,30,UNKNOWN,STATIC,ROUTE_SOURCE_LOW,trip.com "버스 30분" R039,UNKNOWN,LOW confidence. 노선번호 미확인.
+고소동(천사벽화골목),자산탑승장,TAXI,10,10,UNKNOWN,STATIC,ROUTE_SOURCE_LOW,trip.com "택시 10분" R039,UNKNOWN,LOW confidence.
+진남관,이순신광장,WALK,5,5,UNKNOWN,STATIC,ROUTE_SOURCE_LOW,블로그 참고,UNKNOWN,E3: Founder Route #001. 동일 원도심. CAR 비권장. LOW confidence.
+이순신광장,진남관,WALK,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,-,-,역방향. Evidence 없음.
+천사벽화골목(고소동),하멜전시관,WALK,3,5,종포해양공원 경유,STATIC,ROUTE_SOURCE_LOW,여수시청 공식 코스 구조 (yeosu.go.kr/tour/leisure/walk/goso_angel),2026-09-21,E5: 벽화골목 종포문 출구→종포해양공원(=하멜전시관 위치). 시간은 구조 파생. LOW confidence.
+하멜전시관,천사벽화골목(고소동),WALK,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,-,-,역방향. Evidence 없음.
+하멜전시관,자산탑승장,CAR,10,10,UNKNOWN,STATIC,ROUTE_SOURCE_DERIVED,E004-TAXI 고소동→자산(trip.com) 파생,UNKNOWN,E6: 참조값 LOW. 하멜전시관·고소동=동일 원도심에서 파생.
+자산탑승장,하멜전시관,CAR,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,-,-,역방향. Evidence 없음.
+오동도,여수세계박람회장,CAR,10,10,약 2km,STATIC,ROUTE_SOURCE_LOW,ibtravel.co.kr (단일 Source),2026-09-21,E1: 여수엑스포역↔오동도 2km 차로 약10분 기반. 박람회장≈엑스포역 권역. 단일Source — LOW confidence.
+오동도,여수세계박람회장,WALK,30,30,약 2km,STATIC,ROUTE_SOURCE_LOW,ibtravel.co.kr (단일 Source),2026-09-21,E1 WALK: 동일 Source. 도보 약 30분. LOW confidence.
+여수세계박람회장,오동도,CAR,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,-,-,역방향. Evidence 없음.
+여수세계박람회장,진남관,CAR,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,-,-,E2: 2026-09-21 WebSearch 실시 — Direct CAR Evidence 미발견. 엑스포권→원도심. UNKNOWN 유지.
+진남관,여수세계박람회장,CAR,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,-,-,역방향. Evidence 없음.
+오동도,이순신광장,CAR,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,-,2026-09-21,직접 CAR Evidence 없음. "약10분" 비공식 참고값 사용 금지.
+오동도,이순신광장,PUBLIC_TRANSIT,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,버스2번(나무위키),2026-09-21,노선 확인됨. 구간 소요시간 미확인.
+오동도,이순신광장,WALK,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,-,2026-09-21,Evidence 없음.
+향일암,돌산공원탑승장,CAR,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,-,2026-09-21,돌산도 남단→북단. 네이버/카카오맵 직접 조회 필요.
+향일암,돌산공원탑승장,TAXI,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,-,2026-09-21,돌산도 내. 지도 조회 필요.
+돌산공원탑승장,향일암,CAR,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,-,-,역방향. Evidence 없음.
+자산탑승장,돌산공원탑승장,CABLE_CAR,12,15,UNKNOWN,DYNAMIC,UNVERIFIED_SECONDARY,나무위키+블로그 복수 Source,2026-09-21,"편도 탑승 소요. CONFLICT: 나무위키10분 vs 블로그12~13분. 공식 미확인(SSL). 강풍·낙뢰 운휴."
+돌산공원탑승장,자산탑승장,CABLE_CAR,12,15,UNKNOWN,DYNAMIC,UNVERIFIED_SECONDARY,동일,2026-09-21,편도 탑승 소요. 동일 구조.
+CABLE_DOLSAN (돌산공원탑승장),RAMADA_YEOSU (라마다 여수),CAR,5,7,~1.2km 도로,STATIC,UNVERIFIED_SECONDARY,복수 외부 Source 주소 기반 계산,2026-09-30,돌산읍 강남로 11 주소 기반. 현장 측정 미실시. MEDIUM confidence. Golden Question 01.
+CABLE_DOLSAN (돌산공원탑승장),RAMADA_YEOSU (라마다 여수),WALK,15,15,~1.2km 도로,STATIC,UNVERIFIED_SECONDARY,복수 외부 Source 주소 기반 계산,2026-09-30,보행 경로 지형 미확인. 참고값.
+RAMADA_YEOSU (라마다 여수),CABLE_DOLSAN (돌산공원탑승장),CAR,5,7,~1.2km 도로,STATIC,UNVERIFIED_SECONDARY,위 동일,2026-09-30,역방향. 동일 Evidence.
+RAMADA_YEOSU (라마다 여수),CABLE_JASAN (자산탑승장),CAR,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,-,-,Golden Question 01 외부 조사 후에도 Not Found. 돌산대교 경유 추정이나 측정값 없음.

@@ -72,9 +72,19 @@
 
 **Product Review Evidence:** `docs/research/SOUL_DETAIL_PAGE_V01_V03_FOUNDER_LUMI_PRODUCT_REVIEW_2026_09_29.md`
 
-**CURRENT ONE NEXT ACTION:** Cable Car V0.3 Prepared Visual Asset Integration + Visual Hospitality Validation
-- 목적: Founder 준비 자산 연결 후 Visual Hospitality 검증 (동일 Cable Car prototype)
-- Judgment Priority 수정 / Odongdo/Hyangiram 확장과 섞지 않는다
+**VISUAL_ASSET_INTEGRATION (2026-09-30):** COMPLETE
+- Founder assets connected: hero.png (SOUL_YEOSU_CABLECAR_PLACE_HERO_V01.png) + wish-scene.png (SOUL_YEOSU_CABLECAR_WISH_SCENE_SUNSET_V01.png)
+- Current HEAD: 21c81c3 (Question Composer relocation)
+
+**GOLDEN_QUESTION_01_STRUCTURING (2026-09-30):** COMPLETE
+- Ramada 여수 (돌산도) ↔ 케이블카 관계 최초 구조화
+- Entity 등록: YEOSU_ENTITY_CANDIDATE_MANIFEST_V0_1.md §13 신규
+- Time Edge 등록: YEOSU_TRAVEL_TIME_MATRIX_V0_1.md §2-F 신규 (CABLE_DOLSAN↔RAMADA 3행 + UNKNOWN 1행)
+- CSV 업데이트: YEOSU_TRAVEL_TIME_MATRIX_V0_1.csv 4행 추가
+- Diagnostic: docs/research/GOLDEN_QUESTION_01_DIAGNOSTIC_2026_09_30.md 생성
+- OPEN: CONFLICT-H (토요일 운영시간 21:30 vs 22:30) / RAMADA→CABLE_JASAN 이동시간 NOT_FOUND
+
+**CURRENT ONE NEXT ACTION:** Commit Golden Question 01 structuring + push to staging/storybook-c7a
 
 ---
 
