@@ -90,9 +90,11 @@
 **FOUNDER DECISIONS (2026-10-01):** D1/D2/D3 APPROVED — `docs/architecture/SOUL_RECONNECTION_FOUNDER_DECISIONS_2026_10_01.md`  
 **IMPLEMENTATION HOLD 해제:** SOUL Runtime Reconnection V0.1 범위에 한함 (5개 Engine 신규 구현 불필요 확인)
 
-**SOUL RUNTIME RECONNECTION V0.1 COMPLETE (2026-10-01):** 12/12 Acceptance Criteria PASS — build GREEN — Evidence: `docs/architecture/SOUL_RECONNECTION_V0_1_IMPLEMENTATION_EVIDENCE.md`
+**SOUL RUNTIME RECONNECTION V0.1 COMPLETE (2026-10-01):** 12/12 Acceptance Criteria PASS — build GREEN — Evidence: `docs/architecture/SOUL_RECONNECTION_V0_1_LIVE_VERIFICATION_2026_10_01.md`
 
-**CURRENT ONE NEXT ACTION (2026-10-01):** Golden Question live test on staging — navigate to /soul/cable-car, submit "10월 17일 라마다에서 출발해서 여수해상케이블카 타려고 해. 일정하고 비용 알려줘." — verify 여정 안내 card appears with Path B response
+**SOUL RUNTIME RECONNECTION V0.1 VERIFIED (2026-10-01):** 2-turn Golden Question live test PASS (Turn1: SUCCESS route.days=2 quote=null / Turn2: QUOTE_READY 172,000원). 3 regression tests PASS. D1/D2/D3 constraints confirmed in code. soyeowoolService.js 4 minimal changes only. No new Engine. No new Parser. No DB/Schema change.
+
+**CURRENT ONE NEXT ACTION (2026-10-01):** Founder staging review — deploy staging/storybook-c7a to staging environment, navigate to /dreamtown/soul/cable-car, test Golden Question 2-turn flow end-to-end in browser.
 
 ---
 

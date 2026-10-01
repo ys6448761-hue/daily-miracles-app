@@ -560,6 +560,8 @@ function _isJourneyPlanningIntent(message) {
   // Explicit construction verb attached to a planning noun
   if (/(일정|코스|여행|계획).*(짜줘|짜주세요|만들어줘|만들어주세요|세워줘|구성해줘)/.test(message)) return true;
   if (/(짜줘|짜주세요|만들어줘|만들어주세요).*(일정|코스|여행)/.test(message)) return true;
+  // Information-request verb attached to planning noun: "일정 알려줘", "일정 보여줘", "일정 알고 싶어"
+  if (/(일정|코스|여행 계획).*(알려줘|알려주세요|보여줘|보여주세요|알고 싶|궁금해|부탁해)/.test(message)) return true;
   return false;
 }
 
@@ -577,6 +579,16 @@ function _isDateProvisionMessage(message) {
   if (!message) return false;
   if (!/\d{1,2}월\s*\d{1,2}일/.test(message)) return false;
   if (/추천해|일정 짜|코스 짜|어디 갈|갈 만한|\d박/.test(message)) return false;
+  return true;
+}
+
+// Detect a pure guest-count provision message — user providing headcount only.
+// "2명이야", "3명이에요", "둘이서", "혼자야" → true
+// Disqualified when competing journey/discovery signals are present.
+function _isGuestCountProvisionMessage(message) {
+  if (!message) return false;
+  if (!/(\d+명|혼자|둘이|둘이서|세명|네명|한명)/.test(message)) return false;
+  if (/추천해|일정 짜|코스 짜|어디 갈|갈 만한|\d박|비용|얼마|견적/.test(message)) return false;
   return true;
 }
 
@@ -1117,6 +1129,91 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
     }
   }
 
+  // ─── GUEST COUNT PROVISION FOLLOW-UP ─────────────────────────────────────
+  // Handles user providing headcount in direct response to SOUL's count-ask.
+  // Fires ONLY when stored journey_ctx has hotel_code + travel_date but no guest_count.
+  if (_isGuestCountProvisionMessage(message)) {
+    let storedCtx = null;
+    try {
+      const sessionData = await sessionService.getSession(sessionId);
+      storedCtx = sessionData && sessionData.journey_ctx ? sessionData.journey_ctx : null;
+    } catch (_) {}
+
+    if (storedCtx && storedCtx.hotel_code && storedCtx.travel_date && !storedCtx.guest_count) {
+      const extractedCount = quoteContextService._extractGuestCount(message, {});
+      if (extractedCount && extractedCount >= 1) {
+        const mergedCtx = {
+          hotel_code:  storedCtx.hotel_code,
+          leisure:     storedCtx.leisure_code || null,
+          guest_count: extractedCount,
+          travel_date: storedCtx.travel_date,
+          region:      'yeosu',
+        };
+
+        let quoteResult = null;
+        const complexCheck = quoteContextService.isComplexGroupHotel(mergedCtx, message);
+        if (complexCheck.complex) {
+          quoteResult = { status: 'PENDING_HUMAN_QUOTE', reason: complexCheck.reason };
+        } else if (quoteContextService.isQuotable(mergedCtx)) {
+          const raw = quoteEngine.calculateQuote(quoteContextService.buildQuoteInput(mergedCtx));
+          if (raw.success) {
+            const clean = quoteEngine.sanitizeForCustomer(raw);
+            clean.status = 'CALCULATED';
+            quoteResult = clean;
+          } else {
+            quoteResult = { status: 'CALCULATION_ERROR', error: raw.error };
+          }
+        }
+
+        // Rebuild route skeleton with confirmed guest_count
+        let routeSkeleton = null;
+        try {
+          const { buildSkeleton } = require('./routeSkeletonService');
+          routeSkeleton = buildSkeleton({
+            start_date:     mergedCtx.travel_date,
+            hotel_code:     mergedCtx.hotel_code,
+            leisure_code:   mergedCtx.leisure,
+            leisure_source: 'USER_SELECTED',
+            guest_count:    mergedCtx.guest_count,
+            candidates:     [],
+            nights:         storedCtx.nights || 1,
+          });
+        } catch (err) {
+          console.error('[GUEST_COUNT_PROVISION_SKELETON_ERROR]', err.message);
+        }
+
+        // Persist confirmed guest_count into session journey_ctx
+        sessionService.updateJourneyContext(sessionId, {
+          ...storedCtx,
+          guest_count: extractedCount,
+        }).catch(err => console.error('[GUEST_COUNT_PROVISION_CTX_WRITE]', err.message));
+
+        const presentationMode = (quoteResult && quoteResult.status === 'CALCULATED') ? 'QUOTE_READY' : 'ROUTE_READY';
+        const soulMsg = (quoteResult && quoteResult.status === 'CALCULATED')
+          ? `${extractedCount}명 확인했어요. 숙박비와 케이블카 요금을 계산했어요.`
+          : `${extractedCount}명 확인했어요.`;
+
+        return {
+          ok: true,
+          payload: {
+            session_id: sessionId,
+            understood_context: { group_size: extractedCount },
+            places: [],
+            why_details: [],
+            message_ko: soulMsg,
+            status: presentationMode,
+            presentation_mode: presentationMode,
+            quote: quoteResult,
+            route: routeSkeleton,
+            shared_journey: null,
+            timestamp: new Date().toISOString(),
+            next_options: [],
+          }
+        };
+      }
+    }
+  }
+
   // UNDERSTAND + SHARED JOURNEY EXTRACTION (parallel — independent AI calls)
   const [understandResult, sharedJourney] = await Promise.all([
     _understand(message),
@@ -1308,13 +1405,14 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
       });
 
       // Write-back: preserve existing journey_ctx fields + update route fields
+      // guest_count stored as null when not user-explicit — GUEST_COUNT_PROVISION handler fills it later.
       sessionService.updateJourneyContext(sessionId, {
         ...(journeyCtxForSkeleton || {}),
         route_id:         routeSkeleton.route_id,
         nights,
         hotel_code:       quoteCtx.hotel_code   || null,
         leisure_code:     _resolvedLeisure,
-        guest_count:      quoteCtx.guest_count  || domainContext.group_size || 2,
+        guest_count:      quoteCtx.guest_count  || domainContext.group_size || null,
         travel_date:      quoteCtx.travel_date  || null,
       }).catch(err => console.error('[JOURNEY_CTX_WRITE_ERROR]', err.message));
 

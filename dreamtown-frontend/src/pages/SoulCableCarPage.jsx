@@ -522,17 +522,16 @@ export default function SoulCableCarPage() {
             여정
           </p>
           <JourneyFlow ctx={travelerContext} />
-          {/* D2: course blocks from Path B — appended below JourneyFlow if present */}
-          {soulResponse?.course?.blocks?.length > 0 && (
+          {/* D2: route days from Path B — appended below JourneyFlow if present */}
+          {soulResponse?.route?.days?.length > 0 && (
             <div className="mt-4 space-y-2 border-t border-white border-opacity-10 pt-4">
-              {soulResponse.course.blocks.map((block, i) => (
+              {soulResponse.route.days.flatMap(d => d.items || []).map((item, i) => (
                 <div key={i} className="flex gap-3 items-start">
-                  <span className="text-xs text-white opacity-30 mt-0.5 shrink-0 w-12">{block.time || ''}</span>
+                  <span className="text-xs text-white opacity-30 mt-0.5 shrink-0 w-12">{item.time_slot || ''}</span>
                   <div>
-                    <p className="text-sm text-white leading-snug">{block.label || block.title || block.description}</p>
-                    {block.note && (
-                      <p className="text-xs text-white opacity-40 mt-0.5">{block.note}</p>
-                    )}
+                    <p className={`text-sm leading-snug ${item.selection_status === 'LOCKED' ? 'text-star-gold' : 'text-white'}`}>
+                      {item.name}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -547,14 +546,14 @@ export default function SoulCableCarPage() {
             <div className="space-y-1.5">
               {soulResponse.quote.breakdown?.map((item, i) => (
                 <div key={i} className="flex justify-between text-sm">
-                  <span className="text-white opacity-60">{item.label}</span>
-                  <span className="text-white">{item.amount_display || item.amount}</span>
+                  <span className="text-white opacity-60">{item.name}</span>
+                  <span className="text-white">{item.sell != null ? item.sell.toLocaleString('ko-KR') + '원' : ''}</span>
                 </div>
               ))}
-              {soulResponse.quote.total_display && (
+              {soulResponse.quote.pricing?.totalSell != null && (
                 <div className="flex justify-between text-sm font-semibold border-t border-white border-opacity-10 pt-2 mt-2">
                   <span className="text-white">합계</span>
-                  <span className="text-star-gold">{soulResponse.quote.total_display}</span>
+                  <span className="text-star-gold">{soulResponse.quote.pricing.totalSell.toLocaleString('ko-KR')}원</span>
                 </div>
               )}
             </div>
