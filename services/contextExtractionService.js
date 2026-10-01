@@ -68,7 +68,9 @@ class ContextExtractionService {
         budget_constraint:      mapSource(src.budget_constraint),
         group_size:             mapSource(src.group_size),
         requested_count:        mapSource(src.requested_count),
-        mobility_constraint:    mapSource(src.mobility_constraint)
+        mobility_constraint:    mapSource(src.mobility_constraint),
+        departure_origin:       mapSource(src.departure_origin),
+        hotel_lodging:          mapSource(src.hotel_lodging)
       };
 
       // Build TravelGuideContext — existing fields UNCHANGED
@@ -99,6 +101,9 @@ class ContextExtractionService {
         group_size:           extracted.group_size ?? null,
         requested_count:      extracted.requested_count ?? null,
         mobility_constraint:  extracted.mobility_constraint ?? null,
+        // Semantic role fields — additive, preserve explicit traveler facts
+        departure_origin:     extracted.departure_origin ?? null,
+        hotel_lodging:        extracted.hotel_lodging ?? null,
         _provenance // additive — does not replace any existing field
       };
 
@@ -160,6 +165,9 @@ class ContextExtractionService {
         group_size:             typeof parsed.group_size === 'number' ? parsed.group_size : null,
         requested_count:        typeof parsed.requested_count === 'number' ? parsed.requested_count : null,
         mobility_constraint:    parsed.mobility_constraint ?? null,
+        // Semantic role fields — departure vs lodging (additive, not mutually exclusive)
+        departure_origin:       parsed.departure_origin ?? null,
+        hotel_lodging:          parsed.hotel_lodging ?? null,
         _source:                parsed._source || {}
       };
     } catch (error) {
@@ -253,6 +261,8 @@ class ContextExtractionService {
   "group_size": 숫자 또는 null (명확한 인원수 언급 시. "12명"=12, "우리 둘"=2. 언급 없으면 null),
   "requested_count": 숫자 또는 null (사용자가 결과 개수를 명시한 경우만. "세 군데"=3, "두 곳"=2, "다섯 개"=5. 추론하지 말고 명시적 언급만. 언급 없으면 null),
   "mobility_constraint": "low_walking" | null ("많이 안 걷는", "걷기 힘든", "편한 코스", "체력이 약한", "이동 부담 없는" 등 명시적 보행 부담 감소 요청 시. 추론 말고 명시적 언급만. 언급 없으면 null),
+  "departure_origin": "라마다" | "켄싱턴 호텔" | null (출발지로 명시된 숙박시설 이름. "에서 출발"이 명시적으로 언급된 경우만. 추론 금지. 언급 없으면 null),
+  "hotel_lodging": "라마다" | "켄싱턴 호텔" | null (숙박 장소로 명시된 숙박시설 이름. "에서 숙박", "에서 1박", "에서 묵" 등이 명시적으로 언급된 경우만. 추론 금지. 언급 없으면 null),
   "_source": {
     "time_available_minutes": "explicit" | "inferred" | "unknown",
     "people_type": "explicit" | "inferred" | "unknown",
@@ -269,7 +279,9 @@ class ContextExtractionService {
     "budget_constraint": "explicit" | "inferred" | "unknown",
     "group_size": "explicit" | "inferred" | "unknown",
     "requested_count": "explicit" | "inferred" | "unknown",
-    "mobility_constraint": "explicit" | "inferred" | "unknown"
+    "mobility_constraint": "explicit" | "inferred" | "unknown",
+    "departure_origin": "explicit" | "inferred" | "unknown",
+    "hotel_lodging": "explicit" | "inferred" | "unknown"
   }
 }
 

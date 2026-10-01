@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-01T01:53:43.651Z",
+  "generated_at": "2026-10-01T04:26:18.355Z",
   "generator": "generate-manifest.js",
-  "total_count": 606,
+  "total_count": 611,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -957,6 +957,91 @@
       "title": "SOUL Final Reconnection Decision Evidence V0.1",
       "created_at": "2026-10-01",
       "checksum": "d191a996"
+    },
+    {
+      "id": "DOC-SOUL_GOLDEN_QUESTION_ORIGIN_PR",
+      "path": "docs/architecture/SOUL_GOLDEN_QUESTION_ORIGIN_PRESERVATION_IMPL_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Golden Question — Origin Preservation V0.1 Implementation Evidence",
+      "created_at": "2026-10-01",
+      "checksum": "7d2723fe"
+    },
+    {
+      "id": "DOC-SOUL_GOLDEN_QUESTION_ORIGIN_PR",
+      "path": "docs/architecture/SOUL_GOLDEN_QUESTION_ORIGIN_PRESERVATION_MINIMUM_CONTRACT_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture",
+        "storybook"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "SOUL Golden Question Origin Preservation — Minimum Contract V0.1",
+      "created_at": "2026-10-01",
+      "checksum": "eda5aa43"
+    },
+    {
+      "id": "DOC-SOUL_GOLDEN_QUESTION_SEMANTIC_",
+      "path": "docs/architecture/SOUL_GOLDEN_QUESTION_SEMANTIC_RESTORATION_GATE_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Golden Question Semantic Restoration Gate V0.1",
+      "created_at": "2026-10-01",
+      "checksum": "e1f45d85"
+    },
+    {
+      "id": "DOC-SOUL_JOURNEY_QUALITY_GAP_AUDIT",
+      "path": "docs/architecture/SOUL_JOURNEY_QUALITY_GAP_AUDIT_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Journey Quality Gap Audit V0.1",
+      "created_at": "2026-10-01",
+      "checksum": "b305ebae"
+    },
+    {
+      "id": "DOC-SOUL_LEGACY_JOURNEY_RESTORATIO",
+      "path": "docs/architecture/SOUL_LEGACY_JOURNEY_RESTORATION_AUDIT_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Legacy Journey Restoration Audit V0.1",
+      "created_at": "2026-10-01",
+      "checksum": "b85ccba5"
     },
     {
       "id": "DOC-SOUL_MAEK_SODAM_RESPONSIBILITY",

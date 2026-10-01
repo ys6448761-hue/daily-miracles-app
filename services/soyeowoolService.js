@@ -600,6 +600,36 @@ function _isCommerceFollowUpIntent(message) {
   return /(얼마야|얼마에요|얼마예요|얼마 들|얼마나 들|가격 알려|견적 보여|견적 뽑|견적 알려|이 정도면|이 일정.*(얼마|가격)|이 코스.*(얼마|가격)|가격이 어)/.test(message);
 }
 
+// ─── Semantic Role Extraction ─────────────────────────────────────────────────
+// Departure and lodging roles are additive — the same place can have both.
+// Uses MVP_HOTELS mapping from quoteContextService; no new resolver added.
+const _DEPARTURE_SUFFIX = /에서\s*출발/;
+const _LODGING_SUFFIX   = /에서\s*(숙박|1박|묵)/;
+const _HOTEL_CODE_TO_KO = { ramada: '라마다', kenny: '켄싱턴 호텔' };
+
+function _extractSemanticRoles(message) {
+  if (!message) return { departure_origin: null, hotel_lodging: null };
+  const hotelCode = quoteContextService._extractHotelCode(message);
+  if (!hotelCode) return { departure_origin: null, hotel_lodging: null };
+  const name = _HOTEL_CODE_TO_KO[hotelCode] || hotelCode;
+  return {
+    departure_origin: _DEPARTURE_SUFFIX.test(message)
+      ? { name, canonical_code: hotelCode, role: 'departure' } : null,
+    hotel_lodging: _LODGING_SUFFIX.test(message)
+      ? { name, canonical_code: hotelCode, role: 'lodging' } : null,
+  };
+}
+
+// Determines hotel_code to pass to routeSkeletonService.
+// departure_origin alone does NOT trigger lodging skeleton.
+// hotel_lodging (or no explicit role = legacy path) → uses hotel_code for skeleton.
+function _hotelCodeForSkeleton(message, quoteCtx) {
+  const { departure_origin, hotel_lodging } = _extractSemanticRoles(message);
+  if (departure_origin && !hotel_lodging) return null; // departure-only → no lodging nodes
+  if (hotel_lodging) return hotel_lodging.canonical_code; // explicit lodging → use code
+  return quoteCtx ? quoteCtx.hotel_code : null; // no explicit role → legacy hotel_id path
+}
+
 // Merge stored journey_ctx with message-extracted overrides.
 // Explicit current-message values always win over stored journey values.
 function _mergeJourneyQuoteCtx(journeyCtx, messageCtx) {
@@ -1397,9 +1427,10 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
     try {
       const { buildSkeleton } = require('./routeSkeletonService');
       const nights = _extractNights(message);
+      const _skeletonHotelCode = _hotelCodeForSkeleton(message, quoteCtx);
       routeSkeleton = buildSkeleton({
         start_date:     quoteCtx.travel_date || null,
-        hotel_code:     quoteCtx.hotel_code || null,
+        hotel_code:     _skeletonHotelCode,
         leisure_code:   _resolvedLeisure,
         leisure_source: _leisureSource,
         guest_count:    quoteCtx.guest_count || domainContext.group_size || 2,
@@ -1407,16 +1438,20 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
         nights,
       });
 
-      // Write-back: preserve existing journey_ctx fields + update route fields
-      // guest_count stored as null when not user-explicit — GUEST_COUNT_PROVISION handler fills it later.
+      // Write-back: preserve existing journey_ctx fields + update route fields.
+      // departure_origin / hotel_lodging stored as independent additive keys.
+      // guest_count stored as null when not user-explicit — GUEST_COUNT_PROVISION fills it later.
+      const _roles = _extractSemanticRoles(message);
       sessionService.updateJourneyContext(sessionId, {
         ...(journeyCtxForSkeleton || {}),
         route_id:         routeSkeleton.route_id,
         nights,
-        hotel_code:       quoteCtx.hotel_code   || null,
+        hotel_code:       _skeletonHotelCode,
         leisure_code:     _resolvedLeisure,
         guest_count:      quoteCtx.guest_count  || domainContext.group_size || null,
         travel_date:      quoteCtx.travel_date  || null,
+        departure_origin: _roles.departure_origin || (journeyCtxForSkeleton && journeyCtxForSkeleton.departure_origin) || null,
+        hotel_lodging:    _roles.hotel_lodging    || (journeyCtxForSkeleton && journeyCtxForSkeleton.hotel_lodging)    || null,
       }).catch(err => console.error('[JOURNEY_CTX_WRITE_ERROR]', err.message));
 
     } catch (err) {

@@ -314,7 +314,7 @@ describe('contextExtractionProvenance — SOYEOWOOL D2', () => {
 
     // _provenance is additive
     expect(ctx._provenance).toBeDefined();
-    expect(Object.keys(ctx._provenance)).toHaveLength(10);
+    expect(Object.keys(ctx._provenance)).toHaveLength(18);
   });
 
   // ── T-CG01: guard corrects wrong GPT classification — parents phrase ──────────
