@@ -12,6 +12,7 @@
 
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getOrEnsureGuestCredential } from '../api/dreamtown.js';
 
 // ── Canonical judgment texts ─────────────────────────────────────────────────
 // Internal — role: SOUL JUDGMENT ("그래서 지금 어떻게 판단하는가")
@@ -249,6 +250,10 @@ export default function SoulCableCarPage() {
     companion: null,
   });
   const [inputValue, setInputValue] = useState('');
+  const [sessionId, setSessionId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [soulMessage, setSoulMessage] = useState(null);
+  const [soulResponse, setSoulResponse] = useState(null);
 
   const hasContext =
     travelerContext.hasVehicle || travelerContext.nextPlace || travelerContext.companion;
@@ -282,12 +287,47 @@ export default function SoulCableCarPage() {
       ? SOUL_DISCOVERY.vehicle
       : SOUL_DISCOVERY.default;
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    if (!inputValue.trim()) return;
-    const updated = parseContext(inputValue, travelerContext);
+    const raw = inputValue.trim();
+    if (!raw || isLoading) return;
+
+    // Quick Context + NL keyword pass — synchronous, zero-LLM
+    const updated = parseContext(raw, travelerContext);
     setTravelerContext(updated);
-    setInputValue('');
+
+    // Send raw question to Path B BEFORE clearing input (raw question preservation)
+    setIsLoading(true);
+    setSoulMessage(null);
+    try {
+      const cred = await getOrEnsureGuestCredential();
+      if (!cred?.guest_token) throw new Error('인증 정보를 가져오지 못했어요. 잠시 후 다시 시도해주세요.');
+
+      const res = await fetch('/api/dt/travel/input/text', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${cred.guest_token}`,
+        },
+        body: JSON.stringify({ message: raw, session_id: sessionId }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(typeof body?.error === 'string' ? body.error : '요청 처리에 실패했어요. 다시 시도해주세요.');
+      }
+
+      const data = await res.json();
+      if (data.session_id) setSessionId(data.session_id);
+      setSoulResponse(data);
+      // D1: message_ko goes to soulMessage ("여정 안내"), NOT to SOUL JUDGMENT (stays Prepared)
+      if (data.message_ko) setSoulMessage(data.message_ko);
+    } catch (err) {
+      setSoulMessage(err.message || '일정을 확인하는 중 문제가 생겼어요. 다시 시도해주세요.');
+    } finally {
+      setIsLoading(false);
+      setInputValue(''); // clear AFTER endpoint call
+    }
   }
 
   return (
@@ -324,9 +364,10 @@ export default function SoulCableCarPage() {
             />
             <button
               type="submit"
-              className="text-star-gold text-sm font-semibold whitespace-nowrap hover:opacity-80 transition-opacity"
+              disabled={isLoading}
+              className="text-star-gold text-sm font-semibold whitespace-nowrap hover:opacity-80 transition-opacity disabled:opacity-40"
             >
-              전달
+              {isLoading ? '확인 중…' : '전달'}
             </button>
           </form>
 
@@ -387,6 +428,14 @@ export default function SoulCableCarPage() {
             );
           })()}
         </Card>
+
+        {/* ── SOUL MESSAGE — runtime travel guidance (D1: separate from SOUL JUDGMENT) ── */}
+        {soulMessage && (
+          <Card>
+            <p className="text-xs text-dream-purple font-semibold mb-2 uppercase tracking-wider">여정 안내</p>
+            <p className="text-sm text-white leading-relaxed">{soulMessage}</p>
+          </Card>
+        )}
 
         {/* ── PLACE HERO ── */}
         {/* PREPARED: SOUL_YEOSU_CABLECAR_PLACE_HERO_V01.png — Founder visual asset */}
@@ -473,7 +522,44 @@ export default function SoulCableCarPage() {
             여정
           </p>
           <JourneyFlow ctx={travelerContext} />
+          {/* D2: course blocks from Path B — appended below JourneyFlow if present */}
+          {soulResponse?.course?.blocks?.length > 0 && (
+            <div className="mt-4 space-y-2 border-t border-white border-opacity-10 pt-4">
+              {soulResponse.course.blocks.map((block, i) => (
+                <div key={i} className="flex gap-3 items-start">
+                  <span className="text-xs text-white opacity-30 mt-0.5 shrink-0 w-12">{block.time || ''}</span>
+                  <div>
+                    <p className="text-sm text-white leading-snug">{block.label || block.title || block.description}</p>
+                    {block.note && (
+                      <p className="text-xs text-white opacity-40 mt-0.5">{block.note}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
+
+        {/* ── COST — D2: quote from Path B, shown only when CALCULATED ── */}
+        {soulResponse?.quote?.status === 'CALCULATED' && (
+          <Card>
+            <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">예상 비용</p>
+            <div className="space-y-1.5">
+              {soulResponse.quote.breakdown?.map((item, i) => (
+                <div key={i} className="flex justify-between text-sm">
+                  <span className="text-white opacity-60">{item.label}</span>
+                  <span className="text-white">{item.amount_display || item.amount}</span>
+                </div>
+              ))}
+              {soulResponse.quote.total_display && (
+                <div className="flex justify-between text-sm font-semibold border-t border-white border-opacity-10 pt-2 mt-2">
+                  <span className="text-white">합계</span>
+                  <span className="text-star-gold">{soulResponse.quote.total_display}</span>
+                </div>
+              )}
+            </div>
+          </Card>
+        )}
 
         {/* ── DEPTH (expandable) — "왜 그런가 / 더 알고 싶을 때" ── */}
         {/* PREPARED: PU-CC-004 (crystal cabin), PU-REL-004/006 (timing/walk) */}
