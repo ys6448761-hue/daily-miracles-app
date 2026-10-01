@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-01T05:28:57.152Z",
+  "generated_at": "2026-10-01T07:47:43.597Z",
   "generator": "generate-manifest.js",
-  "total_count": 614,
+  "total_count": 617,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -942,6 +942,23 @@
       "checksum": "5ecd0ee1"
     },
     {
+      "id": "DOC-SOUL_DELEGATION_CLARIFICATION_",
+      "path": "docs/architecture/SOUL_DELEGATION_CLARIFICATION_CONTRACT_AUDIT_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Delegation Clarification Contract V0.1 — Existing Capability Audit",
+      "created_at": "2026-10-01",
+      "checksum": "99c2996f"
+    },
+    {
       "id": "DOC-SOUL_FINAL_RECONNECTION_DECISI",
       "path": "docs/architecture/SOUL_FINAL_RECONNECTION_DECISION_EVIDENCE_V0_1.md",
       "type": "document",
@@ -1112,6 +1129,23 @@
       "checksum": "23645848"
     },
     {
+      "id": "DOC-SOUL_MULTI_TURN_TRAVELER_CONTE",
+      "path": "docs/architecture/SOUL_MULTI_TURN_TRAVELER_CONTEXT_CONTINUITY_AUDIT_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Multi-turn Traveler Context Continuity V0.1 — Existing Capability Audit",
+      "created_at": "2026-10-01",
+      "checksum": "521af344"
+    },
+    {
       "id": "DOC-SOUL_ORIGIN_AWARE_JOURNEY_JUDG",
       "path": "docs/architecture/SOUL_ORIGIN_AWARE_JOURNEY_JUDGMENT_CONNECTION_SCOPE_V0_1.md",
       "type": "document",
@@ -1233,6 +1267,23 @@
       "title": "SOUL Runtime Reconnection Decision Audit V0.1",
       "created_at": "2026-10-01",
       "checksum": "1291dfc8"
+    },
+    {
+      "id": "DOC-SOUL_TRAVELER_PROFILE_CONTINUI",
+      "path": "docs/architecture/SOUL_TRAVELER_PROFILE_CONTINUITY_IMPL_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Traveler Profile Continuity V0.1 — Implementation",
+      "created_at": "2026-10-01",
+      "checksum": "12401caf"
     },
     {
       "id": "DOC-SOWON_IDENTITY_V0_1",

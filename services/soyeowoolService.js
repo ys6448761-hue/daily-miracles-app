@@ -324,6 +324,68 @@ async function _understand(message) {
   return { ok: true, soulContext: _correctCoupleClassification(message, soulContext) };
 }
 
+// ─── Traveler Profile Continuity V0.1 ────────────────────────────────────────
+// Only USER_EXPLICIT values may establish or update persisted traveler facts.
+// UNKNOWN / AI_INFERENCE values must not overwrite previously stored explicit values.
+
+// Returns current-turn USER_EXPLICIT fields only; null for non-explicit fields.
+function _extractExplicitTravelerFacts(soulContext) {
+  const prov = soulContext._provenance || {};
+  const cc = soulContext.companion_constraints || {};
+  return {
+    people_type:           prov.people_type === 'USER_EXPLICIT' ? soulContext.people_type : null,
+    companion_has_elderly: prov.has_elderly  === 'USER_EXPLICIT' ? !!cc.has_elderly        : null,
+    companion_has_kids:    prov.has_kids     === 'USER_EXPLICIT' ? !!cc.has_kids            : null,
+    has_car:               prov.has_car      === 'USER_EXPLICIT' ? soulContext.has_car      : null,
+  };
+}
+
+// Merges current explicit facts with stored profile.
+// Current explicit always wins; stored fills gaps where current is null.
+function _mergeProfileFacts(currentFacts, stored) {
+  const s = stored || {};
+  return {
+    people_type:           currentFacts.people_type           != null ? currentFacts.people_type           : (s.people_type           ?? null),
+    companion_has_elderly: currentFacts.companion_has_elderly != null ? currentFacts.companion_has_elderly : (s.companion_has_elderly ?? null),
+    companion_has_kids:    currentFacts.companion_has_kids    != null ? currentFacts.companion_has_kids    : (s.companion_has_kids    ?? null),
+    has_car:               currentFacts.has_car               != null ? currentFacts.has_car               : (s.has_car               ?? null),
+  };
+}
+
+// Re-injects persisted explicit traveler profile into soulContext.
+// Precedence: CURRENT USER_EXPLICIT > PERSISTED USER_EXPLICIT > CURRENT DEFAULT/UNKNOWN.
+function _applyPersistedTravelerProfile(soulContext, storedProfile) {
+  if (!storedProfile) return soulContext;
+  const prov = soulContext._provenance || {};
+  const merged = { ...soulContext };
+  const mergedProv = { ...prov };
+  const mergedConstraints = { ...(soulContext.companion_constraints || {}) };
+  let constraintsChanged = false;
+
+  if (prov.people_type !== 'USER_EXPLICIT' && storedProfile.people_type != null) {
+    merged.people_type = storedProfile.people_type;
+    mergedProv.people_type = 'USER_EXPLICIT';
+  }
+  if (prov.has_elderly !== 'USER_EXPLICIT' && storedProfile.companion_has_elderly != null) {
+    mergedConstraints.has_elderly = storedProfile.companion_has_elderly;
+    mergedProv.has_elderly = 'USER_EXPLICIT';
+    constraintsChanged = true;
+  }
+  if (prov.has_kids !== 'USER_EXPLICIT' && storedProfile.companion_has_kids != null) {
+    mergedConstraints.has_kids = storedProfile.companion_has_kids;
+    mergedProv.has_kids = 'USER_EXPLICIT';
+    constraintsChanged = true;
+  }
+  if (prov.has_car !== 'USER_EXPLICIT' && storedProfile.has_car != null) {
+    merged.has_car = storedProfile.has_car;
+    mergedProv.has_car = 'USER_EXPLICIT';
+  }
+
+  merged._provenance = mergedProv;
+  if (constraintsChanged) merged.companion_constraints = mergedConstraints;
+  return merged;
+}
+
 // ─── Private: Shared Journey (V0.2) ──────────────────────────────────────────
 
 async function _extractSharedJourney(message) {
@@ -1334,6 +1396,16 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
       }
     }
 
+    // Persist USER_EXPLICIT traveler facts even on clarification turns (non-blocking).
+    // e.g. "부모님이랑 갈 건데 어디 좋을까요?" — people_type written before Journey turn.
+    const _clarFacts = _extractExplicitTravelerFacts(soulContext);
+    if (Object.values(_clarFacts).some(v => v != null)) {
+      sessionService.updateJourneyContext(sessionId, {
+        ...(journeyCtxForClar || {}),
+        traveler_profile: _mergeProfileFacts(_clarFacts, (journeyCtxForClar && journeyCtxForClar.traveler_profile) || null),
+      }).catch(err => console.error('[TRAVELER_PROFILE_WRITE_ERROR]', err.message));
+    }
+
     return {
       ok: true,
       payload: {
@@ -1356,11 +1428,31 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
     };
   }
 
+  // ─── Traveler Profile Continuity V0.1 ──────────────────────────────────────
+  // Single session read shared by: profile re-injection + skeleton write-back.
+  // Must precede _buildDomainContext so enriched facts flow into Journey Composer.
+  let _sessionCtxForTurn = null;
+  try {
+    const _sd = await sessionService.getSession(sessionId);
+    _sessionCtxForTurn = (_sd && _sd.journey_ctx) ? _sd.journey_ctx : null;
+  } catch (_) {}
+  const _storedTravelerProfile = (_sessionCtxForTurn && _sessionCtxForTurn.traveler_profile) || null;
+  const enrichedSoulContext = _applyPersistedTravelerProfile(soulContext, _storedTravelerProfile);
+
+  // Write USER_EXPLICIT facts from this turn to persisted profile (non-blocking).
+  const _turnFacts = _extractExplicitTravelerFacts(soulContext);
+  if (Object.values(_turnFacts).some(v => v != null)) {
+    sessionService.updateJourneyContext(sessionId, {
+      ...(_sessionCtxForTurn || {}),
+      traveler_profile: _mergeProfileFacts(_turnFacts, _storedTravelerProfile),
+    }).catch(err => console.error('[TRAVELER_PROFILE_WRITE_ERROR]', err.message));
+  }
+
   // CONSTRUCT REQUEST ENVELOPE (internal audit — not returned to client directly)
-  const request = _buildRequestEnvelope(principal, soulContext, sessionId);
+  const request = _buildRequestEnvelope(principal, enrichedSoulContext, sessionId);
 
   // D5 DOMAIN CONTEXT + DOMAIN_FALLBACK labeling
-  const baseDomainContext = _buildDomainContext(soulContext, sessionId, hotelId);
+  const baseDomainContext = _buildDomainContext(enrichedSoulContext, sessionId, hotelId);
 
   // V0.2: Supplement domain context with minimum Shared Journey signals
   // EXPERIENCED items are NEVER added to exclude_place_ids
@@ -1413,12 +1505,8 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
   let _resolvedLeisure = null;
   let _leisureSource   = null;
   if (_isJourneyPlanningIntent(message) && quoteCtx) {
-    // Load session to carry forward traveler's explicit leisure preference
-    let journeyCtxForSkeleton = null;
-    try {
-      const sessionCtx = await sessionService.getSession(sessionId);
-      journeyCtxForSkeleton = sessionCtx && sessionCtx.journey_ctx ? sessionCtx.journey_ctx : null;
-    } catch (_) {}
+    // Reuse session context already loaded for Traveler Profile Continuity above.
+    const journeyCtxForSkeleton = _sessionCtxForTurn;
 
     // Priority: current message > stored traveler preference > null
     _resolvedLeisure = quoteCtx.leisure
@@ -1455,6 +1543,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
         travel_date:      quoteCtx.travel_date  || null,
         departure_origin: _roles.departure_origin || (journeyCtxForSkeleton && journeyCtxForSkeleton.departure_origin) || null,
         hotel_lodging:    _roles.hotel_lodging    || (journeyCtxForSkeleton && journeyCtxForSkeleton.hotel_lodging)    || null,
+        traveler_profile: _mergeProfileFacts(_extractExplicitTravelerFacts(enrichedSoulContext), _storedTravelerProfile),
       }).catch(err => console.error('[JOURNEY_CTX_WRITE_ERROR]', err.message));
 
     } catch (err) {
@@ -1474,7 +1563,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
   const status = _deriveStatus(tgResult, domainContext);
 
   // D7 SOUL MESSAGE
-  const soulMessage = _generateSoulMessage(soulContext, status, message, quoteCtx);
+  const soulMessage = _generateSoulMessage(enrichedSoulContext, status, message, quoteCtx);
 
   // WHY DETAILS
   const whyDetails = _buildWhyDetails(tgResult, domainContext);
@@ -1483,7 +1572,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
   const result = _buildResultEnvelope(request, tgResult, domainContext, status);
 
   // CLIENT PAYLOAD
-  const payload = _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionId, soulContext, sharedJourney, quoteResult, routeSkeleton);
+  const payload = _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionId, enrichedSoulContext, sharedJourney, quoteResult, routeSkeleton);
 
   return { ok: true, payload };
 }
