@@ -793,6 +793,9 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx) {
       if (!quoteCtx.travel_date && /비용|얼마|가격|견적/.test(message)) {
         return `${base}\n날짜를 알려주시면 숙박비와 ${leisureName} 요금도 바로 계산해 드릴게요.`;
       }
+      if (quoteCtx.travel_date && !quoteCtx.guest_count && /비용|얼마|가격|견적/.test(message)) {
+        return `${base}\n몇 분이세요? 인원을 알려주시면 숙박비와 ${leisureName} 요금을 바로 계산해 드릴게요.`;
+      }
       return base;
     }
     if (hotelName) {
