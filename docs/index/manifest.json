@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-01T04:26:18.355Z",
+  "generated_at": "2026-10-01T05:08:42.051Z",
   "generator": "generate-manifest.js",
-  "total_count": 611,
+  "total_count": 613,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1025,6 +1025,40 @@
       "title": "SOUL Journey Quality Gap Audit V0.1",
       "created_at": "2026-10-01",
       "checksum": "b305ebae"
+    },
+    {
+      "id": "DOC-SOUL_LEGACY_JOURNEY_PRESENTATI",
+      "path": "docs/architecture/SOUL_LEGACY_JOURNEY_PRESENTATION_RESTORATION_IMPL_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Legacy Journey Presentation Restoration V0.1 — Implementation Evidence",
+      "created_at": "2026-10-01",
+      "checksum": "58c76c74"
+    },
+    {
+      "id": "DOC-SOUL_LEGACY_JOURNEY_PRESENTATI",
+      "path": "docs/architecture/SOUL_LEGACY_JOURNEY_PRESENTATION_RESTORATION_SCOPE_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Legacy Journey Presentation Restoration V0.1 — Scope Verification",
+      "created_at": "2026-10-01",
+      "checksum": "747eb5d3"
     },
     {
       "id": "DOC-SOUL_LEGACY_JOURNEY_RESTORATIO",

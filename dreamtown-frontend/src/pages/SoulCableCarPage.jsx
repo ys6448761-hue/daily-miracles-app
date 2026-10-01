@@ -13,6 +13,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getOrEnsureGuestCredential } from '../api/dreamtown.js';
+import CourseDisplay from '../components/TravelGuide/CourseDisplay.jsx';
 
 // ── Canonical judgment texts ─────────────────────────────────────────────────
 // Internal — role: SOUL JUDGMENT ("그래서 지금 어떻게 판단하는가")
@@ -522,8 +523,14 @@ export default function SoulCableCarPage() {
             여정
           </p>
           <JourneyFlow ctx={travelerContext} />
-          {/* D2: route days from Path B — appended below JourneyFlow if present */}
-          {soulResponse?.route?.days?.length > 0 && (
+          {/* Journey detail: course (Journey Composer V0) takes precedence over route skeleton.
+              course-first: prevents double Journey exposure. */}
+          {soulResponse?.course?.blocks?.length > 0 ? (
+            <div className="mt-4 border-t border-white border-opacity-10 pt-4">
+              <CourseDisplay course={soulResponse.course} />
+            </div>
+          ) : soulResponse?.route?.days?.length > 0 && (
+            /* Fallback: route skeleton (LOCKED items) when course not available */
             <div className="mt-4 space-y-2 border-t border-white border-opacity-10 pt-4">
               {soulResponse.route.days.flatMap(d => d.items || []).map((item, i) => (
                 <div key={i} className="flex gap-3 items-start">

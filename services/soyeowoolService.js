@@ -976,7 +976,10 @@ function _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionI
     // COST/margin excluded by sanitizeForCustomer()
     quote: quoteResult || null,
     // MY ROUTE: deterministic skeleton (null for single-day trips)
-    route: routeSkeleton || null
+    route: routeSkeleton || null,
+    // JOURNEY COMPOSER V0: rich course blocks (place/transition/meal/cafe)
+    // Previously dropped here — restored as additive field. null when not generated.
+    course: (tgResult && tgResult.course) || null
   };
 }
 
