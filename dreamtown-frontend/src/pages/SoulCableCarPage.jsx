@@ -1,9 +1,13 @@
 /**
- * SOUL Cable Car Detail Page V0.3
- * 여수해상케이블카 — Living Travel Detail Page
+ * SOUL Living Detail Page V0.4
+ * 여수해상케이블카 / 오동도 / 향일암 — Place-switching Living Travel Detail Page
  *
- * V0.3 changes: real Place Hero image, FOR ME section, repetition removed,
- *   internal evidence tags hidden from traveler UI, page length stable across states.
+ * V0.4 changes: place switching driven by backend resolved_code (PLACE_LOOKUP only).
+ *   Title, Hero text, Basic Info, SOUL Judgment switch per canonical place.
+ *   Hero image: cable car only (odongdo/hyangiram assets not in repo — gradient fallback).
+ *   Journey suppressed for non-cablecar PLACE_LOOKUP to prevent contradictory cable-car routing.
+ *   parseContext '주차' substring false-positive fixed.
+ *   V0.1 supported places: cablecar, odongdo, hyangiram.
  *
  * Evidence (internal — not shown in traveler UI):
  *   PU-CC-001~005 · PU-REL-001~006
@@ -36,6 +40,14 @@ const SOUL_DISCOVERY = {
     '크리스탈 캐빈은 바닥이 투명해요. 고소 불편이 있으신 분이라면 일반 캐빈이 더 편하실 수 있어요. 탑승 전 현장에서 선택하실 수 있습니다.',
 };
 
+// ── V0.1 place hero asset map ─────────────────────────────────────────────────
+// Only places with confirmed assets in repo are listed.
+// odongdo: ASSET_GAP — not found in repo (gradient fallback used)
+// hyangiram: ASSET_GAP — not found in repo (gradient fallback used)
+const PLACE_HERO_MAP = {
+  cablecar: '/dreamtown/images/soul/cable-car/hero.png',
+};
+
 // ── FOR ME texts — internal ──────────────────────────────────────────────────
 // Role: "내 상황에서 무엇이 중요해졌나" (one critical practical fact per context)
 
@@ -54,10 +66,10 @@ function parseContext(input, current) {
   const lower = input.toLowerCase();
   const next = { ...current };
   if (
-    lower.includes('차') ||
     lower.includes('자차') ||
     lower.includes('드라이브') ||
-    lower.includes('렌트')
+    lower.includes('렌트') ||
+    (lower.includes('차') && !lower.includes('주차') && !lower.includes('기차'))
   ) {
     next.hasVehicle = true;
   }
@@ -256,6 +268,16 @@ export default function SoulCableCarPage() {
   const [soulMessage, setSoulMessage] = useState(null);
   const [soulResponse, setSoulResponse] = useState(null);
 
+  // Place-switching state — driven by backend canonical resolved_code (PLACE_LOOKUP only)
+  const isPlaceKnowledge =
+    soulResponse?.presentation_mode === 'PLACE_KNOWLEDGE' &&
+    soulResponse?.status === 'PLACE_LOOKUP' &&
+    soulResponse?.resolved_code != null;
+  const placeCode = isPlaceKnowledge ? soulResponse.resolved_code : 'cablecar';
+  const placeData = isPlaceKnowledge ? (soulResponse.places?.[0] ?? null) : null;
+  const isCableCarView = placeCode === 'cablecar';
+  const heroSrc = PLACE_HERO_MAP[placeCode] ?? null;
+
   const hasContext =
     travelerContext.hasVehicle || travelerContext.nextPlace || travelerContext.companion;
   const hasParents = travelerContext.companion === 'parents';
@@ -343,7 +365,9 @@ export default function SoulCableCarPage() {
           >
             ← 뒤로
           </button>
-          <h1 className="text-sm font-semibold text-white truncate mx-2">여수해상케이블카</h1>
+          <h1 className="text-sm font-semibold text-white truncate mx-2">
+            {isCableCarView ? '여수해상케이블카' : (placeData?.name_ko || '여수해상케이블카')}
+          </h1>
           <div className="flex items-center gap-3 text-white opacity-40 text-sm">
             <span title="저장">🔖</span>
             <span title="공유">↗</span>
@@ -439,17 +463,16 @@ export default function SoulCableCarPage() {
         )}
 
         {/* ── PLACE HERO ── */}
-        {/* PREPARED: SOUL_YEOSU_CABLECAR_PLACE_HERO_V01.png — Founder visual asset */}
+        {/* Hero image: cable car only. odongdo/hyangiram = ASSET_GAP → gradient fallback. */}
         <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '200px' }}>
-          <img
-            src="/dreamtown/images/soul/cable-car/hero.png"
-            alt="여수해상케이블카"
-            className="absolute inset-0 w-full h-full object-cover"
-            onError={(e) => {
-              /* fallback to CSS gradient if image fails */
-              e.currentTarget.style.display = 'none';
-            }}
-          />
+          {heroSrc && (
+            <img
+              src={heroSrc}
+              alt={placeData?.name_ko || '여수해상케이블카'}
+              className="absolute inset-0 w-full h-full object-cover"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+          )}
           {/* Gradient overlay for text readability */}
           <div
             className="absolute inset-0"
@@ -458,7 +481,7 @@ export default function SoulCableCarPage() {
                 'linear-gradient(to top, rgba(10,22,40,0.90) 0%, rgba(10,22,40,0.45) 50%, rgba(10,22,40,0.15) 100%)',
             }}
           />
-          {/* CSS gradient background (shows when image fails) */}
+          {/* CSS gradient background — always present as base */}
           <div
             className="absolute inset-0 -z-10"
             style={{
@@ -469,55 +492,83 @@ export default function SoulCableCarPage() {
           <div className="relative z-10 p-5 flex flex-col justify-end" style={{ minHeight: '200px' }}>
             <div className="mt-auto">
               <p className="text-xs text-white opacity-50 mb-1 tracking-widest uppercase">
-                여수 · 해상 케이블카
+                {isCableCarView ? '여수 · 해상 케이블카' : ('여수 · ' + (placeData?.name_ko || ''))}
               </p>
               <h2 className="text-2xl font-bold text-white leading-tight">
-                여수해상케이블카
+                {isCableCarView ? '여수해상케이블카' : (placeData?.name_ko || '')}
               </h2>
-              {/* PREPARED: PU-CC-001 */}
-              <p className="text-sm text-white opacity-60 mt-1">
-                도시와 섬 사이 · 바다 위 10분
-              </p>
+              {isCableCarView && (
+                <p className="text-sm text-white opacity-60 mt-1">
+                  도시와 섬 사이 · 바다 위 10분
+                </p>
+              )}
             </div>
           </div>
         </div>
 
-        {/* ── ESSENTIAL INFO (always visible) ── */}
-        {/* PREPARED: PU-CC-001~005 — internal tags removed from traveler UI */}
+        {/* ── ESSENTIAL INFO ── */}
+        {/* Cable car: prepared facts. Other places: DB-driven from SOUL response. */}
         <Card>
           <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">알아야 할 것</p>
-          {/* PU-CC-001: 두 정류장 */}
-          <FactRow label="탑승 구조" value="자산(시내) ↔ 돌산(섬) 왕복" />
-          {/* PU-CC-005: 소요시간 — freshness as traveler language */}
-          <FactRow label="소요시간" value="편도 약 10분" note="현장 확인 권장" />
-          {/* PU-CC-004: 요금 */}
-          <FactRow label="요금" value="일반 · 크리스탈 캐빈 구분" note="현장·공식 확인" />
-          {/* PU-CC-005: 운영 */}
-          <FactRow label="운영 시간" value="09:30~21:30 · 강풍 시 중단" note="당일 변경 가능" />
-          {/* PU-CC-003: 주차 */}
-          <FactRow label="주차" value="자산정류장 측 주차장" />
+          {isCableCarView ? (
+            <>
+              <FactRow label="탑승 구조" value="자산(시내) ↔ 돌산(섬) 왕복" />
+              <FactRow label="소요시간" value="편도 약 10분" note="현장 확인 권장" />
+              <FactRow label="요금" value="일반 · 크리스탈 캐빈 구분" note="현장·공식 확인" />
+              <FactRow label="운영 시간" value="09:30~21:30 · 강풍 시 중단" note="당일 변경 가능" />
+              <FactRow label="주차" value="자산정류장 측 주차장" />
+            </>
+          ) : placeData ? (
+            <>
+              {placeData.avg_stay_minutes && (
+                <FactRow label="평균 체류" value={`약 ${placeData.avg_stay_minutes}분`} />
+              )}
+              {placeData.opening_hours_json?.summary && (
+                <FactRow label="운영 시간" value={placeData.opening_hours_json.summary} note="현장 확인 권장" />
+              )}
+              {placeData.admission_fee_json?.summary && (
+                <FactRow label="입장료" value={placeData.admission_fee_json.summary} note="현장 확인" />
+              )}
+              {!placeData.admission_fee_json?.summary && placeData.admission_fee_json?.adult && (
+                <FactRow label="입장료" value={String(placeData.admission_fee_json.adult)} note="현장 확인" />
+              )}
+              {placeData.parking_info && (
+                <FactRow label="주차" value={placeData.parking_info} />
+              )}
+              {!placeData.avg_stay_minutes && !placeData.opening_hours_json && !placeData.admission_fee_json && !placeData.parking_info && (
+                <p className="text-sm text-white opacity-50">현장에서 확인하세요.</p>
+              )}
+            </>
+          ) : (
+            <p className="text-sm text-white opacity-50">현장에서 확인하세요.</p>
+          )}
         </Card>
 
-        {/* ── FOR ME — context-aware, short, does NOT append per state ── */}
-        {/* COMPOSE: content changes by stateIndex, section height stays stable */}
-        <ForMeSection
-          ctx={travelerContext}
-          stateIndex={stateIndex}
-          prevJourneyNote={prevJourneyNote}
-        />
+        {/* ── FOR ME — cable-car context only ── */}
+        {(isCableCarView || !isPlaceKnowledge) && (
+          <ForMeSection
+            ctx={travelerContext}
+            stateIndex={stateIndex}
+            prevJourneyNote={prevJourneyNote}
+          />
+        )}
 
-        {/* ── SOUL JUDGMENT — judgment first, role-separated from Journey ── */}
-        {/* Role: "그래서 지금 어떻게 판단하는가" */}
-        {/* COMPOSE: recomposes with context */}
+        {/* ── SOUL JUDGMENT ── */}
+        {/* PLACE_LOOKUP: shows canonical place_identity_ko from backend. */}
+        {/* Other intents: shows cable-car prepared texts (primaryDiscovery). */}
         <Card>
           <p className="text-xs text-dream-purple font-semibold mb-3 uppercase tracking-wider">
             SOUL
           </p>
-          <p className="text-sm text-white leading-relaxed">{primaryDiscovery}</p>
+          <p className="text-sm text-white leading-relaxed">
+            {isPlaceKnowledge && soulResponse?.place_identity_ko
+              ? soulResponse.place_identity_ko
+              : primaryDiscovery}
+          </p>
         </Card>
 
-        {/* ── JOURNEY — visual only, does NOT repeat SOUL text ── */}
-        {/* Role: "그 판단을 이동/경험으로 어떻게 이해할까" */}
+        {/* ── JOURNEY — suppressed for non-cablecar PLACE_LOOKUP to prevent contradictory routing ── */}
+        {(isCableCarView || !isPlaceKnowledge) && (
         <Card>
           <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">
             여정
@@ -545,6 +596,7 @@ export default function SoulCableCarPage() {
             </div>
           )}
         </Card>
+        )}
 
         {/* ── COST — D2: quote from Path B, shown only when CALCULATED ── */}
         {soulResponse?.quote?.status === 'CALCULATED' && (
@@ -567,29 +619,29 @@ export default function SoulCableCarPage() {
           </Card>
         )}
 
-        {/* ── DEPTH (expandable) — "왜 그런가 / 더 알고 싶을 때" ── */}
-        {/* PREPARED: PU-CC-004 (crystal cabin), PU-REL-004/006 (timing/walk) */}
-        <ExpandableSection title="더 알고 싶을 때">
-          <div className="space-y-3 text-sm text-white opacity-80 leading-relaxed">
-            <p>
-              <span className="text-white opacity-50 text-xs block mb-0.5">크리스탈 캐빈</span>
-              6인승. 바닥과 측면 일부가 투명해 아래 바다를 내려다볼 수 있어요. 일반 캐빈보다 요금이 높습니다. 탑승 전 현장에서 선택하실 수 있어요.
-            </p>
-            {travelerContext.nextPlace === 'odongdo' && (
+        {/* ── DEPTH (expandable) — cable-car specific, hidden for other PLACE_LOOKUP ── */}
+        {(isCableCarView || !isPlaceKnowledge) && (
+          <ExpandableSection title="더 알고 싶을 때">
+            <div className="space-y-3 text-sm text-white opacity-80 leading-relaxed">
               <p>
-                <span className="text-white opacity-50 text-xs block mb-0.5">오동도 연계 동선</span>
-                자산 하차 후 오동도 방파제 입구까지 도보 약 5분. 케이블카 + 오동도 합산 약 3~4시간. 돌산 하차 후 오동도 이동은 도보 불가(차량/택시 필요).
+                <span className="text-white opacity-50 text-xs block mb-0.5">크리스탈 캐빈</span>
+                6인승. 바닥과 측면 일부가 투명해 아래 바다를 내려다볼 수 있어요. 일반 캐빈보다 요금이 높습니다. 탑승 전 현장에서 선택하실 수 있어요.
               </p>
-            )}
-            <p className="text-white opacity-40 text-xs">
-              ☎ 운행 문의: 061-664-7301
-            </p>
-          </div>
-        </ExpandableSection>
+              {travelerContext.nextPlace === 'odongdo' && (
+                <p>
+                  <span className="text-white opacity-50 text-xs block mb-0.5">오동도 연계 동선</span>
+                  자산 하차 후 오동도 방파제 입구까지 도보 약 5분. 케이블카 + 오동도 합산 약 3~4시간. 돌산 하차 후 오동도 이동은 도보 불가(차량/택시 필요).
+                </p>
+              )}
+              <p className="text-white opacity-40 text-xs">
+                ☎ 운행 문의: 061-664-7301
+              </p>
+            </div>
+          </ExpandableSection>
+        )}
 
-        {/* ── WISH SCENE — STATE 2+ only, image only, no caption ── */}
-        {/* Conditional: shows only when traveler has meaningful multi-context */}
-        {stateIndex >= 2 && (
+        {/* ── WISH SCENE — cable car STATE 2+ only, hidden for other PLACE_LOOKUP ── */}
+        {stateIndex >= 2 && (isCableCarView || !isPlaceKnowledge) && (
           <div className="rounded-2xl overflow-hidden" style={{ minHeight: '140px' }}>
             <img
               src="/dreamtown/images/soul/cable-car/wish-scene.png"
