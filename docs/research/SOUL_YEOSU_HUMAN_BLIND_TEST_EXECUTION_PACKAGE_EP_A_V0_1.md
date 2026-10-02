@@ -877,7 +877,7 @@ The following values are frozen for use in ALL stimulus generation and ALL parti
 | 케이블카 운영 시간 | SEMI_STABLE | 09:30~21:30 (토요일 연장); 수요일 점검 패턴 | PU-CC-005 | [to document] |
 | 케이블카 일반 캐빈 요금 | SEMI_STABLE | 왕복 ₩17,000 / 편도 ₩14,000 | PU-CC-004 | [to document] |
 | 케이블카 크리스탈 캐빈 요금 | SEMI_STABLE | 왕복 ₩24,000 / 편도 ₩19,000 | PU-CC-004 | [to document] |
-| 향일암 입장료 | SEMI_STABLE | 성인 ₩2,000 기준 (VERIFY at freeze time) | PU-HY-001 ref | [to document] |
+| 향일암 입장료 | ~~SEMI_STABLE~~ **STALE/SUPERSEDED** | ~~성인 ₩2,000 기준~~ → **무료 (adult=0)**. 문화재 관람료 폐지. verified 2026-09-20 (GOVERNMENT_PORTAL). Evidence: YEOSU_2026_VERIFICATION_BATCH_01.md [11]. | PU-HY-001 ref | SOUL_HYANGIRAM_ADMISSION_CONFLICT_CLOSURE_V0_1.md |
 | 향일암 → 여수엑스포역 자동차 시간 | SEMI_STABLE | 약 36분, 32.6km | PU-HY-006 | [to document] |
 | 케이블카 강풍 중단 정책 | STABLE | 강풍주의보/경보 시 중단 | PU-CC-005 | [to document] |
 

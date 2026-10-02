@@ -280,7 +280,7 @@ index 37 = (29,3) 전복섬개도 힐링코스 — 순서 이탈은 삽입 순�
 - 아쿠아플라넷여수
 - 해상케이블카 (현재 DB에 있으나 요금 null)
 - 전남해양수산과학관
-- 향일암 (입장료 있음)
+- ~~향일암 (입장료 있음)~~ → **[STALE/SUPERSEDED 2026-10-02]** 향일암 입장료는 무료로 확인됨. 기존 문화재 관람료(성인 2,500원) 폐지. Evidence: YEOSU_2026_VERIFICATION_BATCH_01.md [11], verified 2026-09-20 (GOVERNMENT_PORTAL + OFFICIAL_NEWS). Canonical: travel_places.admission_fee_json = {"adult":0}. See SOUL_HYANGIRAM_ADMISSION_CONFLICT_CLOSURE_V0_1.md.
 
 ### D. 섬 (도서) Entity — 접근성 데이터 필수
 - 거문도, 백도: 여수연안여객선터미널 출발, 운항 시간표 확인 필요
