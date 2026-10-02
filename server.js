@@ -2856,6 +2856,15 @@ if (travelGuideRoutes) {
   console.log('✅ Travel Guide 라우터 등록 완료 (/api/dt/travel)');
 }
 
+// ---------- LUMI Travel Input Routes (/api/dt/travel/input/text) ----------
+try {
+  const travelInputRoutes = require('./routes/travelInputRoutes');
+  app.use('/api/dt/travel', travelInputRoutes);
+  console.log('✅ LUMI Travel Input 라우터 등록 완료 (/api/dt/travel/input/text)');
+} catch (e) {
+  console.warn('⚠️ travelInputRoutes 로드 실패:', e.message);
+}
+
 // ---------- Star MVP (/api/star) ----------
 let starMvpRoutes = null;
 try {
