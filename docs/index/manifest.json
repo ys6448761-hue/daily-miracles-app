@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-02T23:36:56.792Z",
+  "generated_at": "2026-10-02T23:48:09.290Z",
   "generator": "generate-manifest.js",
-  "total_count": 406,
+  "total_count": 407,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -986,6 +986,22 @@
       "title": "SOUL Place Identity & Visual Routing V0.1 — READ-ONLY Audit",
       "created_at": "2026-10-02",
       "checksum": "8a176cc5"
+    },
+    {
+      "id": "DOC-SOUL_UI_001_EXPLICIT_CONTEXT_C",
+      "path": "docs/architecture/SOUL_UI_001_EXPLICIT_CONTEXT_CONTRACT_DESIGN_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "UI-001 — Structured Explicit Context Contract Design V0.1",
+      "created_at": "2026-10-02",
+      "checksum": "b13ed8c2"
     },
     {
       "id": "DOC-SOYEOWOOL_PHASE1_SCOPE_LOCK_20",
