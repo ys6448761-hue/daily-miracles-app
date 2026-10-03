@@ -83,6 +83,31 @@ point_ledger, harbor_wishes, settlement_events, ops_events
 3. 에러: middleware/errorHandler.js 글로벌
 4. 마이그레이션: database/migrations/ 순번 엄수
 
+## 🛡 Product Contract Preflight (Project Phoenix)
+
+Product / UI 구현 전 반드시 아래 중 하나를 반환한다.
+
+```
+TASK_ALIGNED              — 기존 Product Contract 범위 내 실행
+TASK_EXTENDS_CONTRACT     — 기존 계약을 보존하며 추가
+TASK_CONFLICTS_WITH_CONTRACT — 계약과 충돌 → STOP, Founder 결정 필요
+CONTRACT_MISSING          — 계약 미존재 → STOP, Product Vision 먼저
+```
+
+**IMPLEMENTATION_GO** = 기존 Product Contract 범위 내 실행 (Founder 별도 승인 불필요)  
+**PRODUCT_CHANGE_GO** = Product Contract 변경 → Founder 명시 승인 필수
+
+Product Contract Authority (읽기 순서):
+```
+memory/MEMORY.md → docs/product/SOUL_PRODUCT_VISION_V0_1.md → 관련 Decision
+```
+
+추가 규칙:
+- grep 0건 ≠ Vision 부재 (Vision이 없으면 코드에도 없을 수 있음)
+- 코드 상태 ≠ 제품 의도 (staging 구현이 Vision을 정의하지 않음)
+- NOT_IMPLEMENTED ≠ DEPRECATED (미구현 ≠ 폐기)
+- 소원이와의 경험 표면 축소/교체/재정의 시 Founder 승인 필수
+
 ## 📚 참조 문서 경로
 | 문서 | 경로 | 용도 |
 |------|------|------|

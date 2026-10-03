@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-03T04:30:36.493Z",
+  "generated_at": "2026-10-03T04:42:39.462Z",
   "generator": "generate-manifest.js",
-  "total_count": 419,
+  "total_count": 421,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1790,6 +1790,24 @@
       "checksum": "5e969ee6"
     },
     {
+      "id": "DOC-DECISION_PHOENIX_D2_LIVING_DET",
+      "path": "docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md",
+      "type": "decision",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "decisions",
+      "tags": [
+        "decisions",
+        "소원",
+        "storybook"
+      ],
+      "owner": "ceo",
+      "status": "active",
+      "title": "Decision Record: D2 — Living Detail Page",
+      "created_at": "2026-10-03",
+      "checksum": "5d6ac1e0"
+    },
+    {
       "id": "DOC-index",
       "path": "docs/decisions/index.md",
       "type": "decision",
@@ -3074,6 +3092,24 @@
       "title": "가격표 퀵 레퍼런스 (영업용)",
       "created_at": "2026-10-03",
       "checksum": "7ca0aa2e"
+    },
+    {
+      "id": "DOC-SOUL_PRODUCT_VISION_V0_1",
+      "path": "docs/product/SOUL_PRODUCT_VISION_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "product",
+      "tags": [
+        "product",
+        "소원",
+        "storybook"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Product Vision V0.1",
+      "created_at": "2026-10-03",
+      "checksum": "08d0a58e"
     },
     {
       "id": "DOC-README",

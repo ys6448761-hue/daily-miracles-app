@@ -1,8 +1,58 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-04-04
-담당: Claude Code (Antigravity)
+Last Updated: 2026-10-03
+담당: Claude Code (Lumi / Code Master)
+
+---
+
+## ★ PROJECT PHOENIX — ACTIVE (2026-09-18 ~ 현재)
+
+> **아래 섹션이 현재 활성 작업입니다.** 2026-04-04 이후 내용은 Project Phoenix 시대입니다.
+
+### 필수 읽기 순서 (신규 세션)
+
+```
+1. memory/MEMORY.md                                    ← 최신 Project State + Current Next Action
+2. docs/product/SOUL_PRODUCT_VISION_V0_1.md            ← Active Product Vision (SOUL 상세 경험)
+3. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
+4. docs/architecture/SOUL_PRODUCT_CONTINUITY_INCIDENT_AUDIT_V0_1.md  ← Continuity 기록
+5. docs/architecture/SOUL_VISION_CONTINUITY_REPOSITORY_STATE_INVENTORY_V0_1.md  ← 현재 구현 상태
+```
+
+### ★ Current Next Action (exactly 1)
+
+**SoulCableCarPage.jsx Production Port — Product Contract Alignment Required**
+
+- SoulCableCarPage.jsx: `origin/staging/storybook-c7a` ONLY — NOT on main
+- All backend prerequisites LIVE: Judgment V0.1 (@d3e7f0e), UI-001 (@294c55c), Soyeowool Phase 1 (@1f5afab)
+- Port classification: **PORT_REQUIRES_MINIMAL_ALIGNMENT** (D2 confirmed, vision canonicalized — see below)
+- Port-ready elements: QUESTION_COMPOSER, SOUL_MESSAGE, PLACE_HERO, SOUL_JUDGMENT, ESSENTIAL_INFO (PlaceBasicInfo 연결 포함), COST
+- Alignment required: chip→API wiring (Gap B), JOURNEY scope within D2, social proof slot decision
+
+### Production-Live (Project Phoenix)
+
+| Surface | Commit | Status |
+|---|---|---|
+| PlaceBasicInfo V0.2 (6 fields) | 17aebc8 | PRODUCTION_LIVE |
+| Judgment V0.1 backend | d3e7f0e | PRODUCTION_LIVE |
+| UI-001 explicit_context contract | 294c55c | PRODUCTION_LIVE |
+| Soyeowool Phase 1 | 1f5afab | PRODUCTION_LIVE |
+
+### Staging-Only (SoulCableCarPage, 9 elements)
+
+QUESTION_COMPOSER / SOUL_MESSAGE / PLACE_HERO / ESSENTIAL_INFO / FOR_ME / SOUL_JUDGMENT / JOURNEY / COST / DEPTH
+
+### Key Phoenix Architecture Documents
+
+| Document | Path | Purpose |
+|---|---|---|
+| SOUL Product Vision | `docs/product/SOUL_PRODUCT_VISION_V0_1.md` | Canonical product direction |
+| D2 Decision | `docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md` | Living Detail Page decision |
+| Traveler Baseline | `docs/architecture/PHOENIX_HANDOVER_2026_09_21_TRAVELER_BASELINE_SHARED_JOURNEY.md` | Level 4 핵심 |
+| Aurora3/Route | `docs/architecture/PHOENIX_HANDOVER_2026_09_21.md` | Aurora3 + Route knowledge |
+
+---
 
 ---
 
