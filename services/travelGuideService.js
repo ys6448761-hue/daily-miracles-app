@@ -193,6 +193,7 @@ class TravelGuideService {
       physical_difficulty: p.physical_difficulty || null,
       admission_fee_json: p.admission_fee_json || null,
       operating_hours: p.opening_hours_json ? JSON.stringify(p.opening_hours_json) : null,
+      parking_info: p.parking_info || null,
       accessibility: {
         // NEW: Status fields (Phase 1)
         wheelchair_status: p.accessibility_wheelchair_status || 'unknown',

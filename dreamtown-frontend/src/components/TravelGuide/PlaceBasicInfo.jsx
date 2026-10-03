@@ -47,8 +47,9 @@ function PlaceBasicInfo({ place }) {
   const stayTime = formatStayTime(place.avg_stay_minutes);
   const difficulty = formatDifficulty(place.physical_difficulty);
   const indoorOutdoor = formatIndoorOutdoor(place.indoor_outdoor);
+  const parking = place.parking_info || null;
 
-  const hasAnyField = admission || hours || stayTime || difficulty || indoorOutdoor;
+  const hasAnyField = admission || hours || stayTime || difficulty || indoorOutdoor || parking;
   if (!hasAnyField) return null;
 
   return (
@@ -81,6 +82,12 @@ function PlaceBasicInfo({ place }) {
         <div className="info-row">
           <span>환경</span>
           <span>{indoorOutdoor}</span>
+        </div>
+      )}
+      {parking && (
+        <div className="info-row">
+          <span>주차</span>
+          <span>{parking}</span>
         </div>
       )}
     </div>
