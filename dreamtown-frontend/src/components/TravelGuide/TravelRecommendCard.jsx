@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import PlaceBasicInfo from './PlaceBasicInfo';
 
 function TravelRecommendCard({ place, onViewMap, onGetDirections }) {
   const getStatusLabel = () => {
@@ -54,6 +55,8 @@ function TravelRecommendCard({ place, onViewMap, onGetDirections }) {
           <span>{getTotalTimeLabel()}</span>
         </div>
       </div>
+
+      <PlaceBasicInfo place={place} />
 
       <div className="card-actions">
         <button onClick={onViewMap} className="btn-secondary">
