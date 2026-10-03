@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-03T01:39:44.122Z",
+  "generated_at": "2026-10-03T01:52:22.360Z",
   "generator": "generate-manifest.js",
-  "total_count": 415,
+  "total_count": 416,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -880,7 +880,23 @@
       "status": "active",
       "title": "Basic Information V0.2 — Parking Connection Implementation Evidence",
       "created_at": "2026-10-03",
-      "checksum": "14c31f29"
+      "checksum": "e90c6992"
+    },
+    {
+      "id": "DOC-SOUL_BASIC_INFO_V02_PARKING_PR",
+      "path": "docs/architecture/SOUL_BASIC_INFO_V02_PARKING_PRODUCTION_PROMOTION_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "Basic Information V0.2 Parking — Production Promotion Evidence",
+      "created_at": "2026-10-03",
+      "checksum": "c26c8bc5"
     },
     {
       "id": "DOC-SOUL_DELEGATION_CLARIFICATION_",
