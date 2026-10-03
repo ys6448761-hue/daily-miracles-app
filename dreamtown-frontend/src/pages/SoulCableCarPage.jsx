@@ -41,8 +41,10 @@ const SOUL_DISCOVERY = {
 };
 
 // ── V0.1 place hero asset map ─────────────────────────────────────────────────
+// Restoration V0.1: using verified existing OG photo (public/images/og/cablecar.jpg)
+// Works at: port 3002 (base:'/') and production Express (public/ served at root)
 const PLACE_HERO_MAP = {
-  cablecar: '/dreamtown/images/soul/cable-car/hero.png',
+  cablecar: '/images/og/cablecar.jpg',
 };
 
 // ── FOR ME texts ─────────────────────────────────────────────────────────────
@@ -521,6 +523,7 @@ export default function SoulCableCarPage() {
             <>
               <FactRow label="탑승 구조" value="자산(시내) ↔ 돌산(섬) 왕복" />
               <FactRow label="소요시간" value="편도 약 10분" note="현장 확인 권장" />
+              <FactRow label="캐빈" value="일반 / 크리스탈" note="탑승 전 현장 선택 · 예약 불필요" />
               <FactRow label="요금" value="일반 · 크리스탈 캐빈 구분" note="현장·공식 확인" />
               <FactRow label="운영 시간" value="09:30~21:30 · 강풍 시 중단" note="당일 변경 가능" />
               <FactRow label="주차" value="자산정류장 측 주차장" />
