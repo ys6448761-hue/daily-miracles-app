@@ -87,6 +87,7 @@ import AdminQRCenter from './pages/admin/AdminQRCenter.jsx';
 import AdminCablecarPage from './pages/AdminCablecarPage.jsx';
 import LocationAdmin from './pages/admin/LocationAdmin.jsx';
 import TravelGuidePage from './pages/TravelGuidePage.jsx';
+import SoulCableCarPage from './pages/SoulCableCarPage.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
 if (window.location.pathname.startsWith('//')) {
@@ -120,6 +121,8 @@ export default function App() {
           <Route path="/wish/input"  element={<WishInputScreen />} />
           <Route path="/star-birth"  element={<StarBirth />} />
           <Route path="/travel-guide" element={<TravelGuidePage />} />
+          {/* SOUL Living Detail Page — place-switching conversational experience */}
+          <Route path="/soul/cable-car" element={<SoulCableCarPage />} />
           <Route path="/my-star"     element={<MyStarReturn />} />
           <Route path="/my-star/:id" element={<MyStar />} />
           <Route path="/my-star/:id/book"     element={<DigitalBook />} />
