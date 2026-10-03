@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-03T02:06:33.057Z",
+  "generated_at": "2026-10-03T02:37:30.967Z",
   "generator": "generate-manifest.js",
-  "total_count": 417,
+  "total_count": 418,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1116,6 +1116,25 @@
       "title": "SOUL Place Identity & Visual Routing V0.1 — READ-ONLY Audit",
       "created_at": "2026-10-03",
       "checksum": "8a176cc5"
+    },
+    {
+      "id": "DOC-SOUL_PRODUCT_CONTINUITY_INCIDE",
+      "path": "docs/architecture/SOUL_PRODUCT_CONTINUITY_INCIDENT_AUDIT_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture",
+        "소원",
+        "storybook",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Product Continuity Incident Audit V0.1",
+      "created_at": "2026-10-03",
+      "checksum": "435cf4a6"
     },
     {
       "id": "DOC-SOUL_UI_001_EXPLICIT_CONTEXT_C",
