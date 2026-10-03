@@ -163,6 +163,34 @@ class SessionService {
   }
 
   /**
+   * Update journey_ctx within the session context (fire-and-forget safe).
+   * Reads existing context, sets journey_ctx key, writes back.
+   * @param {string} sessionId
+   * @param {object} journeyCtxData - full journey_ctx object to store
+   * @returns {Promise<boolean>}
+   */
+  async updateJourneyContext(sessionId, journeyCtxData) {
+    try {
+      const readResult = await db.query(
+        'SELECT context FROM travel_guide_sessions WHERE session_id = $1',
+        [sessionId]
+      );
+      if (readResult.rows.length === 0) return false;
+      const currentCtx = JSON.parse(readResult.rows[0].context || '{}');
+      const updatedCtx = { ...currentCtx, journey_ctx: journeyCtxData };
+      const now = new Date();
+      const writeResult = await db.query(
+        'UPDATE travel_guide_sessions SET context = $1, last_activity_at = $2 WHERE session_id = $3 RETURNING session_id',
+        [JSON.stringify(updatedCtx), now, sessionId]
+      );
+      return writeResult.rows.length > 0;
+    } catch (error) {
+      console.error('[SESSION_JOURNEY_CTX_ERROR]', error.message);
+      return false;
+    }
+  }
+
+  /**
    * Get session info for debugging/admin
    * @param {string} sessionId
    * @returns {Promise<object | null>}

@@ -483,6 +483,42 @@ function _applyPersistedTravelerProfile(soulContext, storedProfile) {
   return merged;
 }
 
+// ─── UI-001: Explicit context chip supplement ─────────────────────────────────
+// Supplements GPT-extracted soulContext with chip values ONLY for UNKNOWN fields.
+// USER_EXPLICIT text provenance always wins over chip. Chip wins over session persisted.
+// Mirrors _applyPersistedTravelerProfile pattern.
+function _applyExplicitContextChip(soulContext, explicit_context) {
+  if (!explicit_context || Object.keys(explicit_context).length === 0) return soulContext;
+  const prov = soulContext._provenance || {};
+  const merged = { ...soulContext };
+  const mergedProv = { ...prov };
+  const mergedConstraints = { ...(soulContext.companion_constraints || {}) };
+  let constraintsChanged = false;
+
+  if (prov.people_type !== 'USER_EXPLICIT' && explicit_context.people_type) {
+    merged.people_type = explicit_context.people_type;
+    mergedProv.people_type = 'USER_EXPLICIT';
+    if (explicit_context.people_type === 'family_elderly') {
+      mergedConstraints.has_elderly = true;
+      mergedProv.has_elderly = 'USER_EXPLICIT';
+      constraintsChanged = true;
+    } else if (explicit_context.people_type === 'family_with_kids') {
+      mergedConstraints.has_kids = true;
+      mergedProv.has_kids = 'USER_EXPLICIT';
+      constraintsChanged = true;
+    }
+  }
+
+  if (prov.has_car !== 'USER_EXPLICIT' && explicit_context.has_car != null) {
+    merged.has_car = explicit_context.has_car;
+    mergedProv.has_car = 'USER_EXPLICIT';
+  }
+
+  merged._provenance = mergedProv;
+  if (constraintsChanged) merged.companion_constraints = mergedConstraints;
+  return merged;
+}
+
 // ─── Private: Shared Journey (V0.2) ──────────────────────────────────────────
 
 async function _extractSharedJourney(message) {
@@ -1144,10 +1180,24 @@ function _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionI
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
-async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
+async function handleTravelRequest({ message, sessionId, hotelId, principal, explicit_context = {} }) {
   // PLACE_LOOKUP DETECTION (deterministic, pre-GPT)
   // Exact/alias match → skip ranking. Unknown → PLACE_UNKNOWN (no substitution).
-  const placeLookup = _detectPlaceLookupIntent(message);
+  // UI-001: chip place_code supplements when text has no alias but message has a lookup/suitability verb.
+  // Text alias always wins over chip (Principle 1 of contract).
+  let placeLookup = _detectPlaceLookupIntent(message);
+  if (!placeLookup.isPlaceLookup && explicit_context.place_code && !DISCOVERY_OVERRIDES.test(message)) {
+    const hasVerb = MEDIUM_LOOKUP.test(message) || STRONG_LOOKUP.test(message);
+    if (hasVerb) {
+      placeLookup = {
+        isPlaceLookup: true,
+        resolvedCode: explicit_context.place_code,
+        isSuitabilityQuery: SUITABILITY_LOOKUP.test(message),
+        source: 'EXPLICIT_CONTEXT',
+      };
+    }
+  }
+
   if (placeLookup.isPlaceLookup) {
     if (placeLookup.resolvedCode) {
       const place = await travelGuideService.getPlaceByCode(placeLookup.resolvedCode);
@@ -1155,10 +1205,15 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
         // Judgment V0.1 — only for suitability queries (어때?/괜찮아? etc.), not informational (알려줘)
         let judgedContext = null;
         if (placeLookup.isSuitabilityQuery) {
-          // Lightweight traveler context: current message (deterministic) > persisted session > null
+          // Traveler context precedence: current message text > chip > persisted session > null
           const msgPeople = _extractPeopleLightweight(message);
           let people_type = msgPeople.people_type;
           let companion_has_elderly = msgPeople.companion_has_elderly;
+          // UI-001: chip supplement (text > chip > session)
+          if (!people_type && explicit_context.people_type) {
+            people_type = explicit_context.people_type;
+            companion_has_elderly = (explicit_context.people_type === 'family_elderly');
+          }
           if (!people_type) {
             try {
               const sd = await sessionService.getSession(sessionId);
@@ -1437,7 +1492,10 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal }) {
   if (!understandResult.ok) {
     return { ok: false, httpStatus: 400, error: understandResult.error };
   }
-  const { soulContext } = understandResult;
+  // UI-001: apply chip supplement after GPT extraction.
+  // Text (USER_EXPLICIT) always wins; chip fills only UNKNOWN/non-explicit fields.
+  let { soulContext } = understandResult;
+  soulContext = _applyExplicitContextChip(soulContext, explicit_context);
 
   // GROUP QUOTE ROUTING — 5+ people with cost/quote intent → human consultation
   if (_isGroupQuoteRequest(soulContext)) {
