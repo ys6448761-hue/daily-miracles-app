@@ -40,15 +40,42 @@
 -
 ```
 
-## 변경 내용 요약
-<!-- 이 PR이 무엇을 변경하는지 간단히 설명 -->
+## 1. Project Mode
+- [ ] Quick Build
+- [ ] Scale Build
 
+## 2. Changed files
+<!-- 변경된 파일 목록 -->
+-
 
-## 테스트 방법
-<!-- 어떻게 테스트했는지, 또는 테스트 계획 -->
+## 3. Tests run
+<!-- 실행한 테스트 목록 -->
 - [ ] 로컬 테스트 완료
 - [ ] 자동화 테스트 통과
 - [ ] 수동 테스트 완료
+
+## 4. Plan Required changes?
+<!-- shared/scripts/workflows/migrations 수정 시 사전 승인 필수 -->
+- [ ] shared
+- [ ] scripts
+- [ ] workflows
+- [ ] migrations
+
+Plan link:
+
+## 5. Refactoring Risk Check
+<!-- 해당 항목 체크 + 대응 전략 기술. 대응 전략 없으면 머지 금지 -->
+- [ ] R1 Shared — 단독 PR + QA 회귀 필수
+- [ ] R2 AccessPolicy — 권한 판단 단일화, FE 분기 금지
+- [ ] R3 Rewards Ledger — 원장 기반 + 멱등키
+- [ ] R4 Payment FSM — 상태 고정, 혜택은 이벤트 기반
+
+## 6. Risk + Mitigation
+<!-- 리스크와 대응 방안 -->
+-
+
+## 7. E2E Status (Scale Build only)
+- [ ] Passed
 
 ## 체크리스트
 - [ ] 코드 스타일 가이드 준수
@@ -62,8 +89,10 @@
 
 ---
 <!--
-⚠️ AIL Gate 필수 조건:
+⚠️ 머지 필수 조건:
 - [AIL] 섹션이 있어야 합니다
 - Source ID가 명시되어야 합니다
-- 위 조건 미충족 시 머지 불가
+- Plan Required 변경은 승인 없으면 머지 금지
+- Refactoring Risk 대응 전략 없으면 머지 금지
+- Scale Build는 E2E 최소 1개 통과 필수
 -->
