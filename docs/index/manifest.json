@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-03T00:56:47.936Z",
+  "generated_at": "2026-10-03T01:07:19.871Z",
   "generator": "generate-manifest.js",
-  "total_count": 411,
+  "total_count": 412,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -817,6 +817,22 @@
       "title": "Basic Information — Production Data Conflict Resolution V0.1",
       "created_at": "2026-10-03",
       "checksum": "89536048"
+    },
+    {
+      "id": "DOC-SOUL_BASIC_INFO_UI_CONNECTION_",
+      "path": "docs/architecture/SOUL_BASIC_INFO_UI_CONNECTION_IMPL_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "Basic Information UI Connection V0.1 — Implementation Evidence",
+      "created_at": "2026-10-03",
+      "checksum": "3c2bc786"
     },
     {
       "id": "DOC-SOUL_DELEGATION_CLARIFICATION_",
