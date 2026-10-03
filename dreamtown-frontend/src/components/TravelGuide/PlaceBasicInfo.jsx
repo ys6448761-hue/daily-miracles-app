@@ -54,33 +54,33 @@ function PlaceBasicInfo({ place }) {
   return (
     <div className="place-basic-info">
       {admission && (
-        <div className="basic-info-row">
-          <span className="basic-info-label">입장료</span>
-          <span className="basic-info-value">{admission}</span>
+        <div className="info-row">
+          <span>입장료</span>
+          <span>{admission}</span>
         </div>
       )}
       {hours && (
-        <div className="basic-info-row">
-          <span className="basic-info-label">운영시간</span>
-          <span className="basic-info-value">{hours}</span>
+        <div className="info-row">
+          <span>운영시간</span>
+          <span>{hours}</span>
         </div>
       )}
       {stayTime && (
-        <div className="basic-info-row">
-          <span className="basic-info-label">평균 체류</span>
-          <span className="basic-info-value">{stayTime}</span>
+        <div className="info-row">
+          <span>평균 체류</span>
+          <span>{stayTime}</span>
         </div>
       )}
       {difficulty && (
-        <div className="basic-info-row">
-          <span className="basic-info-label">걷기 난이도</span>
-          <span className="basic-info-value">{difficulty}</span>
+        <div className="info-row">
+          <span>걷기 난이도</span>
+          <span>{difficulty}</span>
         </div>
       )}
       {indoorOutdoor && (
-        <div className="basic-info-row">
-          <span className="basic-info-label">환경</span>
-          <span className="basic-info-value">{indoorOutdoor}</span>
+        <div className="info-row">
+          <span>환경</span>
+          <span>{indoorOutdoor}</span>
         </div>
       )}
     </div>
