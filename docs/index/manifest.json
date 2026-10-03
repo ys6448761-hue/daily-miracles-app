@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-03T01:31:32.967Z",
+  "generated_at": "2026-10-03T01:39:44.122Z",
   "generator": "generate-manifest.js",
-  "total_count": 414,
+  "total_count": 415,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -865,6 +865,22 @@
       "title": "Basic Information V0.2 Gap Prioritization — Parking / Address / Product Surface",
       "created_at": "2026-10-03",
       "checksum": "3d168bb3"
+    },
+    {
+      "id": "DOC-SOUL_BASIC_INFO_V02_PARKING_IM",
+      "path": "docs/architecture/SOUL_BASIC_INFO_V02_PARKING_IMPL_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "Basic Information V0.2 — Parking Connection Implementation Evidence",
+      "created_at": "2026-10-03",
+      "checksum": "14c31f29"
     },
     {
       "id": "DOC-SOUL_DELEGATION_CLARIFICATION_",
