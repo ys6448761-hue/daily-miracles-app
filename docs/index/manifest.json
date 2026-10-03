@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-03T08:33:44.266Z",
+  "generated_at": "2026-10-03T20:49:40.451Z",
   "generator": "generate-manifest.js",
-  "total_count": 425,
+  "total_count": 426,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3162,6 +3162,23 @@
       "title": "가격표 퀵 레퍼런스 (영업용)",
       "created_at": "2026-10-03",
       "checksum": "7ca0aa2e"
+    },
+    {
+      "id": "DOC-SOUL_PRACTITIONER_REVIEW_PACKA",
+      "path": "docs/product/SOUL_PRACTITIONER_REVIEW_PACKAGE_V0_2.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "product",
+      "tags": [
+        "product",
+        "소원"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Practitioner Review Package V0.2",
+      "created_at": "2026-10-03",
+      "checksum": "70d9251c"
     },
     {
       "id": "DOC-SOUL_PRODUCT_VISION_V0_1",
