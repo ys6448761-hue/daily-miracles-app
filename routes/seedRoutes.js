@@ -29,13 +29,9 @@ const ALLOWED_EVENTS    = new Set(['view', 'click', 'wish_started']);
 // location → OG-suitable base image (Kakao 5MB 권장 이내, 1200x1200 JPEG)
 // 미제공 또는 default OG 입력 시 location별 자동 매핑. 파일 부재 시 DEFAULT_OG fallback.
 const DEFAULT_OG = '/images/dreamtown-og-v4.jpg';
-const LOCATION_BASE_IMAGE = {
-  cablecar:                '/images/og/cablecar.jpg',
-  yeosu_cablecar:          '/images/og/cablecar.jpg',
-  yeosu_cablecar_workshop: '/images/og/cablecar.jpg',
-  hamel:                   '/images/og/hamel.jpg',
-  yeosu_hamel:             '/images/og/hamel.jpg',
-};
+// Legacy Yeosu Origin OG images deleted (Founder decision 2026-10-04).
+// All LOCATION_BASE_IMAGE entries removed — resolveBaseImage falls through to DEFAULT_OG.
+const LOCATION_BASE_IMAGE = {};
 
 function resolveBaseImage(inputUrl, location) {
   // 1) 명시 입력이 default OG 아니면 그대로 사용

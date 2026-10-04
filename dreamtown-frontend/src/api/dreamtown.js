@@ -676,3 +676,8 @@ export async function createSeed({ location, image_url, title = null, parent_sta
   }
   return res.json();
 }
+
+// ── Guest Identity — SOUL Living Detail Page ──────────────────────
+// guestCredentialUtil.js: on-demand JWT bootstrap + localStorage reuse
+// Used by SoulCableCarPage and any protected-domain action.
+export { getOrEnsureGuestCredential, clearGuestCredential, isGuestTokenValid } from './guestCredentialUtil.js';
