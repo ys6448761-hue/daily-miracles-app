@@ -31,9 +31,9 @@ import CourseDisplay from '../components/TravelGuide/CourseDisplay.jsx';
 // ── Canonical judgment texts ─────────────────────────────────────────────────
 const SOUL_DISCOVERY = {
   default:
-    '자산과 돌산, 어느 쪽에서도 이용할 수 있어요. 어디서 출발하고 케이블카 다음에 어디로 가실지 알려주시면, 여행 동선에 맞는 쪽을 같이 볼게요.',
+    '케이블카는 어디서 타느냐보다, 어디로 내려서 다음 여행을 이어갈지가 더 중요해요. 자산과 돌산 어느 쪽에서도 탈 수 있기 때문에, 차가 있는지·오동도를 갈지·그다음 어디로 갈지에 따라 더 편한 방향이 달라져요.',
   vehicle:
-    '자산정류장 주차장에 차를 두고 타시면 편해요. 왕복 운행이라 원하는 방향으로 타고 내리실 수 있어요.',
+    '차로 가신다면 어느 정류장에서 출발할지와 편도·왕복 여부를 함께 보는 게 중요해요. 편도 이용 시 차가 출발 정류장에 남기 때문에, 케이블카 다음 일정까지 보고 출발 쪽을 정하는 게 좋아요.',
   odongdo:
     '오동도까지 이어가신다면 자산 쪽을 동선 후보로 먼저 볼 만해요. 다만 차를 어디에 둘지와 케이블카를 왕복할지에 따라 더 편한 동선은 달라질 수 있어요.',
   parents:
@@ -47,9 +47,9 @@ const PLACE_HERO_MAP = {};
 
 // ── FOR ME texts ─────────────────────────────────────────────────────────────
 const FOR_ME = {
-  vehicle: '자산정류장 주차장(1,000+대)을 이용하세요. 성수기 주말엔 오전 일찍 도착하면 여유 있습니다.',
-  odongdo: '자산 하차 후 오동도 입구까지 도보 약 5분. 케이블카 + 오동도 합산 반나절(3~4시간) 코스입니다.',
-  parents: '일반/크리스탈 캐빈은 당일 매표소에서 선택하시면 돼요. 미리 예약하실 필요 없습니다.',
+  vehicle: '자산·돌산 양쪽에서 접근할 수 있어요. 차를 어디에 둘지와 편도·왕복 여부에 따라 더 편한 동선이 달라집니다.',
+  odongdo: '자산정류장은 오동도 입구와 가까워 함께 이어보기 좋은 동선입니다.',
+  parents: '일반/크리스탈 캐빈은 당일 매표소에서 선택하시면 돼요. 탑승권 구매 방식은 방문 전 공식 안내를 확인하세요.',
 };
 
 // ── Context parser — keyword-based, zero LLM ────────────────────────────────
@@ -196,7 +196,7 @@ function JourneyFlow({ ctx }) {
           <span className="text-base flex-shrink-0">🚡</span>
           <div className="flex-1 h-px bg-dream-purple opacity-40" />
         </div>
-        <div className="text-xs text-white opacity-30 mt-1">편도 약 10분</div>
+        <div className="text-xs text-white opacity-30 mt-1">편도 약 13분</div>
       </div>
 
       <div className="flex-shrink-0 text-center min-w-0">
@@ -295,7 +295,7 @@ export default function SoulCableCarPage() {
   const prevJourneyNote =
     stateIndex === 3
       ? travelerContext.nextPlace === 'odongdo'
-        ? '오동도 연계 · 자산 출발 · 3~4시간 코스'
+        ? '오동도 연계 · 자산 쪽 동선 함께 보기'
         : travelerContext.hasVehicle
         ? '자차 · 자산정류장 주차 후 탑승'
         : null
@@ -505,7 +505,7 @@ export default function SoulCableCarPage() {
               </h2>
               {isCableCarView && (
                 <p className="text-sm text-white opacity-60 mt-1">
-                  도시와 섬 사이 · 바다 위 10분
+                  도시와 섬 사이 · 바다 위를 건너는 여수
                 </p>
               )}
             </div>
@@ -519,12 +519,12 @@ export default function SoulCableCarPage() {
           <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">알아야 할 것</p>
           {isCableCarView ? (
             <>
-              <FactRow label="탑승 구조" value="자산(시내) ↔ 돌산(섬) 왕복" />
-              <FactRow label="소요시간" value="편도 약 10분" note="현장 확인 권장" />
-              <FactRow label="캐빈" value="일반 / 크리스탈" note="탑승 전 현장 선택 · 예약 불필요" />
-              <FactRow label="요금" value="일반 · 크리스탈 캐빈 구분" note="현장·공식 확인" />
-              <FactRow label="운영 시간" value="09:30~21:30 · 강풍 시 중단" note="당일 변경 가능" />
-              <FactRow label="주차" value="자산정류장 측 주차장" />
+              <FactRow label="탑승 구조" value="자산(해야) ↔ 돌산(놀아)" note="양쪽 모두 발권·탑승 · 편도/왕복 가능" />
+              <FactRow label="탑승시간" value="편도 약 13분 전후" note="현장 확인 권장" />
+              <FactRow label="캐빈" value="일반(8인) / 크리스탈(6인)" note="현장 선택 · 탑승권 구매 방식은 방문 전 공식 안내 확인" />
+              <FactRow label="요금" value="일반 대인 왕복 17,000원~" note="크리스탈·소인 별도 · 자세한 요금 ▼" />
+              <FactRow label="운영시간" value="09:30~21:30" note="강풍·기상·정비 시 변경 · 당일 확인 권장" />
+              <FactRow label="주차" value="자산·돌산 양쪽 접근 가능" note="주차 위치·혼잡은 출발 정류장에 따라 확인" />
             </>
           ) : placeData ? (
             (() => {
@@ -554,6 +554,65 @@ export default function SoulCableCarPage() {
           )}
         </Card>
 
+        {/* ── RICH BASIC — 요금 상세 ── */}
+        {(isCableCarView || !isPlaceKnowledge) && (
+          <ExpandableSection title="요금 상세">
+            <p className="text-xs text-white opacity-40 mb-1">일반 캐빈 (8인 동승)</p>
+            <FactRow label="대인 왕복" value="17,000원" note="편도 14,000원" />
+            <FactRow label="소인 왕복" value="12,000원" note="편도 9,000원" />
+            <p className="text-xs text-white opacity-40 pt-2">크리스탈 캐빈 (6인 동승)</p>
+            <FactRow label="대인 왕복" value="24,000원" note="편도 19,000원" />
+            <FactRow label="소인 왕복" value="19,000원" note="편도 14,000원" />
+            <p className="text-xs text-white opacity-30 pt-1">소인: 36개월~초등학생</p>
+            <p className="text-xs text-white opacity-30">경로(만 65세 이상) · 장애인 · 국가유공자 · 여수시민 할인 있음 · 할인 금액은 현장 확인</p>
+          </ExpandableSection>
+        )}
+
+        {/* ── RICH BASIC — 캐빈 선택 ── */}
+        {(isCableCarView || !isPlaceKnowledge) && (
+          <ExpandableSection title="캐빈 선택">
+            <div>
+              <p className="text-xs text-white opacity-50 mb-1">일반 캐빈 (8인 동승)</p>
+              <p className="text-sm text-white opacity-80 leading-relaxed">수동 휠체어, 접은 유모차 탑승 가능합니다.</p>
+            </div>
+            <div>
+              <p className="text-xs text-white opacity-50 mb-1">크리스탈 캐빈 (6인 동승)</p>
+              <p className="text-sm text-white opacity-80 leading-relaxed">강화유리 바닥으로 바다를 내려다볼 수 있어요. 요금이 일반보다 높습니다.</p>
+              <p className="text-xs text-white opacity-50 mt-1.5">유모차·휠체어·캐리어 등 바퀴 있는 물품은 크리스탈 반입이 제한됩니다. 이 경우 일반 캐빈을 이용하세요.</p>
+            </div>
+            <p className="text-xs text-white opacity-40">전동휠체어는 탑승 제한. 웨건형·2인용 이상 유모차도 제한될 수 있습니다.</p>
+            <p className="text-xs text-white opacity-30">탑승권 구매 방식은 방문 전 공식 안내를 확인하세요.</p>
+          </ExpandableSection>
+        )}
+
+        {/* ── RICH BASIC — 운행 시간 · 날씨 ── */}
+        {(isCableCarView || !isPlaceKnowledge) && (
+          <ExpandableSection title="운행 시간 · 날씨">
+            <FactRow label="기본 운행" value="09:30~21:30" note="날짜·시기에 따라 변경 가능" />
+            <p className="text-xs text-white opacity-50">강풍 또는 기상·정비 상황에서 운행이 변경되거나 중단될 수 있어요. 비 자체가 무조건 중단 기준은 아닙니다.</p>
+            <p className="text-xs text-white opacity-50">방문 당일 공식 운행 여부를 확인하는 것을 권장합니다.</p>
+            <p className="text-xs text-white opacity-40">일몰·주말·성수기에는 혼잡할 수 있어요. 여유 있게 시간을 계획하세요.</p>
+          </ExpandableSection>
+        )}
+
+        {/* ── RICH BASIC — 정류장 & 자동차 여행 ── */}
+        {(isCableCarView || !isPlaceKnowledge) && (
+          <ExpandableSection title="정류장 & 자동차 여행">
+            <div>
+              <p className="text-xs text-white opacity-50 mb-1">자산(해야정류장)</p>
+              <p className="text-sm text-white opacity-80 leading-relaxed">자산공원·수정동 방면. 오동도 입구와 가까워 함께 묶기 좋아요.</p>
+            </div>
+            <div>
+              <p className="text-xs text-white opacity-50 mb-1">돌산(놀아정류장)</p>
+              <p className="text-sm text-white opacity-80 leading-relaxed">돌산도 방면. 돌산공원과 연결됩니다.</p>
+            </div>
+            <div>
+              <p className="text-xs text-white opacity-50 mb-1">자동차 여행</p>
+              <p className="text-sm text-white opacity-80 leading-relaxed">편도 이용 시 차량이 출발 정류장에 남아요. 왕복 이용하면 출발 정류장으로 돌아오기 때문에 차량 회수가 단순합니다.</p>
+            </div>
+          </ExpandableSection>
+        )}
+
         {/* ── FOR ME — cable-car context only ── */}
         {(isCableCarView || !isPlaceKnowledge) && (
           <ForMeSection
@@ -568,6 +627,11 @@ export default function SoulCableCarPage() {
           <p className="text-xs text-dream-purple font-semibold mb-3 uppercase tracking-wider">
             SOUL
           </p>
+          {isCableCarView && !isPlaceKnowledge && (
+            <p className="text-xs text-white opacity-40 mb-2 leading-relaxed">
+              여수 바다 위를 가로지르는 해상 케이블카예요. 케이블카 안에서 바다와 섬·항구를 내려다볼 수 있어요.
+            </p>
+          )}
           <p className="text-sm text-white leading-relaxed">
             {isPlaceKnowledge && soulResponse?.place_identity_ko
               ? soulResponse.place_identity_ko
@@ -635,9 +699,17 @@ export default function SoulCableCarPage() {
               {travelerContext.nextPlace === 'odongdo' && (
                 <p>
                   <span className="text-white opacity-50 text-xs block mb-0.5">오동도 연계 동선</span>
-                  자산 하차 후 오동도 방파제 입구까지 도보 약 5분. 케이블카 + 오동도 합산 약 3~4시간. 돌산 하차 후 오동도 이동은 도보 불가(차량/택시 필요).
+                  자산정류장은 오동도 입구와 가까워 함께 이어보기 좋은 동선입니다. 구체적인 이동 방법은 방문 전 확인을 권장합니다.
                 </p>
               )}
+              <p>
+                <span className="text-white opacity-50 text-xs block mb-0.5">돌산 하차 후</span>
+                돌산공원이 케이블카 인근에 있어요. 저녁 야경을 즐기며 이어가기 좋은 동선입니다.
+              </p>
+              <p>
+                <span className="text-white opacity-50 text-xs block mb-0.5">함께 찾는 코스</span>
+                향일암을 오전에 방문한 뒤 오후에 케이블카로 이어가는 여정이 자주 등장해요.
+              </p>
               <p className="text-white opacity-40 text-xs">
                 ☎ 운행 문의: 061-664-7301
               </p>
