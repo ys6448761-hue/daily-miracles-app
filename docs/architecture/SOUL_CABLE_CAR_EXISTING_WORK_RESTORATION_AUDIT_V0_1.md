@@ -1,9 +1,28 @@
 # SOUL Cable Car — Existing Work Restoration Audit V0.1
 
-**Status:** AUDIT_COMPLETE  
-**Branch audited:** `integration/soul-cablecar-port-v0-1` @ `3800790`  
+**Status:** AUDIT_COMPLETE + RESTORATION_VERIFIED  
+**Branch audited:** `integration/soul-cablecar-port-v0-1` @ `3800790` → final HEAD `c7d1e38`  
 **Date:** 2026-10-04  
-**Mode:** READ-ONLY — no code changes  
+**Mode:** READ-ONLY — no code changes
+
+---
+
+## Verification Closure (2026-10-04)
+
+| Milestone | Commit | Status |
+|---|---|---|
+| Rich Knowledge Matrix (16 items) | 17f9401 | COMPLETE |
+| Cabin FactRow (F5 PRESENTATION_GAP) | 25eee04 | IMPLEMENTED |
+| Legacy Yeosu Origin deletion (60 files) | c7d1e38 | EXECUTED |
+| Browser verification | — | PASS |
+| PLACE_HERO | — | SAFE_IMAGELESS_FALLBACK |
+
+**CABLE_CAR_BROWSER_VERIFY: PASS**  
+URL: `http://localhost:3002/soul/cable-car`
+
+**Current audit conclusion:**  
+PRIMARY GAP = CONNECTION_GAP + PRESENTATION_GAP (not new knowledge creation).  
+B/F-class items remain unconnected — addressed in next action: CABLE_CAR_KNOWLEDGE_CONNECTION_RESTORATION_V0_2.  
 
 ---
 

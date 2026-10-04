@@ -3,7 +3,7 @@
 **Decision Date:** 2026-10-04  
 **Authority:** Founder (이세진 / 푸르미르)  
 **Branch:** `integration/soul-cablecar-port-v0-1`  
-**Status:** EXECUTED — 60 files deleted, 3 code references cleaned
+**Status:** VERIFIED — 60 files deleted · 3 references cleaned · Browser PASS (2026-10-04)
 
 ---
 
@@ -101,6 +101,28 @@ Filenames follow pattern: `{place}_page05_{emotional_afterflow|reality_reconnect
 - **SoulCableCarPage hero:** `PLACE_HERO_MAP` is empty `{}` → `heroSrc = null` → `{heroSrc && <img/>}` evaluates to false → **gradient background shown**. All text, SOUL_DISCOVERY, FOR_ME, Cabin FactRow, JourneyFlow, DEPTH sections unaffected.
 - **seedRoutes.js / storybook thumbnails:** `LOCATION_BASE_IMAGE` empty → `resolveBaseImage` falls to `DEFAULT_OG` (`/images/dreamtown-og-v4.jpg`) — verified exists.
 - **No build errors expected** — No import statements reference the deleted files.
+
+---
+
+## Browser Verification Evidence
+
+**Date:** 2026-10-04  
+**URL:** `http://localhost:3002/soul/cable-car`  
+**Branch/HEAD:** `integration/soul-cablecar-port-v0-1` @ `c7d1e38`
+
+| Check | Result |
+|---|---|
+| LEGACY_YEOSU_ORIGIN_ASSET_DELETION | VERIFIED |
+| CABLE_CAR_BROWSER_VERIFY | PASS |
+| PLACE_HERO | SAFE_IMAGELESS_FALLBACK (gradient) |
+| Legacy cable car OG image visible | NO (deleted, correct) |
+| SoulCableCarPage renders | YES |
+| 부모님 context chip renders | YES |
+| Cable Car Basic Information | INTACT |
+| Cabin FactRow | INTACT |
+| Page broken by deletion | NO |
+
+**Founder decision on hero:** No new Place Hero selection yet. SAFE_IMAGELESS_FALLBACK is the current approved state.
 
 ---
 
