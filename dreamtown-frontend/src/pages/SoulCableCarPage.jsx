@@ -40,12 +40,10 @@ const SOUL_DISCOVERY = {
     '크리스탈 캐빈은 바닥이 투명해요. 고소 불편이 있으신 분이라면 일반 캐빈이 더 편하실 수 있어요. 탑승 전 현장에서 선택하실 수 있습니다.',
 };
 
-// ── V0.1 place hero asset map ─────────────────────────────────────────────────
-// Restoration V0.1: using verified existing OG photo (public/images/og/cablecar.jpg)
-// Works at: port 3002 (base:'/') and production Express (public/ served at root)
-const PLACE_HERO_MAP = {
-  cablecar: '/images/og/cablecar.jpg',
-};
+// ── place hero asset map ──────────────────────────────────────────────────────
+// Legacy Yeosu Origin OG images deleted (Founder decision 2026-10-04).
+// heroSrc resolves to null → gradient background shown (safe fallback).
+const PLACE_HERO_MAP = {};
 
 // ── FOR ME texts ─────────────────────────────────────────────────────────────
 const FOR_ME = {

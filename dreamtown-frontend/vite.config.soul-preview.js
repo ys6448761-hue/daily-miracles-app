@@ -17,11 +17,6 @@ export default defineConfig({
         target: 'http://localhost:5000',
         changeOrigin: true,
       },
-      // Proxy OG and canonical images from Express (public/ root, not dreamtown-frontend/public/)
-      '/images/og': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-      },
     },
   },
 });

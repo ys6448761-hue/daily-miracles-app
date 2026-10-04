@@ -726,6 +726,7 @@
     "DOC-HAMEL_MIGRATION_PLAN",
     "DOC-HAMEL_REFERENCE_AUDIT",
     "DOC-DECISION_PHOENIX_D2_LIVING_DET",
+    "DOC-LEGACY_YEOSU_ORIGIN_ASSETS_DEL",
     "DOC-DT_API_Registry",
     "DOC-GATE2_Canonical_Asset_Verifica",
     "DOC-SOUL_PRODUCT_VISION_V0_1",
@@ -1010,6 +1011,9 @@
   ],
   "events": [
     "DOC-playground-events"
+  ],
+  "governance": [
+    "DOC-LEGACY_YEOSU_ORIGIN_ASSETS_DEL"
   ],
   "gpt": [
     "DOC-DreamTown_GPT_Knowledge_Pack",
