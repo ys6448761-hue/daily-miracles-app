@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-04T05:55:29.103Z",
+  "generated_at": "2026-10-04T06:23:34.431Z",
   "generator": "generate-manifest.js",
-  "total_count": 435,
+  "total_count": 436,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1029,6 +1029,23 @@
       "title": "SOUL_CABLE_CAR_PERSONALIZED_JUDGMENT_JOURNEY_V0_1_EVIDENCE",
       "created_at": "2026-10-04",
       "checksum": "79055dd6"
+    },
+    {
+      "id": "DOC-SOUL_CABLE_CAR_PLACE_HERO_VISU",
+      "path": "docs/architecture/SOUL_CABLE_CAR_PLACE_HERO_VISUAL_ENTRY_AUDIT_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture",
+        "소원"
+      ],
+      "owner": "team",
+      "status": "**삭제됨** — Founder 결정 2026-10-04 (`c7d1e38`)",
+      "title": "SOUL_CABLE_CAR_PLACE_HERO_VISUAL_ENTRY_AUDIT_V0_1",
+      "created_at": "2026-10-04",
+      "checksum": "c8a2bb40"
     },
     {
       "id": "DOC-SOUL_CABLE_CAR_RICH_BASIC_INFO",
