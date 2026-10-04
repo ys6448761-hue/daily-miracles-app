@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-04T07:36:18.583Z",
+  "generated_at": "2026-10-04T23:24:30.279Z",
   "generator": "generate-manifest.js",
-  "total_count": 438,
+  "total_count": 440,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -453,6 +453,23 @@
       "title": "DreamTown Galaxy Mode SSOT",
       "created_at": "내용",
       "checksum": "bae6a841"
+    },
+    {
+      "id": "DOC-CEO-WEEKLY-2026-W40",
+      "path": "docs/reports/CEO-WEEKLY-2026-W40.md",
+      "type": "report",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "reports",
+      "tags": [
+        "reports",
+        "aurora"
+      ],
+      "owner": "comi",
+      "status": "active",
+      "title": "CEO-WEEKLY-2026-W40",
+      "created_at": "2026-10-04T19:47:49.465Z",
+      "checksum": "68f366b1"
     },
     {
       "id": "DOC-aurora5-master-knowledge-v2",
@@ -5930,6 +5947,24 @@
       "title": "Wix 팀 소개 페이지 콘텐츠",
       "created_at": "2026-10-04",
       "checksum": "cb6751ba"
+    },
+    {
+      "id": "DOC-PHOENIX_WORKER_CONTEXT_V0_1",
+      "path": "docs/worker/PHOENIX_WORKER_CONTEXT_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "worker",
+      "tags": [
+        "worker",
+        "소원",
+        "가격"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "PHOENIX WORKER CONTEXT V0.1",
+      "created_at": "2026-10-04",
+      "checksum": "bb80c7b4"
     },
     {
       "id": "DOC-README",
