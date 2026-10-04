@@ -1,9 +1,30 @@
 # SOUL_CABLE_CAR_PLACE_HERO_VISUAL_ENTRY_AUDIT_V0_1
 
-**Status:** ENTRY_AUDIT_COMPLETE / FOUNDER_DECISION_REQUIRED  
+**Status:** ENTRY_AUDIT_COMPLETE / FOUNDER_DECISION_REQUIRED — CORRECTION ISSUED  
 **Date:** 2026-10-04  
 **Authoritative Checkpoint:** main @ `bd20e8f`  
 **Scope:** Knowledge-first visual audit. No UI modification. No image generation.
+
+---
+
+## ⚠️ CORRECTION (2026-10-04 — Founder-provided source)
+
+**Founder confirmed existing SOUL Asset location:**  
+`C:\DREAM TOWN\Assets\SOUL\`
+
+This source was NOT inspected in the initial audit. Inspection completed immediately upon notification.
+
+**Corrected primary finding:**
+
+| 항목 | 초기 Audit | 수정 후 |
+|---|---|---|
+| Primary Hero candidate | `cablecar-star-intro.png` (B EXISTS_NOT_CONNECTED) | `SOUL_YEOSU_CABLECAR_PLACE_HERO_V01.png` (C SOURCE_EXISTS_NOT_STRUCTURED) |
+| Gap classification | B CONNECTION_GAP | C SOURCE_EXISTS_NOT_STRUCTURED → B (after import) |
+| Asset purpose | App launch general brand image | **Purpose-built SOUL Place Hero** |
+| Format | 1080×1920 (9:16 portrait) | **1672×941 (~16:9 landscape) — Hero 최적** |
+| Quality tier | Approved brand asset | **Founder-designated SOUL Hero** |
+
+**See Section 13 (CORRECTION — Founder-Provided Source) for full findings.**
 
 ---
 
@@ -203,80 +224,68 @@ JOURNEY
 
 ## 6. GAP CLASSIFICATION
 
-| 갭 종류 | 내용 | 분류 |
+⚠️ **CORRECTED** — Founder-provided source inspected (see Section 13).
+
+| 갭 종류 | 내용 | 분류 (수정) |
 |---|---|---|
 | Knowledge gap — 기본 장소 정체 | 없음 | A EXISTS_AND_KNOWN |
-| Visual asset — 외부 관점 Hero | cablecar-star-intro.png 존재 | B EXISTS_NOT_CONNECTED |
+| **SOUL Place Hero — Founder-provided** | `SOUL_YEOSU_CABLECAR_PLACE_HERO_V01.png` — repo 외부 존재 | **C SOURCE_EXISTS_NOT_STRUCTURED** |
+| Visual asset — repo 내 관련 자산 | `cablecar-star-intro.png` 존재 (B) | B EXISTS_NOT_CONNECTED (secondary) |
 | Visual asset — 삭제 OG | og/cablecar.jpg 삭제됨 (Founder 결정) | — PROHIBITED |
-| Provenance — cablecar-star-intro.png | MANIFEST 미등재 | D VERIFICATION_REQUIRED |
 | Connection — PLACE_HERO_MAP | cablecar 키 없음 → null | B EXISTS_NOT_CONNECTED |
 | Presentation — 현재 화면 | 그라디언트 fallback | F PRESENTATION_GAP |
 
-**핵심:** Knowledge gap 없음. Visual asset gap 없음 (B 존재). True 문제 = CONNECTION_GAP.
+**핵심 (수정):** Knowledge gap 없음. Purpose-built Founder SOUL Hero asset 존재 (외부 경로). True 문제 = SOURCE_EXISTS_NOT_STRUCTURED → 파일 import + PLACE_HERO_MAP 연결.
 
 ---
 
 ## 7. DECISION OPTIONS
 
-### OPTION A — 기존 `cablecar-star-intro.png` 연결 (CONNECTION)
+⚠️ **CORRECTED** — Options revised based on Founder-provided source (see Section 13).
+
+### OPTION A — Founder SOUL Hero 자산 Import + 연결 (RECOMMENDED)
+
+`C:\DREAM TOWN\Assets\SOUL\Yeosu_Cable_Car\Place_Hero\SOUL_YEOSU_CABLECAR_PLACE_HERO_V01.png`  
+→ `public/images/soul/place-hero/cablecar.png` (또는 동등 경로)  
+→ `PLACE_HERO_MAP = { cablecar: '/images/soul/place-hero/cablecar.png' }`
+
+**장점:**
+- Founder 지정 SOUL Place Hero 전용 자산
+- 1672×941 (16:9 가로형) — Hero 크롭 문제 없음
+- 주간 전경 + 도시+바다+섬+교량 파노라마 — "바다 위" 즉시 전달
+- DreamTown 수채화/애니메이션 일러스트 스타일 일치
+- 3개 장소 동일 패턴 (SOUL Asset System) — 향후 확장성 확보
+
+**위험:**
+- 파일이 repo 외부에 있음 — public/ 복사 필요 (단순 파일 복사)
+- Provenance: Founder 제공 = FOUNDER_AUTHORED
+
+**Provenance 상태:** FOUNDER_DESIGNATED — `C:\DREAM TOWN\Assets\SOUL\` 구조로 확인됨  
+**Founder 승인 필요:** YES — import 위치 + 파일명 확인  
+**이미지 생성 필요:** 없음  
+**구현 범위:** 파일 복사 → PLACE_HERO_MAP 한 줄 변경
+
+---
+
+### OPTION B — `cablecar-star-intro.png` 연결 (SECONDARY)
 
 `PLACE_HERO_MAP['cablecar'] = '/assets/brand/core/cablecar-star-intro.png'`
 
-**장점:**
-- 즉시 연결 가능. 신규 자산 불필요
-- AppLaunch에서 현재 사용 중인 Approved 브랜드 자산 재사용
-- DreamTown 스타일 일치 (수채화, 야경, 케이블카 외부 뷰)
-- 1080×1920 (9:16) — 모바일 세로 화면에 최적. `objectFit: cover`로 Hero 영역에 맞춤 (AppLaunch에서 이미 검증됨)
-- 케이블카 외부 관점 → "바다 위" 사실 즉시 전달
-- 돌산대교 포함 → Yeosu 신호
-
-**위험:**
-- Provenance UNRECORDED — 제작 시점·방법 불명 (AppLaunch에서는 문제 없이 사용 중)
-- 9:16 세로 이미지를 Hero 가로 영역에 `objectFit: cover`하면 상하가 크롭됨 → 중앙 구도 검토 필요
-
-**Provenance 상태:** UNRECORDED (but production-used)  
-**Founder 승인 필요:** YES — 기존 AppLaunch 전용 자산을 SOUL Hero 컨텍스트로 확장  
-**이미지 생성 필요:** 없음  
-**구현 변경 범위:** `SoulCableCarPage.jsx:54` 한 줄 (`PLACE_HERO_MAP = { cablecar: '...' }`)
+**장점:** 즉시 연결 가능. 파일 이동 불필요.  
+**위험:** 1080×1920 (9:16 세로) → Hero 가로 영역 크롭. AppLaunch 전용 자산을 Hero로 재사용.  
+**결론:** Founder SOUL Asset 존재 확인 이후 **열등한 선택**. OPTION A 이후에만 고려.
 
 ---
 
-### OPTION B — 새 Hero 이미지 생성 (Hero-purpose 전용)
+### OPTION C — 새 이미지 생성
 
-기존 Knowledge + `cablecar-star-intro.png` 외부 관점을 참조해 Hero 전용 이미지 AI 생성.  
-목표 비율: 가로형 (16:9 또는 3:2)으로 Hero 영역에 최적화.
-
-**장점:**
-- Hero 전용 구도 (가로형) — 크롭 문제 없음
-- 새 Provenance 기록 가능 (MANIFEST 신규 등재)
-
-**위험:**
-- AI 생성 사이클 필요 (prompt → review → approve → Evidence)
-- 스타일 일관성 확보 위해 `cablecar.json` + `cablecar-star-intro.png` 모두 참조 필요
-- 검증 라운드 추가 필요
-
-**Provenance 상태:** NEW (생성 후 MANIFEST 등재 필요)  
-**Founder 승인 필요:** YES (prompt 방향 + 결과물 검토)  
-**이미지 생성 필요:** 있음  
-**구현 범위:** 이미지 생성 → 검증 → public/ 배치 → PLACE_HERO_MAP 연결
+**결론:** OPTION A(Founder 제공 자산)가 존재하므로 불필요. EXCLUDED.
 
 ---
 
-### OPTION C — 기존 MANIFEST canonical 이미지 전용 Hero 발굴
+### OPTION D (기존 C) — canonical/source/cablecar 25장 사용
 
-`canonical/source/cablecar/` 25장 중 `calm` 계열(memory_anchor)을 Hero로 사용.  
-예: `13_calm_emerald_yeosu_cablecar_stage1.png`
-
-**장점:**
-- Category A, MANIFEST 등재됨, provenance 명확
-
-**위험:**
-- **내부 관점** — 소원이 캐빈 내부 앉아서 창 바라봄. Place 신뢰 신호 전달 실패
-- 소원이 캐릭터 포함 → WishArt 별 경험 컨텍스트 혼동
-- 2:3 세로 비율 — Hero 레이아웃 부적합
-- **NOT_SUITABLE로 판단**
-
-**최종 결론: OPTION C 제외**
+**결론:** 내부 관점 + WishArt 컨텍스트 → NOT_SUITABLE. EXCLUDED.
 
 ---
 
@@ -305,15 +314,17 @@ Founder 결정 전에는 구현하지 않습니다.
 
 ---
 
-## 10. OPEN QUESTIONS FOR FOUNDER
+## 10. OPEN QUESTIONS FOR FOUNDER (REVISED)
 
-**Q1.** `cablecar-star-intro.png`을 SOUL Cable Car Hero 이미지로 재사용하는 데 동의하십니까?  
-(현재 AppLaunch 전용 → SOUL Hero 컨텍스트 확장)
+⚠️ **Q1, Q2 철회** — Founder SOUL Asset (`SOUL_YEOSU_CABLECAR_PLACE_HERO_V01.png`) 존재 확인으로 불필요.
 
-**Q2.** 9:16 세로 이미지를 Hero 영역에 `objectFit: cover` + center crop으로 사용하는 것이 수용 가능합니까?  
-(케이블카 중앙부가 잘려나오지 않도록 `object-position` 조정 필요 여부)
+**Q1 (신규).** `SOUL_YEOSU_CABLECAR_PLACE_HERO_V01.png`을 repo `public/` 아래 어느 경로로 import합니까?  
+예시 후보:
+- `public/images/soul/place-hero/cablecar.png`
+- `public/assets/soul/yeosu-cable-car/place-hero-v01.png`
 
-**Q3.** 만약 OPTION B(새 생성)를 선택하신다면, 외부(가로형) 관점이 필요합니까, 아니면 내부 관점도 고려합니까?
+**Q2 (신규).** 향일암·오동도 Place Hero도 같은 세션에서 동시 import합니까?  
+(3개 장소 동일 패턴이므로 함께 처리 가능)
 
 ---
 
@@ -321,10 +332,110 @@ Founder 결정 전에는 구현하지 않습니다.
 
 `CABLE_CAR_PLACE_HERO_VISUAL_TRUST_LAYER_V1 = ENTRY_AUDIT_COMPLETE / FOUNDER_DECISION_REQUIRED`
 
-구현 BLOCKED — Founder Q1/Q2 결정 후 진행.
+구현 BLOCKED — Founder import 경로 결정 후 진행.
 
 ---
 
 ## 12. CURRENT NEXT ACTION
 
 `CABLE_CAR_PLACE_HERO_VISUAL_DIRECTION_FOUNDER_DECISION`
+
+---
+
+## 13. CORRECTION — FOUNDER-PROVIDED SOURCE FULL INSPECTION
+
+**Inspected:** `C:\DREAM TOWN\Assets\SOUL\`  
+**Date:** 2026-10-04 (즉시 수정)
+
+### 13.1 SOUL Asset System Structure
+
+```
+C:\DREAM TOWN\Assets\SOUL\
+├── Yeosu_Cable_Car\
+│   ├── Place_Hero\
+│   │   └── SOUL_YEOSU_CABLECAR_PLACE_HERO_V01.png
+│   ├── Context\
+│   │   └── SOUL_YEOSU_CABLECAR_CONTEXT_FAMILY_SUNSET_V01.png
+│   ├── Experience\
+│   │   ├── SOUL_YEOSU_CABLECAR_EXPERIENCE_CABIN_VIEW_V01.png
+│   │   └── SOUL_YEOSU_CABLECAR_EXPERIENCE_CITY_VIEW_V01.png
+│   ├── Wish_Scene\
+│   │   └── SOUL_YEOSU_CABLECAR_WISH_SCENE_SUNSET_V01.png
+│   └── Journey\ (비어있음)
+├── Odongdo\
+│   ├── Place_Hero\
+│   │   └── SOUL_ODONGDO_PLACE_HERO_V01.png
+│   ├── Context\ (2개)
+│   ├── Experience\ (3개)
+│   ├── Wish_Scene\ (비어있음)
+│   └── Journey\ (비어있음)
+└── Hyangiram\
+    ├── Place_Hero\
+    │   └── SOUL_HYANGIRAM_PLACE_HERO_V01.png
+    ├── Context\ (2개)
+    ├── Experience\ (5개)
+    ├── Wish_Scene\ (1개)
+    └── Journey\ (비어있음)
+```
+
+### 13.2 Cable Car Place Hero — Visual Inspection
+
+**`SOUL_YEOSU_CABLECAR_PLACE_HERO_V01.png`**
+
+| 항목 | 값 |
+|---|---|
+| 경로 | `C:\DREAM TOWN\Assets\SOUL\Yeosu_Cable_Car\Place_Hero\` |
+| 해상도 | **1672 × 941** (~16:9 landscape) |
+| 파일 크기 | 3,083,553 bytes (~3.0MB) |
+| 포맷 | PNG |
+| 생성일 | 2026-09-29 |
+| 스타일 | 수채화/애니메이션 일러스트, DreamTown 스타일 |
+| **내용** | 주간/황금시간대. 좌측 전경: 빨간 케이블카 캐빈 (클로즈업), 내부 여성 실루엣(뒷모습, 검은 머리). 배경: 여수 시내 건물군 + 항구 + 초록 섬 + 교량 + 파란 바다 + 배 + 산. 다수 케이블카 캐빈이 케이블 위에 보임. |
+| Cable Car 인식 | **즉시 인식** — 빨간 캐빈이 전경에 클로즈업 |
+| Yeosu 인식 | **즉시 인식** — 항구+섬+교량+산+배 구조 = 여수 전경 |
+| Hero 적합성 | **HERO_CANDIDATE A+** — 목적별 제작, 16:9, 크롭 불필요 |
+| Provenance | FOUNDER_DESIGNATED (SOUL Asset 전용 디렉토리에 위치) |
+| repo 존재 | **없음** — import 필요 |
+| **판정** | **C SOURCE_EXISTS_NOT_STRUCTURED → OPTION A로 해결** |
+
+### 13.3 Hyangiram / Odongdo Inventory (연속성 확인)
+
+**`SOUL_ODONGDO_PLACE_HERO_V01.png`** — 1672×941, 2.9MB, 2026-09-29
+- 내용: 오동도 방파제+섬+등대+파란 바다+화물선. 주간. 전경 나무.
+- 오동도 인식: 즉시 (방파제 연결 구조 = 오동도 시그니처)
+- HERO_CANDIDATE: A+
+
+**`SOUL_HYANGIRAM_PLACE_HERO_V01.png`** — 1671×941, 3.1MB, 2026-09-29
+- 내용: 산봉우리 한국 전통 사찰 건물. 주변 울창한 숲. 좌측 파란 바다. 주간.
+- 향일암 인식: 즉시 (산꼭대기 사찰+바다 = 향일암 시그니처)
+- HERO_CANDIDATE: A+
+
+**결론:** 3개 장소 모두 동일 포맷(1672~×941, ~16:9), 동일 명명 패턴(`SOUL_{PLACE}_PLACE_HERO_V01.png`), 동일 제작 시기(2026-09-29). 통일된 SOUL Asset System 확인.
+
+### 13.4 Revised Connection Trace
+
+```
+C:\DREAM TOWN\Assets\SOUL\Yeosu_Cable_Car\Place_Hero\
+  SOUL_YEOSU_CABLECAR_PLACE_HERO_V01.png
+    ↓ [IMPORT NEEDED — 단순 파일 복사]
+public/images/soul/place-hero/cablecar.png (또는 Founder 지정 경로)
+    ↓ [PLACE_HERO_MAP 등재 필요]
+PLACE_HERO_MAP = { cablecar: '/images/soul/place-hero/cablecar.png' }
+    ↓
+heroSrc = '/images/soul/place-hero/cablecar.png'
+    ↓
+<img src={heroSrc} ... /> 렌더링 → 그라디언트 대체
+```
+
+**갭 종류: C SOURCE_EXISTS_NOT_STRUCTURED**
+(파일 존재, 구조화 미완료 = repo에 없음)
+
+### 13.5 Previous Conclusion Correction
+
+| 항목 | 이전 판단 | 수정 판단 |
+|---|---|---|
+| Primary candidate | `cablecar-star-intro.png` | `SOUL_YEOSU_CABLECAR_PLACE_HERO_V01.png` |
+| Gap type | B EXISTS_NOT_CONNECTED | C SOURCE_EXISTS_NOT_STRUCTURED |
+| Recommended action | AppLaunch 자산 재사용 | Founder SOUL Asset import |
+| Image generation | Not needed | Not needed (여전히 불필요) |
+| Crop issue | 9:16 → Hero 크롭 문제 | **없음** — 16:9 이미 최적 비율 |
