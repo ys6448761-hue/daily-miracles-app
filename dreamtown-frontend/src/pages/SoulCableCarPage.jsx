@@ -49,9 +49,11 @@ const SOUL_DISCOVERY = {
 };
 
 // ── place hero asset map ──────────────────────────────────────────────────────
-// Legacy Yeosu Origin OG images deleted (Founder decision 2026-10-04).
-// heroSrc resolves to null → gradient background shown (safe fallback).
-const PLACE_HERO_MAP = {};
+// Source: C:\DREAM TOWN\Assets\SOUL\{Place}\Place_Hero\ (Founder-designated SOUL assets)
+// Hyangiram / Odongdo imported but not wired — connected when their pages ship.
+const PLACE_HERO_MAP = {
+  cablecar: '/images/soul/place-hero/cablecar.png',
+};
 
 // ── FOR ME texts (7 context variants) ────────────────────────────────────────
 const FOR_ME = {
