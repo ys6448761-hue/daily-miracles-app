@@ -703,6 +703,28 @@ export default function SoulCableCarPage() {
           )}
         </Card>
 
+        {/* ── EXPERIENCE: CITY VIEW — visual transition from factual trust to experience ── */}
+        {isCableCarView && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '220px' }}>
+            <img
+              src="/images/soul/cable-car/experience-city-view.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 40%' }}
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.55) 0%, transparent 55%)' }}
+            />
+            <div className="relative z-10 p-4 flex flex-col justify-end" style={{ minHeight: '220px' }}>
+              <div className="mt-auto">
+                <p className="text-xs text-white opacity-60">바다 위에서 만나는 여수</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ── FOR ME — cable-car context only ── */}
         {(isCableCarView || !isPlaceKnowledge) && (
           <ForMeSection
@@ -710,6 +732,23 @@ export default function SoulCableCarPage() {
             variantKey={soulVariantKey}
             prevJourneyNote={prevJourneyNote}
           />
+        )}
+
+        {/* ── CONTEXT: FAMILY SUNSET — shown when family/parents context active ── */}
+        {isCableCarView && (travelerContext.companion === 'family' || travelerContext.companion === 'parents') && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '180px' }}>
+            <img
+              src="/images/soul/cable-car/context-family-sunset.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 30%' }}
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.20) 0%, transparent 40%)' }}
+            />
+          </div>
         )}
 
         {/* ── SOUL JUDGMENT ── */}
@@ -728,6 +767,23 @@ export default function SoulCableCarPage() {
               : primaryDiscovery}
           </p>
         </Card>
+
+        {/* ── EXPERIENCE: CABIN VIEW — visual breathing moment before Journey ── */}
+        {isCableCarView && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '200px' }}>
+            <img
+              src="/images/soul/cable-car/experience-cabin-view.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 35%' }}
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.18) 0%, transparent 40%)' }}
+            />
+          </div>
+        )}
 
         {/* ── JOURNEY — suppressed for non-cablecar PLACE_LOOKUP ── */}
         {(isCableCarView || !isPlaceKnowledge) && (
@@ -848,15 +904,16 @@ export default function SoulCableCarPage() {
 
         {/* ── WISH SCENE — cable car STATE 2+ only ── */}
         {stateIndex >= 2 && (isCableCarView || !isPlaceKnowledge) && (
-          <div className="rounded-2xl overflow-hidden" style={{ minHeight: '140px' }}>
+          <div className="rounded-2xl overflow-hidden relative mt-2" style={{ minHeight: '260px' }}>
             <img
-              src="/dreamtown/images/soul/cable-car/wish-scene.png"
+              src="/images/soul/cable-car/wish-scene.png"
               alt=""
-              className="w-full object-cover"
-              style={{ minHeight: '140px', maxHeight: '200px' }}
-              onError={(e) => {
-                e.currentTarget.parentElement.style.display = 'none';
-              }}
+              className="absolute inset-0 w-full h-full object-cover"
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.22) 0%, transparent 45%)' }}
             />
           </div>
         )}
