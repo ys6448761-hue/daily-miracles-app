@@ -316,6 +316,95 @@ function ForMeSection({ stateIndex, variantKey, prevJourneyNote }) {
   );
 }
 
+function QuestionDiscovery({ ctx }) {
+  const [openKeys, setOpenKeys] = useState(new Set());
+
+  function toggle(key) {
+    setOpenKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }
+
+  const hasVehicle = ctx.hasVehicle;
+  const isOdongdo = ctx.nextPlace === 'odongdo';
+  const isParents = ctx.companion === 'parents';
+
+  const contextQuestions = [
+    hasVehicle && {
+      key: 'vehicle',
+      icon: '🚗',
+      q: '차를 가져가면 뭘 먼저 봐야 해요?',
+      a: '편도 이용 시 차량이 출발 정류장에 남아요. 왕복으로 이용하면 출발 정류장으로 돌아오기 때문에 차량 회수가 단순합니다. 다음 일정까지 고려해서 편도·왕복을 미리 정하는 게 좋아요.',
+    },
+    isOdongdo && {
+      key: 'odongdo',
+      icon: '🌿',
+      q: '오동도와 어떻게 이어가요?',
+      a: '자산정류장(해야)은 오동도 입구와 가까워 함께 이어보기 좋은 동선입니다. 구체적인 이동 방법은 방문 전 확인을 권장합니다.',
+    },
+    isParents && {
+      key: 'parents',
+      icon: '👨‍👩‍👧',
+      q: '부모님과 탈 때 뭘 보면 좋을까요?',
+      a: '일반 캐빈은 수동 휠체어·접은 유모차 탑승이 가능해요. 크리스탈 캐빈은 바닥이 투명해 특별하지만, 높은 곳이나 투명 바닥이 불편하시면 일반 캐빈이 더 편할 수 있어요. 전동휠체어는 탑승 제한이 있습니다.',
+    },
+  ].filter(Boolean);
+
+  const generalQuestions = [
+    {
+      key: 'crystal',
+      icon: '💎',
+      q: '크리스탈 캐빈은 뭐가 달라요?',
+      a: '6인승으로 일반(8인)보다 정원이 적어요. 바닥과 측면 일부가 강화유리라 아래 바다를 내려다볼 수 있어요. 요금이 일반보다 높으며, 바퀴 있는 물품 반입이 제한됩니다. 현장에서 탑승 전 선택하실 수 있어요.',
+    },
+    {
+      key: 'dolsan',
+      icon: '🏔️',
+      q: '돌산에서 내리면 뭐가 있어요?',
+      a: '돌산공원이 케이블카 인근에 있어요. 저녁 야경을 즐기며 이어가기 좋은 동선입니다.',
+    },
+    {
+      key: 'next',
+      icon: '🗺️',
+      q: '케이블카와 함께 어디를 둘러볼까요?',
+      a: '향일암을 오전에 방문한 뒤 오후에 케이블카로 이어가는 여정이 자주 등장해요.',
+    },
+  ];
+
+  const questions = [...contextQuestions, ...generalQuestions];
+
+  return (
+    <div className="space-y-2">
+      {questions.map(({ key, icon, q, a }) => {
+        const isOpen = openKeys.has(key);
+        return (
+          <div
+            key={key}
+            className="rounded-xl bg-white bg-opacity-5 border border-white border-opacity-10 overflow-hidden"
+          >
+            <button
+              onClick={() => toggle(key)}
+              className="w-full flex items-start gap-3 px-4 py-3 text-left"
+            >
+              <span className="text-base flex-shrink-0 mt-0.5">{icon}</span>
+              <span className="text-sm text-white opacity-80 leading-snug flex-1">{q}</span>
+              <span className="text-white opacity-30 text-xs flex-shrink-0 mt-1">{isOpen ? '▲' : '▼'}</span>
+            </button>
+            {isOpen && (
+              <div className="px-4 pb-3">
+                <p className="text-sm text-white opacity-60 leading-relaxed pl-7">{a}</p>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ── Main page ────────────────────────────────────────────────────────────────
 export default function SoulCableCarPage() {
   const navigate = useNavigate();
@@ -746,33 +835,13 @@ export default function SoulCableCarPage() {
           </Card>
         )}
 
-        {/* ── DEPTH (expandable) — cable-car specific ── */}
+        {/* ── DEPTH — Question Discovery ── */}
         {(isCableCarView || !isPlaceKnowledge) && (
-          <ExpandableSection title="더 알고 싶을 때">
-            <div className="space-y-3 text-sm text-white opacity-80 leading-relaxed">
-              <p>
-                <span className="text-white opacity-50 text-xs block mb-0.5">크리스탈 캐빈</span>
-                6인승. 바닥과 측면 일부가 투명해 아래 바다를 내려다볼 수 있어요. 일반 캐빈보다 요금이 높습니다. 탑승 전 현장에서 선택하실 수 있어요.
-              </p>
-              {travelerContext.nextPlace === 'odongdo' && (
-                <p>
-                  <span className="text-white opacity-50 text-xs block mb-0.5">오동도 연계 동선</span>
-                  자산정류장은 오동도 입구와 가까워 함께 이어보기 좋은 동선입니다. 구체적인 이동 방법은 방문 전 확인을 권장합니다.
-                </p>
-              )}
-              <p>
-                <span className="text-white opacity-50 text-xs block mb-0.5">돌산 하차 후</span>
-                돌산공원이 케이블카 인근에 있어요. 저녁 야경을 즐기며 이어가기 좋은 동선입니다.
-              </p>
-              <p>
-                <span className="text-white opacity-50 text-xs block mb-0.5">함께 찾는 코스</span>
-                향일암을 오전에 방문한 뒤 오후에 케이블카로 이어가는 여정이 자주 등장해요.
-              </p>
-              <p className="text-white opacity-40 text-xs">
-                ☎ 운행 문의: 061-664-7301
-              </p>
-            </div>
-          </ExpandableSection>
+          <div>
+            <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">더 알고 싶을 때</p>
+            <QuestionDiscovery ctx={travelerContext} />
+            <p className="text-white opacity-30 text-xs mt-3">☎ 운행 문의: 061-664-7301</p>
+          </div>
         )}
 
         {/* ── WISH SCENE — cable car STATE 2+ only ── */}

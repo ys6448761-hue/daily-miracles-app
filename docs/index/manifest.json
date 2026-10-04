@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-04T04:57:24.496Z",
+  "generated_at": "2026-10-04T05:32:29.678Z",
   "generator": "generate-manifest.js",
-  "total_count": 431,
+  "total_count": 432,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -964,6 +964,22 @@
       "title": "SOUL_CABLE_CAR_LIVING_DETAIL_INFORMATION_HIERARCHY_V0_1_EVIDENCE",
       "created_at": "2026-10-04",
       "checksum": "d824f4ef"
+    },
+    {
+      "id": "DOC-SOUL_CABLE_CAR_MORE_TO_KNOW_QU",
+      "path": "docs/architecture/SOUL_CABLE_CAR_MORE_TO_KNOW_QUESTION_DISCOVERY_V0_1_EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture"
+      ],
+      "owner": "team",
+      "status": "|---",
+      "title": "SOUL_CABLE_CAR_MORE_TO_KNOW_QUESTION_DISCOVERY_V0_1_EVIDENCE",
+      "created_at": "2026-10-04",
+      "checksum": "b101da11"
     },
     {
       "id": "DOC-SOUL_CABLE_CAR_PERSONALIZED_JU",
