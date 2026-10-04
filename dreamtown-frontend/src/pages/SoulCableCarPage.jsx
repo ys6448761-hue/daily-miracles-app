@@ -612,6 +612,60 @@ export default function SoulCableCarPage() {
           )}
         </Card>
 
+        {/* ── FOR ME — cable-car context only ── */}
+        {(isCableCarView || !isPlaceKnowledge) && (
+          <ForMeSection
+            stateIndex={stateIndex}
+            variantKey={soulVariantKey}
+            prevJourneyNote={prevJourneyNote}
+          />
+        )}
+
+        {/* ── SOUL JUDGMENT ── */}
+        <Card>
+          <p className="text-xs text-dream-purple font-semibold mb-3 uppercase tracking-wider">
+            SOUL
+          </p>
+          {isCableCarView && !isPlaceKnowledge && !hasContext && (
+            <p className="text-xs text-white opacity-40 mb-2 leading-relaxed">
+              여수 바다 위를 가로지르는 해상 케이블카예요. 케이블카 안에서 바다와 섬·항구를 내려다볼 수 있어요.
+            </p>
+          )}
+          <p className="text-sm text-white leading-relaxed">
+            {isPlaceKnowledge && soulResponse?.place_identity_ko
+              ? soulResponse.place_identity_ko
+              : primaryDiscovery}
+          </p>
+        </Card>
+
+        {/* ── JOURNEY — suppressed for non-cablecar PLACE_LOOKUP ── */}
+        {(isCableCarView || !isPlaceKnowledge) && (
+          <Card>
+            <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">
+              {hasContext ? 'SOUL이 보는 내 여행' : '여정'}
+            </p>
+            <JourneyFlow ctx={travelerContext} variantKey={soulVariantKey} />
+            {soulResponse?.course?.blocks?.length > 0 ? (
+              <div className="mt-4 border-t border-white border-opacity-10 pt-4">
+                <CourseDisplay course={soulResponse.course} />
+              </div>
+            ) : soulResponse?.route?.days?.length > 0 && (
+              <div className="mt-4 space-y-2 border-t border-white border-opacity-10 pt-4">
+                {soulResponse.route.days.flatMap(d => d.items || []).map((item, i) => (
+                  <div key={i} className="flex gap-3 items-start">
+                    <span className="text-xs text-white opacity-30 mt-0.5 shrink-0 w-12">{item.time_slot || ''}</span>
+                    <div>
+                      <p className={`text-sm leading-snug ${item.selection_status === 'LOCKED' ? 'text-star-gold' : 'text-white'}`}>
+                        {item.name}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+        )}
+
         {/* ── RICH BASIC — 요금 상세 ── */}
         {(isCableCarView || !isPlaceKnowledge) && (
           <ExpandableSection title="요금 상세">
@@ -669,60 +723,6 @@ export default function SoulCableCarPage() {
               <p className="text-sm text-white opacity-80 leading-relaxed">편도 이용 시 차량이 출발 정류장에 남아요. 왕복 이용하면 출발 정류장으로 돌아오기 때문에 차량 회수가 단순합니다.</p>
             </div>
           </ExpandableSection>
-        )}
-
-        {/* ── FOR ME — cable-car context only ── */}
-        {(isCableCarView || !isPlaceKnowledge) && (
-          <ForMeSection
-            stateIndex={stateIndex}
-            variantKey={soulVariantKey}
-            prevJourneyNote={prevJourneyNote}
-          />
-        )}
-
-        {/* ── SOUL JUDGMENT ── */}
-        <Card>
-          <p className="text-xs text-dream-purple font-semibold mb-3 uppercase tracking-wider">
-            SOUL
-          </p>
-          {isCableCarView && !isPlaceKnowledge && (
-            <p className="text-xs text-white opacity-40 mb-2 leading-relaxed">
-              여수 바다 위를 가로지르는 해상 케이블카예요. 케이블카 안에서 바다와 섬·항구를 내려다볼 수 있어요.
-            </p>
-          )}
-          <p className="text-sm text-white leading-relaxed">
-            {isPlaceKnowledge && soulResponse?.place_identity_ko
-              ? soulResponse.place_identity_ko
-              : primaryDiscovery}
-          </p>
-        </Card>
-
-        {/* ── JOURNEY — suppressed for non-cablecar PLACE_LOOKUP ── */}
-        {(isCableCarView || !isPlaceKnowledge) && (
-          <Card>
-            <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">
-              {hasContext ? 'SOUL이 보는 내 여행' : '여정'}
-            </p>
-            <JourneyFlow ctx={travelerContext} variantKey={soulVariantKey} />
-            {soulResponse?.course?.blocks?.length > 0 ? (
-              <div className="mt-4 border-t border-white border-opacity-10 pt-4">
-                <CourseDisplay course={soulResponse.course} />
-              </div>
-            ) : soulResponse?.route?.days?.length > 0 && (
-              <div className="mt-4 space-y-2 border-t border-white border-opacity-10 pt-4">
-                {soulResponse.route.days.flatMap(d => d.items || []).map((item, i) => (
-                  <div key={i} className="flex gap-3 items-start">
-                    <span className="text-xs text-white opacity-30 mt-0.5 shrink-0 w-12">{item.time_slot || ''}</span>
-                    <div>
-                      <p className={`text-sm leading-snug ${item.selection_status === 'LOCKED' ? 'text-star-gold' : 'text-white'}`}>
-                        {item.name}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </Card>
         )}
 
         {/* ── COST — shown only when CALCULATED ── */}
