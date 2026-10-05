@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-05T04:51:28.155Z",
+  "generated_at": "2026-10-05T05:50:32.095Z",
   "generator": "generate-manifest.js",
-  "total_count": 441,
+  "total_count": 442,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1112,6 +1112,22 @@
       "title": "SOUL_CABLE_CAR_V1_PRODUCTION_RUNTIME_ACCEPTANCE",
       "created_at": "2026-10-05",
       "checksum": "ca3cb605"
+    },
+    {
+      "id": "DOC-SOUL_CONVERSATION_LIVING_DETAI",
+      "path": "docs/architecture/SOUL_CONVERSATION_LIVING_DETAIL_V0_1_EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture"
+      ],
+      "owner": "code",
+      "status": "상세",
+      "title": "SOUL_CONVERSATION_LIVING_DETAIL_V0_1_EVIDENCE",
+      "created_at": "2026-10-05",
+      "checksum": "e7264409"
     },
     {
       "id": "DOC-SOUL_DELEGATION_CLARIFICATION_",
