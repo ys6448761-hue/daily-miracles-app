@@ -2665,6 +2665,15 @@ try {
   console.warn('⚠️ impactRoutes 로드 실패:', e.message);
 }
 
+// ---------- Identity Bootstrap (/api/dt/identity) ----------
+try {
+  const identityRoutes = require('./routes/identityRoutes');
+  app.use('/api/dt/identity', identityRoutes);
+  console.log('✅ Identity Bootstrap 라우터 등록 완료 (/api/dt/identity)');
+} catch (e) {
+  console.warn('⚠️ identityRoutes 로드 실패:', e.message);
+}
+
 // ---------- Travel Guide Routes (/api/dt/travel) ----------
 try {
   const travelGuideRoutes = require('./routes/travelGuideRoutes');
