@@ -229,6 +229,57 @@ function ContextChip({ label, onRemove }) {
   );
 }
 
+// ── SOUL Answer Summary V0.1 ─────────────────────────────────────────────────
+// Presentation layer only — no new judgment. Derives from existing soulResponse fields.
+// Recomposes (replaces) on every new response — never accumulates.
+function SoulAnswerSummary({ response }) {
+  if (!response || !response.message_ko) return null;
+
+  const mode = response.presentation_mode;
+  const status = response.status;
+
+  let badge = null;
+  if (status !== 'JOURNEY_CONTINUITY') {
+    if (mode === 'DISCOVERING' || (status === 'PLACE_LOOKUP' && response.places?.length > 0)) {
+      badge = { label: '추천 가능', cls: 'text-green-300 bg-green-900 bg-opacity-40 border-green-700 border-opacity-40' };
+    } else if (mode === 'PARTIAL') {
+      badge = { label: '상황에 따라 달라요', cls: 'text-yellow-300 bg-yellow-900 bg-opacity-30 border-yellow-700 border-opacity-40' };
+    } else if (status === 'CLARIFICATION' || (mode === 'CLARIFICATION' && status !== 'JOURNEY_CONTINUITY')) {
+      badge = { label: '확인 필요', cls: 'text-blue-300 bg-blue-900 bg-opacity-30 border-blue-700 border-opacity-40' };
+    }
+  }
+
+  const keyPoints = (response.why_details?.[0]?.place_features || []).slice(0, 3);
+  const nextAction = response.next_options?.[0] || null;
+
+  return (
+    <Card>
+      <p className="text-xs text-dream-purple font-semibold mb-2 uppercase tracking-wider">SOUL의 답</p>
+      <p className="text-sm text-white leading-relaxed whitespace-pre-line">{response.message_ko}</p>
+      {badge && (
+        <span className={`inline-block mt-2 text-xs px-2.5 py-1 rounded-full font-medium border ${badge.cls}`}>
+          {badge.label}
+        </span>
+      )}
+      {keyPoints.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mt-3">
+          {keyPoints.map((pt, i) => (
+            <span key={i} className="text-xs px-2 py-1 rounded-full bg-white bg-opacity-10 text-white opacity-70">
+              {pt}
+            </span>
+          ))}
+        </div>
+      )}
+      {nextAction && (
+        <div className="mt-3 pt-3 border-t border-white border-opacity-10">
+          <p className="text-xs text-white opacity-40 mb-1">다음에 알려주세요</p>
+          <p className="text-xs text-white opacity-70 leading-snug">{nextAction}</p>
+        </div>
+      )}
+    </Card>
+  );
+}
+
 function Card({ children, className = '' }) {
   return (
     <div
@@ -1024,13 +1075,19 @@ export default function SoulCableCarPage() {
           })()}
         </Card>
 
-        {/* ── SOUL MESSAGE ── */}
-        {soulMessage && (
-          <Card>
-            <p className="text-xs text-dream-purple font-semibold mb-2 uppercase tracking-wider">여정 안내</p>
-            <p className="text-sm text-white leading-relaxed">{soulMessage}</p>
-          </Card>
-        )}
+        {/* ── SOUL ANSWER SUMMARY (V0.1) ── */}
+        {/* Success: structured summary. Error (no soulResponse): plain message card. */}
+        {soulResponse
+          ? <SoulAnswerSummary response={soulResponse} />
+          : soulMessage
+          ? (
+            <Card>
+              <p className="text-xs text-dream-purple font-semibold mb-2 uppercase tracking-wider">안내</p>
+              <p className="text-sm text-white leading-relaxed">{soulMessage}</p>
+            </Card>
+          )
+          : null
+        }
 
         {/* ── LIVING DETAIL NAVIGATION (V0.1) ─────────────────────────────────────
              When SOUL Discovery response includes places with a Living Detail page,
