@@ -882,14 +882,13 @@ class TravelGuideService {
       }
     }
 
-    // Companion fit — suppress suitability claim when walking burden is unknown (G2)
+    // Companion fit — walking burden unknown: do NOT claim suitability, let stay-time speak
     const walkingUnknown = (place._warnings || []).includes('walking_burden_unknown');
     if (pt === 'family_elderly' && suitable.includes('elderly')) {
-      if (walkingUnknown) {
-        parts.push('어르신 방문 가능 (보행 난이도 미확인)');
-      } else {
+      if (!walkingUnknown) {
         parts.push('어르신과 함께 방문하기 좋아요');
       }
+      // walkingUnknown → no suitability claim; warning already in place._warnings
     } else if (pt === 'family_with_kids' && suitable.includes('kids_ok')) {
       parts.push('아이와 함께 즐기기 좋아요');
     } else if (pt === 'couple' && (suitable.includes('couples') || emotions.includes('date'))) {
@@ -900,10 +899,10 @@ class TravelGuideService {
 
     // Time fit — only emit when time is the user's primary query intent
     // Suppressed when intent is night/photo/budget (those have their own reason signals)
+    // "부담 없이" removed: avg_stay_minutes is verified stay time, not walking burden.
     const timeIsMainIntent = !pref && !timeOfDay && !budget;
     if (timeIsMainIntent && timeMin && place.avg_stay_minutes) {
-      if (place.avg_stay_minutes <= 45) parts.push(`${place.avg_stay_minutes}분이면 부담 없이 둘러볼 수 있어요`);
-      else if (place.avg_stay_minutes <= 90) parts.push(`느긋하게 ${place.avg_stay_minutes}분 정도 즐길 수 있어요`);
+      parts.push(`${place.avg_stay_minutes}분 정도 둘러볼 수 있어요`);
     }
 
     // Photo preference — specific to photo intent only

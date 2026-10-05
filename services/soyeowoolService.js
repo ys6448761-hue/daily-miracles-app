@@ -513,6 +513,26 @@ function _applyExplicitContextChip(soulContext, explicit_context) {
     }
   }
 
+  // Fix 1: explicit_context.companion → people_type (UI-state companion overrides GPT text inference)
+  // companion=parents → family_elderly, companion=family → family_with_kids
+  // companion field from UI chip represents what the traveler has already set — always authoritative.
+  // Exception: text explicitly stated a DIFFERENT solo/group type wins if it contains explicit solo marker.
+  const COMPANION_PEOPLE_MAP = { parents: 'family_elderly', family: 'family_with_kids' };
+  if (explicit_context.companion && COMPANION_PEOPLE_MAP[explicit_context.companion]) {
+    const mappedType = COMPANION_PEOPLE_MAP[explicit_context.companion];
+    merged.people_type = mappedType;
+    mergedProv.people_type = 'USER_EXPLICIT';
+    if (mappedType === 'family_elderly') {
+      mergedConstraints.has_elderly = true;
+      mergedProv.has_elderly = 'USER_EXPLICIT';
+      constraintsChanged = true;
+    } else if (mappedType === 'family_with_kids') {
+      mergedConstraints.has_kids = true;
+      mergedProv.has_kids = 'USER_EXPLICIT';
+      constraintsChanged = true;
+    }
+  }
+
   if (prov.has_car !== 'USER_EXPLICIT' && explicit_context.has_car != null) {
     merged.has_car = explicit_context.has_car;
     mergedProv.has_car = 'USER_EXPLICIT';
@@ -958,7 +978,7 @@ function _generateClarificationMessage(soulContext, message, journeyCtx) {
   return '여수 여행을 더 잘 도와드릴 수 있도록, 어떤 여행을 계획하고 계신지 말씀해 주세요.';
 }
 
-function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPlaceCode = null) {
+function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPlaceCode = null, effectiveMobility = null) {
   const provenance = soulContext._provenance || {};
   const pt = soulContext.people_type;
   const timeMinutes = soulContext.time_available_minutes;
@@ -1008,7 +1028,7 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPla
     situationLine = '지금 상황에 맞는 곳을 찾아볼게요.';
   }
 
-  const mobilityConstraint = soulContext.mobility_constraint;
+  const mobilityConstraint = effectiveMobility || soulContext.mobility_constraint;
   const requestedCount = soulContext.requested_count;
 
   // Fix 2: Narrow journey acknowledgement — grounded, only when both hotel+leisure resolved.
@@ -1041,24 +1061,43 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPla
     return `${situationLine}\n조건에 맞는 장소를 찾지 못했어요. 시간이나 조건을 조정해보실래요?`;
   }
 
+  // Fix 4: place-aware prefix for PARTIAL — reflect current Living Detail context
+  const curPlaceNamePartial = currentPlaceCode ? (CURRENT_PLACE_KO[currentPlaceCode] || null) : null;
+  const placePrefix = curPlaceNamePartial ? `${curPlaceNamePartial}에서 이어지는 여행이에요.` : null;
+
   // D6 soft clarification for UNKNOWN time (PARTIAL)
   if (status === 'PARTIAL') {
     // Multi-day first: "1박2일" makes time_available clarification contradictory.
     if (_isMultiDayTrip(message)) {
-      return `${situationLine}\n여수에서 가볼 만한 곳을 골라봤어요.`;
+      return placePrefix
+        ? `${placePrefix}\n여수에서 가볼 만한 곳을 골라봤어요.`
+        : `${situationLine}\n여수에서 가볼 만한 곳을 골라봤어요.`;
     }
     if (pref === 'photo') {
       const countNote = requestedCount ? `${requestedCount}곳 요청하셨는데, ` : '';
-      return `${situationLine}\n${countNote}사진 찍기 좋은 곳 위주로 골라봤어요.`;
+      const base = placePrefix ? `${placePrefix}\n${situationLine}` : situationLine;
+      return `${base}\n${countNote}사진 찍기 좋은 곳 위주로 골라봤어요.`;
     }
     if (mobilityConstraint === 'low_walking') {
-      return `${situationLine}\n걷기 부담이 적은 곳을 고르려 했는데, 지금 장소 데이터에 보행 난이도 정보가 없어요.\n방문 전 각 장소의 도보 거리를 꼭 확인해보세요.`;
+      const base = placePrefix ? `${placePrefix}\n${situationLine}` : situationLine;
+      return `${base}\n걷기 부담이 적은 곳을 고르려 했는데, 지금 장소 데이터에 보행 난이도 정보가 없어요.\n방문 전 각 장소의 도보 거리를 꼭 확인해보세요.`;
+    }
+    // Fix 2: family_elderly + hyangiram (high difficulty) without mobility signal
+    // → walking state is the decision-critical UNKNOWN, not time
+    if (pt === 'family_elderly' && currentPlaceCode === 'hyangiram' && !mobilityConstraint) {
+      return `${placePrefix || situationLine}\n이동 부담이 적은 곳으로 골라봤어요. 걷기 많이 힘드신가요?`;
     }
     if (timeOfDay === 'night' || timeOfDay === 'evening') {
-      return `${situationLine}\n지금 갈 수 있는 야간 명소를 골라봤어요.`;
+      const base = placePrefix ? `${placePrefix}\n${situationLine}` : situationLine;
+      return `${base}\n지금 갈 수 있는 야간 명소를 골라봤어요.`;
     }
     if (budget === 'free' || budget === 'low') {
-      return `${situationLine}\n부담 적은 곳 위주로 골라봤는데, 입장료는 직접 확인이 필요해요.`;
+      const base = placePrefix ? `${placePrefix}\n${situationLine}` : situationLine;
+      return `${base}\n부담 적은 곳 위주로 골라봤는데, 입장료는 직접 확인이 필요해요.`;
+    }
+    // Default PARTIAL — place-aware if current place known
+    if (placePrefix) {
+      return `${placePrefix}\n${situationLine}\n대략 2시간 기준으로 갈 곳을 골라봤어요.\n시간이 얼마나 남으셨어요?`;
     }
     return `${situationLine}\n대략 2시간 기준으로 편하게 갈 곳을 골라봤어요.\n시간이 얼마나 남으셨어요?`;
   }
@@ -1092,7 +1131,7 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPla
 
 // ─── Private: Result envelope ────────────────────────────────────────────────
 
-function _buildResultEnvelope(request, tgResult, domainContext, status) {
+function _buildResultEnvelope(request, tgResult, domainContext, status, soulHints = {}) {
   const constraints = [];
   if (
     status === 'PARTIAL' &&
@@ -1107,7 +1146,14 @@ function _buildResultEnvelope(request, tgResult, domainContext, status) {
     nextOptions.push('시간 조건을 늘리면 더 많은 곳을 추천할 수 있어요');
     nextOptions.push('제약 조건을 변경해보세요');
   } else if (status === 'PARTIAL') {
-    nextOptions.push('시간이 얼마나 남으셨어요?');
+    // Fix 2: Decision-critical question priority
+    // family_elderly + high-difficulty place + no mobility signal → ask walking state first
+    const { currentPlaceCode } = soulHints;
+    if (domainContext.people_type === 'family_elderly' && currentPlaceCode === 'hyangiram' && !domainContext.mobility_constraint) {
+      nextOptions.push('걷기 많이 힘드신가요?');
+    } else {
+      nextOptions.push('시간이 얼마나 남으셨어요?');
+    }
   }
 
   let why;
@@ -1756,13 +1802,13 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   const status = _deriveStatus(tgResult, domainContext);
 
   // D7 SOUL MESSAGE
-  const soulMessage = _generateSoulMessage(enrichedSoulContext, status, message, quoteCtx, explicit_context.place_code || null);
+  const soulMessage = _generateSoulMessage(enrichedSoulContext, status, message, quoteCtx, explicit_context.place_code || null, domainContext.mobility_constraint || null);
 
   // WHY DETAILS
   const whyDetails = _buildWhyDetails(tgResult, domainContext);
 
   // RESULT ENVELOPE
-  const result = _buildResultEnvelope(request, tgResult, domainContext, status);
+  const result = _buildResultEnvelope(request, tgResult, domainContext, status, { currentPlaceCode: explicit_context.place_code || null });
 
   // CLIENT PAYLOAD
   const payload = _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionId, enrichedSoulContext, sharedJourney, quoteResult, routeSkeleton);
