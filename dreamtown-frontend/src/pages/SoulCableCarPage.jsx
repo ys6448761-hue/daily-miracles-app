@@ -28,6 +28,37 @@ import { useNavigate } from 'react-router-dom';
 import { getOrEnsureGuestCredential } from '../api/dreamtown.js';
 import CourseDisplay from '../components/TravelGuide/CourseDisplay.jsx';
 
+// ── Odongdo judgment texts ───────────────────────────────────────────────────
+// Source: Phoenix Knowledge — PLACE_IDENTITY_KO, itineraryService, SSOT YS01, Route Corpus
+// Coverage: 방파제 길 (PLACE_IDENTITY_KO), 동백꽃 (dtArtifactWorker+itineraryService),
+//           동백열차 (itineraryService+R041), suitable_for=[family,kids_ok,elderly,groups]
+// NOT covered: bamboo/fountain (E gap), physical_difficulty (NULL), specific times
+const ODONGDO_SOUL_DISCOVERY = {
+  default:
+    '오동도는 어디까지 들어가느냐에 따라 여행의 크기가 달라지는 곳이에요. 방파제 길을 걸으며 바다를 보는 것만으로도 충분하고, 여유가 있다면 섬 안쪽까지 더 들어가볼 수 있어요.',
+  parents:
+    '방파제 길은 바다를 보며 천천히 걷기 좋아요. 섬 안쪽으로 얼마나 들어갈지는 체력과 그날 상황에 따라 조절하면 돼요. 동백열차로 안쪽까지 이동하는 방법도 있어요.',
+  family:
+    '방파제 길을 따라 바다를 보고, 동백꽃이 피는 시즌이라면 섬 안쪽까지 함께 걷기 좋아요. 동백열차를 이용하면 섬 안까지 쉽게 들어갈 수도 있어요.',
+  vehicle:
+    '오동도는 방파제 길을 통해 걸어 들어가는 섬이에요. 차는 오동도 주변 주차장을 이용하게 돼요. 방문 전 주차 상황을 확인하는 것을 권장해요.',
+};
+
+// ── Odongdo FOR ME texts ──────────────────────────────────────────────────────
+const ODONGDO_FOR_ME = {
+  parents: '방파제까지는 부담 없이 걸을 수 있어요. 섬 안쪽으로 얼마나 들어갈지는 현장에서 체력에 따라 조절하세요.',
+  family:  '동백꽃 시즌이라면 섬 안쪽까지 함께 걷기 좋아요. 동백열차로 편하게 들어가는 방법도 있어요.',
+  vehicle: '오동도 주변 주차 상황은 방문 전 확인을 권장해요.',
+};
+
+// ── Odongdo variant key ───────────────────────────────────────────────────────
+function getOdongdoVariantKey(ctx) {
+  if (ctx.companion === 'parents') return 'parents';
+  if (ctx.companion === 'family') return 'family';
+  if (ctx.hasVehicle) return 'vehicle';
+  return 'default';
+}
+
 // ── Canonical judgment texts (8 context variants) ────────────────────────────
 const SOUL_DISCOVERY = {
   default:
@@ -50,9 +81,10 @@ const SOUL_DISCOVERY = {
 
 // ── place hero asset map ──────────────────────────────────────────────────────
 // Source: C:\DREAM TOWN\Assets\SOUL\{Place}\Place_Hero\ (Founder-designated SOUL assets)
-// Hyangiram / Odongdo imported but not wired — connected when their pages ship.
+// Hyangiram imported but not wired — connected when Hyangiram page ships.
 const PLACE_HERO_MAP = {
   cablecar: '/images/soul/place-hero/cablecar.png',
+  odongdo:  '/images/soul/place-hero/odongdo.png',
 };
 
 // ── FOR ME texts (7 context variants) ────────────────────────────────────────
@@ -407,6 +439,176 @@ function QuestionDiscovery({ ctx }) {
   );
 }
 
+// ── Odongdo 3-stage Experience Journey ───────────────────────────────────────
+// Stage model: 방파제 진입 → 섬 내부 경험 → 귀환
+// Source: PLACE_IDENTITY_KO "방파제 길", itineraryService "동백열차", Route Corpus R033 "등대"
+// NOT included: specific durations (avg_stay CONFLICT 120↔30~60), physical difficulty (NULL)
+function OdongdoJourneyFlow({ ctx }) {
+  const hasParents = ctx.companion === 'parents';
+  const hasFamily  = ctx.companion === 'family';
+  const hasVehicle = ctx.hasVehicle;
+
+  const JOURNEY_NOTES = {
+    default:  '방파제 길을 걷는 것만으로도 충분하고, 여유가 있다면 안쪽까지 더 들어가볼 수 있어요.',
+    parents:  '방파제 길은 천천히 걷기 좋아요. 섬 안쪽으로 얼마나 들어갈지는 현장에서 상황 봐가며 결정하세요.',
+    family:   '동백열차를 이용하면 섬 안까지 쉽게 들어갈 수 있어요.',
+    vehicle:  '오동도 주변 주차 상황은 방문 전 확인을 권장해요.',
+  };
+  const noteKey = hasParents ? 'parents' : hasFamily ? 'family' : hasVehicle ? 'vehicle' : 'default';
+  const journeyNote = JOURNEY_NOTES[noteKey];
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 overflow-x-auto py-1">
+
+        {/* Stage 1 — 방파제 진입 */}
+        <div className="flex-shrink-0 text-center min-w-0">
+          <div className="w-9 h-9 rounded-full bg-blue-900 bg-opacity-50 border border-blue-500 border-opacity-40 flex items-center justify-center mx-auto text-base">
+            {hasVehicle ? '🅿️' : '🚶'}
+          </div>
+          <div className="text-xs text-white opacity-70 mt-1">방파제</div>
+          {hasVehicle && (
+            <div className="text-xs text-white opacity-30 mt-0.5">주차 확인</div>
+          )}
+        </div>
+
+        <div className="flex-1 flex flex-col items-center min-w-[40px]">
+          <div className="w-full flex items-center">
+            <div className="flex-1 h-px bg-blue-400 opacity-30" />
+          </div>
+          <div className="text-xs text-white opacity-20 mt-1">입장</div>
+        </div>
+
+        {/* Stage 2 — 섬 내부 경험 */}
+        <div className="flex-shrink-0 text-center min-w-0">
+          <div className="w-9 h-9 rounded-full bg-green-900 bg-opacity-50 border border-green-500 border-opacity-40 flex items-center justify-center mx-auto text-base">
+            🌸
+          </div>
+          <div className="text-xs text-white opacity-70 mt-1">섬 내부</div>
+          {(hasFamily || hasParents) && (
+            <div className="text-xs text-white opacity-30 mt-0.5">동백열차↗</div>
+          )}
+        </div>
+
+        <div className="flex-1 flex flex-col items-center min-w-[40px]">
+          <div className="w-full flex items-center">
+            <div className="flex-1 h-px border-t border-dashed border-white border-opacity-20" />
+          </div>
+          <div className="text-xs text-white opacity-20 mt-1">↔</div>
+        </div>
+
+        {/* Stage 3 — 귀환 */}
+        <div className="flex-shrink-0 text-center min-w-0">
+          <div className="w-9 h-9 rounded-full bg-white bg-opacity-10 border border-white border-opacity-20 flex items-center justify-center mx-auto text-base">
+            ↩
+          </div>
+          <div className="text-xs text-white opacity-50 mt-1">귀환</div>
+        </div>
+      </div>
+
+      {journeyNote && (
+        <p className="text-xs text-dream-purple opacity-70 mt-2 leading-relaxed">{journeyNote}</p>
+      )}
+    </div>
+  );
+}
+
+// ── Odongdo Next Journey — where to go after ─────────────────────────────────
+// Source: Route Corpus patterns (오동도→이순신광장/낭만포차/케이블카)
+// Travel times: ALL UNKNOWN — no numbers invented
+function OdongdoNextJourney() {
+  return (
+    <div className="space-y-2 text-sm text-white opacity-70 leading-relaxed">
+      <p>오동도를 나온 뒤 도심 방향으로 이어가거나, 케이블카와 연결하는 여정도 있어요.</p>
+      <p className="text-xs text-white opacity-40">이순신광장·낭만포차거리, 또는 케이블카 방면 동선이 자주 등장해요. 이동시간은 방문 시 확인하세요.</p>
+    </div>
+  );
+}
+
+// ── Odongdo Question Discovery ────────────────────────────────────────────────
+// Source: itineraryService (동백열차), Route Corpus R033 (등대), SSOT YS01 (바다), Route patterns
+// NOT claimed: specific durations, fountain facts, bamboo facts, exact bloom month
+function OdongdoQuestionDiscovery({ ctx }) {
+  const [openKeys, setOpenKeys] = useState(new Set());
+  function toggle(key) {
+    setOpenKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }
+
+  const hasParents = ctx.companion === 'parents';
+  const hasFamily  = ctx.companion === 'family';
+
+  const contextQuestions = [
+    hasParents && {
+      key: 'parents_walk',
+      icon: '👨‍👩‍👧',
+      q: '부모님과 함께라면 어느 정도까지 걷는 게 좋아요?',
+      a: '방파제 길은 걸을 수 있어요. 섬 안쪽으로 들어갈수록 길이 달라져요. 동백열차로 안쪽까지 이동하는 방법도 있어요. 체력 상태에 따라 현장에서 조절하세요.',
+    },
+    hasFamily && {
+      key: 'family_kids',
+      icon: '👨‍👩‍👦',
+      q: '아이들과 어디까지 가면 좋아요?',
+      a: '방파제 길을 따라 바다를 보고, 동백열차를 이용하면 섬 안쪽까지 이동할 수 있어요. 동백꽃이 피는 시즌이라면 섬 안까지 걷기 좋아요.',
+    },
+  ].filter(Boolean);
+
+  const generalQuestions = [
+    {
+      key: 'dongbaek_train',
+      icon: '🚂',
+      q: '동백열차는 어떻게 이용해요?',
+      a: '오동도 입구에서 섬 안쪽까지 이동하는 작은 열차예요. 운행 시간과 요금은 방문 전 확인을 권장해요.',
+    },
+    {
+      key: 'walking',
+      icon: '🚶',
+      q: '걸어서 섬을 돌아볼 수 있어요?',
+      a: '방파제 길을 포함해 섬 전체를 도보로 돌아볼 수 있어요. 여유 있게 계획하는 것을 권장해요.',
+    },
+    {
+      key: 'next_place',
+      icon: '🗺️',
+      q: '오동도 다음엔 어디가 좋아요?',
+      a: '오동도를 나오면 도심 방면으로 이어가기 좋아요. 이순신광장·낭만포차거리 방향이나 케이블카 방면 동선이 자주 등장해요.',
+    },
+    {
+      key: 'camellia',
+      icon: '🌸',
+      q: '동백꽃은 언제 피어요?',
+      a: '여수 오동도 동백꽃은 겨울부터 봄 사이에 피어요. 해마다 개화 시기가 다를 수 있어 방문 전 확인을 권장해요.',
+    },
+  ];
+
+  const questions = [...contextQuestions, ...generalQuestions];
+
+  return (
+    <div className="space-y-2">
+      {questions.map(({ key, icon, q, a }) => {
+        const isOpen = openKeys.has(key);
+        return (
+          <div key={key} className="rounded-xl bg-white bg-opacity-5 border border-white border-opacity-10 overflow-hidden">
+            <button onClick={() => toggle(key)} className="w-full flex items-start gap-3 px-4 py-3 text-left">
+              <span className="text-base flex-shrink-0 mt-0.5">{icon}</span>
+              <span className="text-sm text-white opacity-80 leading-snug flex-1">{q}</span>
+              <span className="text-white opacity-30 text-xs flex-shrink-0 mt-1">{isOpen ? '▲' : '▼'}</span>
+            </button>
+            {isOpen && (
+              <div className="px-4 pb-3">
+                <p className="text-sm text-white opacity-60 leading-relaxed pl-7">{a}</p>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ── Main page ────────────────────────────────────────────────────────────────
 export default function SoulCableCarPage() {
   const navigate = useNavigate();
@@ -430,11 +632,13 @@ export default function SoulCableCarPage() {
   const placeCode = isPlaceKnowledge ? soulResponse.resolved_code : 'cablecar';
   const placeData = isPlaceKnowledge ? (soulResponse.places?.[0] ?? null) : null;
   const isCableCarView = placeCode === 'cablecar';
+  const isOdongdoView  = placeCode === 'odongdo';
   const heroSrc = PLACE_HERO_MAP[placeCode] ?? null;
 
   const hasContext =
     travelerContext.hasVehicle || travelerContext.nextPlace || travelerContext.companion;
   const hasParents = travelerContext.companion === 'parents';
+  const hasFamily  = travelerContext.companion === 'family';
 
   const stateIndex = hasParents
     ? 3
@@ -444,7 +648,8 @@ export default function SoulCableCarPage() {
     ? 1
     : 0;
 
-  const soulVariantKey = getSoulVariantKey(travelerContext);
+  const soulVariantKey     = getSoulVariantKey(travelerContext);
+  const odongdoVariantKey  = getOdongdoVariantKey(travelerContext);
 
   const prevJourneyNote =
     travelerContext.companion === 'parents'
@@ -457,7 +662,9 @@ export default function SoulCableCarPage() {
         : null
       : null;
 
-  const primaryDiscovery = SOUL_DISCOVERY[soulVariantKey] ?? SOUL_DISCOVERY.default;
+  const primaryDiscovery = isOdongdoView
+    ? (ODONGDO_SOUL_DISCOVERY[odongdoVariantKey] ?? ODONGDO_SOUL_DISCOVERY.default)
+    : (SOUL_DISCOVERY[soulVariantKey] ?? SOUL_DISCOVERY.default);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -525,7 +732,7 @@ export default function SoulCableCarPage() {
             ← 뒤로
           </button>
           <h1 className="text-sm font-semibold text-white truncate mx-2">
-            {isCableCarView ? '여수해상케이블카' : (placeData?.name_ko || '여수해상케이블카')}
+            {isCableCarView ? '여수해상케이블카' : isOdongdoView ? '오동도' : (placeData?.name_ko || '여수해상케이블카')}
           </h1>
           <div className="flex items-center gap-3 text-white opacity-40 text-sm">
             <span title="저장">🔖</span>
@@ -543,7 +750,7 @@ export default function SoulCableCarPage() {
               ref={inputRef}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="케이블카에 대해 뭐든 물어보세요"
+              placeholder={isOdongdoView ? '오동도에 대해 뭐든 물어보세요' : '케이블카에 대해 뭐든 물어보세요'}
               className="flex-1 bg-transparent text-white placeholder-white placeholder-opacity-40 text-sm outline-none"
             />
             <button
@@ -650,11 +857,16 @@ export default function SoulCableCarPage() {
                 {isCableCarView ? '여수 · 해상 케이블카' : ('여수 · ' + (placeData?.name_ko || ''))}
               </p>
               <h2 className="text-2xl font-bold text-white leading-tight">
-                {isCableCarView ? '여수해상케이블카' : (placeData?.name_ko || '')}
+                {isCableCarView ? '여수해상케이블카' : isOdongdoView ? '오동도' : (placeData?.name_ko || '')}
               </h2>
               {isCableCarView && (
                 <p className="text-sm text-white opacity-60 mt-1">
                   도시와 섬 사이 · 바다 위를 건너는 여수
+                </p>
+              )}
+              {isOdongdoView && (
+                <p className="text-sm text-white opacity-60 mt-1">
+                  방파제 끝에서 만나는 섬 · 바다와 동백의 여수
                 </p>
               )}
             </div>
@@ -703,6 +915,29 @@ export default function SoulCableCarPage() {
           )}
         </Card>
 
+        {/* ── ODONGDO: EXPERIENCE CAMELLIA — 동백꽃 섬 정체성 ── */}
+        {/* Source: dtArtifactWorker keywords, itineraryService "동백꽃", SSOT YS01 */}
+        {isOdongdoView && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '220px' }}>
+            <img
+              src="/images/soul/odongdo/experience-camellia.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 40%' }}
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.50) 0%, transparent 55%)' }}
+            />
+            <div className="relative z-10 p-4 flex flex-col justify-end" style={{ minHeight: '220px' }}>
+              <div className="mt-auto">
+                <p className="text-xs text-white opacity-60">동백꽃과 함께하는 오동도</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ── EXPERIENCE: CITY VIEW — visual transition from factual trust to experience ── */}
         {isCableCarView && (
           <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '220px' }}>
@@ -734,11 +969,37 @@ export default function SoulCableCarPage() {
           />
         )}
 
+        {/* ── ODONGDO: FOR ME — companion or vehicle context ── */}
+        {isOdongdoView && odongdoVariantKey !== 'default' && ODONGDO_FOR_ME[odongdoVariantKey] && (
+          <Card className="border-dream-purple border-opacity-30">
+            <p className="text-xs text-dream-purple font-semibold mb-2 uppercase tracking-wider">나에게 중요한 것</p>
+            <p className="text-sm text-white leading-relaxed">{ODONGDO_FOR_ME[odongdoVariantKey]}</p>
+          </Card>
+        )}
+
         {/* ── CONTEXT: FAMILY SUNSET — shown when family/parents context active ── */}
         {isCableCarView && (travelerContext.companion === 'family' || travelerContext.companion === 'parents') && (
           <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '180px' }}>
             <img
               src="/images/soul/cable-car/context-family-sunset.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 30%' }}
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.20) 0%, transparent 40%)' }}
+            />
+          </div>
+        )}
+
+        {/* ── ODONGDO: CONTEXT FAMILY WALK — 가족/부모님 동행 시각 지지 ── */}
+        {/* Source: suitable_for=['family','elderly','kids_ok'], PLACE_IDENTITY_KO "방파제 길" */}
+        {isOdongdoView && (hasFamily || hasParents) && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '180px' }}>
+            <img
+              src="/images/soul/odongdo/context-family-walk.png"
               alt=""
               className="absolute inset-0 w-full h-full object-cover"
               style={{ objectPosition: 'center 30%' }}
@@ -783,6 +1044,38 @@ export default function SoulCableCarPage() {
               style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.18) 0%, transparent 40%)' }}
             />
           </div>
+        )}
+
+        {/* ── ODONGDO: EXPERIENCE SEA DISCOVERY — 바다 발견 시각 ── */}
+        {/* Source: dtArtifactWorker "solitary figure gazing outward", SSOT YS01 "설렘, 시작" */}
+        {isOdongdoView && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '200px' }}>
+            <img
+              src="/images/soul/odongdo/experience-sea-discovery.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 35%' }}
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.18) 0%, transparent 40%)' }}
+            />
+          </div>
+        )}
+
+        {/* ── ODONGDO: EXPERIENCE JOURNEY — 3-stage internal + next ── */}
+        {isOdongdoView && (
+          <Card>
+            <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">
+              {hasContext ? 'SOUL이 보는 내 여행' : '여정'}
+            </p>
+            <OdongdoJourneyFlow ctx={travelerContext} />
+            <div className="mt-4 pt-4 border-t border-white border-opacity-10">
+              <p className="text-xs text-white opacity-40 mb-2 font-medium uppercase tracking-wider">오동도 이후</p>
+              <OdongdoNextJourney />
+            </div>
+          </Card>
         )}
 
         {/* ── JOURNEY — suppressed for non-cablecar PLACE_LOOKUP ── */}
@@ -899,6 +1192,14 @@ export default function SoulCableCarPage() {
             <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">더 알고 싶을 때</p>
             <QuestionDiscovery ctx={travelerContext} />
             <p className="text-white opacity-30 text-xs mt-3">☎ 운행 문의: 061-664-7301</p>
+          </div>
+        )}
+
+        {/* ── ODONGDO: Question Discovery ── */}
+        {isOdongdoView && (
+          <div>
+            <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">더 알고 싶을 때</p>
+            <OdongdoQuestionDiscovery ctx={travelerContext} />
           </div>
         )}
 
