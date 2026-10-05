@@ -1237,6 +1237,229 @@ function _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionI
   };
 }
 
+// ─── SOUL MINIMUM JOURNEY CONTINUITY V0.1 ─────────────────────────────────────
+// 5 Decision Types within the current conversation session.
+// Journey state: journey_ctx.conversation_journey — no new DB schema.
+// Scope: cablecar / odongdo / hyangiram only.
+// All physical_difficulty data read from DB via getPlaceByCode() — not hardcoded.
+
+const _CONV_GOLDEN_KO = { odongdo: '오동도', cablecar: '케이블카', hyangiram: '향일암' };
+
+function _extractGoldenPlaceCode(message) {
+  if (/오동도/.test(message)) return 'odongdo';
+  if (/케이블카|케이블 카/.test(message)) return 'cablecar';
+  if (/향일암/.test(message)) return 'hyangiram';
+  return null;
+}
+
+// Korean particle selector: afterConsonant vs afterVowel based on last character
+function _koreanParticle(word, afterConsonant, afterVowel) {
+  if (!word) return afterConsonant;
+  const code = word.charCodeAt(word.length - 1) - 0xAC00;
+  if (code < 0 || code > 11171) return afterConsonant;
+  return code % 28 === 0 ? afterVowel : afterConsonant;
+}
+
+// Detection order: JOURNEY_MODIFY > CONSTRAINT_UPDATE > FEASIBILITY > JOURNEY_ADD > JOURNEY_PREFERENCE
+function _detectJourneyDecisionType(message) {
+  const msg = message || '';
+  if (/(하나 빼|빼줘|빼주세요|제외해줘|하나만 빼|뭐 빼)/.test(msg)) return 'JOURNEY_MODIFY';
+  if (/(걷는 건 힘|걷기 힘|걸으면 힘|힘들어하|다리 아|무릎 아|걷기 많이|많이 걷는)/.test(msg)) return 'CONSTRAINT_UPDATE';
+  if (/(가능해|가능한가요|갈 수 있어|될까|가봐도 될|갈 수 있을까)/.test(msg)) return 'FEASIBILITY';
+  if (/(도 탈래|도 갈래|도 넣어|탈래|도 타고|도 가볼까)/.test(msg)) return 'JOURNEY_ADD';
+  if (/(먼저 가고 싶|가고 싶어|가고싶어)/.test(msg)) return 'JOURNEY_PREFERENCE';
+  return null;
+}
+
+function _readConvJourney(journeyCtx) {
+  const cj = (journeyCtx && journeyCtx.conversation_journey) || null;
+  if (!cj) return { places: [], constraints: {} };
+  return { places: Array.isArray(cj.places) ? cj.places : [], constraints: cj.constraints || {} };
+}
+
+function _convJourneyPlace(convJourney, code) {
+  return convJourney.places.find(p => p.code === code) || null;
+}
+
+function _convJourneyUpsertPlace(convJourney, code, update) {
+  const existing = convJourney.places.find(p => p.code === code);
+  if (existing) {
+    return convJourney.places.map(p => p.code === code ? { ...p, ...update } : p);
+  }
+  return [...convJourney.places, { code, ...update }];
+}
+
+function _convJourneyRemovePlace(convJourney, code) {
+  return { ...convJourney, places: convJourney.places.filter(p => p.code !== code) };
+}
+
+function _convJourneyIncludedKo(convJourney) {
+  return convJourney.places
+    .filter(p => p.status === 'included' || p.status === 'proposed')
+    .map(p => {
+      const ko = _CONV_GOLDEN_KO[p.code] || p.code;
+      return p.status === 'proposed' ? `${ko}(검토중)` : ko;
+    })
+    .join(', ');
+}
+
+async function _handleJourneyDecision({ decisionType, message, soulContext, convJourney, journeyCtxForClar, sessionId }) {
+  const placeCode = _extractGoldenPlaceCode(message);
+  const pt = soulContext.people_type;
+  const hasLowWalking = convJourney.constraints.low_walking || false;
+
+  let soulMsg = null;
+  let nextOptions = [];
+  let updatedConvJourney = { places: [...convJourney.places], constraints: { ...convJourney.constraints } };
+
+  // A. JOURNEY_PREFERENCE
+  if (decisionType === 'JOURNEY_PREFERENCE' && placeCode) {
+    const ko = _CONV_GOLDEN_KO[placeCode];
+    const isFirst = updatedConvJourney.places.length === 0 || /먼저/.test(message);
+    updatedConvJourney.places = _convJourneyUpsertPlace(updatedConvJourney, placeCode, {
+      status: 'included', ...(isFirst ? { preference: 'first' } : {}),
+    });
+    soulMsg = isFirst
+      ? `${ko}를 첫 번째 장소로 넣을게요.\n추가하고 싶은 곳이 있으신가요?`
+      : `${ko}를 여행에 넣을게요.\n추가하고 싶은 곳이 있으신가요?`;
+    nextOptions = ['케이블카도 탈래', '향일암까지 가능해?'];
+  }
+
+  // B. JOURNEY_ADD
+  else if (decisionType === 'JOURNEY_ADD' && placeCode) {
+    const ko = _CONV_GOLDEN_KO[placeCode];
+    updatedConvJourney.places = _convJourneyUpsertPlace(updatedConvJourney, placeCode, { status: 'included' });
+    const includedKo = _convJourneyIncludedKo(updatedConvJourney);
+    soulMsg = `${ko}도 함께 넣을게요.\n지금까지: ${includedKo}.`;
+    nextOptions = ['향일암까지 가능해?', '다른 곳은요?'];
+  }
+
+  // C. FEASIBILITY
+  else if (decisionType === 'FEASIBILITY' && placeCode) {
+    const ko = _CONV_GOLDEN_KO[placeCode];
+    const placeData = await travelGuideService.getPlaceByCode(placeCode);
+    const difficulty = placeData ? placeData.physical_difficulty : null;
+
+    if (placeCode === 'hyangiram') {
+      if (difficulty === 'high') {
+        if (pt === 'family_elderly' && !hasLowWalking) {
+          soulMsg = `향일암 자체는 갈 수 있어요. 다만 계단이 가파른 구간이 있어요.\n부모님이 계단 오르내리기 불편하신 편인가요?`;
+          nextOptions = [PU_HY_003_ASK_EXAMPLES[0], '괜찮으세요'];
+        } else if (pt === 'family_elderly' && hasLowWalking) {
+          soulMsg = `향일암은 계단이 가파른 구간이 있어요. 걷기 부담이 있으신 상황에서 무리가 될 수 있어요.\n일정에 넣되 당일 체력 상태를 보고 결정하시는 걸 권장해요.`;
+          nextOptions = ['그래도 가볼게요', '그럼 빼줘'];
+        } else {
+          soulMsg = `향일암은 계단이 가파른 구간이 있어요. 체력에 따라 다를 수 있어요.\n일정에 넣어볼까요?`;
+          nextOptions = ['네, 넣어주세요', '조금 더 생각해볼게요'];
+        }
+      } else if (!difficulty) {
+        soulMsg = `향일암은 갈 수 있어요. 보행 난이도 정보가 충분하지 않아서 방문 전 확인을 권장해요.\n일정에 넣어볼까요?`;
+        nextOptions = ['네, 넣어주세요'];
+      } else {
+        soulMsg = `향일암은 갈 수 있어요. 일정에 넣어볼까요?`;
+        nextOptions = ['네, 넣어주세요'];
+      }
+      updatedConvJourney.places = _convJourneyUpsertPlace(updatedConvJourney, placeCode, { status: 'proposed' });
+    } else {
+      soulMsg = `${ko}는 가실 수 있어요.\n일정에 넣어볼까요?`;
+      nextOptions = ['네, 넣어주세요'];
+      updatedConvJourney.places = _convJourneyUpsertPlace(updatedConvJourney, placeCode, { status: 'proposed' });
+    }
+  }
+
+  // D. CONSTRAINT_UPDATE
+  else if (decisionType === 'CONSTRAINT_UPDATE') {
+    updatedConvJourney.constraints.low_walking = true;
+    const hya = _convJourneyPlace(updatedConvJourney, 'hyangiram');
+    const includedKo = _convJourneyIncludedKo(updatedConvJourney);
+
+    if (hya && (hya.status === 'proposed' || hya.status === 'included')) {
+      soulMsg = `알겠어요. 걷기 부담을 줄이는 방향으로 볼게요.\n현재 일정: ${includedKo}.\n향일암은 계단이 가파른 구간이 있어서 부담이 될 수 있어요. 어떻게 할까요?`;
+      nextOptions = ['향일암 빼줘', '그래도 가볼게요'];
+    } else {
+      const listStr = includedKo || '아직 없어요';
+      soulMsg = `알겠어요. 걷기 부담이 적은 일정으로 생각할게요.\n현재 일정: ${listStr}.`;
+      nextOptions = ['다른 장소 추가하기'];
+    }
+  }
+
+  // E. JOURNEY_MODIFY
+  else if (decisionType === 'JOURNEY_MODIFY') {
+    const includedPlaces = updatedConvJourney.places.filter(p => p.status === 'included' || p.status === 'proposed');
+    if (includedPlaces.length === 0) return { ok: false };
+
+    const placeDetails = await Promise.all(
+      includedPlaces.map(async p => {
+        const data = await travelGuideService.getPlaceByCode(p.code);
+        return { ...p, physical_difficulty: data ? data.physical_difficulty : null };
+      })
+    );
+
+    let toRemove = null;
+    if (hasLowWalking || pt === 'family_elderly') {
+      toRemove = placeDetails.find(p => p.physical_difficulty === 'high')
+        || placeDetails.find(p => p.status === 'proposed')
+        || null;
+    } else {
+      toRemove = placeDetails.find(p => p.status === 'proposed') || null;
+    }
+
+    if (toRemove) {
+      const removeKo = _CONV_GOLDEN_KO[toRemove.code] || toRemove.code;
+      const remaining = includedPlaces.filter(p => p.code !== toRemove.code);
+      const remainingKo = remaining.map(p => _CONV_GOLDEN_KO[p.code] || p.code).join(', ');
+      updatedConvJourney = _convJourneyRemovePlace(updatedConvJourney, toRemove.code);
+
+      let reason = '';
+      if (toRemove.physical_difficulty === 'high' && (hasLowWalking || pt === 'family_elderly')) {
+        reason = hasLowWalking
+          ? '걷기 부담이 있는 상황에서 계단이 가파른 구간이 있어요'
+          : '계단이 가파른 구간이 있어 부모님께 부담이 될 수 있어요';
+      } else if (toRemove.status === 'proposed') {
+        reason = '아직 확정되지 않은 장소예요';
+      } else {
+        reason = '현재 일정에서 가장 부담이 될 수 있어요';
+      }
+
+      const eul = _koreanParticle(removeKo, '을', '를');
+      soulMsg = remainingKo
+        ? `${removeKo}${eul} 빼겠어요. ${reason}.\n남은 일정: ${remainingKo}.`
+        : `${removeKo}${eul} 빼겠어요. ${reason}.`;
+      nextOptions = ['저녁엔 어디 가면 좋아?'];
+    } else {
+      const placeNames = includedPlaces.map(p => _CONV_GOLDEN_KO[p.code] || p.code).join(', ');
+      soulMsg = `현재 일정: ${placeNames}.\n어떤 장소를 빼고 싶으신가요?`;
+      nextOptions = includedPlaces.map(p => `${_CONV_GOLDEN_KO[p.code] || p.code} 빼기`).slice(0, 3);
+    }
+  }
+
+  if (!soulMsg) return { ok: false };
+
+  return {
+    ok: true,
+    updatedConvJourney,  // returned to caller for a single awaited session write
+    payload: {
+      session_id: sessionId,
+      understood_context: {
+        people_type: soulContext.people_type || null,
+        group_size: soulContext.group_size || null,
+        mobility_constraint: updatedConvJourney.constraints.low_walking ? 'low_walking' : null,
+      },
+      places: [],
+      why_details: [],
+      message_ko: soulMsg,
+      status: 'JOURNEY_CONTINUITY',
+      presentation_mode: 'CLARIFICATION',
+      quote: null,
+      route: null,
+      shared_journey: null,
+      timestamp: new Date().toISOString(),
+      next_options: nextOptions,
+      conversation_journey: { places: updatedConvJourney.places, constraints: updatedConvJourney.constraints },
+    }
+  };
+}
+
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 async function handleTravelRequest({ message, sessionId, hotelId, principal, explicit_context = {} }) {
@@ -1598,6 +1821,34 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
       const sessionCtx = await sessionService.getSession(sessionId);
       journeyCtxForClar = sessionCtx && sessionCtx.journey_ctx ? sessionCtx.journey_ctx : null;
     } catch (_) {}
+
+    // ── Journey Decision Gate — intercept before generic CLARIFICATION ──────────
+    const _journeyDecisionType = _detectJourneyDecisionType(message);
+    if (_journeyDecisionType) {
+      const _convJourney = _readConvJourney(journeyCtxForClar);
+      const _journeyResult = await _handleJourneyDecision({
+        decisionType: _journeyDecisionType,
+        message,
+        soulContext,
+        convJourney: _convJourney,
+        journeyCtxForClar,
+        sessionId,
+      });
+      if (_journeyResult.ok) {
+        // Single awaited write: conversation_journey + traveler facts merged to avoid race.
+        const _jFacts = _extractExplicitTravelerFacts(soulContext);
+        const _cj = _journeyResult.updatedConvJourney;
+        const _writeData = {
+          ...(journeyCtxForClar || {}),
+          conversation_journey: { places: _cj.places, constraints: _cj.constraints },
+        };
+        if (Object.values(_jFacts).some(v => v != null)) {
+          _writeData.traveler_profile = _mergeProfileFacts(_jFacts, (journeyCtxForClar && journeyCtxForClar.traveler_profile) || null);
+        }
+        await sessionService.updateJourneyContext(sessionId, _writeData).catch(err => console.error('[CONV_JOURNEY_WRITE_ERROR]', err.message));
+        return { ok: true, payload: _journeyResult.payload };
+      }
+    }
 
     const clarificationMsg = _generateClarificationMessage(soulContext, message, journeyCtxForClar);
 

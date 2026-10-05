@@ -78,7 +78,8 @@ class SessionService {
         return null; // Session expired
       }
 
-      return JSON.parse(session.context);
+      // context is JSONB — pg driver already returns a JS object, no JSON.parse needed
+      return session.context;
     } catch (error) {
       console.error('Failed to retrieve session:', error);
       return null;
@@ -176,7 +177,8 @@ class SessionService {
         [sessionId]
       );
       if (readResult.rows.length === 0) return false;
-      const currentCtx = JSON.parse(readResult.rows[0].context || '{}');
+      // context is JSONB — pg driver already returns a JS object, no JSON.parse needed
+      const currentCtx = readResult.rows[0].context || {};
       const updatedCtx = { ...currentCtx, journey_ctx: journeyCtxData };
       const now = new Date();
       const writeResult = await db.query(
