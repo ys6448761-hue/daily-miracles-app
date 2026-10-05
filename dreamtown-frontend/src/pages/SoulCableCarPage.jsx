@@ -627,7 +627,7 @@ function HyangiramNextJourney({ ctx }) {
       <div className="space-y-2 text-sm text-white">
         <div>
           <span className="opacity-60">여유 있음</span>
-          <span className="ml-2 opacity-80">여수해상케이블카 · 오동도 방향 (코스 연계 자주 등장)</span>
+          <span className="ml-2 opacity-80">여수해상케이블카 · 오동도 방향</span>
         </div>
         <div>
           <span className="opacity-60">조금 지침</span>
@@ -682,13 +682,13 @@ function HyangiramQuestionDiscovery({ ctx }) {
       key: 'hours',
       icon: '🕐',
       q: '몇 시부터 입장할 수 있어요?',
-      a: '입장시간은 04:00~19:00예요. 일출 시간대에는 04:00부터 입장이 가능해요. 현장 변동이 있을 수 있어 방문 전 확인을 권장해요.',
+      a: '확인된 운영시간은 04:00~19:00예요. 현장 변동이 있을 수 있어 방문 전 확인을 권장해요.',
     },
     {
       key: 'sunrise',
       icon: '🌅',
       q: '일출 보러 가려면 어떻게 해야 해요?',
-      a: '향일암은 일출 명소로 알려진 곳이에요. 새벽 04:00부터 입장이 가능해요. 일출 시즌에는 방문객이 많아 이른 도착을 권장해요. 정확한 일출 시간은 날짜에 따라 다릅니다.',
+      a: '향일암은 일출 명소로 알려진 곳이에요. 확인된 운영시간은 04:00~19:00이에요. 일출 시간 자체는 날짜에 따라 달라요. 일출 시즌에는 방문객이 많아 이른 도착을 권장해요. 당일 운영 여부는 방문 전 확인하세요.',
     },
     {
       key: 'next',
@@ -1091,9 +1091,12 @@ export default function SoulCableCarPage() {
             // Advisory on hours/admission: official transition date 재확인 권장 (BATCH_01 note)
             <>
               <FactRow label="환경" value="야외 / 산 암자" note="오르는 길 포함 — 계단 많음" />
-              <FactRow label="입장" value="무료" note="현장 재확인 권장" />
-              <FactRow label="입장시간" value="04:00~19:00" note="현장 확인 권장 · 일출 시 이른 도착 권장" />
-              <FactRow label="주차" value="공영주차장 2시간 무료" note="혼잡 시 확인 권장" />
+              <FactRow label="입장" value="무료" />
+              <FactRow label="입장시간" value="04:00~19:00" />
+              <FactRow label="주차" value="공영주차장 2시간 무료" />
+              <p className="text-xs text-white opacity-30 mt-2">
+                입장료·운영시간·주차는 방문 전 현장 확인을 권장해요.
+              </p>
             </>
           ) : isOdongdoView ? (
             // Odongdo curated — only Seed ORIGIN data + itineraryService/Route Corpus knowledge
