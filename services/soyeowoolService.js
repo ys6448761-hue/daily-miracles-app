@@ -135,6 +135,10 @@ const PLACE_IDENTITY_KO = {
   yeosu_expo_park:     '여수세계박람회가 열렸던 공원이에요. 넓은 야외 공간에서 산책과 다양한 이벤트를 즐길 수 있어요.',
 };
 
+// ── CURRENT_PLACE_KO: Korean name for known Living Detail places ──────────────
+// Used by V0.1 place-aware SOUL message framing (DISCOVERY context).
+const CURRENT_PLACE_KO = { cablecar: '케이블카', odongdo: '오동도', hyangiram: '향일암' };
+
 // ── Prepared Knowledge (PU) — static constants for Judgment V0.1 ──────────────
 // Source: docs/research/SOUL_YEOSU_3_PLACE_PREPARATION_UNITS_V0_1.md
 // These encode ONLY facts from PREPARED/VERIFIED corpus. Do not expand without authorization.
@@ -952,7 +956,7 @@ function _generateClarificationMessage(soulContext, message, journeyCtx) {
   return '여수 여행을 더 잘 도와드릴 수 있도록, 어떤 여행을 계획하고 계신지 말씀해 주세요.';
 }
 
-function _generateSoulMessage(soulContext, status, message, quoteCtx) {
+function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPlaceCode = null) {
   const provenance = soulContext._provenance || {};
   const pt = soulContext.people_type;
   const timeMinutes = soulContext.time_available_minutes;
@@ -1058,11 +1062,16 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx) {
   }
 
   // SUCCESS — second line based on companion + situation
+  // V0.1: Place-aware Discovery framing — acknowledge transition from current Living Detail page.
+  const curPlaceName = currentPlaceCode ? (CURRENT_PLACE_KO[currentPlaceCode] || null) : null;
+  const isDiscovery  = _isDiscoveryIntent(message);
   let secondLine;
   if (mobilityConstraint === 'low_walking') {
     secondLine = '걷기 부담이 적은 곳으로 골라봤는데, 보행 난이도 정보가 없어 방문 전 확인을 권장해요.';
   } else if (pt === 'family_elderly') {
-    secondLine = '이동 부담이 적은 곳으로 골라봤어요.';
+    secondLine = curPlaceName && isDiscovery
+      ? `${curPlaceName} 다음으로, 이동 부담이 적은 곳을 골라봤어요.`
+      : '이동 부담이 적은 곳으로 골라봤어요.';
   } else if (pref === 'photo') {
     const countNote = requestedCount ? `${requestedCount}곳 ` : '';
     secondLine = `사진 잘 나오는 ${countNote}뷰 포인트를 골라봤어요.`;
@@ -1071,7 +1080,9 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx) {
   } else if (timeOfDay === 'night' || timeOfDay === 'evening') {
     secondLine = '지금 가도 분위기 좋은 곳으로 골라봤어요.';
   } else {
-    secondLine = '이동 시간까지 생각해서 편하게 갈 수 있는 곳으로 골라봐요.';
+    secondLine = curPlaceName && isDiscovery
+      ? `${curPlaceName} 다음으로 갈 곳을 골라봤어요.`
+      : '이동 시간까지 생각해서 편하게 갈 수 있는 곳으로 골라봐요.';
   }
 
   return `${situationLine}\n${secondLine}`;
@@ -1628,6 +1639,12 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   // D5 DOMAIN CONTEXT + DOMAIN_FALLBACK labeling
   const baseDomainContext = _buildDomainContext(enrichedSoulContext, sessionId, hotelId);
 
+  // V0.1: Place-aware Discovery — exclude current Living Detail place from recommendations.
+  // Prevents SOUL from recommending the place the traveler is already viewing.
+  if (explicit_context.place_code && !baseDomainContext.exclude_place_ids.includes(explicit_context.place_code)) {
+    baseDomainContext.exclude_place_ids = [...baseDomainContext.exclude_place_ids, explicit_context.place_code];
+  }
+
   // V0.2: Supplement domain context with minimum Shared Journey signals
   // EXPERIENCED items are NEVER added to exclude_place_ids
   const domainContext = _supplementDomainFromSharedJourney(baseDomainContext, sharedJourney);
@@ -1737,7 +1754,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   const status = _deriveStatus(tgResult, domainContext);
 
   // D7 SOUL MESSAGE
-  const soulMessage = _generateSoulMessage(enrichedSoulContext, status, message, quoteCtx);
+  const soulMessage = _generateSoulMessage(enrichedSoulContext, status, message, quoteCtx, explicit_context.place_code || null);
 
   // WHY DETAILS
   const whyDetails = _buildWhyDetails(tgResult, domainContext);

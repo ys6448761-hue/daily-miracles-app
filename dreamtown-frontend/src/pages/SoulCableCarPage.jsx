@@ -819,12 +819,15 @@ export default function SoulCableCarPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [soulMessage, setSoulMessage] = useState(null);
   const [soulResponse, setSoulResponse] = useState(null);
+  // V0.1: navPlaceCode — override to navigate to a Living Detail from SOUL Discovery results.
+  // Resets on each new user submission. Persists across response turns for smooth navigation.
+  const [navPlaceCode, setNavPlaceCode] = useState(null);
 
   const isPlaceKnowledge =
     soulResponse?.presentation_mode === 'PLACE_KNOWLEDGE' &&
     soulResponse?.status === 'PLACE_LOOKUP' &&
     soulResponse?.resolved_code != null;
-  const placeCode = isPlaceKnowledge ? soulResponse.resolved_code : 'cablecar';
+  const placeCode = navPlaceCode || (isPlaceKnowledge ? soulResponse.resolved_code : 'cablecar');
   const placeData = isPlaceKnowledge ? (soulResponse.places?.[0] ?? null) : null;
   const isCableCarView  = placeCode === 'cablecar';
   const isOdongdoView   = placeCode === 'odongdo';
@@ -876,12 +879,15 @@ export default function SoulCableCarPage() {
     // Gap B — UI-001 explicit_context wiring
     // Chip state → explicit_context (advisory, not commanding)
     // Rules: chip does NOT auto-submit, does NOT fabricate sentences, text place alias wins
-    // place_code NOT sent from chips — text-driven place recognition takes precedence
+    // V0.1: place_code sent as page-context signal (NOT chip-driven place lookup).
+    // Backend uses this to: exclude current place from Discovery + context-aware message framing.
     const explicit_context = {};
+    explicit_context.place_code = placeCode; // current Living Detail page context
     if (updated.hasVehicle) explicit_context.has_car = true;
     if (updated.companion === 'parents') explicit_context.people_type = 'family_elderly';
     else if (updated.companion === 'family') explicit_context.people_type = 'family_with_kids';
 
+    setNavPlaceCode(null); // Reset Living Detail navigation override on new query
     setIsLoading(true);
     setSoulMessage(null);
     try {
@@ -1025,6 +1031,34 @@ export default function SoulCableCarPage() {
             <p className="text-sm text-white leading-relaxed">{soulMessage}</p>
           </Card>
         )}
+
+        {/* ── LIVING DETAIL NAVIGATION (V0.1) ─────────────────────────────────────
+             When SOUL Discovery response includes places with a Living Detail page,
+             show navigation buttons. Clicking switches the Living Detail view below.
+             Resets on next user query. No new chat UI — additive to existing response.
+        ────────────────────────────────────────────────────────────────────────── */}
+        {soulResponse?.presentation_mode === 'DISCOVERING' && (() => {
+          const DETAIL_NAMES = { cablecar: '여수해상케이블카', odongdo: '오동도', hyangiram: '향일암' };
+          const detailPlaces = (soulResponse.places || []).filter(p => DETAIL_NAMES[p.code]);
+          if (detailPlaces.length === 0) return null;
+          return (
+            <Card>
+              <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">장소 자세히 보기</p>
+              <div className="space-y-2">
+                {detailPlaces.map(p => (
+                  <button
+                    key={p.code}
+                    onClick={() => setNavPlaceCode(p.code)}
+                    className="w-full text-left px-3 py-2.5 rounded-xl bg-white bg-opacity-5 hover:bg-opacity-10 transition-colors"
+                  >
+                    <span className="text-sm text-white font-medium">{DETAIL_NAMES[p.code]}</span>
+                    <span className="text-xs text-white opacity-40 ml-2">자세히 보기 →</span>
+                  </button>
+                ))}
+              </div>
+            </Card>
+          );
+        })()}
 
         {/* ── PLACE HERO ── */}
         <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '200px' }}>
