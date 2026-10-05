@@ -59,6 +59,38 @@ function getOdongdoVariantKey(ctx) {
   return 'default';
 }
 
+// ── Hyangiram judgment texts ─────────────────────────────────────────────────
+// Source: physical_difficulty=high (BATCH_01 CONFIRMED), suitable_for=[family,elderly,kids_ok,pilgrimage]
+// emotion=serenity, tags=[dawn,faith,historical]. Two paths known (Prepared Knowledge — no path names verified).
+// Route Corpus: 향일암→케이블카 occurrence=3 (OFFICIAL×1, WEB×1). avg_stay=90 (seed).
+// NOT covered: exact step count, fixed climb time, accessibility claims, specific path names.
+const HYANGIRAM_SOUL_DISCOVERY = {
+  default:
+    '향일암은 누구와 어떤 길로 어디까지 올라갈지를 먼저 생각하면 더 좋은 곳이에요. 올라가는 길이 두 가지라, 같은 향일암이라도 선택에 따라 경험이 달라져요.',
+  parents:
+    '향일암은 체력과 페이스가 먼저예요. 올라가는 길이 두 가지라 경사 차이가 있어요. 어디까지 갈지는 올라가면서 현장에서 함께 조율해도 돼요.',
+  family:
+    '향일암은 아이들과 함께라면 어디까지 올라갈지를 미리 이야기하고 가는 게 좋아요. 올라가는 길 선택이 경험의 크기를 결정해요.',
+  vehicle:
+    '차로 오신다면 공영주차장에서 출발하게 돼요. 오르기 전 주차 상황과 시간 여유를 먼저 확인하는 걸 권장해요.',
+};
+
+// ── Hyangiram FOR ME texts ────────────────────────────────────────────────────
+// NOT included: accessibility claims, stroller/wheelchair totals — NOT verified by Phoenix
+const HYANGIRAM_FOR_ME = {
+  parents: '오르는 길 선택과 페이스 조절이 중요해요. 중간에 쉬어가며 어디까지 갈지는 현장에서 정해도 돼요.',
+  family:  '아이 체력을 기준으로 어디까지 올라갈지 미리 이야기하고 가세요.',
+  vehicle: '공영주차장 2시간 무료. 오르는 시간을 고려해 여유 있게 주차하세요.',
+};
+
+// ── Hyangiram variant key ─────────────────────────────────────────────────────
+function getHyangiramVariantKey(ctx) {
+  if (ctx.companion === 'parents') return 'parents';
+  if (ctx.companion === 'family') return 'family';
+  if (ctx.hasVehicle) return 'vehicle';
+  return 'default';
+}
+
 // ── Canonical judgment texts (8 context variants) ────────────────────────────
 const SOUL_DISCOVERY = {
   default:
@@ -81,10 +113,10 @@ const SOUL_DISCOVERY = {
 
 // ── place hero asset map ──────────────────────────────────────────────────────
 // Source: C:\DREAM TOWN\Assets\SOUL\{Place}\Place_Hero\ (Founder-designated SOUL assets)
-// Hyangiram imported but not wired — connected when Hyangiram page ships.
 const PLACE_HERO_MAP = {
-  cablecar: '/images/soul/place-hero/cablecar.png',
-  odongdo:  '/images/soul/place-hero/odongdo.png',
+  cablecar:  '/images/soul/place-hero/cablecar.png',
+  odongdo:   '/images/soul/place-hero/odongdo.png',
+  hyangiram: '/images/soul/place-hero/hyangiram.png',
 };
 
 // ── FOR ME texts (7 context variants) ────────────────────────────────────────
@@ -526,6 +558,169 @@ function OdongdoNextJourney() {
 }
 
 // ── Odongdo Question Discovery ────────────────────────────────────────────────
+// ── Hyangiram JourneyFlow ─────────────────────────────────────────────────────
+// Source: physical_difficulty=high (BATCH_01), seed outdoor, Route Corpus FULL_DAY.
+// Two paths: gently-sloped vs steeper — Prepared Knowledge. NO path names verified.
+// NOT claimed: exact step count, fixed climb time, complete accessibility, path names
+function HyangiramJourneyFlow({ ctx }) {
+  const hasParents = ctx.companion === 'parents';
+  const hasFamily  = ctx.companion === 'family';
+  const hasVehicle = ctx.hasVehicle;
+
+  const journeyNotes = hasParents
+    ? '페이스를 낮추고 중간에 쉬어가며 올라가세요. 어디까지 갈지는 현장에서 조율해도 돼요.'
+    : hasFamily
+    ? '아이와 함께라면 중간 쉬는 지점을 미리 이야기해두면 좋아요.'
+    : hasVehicle
+    ? '공영주차장 2시간 무료. 오르는 시간을 고려해 여유 있게 주차하세요.'
+    : '오르는 길 선택이 먼저예요. 한 방향으로 오르고 다른 방향으로 내려오는 방법도 있어요.';
+
+  const steps = [
+    {
+      label: hasVehicle ? '🅿️ 도착 — 공영주차장' : '🚶 도착 — 현장',
+      note: hasVehicle ? '공영주차장 2시간 무료 (현장 혼잡 확인 권장)' : null,
+    },
+    {
+      label: '🗺️ 길 선택',
+      note: '두 경로 있음 — 경사 차이가 있어요. 체력과 동행자 상황에 맞게 선택하세요.',
+    },
+    {
+      label: '⛰️ 오르기',
+      note: journeyNotes,
+    },
+    {
+      label: '🏛️ 향일암 경험',
+      note: '절벽 암자 · 바위 통로 · 높은 곳의 바다 전망',
+    },
+    {
+      label: '↩ 내려오기',
+      note: '올라온 길 또는 다른 경로로 내려갈 수 있어요. 하산 체력을 남겨두세요.',
+    },
+  ];
+
+  return (
+    <div className="space-y-2">
+      {steps.map((s, i) => (
+        <div key={i} className="flex gap-3">
+          <div className="flex flex-col items-center">
+            <div className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ background: 'rgba(155,135,245,0.7)' }} />
+            {i < steps.length - 1 && <div className="w-px flex-1 mt-1" style={{ background: 'rgba(155,135,245,0.2)', minHeight: '16px' }} />}
+          </div>
+          <div className="pb-2">
+            <p className="text-sm text-white font-medium">{s.label}</p>
+            {s.note && <p className="text-xs text-white opacity-50 mt-0.5">{s.note}</p>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Hyangiram NextJourney ─────────────────────────────────────────────────────
+// Source: Route Corpus 향일암→케이블카 occurrence=3 (OFFICIAL×1, WEB×1, R035/R036/R038)
+// NO verified travel time → 이동시간 숫자 없음
+// NOT claimed: fixed next place, "무조건 케이블카"
+function HyangiramNextJourney({ ctx }) {
+  return (
+    <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+      <p className="text-xs text-white opacity-40 mb-2 uppercase tracking-wider">하산 후 — 체력에 따라</p>
+      <div className="space-y-2 text-sm text-white">
+        <div>
+          <span className="opacity-60">여유 있음</span>
+          <span className="ml-2 opacity-80">여수해상케이블카 · 오동도 방향 (코스 연계 자주 등장)</span>
+        </div>
+        <div>
+          <span className="opacity-60">조금 지침</span>
+          <span className="ml-2 opacity-80">식사 · 카페 등 앉아서 쉬는 장소 먼저</span>
+        </div>
+        <div>
+          <span className="opacity-60">많이 지침</span>
+          <span className="ml-2 opacity-80">숙소 또는 가벼운 일정으로 전환 권장</span>
+        </div>
+      </div>
+      <p className="text-xs text-white opacity-25 mt-2">이동시간은 교통·출발지에 따라 달라요 — 현장 확인 권장</p>
+    </div>
+  );
+}
+
+// ── Hyangiram QuestionDiscovery ───────────────────────────────────────────────
+// Source: BATCH_01 (hours=04:00~19:00), physical_difficulty=high, two paths (Prepared Knowledge)
+// NOT claimed: exact step count, complete accessibility, fixed sunrise time
+function HyangiramQuestionDiscovery({ ctx }) {
+  const [openKeys, setOpenKeys] = useState(new Set());
+  function toggle(key) {
+    setOpenKeys(prev => {
+      const next = new Set(prev);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+  }
+
+  const hasParents = ctx.companion === 'parents';
+  const hasFamily  = ctx.companion === 'family';
+
+  const items = [
+    hasParents && {
+      key: 'parents',
+      icon: '👴',
+      q: '부모님과 함께라면 어디까지 올라가면 좋아요?',
+      a: '나이보다는 평소 계단·오르막 걷는 상태가 더 중요해요. 올라가는 길이 두 가지라 경사 차이가 있어요. 중간에 쉬어가며 어디까지 갈지는 현장에서 함께 조율하는 게 좋아요.',
+    },
+    hasFamily && {
+      key: 'family',
+      icon: '👶',
+      q: '아이들과 함께 올라갈 수 있어요?',
+      a: '아이들과 함께 올라갈 수 있어요. 오르는 길이 계단이 많아요. 아이 체력과 페이스를 기준으로 어디까지 갈지 미리 이야기하고 가는 걸 권장해요.',
+    },
+    {
+      key: 'paths',
+      icon: '🗺️',
+      q: '올라가는 길이 두 가지라고 들었어요',
+      a: '두 경로 모두 올라갈 수 있어요. 한 쪽은 더 가파르고, 다른 쪽은 상대적으로 완만해요. 두 길로 각각 오르고 내리는 방법도 있어요. 완만한 길도 계단이 없지는 않아요.',
+    },
+    {
+      key: 'hours',
+      icon: '🕐',
+      q: '몇 시부터 입장할 수 있어요?',
+      a: '입장시간은 04:00~19:00예요. 일출 시간대에는 04:00부터 입장이 가능해요. 현장 변동이 있을 수 있어 방문 전 확인을 권장해요.',
+    },
+    {
+      key: 'sunrise',
+      icon: '🌅',
+      q: '일출 보러 가려면 어떻게 해야 해요?',
+      a: '향일암은 일출 명소로 알려진 곳이에요. 새벽 04:00부터 입장이 가능해요. 일출 시즌에는 방문객이 많아 이른 도착을 권장해요. 정확한 일출 시간은 날짜에 따라 다릅니다.',
+    },
+    {
+      key: 'next',
+      icon: '➡️',
+      q: '향일암 다음엔 어디가 좋아요?',
+      a: '향일암 다음으로 여수해상케이블카를 연결하는 경로가 여러 코스에서 자주 나와요. 하산 후 체력과 남은 시간에 따라 정하는 게 좋아요. 이동시간은 교통 방법에 따라 달라요.',
+    },
+  ].filter(Boolean);
+
+  return (
+    <div className="space-y-2">
+      {items.map(item => (
+        <div key={item.key} className="rounded-xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
+          <button
+            onClick={() => toggle(item.key)}
+            className="w-full text-left px-4 py-3 flex items-start gap-2"
+          >
+            <span className="text-base flex-shrink-0">{item.icon}</span>
+            <span className="text-sm text-white opacity-80 leading-snug">{item.q}</span>
+            <span className="ml-auto text-white opacity-30 text-xs flex-shrink-0">{openKeys.has(item.key) ? '▲' : '▼'}</span>
+          </button>
+          {openKeys.has(item.key) && (
+            <div className="px-4 pb-3">
+              <p className="text-sm text-white opacity-60 leading-relaxed">{item.a}</p>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // Source: itineraryService (동백열차), Route Corpus R033 (등대), SSOT YS01 (바다), Route patterns
 // NOT claimed: specific durations, fountain facts, bamboo facts, exact bloom month
 function OdongdoQuestionDiscovery({ ctx }) {
@@ -631,8 +826,9 @@ export default function SoulCableCarPage() {
     soulResponse?.resolved_code != null;
   const placeCode = isPlaceKnowledge ? soulResponse.resolved_code : 'cablecar';
   const placeData = isPlaceKnowledge ? (soulResponse.places?.[0] ?? null) : null;
-  const isCableCarView = placeCode === 'cablecar';
-  const isOdongdoView  = placeCode === 'odongdo';
+  const isCableCarView  = placeCode === 'cablecar';
+  const isOdongdoView   = placeCode === 'odongdo';
+  const isHyangiramView = placeCode === 'hyangiram';
   const heroSrc = PLACE_HERO_MAP[placeCode] ?? null;
 
   const hasContext =
@@ -648,8 +844,9 @@ export default function SoulCableCarPage() {
     ? 1
     : 0;
 
-  const soulVariantKey     = getSoulVariantKey(travelerContext);
-  const odongdoVariantKey  = getOdongdoVariantKey(travelerContext);
+  const soulVariantKey      = getSoulVariantKey(travelerContext);
+  const odongdoVariantKey   = getOdongdoVariantKey(travelerContext);
+  const hyangiramVariantKey = getHyangiramVariantKey(travelerContext);
 
   const prevJourneyNote =
     travelerContext.companion === 'parents'
@@ -664,6 +861,8 @@ export default function SoulCableCarPage() {
 
   const primaryDiscovery = isOdongdoView
     ? (ODONGDO_SOUL_DISCOVERY[odongdoVariantKey] ?? ODONGDO_SOUL_DISCOVERY.default)
+    : isHyangiramView
+    ? (HYANGIRAM_SOUL_DISCOVERY[hyangiramVariantKey] ?? HYANGIRAM_SOUL_DISCOVERY.default)
     : (SOUL_DISCOVERY[soulVariantKey] ?? SOUL_DISCOVERY.default);
 
   async function handleSubmit(e) {
@@ -732,7 +931,7 @@ export default function SoulCableCarPage() {
             ← 뒤로
           </button>
           <h1 className="text-sm font-semibold text-white truncate mx-2">
-            {isCableCarView ? '여수해상케이블카' : isOdongdoView ? '오동도' : (placeData?.name_ko || '여수해상케이블카')}
+            {isCableCarView ? '여수해상케이블카' : isOdongdoView ? '오동도' : isHyangiramView ? '향일암' : (placeData?.name_ko || '여수해상케이블카')}
           </h1>
           <div className="flex items-center gap-3 text-white opacity-40 text-sm">
             <span title="저장">🔖</span>
@@ -750,7 +949,7 @@ export default function SoulCableCarPage() {
               ref={inputRef}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder={isOdongdoView ? '오동도에 대해 뭐든 물어보세요' : '케이블카에 대해 뭐든 물어보세요'}
+              placeholder={isOdongdoView ? '오동도에 대해 뭐든 물어보세요' : isHyangiramView ? '향일암에 대해 뭐든 물어보세요' : '케이블카에 대해 뭐든 물어보세요'}
               className="flex-1 bg-transparent text-white placeholder-white placeholder-opacity-40 text-sm outline-none"
             />
             <button
@@ -857,7 +1056,7 @@ export default function SoulCableCarPage() {
                 {isCableCarView ? '여수 · 해상 케이블카' : ('여수 · ' + (placeData?.name_ko || ''))}
               </p>
               <h2 className="text-2xl font-bold text-white leading-tight">
-                {isCableCarView ? '여수해상케이블카' : isOdongdoView ? '오동도' : (placeData?.name_ko || '')}
+                {isCableCarView ? '여수해상케이블카' : isOdongdoView ? '오동도' : isHyangiramView ? '향일암' : (placeData?.name_ko || '')}
               </h2>
               {isCableCarView && (
                 <p className="text-sm text-white opacity-60 mt-1">
@@ -867,6 +1066,11 @@ export default function SoulCableCarPage() {
               {isOdongdoView && (
                 <p className="text-sm text-white opacity-60 mt-1">
                   방파제 끝에서 만나는 섬 · 바다와 동백의 여수
+                </p>
+              )}
+              {isHyangiramView && (
+                <p className="text-sm text-white opacity-60 mt-1">
+                  절벽 위의 암자 · 바다와 빛의 여수
                 </p>
               )}
             </div>
@@ -880,7 +1084,18 @@ export default function SoulCableCarPage() {
         {/* Other places: PlaceBasicInfo V0.2 formatter logic + FactRow (null-tolerant). */}
         <Card>
           <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">알아야 할 것</p>
-          {isOdongdoView ? (
+          {isHyangiramView ? (
+            // Hyangiram curated — BATCH_01 verified: admission=무료, hours=04:00~19:00,
+            //   physical_difficulty=high, parking=공영주차장 2시간 무료. Seed: outdoor.
+            // NOT shown: exact step count, fixed climb time, accessibility totals (not verified)
+            // Advisory on hours/admission: official transition date 재확인 권장 (BATCH_01 note)
+            <>
+              <FactRow label="환경" value="야외 / 산 암자" note="오르는 길 포함 — 계단 많음" />
+              <FactRow label="입장" value="무료" note="현장 재확인 권장" />
+              <FactRow label="입장시간" value="04:00~19:00" note="현장 확인 권장 · 일출 시 이른 도착 권장" />
+              <FactRow label="주차" value="공영주차장 2시간 무료" note="혼잡 시 확인 권장" />
+            </>
+          ) : isOdongdoView ? (
             // Odongdo curated — only Seed ORIGIN data + itineraryService/Route Corpus knowledge
             // NOT shown: admission_fee (unverified), opening_hours (unverified),
             //            avg_stay (CONFLICT 120↔30~60min), physical_difficulty (NULL)
@@ -926,6 +1141,145 @@ export default function SoulCableCarPage() {
             <p className="text-sm text-white opacity-50">현장에서 확인하세요.</p>
           )}
         </Card>
+
+        {/* ── HYANGIRAM: EXPERIENCE SUNRISE — 일출·빛 장소 정체성 ── */}
+        {/* Source: seed weather_suitable=['sunrise'], emotion_tags=['dawn','faith','historical'] */}
+        {/* Seed: ORIGIN-002. Route Corpus R037: 06:30 일출(선택). BATCH_01: 04:00 입장 확인. */}
+        {isHyangiramView && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '220px' }}>
+            <img
+              src="/images/soul/hyangiram/context-sunrise.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 40%' }}
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.45) 0%, transparent 55%)' }}
+            />
+            <div className="relative z-10 p-4 flex flex-col justify-end" style={{ minHeight: '220px' }}>
+              <div className="mt-auto">
+                <p className="text-xs text-white opacity-60">빛과 바다의 향일암</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── HYANGIRAM: FOR ME ── */}
+        {isHyangiramView && hyangiramVariantKey !== 'default' && HYANGIRAM_FOR_ME[hyangiramVariantKey] && (
+          <Card className="border-dream-purple border-opacity-30">
+            <p className="text-xs text-dream-purple font-semibold mb-2 uppercase tracking-wider">나에게 중요한 것</p>
+            <p className="text-sm text-white leading-relaxed">{HYANGIRAM_FOR_ME[hyangiramVariantKey]}</p>
+          </Card>
+        )}
+
+        {/* ── HYANGIRAM: CONTEXT PARENTS REST — 부모님/어르신 동행 시각 지지 ── */}
+        {/* Source: suitable_for=['elderly'], seed ORIGIN-002, physical_difficulty=high (BATCH_01) */}
+        {/* NOT a claim of full accessibility — shows rest/pause context only */}
+        {isHyangiramView && hasParents && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '180px' }}>
+            <img
+              src="/images/soul/hyangiram/context-parents-rest.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.20) 0%, transparent 40%)' }}
+            />
+          </div>
+        )}
+
+        {/* ── HYANGIRAM: EXPERIENCE LIGHT STEPS — 오르는 길 경험 ── */}
+        {/* Source: physical_difficulty=high (BATCH_01), seed outdoor, Route Corpus FULL_DAY experience */}
+        {isHyangiramView && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '200px' }}>
+            <img
+              src="/images/soul/hyangiram/experience-light-steps.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.18) 0%, transparent 40%)' }}
+            />
+          </div>
+        )}
+
+        {/* ── HYANGIRAM: EXPERIENCE JOURNEY — 도착→길선택→오르기→향일암→내려오기 ── */}
+        {isHyangiramView && (
+          <Card>
+            <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">
+              SOUL이 보는 내 여행
+            </p>
+            <HyangiramJourneyFlow ctx={travelerContext} />
+            <HyangiramNextJourney ctx={travelerContext} />
+          </Card>
+        )}
+
+        {/* ── HYANGIRAM: EXPERIENCE ROCK PASSAGE — 돌문/바위 통로 진입 경험 ── */}
+        {/* Source: Phoenix directive "돌문/진입 경험" as Experience Reward */}
+        {isHyangiramView && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '200px' }}>
+            <img
+              src="/images/soul/hyangiram/experience-rock-passage.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 50%' }}
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.18) 0%, transparent 40%)' }}
+            />
+          </div>
+        )}
+
+        {/* ── HYANGIRAM: EXPERIENCE SEA VIEW — 높은 곳의 바다 전망 ── */}
+        {/* Source: Phoenix directive "바다", "높은 곳에서의 시야". seed emotion=serenity */}
+        {isHyangiramView && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '220px' }}>
+            <img
+              src="/images/soul/hyangiram/experience-sea-view.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 40%' }}
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.18) 0%, transparent 40%)' }}
+            />
+          </div>
+        )}
+
+        {/* ── HYANGIRAM: Question Discovery ── */}
+        {isHyangiramView && (
+          <div>
+            <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">더 알고 싶을 때</p>
+            <HyangiramQuestionDiscovery ctx={travelerContext} />
+          </div>
+        )}
+
+        {/* ── HYANGIRAM: Wish Scene — 바다+빛 감정 마무리 ── */}
+        {/* Source: SOUL_HYANGIRAM_WISH_SCENE_SEA_LIGHT_V01.png (Founder asset). stateIndex>=1 */}
+        {stateIndex >= 1 && isHyangiramView && (
+          <div className="rounded-2xl overflow-hidden relative mt-2" style={{ minHeight: '260px' }}>
+            <img
+              src="/images/soul/hyangiram/wish-scene.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.22) 0%, transparent 45%)' }}
+            />
+          </div>
+        )}
 
         {/* ── ODONGDO: EXPERIENCE CAMELLIA — 동백꽃 섬 정체성 ── */}
         {/* Source: dtArtifactWorker keywords, itineraryService "동백꽃", SSOT YS01 */}
