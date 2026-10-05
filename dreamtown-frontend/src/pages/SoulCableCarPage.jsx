@@ -249,13 +249,24 @@ function SoulAnswerSummary({ response }) {
     }
   }
 
+  // Copy hierarchy: first sentence = conclusion, rest = short Why
+  const lines = response.message_ko.split('\n');
+  const firstLine = lines[0] || '';
+  const sentenceEnd = firstLine.search(/[.!?。]\s*/);
+  const firstSentence = sentenceEnd >= 0 ? firstLine.slice(0, sentenceEnd + 1) : firstLine;
+  const restOfFirst = sentenceEnd >= 0 ? firstLine.slice(sentenceEnd + 1).trim() : '';
+  const restLines = [restOfFirst, ...lines.slice(1)].filter(Boolean).join('\n');
+
   const keyPoints = (response.why_details?.[0]?.place_features || []).slice(0, 3);
   const nextAction = response.next_options?.[0] || null;
 
   return (
     <Card>
       <p className="text-xs text-dream-purple font-semibold mb-2 uppercase tracking-wider">SOUL의 답</p>
-      <p className="text-sm text-white leading-relaxed whitespace-pre-line">{response.message_ko}</p>
+      <p className="text-sm font-medium text-white leading-snug">{firstSentence}</p>
+      {restLines && (
+        <p className="text-sm text-white opacity-70 leading-relaxed mt-1 whitespace-pre-line">{restLines}</p>
+      )}
       {badge && (
         <span className={`inline-block mt-2 text-xs px-2.5 py-1 rounded-full font-medium border ${badge.cls}`}>
           {badge.label}
@@ -859,6 +870,7 @@ function OdongdoQuestionDiscovery({ ctx }) {
 export default function SoulCableCarPage() {
   const navigate = useNavigate();
   const inputRef = useRef(null);
+  const summaryRef = useRef(null);
 
   const [travelerContext, setTravelerContext] = useState({
     hasVehicle: false,
@@ -967,6 +979,8 @@ export default function SoulCableCarPage() {
       if (data.session_id) setSessionId(data.session_id);
       setSoulResponse(data);
       if (data.message_ko) setSoulMessage(data.message_ko);
+      // Scroll Summary into view so user sees QUESTION → ANSWER without manual scroll
+      setTimeout(() => summaryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
     } catch (err) {
       setSoulMessage(err.message || '일정을 확인하는 중 문제가 생겼어요. 다시 시도해주세요.');
     } finally {
@@ -1076,18 +1090,20 @@ export default function SoulCableCarPage() {
         </Card>
 
         {/* ── SOUL ANSWER SUMMARY (V0.1) ── */}
-        {/* Success: structured summary. Error (no soulResponse): plain message card. */}
-        {soulResponse
-          ? <SoulAnswerSummary response={soulResponse} />
-          : soulMessage
-          ? (
-            <Card>
-              <p className="text-xs text-dream-purple font-semibold mb-2 uppercase tracking-wider">안내</p>
-              <p className="text-sm text-white leading-relaxed">{soulMessage}</p>
-            </Card>
-          )
-          : null
-        }
+        {/* Directly below input. Scroll target after response. Success: structured summary. Error: plain card. */}
+        <div ref={summaryRef}>
+          {soulResponse
+            ? <SoulAnswerSummary response={soulResponse} />
+            : soulMessage
+            ? (
+              <Card>
+                <p className="text-xs text-dream-purple font-semibold mb-2 uppercase tracking-wider">안내</p>
+                <p className="text-sm text-white leading-relaxed">{soulMessage}</p>
+              </Card>
+            )
+            : null
+          }
+        </div>
 
         {/* ── LIVING DETAIL NAVIGATION (V0.1) ─────────────────────────────────────
              When SOUL Discovery response includes places with a Living Detail page,
