@@ -568,7 +568,7 @@ function OdongdoQuestionDiscovery({ ctx }) {
       key: 'walking',
       icon: '🚶',
       q: '걸어서 섬을 돌아볼 수 있어요?',
-      a: '방파제 길을 포함해 섬 전체를 도보로 돌아볼 수 있어요. 여유 있게 계획하는 것을 권장해요.',
+      a: '방파제 길과 섬 안쪽을 도보로 돌아볼 수 있어요. 여유 있게 계획하는 것을 권장해요.',
     },
     {
       key: 'next_place',
@@ -875,10 +875,22 @@ export default function SoulCableCarPage() {
 
         {/* ── ESSENTIAL INFO ── */}
         {/* Cable car: prepared static facts (DB data incomplete — known, deliberate).  */}
+        {/* Odongdo: curated verified facts only — DB fields (admission/hours/difficulty/parking)    */}
+        {/*          are NULL or unverified; generic formatter would expose unverified runtime data. */}
         {/* Other places: PlaceBasicInfo V0.2 formatter logic + FactRow (null-tolerant). */}
         <Card>
           <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">알아야 할 것</p>
-          {isCableCarView ? (
+          {isOdongdoView ? (
+            // Odongdo curated — only Seed ORIGIN data + itineraryService/Route Corpus knowledge
+            // NOT shown: admission_fee (unverified), opening_hours (unverified),
+            //            avg_stay (CONFLICT 120↔30~60min), physical_difficulty (NULL)
+            <>
+              <FactRow label="환경" value="야외" note="방파제 길 걷기 또는 동백열차로 섬 입장" />
+              <p className="text-xs text-white opacity-30 mt-2">
+                입장료·운영시간·주차는 방문 전 확인을 권장해요.
+              </p>
+            </>
+          ) : isCableCarView ? (
             <>
               <FactRow label="탑승 구조" value="자산(해야) ↔ 돌산(놀아)" note="양쪽 모두 발권·탑승 · 편도/왕복 가능" />
               <FactRow label="탑승시간" value="편도 약 13분 전후" note="현장 확인 권장" />
