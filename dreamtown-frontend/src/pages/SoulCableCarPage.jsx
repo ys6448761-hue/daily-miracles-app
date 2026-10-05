@@ -870,7 +870,6 @@ function OdongdoQuestionDiscovery({ ctx }) {
 export default function SoulCableCarPage() {
   const navigate = useNavigate();
   const inputRef = useRef(null);
-  const summaryRef = useRef(null);
 
   const [travelerContext, setTravelerContext] = useState({
     hasVehicle: false,
@@ -979,8 +978,6 @@ export default function SoulCableCarPage() {
       if (data.session_id) setSessionId(data.session_id);
       setSoulResponse(data);
       if (data.message_ko) setSoulMessage(data.message_ko);
-      // Scroll Summary into view so user sees QUESTION → ANSWER without manual scroll
-      setTimeout(() => summaryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
     } catch (err) {
       setSoulMessage(err.message || '일정을 확인하는 중 문제가 생겼어요. 다시 시도해주세요.');
     } finally {
@@ -1090,20 +1087,19 @@ export default function SoulCableCarPage() {
         </Card>
 
         {/* ── SOUL ANSWER SUMMARY (V0.1) ── */}
-        {/* Directly below input. Scroll target after response. Success: structured summary. Error: plain card. */}
-        <div ref={summaryRef}>
-          {soulResponse
-            ? <SoulAnswerSummary response={soulResponse} />
-            : soulMessage
-            ? (
-              <Card>
-                <p className="text-xs text-dream-purple font-semibold mb-2 uppercase tracking-wider">안내</p>
-                <p className="text-sm text-white leading-relaxed">{soulMessage}</p>
-              </Card>
-            )
-            : null
-          }
-        </div>
+        {/* Directly below input card, before Place Hero — normal document flow. */}
+        {/* Success: structured summary. Error (bootstrap/network fail): plain message card. */}
+        {soulResponse
+          ? <SoulAnswerSummary response={soulResponse} />
+          : soulMessage
+          ? (
+            <Card>
+              <p className="text-xs text-dream-purple font-semibold mb-2 uppercase tracking-wider">안내</p>
+              <p className="text-sm text-white leading-relaxed">{soulMessage}</p>
+            </Card>
+          )
+          : null
+        }
 
         {/* ── LIVING DETAIL NAVIGATION (V0.1) ─────────────────────────────────────
              When SOUL Discovery response includes places with a Living Detail page,
