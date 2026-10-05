@@ -68,7 +68,7 @@ const SUITABILITY_LOOKUP = /어때\??|어떤가요|은\?|는\?|이야\??|괜찮�
 
 // DISCOVERY overrides — when any of these appear, treat as DISCOVERY
 // even if a known place alias is present in the message
-const DISCOVERY_OVERRIDES = /근처|어디 갈|어디가 좋|갈만|가볼 만|추천해|뭐 할까|어디서|같이 갈|같이 어디|타고 싶|가고 싶|하고 싶|일정|비용|얼마|포함/;
+const DISCOVERY_OVERRIDES = /근처|어디 갈|어디가 좋|갈만|가볼 만|추천해|뭐 할까|뭐 하지|뭐하지|어디서|같이 갈|같이 어디|타고 싶|가고 싶|하고 싶|일정|비용|얼마|포함/;
 
 // Place-like noun suffixes — for unknown place detection
 const PLACE_SUFFIX_RE = /공원|시장|광장|대교|타워|암자|향일암|해변|마을|포차거리|케이블카|전망대|박물관|기념관|해수욕/;
@@ -870,8 +870,10 @@ function _isDiscoveryIntent(message) {
   if (/(추천해|추천해줘|추천해주|추천좀|추천 좀|알려줘|알려주세요|보여줘|보여주세요|찾아줘|찾아주세요)/.test(message)) return true;
   // Discovery question forms — "어디 갈까", "어디가 좋아", "갈 곳 뭐 있어?"
   if (/(어디 갈까|어디갈까|어디 가면|어디가면|어디가 좋|어디 가도|어디에 가|근처에 어디|어디 뭐|갈 곳 뭐|갈곳 뭐)/.test(message)) return true;
-  // Activity-seeking — "뭐 할까?" (post-plan discovery of what to do)
-  if (/(뭐 할까|뭐할까|무얼 할까|무엇을 할까)/.test(message)) return true;
+  // Activity-seeking — "뭐 할까?", "뭐 하지?" (post-visit next-step)
+  if (/(뭐 할까|뭐할까|무얼 할까|무엇을 할까|뭐 하지|뭐하지|무얼 하지)/.test(message)) return true;
+  // Post-visit directional — "그 다음 어디 가?", "어딜 가?"
+  if (/(어딜 가|어디 가\??$)/.test(message)) return true;
   // Discovery noun phrases — "갈 만한 곳", "가볼 만한 곳", "좋은 곳"
   if (/(갈 만한|갈만한|가볼 만한|가볼만한|좋은 곳|좋은곳|가봐야|가야 할 곳|볼 곳|볼곳)/.test(message)) return true;
   // Sightseeing intent
