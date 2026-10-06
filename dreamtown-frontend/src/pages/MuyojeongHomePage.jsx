@@ -1,15 +1,24 @@
 /**
- * SOUL 무여정 Main Home V1
+ * SOUL 무여정 Main Home V1.1
  * 여수맘 파일럿 + Founder Meeting용 프로덕션 홈
  *
  * Route: /muyojeong
  * SOUL runtime: POST /api/dt/travel/input/text (no place_code — traveler context only)
  *
+ * V1.1 changes (Founder/Lumi visual review revision):
+ *   - Overflow fix: no transform:scale; overflow-x:hidden; flex min-width:0 on input
+ *   - Visual: warm Yeosu evening harbor gradient, Yeosu Blue / Starlight Gold / Aqua Glow
+ *   - SOUL master: soul-master.png (copied from Founder Original — originals untouched)
+ *   - Chips: 2-column grid, 44px tap targets
+ *   - Place cards: per-place routing (/soul/cable-car?place=code)
+ *   - word-break: keep-all on all Korean text for correct mobile wrapping
+ *
+ * Asset paths:
+ *   SOUL master → public/images/soul/soul-master.png (Founder Original copy)
+ *   Home visual reference → public/images/soul/muyojeong-home-reference.png (Founder Original copy)
+ *
  * Constraints (Founder directive):
- *   - NO schema / migration / seed / new knowledge
- *   - NO FAQ / Dynamic FAQ / Commerce / booking / analytics
- *   - NO new recommendation engine
- *   - SOUL character asset not found → CSS wave decoration (do not substitute another rendition)
+ *   - NO schema / migration / seed / new knowledge / FAQ / Commerce / analytics
  *   - STOP after verification for Founder/Lumi Visual Review
  */
 
@@ -17,7 +26,14 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getOrEnsureGuestCredential } from '../api/dreamtown.js';
 
-// ── SOUL Answer Summary — local, same pattern as SoulCableCarPage ─────────────
+// ── Color tokens — from Founder Visual Reference ───────────────────────────────
+const C = {
+  yeosuBlue:    '#6EB8FF',
+  starlightGold: '#FFD67A',
+  aquaGlow:     '#B8F4FF',
+};
+
+// ── SOUL Answer Summary ────────────────────────────────────────────────────────
 function SoulAnswerSummary({ response, onNewQuestion }) {
   if (!response || !response.message_ko) return null;
 
@@ -35,32 +51,48 @@ function SoulAnswerSummary({ response, onNewQuestion }) {
     }
   }
 
-  const lines        = response.message_ko.split('\n');
-  const firstLine    = lines[0] || '';
-  const sentenceEnd  = firstLine.search(/[.!?。]\s*/);
+  const lines         = response.message_ko.split('\n');
+  const firstLine     = lines[0] || '';
+  const sentenceEnd   = firstLine.search(/[.!?。]\s*/);
   const firstSentence = sentenceEnd >= 0 ? firstLine.slice(0, sentenceEnd + 1) : firstLine;
-  const restOfFirst  = sentenceEnd >= 0 ? firstLine.slice(sentenceEnd + 1).trim() : '';
-  const restLines    = [restOfFirst, ...lines.slice(1)].filter(Boolean).join('\n');
+  const restOfFirst   = sentenceEnd >= 0 ? firstLine.slice(sentenceEnd + 1).trim() : '';
+  const restLines     = [restOfFirst, ...lines.slice(1)].filter(Boolean).join('\n');
 
   const keyPoints  = (response.why_details?.[0]?.place_features || []).slice(0, 3);
   const nextAction = response.next_options?.[0] || null;
 
   return (
-    <div className="rounded-2xl bg-white bg-opacity-5 border border-white border-opacity-10 p-4">
+    <div
+      className="rounded-2xl p-4"
+      style={{
+        background: 'rgba(110,184,255,0.07)',
+        border:     `1px solid rgba(110,184,255,0.22)`,
+        boxShadow:  '0 2px 16px rgba(110,184,255,0.06)',
+      }}
+    >
       <div className="flex items-center justify-between mb-2">
-        <p className="text-xs text-cyan-400 font-semibold uppercase tracking-wider">SOUL의 답</p>
+        <p style={{ fontSize: '0.6875rem', color: C.yeosuBlue, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+          SOUL의 답
+        </p>
         {onNewQuestion && (
           <button
             onClick={onNewQuestion}
-            className="text-xs text-white opacity-30 hover:opacity-60 transition-opacity"
+            style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)', cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
           >
             다시 물어보기
           </button>
         )}
       </div>
-      <p className="text-sm font-medium text-white leading-snug">{firstSentence}</p>
+      <p className="text-white font-medium leading-snug" style={{ fontSize: '0.9375rem', wordBreak: 'keep-all' }}>
+        {firstSentence}
+      </p>
       {restLines && (
-        <p className="text-sm text-white opacity-70 leading-relaxed mt-1 whitespace-pre-line">{restLines}</p>
+        <p
+          className="text-white leading-relaxed mt-1 whitespace-pre-line"
+          style={{ fontSize: '0.875rem', opacity: 0.7, wordBreak: 'keep-all' }}
+        >
+          {restLines}
+        </p>
       )}
       {badge && (
         <span className={`inline-block mt-2 text-xs px-2.5 py-1 rounded-full font-medium border ${badge.cls}`}>
@@ -70,23 +102,23 @@ function SoulAnswerSummary({ response, onNewQuestion }) {
       {keyPoints.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mt-3">
           {keyPoints.map((pt, i) => (
-            <span key={i} className="text-xs px-2 py-1 rounded-full bg-white bg-opacity-10 text-white opacity-70">
+            <span key={i} style={{ fontSize: '0.75rem', padding: '2px 10px', borderRadius: '20px', background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}>
               {pt}
             </span>
           ))}
         </div>
       )}
       {nextAction && (
-        <div className="mt-3 pt-3 border-t border-white border-opacity-10">
-          <p className="text-xs text-white opacity-40 mb-1">다음에 알려주세요</p>
-          <p className="text-xs text-white opacity-70 leading-snug">{nextAction}</p>
+        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+          <p style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.38)', marginBottom: '4px' }}>다음에 알려주세요</p>
+          <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.68)', lineHeight: 1.5, wordBreak: 'keep-all' }}>{nextAction}</p>
         </div>
       )}
     </div>
   );
 }
 
-// ── Suggestion chips — 4 canonical pilot queries ───────────────────────────────
+// ── Suggestion chips — Founder directive canonical 4, 2-col grid ──────────────
 const SUGGESTION_CHIPS = [
   '부모님과 어디 가면 좋을까?',
   '아이와 오늘 어디 가지?',
@@ -94,30 +126,29 @@ const SUGGESTION_CHIPS = [
   '비 오면 어디 가면 좋아?',
 ];
 
-// ── Place entries — existing Living Detail, reuse existing hero assets ──────────
-// Label: "SOUL과 먼저 둘러보기" — NOT "TOP 3" / "Best 3"
-// Navigation: all route to /soul/cable-car (handles cablecar/odongdo/hyangiram via SOUL switching)
+// ── Place entries — per-place routing via ?place= URL param ───────────────────
+// SoulCableCarPage.entryPlaceCode reads this to start the correct Living Detail view.
 const PLACE_ENTRIES = [
   {
     code:    'cablecar',
     name:    '여수해상케이블카',
     desc:    '자산 ↔ 돌산 · 편도 약 13분',
     heroSrc: '/images/soul/place-hero/cablecar.png',
-    path:    '/soul/cable-car',
+    path:    '/soul/cable-car?place=cablecar',
   },
   {
     code:    'odongdo',
     name:    '오동도',
     desc:    '방파제 길 · 동백꽃 · 동백열차',
     heroSrc: '/images/soul/place-hero/odongdo.png',
-    path:    '/soul/cable-car',
+    path:    '/soul/cable-car?place=odongdo',
   },
   {
     code:    'hyangiram',
     name:    '향일암',
     desc:    '절벽 암자 · 해돋이 · 두 갈래 길',
     heroSrc: '/images/soul/place-hero/hyangiram.png',
-    path:    '/soul/cable-car',
+    path:    '/soul/cable-car?place=hyangiram',
   },
 ];
 
@@ -126,11 +157,12 @@ export default function MuyojeongHomePage() {
   const navigate = useNavigate();
   const inputRef = useRef(null);
 
-  const [inputValue,   setInputValue]   = useState('');
-  const [sessionId,    setSessionId]    = useState(null);
-  const [isLoading,    setIsLoading]    = useState(false);
-  const [soulResponse, setSoulResponse] = useState(null);
-  const [errorMsg,     setErrorMsg]     = useState(null);
+  const [inputValue,    setInputValue]    = useState('');
+  const [sessionId,     setSessionId]     = useState(null);
+  const [isLoading,     setIsLoading]     = useState(false);
+  const [soulResponse,  setSoulResponse]  = useState(null);
+  const [errorMsg,      setErrorMsg]      = useState(null);
+  const [soulMasterErr, setSoulMasterErr] = useState(false);
 
   async function _callSOUL(text) {
     setErrorMsg(null);
@@ -148,7 +180,7 @@ export default function MuyojeongHomePage() {
         body: JSON.stringify({
           message:    text,
           session_id: sessionId,
-          // NO place_code — Main home sends traveler context only, not place context
+          // NO place_code — main home is traveler context only
         }),
       });
 
@@ -188,95 +220,227 @@ export default function MuyojeongHomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-night-sky text-white pb-24">
+    // overflow-x:hidden — primary overflow guard.
+    // No transform:scale used anywhere (V1 source of overflow was absolute+scale ring → removed).
+    <div
+      className="min-h-screen text-white pb-24"
+      style={{
+        overflowX: 'hidden',
+        // Warm Yeosu evening harbor atmosphere:
+        // deep purple-navy top (evening sky) → ocean blue → dark sea
+        // radial warm sunset glow at top-right (cable car / harbor direction)
+        background: [
+          'radial-gradient(ellipse at 80% 0%, rgba(255,165,50,0.10) 0%, transparent 48%)',
+          'radial-gradient(ellipse at 20% 15%, rgba(110,184,255,0.07) 0%, transparent 40%)',
+          'linear-gradient(180deg, #130b1e 0%, #0b1830 30%, #061525 65%, #030c18 100%)',
+        ].join(', '),
+      }}
+    >
 
-      {/* ── BRAND HEADER ── */}
-      {/* Compact header: brand label + SOUL identity side-by-side to save vertical space */}
-      <header className="px-4 pt-6 pb-0">
-        <div className="flex items-center justify-between max-w-md mx-auto">
-          <div>
-            <p className="text-xs text-white opacity-25 tracking-widest uppercase leading-none mb-0.5">
-              무료 여수여행정보
-            </p>
-            <h1 className="text-lg font-bold tracking-wide leading-none" style={{ color: '#E8D5A3' }}>
-              무여정
-            </h1>
+      {/* ── HERO — brand + SOUL + promise ── */}
+      {/* Subtle aqua warm highlight at top */}
+      <div
+        style={{
+          background:    'linear-gradient(180deg, rgba(14,116,144,0.13) 0%, transparent 100%)',
+          paddingTop:    '2.25rem',
+          paddingBottom: '1.5rem',
+          paddingLeft:   '1rem',
+          paddingRight:  '1rem',
+        }}
+      >
+        <div className="max-w-md mx-auto flex flex-col items-center text-center">
+
+          {/* Brand label */}
+          <p style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.30)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '1.25rem' }}>
+            무료 여수여행정보
+          </p>
+
+          {/* SOUL character — approved Master asset (soul-master.png) */}
+          {/* On error: CSS aqua wave fallback */}
+          <div
+            style={{
+              width:        '80px',
+              height:       '80px',
+              borderRadius: '50%',
+              overflow:     'hidden',
+              flexShrink:   0,
+              marginBottom: '0.875rem',
+              // Aqua glow ring via box-shadow — no absolute positioning, no overflow
+              boxShadow: [
+                `0 0 0 3px rgba(110,184,255,0.22)`,
+                `0 0 0 8px rgba(255,214,122,0.09)`,
+                `0 0 28px rgba(110,184,255,0.18)`,
+              ].join(', '),
+            }}
+          >
+            {!soulMasterErr ? (
+              <img
+                src="/images/soul/soul-master.png"
+                alt="SOUL — 나의 여수여행 친구"
+                onError={() => setSoulMasterErr(true)}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+            ) : (
+              <div
+                style={{
+                  width:      '100%',
+                  height:     '100%',
+                  background: 'radial-gradient(circle at 38% 38%, rgba(110,184,255,0.38) 0%, rgba(6,78,100,0.6) 60%, rgba(4,14,24,0.8) 100%)',
+                  display:    'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize:   '2rem',
+                }}
+              >
+                🌊
+              </div>
+            )}
           </div>
-          {/* SOUL identity mark — CSS wave character. SOUL_CHARACTER_MASTER_V1.png not found in repo. */}
-          <div className="relative w-12 h-12 flex-shrink-0">
-            <div
-              className="w-full h-full rounded-full flex items-center justify-center"
-              style={{
-                background: 'radial-gradient(circle at 38% 38%, rgba(34,211,238,0.22) 0%, rgba(14,116,144,0.32) 60%, rgba(3,7,18,0.55) 100%)',
-                border:     '1.5px solid rgba(34,211,238,0.28)',
-              }}
-            >
-              <span style={{ fontSize: '1.4rem' }}>🌊</span>
-            </div>
-            <div
-              className="absolute inset-0 rounded-full pointer-events-none"
-              style={{ border: '1px solid rgba(232,213,163,0.14)', transform: 'scale(1.2)' }}
-            />
-          </div>
-        </div>
-      </header>
 
-      <div className="max-w-md mx-auto px-4 space-y-5 pt-5">
+          {/* SOUL identity tagline */}
+          <p style={{ fontSize: '0.75rem', color: C.yeosuBlue, opacity: 0.85, marginBottom: '0.625rem', letterSpacing: '0.04em' }}>
+            나의 여수여행 친구
+          </p>
 
-        {/* ── BRAND PROMISE — compact, input visible above fold on 375px+ ── */}
-        <section>
-          <h2 className="text-xl font-semibold text-white leading-snug mb-1">
+          {/* Brand name */}
+          <h1
+            style={{
+              fontWeight:    800,
+              fontSize:      '2rem',
+              letterSpacing: '0.04em',
+              color:         C.starlightGold,
+              marginBottom:  '1rem',
+              lineHeight:    1.1,
+            }}
+          >
+            무여정
+          </h1>
+
+          {/* Brand promise */}
+          <h2
+            style={{
+              fontWeight: 600,
+              fontSize:   '1.125rem',
+              color:      '#ffffff',
+              lineHeight: 1.45,
+              wordBreak:  'keep-all',
+              marginBottom: '0.5rem',
+            }}
+          >
             여수가 궁금하면,<br />그냥 물어보세요.
           </h2>
-          <p className="text-sm text-white opacity-45 leading-relaxed">
+          <p
+            style={{
+              fontSize:  '0.875rem',
+              color:     'rgba(255,255,255,0.50)',
+              lineHeight: 1.55,
+              wordBreak:  'keep-all',
+            }}
+          >
             여수를 잘 아는 여행친구 SOUL이 함께 찾아볼게요.
           </p>
-        </section>
 
-        {/* ── SOUL INPUT — PRIMARY ACTION ── */}
+        </div>
+      </div>
+
+      {/* ── CONTENT ── */}
+      <div
+        className="max-w-md mx-auto px-4"
+        style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+      >
+
+        {/* ── SOUL INPUT — PRIMARY ACTION, pill style ── */}
         <div
-          className="rounded-2xl p-4"
           style={{
-            background: 'rgba(255,255,255,0.05)',
-            border:     '1px solid rgba(255,255,255,0.14)',
+            borderRadius: '999px',
+            background:   'rgba(255,255,255,0.08)',
+            border:       `1.5px solid rgba(110,184,255,0.28)`,
+            boxShadow:    '0 2px 20px rgba(110,184,255,0.10)',
           }}
         >
-          <form onSubmit={handleSubmit} className="flex gap-3 items-center">
+          <form
+            onSubmit={handleSubmit}
+            style={{ display: 'flex', alignItems: 'center', padding: '4px 6px 4px 20px' }}
+          >
             <input
               ref={inputRef}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="여수 여행 뭐든 물어보세요"
-              className="flex-1 bg-transparent text-white placeholder-white placeholder-opacity-40 text-sm outline-none"
+              placeholder="여수에서 궁금한 건 뭐든 물어보세요"
               disabled={isLoading}
+              // min-width:0 is critical — prevents flex child from overflowing parent in mobile Chrome
+              style={{
+                flex:        '1 1 0',
+                minWidth:    0,
+                background:  'transparent',
+                color:       'white',
+                fontSize:    '0.9375rem',
+                outline:     'none',
+                border:      'none',
+                padding:     '10px 0',
+                wordBreak:   'keep-all',
+              }}
+              className="placeholder-white placeholder-opacity-35"
             />
+            {/* Send button — circular, Yeosu Blue tint */}
             <button
               type="submit"
               disabled={isLoading || !inputValue.trim()}
-              className="text-sm font-semibold whitespace-nowrap hover:opacity-80 transition-opacity disabled:opacity-40"
-              style={{ color: '#E8D5A3' }}
+              style={{
+                width:        '40px',
+                height:       '40px',
+                borderRadius: '50%',
+                flexShrink:   0,
+                background:   isLoading || !inputValue.trim() ? 'rgba(110,184,255,0.15)' : 'rgba(110,184,255,0.85)',
+                border:       'none',
+                cursor:       isLoading || !inputValue.trim() ? 'default' : 'pointer',
+                display:      'flex',
+                alignItems:   'center',
+                justifyContent: 'center',
+                fontSize:     '1.125rem',
+                transition:   'background 0.15s',
+                marginLeft:   '8px',
+              }}
+              aria-label="전달"
             >
-              {isLoading ? '확인 중…' : '물어보기'}
+              {isLoading ? (
+                <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)' }}>…</span>
+              ) : (
+                '→'
+              )}
             </button>
           </form>
         </div>
 
-        {/* ── SUGGESTION CHIPS — hidden after first SOUL response ── */}
+        {/* ── SUGGESTION CHIPS — 2-column grid, hidden after SOUL answers ── */}
         {!soulResponse && !isLoading && (
-          <div className="flex flex-wrap gap-2">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
             {SUGGESTION_CHIPS.map((chip) => (
               <button
                 key={chip}
                 onClick={() => handleChipClick(chip)}
-                className="px-3 py-2.5 rounded-full text-sm border text-white text-left leading-snug transition-all"
                 style={{
-                  borderColor: 'rgba(255,255,255,0.18)',
-                  opacity:      0.75,
-                  background:   'transparent',
-                  minHeight:    '40px',
+                  padding:      '10px 12px',
+                  borderRadius: '12px',
+                  border:       '1px solid rgba(255,255,255,0.14)',
+                  background:   'rgba(255,255,255,0.05)',
+                  color:        'rgba(255,255,255,0.78)',
+                  fontSize:     '0.8125rem',
+                  textAlign:    'left',
+                  lineHeight:   1.4,
+                  cursor:       'pointer',
+                  minHeight:    '44px',
+                  wordBreak:    'keep-all',
+                  transition:   'border-color 0.15s, background 0.15s',
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(34,211,238,0.5)'; e.currentTarget.style.opacity = '1'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)'; e.currentTarget.style.opacity = '0.75'; }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(110,184,255,0.40)';
+                  e.currentTarget.style.background  = 'rgba(110,184,255,0.09)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.14)';
+                  e.currentTarget.style.background  = 'rgba(255,255,255,0.05)';
+                }}
               >
                 {chip}
               </button>
@@ -284,18 +448,33 @@ export default function MuyojeongHomePage() {
           </div>
         )}
 
-        {/* ── LOADING INDICATOR ── */}
+        {/* ── LOADING ── */}
         {isLoading && (
-          <div className="rounded-2xl p-4 text-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <p className="text-sm text-white opacity-50">SOUL이 여수 여행 정보를 찾고 있어요…</p>
+          <div
+            className="rounded-2xl text-center py-4"
+            style={{ background: 'rgba(110,184,255,0.05)', border: '1px solid rgba(110,184,255,0.12)' }}
+          >
+            <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.48)' }}>
+              SOUL이 여수 여행 정보를 찾고 있어요…
+            </p>
           </div>
         )}
 
         {/* ── ERROR ── */}
         {errorMsg && !isLoading && (
-          <div className="rounded-2xl p-4" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <p className="text-sm text-white opacity-60 mb-2">{errorMsg}</p>
-            <button onClick={handleReset} className="text-xs" style={{ color: '#E8D5A3', opacity: 0.7 }}>다시 시도</button>
+          <div
+            className="rounded-2xl p-4"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+          >
+            <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.58)', wordBreak: 'keep-all', marginBottom: '8px' }}>
+              {errorMsg}
+            </p>
+            <button
+              onClick={handleReset}
+              style={{ color: C.starlightGold, opacity: 0.72, fontSize: '0.8125rem', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            >
+              다시 시도
+            </button>
           </div>
         )}
 
@@ -305,35 +484,88 @@ export default function MuyojeongHomePage() {
         )}
 
         {/* ── PLACE ENTRIES: SOUL과 먼저 둘러보기 ── */}
-        <section>
-          <p className="text-xs text-white opacity-35 uppercase tracking-wider mb-3">
+        <section style={{ marginTop: '4px' }}>
+          <p
+            style={{
+              fontSize:      '0.6875rem',
+              color:         'rgba(255,255,255,0.30)',
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              marginBottom:  '10px',
+            }}
+          >
             SOUL과 먼저 둘러보기
           </p>
-          <div className="space-y-3">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {PLACE_ENTRIES.map((place) => (
               <button
                 key={place.code}
                 onClick={() => navigate(place.path)}
-                className="w-full rounded-2xl overflow-hidden text-left transition-all hover:opacity-90"
-                style={{ border: '1px solid rgba(255,255,255,0.10)' }}
+                style={{
+                  width:        '100%',
+                  display:      'block',
+                  borderRadius: '16px',
+                  overflow:     'hidden',
+                  textAlign:    'left',
+                  cursor:       'pointer',
+                  background:   'none',
+                  padding:      0,
+                  border:       '1px solid rgba(255,255,255,0.10)',
+                  // No transform on hover — avoids mobile overflow issues
+                }}
               >
-                <div className="relative h-28 overflow-hidden bg-blue-900 bg-opacity-30">
+                <div
+                  style={{
+                    position:   'relative',
+                    height:     '112px',
+                    background: 'rgba(6,24,40,0.9)',
+                    overflow:   'hidden',
+                  }}
+                >
                   <img
                     src={place.heroSrc}
                     alt={place.name}
-                    className="w-full h-full object-cover"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                     onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
-                  {/* gradient overlay */}
+                  {/* gradient overlay — crop is intentional, text always readable */}
                   <div
-                    className="absolute inset-0"
                     style={{
-                      background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.15) 60%, transparent 100%)',
+                      position:   'absolute',
+                      inset:      0,
+                      background: 'linear-gradient(to top, rgba(3,12,24,0.72) 0%, rgba(3,12,24,0.18) 60%, transparent 100%)',
                     }}
                   />
-                  <div className="absolute bottom-3 left-4 right-4">
-                    <p className="text-sm font-semibold text-white leading-snug">{place.name}</p>
-                    <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.55)' }}>{place.desc}</p>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom:   0,
+                      left:     0,
+                      right:    0,
+                      padding:  '0 16px 12px',
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontWeight: 600,
+                        fontSize:   '0.9375rem',
+                        color:      '#fff',
+                        wordBreak:  'keep-all',
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {place.name}
+                    </p>
+                    <p
+                      style={{
+                        fontSize:   '0.75rem',
+                        color:      'rgba(255,255,255,0.52)',
+                        marginTop:  '2px',
+                        wordBreak:  'keep-all',
+                      }}
+                    >
+                      {place.desc}
+                    </p>
                   </div>
                 </div>
               </button>
@@ -342,8 +574,15 @@ export default function MuyojeongHomePage() {
         </section>
 
         {/* ── FOOTER NOTE ── */}
-        <div className="text-center pt-2 pb-4">
-          <p className="text-xs text-white opacity-20 leading-relaxed">
+        <div style={{ textAlign: 'center', paddingTop: '4px', paddingBottom: '1.5rem' }}>
+          <p
+            style={{
+              fontSize:   '0.6875rem',
+              color:      'rgba(255,255,255,0.20)',
+              lineHeight: 1.6,
+              wordBreak:  'keep-all',
+            }}
+          >
             SOUL은 현재 알고 있는 정보를 바탕으로 답해드려요.<br />
             최신 운영 정보는 현장에서 확인을 권장해요.
           </p>

@@ -24,7 +24,7 @@
  */
 
 import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getOrEnsureGuestCredential } from '../api/dreamtown.js';
 import CourseDisplay from '../components/TravelGuide/CourseDisplay.jsx';
 
@@ -867,9 +867,17 @@ function OdongdoQuestionDiscovery({ ctx }) {
 }
 
 // ── Main page ────────────────────────────────────────────────────────────────
+const SUPPORTED_PLACE_CODES = ['cablecar', 'odongdo', 'hyangiram'];
+
 export default function SoulCableCarPage() {
   const navigate = useNavigate();
   const inputRef = useRef(null);
+  const [searchParams] = useSearchParams();
+
+  // Entry place from URL (?place=odongdo|hyangiram) — set by MuyojeongHomePage place cards.
+  // Falls through the placeCode chain so the correct Living Detail view is shown on entry.
+  const urlPlace = searchParams.get('place');
+  const entryPlaceCode = SUPPORTED_PLACE_CODES.includes(urlPlace) ? urlPlace : null;
 
   const [travelerContext, setTravelerContext] = useState({
     hasVehicle: false,
@@ -889,7 +897,7 @@ export default function SoulCableCarPage() {
     soulResponse?.presentation_mode === 'PLACE_KNOWLEDGE' &&
     soulResponse?.status === 'PLACE_LOOKUP' &&
     soulResponse?.resolved_code != null;
-  const placeCode = navPlaceCode || (isPlaceKnowledge ? soulResponse.resolved_code : 'cablecar');
+  const placeCode = navPlaceCode || (isPlaceKnowledge ? soulResponse.resolved_code : entryPlaceCode || 'cablecar');
   const placeData = isPlaceKnowledge ? (soulResponse.places?.[0] ?? null) : null;
   const isCableCarView  = placeCode === 'cablecar';
   const isOdongdoView   = placeCode === 'odongdo';
