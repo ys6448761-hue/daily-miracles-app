@@ -88,6 +88,7 @@ import AdminCablecarPage from './pages/AdminCablecarPage.jsx';
 import LocationAdmin from './pages/admin/LocationAdmin.jsx';
 import TravelGuidePage from './pages/TravelGuidePage.jsx';
 import SoulCableCarPage from './pages/SoulCableCarPage.jsx';
+import MuyojeongHomePage from './pages/MuyojeongHomePage.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
 if (window.location.pathname.startsWith('//')) {
@@ -121,6 +122,8 @@ export default function App() {
           <Route path="/wish/input"  element={<WishInputScreen />} />
           <Route path="/star-birth"  element={<StarBirth />} />
           <Route path="/travel-guide" element={<TravelGuidePage />} />
+          {/* SOUL 무여정 Main Home — 여수맘 파일럿 진입점 */}
+          <Route path="/muyojeong" element={<MuyojeongHomePage />} />
           {/* SOUL Living Detail Page — place-switching conversational experience */}
           <Route path="/soul/cable-car" element={<SoulCableCarPage />} />
           <Route path="/my-star"     element={<MyStarReturn />} />
