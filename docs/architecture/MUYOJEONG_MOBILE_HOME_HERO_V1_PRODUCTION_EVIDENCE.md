@@ -1,11 +1,12 @@
 # MUYOJEONG MOBILE HOME HERO V1 — Production Evidence
 
-**Status:** FOUNDER APPROVED ASSET — PRODUCTION INTEGRATED — V1.4 PRODUCTION 404 ROOT CAUSE FIXED
+**Status:** FOUNDER/LUMI VISUAL APPROVED — CLOSED_CURRENT_PHASE
 **Date:** 2026-10-06
 **Implementation Commits:**
-- `cf2e4c4` — V1.2: Hero artwork integration (image added to dreamtown-frontend/public/)
-- `0cbe162` — V1.3: CSS adjustments (340px height, objectPosition 78%, 30px gradient)
-- `9151979` — V1.4: Root cause fix (image copied to root public/images/muyojeong/)
+- `cf2e4c4` — V1.2: Hero artwork integration
+- `0cbe162` — V1.3: CSS (340px, objectPosition 78%, 30px gradient)
+- `9151979` — V1.4: Root cause fix — image copied to root public/images/muyojeong/ (resolves production 404)
+- `f8bc65a` — V1.4 micro-fix: brand eyebrow clipping (remove marginTop -8px, opacity 0.30→0.42)
 **Route:** `https://app.dailymiracles.kr/muyojeong`
 
 ---
@@ -244,16 +245,14 @@ Per Founder directive:
 ```
 MUYOJEONG MOBILE HOME HERO V1
 = FOUNDER APPROVED ASSET
-= V1.2 PRODUCTION INTEGRATED (commit cf2e4c4)
-= V1.3 CSS FIX (commit 0cbe162) — PC-environment analysis; CSS is correct for when image loads
-= V1.4 PRODUCTION ROOT CAUSE FIXED (commit 9151979)
-  Root cause: server.js:296 hard-404 terminated /images/muyojeong/ before dist serving
-  Image was NOT served on production — all previous mobile failures stem from this 404
-  Fix: image copied to root public/images/muyojeong/ — now served by server.js:81
-= TECHNICALLY MOBILE VERIFIED (pending Render.com deploy of commit 9151979)
-= FOUNDER/LUMI MOBILE VISUAL RE-REVIEW REQUIRED
+= PRODUCTION INTEGRATED
+= V1.4 ROOT CAUSE FIXED (commit 9151979)
+  server.js:296 hard-404 terminated /images/muyojeong/ — image never served on production
+  Fix: image copied to root public/images/muyojeong/ — served by server.js:81
+= V1.4 MICRO-FIX (commit f8bc65a)
+  "무료 여수여행정보" eyebrow: marginTop -8px removed, paddingTop 0.875rem, opacity 0.30→0.42
+= FOUNDER/LUMI VISUAL APPROVED
+= CLOSED_CURRENT_PHASE
 ```
 
 **Founder Original:** `C:\DREAM TOWN\30_Founder Originals\Muyojeong\Home\MUYOJEONG_MOBILE_HOME_HERO_V1.png` — UNTOUCHED
-
-**Next action:** Wait for Render.com deploy → Founder verifies on actual mobile → visual re-review

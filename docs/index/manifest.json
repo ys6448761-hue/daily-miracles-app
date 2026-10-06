@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-06T08:55:02.074Z",
+  "generated_at": "2026-10-06T09:04:51.964Z",
   "generator": "generate-manifest.js",
   "total_count": 451,
   "documents": [
@@ -776,7 +776,7 @@
       "status": "active",
       "title": "MUYOJEONG MOBILE HOME HERO V1 — Production Evidence",
       "created_at": "2026-10-06",
-      "checksum": "78608dbe"
+      "checksum": "63eaf8dd"
     },
     {
       "id": "DOC-PHOENIX_HANDOVER_2026_09_21",
