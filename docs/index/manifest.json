@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-06T23:32:20.832Z",
+  "generated_at": "2026-10-06T23:42:24.864Z",
   "generator": "generate-manifest.js",
   "total_count": 452,
   "documents": [
@@ -1190,9 +1190,9 @@
       ],
       "owner": "team",
       "status": "active",
-      "title": "SOUL CURRENT INTENT × MULTI-PLACE × CONTEXT PRECEDENCE V0.1 — Evidence",
+      "title": "SOUL Current Intent × Multi-Place × Context Precedence V0.1 — Evidence",
       "created_at": "2026-10-06",
-      "checksum": "376125dd"
+      "checksum": "633c5dba"
     },
     {
       "id": "DOC-SOUL_CURRENT_PLACE_CONTEXT_ARC",
