@@ -295,15 +295,15 @@ export default function MuyojeongHomePage() {
         />
       </div>
 
-      {/* ── BRAND + PROMISE — below hero, immediately after fade ── */}
+      {/* ── BRAND + PROMISE — below hero, clear of gradient zone ── */}
       <div
         className="max-w-md mx-auto text-center"
-        style={{ padding: '0 1rem 0.75rem', marginTop: '-8px' }}
+        style={{ padding: '0.875rem 1rem 0.75rem' }}
       >
         <p
           style={{
             fontSize:      '0.6875rem',
-            color:         'rgba(255,255,255,0.30)',
+            color:         'rgba(255,255,255,0.42)',
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
             marginBottom:  '0.25rem',
