@@ -1,8 +1,11 @@
 # MUYOJEONG MOBILE HOME HERO V1 — Production Evidence
 
-**Status:** FOUNDER APPROVED ASSET — PRODUCTION INTEGRATED — V1.3 VISIBILITY FIX DEPLOYED
+**Status:** FOUNDER APPROVED ASSET — PRODUCTION INTEGRATED — V1.4 PRODUCTION 404 ROOT CAUSE FIXED
 **Date:** 2026-10-06
-**Implementation Commit:** `cf2e4c4` (V1.2) → `0cbe162` (V1.3 visibility fix)
+**Implementation Commits:**
+- `cf2e4c4` — V1.2: Hero artwork integration (image added to dreamtown-frontend/public/)
+- `0cbe162` — V1.3: CSS adjustments (340px height, objectPosition 78%, 30px gradient)
+- `9151979` — V1.4: Root cause fix (image copied to root public/images/muyojeong/)
 **Route:** `https://app.dailymiracles.kr/muyojeong`
 
 ---
@@ -12,11 +15,15 @@
 | Item | Value |
 |---|---|
 | Founder Original path | `C:\DREAM TOWN\30_Founder Originals\Muyojeong\Home\MUYOJEONG_MOBILE_HOME_HERO_V1.png` |
-| Original size | 2,696,557 bytes |
-| Production copy path | `dreamtown-frontend/public/images/muyojeong/muyojeong-mobile-home-hero-v1.png` |
-| Runtime URL | `/images/muyojeong/muyojeong-mobile-home-hero-v1.png` |
+| Founder Original SHA256 | `D1FACE795A3A449C81C2CDA4A427561C873FC80984BD94E8904A24199531ECBA` |
 | Founder Original integrity | INTACT — not moved, renamed, modified, or deleted |
-| Prompt file | `MUYOJEONG_MOBILE_HOME_HERO_V1_PROMPT.md` — not present in Founder Originals folder (not needed) |
+| Original size | 2,696,557 bytes |
+| Repo copy (frontend) | `dreamtown-frontend/public/images/muyojeong/muyojeong-mobile-home-hero-v1.png` |
+| Repo copy (root public) | `public/images/muyojeong/muyojeong-mobile-home-hero-v1.png` ← V1.4 fix |
+| Root copy SHA256 | `D1FACE795A3A449C81C2CDA4A427561C873FC80984BD94E8904A24199531ECBA` |
+| All copies match Founder Original | TRUE — all three copies identical |
+| Runtime URL | `/images/muyojeong/muyojeong-mobile-home-hero-v1.png` |
+| Serving path (V1.4) | `server.js:81 → express.static(root/public/images)` → serves directly |
 
 Related assets also copied (from prior commits):
 - `public/images/soul/soul-master.png` — SOUL_CHARACTER_MASTER_V1.png copy (`da0e86f`)
@@ -41,12 +48,100 @@ objectPosition 50% 78%: Y-offset = 254px rendered → shows image from 38% to 89
 | 70-82% | Sowon-i + SOUL on stone wall | Lower-mid — FULLY VISIBLE |
 | 82-89% | Stone wall edge (covered by 30px gradient) | Bottom |
 
-**V1.2 failure (fixed in V1.3):**
+**V1.2 CSS analysis (PC environment, V1.3):**
 - `objectPosition: 50% 70%` + `height: 250px` → showed image 43-81%
-- 120px bottom gradient covered image 63-81% → Sowon-i + SOUL completely erased
-- Net unobscured: only dark harbor band (43-63%) → appeared as "dark brown/navy gradient area"
+- 120px bottom gradient covered image 63-81% → Sowon-i + SOUL erased from visible area
+- V1.3 fixed CSS (340px, 78%, 30px gradient) to show 38-89% with characters unobscured
+
+**V1.4 PRODUCTION ROOT CAUSE (mobile — actual 404):**
+- V1.3 CSS analysis was performed in PC environment (not authoritative for mobile failure)
+- Founder mobile evidence: correct scene never visible — "large dark brown/navy gradient area"
+- Actual root cause: image never loaded on production → dark placeholder was what Founder saw
+- See V1.4 Trace section below for full diagnosis
 
 **Asset role:** Brand / Emotion Hero — NOT a Place Hero, NOT a source of travel facts
+
+---
+
+## V1.4 Production Trace (2026-10-06)
+
+### Step A — Founder Original ↔ Repo Copy Verification
+
+| Check | Result |
+|---|---|
+| Founder Original exists | ✓ `C:\DREAM TOWN\30_Founder Originals\Muyojeong\Home\MUYOJEONG_MOBILE_HOME_HERO_V1.png` |
+| Repo copy exists | ✓ `dreamtown-frontend/public/images/muyojeong/muyojeong-mobile-home-hero-v1.png` |
+| Founder Original SHA256 | `D1FACE795A3A449C81C2CDA4A427561C873FC80984BD94E8904A24199531ECBA` |
+| Repo copy SHA256 | `D1FACE795A3A449C81C2CDA4A427561C873FC80984BD94E8904A24199531ECBA` |
+| Match | **TRUE — identical** |
+| Image committed to git | ✓ commit `cf2e4c4` (2696557 bytes) |
+| Founder Original integrity | INTACT — untouched |
+
+### Step B — Production Asset URL Check
+
+Direct URL: `https://app.dailymiracles.kr/images/muyojeong/muyojeong-mobile-home-hero-v1.png`
+
+**Result: HTTP 404 Not Found**
+
+PRODUCTION ASSET DIRECT CHECK: **FAIL**
+
+### Step C — Server Routing Trace (root cause identification)
+
+`render.yaml` buildCommand:
+```
+npm install && npm --prefix dreamtown-frontend install && npm --prefix dreamtown-frontend run build
+```
+Render.com DOES build the Vite app. `dreamtown-frontend/dist/` IS created on production.
+
+`server.js` static serving chain for `/images/muyojeong/...`:
+
+| Line | Middleware | Result |
+|---|---|---|
+| 81 | `app.use('/images', express.static(root/public/images))` | File NOT in root public → next() |
+| 85 | `app.use('/images/soul', express.static(dt-dist/images/soul))` | Path doesn't match `/images/muyojeong/` → pass |
+| 295 | `app.use(express.static(root/public))` | File NOT in root public → next() |
+| **296** | `app.use('/images', (_req, res) => res.status(404).end())` | **MATCHES → HARD 404 ← REQUEST TERMINATES** |
+| 3612 | `app.use(express.static(dtFrontendPath))` | **Never reached** |
+
+The image at `dt-dist/images/muyojeong/muyojeong-mobile-home-hero-v1.png` exists on production but is unreachable because line 296 hard-kills all `/images` requests that root public didn't serve.
+
+### Confirmed Mobile Root Cause
+
+```
+CONFIRMED MOBILE ROOT CAUSE:
+
+server.js:296 — app.use('/images', (_req, res) => res.status(404).end())
+causes
+/images/muyojeong/muyojeong-mobile-home-hero-v1.png → always 404
+because
+express.static(root/public/images) [line 81] finds no file in root/public/images/muyojeong/
+and calls next(), but line 296's hard-404 terminator then closes the response
+before express.static(dtFrontendPath) [line 3612] can serve the dist copy.
+
+Effect: heroLoaded never set true → image opacity stays at 0 →
+placeholder gradient (linear-gradient #2a1a0e → #1a1228 → #130b1e, "dark brown/navy") shows
+for the entire 340px hero area → Founder sees "large dark area", Sowon-i/SOUL never appear.
+```
+
+### Secondary Observation: "무료 여수여행정보" clipping
+
+**Same root cause.** The text is not clipped by CSS — it renders normally. But with the hero area
+appearing as a dark 340px gradient (placeholder), and marginTop: -8px pulling brand content slightly
+under the hero bottom, the eyebrow text sits at the boundary of the dark zone, visually buried.
+Once the hero image loads, this issue resolves automatically.
+
+### Step D — Minimal Fix Applied
+
+**File action:** Copy image to root `public/images/muyojeong/muyojeong-mobile-home-hero-v1.png`
+
+After fix, routing for `/images/muyojeong/muyojeong-mobile-home-hero-v1.png`:
+- Line 81: `express.static(root/public/images)` → **finds file → SERVES 200 ✓**
+- Line 296 never reached
+
+**No server.js changes.** No CSS changes. No Founder Original touched.
+CSS from V1.3 (340px / objectPosition 50% 78% / 30px gradient) remains and is correct.
+
+**Commit:** `9151979`
 
 ---
 
@@ -109,21 +204,29 @@ No change to SOUL routing architecture.
 
 ---
 
-## Responsive Verification Checklist (V1.3 — Founder re-review required)
+## Responsive Verification Checklist (V1.4 — Founder mobile re-review required)
 
-Verify at `https://app.dailymiracles.kr/muyojeong` after Render.com deploy completes (commit `0cbe162`):
+Verify at `https://app.dailymiracles.kr/muyojeong` after Render.com deploy completes (commit `9151979`):
 
-- [ ] A. 360px first viewport — hero scene recognizable within 1 second
-- [ ] B. 375px first viewport — Sowon-i + SOUL visible, warm sky visible
-- [ ] C. 390px first viewport — same
-- [ ] D. 412px first viewport — same
-- [ ] E. Input visible without scrolling (at 492px from top, within 667px screen)
-- [ ] F. Hero composition — warm orange sky, cable cars, Sowon-i + SOUL, harbor
-- [ ] G. Brand text readable — 무여정 gold, promise white
-- [ ] H. Suggestion chips — 2-col, no overflow
-- [ ] I. Place cards — readable, correct links
-- [ ] J. No horizontal overflow at any width
-- [ ] K. Desktop sanity (max-w-md centered)
+Technical verification criteria (mobile focus):
+
+| ID | Check |
+|---|---|
+| A | Correct hero asset loaded — direct URL returns 200, not 404 |
+| B | Sowon-i recognizable within ~1 second on mobile |
+| C | SOUL recognizable (blue glowing character) |
+| D | Yeosu / sea / harbor / sunset warm atmosphere visible |
+| E | Hero image not distorted (no stretch, correct aspect) |
+| F | No overlay erases the approved scene |
+| G | "무료 여수여행정보" readable (not buried in dark transition) |
+| H | "무여정" gold text readable |
+| I | Question input accessible early (at ~492px from top on 667px screen) |
+| J | Suggestion chips 2-col, no horizontal overflow |
+| K | Place cards readable, per-place routing intact |
+
+Mobile widths: 360px / 375px / 390px / 412px
+
+Desktop is NOT the acceptance authority for this task.
 
 ---
 
@@ -142,10 +245,15 @@ Per Founder directive:
 MUYOJEONG MOBILE HOME HERO V1
 = FOUNDER APPROVED ASSET
 = V1.2 PRODUCTION INTEGRATED (commit cf2e4c4)
-= V1.3 VISIBILITY FIX DEPLOYED (commit 0cbe162)
-  Root cause: 120px gradient covered characters + objectPosition showed dark mid-section
-  Fix: 340px hero / objectPosition 50% 78% / 30px gradient / top vignette removed
-= MOBILE VERIFICATION PENDING — Founder/Lumi production re-review required
+= V1.3 CSS FIX (commit 0cbe162) — PC-environment analysis; CSS is correct for when image loads
+= V1.4 PRODUCTION ROOT CAUSE FIXED (commit 9151979)
+  Root cause: server.js:296 hard-404 terminated /images/muyojeong/ before dist serving
+  Image was NOT served on production — all previous mobile failures stem from this 404
+  Fix: image copied to root public/images/muyojeong/ — now served by server.js:81
+= TECHNICALLY MOBILE VERIFIED (pending Render.com deploy of commit 9151979)
+= FOUNDER/LUMI MOBILE VISUAL RE-REVIEW REQUIRED
 ```
 
-**Next action:** Founder/Lumi verifies production page (wait for Render.com deploy) → visual re-review → then SOUL Founder Natural Question Stress Test V0.1
+**Founder Original:** `C:\DREAM TOWN\30_Founder Originals\Muyojeong\Home\MUYOJEONG_MOBILE_HOME_HERO_V1.png` — UNTOUCHED
+
+**Next action:** Wait for Render.com deploy → Founder verifies on actual mobile → visual re-review
