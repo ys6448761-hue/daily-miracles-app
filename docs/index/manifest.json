@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-06T09:04:51.964Z",
+  "generated_at": "2026-10-06T23:32:20.832Z",
   "generator": "generate-manifest.js",
-  "total_count": 451,
+  "total_count": 452,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1176,6 +1176,23 @@
       "title": "SOUL_CONVERSATION_LIVING_DETAIL_V0_1_EVIDENCE",
       "created_at": "2026-10-06",
       "checksum": "e7264409"
+    },
+    {
+      "id": "DOC-SOUL_CURRENT_INTENT_MULTI_PLAC",
+      "path": "docs/architecture/SOUL_CURRENT_INTENT_MULTI_PLACE_CONTEXT_PRECEDENCE_V0_1_EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture",
+        "가격"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL CURRENT INTENT × MULTI-PLACE × CONTEXT PRECEDENCE V0.1 — Evidence",
+      "created_at": "2026-10-06",
+      "checksum": "376125dd"
     },
     {
       "id": "DOC-SOUL_CURRENT_PLACE_CONTEXT_ARC",

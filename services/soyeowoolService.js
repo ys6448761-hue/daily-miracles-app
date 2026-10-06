@@ -55,11 +55,12 @@ const PLACE_ALIAS_MAP = {
 const STRONG_LOOKUP = /에 대해|설명해줘|설명해주세요|어떤 곳이야|이란 뭐|뭐야/;
 const STRONG_PROXIMITY = 20;
 
-// Medium lookup verbs — need tight proximity (≤ 6 chars) to avoid false positives
-// e.g. "케이블카 포함해서 알려줘" → "알려줘" is 9+ chars away → NOT lookup
-// "괜찮아\??" added 2026-10-02: suitability questions ("향일암 괜찮아?") treated as place lookup
+// Medium lookup verbs — proximity window from alias end.
+// Korean is SOV: judgment verb often comes at sentence end ("향일암은 부모님이 가기 괜찮아?").
+// 15-char window covers end-of-sentence verbs without spanning unrelated clauses.
+// False-positive guard: DISCOVERY_OVERRIDES fires first for "포함/얼마/일정" messages.
 const MEDIUM_LOOKUP = /알려줘|알려주세요|어때\??|어떤가요|은\?|는\?|이야\??|괜찮아\??/;
-const MEDIUM_PROXIMITY = 6;
+const MEDIUM_PROXIMITY = 15;
 
 // Suitability-intent subset of MEDIUM_LOOKUP — evaluative/judgment framing vs pure informational.
 // 알려줘/알려주세요 = informational only → isSuitabilityQuery:false
@@ -553,10 +554,12 @@ function _applyExplicitContextChip(soulContext, explicit_context) {
 
   // Fix 1: explicit_context.companion → people_type (UI-state companion overrides GPT text inference)
   // companion=parents → family_elderly, companion=family → family_with_kids
-  // companion field from UI chip represents what the traveler has already set — always authoritative.
-  // Exception: text explicitly stated a DIFFERENT solo/group type wins if it contains explicit solo marker.
+  // companion field from UI chip represents what the traveler has already set — usually authoritative.
+  // Exception: when the current turn's GPT extraction has USER_EXPLICIT provenance (user said "나 혼자"
+  // or "엄마는 안 가고"), that explicit text overrides the stale chip state.
   const COMPANION_PEOPLE_MAP = { parents: 'family_elderly', family: 'family_with_kids' };
-  if (explicit_context.companion && COMPANION_PEOPLE_MAP[explicit_context.companion]) {
+  if (explicit_context.companion && COMPANION_PEOPLE_MAP[explicit_context.companion] &&
+      prov.people_type !== 'USER_EXPLICIT') {
     const mappedType = COMPANION_PEOPLE_MAP[explicit_context.companion];
     merged.people_type = mappedType;
     mergedProv.people_type = 'USER_EXPLICIT';
@@ -814,11 +817,11 @@ function _isJourneyPlanningIntent(message) {
   if (!message) return false;
   // Overnight stay pattern always implies journey planning
   if (/\d박\s*\d일|\d박/.test(message)) return true;
-  // Explicit construction verb attached to a planning noun
-  if (/(일정|코스|여행|계획).*(짜줘|짜주세요|만들어줘|만들어주세요|세워줘|구성해줘)/.test(message)) return true;
-  if (/(짜줘|짜주세요|만들어줘|만들어주세요).*(일정|코스|여행)/.test(message)) return true;
-  // Information-request verb attached to planning noun: "일정 알려줘", "일정 보여줘", "일정 알고 싶어"
-  if (/(일정|코스|여행 계획).*(알려줘|알려주세요|보여줘|보여주세요|알고 싶|궁금해|부탁해)/.test(message)) return true;
+  // Explicit construction verb attached to a planning noun ("동선" = route/itinerary)
+  if (/(일정|코스|여행|계획|동선).*(짜줘|짜주세요|만들어줘|만들어주세요|세워줘|구성해줘)/.test(message)) return true;
+  if (/(짜줘|짜주세요|만들어줘|만들어주세요).*(일정|코스|여행|동선)/.test(message)) return true;
+  // Information-request verb attached to planning noun: "일정 알려줘", "동선 알려줘"
+  if (/(일정|코스|여행 계획|동선).*(알려줘|알려주세요|보여줘|보여주세요|알고 싶|궁금해|부탁해)/.test(message)) return true;
   return false;
 }
 
@@ -867,10 +870,10 @@ function _isPlaceSpecificQuery(message) {
   if (/(얼마야|얼마예요|요금|입장료|가격|티켓)/.test(message)) return true;
   if (/(왕복|편도)/.test(message)) return true;
   if (/(휠체어|유모차|접근성|장애|배리어)/.test(message)) return true;
-  if (/(지금.*탈|지금.*가도|지금.*갈|영업.*해|운영.*해|열었|탈 수 있|타도 돼|탈 수 있어)/.test(message)) return true;
-  if (/(비 오면|날씨|우천|기상|눈이|바람이|태풍)/.test(message)) return true;
+  if (/(지금.*탈|지금.*가도|지금.*갈|영업.*해|운영.*해|열었|탈 수 있|타도 돼|탈 수 있어|운행.*해|운행.*돼|운행 중|지금.*운행)/.test(message)) return true;
+  if (/(비 오면|비 오|비가 오|날씨|우천|기상|눈이|바람이|태풍)/.test(message)) return true;
   if (/(오동도.*갔다가|오동도.*후에|오동도.*타도|오동도.*케이블|향일암.*갔다가|향일암.*후에)/.test(message)) return true;
-  if (/(포토존|사진 어디|사진.*찍기|찍기 좋은 곳)/.test(message)) return true;
+  if (/(포토존|사진 어디|사진.*찍기|사진.*찍어|어디서.*찍|찍기 좋은 곳)/.test(message)) return true;
   if (/(알려 줘)/.test(message)) return true; // spaced form not in MEDIUM_LOOKUP
   return false;
 }
@@ -948,11 +951,15 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
     }
   }
 
-  // Current operation / can we go now?
-  else if (/(지금.*탈|지금.*가도|지금.*갈|영업.*해|운영.*해|열었|탈 수 있|타도 돼)/.test(msg)) {
+  // Current operation / can we go now? / is it running?
+  else if (/(지금.*탈|지금.*가도|지금.*갈|영업.*해|운영.*해|열었|탈 수 있|타도 돼|운행.*해|운행.*돼|운행 중|지금.*운행)/.test(msg)) {
     if (knowledge.hours_ko) {
       answer = `${name} 운영시간은 ${knowledge.hours_ko}예요.`;
       if (knowledge.hours_trust === 'NON_OFFICIAL') answer += '\n(참고값이에요.)';
+      // If weather is also asked, surface weather policy inline rather than losing it to the else-if chain
+      if (/(비|날씨|우천|기상|눈|바람|태풍)/.test(msg) && knowledge.weather_ko) {
+        answer += `\n\n${knowledge.weather_ko}`;
+      }
       answer += '\n현재 운영 여부는 현장 확인이 필요해요.' + verifyNote;
     } else {
       answer = `${name}의 현재 운영 여부는 현장 확인이 필요해요.${verifyNote}`;
@@ -960,7 +967,7 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
   }
 
   // Weather
-  else if (/(비 오면|날씨|우천|기상|눈이|바람이|태풍)/.test(msg)) {
+  else if (/(비 오면|비 오|비가 오|날씨|우천|기상|눈이|바람이|태풍)/.test(msg)) {
     if (knowledge.weather_ko) {
       answer = knowledge.weather_ko + verifyNote;
     } else {
@@ -969,7 +976,7 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
   }
 
   // Photo zone — TRUE KNOWLEDGE GAP for all current places
-  else if (/(포토존|사진 어디|사진.*찍기|찍기 좋은 곳)/.test(msg)) {
+  else if (/(포토존|사진 어디|사진.*찍기|사진.*찍어|어디서.*찍|찍기 좋은 곳)/.test(msg)) {
     answer = `${name} 내 포토존 위치는 아직 정확하게 파악하지 못했어요. 현장에서 직원에게 문의해보세요.`;
   }
 
@@ -1158,6 +1165,12 @@ function _generateClarificationMessage(soulContext, message, journeyCtx) {
   // Indecision / open
   if (/(잘 모르겠|모르겠어|뭐가 좋을|뭐 해야|어떡하|어쩌)/.test(msg)) {
     return '괜찮아요. 천천히 얘기해주세요.\n여수에서 어떤 경험을 하고 싶으신가요?';
+  }
+
+  // Specific operational/photo question — do NOT replace with companion context.
+  // These questions have a clear factual intent; companion framing would be confusing.
+  if (/(운행|운영|열었|오픈|마감|비 오|날씨|기상|사진|찍어|찍을|포토|얼마나|걸려|요금|입장|가격)/.test(msg)) {
+    return '더 정확히 알아볼게요. 어느 장소에 대해 궁금하신가요?';
   }
 
   // Companion-aware generic fallback
@@ -1464,6 +1477,16 @@ function _detectJourneyDecisionType(message) {
   if (/(가능해|가능한가요|갈 수 있어|될까|가봐도 될|갈 수 있을까)/.test(msg)) return 'FEASIBILITY';
   if (/(도 탈래|도 갈래|도 넣어|탈래|도 타고|도 가볼까)/.test(msg)) return 'JOURNEY_ADD';
   if (/(먼저 가고 싶|가고 싶어|가고싶어)/.test(msg)) return 'JOURNEY_PREFERENCE';
+  // Multi-place sequence: "케이블카 타고 향일암 갔다 올 거야" — user states an ordered visit plan
+  if (/(갔다 올|갔다가|들렀다가|타고.*갔다)/.test(msg)) {
+    const mentionedCodes = [...new Set(
+      Object.entries(PLACE_ALIAS_MAP)
+        .filter(([alias]) => msg.includes(alias))
+        .map(([, code]) => code)
+    )];
+    if (mentionedCodes.length >= 2) return 'JOURNEY_MULTI_PLACE';
+    if (mentionedCodes.length === 1) return 'JOURNEY_PREFERENCE';
+  }
   return null;
 }
 
@@ -1627,6 +1650,26 @@ async function _handleJourneyDecision({ decisionType, message, soulContext, conv
       soulMsg = `현재 일정: ${placeNames}.\n어떤 장소를 빼고 싶으신가요?`;
       nextOptions = includedPlaces.map(p => `${_CONV_GOLDEN_KO[p.code] || p.code} 빼기`).slice(0, 3);
     }
+  }
+
+  // F. JOURNEY_MULTI_PLACE — ordered multi-place visit ("케이블카 타고 향일암 갔다 올 거야")
+  else if (decisionType === 'JOURNEY_MULTI_PLACE') {
+    const seen = new Set();
+    const orderedCodes = [];
+    Object.keys(PLACE_ALIAS_MAP)
+      .sort((a, b) => message.indexOf(a) - message.indexOf(b))
+      .filter(a => message.includes(a))
+      .forEach(a => {
+        const code = PLACE_ALIAS_MAP[a];
+        if (!seen.has(code)) { seen.add(code); orderedCodes.push(code); }
+      });
+    for (const code of orderedCodes) {
+      updatedConvJourney.places = _convJourneyUpsertPlace(updatedConvJourney, code, { status: 'included' });
+    }
+    const placeNames = orderedCodes.map(c => _CONV_GOLDEN_KO[c] || c).join(' → ');
+    const carNote = soulContext.has_car === true ? ' 차로 이동하시면 편하게 둘 다 보실 수 있어요.' : '';
+    soulMsg = `${placeNames} 순서로 계획해볼게요.${carNote}\n다른 곳도 추가하거나 변경이 필요하시면 말씀해 주세요.`;
+    nextOptions = ['이동 시간 알려줘', '다른 장소도 추가'];
   }
 
   if (!soulMsg) return { ok: false };
@@ -2033,7 +2076,15 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
     // Examples: 왕복이 나아?, 비 오면?, 휠체어 탈 수 있어?, 얼마나 걸려?, 얼마야?
     // Placed after Journey Decision Gate setup but before generic CLARIFICATION.
     // soulContext is already enriched with persisted traveler profile at this point.
-    const _psqPlaceCode = explicit_context && explicit_context.place_code;
+    // Text alias wins over current page: "케이블카는 얼마야?" on Odongdo → cablecar PSQ.
+    let _psqPlaceCode = explicit_context && explicit_context.place_code;
+    if (_psqPlaceCode) {
+      const _psqTextAlias = Object.keys(PLACE_ALIAS_MAP)
+        .sort((a, b) => b.length - a.length)
+        .find(alias => message.includes(alias));
+      const _psqTextCode = _psqTextAlias ? PLACE_ALIAS_MAP[_psqTextAlias] : null;
+      if (_psqTextCode && _psqTextCode !== _psqPlaceCode) _psqPlaceCode = _psqTextCode;
+    }
     if (_psqPlaceCode && _isPlaceSpecificQuery(message)) {
       try {
         const _psqPlace = await travelGuideService.getPlaceByCode(_psqPlaceCode);
