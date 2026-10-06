@@ -449,9 +449,15 @@ function _correctCoupleClassification(message, soulContext) {
   };
 }
 
-async function _understand(message) {
+async function _understand(message, options = {}) {
   const soulContext = await contextExtractionService.parseUserMessage(message);
   if (soulContext.error) {
+    // PSQ messages are often short (e.g. "얼마야?" = 4 chars) and don't need full NL extraction.
+    // When a place_code is set and the message matches PSQ patterns, return a minimal stub
+    // so the PSQ gate downstream can handle it instead of returning HTTP 400.
+    if (options.placeCode && _isPlaceSpecificQuery(message)) {
+      return { ok: true, soulContext: { people_type: 'unknown', _provenance: {}, companion_constraints: {} } };
+    }
     return { ok: false, error: soulContext.error };
   }
   return { ok: true, soulContext: _correctCoupleClassification(message, soulContext) };
@@ -932,6 +938,16 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
     if (knowledge.stairs_ko) answer += `\n\n참고: ${knowledge.stairs_ko}`;
   }
 
+  // Place connection (e.g. 오동도 갔다가 케이블카 타도 돼?) — checked BEFORE operation
+  // to prevent "타도 돼" substring from matching the operation branch first.
+  else if (/(오동도.*갔다가|오동도.*후에|오동도.*타도|오동도.*케이블|향일암.*갔다가|향일암.*후에)/.test(msg)) {
+    if (knowledge.odongdo_connection_ko) {
+      answer = knowledge.odongdo_connection_ko;
+    } else {
+      answer = `두 장소를 함께 계획하신다면 일정을 확인해드릴게요. 어떤 순서로 생각하고 계세요?`;
+    }
+  }
+
   // Current operation / can we go now?
   else if (/(지금.*탈|지금.*가도|지금.*갈|영업.*해|운영.*해|열었|탈 수 있|타도 돼)/.test(msg)) {
     if (knowledge.hours_ko) {
@@ -949,15 +965,6 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
       answer = knowledge.weather_ko + verifyNote;
     } else {
       answer = `${name}의 날씨 운영 정책은 현장 확인이 필요해요.${verifyNote}`;
-    }
-  }
-
-  // Place connection (e.g. 오동도 갔다가 케이블카 타도 돼?)
-  else if (/(오동도.*갔다가|오동도.*후에|오동도.*타도|오동도.*케이블|향일암.*갔다가|향일암.*후에)/.test(msg)) {
-    if (knowledge.odongdo_connection_ko) {
-      answer = knowledge.odongdo_connection_ko;
-    } else {
-      answer = `두 장소를 함께 계획하신다면 일정을 확인해드릴게요. 어떤 순서로 생각하고 계세요?`;
     }
   }
 
@@ -1957,7 +1964,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
 
   // UNDERSTAND + SHARED JOURNEY EXTRACTION (parallel — independent AI calls)
   const [understandResult, sharedJourney] = await Promise.all([
-    _understand(message),
+    _understand(message, { placeCode: explicit_context && explicit_context.place_code }),
     _extractSharedJourney(message)
   ]);
 
