@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-06T04:11:58.676Z",
+  "generated_at": "2026-10-06T05:22:23.093Z",
   "generator": "generate-manifest.js",
-  "total_count": 449,
+  "total_count": 450,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -745,6 +745,22 @@
       "title": "PROJECT PHOENIX — MUYEOJEONG / SOYEOWOOL / MAEK",
       "created_at": "2026-10-06",
       "checksum": "eb6981d2"
+    },
+    {
+      "id": "DOC-MUYOJEONG_HOME_V1_EVIDENCE",
+      "path": "docs/architecture/MUYOJEONG_HOME_V1_EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL 무여정 Main Home V1 — Evidence",
+      "created_at": "2026-10-06",
+      "checksum": "42543ef8"
     },
     {
       "id": "DOC-PHOENIX_HANDOVER_2026_09_21",
