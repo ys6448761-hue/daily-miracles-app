@@ -70,6 +70,38 @@ const SUITABILITY_LOOKUP = /어때\??|어떤가요|은\?|는\?|이야\??|괜찮�
 // even if a known place alias is present in the message
 const DISCOVERY_OVERRIDES = /근처|어디 갈|어디가 좋|갈만|가볼 만|추천해|뭐 할까|뭐 하지|뭐하지|어디서|같이 갈|같이 어디|타고 싶|가고 싶|하고 싶|일정|비용|얼마|포함/;
 
+// ─── Place-Specific Query V0.1 — verified inline knowledge for 3 Golden Places ─
+// Trust levels: VERIFIED=batch-verified, NON_OFFICIAL=blog source, UNKNOWN=no data.
+// Fields: phone (inquiry), ride_duration_ko, price_ko, hours_ko, roundtrip_ko,
+//         odongdo_connection_ko, weather_ko, wheelchair_ko, stairs_ko.
+const _PLACE_KNOWLEDGE = {
+  cablecar: {
+    phone: '061-664-7301',
+    ride_duration_ko: '편도 약 12~13분, 거리 1.5km',
+    ride_trust: 'NON_OFFICIAL',
+    price_ko: '일반캐빈 왕복 약 17,000원/편도 약 14,000원. 크리스탈캐빈(유리바닥) 왕복 약 24,000원/편도 약 19,000원.',
+    price_trust: 'NON_OFFICIAL',
+    hours_ko: '09:30~21:30 (토요일·성수기 연장)',
+    hours_trust: 'NON_OFFICIAL',
+    roundtrip_ko: '왕복권과 편도권 모두 있어요. 차를 가져오셨다면 한쪽 역에 주차하고 편도로 타신 후 반대편에서 이동하는 방법도 있어요. 왕복은 타신 곳으로 돌아오는 방식이에요.',
+    odongdo_connection_ko: '자산역(여수 쪽)에서 오동도 입구까지 버스 연계 동선으로 이어갈 수 있어요.',
+    weather_ko: '실외 고공 구간이 있어서, 강풍이나 기상 악화 시 운행이 중단될 수 있어요. 당일 날씨를 미리 확인해보세요.',
+  },
+  odongdo: {
+    phone: '061-659-1819',
+    admission_ko: '무료',
+    hours_ko: '연중무휴 (동백열차 09:00~17:00)',
+    hours_trust: 'NON_OFFICIAL',
+  },
+  hyangiram: {
+    phone: null,
+    admission_ko: '무료',
+    hours_ko: '04:00~19:00',
+    hours_trust: 'NON_OFFICIAL',
+    stairs_ko: '경내 계단 구간이 있어요. 거동이 불편하신 분은 주의가 필요해요.',
+  },
+};
+
 // Place-like noun suffixes — for unknown place detection
 const PLACE_SUFFIX_RE = /공원|시장|광장|대교|타워|암자|향일암|해변|마을|포차거리|케이블카|전망대|박물관|기념관|해수욕/;
 
@@ -819,6 +851,163 @@ function _isCommerceFollowUpIntent(message) {
   return /(얼마야|얼마에요|얼마예요|얼마 들|얼마나 들|가격 알려|견적 보여|견적 뽑|견적 알려|이 정도면|이 일정.*(얼마|가격)|이 코스.*(얼마|가격)|가격이 어)/.test(message);
 }
 
+// ─── Place-Specific Query V0.1 ────────────────────────────────────────────────
+// Detects operational/factual questions about the CURRENT place (place_code must be set at call site).
+// These questions presuppose the place is already chosen — the user wants depth about it.
+// Placed AFTER Journey Decision Gate so journey modifications ("빼줘", "가능해") take priority.
+function _isPlaceSpecificQuery(message) {
+  if (!message) return false;
+  if (/(얼마나 걸|몇 분|소요시간|걸리나요|걸려요|걸려\??)/.test(message)) return true;
+  if (/(얼마야|얼마예요|요금|입장료|가격|티켓)/.test(message)) return true;
+  if (/(왕복|편도)/.test(message)) return true;
+  if (/(휠체어|유모차|접근성|장애|배리어)/.test(message)) return true;
+  if (/(지금.*탈|지금.*가도|지금.*갈|영업.*해|운영.*해|열었|탈 수 있|타도 돼|탈 수 있어)/.test(message)) return true;
+  if (/(비 오면|날씨|우천|기상|눈이|바람이|태풍)/.test(message)) return true;
+  if (/(오동도.*갔다가|오동도.*후에|오동도.*타도|오동도.*케이블|향일암.*갔다가|향일암.*후에)/.test(message)) return true;
+  if (/(포토존|사진 어디|사진.*찍기|찍기 좋은 곳)/.test(message)) return true;
+  if (/(알려 줘)/.test(message)) return true; // spaced form not in MEDIUM_LOOKUP
+  return false;
+}
+
+// Build a deterministic response for place-specific operational/factual questions.
+// Uses inline verified knowledge (_PLACE_KNOWLEDGE) + DB place fields.
+// KNOWLEDGE SAFETY: answer only from known data; hedge on NON_OFFICIAL; UNKNOWN → VERIFY.
+function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId) {
+  const msg = message;
+  const code = place.code || '';
+  const knowledge = _PLACE_KNOWLEDGE[code] || {};
+  const name = place.name_ko || code;
+  const phone = knowledge.phone || place.phone_inquiry || null;
+  const verifyNote = phone
+    ? `\n\n정확한 정보는 ${phone}에 문의하시거나 현장에서 확인해보세요.`
+    : '\n\n현장에서 직원에게 문의해보세요.';
+
+  let answer = null;
+
+  // Duration
+  if (/(얼마나 걸|몇 분|소요시간|걸리나요|걸려요|걸려\??)/.test(msg)) {
+    if (knowledge.ride_duration_ko) {
+      answer = `${name}은 ${knowledge.ride_duration_ko}예요.`;
+      if (knowledge.ride_trust === 'NON_OFFICIAL') answer += '\n(블로그 참고값이에요. 현장 상황에 따라 다를 수 있어요.)';
+    } else if (place.avg_stay_minutes) {
+      answer = `${name} 평균 관람 시간은 약 ${place.avg_stay_minutes}분이에요.`;
+    }
+  }
+
+  // Roundtrip vs oneway
+  else if (/(왕복|편도)/.test(msg)) {
+    if (knowledge.roundtrip_ko) {
+      answer = knowledge.roundtrip_ko;
+      if (knowledge.price_ko) {
+        answer += `\n\n요금 참고: ${knowledge.price_ko}`;
+        if (knowledge.price_trust === 'NON_OFFICIAL') answer += `\n※ 공식 사이트 확인이 필요해요.${verifyNote}`;
+      }
+    }
+  }
+
+  // Price / admission fee
+  else if (/(얼마야|얼마예요|요금|입장료|가격|티켓)/.test(msg)) {
+    if (knowledge.admission_ko === '무료') {
+      answer = `${name}은 무료예요.`;
+    } else if (knowledge.price_ko) {
+      answer = `${name} 요금 참고값이에요.\n${knowledge.price_ko}`;
+      if (knowledge.price_trust === 'NON_OFFICIAL') answer += `\n\n※ 공식 사이트 확인이 필요해요.${verifyNote}`;
+    } else if (place.admission_fee_json) {
+      answer = `${name} 요금 정보가 있어요.${verifyNote}`;
+    } else {
+      answer = `${name} 요금 정보를 정확하게 알고 있지 않아요.${verifyNote}`;
+    }
+  }
+
+  // Wheelchair / accessibility
+  else if (/(휠체어|유모차|접근성|장애|배리어)/.test(msg)) {
+    const wsStatus = place.accessibility_wheelchair_status;
+    if (wsStatus === 'verified_yes') {
+      answer = `${name}은 휠체어 접근이 가능해요.`;
+    } else if (wsStatus === 'verified_no') {
+      answer = `${name}은 휠체어 접근이 어렵습니다.`;
+    } else {
+      answer = `${name}의 휠체어 접근 여부는 아직 정확하게 확인되지 않았어요.${verifyNote}`;
+    }
+    if (knowledge.stairs_ko) answer += `\n\n참고: ${knowledge.stairs_ko}`;
+  }
+
+  // Current operation / can we go now?
+  else if (/(지금.*탈|지금.*가도|지금.*갈|영업.*해|운영.*해|열었|탈 수 있|타도 돼)/.test(msg)) {
+    if (knowledge.hours_ko) {
+      answer = `${name} 운영시간은 ${knowledge.hours_ko}예요.`;
+      if (knowledge.hours_trust === 'NON_OFFICIAL') answer += '\n(참고값이에요.)';
+      answer += '\n현재 운영 여부는 현장 확인이 필요해요.' + verifyNote;
+    } else {
+      answer = `${name}의 현재 운영 여부는 현장 확인이 필요해요.${verifyNote}`;
+    }
+  }
+
+  // Weather
+  else if (/(비 오면|날씨|우천|기상|눈이|바람이|태풍)/.test(msg)) {
+    if (knowledge.weather_ko) {
+      answer = knowledge.weather_ko + verifyNote;
+    } else {
+      answer = `${name}의 날씨 운영 정책은 현장 확인이 필요해요.${verifyNote}`;
+    }
+  }
+
+  // Place connection (e.g. 오동도 갔다가 케이블카 타도 돼?)
+  else if (/(오동도.*갔다가|오동도.*후에|오동도.*타도|오동도.*케이블|향일암.*갔다가|향일암.*후에)/.test(msg)) {
+    if (knowledge.odongdo_connection_ko) {
+      answer = knowledge.odongdo_connection_ko;
+    } else {
+      answer = `두 장소를 함께 계획하신다면 일정을 확인해드릴게요. 어떤 순서로 생각하고 계세요?`;
+    }
+  }
+
+  // Photo zone — TRUE KNOWLEDGE GAP for all current places
+  else if (/(포토존|사진 어디|사진.*찍기|찍기 좋은 곳)/.test(msg)) {
+    answer = `${name} 내 포토존 위치는 아직 정확하게 파악하지 못했어요. 현장에서 직원에게 문의해보세요.`;
+  }
+
+  // "알려 줘" spaced-form fallback — route to existing place info
+  else if (/(알려 줘)/.test(msg)) {
+    if (knowledge.hours_ko) {
+      answer = `${name}에 대해 알려드릴게요.\n`;
+      if (knowledge.ride_duration_ko) answer += `이동시간: ${knowledge.ride_duration_ko}\n`;
+      if (knowledge.hours_ko) answer += `운영시간: ${knowledge.hours_ko}\n`;
+      if (knowledge.price_ko) answer += `요금(참고): ${knowledge.price_ko}\n※ 공식 확인 필요`;
+      if (!knowledge.ride_duration_ko && !knowledge.hours_ko && !knowledge.price_ko) {
+        answer = `${name}에 대해 더 구체적으로 알고 싶은 것이 있으신가요?`;
+      }
+    } else {
+      answer = `${name}에 대해 더 구체적으로 알고 싶은 것이 있으신가요?`;
+    }
+  }
+
+  // Default — should rarely happen given _isPlaceSpecificQuery patterns
+  if (!answer) {
+    answer = `${name}에 대한 정보를 확인 중이에요.${verifyNote}`;
+  }
+
+  return {
+    ok: true,
+    payload: {
+      session_id: sessionId,
+      understood_context: {
+        people_type: (soulContext && soulContext.people_type) || null,
+        group_size: (soulContext && soulContext.group_size) || null,
+      },
+      places: [],
+      why_details: [],
+      message_ko: answer,
+      status: 'PLACE_SPECIFIC_QUERY',
+      presentation_mode: 'PLACE_KNOWLEDGE',
+      quote: null,
+      route: null,
+      shared_journey: null,
+      timestamp: new Date().toISOString(),
+      next_options: [],
+    }
+  };
+}
+
 // ─── Semantic Role Extraction ─────────────────────────────────────────────────
 // Departure and lodging roles are additive — the same place can have both.
 // Uses MVP_HOTELS mapping from quoteContextService; no new resolver added.
@@ -1517,7 +1706,8 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   // ─── COMMERCE FOLLOW-UP (pre-GPT, uses stored journey_ctx) ──────────────────
   // "이 정도면 얼마야?", "견적 보여줘" etc. — never routes to DISCOVERY.
   // Merges stored Journey with explicit message overrides (message wins on conflict).
-  if (_isCommerceFollowUpIntent(message)) {
+  // Guard: explicit place_code means user is asking about current place price, not journey quote.
+  if (_isCommerceFollowUpIntent(message) && !explicit_context.place_code) {
     let journeyCtx = null;
     try {
       const sessionCtx = await sessionService.getSession(sessionId);
@@ -1829,6 +2019,24 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
     const _earlyStoredProfile = (journeyCtxForClar && journeyCtxForClar.traveler_profile) || null;
     if (_earlyStoredProfile) {
       soulContext = _applyPersistedTravelerProfile(soulContext, _earlyStoredProfile);
+    }
+
+    // ── Place-Specific Query Gate (V0.1) — intercept before CLARIFICATION ────────
+    // Handles operational/factual questions about the CURRENT place (place_code required).
+    // Examples: 왕복이 나아?, 비 오면?, 휠체어 탈 수 있어?, 얼마나 걸려?, 얼마야?
+    // Placed after Journey Decision Gate setup but before generic CLARIFICATION.
+    // soulContext is already enriched with persisted traveler profile at this point.
+    const _psqPlaceCode = explicit_context && explicit_context.place_code;
+    if (_psqPlaceCode && _isPlaceSpecificQuery(message)) {
+      try {
+        const _psqPlace = await travelGuideService.getPlaceByCode(_psqPlaceCode);
+        if (_psqPlace) {
+          return _buildPlaceSpecificQueryPayload(message, _psqPlace, soulContext, sessionId);
+        }
+      } catch (_psqErr) {
+        console.warn('[PLACE_SPECIFIC_QUERY_ERROR]', _psqErr.message);
+        // Non-fatal: fall through to Journey Decision Gate / CLARIFICATION
+      }
     }
 
     // ── Journey Decision Gate — intercept before generic CLARIFICATION ──────────
