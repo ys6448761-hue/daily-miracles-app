@@ -233,24 +233,35 @@ export default function MuyojeongHomePage() {
 
       {/* ── HERO IMAGE ─────────────────────────────────────────────────────── */}
       {/*
-          Approved Founder artwork: MUYOJEONG_MOBILE_HOME_HERO_V1.png
-          Composition: Lumi viewpoint → Sowon-i + SOUL → Yeosu sunset harbor
-          250px height preserves:
-            - golden sky glow + cable cars (upper visible area)
-            - Sowon-i and SOUL seated on stone wall (center of visible area)
-            - harbor with evening lights (throughout)
-          object-position:50% 70% — centers the crop at 70% of image height,
-          showing the lower-mid portion (harbor, characters) without cutting Sowon-i/SOUL.
-          The standalone SOUL portrait (soul-master.png) is NOT shown here —
-          SOUL is already present inside this artwork (no mascot duplication).
+          Approved Founder artwork: MUYOJEONG_MOBILE_HOME_HERO_V1.png (941×1671px, ratio 1.776)
+          Composition: Lumi viewpoint → Sowon-i (back, dark hair) + SOUL (blue character) → Yeosu sunset harbor
+
+          V1.3 object-position fix:
+            Image: 941×1671px. At 375px wide → natural height 666px.
+            Container 340px → overflow 326px.
+            objectPosition 50% 78% → Y-offset = 78% × 326 = 254px rendered = 38% from image top.
+            Visible range: 38-89% of original image.
+              38-45%: warm orange sunset sky base ← emotional hook
+              45-55%: cable car cables and gondolas
+              55-70%: Yeosu harbor with evening city lights
+              70-82%: Sowon-i + SOUL on stone wall ← FULLY VISIBLE
+              82-89%: stone wall edge (covered by 30px gradient)
+
+          Previous bug (V1.2):
+            - objectPosition 50% 70% with 250px container → showed 43-81% of image
+            - 120px bottom gradient covered image 63-81% → erased Sowon-i + SOUL
+            - Result: only dark harbor band (52-63%) visible → appeared as dark gradient area
+
+          Bottom gradient: 30px only (readability at page edge, NOT covering characters)
+          No top vignette: removed — was obscuring cable car area at this object-position
       */}
       <div
         style={{
           position:   'relative',
           width:      '100%',
-          height:     '250px',
+          height:     '340px',
           overflow:   'hidden',
-          // Loading placeholder — matches warm gradient of hero content
+          // Loading placeholder — warm dark while image loads
           background: 'linear-gradient(180deg, #2a1a0e 0%, #1a1228 50%, #130b1e 100%)',
         }}
       >
@@ -262,35 +273,23 @@ export default function MuyojeongHomePage() {
             width:          '100%',
             height:         '100%',
             objectFit:      'cover',
-            // 70%: visible range = ~47-83% of natural image height
-            // Shows: cable car silhouettes, harbor, golden sky glow, Sowon-i, SOUL
-            objectPosition: '50% 70%',
+            // 78%: visible range = 38-89% of natural image height
+            // Shows: warm sunset sky + cable cars + harbor + Sowon-i + SOUL
+            objectPosition: '50% 78%',
             display:        'block',
             opacity:        heroLoaded ? 1 : 0,
             transition:     'opacity 0.4s ease',
           }}
         />
-        {/* Bottom fade: hero artwork → page background (seamless transition) */}
+        {/* Bottom fade: 30px — covers only stone wall edge (84-89%), NOT characters */}
         <div
           style={{
             position:   'absolute',
             bottom:     0,
             left:       0,
             right:      0,
-            height:     '120px',
+            height:     '30px',
             background: `linear-gradient(to bottom, transparent 0%, ${PAGE_BG} 100%)`,
-            pointerEvents: 'none',
-          }}
-        />
-        {/* Top subtle dark vignette for sky readability */}
-        <div
-          style={{
-            position:   'absolute',
-            top:        0,
-            left:       0,
-            right:      0,
-            height:     '60px',
-            background: 'linear-gradient(to bottom, rgba(19,11,30,0.35) 0%, transparent 100%)',
             pointerEvents: 'none',
           }}
         />
