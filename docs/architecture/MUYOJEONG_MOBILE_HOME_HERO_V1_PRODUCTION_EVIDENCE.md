@@ -1,8 +1,8 @@
 # MUYOJEONG MOBILE HOME HERO V1 — Production Evidence
 
-**Status:** FOUNDER APPROVED ASSET — PRODUCTION INTEGRATED
+**Status:** FOUNDER APPROVED ASSET — PRODUCTION INTEGRATED — V1.3 VISIBILITY FIX DEPLOYED
 **Date:** 2026-10-06
-**Implementation Commit:** `cf2e4c4`
+**Implementation Commit:** `cf2e4c4` (V1.2) → `0cbe162` (V1.3 visibility fix)
 **Route:** `https://app.dailymiracles.kr/muyojeong`
 
 ---
@@ -28,13 +28,23 @@ Related assets also copied (from prior commits):
 
 **Scene:** Lumi (viewer) observing → Sowon-i (long dark hair, back to camera) + SOUL (blue glowing character) → Yeosu harbor at sunset
 
-**Visible elements in 250px mobile crop (object-position: 50% 70%):**
-- Warm orange-red sunset sky with clouds and first stars
-- Yeosu harbor with evening city lights below
-- Cable car cables and gondolas crossing the harbor
-- Sowon-i seated on stone wall (center frame)
-- SOUL seated beside Sowon-i (glowing blue character, fully visible)
-- Stone wall flowers/greenery in foreground
+**Visible elements in 340px mobile crop (object-position: 50% 78%) — V1.3:**
+
+Image 941×1671px. At 375px wide: natural height = 666px, overflow = 326px.
+objectPosition 50% 78%: Y-offset = 254px rendered → shows image from 38% to 89% of original.
+
+| Image % | Content | Container position |
+|---|---|---|
+| 38-45% | Warm orange sunset sky base | Hero top |
+| 45-55% | Cable car cables + gondolas | Upper-mid |
+| 55-70% | Yeosu harbor with evening city lights | Mid |
+| 70-82% | Sowon-i + SOUL on stone wall | Lower-mid — FULLY VISIBLE |
+| 82-89% | Stone wall edge (covered by 30px gradient) | Bottom |
+
+**V1.2 failure (fixed in V1.3):**
+- `objectPosition: 50% 70%` + `height: 250px` → showed image 43-81%
+- 120px bottom gradient covered image 63-81% → Sowon-i + SOUL completely erased
+- Net unobscured: only dark harbor band (43-63%) → appeared as "dark brown/navy gradient area"
 
 **Asset role:** Brand / Emotion Hero — NOT a Place Hero, NOT a source of travel facts
 
@@ -42,11 +52,11 @@ Related assets also copied (from prior commits):
 
 ## Integration Details
 
-### Layout Treatment (250px hero = no full-height poster)
+### Layout Treatment (340px hero — V1.3)
 
 ```
-[Hero: 250px, object-fit:cover, object-position:50% 70%]
-  ↓ bottom gradient fade (transparent → #130b1e)
+[Hero: 340px, object-fit:cover, object-position:50% 78%]
+  ↓ bottom gradient fade 30px only (transparent → #130b1e)
 [Brand: 무료 여수여행정보 / 무여정 / promise text]
 [SOUL input pill — PRIMARY ACTION]
 [Suggestion chips 2-col]
@@ -56,22 +66,22 @@ Related assets also copied (from prior commits):
 ```
 
 On 375px × 667px screen:
-- Hero ends at ~250px
+- Hero ends at ~340px
 - Brand section: ~100px
 - Input: ~52px
-- **Input visible at ~402px from top** (within 667px viewport, no scrolling required)
+- **Input visible at ~492px from top** (within 667px viewport, visible without scrolling)
 
-### Key implementation decisions
+### Key implementation decisions (V1.3)
 
 | Decision | Rationale |
 |---|---|
-| `object-position: 50% 70%` | Shows characters + harbor; sky glow visible; no cropping of Sowon-i or SOUL |
-| 250px hero height | Balances emotional impact with immediate SOUL access |
-| Bottom gradient fade | Hero → page background (#130b1e) seamless, no hard edge |
-| Top vignette (60px) | Subtle darkening for sky readability |
+| `object-position: 50% 78%` | Shows image 38-89%: warm sky + cable cars + harbor + Sowon-i/SOUL (70-82%) all visible |
+| `height: 340px` | Increases visible band to 51% of image; both sky warmth and characters can appear together |
+| Bottom gradient: 30px only | Covers only stone wall edge (84-89%); does NOT reach characters at 70-82% |
+| Top vignette REMOVED | Was obscuring cable car area at 38-52%; no longer needed |
 | `opacity` transition on load | Warm placeholder gradient during image load, smooth reveal |
 | SOUL standalone portrait REMOVED | SOUL visible inside Hero artwork — no mascot duplication |
-| `overflow: hidden` on hero container | Image does not bleed outside 250px box |
+| `overflow: hidden` on hero container | Image does not bleed outside 340px box |
 
 ### Preserved from V1.1
 
@@ -99,16 +109,16 @@ No change to SOUL routing architecture.
 
 ---
 
-## Responsive Verification Checklist
+## Responsive Verification Checklist (V1.3 — Founder re-review required)
 
-Verify at `https://app.dailymiracles.kr/muyojeong`:
+Verify at `https://app.dailymiracles.kr/muyojeong` after Render.com deploy completes (commit `0cbe162`):
 
-- [ ] A. 360px first viewport — hero, brand, input above fold
-- [ ] B. 375px first viewport — input visible without scrolling
+- [ ] A. 360px first viewport — hero scene recognizable within 1 second
+- [ ] B. 375px first viewport — Sowon-i + SOUL visible, warm sky visible
 - [ ] C. 390px first viewport — same
 - [ ] D. 412px first viewport — same
-- [ ] E. SOUL question submission — chip or typed
-- [ ] F. Hero composition — Sowon-i + SOUL visible, no distortion
+- [ ] E. Input visible without scrolling (at 492px from top, within 667px screen)
+- [ ] F. Hero composition — warm orange sky, cable cars, Sowon-i + SOUL, harbor
 - [ ] G. Brand text readable — 무여정 gold, promise white
 - [ ] H. Suggestion chips — 2-col, no overflow
 - [ ] I. Place cards — readable, correct links
@@ -131,8 +141,11 @@ Per Founder directive:
 ```
 MUYOJEONG MOBILE HOME HERO V1
 = FOUNDER APPROVED ASSET
-= PRODUCTION INTEGRATED (commit cf2e4c4)
-= MOBILE VERIFICATION PENDING (Founder/Lumi production review required)
+= V1.2 PRODUCTION INTEGRATED (commit cf2e4c4)
+= V1.3 VISIBILITY FIX DEPLOYED (commit 0cbe162)
+  Root cause: 120px gradient covered characters + objectPosition showed dark mid-section
+  Fix: 340px hero / objectPosition 50% 78% / 30px gradient / top vignette removed
+= MOBILE VERIFICATION PENDING — Founder/Lumi production re-review required
 ```
 
-**Next action:** Founder/Lumi reviews production page → then proceeds to SOUL Founder Natural Question Stress Test V0.1
+**Next action:** Founder/Lumi verifies production page (wait for Render.com deploy) → visual re-review → then SOUL Founder Natural Question Stress Test V0.1
