@@ -1822,6 +1822,15 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
       journeyCtxForClar = sessionCtx && sessionCtx.journey_ctx ? sessionCtx.journey_ctx : null;
     } catch (_) {}
 
+    // Traveler Profile Continuity: enrich soulContext from persisted profile BEFORE any gate uses it.
+    // A non-companion turn ("차 가져가") must not overwrite an already-known explicit people_type.
+    // Precedence: CURRENT USER_EXPLICIT > PERSISTED USER_EXPLICIT > CURRENT default/unknown.
+    // _applyPersistedTravelerProfile is idempotent: if current turn already has USER_EXPLICIT, stored is ignored.
+    const _earlyStoredProfile = (journeyCtxForClar && journeyCtxForClar.traveler_profile) || null;
+    if (_earlyStoredProfile) {
+      soulContext = _applyPersistedTravelerProfile(soulContext, _earlyStoredProfile);
+    }
+
     // ── Journey Decision Gate — intercept before generic CLARIFICATION ──────────
     const _journeyDecisionType = _detectJourneyDecisionType(message);
     if (_journeyDecisionType) {
