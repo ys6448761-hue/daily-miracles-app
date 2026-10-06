@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-06T02:30:28.151Z",
+  "generated_at": "2026-10-06T04:02:14.979Z",
   "generator": "generate-manifest.js",
-  "total_count": 447,
+  "total_count": 448,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1445,6 +1445,23 @@
       "title": "SOUL Place Identity & Visual Routing V0.1 — READ-ONLY Audit",
       "created_at": "2026-10-06",
       "checksum": "8a176cc5"
+    },
+    {
+      "id": "DOC-SOUL_PLACE_SPECIFIC_QUERY_V0_1",
+      "path": "docs/architecture/SOUL_PLACE_SPECIFIC_QUERY_V0_1_EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture",
+        "가격"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "SOUL Place-Specific Query V0.1 — Production Evidence",
+      "created_at": "2026-10-06",
+      "checksum": "96a0fcb6"
     },
     {
       "id": "DOC-SOUL_PRODUCT_CONTINUITY_INCIDE",
