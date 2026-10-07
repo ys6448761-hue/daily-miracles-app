@@ -1441,7 +1441,7 @@ export default function SoulCableCarPage() {
         )}
 
         {/* ── FOR ME — cable-car context only ── */}
-        {(isCableCarView || !isPlaceKnowledge) && (
+        {isCableCarView && (
           <ForMeSection
             stateIndex={stateIndex}
             variantKey={soulVariantKey}
@@ -1559,7 +1559,7 @@ export default function SoulCableCarPage() {
         )}
 
         {/* ── JOURNEY — suppressed for non-cablecar PLACE_LOOKUP ── */}
-        {(isCableCarView || !isPlaceKnowledge) && (
+        {isCableCarView && (
           <Card>
             <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">
               {hasContext ? 'SOUL이 보는 내 여행' : '여정'}
@@ -1587,7 +1587,7 @@ export default function SoulCableCarPage() {
         )}
 
         {/* ── RICH BASIC — 요금 상세 ── */}
-        {(isCableCarView || !isPlaceKnowledge) && (
+        {isCableCarView && (
           <ExpandableSection title="요금 상세">
             <p className="text-xs text-white opacity-40 mb-1">일반 캐빈 (8인 동승)</p>
             <FactRow label="대인 왕복" value="17,000원" note="편도 14,000원" />
@@ -1601,7 +1601,7 @@ export default function SoulCableCarPage() {
         )}
 
         {/* ── RICH BASIC — 캐빈 선택 ── */}
-        {(isCableCarView || !isPlaceKnowledge) && (
+        {isCableCarView && (
           <ExpandableSection title="캐빈 선택">
             <div>
               <p className="text-xs text-white opacity-50 mb-1">일반 캐빈 (8인 동승)</p>
@@ -1618,7 +1618,7 @@ export default function SoulCableCarPage() {
         )}
 
         {/* ── RICH BASIC — 운행 시간 · 날씨 ── */}
-        {(isCableCarView || !isPlaceKnowledge) && (
+        {isCableCarView && (
           <ExpandableSection title="운행 시간 · 날씨">
             <FactRow label="기본 운행" value="09:30~21:30" note="날짜·시기에 따라 변경 가능" />
             <p className="text-xs text-white opacity-50">강풍 또는 기상·정비 상황에서 운행이 변경되거나 중단될 수 있어요. 비 자체가 무조건 중단 기준은 아닙니다.</p>
@@ -1628,7 +1628,7 @@ export default function SoulCableCarPage() {
         )}
 
         {/* ── RICH BASIC — 정류장 & 자동차 여행 ── */}
-        {(isCableCarView || !isPlaceKnowledge) && (
+        {isCableCarView && (
           <ExpandableSection title="정류장 & 자동차 여행">
             <div>
               <p className="text-xs text-white opacity-50 mb-1">자산(해야정류장)</p>
@@ -1667,7 +1667,7 @@ export default function SoulCableCarPage() {
         )}
 
         {/* ── DEPTH — Question Discovery ── */}
-        {(isCableCarView || !isPlaceKnowledge) && (
+        {isCableCarView && (
           <div>
             <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">더 알고 싶을 때</p>
             <QuestionDiscovery ctx={travelerContext} />
@@ -1684,7 +1684,7 @@ export default function SoulCableCarPage() {
         )}
 
         {/* ── WISH SCENE — cable car STATE 2+ only ── */}
-        {stateIndex >= 2 && (isCableCarView || !isPlaceKnowledge) && (
+        {stateIndex >= 2 && isCableCarView && (
           <div className="rounded-2xl overflow-hidden relative mt-2" style={{ minHeight: '260px' }}>
             <img
               src="/images/soul/cable-car/wish-scene.png"

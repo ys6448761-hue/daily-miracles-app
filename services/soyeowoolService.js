@@ -87,6 +87,7 @@ const _PLACE_KNOWLEDGE = {
     roundtrip_ko: '왕복권과 편도권 모두 있어요. 차를 가져오셨다면 한쪽 역에 주차하고 편도로 타신 후 반대편에서 이동하는 방법도 있어요. 왕복은 타신 곳으로 돌아오는 방식이에요.',
     odongdo_connection_ko: '자산역(여수 쪽)에서 오동도 입구까지 버스 연계 동선으로 이어갈 수 있어요.',
     weather_ko: '실외 고공 구간이 있어서, 강풍이나 기상 악화 시 운행이 중단될 수 있어요. 당일 날씨를 미리 확인해보세요.',
+    parking_ko: '자산(해야)·돌산(놀아) 양쪽 정류장 모두 접근 가능해요. 주차 위치·혼잡은 출발 정류장에 따라 달라요.',
   },
   odongdo: {
     phone: '061-659-1819',
@@ -100,6 +101,7 @@ const _PLACE_KNOWLEDGE = {
     hours_ko: '04:00~19:00',
     hours_trust: 'NON_OFFICIAL',
     stairs_ko: '경내 계단 구간이 있어요. 거동이 불편하신 분은 주의가 필요해요.',
+    routes_ko: '두 경로로 오를 수 있어요. 한 쪽은 가파른 편이고 (약 10분), 다른 쪽은 상대적으로 완만해요 (약 15분). 완만한 길도 계단이 없지는 않아요. 올라온 길 또는 다른 경로로 내려갈 수 있어요.',
   },
 };
 
@@ -980,6 +982,15 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
     answer = `${name} 내 포토존 위치는 아직 정확하게 파악하지 못했어요. 현장에서 직원에게 문의해보세요.`;
   }
 
+  // Parking — connect to parking_ko knowledge when present
+  else if (/(주차|차 세우|차 대|주차장)/.test(msg)) {
+    if (knowledge.parking_ko) {
+      answer = knowledge.parking_ko + verifyNote;
+    } else {
+      answer = `${name}의 주차 정보는 현장 확인이 필요해요.${verifyNote}`;
+    }
+  }
+
   // Hours — alternative phrasings not caught by the operation branch ("몇 시까지", "마감", "열어")
   else if (/(몇 시까지|마감|닫어|닫나요|닫아|언제까지|열어|몇 시에 열|언제 열)/.test(msg)) {
     if (knowledge.hours_ko) {
@@ -991,11 +1002,13 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
     }
   }
 
-  // Stairs / alternate route — return stairs knowledge, admit no alternate path data
+  // Stairs / alternate route — prefer routes_ko (full context) over stairs_ko alone
+  // Never append false "대안 경로 정보 없어요" when routes_ko is present.
   else if (/(계단|다른 길|우회|올라가는 길|내려가는 길)/.test(msg)) {
-    if (knowledge.stairs_ko) {
-      answer = knowledge.stairs_ko;
-      answer += `\n대안 경로 정보는 아직 없어요.${verifyNote}`;
+    if (knowledge.routes_ko) {
+      answer = knowledge.routes_ko + verifyNote;
+    } else if (knowledge.stairs_ko) {
+      answer = knowledge.stairs_ko + verifyNote;
     } else {
       answer = `${name}의 경로 정보가 아직 없어요.${verifyNote}`;
     }
@@ -1192,6 +1205,19 @@ function _generateClarificationMessage(soulContext, message, journeyCtx) {
   // These questions have a clear factual intent; companion framing would be confusing.
   if (/(운행|운영|열었|오픈|마감|비 오|날씨|기상|사진|찍어|찍을|포토|얼마나|걸려|요금|입장|가격)/.test(msg)) {
     return '더 정확히 알아볼게요. 어느 장소에 대해 궁금하신가요?';
+  }
+
+  // Comparison intent — criterion is present but comparison targets are missing.
+  // "어디가 더 편해?" → criterion="편함", targets=missing.
+  // Do NOT discard the criterion with a generic companion greeting.
+  // Do NOT invent comparison targets.
+  if (/(어디가 더|어디가 편한|더 편해|더 편한|어느 쪽이 더|어느 곳이 더)/.test(msg)) {
+    const isComfortComparison = /(편해|편한|편안|쉬워|수월)/.test(msg);
+    if (isComfortComparison) {
+      const companionPrefix = pt === 'family_elderly' ? '부모님이 ' : '';
+      return `어디와 어디를 비교해드릴까요?\n${companionPrefix}더 편하게 다녀올 수 있는 곳을 기준으로 비교해볼게요.`;
+    }
+    return '어디와 어디를 비교해드릴까요?\n비교해드릴 장소를 알려주시면 바로 살펴볼게요.';
   }
 
   // Companion-aware generic fallback
