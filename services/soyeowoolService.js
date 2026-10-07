@@ -103,6 +103,41 @@ const _PLACE_KNOWLEDGE = {
     stairs_ko: '경내 계단 구간이 있어요. 거동이 불편하신 분은 주의가 필요해요.',
     routes_ko: '두 경로로 오를 수 있어요. 한 쪽은 가파른 편이고 (약 10분), 다른 쪽은 상대적으로 완만해요 (약 15분). 완만한 길도 계단이 없지는 않아요. 올라온 길 또는 다른 경로로 내려갈 수 있어요.',
   },
+  // ── BROAD places — Phoenix-verified evidence only ──────────────────────────
+  lee_soon_shin_plaza: {
+    phone: null,
+    admission_ko: '무료예요.',
+    hours_ko: '야외 광장으로 연중개방이에요.',
+    experience_ko: '이순신 장군을 기리는 역사 광장이에요. 거북선 무료 전시도 있어요. 미남크루즈 코스와 2층버스 주간코스에도 포함돼요.',
+    fit_ko: '역사에 관심 있는 분이나 아이와 함께 오기 좋아요. 크루즈나 2층버스 여행 동선에 자연스럽게 포함돼요.',
+    unknown_boundary: '거북선 내부 탑승 여부 등 세부 사항은 현장에서 확인해보세요.',
+  },
+  dolsan_nightscape: {
+    phone: '061-659-4628',
+    admission_ko: '무료예요. 주차도 무료예요 (승용차 150대, 대형차 15대).',
+    hours_ko: '연중개방 (24시간)이에요.',
+    experience_ko: '여수 야경을 보기 가장 좋은 곳 중 하나예요. 돌산대교·이순신광장·장군도를 한눈에 볼 수 있어요. 반려동물도 함께 갈 수 있어요.',
+    fit_ko: '야경 감상에 좋아요. 반려동물 동반 가능해요. 2층버스 종점이라 대중교통으로도 오기 편해요.',
+    unknown_boundary: '야경 최적 시간대는 계절에 따라 달라요. 현장에서 확인해보세요.',
+  },
+  marine_park: {
+    phone: '061-690-2342',
+    phone_hamel: '061-659-5706',
+    admission_ko: '공원과 하멜전시관 모두 무료예요.',
+    hours_ko: null,
+    hamel_hours_ko: '하멜전시관은 09:00~18:00, 월요일 휴무예요.',
+    experience_ko: '1.5km 산책로가 있는 해안 공원이에요. 공원 안에 하멜전시관이 있어요. 미남크루즈와 이사부크루즈 코스도 이곳을 지나가요.',
+    fit_ko: '산책·휴식을 즐기기 좋아요. 하멜과 여수의 인연이 궁금한 분께 하멜전시관을 추천해요.',
+    unknown_boundary: '공원 야간 개방 여부는 확인이 필요해요.',
+  },
+  dolsan_daegyo: {
+    phone: null,
+    admission_ko: null,
+    hours_ko: null,
+    experience_ko: '여수 시내와 돌산도를 잇는 다리예요. 케이블카 돌산역(놀아) 가까이에 있어요. 돌산공원에서 야경으로 보기 좋아요. 미남크루즈와 이사부크루즈 코스에서도 볼 수 있어요.',
+    fit_ko: '야경 감상 동선에 포함돼요. 크루즈에서도 볼 수 있어요.',
+    unknown_boundary: '도보로 건너는 게 가능한지는 현장에서 확인해보세요.',
+  },
 };
 
 // Place-like noun suffixes — for unknown place detection
@@ -284,18 +319,25 @@ function _buildPlaceLookupMessage(place, judgedContext = null) {
   parts.push(`${name}에 대해 알려드릴게요.`);
 
   // Identity + experience line
+  // Prefer experience_ko from _PLACE_KNOWLEDGE when present (richer content for BROAD places).
+  // Falls back to PLACE_IDENTITY_KO (all 12 places), then structural fallback.
   if (place.description_short) {
     parts.push(place.description_short);
   } else {
-    const identity = PLACE_IDENTITY_KO[place.code] || null;
-    if (identity) {
-      parts.push(identity);
+    const placeKnowledge = _PLACE_KNOWLEDGE[place.code] || {};
+    if (placeKnowledge.experience_ko) {
+      parts.push(placeKnowledge.experience_ko);
     } else {
-      // Structural fallback — rare (only for unknown codes)
-      const io = place.indoor_outdoor;
-      if (io === 'outdoor')                              parts.push('야외 공간이에요.');
-      else if (io === 'indoor')                         parts.push('실내 시설이에요.');
-      else if (io === 'indoor_outdoor' || io === 'mixed') parts.push('실내·외 혼합 공간이에요.');
+      const identity = PLACE_IDENTITY_KO[place.code] || null;
+      if (identity) {
+        parts.push(identity);
+      } else {
+        // Structural fallback — rare (only for unknown codes)
+        const io = place.indoor_outdoor;
+        if (io === 'outdoor')                              parts.push('야외 공간이에요.');
+        else if (io === 'indoor')                         parts.push('실내 시설이에요.');
+        else if (io === 'indoor_outdoor' || io === 'mixed') parts.push('실내·외 혼합 공간이에요.');
+      }
     }
   }
 
@@ -917,9 +959,11 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
   }
 
   // Price / admission fee
-  else if (/(얼마야|얼마예요|요금|입장료|가격|티켓)/.test(msg)) {
+  else if (/(얼마야|얼마예요|요금|입장료|가격|티켓|무료야|공짜야|유료야|무료인가|무료 인가|무료예요)/.test(msg)) {
     if (knowledge.admission_ko === '무료') {
       answer = `${name}은 무료예요.`;
+    } else if (knowledge.admission_ko) {
+      answer = knowledge.admission_ko + verifyNote;
     } else if (knowledge.price_ko) {
       answer = `${name} 요금 참고값이에요.\n${knowledge.price_ko}`;
       if (knowledge.price_trust === 'NON_OFFICIAL') answer += `\n\n※ 공식 사이트 확인이 필요해요.${verifyNote}`;
@@ -1014,16 +1058,49 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
     }
   }
 
-  // "알려 줘" spaced-form fallback — route to existing place info
+  // Hamel Exhibition Hall — marine_park specific, before general experience branch
+  else if (/(하멜전시관|하멜 전시관|하멜|네덜란드|전시관)/.test(msg)) {
+    if (knowledge.hamel_hours_ko) {
+      const hamelPhone = knowledge.phone_hamel || knowledge.phone;
+      const hamelVerify = hamelPhone
+        ? `\n\n정확한 정보는 ${hamelPhone}에 문의하시거나 현장에서 확인해보세요.`
+        : '\n\n현장에서 직원에게 문의해보세요.';
+      answer = knowledge.hamel_hours_ko + hamelVerify;
+    } else if (knowledge.experience_ko) {
+      answer = knowledge.experience_ko + verifyNote;
+    }
+  }
+
+  // Experience / Place Identity — preference over raw field dump for BROAD places
+  else if (/(어떤 곳|어떤 데|어떤 장소|소개|설명해|알고 싶어|알려줘|뭐 하는 곳|뭐가 있어|뭐 볼|뭐해)/.test(msg)) {
+    if (knowledge.experience_ko) {
+      answer = knowledge.experience_ko + verifyNote;
+    }
+  }
+
+  // Fit / Companion — only fires when fit_ko present; does not invent judgments
+  else if (/(누구랑|어울려|잘 맞|가기 좋|어울리|적합|노인|어린이|어린|친구|혼자|커플|연인)/.test(msg)) {
+    if (knowledge.fit_ko) {
+      answer = knowledge.fit_ko + verifyNote;
+    }
+  }
+
+  // Access / Transportation
+  else if (/(어떻게 가|교통|가는 법|대중교통|버스로|접근)/.test(msg)) {
+    if (knowledge.access_ko) {
+      answer = knowledge.access_ko + verifyNote;
+    }
+  }
+
+  // "알려 줘" spaced-form fallback — prefer experience_ko for BROAD places
   else if (/(알려 줘)/.test(msg)) {
-    if (knowledge.hours_ko) {
+    if (knowledge.experience_ko) {
+      answer = knowledge.experience_ko + verifyNote;
+    } else if (knowledge.hours_ko) {
       answer = `${name}에 대해 알려드릴게요.\n`;
       if (knowledge.ride_duration_ko) answer += `이동시간: ${knowledge.ride_duration_ko}\n`;
       if (knowledge.hours_ko) answer += `운영시간: ${knowledge.hours_ko}\n`;
       if (knowledge.price_ko) answer += `요금(참고): ${knowledge.price_ko}\n※ 공식 확인 필요`;
-      if (!knowledge.ride_duration_ko && !knowledge.hours_ko && !knowledge.price_ko) {
-        answer = `${name}에 대해 더 구체적으로 알고 싶은 것이 있으신가요?`;
-      }
     } else {
       answer = `${name}에 대해 더 구체적으로 알고 싶은 것이 있으신가요?`;
     }
