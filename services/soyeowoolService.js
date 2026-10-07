@@ -980,6 +980,27 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
     answer = `${name} 내 포토존 위치는 아직 정확하게 파악하지 못했어요. 현장에서 직원에게 문의해보세요.`;
   }
 
+  // Hours — alternative phrasings not caught by the operation branch ("몇 시까지", "마감", "열어")
+  else if (/(몇 시까지|마감|닫어|닫나요|닫아|언제까지|열어|몇 시에 열|언제 열)/.test(msg)) {
+    if (knowledge.hours_ko) {
+      answer = `${name} 운영시간은 ${knowledge.hours_ko}예요.`;
+      if (knowledge.hours_trust === 'NON_OFFICIAL') answer += '\n(참고값이에요.)';
+      answer += verifyNote;
+    } else {
+      answer = `${name}의 운영시간 정보가 아직 없어요.${verifyNote}`;
+    }
+  }
+
+  // Stairs / alternate route — return stairs knowledge, admit no alternate path data
+  else if (/(계단|다른 길|우회|올라가는 길|내려가는 길)/.test(msg)) {
+    if (knowledge.stairs_ko) {
+      answer = knowledge.stairs_ko;
+      answer += `\n대안 경로 정보는 아직 없어요.${verifyNote}`;
+    } else {
+      answer = `${name}의 경로 정보가 아직 없어요.${verifyNote}`;
+    }
+  }
+
   // "알려 줘" spaced-form fallback — route to existing place info
   else if (/(알려 줘)/.test(msg)) {
     if (knowledge.hours_ko) {
@@ -2122,6 +2143,28 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
         }
         await sessionService.updateJourneyContext(sessionId, _writeData).catch(err => console.error('[CONV_JOURNEY_WRITE_ERROR]', err.message));
         return { ok: true, payload: _journeyResult.payload };
+      }
+    }
+
+    // ── Living Detail Fallback — unrecognized concrete questions on place pages ──────
+    // When the PSQ gate didn't fire (pattern not in _isPlaceSpecificQuery) but a place_code
+    // context exists, attempt PSQ rather than falling to a generic planning prompt.
+    // _buildPlaceSpecificQueryPayload returns graceful "정보를 확인 중이에요" for unknown patterns.
+    // Guard: skip for greetings, indecision, and cable-car clarification intents that
+    // belong in _generateClarificationMessage early branches.
+    const _ldGuardBypass =
+      /^(안녕|안녕하세요|반가워|하이|hello|hi)[\s!.?]*$/i.test(message.trim())
+      || /(잘 모르겠|모르겠어|뭐가 좋을|뭐 해야|어떡하|어쩌)/.test(message)
+      || (/케이블카|케이블 카/.test(message) && /(꼭|반드시|타고 싶|타야|빼고|빼줘|제외|일정에|탈거야)/.test(message));
+    if (_psqPlaceCode && !_ldGuardBypass) {
+      try {
+        const _ldPlace = await travelGuideService.getPlaceByCode(_psqPlaceCode);
+        if (_ldPlace) {
+          return _buildPlaceSpecificQueryPayload(message, _ldPlace, soulContext, sessionId);
+        }
+      } catch (_ldErr) {
+        console.warn('[LIVING_DETAIL_FALLBACK_ERROR]', _ldErr.message);
+        // Non-fatal: fall through to _generateClarificationMessage
       }
     }
 
