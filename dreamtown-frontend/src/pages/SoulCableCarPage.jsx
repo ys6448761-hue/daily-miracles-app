@@ -117,6 +117,7 @@ const PLACE_HERO_MAP = {
   cablecar:  '/images/soul/place-hero/cablecar.png',
   odongdo:   '/images/soul/place-hero/odongdo.png',
   hyangiram: '/images/soul/place-hero/hyangiram.png',
+  yisunsin:  '/images/soul/place-hero/yisunsin.png',
 };
 
 // ── FOR ME texts (7 context variants) ────────────────────────────────────────

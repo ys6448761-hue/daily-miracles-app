@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-07T01:29:01.230Z",
+  "generated_at": "2026-10-07T23:28:28.193Z",
   "generator": "generate-manifest.js",
-  "total_count": 454,
+  "total_count": 455,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1509,7 +1509,7 @@
       "status": "active",
       "title": "SOUL Place Knowledge Binding Repair V0.1 — Evidence",
       "created_at": "2026-10-07",
-      "checksum": "37b53caa"
+      "checksum": "ccfd7ad8"
     },
     {
       "id": "DOC-SOUL_PLACE_SPECIFIC_QUERY_V0_1",
@@ -1682,6 +1682,22 @@
       "title": "SOUL Vision Continuity — Current Repository State & Work Inventory V0.1",
       "created_at": "2026-10-07",
       "checksum": "d484aa77"
+    },
+    {
+      "id": "DOC-SOUL_YISUNSIN_SQUARE_ASSET_DEC",
+      "path": "docs/architecture/SOUL_YISUNSIN_SQUARE_ASSET_DECISION_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture"
+      ],
+      "owner": "team",
+      "status": "역할 설명",
+      "title": "SOUL YiSunSin Square — Asset Inventory Decision V0.1",
+      "created_at": "2026-10-07",
+      "checksum": "168ae27a"
     },
     {
       "id": "DOC-SOYEOWOOL_PHASE1_SCOPE_LOCK_20",
