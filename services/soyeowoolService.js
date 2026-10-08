@@ -112,9 +112,20 @@ const _PLACE_KNOWLEDGE = {
     fit_ko: '역사에 관심 있는 분이나 아이와 함께 오기 좋아요. 크루즈나 2층버스 여행 동선에 자연스럽게 포함돼요.',
     unknown_boundary: '거북선 내부 탑승 여부 등 세부 사항은 현장에서 확인해보세요.',
   },
+  // ── PARKING LIFECYCLE (dolsan_nightscape) ────────────────────────────────────
+  // Archive — past operation (date unconfirmed):
+  //   admission_ko (old): '무료예요. 주차도 무료예요 (승용차 150대, 대형차 15대).'
+  //   Background: 과거 무료 운영 → 현재 유료 전환. 대형버스 공간 → 승용차 공간으로 전환.
+  //   Source: Founder 2026-10-09 확인. DO NOT restore old values.
+  //
+  // Current (Founder-confirmed 2026-10-09):
+  //   면수: Founder 확인 235대. 운영주체 자료 249대와 집계 범위 차이 미해결 Evidence.
+  //   235대는 집계 범위가 명확해질 때까지 서비스 미노출.
+  //   요금: 최초 1시간 무료, 이후 10분당 200원. 현장 안내판 우선.
   dolsan_nightscape: {
     phone: '061-659-4628',
-    admission_ko: '무료예요. 주차도 무료예요 (승용차 150대, 대형차 15대).',
+    admission_ko: '무료예요.',
+    parking_ko: '공영주차장이 있어요. 최초 1시간 무료, 이후 10분당 200원이에요. 방문 전 현장 안내판을 확인해보세요.',
     hours_ko: '연중개방 (24시간)이에요.',
     experience_ko: '여수 야경을 보기 가장 좋은 곳 중 하나예요. 돌산대교·이순신광장·장군도를 한눈에 볼 수 있어요. 반려동물도 함께 갈 수 있어요.',
     fit_ko: '야경 감상에 좋아요. 반려동물 동반 가능해요. 2층버스 종점이라 대중교통으로도 오기 편해요.',
