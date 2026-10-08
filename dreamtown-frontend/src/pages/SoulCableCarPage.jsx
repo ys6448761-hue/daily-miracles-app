@@ -111,13 +111,98 @@ const SOUL_DISCOVERY = {
     '오동도까지 이어가면서 차를 이용하고 부모님도 함께라면, 결정에 중요한 것은 차량 회수와 탑승 편안함이에요. 왕복으로 이용하면 차량 회수가 단순해지고, 일반 캐빈이 부모님께 더 편할 수 있어요.',
 };
 
+// ── Dolsan Park discovery text ────────────────────────────────────────────────
+// Source: V1.1 Content — Founder / Lumi approved 2026-10-09
+// PLACE: dolsan_nightscape (돌산대교 돌산공원)
+// Guardrail: 하트 조형물 현재 존치 미확정 — 조형물 언급 금지
+const DOLSAN_SOUL_DISCOVERY = {
+  default:
+    '돌산공원은 어떤 시간에 오느냐에 따라 전혀 다른 풍경을 만나는 곳이에요. 낮에는 돌산대교와 바다의 형태가 선명하고, 해 질 무렵에는 하늘빛이 달라지며, 밤에는 대교와 건너편 도시의 조명이 또 다른 여수를 만들어요.',
+};
+
+// ── Dolsan Park FOR ME text ───────────────────────────────────────────────────
+// Source: V1.1 Content — 접근성 가드레일 포함
+// Guardrail: 준공기념탑 계단 구간 = 휠체어 불가. 전망대 인근 차량 접근 대체 안내.
+// NOT claimed: 전망대 전 구역 무단차 보장 없음
+const DOLSAN_FOR_ME =
+  '돌산대교 준공기념탑 부근에는 계단이 있어 휠체어로 해당 구간을 통과할 수 없습니다. 휠체어 이용자는 케이블카 인근에서 도보보다 차량으로 전망대 인근 주차장까지 이동하는 방법을 고려해 주세요. 차량 이동은 약 1~2분이며, 전망 지점별 세부 이동 조건은 현장에서 확인해 주세요.';
+
+// ── Dolsan Park QuestionDiscovery ────────────────────────────────────────────
+// Source: V1.1 Question Discovery — 5 questions confirmed by Founder / Lumi 2026-10-09
+function DolsanQuestionDiscovery() {
+  const [openKeys, setOpenKeys] = useState(new Set());
+  function toggle(key) {
+    setOpenKeys((prev) => {
+      const next = new Set(prev);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+  }
+
+  const items = [
+    {
+      key: 'view',
+      icon: '🌉',
+      q: '돌산공원에서는 어떤 풍경을 볼 수 있나요?',
+      a: '돌산대교의 A자형 주탑과 사선 케이블, 그 너머의 바다와 여수 시가지가 하나의 풍경으로 이어져요. 낮에는 다리와 바다의 형태가 선명하고, 밤에는 대교와 건너편 도시의 조명이 달라진 여수를 보여줘요.',
+    },
+    {
+      key: 'time',
+      icon: '🌇',
+      q: '낮과 밤 중 언제 방문하면 좋을까요?',
+      a: '낮에는 바다와 도시 풍경이 선명하게 보이고, 해 질 무렵에는 하늘빛이 달라지며, 밤에는 돌산대교와 건너편 도시의 조명이 또 다른 풍경을 만들어요. 각 시간대에 다른 여수를 만날 수 있어서 방문 목적에 따라 선택하시면 돼요.',
+    },
+    {
+      key: 'spot',
+      icon: '📍',
+      q: '돌산대교를 바라볼 수 있는 전망 지점은 어디인가요?',
+      a: '돌산공원 전망대에서 돌산대교와 장군도, 여수 바다를 볼 수 있어요. 전망 지점 위치는 공원 현장 안내를 따라 이동하시면 돼요.',
+    },
+    {
+      key: 'parking',
+      icon: '🅿️',
+      q: '돌산공원 공영주차장은 무료인가요?',
+      a: '돌산공원 공영주차장은 최초 1시간 무료이며, 이후 10분당 200원의 요금이 부과돼요. 방문 전 최신 운영주체 안내를 확인하는 것을 권장해요.',
+    },
+    {
+      key: 'wheelchair',
+      icon: '♿',
+      q: '휠체어를 이용한다면 전망대까지 어떻게 이동해야 하나요?',
+      a: '돌산대교 준공기념탑 부근에는 계단이 있어 휠체어로 해당 구간을 통과하기 어려워요. 차량으로 전망대 인근 주차장까지 이동하는 방법을 고려해 주세요. 차량 이동은 약 1~2분이며, 전망 지점별 세부 이동 조건은 현장에서 확인해 주세요.',
+    },
+  ];
+
+  return (
+    <div className="space-y-2">
+      {items.map((item) => (
+        <div key={item.key} className="rounded-xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
+          <button
+            onClick={() => toggle(item.key)}
+            className="w-full text-left px-4 py-3 flex items-start gap-2"
+          >
+            <span className="text-base flex-shrink-0">{item.icon}</span>
+            <span className="text-sm text-white opacity-80 leading-snug">{item.q}</span>
+            <span className="ml-auto text-white opacity-30 text-xs flex-shrink-0">{openKeys.has(item.key) ? '▲' : '▼'}</span>
+          </button>
+          {openKeys.has(item.key) && (
+            <div className="px-4 pb-3">
+              <p className="text-sm text-white opacity-60 leading-relaxed">{item.a}</p>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ── place hero asset map ──────────────────────────────────────────────────────
 // Source: C:\DREAM TOWN\Assets\SOUL\{Place}\Place_Hero\ (Founder-designated SOUL assets)
 const PLACE_HERO_MAP = {
-  cablecar:  '/images/soul/place-hero/cablecar.png',
-  odongdo:   '/images/soul/place-hero/odongdo.png',
-  hyangiram: '/images/soul/place-hero/hyangiram.png',
-  yisunsin:  '/images/soul/place-hero/yisunsin.png',
+  cablecar:          '/images/soul/place-hero/cablecar.png',
+  odongdo:           '/images/soul/place-hero/odongdo.png',
+  hyangiram:         '/images/soul/place-hero/hyangiram.png',
+  yisunsin:          '/images/soul/place-hero/yisunsin.png',
+  dolsan_nightscape: '/images/soul/place-hero/dolsan-nightscape.png',
 };
 
 // ── FOR ME texts (7 context variants) ────────────────────────────────────────
@@ -868,7 +953,7 @@ function OdongdoQuestionDiscovery({ ctx }) {
 }
 
 // ── Main page ────────────────────────────────────────────────────────────────
-const SUPPORTED_PLACE_CODES = ['cablecar', 'odongdo', 'hyangiram'];
+const SUPPORTED_PLACE_CODES = ['cablecar', 'odongdo', 'hyangiram', 'dolsan_nightscape'];
 
 export default function SoulCableCarPage() {
   const navigate = useNavigate();
@@ -903,6 +988,7 @@ export default function SoulCableCarPage() {
   const isCableCarView  = placeCode === 'cablecar';
   const isOdongdoView   = placeCode === 'odongdo';
   const isHyangiramView = placeCode === 'hyangiram';
+  const isDolsanView    = placeCode === 'dolsan_nightscape';
   const heroSrc = PLACE_HERO_MAP[placeCode] ?? null;
 
   const hasContext =
@@ -937,6 +1023,8 @@ export default function SoulCableCarPage() {
     ? (ODONGDO_SOUL_DISCOVERY[odongdoVariantKey] ?? ODONGDO_SOUL_DISCOVERY.default)
     : isHyangiramView
     ? (HYANGIRAM_SOUL_DISCOVERY[hyangiramVariantKey] ?? HYANGIRAM_SOUL_DISCOVERY.default)
+    : isDolsanView
+    ? DOLSAN_SOUL_DISCOVERY.default
     : (SOUL_DISCOVERY[soulVariantKey] ?? SOUL_DISCOVERY.default);
 
   async function handleSubmit(e) {
@@ -1008,7 +1096,7 @@ export default function SoulCableCarPage() {
             ← 뒤로
           </button>
           <h1 className="text-sm font-semibold text-white truncate mx-2">
-            {isCableCarView ? '여수해상케이블카' : isOdongdoView ? '오동도' : isHyangiramView ? '향일암' : (placeData?.name_ko || '여수해상케이블카')}
+            {isCableCarView ? '여수해상케이블카' : isOdongdoView ? '오동도' : isHyangiramView ? '향일암' : isDolsanView ? '돌산공원' : (placeData?.name_ko || '여수해상케이블카')}
           </h1>
           <div className="flex items-center gap-3 text-white opacity-40 text-sm">
             <span title="저장">🔖</span>
@@ -1026,7 +1114,7 @@ export default function SoulCableCarPage() {
               ref={inputRef}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder={isOdongdoView ? '오동도에 대해 뭐든 물어보세요' : isHyangiramView ? '향일암에 대해 뭐든 물어보세요' : '케이블카에 대해 뭐든 물어보세요'}
+              placeholder={isOdongdoView ? '오동도에 대해 뭐든 물어보세요' : isHyangiramView ? '향일암에 대해 뭐든 물어보세요' : isDolsanView ? '돌산공원 야경, 주차, 전망대 가는 길… 무엇이 궁금하세요?' : '케이블카에 대해 뭐든 물어보세요'}
               className="flex-1 bg-transparent text-white placeholder-white placeholder-opacity-40 text-sm outline-none"
             />
             <button
@@ -1116,7 +1204,7 @@ export default function SoulCableCarPage() {
              Resets on next user query. No new chat UI — additive to existing response.
         ────────────────────────────────────────────────────────────────────────── */}
         {soulResponse?.presentation_mode === 'DISCOVERING' && (() => {
-          const DETAIL_NAMES = { cablecar: '여수해상케이블카', odongdo: '오동도', hyangiram: '향일암' };
+          const DETAIL_NAMES = { cablecar: '여수해상케이블카', odongdo: '오동도', hyangiram: '향일암', dolsan_nightscape: '돌산대교 돌산공원' };
           const detailPlaces = (soulResponse.places || []).filter(p => DETAIL_NAMES[p.code]);
           if (detailPlaces.length === 0) return null;
           return (
@@ -1165,10 +1253,10 @@ export default function SoulCableCarPage() {
           <div className="relative z-10 p-5 flex flex-col justify-end" style={{ minHeight: '200px' }}>
             <div className="mt-auto">
               <p className="text-xs text-white opacity-50 mb-1 tracking-widest uppercase">
-                {isCableCarView ? '여수 · 해상 케이블카' : ('여수 · ' + (placeData?.name_ko || ''))}
+                {isCableCarView ? '여수 · 해상 케이블카' : isDolsanView ? '여수 · 돌산대교 돌산공원' : ('여수 · ' + (placeData?.name_ko || ''))}
               </p>
               <h2 className="text-2xl font-bold text-white leading-tight">
-                {isCableCarView ? '여수해상케이블카' : isOdongdoView ? '오동도' : isHyangiramView ? '향일암' : (placeData?.name_ko || '')}
+                {isCableCarView ? '여수해상케이블카' : isOdongdoView ? '오동도' : isHyangiramView ? '향일암' : isDolsanView ? '돌산공원' : (placeData?.name_ko || '')}
               </h2>
               {isCableCarView && (
                 <p className="text-sm text-white opacity-60 mt-1">
@@ -1185,6 +1273,11 @@ export default function SoulCableCarPage() {
                   절벽 위의 암자 · 바다와 빛의 여수
                 </p>
               )}
+              {isDolsanView && (
+                <p className="text-sm text-white opacity-60 mt-1">
+                  돌산대교 전망 · 낮과 밤이 다른 여수
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -1196,7 +1289,19 @@ export default function SoulCableCarPage() {
         {/* Other places: PlaceBasicInfo V0.2 formatter logic + FactRow (null-tolerant). */}
         <Card>
           <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">알아야 할 것</p>
-          {isHyangiramView ? (
+          {isDolsanView ? (
+            // Dolsan curated — V1.1 approved facts: 무료입장/상시개방/공영주차장/안내전화
+            // NOT shown: exact parking count (official range unconfirmed), heart LED status (uncertain)
+            <>
+              <FactRow label="입장" value="무료" />
+              <FactRow label="개방" value="상시" />
+              <FactRow label="주차" value="공영주차장" note="최초 1시간 무료, 이후 10분당 200원" />
+              <FactRow label="문의" value="061-659-4628" />
+              <p className="text-xs text-white opacity-30 mt-2">
+                주차 운영 조건은 방문 전 현장 확인을 권장해요.
+              </p>
+            </>
+          ) : isHyangiramView ? (
             // Hyangiram curated — BATCH_01 verified: admission=무료, hours=04:00~19:00,
             //   physical_difficulty=high, parking=공영주차장 2시간 무료. Seed: outdoor.
             // NOT shown: exact step count, fixed climb time, accessibility totals (not verified)
@@ -1396,6 +1501,118 @@ export default function SoulCableCarPage() {
           </div>
         )}
 
+        {/* ── DOLSAN: EXPERIENCE 01 — 야경 · 대교 전경 ── */}
+        {/* Source: Dolsan_Park/Experience/… 야경 파노라마. V1.1 decision: experience-v1.png */}
+        {/* Guardrail: 하트형 LED 조형물 존치 여부 미확정 — 조형물 언급 금지 */}
+        {isDolsanView && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '220px' }}>
+            <img
+              src="/images/soul/dolsan-nightscape/experience-v1.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 40%' }}
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.50) 0%, transparent 55%)' }}
+            />
+            <div className="relative z-10 p-4 flex flex-col justify-end" style={{ minHeight: '220px' }}>
+              <div className="mt-auto">
+                <p className="text-xs text-white opacity-60">돌산대교 야경 · 밤의 여수</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── DOLSAN: FOR ME — 접근성 안내 ── */}
+        {/* Guardrail: 준공기념탑 계단 = 휠체어 불가. 차량 대안 안내. 전 구역 무단차 보장 안 함. */}
+        {isDolsanView && (
+          <Card className="border-dream-purple border-opacity-30">
+            <p className="text-xs text-dream-purple font-semibold mb-2 uppercase tracking-wider">접근 안내</p>
+            <p className="text-sm text-white leading-relaxed">{DOLSAN_FOR_ME}</p>
+          </Card>
+        )}
+
+        {/* ── DOLSAN: CONTEXT — 낮의 공원 전경 ── */}
+        {/* Source: Dolsan_Park/Context/… 낮 공원 + 준공기념탑 원경. V1.1 decision: context-v1.png */}
+        {isDolsanView && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '200px' }}>
+            <img
+              src="/images/soul/dolsan-nightscape/context-v1.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 40%' }}
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.18) 0%, transparent 40%)' }}
+            />
+          </div>
+        )}
+
+        {/* ── DOLSAN: SOUL JUDGMENT ── */}
+        {isDolsanView && (
+          <Card>
+            <p className="text-xs text-dream-purple font-semibold mb-3 uppercase tracking-wider">SOUL</p>
+            <p className="text-sm text-white leading-relaxed">
+              {isPlaceKnowledge && soulResponse?.place_identity_ko
+                ? soulResponse.place_identity_ko
+                : primaryDiscovery}
+            </p>
+          </Card>
+        )}
+
+        {/* ── DOLSAN: JOURNEY — 두 경로 (일반 / 휠체어 대안) ── */}
+        {/* Source: V1.1 journey text. 두 경로: 도보 / 차량 대안. */}
+        {isDolsanView && (
+          <Card>
+            <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">여정</p>
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs text-white opacity-50 mb-1 font-medium">일반 경로</p>
+                <p className="text-sm text-white opacity-80 leading-relaxed">
+                  공원 주차장 → 산책로 → 준공기념탑 부근 → 전망 포인트. 전망대까지 도보 이동 가능하며 이정표를 따라 이동하세요.
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-white opacity-50 mb-1 font-medium">차량 대안 (접근 제한 시)</p>
+                <p className="text-sm text-white opacity-80 leading-relaxed">
+                  준공기념탑 부근 계단 구간이 어려운 경우, 차량으로 전망대 인근 주차장까지 이동(약 1~2분)하는 방법을 고려해 주세요. 전망 지점별 이동 조건은 현장에서 확인하세요.
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* ── DOLSAN: JOURNEY IMAGE ── */}
+        {/* Source: Dolsan_Park/Journey/… 목조 데크 전망 at sunset. V1.1 decision: journey-v2.png */}
+        {isDolsanView && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '200px' }}>
+            <img
+              src="/images/soul/dolsan-nightscape/journey-v2.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 40%' }}
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.18) 0%, transparent 40%)' }}
+            />
+          </div>
+        )}
+
+        {/* ── DOLSAN: Question Discovery ── */}
+        {isDolsanView && (
+          <div>
+            <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">더 알고 싶을 때</p>
+            <DolsanQuestionDiscovery />
+            <p className="text-white opacity-30 text-xs mt-3">☎ 공원 문의: 061-659-4628</p>
+          </div>
+        )}
+
         {/* ── ODONGDO: EXPERIENCE CAMELLIA — 동백꽃 섬 정체성 ── */}
         {/* Source: dtArtifactWorker keywords, itineraryService "동백꽃", SSOT YS01 */}
         {isOdongdoView && (
@@ -1493,22 +1710,25 @@ export default function SoulCableCarPage() {
           </div>
         )}
 
-        {/* ── SOUL JUDGMENT ── */}
-        <Card>
-          <p className="text-xs text-dream-purple font-semibold mb-3 uppercase tracking-wider">
-            SOUL
-          </p>
-          {isCableCarView && !isPlaceKnowledge && !hasContext && (
-            <p className="text-xs text-white opacity-40 mb-2 leading-relaxed">
-              여수 바다 위를 가로지르는 해상 케이블카예요. 케이블카 안에서 바다와 섬·항구를 내려다볼 수 있어요.
+        {/* ── SOUL JUDGMENT — cable car / odongdo / hyangiram / PLACE_KNOWLEDGE only ── */}
+        {/* dolsan has its own SOUL card rendered inline above */}
+        {!isDolsanView && (
+          <Card>
+            <p className="text-xs text-dream-purple font-semibold mb-3 uppercase tracking-wider">
+              SOUL
             </p>
-          )}
-          <p className="text-sm text-white leading-relaxed">
-            {isPlaceKnowledge && soulResponse?.place_identity_ko
-              ? soulResponse.place_identity_ko
-              : primaryDiscovery}
-          </p>
-        </Card>
+            {isCableCarView && !isPlaceKnowledge && !hasContext && (
+              <p className="text-xs text-white opacity-40 mb-2 leading-relaxed">
+                여수 바다 위를 가로지르는 해상 케이블카예요. 케이블카 안에서 바다와 섬·항구를 내려다볼 수 있어요.
+              </p>
+            )}
+            <p className="text-sm text-white leading-relaxed">
+              {isPlaceKnowledge && soulResponse?.place_identity_ko
+                ? soulResponse.place_identity_ko
+                : primaryDiscovery}
+            </p>
+          </Card>
+        )}
 
         {/* ── EXPERIENCE: CABIN VIEW — visual breathing moment before Journey ── */}
         {isCableCarView && (
