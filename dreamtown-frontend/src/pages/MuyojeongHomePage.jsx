@@ -36,12 +36,17 @@ import { getOrEnsureGuestCredential } from '../api/dreamtown.js';
 // ── Living Detail nav — place codes with supported detail views ────────────────
 // Mirrors SoulCableCarPage.SUPPORTED_PLACE_CODES.
 // lee_soon_shin_plaza excluded: no dedicated detail view yet (폴백 → cablecar 방지).
-const NAVIGABLE_PLACE_CODES = ['cablecar', 'odongdo', 'hyangiram', 'dolsan_nightscape'];
+const NAVIGABLE_PLACE_CODES = ['cablecar', 'odongdo', 'hyangiram', 'dolsan_nightscape', 'dolsan_daegyo'];
 const PLACE_NAME_KO = {
   cablecar:          '케이블카',
   odongdo:           '오동도',
   hyangiram:         '향일암',
   dolsan_nightscape: '돌산공원',
+  dolsan_daegyo:     '돌산대교',
+};
+// 돌산대교는 돌산공원 Living Detail 페이지 공유 — 별도 상세 뷰 없음
+const PLACE_DETAIL_CODE_MAP = {
+  dolsan_daegyo: 'dolsan_nightscape',
 };
 
 // ── Color tokens — from Founder Visual Reference ───────────────────────────────
@@ -137,7 +142,7 @@ function SoulAnswerSummary({ response, onNewQuestion }) {
       {isNavigable && (
         <div style={{ marginTop: '12px' }}>
           <button
-            onClick={() => navigate(`/soul/cable-car?place=${resolvedCode}`)}
+            onClick={() => navigate(`/soul/cable-car?place=${PLACE_DETAIL_CODE_MAP[resolvedCode] || resolvedCode}`)}
             style={{
               width:        '100%',
               padding:      '10px 16px',
