@@ -71,6 +71,106 @@ const SUITABILITY_LOOKUP = /어때\??|어떤가요|은\?|는\?|이야\??|괜찮�
 // even if a known place alias is present in the message
 const DISCOVERY_OVERRIDES = /근처|어디 갈|어디가 좋|갈만|가볼 만|추천해|뭐 할까|뭐 하지|뭐하지|어디서|같이 갈|같이 어디|타고 싶|가고 싶|하고 싶|일정|비용|얼마|포함/;
 
+// ─── City Context Safety Guard V0.1 ──────────────────────────────────────────
+// Purpose: block fabricated routing of unsupported-city requests to Yeosu results.
+// Scope: soyeowoolService only. DB/Schema/Route/JSX changes: NONE.
+// city_code is always 'YEOSU' in v0.1; CITY_DISPLAY_NAME is a hook for future multi-city.
+
+const UNSUPPORTED_CITY_KO  = ['순천', '광양'];
+const CITY_DISPLAY_NAME    = '여수'; // v0.1 constant — all response text uses this
+
+// Comparison: "여수와 순천 중" — city comparison question, not a booking request
+const _CITY_COMPARISON_RE      = /(여수|순천|광양)\s*(와|과)\s*(여수|순천|광양).{0,8}(중|사이|간)/;
+// Unsupported city deferred: "순천은 다음에" — unsupported is NOT the current destination
+const _UNSUPPORTED_DEFERRED_RE = /(순천|광양)\s*(은|는)?\s*(다음에|나중에|언젠가)/;
+// Unsupported city excluded: "광양은 빼고" — request focuses on Yeosu
+const _CITY_EXCLUDE_RE         = /(순천|광양)\s*(은|는)?\s*(빼고|제외|없이)/;
+// Multi-night multi-city: requires explicit night/day token spanning two different cities
+const _MULTI_CITY_NIGHTS_RE    = /(여수|순천|광양).{0,25}(1박|2박|3박|하루|이틀|사흘).{0,25}(여수|순천|광양)/;
+
+/**
+ * Classify whether a message targets an unsupported city.
+ *   null                 → no unsupported city, or safely deferred/excluded → normal flow
+ *   'AMBIGUOUS'          → comparison question, intent unclear → clarification
+ *   'MULTI_CITY_REQUEST' → explicit multi-night multi-city plan → partial support msg
+ *   'UNSUPPORTED_PRIMARY'→ user requests unsupported city as current destination
+ */
+function _classifyCityIntent(message) {
+  const hasUnsupported = UNSUPPORTED_CITY_KO.some(c => message.includes(c));
+  if (!hasUnsupported) return null;
+
+  if (_CITY_COMPARISON_RE.test(message))      return 'AMBIGUOUS';
+  if (_MULTI_CITY_NIGHTS_RE.test(message))    return 'MULTI_CITY_REQUEST';
+  if (_UNSUPPORTED_DEFERRED_RE.test(message)) return null; // unsupported city deferred → yeosu flow
+  if (_CITY_EXCLUDE_RE.test(message))         return null; // unsupported city excluded → yeosu flow
+
+  return 'UNSUPPORTED_PRIMARY';
+}
+
+function _buildUnsupportedCityPayload(cityName, sessionId) {
+  return {
+    ok: true,
+    payload: {
+      session_id: sessionId,
+      understood_context: {},
+      places: [],
+      why_details: [],
+      message_ko: `${cityName}은(는) 아직 제가 안내드릴 수 있는 지역이 아니에요.\n현재는 ${CITY_DISPLAY_NAME} 여행을 도와드릴 수 있어요.\n${CITY_DISPLAY_NAME}에서 비슷한 경험을 찾아드릴까요?`,
+      status: 'CITY_UNSUPPORTED',
+      presentation_mode: 'CLARIFICATION',
+      resolved_code: null,
+      quote: null,
+      route: null,
+      shared_journey: null,
+      next_options: [`${CITY_DISPLAY_NAME}에서 찾아드릴게요`],
+      timestamp: new Date().toISOString(),
+    },
+  };
+}
+
+function _buildMultiCityPayload(sessionId) {
+  return {
+    ok: true,
+    payload: {
+      session_id: sessionId,
+      understood_context: {},
+      places: [],
+      why_details: [],
+      message_ko: `${CITY_DISPLAY_NAME}·순천·광양 여정을 계획하고 계시는군요.\n현재 ${CITY_DISPLAY_NAME} 구간은 도와드릴 수 있어요. 순천·광양은 아직 준비 중이에요.\n${CITY_DISPLAY_NAME}부터 함께 계획해드릴까요?`,
+      status: 'MULTI_CITY_PARTIAL',
+      presentation_mode: 'CLARIFICATION',
+      resolved_code: null,
+      quote: null,
+      route: null,
+      shared_journey: null,
+      next_options: [`${CITY_DISPLAY_NAME}부터 계획해요`],
+      timestamp: new Date().toISOString(),
+    },
+  };
+}
+
+function _buildAmbiguousCityPayload(sessionId) {
+  return {
+    ok: true,
+    payload: {
+      session_id: sessionId,
+      understood_context: {},
+      places: [],
+      why_details: [],
+      message_ko: `어느 지역을 먼저 여행하고 싶으신지 알려주세요.\n현재는 ${CITY_DISPLAY_NAME} 여행을 도와드릴 수 있어요.`,
+      status: 'CITY_AMBIGUOUS',
+      presentation_mode: 'CLARIFICATION',
+      resolved_code: null,
+      quote: null,
+      route: null,
+      shared_journey: null,
+      next_options: [`${CITY_DISPLAY_NAME}로 계획할게요`],
+      timestamp: new Date().toISOString(),
+    },
+  };
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ─── Place-Specific Query V0.1 — verified inline knowledge for 3 Golden Places ─
 // Trust levels: VERIFIED=batch-verified, NON_OFFICIAL=blog source, UNKNOWN=no data.
 // Fields: phone (inquiry), ride_duration_ko, price_ko, hours_ko, roundtrip_ko,
@@ -1286,12 +1386,12 @@ function _generateClarificationMessage(soulContext, message, journeyCtx) {
 
   // Greeting
   if (/^(안녕|안녕하세요|반가워|하이|hello|hi)\s*[!.?]?\s*$/i.test(msg.trim())) {
-    return '안녕하세요! 여수 여행을 도와드릴게요.\n어떤 여행을 생각하고 계신가요?';
+    return `안녕하세요! ${CITY_DISPLAY_NAME} 여행을 도와드릴게요.\n어떤 여행을 생각하고 계신가요?`;
   }
 
   // Indecision / open
   if (/(잘 모르겠|모르겠어|뭐가 좋을|뭐 해야|어떡하|어쩌)/.test(msg)) {
-    return '괜찮아요. 천천히 얘기해주세요.\n여수에서 어떤 경험을 하고 싶으신가요?';
+    return `괜찮아요. 천천히 얘기해주세요.\n${CITY_DISPLAY_NAME}에서 어떤 경험을 하고 싶으신가요?`;
   }
 
   // Specific operational/photo question — do NOT replace with companion context.
@@ -1324,7 +1424,7 @@ function _generateClarificationMessage(soulContext, message, journeyCtx) {
     return '부모님과 함께하는 여행이시군요.\n어떤 도움이 필요하신가요?';
   }
 
-  return '여수 여행을 더 잘 도와드릴 수 있도록, 어떤 여행을 계획하고 계신지 말씀해 주세요.';
+  return `${CITY_DISPLAY_NAME} 여행을 더 잘 도와드릴 수 있도록, 어떤 여행을 계획하고 계신지 말씀해 주세요.`;
 }
 
 function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPlaceCode = null, effectiveMobility = null) {
@@ -1351,7 +1451,7 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPla
   if (_isMultiDayTrip(message)) {
     situationLine = companionLine
       ? `${companionLine} 여행이시군요.`
-      : '여수 여행을 계획하고 계시군요.';
+      : `${CITY_DISPLAY_NAME} 여행을 계획하고 계시군요.`;
   } else if (timeOfDay === 'night' || timeOfDay === 'evening') {
     situationLine = companionLine
       ? `${companionLine} 밤 시간이 남으셨군요.`
@@ -1419,8 +1519,8 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPla
     // Multi-day first: "1박2일" makes time_available clarification contradictory.
     if (_isMultiDayTrip(message)) {
       return placePrefix
-        ? `${placePrefix}\n여수에서 가볼 만한 곳을 골라봤어요.`
-        : `${situationLine}\n여수에서 가볼 만한 곳을 골라봤어요.`;
+        ? `${placePrefix}\n${CITY_DISPLAY_NAME}에서 가볼 만한 곳을 골라봤어요.`
+        : `${situationLine}\n${CITY_DISPLAY_NAME}에서 가볼 만한 곳을 골라봤어요.`;
     }
     if (pref === 'photo') {
       const countNote = requestedCount ? `${requestedCount}곳 요청하셨는데, ` : '';
@@ -1842,6 +1942,21 @@ async function _handleJourneyDecision({ decisionType, message, soulContext, conv
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 async function handleTravelRequest({ message, sessionId, hotelId, principal, explicit_context = {} }) {
+  // ─── City Context Safety Guard V0.1 ─────────────────────────────────────────
+  // Intercepts unsupported-city requests before PLACE_LOOKUP or DISCOVERY paths.
+  // Must be the first gate — DISCOVERY_OVERRIDES includes "하고 싶" which would otherwise
+  // bypass PLACE_LOOKUP and silently route "순천에서 하루 보내고 싶어" to Yeosu results.
+  {
+    const cityIntent = _classifyCityIntent(message);
+    if (cityIntent === 'UNSUPPORTED_PRIMARY') {
+      const detectedCity = UNSUPPORTED_CITY_KO.find(c => message.includes(c)) || '해당 지역';
+      return _buildUnsupportedCityPayload(detectedCity, sessionId);
+    }
+    if (cityIntent === 'MULTI_CITY_REQUEST') return _buildMultiCityPayload(sessionId);
+    if (cityIntent === 'AMBIGUOUS')          return _buildAmbiguousCityPayload(sessionId);
+  }
+  // ─────────────────────────────────────────────────────────────────────────────
+
   // PLACE_LOOKUP DETECTION (deterministic, pre-GPT)
   // Exact/alias match → skip ranking. Unknown → PLACE_UNKNOWN (no substitution).
   // UI-001: chip place_code supplements when text has no alias but message has a lookup/suitability verb.
@@ -2175,7 +2290,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
       why_details: [],
       message_ko: quoteMessage,
       status: 'GROUP_CONSULTATION_REQUIRED',
-      next_options: ['여수 관광지 먼저 둘러보기'],
+      next_options: [`${CITY_DISPLAY_NAME} 관광지 먼저 둘러보기`],
       group_size: soulContext.group_size,
       timestamp: new Date().toISOString(),
       shared_journey: sharedJourney || null
