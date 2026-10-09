@@ -1090,7 +1090,7 @@ export default function SoulCableCarPage() {
       <header className="sticky top-0 z-10 bg-night-sky bg-opacity-95 backdrop-blur-sm border-b border-white border-opacity-10">
         <div className="max-w-md mx-auto flex items-center justify-between px-4 py-3">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/muyojeong')}
             className="text-white opacity-60 hover:opacity-100 text-sm flex items-center gap-1"
           >
             ← 뒤로
