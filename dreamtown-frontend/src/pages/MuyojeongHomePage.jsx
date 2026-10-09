@@ -33,6 +33,17 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getOrEnsureGuestCredential } from '../api/dreamtown.js';
 
+// ── Living Detail nav — place codes with supported detail views ────────────────
+// Mirrors SoulCableCarPage.SUPPORTED_PLACE_CODES.
+// lee_soon_shin_plaza excluded: no dedicated detail view yet (폴백 → cablecar 방지).
+const NAVIGABLE_PLACE_CODES = ['cablecar', 'odongdo', 'hyangiram', 'dolsan_nightscape'];
+const PLACE_NAME_KO = {
+  cablecar:          '케이블카',
+  odongdo:           '오동도',
+  hyangiram:         '향일암',
+  dolsan_nightscape: '돌산공원',
+};
+
 // ── Color tokens — from Founder Visual Reference ───────────────────────────────
 // Yeosu Blue #6EB8FF / Starlight Gold #FFD67A / Aqua Glow #B8F4FF
 const PAGE_BG = '#130b1e'; // page background — must match hero bottom gradient
@@ -41,8 +52,13 @@ const PAGE_BG = '#130b1e'; // page background — must match hero bottom gradien
 function SoulAnswerSummary({ response, onNewQuestion }) {
   if (!response || !response.message_ko) return null;
 
-  const mode   = response.presentation_mode;
-  const status = response.status;
+  const navigate = useNavigate();
+  const mode     = response.presentation_mode;
+  const status   = response.status;
+
+  const resolvedCode   = response.resolved_code || null;
+  const isNavigable    = status === 'PLACE_LOOKUP' && NAVIGABLE_PLACE_CODES.includes(resolvedCode);
+  const placeNameForBtn = isNavigable ? (PLACE_NAME_KO[resolvedCode] || resolvedCode) : null;
 
   let badge = null;
   if (status !== 'JOURNEY_CONTINUITY') {
@@ -116,6 +132,28 @@ function SoulAnswerSummary({ response, onNewQuestion }) {
           <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.68)', lineHeight: 1.5, wordBreak: 'keep-all' }}>
             {nextAction}
           </p>
+        </div>
+      )}
+      {isNavigable && (
+        <div style={{ marginTop: '12px' }}>
+          <button
+            onClick={() => navigate(`/soul/cable-car?place=${resolvedCode}`)}
+            style={{
+              width:        '100%',
+              padding:      '10px 16px',
+              borderRadius: '12px',
+              background:   'rgba(110,184,255,0.13)',
+              border:       '1px solid rgba(110,184,255,0.32)',
+              color:        '#6EB8FF',
+              fontSize:     '0.875rem',
+              fontWeight:   600,
+              cursor:       'pointer',
+              textAlign:    'center',
+              wordBreak:    'keep-all',
+            }}
+          >
+            {placeNameForBtn} 자세히 보기 →
+          </button>
         </div>
       )}
     </div>
