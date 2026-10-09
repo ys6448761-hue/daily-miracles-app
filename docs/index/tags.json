@@ -14,6 +14,7 @@
     "DOC-tag_taxonomy",
     "DOC-소원놀이터_종합문서_v10",
     "DOC-AURORA-STATUS",
+    "DOC-ARCH_GUARD_PROTOCOL_V0_1",
     "DOC-dreamtown-postcard-emotion-cop",
     "DOC-DreamTown_Emotional_Translatio",
     "DOC-INDEX",
@@ -38,6 +39,7 @@
     "DOC-SOUL_CABLE_CAR_RICH_BASIC_INFO",
     "DOC-SOUL_Detail_Content_Structure_",
     "DOC-SOUL_Detail_Page_Reuse_Audit_V",
+    "DOC-SOUL_LIVING_DETAIL_NAV_PRODUCT",
     "DOC-SOUL_LIVING_DETAIL_PAGE_REALIT",
     "DOC-SOUL_PRODUCT_CONTINUITY_INCIDE",
     "DOC-SOUL_TAXONOMY_PROVENANCE_AUDIT",
@@ -58,6 +60,7 @@
     "DOC-kpi-event-schema",
     "DOC-README",
     "DOC-playground-events",
+    "DOC-ARCH_GUARD_SCENARIO_VERIFICATI",
     "DOC-DreamTown_GPT_Knowledge_Pack",
     "DOC-DreamTown_SSOT_Core",
     "DOC-DreamTown_SSOT_Registry_Summar",
@@ -535,6 +538,7 @@
     "DOC-SOUL_CURRENT_INTENT_MULTI_PLAC",
     "DOC-SOUL_OPEN_ENDED_PLACE_QUESTION",
     "DOC-SOUL_PLACE_SPECIFIC_QUERY_V0_1",
+    "DOC-SOUL_SHORT_OPERATIONAL_GATE_V0",
     "DOC-DEC-20260201-포인트추천예고편-정책구현",
     "DOC-YEOSU_2026_VERIFICATION_BATCH_",
     "DOC-YEOSU_2026_VERIFICATION_BATCH_",
@@ -579,12 +583,15 @@
     "DOC-AIL-정산-v2-final",
     "DOC-DreamTown_Event_SSOT",
     "DOC-AURORA-STATUS",
+    "DOC-ARCH_GUARD_PROTOCOL_V0_1",
     "DOC-INDEX",
     "DOC-aurora5-master-knowledge-v2",
     "DOC-PROMOTION-RULES",
     "DOC-정산-v2-CEO-요약",
+    "DOC-SOUL_LIVING_DETAIL_NAV_PRODUCT",
     "DOC-CLAUDE_DESKTOP_MCP_CONFIG",
     "DOC-README",
+    "DOC-ARCH_GUARD_SCENARIO_VERIFICATI",
     "DOC-DT_Express_Architecture",
     "DOC-DT_Folder_Responsibility_Index",
     "DOC-설계구조-루미기획-충돌분석",
@@ -627,6 +634,7 @@
     "DOC-2025-12-30_소원5문항_gem유지_결정서",
     "DOC-20251229-9PH",
     "DOC-20251229-SRH",
+    "DOC-MEET-20261010-003",
     "DOC-inquiry-form-api"
   ],
   "ops": [
@@ -848,6 +856,14 @@
     "DOC-20260101-99J",
     "DOC-20251229-PFO"
   ],
+  "governance": [
+    "DOC-ARCH_GUARD_PROTOCOL_V0_1",
+    "DOC-ARCH_GUARD_CONTINUITY_H01_H03",
+    "DOC-ARCH_GUARD_DUAL_AGENT_CONTINUI",
+    "DOC-ARCH_GUARD_SCENARIO_VERIFICATI",
+    "DOC-LEGACY_YEOSU_ORIGIN_ASSETS_DEL",
+    "DOC-TEMPLATE_Decision_Meeting_Reco"
+  ],
   "ssot": [
     "DOC-dreamtown-postcard-emotion-cop",
     "DOC-INDEX",
@@ -923,6 +939,7 @@
     "DOC-SOUL_DELEGATION_CLARIFICATION_",
     "DOC-SOUL_Detail_Content_Structure_",
     "DOC-SOUL_Detail_Page_Reuse_Audit_V",
+    "DOC-SOUL_DOLSAN_BRIDGE_LIVING_DETA",
     "DOC-SOUL_DOLSAN_PARK_RUNTIME_QA_V1",
     "DOC-SOUL_GOLDEN_QUESTION_ORIGIN_PR",
     "DOC-SOUL_GOLDEN_QUESTION_SEMANTIC_",
@@ -930,6 +947,7 @@
     "DOC-SOUL_JUDGMENT_V01_PRODUCTION_P",
     "DOC-SOUL_LEGACY_JOURNEY_PRESENTATI",
     "DOC-SOUL_LEGACY_JOURNEY_RESTORATIO",
+    "DOC-SOUL_LIVING_DETAIL_NAV_PRODUCT",
     "DOC-SOUL_LIVING_DETAIL_PAGE_REALIT",
     "DOC-SOUL_LIVING_DETAIL_PAGE_SIMPLE",
     "DOC-SOUL_MINIMAL_PORT_IMPL_RECORD_",
@@ -945,6 +963,7 @@
     "DOC-SOUL_PRE_PILOT_READINESS_CHECK",
     "DOC-SOUL_PRODUCT_CONTINUITY_INCIDE",
     "DOC-SOUL_RUNTIME_REPAIR_CLARIFICAT",
+    "DOC-SOUL_SHORT_OPERATIONAL_GATE_V0",
     "DOC-SOUL_TAXONOMY_PROVENANCE_AUDIT",
     "DOC-SOUL_TAXONOMY_PROVENANCE_AUDIT",
     "DOC-SOUL_UI_001_EXPLICIT_CONTEXT_C",
@@ -1052,9 +1071,6 @@
   ],
   "events": [
     "DOC-playground-events"
-  ],
-  "governance": [
-    "DOC-LEGACY_YEOSU_ORIGIN_ASSETS_DEL"
   ],
   "gpt": [
     "DOC-DreamTown_GPT_Knowledge_Pack",
@@ -1431,5 +1447,11 @@
   ],
   "컨텍스트관리": [
     "DOC-2025-12-29_최수민방식적용"
+  ],
+  "meetings": [
+    "DOC-MEET-20261010-001",
+    "DOC-MEET-20261010-002",
+    "DOC-MEET-20261010-003",
+    "DOC-MEET-20261009-001"
   ]
 }

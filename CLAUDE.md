@@ -108,6 +108,9 @@ memory/MEMORY.md → docs/product/SOUL_PRODUCT_VISION_V0_1.md → 관련 Decisio
 - NOT_IMPLEMENTED ≠ DEPRECATED (미구현 ≠ 폐기)
 - 소원이와의 경험 표면 축소/교체/재정의 시 Founder 승인 필수
 
+**Architecture Guard Protocol (PILOT):**
+충돌 판정(PASS/ADVISORY/REVIEW HOLD/HARD HOLD)·양방향 메시지 형식·Meeting Record → `docs/governance/ARCH_GUARD_PROTOCOL_V0_1.md`
+
 ## 📚 참조 문서 경로
 | 문서 | 경로 | 용도 |
 |------|------|------|

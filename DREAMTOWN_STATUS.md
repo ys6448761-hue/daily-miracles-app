@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-03
+Last Updated: 2026-10-10
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -13,22 +13,24 @@ Last Updated: 2026-10-03
 ### 필수 읽기 순서 (신규 세션)
 
 ```
-1. memory/MEMORY.md                                    ← 최신 Project State + Current Next Action
+1. memory/MEMORY.md (동일 머신)                        ← 최신 Project State + Current Next Action
+   또는 이 파일 §★ Current Next Action (원격 클론 환경) ← git-tracked 스냅샷
 2. docs/product/SOUL_PRODUCT_VISION_V0_1.md            ← Active Product Vision (SOUL 상세 경험)
-3. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
-4. docs/architecture/SOUL_PRODUCT_CONTINUITY_INCIDENT_AUDIT_V0_1.md  ← Continuity 기록
-5. docs/architecture/SOUL_VISION_CONTINUITY_REPOSITORY_STATE_INVENTORY_V0_1.md  ← 현재 구현 상태
+3. docs/governance/ARCH_GUARD_PROTOCOL_V0_1.md         ← Architecture Guard PILOT rev3 (충돌 판정)
+4. docs/governance/meetings/ (최신 Meeting Record)     ← 결정 근거 + Founder Decision 상태
+5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
-### ★ Current Next Action (exactly 1)
+### ★ Current Next Action (exactly 1) — Updated: 2026-10-10
 
-**SoulCableCarPage.jsx Production Port — Product Contract Alignment Required**
+**Architecture Guard PILOT rev3 로컬 커밋 완료 대기 → GitHub Push Founder 결정 대기**
 
-- SoulCableCarPage.jsx: `origin/staging/storybook-c7a` ONLY — NOT on main
-- All backend prerequisites LIVE: Judgment V0.1 (@d3e7f0e), UI-001 (@294c55c), Soyeowool Phase 1 (@1f5afab)
-- Port classification: **PORT_REQUIRES_MINIMAL_ALIGNMENT** (D2 confirmed, vision canonicalized — see below)
-- Port-ready elements: QUESTION_COMPOSER, SOUL_MESSAGE, PLACE_HERO, SOUL_JUDGMENT, ESSENTIAL_INFO (PlaceBasicInfo 연결 포함), COST
-- Alignment required: chip→API wiring (Gap B), JOURNEY scope within D2, social proof slot decision
+- SOUL Living Detail Navigation R1: **CLOSED** @77cac69 (Founder QA ALL PASS 2026-10-09)
+- Architecture Guard V0.1: **PILOT rev3** — Dual-Agent Continuity 10/10 PASS [SIMULATED]
+- 실제 독립 신규 세션 검증: **미실시** (별도 환경 테스트 필요)
+- GitHub Push: **미승인** (로컬 커밋만 승인됨)
+- 미해결: enforce_admins=false AIL Gate bypass / Render CI 미대기 (구조적 위험 기록 유지)
+- 전체 상세: `memory/MEMORY.md` (동일 머신) 또는 `docs/governance/meetings/MEET-20261010-003.md`
 
 ### Production-Live (Project Phoenix)
 
@@ -38,6 +40,8 @@ Last Updated: 2026-10-03
 | Judgment V0.1 backend | d3e7f0e | PRODUCTION_LIVE |
 | UI-001 explicit_context contract | 294c55c | PRODUCTION_LIVE |
 | Soyeowool Phase 1 | 1f5afab | PRODUCTION_LIVE |
+| SOUL Short Op Gate V0.1 | b11f012 | PRODUCTION_LIVE |
+| **SOUL Living Detail Navigation R1** | **77cac69** | **PRODUCTION_LIVE — Founder QA ALL PASS** |
 
 ### Staging-Only (SoulCableCarPage, 9 elements)
 
