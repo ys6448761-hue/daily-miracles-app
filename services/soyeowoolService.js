@@ -171,6 +171,37 @@ function _buildAmbiguousCityPayload(sessionId) {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─── Short Operational Query Gate V0.1 ───────────────────────────────────────
+// Short messages (< 5 chars) that are clearly place-specific operational queries
+// but carry no place context → PLACE_CONTEXT_REQUIRED clarification in MuyojeongHomePage.
+// When explicit place_code IS present → gate is skipped (falls through to PSQ path).
+// Anchor pattern: full message must be just the keyword (optional trailing punctuation).
+const SHORT_OPERATIONAL_RE = /^(주차|요금|입장료|화장실|운영시간|운행시간|예약|계단|가격|전화)[?!？]?$/;
+
+function _buildPlaceContextClarificationPayload(keyword, sessionId) {
+  // Use keyword+"정보" to avoid Korean subject-particle mismatch (가 vs 이).
+  // All result strings end in "보" (vowel) → "정보가" is always grammatically correct.
+  return {
+    ok: true,
+    payload: {
+      session_id: sessionId,
+      understood_context: {},
+      places: [],
+      why_details: [],
+      message_ko: `${keyword} 정보가 궁금하신 장소를 알려주세요.\n예: '오동도 ${keyword}', '케이블카 ${keyword}'처럼 장소 이름과 함께 물어보시면 바로 답해드릴게요.`,
+      status: 'PLACE_CONTEXT_REQUIRED',
+      presentation_mode: 'CLARIFICATION',
+      resolved_code: null,
+      quote: null,
+      route: null,
+      shared_journey: null,
+      next_options: [`오동도 ${keyword}`, `케이블카 ${keyword}`],
+      timestamp: new Date().toISOString(),
+    },
+  };
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ─── Place-Specific Query V0.1 — verified inline knowledge for 3 Golden Places ─
 // Trust levels: VERIFIED=batch-verified, NON_OFFICIAL=blog source, UNKNOWN=no data.
 // Fields: phone (inquiry), ride_duration_ko, price_ko, hours_ko, roundtrip_ko,
@@ -1035,6 +1066,8 @@ function _isPlaceSpecificQuery(message) {
   if (/(오동도.*갔다가|오동도.*후에|오동도.*타도|오동도.*케이블|향일암.*갔다가|향일암.*후에)/.test(message)) return true;
   if (/(포토존|사진 어디|사진.*찍기|사진.*찍어|어디서.*찍|찍기 좋은 곳)/.test(message)) return true;
   if (/(알려 줘)/.test(message)) return true; // spaced form not in MEDIUM_LOOKUP
+  if (/(주차|주차장|주차비|주차요금|차 세우|차 대는)/.test(message)) return true;
+  if (/(화장실|운영시간|운행시간)/.test(message)) return true; // short operational — need place context
   return false;
 }
 
@@ -2007,6 +2040,16 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
     }
     return { ok: true, payload: _buildUnknownPlacePayload(placeLookup.placeName, sessionId) };
   }
+
+  // ─── Short Operational Query Gate V0.1 ────────────────────────────────────────
+  // Intercepts short place-specific operational keywords (주차/요금/etc.) when NO
+  // place context is available (MuyojeongHomePage). Returns CLARIFICATION asking
+  // which place the user means — avoids HTTP 400 from contextExtraction length guard.
+  // Messages with explicit place_code fall through to PSQ gate at line ~2343.
+  if (!explicit_context.place_code && SHORT_OPERATIONAL_RE.test(message.trim())) {
+    return _buildPlaceContextClarificationPayload(message.trim(), sessionId);
+  }
+  // ─────────────────────────────────────────────────────────────────────────────
 
   // ─── COMMERCE FOLLOW-UP (pre-GPT, uses stored journey_ctx) ──────────────────
   // "이 정도면 얼마야?", "견적 보여줘" etc. — never routes to DISCOVERY.
