@@ -185,6 +185,11 @@ function _detectPlaceLookupIntent(message) {
       const isSuitabilityQuery = SUITABILITY_LOOKUP.test(afterAlias.slice(0, MEDIUM_PROXIMITY));
       return { isPlaceLookup: true, placeName: alias, resolvedCode: PLACE_ALIAS_MAP[alias], isSuitabilityQuery };
     }
+    // Exact alias match: entire message IS the place name with no trailing content
+    // DISCOVERY_OVERRIDES already filtered above; verb-based paths already handled above.
+    if (message.trim() === alias) {
+      return { isPlaceLookup: true, placeName: alias, resolvedCode: PLACE_ALIAS_MAP[alias], isSuitabilityQuery: false };
+    }
   }
 
   // No known alias — check if message mentions an unknown place-like noun with a strong lookup verb
