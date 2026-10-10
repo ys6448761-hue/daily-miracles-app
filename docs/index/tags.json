@@ -907,6 +907,7 @@
     "DOC-inquiry-form-api"
   ],
   "architecture": [
+    "DOC-ARCH_GUARD_A_PLUS_B_ENFORCEMEN",
     "DOC-Dolsan_Bridge_Park_Integration",
     "DOC-MUYEOJEONG_MAEK_MASTER_HANDOVE",
     "DOC-MUYOJEONG_HOME_V1_EVIDENCE",
