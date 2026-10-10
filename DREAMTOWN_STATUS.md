@@ -26,7 +26,7 @@ Last Updated: 2026-10-10
 **GitHub Push 방식 (A/B/C) — Founder 결정 대기**
 
 - Architecture Guard PILOT rev3 로컬 커밋: **CLOSED** @2f44425 (2026-10-10)
-- suitable_for Option C 구현 + 검증: **CLOSED** @[SHA_PENDING] (2026-10-10)
+- suitable_for Option C 구현 + 검증: **CLOSED** @86b955c (2026-10-10)
   - 변경: `travelGuideService.js` + `soyeowoolService.js` (코드 2파일)
   - Evidence: `docs/architecture/SOUL_SUITABLE_FOR_OPTION_C_EVIDENCE_V0_1.md`
   - 단위 테스트 15/15 PASS / 직접 API 2/2 PASS
