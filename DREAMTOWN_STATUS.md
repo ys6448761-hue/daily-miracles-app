@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-03
+Last Updated: 2026-10-10
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -13,22 +13,28 @@ Last Updated: 2026-10-03
 ### 필수 읽기 순서 (신규 세션)
 
 ```
-1. memory/MEMORY.md                                    ← 최신 Project State + Current Next Action
+1. memory/MEMORY.md (동일 머신)                        ← 최신 Project State + Current Next Action
+   또는 이 파일 §★ Current Next Action (원격 클론 환경) ← git-tracked 스냅샷
 2. docs/product/SOUL_PRODUCT_VISION_V0_1.md            ← Active Product Vision (SOUL 상세 경험)
-3. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
-4. docs/architecture/SOUL_PRODUCT_CONTINUITY_INCIDENT_AUDIT_V0_1.md  ← Continuity 기록
-5. docs/architecture/SOUL_VISION_CONTINUITY_REPOSITORY_STATE_INVENTORY_V0_1.md  ← 현재 구현 상태
+3. docs/governance/ARCH_GUARD_PROTOCOL_V0_1.md         ← Architecture Guard PILOT rev3 (충돌 판정)
+4. docs/governance/meetings/ (최신 Meeting Record)     ← 결정 근거 + Founder Decision 상태
+5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
-### ★ Current Next Action (exactly 1)
+### ★ Current Next Action (exactly 1) — Updated: 2026-10-10
 
-**SoulCableCarPage.jsx Production Port — Product Contract Alignment Required**
+**GitHub Push 방식 (A/B/C) — Founder 결정 대기**
 
-- SoulCableCarPage.jsx: `origin/staging/storybook-c7a` ONLY — NOT on main
-- All backend prerequisites LIVE: Judgment V0.1 (@d3e7f0e), UI-001 (@294c55c), Soyeowool Phase 1 (@1f5afab)
-- Port classification: **PORT_REQUIRES_MINIMAL_ALIGNMENT** (D2 confirmed, vision canonicalized — see below)
-- Port-ready elements: QUESTION_COMPOSER, SOUL_MESSAGE, PLACE_HERO, SOUL_JUDGMENT, ESSENTIAL_INFO (PlaceBasicInfo 연결 포함), COST
-- Alignment required: chip→API wiring (Gap B), JOURNEY scope within D2, social proof slot decision
+- Architecture Guard PILOT rev3 로컬 커밋: **CLOSED** @2f44425 (2026-10-10)
+- suitable_for Option C 구현 + 검증: **CLOSED** @86b955c (2026-10-10)
+  - 변경: `travelGuideService.js` + `soyeowoolService.js` (코드 2파일)
+  - Evidence: `docs/architecture/SOUL_SUITABLE_FOR_OPTION_C_EVIDENCE_V0_1.md`
+  - 단위 테스트 15/15 PASS / 직접 API 2/2 PASS
+  - 미검증: SOUL SUCCESS message_ko 실서버 / dolsan_nightscape top-3 현장 노출
+- GitHub Push 사전 검토: **완료** — Verdict: ADVISORY (Evidence: `docs/governance/ARCH_GUARD_PUSH_PREFLIGHT_V0_1.md`)
+- Code 권고: B (브랜치 + PR) 1순위 / A (direct push) 2순위 / C (보류) 3순위
+- Push 미해결 항목: manifest.json PR docs-only 면제 UNKNOWN / enforce_admins=false / Render CI 미대기
+- 전체 상세: `memory/MEMORY.md` (동일 머신) 또는 `docs/governance/meetings/MEET-20261010-003.md`
 
 ### Production-Live (Project Phoenix)
 
@@ -38,6 +44,8 @@ Last Updated: 2026-10-03
 | Judgment V0.1 backend | d3e7f0e | PRODUCTION_LIVE |
 | UI-001 explicit_context contract | 294c55c | PRODUCTION_LIVE |
 | Soyeowool Phase 1 | 1f5afab | PRODUCTION_LIVE |
+| SOUL Short Op Gate V0.1 | b11f012 | PRODUCTION_LIVE |
+| **SOUL Living Detail Navigation R1** | **77cac69** | **PRODUCTION_LIVE — Founder QA ALL PASS** |
 
 ### Staging-Only (SoulCableCarPage, 9 elements)
 

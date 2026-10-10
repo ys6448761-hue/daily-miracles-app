@@ -3,6 +3,9 @@
 > Codex와 Claude Code 협업 가이드.
 > 이 파일을 먼저 읽고 작업을 시작하라.
 
+**Architecture Guard (PILOT):**
+충돌 감지·양방향 검토(Lumi↔Code)·Meeting Record 형식 → `docs/governance/ARCH_GUARD_PROTOCOL_V0_1.md`
+
 ---
 
 ## 1. 프로젝트 정체성

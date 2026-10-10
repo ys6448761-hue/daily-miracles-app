@@ -646,8 +646,17 @@ class TravelGuideService {
       return suitableFor.includes("kids_ok");
     }
     if (people_type === "family_elderly" && companion_constraints?.has_elderly) {
-      // Note: DB uses "elderly" not "elderly_ok" (vocabulary alignment fix)
-      return suitableFor.includes("elderly");
+      // Explicit auto-recommendation policy: pojangmacha excluded (venue characteristic, not a safety inference)
+      if (place.code === 'romantic_pojangmacha') return false;
+      // suitable_for tag absence = data gap, not a finding of unsuitability
+      // Physical safety is handled by _passesAccessibility + G2
+      if (!suitableFor.includes('elderly')) {
+        if (!place._warnings) place._warnings = [];
+        if (!place._warnings.includes('elderly_fit_unverified')) {
+          place._warnings.push('elderly_fit_unverified');
+        }
+        return true;
+      }
     }
 
     return true;
@@ -884,11 +893,14 @@ class TravelGuideService {
 
     // Companion fit — walking burden unknown: do NOT claim suitability, let stay-time speak
     const walkingUnknown = (place._warnings || []).includes('walking_burden_unknown');
+    const elderlyFitUnverified = (place._warnings || []).includes('elderly_fit_unverified');
     if (pt === 'family_elderly' && suitable.includes('elderly')) {
       if (!walkingUnknown) {
         parts.push('어르신과 함께 방문하기 좋아요');
       }
       // walkingUnknown → no suitability claim; warning already in place._warnings
+    } else if (pt === 'family_elderly' && elderlyFitUnverified) {
+      // elderly_fit_unverified: tag not confirmed — suppress positive suitability claim
     } else if (pt === 'family_with_kids' && suitable.includes('kids_ok')) {
       parts.push('아이와 함께 즐기기 좋아요');
     } else if (pt === 'couple' && (suitable.includes('couples') || emotions.includes('date'))) {
