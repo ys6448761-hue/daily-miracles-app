@@ -23,13 +23,17 @@ Last Updated: 2026-10-10
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-10
 
-**Architecture Guard PILOT rev3 로컬 커밋 완료 대기 → GitHub Push Founder 결정 대기**
+**GitHub Push 방식 (A/B/C) — Founder 결정 대기**
 
-- SOUL Living Detail Navigation R1: **CLOSED** @77cac69 (Founder QA ALL PASS 2026-10-09)
-- Architecture Guard V0.1: **PILOT rev3** — Dual-Agent Continuity 10/10 PASS [SIMULATED]
-- 실제 독립 신규 세션 검증: **미실시** (별도 환경 테스트 필요)
-- GitHub Push: **미승인** (로컬 커밋만 승인됨)
-- 미해결: enforce_admins=false AIL Gate bypass / Render CI 미대기 (구조적 위험 기록 유지)
+- Architecture Guard PILOT rev3 로컬 커밋: **CLOSED** @2f44425 (2026-10-10)
+- suitable_for Option C 구현 + 검증: **CLOSED** @[SHA_PENDING] (2026-10-10)
+  - 변경: `travelGuideService.js` + `soyeowoolService.js` (코드 2파일)
+  - Evidence: `docs/architecture/SOUL_SUITABLE_FOR_OPTION_C_EVIDENCE_V0_1.md`
+  - 단위 테스트 15/15 PASS / 직접 API 2/2 PASS
+  - 미검증: SOUL SUCCESS message_ko 실서버 / dolsan_nightscape top-3 현장 노출
+- GitHub Push 사전 검토: **완료** — Verdict: ADVISORY (Evidence: `docs/governance/ARCH_GUARD_PUSH_PREFLIGHT_V0_1.md`)
+- Code 권고: B (브랜치 + PR) 1순위 / A (direct push) 2순위 / C (보류) 3순위
+- Push 미해결 항목: manifest.json PR docs-only 면제 UNKNOWN / enforce_admins=false / Render CI 미대기
 - 전체 상세: `memory/MEMORY.md` (동일 머신) 또는 `docs/governance/meetings/MEET-20261010-003.md`
 
 ### Production-Live (Project Phoenix)

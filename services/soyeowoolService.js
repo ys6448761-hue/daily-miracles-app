@@ -1460,7 +1460,7 @@ function _generateClarificationMessage(soulContext, message, journeyCtx) {
   return `${CITY_DISPLAY_NAME} 여행을 더 잘 도와드릴 수 있도록, 어떤 여행을 계획하고 계신지 말씀해 주세요.`;
 }
 
-function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPlaceCode = null, effectiveMobility = null) {
+function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPlaceCode = null, effectiveMobility = null, allPlaceWarnings = new Set()) {
   const provenance = soulContext._provenance || {};
   const pt = soulContext.people_type;
   const timeMinutes = soulContext.time_available_minutes;
@@ -1592,9 +1592,15 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPla
   if (mobilityConstraint === 'low_walking') {
     secondLine = '걷기 부담이 적은 곳으로 골라봤는데, 보행 난이도 정보가 없어 방문 전 확인을 권장해요.';
   } else if (pt === 'family_elderly') {
-    secondLine = curPlaceName && isDiscovery
-      ? `${curPlaceName} 다음으로, 이동 부담이 적은 곳을 골라봤어요.`
-      : '이동 부담이 적은 곳으로 골라봤어요.';
+    if (allPlaceWarnings.has('elderly_fit_unverified')) {
+      // elderly_fit_unverified = 추천 태그 부재 (이동 경로 미확인이 아님)
+      secondLine = '함께 둘러볼 만한 장소를 찾아봤어요. 일부 장소는 어르신 동반 방문 정보가 아직 확인되지 않았으니, 방문 전에 확인해 주세요.';
+    } else {
+      // 'elderly' 태그 존재 = 어르신 방문 사례 있음 (물리적 편의 확인 아님)
+      secondLine = curPlaceName && isDiscovery
+        ? `${curPlaceName} 다음으로 함께 둘러볼 만한 곳을 찾아봤어요.`
+        : '함께 둘러볼 만한 곳을 찾아봤어요.';
+    }
   } else if (pref === 'photo') {
     const countNote = requestedCount ? `${requestedCount}곳 ` : '';
     secondLine = `사진 잘 나오는 ${countNote}뷰 포인트를 골라봤어요.`;
@@ -2648,7 +2654,10 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   const status = _deriveStatus(tgResult, domainContext);
 
   // D7 SOUL MESSAGE
-  const soulMessage = _generateSoulMessage(enrichedSoulContext, status, message, quoteCtx, explicit_context.place_code || null, domainContext.mobility_constraint || null);
+  const allPlaceWarnings = new Set(
+    (tgResult && tgResult.places ? tgResult.places : []).flatMap(p => p.warnings || [])
+  );
+  const soulMessage = _generateSoulMessage(enrichedSoulContext, status, message, quoteCtx, explicit_context.place_code || null, domainContext.mobility_constraint || null, allPlaceWarnings);
 
   // WHY DETAILS
   const whyDetails = _buildWhyDetails(tgResult, domainContext);
