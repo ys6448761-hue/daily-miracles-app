@@ -127,6 +127,12 @@ const DOLSAN_SOUL_DISCOVERY = {
 const DOLSAN_FOR_ME =
   '돌산대교 준공기념탑 부근에는 계단이 있어 휠체어로 해당 구간을 통과할 수 없습니다. 휠체어 이용자는 케이블카 인근에서 도보보다 차량으로 전망대 인근 주차장까지 이동하는 방법을 고려해 주세요. 차량 이동은 약 1~2분이며, 전망 지점별 세부 이동 조건은 현장에서 확인해 주세요.';
 
+// ── YiSunSin Square discovery text ───────────────────────────────────────────
+// Source: soyeowoolService.js _PLACE_KNOWLEDGE.lee_soon_shin_plaza.place_identity_ko
+// SSOT emotional role: 연결 / 사람의 온기 (SSOT-ROUTE-001, SSOT-LOC-001, SSOT-LOOP-001)
+const YISUNSIN_SOUL_DISCOVERY =
+  '이순신 장군을 기리는 여수의 대표 광장이에요. 역사적인 분위기와 함께 여수항 풍경을 만날 수 있어요.';
+
 // ── Dolsan Park QuestionDiscovery ────────────────────────────────────────────
 // Source: V1.1 Question Discovery — 5 questions confirmed by Founder / Lumi 2026-10-09
 function DolsanQuestionDiscovery() {
@@ -198,11 +204,12 @@ function DolsanQuestionDiscovery() {
 // ── place hero asset map ──────────────────────────────────────────────────────
 // Source: C:\DREAM TOWN\Assets\SOUL\{Place}\Place_Hero\ (Founder-designated SOUL assets)
 const PLACE_HERO_MAP = {
-  cablecar:          '/images/soul/place-hero/cablecar.png',
-  odongdo:           '/images/soul/place-hero/odongdo.png',
-  hyangiram:         '/images/soul/place-hero/hyangiram.png',
-  yisunsin:          '/images/soul/place-hero/yisunsin.png',
-  dolsan_nightscape: '/images/soul/place-hero/dolsan-nightscape.png',
+  cablecar:             '/images/soul/place-hero/cablecar.png',
+  odongdo:              '/images/soul/place-hero/odongdo.png',
+  hyangiram:            '/images/soul/place-hero/hyangiram.png',
+  yisunsin:             '/images/soul/place-hero/yisunsin.png',
+  lee_soon_shin_plaza:  '/images/soul/place-hero/yisunsin.png',
+  dolsan_nightscape:    '/images/soul/place-hero/dolsan-nightscape.png',
 };
 
 // ── FOR ME texts (7 context variants) ────────────────────────────────────────
@@ -953,7 +960,7 @@ function OdongdoQuestionDiscovery({ ctx }) {
 }
 
 // ── Main page ────────────────────────────────────────────────────────────────
-const SUPPORTED_PLACE_CODES = ['cablecar', 'odongdo', 'hyangiram', 'dolsan_nightscape'];
+const SUPPORTED_PLACE_CODES = ['cablecar', 'odongdo', 'hyangiram', 'dolsan_nightscape', 'lee_soon_shin_plaza'];
 
 export default function SoulCableCarPage() {
   const navigate = useNavigate();
@@ -989,6 +996,7 @@ export default function SoulCableCarPage() {
   const isOdongdoView   = placeCode === 'odongdo';
   const isHyangiramView = placeCode === 'hyangiram';
   const isDolsanView    = placeCode === 'dolsan_nightscape';
+  const isYisunsinView  = placeCode === 'lee_soon_shin_plaza';
   const heroSrc = PLACE_HERO_MAP[placeCode] ?? null;
 
   const hasContext =
@@ -1025,6 +1033,8 @@ export default function SoulCableCarPage() {
     ? (HYANGIRAM_SOUL_DISCOVERY[hyangiramVariantKey] ?? HYANGIRAM_SOUL_DISCOVERY.default)
     : isDolsanView
     ? DOLSAN_SOUL_DISCOVERY.default
+    : isYisunsinView
+    ? YISUNSIN_SOUL_DISCOVERY
     : (SOUL_DISCOVERY[soulVariantKey] ?? SOUL_DISCOVERY.default);
 
   async function handleSubmit(e) {
@@ -1096,7 +1106,7 @@ export default function SoulCableCarPage() {
             ← 뒤로
           </button>
           <h1 className="text-sm font-semibold text-white truncate mx-2">
-            {isCableCarView ? '여수해상케이블카' : isOdongdoView ? '오동도' : isHyangiramView ? '향일암' : isDolsanView ? '돌산공원' : (placeData?.name_ko || '여수해상케이블카')}
+            {isCableCarView ? '여수해상케이블카' : isOdongdoView ? '오동도' : isHyangiramView ? '향일암' : isDolsanView ? '돌산공원' : isYisunsinView ? '이순신광장' : (placeData?.name_ko || '여수해상케이블카')}
           </h1>
           <div className="flex items-center gap-3 text-white opacity-40 text-sm">
             <span title="저장">🔖</span>
@@ -1114,7 +1124,7 @@ export default function SoulCableCarPage() {
               ref={inputRef}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder={isOdongdoView ? '오동도에 대해 뭐든 물어보세요' : isHyangiramView ? '향일암에 대해 뭐든 물어보세요' : isDolsanView ? '돌산공원 야경, 주차, 전망대 가는 길… 무엇이 궁금하세요?' : '케이블카에 대해 뭐든 물어보세요'}
+              placeholder={isOdongdoView ? '오동도에 대해 뭐든 물어보세요' : isHyangiramView ? '향일암에 대해 뭐든 물어보세요' : isDolsanView ? '돌산공원 야경, 주차, 전망대 가는 길… 무엇이 궁금하세요?' : isYisunsinView ? '이순신광장에 대해 뭐든 물어보세요' : '케이블카에 대해 뭐든 물어보세요'}
               className="flex-1 bg-transparent text-white placeholder-white placeholder-opacity-40 text-sm outline-none"
             />
             <button
@@ -1204,7 +1214,7 @@ export default function SoulCableCarPage() {
              Resets on next user query. No new chat UI — additive to existing response.
         ────────────────────────────────────────────────────────────────────────── */}
         {soulResponse?.presentation_mode === 'DISCOVERING' && (() => {
-          const DETAIL_NAMES = { cablecar: '여수해상케이블카', odongdo: '오동도', hyangiram: '향일암', dolsan_nightscape: '돌산대교 돌산공원' };
+          const DETAIL_NAMES = { cablecar: '여수해상케이블카', odongdo: '오동도', hyangiram: '향일암', dolsan_nightscape: '돌산대교 돌산공원', lee_soon_shin_plaza: '이순신광장' };
           const detailPlaces = (soulResponse.places || []).filter(p => DETAIL_NAMES[p.code]);
           if (detailPlaces.length === 0) return null;
           return (
@@ -1253,10 +1263,10 @@ export default function SoulCableCarPage() {
           <div className="relative z-10 p-5 flex flex-col justify-end" style={{ minHeight: '200px' }}>
             <div className="mt-auto">
               <p className="text-xs text-white opacity-50 mb-1 tracking-widest uppercase">
-                {isCableCarView ? '여수 · 해상 케이블카' : isDolsanView ? '여수 · 돌산대교 돌산공원' : ('여수 · ' + (placeData?.name_ko || ''))}
+                {isCableCarView ? '여수 · 해상 케이블카' : isDolsanView ? '여수 · 돌산대교 돌산공원' : isYisunsinView ? '여수 · 이순신광장' : ('여수 · ' + (placeData?.name_ko || ''))}
               </p>
               <h2 className="text-2xl font-bold text-white leading-tight">
-                {isCableCarView ? '여수해상케이블카' : isOdongdoView ? '오동도' : isHyangiramView ? '향일암' : isDolsanView ? '돌산공원' : (placeData?.name_ko || '')}
+                {isCableCarView ? '여수해상케이블카' : isOdongdoView ? '오동도' : isHyangiramView ? '향일암' : isDolsanView ? '돌산공원' : isYisunsinView ? '이순신광장' : (placeData?.name_ko || '')}
               </h2>
               {isCableCarView && (
                 <p className="text-sm text-white opacity-60 mt-1">
@@ -1278,6 +1288,11 @@ export default function SoulCableCarPage() {
                   돌산대교 전망 · 낮과 밤이 다른 여수
                 </p>
               )}
+              {isYisunsinView && (
+                <p className="text-sm text-white opacity-60 mt-1">
+                  역사의 광장 · 사람과 여수항이 만나는 곳
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -1289,7 +1304,17 @@ export default function SoulCableCarPage() {
         {/* Other places: PlaceBasicInfo V0.2 formatter logic + FactRow (null-tolerant). */}
         <Card>
           <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">알아야 할 것</p>
-          {isDolsanView ? (
+          {isYisunsinView ? (
+            // YiSunSin curated — Source: _PLACE_KNOWLEDGE.lee_soon_shin_plaza (admission_ko/hours_ko/unknown_boundary)
+            // NOT shown: 거북선 내부 탑승 여부 (unknown_boundary — field verification required)
+            <>
+              <FactRow label="입장" value="무료" />
+              <FactRow label="개방" value="연중개방" note="야외 광장" />
+              <p className="text-xs text-white opacity-30 mt-2">
+                거북선 내부 탑승 여부 등 세부 사항은 현장에서 확인해보세요.
+              </p>
+            </>
+          ) : isDolsanView ? (
             // Dolsan curated — V1.1 approved facts: 무료입장/상시개방/공영주차장/안내전화
             // NOT shown: exact parking count (official range unconfirmed), heart LED status (uncertain)
             <>
@@ -1499,6 +1524,42 @@ export default function SoulCableCarPage() {
               style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.22) 0%, transparent 45%)' }}
             />
           </div>
+        )}
+
+        {/* ── YISUNSIN: SOUL JUDGMENT ── */}
+        {/* Source: soyeowoolService._PLACE_KNOWLEDGE.lee_soon_shin_plaza (place_identity_ko) */}
+        {/* SSOT emotional role: 연결 / 사람의 온기 */}
+        {isYisunsinView && (
+          <Card>
+            <p className="text-xs text-dream-purple font-semibold mb-3 uppercase tracking-wider">SOUL</p>
+            <p className="text-sm text-white leading-relaxed">
+              {isPlaceKnowledge && soulResponse?.place_identity_ko
+                ? soulResponse.place_identity_ko
+                : YISUNSIN_SOUL_DISCOVERY}
+            </p>
+          </Card>
+        )}
+
+        {/* ── YISUNSIN: EXPERIENCE ── */}
+        {/* Source: _PLACE_KNOWLEDGE.lee_soon_shin_plaza.experience_ko */}
+        {isYisunsinView && (
+          <Card>
+            <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">이런 곳이에요</p>
+            <p className="text-sm text-white opacity-80 leading-relaxed">
+              이순신 장군을 기리는 역사 광장이에요. 거북선 무료 전시도 있어요. 미남크루즈 코스와 2층버스 주간코스에도 포함돼요.
+            </p>
+          </Card>
+        )}
+
+        {/* ── YISUNSIN: FIT ── */}
+        {/* Source: _PLACE_KNOWLEDGE.lee_soon_shin_plaza.fit_ko */}
+        {isYisunsinView && (
+          <Card className="border-dream-purple border-opacity-30">
+            <p className="text-xs text-dream-purple font-semibold mb-2 uppercase tracking-wider">이런 분께 맞아요</p>
+            <p className="text-sm text-white leading-relaxed">
+              역사에 관심 있는 분이나 아이와 함께 오기 좋아요. 크루즈나 2층버스 여행 동선에 자연스럽게 포함돼요.
+            </p>
+          </Card>
         )}
 
         {/* ── DOLSAN: EXPERIENCE 01 — 야경 · 대교 전경 ── */}
