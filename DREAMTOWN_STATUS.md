@@ -23,18 +23,18 @@ Last Updated: 2026-10-10
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-10
 
-**GitHub Push 방식 (A/B/C) — Founder 결정 대기**
+**SOUL suitable_for Option C PRODUCTION_LIVE — 다음 기능 기획 대기**
 
-- Architecture Guard PILOT rev3 로컬 커밋: **CLOSED** @2f44425 (2026-10-10)
-- suitable_for Option C 구현 + 검증: **CLOSED** @86b955c (2026-10-10)
-  - 변경: `travelGuideService.js` + `soyeowoolService.js` (코드 2파일)
+- **PR #29 MERGED: @afcecc4** (2026-10-10)
+  - Production Smoke Test: 8/8 PASS (daily-miracles-app.onrender.com)
+  - Deploy Health Check: SUCCESS ✓ / AIL Gate: SUCCESS ✓
+- suitable_for Option C: **PRODUCTION_LIVE** @afcecc4
+  - family_elderly soft warning (`elderly_fit_unverified`) — 하드 제외 → 소프트 경고
+  - pojangmacha 정책 제외, message_ko 조건부 분기
   - Evidence: `docs/architecture/SOUL_SUITABLE_FOR_OPTION_C_EVIDENCE_V0_1.md`
-  - 단위 테스트 15/15 PASS / 직접 API 2/2 PASS
-  - 미검증: SOUL SUCCESS message_ko 실서버 / dolsan_nightscape top-3 현장 노출
-- GitHub Push 사전 검토: **완료** — Verdict: ADVISORY (Evidence: `docs/governance/ARCH_GUARD_PUSH_PREFLIGHT_V0_1.md`)
-- Code 권고: B (브랜치 + PR) 1순위 / A (direct push) 2순위 / C (보류) 3순위
-- Push 미해결 항목: manifest.json PR docs-only 면제 UNKNOWN / enforce_admins=false / Render CI 미대기
-- 전체 상세: `memory/MEMORY.md` (동일 머신) 또는 `docs/governance/meetings/MEET-20261010-003.md`
+- Architecture Guard PILOT rev3: origin/main @afcecc4 포함 ✓
+- 미해결: enforce_admins=false / SOUL+elderly_fit_unverified message_ko 직접 관찰 / dolsan_nightscape top-3 (구조적, 유지)
+- 전체 상세: `docs/governance/meetings/MEET-20261010-003.md`
 
 ### Production-Live (Project Phoenix)
 
@@ -46,6 +46,7 @@ Last Updated: 2026-10-10
 | Soyeowool Phase 1 | 1f5afab | PRODUCTION_LIVE |
 | SOUL Short Op Gate V0.1 | b11f012 | PRODUCTION_LIVE |
 | **SOUL Living Detail Navigation R1** | **77cac69** | **PRODUCTION_LIVE — Founder QA ALL PASS** |
+| **SOUL suitable_for Option C** | **afcecc4** | **PRODUCTION_LIVE — Smoke Test 8/8 PASS** |
 
 ### Staging-Only (SoulCableCarPage, 9 elements)
 

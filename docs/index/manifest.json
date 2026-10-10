@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-10T02:08:00.630Z",
+  "generated_at": "2026-10-10T03:16:41.220Z",
   "generator": "generate-manifest.js",
   "total_count": 473,
   "documents": [
@@ -1728,7 +1728,7 @@
       "status": "|------",
       "title": "SOUL suitable_for Option C — Evidence V0.1",
       "created_at": "2026-10-10",
-      "checksum": "c6524de1"
+      "checksum": "aae956fa"
     },
     {
       "id": "DOC-SOUL_TAXONOMY_PROVENANCE_AUDIT",
@@ -8235,7 +8235,7 @@
       "status": "origin/main 반영 여부",
       "title": "Phoenix Decision Meeting Record",
       "created_at": "1010-00-01",
-      "checksum": "b4913bb3"
+      "checksum": "0d435f56"
     },
     {
       "id": "DOC-MEET-20261009-001",

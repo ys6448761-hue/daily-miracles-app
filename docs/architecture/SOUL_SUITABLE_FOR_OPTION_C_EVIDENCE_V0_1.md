@@ -1,9 +1,9 @@
 # SOUL suitable_for Option C — Evidence V0.1
 
 **Document ID:** SOUL-OPTION-C-EVIDENCE-V0.1  
-**Status:** 로컬 커밋 완료  
+**Status:** PRODUCTION_LIVE — Merge SHA afcecc4  
 **Date:** 2026-10-10  
-**Session:** MEET-20261010-003 연계 (Option C 구현 + 검증)
+**Session:** MEET-20261010-003 연계 (Option C 구현 + 검증 + Production 배포)
 
 ---
 
@@ -86,14 +86,21 @@ if (people_type === "family_elderly" && companion_constraints?.has_elderly) {
 
 | 테스트 | 방법 | 결과 |
 |--------|------|------|
-| KR/YEOSU family_elderly 추천 (recommend endpoint) | 실제 서버 localhost:5000 | ✅ PASS — 3개 반환, hyangiram/pojangmacha 미포함 |
-| lee_soon_shin_plaza warnings | 실제 서버 API 응답 확인 | ✅ PASS — elderly_fit_unverified 없음 |
+| KR/YEOSU family_elderly 추천 (recommend endpoint) | 실제 서버 localhost:5000 | ✅ PASS — 2개 반환, hyangiram/pojangmacha 미포함 |
+| jaisan_park / jungang_market warnings | SOUL SUCCESS 실제 응답 | ✅ PASS — elderly_fit_unverified 없음 (elderly 태그 있음) |
+| SOUL SUCCESS 경로 — elderly_fit_unverified 없는 message_ko | Node.js HTTP → localhost:5000/api/dt/travel/input/text | ✅ PASS — "함께 둘러볼 만한 곳을 찾아봤어요." (이동 부담 주장 없음) |
+| elderly_fit_unverified warnings (recommend endpoint, exclude 어르신 장소) | 실제 서버 — exclude elderly-tagged places | ✅ PASS — cablecar/sky_tower: ["elderly_fit_unverified",...] |
+| 추천 사유 — elderly_fit_unverified 시 긍정 주장 없음 | 실제 서버 응답 reason 필드 | ✅ PASS — "45분 정도 둘러볼 수 있어요" (어르신 적합 주장 없음) |
+
+**참고: Bash 셸 인코딩 문제 발견**
+Windows Bash에서 한국어 직접 전송 시 인코딩 깨짐 → `_isDiscoveryIntent`가 항상 `false` → CLARIFICATION.
+Node.js HTTP 직접 요청으로 우회. 실제 서버(UTF-8)는 정상 동작.
 
 ### 4-C. 미검증 항목
 
 | 항목 | 미검증 이유 | 상태 |
 |------|-----------|------|
-| SOUL SUCCESS 경로 `message_ko` 실제 서버 | SOUL이 CLARIFICATION 상태로 진입 (추가 컨텍스트 요구) | **미검증** |
+| SOUL SUCCESS 경로 `message_ko` — elderly_fit_unverified 있을 때 | elderly_fit_unverified 장소(cablecar 등)가 어르신 태그 있는 장소보다 점수 낮아 top-3 미진입. recommend endpoint로 필터 동작 확인 + 단위 테스트 MSG-2 PASS. | **로직 검증 완료, SOUL 엔드포인트 직접 도달 불가** |
 | dolsan_nightscape top-3 노출 | Experience Cluster Diversity 필터로 top-3 미진입 (dolsan_area 클러스터) | **미검증 (필터 동작은 정상)** |
 
 ---
@@ -135,7 +142,7 @@ ARCHITECTURE GUARD: PASS
 family_with_kids 필터: Option C 경계 유지 확인
 LOCKED SSOT 충돌: 없음
 단위 테스트: 15/15 PASS
-직접 API: 2/2 PASS
+직접 API: 5/5 PASS (서버 재시작 후 Node.js HTTP 요청으로 검증)
 ```
 
 ---
@@ -144,12 +151,31 @@ LOCKED SSOT 충돌: 없음
 
 | 위험 | 상태 |
 |------|------|
-| SOUL SUCCESS message_ko 실제 서버 검증 | 미완료 — 단위 테스트로 로직 검증 완료 |
+| SOUL SUCCESS + elderly_fit_unverified message_ko 동시 실서버 | 미완료 — 로직 검증 완료 (elderly 태그 장소 점수 우위로 직접 도달 불가) |
 | dolsan_nightscape top-3 현장 노출 | 미완료 — _passesCompanion 동작 단위 검증 완료 |
 | dolsan_nightscape _PLACE_KNOWLEDGE 미추가 | COVERAGE_GAP 유지 |
 | enforce_admins=false AIL Gate bypass | UNRESOLVED (구조적) |
-| GitHub Push | 별도 Founder 승인 필요 |
 
 ---
 
-*작성: 2026-10-10 / Code (Claude Code)*
+## 9. Production Smoke Test (2026-10-10)
+
+**Merge SHA:** afcecc4  
+**Target:** daily-miracles-app.onrender.com
+
+| 테스트 | 항목 | 결과 |
+|--------|------|------|
+| T1 | 서비스 정상 응답 (health) | ✅ PASS |
+| T2 | SOUL SUCCESS family_elderly + 120분 | ✅ PASS — 2 places |
+| T3 | elderly_fit_unverified 없음 (elderly 태그 장소) | ✅ PASS — jaisan_park/jungang_market |
+| T4 | message_ko — 이동 부담 주장 없음 | ✅ PASS |
+| T5 | hyangiram 제외 (물리 안전 필터) | ✅ PASS |
+| T6 | elderly_fit_unverified 경고 전달 (non-elderly 장소) | ✅ PASS — cablecar/sky_tower |
+| T7 | 추천 사유 긍정 어르신 주장 없음 | ✅ PASS |
+| T8 | pojangmacha family_elderly 정책 제외 | ✅ PASS |
+
+**Production Smoke Test: 8/8 PASS**
+
+---
+
+*작성: 2026-10-10 / Code (Claude Code) | 배포: afcecc4*
