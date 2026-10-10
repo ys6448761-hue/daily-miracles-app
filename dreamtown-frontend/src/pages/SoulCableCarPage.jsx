@@ -1213,7 +1213,10 @@ export default function SoulCableCarPage() {
              show navigation buttons. Clicking switches the Living Detail view below.
              Resets on next user query. No new chat UI — additive to existing response.
         ────────────────────────────────────────────────────────────────────────── */}
-        {soulResponse?.presentation_mode === 'DISCOVERING' && (() => {
+        {(
+          soulResponse?.presentation_mode === 'DISCOVERING' ||
+          (soulResponse?.status === 'PLACE_LOOKUP' && soulResponse?.places?.length > 0)
+        ) && (() => {
           const DETAIL_NAMES = { cablecar: '여수해상케이블카', odongdo: '오동도', hyangiram: '향일암', dolsan_nightscape: '돌산대교 돌산공원', lee_soon_shin_plaza: '이순신광장' };
           const detailPlaces = (soulResponse.places || []).filter(p => DETAIL_NAMES[p.code]);
           if (detailPlaces.length === 0) return null;
