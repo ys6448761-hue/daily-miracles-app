@@ -1244,7 +1244,14 @@ export default function SoulCableCarPage() {
           {heroSrc && (
             <img
               src={heroSrc}
-              alt={placeData?.name_ko || '여수해상케이블카'}
+              alt={
+                isCableCarView  ? '여수해상케이블카' :
+                isOdongdoView   ? '오동도' :
+                isHyangiramView ? '향일암' :
+                isDolsanView    ? '돌산공원' :
+                isYisunsinView  ? '이순신광장' :
+                (placeData?.name_ko || '여수해상케이블카')
+              }
               className="absolute inset-0 w-full h-full object-cover"
               onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
@@ -1565,6 +1572,89 @@ export default function SoulCableCarPage() {
           </Card>
         )}
 
+        {/* ── YISUNSIN: CONTEXT DAY ── */}
+        {/* Source: YiSunSin_Square/Context/Context_Day_V1.png (Founder asset) */}
+        {isYisunsinView && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '220px' }}>
+            <img
+              src="/images/soul/lee-soon-shin-plaza/context-day-v1.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 50%' }}
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.45) 0%, transparent 55%)' }}
+            />
+            <div className="relative z-10 p-4 flex flex-col justify-end" style={{ minHeight: '220px' }}>
+              <div className="mt-auto">
+                <p className="text-xs text-white opacity-60">여수항과 이순신 장군의 광장</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── YISUNSIN: EXPERIENCE TURTLE SHIP ── */}
+        {/* Source: YiSunSin_Square/Experience/Experience_Turtle_Ship_V1.png (Founder asset) */}
+        {/* Guardrail: 거북선 내부 탑승 여부 미확인 — 관련 설명 금지 */}
+        {isYisunsinView && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '200px' }}>
+            <img
+              src="/images/soul/lee-soon-shin-plaza/experience-turtle-ship-v1.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 50%' }}
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.18) 0%, transparent 40%)' }}
+            />
+          </div>
+        )}
+
+        {/* ── YISUNSIN: JOURNEY PLAZA ── */}
+        {/* Source: YiSunSin_Square/Journey/Journey_Plaza_V1.png (Founder asset) */}
+        {isYisunsinView && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '200px' }}>
+            <img
+              src="/images/soul/lee-soon-shin-plaza/journey-plaza-v1.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 50%' }}
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.18) 0%, transparent 40%)' }}
+            />
+          </div>
+        )}
+
+        {/* ── YISUNSIN: CONTEXT NIGHT ── */}
+        {/* Source: YiSunSin_Square/Context/Context_Night_V1.png (Founder asset) */}
+        {isYisunsinView && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '220px' }}>
+            <img
+              src="/images/soul/lee-soon-shin-plaza/context-night-v1.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 50%' }}
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.50) 0%, transparent 55%)' }}
+            />
+            <div className="relative z-10 p-4 flex flex-col justify-end" style={{ minHeight: '220px' }}>
+              <div className="mt-auto">
+                <p className="text-xs text-white opacity-60">밤의 광장 · 여수항 야경</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ── DOLSAN: EXPERIENCE 01 — 야경 · 대교 전경 ── */}
         {/* Source: Dolsan_Park/Experience/… 야경 파노라마. V1.1 decision: experience-v1.png */}
         {/* Guardrail: 하트형 LED 조형물 존치 여부 미확정 — 조형물 언급 금지 */}
@@ -1775,8 +1865,8 @@ export default function SoulCableCarPage() {
         )}
 
         {/* ── SOUL JUDGMENT — cable car / odongdo / hyangiram / PLACE_KNOWLEDGE only ── */}
-        {/* dolsan has its own SOUL card rendered inline above */}
-        {!isDolsanView && (
+        {/* dolsan + yisunsin have their own SOUL cards rendered inline above */}
+        {!isDolsanView && !isYisunsinView && (
           <Card>
             <p className="text-xs text-dream-purple font-semibold mb-3 uppercase tracking-wider">
               SOUL
