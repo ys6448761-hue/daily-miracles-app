@@ -35,14 +35,14 @@ import { getOrEnsureGuestCredential } from '../api/dreamtown.js';
 
 // ── Living Detail nav — place codes with supported detail views ────────────────
 // Mirrors SoulCableCarPage.SUPPORTED_PLACE_CODES.
-// lee_soon_shin_plaza excluded: no dedicated detail view yet (폴백 → cablecar 방지).
-const NAVIGABLE_PLACE_CODES = ['cablecar', 'odongdo', 'hyangiram', 'dolsan_nightscape', 'dolsan_daegyo'];
+const NAVIGABLE_PLACE_CODES = ['cablecar', 'odongdo', 'hyangiram', 'dolsan_nightscape', 'dolsan_daegyo', 'lee_soon_shin_plaza'];
 const PLACE_NAME_KO = {
-  cablecar:          '케이블카',
-  odongdo:           '오동도',
-  hyangiram:         '향일암',
-  dolsan_nightscape: '돌산공원',
-  dolsan_daegyo:     '돌산대교',
+  cablecar:            '케이블카',
+  odongdo:             '오동도',
+  hyangiram:           '향일암',
+  dolsan_nightscape:   '돌산공원',
+  dolsan_daegyo:       '돌산대교',
+  lee_soon_shin_plaza: '이순신광장',
 };
 // 돌산대교는 돌산공원 Living Detail 페이지 공유 — 별도 상세 뷰 없음
 const PLACE_DETAIL_CODE_MAP = {
