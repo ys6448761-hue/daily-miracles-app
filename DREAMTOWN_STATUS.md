@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-10
+Last Updated: 2026-10-11
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,18 +23,27 @@ Last Updated: 2026-10-10
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-10
 
-**GitHub Push 방식 (A/B/C) — Founder 결정 대기**
+**Architecture Guard A+B CONFIGURATION_VERIFIED — 다음 실제 기능 PR에서 Runtime 검증**
 
-- Architecture Guard PILOT rev3 로컬 커밋: **CLOSED** @2f44425 (2026-10-10)
-- suitable_for Option C 구현 + 검증: **CLOSED** @86b955c (2026-10-10)
-  - 변경: `travelGuideService.js` + `soyeowoolService.js` (코드 2파일)
-  - Evidence: `docs/architecture/SOUL_SUITABLE_FOR_OPTION_C_EVIDENCE_V0_1.md`
-  - 단위 테스트 15/15 PASS / 직접 API 2/2 PASS
-  - 미검증: SOUL SUCCESS message_ko 실서버 / dolsan_nightscape top-3 현장 노출
-- GitHub Push 사전 검토: **완료** — Verdict: ADVISORY (Evidence: `docs/governance/ARCH_GUARD_PUSH_PREFLIGHT_V0_1.md`)
-- Code 권고: B (브랜치 + PR) 1순위 / A (direct push) 2순위 / C (보류) 3순위
-- Push 미해결 항목: manifest.json PR docs-only 면제 UNKNOWN / enforce_admins=false / Render CI 미대기
-- 전체 상세: `memory/MEMORY.md` (동일 머신) 또는 `docs/governance/meetings/MEET-20261010-003.md`
+- **Architecture Guard A+B 적용 완료 (2026-10-10)**
+  - Option B: PR 필수 (`required_approving_review_count=0`) APPLIED ✓
+  - Option A: `enforce_admins=true` APPLIED ✓
+  - AIL Gate (`contexts: ["AIL Gate"]`, `strict: true`) 보존 ✓
+  - Evidence: `docs/architecture/ARCH_GUARD_A_PLUS_B_ENFORCEMENT_EVIDENCE_V0_1.md`
+- **기존 위험 해소:**
+  - `enforce_admins=false` UNRESOLVED → **RESOLVED** ✓
+  - 관리자 직접 Push 차단 → **적용** ✓
+- **RUNTIME UNVERIFIED (OPEN):**
+  - 직접 Push 실제 차단 / AIL Gate FAIL Merge 차단 / Founder self-merge 동작
+  - → 다음 실제 기능 PR에서 자연 확인
+- SOUL suitable_for Option C: **PRODUCTION_LIVE** @afcecc4 (유지)
+- 미해결: SOUL+elderly_fit_unverified message_ko 직접 관찰 / dolsan_nightscape top-3 (구조적, 유지)
+- 전체 상세: `docs/governance/meetings/MEET-20261010-003.md`
+- **STOP Guard Rule Recovery: CLOSED** (PR #35 @4f99dc0, 2026-10-11)
+  - Guardian Preflight 필수 발행 의무 / Founder 구두 승인 ≠ 면제 (CLAUDE.md)
+  - 컴팩션 재개 = 신규 세션 (Current Next Action 선확인 의무)
+  - Architecture Guard §4 [7] Current Next Action 정렬 항목 추가
+  - 잔여 위험: 자동 차단 미구현 (AI 지침 준수 의존)
 
 ### Production-Live (Project Phoenix)
 
@@ -46,6 +55,8 @@ Last Updated: 2026-10-10
 | Soyeowool Phase 1 | 1f5afab | PRODUCTION_LIVE |
 | SOUL Short Op Gate V0.1 | b11f012 | PRODUCTION_LIVE |
 | **SOUL Living Detail Navigation R1** | **77cac69** | **PRODUCTION_LIVE — Founder QA ALL PASS** |
+| **SOUL suitable_for Option C** | **afcecc4** | **PRODUCTION_LIVE — Smoke Test 8/8 PASS** |
+| **YiSunSin chip variants + image reorder** | **d95fd45** | **PRODUCTION_LIVE (코드) — 차량 Content QA 미완료** |
 
 ### Staging-Only (SoulCableCarPage, 9 elements)
 
