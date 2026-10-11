@@ -125,9 +125,14 @@ Lumi (담당 AI — 철학/경험/미래 방향 제안)
 
 [6] 기존 Evidence와 모순 여부
     → PASS 판정된 테스트 결과, Founder QA 기록과 모순되는가?
+
+[7] Current Next Action 정렬 여부
+    → DREAMTOWN_STATUS.md §★ Current Next Action과 현재 작업이 충돌하는가?
+      (memory/MEMORY.md는 보조 확인. 두 자료가 다르면 DREAMTOWN_STATUS.md 우선, 충돌 명시)
+      미완료 P0 작업이 있는 상태에서 신규 기능 구현 요청이 들어오면 → REVIEW HOLD
 ```
 
-6개 모두 이상 없으면 → **PASS**  
+7개 모두 이상 없으면 → **PASS**  
 이상 발견 시 → 아래 판정 기준 적용
 
 ---

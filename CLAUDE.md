@@ -33,6 +33,9 @@ API prefix: `/api/dt/`
 - 현황: `DREAMTOWN_STATUS.md` (루트)
 - 마스터: `docs/00-master/aurora5-master-knowledge-v2.md`
 - 팀메모리: `.claude/team-memory/`
+- **컴팩션 복구·세션 재개·담당자 변경은 신규 세션 시작과 동일하게 취급한다.**  
+  `DREAMTOWN_STATUS.md` §★ Current Next Action을 먼저 확인한다.  
+  컴팩션 요약의 Optional Next Step은 Project State 정본을 대체하지 않는다.
 
 ## 🚨 절대 규칙
 - **코드 수정 권한: Claude Code만** (이 인스턴스는 Antigravity)
@@ -83,6 +86,28 @@ point_ledger, harbor_wishes, settlement_events, ops_events
 3. 에러: middleware/errorHandler.js 글로벌
 4. 마이그레이션: database/migrations/ 순번 엄수
 
+## 🛡 Guardian Preflight 의무
+
+기능 구현 전 반드시 아래 형식의 보고서를 발행한다.
+
+```
+### Guardian Preflight Report
+Requested Change:
+Existing Assets Found:
+Change Classification:   (CONNECT / EXTEND / REPAIR / REPLACE / NEW)
+Duplication Risk:
+Data Risk:
+Questions Requiring Decision:
+Implementation Status:   BLOCKED / READY
+```
+
+- `Implementation Status: READY` 확인 전까지 코드 수정 금지.
+- Founder의 구두·문자 구현 승인은 Preflight 발행을 면제하지 않는다.
+- 기존 유효한 Preflight는 적용 범위와 근거를 확인한 경우에만 재사용한다.
+- Product Contract Preflight 및 Architecture Guard 판정은 별도 의무로 유지된다.
+
+---
+
 ## 🛡 Product Contract Preflight (Project Phoenix)
 
 Product / UI 구현 전 반드시 아래 중 하나를 반환한다.
@@ -107,6 +132,7 @@ memory/MEMORY.md → docs/product/SOUL_PRODUCT_VISION_V0_1.md → 관련 Decisio
 - 코드 상태 ≠ 제품 의도 (staging 구현이 Vision을 정의하지 않음)
 - NOT_IMPLEMENTED ≠ DEPRECATED (미구현 ≠ 폐기)
 - 소원이와의 경험 표면 축소/교체/재정의 시 Founder 승인 필수
+- **Founder 구현 승인은 판정문 반환을 대체하지 않는다. 판정문이 먼저, 승인된 구현은 그다음이다.**
 
 **Architecture Guard Protocol (PILOT):**
 충돌 판정(PASS/ADVISORY/REVIEW HOLD/HARD HOLD)·양방향 메시지 형식·Meeting Record → `docs/governance/ARCH_GUARD_PROTOCOL_V0_1.md`
