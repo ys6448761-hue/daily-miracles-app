@@ -1336,11 +1336,17 @@ export default function SoulCableCarPage() {
           {isYisunsinView ? (
             // YiSunSin curated — Source: _PLACE_KNOWLEDGE.lee_soon_shin_plaza (admission_ko/hours_ko/unknown_boundary)
             // NOT shown: 거북선 내부 탑승 여부 (unknown_boundary — field verification required)
+            // Guardrail: 주차 요금·위치 미단정 (CAND-INFO-001) — "현장 확인 권장" 수준만 표시
             <>
               <FactRow label="입장" value="무료" />
               <FactRow label="개방" value="연중개방" note="야외 광장" />
+              {travelerContext.hasVehicle && (
+                <FactRow label="주차" value="현장 확인 권장" />
+              )}
               <p className="text-xs text-white opacity-30 mt-2">
-                거북선 내부 탑승 여부 등 세부 사항은 현장에서 확인해보세요.
+                {travelerContext.hasVehicle
+                  ? '주차 정보 및 거북선 내부 탑승 여부 등 세부 사항은 현장에서 확인해보세요.'
+                  : '거북선 내부 탑승 여부 등 세부 사항은 현장에서 확인해보세요.'}
               </p>
             </>
           ) : isDolsanView ? (
