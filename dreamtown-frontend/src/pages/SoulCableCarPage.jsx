@@ -127,11 +127,29 @@ const DOLSAN_SOUL_DISCOVERY = {
 const DOLSAN_FOR_ME =
   '돌산대교 준공기념탑 부근에는 계단이 있어 휠체어로 해당 구간을 통과할 수 없습니다. 휠체어 이용자는 케이블카 인근에서 도보보다 차량으로 전망대 인근 주차장까지 이동하는 방법을 고려해 주세요. 차량 이동은 약 1~2분이며, 전망 지점별 세부 이동 조건은 현장에서 확인해 주세요.';
 
-// ── YiSunSin Square discovery text ───────────────────────────────────────────
+// ── YiSunSin Square discovery texts (4 context variants) ─────────────────────
 // Source: soyeowoolService.js _PLACE_KNOWLEDGE.lee_soon_shin_plaza.place_identity_ko
 // SSOT emotional role: 연결 / 사람의 온기 (SSOT-ROUTE-001, SSOT-LOC-001, SSOT-LOOP-001)
-const YISUNSIN_SOUL_DISCOVERY =
-  '이순신 장군을 기리는 여수의 대표 광장이에요. 역사적인 분위기와 함께 여수항 풍경을 만날 수 있어요.';
+// Guardrail: 주차요금·무료시간·이동시간·접근성 보장 단정 금지 (CAND-INFO-001)
+const YISUNSIN_SOUL_DISCOVERY = {
+  default:
+    '이순신 장군을 기리는 여수의 대표 광장이에요. 역사적인 분위기와 함께 여수항 풍경을 만날 수 있어요.',
+  vehicle:
+    '이순신광장 주변에는 지하·노상 공영주차장 선택지가 있어요. 혼잡할 때를 대비해 대안 주차 위치를 미리 확인해두세요. 요금과 운영 조건은 방문 전 현장 확인을 권장해요.',
+  odongdo:
+    '이순신광장에서 여수항과 역사의 분위기를 느낀 뒤, 오동도에서 바다와 자연을 이어서 즐길 수 있어요. 두 곳을 함께 묶는 동선은 이동 방법과 순서를 출발 전 먼저 확인해두는 게 좋아요.',
+  parents:
+    '부모님과 함께 이순신 장군의 이야기와 여수항 풍경을 천천히 둘러볼 수 있어요. 걷는 거리와 중간 휴식 장소는 방문 전 미리 확인해두세요.',
+};
+
+// ── YiSunSin Square variant key ───────────────────────────────────────────────
+// Priority: parents > odongdo > vehicle > default
+function getYisunsinVariantKey(ctx) {
+  if (ctx.companion === 'parents') return 'parents';
+  if (ctx.nextPlace === 'odongdo') return 'odongdo';
+  if (ctx.hasVehicle) return 'vehicle';
+  return 'default';
+}
 
 // ── Dolsan Park QuestionDiscovery ────────────────────────────────────────────
 // Source: V1.1 Question Discovery — 5 questions confirmed by Founder / Lumi 2026-10-09
@@ -1015,6 +1033,7 @@ export default function SoulCableCarPage() {
   const soulVariantKey      = getSoulVariantKey(travelerContext);
   const odongdoVariantKey   = getOdongdoVariantKey(travelerContext);
   const hyangiramVariantKey = getHyangiramVariantKey(travelerContext);
+  const yisunsinVariantKey  = getYisunsinVariantKey(travelerContext);
 
   const prevJourneyNote =
     travelerContext.companion === 'parents'
@@ -1034,7 +1053,7 @@ export default function SoulCableCarPage() {
     : isDolsanView
     ? DOLSAN_SOUL_DISCOVERY.default
     : isYisunsinView
-    ? YISUNSIN_SOUL_DISCOVERY
+    ? (YISUNSIN_SOUL_DISCOVERY[yisunsinVariantKey] ?? YISUNSIN_SOUL_DISCOVERY.default)
     : (SOUL_DISCOVERY[soulVariantKey] ?? SOUL_DISCOVERY.default);
 
   async function handleSubmit(e) {
@@ -1545,29 +1564,7 @@ export default function SoulCableCarPage() {
             <p className="text-sm text-white leading-relaxed">
               {isPlaceKnowledge && soulResponse?.place_identity_ko
                 ? soulResponse.place_identity_ko
-                : YISUNSIN_SOUL_DISCOVERY}
-            </p>
-          </Card>
-        )}
-
-        {/* ── YISUNSIN: EXPERIENCE ── */}
-        {/* Source: _PLACE_KNOWLEDGE.lee_soon_shin_plaza.experience_ko */}
-        {isYisunsinView && (
-          <Card>
-            <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">이런 곳이에요</p>
-            <p className="text-sm text-white opacity-80 leading-relaxed">
-              이순신 장군을 기리는 역사 광장이에요. 거북선 무료 전시도 있어요. 미남크루즈 코스와 2층버스 주간코스에도 포함돼요.
-            </p>
-          </Card>
-        )}
-
-        {/* ── YISUNSIN: FIT ── */}
-        {/* Source: _PLACE_KNOWLEDGE.lee_soon_shin_plaza.fit_ko */}
-        {isYisunsinView && (
-          <Card className="border-dream-purple border-opacity-30">
-            <p className="text-xs text-dream-purple font-semibold mb-2 uppercase tracking-wider">이런 분께 맞아요</p>
-            <p className="text-sm text-white leading-relaxed">
-              역사에 관심 있는 분이나 아이와 함께 오기 좋아요. 크루즈나 2층버스 여행 동선에 자연스럽게 포함돼요.
+                : (YISUNSIN_SOUL_DISCOVERY[yisunsinVariantKey] ?? YISUNSIN_SOUL_DISCOVERY.default)}
             </p>
           </Card>
         )}
@@ -1595,6 +1592,17 @@ export default function SoulCableCarPage() {
           </div>
         )}
 
+        {/* ── YISUNSIN: EXPERIENCE ── */}
+        {/* Source: _PLACE_KNOWLEDGE.lee_soon_shin_plaza.experience_ko */}
+        {isYisunsinView && (
+          <Card>
+            <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">이런 곳이에요</p>
+            <p className="text-sm text-white opacity-80 leading-relaxed">
+              이순신 장군을 기리는 역사 광장이에요. 거북선 무료 전시도 있어요. 미남크루즈 코스와 2층버스 주간코스에도 포함돼요.
+            </p>
+          </Card>
+        )}
+
         {/* ── YISUNSIN: EXPERIENCE TURTLE SHIP ── */}
         {/* Source: YiSunSin_Square/Experience/Experience_Turtle_Ship_V1.png (Founder asset) */}
         {/* Guardrail: 거북선 내부 탑승 여부 미확인 — 관련 설명 금지 */}
@@ -1612,6 +1620,17 @@ export default function SoulCableCarPage() {
               style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.18) 0%, transparent 40%)' }}
             />
           </div>
+        )}
+
+        {/* ── YISUNSIN: FIT ── */}
+        {/* Source: _PLACE_KNOWLEDGE.lee_soon_shin_plaza.fit_ko */}
+        {isYisunsinView && (
+          <Card className="border-dream-purple border-opacity-30">
+            <p className="text-xs text-dream-purple font-semibold mb-2 uppercase tracking-wider">이런 분께 맞아요</p>
+            <p className="text-sm text-white leading-relaxed">
+              역사에 관심 있는 분이나 아이와 함께 오기 좋아요. 크루즈나 2층버스 여행 동선에 자연스럽게 포함돼요.
+            </p>
+          </Card>
         )}
 
         {/* ── YISUNSIN: JOURNEY PLAZA ── */}
