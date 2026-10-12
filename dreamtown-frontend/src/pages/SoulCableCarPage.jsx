@@ -270,7 +270,18 @@ function parseContext(input, current) {
     lower.includes('자차') ||
     lower.includes('드라이브') ||
     lower.includes('렌트') ||
-    (lower.includes('차') && !lower.includes('주차') && !lower.includes('기차'))
+    // B-2 fix: '차로' as explicit driving keyword (independent of 주차 exclusion)
+    (lower.includes('차로') && !lower.includes('기차로')) ||
+    // B-2 fix: '차에' as explicit vehicle keyword (차에 싣다/타다 pattern)
+    lower.includes('차에') ||
+    // B-1 fix: broad '차' match — add exclusions for non-vehicle substrings
+    (lower.includes('차') &&
+     !lower.includes('주차') &&
+     !lower.includes('기차') &&
+     !lower.includes('유모차') &&
+     !lower.includes('차이') &&
+     !lower.includes('차례') &&
+     !lower.includes('차 없이'))
   ) {
     next.hasVehicle = true;
   }
