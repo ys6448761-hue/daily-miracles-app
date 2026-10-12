@@ -134,20 +134,26 @@ const DOLSAN_FOR_ME =
 const YISUNSIN_SOUL_DISCOVERY = {
   default:
     '이순신 장군을 기리는 여수의 대표 광장이에요. 역사적인 분위기와 함께 여수항 풍경을 만날 수 있어요.',
+  // Source: yumcorp.or.kr (확인일: 2026-10-11). 주차 가용 보장 아님 (CAND-INFO-001).
   vehicle:
-    '이순신광장 주변에는 지하·노상 공영주차장 선택지가 있어요. 혼잡할 때를 대비해 대안 주차 위치를 미리 확인해두세요. 요금과 운영 조건은 방문 전 현장 확인을 권장해요.',
+    '이순신광장공영주차장을 먼저 확인해 보세요. 지하주차장이며, 내비게이션에서는 주차장 이름으로 검색할 수 있어요. 차량 목적지로는 전남 여수시 선어시장길 6을 참고하되, 실제 진입구와 진입 방향은 현장 표지를 확인해 주세요.\n소형차는 처음 1시간 무료, 이후 10분마다 200원, 하루 최대 5,000원이에요. 점심 추가 무료나 야간 이용 조건은 별도로 확인해 주세요.\n만차라면 진남관공영주차장 등 다른 공식 주차시설도 확인할 수 있어요. 도착할 때 빈자리가 있다는 보장은 아니에요.',
+  // Source: access.visitkorea.or.kr (2019년 기준). 엘리베이터 가동·무장애 경로 미확인 (CAND-INFO-001).
+  parents:
+    '광장과 여수항 풍경을 중심으로 짧게 둘러보는 방법이 있어요. 다만 주차장에서 광장까지 계단이나 턱 없이 이어지는 경로는 아직 확인되지 않았어요. 보행보조기나 휠체어를 사용하신다면 출구와 이동 경로를 먼저 확인해 주세요.\n공식 관광 안내도에는 지하주차장 엘리베이터가 표시돼 있어요. 다만 현재 가동 여부와 광장까지의 연결 경로는 확인되지 않았어요.',
+  // Source: 거북선 내부·유아시설 미확인 (CAND-INFO-001).
+  family:
+    '이순신광장에서 거북선 외관을 둘러보는 방문을 생각해 볼 수 있어요. 내부 관람 여부와 현재 운영시간, 계단 이용 조건은 확인이 필요해요.\n유모차 대여 여부와 기저귀교환대·수유 공간의 위치는 현재 확인된 자료만으로 확정하기 어려워요.',
   odongdo:
     '이순신광장에서 여수항과 역사의 분위기를 느낀 뒤, 오동도에서 바다와 자연을 이어서 즐길 수 있어요. 두 곳을 함께 묶는 동선은 이동 방법과 순서를 출발 전 먼저 확인해두는 게 좋아요.',
-  parents:
-    '부모님과 함께 이순신 장군의 이야기와 여수항 풍경을 천천히 둘러볼 수 있어요. 걷는 거리와 중간 휴식 장소는 방문 전 미리 확인해두세요.',
 };
 
 // ── YiSunSin Square variant key ───────────────────────────────────────────────
-// Priority: parents > odongdo > vehicle > default
+// Priority: parents > vehicle > family > odongdo > default (Option C — Founder approved 2026-10-12)
 function getYisunsinVariantKey(ctx) {
   if (ctx.companion === 'parents') return 'parents';
-  if (ctx.nextPlace === 'odongdo') return 'odongdo';
   if (ctx.hasVehicle) return 'vehicle';
+  if (ctx.companion === 'family') return 'family';
+  if (ctx.nextPlace === 'odongdo') return 'odongdo';
   return 'default';
 }
 
@@ -262,9 +268,27 @@ function parseContext(input, current) {
   const next = { ...current };
   if (
     lower.includes('자차') ||
+    lower.includes('자가용') ||                              // B-3 fix: 자가용=private car
     lower.includes('드라이브') ||
     lower.includes('렌트') ||
-    (lower.includes('차') && !lower.includes('주차') && !lower.includes('기차'))
+    lower.includes('렌터') ||                               // B-4 fix: 렌터카 (렌터 ≠ 렌트 in Korean)
+    // B-2 fix: '차로' as explicit driving keyword (independent of 주차 exclusion)
+    (lower.includes('차로') && !lower.includes('기차로')) ||
+    // B-2 fix: '차에' as explicit vehicle keyword (차에 싣다/타다 pattern)
+    lower.includes('차에') ||
+    // C fix: parking-info queries imply vehicle (specific patterns, not broad 주차)
+    lower.includes('주차비') ||                             // C-2: 주차비=parking fee
+    lower.includes('주차장은') ||                           // C-1: 주차장은 어디야
+    lower.includes('주차는') ||                             // C-1 alt: 주차는 어디야
+    lower.includes('주차 가능') ||                          // C-3: 주차 가능한가요
+    // B-1 fix: broad '차' match — add exclusions for non-vehicle substrings
+    (lower.includes('차') &&
+     !lower.includes('주차') &&
+     !lower.includes('기차') &&
+     !lower.includes('유모차') &&
+     !lower.includes('차이') &&
+     !lower.includes('차례') &&
+     !lower.includes('차 없이'))
   ) {
     next.hasVehicle = true;
   }
@@ -1604,7 +1628,7 @@ export default function SoulCableCarPage() {
           <Card>
             <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">이런 곳이에요</p>
             <p className="text-sm text-white opacity-80 leading-relaxed">
-              이순신 장군을 기리는 역사 광장이에요. 거북선 무료 전시도 있어요. 미남크루즈 코스와 2층버스 주간코스에도 포함돼요.
+              이순신 장군을 기리는 역사 광장이에요. 거북선 외관을 가까이 볼 수 있어요. 내부 관람 운영 상황은 현장 확인이 필요해요. 미남크루즈 코스와 2층버스 주간코스에도 포함돼요.
             </p>
           </Card>
         )}
