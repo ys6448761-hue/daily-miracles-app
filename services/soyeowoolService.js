@@ -1107,6 +1107,28 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
     }
   }
 
+  // [A] Parking — checked BEFORE Price to prevent "주차비 얼마야?" matching admission_ko.
+  // Compound "주차비 + 입장료" queries resolve to parking (more specific). Partial-response limitation acknowledged.
+  else if (/(주차|차 세우|차 대|주차장)/.test(msg)) {
+    if (knowledge.parking_ko) {
+      answer = knowledge.parking_ko + verifyNote;
+    } else {
+      answer = `${name}의 주차 정보는 현장 확인이 필요해요.${verifyNote}`;
+    }
+  }
+
+  // [B] Geobukseon (거북선) unverified specifics — lee_soon_shin_plaza only.
+  // Checked BEFORE Price so "거북선 얼마야?" is not answered with admission_ko.
+  // Internal admission, operation, fees are unverified (CAND-INFO-001).
+  // Exterior view queries do not reach PSQ via _isPlaceSpecificQuery, so they are unaffected.
+  else if (
+    code === 'lee_soon_shin_plaza' &&
+    /(거북선).*(들어갈|들어가|입장|탑승|내부|안에|무료|유료|얼마|요금|운영|열었|지금|가능)/.test(msg)
+  ) {
+    answer = knowledge.unknown_boundary
+      || `${name}의 거북선 관련 정보는 현장에서 확인해보세요.${verifyNote}`;
+  }
+
   // Price / admission fee
   else if (/(얼마야|얼마예요|요금|입장료|가격|티켓|무료야|공짜야|유료야|무료인가|무료 인가|무료예요)/.test(msg)) {
     if (knowledge.admission_ko === '무료') {
@@ -1149,7 +1171,12 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
   // Current operation / can we go now? / is it running?
   else if (/(지금.*탈|지금.*가도|지금.*갈|영업.*해|운영.*해|열었|탈 수 있|타도 돼|운행.*해|운행.*돼|운행 중|지금.*운행)/.test(msg)) {
     if (knowledge.hours_ko) {
-      answer = `${name} 운영시간은 ${knowledge.hours_ko}예요.`;
+      // [C] Avoid double suffix: if hours_ko is already a complete sentence ending with "요.",
+      // use it as-is; otherwise append "예요." (preserves existing output for time-value formats).
+      const _h = knowledge.hours_ko;
+      answer = /요\.$/.test(_h)
+        ? `${name} 운영시간은 ${_h}`
+        : `${name} 운영시간은 ${_h}예요.`;
       if (knowledge.hours_trust === 'NON_OFFICIAL') answer += '\n(참고값이에요.)';
       // If weather is also asked, surface weather policy inline rather than losing it to the else-if chain
       if (/(비|날씨|우천|기상|눈|바람|태풍)/.test(msg) && knowledge.weather_ko) {
@@ -1175,19 +1202,14 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
     answer = `${name} 내 포토존 위치는 아직 정확하게 파악하지 못했어요. 현장에서 직원에게 문의해보세요.`;
   }
 
-  // Parking — connect to parking_ko knowledge when present
-  else if (/(주차|차 세우|차 대|주차장)/.test(msg)) {
-    if (knowledge.parking_ko) {
-      answer = knowledge.parking_ko + verifyNote;
-    } else {
-      answer = `${name}의 주차 정보는 현장 확인이 필요해요.${verifyNote}`;
-    }
-  }
-
   // Hours — alternative phrasings not caught by the operation branch ("몇 시까지", "마감", "열어")
   else if (/(몇 시까지|마감|닫어|닫나요|닫아|언제까지|열어|몇 시에 열|언제 열)/.test(msg)) {
     if (knowledge.hours_ko) {
-      answer = `${name} 운영시간은 ${knowledge.hours_ko}예요.`;
+      // [C] Same double-suffix guard as operation branch above.
+      const _h = knowledge.hours_ko;
+      answer = /요\.$/.test(_h)
+        ? `${name} 운영시간은 ${_h}`
+        : `${name} 운영시간은 ${_h}예요.`;
       if (knowledge.hours_trust === 'NON_OFFICIAL') answer += '\n(참고값이에요.)';
       answer += verifyNote;
     } else {
