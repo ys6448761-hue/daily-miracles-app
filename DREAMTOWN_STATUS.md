@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-11
+Last Updated: 2026-10-13
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -21,9 +21,9 @@ Last Updated: 2026-10-11
 5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
-### ★ Current Next Action (exactly 1) — Updated: 2026-10-10
+### ★ Current Next Action (exactly 1) — Updated: 2026-10-13
 
-**Architecture Guard A+B CONFIGURATION_VERIFIED — 다음 실제 기능 PR에서 Runtime 검증**
+**다음 실제 기능 PR에서 Architecture Guard Runtime 검증 (자연 발생 대기)**
 
 - **Architecture Guard A+B 적용 완료 (2026-10-10)**
   - Option B: PR 필수 (`required_approving_review_count=0`) APPLIED ✓
@@ -44,6 +44,28 @@ Last Updated: 2026-10-11
   - 컴팩션 재개 = 신규 세션 (Current Next Action 선확인 의무)
   - Architecture Guard §4 [7] Current Next Action 정렬 항목 추가
   - 잔여 위험: 자동 차단 미구현 (AI 지침 준수 의존)
+- **YiSunSin Square SOUL Phase 1: CLOSED (Founder Decision 2026-10-13)**
+  - PR #40 PSQ Fix A/B/C MERGED @0a19a291 ✓
+  - PR #39 YiSunSin chip variants + parseContext MERGED @a4511a96 ✓
+  - Production Live SHA: a4511a96f4e8a3ad0f922c55f4a61c5e66a26d42
+  - S-1~S-3 (PSQ): 3/3 PASS / 부모님·가족·차량 컨텍스트 칩 UI 확인 ✓
+  - S-4~S-8 일반 fallback: Journey Decision → Living Detail Fallback 경로 확인
+    - 원인: `_extractGoldenPlaceCode`가 이순신광장 미인식 + JOURNEY_PREFERENCE가 explicit_context 미사용
+    - Phase 1 범위에 맥락별 SOUL API 응답 미포함 → Phase 2로 분리 (Founder 결정)
+
+### Phase 2 Open Item — YiSunSin SOUL 맥락별 대화 응답 (2026-10-13 등록)
+
+이순신광장 SOUL의 companion/vehicle context를 SOUL API 응답에 반영하는 작업.
+
+검토 대상:
+- `explicit_context.place_code` 기반 JOURNEY_PREFERENCE 처리 (`_handleJourneyDecision` 수정)
+- `_extractGoldenPlaceCode`에 이순신광장 추가 또는 `explicit_context` fallback 활용
+- parents / vehicle / family 컨텍스트별 응답 분기
+- 확인되지 않은 장소 정보에 대한 안전한 응답 (guardrail 유지)
+- S-4~S-8 응답 품질 검증 (현재 진단 Evidence 재사용 가능)
+
+기존 Evidence: 이번 세션 진단 (soyeowoolService.js 1758~1976 + 2400~2474 경로 확인 완료)
+착수 조건: Founder 기능 기획 결정 + Guardian Preflight READY
 
 ### Production-Live (Project Phoenix)
 
@@ -57,6 +79,8 @@ Last Updated: 2026-10-11
 | **SOUL Living Detail Navigation R1** | **77cac69** | **PRODUCTION_LIVE — Founder QA ALL PASS** |
 | **SOUL suitable_for Option C** | **afcecc4** | **PRODUCTION_LIVE — Smoke Test 8/8 PASS** |
 | **YiSunSin chip variants + image reorder** | **d95fd45** | **PRODUCTION_LIVE (코드) — 차량 Content QA 미완료** |
+| **PSQ Fix A/B/C (주차 우선순위·거북선·이중어미)** | **0a19a291** | **PRODUCTION_LIVE — S-1~S-3 3/3 PASS** |
+| **YiSunSin SOUL Phase 1 (chip variants + parseContext)** | **a4511a96** | **PRODUCTION_LIVE — Phase 1 CLOSED @2026-10-13** |
 
 ### Staging-Only (SoulCableCarPage, 9 elements)
 
