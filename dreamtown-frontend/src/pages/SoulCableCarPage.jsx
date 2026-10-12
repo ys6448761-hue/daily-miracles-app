@@ -268,12 +268,19 @@ function parseContext(input, current) {
   const next = { ...current };
   if (
     lower.includes('자차') ||
+    lower.includes('자가용') ||                              // B-3 fix: 자가용=private car
     lower.includes('드라이브') ||
     lower.includes('렌트') ||
+    lower.includes('렌터') ||                               // B-4 fix: 렌터카 (렌터 ≠ 렌트 in Korean)
     // B-2 fix: '차로' as explicit driving keyword (independent of 주차 exclusion)
     (lower.includes('차로') && !lower.includes('기차로')) ||
     // B-2 fix: '차에' as explicit vehicle keyword (차에 싣다/타다 pattern)
     lower.includes('차에') ||
+    // C fix: parking-info queries imply vehicle (specific patterns, not broad 주차)
+    lower.includes('주차비') ||                             // C-2: 주차비=parking fee
+    lower.includes('주차장은') ||                           // C-1: 주차장은 어디야
+    lower.includes('주차는') ||                             // C-1 alt: 주차는 어디야
+    lower.includes('주차 가능') ||                          // C-3: 주차 가능한가요
     // B-1 fix: broad '차' match — add exclusions for non-vehicle substrings
     (lower.includes('차') &&
      !lower.includes('주차') &&
