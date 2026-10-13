@@ -23,6 +23,14 @@ const sessionService = require('./sessionService');
 const CAPABILITY = 'TRAVEL_INTELLIGENCE';
 const SOURCE = 'travelGuideService/8-filter-cascade';
 
+// ─── Route Corpus (C-4: journey course) ──────────────────────────────────────
+// Loaded once at startup. Fails gracefully if file missing.
+const _ROUTE_CORPUS = (() => {
+  try { return require('../docs/knowledge/YEOSU_ROUTE_CORPUS_V0_1.json'); } catch (_) { return null; }
+})();
+// Pre-select R032 (2층버스 주간코스, yeosu.go.kr verified) as default half-day course reference.
+const _ROUTE_HALFDAY_DEFAULT = _ROUTE_CORPUS?.routes?.find(r => r.route_id === 'R032') || null;
+
 // ─── PLACE_LOOKUP: alias map ──────────────────────────────────────────────────
 // Maps Korean name/alias → travel_places.code
 // Only verified travel_places codes. Alias ≠ unverified place name.
@@ -1535,6 +1543,20 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPla
   const mobilityConstraint = effectiveMobility || soulContext.mobility_constraint;
   const requestedCount = soulContext.requested_count;
 
+  // C-4: Journey course — no booking context, explicit "코스 짜줘" intent.
+  // _noBookingCtx: quoteCtx is always an object (extractQuoteContext never returns null),
+  // so check hotel_code + leisure fields to detect "no journey started" state.
+  // Uses R032 (낭만버스 2층버스 주간코스, yeosu.go.kr verified) as default half-day course.
+  // C-3 guard: excludes "동선을 알려줘" vehicle-discovery queries via narrow pattern.
+  const _isCourseIntent = /(코스|일정).*(짜줘|짜주세요|만들어줘|만들어주세요|구성해줘)/.test(message);
+  const _noBookingCtx = !quoteCtx?.hotel_code && !quoteCtx?.leisure;
+  if (_noBookingCtx && _isCourseIntent && status !== 'NO_RESULT' && _ROUTE_HALFDAY_DEFAULT) {
+    const stops = (_ROUTE_HALFDAY_DEFAULT.stops || [])
+      .filter(s => s.category !== 'TRANSPORT_HUB' && s.category !== 'ACCOMMODATION')
+      .map(s => s.entity_name);
+    return `여수 낭만버스 2층버스 주간 코스를 소개해드릴게요.\n${stops.join(' → ')}\n\n시간과 동반자에 따라 조정할 수 있어요. 꼭 가고 싶은 곳이 있으신가요?`;
+  }
+
   // Fix 2: Narrow journey acknowledgement — grounded, only when both hotel+leisure resolved.
   // Acknowledges explicit resolved choices naturally. Does NOT enumerate every field.
   // Only fires for journey planning intent — NOT Discovery, NOT clarification.
@@ -2679,7 +2701,18 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   const allPlaceWarnings = new Set(
     (tgResult && tgResult.places ? tgResult.places : []).flatMap(p => p.warnings || [])
   );
-  const soulMessage = _generateSoulMessage(enrichedSoulContext, status, message, quoteCtx, explicit_context.place_code || null, domainContext.mobility_constraint || null, allPlaceWarnings);
+  let soulMessage = _generateSoulMessage(enrichedSoulContext, status, message, quoteCtx, explicit_context.place_code || null, domainContext.mobility_constraint || null, allPlaceWarnings);
+
+  // C-3: Parking supplement — append verified parking_ko for recommended places when has_car=true.
+  // Uses _PLACE_KNOWLEDGE data only. Places without parking_ko are silently omitted (UNKNOWN preserved).
+  if (enrichedSoulContext.has_car === true && tgResult?.places?.length) {
+    const parkingLines = tgResult.places
+      .filter(p => p.place_code && _PLACE_KNOWLEDGE[p.place_code]?.parking_ko)
+      .map(p => `  · ${_PLACE_KNOWLEDGE[p.place_code].parking_ko}`);
+    if (parkingLines.length) {
+      soulMessage += '\n\n주차 정보:\n' + parkingLines.join('\n');
+    }
+  }
 
   // WHY DETAILS
   const whyDetails = _buildWhyDetails(tgResult, domainContext);
