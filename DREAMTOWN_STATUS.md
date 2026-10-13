@@ -44,6 +44,14 @@ Last Updated: 2026-10-13
   - 컴팩션 재개 = 신규 세션 (Current Next Action 선확인 의무)
   - Architecture Guard §4 [7] Current Next Action 정렬 항목 추가
   - 잔여 위험: 자동 차단 미구현 (AI 지침 준수 의존)
+- **무여정 메인 4개 카테고리 칩 PR #42: MERGED (2026-10-13)**
+  - Merge SHA: eadcbde9a8bcdb6c67ebe43fc1afc53eca0266ec / Feature: 788962b
+  - 변경 파일 2개: `MuyojeongHomePage.jsx`, `soyeowoolService.js`
+  - C-1~C-4 로컬 API 검증 PASS / AIL Gate PASS / docker-smoke PASS
+  - Vercel 2건 FAIL (비필수 체크) / Render Production 미배포 (미승인)
+  - Architecture Guard Runtime 부분 확인: enforce_admins=true 작동 ✓ (Founder PR 통해 Merge)
+  - Architecture Guard Runtime 미확인: AIL Gate FAIL → Merge 차단 동작 (다음 PR로 이월)
+  - Evidence: `docs/architecture/MUYOJEONG_CHIP_C3C4_PR42_EVIDENCE.md`
 - **YiSunSin Square SOUL Phase 1: CLOSED (Founder Decision 2026-10-13)**
   - PR #40 PSQ Fix A/B/C MERGED @0a19a291 ✓
   - PR #39 YiSunSin chip variants + parseContext MERGED @a4511a96 ✓
@@ -81,6 +89,7 @@ Last Updated: 2026-10-13
 | **YiSunSin chip variants + image reorder** | **d95fd45** | **PRODUCTION_LIVE (코드) — 차량 Content QA 미완료** |
 | **PSQ Fix A/B/C (주차 우선순위·거북선·이중어미)** | **0a19a291** | **PRODUCTION_LIVE — S-1~S-3 3/3 PASS** |
 | **YiSunSin SOUL Phase 1 (chip variants + parseContext)** | **a4511a96** | **PRODUCTION_LIVE — Phase 1 CLOSED @2026-10-13** |
+| **무여정 메인 4개 카테고리 칩 (C-3/C-4)** | **788962b** | **MERGED to main (PR #42, eadcbde) — Render Production 미배포 (미승인)** |
 
 ### Staging-Only (SoulCableCarPage, 9 elements)
 
