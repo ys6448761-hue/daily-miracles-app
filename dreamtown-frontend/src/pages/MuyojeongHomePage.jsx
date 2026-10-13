@@ -166,11 +166,12 @@ function SoulAnswerSummary({ response, onNewQuestion }) {
 }
 
 // ── Suggestion chips — Founder directive canonical 4, 2-col grid ──────────────
+// label: 화면 표시 / query: SOUL API 전달 질문 / ec: optional explicit_context
 const SUGGESTION_CHIPS = [
-  '부모님과 어디 가면 좋을까?',
-  '아이와 오늘 어디 가지?',
-  '차 가져가는데 동선 짜줘',
-  '비 오면 어디 가면 좋아?',
+  { label: '부모님과 함께', query: '부모님과 여수에서 어디 가면 좋을까?' },
+  { label: '아이와 함께',   query: '아이와 여수에서 어디 가면 좋을까?' },
+  { label: '차량으로',      query: '여수에서 주차할 곳과 차로 이동하기 좋은 장소, 동선을 알려줘.', ec: { has_car: true } },
+  { label: '여행코스',      query: '여수 여행코스를 짜줘.' },
 ];
 
 // ── Place entries — per-place routing via ?place= URL param ───────────────────
@@ -211,7 +212,7 @@ export default function MuyojeongHomePage() {
   const [errorMsg,     setErrorMsg]     = useState(null);
   const [heroLoaded,   setHeroLoaded]   = useState(false);
 
-  async function _callSOUL(text) {
+  async function _callSOUL(text, explicitCtx) {
     setErrorMsg(null);
     setIsLoading(true);
     try {
@@ -228,6 +229,7 @@ export default function MuyojeongHomePage() {
           message:    text,
           session_id: sessionId,
           // NO place_code — main home is traveler context only
+          ...(explicitCtx ? { explicit_context: explicitCtx } : {}),
         }),
       });
 
@@ -254,9 +256,9 @@ export default function MuyojeongHomePage() {
     _callSOUL(raw);
   }
 
-  function handleChipClick(chip) {
+  function handleChipClick(query, ec) {
     if (isLoading) return;
-    _callSOUL(chip);
+    _callSOUL(query, ec);
   }
 
   function handleReset() {
@@ -463,8 +465,8 @@ export default function MuyojeongHomePage() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
             {SUGGESTION_CHIPS.map((chip) => (
               <button
-                key={chip}
-                onClick={() => handleChipClick(chip)}
+                key={chip.label}
+                onClick={() => handleChipClick(chip.query, chip.ec)}
                 style={{
                   padding:      '10px 12px',
                   borderRadius: '12px',
@@ -488,7 +490,7 @@ export default function MuyojeongHomePage() {
                   e.currentTarget.style.background  = 'rgba(255,255,255,0.05)';
                 }}
               >
-                {chip}
+                {chip.label}
               </button>
             ))}
           </div>
