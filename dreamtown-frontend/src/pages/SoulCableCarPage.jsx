@@ -1080,6 +1080,36 @@ export default function SoulCableCarPage() {
     ? (YISUNSIN_SOUL_DISCOVERY[yisunsinVariantKey] ?? YISUNSIN_SOUL_DISCOVERY.default)
     : (SOUL_DISCOVERY[soulVariantKey] ?? SOUL_DISCOVERY.default);
 
+  // ── SOUL API 공통 호출 (handleSubmit + 카테고리 칩 공유) ────────────────────
+  async function _callSOULDirect(message, extraCtx = {}) {
+    if (isLoading) return;
+    const explicit_context = { place_code: placeCode, ...extraCtx };
+    setNavPlaceCode(null);
+    setIsLoading(true);
+    setSoulMessage(null);
+    try {
+      const cred = await getOrEnsureGuestCredential();
+      if (!cred?.guest_token) throw new Error('인증 정보를 가져오지 못했어요. 잠시 후 다시 시도해주세요.');
+      const res = await fetch('/api/dt/travel/input/text', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cred.guest_token}` },
+        body: JSON.stringify({ message, session_id: sessionId, explicit_context }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(typeof body?.error === 'string' ? body.error : '요청 처리에 실패했어요. 다시 시도해주세요.');
+      }
+      const data = await res.json();
+      if (data.session_id) setSessionId(data.session_id);
+      setSoulResponse(data);
+      if (data.message_ko) setSoulMessage(data.message_ko);
+    } catch (err) {
+      setSoulMessage(err.message || '일정을 확인하는 중 문제가 생겼어요. 다시 시도해주세요.');
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     const raw = inputValue.trim();
@@ -1089,51 +1119,31 @@ export default function SoulCableCarPage() {
     setTravelerContext(updated);
 
     // Gap B — UI-001 explicit_context wiring
-    // Chip state → explicit_context (advisory, not commanding)
-    // Rules: chip does NOT auto-submit, does NOT fabricate sentences, text place alias wins
-    // V0.1: place_code sent as page-context signal (NOT chip-driven place lookup).
-    // Backend uses this to: exclude current place from Discovery + context-aware message framing.
-    const explicit_context = {};
-    explicit_context.place_code = placeCode; // current Living Detail page context
-    if (updated.hasVehicle) explicit_context.has_car = true;
-    if (updated.companion === 'parents') explicit_context.people_type = 'family_elderly';
-    else if (updated.companion === 'family') explicit_context.people_type = 'family_with_kids';
+    // V0.1: place_code sent as page-context signal.
+    const extraCtx = {};
+    if (updated.hasVehicle) extraCtx.has_car = true;
+    if (updated.companion === 'parents') extraCtx.people_type = 'family_elderly';
+    else if (updated.companion === 'family') extraCtx.people_type = 'family_with_kids';
 
-    setNavPlaceCode(null); // Reset Living Detail navigation override on new query
-    setIsLoading(true);
-    setSoulMessage(null);
-    try {
-      const cred = await getOrEnsureGuestCredential();
-      if (!cred?.guest_token) throw new Error('인증 정보를 가져오지 못했어요. 잠시 후 다시 시도해주세요.');
+    await _callSOULDirect(raw, extraCtx);
+    setInputValue('');
+  }
 
-      const res = await fetch('/api/dt/travel/input/text', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${cred.guest_token}`,
-        },
-        body: JSON.stringify({
-          message: raw,
-          session_id: sessionId,
-          explicit_context: Object.keys(explicit_context).length > 0 ? explicit_context : undefined,
-        }),
-      });
+  // ── 장소 상세 4개 카테고리 칩 ────────────────────────────────────────────────
+  const DETAIL_CATEGORY_CHIPS = [
+    { label: '부모님과 함께', query: '부모님과 함께 왔어요. 이곳에서 어떻게 즐기면 좋을까요?', ec: { people_type: 'family_elderly' } },
+    { label: '아이와 함께',   query: '아이와 함께 왔어요. 이곳에서 어떻게 즐기면 좋을까요?', ec: { people_type: 'family_with_kids' } },
+    { label: '차량으로',      query: '차 가지고 왔어요. 주차할 수 있어요?', ec: { has_car: true } },
+    { label: '여행코스',      query: '이 장소에 대해 알려줘.', ec: {} },
+  ];
 
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(typeof body?.error === 'string' ? body.error : '요청 처리에 실패했어요. 다시 시도해주세요.');
-      }
-
-      const data = await res.json();
-      if (data.session_id) setSessionId(data.session_id);
-      setSoulResponse(data);
-      if (data.message_ko) setSoulMessage(data.message_ko);
-    } catch (err) {
-      setSoulMessage(err.message || '일정을 확인하는 중 문제가 생겼어요. 다시 시도해주세요.');
-    } finally {
-      setIsLoading(false);
-      setInputValue('');
-    }
+  function handleDetailChipClick(chip) {
+    if (isLoading) return;
+    // 동반자/차량 컨텍스트도 함께 반영
+    if (chip.ec?.people_type === 'family_elderly') setTravelerContext((c) => ({ ...c, companion: 'parents' }));
+    else if (chip.ec?.people_type === 'family_with_kids') setTravelerContext((c) => ({ ...c, companion: 'family' }));
+    else if (chip.ec?.has_car) setTravelerContext((c) => ({ ...c, hasVehicle: true }));
+    _callSOULDirect(chip.query, chip.ec);
   }
 
   return (
@@ -1208,32 +1218,22 @@ export default function SoulCableCarPage() {
             </div>
           )}
 
-          {/* Quick Context — progressive, hides when all active */}
-          {(() => {
-            const allOptions = [
-              { label: '🚗 자차로 가요', query: '차가 있어요', active: travelerContext.hasVehicle },
-              { label: '🌿 오동도도요', query: '오동도도 갈 거예요', active: travelerContext.nextPlace === 'odongdo' },
-              { label: '👨‍👩‍👧 부모님과요', query: '부모님도 같이 가요', active: travelerContext.companion === 'parents' },
-            ];
-            const remaining = allOptions.filter((o) => !o.active);
-            if (remaining.length === 0) return null;
-            return (
-              <div className="mt-3 pt-3 border-t border-white border-opacity-10">
-                <p className="text-xs text-white opacity-30 mb-2">내 상황을 더하면 더 정확하게 알려드려요</p>
-                <div className="flex flex-wrap gap-2">
-                  {remaining.map((s) => (
-                    <button
-                      key={s.query}
-                      onClick={() => setTravelerContext((c) => parseContext(s.query, c))}
-                      className="px-3 py-1.5 rounded-full text-xs border border-white border-opacity-20 text-white opacity-70 hover:opacity-100 hover:border-dream-purple transition-all"
-                    >
-                      {s.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            );
-          })()}
+          {/* 4개 카테고리 칩 — auto-submit, place_code 포함 */}
+          <div className="mt-3 pt-3 border-t border-white border-opacity-10">
+            <p className="text-xs text-white opacity-30 mb-2">카테고리로 바로 물어보세요</p>
+            <div className="flex flex-wrap gap-2">
+              {DETAIL_CATEGORY_CHIPS.map((chip) => (
+                <button
+                  key={chip.label}
+                  onClick={() => handleDetailChipClick(chip)}
+                  disabled={isLoading}
+                  className="px-3 py-1.5 rounded-full text-xs border border-white border-opacity-20 text-white opacity-70 hover:opacity-100 hover:border-dream-purple transition-all disabled:opacity-30"
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </Card>
 
         {/* ── SOUL ANSWER SUMMARY (V0.1) ── */}
