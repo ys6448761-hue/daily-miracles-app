@@ -2045,7 +2045,11 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   // UI-001: chip place_code supplements when text has no alias but message has a lookup/suitability verb.
   // Text alias always wins over chip (Principle 1 of contract).
   let placeLookup = _detectPlaceLookupIntent(message);
-  if (!placeLookup.isPlaceLookup && explicit_context.place_code && !DISCOVERY_OVERRIDES.test(message)) {
+  // PSQ guard: if message has specific operational intent (주차, 요금, 운영…), let PSQ handle it
+  // rather than promoting to PLACE_LOOKUP. Prevents "주차와 이동 동선을 알려줘" from getting a
+  // generic place-info response instead of the targeted parking guardrail.
+  if (!placeLookup.isPlaceLookup && explicit_context.place_code && !DISCOVERY_OVERRIDES.test(message)
+      && !_isPlaceSpecificQuery(message)) {
     const hasVerb = MEDIUM_LOOKUP.test(message) || STRONG_LOOKUP.test(message);
     if (hasVerb) {
       placeLookup = {
@@ -2477,12 +2481,14 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
     // When the PSQ gate didn't fire (pattern not in _isPlaceSpecificQuery) but a place_code
     // context exists, attempt PSQ rather than falling to a generic planning prompt.
     // _buildPlaceSpecificQueryPayload returns graceful "정보를 확인 중이에요" for unknown patterns.
-    // Guard: skip for greetings, indecision, and cable-car clarification intents that
-    // belong in _generateClarificationMessage early branches.
+    // Guard: skip for greetings, indecision, cable-car clarification intents, and
+    // companion/category chip queries that need the planning path.
     const _ldGuardBypass =
       /^(안녕|안녕하세요|반가워|하이|hello|hi)[\s!.?]*$/i.test(message.trim())
       || /(잘 모르겠|모르겠어|뭐가 좋을|뭐 해야|어떡하|어쩌)/.test(message)
-      || (/케이블카|케이블 카/.test(message) && /(꼭|반드시|타고 싶|타야|빼고|빼줘|제외|일정에|탈거야)/.test(message));
+      || (/케이블카|케이블 카/.test(message) && /(꼭|반드시|타고 싶|타야|빼고|빼줘|제외|일정에|탈거야)/.test(message))
+      || /(부모님과|아이와|가족과).*(왔어|왔어요|왔는데|함께라면|함께 왔|와서)/.test(message)
+      || /(이곳에서.*(즐기|어떻게)|어떻게.*즐기)/.test(message);
     if (_psqPlaceCode && !_ldGuardBypass) {
       try {
         const _ldPlace = await travelGuideService.getPlaceByCode(_psqPlaceCode);
@@ -2491,6 +2497,43 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
         }
       } catch (_ldErr) {
         console.warn('[LIVING_DETAIL_FALLBACK_ERROR]', _ldErr.message);
+        // Non-fatal: fall through to _generateClarificationMessage
+      }
+    }
+
+    // ── Companion Chip Response — D1/D2: companion/category chips on place detail page ──────────
+    // When _ldGuardBypass is true (companion chip bypassed Living Detail Fallback) and
+    // place_code is set, return substantive place knowledge + companion fit note instead of
+    // a pure CLARIFICATION question. Uses _PLACE_KNOWLEDGE experience_ko + fit_ko — no fabrication.
+    const _isCompanionChipQuery =
+      _psqPlaceCode && _ldGuardBypass &&
+      (/(부모님과|아이와|가족과).*(왔어|왔어요|함께)/.test(message) ||
+       /(이곳에서.*(즐기|어떻게)|어떻게.*즐기)/.test(message));
+    if (_isCompanionChipQuery) {
+      try {
+        const _ccPlace = await travelGuideService.getPlaceByCode(_psqPlaceCode);
+        if (_ccPlace) {
+          const _ccKnowledge = _PLACE_KNOWLEDGE[_ccPlace.code] || {};
+          const _ccName = _ccPlace.name_ko || _ccPlace.code;
+          const _ccParts = [`${_ccName}에 대해 알려드릴게요.`];
+          if (_ccKnowledge.experience_ko) _ccParts.push(_ccKnowledge.experience_ko);
+          if (_ccKnowledge.fit_ko)        _ccParts.push(_ccKnowledge.fit_ko);
+          if (soulContext.people_type === 'family_elderly' && _ccPlace.physical_difficulty === 'high') {
+            _ccParts.push('경사나 계단이 있어요. 이동 동선을 미리 확인해보세요.');
+          }
+          if (soulContext.people_type === 'family_with_kids' && _ccPlace.accessibility_stroller) {
+            _ccParts.push('유모차 접근이 가능해요.');
+          }
+          return {
+            ok: true,
+            payload: {
+              ..._buildPlaceLookupClientPayload(_ccPlace, sessionId, null),
+              message_ko: _ccParts.join('\n'),
+            },
+          };
+        }
+      } catch (_ccErr) {
+        console.warn('[COMPANION_CHIP_ERROR]', _ccErr.message);
         // Non-fatal: fall through to _generateClarificationMessage
       }
     }
