@@ -279,11 +279,15 @@ class TravelGuideService {
 
     // Determine time slot and target stop count
     const timeSlot = this._detectTimeSlot(timeMinutes);
+    // When time_available_minutes is a fallback (user didn't specify), use 3 stops as default
+    // so category chip recommendations show a meaningful selection rather than 2 places
+    const _timeIsFallback = context._domainFallbacks?.includes('time_available_minutes');
     // G1: respect explicit requested_count — capped at 5 and floored at 1
     const rawTarget = this._getTargetStopCount(timeSlot, timeMinutes);
+    const defaultTarget = _timeIsFallback ? Math.max(rawTarget, 3) : rawTarget;
     const targetStops = context.requested_count
       ? Math.max(1, Math.min(5, context.requested_count))
-      : rawTarget;
+      : defaultTarget;
 
     // Select places that fit available time (greedy: fit as many as possible)
     // Must-visit places are anchored in composition
@@ -410,6 +414,7 @@ class TravelGuideService {
     }
 
     // Step 2: Fill remaining slots with top-ranked candidates (excluding must-visit already selected)
+    const _tmFallback = context._domainFallbacks?.includes('time_available_minutes');
     const selectedCodes = new Set(selected.map(p => p.code));
     for (const place of candidates) {
       if (selected.length >= targetCount) break;
@@ -417,8 +422,9 @@ class TravelGuideService {
 
       const timeNeeded = place.avg_stay_minutes;
 
-      // Check if this place fits in remaining time budget
-      if (placesTimeUsed + timeNeeded <= availableForPlaces) {
+      // When time is fallback (user didn't specify), skip the budget check so category
+      // chip recommendations aren't cut off by an arbitrary 120-minute default.
+      if (_tmFallback || placesTimeUsed + timeNeeded <= availableForPlaces) {
         selected.push(place);
         selectedCodes.add(place.code);
         placesTimeUsed += timeNeeded;

@@ -1554,7 +1554,7 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPla
     const stops = (_ROUTE_HALFDAY_DEFAULT.stops || [])
       .filter(s => s.category !== 'TRANSPORT_HUB' && s.category !== 'ACCOMMODATION')
       .map(s => s.entity_name);
-    return `여수 낭만버스 2층버스 주간 코스를 소개해드릴게요.\n${stops.join(' → ')}\n\n시간과 동반자에 따라 조정할 수 있어요. 꼭 가고 싶은 곳이 있으신가요?`;
+    return `여수 낭만버스 2층버스 주간 코스를 소개해드릴게요.\n${stops.join(' → ')}\n\n버스가 실제 경유하는 코스예요. 자차나 대중교통으로도 방문할 수 있어요.`;
   }
 
   // Fix 2: Narrow journey acknowledgement — grounded, only when both hotel+leisure resolved.
@@ -1620,6 +1620,13 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPla
     if (budget === 'free' || budget === 'low') {
       const base = placePrefix ? `${placePrefix}\n${situationLine}` : situationLine;
       return `${base}\n부담 적은 곳 위주로 골라봤는데, 입장료는 직접 확인이 필요해요.`;
+    }
+    // Companion category chip: family_elderly/family_with_kids/has_car without currentPlaceCode
+    // → return recommendation message, skip time question (category click is a complete request)
+    if (!currentPlaceCode) {
+      if (pt === 'family_elderly') return `부모님과 함께 여행이시군요.\n부모님과 함께 둘러볼 만한 곳을 골라봤어요.`;
+      if (pt === 'family_with_kids') return `아이들과 함께 여행이시군요.\n아이와 함께 즐길 수 있는 곳을 골라봤어요.`;
+      if (soulContext.has_car === true) return `지금 상황에 맞는 곳을 찾아볼게요.\n자차로 이동하기 좋은 곳을 골라봤어요.`;
     }
     // Default PARTIAL — place-aware if current place known
     if (placePrefix) {
@@ -2518,11 +2525,27 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
           const _ccParts = [`${_ccName}에 대해 알려드릴게요.`];
           if (_ccKnowledge.experience_ko) _ccParts.push(_ccKnowledge.experience_ko);
           if (_ccKnowledge.fit_ko)        _ccParts.push(_ccKnowledge.fit_ko);
-          if (soulContext.people_type === 'family_elderly' && _ccPlace.physical_difficulty === 'high') {
-            _ccParts.push('경사나 계단이 있어요. 이동 동선을 미리 확인해보세요.');
+          if (soulContext.people_type === 'family_elderly') {
+            if (_ccPlace.physical_difficulty === 'high') {
+              _ccParts.push('경사나 계단이 있어요. 이동 동선을 미리 확인해보세요.');
+            } else if (Array.isArray(_ccPlace.suitable_for) && _ccPlace.suitable_for.includes('elderly')) {
+              const _stayMin = _ccPlace.avg_stay_minutes;
+              const _isOutdoor = _ccPlace.venue_type === 'outdoor';
+              if (_isOutdoor && _stayMin) _ccParts.push(`야외 장소라 이동 부담이 적어요. 보통 약 ${_stayMin}분 정도 머물러요.`);
+              else if (_isOutdoor)        _ccParts.push('야외 장소라 이동 부담이 적어요.');
+              else if (_stayMin)          _ccParts.push(`보통 약 ${_stayMin}분 정도 머물러요.`);
+            }
           }
-          if (soulContext.people_type === 'family_with_kids' && _ccPlace.accessibility_stroller) {
-            _ccParts.push('유모차 접근이 가능해요.');
+          if (soulContext.people_type === 'family_with_kids') {
+            if (_ccPlace.accessibility_stroller) {
+              _ccParts.push('유모차 접근이 가능해요.');
+            } else if (Array.isArray(_ccPlace.suitable_for) && _ccPlace.suitable_for.includes('kids_ok')) {
+              const _stayMin = _ccPlace.avg_stay_minutes;
+              const _isOutdoor = _ccPlace.venue_type === 'outdoor';
+              if (_isOutdoor && _stayMin) _ccParts.push(`야외 장소라 아이와 자유롭게 둘러보기 좋아요. 보통 약 ${_stayMin}분 정도 머물러요.`);
+              else if (_isOutdoor)        _ccParts.push('야외 장소라 아이와 자유롭게 둘러보기 좋아요.');
+              else if (_stayMin)          _ccParts.push(`보통 약 ${_stayMin}분 정도 머물러요.`);
+            }
           }
           return {
             ok: true,
@@ -2746,9 +2769,32 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   );
   let soulMessage = _generateSoulMessage(enrichedSoulContext, status, message, quoteCtx, explicit_context.place_code || null, domainContext.mobility_constraint || null, allPlaceWarnings);
 
+  // Companion PARTIAL supplement: append place names in message for family_elderly/family_with_kids
+  // so the UI shows actual recommendations. Excludes jungang_market for family_elderly
+  // (Founder decision: 중앙시장 제외, 수산물 특화거리 대체 — 수산물특화시장 DB 미등록으로 제외만 적용).
+  // Guard: skip for course-intent messages — 낭만버스 route reply is already self-contained.
+  const _ELDERLY_MSG_EXCLUDE = new Set(['jungang_market']);
+  const _isCourseMsg = /(코스|일정).*(짜줘|짜주세요|만들어줘|만들어주세요|구성해줘)/.test(message);
+  if (status === 'PARTIAL' && !explicit_context.place_code && tgResult?.places?.length && !_isCourseMsg) {
+    const _mPt = enrichedSoulContext.people_type;
+    const _hasCar = enrichedSoulContext.has_car === true;
+    if (_mPt === 'family_elderly' || _mPt === 'family_with_kids') {
+      const _mPlaces = tgResult.places.filter(p =>
+        !(_mPt === 'family_elderly' && _ELDERLY_MSG_EXCLUDE.has(p.place_code))
+      );
+      const _mNames = _mPlaces.map(p => p.name_ko).filter(Boolean);
+      if (_mNames.length) soulMessage += '\n\n' + _mNames.map(n => `· ${n}`).join('\n');
+    } else if (_hasCar) {
+      // C-3: has_car PARTIAL — include place names so users see actual recommendations
+      const _carNames = tgResult.places.map(p => p.name_ko).filter(Boolean);
+      if (_carNames.length) soulMessage += '\n\n' + _carNames.map(n => `· ${n}`).join('\n');
+    }
+  }
+
   // C-3: Parking supplement — append verified parking_ko for recommended places when has_car=true.
   // Uses _PLACE_KNOWLEDGE data only. Places without parking_ko are silently omitted (UNKNOWN preserved).
-  if (enrichedSoulContext.has_car === true && tgResult?.places?.length) {
+  // Guard: skip for course-intent messages — 낭만버스 route reply does not need parking info appended.
+  if (enrichedSoulContext.has_car === true && tgResult?.places?.length && !_isCourseMsg) {
     const parkingLines = tgResult.places
       .filter(p => p.place_code && _PLACE_KNOWLEDGE[p.place_code]?.parking_ko)
       .map(p => `  · ${_PLACE_KNOWLEDGE[p.place_code].parking_ko}`);
