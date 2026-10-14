@@ -1140,12 +1140,20 @@ export default function SoulCableCarPage() {
 
   function handleDetailChipClick(chip) {
     if (isLoading) return;
-    // 동반자/차량 컨텍스트 반영, 카테고리 전환 시 courseSelected 초기화
-    if (chip.ec?.people_type === 'family_elderly') setTravelerContext((c) => ({ ...c, companion: 'parents', courseSelected: false }));
-    else if (chip.ec?.people_type === 'family_with_kids') setTravelerContext((c) => ({ ...c, companion: 'family', courseSelected: false }));
-    else if (chip.ec?.has_car) setTravelerContext((c) => ({ ...c, hasVehicle: true, courseSelected: false }));
-    else setTravelerContext((c) => ({ ...c, courseSelected: true })); // 여행코스
-    _callSOULDirect(chip.query, chip.ec);
+    // Compute next context synchronously (avoids stale-closure on _callSOULDirect)
+    // so has_car + companion accumulated state is always reflected in the API payload.
+    const nextCtx = { ...travelerContext, courseSelected: false };
+    if (chip.ec?.people_type === 'family_elderly')      { nextCtx.companion = 'parents'; }
+    else if (chip.ec?.people_type === 'family_with_kids') { nextCtx.companion = 'family'; }
+    else if (chip.ec?.has_car)                            { nextCtx.hasVehicle = true; }
+    else                                                  { nextCtx.courseSelected = true; }
+    setTravelerContext(nextCtx);
+    // Build merged ec from final context — includes all accumulated conditions
+    const mergedEc = {};
+    if (nextCtx.hasVehicle) mergedEc.has_car = true;
+    if (nextCtx.companion === 'parents')       mergedEc.people_type = 'family_elderly';
+    else if (nextCtx.companion === 'family')   mergedEc.people_type = 'family_with_kids';
+    _callSOULDirect(chip.query, mergedEc);
   }
 
   return (
