@@ -1018,6 +1018,7 @@ export default function SoulCableCarPage() {
     hasVehicle: false,
     nextPlace: null,
     companion: null,
+    courseSelected: false,
   });
   const [inputValue, setInputValue] = useState('');
   const [sessionId, setSessionId] = useState(null);
@@ -1042,7 +1043,7 @@ export default function SoulCableCarPage() {
   const heroSrc = PLACE_HERO_MAP[placeCode] ?? null;
 
   const hasContext =
-    travelerContext.hasVehicle || travelerContext.nextPlace || travelerContext.companion;
+    travelerContext.hasVehicle || travelerContext.nextPlace || travelerContext.companion || travelerContext.courseSelected;
   const hasParents = travelerContext.companion === 'parents';
   const hasFamily  = travelerContext.companion === 'family';
 
@@ -1139,10 +1140,11 @@ export default function SoulCableCarPage() {
 
   function handleDetailChipClick(chip) {
     if (isLoading) return;
-    // 동반자/차량 컨텍스트도 함께 반영
-    if (chip.ec?.people_type === 'family_elderly') setTravelerContext((c) => ({ ...c, companion: 'parents' }));
-    else if (chip.ec?.people_type === 'family_with_kids') setTravelerContext((c) => ({ ...c, companion: 'family' }));
-    else if (chip.ec?.has_car) setTravelerContext((c) => ({ ...c, hasVehicle: true }));
+    // 동반자/차량 컨텍스트 반영, 카테고리 전환 시 courseSelected 초기화
+    if (chip.ec?.people_type === 'family_elderly') setTravelerContext((c) => ({ ...c, companion: 'parents', courseSelected: false }));
+    else if (chip.ec?.people_type === 'family_with_kids') setTravelerContext((c) => ({ ...c, companion: 'family', courseSelected: false }));
+    else if (chip.ec?.has_car) setTravelerContext((c) => ({ ...c, hasVehicle: true, courseSelected: false }));
+    else setTravelerContext((c) => ({ ...c, courseSelected: true })); // 여행코스
     _callSOULDirect(chip.query, chip.ec);
   }
 
@@ -1213,6 +1215,12 @@ export default function SoulCableCarPage() {
                 <ContextChip
                   label="👨‍👩‍👦 가족"
                   onRemove={() => setTravelerContext((c) => ({ ...c, companion: null }))}
+                />
+              )}
+              {travelerContext.courseSelected && (
+                <ContextChip
+                  label="🗺️ 여행코스"
+                  onRemove={() => setTravelerContext((c) => ({ ...c, courseSelected: false }))}
                 />
               )}
             </div>
