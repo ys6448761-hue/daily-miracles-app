@@ -1259,37 +1259,6 @@ export default function SoulCableCarPage() {
           : null
         }
 
-        {/* ── LIVING DETAIL NAVIGATION (V0.1) ─────────────────────────────────────
-             When SOUL Discovery response includes places with a Living Detail page,
-             show navigation buttons. Clicking switches the Living Detail view below.
-             Resets on next user query. No new chat UI — additive to existing response.
-        ────────────────────────────────────────────────────────────────────────── */}
-        {(
-          soulResponse?.presentation_mode === 'DISCOVERING' ||
-          (soulResponse?.status === 'PLACE_LOOKUP' && soulResponse?.places?.length > 0)
-        ) && (() => {
-          const DETAIL_NAMES = { cablecar: '여수해상케이블카', odongdo: '오동도', hyangiram: '향일암', dolsan_nightscape: '돌산대교 돌산공원', lee_soon_shin_plaza: '이순신광장' };
-          const detailPlaces = (soulResponse.places || []).filter(p => DETAIL_NAMES[p.code]);
-          if (detailPlaces.length === 0) return null;
-          return (
-            <Card>
-              <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">장소 자세히 보기</p>
-              <div className="space-y-2">
-                {detailPlaces.map(p => (
-                  <button
-                    key={p.code}
-                    onClick={() => setNavPlaceCode(p.code)}
-                    className="w-full text-left px-3 py-2.5 rounded-xl bg-white bg-opacity-5 hover:bg-opacity-10 transition-colors"
-                  >
-                    <span className="text-sm text-white font-medium">{DETAIL_NAMES[p.code]}</span>
-                    <span className="text-xs text-white opacity-40 ml-2">자세히 보기 →</span>
-                  </button>
-                ))}
-              </div>
-            </Card>
-          );
-        })()}
-
         {/* ── PLACE HERO ── */}
         <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '200px' }}>
           {heroSrc && (
