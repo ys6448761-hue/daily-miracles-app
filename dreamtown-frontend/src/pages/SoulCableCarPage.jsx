@@ -1277,6 +1277,15 @@ export default function SoulCableCarPage() {
           : null
         }
 
+        {/* ── COURSE DISPLAY — non-cablecar living detail views ── */}
+        {/* Cablecar already renders CourseDisplay inside its own Journey card (isCableCarView block). */}
+        {!isCableCarView && soulResponse?.course?.blocks?.length > 0 && (
+          <Card>
+            <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">여행코스</p>
+            <CourseDisplay course={soulResponse.course} />
+          </Card>
+        )}
+
         {/* ── PLACE HERO ── */}
         <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '200px' }}>
           {heroSrc && (

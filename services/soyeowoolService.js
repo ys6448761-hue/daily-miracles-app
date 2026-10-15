@@ -2783,6 +2783,13 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   // Guard: skip for course-intent messages — 낭만버스 route reply is already self-contained.
   const _ELDERLY_MSG_EXCLUDE = new Set(['jungang_market']);
   const _isCourseMsg = /(코스|일정).*(짜줘|짜주세요|만들어줘|만들어주세요|구성해줘)/.test(message);
+
+  // Fix B: Suppress time-clarification question when a real course was generated for a detail page.
+  // Safety: fires only when course intent confirmed + place_code present + TG produced ≥2 places.
+  // Non-course PARTIAL (discovery) and main-page responses are unaffected.
+  if (_isCourseMsg && explicit_context.place_code && (tgResult?.places?.length >= 2)) {
+    soulMessage = soulMessage.replace('\n시간이 얼마나 남으셨어요?', '\n대략 2시간 기준으로 코스를 구성했어요.');
+  }
   if (status === 'PARTIAL' && !explicit_context.place_code && tgResult?.places?.length && !_isCourseMsg) {
     const _mPt = enrichedSoulContext.people_type;
     const _hasCar = enrichedSoulContext.has_car === true;
