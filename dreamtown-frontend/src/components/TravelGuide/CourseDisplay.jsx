@@ -3,29 +3,25 @@
  * Displays Journey Composer V0 course blocks in visual sequence
  * Shows: places → travel transitions → meals → cafes
  * P0: Cafe blocks show partner benefits when available
+ *
+ * UX Honesty Rules (Founder Decision 2026-10-15):
+ * - available_minutes badge not shown (may be fallback, not user-stated)
+ * - travel_transition "이동시간 확인 중" shown at most once, at course footer
+ * - block.warnings not exposed to UI (internal diagnostics only)
+ * - total_stay_minutes labeled as place stay time, not total trip time
  */
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 export default function CourseDisplay({ course }) {
   if (!course || !course.blocks || course.blocks.length === 0) {
     return null;
   }
 
-  const getBlockIcon = (type) => {
-    switch (type) {
-      case 'place':
-        return '📍';
-      case 'travel_transition':
-        return '→';
-      case 'meal':
-        return '🍽️';
-      case 'cafe':
-        return '☕';
-      default:
-        return '•';
-    }
-  };
+  // D2: detect if any travel segment has unverified duration — for single footer notice
+  const hasTravelUnknown = course.blocks.some(
+    (b) => b.type === 'travel_transition' && !b.estimated_duration_range
+  );
 
   const getBlockDisplay = (block) => {
     switch (block.type) {
@@ -40,9 +36,10 @@ export default function CourseDisplay({ course }) {
         return {
           icon: '↓',
           title: block.message_ko || '이동',
+          // D2: only show duration when verified; omit individual "확인 중" labels
           subtitle: block.estimated_duration_range
             ? `약 ${block.estimated_duration_range.min}-${block.estimated_duration_range.max}분`
-            : '이동시간 확인 중',
+            : null,
           className: 'course-block-travel'
         };
       case 'meal':
@@ -52,8 +49,7 @@ export default function CourseDisplay({ course }) {
           subtitle: `약 ${block.estimated_duration_minutes}분`,
           className: 'course-block-meal'
         };
-      case 'cafe':
-        // Build subtitle with benefit if available
+      case 'cafe': {
         let subtitle = `약 ${block.estimated_duration_minutes}분`;
         if (block.cafes && block.cafes.length > 0) {
           const firstCafe = block.cafes[0];
@@ -64,14 +60,15 @@ export default function CourseDisplay({ course }) {
         return {
           icon: '☕',
           title: '카페 휴식',
-          subtitle: subtitle,
+          subtitle,
           className: 'course-block-cafe'
         };
+      }
       default:
         return {
           icon: '•',
           title: block.type,
-          subtitle: '',
+          subtitle: null,
           className: 'course-block-default'
         };
     }
@@ -80,13 +77,8 @@ export default function CourseDisplay({ course }) {
   return (
     <section className="course-display">
       <div className="course-header">
+        {/* D1: available_minutes badge removed — value may be fallback, not user-stated */}
         <h3>📋 여행 코스 구성</h3>
-        <div className="course-meta">
-          <span className="course-time">{course.available_minutes}분 코스</span>
-          <span className="course-fit" data-status={course.summary?.fit_status}>
-            {course.summary?.fit_status === 'travel_time_unverified' ? '⏱️ 이동시간 확인 중' : '⭐ 여유 있음'}
-          </span>
-        </div>
       </div>
 
       <div className="course-timeline">
@@ -118,15 +110,7 @@ export default function CourseDisplay({ course }) {
                     ))}
                   </div>
                 )}
-                {block.warnings && block.warnings.length > 0 && (
-                  <div className="block-warnings">
-                    {block.warnings.map((w, i) => (
-                      <span key={i} className="warning-tag">
-                        ⚠️ {w.replace(/_/g, ' ')}
-                      </span>
-                    ))}
-                  </div>
-                )}
+                {/* D3: block.warnings not shown — internal diagnostics only */}
               </div>
               {idx < course.blocks.length - 1 && (
                 <div className="block-arrow">↓</div>
@@ -141,8 +125,9 @@ export default function CourseDisplay({ course }) {
           <span className="label">선택 장소</span>
           <span className="value">{course.actual_stop_count}곳</span>
         </div>
+        {/* D4: labeled as place stay time, not total trip time */}
         <div className="summary-item">
-          <span className="label">체류 시간</span>
+          <span className="label">장소 체류시간 합계</span>
           <span className="value">{course.summary?.total_stay_minutes}분</span>
         </div>
         {course.summary?.estimated_total_range && (
@@ -154,6 +139,14 @@ export default function CourseDisplay({ course }) {
           </div>
         )}
       </div>
+
+      {/* D4: note that travel time is not included in stay total */}
+      <p className="course-stay-note">※ 이동시간은 포함되지 않습니다</p>
+
+      {/* D2: single footer notice when any travel duration is unverified */}
+      {hasTravelUnknown && (
+        <p className="course-travel-notice">장소 간 이동시간은 현재 안내가 어렵습니다</p>
+      )}
 
       {course.message_ko && (
         <div className="course-message">
