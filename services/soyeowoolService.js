@@ -1550,7 +1550,7 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPla
   // C-3 guard: excludes "동선을 알려줘" vehicle-discovery queries via narrow pattern.
   const _isCourseIntent = /(코스|일정).*(짜줘|짜주세요|만들어줘|만들어주세요|구성해줘)/.test(message);
   const _noBookingCtx = !quoteCtx?.hotel_code && !quoteCtx?.leisure;
-  if (_noBookingCtx && _isCourseIntent && status !== 'NO_RESULT' && _ROUTE_HALFDAY_DEFAULT) {
+  if (_noBookingCtx && _isCourseIntent && status !== 'NO_RESULT' && _ROUTE_HALFDAY_DEFAULT && !currentPlaceCode) {
     const stops = (_ROUTE_HALFDAY_DEFAULT.stops || [])
       .filter(s => s.category !== 'TRANSPORT_HUB' && s.category !== 'ACCOMMODATION')
       .map(s => s.entity_name);
@@ -2650,9 +2650,17 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   const baseDomainContext = _buildDomainContext(enrichedSoulContext, sessionId, hotelId);
 
   // V0.1: Place-aware Discovery — exclude current Living Detail place from recommendations.
-  // Prevents SOUL from recommending the place the traveler is already viewing.
-  if (explicit_context.place_code && !baseDomainContext.exclude_place_ids.includes(explicit_context.place_code)) {
-    baseDomainContext.exclude_place_ids = [...baseDomainContext.exclude_place_ids, explicit_context.place_code];
+  // Course requests anchor the current place as must-visit instead of excluding it.
+  const _isCourseQuery = /(코스|일정).*(짜줘|짜주세요|만들어줘|만들어주세요|구성해줘)/.test(message);
+  if (explicit_context.place_code) {
+    if (_isCourseQuery) {
+      const _existingMust = baseDomainContext.must_visit_place_ids || [];
+      if (!_existingMust.includes(explicit_context.place_code)) {
+        baseDomainContext.must_visit_place_ids = [explicit_context.place_code, ..._existingMust];
+      }
+    } else if (!baseDomainContext.exclude_place_ids.includes(explicit_context.place_code)) {
+      baseDomainContext.exclude_place_ids = [...baseDomainContext.exclude_place_ids, explicit_context.place_code];
+    }
   }
 
   // V0.2: Supplement domain context with minimum Shared Journey signals

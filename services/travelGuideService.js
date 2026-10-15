@@ -168,6 +168,24 @@ class TravelGuideService {
     // 10. Experience Cluster Diversity (prevent geographic monopoly)
     candidates = this._applyClusterDiversity(candidates);
 
+    // Must-visit anchor recovery: the traveler is already at the must-visit place,
+    // so transport filters are irrelevant for that specific place.
+    // If a must-visit place was filtered out, re-inject it from the full places pool.
+    if (mustVisitPlaceIds.length > 0) {
+      const candidateCodes = new Set(candidates.map(c => c.code));
+      for (const placeCode of mustVisitPlaceIds) {
+        if (!candidateCodes.has(placeCode)) {
+          const reinjected = places.find(p => p.code === placeCode);
+          if (reinjected) {
+            if (!reinjected._warnings) reinjected._warnings = [];
+            reinjected._warnings.push('transport_override_already_there');
+            candidates.unshift(reinjected);
+            candidateCodes.add(placeCode);
+          }
+        }
+      }
+    }
+
     // JOURNEY COMPOSITION V0: Variable stop count based on available time
     // Pass user preferences (must-visit) to composition
     const journeyComposition = await this._composeJourney(candidates, context, mustVisitPlaceIds);

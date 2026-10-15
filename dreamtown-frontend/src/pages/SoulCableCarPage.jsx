@@ -1135,7 +1135,7 @@ export default function SoulCableCarPage() {
     { label: '부모님과 함께', query: '부모님과 함께 왔어요. 이곳에서 어떻게 즐기면 좋을까요?', ec: { people_type: 'family_elderly' } },
     { label: '아이와 함께',   query: '아이와 함께 왔어요. 이곳에서 어떻게 즐기면 좋을까요?', ec: { people_type: 'family_with_kids' } },
     { label: '차량으로',      query: '차 가지고 왔어요. 주차할 수 있어요?', ec: { has_car: true } },
-    { label: '여행코스',      query: '이 장소에 대해 알려줘.', ec: {} },
+    { label: '여행코스',      query: '이 장소를 포함해서 여수 코스를 짜줘.', ec: {} },
   ];
 
   function handleDetailChipClick(chip) {
