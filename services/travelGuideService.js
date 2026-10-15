@@ -34,6 +34,9 @@ class TravelGuideService {
     // Apply user exclusions: filter out explicitly rejected places
     places = places.filter(p => !excludePlaceIds.includes(p.code));
 
+    // Founder decision 2026-10-15: 중앙시장 현장 콘텐츠 부족 — TG 추천 전면 제외 (DB 보존)
+    places = places.filter(p => p.code !== 'jungang_market');
+
     // P0 Ramada Field Test: Exclude jaisan_park from default rotation
     // Keep in DB for seasonal recommendations (autumn foliage), but not in default courses
     if (context.entry_point && context.entry_point.includes('RAMADA')) {

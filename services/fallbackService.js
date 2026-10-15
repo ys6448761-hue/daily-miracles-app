@@ -224,7 +224,8 @@ class FallbackService {
         context.country_code,
         context.city_code,
       ]);
-      return result.rows || [];
+      // Founder decision 2026-10-15: travelGuideService와 동일한 제외 정책 적용
+      return (result.rows || []).filter(r => r.code !== 'jungang_market');
     } catch (error) {
       console.error("Failed to fetch fallback candidates:", error);
       return [];
