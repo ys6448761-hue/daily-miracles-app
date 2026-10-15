@@ -626,6 +626,27 @@ function _buildUnknownPlacePayload(placeName, sessionId) {
   };
 }
 
+// Founder decision 2026-10-15 Policy B: 중앙시장 관광 안내·추천 전면 제외
+// Returns when user asks about jungang_market directly (PLACE_LOOKUP or PSQ).
+function _buildJungangPolicyNotice(sessionId) {
+  return {
+    session_id: sessionId,
+    understood_context: {},
+    places: [],
+    why_details: [],
+    message_ko: '여수 중앙시장은 현재 DreamTown 추천 여행지에 포함되어 있지 않아요. 다른 여수 여행지를 안내해 드릴게요.',
+    status: 'PLACE_EXCLUDED',
+    intent: 'PLACE_LOOKUP',
+    presentation_mode: 'PLACE_KNOWLEDGE',
+    resolved_code: null,
+    next_options: ['다른 여수 여행지 추천해줘'],
+    timestamp: new Date().toISOString(),
+    shared_journey: null,
+    quote: null,
+    route: null,
+  };
+}
+
 // ─── Private: Understand ─────────────────────────────────────────────────────
 
 // Deterministic post-extraction correction for couple/partner language.
@@ -2070,6 +2091,10 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
 
   if (placeLookup.isPlaceLookup) {
     if (placeLookup.resolvedCode) {
+      // Founder decision 2026-10-15 Policy B: 중앙시장 직접 질문 차단 — 관광지 소개 금지
+      if (placeLookup.resolvedCode === 'jungang_market') {
+        return { ok: true, payload: _buildJungangPolicyNotice(sessionId) };
+      }
       const place = await travelGuideService.getPlaceByCode(placeLookup.resolvedCode);
       if (place) {
         // Judgment V0.1 — only for suitability queries (어때?/괜찮아? etc.), not informational (알려줘)
@@ -2445,6 +2470,10 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
       if (_psqTextCode && _psqTextCode !== _psqPlaceCode) _psqPlaceCode = _psqTextCode;
     }
     if (_psqPlaceCode && _isPlaceSpecificQuery(message)) {
+      // Founder decision 2026-10-15 Policy B: 중앙시장 PSQ 차단
+      if (_psqPlaceCode === 'jungang_market') {
+        return { ok: true, payload: _buildJungangPolicyNotice(sessionId) };
+      }
       try {
         const _psqPlace = await travelGuideService.getPlaceByCode(_psqPlaceCode);
         if (_psqPlace) {
@@ -2778,8 +2807,8 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   let soulMessage = _generateSoulMessage(enrichedSoulContext, status, message, quoteCtx, explicit_context.place_code || null, domainContext.mobility_constraint || null, allPlaceWarnings);
 
   // Companion PARTIAL supplement: append place names in message for family_elderly/family_with_kids
-  // so the UI shows actual recommendations. Excludes jungang_market for family_elderly
-  // (Founder decision: 중앙시장 제외, 수산물 특화거리 대체 — 수산물특화시장 DB 미등록으로 제외만 적용).
+  // so the UI shows actual recommendations.
+  // (Founder decision 2026-10-15 Policy B: 중앙시장 TG·PSQ·PLACE_LOOKUP 전면 차단 — _ELDERLY_MSG_EXCLUDE 역할 종료).
   // Guard: skip for course-intent messages — 낭만버스 route reply is already self-contained.
   const _ELDERLY_MSG_EXCLUDE = new Set(['jungang_market']);
   const _isCourseMsg = /(코스|일정).*(짜줘|짜주세요|만들어줘|만들어주세요|구성해줘)/.test(message);
