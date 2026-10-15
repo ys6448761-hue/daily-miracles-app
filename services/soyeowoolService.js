@@ -1651,9 +1651,9 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPla
     }
     // Default PARTIAL — place-aware if current place known
     if (placePrefix) {
-      return `${placePrefix}\n${situationLine}\n대략 2시간 기준으로 갈 곳을 골라봤어요.\n시간이 얼마나 남으셨어요?`;
+      return `${placePrefix}\n${situationLine}\n가볼 만한 곳을 골라봤어요.\n시간이 얼마나 남으셨어요?`;
     }
-    return `${situationLine}\n대략 2시간 기준으로 편하게 갈 곳을 골라봤어요.\n시간이 얼마나 남으셨어요?`;
+    return `${situationLine}\n가볼 만한 곳을 골라봤어요.\n시간이 얼마나 남으셨어요?`;
   }
 
   // SUCCESS — second line based on companion + situation
@@ -2816,8 +2816,9 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   // Fix B: Suppress time-clarification question when a real course was generated for a detail page.
   // Safety: fires only when course intent confirmed + place_code present + TG produced ≥2 places.
   // Non-course PARTIAL (discovery) and main-page responses are unaffected.
+  // Q2 C: remove clarification question after course response — asking time again is contradictory.
   if (_isCourseMsg && explicit_context.place_code && (tgResult?.places?.length >= 2)) {
-    soulMessage = soulMessage.replace('\n시간이 얼마나 남으셨어요?', '\n대략 2시간 기준으로 코스를 구성했어요.');
+    soulMessage = soulMessage.replace('\n시간이 얼마나 남으셨어요?', '');
   }
   if (status === 'PARTIAL' && !explicit_context.place_code && tgResult?.places?.length && !_isCourseMsg) {
     const _mPt = enrichedSoulContext.people_type;
