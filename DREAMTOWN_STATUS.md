@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-13
+Last Updated: 2026-10-15
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -21,9 +21,23 @@ Last Updated: 2026-10-13
 5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
-### ★ Current Next Action (exactly 1) — Updated: 2026-10-13
+### ★ Current Next Action (exactly 1) — Updated: 2026-10-15
 
-**다음 실제 기능 PR에서 Architecture Guard Runtime 검증 (자연 발생 대기)**
+**기존 미커밋 Project State 및 Evidence의 안전한 GitHub 저장 범위 검토**
+
+---
+
+### 완료된 작업 기록 (2026-10-15)
+
+- **CourseDisplay Time Honesty Repair: CLOSED (Founder Decision 2026-10-15)**
+  - PR #53 MERGED @5937d17 / Render LIVE 2026-10-15 15:33 KST (dep-db8765jncjis73et8acg)
+  - 변경: `CourseDisplay.jsx` (FE 1파일, +29/-36) — 백엔드 무변경
+  - CLOSED 범위: 코드 수정 · PR Merge · Production 배포 · 이순신광장 D1~D4 화면 검증
+    - D1: 숫자 코스 배지 제거 PASS / D2: 이동시간 반복 제거 + footer 1회 PASS
+    - D3: 내부 경고 코드 비노출 PASS / D4: 장소 체류시간 합계 180분 표시 PASS
+  - **OPEN:** SOUL 상위 응답 "대략 2시간 기준" 문구 ↔ 체류시간 합계 180분 불일치 — 별도 검토 필요
+  - **UNVERIFIED:** 케이블카 상세 회귀 / 부모님·여행코스 칩 순서 회귀 / 실제 이동시간·총 소요시간
+  - AIL Gate PASS / docker-smoke PASS
 
 - **Architecture Guard A+B 적용 완료 (2026-10-10)**
   - Option B: PR 필수 (`required_approving_review_count=0`) APPLIED ✓
@@ -60,6 +74,56 @@ Last Updated: 2026-10-13
   - S-4~S-8 일반 fallback: Journey Decision → Living Detail Fallback 경로 확인
     - 원인: `_extractGoldenPlaceCode`가 이순신광장 미인식 + JOURNEY_PREFERENCE가 explicit_context 미사용
     - Phase 1 범위에 맥락별 SOUL API 응답 미포함 → Phase 2로 분리 (Founder 결정)
+- **중앙시장 Policy B: CLOSED (Founder Decision 2026-10-15)**
+  - PR #52 MERGED @50cd3d6 / Render LIVE 2026-10-15 14:03 KST
+  - 대상: `jungang_market` — TG 추천 후보·Fallback·PLACE_LOOKUP·PSQ 전면 차단
+  - 변경: `travelGuideService.js` + `fallbackService.js` + `soyeowoolService.js` (3파일, +36/-3)
+  - Production P1~P10 10/10 PASS (일반·부모님·아이·차량·직접질문·회귀)
+  - DB 및 Route Corpus 보존 / 수산물특화시장 별도 장소로 구분
+  - **UNVERIFIED:** PLACE_EXCLUDED 브라우저 렌더링 / Fallback 실제 DB 실행 / 부모님→코스 실제 순차 칩 전이
+  - **후속 개선 후보:** 중앙시장 포함 요청 시 제외 이유 안내 / `_ELDERLY_MSG_EXCLUDE` 코드 정리(COSMETIC)
+  - Architecture Guard Runtime 확인: AIL Gate FAIL → Merge 차단 동작 **최초 자연 확인 완료** ✓
+    - 초기 PR body에 [AIL] 섹션 누락 → AIL Gate FAILURE → Merge 차단 → body 보완 후 재통과
+
+### Founder Decision — 케이블카 왕복 기본 원칙 SOUL-CABLECAR-001 (2026-10-15 등록)
+
+**상태:** CANDIDATE (SSOT 승격 전 검증 필요)
+
+| 결정 항목 | 확정값 |
+|---|---|
+| 탑승 방식 | 왕복 기본 (자산→돌산→자산) |
+| 편도/왕복 질문 | 개인 코스에서 묻지 않음 |
+| 단체 편도 | 단체 견적 영역 별도 계산 |
+| 왕복 후 출발 기점 | 자산탑승장 (`cablecar`, 오동도로 61-11) |
+
+적용 코스: `이순신광장 → 자산탑승장 → 케이블카왕복 → 자산탑승장 → 향일암`
+
+**기존 결정과 충돌 없음** — Founder Route #001 ROUND_TRIP(2026-09-21)과 방향 일치.
+
+**UNVERIFIED 유지:** `avg_stay_minutes=45` (cablecar DB)가 왕복 탑승(25~30분) + 돌산 체류를 포함하는지 미확인.
+
+**Evidence 확보 현황 (2026-10-15 갱신):**
+
+| Edge | From | To | Mode | 값 | Source | 상태 |
+|---|---|---|---|---|---|---|
+| EA | 이순신광장 | 자산탑승장(케이블카) | CAR | 10분 | FOUNDER_EVIDENCE | UNVERIFIED (LOW) |
+| EB | 자산탑승장(케이블카) | 향일암 | CAR | 36분 | FOUNDER_EVIDENCE | UNVERIFIED (LOW) |
+| EC | 이순신광장 | 자산공원 | CAR | 9분 | FOUNDER_EVIDENCE | UNVERIFIED (LOW) |
+| ED | 자산공원 | 중앙시장 | CAR | UNKNOWN | — | jungang_market 추천 제외로 측정 불필요 |
+| EE | 오동도 | 자산탑승장(케이블카) | CAR | 3분 | FOUNDER_EVIDENCE | UNVERIFIED (LOW) |
+| EF | 자산탑승장(케이블카) | 수산물특화시장 | CAR | 7분 | FOUNDER_EVIDENCE | UNVERIFIED — 수산물특화시장 DB 미등록, place_code 없음 |
+
+EA+EB 합계: 46분 / 일반 코스 체류(180) + 이동(46) = 226분 (참고값, Runtime 미적용)
+
+저장: `docs/knowledge/YEOSU_FOUNDER_ROUTE_001_TIME_EVIDENCE.md` [UPDATE 2026-10-15] 섹션 추가 완료
+
+**남은 검증 항목:**
+- EA~EE 네이버/카카오맵 실측 검증 (현재 UNVERIFIED)
+- 역방향 Edge 별도 측정 필요
+- 케이블카 avg_stay_minutes=45 왕복 적절성 UNVERIFIED
+- `_estimateTravelTime()` 교체: EA~EE 확보됐으나 검증 완료 후 별도 Preflight 필요
+
+---
 
 ### Phase 2 Open Item — YiSunSin SOUL 맥락별 대화 응답 (2026-10-13 등록)
 
@@ -74,6 +138,7 @@ Last Updated: 2026-10-13
 
 기존 Evidence: 이번 세션 진단 (soyeowoolService.js 1758~1976 + 2400~2474 경로 확인 완료)
 착수 조건: Founder 기능 기획 결정 + Guardian Preflight READY
+후속 Next Action 후보: YiSunSin SOUL Phase 2 착수 (Founder 기능 기획 결정 대기 — 현재 OPEN)
 
 ### Production-Live (Project Phoenix)
 
@@ -90,6 +155,11 @@ Last Updated: 2026-10-13
 | **PSQ Fix A/B/C (주차 우선순위·거북선·이중어미)** | **0a19a291** | **PRODUCTION_LIVE — S-1~S-3 3/3 PASS** |
 | **YiSunSin SOUL Phase 1 (chip variants + parseContext)** | **a4511a96** | **PRODUCTION_LIVE — Phase 1 CLOSED @2026-10-13** |
 | **무여정 메인 4개 카테고리 칩 (C-3/C-4)** | **788962b** | **MERGED to main (PR #42, eadcbde) — Render Production 미배포 (미승인)** |
+| **상세 Living Detail Nav 제거** | **e0df2bf** | **MERGED to main (PR #47) — PRODUCTION_LIVE @bcf391f** |
+| **상세 조건 전달 Repair (handleDetailChipClick ec 누적)** | **0cba566** | **MERGED to main (PR #48) — PRODUCTION_LIVE @bcf391f** |
+| **상세 여행코스 Repair (must-visit + C4 guard + transport 재주입)** | **9261908** | **PRODUCTION_LIVE (PR #49, bcf391f, 2026-10-15) — B 5/5 PASS, C 2/2 PASS** |
+| **중앙시장 Policy B (TG·Fallback·PSQ·PLACE_LOOKUP 제외)** | **4abae6e** | **PRODUCTION_LIVE (PR #52, 50cd3d6, 2026-10-15 14:03 KST) — P1~P10 10/10 PASS** |
+| **CourseDisplay Time Honesty Repair (D1~D4)** | **b4876eb** | **PRODUCTION_LIVE (PR #53, 5937d17, 2026-10-15 15:33 KST) — D1~D4 Founder Screenshot PASS** |
 
 ### Staging-Only (SoulCableCarPage, 9 elements)
 
