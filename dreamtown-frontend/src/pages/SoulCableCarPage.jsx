@@ -1140,20 +1140,30 @@ export default function SoulCableCarPage() {
 
   function handleDetailChipClick(chip) {
     if (isLoading) return;
-    // Compute next context synchronously (avoids stale-closure on _callSOULDirect)
-    // so has_car + companion accumulated state is always reflected in the API payload.
+    // Preserve courseSelected across companion/vehicle chip clicks so that
+    // 여행코스→아이 and 아이→여행코스 both result in a course query.
+    const wasCourseSelected = travelerContext.courseSelected;
     const nextCtx = { ...travelerContext, courseSelected: false };
-    if (chip.ec?.people_type === 'family_elderly')      { nextCtx.companion = 'parents'; }
-    else if (chip.ec?.people_type === 'family_with_kids') { nextCtx.companion = 'family'; }
-    else if (chip.ec?.has_car)                            { nextCtx.hasVehicle = true; }
-    else                                                  { nextCtx.courseSelected = true; }
+    if (chip.ec?.people_type === 'family_elderly') {
+      nextCtx.companion = 'parents';
+      nextCtx.courseSelected = wasCourseSelected;
+    } else if (chip.ec?.people_type === 'family_with_kids') {
+      nextCtx.companion = 'family';
+      nextCtx.courseSelected = wasCourseSelected;
+    } else if (chip.ec?.has_car) {
+      nextCtx.hasVehicle = true;
+      nextCtx.courseSelected = wasCourseSelected;
+    } else {
+      nextCtx.courseSelected = true;
+    }
     setTravelerContext(nextCtx);
-    // Build merged ec from final context — includes all accumulated conditions
     const mergedEc = {};
     if (nextCtx.hasVehicle) mergedEc.has_car = true;
     if (nextCtx.companion === 'parents')       mergedEc.people_type = 'family_elderly';
     else if (nextCtx.companion === 'family')   mergedEc.people_type = 'family_with_kids';
-    _callSOULDirect(chip.query, mergedEc);
+    const COURSE_QUERY = '이 장소를 포함해서 여수 코스를 짜줘.';
+    const effectiveQuery = nextCtx.courseSelected ? COURSE_QUERY : chip.query;
+    _callSOULDirect(effectiveQuery, mergedEc);
   }
 
   return (
