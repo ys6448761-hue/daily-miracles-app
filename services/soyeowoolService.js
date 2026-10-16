@@ -2523,7 +2523,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
       /^(안녕|안녕하세요|반가워|하이|hello|hi)[\s!.?]*$/i.test(message.trim())
       || /(잘 모르겠|모르겠어|뭐가 좋을|뭐 해야|어떡하|어쩌)/.test(message)
       || (/케이블카|케이블 카/.test(message) && /(꼭|반드시|타고 싶|타야|빼고|빼줘|제외|일정에|탈거야)/.test(message))
-      || /(부모님과|아이와|가족과).*(왔어|왔어요|왔는데|함께라면|함께 왔|와서)/.test(message)
+      || /(부모님과|아이와|가족과).*(왔어|왔어요|왔는데|함께라면|함께 왔|와서|가려고)/.test(message)
       || /(이곳에서.*(즐기|어떻게)|어떻게.*즐기)/.test(message);
     if (_psqPlaceCode && !_ldGuardBypass) {
       try {
