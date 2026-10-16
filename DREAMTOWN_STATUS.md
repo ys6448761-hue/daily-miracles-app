@@ -21,11 +21,28 @@ Last Updated: 2026-10-15
 5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
-### ★ Current Next Action (exactly 1) — Updated: 2026-10-15
+### ★ Current Next Action (exactly 1) — Updated: 2026-10-16
 
-**기존 미커밋 Project State 및 Evidence의 안전한 GitHub 저장 범위 검토**
+**SSOT-ROUTE-003 Draft → Confirmed 승격 조건 충족 확인 (1.2km 지도 실측 + 별빛혜택 정의)**
 
 ---
+
+### 완료된 작업 기록 (2026-10-16)
+
+- **SOUL Time Honesty Message Repair: CLOSED (Founder Decision 2026-10-15)**
+  - PR #55 MERGED @22a3e16 / Render LIVE 2026-10-15 16:28 KST
+  - 변경: `services/soyeowoolService.js` (BE 1파일, 3줄) — FE·DB·API 계약 무변경
+  - CLOSED 범위: 경로 A(PARTIAL default "2시간 기준" 제거) / 경로 B(코스 요청 후 시간 질문 제거)
+  - Jest SOUL 65/65 PASS / AIL Gate PASS / docker-smoke PASS
+  - **OPEN:** `next_options[0]` '시간이 얼마나 남으셨어요?' 코스 요청 후 미억제 — 최소 수정안 확인 완료 (soyeowoolService.js 2줄 추가), Founder 승인 대기
+  - **UNVERIFIED:** 브라우저 실 API SOUL 응답 확인
+
+- **SSOT-ROUTE-003 별빛 해안길 Draft 생성 (2026-10-16)**
+  - 파일: `docs/ssot/episodes/SSOT-ROUTE-003_Starlight_Coastal_Walk.md`
+  - Status: Draft (Confirmed 전)
+  - Founder Confirmed: 이순신광장→하멜등대 / 1.2km / 18~25분 / 기본감상형 40~60분 / 여유체험형 120~150분 / 중간 선택 경험 정의
+  - 기존 SSOT 충돌 없음: SSOT-ROUTE-001·002·LOC-001·TIME-001 미변경
+  - Draft → Confirmed 조건: 1.2km 지도 실측 + 별빛혜택 정의 + Founder 최종 승인
 
 ### 완료된 작업 기록 (2026-10-15)
 
@@ -160,6 +177,7 @@ EA+EB 합계: 46분 / 일반 코스 체류(180) + 이동(46) = 226분 (참고값
 | **상세 여행코스 Repair (must-visit + C4 guard + transport 재주입)** | **9261908** | **PRODUCTION_LIVE (PR #49, bcf391f, 2026-10-15) — B 5/5 PASS, C 2/2 PASS** |
 | **중앙시장 Policy B (TG·Fallback·PSQ·PLACE_LOOKUP 제외)** | **4abae6e** | **PRODUCTION_LIVE (PR #52, 50cd3d6, 2026-10-15 14:03 KST) — P1~P10 10/10 PASS** |
 | **CourseDisplay Time Honesty Repair (D1~D4)** | **b4876eb** | **PRODUCTION_LIVE (PR #53, 5937d17, 2026-10-15 15:33 KST) — D1~D4 Founder Screenshot PASS** |
+| **SOUL Time Honesty Message Repair** | **82a404e** | **PRODUCTION_LIVE (PR #55, 22a3e16, 2026-10-15 16:28 KST) — 경로 A·B 수정. next_options 미억제 OPEN** |
 
 ### Staging-Only (SoulCableCarPage, 9 elements)
 
