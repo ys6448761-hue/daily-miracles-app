@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-16T08:31:16.992Z",
+  "generated_at": "2026-10-16T08:37:35.795Z",
   "generator": "generate-manifest.js",
-  "total_count": 477,
+  "total_count": 478,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -5579,6 +5579,23 @@
       "title": "SSOT-PRICE-001 — DreamTown 별빛항로 가격 체계 v1.0",
       "created_at": "2026-10-16",
       "checksum": "96e8722a"
+    },
+    {
+      "id": "DOC-SOURCES_INDEX",
+      "path": "docs/ssot/SOURCES_INDEX.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "ssot",
+      "tags": [
+        "ssot",
+        "aurora"
+      ],
+      "owner": "team",
+      "status": "트랙",
+      "title": "SOURCES_INDEX — DreamTown SSOT 원본 출처 인덱스",
+      "created_at": "2026-10-16",
+      "checksum": "51b50186"
     },
     {
       "id": "DOC-SSOT-PRODUCT-001_DreamTown_Pro",
