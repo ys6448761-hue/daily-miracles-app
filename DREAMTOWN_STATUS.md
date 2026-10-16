@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-15
+Last Updated: 2026-10-17
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -21,11 +21,22 @@ Last Updated: 2026-10-15
 5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
-### ★ Current Next Action (exactly 1) — Updated: 2026-10-16
+### ★ Current Next Action (exactly 1) — Updated: 2026-10-17
 
-**SSOT-ROUTE-003 Draft → Confirmed 승격 조건 충족 확인 (1.2km 지도 실측 + 별빛혜택 정의)**
+**PR #57 — SOUL next_options 코스 응답 시간 질문 억제 — AIL Gate 통과 후 Founder Merge 승인 대기**
 
 ---
+
+### 완료된 작업 기록 (2026-10-17)
+
+- **SOUL next_options 코스 응답 시간 질문 억제: PR #57 OPEN (Founder Decision 2026-10-17)**
+  - PR #57 — https://github.com/ys6448761-hue/daily-miracles-app/pull/57
+  - Commit: `b53d474` / Branch: `fix/soul-next-options-course-suppress`
+  - 변경: `services/soyeowoolService.js` (+5줄) — `_buildResultEnvelope` 후 `result.next_options = []` 조건부 억제
+  - 가드: `_isCourseMsg && explicit_context.place_code && tgResult?.places?.length >= 2`
+  - SOUL 65/65 PASS / Production UNVERIFIED (Founder 확인 예정)
+  - PR #55(soulMessage 텍스트 제거)와 합산 시 코스 후 시간 질문 완전 억제
+  - Production 배포: NOT AUTHORIZED (별도 Founder 승인 필요)
 
 ### 완료된 작업 기록 (2026-10-16)
 
