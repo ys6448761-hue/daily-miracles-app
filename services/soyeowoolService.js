@@ -2854,6 +2854,11 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   // RESULT ENVELOPE
   const result = _buildResultEnvelope(request, tgResult, domainContext, status, { currentPlaceCode: explicit_context.place_code || null });
 
+  // Suppress time-clarification next_option after a real course response (same guard as soulMessage fix above).
+  if (_isCourseMsg && explicit_context.place_code && (tgResult?.places?.length >= 2)) {
+    result.next_options = [];
+  }
+
   // CLIENT PAYLOAD
   const payload = _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionId, enrichedSoulContext, sharedJourney, quoteResult, routeSkeleton);
 
