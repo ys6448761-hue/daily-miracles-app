@@ -23,11 +23,22 @@ Last Updated: 2026-10-17
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-17
 
-**SSOT-ROUTE-003 Draft → Confirmed 승격 조건 충족 확인 (1.2km 지도 실측 + 별빛혜택 정의)**
+**Render Production 배포 승인 (PR #59 + PR #57 포함 `a1a4621` → Render 배포)**
 
 ---
 
 ### 완료된 작업 기록 (2026-10-17)
+
+- **SOUL Case C Companion Guard 수정: CLOSED (Founder Decision 2026-10-17)**
+  - PR #59 MERGED @f3bb1e2 / Merge Commit: `a1a4621ee5be832232af58cbc4d51898c2e085f8`
+  - Merge 시각: 2026-10-16T23:56:43Z (KST 2026-10-17 오전 8:56)
+  - 변경: `services/soyeowoolService.js` (1+1-) — `_ldGuardBypass` 정규식에 `가려고` 추가
+  - 신규: `tests/unit/soulCaseCCompanionGuard.test.js` (13케이스 / 13/13 PASS)
+  - AIL Gate PASS / docker-smoke PASS
+  - Root Cause: "부모님과 함께 가려고 해요" → `_ldGuardBypass=false` → Living Detail Fallback → `next_options:[]`
+  - Fix: `가려고` 패턴 추가 → Companion Response 경로 → PARTIAL → `next_options:['걷기 많이 힘드신가요?']`
+  - Production 배포: PENDING (Render `5be00bf` 현재 Live, PR #59 미포함)
+  - Runtime 검증: PENDING
 
 - **SOUL next_options 코스 응답 시간 질문 억제: CLOSED (Founder Decision 2026-10-17)**
   - PR #57 MERGED @efc0a60 (main) — Founder FINAL MERGE AUTHORIZATION 2026-10-17
@@ -190,6 +201,8 @@ EA+EB 합계: 46분 / 일반 코스 체류(180) + 이동(46) = 226분 (참고값
 | **중앙시장 Policy B (TG·Fallback·PSQ·PLACE_LOOKUP 제외)** | **4abae6e** | **PRODUCTION_LIVE (PR #52, 50cd3d6, 2026-10-15 14:03 KST) — P1~P10 10/10 PASS** |
 | **CourseDisplay Time Honesty Repair (D1~D4)** | **b4876eb** | **PRODUCTION_LIVE (PR #53, 5937d17, 2026-10-15 15:33 KST) — D1~D4 Founder Screenshot PASS** |
 | **SOUL Time Honesty Message Repair** | **82a404e** | **PRODUCTION_LIVE (PR #55, 22a3e16, 2026-10-15 16:28 KST) — 경로 A·B 수정. next_options 미억제 OPEN** |
+| **SOUL next_options 코스 응답 시간 질문 억제 (PR #57)** | **efc0a60** | **MERGED to main (5be00bf) — PRODUCTION_LIVE @5be00bf028a1fc1e (dep-db99p9navr4c73d8fg4g, 2026-10-17 오전 6:55 KST, Founder Evidence)** |
+| **SOUL Case C Companion Guard 가려고 추가 (PR #59)** | **f3bb1e2** | **MERGED to main (a1a4621) — Render Production 미배포 (PENDING)** |
 
 ### Staging-Only (SoulCableCarPage, 9 elements)
 
