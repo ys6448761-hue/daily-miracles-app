@@ -23,21 +23,21 @@ Last Updated: 2026-10-17
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-17
 
-**Founder — Odongdo SOUL Phase 1 Production Deploy 승인 대기 (PR #67 MERGED @12b7051)**
-- main HEAD: `12b70516b99bc8cc29766ca61d69ac9b1fbb1700` (Squash Merge, 2026-10-17T05:25:33Z)
-- Production Live: `284c5cb97030b4abe6b1e9aab7af18a07ce38c37` (불변, 배포 미실행)
-- Runtime QA O-1~O-7: NOT YET RUN (Production Deploy 후 실행 예정)
+**Founder — 다음 장소 확장 우선순위 결정 대기**
+- Odongdo Phase 1: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-17 14:55 KST)
+- Production Live SHA: `199bcf6e14943a1b394b95bcf02b2e77f17f7d69` / Render: `dep-db9gq76q1p3s7386qn00`
+- Runtime QA O-1~O-7: 7/7 PASS / R-1~R-4: 4/4 PASS / Total: 11/11 PASS
 
 ---
 
 ### 완료된 작업 기록 (2026-10-17)
 
-- **Odongdo SOUL Phase 1: MERGED — PRODUCTION_DEPLOY_PENDING (PR #67, 2026-10-17)**
-  - Squash Merge SHA: `12b70516b99bc8cc29766ca61d69ac9b1fbb1700` / KST 2026-10-17 14:25
-  - AIL Gate: SUCCESS / docker-smoke: SUCCESS
-  - O-1~O-7: experience_ko / walking_ok / parking_trust=UNKNOWN / JOURNEY_PREFERENCE family_elderly+kids / _odongdoVehicleBypass (companion 필수) / Companion Chip walking guardrail ("이동 부담이 적어요" 미노출)
+- **Odongdo SOUL Phase 1: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-17)**
+  - PR #67 Squash Merge SHA: `12b70516b99bc8cc29766ca61d69ac9b1fbb1700` (2026-10-17T05:25Z)
+  - Production SHA: `199bcf6e14943a1b394b95bcf02b2e77f17f7d69` / Render: `dep-db9gq76q1p3s7386qn00` / LIVE: 14:55 KST
+  - O-1~O-7: 7/7 PASS / R-1~R-4: 4/4 PASS / Total: 11/11 PASS / Guardrail violations: 0
+  - Guardrails: "이동 부담이 적어요" 미노출 / 주차 비단정 / 동백열차 단정 없음 — 전 시나리오 PASS
   - 신규 57/57 PASS / 회귀 117/117 PASS (YiSunSin Phase 2 39/39 + Case C 21/21)
-  - Production 배포 미실행 / Runtime QA O-1~O-7 미실행 — Founder Deploy 승인 필요
 
 - **YiSunSin Square SOUL Phase 2: DEPLOYED_AND_VERIFIED (2026-10-17)**
   - PR #64 MERGED @d272003 / PR #65 MERGED @284c5cb
@@ -244,7 +244,8 @@ EA+EB 합계: 46분 / 일반 코스 체류(180) + 이동(46) = 226분 (참고값
 | **CourseDisplay Time Honesty Repair (D1~D4)** | **b4876eb** | **PRODUCTION_LIVE (PR #53, 5937d17, 2026-10-15 15:33 KST) — D1~D4 Founder Screenshot PASS** |
 | **SOUL Time Honesty Message Repair** | **82a404e** | **PRODUCTION_LIVE (PR #55, 22a3e16, 2026-10-15 16:28 KST) — 경로 A·B 수정. next_options 미억제 OPEN** |
 | **SOUL next_options 코스 응답 시간 질문 억제 (PR #57)** | **efc0a60** | **MERGED to main (5be00bf) — PRODUCTION_LIVE @5be00bf028a1fc1e (dep-db99p9navr4c73d8fg4g, 2026-10-17 오전 6:55 KST, Founder Evidence)** |
-| **SOUL Case C Companion Guard 가려고 추가 (PR #59)** | **f3bb1e2** | **MERGED to main (a1a4621) — Render Production 미배포 (PENDING)** |
+| **SOUL Case C Companion Guard 가려고 추가 (PR #59)** | **f3bb1e2** | **MERGED to main (a1a4621) — PRODUCTION_LIVE @199bcf6e** |
+| **Odongdo SOUL Phase 1 (O-1~O-7)** | **12b7051** | **PRODUCTION_LIVE @199bcf6e (dep-db9gq76q1p3s7386qn00, 2026-10-17 14:55 KST) — 11/11 PASS** |
 
 ### Staging-Only (SoulCableCarPage, 9 elements)
 
