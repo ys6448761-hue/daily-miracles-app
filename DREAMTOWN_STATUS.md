@@ -23,11 +23,22 @@ Last Updated: 2026-10-17
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-17
 
-**Render Production 배포 승인 (PR #59 + PR #57 포함 `a1a4621` → Render 배포)**
+**Render Production 배포 Preflight (PR #61 포함 `86d6846` → Render 배포 승인 대기)**
 
 ---
 
 ### 완료된 작업 기록 (2026-10-17)
+
+- **SOUL Case C RC2 Companion Chip next_options 수정: MERGED (Founder Decision 2026-10-17)**
+  - PR #61 MERGED @521afda / Merge Commit: `86d684620486ad13a55aeac3cb04c8342529ac3d`
+  - Merge 시각: 2026-10-17T00:53:46Z (KST 2026-10-17 오전 9:53)
+  - 변경: `services/soyeowoolService.js` (+6줄) — `_ccAccessibilityQ` 조건 + `next_options` 추가
+  - 신규 테스트: `soulCaseCCompanionGuard.test.js` RC2 8케이스 추가 (21/21 PASS)
+  - AIL Gate PASS / docker-smoke PASS
+  - Root Cause 2: `_isCompanionChipQuery`=TRUE → Companion Chip Response → `_buildPlaceLookupClientPayload` spread → `next_options:[]`
+  - Fix: `family_elderly + physical_difficulty='high' + !mobility_constraint` → `next_options:['걷기 많이 힘드신가요?']`
+  - Production 배포: PENDING (Render Live `a2fdc383`, PR #61 미포함)
+  - Case C Runtime: PARTIAL
 
 - **SOUL Case C Companion Guard 수정: CLOSED (Founder Decision 2026-10-17)**
   - PR #59 MERGED @f3bb1e2 / Merge Commit: `a1a4621ee5be832232af58cbc4d51898c2e085f8`
@@ -35,10 +46,10 @@ Last Updated: 2026-10-17
   - 변경: `services/soyeowoolService.js` (1+1-) — `_ldGuardBypass` 정규식에 `가려고` 추가
   - 신규: `tests/unit/soulCaseCCompanionGuard.test.js` (13케이스 / 13/13 PASS)
   - AIL Gate PASS / docker-smoke PASS
-  - Root Cause: "부모님과 함께 가려고 해요" → `_ldGuardBypass=false` → Living Detail Fallback → `next_options:[]`
-  - Fix: `가려고` 패턴 추가 → Companion Response 경로 → PARTIAL → `next_options:['걷기 많이 힘드신가요?']`
-  - Production 배포: PENDING (Render `5be00bf` 현재 Live, PR #59 미포함)
-  - Runtime 검증: PENDING
+  - Root Cause 1: "부모님과 함께 가려고 해요" → `_ldGuardBypass=false` → Living Detail Fallback → `next_options:[]`
+  - Fix: `가려고` 패턴 추가 → `_ldGuardBypass=true` → Companion Chip Response 경로 진입
+  - Render DEPLOYED @`a2fdc383` (dep-db9c51brjlhs73e8unh0, KST 2026-10-17 오전 9:36)
+  - Runtime 검증: PARTIAL (계단·경사 메시지 표시, 접근성 질문 미표시 → RC2로 이어짐)
 
 - **SOUL next_options 코스 응답 시간 질문 억제: CLOSED (Founder Decision 2026-10-17)**
   - PR #57 MERGED @efc0a60 (main) — Founder FINAL MERGE AUTHORIZATION 2026-10-17
