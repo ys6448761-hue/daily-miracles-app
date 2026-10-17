@@ -246,6 +246,11 @@ const _PLACE_KNOWLEDGE = {
     hours_trust: 'NON_OFFICIAL',
     stairs_ko: '경내 계단 구간이 있어요. 거동이 불편하신 분은 주의가 필요해요.',
     routes_ko: '두 경로로 오를 수 있어요. 한 쪽은 가파른 편이고 (약 10분), 다른 쪽은 상대적으로 완만해요 (약 15분). 완만한 길도 계단이 없지는 않아요. 올라온 길 또는 다른 경로로 내려갈 수 있어요.',
+    experience_ko: '향일암은 바다와 바위 절벽의 풍경을 바라보며 잠시 마음을 가다듬을 수 있는 곳이에요. 경사와 계단이 있는 장소이니, 풍경을 즐기는 마음과 함께 자신의 이동 여건도 살펴보세요.',
+    fit_ko: '조용한 풍경과 사찰의 분위기를 느끼고 싶은 분께 어울려요. 부모님이나 아이와 함께라면 계단과 경사 구간을 고려해 무리하지 않는 방문 계획을 세워보세요.',
+    walking_ok: '향일암은 경사와 계단 구간이 있어 걷는 부담이 생길 수 있어요. 이동에 어려움이 있다면 방문 전 접근 경로를 확인하고, 무리하지 않는 계획을 세워보세요.',
+    parking_ko: null,
+    parking_trust: 'UNKNOWN',
   },
   // ── BROAD places — Phoenix-verified evidence only ──────────────────────────
   lee_soon_shin_plaza: {
@@ -1285,13 +1290,23 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
     if (knowledge.experience_ko) answer = knowledge.experience_ko;
   }
 
-  // Walking guidance — fires when walking_ok present (odongdo-only currently)
+  // Hyangiram "어때요" — hyangiram-scoped (H-1)
+  else if (code === 'hyangiram' && /어때요/.test(msg)) {
+    if (knowledge.experience_ko) answer = knowledge.experience_ko;
+  }
+
+  // Walking guidance — fires when walking_ok present
   else if (knowledge.walking_ok && /(걸어야|걷기|걷는|보행)/.test(msg)) {
     answer = knowledge.walking_ok;
   }
 
   // Odongdo vehicle query — parking UNKNOWN (O-5: no companion, Living Detail Fallback path)
   else if (code === 'odongdo' && /(차로|자가용으로)/.test(msg)) {
+    answer = `${name} 주변 주차 정보는 방문 전에 확인하는 것이 좋아요. 실제 이용 가능 여부와 요금은 시점에 따라 달라질 수 있어요.${verifyNote}`;
+  }
+
+  // Hyangiram vehicle query — parking UNKNOWN (H-5: no companion, Living Detail Fallback path)
+  else if (code === 'hyangiram' && /(차로|자가용으로)/.test(msg)) {
     answer = `${name} 주변 주차 정보는 방문 전에 확인하는 것이 좋아요. 실제 이용 가능 여부와 요금은 시점에 따라 달라질 수 있어요.${verifyNote}`;
   }
 
@@ -1933,6 +1948,12 @@ async function _handleJourneyDecision({ decisionType, message, soulContext, conv
       } else if (placeCode === 'odongdo' && pt === 'family_with_kids') {
         soulMsg = `${ko}를 여정에 넣을게요.\n자연과 바다를 아이와 함께 즐기기 좋아요.`;
         nextOptions = ['얼마나 걸어요?'];
+      } else if (placeCode === 'hyangiram' && pt === 'family_elderly') {
+        soulMsg = `${ko}를 여정에 넣을게요.\n계단과 경사가 있는 장소예요. 이동에 어려운 부분이 있으세요?`;
+        nextOptions = ['걷기 많이 힘드신가요?'];
+      } else if (placeCode === 'hyangiram' && pt === 'family_with_kids') {
+        soulMsg = `${ko}를 여정에 넣을게요.\n경사와 계단이 있어요. 아이와 함께라면 이동 여건을 미리 살펴보세요.`;
+        nextOptions = ['걱정되는 부분 있어요?', '넣어줘'];
       } else {
         soulMsg = isFirst
           ? `${ko}를 첫 번째 장소로 넣을게요.\n추가하고 싶은 곳이 있으신가요?`
@@ -2577,6 +2598,11 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
       && soulContext.has_car
       && /(차로|자가용으로)/.test(message)
       && /(부모님과|아이와|가족과)/.test(message);
+    // Hyangiram companion+vehicle bypass — companion prefix required to exclude pure vehicle queries (H-5)
+    const _hyangiramVehicleBypass = _psqPlaceCode === 'hyangiram'
+      && soulContext.has_car
+      && /(차로|자가용으로)/.test(message)
+      && /(부모님과|아이와|가족과)/.test(message);
     const _ldGuardBypass =
       /^(안녕|안녕하세요|반가워|하이|hello|hi)[\s!.?]*$/i.test(message.trim())
       || /(잘 모르겠|모르겠어|뭐가 좋을|뭐 해야|어떡하|어쩌)/.test(message)
@@ -2584,7 +2610,8 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
       || /(부모님과|아이와|가족과).*(왔어|왔어요|왔는데|함께라면|함께 왔|와서|가려고)/.test(message)
       || /(이곳에서.*(즐기|어떻게)|어떻게.*즐기)/.test(message)
       || _yisunsinVehicleBypass
-      || _odongdoVehicleBypass;
+      || _odongdoVehicleBypass
+      || _hyangiramVehicleBypass;
     if (_psqPlaceCode && !_ldGuardBypass) {
       try {
         const _ldPlace = await travelGuideService.getPlaceByCode(_psqPlaceCode);
@@ -2632,6 +2659,8 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
           if (soulContext.people_type === 'family_with_kids') {
             if (_ccPlace.accessibility_stroller) {
               _ccParts.push('유모차 접근이 가능해요.');
+            } else if (_ccPlace.code === 'hyangiram' && _ccPlace.physical_difficulty === 'high') {
+              _ccParts.push('경사와 계단이 있어요. 아이와 함께라면 이동 여건을 미리 살펴보세요.');
             } else if (Array.isArray(_ccPlace.suitable_for) && _ccPlace.suitable_for.includes('kids_ok')) {
               const _stayMin = _ccPlace.avg_stay_minutes;
               const _isOutdoor = _ccPlace.venue_type === 'outdoor';
@@ -2640,7 +2669,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
               else if (_stayMin)          _ccParts.push(`보통 약 ${_stayMin}분 정도 머물러요.`);
             }
           }
-          if (soulContext.has_car && (_ccPlace.code === 'lee_soon_shin_plaza' || _ccPlace.code === 'odongdo')) {
+          if (soulContext.has_car && (_ccPlace.code === 'lee_soon_shin_plaza' || _ccPlace.code === 'odongdo' || _ccPlace.code === 'hyangiram')) {
             const _parkingTrust = _ccKnowledge.parking_trust;
             if (_parkingTrust === 'UNKNOWN') {
               _ccParts.push(`차로 이동하시는군요. ${_ccName} 인근 주차 정보는 방문 전에 확인해보세요.`);
