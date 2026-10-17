@@ -21,14 +21,26 @@ Last Updated: 2026-10-17
 5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
-### ★ Current Next Action (exactly 1) — Updated: 2026-10-17
+### ★ Current Next Action (exactly 1) — Updated: 2026-10-18
 
-**Founder — 다음 장소 확장 우선순위 결정 대기**
-- Odongdo Phase 1: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-17 14:55 KST)
-- Production Live SHA: `199bcf6e14943a1b394b95bcf02b2e77f17f7d69` / Render: `dep-db9gq76q1p3s7386qn00`
-- Runtime QA O-1~O-7: 7/7 PASS / R-1~R-4: 4/4 PASS / Total: 11/11 PASS
+**Founder — 향일암 Phase 1 Production Deploy 승인 대기**
+- Hyangiram Phase 1: MERGED — PRODUCTION_DEPLOY_PENDING
+- Merge Commit SHA: `6965910d4a95d0f740e3a275857d0bb416048dc6` (PR #71, KST 2026-10-18 06:26)
+- 183/183 PASS (신규 66 + 회귀 117) / AIL Gate PASS / docker-smoke PASS
+- Production Live SHA: `199bcf6e14943a1b394b95bcf02b2e77f17f7d69` / Render: `dep-db9gq76q1p3s7386qn00` (불변)
 
 ---
+
+### 완료된 작업 기록 (2026-10-18)
+
+- **Hyangiram SOUL Phase 1: MERGED — PRODUCTION_DEPLOY_PENDING (2026-10-18)**
+  - PR #71 Squash Merge SHA: `6965910d4a95d0f740e3a275857d0bb416048dc6` (2026-10-17T21:26Z / KST 2026-10-18 06:26)
+  - 신규: soulHyangiramPhase1.test.js 66/66 PASS
+  - 회귀: Case C 21/21 / YiSunSin Phase 2 39/39 / Odongdo Phase 1 57/57 PASS / 합계: 183/183 PASS
+  - H-1~H-7: experience_ko / walking_ok / 주차 UNKNOWN / family_elderly 계단 경고 / family_with_kids 이동 안내 / hyangiramVehicleBypass
+  - Guardrails: "쉽게 오를 수 있어요" 미노출 / "공영주차장 2시간 무료" 미노출 / 수치 단정 없음
+  - AIL Gate PASS / docker-smoke PASS / C1~C5 승인 범위 일치
+  - Production 배포: 미실행 — Founder 별도 승인 필요
 
 ### 완료된 작업 기록 (2026-10-17)
 
@@ -246,6 +258,7 @@ EA+EB 합계: 46분 / 일반 코스 체류(180) + 이동(46) = 226분 (참고값
 | **SOUL next_options 코스 응답 시간 질문 억제 (PR #57)** | **efc0a60** | **MERGED to main (5be00bf) — PRODUCTION_LIVE @5be00bf028a1fc1e (dep-db99p9navr4c73d8fg4g, 2026-10-17 오전 6:55 KST, Founder Evidence)** |
 | **SOUL Case C Companion Guard 가려고 추가 (PR #59)** | **f3bb1e2** | **MERGED to main (a1a4621) — PRODUCTION_LIVE @199bcf6e** |
 | **Odongdo SOUL Phase 1 (O-1~O-7)** | **12b7051** | **PRODUCTION_LIVE @199bcf6e (dep-db9gq76q1p3s7386qn00, 2026-10-17 14:55 KST) — 11/11 PASS** |
+| **Hyangiram SOUL Phase 1 (H-1~H-7)** | **6965910** | **MERGED to main (PR #71, 2026-10-18) — PRODUCTION_DEPLOY_PENDING** |
 
 ### Staging-Only (SoulCableCarPage, 9 elements)
 
