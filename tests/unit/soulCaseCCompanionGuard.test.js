@@ -86,3 +86,67 @@ describe('SOUL Case C — _ldGuardBypass Companion Guard', () => {
   });
 
 });
+
+// ── Root Cause 2 — Companion Chip Response next_options 조건 ────────────────
+// Fix (2026-10-17): _isCompanionChipQuery 경로에서도 접근성 질문을 반환하도록 수정.
+// 조건: family_elderly + physical_difficulty='high' + !mobility_constraint
+
+function ccAccessibilityQ(soulContext, place) {
+  return (
+    soulContext.people_type === 'family_elderly' &&
+    place.physical_difficulty === 'high' &&
+    !soulContext.mobility_constraint
+  ) ? ['걷기 많이 힘드신가요?'] : [];
+}
+
+describe('SOUL Case C Root Cause 2 — Companion Chip next_options', () => {
+
+  const hyangiram = { code: 'hyangiram', physical_difficulty: 'high' };
+  const dolsanBridge = { code: 'dolsan_bridge', physical_difficulty: 'low' };
+
+  // ── RC2-T01: 핵심 케이스 — 접근성 질문 생성 ───────────────────────────────
+  test('RC2-T01 향일암 + family_elderly + 제약 없음 → 접근성 질문 포함', () => {
+    const ctx = { people_type: 'family_elderly', mobility_constraint: null };
+    expect(ccAccessibilityQ(ctx, hyangiram)).toEqual(['걷기 많이 힘드신가요?']);
+  });
+
+  // ── RC2-T02: 보행 제약 이미 제공 → 질문 반복 없음 ──────────────────────────
+  test('RC2-T02 mobility_constraint 있음 → 질문 없음', () => {
+    const ctx = { people_type: 'family_elderly', mobility_constraint: 'low_walking' };
+    expect(ccAccessibilityQ(ctx, hyangiram)).toEqual([]);
+  });
+
+  // ── RC2-T03: 고령 동행자 아닌 경우 → 질문 없음 ──────────────────────────────
+  test('RC2-T03 people_type=family_with_kids → 질문 없음', () => {
+    const ctx = { people_type: 'family_with_kids', mobility_constraint: null };
+    expect(ccAccessibilityQ(ctx, hyangiram)).toEqual([]);
+  });
+
+  test('RC2-T04 people_type=solo → 질문 없음', () => {
+    const ctx = { people_type: 'solo', mobility_constraint: null };
+    expect(ccAccessibilityQ(ctx, hyangiram)).toEqual([]);
+  });
+
+  // ── RC2-T05: 접근성 질문 대상이 아닌 장소 → 질문 없음 ──────────────────────
+  test('RC2-T05 physical_difficulty!=high 장소 → 질문 없음', () => {
+    const ctx = { people_type: 'family_elderly', mobility_constraint: null };
+    expect(ccAccessibilityQ(ctx, dolsanBridge)).toEqual([]);
+  });
+
+  test('RC2-T06 physical_difficulty 미정의 장소 → 질문 없음', () => {
+    const ctx = { people_type: 'family_elderly', mobility_constraint: null };
+    expect(ccAccessibilityQ(ctx, { code: 'yisunsin', physical_difficulty: undefined })).toEqual([]);
+  });
+
+  // ── RC2-T07: mobility_constraint falsy 값 구분 ───────────────────────────────
+  test('RC2-T07 mobility_constraint=undefined → 질문 포함 (null과 동일 처리)', () => {
+    const ctx = { people_type: 'family_elderly', mobility_constraint: undefined };
+    expect(ccAccessibilityQ(ctx, hyangiram)).toEqual(['걷기 많이 힘드신가요?']);
+  });
+
+  test('RC2-T08 mobility_constraint=false → 질문 포함', () => {
+    const ctx = { people_type: 'family_elderly', mobility_constraint: false };
+    expect(ccAccessibilityQ(ctx, hyangiram)).toEqual(['걷기 많이 힘드신가요?']);
+  });
+
+});
