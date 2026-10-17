@@ -23,33 +23,43 @@ Last Updated: 2026-10-17
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-17
 
-**Render Production 배포 Preflight (PR #61 포함 `86d6846` → Render 배포 승인 대기)**
+**Founder Review — Case C Production Closure 문서 PR 검토 및 Merge 결정**
 
 ---
 
 ### 완료된 작업 기록 (2026-10-17)
 
-- **SOUL Case C RC2 Companion Chip next_options 수정: MERGED (Founder Decision 2026-10-17)**
-  - PR #61 MERGED @521afda / Merge Commit: `86d684620486ad13a55aeac3cb04c8342529ac3d`
-  - Merge 시각: 2026-10-17T00:53:46Z (KST 2026-10-17 오전 9:53)
-  - 변경: `services/soyeowoolService.js` (+6줄) — `_ccAccessibilityQ` 조건 + `next_options` 추가
-  - 신규 테스트: `soulCaseCCompanionGuard.test.js` RC2 8케이스 추가 (21/21 PASS)
-  - AIL Gate PASS / docker-smoke PASS
-  - Root Cause 2: `_isCompanionChipQuery`=TRUE → Companion Chip Response → `_buildPlaceLookupClientPayload` spread → `next_options:[]`
-  - Fix: `family_elderly + physical_difficulty='high' + !mobility_constraint` → `next_options:['걷기 많이 힘드신가요?']`
-  - Production 배포: PENDING (Render Live `a2fdc383`, PR #61 미포함)
-  - Case C Runtime: PARTIAL
+- **SOUL Case C 접근성 질문 Production 종료: DEPLOYED_AND_VERIFIED (Founder Decision 2026-10-17)**
+  - Production SHA: `d7ac07fc97dec7e23a2730450827bc41c966f139`
+  - Render Deploy ID: `dep-db9chre7bikc73fhhc7g`
+  - Live 시각: 2026-10-17 10:04 KST
+  - **Founder Browser Runtime Evidence:**
+    - 테스트 장소: 향일암 Living Detail
+    - 입력: "부모님과 함께 가려고 해요."
+    - 확인된 SOUL 응답: "향일암에 대해 알려드릴게요." / "경사나 계단이 있어요. 이동 동선을 미리 확인해보세요." / "걷기 많이 힘드신가요?"
+    - 기존 장소 안내 유지: PASS
+  - RC1 Guard PASS / RC2 접근성 후속 질문 PASS
+  - **Case C: DEPLOYED_AND_VERIFIED**
 
-- **SOUL Case C Companion Guard 수정: CLOSED (Founder Decision 2026-10-17)**
+- **SOUL Case C RC2 Companion Chip next_options 수정: DEPLOYED**
+  - PR #61 MERGED @521afda / Merge Commit: `86d684620486ad13a55aeac3cb04c8342529ac3d`
+  - Merge 시각: 2026-10-17T00:53:46Z (KST 오전 9:53)
+  - 변경: `services/soyeowoolService.js` (+6줄) — `_ccAccessibilityQ` 조건 + `next_options` 추가
+  - 신규 테스트: `soulCaseCCompanionGuard.test.js` RC2 8케이스 (21/21 PASS)
+  - AIL Gate PASS / docker-smoke PASS
+  - Root Cause 2: `_isCompanionChipQuery`=TRUE → `_buildPlaceLookupClientPayload` spread → `next_options:[]`
+  - Fix: `family_elderly + physical_difficulty='high' + !mobility_constraint` → `next_options:['걷기 많이 힘드신가요?']`
+  - Production 배포: `d7ac07f` (dep-db9chre7bikc73fhhc7g) DEPLOYED
+
+- **SOUL Case C RC1 Companion Guard 수정: DEPLOYED**
   - PR #59 MERGED @f3bb1e2 / Merge Commit: `a1a4621ee5be832232af58cbc4d51898c2e085f8`
-  - Merge 시각: 2026-10-16T23:56:43Z (KST 2026-10-17 오전 8:56)
+  - Merge 시각: 2026-10-16T23:56:43Z (KST 오전 8:56)
   - 변경: `services/soyeowoolService.js` (1+1-) — `_ldGuardBypass` 정규식에 `가려고` 추가
   - 신규: `tests/unit/soulCaseCCompanionGuard.test.js` (13케이스 / 13/13 PASS)
   - AIL Gate PASS / docker-smoke PASS
   - Root Cause 1: "부모님과 함께 가려고 해요" → `_ldGuardBypass=false` → Living Detail Fallback → `next_options:[]`
   - Fix: `가려고` 패턴 추가 → `_ldGuardBypass=true` → Companion Chip Response 경로 진입
-  - Render DEPLOYED @`a2fdc383` (dep-db9c51brjlhs73e8unh0, KST 2026-10-17 오전 9:36)
-  - Runtime 검증: PARTIAL (계단·경사 메시지 표시, 접근성 질문 미표시 → RC2로 이어짐)
+  - Production 배포: `d7ac07f` (dep-db9chre7bikc73fhhc7g) DEPLOYED
 
 - **SOUL next_options 코스 응답 시간 질문 억제: CLOSED (Founder Decision 2026-10-17)**
   - PR #57 MERGED @efc0a60 (main) — Founder FINAL MERGE AUTHORIZATION 2026-10-17
