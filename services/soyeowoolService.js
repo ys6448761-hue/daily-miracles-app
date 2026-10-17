@@ -250,6 +250,8 @@ const _PLACE_KNOWLEDGE = {
     experience_ko: '이순신 장군을 기리는 역사 광장이에요. 거북선 외관을 가까이 볼 수 있어요. 내부 관람 운영 상황은 현장 확인이 필요해요. 미남크루즈 코스와 2층버스 주간코스에도 포함돼요.',
     fit_ko: '역사에 관심 있는 분이나 아이와 함께 오기 좋아요. 크루즈나 2층버스 여행 동선에 자연스럽게 포함돼요.',
     unknown_boundary: '거북선 내부 탑승 여부 등 세부 사항은 현장에서 확인해보세요.',
+    parking_ko: null,
+    parking_trust: 'UNKNOWN',
   },
   // ── PARKING LIFECYCLE (dolsan_nightscape) ────────────────────────────────────
   // Archive — past operation (date unconfirmed):
@@ -1141,6 +1143,8 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
   else if (/(주차|차 세우|차 대|주차장)/.test(msg)) {
     if (knowledge.parking_ko) {
       answer = knowledge.parking_ko + verifyNote;
+    } else if (knowledge.parking_trust === 'UNKNOWN') {
+      answer = `${name} 주변 주차 정보는 방문 전에 확인하는 것이 좋아요. 실제 이용 가능 여부와 요금은 시점에 따라 달라질 수 있어요.${verifyNote}`;
     } else {
       answer = `${name}의 주차 정보는 현장 확인이 필요해요.${verifyNote}`;
     }
@@ -1873,8 +1877,8 @@ function _convJourneyIncludedKo(convJourney) {
     .join(', ');
 }
 
-async function _handleJourneyDecision({ decisionType, message, soulContext, convJourney, journeyCtxForClar, sessionId }) {
-  const placeCode = _extractGoldenPlaceCode(message);
+async function _handleJourneyDecision({ decisionType, message, soulContext, convJourney, journeyCtxForClar, sessionId, placeCodeHint }) {
+  const placeCode = _extractGoldenPlaceCode(message) || placeCodeHint || null;
   const pt = soulContext.people_type;
   const hasLowWalking = convJourney.constraints.low_walking || false;
 
@@ -1884,15 +1888,30 @@ async function _handleJourneyDecision({ decisionType, message, soulContext, conv
 
   // A. JOURNEY_PREFERENCE
   if (decisionType === 'JOURNEY_PREFERENCE' && placeCode) {
-    const ko = _CONV_GOLDEN_KO[placeCode];
-    const isFirst = updatedConvJourney.places.length === 0 || /먼저/.test(message);
-    updatedConvJourney.places = _convJourneyUpsertPlace(updatedConvJourney, placeCode, {
-      status: 'included', ...(isFirst ? { preference: 'first' } : {}),
-    });
-    soulMsg = isFirst
-      ? `${ko}를 첫 번째 장소로 넣을게요.\n추가하고 싶은 곳이 있으신가요?`
-      : `${ko}를 여행에 넣을게요.\n추가하고 싶은 곳이 있으신가요?`;
-    nextOptions = ['케이블카도 탈래', '향일암까지 가능해?'];
+    if (placeCode === 'lee_soon_shin_plaza') {
+      // Living detail page context — not a journey destination. Provide place-aware response.
+      if (pt === 'family_elderly') {
+        soulMsg = '이순신광장은 야외 광장으로 부모님과 함께 천천히 걸으며 둘러보기 좋아요.\n거북선 외관을 가까이 볼 수 있어요. 이동 동선을 미리 확인해두시면 편하게 돌아보실 수 있어요.';
+        nextOptions = ['주차는 어떻게 돼요?', '걷기 많이 힘드세요?'];
+      } else if (pt === 'family_with_kids') {
+        soulMsg = '이순신광장에는 거북선을 가까이서 볼 수 있는 공간이 있어요.\n아이와 함께 역사 이야기를 나누기 좋아요. 거북선 내부 관람 운영 여부는 현장에서 확인해보세요.';
+        nextOptions = ['거북선 내부 관람 되나요?', '입장료는요?'];
+      } else {
+        soulMsg = '이순신광장을 여정에 넣어볼게요.\n역사 광장으로 거북선 외관을 볼 수 있어요. 미남크루즈나 2층버스 코스와도 잘 어울려요.';
+        nextOptions = ['추가하고 싶은 곳이 있으신가요?'];
+      }
+      // Do not add lee_soon_shin_plaza to conversation journey — it is a living detail context.
+    } else {
+      const ko = _CONV_GOLDEN_KO[placeCode];
+      const isFirst = updatedConvJourney.places.length === 0 || /먼저/.test(message);
+      updatedConvJourney.places = _convJourneyUpsertPlace(updatedConvJourney, placeCode, {
+        status: 'included', ...(isFirst ? { preference: 'first' } : {}),
+      });
+      soulMsg = isFirst
+        ? `${ko}를 첫 번째 장소로 넣을게요.\n추가하고 싶은 곳이 있으신가요?`
+        : `${ko}를 여행에 넣을게요.\n추가하고 싶은 곳이 있으신가요?`;
+      nextOptions = ['케이블카도 탈래', '향일암까지 가능해?'];
+    }
   }
 
   // B. JOURNEY_ADD
@@ -2496,6 +2515,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
         convJourney: _convJourney,
         journeyCtxForClar,
         sessionId,
+        placeCodeHint: _psqPlaceCode || null,
       });
       if (_journeyResult.ok) {
         // Single awaited write: conversation_journey + traveler facts merged to avoid race.
@@ -2519,12 +2539,18 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
     // _buildPlaceSpecificQueryPayload returns graceful "정보를 확인 중이에요" for unknown patterns.
     // Guard: skip for greetings, indecision, cable-car clarification intents, and
     // companion/category chip queries that need the planning path.
+    // Narrow bypass: lee_soon_shin_plaza + confirmed vehicle + vehicle-movement expression.
+    // Not a global "가요" bypass — scoped to place_code === 'lee_soon_shin_plaza' only.
+    const _yisunsinVehicleBypass = _psqPlaceCode === 'lee_soon_shin_plaza'
+      && soulContext.has_car
+      && /(차로|자가용으로)/.test(message);
     const _ldGuardBypass =
       /^(안녕|안녕하세요|반가워|하이|hello|hi)[\s!.?]*$/i.test(message.trim())
       || /(잘 모르겠|모르겠어|뭐가 좋을|뭐 해야|어떡하|어쩌)/.test(message)
       || (/케이블카|케이블 카/.test(message) && /(꼭|반드시|타고 싶|타야|빼고|빼줘|제외|일정에|탈거야)/.test(message))
       || /(부모님과|아이와|가족과).*(왔어|왔어요|왔는데|함께라면|함께 왔|와서|가려고)/.test(message)
-      || /(이곳에서.*(즐기|어떻게)|어떻게.*즐기)/.test(message);
+      || /(이곳에서.*(즐기|어떻게)|어떻게.*즐기)/.test(message)
+      || _yisunsinVehicleBypass;
     if (_psqPlaceCode && !_ldGuardBypass) {
       try {
         const _ldPlace = await travelGuideService.getPlaceByCode(_psqPlaceCode);
@@ -2544,6 +2570,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
     const _isCompanionChipQuery =
       _psqPlaceCode && _ldGuardBypass &&
       (/(부모님과|아이와|가족과).*(왔어|왔어요|함께)/.test(message) ||
+       /(부모님과|아이와|가족과).*(차로|자가용으로)/.test(message) ||
        /(이곳에서.*(즐기|어떻게)|어떻게.*즐기)/.test(message));
     if (_isCompanionChipQuery) {
       try {
@@ -2574,6 +2601,14 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
               if (_isOutdoor && _stayMin) _ccParts.push(`야외 장소라 아이와 자유롭게 둘러보기 좋아요. 보통 약 ${_stayMin}분 정도 머물러요.`);
               else if (_isOutdoor)        _ccParts.push('야외 장소라 아이와 자유롭게 둘러보기 좋아요.');
               else if (_stayMin)          _ccParts.push(`보통 약 ${_stayMin}분 정도 머물러요.`);
+            }
+          }
+          if (soulContext.has_car && _ccPlace.code === 'lee_soon_shin_plaza') {
+            const _parkingTrust = _ccKnowledge.parking_trust;
+            if (_parkingTrust === 'UNKNOWN') {
+              _ccParts.push(`차로 이동하시는군요. ${_ccName} 인근 주차 정보는 방문 전에 확인해보세요.`);
+            } else {
+              _ccParts.push('차로 이동하시는 경우, 인근 주차 여건을 미리 확인해보세요.');
             }
           }
           const _ccAccessibilityQ =
