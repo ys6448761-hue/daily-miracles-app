@@ -2603,7 +2603,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
               else if (_stayMin)          _ccParts.push(`보통 약 ${_stayMin}분 정도 머물러요.`);
             }
           }
-          if (soulContext.has_car) {
+          if (soulContext.has_car && _ccPlace.code === 'lee_soon_shin_plaza') {
             const _parkingTrust = _ccKnowledge.parking_trust;
             if (_parkingTrust === 'UNKNOWN') {
               _ccParts.push(`차로 이동하시는군요. ${_ccName} 인근 주차 정보는 방문 전에 확인해보세요.`);

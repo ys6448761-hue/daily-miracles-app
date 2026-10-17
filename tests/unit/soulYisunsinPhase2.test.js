@@ -97,9 +97,9 @@ function isCompanionChipQuery(message, psqPlaceCode, hasCar) {
   );
 }
 
-// ── Mirrors: Fix C — Companion Chip has_car note ─────────────────────────────
-function companionChipVehicleNote(hasCar, knowledge, name) {
-  if (!hasCar) return null;
+// ── Mirrors: Fix C — Companion Chip has_car note (lee_soon_shin_plaza 한정) ───
+function companionChipVehicleNote(hasCar, placeCode, knowledge, name) {
+  if (!hasCar || placeCode !== 'lee_soon_shin_plaza') return null;
   if (knowledge.parking_trust === 'UNKNOWN') {
     return `차로 이동하시는군요. ${name} 인근 주차 정보는 방문 전에 확인해보세요.`;
   }
@@ -235,21 +235,46 @@ describe('YiSunSin Phase 2 — Fix C: 차량 + 동행 컨텍스트 라우팅', (
     expect(isCompanionChipQuery('아이와 차로 가요', LSP, true)).toBe(true);
   });
 
-  // YS2-T06: Companion Chip 차량 문구
-  test('YS2-T06 S-7: has_car=true + parking_trust=UNKNOWN → 비단정 주차 문구 포함', () => {
-    const note = companionChipVehicleNote(true, LEE_SOON_SHIN_KNOWLEDGE, '이순신광장');
+  // YS2-T06: Companion Chip 차량 문구 (lee_soon_shin_plaza 한정)
+  test('YS2-T06 S-7: has_car=true + lee_soon_shin_plaza + parking_trust=UNKNOWN → 비단정 주차 문구 포함', () => {
+    const note = companionChipVehicleNote(true, LSP, LEE_SOON_SHIN_KNOWLEDGE, '이순신광장');
     expect(note).toContain('차로 이동');
     expect(note).toContain('이순신광장');
     expect(note).toContain('확인');
   });
 
   test('YS2-T06b: 차량 문구 — 주차 단정 표현 없음', () => {
-    const note = companionChipVehicleNote(true, LEE_SOON_SHIN_KNOWLEDGE, '이순신광장');
+    const note = companionChipVehicleNote(true, LSP, LEE_SOON_SHIN_KNOWLEDGE, '이순신광장');
     expect(note).not.toMatch(/주차 무료|주차 가능|공영주차장/);
   });
 
   test('YS2-T06c: has_car=false → 차량 문구 없음 (null)', () => {
-    const note = companionChipVehicleNote(false, LEE_SOON_SHIN_KNOWLEDGE, '이순신광장');
+    const note = companionChipVehicleNote(false, LSP, LEE_SOON_SHIN_KNOWLEDGE, '이순신광장');
+    expect(note).toBeNull();
+  });
+
+  // ── Scope Audit: 다른 장소에 차량 문구가 추가되지 않음 ───────────────────────
+  test('Scope-Audit: 향일암 + has_car=true → 차량 문구 없음 (이순신광장 전용)', () => {
+    const hyangiramKnowledge = { admission_ko: '무료예요.' }; // no parking_trust
+    const note = companionChipVehicleNote(true, 'hyangiram', hyangiramKnowledge, '향일암');
+    expect(note).toBeNull();
+  });
+
+  test('Scope-Audit: 오동도 + has_car=true → 차량 문구 없음', () => {
+    const odongdoKnowledge = { hours_ko: '09:00~18:00' };
+    const note = companionChipVehicleNote(true, 'odongdo', odongdoKnowledge, '오동도');
+    expect(note).toBeNull();
+  });
+
+  test('Scope-Audit: 케이블카 + has_car=true → 차량 문구 없음', () => {
+    const cablecarKnowledge = { price_ko: '왕복 12,000원' };
+    const note = companionChipVehicleNote(true, 'cablecar', cablecarKnowledge, '케이블카');
+    expect(note).toBeNull();
+  });
+
+  test('Scope-Audit: dolsan_nightscape + has_car=true → 차량 문구 없음', () => {
+    const nightscapeKnowledge = { hours_ko: '일몰 후' };
+    const note = companionChipVehicleNote(true, 'dolsan_nightscape', nightscapeKnowledge, '돌산공원');
     expect(note).toBeNull();
   });
 
