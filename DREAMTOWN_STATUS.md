@@ -23,13 +23,20 @@ Last Updated: 2026-10-17
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-17
 
-**Founder Review — 다음 개발 과제 결정 (YiSunSin Phase 2 DEPLOYED_AND_VERIFIED)**
-- Production Live: `284c5cb97030b4abe6b1e9aab7af18a07ce38c37` (dep-db9fdotg1s2s738gt6l0, KST 2026-10-17 13:20)
-- HOLD: YiSunSin Phase 3 (S-7/S-8 next_options 개선 — Founder 기능 결정 필요)
+**Founder PR Review — Odongdo SOUL Phase 1 (PR #67 `d2d1138` → Merge 승인 대기)**
+- Branch: `feat/soul-odongdo-phase1` / Commit: `d2d1138`
+- 신규 테스트 57/57 PASS / 회귀 39+21=60 PASS (YiSunSin Phase 2 + Case C)
+- Production Live: `284c5cb97030b4abe6b1e9aab7af18a07ce38c37` (불변, 배포 미실행)
 
 ---
 
 ### 완료된 작업 기록 (2026-10-17)
+
+- **Odongdo SOUL Phase 1: CODE_MERGED PENDING (PR #67, 2026-10-17)**
+  - Branch: `feat/soul-odongdo-phase1` / Commit: `d2d1138`
+  - O-1~O-7 구현: experience_ko / walking_ok / parking_trust=UNKNOWN / JOURNEY_PREFERENCE family 분기 / Companion Chip walking guardrail
+  - 신규 테스트 57/57 PASS / 회귀 117/117 PASS
+  - Production 배포 미실행 — Founder 승인 필요
 
 - **YiSunSin Square SOUL Phase 2: DEPLOYED_AND_VERIFIED (2026-10-17)**
   - PR #64 MERGED @d272003 / PR #65 MERGED @284c5cb
