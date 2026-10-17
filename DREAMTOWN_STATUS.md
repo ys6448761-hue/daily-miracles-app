@@ -23,20 +23,21 @@ Last Updated: 2026-10-17
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-17
 
-**Founder PR Review — Odongdo SOUL Phase 1 (PR #67 `d2d1138` → Merge 승인 대기)**
-- Branch: `feat/soul-odongdo-phase1` / Commit: `d2d1138`
-- 신규 테스트 57/57 PASS / 회귀 39+21=60 PASS (YiSunSin Phase 2 + Case C)
+**Founder — Odongdo SOUL Phase 1 Production Deploy 승인 대기 (PR #67 MERGED @12b7051)**
+- main HEAD: `12b70516b99bc8cc29766ca61d69ac9b1fbb1700` (Squash Merge, 2026-10-17T05:25:33Z)
 - Production Live: `284c5cb97030b4abe6b1e9aab7af18a07ce38c37` (불변, 배포 미실행)
+- Runtime QA O-1~O-7: NOT YET RUN (Production Deploy 후 실행 예정)
 
 ---
 
 ### 완료된 작업 기록 (2026-10-17)
 
-- **Odongdo SOUL Phase 1: CODE_MERGED PENDING (PR #67, 2026-10-17)**
-  - Branch: `feat/soul-odongdo-phase1` / Commit: `d2d1138`
-  - O-1~O-7 구현: experience_ko / walking_ok / parking_trust=UNKNOWN / JOURNEY_PREFERENCE family 분기 / Companion Chip walking guardrail
-  - 신규 테스트 57/57 PASS / 회귀 117/117 PASS
-  - Production 배포 미실행 — Founder 승인 필요
+- **Odongdo SOUL Phase 1: MERGED — PRODUCTION_DEPLOY_PENDING (PR #67, 2026-10-17)**
+  - Squash Merge SHA: `12b70516b99bc8cc29766ca61d69ac9b1fbb1700` / KST 2026-10-17 14:25
+  - AIL Gate: SUCCESS / docker-smoke: SUCCESS
+  - O-1~O-7: experience_ko / walking_ok / parking_trust=UNKNOWN / JOURNEY_PREFERENCE family_elderly+kids / _odongdoVehicleBypass (companion 필수) / Companion Chip walking guardrail ("이동 부담이 적어요" 미노출)
+  - 신규 57/57 PASS / 회귀 117/117 PASS (YiSunSin Phase 2 39/39 + Case C 21/21)
+  - Production 배포 미실행 / Runtime QA O-1~O-7 미실행 — Founder Deploy 승인 필요
 
 - **YiSunSin Square SOUL Phase 2: DEPLOYED_AND_VERIFIED (2026-10-17)**
   - PR #64 MERGED @d272003 / PR #65 MERGED @284c5cb
