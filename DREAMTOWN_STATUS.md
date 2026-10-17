@@ -23,23 +23,30 @@ Last Updated: 2026-10-17
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-17
 
-**Render Production 배포 승인 (YiSunSin Phase 2 `d272003` → Render 배포)**
-- PR #64 MERGED @d272003 — Render 미배포 (PRODUCTION_PENDING)
-- Production Live (기존): `d7ac07fc97dec7e23a2730450827bc41c966f139` (dep-db9chre7bikc73fhhc7g)
+**Founder — Odongdo SOUL Phase 1 Production Deploy 승인 대기 (PR #67 MERGED @12b7051)**
+- main HEAD: `12b70516b99bc8cc29766ca61d69ac9b1fbb1700` (Merge Commit, 2026-10-17T05:25:33Z)
+- Production Live: `284c5cb97030b4abe6b1e9aab7af18a07ce38c37` (불변, 배포 미실행)
 
 ---
 
 ### 완료된 작업 기록 (2026-10-17)
 
-- **YiSunSin Square SOUL Phase 2: CODE_MERGED — PRODUCTION_PENDING (2026-10-17)**
-  - PR #64 MERGED @d272003 (2026-10-17T03:50:50Z KST 12:50)
+- **Odongdo SOUL Phase 1: MERGED (PR #67 @12b7051, 2026-10-17)**
+  - Merge Commit: `12b70516b99bc8cc29766ca61d69ac9b1fbb1700` / KST 2026-10-17 14:25
+  - O-1~O-7: experience_ko / walking_ok / parking_trust=UNKNOWN / JOURNEY_PREFERENCE family_elderly+kids / _odongdoVehicleBypass (companion 필수) / Companion Chip walking guardrail ("이동 부담이 적어요" 미노출)
+  - 신규 테스트 57/57 PASS / 회귀 117/117 PASS
+  - Production 배포 미실행 — Founder 승인 필요
+
+- **YiSunSin Square SOUL Phase 2: DEPLOYED_AND_VERIFIED (2026-10-17)**
+  - PR #64 MERGED @d272003 / PR #65 MERGED @284c5cb
+  - Render Deploy: `dep-db9fdotg1s2s738gt6l0` / SHA: `284c5cb97030b4abe6b1e9aab7af18a07ce38c37` / Live: 13:20 KST
   - Fix A: `_handleJourneyDecision` placeCodeHint → S-4/S-6 JOURNEY_PREFERENCE lee_soon_shin_plaza 분기
   - Fix B: `_PLACE_KNOWLEDGE.lee_soon_shin_plaza` `parking_trust: 'UNKNOWN'` → S-5 주차 비단정 안내
   - Fix C: `_yisunsinVehicleBypass` + Companion Chip 차량 맥락 (lee_soon_shin_plaza 전용 격리)
   - Scope Fix: `_ccPlace.code === 'lee_soon_shin_plaza'` 조건 추가 (다른 장소 차량 문구 미적용)
   - 신규 테스트: `soulYisunsinPhase2.test.js` (39/39 PASS) / Case C 회귀 21/21 PASS
-  - AIL Gate PASS / docker-smoke PASS
-  - Production: NOT DEPLOYED (Founder 배포 승인 필요)
+  - Runtime QA 10/10 PASS: S-4~S-8 + S-1~S-3 + Case C + Isolation
+  - Advisory: S-7/S-8 next_options 비어있음 (Guardrail 위반 아님, Phase 3 후보)
 
 - **SOUL Case C 접근성 질문 Production 종료: DEPLOYED_AND_VERIFIED (Founder Decision 2026-10-17)**
   - Production SHA: `d7ac07fc97dec7e23a2730450827bc41c966f139`
