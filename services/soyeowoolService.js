@@ -233,6 +233,11 @@ const _PLACE_KNOWLEDGE = {
     admission_ko: '무료',
     hours_ko: '연중무휴 (동백열차 09:00~17:00)',
     hours_trust: 'NON_OFFICIAL',
+    experience_ko: '오동도는 바다 풍경과 계절의 자연을 느끼며 산책할 수 있는 곳이에요. 방파제 길과 섬 안쪽의 산책 경험을 자신의 속도에 맞춰 즐겨보세요.',
+    fit_ko: '자연과 바다를 천천히 즐기고 싶은 분께 잘 어울려요. 부모님이나 아이와 함께라면 걷는 거리와 쉬는 시간을 고려해 동선을 정해보세요.',
+    walking_ok: '오동도는 산책을 즐기는 장소예요. 어느 구간까지 이동하느냐에 따라 걷는 부담이 달라질 수 있어요. 걷기가 부담스럽다면 이동 범위를 짧게 잡고 중간에 쉬어가는 편을 추천해요.',
+    parking_ko: null,
+    parking_trust: 'UNKNOWN',
   },
   hyangiram: {
     phone: null,
@@ -1275,6 +1280,21 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
     }
   }
 
+  // Odongdo "어때요" — odongdo-scoped before generic experience pattern (Founder C2a guardrail)
+  else if (code === 'odongdo' && /어때요/.test(msg)) {
+    if (knowledge.experience_ko) answer = knowledge.experience_ko;
+  }
+
+  // Walking guidance — fires when walking_ok present (odongdo-only currently)
+  else if (knowledge.walking_ok && /(걸어야|걷기|걷는|보행)/.test(msg)) {
+    answer = knowledge.walking_ok;
+  }
+
+  // Odongdo vehicle query — parking UNKNOWN (O-5: no companion, Living Detail Fallback path)
+  else if (code === 'odongdo' && /(차로|자가용으로)/.test(msg)) {
+    answer = `${name} 주변 주차 정보는 방문 전에 확인하는 것이 좋아요. 실제 이용 가능 여부와 요금은 시점에 따라 달라질 수 있어요.${verifyNote}`;
+  }
+
   // Experience / Place Identity — preference over raw field dump for BROAD places
   else if (/(어떤 곳|어떤 데|어떤 장소|소개|설명해|알고 싶어|알려줘|뭐 하는 곳|뭐가 있어|뭐 볼|뭐해)/.test(msg)) {
     if (knowledge.experience_ko) {
@@ -1907,10 +1927,18 @@ async function _handleJourneyDecision({ decisionType, message, soulContext, conv
       updatedConvJourney.places = _convJourneyUpsertPlace(updatedConvJourney, placeCode, {
         status: 'included', ...(isFirst ? { preference: 'first' } : {}),
       });
-      soulMsg = isFirst
-        ? `${ko}를 첫 번째 장소로 넣을게요.\n추가하고 싶은 곳이 있으신가요?`
-        : `${ko}를 여행에 넣을게요.\n추가하고 싶은 곳이 있으신가요?`;
-      nextOptions = ['케이블카도 탈래', '향일암까지 가능해?'];
+      if (placeCode === 'odongdo' && pt === 'family_elderly') {
+        soulMsg = `${ko}를 여정에 넣을게요.\n방파제 길로 산책하기 좋아요. 부모님과 함께라면 걷는 거리와 쉬는 시간을 고려해 동선을 정해보세요.`;
+        nextOptions = ['많이 걸어야 하나요?', '주차는 어떻게 돼요?'];
+      } else if (placeCode === 'odongdo' && pt === 'family_with_kids') {
+        soulMsg = `${ko}를 여정에 넣을게요.\n자연과 바다를 아이와 함께 즐기기 좋아요.`;
+        nextOptions = ['얼마나 걸어요?'];
+      } else {
+        soulMsg = isFirst
+          ? `${ko}를 첫 번째 장소로 넣을게요.\n추가하고 싶은 곳이 있으신가요?`
+          : `${ko}를 여행에 넣을게요.\n추가하고 싶은 곳이 있으신가요?`;
+        nextOptions = ['케이블카도 탈래', '향일암까지 가능해?'];
+      }
     }
   }
 
@@ -2544,13 +2572,19 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
     const _yisunsinVehicleBypass = _psqPlaceCode === 'lee_soon_shin_plaza'
       && soulContext.has_car
       && /(차로|자가용으로)/.test(message);
+    // Odongdo companion+vehicle bypass — companion prefix required to exclude pure vehicle queries (O-5)
+    const _odongdoVehicleBypass = _psqPlaceCode === 'odongdo'
+      && soulContext.has_car
+      && /(차로|자가용으로)/.test(message)
+      && /(부모님과|아이와|가족과)/.test(message);
     const _ldGuardBypass =
       /^(안녕|안녕하세요|반가워|하이|hello|hi)[\s!.?]*$/i.test(message.trim())
       || /(잘 모르겠|모르겠어|뭐가 좋을|뭐 해야|어떡하|어쩌)/.test(message)
       || (/케이블카|케이블 카/.test(message) && /(꼭|반드시|타고 싶|타야|빼고|빼줘|제외|일정에|탈거야)/.test(message))
       || /(부모님과|아이와|가족과).*(왔어|왔어요|왔는데|함께라면|함께 왔|와서|가려고)/.test(message)
       || /(이곳에서.*(즐기|어떻게)|어떻게.*즐기)/.test(message)
-      || _yisunsinVehicleBypass;
+      || _yisunsinVehicleBypass
+      || _odongdoVehicleBypass;
     if (_psqPlaceCode && !_ldGuardBypass) {
       try {
         const _ldPlace = await travelGuideService.getPlaceByCode(_psqPlaceCode);
@@ -2584,6 +2618,9 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
           if (soulContext.people_type === 'family_elderly') {
             if (_ccPlace.physical_difficulty === 'high') {
               _ccParts.push('경사나 계단이 있어요. 이동 동선을 미리 확인해보세요.');
+            } else if (_ccPlace.code === 'odongdo') {
+              // Odongdo: "이동 부담이 적어요" 미노출 — walking_ok로 보행 부담 신중 안내 (Founder C5 guardrail)
+              if (_ccKnowledge.walking_ok) _ccParts.push(_ccKnowledge.walking_ok);
             } else if (Array.isArray(_ccPlace.suitable_for) && _ccPlace.suitable_for.includes('elderly')) {
               const _stayMin = _ccPlace.avg_stay_minutes;
               const _isOutdoor = _ccPlace.venue_type === 'outdoor';
@@ -2603,7 +2640,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
               else if (_stayMin)          _ccParts.push(`보통 약 ${_stayMin}분 정도 머물러요.`);
             }
           }
-          if (soulContext.has_car && _ccPlace.code === 'lee_soon_shin_plaza') {
+          if (soulContext.has_car && (_ccPlace.code === 'lee_soon_shin_plaza' || _ccPlace.code === 'odongdo')) {
             const _parkingTrust = _ccKnowledge.parking_trust;
             if (_parkingTrust === 'UNKNOWN') {
               _ccParts.push(`차로 이동하시는군요. ${_ccName} 인근 주차 정보는 방문 전에 확인해보세요.`);
