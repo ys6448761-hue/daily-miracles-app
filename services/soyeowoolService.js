@@ -2576,11 +2576,17 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
               else if (_stayMin)          _ccParts.push(`보통 약 ${_stayMin}분 정도 머물러요.`);
             }
           }
+          const _ccAccessibilityQ =
+            soulContext.people_type === 'family_elderly' &&
+            _ccPlace.physical_difficulty === 'high' &&
+            !soulContext.mobility_constraint
+              ? ['걷기 많이 힘드신가요?'] : [];
           return {
             ok: true,
             payload: {
               ..._buildPlaceLookupClientPayload(_ccPlace, sessionId, null),
               message_ko: _ccParts.join('\n'),
+              next_options: _ccAccessibilityQ,
             },
           };
         }
