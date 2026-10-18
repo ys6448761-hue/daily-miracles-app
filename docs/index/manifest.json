@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-18T05:05:14.044Z",
+  "generated_at": "2026-10-18T06:52:53.212Z",
   "generator": "generate-manifest.js",
-  "total_count": 480,
+  "total_count": 481,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -8371,6 +8371,22 @@
       "checksum": "70654769"
     },
     {
+      "id": "DOC-SOUL_DOLSAN_BRIDGE_PHASE1_CLOS",
+      "path": "docs/architecture/SOUL_DOLSAN_BRIDGE_PHASE1_CLOSURE_EVIDENCE_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture"
+      ],
+      "owner": "code",
+      "status": "|---",
+      "title": "SOUL Dolsan Bridge Phase 1 Minimal — Closure Evidence V1",
+      "created_at": "|---|---|---|",
+      "checksum": "7452269b"
+    },
+    {
       "id": "DOC-SOUL_DOLSAN_PARK_PHASE1_CLOSUR",
       "path": "docs/architecture/SOUL_DOLSAN_PARK_PHASE1_CLOSURE_EVIDENCE_V1.md",
       "type": "document",
@@ -8384,7 +8400,7 @@
       "status": "Live",
       "title": "SOUL Dolsan Park Phase 1 Minimal — Closure Evidence V1",
       "created_at": "|---|---|---|",
-      "checksum": "cb0d0466"
+      "checksum": "e6879a0b"
     },
     {
       "id": "DOC-MASTER-CONTROL",
