@@ -279,7 +279,7 @@ const _PLACE_KNOWLEDGE = {
     admission_ko: '무료예요.',
     parking_ko: '공영주차장이 있어요. 최초 1시간 무료, 이후 10분당 200원이에요. 방문 전 현장 안내판을 확인해보세요.',
     hours_ko: '연중개방 (24시간)이에요.',
-    experience_ko: '여수 야경을 보기 가장 좋은 곳 중 하나예요. 돌산대교·이순신광장·장군도를 한눈에 볼 수 있어요. 반려동물도 함께 갈 수 있어요.',
+    experience_ko: '돌산공원은 여수의 야경을 높은 곳에서 바라볼 수 있는 공간이에요. 밤이 되면 돌산대교와 바다, 도시의 불빛이 한눈에 들어와요. 하루를 돌아보며 마음속에 남은 생각을 조용히 정리할 수 있는 곳이에요.',
     fit_ko: '야경 감상에 좋아요. 반려동물 동반 가능해요. 2층버스 종점이라 대중교통으로도 오기 편해요.',
     unknown_boundary: '야경 최적 시간대는 계절에 따라 달라요. 현장에서 확인해보세요.',
   },
@@ -1298,6 +1298,11 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
 
   // Cablecar "어때요" — cablecar-scoped (CBL-1)
   else if (code === 'cablecar' && /어때요/.test(msg)) {
+    if (knowledge.experience_ko) answer = knowledge.experience_ko;
+  }
+
+  // Dolsan Park "어때요" — dolsan_nightscape-scoped (DNP-1)
+  else if (code === 'dolsan_nightscape' && /어때요/.test(msg)) {
     if (knowledge.experience_ko) answer = knowledge.experience_ko;
   }
 
