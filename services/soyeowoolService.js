@@ -1855,7 +1855,7 @@ function _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionI
 // ─── SOUL MINIMUM JOURNEY CONTINUITY V0.1 ─────────────────────────────────────
 // 5 Decision Types within the current conversation session.
 // Journey state: journey_ctx.conversation_journey — no new DB schema.
-// Scope: cablecar / odongdo / hyangiram only.
+// Scope: cablecar / odongdo / hyangiram / marine_park / dolsan_nightscape / dolsan_daegyo.
 // All physical_difficulty data read from DB via getPlaceByCode() — not hardcoded.
 
 const _CONV_GOLDEN_KO = {
