@@ -23,18 +23,30 @@ Last Updated: 2026-10-18
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-18
 
-**Founder — 돌산대교 SOUL Phase 1 읽기 전용 Discovery 착수 승인 여부 결정 (R20 수정 제외)**
+**Founder — Dolsan Bridge Phase 1 Closure Docs-only PR Guardian 결과 검토 및 Squash Merge 승인 여부 결정**
+- Dolsan Bridge Phase 1: DEPLOYED_AND_RUNTIME_VERIFIED — CLOSURE_PR_OPEN (Founder Merge 승인 대기)
+  - Code PR #81 MERGED (Squash) SHA: `3fb07234701c6ae4cbae004b6ac916610d40d0df` / KST 15:26
+  - Production LIVE SHA: `3fb07234701c6ae4cbae004b6ac916610d40d0df` / Deploy: `dep-dba6jpvbtjjs73e0b5fg` / LIVE: 15:43 KST
+  - Runtime QA: 13/13 PASS / 신규 회귀 0 / R20 PRE-EXISTING FAIL UNRESOLVED
+  - Closure Evidence: `docs/architecture/SOUL_DOLSAN_BRIDGE_PHASE1_CLOSURE_EVIDENCE_V1.md`
 - Dolsan Park Phase 1: CLOSED — DEPLOYED_AND_VERIFIED (P-2 ADVISORY TRACKED)
-- Closure PR #79 MERGED: `2c94e058f61abc26c246bcd960cc8e0ce4c4c7eb` / main HEAD: `2c94e058f61abc26c246bcd960cc8e0ce4c4c7eb`
-- Production Live SHA: `deec9225213c7a6fe553304992031350168a3893` / Deploy: `dep-dba4gg2jnfac73eb1ke0` / LIVE: 13:19 KST
-- Runtime QA: 10 PASS / 1 ADVISORY (P-2 PRE-EXISTING) / 0 신규 회귀
-- P-2 ADVISORY (UNRESOLVED): 별칭+어때? → PLACE_LOOKUP 우선, parking_ko PSQ 미도달
-- R20 PRE-EXISTING FAIL (UNRESOLVED): dolsan_daegyo JOURNEY_CONTINUITY 기존 실패
-- Cablecar Phase 1: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-18) / Issue #76 (weather_ko 라우팅)
+- Cablecar Phase 1: CLOSED — DEPLOYED_AND_VERIFIED / Issue #76 (weather_ko 라우팅)
+- R20 PRE-EXISTING FAIL (UNRESOLVED): dolsan_daegyo "걸어서 건너갈 수 있어?" → JOURNEY_CONTINUITY
 
 ---
 
 ### 완료된 작업 기록 (2026-10-18)
+
+- **Dolsan Bridge SOUL Phase 1 Minimal: DEPLOYED_AND_RUNTIME_VERIFIED — CLOSURE_PR_OPEN (2026-10-18)**
+  - Founder Decisions: experience_ko Founder 직접 문구 / Option A-1 Minimal / R20 제외
+  - Code PR #81 Squash Merge SHA: `3fb07234701c6ae4cbae004b6ac916610d40d0df` / KST 15:26
+  - Production SHA: `3fb07234701c6ae4cbae004b6ac916610d40d0df` / Deploy: `dep-dba6jpvbtjjs73e0b5fg` / LIVE: 15:43 KST
+  - Scope: DB-1 (experience_ko Founder 승인 문구 — 흐름·전환) — 기존 PLACE_LOOKUP 경로 재사용
+  - 신규: soulDolsanBridgePhase1.test.js 15/15 PASS
+  - 회귀: 신규 0건 (기존 failing 대비 P-1+P-2 개선)
+  - Production Runtime QA: 13/13 PASS / R20 PRE-EXISTING FAIL UNRESOLVED
+  - Evidence: `docs/architecture/SOUL_DOLSAN_BRIDGE_PHASE1_CLOSURE_EVIDENCE_V1.md`
+  - 제외: LDF 분기 / PSQ 라우팅 / JOURNEY_PREFERENCE / R20 / DB·Schema — Phase 2 후보
 
 - **Dolsan Park SOUL Phase 1 Minimal: CLOSED — DEPLOYED_AND_VERIFIED (P-2 ADVISORY TRACKED, 2026-10-18)**
   - Founder Decisions: D-1 (experience_ko Founder 직접 문구) / D-2 (Option A Minimal)
