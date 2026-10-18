@@ -23,21 +23,23 @@ Last Updated: 2026-10-17
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-18
 
-**Founder — Cable Car SOUL Phase 1 Production Deploy 승인 대기**
-- Cablecar Phase 1 Minimal: MERGED — PRODUCTION_DEPLOY_PENDING (PR #74 @7951fd0, 2026-10-18)
-- Production Live SHA: `896e4d5ec37dc1937ee361c3090bfded2b7d1e6e` / Render: `dep-db9v233ncjis73ap46cg` (불변)
-- CBL-1~CBL-9 52/52 PASS / Regression 183/183 PASS / AIL Gate PASS / docker-smoke PASS
+**Founder — 다음 장소 확장 우선순위 결정 대기**
+- Cablecar Phase 1: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-18)
+- P-6 Advisory: Issue #76 등록 (weather_ko 라우팅, Phase 2 후보)
+- Production Live SHA: `f446328491aebd037ed40229c55d229bf9c81b43` / Deploy: `dep-dba2njfavr4c73fu5rc0` / LIVE: 11:18 KST
 
 ---
 
 ### 완료된 작업 기록 (2026-10-18)
 
-- **Cablecar SOUL Phase 1 Minimal: MERGED — PRODUCTION_DEPLOY_PENDING (2026-10-18)**
+- **Cablecar SOUL Phase 1 Minimal: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-18)**
   - PR #74 Squash Merge SHA: `7951fd0cee8ba9d3bfebf1359f4401b9003f8db8`
+  - Production SHA: `f446328491aebd037ed40229c55d229bf9c81b43` / Deploy: `dep-dba2njfavr4c73fu5rc0` / LIVE: 11:18 KST
   - Scope: C1a (experience_ko) + C2a ("어때요" PSQ 분기) — Founder C-1/C-5 승인 문구 정확 반영
   - 신규: soulCablecarPhase1.test.js CBL-1~CBL-9 + GV-01~GV-07 52/52 PASS
   - 회귀: Hyangiram 66 / Odongdo 57 / YiSunSin 39 / CaseC 21 = 183/183 PASS
-  - AIL Gate PASS / docker-smoke PASS / Production 배포 미실행 (Founder 별도 승인 필요)
+  - Production Runtime QA: 8/9 PASS / P-6 ADVISORY (weather_ko 미라우팅, Issue #76 등록)
+  - Evidence: `docs/architecture/SOUL_CABLE_CAR_PHASE1_CLOSURE_EVIDENCE_V1.md`
   - 제외: JOURNEY_PREFERENCE / Companion Chip / parking_trust / DB·Schema — Phase 2 후보
 
 - **Hyangiram SOUL Phase 1: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-18)**
