@@ -23,19 +23,20 @@ Last Updated: 2026-10-18
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-18
 
-**Founder — Closure 문서 PR Squash Merge 승인 대기**
-- Dolsan Park Phase 1: DEPLOYED_AND_VERIFIED — CLOSURE PR PENDING (P-2 ADVISORY TRACKED)
+**Founder — 돌산대교 SOUL Phase 1 읽기 전용 Discovery 착수 승인 여부 결정 (R20 수정 제외)**
+- Dolsan Park Phase 1: CLOSED — DEPLOYED_AND_VERIFIED (P-2 ADVISORY TRACKED)
+- Closure PR #79 MERGED: `2c94e058f61abc26c246bcd960cc8e0ce4c4c7eb` / main HEAD: `2c94e058f61abc26c246bcd960cc8e0ce4c4c7eb`
 - Production Live SHA: `deec9225213c7a6fe553304992031350168a3893` / Deploy: `dep-dba4gg2jnfac73eb1ke0` / LIVE: 13:19 KST
 - Runtime QA: 10 PASS / 1 ADVISORY (P-2 PRE-EXISTING) / 0 신규 회귀
-- P-2 Advisory: 별칭+어때? → PLACE_LOOKUP 우선, parking_ko PSQ 미도달 (PRE-EXISTING, Issue 생성 미승인)
-- R20: dolsan_daegyo JOURNEY_CONTINUITY (PRE-EXISTING FAIL, 미해결 유지)
+- P-2 ADVISORY (UNRESOLVED): 별칭+어때? → PLACE_LOOKUP 우선, parking_ko PSQ 미도달
+- R20 PRE-EXISTING FAIL (UNRESOLVED): dolsan_daegyo JOURNEY_CONTINUITY 기존 실패
 - Cablecar Phase 1: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-18) / Issue #76 (weather_ko 라우팅)
 
 ---
 
 ### 완료된 작업 기록 (2026-10-18)
 
-- **Dolsan Park SOUL Phase 1 Minimal: DEPLOYED_AND_VERIFIED — CLOSURE PR PENDING (2026-10-18)**
+- **Dolsan Park SOUL Phase 1 Minimal: CLOSED — DEPLOYED_AND_VERIFIED (P-2 ADVISORY TRACKED, 2026-10-18)**
   - Founder Decisions: D-1 (experience_ko Founder 직접 문구) / D-2 (Option A Minimal)
   - PR #78 Squash Merge SHA: `deec9225213c7a6fe553304992031350168a3893`
   - Production SHA: `deec9225213c7a6fe553304992031350168a3893` / Deploy: `dep-dba4gg2jnfac73eb1ke0` / LIVE: 13:19 KST
