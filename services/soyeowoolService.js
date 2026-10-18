@@ -228,6 +228,7 @@ const _PLACE_KNOWLEDGE = {
     weather_ko: '실외 고공 구간이 있어서, 강풍이나 기상 악화 시 운행이 중단될 수 있어요. 당일 날씨를 미리 확인해보세요.',
     parking_ko: '자산(해야)·돌산(놀아) 양쪽 정류장 모두 접근 가능해요. 주차 위치·혼잡은 출발 정류장에 따라 달라요.',
     experience_ko: '여수 바다 위를 가로지르는 해상 케이블카예요. 바다와 섬, 항구를 높은 곳에서 바라보며 잠시 시야를 넓힐 수 있어요. 익숙한 풍경도 조금 다른 눈으로 바라보게 되는 시간이 될 수 있어요.',
+    emotional_role: '상승 / 시야 확장',
   },
   odongdo: {
     phone: '061-659-1819',
@@ -235,6 +236,7 @@ const _PLACE_KNOWLEDGE = {
     hours_ko: '연중무휴 (동백열차 09:00~17:00)',
     hours_trust: 'NON_OFFICIAL',
     experience_ko: '오동도는 바다 풍경과 계절의 자연을 느끼며 산책할 수 있는 곳이에요. 방파제 길과 섬 안쪽의 산책 경험을 자신의 속도에 맞춰 즐겨보세요.',
+    emotional_role: '재충전 / 자연 회복',
     fit_ko: '자연과 바다를 천천히 즐기고 싶은 분께 잘 어울려요. 부모님이나 아이와 함께라면 걷는 거리와 쉬는 시간을 고려해 동선을 정해보세요.',
     walking_ok: '오동도는 산책을 즐기는 장소예요. 어느 구간까지 이동하느냐에 따라 걷는 부담이 달라질 수 있어요. 걷기가 부담스럽다면 이동 범위를 짧게 잡고 중간에 쉬어가는 편을 추천해요.',
     parking_ko: null,
@@ -280,6 +282,7 @@ const _PLACE_KNOWLEDGE = {
     parking_ko: '공영주차장이 있어요. 최초 1시간 무료, 이후 10분당 200원이에요. 방문 전 현장 안내판을 확인해보세요.',
     hours_ko: '연중개방 (24시간)이에요.',
     experience_ko: '돌산공원은 여수의 야경을 높은 곳에서 바라볼 수 있는 공간이에요. 밤이 되면 돌산대교와 바다, 도시의 불빛이 한눈에 들어와요. 하루를 돌아보며 마음속에 남은 생각을 조용히 정리할 수 있는 곳이에요.',
+    emotional_role: '여운·다짐·마무리',
     fit_ko: '야경 감상에 좋아요. 반려동물 동반 가능해요. 2층버스 종점이라 대중교통으로도 오기 편해요.',
     unknown_boundary: '야경 최적 시간대는 계절에 따라 달라요. 현장에서 확인해보세요.',
   },
@@ -290,6 +293,7 @@ const _PLACE_KNOWLEDGE = {
     hours_ko: null,
     hamel_hours_ko: '하멜전시관은 09:00~18:00, 월요일 휴무예요.',
     experience_ko: '1.5km 산책로가 있는 해안 공원이에요. 공원 안에 하멜전시관이 있어요. 미남크루즈와 이사부크루즈 코스도 이곳을 지나가요.',
+    emotional_role: '쉼 / 정리·고요함',
     fit_ko: '산책·휴식을 즐기기 좋아요. 하멜과 여수의 인연이 궁금한 분께 하멜전시관을 추천해요.',
     unknown_boundary: '공원 야간 개방 여부는 확인이 필요해요.',
   },
@@ -298,6 +302,7 @@ const _PLACE_KNOWLEDGE = {
     admission_ko: null,
     hours_ko: null,
     experience_ko: '돌산대교는 여수 시내와 돌산도를 이어주는 다리예요. 밤이 되면 다리 위의 불빛과 바다가 어우러져 여수의 풍경을 조금 다르게 느낄 수 있어요. 한쪽에서 다른 쪽으로 이어지는 길을 바라보며, 마음도 천천히 다음 순간으로 넘어가는 시간을 가져보세요.',
+    emotional_role: '흐름·전환',
     fit_ko: '야경 감상 동선에 포함돼요. 크루즈에서도 볼 수 있어요.',
     unknown_boundary: '도보로 건너는 게 가능한지는 현장에서 확인해보세요.',
   },
@@ -1853,12 +1858,22 @@ function _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionI
 // Scope: cablecar / odongdo / hyangiram only.
 // All physical_difficulty data read from DB via getPlaceByCode() — not hardcoded.
 
-const _CONV_GOLDEN_KO = { odongdo: '오동도', cablecar: '케이블카', hyangiram: '향일암' };
+const _CONV_GOLDEN_KO = {
+  odongdo: '오동도',
+  cablecar: '케이블카',
+  hyangiram: '향일암',
+  marine_park: '종포해양공원',
+  dolsan_nightscape: '돌산공원',
+  dolsan_daegyo: '돌산대교',
+};
 
 function _extractGoldenPlaceCode(message) {
   if (/오동도/.test(message)) return 'odongdo';
   if (/케이블카|케이블 카/.test(message)) return 'cablecar';
   if (/향일암/.test(message)) return 'hyangiram';
+  if (/종포해양공원|해양공원/.test(message)) return 'marine_park';
+  if (/돌산공원/.test(message)) return 'dolsan_nightscape';
+  if (/돌산대교/.test(message)) return 'dolsan_daegyo';
   return null;
 }
 
@@ -1977,9 +1992,26 @@ async function _handleJourneyDecision({ decisionType, message, soulContext, conv
   // B. JOURNEY_ADD
   else if (decisionType === 'JOURNEY_ADD' && placeCode) {
     const ko = _CONV_GOLDEN_KO[placeCode];
+    // Level B: capture prior included places before upsert (proposal form — do not assert visits)
+    const priorIncluded = updatedConvJourney.places.filter(p => p.status === 'included' && p.code !== placeCode);
     updatedConvJourney.places = _convJourneyUpsertPlace(updatedConvJourney, placeCode, { status: 'included' });
     const includedKo = _convJourneyIncludedKo(updatedConvJourney);
     soulMsg = `${ko}도 함께 넣을게요.\n지금까지: ${includedKo}.`;
+    // Level B: emotional transition sentence — only when prior included place exists and both have confirmed roles
+    const priorPlace = priorIncluded.length > 0 ? priorIncluded[priorIncluded.length - 1] : null;
+    if (priorPlace) {
+      const priorKnowledge = _PLACE_KNOWLEDGE[priorPlace.code];
+      const nextKnowledge = _PLACE_KNOWLEDGE[placeCode];
+      const priorRole = priorKnowledge && priorKnowledge.emotional_role;
+      const nextRole = nextKnowledge && nextKnowledge.emotional_role;
+      if (priorRole && nextRole) {
+        const priorKo = _CONV_GOLDEN_KO[priorPlace.code] || priorPlace.code;
+        const priorShort = priorRole.split(/[\/·]/)[0].trim();
+        const nextShort = nextRole.split(/[\/·]/)[0].trim();
+        const uro = _koreanParticle(nextShort, '으로', '로');
+        soulMsg += `\n${priorKo}의 ${priorShort}에서, ${ko}의 ${nextShort}${uro} 이어지는 여정이에요.`;
+      }
+    }
     nextOptions = ['향일암까지 가능해?', '다른 곳은요?'];
   }
 
