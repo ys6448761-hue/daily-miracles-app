@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-18T02:35:01.155Z",
+  "generated_at": "2026-10-18T04:40:54.907Z",
   "generator": "generate-manifest.js",
-  "total_count": 479,
+  "total_count": 480,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -8369,6 +8369,22 @@
       "title": "SOUL Cable Car Phase 1 Minimal — Closure Evidence V1",
       "created_at": "|---|---|---|",
       "checksum": "70654769"
+    },
+    {
+      "id": "DOC-SOUL_DOLSAN_PARK_PHASE1_CLOSUR",
+      "path": "docs/architecture/SOUL_DOLSAN_PARK_PHASE1_CLOSURE_EVIDENCE_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture"
+      ],
+      "owner": "code",
+      "status": "Live",
+      "title": "SOUL Dolsan Park Phase 1 Minimal — Closure Evidence V1",
+      "created_at": "|---|---|---|",
+      "checksum": "cb0d0466"
     },
     {
       "id": "DOC-MASTER-CONTROL",

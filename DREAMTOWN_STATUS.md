@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-17
+Last Updated: 2026-10-18
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,14 +23,29 @@ Last Updated: 2026-10-17
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-18
 
-**Founder — 다음 장소 확장 우선순위 결정 대기**
-- Cablecar Phase 1: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-18)
-- P-6 Advisory: Issue #76 등록 (weather_ko 라우팅, Phase 2 후보)
-- Production Live SHA: `f446328491aebd037ed40229c55d229bf9c81b43` / Deploy: `dep-dba2njfavr4c73fu5rc0` / LIVE: 11:18 KST
+**Founder — Closure 문서 PR Squash Merge 승인 대기**
+- Dolsan Park Phase 1: DEPLOYED_AND_VERIFIED — CLOSURE PR PENDING (P-2 ADVISORY TRACKED)
+- Production Live SHA: `deec9225213c7a6fe553304992031350168a3893` / Deploy: `dep-dba4gg2jnfac73eb1ke0` / LIVE: 13:19 KST
+- Runtime QA: 10 PASS / 1 ADVISORY (P-2 PRE-EXISTING) / 0 신규 회귀
+- P-2 Advisory: 별칭+어때? → PLACE_LOOKUP 우선, parking_ko PSQ 미도달 (PRE-EXISTING, Issue 생성 미승인)
+- R20: dolsan_daegyo JOURNEY_CONTINUITY (PRE-EXISTING FAIL, 미해결 유지)
+- Cablecar Phase 1: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-18) / Issue #76 (weather_ko 라우팅)
 
 ---
 
 ### 완료된 작업 기록 (2026-10-18)
+
+- **Dolsan Park SOUL Phase 1 Minimal: DEPLOYED_AND_VERIFIED — CLOSURE PR PENDING (2026-10-18)**
+  - Founder Decisions: D-1 (experience_ko Founder 직접 문구) / D-2 (Option A Minimal)
+  - PR #78 Squash Merge SHA: `deec9225213c7a6fe553304992031350168a3893`
+  - Production SHA: `deec9225213c7a6fe553304992031350168a3893` / Deploy: `dep-dba4gg2jnfac73eb1ke0` / LIVE: 13:19 KST
+  - Scope: E1a (experience_ko Founder 승인 문구) + E2a (dolsan_nightscape "어때요" LDF 분기)
+  - 신규: soulDolsanParkPhase1.test.js 33/33 PASS
+  - 회귀: Cablecar 52 / Hyangiram 66 / Odongdo 57 / YiSunSin 39 / CaseC 21 = 235/235 PASS
+  - Production Runtime QA: 10/11 PASS / P-2 ADVISORY (별칭+어때? → PLACE_LOOKUP 우선, parking_ko 미도달, PRE-EXISTING)
+  - P-9 R20 Baseline: dolsan_daegyo JOURNEY_CONTINUITY — 기존 실패 동일 (PRE-EXISTING FAIL, 미해결)
+  - Evidence: `docs/architecture/SOUL_DOLSAN_PARK_PHASE1_CLOSURE_EVIDENCE_V1.md`
+  - 제외: JOURNEY_PREFERENCE / Companion Chip / parking_trust / dolsan_daegyo / DB·Schema — Phase 2 후보
 
 - **Cablecar SOUL Phase 1 Minimal: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-18)**
   - PR #74 Squash Merge SHA: `7951fd0cee8ba9d3bfebf1359f4401b9003f8db8`
