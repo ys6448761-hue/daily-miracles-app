@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-18T06:52:53.212Z",
+  "generated_at": "2026-10-18T23:38:55.588Z",
   "generator": "generate-manifest.js",
-  "total_count": 481,
+  "total_count": 483,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -471,6 +471,23 @@
       "title": "DreamTown Galaxy Mode SSOT",
       "created_at": "내용",
       "checksum": "bae6a841"
+    },
+    {
+      "id": "DOC-CEO-WEEKLY-2026-W42",
+      "path": "docs/reports/CEO-WEEKLY-2026-W42.md",
+      "type": "report",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "reports",
+      "tags": [
+        "reports",
+        "aurora"
+      ],
+      "owner": "comi",
+      "status": "active",
+      "title": "CEO-WEEKLY-2026-W42",
+      "created_at": "2026-10-18T19:39:45.792Z",
+      "checksum": "a5c8b308"
     },
     {
       "id": "DOC-aurora5-master-knowledge-v2",
@@ -8384,7 +8401,7 @@
       "status": "|---",
       "title": "SOUL Dolsan Bridge Phase 1 Minimal — Closure Evidence V1",
       "created_at": "|---|---|---|",
-      "checksum": "7452269b"
+      "checksum": "d15df799"
     },
     {
       "id": "DOC-SOUL_DOLSAN_PARK_PHASE1_CLOSUR",
@@ -8401,6 +8418,22 @@
       "title": "SOUL Dolsan Park Phase 1 Minimal — Closure Evidence V1",
       "created_at": "|---|---|---|",
       "checksum": "e6879a0b"
+    },
+    {
+      "id": "DOC-SOUL_LEVEL_B_EMOTIONAL_CONTINU",
+      "path": "docs/architecture/SOUL_LEVEL_B_EMOTIONAL_CONTINUITY_CLOSURE_EVIDENCE_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture"
+      ],
+      "owner": "code",
+      "status": "|---",
+      "title": "SOUL Option 2 Level B — Inter-Place Emotional Continuity Closure Evidence V1",
+      "created_at": "|---|---|---|",
+      "checksum": "3a90ee3c"
     },
     {
       "id": "DOC-MASTER-CONTROL",
