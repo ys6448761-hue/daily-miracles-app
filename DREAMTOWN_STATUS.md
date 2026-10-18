@@ -23,8 +23,8 @@ Last Updated: 2026-10-18
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-18
 
-**Founder — Dolsan Bridge Phase 1 Closure Docs-only PR Guardian 결과 검토 및 Squash Merge 승인 여부 결정**
-- Dolsan Bridge Phase 1: DEPLOYED_AND_RUNTIME_VERIFIED — CLOSURE_PR_OPEN (Founder Merge 승인 대기)
+**Founder — 장소 간 감정 연결 품질에 대한 읽기 전용 Discovery 착수 승인 여부 결정 (기존 EP01 Route·SSOT 변경 없음, R20 수정 제외)**
+- Dolsan Bridge Phase 1: CLOSED — DEPLOYED_AND_VERIFIED (R20 PRE-EXISTING FAIL TRACKED)
   - Code PR #81 MERGED (Squash) SHA: `3fb07234701c6ae4cbae004b6ac916610d40d0df` / KST 15:26
   - Production LIVE SHA: `3fb07234701c6ae4cbae004b6ac916610d40d0df` / Deploy: `dep-dba6jpvbtjjs73e0b5fg` / LIVE: 15:43 KST
   - Runtime QA: 13/13 PASS / 신규 회귀 0 / R20 PRE-EXISTING FAIL UNRESOLVED
