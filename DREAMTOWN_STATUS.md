@@ -23,14 +23,22 @@ Last Updated: 2026-10-17
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-18
 
-**Founder — 다음 장소 확장 우선순위 결정 대기**
-- Hyangiram Phase 1: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-18 07:07 KST)
-- Production Live SHA: `896e4d5ec37dc1937ee361c3090bfded2b7d1e6e` / Render: `dep-db9v233ncjis73ap46cg`
-- Runtime QA H-1~H-7: 7/7 PASS / R-1~R-4: 4/4 PASS / Guardrail violations: 0
+**Founder — Cable Car SOUL Phase 1 Production Deploy 승인 대기**
+- Cablecar Phase 1 Minimal: MERGED — PRODUCTION_DEPLOY_PENDING (PR #74 @7951fd0, 2026-10-18)
+- Production Live SHA: `896e4d5ec37dc1937ee361c3090bfded2b7d1e6e` / Render: `dep-db9v233ncjis73ap46cg` (불변)
+- CBL-1~CBL-9 52/52 PASS / Regression 183/183 PASS / AIL Gate PASS / docker-smoke PASS
 
 ---
 
 ### 완료된 작업 기록 (2026-10-18)
+
+- **Cablecar SOUL Phase 1 Minimal: MERGED — PRODUCTION_DEPLOY_PENDING (2026-10-18)**
+  - PR #74 Squash Merge SHA: `7951fd0cee8ba9d3bfebf1359f4401b9003f8db8`
+  - Scope: C1a (experience_ko) + C2a ("어때요" PSQ 분기) — Founder C-1/C-5 승인 문구 정확 반영
+  - 신규: soulCablecarPhase1.test.js CBL-1~CBL-9 + GV-01~GV-07 52/52 PASS
+  - 회귀: Hyangiram 66 / Odongdo 57 / YiSunSin 39 / CaseC 21 = 183/183 PASS
+  - AIL Gate PASS / docker-smoke PASS / Production 배포 미실행 (Founder 별도 승인 필요)
+  - 제외: JOURNEY_PREFERENCE / Companion Chip / parking_trust / DB·Schema — Phase 2 후보
 
 - **Hyangiram SOUL Phase 1: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-18)**
   - PR #71 Squash Merge SHA: `6965910d4a95d0f740e3a275857d0bb416048dc6` (2026-10-17T21:26Z / KST 2026-10-18 06:26)
