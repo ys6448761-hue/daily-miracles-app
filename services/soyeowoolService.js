@@ -227,6 +227,7 @@ const _PLACE_KNOWLEDGE = {
     odongdo_connection_ko: '자산역(여수 쪽)에서 오동도 입구까지 버스 연계 동선으로 이어갈 수 있어요.',
     weather_ko: '실외 고공 구간이 있어서, 강풍이나 기상 악화 시 운행이 중단될 수 있어요. 당일 날씨를 미리 확인해보세요.',
     parking_ko: '자산(해야)·돌산(놀아) 양쪽 정류장 모두 접근 가능해요. 주차 위치·혼잡은 출발 정류장에 따라 달라요.',
+    experience_ko: '여수 바다 위를 가로지르는 해상 케이블카예요. 바다와 섬, 항구를 높은 곳에서 바라보며 잠시 시야를 넓힐 수 있어요. 익숙한 풍경도 조금 다른 눈으로 바라보게 되는 시간이 될 수 있어요.',
   },
   odongdo: {
     phone: '061-659-1819',
@@ -1292,6 +1293,11 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
 
   // Hyangiram "어때요" — hyangiram-scoped (H-1)
   else if (code === 'hyangiram' && /어때요/.test(msg)) {
+    if (knowledge.experience_ko) answer = knowledge.experience_ko;
+  }
+
+  // Cablecar "어때요" — cablecar-scoped (CBL-1)
+  else if (code === 'cablecar' && /어때요/.test(msg)) {
     if (knowledge.experience_ko) answer = knowledge.experience_ko;
   }
 
