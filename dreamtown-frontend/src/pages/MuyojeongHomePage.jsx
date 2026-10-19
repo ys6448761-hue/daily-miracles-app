@@ -265,6 +265,7 @@ export default function MuyojeongHomePage() {
     setSoulResponse(null);
     setErrorMsg(null);
     setInputValue('');
+    setSessionId(null); // session carry-over 차단: 새 질문은 새 세션으로 시작
     inputRef.current?.focus();
   }
 
