@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-19T04:09:42.366Z",
+  "generated_at": "2026-10-19T05:54:44.585Z",
   "generator": "generate-manifest.js",
-  "total_count": 484,
+  "total_count": 485,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -8420,6 +8420,23 @@
       "checksum": "e6879a0b"
     },
     {
+      "id": "DOC-SOUL_HAMEL_LIGHTHOUSE_PHASE1_C",
+      "path": "docs/architecture/SOUL_HAMEL_LIGHTHOUSE_PHASE1_CLOSURE_EVIDENCE_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture",
+        "소원"
+      ],
+      "owner": "team",
+      "status": "|---",
+      "title": "SOUL 하멜등대 Phase 1 Minimal — Closure Evidence V1",
+      "created_at": "|---|---|---|",
+      "checksum": "e40a0408"
+    },
+    {
       "id": "DOC-SOUL_LEVEL_B_EMOTIONAL_CONTINU",
       "path": "docs/architecture/SOUL_LEVEL_B_EMOTIONAL_CONTINUITY_CLOSURE_EVIDENCE_V1.md",
       "type": "document",
@@ -8449,7 +8466,7 @@
       "status": "|---",
       "title": "SOUL 종포해양공원 Phase 1 Minimal — Closure Evidence V1",
       "created_at": "|---|---|---|",
-      "checksum": "cd59469b"
+      "checksum": "bdd20268"
     },
     {
       "id": "DOC-MASTER-CONTROL",

@@ -23,18 +23,31 @@ Last Updated: 2026-10-19
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-19
 
-**Founder — 여수 SOUL Phase 1 다음 장소 결정 (7/10 완료, 하멜등대 독립 후보, R20 수정 제외)**
-- 여수 SOUL Phase 1 완료: 이순신광장 / 향일암 / 오동도 / 케이블카 / 돌산공원 / 돌산대교 / 종포해양공원 (7/10)
+**Founder — 여수 SOUL Phase 1 다음 장소 결정 (8/10 완료, R20 수정 제외)**
+- 여수 SOUL Phase 1 완료: 이순신광장 / 향일암 / 오동도 / 케이블카 / 돌산공원 / 돌산대교 / 종포해양공원 / 하멜등대 (8/10)
 - 목표: 여수 10곳
-- 다음 후보: 하멜등대 (독립 장소, marine_park 별칭 미추가 — Q2 결정)
 - EP02 달빛 항로: 보류 (Founder 결정 필요)
-- main HEAD: `11fac2c` (PR #86 Squash Merge, 2026-10-19 KST)
-- 종포해양공원 Phase 1: CLOSED — DEPLOYED_AND_VERIFIED (PR #86 / Deploy `dep-dbapag61egvs73bjo1l0`)
+- main HEAD: `8c4c07f` (PR #88 Squash Merge, 2026-10-19 KST)
+- 하멜등대 Phase 1: CLOSED — DEPLOYED_AND_VERIFIED (PR #88 / Deploy `dep-dbaqqkfbtjjs73886i9g`)
 - R20 PRE-EXISTING FAIL (UNRESOLVED): dolsan_daegyo "걸어서 건너갈 수 있어?" → JOURNEY_CONTINUITY
 
 ---
 
 ### 완료된 작업 기록 (2026-10-19)
+
+- **하멜등대 SOUL Phase 1 Minimal: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-19)**
+  - Founder Decisions: Q1 (독립 place_code hamel_lighthouse) / Q2 (experience_ko Founder 승인 문구) / Q3 (하멜전시관 운영정보 격리) / Q4 (미검증 정보 생성 금지) / Q5 (여수지방해양수산청 공식 좌표)
+  - Code PR #88 Squash Merge SHA: `8c4c07fcf2e5735d9a9abe87dca5bda7b785c9e6` / KST 2026-10-19
+  - Production SHA: `8c4c07fcf2e5735d9a9abe87dca5bda7b785c9e6` / Deploy: `dep-dbaqqkfbtjjs73886i9g` / LIVE: 14:43 KST
+  - Production DB: travel_places id=15, COMMITTED (14/14 필드 Seed 일치)
+  - Scope: HML-1 (PLACE_ALIAS_MAP) + HML-2 (_PLACE_KNOWLEDGE) + HML-3 ("어때요" LDF) + HML-4 (scope guard) + HML-5~6 (_CONV_GOLDEN_KO + _extractGoldenPlaceCode) + HML-7~8 (DB + Seed)
+  - 신규: soulHamelLighthousePhase1.test.js 26/26 PASS
+  - 회귀: 295/295 PASS / 합계 321/321 PASS
+  - Production Runtime QA: 10/10 PASS
+  - 하멜등대 ↔ 하멜전시관 격리 확인: QA-3/4/5 미검증 정보 미노출 / QA-6/7 marine_park hamel_hours_ko 정상
+  - Level B 격리 유지 (QA-10 "이어지는 여정" 미노출)
+  - Evidence: `docs/architecture/SOUL_HAMEL_LIGHTHOUSE_PHASE1_CLOSURE_EVIDENCE_V1.md`
+  - 제외: 운영시간·전화번호·입장료 / JOURNEY_PREFERENCE / Companion Chip / Level B / EP02 / R20 / P-2 / P-6
 
 - **종포해양공원 SOUL Phase 1 Minimal: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-19)**
   - Founder Decisions: Q1 (experience_ko Founder 승인 문구 — 미검증 수치 제거) / Q2 (하멜등대 미추가) / Q3 (하멜전시관 PSQ 포함)
