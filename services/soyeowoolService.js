@@ -292,7 +292,7 @@ const _PLACE_KNOWLEDGE = {
     admission_ko: '공원과 하멜전시관 모두 무료예요.',
     hours_ko: null,
     hamel_hours_ko: '하멜전시관은 09:00~18:00, 월요일 휴무예요.',
-    experience_ko: '1.5km 산책로가 있는 해안 공원이에요. 공원 안에 하멜전시관이 있어요. 미남크루즈와 이사부크루즈 코스도 이곳을 지나가요.',
+    experience_ko: '바다를 따라 산책할 수 있는 해안 공원이에요. 공원 안에 하멜전시관이 있어요.',
     emotional_role: '쉼 / 정리·고요함',
     fit_ko: '산책·휴식을 즐기기 좋아요. 하멜과 여수의 인연이 궁금한 분께 하멜전시관을 추천해요.',
     unknown_boundary: '공원 야간 개방 여부는 확인이 필요해요.',
@@ -1251,6 +1251,21 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
     answer = `${name} 내 포토존 위치는 아직 정확하게 파악하지 못했어요. 현장에서 직원에게 문의해보세요.`;
   }
 
+  // Hamel Exhibition Hall — marine_park specific.
+  // Must precede the general hours branch: when hours_ko is null (marine_park), the hours else-clause
+  // would shadow hamel_hours_ko responses for queries containing "열어" etc.
+  else if (/(하멜전시관|하멜 전시관|하멜|네덜란드|전시관)/.test(msg)) {
+    if (knowledge.hamel_hours_ko) {
+      const hamelPhone = knowledge.phone_hamel || knowledge.phone;
+      const hamelVerify = hamelPhone
+        ? `\n\n정확한 정보는 ${hamelPhone}에 문의하시거나 현장에서 확인해보세요.`
+        : '\n\n현장에서 직원에게 문의해보세요.';
+      answer = knowledge.hamel_hours_ko + hamelVerify;
+    } else if (knowledge.experience_ko) {
+      answer = knowledge.experience_ko + verifyNote;
+    }
+  }
+
   // Hours — alternative phrasings not caught by the operation branch ("몇 시까지", "마감", "열어")
   else if (/(몇 시까지|마감|닫어|닫나요|닫아|언제까지|열어|몇 시에 열|언제 열)/.test(msg)) {
     if (knowledge.hours_ko) {
@@ -1278,19 +1293,6 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
     }
   }
 
-  // Hamel Exhibition Hall — marine_park specific, before general experience branch
-  else if (/(하멜전시관|하멜 전시관|하멜|네덜란드|전시관)/.test(msg)) {
-    if (knowledge.hamel_hours_ko) {
-      const hamelPhone = knowledge.phone_hamel || knowledge.phone;
-      const hamelVerify = hamelPhone
-        ? `\n\n정확한 정보는 ${hamelPhone}에 문의하시거나 현장에서 확인해보세요.`
-        : '\n\n현장에서 직원에게 문의해보세요.';
-      answer = knowledge.hamel_hours_ko + hamelVerify;
-    } else if (knowledge.experience_ko) {
-      answer = knowledge.experience_ko + verifyNote;
-    }
-  }
-
   // Odongdo "어때요" — odongdo-scoped before generic experience pattern (Founder C2a guardrail)
   else if (code === 'odongdo' && /어때요/.test(msg)) {
     if (knowledge.experience_ko) answer = knowledge.experience_ko;
@@ -1308,6 +1310,11 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
 
   // Dolsan Park "어때요" — dolsan_nightscape-scoped (DNP-1)
   else if (code === 'dolsan_nightscape' && /어때요/.test(msg)) {
+    if (knowledge.experience_ko) answer = knowledge.experience_ko;
+  }
+
+  // Marine Park "어때요" — marine_park-scoped (MRP-1)
+  else if (code === 'marine_park' && /어때요/.test(msg)) {
     if (knowledge.experience_ko) answer = knowledge.experience_ko;
   }
 
