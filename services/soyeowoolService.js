@@ -53,6 +53,7 @@ const PLACE_ALIAS_MAP = {
   '스카이타워':     'sky_tower',
   '해양공원':       'marine_park',
   '종포해양공원':   'marine_park',
+  '하멜등대':       'hamel_lighthouse',
   '엑스포공원':     'yeosu_expo_park',
   '여수엑스포장':   'yeosu_expo_park',
   '엑스포장':       'yeosu_expo_park',
@@ -305,6 +306,14 @@ const _PLACE_KNOWLEDGE = {
     emotional_role: '흐름·전환',
     fit_ko: '야경 감상 동선에 포함돼요. 크루즈에서도 볼 수 있어요.',
     unknown_boundary: '도보로 건너는 게 가능한지는 현장에서 확인해보세요.',
+  },
+  // ── hamel_lighthouse — Phase 1 Minimal (2026-10-19) ─────────────────────────
+  // Operational info (phone/hours/admission) UNVERIFIED — not included.
+  // experience_ko: Founder-approved Q2 text (2026-10-19).
+  hamel_lighthouse: {
+    experience_ko: '하멜등대는 여수 바다를 바라보며 잠시 마음을 가다듬을 수 있는 장소예요. DreamTown에서는 소원을 품고 다시 희망을 바라보는 별빛 항로의 중요한 장소예요.',
+    emotional_role: '연결 / 공명',
+    unknown_boundary: '운영 및 접근 세부 정보는 현장에서 확인해주세요.',
   },
 };
 
@@ -1254,7 +1263,8 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
   // Hamel Exhibition Hall — marine_park specific.
   // Must precede the general hours branch: when hours_ko is null (marine_park), the hours else-clause
   // would shadow hamel_hours_ko responses for queries containing "열어" etc.
-  else if (/(하멜전시관|하멜 전시관|하멜|네덜란드|전시관)/.test(msg)) {
+  // scope guard: hamel_lighthouse is an independent place; its context must not enter this branch.
+  else if (code === 'marine_park' && /(하멜전시관|하멜 전시관|하멜|네덜란드|전시관)/.test(msg)) {
     if (knowledge.hamel_hours_ko) {
       const hamelPhone = knowledge.phone_hamel || knowledge.phone;
       const hamelVerify = hamelPhone
@@ -1315,6 +1325,11 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
 
   // Marine Park "어때요" — marine_park-scoped (MRP-1)
   else if (code === 'marine_park' && /어때요/.test(msg)) {
+    if (knowledge.experience_ko) answer = knowledge.experience_ko;
+  }
+
+  // Hamel Lighthouse "어때요" — hamel_lighthouse-scoped (HML-1)
+  else if (code === 'hamel_lighthouse' && /어때요/.test(msg)) {
     if (knowledge.experience_ko) answer = knowledge.experience_ko;
   }
 
@@ -1872,6 +1887,7 @@ const _CONV_GOLDEN_KO = {
   marine_park: '종포해양공원',
   dolsan_nightscape: '돌산공원',
   dolsan_daegyo: '돌산대교',
+  hamel_lighthouse: '하멜등대',
 };
 
 function _extractGoldenPlaceCode(message) {
@@ -1881,6 +1897,7 @@ function _extractGoldenPlaceCode(message) {
   if (/종포해양공원|해양공원/.test(message)) return 'marine_park';
   if (/돌산공원/.test(message)) return 'dolsan_nightscape';
   if (/돌산대교/.test(message)) return 'dolsan_daegyo';
+  if (/하멜등대/.test(message)) return 'hamel_lighthouse';
   return null;
 }
 

@@ -109,10 +109,20 @@ INSERT INTO travel_places (
  ARRAY['family', 'kids_ok', 'elderly']::text[],
  ARRAY['clear', 'all_season']::text[],
  'insight', ARRAY['view', 'quiet', 'observation']::text[],
+ NULL, 'VERIFIED'),
+
+-- STANDALONE (1/1) — 별도 star_zone 없음, 원도심 권역
+-- Evidence: 여수지방해양수산청 공식 (yeosu.mof.go.kr) — lat/lng VERIFIED 2026-10-19
+('hamel_lighthouse', NULL, 'KR', 'YEOSU',
+ '하멜등대', 'Hamel Lighthouse', '전라남도 여수시 종화동 458-7', 34.7364400, 127.7471000,
+ 'outdoor', NULL,
+ NULL,
+ NULL,
+ 'connection', ARRAY['resonance', 'memory', 'wish']::text[],
  NULL, 'VERIFIED');
 
 -- Verification counts:
 -- DEDUPLICATED: 2 places (E-1+ORIGIN-001=odongdo, S-1+ORIGIN-002=hyangiram)
--- TOTAL UNIQUE: 14 places (12 from star_zones + 2 from ORIGIN, net 14)
--- ALL trust_level values: 2 ORIGIN, 12 VERIFIED
+-- TOTAL UNIQUE: 15 places (12 from star_zones + 2 from ORIGIN + 1 STANDALONE, net 15)
+-- ALL trust_level values: 2 ORIGIN, 13 VERIFIED
 -- Status all: unknown (set by travel_live_status seed)
