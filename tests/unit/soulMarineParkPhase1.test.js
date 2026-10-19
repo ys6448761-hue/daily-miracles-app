@@ -45,7 +45,7 @@ const DOLSAN_PLACE = { code: 'dolsan_nightscape', name_ko: '돌산공원' };
 const PLACE_ALIAS_MAP = {
   '해양공원': 'marine_park',
   '종포해양공원': 'marine_park',
-  '하멜등대': undefined, // 미등록 확인용
+  '하멜등대': 'hamel_lighthouse', // 독립 장소 — marine_park 별칭 아님 (Phase 1 2026-10-19)
 };
 
 // ── Mirrors: _isPlaceSpecificQuery ───────────────────────────────────────────
@@ -311,8 +311,9 @@ test('MRP-7 — "누구랑 가면 좋아?" → fit_ko 포함', () => {
 // MRP-N1 — 하멜등대 미매핑 확인
 // ═══════════════════════════════════════════════════════════════════════════════
 
-test('MRP-N1 — PLACE_ALIAS_MAP에 "하멜등대" 미등록', () => {
-  expect(PLACE_ALIAS_MAP['하멜등대']).toBeUndefined();
+test('MRP-N1 — "하멜등대"는 marine_park 별칭이 아님 (hamel_lighthouse 독립 장소)', () => {
+  expect(PLACE_ALIAS_MAP['하멜등대']).not.toBe('marine_park');
+  expect(PLACE_ALIAS_MAP['하멜등대']).toBe('hamel_lighthouse');
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
