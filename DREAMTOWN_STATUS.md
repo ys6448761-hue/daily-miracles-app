@@ -23,17 +23,31 @@ Last Updated: 2026-10-19
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-19
 
-**Founder — Level B Closure Docs-only PR Squash Merge 승인 여부 결정**
-- Level B Implementation: MERGED_TO_MAIN (PR #84 SHA `855f6eb`) — 2026-10-19 07:21 KST
-- Level B Production: LIVE (Deploy `dep-dbakl2om7kps7397r0fg` / 07:41 KST)
-- Level B Runtime QA: 13/13 PASS (2026-10-19 이번 세션)
-- Closure Evidence: `docs/architecture/SOUL_LEVEL_B_EMOTIONAL_CONTINUITY_CLOSURE_EVIDENCE_V1.md`
-- Docs-only PR: OPEN (이번 세션 생성 예정)
+**Founder — 여수 SOUL Phase 1 다음 장소 결정 (7/10 완료, 하멜등대 독립 후보, R20 수정 제외)**
+- 여수 SOUL Phase 1 완료: 이순신광장 / 향일암 / 오동도 / 케이블카 / 돌산공원 / 돌산대교 / 종포해양공원 (7/10)
+- 목표: 여수 10곳
+- 다음 후보: 하멜등대 (독립 장소, marine_park 별칭 미추가 — Q2 결정)
+- EP02 달빛 항로: 보류 (Founder 결정 필요)
+- main HEAD: `11fac2c` (PR #86 Squash Merge, 2026-10-19 KST)
+- 종포해양공원 Phase 1: CLOSED — DEPLOYED_AND_VERIFIED (PR #86 / Deploy `dep-dbapag61egvs73bjo1l0`)
 - R20 PRE-EXISTING FAIL (UNRESOLVED): dolsan_daegyo "걸어서 건너갈 수 있어?" → JOURNEY_CONTINUITY
 
 ---
 
 ### 완료된 작업 기록 (2026-10-19)
+
+- **종포해양공원 SOUL Phase 1 Minimal: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-19)**
+  - Founder Decisions: Q1 (experience_ko Founder 승인 문구 — 미검증 수치 제거) / Q2 (하멜등대 미추가) / Q3 (하멜전시관 PSQ 포함)
+  - Scope Audit: hamel 분기 위치 이동 → `WITHIN_INTENT_BUT_SCOPE_EXPANDED` Founder 수용
+  - Code PR #86 Squash Merge SHA: `11fac2c21e2393128100f24e59579a42ff52cb64` / KST 2026-10-19
+  - Production SHA: `11fac2c21e2393128100f24e59579a42ff52cb64` / Deploy: `dep-dbapag61egvs73bjo1l0` / LIVE: 13:00 KST
+  - Scope: MRP-1 (experience_ko) + MRP-2 (marine_park "어때요" LDF) + MRP-3 (하멜전시관 PSQ routing fix)
+  - 신규: soulMarineParkPhase1.test.js 27/27 PASS
+  - 회귀: Cablecar 52 / DolsanPark 33 / DolsanBridge 15 / LevelB 14 = 114/114 PASS / 합계 141/141 PASS
+  - Production Runtime QA: 10/10 PASS
+  - QA-8: "하멜등대 어때요?" → CLARIFICATION (marine_park 오매핑 없음 확인)
+  - Evidence: `docs/architecture/SOUL_MARINE_PARK_PHASE1_CLOSURE_EVIDENCE_V1.md`
+  - 제외: 하멜등대 별칭 / JOURNEY_PREFERENCE / Companion Chip / parking / R20 / P-2 / P-6
 
 - **SOUL Option 2 Level B — Inter-Place Emotional Continuity: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-19)**
   - Founder Decisions: 5-place scope / JOURNEY_ADD 전용 / Option A (inline emotional_role) / 향일암 제외
