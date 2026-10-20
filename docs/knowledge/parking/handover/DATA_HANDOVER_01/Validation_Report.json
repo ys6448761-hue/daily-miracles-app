@@ -1,0 +1,68 @@
+{
+  "result": "PASS",
+  "checks": [
+    {
+      "check": "JSON syntax: four required files",
+      "result": "PASS"
+    },
+    {
+      "check": "26 parking IDs unique",
+      "result": "PASS"
+    },
+    {
+      "check": "19 sources with original records preserved",
+      "result": "PASS"
+    },
+    {
+      "check": "26 original facility records preserved",
+      "result": "PASS"
+    },
+    {
+      "check": "12 conflicts preserved",
+      "result": "PASS"
+    },
+    {
+      "check": "7 legacy scenarios and 21 options preserved",
+      "result": "PASS"
+    },
+    {
+      "check": "Evidence reference integrity",
+      "result": "PASS"
+    },
+    {
+      "check": "Mapping parking references resolve",
+      "result": "PASS"
+    },
+    {
+      "check": "Reference place codes only, no Repository confirmation asserted",
+      "result": "PASS"
+    },
+    {
+      "check": "UNKNOWN preserved in original records",
+      "result": "PASS"
+    },
+    {
+      "check": "Phone status and call-date provenance",
+      "result": "PASS"
+    },
+    {
+      "check": "Customer approval gate off",
+      "result": "PASS"
+    },
+    {
+      "check": "Course02 no forced third option",
+      "result": "PASS"
+    }
+  ],
+  "counts": {
+    "facilities": 26,
+    "evidence": 19,
+    "conflicts": 12,
+    "legacy_scenarios": 7,
+    "legacy_options": 21,
+    "mapping_drafts": 18,
+    "focused_courses": 2
+  },
+  "scope": "Data integrity only; no runtime/route/Production tests",
+  "checked_on": "2026-10-20"
+}
