@@ -53,8 +53,17 @@ const PLACE_DETAIL_CODE_MAP = {
 // Yeosu Blue #6EB8FF / Starlight Gold #FFD67A / Aqua Glow #B8F4FF
 const PAGE_BG = '#130b1e'; // page background — must match hero bottom gradient
 
+// ── Time options — shown when SOUL asks '시간이 얼마나 남으셨어요?' ─────────────
+// '1박 2일' 제외: routeSkeletonService 미구현 → routeSkeleton=null → _isMultiDayTrip 미설정
+const TIME_OPTIONS = [
+  { label: '2~3시간', message: '여수에서 2~3시간 있어요. 어디 갈까요?' },
+  { label: '반나절',  message: '여수에서 5시간 있어요. 어디 갈까요?' },
+  { label: '하루',    message: '여수에서 8시간 있어요. 어디 갈까요?' },
+];
+const TIME_QUESTION = '시간이 얼마나 남으셨어요?';
+
 // ── SOUL Answer Summary ────────────────────────────────────────────────────────
-function SoulAnswerSummary({ response, onNewQuestion }) {
+function SoulAnswerSummary({ response, onNewQuestion, onTimeSelect, isLoading }) {
   if (!response || !response.message_ko) return null;
 
   const navigate = useNavigate();
@@ -133,10 +142,36 @@ function SoulAnswerSummary({ response, onNewQuestion }) {
       )}
       {nextAction && (
         <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-          <p style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.38)', marginBottom: '4px' }}>다음에 알려주세요</p>
-          <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.68)', lineHeight: 1.5, wordBreak: 'keep-all' }}>
-            {nextAction}
-          </p>
+          <p style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.38)', marginBottom: '6px' }}>다음에 알려주세요</p>
+          {nextAction === TIME_QUESTION && onTimeSelect ? (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+              {TIME_OPTIONS.map((opt) => (
+                <button
+                  key={opt.label}
+                  onClick={() => onTimeSelect(opt.message)}
+                  disabled={isLoading}
+                  style={{
+                    padding:      '8px 10px',
+                    borderRadius: '10px',
+                    border:       '1px solid rgba(255,255,255,0.18)',
+                    background:   'rgba(255,255,255,0.07)',
+                    color:        isLoading ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.82)',
+                    fontSize:     '0.8125rem',
+                    cursor:       isLoading ? 'default' : 'pointer',
+                    wordBreak:    'keep-all',
+                    textAlign:    'center',
+                    minHeight:    '36px',
+                  }}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.68)', lineHeight: 1.5, wordBreak: 'keep-all' }}>
+              {nextAction}
+            </p>
+          )}
         </div>
       )}
       {isNavigable && (
@@ -529,7 +564,12 @@ export default function MuyojeongHomePage() {
 
         {/* ── SOUL ANSWER ── */}
         {soulResponse && !isLoading && (
-          <SoulAnswerSummary response={soulResponse} onNewQuestion={handleReset} />
+          <SoulAnswerSummary
+            response={soulResponse}
+            onNewQuestion={handleReset}
+            onTimeSelect={(msg) => _callSOUL(msg)}
+            isLoading={isLoading}
+          />
         )}
 
         {/* ── PLACE CARDS: SOUL과 먼저 둘러보기 ── */}
