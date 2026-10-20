@@ -1,0 +1,467 @@
+{
+  "title": "Parking Place Mapping Draft",
+  "repository_verified_by_work": false,
+  "place_code_authority": "Claude Code의 실제 Repository",
+  "allowed_reference_codes": [
+    "lee_soon_shin_plaza",
+    "odongdo",
+    "cablecar",
+    "hamel_lighthouse",
+    "marine_park",
+    "hyangiram"
+  ],
+  "mappings": [
+    {
+      "mapping_id": "MAP-01",
+      "parking_id": "PKG-YUM-13",
+      "place_code": "lee_soon_shin_plaza",
+      "place_code_status": "USER_SUPPLIED_EXAMPLE_REPOSITORY_CONFIRMATION_REQUIRED",
+      "basis": "시설명·선어시장길6 공식포털주소 및 기존 광장 지하주차 근거",
+      "evidence_ids": [
+        "E02",
+        "P02"
+      ],
+      "recommendation_conditions": [
+        "시설명/주소 등 검증된 사실만",
+        "정확 차량입구·보행동선과주말요금 충돌별도"
+      ],
+      "post_parking_walk_verification": "UNKNOWN",
+      "vehicle_return_verification": "UNKNOWN",
+      "accessibility_verification": "UNKNOWN",
+      "status": "READY_FOR_REVIEW",
+      "customer_publication_draft": "CONDITIONAL_FACTS_ONLY_AFTER_FOUNDER_REVIEW",
+      "approved_for_customer_publication": false
+    },
+    {
+      "mapping_id": "MAP-02",
+      "parking_id": "PKG-YUM-14",
+      "place_code": "lee_soon_shin_plaza",
+      "place_code_status": "USER_SUPPLIED_EXAMPLE_REPOSITORY_CONFIRMATION_REQUIRED",
+      "basis": "원도심 대안 시설후보; 광장까지 연속 경로 미검증",
+      "evidence_ids": [
+        "E02",
+        "E04"
+      ],
+      "recommendation_conditions": [
+        "시설현재운영·차량진입·실제보행/복귀경로확인"
+      ],
+      "post_parking_walk_verification": "UNKNOWN",
+      "vehicle_return_verification": "UNKNOWN",
+      "accessibility_verification": "UNKNOWN",
+      "status": "NEEDS_VERIFICATION",
+      "customer_publication_draft": "CONDITIONAL_FACTS_ONLY_AFTER_FOUNDER_REVIEW",
+      "approved_for_customer_publication": false
+    },
+    {
+      "mapping_id": "MAP-03",
+      "parking_id": "PKG-YUM-15",
+      "place_code": "lee_soon_shin_plaza",
+      "place_code_status": "USER_SUPPLIED_EXAMPLE_REPOSITORY_CONFIRMATION_REQUIRED",
+      "basis": "V1.1 원도심 대안후보; 실제 보행편의 미검증",
+      "evidence_ids": [
+        "E02",
+        "E04"
+      ],
+      "recommendation_conditions": [
+        "시설현재운영·차량진입·실제보행/복귀경로확인"
+      ],
+      "post_parking_walk_verification": "UNKNOWN",
+      "vehicle_return_verification": "UNKNOWN",
+      "accessibility_verification": "UNKNOWN",
+      "status": "NEEDS_VERIFICATION",
+      "customer_publication_draft": "CONDITIONAL_FACTS_ONLY_AFTER_FOUNDER_REVIEW",
+      "approved_for_customer_publication": false
+    },
+    {
+      "mapping_id": "MAP-04",
+      "parking_id": "PKG-FOUNDER-TERMINAL-GATED",
+      "place_code": "lee_soon_shin_plaza",
+      "place_code_status": "USER_SUPPLIED_EXAMPLE_REPOSITORY_CONFIRMATION_REQUIRED",
+      "basis": "V1.1 전화인계·원도심 대안가설; 정확 주소 미확보",
+      "evidence_ids": [
+        "F04"
+      ],
+      "recommendation_conditions": [
+        "시설현재운영·차량진입·실제보행/복귀경로확인"
+      ],
+      "post_parking_walk_verification": "UNKNOWN",
+      "vehicle_return_verification": "UNKNOWN",
+      "accessibility_verification": "UNKNOWN",
+      "status": "NEEDS_VERIFICATION",
+      "customer_publication_draft": "CONDITIONAL_FACTS_ONLY_AFTER_FOUNDER_REVIEW",
+      "approved_for_customer_publication": false
+    },
+    {
+      "mapping_id": "MAP-05",
+      "parking_id": "PKG-FOUNDER-TERMINAL-ROADSIDE",
+      "place_code": "lee_soon_shin_plaza",
+      "place_code_status": "USER_SUPPLIED_EXAMPLE_REPOSITORY_CONFIRMATION_REQUIRED",
+      "basis": "정확한 노상구획 식별 전 연결 보류",
+      "evidence_ids": [
+        "F05"
+      ],
+      "recommendation_conditions": [
+        "시설현재운영·차량진입·실제보행/복귀경로확인"
+      ],
+      "post_parking_walk_verification": "UNKNOWN",
+      "vehicle_return_verification": "UNKNOWN",
+      "accessibility_verification": "UNKNOWN",
+      "status": "HOLD",
+      "customer_publication_draft": "WITHHOLD",
+      "approved_for_customer_publication": false
+    },
+    {
+      "mapping_id": "MAP-06",
+      "parking_id": "PKG-YUM-11",
+      "place_code": "odongdo",
+      "place_code_status": "USER_SUPPLIED_EXAMPLE_REPOSITORY_CONFIRMATION_REQUIRED",
+      "basis": "공식 오동도시설 및 Founder 우선검토방향",
+      "evidence_ids": [
+        "E02",
+        "E04",
+        "F02"
+      ],
+      "recommendation_conditions": [
+        "주차시설 사실만",
+        "오동도 내부까지 보행·열차·접근성 별도",
+        "현재빈자리 단정금지"
+      ],
+      "post_parking_walk_verification": "UNKNOWN",
+      "vehicle_return_verification": "UNKNOWN",
+      "accessibility_verification": "UNKNOWN",
+      "status": "READY_FOR_REVIEW",
+      "customer_publication_draft": "CONDITIONAL_FACTS_ONLY_AFTER_FOUNDER_REVIEW",
+      "approved_for_customer_publication": false
+    },
+    {
+      "mapping_id": "MAP-07",
+      "parking_id": "PKG-FOUNDER-ODO-ROADSIDE",
+      "place_code": "odongdo",
+      "place_code_status": "USER_SUPPLIED_EXAMPLE_REPOSITORY_CONFIRMATION_REQUIRED",
+      "basis": "Founder가 오동도입구의 별도시설로 확인",
+      "evidence_ids": [
+        "F03"
+      ],
+      "recommendation_conditions": [
+        "시설현재운영·차량진입·실제보행/복귀경로확인"
+      ],
+      "post_parking_walk_verification": "UNKNOWN",
+      "vehicle_return_verification": "UNKNOWN",
+      "accessibility_verification": "UNKNOWN",
+      "status": "NEEDS_VERIFICATION",
+      "customer_publication_draft": "CONDITIONAL_FACTS_ONLY_AFTER_FOUNDER_REVIEW",
+      "approved_for_customer_publication": false
+    },
+    {
+      "mapping_id": "MAP-08",
+      "parking_id": "PKG-YUM-11",
+      "place_code": "cablecar",
+      "place_code_status": "USER_SUPPLIED_EXAMPLE_REPOSITORY_CONFIRMATION_REQUIRED",
+      "basis": "KTO 해야정류장주차타워=오동도주차타워 명칭대응",
+      "evidence_ids": [
+        "E10",
+        "F02"
+      ],
+      "recommendation_conditions": [
+        "자산 출발일 때",
+        "엘리베이터 현재가동·연결경로 별도 확인",
+        "편도면 차량회수 계획"
+      ],
+      "post_parking_walk_verification": "UNKNOWN",
+      "vehicle_return_verification": "UNKNOWN",
+      "accessibility_verification": "UNKNOWN",
+      "status": "READY_FOR_REVIEW",
+      "customer_publication_draft": "CONDITIONAL_FACTS_ONLY_AFTER_FOUNDER_REVIEW",
+      "approved_for_customer_publication": false
+    },
+    {
+      "mapping_id": "MAP-09",
+      "parking_id": "PKG-YUM-2",
+      "place_code": "cablecar",
+      "place_code_status": "USER_SUPPLIED_EXAMPLE_REPOSITORY_CONFIRMATION_REQUIRED",
+      "basis": "기존 케이블카·돌산공원 공영 시설관계; 운영충돌 미해결",
+      "evidence_ids": [
+        "E04",
+        "P01"
+      ],
+      "recommendation_conditions": [
+        "시설현재운영·차량진입·실제보행/복귀경로확인"
+      ],
+      "post_parking_walk_verification": "UNKNOWN",
+      "vehicle_return_verification": "UNKNOWN",
+      "accessibility_verification": "UNKNOWN",
+      "status": "NEEDS_VERIFICATION",
+      "customer_publication_draft": "CONDITIONAL_FACTS_ONLY_AFTER_FOUNDER_REVIEW",
+      "approved_for_customer_publication": false
+    },
+    {
+      "mapping_id": "MAP-10",
+      "parking_id": "PKG-YUM-LIST-JONGPO",
+      "place_code": "marine_park",
+      "place_code_status": "USER_SUPPLIED_EXAMPLE_REPOSITORY_CONFIRMATION_REQUIRED",
+      "basis": "공단목록 종포해양공원225면; 정확시설 미특정",
+      "evidence_ids": [
+        "E04"
+      ],
+      "recommendation_conditions": [
+        "시설현재운영·차량진입·실제보행/복귀경로확인"
+      ],
+      "post_parking_walk_verification": "UNKNOWN",
+      "vehicle_return_verification": "UNKNOWN",
+      "accessibility_verification": "UNKNOWN",
+      "status": "HOLD",
+      "customer_publication_draft": "WITHHOLD",
+      "approved_for_customer_publication": false
+    },
+    {
+      "mapping_id": "MAP-11",
+      "parking_id": "PKG-YUM-13",
+      "place_code": "marine_park",
+      "place_code_status": "USER_SUPPLIED_EXAMPLE_REPOSITORY_CONFIRMATION_REQUIRED",
+      "basis": "광장출발 해안방문 조합의 주차거점 후보",
+      "evidence_ids": [
+        "E02",
+        "P02"
+      ],
+      "recommendation_conditions": [
+        "시설현재운영·차량진입·실제보행/복귀경로확인"
+      ],
+      "post_parking_walk_verification": "UNKNOWN",
+      "vehicle_return_verification": "UNKNOWN",
+      "accessibility_verification": "UNKNOWN",
+      "status": "NEEDS_VERIFICATION",
+      "customer_publication_draft": "CONDITIONAL_FACTS_ONLY_AFTER_FOUNDER_REVIEW",
+      "approved_for_customer_publication": false
+    },
+    {
+      "mapping_id": "MAP-12",
+      "parking_id": "PKG-FOUNDER-TERMINAL-GATED",
+      "place_code": "marine_park",
+      "place_code_status": "USER_SUPPLIED_EXAMPLE_REPOSITORY_CONFIRMATION_REQUIRED",
+      "basis": "원도심 도보범위를 넓힐 경우 대안가설",
+      "evidence_ids": [
+        "F04"
+      ],
+      "recommendation_conditions": [
+        "시설현재운영·차량진입·실제보행/복귀경로확인"
+      ],
+      "post_parking_walk_verification": "UNKNOWN",
+      "vehicle_return_verification": "UNKNOWN",
+      "accessibility_verification": "UNKNOWN",
+      "status": "NEEDS_VERIFICATION",
+      "customer_publication_draft": "CONDITIONAL_FACTS_ONLY_AFTER_FOUNDER_REVIEW",
+      "approved_for_customer_publication": false
+    },
+    {
+      "mapping_id": "MAP-13",
+      "parking_id": "PKG-YUM-16",
+      "place_code": "marine_park",
+      "place_code_status": "USER_SUPPLIED_EXAMPLE_REPOSITORY_CONFIRMATION_REQUIRED",
+      "basis": "물양장과종포 일반주차 동일성 및 캠핑전용 문제",
+      "evidence_ids": [
+        "E02",
+        "E06"
+      ],
+      "recommendation_conditions": [
+        "시설현재운영·차량진입·실제보행/복귀경로확인"
+      ],
+      "post_parking_walk_verification": "UNKNOWN",
+      "vehicle_return_verification": "UNKNOWN",
+      "accessibility_verification": "UNKNOWN",
+      "status": "HOLD",
+      "customer_publication_draft": "WITHHOLD",
+      "approved_for_customer_publication": false
+    },
+    {
+      "mapping_id": "MAP-14",
+      "parking_id": "PKG-CITY-HAMEL-ANNEX",
+      "place_code": "hamel_lighthouse",
+      "place_code_status": "USER_SUPPLIED_EXAMPLE_REPOSITORY_CONFIRMATION_REQUIRED",
+      "basis": "시목록 전시관 부설시설이나 등대방문객 개방 미확인",
+      "evidence_ids": [
+        "E05"
+      ],
+      "recommendation_conditions": [
+        "시설현재운영·차량진입·실제보행/복귀경로확인"
+      ],
+      "post_parking_walk_verification": "UNKNOWN",
+      "vehicle_return_verification": "UNKNOWN",
+      "accessibility_verification": "UNKNOWN",
+      "status": "HOLD",
+      "customer_publication_draft": "WITHHOLD",
+      "approved_for_customer_publication": false
+    },
+    {
+      "mapping_id": "MAP-15",
+      "parking_id": "PKG-YUM-LIST-JONGPO",
+      "place_code": "hamel_lighthouse",
+      "place_code_status": "USER_SUPPLIED_EXAMPLE_REPOSITORY_CONFIRMATION_REQUIRED",
+      "basis": "하멜 인근 목적 주차시설 식별 미완료",
+      "evidence_ids": [
+        "E04"
+      ],
+      "recommendation_conditions": [
+        "시설현재운영·차량진입·실제보행/복귀경로확인"
+      ],
+      "post_parking_walk_verification": "UNKNOWN",
+      "vehicle_return_verification": "UNKNOWN",
+      "accessibility_verification": "UNKNOWN",
+      "status": "HOLD",
+      "customer_publication_draft": "WITHHOLD",
+      "approved_for_customer_publication": false
+    },
+    {
+      "mapping_id": "MAP-16",
+      "parking_id": "PKG-YUM-13",
+      "place_code": "hamel_lighthouse",
+      "place_code_status": "USER_SUPPLIED_EXAMPLE_REPOSITORY_CONFIRMATION_REQUIRED",
+      "basis": "해안코스 출발거점 후보; 직접 인접주차나 평지경로로 주장하지 않음",
+      "evidence_ids": [
+        "E02",
+        "P02"
+      ],
+      "recommendation_conditions": [
+        "시설현재운영·차량진입·실제보행/복귀경로확인"
+      ],
+      "post_parking_walk_verification": "UNKNOWN",
+      "vehicle_return_verification": "UNKNOWN",
+      "accessibility_verification": "UNKNOWN",
+      "status": "NEEDS_VERIFICATION",
+      "customer_publication_draft": "CONDITIONAL_FACTS_ONLY_AFTER_FOUNDER_REVIEW",
+      "approved_for_customer_publication": false
+    },
+    {
+      "mapping_id": "MAP-17",
+      "parking_id": "PKG-YUM-17",
+      "place_code": "hyangiram",
+      "place_code_status": "USER_SUPPLIED_EXAMPLE_REPOSITORY_CONFIRMATION_REQUIRED",
+      "basis": "향일암 공영시설 존재와 요금/운영충돌",
+      "evidence_ids": [
+        "E02",
+        "E03",
+        "E06"
+      ],
+      "recommendation_conditions": [
+        "시설현재운영·차량진입·실제보행/복귀경로확인"
+      ],
+      "post_parking_walk_verification": "UNKNOWN",
+      "vehicle_return_verification": "UNKNOWN",
+      "accessibility_verification": "UNKNOWN",
+      "status": "HOLD",
+      "customer_publication_draft": "WITHHOLD",
+      "approved_for_customer_publication": false
+    },
+    {
+      "mapping_id": "MAP-18",
+      "parking_id": "PKG-IMPO-UNRESOLVED",
+      "place_code": "hyangiram",
+      "place_code_status": "USER_SUPPLIED_EXAMPLE_REPOSITORY_CONFIRMATION_REQUIRED",
+      "basis": "임포 대체 시설 명칭·운영 미특정",
+      "evidence_ids": [],
+      "recommendation_conditions": [
+        "시설현재운영·차량진입·실제보행/복귀경로확인"
+      ],
+      "post_parking_walk_verification": "UNKNOWN",
+      "vehicle_return_verification": "UNKNOWN",
+      "accessibility_verification": "UNKNOWN",
+      "status": "HOLD",
+      "customer_publication_draft": "WITHHOLD",
+      "approved_for_customer_publication": false
+    }
+  ],
+  "unmapped_parking_ids": [
+    "PKG-CITY-DONGBAEK",
+    "PKG-CITY-JASAN-ENTRY",
+    "PKG-CITY-ODO-CROSS",
+    "PKG-EXTRA-15",
+    "PKG-EXTRA-315",
+    "PKG-EXTRA-317",
+    "PKG-EXTRA-320",
+    "PKG-EXTRA-75",
+    "PKG-FOUNDER-EXPO-MANAGED",
+    "PKG-YUM-3",
+    "PKG-YUM-34",
+    "PKG-YUM-35",
+    "PKG-YUM-36"
+  ],
+  "unmapped_reason": "전수연결강제안함.근거부족또는이번6개참고코드범위밖",
+  "facility_identity_cases": [
+    {
+      "facilities": [
+        "PKG-YUM-11",
+        "PKG-FOUNDER-ODO-ROADSIDE"
+      ],
+      "status": "DISTINCT_AS_FOUNDER_REPORTED",
+      "evidence_ids": [
+        "F02",
+        "F03"
+      ],
+      "note": "별개시설로보존.노상정확좌표미확보"
+    },
+    {
+      "facilities": [
+        "PKG-FOUNDER-TERMINAL-GATED",
+        "PKG-FOUNDER-TERMINAL-ROADSIDE"
+      ],
+      "status": "DISTINCT_AS_FOUNDER_REPORTED",
+      "evidence_ids": [
+        "F04",
+        "F05"
+      ],
+      "note": "관리기관·과금다름.구획확인필요"
+    },
+    {
+      "facilities": [
+        "PKG-FOUNDER-EXPO-MANAGED",
+        "PKG-YUM-3",
+        "PKG-EXTRA-317"
+      ],
+      "status": "IDENTITY_UNRESOLVED",
+      "evidence_ids": [
+        "F06",
+        "E02",
+        "E08"
+      ],
+      "note": "시설범위미확인;병합안함"
+    },
+    {
+      "facilities": [
+        "PKG-YUM-13",
+        "PKG-YUM-14",
+        "PKG-YUM-15"
+      ],
+      "status": "SEPARATE_OFFICIAL_RECORDS",
+      "evidence_ids": [
+        "E02"
+      ],
+      "note": "광장지하/진남관/진남상가각각보존"
+    },
+    {
+      "facilities": [
+        "PKG-YUM-LIST-JONGPO",
+        "PKG-YUM-16"
+      ],
+      "status": "IDENTITY_UNRESOLVED",
+      "evidence_ids": [
+        "E04",
+        "E02",
+        "E06"
+      ],
+      "note": "일반주차 vs 다른용도.동일시설추정금지"
+    },
+    {
+      "facilities": [
+        "PKG-FOUNDER-TERMINAL-ROADSIDE",
+        "PKG-YUM-34",
+        "PKG-YUM-35",
+        "PKG-YUM-36"
+      ],
+      "status": "IDENTITY_UNRESOLVED",
+      "evidence_ids": [
+        "F05",
+        "E02"
+      ],
+      "note": "노상구획미특정.전화요금으로기존레코드덮기금지"
+    }
+  ]
+}

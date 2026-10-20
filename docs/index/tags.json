@@ -1122,6 +1122,11 @@
     "DOC-YEOSU_TIME_EVIDENCE_PILOT_V0_1",
     "DOC-YEOSU_TIME_KNOWLEDGE_V0_1"
   ],
+  "DATA_HANDOVER_01": [
+    "DOC-Change_Log",
+    "DOC-Data_Handover_Report",
+    "DOC-Project_State_Update_Draft"
+  ],
   "에이전틱": [
     "DOC-최수민방식_완전정리",
     "DOC-2025-12-29_Part1_최수민방식QA",
