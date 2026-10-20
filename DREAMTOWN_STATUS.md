@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-19
+Last Updated: 2026-10-20
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -21,14 +21,17 @@ Last Updated: 2026-10-19
 5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
-### ★ Current Next Action (exactly 1) — Updated: 2026-10-19
+### ★ Current Next Action (exactly 1) — Updated: 2026-10-20
 
 **Founder — 여수 SOUL Phase 1 다음 장소 결정 (8/10 완료, R20 수정 제외)**
 - 여수 SOUL Phase 1 완료: 이순신광장 / 향일암 / 오동도 / 케이블카 / 돌산공원 / 돌산대교 / 종포해양공원 / 하멜등대 (8/10)
 - 목표: 여수 10곳
 - EP02 달빛 항로: 보류 (Founder 결정 필요)
-- main HEAD: `8c4c07f` (PR #88 Squash Merge, 2026-10-19 KST)
-- 하멜등대 Phase 1: CLOSED — DEPLOYED_AND_VERIFIED (PR #88 / Deploy `dep-dbaqqkfbtjjs73886i9g`)
+- main HEAD: `994689c` (PR #93 Squash Merge, 2026-10-20 KST 16:28)
+- 무여정 세션 초기화 버그 FIXED: PR #91 MERGED @e4d24b1 (has_car carry-over 차단, handleReset setSessionId null)
+- 무여정 여행시간 선택 V1: MERGED — PR #92 @a20acce (3개 버튼: 2~3시간/반나절/하루)
+- Parking Hospitality V1 데이터 인계: MERGED — PR #93 @994689c (docs-only, docs/knowledge/parking/handover/DATA_HANDOVER_01/)
+- Parking Option B 구현: 미착수 — 장소코드 확정 및 Founder 별도 승인 대기
 - R20 PRE-EXISTING FAIL (UNRESOLVED): dolsan_daegyo "걸어서 건너갈 수 있어?" → JOURNEY_CONTINUITY
 
 ---
