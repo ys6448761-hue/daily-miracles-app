@@ -55,11 +55,11 @@ const PAGE_BG = '#130b1e'; // page background — must match hero bottom gradien
 
 // ── Time options — shown when SOUL asks '시간이 얼마나 남으셨어요?' ─────────────
 // '하루' / '1박 2일' 제외 — 백엔드 시간 파싱이 PARTIAL 반복 (OPEN 항목)
-// '하루': GPT가 time_available_minutes 추출 실패 → fallback 120min → PARTIAL (3/3 확인)
 // '1박 2일': routeSkeletonService 미구현 → routeSkeleton=null → _isMultiDayTrip 미설정
 const TIME_OPTIONS = [
   { label: '2~3시간', message: '여수에서 2~3시간 있어요. 어디 갈까요?' },
   { label: '반나절',  message: '여수에서 5시간 있어요. 어디 갈까요?' },
+  { label: '하루',    message: '여수에서 8시간 있어요. 어디 갈까요?' },
 ];
 const TIME_QUESTION = '시간이 얼마나 남으셨어요?';
 
