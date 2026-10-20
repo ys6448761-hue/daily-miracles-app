@@ -1,0 +1,248 @@
+{
+  "title": "Parking Course Hospitality V1",
+  "courses": [
+    {
+      "course_id": "COURSE-01",
+      "name": "원도심 순환(검토용 명칭)",
+      "place_sequence": [
+        "lee_soon_shin_plaza",
+        "진남관(Repository code UNKNOWN)",
+        "marine_park",
+        "hamel_lighthouse"
+      ],
+      "route_status": "NEEDS_VERIFICATION",
+      "closed_loop_verified": false,
+      "note": "제시 순서는 하멜에서 끝나므로 주차장 복귀까지 확인돼야 물리적 순환이 완성됨.공식코스/전구간평지로표현금지",
+      "parking_options": [
+        {
+          "rank": 1,
+          "parking_id": "PKG-YUM-13",
+          "status": "NEEDS_VERIFICATION",
+          "basis": "광장 출발 거점으로 우선검토",
+          "mapping_refs": [
+            "MAP-01"
+          ],
+          "evidence_ids": [
+            "E02",
+            "P02"
+          ],
+          "requires": [
+            "주차입구·출구",
+            "진남관 경유 경사·계단",
+            "하멜 후 복귀구간",
+            "주말상한/운영충돌"
+          ]
+        },
+        {
+          "rank": 2,
+          "parking_id": "PKG-YUM-14",
+          "status": "NEEDS_VERIFICATION",
+          "basis": "광장거점 혼잡 시 원도심 대안후보.빈자리·더가까움미확인",
+          "evidence_ids": [
+            "E02",
+            "E04"
+          ],
+          "requires": [
+            "주소498-1/505구분",
+            "순서대로방문할때우회·경사",
+            "복귀동선"
+          ]
+        },
+        {
+          "rank": 3,
+          "parking_id": "PKG-FOUNDER-TERMINAL-GATED",
+          "status": "NEEDS_VERIFICATION",
+          "basis": "원도심 넓은보행·회수부담을수용할경우에만 검토",
+          "evidence_ids": [
+            "F04"
+          ],
+          "requires": [
+            "정확차량입구/주소",
+            "원도심접속·횡단",
+            "하멜→터미널귀환",
+            "저보행사용자에게적합성"
+          ]
+        }
+      ],
+      "unranked_candidates": [
+        {
+          "parking_id": "PKG-YUM-15",
+          "status": "NEEDS_VERIFICATION",
+          "reason": "진남상가 후보 유지.순위·접근편의 확정 안함"
+        }
+      ],
+      "return_plan": {
+        "parking_anchor": "선택한 주차시설",
+        "last_place": "hamel_lighthouse",
+        "required_return": true,
+        "route": "UNKNOWN",
+        "distance_m": "UNKNOWN",
+        "minutes": "UNKNOWN",
+        "legal_dropoff_point": "UNKNOWN",
+        "policy": "귀환을 별도 구간으로 계산하되 실제 경로 미검증.임의택시승차점·합법하차점생성금지"
+      },
+      "traveler_differences": {
+        "general": "걷기 범위·복귀수용성 확인 후 후보선택.1안혼잡만으로3안자동추천금지",
+        "parents": "승하차·엘리베이터현행·경사계단·휴식·회수 먼저.3안은낮은요금만으로추천금지",
+        "kids": "유모차연속접근·횡단·아이동반복귀를확인.진남관과거북선내부접근은별도"
+      },
+      "public_fact_scope": [
+        "시설명/검증된대표주소 등 검토용",
+        "시설별 기본요금에서 충돌없는부분만 별도승인후"
+      ],
+      "withhold": [
+        "공식순환코스",
+        "전구간무단차",
+        "도보거리/시간",
+        "현재빈자리",
+        "차량을되찾는실제경로"
+      ]
+    },
+    {
+      "course_id": "COURSE-02",
+      "name": "오동도 + 케이블카(자산 출발 검토)",
+      "place_sequence": [
+        "odongdo",
+        "cablecar"
+      ],
+      "route_status": "NEEDS_VERIFICATION",
+      "parking_options": [
+        {
+          "rank": 1,
+          "parking_id": "PKG-YUM-11",
+          "status": "READY_FOR_REVIEW",
+          "basis": "Founder우선검토방향과공식정류장타워명칭관계",
+          "evidence_ids": [
+            "E10",
+            "F02",
+            "E02"
+          ],
+          "mapping_refs": [
+            "MAP-06",
+            "MAP-08"
+          ],
+          "requires": [
+            "자산출발여부",
+            "현재승강기가동/연결",
+            "오동도보행·열차선택",
+            "편도후회수"
+          ]
+        },
+        {
+          "rank": 2,
+          "parking_id": "PKG-FOUNDER-ODO-ROADSIDE",
+          "status": "NEEDS_VERIFICATION",
+          "basis": "Founder확인별도노상시설",
+          "evidence_ids": [
+            "F03"
+          ],
+          "requires": [
+            "정확위치·구획",
+            "정류장까지실제보행/수직이동",
+            "야간조건·회수경로"
+          ]
+        }
+      ],
+      "third_option": null,
+      "third_option_reason": "박람회장시설·보행연결미특정으로3안강제완성안함",
+      "withheld_candidates": [
+        {
+          "parking_id": "PKG-FOUNDER-EXPO-MANAGED",
+          "status": "HOLD",
+          "reason": "정확시설·오동도접속미확인"
+        }
+      ],
+      "fee_difference": {
+        "tower": {
+          "evidence_ids": [
+            "E02",
+            "E03"
+          ],
+          "first_free_minutes": 60,
+          "additional_krw": 200,
+          "unit_min": 10,
+          "weekday_max": 5000,
+          "sat_sun_holiday_max": 10000,
+          "capacity_statement": "Founder운영기관확인237면;기존210/246충돌보존",
+          "lunch_combination": "사례있음.모든입차3시간무료아님"
+        },
+        "entrance_roadside": {
+          "evidence_ids": [
+            "F03"
+          ],
+          "status": "FOUNDER_PHONE_REPORTED",
+          "first_free_minutes": 30,
+          "additional_krw": 500,
+          "unit_min": 30,
+          "lunch_free": false,
+          "night_free": "22:00~07:00",
+          "daily_max": "UNKNOWN"
+        }
+      },
+      "return_plan": {
+        "round_trip": "자산정류장복귀후주차시설까지연결경로확인필요",
+        "one_way": "반대편하차후자산쪽주차차량회수계획필요.수단·시간UNKNOWN",
+        "parking_return_walk": "UNKNOWN",
+        "elevator_operating_hours_current": "UNKNOWN"
+      },
+      "traveler_differences": {
+        "general": "오동도순서·케이블카편도/왕복·주차복귀를정한뒤선택",
+        "parents": "엘리베이터존재와전구간접근성은다름.노상대안이더편하다고단정금지",
+        "kids": "유모차·탑승조건·오동도이동·복귀피로별도.보관/대여생성금지"
+      },
+      "public_fact_scope": [
+        "타워/노상별도시설",
+        "시설별조건부요금초안",
+        "해야정류장타워공식명칭관계"
+      ],
+      "withhold": [
+        "전구간무단차",
+        "정류장까지분단위이동",
+        "3시간자동무료",
+        "현재여유면수",
+        "편도후복귀수단확정"
+      ]
+    }
+  ],
+  "example_answers": [
+    {
+      "question": "광장부터 진남관하고 하멜등대까지 보고 싶어. 주차는?",
+      "draft": "광장 출발이라면 이순신광장 지하주차장을 먼저 검토할 수 있어요. 진남관 공영주차장과 터미널 차단기식은 대안 후보예요. 하멜등대에서 주차장으로 돌아오는 이동도 포함해야 해서, 걷는 범위와 동행자를 함께 보고 고르는 것이 좋아요.",
+      "evidence_ids": [
+        "E02",
+        "P02",
+        "F04"
+      ],
+      "interpretation": "검토용조건부거점제안.실제경로확정아님",
+      "status": "NEEDS_VERIFICATION",
+      "approved_for_customer_publication": false
+    },
+    {
+      "question": "오동도랑 케이블카 같이 갈 거야.",
+      "draft": "자산 쪽에서 타실 계획이면 오동도 공영주차타워를 먼저 검토할 수 있어요. 입구 노상은 별도 시설이고 요금도 달라요. 케이블카를 편도로 이용한다면 차를 둔 자산 쪽으로 돌아오는 계획도 필요해요.",
+      "evidence_ids": [
+        "E10",
+        "F02",
+        "F03"
+      ],
+      "status": "READY_FOR_REVIEW",
+      "approved_for_customer_publication": false
+    },
+    {
+      "question": "부모님이 오래 못 걸으셔.",
+      "draft": "주차요금보다 주차 후 계단·경사와 다시 차로 돌아오는 부담부터 살펴볼게요. 지금 자료로는 전 구간이 편하다고 보장할 수 없으니, 실제 연결 경로가 확인된 범위에서 방문 범위를 정하는 것이 좋아요.",
+      "evidence_ids": [
+        "P02"
+      ],
+      "status": "NEEDS_VERIFICATION",
+      "approved_for_customer_publication": false
+    }
+  ],
+  "hospitality_rules": {
+    "Fun": "주차를출발점·복귀점으로동시설계",
+    "Comi": "동행자승하차·계단·경사·회수부담우선",
+    "Park": "방문목적/코스선택후출발전에한번핵심제시.조건변경시만보완",
+    "Work": "모든구체적사실은시설별Evidence연결.추론은사실과분리"
+  },
+  "approved_for_customer_publication": false
+}
