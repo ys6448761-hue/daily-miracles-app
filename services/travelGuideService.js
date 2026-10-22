@@ -423,19 +423,21 @@ class TravelGuideService {
     let placesTimeUsed = 0;
 
     // Step 1: Include must-visit places first (they anchor the journey)
+    // P-NEW-1: When time_available_minutes is a fallback (user didn't specify), bypass the
+    // time budget check for must-visit places — user-requested places must not be silently dropped.
+    const _tmFallback = context._domainFallbacks?.includes('time_available_minutes');
     for (const placeCode of mustVisitPlaceIds) {
       const mustVisitPlace = candidates.find(c => c.code === placeCode);
       if (!mustVisitPlace) continue; // Must-visit place not in candidates (excluded by safety/accessibility)
 
       const timeNeeded = mustVisitPlace.avg_stay_minutes;
-      if (placesTimeUsed + timeNeeded <= availableForPlaces) {
+      if (_tmFallback || placesTimeUsed + timeNeeded <= availableForPlaces) {
         selected.push(mustVisitPlace);
-        placesTimeUsed += timeNeeded;
+        placesTimeUsed += timeNeeded || 0;
       }
     }
 
     // Step 2: Fill remaining slots with top-ranked candidates (excluding must-visit already selected)
-    const _tmFallback = context._domainFallbacks?.includes('time_available_minutes');
     const selectedCodes = new Set(selected.map(p => p.code));
     for (const place of candidates) {
       if (selected.length >= targetCount) break;

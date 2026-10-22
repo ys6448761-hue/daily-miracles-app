@@ -962,6 +962,23 @@ function _supplementDomainFromSharedJourney(domainContext, sharedJourney) {
   // EXPERIENCED ≠ EXCLUDE: explicitly do not add experienced to exclude_place_ids
   // (no-op guard — just documents the invariant)
 
+  // P-NEW-1: Forward EXPLICIT want items as must_visit_place_ids.
+  // sharedJourney.want[].specificity=EXPLICIT → user explicitly named these places.
+  // Resolve place_hint → place_code via PLACE_ALIAS_MAP (verified codes only).
+  const explicitWants = (sharedJourney.want || []).filter(w => w.specificity === 'EXPLICIT');
+  if (explicitWants.length > 0) {
+    const mustVisitIds = supplemented.must_visit_place_ids
+      ? [...supplemented.must_visit_place_ids]
+      : [];
+    for (const want of explicitWants) {
+      const code = PLACE_ALIAS_MAP[want.place_hint];
+      if (code && !mustVisitIds.includes(code)) {
+        mustVisitIds.push(code);
+      }
+    }
+    if (mustVisitIds.length > 0) supplemented.must_visit_place_ids = mustVisitIds;
+  }
+
   return supplemented;
 }
 
