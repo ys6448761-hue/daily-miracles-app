@@ -32,6 +32,8 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getOrEnsureGuestCredential } from '../api/dreamtown.js';
+import CourseDisplay from '../components/TravelGuide/CourseDisplay';
+import '../styles/travel-guide.css';
 
 // ── Living Detail nav — place codes with supported detail views ────────────────
 // Mirrors SoulCableCarPage.SUPPORTED_PLACE_CODES.
@@ -570,6 +572,13 @@ export default function MuyojeongHomePage() {
             onTimeSelect={(msg) => _callSOUL(msg)}
             isLoading={isLoading}
           />
+        )}
+
+        {/* ── COURSE DISPLAY ── renders only when SOUL returns course.blocks */}
+        {soulResponse?.course?.blocks?.length > 0 && !isLoading && (
+          <div style={{ marginTop: '16px' }}>
+            <CourseDisplay course={soulResponse.course} />
+          </div>
         )}
 
         {/* ── PLACE CARDS: SOUL과 먼저 둘러보기 ── */}
