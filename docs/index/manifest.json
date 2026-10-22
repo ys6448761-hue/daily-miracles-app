@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-22T04:37:25.147Z",
+  "generated_at": "2026-10-22T08:09:19.620Z",
   "generator": "generate-manifest.js",
-  "total_count": 452,
+  "total_count": 454,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1106,6 +1106,22 @@
       "checksum": "e7264409"
     },
     {
+      "id": "DOC-SOUL_COURSE_DISPLAY_MUYOJEONG_",
+      "path": "docs/architecture/SOUL_COURSE_DISPLAY_MUYOJEONG_VISUAL_REVIEW_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "CourseDisplay × MuyojeongHomePage — Visual Review Evidence V1",
+      "created_at": "2026-10-22",
+      "checksum": "1a649658"
+    },
+    {
       "id": "DOC-SOUL_CURRENT_INTENT_MULTI_PLAC",
       "path": "docs/architecture/SOUL_CURRENT_INTENT_MULTI_PLACE_CONTEXT_PRECEDENCE_V0_1_EVIDENCE.md",
       "type": "document",
@@ -1299,7 +1315,7 @@
       "status": "NOT_IMPLEMENTED",
       "title": "SOUL Parking & Route Reality Check V0.1",
       "created_at": "2026-10-22",
-      "checksum": "19743cf9"
+      "checksum": "b5b277bd"
     },
     {
       "id": "DOC-SOUL_PLACE_KNOWLEDGE_BINDING_R",
@@ -1368,6 +1384,22 @@
       "title": "SOUL Product Continuity Incident Audit V0.1",
       "created_at": "2026-10-22",
       "checksum": "435cf4a6"
+    },
+    {
+      "id": "DOC-SOUL_P_NEW_1_EXPLICIT_PLACE_PR",
+      "path": "docs/architecture/SOUL_P_NEW_1_EXPLICIT_PLACE_PRESERVATION_DEPLOYMENT_EVIDENCE_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "P-NEW-1 Explicit Place Preservation — Production Deployment Evidence V1",
+      "created_at": "2026-10-22",
+      "checksum": "3a7f1e6d"
     },
     {
       "id": "DOC-SOUL_RUNTIME_REPAIR_CLARIFICAT",
