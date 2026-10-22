@@ -97,6 +97,34 @@ const _CITY_EXCLUDE_RE         = /(순천|광양)\s*(은|는)?\s*(빼고|제외|
 // Multi-night multi-city: requires explicit night/day token spanning two different cities
 const _MULTI_CITY_NIGHTS_RE    = /(여수|순천|광양).{0,25}(1박|2박|3박|하루|이틀|사흘).{0,25}(여수|순천|광양)/;
 
+// ─── G1 City Detection V0.1 ──────────────────────────────────────────────────
+// Runs BEFORE _classifyCityIntent. Handles new cities (부산/서울/제주 등).
+// 순천/광양은 레거시 Guard 전담. D3.1 예외만 LEGACY_ORIGIN_RE로 처리.
+const _G1_DETECTABLE_NEW_CITIES = {
+  BUSAN:     ['부산', '해운대', '광안리'],
+  SEOUL:     ['서울', '명동', '강남', '홍대'],
+  JEJU:      ['제주', '제주도'],
+  GWANGJU:   ['광주'],
+  JEONJU:    ['전주', '한옥마을'],
+  TONGYEONG: ['통영'],
+  GEOJE:     ['거제'],
+};
+// 여수 목적지 확정 마커 — 케이블카 제외 (통영/부산도 보유, 모호성)
+const _G1_YEOSU_DEST_RE     = /여수|오동도|이순신광장|향일암|돌산대교|돌산공원|하멜등대|종포해양공원/;
+// 여수가 연기 맥락에 있으면 목적지 아님 (Gate A-3)
+const _G1_YEOSU_DEFERRED_RE = /여수\s*(는|은)?\s*(다음에|나중에|언젠가)/;
+// 여수 장소가 제외 맥락에 있으면 목적지 아님 (Gate A-4)
+const _G1_YEOSU_EXCLUDED_RE = /(여수|오동도|이순신광장|향일암|돌산대교|돌산공원|하멜등대|종포해양공원)\s*(말고|빼고|제외)/;
+// D3.1: 순천·광양이 출발지이고 여수 장소가 목적지인 경우
+const _G1_LEGACY_ORIGIN_RE  = /(순천|광양).{0,10}에서.{0,20}(여수|오동도|이순신광장|향일암|돌산|하멜등대|종포)/;
+// 신규 도시 다박 (여수 포함): _buildMultiCityPayload 하드코딩 재사용 금지
+const _G1_MULTI_NIGHT_RE    = /(여수).{0,30}(1박|2박|3박|하루|이틀|사흘).{0,30}(부산|서울|제주|광주|전주|통영|거제)/;
+const _G1_MULTI_NIGHT_REV   = /(부산|서울|제주|광주|전주|통영|거제).{0,30}(1박|2박|3박|하루|이틀|사흘).{0,30}여수/;
+// 개별 도시 deferred/excluded 맥락
+const _G1_DEFERRED_CTX_RE   = /(은|는)?\s*(다음에|나중에|언젠가)/;
+const _G1_EXCLUDED_CTX_RE   = /(은|는)?\s*(빼고|제외하고|없이)/;
+// ─────────────────────────────────────────────────────────────────────────────
+
 /**
  * Classify whether a message targets an unsupported city.
  *   null                 → no unsupported city, or safely deferred/excluded → normal flow
@@ -177,6 +205,71 @@ function _buildAmbiguousCityPayload(sessionId) {
       timestamp: new Date().toISOString(),
     },
   };
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── G1 _detectCityCode ───────────────────────────────────────────────────────
+// Returns { role, detected_city_name?, is_supported }
+// role: 'ORIGIN_TO_YEOSU' | 'AMBIGUOUS' | 'UNSUPPORTED_PRIMARY' | null
+function _detectCityCode(message) {
+  const hasYeosu   = /여수/.test(message);
+  const allAliases = Object.values(_G1_DETECTABLE_NEW_CITIES).flat();
+  const hasNewCity = allAliases.some(a => message.includes(a));
+
+  // ① 신규 도시 미포함 → D3.1 예외만 확인, 나머지 레거시 Guard 위임
+  if (!hasNewCity) {
+    if (_G1_LEGACY_ORIGIN_RE.test(message)) {
+      return { role: 'ORIGIN_TO_YEOSU', is_supported: true };
+    }
+    return { role: null, is_supported: true };
+  }
+
+  // ② Gate B: 복수 신규 도시 → 첫 번째 도시 단일 확정 금지
+  const mentionedCount = Object.values(_G1_DETECTABLE_NEW_CITIES)
+    .filter(aliases => aliases.some(a => message.includes(a))).length;
+  if (mentionedCount >= 2) {
+    return { role: 'AMBIGUOUS', is_supported: false };
+  }
+
+  // ③ 신규 도시 + 여수 포함 다박 → AMBIGUOUS (_buildMultiCityPayload 순천/광양 하드코딩 재사용 금지)
+  if (_G1_MULTI_NIGHT_RE.test(message) || _G1_MULTI_NIGHT_REV.test(message)) {
+    return { role: 'AMBIGUOUS', is_supported: false };
+  }
+
+  // ④ 신규 도시 개별 감지
+  for (const [, aliases] of Object.entries(_G1_DETECTABLE_NEW_CITIES)) {
+    for (const alias of aliases) {
+      if (!message.includes(alias)) continue;
+      const idx        = message.indexOf(alias);
+      const shortAfter = message.slice(idx + alias.length, idx + alias.length + 8);
+      // 12자 창: "은 다음에" / "은 빼고" 등 도시 바로 뒤 연기·제외 패턴 감지
+      // (30자로 하면 "여수는 다음에" 같은 다른 장소의 연기 맥락이 오인식됨)
+      const ctxWindow  = message.slice(idx + alias.length, idx + alias.length + 12);
+
+      // Deferred/excluded 맥락 → 레거시 Guard에 위임
+      if (_G1_DEFERRED_CTX_RE.test(ctxWindow) || _G1_EXCLUDED_CTX_RE.test(ctxWindow)) break;
+
+      const isOriginCity = /에서/.test(shortAfter);
+
+      // Gate A: 출발지 + 여수 목적지 확정 (연기/제외 맥락 제외) → Guard 우회
+      if (isOriginCity
+          && _G1_YEOSU_DEST_RE.test(message)
+          && !_G1_YEOSU_DEFERRED_RE.test(message)
+          && !_G1_YEOSU_EXCLUDED_RE.test(message)) {
+        return { role: 'ORIGIN_TO_YEOSU', is_supported: true };
+      }
+
+      // 여수 + 신규 도시(비원점) → 복수 여행 의도 → AMBIGUOUS
+      if (hasYeosu) {
+        return { role: 'AMBIGUOUS', is_supported: false };
+      }
+
+      // 여수 없음, 비원점 → 미지원 도시 단독 요청
+      return { role: 'UNSUPPORTED_PRIMARY', detected_city_name: alias, is_supported: false };
+    }
+  }
+
+  return { role: null, is_supported: true };
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -316,6 +409,165 @@ const _PLACE_KNOWLEDGE = {
     unknown_boundary: '운영 및 접근 세부 정보는 현장에서 확인해주세요.',
   },
 };
+
+// ── PARKING OPTION B — Structured facility data ──────────────────────────────
+// Gate: approved_for_customer_publication: false on ALL entries.
+// Customer exposure requires explicit Founder approval per facility.
+// Until gate opens, _buildParkingOptionBAnswer() returns null → existing fallback fires.
+// C-3 supplement does NOT reference this object — no leakage path.
+const _PLACE_PARKING = {
+  lee_soon_shin_plaza: {
+    approved_for_customer_publication: false,
+    evidence_package: 'DATA_HANDOVER_01',
+    evidence_last_updated: '2026-10-20',
+    facilities: [
+      {
+        facility_id: 'PKG-YUM-13',
+        role: 'A',
+        official_name: '이순신광장 공영 지하주차장',
+        address: '선어시장길 6',
+        facility_type: 'UNDERGROUND',
+        manager: '여수시도시관리공단',
+        capacity_approx: 100,
+        operating_hours: '24시간 (무인)',
+        initial_free_minutes: 60,
+        additional_fee_krw: 200,
+        billing_unit_minutes: 10,
+        lunch_free_window: '12:00~14:00',
+        max_daily_krw: 5000,
+        weekend_max_krw: 'UNKNOWN',
+        access_note: '광장 바로 인접',
+        approved_for_customer_publication: false,
+        evidence_ids: ['E02', 'E03', 'E04', 'FOUNDER_PHONE_2026-10-21'],
+        evidence_status: 'CONFIRMED_PLUS_FOUNDER_PHONE',
+        open_conflicts: ['C09'],
+      },
+      {
+        facility_id: 'PKG-YUM-15',
+        role: 'B',
+        official_name: '진남상가 주차장',
+        address: '통제영3길 14-13',
+        facility_type: 'UNKNOWN',
+        manager: '여수시도시관리공단',
+        capacity_approx: null,
+        initial_free_minutes: 60,
+        additional_fee_krw: 200,
+        billing_unit_minutes: 10,
+        lunch_free_window: 'UNKNOWN',
+        max_daily_krw: 5000,
+        weekend_max_krw: 'UNKNOWN',
+        access_note: '광장에서 도보 이동 가능 (~200m 추정, entrance_location 미검증)',
+        approved_for_customer_publication: false,
+        evidence_ids: ['E02', 'E03', 'E04'],
+        evidence_status: 'CONFIRMED_WEB',
+        mapping_status: 'NEEDS_VERIFICATION',
+      },
+      {
+        facility_id: 'PKG-FOUNDER-TERMINAL-GATED',
+        role: 'C',
+        official_name: '연안여객선터미널 차단기식 주차장',
+        address: 'UNKNOWN',
+        facility_type: 'BARRIER_CONTROLLED',
+        manager: '여수광양항만공사 여수지사',
+        capacity_approx: 154,
+        operating_hours: 'UNKNOWN',
+        initial_free_minutes: 10,
+        additional_fee_krw: 500,
+        billing_unit_minutes: 30,
+        lunch_free_window: null,
+        max_daily_krw: 5000,
+        weekend_max_krw: 5000,
+        access_note: '터미널 시설 내 — 일반 관광객 이용 가능 여부 미확인',
+        approved_for_customer_publication: false,
+        evidence_ids: ['F04'],
+        evidence_status: 'FOUNDER_PHONE_REPORTED',
+      },
+      {
+        facility_id: 'PKG-FOUNDER-TERMINAL-ROADSIDE',
+        role: 'C',
+        official_name: '연안여객선터미널 앞 노상주차장',
+        address: 'UNKNOWN',
+        facility_type: 'ROADSIDE',
+        manager: '여수시도시관리공단',
+        capacity_approx: null,
+        initial_free_minutes: 30,
+        additional_fee_krw: 500,
+        billing_unit_minutes: 30,
+        lunch_free_window: '12:00~14:00',
+        max_daily_krw: 'UNKNOWN',
+        weekend_max_krw: 'UNKNOWN',
+        access_note: '빈자리 확인 후 이용 — 사전 계획 비권장',
+        approved_for_customer_publication: false,
+        evidence_ids: ['F05'],
+        evidence_status: 'FOUNDER_PHONE_REPORTED',
+        mapping_status: 'HOLD',
+      },
+    ],
+    excluded_facilities: [
+      {
+        facility_id: 'PKG-YUM-LIST-JONGPO',
+        reason: 'IDENTITY_UNRESOLVED — 요금 전면 UNKNOWN, 이순신광장과 별도 관광 동선',
+        approved_for_customer_publication: false,
+      },
+    ],
+  },
+};
+
+/**
+ * Option B parking answer builder.
+ * Returns null when place-level gate is closed (approved_for_customer_publication: false).
+ * When gate opens (future Founder approval per facility), returns A/B/C structured answer:
+ *   role A — nearest primary
+ *   role B — overflow alternative (triggered by 혼잡/만차/대안 queries)
+ *   role C ROADSIDE — spot-only (triggered by 노상/잠깐/단기 queries)
+ * All facility-level gates must also pass before content is used.
+ */
+function _buildParkingOptionBAnswer(placeCode, message) {
+  const parkingData = _PLACE_PARKING[placeCode];
+  if (!parkingData) return null;
+  if (!parkingData.approved_for_customer_publication) return null;
+
+  const approved = (parkingData.facilities || []).filter(f => f.approved_for_customer_publication);
+  if (!approved.length) return null;
+
+  const typeA = approved.filter(f => f.role === 'A');
+  const typeB = approved.filter(f => f.role === 'B');
+  const roadsideC = approved.filter(f => f.role === 'C' && f.facility_type === 'ROADSIDE');
+
+  const isOverflow = /(꽉|혼잡|만차|없으면|없을 때|대안|다른 주차)/.test(message);
+  const isRoadside = /(노상|길가|잠깐|잠시|짧게|단기)/.test(message);
+
+  if (isOverflow && typeB.length) {
+    const b = typeB[0];
+    const freeHr = b.initial_free_minutes >= 60 ? `${b.initial_free_minutes / 60}시간` : `${b.initial_free_minutes}분`;
+    const fee = b.additional_fee_krw && b.billing_unit_minutes
+      ? `이후 ${b.billing_unit_minutes}분당 ${b.additional_fee_krw}원` : '';
+    return `광장이 혼잡하다면 ${b.official_name}도 이용할 수 있어요. 최초 ${freeHr} 무료${fee ? ', ' + fee : ''}이에요.`;
+  }
+
+  if (isRoadside && roadsideC.length) {
+    const c = roadsideC[0];
+    return `${c.official_name}이 있어요. ${c.access_note || '빈자리 확인 후 이용해보세요.'}`;
+  }
+
+  if (typeA.length) {
+    const a = typeA[0];
+    const freeHr = a.initial_free_minutes >= 60 ? `${a.initial_free_minutes / 60}시간` : `${a.initial_free_minutes}분`;
+    const parts = [
+      `${a.official_name}이 있어요.`,
+      `최초 ${freeHr} 무료` +
+        (a.lunch_free_window && a.lunch_free_window !== 'UNKNOWN' ? `, 점심(${a.lunch_free_window})에도 무료` : '') +
+        (a.additional_fee_krw && a.billing_unit_minutes
+          ? `, 이후 ${a.billing_unit_minutes}분당 ${a.additional_fee_krw}원` : '') +
+        (a.max_daily_krw && a.max_daily_krw !== 'UNKNOWN' ? `, 하루 최대 ${a.max_daily_krw.toLocaleString()}원` : '') +
+        '이에요.',
+      a.operating_hours && a.operating_hours !== 'UNKNOWN' ? `${a.operating_hours} 운영해요.` : null,
+    ].filter(Boolean);
+    return parts.join(' ');
+  }
+
+  return null;
+}
 
 // Place-like noun suffixes — for unknown place detection
 const PLACE_SUFFIX_RE = /공원|시장|광장|대교|타워|암자|향일암|해변|마을|포차거리|케이블카|전망대|박물관|기념관|해수욕/;
@@ -1165,8 +1417,14 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
 
   // [A] Parking — checked BEFORE Price to prevent "주차비 얼마야?" matching admission_ko.
   // Compound "주차비 + 입장료" queries resolve to parking (more specific). Partial-response limitation acknowledged.
+  // Option B gate: _buildParkingOptionBAnswer returns non-null only when place-level AND
+  // facility-level approved_for_customer_publication flags are true. Gate is closed for all
+  // facilities currently — returns null, existing fallback chain fires unchanged.
   else if (/(주차|차 세우|차 대|주차장)/.test(msg)) {
-    if (knowledge.parking_ko) {
+    const _optionBAnswer = _buildParkingOptionBAnswer(code, msg);
+    if (_optionBAnswer) {
+      answer = _optionBAnswer + verifyNote;
+    } else if (knowledge.parking_ko) {
       answer = knowledge.parking_ko + verifyNote;
     } else if (knowledge.parking_trust === 'UNKNOWN') {
       answer = `${name} 주변 주차 정보는 방문 전에 확인하는 것이 좋아요. 실제 이용 가능 여부와 요금은 시점에 따라 달라질 수 있어요.${verifyNote}`;
@@ -2188,11 +2446,25 @@ async function _handleJourneyDecision({ decisionType, message, soulContext, conv
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 async function handleTravelRequest({ message, sessionId, hotelId, principal, explicit_context = {} }) {
-  // ─── City Context Safety Guard V0.1 ─────────────────────────────────────────
+  // ─── G1 City Detection (runs before legacy Guard) ────────────────────────────
+  let _skipLegacyGuard = false;
+  {
+    const cityDet = _detectCityCode(message);
+    if (cityDet.role === 'ORIGIN_TO_YEOSU') {
+      _skipLegacyGuard = true;    // 여수 목적지 확정 — 레거시 Guard 건너뜀
+    } else if (!cityDet.is_supported) {
+      if (cityDet.role === 'UNSUPPORTED_PRIMARY')
+        return _buildUnsupportedCityPayload(cityDet.detected_city_name || '해당 지역', sessionId);
+      if (cityDet.role === 'AMBIGUOUS') return _buildAmbiguousCityPayload(sessionId);
+    }
+  }
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  // ─── City Context Safety Guard V0.1 (코드 무수정) ────────────────────────────
   // Intercepts unsupported-city requests before PLACE_LOOKUP or DISCOVERY paths.
   // Must be the first gate — DISCOVERY_OVERRIDES includes "하고 싶" which would otherwise
   // bypass PLACE_LOOKUP and silently route "순천에서 하루 보내고 싶어" to Yeosu results.
-  {
+  if (!_skipLegacyGuard) {
     const cityIntent = _classifyCityIntent(message);
     if (cityIntent === 'UNSUPPORTED_PRIMARY') {
       const detectedCity = UNSUPPORTED_CITY_KO.find(c => message.includes(c)) || '해당 지역';
