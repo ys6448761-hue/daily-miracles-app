@@ -23,15 +23,18 @@ Last Updated: 2026-10-22
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-22
 
-**Founder — P-NEW-1 MERGED, Production 배포 타이밍 결정 (수동 배포 대기)**
-- main HEAD: `4af1709` (PR #99 P-NEW-1 Explicit Place Preservation V0.1, 2026-10-22 KST 06:19)
-- **P-NEW-1 Explicit Place Preservation V0.1: MERGED — Production 배포 대기**
-  - PR #99 Squash Merge SHA: `4af1709aceab0479a3be0fc33d4850f73609e02a` / KST 2026-10-22 06:19
-  - Render: Manual Deploy 설정 (Founder-confirmed) — 자동 배포 미실행
-  - Post-merge CI: AIL Gate ✓ / Manifest Verify ✓ / docker-smoke ✓ / Deploy Health Check ✓
-  - Production Live SHA: `b6c05978` (기존값 유지 — 신규 배포 미실행)
-  - 신규 6/6 PASS / 회귀 113/114 PASS (R20 PRE-EXISTING 불변)
-  - Evidence: `docs/architecture/SOUL_PARKING_ROUTE_REALITY_CHECK_V0_1.md`
+**Founder — 여수 SOUL Phase 1 다음 장소 결정 / P-NEW-1 DEPLOYED_AND_VERIFIED**
+- main HEAD: `292a6b0` (PR #100 State Sync, 2026-10-22 KST 06:30)
+- **P-NEW-1 Explicit Place Preservation V0.1: DEPLOYED_AND_VERIFIED (2026-10-22)**
+  - PR #99 Squash Merge SHA: `4af1709aceab0479a3be0fc33d4850f73609e02a`
+  - Production SHA: `292a6b0d7f78cde00f5e045203b3ea97d5900912` / Deploy: `dep-dbcqt70m7kps73cl2ha0` / LIVE: 2026-10-22 KST
+  - T1 케이블카+오동도: SUCCESS — cablecar ✓ / odongdo ✓ / PASS
+  - T2 이순신광장+하멜등대: SUCCESS — lee_soon_shin_plaza ✓ / hamel_lighthouse ✓ / PASS
+  - T3 오동도 단일 코스: SUCCESS / PASS (회귀 없음)
+  - T4 1시간+4장소: JOURNEY_CONTINUITY / ADVISORY (PRE-EXISTING, 신규 회귀 아님)
+  - T5 부산 CITY_UNSUPPORTED: PASS (G1 회귀 없음)
+  - T6 Health Check: HTTP 200 / PASS
+  - Evidence: `docs/architecture/SOUL_P_NEW_1_EXPLICIT_PLACE_PRESERVATION_DEPLOYMENT_EVIDENCE_V1.md`
 - G1 City Detection V0.1: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-22, PR #96 / `b6c0597`)
 - CAND-EXP-003 소원 우선 적응형 여행코스: PR #97 OPEN (Founder 검토 대기)
 - Parking Option B 구현: 미착수 — 장소코드 확정 및 Founder 별도 승인 대기
