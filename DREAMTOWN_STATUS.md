@@ -23,14 +23,15 @@ Last Updated: 2026-10-22
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-23
 
-**Founder — PR #103 + #104 main 포함 완료. Production 배포 별도 승인 필요.**
-- main HEAD: `8ce8dfb` (PR #104 null guard Squash Merge, 2026-10-23 KST)
-- **PR #103 MERGED** @`d40586a` — MuyojeongHomePage CourseDisplay 연결 (CONNECT)
-- **PR #104 MERGED** @`8ce8dfb` — stay_minutes null guard REPAIR
-  - 하멜등대 "null분 체류" → 표시 생략 완료 / T1~T7 7/7 PASS / AIL Gate GREEN
-  - Evidence: `docs/architecture/SOUL_COURSE_DISPLAY_MUYOJEONG_VISUAL_REVIEW_V1.md`
-- Production: `292a6b0` (dep-dbcqt70m7kps73cl2ha0, LIVE) — PR #103/#104 미배포 대기 중
-- 다음: Founder Production 배포 승인 (PR #103 + #104 합산, 별도 명시 승인 필요)
+**Founder — 다음 장소 / 다음 기능 결정**
+- **CourseDisplay DEPLOYED_AND_VERIFIED** — 8/8 PASS (2026-10-23)
+- Production SHA: `696839a` / Deploy: `dep-dbd790mq1p3s73coua40` / LIVE: 2026-10-23 05:42 KST
+- **PR #103** @`d40586a` — MuyojeongHomePage CourseDisplay CONNECT ✓
+- **PR #104** @`8ce8dfb` — stay_minutes null guard REPAIR ✓ (하멜등대 "null분 체류" 해결)
+- **PR #105** @`696839a` — Project State sync ✓
+- Evidence: `docs/architecture/SOUL_COURSE_DISPLAY_PRODUCTION_VERIFICATION_V1.md`
+- 여수 SOUL Phase 1 완료: 이순신광장/향일암/오동도/케이블카/돌산공원/돌산대교/종포해양공원/하멜등대 (8/10)
+- R20 PRE-EXISTING FAIL (UNRESOLVED): dolsan_daegyo "걸어서 건너갈 수 있어?" → JOURNEY_CONTINUITY
 - **P-NEW-1 Explicit Place Preservation V0.1: DEPLOYED_AND_VERIFIED (2026-10-22)**
   - PR #99 Squash Merge SHA: `4af1709aceab0479a3be0fc33d4850f73609e02a`
   - Production SHA: `292a6b0d7f78cde00f5e045203b3ea97d5900912` / Deploy: `dep-dbcqt70m7kps73cl2ha0` / LIVE: 2026-10-22 KST
