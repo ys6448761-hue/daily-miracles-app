@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-22T03:25:27.993Z",
+  "generated_at": "2026-10-22T03:47:09.716Z",
   "generator": "generate-manifest.js",
-  "total_count": 450,
+  "total_count": 451,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -1153,6 +1153,22 @@
       "title": "SOUL Dolsan Park Living Detail — Runtime QA V1 Evidence",
       "created_at": "2026-10-22",
       "checksum": "bb9c93ba"
+    },
+    {
+      "id": "DOC-SOUL_G1_CITY_DETECTION_V0_1_CL",
+      "path": "docs/architecture/SOUL_G1_CITY_DETECTION_V0_1_CLOSURE_EVIDENCE_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "architecture",
+      "tags": [
+        "architecture"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "G1 City Detection V0.1 — Closure Evidence",
+      "created_at": "2026-10-22",
+      "checksum": "6a26e373"
     },
     {
       "id": "DOC-SOUL_JUDGMENT_V01_PRODUCTION_P",
