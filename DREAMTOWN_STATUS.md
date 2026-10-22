@@ -21,16 +21,16 @@ Last Updated: 2026-10-22
 5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
-### ★ Current Next Action (exactly 1) — Updated: 2026-10-22
+### ★ Current Next Action (exactly 1) — Updated: 2026-10-23
 
-**Founder — CourseDisplay Visual Review PASS. Production 배포 또는 ADVISORY(하멜등대 null분) 처리 방향 결정 필요.**
-- main HEAD: `d40586a` (PR #103 CourseDisplay CONNECT Squash Merge, 2026-10-22 KST)
-- **PR #103 MERGED** — MuyojeongHomePage CourseDisplay 연결 (Frontend Only, 3파일)
-- **Visual Review: VISUAL_REVIEW_PASS** (5/5 PASS, ADVISORY 1건)
-  - ADVISORY: 하멜등대 stay_minutes=null → "null분 체류" 표시 (pre-existing 데이터 갭)
+**Founder — PR #103 + #104 main 포함 완료. Production 배포 별도 승인 필요.**
+- main HEAD: `8ce8dfb` (PR #104 null guard Squash Merge, 2026-10-23 KST)
+- **PR #103 MERGED** @`d40586a` — MuyojeongHomePage CourseDisplay 연결 (CONNECT)
+- **PR #104 MERGED** @`8ce8dfb` — stay_minutes null guard REPAIR
+  - 하멜등대 "null분 체류" → 표시 생략 완료 / T1~T7 7/7 PASS / AIL Gate GREEN
   - Evidence: `docs/architecture/SOUL_COURSE_DISPLAY_MUYOJEONG_VISUAL_REVIEW_V1.md`
-- Production: `292a6b0` (dep-dbcqt70m7kps73cl2ha0, LIVE) — PR #103 미배포 대기 중
-- 다음: Founder Production 배포 승인 (별도 명시 승인 필요) + ADVISORY 처리 방향 결정
+- Production: `292a6b0` (dep-dbcqt70m7kps73cl2ha0, LIVE) — PR #103/#104 미배포 대기 중
+- 다음: Founder Production 배포 승인 (PR #103 + #104 합산, 별도 명시 승인 필요)
 - **P-NEW-1 Explicit Place Preservation V0.1: DEPLOYED_AND_VERIFIED (2026-10-22)**
   - PR #99 Squash Merge SHA: `4af1709aceab0479a3be0fc33d4850f73609e02a`
   - Production SHA: `292a6b0d7f78cde00f5e045203b3ea97d5900912` / Deploy: `dep-dbcqt70m7kps73cl2ha0` / LIVE: 2026-10-22 KST
