@@ -1,0 +1,583 @@
+{
+  "title": "Parking Evidence Register — Handover",
+  "sources": [
+    {
+      "evidence_id": "E01",
+      "source_type": "OFFICIAL_WEB_SOURCE",
+      "verification_status": "CLAIM_SCOPE_LIMITED_PREVIOUS_VERIFICATION",
+      "url": "https://parking.yumcorp.or.kr/main",
+      "original_source_date": "UNKNOWN",
+      "original_checked_at": "2026-10-20",
+      "phone_call_date": null,
+      "handover_received_at": null,
+      "access_status": "PREVIOUS_SOURCE_READ_REUSED",
+      "source_claim": "포털 진입점. 표시 내용과 개별 요금 설정 사이 충돌 존재",
+      "original_source_record": {
+        "id": "E01",
+        "institution": "여수시도시관리공단 주차포털",
+        "url": "https://parking.yumcorp.or.kr/main",
+        "checked_at": "2026-10-20",
+        "source_date": "UNKNOWN",
+        "finding": "포털 진입점. 표시 내용과 개별 요금 설정 사이 충돌 존재"
+      },
+      "public_use": "NOT_AUTOMATICALLY_APPROVED"
+    },
+    {
+      "evidence_id": "E02",
+      "source_type": "OFFICIAL_WEB_SOURCE",
+      "verification_status": "CLAIM_SCOPE_LIMITED_PREVIOUS_VERIFICATION",
+      "url": "https://parking.yumcorp.or.kr/api/parking/realtime/list",
+      "original_source_date": "UNKNOWN",
+      "original_checked_at": "2026-10-20",
+      "phone_call_date": null,
+      "handover_received_at": null,
+      "access_status": "PREVIOUS_SOURCE_READ_REUSED",
+      "source_claim": "공개 응답 40개. 시설별 주소·등록면수·좌표·요일별 요금. 응답 시각은 센서 측정시각 아님",
+      "original_source_record": {
+        "id": "E02",
+        "institution": "여수시도시관리공단",
+        "url": "https://parking.yumcorp.or.kr/api/parking/realtime/list",
+        "checked_at": "2026-10-20",
+        "response_datetime_raw": "2026-10-20 13:26:22",
+        "source_date": "UNKNOWN",
+        "finding": "공개 응답 40개. 시설별 주소·등록면수·좌표·요일별 요금. 응답 시각은 센서 측정시각 아님"
+      },
+      "public_use": "NOT_AUTOMATICALLY_APPROVED"
+    },
+    {
+      "evidence_id": "E03",
+      "source_type": "OFFICIAL_WEB_SOURCE",
+      "verification_status": "CLAIM_SCOPE_LIMITED_PREVIOUS_VERIFICATION",
+      "url": "https://parking.yumcorp.or.kr/parking/fee/info",
+      "original_source_date": "UNKNOWN",
+      "original_checked_at": "2026-10-20",
+      "phone_call_date": null,
+      "handover_received_at": null,
+      "access_status": "PREVIOUS_SOURCE_READ_REUSED",
+      "source_claim": "시설명 명시 소형차 요금표. 오동도 주말 상한 예외. 노상/일부 노외는 E02와 상충",
+      "original_source_record": {
+        "id": "E03",
+        "institution": "여수시도시관리공단",
+        "url": "https://parking.yumcorp.or.kr/parking/fee/info",
+        "resource_url": "https://parking.yumcorp.or.kr/js/view-parkingFeeInfo-vue.js",
+        "checked_at": "2026-10-20",
+        "source_date": "UNKNOWN",
+        "finding": "시설명 명시 소형차 요금표. 오동도 주말 상한 예외. 노상/일부 노외는 E02와 상충"
+      },
+      "public_use": "NOT_AUTOMATICALLY_APPROVED"
+    },
+    {
+      "evidence_id": "E04",
+      "source_type": "OFFICIAL_WEB_SOURCE",
+      "verification_status": "CLAIM_SCOPE_LIMITED_PREVIOUS_VERIFICATION",
+      "url": "https://www.yumcorp.or.kr/www/service/public_parking",
+      "original_source_date": "UNKNOWN",
+      "original_checked_at": "2026-10-20",
+      "phone_call_date": null,
+      "handover_received_at": null,
+      "access_status": "PREVIOUS_SOURCE_READ_REUSED",
+      "source_claim": "관리 시설·면수·공통 요금 및 지정 고시 조건",
+      "original_source_record": {
+        "id": "E04",
+        "institution": "여수시도시관리공단",
+        "url": "https://www.yumcorp.or.kr/www/service/public_parking",
+        "checked_at": "2026-10-20",
+        "source_date": "UNKNOWN",
+        "finding": "관리 시설·면수·공통 요금 및 지정 고시 조건"
+      },
+      "public_use": "NOT_AUTOMATICALLY_APPROVED"
+    },
+    {
+      "evidence_id": "E05",
+      "source_type": "OFFICIAL_WEB_SOURCE",
+      "verification_status": "CLAIM_SCOPE_LIMITED_PREVIOUS_VERIFICATION",
+      "url": "https://yscms.yeosu.go.kr/tour/information/trafficinfo/public_parking",
+      "original_source_date": "UNKNOWN",
+      "original_checked_at": "2026-10-20",
+      "phone_call_date": null,
+      "handover_received_at": null,
+      "access_status": "PREVIOUS_SOURCE_READ_REUSED",
+      "source_claim": "직접 HTTP 원문 확보. 공단/포털과 주소·면수 차이. 일반 웹 열람은 시간초과",
+      "original_source_record": {
+        "id": "E05",
+        "institution": "여수시 관광문화",
+        "url": "https://yscms.yeosu.go.kr/tour/information/trafficinfo/public_parking",
+        "checked_at": "2026-10-20",
+        "source_date": "UNKNOWN",
+        "finding": "직접 HTTP 원문 확보. 공단/포털과 주소·면수 차이. 일반 웹 열람은 시간초과"
+      },
+      "public_use": "NOT_AUTOMATICALLY_APPROVED"
+    },
+    {
+      "evidence_id": "E06",
+      "source_type": "OFFICIAL_WEB_SOURCE",
+      "verification_status": "CLAIM_SCOPE_LIMITED_PREVIOUS_VERIFICATION",
+      "url": "https://parking.yumcorp.or.kr/js/src_composables_useParking_js-src_components_kakao_KakaoMap_vue.js",
+      "original_source_date": "UNKNOWN",
+      "original_checked_at": "2026-10-20",
+      "phone_call_date": null,
+      "handover_received_at": null,
+      "access_status": "PREVIOUS_SOURCE_READ_REUSED",
+      "source_claim": "화면용 주차시간·기타 안내 JSON 내 과거 임시폐쇄, 무료개방, 캠핑 정기권 문구. 현재 요금 응답과 상충",
+      "original_source_record": {
+        "id": "E06",
+        "institution": "여수시도시관리공단",
+        "url": "https://parking.yumcorp.or.kr/js/src_composables_useParking_js-src_components_kakao_KakaoMap_vue.js",
+        "checked_at": "2026-10-20",
+        "source_date": "UNKNOWN",
+        "finding": "화면용 주차시간·기타 안내 JSON 내 과거 임시폐쇄, 무료개방, 캠핑 정기권 문구. 현재 요금 응답과 상충"
+      },
+      "public_use": "NOT_AUTOMATICALLY_APPROVED"
+    },
+    {
+      "evidence_id": "E07",
+      "source_type": "OFFICIAL_WEB_SOURCE",
+      "verification_status": "CLAIM_SCOPE_LIMITED_PREVIOUS_VERIFICATION",
+      "url": "https://parking.yumcorp.or.kr/js/view-main-vue.js",
+      "original_source_date": "UNKNOWN",
+      "original_checked_at": "2026-10-20",
+      "phone_call_date": null,
+      "handover_received_at": null,
+      "access_status": "PREVIOUS_SOURCE_READ_REUSED",
+      "source_claim": "메인 화면 주차목록 조회 타이머 60,000ms. 현장 센서 갱신 주기 보장 아님",
+      "original_source_record": {
+        "id": "E07",
+        "institution": "여수시도시관리공단",
+        "url": "https://parking.yumcorp.or.kr/js/view-main-vue.js",
+        "checked_at": "2026-10-20",
+        "source_date": "UNKNOWN",
+        "finding": "메인 화면 주차목록 조회 타이머 60,000ms. 현장 센서 갱신 주기 보장 아님"
+      },
+      "public_use": "NOT_AUTOMATICALLY_APPROVED"
+    },
+    {
+      "evidence_id": "E08",
+      "source_type": "OFFICIAL_WEB_SOURCE",
+      "verification_status": "CLAIM_SCOPE_LIMITED_PREVIOUS_VERIFICATION",
+      "url": "https://parking.yumcorp.or.kr/api/parking/extra/list",
+      "original_source_date": "UNKNOWN",
+      "original_checked_at": "2026-10-20",
+      "phone_call_date": null,
+      "handover_received_at": null,
+      "access_status": "PREVIOUS_SOURCE_READ_REUSED",
+      "source_claim": "기타 주차장 334개 등록. 주차요금 목록 공백은 무료 증거 아님. 인근 일부만 패키지 채택",
+      "original_source_record": {
+        "id": "E08",
+        "institution": "여수시도시관리공단",
+        "url": "https://parking.yumcorp.or.kr/api/parking/extra/list",
+        "checked_at": "2026-10-20",
+        "response_datetime_raw": "2026-10-20 13:28:24",
+        "source_date": "UNKNOWN",
+        "finding": "기타 주차장 334개 등록. 주차요금 목록 공백은 무료 증거 아님. 인근 일부만 패키지 채택"
+      },
+      "public_use": "NOT_AUTOMATICALLY_APPROVED"
+    },
+    {
+      "evidence_id": "F01",
+      "source_type": "FOUNDER_PHONE_REPORTED",
+      "verification_status": "FOUNDER_PHONE_REPORTED",
+      "url": "UNKNOWN",
+      "original_source_date": "UNKNOWN",
+      "original_checked_at": "2026-10-20",
+      "phone_call_date": "UNKNOWN",
+      "handover_received_at": "2026-10-20",
+      "access_status": "NOT_APPLICABLE_PHONE_HANDOVER",
+      "source_claim": "공단 공통 요금·무료시간·결합 적용 사례. 통화일·부서별 적용 시설·정산 예시 원기록 미제공",
+      "original_source_record": {
+        "id": "F01",
+        "institution": "Founder 전화 확인 인계",
+        "url": "UNKNOWN",
+        "checked_at": "2026-10-20",
+        "source_date": "UNKNOWN",
+        "finding": "공단 공통 요금·무료시간·결합 적용 사례. 통화일·부서별 적용 시설·정산 예시 원기록 미제공",
+        "provenance_type": "FOUNDER_EVIDENCE"
+      },
+      "public_use": "NOT_AUTOMATICALLY_APPROVED"
+    },
+    {
+      "evidence_id": "F02",
+      "source_type": "FOUNDER_PHONE_REPORTED",
+      "verification_status": "FOUNDER_PHONE_REPORTED",
+      "url": "UNKNOWN",
+      "original_source_date": "UNKNOWN",
+      "original_checked_at": "2026-10-20",
+      "phone_call_date": "UNKNOWN",
+      "handover_received_at": "2026-10-20",
+      "access_status": "NOT_APPLICABLE_PHONE_HANDOVER",
+      "source_claim": "오동도 주차타워 237면, 공단 관리. 입구 노상 37면과 별도 시설",
+      "original_source_record": {
+        "id": "F02",
+        "institution": "Founder 전화 확인 인계",
+        "url": "UNKNOWN",
+        "checked_at": "2026-10-20",
+        "source_date": "UNKNOWN",
+        "finding": "오동도 주차타워 237면, 공단 관리. 입구 노상 37면과 별도 시설",
+        "provenance_type": "FOUNDER_EVIDENCE"
+      },
+      "public_use": "NOT_AUTOMATICALLY_APPROVED"
+    },
+    {
+      "evidence_id": "F03",
+      "source_type": "FOUNDER_PHONE_REPORTED",
+      "verification_status": "FOUNDER_PHONE_REPORTED",
+      "url": "UNKNOWN",
+      "original_source_date": "UNKNOWN",
+      "original_checked_at": "2026-10-20",
+      "phone_call_date": "UNKNOWN",
+      "handover_received_at": "2026-10-20",
+      "access_status": "NOT_APPLICABLE_PHONE_HANDOVER",
+      "source_claim": "오동도 입구 노상: 공원과 관리, 37면, 최초30분/이후30분500원,22~07무료,점심무료불가",
+      "original_source_record": {
+        "id": "F03",
+        "institution": "Founder 전화 확인 인계",
+        "url": "UNKNOWN",
+        "checked_at": "2026-10-20",
+        "source_date": "UNKNOWN",
+        "finding": "오동도 입구 노상: 공원과 관리, 37면, 최초30분/이후30분500원,22~07무료,점심무료불가",
+        "provenance_type": "FOUNDER_EVIDENCE"
+      },
+      "public_use": "NOT_AUTOMATICALLY_APPROVED"
+    },
+    {
+      "evidence_id": "P01",
+      "source_type": "RESEARCH_DERIVED",
+      "verification_status": "REFERENCE_ONLY",
+      "url": "UNKNOWN",
+      "original_source_date": "2026-10-19",
+      "original_checked_at": "2026-10-19",
+      "phone_call_date": null,
+      "handover_received_at": null,
+      "access_status": "DERIVED_REPORT",
+      "source_claim": "정류장 승강기와 공원 접근 경로 분리; 주차장 명칭 대응. 오늘 원문 재사용 검토",
+      "original_source_record": {
+        "id": "P01",
+        "institution": "Work 기존 검증 보고서",
+        "url": "UNKNOWN",
+        "library_file_id": "libfile_5d80c04a27288191b775f20e7f825bea",
+        "checked_at": "2026-10-19",
+        "source_date": "2026-10-19",
+        "finding": "정류장 승강기와 공원 접근 경로 분리; 주차장 명칭 대응. 오늘 원문 재사용 검토"
+      },
+      "public_use": "NOT_AUTOMATICALLY_APPROVED"
+    },
+    {
+      "evidence_id": "P02",
+      "source_type": "RESEARCH_DERIVED",
+      "verification_status": "REFERENCE_ONLY",
+      "url": "UNKNOWN",
+      "original_source_date": "2026-10-12",
+      "original_checked_at": "2026-10-12",
+      "phone_call_date": null,
+      "handover_received_at": null,
+      "access_status": "DERIVED_REPORT",
+      "source_claim": "광장 지하주차장 엘리베이터 부재 단정 충돌, 연속 보행경로 미확인. 현재 가동 확인 아님",
+      "original_source_record": {
+        "id": "P02",
+        "institution": "Work 기존 독립 교차 검증",
+        "url": "UNKNOWN",
+        "library_file_id": "libfile_7b3fad0e80748191adff21448463a768",
+        "checked_at": "2026-10-12",
+        "source_date": "2026-10-12",
+        "finding": "광장 지하주차장 엘리베이터 부재 단정 충돌, 연속 보행경로 미확인. 현재 가동 확인 아님"
+      },
+      "public_use": "NOT_AUTOMATICALLY_APPROVED"
+    },
+    {
+      "evidence_id": "E09",
+      "source_type": "OFFICIAL_WEB_SOURCE",
+      "verification_status": "SOURCE_UNAVAILABLE",
+      "url": "https://yeosucablecar.com/kr/dolsan/parking",
+      "original_source_date": "UNKNOWN",
+      "original_checked_at": "2026-10-20",
+      "phone_call_date": null,
+      "handover_received_at": null,
+      "access_status": "FAILED",
+      "source_claim": "원문 접근 실패. 자산 주차 페이지도 실패; 운영사 무료주차 확정값 신규 채택 없음",
+      "original_source_record": {
+        "id": "E09",
+        "institution": "케이블카 운영사",
+        "url": "https://yeosucablecar.com/kr/dolsan/parking",
+        "checked_at": "2026-10-20",
+        "source_date": "UNKNOWN",
+        "finding": "원문 접근 실패. 자산 주차 페이지도 실패; 운영사 무료주차 확정값 신규 채택 없음"
+      },
+      "public_use": "NOT_AUTOMATICALLY_APPROVED"
+    },
+    {
+      "evidence_id": "E10",
+      "source_type": "OFFICIAL_WEB_SOURCE",
+      "verification_status": "CLAIM_SCOPE_LIMITED_PREVIOUS_VERIFICATION",
+      "url": "https://access.visitkorea.or.kr/ms/detail.do?cotId=7379df1e-2b68-4894-bc61-072cdbf580e7",
+      "original_source_date": "페이지2025-10-23/코스지도2022-02-08",
+      "original_checked_at": "2026-10-19",
+      "phone_call_date": null,
+      "handover_received_at": null,
+      "access_status": "PREVIOUS_SOURCE_READ_REUSED",
+      "source_claim": "기존 검증 재사용: 해야정류장 주차타워=오동도 공영주차타워. 전체 공원 무장애 인증 아님",
+      "original_source_record": {
+        "id": "E10",
+        "institution": "한국관광공사",
+        "url": "https://access.visitkorea.or.kr/ms/detail.do?cotId=7379df1e-2b68-4894-bc61-072cdbf580e7",
+        "checked_at": "2026-10-19",
+        "source_date": "페이지2025-10-23/코스지도2022-02-08",
+        "finding": "기존 검증 재사용: 해야정류장 주차타워=오동도 공영주차타워. 전체 공원 무장애 인증 아님"
+      },
+      "public_use": "NOT_AUTOMATICALLY_APPROVED"
+    },
+    {
+      "evidence_id": "E11",
+      "source_type": "OFFICIAL_WEB_SOURCE",
+      "verification_status": "REFERENCE_ONLY",
+      "url": "https://yeosu.go.kr/tour/travel/info_each_area?idx=409&mode=view",
+      "original_source_date": "UNKNOWN",
+      "original_checked_at": "2026-10-20",
+      "phone_call_date": null,
+      "handover_received_at": null,
+      "access_status": "SEARCH_ONLY",
+      "source_claim": "검색 결과에 종포해양공원 주차무료 문구, 원문 열람 실패. 특정 주차장 무료 확정에 사용 안 함",
+      "original_source_record": {
+        "id": "E11",
+        "institution": "여수시 관광문화",
+        "url": "https://yeosu.go.kr/tour/travel/info_each_area?idx=409&mode=view",
+        "checked_at": "2026-10-20",
+        "source_date": "UNKNOWN",
+        "finding": "검색 결과에 종포해양공원 주차무료 문구, 원문 열람 실패. 특정 주차장 무료 확정에 사용 안 함"
+      },
+      "public_use": "NOT_AUTOMATICALLY_APPROVED"
+    },
+    {
+      "evidence_id": "F04",
+      "source_type": "FOUNDER_PHONE_REPORTED",
+      "verification_status": "FOUNDER_PHONE_REPORTED",
+      "url": "UNKNOWN",
+      "original_source_date": "UNKNOWN",
+      "original_checked_at": "UNKNOWN",
+      "phone_call_date": "UNKNOWN",
+      "handover_received_at": "2026-10-20",
+      "access_status": "NOT_APPLICABLE_PHONE_HANDOVER",
+      "source_claim": "연안터미널 차단기식 약154면,최초10분무료,30분500원,일최대5000,평일주말동일·24시간동일요금,점심/야간무료없음.10분초과과금경계·할인미확인",
+      "original_source_record": {
+        "id": "F04",
+        "institution": "Founder 인계: 여수광양항만공사 여수지사",
+        "provenance_type": "FOUNDER_PHONE_EVIDENCE",
+        "url": "UNKNOWN",
+        "phone_call_date": "UNKNOWN",
+        "recording_or_transcript_id": "UNKNOWN",
+        "received_at": "2026-10-20",
+        "independent_official_verification": false,
+        "finding": "연안터미널 차단기식 약154면,최초10분무료,30분500원,일최대5000,평일주말동일·24시간동일요금,점심/야간무료없음.10분초과과금경계·할인미확인"
+      },
+      "public_use": "NOT_AUTOMATICALLY_APPROVED"
+    },
+    {
+      "evidence_id": "F05",
+      "source_type": "FOUNDER_PHONE_REPORTED",
+      "verification_status": "FOUNDER_PHONE_REPORTED",
+      "url": "UNKNOWN",
+      "original_source_date": "UNKNOWN",
+      "original_checked_at": "UNKNOWN",
+      "phone_call_date": "UNKNOWN",
+      "handover_received_at": "2026-10-20",
+      "access_status": "NOT_APPLICABLE_PHONE_HANDOVER",
+      "source_claim": "터미널앞노상:최초30분무료,이후30분500원,점심12~14무료.정확구획·주소·야간·최대미확인",
+      "original_source_record": {
+        "id": "F05",
+        "institution": "Founder 인계: 여수시도시관리공단",
+        "provenance_type": "FOUNDER_PHONE_EVIDENCE",
+        "url": "UNKNOWN",
+        "phone_call_date": "UNKNOWN",
+        "recording_or_transcript_id": "UNKNOWN",
+        "received_at": "2026-10-20",
+        "independent_official_verification": false,
+        "finding": "터미널앞노상:최초30분무료,이후30분500원,점심12~14무료.정확구획·주소·야간·최대미확인"
+      },
+      "public_use": "NOT_AUTOMATICALLY_APPROVED"
+    },
+    {
+      "evidence_id": "F06",
+      "source_type": "FOUNDER_PHONE_REPORTED",
+      "verification_status": "FOUNDER_PHONE_REPORTED",
+      "url": "UNKNOWN",
+      "original_source_date": "UNKNOWN",
+      "original_checked_at": "UNKNOWN",
+      "phone_call_date": "UNKNOWN",
+      "handover_received_at": "2026-10-20",
+      "access_status": "NOT_APPLICABLE_PHONE_HANDOVER",
+      "source_claim": "07~22,승용10분400원,일최대13000,버스13000안내,1회재입차가능안내.시설·무료회차·할인·시간외출차·버스과금단위미확인",
+      "original_source_record": {
+        "id": "F06",
+        "institution": "Founder 인계: 여수세계박람회장 전화 자동안내",
+        "provenance_type": "FOUNDER_PHONE_AUTO_GUIDANCE",
+        "url": "UNKNOWN",
+        "phone_call_date": "UNKNOWN",
+        "recording_or_transcript_id": "UNKNOWN",
+        "received_at": "2026-10-20",
+        "independent_official_verification": false,
+        "finding": "07~22,승용10분400원,일최대13000,버스13000안내,1회재입차가능안내.시설·무료회차·할인·시간외출차·버스과금단위미확인"
+      },
+      "public_use": "NOT_AUTOMATICALLY_APPROVED"
+    }
+  ],
+  "source_count": 19,
+  "original_source_count": 16,
+  "additional_phone_reports_count": 3,
+  "note": "기존16건에도Founder전화인계F01~03포함.19건이모두독립공식원문인것은아님",
+  "conflicts": [
+    {
+      "id": "C01",
+      "claim": "공단 주차장 주말·공휴일 최대요금 일괄10,000원",
+      "sources": [
+        "F01",
+        "E02",
+        "E03"
+      ],
+      "finding": "오동도만10,000원 일치. 돌산공원·이순신광장·향일암·진남관 등 개별설정5,000원. 일괄 규칙 승계 금지",
+      "decision": "주말·공휴일 확정 요금은 오동도 외 충돌 보류"
+    },
+    {
+      "id": "C02",
+      "claim": "오동도 주차타워 면수",
+      "sources": [
+        "F02",
+        "E02",
+        "E04",
+        "E05"
+      ],
+      "finding": "237/210/237/246. 이유 미확인",
+      "decision": "237은Founder·공단목록값으로 보존, 대표 단일면수 UNKNOWN"
+    },
+    {
+      "id": "C03",
+      "claim": "돌산공원 요금·운영",
+      "sources": [
+        "E02",
+        "E03",
+        "E04",
+        "E05",
+        "E06"
+      ],
+      "finding": "유료시설249면·시250면 vs 화면문구 평일08~19/주말공휴일무료. 기타목록23면은 좌표·필지 다른 시설",
+      "decision": "무료개방·현행 운영시간 보류.249면 공영과23면 기타시설 병합 금지"
+    },
+    {
+      "id": "C04",
+      "claim": "향일암 운영",
+      "sources": [
+        "E02",
+        "E04",
+        "E06"
+      ],
+      "finding": "유료87면과 화면의 무료개방/2024-06-10~2025상반기 임시폐쇄 문구 공존",
+      "decision": "지난 종료일로 재개 추정 금지. 현재 출입·요금 적용 현장 확인"
+    },
+    {
+      "id": "C05",
+      "claim": "종화동 물양장",
+      "sources": [
+        "E02",
+        "E03",
+        "E05",
+        "E06"
+      ],
+      "finding": "추가10분100원 vs 요금표200원;277면 vs243면;캠핑용자동차 정기권전용 문구",
+      "decision": "일반 관광객 대안 자동추천 보류"
+    },
+    {
+      "id": "C06",
+      "claim": "광장로 노상 요금",
+      "sources": [
+        "E02",
+        "E04"
+      ],
+      "finding": "개별설정60분무료/10분200원 vs 일반노상30분무료/30분500원",
+      "decision": "시설별 요금 공개 보류. 로1은 포털 민간 분류, 로2·3과 통합 금지"
+    },
+    {
+      "id": "C07",
+      "claim": "점심·야간 무료 및 최초무료 결합",
+      "sources": [
+        "F01",
+        "E03",
+        "E04"
+      ],
+      "finding": "Founder 적용 사례 존재. 공식은 개별지정 및 별도조건 가능;시설별 결합 정산 예시 없음",
+      "decision": "공통 자동합산 금지. 점심·야간은 개별확인 전 UNKNOWN"
+    },
+    {
+      "id": "C08",
+      "claim": "종포 해양공원 vs 종화동 물양장",
+      "sources": [
+        "E02",
+        "E04",
+        "E05"
+      ],
+      "finding": "공단 종포해양공원225면 목록, 물양장포털277면/시243면. 동일시설 증거 없음",
+      "decision": "별도 레코드.종포225면에 물양장 요금·좌표 복사 금지"
+    },
+    {
+      "id": "C09",
+      "claim": "진남관·이순신광장 시설별 주소·면수",
+      "sources": [
+        "E02",
+        "E04",
+        "E05"
+      ],
+      "finding": "진남관498-1/95 vs505/102.광장102 vs103.차량출입구는 별도 미검증",
+      "decision": "대표주소/면수 충돌 명시.포털 좌표를 출입구로 사용 금지"
+    },
+    {
+      "id": "C10",
+      "claim": "포털 기타 목록은 무료",
+      "sources": [
+        "E08"
+      ],
+      "finding": "요금 항목 공백, 정식 무료 설명 없음",
+      "decision": "무료값 UNKNOWN.일반 관광객 이용권한도 별도 확인"
+    },
+    {
+      "id": "C11",
+      "claim": "터미널앞노상과포털광장로1/2/3구획동일성",
+      "sources": [
+        "F05",
+        "E02",
+        "E04"
+      ],
+      "finding": "전화30분무료/30분500원;포털일부60분무료/10분200원.구획미특정",
+      "decision": "기존C06유지.동일시설확정전요금대체/중복제거금지"
+    },
+    {
+      "id": "C12",
+      "claim": "박람회장관리주차장과공단정문/기타엑스포1문동일성",
+      "sources": [
+        "F06",
+        "E02",
+        "E08"
+      ],
+      "finding": "관리전화400/10·최대13000 vs기존다른주차시설요금.정확시설범위미확보",
+      "decision": "서로다른후보레코드로유지.가짜충돌해결및요금통합금지"
+    }
+  ],
+  "context_sources": [
+    {
+      "source_library_file_id": "libfile_bc9503175a588191b296f33f255368cc",
+      "title": "DreamTown Parking Hospitality V1 — Architecture Review",
+      "review_read_on": "2026-10-20",
+      "repository_rechecked_by_work": false,
+      "option_b": "구조화 JSON을 기존 C-3/PSQ에 연결하는 검토안. 구현 승인 없음."
+    }
+  ],
+  "unresolved_handover_discrepancies": [
+    {
+      "id": "HD01",
+      "claim": "향일암공영2시간무료(Code보고의BATCH01인용) vsV1.1최초1시간",
+      "status": "UNVERIFIED_SOURCE_CONFLICT",
+      "code_report_library_id": "libfile_bc9503175a588191b296f33f255368cc",
+      "evidence_ids": [
+        "E02",
+        "E03",
+        "E06"
+      ],
+      "note": "BATCH01정본미확보;새12건중하나로임의치환안함.고객안내HOLD"
+    }
+  ]
+}

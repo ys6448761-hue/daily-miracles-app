@@ -54,11 +54,11 @@ const PLACE_DETAIL_CODE_MAP = {
 const PAGE_BG = '#130b1e'; // page background — must match hero bottom gradient
 
 // ── Time options — shown when SOUL asks '시간이 얼마나 남으셨어요?' ─────────────
+// '1박 2일' 제외: routeSkeletonService 미구현 → routeSkeleton=null → _isMultiDayTrip 미설정
 const TIME_OPTIONS = [
   { label: '2~3시간', message: '여수에서 2~3시간 있어요. 어디 갈까요?' },
-  { label: '반나절',  message: '여수에서 반나절 있어요. 어디 갈까요?' },
-  { label: '하루',    message: '여수에서 하루 있어요. 어디 갈까요?' },
-  { label: '1박 2일', message: '여수에서 1박 2일 일정이에요. 어디 갈까요?' },
+  { label: '반나절',  message: '여수에서 5시간 있어요. 어디 갈까요?' },
+  { label: '하루',    message: '여수에서 8시간 있어요. 어디 갈까요?' },
 ];
 const TIME_QUESTION = '시간이 얼마나 남으셨어요?';
 

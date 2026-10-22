@@ -1,0 +1,44 @@
+{
+  "files": [
+    {
+      "name": "Change_Log.md",
+      "bytes": 1493,
+      "sha256": "0b3a587a53221e253625a2e23b0dcae2ae763003d78d1280c9c6ef221060c644"
+    },
+    {
+      "name": "Data_Handover_Report.md",
+      "bytes": 12540,
+      "sha256": "34e1e212732295bc4a90eae6976f04d78853fab9b289bfb0f771c70bf8b1ed9a"
+    },
+    {
+      "name": "Parking_Course_Hospitality_V1.json",
+      "bytes": 9087,
+      "sha256": "e47ac6162776fa0be0c1f848eb10ef7b685d3b9b9f764934604c11972a22c6ce"
+    },
+    {
+      "name": "Parking_Data_Package_V1_1.json",
+      "bytes": 265513,
+      "sha256": "f4e80fb2ad26fc30179ac4a1be48140693d6e5cf1a9e41408a7078eb01f096f5"
+    },
+    {
+      "name": "Parking_Evidence_Register.json",
+      "bytes": 25262,
+      "sha256": "9a0c6b1a56bcbf98c3f51eb8a12339c2679e324109f7bc26906b5bdeeda66398"
+    },
+    {
+      "name": "Parking_Place_Mapping_Draft.json",
+      "bytes": 16370,
+      "sha256": "129f1e22094b0aa8e8f13315a66bfc5c633f6aad044e01550da476575c50ccf8"
+    },
+    {
+      "name": "Project_State_Update_Draft.md",
+      "bytes": 993,
+      "sha256": "f76a2d265eed3238c85dbe1c872e567f38f4dcfec4010349b6589aefb82bfedc"
+    },
+    {
+      "name": "Validation_Report.json",
+      "bytes": 1494,
+      "sha256": "69e3a4da9f25df90488abe513a04ccb2939d1c0af682ee7f773aa2aa42afcf63"
+    }
+  ]
+}
