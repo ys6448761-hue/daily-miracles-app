@@ -23,8 +23,11 @@ Last Updated: 2026-10-22
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-22
 
-**Founder — 여수 SOUL Phase 1 다음 장소 결정 / P-NEW-1 DEPLOYED_AND_VERIFIED**
+**Founder — CourseDisplay MuyojeongHomePage 연결 PR #102 검토 및 병합 승인**
+- PR #102 OPEN: feat/course-display-muyojeong-v1 — CourseDisplay 연결 (Frontend Only)
+- 변경: MuyojeongHomePage.jsx import + 조건부 렌더링 / 신규: soulCourseDisplayConnect.test.js 6/6 PASS
 - main HEAD: `292a6b0` (PR #100 State Sync, 2026-10-22 KST 06:30)
+- **P-NEW-1 Explicit Place Preservation V0.1: DEPLOYED_AND_VERIFIED (2026-10-22)**
 - **P-NEW-1 Explicit Place Preservation V0.1: DEPLOYED_AND_VERIFIED (2026-10-22)**
   - PR #99 Squash Merge SHA: `4af1709aceab0479a3be0fc33d4850f73609e02a`
   - Production SHA: `292a6b0d7f78cde00f5e045203b3ea97d5900912` / Deploy: `dep-dbcqt70m7kps73cl2ha0` / LIVE: 2026-10-22 KST
