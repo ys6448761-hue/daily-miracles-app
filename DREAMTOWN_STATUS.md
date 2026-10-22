@@ -23,11 +23,14 @@ Last Updated: 2026-10-22
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-22
 
-**Founder — CourseDisplay MuyojeongHomePage 연결 PR #102 검토 및 병합 승인**
-- PR #102 OPEN: feat/course-display-muyojeong-v1 — CourseDisplay 연결 (Frontend Only)
-- 변경: MuyojeongHomePage.jsx import + 조건부 렌더링 / 신규: soulCourseDisplayConnect.test.js 6/6 PASS
-- main HEAD: `292a6b0` (PR #100 State Sync, 2026-10-22 KST 06:30)
-- **P-NEW-1 Explicit Place Preservation V0.1: DEPLOYED_AND_VERIFIED (2026-10-22)**
+**Founder — CourseDisplay Visual Review PASS. Production 배포 또는 ADVISORY(하멜등대 null분) 처리 방향 결정 필요.**
+- main HEAD: `d40586a` (PR #103 CourseDisplay CONNECT Squash Merge, 2026-10-22 KST)
+- **PR #103 MERGED** — MuyojeongHomePage CourseDisplay 연결 (Frontend Only, 3파일)
+- **Visual Review: VISUAL_REVIEW_PASS** (5/5 PASS, ADVISORY 1건)
+  - ADVISORY: 하멜등대 stay_minutes=null → "null분 체류" 표시 (pre-existing 데이터 갭)
+  - Evidence: `docs/architecture/SOUL_COURSE_DISPLAY_MUYOJEONG_VISUAL_REVIEW_V1.md`
+- Production: `292a6b0` (dep-dbcqt70m7kps73cl2ha0, LIVE) — PR #103 미배포 대기 중
+- 다음: Founder Production 배포 승인 (별도 명시 승인 필요) + ADVISORY 처리 방향 결정
 - **P-NEW-1 Explicit Place Preservation V0.1: DEPLOYED_AND_VERIFIED (2026-10-22)**
   - PR #99 Squash Merge SHA: `4af1709aceab0479a3be0fc33d4850f73609e02a`
   - Production SHA: `292a6b0d7f78cde00f5e045203b3ea97d5900912` / Deploy: `dep-dbcqt70m7kps73cl2ha0` / LIVE: 2026-10-22 KST

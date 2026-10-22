@@ -66,9 +66,9 @@ const mkCtx = (overrides = {}) => ({
   ...overrides,
 });
 
-const cablecarPlace = { code: 'cablecar',         name_ko: '여수해상케이블카', physical_difficulty: 'low', avg_stay_minutes: 45 };
-const hamelPlace    = { code: 'hamel_lighthouse',  name_ko: '하멜등대',       physical_difficulty: 'low', avg_stay_minutes: 40 };
-const hyangiramPlace = { code: 'hyangiram',        name_ko: '향일암',         physical_difficulty: 'medium', avg_stay_minutes: 60 };
+const cablecarPlace  = { code: 'cablecar',         name_ko: '여수해상케이블카', physical_difficulty: 'low',    avg_stay_minutes: 45   };
+const hamelPlace     = { code: 'hamel_lighthouse', name_ko: '하멜등대',        physical_difficulty: 'low',    avg_stay_minutes: null };
+const hyangiramPlace = { code: 'hyangiram',        name_ko: '향일암',          physical_difficulty: 'medium', avg_stay_minutes: 60   };
 
 // Minimal course shape that CourseDisplay expects
 const mkCourse = (places, withTravelTime = false) => ({
@@ -89,7 +89,7 @@ const mkCourse = (places, withTravelTime = false) => ({
     }),
   ],
   actual_stop_count: places.length,
-  summary: { total_stay_minutes: places.reduce((sum, p) => sum + p.avg_stay_minutes, 0) },
+  summary: { total_stay_minutes: places.reduce((sum, p) => sum + (p.avg_stay_minutes ?? 0), 0) },
   message_ko: null,
 });
 
@@ -229,4 +229,38 @@ test('T6 — 단일 장소 코스도 blocks 전달 시 course 포함', async () 
   expect(result.payload.course).not.toBeNull();
   expect(result.payload.course.blocks).toHaveLength(1);
   expect(result.payload.course.blocks[0].code).toBe('cablecar');
+});
+
+// ══════════════════════════════════════════════════════════════
+// T7 — place.stay_minutes null 전파 (하멜등대 avg_stay_minutes=null)
+//      Frontend null guard (CourseDisplay line 32) 계약 검증
+// ══════════════════════════════════════════════════════════════
+
+test('T7 — 하멜등대 avg_stay_minutes=null → course.blocks[place].stay_minutes=null (frontend null guard 계약)', async () => {
+  const course = mkCourse([cablecarPlace, hamelPlace, hyangiramPlace]);
+  travelGuideSvc.recommend.mockResolvedValue({
+    places: [cablecarPlace, hamelPlace, hyangiramPlace],
+    course,
+  });
+
+  const result = await makeRequest('케이블카, 하멜등대, 향일암 코스 짜줘.');
+
+  const hamelBlock = result.payload.course.blocks.find(
+    (b) => b.type === 'place' && b.code === 'hamel_lighthouse'
+  );
+  expect(hamelBlock).toBeDefined();
+  // null must be preserved — frontend CourseDisplay uses `stay_minutes != null` guard
+  // to suppress "null분 체류" display
+  expect(hamelBlock.stay_minutes).toBeNull();
+
+  // Other places retain valid stay_minutes
+  const cablecarBlock = result.payload.course.blocks.find(
+    (b) => b.type === 'place' && b.code === 'cablecar'
+  );
+  expect(cablecarBlock.stay_minutes).toBe(45);
+
+  const hyangiramBlock = result.payload.course.blocks.find(
+    (b) => b.type === 'place' && b.code === 'hyangiram'
+  );
+  expect(hyangiramBlock.stay_minutes).toBe(60);
 });

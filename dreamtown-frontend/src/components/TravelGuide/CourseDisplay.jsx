@@ -29,7 +29,7 @@ export default function CourseDisplay({ course }) {
         return {
           icon: '📍',
           title: block.name_ko,
-          subtitle: `${block.stay_minutes}분 체류`,
+          subtitle: block.stay_minutes != null ? `${block.stay_minutes}분 체류` : null,
           className: 'course-block-place'
         };
       case 'travel_transition':
