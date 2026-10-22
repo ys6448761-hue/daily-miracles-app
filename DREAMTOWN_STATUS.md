@@ -23,21 +23,19 @@ Last Updated: 2026-10-22
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-22
 
-**Founder — 여수 SOUL Phase 1 다음 장소 결정 (8/10 완료, R20 수정 제외)**
-- 여수 SOUL Phase 1 완료: 이순신광장 / 향일암 / 오동도 / 케이블카 / 돌산공원 / 돌산대교 / 종포해양공원 / 하멜등대 (8/10)
-- 목표: 여수 10곳
-- EP02 달빛 항로: 보류 (Founder 결정 필요)
-- main HEAD: `b6c0597` (PR #96 G1 City Detection V0.1, 2026-10-22 KST)
-- **G1 City Detection V0.1: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-22)**
-  - PR #96 Squash Merge SHA: `b6c05978a020bc46dcb0d2f17bcd4f90e6bc29dc`
-  - Render Deploy: `dep-dbco8ia9lscs73eimui0` / Live SHA: `b6c05978` / VERIFIED: 03:44 KST
-  - T1 여수 정상: CLARIFICATION ✓ / T2 부산 차단: CITY_UNSUPPORTED ✓
-  - T3 출발지 구분: JOURNEY_CONTINUITY ✓ / T4 복수 도시: CITY_AMBIGUOUS ✓
-  - Evidence: `docs/architecture/SOUL_G1_CITY_DETECTION_V0_1_CLOSURE_EVIDENCE_V1.md`
-  - 감지 도시: 부산/서울/제주/광주/전주/통영/거제 (7개)
-  - Known Limitation RR-1: 미등록 도시(대구/인천 등) fallback to legacy guard
+**Founder — P-NEW-1 MERGED, Production 배포 타이밍 결정 (수동 배포 대기)**
+- main HEAD: `4af1709` (PR #99 P-NEW-1 Explicit Place Preservation V0.1, 2026-10-22 KST 06:19)
+- **P-NEW-1 Explicit Place Preservation V0.1: MERGED — Production 배포 대기**
+  - PR #99 Squash Merge SHA: `4af1709aceab0479a3be0fc33d4850f73609e02a` / KST 2026-10-22 06:19
+  - Render: Manual Deploy 설정 (Founder-confirmed) — 자동 배포 미실행
+  - Post-merge CI: AIL Gate ✓ / Manifest Verify ✓ / docker-smoke ✓ / Deploy Health Check ✓
+  - Production Live SHA: `b6c05978` (기존값 유지 — 신규 배포 미실행)
+  - 신규 6/6 PASS / 회귀 113/114 PASS (R20 PRE-EXISTING 불변)
+  - Evidence: `docs/architecture/SOUL_PARKING_ROUTE_REALITY_CHECK_V0_1.md`
+- G1 City Detection V0.1: CLOSED — DEPLOYED_AND_VERIFIED (2026-10-22, PR #96 / `b6c0597`)
 - CAND-EXP-003 소원 우선 적응형 여행코스: PR #97 OPEN (Founder 검토 대기)
 - Parking Option B 구현: 미착수 — 장소코드 확정 및 Founder 별도 승인 대기
+- 여수 SOUL Phase 1 완료: 이순신광장 / 향일암 / 오동도 / 케이블카 / 돌산공원 / 돌산대교 / 종포해양공원 / 하멜등대 (8/10)
 - R20 PRE-EXISTING FAIL (UNRESOLVED): dolsan_daegyo "걸어서 건너갈 수 있어?" → JOURNEY_CONTINUITY
 
 ---
