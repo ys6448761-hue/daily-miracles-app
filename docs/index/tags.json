@@ -723,6 +723,7 @@
     "DOC-DECISION_PHOENIX_D2_LIVING_DET",
     "DOC-LEGACY_YEOSU_ORIGIN_ASSETS_DEL",
     "DOC-DT_API_Registry",
+    "DOC-YEOSU_TRAVEL_TIME_MATRIX_V0_1",
     "DOC-GATE2_Canonical_Asset_Verifica",
     "DOC-SOUL_PRODUCT_VISION_V0_1",
     "DOC-README",
@@ -1063,7 +1064,8 @@
   ],
   "knowledge": [
     "DOC-README",
-    "DOC-YEOSU_FOUNDER_ROUTE_001_TIME_E"
+    "DOC-YEOSU_FOUNDER_ROUTE_001_TIME_E",
+    "DOC-YEOSU_TRAVEL_TIME_MATRIX_V0_1"
   ],
   "에이전틱": [
     "DOC-최수민방식_완전정리",

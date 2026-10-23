@@ -23,6 +23,14 @@ Last Updated: 2026-10-22
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-23
 
+**Founder — Travel Time Matrix Recovery PR #107 리뷰 및 병합 승인**
+- PR #107 `docs/travel-time-matrix-recovery` 브랜치 — docs-only, 코드/DB 변경 없음
+- 복구 내용: `YEOSU_TRAVEL_TIME_MATRIX_V0_1.md` + `.csv` (staging/storybook-c7a b9b37d6 → main)
+- 추가 내용: 2026-10-15 EA/EB Founder Evidence + 2026-10-23 EC-NEW(3분)/ED-NEW(38분) 신규 Edge
+- GOVERNANCE_HOLD 유지 — 코드 연결 별도 승인 필요
+- 관련 파일: `docs/knowledge/YEOSU_TRAVEL_TIME_MATRIX_V0_1.md` / `.csv`
+
+**이전 Next Action (완료)**
 **Founder — 다음 장소 / 다음 기능 결정**
 - **CourseDisplay DEPLOYED_AND_VERIFIED** — 8/8 PASS (2026-10-23)
 - Production SHA: `696839a` / Deploy: `dep-dbd790mq1p3s73coua40` / LIVE: 2026-10-23 05:42 KST
