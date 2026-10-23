@@ -1191,8 +1191,9 @@ function _isJourneyPlanningIntent(message) {
   // Explicit construction verb attached to a planning noun ("동선" = route/itinerary)
   if (/(일정|코스|여행|계획|동선).*(짜줘|짜주세요|만들어줘|만들어주세요|세워줘|구성해줘)/.test(message)) return true;
   if (/(짜줘|짜주세요|만들어줘|만들어주세요).*(일정|코스|여행|동선)/.test(message)) return true;
-  // Information-request verb attached to planning noun: "일정 알려줘", "동선 알려줘"
-  if (/(일정|코스|여행 계획|동선).*(알려줘|알려주세요|보여줘|보여주세요|알고 싶|궁금해|부탁해)/.test(message)) return true;
+  // Information-request verb attached to planning noun: "일정 알려줘", "코스 알려줘"
+  // "동선 알려줘" 단독은 Discovery로 처리 ("동선 짜줘"는 line 1193에서 이미 매칭)
+  if (/(일정|코스|여행 계획).*(알려줘|알려주세요|보여줘|보여주세요|알고 싶|궁금해|부탁해)/.test(message)) return true;
   return false;
 }
 
@@ -3006,6 +3007,13 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   // V0.1: Place-aware Discovery — exclude current Living Detail place from recommendations.
   // Course requests anchor the current place as must-visit instead of excluding it.
   const _isCourseQuery = /(코스|일정).*(짜줘|짜주세요|만들어줘|만들어주세요|구성해줘)/.test(message);
+  // CAR_INFO V0.1: vehicle-access + parking-info discovery — not course/itinerary building.
+  // Safety: _isCourseQuery takes priority; _isJourneyPlanningIntent construction verbs take priority.
+  // Fires on "차로 가기 좋은 곳", "주차 정보를 알려줘". NOT on "코스 짜줘" or "동선 짜줘".
+  const _isCarInfoQuery = (
+    /(차로|자차로|차량으로).*(가기|이동|좋은|추천|알려줘|알려주세요)/.test(message) ||
+    /주차.*정보/.test(message)
+  ) && !_isCourseQuery && !_isJourneyPlanningIntent(message);
   if (explicit_context.place_code) {
     if (_isCourseQuery) {
       const _existingMust = baseDomainContext.must_visit_place_ids || [];
@@ -3246,6 +3254,10 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   if (_isCourseMsg && explicit_context.place_code && (tgResult?.places?.length >= 2)) {
     soulMessage = soulMessage.replace('\n시간이 얼마나 남으셨어요?', '');
   }
+  // CAR_INFO: strip time question from message — parking info responses don't need time input.
+  if (_isCarInfoQuery) {
+    soulMessage = soulMessage.replace('\n시간이 얼마나 남으셨어요?', '');
+  }
   if (status === 'PARTIAL' && !explicit_context.place_code && tgResult?.places?.length && !_isCourseMsg) {
     const _mPt = enrichedSoulContext.people_type;
     const _hasCar = enrichedSoulContext.has_car === true;
@@ -3284,9 +3296,16 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   if (_isCourseMsg && explicit_context.place_code && (tgResult?.places?.length >= 2)) {
     result.next_options = [];
   }
+  // CAR_INFO: remove TIME_OPTIONS from next_options — parking info responses don't need time input.
+  if (_isCarInfoQuery) {
+    result.next_options = result.next_options.filter(o => o !== '시간이 얼마나 남으셨어요?');
+  }
 
   // CLIENT PAYLOAD
   const payload = _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionId, enrichedSoulContext, sharedJourney, quoteResult, routeSkeleton);
+
+  // CAR_INFO: suppress course — parking info responses must not render CourseDisplay.
+  if (_isCarInfoQuery) payload.course = null;
 
   return { ok: true, payload };
 }
