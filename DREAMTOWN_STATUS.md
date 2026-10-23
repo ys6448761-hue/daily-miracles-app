@@ -21,7 +21,27 @@ Last Updated: 2026-10-23
 5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
-### ★ Current Next Action (exactly 1) — Updated: 2026-10-23
+### ★ Current Next Action (exactly 1) — Updated: 2026-10-24
+
+**Founder — Phase B V0.1 LOCAL_IMPL_COMPLETE. Git commit / PR / Deploy 별도 승인 대기.**
+- **EVIDENCE-B-001 저장 완료** (2026-10-24) — 509/510 PASS, 신규 회귀 0건
+  - 저장: `docs/knowledge/EVIDENCE-B-001_Hotel_Nighttime_Walk_V0_1_Implementation.md`
+  - 변경 파일: `quoteContextService.js:15` (신라스테이 alias) + `soyeowoolService.js` 3곳
+  - 실제 응답 — NW-01 (신라스테이): "신라스테이에서 이순신광장까지 걸어서 약 26분(1.7km)..." ✓
+  - 실제 응답 — NW-02 (호텔없음): "이순신광장 해안을 따라 종포해양공원, 하멜등대까지..." ✓
+  - NW-REG-05 차량접근: `_isNighttimeWalkQuery = false` (기존 경로 유지) ✓
+  - NW-SAFE-01~05: 미검증 항목(1.2km/안전/주차/별빛혜택) 미포함 ✓
+  - 전체 soul 회귀: 487/488 PASS (R20 PRE-EXISTING, 신규 0건)
+  - isQuotable 기존 조건 유지 — 신라스테이 자동 견적 없음 확인
+  - **Git: 미commit / PR: 미생성 / Deploy: 미실행**
+- **IMPL-PLAN-B-001** (2026-10-24): `docs/knowledge/IMPL-PLAN-B-001_Hotel_Nighttime_Walk_V0_1.md`
+- **PREFLIGHT-PHASE-B-001** (2026-10-24): `docs/knowledge/PREFLIGHT-PHASE-B-001_Hotel_Nighttime_Walk.md`
+- **PILOT-INTENT-002 Phase A: PARTIAL COMPLETE** (2026-10-24)
+  - 신라스테이→이순신광장 CAR 5분/1.9km / WALK 26분/1.7km — Founder 네이버 지도 캡처, 2026-10-24
+  - 저장: `docs/knowledge/PILOT-INTENT-002_Hotel_to_Starlight_Answer_Gap.md`
+- **PILOT-INTENT-001** (2026-10-24): 8개 키워드 SOUL 커버리지 분석 — `docs/knowledge/PILOT-INTENT-001_Traveler_Intent_8Keywords.md`
+- **CAND-EXP-002-B** (2026-10-24): 별빛항로 현지 경험 Candidate — `docs/constitution/candidate/CAND-EXP-002_Starlight_Route_Local_Experience.md`
+- **주의:** PR #111 (CAR_INFO Separation V0.1) main HEAD `bbb5b96` — Production NOT DEPLOYED
 
 **Founder — CAR_INFO Separation V0.1 MERGED. 다음 기능/Production Deploy 결정 필요.**
 - **PR #111 MERGED** @`bbb5b96` — CAR_INFO Separation V0.1 (2026-10-23 KST)

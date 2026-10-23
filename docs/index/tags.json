@@ -44,6 +44,7 @@
     "DOC-CAND-CONSTITUTION-002_DreamTow",
     "DOC-CAND-EXP-001_DreamTown_Experie",
     "DOC-CAND-EXP-002_DreamTown_Orchest",
+    "DOC-CAND-EXP-002_Starlight_Route_L",
     "DOC-CAND-WISH-001_Happy_Memory_Fir",
     "DOC-CONSTITUTION",
     "DOC-DEC-20260201-포인트추천예고편-정책구현",
@@ -66,6 +67,10 @@
     "DOC-DT_React_Architecture",
     "DOC-GROWTH-ROADMAP",
     "DOC-JUDGE_PROMPTS",
+    "DOC-IMPL-PLAN-B-001_Hotel_Nighttim",
+    "DOC-PILOT-INTENT-001_Traveler_Inte",
+    "DOC-PILOT-INTENT-002_Hotel_to_Star",
+    "DOC-PREFLIGHT-PHASE-B-001_Hotel_Ni",
     "DOC-README",
     "DOC-LAUNCH-DECLARATION",
     "DOC-설계구조-루미기획-충돌분석",
@@ -298,6 +303,7 @@
     "DOC-CAND-CONSTITUTION-002_DreamTow",
     "DOC-CAND-EXP-001_DreamTown_Experie",
     "DOC-CAND-EXP-002_DreamTown_Orchest",
+    "DOC-CAND-EXP-002_Starlight_Route_L",
     "DOC-CONSTITUTION_GOVERNANCE",
     "DOC-OP-CONSTITUTION-001_Pilot_Rese",
     "DOC-CONSTITUTION",
@@ -530,6 +536,7 @@
     "DOC-SOUL_OPEN_ENDED_PLACE_QUESTION",
     "DOC-SOUL_PLACE_SPECIFIC_QUERY_V0_1",
     "DOC-DEC-20260201-포인트추천예고편-정책구현",
+    "DOC-PILOT-INTENT-001_Traveler_Inte",
     "DOC-drive-github-sync-setup",
     "DOC-가격표_퀵레퍼런스",
     "DOC-tax-accounting-ai-tools-analys",
@@ -997,6 +1004,7 @@
     "DOC-CAND-CONSTITUTION-002_DreamTow",
     "DOC-CAND-EXP-001_DreamTown_Experie",
     "DOC-CAND-EXP-002_DreamTown_Orchest",
+    "DOC-CAND-EXP-002_Starlight_Route_L",
     "DOC-CAND-WISH-001_Happy_Memory_Fir"
   ],
   "constitution": [
@@ -1056,14 +1064,19 @@
     "DOC-CONTEXT",
     "DOC-PLAN"
   ],
+  "knowledge": [
+    "DOC-EVIDENCE-B-001_Hotel_Nighttime",
+    "DOC-IMPL-PLAN-B-001_Hotel_Nighttim",
+    "DOC-PILOT-INTENT-001_Traveler_Inte",
+    "DOC-PILOT-INTENT-002_Hotel_to_Star",
+    "DOC-PREFLIGHT-PHASE-B-001_Hotel_Ni",
+    "DOC-README",
+    "DOC-YEOSU_FOUNDER_ROUTE_001_TIME_E"
+  ],
   "DATA_HANDOVER_01": [
     "DOC-Change_Log",
     "DOC-Data_Handover_Report",
     "DOC-Project_State_Update_Draft"
-  ],
-  "knowledge": [
-    "DOC-README",
-    "DOC-YEOSU_FOUNDER_ROUTE_001_TIME_E"
   ],
   "에이전틱": [
     "DOC-최수민방식_완전정리",

@@ -1540,7 +1540,7 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
 // Uses MVP_HOTELS mapping from quoteContextService; no new resolver added.
 const _DEPARTURE_SUFFIX = /에서\s*출발/;
 const _LODGING_SUFFIX   = /에서\s*(숙박|1박|묵)/;
-const _HOTEL_CODE_TO_KO = { ramada: '라마다', kenny: '켄싱턴 호텔' };
+const _HOTEL_CODE_TO_KO = { ramada: '라마다', kenny: '켄싱턴 호텔', shinra_stay_yeosu: '신라스테이 여수' };
 
 function _extractSemanticRoles(message) {
   if (!message) return { departure_origin: null, hotel_lodging: null };
@@ -1615,6 +1615,35 @@ function _isDiscoveryIntent(message) {
   // Sightseeing intent
   if (/(구경하고 싶|구경하고싶|구경 하고 싶)/.test(message)) return true;
   return false;
+}
+
+// Phase B V0.1: 밤바다 산책/즐기기 feasibility 질문 감지.
+// D1: 호텔명 불필요. "밤바다" + 걷기/산책/즐기기/코스 결합 패턴으로 제한.
+// D1: 차량 접근 패턴("차로 가기 좋은") 제외 — 기존 _isCarInfoQuery 경로와 의도 분리.
+function _isNighttimeWalkQuery(message) {
+  if (!message) return false;
+  const hasNightSea    = /밤바다/.test(message);
+  const hasTravelIntent = /(걷|산책|즐길|즐기|코스|거닐|해안을|해변을)/.test(message);
+  const isCarAccess    = /(차로|자차로|차량으로).*(가기|이동|좋은|추천)/.test(message);
+  return hasNightSea && hasTravelIntent && !isCarAccess;
+}
+
+// Phase B V0.1: 밤바다 산책 안내 응답 빌더.
+// D2: SSOT-ROUTE-003 전체 1.2km 수치 미사용. 검증된 Evidence만 사용.
+// D3: 신라스테이 여수만 hotel-specific 거리 표시 (Evidence: Founder 네이버 지도 2026-10-24).
+// 미검증 항목(야간 안전성·복귀시간·주차·별빛혜택) 확정 안내 금지.
+function _buildNighttimeWalkPayload(sessionId, message) {
+  const hotelCode = quoteContextService._extractHotelCode(message || '');
+  let hotelLine = '';
+  if (hotelCode === 'shinra_stay_yeosu') {
+    hotelLine = '신라스테이에서 이순신광장까지 걸어서 약 26분(1.7km) 거리예요.\n';
+  }
+  const body = hotelLine
+    + '이순신광장 해안을 따라 종포해양공원, 하멜등대까지\n'
+    + '천천히 걸으며 여수 밤바다를 즐길 수 있어요.\n'
+    + '종포해양공원에서 잠시 쉬어가고, 하멜등대에서 밤바다를 바라보는 코스예요.\n'
+    + '돌아올 때는 같은 길을 걷거나, 늦은 시간에는 택시를 이용하는 방법도 있어요.';
+  return _buildClarificationPayload(sessionId, body);
 }
 
 // Generate a meaningful SOUL clarification response for non-discovery contexts.
@@ -2916,6 +2945,12 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
         console.warn('[COMPANION_CHIP_ERROR]', _ccErr.message);
         // Non-fatal: fall through to _generateClarificationMessage
       }
+    }
+
+    // Phase B V0.1: 밤바다 산책 의도 → 최소 답변 생성.
+    // 기존 DISCOVERY/PLACE_LOOKUP/CLARIFICATION 미연결 질문("즐길 수 있을까요?") 처리.
+    if (_isNighttimeWalkQuery(message)) {
+      return { ok: true, payload: _buildNighttimeWalkPayload(sessionId, message) };
     }
 
     const clarificationMsg = _generateClarificationMessage(soulContext, message, journeyCtxForClar);
