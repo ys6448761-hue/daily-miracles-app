@@ -23,17 +23,20 @@ Last Updated: 2026-10-23
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-24
 
-**Founder — Phase B V0.1 LOCAL_IMPL_COMPLETE. Git commit / PR / Deploy 별도 승인 대기.**
-- **EVIDENCE-B-001 저장 완료** (2026-10-24) — 509/510 PASS, 신규 회귀 0건
-  - 저장: `docs/knowledge/EVIDENCE-B-001_Hotel_Nighttime_Walk_V0_1_Implementation.md`
-  - 변경 파일: `quoteContextService.js:15` (신라스테이 alias) + `soyeowoolService.js` 3곳
-  - 실제 응답 — NW-01 (신라스테이): "신라스테이에서 이순신광장까지 걸어서 약 26분(1.7km)..." ✓
-  - 실제 응답 — NW-02 (호텔없음): "이순신광장 해안을 따라 종포해양공원, 하멜등대까지..." ✓
-  - NW-REG-05 차량접근: `_isNighttimeWalkQuery = false` (기존 경로 유지) ✓
-  - NW-SAFE-01~05: 미검증 항목(1.2km/안전/주차/별빛혜택) 미포함 ✓
-  - 전체 soul 회귀: 487/488 PASS (R20 PRE-EXISTING, 신규 0건)
-  - isQuotable 기존 조건 유지 — 신라스테이 자동 견적 없음 확인
-  - **Git: 미commit / PR: 미생성 / Deploy: 미실행**
+**Founder — PR #113 OPEN. Merge 승인 대기. AIL Gate 미트리거(GitHub 일시적 이슈) 확인 필요.**
+- **PR #113 OPEN** @`ae93bba` — Nighttime Walk SOUL Answer Phase B V0.1 (2026-10-24)
+  - URL: https://github.com/ys6448761-hue/daily-miracles-app/pull/113
+  - 브랜치: `feat/soul-nighttime-walk-phase-b-v0-1` → main
+  - 변경 파일: `quoteContextService.js` + `soyeowoolService.js` + 6개 docs 신규
+  - 테스트: 509/510 PASS (R20 PRE-EXISTING, 신규 회귀 0건)
+  - **CI 상태:**
+    - Vercel FAILURE — PRE-EXISTING (Node.js 20.x, PR #109/#111과 동일)
+    - AIL Gate — NOT RUN (GitHub pull_request 이벤트 미트리거, 원인 불명)
+    - docker-smoke — NOT RUN (동일 원인)
+    - approve-dec.yml — workflow file syntax issue (PRE-EXISTING)
+  - **주의:** AIL Gate [AIL] 섹션은 PR body에 포함됨. GitHub Actions 트리거 문제 별도 확인 필요.
+  - Production Deploy: NOT DEPLOYED
+- **EVIDENCE-B-001** (2026-10-24): `docs/knowledge/EVIDENCE-B-001_Hotel_Nighttime_Walk_V0_1_Implementation.md`
 - **IMPL-PLAN-B-001** (2026-10-24): `docs/knowledge/IMPL-PLAN-B-001_Hotel_Nighttime_Walk_V0_1.md`
 - **PREFLIGHT-PHASE-B-001** (2026-10-24): `docs/knowledge/PREFLIGHT-PHASE-B-001_Hotel_Nighttime_Walk.md`
 - **PILOT-INTENT-002 Phase A: PARTIAL COMPLETE** (2026-10-24)
