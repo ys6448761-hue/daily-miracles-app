@@ -80,6 +80,20 @@ const SUITABILITY_LOOKUP = /어때\??|어떤가요|은\?|는\?|이야\??|괜찮�
 // even if a known place alias is present in the message
 const DISCOVERY_OVERRIDES = /근처|어디 갈|어디가 좋|갈만|가볼 만|추천해|뭐 할까|뭐 하지|뭐하지|어디서|같이 갈|같이 어디|타고 싶|가고 싶|하고 싶|일정|비용|얼마|포함/;
 
+// ─── COURSE_PLANNING Time Gate — secondary intent classifier (advisory) ───────
+// Primary restore condition is pending_course_awaiting_time session flag.
+// This function is used for logging only — it does NOT gate the restore decision.
+function _isCoursePendingTimeProvision(msg) {
+  if (!msg) return false;
+  const t = msg.trim();
+  if (/^여수에서 (2~3|5|8)시간 있어요\. 어디 갈까요\?$/.test(t)) return true;
+  if (/^(\d+~?\d*시간|하루|반나절|종일)(이요|요|\.|\!|있어요?|정도)?$/.test(t)) return true;
+  if (/^(\d+~?\d*시간|하루|반나절|종일).{0,15}있어요/.test(t) &&
+      !/맛집|식당|카페|커피|숙박|호텔|펜션/.test(t)) return true;
+  if (/(코스|일정).*(짜줘|짜주세요|만들어줘|만들어주세요|구성해줘)/.test(t)) return true;
+  return false;
+}
+
 // ─── City Context Safety Guard V0.1 ──────────────────────────────────────────
 // Purpose: block fabricated routing of unsupported-city requests to Yeosu results.
 // Scope: soyeowoolService only. DB/Schema/Route/JSX changes: NONE.
@@ -2681,6 +2695,21 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   const needsTravelIntelligence = _isDiscoveryIntent(message) || _isJourneyPlanningIntent(message);
 
   if (!needsTravelIntelligence) {
+    // Issue B: Bypass DISCOVERY GATE for pending course time provisions.
+    // When pending_course_awaiting_time=true and message is a clear time response
+    // ("8시간", "하루" etc.), skip the non-discovery path and route to Travel Intelligence.
+    // This reads the session once here; the profile section reads it again at line ~2967.
+    // Two reads are acceptable — this path fires only on the narrow bypass condition.
+    nonDiscovery: {
+      if (_isCoursePendingTimeProvision(message)) {
+        try {
+          const _bypassSd = await sessionService.getSession(sessionId);
+          if (_bypassSd?.journey_ctx?.pending_course_awaiting_time === true) {
+            break nonDiscovery; // skip non-discovery path → fall through to Travel Intelligence
+          }
+        } catch (_) {}
+      }
+
     // Load journey_ctx for context-aware clarification (known-field suppression)
     let journeyCtxForClar = null;
     try {
@@ -2931,6 +2960,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
         next_options: [],
       }
     };
+    } // end nonDiscovery: labeled block
   }
 
   // ─── Traveler Profile Continuity V0.1 ──────────────────────────────────────
@@ -2944,14 +2974,11 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   const _storedTravelerProfile = (_sessionCtxForTurn && _sessionCtxForTurn.traveler_profile) || null;
   const enrichedSoulContext = _applyPersistedTravelerProfile(soulContext, _storedTravelerProfile);
 
-  // Write USER_EXPLICIT facts from this turn to persisted profile (non-blocking).
+  // Write USER_EXPLICIT facts from this turn to persisted profile.
+  // _hasTurnFacts is computed here; the actual write is deferred to after the
+  // Time Gate check so Gate and profile writes can be merged into a single call.
   const _turnFacts = _extractExplicitTravelerFacts(soulContext);
-  if (Object.values(_turnFacts).some(v => v != null)) {
-    sessionService.updateJourneyContext(sessionId, {
-      ...(_sessionCtxForTurn || {}),
-      traveler_profile: _mergeProfileFacts(_turnFacts, _storedTravelerProfile),
-    }).catch(err => console.error('[TRAVELER_PROFILE_WRITE_ERROR]', err.message));
-  }
+  const _hasTurnFacts = Object.values(_turnFacts).some(v => v != null);
 
   // CONSTRUCT REQUEST ENVELOPE (internal audit — not returned to client directly)
   const request = _buildRequestEnvelope(principal, enrichedSoulContext, sessionId);
@@ -2976,6 +3003,107 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   // V0.2: Supplement domain context with minimum Shared Journey signals
   // EXPERIENCED items are NEVER added to exclude_place_ids
   const domainContext = _supplementDomainFromSharedJourney(baseDomainContext, sharedJourney);
+
+  // ─── COURSE_PLANNING Time Gate V0.1 ──────────────────────────────────────────
+  // When user requests a course but time is DOMAIN_FALLBACK (not explicit),
+  // save must_visit places + course-awaiting-time flag, then return time question.
+  // On save failure: return safe retry guidance — do NOT return time question as
+  // if pending was saved, and do NOT fall through to DISCOVERY with fake 120-min course.
+  {
+    const _gPending = (domainContext.must_visit_place_ids || []).filter(Boolean);
+    if (_isCourseQuery &&
+        domainContext._domainFallbacks?.includes('time_available_minutes')) {
+
+      const _gCtx = {
+        ...(_sessionCtxForTurn || {}),
+        pending_must_visit_place_ids: _gPending,
+        pending_course_awaiting_time: true,
+        ...(_hasTurnFacts ? { traveler_profile: _mergeProfileFacts(_turnFacts, _storedTravelerProfile) } : {}),
+      };
+
+      try {
+        await sessionService.updateJourneyContext(sessionId, _gCtx);
+      } catch (err) {
+        console.error('[COURSE_GATE_WRITE_ERROR]', err.message);
+        // Pending not saved — return safe retry guidance (not a success CLARIFICATION).
+        return {
+          ok: true,
+          payload: {
+            status: 'CLARIFICATION',
+            session_id: sessionId,
+            message_ko: '일시적인 오류가 발생했어요. 장소와 시간을 함께 다시 입력해 주세요.',
+            next_options: [],
+            course: null,
+            route: null,
+            shared_journey: sharedJourney || null,
+            timestamp: new Date().toISOString(),
+          }
+        };
+      }
+
+      return {
+        ok: true,
+        payload: {
+          status: 'CLARIFICATION',
+          session_id: sessionId,
+          message_ko: '알겠어요! 여수에서 얼마나 시간이 있으세요?',
+          next_options: ['시간이 얼마나 남으셨어요?'],
+          course: null,
+          route: null,
+          shared_journey: sharedJourney || null,
+          timestamp: new Date().toISOString(),
+        }
+      };
+    }
+  }
+
+  // ─── Pending Must-Visit Restore V0.1 ─────────────────────────────────────────
+  // Restores must_visit places from a prior Gate turn when user provides time.
+  // PRIMARY condition: pending_course_awaiting_time session flag (set by Gate above).
+  // _isCoursePendingTimeProvision() is logged for advisory purposes only.
+  {
+    const _rPending = (_sessionCtxForTurn?.pending_must_visit_place_ids || []).filter(Boolean);
+    const _rAwaitingTime = _sessionCtxForTurn?.pending_course_awaiting_time === true;
+    const _shouldRestore = (
+      _rAwaitingTime &&                                                         // PRIMARY: session state
+      _rPending.length > 0 &&                                                   // A: pending exists
+      !domainContext._domainFallbacks?.includes('time_available_minutes') &&    // B: time explicit
+      (domainContext.must_visit_place_ids?.length ?? 0) === 0                   // C: no new places this turn
+    );
+
+    if (_shouldRestore) {
+      console.log('[COURSE_GATE_RESTORE]', {
+        pending: _rPending,
+        secondarySignal: _isCoursePendingTimeProvision(message),
+      });
+      domainContext.must_visit_place_ids = [..._rPending];
+    }
+
+    // Pending clear: single awaited write combining profile + clear.
+    // await prevents stale context from re-applying pending on the next turn.
+    // Runs on restore path only; non-restore non-gate path uses fire-and-forget below.
+    if (_rAwaitingTime) {
+      const _clearCtx = {
+        ...(_sessionCtxForTurn || {}),
+        pending_must_visit_place_ids: null,
+        pending_course_awaiting_time: false,
+        ...(_hasTurnFacts ? { traveler_profile: _mergeProfileFacts(_turnFacts, _storedTravelerProfile) } : {}),
+      };
+      try {
+        await sessionService.updateJourneyContext(sessionId, _clearCtx);
+      } catch (err) {
+        console.error('[PENDING_CLEAR_WRITE_ERROR]', err.message);
+        // Clear failed: pending_course_awaiting_time remains true.
+        // Next-turn restore is still guarded by conditions A-C, limiting double-application.
+      }
+    } else if (_hasTurnFacts) {
+      // Non-gate, non-restore path: fire-and-forget profile write (existing behavior).
+      sessionService.updateJourneyContext(sessionId, {
+        ...(_sessionCtxForTurn || {}),
+        traveler_profile: _mergeProfileFacts(_turnFacts, _storedTravelerProfile),
+      }).catch(err => console.error('[TRAVELER_PROFILE_WRITE_ERROR]', err.message));
+    }
+  }
 
   // ROUTE TO TRAVEL_INTELLIGENCE
   const routeResult = await _routeToTravelIntelligence(domainContext);
