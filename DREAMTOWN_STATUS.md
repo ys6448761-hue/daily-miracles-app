@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-22
+Last Updated: 2026-10-23
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,7 +23,13 @@ Last Updated: 2026-10-22
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-23
 
-**Founder — 다음 장소 / 다음 기능 결정**
+**Founder — COURSE_PLANNING Time Gate V0.1 MERGED. Production Deploy 승인 결정 필요.**
+- **PR #109 MERGED** @`997dfdc` — COURSE_PLANNING Time Gate V0.1 (2026-10-23 KST)
+  - Squash Merge SHA: `997dfdc121189b8d238e0dc7adc65bb119c30fc3`
+  - main HEAD: `997dfdc` / Production: NOT DEPLOYED
+  - Required CI: AIL Gate ✓ / docker-smoke ✓ / Vercel FAILURE (PRE-EXISTING, merged PR #99도 동일)
+  - PR #108: CLOSED (로컬 main stale로 의도치 않은 파일 포함, PR #109로 대체)
+  - 로컬 테스트: T1-T18 18/18 PASS / soul 전체 138/139 PASS (R20 PRE-EXISTING)
 - **CourseDisplay DEPLOYED_AND_VERIFIED** — 8/8 PASS (2026-10-23)
 - Production SHA: `696839a` / Deploy: `dep-dbd790mq1p3s73coua40` / LIVE: 2026-10-23 05:42 KST
 - **PR #103** @`d40586a` — MuyojeongHomePage CourseDisplay CONNECT ✓
