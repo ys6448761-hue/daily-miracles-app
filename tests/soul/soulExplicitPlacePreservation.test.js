@@ -171,10 +171,14 @@ test("C — 단일 장소(케이블카) EXPLICIT → must_visit_place_ids=['cabl
 });
 
 // ══════════════════════════════════════════════════════════════
-// D — 시간 fallback(_tmFallback): must_visit_place_ids 전달 유지
+// D — 시간 fallback(_tmFallback) + 코스 요청 → COURSE_PLANNING Time Gate 발동
+// [UPDATED 2026-10-23]: Time Gate V0.1 도입으로 동작 변경.
+//   이전: PARTIAL 반환 + recommend 호출 (120분 DOMAIN_FALLBACK 코스 생성)
+//   현재: CLARIFICATION 반환 + pending 저장 (시간 미확정 코스 표시 금지)
+//   사용자는 시간 선택 후 Turn 2에서 코스를 받는다.
 // ══════════════════════════════════════════════════════════════
 
-test('D — time_available_minutes UNKNOWN(_tmFallback) → must_visit_place_ids 전달됨', async () => {
+test('D — time_available_minutes UNKNOWN + 코스 요청 → Time Gate 발동, CLARIFICATION 반환', async () => {
   // Provenance marks time_available_minutes as UNKNOWN → _domainFallbacks includes it
   contextSvc.parseUserMessage.mockResolvedValue(mkCtx({
     time_available_minutes: 120,
@@ -183,18 +187,21 @@ test('D — time_available_minutes UNKNOWN(_tmFallback) → must_visit_place_ids
   sharedJourneySvc.extractSharedJourney.mockResolvedValue(
     mkExplicitWant('케이블카', '오동도')
   );
-  travelGuideSvc.recommend.mockResolvedValue({ places: [cablecarPlace, odongdoPlace] });
 
   const result = await makeRequest('케이블카랑 오동도 코스 짜줘.');
 
   expect(result.ok).toBe(true);
-
-  const domainCtx = travelGuideSvc.recommend.mock.calls[0][0];
-  // _domainFallbacks should include time_available_minutes
-  expect(domainCtx._domainFallbacks).toContain('time_available_minutes');
-  // Despite time fallback, must_visit_place_ids still forwarded
-  expect(domainCtx.must_visit_place_ids).toContain('cablecar');
-  expect(domainCtx.must_visit_place_ids).toContain('odongdo');
+  // Time Gate fires: CLARIFICATION returned, not PARTIAL
+  expect(result.payload.status).toBe('CLARIFICATION');
+  expect(result.payload.next_options).toContain('시간이 얼마나 남으셨어요?');
+  // recommend NOT called — gate prevents 120-min fake course
+  expect(travelGuideSvc.recommend).not.toHaveBeenCalled();
+  // pending stored with both places
+  const [, writtenCtx] = sessionSvc.updateJourneyContext.mock.calls[0];
+  expect(writtenCtx.pending_must_visit_place_ids).toEqual(
+    expect.arrayContaining(['cablecar', 'odongdo'])
+  );
+  expect(writtenCtx.pending_course_awaiting_time).toBe(true);
 });
 
 // ══════════════════════════════════════════════════════════════
