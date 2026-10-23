@@ -23,12 +23,14 @@ Last Updated: 2026-10-23
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-23
 
-**Founder — COURSE_PLANNING Time Gate V0.1 MERGED. Production Deploy 승인 결정 필요.**
+**Founder — CAR_INFO Separation V0.1 MERGED. 다음 기능/Production Deploy 결정 필요.**
+- **PR #111 MERGED** @`bbb5b96` — CAR_INFO Separation V0.1 (2026-10-23 KST)
+  - "차량으로" chip: course=null + TIME_OPTIONS 제거 + parking_ko 보존
+  - `_isCarInfoQuery`: 차로/자차로/차량으로 + 가기/이동/주차정보 → COURSE_PLANNING과 분리
+  - Required CI: AIL Gate ✓ / docker-smoke ✓ / Vercel FAILURE (PRE-EXISTING, Node.js 20.x)
+  - CI-1~CI-7: 7/7 PASS / T1-T18: 18/18 PASS / soul 475/476 PASS (R20 PRE-EXISTING)
+  - main HEAD: `bbb5b96` / Production: NOT DEPLOYED
 - **PR #109 MERGED** @`997dfdc` — COURSE_PLANNING Time Gate V0.1 (2026-10-23 KST)
-  - Squash Merge SHA: `997dfdc121189b8d238e0dc7adc65bb119c30fc3`
-  - main HEAD: `997dfdc` / Production: NOT DEPLOYED
-  - Required CI: AIL Gate ✓ / docker-smoke ✓ / Vercel FAILURE (PRE-EXISTING, merged PR #99도 동일)
-  - PR #108: CLOSED (로컬 main stale로 의도치 않은 파일 포함, PR #109로 대체)
   - 로컬 테스트: T1-T18 18/18 PASS / soul 전체 138/139 PASS (R20 PRE-EXISTING)
 - **CourseDisplay DEPLOYED_AND_VERIFIED** — 8/8 PASS (2026-10-23)
 - Production SHA: `696839a` / Deploy: `dep-dbd790mq1p3s73coua40` / LIVE: 2026-10-23 05:42 KST
