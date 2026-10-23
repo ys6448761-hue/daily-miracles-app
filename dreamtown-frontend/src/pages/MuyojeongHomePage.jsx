@@ -207,7 +207,7 @@ function SoulAnswerSummary({ response, onNewQuestion, onTimeSelect, isLoading })
 const SUGGESTION_CHIPS = [
   { label: '부모님과 함께', query: '부모님과 여수에서 어디 가면 좋을까?' },
   { label: '아이와 함께',   query: '아이와 여수에서 어디 가면 좋을까?' },
-  { label: '차량으로',      query: '여수에서 주차할 곳과 차로 이동하기 좋은 장소, 동선을 알려줘.', ec: { has_car: true } },
+  { label: '차량으로',      query: '여수에서 차로 가기 좋은 곳과 주차 정보를 알려줘.', ec: { has_car: true } },
   { label: '여행코스',      query: '여수 여행코스를 짜줘.' },
 ];
 
