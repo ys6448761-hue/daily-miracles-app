@@ -18,7 +18,10 @@ const MVP_HOTELS = {
   'ramada': 'ramada',
   '케니': 'kenny',
   '케니호텔': 'kenny',
-  'kenny': 'kenny'
+  'kenny': 'kenny',
+  // Phase B V0.1: 신라스테이 여수 (D3: 단독, isQuotable 제외)
+  '신라스테이': 'shinra_stay_yeosu',
+  '신라스테이여수': 'shinra_stay_yeosu',
 };
 
 const COMPLEX_PATTERNS = [
