@@ -23,15 +23,32 @@ Last Updated: 2026-10-24
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-24
 
-**Founder — Phase B V0.1 DEPLOYED_AND_VERIFIED (2026-10-24 10:21 KST). PR #114 Merge 또는 다음 기능 결정 필요.**
+**Founder — PR #115 MERGE_READY. Merge 승인 필요.**
+- **PR #115 OPEN**: `fix/full-day-candidate-cap` → main / SHA: `c6a53be` (main synced)
+  - URL: https://github.com/ys6448761-hue/daily-miracles-app/pull/115
+  - **mergeable: MERGEABLE** ✓ / mergeStateStatus: UNSTABLE (approve-dec PRE-EXISTING)
+  - **AIL Gate**: success ✓ / **docker-smoke**: success ✓ / **Manifest Verify**: success ✓
+  - Vercel / approve-dec.yml: PRE-EXISTING — 이번 변경 무관
+  - **Guardian**: MERGE_READY
+- **COURSE_PLANNING FullDay BUG 구현 COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-FULLDAY-IMPL-V0_1.md`
+  - 신규 테스트 21/21 PASS / 전체 회귀 548/549 PASS (R20 PRE-EXISTING 제외)
+  - 8h: cap=5, 5곳, stay=300min / 2h/5h FALLBACK 기존 동작 보존
+- **COURSE_PLANNING FullDay BUG 설계 검증 COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-FULLDAY-DESIGN-V0_1.md`
+- **COURSE_PLANNING 8h Trace COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-8H-TRACE-V0_1.md`
+  - **BUG 확정**: `_applyClusterDiversity` 라인 1180 `if (selected.length === 3) break` — 하드코딩 cap=3
+  - 로컬 재현: node 실행 → `[cablecar, hamel_lighthouse, hyangiram]` Count=3 / totalStay=135분 ✓
+- **COURSE_PLANNING Time Fit Review COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-TIME-FIT-DIAGNOSIS-V0_1.md`
+  - "이동시간 확인 중": EXPECTED — P0-1 설계 (CAR 매트릭스 HOLD)
+  - hamel_lighthouse.avg_stay_minutes=null: DATA_GAP (A. DB 입력 보류 — Founder Decision 2026-10-24)
+- **PILOT-INTENT-003-T5 COMPLETED** (2026-10-24): `docs/knowledge/PILOT-INTENT-003-T5_Car_Query_Path_Review.md`
+  - UX_GAP 2건: ① "추천 가능" 배지가 CAR_INFO 쿼리에도 동일 표시 / ② 향일암·하멜등대 주차 안내 없음
+  - **코드 수정 없음** / Git commit/push: **미실행** (Founder 별도 승인 필요)
+- **PILOT-INTENT-003 COMPLETED** (2026-10-24): 6 PASS / 2 ADVISORY / 0 FAIL
+- **PR #114 MERGED** @`49e1e28` (2026-10-24 KST) — Phase B V0.1 State Sync 완료
 - **Phase B V0.1 DEPLOYED_AND_VERIFIED** — Deploy ID: `dep-dbe0et3ncjis73do73ng` / SHA: `4c16052` / 2026-10-24 10:21 KST
   - Production QA A~G: A(Health PASS) / B-1(신라스테이 밤바다 PASS) / C-1(호텔명 없음 PASS) / D(CODE VERIFIED) / E(Time Gate PASS) / F(CAR_INFO PRE-VERIFIED 7/7) / G(미검증 정보 노출 없음 PASS)
-  - 신규 회귀: **없음** / R20 PRE-EXISTING: 미변경 유지 / Rollback 발생: 없음
-  - Evidence: `docs/knowledge/EVIDENCE-B-002_Phase_B_V0_1_Production_QA.md`
-  - Advisory: B-2/C-2 "알려줘"/"추천해줘" → Discovery 경로 (설계 범위 외, 신규 회귀 아님)
+  - 신규 회귀: **없음** / R20 PRE-EXISTING: 미변경 유지 / Evidence: `docs/knowledge/EVIDENCE-B-002_Phase_B_V0_1_Production_QA.md`
   - Render Auto-Deploy: **OFF 유지**
-- **PR #114 OPEN** — State Sync (DREAMTOWN_STATUS.md 1개, AIL Gate ✓ / docker-smoke ✓)
-  - Merge READY (Founder 승인 필요)
 - **Release Preflight** (2026-10-24): `docs/knowledge/RELEASE-PREFLIGHT-B-001_Phase_B_V0_1.md`
   - Release SHA: `4c16052` / 이전 Production SHA: `696839a` / Rollback: `dep-dbd790mq1p3s73coua40`
   - 배포 범위: PR #109(Time Gate) + PR #111(CAR_INFO) + PR #113(Phase B) — 3개 동시 배포
