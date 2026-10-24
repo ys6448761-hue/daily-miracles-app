@@ -23,24 +23,26 @@ Last Updated: 2026-10-24
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-24
 
-**Founder — PR #113 MERGED. Production Deploy 결정 필요.**
+**Founder — Phase B V0.1 DEPLOYED_AND_VERIFIED (2026-10-24 10:21 KST). PR #114 Merge 또는 다음 기능 결정 필요.**
+- **Phase B V0.1 DEPLOYED_AND_VERIFIED** — Deploy ID: `dep-dbe0et3ncjis73do73ng` / SHA: `4c16052` / 2026-10-24 10:21 KST
+  - Production QA A~G: A(Health PASS) / B-1(신라스테이 밤바다 PASS) / C-1(호텔명 없음 PASS) / D(CODE VERIFIED) / E(Time Gate PASS) / F(CAR_INFO PRE-VERIFIED 7/7) / G(미검증 정보 노출 없음 PASS)
+  - 신규 회귀: **없음** / R20 PRE-EXISTING: 미변경 유지 / Rollback 발생: 없음
+  - Evidence: `docs/knowledge/EVIDENCE-B-002_Phase_B_V0_1_Production_QA.md`
+  - Advisory: B-2/C-2 "알려줘"/"추천해줘" → Discovery 경로 (설계 범위 외, 신규 회귀 아님)
+  - Render Auto-Deploy: **OFF 유지**
+- **PR #114 OPEN** — State Sync (DREAMTOWN_STATUS.md 1개, AIL Gate ✓ / docker-smoke ✓)
+  - Merge READY (Founder 승인 필요)
+- **Release Preflight** (2026-10-24): `docs/knowledge/RELEASE-PREFLIGHT-B-001_Phase_B_V0_1.md`
+  - Release SHA: `4c16052` / 이전 Production SHA: `696839a` / Rollback: `dep-dbd790mq1p3s73coua40`
+  - 배포 범위: PR #109(Time Gate) + PR #111(CAR_INFO) + PR #113(Phase B) — 3개 동시 배포
+  - Guardian Release 판정: **READY** (배포 완료)
 - **PR #113 MERGED** @`4c16052` — Nighttime Walk SOUL Answer Phase B V0.1 (2026-10-24 KST)
   - Squash Merge SHA: `4c160529f08616433bb639e0ce153044b998fca5`
-  - 브랜치: `feat/soul-nighttime-walk-phase-b-v0-1` → main
-  - 변경 파일: `quoteContextService.js` + `soyeowoolService.js` + 6개 docs 신규
-  - 테스트: 509/510 PASS (R20 PRE-EXISTING, 신규 회귀 0건)
-  - **CI 상태 (pull_request, 최종 — SHA: 441e7fb):**
-    - AIL Gate — **success** (run ID: 40046332352)
-    - docker-smoke — **success** (run ID: 40046332344)
-    - Vercel FAILURE — PRE-EXISTING (Node.js 20.x)
-    - approve-dec.yml — PRE-EXISTING syntax issue
-  - **CI 상태 (push to main, merge SHA: 4c16052):**
-    - AIL Gate — **success** (run ID: 40046602507)
-    - docker-smoke — **success** (run ID: 40046602519)
-    - Manifest Verify — **success** (run ID: 40046602556)
-    - Deploy Health Check — **success** (run ID: 40046602511, 기존 URL 응답 확인)
-    - approve-dec.yml — failure (PRE-EXISTING)
-  - Production: **NOT DEPLOYED** (SHA: 696839a 유지, Render auto-deploy OFF)
+  - CI (pull_request): AIL Gate ✓ (40046332352) / docker-smoke ✓ (40046332344)
+  - CI (push to main): AIL Gate ✓ (40046602507) / docker-smoke ✓ (40046602519)
+  - Production: **DEPLOYED** (dep-dbe0et3ncjis73do73ng, 2026-10-24 10:21 KST)
+- **PR #114 OPEN** — State Sync (DREAMTOWN_STATUS.md 1개, AIL Gate ✓ / docker-smoke ✓)
+  - Merge READY (Founder Production Deploy 승인 시 함께 처리 가능)
 - **CI-DIAG-PR113-001 v3 CLOSED** (2026-10-24): `docs/knowledge/CI-DIAG-PR113-001.md`
   - Root-cause: `mergeable_state="dirty"` → merge conflict → GitHub Actions pull_request 차단
   - 해소: `git merge origin/main` + DREAMTOWN_STATUS.md conflict 해결 + push (Founder 승인)

@@ -1067,11 +1067,13 @@
   "knowledge": [
     "DOC-CI-DIAG-PR113-001",
     "DOC-EVIDENCE-B-001_Hotel_Nighttime",
+    "DOC-EVIDENCE-B-002_Phase_B_V0_1_Pr",
     "DOC-IMPL-PLAN-B-001_Hotel_Nighttim",
     "DOC-PILOT-INTENT-001_Traveler_Inte",
     "DOC-PILOT-INTENT-002_Hotel_to_Star",
     "DOC-PREFLIGHT-PHASE-B-001_Hotel_Ni",
     "DOC-README",
+    "DOC-RELEASE-PREFLIGHT-B-001_Phase_",
     "DOC-YEOSU_FOUNDER_ROUTE_001_TIME_E"
   ],
   "DATA_HANDOVER_01": [
