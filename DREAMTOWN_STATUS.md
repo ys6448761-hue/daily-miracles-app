@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-24
+Last Updated: 2026-10-25
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -21,19 +21,20 @@ Last Updated: 2026-10-24
 5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
-### ★ Current Next Action (exactly 1) — Updated: 2026-10-24
+### ★ Current Next Action (exactly 1) — Updated: 2026-10-25
 
-**Founder — H1~H4 측정값 제공 또는 다음 작업 지시 필요.**
-- **PR #115 DEPLOYED_AND_VERIFIED** — SHA `7567b59` / Deploy `dep-dbe621rncjis73d4d3h0` / 2026-10-24 KST
-  - 2h: 장소 2개 / 체류 45분 ✅ / 5h: 장소 3개 / 체류 135분 ✅ / 8h: 장소 5개 / 체류 210분 ✅
-  - 8h 실제 순서: 케이블카 → 하멜등대 → 향일암 → 자산공원 → 이순신광장
-  - Guardian: PROD_UI_VERIFIED / Evidence: `docs/knowledge/PR115-PROD-QA-EVIDENCE-V0_1.md`
-- **PR #115 CLOSED** — `_applyClusterDiversity` cap fix 기능 수정 작업 종료
-- **PR #116 MERGED** @`7567b59` (2026-10-24 KST) — F-1~F-4 Naver Maps CAR Evidence (docs-only)
-  - F-1~F-4: `docs/knowledge/YEOSU_FOUNDER_ROUTE_001_TIME_EVIDENCE.md` §[UPDATE 2026-10-24]
-  - EA~EF 보존 / Runtime Connected: NO / GOVERNANCE_HOLD 유지
-- **H1~H4 MISSING**: 8h 코스 직접 Edge 4개 — Founder 측정값 제공 필요
-- **hamel_lighthouse avg_stay_minutes**: null / DATA_GAP / Production 화면 blank 확인
+**Founder — PR #118 Merge 승인 필요 (Travel Time UI V0.1 — IMPLEMENTATION_APPROVED / PRODUCTION_HOLD).**
+- **Travel Time UI V0.1 구현 COMPLETED** (2026-10-25)
+  - Branch: `feat/travel-time-ui-v0.1` / Guardian: IMPLEMENTATION_APPROVED / PRODUCTION_HOLD
+  - 변경 파일: `travelGuideService.js` / `CourseDisplay.jsx` / `tests/soul/soulTravelTimeDisplay.test.js`
+  - 신규 테스트: 18/18 PASS (T-1~T-15) / 회귀: 566/567 (R20 PRE-EXISTING 유지, 신규 0건)
+  - `_estimateTravelTime()` V0 Stub 미변경 / GOVERNANCE_HOLD 유지
+  - Production Deploy: HOLD (Founder Merge 승인 이후 별도)
+- **PR #117 MERGED** @`a8861cc` (2026-10-24 KST) — PR #115 Production QA Evidence 보존 (docs-only)
+- **PR #115 DEPLOYED_AND_VERIFIED / CLOSED** — SHA `7567b59` / Deploy `dep-dbe621rncjis73d4d3h0`
+- **Production LIVE**: `7567b59` (Render Auto-Deploy OFF)
+- **PR #116 MERGED** @`7567b59` — F-1~F-4 Naver Maps CAR Evidence
+- **hamel_lighthouse avg_stay_minutes**: null / DATA_GAP (DB 변경 별도 승인 대기)
 
 **PR #115 CLOSED (이전 상태 기록).**
 - **PR #115 MERGED** @`d6323c9` (2026-10-24 KST) — full-day candidate cap fix
