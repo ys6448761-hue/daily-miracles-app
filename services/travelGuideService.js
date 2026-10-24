@@ -14,6 +14,24 @@ const EXPERIENCE_CLUSTERS = {
   dolsan_area: ['dolsan_daegyo', 'dolsan_nightscape', 'cablecar']
 };
 
+// Verified CAR travel time edges (Founder NAVER_MEASURED)
+// Source: YEOSU_FOUNDER_ROUTE_001_TIME_EVIDENCE.md §[UPDATE 2026-10-24] F-1~F-4
+//         DREAMTOWN-TIME-BUDGET-V0_1-CANDIDATE.md §P1~P4 (2026-10-25)
+// Buffer policy: CAR ≤10min → +5min / CAR ≥11min → +10min
+// Key format: 'from_code→to_code' (단방향, 역방향 자동 생성 없음)
+const VERIFIED_TRAVEL_EDGES = {
+  // P1~P4: Production 8h Course (Founder NAVER_MEASURED 2026-10-25)
+  'cablecar→hamel_lighthouse':            { car: 2,  buf: 5,  op: 7,  km: 1.6,   poi: '자산탑승장→하멜전시관주차장' },
+  'hamel_lighthouse→hyangiram':           { car: 35, buf: 10, op: 45, km: 27,    poi: '하멜전시관주차장→향일암공영주차장' },
+  'hyangiram→jaisan_park':                { car: 35, buf: 10, op: 45, km: 26,    poi: '향일암공영주차장→자산공원주차장' },
+  'jaisan_park→lee_soon_shin_plaza':      { car: 4,  buf: 5,  op: 9,  km: 1.6,   poi: '자산공원주차장→이순신광장' },
+  // F-1~F-4: Founder NAVER_MEASURED 2026-10-24
+  'lee_soon_shin_plaza→hamel_lighthouse': { car: 5,  buf: 5,  op: 10, km: 1.5,   poi: '이순신광장→하멜전시관주차장' },
+  'hamel_lighthouse→lee_soon_shin_plaza': { car: 4,  buf: 5,  op: 9,  km: 1.6,   poi: '하멜전시관주차장→이순신광장' },
+  'lee_soon_shin_plaza→marine_park':      { car: 2,  buf: 5,  op: 7,  km: 0.658, poi: '이순신광장→해양공원' },
+  'marine_park→hamel_lighthouse':         { car: 3,  buf: 5,  op: 8,  km: 0.866, poi: '해양공원→하멜전시관주차장' },
+};
+
 class TravelGuideService {
   /**
    * Main recommendation endpoint
@@ -335,9 +353,9 @@ class TravelGuideService {
     const cafeTimeMinutes = selectedPlaces.length > 2 ? 30 : 0; // 1 cafe if 3+ places
 
     // P0-2 FIX: Fit status must reflect unknown travel time
-    // Cannot claim "fits_comfortably" when travel duration is unverified
-    const travelTransitionCount = blocks.filter(b => b.type === 'travel_transition').length;
-    const travelUnknown = travelTransitionCount > 0;
+    // Cannot claim "fits_comfortably" when any transition is unverified
+    const travelTransitionBlocks = blocks.filter(b => b.type === 'travel_transition');
+    const travelUnknown = travelTransitionBlocks.some(b => b.status !== 'verified');
     const fitStatus = travelUnknown ? 'travel_time_unverified' : 'fits_comfortably';
 
     return {
@@ -492,16 +510,30 @@ class TravelGuideService {
       });
 
       // Add travel time indicator (if not last place)
-      // P0-1 FIX: Only show duration_range when travel time is verified
+      // Travel Time UI V0.1: look up VERIFIED_TRAVEL_EDGES; fall back to unknown
       if (index < places.length - 1) {
-        blocks.push({
-          sequence: sequence++,
-          type: 'travel_transition',
-          estimated_duration_range: null,  // P0-1: null when status='unknown'
-          status: 'unknown', // V0: No verified travel time data
-          message_ko: '이동시간 확인 중', // P0-1: User-facing message
-          note: 'Travel time will be calculated when route data becomes available'
-        });
+        const nextPlace = places[index + 1];
+        const edgeKey = `${place.code}→${nextPlace.code}`;
+        const edge = VERIFIED_TRAVEL_EDGES[edgeKey];
+        if (edge) {
+          blocks.push({
+            sequence: sequence++,
+            type: 'travel_transition',
+            estimated_duration_range: { min: edge.op, max: edge.op },
+            status: 'verified',
+            message_ko: `이동 약 ${edge.op}분`,
+            note: `Source: VERIFIED_TRAVEL_EDGES / CAR ${edge.car}min + buf ${edge.buf}min / ${edge.poi}`
+          });
+        } else {
+          blocks.push({
+            sequence: sequence++,
+            type: 'travel_transition',
+            estimated_duration_range: null,
+            status: 'unknown',
+            message_ko: '이동시간 확인 중',
+            note: 'Travel time will be calculated when route data becomes available'
+          });
+        }
       }
     });
 

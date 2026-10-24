@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-24T07:55:48.117Z",
+  "generated_at": "2026-10-24T22:45:27.846Z",
   "generator": "generate-manifest.js",
-  "total_count": 475,
+  "total_count": 476,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2800,6 +2800,22 @@
       "title": "COURSE-PLANNING-TIME-FIT-DIAGNOSIS-V0_1",
       "created_at": "2026-10-24",
       "checksum": "36ef63ed"
+    },
+    {
+      "id": "DOC-DREAMTOWN-TIME-BUDGET-V0_1-CAN",
+      "path": "docs/knowledge/DREAMTOWN-TIME-BUDGET-V0_1-CANDIDATE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "변경 근거",
+      "title": "DREAMTOWN-TIME-BUDGET-V0_1-CANDIDATE",
+      "created_at": "2026-10-24",
+      "checksum": "28ac1239"
     },
     {
       "id": "DOC-EVIDENCE-B-001_Hotel_Nighttime",
