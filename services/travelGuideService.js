@@ -373,7 +373,7 @@ class TravelGuideService {
           total_stay_minutes: totalStayMinutes,
           estimated_meal_time: selectedPlaces.length > 0 ? 60 : 0,
           estimated_cafe_time: selectedPlaces.length > 2 ? 30 : 0,
-          unknown_travel_segments: travelTransitionCount,  // P0-2: explicit unknown count
+          unknown_travel_segments: travelTransitionBlocks.filter(b => b.status !== 'verified').length,  // P0-2: explicit unknown count
           estimated_total_range: travelUnknown ? null : {  // P0-2: null when unknown
             min: totalStayMinutes + (selectedPlaces.length > 0 ? 60 : 0),
             max: totalStayMinutes + (selectedPlaces.length > 0 ? 60 : 0) + (selectedPlaces.length > 2 ? 30 : 0)
