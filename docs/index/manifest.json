@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-24T01:37:03.803Z",
+  "generated_at": "2026-10-24T04:50:35.779Z",
   "generator": "generate-manifest.js",
-  "total_count": 464,
+  "total_count": 470,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2738,6 +2738,70 @@
       "checksum": "ffb65e2e"
     },
     {
+      "id": "DOC-COURSE-PLANNING-8H-TRACE-V0_1",
+      "path": "docs/knowledge/COURSE-PLANNING-8H-TRACE-V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "COURSE-PLANNING-8H-TRACE-V0_1",
+      "created_at": "2026-10-24",
+      "checksum": "facb3bab"
+    },
+    {
+      "id": "DOC-COURSE-PLANNING-FULLDAY-DESIGN",
+      "path": "docs/knowledge/COURSE-PLANNING-FULLDAY-DESIGN-V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "내용",
+      "title": "COURSE-PLANNING-FULLDAY-DESIGN-V0_1",
+      "created_at": "2026-10-24",
+      "checksum": "7f144f28"
+    },
+    {
+      "id": "DOC-COURSE-PLANNING-FULLDAY-IMPL-V",
+      "path": "docs/knowledge/COURSE-PLANNING-FULLDAY-IMPL-V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "COURSE-PLANNING-FULLDAY-IMPL-V0_1",
+      "created_at": "2026-10-24",
+      "checksum": "1d5c329c"
+    },
+    {
+      "id": "DOC-COURSE-PLANNING-TIME-FIT-DIAGN",
+      "path": "docs/knowledge/COURSE-PLANNING-TIME-FIT-DIAGNOSIS-V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "COURSE-PLANNING-TIME-FIT-DIAGNOSIS-V0_1",
+      "created_at": "2026-10-24",
+      "checksum": "36ef63ed"
+    },
+    {
       "id": "DOC-EVIDENCE-B-001_Hotel_Nighttime",
       "path": "docs/knowledge/EVIDENCE-B-001_Hotel_Nighttime_Walk_V0_1_Implementation.md",
       "type": "document",
@@ -2868,6 +2932,38 @@
       "title": "PILOT-INTENT-002 — Hotel-to-Starlight SOUL Answer Gap 분석",
       "created_at": "2026-10-24",
       "checksum": "ee59987b"
+    },
+    {
+      "id": "DOC-PILOT-INTENT-003-T5_Car_Query_",
+      "path": "docs/knowledge/PILOT-INTENT-003-T5_Car_Query_Path_Review.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "PILOT-INTENT-003-T5 — '차량으로' 선택 응답 경로 검토",
+      "created_at": "2026-10-24",
+      "checksum": "10cfc143"
+    },
+    {
+      "id": "DOC-PILOT-INTENT-003_Nighttime_Wal",
+      "path": "docs/knowledge/PILOT-INTENT-003_Nighttime_Walk_Real_Question_Pilot.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "PILOT-INTENT-003 — Nighttime Walk Real Question Pilot",
+      "created_at": "2026-10-24",
+      "checksum": "da360aaf"
     },
     {
       "id": "DOC-PREFLIGHT-PHASE-B-001_Hotel_Ni",

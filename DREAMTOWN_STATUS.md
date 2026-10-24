@@ -23,15 +23,37 @@ Last Updated: 2026-10-24
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-24
 
-**Founder — Phase B V0.1 DEPLOYED_AND_VERIFIED (2026-10-24 10:21 KST). PR #114 Merge 또는 다음 기능 결정 필요.**
+**Founder — 8h BUG 수정 구현 완료. Git commit/push/PR 승인 필요.**
+- **COURSE_PLANNING FullDay BUG 구현 COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-FULLDAY-IMPL-V0_1.md`
+  - **수정 완료**: `travelGuideService.js` Step 10 + `_applyClusterDiversity(candidates, maxCount=3)`
+  - **신규 테스트 21/21 PASS**: `tests/soul/soulCoursePlanningFullDay.test.js` (C-NEW-1~C-NEW-7)
+  - **전체 회귀 548/549 PASS**: R20 PRE-EXISTING 1건만 실패 (이번 변경과 무관)
+  - **재현 결과**: 2h(cap=2, 2곳/45min) / 5h(cap=3, 3곳/135min) / 8h(cap=5, **5곳/300min**) / FALLBACK(cap=3, 3곳)
+  - **이동시간 P0-1 / CAR 매트릭스 HOLD / hamel DATA_GAP**: 모두 유지 ✓
+  - **Guardian 판정**: IMPLEMENTATION_READY
+  - **코드 수정 완료** / Git commit/push: **미실행** (Founder 승인 대기)
+  - **Founder 승인 요청**: Git commit + PR 생성
+- **COURSE_PLANNING FullDay BUG 설계 검증 COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-FULLDAY-DESIGN-V0_1.md`
+- **COURSE_PLANNING 8h Trace COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-8H-TRACE-V0_1.md`
+  - **BUG 확정**: `_applyClusterDiversity` 라인 1180 `if (selected.length === 3) break` — 하드코딩 cap=3
+  - 로컬 재현: node 실행 → `[cablecar, hamel_lighthouse, hyangiram]` Count=3 / totalStay=135분 ✓
+- **COURSE_PLANNING Time Fit Review COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-TIME-FIT-DIAGNOSIS-V0_1.md`
+  - "이동시간 확인 중": EXPECTED — P0-1 설계 (CAR 매트릭스 HOLD)
+  - hamel_lighthouse.avg_stay_minutes=null: DATA_GAP (A. DB 입력 보류 — Founder Decision 2026-10-24)
+- **PILOT-INTENT-003-T5 COMPLETED** (2026-10-24): `docs/knowledge/PILOT-INTENT-003-T5_Car_Query_Path_Review.md`
+  - Discovery 우선: "알려줘" → needsTravelIntelligence=true → recommend() → _isCarInfoQuery 사후 처리 (EXPECTED)
+  - 케이블카만 주차 안내: parking_ko 있는 장소만 보충 (EXPECTED, C-3 설계 의도)
+  - UX_GAP 2건: ① "추천 가능" 배지가 CAR_INFO 쿼리에도 동일 표시 / ② 향일암·하멜등대 주차 안내 없음
+  - UNKNOWN 1건: 향일암 "차로 가기 좋은 곳" 추천 타당성 (access_by_car 기본값 true, 주차 Evidence 미확인)
+  - BUG: **없음**
+  - **코드 수정 없음** / Git commit/push: **미실행** (Founder 별도 승인 필요)
+  - **Founder 승인 요청**: ①향일암 주차 Evidence 확보 여부 ②하멜등대 parking_ko 추가 여부 ③배지 개선 필요성
+- **PILOT-INTENT-003 COMPLETED** (2026-10-24): `docs/knowledge/PILOT-INTENT-003_Nighttime_Walk_Real_Question_Pilot.md`
+  - T-1~T-8: 6 PASS / 2 ADVISORY / 0 FAIL / 미검증 정보 노출 0건
+- **PR #114 MERGED** @`49e1e28` (2026-10-24 KST) — Phase B V0.1 State Sync 완료
 - **Phase B V0.1 DEPLOYED_AND_VERIFIED** — Deploy ID: `dep-dbe0et3ncjis73do73ng` / SHA: `4c16052` / 2026-10-24 10:21 KST
-  - Production QA A~G: A(Health PASS) / B-1(신라스테이 밤바다 PASS) / C-1(호텔명 없음 PASS) / D(CODE VERIFIED) / E(Time Gate PASS) / F(CAR_INFO PRE-VERIFIED 7/7) / G(미검증 정보 노출 없음 PASS)
-  - 신규 회귀: **없음** / R20 PRE-EXISTING: 미변경 유지 / Rollback 발생: 없음
-  - Evidence: `docs/knowledge/EVIDENCE-B-002_Phase_B_V0_1_Production_QA.md`
-  - Advisory: B-2/C-2 "알려줘"/"추천해줘" → Discovery 경로 (설계 범위 외, 신규 회귀 아님)
+  - Production QA A~G: 6 PASS / 2 ADVISORY / 신규 회귀 없음
   - Render Auto-Deploy: **OFF 유지**
-- **PR #114 OPEN** — State Sync (DREAMTOWN_STATUS.md 1개, AIL Gate ✓ / docker-smoke ✓)
-  - Merge READY (Founder 승인 필요)
 - **Release Preflight** (2026-10-24): `docs/knowledge/RELEASE-PREFLIGHT-B-001_Phase_B_V0_1.md`
   - Release SHA: `4c16052` / 이전 Production SHA: `696839a` / Rollback: `dep-dbd790mq1p3s73coua40`
   - 배포 범위: PR #109(Time Gate) + PR #111(CAR_INFO) + PR #113(Phase B) — 3개 동시 배포

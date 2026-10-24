@@ -169,7 +169,12 @@ class TravelGuideService {
     });
 
     // 10. Experience Cluster Diversity (prevent geographic monopoly)
-    candidates = this._applyClusterDiversity(candidates);
+    // Compute targetCount preview before diversity filter so full_day (8h→5 stops) is respected.
+    const _previewTimeSlot = this._detectTimeSlot(context.time_available_minutes);
+    const _previewIsFallback = context._domainFallbacks?.includes('time_available_minutes');
+    const _previewRawTarget = this._getTargetStopCount(_previewTimeSlot, context.time_available_minutes);
+    const _diversityMax = _previewIsFallback ? Math.max(_previewRawTarget, 3) : _previewRawTarget;
+    candidates = this._applyClusterDiversity(candidates, _diversityMax);
 
     // Must-visit anchor recovery: the traveler is already at the must-visit place,
     // so transport filters are irrelevant for that specific place.
@@ -1155,11 +1160,13 @@ class TravelGuideService {
 
   /**
    * Helper: Apply experience cluster diversity to recommendations
-   * Prevents same geographic area from monopolizing multiple top-3 slots
-   * Rule: Max 1 candidate per cluster in top-3 (unless unavoidable due to limited inventory)
+   * Prevents same geographic area from monopolizing top candidate slots
+   * Rule: Max 1 candidate per cluster (unless unavoidable due to limited inventory)
+   * @param {Array} candidates - Score-sorted place array
+   * @param {number} maxCount - Target candidate count (default 3; 5 for full_day/8h)
    * @private
    */
-  _applyClusterDiversity(candidates) {
+  _applyClusterDiversity(candidates, maxCount = 3) {
     const selected = [];
     const seenClusters = new Set();
 
@@ -1177,17 +1184,17 @@ class TravelGuideService {
       }
       // else: cluster already represented, skip
 
-      if (selected.length === 3) {
+      if (selected.length >= maxCount) {
         break;
       }
     }
 
-    // Fallback: if diversity reduced results below 3, fill remaining slots
-    if (selected.length < 3 && candidates.length > selected.length) {
+    // Fallback: if diversity reduced results below maxCount, fill remaining slots
+    if (selected.length < maxCount && candidates.length > selected.length) {
       for (const candidate of candidates) {
         if (selected.includes(candidate)) continue;
         selected.push(candidate);
-        if (selected.length === 3) break;
+        if (selected.length >= maxCount) break;
       }
       // Mark that diversity constraint was relaxed due to limited inventory
       selected._cluster_diversity_relaxed = true;
