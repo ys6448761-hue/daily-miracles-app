@@ -749,7 +749,113 @@ Verification: UNVERIFIED — 공식 측정값 아님. 네이버/카카오맵 실
 
 ---
 
+## [UPDATE 2026-10-24] 원도심 권역 CAR Edge — Naver Maps Measured Evidence
+
+### 배경
+
+Founder가 네이버지도 측정값 4개를 직접 제공했다. (Founder Direction 2026-10-24)
+기존 EA~EF(SOUL 코스 예상값)와 별도 섹션으로 보존한다.
+
+**미접근 데이터 명시:**
+- `YEOSU_SOUL_TRAVEL_STAY_TIME_V0_1.xlsx`: 저장소 미포함 — 이번 기록에 반영되지 않음
+- Travel Time Matrix V0.1 (`YEOSU_TRAVEL_TIME_MATRIX_V0_1.md`+`.csv`): 현재 저장소에서 파일 미발견
+
+**원칙 (EA~EF 동일 원칙 계승):**
+- 역방향(B→A) 자동 생성 금지 — F-1/F-2는 각각 독립 측정값으로 기록
+- Runtime Connected: NO — GOVERNANCE_HOLD 유지
+- 기존 EA~EF 덮어쓰기 없음
+
+---
+
+### Naver Maps CAR Edge Time Table (2026-10-24)
+
+Source: FOUNDER_PROVIDED_NAVER_MAPS
+Mode: CAR (단방향 각각)
+Verification: 네이버지도 Founder 직접 조회 측정값
+Runtime Connected: NO
+
+| Edge ID | From (place_code) | To (place_code) | Mode | Minutes | Distance | Source | Status |
+|---|---|---|---|---|---|---|---|
+| F-1 | `lee_soon_shin_plaza` (이순신광장) | `hamel_lighthouse` (하멜등대) | CAR | **5** | 1.5km | FOUNDER_PROVIDED_NAVER_MAPS | NAVER_MEASURED |
+| F-2 | `hamel_lighthouse` (하멜등대) | `lee_soon_shin_plaza` (이순신광장) | CAR | **4** | 1.6km | FOUNDER_PROVIDED_NAVER_MAPS | NAVER_MEASURED |
+| F-3 | `lee_soon_shin_plaza` (이순신광장) | `marine_park` (종포해양공원) | CAR | **2** | 658m | FOUNDER_PROVIDED_NAVER_MAPS | NAVER_MEASURED |
+| F-4 | `marine_park` (종포해양공원) | `hamel_lighthouse` (하멜등대) | CAR | **3** | 866m | FOUNDER_PROVIDED_NAVER_MAPS | NAVER_MEASURED |
+
+**비고 — 역방향 처리:**
+- F-1 (이순신광장→하멜등대 5분) / F-2 (하멜등대→이순신광장 4분): 각각 독립 측정값. B→A가 A→B와 다름(1분 차이).
+- F-3 / F-4 역방향: 아직 미측정 (F-3 역방향 = marine_park→lee_soon_shin_plaza, F-4 역방향 = hamel_lighthouse→marine_park)
+
+---
+
+### 장소 코드 정확성 확인
+
+| place_code | name_ko | DB 등록 여부 | 검증 |
+|-----------|---------|-----------|------|
+| `lee_soon_shin_plaza` | 이순신광장 | ✓ (id 등록) | ✓ |
+| `hamel_lighthouse` | 하멜등대 | ✓ (id=15, HML-7 2026-10-19) | ✓ |
+| `marine_park` | 종포해양공원 | ✓ (등록됨) | ✓ |
+
+---
+
+### F-1~F-4와 8h 코스 H1~H4 관계
+
+8h SOUL 코스: `cablecar → hamel_lighthouse → hyangiram → lee_soon_shin_plaza → odongdo`
+
+| 8h Edge | F-1~F-4 직접 매핑 | 판정 |
+|---------|-----------------|------|
+| H1: cablecar → hamel_lighthouse | 없음 (F-1은 출발지가 lee_soon_shin_plaza) | ❌ MISSING |
+| H2: hamel_lighthouse → hyangiram | 없음 | ❌ MISSING |
+| H3: hyangiram → lee_soon_shin_plaza | 없음 | ❌ MISSING |
+| H4: lee_soon_shin_plaza → odongdo | 없음 (F-1~F-4 목적지 다름) | ❌ MISSING |
+
+**H1~H4: MISSING 유지 — F-1~F-4로 해소되지 않음. 네이버/카카오맵 별도 조회 필요.**
+
+---
+
+### 참고 계산 — 원도심 순환 (REFERENCE ONLY — Runtime 사용 금지)
+
+이순신광장 기점으로 종포해양공원 경유 하멜등대까지:
+
+| 구간 | Minutes | 거리 | Source |
+|------|---------|------|--------|
+| 이순신광장 → 종포해양공원 (F-3) | 2 | 658m | NAVER_MEASURED |
+| 종포해양공원 → 하멜등대 (F-4) | 3 | 866m | NAVER_MEASURED |
+| **이순신광장 → 종포해양공원 → 하멜등대 합계** | **5** | **1,524m** | 참고값 |
+| 이순신광장 → 하멜등대 직행 (F-1) | 5 | 1.5km | NAVER_MEASURED |
+
+*F-1(직행 5분) = F-3+F-4(경유 5분) — 수치 일치 확인 (참고용)*
+
+---
+
+### 남은 UNKNOWN (2026-10-24 추가)
+
+| Edge | 상태 | 우선순위 |
+|------|------|---------|
+| H1: cablecar → hamel_lighthouse | MISSING | HIGH (8h 코스) |
+| H2: hamel_lighthouse → hyangiram | MISSING | HIGH (8h 코스) |
+| H3: hyangiram → lee_soon_shin_plaza | MISSING | HIGH (8h 코스) |
+| H4: lee_soon_shin_plaza → odongdo | MISSING | HIGH (8h 코스) |
+| F-3 역방향 (marine_park → lee_soon_shin_plaza) | 미측정 | MEDIUM |
+| F-4 역방향 (hamel_lighthouse → marine_park) | 미측정 | MEDIUM |
+| hamel_lighthouse avg_stay_minutes | null (DATA_GAP) | HIGH |
+| Excel 데이터 반영 여부 | 미접근 | 확인 필요 |
+
+---
+
+*업데이트: 2026-10-24 — F-1~F-4 Naver Maps Measured Evidence 추가*
+*Source: Founder 제공 네이버지도 측정값 (2026-10-24)*
+*DB/Schema/Runtime 변경 없음. DESIGN & EVIDENCE ONLY.*
+*승인: Founder Approval 2026-10-24 (로컬 기록 / Git commit/push 별도 승인)*
+
+---
+
+**이 파일 업데이트 이후 자동으로 다음 단계 구현하지 않음. Founder 검수 대기.**
+
+---
+
 *생성: Claude Sonnet 4.6 / MUYEOJEONG Route Intelligence Phase*  
 *업데이트: 2026-09-21 B — FOUNDER_OPERATIONAL_STAY_TIME 6개 + CAR Edge 조사 + Timeline V2*  
-*Sources: Batch 01, Batch 02, Time Knowledge V0.1 (E002/E003/E004), WebSearch (2026-09-21)*  
+*업데이트: 2026-10-15 — SOUL Course Edge EA~EF Founder Evidence 추가*  
+*업데이트: 2026-10-24 — F-1~F-4 Naver Maps Measured Evidence 추가 (Founder Approval)*  
+*Sources: Batch 01, Batch 02, Time Knowledge V0.1 (E002/E003/E004), WebSearch (2026-09-21), Naver Maps (2026-10-24)*  
 *DB/Schema/Runtime 변경 없음. DESIGN & EVIDENCE ONLY.*

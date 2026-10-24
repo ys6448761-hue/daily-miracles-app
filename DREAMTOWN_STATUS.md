@@ -23,13 +23,29 @@ Last Updated: 2026-10-24
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-24
 
-**Founder — PR #115 MERGE_READY. Merge 승인 필요.**
-- **PR #115 OPEN**: `fix/full-day-candidate-cap` → main / SHA: `c6a53be` (main synced)
-  - URL: https://github.com/ys6448761-hue/daily-miracles-app/pull/115
-  - **mergeable: MERGEABLE** ✓ / mergeStateStatus: UNSTABLE (approve-dec PRE-EXISTING)
-  - **AIL Gate**: success ✓ / **docker-smoke**: success ✓ / **Manifest Verify**: success ✓
-  - Vercel / approve-dec.yml: PRE-EXISTING — 이번 변경 무관
-  - **Guardian**: MERGE_READY
+**Founder — F-1~F-4 기록 완료. 다음: H1~H4 측정값 제공 또는 PR #115 Production Deploy 승인.**
+- **F-1~F-4 RECORDED** (2026-10-24 로컬): `docs/knowledge/YEOSU_FOUNDER_ROUTE_001_TIME_EVIDENCE.md` §[UPDATE 2026-10-24]
+  - F-1: `lee_soon_shin_plaza` → `hamel_lighthouse` | CAR 5분 / 1.5km | NAVER_MEASURED
+  - F-2: `hamel_lighthouse` → `lee_soon_shin_plaza` | CAR 4분 / 1.6km | NAVER_MEASURED
+  - F-3: `lee_soon_shin_plaza` → `marine_park` | CAR 2분 / 658m | NAVER_MEASURED
+  - F-4: `marine_park` → `hamel_lighthouse` | CAR 3분 / 866m | NAVER_MEASURED
+  - 기존 EA~EF 보존 / 역방향 자동 생성 없음 / Runtime Connected: NO
+  - 참고: F-1(직행 5분) = F-3+F-4(경유 5분) — 수치 일치 확인
+- **H1~H4 MISSING 유지**: 8h 코스 직접 Edge 4개 — F-1~F-4로 해소 불가
+  - H1: cablecar → hamel_lighthouse | H2: hamel_lighthouse → hyangiram
+  - H3: hyangiram → lee_soon_shin_plaza | H4: lee_soon_shin_plaza → odongdo
+  - 해소 방법: 네이버/카카오맵 직접 조회 (Founder 또는 별도 측정)
+- **GOVERNANCE_HOLD 유지**: CAR 매트릭스 Runtime 연결 미실행
+- **SOUL Travel Time Reconciliation COMPLETED** (2026-10-24): `docs/knowledge/SOUL-TRAVEL-TIME-RECONCILIATION-V0_1.md`
+  - Travel Time Matrix V0.1 저장소 MISSING 확인 (memory 참조, repo 0건)
+- **SOUL Travel Time GAP Analysis COMPLETED** (2026-10-24): `docs/knowledge/SOUL-TRAVEL-TIME-GAP-ANALYSIS-V0_1.md`
+
+**PR #115 MERGED — Production Deploy 승인 필요 (별도).**
+- **PR #115 MERGED** @`d6323c9` (2026-10-24 KST) — full-day candidate cap fix
+  - main HEAD: `d6323c9` / Production LIVE: `4c16052` (Render Auto-Deploy OFF, 미배포)
+  - main CI: AIL Gate ✓ / docker-smoke ✓ / Manifest Verify ✓ / Deploy Health Check ✓
+  - approve-dec.yml failure: PRE-EXISTING (이번 변경 무관)
+  - **Guardian**: CLOSED
 - **COURSE_PLANNING FullDay BUG 구현 COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-FULLDAY-IMPL-V0_1.md`
   - 신규 테스트 21/21 PASS / 전체 회귀 548/549 PASS (R20 PRE-EXISTING 제외)
   - 8h: cap=5, 5곳, stay=300min / 2h/5h FALLBACK 기존 동작 보존
