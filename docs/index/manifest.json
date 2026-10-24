@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-24T00:40:59.091Z",
+  "generated_at": "2026-10-24T01:37:03.803Z",
   "generator": "generate-manifest.js",
-  "total_count": 462,
+  "total_count": 464,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2754,6 +2754,22 @@
       "checksum": "82feb91a"
     },
     {
+      "id": "DOC-EVIDENCE-B-002_Phase_B_V0_1_Pr",
+      "path": "docs/knowledge/EVIDENCE-B-002_Phase_B_V0_1_Production_QA.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "200 OK",
+      "title": "EVIDENCE-B-002 — Phase B V0.1 Production QA",
+      "created_at": "2026-10-24",
+      "checksum": "5f4e7c68"
+    },
+    {
       "id": "DOC-IMPL-PLAN-B-001_Hotel_Nighttim",
       "path": "docs/knowledge/IMPL-PLAN-B-001_Hotel_Nighttime_Walk_V0_1.md",
       "type": "document",
@@ -2886,6 +2902,22 @@
       "title": "Knowledge Cards (지식카드)",
       "created_at": "2026-10-24",
       "checksum": "a4d0a8e8"
+    },
+    {
+      "id": "DOC-RELEASE-PREFLIGHT-B-001_Phase_",
+      "path": "docs/knowledge/RELEASE-PREFLIGHT-B-001_Phase_B_V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "MERGED ✓",
+      "title": "RELEASE-PREFLIGHT-B-001 — Phase B V0.1 Production Release Preflight",
+      "created_at": "2026-10-24",
+      "checksum": "cd560b62"
     },
     {
       "id": "DOC-YEOSU_FOUNDER_ROUTE_001_TIME_E",
