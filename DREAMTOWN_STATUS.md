@@ -23,16 +23,21 @@ Last Updated: 2026-10-24
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-24
 
-**Founder — 8h BUG 수정 구현 완료. Git commit/push/PR 승인 필요.**
+**Founder — PR #115 HOLD. [AIL] 섹션 추가 + CI 재트리거 승인 필요.**
+- **PR #115 OPEN**: `fix/full-day-candidate-cap` → main / SHA: `52a324a`
+  - URL: https://github.com/ys6448761-hue/daily-miracles-app/pull/115
+  - CI 진단: `docs/knowledge/PR115-CI-DIAG-V0_1.md`
+  - CI 복구 분석: `docs/knowledge/PR115-CI-RECOVERY-V0_1.md`
+  - **AIL Gate 미트리거 원인 (진단 완료)**:
+    - A. GitHub `pull_request.opened` 이벤트 미전달 (PROBABLE) — 30분+ 경과, run 없음
+    - B. PR 본문 `[AIL]` 섹션 없음 → 트리거 시에도 FAIL 예상
+    - 브랜치: `docs/state-sync-pr113-merged` 기점 생성 → 3커밋 포함 (extra 2개 = docs only, 코드 무관)
+  - **Vercel / approve-dec.yml**: PRE-EXISTING (이번 변경 무관)
+  - **Guardian**: HOLD
+  - **복구 최소 조치 (Founder 승인 필요)**: PR 본문 `[AIL]` 섹션 추가 → `pull_request.edited` → AIL Gate / docker-smoke 재트리거
 - **COURSE_PLANNING FullDay BUG 구현 COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-FULLDAY-IMPL-V0_1.md`
-  - **수정 완료**: `travelGuideService.js` Step 10 + `_applyClusterDiversity(candidates, maxCount=3)`
-  - **신규 테스트 21/21 PASS**: `tests/soul/soulCoursePlanningFullDay.test.js` (C-NEW-1~C-NEW-7)
-  - **전체 회귀 548/549 PASS**: R20 PRE-EXISTING 1건만 실패 (이번 변경과 무관)
-  - **재현 결과**: 2h(cap=2, 2곳/45min) / 5h(cap=3, 3곳/135min) / 8h(cap=5, **5곳/300min**) / FALLBACK(cap=3, 3곳)
-  - **이동시간 P0-1 / CAR 매트릭스 HOLD / hamel DATA_GAP**: 모두 유지 ✓
-  - **Guardian 판정**: IMPLEMENTATION_READY
-  - **코드 수정 완료** / Git commit/push: **미실행** (Founder 승인 대기)
-  - **Founder 승인 요청**: Git commit + PR 생성
+  - 신규 테스트 21/21 PASS / 전체 회귀 548/549 PASS (R20 PRE-EXISTING 제외)
+  - 8h: cap=5, 5곳, stay=300min / 2h/5h FALLBACK 기존 동작 보존
 - **COURSE_PLANNING FullDay BUG 설계 검증 COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-FULLDAY-DESIGN-V0_1.md`
 - **COURSE_PLANNING 8h Trace COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-8H-TRACE-V0_1.md`
   - **BUG 확정**: `_applyClusterDiversity` 라인 1180 `if (selected.length === 3) break` — 하드코딩 cap=3
