@@ -23,18 +23,15 @@ Last Updated: 2026-10-24
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-24
 
-**Founder — PR #115 HOLD. [AIL] 섹션 추가 + CI 재트리거 승인 필요.**
-- **PR #115 OPEN**: `fix/full-day-candidate-cap` → main / SHA: `52a324a`
+**Founder — PR #115 HOLD. main 충돌 해결 후 CI 재트리거 확인 중.**
+- **PR #115 OPEN**: `fix/full-day-candidate-cap` → main / SHA: `f34f615` (+ main sync)
   - URL: https://github.com/ys6448761-hue/daily-miracles-app/pull/115
   - CI 진단: `docs/knowledge/PR115-CI-DIAG-V0_1.md`
   - CI 복구 분석: `docs/knowledge/PR115-CI-RECOVERY-V0_1.md`
-  - **AIL Gate 미트리거 원인 (진단 완료)**:
-    - A. GitHub `pull_request.opened` 이벤트 미전달 (PROBABLE) — 30분+ 경과, run 없음
-    - B. PR 본문 `[AIL]` 섹션 없음 → 트리거 시에도 FAIL 예상
-    - 브랜치: `docs/state-sync-pr113-merged` 기점 생성 → 3커밋 포함 (extra 2개 = docs only, 코드 무관)
+  - **CI 미트리거 원인**: `mergeable: CONFLICTING` (브랜치가 PR #114 이전 SHA에서 생성)
+  - **복구 조치**: origin/main merge → 충돌 해결 → 새 SHA → synchronize 이벤트
   - **Vercel / approve-dec.yml**: PRE-EXISTING (이번 변경 무관)
-  - **Guardian**: HOLD
-  - **복구 최소 조치 (Founder 승인 필요)**: PR 본문 `[AIL]` 섹션 추가 → `pull_request.edited` → AIL Gate / docker-smoke 재트리거
+  - **Guardian**: HOLD — CI 결과 대기
 - **COURSE_PLANNING FullDay BUG 구현 COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-FULLDAY-IMPL-V0_1.md`
   - 신규 테스트 21/21 PASS / 전체 회귀 548/549 PASS (R20 PRE-EXISTING 제외)
   - 8h: cap=5, 5곳, stay=300min / 2h/5h FALLBACK 기존 동작 보존
@@ -46,18 +43,13 @@ Last Updated: 2026-10-24
   - "이동시간 확인 중": EXPECTED — P0-1 설계 (CAR 매트릭스 HOLD)
   - hamel_lighthouse.avg_stay_minutes=null: DATA_GAP (A. DB 입력 보류 — Founder Decision 2026-10-24)
 - **PILOT-INTENT-003-T5 COMPLETED** (2026-10-24): `docs/knowledge/PILOT-INTENT-003-T5_Car_Query_Path_Review.md`
-  - Discovery 우선: "알려줘" → needsTravelIntelligence=true → recommend() → _isCarInfoQuery 사후 처리 (EXPECTED)
-  - 케이블카만 주차 안내: parking_ko 있는 장소만 보충 (EXPECTED, C-3 설계 의도)
   - UX_GAP 2건: ① "추천 가능" 배지가 CAR_INFO 쿼리에도 동일 표시 / ② 향일암·하멜등대 주차 안내 없음
-  - UNKNOWN 1건: 향일암 "차로 가기 좋은 곳" 추천 타당성 (access_by_car 기본값 true, 주차 Evidence 미확인)
-  - BUG: **없음**
   - **코드 수정 없음** / Git commit/push: **미실행** (Founder 별도 승인 필요)
-  - **Founder 승인 요청**: ①향일암 주차 Evidence 확보 여부 ②하멜등대 parking_ko 추가 여부 ③배지 개선 필요성
-- **PILOT-INTENT-003 COMPLETED** (2026-10-24): `docs/knowledge/PILOT-INTENT-003_Nighttime_Walk_Real_Question_Pilot.md`
-  - T-1~T-8: 6 PASS / 2 ADVISORY / 0 FAIL / 미검증 정보 노출 0건
+- **PILOT-INTENT-003 COMPLETED** (2026-10-24): 6 PASS / 2 ADVISORY / 0 FAIL
 - **PR #114 MERGED** @`49e1e28` (2026-10-24 KST) — Phase B V0.1 State Sync 완료
 - **Phase B V0.1 DEPLOYED_AND_VERIFIED** — Deploy ID: `dep-dbe0et3ncjis73do73ng` / SHA: `4c16052` / 2026-10-24 10:21 KST
-  - Production QA A~G: 6 PASS / 2 ADVISORY / 신규 회귀 없음
+  - Production QA A~G: A(Health PASS) / B-1(신라스테이 밤바다 PASS) / C-1(호텔명 없음 PASS) / D(CODE VERIFIED) / E(Time Gate PASS) / F(CAR_INFO PRE-VERIFIED 7/7) / G(미검증 정보 노출 없음 PASS)
+  - 신규 회귀: **없음** / R20 PRE-EXISTING: 미변경 유지 / Evidence: `docs/knowledge/EVIDENCE-B-002_Phase_B_V0_1_Production_QA.md`
   - Render Auto-Deploy: **OFF 유지**
 - **Release Preflight** (2026-10-24): `docs/knowledge/RELEASE-PREFLIGHT-B-001_Phase_B_V0_1.md`
   - Release SHA: `4c16052` / 이전 Production SHA: `696839a` / Rollback: `dep-dbd790mq1p3s73coua40`
