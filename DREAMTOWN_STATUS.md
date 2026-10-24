@@ -23,32 +23,26 @@ Last Updated: 2026-10-24
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-24
 
-**Founder — F-1~F-4 기록 완료. 다음: H1~H4 측정값 제공 또는 PR #115 Production Deploy 승인.**
-- **F-1~F-4 RECORDED** (2026-10-24 로컬): `docs/knowledge/YEOSU_FOUNDER_ROUTE_001_TIME_EVIDENCE.md` §[UPDATE 2026-10-24]
-  - F-1: `lee_soon_shin_plaza` → `hamel_lighthouse` | CAR 5분 / 1.5km | NAVER_MEASURED
-  - F-2: `hamel_lighthouse` → `lee_soon_shin_plaza` | CAR 4분 / 1.6km | NAVER_MEASURED
-  - F-3: `lee_soon_shin_plaza` → `marine_park` | CAR 2분 / 658m | NAVER_MEASURED
-  - F-4: `marine_park` → `hamel_lighthouse` | CAR 3분 / 866m | NAVER_MEASURED
-  - 기존 EA~EF 보존 / 역방향 자동 생성 없음 / Runtime Connected: NO
-  - 참고: F-1(직행 5분) = F-3+F-4(경유 5분) — 수치 일치 확인
-- **H1~H4 MISSING 유지**: 8h 코스 직접 Edge 4개 — F-1~F-4로 해소 불가
-  - H1: cablecar → hamel_lighthouse | H2: hamel_lighthouse → hyangiram
-  - H3: hyangiram → lee_soon_shin_plaza | H4: lee_soon_shin_plaza → odongdo
-  - 해소 방법: 네이버/카카오맵 직접 조회 (Founder 또는 별도 측정)
-- **GOVERNANCE_HOLD 유지**: CAR 매트릭스 Runtime 연결 미실행
-- **SOUL Travel Time Reconciliation COMPLETED** (2026-10-24): `docs/knowledge/SOUL-TRAVEL-TIME-RECONCILIATION-V0_1.md`
-  - Travel Time Matrix V0.1 저장소 MISSING 확인 (memory 참조, repo 0건)
-- **SOUL Travel Time GAP Analysis COMPLETED** (2026-10-24): `docs/knowledge/SOUL-TRAVEL-TIME-GAP-ANALYSIS-V0_1.md`
+**Founder — H1~H4 측정값 제공 또는 다음 작업 지시 필요.**
+- **PR #115 DEPLOYED_AND_VERIFIED** — SHA `7567b59` / Deploy `dep-dbe621rncjis73d4d3h0` / 2026-10-24 KST
+  - 2h: 장소 2개 / 체류 45분 ✅ / 5h: 장소 3개 / 체류 135분 ✅ / 8h: 장소 5개 / 체류 210분 ✅
+  - 8h 실제 순서: 케이블카 → 하멜등대 → 향일암 → 자산공원 → 이순신광장
+  - Guardian: PROD_UI_VERIFIED / Evidence: `docs/knowledge/PR115-PROD-QA-EVIDENCE-V0_1.md`
+- **PR #115 CLOSED** — `_applyClusterDiversity` cap fix 기능 수정 작업 종료
+- **PR #116 MERGED** @`7567b59` (2026-10-24 KST) — F-1~F-4 Naver Maps CAR Evidence (docs-only)
+  - F-1~F-4: `docs/knowledge/YEOSU_FOUNDER_ROUTE_001_TIME_EVIDENCE.md` §[UPDATE 2026-10-24]
+  - EA~EF 보존 / Runtime Connected: NO / GOVERNANCE_HOLD 유지
+- **H1~H4 MISSING**: 8h 코스 직접 Edge 4개 — Founder 측정값 제공 필요
+- **hamel_lighthouse avg_stay_minutes**: null / DATA_GAP / Production 화면 blank 확인
 
-**PR #115 MERGED — Production Deploy 승인 필요 (별도).**
+**PR #115 CLOSED (이전 상태 기록).**
 - **PR #115 MERGED** @`d6323c9` (2026-10-24 KST) — full-day candidate cap fix
-  - main HEAD: `d6323c9` / Production LIVE: `4c16052` (Render Auto-Deploy OFF, 미배포)
   - main CI: AIL Gate ✓ / docker-smoke ✓ / Manifest Verify ✓ / Deploy Health Check ✓
   - approve-dec.yml failure: PRE-EXISTING (이번 변경 무관)
-  - **Guardian**: CLOSED
+  - **Guardian**: CLOSED → PROD_UI_VERIFIED
 - **COURSE_PLANNING FullDay BUG 구현 COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-FULLDAY-IMPL-V0_1.md`
   - 신규 테스트 21/21 PASS / 전체 회귀 548/549 PASS (R20 PRE-EXISTING 제외)
-  - 8h: cap=5, 5곳, stay=300min / 2h/5h FALLBACK 기존 동작 보존
+  - 8h: cap=5, 5곳 / 5h: cap=3, 3곳 / 2h: cap=2, 2곳
 - **COURSE_PLANNING FullDay BUG 설계 검증 COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-FULLDAY-DESIGN-V0_1.md`
 - **COURSE_PLANNING 8h Trace COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-8H-TRACE-V0_1.md`
   - **BUG 확정**: `_applyClusterDiversity` 라인 1180 `if (selected.length === 3) break` — 하드코딩 cap=3

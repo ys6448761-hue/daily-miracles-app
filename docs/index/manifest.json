@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-24T07:17:32.157Z",
+  "generated_at": "2026-10-24T07:55:48.117Z",
   "generator": "generate-manifest.js",
-  "total_count": 474,
+  "total_count": 475,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2996,6 +2996,22 @@
       "title": "PR115-CI-RECOVERY-V0_1",
       "created_at": "2026-10-24",
       "checksum": "02120039"
+    },
+    {
+      "id": "DOC-PR115-PROD-QA-EVIDENCE-V0_1",
+      "path": "docs/knowledge/PR115-PROD-QA-EVIDENCE-V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "근거",
+      "title": "PR115-PROD-QA-EVIDENCE-V0_1",
+      "created_at": "2026-10-24",
+      "checksum": "e6f74fbb"
     },
     {
       "id": "DOC-PREFLIGHT-PHASE-B-001_Hotel_Ni",
