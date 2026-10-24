@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-23
+Last Updated: 2026-10-24
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -21,14 +21,42 @@ Last Updated: 2026-10-23
 5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
-### ★ Current Next Action (exactly 1) — Updated: 2026-10-23
+### ★ Current Next Action (exactly 1) — Updated: 2026-10-24
 
-**Founder — COURSE_PLANNING Time Gate V0.1 MERGED. Production Deploy 승인 결정 필요.**
+**Founder — PR #113 AIL Gate ✓ / docker-smoke ✓. Merge 승인 결정 필요.**
+- **CI-DIAG-PR113-001 v3 CLOSED** (2026-10-24): `docs/knowledge/CI-DIAG-PR113-001.md`
+  - Root-cause: `mergeable_state="dirty"` → merge conflict → GitHub Actions pull_request 차단
+  - 해소: `git merge origin/main` + DREAMTOWN_STATUS.md conflict 해결 + push (Founder 승인)
+  - 결과: pull_request: synchronize 이벤트 발화 → AIL Gate ✓ / docker-smoke ✓
+- **PR #113 OPEN** @`9a46c45` — Nighttime Walk SOUL Answer Phase B V0.1 (2026-10-24)
+  - URL: https://github.com/ys6448761-hue/daily-miracles-app/pull/113
+  - 브랜치: `feat/soul-nighttime-walk-phase-b-v0-1` → main
+  - 변경 파일: `quoteContextService.js` + `soyeowoolService.js` + 6개 docs 신규
+  - 테스트: 509/510 PASS (R20 PRE-EXISTING, 신규 회귀 0건)
+  - **CI 상태 (최종):**
+    - AIL Gate — **success** (run ID: 40046202568, pull_request, SHA: 9a46c45)
+    - docker-smoke — **success** (run ID: 40046202528, pull_request, SHA: 9a46c45)
+    - Manifest Verify — success (run ID: 40046202514)
+    - Vercel FAILURE — PRE-EXISTING (Node.js 20.x, PR #109/#111과 동일)
+    - approve-dec.yml — PRE-EXISTING syntax issue
+  - mergeable: true / mergeable_state: unstable (Vercel PRE-EXISTING 때문)
+  - Guardian 판정: **READY** — AIL Gate PASS, required checks 충족
+  - Production Deploy: NOT DEPLOYED
+- **EVIDENCE-B-001** (2026-10-24): `docs/knowledge/EVIDENCE-B-001_Hotel_Nighttime_Walk_V0_1_Implementation.md`
+- **IMPL-PLAN-B-001** (2026-10-24): `docs/knowledge/IMPL-PLAN-B-001_Hotel_Nighttime_Walk_V0_1.md`
+- **PREFLIGHT-PHASE-B-001** (2026-10-24): `docs/knowledge/PREFLIGHT-PHASE-B-001_Hotel_Nighttime_Walk.md`
+- **PILOT-INTENT-002 Phase A: PARTIAL COMPLETE** (2026-10-24)
+  - 신라스테이→이순신광장 CAR 5분/1.9km / WALK 26분/1.7km — Founder 네이버 지도 캡처, 2026-10-24
+  - 저장: `docs/knowledge/PILOT-INTENT-002_Hotel_to_Starlight_Answer_Gap.md`
+- **PILOT-INTENT-001** (2026-10-24): 8개 키워드 SOUL 커버리지 분석 — `docs/knowledge/PILOT-INTENT-001_Traveler_Intent_8Keywords.md`
+- **CAND-EXP-002-B** (2026-10-24): 별빛항로 현지 경험 Candidate — `docs/constitution/candidate/CAND-EXP-002_Starlight_Route_Local_Experience.md`
+- **PR #111 MERGED** @`bbb5b96` — CAR_INFO Separation V0.1 (2026-10-23 KST)
+  - "차량으로" chip: course=null + TIME_OPTIONS 제거 + parking_ko 보존
+  - `_isCarInfoQuery`: 차로/자차로/차량으로 + 가기/이동/주차정보 → COURSE_PLANNING과 분리
+  - Required CI: AIL Gate ✓ / docker-smoke ✓ / Vercel FAILURE (PRE-EXISTING, Node.js 20.x)
+  - CI-1~CI-7: 7/7 PASS / T1-T18: 18/18 PASS / soul 475/476 PASS (R20 PRE-EXISTING)
+  - main HEAD: `bbb5b96` / Production: NOT DEPLOYED
 - **PR #109 MERGED** @`997dfdc` — COURSE_PLANNING Time Gate V0.1 (2026-10-23 KST)
-  - Squash Merge SHA: `997dfdc121189b8d238e0dc7adc65bb119c30fc3`
-  - main HEAD: `997dfdc` / Production: NOT DEPLOYED
-  - Required CI: AIL Gate ✓ / docker-smoke ✓ / Vercel FAILURE (PRE-EXISTING, merged PR #99도 동일)
-  - PR #108: CLOSED (로컬 main stale로 의도치 않은 파일 포함, PR #109로 대체)
   - 로컬 테스트: T1-T18 18/18 PASS / soul 전체 138/139 PASS (R20 PRE-EXISTING)
 - **CourseDisplay DEPLOYED_AND_VERIFIED** — 8/8 PASS (2026-10-23)
 - Production SHA: `696839a` / Deploy: `dep-dbd790mq1p3s73coua40` / LIVE: 2026-10-23 05:42 KST
