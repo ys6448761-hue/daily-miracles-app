@@ -23,13 +23,12 @@ Last Updated: 2026-10-24
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-24
 
-**Founder — PR #115 MERGE_READY. Merge 승인 필요.**
-- **PR #115 OPEN**: `fix/full-day-candidate-cap` → main / SHA: `c6a53be` (main synced)
-  - URL: https://github.com/ys6448761-hue/daily-miracles-app/pull/115
-  - **mergeable: MERGEABLE** ✓ / mergeStateStatus: UNSTABLE (approve-dec PRE-EXISTING)
-  - **AIL Gate**: success ✓ / **docker-smoke**: success ✓ / **Manifest Verify**: success ✓
-  - Vercel / approve-dec.yml: PRE-EXISTING — 이번 변경 무관
-  - **Guardian**: MERGE_READY
+**Founder — PR #115 MERGED. Production Deploy 승인 필요 (별도).**
+- **PR #115 MERGED** @`d6323c9` (2026-10-24 KST) — full-day candidate cap fix
+  - main HEAD: `d6323c9` / Production LIVE: `4c16052` (Render Auto-Deploy OFF, 미배포)
+  - main CI: AIL Gate ✓ / docker-smoke ✓ / Manifest Verify ✓ / Deploy Health Check ✓
+  - approve-dec.yml failure: PRE-EXISTING (이번 변경 무관)
+  - **Guardian**: CLOSED
 - **COURSE_PLANNING FullDay BUG 구현 COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-FULLDAY-IMPL-V0_1.md`
   - 신규 테스트 21/21 PASS / 전체 회귀 548/549 PASS (R20 PRE-EXISTING 제외)
   - 8h: cap=5, 5곳, stay=300min / 2h/5h FALLBACK 기존 동작 보존
