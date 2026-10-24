@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-24
+Last Updated: 2026-10-25
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -21,29 +21,18 @@ Last Updated: 2026-10-24
 5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
-### ★ Current Next Action (exactly 1) — Updated: 2026-10-24
+### ★ Current Next Action (exactly 1) — Updated: 2026-10-25
 
-**Founder — PR #113 MERGED. Production Deploy 결정 필요.**
-- **PR #113 MERGED** @`4c16052` — Nighttime Walk SOUL Answer Phase B V0.1 (2026-10-24 KST)
-  - Squash Merge SHA: `4c160529f08616433bb639e0ce153044b998fca5`
-  - 브랜치: `feat/soul-nighttime-walk-phase-b-v0-1` → main
-  - 변경 파일: `quoteContextService.js` + `soyeowoolService.js` + 6개 docs 신규
-  - 테스트: 509/510 PASS (R20 PRE-EXISTING, 신규 회귀 0건)
-  - **CI 상태 (pull_request, 최종):**
-    - AIL Gate — **success** (run ID: 40046332352, SHA: 441e7fb)
-    - docker-smoke — **success** (run ID: 40046332344, SHA: 441e7fb)
-    - Vercel FAILURE — PRE-EXISTING (Node.js 20.x)
-    - approve-dec.yml — PRE-EXISTING syntax issue
-  - **CI 상태 (push to main, merge SHA: 4c16052):**
-    - AIL Gate — **success** (run ID: 40046602507)
-    - docker-smoke — **success** (run ID: 40046602519)
-    - Manifest Verify — **success** (run ID: 40046602556)
-    - Deploy Health Check — **success** (run ID: 40046602511, 기존 URL 응답 확인)
-    - approve-dec.yml — failure (PRE-EXISTING)
-  - Production: **NOT DEPLOYED** (SHA: 696839a 유지, Render auto-deploy OFF)
-- **CI-DIAG-PR113-001 v3 CLOSED** (2026-10-24): `docs/knowledge/CI-DIAG-PR113-001.md`
-  - Root-cause: `mergeable_state="dirty"` → merge conflict → GitHub Actions pull_request 차단
-  - 해소: `git merge origin/main` + DREAMTOWN_STATUS.md conflict 해결 + push
+**Founder — PR #118 Production Deploy 승인 필요.**
+- **PR #118 MERGED** @`8aaeccd` (2026-10-25 KST) — Travel Time UI V0.1
+  - main HEAD: `8aaeccd` / main CI: AIL Gate ✓ / docker-smoke ✓ / Manifest ✓ / health-check ✓
+  - Guardian: MERGED_AND_VERIFIED / PRODUCTION_HOLD
+  - `_estimateTravelTime()` V0 Stub 미변경 / CAR GOVERNANCE_HOLD 유지
+  - pre-merge 버그 수정: `travelTransitionCount` ReferenceError → `travelTransitionBlocks.filter` (commit `4d52801`)
+- **Production LIVE**: `7567b59` (Render Auto-Deploy OFF — PR #118 미배포)
+- **PR #117 MERGED** @`a8861cc` — PR #115 Production QA Evidence
+- **hamel_lighthouse avg_stay_minutes**: null / DATA_GAP (DB 변경 별도 승인 대기)
+- **hyangiram avg_stay_minutes**: 90 (DB) / Candidate 120분 — 별도 승인 대기
 - **EVIDENCE-B-001** (2026-10-24): `docs/knowledge/EVIDENCE-B-001_Hotel_Nighttime_Walk_V0_1_Implementation.md`
 - **IMPL-PLAN-B-001** (2026-10-24): `docs/knowledge/IMPL-PLAN-B-001_Hotel_Nighttime_Walk_V0_1.md`
 - **PREFLIGHT-PHASE-B-001** (2026-10-24): `docs/knowledge/PREFLIGHT-PHASE-B-001_Hotel_Nighttime_Walk.md`

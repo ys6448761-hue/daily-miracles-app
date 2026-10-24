@@ -38,7 +38,9 @@ export default function CourseDisplay({ course }) {
           title: block.message_ko || '이동',
           // D2: only show duration when verified; omit individual "확인 중" labels
           subtitle: block.estimated_duration_range
-            ? `약 ${block.estimated_duration_range.min}-${block.estimated_duration_range.max}분`
+            ? (block.estimated_duration_range.min === block.estimated_duration_range.max
+              ? `약 ${block.estimated_duration_range.min}분`
+              : `약 ${block.estimated_duration_range.min}-${block.estimated_duration_range.max}분`)
             : null,
           className: 'course-block-travel'
         };
