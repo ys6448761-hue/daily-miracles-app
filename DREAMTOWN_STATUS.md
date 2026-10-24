@@ -23,15 +23,13 @@ Last Updated: 2026-10-24
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-24
 
-**Founder — PR #115 HOLD. main 충돌 해결 후 CI 재트리거 확인 중.**
-- **PR #115 OPEN**: `fix/full-day-candidate-cap` → main / SHA: `f34f615` (+ main sync)
+**Founder — PR #115 MERGE_READY. Merge 승인 필요.**
+- **PR #115 OPEN**: `fix/full-day-candidate-cap` → main / SHA: `c6a53be` (main synced)
   - URL: https://github.com/ys6448761-hue/daily-miracles-app/pull/115
-  - CI 진단: `docs/knowledge/PR115-CI-DIAG-V0_1.md`
-  - CI 복구 분석: `docs/knowledge/PR115-CI-RECOVERY-V0_1.md`
-  - **CI 미트리거 원인**: `mergeable: CONFLICTING` (브랜치가 PR #114 이전 SHA에서 생성)
-  - **복구 조치**: origin/main merge → 충돌 해결 → 새 SHA → synchronize 이벤트
-  - **Vercel / approve-dec.yml**: PRE-EXISTING (이번 변경 무관)
-  - **Guardian**: HOLD — CI 결과 대기
+  - **mergeable: MERGEABLE** ✓ / mergeStateStatus: UNSTABLE (approve-dec PRE-EXISTING)
+  - **AIL Gate**: success ✓ / **docker-smoke**: success ✓ / **Manifest Verify**: success ✓
+  - Vercel / approve-dec.yml: PRE-EXISTING — 이번 변경 무관
+  - **Guardian**: MERGE_READY
 - **COURSE_PLANNING FullDay BUG 구현 COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-FULLDAY-IMPL-V0_1.md`
   - 신규 테스트 21/21 PASS / 전체 회귀 548/549 PASS (R20 PRE-EXISTING 제외)
   - 8h: cap=5, 5곳, stay=300min / 2h/5h FALLBACK 기존 동작 보존
