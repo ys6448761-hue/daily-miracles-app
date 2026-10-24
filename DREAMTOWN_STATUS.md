@@ -23,18 +23,22 @@ Last Updated: 2026-10-23
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-24
 
-**Founder — PR #113 OPEN. Merge 승인 대기. AIL Gate 미트리거(GitHub 일시적 이슈) 확인 필요.**
-- **PR #113 OPEN** @`ae93bba` — Nighttime Walk SOUL Answer Phase B V0.1 (2026-10-24)
+**Founder — PR #113 merge conflict 해소 후 AIL Gate 및 docker-smoke 결과 확인 필요.**
+- **CI-DIAG-PR113-001 v3 완료** (2026-10-24): `docs/knowledge/CI-DIAG-PR113-001.md`
+  - Root-cause CONFIRMED: `mergeable_state="dirty"` — DREAMTOWN_STATUS.md merge conflict
+  - main d0b5acc(DREAMTOWN_STATUS.md) ↔ PR #113 브랜치 동일 파일 충돌 → GitHub Actions pull_request workflow 전체 차단
+  - 현재: merge conflict 해소 commit + push 진행 중 (Founder 승인)
+- **PR #113 OPEN** @`cb6954b` — Nighttime Walk SOUL Answer Phase B V0.1 (2026-10-24)
   - URL: https://github.com/ys6448761-hue/daily-miracles-app/pull/113
   - 브랜치: `feat/soul-nighttime-walk-phase-b-v0-1` → main
   - 변경 파일: `quoteContextService.js` + `soyeowoolService.js` + 6개 docs 신규
   - 테스트: 509/510 PASS (R20 PRE-EXISTING, 신규 회귀 0건)
-  - **CI 상태:**
-    - Vercel FAILURE — PRE-EXISTING (Node.js 20.x, PR #109/#111과 동일)
-    - AIL Gate — NOT RUN (GitHub pull_request 이벤트 미트리거, 원인 불명)
-    - docker-smoke — NOT RUN (동일 원인)
-    - approve-dec.yml — workflow file syntax issue (PRE-EXISTING)
-  - **주의:** AIL Gate [AIL] 섹션은 PR body에 포함됨. GitHub Actions 트리거 문제 별도 확인 필요.
+  - **CI 상태 (conflict 해소 전):**
+    - AIL Gate — NOT RUN (merge conflict dirty state로 GitHub Actions 차단, CONFIRMED)
+    - docker-smoke — NOT RUN (동일 원인, CONFIRMED)
+    - Vercel FAILURE — PRE-EXISTING (Node.js 20.x)
+    - approve-dec.yml — PRE-EXISTING syntax issue
+  - AIL [AIL] 섹션: PR body에 포함됨
   - Production Deploy: NOT DEPLOYED
 - **EVIDENCE-B-001** (2026-10-24): `docs/knowledge/EVIDENCE-B-001_Hotel_Nighttime_Walk_V0_1_Implementation.md`
 - **IMPL-PLAN-B-001** (2026-10-24): `docs/knowledge/IMPL-PLAN-B-001_Hotel_Nighttime_Walk_V0_1.md`
@@ -44,9 +48,6 @@ Last Updated: 2026-10-23
   - 저장: `docs/knowledge/PILOT-INTENT-002_Hotel_to_Starlight_Answer_Gap.md`
 - **PILOT-INTENT-001** (2026-10-24): 8개 키워드 SOUL 커버리지 분석 — `docs/knowledge/PILOT-INTENT-001_Traveler_Intent_8Keywords.md`
 - **CAND-EXP-002-B** (2026-10-24): 별빛항로 현지 경험 Candidate — `docs/constitution/candidate/CAND-EXP-002_Starlight_Route_Local_Experience.md`
-- **주의:** PR #111 (CAR_INFO Separation V0.1) main HEAD `bbb5b96` — Production NOT DEPLOYED
-
-**Founder — CAR_INFO Separation V0.1 MERGED. 다음 기능/Production Deploy 결정 필요.**
 - **PR #111 MERGED** @`bbb5b96` — CAR_INFO Separation V0.1 (2026-10-23 KST)
   - "차량으로" chip: course=null + TIME_OPTIONS 제거 + parking_ko 보존
   - `_isCarInfoQuery`: 차로/자차로/차량으로 + 가기/이동/주차정보 → COURSE_PLANNING과 분리

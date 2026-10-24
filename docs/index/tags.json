@@ -1065,6 +1065,7 @@
     "DOC-PLAN"
   ],
   "knowledge": [
+    "DOC-CI-DIAG-PR113-001",
     "DOC-EVIDENCE-B-001_Hotel_Nighttime",
     "DOC-IMPL-PLAN-B-001_Hotel_Nighttim",
     "DOC-PILOT-INTENT-001_Traveler_Inte",
