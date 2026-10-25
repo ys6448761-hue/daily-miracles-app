@@ -23,18 +23,19 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
 
-**여수 전역 지도 V0.1 — 코드 구조 구현 착수 (지도 배경 이미지 수령 대기)**
-- **MAP_V01_PREPARATION_READY** ✅ (2026-10-26) — Evidence: `docs/knowledge/MAP-V01-PREPARATION-EVIDENCE.md`
-  - OI-MAP-1~5 Founder 승인 완료 (2026-10-26)
-  - 고소동 좌표 VERIFIED: 34.7389997, 127.7411688 (NAVER 마커, mom-mom.net)
-  - 여수 수산시장 UV-2 유지 (주소 확인, 좌표 미검증 → placeholder)
-  - 지도 배경 이미지 **ASSET_MISSING** — Founder 제공 필요 (§4 이미지 사양 참조)
-- **즉시 착수 가능**: yeosuMapData.js · YeosuMapSelector.jsx · MuyojeongHomePage.jsx(EXTEND)
-  - 이미지 없이 fallback div 모드로 구조 구현 가능
-- **이미지 수령 후 추가**: 배경 바인딩 + bounding box 캘리브레이션
+**여수 지역별 탐색 V0.1 — Founder 지도 이미지 제공 → 배경 바인딩 착수**
+- **MAP_V01_UI_STRUCTURE_READY** ✅ (2026-10-26) — SHA `240374a`
+  - `yeosuMapData.js`: 35개 장소 + 7개 권역 데이터 (OI-MAP-1~5 반영)
+  - `YeosuMapSelector.jsx`: 권역 카드 → 장소 목록 탐색 (fallback div 모드)
+  - `MuyojeongHomePage.jsx` EXTEND: "지역별 보기" 토글 + mapMode 상태
+  - 빌드: ✅ 698 modules / 회귀: 563/564 PASS (R20 PRE-EXISTING)
+  - 고소동 좌표 VERIFIED: 34.7389997, 127.7411688 / 수산시장 UV-2 유지
+- **남은 Blocker**:
+  - 지도 배경 이미지 ASSET_MISSING — Founder 제공 필요 (§4 이미지 사양: `MAP-V01-PREPARATION-EVIDENCE.md`)
+  - 여수 수산시장 UV-2 — 좌표 미검증 (placeholder 처리됨)
+- **MAP_V01_PREPARATION_READY** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-PREPARATION-EVIDENCE.md`
 - **MAP_V01_DECISION_SHEET: FOUNDER_APPROVED** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-DECISION-SHEET.md`
-- **MAP_DISCOVERY_INVENTORY_READY** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-YEOSU-PLACE-INVENTORY.md`
-- **PR #134 OPEN** — docs/pr133-state-sync State Sync. Founder merge 승인 필요
+- **PR #134 OPEN** — docs/pr133-state-sync (상태 동기화 포함). Founder merge 승인 필요
 - **맞춤 항로 V0.1: PRODUCTION_QA_CLOSED** ✅ (2026-10-25 17:17 KST) SHA `425a643`
 
 **구현 금지:**
