@@ -23,19 +23,19 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-25
 
-**Founder — PR #121 Merge 승인 필요. Production Deploy 별도 승인 필요.**
-- **PR #121 OPEN** @ `809234f` — Stay Time DB Update V0.1 (feat/travel-places-stay-time-v01)
+**Founder — Migration 207 Production 실행 승인 + Production Deploy 승인 필요.**
+- **PR #121 MERGED** @ `f61fc5b` (2026-10-25 KST) — Stay Time DB Update V0.1
+  - main HEAD: `f61fc5b` / main CI: AIL Gate ✓ / docker-smoke ✓ / Manifest ✓ / Health Check ✓
   - hamel_lighthouse: null→30 / hyangiram: 90→120 (Founder Decision 2026-10-25)
   - migration: `207_travel_places_stay_time_v01.sql` (idempotent + rollback 포함)
   - fitStatus 3방향: travel_time_unverified / budget_exceeded / fits_comfortably
-  - estimated_total_range: verified travel 포함 (stay+travel+meal / +café)
-  - meal/café: 하드코딩 공식 → 실제 블록 기반 계산
-  - **Guardian HOLD 해소**: 5h(307>300)→budget_exceeded / 8h(436<480)→fits_comfortably
+  - estimated_total_range: stay+verified_travel+meal / +café
+  - Guardian: MERGED_AND_VERIFIED / PRODUCTION_HOLD
   - 46/46 PASS (T-1~T-29) / R20 PRE-EXISTING
-  - Evidence: `docs/knowledge/TRAVEL-PLACES-STAY-TIME-V01-EVIDENCE.md`
-  - Production DB 미실행 — Merge 후 별도 승인 필요
-- **PR #120 OPEN** — fix/fitStatus-stay-unknown @ `3df7c29` (stayUnknown guard only)
-  - PR #121에 동일 guard 포함 → PR #121 merge 시 PR #120 close 권장
+  - Migration 207 미실행 (admin allowlist 미등록 — 별도 Founder 승인 필요)
+- **PR #120 CLOSED** — superseded by PR #121 (2026-10-25)
+- **5h(307>300) → budget_exceeded** ✅ / **8h(436<480) → fits_comfortably** ✅
+- **8h meal+café(466<480) → fits_comfortably, 잔여 14분** ✅
 - **PR #118 MERGED** @`8aaeccd` (2026-10-25 KST) — Travel Time UI V0.1
   - main HEAD: `3fe3686` (origin) / Guardian: MERGED_AND_VERIFIED / PRODUCTION_HOLD
   - `_estimateTravelTime()` V0 Stub 미변경 / CAR GOVERNANCE_HOLD 유지
