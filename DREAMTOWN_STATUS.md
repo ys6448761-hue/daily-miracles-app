@@ -23,20 +23,15 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-25
 
-**PR #131 Merge 대기 — Guardian Pre-Merge Review PASS, Founder Merge 승인 필요**
-- **Founder Visual QA: T1~T7 PASS** ✅ (2026-10-25) — `http://localhost:5000/muyojeong`
-- **Guardian Pre-Merge Review: MERGE_READY** ✅ (2026-10-25) — 5/5 통합 테스트 CODE_VERIFIED
+**맞춤 항로 V0.1 — PR #131 main 병합 완료, Production QA 대기**
+- **UI Visual QA**: PASS ✅ (T1~T7, 2026-10-25, `localhost:5000/muyojeong`)
+- **Code-level integration review**: PASS ✅ (5/5 CODE_VERIFIED — buildSoulMessage / PLACE_ALIAS_MAP / 270분 치환없음 / CourseDisplay / travel_time_unverified)
+- **Runtime SOUL API integration**: UNVERIFIED ⚠️ (운영 DB write 없이 정적 코드 추적만 수행)
+- **Production QA**: NOT STARTED ⏳ (Render 배포 후 Founder 실제 SOUL 제출 테스트 필요)
+- **PR #131 MERGED** ✅ (2026-10-25) SHA: `bfaa568`→main / Founder Conditional Merge Authorization
+  - 빌드: ✅ / 회귀: 566/567 PASS (R20 PRE-EXISTING) / 신규 API·DB 없음
+  - MuyojeongHomePage.jsx V1.3: 장소 칩 8+4 / 시간 직접입력 / CTA
 - **PR #130: MERGED** ✅ @`2026-10-25T04:26:14Z` — Production Deploy LIVE + Post-Deploy QA §12
-- **맞춤 항로 V0.1 구현: IMPLEMENTED** ✅ (2026-10-25) SHA: `bfaa568` Branch: feat/custom-route-v01
-  - PR #131 OPEN — Production 배포 금지 / Founder Merge 승인 대기
-  - 빌드: ✅ (vite build 성공) / 회귀: 566/567 PASS (R20 PRE-EXISTING)
-  - MuyojeongHomePage.jsx V1.3: 장소 칩 8개+펼치기 4개 / 시간 직접입력 / CTA
-  - 기존 POST /api/dt/travel/input/text 재사용 (신규 API·DB 없음)
-- **Evidence 정합성 수정** ✅ (설계 에이전트 hamel=45 오류 → 30 수정)
-  - total_known(no-meal): 195분 확정 (30+120+45) / budget_exceeded 기준 유지
-  - total_known(meal+cafe): 285분 확정 (식사/카페 V0.1 제외)
-- **맞춤 항로 V0.1 최소 설계: DESIGN COMPLETE** ✅ `docs/knowledge/CUSTOM-ROUTE-V01-DESIGN.md`
-- **파이프라인 호환성: 검증 완료** ✅ A~E 시나리오 / must_visit_place_ids 완전 재사용
 - **'소원이 직접 입력형 맞춤 항로 V0.1' 분석·설계·구현: COMPLETE** ✅
 - **Travel Time UI V0.1 + Stay Time DB Update V0.1: PRODUCTION LIVE** ✅
   - Production LIVE SHA: **`75223a6`**
