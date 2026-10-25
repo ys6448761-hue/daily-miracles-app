@@ -235,5 +235,59 @@ Founder 액션 필요: Render Dashboard → `daily-miracles-app` 서비스의 �
 
 ---
 
+## 10. Migration 207 Final Execution Gate (2026-10-25)
+
+**Founder 확인**: Render Production PostgreSQL 백업·복구 가능 — CONFIRMED
+
+### DB 인스턴스 다층 식별 (도메인 매칭 외 추가 검증)
+
+| 항목 | 값 | 검증 방법 |
+|------|---|---------|
+| Provider | RENDER_POSTGRES | 호스트 도메인 패턴 |
+| Instance ID | `dpg-d3t9gpa4d50c73d2i3gg-a` | URL에서 추출 |
+| Region | Singapore | 호스트 세그먼트 |
+| **DB name** | **`yeosu_miracle_travel`** | `SELECT current_database()` 라이브 조회 |
+| PG version | PostgreSQL 17.9 | `SELECT version()` |
+| Public tables | 254 | `information_schema.tables` 카운트 |
+| wish_entries | 6 rows | 실제 운영 데이터 존재 확인 |
+| sowon_profiles | 5 rows | 실제 운영 데이터 존재 확인 |
+
+**판정**: DB name `yeosu_miracle_travel` + 운영 데이터(wish_entries 6건, sowon_profiles 5건) + 254개 테이블 → Production 인스턴스 맞음. ✅
+
+### 실행 직전 재조회 (2026-10-25)
+
+| place_code | avg_stay_minutes | 비고 |
+|-----------|-----------------|------|
+| hamel_lighthouse | **NULL** ✅ | Migration 207 `WHERE IS NULL` 조건 매칭 |
+| hyangiram | **90** ✅ | Migration 207 `WHERE = 90` 조건 매칭 |
+| cablecar | 45 | 참조값 (변경 없음) |
+| travel_places 전체 | 13행 / stay값 있음: 12행 | hamel만 NULL — 정상 |
+
+### Migration 207 SQL 무결성
+
+| 항목 | 값 |
+|------|---|
+| 파일 | `database/migrations/207_travel_places_stay_time_v01.sql` |
+| Lines | 83 |
+| SHA-256 | `82fd4b59c883425c6185b2fc9b0ef3f0e8da4f3d6d5ec163f072f4246afeaebe` |
+| BEGIN | ✅ | COMMIT | ✅ |
+| hamel_lighthouse | ✅ | hyangiram | ✅ |
+| IS NULL guard | ✅ | = 90 guard | ✅ |
+| RAISE EXCEPTION | ✅ | RAISE NOTICE | ✅ |
+
+### Guardian Final Gate
+
+```
+DB_IDENTITY        : CONFIRMED (yeosu_miracle_travel / dpg-d3t9gpa4d50c73d2i3gg-a)
+PRE_CONDITIONS     : PASS (hamel=NULL, hyangiram=90)
+MIGRATION_INTEGRITY: PASS (SHA-256 82fd4b59...)
+BACKUP_STATUS      : Founder CONFIRMED
+EXECUTION_HOLD     : --execute 아직 미실행 — Founder 최종 승인 대기
+```
+
+**→ EXECUTION_READY**
+
+---
+
 *작성: 2026-10-25 / Claude Code (Antigravity)*  
 *Production DB 변경 아님. Migration 준비 전용.*
