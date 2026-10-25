@@ -46,6 +46,7 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getOrEnsureGuestCredential } from '../api/dreamtown.js';
 import CourseDisplay from '../components/TravelGuide/CourseDisplay';
+import YeosuMapSelector from '../components/YeosuMapSelector';
 import '../styles/travel-guide.css';
 
 // ── Living Detail nav — place codes with supported detail views ────────────────
@@ -297,6 +298,8 @@ export default function MuyojeongHomePage() {
   const [routePlaces,    setRoutePlaces]    = useState([]); // { code, name } array (순서 보존)
   const [routeMinutes,   setRouteMinutes]   = useState(''); // string '60'~'540'
   const [showMorePlaces, setShowMorePlaces] = useState(false);
+  // Map mode — 지역별 탐색 V0.1 (routePlaces 공유)
+  const [mapMode,        setMapMode]        = useState(false);
 
   async function _callSOUL(text, explicitCtx) {
     setErrorMsg(null);
@@ -355,6 +358,7 @@ export default function MuyojeongHomePage() {
     setRoutePlaces([]);
     setRouteMinutes('');
     setShowMorePlaces(false);
+    setMapMode(false);
     inputRef.current?.focus();
   }
 
@@ -632,11 +636,40 @@ export default function MuyojeongHomePage() {
               }}
             >
               {/* 헤더 */}
-              <p style={{ fontSize: '0.6875rem', color: '#FFD67A', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
-                가고 싶은 곳 골라보기
-              </p>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <p style={{ fontSize: '0.6875rem', color: '#FFD67A', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
+                  가고 싶은 곳 골라보기
+                </p>
+                <button
+                  onClick={() => setMapMode(v => !v)}
+                  aria-label={mapMode ? '목록으로 보기' : '지역별로 보기'}
+                  style={{
+                    background: mapMode ? 'rgba(110,184,255,0.15)' : 'none',
+                    border: '1px solid',
+                    borderColor: mapMode ? 'rgba(110,184,255,0.35)' : 'rgba(255,255,255,0.15)',
+                    borderRadius: '20px',
+                    color: mapMode ? '#6EB8FF' : 'rgba(255,255,255,0.45)',
+                    fontSize: '0.6875rem',
+                    padding: '4px 10px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {mapMode ? '목록으로 ↑' : '지역별 보기'}
+                </button>
+              </div>
 
-              {/* 장소 칩 — 대표 8개 */}
+              {/* 지역별 탐색 — mapMode 활성 시 표시 */}
+              {mapMode && (
+                <YeosuMapSelector
+                  selectedPlaces={routePlaces}
+                  onTogglePlace={toggleRoutePlace}
+                  onClose={() => setMapMode(false)}
+                />
+              )}
+
+              {/* 장소 칩 — 대표 8개 (mapMode 비활성 시 표시) */}
+              {!mapMode && (
               <div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                   {ROUTE_PLACES_MAIN.map(place => {
@@ -696,6 +729,7 @@ export default function MuyojeongHomePage() {
                   </div>
                 )}
               </div>
+              )}
 
               {/* 시간 선택 */}
               <div>
