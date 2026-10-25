@@ -23,12 +23,15 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-25
 
-**맞춤 항로 V0.1 — PR #131 main 병합 완료, Production QA 대기**
+**맞춤 항로 V0.1 — Founder Render 수동 배포 + Production QA 1건 실행 필요**
 - **UI Visual QA**: PASS ✅ (T1~T7, 2026-10-25, `localhost:5000/muyojeong`)
-- **Code-level integration review**: PASS ✅ (5/5 CODE_VERIFIED — buildSoulMessage / PLACE_ALIAS_MAP / 270분 치환없음 / CourseDisplay / travel_time_unverified)
-- **Runtime SOUL API integration**: UNVERIFIED ⚠️ (운영 DB write 없이 정적 코드 추적만 수행)
-- **Production QA**: NOT STARTED ⏳ (Render 배포 후 Founder 실제 SOUL 제출 테스트 필요)
-- **PR #131 MERGED** ✅ (2026-10-25) SHA: `bfaa568`→main / Founder Conditional Merge Authorization
+- **Code-level integration review**: PASS ✅ (5/5 CODE_VERIFIED)
+- **Runtime Service Integration**: PASS ✅ MR-1~MR-6 6/6 — `soulCustomRouteV01Integration` (2026-10-25)
+  - MR-2 향일암→hyangiram PLACE_ALIAS_MAP ✅ / MR-4 270분 치환없음 ✅ / MR-5 Time Gate 미발동 ✅
+  - Evidence: `docs/knowledge/CUSTOM-ROUTE-V01-RUNTIME-GATE-EVIDENCE.md`
+  - HTTP 경로 격리 불가: `sessionService.createSession()` INSERT → 운영 DB 쓰기
+- **Production QA**: NOT STARTED ⏳ — Founder가 Render에 수동 배포 후 하멜등대+향일암+270분 제출 테스트
+- **PR #131 MERGED** ✅ SHA: `98550fb` / 2026-10-25T06:41:56Z / Founder Conditional Merge Authorization
   - 빌드: ✅ / 회귀: 566/567 PASS (R20 PRE-EXISTING) / 신규 API·DB 없음
   - MuyojeongHomePage.jsx V1.3: 장소 칩 8+4 / 시간 직접입력 / CTA
 - **PR #130: MERGED** ✅ @`2026-10-25T04:26:14Z` — Production Deploy LIVE + Post-Deploy QA §12
