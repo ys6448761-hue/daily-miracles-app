@@ -88,7 +88,7 @@ const timeLabel = timeMinutes < 60
 | 하멜→향일암 이동 45분 | ✅ | P2 VERIFIED_TRAVEL_EDGE |
 | 향일암→케이블카 "이동시간 확인 중" | ✅ | travel_time_unverified 정상 동작 |
 | 케이블카 포함 (추가 장소) | ✅ | 270분 예산 내 정상 추가 |
-| 전체 체류+이동 예산 | ✅ | 240분+ < 270분 (fits_comfortably) |
+| 전체 fitStatus | ⚠️ travel_time_unverified | 미검증 구간(향일암→케이블카) 포함 → fits_comfortably 확정 불가 |
 
 ---
 
@@ -98,13 +98,18 @@ const timeLabel = timeMinutes < 60
 하멜등대  30분 체류
 이동      45분 (hamel→hyangiram, VERIFIED P2)
 향일암   120분 체류
-이동        ? (hyangiram→cablecar, UNVERIFIED)
+이동        ? (hyangiram→cablecar, UNVERIFIED — 이동시간 확인 중)
 케이블카  45분 체류
-─────────────────
-확인된 합계: 240분 + 미검증 이동
-예산:        270분
-여유:        최소 30분 (미검증 이동 고려 시 실제 여유는 감소)
+─────────────────────────────────────────────────
+확인된 체류+이동 합계: 240분 (195체류 + 45이동)
+미검증 이동:          UNKNOWN (hyangiram→cablecar)
+전체 합계:            240분 + ? (확정 불가)
+예산:                 270분
+전체 예산 적합성:     확정 불가 — fitStatus = travel_time_unverified
 ```
+
+**주의**: 확인된 240분 < 270분이나, 미검증 이동시간이 0~30분 이상일 수 있어  
+전체 코스가 270분 예산에 맞는지는 Founder NAVER 측정 전까지 확정 불가.
 
 ---
 

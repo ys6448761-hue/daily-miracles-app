@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-25T07:45:25.463Z",
+  "generated_at": "2026-10-25T07:49:59.074Z",
   "generator": "generate-manifest.js",
   "total_count": 481,
   "documents": [
@@ -2848,7 +2848,7 @@
       "status": "|------",
       "title": "맞춤 항로 V0.1 — Production QA Evidence",
       "created_at": "2026-10-25",
-      "checksum": "937f0fb2"
+      "checksum": "1a5b53f4"
     },
     {
       "id": "DOC-CUSTOM-ROUTE-V01-RUNTIME-GATE-",

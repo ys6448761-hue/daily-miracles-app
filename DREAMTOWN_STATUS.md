@@ -23,7 +23,7 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-25
 
-**시간 표시 수정 PR #133 — Founder Guardian Review 후 merge + Production 재배포 필요**
+**PR #133 MERGE_READY — Founder merge 승인 + Production 재배포 필요**
 - **UI Visual QA**: PASS ✅ (T1~T7, 2026-10-25, `localhost:5000/muyojeong`)
 - **Code-level integration review**: PASS ✅ (5/5 CODE_VERIFIED)
 - **Runtime Service Integration**: PASS ✅ MR-1~MR-6 6/6 — `soulCustomRouteV01Integration`
@@ -35,10 +35,13 @@ Last Updated: 2026-10-25
 - **Production QA**: PASS_WITH_FINDINGS ⚠️ (2026-10-25, SHA `98550fb`, Deploy `dep-dbeqvi1srm7s73d2i7ig`)
   - 하멜등대+향일암 코스 포함 ✅ / 이동 45분(P2) ✅ / travel_time_unverified ✅
   - **FINDING**: 270분 → "5시간 정도 시간이 있으시군요." (Math.round(4.5)=5 오버스테이트)
-  - **PR #133 OPEN** — fix(soul): Math.round → 정확한 시간+분 표시 / TL-1~7 7/7 PASS
-    - Evidence: `docs/knowledge/CUSTOM-ROUTE-V01-PRODUCTION-QA-EVIDENCE.md`
-    - 수정 범위: `soyeowoolService.js:1785` display text only — 실제 270분 값 정상
-    - Quick Time 칩(120/300/480분) 영향 없음 / 직접 입력 경로만 해당
+  - **PR #133 MERGE_READY** ✅ — fix(soul): Math.round → 정확한 시간+분 표시
+    - Pre-Merge Review: PASS (2026-10-25)
+    - 변경 범위: `soyeowoolService.js:1785` 단 1줄 (+3줄 comment+ternary) — display text only
+    - 코스 선정·fitStatus·time_available_minutes 값: 변경 없음 ✅
+    - Quick Time 칩(120/300/480분) 영향 없음 ✅ / TL-1~7 7/7 PASS ✅ / 회귀 615/616 ✅
+    - fitStatus: travel_time_unverified (향일암→케이블카 미검증) — 정상 동작 확인
+    - Evidence: `docs/knowledge/CUSTOM-ROUTE-V01-PRODUCTION-QA-EVIDENCE.md` (정정 완료)
 - **PR #131 MERGED** ✅ SHA: `98550fb` / 2026-10-25T06:41:56Z / Founder Conditional Merge Authorization
   - 빌드: ✅ / 회귀: 566/567 PASS (R20 PRE-EXISTING) / 신규 API·DB 없음
   - MuyojeongHomePage.jsx V1.3: 장소 칩 8+4 / 시간 직접입력 / CTA
