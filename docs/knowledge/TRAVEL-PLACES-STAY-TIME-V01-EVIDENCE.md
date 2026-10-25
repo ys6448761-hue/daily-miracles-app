@@ -53,22 +53,31 @@ COMMIT;
 
 ## 4. fitStatus 검증 — 이동·체류시간 구분
 
-### stayUnknown guard (travelGuideService.js)
+> **정정 (2026-10-25 Guardian HOLD 반영):** 아래 §4/§5-3은 Guardian HOLD 이전 초안 기준으로 작성되었음.
+> 실제 코드(`travelGuideService.js` PR #121)는 3-way fitStatus로 수정됨. 5h = `budget_exceeded`.
+
+### stayUnknown guard + 3-way fitStatus (travelGuideService.js — PR #121 최종)
 ```js
 const travelUnknown = travelTransitionBlocks.some(b => b.status !== 'verified');
 const stayUnknown   = selectedPlaces.some(p => p.avg_stay_minutes == null);
-const fitStatus     = (travelUnknown || stayUnknown) ? 'travel_time_unverified' : 'fits_comfortably';
+const budgetExceeded = !travelUnknown && !stayUnknown && totalKnownMinutes > timeMinutes;
+
+const fitStatus = (travelUnknown || stayUnknown)
+  ? 'travel_time_unverified'
+  : budgetExceeded
+    ? 'budget_exceeded'
+    : 'fits_comfortably';
 ```
 
-### 코스별 fitStatus 전환 (Migration 207 적용 후)
+### 코스별 fitStatus 전환 (Migration 207 적용 후 — PR #121 3-way 기준)
 
-| 코스 | travelUnknown | stayUnknown (post-migration) | fitStatus |
-|------|--------------|----------------------------|-----------|
-| 2h | FALSE (P1 VERIFIED) | FALSE (hamel=30) | **fits_comfortably** ✅ |
-| 5h | FALSE (P1,P2 VERIFIED) | FALSE (hamel=30, hyangiram=120) | **fits_comfortably** ✅ |
-| 8h | FALSE (P1~P4 VERIFIED) | FALSE (모든 장소 값 있음) | **fits_comfortably** ✅ |
+| 코스 | travelUnknown | stayUnknown | totalKnownMinutes | timeMinutes | fitStatus |
+|------|--------------|------------|-------------------|-------------|-----------|
+| 2h | FALSE (P1 VERIFIED) | FALSE (hamel=30) | 82 | 120 | **fits_comfortably** ✅ |
+| 5h | FALSE (P1,P2 VERIFIED) | FALSE (hamel=30, hyangiram=120) | 307 | 300 | **budget_exceeded** ✅ |
+| 8h | FALSE (P1~P4 VERIFIED) | FALSE (모든 장소 값 있음) | 436 | 480 | **fits_comfortably** ✅ |
 
-*이동시간(travel) 검증 여부와 체류시간(stay) 완전성을 독립적으로 체크 — 각각 별도 flag*
+*검증(travel/stay 완전성)과 예산 판단(budget)은 독립적으로 처리 — 3-way 분기*
 
 ---
 
@@ -109,8 +118,12 @@ const fitStatus     = (travelUnknown || stayUnknown) ? 'travel_time_unverified' 
 | 케이블카(45) + P1(7) + 하멜(30) + P2(45) + 향일암(120) | 247분 |
 | 식사 60분 | |
 | **합계** | **307분** |
-| 5h 슬롯 범위 | 270~360분 (하드 300 캡 없음) |
-| 판정 | **fits_comfortably** (307 ≤ 360) |
+| 5h 슬롯 | timeMinutes = **300분** |
+| 판정 | **budget_exceeded** (307 > 300) ✅ |
+
+> **정정:** 초안은 "270~360분 범위, fits_comfortably"로 기록되었으나, PR #121 Guardian HOLD에서
+> `timeMinutes=300`(5h 슬롯 하드값) 기준 307 > 300 → `budget_exceeded`로 확정됨.
+> 테스트 T-25가 이 동작을 regression으로 보호 중.
 
 ### 5-4. 2h 코스 시간 예산
 
