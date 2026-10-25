@@ -23,27 +23,35 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-25
 
-**Founder — Migration 207 Production 실행 승인 + Production Deploy 승인 필요.**
+**Founder — Migration 207 실행 승인(Supabase SQL Editor) + Production Deploy 승인(Render 수동) 필요.**
+- **PR #123 MERGED** @ `d389da4` (2026-10-25 KST) — Evidence 5h fitStatus 정정 (docs-only)
+  - §4/§5-3 budget_exceeded 반영 / fitStatus 3-way 코드 스니펫 / 실행 전 DB 값 §8 보존
+  - AIL Gate ✓ / Manifest ✓ / docker-smoke ✓ / Vercel FAIL PRE-EXISTING (Node.js 20.x)
+- **main HEAD: `d389da4`** — 최종 배포 후보 (Production HOLD)
+- **Production DB 사전 값 CONFIRMED** (2026-10-25 라이브 조회):
+  - hamel_lighthouse: **NULL** ✅ → Migration 207 `WHERE IS NULL` 매칭
+  - hyangiram: **90** ✅ → Migration 207 `WHERE = 90` 매칭
+- **Supabase 백업 상태**: Dashboard 직접 확인 필요 (코드에서 플랜 티어 미확인)
+- **Migration 207**: READY / EXECUTION_HOLD — Founder 승인 대기
+  - 실행 경로: Supabase SQL Editor (경로 A, 코드 변경 없음)
+  - 실행 파일: `database/migrations/207_travel_places_stay_time_v01.sql`
+  - 예상 결과: hamel UPDATE 1 / hyangiram UPDATE 1 / NOTICE 'Migration 207 OK'
+  - 롤백: Evidence §8 참조 (2줄 SQL)
+- **Production Deploy**: READY / HOLD — 별도 Founder 승인 대기
+  - 배포 후보: main `d389da4` / Production LIVE: `7567b59`
+  - 권장 순서: Migration 207 실행 → DB 검증 → Render 수동 배포 → QA
 - **PR #121 MERGED** @ `f61fc5b` (2026-10-25 KST) — Stay Time DB Update V0.1
-  - main HEAD: `f61fc5b` / main CI: AIL Gate ✓ / docker-smoke ✓ / Manifest ✓ / Health Check ✓
-  - hamel_lighthouse: null→30 / hyangiram: 90→120 (Founder Decision 2026-10-25)
-  - migration: `207_travel_places_stay_time_v01.sql` (idempotent + rollback 포함)
   - fitStatus 3방향: travel_time_unverified / budget_exceeded / fits_comfortably
-  - estimated_total_range: stay+verified_travel+meal / +café
-  - Guardian: MERGED_AND_VERIFIED / PRODUCTION_HOLD
   - 46/46 PASS (T-1~T-29) / R20 PRE-EXISTING
-  - Migration 207 미실행 (admin allowlist 미등록 — 별도 Founder 승인 필요)
 - **PR #120 CLOSED** — superseded by PR #121 (2026-10-25)
 - **5h(307>300) → budget_exceeded** ✅ / **8h(436<480) → fits_comfortably** ✅
 - **8h meal+café(466<480) → fits_comfortably, 잔여 14분** ✅
 - **PR #118 MERGED** @`8aaeccd` (2026-10-25 KST) — Travel Time UI V0.1
-  - main HEAD: `3fe3686` (origin) / Guardian: MERGED_AND_VERIFIED / PRODUCTION_HOLD
   - `_estimateTravelTime()` V0 Stub 미변경 / CAR GOVERNANCE_HOLD 유지
-- **Production LIVE**: `7567b59` (Render Auto-Deploy OFF — PR #118 미배포)
-- **PR #117 MERGED** @`a8861cc` — PR #115 Production QA Evidence
-- **hamel_lighthouse avg_stay_minutes**: null→30 (Founder Approved, DB 미반영 — PR #121)
-- **hyangiram avg_stay_minutes**: 90→120 (Founder Approved, DB 미반영 — PR #121)
-- **Post-migration 시간 예산**: 8h=436분(여유44분) / 5h=307분 / 2h=82분 — fits_comfortably ✅
+- **Production LIVE**: `7567b59` (Render Auto-Deploy OFF)
+- **hamel_lighthouse avg_stay_minutes**: null→30 (Founder Approved, DB 미반영)
+- **hyangiram avg_stay_minutes**: 90→120 (Founder Approved, DB 미반영)
+- **Post-migration 시간 예산**: 8h=436분(여유44분) / 5h=307분(budget_exceeded) / 2h=82분
 - **EVIDENCE-B-001** (2026-10-24): `docs/knowledge/EVIDENCE-B-001_Hotel_Nighttime_Walk_V0_1_Implementation.md`
 - **IMPL-PLAN-B-001** (2026-10-24): `docs/knowledge/IMPL-PLAN-B-001_Hotel_Nighttime_Walk_V0_1.md`
 - **PREFLIGHT-PHASE-B-001** (2026-10-24): `docs/knowledge/PREFLIGHT-PHASE-B-001_Hotel_Nighttime_Walk.md`

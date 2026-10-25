@@ -162,5 +162,30 @@ R20 PRE-EXISTING: `dolsan_daegyo "걸어서 건너갈 수 있어?" → JOURNEY_C
 
 ---
 
+## 8. Migration 직전 Production DB 사전 값 (실행 전 보존 기록)
+
+조회 시각: **2026-10-25 (KST)** — Migration 207 실행 전 라이브 조회 결과
+
+| place_code | avg_stay_minutes | updated_at (UTC) |
+|-----------|-----------------|------------------|
+| hamel_lighthouse | **NULL** | 2026-10-18T20:29:27.308Z |
+| hyangiram | **90** | 2026-10-01T20:54:47.219Z |
+
+상태:
+- hamel_lighthouse = NULL ✅ → Migration 207 `WHERE IS NULL` 조건 매칭 (UPDATE 1 예상)
+- hyangiram = 90 ✅ → Migration 207 `WHERE = 90` 조건 매칭 (UPDATE 1 예상)
+
+롤백 기준값 (실행 취소 시 복구 목표):
+```sql
+BEGIN;
+UPDATE travel_places SET avg_stay_minutes = NULL WHERE code = 'hamel_lighthouse';
+UPDATE travel_places SET avg_stay_minutes = 90   WHERE code = 'hyangiram';
+COMMIT;
+```
+
+Migration 207 실행 상태: **EXECUTION_HOLD — Founder 승인 대기 중**
+
+---
+
 *작성: 2026-10-25 / Claude Code (Antigravity)*  
 *Production DB 변경 아님. Migration 준비 전용.*
