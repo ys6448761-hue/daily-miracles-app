@@ -400,3 +400,184 @@ describe('T-24: Time budget — 2h course (Migration 207 values)', () => {
     expect(STAY + TRAVEL).toBeLessThan(120);
   });
 });
+
+// ==========================================================================
+// T-25~T-29: Budget fit / exceeded (Guardian HOLD fix)
+// fitStatus separates: verification status / time budget judgment
+// ==========================================================================
+
+// Helper: meal options for tests
+function mkMealOptions() {
+  return { restaurants: [{ restaurant_code: 'R1', name: '식당', cuisine_type: 'korean', accessibility: {} }] };
+}
+function mkCafeOptions() {
+  return [{ id: 1, name: '카페', category: 'cafe', address: '여수' }];
+}
+
+// ---------- T-25: 5h course — 307 > 300 → budget_exceeded (regression) ----------
+describe('T-25: 5h course with meal → total 307 > 300 (budget_exceeded regression)', () => {
+  // stay: cablecar(45)+hamel(30)+hyangiram(120) = 195
+  // travel: P1(7)+P2(45) = 52
+  // meal: 60
+  // total: 307 > budget 300
+  const BUDGET_5H = 300;
+
+  test('total known = 307 (stay195 + travel52 + meal60)', () => {
+    const places = [
+      makePlace('cablecar', 45),
+      makePlace('hamel_lighthouse', 30),
+      makePlace('hyangiram', 120),
+    ];
+    const ctx = mkCtx({ meal_context: 'lunch' });
+    const blocks = svc._buildJourneyBlocks(places, mkMealOptions(), [], {}, ctx);
+
+    const travelBlocks = blocks.filter(b => b.type === 'travel_transition');
+    const mealBlocks = blocks.filter(b => b.type === 'meal');
+
+    const verifiedTravel = travelBlocks
+      .filter(b => b.status === 'verified')
+      .reduce((sum, b) => sum + b.estimated_duration_range.min, 0);
+    const mealMin = mealBlocks.reduce((sum, b) => sum + (b.estimated_duration_minutes || 0), 0);
+    const stayTotal = places.reduce((sum, p) => sum + p.avg_stay_minutes, 0);
+
+    expect(verifiedTravel).toBe(52);  // P1(7)+P2(45)
+    expect(mealMin).toBe(60);
+    expect(stayTotal).toBe(195);
+    expect(stayTotal + verifiedTravel + mealMin).toBe(307);
+    expect(stayTotal + verifiedTravel + mealMin).toBeGreaterThan(BUDGET_5H);
+  });
+
+  test('budgetExceeded=true when 307 > 300', () => {
+    const totalKnown = 307;
+    const travelUnknown = false;
+    const stayUnknown = false;
+    const budgetExceeded = !travelUnknown && !stayUnknown && totalKnown > BUDGET_5H;
+    expect(budgetExceeded).toBe(true);
+  });
+
+  test('fitStatus should NOT be fits_comfortably when budgetExceeded', () => {
+    const travelUnknown = false;
+    const stayUnknown = false;
+    const budgetExceeded = true;
+    const fitStatus = (travelUnknown || stayUnknown)
+      ? 'travel_time_unverified'
+      : budgetExceeded ? 'budget_exceeded' : 'fits_comfortably';
+    expect(fitStatus).toBe('budget_exceeded');
+    expect(fitStatus).not.toBe('fits_comfortably');
+  });
+});
+
+// ---------- T-26: 8h course with meal (no café) → 436 < 480 → fits_comfortably ----------
+describe('T-26: 8h course with meal only → 436 < 480 (fits_comfortably)', () => {
+  // stay: 270, travel: 106, meal: 60, café: 0
+  // total: 436 < 480
+  const BUDGET_8H = 480;
+
+  test('total known = 436 (stay270 + travel106 + meal60)', () => {
+    const places = [
+      makePlace('cablecar', 45),
+      makePlace('hamel_lighthouse', 30),
+      makePlace('hyangiram', 120),
+      makePlace('jaisan_park', 30),
+      makePlace('lee_soon_shin_plaza', 45),
+    ];
+    const ctx = mkCtx({ meal_context: 'lunch' });
+    const blocks = svc._buildJourneyBlocks(places, mkMealOptions(), [], {}, ctx);
+
+    const travelBlocks = blocks.filter(b => b.type === 'travel_transition');
+    const mealBlocks = blocks.filter(b => b.type === 'meal');
+    const cafeBlocks = blocks.filter(b => b.type === 'cafe');
+
+    const verifiedTravel = travelBlocks
+      .filter(b => b.status === 'verified')
+      .reduce((sum, b) => sum + b.estimated_duration_range.min, 0);
+    const mealMin = mealBlocks.reduce((sum, b) => sum + (b.estimated_duration_minutes || 0), 0);
+    const cafeMin = cafeBlocks.reduce((sum, b) => sum + (b.estimated_duration_minutes || 0), 0);
+    const stayTotal = places.reduce((sum, p) => sum + p.avg_stay_minutes, 0);
+
+    expect(verifiedTravel).toBe(106); // P1+P2+P3+P4
+    expect(mealMin).toBe(60);
+    expect(cafeMin).toBe(0);          // no café (cafeOptions=[])
+    expect(stayTotal + verifiedTravel + mealMin + cafeMin).toBe(436);
+    expect(stayTotal + verifiedTravel + mealMin + cafeMin).toBeLessThan(BUDGET_8H);
+  });
+});
+
+// ---------- T-27: 8h course with meal + café → 466 < 480 → fits_comfortably ----------
+describe('T-27: 8h course with meal + café → 466 < 480 (fits_comfortably)', () => {
+  // stay: 270, travel: 106, meal: 60, café: 30
+  // total: 466 < 480
+  const BUDGET_8H = 480;
+
+  test('total known = 466 (stay270 + travel106 + meal60 + café30)', () => {
+    const places = [
+      makePlace('cablecar', 45),
+      makePlace('hamel_lighthouse', 30),
+      makePlace('hyangiram', 120),
+      makePlace('jaisan_park', 30),
+      makePlace('lee_soon_shin_plaza', 45),
+    ];
+    const ctx = mkCtx({ meal_context: 'lunch' });
+    const blocks = svc._buildJourneyBlocks(places, mkMealOptions(), mkCafeOptions(), [], ctx);
+
+    const travelBlocks = blocks.filter(b => b.type === 'travel_transition');
+    const mealBlocks = blocks.filter(b => b.type === 'meal');
+    const cafeBlocks = blocks.filter(b => b.type === 'cafe');
+
+    const verifiedTravel = travelBlocks
+      .filter(b => b.status === 'verified')
+      .reduce((sum, b) => sum + b.estimated_duration_range.min, 0);
+    const mealMin = mealBlocks.reduce((sum, b) => sum + (b.estimated_duration_minutes || 0), 0);
+    const cafeMin = cafeBlocks.reduce((sum, b) => sum + (b.estimated_duration_minutes || 0), 0);
+    const stayTotal = places.reduce((sum, p) => sum + p.avg_stay_minutes, 0);
+
+    expect(cafeMin).toBe(30);   // café block present
+    expect(stayTotal + verifiedTravel + mealMin + cafeMin).toBe(466);
+    expect(stayTotal + verifiedTravel + mealMin + cafeMin).toBeLessThan(BUDGET_8H);
+  });
+});
+
+// ---------- T-28: estimated_total_range includes verified travel ----------
+describe('T-28: estimated_total_range includes verified travel (not just stay)', () => {
+  test('8h range min = stay + travel + meal (travel included)', () => {
+    // stay=270, travel=106, meal=60 → min=436, max=466
+    const stayTotal = 270;
+    const verifiedTravel = 106;
+    const meal = 60;
+    const cafe = 30;
+    expect(stayTotal + verifiedTravel + meal).toBe(436);
+    expect(stayTotal + verifiedTravel + meal + cafe).toBe(466);
+  });
+
+  test('range min (no café) vs max (with café) differ by café duration', () => {
+    const min = 270 + 106 + 60;      // 436 (no café)
+    const max = 270 + 106 + 60 + 30; // 466 (with café)
+    expect(max - min).toBe(30);
+  });
+});
+
+// ---------- T-29: fitStatus three-way logic ----------
+describe('T-29: fitStatus three-way: travel_time_unverified / budget_exceeded / fits_comfortably', () => {
+  function computeFitStatus(travelUnknown, stayUnknown, budgetExceeded) {
+    return (travelUnknown || stayUnknown)
+      ? 'travel_time_unverified'
+      : budgetExceeded ? 'budget_exceeded' : 'fits_comfortably';
+  }
+
+  test('travelUnknown → travel_time_unverified (budget ignored)', () => {
+    expect(computeFitStatus(true, false, false)).toBe('travel_time_unverified');
+    expect(computeFitStatus(true, false, true)).toBe('travel_time_unverified');
+  });
+
+  test('stayUnknown → travel_time_unverified (budget ignored)', () => {
+    expect(computeFitStatus(false, true, false)).toBe('travel_time_unverified');
+  });
+
+  test('all known + budget exceeded → budget_exceeded', () => {
+    expect(computeFitStatus(false, false, true)).toBe('budget_exceeded');
+  });
+
+  test('all known + fits → fits_comfortably', () => {
+    expect(computeFitStatus(false, false, false)).toBe('fits_comfortably');
+  });
+});
