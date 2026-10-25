@@ -23,14 +23,16 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-25
 
-**맞춤 항로 V0.1 — Founder Render 수동 배포 + Production QA 1건 실행 필요**
+**맞춤 항로 V0.1 — Founder Render 수동 배포 + Production QA 1건 필요**
 - **UI Visual QA**: PASS ✅ (T1~T7, 2026-10-25, `localhost:5000/muyojeong`)
 - **Code-level integration review**: PASS ✅ (5/5 CODE_VERIFIED)
-- **Runtime Service Integration**: PASS ✅ MR-1~MR-6 6/6 — `soulCustomRouteV01Integration` (2026-10-25)
+- **Runtime Service Integration**: PASS ✅ MR-1~MR-6 6/6 — `soulCustomRouteV01Integration`
   - MR-2 향일암→hyangiram PLACE_ALIAS_MAP ✅ / MR-4 270분 치환없음 ✅ / MR-5 Time Gate 미발동 ✅
-  - Evidence: `docs/knowledge/CUSTOM-ROUTE-V01-RUNTIME-GATE-EVIDENCE.md`
-  - HTTP 경로 격리 불가: `sessionService.createSession()` INSERT → 운영 DB 쓰기
-- **Production QA**: NOT STARTED ⏳ — Founder가 Render에 수동 배포 후 하멜등대+향일암+270분 제출 테스트
+- **HTTP Integration (supertest)**: PASS ✅ HT-1~HT-8 8/8 — `soulCustomRouteV01HttpGate` (2026-10-25)
+  - 실제 JWT 인증 미들웨어 실행 ✅ / session_id 응답 ✅ / must_visit=[hamel,hyangiram] ✅ / time=270 ✅
+  - sessionService.createSession MOCKED (운영 DB INSERT 없음) / GPT MOCKED
+  - Evidence: `docs/knowledge/CUSTOM-ROUTE-V01-HTTP-GATE-EVIDENCE.md`
+- **Production QA**: NOT STARTED ⏳ — Founder가 Render에 수동 배포 후 하멜등대+향일암+270분 브라우저 제출 테스트
 - **PR #131 MERGED** ✅ SHA: `98550fb` / 2026-10-25T06:41:56Z / Founder Conditional Merge Authorization
   - 빌드: ✅ / 회귀: 566/567 PASS (R20 PRE-EXISTING) / 신규 API·DB 없음
   - MuyojeongHomePage.jsx V1.3: 장소 칩 8+4 / 시간 직접입력 / CTA
