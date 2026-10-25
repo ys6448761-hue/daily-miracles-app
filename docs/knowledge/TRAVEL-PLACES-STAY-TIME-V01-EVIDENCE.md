@@ -436,6 +436,35 @@ Migration 207 검증:
 - `hyangiram` stay: **120분** 반영 ✅
 - 5곳 전원 verified travel segments (unknown=0) ✅
 
+### estimated.min vs total_known 정합성 설명
+
+코드(`services/travelGuideService.js` L395~404)에서 두 값의 정의:
+
+```js
+total_known_activity_minutes = stay + verifiedTravel + meal + cafe  // cafe 포함
+estimated_total_range.min    = stay + verifiedTravel + meal         // cafe 제외
+estimated_total_range.max    = stay + verifiedTravel + meal + cafe  // = total_known
+```
+
+따라서 `estimated_total_range.max === total_known_activity_minutes` (항상 동일).
+
+| 코스 | stay | travel | meal | cafe | min(meal까지) | max=total_known |
+|-----|------|--------|------|------|--------------|----------------|
+| 2h | 45 | 0 | 60 | 0 | **105** | 105 |
+| 5h | 195 | 52 | 60 | 30 | **307** | 337 |
+| 8h | 270 | 106 | 60 | 30 | **436** | 466 |
+
+budget_exceeded 판정은 `total_known_activity_minutes` (cafe 포함) 기준:
+- 5h: **337 > 300** → budget_exceeded ✅
+- 8h: **466 < 480** → fits_comfortably ✅
+
+**2h: 105 vs 기존 설계 예상 82 차이 설명**
+
+- 82는 단위 테스트(T-28)의 hardcoded 장소 조합(이순신광장+오동도)의 값
+- Production 실제 = `entry_point:"cablecar"` + 2h → 케이블카(stay=45) 단독 선택
+- 케이블카 45 + meal 60 = 105 (정상 동작, entry_point에 따른 동적 선택)
+- 82 ≠ Production 기준 — 단위 테스트 픽스처 값이므로 불일치 아님
+
 ### travel_time_unverified 오판정 여부
 
 | 코스 | unknown_travel_segments | fit_status | 오판정 여부 |
