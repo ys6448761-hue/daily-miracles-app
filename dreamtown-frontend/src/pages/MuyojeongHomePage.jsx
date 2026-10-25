@@ -1,4 +1,17 @@
 /**
+ * SOUL 무여정 Main Home V1.3 — 소원이 직접 입력형 맞춤 항로 V0.1
+ *
+ * V1.3 changes (Custom Route UI):
+ *   - 장소 선택 칩 (대표 8개 + 더 보기 +4): 소원이 직접 방문지 선택
+ *   - 시간 직접 입력 (60~540분) + 빠른 선택 (2시간/반나달/하루)
+ *   - buildSoulMessage(): 선택값 → 자연어 메시지 자동 구성
+ *   - 기존 POST /api/dt/travel/input/text 재사용 (신규 API 없음)
+ *   - 식사/카페 옵션: GPT 추출 신뢰성 미검증 → V0.1 제외
+ *   - 중앙시장: TG 추천 전면 제외 상태 → 칩 목록 제외
+ *   - CAR GOVERNANCE_HOLD 유지 / 기존 채팅 흐름 미변경
+ *   Evidence: docs/knowledge/CUSTOM-ROUTE-V01-DESIGN.md
+ *   hamel avg_stay=30, hyangiram=120 → total_known=195분(no-meal)
+ *
  * SOUL 무여정 Main Home V1.2
  * 여수맘 파일럿 + Founder Meeting용 프로덕션 홈
  *
@@ -202,6 +215,38 @@ function SoulAnswerSummary({ response, onNewQuestion, onTimeSelect, isLoading })
   );
 }
 
+// ── Custom Route — 소원이 직접 입력형 맞춤 항로 V0.1 ─────────────────────────
+// 대표 8개: SOUL Phase 1 완료 + experience_ko Founder 승인 장소
+const ROUTE_PLACES_MAIN = [
+  { code: 'hamel_lighthouse',    name: '하멜등대',     stay: 30  },
+  { code: 'hyangiram',           name: '향일암',       stay: 120 },
+  { code: 'odongdo',             name: '오동도',       stay: 120 },
+  { code: 'cablecar',            name: '케이블카',     stay: 45  },
+  { code: 'lee_soon_shin_plaza', name: '이순신광장',   stay: 45  },
+  { code: 'dolsan_nightscape',   name: '돌산공원',     stay: 45  },
+  { code: 'dolsan_daegyo',       name: '돌산대교',     stay: 30  },
+  { code: 'marine_park',         name: '종포해양공원', stay: 75  },
+];
+// 전체 펼치기 +4 (SOUL Phase 1 미완료 — 코스 포함 가능, 이동시간 미검증 가능성)
+// 중앙시장 제외: travelGuideService TG 추천 전면 제외 상태 → 선택해도 코스 미등장
+const ROUTE_PLACES_MORE = [
+  { code: 'jaisan_park',         name: '자산공원',     stay: 30  },
+  { code: 'romantic_pojangmacha',name: '낭만포차거리', stay: 60  },
+  { code: 'sky_tower',           name: '스카이타워',   stay: 60  },
+  { code: 'yeosu_expo_park',     name: '엑스포공원',   stay: 120 },
+];
+// 빠른 시간 선택: 명확한 분 단위로 GPT 추출 오류 방지
+const ROUTE_TIME_QUICK = [
+  { label: '2시간', minutes: 120 },
+  { label: '반나절', minutes: 300 },
+  { label: '하루',  minutes: 480 },
+];
+
+function buildSoulMessage(selectedPlaces, minutes) {
+  const names = selectedPlaces.map(p => p.name).join(', ');
+  return `${names} 가고 싶어요. ${minutes}분 코스 짜줘.`;
+}
+
 // ── Suggestion chips — Founder directive canonical 4, 2-col grid ──────────────
 // label: 화면 표시 / query: SOUL API 전달 질문 / ec: optional explicit_context
 const SUGGESTION_CHIPS = [
@@ -242,12 +287,16 @@ export default function MuyojeongHomePage() {
   const navigate = useNavigate();
   const inputRef = useRef(null);
 
-  const [inputValue,   setInputValue]   = useState('');
-  const [sessionId,    setSessionId]    = useState(null);
-  const [isLoading,    setIsLoading]    = useState(false);
-  const [soulResponse, setSoulResponse] = useState(null);
-  const [errorMsg,     setErrorMsg]     = useState(null);
-  const [heroLoaded,   setHeroLoaded]   = useState(false);
+  const [inputValue,     setInputValue]     = useState('');
+  const [sessionId,      setSessionId]      = useState(null);
+  const [isLoading,      setIsLoading]      = useState(false);
+  const [soulResponse,   setSoulResponse]   = useState(null);
+  const [errorMsg,       setErrorMsg]       = useState(null);
+  const [heroLoaded,     setHeroLoaded]     = useState(false);
+  // Custom Route state — V0.1
+  const [routePlaces,    setRoutePlaces]    = useState([]); // { code, name } array (순서 보존)
+  const [routeMinutes,   setRouteMinutes]   = useState(''); // string '60'~'540'
+  const [showMorePlaces, setShowMorePlaces] = useState(false);
 
   async function _callSOUL(text, explicitCtx) {
     setErrorMsg(null);
@@ -303,7 +352,33 @@ export default function MuyojeongHomePage() {
     setErrorMsg(null);
     setInputValue('');
     setSessionId(null); // session carry-over 차단: 새 질문은 새 세션으로 시작
+    setRoutePlaces([]);
+    setRouteMinutes('');
+    setShowMorePlaces(false);
     inputRef.current?.focus();
+  }
+
+  function toggleRoutePlace(place) {
+    setRoutePlaces(prev =>
+      prev.some(p => p.code === place.code)
+        ? prev.filter(p => p.code !== place.code)
+        : [...prev, place]
+    );
+  }
+
+  function handleRouteTimeQuick(minutes) {
+    setRouteMinutes(String(minutes));
+  }
+
+  function handleRouteMinutesInput(e) {
+    const v = e.target.value.replace(/[^0-9]/g, '');
+    setRouteMinutes(v);
+  }
+
+  function handleRouteSubmit() {
+    const mins = parseInt(routeMinutes, 10);
+    if (routePlaces.length === 0 || !mins || mins < 60 || mins > 540 || isLoading) return;
+    _callSOUL(buildSoulMessage(routePlaces, mins));
   }
 
   return (
@@ -533,6 +608,173 @@ export default function MuyojeongHomePage() {
             ))}
           </div>
         )}
+
+        {/* ── CUSTOM ROUTE — 소원이 직접 입력형 맞춤 항로 V0.1 ── */}
+        {!soulResponse && !isLoading && (() => {
+          const routeMins = parseInt(routeMinutes, 10);
+          const isValid   = routePlaces.length > 0 && routeMins >= 60 && routeMins <= 540;
+
+          const chipBase = {
+            padding: '8px 14px', borderRadius: '20px', fontSize: '0.8125rem',
+            cursor: 'pointer', border: '1px solid', wordBreak: 'keep-all',
+            transition: 'background 0.15s, border-color 0.15s', minHeight: '36px',
+            background: 'none',
+          };
+
+          return (
+            <div
+              style={{
+                borderRadius: '16px',
+                border: '1px solid rgba(255,214,122,0.20)',
+                background: 'rgba(255,214,122,0.04)',
+                padding: '16px',
+                display: 'flex', flexDirection: 'column', gap: '14px',
+              }}
+            >
+              {/* 헤더 */}
+              <p style={{ fontSize: '0.6875rem', color: '#FFD67A', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
+                가고 싶은 곳 골라보기
+              </p>
+
+              {/* 장소 칩 — 대표 8개 */}
+              <div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {ROUTE_PLACES_MAIN.map(place => {
+                    const active = routePlaces.some(p => p.code === place.code);
+                    return (
+                      <button
+                        key={place.code}
+                        onClick={() => toggleRoutePlace(place)}
+                        disabled={isLoading}
+                        style={{
+                          ...chipBase,
+                          color:       active ? '#130b1e' : 'rgba(255,255,255,0.80)',
+                          background:  active ? '#FFD67A' : 'rgba(255,255,255,0.06)',
+                          borderColor: active ? '#FFD67A' : 'rgba(255,255,255,0.16)',
+                          fontWeight:  active ? 600 : 400,
+                        }}
+                      >
+                        {place.name}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* 더 보기 토글 */}
+                <button
+                  onClick={() => setShowMorePlaces(v => !v)}
+                  style={{
+                    marginTop: '8px', background: 'none', border: 'none', padding: '2px 0',
+                    color: 'rgba(255,255,255,0.38)', fontSize: '0.75rem', cursor: 'pointer',
+                  }}
+                >
+                  {showMorePlaces ? '접기 ▲' : '+ 더 보기 ▼'}
+                </button>
+
+                {/* 전체 장소 +4 */}
+                {showMorePlaces && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+                    {ROUTE_PLACES_MORE.map(place => {
+                      const active = routePlaces.some(p => p.code === place.code);
+                      return (
+                        <button
+                          key={place.code}
+                          onClick={() => toggleRoutePlace(place)}
+                          disabled={isLoading}
+                          style={{
+                            ...chipBase,
+                            color:       active ? '#130b1e' : 'rgba(255,255,255,0.65)',
+                            background:  active ? '#FFD67A' : 'rgba(255,255,255,0.04)',
+                            borderColor: active ? '#FFD67A' : 'rgba(255,255,255,0.12)',
+                            fontWeight:  active ? 600 : 400,
+                          }}
+                        >
+                          {place.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* 시간 선택 */}
+              <div>
+                <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.42)', marginBottom: '8px', margin: '0 0 8px' }}>
+                  얼마나 여행하실 건가요?
+                </p>
+                {/* 빠른 선택 */}
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
+                  {ROUTE_TIME_QUICK.map(opt => {
+                    const active = routeMinutes === String(opt.minutes);
+                    return (
+                      <button
+                        key={opt.label}
+                        onClick={() => handleRouteTimeQuick(opt.minutes)}
+                        disabled={isLoading}
+                        style={{
+                          ...chipBase,
+                          color:       active ? '#130b1e' : 'rgba(255,255,255,0.78)',
+                          background:  active ? '#6EB8FF'  : 'rgba(255,255,255,0.06)',
+                          borderColor: active ? '#6EB8FF'  : 'rgba(255,255,255,0.16)',
+                          fontWeight:  active ? 600 : 400,
+                        }}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                {/* 직접 입력 */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="number"
+                    min={60}
+                    max={540}
+                    value={routeMinutes}
+                    onChange={handleRouteMinutesInput}
+                    placeholder="직접 입력"
+                    disabled={isLoading}
+                    aria-label="여행 시간 (분 단위)"
+                    style={{
+                      width: '100px', padding: '8px 12px', borderRadius: '10px',
+                      border: '1px solid rgba(255,255,255,0.20)',
+                      background: 'rgba(255,255,255,0.07)',
+                      color: 'white', fontSize: '0.875rem', outline: 'none',
+                    }}
+                  />
+                  <span style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.45)' }}>분</span>
+                  {routeMinutes && (parseInt(routeMinutes, 10) < 60 || parseInt(routeMinutes, 10) > 540) && (
+                    <span style={{ fontSize: '0.75rem', color: 'rgba(255,100,100,0.80)' }}>60~540분</span>
+                  )}
+                </div>
+              </div>
+
+              {/* 선택 요약 */}
+              {routePlaces.length > 0 && (
+                <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.45)', margin: 0, wordBreak: 'keep-all' }}>
+                  선택: {routePlaces.map(p => p.name).join(' · ')}
+                  {isValid && ` · ${routeMinutes}분`}
+                </p>
+              )}
+
+              {/* CTA */}
+              <button
+                onClick={handleRouteSubmit}
+                disabled={!isValid || isLoading}
+                style={{
+                  width: '100%', padding: '13px 16px', borderRadius: '12px',
+                  background: isValid ? 'rgba(110,184,255,0.85)' : 'rgba(110,184,255,0.18)',
+                  border: 'none',
+                  color: isValid ? '#fff' : 'rgba(255,255,255,0.30)',
+                  fontSize: '0.9375rem', fontWeight: 600, cursor: isValid ? 'pointer' : 'default',
+                  transition: 'background 0.15s',
+                }}
+              >
+                소울이에게 코스 추천받기 →
+              </button>
+            </div>
+          );
+        })()}
 
         {/* ── LOADING ── */}
         {isLoading && (

@@ -23,7 +23,16 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-25
 
-**'소원이 직접 입력형 맞춤 항로 V0.1' 기존 코드 재사용 분석 및 최소 설계 착수.**
+**맞춤 항로 V0.1 — PR #131 main 병합 완료, Production QA 대기**
+- **UI Visual QA**: PASS ✅ (T1~T7, 2026-10-25, `localhost:5000/muyojeong`)
+- **Code-level integration review**: PASS ✅ (5/5 CODE_VERIFIED — buildSoulMessage / PLACE_ALIAS_MAP / 270분 치환없음 / CourseDisplay / travel_time_unverified)
+- **Runtime SOUL API integration**: UNVERIFIED ⚠️ (운영 DB write 없이 정적 코드 추적만 수행)
+- **Production QA**: NOT STARTED ⏳ (Render 배포 후 Founder 실제 SOUL 제출 테스트 필요)
+- **PR #131 MERGED** ✅ (2026-10-25) SHA: `bfaa568`→main / Founder Conditional Merge Authorization
+  - 빌드: ✅ / 회귀: 566/567 PASS (R20 PRE-EXISTING) / 신규 API·DB 없음
+  - MuyojeongHomePage.jsx V1.3: 장소 칩 8+4 / 시간 직접입력 / CTA
+- **PR #130: MERGED** ✅ @`2026-10-25T04:26:14Z` — Production Deploy LIVE + Post-Deploy QA §12
+- **'소원이 직접 입력형 맞춤 항로 V0.1' 분석·설계·구현: COMPLETE** ✅
 - **Travel Time UI V0.1 + Stay Time DB Update V0.1: PRODUCTION LIVE** ✅
   - Production LIVE SHA: **`75223a6`**
   - Deploy ID: `dep-dbenuu0ae00c73dovmq0`
