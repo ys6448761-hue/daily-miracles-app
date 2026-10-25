@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-25T05:36:46.965Z",
+  "generated_at": "2026-10-25T07:13:15.498Z",
   "generator": "generate-manifest.js",
-  "total_count": 478,
+  "total_count": 480,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2816,7 +2816,39 @@
       "status": "disabled",
       "title": "CUSTOM-ROUTE-V01-DESIGN",
       "created_at": "2026-10-25",
-      "checksum": "e0362de2"
+      "checksum": "167eef26"
+    },
+    {
+      "id": "DOC-CUSTOM-ROUTE-V01-HTTP-GATE-EVI",
+      "path": "docs/knowledge/CUSTOM-ROUTE-V01-HTTP-GATE-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "맞춤 항로 V0.1 — HTTP Integration Gate Evidence",
+      "created_at": "2026-10-25",
+      "checksum": "c8ac5a77"
+    },
+    {
+      "id": "DOC-CUSTOM-ROUTE-V01-RUNTIME-GATE-",
+      "path": "docs/knowledge/CUSTOM-ROUTE-V01-RUNTIME-GATE-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "근거",
+      "title": "맞춤 항로 V0.1 — Runtime Integration Gate Evidence",
+      "created_at": "2026-10-25",
+      "checksum": "26864fb8"
     },
     {
       "id": "DOC-DREAMTOWN-TIME-BUDGET-V0_1-CAN",
