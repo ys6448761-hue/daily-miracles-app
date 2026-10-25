@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-24T22:45:27.846Z",
+  "generated_at": "2026-10-24T23:57:36.206Z",
   "generator": "generate-manifest.js",
   "total_count": 476,
   "documents": [
@@ -2751,7 +2751,7 @@
       "status": "active",
       "title": "COURSE-PLANNING-8H-TRACE-V0_1",
       "created_at": "2026-10-24",
-      "checksum": "facb3bab"
+      "checksum": "93608aba"
     },
     {
       "id": "DOC-COURSE-PLANNING-FULLDAY-DESIGN",
@@ -2767,7 +2767,7 @@
       "status": "내용",
       "title": "COURSE-PLANNING-FULLDAY-DESIGN-V0_1",
       "created_at": "2026-10-24",
-      "checksum": "7f144f28"
+      "checksum": "91f347f2"
     },
     {
       "id": "DOC-COURSE-PLANNING-FULLDAY-IMPL-V",
@@ -2783,7 +2783,7 @@
       "status": "active",
       "title": "COURSE-PLANNING-FULLDAY-IMPL-V0_1",
       "created_at": "2026-10-24",
-      "checksum": "1d5c329c"
+      "checksum": "b762747f"
     },
     {
       "id": "DOC-COURSE-PLANNING-TIME-FIT-DIAGN",
@@ -2799,7 +2799,7 @@
       "status": "active",
       "title": "COURSE-PLANNING-TIME-FIT-DIAGNOSIS-V0_1",
       "created_at": "2026-10-24",
-      "checksum": "36ef63ed"
+      "checksum": "053522d1"
     },
     {
       "id": "DOC-DREAMTOWN-TIME-BUDGET-V0_1-CAN",
@@ -2815,7 +2815,7 @@
       "status": "변경 근거",
       "title": "DREAMTOWN-TIME-BUDGET-V0_1-CANDIDATE",
       "created_at": "2026-10-24",
-      "checksum": "28ac1239"
+      "checksum": "075cbc99"
     },
     {
       "id": "DOC-EVIDENCE-B-001_Hotel_Nighttime",
@@ -2847,7 +2847,7 @@
       "status": "200 OK",
       "title": "EVIDENCE-B-002 — Phase B V0.1 Production QA",
       "created_at": "2026-10-24",
-      "checksum": "5f4e7c68"
+      "checksum": "857d3ca5"
     },
     {
       "id": "DOC-IMPL-PLAN-B-001_Hotel_Nighttim",
@@ -2995,7 +2995,7 @@
       "status": "근거",
       "title": "PR115-CI-DIAG-V0_1",
       "created_at": "2026-10-24",
-      "checksum": "256f8a1b"
+      "checksum": "f1bcdf82"
     },
     {
       "id": "DOC-PR115-CI-RECOVERY-V0_1",
@@ -3011,7 +3011,7 @@
       "status": "판정",
       "title": "PR115-CI-RECOVERY-V0_1",
       "created_at": "2026-10-24",
-      "checksum": "02120039"
+      "checksum": "735bbeb1"
     },
     {
       "id": "DOC-PR115-PROD-QA-EVIDENCE-V0_1",
@@ -3077,7 +3077,7 @@
       "status": "MERGED ✓",
       "title": "RELEASE-PREFLIGHT-B-001 — Phase B V0.1 Production Release Preflight",
       "created_at": "2026-10-24",
-      "checksum": "cd560b62"
+      "checksum": "398a083a"
     },
     {
       "id": "DOC-SOUL-TRAVEL-TIME-GAP-ANALYSIS-",

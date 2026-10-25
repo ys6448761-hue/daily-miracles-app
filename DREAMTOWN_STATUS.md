@@ -23,57 +23,16 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-25
 
-**Founder — PR #118 Merge 승인 필요 (Travel Time UI V0.1 — IMPLEMENTATION_APPROVED / PRODUCTION_HOLD).**
-- **Travel Time UI V0.1 구현 COMPLETED** (2026-10-25)
-  - Branch: `feat/travel-time-ui-v0.1` / Guardian: IMPLEMENTATION_APPROVED / PRODUCTION_HOLD
-  - 변경 파일: `travelGuideService.js` / `CourseDisplay.jsx` / `tests/soul/soulTravelTimeDisplay.test.js`
-  - 신규 테스트: 18/18 PASS (T-1~T-15) / 회귀: 566/567 (R20 PRE-EXISTING 유지, 신규 0건)
-  - `_estimateTravelTime()` V0 Stub 미변경 / GOVERNANCE_HOLD 유지
-  - Production Deploy: HOLD (Founder Merge 승인 이후 별도)
-- **PR #117 MERGED** @`a8861cc` (2026-10-24 KST) — PR #115 Production QA Evidence 보존 (docs-only)
-- **PR #115 DEPLOYED_AND_VERIFIED / CLOSED** — SHA `7567b59` / Deploy `dep-dbe621rncjis73d4d3h0`
-- **Production LIVE**: `7567b59` (Render Auto-Deploy OFF)
-- **PR #116 MERGED** @`7567b59` — F-1~F-4 Naver Maps CAR Evidence
+**Founder — PR #118 Production Deploy 승인 필요.**
+- **PR #118 MERGED** @`8aaeccd` (2026-10-25 KST) — Travel Time UI V0.1
+  - main HEAD: `8aaeccd` / main CI: AIL Gate ✓ / docker-smoke ✓ / Manifest ✓ / health-check ✓
+  - Guardian: MERGED_AND_VERIFIED / PRODUCTION_HOLD
+  - `_estimateTravelTime()` V0 Stub 미변경 / CAR GOVERNANCE_HOLD 유지
+  - pre-merge 버그 수정: `travelTransitionCount` ReferenceError → `travelTransitionBlocks.filter` (commit `4d52801`)
+- **Production LIVE**: `7567b59` (Render Auto-Deploy OFF — PR #118 미배포)
+- **PR #117 MERGED** @`a8861cc` — PR #115 Production QA Evidence
 - **hamel_lighthouse avg_stay_minutes**: null / DATA_GAP (DB 변경 별도 승인 대기)
-
-**PR #115 CLOSED (이전 상태 기록).**
-- **PR #115 MERGED** @`d6323c9` (2026-10-24 KST) — full-day candidate cap fix
-  - main CI: AIL Gate ✓ / docker-smoke ✓ / Manifest Verify ✓ / Deploy Health Check ✓
-  - approve-dec.yml failure: PRE-EXISTING (이번 변경 무관)
-  - **Guardian**: CLOSED → PROD_UI_VERIFIED
-- **COURSE_PLANNING FullDay BUG 구현 COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-FULLDAY-IMPL-V0_1.md`
-  - 신규 테스트 21/21 PASS / 전체 회귀 548/549 PASS (R20 PRE-EXISTING 제외)
-  - 8h: cap=5, 5곳 / 5h: cap=3, 3곳 / 2h: cap=2, 2곳
-- **COURSE_PLANNING FullDay BUG 설계 검증 COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-FULLDAY-DESIGN-V0_1.md`
-- **COURSE_PLANNING 8h Trace COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-8H-TRACE-V0_1.md`
-  - **BUG 확정**: `_applyClusterDiversity` 라인 1180 `if (selected.length === 3) break` — 하드코딩 cap=3
-  - 로컬 재현: node 실행 → `[cablecar, hamel_lighthouse, hyangiram]` Count=3 / totalStay=135분 ✓
-- **COURSE_PLANNING Time Fit Review COMPLETED** (2026-10-24): `docs/knowledge/COURSE-PLANNING-TIME-FIT-DIAGNOSIS-V0_1.md`
-  - "이동시간 확인 중": EXPECTED — P0-1 설계 (CAR 매트릭스 HOLD)
-  - hamel_lighthouse.avg_stay_minutes=null: DATA_GAP (A. DB 입력 보류 — Founder Decision 2026-10-24)
-- **PILOT-INTENT-003-T5 COMPLETED** (2026-10-24): `docs/knowledge/PILOT-INTENT-003-T5_Car_Query_Path_Review.md`
-  - UX_GAP 2건: ① "추천 가능" 배지가 CAR_INFO 쿼리에도 동일 표시 / ② 향일암·하멜등대 주차 안내 없음
-  - **코드 수정 없음** / Git commit/push: **미실행** (Founder 별도 승인 필요)
-- **PILOT-INTENT-003 COMPLETED** (2026-10-24): 6 PASS / 2 ADVISORY / 0 FAIL
-- **PR #114 MERGED** @`49e1e28` (2026-10-24 KST) — Phase B V0.1 State Sync 완료
-- **Phase B V0.1 DEPLOYED_AND_VERIFIED** — Deploy ID: `dep-dbe0et3ncjis73do73ng` / SHA: `4c16052` / 2026-10-24 10:21 KST
-  - Production QA A~G: A(Health PASS) / B-1(신라스테이 밤바다 PASS) / C-1(호텔명 없음 PASS) / D(CODE VERIFIED) / E(Time Gate PASS) / F(CAR_INFO PRE-VERIFIED 7/7) / G(미검증 정보 노출 없음 PASS)
-  - 신규 회귀: **없음** / R20 PRE-EXISTING: 미변경 유지 / Evidence: `docs/knowledge/EVIDENCE-B-002_Phase_B_V0_1_Production_QA.md`
-  - Render Auto-Deploy: **OFF 유지**
-- **Release Preflight** (2026-10-24): `docs/knowledge/RELEASE-PREFLIGHT-B-001_Phase_B_V0_1.md`
-  - Release SHA: `4c16052` / 이전 Production SHA: `696839a` / Rollback: `dep-dbd790mq1p3s73coua40`
-  - 배포 범위: PR #109(Time Gate) + PR #111(CAR_INFO) + PR #113(Phase B) — 3개 동시 배포
-  - Guardian Release 판정: **READY** (배포 완료)
-- **PR #113 MERGED** @`4c16052` — Nighttime Walk SOUL Answer Phase B V0.1 (2026-10-24 KST)
-  - Squash Merge SHA: `4c160529f08616433bb639e0ce153044b998fca5`
-  - CI (pull_request): AIL Gate ✓ (40046332352) / docker-smoke ✓ (40046332344)
-  - CI (push to main): AIL Gate ✓ (40046602507) / docker-smoke ✓ (40046602519)
-  - Production: **DEPLOYED** (dep-dbe0et3ncjis73do73ng, 2026-10-24 10:21 KST)
-- **PR #114 OPEN** — State Sync (DREAMTOWN_STATUS.md 1개, AIL Gate ✓ / docker-smoke ✓)
-  - Merge READY (Founder Production Deploy 승인 시 함께 처리 가능)
-- **CI-DIAG-PR113-001 v3 CLOSED** (2026-10-24): `docs/knowledge/CI-DIAG-PR113-001.md`
-  - Root-cause: `mergeable_state="dirty"` → merge conflict → GitHub Actions pull_request 차단
-  - 해소: `git merge origin/main` + DREAMTOWN_STATUS.md conflict 해결 + push (Founder 승인)
+- **hyangiram avg_stay_minutes**: 90 (DB) / Candidate 120분 — 별도 승인 대기
 - **EVIDENCE-B-001** (2026-10-24): `docs/knowledge/EVIDENCE-B-001_Hotel_Nighttime_Walk_V0_1_Implementation.md`
 - **IMPL-PLAN-B-001** (2026-10-24): `docs/knowledge/IMPL-PLAN-B-001_Hotel_Nighttime_Walk_V0_1.md`
 - **PREFLIGHT-PHASE-B-001** (2026-10-24): `docs/knowledge/PREFLIGHT-PHASE-B-001_Hotel_Nighttime_Walk.md`
