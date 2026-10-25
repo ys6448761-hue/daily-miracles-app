@@ -23,23 +23,26 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-25
 
-**Founder — Migration 207 실행 승인(Supabase SQL Editor) + Production Deploy 승인(Render 수동) 필요.**
-- **PR #123 MERGED** @ `d389da4` (2026-10-25 KST) — Evidence 5h fitStatus 정정 (docs-only)
-  - §4/§5-3 budget_exceeded 반영 / fitStatus 3-way 코드 스니펫 / 실행 전 DB 값 §8 보존
-  - AIL Gate ✓ / Manifest ✓ / docker-smoke ✓ / Vercel FAIL PRE-EXISTING (Node.js 20.x)
-- **main HEAD: `d389da4`** — 최종 배포 후보 (Production HOLD)
-- **Production DB 사전 값 CONFIRMED** (2026-10-25 라이브 조회):
-  - hamel_lighthouse: **NULL** ✅ → Migration 207 `WHERE IS NULL` 매칭
-  - hyangiram: **90** ✅ → Migration 207 `WHERE = 90` 매칭
-- **Supabase 백업 상태**: Dashboard 직접 확인 필요 (코드에서 플랜 티어 미확인)
-- **Migration 207**: READY / EXECUTION_HOLD — Founder 승인 대기
-  - 실행 경로: Supabase SQL Editor (경로 A, 코드 변경 없음)
-  - 실행 파일: `database/migrations/207_travel_places_stay_time_v01.sql`
-  - 예상 결과: hamel UPDATE 1 / hyangiram UPDATE 1 / NOTICE 'Migration 207 OK'
+**Founder — Migration 207 --execute 승인(Render PostgreSQL 대상) + Production Deploy 승인(Render 수동) 필요.**
+- **PR #126 MERGED** @ `94f4e37` (2026-10-25 KST) — Migration 207 Path B 스크립트
+  - `scripts/run-migration-207.js` 신규 / PREFLIGHT PASS (hamel=NULL, hyangiram=90 확인)
+  - AIL Gate ✓ / Manifest ✓ / docker-smoke ✓ / 46/46 PASS
+  - 실행 방법: `node scripts/run-migration-207.js --execute` (Founder 별도 승인 필요)
+- **PR #125 MERGED** @ `f173fbf` — DB Identity Verification Evidence §9
+  - Production DB: Render PostgreSQL (Singapore) — Supabase dreamtown-storybook-staging 아님
+  - Migration 경로 A(Supabase SQL Editor) 폐기 → 경로 B(스크립트) 확정
+- **main HEAD: `94f4e37`** — 최종 배포 후보 (Production HOLD)
+- **Production DB 사전 값 CONFIRMED** (2026-10-25 Render PostgreSQL 라이브 조회):
+  - hamel_lighthouse: **NULL** ✅ / hyangiram: **90** ✅
+- **Migration 207**: READY / EXECUTION_HOLD
+  - 실행 명령: `node scripts/run-migration-207.js --execute`
+  - 대상: Render PostgreSQL (*.singapore-postgres.render.com)
+  - 안전 조건: Supabase guard / 사전 값 검증 / idempotent / 사후 검증
   - 롤백: Evidence §8 참조 (2줄 SQL)
-- **Production Deploy**: READY / HOLD — 별도 Founder 승인 대기
-  - 배포 후보: main `d389da4` / Production LIVE: `7567b59`
-  - 권장 순서: Migration 207 실행 → DB 검증 → Render 수동 배포 → QA
+- **Render PostgreSQL 백업**: Render Dashboard 확인 필요
+- **Production Deploy**: HOLD — Migration 선행 후 별도 승인
+  - 배포 후보: main `94f4e37` / Production LIVE: `7567b59`
+  - 권장 순서: Render 백업 확인 → Migration --execute → DB 검증 → Render 수동 배포 → QA
 - **PR #121 MERGED** @ `f61fc5b` (2026-10-25 KST) — Stay Time DB Update V0.1
   - fitStatus 3방향: travel_time_unverified / budget_exceeded / fits_comfortably
   - 46/46 PASS (T-1~T-29) / R20 PRE-EXISTING
