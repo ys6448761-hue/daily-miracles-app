@@ -23,26 +23,24 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-25
 
-**Founder — Migration 207 --execute 승인(Render PostgreSQL 대상) + Production Deploy 승인(Render 수동) 필요.**
-- **PR #126 MERGED** @ `94f4e37` (2026-10-25 KST) — Migration 207 Path B 스크립트
-  - `scripts/run-migration-207.js` 신규 / PREFLIGHT PASS (hamel=NULL, hyangiram=90 확인)
-  - AIL Gate ✓ / Manifest ✓ / docker-smoke ✓ / 46/46 PASS
-  - 실행 방법: `node scripts/run-migration-207.js --execute` (Founder 별도 승인 필요)
-- **PR #125 MERGED** @ `f173fbf` — DB Identity Verification Evidence §9
-  - Production DB: Render PostgreSQL (Singapore) — Supabase dreamtown-storybook-staging 아님
-  - Migration 경로 A(Supabase SQL Editor) 폐기 → 경로 B(스크립트) 확정
-- **main HEAD: `94f4e37`** — 최종 배포 후보 (Production HOLD)
-- **Production DB 사전 값 CONFIRMED** (2026-10-25 Render PostgreSQL 라이브 조회):
-  - hamel_lighthouse: **NULL** ✅ / hyangiram: **90** ✅
-- **Migration 207**: READY / EXECUTION_HOLD
-  - 실행 명령: `node scripts/run-migration-207.js --execute`
-  - 대상: Render PostgreSQL (*.singapore-postgres.render.com)
-  - 안전 조건: Supabase guard / 사전 값 검증 / idempotent / 사후 검증
-  - 롤백: Evidence §8 참조 (2줄 SQL)
-- **Render PostgreSQL 백업**: Render Dashboard 확인 필요
-- **Production Deploy**: HOLD — Migration 선행 후 별도 승인
-  - 배포 후보: main `94f4e37` / Production LIVE: `7567b59`
-  - 권장 순서: Render 백업 확인 → Migration --execute → DB 검증 → Render 수동 배포 → QA
+**Founder — Production Deploy 승인(Render 수동) 필요.**
+- **Migration 207: DEPLOYED_AND_VERIFIED** ✅ (2026-10-25T03:49:24Z)
+  - hamel_lighthouse: NULL → **30** ✅ / hyangiram: 90 → **120** ✅
+  - 변경 행: 2 / 미변경: 11 / 전체 13행 이상 없음
+  - DB: `yeosu_miracle_travel` / Instance: `dpg-d3t9gpa4d50c73d2i3gg-a` (Render Singapore)
+  - Evidence §11: 실행 결과 + 전체 레코드 검증 기록 완료
+- **PR #128 MERGED** @ `5bd4392` — Migration 207 Final Execution Gate Evidence §10
+- **PR #126 MERGED** @ `94f4e37` — Migration 207 Path B 스크립트
+- **PR #125 MERGED** @ `f173fbf` — DB Identity Verification
+- **main HEAD**: `5bd4392` 이후 (Evidence §11 PR 대기) → 배포 후보 갱신 예정
+- **Production LIVE**: `7567b59` (Render Auto-Deploy OFF — Deploy HOLD)
+- **Production Deploy**: HOLD — 별도 Founder 승인 필요
+  - 배포 후보: main (PR #129 state sync 후 갱신)
+  - 권장 QA: hamel=30/5h=budget_exceeded/8h=fits_comfortably 확인
+- **fitStatus 3-way**: travel_time_unverified / budget_exceeded / fits_comfortably
+  - 5h(307>300) → budget_exceeded ✅ / 8h(436<480) → fits_comfortably ✅
+- **CAR GOVERNANCE_HOLD**: 유지 / `_estimateTravelTime()` V0 Stub 유지
+- **R20 PRE-EXISTING**: dolsan_daegyo JOURNEY_CONTINUITY (무관)
 - **PR #121 MERGED** @ `f61fc5b` (2026-10-25 KST) — Stay Time DB Update V0.1
   - fitStatus 3방향: travel_time_unverified / budget_exceeded / fits_comfortably
   - 46/46 PASS (T-1~T-29) / R20 PRE-EXISTING
