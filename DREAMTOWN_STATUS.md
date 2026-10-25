@@ -23,12 +23,15 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-25
 
-**Founder — PR #120 + PR #121 Merge 승인 필요. Production Deploy 별도 승인 필요.**
-- **PR #121 OPEN** @ `7aacca8` — Stay Time DB Update V0.1 (feat/travel-places-stay-time-v01)
+**Founder — PR #121 Merge 승인 필요. Production Deploy 별도 승인 필요.**
+- **PR #121 OPEN** @ `809234f` — Stay Time DB Update V0.1 (feat/travel-places-stay-time-v01)
   - hamel_lighthouse: null→30 / hyangiram: 90→120 (Founder Decision 2026-10-25)
   - migration: `207_travel_places_stay_time_v01.sql` (idempotent + rollback 포함)
-  - stayUnknown guard 포함 (PR #120 supersede)
-  - 35/35 PASS (T-1~T-24) / R20 PRE-EXISTING
+  - fitStatus 3방향: travel_time_unverified / budget_exceeded / fits_comfortably
+  - estimated_total_range: verified travel 포함 (stay+travel+meal / +café)
+  - meal/café: 하드코딩 공식 → 실제 블록 기반 계산
+  - **Guardian HOLD 해소**: 5h(307>300)→budget_exceeded / 8h(436<480)→fits_comfortably
+  - 46/46 PASS (T-1~T-29) / R20 PRE-EXISTING
   - Evidence: `docs/knowledge/TRAVEL-PLACES-STAY-TIME-V01-EVIDENCE.md`
   - Production DB 미실행 — Merge 후 별도 승인 필요
 - **PR #120 OPEN** — fix/fitStatus-stay-unknown @ `3df7c29` (stayUnknown guard only)
