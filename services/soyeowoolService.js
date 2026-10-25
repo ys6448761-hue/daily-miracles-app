@@ -1780,9 +1780,12 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPla
       ? `${companionLine} 가볍게 즐길 수 있는 곳을 찾으시는군요.`
       : '부담 없이 즐길 수 있는 곳을 찾으시는군요.';
   } else if (timeKnown && timeMinutes) {
+    // Exact hours+minutes — Math.round() overstates non-round values (e.g. 270 min → 4.5h → round 5h)
     const timeLabel = timeMinutes < 60
       ? `${timeMinutes}분`
-      : `${Math.round(timeMinutes / 60)}시간`;
+      : timeMinutes % 60 === 0
+        ? `${Math.floor(timeMinutes / 60)}시간`
+        : `${Math.floor(timeMinutes / 60)}시간 ${timeMinutes % 60}분`;
     situationLine = companionLine
       ? `${companionLine} ${timeLabel} 정도 시간이 있으시군요.`
       : `${timeLabel} 정도 시간이 있으시군요.`;
