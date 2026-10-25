@@ -23,7 +23,18 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-25
 
-**'소원이 직접 입력형 맞춤 항로 V0.1' 기존 코드 재사용 분석 및 최소 설계 착수.**
+**`MuyojeongHomePage.jsx` 장소 선택 칩 + 시간 직접 입력 UI V0.1 구현 착수. (Founder 구현 승인 후)**
+- **맞춤 항로 V0.1 최소 설계: DESIGN COMPLETE** ✅ (2026-10-25)
+  - Evidence 정합성 확인: 210분(PASS) / 300분(PASS) / PR #130 OPEN / PLACE_ALIAS_MAP 13코드 완전 일치
+  - 설계 문서: `docs/knowledge/CUSTOM-ROUTE-V01-DESIGN.md`
+  - 아키텍처: 장소 선택 칩 → 메시지 자동 구성 → POST /api/dt/travel/input/text (신규 API 없음)
+  - 대표 8개(SOUL Phase 1 완료) / 전체 펼치기 +5 / 수용 기준 T1~T10
+  - OI-1: hyangiram→hamel reverse edge 미검증 (V0.1 차단 아님, 후속)
+  - Founder Q1(같은 화면 배치) / Q2(대표 8개+펼치기) 결정 반영 완료
+- **파이프라인 호환성: 검증 완료** ✅
+  - A~E 시나리오 PASS (B: ADVISORY — reverse edge 미검증)
+  - PR #115 cap fix 이미 배포됨 / must_visit_place_ids 완전 재사용 가능
+- **'소원이 직접 입력형 맞춤 항로 V0.1' 기존 코드 재사용 분석 및 최소 설계: COMPLETE** ✅
 - **Travel Time UI V0.1 + Stay Time DB Update V0.1: PRODUCTION LIVE** ✅
   - Production LIVE SHA: **`75223a6`**
   - Deploy ID: `dep-dbenuu0ae00c73dovmq0`
