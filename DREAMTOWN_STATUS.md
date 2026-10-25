@@ -23,22 +23,20 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-25
 
-**Founder — Production Deploy 승인(Render 수동) 필요.**
+**'소원이 직접 입력형 맞춤 항로 V0.1' 기존 코드 재사용 분석 및 최소 설계 착수.**
+- **Travel Time UI V0.1 + Stay Time DB Update V0.1: PRODUCTION LIVE** ✅
+  - Production LIVE SHA: **`75223a6`**
+  - Deploy ID: `dep-dbenuu0ae00c73dovmq0`
+  - LIVE 확인: 2026-10-25 13:05 KST (Founder 수동 배포)
+- **Post-Deploy QA: 3/3 PASS** ✅
+  - 2h → fits_comfortably (total=105 < 120) ✅
+  - 5h → budget_exceeded (estimated.min=307 > 300) ✅
+  - 8h → fits_comfortably (estimated.min=436, total=466 < 480) ✅
+  - hamel_lighthouse=30 / hyangiram=120 Production 반영 확인 ✅
+  - travel_time_unverified 오판정 없음 (unknown_travel_segments=0 for all) ✅
 - **Migration 207: DEPLOYED_AND_VERIFIED** ✅ (2026-10-25T03:49:24Z)
   - hamel_lighthouse: NULL → **30** ✅ / hyangiram: 90 → **120** ✅
-  - 변경 행: 2 / 미변경: 11 / 전체 13행 이상 없음
-  - DB: `yeosu_miracle_travel` / Instance: `dpg-d3t9gpa4d50c73d2i3gg-a` (Render Singapore)
-  - Evidence §11: 실행 결과 + 전체 레코드 검증 기록 완료
-- **PR #128 MERGED** @ `5bd4392` — Migration 207 Final Execution Gate Evidence §10
-- **PR #126 MERGED** @ `94f4e37` — Migration 207 Path B 스크립트
-- **PR #125 MERGED** @ `f173fbf` — DB Identity Verification
-- **main HEAD**: `5bd4392` 이후 (Evidence §11 PR 대기) → 배포 후보 갱신 예정
-- **Production LIVE**: `7567b59` (Render Auto-Deploy OFF — Deploy HOLD)
-- **Production Deploy**: HOLD — 별도 Founder 승인 필요
-  - 배포 후보: main (PR #129 state sync 후 갱신)
-  - 권장 QA: hamel=30/5h=budget_exceeded/8h=fits_comfortably 확인
-- **fitStatus 3-way**: travel_time_unverified / budget_exceeded / fits_comfortably
-  - 5h(307>300) → budget_exceeded ✅ / 8h(436<480) → fits_comfortably ✅
+  - Evidence §11~§12: `docs/knowledge/TRAVEL-PLACES-STAY-TIME-V01-EVIDENCE.md`
 - **CAR GOVERNANCE_HOLD**: 유지 / `_estimateTravelTime()` V0 Stub 유지
 - **R20 PRE-EXISTING**: dolsan_daegyo JOURNEY_CONTINUITY (무관)
 - **PR #121 MERGED** @ `f61fc5b` (2026-10-25 KST) — Stay Time DB Update V0.1
@@ -49,10 +47,10 @@ Last Updated: 2026-10-25
 - **8h meal+café(466<480) → fits_comfortably, 잔여 14분** ✅
 - **PR #118 MERGED** @`8aaeccd` (2026-10-25 KST) — Travel Time UI V0.1
   - `_estimateTravelTime()` V0 Stub 미변경 / CAR GOVERNANCE_HOLD 유지
-- **Production LIVE**: `7567b59` (Render Auto-Deploy OFF)
-- **hamel_lighthouse avg_stay_minutes**: null→30 (Founder Approved, DB 미반영)
-- **hyangiram avg_stay_minutes**: 90→120 (Founder Approved, DB 미반영)
-- **Post-migration 시간 예산**: 8h=436분(여유44분) / 5h=307분(budget_exceeded) / 2h=82분
+- **Production LIVE**: `75223a6` (dep-dbenuu0ae00c73dovmq0 / 2026-10-25 13:05 KST) ✅
+- **hamel_lighthouse avg_stay_minutes**: **30분** ✅ (Production DB 반영 완료)
+- **hyangiram avg_stay_minutes**: **120분** ✅ (Production DB 반영 완료)
+- **Production QA**: 5h estimated.min=307(budget_exceeded) / 8h estimated.min=436(fits_comfortably) ✅
 - **EVIDENCE-B-001** (2026-10-24): `docs/knowledge/EVIDENCE-B-001_Hotel_Nighttime_Walk_V0_1_Implementation.md`
 - **IMPL-PLAN-B-001** (2026-10-24): `docs/knowledge/IMPL-PLAN-B-001_Hotel_Nighttime_Walk_V0_1.md`
 - **PREFLIGHT-PHASE-B-001** (2026-10-24): `docs/knowledge/PREFLIGHT-PHASE-B-001_Hotel_Nighttime_Walk.md`

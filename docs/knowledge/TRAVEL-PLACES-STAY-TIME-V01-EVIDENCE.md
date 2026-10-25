@@ -356,3 +356,114 @@ FULL_SCAN         : PASS (13행 전체 수동 검증)
 
 *작성: 2026-10-25 / Claude Code (Antigravity)*  
 *Migration 207 Production 실행 완료. hamel=30 / hyangiram=120.*
+
+---
+
+## 12. Production Deploy & Post-Deploy QA (§12)
+
+**완료일시:** 2026-10-25 13:05 KST  
+**Deploy ID:** `dep-dbenuu0ae00c73dovmq0`  
+**Production LIVE SHA:** `75223a6`  
+**서비스:** daily-miracles-app (Render Auto-Deploy OFF, 수동 배포)
+
+### Health Check
+
+| 엔드포인트 | 상태 | 결과 |
+|---------|-----|------|
+| `GET /api/health` | 200 OK | PASS ✅ |
+| `GET /` | 200 OK | PASS ✅ |
+| database | 연결됨 (3ms) | PASS ✅ |
+
+**Health Check: 2/2 PASS** ✅
+
+### Production QA — 2h / 5h / 8h
+
+요청: `POST https://app.dailymiracles.kr/api/dt/travel/recommend`  
+컨텍스트: `{ country_code:"KR", city_code:"YEOSU", entry_point:"cablecar", people_type:"solo", has_car:true, meal_context:"lunch" }`
+
+#### 2h QA (`time_available_minutes: 120`)
+
+| 항목 | 실제값 | 예상 | 결과 |
+|-----|-------|------|------|
+| fit_status | `fits_comfortably` | fits_comfortably | PASS ✅ |
+| places | `cablecar` (1곳) | — | — |
+| total_stay_minutes | 45 | — | — |
+| verified_travel_minutes | 0 | — | — |
+| actual_meal_minutes | 60 | — | — |
+| estimated_total_range | `{min:105, max:105}` | — | — |
+| unknown_travel_segments | 0 | 0 | PASS ✅ |
+
+**2h QA: PASS** ✅ (105 < 120 → fits_comfortably)
+
+#### 5h QA (`time_available_minutes: 300`)
+
+| 항목 | 실제값 | 예상 | 결과 |
+|-----|-------|------|------|
+| fit_status | `budget_exceeded` | budget_exceeded | PASS ✅ |
+| places | cablecar / hamel_lighthouse / hyangiram | — | — |
+| total_stay_minutes | 195 (45+30+120) | — | — |
+| verified_travel_minutes | 52 (7+45) | — | — |
+| actual_meal_minutes | 60 | — | — |
+| actual_cafe_minutes | 30 | — | — |
+| total_known_activity_minutes | 337 | — | — |
+| estimated_total_range.min | **307** | **307** | PASS ✅ |
+| unknown_travel_segments | 0 | 0 | PASS ✅ |
+
+**5h QA: PASS** ✅ (totalKnown=337 > 300 → budget_exceeded / min=307 일치)
+
+Migration 207 검증:
+- `hamel_lighthouse` stay: **30분** 반영 ✅ (NULL→30)
+- `hyangiram` stay: **120분** 반영 ✅ (90→120)
+
+#### 8h QA (`time_available_minutes: 480`)
+
+| 항목 | 실제값 | 예상 | 결과 |
+|-----|-------|------|------|
+| fit_status | `fits_comfortably` | fits_comfortably | PASS ✅ |
+| places | cablecar / hamel_lighthouse / hyangiram / jaisan_park / lee_soon_shin_plaza (5곳) | — | — |
+| total_stay_minutes | 270 | — | — |
+| verified_travel_minutes | 106 (7+45+45+9) | — | — |
+| actual_meal_minutes | 60 | — | — |
+| actual_cafe_minutes | 30 | — | — |
+| total_known_activity_minutes | **466** | — | — |
+| estimated_total_range | `{min:436, max:466}` | min=436 | PASS ✅ |
+| unknown_travel_segments | 0 | 0 | PASS ✅ |
+
+**8h QA: PASS** ✅ (466 < 480 → fits_comfortably / min=436 일치)
+
+Migration 207 검증:
+- `hamel_lighthouse` stay: **30분** 반영 ✅
+- `hyangiram` stay: **120분** 반영 ✅
+- 5곳 전원 verified travel segments (unknown=0) ✅
+
+### travel_time_unverified 오판정 여부
+
+| 코스 | unknown_travel_segments | fit_status | 오판정 여부 |
+|------|------------------------|-----------|-----------|
+| 2h (1곳) | 0 | fits_comfortably | 없음 ✅ |
+| 5h (3곳) | 0 | budget_exceeded | 없음 ✅ |
+| 8h (5곳) | 0 | fits_comfortably | 없음 ✅ |
+
+`travel_time_unverified` 오판정 없음 ✅
+
+### 최종 판정
+
+```
+PRODUCTION_DEPLOY    : DEPLOYED_AND_VERIFIED ✅
+LIVE_SHA             : 75223a6
+DEPLOY_ID            : dep-dbenuu0ae00c73dovmq0
+HEALTH_CHECK         : 2/2 PASS
+2h_QA                : fits_comfortably PASS
+5h_QA                : budget_exceeded PASS (estimated.min=307)
+8h_QA                : fits_comfortably PASS (estimated.min=436)
+MIGRATION_207        : hamel=30 / hyangiram=120 반영 확인
+TRAVEL_TIME_UNVERIFIED: 오판정 없음
+CAR_GOVERNANCE_HOLD  : 유지 (estimated.min 기준 검증)
+```
+
+**Travel Time UI V0.1 + Stay Time DB Update V0.1: PRODUCTION LIVE** ✅
+
+---
+
+*§12 작성: 2026-10-25 13:xx KST / Claude Code (Antigravity)*  
+*Production Deploy LIVE — 모든 QA PASS*

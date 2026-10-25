@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-25T03:50:39.809Z",
+  "generated_at": "2026-10-25T04:17:19.147Z",
   "generator": "generate-manifest.js",
   "total_count": 477,
   "documents": [
@@ -3126,7 +3126,7 @@
       "status": "Founder 근거",
       "title": "TRAVEL-PLACES-STAY-TIME-V01-EVIDENCE",
       "created_at": "2026-10-25",
-      "checksum": "e1a3fed0"
+      "checksum": "aea52072"
     },
     {
       "id": "DOC-YEOSU_FOUNDER_ROUTE_001_TIME_E",
