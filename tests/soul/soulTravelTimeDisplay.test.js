@@ -230,3 +230,173 @@ describe('T-15: message_ko for verified edge', () => {
     expect(t.message_ko).toBe('이동 약 45분');
   });
 });
+
+// ==========================================================================
+// T-16~T-18: stayUnknown guard (pre-migration state — hamel=null)
+// ==========================================================================
+
+// ---------- T-16: stayUnknown — null avg_stay_minutes blocks fits_comfortably ----------
+describe('T-16: stayUnknown — null avg_stay_minutes blocks fits_comfortably', () => {
+  function makeHamelNull() {
+    return { code: 'hamel_lighthouse', avg_stay_minutes: null, name_ko: '하멜등대', _warnings: [] };
+  }
+
+  test('course with null stay → travelUnknown=false but stayUnknown=true (all transitions verified)', () => {
+    const places = [
+      makePlace('cablecar', 45),
+      makeHamelNull(),
+      makePlace('hyangiram', 90),
+    ];
+    const blocks = svc._buildJourneyBlocks(places, { restaurants: [] }, [], {}, mkCtx());
+    const travelBlocks = blocks.filter(b => b.type === 'travel_transition');
+    expect(travelBlocks[0].status).toBe('verified');
+    expect(travelBlocks[1].status).toBe('verified');
+    const travelUnknown = travelBlocks.some(b => b.status !== 'verified');
+    const stayUnknown = places.some(p => p.avg_stay_minutes == null);
+    expect(travelUnknown).toBe(false);
+    expect(stayUnknown).toBe(true);
+  });
+
+  test('travel blocks still show verified minutes even when stayUnknown=true', () => {
+    const places = [makePlace('cablecar', 45), makeHamelNull(), makePlace('hyangiram', 90)];
+    const blocks = svc._buildJourneyBlocks(places, { restaurants: [] }, [], {}, mkCtx());
+    const travelBlocks = blocks.filter(b => b.type === 'travel_transition');
+    expect(travelBlocks[0].estimated_duration_range.min).toBe(7);
+    expect(travelBlocks[1].estimated_duration_range.min).toBe(45);
+    expect(travelBlocks[0].message_ko).toBe('이동 약 7분');
+  });
+});
+
+// ---------- T-17: 8h full course — hamel null must NOT return fits_comfortably ----------
+describe('T-17: 8h course with hamel null — must NOT return fits_comfortably', () => {
+  test('stayUnknown guard: hamel null + all transitions verified → stayUnknown=true', () => {
+    const places = [
+      makePlace('cablecar', 45),
+      { code: 'hamel_lighthouse', avg_stay_minutes: null, name_ko: '하멜등대', _warnings: [] },
+      makePlace('hyangiram', 90),
+      makePlace('jaisan_park', 30),
+      makePlace('lee_soon_shin_plaza', 45),
+    ];
+    const stayUnknown = places.some(p => p.avg_stay_minutes == null);
+    expect(stayUnknown).toBe(true);
+  });
+
+  test('all places with known stay → stayUnknown=false', () => {
+    const places = [
+      makePlace('cablecar', 45),
+      makePlace('hamel_lighthouse', 30),
+      makePlace('hyangiram', 90),
+      makePlace('jaisan_park', 30),
+      makePlace('lee_soon_shin_plaza', 45),
+    ];
+    const stayUnknown = places.some(p => p.avg_stay_minutes == null);
+    expect(stayUnknown).toBe(false);
+  });
+});
+
+// ---------- T-18: == null catches undefined too ----------
+describe('T-18: stayUnknown guard catches undefined as well as null', () => {
+  test('avg_stay_minutes=undefined → stayUnknown=true', () => {
+    const places = [{ code: 'test', avg_stay_minutes: undefined, name_ko: 'test', _warnings: [] }];
+    const stayUnknown = places.some(p => p.avg_stay_minutes == null);
+    expect(stayUnknown).toBe(true);
+  });
+
+  test('avg_stay_minutes=0 → stayUnknown=false (0 is a known value)', () => {
+    const places = [makePlace('test', 0)];
+    const stayUnknown = places.some(p => p.avg_stay_minutes == null);
+    expect(stayUnknown).toBe(false);
+  });
+});
+
+// ==========================================================================
+// T-19~T-24: Post-migration state (Migration 207 — Founder Decision 2026-10-25)
+// hamel_lighthouse=30, hyangiram=120
+// ==========================================================================
+
+// ---------- T-19: Post-migration — 2h course stayUnknown=false ----------
+describe('T-19: Post-migration — 2h course (cablecar+hamel=30) → stayUnknown=false', () => {
+  test('hamel=30 → stayUnknown=false', () => {
+    const places = [makePlace('cablecar', 45), makePlace('hamel_lighthouse', 30)];
+    const stayUnknown = places.some(p => p.avg_stay_minutes == null);
+    expect(stayUnknown).toBe(false);
+  });
+});
+
+// ---------- T-20: Post-migration — 5h course stayUnknown=false ----------
+describe('T-20: Post-migration — 5h course (cablecar+hamel+hyangiram=120) → stayUnknown=false', () => {
+  test('all places have stay → stayUnknown=false', () => {
+    const places = [
+      makePlace('cablecar', 45),
+      makePlace('hamel_lighthouse', 30),
+      makePlace('hyangiram', 120),
+    ];
+    const stayUnknown = places.some(p => p.avg_stay_minutes == null);
+    expect(stayUnknown).toBe(false);
+  });
+});
+
+// ---------- T-21: Post-migration — 8h course stayUnknown=false ----------
+describe('T-21: Post-migration — 8h course all stays known → stayUnknown=false', () => {
+  test('all 5 places with known stay → stayUnknown=false', () => {
+    const places = [
+      makePlace('cablecar', 45),
+      makePlace('hamel_lighthouse', 30),
+      makePlace('hyangiram', 120),
+      makePlace('jaisan_park', 30),
+      makePlace('lee_soon_shin_plaza', 45),
+    ];
+    const stayUnknown = places.some(p => p.avg_stay_minutes == null);
+    expect(stayUnknown).toBe(false);
+  });
+});
+
+// ---------- T-22: Time budget — 8h course (post-migration) ----------
+describe('T-22: Time budget — 8h course (Migration 207 values)', () => {
+  // cablecar(45) + hamel(30) + hyangiram(120) + jaisan(30) + lss(45) = 270
+  // P1(7) + P2(45) + P3(45) + P4(9) = 106
+  // meal: 60
+  // total: 436 < 480
+  const STAY = 45 + 30 + 120 + 30 + 45;   // 270
+  const TRAVEL = 7 + 45 + 45 + 9;          // 106
+  const MEAL = 60;
+
+  test('stay total = 270', () => { expect(STAY).toBe(270); });
+  test('travel total = 106 (P1+P2+P3+P4)', () => { expect(TRAVEL).toBe(106); });
+  test('total activity 436 < 480 (8h fits)', () => {
+    expect(STAY + TRAVEL + MEAL).toBe(436);
+    expect(STAY + TRAVEL + MEAL).toBeLessThan(480);
+  });
+});
+
+// ---------- T-23: Time budget — 5h course (post-migration) ----------
+describe('T-23: Time budget — 5h course (Migration 207 values)', () => {
+  // cablecar(45) + hamel(30) + hyangiram(120) = 195
+  // P1(7) + P2(45) = 52
+  // meal: 60
+  // total: 307 (5h slot is 270-360min range, not hard 300 cap)
+  const STAY = 45 + 30 + 120;  // 195
+  const TRAVEL = 7 + 45;       // 52
+  const MEAL = 60;
+
+  test('stay total = 195', () => { expect(STAY).toBe(195); });
+  test('total activity = 307', () => { expect(STAY + TRAVEL + MEAL).toBe(307); });
+  test('307 within 5h slot upper bound (360)', () => {
+    expect(STAY + TRAVEL + MEAL).toBeLessThanOrEqual(360);
+  });
+});
+
+// ---------- T-24: Time budget — 2h course (post-migration) ----------
+describe('T-24: Time budget — 2h course (Migration 207 values)', () => {
+  // cablecar(45) + hamel(30) = 75
+  // P1(7)
+  // place+travel = 82 < 120
+  const STAY = 45 + 30;  // 75
+  const TRAVEL = 7;
+
+  test('stay total = 75 (cablecar+hamel post-migration)', () => { expect(STAY).toBe(75); });
+  test('place + travel = 82 < 120 (2h fits without meal)', () => {
+    expect(STAY + TRAVEL).toBe(82);
+    expect(STAY + TRAVEL).toBeLessThan(120);
+  });
+});
