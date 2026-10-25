@@ -113,10 +113,28 @@ const timeLabel = timeMinutes < 60
 
 ---
 
+## PR #133 Production QA Closure
+
+**Guardian 판정**: PR133_PRODUCTION_QA_PASS / TIME_LABEL_FINDING_RESOLVED
+
+| 항목 | 결과 |
+|------|------|
+| Production SHA | `425a643` |
+| Deploy ID | `dep-dberknvavr4c73btaoj0` |
+| LIVE 시각 | 2026-10-25 17:17 KST |
+| 응답 문구 | "4시간 30분 정도 시간이 있으시군요." ✅ |
+| 기존 오류 "5시간" | **RESOLVED** ✅ |
+| 하멜등대 포함 | ✅ |
+| 향일암 포함 | ✅ |
+| 하멜등대→향일암 이동 | 약 45분 표시 ✅ |
+| 향일암→케이블카 이동 | "이동시간 확인 중" (travel_time_unverified 유지) |
+| 체류시간 합계 | 195분 (30+120+45) |
+| 전체 270분 적합성 | ⚠️ 미확정 (travel_time_unverified) |
+
 ## 후속 계획
 
 | 항목 | 상태 |
 |------|------|
-| PR #133 (시간 표시 수정) | OPEN — AIL Gate + CI 통과 후 Founder merge 승인 필요 |
+| PR #133 Production QA | **CLOSED** ✅ (2026-10-25 17:17 KST) |
 | hyangiram→cablecar 이동시간 | Founder NAVER 측정 후 VERIFIED_TRAVEL_EDGES 추가 (별도) |
-| Production 재배포 | PR #133 merge 후 Founder 수동 배포 |
+| PR #134 State Sync | OPEN — Founder merge 승인 필요 |

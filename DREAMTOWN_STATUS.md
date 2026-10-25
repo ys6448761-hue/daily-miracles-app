@@ -23,12 +23,18 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-25
 
-**Production 재배포 — Founder Render 수동 배포 후 "4시간 30분" 표시 확인**
-- **PR #133 MERGED** ✅ SHA: `425a643` / 2026-10-25 — fix(soul): Math.round → 정확한 시간+분 표시
-  - 변경 범위: `soyeowoolService.js:1785` 단 1줄 (+3줄 ternary) — display text only
-  - TL-1~7 7/7 PASS ✅ / 회귀 615/616 ✅ (R20 PRE-EXISTING)
-  - 배포 방법: Render 대시보드 → srv-d3kt93b3fgac73a3nt1g → Manual Deploy → main `425a643`
-  - QA 기준: 270분 직접 입력 → "4시간 30분 정도 시간이 있으시군요." 확인
+**PR #134 Founder merge 승인 — docs/pr133-state-sync State Sync 완료**
+- **맞춤 항로 V0.1: PRODUCTION_QA_CLOSED** ✅ (2026-10-25 17:17 KST)
+  - SHA `425a643` / Deploy `dep-dberknvavr4c73btaoj0`
+  - "4시간 30분 정도 시간이 있으시군요." ✅ VERIFIED
+  - FINDING TIME_LABEL: **RESOLVED** ✅ (기존 "5시간" 오류 완전 해소)
+  - travel_time_unverified: 유지 (향일암→케이블카 미검증) / CAR GOVERNANCE_HOLD: 유지
+- **PR #134 OPEN** — docs/pr133-state-sync (docs-only State Sync)
+  - Evidence: CUSTOM-ROUTE-V01-HTTP-GATE, CUSTOM-ROUTE-V01-PRODUCTION-QA 포함
+  - Tests: soulCustomRouteV01HttpGate + soulTimeLabelDisplay 포함
+  - 임의 병합 금지 / Founder merge 승인 필요
+- **PR #133 MERGED** ✅ SHA: `425a643` / 2026-10-25T08:02:51Z
+  - TL-1~7 7/7 PASS ✅ / 회귀 615/616 ✅ / 변경: soyeowoolService.js:1785만
 - **UI Visual QA**: PASS ✅ (T1~T7, 2026-10-25, `localhost:5000/muyojeong`)
 - **Code-level integration review**: PASS ✅ (5/5 CODE_VERIFIED)
 - **Runtime Service Integration**: PASS ✅ MR-1~MR-6 6/6 — `soulCustomRouteV01Integration`
@@ -37,9 +43,8 @@ Last Updated: 2026-10-25
   - 실제 JWT 인증 미들웨어 실행 ✅ / session_id 응답 ✅ / must_visit=[hamel,hyangiram] ✅ / time=270 ✅
   - sessionService.createSession MOCKED (운영 DB INSERT 없음) / GPT MOCKED
   - Evidence: `docs/knowledge/CUSTOM-ROUTE-V01-HTTP-GATE-EVIDENCE.md`
-- **Production QA**: PASS_WITH_FINDINGS ⚠️ (2026-10-25, SHA `98550fb`, Deploy `dep-dbeqvi1srm7s73d2i7ig`)
-  - 하멜등대+향일암 코스 포함 ✅ / 이동 45분(P2) ✅ / travel_time_unverified ✅
-  - **FINDING (FIXED by PR #133)**: 270분 → "5시간" (Math.round(4.5)=5 오버스테이트) → "4시간 30분"
+- **Production QA**: PR133_PRODUCTION_QA_PASS ✅ (2026-10-25 17:17 KST, SHA `425a643`, Deploy `dep-dberknvavr4c73btaoj0`)
+  - 하멜등대+향일암 포함 ✅ / 이동 45분(P2) ✅ / travel_time_unverified ✅ / 체류 195분 ✅
   - Evidence: `docs/knowledge/CUSTOM-ROUTE-V01-PRODUCTION-QA-EVIDENCE.md`
 - **PR #131 MERGED** ✅ SHA: `98550fb` / 2026-10-25T06:41:56Z / Founder Conditional Merge Authorization
   - 빌드: ✅ / 회귀: 566/567 PASS (R20 PRE-EXISTING) / 신규 API·DB 없음
