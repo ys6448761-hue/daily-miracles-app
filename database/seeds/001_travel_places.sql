@@ -14,7 +14,7 @@ INSERT INTO travel_places (
 -- SOUTH (1/2)
 ('hyangiram', 'S-1', 'KR', 'YEOSU',
  '향일암', 'Hyangiram', '돌산읍 향일암로 1', 34.5914162, 127.8037534,
- 'outdoor', 90,
+ 'outdoor', 120,
  ARRAY['family', 'elderly', 'kids_ok', 'pilgrimage']::text[],
  ARRAY['clear', 'sunrise', 'all_season']::text[],
  'serenity', ARRAY['dawn', 'faith', 'historical']::text[],
@@ -115,7 +115,7 @@ INSERT INTO travel_places (
 -- Evidence: 여수지방해양수산청 공식 (yeosu.mof.go.kr) — lat/lng VERIFIED 2026-10-19
 ('hamel_lighthouse', NULL, 'KR', 'YEOSU',
  '하멜등대', 'Hamel Lighthouse', '전라남도 여수시 종화동 458-7', 34.7364400, 127.7471000,
- 'outdoor', NULL,
+ 'outdoor', 30,
  NULL,
  NULL,
  'connection', ARRAY['resonance', 'memory', 'wish']::text[],

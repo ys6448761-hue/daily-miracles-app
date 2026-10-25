@@ -23,16 +23,27 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-25
 
-**Founder — PR #118 Production Deploy 승인 필요.**
+**Founder — PR #121 Merge 승인 필요. Production Deploy 별도 승인 필요.**
+- **PR #121 OPEN** @ `809234f` — Stay Time DB Update V0.1 (feat/travel-places-stay-time-v01)
+  - hamel_lighthouse: null→30 / hyangiram: 90→120 (Founder Decision 2026-10-25)
+  - migration: `207_travel_places_stay_time_v01.sql` (idempotent + rollback 포함)
+  - fitStatus 3방향: travel_time_unverified / budget_exceeded / fits_comfortably
+  - estimated_total_range: verified travel 포함 (stay+travel+meal / +café)
+  - meal/café: 하드코딩 공식 → 실제 블록 기반 계산
+  - **Guardian HOLD 해소**: 5h(307>300)→budget_exceeded / 8h(436<480)→fits_comfortably
+  - 46/46 PASS (T-1~T-29) / R20 PRE-EXISTING
+  - Evidence: `docs/knowledge/TRAVEL-PLACES-STAY-TIME-V01-EVIDENCE.md`
+  - Production DB 미실행 — Merge 후 별도 승인 필요
+- **PR #120 OPEN** — fix/fitStatus-stay-unknown @ `3df7c29` (stayUnknown guard only)
+  - PR #121에 동일 guard 포함 → PR #121 merge 시 PR #120 close 권장
 - **PR #118 MERGED** @`8aaeccd` (2026-10-25 KST) — Travel Time UI V0.1
-  - main HEAD: `8aaeccd` / main CI: AIL Gate ✓ / docker-smoke ✓ / Manifest ✓ / health-check ✓
-  - Guardian: MERGED_AND_VERIFIED / PRODUCTION_HOLD
+  - main HEAD: `3fe3686` (origin) / Guardian: MERGED_AND_VERIFIED / PRODUCTION_HOLD
   - `_estimateTravelTime()` V0 Stub 미변경 / CAR GOVERNANCE_HOLD 유지
-  - pre-merge 버그 수정: `travelTransitionCount` ReferenceError → `travelTransitionBlocks.filter` (commit `4d52801`)
 - **Production LIVE**: `7567b59` (Render Auto-Deploy OFF — PR #118 미배포)
 - **PR #117 MERGED** @`a8861cc` — PR #115 Production QA Evidence
-- **hamel_lighthouse avg_stay_minutes**: null / DATA_GAP (DB 변경 별도 승인 대기)
-- **hyangiram avg_stay_minutes**: 90 (DB) / Candidate 120분 — 별도 승인 대기
+- **hamel_lighthouse avg_stay_minutes**: null→30 (Founder Approved, DB 미반영 — PR #121)
+- **hyangiram avg_stay_minutes**: 90→120 (Founder Approved, DB 미반영 — PR #121)
+- **Post-migration 시간 예산**: 8h=436분(여유44분) / 5h=307분 / 2h=82분 — fits_comfortably ✅
 - **EVIDENCE-B-001** (2026-10-24): `docs/knowledge/EVIDENCE-B-001_Hotel_Nighttime_Walk_V0_1_Implementation.md`
 - **IMPL-PLAN-B-001** (2026-10-24): `docs/knowledge/IMPL-PLAN-B-001_Hotel_Nighttime_Walk_V0_1.md`
 - **PREFLIGHT-PHASE-B-001** (2026-10-24): `docs/knowledge/PREFLIGHT-PHASE-B-001_Hotel_Nighttime_Walk.md`

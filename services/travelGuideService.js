@@ -347,16 +347,38 @@ class TravelGuideService {
     // Compose journey blocks (with cafe benefits)
     const blocks = this._buildJourneyBlocks(selectedPlaces, mealOptions, cafeOptions, benefitsData, context);
 
-    // Calculate total time and fit assessment
-    const totalStayMinutes = selectedPlaces.reduce((sum, p) => sum + p.avg_stay_minutes, 0);
-    const mealTimeMinutes = selectedPlaces.length > 0 ? 60 : 0; // 1 meal if any places
-    const cafeTimeMinutes = selectedPlaces.length > 2 ? 30 : 0; // 1 cafe if 3+ places
+    // Calculate total stay (null-safe; stayUnknown flag catches any null)
+    const totalStayMinutes = selectedPlaces.reduce((sum, p) => sum + (p.avg_stay_minutes || 0), 0);
 
-    // P0-2 FIX: Fit status must reflect unknown travel time
-    // Cannot claim "fits_comfortably" when any transition is unverified
+    // Categorize blocks by type
     const travelTransitionBlocks = blocks.filter(b => b.type === 'travel_transition');
+    const mealBlocks = blocks.filter(b => b.type === 'meal');
+    const cafeBlocks = blocks.filter(b => b.type === 'cafe');
+
+    // Verification flags
     const travelUnknown = travelTransitionBlocks.some(b => b.status !== 'verified');
-    const fitStatus = travelUnknown ? 'travel_time_unverified' : 'fits_comfortably';
+    const stayUnknown = selectedPlaces.some(p => p.avg_stay_minutes == null);
+
+    // Cumulative times from actual blocks — NOT hardcoded formulas
+    // totalStayMinutes: null-safe (null avg_stay treated as 0; stayUnknown catches the gap)
+    const verifiedTravelMinutes = travelTransitionBlocks
+      .filter(b => b.status === 'verified')
+      .reduce((sum, b) => sum + b.estimated_duration_range.min, 0);
+    const actualMealMinutes = mealBlocks.reduce((sum, b) => sum + (b.estimated_duration_minutes || 0), 0);
+    const actualCafeMinutes = cafeBlocks.reduce((sum, b) => sum + (b.estimated_duration_minutes || 0), 0);
+
+    // Total known activity: stay + verified travel + meal + café
+    const totalKnownMinutes = totalStayMinutes + verifiedTravelMinutes + actualMealMinutes + actualCafeMinutes;
+
+    // Budget check: only meaningful when travel AND stay are fully known
+    const budgetExceeded = !travelUnknown && !stayUnknown && totalKnownMinutes > timeMinutes;
+
+    // Three-way fitStatus — verification and budget are separate concerns
+    const fitStatus = (travelUnknown || stayUnknown)
+      ? 'travel_time_unverified'
+      : budgetExceeded
+        ? 'budget_exceeded'
+        : 'fits_comfortably';
 
     return {
       selectedPlaces,
@@ -369,20 +391,25 @@ class TravelGuideService {
         actual_stop_count: selectedPlaces.length,
         blocks: blocks,
         summary: {
-          total_known_activity_minutes: totalStayMinutes + mealTimeMinutes + cafeTimeMinutes,  // P0-2: clarify what's known
           total_stay_minutes: totalStayMinutes,
-          estimated_meal_time: selectedPlaces.length > 0 ? 60 : 0,
-          estimated_cafe_time: selectedPlaces.length > 2 ? 30 : 0,
-          unknown_travel_segments: travelTransitionBlocks.filter(b => b.status !== 'verified').length,  // P0-2: explicit unknown count
-          estimated_total_range: travelUnknown ? null : {  // P0-2: null when unknown
-            min: totalStayMinutes + (selectedPlaces.length > 0 ? 60 : 0),
-            max: totalStayMinutes + (selectedPlaces.length > 0 ? 60 : 0) + (selectedPlaces.length > 2 ? 30 : 0)
+          verified_travel_minutes: verifiedTravelMinutes,
+          actual_meal_minutes: actualMealMinutes,
+          actual_cafe_minutes: actualCafeMinutes,
+          total_known_activity_minutes: totalKnownMinutes,
+          unknown_travel_segments: travelTransitionBlocks.filter(b => b.status !== 'verified').length,
+          estimated_total_range: (travelUnknown || stayUnknown) ? null : {
+            min: totalStayMinutes + verifiedTravelMinutes + actualMealMinutes,
+            max: totalStayMinutes + verifiedTravelMinutes + actualMealMinutes + actualCafeMinutes
           },
-          fit_status: fitStatus  // P0-2: 'travel_time_unverified' when unknown
+          fit_status: fitStatus
         },
-        message_ko: travelUnknown
-          ? '관광·식사·휴식 기준으로 구성했어요. 장소 간 이동시간은 현재 확인 중입니다.'
-          : '시간 범위 내에서 편안하게 둘러볼 수 있어요.'
+        message_ko: (travelUnknown || stayUnknown)
+          ? (travelUnknown
+              ? '관광·식사·휴식 기준으로 구성했어요. 장소 간 이동시간은 현재 확인 중입니다.'
+              : '관광·식사·휴식 기준으로 구성했어요. 일부 장소의 체류시간을 확인 중입니다.')
+          : budgetExceeded
+            ? '관광·식사·휴식 기준으로 구성했어요. 선택하신 시간보다 다소 더 소요될 수 있어요.'
+            : '시간 범위 내에서 편안하게 둘러볼 수 있어요.'
       }
     };
   }
