@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-25T07:07:16.273Z",
+  "generated_at": "2026-10-25T08:09:43.598Z",
   "generator": "generate-manifest.js",
-  "total_count": 479,
+  "total_count": 477,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2819,6 +2819,38 @@
       "checksum": "167eef26"
     },
     {
+      "id": "DOC-CUSTOM-ROUTE-V01-HTTP-GATE-EVI",
+      "path": "docs/knowledge/CUSTOM-ROUTE-V01-HTTP-GATE-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "맞춤 항로 V0.1 — HTTP Integration Gate Evidence",
+      "created_at": "2026-10-25",
+      "checksum": "35c6c3eb"
+    },
+    {
+      "id": "DOC-CUSTOM-ROUTE-V01-PRODUCTION-QA",
+      "path": "docs/knowledge/CUSTOM-ROUTE-V01-PRODUCTION-QA-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "team",
+      "status": "|------",
+      "title": "맞춤 항로 V0.1 — Production QA Evidence",
+      "created_at": "2026-10-25",
+      "checksum": "61005ba3"
+    },
+    {
       "id": "DOC-CUSTOM-ROUTE-V01-RUNTIME-GATE-",
       "path": "docs/knowledge/CUSTOM-ROUTE-V01-RUNTIME-GATE-EVIDENCE.md",
       "type": "document",
@@ -2983,38 +3015,6 @@
       "checksum": "ee59987b"
     },
     {
-      "id": "DOC-PILOT-INTENT-003-T5_Car_Query_",
-      "path": "docs/knowledge/PILOT-INTENT-003-T5_Car_Query_Path_Review.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge"
-      ],
-      "owner": "code",
-      "status": "active",
-      "title": "PILOT-INTENT-003-T5 — '차량으로' 선택 응답 경로 검토",
-      "created_at": "2026-10-25",
-      "checksum": "10cfc143"
-    },
-    {
-      "id": "DOC-PILOT-INTENT-003_Nighttime_Wal",
-      "path": "docs/knowledge/PILOT-INTENT-003_Nighttime_Walk_Real_Question_Pilot.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge"
-      ],
-      "owner": "code",
-      "status": "active",
-      "title": "PILOT-INTENT-003 — Nighttime Walk Real Question Pilot",
-      "created_at": "2026-10-25",
-      "checksum": "da360aaf"
-    },
-    {
       "id": "DOC-PR115-CI-DIAG-V0_1",
       "path": "docs/knowledge/PR115-CI-DIAG-V0_1.md",
       "type": "document",
@@ -3111,38 +3111,6 @@
       "title": "RELEASE-PREFLIGHT-B-001 — Phase B V0.1 Production Release Preflight",
       "created_at": "2026-10-25",
       "checksum": "398a083a"
-    },
-    {
-      "id": "DOC-SOUL-TRAVEL-TIME-GAP-ANALYSIS-",
-      "path": "docs/knowledge/SOUL-TRAVEL-TIME-GAP-ANALYSIS-V0_1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge"
-      ],
-      "owner": "code",
-      "status": "#",
-      "title": "SOUL-TRAVEL-TIME-GAP-ANALYSIS-V0_1",
-      "created_at": "2026-10-25",
-      "checksum": "abe6a482"
-    },
-    {
-      "id": "DOC-SOUL-TRAVEL-TIME-RECONCILIATIO",
-      "path": "docs/knowledge/SOUL-TRAVEL-TIME-RECONCILIATION-V0_1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge"
-      ],
-      "owner": "code",
-      "status": "|------",
-      "title": "SOUL-TRAVEL-TIME-RECONCILIATION-V0_1",
-      "created_at": "2026-10-25",
-      "checksum": "43390636"
     },
     {
       "id": "DOC-TRAVEL-PLACES-STAY-TIME-V01-EV",
