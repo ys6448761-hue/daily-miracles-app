@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-25T08:23:50.136Z",
+  "generated_at": "2026-10-25T21:42:14.121Z",
   "generator": "generate-manifest.js",
-  "total_count": 477,
+  "total_count": 479,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2930,6 +2930,38 @@
       "title": "IMPL-PLAN-B-001 — Hotel-to-Starlight Nighttime Walk SOUL Answer V0.1",
       "created_at": "2026-10-25",
       "checksum": "2354919b"
+    },
+    {
+      "id": "DOC-MAP-V01-DECISION-SHEET",
+      "path": "docs/knowledge/MAP-V01-DECISION-SHEET.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "team",
+      "status": "수",
+      "title": "Map V0.1 Design Decision Sheet",
+      "created_at": "2026-10-25",
+      "checksum": "fd73f457"
+    },
+    {
+      "id": "DOC-MAP-V01-YEOSU-PLACE-INVENTORY",
+      "path": "docs/knowledge/MAP-V01-YEOSU-PLACE-INVENTORY.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "비고",
+      "title": "여수 전역 관광지 Inventory — Map V0.1 설계 기초",
+      "created_at": "2026-10-25",
+      "checksum": "18c69daa"
     },
     {
       "id": "DOC-Change_Log",
