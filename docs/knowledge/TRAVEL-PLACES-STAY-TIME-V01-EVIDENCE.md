@@ -289,5 +289,70 @@ EXECUTION_HOLD     : --execute 아직 미실행 — Founder 최종 승인 대기
 
 ---
 
+## 11. Migration 207 Execution Result (2026-10-25)
+
+**실행 승인**: Founder APPROVED (2026-10-25)  
+**실행 시각**: 2026-10-25T03:49:24.127Z (UTC)  
+**실행 방법**: `node scripts/run-migration-207.js --execute`
+
+### 실행 전 최종 게이트 (실행 직전 재조회)
+
+| 검증 항목 | 값 | 결과 |
+|---------|---|------|
+| DB name | `yeosu_miracle_travel` | PASS ✅ |
+| Instance ID | `dpg-d3t9gpa4d50c73d2i3gg-a` | PASS ✅ |
+| hamel_lighthouse | NULL | PASS ✅ |
+| hyangiram | 90 | PASS ✅ |
+| Migration SQL SHA-256 | `82fd4b59...afeaebe` | PASS ✅ |
+| **GATE** | | **GO** |
+
+### 실행 로그
+
+```
+Mode: EXECUTE
+DB Provider : RENDER_POSTGRES
+hamel_lighthouse : MATCHES (NULL → 30)
+hyangiram        : MATCHES (90 → 120)
+Migration 207 SQL: COMMITTED
+Post-flight hamel_lighthouse = 30 ✅
+Post-flight hyangiram        = 120 ✅
+Migration 207 COMPLETE
+```
+
+### 사후 전체 레코드 검증 (travel_places 13행)
+
+| place_code | avg_stay_minutes | 변경 여부 |
+|-----------|-----------------|---------|
+| hamel_lighthouse | **30** | ✅ NULL→30 (CHANGED) |
+| hyangiram | **120** | ✅ 90→120 (CHANGED) |
+| cablecar | 45 | 변경 없음 |
+| dolsan_daegyo | 30 | 변경 없음 |
+| dolsan_nightscape | 45 | 변경 없음 |
+| jaisan_park | 30 | 변경 없음 |
+| jungang_market | 75 | 변경 없음 |
+| lee_soon_shin_plaza | 45 | 변경 없음 |
+| marine_park | 75 | 변경 없음 |
+| odongdo | 120 | 변경 없음 |
+| romantic_pojangmacha | 60 | 변경 없음 |
+| sky_tower | 60 | 변경 없음 |
+| yeosu_expo_park | 120 | 변경 없음 |
+
+변경 행: **2** (hamel, hyangiram) / 미변경: **11** / 총 13행 이상 없음 ✅
+
+### 최종 판정
+
+```
+EXECUTION_STATUS  : SUCCESS
+CHANGED_ROWS      : 2 (hamel_lighthouse=30, hyangiram=120)
+UNCHANGED_ROWS    : 11 (모두 원래 값 유지)
+TRANSACTION       : COMMITTED
+POST_FLIGHT       : PASS (스크립트 자동 검증)
+FULL_SCAN         : PASS (13행 전체 수동 검증)
+```
+
+**Migration 207: DEPLOYED_AND_VERIFIED** ✅
+
+---
+
 *작성: 2026-10-25 / Claude Code (Antigravity)*  
-*Production DB 변경 아님. Migration 준비 전용.*
+*Migration 207 Production 실행 완료. hamel=30 / hyangiram=120.*
