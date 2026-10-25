@@ -187,5 +187,53 @@ Migration 207 실행 상태: **EXECUTION_HOLD — Founder 승인 대기 중**
 
 ---
 
+## 9. Production DB Identity Verification (2026-10-25)
+
+**발단**: Founder Supabase Dashboard에서 `dreamtown-storybook-staging` 프로젝트 확인 (PAUSED / FREE / Branch: PRODUCTION 레이블)
+
+### 조사 결과
+
+**로컬 `.env` DATABASE_URL 연결 대상 분석** (민감정보 제외):
+
+| 항목 | 값 |
+|------|---|
+| DB Provider | **RENDER_POSTGRES** |
+| Host domain | `singapore-postgres.render.com` |
+| Instance prefix | `dpg-` (Render 관리 PostgreSQL 패턴) |
+| Region | Singapore (ap-southeast-1) |
+
+### 판정
+
+| 항목 | 결론 |
+|------|------|
+| Production DB | **Render PostgreSQL** (Render 관리형) |
+| Supabase `dreamtown-storybook-staging` | **별개 프로젝트** — Production DB 아님 |
+| 이전 hamel/hyangiram 라이브 조회 | **Render PostgreSQL 대상** ✅ (값 신뢰 유지) |
+| hamel=NULL / hyangiram=90 | **실제 Production 값** 확인됨 |
+
+### 영향: Migration 207 실행 경로 변경 필요
+
+기존 권고 경로 A (Supabase SQL Editor)는 **INVALID** — Production DB가 Render PostgreSQL이므로 Supabase SQL Editor에서 실행해도 Production에 반영되지 않음.
+
+**유효한 실행 경로 (Founder 결정 필요)**:
+
+| 경로 | 방법 | 사전 조건 |
+|------|------|---------|
+| B | `scripts/run-migration-207.js` 로컬 실행 (DATABASE_URL → Render PostgreSQL) | 스크립트 신규 PR |
+| C | `server.js` admin allowlist에 `"207"` 추가 → `/api/admin/run-migration` | 코드 PR 필요 |
+| D | Render Dashboard → Shell 탭 → `node` 직접 실행 | Render 접근 권한 필요 |
+
+기존 스크립트 패턴 참조: `scripts/run-migration-069-070.js` (동일 구조, DATABASE_URL → pg Pool → SQL 파일 실행)
+
+### Render PostgreSQL 백업 상태
+
+코드에서 Render DB 플랜 티어 직접 확인 불가.
+
+Founder 액션 필요: Render Dashboard → `daily-miracles-app` 서비스의 연결된 PostgreSQL DB → `Backups` 탭 확인.
+- Render Free tier: 일별 자동 백업 1일 보관
+- Render Standard: 7일 보관
+
+---
+
 *작성: 2026-10-25 / Claude Code (Antigravity)*  
 *Production DB 변경 아님. Migration 준비 전용.*
