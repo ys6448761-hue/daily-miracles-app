@@ -230,3 +230,82 @@ describe('T-15: message_ko for verified edge', () => {
     expect(t.message_ko).toBe('이동 약 45분');
   });
 });
+
+// ---------- T-16: stayUnknown guard — null avg_stay_minutes → NOT fits_comfortably ----------
+describe('T-16: stayUnknown — null avg_stay_minutes blocks fits_comfortably', () => {
+  // Simulate 8h course with hamel_lighthouse (avg_stay_minutes=null, as in DB)
+  function makeHamelNull() {
+    return { code: 'hamel_lighthouse', avg_stay_minutes: null, name_ko: '하멜등대', _warnings: [] };
+  }
+
+  test('course with null stay → travelUnknown=false but stayUnknown=true (all transitions verified)', () => {
+    // P1+P2 both verified, but hamel has null stay
+    const places = [
+      makePlace('cablecar', 45),
+      makeHamelNull(),
+      makePlace('hyangiram', 90),
+    ];
+    const blocks = svc._buildJourneyBlocks(places, { restaurants: [] }, [], {}, mkCtx());
+    const travelBlocks = blocks.filter(b => b.type === 'travel_transition');
+    // P1 and P2 should both be verified
+    expect(travelBlocks[0].status).toBe('verified');
+    expect(travelBlocks[1].status).toBe('verified');
+    // travelUnknown = false (all verified), but stayUnknown = true (hamel=null)
+    const travelUnknown = travelBlocks.some(b => b.status !== 'verified');
+    const stayUnknown = places.some(p => p.avg_stay_minutes == null);
+    expect(travelUnknown).toBe(false);
+    expect(stayUnknown).toBe(true);
+  });
+
+  test('travel blocks still show verified minutes even when stayUnknown=true', () => {
+    const places = [makePlace('cablecar', 45), makeHamelNull(), makePlace('hyangiram', 90)];
+    const blocks = svc._buildJourneyBlocks(places, { restaurants: [] }, [], {}, mkCtx());
+    const travelBlocks = blocks.filter(b => b.type === 'travel_transition');
+    // Travel display is intact
+    expect(travelBlocks[0].estimated_duration_range.min).toBe(7);   // P1
+    expect(travelBlocks[1].estimated_duration_range.min).toBe(45);  // P2
+    expect(travelBlocks[0].message_ko).toBe('이동 약 7분');
+  });
+});
+
+// ---------- T-17: 8h full course — stayUnknown blocks fits_comfortably ----------
+describe('T-17: 8h course with hamel null — must NOT return fits_comfortably', () => {
+  test('stayUnknown guard: hamel null + all transitions verified → stayUnknown=true', () => {
+    const places = [
+      makePlace('cablecar', 45),
+      { code: 'hamel_lighthouse', avg_stay_minutes: null, name_ko: '하멜등대', _warnings: [] },
+      makePlace('hyangiram', 90),
+      makePlace('jaisan_park', 30),
+      makePlace('lee_soon_shin_plaza', 45),
+    ];
+    const stayUnknown = places.some(p => p.avg_stay_minutes == null);
+    expect(stayUnknown).toBe(true);
+  });
+
+  test('all places with known stay → stayUnknown=false', () => {
+    const places = [
+      makePlace('cablecar', 45),
+      makePlace('hamel_lighthouse', 30),  // hypothetical DB value
+      makePlace('hyangiram', 90),
+      makePlace('jaisan_park', 30),
+      makePlace('lee_soon_shin_plaza', 45),
+    ];
+    const stayUnknown = places.some(p => p.avg_stay_minutes == null);
+    expect(stayUnknown).toBe(false);
+  });
+});
+
+// ---------- T-18: null == null vs null === null (== null catches undefined too) ----------
+describe('T-18: stayUnknown guard catches undefined as well as null', () => {
+  test('avg_stay_minutes=undefined → stayUnknown=true', () => {
+    const places = [{ code: 'test', avg_stay_minutes: undefined, name_ko: 'test', _warnings: [] }];
+    const stayUnknown = places.some(p => p.avg_stay_minutes == null);
+    expect(stayUnknown).toBe(true);
+  });
+
+  test('avg_stay_minutes=0 → stayUnknown=false (0 is a known value)', () => {
+    const places = [makePlace('test', 0)];
+    const stayUnknown = places.some(p => p.avg_stay_minutes == null);
+    expect(stayUnknown).toBe(false);
+  });
+});
