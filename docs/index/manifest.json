@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-25T21:42:14.121Z",
+  "generated_at": "2026-10-25T22:02:51.948Z",
   "generator": "generate-manifest.js",
-  "total_count": 479,
+  "total_count": 480,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2945,7 +2945,23 @@
       "status": "수",
       "title": "Map V0.1 Design Decision Sheet",
       "created_at": "2026-10-25",
-      "checksum": "fd73f457"
+      "checksum": "3e49ddda"
+    },
+    {
+      "id": "DOC-MAP-V01-PREPARATION-EVIDENCE",
+      "path": "docs/knowledge/MAP-V01-PREPARATION-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "비고",
+      "title": "Map V0.1 Preparation Evidence",
+      "created_at": "2026-10-25",
+      "checksum": "de44e7d6"
     },
     {
       "id": "DOC-MAP-V01-YEOSU-PLACE-INVENTORY",

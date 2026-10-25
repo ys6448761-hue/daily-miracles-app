@@ -23,26 +23,22 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
 
-**여수 전역 지도 V0.1 — Founder OI-MAP-1~5 결정 → 구현 착수**
-- **MAP_V01_DECISION_SHEET: READY** ✅ (2026-10-26)
-  - 카운트 정정: 34개 → **35개** (✅12 + ⛔1 + 🔵5 + 🟡14 + 🔴3)
-  - 기존 SOUL 13개 장소 상태 명시 완료 (`§2`)
-  - OI-MAP-1~5 Guardian 권고 포함 Founder Decision Sheet 완료
-  - 이미지 자산: place-hero 5종 확인 / 지도 배경 이미지 미존재 (Founder 제공 필요)
-  - Evidence: `docs/knowledge/MAP-V01-DECISION-SHEET.md`
-- **Founder Action Required (OI-MAP-1~5)**:
-  - OI-MAP-1: 중앙시장 지도 표시 여부 (A/B/C)
-  - OI-MAP-2: 신규 탐색 가능 5개 우선순위 (A/B/C/D/E)
-  - OI-MAP-3: V0.1 지도 권역 범위 (A/B/C/D)
-  - OI-MAP-4: 고소동·수산시장 lat/lng NAVER 확인 후 제공
-  - OI-MAP-5: 배편 필수 권역 표시 방식 (A/B/C)
-- **MAP_DISCOVERY_INVENTORY_READY** ✅ (2026-10-26) — Evidence: `docs/knowledge/MAP-V01-YEOSU-PLACE-INVENTORY.md`
-- **Map V0.1 DESIGN_READY** ✅ (2026-10-26) — 파일 3개: yeosuMapData.js · YeosuMapSelector.jsx · MuyojeongHomePage.jsx(EXTEND)
+**여수 전역 지도 V0.1 — 코드 구조 구현 착수 (지도 배경 이미지 수령 대기)**
+- **MAP_V01_PREPARATION_READY** ✅ (2026-10-26) — Evidence: `docs/knowledge/MAP-V01-PREPARATION-EVIDENCE.md`
+  - OI-MAP-1~5 Founder 승인 완료 (2026-10-26)
+  - 고소동 좌표 VERIFIED: 34.7389997, 127.7411688 (NAVER 마커, mom-mom.net)
+  - 여수 수산시장 UV-2 유지 (주소 확인, 좌표 미검증 → placeholder)
+  - 지도 배경 이미지 **ASSET_MISSING** — Founder 제공 필요 (§4 이미지 사양 참조)
+- **즉시 착수 가능**: yeosuMapData.js · YeosuMapSelector.jsx · MuyojeongHomePage.jsx(EXTEND)
+  - 이미지 없이 fallback div 모드로 구조 구현 가능
+- **이미지 수령 후 추가**: 배경 바인딩 + bounding box 캘리브레이션
+- **MAP_V01_DECISION_SHEET: FOUNDER_APPROVED** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-DECISION-SHEET.md`
+- **MAP_DISCOVERY_INVENTORY_READY** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-YEOSU-PLACE-INVENTORY.md`
 - **PR #134 OPEN** — docs/pr133-state-sync State Sync. Founder merge 승인 필요
 - **맞춤 항로 V0.1: PRODUCTION_QA_CLOSED** ✅ (2026-10-25 17:17 KST) SHA `425a643`
 
-**구현 금지 (Founder OI-MAP-1~5 결정 전):**
-- 지도 구현 착수 / PR #134 임의 병합 / Production 배포 / DB·Schema 변경 / CAR GOVERNANCE_HOLD 해제
+**구현 금지:**
+- 지도 배경 없이 완성된 서비스 배포 / PR #134 임의 병합 / Production 배포 / DB·Schema 변경 / CAR GOVERNANCE_HOLD 해제
 
 ---
 
