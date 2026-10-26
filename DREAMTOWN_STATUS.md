@@ -23,15 +23,17 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
 
-**여수 지역별 탐색 V0.1 — Founder QA Preview 구현 완료 → 로컬에서 검수 가능**
-- **MAP_V01_BOUNDARY_FOUNDER_QA_VIEW_READY** ✅ (2026-10-26)
-  - 접근: 로컬 `localhost:5000/muyojeong` → 지역별 보기 → 원도심 or 오동도·엑스포 + `?qa_preview=boundary`
-  - Zone 1·2 PROVISIONAL 경계 청록/주황 점선, 장소 기준점 마커 표시
-  - `import.meta.env.DEV` 게이팅 → 프로덕션 빌드 dead-code 제거, URL 파라미터 단독 우회 불가
-  - QA 배너 "검수용 미확정 경계 — 로컬 개발환경 전용" 표시
-  - 일반 사용자 화면: VERIFIED 게이팅 유지 (변경 없음)
+**여수 지역별 탐색 V0.1 — Boundary Render 근본 원인 수정 완료 → Founder 검수 가능**
+- **MAP_V01_BOUNDARY_RENDER_ROOT_CAUSE_RESOLVED** ✅ (2026-10-26)
+  - **근본 원인**: Express가 `dist/` 빌드 서빙 → `import.meta.env.DEV=false` → QA 항상 비활성
+  - **수정**: `hostname==='localhost'||'127.0.0.1'` 조건으로 교체 → 빌드된 파일에도 정상 동작
+  - 테스트 사각형 SVG(빨간 점선) 추가 → SVG 레이어 렌더링 자체 검증용
+  - ZoneOverview imageId 필터 추가 → overview 이미지에 oldtown 좌표 오버레이 방지
   - 빌드 ✅ 698 modules / 회귀 615/616 PASS (R20 PRE-EXISTING 유지)
-  - Evidence: `docs/knowledge/MAP-V01-BOUNDARY-FOUNDER-QA-VIEW-EVIDENCE.md`
+  - **검수 URL**: `http://localhost:5000/muyojeong?qa_preview=boundary`
+    → 지역별 보기 → 원도심 or 오동도·엑스포 → 빨간 점선 테두리 + 경계 점선 + 마커 확인
+  - Evidence: `docs/knowledge/MAP-V01-BOUNDARY-RENDER-ROOT-CAUSE-EVIDENCE.md`
+- **MAP_V01_BOUNDARY_FOUNDER_QA_VIEW_READY** ✅ (2026-10-26)
 - **MAP_V01_OLDTOWN_BOUNDARY_OVERLAY_READY** ✅ (2026-10-26)
   - `docs/knowledge/MAP-V01-OLDTOWN-BOUNDARY-OVERLAY.png` — Founder 검수용 이미지
   - Zone 1(청록 점선)·Zone 2(주황 점선) PROVISIONAL 경계 + 장소 마커 동시 표시

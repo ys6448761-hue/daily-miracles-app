@@ -54,9 +54,11 @@ function ZoneOverview({ onSelectZone, isQAPreview }) {
   const [hoveredZoneId, setHoveredZoneId] = useState(null);
 
   // VERIFIED + points 존재 시에만 SVG 렌더 — QA Preview 시 PROVISIONAL도 표시
+  // overview 이미지용 boundary만 허용 (oldtown imageId는 좌표계가 다름)
   const boundary = hoveredZoneId ? getZoneBoundary(hoveredZoneId) : null;
   const showBoundary =
     (boundary?.status === 'VERIFIED' || (isQAPreview && boundary?.status === 'PROVISIONAL')) &&
+    boundary?.imageId === 'yeosu-overview-v01' &&
     Array.isArray(boundary.points) &&
     boundary.points.length >= 3;
 
@@ -254,27 +256,39 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                     display: 'block',
                   }}
                 />
-                {/* QA Preview: PROVISIONAL 경계 SVG (DEV 전용 — 프로덕션 빌드에서 dead code) */}
-                {showOldtownBoundary && (
+                {/* QA Preview: SVG 레이어 (localhost + ?qa_preview=boundary 전용) */}
+                {isQAPreview && (
                   <svg
                     style={{
                       position: 'absolute', top: 0, left: 0,
                       width: '100%', height: '100%',
                       pointerEvents: 'none',
+                      zIndex: 10,
                     }}
                     viewBox="0 0 1 1"
                     preserveAspectRatio="none"
                     aria-hidden="true"
                   >
-                    <polygon
-                      points={oldtownBoundary.points.map(p => `${p.x},${p.y}`).join(' ')}
-                      fill={`${zone.color}18`}
-                      stroke={zone.color}
-                      strokeWidth="0.007"
-                      strokeDasharray="0.020 0.010"
-                      strokeLinejoin="round"
-                      opacity="0.90"
+                    {/* SVG 렌더링 확인용 테스트 사각형 — 실제 여수 경계 아님. 확인 후 제거 예정 */}
+                    <rect
+                      x="0.05" y="0.05" width="0.90" height="0.90"
+                      fill="none"
+                      stroke="rgba(255,80,80,0.7)"
+                      strokeWidth="0.008"
+                      strokeDasharray="0.025 0.012"
                     />
+                    {/* PROVISIONAL 경계 */}
+                    {showOldtownBoundary && (
+                      <polygon
+                        points={oldtownBoundary.points.map(p => `${p.x},${p.y}`).join(' ')}
+                        fill={`${zone.color}18`}
+                        stroke={zone.color}
+                        strokeWidth="0.007"
+                        strokeDasharray="0.020 0.010"
+                        strokeLinejoin="round"
+                        opacity="0.90"
+                      />
+                    )}
                   </svg>
                 )}
                 {/* Phase A 마커 (기존 유지) */}
@@ -486,9 +500,11 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
 
 export default function YeosuMapSelector({ selectedPlaces, onTogglePlace, onClose }) {
   const [activeZone, setActiveZone] = useState(null);
-  // QA Preview — import.meta.env.DEV에서만 활성화. 프로덕션 빌드에서 false로 dead-code 제거됨.
-  // 로컬: ?qa_preview=boundary 파라미터 추가 시 PROVISIONAL 경계 표시.
-  const isQAPreview = import.meta.env.DEV &&
+  // QA Preview — localhost에서만 활성화. Express가 빌드된 dist를 서빙하므로
+  // import.meta.env.DEV는 항상 false → hostname 체크로 대체.
+  // Production(app.dailymiracles.kr)는 hostname이 달라 절대 활성화되지 않음.
+  const isQAPreview =
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') &&
     new URLSearchParams(window.location.search).get('qa_preview') === 'boundary';
 
   return (
