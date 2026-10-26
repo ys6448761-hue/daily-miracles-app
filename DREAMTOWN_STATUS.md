@@ -24,12 +24,15 @@ Last Updated: 2026-10-25
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
 
 **여수 지역별 탐색 V0.1 — Founder 오동도 마커 위치 확인 대기**
+- **MAP_V01_BROWSER_ASSET_VERIFIED** ✅ (2026-10-26) — SHA `e97b4c7`
+  - 원인: `app.use('/images', 404)` (line 296)이 `static(dtFrontendPath)` 보다 먼저 차단
+  - 수정: `/images/muyojeong` 전용 라우트를 `/images/soul` 패턴과 동일하게 추가
+  - 검증: overview 200 image/png ✅ / oldtown 200 image/png ✅
 - **MAP_V01_PHASE_A_PREVIEW_READY** ✅ (2026-10-26) — SHA `72bd8bc`
   - 오동도 마커 1개(PROVISIONAL): oldtown 이미지 x:0.87, y:0.28 흰 점
   - padding-top 64.32% 비율 컨테이너: 종횡비 보존 → objectFit:fill → 크롭 없음
-  - 마커 클릭 → isSelectablePlace() 통과 → toggleRoutePlace (TG_READY 게이팅 재사용)
-  - MEDIUM/NONE 마커: getMarkersForImage HIGH-only 게이트로 자동 제외
-  - 로컬 확인: `localhost:5000/muyojeong` → 지역별 보기 → 원도심 해안권 → 오동도 마커
+  - 마커 클릭 → isSelectablePlace() → toggleRoutePlace (TG_READY 게이팅 재사용)
+  - 로컬 확인: `localhost:5000/muyojeong` → 지역별 보기 → 원도심 → 지도+오동도 점
   - **Founder 위치 확인 전 VERIFIED 승격 금지**
 - **MAP_V01_MARKER_PLAN_READY** ✅ (2026-10-26) — SHA `3f2c049`
 - **MAP_V01_IMAGE_BINDING_READY** ✅ (2026-10-26) — SHA `03b18f0`
