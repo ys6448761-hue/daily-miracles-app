@@ -49,7 +49,7 @@ export const YEOSU_PLACES = [
     status: 'tg_ready', coordVerified: true,
     // Phase A 마커 — 시각 검증 기준, PROVISIONAL (Founder 위치 확인 대기)
     // 출처: MAP-V01-MARKER-PLAN.md §2-1 (HIGH confidence — 등대+방파제 명확 식별)
-    // Zone 2 소속 → Zone 1 oldtown 상세 지도에서 마커 제외됨 (YeosuMapSelector zone 필터)
+    // Zone 2 소속 → Zone 1 상세 지도에서 zone 필터로 제외 / Zone 2 상세 지도에서 표시됨
     markerPos: {
       oldtown: { x: 0.87, y: 0.28, confidence: 'HIGH', status: 'PROVISIONAL' },
     },
@@ -119,9 +119,9 @@ export const YEOSU_ZONES = [
   },
   {
     id: 2, name_ko: '오동도·엑스포권', color: '#B8F4FF',
-    hasDetailMap: false,
+    hasDetailMap: true, // oldtown 이미지 재사용 (FOUNDER_ZONE2_DETAIL_MAP_REUSE_APPROVED)
     boundingBox: { minLat: 34.740, maxLat: 34.775, minLng: 127.745, maxLng: 127.780 },
-    boundary: { imageId: 'yeosu-overview-v01', points: null, status: 'UNVERIFIED', source: null },
+    boundary: { imageId: 'yeosu-oldtown-v01', points: null, status: 'UNVERIFIED', source: null },
   },
   {
     id: 3, name_ko: '돌산권', color: '#FFD67A',
