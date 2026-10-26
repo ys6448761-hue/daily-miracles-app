@@ -24,6 +24,16 @@ Last Updated: 2026-10-25
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
 
 **여수 지역별 탐색 V0.1 — Boundary Scaffold 완료 → Founder 경계 좌표 검수 대기**
+- **MAP_V01_ZONE2_DETAIL_MAP_CORRECTED** ✅ (2026-10-26) SHA `5be807f`
+  - Zone 2 hasDetailMap: true / boundary.imageId: yeosu-oldtown-v01 (FOUNDER_ZONE2_DETAIL_MAP_REUSE_APPROVED)
+  - 오동도 마커(zone=2) → Zone 2 ZoneDetail에서 zone 필터로 자동 표시
+  - Zone 1 oldtown 유지 / Zone 3~7 overview 유지
+- **MAP_V01_ZONE1_BOUNDARY_PROVISIONAL_READY** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-ZONE1-BOUNDARY-PROVISIONAL.md`
+  - 이미지별 역할 분리: overview/oldtown 독립 좌표계
+  - Zone 1 지리 범위 분석 (확정 5곳 기준)
+  - PROVISIONAL 폴리곤 추정 (overview용, 고불확실도 — Founder 보정 필요)
+  - B-1a~B-3 Founder 확인 항목 정의
+  - **현재 코드 변경 없음** (status: UNVERIFIED 유지, 사용자 화면 변화 없음)
 - **MAP_V01_ZONE_DETAIL_PREVIEW_READY** ✅ (2026-10-26) SHA `6d51f72`
   - Zone 2~7 ZoneDetail 진입 시 overview 이미지 미리보기 추가 (Fix-A)
   - height:200px + CSS aspectRatio:1206/1304 → width 자동 ~185px → 비율 보존·크롭 없음
@@ -54,8 +64,9 @@ Last Updated: 2026-10-25
 - **Production 미배포** ← 브랜치: `docs/pr133-state-sync`
 
 **남은 작업:**
-- Founder → `localhost:5100/muyojeong` 지역별 보기 → 돌산권 선택 → overview 이미지 표시 확인
-- Founder → Zone별 경계 범위 시각 확인 → points 인코딩 → PROVISIONAL → 검수 → VERIFIED
+- Founder → `localhost:5100/muyojeong` → Zone 2 오동도·엑스포권 선택 → oldtown 이미지 + 오동도 마커 확인
+- Founder → §5 PROVISIONAL 폴리곤(overview, Zone 1) 시각 확인 → 위치 보정 피드백
+- Founder B-1a~B-3 확인 → 좌표 정밀화 → PROVISIONAL 적용 → 검수 → VERIFIED 승격
 - PR #134 merge 승인 → Production 반영
 
 **이전 Current Next Action (2026-10-26 이전):**

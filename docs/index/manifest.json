@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-26T05:21:18.809Z",
+  "generated_at": "2026-10-26T06:04:10.823Z",
   "generator": "generate-manifest.js",
-  "total_count": 487,
+  "total_count": 488,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3090,6 +3090,22 @@
       "title": "MAP V0.1 권역 정합성 확인 — Founder 15곳 ↔ Inventory 대조",
       "created_at": "2026-10-26",
       "checksum": "dabe224c"
+    },
+    {
+      "id": "DOC-MAP-V01-ZONE1-BOUNDARY-PROVISI",
+      "path": "docs/knowledge/MAP-V01-ZONE1-BOUNDARY-PROVISIONAL.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "|------",
+      "title": "MAP V0.1 — Zone 1 Boundary PROVISIONAL 시안",
+      "created_at": "2026-10-26",
+      "checksum": "a45b5456"
     },
     {
       "id": "DOC-Change_Log",
