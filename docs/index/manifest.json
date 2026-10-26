@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-26T06:12:28.066Z",
+  "generated_at": "2026-10-26T06:21:35.422Z",
   "generator": "generate-manifest.js",
-  "total_count": 489,
+  "total_count": 490,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3010,6 +3010,22 @@
       "title": "MAP V0.1 마커 설계 문서",
       "created_at": "2026-10-26",
       "checksum": "5e306fe0"
+    },
+    {
+      "id": "DOC-MAP-V01-OLDTOWN-BOUNDARY-OVERL",
+      "path": "docs/knowledge/MAP-V01-OLDTOWN-BOUNDARY-OVERLAY-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "MAP V0.1 — Oldtown Boundary Overlay Evidence",
+      "created_at": "2026-10-26",
+      "checksum": "c33e13fa"
     },
     {
       "id": "DOC-MAP-V01-OLDTOWN-BOUNDARY-VISUA",

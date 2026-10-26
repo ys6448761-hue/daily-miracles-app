@@ -23,7 +23,15 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
 
-**여수 지역별 탐색 V0.1 — Oldtown 이미지 경계 시각 QA 문서 완료 → Founder 검수 대기**
+**여수 지역별 탐색 V0.1 — Oldtown 경계 오버레이 이미지 완료 → Founder F-1~F-7 검수 대기**
+- **MAP_V01_OLDTOWN_BOUNDARY_OVERLAY_READY** ✅ (2026-10-26)
+  - `docs/knowledge/MAP-V01-OLDTOWN-BOUNDARY-OVERLAY.png` — Founder 검수용 이미지
+  - Zone 1(청록 점선)·Zone 2(주황 점선) PROVISIONAL 경계 + 장소 마커 동시 표시
+  - GPS 확인 장소(파란 원) / 충돌 가능(노란 원) / 미검증 추정(회색 원) / 기준점(금색★)
+  - ⚠ 엑스포공원·스카이타워가 Zone 1/2 분리선 서쪽에 표시 — 경계 재조정 필요 가능성
+  - Evidence: `docs/knowledge/MAP-V01-OLDTOWN-BOUNDARY-OVERLAY-EVIDENCE.md`
+  - F-1~F-7 Founder 검수 항목 정의
+  - 코드 변경 없음 / status:UNVERIFIED 유지 / 원본 PNG 미변경
 - **MAP_V01_OLDTOWN_BOUNDARY_VISUAL_QA_READY** ✅ (2026-10-26)
   - `docs/knowledge/MAP-V01-OLDTOWN-BOUNDARY-VISUAL-QA.md`
   - oldtown 이미지(1564×1006) 기준 Zone 1·2 장소 추정 좌표 + PROVISIONAL 경계 후보
