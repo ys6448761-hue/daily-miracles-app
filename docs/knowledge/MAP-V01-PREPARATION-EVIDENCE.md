@@ -61,24 +61,36 @@
 
 **Vite 경로 주의**: 브라우저 URL `/images/soul/place-hero/cablecar.png` → `dreamtown-frontend/public/images/soul/place-hero/cablecar.png`
 
-### 지도 배경 이미지 — ASSET_MISSING
+### 지도 배경 이미지 — ASSET_PATH_VERIFIED (2026-10-26)
 
-| 파일 | 상태 | 비고 |
+| 파일 | 상태 | 경로 |
 |------|------|------|
-| `dreamtown-frontend/public/images/muyojeong/map/` 디렉토리 | **미존재** | |
-| `yeosu-overview-v1.png` (전체 권역 지도) | **미존재** | Founder 제공 필요 |
-| `zone-wondomsim-v1.png` (원도심 확대) | **미존재** | Founder 제공 필요 |
+| `yeosu-overview-v01.png` (전체 권역 지도) | ✅ 복사 완료 | `dreamtown-frontend/public/images/muyojeong/map/` |
+| `yeosu-oldtown-v01.png` (원도심 확대 지도) | ✅ 복사 완료 | `dreamtown-frontend/public/images/muyojeong/map/` |
+| `dreamtown-frontend/dist/images/muyojeong/map/` | ✅ 빌드 반영 | Vite build 후 dist/ 자동 복사 확인 |
+
+**원본 보존**: `client/public/images/dreamtown/maps/` — 삭제하지 않음
+
+**URL 접근 경로**:
+- `/images/muyojeong/map/yeosu-overview-v01.png` → Express line 3612 → `dreamtown-frontend/dist/images/muyojeong/map/yeosu-overview-v01.png`
+- `/images/muyojeong/map/yeosu-oldtown-v01.png` → 동일 경로
+
+**파일명 비교 (계획 vs 실제)**:
+| 계획 (Evidence §4 원안) | 실제 Founder 파일명 | 의미 |
+|---|---|---|
+| `yeosu-overview-v1.png` | `yeosu-overview-v01.png` | 버전 표기 차이 (`v1` → `v01`) |
+| `zone-wondomsim-v1.png` | `yeosu-oldtown-v01.png` | 원도심 확대 지도 (oldtown=원도심) |
 
 ---
 
 ## §4 이미지 사양 요구서 (Founder 제공용)
 
-### 4-1. 여수 전체 지도 (`yeosu-overview-v1.png`)
+### 4-1. 여수 전체 지도 (`yeosu-overview-v01.png`)
 
 | 항목 | 사양 |
 |------|------|
-| 파일명 | `yeosu-overview-v1.png` |
-| 저장 경로 | `dreamtown-frontend/public/images/muyojeong/map/` |
+| 파일명 | `yeosu-overview-v01.png` ← **Founder 저장 파일명 (v01)** |
+| 저장 경로 | `dreamtown-frontend/public/images/muyojeong/map/` ✅ 복사 완료 (2026-10-26) |
 | 권장 크기 | 750×950px (1배율) / 1500×1900px (2배율 @2x 권장) |
 | 포맷 | PNG 또는 WebP |
 | 배경 | 투명 또는 단색 (마커 오버레이 고려) |
@@ -99,12 +111,12 @@
 
 ---
 
-### 4-2. 원도심 확대 지도 (`zone-wondomsim-v1.png`)
+### 4-2. 원도심 확대 지도 (`yeosu-oldtown-v01.png`)
 
 | 항목 | 사양 |
 |------|------|
-| 파일명 | `zone-wondomsim-v1.png` |
-| 저장 경로 | `dreamtown-frontend/public/images/muyojeong/map/` |
+| 파일명 | `yeosu-oldtown-v01.png` ← **Founder 저장 파일명 (v01, oldtown=원도심)** |
+| 저장 경로 | `dreamtown-frontend/public/images/muyojeong/map/` ✅ 복사 완료 (2026-10-26) |
 | 권장 크기 | 750×750px (1배율) / 1500×1500px (2배율) |
 | 권역 bounding box | lat 34.730~34.765, lng 127.725~127.760 (추정, Founder 확인 필요) |
 | 포함 장소 표시 기준점 | 이순신광장·하멜등대·낭만포차·오동도·케이블카·자산공원·해양공원·엑스포공원·스카이타워 |
@@ -155,10 +167,18 @@
 ## §7 판정
 
 ```
-MAP_V01_PREPARATION_READY
+MAP_V01_PREPARATION_READY (2026-10-26 최초)
+ASSET_PATH_VERIFIED       (2026-10-26 업데이트)
 ```
 
-- 코드 구조 (yeosuMapData.js + YeosuMapSelector.jsx + MuyojeongHomePage EXTEND) 즉시 착수 가능
-- 지도 배경 이미지 ASSET_MISSING → 완성된 서비스 배포 불가 (이미지 수령 후 마운트)
-- 여수 수산시장 UV-2 유지 → placeholder 마커로 구현, 좌표 확정 후 교체
-- Production 배포 / DB 변경 금지 유지
+| 항목 | 상태 |
+|------|------|
+| 코드 구조 (yeosuMapData.js + YeosuMapSelector.jsx + MuyojeongHomePage EXTEND) | ✅ SHA `240374a` |
+| 지도 배경 이미지 경로 | ✅ `dreamtown-frontend/public/images/muyojeong/map/` 복사 완료 |
+| Vite build dist/ 반영 | ✅ 확인 완료 |
+| 원본 보존 (`client/public/images/dreamtown/maps/`) | ✅ 삭제 없음 |
+| 여수 수산시장 UV-2 | 🟡 유지 (좌표 미검증, placeholder) |
+| Production 배포 | ❌ 금지 유지 |
+| DB/Schema 변경 | ❌ 없음 |
+
+**다음 단계**: 지리적 정합성 검증 + 마커 캘리브레이션 (별도 단계)

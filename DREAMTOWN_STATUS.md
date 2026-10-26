@@ -30,8 +30,12 @@ Last Updated: 2026-10-25
   - `MuyojeongHomePage.jsx` EXTEND: "지역별 보기" 토글 + mapMode 상태
   - 빌드: ✅ 698 modules / 회귀: 563/564 PASS (R20 PRE-EXISTING)
   - 고소동 좌표 VERIFIED: 34.7389997, 127.7411688 / 수산시장 UV-2 유지
+- **ASSET_PATH_VERIFIED** ✅ (2026-10-26) — 이미지 2개 `dreamtown-frontend/public/images/muyojeong/map/` 복사 완료
+  - `yeosu-overview-v01.png` / `yeosu-oldtown-v01.png` → Vite build dist/ 반영 확인
+  - 원본 보존: `client/public/images/dreamtown/maps/` (삭제 없음)
+  - URL: `/images/muyojeong/map/yeosu-overview-v01.png` (Express line 3612 경유)
 - **남은 Blocker**:
-  - 지도 배경 이미지 ASSET_MISSING — Founder 제공 필요 (§4 이미지 사양: `MAP-V01-PREPARATION-EVIDENCE.md`)
+  - 지리적 정합성 검증 + 마커 캘리브레이션 (별도 단계)
   - 여수 수산시장 UV-2 — 좌표 미검증 (placeholder 처리됨)
 - **MAP_V01_PREPARATION_READY** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-PREPARATION-EVIDENCE.md`
 - **MAP_V01_DECISION_SHEET: FOUNDER_APPROVED** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-DECISION-SHEET.md`
