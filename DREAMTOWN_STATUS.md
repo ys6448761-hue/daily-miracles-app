@@ -23,23 +23,24 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
 
-**여수 지역별 탐색 V0.1 — Founder 지정 15곳 정합성 확인 완료, FC-1~5 결정 대기**
+**여수 지역별 탐색 V0.1 — FC 구현 완료. Founder Preview 확인 + PR merge 대기**
+- **MAP_V01_FC_IMPLEMENTATION_READY** ✅ (2026-10-26) SHA `63bd640`
+  - Inventory: 35→42 (신규 7개 EXPLORER, 종포해양공원 Zone 2→1)
+  - Zone 1 (8곳 표시, TG_READY 4): 이순신광장·낭만포차·하멜등대·고소동·수산시장·**진남관·오포대·종포해양공원**
+  - Zone 2 (11곳 표시, TG_READY 5): 오동도·케이블카·엑스포공원·스카이타워·자산공원·아쿠아플라넷·유월드루지·**엑스포역·바닷길·만성리·오션크루즈**
+  - Zone 3 (5곳, TG_READY 2): 돌산대교·돌산공원·무슬목·갓장터·**돌산탑승장**
+  - Zone 4~7: 변경 없음
+  - SOUL gate: EXPLORER leaking PASS (0건) / TG_READY 12개 보존
+  - YeosuMapSelector.jsx: `markers.filter(m => m.zone === zone.id)` — Zone별 마커 필터
+  - 빌드 698 modules ✅ / 회귀 615/616 PASS (R20 PRE-EXISTING)
+  - **미검증 (마커 미표시)**: 진남관·오포대·엑스포역·엑스포바닷길·만성리·오션크루즈·돌산탑승장
+  - **Production 미배포** ← 브랜치: `docs/pr133-state-sync`
 - **ZONE_FOUNDER_LIST_RECONCILED** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-ZONE-RECONCILIATION.md`
-  - Founder 원도심 8곳 / 오동도·엑스포 7곳 ↔ Inventory 35개 전수 대조 완료
-  - EXISTING_MATCH 7곳 / ALIAS_MATCH 1곳 / ZONE_MISMATCH 1곳 / INVENTORY_MISSING 5곳
-  - **이전 최종안 수정**: 돌산대교 Zone 3→1 취소 (Founder 목록에 없음). Zone 3 유지.
-  - 즉시 승인 가능: 종포해양공원 Zone 2→1 **1개만**
-  - INVENTORY_MISSING: 진남관·오포대(원도심) / 엑스포역·만성리·오션크루즈(오동도·엑스포)
-  - **현재 UI 권역 데이터 변경 없음 — FC-1~5 결정 후 구현**
-- **DREAMTOWN_ZONE_FINAL_PROPOSAL_READY** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-ZONE-FINAL-PROPOSAL.md`
 - **MAP_V01_BROWSER_ASSET_VERIFIED** ✅ (2026-10-26) — SHA `e97b4c7`
 
-**Founder 결정 필요 (5개 — `MAP-V01-ZONE-RECONCILIATION.md §10`):**
-- FC-1: 진남관 TG 상태 (TG_READY or EXPLORER)
-- FC-2: 오포대 TG 상태 (EXPLORER or VERIFY)
-- FC-3: 케이블카 `cablecar` = "자산탑승장" alias 확인? or 분리?
-- FC-4: 엑스포 바닷길 = `yeosu_expo_park` alias? or 별도 code?
-- FC-5: 여수엑스포역·만성리해수욕장·여수오션크루즈 추가 여부 + TG 상태
+**남은 작업:**
+- Founder Preview: `localhost:5100/muyojeong` → 지역별 보기 → Zone 1(8곳) / Zone 2(11곳) 확인
+- PR #134 merge 승인 → Production 반영
 
 **이전 Current Next Action (2026-10-26 이전):**
 **여수 지역별 탐색 V0.1 — Founder 오동도 마커 위치 확인 대기**
