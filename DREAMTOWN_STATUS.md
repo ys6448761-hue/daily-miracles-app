@@ -23,13 +23,15 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
 
-**여수 지역별 탐색 V0.1 — Boundary 설계 READY → Founder B-1~B-4 확인 대기**
+**여수 지역별 탐색 V0.1 — Boundary Scaffold 완료 → Founder 경계 좌표 검수 대기**
+- **MAP_V01_BOUNDARY_SCAFFOLD_READY** ✅ (2026-10-26) SHA `58b7bbc`
+  - `boundary{imageId/points/status/source}` 7개 Zone 전체 추가 (전체 UNVERIFIED)
+  - SVG 오버레이: viewBox="0 0 1 1" / preserveAspectRatio="none" / pointerEvents="none"
+  - padding-top 108.13% 컨테이너 + objectFit:fill → 좌표 정합 보장
+  - VERIFIED+points>=3 조건 미충족 → 현재 사용자 화면 경계선 미표시 ✅
+  - 카드 hover: border/bg 약한 강조 추가 (desktop)
+  - Evidence: `docs/knowledge/MAP-V01-BOUNDARY-SCAFFOLD-EVIDENCE.md`
 - **MAP_V01_BOUNDARY_DESIGN_READY** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-BOUNDARY-DESIGN.md`
-  - overview(1206×1304, ratio 1.0813) + oldtown(1564×1006, ratio 0.6432) 해상도 확인
-  - Zone 1·2·3 경계 표현 HIGH 가능 / Zone 4·6·7 이미지 범위 밖 가능성 HIGH
-  - SVG 설계: `viewBox="0 0 1 1"` + padding-top 비율 컨테이너 → 모바일 반응형 ✅
-  - `boundaryPoly: [{x, y}...]` 구조 확정 → Founder 경계 확인 후 인코딩
-  - **Founder 확인 필요 B-1~B-4**: overview 이미지 내 권역 범위·경계·스타일
 - **MAP_V01_GEO_2_ZONE_5_APPLIED** ✅ (2026-10-26) SHA `fcd1e28`
   - settler_cactus: Zone 6(화양)→5(소호·장도). 법인주소=소라면 논골안길 20-9.
   - Zone 5: 5→6곳 / Zone 6: 6→5곳 (예상값 일치)
@@ -49,7 +51,7 @@ Last Updated: 2026-10-25
 - **Production 미배포** ← 브랜치: `docs/pr133-state-sync`
 
 **남은 작업:**
-- Founder B-1~B-4 확인 → boundaryPoly 인코딩 → SVG 구현
+- Founder → overview 이미지에서 Zone 1·2·3 경계 범위 시각 확인 → points 인코딩 → PROVISIONAL → 검수 → VERIFIED
 - PR #134 merge 승인 → Production 반영
 
 **이전 Current Next Action (2026-10-26 이전):**

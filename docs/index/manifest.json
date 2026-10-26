@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-26T05:01:12.233Z",
+  "generated_at": "2026-10-26T05:21:18.809Z",
   "generator": "generate-manifest.js",
-  "total_count": 486,
+  "total_count": 487,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2946,6 +2946,22 @@
       "title": "MAP V0.1 — Zone Boundary 설계 검토",
       "created_at": "2026-10-26",
       "checksum": "f56cdb61"
+    },
+    {
+      "id": "DOC-MAP-V01-BOUNDARY-SCAFFOLD-EVID",
+      "path": "docs/knowledge/MAP-V01-BOUNDARY-SCAFFOLD-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "MAP V0.1 — Zone Boundary Scaffold Evidence",
+      "created_at": "2026-10-26",
+      "checksum": "69f6710d"
     },
     {
       "id": "DOC-MAP-V01-DECISION-SHEET",
