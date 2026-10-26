@@ -23,20 +23,27 @@ Last Updated: 2026-10-27
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**여수 지역별 탐색 V0.1 — 마커 안전성 검증 완료 → Founder 브라우저 검수 대기**
+**SOUL 차량 여행 안내 개선 검토 — Founder Decision 대기**
+- **SOUL_VEHICLE_GUIDANCE_REVIEW_READY** ✅ (2026-10-26)
+  - Evidence: `docs/knowledge/SOUL-VEHICLE-GUIDANCE-REVIEW-V0_1.md`
+  - 코드·엔진·API·DB 변경 없음 / CAR GOVERNANCE_HOLD 유지
+  - **현재 잘 작동**: 케이블카 PSQ roundtrip_ko+parking_ko / 돌산공원 C-3 보충 / Companion+차량 chip
+  - **공백 (data만으로 개선 가능)**:
+    - 향일암 parking_ko=null → 차량 여행자 주차 안내 없음 (데이터 수집 필요)
+    - 오동도 parking_ko=null → 방파제 구조·주차 확인 필요
+  - **공백 (소규모 코드 변경 필요, Founder Decision 대기)**:
+    - 향일암 차량 쿼리 시 routes_ko(등반 경로) 미연결
+    - 케이블카 탑승장 선택 기준이 특정 질문 없이 미노출
+    - JOURNEY_CONTINUITY carNote — 탑승장/동선 안내 없음
+  - **제안 Follow-up 1개**: 케이블카+오동도 계획 시 자산역 탑승장 안내 next_option 추가 여부 → Founder Decision 필요
+
+**MAP 마커 안전성 검증 완료**
 - **MAP_V01_MARKER_SAFETY_VERIFIED** ✅ (2026-10-27)
   - 단위 테스트 24/24 PASS (`tests/unit/mapMarkerSafety.test.js`)
-  - PROVISIONAL 마커 일반 화면 숨김: `null` 반환 ✅
-  - PROVISIONAL 마커 클릭 차단: `onTogglePlace` 0회 호출 ✅
-  - EXPLORER/FERRY/TG_EXCLUDED SOUL 누출 0건 ✅
-  - 토글 3-step (선택→해제→재선택) ✅
+  - PROVISIONAL 마커 숨김 / 클릭 차단 / SOUL 누출 0건 코드 레벨 검증
   - Evidence: `docs/knowledge/MAP-V01-TOGGLE-MARKER-QA-FIX-EVIDENCE.md` §6
-
-- **[이전] SOUL_VEHICLE_GUIDANCE_REVIEW_READY** ✅ (2026-10-26)
-  - Evidence: `docs/knowledge/SOUL-VEHICLE-GUIDANCE-REVIEW-V0_1.md`
-  - 코드 변경 없음 / SOUL 엔진 변경 없음 / CAR GOVERNANCE_HOLD 유지
-  - 주요 갭: 향일암·오동도 parking_ko 없음 / 케이블카 탑승장 선택 기준 미노출 / 향일암 routes_ko 차량 쿼리 미연결
-  - 제안 Follow-up 1개: "케이블카 + 오동도 → 자산역 탑승장 안내" (next_option 추가 여부 Founder Decision 필요)
+  - 브라우저 검수(Founder): 일반 화면 마커 미표시 / 버튼 토글 / QA Preview 반투명 마커
+  - Phase B: 오동도 위치 확인 → 좌표 정밀화 → VERIFIED → 마커-버튼 토글 활성화
 
 **여수 지역별 탐색 V0.1 — 토글·마커 QA Fix → Founder 브라우저 검수 대기**
 - **MAP_V01_TOGGLE_AND_MARKER_QA_FIXED** ✅ (2026-10-27)
