@@ -23,19 +23,20 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
 
-**여수 지역별 탐색 V0.1 — Founder 지도 이미지 제공 → 배경 바인딩 착수**
+**여수 지역별 탐색 V0.1 — bounding box 캘리브레이션 대기**
+- **MAP_V01_IMAGE_BINDING_READY** ✅ (2026-10-26) — YeosuMapSelector.jsx 이미지 바인딩 완료
+  - overview 이미지: 전역 지도 권역 목록 상단 표시
+  - oldtown 이미지: 원도심 권역(Zone 1, `hasDetailMap:true`) 진입 시 표시
+  - onError fallback: 이미지 로딩 실패 시 기존 카드 UI 자동 대체
+  - 마커 미표시 유지 (`GEO_CALIBRATION_PENDING`)
+  - 빌드: ✅ 698 modules / 회귀: ✅ 587/588 PASS (R20 PRE-EXISTING)
+- **지리 정합성 검증 완료** (2026-10-26) — `docs/knowledge/MAP-V01-PREPARATION-EVIDENCE.md §8`
+  - 오동도 등대 + 방파제: VERIFIED (oldtown) / 돌산도·원도심: APPROXIMATE / 이순신광장·이순신대교: NOT_COVERED
+  - 이미지는 일러스트 스타일 → 좌표 기반 마커 오버레이에 캘리브레이션 필수
 - **MAP_V01_UI_STRUCTURE_READY** ✅ (2026-10-26) — SHA `240374a`
-  - `yeosuMapData.js`: 35개 장소 + 7개 권역 데이터 (OI-MAP-1~5 반영)
-  - `YeosuMapSelector.jsx`: 권역 카드 → 장소 목록 탐색 (fallback div 모드)
-  - `MuyojeongHomePage.jsx` EXTEND: "지역별 보기" 토글 + mapMode 상태
-  - 빌드: ✅ 698 modules / 회귀: 563/564 PASS (R20 PRE-EXISTING)
-  - 고소동 좌표 VERIFIED: 34.7389997, 127.7411688 / 수산시장 UV-2 유지
-- **ASSET_PATH_VERIFIED** ✅ (2026-10-26) — 이미지 2개 `dreamtown-frontend/public/images/muyojeong/map/` 복사 완료
-  - `yeosu-overview-v01.png` / `yeosu-oldtown-v01.png` → Vite build dist/ 반영 확인
-  - 원본 보존: `client/public/images/dreamtown/maps/` (삭제 없음)
-  - URL: `/images/muyojeong/map/yeosu-overview-v01.png` (Express line 3612 경유)
+- **ASSET_PATH_VERIFIED** ✅ (2026-10-26) — SHA `8ad8ba2`
 - **남은 Blocker**:
-  - 지리적 정합성 검증 + 마커 캘리브레이션 (별도 단계)
+  - 이미지 4모서리 bounding box 좌표 Founder 제공 → pixel↔coord 캘리브레이션
   - 여수 수산시장 UV-2 — 좌표 미검증 (placeholder 처리됨)
 - **MAP_V01_PREPARATION_READY** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-PREPARATION-EVIDENCE.md`
 - **MAP_V01_DECISION_SHEET: FOUNDER_APPROVED** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-DECISION-SHEET.md`

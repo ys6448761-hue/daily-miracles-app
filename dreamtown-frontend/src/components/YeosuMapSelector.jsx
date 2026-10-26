@@ -1,10 +1,12 @@
 /**
  * YeosuMapSelector — 여수 지역별 장소 탐색 V0.1
  *
- * V0.1 구현: 지도 배경 이미지 없는 fallback div 모드
+ * V0.1 구현: 지도 배경 이미지 바인딩 + fallback div 모드
  *   - 7개 권역 카드 → 권역 장소 목록 → 장소 선택
- *   - 지도 배경(ASSET_MISSING): 권역 색상 카드로 대체
- *   - 이미지 바인딩은 Founder 이미지 제공 후 V0.2에서 추가
+ *   - overview 이미지: 전체 권역 시각 참조 (마커 미표시 — GEO_CALIBRATION_PENDING)
+ *   - oldtown 이미지: 원도심 권역(hasDetailMap=true) 진입 시 표시
+ *   - 이미지 로딩 실패 시 기존 카드 UI로 자동 대체
+ *   - 좌표 기반 마커: 캘리브레이션 완료 후 별도 단계에서 추가
  *
  * 선택 가능 상태:
  *   TG_READY     — 선택 가능 (routePlaces 공유)
@@ -34,13 +36,34 @@ const STATUS_BADGE = {
   [MAP_STATUS.FERRY]:         { label: '⛴ 배편 필요', color: 'rgba(200,200,220,0.70)', bg: 'rgba(200,200,220,0.08)' },
 };
 
+const OVERVIEW_IMG  = '/images/muyojeong/map/yeosu-overview-v01.png';
+const OLDTOWN_IMG   = '/images/muyojeong/map/yeosu-oldtown-v01.png';
+
 function ZoneOverview({ onSelectZone }) {
+  const [imgError, setImgError] = useState(false);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      {/* ASSET_MISSING 안내 */}
-      <p style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.28)', textAlign: 'center', padding: '4px 0 8px' }}>
-        지도 이미지 준비 중 — 권역 카드로 탐색하세요
-      </p>
+      {/* 여수 전역 지도 이미지 — 마커 미표시 (GEO_CALIBRATION_PENDING) */}
+      {!imgError ? (
+        <img
+          src={OVERVIEW_IMG}
+          alt="여수 전역 지도"
+          onError={() => setImgError(true)}
+          style={{
+            width: '100%',
+            maxHeight: '260px',
+            objectFit: 'cover',
+            objectPosition: 'top',
+            borderRadius: '10px',
+            display: 'block',
+          }}
+        />
+      ) : (
+        <p style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.28)', textAlign: 'center', padding: '4px 0 8px' }}>
+          지도 이미지를 불러올 수 없어요 — 권역 카드로 탐색하세요
+        </p>
+      )}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
         {YEOSU_ZONES.map(zone => {
           const count = countTgReadyByZone(zone.id);
@@ -89,8 +112,9 @@ function ZoneOverview({ onSelectZone }) {
 }
 
 function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack }) {
-  const zone  = YEOSU_ZONES.find(z => z.id === zoneId);
+  const zone   = YEOSU_ZONES.find(z => z.id === zoneId);
   const places = getPlacesByZone(zoneId);
+  const [imgError, setImgError] = useState(false);
 
   if (!zone) return null;
 
@@ -123,6 +147,23 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack }) {
         <p style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.35)', margin: 0, wordBreak: 'keep-all' }}>
           {zone.note}
         </p>
+      )}
+
+      {/* 원도심 확대 지도 — hasDetailMap=true 권역만 표시 (마커 미표시, GEO_CALIBRATION_PENDING) */}
+      {zone.hasDetailMap && !imgError && (
+        <img
+          src={OLDTOWN_IMG}
+          alt={`${zone.name_ko} 지도`}
+          onError={() => setImgError(true)}
+          style={{
+            width: '100%',
+            maxHeight: '200px',
+            objectFit: 'cover',
+            objectPosition: 'center',
+            borderRadius: '10px',
+            display: 'block',
+          }}
+        />
       )}
 
       {/* 배편 필수 안내 */}

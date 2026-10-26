@@ -157,28 +157,57 @@
 |----|------|------|------|
 | UV-1 | 고소동 천사벽화골목 lat/lng | **RESOLVED** ✅ | 34.7389997, 127.7411688 (NAVER 마커) |
 | UV-2 | 여수 수산시장 lat/lng | 🟡 유지 | placeholder 처리 + Founder Kakao Geocoding 권고 |
-| UV-3 | 권역 bounding box 경계값 | 추정값 사용 | 이미지 제공 후 Founder 육안 확인 |
-| UV-4 | 배경 일러스트 ↔ 마커 정합성 | ASSET_MISSING | 이미지 제공 후 확인 |
+| UV-3 | 권역 bounding box 경계값 | 🟡 캘리브레이션 대기 | 이미지 바인딩 완료 — pixel↔coord 변환 별도 단계 |
+| UV-4 | 배경 일러스트 ↔ 마커 정합성 | 🟡 GEO_CALIBRATION_PENDING | 마커 미표시 유지 (좌표 기반 오버레이 보류) |
 | UV-5 | 검증 필요 14개 장소 운영·예약 | V0.2 이후 | |
 | UV-6 | 배편 현행 시간표 | V0.2 이후 | |
+
+---
+
+## §8 지리 정합성 검증 결과 (2026-10-26)
+
+이미지 규격:
+- `yeosu-overview-v01.png`: 1206 × 1304 px (세로형, 일러스트)
+- `yeosu-oldtown-v01.png`: 1564 × 1006 px (가로형, 일러스트)
+
+| 항목 | overview | oldtown | 판정 |
+|------|---------|---------|------|
+| 여수 본토 + 원도심 도시 격자 | 상단 격자 확인 | 좌측 격자 확인 | APPROXIMATE |
+| 오동도 (등대 + 방파제) | 우상단 pier 구조 | 우측 등대 섬 + 방파제 명확 | VERIFIED (oldtown) |
+| 돌산도 + 돌산대교 | 중앙 남북 반도 확인 | 하단 교량 연결 확인 | APPROXIMATE |
+| 엑스포 부두·해양공원 | 우상단 부두 구조 | 우상단 Expo 부두 | APPROXIMATE |
+| 이순신광장 | 도시 내부 — 식별 불명확 | 도시 내부 — 식별 불명확 | NOT_COVERED |
+| 이순신대교 (광양 방면) | 좌상단 — 불명확 | 미포함 | NOT_COVERED |
+| 화양반도·여자만 | 미포함 | 미포함 | NOT_COVERED |
+| 섬섬길 (배편 섬 군집) | 하단 소규모 섬 군집 | 미포함 | APPROXIMATE |
+
+**결론:**
+- 두 이미지 모두 일러스트 스타일 (위성 사진 아님)
+- 전체 지형 배치는 여수 해안선과 APPROXIMATE 일치 — 시각 참조 역할 수행 가능
+- 좌표-픽셀 변환 없이 정확한 마커 오버레이 불가 → **마커 미표시 유지**
+- 캘리브레이션: 이미지 bounding box 4개 모서리 좌표 Founder 제공 후 진행
 
 ---
 
 ## §7 판정
 
 ```
-MAP_V01_PREPARATION_READY (2026-10-26 최초)
-ASSET_PATH_VERIFIED       (2026-10-26 업데이트)
+MAP_V01_PREPARATION_READY  (2026-10-26 최초)
+ASSET_PATH_VERIFIED        (2026-10-26)
+MAP_V01_IMAGE_BINDING_READY (2026-10-26 업데이트)
 ```
 
 | 항목 | 상태 |
 |------|------|
 | 코드 구조 (yeosuMapData.js + YeosuMapSelector.jsx + MuyojeongHomePage EXTEND) | ✅ SHA `240374a` |
-| 지도 배경 이미지 경로 | ✅ `dreamtown-frontend/public/images/muyojeong/map/` 복사 완료 |
-| Vite build dist/ 반영 | ✅ 확인 완료 |
-| 원본 보존 (`client/public/images/dreamtown/maps/`) | ✅ 삭제 없음 |
+| 지도 배경 이미지 경로 | ✅ `dreamtown-frontend/public/images/muyojeong/map/` |
+| 이미지 바인딩 | ✅ overview(전역) + oldtown(원도심 권역 진입 시) |
+| 이미지 로딩 실패 fallback | ✅ onError → 카드 UI 유지 |
+| 마커 오버레이 | ⏸ GEO_CALIBRATION_PENDING — 좌표 기반 마커 미표시 |
+| Vite build | ✅ 698 modules, 오류 없음 |
+| 회귀 테스트 | ✅ 587/588 PASS (R20 PRE-EXISTING 제외) |
 | 여수 수산시장 UV-2 | 🟡 유지 (좌표 미검증, placeholder) |
 | Production 배포 | ❌ 금지 유지 |
 | DB/Schema 변경 | ❌ 없음 |
 
-**다음 단계**: 지리적 정합성 검증 + 마커 캘리브레이션 (별도 단계)
+**다음 단계**: bounding box 4모서리 좌표 → pixel↔coord 캘리브레이션 → 마커 오버레이 (별도 단계)
