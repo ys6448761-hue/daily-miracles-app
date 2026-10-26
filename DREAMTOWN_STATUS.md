@@ -24,12 +24,15 @@ Last Updated: 2026-10-25
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
 
 **여수 지역별 탐색 V0.1 — Boundary Scaffold 완료 → Founder 경계 좌표 검수 대기**
+- **MAP_V01_ZONE_DETAIL_PREVIEW_READY** ✅ (2026-10-26) SHA `6d51f72`
+  - Zone 2~7 ZoneDetail 진입 시 overview 이미지 미리보기 추가 (Fix-A)
+  - height:200px + CSS aspectRatio:1206/1304 → width 자동 ~185px → 비율 보존·크롭 없음
+  - objectFit:fill + SVG viewBox="0 0 1 1" → 동일 좌표계 / pointerEvents:none
+  - VERIFIED boundary → 금빛 점선 표시 / UNVERIFIED → 이미지만 (현재 전체 UNVERIFIED)
+  - Zone 1 oldtown 지도 + Phase A 마커 기존 동작 완전 유지
 - **MAP_V01_BOUNDARY_SCAFFOLD_READY** ✅ (2026-10-26) SHA `58b7bbc`
   - `boundary{imageId/points/status/source}` 7개 Zone 전체 추가 (전체 UNVERIFIED)
-  - SVG 오버레이: viewBox="0 0 1 1" / preserveAspectRatio="none" / pointerEvents="none"
-  - padding-top 108.13% 컨테이너 + objectFit:fill → 좌표 정합 보장
-  - VERIFIED+points>=3 조건 미충족 → 현재 사용자 화면 경계선 미표시 ✅
-  - 카드 hover: border/bg 약한 강조 추가 (desktop)
+  - ZoneOverview SVG 오버레이 + 카드 hover 강조 구현
   - Evidence: `docs/knowledge/MAP-V01-BOUNDARY-SCAFFOLD-EVIDENCE.md`
 - **MAP_V01_BOUNDARY_DESIGN_READY** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-BOUNDARY-DESIGN.md`
 - **MAP_V01_GEO_2_ZONE_5_APPLIED** ✅ (2026-10-26) SHA `fcd1e28`
@@ -51,7 +54,8 @@ Last Updated: 2026-10-25
 - **Production 미배포** ← 브랜치: `docs/pr133-state-sync`
 
 **남은 작업:**
-- Founder → overview 이미지에서 Zone 1·2·3 경계 범위 시각 확인 → points 인코딩 → PROVISIONAL → 검수 → VERIFIED
+- Founder → `localhost:5100/muyojeong` 지역별 보기 → 돌산권 선택 → overview 이미지 표시 확인
+- Founder → Zone별 경계 범위 시각 확인 → points 인코딩 → PROVISIONAL → 검수 → VERIFIED
 - PR #134 merge 승인 → Production 반영
 
 **이전 Current Next Action (2026-10-26 이전):**
