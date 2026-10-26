@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-25
+Last Updated: 2026-10-26
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -22,6 +22,15 @@ Last Updated: 2026-10-25
 ```
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
+
+**SOUL Vehicle Guidance Review V0.1 완료 → Founder 검토 대기**
+- **SOUL_VEHICLE_GUIDANCE_REVIEW_READY** ✅ (2026-10-26)
+  - Evidence: `docs/knowledge/SOUL-VEHICLE-GUIDANCE-REVIEW-V0_1.md`
+  - 코드 변경 없음 / SOUL 엔진 변경 없음 / CAR GOVERNANCE_HOLD 유지
+  - 주요 갭: 향일암·오동도 parking_ko 없음 / 케이블카 탑승장 선택 기준 미노출 / 향일암 routes_ko 차량 쿼리 미연결
+  - 현재 잘 작동: 케이블카 PSQ roundtrip_ko+parking_ko / 돌산공원 C-3 주차 보충 / Companion+차량 chip
+  - 제안 Follow-up 1개: "케이블카 + 오동도 → 자산역 탑승장 안내" (next_option 추가 여부 Founder Decision 필요)
+  - 코드 변경 없이 가능한 개선: 향일암·오동도 parking 데이터 수집 후 DB 업데이트
 
 **여수 지역별 탐색 V0.1 — Zone 2 경계 수정 완료 → Founder SE boundary 확인 대기**
 - **MAP_V01_ZONE2_BOUNDARY_CORRECTION_READY** ✅ (2026-10-26)
