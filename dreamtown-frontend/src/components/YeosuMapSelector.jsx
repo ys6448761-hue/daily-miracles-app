@@ -174,6 +174,13 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack }) {
   const zone   = YEOSU_ZONES.find(z => z.id === zoneId);
   const places = getPlacesByZone(zoneId);
   const [imgError, setImgError] = useState(false);
+  const [overviewImgError, setOverviewImgError] = useState(false);
+  // Zone 2~7 overview 미리보기용 — Zone 1은 oldtown(hasDetailMap) 사용
+  const zoneBoundary = !zone?.hasDetailMap ? getZoneBoundary(zoneId) : null;
+  const showZoneBoundary =
+    zoneBoundary?.status === 'VERIFIED' &&
+    Array.isArray(zoneBoundary.points) &&
+    zoneBoundary.points.length >= 3;
 
   if (!zone) return null;
 
@@ -208,64 +215,109 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack }) {
         </p>
       )}
 
-      {/* 원도심 확대 지도 — hasDetailMap=true 권역만 표시 */}
-      {/* Phase A 마커: oldtown 이미지 내 HIGH confidence 장소만 (PROVISIONAL) */}
-      {zone.hasDetailMap && !imgError && (() => {
-        const markers = getMarkersForImage('oldtown');
-        // padding-top 비율 컨테이너: 이미지 종횡비(1006/1564≈64.32%) 보존
-        // height = 64.32% of width → objectFit:fill 크롭 없음 → 마커 x%/y% 정확 대응
-        // 모바일 350px 기준: 높이 ≈ 225px
-        return (
-          <div style={{ position: 'relative', width: '100%', paddingTop: '64.32%', borderRadius: '10px', overflow: 'hidden' }}>
-            <img
-              src={OLDTOWN_IMG}
-              alt={`${zone.name_ko} 지도`}
-              onError={() => setImgError(true)}
-              style={{
-                position: 'absolute', top: 0, left: 0,
-                width: '100%', height: '100%',
-                objectFit: 'fill',  // 컨테이너가 이미 정확한 비율 → fill로 크롭 없음
-                display: 'block',
-              }}
-            />
-            {/* Zone 필터: 현재 권역 장소만 표시 (타 Zone 마커 혼입 방지) */}
-            {markers.filter(m => m.zone === zone.id).map(m => {
-              const mp = m.markerPos.oldtown;
-              const selected = selectedPlaces.some(p => p.code === m.code);
-              const selectable = isSelectablePlace(m);
-              return (
-                <div
-                  key={m.code}
-                  onClick={() => selectable && onTogglePlace({ code: m.code, name: m.name_ko })}
-                  role={selectable ? 'button' : undefined}
-                  aria-label={selectable ? `${m.name_ko} 선택` : m.name_ko}
-                  aria-pressed={selectable ? selected : undefined}
-                  title={m.name_ko}
-                  style={{
-                    position: 'absolute',
-                    left: `${mp.x * 100}%`,
-                    top: `${mp.y * 100}%`,
-                    transform: 'translate(-50%, -50%)',
-                    // 터치 영역 확보 (28px²), 시각 점은 내부 div로 분리
-                    padding: '8px',
-                    cursor: selectable ? 'pointer' : 'default',
-                  }}
-                >
-                  <div style={{
-                    width: '12px',
-                    height: '12px',
-                    borderRadius: '50%',
-                    background: selected ? '#FFD67A' : 'rgba(255,255,255,0.92)',
-                    border: `2px solid ${selected ? '#b8900a' : 'rgba(0,0,0,0.32)'}`,
-                    boxShadow: '0 1px 5px rgba(0,0,0,0.45)',
-                    transition: 'background 0.15s, border-color 0.15s',
-                  }} />
-                </div>
-              );
-            })}
+      {zone.hasDetailMap ? (
+        /* Zone 1 — oldtown 확대 지도 + Phase A 마커 (기존 유지) */
+        !imgError && (() => {
+          const markers = getMarkersForImage('oldtown');
+          return (
+            <div style={{ position: 'relative', width: '100%', paddingTop: '64.32%', borderRadius: '10px', overflow: 'hidden' }}>
+              <img
+                src={OLDTOWN_IMG}
+                alt={`${zone.name_ko} 지도`}
+                onError={() => setImgError(true)}
+                style={{
+                  position: 'absolute', top: 0, left: 0,
+                  width: '100%', height: '100%',
+                  objectFit: 'fill',
+                  display: 'block',
+                }}
+              />
+              {markers.filter(m => m.zone === zone.id).map(m => {
+                const mp = m.markerPos.oldtown;
+                const selected = selectedPlaces.some(p => p.code === m.code);
+                const selectable = isSelectablePlace(m);
+                return (
+                  <div
+                    key={m.code}
+                    onClick={() => selectable && onTogglePlace({ code: m.code, name: m.name_ko })}
+                    role={selectable ? 'button' : undefined}
+                    aria-label={selectable ? `${m.name_ko} 선택` : m.name_ko}
+                    aria-pressed={selectable ? selected : undefined}
+                    title={m.name_ko}
+                    style={{
+                      position: 'absolute',
+                      left: `${mp.x * 100}%`,
+                      top: `${mp.y * 100}%`,
+                      transform: 'translate(-50%, -50%)',
+                      padding: '8px',
+                      cursor: selectable ? 'pointer' : 'default',
+                    }}
+                  >
+                    <div style={{
+                      width: '12px', height: '12px', borderRadius: '50%',
+                      background: selected ? '#FFD67A' : 'rgba(255,255,255,0.92)',
+                      border: `2px solid ${selected ? '#b8900a' : 'rgba(0,0,0,0.32)'}`,
+                      boxShadow: '0 1px 5px rgba(0,0,0,0.45)',
+                      transition: 'background 0.15s, border-color 0.15s',
+                    }} />
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()
+      ) : (
+        /* Zone 2~7 — overview 지도 미리보기 + VERIFIED 경계선 (현재 전체 UNVERIFIED) */
+        /* height:200px + aspectRatio → width 자동 계산(≈185px) → 비율 보존·크롭 없음 */
+        /* objectFit:fill + SVG viewBox="0 0 1 1" → 동일 좌표계 보장 */
+        !overviewImgError && (
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{
+              position: 'relative',
+              height: '200px',
+              aspectRatio: '1206 / 1304',
+              borderRadius: '10px',
+              overflow: 'hidden',
+              flexShrink: 0,
+            }}>
+              <img
+                src={OVERVIEW_IMG}
+                alt={`여수 지도 — ${zone.name_ko}`}
+                onError={() => setOverviewImgError(true)}
+                style={{
+                  position: 'absolute', top: 0, left: 0,
+                  width: '100%', height: '100%',
+                  objectFit: 'fill',
+                  display: 'block',
+                }}
+              />
+              {/* SVG 경계선 — VERIFIED + points >= 3 시에만 표시 */}
+              <svg
+                style={{
+                  position: 'absolute', top: 0, left: 0,
+                  width: '100%', height: '100%',
+                  pointerEvents: 'none',
+                }}
+                viewBox="0 0 1 1"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                {showZoneBoundary && (
+                  <polygon
+                    points={zoneBoundary.points.map(p => `${p.x},${p.y}`).join(' ')}
+                    fill={`${zone.color}18`}
+                    stroke={zone.color}
+                    strokeWidth="0.008"
+                    strokeDasharray="0.020 0.010"
+                    strokeLinejoin="round"
+                    opacity="0.85"
+                  />
+                )}
+              </svg>
+            </div>
           </div>
-        );
-      })()}
+        )
+      )}
 
       {/* 배편 필수 안내 */}
       {zoneId === 7 && (
