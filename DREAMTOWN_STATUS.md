@@ -23,27 +23,26 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
 
-**여수 지역별 탐색 V0.1 — Geographic QA HOLD: GEO-1~4 Founder 주소 확인 대기**
-- **MAP_V01_GEOGRAPHIC_QA_HOLD** (2026-10-26) — `docs/knowledge/MAP-V01-GEOGRAPHIC-QA-CONFLICT.md`
-  - 유월드루지 Zone 2→5 ✅ SHA `4e6afd7` (소호 관광단지 지리 정합)
-  - 충돌 4건 보류: nk_submarine(돌산도 소재 미확인) / settler_cactus·artland·bonghwangsan(화양면 소재)
-  - **Founder 결정 필요 GEO-1~4**: 각 장소 실제 주소 확인 후 Zone 3 이동 or Zone 유지 결정
+**여수 지역별 탐색 V0.1 — Geographic QA 완료 (GEO-2 HOLD 잔여) → PR #134 merge 또는 Preview 확인**
+- **MAP_V01_FOUNDER_ADDRESS_EVIDENCE_APPLIED** (2026-10-26) SHA `4f8d411`
+  - GEO-4 bonghwangsan: Zone 6→3 ✅ (돌산읍 대복길 160 Founder 주소 확인)
+  - GEO-1 nk_submarine: Zone 5→3 ✅ (Founder 판단 유지)
+  - GEO-3 artland_resort: Zone 6→3 ✅ (Founder 판단 유지)
+  - **GEO-2 서틀러다육식물원: Zone 6 HOLD** — 법인주소=소라면, 실제 방문지 미확인. 이동 금지.
+  - Zone 3 돌산권: 5→8곳 / Zone 5 소호·장도: 6→5곳 / Zone 6 화양: 8→6곳
+  - TG_READY 12개 불변 / 전체 42개 불변 / 빌드 698 modules / 615/616 PASS
+- **MAP_V01_GEOGRAPHIC_QA_HOLD** → **APPLIED (4/5건 완료, GEO-2 유지)**
+  - Evidence: `docs/knowledge/MAP-V01-GEOGRAPHIC-QA-CONFLICT.md`
 - **MAP_V01_FC_IMPLEMENTATION_READY** ✅ (2026-10-26) SHA `63bd640`
-  - Inventory: 35→42 (신규 7개 EXPLORER, 종포해양공원 Zone 2→1)
-  - Zone 1 (8곳 표시, TG_READY 4): 이순신광장·낭만포차·하멜등대·고소동·수산시장·**진남관·오포대·종포해양공원**
-  - Zone 2 (11곳 표시, TG_READY 5): 오동도·케이블카·엑스포공원·스카이타워·자산공원·아쿠아플라넷·유월드루지·**엑스포역·바닷길·만성리·오션크루즈**
-  - Zone 3 (5곳, TG_READY 2): 돌산대교·돌산공원·무슬목·갓장터·**돌산탑승장**
+  - Zone 1 (8곳, TG_READY 4): 이순신광장·낭만포차·하멜등대·고소동·수산시장·진남관·오포대·종포해양공원
+  - Zone 2 (10곳, TG_READY 5): 오동도·케이블카·엑스포공원·스카이타워·자산공원·아쿠아플라넷·엑스포역·바닷길·만성리·오션크루즈
+  - Zone 3 (8곳, TG_READY 2): 돌산대교·돌산공원·무슬목·갓장터·돌산탑승장·**nk_submarine·bonghwangsan·artland_resort**
   - Zone 4~7: 변경 없음
-  - SOUL gate: EXPLORER leaking PASS (0건) / TG_READY 12개 보존
-  - YeosuMapSelector.jsx: `markers.filter(m => m.zone === zone.id)` — Zone별 마커 필터
-  - 빌드 698 modules ✅ / 회귀 615/616 PASS (R20 PRE-EXISTING)
-  - **미검증 (마커 미표시)**: 진남관·오포대·엑스포역·엑스포바닷길·만성리·오션크루즈·돌산탑승장
   - **Production 미배포** ← 브랜치: `docs/pr133-state-sync`
-- **ZONE_FOUNDER_LIST_RECONCILED** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-ZONE-RECONCILIATION.md`
-- **MAP_V01_BROWSER_ASSET_VERIFIED** ✅ (2026-10-26) — SHA `e97b4c7`
+- **ZONE_FOUNDER_LIST_RECONCILED** ✅ / **MAP_V01_BROWSER_ASSET_VERIFIED** ✅
 
 **남은 작업:**
-- Founder Preview: `localhost:5100/muyojeong` → 지역별 보기 → Zone 1(8곳) / Zone 2(11곳) 확인
+- GEO-2: 서틀러다육식물원 실제 방문지 주소 확인 (Founder) → Zone 5 소라면 or Zone 6 유지 결정
 - PR #134 merge 승인 → Production 반영
 
 **이전 Current Next Action (2026-10-26 이전):**
