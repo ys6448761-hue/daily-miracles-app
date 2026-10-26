@@ -32,7 +32,22 @@ Last Updated: 2026-10-26
   - 제안 Follow-up 1개: "케이블카 + 오동도 → 자산역 탑승장 안내" (next_option 추가 여부 Founder Decision 필요)
   - 코드 변경 없이 가능한 개선: 향일암·오동도 parking 데이터 수집 후 DB 업데이트
 
-**여수 지역별 탐색 V0.1 — Zone 2 경계 확장 + 마커 토글 완료 → Founder 검수 대기**
+**여수 지역별 탐색 V0.1 — 토글·마커 QA Fix → Founder 브라우저 검수 대기**
+- **MAP_V01_TOGGLE_AND_MARKER_QA_FIXED** ✅ (2026-10-27)
+  - **근본 원인 1**: PROVISIONAL 마커가 일반 화면에 표시됨 — `status` 검사 누락
+  - **근본 원인 2**: 오동도 마커(0.87,0.28) ≠ 이미지 실제 위치(추정 0.91,0.24)
+  - **수정**: `!isVerified && !isQAPreview → return null` — PROVISIONAL 마커 숨김
+  - **수정**: `pointerEvents: isVerified ? undefined : 'none'` — PROVISIONAL 클릭 차단
+  - 빌드 ✅ 698 modules / 회귀 615/616 PASS (R20 PRE-EXISTING)
+  - Evidence: `docs/knowledge/MAP-V01-TOGGLE-MARKER-QA-FIX-EVIDENCE.md`
+  - **Founder 브라우저 검수 필요**:
+    - 일반 화면: 지도 마커 미표시 확인
+    - 버튼 클릭 → 선택/해제 정상 확인
+    - `?qa_preview=boundary` → Zone 2: 반투명 주황 마커(클릭 불가) 확인
+  - **Phase B**: Founder 오동도 위치 확인 → 좌표 정밀화 → VERIFIED → 마커-버튼 토글 활성화
+- **MAP_V01_ZONE2_BOUNDARY_AND_MARKER_TOGGLE_READY** ✅ (2026-10-26)
+  - **INTERACTION_QA_FAILED → 수정 완료 → 브라우저 검수 대기**
+- **여수 지역별 탐색 V0.1 — Zone 2 경계 확장 + 마커 토글 완료 → Founder 검수 대기**
 - **MAP_V01_ZONE2_BOUNDARY_AND_MARKER_TOGGLE_READY** ✅ (2026-10-26)
   - Zone 2 NW: (0.47,0.30) → (0.47,0.10) — 여수엑스포역 방향 북측 확장
   - 여수엑스포역 QA 마커 좌표: (0.490,0.320) → (0.570,0.080) (시각 재추정)
