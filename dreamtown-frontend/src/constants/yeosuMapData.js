@@ -104,46 +104,58 @@ export const YEOSU_PLACES = [
 
 // 7개 권역 정의 (OI-MAP-3 Founder 승인)
 // boundingBox: 마커 픽셀 변환용 추정값 — Founder 이미지 제공 후 캘리브레이션 필요 (UV-3)
+// boundary: SVG 경계선 오버레이 데이터 (BOUNDARY_SCAFFOLD_READY 2026-10-26)
+//   imageId  — 기준 이미지 파일명(확장자 제외)
+//   points   — 이미지 상대 좌표 [{x:0~1, y:0~1}...] 반시계 or 시계 방향. Founder 검수 후 인코딩.
+//   status   — UNVERIFIED | PROVISIONAL | VERIFIED. VERIFIED만 실제 렌더링.
+//   source   — 좌표 작성 근거
 export const YEOSU_ZONES = [
   {
     id: 1, name_ko: '원도심 해안권', color: '#6EB8FF',
-    hasDetailMap: true, // 원도심: V0.1 상세 지도 우선 (OI-MAP-3)
+    hasDetailMap: true,
     boundingBox: { minLat: 34.730, maxLat: 34.765, minLng: 127.725, maxLng: 127.760 },
+    boundary: { imageId: 'yeosu-overview-v01', points: null, status: 'UNVERIFIED', source: null },
     note: '이순신대교·여객선터미널·하멜등대 포함',
   },
   {
     id: 2, name_ko: '오동도·엑스포권', color: '#B8F4FF',
     hasDetailMap: false,
     boundingBox: { minLat: 34.740, maxLat: 34.775, minLng: 127.745, maxLng: 127.780 },
+    boundary: { imageId: 'yeosu-overview-v01', points: null, status: 'UNVERIFIED', source: null },
   },
   {
     id: 3, name_ko: '돌산권', color: '#FFD67A',
     hasDetailMap: false,
     boundingBox: { minLat: 34.720, maxLat: 34.750, minLng: 127.740, maxLng: 127.760 },
+    boundary: { imageId: 'yeosu-overview-v01', points: null, status: 'UNVERIFIED', source: null },
     note: '돌산대교 도보 접근 가능',
   },
   {
     id: 4, name_ko: '향일암권', color: '#FF9BAF',
     hasDetailMap: false,
     boundingBox: { minLat: 34.580, maxLat: 34.610, minLng: 127.790, maxLng: 127.820 },
+    boundary: { imageId: 'yeosu-overview-v01', points: null, status: 'UNVERIFIED', source: null },
     note: '일출 명소. 이른 아침 방문 권장',
   },
   {
     id: 5, name_ko: '소호·장도권', color: '#A8E6CF',
     hasDetailMap: false,
-    boundingBox: null, // 미검증
+    boundingBox: null,
+    boundary: { imageId: 'yeosu-overview-v01', points: null, status: 'UNVERIFIED', source: null },
     note: '소호동동다리·장도(예술의 섬) 포함',
   },
   {
     id: 6, name_ko: '화양·여자만권', color: '#D4A8FF',
     hasDetailMap: false,
-    boundingBox: null, // 미검증
+    boundingBox: null,
+    boundary: { imageId: 'yeosu-overview-v01', points: null, status: 'UNVERIFIED', source: null },
     note: '일몰·갯벌 명소. 차량 이동 권장',
   },
   {
     id: 7, name_ko: '섬섬길 (배편 필수)', color: '#888899',
     hasDetailMap: false,
-    boundingBox: null, // 미검증
+    boundingBox: null,
+    boundary: { imageId: 'yeosu-overview-v01', points: null, status: 'UNVERIFIED', source: null },
     note: '백야선착장 출발. 운항 일정·물때 확인 필수',
   },
 ];
@@ -170,4 +182,10 @@ export function isSelectablePlace(place) {
 // 권역별 TG_READY 장소 수
 export function countTgReadyByZone(zoneId) {
   return YEOSU_PLACES.filter(p => p.zone === zoneId && p.status === MAP_STATUS.TG_READY).length;
+}
+
+// 권역 경계 데이터 반환 — SVG 오버레이 렌더링용
+// VERIFIED 상태 + points 존재 시에만 실제 표시
+export function getZoneBoundary(zoneId) {
+  return YEOSU_ZONES.find(z => z.id === zoneId)?.boundary ?? null;
 }

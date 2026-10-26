@@ -30,7 +30,12 @@ import {
   getMarkersForImage,
   isSelectablePlace,
   countTgReadyByZone,
+  getZoneBoundary,
 } from '../constants/yeosuMapData';
+
+// overview 이미지 aspect ratio: 1206×1304 → padding-top 108.13%
+// objectFit:fill + SVG viewBox="0 0 1 1" + preserveAspectRatio="none" 조합으로 좌표 정합
+const OVERVIEW_IMG_RATIO_PCT = ((1304 / 1206) * 100).toFixed(2); // "108.13"
 
 // 상태별 배지 표시 정의
 const STATUS_BADGE = {
@@ -44,24 +49,69 @@ const OLDTOWN_IMG   = '/images/muyojeong/map/yeosu-oldtown-v01.png';
 
 function ZoneOverview({ onSelectZone }) {
   const [imgError, setImgError] = useState(false);
+  // hoveredZoneId: 데스크탑 hover / 포커스 시 해당 권역 경계 미리보기 (VERIFIED 상태만 표시)
+  const [hoveredZoneId, setHoveredZoneId] = useState(null);
+
+  // VERIFIED + points 존재 시에만 SVG 렌더 — 현재 전체 UNVERIFIED이므로 사용자 화면 변화 없음
+  const boundary = hoveredZoneId ? getZoneBoundary(hoveredZoneId) : null;
+  const showBoundary =
+    boundary?.status === 'VERIFIED' &&
+    Array.isArray(boundary.points) &&
+    boundary.points.length >= 3;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      {/* 여수 전역 지도 이미지 — 마커 미표시 (GEO_CALIBRATION_PENDING) */}
+      {/* 여수 전역 지도 — padding-top 비율 컨테이너(108.13%) + SVG 경계 오버레이 */}
       {!imgError ? (
-        <img
-          src={OVERVIEW_IMG}
-          alt="여수 전역 지도"
-          onError={() => setImgError(true)}
+        <div
           style={{
+            position: 'relative',
             width: '100%',
-            maxHeight: '260px',
-            objectFit: 'cover',
-            objectPosition: 'top',
+            paddingTop: `${OVERVIEW_IMG_RATIO_PCT}%`,
             borderRadius: '10px',
-            display: 'block',
+            overflow: 'hidden',
           }}
-        />
+        >
+          <img
+            src={OVERVIEW_IMG}
+            alt="여수 전역 지도"
+            onError={() => setImgError(true)}
+            style={{
+              position: 'absolute', top: 0, left: 0,
+              width: '100%', height: '100%',
+              objectFit: 'fill',
+              display: 'block',
+            }}
+          />
+          {/* SVG 경계 오버레이 — VERIFIED boundary만 렌더 (현재 전체 UNVERIFIED) */}
+          {/* viewBox="0 0 1 1" + preserveAspectRatio="none" → objectFit:fill과 좌표 정합 */}
+          <svg
+            style={{
+              position: 'absolute', top: 0, left: 0,
+              width: '100%', height: '100%',
+              pointerEvents: 'none',
+            }}
+            viewBox="0 0 1 1"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            {showBoundary && (() => {
+              const zone = YEOSU_ZONES.find(z => z.id === hoveredZoneId);
+              if (!zone) return null;
+              return (
+                <polygon
+                  points={boundary.points.map(p => `${p.x},${p.y}`).join(' ')}
+                  fill={`${zone.color}18`}
+                  stroke={zone.color}
+                  strokeWidth="0.006"
+                  strokeDasharray="0.016 0.008"
+                  strokeLinejoin="round"
+                  opacity="0.85"
+                />
+              );
+            })()}
+          </svg>
+        </div>
       ) : (
         <p style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.28)', textAlign: 'center', padding: '4px 0 8px' }}>
           지도 이미지를 불러올 수 없어요 — 권역 카드로 탐색하세요
@@ -70,22 +120,28 @@ function ZoneOverview({ onSelectZone }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
         {YEOSU_ZONES.map(zone => {
           const count = countTgReadyByZone(zone.id);
+          const isHovered = hoveredZoneId === zone.id;
           return (
             <button
               key={zone.id}
               onClick={() => onSelectZone(zone.id)}
+              onMouseEnter={() => setHoveredZoneId(zone.id)}
+              onMouseLeave={() => setHoveredZoneId(null)}
+              onFocus={() => setHoveredZoneId(zone.id)}
+              onBlur={() => setHoveredZoneId(null)}
               aria-label={`${zone.name_ko} — 추천 가능 장소 ${count}곳`}
               style={{
                 padding: '14px 12px',
                 borderRadius: '12px',
-                background: `${zone.color}14`,
-                border: `1px solid ${zone.color}30`,
+                background: isHovered ? `${zone.color}20` : `${zone.color}14`,
+                border: `1px solid ${isHovered ? zone.color + '55' : zone.color + '30'}`,
                 textAlign: 'left',
                 cursor: 'pointer',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '6px',
                 minHeight: '72px',
+                transition: 'background 0.15s, border-color 0.15s',
               }}
             >
               <span
