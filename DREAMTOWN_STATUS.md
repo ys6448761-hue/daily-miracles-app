@@ -23,6 +23,18 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
 
+**여수 지역별 탐색 V0.1 — 권역 재설계 Founder 결정 대기 (FD-1~7)**
+- **DREAMTOWN_ZONE_DESIGN_REVIEW_READY** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-ZONE-DESIGN-REVIEW.md`
+  - 여수시청↔DreamTown 7개 권역 비교표 / 35개 장소 배치표 완료
+  - 추천안 A(7개 권역, Founder 8/7 반영) + 대안 B(6개 권역, 통합형)
+  - Founder 결정 필요: FD-1(원도심 8곳 구성) / FD-2(향일암 단독 유지?) / FD-3(케이블카 귀속) / FD-4(돌산대교 이동) / FD-5(소호·장도 가치) / FD-6(권역 수) / FD-7(종포해양공원 이동)
+  - **현재 UI 권역 데이터 변경 없음 — Founder 결정 후 구현**
+- **MAP_V01_BROWSER_ASSET_VERIFIED** ✅ (2026-10-26) — SHA `e97b4c7` (이미지 로딩 수정 완료)
+- **Founder 오동도 마커 위치 확인 대기** — PROVISIONAL x:0.87, y:0.28
+
+**Founder 결정 필요 (FD-1~7):** `docs/knowledge/MAP-V01-ZONE-DESIGN-REVIEW.md §8`
+
+**이전 Current Next Action (2026-10-26 이전):**
 **여수 지역별 탐색 V0.1 — Founder 오동도 마커 위치 확인 대기**
 - **MAP_V01_BROWSER_ASSET_VERIFIED** ✅ (2026-10-26) — SHA `e97b4c7`
   - 원인: `app.use('/images', 404)` (line 296)이 `static(dtFrontendPath)` 보다 먼저 차단

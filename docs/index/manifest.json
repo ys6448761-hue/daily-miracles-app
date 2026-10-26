@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-26T02:10:19.863Z",
+  "generated_at": "2026-10-26T02:54:36.702Z",
   "generator": "generate-manifest.js",
-  "total_count": 481,
+  "total_count": 482,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2994,6 +2994,22 @@
       "title": "여수 전역 관광지 Inventory — Map V0.1 설계 기초",
       "created_at": "2026-10-26",
       "checksum": "18c69daa"
+    },
+    {
+      "id": "DOC-MAP-V01-ZONE-DESIGN-REVIEW",
+      "path": "docs/knowledge/MAP-V01-ZONE-DESIGN-REVIEW.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "code",
+      "title": "MAP V0.1 권역 재설계 비교 검토",
+      "created_at": "2026-10-26",
+      "checksum": "d72c4026"
     },
     {
       "id": "DOC-Change_Log",
