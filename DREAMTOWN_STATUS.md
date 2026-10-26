@@ -23,16 +23,22 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
 
-**여수 지역별 탐색 V0.1 — 권역 재설계 Founder 결정 대기 (FD-1~7)**
-- **DREAMTOWN_ZONE_DESIGN_REVIEW_READY** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-ZONE-DESIGN-REVIEW.md`
-  - 여수시청↔DreamTown 7개 권역 비교표 / 35개 장소 배치표 완료
-  - 추천안 A(7개 권역, Founder 8/7 반영) + 대안 B(6개 권역, 통합형)
-  - Founder 결정 필요: FD-1(원도심 8곳 구성) / FD-2(향일암 단독 유지?) / FD-3(케이블카 귀속) / FD-4(돌산대교 이동) / FD-5(소호·장도 가치) / FD-6(권역 수) / FD-7(종포해양공원 이동)
+**여수 지역별 탐색 V0.1 — 권역 최종안 Founder 3개 확인 대기 (FD-A/B/C)**
+- **DREAMTOWN_ZONE_FINAL_PROPOSAL_READY** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-ZONE-FINAL-PROPOSAL.md`
+  - 최종 추천: 7개 권역 유지 / 종포해양공원 Zone 2→1 / 돌산대교 Zone 3→1 / 나머지 유지
+  - 원도심 **7곳** (지리 기반) — Founder 언급 "8곳"과 1곳 차이 (8번째=자산공원은 지리 충돌, 이동 불가)
+  - 오동도·엑스포 **7곳** ✅ (종포 이동 후 정확히 7곳)
+  - 케이블카 Zone 2 유지 / 향일암 Zone 4 단독 유지
+  - SOUL 변경 없음 — zone 필드 2개(marine_park, dolsan_daegyo)만 수정 필요
   - **현재 UI 권역 데이터 변경 없음 — Founder 결정 후 구현**
-- **MAP_V01_BROWSER_ASSET_VERIFIED** ✅ (2026-10-26) — SHA `e97b4c7` (이미지 로딩 수정 완료)
+- **DREAMTOWN_ZONE_DESIGN_REVIEW_READY** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-ZONE-DESIGN-REVIEW.md`
+- **MAP_V01_BROWSER_ASSET_VERIFIED** ✅ (2026-10-26) — SHA `e97b4c7`
 - **Founder 오동도 마커 위치 확인 대기** — PROVISIONAL x:0.87, y:0.28
 
-**Founder 결정 필요 (FD-1~7):** `docs/knowledge/MAP-V01-ZONE-DESIGN-REVIEW.md §8`
+**Founder 결정 필요 (3개):**
+- FD-A: 원도심 7곳 확정? (8번째 없음 — 지리 충돌) or 자산공원 포함해 8곳?
+- FD-B: Zone 3 돌산공원 단독 유지? or 향일암 통합해 "돌산도권"?
+- FD-C: Zone 2 오동도·엑스포 7곳 확정? ← 권고안 그대로
 
 **이전 Current Next Action (2026-10-26 이전):**
 **여수 지역별 탐색 V0.1 — Founder 오동도 마커 위치 확인 대기**
