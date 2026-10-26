@@ -23,7 +23,11 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
 
-**여수 지역별 탐색 V0.1 — FC 구현 완료. Founder Preview 확인 + PR merge 대기**
+**여수 지역별 탐색 V0.1 — Geographic QA HOLD: GEO-1~4 Founder 주소 확인 대기**
+- **MAP_V01_GEOGRAPHIC_QA_HOLD** (2026-10-26) — `docs/knowledge/MAP-V01-GEOGRAPHIC-QA-CONFLICT.md`
+  - 유월드루지 Zone 2→5 ✅ SHA `4e6afd7` (소호 관광단지 지리 정합)
+  - 충돌 4건 보류: nk_submarine(돌산도 소재 미확인) / settler_cactus·artland·bonghwangsan(화양면 소재)
+  - **Founder 결정 필요 GEO-1~4**: 각 장소 실제 주소 확인 후 Zone 3 이동 or Zone 유지 결정
 - **MAP_V01_FC_IMPLEMENTATION_READY** ✅ (2026-10-26) SHA `63bd640`
   - Inventory: 35→42 (신규 7개 EXPLORER, 종포해양공원 Zone 2→1)
   - Zone 1 (8곳 표시, TG_READY 4): 이순신광장·낭만포차·하멜등대·고소동·수산시장·**진남관·오포대·종포해양공원**
