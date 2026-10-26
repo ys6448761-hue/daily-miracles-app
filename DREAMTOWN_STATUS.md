@@ -23,18 +23,20 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
 
-**여수 지역별 탐색 V0.1 — Phase A 마커 구현 착수 가능**
-- **MAP_V01_MARKER_PLAN_READY** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-MARKER-PLAN.md`
-  - 이미지 상대 위치(%) 기반 마커 설계 완료 (lat/lng bounding box 불필요)
-  - Phase A: 오동도 HIGH(oldtown x:0.87, y:0.28) — 즉시 구현 가능
-  - Phase B: 엑스포공원·돌산대교(MEDIUM) — Founder 육안 확인 후
-  - Phase C: 나머지 장소 — 마커 미표시, 카드 탐색 유지
-  - 35↔SOUL13 게이팅 검증: 정상 ✅ (TG_READY만 routePlaces → SOUL API 전달)
+**여수 지역별 탐색 V0.1 — Founder 오동도 마커 위치 확인 대기**
+- **MAP_V01_PHASE_A_PREVIEW_READY** ✅ (2026-10-26) — SHA `72bd8bc`
+  - 오동도 마커 1개(PROVISIONAL): oldtown 이미지 x:0.87, y:0.28 흰 점
+  - padding-top 64.32% 비율 컨테이너: 종횡비 보존 → objectFit:fill → 크롭 없음
+  - 마커 클릭 → isSelectablePlace() 통과 → toggleRoutePlace (TG_READY 게이팅 재사용)
+  - MEDIUM/NONE 마커: getMarkersForImage HIGH-only 게이트로 자동 제외
+  - 로컬 확인: `localhost:5000/muyojeong` → 지역별 보기 → 원도심 해안권 → 오동도 마커
+  - **Founder 위치 확인 전 VERIFIED 승격 금지**
+- **MAP_V01_MARKER_PLAN_READY** ✅ (2026-10-26) — SHA `3f2c049`
 - **MAP_V01_IMAGE_BINDING_READY** ✅ (2026-10-26) — SHA `03b18f0`
 - **MAP_V01_UI_STRUCTURE_READY** ✅ (2026-10-26) — SHA `240374a`
 - **ASSET_PATH_VERIFIED** ✅ (2026-10-26) — SHA `8ad8ba2`
 - **남은 Blocker**:
-  - Phase A 마커 구현 (오동도 HIGH 1개) → Founder 위치 확인 → Phase B 확장
+  - Founder 오동도 마커 위치 확인 → Phase B(엑스포·돌산대교) 또는 위치 조정
   - 여수 수산시장 UV-2 — 좌표 미검증 (placeholder 처리됨)
 - **MAP_V01_PREPARATION_READY** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-PREPARATION-EVIDENCE.md`
 - **MAP_V01_DECISION_SHEET: FOUNDER_APPROVED** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-DECISION-SHEET.md`
@@ -120,10 +122,11 @@ Production SHA: `425a643` (맞춤 항로 V0.1, 2026-10-25).
 
 ```
 1. 이 섹션 읽기 (완료)
-2. docs/knowledge/MAP-V01-PREPARATION-EVIDENCE.md §3·§7 확인 (ASSET_PATH_VERIFIED)
-3. dreamtown-frontend/src/constants/yeosuMapData.js — 35개 장소 데이터 구조 파악
-4. dreamtown-frontend/src/components/YeosuMapSelector.jsx — UI 구조 파악
-5. 다음 작업: 지리적 정합성 검증 + 이미지 배경 바인딩 설계 (Guardian Preflight 발행 후 착수)
+2. docs/knowledge/MAP-V01-PREPARATION-EVIDENCE.md §7·§8 확인
+3. docs/knowledge/MAP-V01-MARKER-PLAN.md — Phase A~C 분류 및 35↔SOUL13 연결 확인
+4. dreamtown-frontend/src/constants/yeosuMapData.js — odongdo.markerPos 구조 파악
+5. dreamtown-frontend/src/components/YeosuMapSelector.jsx — ZoneDetail 마커 레이어 파악
+6. 다음 작업: Founder 오동도 마커 위치 확인 후 Phase B 진행
 ```
 
 ---
