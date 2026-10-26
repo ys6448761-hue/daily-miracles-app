@@ -31,6 +31,7 @@ import {
   isSelectablePlace,
   countTgReadyByZone,
   getZoneBoundary,
+  QA_OLDTOWN_POSITIONS,
 } from '../constants/yeosuMapData';
 
 // overview 이미지 aspect ratio: 1206×1304 → padding-top 108.13%
@@ -47,15 +48,15 @@ const STATUS_BADGE = {
 const OVERVIEW_IMG  = '/images/muyojeong/map/yeosu-overview-v01.png';
 const OLDTOWN_IMG   = '/images/muyojeong/map/yeosu-oldtown-v01.png';
 
-function ZoneOverview({ onSelectZone }) {
+function ZoneOverview({ onSelectZone, isQAPreview }) {
   const [imgError, setImgError] = useState(false);
   // hoveredZoneId: 데스크탑 hover / 포커스 시 해당 권역 경계 미리보기 (VERIFIED 상태만 표시)
   const [hoveredZoneId, setHoveredZoneId] = useState(null);
 
-  // VERIFIED + points 존재 시에만 SVG 렌더 — 현재 전체 UNVERIFIED이므로 사용자 화면 변화 없음
+  // VERIFIED + points 존재 시에만 SVG 렌더 — QA Preview 시 PROVISIONAL도 표시
   const boundary = hoveredZoneId ? getZoneBoundary(hoveredZoneId) : null;
   const showBoundary =
-    boundary?.status === 'VERIFIED' &&
+    (boundary?.status === 'VERIFIED' || (isQAPreview && boundary?.status === 'PROVISIONAL')) &&
     Array.isArray(boundary.points) &&
     boundary.points.length >= 3;
 
@@ -170,17 +171,26 @@ function ZoneOverview({ onSelectZone }) {
   );
 }
 
-function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack }) {
+function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview }) {
   const zone   = YEOSU_ZONES.find(z => z.id === zoneId);
   const places = getPlacesByZone(zoneId);
   const [imgError, setImgError] = useState(false);
   const [overviewImgError, setOverviewImgError] = useState(false);
-  // Zone 2~7 overview 미리보기용 — Zone 1은 oldtown(hasDetailMap) 사용
+  // Zone 3~7 overview 미리보기용 — Zone 1·2(hasDetailMap)는 oldtown 사용
   const zoneBoundary = !zone?.hasDetailMap ? getZoneBoundary(zoneId) : null;
   const showZoneBoundary =
-    zoneBoundary?.status === 'VERIFIED' &&
+    (zoneBoundary?.status === 'VERIFIED' || (isQAPreview && zoneBoundary?.status === 'PROVISIONAL')) &&
     Array.isArray(zoneBoundary.points) &&
     zoneBoundary.points.length >= 3;
+  // QA Preview: oldtown 이미지의 Zone 1·2 PROVISIONAL 경계 + 장소 마커
+  const oldtownBoundary = isQAPreview && zone?.hasDetailMap ? getZoneBoundary(zoneId) : null;
+  const showOldtownBoundary =
+    oldtownBoundary?.status === 'PROVISIONAL' &&
+    Array.isArray(oldtownBoundary.points) &&
+    oldtownBoundary.points.length >= 3;
+  const qaPlaces = isQAPreview && zone?.hasDetailMap
+    ? Object.entries(QA_OLDTOWN_POSITIONS).filter(([, p]) => p.zone === zoneId)
+    : [];
 
   if (!zone) return null;
 
@@ -216,54 +226,120 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack }) {
       )}
 
       {zone.hasDetailMap ? (
-        /* Zone 1 — oldtown 확대 지도 + Phase A 마커 (기존 유지) */
+        /* Zone 1·2 — oldtown 확대 지도 + Phase A 마커 (기존 유지) + QA Preview 경계 */
         !imgError && (() => {
           const markers = getMarkersForImage('oldtown');
           return (
-            <div style={{ position: 'relative', width: '100%', paddingTop: '64.32%', borderRadius: '10px', overflow: 'hidden' }}>
-              <img
-                src={OLDTOWN_IMG}
-                alt={`${zone.name_ko} 지도`}
-                onError={() => setImgError(true)}
-                style={{
-                  position: 'absolute', top: 0, left: 0,
-                  width: '100%', height: '100%',
-                  objectFit: 'fill',
-                  display: 'block',
-                }}
-              />
-              {markers.filter(m => m.zone === zone.id).map(m => {
-                const mp = m.markerPos.oldtown;
-                const selected = selectedPlaces.some(p => p.code === m.code);
-                const selectable = isSelectablePlace(m);
-                return (
+            <>
+              {/* QA Preview 배너 — DEV 환경 전용, 사용자 화면 미표시 */}
+              {isQAPreview && (
+                <div style={{
+                  padding: '6px 10px', borderRadius: '8px',
+                  background: 'rgba(255,160,0,0.15)', border: '1px solid rgba(255,160,0,0.40)',
+                  fontSize: '0.6875rem', color: 'rgba(255,200,80,0.90)',
+                  wordBreak: 'keep-all', lineHeight: 1.5,
+                }}>
+                  ⚠ 검수용 미확정 경계 — 로컬 개발환경 전용 / Founder 검수 전 미공개 / PROVISIONAL
+                </div>
+              )}
+              <div style={{ position: 'relative', width: '100%', paddingTop: '64.32%', borderRadius: '10px', overflow: 'hidden' }}>
+                <img
+                  src={OLDTOWN_IMG}
+                  alt={`${zone.name_ko} 지도`}
+                  onError={() => setImgError(true)}
+                  style={{
+                    position: 'absolute', top: 0, left: 0,
+                    width: '100%', height: '100%',
+                    objectFit: 'fill',
+                    display: 'block',
+                  }}
+                />
+                {/* QA Preview: PROVISIONAL 경계 SVG (DEV 전용 — 프로덕션 빌드에서 dead code) */}
+                {showOldtownBoundary && (
+                  <svg
+                    style={{
+                      position: 'absolute', top: 0, left: 0,
+                      width: '100%', height: '100%',
+                      pointerEvents: 'none',
+                    }}
+                    viewBox="0 0 1 1"
+                    preserveAspectRatio="none"
+                    aria-hidden="true"
+                  >
+                    <polygon
+                      points={oldtownBoundary.points.map(p => `${p.x},${p.y}`).join(' ')}
+                      fill={`${zone.color}18`}
+                      stroke={zone.color}
+                      strokeWidth="0.007"
+                      strokeDasharray="0.020 0.010"
+                      strokeLinejoin="round"
+                      opacity="0.90"
+                    />
+                  </svg>
+                )}
+                {/* Phase A 마커 (기존 유지) */}
+                {markers.filter(m => m.zone === zone.id).map(m => {
+                  const mp = m.markerPos.oldtown;
+                  const selected = selectedPlaces.some(p => p.code === m.code);
+                  const selectable = isSelectablePlace(m);
+                  return (
+                    <div
+                      key={m.code}
+                      onClick={() => selectable && onTogglePlace({ code: m.code, name: m.name_ko })}
+                      role={selectable ? 'button' : undefined}
+                      aria-label={selectable ? `${m.name_ko} 선택` : m.name_ko}
+                      aria-pressed={selectable ? selected : undefined}
+                      title={m.name_ko}
+                      style={{
+                        position: 'absolute',
+                        left: `${mp.x * 100}%`,
+                        top: `${mp.y * 100}%`,
+                        transform: 'translate(-50%, -50%)',
+                        padding: '8px',
+                        cursor: selectable ? 'pointer' : 'default',
+                      }}
+                    >
+                      <div style={{
+                        width: '12px', height: '12px', borderRadius: '50%',
+                        background: selected ? '#FFD67A' : 'rgba(255,255,255,0.92)',
+                        border: `2px solid ${selected ? '#b8900a' : 'rgba(0,0,0,0.32)'}`,
+                        boxShadow: '0 1px 5px rgba(0,0,0,0.45)',
+                        transition: 'background 0.15s, border-color 0.15s',
+                      }} />
+                    </div>
+                  );
+                })}
+                {/* QA Preview: 장소 기준점 마커 (DEV 전용) */}
+                {qaPlaces.map(([code, p]) => (
                   <div
-                    key={m.code}
-                    onClick={() => selectable && onTogglePlace({ code: m.code, name: m.name_ko })}
-                    role={selectable ? 'button' : undefined}
-                    aria-label={selectable ? `${m.name_ko} 선택` : m.name_ko}
-                    aria-pressed={selectable ? selected : undefined}
-                    title={m.name_ko}
+                    key={`qa-${code}`}
+                    title={`[QA] ${code}`}
                     style={{
                       position: 'absolute',
-                      left: `${mp.x * 100}%`,
-                      top: `${mp.y * 100}%`,
+                      left: `${p.x * 100}%`,
+                      top: `${p.y * 100}%`,
                       transform: 'translate(-50%, -50%)',
-                      padding: '8px',
-                      cursor: selectable ? 'pointer' : 'default',
+                      pointerEvents: 'none',
                     }}
                   >
                     <div style={{
-                      width: '12px', height: '12px', borderRadius: '50%',
-                      background: selected ? '#FFD67A' : 'rgba(255,255,255,0.92)',
-                      border: `2px solid ${selected ? '#b8900a' : 'rgba(0,0,0,0.32)'}`,
-                      boxShadow: '0 1px 5px rgba(0,0,0,0.45)',
-                      transition: 'background 0.15s, border-color 0.15s',
+                      width: p.anchor ? '16px' : '10px',
+                      height: p.anchor ? '16px' : '10px',
+                      borderRadius: '50%',
+                      background: p.anchor
+                        ? 'rgba(255,215,0,0.9)'
+                        : p.conflict
+                        ? 'rgba(255,160,0,0.85)'
+                        : p.confirmed
+                        ? 'rgba(80,200,255,0.80)'
+                        : 'rgba(200,200,200,0.60)',
+                      border: `2px solid ${p.anchor ? '#b8900a' : p.conflict ? '#cc6000' : p.confirmed ? '#0060aa' : '#888'}`,
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.5)',
                     }} />
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            </>
           );
         })()
       ) : (
@@ -410,12 +486,16 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack }) {
 
 export default function YeosuMapSelector({ selectedPlaces, onTogglePlace, onClose }) {
   const [activeZone, setActiveZone] = useState(null);
+  // QA Preview — import.meta.env.DEV에서만 활성화. 프로덕션 빌드에서 false로 dead-code 제거됨.
+  // 로컬: ?qa_preview=boundary 파라미터 추가 시 PROVISIONAL 경계 표시.
+  const isQAPreview = import.meta.env.DEV &&
+    new URLSearchParams(window.location.search).get('qa_preview') === 'boundary';
 
   return (
     <div
       style={{
         borderRadius: '16px',
-        border: '1px solid rgba(110,184,255,0.18)',
+        border: `1px solid ${isQAPreview ? 'rgba(255,160,0,0.35)' : 'rgba(110,184,255,0.18)'}`,
         background: 'rgba(110,184,255,0.04)',
         padding: '14px',
         display: 'flex', flexDirection: 'column', gap: '12px',
@@ -437,13 +517,14 @@ export default function YeosuMapSelector({ selectedPlaces, onTogglePlace, onClos
 
       {/* 내용 — 권역 개요 or 권역 상세 */}
       {activeZone === null ? (
-        <ZoneOverview onSelectZone={setActiveZone} />
+        <ZoneOverview onSelectZone={setActiveZone} isQAPreview={isQAPreview} />
       ) : (
         <ZoneDetail
           zoneId={activeZone}
           selectedPlaces={selectedPlaces}
           onTogglePlace={onTogglePlace}
           onBack={() => setActiveZone(null)}
+          isQAPreview={isQAPreview}
         />
       )}
     </div>

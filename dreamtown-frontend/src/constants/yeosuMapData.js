@@ -114,14 +114,40 @@ export const YEOSU_ZONES = [
     id: 1, name_ko: '원도심 해안권', color: '#6EB8FF',
     hasDetailMap: true,
     boundingBox: { minLat: 34.730, maxLat: 34.765, minLng: 127.725, maxLng: 127.760 },
-    boundary: { imageId: 'yeosu-overview-v01', points: null, status: 'UNVERIFIED', source: null },
+    // PROVISIONAL: oldtown 기준 좌표. 오동도(0.87,0.28) 단일 역산. Founder F-1~F-7 검수 전.
+    boundary: {
+      imageId: 'yeosu-oldtown-v01',
+      points: [
+        { x: 0.10, y: 0.38 }, // NW: 이순신광장 북서 항만
+        { x: 0.57, y: 0.38 }, // NE: 종포해양공원 북 (Zone 1/2 상단 경계)
+        { x: 0.60, y: 0.55 }, // E:  하멜등대·종포 동쪽
+        { x: 0.56, y: 0.76 }, // SE: 하멜등대 남동
+        { x: 0.28, y: 0.82 }, // S:  낭만포차거리 남측
+        { x: 0.10, y: 0.65 }, // SW: 이순신광장 남서 해안
+      ],
+      status: 'PROVISIONAL',
+      source: 'oldtown-boundary-overlay-2026-10-26 (odongdo single-ref)',
+    },
     note: '이순신대교·여객선터미널·하멜등대 포함',
   },
   {
     id: 2, name_ko: '오동도·엑스포권', color: '#B8F4FF',
     hasDetailMap: true, // oldtown 이미지 재사용 (FOUNDER_ZONE2_DETAIL_MAP_REUSE_APPROVED)
     boundingBox: { minLat: 34.740, maxLat: 34.775, minLng: 127.745, maxLng: 127.780 },
-    boundary: { imageId: 'yeosu-oldtown-v01', points: null, status: 'UNVERIFIED', source: null },
+    // PROVISIONAL: oldtown 기준 좌표. 오동도(0.87,0.28) CONFIRMED 기준점.
+    boundary: {
+      imageId: 'yeosu-oldtown-v01',
+      points: [
+        { x: 0.57, y: 0.38 }, // NW: Zone 1/2 상단 경계
+        { x: 0.90, y: 0.15 }, // NE: 오동도 북동
+        { x: 0.95, y: 0.45 }, // E:  이미지 오른쪽 경계
+        { x: 0.80, y: 0.82 }, // SE: 이미지 하단 우측
+        { x: 0.60, y: 0.76 }, // SW: Zone 1/2 하단 경계
+        { x: 0.60, y: 0.55 }, // W:  Zone 1/2 경계 (하멜등대 동쪽)
+      ],
+      status: 'PROVISIONAL',
+      source: 'oldtown-boundary-overlay-2026-10-26 (odongdo single-ref)',
+    },
   },
   {
     id: 3, name_ko: '돌산권', color: '#FFD67A',
@@ -189,3 +215,29 @@ export function countTgReadyByZone(zoneId) {
 export function getZoneBoundary(zoneId) {
   return YEOSU_ZONES.find(z => z.id === zoneId)?.boundary ?? null;
 }
+
+// ── QA Preview 전용 위치 데이터 ──────────────────────────────────────────────
+// import.meta.env.DEV + ?qa_preview=boundary 에서만 사용 (프로덕션 빌드 dead-code 제거됨)
+// 오동도(0.87,0.28) 단일 역산 — 불확실도 HIGH. Founder F-1~F-7 검수 대기.
+// conflict: true → 경계 서쪽에 위치하는 Zone 2 장소 (F-5 확인 필요)
+// anchor: true  → 기준점
+export const QA_OLDTOWN_POSITIONS = {
+  // Zone 1 — GPS 확인
+  lee_soon_shin_plaza:  { x: 0.298, y: 0.512, confirmed: true,  zone: 1 },
+  romantic_pojangmacha: { x: 0.379, y: 0.582, confirmed: true,  zone: 1 },
+  hamel_lighthouse:     { x: 0.518, y: 0.678, confirmed: true,  zone: 1 },
+  gosodong_mural:       { x: 0.406, y: 0.633, confirmed: true,  zone: 1 },
+  marine_park:          { x: 0.526, y: 0.468, confirmed: true,  zone: 1 },
+  // Zone 1 — null coords 추정
+  yeosu_fish_market:    { x: 0.250, y: 0.500, confirmed: false, zone: 1 },
+  jinamgwan:            { x: 0.280, y: 0.580, confirmed: false, zone: 1 },
+  opodae:               { x: 0.380, y: 0.670, confirmed: false, zone: 1 },
+  // Zone 2 — GPS 확인
+  odongdo:              { x: 0.870, y: 0.280, confirmed: true,  zone: 2, anchor: true },
+  cablecar:             { x: 0.692, y: 0.572, confirmed: true,  zone: 2 },
+  jaisan_park:          { x: 0.650, y: 0.483, confirmed: true,  zone: 2 },
+  yeosu_expo_park:      { x: 0.478, y: 0.418, confirmed: true,  zone: 2, conflict: true },
+  sky_tower:            { x: 0.512, y: 0.432, confirmed: true,  zone: 2, conflict: true },
+  // Zone 2 — null coords 추정
+  aquaplanet:           { x: 0.740, y: 0.420, confirmed: false, zone: 2 },
+};
