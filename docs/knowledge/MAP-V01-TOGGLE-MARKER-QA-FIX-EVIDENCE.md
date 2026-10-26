@@ -105,14 +105,38 @@ Founder가 정확한 위치 확인 후 좌표 업데이트 → VERIFIED 승격 �
 
 ---
 
-## §6 브라우저 테스트 가능 범위
+## §6 검증 결과
 
-**코드 레벨 검증**: ✅ 완료  
-- `if (!isVerified && !isQAPreview) return null` — PROVISIONAL 숨김 로직 확인
-- `pointerEvents: isVerified ? undefined : 'none'` — 클릭 차단 확인
-- `selectable = isSelectablePlace(m) && isVerified` — 선택 연결 차단 확인
+### 단위 테스트 결과 (2026-10-27)
 
-**브라우저 상호작용 테스트**: Founder 직접 검수 필요  
+**파일**: `tests/unit/mapMarkerSafety.test.js`  
+**결과**: **24/24 PASS**
+
+| 테스트 그룹 | 건수 | 결과 |
+|-----------|------|------|
+| isSelectablePlace — SOUL 게이팅 | 4 | ✅ PASS |
+| shouldRenderMarker — PROVISIONAL 마커 숨김 | 4 | ✅ PASS |
+| isMarkerSelectable — PROVISIONAL 마커 선택 차단 | 4 | ✅ PASS |
+| toggleRoutePlace 호출 가드 — handleToggle 동작 | 3 | ✅ PASS |
+| toggleRoutePlace 버튼 토글 — 선택/해제 정상 | 5 | ✅ PASS |
+| 오동도 현재 마커 상태 확인 | 4 | ✅ PASS |
+
+**핵심 검증 항목**:
+- PROVISIONAL 마커, 일반 화면 → `null` (숨김) ✅
+- PROVISIONAL 마커 클릭 → `onTogglePlace` 0회 호출 ✅
+- EXPLORER/FERRY/TG_EXCLUDED → `isSelectablePlace` false → SOUL 누출 0건 ✅
+- 선택 → 해제 → 재선택 (3-step 토글) ✅
+- 오동도 현재 상태: `status: 'PROVISIONAL'` → 일반 화면 숨김 확인 ✅
+
+### 코드 레벨 검증 (정적 분석)
+
+- `if (!isVerified && !isQAPreview) return null` — PROVISIONAL 숨김 로직 (line 302) ✅
+- `pointerEvents: isVerified ? undefined : 'none'` — 클릭 차단 (line 329) ✅
+- `selectable = isSelectablePlace(m) && isVerified` — 선택 연결 차단 (line 305) ✅
+
+### 미검증 범위 (브라우저 필요)
+
+**Founder 직접 검수 필요** — 브라우저 자동화 도구 없음  
 검수 URL: `http://localhost:5000/muyojeong`  
 확인 항목:
 1. 일반 화면에서 지도 마커 미표시 확인

@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-26
+Last Updated: 2026-10-27
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -21,16 +21,22 @@ Last Updated: 2026-10-26
 5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
-### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
+### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**SOUL Vehicle Guidance Review V0.1 완료 → Founder 검토 대기**
-- **SOUL_VEHICLE_GUIDANCE_REVIEW_READY** ✅ (2026-10-26)
+**여수 지역별 탐색 V0.1 — 마커 안전성 검증 완료 → Founder 브라우저 검수 대기**
+- **MAP_V01_MARKER_SAFETY_VERIFIED** ✅ (2026-10-27)
+  - 단위 테스트 24/24 PASS (`tests/unit/mapMarkerSafety.test.js`)
+  - PROVISIONAL 마커 일반 화면 숨김: `null` 반환 ✅
+  - PROVISIONAL 마커 클릭 차단: `onTogglePlace` 0회 호출 ✅
+  - EXPLORER/FERRY/TG_EXCLUDED SOUL 누출 0건 ✅
+  - 토글 3-step (선택→해제→재선택) ✅
+  - Evidence: `docs/knowledge/MAP-V01-TOGGLE-MARKER-QA-FIX-EVIDENCE.md` §6
+
+- **[이전] SOUL_VEHICLE_GUIDANCE_REVIEW_READY** ✅ (2026-10-26)
   - Evidence: `docs/knowledge/SOUL-VEHICLE-GUIDANCE-REVIEW-V0_1.md`
   - 코드 변경 없음 / SOUL 엔진 변경 없음 / CAR GOVERNANCE_HOLD 유지
   - 주요 갭: 향일암·오동도 parking_ko 없음 / 케이블카 탑승장 선택 기준 미노출 / 향일암 routes_ko 차량 쿼리 미연결
-  - 현재 잘 작동: 케이블카 PSQ roundtrip_ko+parking_ko / 돌산공원 C-3 주차 보충 / Companion+차량 chip
   - 제안 Follow-up 1개: "케이블카 + 오동도 → 자산역 탑승장 안내" (next_option 추가 여부 Founder Decision 필요)
-  - 코드 변경 없이 가능한 개선: 향일암·오동도 parking 데이터 수집 후 DB 업데이트
 
 **여수 지역별 탐색 V0.1 — 토글·마커 QA Fix → Founder 브라우저 검수 대기**
 - **MAP_V01_TOGGLE_AND_MARKER_QA_FIXED** ✅ (2026-10-27)

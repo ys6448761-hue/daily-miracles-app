@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-26T20:37:55.119Z",
+  "generated_at": "2026-10-26T23:21:28.407Z",
   "generator": "generate-manifest.js",
   "total_count": 497,
   "documents": [
@@ -3121,7 +3121,7 @@
       "status": "기능",
       "title": "MAP V0.1 — Toggle & Marker QA Fix Evidence",
       "created_at": "2026-10-26",
-      "checksum": "278cf7d7"
+      "checksum": "d4a9d42d"
     },
     {
       "id": "DOC-MAP-V01-YEOSU-PLACE-INVENTORY",
