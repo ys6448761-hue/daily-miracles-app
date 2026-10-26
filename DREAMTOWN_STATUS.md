@@ -23,20 +23,18 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
 
-**여수 지역별 탐색 V0.1 — bounding box 캘리브레이션 대기**
-- **MAP_V01_IMAGE_BINDING_READY** ✅ (2026-10-26) — YeosuMapSelector.jsx 이미지 바인딩 완료
-  - overview 이미지: 전역 지도 권역 목록 상단 표시
-  - oldtown 이미지: 원도심 권역(Zone 1, `hasDetailMap:true`) 진입 시 표시
-  - onError fallback: 이미지 로딩 실패 시 기존 카드 UI 자동 대체
-  - 마커 미표시 유지 (`GEO_CALIBRATION_PENDING`)
-  - 빌드: ✅ 698 modules / 회귀: ✅ 587/588 PASS (R20 PRE-EXISTING)
-- **지리 정합성 검증 완료** (2026-10-26) — `docs/knowledge/MAP-V01-PREPARATION-EVIDENCE.md §8`
-  - 오동도 등대 + 방파제: VERIFIED (oldtown) / 돌산도·원도심: APPROXIMATE / 이순신광장·이순신대교: NOT_COVERED
-  - 이미지는 일러스트 스타일 → 좌표 기반 마커 오버레이에 캘리브레이션 필수
+**여수 지역별 탐색 V0.1 — Phase A 마커 구현 착수 가능**
+- **MAP_V01_MARKER_PLAN_READY** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-MARKER-PLAN.md`
+  - 이미지 상대 위치(%) 기반 마커 설계 완료 (lat/lng bounding box 불필요)
+  - Phase A: 오동도 HIGH(oldtown x:0.87, y:0.28) — 즉시 구현 가능
+  - Phase B: 엑스포공원·돌산대교(MEDIUM) — Founder 육안 확인 후
+  - Phase C: 나머지 장소 — 마커 미표시, 카드 탐색 유지
+  - 35↔SOUL13 게이팅 검증: 정상 ✅ (TG_READY만 routePlaces → SOUL API 전달)
+- **MAP_V01_IMAGE_BINDING_READY** ✅ (2026-10-26) — SHA `03b18f0`
 - **MAP_V01_UI_STRUCTURE_READY** ✅ (2026-10-26) — SHA `240374a`
 - **ASSET_PATH_VERIFIED** ✅ (2026-10-26) — SHA `8ad8ba2`
 - **남은 Blocker**:
-  - 이미지 4모서리 bounding box 좌표 Founder 제공 → pixel↔coord 캘리브레이션
+  - Phase A 마커 구현 (오동도 HIGH 1개) → Founder 위치 확인 → Phase B 확장
   - 여수 수산시장 UV-2 — 좌표 미검증 (placeholder 처리됨)
 - **MAP_V01_PREPARATION_READY** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-PREPARATION-EVIDENCE.md`
 - **MAP_V01_DECISION_SHEET: FOUNDER_APPROVED** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-DECISION-SHEET.md`
@@ -114,8 +112,9 @@ Production SHA: `425a643` (맞춤 항로 V0.1, 2026-10-25).
 | 문서 | 내용 |
 |------|------|
 | `docs/knowledge/MAP-V01-DECISION-SHEET.md` | OI-MAP-1~5 Founder 결정 + 35개 인벤토리 |
-| `docs/knowledge/MAP-V01-PREPARATION-EVIDENCE.md` | 좌표 검증 결과 + 이미지 경로 검증 + 판정 |
+| `docs/knowledge/MAP-V01-PREPARATION-EVIDENCE.md` | 좌표 검증 + 이미지 경로 + 지리 정합성 §8 |
 | `docs/knowledge/MAP-V01-YEOSU-PLACE-INVENTORY.md` | 35개 장소 상태 분류 원본 |
+| `docs/knowledge/MAP-V01-MARKER-PLAN.md` | 마커 설계 + Phase A~C + 35↔SOUL13 연결 확인 |
 
 #### 새 담당자 시작 순서
 

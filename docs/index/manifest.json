@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-26T01:58:12.115Z",
+  "generated_at": "2026-10-26T02:10:19.863Z",
   "generator": "generate-manifest.js",
-  "total_count": 480,
+  "total_count": 481,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2946,6 +2946,22 @@
       "title": "Map V0.1 Design Decision Sheet",
       "created_at": "2026-10-26",
       "checksum": "3e49ddda"
+    },
+    {
+      "id": "DOC-MAP-V01-MARKER-PLAN",
+      "path": "docs/knowledge/MAP-V01-MARKER-PLAN.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "수",
+      "title": "MAP V0.1 마커 설계 문서",
+      "created_at": "2026-10-26",
+      "checksum": "5e306fe0"
     },
     {
       "id": "DOC-MAP-V01-PREPARATION-EVIDENCE",
