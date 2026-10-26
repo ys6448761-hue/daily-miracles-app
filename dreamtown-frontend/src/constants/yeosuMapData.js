@@ -39,7 +39,15 @@ export const YEOSU_PLACES = [
   { code: 'yeosu_fish_market',    name_ko: '여수 수산시장', zone: 1, lat: null,       lng: null,        status: 'explorer',   coordVerified: false, coordNote: 'UV-2: 주소=여객선터미널길 24 교동 확인, 좌표 미검증' },
 
   // ── 권역 2: 오동도·엑스포권 ──────────────────────────────────────────────
-  { code: 'odongdo',              name_ko: '오동도',       zone: 2, lat: 34.7602,    lng: 127.7655,    status: 'tg_ready',   coordVerified: true },
+  {
+    code: 'odongdo', name_ko: '오동도', zone: 2, lat: 34.7602, lng: 127.7655,
+    status: 'tg_ready', coordVerified: true,
+    // Phase A 마커 — 시각 검증 기준, PROVISIONAL (Founder 위치 확인 대기)
+    // 출처: MAP-V01-MARKER-PLAN.md §2-1 (HIGH confidence — 등대+방파제 명확 식별)
+    markerPos: {
+      oldtown: { x: 0.87, y: 0.28, confidence: 'HIGH', status: 'PROVISIONAL' },
+    },
+  },
   { code: 'cablecar',             name_ko: '케이블카',     zone: 2, lat: 34.7428,    lng: 127.7562,    status: 'tg_ready',   coordVerified: true },
   { code: 'marine_park',          name_ko: '종포해양공원', zone: 2, lat: 34.7488,    lng: 127.7475,    status: 'tg_ready',   coordVerified: true },
   { code: 'yeosu_expo_park',      name_ko: '엑스포공원',   zone: 2, lat: 34.7520,    lng: 127.7450,    status: 'tg_ready',   coordVerified: true },
@@ -130,6 +138,14 @@ export const YEOSU_ZONES = [
 // 권역별 장소 목록 (hidden 제외)
 export function getPlacesByZone(zoneId) {
   return YEOSU_PLACES.filter(p => p.zone === zoneId && !p.hidden);
+}
+
+// 특정 이미지 키에 마커 위치가 정의된 장소 목록
+// Phase A: HIGH confidence만 반환 (MEDIUM 이상은 Founder 확인 후 추가)
+export function getMarkersForImage(imageKey) {
+  return YEOSU_PLACES.filter(
+    p => !p.hidden && p.markerPos && p.markerPos[imageKey] && p.markerPos[imageKey].confidence === 'HIGH'
+  );
 }
 
 // 지도에서 선택 가능한 장소 여부

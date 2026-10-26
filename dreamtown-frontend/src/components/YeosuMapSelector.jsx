@@ -1,12 +1,14 @@
 /**
  * YeosuMapSelector — 여수 지역별 장소 탐색 V0.1
  *
- * V0.1 구현: 지도 배경 이미지 바인딩 + fallback div 모드
+ * V0.1 구현: 이미지 바인딩 + Phase A 마커 (오동도 PROVISIONAL)
  *   - 7개 권역 카드 → 권역 장소 목록 → 장소 선택
- *   - overview 이미지: 전체 권역 시각 참조 (마커 미표시 — GEO_CALIBRATION_PENDING)
+ *   - overview 이미지: 전체 권역 시각 참조 (마커 미표시)
  *   - oldtown 이미지: 원도심 권역(hasDetailMap=true) 진입 시 표시
+ *     + Phase A 마커: HIGH confidence 장소만 (오동도 1개, PROVISIONAL)
+ *     + padding-top 비율 컨테이너: 종횡비 보존 → 마커 위치 정확도 확보
  *   - 이미지 로딩 실패 시 기존 카드 UI로 자동 대체
- *   - 좌표 기반 마커: 캘리브레이션 완료 후 별도 단계에서 추가
+ *   - MEDIUM/NONE 마커: Phase B (Founder 확인 후 추가)
  *
  * 선택 가능 상태:
  *   TG_READY     — 선택 가능 (routePlaces 공유)
@@ -25,6 +27,7 @@ import {
   YEOSU_ZONES,
   MAP_STATUS,
   getPlacesByZone,
+  getMarkersForImage,
   isSelectablePlace,
   countTgReadyByZone,
 } from '../constants/yeosuMapData';
@@ -149,22 +152,63 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack }) {
         </p>
       )}
 
-      {/* 원도심 확대 지도 — hasDetailMap=true 권역만 표시 (마커 미표시, GEO_CALIBRATION_PENDING) */}
-      {zone.hasDetailMap && !imgError && (
-        <img
-          src={OLDTOWN_IMG}
-          alt={`${zone.name_ko} 지도`}
-          onError={() => setImgError(true)}
-          style={{
-            width: '100%',
-            maxHeight: '200px',
-            objectFit: 'cover',
-            objectPosition: 'center',
-            borderRadius: '10px',
-            display: 'block',
-          }}
-        />
-      )}
+      {/* 원도심 확대 지도 — hasDetailMap=true 권역만 표시 */}
+      {/* Phase A 마커: oldtown 이미지 내 HIGH confidence 장소만 (PROVISIONAL) */}
+      {zone.hasDetailMap && !imgError && (() => {
+        const markers = getMarkersForImage('oldtown');
+        // padding-top 비율 컨테이너: 이미지 종횡비(1006/1564≈64.32%) 보존
+        // height = 64.32% of width → objectFit:fill 크롭 없음 → 마커 x%/y% 정확 대응
+        // 모바일 350px 기준: 높이 ≈ 225px
+        return (
+          <div style={{ position: 'relative', width: '100%', paddingTop: '64.32%', borderRadius: '10px', overflow: 'hidden' }}>
+            <img
+              src={OLDTOWN_IMG}
+              alt={`${zone.name_ko} 지도`}
+              onError={() => setImgError(true)}
+              style={{
+                position: 'absolute', top: 0, left: 0,
+                width: '100%', height: '100%',
+                objectFit: 'fill',  // 컨테이너가 이미 정확한 비율 → fill로 크롭 없음
+                display: 'block',
+              }}
+            />
+            {markers.map(m => {
+              const mp = m.markerPos.oldtown;
+              const selected = selectedPlaces.some(p => p.code === m.code);
+              const selectable = isSelectablePlace(m);
+              return (
+                <div
+                  key={m.code}
+                  onClick={() => selectable && onTogglePlace({ code: m.code, name: m.name_ko })}
+                  role={selectable ? 'button' : undefined}
+                  aria-label={selectable ? `${m.name_ko} 선택` : m.name_ko}
+                  aria-pressed={selectable ? selected : undefined}
+                  title={m.name_ko}
+                  style={{
+                    position: 'absolute',
+                    left: `${mp.x * 100}%`,
+                    top: `${mp.y * 100}%`,
+                    transform: 'translate(-50%, -50%)',
+                    // 터치 영역 확보 (28px²), 시각 점은 내부 div로 분리
+                    padding: '8px',
+                    cursor: selectable ? 'pointer' : 'default',
+                  }}
+                >
+                  <div style={{
+                    width: '12px',
+                    height: '12px',
+                    borderRadius: '50%',
+                    background: selected ? '#FFD67A' : 'rgba(255,255,255,0.92)',
+                    border: `2px solid ${selected ? '#b8900a' : 'rgba(0,0,0,0.32)'}`,
+                    boxShadow: '0 1px 5px rgba(0,0,0,0.45)',
+                    transition: 'background 0.15s, border-color 0.15s',
+                  }} />
+                </div>
+              );
+            })}
+          </div>
+        );
+      })()}
 
       {/* 배편 필수 안내 */}
       {zoneId === 7 && (
