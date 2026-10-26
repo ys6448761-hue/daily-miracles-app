@@ -172,7 +172,8 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack }) {
                 display: 'block',
               }}
             />
-            {markers.map(m => {
+            {/* Zone 필터: 현재 권역 장소만 표시 (타 Zone 마커 혼입 방지) */}
+            {markers.filter(m => m.zone === zone.id).map(m => {
               const mp = m.markerPos.oldtown;
               const selected = selectedPlaces.some(p => p.code === m.code);
               const selectable = isSelectablePlace(m);

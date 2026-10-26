@@ -2,7 +2,7 @@
  * 여수 전역 지도 V0.1 — 장소 및 권역 데이터
  *
  * 근거: docs/knowledge/MAP-V01-PREPARATION-EVIDENCE.md
- * Founder 승인: OI-MAP-1~5 (2026-10-26)
+ * Founder 승인: OI-MAP-1~5 (2026-10-26) / FC-1~5 (2026-10-26)
  *
  * 상태 규칙:
  *   TG_READY      — SOUL TG 추천 가능. 장소 칩과 동일 상태.
@@ -37,6 +37,11 @@ export const YEOSU_PLACES = [
   { code: 'gosodong_mural',       name_ko: '고소동 천사벽화골목', zone: 1, lat: 34.7389997, lng: 127.7411688, status: 'explorer', coordVerified: true, coordNote: 'NAVER 마커 기준 (mom-mom.net, 2026-10-26)' },
   // UV-2: 좌표 미검증 — lat/lng null 유지
   { code: 'yeosu_fish_market',    name_ko: '여수 수산시장', zone: 1, lat: null,       lng: null,        status: 'explorer',   coordVerified: false, coordNote: 'UV-2: 주소=여객선터미널길 24 교동 확인, 좌표 미검증' },
+  // 진남관·오포대: Founder 원도심 8곳 (FC-1/2 승인, EXPLORER — 좌표 미검증, 마커 미표시)
+  { code: 'jinamgwan',            name_ko: '진남관',        zone: 1, lat: null,       lng: null,        status: 'explorer',   coordVerified: false, coordNote: '국보 304호. 여수시 군자동 소재 확인. 좌표 미검증.' },
+  { code: 'opodae',               name_ko: '오포대',        zone: 1, lat: null,       lng: null,        status: 'explorer',   coordVerified: false, coordNote: '고소동 언덕 소재 확인. 좌표 미검증.' },
+  // 종포해양공원: Zone 2→1 (Founder 원도심 8곳 포함, FC-ZONE 승인)
+  { code: 'marine_park',          name_ko: '종포해양공원', zone: 1, lat: 34.7488,    lng: 127.7475,    status: 'tg_ready',   coordVerified: true },
 
   // ── 권역 2: 오동도·엑스포권 ──────────────────────────────────────────────
   {
@@ -44,23 +49,31 @@ export const YEOSU_PLACES = [
     status: 'tg_ready', coordVerified: true,
     // Phase A 마커 — 시각 검증 기준, PROVISIONAL (Founder 위치 확인 대기)
     // 출처: MAP-V01-MARKER-PLAN.md §2-1 (HIGH confidence — 등대+방파제 명확 식별)
+    // Zone 2 소속 → Zone 1 oldtown 상세 지도에서 마커 제외됨 (YeosuMapSelector zone 필터)
     markerPos: {
       oldtown: { x: 0.87, y: 0.28, confidence: 'HIGH', status: 'PROVISIONAL' },
     },
   },
+  // cablecar = SOUL entity (TG_READY). 좌표=자산탑승장(여수 본토). Founder "해상케이블카 자산탑승장" alias.
   { code: 'cablecar',             name_ko: '케이블카',     zone: 2, lat: 34.7428,    lng: 127.7562,    status: 'tg_ready',   coordVerified: true },
-  { code: 'marine_park',          name_ko: '종포해양공원', zone: 2, lat: 34.7488,    lng: 127.7475,    status: 'tg_ready',   coordVerified: true },
   { code: 'yeosu_expo_park',      name_ko: '엑스포공원',   zone: 2, lat: 34.7520,    lng: 127.7450,    status: 'tg_ready',   coordVerified: true },
   { code: 'sky_tower',            name_ko: '스카이타워',   zone: 2, lat: 34.7512,    lng: 127.7468,    status: 'tg_ready',   coordVerified: true },
   { code: 'jaisan_park',          name_ko: '자산공원',     zone: 2, lat: 34.7480,    lng: 127.7540,    status: 'tg_ready',   coordVerified: true },
   { code: 'aquaplanet',           name_ko: '아쿠아플라넷', zone: 2, lat: null,       lng: null,        status: 'explorer',   coordVerified: false },
   { code: 'yworld_luge',          name_ko: '유월드루지',   zone: 2, lat: null,       lng: null,        status: 'explorer',   coordVerified: false },
+  // 신규 EXPLORER — Founder 오동도·엑스포 7곳 (FC-3~5 승인, 좌표 미검증, 마커 미표시)
+  { code: 'yeosu_expo_station',   name_ko: '여수엑스포역', zone: 2, lat: null,       lng: null,        status: 'explorer',   coordVerified: false, coordNote: 'KTX 종착역. 엑스포 부지 북측. 좌표 미검증.' },
+  { code: 'expo_ocean_trail',     name_ko: '엑스포 바닷길', zone: 2, lat: null,      lng: null,        status: 'explorer',   coordVerified: false, coordNote: '엑스포 해안 산책로. yeosu_expo_park와 별개 등록. 경계·좌표 미검증.' },
+  { code: 'manseongri_beach',     name_ko: '만성리해수욕장', zone: 2, lat: null,     lng: null,        status: 'explorer',   coordVerified: false, coordNote: 'Founder Zone 2 배치. 좌표 미검증.' },
+  { code: 'yeosu_ocean_cruise',   name_ko: '여수오션크루즈', zone: 2, lat: null,     lng: null,        status: 'explorer',   coordVerified: false, coordNote: '선착장 위치 UNVERIFIED. 운항 조건 별도 확인 필요.' },
 
   // ── 권역 3: 돌산권 ──────────────────────────────────────────────────────
   { code: 'dolsan_daegyo',        name_ko: '돌산대교',     zone: 3, lat: 34.7395,    lng: 127.7456,    status: 'tg_ready',   coordVerified: true },
   { code: 'dolsan_nightscape',    name_ko: '돌산공원',     zone: 3, lat: 34.7289,    lng: 127.7472,    status: 'tg_ready',   coordVerified: true },
   { code: 'museukmok',            name_ko: '무슬목',       zone: 3, lat: null,       lng: null,        status: 'explorer',   coordVerified: false },
   { code: 'dolsan_got_market',    name_ko: '돌산갓장터마을', zone: 3, lat: null,     lng: null,        status: 'verify',     coordVerified: false },
+  // 해상케이블카 돌산탑승장: Zone 3 지도 탐색 전용. SOUL은 기존 cablecar(Zone 2 TG_READY) 사용.
+  { code: 'cablecar_dolsan',      name_ko: '해상케이블카 돌산탑승장', zone: 3, lat: null, lng: null, status: 'explorer', coordVerified: false, coordNote: '돌산도 쪽 탑승장. 좌표 미검증. SOUL 게이팅: cablecar(TG_READY) 별도 유지.' },
 
   // ── 권역 4: 향일암권 ──────────────────────────────────────────────────
   { code: 'hyangiram',            name_ko: '향일암',       zone: 4, lat: 34.5914162, lng: 127.8037534, status: 'tg_ready',   coordVerified: true },
