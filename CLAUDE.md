@@ -35,7 +35,8 @@ API prefix: `/api/dt/`
 - 팀메모리: `.claude/team-memory/`
 - **컴팩션 복구·세션 재개·담당자 변경은 신규 세션 시작과 동일하게 취급한다.**  
   `DREAMTOWN_STATUS.md` §★ Current Next Action을 먼저 확인한다.  
-  컴팩션 요약의 Optional Next Step은 Project State 정본을 대체하지 않는다.
+  컴팩션 요약의 Optional Next Step은 Project State 정본을 대체하지 않는다.  
+  Confirmed/Decided 항목은 충돌 Evidence가 없으면 재조사하지 않는다. → `DREAMTOWN_STATUS.md` "MAP V0.1 인계 스냅샷" 섹션 참조.
 
 ## 🚨 절대 규칙
 - **코드 수정 권한: Claude Code만** (이 인스턴스는 Antigravity)

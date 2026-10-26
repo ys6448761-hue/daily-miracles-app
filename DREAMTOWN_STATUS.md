@@ -47,6 +47,87 @@ Last Updated: 2026-10-25
 
 ---
 
+### MAP V0.1 인계 스냅샷 (2026-10-26) — 새 담당자 시작점
+
+> 새 세션/담당자는 이 섹션부터 읽는다. Confirmed 항목은 충돌 Evidence 없이 재조사하지 않는다.
+
+#### 브랜치 / 코드 위치
+
+| 항목 | 값 | 상태 |
+|------|-----|------|
+| 작업 브랜치 | `docs/pr133-state-sync` | PR #134 OPEN (Founder merge 대기) |
+| main HEAD (Production) | `425a643` | Render 배포 완료 |
+| UI 구현 커밋 | `240374a` | Confirmed ✅ |
+| 이미지 추가 커밋 | `8ad8ba2` | Confirmed ✅ |
+| working tree | 클린 (`client/` 미추적만 존재) | Confirmed ✅ |
+
+#### UI 구현 파일 (SHA `240374a`)
+
+| 파일 | 유형 | 비고 |
+|------|------|------|
+| `dreamtown-frontend/src/constants/yeosuMapData.js` | NEW | 35개 장소 + 7개 권역 상수 |
+| `dreamtown-frontend/src/components/YeosuMapSelector.jsx` | NEW | 권역 카드 → 장소 탐색 UI |
+| `dreamtown-frontend/src/pages/MuyojeongHomePage.jsx` | EXTEND | "지역별 보기" 토글 추가 (기존 로직 무변경) |
+
+#### 이미지 정본 경로 (SHA `8ad8ba2`)
+
+| 파일 | 정본 경로 | 브라우저 URL |
+|------|----------|-------------|
+| `yeosu-overview-v01.png` | `dreamtown-frontend/public/images/muyojeong/map/` | `/images/muyojeong/map/yeosu-overview-v01.png` |
+| `yeosu-oldtown-v01.png` | 동일 | `/images/muyojeong/map/yeosu-oldtown-v01.png` |
+| 원본 보존 (접근 불가) | `client/public/images/dreamtown/maps/` | Express 미등록 — URL 없음 |
+
+#### Founder 승인 결정 (OI-MAP-1~5) — Confirmed
+
+| 항목 | 결정 | 근거 문서 |
+|------|------|----------|
+| OI-MAP-1 | 중앙시장 지도 미표시 (TG 전면 제외 유지) | `docs/knowledge/MAP-V01-DECISION-SHEET.md` |
+| OI-MAP-2 | 고소동·수산시장 EXPLORER 표시, SOUL 자동 승격 금지 | 동일 |
+| OI-MAP-3 | 7개 권역 전체 표현, 원도심 우선 상세 | 동일 |
+| OI-MAP-4 | 신뢰 출처 조사 허용 (Founder 수동 측정 불필요) | 동일 |
+| OI-MAP-5 | 배편 배지 표시 + SOUL 추천 제외 | 동일 |
+
+#### 미해결 항목 (Pending)
+
+| ID | 항목 | 상태 | 조치 |
+|----|------|------|------|
+| UV-2 | 여수 수산시장 lat/lng | 🟡 미검증 | placeholder 처리됨. Kakao Geocoding 또는 Founder 측정 |
+| UV-3 | 권역 bounding box 정확도 | 🟡 추정값 | 이미지 수령 후 캘리브레이션 |
+| — | 지리적 정합성 검증 + 마커 캘리브레이션 | ⏸ 별도 단계 | 다음 Current Next Action 착수 전 설계 |
+
+#### 유지 중인 HOLD
+
+| HOLD | 내용 |
+|------|------|
+| CAR GOVERNANCE_HOLD | `_estimateTravelTime()` V0 Stub 유지. 해제 금지. |
+| SOUL 자동 승격 금지 | EXPLORER 장소를 TG_READY로 자동 변경 금지 (OI-MAP-2) |
+| Production 배포 금지 | 지도 배경 없이 완성된 서비스로 배포 금지 |
+
+#### Production 변경 여부
+
+MAP V0.1 구현(`240374a`, `8ad8ba2`)은 **PR #134 미병합 상태** — Production에 반영되지 않음.  
+Production SHA: `425a643` (맞춤 항로 V0.1, 2026-10-25).
+
+#### Evidence 경로
+
+| 문서 | 내용 |
+|------|------|
+| `docs/knowledge/MAP-V01-DECISION-SHEET.md` | OI-MAP-1~5 Founder 결정 + 35개 인벤토리 |
+| `docs/knowledge/MAP-V01-PREPARATION-EVIDENCE.md` | 좌표 검증 결과 + 이미지 경로 검증 + 판정 |
+| `docs/knowledge/MAP-V01-YEOSU-PLACE-INVENTORY.md` | 35개 장소 상태 분류 원본 |
+
+#### 새 담당자 시작 순서
+
+```
+1. 이 섹션 읽기 (완료)
+2. docs/knowledge/MAP-V01-PREPARATION-EVIDENCE.md §3·§7 확인 (ASSET_PATH_VERIFIED)
+3. dreamtown-frontend/src/constants/yeosuMapData.js — 35개 장소 데이터 구조 파악
+4. dreamtown-frontend/src/components/YeosuMapSelector.jsx — UI 구조 파악
+5. 다음 작업: 지리적 정합성 검증 + 이미지 배경 바인딩 설계 (Guardian Preflight 발행 후 착수)
+```
+
+---
+
 **[ARCHIVE] 이전 Current Next Action**
 
 **PR #134 Founder merge 승인 — docs/pr133-state-sync State Sync 완료**
