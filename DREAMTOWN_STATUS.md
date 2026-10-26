@@ -23,26 +23,33 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
 
-**여수 지역별 탐색 V0.1 — Geographic QA 완료 (GEO-2 HOLD 잔여) → PR #134 merge 또는 Preview 확인**
-- **MAP_V01_FOUNDER_ADDRESS_EVIDENCE_APPLIED** (2026-10-26) SHA `4f8d411`
-  - GEO-4 bonghwangsan: Zone 6→3 ✅ (돌산읍 대복길 160 Founder 주소 확인)
-  - GEO-1 nk_submarine: Zone 5→3 ✅ (Founder 판단 유지)
-  - GEO-3 artland_resort: Zone 6→3 ✅ (Founder 판단 유지)
-  - **GEO-2 서틀러다육식물원: Zone 6 HOLD** — 법인주소=소라면, 실제 방문지 미확인. 이동 금지.
-  - Zone 3 돌산권: 5→8곳 / Zone 5 소호·장도: 6→5곳 / Zone 6 화양: 8→6곳
-  - TG_READY 12개 불변 / 전체 42개 불변 / 빌드 698 modules / 615/616 PASS
-- **MAP_V01_GEOGRAPHIC_QA_HOLD** → **APPLIED (4/5건 완료, GEO-2 유지)**
-  - Evidence: `docs/knowledge/MAP-V01-GEOGRAPHIC-QA-CONFLICT.md`
-- **MAP_V01_FC_IMPLEMENTATION_READY** ✅ (2026-10-26) SHA `63bd640`
-  - Zone 1 (8곳, TG_READY 4): 이순신광장·낭만포차·하멜등대·고소동·수산시장·진남관·오포대·종포해양공원
-  - Zone 2 (10곳, TG_READY 5): 오동도·케이블카·엑스포공원·스카이타워·자산공원·아쿠아플라넷·엑스포역·바닷길·만성리·오션크루즈
-  - Zone 3 (8곳, TG_READY 2): 돌산대교·돌산공원·무슬목·갓장터·돌산탑승장·**nk_submarine·bonghwangsan·artland_resort**
-  - Zone 4~7: 변경 없음
-  - **Production 미배포** ← 브랜치: `docs/pr133-state-sync`
-- **ZONE_FOUNDER_LIST_RECONCILED** ✅ / **MAP_V01_BROWSER_ASSET_VERIFIED** ✅
+**여수 지역별 탐색 V0.1 — Boundary 설계 READY → Founder B-1~B-4 확인 대기**
+- **MAP_V01_BOUNDARY_DESIGN_READY** ✅ (2026-10-26) — `docs/knowledge/MAP-V01-BOUNDARY-DESIGN.md`
+  - overview(1206×1304, ratio 1.0813) + oldtown(1564×1006, ratio 0.6432) 해상도 확인
+  - Zone 1·2·3 경계 표현 HIGH 가능 / Zone 4·6·7 이미지 범위 밖 가능성 HIGH
+  - SVG 설계: `viewBox="0 0 1 1"` + padding-top 비율 컨테이너 → 모바일 반응형 ✅
+  - `boundaryPoly: [{x, y}...]` 구조 확정 → Founder 경계 확인 후 인코딩
+  - **Founder 확인 필요 B-1~B-4**: overview 이미지 내 권역 범위·경계·스타일
+- **MAP_V01_GEO_2_ZONE_5_APPLIED** ✅ (2026-10-26) SHA `fcd1e28`
+  - settler_cactus: Zone 6(화양)→5(소호·장도). 법인주소=소라면 논골안길 20-9.
+  - Zone 5: 5→6곳 / Zone 6: 6→5곳 (예상값 일치)
+- **MAP_V01_FOUNDER_ADDRESS_EVIDENCE_APPLIED** ✅ (2026-10-26) SHA `4f8d411`
+  - GEO-1 nk_submarine Zone 5→3 / GEO-3 artland_resort Zone 6→3 / GEO-4 bonghwangsan Zone 6→3
+- **MAP_V01_FC_IMPLEMENTATION_READY** ✅ SHA `63bd640`
+
+**최종 Inventory 상태:**
+- Zone 1 (8곳, TG_READY 4): 이순신광장·낭만포차·하멜등대·고소동·수산시장·진남관·오포대·종포해양공원
+- Zone 2 (10곳, TG_READY 5): 오동도·케이블카·엑스포공원·스카이타워·자산공원·아쿠아플라넷·엑스포역·바닷길·만성리·오션크루즈
+- Zone 3 (8곳, TG_READY 2): 돌산대교·돌산공원·무슬목·갓장터·돌산탑승장·nk_submarine·bonghwangsan·artland_resort
+- Zone 4 (1곳, TG_READY 1): 향일암
+- Zone 5 (6곳, TG_READY 0): 장도·소호요트장·소호동동다리·이순신마리나·유월드루지·서틀러다육식물원
+- Zone 6 (5곳, TG_READY 0): 가사리·여자만·섬달천·화양드라이브·장척갯벌
+- Zone 7 (3곳, TG_READY 0): 사도·하화도·화정도서
+- **합계: 41곳 표시 + 1 hidden(중앙시장) = 42곳 / TG_READY 12개**
+- **Production 미배포** ← 브랜치: `docs/pr133-state-sync`
 
 **남은 작업:**
-- GEO-2: 서틀러다육식물원 실제 방문지 주소 확인 (Founder) → Zone 5 소라면 or Zone 6 유지 결정
+- Founder B-1~B-4 확인 → boundaryPoly 인코딩 → SVG 구현
 - PR #134 merge 승인 → Production 반영
 
 **이전 Current Next Action (2026-10-26 이전):**
