@@ -291,17 +291,20 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                     )}
                   </svg>
                 )}
-                {/* Phase A 마커 (기존 유지) */}
+                {/* Phase A 마커 — selectedPlaces 공유로 버튼과 양방향 동기화 */}
                 {markers.filter(m => m.zone === zone.id).map(m => {
                   const mp = m.markerPos.oldtown;
                   const selected = selectedPlaces.some(p => p.code === m.code);
                   const selectable = isSelectablePlace(m);
+                  const handleToggle = () => selectable && onTogglePlace({ code: m.code, name: m.name_ko });
                   return (
                     <div
                       key={m.code}
-                      onClick={() => selectable && onTogglePlace({ code: m.code, name: m.name_ko })}
+                      onClick={handleToggle}
+                      onKeyDown={selectable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleToggle(); } } : undefined}
                       role={selectable ? 'button' : undefined}
-                      aria-label={selectable ? `${m.name_ko} 선택` : m.name_ko}
+                      tabIndex={selectable ? 0 : undefined}
+                      aria-label={selectable ? `${m.name_ko} ${selected ? '선택 해제' : '선택'}` : m.name_ko}
                       aria-pressed={selectable ? selected : undefined}
                       title={m.name_ko}
                       style={{
@@ -311,14 +314,17 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                         transform: 'translate(-50%, -50%)',
                         padding: '8px',
                         cursor: selectable ? 'pointer' : 'default',
+                        outline: 'none',
                       }}
                     >
                       <div style={{
-                        width: '12px', height: '12px', borderRadius: '50%',
+                        width: selected ? '14px' : '12px',
+                        height: selected ? '14px' : '12px',
+                        borderRadius: '50%',
                         background: selected ? '#FFD67A' : 'rgba(255,255,255,0.92)',
                         border: `2px solid ${selected ? '#b8900a' : 'rgba(0,0,0,0.32)'}`,
-                        boxShadow: '0 1px 5px rgba(0,0,0,0.45)',
-                        transition: 'background 0.15s, border-color 0.15s',
+                        boxShadow: selected ? '0 0 0 3px rgba(255,214,122,0.35), 0 1px 5px rgba(0,0,0,0.45)' : '0 1px 5px rgba(0,0,0,0.45)',
+                        transition: 'all 0.15s',
                       }} />
                     </div>
                   );

@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-26T07:17:42.021Z",
+  "generated_at": "2026-10-26T07:25:00.707Z",
   "generator": "generate-manifest.js",
-  "total_count": 495,
+  "total_count": 496,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3202,6 +3202,22 @@
       "title": "MAP V0.1 — Zone 2 Boundary Correction",
       "created_at": "2026-10-26",
       "checksum": "2180db19"
+    },
+    {
+      "id": "DOC-MAP-V01-ZONE2-EXPO-STATION-EXT",
+      "path": "docs/knowledge/MAP-V01-ZONE2-EXPO-STATION-EXTENSION-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "MAP V0.1 — Zone 2 Boundary Expo Station Extension + Marker Toggle Evidence",
+      "created_at": "2026-10-26",
+      "checksum": "5cf8881f"
     },
     {
       "id": "DOC-Change_Log",

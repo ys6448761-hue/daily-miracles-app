@@ -32,7 +32,16 @@ Last Updated: 2026-10-26
   - 제안 Follow-up 1개: "케이블카 + 오동도 → 자산역 탑승장 안내" (next_option 추가 여부 Founder Decision 필요)
   - 코드 변경 없이 가능한 개선: 향일암·오동도 parking 데이터 수집 후 DB 업데이트
 
-**여수 지역별 탐색 V0.1 — Zone 2 경계 수정 완료 → Founder SE boundary 확인 대기**
+**여수 지역별 탐색 V0.1 — Zone 2 경계 확장 + 마커 토글 완료 → Founder 검수 대기**
+- **MAP_V01_ZONE2_BOUNDARY_AND_MARKER_TOGGLE_READY** ✅ (2026-10-26)
+  - Zone 2 NW: (0.47,0.30) → (0.47,0.10) — 여수엑스포역 방향 북측 확장
+  - 여수엑스포역 QA 마커 좌표: (0.490,0.320) → (0.570,0.080) (시각 재추정)
+  - 마커 ↔ 버튼 양방향 토글: selectedPlaces 공유로 이미 동작 / tabIndex+onKeyDown 추가
+  - 빌드 ✅ 698 modules / 회귀 615/616 PASS (R20 PRE-EXISTING)
+  - 비교 이미지: `docs/knowledge/MAP-V01-ZONE2-EXPO-STATION-EXTENSION-COMPARE.png`
+  - Evidence: `docs/knowledge/MAP-V01-ZONE2-EXPO-STATION-EXTENSION-EVIDENCE.md`
+  - **Founder 확인 필요**: Zone 2 북측 경계가 엑스포역을 충분히 포함하는지 + 오동도 마커 위치
+- **MAP_V01_ZONE2_BOUNDARY_CORRECTION_READY** ✅ (2026-10-26)
 - **MAP_V01_ZONE2_BOUNDARY_CORRECTION_READY** ✅ (2026-10-26)
   - SE (0.80,0.82)→(0.74,0.63): 돌산 방향 침범 제거
   - NW (0.57,0.38)→(0.47,0.30): 여수엑스포역 포함 추정 (UNKNOWN exact)

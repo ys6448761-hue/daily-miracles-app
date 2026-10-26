@@ -134,22 +134,22 @@ export const YEOSU_ZONES = [
     id: 2, name_ko: '오동도·엑스포권', color: '#B8F4FF',
     hasDetailMap: true, // oldtown 이미지 재사용 (FOUNDER_ZONE2_DETAIL_MAP_REUSE_APPROVED)
     boundingBox: { minLat: 34.740, maxLat: 34.775, minLng: 127.745, maxLng: 127.780 },
-    // PROVISIONAL: oldtown 기준 좌표. 2026-10-26 수정.
+    // PROVISIONAL: oldtown 기준 좌표. 2026-10-26 수정 2차.
     // Founder Decision: 돌산 침범 제거, 여수엑스포역 포함.
-    // 여수엑스포역 위치 UNKNOWN (null coords) — 엑스포 북측 추정 범위로 경계 포함.
+    // 여수엑스포역: 이미지 상단 우측 역사 구조물 y≈0.02~0.10 시각 추정 → NW y=0.10 포함 확장.
     // 오동도(0.87,0.28) CONFIRMED. 나머지 시각 추정.
     boundary: {
       imageId: 'yeosu-oldtown-v01',
       points: [
-        { x: 0.47, y: 0.30 }, // NW: 엑스포 단지 북측 — 엑스포역 포함 추정 (UNKNOWN exact)
+        { x: 0.47, y: 0.10 }, // NW: 엑스포역 방향 북측 확장 (이미지 상단 역사 구조물 y≈0.05~0.10)
         { x: 0.90, y: 0.14 }, // NE: 오동도 북동
         { x: 0.96, y: 0.46 }, // E:  오동도 동쪽 이미지 경계
-        { x: 0.74, y: 0.63 }, // SE: 케이블카 자산탑승장 남동 (돌산 제외) ← 수정
-        { x: 0.57, y: 0.63 }, // S:  Zone 2 남측 경계 (돌산 제외) ← 수정
+        { x: 0.74, y: 0.63 }, // SE: 케이블카 자산탑승장 남동 (돌산 제외)
+        { x: 0.57, y: 0.63 }, // S:  Zone 2 남측 경계 (돌산 제외)
         { x: 0.56, y: 0.40 }, // W:  Zone 1/2 경계 하단
       ],
       status: 'PROVISIONAL',
-      source: 'zone2-correction-2026-10-26 (dolsan-excluded, expo-station-included)',
+      source: 'zone2-expo-station-extension-2026-10-26 (nw-y-0.30→0.10, expo-station-visual-est)',
     },
   },
   {
@@ -243,5 +243,5 @@ export const QA_OLDTOWN_POSITIONS = {
   sky_tower:            { x: 0.512, y: 0.432, confirmed: true,  zone: 2, conflict: true },
   // Zone 2 — null coords 추정
   aquaplanet:           { x: 0.740, y: 0.420, confirmed: false, zone: 2 },
-  yeosu_expo_station:   { x: 0.490, y: 0.320, confirmed: false, zone: 2 }, // UNKNOWN — 엑스포 북측 추정
+  yeosu_expo_station:   { x: 0.570, y: 0.080, confirmed: false, zone: 2 }, // UNKNOWN — 이미지 상단 역사 구조물 시각 추정 (2026-10-26)
 };
