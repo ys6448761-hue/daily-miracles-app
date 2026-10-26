@@ -23,7 +23,17 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
 
-**여수 지역별 탐색 V0.1 — Boundary Render 근본 원인 수정 완료 → Founder 검수 가능**
+**여수 지역별 탐색 V0.1 — Zone 2 경계 수정 완료 → Founder SE boundary 확인 대기**
+- **MAP_V01_ZONE2_BOUNDARY_CORRECTION_READY** ✅ (2026-10-26)
+  - SE (0.80,0.82)→(0.74,0.63): 돌산 방향 침범 제거
+  - NW (0.57,0.38)→(0.47,0.30): 여수엑스포역 포함 추정 (UNKNOWN exact)
+  - 비교 이미지: `docs/knowledge/MAP-V01-ZONE2-BOUNDARY-CORRECTION-COMPARE.png`
+  - 빌드 ✅ 698 modules / 회귀 615/616 PASS (R20 PRE-EXISTING)
+  - **Founder 확인 필요**: S boundary y=0.63이 돌산을 충분히 제외하는지 + 엑스포역 NW 위치
+- **MAP_V01_SEVEN_ZONE_VISUAL_QA_RECORDED** ✅ (2026-10-26)
+  - SVG 렌더링 확인(빨간 테스트 사각형), Zone 1·2 QA 배너·경계선 표시 확인
+  - Zone 3~7 overview 가독성 이슈: Phase 2 backlog 등록
+  - 권역 간 장소 선택 누적: 의도된 설계 확인 (routePlaces 공유)
 - **MAP_V01_BOUNDARY_RENDER_ROOT_CAUSE_RESOLVED** ✅ (2026-10-26)
   - **근본 원인**: Express가 `dist/` 빌드 서빙 → `import.meta.env.DEV=false` → QA 항상 비활성
   - **수정**: `hostname==='localhost'||'127.0.0.1'` 조건으로 교체 → 빌드된 파일에도 정상 동작
