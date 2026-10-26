@@ -90,7 +90,7 @@ export const YEOSU_PLACES = [
   { code: 'yeojaman_sunset',      name_ko: '여자만갯벌/해넘이', zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false },
   { code: 'seomdalcheon',         name_ko: '섬달천',             zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false },
   { code: 'hwanyang_drive',       name_ko: '화양드라이브',       zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false },
-  { code: 'settler_cactus',       name_ko: '서틀러다육식물원',   zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false, coordNote: 'GEO-2 HOLD: 법인주소=소라면 논골안길(서틀러영농조합법인). 실제 방문지 소재 미확인. 법인주소≠방문지 가능성. Zone 변경 금지.' },
+  { code: 'settler_cactus',       name_ko: '서틀러다육식물원',   zone: 5, lat: null, lng: null, status: 'verify', coordVerified: false, coordNote: 'GEO-2: Founder 결정 Zone 6→5 (소호·장도권). 법인주소=소라면 논골안길 20-9. 실제 방문지 동일성 UNVERIFIED. 좌표·마커 미표시.' },
   { code: 'jangcheok_tideland',   name_ko: '장척갯벌체험',       zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false },
   { code: 'bonghwangsan',         name_ko: '봉황산자연휴양림',   zone: 3, lat: null, lng: null, status: 'verify', coordVerified: false, coordNote: 'Founder 주소 확인: 전남 여수시 돌산읍 대복길 160 → Zone 6→3 (돌산권).' },
   { code: 'artland_resort',       name_ko: '예술랜드리조트',     zone: 3, lat: null, lng: null, status: 'verify', coordVerified: false, coordNote: 'Founder QA 판단 유지: Zone 6→3 (돌산권). 주소 미제공, Founder 판단 기준.' },
