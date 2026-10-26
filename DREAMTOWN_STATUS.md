@@ -23,7 +23,13 @@ Last Updated: 2026-10-25
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-26
 
-**여수 지역별 탐색 V0.1 — Boundary Scaffold 완료 → Founder 경계 좌표 검수 대기**
+**여수 지역별 탐색 V0.1 — Oldtown 이미지 경계 시각 QA 문서 완료 → Founder 검수 대기**
+- **MAP_V01_OLDTOWN_BOUNDARY_VISUAL_QA_READY** ✅ (2026-10-26)
+  - `docs/knowledge/MAP-V01-OLDTOWN-BOUNDARY-VISUAL-QA.md`
+  - oldtown 이미지(1564×1006) 기준 Zone 1·2 장소 추정 좌표 + PROVISIONAL 경계 후보
+  - 오동도(x=0.87,y=0.28) 단일 기준점 역산 → 전체 추정 좌표 도출 (고불확실도)
+  - V-1~V-7 Founder 검수 항목 정의 (이순신광장/하멜등대/오동도 위치 확인 요청)
+  - 코드 변경 없음 / 사용자 화면 변화 없음 / status:UNVERIFIED 유지
 - **MAP_V01_ZONE2_DETAIL_MAP_CORRECTED** ✅ (2026-10-26) SHA `5be807f`
   - Zone 2 hasDetailMap: true / boundary.imageId: yeosu-oldtown-v01 (FOUNDER_ZONE2_DETAIL_MAP_REUSE_APPROVED)
   - 오동도 마커(zone=2) → Zone 2 ZoneDetail에서 zone 필터로 자동 표시
