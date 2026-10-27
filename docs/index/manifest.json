@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-27T09:28:30.961Z",
+  "generated_at": "2026-10-27T09:35:26.063Z",
   "generator": "generate-manifest.js",
-  "total_count": 514,
+  "total_count": 515,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3298,6 +3298,22 @@
       "title": "Map V0.1 Preparation Evidence",
       "created_at": "2026-10-27",
       "checksum": "16df6ee6"
+    },
+    {
+      "id": "DOC-MAP-V01-SAVE-GATE-EVIDENCE",
+      "path": "docs/knowledge/MAP-V01-SAVE-GATE-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "레이블",
+      "title": "MAP V0.1 — First Marker Save Gate Evidence",
+      "created_at": "2026-10-27",
+      "checksum": "f8aab363"
     },
     {
       "id": "DOC-MAP-V01-SEVEN-ZONE-VISUAL-QA",
