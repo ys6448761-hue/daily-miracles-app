@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-27T00:37:51.456Z",
+  "generated_at": "2026-10-27T01:13:44.447Z",
   "generator": "generate-manifest.js",
-  "total_count": 499,
+  "total_count": 500,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3431,6 +3431,22 @@
       "title": "RELEASE-PREFLIGHT-B-001 — Phase B V0.1 Production Release Preflight",
       "created_at": "2026-10-27",
       "checksum": "398a083a"
+    },
+    {
+      "id": "DOC-SOUL-CAR-INTENT-UX-EVIDENCE",
+      "path": "docs/knowledge/SOUL-CAR-INTENT-UX-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "team",
+      "status": "|------",
+      "title": "SOUL CAR INTENT RESPONSE UX Evidence",
+      "created_at": "2026-10-27",
+      "checksum": "33424f5f"
     },
     {
       "id": "DOC-SOUL-VEHICLE-GUIDANCE-MINIMAL-",

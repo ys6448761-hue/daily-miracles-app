@@ -1883,7 +1883,7 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPla
     if (!currentPlaceCode) {
       if (pt === 'family_elderly') return `부모님과 함께 여행이시군요.\n부모님과 함께 둘러볼 만한 곳을 골라봤어요.`;
       if (pt === 'family_with_kids') return `아이들과 함께 여행이시군요.\n아이와 함께 즐길 수 있는 곳을 골라봤어요.`;
-      if (soulContext.has_car === true) return `지금 상황에 맞는 곳을 찾아볼게요.\n자차로 이동하기 좋은 곳을 골라봤어요.`;
+      if (soulContext.has_car === true) return `차를 가져오셨군요. 이동이 한결 자유롭겠어요.\n자차로 다니기 좋은 곳을 골라봤어요.`;
     }
     // Default PARTIAL — place-aware if current place known
     if (placePrefix) {
@@ -3308,16 +3308,22 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
       const _mNames = _mPlaces.map(p => p.name_ko).filter(Boolean);
       if (_mNames.length) soulMessage += '\n\n' + _mNames.map(n => `· ${n}`).join('\n');
     } else if (_hasCar) {
-      // C-3: has_car PARTIAL — include place names so users see actual recommendations
-      const _carNames = tgResult.places.map(p => p.name_ko).filter(Boolean);
-      if (_carNames.length) soulMessage += '\n\n' + _carNames.map(n => `· ${n}`).join('\n');
+      // has_car PARTIAL — 장소명 + parking_ko 통합 표시 (실용적 이동 팁 바로 제공)
+      // parking_ko가 없는 장소는 장소명만 표시, UNKNOWN 보존
+      const _carEntries = tgResult.places.map(p => {
+        const pk = p.place_code && _PLACE_KNOWLEDGE[p.place_code]?.parking_ko;
+        return pk ? `· ${p.name_ko}\n  ${pk}` : `· ${p.name_ko}`;
+      });
+      if (_carEntries.length) soulMessage += '\n\n' + _carEntries.join('\n');
     }
   }
 
   // C-3: Parking supplement — append verified parking_ko for recommended places when has_car=true.
   // Uses _PLACE_KNOWLEDGE data only. Places without parking_ko are silently omitted (UNKNOWN preserved).
-  // Guard: skip for course-intent messages — 낭만버스 route reply does not need parking info appended.
-  if (enrichedSoulContext.has_car === true && tgResult?.places?.length && !_isCourseMsg) {
+  // Guard 1: skip for course-intent messages
+  // Guard 2: skip for PARTIAL has_car no-place_code — already integrated inline above
+  const _carPartialCovered = status === 'PARTIAL' && !explicit_context.place_code && enrichedSoulContext.has_car === true;
+  if (enrichedSoulContext.has_car === true && tgResult?.places?.length && !_isCourseMsg && !_carPartialCovered) {
     const parkingLines = tgResult.places
       .filter(p => p.place_code && _PLACE_KNOWLEDGE[p.place_code]?.parking_ko)
       .map(p => `  · ${_PLACE_KNOWLEDGE[p.place_code].parking_ko}`);

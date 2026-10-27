@@ -23,7 +23,15 @@ Last Updated: 2026-10-27
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**MAP V0.1 Final Integration — Founder 브라우저 QA 검수 1회 필요**
+**SOUL CAR INTENT RESPONSE UX — Founder 브라우저 검수 + Before/After 확인**
+- **SOUL_CAR_INTENT_RESPONSE_UX_READY** ✅ (2026-10-27)
+  - Evidence: `docs/knowledge/SOUL-CAR-INTENT-UX-EVIDENCE.md`
+  - 변경: 인트로 텍스트 개선 + PARTIAL has_car 장소별 parking_ko 통합 표시 + 중복 방지 가드
+  - 회귀: 639/640 PASS (R20 PRE-EXISTING 유지) ✅
+  - 검증: soulCarInfoSeparation.test.js 7/7 PASS (CI-2 SUCCESS path 정상 유지) ✅
+  - 변경 없음: SOUL 추천 로직 / API / DB / CAR GOVERNANCE_HOLD / _estimateTravelTime() stub
+
+**[이전] MAP V0.1 Final Integration — Founder 브라우저 QA 검수 1회 필요**
 - **MAP_V01_FINAL_INTEGRATION_WITH_DEFERRED_MARKERS** ✅ (2026-10-27)
   - **Authorized**: MAP_V01_FINAL_INTEGRATION_AUTHORIZED
   - Evidence: `docs/knowledge/MAP-V01-FINAL-INTEGRATION-EVIDENCE.md`
