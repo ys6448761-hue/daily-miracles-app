@@ -717,7 +717,7 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                           : `${m.name_ko} (위치 미검증)`
                       }
                       aria-pressed={(!placementMode && selectable) ? selected : undefined}
-                      title={isVerified ? m.name_ko : `[QA위치미검증] ${m.name_ko}`}
+                      title={isVerified ? m.name_ko : `${m.name_ko} · 위치 검수 중`}
                       style={{
                         position: 'absolute',
                         left: `${mp.x * 100}%`,
@@ -942,7 +942,13 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
             return (
               <div
                 key={place.code}
-                title={place.status === MAP_STATUS.FERRY ? '배편 예약 후 방문 권장' : '코스 추천 준비 중이에요'}
+                title={
+                  place.status === MAP_STATUS.FERRY
+                    ? '배편 예약 후 방문 권장'
+                    : place.status === MAP_STATUS.EXPLORER
+                    ? `${place.name_ko} — 탐색 가능한 장소예요. 여행 코스 직접 추가는 준비 중이에요.`
+                    : '정보 수집 중인 장소예요'
+                }
                 style={{
                   padding: '8px 12px',
                   borderRadius: '20px',
@@ -950,9 +956,10 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                   background: badge ? badge.bg : 'rgba(255,255,255,0.04)',
                   display: 'flex', alignItems: 'center', gap: '6px',
                   cursor: 'default',
+                  opacity: place.status === MAP_STATUS.EXPLORER ? 0.72 : 0.55,
                 }}
               >
-                <span style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.45)', wordBreak: 'keep-all' }}>
+                <span style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.55)', wordBreak: 'keep-all' }}>
                   {place.name_ko}
                 </span>
                 {badge && (

@@ -23,14 +23,22 @@ Last Updated: 2026-10-27
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**MAP V0.1 마커 렌더링 확인 — Founder 브라우저 검수 후 VERIFIED 승격 여부 결정**
+**MAP V0.1 — 4곳 위치 재지정 대기 (아쿠아플라넷·빅오쇼·낭만요트·블루요트)**
+- **MAP_V01_DISCOVERY_CLICK_FIXED** ✅ (2026-10-27) SHA (pending)
+  - 클릭 불가 원인: `isSelectablePlace()` = `status === 'tg_ready'` — explorer 장소 비인터랙티브 (의도된 SOUL 게이팅)
+  - UX 수정: 하단 목록 explorer `<div>` title "코스 추천 준비 중이에요" → 장소별 명확한 안내 문구
+  - 마커 title `[QA위치미검증]` → `위치 검수 중` (개발자 용어 제거)
+  - SOUL 게이팅 유지: isSelectablePlace() 변경 없음 / TG_READY 아닌 장소 SOUL 포함 없음
+  - marine_park 중복: **코드 정상** — Founder 브라우저 하드 리프레시(Ctrl+Shift+R) 필요
+  - 4곳 POSITION_CORRECTION_REQUIRED 주석 추가 (좌표 불변, 재드래그 대기)
+  - 빌드 ✅ 698 modules / 639/640 PASS / Evidence: `docs/knowledge/MAP-V01-DISCOVERY-CLICK-UX-EVIDENCE.md`
+  - **다음**: Founder QA Preview → 아쿠아플라넷·빅오쇼·낭만요트·블루요트 4곳 재드래그 → 내보내기 → 코드야 전달
 - **MAP_V01_DUPLICATE_MARKERS_REMOVED** ✅ (2026-10-27) SHA `d67df29`
   - 원인: QA_OLDTOWN_POSITIONS(구버전 참조점) + markerPos(신규 좌표) 동일 place_id 이중 렌더링
   - 수정: qaPlaces 필터에 "markerPos 있는 장소 제외" 조건 추가 (YeosuMapSelector.jsx line 355-361)
   - 제거된 QA 참조점: 12곳 (markerPos 반영된 장소) / 유지: 3곳 (gosodong·수산시장·엑스포역)
   - 중복 0건 / Founder 좌표 15개 불변 / 빌드 ✅ / 639/640 PASS
   - Evidence: `docs/knowledge/MAP-V01-DUPLICATE-MARKER-FIX-EVIDENCE.md`
-  - **다음**: Founder `localhost:5000/muyojeong` → Zone 1·2 마커 위치 확인 → VERIFIED 승격 여부 결정
 - **MAP_V01_15_MARKERS_SOURCE_SAVED** ✅ (2026-10-27) SHA `92e4b99`
   - 15곳 전체 Founder 좌표 반영 완료 / 15/15 소스 일치 / 전 15곳 PROVISIONAL 유지
   - Zone 1: 이순신광장·낭만포차·하멜등대·진남관·오포대·종포해양공원

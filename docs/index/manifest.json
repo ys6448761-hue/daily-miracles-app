@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-27T10:16:09.811Z",
+  "generated_at": "2026-10-27T10:40:10.308Z",
   "generator": "generate-manifest.js",
-  "total_count": 516,
+  "total_count": 517,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3074,6 +3074,22 @@
       "title": "MAP V0.1 Direct Marker Placement — Evidence",
       "created_at": "2026-10-27",
       "checksum": "0b434d50"
+    },
+    {
+      "id": "DOC-MAP-V01-DISCOVERY-CLICK-UX-EVI",
+      "path": "docs/knowledge/MAP-V01-DISCOVERY-CLICK-UX-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "근거",
+      "title": "MAP V0.1 — Discovery Click UX Fix Evidence",
+      "created_at": "2026-10-27",
+      "checksum": "d750d61d"
     },
     {
       "id": "DOC-MAP-V01-DRAFT-PERSISTENCE-QA-E",
