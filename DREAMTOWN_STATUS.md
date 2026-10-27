@@ -23,13 +23,20 @@ Last Updated: 2026-10-27
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**SOUL CAR INTENT RESPONSE UX — Founder 브라우저 검수 + Before/After 확인**
-- **SOUL_CAR_INTENT_RESPONSE_UX_READY** ✅ (2026-10-27)
-  - Evidence: `docs/knowledge/SOUL-CAR-INTENT-UX-EVIDENCE.md`
-  - 변경: 인트로 텍스트 개선 + PARTIAL has_car 장소별 parking_ko 통합 표시 + 중복 방지 가드
+**SOUL MAIN CAR INTENT RUNTIME — Founder 로컬 서버 재시작 필요**
+- **SOUL_MAIN_CAR_INTENT_RUNTIME_FIXED** ✅ (2026-10-27) SHA `e246f40`
+  - **미반영 원인 1**: 서버가 828ba78 이전(2026-10-26 11:28)에 시작되어 이전 코드를 require 캐시에 보유
+  - **미반영 원인 2**: `has_car` backward-compat default(`null→true`)로 비차량 쿼리에도 차량 인트로 표시됨
+  - **수정**: `_provenance.has_car === 'USER_EXPLICIT'` 가드 3곳 추가 (인트로 분기 / PARTIAL 통합 표시 / C-3 parking supplement)
+  - **로컬 API 검증**:
+    - A. '차량으로' 버튼 → "차를 가져오셨군요." + parking_ko 통합 표시 ✅
+    - E. 비차량 쿼리("여수 명소 추천해줘") → 차량 인트로 없음 ✅
   - 회귀: 639/640 PASS (R20 PRE-EXISTING 유지) ✅
-  - 검증: soulCarInfoSeparation.test.js 7/7 PASS (CI-2 SUCCESS path 정상 유지) ✅
-  - 변경 없음: SOUL 추천 로직 / API / DB / CAR GOVERNANCE_HOLD / _estimateTravelTime() stub
+  - **Founder 로컬 서버 재시작 필요**: `Ctrl+C → node server.js` 또는 npm start
+
+**[이전] SOUL CAR INTENT RESPONSE UX**
+- **SOUL_CAR_INTENT_RESPONSE_UX_READY** ✅ (2026-10-27) SHA `828ba78`
+  - Evidence: `docs/knowledge/SOUL-CAR-INTENT-UX-EVIDENCE.md`
 
 **[이전] MAP V0.1 Final Integration — Founder 브라우저 QA 검수 1회 필요**
 - **MAP_V01_FINAL_INTEGRATION_WITH_DEFERRED_MARKERS** ✅ (2026-10-27)
