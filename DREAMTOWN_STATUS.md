@@ -23,24 +23,25 @@ Last Updated: 2026-10-27
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**MAP V0.1 Direct Marker Placement — Founder QA 도구 완성, 브라우저 검수 필요**
+**MAP V0.1 그림판 마커 정렬 완료 — Founder 브라우저 검수 필요**
+- **MAP_V01_PAINT_MARKER_ALIGNMENT_READY** ✅ (2026-10-27) SHA `9c5c137`
+  - Python Pillow 픽셀 클러스터 추출 (1564×1006 동일 해상도 확인)
+  - **업데이트**: 낭만포차(0.593,0.599) / 하멜등대(0.519,0.718) [AMBIGUOUS 해소] / 종포해양공원(0.387,0.509)
+  - **재확인 필요**: 이순신광장 (흰 원 표시) / 자산공원 (마커 없음) / 케이블카 (AMBIGUOUS 유지)
+  - 빌드 ✅ 698 modules / 회귀 ✅ 639/640 PASS (R20 PRE-EXISTING)
+  - Evidence: `docs/knowledge/MAP-V01-FOUNDER-MARKER-ALIGNMENT-EVIDENCE.md`
 - **MAP_V01_DIRECT_MARKER_PLACEMENT_READY** ✅ (2026-10-27) SHA `05e1c0c`
   - QA Preview(`localhost + ?qa_preview=boundary`)에서만 활성화
   - **마커 위치 지정 모드**: 지도 클릭 → 녹색 후보 마커 즉시 표시 → 좌표 복사
-  - **대상 5개 장소**: 이순신광장 / 종포해양공원 / 낭만포차거리 / 오동도 / 자산공원
-  - **AMBIGUOUS 2개** (목록 미포함): 하멜등대 / 케이블카
-  - 빌드 ✅ 698 modules / 회귀 639/640 PASS (R20 PRE-EXISTING)
-  - Evidence: `docs/knowledge/MAP-V01-DIRECT-MARKER-PLACEMENT-EVIDENCE.md`
-  - **Founder 검수 절차**:
+  - **Founder 검수 절차** (이순신광장·자산공원·케이블카 재확인 포함):
     1. `node server.js` 재시작
     2. `http://localhost:5000/muyojeong?qa_preview=boundary` 접속
     3. Zone 1 → "📍 마커 위치 지정 모드 시작" → 장소 선택 → 지도 클릭
-    4. 5개 장소 완료 후 "전체 좌표 복사" → 코드야에게 전달
-    5. 하멜등대·케이블카 위치도 위치 지정 모드로 직접 지정 가능
+    4. 이순신광장·자산공원·케이블카 위치 직접 지정 → "전체 좌표 복사" → 코드야에게 전달
 
-**[이전] MAP V0.1 Founder 마커 정렬 완료**
+**[이전] MAP V0.1 Founder 마커 정렬 (1차)**
 - **MAP_V01_FOUNDER_MARKER_ALIGNMENT_READY** ✅ (2026-10-27) SHA `f25653f`
-  - 이순신광장(0.255,0.540) / 종포해양공원(0.410,0.603) / 낭만포차거리(0.445,0.626) / 오동도(0.853,0.340) / 자산공원(0.582,0.495)
+  - 이순신광장(0.255,0.540) / 종포해양공원(0.387,0.509) / 낭만포차거리(0.593,0.599) / 하멜등대(0.519,0.718) / 오동도(0.853,0.340) / 자산공원(0.582,0.495)
   - Evidence: `docs/knowledge/MAP-V01-FOUNDER-MARKER-ALIGNMENT-EVIDENCE.md`
 
 **[이전] SOUL MAIN CAR INTENT — Founder 브라우저 확인 1회 필요**
