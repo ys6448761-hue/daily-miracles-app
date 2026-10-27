@@ -47,9 +47,10 @@ const STATUS_BADGE = {
 const OVERVIEW_IMG  = '/images/muyojeong/map/yeosu-overview-v01.png';
 const OLDTOWN_IMG   = '/images/muyojeong/map/yeosu-oldtown-v01.png';
 
-// 로컬 초안 저장 키 — imageId=oldtown, 데이터버전=v01
+// 로컬 초안 저장 키 — imageId=oldtown, 데이터버전=v02
+// CLEAN_RESTART_V02 (2026-10-27): v01 초안 격리, 새 좌표 작업 시작
 // 이미지·데이터 버전이 바뀌면 키를 변경해 오래된 초안 자동 무효화
-const DRAFT_KEY = 'yeosu_map_draft_v01_oldtown';
+const DRAFT_KEY = 'yeosu_map_draft_v02_oldtown';
 
 // 마커 위치 지정 대상 장소 — Zone 1·2 모두 oldtown 이미지를 공유하므로 한 화면에서 연속 지정 가능
 const PLACEMENT_TARGETS = [

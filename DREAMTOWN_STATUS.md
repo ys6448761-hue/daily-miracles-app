@@ -23,27 +23,29 @@ Last Updated: 2026-10-27
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**MAP V0.1 Zone 1·2 Final Completion — Founder 복사 결과 수신 후 마무리**
-- **MAP_V01_DRAFT_PERSISTENCE_QA_PASS** ✅ (2026-10-27) — Static PASS / 브라우저 항목 OPEN
-  - 정적 분석 PASS 5항목: DRAFT_KEY 일치, 빈 candidates 덮어쓰기 방지, Zone 전환 보존, 초안삭제 명시적 전용
-  - 브라우저 OPEN 4항목 (V-03/04/05/06): 드래그→저장·새로고침 복원·Zone 전환·내보내기 일치
-  - V-09 이전 세션 좌표: 서버 접근 불가 — Founder DevTools 직접 확인 필요
+**MAP V0.1 마커 좌표 지정 — Founder 드래그(15곳) → 좌표 전달 → 코드야 반영**
+- **MAP_V01_MARKER_CLEAN_RESTART_READY** ✅ (2026-10-27)
+  - Founder 결정: MAP_V01_MARKER_CLEAN_RESTART_APPROVED — 모든 PROVISIONAL markerPos 초기화
+  - 백업 SHA: `72367ee` / 백업 파일: `docs/knowledge/MAP-V01-MARKERPOS-BACKUP.md` (7곳)
+  - 초기화된 markerPos: 이순신광장·낭만포차·하멜등대·종포해양공원·오동도·케이블카·자산공원
+  - DRAFT_KEY v02 (`yeosu_map_draft_v02_oldtown`) — v01 초안 격리 완료
+  - 보존: Zone 1~7·Inventory 45·TG_READY 12·SOUL 게이팅·드래그 편집기·localStorage 저장·복원
+  - Runtime QA: 11/12 PASS (T-07 저장·T-08 복원·T-09 Zone 전환 모두 PASS / T-11 test infra)
+  - 빌드 ✅ 698 modules / 639/640 PASS (R20 PRE-EXISTING)
+  - Evidence: `docs/knowledge/MAP-V01-CLEAN-RESTART-EVIDENCE.md`
+  - **Founder 다음 할 일** (드래그 15곳):
+    1. `localhost:5000/muyojeong?qa_preview=boundary` → Zone 1 진입 → "좌표 지정 시작"
+    2. PLACEMENT_TARGETS 15곳 각각: A(드래그) → B(내보내기) → 코드야에게 전달
+    3. 워크플로우: NOT_PLACED → DRAFT → SOURCE_SAVED → FOUNDER_APPROVED
+    4. 완료 후 VERIFIED 승격은 별도 Founder 명시 승인 필요
+- **MAP_V01_DRAFT_RUNTIME_VERIFIED** ✅ (2026-10-27) — Runtime 11/12 PASS
+  - T-07(저장)·T-08(복원 배지·좌표 일치)·T-09(Zone 전환 유지) 모두 PASS
+  - T-11: puppeteer 스크롤 클릭 이슈 (코드 버그 아님)
+  - Evidence: `docs/knowledge/MAP-V01-CLEAN-RESTART-EVIDENCE.md §5`
+- **MAP_V01_DRAFT_PERSISTENCE_QA_PASS** ✅ (2026-10-27) — Static PASS
   - Evidence: `docs/knowledge/MAP-V01-DRAFT-PERSISTENCE-QA-EVIDENCE.md`
-- **MAP_V01_COORDINATE_DRAFT_PERSISTENCE_READY** ✅ (2026-10-27)
-  - localStorage 로컬 초안 자동 저장·복원 추가 (QA Preview 전용)
-  - 저장 키: `yeosu_map_draft_v01_oldtown` (imageId + 데이터버전 포함)
-  - 새로고침 후에도 초안 좌표 복원됨 / "초안 복원됨" 배지 표시
-  - 상태 4단계: 미지정 → 후보 좌표 있음 → 내보내기 완료 → **코드 반영**
-  - "초안 삭제" 버튼: localStorage + state 전체 초기화
-  - 빌드 ✅ / 639/640 PASS (R20 PRE-EXISTING)
-  - Evidence: `docs/knowledge/MAP-V01-COORDINATE-DRAFT-PERSISTENCE-EVIDENCE.md`
-  - **Founder 다음 할 일**:
-    1. `node server.js` 재시작 → `localhost:5000/muyojeong?qa_preview=boundary`
-    2. 이순신광장·하멜등대·엑스포공원·스카이타워 드래그 위치 지정
-    3. "전체 좌표 내보내기" → 클립보드 결과 코드야에게 전달
-    4. 새로고침 → 초안 복원 확인 (V-04 브라우저 검증)
+- **[이전] MAP_V01_COORDINATE_DRAFT_PERSISTENCE_READY** ✅ (2026-10-27) — 해제됨 (v02로 대체)
 - **[이전] MAP_V01_COORDINATE_PERSISTENCE_HOLD** (2026-10-27) — 해제됨
-  - 케이블카 Zone 2 정상 / 이순신광장·하멜등대 드래그 좌표 유실 확인
   - Evidence: `docs/knowledge/MAP-V01-POSITION-CATEGORY-CHECK-EVIDENCE.md`
 - **MAP_V01_ZONE1_ZONE2_FINAL_COMPLETION_READY** ✅ (2026-10-27)
   - 빅오쇼(big_o_show) Zone 2 EXPLORER 신규 추가 → 최종 Inventory 45개

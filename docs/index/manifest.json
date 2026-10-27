@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-27T09:04:04.320Z",
+  "generated_at": "2026-10-27T09:28:30.961Z",
   "generator": "generate-manifest.js",
-  "total_count": 512,
+  "total_count": 514,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2996,6 +2996,22 @@
       "checksum": "69f6710d"
     },
     {
+      "id": "DOC-MAP-V01-CLEAN-RESTART-EVIDENCE",
+      "path": "docs/knowledge/MAP-V01-CLEAN-RESTART-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "|------",
+      "title": "MAP V0.1 — Marker Clean Restart Evidence",
+      "created_at": "2026-10-27",
+      "checksum": "aaa5e5d8"
+    },
+    {
       "id": "DOC-MAP-V01-COMPLETION-LEDGER",
       "path": "docs/knowledge/MAP-V01-COMPLETION-LEDGER.md",
       "type": "document",
@@ -3186,6 +3202,22 @@
       "title": "MAP V0.1 마커 설계 문서",
       "created_at": "2026-10-27",
       "checksum": "5e306fe0"
+    },
+    {
+      "id": "DOC-MAP-V01-MARKERPOS-BACKUP",
+      "path": "docs/knowledge/MAP-V01-MARKERPOS-BACKUP.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "MAP V0.1 — markerPos 백업 (CLEAN RESTART 전)",
+      "created_at": "2026-10-27",
+      "checksum": "55064872"
     },
     {
       "id": "DOC-MAP-V01-OLDTOWN-BOUNDARY-OVERL",
