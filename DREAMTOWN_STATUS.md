@@ -23,19 +23,19 @@ Last Updated: 2026-10-27
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**SOUL 차량 여행 안내 개선 검토 — Founder Decision 대기**
-- **SOUL_VEHICLE_GUIDANCE_REVIEW_READY** ✅ (2026-10-26)
-  - Evidence: `docs/knowledge/SOUL-VEHICLE-GUIDANCE-REVIEW-V0_1.md`
-  - 코드·엔진·API·DB 변경 없음 / CAR GOVERNANCE_HOLD 유지
-  - **현재 잘 작동**: 케이블카 PSQ roundtrip_ko+parking_ko / 돌산공원 C-3 보충 / Companion+차량 chip
-  - **공백 (data만으로 개선 가능)**:
-    - 향일암 parking_ko=null → 차량 여행자 주차 안내 없음 (데이터 수집 필요)
-    - 오동도 parking_ko=null → 방파제 구조·주차 확인 필요
-  - **공백 (소규모 코드 변경 필요, Founder Decision 대기)**:
-    - 향일암 차량 쿼리 시 routes_ko(등반 경로) 미연결
-    - 케이블카 탑승장 선택 기준이 특정 질문 없이 미노출
-    - JOURNEY_CONTINUITY carNote — 탑승장/동선 안내 없음
-  - **제안 Follow-up 1개**: 케이블카+오동도 계획 시 자산역 탑승장 안내 next_option 추가 여부 → Founder Decision 필요
+**SOUL 차량 안내 최소 개선 완료 — Founder 브라우저 검수 대기**
+- **SOUL_VEHICLE_GUIDANCE_MINIMAL_READY** ✅ (2026-10-27)
+  - **Founder Decision**: FOUNDER_VEHICLE_GUIDANCE_SIMPLIFIED
+  - Evidence: `docs/knowledge/SOUL-VEHICLE-GUIDANCE-MINIMAL-EVIDENCE.md`
+  - DB/Schema/엔진/API 변경 없음 / CAR GOVERNANCE_HOLD 유지
+  - **수정 1 — 향일암 H-5 차량 쿼리**:
+    - BEFORE: "주차 정보는 방문 전에 확인하는 것이 좋아요."
+    - AFTER: "혼잡할 때는 임포주차장을 이용한 후 도보로 이동하는 방법도 있어요. 실제 운영 상황과 이용 가능 여부는 방문 당일 현장에서 확인해보세요."
+  - **수정 2 — 케이블카 C-3 주차 보충**:
+    - BEFORE: "자산·돌산 양쪽 접근 가능. 주차 위치·혼잡은 출발 정류장에 따라 달라요."
+    - AFTER: "자산·돌산 양쪽 접근 가능. 자산 탑승장: 주차 후 엘리베이터. 돌산 탑승장: 주차 후 도보."
+  - 회귀: 639/640 PASS (R20 PRE-EXISTING 유지)
+  - **Founder 브라우저 확인**: 향일암 "차로 가려고요" 응답 / 케이블카 has_car 응답
 
 **MAP 마커 안전성 검증 완료**
 - **MAP_V01_MARKER_SAFETY_VERIFIED** ✅ (2026-10-27)

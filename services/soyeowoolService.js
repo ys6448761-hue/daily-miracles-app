@@ -334,7 +334,7 @@ const _PLACE_KNOWLEDGE = {
     roundtrip_ko: '왕복권과 편도권 모두 있어요. 차를 가져오셨다면 한쪽 역에 주차하고 편도로 타신 후 반대편에서 이동하는 방법도 있어요. 왕복은 타신 곳으로 돌아오는 방식이에요.',
     odongdo_connection_ko: '자산역(여수 쪽)에서 오동도 입구까지 버스 연계 동선으로 이어갈 수 있어요.',
     weather_ko: '실외 고공 구간이 있어서, 강풍이나 기상 악화 시 운행이 중단될 수 있어요. 당일 날씨를 미리 확인해보세요.',
-    parking_ko: '자산(해야)·돌산(놀아) 양쪽 정류장 모두 접근 가능해요. 주차 위치·혼잡은 출발 정류장에 따라 달라요.',
+    parking_ko: '자산(해야)·돌산(놀아) 양쪽 정류장 모두 접근 가능해요. 자산 탑승장은 주차 후 엘리베이터로 이동해요. 돌산 탑승장은 주차 후 도보로 이동해요.',
     experience_ko: '여수 바다 위를 가로지르는 해상 케이블카예요. 바다와 섬, 항구를 높은 곳에서 바라보며 잠시 시야를 넓힐 수 있어요. 익숙한 풍경도 조금 다른 눈으로 바라보게 되는 시간이 될 수 있어요.',
     emotional_role: '상승 / 시야 확장',
   },
@@ -360,8 +360,8 @@ const _PLACE_KNOWLEDGE = {
     experience_ko: '향일암은 바다와 바위 절벽의 풍경을 바라보며 잠시 마음을 가다듬을 수 있는 곳이에요. 경사와 계단이 있는 장소이니, 풍경을 즐기는 마음과 함께 자신의 이동 여건도 살펴보세요.',
     fit_ko: '조용한 풍경과 사찰의 분위기를 느끼고 싶은 분께 어울려요. 부모님이나 아이와 함께라면 계단과 경사 구간을 고려해 무리하지 않는 방문 계획을 세워보세요.',
     walking_ok: '향일암은 경사와 계단 구간이 있어 걷는 부담이 생길 수 있어요. 이동에 어려움이 있다면 방문 전 접근 경로를 확인하고, 무리하지 않는 계획을 세워보세요.',
-    parking_ko: null,
-    parking_trust: 'UNKNOWN',
+    parking_ko: '혼잡할 때는 임포주차장을 이용한 후 도보로 이동하는 방법도 있어요. 실제 운영 상황과 이용 가능 여부는 방문 당일 현장에서 확인해보세요.',
+    parking_trust: 'NON_OFFICIAL',
   },
   // ── BROAD places — Phoenix-verified evidence only ──────────────────────────
   lee_soon_shin_plaza: {
@@ -1468,9 +1468,11 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
     answer = `${name} 주변 주차 정보는 방문 전에 확인하는 것이 좋아요. 실제 이용 가능 여부와 요금은 시점에 따라 달라질 수 있어요.${verifyNote}`;
   }
 
-  // Hyangiram vehicle query — parking UNKNOWN (H-5: no companion, Living Detail Fallback path)
+  // Hyangiram vehicle query — uses parking_ko when available (H-5: no companion, Living Detail Fallback path)
   else if (code === 'hyangiram' && /(차로|자가용으로)/.test(msg)) {
-    answer = `${name} 주변 주차 정보는 방문 전에 확인하는 것이 좋아요. 실제 이용 가능 여부와 요금은 시점에 따라 달라질 수 있어요.${verifyNote}`;
+    answer = knowledge.parking_ko
+      ? `${knowledge.parking_ko}${verifyNote}`
+      : `${name} 주변 주차 정보는 방문 전에 확인하는 것이 좋아요. 실제 이용 가능 여부와 요금은 시점에 따라 달라질 수 있어요.${verifyNote}`;
   }
 
   // Experience / Place Identity — preference over raw field dump for BROAD places
