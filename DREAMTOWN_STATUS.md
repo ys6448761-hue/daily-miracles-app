@@ -23,16 +23,15 @@ Last Updated: 2026-10-27
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**SOUL MAIN CAR INTENT RUNTIME — Founder 로컬 서버 재시작 필요**
-- **SOUL_MAIN_CAR_INTENT_RUNTIME_FIXED** ✅ (2026-10-27) SHA `e246f40`
-  - **미반영 원인 1**: 서버가 828ba78 이전(2026-10-26 11:28)에 시작되어 이전 코드를 require 캐시에 보유
-  - **미반영 원인 2**: `has_car` backward-compat default(`null→true`)로 비차량 쿼리에도 차량 인트로 표시됨
-  - **수정**: `_provenance.has_car === 'USER_EXPLICIT'` 가드 3곳 추가 (인트로 분기 / PARTIAL 통합 표시 / C-3 parking supplement)
-  - **로컬 API 검증**:
-    - A. '차량으로' 버튼 → "차를 가져오셨군요." + parking_ko 통합 표시 ✅
-    - E. 비차량 쿼리("여수 명소 추천해줘") → 차량 인트로 없음 ✅
-  - 회귀: 639/640 PASS (R20 PRE-EXISTING 유지) ✅
-  - **Founder 로컬 서버 재시작 필요**: `Ctrl+C → node server.js` 또는 npm start
+**SOUL MAIN CAR INTENT — Founder 브라우저 확인 1회 필요**
+- **SOUL_MAIN_CAR_INTENT_BROWSER_QA_OPEN** (2026-10-27) SHA `e246f40`
+  - **API 검증 완료** (서버 PID 25068 / e246f40 반영 / 2026-10-27 10:39):
+    - A. '차량으로' → "차를 가져오셨군요." + 케이블카/향일암 parking_ko 통합 ✅
+    - D. "주차 정보:" 중복 섹션 없음 ✅ / E. 비차량 쿼리 차량 인트로 없음 ✅
+    - F. TG_READY 게이팅 불변 (케이블카/하멜등대/향일암) ✅
+  - **브라우저 검증 OPEN**: Founder 로컬에서 `node server.js` 재시작 후 `http://localhost:5000/muyojeong` 접속 → '차량으로' 버튼 클릭 확인
+  - 회귀: 639/640 PASS (R20 PRE-EXISTING 유지)
+  - Evidence: `docs/knowledge/SOUL-CAR-INTENT-UX-EVIDENCE.md`
 
 **[이전] SOUL CAR INTENT RESPONSE UX**
 - **SOUL_CAR_INTENT_RESPONSE_UX_READY** ✅ (2026-10-27) SHA `828ba78`

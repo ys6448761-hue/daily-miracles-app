@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-27T01:13:44.447Z",
+  "generated_at": "2026-10-27T01:48:02.410Z",
   "generator": "generate-manifest.js",
   "total_count": 500,
   "documents": [
@@ -3446,7 +3446,7 @@
       "status": "|------",
       "title": "SOUL CAR INTENT RESPONSE UX Evidence",
       "created_at": "2026-10-27",
-      "checksum": "33424f5f"
+      "checksum": "e827aab4"
     },
     {
       "id": "DOC-SOUL-VEHICLE-GUIDANCE-MINIMAL-",

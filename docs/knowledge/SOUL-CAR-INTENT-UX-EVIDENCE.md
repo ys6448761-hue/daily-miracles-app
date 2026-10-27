@@ -1,7 +1,8 @@
 # SOUL CAR INTENT RESPONSE UX Evidence
 
 **Date**: 2026-10-27  
-**Status**: SOUL_CAR_INTENT_RESPONSE_UX_READY  
+**Status**: SOUL_MAIN_CAR_INTENT_BROWSER_QA_OPEN  
+**SHA**: e246f40 (provenance guard) / f8ece42 (state sync)  
 **Authorized**: FOUNDER_VEHICLE_GUIDANCE_SIMPLIFIED (이전 세션) + SOUL_CAR_INTENT_RESPONSE_UX (이번 세션)
 
 ---
@@ -95,10 +96,40 @@ SUCCESS path (has_car + explicit time) 또는 place_code 있는 경우 → C-3 �
 
 ## §4 테스트 결과
 
+### 단위·회귀 (e246f40 기준)
+
 | 테스트 | 결과 | 비고 |
 |--------|------|------|
 | soulCarInfoSeparation.test.js (7/7) | ✅ PASS | CI-2 포함 — SUCCESS path C-3 정상 작동 |
 | 전체 회귀 (639/640) | ✅ PASS | R20 PRE-EXISTING 1개 — dolsan_daegyo |
+
+### API 검증 (서버 PID 25068 / 2026-10-27 10:39 재시작 / e246f40 반영)
+
+| 항목 | 검증 방법 | 결과 |
+|------|---------|------|
+| A. '차량으로' 버튼 → "차를 가져오셨군요." 인트로 | HTTP API | ✅ PASS |
+| B. 케이블카 자산 엘리베이터·돌산 도보 안내 | HTTP API | ✅ PASS |
+| C. 향일암 혼잡 시 임포주차장 안내 | HTTP API | ✅ PASS |
+| D. "주차 정보:" 중복 섹션 없음 (`_carPartialCovered` 가드 작동) | HTTP API | ✅ PASS |
+| E. 비차량 쿼리("여수 명소 추천해줘") — 차량 인트로 없음 | HTTP API | ✅ PASS |
+| F. 기존 추천 장소·게이팅 불변 (TG_READY: 케이블카/하멜등대/향일암) | HTTP API | ✅ PASS |
+
+### 브라우저 검증 — OPEN (자동화 불가)
+
+| 항목 | 상태 |
+|------|------|
+| '차량으로' 버튼 클릭 → 화면 렌더링 확인 | OPEN — Founder 브라우저 확인 필요 |
+| 모바일 뷰포트 | OPEN |
+
+**브라우저 확인 URL**: `http://localhost:5000/muyojeong`  
+서버 재시작: Founder 로컬에서 `node server.js` 재실행 필요 (e246f40 반영)
+
+### has_car provenance 구분
+
+| 경로 | `has_car` 값 | `_provenance.has_car` | 결과 |
+|------|------------|----------------------|------|
+| '차량으로' 버튼 (`explicit_context.has_car: true`) | `true` | `USER_EXPLICIT` | 차량 인트로 표시 ✅ |
+| 일반 텍스트 쿼리 (차량 언급 없음) | `true` (backward-compat) | `UNKNOWN` | 차량 인트로 없음 ✅ |
 
 ---
 
