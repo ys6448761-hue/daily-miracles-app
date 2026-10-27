@@ -32,7 +32,8 @@ export const YEOSU_PLACES = [
   // 이순신광장: 흰 원으로 표시됨 — 빨간 픽셀 추출 불가. 기존 좌표 유지. Founder 재확인 필요.
   // 마커 좌표: CLEAN_RESTART_V02 (2026-10-27) — 기존 PROVISIONAL 백업 후 초기화
   // 백업: docs/knowledge/MAP-V01-MARKERPOS-BACKUP.md
-  { code: 'lee_soon_shin_plaza',  name_ko: '이순신광장',   zone: 1, lat: 34.7463,    lng: 127.7356,    status: 'tg_ready',   coordVerified: true },
+  { code: 'lee_soon_shin_plaza',  name_ko: '이순신광장',   zone: 1, lat: 34.7463,    lng: 127.7356,    status: 'tg_ready',   coordVerified: true,
+    markerPos: { oldtown: { x: 0.391, y: 0.544, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 지정 2026-10-27
   { code: 'romantic_pojangmacha', name_ko: '낭만포차거리', zone: 1, lat: 34.7421,    lng: 127.7398,    status: 'tg_ready',   coordVerified: true },
   { code: 'hamel_lighthouse',     name_ko: '하멜등대',     zone: 1, lat: 34.7364,    lng: 127.7471,    status: 'tg_ready',   coordVerified: true },
   // 중앙시장: OI-MAP-1 — 지도 미표시, TG 전면 제외 유지
