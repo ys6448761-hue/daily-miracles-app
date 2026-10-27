@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-27T06:23:59.416Z",
+  "generated_at": "2026-10-27T06:39:00.177Z",
   "generator": "generate-manifest.js",
-  "total_count": 505,
+  "total_count": 506,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3106,6 +3106,22 @@
       "title": "MAP V0.1 Geographic QA — 지리 충돌 보고",
       "created_at": "2026-10-27",
       "checksum": "4ce49452"
+    },
+    {
+      "id": "DOC-MAP-V01-MARKER-EDITOR-E2E-EVID",
+      "path": "docs/knowledge/MAP-V01-MARKER-EDITOR-E2E-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "원인",
+      "title": "MAP V0.1 Marker Editor E2E — Evidence",
+      "created_at": "2026-10-27",
+      "checksum": "bef63ab5"
     },
     {
       "id": "DOC-MAP-V01-MARKER-PLAN",

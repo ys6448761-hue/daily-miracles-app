@@ -23,7 +23,23 @@ Last Updated: 2026-10-27
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**MAP V0.1 마커 편집기 — Founder 브라우저 검수 필요**
+**MAP V0.1 Marker Editor E2E — Founder 브라우저 검수 필요**
+- **MAP_V01_MARKER_EDITOR_E2E_READY** ✅ (2026-10-27)
+  - 편집 모드 화면 단순화: 테스트 사각형·경계선·기존 마커·QA 기준점 숨김
+  - 선택 장소명 + x/y + 저장 상태 4단계 패널 항상 표시
+  - 저장 상태: 미지정→후보 좌표 있음→내보내기 완료(코드 반영 전)→코드 반영
+  - 하단 장소 선택 목록: 편집 모드 시 opacity 0.25 + pointerEvents none
+  - 빌드 ✅ / 639/640 PASS (R20 PRE-EXISTING)
+  - Evidence: `docs/knowledge/MAP-V01-MARKER-EDITOR-E2E-EVIDENCE.md`
+  - **브라우저 E2E 검증: OPEN** — Founder 직접 확인 필요
+  - **Founder 검수 절차**:
+    1. `node server.js` 재시작
+    2. `http://localhost:5000/muyojeong?qa_preview=boundary`
+    3. Zone 2 → 자산공원 선택
+    4. 빨간 사각형·경계선·기존 마커 사라짐 확인
+    5. 지도 클릭 또는 마커 드래그 → 상태 패널 x/y 변화 확인
+    6. "좌표 내보내기" → "내보내기 완료 · 코드 반영 전" 확인
+    7. "종료" → 하단 장소 버튼 정상 토글 확인
 - **MAP_V01_FINAL_MARKER_CLOSEOUT_VERIFIED** ✅ (2026-10-27)
   - 종포해양공원 조사 결과: 이미 Task 2(SHA `26afeac`)에서 PLACEMENT_TARGETS(9개)에 포함됨
   - package.json 불필요 항목(`"daily-miracles-mvp": "file:.."`) 정리

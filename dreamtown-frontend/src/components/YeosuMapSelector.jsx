@@ -429,12 +429,49 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                         );
                       })}
 
-                      {/* 안내 */}
-                      <p style={{ fontSize: '0.625rem', color: 'rgba(255,255,255,0.38)', margin: 0, lineHeight: 1.5 }}>
-                        {placementTarget
-                          ? `지도를 클릭해 「${zoneTargets.find(t => t.code === placementTarget)?.name_ko}」 위치를 지정하세요. 다시 클릭하면 수정됩니다.`
-                          : '장소를 선택한 후 지도를 클릭하세요.'}
-                      </p>
+                      {/* 선택 장소 현재 좌표 + 상태 — 항상 표시 */}
+                      {placementTarget && (() => {
+                        const targetName = zoneTargets.find(t => t.code === placementTarget)?.name_ko;
+                        const cand = candidates[placementTarget];
+                        const statusLabel = cand
+                          ? (copied === placementTarget || copied === 'all'
+                            ? '내보내기 완료 · 코드 반영 전'
+                            : '후보 좌표 있음')
+                          : '미지정';
+                        const statusColor = cand
+                          ? (copied === placementTarget || copied === 'all' ? 'rgba(80,220,120,0.90)' : 'rgba(255,200,80,0.85)')
+                          : 'rgba(255,255,255,0.35)';
+                        return (
+                          <div style={{
+                            padding: '6px 10px', borderRadius: '8px',
+                            background: 'rgba(0,0,0,0.35)',
+                            display: 'flex', flexDirection: 'column', gap: '3px',
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <span style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.70)', fontWeight: 600 }}>
+                                {targetName}
+                              </span>
+                              <span style={{ fontSize: '0.5625rem', color: statusColor }}>
+                                {statusLabel}
+                              </span>
+                            </div>
+                            {cand ? (
+                              <span style={{ fontSize: '0.625rem', color: 'rgba(80,220,120,0.85)', fontFamily: 'monospace' }}>
+                                x={cand.x}, y={cand.y}
+                              </span>
+                            ) : (
+                              <span style={{ fontSize: '0.5625rem', color: 'rgba(255,255,255,0.30)' }}>
+                                지도를 클릭하거나 마커를 드래그해 위치를 지정하세요
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()}
+                      {!placementTarget && (
+                        <p style={{ fontSize: '0.625rem', color: 'rgba(255,255,255,0.38)', margin: 0, lineHeight: 1.5 }}>
+                          장소를 선택한 후 지도를 클릭하세요.
+                        </p>
+                      )}
 
                       {/* 후보 좌표 출력 + 미세 조정 */}
                       {Object.entries(candidates).filter(([code]) => zoneTargets.some(t => t.code === code)).length > 0 && (
@@ -467,7 +504,7 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                                   color: copied === t.code ? 'rgba(80,220,120,0.95)' : 'rgba(255,255,255,0.55)',
                                 }}
                               >
-                                    {copied === t.code ? '복사됨' : '복사'}
+                                    {copied === t.code ? '내보내기 완료' : '좌표 내보내기'}
                                   </button>
                                 </div>
                               </div>
@@ -503,7 +540,7 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                                 color: copied === 'all' ? 'rgba(80,220,120,0.95)' : 'rgba(80,220,120,0.60)',
                               }}
                             >
-                              {copied === 'all' ? '전체 복사됨 ✓' : '전체 좌표 복사 (yeosuMapData.js 형식)'}
+                              {copied === 'all' ? '전체 내보내기 완료 (코드 반영 전)' : '전체 좌표 내보내기 (yeosuMapData.js 형식)'}
                             </button>
                           )}
                         </div>
@@ -554,16 +591,18 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                     preserveAspectRatio="none"
                     aria-hidden="true"
                   >
-                    {/* SVG 렌더링 확인용 테스트 사각형 */}
-                    <rect
-                      x="0.05" y="0.05" width="0.90" height="0.90"
-                      fill="none"
-                      stroke="rgba(255,80,80,0.7)"
-                      strokeWidth="0.008"
-                      strokeDasharray="0.025 0.012"
-                    />
-                    {/* PROVISIONAL 경계 */}
-                    {showOldtownBoundary && (
+                    {/* SVG 렌더링 확인용 테스트 사각형 — 편집 모드 시 숨김 */}
+                    {!placementMode && (
+                      <rect
+                        x="0.05" y="0.05" width="0.90" height="0.90"
+                        fill="none"
+                        stroke="rgba(255,80,80,0.7)"
+                        strokeWidth="0.008"
+                        strokeDasharray="0.025 0.012"
+                      />
+                    )}
+                    {/* PROVISIONAL 경계 — 편집 모드 시 숨김 */}
+                    {!placementMode && showOldtownBoundary && (
                       <polygon
                         points={oldtownBoundary.points.map(p => `${p.x},${p.y}`).join(' ')}
                         fill={`${zone.color}18`}
@@ -585,6 +624,8 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                   const mp = m.markerPos.oldtown;
                   const isVerified = mp.status === 'VERIFIED';
                   if (!isVerified && !isQAPreview) return null;
+                  // 편집 모드 시 기존 마커 숨김 — 후보 마커가 대신 표시됨
+                  if (placementMode) return null;
                   const selected = selectedPlaces.some(p => p.code === m.code);
                   const selectable = isSelectablePlace(m) && (isVerified || isQAPreview);
                   // 위치 지정 모드 중 기존 마커 토글 비활성화
@@ -636,8 +677,8 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                   );
                 })}
 
-                {/* QA Preview: 장소 기준점 마커 (DEV 전용) */}
-                {qaPlaces.map(([code, p]) => (
+                {/* QA Preview: 장소 기준점 마커 (DEV 전용) — 편집 모드 시 숨김 */}
+                {!placementMode && qaPlaces.map(([code, p]) => (
                   <div
                     key={`qa-${code}`}
                     title={`[QA] ${code}`}
@@ -788,7 +829,8 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
         </div>
       )}
 
-      {/* 장소 목록 */}
+      {/* 장소 목록 — 편집 모드 시 비활성화 */}
+      <div style={{ opacity: placementMode ? 0.25 : 1, pointerEvents: placementMode ? 'none' : 'auto', transition: 'opacity 0.20s' }}>
       {places.length === 0 ? (
         <p style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.35)', textAlign: 'center', padding: '16px 0' }}>
           장소 정보를 수집 중이에요
@@ -852,6 +894,7 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
           })}
         </div>
       )}
+      </div>{/* end 장소목록 편집모드 비활성화 래퍼 */}
 
       {/* 선택된 장소 합계 */}
       {selectedPlaces.length > 0 && (
