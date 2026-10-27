@@ -20,7 +20,7 @@
  *   onClose        — () => void (지역별 보기 닫기)
  */
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   YEOSU_ZONES,
   MAP_STATUS,
@@ -192,41 +192,91 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
   // candidates: { [code]: { x, y } } — 장소별 독립 후보 좌표
   const [candidates, setCandidates] = useState({});
   const [copied, setCopied] = useState(false);
+  // 드래그 state
+  const [draggingCode, setDraggingCode] = useState(null);
+  const mapWrapperRef = useRef(null);
 
   // Zone 1·2 모두 oldtown 이미지를 공유 → hasDetailMap인 경우 전 장소 선택 가능
   const zoneTargets = isQAPreview && zone?.hasDetailMap
     ? PLACEMENT_TARGETS
     : [];
 
-  // 위치 지정 모드 토글 — 모드 끄면 placementTarget 초기화
+  // 위치 지정 모드 토글 — 모드 끄면 placementTarget·dragging 초기화
   const togglePlacementMode = () => {
     setPlacementMode(prev => {
-      if (prev) setPlacementTarget(null);
+      if (prev) { setPlacementTarget(null); setDraggingCode(null); }
       return !prev;
     });
   };
 
-  // 지도 클릭/터치 → normalized (x, y) 계산
-  // wrapper div(objectFit:fill 컨테이너) 기준 — 이미지가 fill로 wrapper를 꽉 채우므로
-  // wrapper.getBoundingClientRect()가 곧 이미지 표시 영역
+  // normalized x/y 계산 헬퍼 (mapWrapperRef 기준)
+  const calcNorm = (clientX, clientY) => {
+    const rect = mapWrapperRef.current?.getBoundingClientRect();
+    if (!rect) return null;
+    return {
+      x: parseFloat(Math.min(1, Math.max(0, (clientX - rect.left) / rect.width)).toFixed(3)),
+      y: parseFloat(Math.min(1, Math.max(0, (clientY - rect.top) / rect.height)).toFixed(3)),
+    };
+  };
+
+  // 지도 클릭 → 선택된 장소 위치 지정 (드래그 중에는 무시)
   const handleMapClick = (e) => {
-    if (!placementMode || !placementTarget) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = parseFloat(Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width)).toFixed(3));
-    const y = parseFloat(Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height)).toFixed(3));
-    setCandidates(prev => ({ ...prev, [placementTarget]: { x, y } }));
+    if (!placementMode || !placementTarget || draggingCode) return;
+    const n = calcNorm(e.clientX, e.clientY);
+    if (!n) return;
+    setCandidates(prev => ({ ...prev, [placementTarget]: n }));
     setCopied(false);
   };
 
+  // touch fallback (Pointer Events가 지원되지 않는 구형 브라우저용)
   const handleMapTouch = (e) => {
-    if (!placementMode || !placementTarget) return;
-    e.preventDefault(); // 스크롤/확대 방지
+    if (!placementMode || !placementTarget || draggingCode) return;
+    e.preventDefault();
     const touch = e.changedTouches[0];
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = parseFloat(Math.min(1, Math.max(0, (touch.clientX - rect.left) / rect.width)).toFixed(3));
-    const y = parseFloat(Math.min(1, Math.max(0, (touch.clientY - rect.top) / rect.height)).toFixed(3));
-    setCandidates(prev => ({ ...prev, [placementTarget]: { x, y } }));
+    const n = calcNorm(touch.clientX, touch.clientY);
+    if (!n) return;
+    setCandidates(prev => ({ ...prev, [placementTarget]: n }));
     setCopied(false);
+  };
+
+  // 후보 마커 드래그 — Pointer Events + pointer capture
+  const handleCandidatePointerDown = (e, code) => {
+    if (!placementMode) return;
+    e.stopPropagation();
+    e.preventDefault();
+    e.target.setPointerCapture(e.pointerId);
+    setDraggingCode(code);
+    setPlacementTarget(code); // 드래그 시작 시 해당 장소 자동 선택
+    setCopied(false);
+  };
+
+  const handleCandidatePointerMove = (e, code) => {
+    if (draggingCode !== code) return;
+    const n = calcNorm(e.clientX, e.clientY);
+    if (!n) return;
+    setCandidates(prev => ({ ...prev, [code]: n }));
+  };
+
+  const handleCandidatePointerUp = (e, code) => {
+    if (draggingCode !== code) return;
+    setDraggingCode(null);
+    setCopied(false);
+  };
+
+  // 미세 조정 (1px 단위 = 이미지 1564 기준 ≈ 0.001)
+  const nudge = (code, axis, delta) => {
+    setCandidates(prev => {
+      const c = prev[code];
+      if (!c) return prev;
+      return { ...prev, [code]: { ...c, [axis]: parseFloat(Math.min(1, Math.max(0, c[axis] + delta)).toFixed(3)) } };
+    });
+    setCopied(false);
+  };
+
+  // 후보 좌표 재설정
+  const resetCandidate = (code) => {
+    setCandidates(prev => { const n = { ...prev }; delete n[code]; return n; });
+    if (draggingCode === code) setDraggingCode(null);
   };
 
   // 단일 장소 좌표 복사
@@ -386,19 +436,30 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                           : '장소를 선택한 후 지도를 클릭하세요.'}
                       </p>
 
-                      {/* 후보 좌표 출력 */}
+                      {/* 후보 좌표 출력 + 미세 조정 */}
                       {Object.entries(candidates).filter(([code]) => zoneTargets.some(t => t.code === code)).length > 0 && (
                         <div style={{
                           background: 'rgba(0,0,0,0.30)', borderRadius: '8px',
-                          padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: '5px',
+                          padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: '8px',
                         }}>
                           {zoneTargets.filter(t => candidates[t.code]).map(t => (
-                            <div key={t.code} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
-                              <span style={{ fontSize: '0.6875rem', color: 'rgba(80,220,120,0.85)', fontFamily: 'monospace', letterSpacing: '0.02em' }}>
-                                {t.name_ko}: x={candidates[t.code].x}, y={candidates[t.code].y}
-                              </span>
-                              <button
-                                onClick={() => copyCandidate(t.code)}
+                            <div key={t.code} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              {/* 좌표 + 복사·재설정 버튼 */}
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
+                                <span style={{ fontSize: '0.6875rem', color: 'rgba(80,220,120,0.85)', fontFamily: 'monospace', letterSpacing: '0.02em', flexShrink: 1, minWidth: 0 }}>
+                                  {t.name_ko}: x={candidates[t.code].x}, y={candidates[t.code].y}
+                                </span>
+                                <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
+                                  <button
+                                    onClick={() => resetCandidate(t.code)}
+                                    style={{
+                                      padding: '2px 6px', borderRadius: '8px', border: '1px solid rgba(255,80,80,0.30)',
+                                      cursor: 'pointer', fontSize: '0.5625rem', background: 'rgba(255,80,80,0.10)',
+                                      color: 'rgba(255,120,120,0.80)',
+                                    }}
+                                  >✕</button>
+                                  <button
+                                    onClick={() => copyCandidate(t.code)}
                                 style={{
                                   padding: '2px 8px', borderRadius: '8px', border: 'none', cursor: 'pointer',
                                   fontSize: '0.625rem', flexShrink: 0,
@@ -406,8 +467,28 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                                   color: copied === t.code ? 'rgba(80,220,120,0.95)' : 'rgba(255,255,255,0.55)',
                                 }}
                               >
-                                {copied === t.code ? '복사됨' : '복사'}
-                              </button>
+                                    {copied === t.code ? '복사됨' : '복사'}
+                                  </button>
+                                </div>
+                              </div>
+                              {/* 미세 조정 버튼 (선택된 장소만) */}
+                              {placementTarget === t.code && (
+                                <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap', marginLeft: '2px' }}>
+                                  {[['←', 'x', -0.001], ['→', 'x', 0.001], ['↑', 'y', -0.001], ['↓', 'y', 0.001]].map(([label, axis, delta]) => (
+                                    <button
+                                      key={label}
+                                      onClick={() => nudge(t.code, axis, delta)}
+                                      style={{
+                                        padding: '2px 7px', borderRadius: '6px', border: '1px solid rgba(80,180,255,0.30)',
+                                        cursor: 'pointer', fontSize: '0.625rem',
+                                        background: 'rgba(80,180,255,0.10)', color: 'rgba(120,200,255,0.85)',
+                                        fontFamily: 'monospace',
+                                      }}
+                                    >{label}</button>
+                                  ))}
+                                  <span style={{ fontSize: '0.5rem', color: 'rgba(255,255,255,0.25)', alignSelf: 'center', marginLeft: '2px' }}>±0.001</span>
+                                </div>
+                              )}
                             </div>
                           ))}
 
@@ -432,12 +513,14 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                 </div>
               )}
 
-              {/* 지도 이미지 — 위치 지정 클릭 핸들러 포함 */}
+              {/* 지도 이미지 — 클릭·드래그 핸들러 포함 */}
               <div
+                ref={mapWrapperRef}
                 style={{
                   position: 'relative', width: '100%', paddingTop: '64.32%',
                   borderRadius: '10px', overflow: 'hidden',
-                  cursor: placementMode && placementTarget ? 'crosshair' : 'default',
+                  cursor: draggingCode ? 'grabbing' : (placementMode && placementTarget ? 'crosshair' : 'default'),
+                  touchAction: placementMode ? 'none' : 'auto',
                 }}
                 onClick={handleMapClick}
                 onTouchEnd={handleMapTouch}
@@ -585,45 +668,56 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                   </div>
                 ))}
 
-                {/* 후보 마커 — 위치 지정 모드에서 클릭한 장소 좌표 표시 */}
+                {/* 후보 마커 — 드래그 가능 (Pointer Events + capture) */}
                 {placementMode && zoneTargets.filter(t => candidates[t.code]).map(t => {
                   const c = candidates[t.code];
                   const isActive = placementTarget === t.code;
+                  const isDragging = draggingCode === t.code;
                   return (
                     <div
                       key={`cand-${t.code}`}
-                      title={`[후보] ${t.name_ko}: (${c.x}, ${c.y})`}
+                      title={`[후보] ${t.name_ko}: (${c.x}, ${c.y}) — 드래그해 위치 조정`}
+                      onPointerDown={(e) => handleCandidatePointerDown(e, t.code)}
+                      onPointerMove={(e) => handleCandidatePointerMove(e, t.code)}
+                      onPointerUp={(e) => handleCandidatePointerUp(e, t.code)}
+                      onPointerCancel={(e) => handleCandidatePointerUp(e, t.code)}
                       style={{
                         position: 'absolute',
                         left: `${c.x * 100}%`,
                         top: `${c.y * 100}%`,
                         transform: 'translate(-50%, -50%)',
-                        pointerEvents: 'none',
-                        zIndex: 30,
+                        pointerEvents: 'auto',
+                        cursor: isDragging ? 'grabbing' : 'grab',
+                        zIndex: isDragging ? 40 : 30,
                         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
+                        touchAction: 'none',
+                        userSelect: 'none',
+                        WebkitUserSelect: 'none',
                       }}
                     >
                       {/* 후보 마커 원 */}
                       <div style={{
-                        width: isActive ? '16px' : '12px',
-                        height: isActive ? '16px' : '12px',
+                        width: isDragging ? '20px' : (isActive ? '16px' : '12px'),
+                        height: isDragging ? '20px' : (isActive ? '16px' : '12px'),
                         borderRadius: '50%',
-                        background: isActive ? 'rgba(80,220,120,0.90)' : 'rgba(80,220,120,0.55)',
-                        border: `2px solid ${isActive ? 'rgba(0,140,60,0.95)' : 'rgba(0,140,60,0.65)'}`,
-                        boxShadow: isActive
-                          ? '0 0 0 3px rgba(80,220,120,0.30), 0 1px 6px rgba(0,0,0,0.55)'
-                          : '0 1px 4px rgba(0,0,0,0.45)',
-                        transition: 'all 0.15s',
+                        background: isDragging ? 'rgba(80,220,120,1.0)' : (isActive ? 'rgba(80,220,120,0.90)' : 'rgba(80,220,120,0.55)'),
+                        border: `2px solid ${isDragging ? 'rgba(0,120,50,1.0)' : (isActive ? 'rgba(0,140,60,0.95)' : 'rgba(0,140,60,0.65)')}`,
+                        boxShadow: isDragging
+                          ? '0 0 0 5px rgba(80,220,120,0.25), 0 2px 10px rgba(0,0,0,0.65)'
+                          : (isActive ? '0 0 0 3px rgba(80,220,120,0.30), 0 1px 6px rgba(0,0,0,0.55)' : '0 1px 4px rgba(0,0,0,0.45)'),
+                        transition: isDragging ? 'none' : 'all 0.15s',
                       }} />
                       {/* 장소명 라벨 */}
                       <div style={{
-                        background: 'rgba(0,0,0,0.70)', borderRadius: '4px',
+                        background: 'rgba(0,0,0,0.75)', borderRadius: '4px',
                         padding: '1px 5px',
-                        fontSize: '0.5625rem', color: isActive ? 'rgba(80,220,120,0.95)' : 'rgba(200,255,210,0.75)',
-                        whiteSpace: 'nowrap', fontWeight: isActive ? 600 : 400,
+                        fontSize: '0.5625rem',
+                        color: isDragging ? 'rgba(80,220,120,1.0)' : (isActive ? 'rgba(80,220,120,0.95)' : 'rgba(200,255,210,0.75)'),
+                        whiteSpace: 'nowrap',
+                        fontWeight: (isDragging || isActive) ? 600 : 400,
                         lineHeight: 1.4,
                       }}>
-                        {t.name_ko}
+                        {t.name_ko}{isDragging ? ` (${c.x}, ${c.y})` : ''}
                       </div>
                     </div>
                   );
