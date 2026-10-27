@@ -24,6 +24,14 @@ Last Updated: 2026-10-27
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
 **MAP V0.1 Zone 1·2 Final Completion — Founder 복사 결과 수신 후 마무리**
+- **MAP_V01_COORDINATE_PERSISTENCE_HOLD** ⚠️ (2026-10-27)
+  - Founder QA: 이순신광장·하멜등대 위치 오류 / 케이블카 미표시 보고
+  - **케이블카**: Zone 2 소속 정상. 원도심(Zone 1) 하단 목록에 없는 것은 정상 동작. 코드 변경 없음.
+    - 케이블카를 보려면 Zone 2(오동도·엑스포권) 하단 목록에서 선택하세요.
+  - **이순신광장·하멜등대**: 현재 코드값(0.255/0.540, 0.519/0.718)이 Founder 드래그 수정 이전값.
+    - Founder 드래그 결과 미수신 → 코드에 반영 불가 (추측 수정 금지)
+  - **HOLD 해제 조건**: Founder "전체 좌표 내보내기" 클립보드 결과 전달 (최소 이순신광장·하멜등대)
+  - Evidence: `docs/knowledge/MAP-V01-POSITION-CATEGORY-CHECK-EVIDENCE.md`
 - **MAP_V01_ZONE1_ZONE2_FINAL_COMPLETION_READY** ✅ (2026-10-27)
   - 빅오쇼(big_o_show) Zone 2 EXPLORER 신규 추가 → 최종 Inventory 45개
   - PLACEMENT_TARGETS 9→15개: Zone 1에 오포대·진남관 / Zone 2에 아쿠아플라넷·빅오쇼 추가
@@ -32,7 +40,7 @@ Last Updated: 2026-10-27
   - 빌드 ✅ / 639/640 PASS (R20 PRE-EXISTING)
   - Evidence: `docs/knowledge/MAP-V01-ZONE1-ZONE2-FINAL-COMPLETION-EVIDENCE.md`
   - **Founder 액션 필요**: 브라우저에서 "전체 좌표 내보내기" 클립보드 결과 전달
-    → 엑스포공원·스카이타워 + Founder 수정 좌표 코드 반영 → MAP V0.1 마무리
+    → 이순신광장·하멜등대 수정 좌표 + 엑스포공원·스카이타워 좌표 코드 반영 → MAP V0.1 마무리
 - **MAP_V01_COMPLETION_LEDGER_READY** ✅ (2026-10-27)
   - Confirmed/Open/Deferred 구분 완료
   - 후보 좌표 → yeosuMapData.js 반영 검증: 전체 반영 완료 (유실 없음)

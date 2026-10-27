@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-27T07:27:50.979Z",
+  "generated_at": "2026-10-27T07:54:12.500Z",
   "generator": "generate-manifest.js",
-  "total_count": 509,
+  "total_count": 510,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3202,6 +3202,22 @@
       "title": "MAP V0.1 Placement UX Fix — Evidence",
       "created_at": "2026-10-27",
       "checksum": "a96fa30e"
+    },
+    {
+      "id": "DOC-MAP-V01-POSITION-CATEGORY-CHEC",
+      "path": "docs/knowledge/MAP-V01-POSITION-CATEGORY-CHECK-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "항목",
+      "title": "MAP V0.1 Position & Category Check — Evidence",
+      "created_at": "2026-10-27",
+      "checksum": "030e063f"
     },
     {
       "id": "DOC-MAP-V01-PREPARATION-EVIDENCE",
