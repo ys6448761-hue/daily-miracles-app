@@ -23,21 +23,22 @@ Last Updated: 2026-10-27
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**MAP V0.1 그림판 마커 정렬 완료 — Founder 브라우저 검수 필요**
-- **MAP_V01_PAINT_MARKER_ALIGNMENT_READY** ✅ (2026-10-27) SHA `9c5c137`
-  - Python Pillow 픽셀 클러스터 추출 (1564×1006 동일 해상도 확인)
-  - **업데이트**: 낭만포차(0.593,0.599) / 하멜등대(0.519,0.718) [AMBIGUOUS 해소] / 종포해양공원(0.387,0.509)
-  - **재확인 필요**: 이순신광장 (흰 원 표시) / 자산공원 (마커 없음) / 케이블카 (AMBIGUOUS 유지)
+**MAP V0.1 위치 지정 UX 수정 — Founder 브라우저 재검수 필요**
+- **MAP_V01_PLACEMENT_UX_FIXED** ✅ (2026-10-27) SHA `26afeac`
+  - Founder QA 실패 해소: Zone 2 화면에서도 Zone 1 장소 선택 가능
+  - **PLACEMENT_TARGETS 9개**: Zone 1(이순신광장·종포해양공원·낭만포차거리·하멜등대) + Zone 2(오동도·케이블카·엑스포공원·스카이타워·자산공원)
+  - Zone 1·2 구분 레이블 UI 추가 / 기존 마커 Zone 1·2 모두 표시
   - 빌드 ✅ 698 modules / 회귀 ✅ 639/640 PASS (R20 PRE-EXISTING)
-  - Evidence: `docs/knowledge/MAP-V01-FOUNDER-MARKER-ALIGNMENT-EVIDENCE.md`
-- **MAP_V01_DIRECT_MARKER_PLACEMENT_READY** ✅ (2026-10-27) SHA `05e1c0c`
-  - QA Preview(`localhost + ?qa_preview=boundary`)에서만 활성화
-  - **마커 위치 지정 모드**: 지도 클릭 → 녹색 후보 마커 즉시 표시 → 좌표 복사
-  - **Founder 검수 절차** (이순신광장·자산공원·케이블카 재확인 포함):
+  - Evidence: `docs/knowledge/MAP-V01-PLACEMENT-UX-FIX-EVIDENCE.md`
+  - **Founder 검수 절차**:
     1. `node server.js` 재시작
     2. `http://localhost:5000/muyojeong?qa_preview=boundary` 접속
-    3. Zone 1 → "📍 마커 위치 지정 모드 시작" → 장소 선택 → 지도 클릭
-    4. 이순신광장·자산공원·케이블카 위치 직접 지정 → "전체 좌표 복사" → 코드야에게 전달
+    3. Zone 1 또는 Zone 2 어느 권역에서나 진입
+    4. "📍 마커 위치 지정 모드 시작" → Zone 1·2 장소 모두 선택 가능 확인
+    5. 이순신광장·자산공원·케이블카 위치 직접 지정 → "전체 좌표 복사" → 코드야에게 전달
+- **MAP_V01_PAINT_MARKER_ALIGNMENT_READY** ✅ (2026-10-27) SHA `9c5c137`
+  - 낭만포차(0.593,0.599) / 하멜등대(0.519,0.718) [AMBIGUOUS 해소] / 종포해양공원(0.387,0.509)
+  - 재확인 필요: 이순신광장(흰 원) / 자산공원(마커 없음) / 케이블카(AMBIGUOUS)
 
 **[이전] MAP V0.1 Founder 마커 정렬 (1차)**
 - **MAP_V01_FOUNDER_MARKER_ALIGNMENT_READY** ✅ (2026-10-27) SHA `f25653f`
