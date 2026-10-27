@@ -24,13 +24,21 @@ Last Updated: 2026-10-27
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
 **MAP V0.1 Zone 1·2 Final Completion — Founder 복사 결과 수신 후 마무리**
-- **MAP_V01_COORDINATE_PERSISTENCE_HOLD** ⚠️ (2026-10-27)
-  - Founder QA: 이순신광장·하멜등대 위치 오류 / 케이블카 미표시 보고
-  - **케이블카**: Zone 2 소속 정상. 원도심(Zone 1) 하단 목록에 없는 것은 정상 동작. 코드 변경 없음.
-    - 케이블카를 보려면 Zone 2(오동도·엑스포권) 하단 목록에서 선택하세요.
-  - **이순신광장·하멜등대**: 현재 코드값(0.255/0.540, 0.519/0.718)이 Founder 드래그 수정 이전값.
-    - Founder 드래그 결과 미수신 → 코드에 반영 불가 (추측 수정 금지)
-  - **HOLD 해제 조건**: Founder "전체 좌표 내보내기" 클립보드 결과 전달 (최소 이순신광장·하멜등대)
+- **MAP_V01_COORDINATE_DRAFT_PERSISTENCE_READY** ✅ (2026-10-27)
+  - localStorage 로컬 초안 자동 저장·복원 추가 (QA Preview 전용)
+  - 저장 키: `yeosu_map_draft_v01_oldtown` (imageId + 데이터버전 포함)
+  - 새로고침 후에도 초안 좌표 복원됨 / "초안 복원됨" 배지 표시
+  - 상태 4단계: 미지정 → 후보 좌표 있음 → 내보내기 완료 → **코드 반영**
+  - "초안 삭제" 버튼: localStorage + state 전체 초기화
+  - 빌드 ✅ / 639/640 PASS (R20 PRE-EXISTING)
+  - Evidence: `docs/knowledge/MAP-V01-COORDINATE-DRAFT-PERSISTENCE-EVIDENCE.md`
+  - **Founder 다음 할 일**:
+    1. `node server.js` 재시작 → `localhost:5000/muyojeong?qa_preview=boundary`
+    2. 이순신광장·하멜등대·엑스포공원·스카이타워 드래그 위치 지정
+    3. "전체 좌표 내보내기" → 클립보드 결과 코드야에게 전달
+    4. 새로고침 → 초안 복원 확인
+- **[이전] MAP_V01_COORDINATE_PERSISTENCE_HOLD** (2026-10-27) — 해제됨
+  - 케이블카 Zone 2 정상 / 이순신광장·하멜등대 드래그 좌표 유실 확인
   - Evidence: `docs/knowledge/MAP-V01-POSITION-CATEGORY-CHECK-EVIDENCE.md`
 - **MAP_V01_ZONE1_ZONE2_FINAL_COMPLETION_READY** ✅ (2026-10-27)
   - 빅오쇼(big_o_show) Zone 2 EXPLORER 신규 추가 → 최종 Inventory 45개

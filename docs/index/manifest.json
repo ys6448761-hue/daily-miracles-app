@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-27T07:54:12.500Z",
+  "generated_at": "2026-10-27T08:57:49.949Z",
   "generator": "generate-manifest.js",
-  "total_count": 510,
+  "total_count": 511,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3010,6 +3010,22 @@
       "title": "MAP V0.1 Completion Ledger",
       "created_at": "2026-10-27",
       "checksum": "3786088a"
+    },
+    {
+      "id": "DOC-MAP-V01-COORDINATE-DRAFT-PERSI",
+      "path": "docs/knowledge/MAP-V01-COORDINATE-DRAFT-PERSISTENCE-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "조건",
+      "title": "MAP V0.1 — Coordinate Draft Persistence Evidence",
+      "created_at": "2026-10-27",
+      "checksum": "21a90567"
     },
     {
       "id": "DOC-MAP-V01-DECISION-SHEET",

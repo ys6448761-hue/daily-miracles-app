@@ -20,9 +20,10 @@
  *   onClose        — () => void (지역별 보기 닫기)
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   YEOSU_ZONES,
+  YEOSU_PLACES,
   MAP_STATUS,
   getPlacesByZone,
   getMarkersForImage,
@@ -45,6 +46,10 @@ const STATUS_BADGE = {
 
 const OVERVIEW_IMG  = '/images/muyojeong/map/yeosu-overview-v01.png';
 const OLDTOWN_IMG   = '/images/muyojeong/map/yeosu-oldtown-v01.png';
+
+// 로컬 초안 저장 키 — imageId=oldtown, 데이터버전=v01
+// 이미지·데이터 버전이 바뀌면 키를 변경해 오래된 초안 자동 무효화
+const DRAFT_KEY = 'yeosu_map_draft_v01_oldtown';
 
 // 마커 위치 지정 대상 장소 — Zone 1·2 모두 oldtown 이미지를 공유하므로 한 화면에서 연속 지정 가능
 const PLACEMENT_TARGETS = [
@@ -201,9 +206,34 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
   // candidates: { [code]: { x, y } } — 장소별 독립 후보 좌표
   const [candidates, setCandidates] = useState({});
   const [copied, setCopied] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
   // 드래그 state
   const [draggingCode, setDraggingCode] = useState(null);
   const mapWrapperRef = useRef(null);
+
+  // 마운트 시 로컬 초안 복원 (QA Preview + hasDetailMap 전용)
+  useEffect(() => {
+    if (!isQAPreview || !zone?.hasDetailMap) return;
+    try {
+      const saved = localStorage.getItem(DRAFT_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+          setCandidates(parsed);
+          setDraftRestored(true);
+        }
+      }
+    } catch {}
+  }, []); // mount-only — 의도적 빈 deps
+
+  // candidates 변경 시 로컬 초안 저장
+  useEffect(() => {
+    if (!isQAPreview || !zone?.hasDetailMap) return;
+    if (Object.keys(candidates).length === 0) return;
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(candidates));
+    } catch {}
+  }, [candidates]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Zone 1·2 모두 oldtown 이미지를 공유 → hasDetailMap인 경우 전 장소 선택 가능
   const zoneTargets = isQAPreview && zone?.hasDetailMap
@@ -385,9 +415,14 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                   display: 'flex', flexDirection: 'column', gap: '8px',
                 }}>
                   {/* 모드 토글 버튼 */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
                     <span style={{ fontSize: '0.6875rem', color: placementMode ? 'rgba(80,220,120,0.90)' : 'rgba(255,255,255,0.45)', fontWeight: 600 }}>
                       📍 마커 위치 지정 모드
+                      {draftRestored && placementMode && (
+                        <span style={{ marginLeft: '6px', fontSize: '0.5625rem', color: 'rgba(120,200,255,0.80)', fontWeight: 400 }}>
+                          초안 복원됨
+                        </span>
+                      )}
                     </span>
                     <button
                       onClick={togglePlacementMode}
@@ -442,14 +477,19 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                       {placementTarget && (() => {
                         const targetName = zoneTargets.find(t => t.code === placementTarget)?.name_ko;
                         const cand = candidates[placementTarget];
-                        const statusLabel = cand
-                          ? (copied === placementTarget || copied === 'all'
-                            ? '내보내기 완료 · 코드 반영 전'
-                            : '후보 좌표 있음')
-                          : '미지정';
-                        const statusColor = cand
-                          ? (copied === placementTarget || copied === 'all' ? 'rgba(80,220,120,0.90)' : 'rgba(255,200,80,0.85)')
-                          : 'rgba(255,255,255,0.35)';
+                        const codedPlace = YEOSU_PLACES.find(p => p.code === placementTarget);
+                        const codedPos = codedPlace?.markerPos?.oldtown;
+                        const isCodeReflected = cand && codedPos && cand.x === codedPos.x && cand.y === codedPos.y;
+                        const statusLabel = isCodeReflected
+                          ? '코드 반영'
+                          : cand
+                            ? (copied === placementTarget || copied === 'all' ? '내보내기 완료 · 코드 반영 전' : '후보 좌표 있음')
+                            : '미지정';
+                        const statusColor = isCodeReflected
+                          ? 'rgba(120,200,255,0.90)'
+                          : cand
+                            ? (copied === placementTarget || copied === 'all' ? 'rgba(80,220,120,0.90)' : 'rgba(255,200,80,0.85)')
+                            : 'rgba(255,255,255,0.35)';
                         return (
                           <div style={{
                             padding: '6px 10px', borderRadius: '8px',
@@ -552,6 +592,23 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                               {copied === 'all' ? '전체 내보내기 완료 (코드 반영 전)' : '전체 좌표 내보내기 (yeosuMapData.js 형식)'}
                             </button>
                           )}
+                          {/* 초안 삭제 — localStorage + state 초기화 */}
+                          <button
+                            onClick={() => {
+                              setCandidates({});
+                              setDraftRestored(false);
+                              setCopied(false);
+                              try { localStorage.removeItem(DRAFT_KEY); } catch {}
+                            }}
+                            style={{
+                              marginTop: '2px', padding: '3px 0', borderRadius: '8px',
+                              border: '1px solid rgba(255,80,80,0.20)', cursor: 'pointer',
+                              fontSize: '0.5625rem', width: '100%',
+                              background: 'transparent', color: 'rgba(255,120,120,0.50)',
+                            }}
+                          >
+                            초안 삭제 (전체 초기화)
+                          </button>
                         </div>
                       )}
                     </>
