@@ -23,7 +23,22 @@ Last Updated: 2026-10-27
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**MAP V0.1 위치 지정 UX 수정 — Founder 브라우저 재검수 필요**
+**MAP V0.1 드래그 마커 편집기 — Founder 브라우저 검수 필요**
+- **MAP_V01_DRAGGABLE_MARKER_EDITOR_READY** ✅ (2026-10-27) SHA `431a2eb`
+  - Pointer Events(pointerdown/move/up/cancel) + setPointerCapture 드래그
+  - 드래그 중: 마커 확대·grabbing 커서·실시간 좌표 라벨
+  - 미세 조정 버튼(←→↑↓ ±0.001) + ✕ 재설정 버튼
+  - touch-action:none (placementMode 시 모바일 스크롤 억제)
+  - 빌드 ✅ 698 modules / 회귀 ✅ 639/640 PASS
+  - Evidence: `docs/knowledge/MAP-V01-DRAGGABLE-MARKER-EDITOR-EVIDENCE.md`
+  - **브라우저 드래그 검증: OPEN** — Founder 직접 확인 필요
+  - **Founder 검수 절차**:
+    1. `node server.js` 재시작
+    2. `http://localhost:5000/muyojeong?qa_preview=boundary`
+    3. Zone 1 또는 Zone 2 진입
+    4. 위치 지정 모드 시작 → 장소 선택 → 지도 클릭 → 녹색 마커 등장
+    5. **녹색 마커를 마우스로 잡고 드래그** → 실시간 이동 확인
+    6. ←/→/↑/↓ 미세 조정 → "전체 좌표 복사" → 코드야에게 전달
 - **MAP_V01_PLACEMENT_UX_FIXED** ✅ (2026-10-27) SHA `26afeac`
   - Founder QA 실패 해소: Zone 2 화면에서도 Zone 1 장소 선택 가능
   - **PLACEMENT_TARGETS 9개**: Zone 1(이순신광장·종포해양공원·낭만포차거리·하멜등대) + Zone 2(오동도·케이블카·엑스포공원·스카이타워·자산공원)
