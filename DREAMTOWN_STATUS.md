@@ -23,14 +23,17 @@ Last Updated: 2026-10-27
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**MAP V0.1 이순신광장 SOURCE_SAVED — 다음 장소 드래그 대기**
-- **MAP_V01_FIRST_SOURCE_SAVE_VERIFIED** ✅ (2026-10-27) SHA `607ddb9`
-  - 이순신광장 markerPos 반영: x=0.391, y=0.544 / confidence=HIGH / status=PROVISIONAL
-  - dist 검증: `.391,y:.544,confidence:"HIGH",status:"PROVISIONAL"` ✅
+**MAP V0.1 마커 SOURCE_SAVED 완료 — Founder VERIFIED 승격 검수 대기**
+- **MAP_V01_15_MARKERS_SOURCE_SAVED** ✅ (2026-10-27) SHA `92e4b99`
+  - 15곳 전체 Founder 좌표 반영 완료 / 15/15 소스 일치 / 전 15곳 PROVISIONAL 유지
+  - Zone 1: 이순신광장·낭만포차·하멜등대·진남관·오포대·종포해양공원
+  - Zone 2: 오동도·케이블카·엑스포공원·스카이타워·자산공원·아쿠아플라넷·낭만요트·블루요트·빅오쇼
+  - dist 검증: confidence:"HIGH" 16개(15 markerPos + 1 필터) ✅
   - 빌드 ✅ 698 modules / 639/640 PASS (R20 PRE-EXISTING)
-  - 상태: **SOURCE_SAVED** (VERIFIED 승격은 별도 Founder 승인 필요)
+  - 상태: **SOURCE_SAVED** 전 15곳 (VERIFIED 승격 = 별도 Founder 승인)
   - Evidence: `docs/knowledge/MAP-V01-SAVE-GATE-EVIDENCE.md`
-  - **다음**: 나머지 14곳 동일 절차 — 드래그 → 내보내기 → 코드야 전달
+  - **다음**: Founder 브라우저에서 지도 마커 위치 확인 → VERIFIED 승격 여부 결정
+- **MAP_V01_FIRST_SOURCE_SAVE_VERIFIED** ✅ (2026-10-27) SHA `607ddb9` — 이순신광장 1곳 선행 반영
 - **MAP_V01_SAVE_GATE_HOLD** ✅ (2026-10-27) — Acceptance Gate 검증 완료
   - T-11: TEST INFRA (코드 버그 아님) / v01/v02 격리 완전 / 상태 4단계 구분 명확
 - **MAP_V01_MARKER_CLEAN_RESTART_READY** ✅ (2026-10-27) SHA `2dad09f`
