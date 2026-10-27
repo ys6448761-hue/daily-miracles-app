@@ -352,9 +352,13 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
     oldtownBoundary?.status === 'PROVISIONAL' &&
     Array.isArray(oldtownBoundary?.points) &&
     oldtownBoundary.points.length >= 3;
-  // oldtown 이미지: Zone 1·2 장소 기준점 모두 표시
+  // oldtown 이미지: Zone 1·2 중 markerPos 미반영 장소만 QA 기준점 표시
+  // markerPos가 있는 장소는 markers 경로에서 이미 렌더링 → QA 참조점 중복 제거
   const qaPlaces = isQAPreview && zone?.hasDetailMap
-    ? Object.entries(QA_OLDTOWN_POSITIONS).filter(([, p]) => p.zone === 1 || p.zone === 2)
+    ? Object.entries(QA_OLDTOWN_POSITIONS).filter(([code, p]) =>
+        (p.zone === 1 || p.zone === 2) &&
+        !YEOSU_PLACES.find(pl => pl.code === code)?.markerPos?.oldtown
+      )
     : [];
 
   if (!zone) return null;
