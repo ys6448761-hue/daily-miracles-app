@@ -28,13 +28,14 @@ export const MAP_STATUS = {
 export const YEOSU_PLACES = [
   // ── 권역 1: 원도심 해안권 ─────────────────────────────────────────────────
   // 기존 TG_READY
-  // markerPos: oldtown 이미지 시각 추정 (2026-10-27). 이미지 직접 확인 후 추정. PROVISIONAL.
+  // markerPos: Founder 손표시 이미지 기준 (marker-oldtown-founder.png.jpg / marker-zone2-founder.png.jpg, 2026-10-27). PROVISIONAL.
   { code: 'lee_soon_shin_plaza',  name_ko: '이순신광장',   zone: 1, lat: 34.7463,    lng: 127.7356,    status: 'tg_ready',   coordVerified: true,
-    markerPos: { oldtown: { x: 0.30, y: 0.51, confidence: 'HIGH', status: 'PROVISIONAL' } } },
+    markerPos: { oldtown: { x: 0.255, y: 0.540, confidence: 'HIGH', status: 'PROVISIONAL' } } },
   { code: 'romantic_pojangmacha', name_ko: '낭만포차거리', zone: 1, lat: 34.7421,    lng: 127.7398,    status: 'tg_ready',   coordVerified: true,
-    markerPos: { oldtown: { x: 0.38, y: 0.61, confidence: 'HIGH', status: 'PROVISIONAL' } } },
+    markerPos: { oldtown: { x: 0.445, y: 0.626, confidence: 'HIGH', status: 'PROVISIONAL' } } },
   { code: 'hamel_lighthouse',     name_ko: '하멜등대',     zone: 1, lat: 34.7364,    lng: 127.7471,    status: 'tg_ready',   coordVerified: true,
     markerPos: { oldtown: { x: 0.50, y: 0.68, confidence: 'HIGH', status: 'PROVISIONAL' } } },
+    // AMBIGUOUS: Founder 이미지에 화살표만 있고 빨간 점 없음 — 현재 좌표 유지 (Founder 재확인 필요)
   // 중앙시장: OI-MAP-1 — 지도 미표시, TG 전면 제외 유지
   { code: 'jungang_market',       name_ko: '중앙시장',     zone: 1, lat: 34.7450,    lng: 127.7370,    status: 'tg_excluded', hidden: true, coordVerified: true },
   // 신규 탐색 가능 (OI-MAP-2)
@@ -46,7 +47,7 @@ export const YEOSU_PLACES = [
   { code: 'opodae',               name_ko: '오포대',        zone: 1, lat: null,       lng: null,        status: 'explorer',   coordVerified: false, coordNote: '고소동 언덕 소재 확인. 좌표 미검증.' },
   // 종포해양공원: Zone 2→1 (Founder 원도심 8곳 포함, FC-ZONE 승인)
   { code: 'marine_park',          name_ko: '종포해양공원', zone: 1, lat: 34.7488,    lng: 127.7475,    status: 'tg_ready',   coordVerified: true,
-    markerPos: { oldtown: { x: 0.53, y: 0.47, confidence: 'HIGH', status: 'PROVISIONAL' } } },
+    markerPos: { oldtown: { x: 0.410, y: 0.603, confidence: 'HIGH', status: 'PROVISIONAL' } } },
 
   // ── 권역 2: 오동도·엑스포권 ──────────────────────────────────────────────
   {
@@ -56,7 +57,7 @@ export const YEOSU_PLACES = [
     // 출처: MAP-V01-MARKER-PLAN.md §2-1 (HIGH confidence — 등대+방파제 명확 식별)
     // Zone 2 소속 → Zone 1 상세 지도에서 zone 필터로 제외 / Zone 2 상세 지도에서 표시됨
     markerPos: {
-      oldtown: { x: 0.87, y: 0.28, confidence: 'HIGH', status: 'PROVISIONAL' },
+      oldtown: { x: 0.853, y: 0.340, confidence: 'HIGH', status: 'PROVISIONAL' },
     },
   },
   // cablecar = SOUL entity (TG_READY). 좌표=자산탑승장(여수 본토). Founder "해상케이블카 자산탑승장" alias.
@@ -65,7 +66,7 @@ export const YEOSU_PLACES = [
   { code: 'yeosu_expo_park',      name_ko: '엑스포공원',   zone: 2, lat: 34.7520,    lng: 127.7450,    status: 'tg_ready',   coordVerified: true },
   { code: 'sky_tower',            name_ko: '스카이타워',   zone: 2, lat: 34.7512,    lng: 127.7468,    status: 'tg_ready',   coordVerified: true },
   { code: 'jaisan_park',          name_ko: '자산공원',     zone: 2, lat: 34.7480,    lng: 127.7540,    status: 'tg_ready',   coordVerified: true,
-    markerPos: { oldtown: { x: 0.65, y: 0.48, confidence: 'HIGH', status: 'PROVISIONAL' } } },
+    markerPos: { oldtown: { x: 0.582, y: 0.495, confidence: 'HIGH', status: 'PROVISIONAL' } } },
   { code: 'aquaplanet',           name_ko: '아쿠아플라넷', zone: 2, lat: null,       lng: null,        status: 'explorer',   coordVerified: false },
   { code: 'yworld_luge',          name_ko: '유월드루지',   zone: 5, lat: null,       lng: null,        status: 'explorer',   coordVerified: false, coordNote: 'Founder QA: Zone 2→5. 소호 관광단지 인근.' },
   // 신규 EXPLORER — Founder 오동도·엑스포 7곳 (FC-3~5 승인, 좌표 미검증, 마커 미표시)
@@ -232,20 +233,20 @@ export function getZoneBoundary(zoneId) {
 // conflict: true → 경계 서쪽에 위치하는 Zone 2 장소 (F-5 확인 필요)
 // anchor: true  → 기준점
 export const QA_OLDTOWN_POSITIONS = {
-  // Zone 1 — GPS 확인
-  lee_soon_shin_plaza:  { x: 0.298, y: 0.512, confirmed: true,  zone: 1 },
-  romantic_pojangmacha: { x: 0.379, y: 0.582, confirmed: true,  zone: 1 },
-  hamel_lighthouse:     { x: 0.518, y: 0.678, confirmed: true,  zone: 1 },
+  // Zone 1 — Founder 손표시 이미지 기준 2026-10-27 업데이트 (PROVISIONAL)
+  lee_soon_shin_plaza:  { x: 0.255, y: 0.540, confirmed: true,  zone: 1 }, // Founder: marker-oldtown-founder.png.jpg
+  romantic_pojangmacha: { x: 0.445, y: 0.626, confirmed: true,  zone: 1 }, // Founder: marker-oldtown-founder.png.jpg
+  hamel_lighthouse:     { x: 0.518, y: 0.678, confirmed: false, zone: 1 }, // AMBIGUOUS: 화살표만, 점 없음 — Founder 재확인 필요
   gosodong_mural:       { x: 0.406, y: 0.633, confirmed: true,  zone: 1 },
-  marine_park:          { x: 0.526, y: 0.468, confirmed: true,  zone: 1 },
+  marine_park:          { x: 0.410, y: 0.603, confirmed: true,  zone: 1 }, // Founder: marker-oldtown-founder.png.jpg
   // Zone 1 — null coords 추정
   yeosu_fish_market:    { x: 0.250, y: 0.500, confirmed: false, zone: 1 },
   jinamgwan:            { x: 0.280, y: 0.580, confirmed: false, zone: 1 },
   opodae:               { x: 0.380, y: 0.670, confirmed: false, zone: 1 },
-  // Zone 2 — GPS 확인
-  odongdo:              { x: 0.870, y: 0.280, confirmed: true,  zone: 2, anchor: true },
-  cablecar:             { x: 0.692, y: 0.572, confirmed: true,  zone: 2 },
-  jaisan_park:          { x: 0.650, y: 0.483, confirmed: true,  zone: 2 },
+  // Zone 2 — Founder 손표시 이미지 기준 2026-10-27 업데이트 (PROVISIONAL)
+  odongdo:              { x: 0.853, y: 0.340, confirmed: true,  zone: 2, anchor: true }, // Founder: marker-zone2-founder.png.jpg
+  cablecar:             { x: 0.692, y: 0.572, confirmed: false, zone: 2 }, // AMBIGUOUS: 레이블↔점 대응 불명확 — Founder 재확인 필요
+  jaisan_park:          { x: 0.582, y: 0.495, confirmed: true,  zone: 2 }, // Founder: marker-zone2-founder.png.jpg
   yeosu_expo_park:      { x: 0.478, y: 0.418, confirmed: true,  zone: 2, conflict: true },
   sky_tower:            { x: 0.512, y: 0.432, confirmed: true,  zone: 2, conflict: true },
   // Zone 2 — null coords 추정

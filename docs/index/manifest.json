@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-27T01:48:02.410Z",
+  "generated_at": "2026-10-27T02:17:39.981Z",
   "generator": "generate-manifest.js",
-  "total_count": 500,
+  "total_count": 501,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3026,6 +3026,22 @@
       "title": "MAP V0.1 Final Integration Evidence",
       "created_at": "2026-10-27",
       "checksum": "01a4dd8a"
+    },
+    {
+      "id": "DOC-MAP-V01-FOUNDER-MARKER-ALIGNME",
+      "path": "docs/knowledge/MAP-V01-FOUNDER-MARKER-ALIGNMENT-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "MAP V0.1 Founder Marker Alignment — Evidence",
+      "created_at": "2026-10-27",
+      "checksum": "8caaa36a"
     },
     {
       "id": "DOC-MAP-V01-GEOGRAPHIC-QA-CONFLICT",
