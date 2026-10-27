@@ -23,19 +23,16 @@ Last Updated: 2026-10-27
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**MAP V0.1 이순신광장 첫 좌표 저장 — Founder 드래그 결과 수신 → PROVISIONAL 반영**
-- **MAP_V01_SAVE_GATE_HOLD** (2026-10-27) — Founder 이순신광장 드래그 좌표 수신 대기
-  - Acceptance Gate 검증 완료 (항목 1-5 모두 PASS):
-    - T-11 실패: puppeteer 뷰포트 클릭 이슈 (코드 버그 아님, 기존 알려진 TEST INFRA)
-    - v01/v02 초안 완전 격리: DRAFT_KEY v02 코드 4곳 모두 확인, v01 키 코드 전무
-    - 상태 4단계 명확 구분: 미지정→후보→내보내기→코드반영 (라인 481-488)
-    - QA_OLDTOWN_POSITIONS ≠ markerPos 렌더링 — 혼용 없음 ✅
-  - **Founder 할 일 (이순신광장 1곳)**:
-    1. `localhost:5000/muyojeong?qa_preview=boundary` → Zone 1 → "좌표 지정 시작"
-    2. 이순신광장 선택 → 지도 위 정확한 위치 클릭 (DRAFT 상태)
-    3. "좌표 내보내기" 클릭 → 클립보드 내용 코드야에게 전달
-    4. 코드야: `yeosuMapData.js`에 PROVISIONAL 반영 → 브라우저 확인 → SOURCE_SAVED
+**MAP V0.1 이순신광장 SOURCE_SAVED — 다음 장소 드래그 대기**
+- **MAP_V01_FIRST_SOURCE_SAVE_VERIFIED** ✅ (2026-10-27) SHA `607ddb9`
+  - 이순신광장 markerPos 반영: x=0.391, y=0.544 / confidence=HIGH / status=PROVISIONAL
+  - dist 검증: `.391,y:.544,confidence:"HIGH",status:"PROVISIONAL"` ✅
+  - 빌드 ✅ 698 modules / 639/640 PASS (R20 PRE-EXISTING)
+  - 상태: **SOURCE_SAVED** (VERIFIED 승격은 별도 Founder 승인 필요)
   - Evidence: `docs/knowledge/MAP-V01-SAVE-GATE-EVIDENCE.md`
+  - **다음**: 나머지 14곳 동일 절차 — 드래그 → 내보내기 → 코드야 전달
+- **MAP_V01_SAVE_GATE_HOLD** ✅ (2026-10-27) — Acceptance Gate 검증 완료
+  - T-11: TEST INFRA (코드 버그 아님) / v01/v02 격리 완전 / 상태 4단계 구분 명확
 - **MAP_V01_MARKER_CLEAN_RESTART_READY** ✅ (2026-10-27) SHA `2dad09f`
   - 백업 SHA: `72367ee` / 7곳 markerPos 초기화 / DRAFT_KEY v02 격리
   - Evidence: `docs/knowledge/MAP-V01-CLEAN-RESTART-EVIDENCE.md`
