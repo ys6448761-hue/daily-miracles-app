@@ -28,14 +28,16 @@ export const MAP_STATUS = {
 export const YEOSU_PLACES = [
   // ── 권역 1: 원도심 해안권 ─────────────────────────────────────────────────
   // 기존 TG_READY
-  // markerPos: Founder 손표시 이미지 기준 (marker-oldtown-founder.png.jpg / marker-zone2-founder.png.jpg, 2026-10-27). PROVISIONAL.
+  // markerPos: Founder 그림판 PNG 기준 (marker-oldtown-founder.png, 2026-10-27). PROVISIONAL.
+  // 이순신광장: 흰 원으로 표시됨 — 빨간 픽셀 추출 불가. 기존 좌표 유지. Founder 재확인 필요.
   { code: 'lee_soon_shin_plaza',  name_ko: '이순신광장',   zone: 1, lat: 34.7463,    lng: 127.7356,    status: 'tg_ready',   coordVerified: true,
     markerPos: { oldtown: { x: 0.255, y: 0.540, confidence: 'HIGH', status: 'PROVISIONAL' } } },
   { code: 'romantic_pojangmacha', name_ko: '낭만포차거리', zone: 1, lat: 34.7421,    lng: 127.7398,    status: 'tg_ready',   coordVerified: true,
-    markerPos: { oldtown: { x: 0.445, y: 0.626, confidence: 'HIGH', status: 'PROVISIONAL' } } },
+    markerPos: { oldtown: { x: 0.593, y: 0.599, confidence: 'HIGH', status: 'PROVISIONAL' } } },
+    // 2026-10-27 그림판 PNG: "낭만포다" 라벨 확인 → px(928,603)/1564,1006
   { code: 'hamel_lighthouse',     name_ko: '하멜등대',     zone: 1, lat: 34.7364,    lng: 127.7471,    status: 'tg_ready',   coordVerified: true,
-    markerPos: { oldtown: { x: 0.50, y: 0.68, confidence: 'HIGH', status: 'PROVISIONAL' } } },
-    // AMBIGUOUS: Founder 이미지에 화살표만 있고 빨간 점 없음 — 현재 좌표 유지 (Founder 재확인 필요)
+    markerPos: { oldtown: { x: 0.519, y: 0.718, confidence: 'HIGH', status: 'PROVISIONAL' } } },
+    // 2026-10-27 그림판 PNG: "하멜등다" 라벨 확인 → px(812,722)/1564,1006. AMBIGUOUS 해소.
   // 중앙시장: OI-MAP-1 — 지도 미표시, TG 전면 제외 유지
   { code: 'jungang_market',       name_ko: '중앙시장',     zone: 1, lat: 34.7450,    lng: 127.7370,    status: 'tg_excluded', hidden: true, coordVerified: true },
   // 신규 탐색 가능 (OI-MAP-2)
@@ -47,7 +49,8 @@ export const YEOSU_PLACES = [
   { code: 'opodae',               name_ko: '오포대',        zone: 1, lat: null,       lng: null,        status: 'explorer',   coordVerified: false, coordNote: '고소동 언덕 소재 확인. 좌표 미검증.' },
   // 종포해양공원: Zone 2→1 (Founder 원도심 8곳 포함, FC-ZONE 승인)
   { code: 'marine_park',          name_ko: '종포해양공원', zone: 1, lat: 34.7488,    lng: 127.7475,    status: 'tg_ready',   coordVerified: true,
-    markerPos: { oldtown: { x: 0.410, y: 0.603, confidence: 'HIGH', status: 'PROVISIONAL' } } },
+    markerPos: { oldtown: { x: 0.387, y: 0.509, confidence: 'HIGH', status: 'PROVISIONAL' } } },
+    // 2026-10-27 그림판 PNG: "종해양공원" 라벨 근처 → px(605,512)/1564,1006
 
   // ── 권역 2: 오동도·엑스포권 ──────────────────────────────────────────────
   {
@@ -234,11 +237,11 @@ export function getZoneBoundary(zoneId) {
 // anchor: true  → 기준점
 export const QA_OLDTOWN_POSITIONS = {
   // Zone 1 — Founder 손표시 이미지 기준 2026-10-27 업데이트 (PROVISIONAL)
-  lee_soon_shin_plaza:  { x: 0.255, y: 0.540, confirmed: true,  zone: 1 }, // Founder: marker-oldtown-founder.png.jpg
-  romantic_pojangmacha: { x: 0.445, y: 0.626, confirmed: true,  zone: 1 }, // Founder: marker-oldtown-founder.png.jpg
-  hamel_lighthouse:     { x: 0.518, y: 0.678, confirmed: false, zone: 1 }, // AMBIGUOUS: 화살표만, 점 없음 — Founder 재확인 필요
+  lee_soon_shin_plaza:  { x: 0.255, y: 0.540, confirmed: false, zone: 1 }, // 흰 원 표시 — 픽셀 추출 불가, Founder 재확인 필요
+  romantic_pojangmacha: { x: 0.593, y: 0.599, confirmed: true,  zone: 1 }, // "낭만포다" 라벨 → px(928,603) 2026-10-27
+  hamel_lighthouse:     { x: 0.519, y: 0.718, confirmed: true,  zone: 1 }, // "하멜등다" 라벨 → px(812,722) 2026-10-27. AMBIGUOUS 해소.
   gosodong_mural:       { x: 0.406, y: 0.633, confirmed: true,  zone: 1 },
-  marine_park:          { x: 0.410, y: 0.603, confirmed: true,  zone: 1 }, // Founder: marker-oldtown-founder.png.jpg
+  marine_park:          { x: 0.387, y: 0.509, confirmed: true,  zone: 1 }, // "종해양공원" 라벨 근처 → px(605,512) 2026-10-27
   // Zone 1 — null coords 추정
   yeosu_fish_market:    { x: 0.250, y: 0.500, confirmed: false, zone: 1 },
   jinamgwan:            { x: 0.280, y: 0.580, confirmed: false, zone: 1 },
