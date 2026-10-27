@@ -1883,7 +1883,8 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPla
     if (!currentPlaceCode) {
       if (pt === 'family_elderly') return `부모님과 함께 여행이시군요.\n부모님과 함께 둘러볼 만한 곳을 골라봤어요.`;
       if (pt === 'family_with_kids') return `아이들과 함께 여행이시군요.\n아이와 함께 즐길 수 있는 곳을 골라봤어요.`;
-      if (soulContext.has_car === true) return `차를 가져오셨군요. 이동이 한결 자유롭겠어요.\n자차로 다니기 좋은 곳을 골라봤어요.`;
+      // Guard: USER_EXPLICIT only — backward-compat default (null→true) must not trigger car intro
+      if (soulContext.has_car === true && (soulContext._provenance || {}).has_car === 'USER_EXPLICIT') return `차를 가져오셨군요. 이동이 한결 자유롭겠어요.\n자차로 다니기 좋은 곳을 골라봤어요.`;
     }
     // Default PARTIAL — place-aware if current place known
     if (placePrefix) {
@@ -3300,7 +3301,8 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   }
   if (status === 'PARTIAL' && !explicit_context.place_code && tgResult?.places?.length && !_isCourseMsg) {
     const _mPt = enrichedSoulContext.people_type;
-    const _hasCar = enrichedSoulContext.has_car === true;
+    // Guard: USER_EXPLICIT only — backward-compat null→true must not append parking tips
+    const _hasCar = enrichedSoulContext.has_car === true && (enrichedSoulContext._provenance || {}).has_car === 'USER_EXPLICIT';
     if (_mPt === 'family_elderly' || _mPt === 'family_with_kids') {
       const _mPlaces = tgResult.places.filter(p =>
         !(_mPt === 'family_elderly' && _ELDERLY_MSG_EXCLUDE.has(p.place_code))
@@ -3322,8 +3324,9 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   // Uses _PLACE_KNOWLEDGE data only. Places without parking_ko are silently omitted (UNKNOWN preserved).
   // Guard 1: skip for course-intent messages
   // Guard 2: skip for PARTIAL has_car no-place_code — already integrated inline above
-  const _carPartialCovered = status === 'PARTIAL' && !explicit_context.place_code && enrichedSoulContext.has_car === true;
-  if (enrichedSoulContext.has_car === true && tgResult?.places?.length && !_isCourseMsg && !_carPartialCovered) {
+  const _isExplicitCar = enrichedSoulContext.has_car === true && (enrichedSoulContext._provenance || {}).has_car === 'USER_EXPLICIT';
+  const _carPartialCovered = status === 'PARTIAL' && !explicit_context.place_code && _isExplicitCar;
+  if (_isExplicitCar && tgResult?.places?.length && !_isCourseMsg && !_carPartialCovered) {
     const parkingLines = tgResult.places
       .filter(p => p.place_code && _PLACE_KNOWLEDGE[p.place_code]?.parking_ko)
       .map(p => `  · ${_PLACE_KNOWLEDGE[p.place_code].parking_ko}`);
