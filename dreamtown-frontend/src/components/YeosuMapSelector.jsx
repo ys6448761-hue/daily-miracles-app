@@ -46,13 +46,18 @@ const STATUS_BADGE = {
 const OVERVIEW_IMG  = '/images/muyojeong/map/yeosu-overview-v01.png';
 const OLDTOWN_IMG   = '/images/muyojeong/map/yeosu-oldtown-v01.png';
 
-// Founder 마커 위치 지정 대상 장소 (Zone 1·2 각각)
-// 하멜등대·케이블카: AMBIGUOUS — 목록 제외 (Founder 재확인 필요)
+// 마커 위치 지정 대상 장소 — Zone 1·2 모두 oldtown 이미지를 공유하므로 한 화면에서 연속 지정 가능
 const PLACEMENT_TARGETS = [
+  // Zone 1 — 원도심 해안권
   { code: 'lee_soon_shin_plaza',  name_ko: '이순신광장',   zone: 1 },
   { code: 'marine_park',          name_ko: '종포해양공원', zone: 1 },
   { code: 'romantic_pojangmacha', name_ko: '낭만포차거리', zone: 1 },
+  { code: 'hamel_lighthouse',     name_ko: '하멜등대',     zone: 1 },
+  // Zone 2 — 오동도·엑스포권
   { code: 'odongdo',              name_ko: '오동도',       zone: 2 },
+  { code: 'cablecar',             name_ko: '케이블카',     zone: 2 },
+  { code: 'yeosu_expo_park',      name_ko: '엑스포공원',   zone: 2 },
+  { code: 'sky_tower',            name_ko: '스카이타워',   zone: 2 },
   { code: 'jaisan_park',          name_ko: '자산공원',     zone: 2 },
 ];
 
@@ -188,8 +193,9 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
   const [candidates, setCandidates] = useState({});
   const [copied, setCopied] = useState(false);
 
+  // Zone 1·2 모두 oldtown 이미지를 공유 → hasDetailMap인 경우 전 장소 선택 가능
   const zoneTargets = isQAPreview && zone?.hasDetailMap
-    ? PLACEMENT_TARGETS.filter(t => t.zone === zoneId)
+    ? PLACEMENT_TARGETS
     : [];
 
   // 위치 지정 모드 토글 — 모드 끄면 placementTarget 초기화
@@ -256,8 +262,9 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
     oldtownBoundary?.status === 'PROVISIONAL' &&
     Array.isArray(oldtownBoundary?.points) &&
     oldtownBoundary.points.length >= 3;
+  // oldtown 이미지: Zone 1·2 장소 기준점 모두 표시
   const qaPlaces = isQAPreview && zone?.hasDetailMap
-    ? Object.entries(QA_OLDTOWN_POSITIONS).filter(([, p]) => p.zone === zoneId)
+    ? Object.entries(QA_OLDTOWN_POSITIONS).filter(([, p]) => p.zone === 1 || p.zone === 2)
     : [];
 
   if (!zone) return null;
@@ -338,28 +345,39 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
 
                   {placementMode && (
                     <>
-                      {/* 장소 선택 */}
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                        {zoneTargets.map(t => (
-                          <button
-                            key={t.code}
-                            onClick={() => { setPlacementTarget(t.code); setCopied(false); }}
-                            style={{
-                              padding: '5px 10px', borderRadius: '14px', border: '1px solid',
-                              cursor: 'pointer', fontSize: '0.75rem',
-                              background: placementTarget === t.code ? 'rgba(80,220,120,0.20)' : 'rgba(255,255,255,0.06)',
-                              borderColor: placementTarget === t.code ? 'rgba(80,220,120,0.55)' : 'rgba(255,255,255,0.15)',
-                              color: placementTarget === t.code ? 'rgba(80,220,120,0.95)' : 'rgba(255,255,255,0.65)',
-                              fontWeight: placementTarget === t.code ? 600 : 400,
-                            }}
-                          >
-                            {t.name_ko}
-                            {candidates[t.code] && (
-                              <span style={{ marginLeft: '4px', opacity: 0.7 }}>✓</span>
-                            )}
-                          </button>
-                        ))}
-                      </div>
+                      {/* 장소 선택 — Zone 1·2 구분 표시 */}
+                      {[1, 2].map(zn => {
+                        const targets = zoneTargets.filter(t => t.zone === zn);
+                        if (targets.length === 0) return null;
+                        return (
+                          <div key={zn}>
+                            <div style={{ fontSize: '0.5625rem', color: 'rgba(255,255,255,0.30)', marginBottom: '4px', letterSpacing: '0.04em' }}>
+                              Zone {zn}
+                            </div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                              {targets.map(t => (
+                                <button
+                                  key={t.code}
+                                  onClick={() => { setPlacementTarget(t.code); setCopied(false); }}
+                                  style={{
+                                    padding: '4px 10px', borderRadius: '14px', border: '1px solid',
+                                    cursor: 'pointer', fontSize: '0.6875rem',
+                                    background: placementTarget === t.code ? 'rgba(80,220,120,0.20)' : 'rgba(255,255,255,0.06)',
+                                    borderColor: placementTarget === t.code ? 'rgba(80,220,120,0.55)' : 'rgba(255,255,255,0.15)',
+                                    color: placementTarget === t.code ? 'rgba(80,220,120,0.95)' : 'rgba(255,255,255,0.65)',
+                                    fontWeight: placementTarget === t.code ? 600 : 400,
+                                  }}
+                                >
+                                  {t.name_ko}
+                                  {candidates[t.code] && (
+                                    <span style={{ marginLeft: '4px', opacity: 0.7 }}>✓</span>
+                                  )}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
 
                       {/* 안내 */}
                       <p style={{ fontSize: '0.625rem', color: 'rgba(255,255,255,0.38)', margin: 0, lineHeight: 1.5 }}>
@@ -479,7 +497,8 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                 {/* 기존 마커 렌더링
                     일반 화면: VERIFIED만 표시, PROVISIONAL 숨김.
                     QA Preview: PROVISIONAL도 표시. 위치 지정 모드 중 토글 비활성. */}
-                {markers.filter(m => m.zone === zone.id).map(m => {
+                {/* hasDetailMap 권역: Zone 1·2 마커 모두 표시 (같은 oldtown 이미지 공유) */}
+                {markers.filter(m => zone.hasDetailMap ? (m.zone === 1 || m.zone === 2) : m.zone === zone.id).map(m => {
                   const mp = m.markerPos.oldtown;
                   const isVerified = mp.status === 'VERIFIED';
                   if (!isVerified && !isQAPreview) return null;
