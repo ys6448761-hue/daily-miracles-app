@@ -53,12 +53,18 @@ const PLACEMENT_TARGETS = [
   { code: 'marine_park',          name_ko: '종포해양공원', zone: 1 },
   { code: 'romantic_pojangmacha', name_ko: '낭만포차거리', zone: 1 },
   { code: 'hamel_lighthouse',     name_ko: '하멜등대',     zone: 1 },
+  // Zone 1 추가: Founder Final Completion 2026-10-27
+  { code: 'opodae',               name_ko: '오포대',       zone: 1 },
+  { code: 'jinamgwan',            name_ko: '진남관',       zone: 1 },
   // Zone 2 — 오동도·엑스포권
   { code: 'odongdo',              name_ko: '오동도',       zone: 2 },
   { code: 'cablecar',             name_ko: '케이블카',     zone: 2 },
   { code: 'yeosu_expo_park',      name_ko: '엑스포공원',   zone: 2 },
   { code: 'sky_tower',            name_ko: '스카이타워',   zone: 2 },
   { code: 'jaisan_park',          name_ko: '자산공원',     zone: 2 },
+  // Zone 2 추가: Founder Final Completion 2026-10-27
+  { code: 'aquaplanet',           name_ko: '아쿠아플라넷', zone: 2 },
+  { code: 'big_o_show',           name_ko: '빅오쇼',       zone: 2 },
   // 낭만요트·블루요트: Founder Decision 2026-10-27 — 유탑마리나호텔 앞 선착장
   { code: 'nangman_yacht',        name_ko: '낭만요트',     zone: 2 },
   { code: 'blue_yacht',           name_ko: '블루요트',     zone: 2 },

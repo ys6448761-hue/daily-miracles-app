@@ -23,7 +23,16 @@ Last Updated: 2026-10-27
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**MAP V0.1 — Founder 마커 위치 지정 (드래그 편집기)**
+**MAP V0.1 Zone 1·2 Final Completion — Founder 복사 결과 수신 후 마무리**
+- **MAP_V01_ZONE1_ZONE2_FINAL_COMPLETION_READY** ✅ (2026-10-27)
+  - 빅오쇼(big_o_show) Zone 2 EXPLORER 신규 추가 → 최종 Inventory 45개
+  - PLACEMENT_TARGETS 9→15개: Zone 1에 오포대·진남관 / Zone 2에 아쿠아플라넷·빅오쇼 추가
+  - 기존 9곳 좌표: 7곳 코드 반영 완료 / 엑스포공원·스카이타워 markerPos 없음
+  - **BLOCKER**: Founder "전체 좌표 내보내기" 결과 미수신 → 수신 즉시 반영
+  - 빌드 ✅ / 639/640 PASS (R20 PRE-EXISTING)
+  - Evidence: `docs/knowledge/MAP-V01-ZONE1-ZONE2-FINAL-COMPLETION-EVIDENCE.md`
+  - **Founder 액션 필요**: 브라우저에서 "전체 좌표 내보내기" 클립보드 결과 전달
+    → 엑스포공원·스카이타워 + Founder 수정 좌표 코드 반영 → MAP V0.1 마무리
 - **MAP_V01_COMPLETION_LEDGER_READY** ✅ (2026-10-27)
   - Confirmed/Open/Deferred 구분 완료
   - 후보 좌표 → yeosuMapData.js 반영 검증: 전체 반영 완료 (유실 없음)
