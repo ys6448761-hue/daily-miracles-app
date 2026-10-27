@@ -23,7 +23,18 @@ Last Updated: 2026-10-27
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**MAP V0.1 Marker Editor E2E — Founder 브라우저 검수 필요**
+**MAP V0.1 — 낭만요트·블루요트 마커 위치 지정 + Marker Editor E2E Founder 검수**
+- **MAP_V01_YACHT_BOARDING_LOCATIONS_RECONCILED** ✅ (2026-10-27)
+  - 낭만요트(nangman_yacht)·블루요트(blue_yacht) Zone 2 EXPLORER 신규 추가
+  - 탑승 기준: 유탑마리나호텔 앞(오동도로 61-15) — 낭만(정문 오른편)·블루(정문 왼편)
+  - 기존 42개 중복 없음 확인 → 최종 Inventory 44개 / TG_READY 12개 유지
+  - PLACEMENT_TARGETS Zone 2에 추가 — 드래그 편집기에서 위치 지정 가능
+  - 마커 좌표 임의 입력 없음 / SOUL 미편입 / EXPLORER 상태
+  - 빌드 ✅ / 639/640 PASS (R20 PRE-EXISTING)
+  - Evidence: `docs/knowledge/MAP-V01-YACHT-BOARDING-LOCATIONS-EVIDENCE.md`
+  - **Founder 다음 할 일**: 드래그 편집기에서 낭만요트·블루요트 위치 지정 → 좌표 전달
+
+**[이전] MAP V0.1 Marker Editor E2E — Founder 브라우저 검수 필요**
 - **MAP_V01_MARKER_EDITOR_E2E_READY** ✅ (2026-10-27)
   - 편집 모드 화면 단순화: 테스트 사각형·경계선·기존 마커·QA 기준점 숨김
   - 선택 장소명 + x/y + 저장 상태 4단계 패널 항상 표시

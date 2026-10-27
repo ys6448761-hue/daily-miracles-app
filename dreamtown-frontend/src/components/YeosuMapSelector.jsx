@@ -59,6 +59,9 @@ const PLACEMENT_TARGETS = [
   { code: 'yeosu_expo_park',      name_ko: '엑스포공원',   zone: 2 },
   { code: 'sky_tower',            name_ko: '스카이타워',   zone: 2 },
   { code: 'jaisan_park',          name_ko: '자산공원',     zone: 2 },
+  // 낭만요트·블루요트: Founder Decision 2026-10-27 — 유탑마리나호텔 앞 선착장
+  { code: 'nangman_yacht',        name_ko: '낭만요트',     zone: 2 },
+  { code: 'blue_yacht',           name_ko: '블루요트',     zone: 2 },
 ];
 
 function ZoneOverview({ onSelectZone, isQAPreview }) {

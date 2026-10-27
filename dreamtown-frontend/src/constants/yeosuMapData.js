@@ -77,6 +77,10 @@ export const YEOSU_PLACES = [
   { code: 'expo_ocean_trail',     name_ko: '엑스포 바닷길', zone: 2, lat: null,      lng: null,        status: 'explorer',   coordVerified: false, coordNote: '엑스포 해안 산책로. yeosu_expo_park와 별개 등록. 경계·좌표 미검증.' },
   { code: 'manseongri_beach',     name_ko: '만성리해수욕장', zone: 2, lat: null,     lng: null,        status: 'explorer',   coordVerified: false, coordNote: 'Founder Zone 2 배치. 좌표 미검증.' },
   { code: 'yeosu_ocean_cruise',   name_ko: '여수오션크루즈', zone: 2, lat: null,     lng: null,        status: 'explorer',   coordVerified: false, coordNote: '선착장 위치 UNVERIFIED. 운항 조건 별도 확인 필요.' },
+  // 낭만요트·블루요트: Founder Decision 2026-10-27 — 탑승 기준 위치=유탑마리나호텔 앞(오동도로 61-15)
+  // 운항 일정·예약 미확인. 마커 좌표 임의 입력 금지 — Founder 드래그 편집 후 반영.
+  { code: 'nangman_yacht',        name_ko: '낭만요트',      zone: 2, lat: null,     lng: null,        status: 'explorer',   coordVerified: false, coordNote: '탑승 위치: 유탑마리나호텔 정문 오른편 선착장(여수시 오동도로 61-15). 좌표·마커 미검증.' },
+  { code: 'blue_yacht',           name_ko: '블루요트',      zone: 2, lat: null,     lng: null,        status: 'explorer',   coordVerified: false, coordNote: '탑승 위치: 유탑마리나호텔 정문 왼편 전용 선착장(여수시 오동도로 61-15). 좌표·마커 미검증.' },
 
   // ── 권역 3: 돌산권 ──────────────────────────────────────────────────────
   { code: 'dolsan_daegyo',        name_ko: '돌산대교',     zone: 3, lat: 34.7395,    lng: 127.7456,    status: 'tg_ready',   coordVerified: true },
