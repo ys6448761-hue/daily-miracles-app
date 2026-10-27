@@ -1,20 +1,18 @@
 /**
  * YeosuMapSelector — 여수 지역별 장소 탐색 V0.1
  *
- * V0.1 구현: 이미지 바인딩 + Phase A 마커 (오동도 PROVISIONAL)
+ * V0.1 구현: 이미지 바인딩 + Phase A 마커 (PROVISIONAL)
  *   - 7개 권역 카드 → 권역 장소 목록 → 장소 선택
  *   - overview 이미지: 전체 권역 시각 참조 (마커 미표시)
  *   - oldtown 이미지: 원도심 권역(hasDetailMap=true) 진입 시 표시
- *     + Phase A 마커: HIGH confidence 장소만 (오동도 1개, PROVISIONAL)
+ *     + Phase A 마커: HIGH confidence 장소만 (PROVISIONAL)
  *     + padding-top 비율 컨테이너: 종횡비 보존 → 마커 위치 정확도 확보
  *   - 이미지 로딩 실패 시 기존 카드 UI로 자동 대체
- *   - MEDIUM/NONE 마커: Phase B (Founder 확인 후 추가)
  *
- * 선택 가능 상태:
- *   TG_READY     — 선택 가능 (routePlaces 공유)
- *   EXPLORER     — 표시만 (SOUL 추천 자동 승격 금지: OI-MAP-2)
- *   VERIFY_NEEDED— 표시만 (정보 수집 중)
- *   FERRY        — 배편 배지 표시, 선택 불가 (OI-MAP-5)
+ * QA Preview (localhost + ?qa_preview=boundary):
+ *   - PROVISIONAL 마커 표시 + 토글 테스트 허용
+ *   - 마커 위치 지정 모드: 지도 클릭 → normalized x/y 후보 좌표 수집
+ *     → Founder 승인 전 PROVISIONAL 유지, 서버 DB 저장 없음
  *
  * Props:
  *   selectedPlaces — { code, name } array (routePlaces와 공유)
@@ -48,13 +46,20 @@ const STATUS_BADGE = {
 const OVERVIEW_IMG  = '/images/muyojeong/map/yeosu-overview-v01.png';
 const OLDTOWN_IMG   = '/images/muyojeong/map/yeosu-oldtown-v01.png';
 
+// Founder 마커 위치 지정 대상 장소 (Zone 1·2 각각)
+// 하멜등대·케이블카: AMBIGUOUS — 목록 제외 (Founder 재확인 필요)
+const PLACEMENT_TARGETS = [
+  { code: 'lee_soon_shin_plaza',  name_ko: '이순신광장',   zone: 1 },
+  { code: 'marine_park',          name_ko: '종포해양공원', zone: 1 },
+  { code: 'romantic_pojangmacha', name_ko: '낭만포차거리', zone: 1 },
+  { code: 'odongdo',              name_ko: '오동도',       zone: 2 },
+  { code: 'jaisan_park',          name_ko: '자산공원',     zone: 2 },
+];
+
 function ZoneOverview({ onSelectZone, isQAPreview }) {
   const [imgError, setImgError] = useState(false);
-  // hoveredZoneId: 데스크탑 hover / 포커스 시 해당 권역 경계 미리보기 (VERIFIED 상태만 표시)
   const [hoveredZoneId, setHoveredZoneId] = useState(null);
 
-  // VERIFIED + points 존재 시에만 SVG 렌더 — QA Preview 시 PROVISIONAL도 표시
-  // overview 이미지용 boundary만 허용 (oldtown imageId는 좌표계가 다름)
   const boundary = hoveredZoneId ? getZoneBoundary(hoveredZoneId) : null;
   const showBoundary =
     (boundary?.status === 'VERIFIED' || (isQAPreview && boundary?.status === 'PROVISIONAL')) &&
@@ -64,7 +69,6 @@ function ZoneOverview({ onSelectZone, isQAPreview }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      {/* 여수 전역 지도 — padding-top 비율 컨테이너(108.13%) + SVG 경계 오버레이 */}
       {!imgError ? (
         <div
           style={{
@@ -86,8 +90,6 @@ function ZoneOverview({ onSelectZone, isQAPreview }) {
               display: 'block',
             }}
           />
-          {/* SVG 경계 오버레이 — VERIFIED boundary만 렌더 (현재 전체 UNVERIFIED) */}
-          {/* viewBox="0 0 1 1" + preserveAspectRatio="none" → objectFit:fill과 좌표 정합 */}
           <svg
             style={{
               position: 'absolute', top: 0, left: 0,
@@ -178,17 +180,81 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
   const places = getPlacesByZone(zoneId);
   const [imgError, setImgError] = useState(false);
   const [overviewImgError, setOverviewImgError] = useState(false);
-  // Zone 3~7 overview 미리보기용 — Zone 1·2(hasDetailMap)는 oldtown 사용
+
+  // 위치 지정 모드 state (QA Preview 전용)
+  const [placementMode, setPlacementMode] = useState(false);
+  const [placementTarget, setPlacementTarget] = useState(null);
+  // candidates: { [code]: { x, y } } — 장소별 독립 후보 좌표
+  const [candidates, setCandidates] = useState({});
+  const [copied, setCopied] = useState(false);
+
+  const zoneTargets = isQAPreview && zone?.hasDetailMap
+    ? PLACEMENT_TARGETS.filter(t => t.zone === zoneId)
+    : [];
+
+  // 위치 지정 모드 토글 — 모드 끄면 placementTarget 초기화
+  const togglePlacementMode = () => {
+    setPlacementMode(prev => {
+      if (prev) setPlacementTarget(null);
+      return !prev;
+    });
+  };
+
+  // 지도 클릭/터치 → normalized (x, y) 계산
+  // wrapper div(objectFit:fill 컨테이너) 기준 — 이미지가 fill로 wrapper를 꽉 채우므로
+  // wrapper.getBoundingClientRect()가 곧 이미지 표시 영역
+  const handleMapClick = (e) => {
+    if (!placementMode || !placementTarget) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = parseFloat(Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width)).toFixed(3));
+    const y = parseFloat(Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height)).toFixed(3));
+    setCandidates(prev => ({ ...prev, [placementTarget]: { x, y } }));
+    setCopied(false);
+  };
+
+  const handleMapTouch = (e) => {
+    if (!placementMode || !placementTarget) return;
+    e.preventDefault(); // 스크롤/확대 방지
+    const touch = e.changedTouches[0];
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = parseFloat(Math.min(1, Math.max(0, (touch.clientX - rect.left) / rect.width)).toFixed(3));
+    const y = parseFloat(Math.min(1, Math.max(0, (touch.clientY - rect.top) / rect.height)).toFixed(3));
+    setCandidates(prev => ({ ...prev, [placementTarget]: { x, y } }));
+    setCopied(false);
+  };
+
+  // 단일 장소 좌표 복사
+  const copyCandidate = (code) => {
+    const c = candidates[code];
+    if (!c) return;
+    const text = `{ code: '${code}', x: ${c.x}, y: ${c.y} }`;
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(code);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  // 전체 후보 좌표 복사 (yeosuMapData.js 붙여넣기 형식)
+  const copyAllCandidates = () => {
+    if (Object.keys(candidates).length === 0) return;
+    const lines = Object.entries(candidates)
+      .map(([code, { x, y }]) => `  // ${code}\n  markerPos: { oldtown: { x: ${x}, y: ${y}, confidence: 'HIGH', status: 'PROVISIONAL' } }`)
+      .join('\n\n');
+    navigator.clipboard.writeText(lines).then(() => {
+      setCopied('all');
+      setTimeout(() => setCopied(false), 2500);
+    });
+  };
+
   const zoneBoundary = !zone?.hasDetailMap ? getZoneBoundary(zoneId) : null;
   const showZoneBoundary =
     (zoneBoundary?.status === 'VERIFIED' || (isQAPreview && zoneBoundary?.status === 'PROVISIONAL')) &&
-    Array.isArray(zoneBoundary.points) &&
+    Array.isArray(zoneBoundary?.points) &&
     zoneBoundary.points.length >= 3;
-  // QA Preview: oldtown 이미지의 Zone 1·2 PROVISIONAL 경계 + 장소 마커
   const oldtownBoundary = isQAPreview && zone?.hasDetailMap ? getZoneBoundary(zoneId) : null;
   const showOldtownBoundary =
     oldtownBoundary?.status === 'PROVISIONAL' &&
-    Array.isArray(oldtownBoundary.points) &&
+    Array.isArray(oldtownBoundary?.points) &&
     oldtownBoundary.points.length >= 3;
   const qaPlaces = isQAPreview && zone?.hasDetailMap
     ? Object.entries(QA_OLDTOWN_POSITIONS).filter(([, p]) => p.zone === zoneId)
@@ -228,12 +294,11 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
       )}
 
       {zone.hasDetailMap ? (
-        /* Zone 1·2 — oldtown 확대 지도 + Phase A 마커 (기존 유지) + QA Preview 경계 */
         !imgError && (() => {
           const markers = getMarkersForImage('oldtown');
           return (
             <>
-              {/* QA Preview 배너 — DEV 환경 전용, 사용자 화면 미표시 */}
+              {/* QA Preview 배너 */}
               {isQAPreview && (
                 <div style={{
                   padding: '6px 10px', borderRadius: '8px',
@@ -244,7 +309,121 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                   ⚠ 검수용 미확정 경계 — 로컬 개발환경 전용 / Founder 검수 전 미공개 / PROVISIONAL
                 </div>
               )}
-              <div style={{ position: 'relative', width: '100%', paddingTop: '64.32%', borderRadius: '10px', overflow: 'hidden' }}>
+
+              {/* 마커 위치 지정 UI (QA Preview + hasDetailMap 전용) */}
+              {isQAPreview && zoneTargets.length > 0 && (
+                <div style={{
+                  padding: '10px 12px', borderRadius: '10px',
+                  background: placementMode ? 'rgba(80,220,120,0.10)' : 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${placementMode ? 'rgba(80,220,120,0.40)' : 'rgba(255,255,255,0.12)'}`,
+                  display: 'flex', flexDirection: 'column', gap: '8px',
+                }}>
+                  {/* 모드 토글 버튼 */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '0.6875rem', color: placementMode ? 'rgba(80,220,120,0.90)' : 'rgba(255,255,255,0.45)', fontWeight: 600 }}>
+                      📍 마커 위치 지정 모드
+                    </span>
+                    <button
+                      onClick={togglePlacementMode}
+                      style={{
+                        padding: '4px 12px', borderRadius: '12px', border: 'none', cursor: 'pointer',
+                        fontSize: '0.6875rem', fontWeight: 600,
+                        background: placementMode ? 'rgba(80,220,120,0.25)' : 'rgba(255,255,255,0.10)',
+                        color: placementMode ? 'rgba(80,220,120,0.95)' : 'rgba(255,255,255,0.60)',
+                      }}
+                    >
+                      {placementMode ? '종료' : '시작'}
+                    </button>
+                  </div>
+
+                  {placementMode && (
+                    <>
+                      {/* 장소 선택 */}
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                        {zoneTargets.map(t => (
+                          <button
+                            key={t.code}
+                            onClick={() => { setPlacementTarget(t.code); setCopied(false); }}
+                            style={{
+                              padding: '5px 10px', borderRadius: '14px', border: '1px solid',
+                              cursor: 'pointer', fontSize: '0.75rem',
+                              background: placementTarget === t.code ? 'rgba(80,220,120,0.20)' : 'rgba(255,255,255,0.06)',
+                              borderColor: placementTarget === t.code ? 'rgba(80,220,120,0.55)' : 'rgba(255,255,255,0.15)',
+                              color: placementTarget === t.code ? 'rgba(80,220,120,0.95)' : 'rgba(255,255,255,0.65)',
+                              fontWeight: placementTarget === t.code ? 600 : 400,
+                            }}
+                          >
+                            {t.name_ko}
+                            {candidates[t.code] && (
+                              <span style={{ marginLeft: '4px', opacity: 0.7 }}>✓</span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* 안내 */}
+                      <p style={{ fontSize: '0.625rem', color: 'rgba(255,255,255,0.38)', margin: 0, lineHeight: 1.5 }}>
+                        {placementTarget
+                          ? `지도를 클릭해 「${zoneTargets.find(t => t.code === placementTarget)?.name_ko}」 위치를 지정하세요. 다시 클릭하면 수정됩니다.`
+                          : '장소를 선택한 후 지도를 클릭하세요.'}
+                      </p>
+
+                      {/* 후보 좌표 출력 */}
+                      {Object.entries(candidates).filter(([code]) => zoneTargets.some(t => t.code === code)).length > 0 && (
+                        <div style={{
+                          background: 'rgba(0,0,0,0.30)', borderRadius: '8px',
+                          padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: '5px',
+                        }}>
+                          {zoneTargets.filter(t => candidates[t.code]).map(t => (
+                            <div key={t.code} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                              <span style={{ fontSize: '0.6875rem', color: 'rgba(80,220,120,0.85)', fontFamily: 'monospace', letterSpacing: '0.02em' }}>
+                                {t.name_ko}: x={candidates[t.code].x}, y={candidates[t.code].y}
+                              </span>
+                              <button
+                                onClick={() => copyCandidate(t.code)}
+                                style={{
+                                  padding: '2px 8px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                                  fontSize: '0.625rem', flexShrink: 0,
+                                  background: copied === t.code ? 'rgba(80,220,120,0.25)' : 'rgba(255,255,255,0.10)',
+                                  color: copied === t.code ? 'rgba(80,220,120,0.95)' : 'rgba(255,255,255,0.55)',
+                                }}
+                              >
+                                {copied === t.code ? '복사됨' : '복사'}
+                              </button>
+                            </div>
+                          ))}
+
+                          {/* 전체 복사 버튼 */}
+                          {Object.keys(candidates).filter(c => zoneTargets.some(t => t.code === c)).length > 1 && (
+                            <button
+                              onClick={copyAllCandidates}
+                              style={{
+                                marginTop: '4px', padding: '4px 0', borderRadius: '8px', border: '1px solid rgba(80,220,120,0.30)',
+                                cursor: 'pointer', fontSize: '0.625rem', width: '100%',
+                                background: copied === 'all' ? 'rgba(80,220,120,0.15)' : 'transparent',
+                                color: copied === 'all' ? 'rgba(80,220,120,0.95)' : 'rgba(80,220,120,0.60)',
+                              }}
+                            >
+                              {copied === 'all' ? '전체 복사됨 ✓' : '전체 좌표 복사 (yeosuMapData.js 형식)'}
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* 지도 이미지 — 위치 지정 클릭 핸들러 포함 */}
+              <div
+                style={{
+                  position: 'relative', width: '100%', paddingTop: '64.32%',
+                  borderRadius: '10px', overflow: 'hidden',
+                  cursor: placementMode && placementTarget ? 'crosshair' : 'default',
+                }}
+                onClick={handleMapClick}
+                onTouchEnd={handleMapTouch}
+              >
                 <img
                   src={OLDTOWN_IMG}
                   alt={`${zone.name_ko} 지도`}
@@ -254,9 +433,14 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                     width: '100%', height: '100%',
                     objectFit: 'fill',
                     display: 'block',
+                    // 위치 지정 모드 중 이미지 드래그 방지
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    pointerEvents: 'none',
                   }}
                 />
-                {/* QA Preview: SVG 레이어 (localhost + ?qa_preview=boundary 전용) */}
+
+                {/* QA Preview SVG 오버레이 — pointer-events:none (클릭 투과) */}
                 {isQAPreview && (
                   <svg
                     style={{
@@ -269,7 +453,7 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                     preserveAspectRatio="none"
                     aria-hidden="true"
                   >
-                    {/* SVG 렌더링 확인용 테스트 사각형 — 실제 여수 경계 아님. 확인 후 제거 예정 */}
+                    {/* SVG 렌더링 확인용 테스트 사각형 */}
                     <rect
                       x="0.05" y="0.05" width="0.90" height="0.90"
                       fill="none"
@@ -291,32 +475,34 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                     )}
                   </svg>
                 )}
-                {/* 마커 렌더링 규칙:
+
+                {/* 기존 마커 렌더링
                     일반 화면: VERIFIED만 표시, PROVISIONAL 숨김.
-                    QA Preview (로컬 ?qa_preview=boundary): PROVISIONAL도 표시 + 클릭 허용(토글 테스트용).
-                    EXPLORER/FERRY/TG_EXCLUDED: isSelectablePlace=false → 클릭해도 toggleRoutePlace 미호출. */}
+                    QA Preview: PROVISIONAL도 표시. 위치 지정 모드 중 토글 비활성. */}
                 {markers.filter(m => m.zone === zone.id).map(m => {
                   const mp = m.markerPos.oldtown;
                   const isVerified = mp.status === 'VERIFIED';
-                  // 일반 화면: VERIFIED만. QA Preview: PROVISIONAL도 토글 테스트 허용.
                   if (!isVerified && !isQAPreview) return null;
                   const selected = selectedPlaces.some(p => p.code === m.code);
-                  // TG_READY 조건 유지. 일반: VERIFIED 필수. QA: PROVISIONAL도 테스트 허용.
                   const selectable = isSelectablePlace(m) && (isVerified || isQAPreview);
-                  const handleToggle = () => selectable && onTogglePlace({ code: m.code, name: m.name_ko });
+                  // 위치 지정 모드 중 기존 마커 토글 비활성화
+                  const handleToggle = () => {
+                    if (placementMode) return;
+                    if (selectable) onTogglePlace({ code: m.code, name: m.name_ko });
+                  };
                   return (
                     <div
                       key={m.code}
-                      onClick={handleToggle}
-                      onKeyDown={selectable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleToggle(); } } : undefined}
-                      role={selectable ? 'button' : undefined}
-                      tabIndex={selectable ? 0 : undefined}
+                      onClick={(e) => { e.stopPropagation(); handleToggle(); }}
+                      onKeyDown={(!placementMode && selectable) ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleToggle(); } } : undefined}
+                      role={(!placementMode && selectable) ? 'button' : undefined}
+                      tabIndex={(!placementMode && selectable) ? 0 : undefined}
                       aria-label={
-                        selectable
+                        selectable && !placementMode
                           ? `${m.name_ko} ${selected ? '선택 해제' : '선택'}${!isVerified ? ' (QA)' : ''}`
                           : `${m.name_ko} (위치 미검증)`
                       }
-                      aria-pressed={selectable ? selected : undefined}
+                      aria-pressed={(!placementMode && selectable) ? selected : undefined}
                       title={isVerified ? m.name_ko : `[QA위치미검증] ${m.name_ko}`}
                       style={{
                         position: 'absolute',
@@ -324,17 +510,16 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                         top: `${mp.y * 100}%`,
                         transform: 'translate(-50%, -50%)',
                         padding: '8px',
-                        cursor: selectable ? 'pointer' : 'default',
+                        cursor: (selectable && !placementMode) ? 'pointer' : 'default',
                         outline: 'none',
                         pointerEvents: (isVerified || isQAPreview) ? undefined : 'none',
+                        zIndex: 20,
                       }}
                     >
                       <div style={{
                         width: isVerified ? (selected ? '14px' : '12px') : (selected ? '12px' : '10px'),
                         height: isVerified ? (selected ? '14px' : '12px') : (selected ? '12px' : '10px'),
                         borderRadius: '50%',
-                        // PROVISIONAL 선택됨: 주황-금색. PROVISIONAL 미선택: 반투명 주황.
-                        // VERIFIED 선택됨: 금색. VERIFIED 미선택: 흰색.
                         background: !isVerified
                           ? (selected ? 'rgba(255,160,0,0.85)' : 'rgba(255,160,0,0.45)')
                           : (selected ? '#FFD67A' : 'rgba(255,255,255,0.92)'),
@@ -343,10 +528,12 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                           ? `0 0 0 3px rgba(255,214,122,0.35), 0 1px 5px rgba(0,0,0,0.45)`
                           : '0 1px 5px rgba(0,0,0,0.45)',
                         transition: 'all 0.15s',
+                        opacity: placementMode ? 0.4 : 1,
                       }} />
                     </div>
                   );
                 })}
+
                 {/* QA Preview: 장소 기준점 마커 (DEV 전용) */}
                 {qaPlaces.map(([code, p]) => (
                   <div
@@ -358,6 +545,7 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                       top: `${p.y * 100}%`,
                       transform: 'translate(-50%, -50%)',
                       pointerEvents: 'none',
+                      zIndex: 15,
                     }}
                   >
                     <div style={{
@@ -373,17 +561,59 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                         : 'rgba(200,200,200,0.60)',
                       border: `2px solid ${p.anchor ? '#b8900a' : p.conflict ? '#cc6000' : p.confirmed ? '#0060aa' : '#888'}`,
                       boxShadow: '0 1px 4px rgba(0,0,0,0.5)',
+                      opacity: placementMode ? 0.4 : 1,
                     }} />
                   </div>
                 ))}
+
+                {/* 후보 마커 — 위치 지정 모드에서 클릭한 장소 좌표 표시 */}
+                {placementMode && zoneTargets.filter(t => candidates[t.code]).map(t => {
+                  const c = candidates[t.code];
+                  const isActive = placementTarget === t.code;
+                  return (
+                    <div
+                      key={`cand-${t.code}`}
+                      title={`[후보] ${t.name_ko}: (${c.x}, ${c.y})`}
+                      style={{
+                        position: 'absolute',
+                        left: `${c.x * 100}%`,
+                        top: `${c.y * 100}%`,
+                        transform: 'translate(-50%, -50%)',
+                        pointerEvents: 'none',
+                        zIndex: 30,
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
+                      }}
+                    >
+                      {/* 후보 마커 원 */}
+                      <div style={{
+                        width: isActive ? '16px' : '12px',
+                        height: isActive ? '16px' : '12px',
+                        borderRadius: '50%',
+                        background: isActive ? 'rgba(80,220,120,0.90)' : 'rgba(80,220,120,0.55)',
+                        border: `2px solid ${isActive ? 'rgba(0,140,60,0.95)' : 'rgba(0,140,60,0.65)'}`,
+                        boxShadow: isActive
+                          ? '0 0 0 3px rgba(80,220,120,0.30), 0 1px 6px rgba(0,0,0,0.55)'
+                          : '0 1px 4px rgba(0,0,0,0.45)',
+                        transition: 'all 0.15s',
+                      }} />
+                      {/* 장소명 라벨 */}
+                      <div style={{
+                        background: 'rgba(0,0,0,0.70)', borderRadius: '4px',
+                        padding: '1px 5px',
+                        fontSize: '0.5625rem', color: isActive ? 'rgba(80,220,120,0.95)' : 'rgba(200,255,210,0.75)',
+                        whiteSpace: 'nowrap', fontWeight: isActive ? 600 : 400,
+                        lineHeight: 1.4,
+                      }}>
+                        {t.name_ko}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </>
           );
         })()
       ) : (
-        /* Zone 2~7 — overview 지도 미리보기 + VERIFIED 경계선 (현재 전체 UNVERIFIED) */
-        /* height:200px + aspectRatio → width 자동 계산(≈185px) → 비율 보존·크롭 없음 */
-        /* objectFit:fill + SVG viewBox="0 0 1 1" → 동일 좌표계 보장 */
         !overviewImgError && (
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <div style={{
@@ -405,7 +635,6 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                   display: 'block',
                 }}
               />
-              {/* SVG 경계선 — VERIFIED + points >= 3 시에만 표시 */}
               <svg
                 style={{
                   position: 'absolute', top: 0, left: 0,
@@ -484,7 +713,6 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
               );
             }
 
-            // 비선택 장소 (EXPLORER / VERIFY_NEEDED / FERRY)
             return (
               <div
                 key={place.code}
@@ -524,8 +752,7 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
 
 export default function YeosuMapSelector({ selectedPlaces, onTogglePlace, onClose }) {
   const [activeZone, setActiveZone] = useState(null);
-  // QA Preview — localhost에서만 활성화. Express가 빌드된 dist를 서빙하므로
-  // import.meta.env.DEV는 항상 false → hostname 체크로 대체.
+  // QA Preview — localhost에서만 활성화.
   // Production(app.dailymiracles.kr)는 hostname이 달라 절대 활성화되지 않음.
   const isQAPreview =
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') &&
