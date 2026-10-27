@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-27T07:16:51.142Z",
+  "generated_at": "2026-10-27T07:23:18.812Z",
   "generator": "generate-manifest.js",
-  "total_count": 507,
+  "total_count": 508,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2994,6 +2994,22 @@
       "title": "MAP V0.1 — Zone Boundary Scaffold Evidence",
       "created_at": "2026-10-27",
       "checksum": "69f6710d"
+    },
+    {
+      "id": "DOC-MAP-V01-COMPLETION-LEDGER",
+      "path": "docs/knowledge/MAP-V01-COMPLETION-LEDGER.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "|------",
+      "title": "MAP V0.1 Completion Ledger",
+      "created_at": "2026-10-27",
+      "checksum": "3786088a"
     },
     {
       "id": "DOC-MAP-V01-DECISION-SHEET",

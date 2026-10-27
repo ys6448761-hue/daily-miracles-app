@@ -23,7 +23,20 @@ Last Updated: 2026-10-27
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**MAP V0.1 — 낭만요트·블루요트 마커 위치 지정 + Marker Editor E2E Founder 검수**
+**MAP V0.1 — Founder 마커 위치 지정 (드래그 편집기)**
+- **MAP_V01_COMPLETION_LEDGER_READY** ✅ (2026-10-27)
+  - Confirmed/Open/Deferred 구분 완료
+  - 후보 좌표 → yeosuMapData.js 반영 검증: 전체 반영 완료 (유실 없음)
+  - 추가 요청 6곳: 오포대·진남관·아쿠아플라넷 기등록 / 낭만요트·블루요트 금번 등록 / 빅오쇼 미등록(Founder Decision 필요)
+  - Evidence: `docs/knowledge/MAP-V01-COMPLETION-LEDGER.md`
+  - **Founder 즉시 할 일** (드래그 편집기):
+    - `localhost:5000/muyojeong?qa_preview=boundary` → Zone 1 또는 2 진입
+    - 지정 필요: **이순신광장·케이블카·엑스포공원·스카이타워·자산공원(재확인)·낭만요트·블루요트** (7곳)
+    - E2E 7단계: 자산공원 드래그 → 내보내기 → 종료 후 토글 확인
+    - 완료 후 "전체 좌표 내보내기" → 코드야 전달
+  - **빅오쇼**: Inventory 미등록 — Founder 등록 여부 결정 필요
+
+**[이전] MAP V0.1 — 낭만요트·블루요트 마커 위치 지정 + Marker Editor E2E Founder 검수**
 - **MAP_V01_YACHT_BOARDING_LOCATIONS_RECONCILED** ✅ (2026-10-27)
   - 낭만요트(nangman_yacht)·블루요트(blue_yacht) Zone 2 EXPLORER 신규 추가
   - 탑승 기준: 유탑마리나호텔 앞(오동도로 61-15) — 낭만(정문 오른편)·블루(정문 왼편)
