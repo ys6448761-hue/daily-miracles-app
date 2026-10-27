@@ -24,6 +24,11 @@ Last Updated: 2026-10-27
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
 **MAP V0.1 Zone 1·2 Final Completion — Founder 복사 결과 수신 후 마무리**
+- **MAP_V01_DRAFT_PERSISTENCE_QA_PASS** ✅ (2026-10-27) — Static PASS / 브라우저 항목 OPEN
+  - 정적 분석 PASS 5항목: DRAFT_KEY 일치, 빈 candidates 덮어쓰기 방지, Zone 전환 보존, 초안삭제 명시적 전용
+  - 브라우저 OPEN 4항목 (V-03/04/05/06): 드래그→저장·새로고침 복원·Zone 전환·내보내기 일치
+  - V-09 이전 세션 좌표: 서버 접근 불가 — Founder DevTools 직접 확인 필요
+  - Evidence: `docs/knowledge/MAP-V01-DRAFT-PERSISTENCE-QA-EVIDENCE.md`
 - **MAP_V01_COORDINATE_DRAFT_PERSISTENCE_READY** ✅ (2026-10-27)
   - localStorage 로컬 초안 자동 저장·복원 추가 (QA Preview 전용)
   - 저장 키: `yeosu_map_draft_v01_oldtown` (imageId + 데이터버전 포함)
@@ -36,7 +41,7 @@ Last Updated: 2026-10-27
     1. `node server.js` 재시작 → `localhost:5000/muyojeong?qa_preview=boundary`
     2. 이순신광장·하멜등대·엑스포공원·스카이타워 드래그 위치 지정
     3. "전체 좌표 내보내기" → 클립보드 결과 코드야에게 전달
-    4. 새로고침 → 초안 복원 확인
+    4. 새로고침 → 초안 복원 확인 (V-04 브라우저 검증)
 - **[이전] MAP_V01_COORDINATE_PERSISTENCE_HOLD** (2026-10-27) — 해제됨
   - 케이블카 Zone 2 정상 / 이순신광장·하멜등대 드래그 좌표 유실 확인
   - Evidence: `docs/knowledge/MAP-V01-POSITION-CATEGORY-CHECK-EVIDENCE.md`

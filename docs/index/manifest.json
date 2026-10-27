@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-27T08:57:49.949Z",
+  "generated_at": "2026-10-27T09:04:04.320Z",
   "generator": "generate-manifest.js",
-  "total_count": 511,
+  "total_count": 512,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3058,6 +3058,22 @@
       "title": "MAP V0.1 Direct Marker Placement — Evidence",
       "created_at": "2026-10-27",
       "checksum": "0b434d50"
+    },
+    {
+      "id": "DOC-MAP-V01-DRAFT-PERSISTENCE-QA-E",
+      "path": "docs/knowledge/MAP-V01-DRAFT-PERSISTENCE-QA-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "|------",
+      "title": "MAP V0.1 — Draft Persistence QA Evidence",
+      "created_at": "2026-10-27",
+      "checksum": "335a3cb0"
     },
     {
       "id": "DOC-MAP-V01-DRAGGABLE-MARKER-EDITO",
