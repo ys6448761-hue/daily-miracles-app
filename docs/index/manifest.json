@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-27T05:21:28.957Z",
+  "generated_at": "2026-10-27T06:23:59.416Z",
   "generator": "generate-manifest.js",
-  "total_count": 504,
+  "total_count": 505,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3058,6 +3058,22 @@
       "title": "MAP V0.1 Final Integration Evidence",
       "created_at": "2026-10-27",
       "checksum": "01a4dd8a"
+    },
+    {
+      "id": "DOC-MAP-V01-FINAL-MARKER-CLOSEOUT-",
+      "path": "docs/knowledge/MAP-V01-FINAL-MARKER-CLOSEOUT-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "|------",
+      "title": "MAP V0.1 Final Marker Closeout — Evidence",
+      "created_at": "2026-10-27",
+      "checksum": "770423be"
     },
     {
       "id": "DOC-MAP-V01-FOUNDER-MARKER-ALIGNME",

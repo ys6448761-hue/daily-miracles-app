@@ -23,7 +23,13 @@ Last Updated: 2026-10-27
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**MAP V0.1 드래그 마커 편집기 — Founder 브라우저 검수 필요**
+**MAP V0.1 마커 편집기 — Founder 브라우저 검수 필요**
+- **MAP_V01_FINAL_MARKER_CLOSEOUT_VERIFIED** ✅ (2026-10-27)
+  - 종포해양공원 조사 결과: 이미 Task 2(SHA `26afeac`)에서 PLACEMENT_TARGETS(9개)에 포함됨
+  - package.json 불필요 항목(`"daily-miracles-mvp": "file:.."`) 정리
+  - 빌드 ✅ / 테스트 639/640 PASS (R20 PRE-EXISTING)
+  - Evidence: `docs/knowledge/MAP-V01-FINAL-MARKER-CLOSEOUT-EVIDENCE.md`
+  - **Founder 직접 지정 필요**: 이순신광장(흰 원) / 엑스포공원·스카이타워·자산공원(마커 없음) / 케이블카(AMBIGUOUS)
 - **MAP_V01_DRAGGABLE_MARKER_EDITOR_READY** ✅ (2026-10-27) SHA `431a2eb`
   - Pointer Events(pointerdown/move/up/cancel) + setPointerCapture 드래그
   - 드래그 중: 마커 확대·grabbing 커서·실시간 좌표 라벨
