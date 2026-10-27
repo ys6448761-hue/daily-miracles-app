@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-27T00:27:12.984Z",
+  "generated_at": "2026-10-27T00:37:51.456Z",
   "generator": "generate-manifest.js",
-  "total_count": 498,
+  "total_count": 499,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3010,6 +3010,22 @@
       "title": "Map V0.1 Design Decision Sheet",
       "created_at": "2026-10-27",
       "checksum": "3e49ddda"
+    },
+    {
+      "id": "DOC-MAP-V01-FINAL-INTEGRATION-EVID",
+      "path": "docs/knowledge/MAP-V01-FINAL-INTEGRATION-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "식별 근거",
+      "title": "MAP V0.1 Final Integration Evidence",
+      "created_at": "2026-10-27",
+      "checksum": "01a4dd8a"
     },
     {
       "id": "DOC-MAP-V01-GEOGRAPHIC-QA-CONFLICT",

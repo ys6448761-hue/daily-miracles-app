@@ -28,9 +28,13 @@ export const MAP_STATUS = {
 export const YEOSU_PLACES = [
   // ── 권역 1: 원도심 해안권 ─────────────────────────────────────────────────
   // 기존 TG_READY
-  { code: 'lee_soon_shin_plaza',  name_ko: '이순신광장',   zone: 1, lat: 34.7463,    lng: 127.7356,    status: 'tg_ready',   coordVerified: true },
-  { code: 'romantic_pojangmacha', name_ko: '낭만포차거리', zone: 1, lat: 34.7421,    lng: 127.7398,    status: 'tg_ready',   coordVerified: true },
-  { code: 'hamel_lighthouse',     name_ko: '하멜등대',     zone: 1, lat: 34.7364,    lng: 127.7471,    status: 'tg_ready',   coordVerified: true },
+  // markerPos: oldtown 이미지 시각 추정 (2026-10-27). 이미지 직접 확인 후 추정. PROVISIONAL.
+  { code: 'lee_soon_shin_plaza',  name_ko: '이순신광장',   zone: 1, lat: 34.7463,    lng: 127.7356,    status: 'tg_ready',   coordVerified: true,
+    markerPos: { oldtown: { x: 0.30, y: 0.51, confidence: 'HIGH', status: 'PROVISIONAL' } } },
+  { code: 'romantic_pojangmacha', name_ko: '낭만포차거리', zone: 1, lat: 34.7421,    lng: 127.7398,    status: 'tg_ready',   coordVerified: true,
+    markerPos: { oldtown: { x: 0.38, y: 0.61, confidence: 'HIGH', status: 'PROVISIONAL' } } },
+  { code: 'hamel_lighthouse',     name_ko: '하멜등대',     zone: 1, lat: 34.7364,    lng: 127.7471,    status: 'tg_ready',   coordVerified: true,
+    markerPos: { oldtown: { x: 0.50, y: 0.68, confidence: 'HIGH', status: 'PROVISIONAL' } } },
   // 중앙시장: OI-MAP-1 — 지도 미표시, TG 전면 제외 유지
   { code: 'jungang_market',       name_ko: '중앙시장',     zone: 1, lat: 34.7450,    lng: 127.7370,    status: 'tg_excluded', hidden: true, coordVerified: true },
   // 신규 탐색 가능 (OI-MAP-2)
@@ -41,7 +45,8 @@ export const YEOSU_PLACES = [
   { code: 'jinamgwan',            name_ko: '진남관',        zone: 1, lat: null,       lng: null,        status: 'explorer',   coordVerified: false, coordNote: '국보 304호. 여수시 군자동 소재 확인. 좌표 미검증.' },
   { code: 'opodae',               name_ko: '오포대',        zone: 1, lat: null,       lng: null,        status: 'explorer',   coordVerified: false, coordNote: '고소동 언덕 소재 확인. 좌표 미검증.' },
   // 종포해양공원: Zone 2→1 (Founder 원도심 8곳 포함, FC-ZONE 승인)
-  { code: 'marine_park',          name_ko: '종포해양공원', zone: 1, lat: 34.7488,    lng: 127.7475,    status: 'tg_ready',   coordVerified: true },
+  { code: 'marine_park',          name_ko: '종포해양공원', zone: 1, lat: 34.7488,    lng: 127.7475,    status: 'tg_ready',   coordVerified: true,
+    markerPos: { oldtown: { x: 0.53, y: 0.47, confidence: 'HIGH', status: 'PROVISIONAL' } } },
 
   // ── 권역 2: 오동도·엑스포권 ──────────────────────────────────────────────
   {
@@ -55,10 +60,12 @@ export const YEOSU_PLACES = [
     },
   },
   // cablecar = SOUL entity (TG_READY). 좌표=자산탑승장(여수 본토). Founder "해상케이블카 자산탑승장" alias.
-  { code: 'cablecar',             name_ko: '케이블카',     zone: 2, lat: 34.7428,    lng: 127.7562,    status: 'tg_ready',   coordVerified: true },
+  { code: 'cablecar',             name_ko: '케이블카',     zone: 2, lat: 34.7428,    lng: 127.7562,    status: 'tg_ready',   coordVerified: true,
+    markerPos: { oldtown: { x: 0.69, y: 0.57, confidence: 'HIGH', status: 'PROVISIONAL' } } },
   { code: 'yeosu_expo_park',      name_ko: '엑스포공원',   zone: 2, lat: 34.7520,    lng: 127.7450,    status: 'tg_ready',   coordVerified: true },
   { code: 'sky_tower',            name_ko: '스카이타워',   zone: 2, lat: 34.7512,    lng: 127.7468,    status: 'tg_ready',   coordVerified: true },
-  { code: 'jaisan_park',          name_ko: '자산공원',     zone: 2, lat: 34.7480,    lng: 127.7540,    status: 'tg_ready',   coordVerified: true },
+  { code: 'jaisan_park',          name_ko: '자산공원',     zone: 2, lat: 34.7480,    lng: 127.7540,    status: 'tg_ready',   coordVerified: true,
+    markerPos: { oldtown: { x: 0.65, y: 0.48, confidence: 'HIGH', status: 'PROVISIONAL' } } },
   { code: 'aquaplanet',           name_ko: '아쿠아플라넷', zone: 2, lat: null,       lng: null,        status: 'explorer',   coordVerified: false },
   { code: 'yworld_luge',          name_ko: '유월드루지',   zone: 5, lat: null,       lng: null,        status: 'explorer',   coordVerified: false, coordNote: 'Founder QA: Zone 2→5. 소호 관광단지 인근.' },
   // 신규 EXPLORER — Founder 오동도·엑스포 7곳 (FC-3~5 승인, 좌표 미검증, 마커 미표시)

@@ -23,19 +23,29 @@ Last Updated: 2026-10-27
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**SOUL 차량 안내 최소 개선 완료 — Founder 브라우저 검수 대기**
+**MAP V0.1 Final Integration — Founder 브라우저 QA 검수 1회 필요**
+- **MAP_V01_FINAL_INTEGRATION_WITH_DEFERRED_MARKERS** ✅ (2026-10-27)
+  - **Authorized**: MAP_V01_FINAL_INTEGRATION_AUTHORIZED
+  - Evidence: `docs/knowledge/MAP-V01-FINAL-INTEGRATION-EVIDENCE.md`
+  - **마커 추가**: Zone 1 TG_READY 4개 + Zone 2 추가 2개 = 총 7개 장소 markerPos.oldtown PROVISIONAL 추가
+    - Zone 1: 이순신광장(0.30,0.51) / 낭만포차거리(0.38,0.61) / 하멜등대(0.50,0.68) / 종포해양공원(0.53,0.47)
+    - Zone 2: 케이블카(0.69,0.57) / 자산공원(0.65,0.48) / 오동도(0.87,0.28 기존)
+  - **양방향 토글**: QA Preview에서 PROVISIONAL 마커 클릭 허용 (일반 사용자 차단 유지)
+  - **SOUL 게이팅**: isSelectablePlace(TG_READY 전용) 변경 없음 / EXPLORER 차단 유지
+  - **Inventory**: 42개 / TG_READY 12개 / 7개 권역 보존 ✅
+  - **빌드**: 698 modules ✅ / **회귀**: 639/640 PASS (R20 PRE-EXISTING 유지) ✅
+  - **Deferred**: yeosu_expo_park / sky_tower — QA_OLDTOWN_POSITIONS conflict, 이미지에서 독립 식별 불가
+  - **브라우저 미검증 (자동화 불가)**: A~E 토글, I 모바일 → Founder 직접 검수 필요
+  - **검수 URL** (1회 제출): `http://localhost:5000/muyojeong?qa_preview=boundary`
+    - Zone 1(원도심): 마커 4개 반투명 주황 표시, 클릭→버튼 ON/OFF
+    - Zone 2(오동도·엑스포): 마커 3개 표시, 오동도·케이블카·자산공원 토글
+    - 일반 화면(qa_preview 제거): 마커 전체 숨김
+  - **다음**: Founder VERIFIED 승격 위치 지정 → VERIFIED 마커 → 일반 사용자 마커 활성화
+
+**[이전] SOUL 차량 안내 최소 개선 완료**
 - **SOUL_VEHICLE_GUIDANCE_MINIMAL_READY** ✅ (2026-10-27)
-  - **Founder Decision**: FOUNDER_VEHICLE_GUIDANCE_SIMPLIFIED
   - Evidence: `docs/knowledge/SOUL-VEHICLE-GUIDANCE-MINIMAL-EVIDENCE.md`
-  - DB/Schema/엔진/API 변경 없음 / CAR GOVERNANCE_HOLD 유지
-  - **수정 1 — 향일암 H-5 차량 쿼리**:
-    - BEFORE: "주차 정보는 방문 전에 확인하는 것이 좋아요."
-    - AFTER: "혼잡할 때는 임포주차장을 이용한 후 도보로 이동하는 방법도 있어요. 실제 운영 상황과 이용 가능 여부는 방문 당일 현장에서 확인해보세요."
-  - **수정 2 — 케이블카 C-3 주차 보충**:
-    - BEFORE: "자산·돌산 양쪽 접근 가능. 주차 위치·혼잡은 출발 정류장에 따라 달라요."
-    - AFTER: "자산·돌산 양쪽 접근 가능. 자산 탑승장: 주차 후 엘리베이터. 돌산 탑승장: 주차 후 도보."
-  - 회귀: 639/640 PASS (R20 PRE-EXISTING 유지)
-  - **Founder 브라우저 확인**: 향일암 "차로 가려고요" 응답 / 케이블카 has_car 응답
+  - 향일암: 임포주차장 안내 추가 / 케이블카: 탑승장별 접근 방식 추가
 
 **MAP 마커 안전성 검증 완료**
 - **MAP_V01_MARKER_SAFETY_VERIFIED** ✅ (2026-10-27)

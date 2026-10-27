@@ -291,18 +291,18 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                     )}
                   </svg>
                 )}
-                {/* Phase A 마커 — VERIFIED 상태만 일반 화면 표시.
-                    PROVISIONAL은 위치 미검증 → 일반 사용자 화면 숨김.
-                    QA Preview: PROVISIONAL도 표시하되 클릭 불가, 위치 참고용만.
-                    근거: yeosuMapData.js §comment "VERIFIED만 실제 렌더링" */}
+                {/* 마커 렌더링 규칙:
+                    일반 화면: VERIFIED만 표시, PROVISIONAL 숨김.
+                    QA Preview (로컬 ?qa_preview=boundary): PROVISIONAL도 표시 + 클릭 허용(토글 테스트용).
+                    EXPLORER/FERRY/TG_EXCLUDED: isSelectablePlace=false → 클릭해도 toggleRoutePlace 미호출. */}
                 {markers.filter(m => m.zone === zone.id).map(m => {
                   const mp = m.markerPos.oldtown;
                   const isVerified = mp.status === 'VERIFIED';
-                  // 일반 화면: VERIFIED만. QA Preview: PROVISIONAL도 위치 참고용으로.
+                  // 일반 화면: VERIFIED만. QA Preview: PROVISIONAL도 토글 테스트 허용.
                   if (!isVerified && !isQAPreview) return null;
                   const selected = selectedPlaces.some(p => p.code === m.code);
-                  // PROVISIONAL 마커는 클릭 불가 — 위치 미검증이므로 선택 연결 금지.
-                  const selectable = isSelectablePlace(m) && isVerified;
+                  // TG_READY 조건 유지. 일반: VERIFIED 필수. QA: PROVISIONAL도 테스트 허용.
+                  const selectable = isSelectablePlace(m) && (isVerified || isQAPreview);
                   const handleToggle = () => selectable && onTogglePlace({ code: m.code, name: m.name_ko });
                   return (
                     <div
@@ -313,11 +313,11 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                       tabIndex={selectable ? 0 : undefined}
                       aria-label={
                         selectable
-                          ? `${m.name_ko} ${selected ? '선택 해제' : '선택'}`
+                          ? `${m.name_ko} ${selected ? '선택 해제' : '선택'}${!isVerified ? ' (QA)' : ''}`
                           : `${m.name_ko} (위치 미검증)`
                       }
                       aria-pressed={selectable ? selected : undefined}
-                      title={isVerified ? m.name_ko : `[위치 미검증] ${m.name_ko}`}
+                      title={isVerified ? m.name_ko : `[QA위치미검증] ${m.name_ko}`}
                       style={{
                         position: 'absolute',
                         left: `${mp.x * 100}%`,
@@ -326,21 +326,21 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                         padding: '8px',
                         cursor: selectable ? 'pointer' : 'default',
                         outline: 'none',
-                        pointerEvents: isVerified ? undefined : 'none',
+                        pointerEvents: (isVerified || isQAPreview) ? undefined : 'none',
                       }}
                     >
                       <div style={{
-                        width: isVerified ? (selected ? '14px' : '12px') : '10px',
-                        height: isVerified ? (selected ? '14px' : '12px') : '10px',
+                        width: isVerified ? (selected ? '14px' : '12px') : (selected ? '12px' : '10px'),
+                        height: isVerified ? (selected ? '14px' : '12px') : (selected ? '12px' : '10px'),
                         borderRadius: '50%',
-                        // PROVISIONAL: 반투명 주황 (위치 참고용, 미확정 표시)
-                        // VERIFIED + selected: 금색. VERIFIED 미선택: 흰색.
+                        // PROVISIONAL 선택됨: 주황-금색. PROVISIONAL 미선택: 반투명 주황.
+                        // VERIFIED 선택됨: 금색. VERIFIED 미선택: 흰색.
                         background: !isVerified
-                          ? 'rgba(255,160,0,0.45)'
-                          : selected ? '#FFD67A' : 'rgba(255,255,255,0.92)',
-                        border: `2px solid ${!isVerified ? 'rgba(200,100,0,0.55)' : selected ? '#b8900a' : 'rgba(0,0,0,0.32)'}`,
-                        boxShadow: selected && isVerified
-                          ? '0 0 0 3px rgba(255,214,122,0.35), 0 1px 5px rgba(0,0,0,0.45)'
+                          ? (selected ? 'rgba(255,160,0,0.85)' : 'rgba(255,160,0,0.45)')
+                          : (selected ? '#FFD67A' : 'rgba(255,255,255,0.92)'),
+                        border: `2px solid ${!isVerified ? (selected ? 'rgba(200,100,0,0.90)' : 'rgba(200,100,0,0.55)') : (selected ? '#b8900a' : 'rgba(0,0,0,0.32)')}`,
+                        boxShadow: selected
+                          ? `0 0 0 3px rgba(255,214,122,0.35), 0 1px 5px rgba(0,0,0,0.45)`
                           : '0 1px 5px rgba(0,0,0,0.45)',
                         transition: 'all 0.15s',
                       }} />
