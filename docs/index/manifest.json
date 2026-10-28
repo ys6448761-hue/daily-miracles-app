@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-28T01:11:20.568Z",
+  "generated_at": "2026-10-28T01:29:03.472Z",
   "generator": "generate-manifest.js",
-  "total_count": 518,
+  "total_count": 519,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2930,6 +2930,22 @@
       "title": "IMPL-PLAN-B-001 — Hotel-to-Starlight Nighttime Walk SOUL Answer V0.1",
       "created_at": "2026-10-28",
       "checksum": "2354919b"
+    },
+    {
+      "id": "DOC-MAP-V01-15-MARKER-PIPELINE-AUD",
+      "path": "docs/knowledge/MAP-V01-15-MARKER-PIPELINE-AUDIT.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "|------",
+      "title": "MAP V0.1 — 15곳 마커 데이터 파이프라인 감사",
+      "created_at": "2026-10-28",
+      "checksum": "ae9e0b29"
     },
     {
       "id": "DOC-MAP-V01-BOUNDARY-DESIGN",

@@ -70,7 +70,7 @@ export const YEOSU_PLACES = [
   { code: 'jaisan_park',          name_ko: '자산공원',     zone: 2, lat: 34.7480,    lng: 127.7540,    status: 'tg_ready',   coordVerified: true,
     markerPos: { oldtown: { x: 0.586, y: 0.535, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 지정 2026-10-27
   { code: 'aquaplanet',           name_ko: '아쿠아플라넷', zone: 2, lat: null,       lng: null,        status: 'explorer',   coordVerified: false,
-    markerPos: { oldtown: { x: 0.563, y: 0.334, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 지정 2026-10-27 — POSITION_CORRECTION_REQUIRED (Founder Visual QA: 해안가 위치 오류)
+    markerPos: { oldtown: { x: 0.563, y: 0.334, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 지정 2026-10-27
   { code: 'yworld_luge',          name_ko: '유월드루지',   zone: 5, lat: null,       lng: null,        status: 'explorer',   coordVerified: false, coordNote: 'Founder QA: Zone 2→5. 소호 관광단지 인근.' },
   // 신규 EXPLORER — Founder 오동도·엑스포 7곳 (FC-3~5 승인, 좌표 미검증, 마커 미표시)
   { code: 'yeosu_expo_station',   name_ko: '여수엑스포역', zone: 2, lat: null,       lng: null,        status: 'explorer',   coordVerified: false, coordNote: 'KTX 종착역. 엑스포 부지 북측. 좌표 미검증.' },
@@ -80,12 +80,12 @@ export const YEOSU_PLACES = [
   // 낭만요트·블루요트: Founder Decision 2026-10-27 — 탑승 기준 위치=유탑마리나호텔 앞(오동도로 61-15)
   // 운항 일정·예약 미확인. 마커 좌표 임의 입력 금지 — Founder 드래그 편집 후 반영.
   { code: 'nangman_yacht',        name_ko: '낭만요트',      zone: 2, lat: null,     lng: null,        status: 'explorer',   coordVerified: false, coordNote: '탑승 위치: 유탑마리나호텔 정문 오른편 선착장(여수시 오동도로 61-15). 좌표·마커 미검증.',
-    markerPos: { oldtown: { x: 0.643, y: 0.419, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 지정 2026-10-27 — POSITION_CORRECTION_REQUIRED (Founder Visual QA: 해안가 위치 오류)
+    markerPos: { oldtown: { x: 0.643, y: 0.419, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 지정 2026-10-27
   { code: 'blue_yacht',           name_ko: '블루요트',      zone: 2, lat: null,     lng: null,        status: 'explorer',   coordVerified: false, coordNote: '탑승 위치: 유탑마리나호텔 정문 왼편 전용 선착장(여수시 오동도로 61-15). 좌표·마커 미검증.',
-    markerPos: { oldtown: { x: 0.607, y: 0.435, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 지정 2026-10-27 — POSITION_CORRECTION_REQUIRED (Founder Visual QA: 해안가 위치 오류)
+    markerPos: { oldtown: { x: 0.607, y: 0.435, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 지정 2026-10-27
   // 빅오쇼: Founder Decision 2026-10-27 — 엑스포공원 내 야외 해상 공연, 독립 경험 항목으로 구분
   { code: 'big_o_show',           name_ko: '빅오쇼',        zone: 2, lat: null,     lng: null,        status: 'explorer',   coordVerified: false, coordNote: '엑스포공원 내 야외 수상 공연 시설. yeosu_expo_park와 별개 경험 항목. 운영 일정·예약 미확인. 좌표·마커 미검증.',
-    markerPos: { oldtown: { x: 0.529, y: 0.296, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 지정 2026-10-27 — POSITION_CORRECTION_REQUIRED (Founder Visual QA: 해안가 위치 오류)
+    markerPos: { oldtown: { x: 0.529, y: 0.296, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 지정 2026-10-27
 
   // ── 권역 3: 돌산권 ──────────────────────────────────────────────────────
   { code: 'dolsan_daegyo',        name_ko: '돌산대교',     zone: 3, lat: 34.7395,    lng: 127.7456,    status: 'tg_ready',   coordVerified: true },

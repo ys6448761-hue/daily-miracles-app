@@ -23,15 +23,18 @@ Last Updated: 2026-10-27
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
-**MAP V0.1 — 4곳 위치 재지정 대기 (아쿠아플라넷·빅오쇼·낭만요트·블루요트)**
-- **MAP_V01_RENDER_CLICK_QA_PASS** ✅ (2026-10-28) SHA (pending)
-  - **종포해양공원 중복**: incognito 새 세션 puppeteer 실검증 → 마커 1개 PASS (캐시 아님, 코드 정상)
-  - **낭만요트·블루요트 탐색 클릭**: `<button>` + `activeExplorerPlace` 토글 → 하이라이트 + 지도 ring
-  - **SOUL 게이팅 유지**: explorer click → `setActiveExplorerPlace` only, `onTogglePlace` 호출 없음
-  - **T-A1~T-A5 5/5 PASS** (puppeteer 브라우저 실증): Evidence `docs/knowledge/MAP-V01-RENDER-CLICK-QA-EVIDENCE.md`
-  - 4곳(아쿠아플라넷·빅오쇼·낭만요트·블루요트) POSITION_CORRECTION_REQUIRED 유지 — 재드래그 대기
-  - 빌드 ✅ 698 modules (hash: index-D5MWK-U8.js) / 639/640 PASS
-  - **다음**: Founder QA Preview → 4곳 재드래그 → 내보내기 → 코드야 전달
+**MAP V0.1 — Founder VERIFIED 승격 결정 대기**
+- **MAP_V01_15_MARKER_PIPELINE_VERIFIED** ✅ (2026-10-28) SHA (pending)
+  - **11개 제한 없음**: 코드 전수 검색 — slice/limit/maxItems 없음
+  - **15/15 파이프라인 완전 검증**: 소스 좌표 = 렌더 좌표 (puppeteer 실증)
+  - **4곳 좌표 정상 반영 확인**: 아쿠아플라넷·빅오쇼·낭만요트·블루요트 소스 일치
+  - `POSITION_CORRECTION_REQUIRED` 주석 제거 — Founder 정정: 예전 지정 좌표 = 올바른 좌표
+  - QA 편집기 후보 목록: Zone1 6개 + Zone2 9개 = 15개 (제한 없음)
+  - 빌드 ✅ / 회귀 639/640 (R20 PRE-EXISTING)
+  - Evidence: `docs/knowledge/MAP-V01-15-MARKER-PIPELINE-AUDIT.md`
+  - **다음**: Founder가 QA Preview에서 15개 마커 위치 육안 확인 → VERIFIED 승격 여부 결정
+- **MAP_V01_RENDER_CLICK_QA_PASS** ✅ (2026-10-28) SHA `f4963af`
+  - 종포해양공원 중복 실검증 PASS / explorer 탐색 클릭 T-A1~T-A5 5/5 PASS
 - **MAP_V01_DISCOVERY_CLICK_FIXED** ✅ (2026-10-27) SHA `96e3a95`
   - 마커 title 개발자 용어 제거 / 하단 목록 tooltip 명확화 (탐색 클릭은 이번 커밋에서 완성)
 - **MAP_V01_DUPLICATE_MARKERS_REMOVED** ✅ (2026-10-27) SHA `d67df29`
