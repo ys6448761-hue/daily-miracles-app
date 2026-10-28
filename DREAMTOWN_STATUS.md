@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (Zone 3 overview 결정 기록)
+Last Updated: 2026-10-29 (All-Zone Marker Editor READY)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,14 +23,22 @@ Last Updated: 2026-10-29 (Zone 3 overview 결정 기록)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
-**MAP V0.1 — Zone 3~7 overview 마커 시스템 + Zone 1/2 VERIFIED 승격 결정 대기**
+**MAP V0.1 — Founder Zone 3~7 overview 좌표 지정 대기**
+- **MAP_V01_ALL_ZONE_MARKER_EDITOR_READY** ✅ (2026-10-29) SHA `027b4c5`
+  - Zone 1~7 전 권역 QA 편집기 구현 완료
+  - Zone 1·2 (oldtown): QA 편집 대상 21곳 (Zone 1 8 + Zone 2 13)
+  - Zone 3 (overview): QA 편집 대상 8곳 (dolsan_daegyo 등)
+  - Zone 4~7 (overview): 각 1·6·5·3곳
+  - overview 초안 저장/복원/내보내기 (`DRAFT_KEY_OVERVIEW`)
+  - 2× 확대 토글 (QA 위치 지정 모드, 모바일 대응)
+  - `markerPos.overview` 렌더링 시스템 구축
+  - 빌드 ✅ / 639/640 PASS (R20 PRE-EXISTING)
+  - Evidence: `docs/knowledge/MAP-V01-ALL-ZONE-MARKER-EDITOR-EVIDENCE.md`
+  - **미등록**: 미남크루즈·이사부크루즈 → OPEN (Inventory 추가 = Founder 결정)
+  - **Founder 다음 액션**: `/muyojeong?qa_preview=boundary` → Zone 3~7 진입 → 장소 위치 지정 → 내보내기 → 코드야 전달
 - **MAP_V01_ZONE3_OVERVIEW_DECISION_RECORDED** ✅ (2026-10-29)
   - **Founder 결정**: Zone 3 돌산권 = overview 이미지 사용 (oldtown 지도 적용 취소)
-  - Zone 3 `hasDetailMap: false` — 이미 올바른 상태 (코드 변경 없음)
-  - Zone 3~7 전부 overview 이미지 사용. markerPos.overview 좌표 없음 → 전원 OPEN
   - Evidence: `docs/knowledge/MAP-V01-ZONE3-OVERVIEW-DECISION-EVIDENCE.md`
-  - **Zone 1/2 VERIFIED 승격**: Founder 스크린샷/브라우저 확인 후 결정 대기
-  - **Zone 3~7 다음 단계**: overview 마커 표시 시스템 확장 또는 Founder 지시 대기
 - **MAP_V01_VISUAL_CLOSEOUT_READY** ✅ (2026-10-29) SHA `d3fc30b`
   - Zone 1 스크린샷: 마커 6개, 원도심 해안 좌측 분포 ✅
   - Zone 2 스크린샷: 마커 9개, 오동도·엑스포 우측 분포 ✅

@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-28T22:19:46.250Z",
+  "generated_at": "2026-10-28T22:42:50.561Z",
   "generator": "generate-manifest.js",
-  "total_count": 522,
+  "total_count": 523,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2946,6 +2946,22 @@
       "title": "MAP V0.1 — 15곳 마커 데이터 파이프라인 감사",
       "created_at": "2026-10-28",
       "checksum": "ae9e0b29"
+    },
+    {
+      "id": "DOC-MAP-V01-ALL-ZONE-MARKER-EDITOR",
+      "path": "docs/knowledge/MAP-V01-ALL-ZONE-MARKER-EDITOR-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "이후 상태",
+      "title": "MAP V0.1 — All-Zone Marker Editor Evidence",
+      "created_at": "2026-10-28",
+      "checksum": "748e226a"
     },
     {
       "id": "DOC-MAP-V01-BOUNDARY-DESIGN",
