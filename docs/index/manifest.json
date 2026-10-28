@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-28T21:27:35.227Z",
+  "generated_at": "2026-10-28T21:44:03.954Z",
   "generator": "generate-manifest.js",
-  "total_count": 520,
+  "total_count": 521,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3410,6 +3410,22 @@
       "title": "MAP V0.1 — Toggle & Marker QA Fix Evidence",
       "created_at": "2026-10-28",
       "checksum": "d4a9d42d"
+    },
+    {
+      "id": "DOC-MAP-V01-VISUAL-CLOSEOUT-EVIDEN",
+      "path": "docs/knowledge/MAP-V01-VISUAL-CLOSEOUT-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "|------",
+      "title": "MAP V0.1 — Visual Closeout Evidence",
+      "created_at": "2026-10-28",
+      "checksum": "8e34adaf"
     },
     {
       "id": "DOC-MAP-V01-YACHT-BOARDING-LOCATIO",

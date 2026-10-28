@@ -24,14 +24,17 @@ Last Updated: 2026-10-29
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
 **MAP V0.1 — Founder VERIFIED 승격 결정 대기**
-- **MAP_V01_ZONE_SEPARATION_VERIFIED** ✅ (2026-10-29) SHA (pending)
+- **MAP_V01_VISUAL_CLOSEOUT_READY** ✅ (2026-10-29) SHA (pending)
+  - Zone 1 스크린샷: 마커 6개, 원도심 해안 좌측 분포 ✅
+  - Zone 2 스크린샷: 마커 9개, 오동도·엑스포 우측 분포 ✅
+  - 불일치 0건 / Zone 2 drift 없음 (좌표 수식 동일 + 소스=렌더 100% 일치)
+  - Evidence: `docs/knowledge/MAP-V01-VISUAL-CLOSEOUT-EVIDENCE.md` + `visual-closeout-2026-10-29/*.png`
+  - **다음**: Founder가 스크린샷 또는 `/muyojeong?qa_preview=boundary`에서 마커 위치 확인 → VERIFIED 승격 여부 결정
+- **MAP_V01_ZONE_SEPARATION_VERIFIED** ✅ (2026-10-29) SHA `3b36c6c`
   - **권역 분리 버그 수정**: Zone 1 → 6개만 / Zone 2 → 9개만 (교차 혼입 0)
   - **Founder 최종 좌표 15/15 갱신** (2026-10-29)
-  - **Zone 2 drift 조사**: 구조적 원인 없음 — 동일 이미지/paddingTop/수식. 권역 분리 후 해소.
-  - **19/19 PASS** (T-Z1~Z4 권역 분리 + T-C-1~15 좌표 정합) / puppeteer incognito
-  - 빌드 ✅ 698 modules / 회귀 639/640 (R20 PRE-EXISTING)
+  - **19/19 PASS** / 빌드 ✅ / 회귀 639/640 (R20 PRE-EXISTING)
   - Evidence: `docs/knowledge/MAP-V01-ZONE-SEPARATION-FINAL-COORD-EVIDENCE.md`
-  - **다음**: Founder가 Zone 1·Zone 2 QA Preview에서 마커 위치 확인 → VERIFIED 승격 여부 결정
 - **MAP_V01_15_MARKER_PIPELINE_VERIFIED** ✅ (2026-10-28) SHA `4a98a6d`
   - **11개 제한 없음**: 코드 전수 검색 — slice/limit/maxItems 없음
   - **15/15 파이프라인 완전 검증**: 소스 좌표 = 렌더 좌표 (puppeteer 실증)
