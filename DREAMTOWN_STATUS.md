@@ -24,15 +24,16 @@ Last Updated: 2026-10-27
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
 
 **MAP V0.1 — 4곳 위치 재지정 대기 (아쿠아플라넷·빅오쇼·낭만요트·블루요트)**
-- **MAP_V01_DISCOVERY_CLICK_FIXED** ✅ (2026-10-27) SHA (pending)
-  - 클릭 불가 원인: `isSelectablePlace()` = `status === 'tg_ready'` — explorer 장소 비인터랙티브 (의도된 SOUL 게이팅)
-  - UX 수정: 하단 목록 explorer `<div>` title "코스 추천 준비 중이에요" → 장소별 명확한 안내 문구
-  - 마커 title `[QA위치미검증]` → `위치 검수 중` (개발자 용어 제거)
-  - SOUL 게이팅 유지: isSelectablePlace() 변경 없음 / TG_READY 아닌 장소 SOUL 포함 없음
-  - marine_park 중복: **코드 정상** — Founder 브라우저 하드 리프레시(Ctrl+Shift+R) 필요
-  - 4곳 POSITION_CORRECTION_REQUIRED 주석 추가 (좌표 불변, 재드래그 대기)
-  - 빌드 ✅ 698 modules / 639/640 PASS / Evidence: `docs/knowledge/MAP-V01-DISCOVERY-CLICK-UX-EVIDENCE.md`
-  - **다음**: Founder QA Preview → 아쿠아플라넷·빅오쇼·낭만요트·블루요트 4곳 재드래그 → 내보내기 → 코드야 전달
+- **MAP_V01_RENDER_CLICK_QA_PASS** ✅ (2026-10-28) SHA (pending)
+  - **종포해양공원 중복**: incognito 새 세션 puppeteer 실검증 → 마커 1개 PASS (캐시 아님, 코드 정상)
+  - **낭만요트·블루요트 탐색 클릭**: `<button>` + `activeExplorerPlace` 토글 → 하이라이트 + 지도 ring
+  - **SOUL 게이팅 유지**: explorer click → `setActiveExplorerPlace` only, `onTogglePlace` 호출 없음
+  - **T-A1~T-A5 5/5 PASS** (puppeteer 브라우저 실증): Evidence `docs/knowledge/MAP-V01-RENDER-CLICK-QA-EVIDENCE.md`
+  - 4곳(아쿠아플라넷·빅오쇼·낭만요트·블루요트) POSITION_CORRECTION_REQUIRED 유지 — 재드래그 대기
+  - 빌드 ✅ 698 modules (hash: index-D5MWK-U8.js) / 639/640 PASS
+  - **다음**: Founder QA Preview → 4곳 재드래그 → 내보내기 → 코드야 전달
+- **MAP_V01_DISCOVERY_CLICK_FIXED** ✅ (2026-10-27) SHA `96e3a95`
+  - 마커 title 개발자 용어 제거 / 하단 목록 tooltip 명확화 (탐색 클릭은 이번 커밋에서 완성)
 - **MAP_V01_DUPLICATE_MARKERS_REMOVED** ✅ (2026-10-27) SHA `d67df29`
   - 원인: QA_OLDTOWN_POSITIONS(구버전 참조점) + markerPos(신규 좌표) 동일 place_id 이중 렌더링
   - 수정: qaPlaces 필터에 "markerPos 있는 장소 제외" 조건 추가 (YeosuMapSelector.jsx line 355-361)

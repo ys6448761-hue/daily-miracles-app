@@ -210,6 +210,8 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
   const [draftRestored, setDraftRestored] = useState(false);
   // 드래그 state
   const [draggingCode, setDraggingCode] = useState(null);
+  // explorer 장소 탐색 하이라이트 — SOUL 추가 없음, 지도 마커만 강조
+  const [activeExplorerPlace, setActiveExplorerPlace] = useState(null);
   const mapWrapperRef = useRef(null);
 
   // 마운트 시 로컬 초안 복원 (QA Preview + hasDetailMap 전용)
@@ -699,24 +701,34 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                   if (placementMode) return null;
                   const selected = selectedPlaces.some(p => p.code === m.code);
                   const selectable = isSelectablePlace(m) && (isVerified || isQAPreview);
+                  const isExplorer = m.status === MAP_STATUS.EXPLORER;
+                  const isExplorerActive = isExplorer && activeExplorerPlace === m.code;
                   // 위치 지정 모드 중 기존 마커 토글 비활성화
                   const handleToggle = () => {
                     if (placementMode) return;
-                    if (selectable) onTogglePlace({ code: m.code, name: m.name_ko });
+                    if (selectable) {
+                      onTogglePlace({ code: m.code, name: m.name_ko });
+                    } else if (isExplorer) {
+                      // Explorer: 탐색 하이라이트만 토글 — SOUL 일정 추가 없음
+                      setActiveExplorerPlace(prev => prev === m.code ? null : m.code);
+                    }
                   };
+                  const interactive = !placementMode && (selectable || isExplorer);
                   return (
                     <div
                       key={m.code}
                       onClick={(e) => { e.stopPropagation(); handleToggle(); }}
-                      onKeyDown={(!placementMode && selectable) ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleToggle(); } } : undefined}
-                      role={(!placementMode && selectable) ? 'button' : undefined}
-                      tabIndex={(!placementMode && selectable) ? 0 : undefined}
+                      onKeyDown={interactive ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleToggle(); } } : undefined}
+                      role={interactive ? 'button' : undefined}
+                      tabIndex={interactive ? 0 : undefined}
                       aria-label={
                         selectable && !placementMode
                           ? `${m.name_ko} ${selected ? '선택 해제' : '선택'}${!isVerified ? ' (QA)' : ''}`
+                          : isExplorer
+                          ? `${m.name_ko} — 탐색 가능 (코스 추가 준비 중)`
                           : `${m.name_ko} (위치 미검증)`
                       }
-                      aria-pressed={(!placementMode && selectable) ? selected : undefined}
+                      aria-pressed={selectable ? selected : isExplorer ? isExplorerActive : undefined}
                       title={isVerified ? m.name_ko : `${m.name_ko} · 위치 검수 중`}
                       style={{
                         position: 'absolute',
@@ -724,7 +736,7 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                         top: `${mp.y * 100}%`,
                         transform: 'translate(-50%, -50%)',
                         padding: '8px',
-                        cursor: (selectable && !placementMode) ? 'pointer' : 'default',
+                        cursor: interactive ? 'pointer' : 'default',
                         outline: 'none',
                         pointerEvents: (isVerified || isQAPreview) ? undefined : 'none',
                         zIndex: 20,
@@ -738,8 +750,10 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                           ? (selected ? 'rgba(255,160,0,0.85)' : 'rgba(255,160,0,0.45)')
                           : (selected ? '#FFD67A' : 'rgba(255,255,255,0.92)'),
                         border: `2px solid ${!isVerified ? (selected ? 'rgba(200,100,0,0.90)' : 'rgba(200,100,0,0.55)') : (selected ? '#b8900a' : 'rgba(0,0,0,0.32)')}`,
-                        boxShadow: selected
-                          ? `0 0 0 3px rgba(255,214,122,0.35), 0 1px 5px rgba(0,0,0,0.45)`
+                        boxShadow: isExplorerActive
+                          ? '0 0 0 4px rgba(110,184,255,0.45), 0 1px 5px rgba(0,0,0,0.45)'
+                          : selected
+                          ? '0 0 0 3px rgba(255,214,122,0.35), 0 1px 5px rgba(0,0,0,0.45)'
                           : '0 1px 5px rgba(0,0,0,0.45)',
                         transition: 'all 0.15s',
                         opacity: placementMode ? 0.4 : 1,
@@ -939,14 +953,42 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
               );
             }
 
+            if (place.status === MAP_STATUS.EXPLORER) {
+              const isActive = activeExplorerPlace === place.code;
+              return (
+                <button
+                  key={place.code}
+                  onClick={() => setActiveExplorerPlace(prev => prev === place.code ? null : place.code)}
+                  aria-pressed={isActive}
+                  title={`${place.name_ko} — 탐색 가능한 장소예요. 여행 코스 직접 추가는 준비 중이에요.`}
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: '20px',
+                    border: `1px solid ${isActive ? 'rgba(110,184,255,0.50)' : 'rgba(255,255,255,0.12)'}`,
+                    background: isActive ? 'rgba(110,184,255,0.18)' : (badge ? badge.bg : 'rgba(255,255,255,0.04)'),
+                    display: 'flex', alignItems: 'center', gap: '6px',
+                    cursor: 'pointer',
+                    transition: 'background 0.15s, border-color 0.15s',
+                  }}
+                >
+                  <span style={{ fontSize: '0.8125rem', color: isActive ? 'rgba(110,184,255,0.95)' : 'rgba(255,255,255,0.60)', wordBreak: 'keep-all' }}>
+                    {place.name_ko}
+                  </span>
+                  {badge && (
+                    <span style={{ fontSize: '0.625rem', color: badge.color, background: badge.bg, padding: '2px 6px', borderRadius: '10px', whiteSpace: 'nowrap' }}>
+                      {badge.label}
+                    </span>
+                  )}
+                </button>
+              );
+            }
+
             return (
               <div
                 key={place.code}
                 title={
                   place.status === MAP_STATUS.FERRY
                     ? '배편 예약 후 방문 권장'
-                    : place.status === MAP_STATUS.EXPLORER
-                    ? `${place.name_ko} — 탐색 가능한 장소예요. 여행 코스 직접 추가는 준비 중이에요.`
                     : '정보 수집 중인 장소예요'
                 }
                 style={{
@@ -956,10 +998,10 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                   background: badge ? badge.bg : 'rgba(255,255,255,0.04)',
                   display: 'flex', alignItems: 'center', gap: '6px',
                   cursor: 'default',
-                  opacity: place.status === MAP_STATUS.EXPLORER ? 0.72 : 0.55,
+                  opacity: 0.50,
                 }}
               >
-                <span style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.55)', wordBreak: 'keep-all' }}>
+                <span style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.50)', wordBreak: 'keep-all' }}>
                   {place.name_ko}
                 </span>
                 {badge && (
