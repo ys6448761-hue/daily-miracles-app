@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29
+Last Updated: 2026-10-29 (Zone 3 overview 결정 기록)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,13 +23,19 @@ Last Updated: 2026-10-29
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
-**MAP V0.1 — Founder VERIFIED 승격 결정 대기**
-- **MAP_V01_VISUAL_CLOSEOUT_READY** ✅ (2026-10-29) SHA (pending)
+**MAP V0.1 — Zone 3~7 overview 마커 시스템 + Zone 1/2 VERIFIED 승격 결정 대기**
+- **MAP_V01_ZONE3_OVERVIEW_DECISION_RECORDED** ✅ (2026-10-29)
+  - **Founder 결정**: Zone 3 돌산권 = overview 이미지 사용 (oldtown 지도 적용 취소)
+  - Zone 3 `hasDetailMap: false` — 이미 올바른 상태 (코드 변경 없음)
+  - Zone 3~7 전부 overview 이미지 사용. markerPos.overview 좌표 없음 → 전원 OPEN
+  - Evidence: `docs/knowledge/MAP-V01-ZONE3-OVERVIEW-DECISION-EVIDENCE.md`
+  - **Zone 1/2 VERIFIED 승격**: Founder 스크린샷/브라우저 확인 후 결정 대기
+  - **Zone 3~7 다음 단계**: overview 마커 표시 시스템 확장 또는 Founder 지시 대기
+- **MAP_V01_VISUAL_CLOSEOUT_READY** ✅ (2026-10-29) SHA `d3fc30b`
   - Zone 1 스크린샷: 마커 6개, 원도심 해안 좌측 분포 ✅
   - Zone 2 스크린샷: 마커 9개, 오동도·엑스포 우측 분포 ✅
   - 불일치 0건 / Zone 2 drift 없음 (좌표 수식 동일 + 소스=렌더 100% 일치)
   - Evidence: `docs/knowledge/MAP-V01-VISUAL-CLOSEOUT-EVIDENCE.md` + `visual-closeout-2026-10-29/*.png`
-  - **다음**: Founder가 스크린샷 또는 `/muyojeong?qa_preview=boundary`에서 마커 위치 확인 → VERIFIED 승격 여부 결정
 - **MAP_V01_ZONE_SEPARATION_VERIFIED** ✅ (2026-10-29) SHA `3b36c6c`
   - **권역 분리 버그 수정**: Zone 1 → 6개만 / Zone 2 → 9개만 (교차 혼입 0)
   - **Founder 최종 좌표 15/15 갱신** (2026-10-29)
