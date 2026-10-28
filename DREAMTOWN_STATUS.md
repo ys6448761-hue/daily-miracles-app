@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-27
+Last Updated: 2026-10-29
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -21,18 +21,22 @@ Last Updated: 2026-10-27
 5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
-### ★ Current Next Action (exactly 1) — Updated: 2026-10-27
+### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
 **MAP V0.1 — Founder VERIFIED 승격 결정 대기**
-- **MAP_V01_15_MARKER_PIPELINE_VERIFIED** ✅ (2026-10-28) SHA (pending)
+- **MAP_V01_ZONE_SEPARATION_VERIFIED** ✅ (2026-10-29) SHA (pending)
+  - **권역 분리 버그 수정**: Zone 1 → 6개만 / Zone 2 → 9개만 (교차 혼입 0)
+  - **Founder 최종 좌표 15/15 갱신** (2026-10-29)
+  - **Zone 2 drift 조사**: 구조적 원인 없음 — 동일 이미지/paddingTop/수식. 권역 분리 후 해소.
+  - **19/19 PASS** (T-Z1~Z4 권역 분리 + T-C-1~15 좌표 정합) / puppeteer incognito
+  - 빌드 ✅ 698 modules / 회귀 639/640 (R20 PRE-EXISTING)
+  - Evidence: `docs/knowledge/MAP-V01-ZONE-SEPARATION-FINAL-COORD-EVIDENCE.md`
+  - **다음**: Founder가 Zone 1·Zone 2 QA Preview에서 마커 위치 확인 → VERIFIED 승격 여부 결정
+- **MAP_V01_15_MARKER_PIPELINE_VERIFIED** ✅ (2026-10-28) SHA `4a98a6d`
   - **11개 제한 없음**: 코드 전수 검색 — slice/limit/maxItems 없음
   - **15/15 파이프라인 완전 검증**: 소스 좌표 = 렌더 좌표 (puppeteer 실증)
-  - **4곳 좌표 정상 반영 확인**: 아쿠아플라넷·빅오쇼·낭만요트·블루요트 소스 일치
   - `POSITION_CORRECTION_REQUIRED` 주석 제거 — Founder 정정: 예전 지정 좌표 = 올바른 좌표
-  - QA 편집기 후보 목록: Zone1 6개 + Zone2 9개 = 15개 (제한 없음)
-  - 빌드 ✅ / 회귀 639/640 (R20 PRE-EXISTING)
   - Evidence: `docs/knowledge/MAP-V01-15-MARKER-PIPELINE-AUDIT.md`
-  - **다음**: Founder가 QA Preview에서 15개 마커 위치 육안 확인 → VERIFIED 승격 여부 결정
 - **MAP_V01_RENDER_CLICK_QA_PASS** ✅ (2026-10-28) SHA `f4963af`
   - 종포해양공원 중복 실검증 PASS / explorer 탐색 클릭 T-A1~T-A5 5/5 PASS
 - **MAP_V01_DISCOVERY_CLICK_FIXED** ✅ (2026-10-27) SHA `96e3a95`

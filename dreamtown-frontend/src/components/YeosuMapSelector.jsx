@@ -358,7 +358,7 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
   // markerPos가 있는 장소는 markers 경로에서 이미 렌더링 → QA 참조점 중복 제거
   const qaPlaces = isQAPreview && zone?.hasDetailMap
     ? Object.entries(QA_OLDTOWN_POSITIONS).filter(([code, p]) =>
-        (p.zone === 1 || p.zone === 2) &&
+        p.zone === zoneId &&
         !YEOSU_PLACES.find(pl => pl.code === code)?.markerPos?.oldtown
       )
     : [];
@@ -691,9 +691,9 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
 
                 {/* 기존 마커 렌더링
                     일반 화면: VERIFIED만 표시, PROVISIONAL 숨김.
-                    QA Preview: PROVISIONAL도 표시. 위치 지정 모드 중 토글 비활성. */}
-                {/* hasDetailMap 권역: Zone 1·2 마커 모두 표시 (같은 oldtown 이미지 공유) */}
-                {markers.filter(m => zone.hasDetailMap ? (m.zone === 1 || m.zone === 2) : m.zone === zone.id).map(m => {
+                    QA Preview: PROVISIONAL도 표시. 위치 지정 모드 중 토글 비활성.
+                    Zone 1 → Zone 1 마커 6개만 / Zone 2 → Zone 2 마커 9개만 (권역 분리) */}
+                {markers.filter(m => m.zone === zone.id).map(m => {
                   const mp = m.markerPos.oldtown;
                   const isVerified = mp.status === 'VERIFIED';
                   if (!isVerified && !isQAPreview) return null;
