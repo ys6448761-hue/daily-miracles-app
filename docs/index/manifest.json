@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-29T05:45:20.658Z",
+  "generated_at": "2026-10-29T05:51:25.443Z",
   "generator": "generate-manifest.js",
-  "total_count": 536,
+  "total_count": 537,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3250,6 +3250,22 @@
       "title": "MAP V0.1 Final Marker Closeout — Evidence",
       "created_at": "2026-10-29",
       "checksum": "770423be"
+    },
+    {
+      "id": "DOC-MAP-V01-FIVE-ZONE-VISUAL-RECON",
+      "path": "docs/knowledge/MAP-V01-FIVE-ZONE-VISUAL-RECONCILIATION-HOLD-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "MAP V0.1 — Five Zone Visual Reconciliation Evidence",
+      "created_at": "2026-10-29",
+      "checksum": "86d8598a"
     },
     {
       "id": "DOC-MAP-V01-FOUNDER-MARKER-ALIGNME",
