@@ -89,18 +89,19 @@ export const YEOSU_PLACES = [
     markerPos: { oldtown: { x: 0.549, y: 0.285, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 최종 좌표 2026-10-29
 
   // ── 권역 3: 돌산권 ──────────────────────────────────────────────────────
-  // Zone 3 Founder 후보 좌표 2026-10-29 — PROVISIONAL (overview 이미지 기준)
+  // Zone 3 Founder 초안 대조 반영 2026-10-29 — PROVISIONAL (overview 이미지 기준)
+  // 백업(이전 SOURCE): dolsan_daegyo x=0.639 y=0.518 / dolsan_nightscape x=0.681 y=0.539 / museukmok x=0.701 y=0.615 / cablecar_dolsan x=0.678 y=0.531
   { code: 'dolsan_daegyo',        name_ko: '돌산대교',     zone: 3, lat: 34.7395,    lng: 127.7456,    status: 'tg_ready',   coordVerified: true,
-    markerPos: { overview: { x: 0.639, y: 0.518, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
+    markerPos: { overview: { x: 0.617, y: 0.495, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 초안 2026-10-29 (이전: x=0.639 y=0.518)
   { code: 'dolsan_nightscape',    name_ko: '돌산공원',     zone: 3, lat: 34.7289,    lng: 127.7472,    status: 'tg_ready',   coordVerified: true,
-    markerPos: { overview: { x: 0.681, y: 0.539, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
+    markerPos: { overview: { x: 0.671, y: 0.511, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 초안 2026-10-29 (이전: x=0.681 y=0.539)
   { code: 'museukmok',            name_ko: '무슬목',       zone: 3, lat: null,       lng: null,        status: 'explorer',   coordVerified: false,
-    markerPos: { overview: { x: 0.701, y: 0.615, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
+    markerPos: { overview: { x: 0.696, y: 0.606, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 초안 2026-10-29 (이전: x=0.701 y=0.615)
   { code: 'dolsan_got_market',    name_ko: '돌산갓장터마을', zone: 4, lat: null,     lng: null,        status: 'verify',     coordVerified: false, coordNote: 'Founder 결정 2026-10-29: Zone 3→4 (향일암권) 재배정.',
     markerPos: { overview: { x: 0.702, y: 0.660, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 제공 2026-10-29
   // 해상케이블카 돌산탑승장: Zone 3 지도 탐색 전용. SOUL은 기존 cablecar(Zone 2 TG_READY) 사용.
   { code: 'cablecar_dolsan',      name_ko: '해상케이블카 돌산탑승장', zone: 3, lat: null, lng: null, status: 'explorer', coordVerified: false, coordNote: '돌산도 쪽 탑승장. 좌표 미검증. SOUL 게이팅: cablecar(TG_READY) 별도 유지.',
-    markerPos: { overview: { x: 0.678, y: 0.531, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
+    markerPos: { overview: { x: 0.715, y: 0.528, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 초안 2026-10-29 (이전: x=0.678 y=0.531)
   // 미남크루즈·이사부크루즈: Founder 결정 2026-10-29 — Zone 3 돌산권 탐색 대상 포함. 좌표 미확인.
   { code: 'minam_cruise',         name_ko: '미남크루즈',    zone: 3, lat: null, lng: null, status: 'explorer', coordVerified: false, coordNote: 'Founder 결정 2026-10-29: Zone 3 EXPLORER 등록. 선착장 위치·운항 조건 미검증. SOUL 추천 자동 승격 금지.' },
   { code: 'isabu_cruise',         name_ko: '이사부크루즈',  zone: 3, lat: null, lng: null, status: 'explorer', coordVerified: false, coordNote: 'Founder 결정 2026-10-29: Zone 3 EXPLORER 등록. 선착장 위치·운항 조건 미검증. SOUL 추천 자동 승격 금지.' },

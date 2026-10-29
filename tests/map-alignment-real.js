@@ -18,12 +18,12 @@
 
 const puppeteer = require('puppeteer-core');
 
-// yeosuMapData.js와 동일한 Zone 3 소스 좌표
+// yeosuMapData.js와 동일한 Zone 3 소스 좌표 (Founder 초안 반영 2026-10-29)
 const ZONE3_SOURCE = {
-  dolsan_daegyo:   { x: 0.639, y: 0.518 },
-  dolsan_nightscape: { x: 0.681, y: 0.539 },
-  museukmok:       { x: 0.701, y: 0.615 },
-  cablecar_dolsan: { x: 0.678, y: 0.531 },
+  dolsan_daegyo:   { x: 0.617, y: 0.495 },
+  dolsan_nightscape: { x: 0.671, y: 0.511 },
+  museukmok:       { x: 0.696, y: 0.606 },
+  cablecar_dolsan: { x: 0.715, y: 0.528 },
   artland_resort:  { x: 0.740, y: 0.580 },
 };
 

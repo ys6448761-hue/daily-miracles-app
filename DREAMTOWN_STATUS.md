@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (MAP_V01_DRAFT_SOURCE_RECONCILIATION_HOLD)
+Last Updated: 2026-10-29 (MAP_V01_ZONE3_DRAFT_SOURCE_RECONCILED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,15 +23,19 @@ Last Updated: 2026-10-29 (MAP_V01_DRAFT_SOURCE_RECONCILIATION_HOLD)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
-**MAP V0.1 — Zone 3 Draft vs Source 대조 대기 (Founder 초안 내보내기 필요)**
-- **MAP_V01_DRAFT_SOURCE_RECONCILIATION_HOLD** ⏳ (2026-10-29)
-  - SOURCE 좌표 5곳 확인 완료 (yeosuMapData.js 현재 값)
-  - DRAFT 좌표(Founder 브라우저 localStorage) 개발 쉘에서 접근 불가 — 미확인
-  - **Founder 액션 필요**: Zone 3 QA preview → 마커 위치 지정 모드 → "전체 좌표 내보내기" → 코드야 전달
-  - **또는**: Chrome DevTools Console → `JSON.parse(localStorage.getItem('yeosu_map_draft_v02_overview'))`
-  - 일치 시: 조치 없음 / 불일치 시: Founder 결정 후 장소별 개별 반영
-  - 자동 덮어쓰기·VERIFIED 자동 승격 금지
-  - Evidence: `docs/knowledge/MAP-V01-DRAFT-SOURCE-RECONCILIATION-EVIDENCE.md`
+**MAP V0.1 — Zone 3 PROVISIONAL 마커 Founder 현장 검증 대기**
+- **MAP_V01_ZONE3_DRAFT_SOURCE_RECONCILED** ✅ (2026-10-29)
+  - Founder 초안 좌표(직접 전달) → 4곳 교체, 1곳 동일 확인
+  - dolsan_daegyo: 0.639→**0.617** / 0.518→**0.495**
+  - dolsan_nightscape: 0.681→**0.671** / 0.539→**0.511**
+  - museukmok: 0.701→**0.696** / 0.615→**0.606**
+  - cablecar_dolsan: 0.678→**0.715** / 0.531→**0.528**
+  - artland_resort: 0.740=0.740 / 0.580=0.580 (동일)
+  - **Puppeteer 5/5 PASS** (Δ=0.0000) / 빌드 ✅ 698 modules / Jest ✅ 639/640
+  - 5곳 PROVISIONAL 유지 / SOUL 게이팅·Inventory 불변
+  - Evidence: `docs/knowledge/MAP-V01-ZONE3-DRAFT-SOURCE-RECONCILED-EVIDENCE.md`
+- **MAP_V01_DRAFT_SOURCE_RECONCILIATION_HOLD** ✅ RESOLVED (2026-10-29)
+  - Founder 초안 좌표 직접 전달로 HOLD 해제
 - **MAP_V01_FOUNDER_VISUAL_ALIGNMENT_VERIFIED** ✅ (2026-10-29)
   - **이전 Δ=0 오류**: 버튼 선택자 '위치 지정' != 실제 텍스트 '시작' → placement mode 미진입 → 동일 마커를 두 번 측정
   - **올바른 테스트**: localStorage 주입 → '시작' 버튼 → candidate/regular 실제 비교
