@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-30 (MAP_V01_ZONE2_SOURCE_RENDER_ALIGNED)
+Last Updated: 2026-10-30 (MAP_V01_ZONE2_NANGMAN_YACHT_SOURCE_ALIGNED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,7 +23,11 @@ Last Updated: 2026-10-30 (MAP_V01_ZONE2_SOURCE_RENDER_ALIGNED)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-30
 
-**MAP V0.1 — Zone 2 SOURCE_RENDER_ALIGNED 완료 / Founder 화면 확인 대기 (FOUNDER_VISUAL_QA_PENDING)**
+**MAP V0.1 — 낭만요트 최종 수정 완료 / Zone 2 전체 FOUNDER_FINAL_VISUAL_QA_PENDING**
+- **MAP_V01_ZONE2_NANGMAN_YACHT_SOURCE_ALIGNED** ✅ (2026-10-30)
+  - 낭만요트: x=0.627/y=0.425 → **x=0.605/y=0.406** (Founder 최종 수정)
+  - Puppeteer Δ=0.0000 ✅ / 블루요트 불변 ✅
+  - Evidence: `docs/knowledge/MAP-V01-ZONE2-NANGMAN-YACHT-SOURCE-ALIGNED-EVIDENCE.md`
 - **MAP_V01_ZONE2_SOURCE_RENDER_ALIGNED** ✅ (2026-10-30)
   - Zone 6 FOUNDER_VISUAL_ACCEPTED 확정 수령 후 착수
   - 9곳 정정 + 2곳(여수엑스포역·여수오션크루즈) 신규 markerPos 등록

@@ -87,7 +87,7 @@ export const YEOSU_PLACES = [
   // 낭만요트·블루요트: Founder Decision 2026-10-27 — 탑승 기준 위치=유탑마리나호텔 앞(오동도로 61-15)
   // 운항 일정·예약 미확인. 마커 좌표 임의 입력 금지 — Founder 드래그 편집 후 반영.
   { code: 'nangman_yacht',        name_ko: '낭만요트',      zone: 2, lat: null,     lng: null,        status: 'explorer',   coordVerified: false, coordNote: '탑승 위치: 유탑마리나호텔 정문 오른편 선착장(여수시 오동도로 61-15). 좌표·마커 미검증.',
-    markerPos: { oldtown: { x: 0.627, y: 0.425, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 최종 좌표 2026-10-30 (이전: x=0.657 y=0.430)
+    markerPos: { oldtown: { x: 0.605, y: 0.406, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 최종 좌표 2026-10-30 (이전: x=0.627 y=0.425)
   { code: 'blue_yacht',           name_ko: '블루요트',      zone: 2, lat: null,     lng: null,        status: 'explorer',   coordVerified: false, coordNote: '탑승 위치: 유탑마리나호텔 정문 왼편 전용 선착장(여수시 오동도로 61-15). 좌표·마커 미검증.',
     markerPos: { oldtown: { x: 0.593, y: 0.378, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 최종 좌표 2026-10-30 (이전: x=0.627 y=0.414)
   // 빅오쇼: Founder Decision 2026-10-27 — 엑스포공원 내 야외 해상 공연, 독립 경험 항목으로 구분

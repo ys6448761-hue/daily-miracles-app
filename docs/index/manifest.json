@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-29T20:52:22.579Z",
+  "generated_at": "2026-10-29T21:08:04.382Z",
   "generator": "generate-manifest.js",
-  "total_count": 544,
+  "total_count": 545,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3746,6 +3746,22 @@
       "title": "MAP V0.1 — Zone 2 Boundary Expo Station Extension + Marker Toggle Evidence",
       "created_at": "2026-10-29",
       "checksum": "5cf8881f"
+    },
+    {
+      "id": "DOC-MAP-V01-ZONE2-NANGMAN-YACHT-SO",
+      "path": "docs/knowledge/MAP-V01-ZONE2-NANGMAN-YACHT-SOURCE-ALIGNED-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "MAP V0.1 — Zone 2 낭만요트 SOURCE_ALIGNED Evidence",
+      "created_at": "2026-10-29",
+      "checksum": "ad206442"
     },
     {
       "id": "DOC-MAP-V01-ZONE2-SOURCE-RENDER-AL",
