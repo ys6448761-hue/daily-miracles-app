@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (MAP_V01_ZONE4_ZONE5_SOURCE_SAVED)
+Last Updated: 2026-10-29 (MAP_V01_FINAL_INVENTORY_AUDITED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,7 +23,13 @@ Last Updated: 2026-10-29 (MAP_V01_ZONE4_ZONE5_SOURCE_SAVED)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
-**MAP V0.1 — Zone 3~7 PROVISIONAL → VERIFIED 승격 대기 (Founder 현장 확인 후)**
+**MAP V0.1 COMPLETE — PROVISIONAL → VERIFIED 승격 대기 (Founder 현장 확인 후)**
+- **MAP_V01_FINAL_INVENTORY_AUDITED** ✅ (2026-10-29)
+  - 전체 49곳 / SOURCE_SAVED 36곳 / 미배치 13곳
+  - V0.1 처리 완료: **37/49** (36 SOURCE_SAVED + 1 의도적 제외)
+  - V0.2 이관: 12곳 (MAP_OUT_OF_SCOPE 4곳·PLACEMENT_PENDING 1곳·LOCATION_UNVERIFIED 7곳)
+  - 미배치 사유: MAP_OUT_OF_SCOPE 5 / PLACEMENT_PENDING 1 / LOCATION_UNVERIFIED 7
+  - Evidence: `docs/knowledge/MAP-V01-FINAL-INVENTORY-AUDIT-EVIDENCE.md`
 - **MAP_V01_ZONE4_ZONE5_SOURCE_SAVED** ✅ (2026-10-29)
   - Zone 4 SOURCE_SAVED 4/4: 돌산갓장터마을(0.702/0.660)·향일암(0.751/0.804)·북한반잠수정(0.726/0.772)·봉황산(0.678/0.743)
   - Zone 5 SOURCE_SAVED 6/6: 유월드루지(0.461/0.460)·장도(0.525/0.503)·소호요트장(0.478/0.509)·소호동동다리(0.496/0.471)·이순신마리나(0.547/0.504)·서틀러다육(0.406/0.459)

@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-29T02:50:08.384Z",
+  "generated_at": "2026-10-29T04:05:24.544Z",
   "generator": "generate-manifest.js",
-  "total_count": 530,
+  "total_count": 531,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3202,6 +3202,22 @@
       "title": "MAP V0.1 Final Integration Evidence",
       "created_at": "2026-10-29",
       "checksum": "01a4dd8a"
+    },
+    {
+      "id": "DOC-MAP-V01-FINAL-INVENTORY-AUDIT-",
+      "path": "docs/knowledge/MAP-V01-FINAL-INVENTORY-AUDIT-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "MAP V0.1 — Final Inventory Audit Evidence",
+      "created_at": "2026-10-29",
+      "checksum": "a6568a8b"
     },
     {
       "id": "DOC-MAP-V01-FINAL-MARKER-CLOSEOUT-",
