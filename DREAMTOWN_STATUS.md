@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (MAP_V01_ZONE6_SOURCE_RENDER_ALIGNED)
+Last Updated: 2026-10-30 (MAP_V01_ZONE2_SOURCE_RENDER_ALIGNED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -21,10 +21,25 @@ Last Updated: 2026-10-29 (MAP_V01_ZONE6_SOURCE_RENDER_ALIGNED)
 5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
-### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
+### ★ Current Next Action (exactly 1) — Updated: 2026-10-30
 
-**MAP V0.1 — Zone 6 SOURCE_RENDER_ALIGNED 완료 / Zone 1 Founder 화면 확인 대기**
-- **MAP_V01_ZONE6_SOURCE_RENDER_ALIGNED** ✅ (2026-10-29)
+**MAP V0.1 — Zone 2 SOURCE_RENDER_ALIGNED 완료 / Founder 화면 확인 대기 (FOUNDER_VISUAL_QA_PENDING)**
+- **MAP_V01_ZONE2_SOURCE_RENDER_ALIGNED** ✅ (2026-10-30)
+  - Zone 6 FOUNDER_VISUAL_ACCEPTED 확정 수령 후 착수
+  - 9곳 정정 + 2곳(여수엑스포역·여수오션크루즈) 신규 markerPos 등록
+  - odongdo: 0.853/**0.392** → 0.850/**0.355** / cablecar: 0.660/**0.544** → 0.664/**0.507**
+  - yeosu_expo_park: **0.558**/0.211 → **0.556**/0.185 / sky_tower: y=0.137 → y=**0.121**
+  - jaisan_park: **0.581**/**0.537** → **0.602**/**0.508** / aquaplanet: **0.586**/**0.326** → **0.557**/**0.304**
+  - yeosu_expo_station: 신규 **0.567/0.106** / yeosu_ocean_cruise: 신규 **0.608/0.209**
+  - nangman_yacht: **0.657**/0.430 → **0.627**/0.425 / blue_yacht: **0.627**/**0.414** → **0.593**/**0.378**
+  - big_o_show: **0.549**/**0.285** → **0.543**/**0.232**
+  - 미배치 유지: expo_ocean_trail·manseongri_beach (이번 Founder 좌표 없음)
+  - Puppeteer A **11/11 PASS** Δ≤0.0001 / Zone1 혼입 0 / C Zone1 7/7 / Zone2 혼입 0
+  - 빌드 ✅ 698 modules / Jest ✅ 639/640
+  - Zone 1·2 QA 편집기 권역 분리(SHA 41cfed0) 유지 확인
+  - Zone 2: FOUNDER_VISUAL_QA_PENDING (단순 Δ=0만으로 지리적 최종 승인 불가)
+  - Evidence: `docs/knowledge/MAP-V01-ZONE2-SOURCE-RENDER-ALIGNED-EVIDENCE.md`
+- **MAP_V01_ZONE6_SOURCE_RENDER_ALIGNED** ✅ (2026-10-29) — FOUNDER_VISUAL_ACCEPTED ✅
   - 원인: Zone 6 일반 지도가 이전 SOURCE 좌표 잔류 → 일반 지도와 QA 편집기 불일치
   - 수정: `yeosuMapData.js` Zone 6 4곳 교체
     - gasari_ecology: 0.364/**0.404** → 0.364/**0.372**
