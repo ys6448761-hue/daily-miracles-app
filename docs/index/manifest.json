@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-29T04:05:24.544Z",
+  "generated_at": "2026-10-29T04:43:48.734Z",
   "generator": "generate-manifest.js",
-  "total_count": 531,
+  "total_count": 532,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3250,6 +3250,22 @@
       "title": "MAP V0.1 Founder Marker Alignment — Evidence",
       "created_at": "2026-10-29",
       "checksum": "9d23e2d8"
+    },
+    {
+      "id": "DOC-MAP-V01-FOUNDER-VISUAL-ALIGNME",
+      "path": "docs/knowledge/MAP-V01-FOUNDER-VISUAL-ALIGNMENT-VERIFIED-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "MAP V0.1 — Founder Visual Alignment Regression Investigation Evidence",
+      "created_at": "2026-10-29",
+      "checksum": "1ed6b4c0"
     },
     {
       "id": "DOC-MAP-V01-GEOGRAPHIC-QA-CONFLICT",

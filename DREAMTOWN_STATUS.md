@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (MAP_V01_FINAL_INVENTORY_AUDITED)
+Last Updated: 2026-10-29 (MAP_V01_FOUNDER_VISUAL_ALIGNMENT_VERIFIED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -24,6 +24,14 @@ Last Updated: 2026-10-29 (MAP_V01_FINAL_INVENTORY_AUDITED)
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
 **MAP V0.1 COMPLETE — PROVISIONAL → VERIFIED 승격 대기 (Founder 현장 확인 후)**
+- **MAP_V01_FOUNDER_VISUAL_ALIGNMENT_VERIFIED** ✅ (2026-10-29)
+  - **이전 Δ=0 오류**: 버튼 선택자 '위치 지정' != 실제 텍스트 '시작' → placement mode 미진입 → 동일 마커를 두 번 측정
+  - **올바른 테스트**: localStorage 주입 → '시작' 버튼 → candidate/regular 실제 비교
+  - **5/5 PASS**: dolsan_daegyo·nightscape·museukmok·cablecar_dolsan·artland_resort 전부 Δ=0.0000
+  - **렌더링 코드 버그 없음** — 원인: Founder 브라우저 localStorage stale data
+  - **해결**: Founder가 "초안 삭제" 버튼으로 `yeosu_map_draft_v02_overview` 초기화
+  - 코드 변경 없음 / 좌표 보존 / 재드래그 요청 없음
+  - Evidence: `docs/knowledge/MAP-V01-FOUNDER-VISUAL-ALIGNMENT-VERIFIED-EVIDENCE.md`
 - **MAP_V01_FINAL_INVENTORY_AUDITED** ✅ (2026-10-29)
   - 전체 49곳 / SOURCE_SAVED 36곳 / 미배치 13곳
   - V0.1 처리 완료: **37/49** (36 SOURCE_SAVED + 1 의도적 제외)
