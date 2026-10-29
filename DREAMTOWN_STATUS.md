@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (MAP_V01_ZONE1_2_QA_DRAFT_SCOPE_FIXED)
+Last Updated: 2026-10-29 (MAP_V01_ZONE1_FOUNDER_COORDINATES_SOURCE_SAVED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,7 +23,17 @@ Last Updated: 2026-10-29 (MAP_V01_ZONE1_2_QA_DRAFT_SCOPE_FIXED)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
-**MAP V0.1 — Zone 1·2 QA 편집기 권역 분리 버그 수정 완료 / Zone 7 SOURCE_SAVED 완료**
+**MAP V0.1 — Zone 1 Founder 좌표 SOURCE_SAVED 완료 → Founder 화면 확인 대기**
+- **MAP_V01_ZONE1_FOUNDER_COORDINATES_SOURCE_SAVED** ✅ (2026-10-29)
+  - 이순신광장: 0.401/0.549 → **0.375/0.515** / 낭만포차거리: 0.613/0.640 → **0.599/0.614**
+  - 하멜등대: 0.564/0.634 → **0.569/0.603** / 고소동 천사벽화골목: 신규 **0.463/0.518**
+  - 진남관: 0.391/0.474 → **0.380/0.449** / 오포대: 0.476/0.549 → **0.426/0.485**
+  - 종포해양공원: 0.474/0.601 → **0.444/0.582** / 여수 수산시장: PLACEMENT_PENDING 유지
+  - Puppeteer **7/7 PASS** Δ<0.001 / 여수 수산시장 마커 없음 ✅
+  - 빌드 ✅ 698 modules / Jest ✅ 639/640
+  - Zone 1 SOURCE_SAVED: **7곳** (기존 6 + 고소동 천사벽화골목 신규)
+  - Founder 화면 확인 후 VISUAL_ACCEPTED 기록 예정
+  - Evidence: `docs/knowledge/MAP-V01-ZONE1-FOUNDER-COORDINATES-SOURCE-SAVED-EVIDENCE.md`
 - **MAP_V01_ZONE1_2_QA_DRAFT_SCOPE_FIXED** ✅ (2026-10-29)
   - 버그: Zone 1 선택 시 Zone 2 초안(체크, 좌표목록, "초안 복원됨")이 표시되는 오류
   - 원인: `zoneTargets` = `zone===1 || zone===2` → 현재 권역 무관하게 두 권역 혼재

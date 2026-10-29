@@ -32,26 +32,30 @@ export const YEOSU_PLACES = [
   // 이순신광장: 흰 원으로 표시됨 — 빨간 픽셀 추출 불가. 기존 좌표 유지. Founder 재확인 필요.
   // 마커 좌표: CLEAN_RESTART_V02 (2026-10-27) — 기존 PROVISIONAL 백업 후 초기화
   // 백업: docs/knowledge/MAP-V01-MARKERPOS-BACKUP.md
+  // Zone 1 markerPos 이전 좌표 백업 (2026-10-29 Founder 재지정 전):
+  //   lee_soon_shin_plaza: 0.401/0.549 | romantic_pojangmacha: 0.613/0.640 | hamel_lighthouse: 0.564/0.634
+  //   jinamgwan: 0.391/0.474 | opodae: 0.476/0.549 | marine_park: 0.474/0.601 | gosodong_mural: (없음)
   { code: 'lee_soon_shin_plaza',  name_ko: '이순신광장',   zone: 1, lat: 34.7463,    lng: 127.7356,    status: 'tg_ready',   coordVerified: true,
-    markerPos: { oldtown: { x: 0.401, y: 0.549, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 최종 좌표 2026-10-29
+    markerPos: { oldtown: { x: 0.375, y: 0.515, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 재지정 2026-10-29
   { code: 'romantic_pojangmacha', name_ko: '낭만포차거리', zone: 1, lat: 34.7421,    lng: 127.7398,    status: 'tg_ready',   coordVerified: true,
-    markerPos: { oldtown: { x: 0.613, y: 0.640, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 최종 좌표 2026-10-29
+    markerPos: { oldtown: { x: 0.599, y: 0.614, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 재지정 2026-10-29
   { code: 'hamel_lighthouse',     name_ko: '하멜등대',     zone: 1, lat: 34.7364,    lng: 127.7471,    status: 'tg_ready',   coordVerified: true,
-    markerPos: { oldtown: { x: 0.564, y: 0.634, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 최종 좌표 2026-10-29
+    markerPos: { oldtown: { x: 0.569, y: 0.603, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 재지정 2026-10-29
   // 중앙시장: OI-MAP-1 — 지도 미표시, TG 전면 제외 유지
   { code: 'jungang_market',       name_ko: '중앙시장',     zone: 1, lat: 34.7450,    lng: 127.7370,    status: 'tg_excluded', hidden: true, coordVerified: true },
-  // 신규 탐색 가능 (OI-MAP-2)
-  { code: 'gosodong_mural',       name_ko: '고소동 천사벽화골목', zone: 1, lat: 34.7389997, lng: 127.7411688, status: 'explorer', coordVerified: true, coordNote: 'NAVER 마커 기준 (mom-mom.net, 2026-10-26)' },
-  // UV-2: 좌표 미검증 — lat/lng null 유지
-  { code: 'yeosu_fish_market',    name_ko: '여수 수산시장', zone: 1, lat: null,       lng: null,        status: 'explorer',   coordVerified: false, coordNote: 'UV-2: 주소=여객선터미널길 24 교동 확인, 좌표 미검증' },
-  // 진남관·오포대: Founder 원도심 8곳 (FC-1/2 승인, EXPLORER — 좌표 미검증, 마커 미표시)
+  // 신규 탐색 가능 (OI-MAP-2) — Founder 재지정 좌표 2026-10-29
+  { code: 'gosodong_mural',       name_ko: '고소동 천사벽화골목', zone: 1, lat: 34.7389997, lng: 127.7411688, status: 'explorer', coordVerified: true, coordNote: 'NAVER 마커 기준 (mom-mom.net, 2026-10-26)',
+    markerPos: { oldtown: { x: 0.463, y: 0.518, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 재지정 2026-10-29
+  // UV-2: 여수 수산시장 — PLACEMENT_PENDING. 탐색 가능하나 지도 마커 미확정. 좌표 생성 금지.
+  { code: 'yeosu_fish_market',    name_ko: '여수 수산시장', zone: 1, lat: null,       lng: null,        status: 'explorer',   coordVerified: false, coordNote: 'UV-2: 주소=여객선터미널길 24 교동 확인, 좌표 미검증. PLACEMENT_PENDING — 지도 마커 미배치.' },
+  // 진남관·오포대: Founder 원도심 8곳 (FC-1/2 승인, EXPLORER)
   { code: 'jinamgwan',            name_ko: '진남관',        zone: 1, lat: null,       lng: null,        status: 'explorer',   coordVerified: false, coordNote: '국보 304호. 여수시 군자동 소재 확인. 좌표 미검증.',
-    markerPos: { oldtown: { x: 0.391, y: 0.474, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 최종 좌표 2026-10-29
+    markerPos: { oldtown: { x: 0.380, y: 0.449, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 재지정 2026-10-29
   { code: 'opodae',               name_ko: '오포대',        zone: 1, lat: null,       lng: null,        status: 'explorer',   coordVerified: false, coordNote: '고소동 언덕 소재 확인. 좌표 미검증.',
-    markerPos: { oldtown: { x: 0.476, y: 0.549, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 최종 좌표 2026-10-29
+    markerPos: { oldtown: { x: 0.426, y: 0.485, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 재지정 2026-10-29
   // 종포해양공원: Zone 2→1 (Founder 원도심 8곳 포함, FC-ZONE 승인)
   { code: 'marine_park',          name_ko: '종포해양공원', zone: 1, lat: 34.7488,    lng: 127.7475,    status: 'tg_ready',   coordVerified: true,
-    markerPos: { oldtown: { x: 0.474, y: 0.601, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 최종 좌표 2026-10-29
+    markerPos: { oldtown: { x: 0.444, y: 0.582, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 재지정 2026-10-29
 
   // ── 권역 2: 오동도·엑스포권 ──────────────────────────────────────────────
   {
