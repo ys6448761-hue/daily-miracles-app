@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (MAP_V01_ZONE5_VISUAL_QA_PENDING)
+Last Updated: 2026-10-29 (MAP_V01_ZONE5_PLACE_COORDINATE_CORRECTED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,15 +23,21 @@ Last Updated: 2026-10-29 (MAP_V01_ZONE5_VISUAL_QA_PENDING)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
-**MAP V0.1 — Zone 5 수정 좌표 대기 (6곳) · Zone 1·2·6·7은 Zone 5 완료 후 순차 진행**
-- **MAP_V01_ZONE5_VISUAL_QA_PENDING** ⏳ (2026-10-29)
-  - Zone 3·4: ✅ FOUNDER_VISUAL_ACCEPTED (변경 금지)
-  - Zone 5 소호·장도권 6곳: ❌ VISUAL_REJECTED — **원인: SOURCE 좌표 자체가 실제 위치와 다름**
-  - 측정 확인: SOURCE = 렌더 (6/6 Δ=0.0000) — 렌더링 버그·stale localStorage 아님
-  - Founder 브라우저 초안 미확보 (개발 쉘 접근 불가)
-  - **Founder 액션 필요**: DevTools Console → `yeosu_map_draft_v02_overview` 추출 또는 QA 편집기 오류 장소만 재배치 → 코드야 전달
-  - 추측 좌표·공통 offset 적용 금지
-  - Evidence: `docs/knowledge/MAP-V01-ZONE5-VISUAL-QA-PENDING-EVIDENCE.md`
+**MAP V0.1 — Zone 5 Founder 화면 확인 대기 (MAP_V01_ZONE5_VISUAL_QA_PENDING)**
+- **MAP_V01_ZONE5_PLACE_COORDINATE_CORRECTED** ✅ (2026-10-29) SHA 커밋 예정
+  - 이순신마리나: Zone 5 탐색 제외 (hidden:true / tg_excluded / SOUL 의존성 없음)
+  - 웅천친수공원 (`ungcheon_park`): Zone 5 신규 등록 (PLACEMENT_PENDING / markerPos 없음)
+  - 장도: 0.525/0.503 → **0.521/0.471** (이전 이순신마리나 좌표가 실제 장도 위치)
+  - 유월드루지: 0.461/0.460 → **0.458/0.444**
+  - 소호요트장: 0.478/0.509 → **0.476/0.509**
+  - 소호동동다리: 0.496/0.471 → **0.480/0.483**
+  - 서틀러다육식물원: 0.406/0.459 → **0.404/0.442**
+  - Puppeteer **5/5 PASS** Δ=0.0000 / 이순신마리나·웅천친수공원 마커 없음 ✅
+  - 빌드 ✅ 698 modules / Jest ✅ 639/640
+  - **Inventory: 50곳** (+1 ungcheon_park) / **SOURCE_SAVED: 35곳** (-1 이순신마리나)
+  - **Founder 화면 확인 후** MAP_V01_ZONE5_VISUAL_ACCEPTED 기록 예정
+  - Evidence: `docs/knowledge/MAP-V01-ZONE5-PLACE-COORDINATE-CORRECTED-EVIDENCE.md`
+- **MAP_V01_ZONE5_VISUAL_QA_PENDING** ✅ 해소 (2026-10-29)
 - **MAP_V01_FIVE_ZONE_VISUAL_RECONCILIATION_HOLD** ✅ Zone 5 우선 분리 (2026-10-29)
   - Zone 1·2·6·7 VISUAL_REJECTED 상태 보존 — Zone 5 완료 후 순차 진행
   - Evidence: `docs/knowledge/MAP-V01-FIVE-ZONE-VISUAL-RECONCILIATION-HOLD-EVIDENCE.md`

@@ -72,7 +72,7 @@ export const YEOSU_PLACES = [
   { code: 'aquaplanet',           name_ko: '아쿠아플라넷', zone: 2, lat: null,       lng: null,        status: 'explorer',   coordVerified: false,
     markerPos: { oldtown: { x: 0.586, y: 0.326, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 최종 좌표 2026-10-29
   { code: 'yworld_luge',          name_ko: '유월드루지',   zone: 5, lat: null,       lng: null,        status: 'explorer',   coordVerified: false, coordNote: 'Founder QA: Zone 2→5. 소호 관광단지 인근.',
-    markerPos: { overview: { x: 0.461, y: 0.460, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 제공 2026-10-29
+    markerPos: { overview: { x: 0.458, y: 0.444, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 최종 좌표 2026-10-29 (이전: x=0.461 y=0.460)
   // 신규 EXPLORER — Founder 오동도·엑스포 7곳 (FC-3~5 승인, 좌표 미검증, 마커 미표시)
   { code: 'yeosu_expo_station',   name_ko: '여수엑스포역', zone: 2, lat: null,       lng: null,        status: 'explorer',   coordVerified: false, coordNote: 'KTX 종착역. 엑스포 부지 북측. 좌표 미검증.' },
   { code: 'expo_ocean_trail',     name_ko: '엑스포 바닷길', zone: 2, lat: null,      lng: null,        status: 'explorer',   coordVerified: false, coordNote: '엑스포 해안 산책로. yeosu_expo_park와 별개 등록. 경계·좌표 미검증.' },
@@ -112,13 +112,15 @@ export const YEOSU_PLACES = [
 
   // ── 권역 5: 소호·장도권 ──────────────────────────────────────────────
   { code: 'jangdo',               name_ko: '장도',         zone: 5, lat: null,       lng: null,        status: 'verify',     coordVerified: false,
-    markerPos: { overview: { x: 0.525, y: 0.503, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 제공 2026-10-29
+    markerPos: { overview: { x: 0.521, y: 0.471, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 최종 좌표 2026-10-29 (이전 x=0.525 y=0.503. 이전 이순신마리나 좌표 0.521/0.471이 실제 장도 위치로 확인됨)
   { code: 'soho_yacht',           name_ko: '소호요트장',   zone: 5, lat: null,       lng: null,        status: 'verify',     coordVerified: false,
-    markerPos: { overview: { x: 0.478, y: 0.509, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 제공 2026-10-29
+    markerPos: { overview: { x: 0.476, y: 0.509, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 최종 좌표 2026-10-29 (이전: x=0.478 y=0.509)
   { code: 'soho_bridge',          name_ko: '소호동동다리', zone: 5, lat: null,       lng: null,        status: 'verify',     coordVerified: false,
-    markerPos: { overview: { x: 0.496, y: 0.471, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 제공 2026-10-29
-  { code: 'lee_soon_shin_marina', name_ko: '이순신마리나', zone: 5, lat: null,       lng: null,        status: 'verify',     coordVerified: false,
-    markerPos: { overview: { x: 0.547, y: 0.504, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 제공 2026-10-29
+    markerPos: { overview: { x: 0.480, y: 0.483, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 최종 좌표 2026-10-29 (이전: x=0.496 y=0.471)
+  // 이순신마리나: Founder 결정 2026-10-29 — Zone 5 탐색 제외. hidden:true (물리 삭제 금지). 이전 좌표(0.547/0.504)는 잘못된 위치였음.
+  { code: 'lee_soon_shin_marina', name_ko: '이순신마리나', zone: 5, lat: null,       lng: null,        status: 'tg_excluded', hidden: true, coordVerified: false, coordNote: 'Founder 결정 2026-10-29: Zone 5 탐색 제외. SOUL 의존성 없음. 이전 markerPos 참조 보존.' },
+  // 웅천친수공원: Founder 결정 2026-10-29 — Zone 5 신규 등록. 좌표 미확정(PLACEMENT_PENDING). 일반 지도 마커 생성 금지.
+  { code: 'ungcheon_park',        name_ko: '웅천친수공원', zone: 5, lat: null,       lng: null,        status: 'verify',     coordVerified: false, coordNote: 'Founder 결정 2026-10-29: Zone 5 신규 등록. 좌표 미확정. QA 편집 후 markerPos 추가 예정.' },
   { code: 'nk_submarine',         name_ko: '북한반잠수정전시관', zone: 4, lat: null, lng: null,        status: 'verify',     coordVerified: false, coordNote: 'Founder 결정 2026-10-29: Zone 5→3→4 (향일암권) 재배정.',
     markerPos: { overview: { x: 0.726, y: 0.772, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 제공 2026-10-29
 
@@ -133,7 +135,7 @@ export const YEOSU_PLACES = [
   { code: 'hwanyang_drive',       name_ko: '화양드라이브',       zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false,
     markerPos: { overview: { x: 0.433, y: 0.506, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
   { code: 'settler_cactus',       name_ko: '서틀러다육식물원',   zone: 5, lat: null, lng: null, status: 'verify', coordVerified: false, coordNote: 'GEO-2: Founder 결정 Zone 6→5 (소호·장도권). 법인주소=소라면 논골안길 20-9. 실제 방문지 동일성 UNVERIFIED.',
-    markerPos: { overview: { x: 0.406, y: 0.459, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 제공 2026-10-29
+    markerPos: { overview: { x: 0.404, y: 0.442, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 최종 좌표 2026-10-29 (이전: x=0.406 y=0.459)
   // jangcheok_tideland 제거 — Founder 결정 2026-10-29: yeojaman_sunset(여자만갯벌/해넘이)와 동일 장소
   { code: 'bonghwangsan',         name_ko: '봉황산자연휴양림',   zone: 4, lat: null, lng: null, status: 'verify', coordVerified: false, coordNote: 'Founder 결정 2026-10-29: Zone 6→3→4 (향일암권) 재배정.',
     markerPos: { overview: { x: 0.678, y: 0.743, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 제공 2026-10-29
