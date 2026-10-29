@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (MAP_V01_ZONE7_LAYOUT_SOURCE_SAVED)
+Last Updated: 2026-10-29 (MAP_V01_ZONE1_2_QA_DRAFT_SCOPE_FIXED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,8 +23,14 @@ Last Updated: 2026-10-29 (MAP_V01_ZONE7_LAYOUT_SOURCE_SAVED)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
-**MAP V0.1 — Zone 7 섬섬길 SOURCE_SAVED 완료 → Founder 화면 확인 대기**
-- **MAP_V01_ZONE7_LAYOUT_SOURCE_SAVED** ✅ (2026-10-29) SHA `커밋 예정`
+**MAP V0.1 — Zone 1·2 QA 편집기 권역 분리 버그 수정 완료 / Zone 7 SOURCE_SAVED 완료**
+- **MAP_V01_ZONE1_2_QA_DRAFT_SCOPE_FIXED** ✅ (2026-10-29)
+  - 버그: Zone 1 선택 시 Zone 2 초안(체크, 좌표목록, "초안 복원됨")이 표시되는 오류
+  - 원인: `zoneTargets` = `zone===1 || zone===2` → 현재 권역 무관하게 두 권역 혼재
+  - 수정: `zoneTargets` → `zone===zoneId` (현재 권역만), `copyAllCandidates` zone 필터, "초안 삭제" zone 스코프
+  - A/B/C/D Puppeteer 4/4 PASS / 빌드 ✅ / Jest 639/640
+  - Evidence: `docs/knowledge/MAP-V01-ZONE1-2-QA-DRAFT-SCOPE-FIXED-EVIDENCE.md`
+- **MAP_V01_ZONE7_LAYOUT_SOURCE_SAVED** ✅ (2026-10-29) SHA `fb1373a`
   - 사도: 0.307/0.823 → **0.311/0.813** / 하화도: 0.420/0.818 → **0.425/0.810**
   - 금오도: 신규 markerPos **0.662/0.877** (PROVISIONAL) / 개도: 신규 **0.512/0.828** (PROVISIONAL)
   - 거문도·백도: `offMap: true` — 지도 마커 미표시, "지도 범위 밖의 섬" 목록 섹션 UI 구현

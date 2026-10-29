@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-29T06:53:44.179Z",
+  "generated_at": "2026-10-29T07:09:10.452Z",
   "generator": "generate-manifest.js",
-  "total_count": 540,
+  "total_count": 541,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3650,6 +3650,22 @@
       "title": "MAP V0.1 — Zone Separation & Final Coordinate Alignment",
       "created_at": "2026-10-29",
       "checksum": "411dff09"
+    },
+    {
+      "id": "DOC-MAP-V01-ZONE1-2-QA-DRAFT-SCOPE",
+      "path": "docs/knowledge/MAP-V01-ZONE1-2-QA-DRAFT-SCOPE-FIXED-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "MAP V0.1 — Zone 1·2 QA 편집기 권역 분리 버그 수정 Evidence",
+      "created_at": "2026-10-29",
+      "checksum": "0e8dd03f"
     },
     {
       "id": "DOC-MAP-V01-ZONE1-BOUNDARY-PROVISI",

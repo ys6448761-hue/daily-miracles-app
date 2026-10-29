@@ -237,14 +237,16 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
     } catch {}
   }, [candidates]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // QA 편집 대상: Zone 1·2 = oldtown 공유 이미지(전체), Zone 3~7 = 해당 권역만
+  // QA 편집 대상: 현재 선택된 권역(zoneId)만 — Zone 1·2 이미지 공유해도 권역별 독립 편집
   const zoneTargets = isQAPreview
     ? YEOSU_PLACES.filter(p => {
         if (p.hidden || p.status === MAP_STATUS.TG_EXCLUDED) return false;
-        if (zone?.hasDetailMap) return p.zone === 1 || p.zone === 2;
         return p.zone === zoneId;
       })
     : [];
+
+  // 현재 권역 저장 초안 유무 — 다른 권역 초안이 있어도 현재 권역 기준으로만 판정
+  const zoneHasDraft = draftRestored && zoneTargets.some(t => candidates[t.code]);
 
   // 위치 지정 모드 토글 — 모드 끄면 placementTarget·dragging 초기화
   const togglePlacementMode = () => {
@@ -335,10 +337,12 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
     });
   };
 
-  // 전체 후보 좌표 복사 (yeosuMapData.js 붙여넣기 형식)
+  // 전체 후보 좌표 복사 — 현재 권역(zoneId) 소속 코드만 내보냄 (다른 권역 혼입 방지)
   const copyAllCandidates = () => {
-    if (Object.keys(candidates).length === 0) return;
-    const lines = Object.entries(candidates)
+    const zoneCodes = new Set(zoneTargets.map(t => t.code));
+    const entries = Object.entries(candidates).filter(([code]) => zoneCodes.has(code));
+    if (entries.length === 0) return;
+    const lines = entries
       .map(([code, { x, y }]) => `  // ${code}\n  markerPos: { ${imageKey}: { x: ${x}, y: ${y}, confidence: 'HIGH', status: 'PROVISIONAL' } }`)
       .join('\n\n');
     navigator.clipboard.writeText(lines).then(() => {
@@ -428,9 +432,14 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
                     <span style={{ fontSize: '0.6875rem', color: placementMode ? 'rgba(80,220,120,0.90)' : 'rgba(255,255,255,0.45)', fontWeight: 600 }}>
                       📍 마커 위치 지정 모드
-                      {draftRestored && placementMode && (
+                      {zoneHasDraft && placementMode && (
                         <span style={{ marginLeft: '6px', fontSize: '0.5625rem', color: 'rgba(120,200,255,0.80)', fontWeight: 400 }}>
-                          초안 복원됨
+                          Zone {zoneId} 초안 복원됨
+                        </span>
+                      )}
+                      {draftRestored && !zoneHasDraft && placementMode && (
+                        <span style={{ marginLeft: '6px', fontSize: '0.5625rem', color: 'rgba(255,200,80,0.60)', fontWeight: 400 }}>
+                          Zone {zoneId} 저장 초안 없음
                         </span>
                       )}
                     </span>
@@ -1017,9 +1026,25 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                             </button>
                           )}
                           <button
-                            onClick={() => { setCandidates({}); setDraftRestored(false); setCopied(false); try { localStorage.removeItem(draftKey); } catch {} }}
+                            onClick={() => {
+                              // 현재 권역 코드만 제거 — 다른 권역 초안 보존
+                              const zoneCodes = new Set(zoneTargets.map(t => t.code));
+                              const remaining = Object.fromEntries(
+                                Object.entries(candidates).filter(([code]) => !zoneCodes.has(code))
+                              );
+                              setCandidates(remaining);
+                              setDraftRestored(false);
+                              setCopied(false);
+                              try {
+                                if (Object.keys(remaining).length > 0) {
+                                  localStorage.setItem(draftKey, JSON.stringify(remaining));
+                                } else {
+                                  localStorage.removeItem(draftKey);
+                                }
+                              } catch {}
+                            }}
                             style={{ marginTop: '2px', padding: '3px 0', borderRadius: '8px', border: '1px solid rgba(255,80,80,0.20)', cursor: 'pointer', fontSize: '0.5625rem', width: '100%', background: 'transparent', color: 'rgba(255,120,120,0.50)' }}
-                          >초안 삭제 (전체 초기화)</button>
+                          >Zone {zoneId} 초안 삭제</button>
                         </div>
                       )}
                     </>
