@@ -94,6 +94,9 @@ export const YEOSU_PLACES = [
   { code: 'dolsan_got_market',    name_ko: '돌산갓장터마을', zone: 3, lat: null,     lng: null,        status: 'verify',     coordVerified: false },
   // 해상케이블카 돌산탑승장: Zone 3 지도 탐색 전용. SOUL은 기존 cablecar(Zone 2 TG_READY) 사용.
   { code: 'cablecar_dolsan',      name_ko: '해상케이블카 돌산탑승장', zone: 3, lat: null, lng: null, status: 'explorer', coordVerified: false, coordNote: '돌산도 쪽 탑승장. 좌표 미검증. SOUL 게이팅: cablecar(TG_READY) 별도 유지.' },
+  // 미남크루즈·이사부크루즈: Founder 결정 2026-10-29 — Zone 3 돌산권 탐색 대상 포함. 좌표 미확인.
+  { code: 'minam_cruise',         name_ko: '미남크루즈',    zone: 3, lat: null, lng: null, status: 'explorer', coordVerified: false, coordNote: 'Founder 결정 2026-10-29: Zone 3 EXPLORER 등록. 선착장 위치·운항 조건 미검증. SOUL 추천 자동 승격 금지.' },
+  { code: 'isabu_cruise',         name_ko: '이사부크루즈',  zone: 3, lat: null, lng: null, status: 'explorer', coordVerified: false, coordNote: 'Founder 결정 2026-10-29: Zone 3 EXPLORER 등록. 선착장 위치·운항 조건 미검증. SOUL 추천 자동 승격 금지.' },
 
   // ── 권역 4: 향일암권 ──────────────────────────────────────────────────
   { code: 'hyangiram',            name_ko: '향일암',       zone: 4, lat: 34.5914162, lng: 127.8037534, status: 'tg_ready',   coordVerified: true },
