@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-30 (MUYOJEONG_PR134_RELEASE_APPROVAL_READY)
+Last Updated: 2026-10-30 (PR134_MERGED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,14 +23,16 @@ Last Updated: 2026-10-30 (MUYOJEONG_PR134_RELEASE_APPROVAL_READY)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-30
 
-**PR #134 Founder merge 승인 → Production 배포**
+**무여정 Production 배포 — Founder 별도 명시 승인 필요**
+- **PR #134 MERGED** ✅ (2026-10-30) — merge SHA: `7f2c084`
+  - Render Auto-Deploy OFF 확인 — Production 배포 자동 발생 없음 ✅
+  - Production 현재 SHA: `425a643` (맞춤 항로 V0.1 / 2026-10-25)
 - **MUYOJEONG_PR134_RELEASE_APPROVAL_READY** ✅ (2026-10-30)
   - **MAP_V01_ZONE1_FOUNDER_VISUAL_ACCEPTED ✅** — Founder 직접 발언: "루미야 존1도 이상없어"
-  - Zone 2 FOUNDER_VISUAL_ACCEPTED ✅ (기존) / Zone 6 FOUNDER_VISUAL_ACCEPTED ✅ (기존)
-  - Zone 1·2·6 VISUAL_ACCEPTED 완료. 남은 거버넌스 조건: 없음
+  - Zone 2 FOUNDER_VISUAL_ACCEPTED ✅ / Zone 6 FOUNDER_VISUAL_ACCEPTED ✅
   - CAR GOVERNANCE_HOLD: 유지 (이동시간 추정 미구현 — 별도 승인 없이 해제 불가)
   - PROVISIONAL 마커: 일반 사용자 미노출 정책 유지
-  - **실제 잔여 조건: PR #134 Founder merge 승인 + Production deploy 승인** (2건, 별도)
+  - **잔여 조건: Production deploy Founder 명시 승인 1건** (PR merge ≠ deploy)
   - Evidence: `docs/knowledge/MUYOJEONG-PR134-RELEASE-APPROVAL-READY-EVIDENCE.md`
 - **MUYOJEONG_RELEASE_GATE_RECONCILED** ✅ (2026-10-30) — READ-ONLY
   - Zone 1 AMBIGUOUS_PENDING → 위 Zone 1 FOUNDER_VISUAL_ACCEPTED로 정정
