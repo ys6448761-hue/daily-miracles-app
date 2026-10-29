@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (MAP_V01_ZONE3_ZONE4_MARKER_SCOPE_READY)
+Last Updated: 2026-10-29 (MAP_V01_ZONE6_DUPLICATE_REMOVED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,7 +23,13 @@ Last Updated: 2026-10-29 (MAP_V01_ZONE3_ZONE4_MARKER_SCOPE_READY)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
-**MAP V0.1 — Founder Zone 3~7 overview 좌표 지정 대기**
+**MAP V0.1 — Founder Zone 3~7 overview 좌표 지정 + 권역별 마커 위치 확인**
+- **MAP_V01_ZONE6_DUPLICATE_REMOVED** ✅ (2026-10-29)
+  - jangcheok_tideland 제거 (yeojaman_sunset와 동일 장소, Founder 결정)
+  - Zone 6 후보 좌표 PROVISIONAL 저장: gasari·yeojaman·seomdalcheon·hwanyang (4곳)
+  - **Inventory: 47 → 46곳** / Zone 6 편집 목록 4곳 / 중복 마커 0건
+  - 빌드 ✅ 698 modules / 회귀 ✅ 639/640 (R20 PRE-EXISTING)
+  - Evidence: `docs/knowledge/MAP-V01-ZONE6-DUPLICATE-REMOVED-EVIDENCE.md`
 - **MAP_V01_ZONE3_ZONE4_MARKER_SCOPE_READY** ✅ (2026-10-29)
   - Zone 3: dolsan_got_market·nk_submarine·bonghwangsan → Zone 4 재배정
   - Zone 3 표시·편집: 돌산대교·돌산공원·무슬목·돌산탑승장·예술랜드리조트 (5곳)

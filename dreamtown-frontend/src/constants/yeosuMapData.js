@@ -109,12 +109,17 @@ export const YEOSU_PLACES = [
   { code: 'nk_submarine',         name_ko: '북한반잠수정전시관', zone: 4, lat: null, lng: null,        status: 'verify',     coordVerified: false, coordNote: 'Founder 결정 2026-10-29: Zone 5→3→4 (향일암권) 재배정.' },
 
   // ── 권역 6: 화양·여자만권 ────────────────────────────────────────────
-  { code: 'gasari_ecology',       name_ko: '가사리생태공원',     zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false },
-  { code: 'yeojaman_sunset',      name_ko: '여자만갯벌/해넘이', zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false },
-  { code: 'seomdalcheon',         name_ko: '섬달천',             zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false },
-  { code: 'hwanyang_drive',       name_ko: '화양드라이브',       zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false },
+  // Zone 6 후보 좌표: Founder 제공 2026-10-29. PROVISIONAL — VERIFIED 승격 전까지 QA 초안 취급.
+  { code: 'gasari_ecology',       name_ko: '가사리생태공원',     zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false,
+    markerPos: { overview: { x: 0.364, y: 0.404, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
+  { code: 'yeojaman_sunset',      name_ko: '여자만갯벌/해넘이', zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false,
+    markerPos: { overview: { x: 0.277, y: 0.288, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
+  { code: 'seomdalcheon',         name_ko: '섬달천',             zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false,
+    markerPos: { overview: { x: 0.254, y: 0.341, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
+  { code: 'hwanyang_drive',       name_ko: '화양드라이브',       zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false,
+    markerPos: { overview: { x: 0.433, y: 0.506, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
   { code: 'settler_cactus',       name_ko: '서틀러다육식물원',   zone: 5, lat: null, lng: null, status: 'verify', coordVerified: false, coordNote: 'GEO-2: Founder 결정 Zone 6→5 (소호·장도권). 법인주소=소라면 논골안길 20-9. 실제 방문지 동일성 UNVERIFIED. 좌표·마커 미표시.' },
-  { code: 'jangcheok_tideland',   name_ko: '장척갯벌체험',       zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false },
+  // jangcheok_tideland 제거 — Founder 결정 2026-10-29: yeojaman_sunset(여자만갯벌/해넘이)와 동일 장소
   { code: 'bonghwangsan',         name_ko: '봉황산자연휴양림',   zone: 4, lat: null, lng: null, status: 'verify', coordVerified: false, coordNote: 'Founder 결정 2026-10-29: Zone 6→3→4 (향일암권) 재배정.' },
   { code: 'artland_resort',       name_ko: '예술랜드리조트',     zone: 3, lat: null, lng: null, status: 'verify', coordVerified: false, coordNote: 'Founder QA 판단 유지: Zone 6→3 (돌산권). 주소 미제공, Founder 판단 기준.' },
 
