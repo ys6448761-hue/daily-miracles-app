@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-29T23:09:45.577Z",
+  "generated_at": "2026-10-29T23:21:21.731Z",
   "generator": "generate-manifest.js",
-  "total_count": 547,
+  "total_count": 548,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3986,6 +3986,22 @@
       "title": "MUYOJEONG_ASSET_AUDIT_AND_RELEASE_PARALLEL_PLAN Evidence",
       "created_at": "2026-10-29",
       "checksum": "94e3b5a6"
+    },
+    {
+      "id": "DOC-MUYOJEONG-PR134-RELEASE-APPROV",
+      "path": "docs/knowledge/MUYOJEONG-PR134-RELEASE-APPROVAL-READY-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "rumi",
+      "status": "Zone",
+      "title": "MUYOJEONG_PR134_RELEASE_APPROVAL_READY Evidence",
+      "created_at": "2026-10-29",
+      "checksum": "bbb859c1"
     },
     {
       "id": "DOC-MUYOJEONG-RELEASE-GATE-RECONCI",

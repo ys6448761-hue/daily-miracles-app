@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-30 (MUYOJEONG_RELEASE_GATE_RECONCILED)
+Last Updated: 2026-10-30 (MUYOJEONG_PR134_RELEASE_APPROVAL_READY)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -24,12 +24,17 @@ Last Updated: 2026-10-30 (MUYOJEONG_RELEASE_GATE_RECONCILED)
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-30
 
 **PR #134 Founder merge 승인 → Production 배포**
+- **MUYOJEONG_PR134_RELEASE_APPROVAL_READY** ✅ (2026-10-30)
+  - **MAP_V01_ZONE1_FOUNDER_VISUAL_ACCEPTED ✅** — Founder 직접 발언: "루미야 존1도 이상없어"
+  - Zone 2 FOUNDER_VISUAL_ACCEPTED ✅ (기존) / Zone 6 FOUNDER_VISUAL_ACCEPTED ✅ (기존)
+  - Zone 1·2·6 VISUAL_ACCEPTED 완료. 남은 거버넌스 조건: 없음
+  - CAR GOVERNANCE_HOLD: 유지 (이동시간 추정 미구현 — 별도 승인 없이 해제 불가)
+  - PROVISIONAL 마커: 일반 사용자 미노출 정책 유지
+  - **실제 잔여 조건: PR #134 Founder merge 승인 + Production deploy 승인** (2건, 별도)
+  - Evidence: `docs/knowledge/MUYOJEONG-PR134-RELEASE-APPROVAL-READY-EVIDENCE.md`
 - **MUYOJEONG_RELEASE_GATE_RECONCILED** ✅ (2026-10-30) — READ-ONLY
-  - Zone 2 FOUNDER_VISUAL_ACCEPTED: "오케이 정상이야" (SHA 81b4cd0 이후) → **MAP_V01_ZONE2_FOUNDER_VISUAL_ACCEPTED ✅**
-  - Zone 6 FOUNDER_VISUAL_ACCEPTED: "완벽해" → 기존 기록 정합성 확인 (line 53)
-  - Zone 1: "다른 권역 정상 반영을 언급" = 간접 언급. per-marker 명시 수용 아님 → **AMBIGUOUS_PENDING 유지**
-  - PROVISIONAL 마커 정책: 모든 Zone 1·2 마커 status='PROVISIONAL' → 일반 사용자 미노출 → **Zone 1 VISUAL_ACCEPTED 없이도 PR #134 merge 안전**
-  - 남은 실제 merge 차단: PR #134 Founder merge 승인 1건뿐
+  - Zone 1 AMBIGUOUS_PENDING → 위 Zone 1 FOUNDER_VISUAL_ACCEPTED로 정정
+  - Zone 2 FOUNDER_VISUAL_ACCEPTED: "오케이 정상이야" (SHA 81b4cd0) / Zone 6: "완벽해"
   - Evidence: `docs/knowledge/MUYOJEONG-RELEASE-GATE-RECONCILED-EVIDENCE.md`
 - **MUYOJEONG_ASSET_AUDIT_AND_RELEASE_PARALLEL_PLAN** ✅ (2026-10-30) — READ-ONLY AUDIT
   - 4버튼 연결 구조 확인: 부모님(family_elderly) / 아이(family_with_kids) ✅ / 차량(GOVERNANCE_HOLD ⚠️) / 코스 ✅
@@ -79,7 +84,7 @@ Last Updated: 2026-10-30 (MUYOJEONG_RELEASE_GATE_RECONCILED)
   - Puppeteer **7/7 PASS** Δ<0.001 / 여수 수산시장 마커 없음 ✅
   - 빌드 ✅ 698 modules / Jest ✅ 639/640
   - Zone 1 SOURCE_SAVED: **7곳** (기존 6 + 고소동 천사벽화골목 신규)
-  - Founder 화면 확인 후 VISUAL_ACCEPTED 기록 예정
+  - **Zone 1 FOUNDER_VISUAL_ACCEPTED ✅** — "루미야 존1도 이상없어" (2026-10-30)
   - Evidence: `docs/knowledge/MAP-V01-ZONE1-FOUNDER-COORDINATES-SOURCE-SAVED-EVIDENCE.md`
 - **MAP_V01_ZONE1_2_QA_DRAFT_SCOPE_FIXED** ✅ (2026-10-29)
   - 버그: Zone 1 선택 시 Zone 2 초안(체크, 좌표목록, "초안 복원됨")이 표시되는 오류
