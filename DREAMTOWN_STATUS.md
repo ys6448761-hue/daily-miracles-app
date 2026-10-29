@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (MAP_V01_OVERVIEW_MARKERS_QA_VISIBLE)
+Last Updated: 2026-10-29 (MAP_V01_EDITOR_DISPLAY_ALIGNMENT_PASS)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -24,6 +24,13 @@ Last Updated: 2026-10-29 (MAP_V01_OVERVIEW_MARKERS_QA_VISIBLE)
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
 **MAP V0.1 — Zone 4·5 overview 좌표 지정 대기**
+- **MAP_V01_EDITOR_DISPLAY_ALIGNMENT_PASS** ✅ (2026-10-29)
+  - **버그 수정**: QA 편집기 마커 중심 vs 일반 표시 마커 중심 불일치
+  - 원인: QA outer div `display:flex;flex-direction:column` → translate(-50%,-50%)가 flex 전체 기준 이동
+  - 수정: `padding:8px` wrapper (일반 마커 동일) + label absolute positioned
+  - **Puppeteer 검증**: dolsan_daegyo Δx=0.0000 / Δy=0.0000 — PASS ✅
+  - 빌드 ✅ 698 modules / 회귀 ✅ 639/640 (R20 PRE-EXISTING)
+  - Evidence: `docs/knowledge/MAP-V01-EDITOR-DISPLAY-ALIGNMENT-PASS-EVIDENCE.md`
 - **MAP_V01_OVERVIEW_MARKERS_QA_VISIBLE** ✅ (2026-10-29)
   - **버그 수정**: `getMarkersForImage` `confidence==='HIGH'` 게이트가 모든 PROVISIONAL 차단
   - 수정: `includeProvisional` 파라미터 추가 → QA Preview에서만 PROVISIONAL 포함

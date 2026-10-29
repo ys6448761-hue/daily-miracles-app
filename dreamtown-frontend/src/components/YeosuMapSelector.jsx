@@ -834,16 +834,16 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                         left: `${c.x * 100}%`,
                         top: `${c.y * 100}%`,
                         transform: 'translate(-50%, -50%)',
+                        padding: '8px',
                         pointerEvents: 'auto',
                         cursor: isDragging ? 'grabbing' : 'grab',
                         zIndex: isDragging ? 40 : 30,
-                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
                         touchAction: 'none',
                         userSelect: 'none',
                         WebkitUserSelect: 'none',
                       }}
                     >
-                      {/* 후보 마커 원 */}
+                      {/* 후보 마커 원 — circle 중심 = translate(-50%,-50%) 기준점 */}
                       <div style={{
                         width: isDragging ? '20px' : (isActive ? '16px' : '12px'),
                         height: isDragging ? '20px' : (isActive ? '16px' : '12px'),
@@ -855,8 +855,13 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                           : (isActive ? '0 0 0 3px rgba(80,220,120,0.30), 0 1px 6px rgba(0,0,0,0.55)' : '0 1px 4px rgba(0,0,0,0.45)'),
                         transition: isDragging ? 'none' : 'all 0.15s',
                       }} />
-                      {/* 장소명 라벨 */}
+                      {/* 장소명 라벨 — absolute로 circle 높이에서 제외 → 좌표 기준 불변 */}
                       <div style={{
+                        position: 'absolute',
+                        top: '100%', left: '50%',
+                        transform: 'translateX(-50%)',
+                        marginTop: '2px',
+                        pointerEvents: 'none',
                         background: 'rgba(0,0,0,0.75)', borderRadius: '4px',
                         padding: '1px 5px',
                         fontSize: '0.5625rem',
@@ -1162,15 +1167,16 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                           left: `${c.x * 100}%`,
                           top: `${c.y * 100}%`,
                           transform: 'translate(-50%, -50%)',
+                          padding: '8px',
                           pointerEvents: 'auto',
                           cursor: isDragging ? 'grabbing' : 'grab',
                           zIndex: isDragging ? 40 : 30,
-                          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
                           touchAction: 'none',
                           userSelect: 'none',
                           WebkitUserSelect: 'none',
                         }}
                       >
+                        {/* circle 중심 = translate(-50%,-50%) 기준점 */}
                         <div style={{
                           width: isDragging ? '20px' : (isActive ? '16px' : '12px'),
                           height: isDragging ? '20px' : (isActive ? '16px' : '12px'),
@@ -1180,7 +1186,13 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                           boxShadow: isDragging ? '0 0 0 5px rgba(80,220,120,0.25), 0 2px 10px rgba(0,0,0,0.65)' : (isActive ? '0 0 0 3px rgba(80,220,120,0.30), 0 1px 6px rgba(0,0,0,0.55)' : '0 1px 4px rgba(0,0,0,0.45)'),
                           transition: isDragging ? 'none' : 'all 0.15s',
                         }} />
+                        {/* 라벨 — absolute로 circle 높이에서 제외 → 좌표 기준 불변 */}
                         <div style={{
+                          position: 'absolute',
+                          top: '100%', left: '50%',
+                          transform: 'translateX(-50%)',
+                          marginTop: '2px',
+                          pointerEvents: 'none',
                           background: 'rgba(0,0,0,0.75)', borderRadius: '4px', padding: '1px 5px',
                           fontSize: '0.5625rem',
                           color: isDragging ? 'rgba(80,220,120,1.0)' : (isActive ? 'rgba(80,220,120,0.95)' : 'rgba(200,255,210,0.75)'),
