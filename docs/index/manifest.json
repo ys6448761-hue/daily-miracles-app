@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-29T04:43:48.734Z",
+  "generated_at": "2026-10-29T04:48:52.782Z",
   "generator": "generate-manifest.js",
-  "total_count": 532,
+  "total_count": 533,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3138,6 +3138,22 @@
       "title": "MAP V0.1 — Draft Persistence QA Evidence",
       "created_at": "2026-10-29",
       "checksum": "335a3cb0"
+    },
+    {
+      "id": "DOC-MAP-V01-DRAFT-SOURCE-RECONCILI",
+      "path": "docs/knowledge/MAP-V01-DRAFT-SOURCE-RECONCILIATION-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "|------",
+      "title": "MAP V0.1 — Draft vs Source Reconciliation Evidence",
+      "created_at": "2026-10-29",
+      "checksum": "93dc9d6c"
     },
     {
       "id": "DOC-MAP-V01-DRAGGABLE-MARKER-EDITO",
