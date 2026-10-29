@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-30 (MUYOJEONG_ASSET_AUDIT_AND_RELEASE_PARALLEL_PLAN)
+Last Updated: 2026-10-30 (MUYOJEONG_RELEASE_GATE_RECONCILED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,7 +23,14 @@ Last Updated: 2026-10-30 (MUYOJEONG_ASSET_AUDIT_AND_RELEASE_PARALLEL_PLAN)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-30
 
-**Zone 1·2 Founder 화면 확인 → MAP_V01_ZONE1_2_FOUNDER_VISUAL_ACCEPTED → PR #134 merge 승인**
+**PR #134 Founder merge 승인 → Production 배포**
+- **MUYOJEONG_RELEASE_GATE_RECONCILED** ✅ (2026-10-30) — READ-ONLY
+  - Zone 2 FOUNDER_VISUAL_ACCEPTED: "오케이 정상이야" (SHA 81b4cd0 이후) → **MAP_V01_ZONE2_FOUNDER_VISUAL_ACCEPTED ✅**
+  - Zone 6 FOUNDER_VISUAL_ACCEPTED: "완벽해" → 기존 기록 정합성 확인 (line 53)
+  - Zone 1: "다른 권역 정상 반영을 언급" = 간접 언급. per-marker 명시 수용 아님 → **AMBIGUOUS_PENDING 유지**
+  - PROVISIONAL 마커 정책: 모든 Zone 1·2 마커 status='PROVISIONAL' → 일반 사용자 미노출 → **Zone 1 VISUAL_ACCEPTED 없이도 PR #134 merge 안전**
+  - 남은 실제 merge 차단: PR #134 Founder merge 승인 1건뿐
+  - Evidence: `docs/knowledge/MUYOJEONG-RELEASE-GATE-RECONCILED-EVIDENCE.md`
 - **MUYOJEONG_ASSET_AUDIT_AND_RELEASE_PARALLEL_PLAN** ✅ (2026-10-30) — READ-ONLY AUDIT
   - 4버튼 연결 구조 확인: 부모님(family_elderly) / 아이(family_with_kids) ✅ / 차량(GOVERNANCE_HOLD ⚠️) / 코스 ✅
   - TG_READY 22곳 / SOUL Phase 1 완료 8곳 / Living Detail 3곳
@@ -31,6 +38,10 @@ Last Updated: 2026-10-30 (MUYOJEONG_ASSET_AUDIT_AND_RELEASE_PARALLEL_PLAN)
   - 오픈 차단 이슈: PR #134 미병합 + Zone 1·2 FOUNDER_FINAL_VISUAL_QA_PENDING
   - 최소 개편안: 방안 A(현행 유지 + 안내 문구 보완) — 데이터 확보 전 카테고리 개편 비권장
   - Evidence: `docs/knowledge/MUYOJEONG-ASSET-AUDIT-AND-RELEASE-PARALLEL-PLAN-EVIDENCE.md`
+- **MAP_V01_ZONE2_FOUNDER_VISUAL_ACCEPTED** ✅ (2026-10-30)
+  - Founder 발언: "오케이 정상이야" (SHA 81b4cd0 낭만요트 최종 수정 이후 명시적 수용)
+  - 근거 SHA: `81b4cd0` (nangman_yacht x=0.627/y=0.425 → 0.605/0.406 최종 반영 후)
+  - Zone 2 11곳 전체 수용 확정
 - **MAP_V01_ZONE2_NANGMAN_YACHT_SOURCE_ALIGNED** ✅ (2026-10-30)
   - 낭만요트: x=0.627/y=0.425 → **x=0.605/y=0.406** (Founder 최종 수정)
   - Puppeteer Δ=0.0000 ✅ / 블루요트 불변 ✅
@@ -58,7 +69,7 @@ Last Updated: 2026-10-30 (MUYOJEONG_ASSET_AUDIT_AND_RELEASE_PARALLEL_PLAN)
     - seomdalcheon: **0.254**/0.341 → **0.238**/0.335
     - hwanyang_drive: 0.433/**0.506** → 0.433/**0.487**
   - Puppeteer QA 일반 지도 **4/4 PASS** Δ=0.0000 / 빌드 ✅ 698 modules / Jest ✅ 639/640
-  - Zone 6 FOUNDER_VISUAL_QA_PENDING (Founder 화면 확인 후 기록)
+  - Zone 6 **FOUNDER_VISUAL_ACCEPTED ✅** ("완벽해" — Release Gate Reconciliation 2026-10-30 기록 정합성 확인)
   - Evidence: `docs/knowledge/MAP-V01-ZONE6-SOURCE-RENDER-ALIGNED-EVIDENCE.md`
 - **MAP_V01_ZONE1_FOUNDER_COORDINATES_SOURCE_SAVED** ✅ (2026-10-29)
   - 이순신광장: 0.401/0.549 → **0.375/0.515** / 낭만포차거리: 0.613/0.640 → **0.599/0.614**

@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-29T22:17:08.952Z",
+  "generated_at": "2026-10-29T23:09:45.577Z",
   "generator": "generate-manifest.js",
-  "total_count": 546,
+  "total_count": 547,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3986,6 +3986,22 @@
       "title": "MUYOJEONG_ASSET_AUDIT_AND_RELEASE_PARALLEL_PLAN Evidence",
       "created_at": "2026-10-29",
       "checksum": "94e3b5a6"
+    },
+    {
+      "id": "DOC-MUYOJEONG-RELEASE-GATE-RECONCI",
+      "path": "docs/knowledge/MUYOJEONG-RELEASE-GATE-RECONCILED-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "|------",
+      "title": "MUYOJEONG_RELEASE_GATE_RECONCILED Evidence",
+      "created_at": "2026-10-29",
+      "checksum": "a325ca06"
     },
     {
       "id": "DOC-Change_Log",
