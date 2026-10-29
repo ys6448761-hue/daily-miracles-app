@@ -129,15 +129,16 @@ export const YEOSU_PLACES = [
     markerPos: { overview: { x: 0.726, y: 0.772, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 제공 2026-10-29
 
   // ── 권역 6: 화양·여자만권 ────────────────────────────────────────────
-  // Zone 6 후보 좌표: Founder 제공 2026-10-29. PROVISIONAL — VERIFIED 승격 전까지 QA 초안 취급.
+  // Zone 6 최종 좌표: Founder QA 편집기 최종값 2026-10-29. PROVISIONAL.
+  // 이전 SOURCE 백업: gasari=0.364/0.404 | yeojaman=0.277/0.288 | seomdalcheon=0.254/0.341 | hwanyang=0.433/0.506
   { code: 'gasari_ecology',       name_ko: '가사리생태공원',     zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false,
-    markerPos: { overview: { x: 0.364, y: 0.404, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
+    markerPos: { overview: { x: 0.364, y: 0.372, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 최종 2026-10-29
   { code: 'yeojaman_sunset',      name_ko: '여자만갯벌/해넘이', zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false,
-    markerPos: { overview: { x: 0.277, y: 0.288, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
+    markerPos: { overview: { x: 0.277, y: 0.273, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 최종 2026-10-29
   { code: 'seomdalcheon',         name_ko: '섬달천',             zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false,
-    markerPos: { overview: { x: 0.254, y: 0.341, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
+    markerPos: { overview: { x: 0.238, y: 0.335, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 최종 2026-10-29
   { code: 'hwanyang_drive',       name_ko: '화양드라이브',       zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false,
-    markerPos: { overview: { x: 0.433, y: 0.506, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
+    markerPos: { overview: { x: 0.433, y: 0.487, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 최종 2026-10-29
   { code: 'settler_cactus',       name_ko: '서틀러다육식물원',   zone: 5, lat: null, lng: null, status: 'verify', coordVerified: false, coordNote: 'GEO-2: Founder 결정 Zone 6→5 (소호·장도권). 법인주소=소라면 논골안길 20-9. 실제 방문지 동일성 UNVERIFIED.',
     markerPos: { overview: { x: 0.404, y: 0.442, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } }, // Founder 최종 좌표 2026-10-29 (이전: x=0.406 y=0.459)
   // jangcheok_tideland 제거 — Founder 결정 2026-10-29: yeojaman_sunset(여자만갯벌/해넘이)와 동일 장소

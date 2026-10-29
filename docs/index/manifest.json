@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-29T07:57:32.980Z",
+  "generated_at": "2026-10-29T08:13:59.396Z",
   "generator": "generate-manifest.js",
-  "total_count": 542,
+  "total_count": 543,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3890,6 +3890,22 @@
       "title": "MAP V0.1 — Zone 6 Duplicate Place Cleanup Evidence",
       "created_at": "2026-10-29",
       "checksum": "80107ee4"
+    },
+    {
+      "id": "DOC-MAP-V01-ZONE6-SOURCE-RENDER-AL",
+      "path": "docs/knowledge/MAP-V01-ZONE6-SOURCE-RENDER-ALIGNED-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "team",
+      "status": "active",
+      "title": "MAP V0.1 — Zone 6 SOURCE_RENDER_ALIGNED Evidence",
+      "created_at": "2026-10-29",
+      "checksum": "22aa430a"
     },
     {
       "id": "DOC-MAP-V01-ZONE7-ISLAND-INVENTORY",

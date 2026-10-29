@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (MAP_V01_ZONE1_FOUNDER_COORDINATES_SOURCE_SAVED)
+Last Updated: 2026-10-29 (MAP_V01_ZONE6_SOURCE_RENDER_ALIGNED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,7 +23,17 @@ Last Updated: 2026-10-29 (MAP_V01_ZONE1_FOUNDER_COORDINATES_SOURCE_SAVED)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
-**MAP V0.1 — Zone 1 Founder 좌표 SOURCE_SAVED 완료 → Founder 화면 확인 대기**
+**MAP V0.1 — Zone 6 SOURCE_RENDER_ALIGNED 완료 / Zone 1 Founder 화면 확인 대기**
+- **MAP_V01_ZONE6_SOURCE_RENDER_ALIGNED** ✅ (2026-10-29)
+  - 원인: Zone 6 일반 지도가 이전 SOURCE 좌표 잔류 → 일반 지도와 QA 편집기 불일치
+  - 수정: `yeosuMapData.js` Zone 6 4곳 교체
+    - gasari_ecology: 0.364/**0.404** → 0.364/**0.372**
+    - yeojaman_sunset: 0.277/**0.288** → 0.277/**0.273**
+    - seomdalcheon: **0.254**/0.341 → **0.238**/0.335
+    - hwanyang_drive: 0.433/**0.506** → 0.433/**0.487**
+  - Puppeteer QA 일반 지도 **4/4 PASS** Δ=0.0000 / 빌드 ✅ 698 modules / Jest ✅ 639/640
+  - Zone 6 FOUNDER_VISUAL_QA_PENDING (Founder 화면 확인 후 기록)
+  - Evidence: `docs/knowledge/MAP-V01-ZONE6-SOURCE-RENDER-ALIGNED-EVIDENCE.md`
 - **MAP_V01_ZONE1_FOUNDER_COORDINATES_SOURCE_SAVED** ✅ (2026-10-29)
   - 이순신광장: 0.401/0.549 → **0.375/0.515** / 낭만포차거리: 0.613/0.640 → **0.599/0.614**
   - 하멜등대: 0.564/0.634 → **0.569/0.603** / 고소동 천사벽화골목: 신규 **0.463/0.518**
