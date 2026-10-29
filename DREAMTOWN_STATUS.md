@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (MAP_V01_ZONE3_DRAFT_SOURCE_RECONCILED)
+Last Updated: 2026-10-29 (MAP_V01_ZONE4_7_COORDINATES_RECONCILED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,7 +23,14 @@ Last Updated: 2026-10-29 (MAP_V01_ZONE3_DRAFT_SOURCE_RECONCILED)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
-**MAP V0.1 — Zone 3 PROVISIONAL 마커 Founder 현장 검증 대기**
+**MAP V0.1 — Founder 브라우저 localStorage 초기화 필요 (Zone 4~7 시각 불일치 해결용)**
+- **MAP_V01_ZONE4_7_COORDINATES_RECONCILED** ✅ (2026-10-29)
+  - Founder 전달값 vs SOURCE 16/16 대조: **전원 일치** → 좌표 변경 없음
+  - Puppeteer **16/16 PASS** (Δ=0.0000, Zone 4·5·6·7 전체)
+  - 시각 불일치 원인: Founder 브라우저 `yeosu_map_draft_v02_overview` stale data
+  - 해결: QA preview → 각 권역 → "초안 삭제" / 또는 DevTools Application → Local Storage 삭제
+  - 코드 변경 없음 / SOURCE_SAVED 36곳 불변
+  - Evidence: `docs/knowledge/MAP-V01-ZONE4-7-COORDINATES-RECONCILED-EVIDENCE.md`
 - **MAP_V01_ZONE3_DRAFT_SOURCE_RECONCILED** ✅ (2026-10-29)
   - Founder 초안 좌표(직접 전달) → 4곳 교체, 1곳 동일 확인
   - dolsan_daegyo: 0.639→**0.617** / 0.518→**0.495**
@@ -32,7 +39,6 @@ Last Updated: 2026-10-29 (MAP_V01_ZONE3_DRAFT_SOURCE_RECONCILED)
   - cablecar_dolsan: 0.678→**0.715** / 0.531→**0.528**
   - artland_resort: 0.740=0.740 / 0.580=0.580 (동일)
   - **Puppeteer 5/5 PASS** (Δ=0.0000) / 빌드 ✅ 698 modules / Jest ✅ 639/640
-  - 5곳 PROVISIONAL 유지 / SOUL 게이팅·Inventory 불변
   - Evidence: `docs/knowledge/MAP-V01-ZONE3-DRAFT-SOURCE-RECONCILED-EVIDENCE.md`
 - **MAP_V01_DRAFT_SOURCE_RECONCILIATION_HOLD** ✅ RESOLVED (2026-10-29)
   - Founder 초안 좌표 직접 전달로 HOLD 해제

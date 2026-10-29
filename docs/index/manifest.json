@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-29T05:11:33.354Z",
+  "generated_at": "2026-10-29T05:28:06.497Z",
   "generator": "generate-manifest.js",
-  "total_count": 534,
+  "total_count": 535,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3746,6 +3746,22 @@
       "title": "MAP V0.1 — Zone 3 / Zone 4 Marker Scope Fix Evidence",
       "created_at": "2026-10-29",
       "checksum": "53a50863"
+    },
+    {
+      "id": "DOC-MAP-V01-ZONE4-7-COORDINATES-RE",
+      "path": "docs/knowledge/MAP-V01-ZONE4-7-COORDINATES-RECONCILED-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "stale 초안 좌표",
+      "title": "MAP V0.1 — Zone 4~7 Coordinates Reconciliation Evidence",
+      "created_at": "2026-10-29",
+      "checksum": "43614e37"
     },
     {
       "id": "DOC-MAP-V01-ZONE4-ZONE5-SOURCE-SAV",
