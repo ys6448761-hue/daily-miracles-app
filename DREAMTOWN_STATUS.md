@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-30 (MAP_V01_ZONE2_NANGMAN_YACHT_SOURCE_ALIGNED)
+Last Updated: 2026-10-30 (MUYOJEONG_ASSET_AUDIT_AND_RELEASE_PARALLEL_PLAN)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,7 +23,14 @@ Last Updated: 2026-10-30 (MAP_V01_ZONE2_NANGMAN_YACHT_SOURCE_ALIGNED)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-30
 
-**MAP V0.1 — 낭만요트 최종 수정 완료 / Zone 2 전체 FOUNDER_FINAL_VISUAL_QA_PENDING**
+**Zone 1·2 Founder 화면 확인 → MAP_V01_ZONE1_2_FOUNDER_VISUAL_ACCEPTED → PR #134 merge 승인**
+- **MUYOJEONG_ASSET_AUDIT_AND_RELEASE_PARALLEL_PLAN** ✅ (2026-10-30) — READ-ONLY AUDIT
+  - 4버튼 연결 구조 확인: 부모님(family_elderly) / 아이(family_with_kids) ✅ / 차량(GOVERNANCE_HOLD ⚠️) / 코스 ✅
+  - TG_READY 22곳 / SOUL Phase 1 완료 8곳 / Living Detail 3곳
+  - 음식/카페: 파이프라인 존재, 큐레이션 데이터 부족 가능성
+  - 오픈 차단 이슈: PR #134 미병합 + Zone 1·2 FOUNDER_FINAL_VISUAL_QA_PENDING
+  - 최소 개편안: 방안 A(현행 유지 + 안내 문구 보완) — 데이터 확보 전 카테고리 개편 비권장
+  - Evidence: `docs/knowledge/MUYOJEONG-ASSET-AUDIT-AND-RELEASE-PARALLEL-PLAN-EVIDENCE.md`
 - **MAP_V01_ZONE2_NANGMAN_YACHT_SOURCE_ALIGNED** ✅ (2026-10-30)
   - 낭만요트: x=0.627/y=0.425 → **x=0.605/y=0.406** (Founder 최종 수정)
   - Puppeteer Δ=0.0000 ✅ / 블루요트 불변 ✅

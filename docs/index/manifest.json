@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-29T21:08:04.382Z",
+  "generated_at": "2026-10-29T22:17:08.952Z",
   "generator": "generate-manifest.js",
-  "total_count": 545,
+  "total_count": 546,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3970,6 +3970,22 @@
       "title": "MAP V0.1 — Zone 7 섬섬길 Layout Source Saved Evidence",
       "created_at": "2026-10-29",
       "checksum": "75efff64"
+    },
+    {
+      "id": "DOC-MUYOJEONG-ASSET-AUDIT-AND-RELE",
+      "path": "docs/knowledge/MUYOJEONG-ASSET-AUDIT-AND-RELEASE-PARALLEL-PLAN-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "|------",
+      "title": "MUYOJEONG_ASSET_AUDIT_AND_RELEASE_PARALLEL_PLAN Evidence",
+      "created_at": "2026-10-29",
+      "checksum": "94e3b5a6"
     },
     {
       "id": "DOC-Change_Log",
