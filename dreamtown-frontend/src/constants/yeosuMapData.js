@@ -125,9 +125,23 @@ export const YEOSU_PLACES = [
 
   // ── 권역 7: 섬섬길 (배편 필수) ───────────────────────────────────────
   // OI-MAP-5: SOUL 추천 제외, 배편 배지 표시
-  { code: 'sado_island',          name_ko: '사도',         zone: 7, lat: null,       lng: null,        status: 'ferry',      coordVerified: false },
-  { code: 'hahwado_island',       name_ko: '하화도',       zone: 7, lat: null,       lng: null,        status: 'ferry',      coordVerified: false },
-  { code: 'hwajung_island',       name_ko: '화정도서',     zone: 7, lat: null,       lng: null,        status: 'ferry',      coordVerified: false },
+  // 공통 안내: 배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인
+  // hwajung_island 제거 — Founder 결정 2026-10-29: 화정도서 탐색 제외
+  { code: 'sado_island',    name_ko: '사도',   zone: 7, lat: null, lng: null, status: 'ferry', coordVerified: false,
+    coordNote: '배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인. Founder QA 초안 좌표.',
+    markerPos: { overview: { x: 0.307, y: 0.823, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
+  { code: 'hahwado_island', name_ko: '하화도', zone: 7, lat: null, lng: null, status: 'ferry', coordVerified: false,
+    coordNote: '배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인. Founder QA 초안 좌표.',
+    markerPos: { overview: { x: 0.420, y: 0.818, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
+  // Founder 결정 2026-10-29: 금오도·거문도·백도·개도 Zone 7 추가. 지도 범위 내 여부 미확인 = PLACEMENT_OPEN.
+  { code: 'geumo_island',    name_ko: '금오도', zone: 7, lat: null, lng: null, status: 'ferry', coordVerified: false,
+    coordNote: '배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인. 지도 이미지 범위 내 위치 미확인 = PLACEMENT_OPEN.' },
+  { code: 'geomundo_island', name_ko: '거문도', zone: 7, lat: null, lng: null, status: 'ferry', coordVerified: false,
+    coordNote: '배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인. 지도 이미지 범위 내 위치 미확인 = PLACEMENT_OPEN.' },
+  { code: 'baekdo_island',   name_ko: '백도',   zone: 7, lat: null, lng: null, status: 'ferry', coordVerified: false,
+    coordNote: '배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인. 거문도와 독립 place_id 유지. 지도 이미지 범위 내 위치 미확인 = PLACEMENT_OPEN.' },
+  { code: 'gaedo_island',    name_ko: '개도',   zone: 7, lat: null, lng: null, status: 'ferry', coordVerified: false,
+    coordNote: '배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인. 지도 이미지 범위 내 위치 미확인 = PLACEMENT_OPEN.' },
 ];
 
 // 7개 권역 정의 (OI-MAP-3 Founder 승인)

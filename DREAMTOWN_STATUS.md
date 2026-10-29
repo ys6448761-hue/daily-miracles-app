@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (MAP_V01_ZONE6_DUPLICATE_REMOVED)
+Last Updated: 2026-10-29 (MAP_V01_ZONE7_ISLAND_INVENTORY_RECONCILED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,7 +23,16 @@ Last Updated: 2026-10-29 (MAP_V01_ZONE6_DUPLICATE_REMOVED)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
-**MAP V0.1 — Founder Zone 3~7 overview 좌표 지정 + 권역별 마커 위치 확인**
+**MAP V0.1 — Founder Zone 3~5·7 overview 좌표 지정 대기 + 신규 섬 마커 위치 확인**
+- **MAP_V01_ZONE7_ISLAND_INVENTORY_RECONCILED** ✅ (2026-10-29)
+  - hwajung_island 제거 (런타임 참조 0건 확인 후 물리 삭제)
+  - 사도·하화도 Founder QA 초안 좌표 PROVISIONAL 저장 (x=0.307/0.823, x=0.420/0.818)
+  - 금오도·거문도·백도·개도 신규 등록 (PLACEMENT_OPEN — 지도 범위 미확인)
+  - 거문도·백도 독립 place_id 유지 (geomundo_island / baekdo_island)
+  - 배편 안내 통일: '배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인'
+  - **Inventory: 46 → 49곳** / Zone 7 편집 목록 6곳
+  - 빌드 ✅ 698 modules / 회귀 ✅ 639/640 (R20 PRE-EXISTING)
+  - Evidence: `docs/knowledge/MAP-V01-ZONE7-ISLAND-INVENTORY-RECONCILED-EVIDENCE.md`
 - **MAP_V01_ZONE6_DUPLICATE_REMOVED** ✅ (2026-10-29)
   - jangcheok_tideland 제거 (yeojaman_sunset와 동일 장소, Founder 결정)
   - Zone 6 후보 좌표 PROVISIONAL 저장: gasari·yeojaman·seomdalcheon·hwanyang (4곳)
