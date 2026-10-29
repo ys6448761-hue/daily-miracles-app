@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (MAP_V01_OVERVIEW_ZONE_CENTERED_ZOOM_PASS)
+Last Updated: 2026-10-29 (MAP_V01_ZONE3_ZONE4_MARKER_SCOPE_READY)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,7 +23,13 @@ Last Updated: 2026-10-29 (MAP_V01_OVERVIEW_ZONE_CENTERED_ZOOM_PASS)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
-**MAP V0.1 — Founder Zone 3~7 overview 좌표 지정 대기 + 권역 중심 PROVISIONAL 좌표 확인**
+**MAP V0.1 — Founder Zone 3~7 overview 좌표 지정 대기**
+- **MAP_V01_ZONE3_ZONE4_MARKER_SCOPE_READY** ✅ (2026-10-29)
+  - Zone 3: dolsan_got_market·nk_submarine·bonghwangsan → Zone 4 재배정
+  - Zone 3 표시·편집: 돌산대교·돌산공원·무슬목·돌산탑승장·예술랜드리조트 (5곳)
+  - Zone 4 편집 대상: 향일암·돌산갓장터마을·북한반잠수정·봉황산 (4곳)
+  - 빌드 ✅ 698 modules / 회귀 ✅ 639/640 (R20 PRE-EXISTING)
+  - Evidence: `docs/knowledge/MAP-V01-ZONE3-ZONE4-MARKER-SCOPE-EVIDENCE.md`
 - **MAP_V01_OVERVIEW_ZONE_CENTERED_ZOOM_PASS** ✅ (2026-10-29)
   - **버그 수정**: `width:200%` + `overflowX:auto` → `transform:scale(2)` + `transformOrigin` (권역별 중심)
   - Zone 3: x=0.62, y=0.58 / Zone 4: x=0.75, y=0.90 / Zone 5: x=0.50, y=0.33 / Zone 6: x=0.15, y=0.42 / Zone 7: x=0.55, y=0.70

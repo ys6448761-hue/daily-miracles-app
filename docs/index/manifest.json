@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-29T00:46:20.658Z",
+  "generated_at": "2026-10-29T01:06:08.542Z",
   "generator": "generate-manifest.js",
-  "total_count": 524,
+  "total_count": 525,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3634,6 +3634,22 @@
       "title": "MAP V0.1 — Zone 3 지도 적용 결정 (overview 유지)",
       "created_at": "2026-10-29",
       "checksum": "9f8f68b1"
+    },
+    {
+      "id": "DOC-MAP-V01-ZONE3-ZONE4-MARKER-SCO",
+      "path": "docs/knowledge/MAP-V01-ZONE3-ZONE4-MARKER-SCOPE-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "MAP V0.1 — Zone 3 / Zone 4 Marker Scope Fix Evidence",
+      "created_at": "2026-10-29",
+      "checksum": "53a50863"
     },
     {
       "id": "DOC-Change_Log",

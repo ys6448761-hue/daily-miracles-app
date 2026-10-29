@@ -91,7 +91,7 @@ export const YEOSU_PLACES = [
   { code: 'dolsan_daegyo',        name_ko: '돌산대교',     zone: 3, lat: 34.7395,    lng: 127.7456,    status: 'tg_ready',   coordVerified: true },
   { code: 'dolsan_nightscape',    name_ko: '돌산공원',     zone: 3, lat: 34.7289,    lng: 127.7472,    status: 'tg_ready',   coordVerified: true },
   { code: 'museukmok',            name_ko: '무슬목',       zone: 3, lat: null,       lng: null,        status: 'explorer',   coordVerified: false },
-  { code: 'dolsan_got_market',    name_ko: '돌산갓장터마을', zone: 3, lat: null,     lng: null,        status: 'verify',     coordVerified: false },
+  { code: 'dolsan_got_market',    name_ko: '돌산갓장터마을', zone: 4, lat: null,     lng: null,        status: 'verify',     coordVerified: false, coordNote: 'Founder 결정 2026-10-29: Zone 3→4 (향일암권) 재배정.' },
   // 해상케이블카 돌산탑승장: Zone 3 지도 탐색 전용. SOUL은 기존 cablecar(Zone 2 TG_READY) 사용.
   { code: 'cablecar_dolsan',      name_ko: '해상케이블카 돌산탑승장', zone: 3, lat: null, lng: null, status: 'explorer', coordVerified: false, coordNote: '돌산도 쪽 탑승장. 좌표 미검증. SOUL 게이팅: cablecar(TG_READY) 별도 유지.' },
   // 미남크루즈·이사부크루즈: Founder 결정 2026-10-29 — Zone 3 돌산권 탐색 대상 포함. 좌표 미확인.
@@ -106,7 +106,7 @@ export const YEOSU_PLACES = [
   { code: 'soho_yacht',           name_ko: '소호요트장',   zone: 5, lat: null,       lng: null,        status: 'verify',     coordVerified: false },
   { code: 'soho_bridge',          name_ko: '소호동동다리', zone: 5, lat: null,       lng: null,        status: 'verify',     coordVerified: false },
   { code: 'lee_soon_shin_marina', name_ko: '이순신마리나', zone: 5, lat: null,       lng: null,        status: 'verify',     coordVerified: false },
-  { code: 'nk_submarine',         name_ko: '북한반잠수정전시관', zone: 3, lat: null, lng: null,        status: 'verify',     coordVerified: false, coordNote: 'Founder QA 판단 유지: Zone 5→3 (돌산권). 주소 미제공, Founder 판단 기준.' },
+  { code: 'nk_submarine',         name_ko: '북한반잠수정전시관', zone: 4, lat: null, lng: null,        status: 'verify',     coordVerified: false, coordNote: 'Founder 결정 2026-10-29: Zone 5→3→4 (향일암권) 재배정.' },
 
   // ── 권역 6: 화양·여자만권 ────────────────────────────────────────────
   { code: 'gasari_ecology',       name_ko: '가사리생태공원',     zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false },
@@ -115,7 +115,7 @@ export const YEOSU_PLACES = [
   { code: 'hwanyang_drive',       name_ko: '화양드라이브',       zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false },
   { code: 'settler_cactus',       name_ko: '서틀러다육식물원',   zone: 5, lat: null, lng: null, status: 'verify', coordVerified: false, coordNote: 'GEO-2: Founder 결정 Zone 6→5 (소호·장도권). 법인주소=소라면 논골안길 20-9. 실제 방문지 동일성 UNVERIFIED. 좌표·마커 미표시.' },
   { code: 'jangcheok_tideland',   name_ko: '장척갯벌체험',       zone: 6, lat: null, lng: null, status: 'verify', coordVerified: false },
-  { code: 'bonghwangsan',         name_ko: '봉황산자연휴양림',   zone: 3, lat: null, lng: null, status: 'verify', coordVerified: false, coordNote: 'Founder 주소 확인: 전남 여수시 돌산읍 대복길 160 → Zone 6→3 (돌산권).' },
+  { code: 'bonghwangsan',         name_ko: '봉황산자연휴양림',   zone: 4, lat: null, lng: null, status: 'verify', coordVerified: false, coordNote: 'Founder 결정 2026-10-29: Zone 6→3→4 (향일암권) 재배정.' },
   { code: 'artland_resort',       name_ko: '예술랜드리조트',     zone: 3, lat: null, lng: null, status: 'verify', coordVerified: false, coordNote: 'Founder QA 판단 유지: Zone 6→3 (돌산권). 주소 미제공, Founder 판단 기준.' },
 
   // ── 권역 7: 섬섬길 (배편 필수) ───────────────────────────────────────
