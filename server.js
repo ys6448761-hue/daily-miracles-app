@@ -83,6 +83,8 @@ app.use('/videos', express.static(path.join(__dirname, 'public', 'videos')));
 // SOUL Living Detail — place-hero images live in dreamtown-frontend/dist (not root public)
 // Must be declared before the generic /images handler falls through to the SPA catch-all
 app.use('/images/soul', express.static(path.join(__dirname, 'dreamtown-frontend', 'dist', 'images', 'soul')));
+// MAP V0.1 — 지역별 탐색 지도 이미지 (dreamtown-frontend/dist, not root public)
+app.use('/images/muyojeong', express.static(path.join(__dirname, 'dreamtown-frontend', 'dist', 'images', 'muyojeong')));
 // ═══════════════════════════════════════════════════════════════════════════
 // [옛날 HTML 페이지 차단 — React SPA 단일 진입]
 // ⚠️ 반드시 express.static('public') 보다 앞에 위치해야 함
