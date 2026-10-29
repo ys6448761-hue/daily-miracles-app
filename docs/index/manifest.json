@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-29T02:33:37.494Z",
+  "generated_at": "2026-10-29T02:50:08.384Z",
   "generator": "generate-manifest.js",
-  "total_count": 529,
+  "total_count": 530,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3682,6 +3682,22 @@
       "title": "MAP V0.1 — Zone 3 / Zone 4 Marker Scope Fix Evidence",
       "created_at": "2026-10-29",
       "checksum": "53a50863"
+    },
+    {
+      "id": "DOC-MAP-V01-ZONE4-ZONE5-SOURCE-SAV",
+      "path": "docs/knowledge/MAP-V01-ZONE4-ZONE5-SOURCE-SAVED-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "MAP V0.1 — Zone 4·5 Founder Coordinates Source Saved Evidence",
+      "created_at": "2026-10-29",
+      "checksum": "48bdf99c"
     },
     {
       "id": "DOC-MAP-V01-ZONE6-DUPLICATE-REMOVE",

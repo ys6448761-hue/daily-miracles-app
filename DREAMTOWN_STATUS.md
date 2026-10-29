@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (MAP_V01_EDITOR_DISPLAY_ALIGNMENT_PASS)
+Last Updated: 2026-10-29 (MAP_V01_ZONE4_ZONE5_SOURCE_SAVED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,7 +23,14 @@ Last Updated: 2026-10-29 (MAP_V01_EDITOR_DISPLAY_ALIGNMENT_PASS)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
-**MAP V0.1 — Zone 4·5 overview 좌표 지정 대기**
+**MAP V0.1 — Zone 3~7 PROVISIONAL → VERIFIED 승격 대기 (Founder 현장 확인 후)**
+- **MAP_V01_ZONE4_ZONE5_SOURCE_SAVED** ✅ (2026-10-29)
+  - Zone 4 SOURCE_SAVED 4/4: 돌산갓장터마을(0.702/0.660)·향일암(0.751/0.804)·북한반잠수정(0.726/0.772)·봉황산(0.678/0.743)
+  - Zone 5 SOURCE_SAVED 6/6: 유월드루지(0.461/0.460)·장도(0.525/0.503)·소호요트장(0.478/0.509)·소호동동다리(0.496/0.471)·이순신마리나(0.547/0.504)·서틀러다육(0.406/0.459)
+  - 소스 좌표 자동 비교: **10/10 PASS** (`tests/map-zone45-verify.mjs`)
+  - Puppeteer QA: Z4=4 / Z5=6 / 타 권역 혼입 0 — 전체 QA 표시 36곳 (26→+10)
+  - 빌드 ✅ 698 modules / 회귀 ✅ 639/640 (R20 PRE-EXISTING)
+  - Evidence: `docs/knowledge/MAP-V01-ZONE4-ZONE5-SOURCE-SAVED-EVIDENCE.md`
 - **MAP_V01_EDITOR_DISPLAY_ALIGNMENT_PASS** ✅ (2026-10-29)
   - **버그 수정**: QA 편집기 마커 중심 vs 일반 표시 마커 중심 불일치
   - 원인: QA outer div `display:flex;flex-direction:column` → translate(-50%,-50%)가 flex 전체 기준 이동
