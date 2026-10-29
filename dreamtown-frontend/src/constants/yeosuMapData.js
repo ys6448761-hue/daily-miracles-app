@@ -88,12 +88,17 @@ export const YEOSU_PLACES = [
     markerPos: { oldtown: { x: 0.549, y: 0.285, confidence: 'HIGH', status: 'PROVISIONAL' } } }, // Founder 최종 좌표 2026-10-29
 
   // ── 권역 3: 돌산권 ──────────────────────────────────────────────────────
-  { code: 'dolsan_daegyo',        name_ko: '돌산대교',     zone: 3, lat: 34.7395,    lng: 127.7456,    status: 'tg_ready',   coordVerified: true },
-  { code: 'dolsan_nightscape',    name_ko: '돌산공원',     zone: 3, lat: 34.7289,    lng: 127.7472,    status: 'tg_ready',   coordVerified: true },
-  { code: 'museukmok',            name_ko: '무슬목',       zone: 3, lat: null,       lng: null,        status: 'explorer',   coordVerified: false },
+  // Zone 3 Founder 후보 좌표 2026-10-29 — PROVISIONAL (overview 이미지 기준)
+  { code: 'dolsan_daegyo',        name_ko: '돌산대교',     zone: 3, lat: 34.7395,    lng: 127.7456,    status: 'tg_ready',   coordVerified: true,
+    markerPos: { overview: { x: 0.639, y: 0.518, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
+  { code: 'dolsan_nightscape',    name_ko: '돌산공원',     zone: 3, lat: 34.7289,    lng: 127.7472,    status: 'tg_ready',   coordVerified: true,
+    markerPos: { overview: { x: 0.681, y: 0.539, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
+  { code: 'museukmok',            name_ko: '무슬목',       zone: 3, lat: null,       lng: null,        status: 'explorer',   coordVerified: false,
+    markerPos: { overview: { x: 0.701, y: 0.615, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
   { code: 'dolsan_got_market',    name_ko: '돌산갓장터마을', zone: 4, lat: null,     lng: null,        status: 'verify',     coordVerified: false, coordNote: 'Founder 결정 2026-10-29: Zone 3→4 (향일암권) 재배정.' },
   // 해상케이블카 돌산탑승장: Zone 3 지도 탐색 전용. SOUL은 기존 cablecar(Zone 2 TG_READY) 사용.
-  { code: 'cablecar_dolsan',      name_ko: '해상케이블카 돌산탑승장', zone: 3, lat: null, lng: null, status: 'explorer', coordVerified: false, coordNote: '돌산도 쪽 탑승장. 좌표 미검증. SOUL 게이팅: cablecar(TG_READY) 별도 유지.' },
+  { code: 'cablecar_dolsan',      name_ko: '해상케이블카 돌산탑승장', zone: 3, lat: null, lng: null, status: 'explorer', coordVerified: false, coordNote: '돌산도 쪽 탑승장. 좌표 미검증. SOUL 게이팅: cablecar(TG_READY) 별도 유지.',
+    markerPos: { overview: { x: 0.678, y: 0.531, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
   // 미남크루즈·이사부크루즈: Founder 결정 2026-10-29 — Zone 3 돌산권 탐색 대상 포함. 좌표 미확인.
   { code: 'minam_cruise',         name_ko: '미남크루즈',    zone: 3, lat: null, lng: null, status: 'explorer', coordVerified: false, coordNote: 'Founder 결정 2026-10-29: Zone 3 EXPLORER 등록. 선착장 위치·운항 조건 미검증. SOUL 추천 자동 승격 금지.' },
   { code: 'isabu_cruise',         name_ko: '이사부크루즈',  zone: 3, lat: null, lng: null, status: 'explorer', coordVerified: false, coordNote: 'Founder 결정 2026-10-29: Zone 3 EXPLORER 등록. 선착장 위치·운항 조건 미검증. SOUL 추천 자동 승격 금지.' },
@@ -121,7 +126,8 @@ export const YEOSU_PLACES = [
   { code: 'settler_cactus',       name_ko: '서틀러다육식물원',   zone: 5, lat: null, lng: null, status: 'verify', coordVerified: false, coordNote: 'GEO-2: Founder 결정 Zone 6→5 (소호·장도권). 법인주소=소라면 논골안길 20-9. 실제 방문지 동일성 UNVERIFIED. 좌표·마커 미표시.' },
   // jangcheok_tideland 제거 — Founder 결정 2026-10-29: yeojaman_sunset(여자만갯벌/해넘이)와 동일 장소
   { code: 'bonghwangsan',         name_ko: '봉황산자연휴양림',   zone: 4, lat: null, lng: null, status: 'verify', coordVerified: false, coordNote: 'Founder 결정 2026-10-29: Zone 6→3→4 (향일암권) 재배정.' },
-  { code: 'artland_resort',       name_ko: '예술랜드리조트',     zone: 3, lat: null, lng: null, status: 'verify', coordVerified: false, coordNote: 'Founder QA 판단 유지: Zone 6→3 (돌산권). 주소 미제공, Founder 판단 기준.' },
+  { code: 'artland_resort',       name_ko: '예술랜드리조트',     zone: 3, lat: null, lng: null, status: 'verify', coordVerified: false, coordNote: 'Founder QA 판단 유지: Zone 6→3 (돌산권). 주소 미제공, Founder 판단 기준.',
+    markerPos: { overview: { x: 0.740, y: 0.580, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
 
   // ── 권역 7: 섬섬길 (배편 필수) ───────────────────────────────────────
   // OI-MAP-5: SOUL 추천 제외, 배편 배지 표시
@@ -237,11 +243,14 @@ export function getPlacesByZone(zoneId) {
 }
 
 // 특정 이미지 키에 마커 위치가 정의된 장소 목록
-// Phase A: HIGH confidence만 반환 (MEDIUM 이상은 Founder 확인 후 추가)
-export function getMarkersForImage(imageKey) {
-  return YEOSU_PLACES.filter(
-    p => !p.hidden && p.markerPos && p.markerPos[imageKey] && p.markerPos[imageKey].confidence === 'HIGH'
-  );
+// 공개 모드: HIGH confidence만 반환
+// QA Preview (includeProvisional=true): HIGH + PROVISIONAL 반환
+export function getMarkersForImage(imageKey, { includeProvisional = false } = {}) {
+  return YEOSU_PLACES.filter(p => {
+    if (p.hidden || !p.markerPos || !p.markerPos[imageKey]) return false;
+    const conf = p.markerPos[imageKey].confidence;
+    return conf === 'HIGH' || (includeProvisional && conf === 'PROVISIONAL');
+  });
 }
 
 // 지도에서 선택 가능한 장소 여부

@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (MAP_V01_ZONE7_ISLAND_INVENTORY_RECONCILED)
+Last Updated: 2026-10-29 (MAP_V01_OVERVIEW_MARKERS_QA_VISIBLE)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,7 +23,15 @@ Last Updated: 2026-10-29 (MAP_V01_ZONE7_ISLAND_INVENTORY_RECONCILED)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
-**MAP V0.1 — Founder Zone 3~5·7 overview 좌표 지정 대기 + 신규 섬 마커 위치 확인**
+**MAP V0.1 — Zone 4·5 overview 좌표 지정 대기**
+- **MAP_V01_OVERVIEW_MARKERS_QA_VISIBLE** ✅ (2026-10-29)
+  - **버그 수정**: `getMarkersForImage` `confidence==='HIGH'` 게이트가 모든 PROVISIONAL 차단
+  - 수정: `includeProvisional` 파라미터 추가 → QA Preview에서만 PROVISIONAL 포함
+  - Zone 3 Founder 좌표 5곳 SOURCE_SAVED (돌산대교·돌산공원·무슬목·돌산탑승장·예술랜드)
+  - **Puppeteer QA 확인**: Z1=6 / Z2=9 / Z3=5 / Z4=0 / Z5=0 / Z6=4 / Z7=2 — 타 권역 혼입 0
+  - 공개 모드 PROVISIONAL 차단 유지 (isQAPreview=false → confidence=HIGH만 통과)
+  - 빌드 ✅ 698 modules / 회귀 ✅ 639/640 (R20 PRE-EXISTING)
+  - Evidence: `docs/knowledge/MAP-V01-OVERVIEW-MARKERS-QA-VISIBLE-EVIDENCE.md`
 - **MAP_V01_ZONE7_ISLAND_INVENTORY_RECONCILED** ✅ (2026-10-29)
   - hwajung_island 제거 (런타임 참조 0건 확인 후 물리 삭제)
   - 사도·하화도 Founder QA 초안 좌표 PROVISIONAL 저장 (x=0.307/0.823, x=0.420/0.818)

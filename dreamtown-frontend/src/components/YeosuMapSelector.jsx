@@ -399,7 +399,7 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
 
       {zone.hasDetailMap ? (
         !imgError && (() => {
-          const markers = getMarkersForImage('oldtown');
+          const markers = getMarkersForImage('oldtown', { includeProvisional: isQAPreview });
           return (
             <>
               {/* QA Preview 배너 */}
@@ -877,7 +877,7 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
         })()
       ) : (
         !overviewImgError && (() => {
-          const overviewMarkers = getMarkersForImage('overview');
+          const overviewMarkers = getMarkersForImage('overview', { includeProvisional: isQAPreview });
           return (
             <>
               {/* QA Preview 배너 */}
