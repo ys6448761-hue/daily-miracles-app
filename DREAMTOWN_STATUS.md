@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (Inventory 47곳 Reconciled)
+Last Updated: 2026-10-29 (MAP_V01_OVERVIEW_ZONE_CENTERED_ZOOM_PASS)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,7 +23,15 @@ Last Updated: 2026-10-29 (Inventory 47곳 Reconciled)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
-**MAP V0.1 — Founder Zone 3~7 overview 좌표 지정 대기**
+**MAP V0.1 — Founder Zone 3~7 overview 좌표 지정 대기 + 권역 중심 PROVISIONAL 좌표 확인**
+- **MAP_V01_OVERVIEW_ZONE_CENTERED_ZOOM_PASS** ✅ (2026-10-29)
+  - **버그 수정**: `width:200%` + `overflowX:auto` → `transform:scale(2)` + `transformOrigin` (권역별 중심)
+  - Zone 3: x=0.62, y=0.58 / Zone 4: x=0.75, y=0.90 / Zone 5: x=0.50, y=0.33 / Zone 6: x=0.15, y=0.42 / Zone 7: x=0.55, y=0.70
+  - oldtown Zone 1: x=0.49, y=0.58 / Zone 2: x=0.63, y=0.36 (Founder 마커 평균)
+  - calcNorm 변경 없음 (CSS transform 수학적 증명 — getBoundingClientRect 보정 자동)
+  - 빌드 ✅ 698 modules / 회귀 ✅ 639/640 (R20 PRE-EXISTING)
+  - **PROVISIONAL**: overview 권역 중심은 지리적 추정값 — Founder 2× 확대 확인 후 갱신 가능
+  - Evidence: `docs/knowledge/MAP-V01-OVERVIEW-ZOOM-CENTER-FIX-EVIDENCE.md`
 - **MAP_V01_INVENTORY_PLACEMENT_RECONCILED** ✅ (2026-10-29) SHA `12d6f19`
   - **Inventory**: 45 → **47곳** (미남크루즈·이사부크루즈 Zone 3 EXPLORER 신규 등록)
   - **QA 편집 대상**: 44 → **46곳** / Zone 3: 8 → **10곳**

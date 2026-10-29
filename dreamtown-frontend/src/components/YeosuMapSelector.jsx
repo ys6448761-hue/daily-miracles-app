@@ -52,6 +52,21 @@ const OLDTOWN_IMG   = '/images/muyojeong/map/yeosu-oldtown-v01.png';
 const DRAFT_KEY          = 'yeosu_map_draft_v02_oldtown';   // Zone 1·2 (oldtown 이미지)
 const DRAFT_KEY_OVERVIEW = 'yeosu_map_draft_v02_overview';  // Zone 3~7 (overview 이미지)
 
+// 권역별 2× 확대 중심 — PROVISIONAL (Founder 좌표 확인 후 갱신)
+// overview 이미지(yeosu-overview-v01.png) 기준 정규화 좌표 [0,1]
+const OVERVIEW_ZONE_ZOOM_CENTERS = {
+  3: { x: 0.62, y: 0.58 }, // 돌산도 중심 — 돌산대교 lat≈34.73 기준 지리적 추정
+  4: { x: 0.75, y: 0.90 }, // 향일암 — lat=34.5914 남단 지리적 추정
+  5: { x: 0.50, y: 0.33 }, // 소호·장도권 — 시내 서편 지리적 추정
+  6: { x: 0.15, y: 0.42 }, // 화양·여자만 — 서쪽 반도 지리적 추정
+  7: { x: 0.55, y: 0.70 }, // 섬섬길 — 남해 도서권 지리적 추정
+};
+// oldtown 이미지(yeosu-oldtown-v01.png) 기준 — Zone 1·2 Founder 마커 평균
+const OLDTOWN_ZONE_ZOOM_CENTERS = {
+  1: { x: 0.49, y: 0.58 }, // Zone 1 Founder 마커 6곳 평균 (x: 0.487, y: 0.575)
+  2: { x: 0.63, y: 0.36 }, // Zone 2 Founder 마커 9곳 평균 (x: 0.630, y: 0.364)
+};
+
 function ZoneOverview({ onSelectZone, isQAPreview }) {
   const [imgError, setImgError] = useState(false);
   const [hoveredZoneId, setHoveredZoneId] = useState(null);
@@ -627,11 +642,14 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
               )}
 
               {/* 지도 이미지 — 클릭·드래그 핸들러 포함 */}
-              <div style={{ overflowX: mapZoomed ? 'auto' : 'hidden', width: '100%', borderRadius: '10px' }}>
+              <div style={{ overflow: 'hidden', width: '100%', borderRadius: '10px' }}>
               <div
                 ref={mapWrapperRef}
                 style={{
-                  position: 'relative', width: mapZoomed ? '200%' : '100%', paddingTop: '64.32%',
+                  position: 'relative', width: '100%', paddingTop: '64.32%',
+                  transform: mapZoomed ? 'scale(2)' : 'none',
+                  transformOrigin: (() => { const c = OLDTOWN_ZONE_ZOOM_CENTERS[zoneId] ?? { x: 0.5, y: 0.5 }; return `${c.x * 100}% ${c.y * 100}%`; })(),
+                  transition: 'transform 0.25s ease',
                   borderRadius: '10px', overflow: 'hidden',
                   cursor: draggingCode ? 'grabbing' : (placementMode && placementTarget ? 'crosshair' : 'default'),
                   touchAction: placementMode ? 'none' : 'auto',
@@ -1020,13 +1038,16 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
               )}
 
               {/* 전체지도 이미지 — 클릭·드래그 핸들러 포함 */}
-              <div style={{ overflowX: mapZoomed ? 'auto' : 'hidden', width: '100%', borderRadius: '10px' }}>
+              <div style={{ overflow: 'hidden', width: '100%', borderRadius: '10px' }}>
                 <div
                   ref={mapWrapperRef}
                   style={{
                     position: 'relative',
-                    width: mapZoomed ? '200%' : '100%',
+                    width: '100%',
                     paddingTop: `${OVERVIEW_IMG_RATIO_PCT}%`,
+                    transform: mapZoomed ? 'scale(2)' : 'none',
+                    transformOrigin: (() => { const c = OVERVIEW_ZONE_ZOOM_CENTERS[zoneId] ?? { x: 0.5, y: 0.5 }; return `${c.x * 100}% ${c.y * 100}%`; })(),
+                    transition: 'transform 0.25s ease',
                     borderRadius: '10px', overflow: 'hidden',
                     cursor: draggingCode ? 'grabbing' : (placementMode && placementTarget ? 'crosshair' : 'default'),
                     touchAction: placementMode ? 'none' : 'auto',
