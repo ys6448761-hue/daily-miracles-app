@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-29T05:51:25.443Z",
+  "generated_at": "2026-10-29T06:21:17.067Z",
   "generator": "generate-manifest.js",
-  "total_count": 537,
+  "total_count": 538,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3810,6 +3810,22 @@
       "title": "MAP V0.1 — Zone 5·6·7 Visual Reconciliation Evidence",
       "created_at": "2026-10-29",
       "checksum": "cb1c1d85"
+    },
+    {
+      "id": "DOC-MAP-V01-ZONE5-VISUAL-QA-PENDIN",
+      "path": "docs/knowledge/MAP-V01-ZONE5-VISUAL-QA-PENDING-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "MAP V0.1 — Zone 5 Visual QA Pending Evidence",
+      "created_at": "2026-10-29",
+      "checksum": "66f0ec86"
     },
     {
       "id": "DOC-MAP-V01-ZONE6-DUPLICATE-REMOVE",

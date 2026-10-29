@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (MAP_V01_FIVE_ZONE_VISUAL_RECONCILIATION_HOLD)
+Last Updated: 2026-10-29 (MAP_V01_ZONE5_VISUAL_QA_PENDING)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,19 +23,18 @@ Last Updated: 2026-10-29 (MAP_V01_FIVE_ZONE_VISUAL_RECONCILIATION_HOLD)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
-**MAP V0.1 — Zone 1·2·5·6·7 수정 좌표 대기 (총 27곳)**
-- **MAP_V01_FIVE_ZONE_VISUAL_RECONCILIATION_HOLD** ⏳ (2026-10-29)
-  - Founder 최신 결정: Zone 1·2 ACCEPTED_AS_IS 판정 철회 → VISUAL_REJECTED 추가
+**MAP V0.1 — Zone 5 수정 좌표 대기 (6곳) · Zone 1·2·6·7은 Zone 5 완료 후 순차 진행**
+- **MAP_V01_ZONE5_VISUAL_QA_PENDING** ⏳ (2026-10-29)
   - Zone 3·4: ✅ FOUNDER_VISUAL_ACCEPTED (변경 금지)
-  - Zone 1 원도심 6곳: ❌ VISUAL_REJECTED / 수정 좌표 대기 (oldtown)
-  - Zone 2 오동도·엑스포 9곳: ❌ VISUAL_REJECTED / 수정 좌표 대기 (oldtown)
-  - Zone 5 소호·장도권 6곳: ❌ VISUAL_REJECTED / 수정 좌표 대기 (overview)
-  - Zone 6 화양·여자만권 4곳: ❌ VISUAL_REJECTED / 수정 좌표 대기 (overview)
-  - Zone 7 섬섬길 2곳: ❌ VISUAL_REJECTED / 수정 좌표 대기 (overview)
-  - **Founder 액션**: QA preview → 각 권역 → 마커 위치 지정 → 오류 장소 드래그 → "전체 좌표 내보내기" / DevTools 추출 후 코드야 전달
-  - 추측 좌표·공통 offset 적용 금지 / 기존 초안·데이터 삭제 금지
+  - Zone 5 소호·장도권 6곳: ❌ VISUAL_REJECTED — **원인: SOURCE 좌표 자체가 실제 위치와 다름**
+  - 측정 확인: SOURCE = 렌더 (6/6 Δ=0.0000) — 렌더링 버그·stale localStorage 아님
+  - Founder 브라우저 초안 미확보 (개발 쉘 접근 불가)
+  - **Founder 액션 필요**: DevTools Console → `yeosu_map_draft_v02_overview` 추출 또는 QA 편집기 오류 장소만 재배치 → 코드야 전달
+  - 추측 좌표·공통 offset 적용 금지
+  - Evidence: `docs/knowledge/MAP-V01-ZONE5-VISUAL-QA-PENDING-EVIDENCE.md`
+- **MAP_V01_FIVE_ZONE_VISUAL_RECONCILIATION_HOLD** ✅ Zone 5 우선 분리 (2026-10-29)
+  - Zone 1·2·6·7 VISUAL_REJECTED 상태 보존 — Zone 5 완료 후 순차 진행
   - Evidence: `docs/knowledge/MAP-V01-FIVE-ZONE-VISUAL-RECONCILIATION-HOLD-EVIDENCE.md`
-- **MAP_V01_ZONE5_7_VISUAL_RECONCILIATION_HOLD** ✅ 통합 (2026-10-29)
 - **MAP_V01_ZONE4_7_COORDINATES_RECONCILED** ✅ (2026-10-29)
   - Founder 전달값 vs SOURCE 16/16 대조: **전원 일치** → 좌표 변경 없음
   - Puppeteer **16/16 PASS** (Δ=0.0000, Zone 4·5·6·7 전체)
