@@ -147,20 +147,24 @@ export const YEOSU_PLACES = [
   // 공통 안내: 배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인
   // hwajung_island 제거 — Founder 결정 2026-10-29: 화정도서 탐색 제외
   { code: 'sado_island',    name_ko: '사도',   zone: 7, lat: null, lng: null, status: 'ferry', coordVerified: false,
-    coordNote: '배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인. Founder QA 초안 좌표.',
-    markerPos: { overview: { x: 0.307, y: 0.823, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
+    coordNote: '배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인. Founder 최종 좌표 2026-10-29.',
+    markerPos: { overview: { x: 0.311, y: 0.813, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
   { code: 'hahwado_island', name_ko: '하화도', zone: 7, lat: null, lng: null, status: 'ferry', coordVerified: false,
-    coordNote: '배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인. Founder QA 초안 좌표.',
-    markerPos: { overview: { x: 0.420, y: 0.818, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
-  // Founder 결정 2026-10-29: 금오도·거문도·백도·개도 Zone 7 추가. 지도 범위 내 여부 미확인 = PLACEMENT_OPEN.
+    coordNote: '배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인. Founder 최종 좌표 2026-10-29.',
+    markerPos: { overview: { x: 0.425, y: 0.810, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
+  // Founder 결정 2026-10-29: 금오도·개도 지도 마커 표시. 거문도·백도 지도 범위 밖 = offMap 목록에만 표시.
   { code: 'geumo_island',    name_ko: '금오도', zone: 7, lat: null, lng: null, status: 'ferry', coordVerified: false,
-    coordNote: '배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인. 지도 이미지 범위 내 위치 미확인 = PLACEMENT_OPEN.' },
+    coordNote: '배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인. Founder 최종 좌표 2026-10-29.',
+    markerPos: { overview: { x: 0.662, y: 0.877, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
   { code: 'geomundo_island', name_ko: '거문도', zone: 7, lat: null, lng: null, status: 'ferry', coordVerified: false,
-    coordNote: '배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인. 지도 이미지 범위 내 위치 미확인 = PLACEMENT_OPEN.' },
+    offMap: true,
+    coordNote: '배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인. Founder 결정 2026-10-29: 수채화 지도 이미지 범위 밖 — 지도 마커 미표시, Zone 7 별도 목록에만 표시.' },
   { code: 'baekdo_island',   name_ko: '백도',   zone: 7, lat: null, lng: null, status: 'ferry', coordVerified: false,
-    coordNote: '배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인. 거문도와 독립 place_id 유지. 지도 이미지 범위 내 위치 미확인 = PLACEMENT_OPEN.' },
+    offMap: true,
+    coordNote: '배편 필수 · 거문도와 독립 place_id 유지. Founder 결정 2026-10-29: 수채화 지도 이미지 범위 밖 — 지도 마커 미표시, Zone 7 별도 목록에만 표시.' },
   { code: 'gaedo_island',    name_ko: '개도',   zone: 7, lat: null, lng: null, status: 'ferry', coordVerified: false,
-    coordNote: '배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인. 지도 이미지 범위 내 위치 미확인 = PLACEMENT_OPEN.' },
+    coordNote: '배편 필수 · 섬별 출발항, 운항 일정 및 물때 확인. Founder 최종 좌표 2026-10-29.',
+    markerPos: { overview: { x: 0.512, y: 0.828, confidence: 'PROVISIONAL', status: 'PROVISIONAL' } } },
 ];
 
 // 7개 권역 정의 (OI-MAP-3 Founder 승인)

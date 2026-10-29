@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-29T06:40:50.933Z",
+  "generated_at": "2026-10-29T06:53:44.179Z",
   "generator": "generate-manifest.js",
-  "total_count": 539,
+  "total_count": 540,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -3874,6 +3874,22 @@
       "title": "MAP V0.1 — Zone 7 섬섬길 Inventory Reconciliation Evidence",
       "created_at": "2026-10-29",
       "checksum": "5bea43e4"
+    },
+    {
+      "id": "DOC-MAP-V01-ZONE7-LAYOUT-SOURCE-SA",
+      "path": "docs/knowledge/MAP-V01-ZONE7-LAYOUT-SOURCE-SAVED-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "의미",
+      "title": "MAP V0.1 — Zone 7 섬섬길 Layout Source Saved Evidence",
+      "created_at": "2026-10-29",
+      "checksum": "75efff64"
     },
     {
       "id": "DOC-Change_Log",

@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (MAP_V01_ZONE5_PLACE_COORDINATE_CORRECTED)
+Last Updated: 2026-10-29 (MAP_V01_ZONE7_LAYOUT_SOURCE_SAVED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,7 +23,16 @@ Last Updated: 2026-10-29 (MAP_V01_ZONE5_PLACE_COORDINATE_CORRECTED)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
-**MAP V0.1 — Zone 5 Founder 화면 확인 대기 (MAP_V01_ZONE5_VISUAL_QA_PENDING)**
+**MAP V0.1 — Zone 7 섬섬길 SOURCE_SAVED 완료 → Founder 화면 확인 대기**
+- **MAP_V01_ZONE7_LAYOUT_SOURCE_SAVED** ✅ (2026-10-29) SHA `커밋 예정`
+  - 사도: 0.307/0.823 → **0.311/0.813** / 하화도: 0.420/0.818 → **0.425/0.810**
+  - 금오도: 신규 markerPos **0.662/0.877** (PROVISIONAL) / 개도: 신규 **0.512/0.828** (PROVISIONAL)
+  - 거문도·백도: `offMap: true` — 지도 마커 미표시, "지도 범위 밖의 섬" 목록 섹션 UI 구현
+  - Puppeteer **4/4 마커 PASS** Δ=0.0000 + 거문도·백도 마커 0건 + offMap 목록 2/2 ✅
+  - 빌드 ✅ 698 modules / Jest ✅ 639/640
+  - SOURCE_SAVED: **37곳** (+금오도·개도) / Inventory: 50곳 불변
+  - Founder 화면 확인 후 VISUAL_ACCEPTED 기록 예정
+  - Evidence: `docs/knowledge/MAP-V01-ZONE7-LAYOUT-SOURCE-SAVED-EVIDENCE.md`
 - **MAP_V01_ZONE5_PLACE_COORDINATE_CORRECTED** ✅ (2026-10-29) SHA 커밋 예정
   - 이순신마리나: Zone 5 탐색 제외 (hidden:true / tg_excluded / SOUL 의존성 없음)
   - 웅천친수공원 (`ungcheon_park`): Zone 5 신규 등록 (PLACEMENT_PENDING / markerPos 없음)

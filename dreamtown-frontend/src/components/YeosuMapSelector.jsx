@@ -187,8 +187,10 @@ function ZoneOverview({ onSelectZone, isQAPreview }) {
 }
 
 function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview }) {
-  const zone   = YEOSU_ZONES.find(z => z.id === zoneId);
-  const places = getPlacesByZone(zoneId);
+  const zone        = YEOSU_ZONES.find(z => z.id === zoneId);
+  const allPlaces   = getPlacesByZone(zoneId);
+  const offMapPlaces = zoneId === 7 ? allPlaces.filter(p => p.offMap) : [];
+  const places       = zoneId === 7 ? allPlaces.filter(p => !p.offMap) : allPlaces;
   const [imgError, setImgError] = useState(false);
   const [overviewImgError, setOverviewImgError] = useState(false);
 
@@ -1220,6 +1222,34 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
           }}
         >
           배편 운항 일정과 물때를 사전에 확인하세요. 현재 코스 추천에는 포함되지 않아요.
+        </div>
+      )}
+
+      {/* 지도 범위 밖의 섬 — Zone 7 전용, 지도 마커 미표시 장소 목록 */}
+      {zoneId === 7 && offMapPlaces.length > 0 && (
+        <div style={{ marginTop: '10px' }}>
+          <p style={{
+            fontSize: '0.7rem', color: 'rgba(200,200,220,0.42)',
+            marginBottom: '6px', letterSpacing: '0.03em',
+          }}>
+            지도 범위 밖의 섬
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+            {offMapPlaces.map(p => (
+              <span
+                key={p.code}
+                style={{
+                  padding: '6px 12px', borderRadius: '20px',
+                  border: '1px solid rgba(200,200,220,0.18)',
+                  fontSize: '0.8125rem', color: 'rgba(200,200,220,0.50)',
+                  background: 'rgba(200,200,220,0.03)',
+                  wordBreak: 'keep-all',
+                }}
+              >
+                {p.name_ko}
+              </span>
+            ))}
+          </div>
         </div>
       )}
 
