@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-29 (MAP_V01_ZONE4_7_COORDINATES_RECONCILED)
+Last Updated: 2026-10-29 (MAP_V01_ZONE5_7_VISUAL_RECONCILIATION_HOLD)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,7 +23,17 @@ Last Updated: 2026-10-29 (MAP_V01_ZONE4_7_COORDINATES_RECONCILED)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-29
 
-**MAP V0.1 — Founder 브라우저 localStorage 초기화 필요 (Zone 4~7 시각 불일치 해결용)**
+**MAP V0.1 — Zone 5·6·7 수정 좌표 대기 (Founder QA 편집기 재배치 필요)**
+- **MAP_V01_ZONE5_7_VISUAL_RECONCILIATION_HOLD** ⏳ (2026-10-29)
+  - Founder 스크린샷 3장 → Zone 5·6·7 위치 오류 직접 확인
+  - Zone 3·4: FOUNDER_VISUAL_ACCEPTED ✅
+  - Zone 5 소호·장도권 6곳: VISUAL_REJECTED ❌ — 수정 좌표 대기
+  - Zone 6 화양·여자만권 4곳: VISUAL_REJECTED ❌ — 수정 좌표 대기
+  - Zone 7 섬섬길 2곳: VISUAL_REJECTED ❌ — 수정 좌표 대기
+  - **Founder 액션 필요**: QA preview → 각 권역 → 마커 위치 지정 → 시작 → 오류 장소 드래그 → "전체 좌표 내보내기" → 코드야 전달
+  - DevTools 추출: `JSON.parse(localStorage.getItem('yeosu_map_draft_v02_overview'))` → 12곳 코드
+  - 추측 좌표·공통 offset 적용 금지 / 기존 데이터 삭제 금지
+  - Evidence: `docs/knowledge/MAP-V01-ZONE5-7-VISUAL-RECONCILIATION-HOLD-EVIDENCE.md`
 - **MAP_V01_ZONE4_7_COORDINATES_RECONCILED** ✅ (2026-10-29)
   - Founder 전달값 vs SOURCE 16/16 대조: **전원 일치** → 좌표 변경 없음
   - Puppeteer **16/16 PASS** (Δ=0.0000, Zone 4·5·6·7 전체)
