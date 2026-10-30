@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-30 (PR134_MERGED)
+Last Updated: 2026-10-30 (MUYOJEONG_V01_PRODUCTION_QA_PASSED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,16 +23,20 @@ Last Updated: 2026-10-30 (PR134_MERGED)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-10-30
 
-**무여정 Production 배포 — Founder 별도 명시 승인 필요**
+**무여정 V0.1 PRODUCTION LIVE — Founder 브라우저 UI QA (4버튼·지도 화면 직접 확인)**
+- **MUYOJEONG_V01_PRODUCTION_QA_PASSED** ✅ (2026-10-30)
+  - Deploy ID: `dep-dbhu2doae00c739ri7ug` / SHA: `7f2c084`
+  - Deploy Time: 2026-10-30 09:16 KST (Founder Render Dashboard Manual Deploy)
+  - HTTP QA: PASS 11 / NOT_TESTED 2 / FAIL 0
+  - 지도 이미지 200 OK ✅ / SOUL API ✅ / 맞춤 항로 ✅ / Living Detail 3곳 ✅
+  - CAR GOVERNANCE_HOLD: 유지 (`travel_time_unverified` 응답 확인)
+  - PROVISIONAL 마커: 미노출 코드 확인 ✅ (`includeProvisional=false`)
+  - NOT_TESTED: 4버튼 UI 렌더링 / TG_READY 게이팅 (브라우저 직접 확인 필요)
+  - Evidence: `docs/knowledge/MUYOJEONG-V01-PRODUCTION-QA-EVIDENCE.md`
 - **PR #134 MERGED** ✅ (2026-10-30) — merge SHA: `7f2c084`
-  - Render Auto-Deploy OFF 확인 — Production 배포 자동 발생 없음 ✅
-  - Production 현재 SHA: `425a643` (맞춤 항로 V0.1 / 2026-10-25)
 - **MUYOJEONG_PR134_RELEASE_APPROVAL_READY** ✅ (2026-10-30)
   - **MAP_V01_ZONE1_FOUNDER_VISUAL_ACCEPTED ✅** — Founder 직접 발언: "루미야 존1도 이상없어"
   - Zone 2 FOUNDER_VISUAL_ACCEPTED ✅ / Zone 6 FOUNDER_VISUAL_ACCEPTED ✅
-  - CAR GOVERNANCE_HOLD: 유지 (이동시간 추정 미구현 — 별도 승인 없이 해제 불가)
-  - PROVISIONAL 마커: 일반 사용자 미노출 정책 유지
-  - **잔여 조건: Production deploy Founder 명시 승인 1건** (PR merge ≠ deploy)
   - Evidence: `docs/knowledge/MUYOJEONG-PR134-RELEASE-APPROVAL-READY-EVIDENCE.md`
 - **MUYOJEONG_RELEASE_GATE_RECONCILED** ✅ (2026-10-30) — READ-ONLY
   - Zone 1 AMBIGUOUS_PENDING → 위 Zone 1 FOUNDER_VISUAL_ACCEPTED로 정정
