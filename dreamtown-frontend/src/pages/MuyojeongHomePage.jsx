@@ -51,7 +51,7 @@ import '../styles/travel-guide.css';
 
 // ── Living Detail nav — place codes with supported detail views ────────────────
 // Mirrors SoulCableCarPage.SUPPORTED_PLACE_CODES.
-const NAVIGABLE_PLACE_CODES = ['cablecar', 'odongdo', 'hyangiram', 'dolsan_nightscape', 'dolsan_daegyo', 'lee_soon_shin_plaza'];
+const NAVIGABLE_PLACE_CODES = ['cablecar', 'odongdo', 'hyangiram', 'dolsan_nightscape', 'dolsan_daegyo', 'lee_soon_shin_plaza', 'hamel_lighthouse'];
 const PLACE_NAME_KO = {
   cablecar:            '케이블카',
   odongdo:             '오동도',
@@ -59,6 +59,7 @@ const PLACE_NAME_KO = {
   dolsan_nightscape:   '돌산공원',
   dolsan_daegyo:       '돌산대교',
   lee_soon_shin_plaza: '이순신광장',
+  hamel_lighthouse:    '하멜등대',
 };
 // 돌산대교는 돌산공원 Living Detail 페이지 공유 — 별도 상세 뷰 없음
 const PLACE_DETAIL_CODE_MAP = {

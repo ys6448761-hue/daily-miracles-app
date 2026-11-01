@@ -111,6 +111,15 @@ const SOUL_DISCOVERY = {
     '오동도까지 이어가면서 차를 이용하고 부모님도 함께라면, 결정에 중요한 것은 차량 회수와 탑승 편안함이에요. 왕복으로 이용하면 차량 회수가 단순해지고, 일반 캐빈이 부모님께 더 편할 수 있어요.',
 };
 
+// ── Hamel Lighthouse discovery text ──────────────────────────────────────────
+// Source: SOUL_HAMEL_LIGHTHOUSE_PHASE1_CLOSURE_EVIDENCE_V1.md + soyeowoolService hamel_lighthouse.experience_ko
+// Guardrail: 운영시간·전화번호 UNVERIFIED (Phase 1 Q3/Q4) — Essential Info만 Founder 확정 사항 표시
+// Essential Info confirmed by Founder (2026-11-01): 24시간 개방, 무료, 1899-2012
+const HAMEL_SOUL_DISCOVERY = {
+  default:
+    '하멜등대는 여수 바다를 바라보며 잠시 마음을 가다듬을 수 있는 장소예요. DreamTown에서는 소원을 품고 다시 희망을 바라보는 별빛 항로의 중요한 장소예요.',
+};
+
 // ── Dolsan Park discovery text ────────────────────────────────────────────────
 // Source: V1.1 Content — Founder / Lumi approved 2026-10-09
 // PLACE: dolsan_nightscape (돌산대교 돌산공원)
@@ -234,6 +243,7 @@ const PLACE_HERO_MAP = {
   yisunsin:             '/images/soul/place-hero/yisunsin.png',
   lee_soon_shin_plaza:  '/images/soul/place-hero/yisunsin.png',
   dolsan_nightscape:    '/images/soul/place-hero/dolsan-nightscape.png',
+  hamel_lighthouse:     '/images/soul/place-hero/hamel-lighthouse.png',
 };
 
 // ── FOR ME texts (7 context variants) ────────────────────────────────────────
@@ -1002,7 +1012,7 @@ function OdongdoQuestionDiscovery({ ctx }) {
 }
 
 // ── Main page ────────────────────────────────────────────────────────────────
-const SUPPORTED_PLACE_CODES = ['cablecar', 'odongdo', 'hyangiram', 'dolsan_nightscape', 'lee_soon_shin_plaza'];
+const SUPPORTED_PLACE_CODES = ['cablecar', 'odongdo', 'hyangiram', 'dolsan_nightscape', 'lee_soon_shin_plaza', 'hamel_lighthouse'];
 
 export default function SoulCableCarPage() {
   const navigate = useNavigate();
@@ -1040,6 +1050,7 @@ export default function SoulCableCarPage() {
   const isHyangiramView = placeCode === 'hyangiram';
   const isDolsanView    = placeCode === 'dolsan_nightscape';
   const isYisunsinView  = placeCode === 'lee_soon_shin_plaza';
+  const isHamelView     = placeCode === 'hamel_lighthouse';
   const heroSrc = PLACE_HERO_MAP[placeCode] ?? null;
 
   const hasContext =
@@ -1079,6 +1090,8 @@ export default function SoulCableCarPage() {
     ? DOLSAN_SOUL_DISCOVERY.default
     : isYisunsinView
     ? (YISUNSIN_SOUL_DISCOVERY[yisunsinVariantKey] ?? YISUNSIN_SOUL_DISCOVERY.default)
+    : isHamelView
+    ? HAMEL_SOUL_DISCOVERY.default
     : (SOUL_DISCOVERY[soulVariantKey] ?? SOUL_DISCOVERY.default);
 
   // ── SOUL API 공통 호출 (handleSubmit + 카테고리 칩 공유) ────────────────────
@@ -1179,7 +1192,7 @@ export default function SoulCableCarPage() {
             ← 뒤로
           </button>
           <h1 className="text-sm font-semibold text-white truncate mx-2">
-            {isCableCarView ? '여수해상케이블카' : isOdongdoView ? '오동도' : isHyangiramView ? '향일암' : isDolsanView ? '돌산공원' : isYisunsinView ? '이순신광장' : (placeData?.name_ko || '여수해상케이블카')}
+            {isCableCarView ? '여수해상케이블카' : isOdongdoView ? '오동도' : isHyangiramView ? '향일암' : isDolsanView ? '돌산공원' : isYisunsinView ? '이순신광장' : isHamelView ? '하멜등대' : (placeData?.name_ko || '여수해상케이블카')}
           </h1>
           <div className="flex items-center gap-3 text-white opacity-40 text-sm">
             <span title="저장">🔖</span>
@@ -1197,7 +1210,7 @@ export default function SoulCableCarPage() {
               ref={inputRef}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder={isOdongdoView ? '오동도에 대해 뭐든 물어보세요' : isHyangiramView ? '향일암에 대해 뭐든 물어보세요' : isDolsanView ? '돌산공원 야경, 주차, 전망대 가는 길… 무엇이 궁금하세요?' : isYisunsinView ? '이순신광장에 대해 뭐든 물어보세요' : '케이블카에 대해 뭐든 물어보세요'}
+              placeholder={isOdongdoView ? '오동도에 대해 뭐든 물어보세요' : isHyangiramView ? '향일암에 대해 뭐든 물어보세요' : isDolsanView ? '돌산공원 야경, 주차, 전망대 가는 길… 무엇이 궁금하세요?' : isYisunsinView ? '이순신광장에 대해 뭐든 물어보세요' : isHamelView ? '하멜등대에 대해 뭐든 물어보세요' : '케이블카에 대해 뭐든 물어보세요'}
               className="flex-1 bg-transparent text-white placeholder-white placeholder-opacity-40 text-sm outline-none"
             />
             <button
@@ -1297,6 +1310,7 @@ export default function SoulCableCarPage() {
                 isHyangiramView ? '향일암' :
                 isDolsanView    ? '돌산공원' :
                 isYisunsinView  ? '이순신광장' :
+                isHamelView     ? '하멜등대' :
                 (placeData?.name_ko || '여수해상케이블카')
               }
               className="absolute inset-0 w-full h-full object-cover"
@@ -1320,10 +1334,10 @@ export default function SoulCableCarPage() {
           <div className="relative z-10 p-5 flex flex-col justify-end" style={{ minHeight: '200px' }}>
             <div className="mt-auto">
               <p className="text-xs text-white opacity-50 mb-1 tracking-widest uppercase">
-                {isCableCarView ? '여수 · 해상 케이블카' : isDolsanView ? '여수 · 돌산대교 돌산공원' : isYisunsinView ? '여수 · 이순신광장' : ('여수 · ' + (placeData?.name_ko || ''))}
+                {isCableCarView ? '여수 · 해상 케이블카' : isDolsanView ? '여수 · 돌산대교 돌산공원' : isYisunsinView ? '여수 · 이순신광장' : isHamelView ? '여수 · 하멜등대' : ('여수 · ' + (placeData?.name_ko || ''))}
               </p>
               <h2 className="text-2xl font-bold text-white leading-tight">
-                {isCableCarView ? '여수해상케이블카' : isOdongdoView ? '오동도' : isHyangiramView ? '향일암' : isDolsanView ? '돌산공원' : isYisunsinView ? '이순신광장' : (placeData?.name_ko || '')}
+                {isCableCarView ? '여수해상케이블카' : isOdongdoView ? '오동도' : isHyangiramView ? '향일암' : isDolsanView ? '돌산공원' : isYisunsinView ? '이순신광장' : isHamelView ? '하멜등대' : (placeData?.name_ko || '')}
               </h2>
               {isCableCarView && (
                 <p className="text-sm text-white opacity-60 mt-1">
@@ -1348,6 +1362,11 @@ export default function SoulCableCarPage() {
               {isYisunsinView && (
                 <p className="text-sm text-white opacity-60 mt-1">
                   역사의 광장 · 사람과 여수항이 만나는 곳
+                </p>
+              )}
+              {isHamelView && (
+                <p className="text-sm text-white opacity-60 mt-1">
+                  바다를 향한 등대 · 희망을 바라보는 별빛 항로
                 </p>
               )}
             </div>
@@ -1411,6 +1430,17 @@ export default function SoulCableCarPage() {
               <FactRow label="환경" value="야외" note="방파제 길 걷기 또는 동백열차로 섬 입장" />
               <p className="text-xs text-white opacity-30 mt-2">
                 입장료·운영시간·주차는 방문 전 확인을 권장해요.
+              </p>
+            </>
+          ) : isHamelView ? (
+            // Hamel curated — Founder confirmed (2026-11-01): 24시간 개방, 무료, 여수시청 콜센터 1899-2012
+            // NOT shown: 주차·접근로 세부 정보 (UNVERIFIED — Phase 1 Q3/Q4)
+            <>
+              <FactRow label="입장" value="무료" />
+              <FactRow label="개방" value="24시간" />
+              <FactRow label="문의" value="1899-2012" note="여수시청 콜센터" />
+              <p className="text-xs text-white opacity-30 mt-2">
+                방문 전 현장 확인을 권장해요.
               </p>
             </>
           ) : isCableCarView ? (
@@ -1843,6 +1873,30 @@ export default function SoulCableCarPage() {
           </div>
         )}
 
+        {/* ── HAMEL: EXPERIENCE — 등대와 여수 바다 풍경 ── */}
+        {/* Source: Hamel_Lighthouse/Experience/ (Founder asset) */}
+        {/* onError pattern: 자산 복사 전까지 섹션 자동 은닉 */}
+        {isHamelView && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '220px' }}>
+            <img
+              src="/images/soul/hamel-lighthouse/experience-v1.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 40%' }}
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.50) 0%, transparent 55%)' }}
+            />
+            <div className="relative z-10 p-4 flex flex-col justify-end" style={{ minHeight: '220px' }}>
+              <div className="mt-auto">
+                <p className="text-xs text-white opacity-60">여수 바다를 바라보는 하멜등대</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ── EXPERIENCE: CITY VIEW — visual transition from factual trust to experience ── */}
         {isCableCarView && (
           <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '220px' }}>
@@ -1935,6 +1989,41 @@ export default function SoulCableCarPage() {
                 : primaryDiscovery}
             </p>
           </Card>
+        )}
+
+        {/* ── HAMEL: EXPERIENCE TEXT — 이런 곳이에요 ── */}
+        {/* Source: soyeowoolService._PLACE_KNOWLEDGE.hamel_lighthouse.experience_ko (Phase 1 Founder approved 2026-10-19) */}
+        {isHamelView && (
+          <Card>
+            <p className="text-xs text-white opacity-40 mb-3 font-medium uppercase tracking-wider">이런 곳이에요</p>
+            <p className="text-sm text-white opacity-80 leading-relaxed">
+              하멜등대는 여수 바다를 바라보며 잠시 마음을 가다듬을 수 있는 장소예요. DreamTown에서는 소원을 품고 다시 희망을 바라보는 별빛 항로의 중요한 장소예요.
+            </p>
+          </Card>
+        )}
+
+        {/* ── HAMEL: WISH SCENE — 소원을 품고 바라보는 별빛 항로 ── */}
+        {/* Source: Hamel_Lighthouse/Wish_Scene/ (Founder asset) */}
+        {/* onError pattern: 자산 복사 전까지 섹션 자동 은닉 */}
+        {isHamelView && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '200px' }}>
+            <img
+              src="/images/soul/hamel-lighthouse/wish-scene.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 40%' }}
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.55) 0%, transparent 55%)' }}
+            />
+            <div className="relative z-10 p-4 flex flex-col justify-end" style={{ minHeight: '200px' }}>
+              <div className="mt-auto">
+                <p className="text-xs text-white opacity-60">소원을 품고 다시 희망을 바라보는 곳</p>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* ── EXPERIENCE: CABIN VIEW — visual breathing moment before Journey ── */}
