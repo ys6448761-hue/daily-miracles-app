@@ -244,17 +244,23 @@ body {
 .soul-scope[data-soul-theme="sunshine"] .text-white.opacity-60 { color: rgba(23,50,77,0.72) !important; }
 .soul-scope[data-soul-theme="sunshine"] .text-white.opacity-50 { color: rgba(23,50,77,0.65) !important; }
 .soul-scope[data-soul-theme="sunshine"] .text-white.opacity-40 { color: rgba(23,50,77,0.58) !important; }
-.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-30 { color: rgba(23,50,77,0.50) !important; }
-.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-25 { color: rgba(23,50,77,0.45) !important; }
-.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-20 { color: rgba(23,50,77,0.38) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-30 { color: rgba(23,50,77,0.62) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-25 { color: rgba(23,50,77,0.55) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-20 { color: rgba(23,50,77,0.48) !important; }
 
-/* ── Hero image overlay: 어두운 gradient 위 텍스트는 흰색 유지 ────────────
-   .soul-hero-overlay 안의 텍스트는 배경이 어두운 이미지 overlay이므로
-   햇살 모드에서도 흰색을 유지해야 가독성이 확보된다.
-   아래 규칙은 위 override보다 뒤에 위치해 specificity 동일 시 후자 우선.  */
+/* ── 이미지 overlay 컨테이너: 어두운 gradient 위 텍스트는 흰색 유지 ──────
+   .rounded-2xl.overflow-hidden.relative 조합은 Place Hero + Experience 이미지
+   카드를 식별하는 고유 패턴 (Card 컴포넌트에는 overflow-hidden/relative 없음).
+   soul-hero-overlay 명시 클래스도 동일 규칙으로 처리.                     */
+.soul-scope[data-soul-theme="sunshine"] .rounded-2xl.overflow-hidden.relative .text-white,
 .soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay .text-white        { color: #ffffff !important; }
-.soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay .text-white.opacity-60 { color: rgba(255,255,255,0.75) !important; opacity: 1 !important; }
-.soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay .text-white.opacity-50 { color: rgba(255,255,255,0.65) !important; opacity: 1 !important; }
+.soul-scope[data-soul-theme="sunshine"] .rounded-2xl.overflow-hidden.relative .text-white.opacity-60,
+.soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay .text-white.opacity-60 { color: rgba(255,255,255,0.78) !important; opacity: 1 !important; }
+.soul-scope[data-soul-theme="sunshine"] .rounded-2xl.overflow-hidden.relative .text-white.opacity-50,
+.soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay .text-white.opacity-50 { color: rgba(255,255,255,0.68) !important; opacity: 1 !important; }
+.soul-scope[data-soul-theme="sunshine"] .rounded-2xl.overflow-hidden.relative span.text-white,
+.soul-scope[data-soul-theme="sunshine"] .rounded-2xl.overflow-hidden.relative p.text-white,
+.soul-scope[data-soul-theme="sunshine"] .rounded-2xl.overflow-hidden.relative div.text-white,
 .soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay span.text-white,
 .soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay p.text-white,
 .soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay div.text-white      { opacity: 1 !important; }
