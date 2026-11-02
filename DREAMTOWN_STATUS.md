@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-30 (MUYOJEONG_V01_PRODUCTION_QA_PASSED)
+Last Updated: 2026-11-02 (HAMEL_LIVING_DETAIL_V01_ASSETS_REGISTERED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -21,9 +21,20 @@ Last Updated: 2026-10-30 (MUYOJEONG_V01_PRODUCTION_QA_PASSED)
 5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
-### ★ Current Next Action (exactly 1) — Updated: 2026-10-30
+### ★ Current Next Action (exactly 1) — Updated: 2026-11-02
 
-**무여정 V0.1 PRODUCTION LIVE — Founder 브라우저 UI QA (4버튼·지도 화면 직접 확인)**
+**하멜등대 Living Detail V0.1 — Founder 브라우저 QA (`/soul/cable-car?place=hamel_lighthouse`)**
+- **HAMEL_LIVING_DETAIL_V01_ASSETS_REGISTERED** ✅ (2026-11-02)
+  - 코드 구현: SHA `705afc1` / 이미지 자산 등록: SHA `c105b40`
+  - 원본 3종 보존 (`C:\DREAM TOWN\Assets\SOUL\Hamel_Lighthouse\`) ✅
+  - 서비스 경로: `dreamtown-frontend/public/images/soul/hamel-lighthouse/` ✅
+  - 빌드: 698 modules ✅ / 회귀: 639/640 PASS (R20 PRE-EXISTING) ✅
+  - URL: `/soul/cable-car?place=hamel_lighthouse`
+  - Evidence: `docs/knowledge/HAMEL-LIGHTHOUSE-LIVING-DETAIL-V01-EVIDENCE.md`
+  - **Founder QA 필요**: 이미지 표시 / SOUL 진입 버튼 / 기존 3곳 정상 동작
+  - **Production 배포: 미승인** — PR #135 merge + Founder 별도 승인 필요
+
+**이전 Next Action: 무여정 V0.1 PRODUCTION LIVE — Founder 브라우저 UI QA (4버튼·지도 화면 직접 확인)**
 - **MUYOJEONG_V01_PRODUCTION_QA_PASSED** ✅ (2026-10-30)
   - Deploy ID: `dep-dbhu2doae00c739ri7ug` / SHA: `7f2c084`
   - Deploy Time: 2026-10-30 09:16 KST (Founder Render Dashboard Manual Deploy)
