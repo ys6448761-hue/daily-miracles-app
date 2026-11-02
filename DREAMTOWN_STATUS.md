@@ -28,20 +28,27 @@ Last Updated: 2026-11-03 (SOUL_THEME_V01_FOUNDER_QA_PASS)
 
 ---
 
-### SOUL 낮·밤 테마 V0.1 — FOUNDER_QA_PASS ✅ (2026-11-03)
+### SOUL 낮·밤 테마 V0.1 — PR_OPEN (병합 Founder 승인 대기) 🟡
 
-- **SOUL_THEME_V01_FOUNDER_QA_PASS** ✅ 오동도 햇살 SOUL 3차 검증 PASS
-  - PASS: 밝은 배경 / Essential Info 보조 글자 / Place Hero 제목 / Experience 이미지 캡션 / SOUL 본문
-- **코드팀 회귀 검증**: 639/640 PASS (R20 PRE-EXISTING 제외), DreamTown 별/Galaxy 영향 없음
-- **HEAD SHA**: `53d89f6` / 브랜치: `docs/pr134-merged-state-sync`
-- **커밋 이력**:
-  - `95d80fe` feat: 최초 구현
-  - `b07b024` fix: Living Detail 배경 self-selector 버그
-  - `73a7cb5` fix: 보조 글자 대비 + Place Hero 캡션
+- **SOUL_THEME_V01_FOUNDER_QA_PASS** ✅ 오동도 햇살 SOUL 3차 검증 PASS (2026-11-03)
+- **PR #135 OPEN**: https://github.com/ys6448761-hue/daily-miracles-app/pull/135
+  - 브랜치: `docs/pr134-merged-state-sync` → `main`
+  - HEAD SHA: `56a4b84` / main SHA: `a10abbd`
+- **코드팀 회귀 검증**: 639/640 PASS (R20 PRE-EXISTING 제외)
+- **커밋 이력 (SOUL 테마 5건)**:
+  - `95d80fe` feat: 최초 구현 (Context + CSS + MuyojeongHome + SoulCableCar)
+  - `b07b024` fix: Living Detail 배경 self-selector 버그 수정
+  - `73a7cb5` fix: 보조 글자 대비 + Place Hero 캡션 흰색
   - `53d89f6` fix: Essential Info note + Experience 이미지 캡션
+  - `5605c9e` docs: FOUNDER_QA_PASS Evidence + Project State
+- **추가 포함 커밋 (기존 Founder 승인)**:
+  - `705afc1`~`05514a2`: 하멜등대 Living Detail V0.1 + 이미지 4종 + 문서
+  - `7c44417`~`3f309ac`: commerce docs 3건 (코드 변경 없음)
+  - `f98bd5d`: muyojeong V01 QA 기록
 - **Evidence**: `docs/knowledge/SOUL-THEME-V01-EVIDENCE.md`
-- **배포**: Founder 별도 승인 후 PR → main merge → Render Auto-Deploy
-- **롤백**: Render 이전 Deploy 재활성화 또는 `git revert 95d80fe..53d89f6`
+- **Render Auto-Deploy**: OFF → merge 후 Founder 수동 배포 필요
+- **배포 후 검증 URL**: `app.dailymiracles.kr/muyojeong`
+- **롤백**: Render 대시보드 이전 Deploy 재활성화 (즉각) 또는 `git revert f98bd5d..56a4b84`
 
 ---
 
