@@ -1306,7 +1306,7 @@ export default function SoulCableCarPage() {
         )}
 
         {/* ── PLACE HERO ── */}
-        <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '200px' }}>
+        <div className="rounded-2xl overflow-hidden relative soul-hero-overlay" style={{ minHeight: '200px' }}>
           {heroSrc && (
             <img
               src={heroSrc}

@@ -161,8 +161,8 @@ body {
 .soul-scope[data-soul-theme="sunshine"] {
   --soul-bg:            #F3F8FC;
   --soul-text:          #17324D;
-  --soul-text-muted:    rgba(23, 50, 77, 0.60);
-  --soul-text-subtle:   rgba(23, 50, 77, 0.38);
+  --soul-text-muted:    rgba(23, 50, 77, 0.70);
+  --soul-text-subtle:   rgba(23, 50, 77, 0.52);
   --soul-accent:        #24678F;
   --soul-card-bg:       rgba(36, 103, 143, 0.07);
   --soul-card-border:   rgba(36, 103, 143, 0.20);
@@ -227,6 +227,37 @@ body {
 .soul-scope[data-soul-theme="sunshine"] .text-star-gold {
   color: #24678F !important;
 }
+
+/* ── Sunshine: element-level opacity 보정 ──────────────────────────────────
+   text-white opacity-XX 조합 시 요소 opacity × color opacity = 이중 흐림.
+   span/p/div 텍스트 요소의 opacity를 1로 복원, color alpha로만 계층 표현.
+   button은 제외 (disabled:opacity-30 등 인터랙션 상태 유지)              */
+.soul-scope[data-soul-theme="sunshine"] span.text-white,
+.soul-scope[data-soul-theme="sunshine"] p.text-white,
+.soul-scope[data-soul-theme="sunshine"] div.text-white {
+  opacity: 1 !important;
+}
+/* opacity 단계별 색상 alpha 재매핑 */
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-90 { color: rgba(23,50,77,0.92) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-80 { color: rgba(23,50,77,0.85) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-70 { color: rgba(23,50,77,0.78) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-60 { color: rgba(23,50,77,0.72) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-50 { color: rgba(23,50,77,0.65) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-40 { color: rgba(23,50,77,0.58) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-30 { color: rgba(23,50,77,0.50) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-25 { color: rgba(23,50,77,0.45) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-20 { color: rgba(23,50,77,0.38) !important; }
+
+/* ── Hero image overlay: 어두운 gradient 위 텍스트는 흰색 유지 ────────────
+   .soul-hero-overlay 안의 텍스트는 배경이 어두운 이미지 overlay이므로
+   햇살 모드에서도 흰색을 유지해야 가독성이 확보된다.
+   아래 규칙은 위 override보다 뒤에 위치해 specificity 동일 시 후자 우선.  */
+.soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay .text-white        { color: #ffffff !important; }
+.soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay .text-white.opacity-60 { color: rgba(255,255,255,0.75) !important; opacity: 1 !important; }
+.soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay .text-white.opacity-50 { color: rgba(255,255,255,0.65) !important; opacity: 1 !important; }
+.soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay span.text-white,
+.soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay p.text-white,
+.soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay div.text-white      { opacity: 1 !important; }
 
 .glow-purple {
   text-shadow: 0 0 20px rgba(155, 135, 245, 0.6);
