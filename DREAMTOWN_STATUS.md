@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-10-30 (MUYOJEONG_PR134_RELEASE_APPROVAL_READY)
+Last Updated: 2026-11-03 (SOUL_THEME_V01_FOUNDER_QA_PASS)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -21,16 +21,92 @@ Last Updated: 2026-10-30 (MUYOJEONG_PR134_RELEASE_APPROVAL_READY)
 5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
-### ★ Current Next Action (exactly 1) — Updated: 2026-10-30
+### ★ Current Next Action (exactly 1) — Updated: 2026-11-03
 
-**PR #134 Founder merge 승인 → Production 배포**
+**커머스 집중: 티켓사이트 ↔ FLOW 호텔 재고·예약·결제 연동**
+- 라마다 실 PIN 수령 (Founder Action) → 패키지 상품 등록 → NicePay 결제 연결
+
+---
+
+### SOUL 낮·밤 테마 V0.1 — PR_OPEN (병합 Founder 승인 대기) 🟡
+
+- **SOUL_THEME_V01_FOUNDER_QA_PASS** ✅ 오동도 햇살 SOUL 3차 검증 PASS (2026-11-03)
+- **PR #135 OPEN**: https://github.com/ys6448761-hue/daily-miracles-app/pull/135
+  - 브랜치: `docs/pr134-merged-state-sync` → `main`
+  - HEAD SHA: `56a4b84` / main SHA: `a10abbd`
+- **코드팀 회귀 검증**: 639/640 PASS (R20 PRE-EXISTING 제외)
+- **커밋 이력 (SOUL 테마 5건)**:
+  - `95d80fe` feat: 최초 구현 (Context + CSS + MuyojeongHome + SoulCableCar)
+  - `b07b024` fix: Living Detail 배경 self-selector 버그 수정
+  - `73a7cb5` fix: 보조 글자 대비 + Place Hero 캡션 흰색
+  - `53d89f6` fix: Essential Info note + Experience 이미지 캡션
+  - `5605c9e` docs: FOUNDER_QA_PASS Evidence + Project State
+- **추가 포함 커밋 (기존 Founder 승인)**:
+  - `705afc1`~`05514a2`: 하멜등대 Living Detail V0.1 + 이미지 4종 + 문서
+  - `7c44417`~`3f309ac`: commerce docs 3건 (코드 변경 없음)
+  - `f98bd5d`: muyojeong V01 QA 기록
+- **Evidence**: `docs/knowledge/SOUL-THEME-V01-EVIDENCE.md`
+- **Render Auto-Deploy**: OFF → merge 후 Founder 수동 배포 필요
+- **배포 후 검증 URL**: `app.dailymiracles.kr/muyojeong`
+- **롤백**: Render 대시보드 이전 Deploy 재활성화 (즉각) 또는 `git revert f98bd5d..56a4b84`
+
+---
+
+**커머스 Phase 1 — 낭만야경 패키지 "독립 상품 등록 방식" 결정 후 라마다 실 PIN 교체 요청 (HOLD)**
+- **COMMERCE_PACKAGE_PHASE1_CONFIRMED** ✅ (2026-11-02)
+  - 복합상품 연결 방식 조사 완료 → 양방향 강제, 기존 단품 구매 차단 위험 → **채택 불가**
+  - **권장 방식: 패키지(30) 카테고리에 독립 상품 등록** (복합상품 연결 없음)
+    - 가격 = 패키지 총액 직접 입력 / 재고 = 수동 관리 / 발권·취소 = 기존 그대로
+    - 기존 케이블카 단품 구매에 영향 없음
+  - Founder Decision: 1박 2일 패키지 중심 전환. 신규 쇼핑몰·예약엔진 개발 금지.
+  - 호텔 후보: 라마다(PARTNER_CONFIRMED) / 케니(FOUNDER_CONFIRMED)
+  - 레저 후보: 케이블카(CONFIRMED) — 나머지 NOT_CONFIRMED
+  - 가장 조건이 갖춰진 조합: **낭만야경 = 라마다 + 케이블카**
+- **차단 조건** (해소 순서):
+  1. **라마다 실 PIN NOT_READY** → 파트너 담당자에게 실 PIN 요청 (Founder Action)
+  2. 운영 서버 코드 버전 확인 — Blocked (FTP/SSH 또는 파일 제공 필요)
+  3. 패키지 단일 티켓 발권 시 호텔+레저 확인 방법 — 발권 테스트 필요
+- Evidence: `docs/knowledge/COMMERCE-PACKAGE-PHASE1-EVIDENCE.md`, `docs/knowledge/COMMERCE-HOTEL-SYSTEM-STATE-EVIDENCE.md`, `docs/knowledge/COMMERCE-PIN-ROLE-EVIDENCE.md`
+- **PIN 역할 확정됨** (2026-11-02):
+  - PIN 사용: `POST /api/dt/flow/confirm`(파트너 체크인 확인) **단 하나** — availability/hold/booking과 무관
+  - **라마다 실 PIN은 FLOW 예약 흐름의 차단 조건이 아님** — 투숙 확인 기능만 차단
+  - **FLOW 최대 차단 조건**: NicePay↔FLOW 연결 없음 + 고객 UI 없음 (신규 개발 필요)
+  - **티켓사이트 방식에서 PIN은 관여 없음** — 수기 호텔 예약 절차 별도 필요
+- **호텔 시스템 현황 확인됨** (2026-11-02):
+  - Production DB: FLOW 4테이블 + SODAM + SOWON_ID(58 rows live) **모두 APPLIED**
+  - 코드: `staging/storybook-c7a`에 5개 서비스 + 3개 라우트 완전 구현 — **main 미병합**
+  - E2E: Kenny + Ramada 9체크 PASS (hold→booking까지. NicePay 연결 미포함)
+- **하멜등대 QA**: QA PASS 4개 항목 (Place Hero/제목/태그라인/Essential Info) — 나머지 미확인 유지
+
+**이전 Next Action: 하멜등대 Living Detail V0.1 — Founder 브라우저 QA 나머지 항목 완료 대기**
+- **HAMEL_LIVING_DETAIL_V01_FOUNDER_QA_PARTIAL** (2026-11-02)
+  - **QA PASS (Founder 확인)**: Place Hero ✅ / 제목 ✅ / 태그라인 ✅ / Essential Info ✅
+  - **QA 대기**: Experience·WishScene 이미지 / SOUL 텍스트·질문 / 기존 3곳 회귀 / 콘솔 404
+  - QA URL: `http://localhost:5000/soul/cable-car?place=hamel_lighthouse`
+  - 코드 SHA: `705afc1` / 이미지 SHA: `c105b40`
+  - Evidence: `docs/knowledge/HAMEL-LIGHTHOUSE-LIVING-DETAIL-V01-EVIDENCE.md` §4-A
+  - **Production 배포: 미승인** — Founder QA 완료 + PR #135 merge 필요
+- **로컬 서버 구성 확인** (2026-11-02)
+  - port 5000 (PID 25068): Express 백엔드 + dist 서빙 (`daily-miracles-mvp`)
+  - port 5002 (PID 9924): Express 백엔드 동일 프로젝트, 별도 포트
+  - port 3000 (PID 45852): Vite dev server (`dreamtown-frontend`)
+  - `/images/soul/*` → `dreamtown-frontend/dist/images/soul/` (server.js line 85)
+- **`reportScheduler` 누락**: `services/reportScheduler.js` 미존재. 로컬(SQLite)에서는 `DATABASE_URL` 없어 미실행 → QA 영향 없음. 운영 환경 영향 별도 조사 필요.
+
+**이전 Next Action: 무여정 V0.1 PRODUCTION LIVE — Founder 브라우저 UI QA (4버튼·지도 화면 직접 확인)**
+- **MUYOJEONG_V01_PRODUCTION_QA_PASSED** ✅ (2026-10-30)
+  - Deploy ID: `dep-dbhu2doae00c739ri7ug` / SHA: `7f2c084`
+  - Deploy Time: 2026-10-30 09:16 KST (Founder Render Dashboard Manual Deploy)
+  - HTTP QA: PASS 11 / NOT_TESTED 2 / FAIL 0
+  - 지도 이미지 200 OK ✅ / SOUL API ✅ / 맞춤 항로 ✅ / Living Detail 3곳 ✅
+  - CAR GOVERNANCE_HOLD: 유지 (`travel_time_unverified` 응답 확인)
+  - PROVISIONAL 마커: 미노출 코드 확인 ✅ (`includeProvisional=false`)
+  - NOT_TESTED: 4버튼 UI 렌더링 / TG_READY 게이팅 (브라우저 직접 확인 필요)
+  - Evidence: `docs/knowledge/MUYOJEONG-V01-PRODUCTION-QA-EVIDENCE.md`
+- **PR #134 MERGED** ✅ (2026-10-30) — merge SHA: `7f2c084`
 - **MUYOJEONG_PR134_RELEASE_APPROVAL_READY** ✅ (2026-10-30)
   - **MAP_V01_ZONE1_FOUNDER_VISUAL_ACCEPTED ✅** — Founder 직접 발언: "루미야 존1도 이상없어"
-  - Zone 2 FOUNDER_VISUAL_ACCEPTED ✅ (기존) / Zone 6 FOUNDER_VISUAL_ACCEPTED ✅ (기존)
-  - Zone 1·2·6 VISUAL_ACCEPTED 완료. 남은 거버넌스 조건: 없음
-  - CAR GOVERNANCE_HOLD: 유지 (이동시간 추정 미구현 — 별도 승인 없이 해제 불가)
-  - PROVISIONAL 마커: 일반 사용자 미노출 정책 유지
-  - **실제 잔여 조건: PR #134 Founder merge 승인 + Production deploy 승인** (2건, 별도)
+  - Zone 2 FOUNDER_VISUAL_ACCEPTED ✅ / Zone 6 FOUNDER_VISUAL_ACCEPTED ✅
   - Evidence: `docs/knowledge/MUYOJEONG-PR134-RELEASE-APPROVAL-READY-EVIDENCE.md`
 - **MUYOJEONG_RELEASE_GATE_RECONCILED** ✅ (2026-10-30) — READ-ONLY
   - Zone 1 AMBIGUOUS_PENDING → 위 Zone 1 FOUNDER_VISUAL_ACCEPTED로 정정

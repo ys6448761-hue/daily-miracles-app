@@ -133,6 +133,138 @@ body {
   text-shadow: 0 0 20px rgba(255, 215, 106, 0.6);
 }
 
+/* ── SOUL 테마 시스템 — .soul-scope 범위 내에서만 적용 ─────────────────────────
+   적용 대상: /muyojeong + /soul/* 경로
+   다른 DreamTown 페이지(별/Galaxy 등)에 영향 없음
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* 별빛 SOUL (기본값 — starlight) */
+.soul-scope {
+  --soul-bg:            #130b1e;
+  --soul-text:          #ffffff;
+  --soul-text-muted:    rgba(255, 255, 255, 0.60);
+  --soul-text-subtle:   rgba(255, 255, 255, 0.38);
+  --soul-accent:        #6EB8FF;
+  --soul-card-bg:       rgba(110, 184, 255, 0.07);
+  --soul-card-border:   rgba(110, 184, 255, 0.22);
+  --soul-input-bg:      rgba(255, 255, 255, 0.08);
+  --soul-input-border:  rgba(110, 184, 255, 0.28);
+  --soul-send-active:   rgba(110, 184, 255, 0.85);
+  --soul-send-inactive: rgba(110, 184, 255, 0.15);
+  --soul-chip-border:   rgba(255, 255, 255, 0.14);
+  --soul-chip-bg:       rgba(255, 255, 255, 0.05);
+  --soul-chip-text:     rgba(255, 255, 255, 0.78);
+  --soul-hero-bg:       linear-gradient(180deg, #2a1a0e 0%, #1a1228 50%, #130b1e 100%);
+}
+
+/* 햇살 SOUL (sunshine) */
+.soul-scope[data-soul-theme="sunshine"] {
+  --soul-bg:            #F3F8FC;
+  --soul-text:          #17324D;
+  --soul-text-muted:    rgba(23, 50, 77, 0.70);
+  --soul-text-subtle:   rgba(23, 50, 77, 0.52);
+  --soul-accent:        #24678F;
+  --soul-card-bg:       rgba(36, 103, 143, 0.07);
+  --soul-card-border:   rgba(36, 103, 143, 0.20);
+  --soul-input-bg:      rgba(36, 103, 143, 0.06);
+  --soul-input-border:  rgba(36, 103, 143, 0.28);
+  --soul-send-active:   rgba(36, 103, 143, 0.85);
+  --soul-send-inactive: rgba(36, 103, 143, 0.20);
+  --soul-chip-border:   rgba(23, 50, 77, 0.12);
+  --soul-chip-bg:       rgba(23, 50, 77, 0.04);
+  --soul-chip-text:     rgba(23, 50, 77, 0.72);
+  --soul-hero-bg:       linear-gradient(180deg, #b8d4e8 0%, #ddeef9 50%, #F3F8FC 100%);
+}
+
+/* SoulCableCarPage Tailwind 클래스 override — 햇살 테마 시 */
+.soul-scope[data-soul-theme="sunshine"] .bg-night-sky {
+  background-color: #F3F8FC !important;
+}
+.soul-scope[data-soul-theme="sunshine"] .text-white {
+  color: #17324D !important;
+}
+.soul-scope[data-soul-theme="sunshine"] .text-star-gold {
+  color: #1a4d6d !important;
+}
+.soul-scope[data-soul-theme="sunshine"] .text-dream-purple {
+  color: #24678F !important;
+}
+.soul-scope[data-soul-theme="sunshine"] .bg-white.bg-opacity-5 {
+  background-color: rgba(36, 103, 143, 0.07) !important;
+}
+.soul-scope[data-soul-theme="sunshine"] .border-white {
+  border-color: rgba(36, 103, 143, 0.18) !important;
+}
+.soul-scope[data-soul-theme="sunshine"] .bg-dream-purple {
+  background-color: rgba(36, 103, 143, 0.40) !important;
+}
+.soul-scope[data-soul-theme="sunshine"] .border-dream-purple {
+  border-color: rgba(36, 103, 143, 0.55) !important;
+}
+/* 배지 색상 override */
+.soul-scope[data-soul-theme="sunshine"] .text-green-300 { color: #1a5c38 !important; }
+.soul-scope[data-soul-theme="sunshine"] .bg-green-900   { background-color: rgba(26, 92, 56, 0.12) !important; }
+.soul-scope[data-soul-theme="sunshine"] .border-green-700 { border-color: rgba(26, 92, 56, 0.25) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-yellow-300  { color: #7d5a00 !important; }
+.soul-scope[data-soul-theme="sunshine"] .bg-yellow-900    { background-color: rgba(125, 90, 0, 0.10) !important; }
+.soul-scope[data-soul-theme="sunshine"] .border-yellow-700 { border-color: rgba(125, 90, 0, 0.22) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-blue-300    { color: #24678F !important; }
+.soul-scope[data-soul-theme="sunshine"] .bg-blue-900      { background-color: rgba(36, 103, 143, 0.10) !important; }
+.soul-scope[data-soul-theme="sunshine"] .border-blue-700  { border-color: rgba(36, 103, 143, 0.25) !important; }
+/* bg-white opacity variants */
+.soul-scope[data-soul-theme="sunshine"] .bg-white.bg-opacity-10 {
+  background-color: rgba(36, 103, 143, 0.10) !important;
+}
+/* placeholder 색상 override */
+.soul-scope[data-soul-theme="sunshine"] .placeholder-white::placeholder {
+  color: rgba(23, 50, 77, 0.40) !important;
+}
+/* header bg-night-sky override (자식 요소 — sticky header) */
+.soul-scope[data-soul-theme="sunshine"] .bg-night-sky {
+  background-color: #F3F8FC !important;
+}
+/* text-star-gold (전달 버튼 등) override */
+.soul-scope[data-soul-theme="sunshine"] .text-star-gold {
+  color: #24678F !important;
+}
+
+/* ── Sunshine: element-level opacity 보정 ──────────────────────────────────
+   text-white opacity-XX 조합 시 요소 opacity × color opacity = 이중 흐림.
+   span/p/div 텍스트 요소의 opacity를 1로 복원, color alpha로만 계층 표현.
+   button은 제외 (disabled:opacity-30 등 인터랙션 상태 유지)              */
+.soul-scope[data-soul-theme="sunshine"] span.text-white,
+.soul-scope[data-soul-theme="sunshine"] p.text-white,
+.soul-scope[data-soul-theme="sunshine"] div.text-white {
+  opacity: 1 !important;
+}
+/* opacity 단계별 색상 alpha 재매핑 */
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-90 { color: rgba(23,50,77,0.92) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-80 { color: rgba(23,50,77,0.85) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-70 { color: rgba(23,50,77,0.78) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-60 { color: rgba(23,50,77,0.72) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-50 { color: rgba(23,50,77,0.65) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-40 { color: rgba(23,50,77,0.58) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-30 { color: rgba(23,50,77,0.62) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-25 { color: rgba(23,50,77,0.55) !important; }
+.soul-scope[data-soul-theme="sunshine"] .text-white.opacity-20 { color: rgba(23,50,77,0.48) !important; }
+
+/* ── 이미지 overlay 컨테이너: 어두운 gradient 위 텍스트는 흰색 유지 ──────
+   .rounded-2xl.overflow-hidden.relative 조합은 Place Hero + Experience 이미지
+   카드를 식별하는 고유 패턴 (Card 컴포넌트에는 overflow-hidden/relative 없음).
+   soul-hero-overlay 명시 클래스도 동일 규칙으로 처리.                     */
+.soul-scope[data-soul-theme="sunshine"] .rounded-2xl.overflow-hidden.relative .text-white,
+.soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay .text-white        { color: #ffffff !important; }
+.soul-scope[data-soul-theme="sunshine"] .rounded-2xl.overflow-hidden.relative .text-white.opacity-60,
+.soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay .text-white.opacity-60 { color: rgba(255,255,255,0.78) !important; opacity: 1 !important; }
+.soul-scope[data-soul-theme="sunshine"] .rounded-2xl.overflow-hidden.relative .text-white.opacity-50,
+.soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay .text-white.opacity-50 { color: rgba(255,255,255,0.68) !important; opacity: 1 !important; }
+.soul-scope[data-soul-theme="sunshine"] .rounded-2xl.overflow-hidden.relative span.text-white,
+.soul-scope[data-soul-theme="sunshine"] .rounded-2xl.overflow-hidden.relative p.text-white,
+.soul-scope[data-soul-theme="sunshine"] .rounded-2xl.overflow-hidden.relative div.text-white,
+.soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay span.text-white,
+.soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay p.text-white,
+.soul-scope[data-soul-theme="sunshine"] .soul-hero-overlay div.text-white      { opacity: 1 !important; }
+
 .glow-purple {
   text-shadow: 0 0 20px rgba(155, 135, 245, 0.6);
 }

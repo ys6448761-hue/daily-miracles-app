@@ -47,11 +47,12 @@ import { useNavigate } from 'react-router-dom';
 import { getOrEnsureGuestCredential } from '../api/dreamtown.js';
 import CourseDisplay from '../components/TravelGuide/CourseDisplay';
 import YeosuMapSelector from '../components/YeosuMapSelector';
+import { useSoulTheme } from '../contexts/SoulThemeContext.jsx';
 import '../styles/travel-guide.css';
 
 // ── Living Detail nav — place codes with supported detail views ────────────────
 // Mirrors SoulCableCarPage.SUPPORTED_PLACE_CODES.
-const NAVIGABLE_PLACE_CODES = ['cablecar', 'odongdo', 'hyangiram', 'dolsan_nightscape', 'dolsan_daegyo', 'lee_soon_shin_plaza'];
+const NAVIGABLE_PLACE_CODES = ['cablecar', 'odongdo', 'hyangiram', 'dolsan_nightscape', 'dolsan_daegyo', 'lee_soon_shin_plaza', 'hamel_lighthouse'];
 const PLACE_NAME_KO = {
   cablecar:            '케이블카',
   odongdo:             '오동도',
@@ -59,15 +60,16 @@ const PLACE_NAME_KO = {
   dolsan_nightscape:   '돌산공원',
   dolsan_daegyo:       '돌산대교',
   lee_soon_shin_plaza: '이순신광장',
+  hamel_lighthouse:    '하멜등대',
 };
 // 돌산대교는 돌산공원 Living Detail 페이지 공유 — 별도 상세 뷰 없음
 const PLACE_DETAIL_CODE_MAP = {
   dolsan_daegyo: 'dolsan_nightscape',
 };
 
-// ── Color tokens — from Founder Visual Reference ───────────────────────────────
-// Yeosu Blue #6EB8FF / Starlight Gold #FFD67A / Aqua Glow #B8F4FF
-const PAGE_BG = '#130b1e'; // page background — must match hero bottom gradient
+// ── Color tokens — CSS 변수로 관리 (SoulThemeContext via .soul-scope) ──────────
+// 하드코딩 색상은 useSoulTheme() 훅에서 resolvedTheme으로 가져옴
+// PAGE_BG: 'var(--soul-bg)' — .soul-scope에 의해 테마별 자동 적용
 
 // ── Time options — shown when SOUL asks '시간이 얼마나 남으셨어요?' ─────────────
 // '1박 2일' 제외: routeSkeletonService 미구현 → routeSkeleton=null → _isMultiDayTrip 미설정
@@ -115,30 +117,29 @@ function SoulAnswerSummary({ response, onNewQuestion, onTimeSelect, isLoading })
     <div
       className="rounded-2xl p-4"
       style={{
-        background: 'rgba(110,184,255,0.07)',
-        border:     '1px solid rgba(110,184,255,0.22)',
+        background: 'var(--soul-card-bg)',
+        border:     '1px solid var(--soul-card-border)',
         boxShadow:  '0 2px 16px rgba(110,184,255,0.06)',
       }}
     >
       <div className="flex items-center justify-between mb-2">
-        <p style={{ fontSize: '0.6875rem', color: '#6EB8FF', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+        <p style={{ fontSize: '0.6875rem', color: 'var(--soul-accent)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
           SOUL의 답
         </p>
         {onNewQuestion && (
           <button
             onClick={onNewQuestion}
-            style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)', cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
+            style={{ fontSize: '0.75rem', color: 'var(--soul-text-subtle)', cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
           >
             다시 물어보기
           </button>
         )}
       </div>
-      <p className="text-white font-medium leading-snug" style={{ fontSize: '0.9375rem', wordBreak: 'keep-all' }}>
+      <p style={{ fontSize: '0.9375rem', wordBreak: 'keep-all', color: 'var(--soul-text)', fontWeight: 500, lineHeight: 1.4 }}>
         {firstSentence}
       </p>
       {restLines && (
-        <p className="text-white leading-relaxed mt-1 whitespace-pre-line"
-          style={{ fontSize: '0.875rem', opacity: 0.7, wordBreak: 'keep-all' }}>
+        <p style={{ fontSize: '0.875rem', color: 'var(--soul-text-muted)', lineHeight: 1.6, marginTop: '4px', wordBreak: 'keep-all', whiteSpace: 'pre-line' }}>
           {restLines}
         </p>
       )}
@@ -150,15 +151,15 @@ function SoulAnswerSummary({ response, onNewQuestion, onTimeSelect, isLoading })
       {keyPoints.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mt-3">
           {keyPoints.map((pt, i) => (
-            <span key={i} style={{ fontSize: '0.75rem', padding: '2px 10px', borderRadius: '20px', background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}>
+            <span key={i} style={{ fontSize: '0.75rem', padding: '2px 10px', borderRadius: '20px', background: 'var(--soul-chip-bg)', color: 'var(--soul-chip-text)', border: '1px solid var(--soul-chip-border)' }}>
               {pt}
             </span>
           ))}
         </div>
       )}
       {nextAction && (
-        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-          <p style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.38)', marginBottom: '6px' }}>다음에 알려주세요</p>
+        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--soul-chip-border)' }}>
+          <p style={{ fontSize: '0.6875rem', color: 'var(--soul-text-subtle)', marginBottom: '6px' }}>다음에 알려주세요</p>
           {nextAction === TIME_QUESTION && onTimeSelect ? (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
               {TIME_OPTIONS.map((opt) => (
@@ -169,9 +170,9 @@ function SoulAnswerSummary({ response, onNewQuestion, onTimeSelect, isLoading })
                   style={{
                     padding:      '8px 10px',
                     borderRadius: '10px',
-                    border:       '1px solid rgba(255,255,255,0.18)',
-                    background:   'rgba(255,255,255,0.07)',
-                    color:        isLoading ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.82)',
+                    border:       '1px solid var(--soul-chip-border)',
+                    background:   'var(--soul-chip-bg)',
+                    color:        isLoading ? 'var(--soul-text-subtle)' : 'var(--soul-chip-text)',
                     fontSize:     '0.8125rem',
                     cursor:       isLoading ? 'default' : 'pointer',
                     wordBreak:    'keep-all',
@@ -184,7 +185,7 @@ function SoulAnswerSummary({ response, onNewQuestion, onTimeSelect, isLoading })
               ))}
             </div>
           ) : (
-            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.68)', lineHeight: 1.5, wordBreak: 'keep-all' }}>
+            <p style={{ fontSize: '0.75rem', color: 'var(--soul-text-muted)', lineHeight: 1.5, wordBreak: 'keep-all' }}>
               {nextAction}
             </p>
           )}
@@ -198,9 +199,9 @@ function SoulAnswerSummary({ response, onNewQuestion, onTimeSelect, isLoading })
               width:        '100%',
               padding:      '10px 16px',
               borderRadius: '12px',
-              background:   'rgba(110,184,255,0.13)',
-              border:       '1px solid rgba(110,184,255,0.32)',
-              color:        '#6EB8FF',
+              background:   'var(--soul-card-bg)',
+              border:       '1px solid var(--soul-card-border)',
+              color:        'var(--soul-accent)',
               fontSize:     '0.875rem',
               fontWeight:   600,
               cursor:       'pointer',
@@ -287,6 +288,7 @@ const PLACE_ENTRIES = [
 export default function MuyojeongHomePage() {
   const navigate = useNavigate();
   const inputRef = useRef(null);
+  const { pref, resolvedTheme, setPref } = useSoulTheme();
 
   const [inputValue,     setInputValue]     = useState('');
   const [sessionId,      setSessionId]      = useState(null);
@@ -387,10 +389,11 @@ export default function MuyojeongHomePage() {
 
   return (
     // overflow-x:hidden — primary horizontal overflow guard (preserved from V1.1)
-    // background matches hero bottom gradient for seamless transition
+    // soul-scope: SOUL 테마 CSS 변수 적용 범위 (DreamTown 다른 페이지 영향 없음)
     <div
-      className="min-h-screen text-white pb-24"
-      style={{ overflowX: 'hidden', background: PAGE_BG }}
+      className="soul-scope min-h-screen pb-24"
+      data-soul-theme={resolvedTheme}
+      style={{ overflowX: 'hidden', background: 'var(--soul-bg)', color: 'var(--soul-text)' }}
     >
 
       {/* ── HERO IMAGE ─────────────────────────────────────────────────────── */}
@@ -423,8 +426,7 @@ export default function MuyojeongHomePage() {
           width:      '100%',
           height:     '340px',
           overflow:   'hidden',
-          // Loading placeholder — warm dark while image loads
-          background: 'linear-gradient(180deg, #2a1a0e 0%, #1a1228 50%, #130b1e 100%)',
+          background: 'var(--soul-hero-bg)',
         }}
       >
         <img
@@ -435,15 +437,13 @@ export default function MuyojeongHomePage() {
             width:          '100%',
             height:         '100%',
             objectFit:      'cover',
-            // 78%: visible range = 38-89% of natural image height
-            // Shows: warm sunset sky + cable cars + harbor + Sowon-i + SOUL
             objectPosition: '50% 78%',
             display:        'block',
             opacity:        heroLoaded ? 1 : 0,
             transition:     'opacity 0.4s ease',
           }}
         />
-        {/* Bottom fade: 30px — covers only stone wall edge (84-89%), NOT characters */}
+        {/* Bottom fade: hero 하단 → 페이지 배경색으로 자연스럽게 이어짐 */}
         <div
           style={{
             position:   'absolute',
@@ -451,10 +451,53 @@ export default function MuyojeongHomePage() {
             left:       0,
             right:      0,
             height:     '30px',
-            background: `linear-gradient(to bottom, transparent 0%, ${PAGE_BG} 100%)`,
+            background: 'linear-gradient(to bottom, transparent 0%, var(--soul-bg) 100%)',
             pointerEvents: 'none',
           }}
         />
+        {/* ── 테마 토글 — hero 우상단 ── */}
+        <div
+          style={{
+            position:       'absolute',
+            top:            '12px',
+            right:          '12px',
+            display:        'flex',
+            gap:            '2px',
+            background:     'rgba(0,0,0,0.38)',
+            borderRadius:   '20px',
+            padding:        '4px',
+            backdropFilter: 'blur(8px)',
+            zIndex:         10,
+          }}
+        >
+          {[
+            { key: 'auto',      label: '자동' },
+            { key: 'sunshine',  label: '☀️' },
+            { key: 'starlight', label: '✦' },
+          ].map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setPref(key)}
+              aria-label={key === 'auto' ? '자동 전환' : key === 'sunshine' ? '햇살 SOUL' : '별빛 SOUL'}
+              style={{
+                padding:      '5px 10px',
+                borderRadius: '16px',
+                border:       'none',
+                fontSize:     key === 'sunshine' ? '1rem' : '0.75rem',
+                fontWeight:   pref === key ? 700 : 400,
+                background:   pref === key ? 'rgba(255,255,255,0.28)' : 'transparent',
+                color:        '#fff',
+                cursor:       'pointer',
+                minHeight:    '32px',
+                minWidth:     '36px',
+                transition:   'background 0.15s',
+                lineHeight:   1,
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* ── BRAND + PROMISE — below hero, clear of gradient zone ── */}
@@ -465,7 +508,7 @@ export default function MuyojeongHomePage() {
         <p
           style={{
             fontSize:      '0.6875rem',
-            color:         'rgba(255,255,255,0.42)',
+            color:         'var(--soul-text-subtle)',
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
             marginBottom:  '0.25rem',
@@ -489,7 +532,7 @@ export default function MuyojeongHomePage() {
           style={{
             fontWeight:    600,
             fontSize:      '1.0625rem',
-            color:         'rgba(255,255,255,0.95)',
+            color:         'var(--soul-text)',
             lineHeight:    1.5,
             wordBreak:     'keep-all',
             marginBottom:  '0.375rem',
@@ -500,7 +543,7 @@ export default function MuyojeongHomePage() {
         <p
           style={{
             fontSize:   '0.875rem',
-            color:      'rgba(255,255,255,0.50)',
+            color:      'var(--soul-text-muted)',
             lineHeight: 1.55,
             wordBreak:  'keep-all',
           }}
@@ -519,8 +562,8 @@ export default function MuyojeongHomePage() {
         <div
           style={{
             borderRadius: '999px',
-            background:   'rgba(255,255,255,0.08)',
-            border:       '1.5px solid rgba(110,184,255,0.28)',
+            background:   'var(--soul-input-bg)',
+            border:       '1.5px solid var(--soul-input-border)',
             boxShadow:    '0 2px 20px rgba(110,184,255,0.10)',
           }}
         >
@@ -539,7 +582,7 @@ export default function MuyojeongHomePage() {
                 flex:       '1 1 0',
                 minWidth:   0,
                 background: 'transparent',
-                color:      'white',
+                color:      'var(--soul-text)',
                 fontSize:   '0.9375rem',
                 outline:    'none',
                 border:     'none',
@@ -559,8 +602,8 @@ export default function MuyojeongHomePage() {
                 borderRadius:   '50%',
                 flexShrink:     0,
                 background:     isLoading || !inputValue.trim()
-                  ? 'rgba(110,184,255,0.15)'
-                  : 'rgba(110,184,255,0.85)',
+                  ? 'var(--soul-send-inactive)'
+                  : 'var(--soul-send-active)',
                 border:         'none',
                 cursor:         isLoading || !inputValue.trim() ? 'default' : 'pointer',
                 display:        'flex',
@@ -587,9 +630,9 @@ export default function MuyojeongHomePage() {
                 style={{
                   padding:      '10px 12px',
                   borderRadius: '12px',
-                  border:       '1px solid rgba(255,255,255,0.14)',
-                  background:   'rgba(255,255,255,0.05)',
-                  color:        'rgba(255,255,255,0.78)',
+                  border:       '1px solid var(--soul-chip-border)',
+                  background:   'var(--soul-chip-bg)',
+                  color:        'var(--soul-chip-text)',
                   fontSize:     '0.8125rem',
                   textAlign:    'left',
                   lineHeight:   1.4,
@@ -599,12 +642,12 @@ export default function MuyojeongHomePage() {
                   transition:   'border-color 0.15s, background 0.15s',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(110,184,255,0.40)';
-                  e.currentTarget.style.background  = 'rgba(110,184,255,0.09)';
+                  e.currentTarget.style.borderColor = 'var(--soul-input-border)';
+                  e.currentTarget.style.background  = 'var(--soul-card-bg)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.14)';
-                  e.currentTarget.style.background  = 'rgba(255,255,255,0.05)';
+                  e.currentTarget.style.borderColor = 'var(--soul-chip-border)';
+                  e.currentTarget.style.background  = 'var(--soul-chip-bg)';
                 }}
               >
                 {chip.label}
@@ -644,11 +687,11 @@ export default function MuyojeongHomePage() {
                   onClick={() => setMapMode(v => !v)}
                   aria-label={mapMode ? '목록으로 보기' : '지역별로 보기'}
                   style={{
-                    background: mapMode ? 'rgba(110,184,255,0.15)' : 'none',
+                    background: mapMode ? 'var(--soul-card-bg)' : 'none',
                     border: '1px solid',
-                    borderColor: mapMode ? 'rgba(110,184,255,0.35)' : 'rgba(255,255,255,0.15)',
+                    borderColor: mapMode ? 'var(--soul-card-border)' : 'var(--soul-chip-border)',
                     borderRadius: '20px',
-                    color: mapMode ? '#6EB8FF' : 'rgba(255,255,255,0.45)',
+                    color: mapMode ? 'var(--soul-accent)' : 'var(--soul-text-subtle)',
                     fontSize: '0.6875rem',
                     padding: '4px 10px',
                     cursor: 'pointer',
@@ -681,9 +724,9 @@ export default function MuyojeongHomePage() {
                         disabled={isLoading}
                         style={{
                           ...chipBase,
-                          color:       active ? '#130b1e' : 'rgba(255,255,255,0.80)',
-                          background:  active ? '#FFD67A' : 'rgba(255,255,255,0.06)',
-                          borderColor: active ? '#FFD67A' : 'rgba(255,255,255,0.16)',
+                          color:       active ? '#130b1e' : 'var(--soul-chip-text)',
+                          background:  active ? '#FFD67A' : 'var(--soul-chip-bg)',
+                          borderColor: active ? '#FFD67A' : 'var(--soul-chip-border)',
                           fontWeight:  active ? 600 : 400,
                         }}
                       >
@@ -698,7 +741,7 @@ export default function MuyojeongHomePage() {
                   onClick={() => setShowMorePlaces(v => !v)}
                   style={{
                     marginTop: '8px', background: 'none', border: 'none', padding: '2px 0',
-                    color: 'rgba(255,255,255,0.38)', fontSize: '0.75rem', cursor: 'pointer',
+                    color: 'var(--soul-text-subtle)', fontSize: '0.75rem', cursor: 'pointer',
                   }}
                 >
                   {showMorePlaces ? '접기 ▲' : '+ 더 보기 ▼'}
@@ -716,9 +759,9 @@ export default function MuyojeongHomePage() {
                           disabled={isLoading}
                           style={{
                             ...chipBase,
-                            color:       active ? '#130b1e' : 'rgba(255,255,255,0.65)',
-                            background:  active ? '#FFD67A' : 'rgba(255,255,255,0.04)',
-                            borderColor: active ? '#FFD67A' : 'rgba(255,255,255,0.12)',
+                            color:       active ? '#130b1e' : 'var(--soul-text-muted)',
+                            background:  active ? '#FFD67A' : 'var(--soul-chip-bg)',
+                            borderColor: active ? '#FFD67A' : 'var(--soul-chip-border)',
                             fontWeight:  active ? 600 : 400,
                           }}
                         >
@@ -733,7 +776,7 @@ export default function MuyojeongHomePage() {
 
               {/* 시간 선택 */}
               <div>
-                <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.42)', marginBottom: '8px', margin: '0 0 8px' }}>
+                <p style={{ fontSize: '0.75rem', color: 'var(--soul-text-subtle)', marginBottom: '8px', margin: '0 0 8px' }}>
                   얼마나 여행하실 건가요?
                 </p>
                 {/* 빠른 선택 */}
@@ -747,9 +790,9 @@ export default function MuyojeongHomePage() {
                         disabled={isLoading}
                         style={{
                           ...chipBase,
-                          color:       active ? '#130b1e' : 'rgba(255,255,255,0.78)',
-                          background:  active ? '#6EB8FF'  : 'rgba(255,255,255,0.06)',
-                          borderColor: active ? '#6EB8FF'  : 'rgba(255,255,255,0.16)',
+                          color:       active ? '#fff' : 'var(--soul-chip-text)',
+                          background:  active ? 'var(--soul-accent)' : 'var(--soul-chip-bg)',
+                          borderColor: active ? 'var(--soul-accent)' : 'var(--soul-chip-border)',
                           fontWeight:  active ? 600 : 400,
                         }}
                       >
@@ -771,12 +814,12 @@ export default function MuyojeongHomePage() {
                     aria-label="여행 시간 (분 단위)"
                     style={{
                       width: '100px', padding: '8px 12px', borderRadius: '10px',
-                      border: '1px solid rgba(255,255,255,0.20)',
-                      background: 'rgba(255,255,255,0.07)',
-                      color: 'white', fontSize: '0.875rem', outline: 'none',
+                      border: '1px solid var(--soul-chip-border)',
+                      background: 'var(--soul-input-bg)',
+                      color: 'var(--soul-text)', fontSize: '0.875rem', outline: 'none',
                     }}
                   />
-                  <span style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.45)' }}>분</span>
+                  <span style={{ fontSize: '0.875rem', color: 'var(--soul-text-subtle)' }}>분</span>
                   {routeMinutes && (parseInt(routeMinutes, 10) < 60 || parseInt(routeMinutes, 10) > 540) && (
                     <span style={{ fontSize: '0.75rem', color: 'rgba(255,100,100,0.80)' }}>60~540분</span>
                   )}
@@ -785,7 +828,7 @@ export default function MuyojeongHomePage() {
 
               {/* 선택 요약 */}
               {routePlaces.length > 0 && (
-                <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.45)', margin: 0, wordBreak: 'keep-all' }}>
+                <p style={{ fontSize: '0.75rem', color: 'var(--soul-text-subtle)', margin: 0, wordBreak: 'keep-all' }}>
                   선택: {routePlaces.map(p => p.name).join(' · ')}
                   {isValid && ` · ${routeMinutes}분`}
                 </p>
@@ -797,9 +840,9 @@ export default function MuyojeongHomePage() {
                 disabled={!isValid || isLoading}
                 style={{
                   width: '100%', padding: '13px 16px', borderRadius: '12px',
-                  background: isValid ? 'rgba(110,184,255,0.85)' : 'rgba(110,184,255,0.18)',
+                  background: isValid ? 'var(--soul-send-active)' : 'var(--soul-send-inactive)',
                   border: 'none',
-                  color: isValid ? '#fff' : 'rgba(255,255,255,0.30)',
+                  color: '#fff',
                   fontSize: '0.9375rem', fontWeight: 600, cursor: isValid ? 'pointer' : 'default',
                   transition: 'background 0.15s',
                 }}
@@ -814,9 +857,9 @@ export default function MuyojeongHomePage() {
         {isLoading && (
           <div
             className="rounded-2xl text-center py-4"
-            style={{ background: 'rgba(110,184,255,0.05)', border: '1px solid rgba(110,184,255,0.12)' }}
+            style={{ background: 'var(--soul-card-bg)', border: '1px solid var(--soul-card-border)' }}
           >
-            <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.48)' }}>
+            <p style={{ fontSize: '0.875rem', color: 'var(--soul-text-muted)' }}>
               SOUL이 여수 여행 정보를 찾고 있어요…
             </p>
           </div>
@@ -826,9 +869,9 @@ export default function MuyojeongHomePage() {
         {errorMsg && !isLoading && (
           <div
             className="rounded-2xl p-4"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+            style={{ background: 'var(--soul-chip-bg)', border: '1px solid var(--soul-chip-border)' }}
           >
-            <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.58)', wordBreak: 'keep-all', marginBottom: '8px' }}>
+            <p style={{ fontSize: '0.875rem', color: 'var(--soul-text-muted)', wordBreak: 'keep-all', marginBottom: '8px' }}>
               {errorMsg}
             </p>
             <button
@@ -863,7 +906,7 @@ export default function MuyojeongHomePage() {
           <p
             style={{
               fontSize:      '0.6875rem',
-              color:         'rgba(255,255,255,0.30)',
+              color:         'var(--soul-text-subtle)',
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
               marginBottom:  '10px',
@@ -885,7 +928,7 @@ export default function MuyojeongHomePage() {
                   cursor:       'pointer',
                   background:   'none',
                   padding:      0,
-                  border:       '1px solid rgba(255,255,255,0.10)',
+                  border:       '1px solid var(--soul-chip-border)',
                 }}
               >
                 <div
@@ -930,7 +973,7 @@ export default function MuyojeongHomePage() {
           <p
             style={{
               fontSize:   '0.6875rem',
-              color:      'rgba(255,255,255,0.20)',
+              color:      'var(--soul-text-subtle)',
               lineHeight: 1.6,
               wordBreak:  'keep-all',
             }}
