@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-02T04:48:41.275Z",
+  "generated_at": "2026-11-02T05:43:13.541Z",
   "generator": "generate-manifest.js",
-  "total_count": 552,
+  "total_count": 553,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -9536,6 +9536,25 @@
       "title": "MASTER-CONTROL — 회의센터 출입구",
       "created_at": "|----|------|------|",
       "checksum": "75826de7"
+    },
+    {
+      "id": "DOC-COMMERCE-HOTEL-SYSTEM-STATE-EV",
+      "path": "docs/knowledge/COMMERCE-HOTEL-SYSTEM-STATE-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "storybook",
+        "가격",
+        "결제"
+      ],
+      "owner": "code",
+      "status": "|------------",
+      "title": "호텔 예약 시스템 현황 Evidence",
+      "created_at": "|------|------|",
+      "checksum": "7346a3f3"
     },
     {
       "id": "DOC-DreamTown_Miracle_System_SSOT",

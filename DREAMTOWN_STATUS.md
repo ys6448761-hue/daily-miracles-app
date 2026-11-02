@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-11-02 (COMMERCE_PACKAGE_PHASE1_CONFIRMED)
+Last Updated: 2026-11-02 (HOTEL_SYSTEM_STATE_CONFIRMED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -37,7 +37,12 @@ Last Updated: 2026-11-02 (COMMERCE_PACKAGE_PHASE1_CONFIRMED)
   1. **라마다 실 PIN NOT_READY** → 파트너 담당자에게 실 PIN 요청 (Founder Action)
   2. 운영 서버 코드 버전 확인 — Blocked (FTP/SSH 또는 파일 제공 필요)
   3. 패키지 단일 티켓 발권 시 호텔+레저 확인 방법 — 발권 테스트 필요
-- Evidence: `docs/knowledge/COMMERCE-PACKAGE-PHASE1-EVIDENCE.md`
+- Evidence: `docs/knowledge/COMMERCE-PACKAGE-PHASE1-EVIDENCE.md`, `docs/knowledge/COMMERCE-HOTEL-SYSTEM-STATE-EVIDENCE.md`
+- **호텔 시스템 현황 확인됨** (2026-11-02):
+  - Production DB: FLOW 4테이블 + SODAM + SOWON_ID(58 rows live) **모두 APPLIED**
+  - 코드: `staging/storybook-c7a`에 5개 서비스 + 3개 라우트 완전 구현 — **main 미병합**
+  - E2E: Kenny + Ramada 9체크 PASS (hold→booking까지. NicePay 연결 미포함)
+  - 판매 경로 A(티켓사이트 독립 상품): 추가 개발 없음 / 경로 B(FLOW 완성): NicePay 연결·UI 필요
 - **하멜등대 QA**: QA PASS 4개 항목 (Place Hero/제목/태그라인/Essential Info) — 나머지 미확인 유지
 
 **이전 Next Action: 하멜등대 Living Detail V0.1 — Founder 브라우저 QA 나머지 항목 완료 대기**
