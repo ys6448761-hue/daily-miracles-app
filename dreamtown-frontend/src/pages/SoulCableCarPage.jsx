@@ -2002,6 +2002,29 @@ export default function SoulCableCarPage() {
           </Card>
         )}
 
+        {/* ── HAMEL: CONTEXT — 낮의 하멜등대 전경 ── */}
+        {/* Source: Hamel_Lighthouse/Context/Hamel_Lighthouse_Context_V1.png (Founder asset) */}
+        {isHamelView && (
+          <div className="rounded-2xl overflow-hidden relative" style={{ minHeight: '220px' }}>
+            <img
+              src="/images/soul/hamel-lighthouse/context-v1.png"
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ objectPosition: 'center 40%' }}
+              onError={(e) => { e.currentTarget.parentElement.style.display = 'none'; }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: 'linear-gradient(to top, rgba(10,22,40,0.45) 0%, transparent 55%)' }}
+            />
+            <div className="relative z-10 p-4 flex flex-col justify-end" style={{ minHeight: '220px' }}>
+              <div className="mt-auto">
+                <p className="text-xs text-white opacity-60">낮의 하멜등대</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ── HAMEL: WISH SCENE — 소원을 품고 바라보는 별빛 항로 ── */}
         {/* Source: Hamel_Lighthouse/Wish_Scene/ (Founder asset) */}
         {/* onError pattern: 자산 복사 전까지 섹션 자동 은닉 */}
