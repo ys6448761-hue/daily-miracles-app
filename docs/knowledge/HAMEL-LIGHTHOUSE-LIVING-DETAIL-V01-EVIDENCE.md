@@ -1,7 +1,7 @@
 # 하멜등대 Living Detail Page V0.1 — 구현 Evidence
 
 **Date**: 2026-11-02  
-**Status**: HAMEL_LIVING_DETAIL_V01_FOUNDER_QA_PARTIAL  
+**Status**: HAMEL_LIVING_DETAIL_V01_CONTEXT_ADDED  
 **Branch**: `docs/pr134-merged-state-sync`
 
 ---
@@ -24,11 +24,11 @@
 | Place Hero | `C:\DREAM TOWN\Assets\SOUL\Hamel_Lighthouse\Place_Hero\Hamel_Lighthouse_Place_Hero_V2.png` | `dreamtown-frontend/public/images/soul/place-hero/hamel-lighthouse.png` |
 | Experience | `C:\DREAM TOWN\Assets\SOUL\Hamel_Lighthouse\Experience\Hamel_Lighthouse_Experience.png` | `dreamtown-frontend/public/images/soul/hamel-lighthouse/experience-v1.png` |
 | Wish Scene | `C:\DREAM TOWN\Assets\SOUL\Hamel_Lighthouse\Wish_Scene\Hamel_Lighthouse_Wish_Scene_V1.png` | `dreamtown-frontend/public/images/soul/hamel-lighthouse/wish-scene.png` |
+| Context (낮 전경) | `C:\DREAM TOWN\Assets\SOUL\Hamel_Lighthouse\Context\Hamel_Lighthouse_Context_V1.png` | `dreamtown-frontend/public/images/soul/hamel-lighthouse/context-v1.png` |
 
 **원본 보존 확인** ✅ — Copy-Item 사용. 원본 6종 모두 `C:\DREAM TOWN\Assets\SOUL\Hamel_Lighthouse\` 에 보존됨.
 
 **미사용 원본 파일** (서비스 미등록):
-- `Context/Hamel_Lighthouse_Context_V1.png` — Context 이미지 (V0.1 범위 외)
 - `Journey/Hamel_Lighthouse_Journey.png` — Journey 이미지 (V0.1 범위 외)
 - `Experience/Hamel_Lighthouse_Experience_V1_Archive.png.png` — Archive 파일, 미사용
 
@@ -87,6 +87,7 @@
 | 페이지 제목 (`하멜등대`) | ✅ PASS — Founder 확인 |
 | 태그라인 (`바다를 향한 등대 · 희망을 바라보는 별빛 항로`) | ✅ PASS — Founder 확인 |
 | Essential Info (무료/24시간/1899-2012) | ✅ PASS — Founder 확인 |
+| Context 이미지 (낮 전경) | 🔲 미확인 — context-v1.png 추가 후 QA 대기 (SHA `c3a27d2`) |
 | Experience 이미지 | 🔲 미확인 — Founder QA 대기 |
 | Wish Scene 이미지 | 🔲 미확인 — Founder QA 대기 |
 | SOUL Discovery 텍스트 | 🔲 미확인 — Founder QA 대기 |
@@ -95,6 +96,14 @@
 | 기존 오동도 회귀 | 🔲 미확인 — Founder QA 대기 |
 | 기존 향일암 회귀 | 🔲 미확인 — Founder QA 대기 |
 | 브라우저 콘솔 404 없음 | 🔲 미확인 — Founder QA 대기 |
+
+## §4-B Context 이미지 추가 (2026-11-02, Founder QA 보완)
+
+- **원본**: `C:\DREAM TOWN\Assets\SOUL\Hamel_Lighthouse\Context\Hamel_Lighthouse_Context_V1.png` (보존)
+- **서비스**: `hamel-lighthouse/context-v1.png` (SHA `c3a27d2`)
+- **배치**: 기존 Context 슬롯 패턴 재사용 — EXPERIENCE TEXT → Context → WISH SCENE
+- **캡션**: `낮의 하멜등대`
+- **빌드**: dist 4종 포함 확인 (place-hero / experience-v1 / context-v1 / wish-scene)
 
 ---
 
