@@ -2253,7 +2253,11 @@ export default function SoulCableCarPage() {
           <button
             disabled
             className="w-full py-3 rounded-2xl text-sm font-semibold border transition-all cursor-not-allowed"
-            style={{
+            style={resolvedTheme === 'sunshine' ? {
+              background: 'rgba(36,103,143,0.08)',
+              borderColor: 'rgba(36,103,143,0.22)',
+              color: 'rgba(23,50,77,0.45)',
+            } : {
               background: 'rgba(155,135,245,0.15)',
               borderColor: 'rgba(155,135,245,0.3)',
               color: 'rgba(255,255,255,0.5)',

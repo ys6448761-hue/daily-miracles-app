@@ -1,8 +1,8 @@
 # SOUL 낮·밤 테마 V0.1 구현 Evidence
 
 **Date**: 2026-11-02 ~ 2026-11-03  
-**Status**: FOUNDER_QA_PASS — 배포 대기 (Founder 별도 승인 필요)  
-**Branch**: docs/pr134-merged-state-sync → PR 대상: main
+**Status**: PRODUCTION_QA_PASS — PR #137 병합 + Render 수동 배포 대기  
+**Branch**: fix/soul-btn-contrast → PR #137 (main)
 
 ---
 
@@ -86,6 +86,8 @@
 | 1차 QA | 2026-11-02 | FAIL | Living Detail 배경 미전환 (self-selector 버그) |
 | 2차 QA | 2026-11-03 | FAIL (잔여 2건) | 보조 글자 흐림 + Experience 캡션 미전환 |
 | 3차 QA | 2026-11-03 | **PASS** | 오동도 햇살 SOUL 전체 항목 확인 |
+| Production QA | 2026-11-03 | **PASS** (잔여 1건) | 향일암 Living Detail 햇살 모드. 비활성화 버튼 대비 수정 필요 |
+| Production QA 최종 | 2026-11-03 | **PASS** | PR #137 수정 반영 후 종료 |
 
 **Founder QA 3차 PASS 항목**
 - ✅ 밝은 배경 전환 정상
@@ -93,6 +95,13 @@
 - ✅ Place Hero 제목 및 설명 정상
 - ✅ Experience 이미지 캡션 표시 개선
 - ✅ SOUL 본문과 이미지 배치 정상
+
+**Production QA PASS 항목 (향일암 기준)**
+- ✅ 운영 사이트 접근
+- ✅ 햇살 모드 밝은 배경
+- ✅ SOUL 본문 및 여행 안내 표시
+- ✅ 모바일 레이아웃
+- ✅ (PR #137) 비활성화 버튼 글자 대비 보완 — disabled 상태 유지
 
 ---
 
@@ -118,6 +127,8 @@
 | `b07b024` | fix: Living Detail 배경 미전환 수정 (self-selector 버그) |
 | `73a7cb5` | fix: 보조 글자 대비 개선 + Place Hero 캡션 흰색 유지 |
 | `53d89f6` | fix: Essential Info note 대비 강화 + Experience 이미지 캡션 수정 |
+| `dfcd97c` | **PR #135 MERGED main** — SOUL 테마 V0.1 병합 (2026-11-03) |
+| `cca8247` | fix: 비활성화 버튼 햇살 모드 글자 대비 보완 (PR #137) |
 
 ---
 
@@ -125,12 +136,14 @@
 
 | 항목 | 값 |
 |------|-----|
-| 배포 대상 브랜치 | `docs/pr134-merged-state-sync` |
-| HEAD SHA | `53d89f6` |
-| PR 대상 | `main` |
-| 배포 방법 | PR 생성 → Founder 승인 → merge → Render Auto-Deploy |
-| 롤백 방법 | `git revert 95d80fe..53d89f6` (4커밋 revert) 또는 Render 이전 Deploy 재활성화 |
-| Production 배포 | **미승인 — Founder 별도 승인 필요** |
+| main HEAD (테마) | `dfcd97c` (PR #135 MERGED) |
+| main HEAD (버튼 fix) | `cca8247` (PR #137 대기 중) |
+| PR #135 | MERGED 2026-11-03 |
+| PR #136 | OPEN — docs only, Founder 직접 병합 |
+| PR #137 | OPEN — 비활성화 버튼 대비 fix |
+| Render Auto-Deploy | OFF 유지 |
+| Production 배포 | **Founder 별도 승인 필요** (PR #137 병합 후) |
+| 롤백 방법 | Render 이전 Deploy 재활성화 |
 
 ---
 
