@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-02T21:34:45.338Z",
+  "generated_at": "2026-11-02T21:57:27.870Z",
   "generator": "generate-manifest.js",
   "total_count": 556,
   "documents": [
@@ -487,7 +487,7 @@
       "status": "active",
       "title": "SOUL 낮·밤 테마 V0.1 구현 Evidence",
       "created_at": "결과",
-      "checksum": "7a6a94b1"
+      "checksum": "00ba42c1"
     },
     {
       "id": "DOC-aurora5-master-knowledge-v2",
@@ -2769,7 +2769,7 @@
       "status": "해소 조건",
       "title": "커머스 Phase 1 — 복합상품 운영 코드 정합성 조사 Evidence",
       "created_at": "2026-11-02",
-      "checksum": "47731e5a"
+      "checksum": "465c7b9e"
     },
     {
       "id": "DOC-COMMERCE-PIN-ROLE-EVIDENCE",
@@ -2787,7 +2787,7 @@
       "status": "active",
       "title": "PIN 역할 및 적용 경로 확인 Evidence",
       "created_at": "2026-11-02",
-      "checksum": "5e9e30d6"
+      "checksum": "6b787daa"
     },
     {
       "id": "DOC-COURSE-PLANNING-8H-TRACE-V0_1",
@@ -2980,7 +2980,7 @@
       "status": "archived",
       "title": "하멜등대 Living Detail Page V0.1 — 구현 Evidence",
       "created_at": "2026-11-02",
-      "checksum": "e2479390"
+      "checksum": "1b1dcec3"
     },
     {
       "id": "DOC-IMPL-PLAN-B-001_Hotel_Nighttim",
@@ -4101,7 +4101,7 @@
       "status": "superseded",
       "title": "MUYOJEONG_V01_PRODUCTION_QA_PASSED Evidence",
       "created_at": "2026-11-02",
-      "checksum": "cbfb03cb"
+      "checksum": "5e8f751d"
     },
     {
       "id": "DOC-Change_Log",
@@ -5313,7 +5313,7 @@
       "status": "active",
       "title": "PR-SOUL-THEME-V01-BODY",
       "created_at": "2026-11-02",
-      "checksum": "c2a66430"
+      "checksum": "b9393408"
     },
     {
       "id": "DOC-REMAINING_CHANGES_COMMIT_SCOPE",
@@ -9606,7 +9606,7 @@
       "status": "|------------",
       "title": "호텔 예약 시스템 현황 Evidence",
       "created_at": "|------|------|",
-      "checksum": "7346a3f3"
+      "checksum": "0834dc15"
     },
     {
       "id": "DOC-DreamTown_Miracle_System_SSOT",
