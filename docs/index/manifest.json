@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-02T21:23:21.113Z",
+  "generated_at": "2026-11-02T21:34:45.338Z",
   "generator": "generate-manifest.js",
-  "total_count": 555,
+  "total_count": 556,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -5297,6 +5297,23 @@
       "title": "GATE 6 — Hamel Continuity Regeneration Prompt Pack 보고서",
       "created_at": "2026-11-02",
       "checksum": "210ed8d9"
+    },
+    {
+      "id": "DOC-PR-SOUL-THEME-V01-BODY",
+      "path": "docs/reports/PR-SOUL-THEME-V01-BODY.md",
+      "type": "report",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "reports",
+      "tags": [
+        "reports",
+        "결제"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "PR-SOUL-THEME-V01-BODY",
+      "created_at": "2026-11-02",
+      "checksum": "c2a66430"
     },
     {
       "id": "DOC-REMAINING_CHANGES_COMMIT_SCOPE",
