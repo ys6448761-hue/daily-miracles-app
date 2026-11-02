@@ -1,7 +1,7 @@
 # 하멜등대 Living Detail Page V0.1 — 구현 Evidence
 
 **Date**: 2026-11-02  
-**Status**: HAMEL_LIVING_DETAIL_V01_ASSETS_REGISTERED  
+**Status**: HAMEL_LIVING_DETAIL_V01_FOUNDER_QA_PARTIAL  
 **Branch**: `docs/pr134-merged-state-sync`
 
 ---
@@ -64,14 +64,37 @@
 |------|------|
 | Vite 빌드 | ✅ 698 modules, exit 0 |
 | dist 이미지 3종 포함 | ✅ |
-| Jest 회귀 | ✅ 639/640 PASS |
-| R20 PRE-EXISTING FAIL | `map-draft-persistence-runtime.test.js` "must contain at least one test" — 미해결 기존 이슈 |
-| 17 suite worker exceptions | PRE-EXISTING 인프라 이슈 — 신규 실패 없음 |
+| Jest 회귀 | 639/640 PASS (전체 PASS로 기록하지 않음) |
+| R20 PRE-EXISTING FAIL | `map-draft-persistence-runtime.test.js` "must contain at least one test" — **미해결, 미수정** |
+| 17 suite worker exceptions | **PRE-EXISTING 인프라 이슈 — 미해결, 미수정** |
 
-**Jest 실패 분류:**
+**Jest 실패 분류 (미해결 항목 명시):**
 - **신규 실패**: 0건
-- **PRE-EXISTING (R20)**: 1건 — `map-draft-persistence-runtime.test.js` (빈 테스트 스위트)
-- **PRE-EXISTING worker 오류**: 17 suites — child process exception, 기존 동일
+- **PRE-EXISTING (R20) — 미해결**: 1건 — `map-draft-persistence-runtime.test.js` (빈 테스트 스위트)
+- **PRE-EXISTING worker 오류 — 미해결**: 17 suites — child process exception, 기존 동일
+
+---
+
+## §4-A Founder 브라우저 QA (2026-11-02)
+
+**QA URL**: `http://localhost:5000/soul/cable-car?place=hamel_lighthouse`  
+**서버**: port 5000 (PID 25068, `node server.js`, `C:\DEV\daily-miracles-mvp`)  
+**이미지 서빙 경로**: `dreamtown-frontend/dist/images/soul/` (server.js line 85)
+
+| 항목 | 결과 |
+|------|------|
+| Place Hero 이미지 | ✅ PASS — Founder 확인 |
+| 페이지 제목 (`하멜등대`) | ✅ PASS — Founder 확인 |
+| 태그라인 (`바다를 향한 등대 · 희망을 바라보는 별빛 항로`) | ✅ PASS — Founder 확인 |
+| Essential Info (무료/24시간/1899-2012) | ✅ PASS — Founder 확인 |
+| Experience 이미지 | 🔲 미확인 — Founder QA 대기 |
+| Wish Scene 이미지 | 🔲 미확인 — Founder QA 대기 |
+| SOUL Discovery 텍스트 | 🔲 미확인 — Founder QA 대기 |
+| SOUL 질문 기능 | 🔲 미확인 — Founder QA 대기 |
+| 기존 케이블카 회귀 | 🔲 미확인 — Founder QA 대기 |
+| 기존 오동도 회귀 | 🔲 미확인 — Founder QA 대기 |
+| 기존 향일암 회귀 | 🔲 미확인 — Founder QA 대기 |
+| 브라우저 콘솔 404 없음 | 🔲 미확인 — Founder QA 대기 |
 
 ---
 

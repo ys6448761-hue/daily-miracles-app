@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-11-02 (HAMEL_LIVING_DETAIL_V01_ASSETS_REGISTERED)
+Last Updated: 2026-11-02 (HAMEL_LIVING_DETAIL_V01_FOUNDER_QA_PARTIAL)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,16 +23,20 @@ Last Updated: 2026-11-02 (HAMEL_LIVING_DETAIL_V01_ASSETS_REGISTERED)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-11-02
 
-**하멜등대 Living Detail V0.1 — Founder 브라우저 QA (`/soul/cable-car?place=hamel_lighthouse`)**
-- **HAMEL_LIVING_DETAIL_V01_ASSETS_REGISTERED** ✅ (2026-11-02)
-  - 코드 구현: SHA `705afc1` / 이미지 자산 등록: SHA `c105b40`
-  - 원본 3종 보존 (`C:\DREAM TOWN\Assets\SOUL\Hamel_Lighthouse\`) ✅
-  - 서비스 경로: `dreamtown-frontend/public/images/soul/hamel-lighthouse/` ✅
-  - 빌드: 698 modules ✅ / 회귀: 639/640 PASS (R20 PRE-EXISTING) ✅
-  - URL: `/soul/cable-car?place=hamel_lighthouse`
-  - Evidence: `docs/knowledge/HAMEL-LIGHTHOUSE-LIVING-DETAIL-V01-EVIDENCE.md`
-  - **Founder QA 필요**: 이미지 표시 / SOUL 진입 버튼 / 기존 3곳 정상 동작
-  - **Production 배포: 미승인** — PR #135 merge + Founder 별도 승인 필요
+**하멜등대 Living Detail V0.1 — Founder 브라우저 QA 나머지 항목 완료 대기**
+- **HAMEL_LIVING_DETAIL_V01_FOUNDER_QA_PARTIAL** (2026-11-02)
+  - **QA PASS (Founder 확인)**: Place Hero ✅ / 제목 ✅ / 태그라인 ✅ / Essential Info ✅
+  - **QA 대기**: Experience·WishScene 이미지 / SOUL 텍스트·질문 / 기존 3곳 회귀 / 콘솔 404
+  - QA URL: `http://localhost:5000/soul/cable-car?place=hamel_lighthouse`
+  - 코드 SHA: `705afc1` / 이미지 SHA: `c105b40`
+  - Evidence: `docs/knowledge/HAMEL-LIGHTHOUSE-LIVING-DETAIL-V01-EVIDENCE.md` §4-A
+  - **Production 배포: 미승인** — Founder QA 완료 + PR #135 merge 필요
+- **로컬 서버 구성 확인** (2026-11-02)
+  - port 5000 (PID 25068): Express 백엔드 + dist 서빙 (`daily-miracles-mvp`)
+  - port 5002 (PID 9924): Express 백엔드 동일 프로젝트, 별도 포트
+  - port 3000 (PID 45852): Vite dev server (`dreamtown-frontend`)
+  - `/images/soul/*` → `dreamtown-frontend/dist/images/soul/` (server.js line 85)
+- **`reportScheduler` 누락**: `services/reportScheduler.js` 미존재. 로컬(SQLite)에서는 `DATABASE_URL` 없어 미실행 → QA 영향 없음. 운영 환경 영향 별도 조사 필요.
 
 **이전 Next Action: 무여정 V0.1 PRODUCTION LIVE — Founder 브라우저 UI QA (4버튼·지도 화면 직접 확인)**
 - **MUYOJEONG_V01_PRODUCTION_QA_PASSED** ✅ (2026-10-30)

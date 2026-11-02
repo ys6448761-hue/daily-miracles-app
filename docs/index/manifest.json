@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-02T01:35:33.802Z",
+  "generated_at": "2026-11-02T02:10:06.433Z",
   "generator": "generate-manifest.js",
   "total_count": 551,
   "documents": [
@@ -2928,7 +2928,7 @@
       "status": "archived",
       "title": "하멜등대 Living Detail Page V0.1 — 구현 Evidence",
       "created_at": "2026-11-02",
-      "checksum": "d22d9bd6"
+      "checksum": "a8a01340"
     },
     {
       "id": "DOC-IMPL-PLAN-B-001_Hotel_Nighttim",
