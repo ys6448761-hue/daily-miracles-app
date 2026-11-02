@@ -1,8 +1,8 @@
 # SOUL 낮·밤 테마 V0.1 구현 Evidence
 
 **Date**: 2026-11-02 ~ 2026-11-03  
-**Status**: PRODUCTION_QA_PASS — PR #137 병합 + Render 수동 배포 대기  
-**Branch**: fix/soul-btn-contrast → PR #137 (main)
+**Status**: CLOSED — PR #137 MERGED (1f02c5c). Render 수동 배포 대기 (Founder 승인 필요)  
+**최종 main SHA**: `1f02c5c` (PR #137, 2026-11-03)
 
 ---
 
@@ -128,7 +128,8 @@
 | `73a7cb5` | fix: 보조 글자 대비 개선 + Place Hero 캡션 흰색 유지 |
 | `53d89f6` | fix: Essential Info note 대비 강화 + Experience 이미지 캡션 수정 |
 | `dfcd97c` | **PR #135 MERGED main** — SOUL 테마 V0.1 병합 (2026-11-03) |
-| `cca8247` | fix: 비활성화 버튼 햇살 모드 글자 대비 보완 (PR #137) |
+| `cca8247` | fix: 비활성화 버튼 햇살 모드 글자 대비 보완 |
+| `1f02c5c` | **PR #137 MERGED main** — 비활성화 버튼 대비 fix + CLOSED (2026-11-03) |
 
 ---
 
@@ -136,14 +137,13 @@
 
 | 항목 | 값 |
 |------|-----|
-| main HEAD (테마) | `dfcd97c` (PR #135 MERGED) |
-| main HEAD (버튼 fix) | `cca8247` (PR #137 대기 중) |
-| PR #135 | MERGED 2026-11-03 |
-| PR #136 | OPEN — docs only, Founder 직접 병합 |
-| PR #137 | OPEN — 비활성화 버튼 대비 fix |
-| Render Auto-Deploy | OFF 유지 |
-| Production 배포 | **Founder 별도 승인 필요** (PR #137 병합 후) |
-| 롤백 방법 | Render 이전 Deploy 재활성화 |
+| **Render 배포 대상 SHA** | **`1f02c5c`** |
+| PR #135 | MERGED `dfcd97c` (2026-11-03) |
+| PR #136 | CLOSED — 중복/구버전, 기록 손실 없음 |
+| PR #137 | MERGED `1f02c5c` (2026-11-03) |
+| Render Auto-Deploy | OFF — Founder 수동 배포 승인 필요 |
+| 배포 검증 항목 | 햇살 모드 비활성화 버튼 대비 + 별빛 모드 회귀 없음 |
+| 롤백 방법 | Render 이전 Deploy 재활성화 (즉각) |
 
 ---
 

@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-11-03 (SOUL_THEME_V01_PRODUCTION_QA_PASS — PR #137 병합 대기)
+Last Updated: 2026-11-03 (SOUL_THEME_V01_CLOSED — PR #137 MERGED, Render 배포 대기)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -28,19 +28,17 @@ Last Updated: 2026-11-03 (SOUL_THEME_V01_PRODUCTION_QA_PASS — PR #137 병합 �
 
 ---
 
-### SOUL 낮·밤 테마 V0.1 — PRODUCTION_QA_PASS (PR #137 병합 후 배포 종료) 🟢
+### SOUL 낮·밤 테마 V0.1 — CLOSED (Render 배포 대기) ✅
 
-- **SOUL_THEME_V01_MERGED_MAIN** ✅ PR #135 MERGED (dfcd97c, 2026-11-03)
-- **PRODUCTION_QA_PASS** ✅ 향일암 Living Detail 햇살 모드 — 운영 확인 (2026-11-03)
-  - 밝은 배경/SOUL 본문/모바일 레이아웃 PASS
-  - 잔여 수정: 비활성화 버튼 대비 → **PR #137** OPEN (cca8247)
-- **PR #137**: https://github.com/ys6448761-hue/daily-miracles-app/pull/137
-  - fix: 비활성화 버튼 햇살 모드 글자 대비 보완 (5행 변경, 버튼 활성화 없음)
-  - 빌드 ✅ 699 modules / 테스트 ✅ 639/640 PASS (R20 PRE-EXISTING 동일)
-- **PR #136**: https://github.com/ys6448761-hue/daily-miracles-app/pull/136 — docs only (Founder 직접 병합)
-- **Render Auto-Deploy**: OFF 유지 → PR #137 병합 후 Founder 수동 배포
+- **PR #135 MERGED** ✅ main SHA: `dfcd97c` (2026-11-03)
+- **PR #137 MERGED** ✅ main SHA: **`1f02c5c`** — 비활성화 버튼 대비 fix (2026-11-03)
+- **PR #136 CLOSED** — 중복/구버전 (docs/reports/PR-SOUL-THEME-V01-BODY.md 이미 main 반영)
+- **PRODUCTION_QA_PASS** ✅ 향일암 햇살 모드 — 밝은 배경/SOUL 본문/모바일 PASS
+- **Render 배포 대상 SHA**: **`1f02c5c`** — Founder 수동 배포 승인 후 실행
+- **배포 검증 URL**: `app.dailymiracles.kr/muyojeong` (햇살 모드 비활성화 버튼 + 별빛 모드 회귀 확인)
+- **롤백**: Render 이전 Deploy 재활성화 (즉각)
 - **Evidence**: `docs/knowledge/SOUL-THEME-V01-EVIDENCE.md`
-- **종료 조건**: PR #137 병합 + Render 수동 배포 → SOUL 테마 V0.1 CLOSED
+- **추가 SOUL UI 개발**: 없음 (Founder 결정)
 
 ---
 
