@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-11-02 (HAMEL_LIVING_DETAIL_V01_FOUNDER_QA_PARTIAL)
+Last Updated: 2026-11-02 (COMMERCE_PACKAGE_PHASE1_CONFIRMED)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,7 +23,24 @@ Last Updated: 2026-11-02 (HAMEL_LIVING_DETAIL_V01_FOUNDER_QA_PARTIAL)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-11-02
 
-**하멜등대 Living Detail V0.1 — Founder 브라우저 QA 나머지 항목 완료 대기**
+**커머스 Phase 1 — 낭만야경 패키지 "독립 상품 등록 방식" 결정 후 라마다 실 PIN 교체 요청**
+- **COMMERCE_PACKAGE_PHASE1_CONFIRMED** ✅ (2026-11-02)
+  - 복합상품 연결 방식 조사 완료 → 양방향 강제, 기존 단품 구매 차단 위험 → **채택 불가**
+  - **권장 방식: 패키지(30) 카테고리에 독립 상품 등록** (복합상품 연결 없음)
+    - 가격 = 패키지 총액 직접 입력 / 재고 = 수동 관리 / 발권·취소 = 기존 그대로
+    - 기존 케이블카 단품 구매에 영향 없음
+  - Founder Decision: 1박 2일 패키지 중심 전환. 신규 쇼핑몰·예약엔진 개발 금지.
+  - 호텔 후보: 라마다(PARTNER_CONFIRMED) / 케니(FOUNDER_CONFIRMED)
+  - 레저 후보: 케이블카(CONFIRMED) — 나머지 NOT_CONFIRMED
+  - 가장 조건이 갖춰진 조합: **낭만야경 = 라마다 + 케이블카**
+- **차단 조건** (해소 순서):
+  1. **라마다 실 PIN NOT_READY** → 파트너 담당자에게 실 PIN 요청 (Founder Action)
+  2. 운영 서버 코드 버전 확인 — Blocked (FTP/SSH 또는 파일 제공 필요)
+  3. 패키지 단일 티켓 발권 시 호텔+레저 확인 방법 — 발권 테스트 필요
+- Evidence: `docs/knowledge/COMMERCE-PACKAGE-PHASE1-EVIDENCE.md`
+- **하멜등대 QA**: QA PASS 4개 항목 (Place Hero/제목/태그라인/Essential Info) — 나머지 미확인 유지
+
+**이전 Next Action: 하멜등대 Living Detail V0.1 — Founder 브라우저 QA 나머지 항목 완료 대기**
 - **HAMEL_LIVING_DETAIL_V01_FOUNDER_QA_PARTIAL** (2026-11-02)
   - **QA PASS (Founder 확인)**: Place Hero ✅ / 제목 ✅ / 태그라인 ✅ / Essential Info ✅
   - **QA 대기**: Experience·WishScene 이미지 / SOUL 텍스트·질문 / 기존 3곳 회귀 / 콘솔 404
