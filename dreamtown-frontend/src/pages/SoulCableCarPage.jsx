@@ -27,6 +27,7 @@ import React, { useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getOrEnsureGuestCredential } from '../api/dreamtown.js';
 import CourseDisplay from '../components/TravelGuide/CourseDisplay.jsx';
+import { useSoulTheme } from '../contexts/SoulThemeContext.jsx';
 
 // ── Odongdo judgment texts ───────────────────────────────────────────────────
 // Source: Phoenix Knowledge — PLACE_IDENTITY_KO, itineraryService, SSOT YS01, Route Corpus
@@ -1018,6 +1019,7 @@ export default function SoulCableCarPage() {
   const navigate = useNavigate();
   const inputRef = useRef(null);
   const [searchParams] = useSearchParams();
+  const { resolvedTheme } = useSoulTheme();
 
   // Entry place from URL (?place=odongdo|hyangiram) — set by MuyojeongHomePage place cards.
   // Falls through the placeCode chain so the correct Living Detail view is shown on entry.
@@ -1180,7 +1182,10 @@ export default function SoulCableCarPage() {
   }
 
   return (
-    <div className="min-h-screen bg-night-sky text-white pb-24">
+    <div
+      className="soul-scope min-h-screen bg-night-sky text-white pb-24"
+      data-soul-theme={resolvedTheme}
+    >
 
       {/* ── HEADER ── */}
       <header className="sticky top-0 z-10 bg-night-sky bg-opacity-95 backdrop-blur-sm border-b border-white border-opacity-10">

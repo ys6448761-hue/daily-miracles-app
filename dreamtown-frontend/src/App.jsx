@@ -89,6 +89,7 @@ import LocationAdmin from './pages/admin/LocationAdmin.jsx';
 import TravelGuidePage from './pages/TravelGuidePage.jsx';
 import SoulCableCarPage from './pages/SoulCableCarPage.jsx';
 import MuyojeongHomePage from './pages/MuyojeongHomePage.jsx';
+import { SoulThemeProvider } from './contexts/SoulThemeContext.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
 if (window.location.pathname.startsWith('//')) {
@@ -107,6 +108,7 @@ function RouteMissDiagnostic() {
 
 export default function App() {
   return (
+    <SoulThemeProvider>
     <BrowserRouter>
       <div className="min-h-screen bg-night-sky max-w-md mx-auto relative">
         <JourneySceneEngine />
@@ -228,5 +230,6 @@ export default function App() {
         </Routes>
       </div>
     </BrowserRouter>
+    </SoulThemeProvider>
   );
 }

@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-11-02 (PIN_ROLE_CONFIRMED)
+Last Updated: 2026-11-02 (SOUL_THEME_V01_BUILD_PASS)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,7 +23,28 @@ Last Updated: 2026-11-02 (PIN_ROLE_CONFIRMED)
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-11-02
 
-**커머스 Phase 1 — 낭만야경 패키지 "독립 상품 등록 방식" 결정 후 라마다 실 PIN 교체 요청**
+**SOUL 낮·밤 테마 V0.1 — Founder 브라우저 QA → PASS 시 PR 생성 → Production 배포 승인 요청**
+- **SOUL_THEME_V01_BUILD_PASS** ✅ (2026-11-02) — 699 modules, 에러 없음
+  - `SoulThemeContext.jsx` 신규: 자동(시간)·수동(localStorage) + visibilitychange 감지
+  - `index.css`: `.soul-scope` CSS 변수 블록 + Tailwind override
+  - `App.jsx`: `SoulThemeProvider` 래핑
+  - `MuyojeongHomePage.jsx`: 전체 색상 CSS 변수화 + hero 우상단 토글 UI (자동/☀️/✦)
+  - `SoulCableCarPage.jsx`: wrapper에 `soul-scope` + `data-soul-theme` (CSS override 방식)
+  - Evidence: `docs/knowledge/SOUL-THEME-V01-EVIDENCE.md`
+- **Founder QA 체크리스트** (`http://localhost:5000/muyojeong`):
+  - [ ] 자동 테마 초기값 (현재 시간 기준)
+  - [ ] 토글 표시 및 터치 가능
+  - [ ] 햇살(☀️): 배경 밝아지고 텍스트 읽히는지
+  - [ ] 별빛(✦): 기존 어두운 배경 복귀
+  - [ ] `/soul/cable-car` 이동 후 선택 유지
+  - [ ] localStorage 유지 (앱 닫고 재방문)
+  - [ ] 콘솔 404 없음
+  - [ ] 모바일 375px 레이아웃 이상 없음
+- **QA PASS 후**: PR 생성 → Production 배포 별도 Founder 승인
+
+---
+
+**커머스 Phase 1 — 낭만야경 패키지 "독립 상품 등록 방식" 결정 후 라마다 실 PIN 교체 요청 (HOLD)**
 - **COMMERCE_PACKAGE_PHASE1_CONFIRMED** ✅ (2026-11-02)
   - 복합상품 연결 방식 조사 완료 → 양방향 강제, 기존 단품 구매 차단 위험 → **채택 불가**
   - **권장 방식: 패키지(30) 카테고리에 독립 상품 등록** (복합상품 연결 없음)
