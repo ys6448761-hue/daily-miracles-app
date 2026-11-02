@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-02T07:43:28.958Z",
+  "generated_at": "2026-11-02T21:23:21.113Z",
   "generator": "generate-manifest.js",
   "total_count": 555,
   "documents": [
@@ -471,6 +471,23 @@
       "title": "DreamTown Galaxy Mode SSOT",
       "created_at": "내용",
       "checksum": "bae6a841"
+    },
+    {
+      "id": "DOC-SOUL-THEME-V01-EVIDENCE",
+      "path": "docs/knowledge/SOUL-THEME-V01-EVIDENCE.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "결제"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "SOUL 낮·밤 테마 V0.1 구현 Evidence",
+      "created_at": "결과",
+      "checksum": "7a6a94b1"
     },
     {
       "id": "DOC-aurora5-master-knowledge-v2",
@@ -4282,23 +4299,6 @@
       "title": "SOUL CAR INTENT RESPONSE UX Evidence",
       "created_at": "2026-11-02",
       "checksum": "ba397e5e"
-    },
-    {
-      "id": "DOC-SOUL-THEME-V01-EVIDENCE",
-      "path": "docs/knowledge/SOUL-THEME-V01-EVIDENCE.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge",
-        "결제"
-      ],
-      "owner": "team",
-      "status": "active",
-      "title": "SOUL 낮·밤 테마 V0.1 구현 Evidence",
-      "created_at": "2026-11-02",
-      "checksum": "d723da08"
     },
     {
       "id": "DOC-SOUL-VEHICLE-GUIDANCE-MINIMAL-",

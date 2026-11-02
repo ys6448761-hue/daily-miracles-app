@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-11-02 (SOUL_THEME_V01_BUILD_PASS)
+Last Updated: 2026-11-03 (SOUL_THEME_V01_FOUNDER_QA_PASS)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -21,26 +21,27 @@ Last Updated: 2026-11-02 (SOUL_THEME_V01_BUILD_PASS)
 5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
-### ★ Current Next Action (exactly 1) — Updated: 2026-11-02
+### ★ Current Next Action (exactly 1) — Updated: 2026-11-03
 
-**SOUL 낮·밤 테마 V0.1 — Founder 브라우저 QA → PASS 시 PR 생성 → Production 배포 승인 요청**
-- **SOUL_THEME_V01_BUILD_PASS** ✅ (2026-11-02) — 699 modules, 에러 없음
-  - `SoulThemeContext.jsx` 신규: 자동(시간)·수동(localStorage) + visibilitychange 감지
-  - `index.css`: `.soul-scope` CSS 변수 블록 + Tailwind override
-  - `App.jsx`: `SoulThemeProvider` 래핑
-  - `MuyojeongHomePage.jsx`: 전체 색상 CSS 변수화 + hero 우상단 토글 UI (자동/☀️/✦)
-  - `SoulCableCarPage.jsx`: wrapper에 `soul-scope` + `data-soul-theme` (CSS override 방식)
-  - Evidence: `docs/knowledge/SOUL-THEME-V01-EVIDENCE.md`
-- **Founder QA 체크리스트** (`http://localhost:5000/muyojeong`):
-  - [ ] 자동 테마 초기값 (현재 시간 기준)
-  - [ ] 토글 표시 및 터치 가능
-  - [ ] 햇살(☀️): 배경 밝아지고 텍스트 읽히는지
-  - [ ] 별빛(✦): 기존 어두운 배경 복귀
-  - [ ] `/soul/cable-car` 이동 후 선택 유지
-  - [ ] localStorage 유지 (앱 닫고 재방문)
-  - [ ] 콘솔 404 없음
-  - [ ] 모바일 375px 레이아웃 이상 없음
-- **QA PASS 후**: PR 생성 → Production 배포 별도 Founder 승인
+**커머스 집중: 티켓사이트 ↔ FLOW 호텔 재고·예약·결제 연동**
+- 라마다 실 PIN 수령 (Founder Action) → 패키지 상품 등록 → NicePay 결제 연결
+
+---
+
+### SOUL 낮·밤 테마 V0.1 — FOUNDER_QA_PASS ✅ (2026-11-03)
+
+- **SOUL_THEME_V01_FOUNDER_QA_PASS** ✅ 오동도 햇살 SOUL 3차 검증 PASS
+  - PASS: 밝은 배경 / Essential Info 보조 글자 / Place Hero 제목 / Experience 이미지 캡션 / SOUL 본문
+- **코드팀 회귀 검증**: 639/640 PASS (R20 PRE-EXISTING 제외), DreamTown 별/Galaxy 영향 없음
+- **HEAD SHA**: `53d89f6` / 브랜치: `docs/pr134-merged-state-sync`
+- **커밋 이력**:
+  - `95d80fe` feat: 최초 구현
+  - `b07b024` fix: Living Detail 배경 self-selector 버그
+  - `73a7cb5` fix: 보조 글자 대비 + Place Hero 캡션
+  - `53d89f6` fix: Essential Info note + Experience 이미지 캡션
+- **Evidence**: `docs/knowledge/SOUL-THEME-V01-EVIDENCE.md`
+- **배포**: Founder 별도 승인 후 PR → main merge → Render Auto-Deploy
+- **롤백**: Render 이전 Deploy 재활성화 또는 `git revert 95d80fe..53d89f6`
 
 ---
 
