@@ -1183,8 +1183,9 @@ export default function SoulCableCarPage() {
 
   return (
     <div
-      className="soul-scope min-h-screen bg-night-sky text-white pb-24"
+      className="soul-scope min-h-screen pb-24"
       data-soul-theme={resolvedTheme}
+      style={{ background: 'var(--soul-bg)', color: 'var(--soul-text)' }}
     >
 
       {/* ── HEADER ── */}

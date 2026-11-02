@@ -211,6 +211,22 @@ body {
 .soul-scope[data-soul-theme="sunshine"] .text-blue-300    { color: #24678F !important; }
 .soul-scope[data-soul-theme="sunshine"] .bg-blue-900      { background-color: rgba(36, 103, 143, 0.10) !important; }
 .soul-scope[data-soul-theme="sunshine"] .border-blue-700  { border-color: rgba(36, 103, 143, 0.25) !important; }
+/* bg-white opacity variants */
+.soul-scope[data-soul-theme="sunshine"] .bg-white.bg-opacity-10 {
+  background-color: rgba(36, 103, 143, 0.10) !important;
+}
+/* placeholder 색상 override */
+.soul-scope[data-soul-theme="sunshine"] .placeholder-white::placeholder {
+  color: rgba(23, 50, 77, 0.40) !important;
+}
+/* header bg-night-sky override (자식 요소 — sticky header) */
+.soul-scope[data-soul-theme="sunshine"] .bg-night-sky {
+  background-color: #F3F8FC !important;
+}
+/* text-star-gold (전달 버튼 등) override */
+.soul-scope[data-soul-theme="sunshine"] .text-star-gold {
+  color: #24678F !important;
+}
 
 .glow-purple {
   text-shadow: 0 0 20px rgba(155, 135, 245, 0.6);
