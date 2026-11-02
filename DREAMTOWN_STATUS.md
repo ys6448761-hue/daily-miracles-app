@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-11-03 (SOUL_THEME_V01_MERGED_main)
+Last Updated: 2026-11-03 (SOUL_THEME_V01_PRODUCTION_QA_PASS — PR #137 병합 대기)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -28,20 +28,19 @@ Last Updated: 2026-11-03 (SOUL_THEME_V01_MERGED_main)
 
 ---
 
-### SOUL 낮·밤 테마 V0.1 — MERGED main ✅ (2026-11-03 21:55 KST)
+### SOUL 낮·밤 테마 V0.1 — PRODUCTION_QA_PASS (PR #137 병합 후 배포 종료) 🟢
 
-- **PR #135 MERGED**: https://github.com/ys6448761-hue/daily-miracles-app/pull/135
-  - merge commit SHA: **`dfcd97c`** / 병합 시각: 2026-11-03 21:55 KST
-  - main SHA (병합 전): `a10abbd` → (병합 후): `dfcd97c`
-- **Founder QA**: 3차 PASS (2026-11-03)
-- **코드팀 회귀 검증**: 639/640 PASS (R20 PRE-EXISTING 제외)
-- **변경 파일 18건·커밋 16건** (SOUL 테마 5 + 하멜등대 6 + commerce docs 3 + muyojeong QA 1 + AIL+state 1)
+- **SOUL_THEME_V01_MERGED_MAIN** ✅ PR #135 MERGED (dfcd97c, 2026-11-03)
+- **PRODUCTION_QA_PASS** ✅ 향일암 Living Detail 햇살 모드 — 운영 확인 (2026-11-03)
+  - 밝은 배경/SOUL 본문/모바일 레이아웃 PASS
+  - 잔여 수정: 비활성화 버튼 대비 → **PR #137** OPEN (cca8247)
+- **PR #137**: https://github.com/ys6448761-hue/daily-miracles-app/pull/137
+  - fix: 비활성화 버튼 햇살 모드 글자 대비 보완 (5행 변경, 버튼 활성화 없음)
+  - 빌드 ✅ 699 modules / 테스트 ✅ 639/640 PASS (R20 PRE-EXISTING 동일)
+- **PR #136**: https://github.com/ys6448761-hue/daily-miracles-app/pull/136 — docs only (Founder 직접 병합)
+- **Render Auto-Deploy**: OFF 유지 → PR #137 병합 후 Founder 수동 배포
 - **Evidence**: `docs/knowledge/SOUL-THEME-V01-EVIDENCE.md`
-- **Render Auto-Deploy**: OFF 유지 → **Production 배포 Founder 별도 승인 필요**
-- **배포 후 검증 URL**: `app.dailymiracles.kr/muyojeong`
-- **롤백 방법**:
-  1. Render 대시보드 → 이전 Deploy 재활성화 (즉각, 코드 변경 없음)
-  2. `git revert f98bd5d..dfcd97c` → PR → deploy
+- **종료 조건**: PR #137 병합 + Render 수동 배포 → SOUL 테마 V0.1 CLOSED
 
 ---
 
