@@ -96,6 +96,11 @@ function verify(req) {
     return { valid: false, reason: 'NONCE_REUSED' };
   }
 
+  // Fail fast: SHA256 hex must be exactly 64 lowercase hex characters
+  if (!/^[0-9a-f]{64}$/i.test(signature)) {
+    return { valid: false, reason: 'INVALID_SIGNATURE_FORMAT' };
+  }
+
   // Constant-time signature comparison
   const expected = computeSignature(secret, {
     timestamp,
@@ -104,11 +109,6 @@ function verify(req) {
     path:   req.path,
     body:   req.body,
   });
-
-  // SHA256 hex is always exactly 64 lowercase hex characters
-  if (!/^[0-9a-f]{64}$/i.test(signature)) {
-    return { valid: false, reason: 'INVALID_SIGNATURE_FORMAT' };
-  }
 
   const sigBuf = Buffer.from(signature, 'hex');
   const expBuf = Buffer.from(expected,  'hex');

@@ -393,4 +393,65 @@ describe('POST /api/dt/flow/ticket-book', () => {
     const smsArg = messageProvider.sendSensSMS.mock.calls[0][1];
     expect(smsArg).toContain('DB connection lost');
   });
+
+  it('sends ops SMS alert on HOLD_NOT_ACTIVE', async () => {
+    flowService.consumeHold.mockResolvedValue({ success: false, reason: 'HOLD_NOT_ACTIVE' });
+
+    const res = await request(app)
+      .post('/api/dt/flow/ticket-book')
+      .set(makeHeaders('POST', '/ticket-book', baseBody))
+      .send(baseBody);
+
+    expect(res.status).toBe(409);
+    expect(messageProvider.sendSensSMS).toHaveBeenCalledTimes(1);
+    const smsArg = messageProvider.sendSensSMS.mock.calls[0][1];
+    expect(smsArg).toContain('HOLD_NOT_ACTIVE');
+    expect(smsArg).toContain('ORD-001');
+  });
+
+  it('returns 200 idempotent on concurrent duplicate (PG 23505)', async () => {
+    // Simulate: idempotency SELECT misses (race), then INSERT hits UNIQUE constraint
+    const pgUniqueError = Object.assign(new Error('duplicate key value'), {
+      code:       '23505',
+      constraint: 'uq_dt_flow_bookings_ticket_order',
+    });
+    flowService.consumeHold.mockRejectedValue(pgUniqueError);
+
+    // After the unique error, re-query finds the existing booking
+    app.locals.db.query = jest.fn()
+      .mockResolvedValueOnce({ rows: [] })                              // idempotency SELECT → miss
+      .mockResolvedValueOnce({ rows: [{ id: 'booking-concurrent', ticket_order_id: 'ORD-001' }] }); // re-query
+
+    const res = await request(app)
+      .post('/api/dt/flow/ticket-book')
+      .set(makeHeaders('POST', '/ticket-book', baseBody))
+      .send(baseBody);
+
+    expect(res.status).toBe(200);
+    expect(res.body.idempotent).toBe(true);
+    expect(res.body.booking_id).toBe('booking-concurrent');
+    // No ops SMS for concurrent idempotent case
+    expect(messageProvider.sendSensSMS).not.toHaveBeenCalled();
+  });
+
+  it('returns 500 + ops SMS when concurrent re-query also fails', async () => {
+    const pgUniqueError = Object.assign(new Error('duplicate key'), {
+      code:       '23505',
+      constraint: 'uq_dt_flow_bookings_ticket_order',
+    });
+    flowService.consumeHold.mockRejectedValue(pgUniqueError);
+
+    // idempotency SELECT → miss, re-query after 23505 → also fails
+    app.locals.db.query = jest.fn()
+      .mockResolvedValueOnce({ rows: [] })                   // idempotency SELECT → miss
+      .mockRejectedValueOnce(new Error('DB offline'));       // re-query → fail
+
+    const res = await request(app)
+      .post('/api/dt/flow/ticket-book')
+      .set(makeHeaders('POST', '/ticket-book', baseBody))
+      .send(baseBody);
+
+    expect(res.status).toBe(500);
+    expect(messageProvider.sendSensSMS).toHaveBeenCalledTimes(1);
+  });
 });

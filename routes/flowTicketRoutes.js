@@ -133,8 +133,11 @@ router.post('/ticket-book', requireTicketAuth, async (req, res) => {
     }, db);
 
     if (!result.success) {
-      // Alert ops for hold failures — payment was taken but booking failed
-      if (result.reason === 'HOLD_EXPIRED' || result.reason === 'HOLD_NOT_FOUND') {
+      // Alert ops for all hold failures where payment may have been taken
+      // HOLD_EXPIRED, HOLD_NOT_FOUND: hold unavailable after payment
+      // HOLD_NOT_ACTIVE: hold already consumed by another path (potential double-book)
+      const needsAlert = ['HOLD_EXPIRED', 'HOLD_NOT_FOUND', 'HOLD_NOT_ACTIVE'];
+      if (needsAlert.includes(result.reason)) {
         const alertText = `[FLOW 티켓 경보] ticket_order_id=${ticket_order_id} hold_id=${hold_id} reason=${result.reason} — 결제됐으나 Hold 실패. 수동 확인 필요.`;
         const adminPhone = process.env.ADMIN_PHONE || process.env.SENDER_PHONE || '18996117';
         sendSensSMS(adminPhone, alertText).catch(e =>
@@ -159,6 +162,29 @@ router.post('/ticket-book', requireTicketAuth, async (req, res) => {
       ticket_order_id: result.booking.ticket_order_id,
     });
   } catch (err) {
+    // Concurrent duplicate: UNIQUE constraint on ticket_order_id (PG error 23505)
+    // The race window between idempotency SELECT and consumeHold INSERT can cause this.
+    // Treat as idempotent — re-query and return the existing booking.
+    if (err.code === '23505' && err.constraint === 'uq_dt_flow_bookings_ticket_order') {
+      try {
+        const dup = await db.query(
+          `SELECT id, ticket_order_id FROM dt_flow_bookings
+           WHERE ticket_order_id = $1 AND status = 'confirmed' LIMIT 1`,
+          [ticket_order_id]
+        );
+        if (dup.rows.length) {
+          return res.status(200).json({
+            success:         true,
+            booking_id:      dup.rows[0].id,
+            ticket_order_id: dup.rows[0].ticket_order_id,
+            idempotent:      true,
+          });
+        }
+      } catch (dupErr) {
+        console.error('[flowTicket] idempotency re-query failed:', dupErr.message);
+      }
+    }
+
     console.error('[flowTicket] ticket-book error:', err.message);
 
     // Alert ops: unexpected DB error during booking (payment may have been taken)
