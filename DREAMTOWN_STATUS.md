@@ -27,11 +27,14 @@ Last Updated: 2026-11-03 (COMMERCE_CHANNEL_DECISION_CONFIRMED — ticket.6117.co
 **커머스 집중: 티켓사이트 ↔ FLOW 호텔 재고·예약·결제 연동**
 - 라마다 실 PIN 수령 (Founder Action) → 패키지 상품 등록 → NicePay 결제 연결
 =======
-**FLOW staging → main 병합 + Migration SQL 승인 → `flowTicketRoutes.js` 구현 착수**
+**PR #140 병합 + Migration 승인 → `flowTicketRoutes.js` 구현 착수**
 
 Founder 승인 필요 (2가지 선행 조건):
-1. **staging → main 병합 승인**: flowRoutes.js + flowInventoryService.js + flowConfirmRoutes.js
+1. **PR #140 병합 승인**: staging/storybook-c7a → main (flowRoutes.js + flowInventoryService.js + flowConfirmRoutes.js)
 2. **Migration 승인**: `dt_flow_bookings.ticket_order_id VARCHAR(100)` + UNIQUE INDEX
+
+- PR #139 OPEN — Commerce Phase 1 설계 docs (병합 승인 필요)
+- PR #140 OPEN — FLOW staging → main (병합 승인 필요, 실행 선행 조건)
 
 승인 후 구현 파일 (1개):
 - `routes/flowTicketRoutes.js` (NEW) — ticket.6117.co.kr webhook 수신 + Hold+Book 원자 처리
