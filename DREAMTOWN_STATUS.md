@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-11-03 (COMMERCE_CHANNEL_DECISION_CONFIRMED — ticket.6117.co.kr = 판매 채널 기준 확정 + 최소 연동 설계 완료)
+Last Updated: 2026-11-03 (PHX-COMMERCE-MIG-002 COMPLETE — Migration 217 Production 사전 점검 SQL 준비 완료, Founder Supabase 실행 대기)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,13 +23,16 @@ Last Updated: 2026-11-03 (COMMERCE_CHANNEL_DECISION_CONFIRMED — ticket.6117.co
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-11-03
 
-**Migration 217 Production 실행 승인 → PR #140 병합 → flowTicketRoutes.js 구현**
+**Founder: Supabase SQL Editor에서 CHECK-01~10 실행 → 전체 PASS 확인 → Migration 217 적용 승인**
 
-- **Migration 217: PREPARED** — `database/migrations/217_flow_ticket_order_id.sql`
-  - Supabase SQL 편집기 직접 실행 (권장) — Production DB 변경 Founder 승인 필요
+- **PHX-COMMERCE-MIG-002 COMPLETE** — READ-ONLY 사전 점검 SQL 준비 완료
+  - 사전 점검: `docs/knowledge/COMMERCE-MIG-217-PRECHECK-V0_1.md` §2 (10개 CHECK)
+  - Migration SQL: `database/migrations/217_flow_ticket_order_id.sql`
   - Evidence: `docs/knowledge/COMMERCE-MIG-217-EVIDENCE-V0_1.md`
+  - Code 분석: 전체 PASS (ticket_order_id/ticket_paid_at 미존재, 인덱스 충돌 없음, consumeHold 호환)
+  - NOT VERIFIED (Founder 실행 필요): 실제 DB 컬럼 목록, 기존 Booking 수, 권한
 - **PR #139 OPEN** — Commerce Phase 1 설계 docs (docs/commerce-phase1-v01 → main)
-- **PR #140 OPEN** — FLOW staging → main (GitHub 확인: 미병합)
+- **PR #140 OPEN** — FLOW staging → main (GitHub 확인: 미병합, Migration과 독립 가능)
 
 **Commerce 판매 채널 기준 확정 (2026-11-03) — DECISION_COMMERCE_CHANNEL_V0_1**
 - ticket.6117.co.kr = PHP 독립 시스템 (상품·주문·NicePay 결제 기준)
