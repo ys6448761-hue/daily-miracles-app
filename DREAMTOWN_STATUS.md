@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-11-03 (SOUL_THEME_V01_PRODUCTION_QA_PASS — PR #137 병합 대기)
+Last Updated: 2026-11-03 (PHX-COMMERCE-MIG-003 SUCCESS — Migration 217 Production APPLIED VERIFIED, dt_flow_bookings ticket_order_id/ticket_paid_at 추가 완료)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,8 +23,30 @@ Last Updated: 2026-11-03 (SOUL_THEME_V01_PRODUCTION_QA_PASS — PR #137 병합 �
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-11-03
 
-**커머스 집중: 티켓사이트 ↔ FLOW 호텔 재고·예약·결제 연동**
-- 라마다 실 PIN 수령 (Founder Action) → 패키지 상품 등록 → NicePay 결제 연결
+**authenticatedPrincipal.js 호환성 확인 → feat/flow-minimal-integration 브랜치 생성 승인**
+
+- **PHX-COMMERCE-MIG-003 SUCCESS** ✅ Migration 217 APPLIED — VERIFIED (2026-11-03)
+  - Production DB: Render PostgreSQL `yeosu_miracle_travel` (NOT Supabase)
+  - ticket_order_id / ticket_paid_at / UNIQUE INDEX 모두 적용 완료
+  - Evidence: `docs/knowledge/COMMERCE-MIG-217-APPLIED-EVIDENCE-V0_1.md`
+- **PHX-COMMERCE-FLOW-001 READY (조건부)** — FLOW 최소 이식 분석 완료 (2026-11-03)
+  - Option B 채택: 필요 파일만 main 기반 신규 브랜치로 이식
+  - 이식 대상: flowInventoryService / flowRoutes / flowConfirmRoutes / flowAdminRoutes / adminGuard / partnerPinService + server.js 블록 3개 + migration 208~214 (기록용)
+  - 충돌 없음 — 전부 신규 파일 + server.js Edit 삽입
+  - Migration 207 충돌: staging 207(voyage_wish_owner) 이식 제외 (Production 미적용)
+  - 미확인: authenticatedPrincipal.js 호환성 (flowRoutes 의존성)
+  - Evidence: `docs/knowledge/COMMERCE-FLOW-MINIMAL-INTEGRATION-V0_1.md`
+- **PR #140 HOLD** — CONFLICTING / CI FAILURE (전체 병합 불필요 — Option B로 대체)
+- **PR #139 OPEN** — Commerce Phase 1 docs (mergeable=MERGEABLE, 충돌 없음)
+
+**Production DB 정체 확정 (2026-11-03):**
+- Render PostgreSQL `yeosu_miracle_travel` — 모든 FLOW 테이블 APPLIED
+- Supabase `aurora5-db`, `dreamtown-storybook-staging` — Production과 무관
+
+**Commerce 판매 채널 기준 확정 (2026-11-03) — DECISION_COMMERCE_CHANNEL_V0_1**
+- ticket.6117.co.kr = PHP 독립 시스템 (상품·주문·NicePay 결제 기준)
+- 연동 V0.2: 결제 전 Hold → 결제 후 Book (2단계)
+- Evidence: `docs/knowledge/COMMERCE-TICKET-FLOW-DESIGN-V0_2.md`
 
 ---
 
