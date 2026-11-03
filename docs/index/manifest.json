@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-03T06:40:05.093Z",
+  "generated_at": "2026-11-03T07:27:39.240Z",
   "generator": "generate-manifest.js",
   "total_count": 559,
   "documents": [
@@ -2768,7 +2768,7 @@
       "status": "비고",
       "title": "PHX-COMMERCE-FLOW-004 — PR #141 CI Gate Evidence",
       "created_at": "2026-11-03",
-      "checksum": "a202555f"
+      "checksum": "6cefb250"
     },
     {
       "id": "DOC-COMMERCE-FLOW-INTEGRATION-V0_1",
@@ -2786,7 +2786,7 @@
       "status": "처리",
       "title": "PHX-COMMERCE-FLOW-003 — FLOW Minimal Integration Evidence",
       "created_at": "2026-11-03",
-      "checksum": "ec8c3e09"
+      "checksum": "62a3ab67"
     },
     {
       "id": "DOC-COMMERCE-PACKAGE-PHASE1-EVIDEN",
@@ -5363,7 +5363,7 @@
       "status": "active",
       "title": "PR-SOUL-THEME-V01-BODY",
       "created_at": "2026-11-03",
-      "checksum": "95f3be6f"
+      "checksum": "b9393408"
     },
     {
       "id": "DOC-REMAINING_CHANGES_COMMIT_SCOPE",

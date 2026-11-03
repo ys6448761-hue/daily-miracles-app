@@ -1,3 +1,24 @@
+## [AIL] 지시서
+
+```ail
+[CONTEXT]
+Source-ID: Founder Decision 2026-11-02 (SOUL Day/Night V0.1 승인)
+- 배경: /muyojeong + /soul/* 경로에 햇살(낮)/별빛(밤) 테마 시스템 적용
+- 기존 DreamTown 별·Galaxy·예약·결제에 영향 없는 범위 제한 구현 요구
+
+[INSTRUCTION]
+1. SoulThemeContext: 시간 기반 자동 전환 + localStorage 수동 선택 보존
+2. CSS 변수 방식: .soul-scope 클래스 범위 내에서만 적용
+3. SoulCableCarPage wrapper: bg-night-sky 인라인 스타일로 교체
+4. Tailwind override: 이미지 overlay (.rounded-2xl.overflow-hidden.relative) 내 텍스트 흰색 유지
+5. 배포 범위: 프론트엔드 CSS/React 전용 — 서버·DB·API 변경 없음
+
+[VERDICT]
+PASS — Founder QA 3차 PASS (2026-11-03), 코드팀 639/640 PASS
+```
+
+---
+
 ## Summary
 
 - **SOUL 낮·밤 테마 V0.1**: 햇살(06:00-17:59)/별빛(18:00-05:59) 자동 전환 + 무여정 홈 수동 토글
