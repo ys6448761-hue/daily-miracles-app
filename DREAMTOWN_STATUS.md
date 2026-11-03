@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-11-03 (SOUL_THEME_V01_PRODUCTION_QA_PASS — PR #137 병합 대기)
+Last Updated: 2026-11-03 (COMMERCE_CHANNEL_DECISION_CONFIRMED — ticket.6117.co.kr = 판매 채널 기준 확정 + 최소 연동 설계 완료)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,8 +23,35 @@ Last Updated: 2026-11-03 (SOUL_THEME_V01_PRODUCTION_QA_PASS — PR #137 병합 �
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-11-03
 
+<<<<<<< Updated upstream
 **커머스 집중: 티켓사이트 ↔ FLOW 호텔 재고·예약·결제 연동**
 - 라마다 실 PIN 수령 (Founder Action) → 패키지 상품 등록 → NicePay 결제 연결
+=======
+**FLOW staging → main 병합 + Migration SQL 승인 → `flowTicketRoutes.js` 구현 착수**
+
+Founder 승인 필요 (2가지 선행 조건):
+1. **staging → main 병합 승인**: flowRoutes.js + flowInventoryService.js + flowConfirmRoutes.js
+2. **Migration 승인**: `dt_flow_bookings.ticket_order_id VARCHAR(100)` + UNIQUE INDEX
+
+승인 후 구현 파일 (1개):
+- `routes/flowTicketRoutes.js` (NEW) — ticket.6117.co.kr webhook 수신 + Hold+Book 원자 처리
+- `server.js` EXTEND (1행) — flowTicketRoutes 마운트
+
+**Commerce 판매 채널 기준 확정 (2026-11-03) — DECISION_COMMERCE_CHANNEL_V0_1**
+- ticket.6117.co.kr = PHP 독립 시스템 (상품·주문·NicePay 결제 기준)
+- Wix 코드(WIX_SUCCESS_URL, /api/payments/verify) = 기존 자산 보존. 티켓 연동 경로 아님.
+- 연동 방향: ticket PHP → `POST /api/dt/flow/ticket-book` (신규 webhook 엔드포인트)
+- FLOW에 `ticket_order_id` 컬럼 추가로 주문번호 대응. nicepay_payments 변경 없음.
+- Evidence: `docs/knowledge/COMMERCE-TICKET-FLOW-DESIGN-V0_1.md`
+- Decision: `docs/decisions/DECISION_COMMERCE_CHANNEL_V0_1.md`
+
+**Commerce Phase 1 — 이전 감사 완료 (2026-11-03)**
+- consumeHold() = 내부 booking 레코드만 생성. 외부 PMS 번호 없음. 파트너 PIN 확인은 별도.
+- 중복 콜백 방어: ticket_order_id UNIQUE INDEX (멱등)
+- 결제 실패·Hold 만료: TTL 30분 자동 재고 복구 재사용 가능
+- 파트너 PIN 확인(flowConfirmRoutes.js) 변경 없이 재사용
+- Evidence: `docs/knowledge/COMMERCE-TICKET-SITE-AUDIT-V0_1.md`
+>>>>>>> Stashed changes
 
 ---
 
