@@ -196,16 +196,20 @@ async function consumeHold(hold_id, sowon_id, booking_details, db) {
 
     const bookingResult = await client.query(
       `INSERT INTO dt_flow_bookings
-         (inventory_id, hold_id, sowon_id, quantity, status, customer_name, phone)
-       VALUES ($1, $2, $3, $4, 'confirmed', $5, $6)
-       RETURNING id, inventory_id, hold_id, sowon_id, quantity, status, created_at`,
+         (inventory_id, hold_id, sowon_id, quantity, status, customer_name, phone,
+          ticket_order_id, ticket_paid_at)
+       VALUES ($1, $2, $3, $4, 'confirmed', $5, $6, $7, $8)
+       RETURNING id, inventory_id, hold_id, sowon_id, quantity, status,
+                 ticket_order_id, ticket_paid_at, created_at`,
       [
         hold.inventory_id,
         hold_id,
         sowon_id,
         hold.quantity,
-        booking_details?.customer_name || null,
-        booking_details?.phone         || null
+        booking_details?.customer_name   || null,
+        booking_details?.phone           || null,
+        booking_details?.ticket_order_id || null,
+        booking_details?.ticket_paid_at  || null,
       ]
     );
 

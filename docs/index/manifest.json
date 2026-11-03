@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-03T06:40:05.093Z",
+  "generated_at": "2026-11-03T08:39:13.236Z",
   "generator": "generate-manifest.js",
-  "total_count": 559,
+  "total_count": 562,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2768,7 +2768,7 @@
       "status": "비고",
       "title": "PHX-COMMERCE-FLOW-004 — PR #141 CI Gate Evidence",
       "created_at": "2026-11-03",
-      "checksum": "a202555f"
+      "checksum": "6cefb250"
     },
     {
       "id": "DOC-COMMERCE-FLOW-INTEGRATION-V0_1",
@@ -2786,7 +2786,7 @@
       "status": "처리",
       "title": "PHX-COMMERCE-FLOW-003 — FLOW Minimal Integration Evidence",
       "created_at": "2026-11-03",
-      "checksum": "ec8c3e09"
+      "checksum": "62a3ab67"
     },
     {
       "id": "DOC-COMMERCE-PACKAGE-PHASE1-EVIDEN",
@@ -2822,6 +2822,57 @@
       "title": "PIN 역할 및 적용 경로 확인 Evidence",
       "created_at": "2026-11-03",
       "checksum": "6b787daa"
+    },
+    {
+      "id": "DOC-COMMERCE-TICKET-FLOW-IMPL-V0_1",
+      "path": "docs/knowledge/COMMERCE-TICKET-FLOW-IMPL-V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "결제"
+      ],
+      "owner": "code",
+      "status": "|------",
+      "title": "PHX-COMMERCE-TICKET-001 — Ticket Hold & Book API Evidence",
+      "created_at": "2026-11-03",
+      "checksum": "c7f22c48"
+    },
+    {
+      "id": "DOC-COMMERCE-TICKET-PROD-GATE-V0_1",
+      "path": "docs/knowledge/COMMERCE-TICKET-PROD-GATE-V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "결제"
+      ],
+      "owner": "code",
+      "status": "필수",
+      "title": "PHX-COMMERCE-TICKET-003 — Production Safety Gate Report",
+      "created_at": "2026-11-03",
+      "checksum": "01d33fb3"
+    },
+    {
+      "id": "DOC-COMMERCE-TICKET-SECURITY-GATE-",
+      "path": "docs/knowledge/COMMERCE-TICKET-SECURITY-GATE-V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "결제"
+      ],
+      "owner": "code",
+      "status": "비고",
+      "title": "PHX-COMMERCE-TICKET-002 — Security Gate Report",
+      "created_at": "2026-11-03",
+      "checksum": "b3882ca5"
     },
     {
       "id": "DOC-COURSE-PLANNING-8H-TRACE-V0_1",
