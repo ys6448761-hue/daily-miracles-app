@@ -2472,6 +2472,19 @@ if (flowAdminKennyRoutes) {
   console.log("✅ FLOW Admin 라우터 등록 완료 (/api/admin/flow/inventory)");
 }
 
+// ---------- FLOW Ticket S2S (/api/dt/flow/ticket-hold, /ticket-book) ----------
+let flowTicketRoutes = null;
+try {
+  flowTicketRoutes = require("./routes/flowTicketRoutes");
+  console.log("✅ FLOW Ticket 라우터 로드 성공");
+} catch (e) {
+  console.warn("⚠️ FLOW Ticket 라우터 로드 실패:", e.message);
+}
+if (flowTicketRoutes) {
+  app.use("/api/dt/flow", flowTicketRoutes);
+  console.log("✅ FLOW Ticket 라우터 등록 완료 (/api/dt/flow/ticket-hold, /ticket-book)");
+}
+
 let wishCheckinRoutes = null;
 try {
   wishCheckinRoutes = require("./routes/wishCheckinRoutes");
