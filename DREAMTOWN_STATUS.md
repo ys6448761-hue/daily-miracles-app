@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-11-03 (PHX-COMMERCE-TICKET-003 PRODUCTION SAFETY GATE PASS — PR #143 MERGE READY)
+Last Updated: 2026-11-03 (PHX-COMMERCE-TICKET-004 MERGED — PR #143 MERGED `2e76281`, main 81/81 PASS)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,30 +23,24 @@ Last Updated: 2026-11-03 (PHX-COMMERCE-TICKET-003 PRODUCTION SAFETY GATE PASS �
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-11-03
 
-**PR #143 병합 승인 → Production 배포 (수동) → Render env 등록 (순서 엄수)**
+**PHP E2E 연동 (PHX-COMMERCE-TICKET-005): PHP HMAC 구현 검증 → 스테이징 hold/book E2E → Render env 등록 → FLOW_TICKET_ENABLED=true**
 
-#### PHX-COMMERCE-TICKET-003: PRODUCTION SAFETY GATE PASS — **MERGE READY** ✅
+#### PHX-COMMERCE-TICKET-004: CONTROLLED MERGE — **MERGED** ✅
 
-- **PR #143 OPEN** (feat/commerce-ticket-flow-v02 → main) — Founder 병합 승인 필요
-  - 최종 Commit: `3dd0695` (Feature Flag 포함)
-  - URL: https://github.com/ys6448761-hue/daily-miracles-app/pull/143
-  - FLOW tests: **81/81 PASS** (기존 51 + 신규 30)
-  - CI: AIL Gate ✅ / Manifest ✅ / docker-smoke ✅ / Vercel FAIL (PRE-EXISTING)
-  - mergeable: MERGEABLE
-- Production Gate 완료:
-  1. 보안 수정 3건 commit `4197669` 포함 확인
-  2. **FLOW_TICKET_ENABLED Feature Flag** 구현 — 미설정 시 503 TICKET_API_DISABLED (fail-closed)
-  3. 기존 FLOW 라우트 영향 없음 확인 (81/81)
-  4. NicePay 검증: PARTIAL (PHP 신뢰 계약 MVP)
-- Evidence: `docs/knowledge/COMMERCE-TICKET-PROD-GATE-V0_1.md`
+- **PR #143 MERGED** (feat/commerce-ticket-flow-v02 → main) — 2026-11-03T08:49:30Z
+  - Merge Commit: `2e76281fec99547ccfa7058d015a9e3ea35b6cf7`
+  - HEAD SHA (잠금): `ab7a3c8506bf0b4597e402db251df3600a9b9174`
+  - main 81/81 FLOW PASS ✅ / Feature Flag fail-closed ✅
+- Evidence: `docs/knowledge/COMMERCE-TICKET-MERGE-EVIDENCE-V0_1.md`
 
-**병합 후 Founder 활성화 순서 (순서 엄수):**
-1. PR #143 병합 → 수동 배포 (API는 503 DISABLED 상태)
-2. Render env: `FLOW_TICKET_SECRET`, `FLOW_TICKET_SOWON_ID`
-3. PHP 담당자 Security Gate §7 확인 + E2E 스테이징 테스트
-4. `FLOW_TICKET_ENABLED=true` (마지막 — API 활성화)
+**⚠️ API 현재 상태: 503 TICKET_API_DISABLED (FLOW_TICKET_ENABLED 미설정)**
 
-**PR #141 이미 병합됨** (`b75aacd5`). PR #142/138 OPEN 유지.
+**활성화 순서 (PHP E2E 완료 후, 순서 엄수):**
+1. Render env: `FLOW_TICKET_SECRET`, `FLOW_TICKET_SOWON_ID`
+2. PHP 담당자 Security Gate §7 확인 + E2E 스테이징 테스트
+3. `FLOW_TICKET_ENABLED=true` (마지막 — API 활성화)
+
+**PR #141 이미 병합됨** (`b75aacd5`). PR #142/138/139 OPEN 유지.
 
 ---
 

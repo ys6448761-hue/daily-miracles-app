@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-03T08:39:13.236Z",
+  "generated_at": "2026-11-03T08:53:36.063Z",
   "generator": "generate-manifest.js",
-  "total_count": 562,
+  "total_count": 563,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2838,7 +2838,24 @@
       "status": "|------",
       "title": "PHX-COMMERCE-TICKET-001 — Ticket Hold & Book API Evidence",
       "created_at": "2026-11-03",
-      "checksum": "c7f22c48"
+      "checksum": "8a3ad557"
+    },
+    {
+      "id": "DOC-COMMERCE-TICKET-MERGE-EVIDENCE",
+      "path": "docs/knowledge/COMMERCE-TICKET-MERGE-EVIDENCE-V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "결제"
+      ],
+      "owner": "code",
+      "status": "|---",
+      "title": "PHX-COMMERCE-TICKET-004 — Controlled Merge Evidence",
+      "created_at": "2026-11-03",
+      "checksum": "b25204d7"
     },
     {
       "id": "DOC-COMMERCE-TICKET-PROD-GATE-V0_1",
@@ -2855,7 +2872,7 @@
       "status": "필수",
       "title": "PHX-COMMERCE-TICKET-003 — Production Safety Gate Report",
       "created_at": "2026-11-03",
-      "checksum": "01d33fb3"
+      "checksum": "5ae5c532"
     },
     {
       "id": "DOC-COMMERCE-TICKET-SECURITY-GATE-",
@@ -2872,7 +2889,7 @@
       "status": "비고",
       "title": "PHX-COMMERCE-TICKET-002 — Security Gate Report",
       "created_at": "2026-11-03",
-      "checksum": "b3882ca5"
+      "checksum": "02bc2b89"
     },
     {
       "id": "DOC-COURSE-PLANNING-8H-TRACE-V0_1",
