@@ -33,6 +33,7 @@ const TEST_SOWON_ID    = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
 
 // Set env before requiring the module so TICKET_SECRET is captured
 beforeAll(() => {
+  process.env.FLOW_TICKET_ENABLED  = 'true';
   process.env.FLOW_TICKET_SECRET   = TEST_SECRET;
   process.env.FLOW_TICKET_SOWON_ID = TEST_SOWON_ID;
   process.env.ADMIN_PHONE          = '01000000000';
@@ -165,6 +166,64 @@ describe('ticketAuthService', () => {
       req.headers['x-ticket-nonce'] = nonce;
       expect(ticketAuth.verify(req).reason).toBe('INVALID_SIGNATURE_FORMAT');
     });
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// §1b Feature Flag — FLOW_TICKET_ENABLED
+// Verifies the production safety gate: API disabled by default.
+// ═══════════════════════════════════════════════════════════════════════════
+describe('Feature Flag — FLOW_TICKET_ENABLED', () => {
+  afterEach(() => {
+    // Restore to test-suite default so subsequent suites run with API enabled
+    process.env.FLOW_TICKET_ENABLED = 'true';
+  });
+
+  it('returns 503 TICKET_API_DISABLED when FLOW_TICKET_ENABLED is not set', async () => {
+    delete process.env.FLOW_TICKET_ENABLED;
+    const app = buildApp();
+    const body = { inventory_id: 'inv-1' };
+    const res = await request(app)
+      .post('/api/dt/flow/ticket-hold')
+      .set(makeHeaders('POST', '/ticket-hold', body))
+      .send(body);
+    expect(res.status).toBe(503);
+    expect(res.body.error).toBe('TICKET_API_DISABLED');
+  });
+
+  it('returns 503 TICKET_API_DISABLED when FLOW_TICKET_ENABLED is "false"', async () => {
+    process.env.FLOW_TICKET_ENABLED = 'false';
+    const app = buildApp();
+    const body = { inventory_id: 'inv-1' };
+    const res = await request(app)
+      .post('/api/dt/flow/ticket-hold')
+      .set(makeHeaders('POST', '/ticket-hold', body))
+      .send(body);
+    expect(res.status).toBe(503);
+    expect(res.body.error).toBe('TICKET_API_DISABLED');
+  });
+
+  it('proceeds to auth check when FLOW_TICKET_ENABLED is "true"', async () => {
+    process.env.FLOW_TICKET_ENABLED = 'true';
+    const app = buildApp();
+    // No auth headers → 401 (not 503 DISABLED)
+    const res = await request(app)
+      .post('/api/dt/flow/ticket-hold')
+      .send({ inventory_id: 'inv-1' });
+    expect(res.status).toBe(401);
+    expect(res.body.error).toBe('TICKET_AUTH_FAILED');
+  });
+
+  it('returns 503 TICKET_API_DISABLED on ticket-book when disabled', async () => {
+    delete process.env.FLOW_TICKET_ENABLED;
+    const app = buildApp();
+    const body = { hold_id: 'h', ticket_order_id: 'ORD-X', ticket_paid_at: new Date().toISOString() };
+    const res = await request(app)
+      .post('/api/dt/flow/ticket-book')
+      .set(makeHeaders('POST', '/ticket-book', body))
+      .send(body);
+    expect(res.status).toBe(503);
+    expect(res.body.error).toBe('TICKET_API_DISABLED');
   });
 });
 

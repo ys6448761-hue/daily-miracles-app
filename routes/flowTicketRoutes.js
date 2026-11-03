@@ -31,8 +31,15 @@ const { sendSensSMS } = require('../services/messageProvider');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Auth middleware — HMAC-SHA256 server-to-server
+//
+// Production safety gate (fail-closed):
+//   FLOW_TICKET_ENABLED must be explicitly set to 'true' to activate the API.
+//   This prevents accidental activation before PHP E2E contract is complete.
 // ─────────────────────────────────────────────────────────────────────────────
 function requireTicketAuth(req, res, next) {
+  if (process.env.FLOW_TICKET_ENABLED !== 'true') {
+    return res.status(503).json({ error: 'TICKET_API_DISABLED' });
+  }
   if (!process.env.FLOW_TICKET_SOWON_ID) {
     console.error('[flowTicket] FLOW_TICKET_SOWON_ID not configured');
     return res.status(503).json({ error: 'SERVER_CONFIG_ERROR' });
