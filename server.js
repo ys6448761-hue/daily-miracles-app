@@ -2433,6 +2433,45 @@ if (dreamtownFlowRoutes) {
   console.log("✅ DreamTown Flow 라우터 등록 완료 (/api/dt/flow)");
 }
 
+// ---------- FLOW Kenny Availability (/api/dt/flow/availability, /hold, /book) ----------
+let flowKennyRoutes = null;
+try {
+  flowKennyRoutes = require("./routes/flowRoutes");
+  console.log("✅ FLOW Kenny 라우터 로드 성공");
+} catch (e) {
+  console.warn("⚠️ FLOW Kenny 라우터 로드 실패:", e.message);
+}
+if (flowKennyRoutes) {
+  app.use("/api/dt/flow", flowKennyRoutes);
+  console.log("✅ FLOW Kenny 라우터 등록 완료 (/api/dt/flow/availability, /hold, /book)");
+}
+
+// ---------- FLOW Confirm (/api/dt/flow/confirm) ----------
+let flowConfirmKennyRoutes = null;
+try {
+  flowConfirmKennyRoutes = require("./routes/flowConfirmRoutes");
+  console.log("✅ FLOW Confirm 라우터 로드 성공");
+} catch (e) {
+  console.warn("⚠️ FLOW Confirm 라우터 로드 실패:", e.message);
+}
+if (flowConfirmKennyRoutes) {
+  app.use("/api/dt/flow", flowConfirmKennyRoutes);
+  console.log("✅ FLOW Confirm 라우터 등록 완료 (/api/dt/flow/confirm)");
+}
+
+// ---------- FLOW Admin Routes (/api/admin/flow/inventory) ----------
+let flowAdminKennyRoutes = null;
+try {
+  flowAdminKennyRoutes = require("./routes/flowAdminRoutes");
+  console.log("✅ FLOW Admin 라우터 로드 성공");
+} catch (e) {
+  console.warn("⚠️ FLOW Admin 라우터 로드 실패:", e.message);
+}
+if (flowAdminKennyRoutes) {
+  app.use("/api/admin/flow", flowAdminKennyRoutes);
+  console.log("✅ FLOW Admin 라우터 등록 완료 (/api/admin/flow/inventory)");
+}
+
 let wishCheckinRoutes = null;
 try {
   wishCheckinRoutes = require("./routes/wishCheckinRoutes");
