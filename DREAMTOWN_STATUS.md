@@ -23,8 +23,15 @@ Last Updated: 2026-11-03 (SOUL_THEME_V01_PRODUCTION_QA_PASS — PR #137 병합 �
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-11-03
 
-**커머스 집중: 티켓사이트 ↔ FLOW 호텔 재고·예약·결제 연동**
-- 라마다 실 PIN 수령 (Founder Action) → 패키지 상품 등록 → NicePay 결제 연결
+**PR #141 검토 및 병합 승인 → flowTicketRoutes.js 구현 착수 승인**
+
+- PR #141 OPEN: feat(flow): minimal FLOW integration for Commerce Phase 1
+  - Branch: feat/flow-minimal-integration / Commit: e0c1158
+  - URL: https://github.com/ys6448761-hue/daily-miracles-app/pull/141
+  - FLOW 테스트 51/51 PASS / 기존 테스트 PRE-EXISTING FAIL 동일 (690/691)
+  - Production DB 변경 없음
+- Evidence: `docs/knowledge/COMMERCE-FLOW-INTEGRATION-V0_1.md`
+- 병합 후 다음: flowTicketRoutes.js 구현 (ticket-hold + ticket-book) — 별도 승인 필요
 
 ---
 
