@@ -23,8 +23,18 @@ Last Updated: 2026-11-03 (SOUL_THEME_V01_CLOSED — PR #137 MERGED, Render 배�
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-11-03
 
-**커머스 집중: 티켓사이트 ↔ FLOW 호텔 재고·예약·결제 연동**
-- 라마다 실 PIN 수령 (Founder Action) → 패키지 상품 등록 → NicePay 결제 연결
+**Migration: `nicepay_payments.flow_hold_id UUID` 컬럼 추가 — Founder DB 변경 승인 후 실행**
+- 파일: `database/migrations/NNN_nicepay_flow_link.sql`
+- 내용: `ALTER TABLE nicepay_payments ADD COLUMN IF NOT EXISTS flow_hold_id UUID;`
+- 기존 276건 데이터 무변경 (NULL 허용 컬럼)
+- 선행 조건: **Founder 승인 필수** (DB Schema 변경)
+- Evidence: `docs/knowledge/COMMERCE-FLOW-CONNECTION-AUDIT-V0_1.md`
+
+**Commerce Phase 1 — 연결 갭 분석 완료 (2026-11-03)**
+- 조사 결과: NicePay ↔ FLOW 사이 연결 테이블 없음 → `flow_hold_id` 컬럼이 최소 연결 지점
+- FLOW 테이블(dt_flow_*): Production DB APPLIED (migration 208~214)
+- FLOW 라우트(flowRoutes.js + flowInventoryService.js): staging/storybook-c7a 브랜치 — main 미병합
+- Evidence: `docs/knowledge/COMMERCE-FLOW-CONNECTION-AUDIT-V0_1.md`
 
 ---
 
