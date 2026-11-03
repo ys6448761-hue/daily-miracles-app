@@ -23,18 +23,20 @@ Last Updated: 2026-11-03 (PHX-COMMERCE-MIG-003 SUCCESS — Migration 217 Product
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-11-03
 
-**PR #140 충돌 해결 전략 결정 → flowTicketRoutes.js 구현 경로 확정**
+**authenticatedPrincipal.js 호환성 확인 → feat/flow-minimal-integration 브랜치 생성 승인**
 
 - **PHX-COMMERCE-MIG-003 SUCCESS** ✅ Migration 217 APPLIED — VERIFIED (2026-11-03)
   - Production DB: Render PostgreSQL `yeosu_miracle_travel` (NOT Supabase)
   - ticket_order_id / ticket_paid_at / UNIQUE INDEX 모두 적용 완료
   - Evidence: `docs/knowledge/COMMERCE-MIG-217-APPLIED-EVIDENCE-V0_1.md`
-- **PR #140 HOLD** — mergeable=CONFLICTING / CI FAILURE / Migration 207 번호 충돌
-  - 26개 파일 충돌 (server.js: main +77줄 vs staging +3,012줄)
-  - Vercel 배포 FAILURE 2개
-  - Migration 207 번호 중복 (main: travel_places_stay_time / staging: voyage_wish_owner)
-  - Evidence: `docs/knowledge/COMMERCE-PR140-MERGE-READINESS-V0_1.md`
-  - 선택지: A) 충돌 해결 후 병합 / B) 필요 파일만 cherry-pick / C) staging에서 직접 작업
+- **PHX-COMMERCE-FLOW-001 READY (조건부)** — FLOW 최소 이식 분석 완료 (2026-11-03)
+  - Option B 채택: 필요 파일만 main 기반 신규 브랜치로 이식
+  - 이식 대상: flowInventoryService / flowRoutes / flowConfirmRoutes / flowAdminRoutes / adminGuard / partnerPinService + server.js 블록 3개 + migration 208~214 (기록용)
+  - 충돌 없음 — 전부 신규 파일 + server.js Edit 삽입
+  - Migration 207 충돌: staging 207(voyage_wish_owner) 이식 제외 (Production 미적용)
+  - 미확인: authenticatedPrincipal.js 호환성 (flowRoutes 의존성)
+  - Evidence: `docs/knowledge/COMMERCE-FLOW-MINIMAL-INTEGRATION-V0_1.md`
+- **PR #140 HOLD** — CONFLICTING / CI FAILURE (전체 병합 불필요 — Option B로 대체)
 - **PR #139 OPEN** — Commerce Phase 1 docs (mergeable=MERGEABLE, 충돌 없음)
 
 **Production DB 정체 확정 (2026-11-03):**

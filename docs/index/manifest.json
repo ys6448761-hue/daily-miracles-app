@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-03T05:21:42.228Z",
+  "generated_at": "2026-11-03T05:57:28.769Z",
   "generator": "generate-manifest.js",
-  "total_count": 565,
+  "total_count": 566,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2770,6 +2770,23 @@
       "title": "CI-DIAG-PR113-001 — PR #113 AIL Gate & docker-smoke 미실행 진단",
       "created_at": "2026-11-03",
       "checksum": "ffb65e2e"
+    },
+    {
+      "id": "DOC-COMMERCE-FLOW-MINIMAL-INTEGRAT",
+      "path": "docs/knowledge/COMMERCE-FLOW-MINIMAL-INTEGRATION-V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "storybook"
+      ],
+      "owner": "code",
+      "status": "main 병합 목적",
+      "title": "PHX-COMMERCE-FLOW-001 — FLOW 최소 이식 분석",
+      "created_at": "2026-11-03",
+      "checksum": "46bb1fce"
     },
     {
       "id": "DOC-COMMERCE-MIG-217-APPLIED-EVIDE",
