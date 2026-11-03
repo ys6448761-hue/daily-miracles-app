@@ -25,24 +25,24 @@ Last Updated: 2026-11-03 (PHX-COMMERCE-TICKET-001 READY — PR #143 병합 승�
 
 **PR #143 병합 승인 → Render 환경변수 등록 (FLOW_TICKET_SECRET, FLOW_TICKET_SOWON_ID)**
 
-#### PHX-COMMERCE-TICKET-001: READY FOR REVIEW ✅
+#### PHX-COMMERCE-TICKET-002: SECURITY GATE PASS — MERGE READY ✅
 
 - **PR #143 OPEN** (feat/commerce-ticket-flow-v02 → main) — Founder 병합 승인 필요
-  - Commit: `c2c3b37`
+  - 최종 Commit: `4197669` (보안 게이트 수정 포함)
   - URL: https://github.com/ys6448761-hue/daily-miracles-app/pull/143
-  - FLOW tests: 74/74 PASS (기존 51 + 신규 23)
-- 구현 완료:
-  - `services/ticketAuthService.js` — HMAC-SHA256 S2S auth
-  - `routes/flowTicketRoutes.js` — POST /ticket-hold + /ticket-book (idempotency 포함)
-  - `services/flowInventoryService.js` — consumeHold ticket 필드 backward-compatible 확장
-  - `tests/unit/flowTicket.test.js` — 23 tests (auth 8 + hold 5 + book 10)
-- Evidence: `docs/knowledge/COMMERCE-TICKET-FLOW-IMPL-V0_1.md`
+  - FLOW tests: 77/77 PASS (기존 51 + 신규 26)
+- Security Gate 수정 완료 (3건):
+  1. **CRITICAL FIX** — 동시 중복 book: PG 23505 → 200 idempotent (false ops SMS 제거)
+  2. **IMPORTANT FIX** — HOLD_NOT_ACTIVE ops SMS 추가 (결제됐으나 Hold 실패 알림)
+  3. **MINOR FIX** — 서명 형식 검증을 computeSignature 전으로 이동
+- Security Gate Evidence: `docs/knowledge/COMMERCE-TICKET-SECURITY-GATE-V0_1.md`
+- 결제 검증: PARTIAL (PHP HMAC 신뢰 계약 MVP — §2 참조)
 - 병합 후 필요 조치:
-  1. Render 환경변수 등록: `FLOW_TICKET_SECRET`, `FLOW_TICKET_SOWON_ID` (Founder Action)
+  1. Render 환경변수: `FLOW_TICKET_SECRET`, `FLOW_TICKET_SOWON_ID` (Founder Action)
   2. 수동 배포 (Render Auto-Deploy: MANUAL)
-  3. PHP ↔ FLOW E2E 연동 테스트 (결제 검증은 PARTIAL — PHP 계약 후 강화)
+  3. PHP 담당자 확인 항목 (Security Gate §7) 처리 후 E2E 연동 테스트
 
-**주의:** PR #141 (#140 대체본)은 이미 main에 병합됨 (`b75aacd5`). PR #142 (docs 업데이트)도 병합 필요.
+**주의:** PR #141은 이미 main에 병합됨 (`b75aacd5`). PR #142 (docs 업데이트)도 병합 필요.
 PR #138 (SOUL 테마 docs CLOSED) OPEN 유지.
 
 ---
