@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-03T06:20:56.288Z",
+  "generated_at": "2026-11-03T06:40:05.093Z",
   "generator": "generate-manifest.js",
-  "total_count": 558,
+  "total_count": 559,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2753,6 +2753,22 @@
       "title": "CI-DIAG-PR113-001 — PR #113 AIL Gate & docker-smoke 미실행 진단",
       "created_at": "2026-11-03",
       "checksum": "ffb65e2e"
+    },
+    {
+      "id": "DOC-COMMERCE-FLOW-CI-GATE-V0_1",
+      "path": "docs/knowledge/COMMERCE-FLOW-CI-GATE-V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "비고",
+      "title": "PHX-COMMERCE-FLOW-004 — PR #141 CI Gate Evidence",
+      "created_at": "2026-11-03",
+      "checksum": "a202555f"
     },
     {
       "id": "DOC-COMMERCE-FLOW-INTEGRATION-V0_1",
