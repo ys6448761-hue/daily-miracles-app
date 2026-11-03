@@ -23,17 +23,19 @@ Last Updated: 2026-11-03 (PHX-COMMERCE-MIG-003 SUCCESS — Migration 217 Product
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-11-03
 
-**PR #140 병합 승인 → flowTicketRoutes.js 구현 착수**
+**PR #140 충돌 해결 전략 결정 → flowTicketRoutes.js 구현 경로 확정**
 
 - **PHX-COMMERCE-MIG-003 SUCCESS** ✅ Migration 217 APPLIED — VERIFIED (2026-11-03)
   - Production DB: Render PostgreSQL `yeosu_miracle_travel` (NOT Supabase)
-  - ticket_order_id VARCHAR(100) NULL 추가 완료
-  - ticket_paid_at TIMESTAMPTZ NULL 추가 완료
-  - uq_dt_flow_bookings_ticket_order UNIQUE INDEX 생성 완료
-  - 기존 Booking 2행 무결성 보존 확인
+  - ticket_order_id / ticket_paid_at / UNIQUE INDEX 모두 적용 완료
   - Evidence: `docs/knowledge/COMMERCE-MIG-217-APPLIED-EVIDENCE-V0_1.md`
-- **PR #139 OPEN** — Commerce Phase 1 설계 docs (docs/commerce-phase1-v01 → main)
-- **PR #140 OPEN** — FLOW staging → main (병합 후 flowTicketRoutes.js 구현 가능)
+- **PR #140 HOLD** — mergeable=CONFLICTING / CI FAILURE / Migration 207 번호 충돌
+  - 26개 파일 충돌 (server.js: main +77줄 vs staging +3,012줄)
+  - Vercel 배포 FAILURE 2개
+  - Migration 207 번호 중복 (main: travel_places_stay_time / staging: voyage_wish_owner)
+  - Evidence: `docs/knowledge/COMMERCE-PR140-MERGE-READINESS-V0_1.md`
+  - 선택지: A) 충돌 해결 후 병합 / B) 필요 파일만 cherry-pick / C) staging에서 직접 작업
+- **PR #139 OPEN** — Commerce Phase 1 docs (mergeable=MERGEABLE, 충돌 없음)
 
 **Production DB 정체 확정 (2026-11-03):**
 - Render PostgreSQL `yeosu_miracle_travel` — 모든 FLOW 테이블 APPLIED
