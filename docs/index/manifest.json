@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-03T02:20:52.884Z",
+  "generated_at": "2026-11-03T04:58:46.024Z",
   "generator": "generate-manifest.js",
-  "total_count": 563,
+  "total_count": 564,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -2770,6 +2770,22 @@
       "title": "CI-DIAG-PR113-001 — PR #113 AIL Gate & docker-smoke 미실행 진단",
       "created_at": "2026-11-03",
       "checksum": "ffb65e2e"
+    },
+    {
+      "id": "DOC-COMMERCE-MIG-217-APPLIED-EVIDE",
+      "path": "docs/knowledge/COMMERCE-MIG-217-APPLIED-EVIDENCE-V0_1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "team",
+      "status": "|--------",
+      "title": "PHX-COMMERCE-MIG-003 — Migration 217 Applied Evidence",
+      "created_at": "2026-11-03",
+      "checksum": "8bea91a7"
     },
     {
       "id": "DOC-COMMERCE-MIG-217-EVIDENCE-V0_1",

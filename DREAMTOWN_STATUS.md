@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-11-03 (PHX-COMMERCE-MIG-002 COMPLETE — Migration 217 Production 사전 점검 SQL 준비 완료, Founder Supabase 실행 대기)
+Last Updated: 2026-11-03 (PHX-COMMERCE-MIG-003 SUCCESS — Migration 217 Production APPLIED VERIFIED, dt_flow_bookings ticket_order_id/ticket_paid_at 추가 완료)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,16 +23,21 @@ Last Updated: 2026-11-03 (PHX-COMMERCE-MIG-002 COMPLETE — Migration 217 Produc
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-11-03
 
-**Founder: Supabase SQL Editor에서 CHECK-01~10 실행 → 전체 PASS 확인 → Migration 217 적용 승인**
+**PR #140 병합 승인 → flowTicketRoutes.js 구현 착수**
 
-- **PHX-COMMERCE-MIG-002 COMPLETE** — READ-ONLY 사전 점검 SQL 준비 완료
-  - 사전 점검: `docs/knowledge/COMMERCE-MIG-217-PRECHECK-V0_1.md` §2 (10개 CHECK)
-  - Migration SQL: `database/migrations/217_flow_ticket_order_id.sql`
-  - Evidence: `docs/knowledge/COMMERCE-MIG-217-EVIDENCE-V0_1.md`
-  - Code 분석: 전체 PASS (ticket_order_id/ticket_paid_at 미존재, 인덱스 충돌 없음, consumeHold 호환)
-  - NOT VERIFIED (Founder 실행 필요): 실제 DB 컬럼 목록, 기존 Booking 수, 권한
+- **PHX-COMMERCE-MIG-003 SUCCESS** ✅ Migration 217 APPLIED — VERIFIED (2026-11-03)
+  - Production DB: Render PostgreSQL `yeosu_miracle_travel` (NOT Supabase)
+  - ticket_order_id VARCHAR(100) NULL 추가 완료
+  - ticket_paid_at TIMESTAMPTZ NULL 추가 완료
+  - uq_dt_flow_bookings_ticket_order UNIQUE INDEX 생성 완료
+  - 기존 Booking 2행 무결성 보존 확인
+  - Evidence: `docs/knowledge/COMMERCE-MIG-217-APPLIED-EVIDENCE-V0_1.md`
 - **PR #139 OPEN** — Commerce Phase 1 설계 docs (docs/commerce-phase1-v01 → main)
-- **PR #140 OPEN** — FLOW staging → main (GitHub 확인: 미병합, Migration과 독립 가능)
+- **PR #140 OPEN** — FLOW staging → main (병합 후 flowTicketRoutes.js 구현 가능)
+
+**Production DB 정체 확정 (2026-11-03):**
+- Render PostgreSQL `yeosu_miracle_travel` — 모든 FLOW 테이블 APPLIED
+- Supabase `aurora5-db`, `dreamtown-storybook-staging` — Production과 무관
 
 **Commerce 판매 채널 기준 확정 (2026-11-03) — DECISION_COMMERCE_CHANNEL_V0_1**
 - ticket.6117.co.kr = PHP 독립 시스템 (상품·주문·NicePay 결제 기준)
