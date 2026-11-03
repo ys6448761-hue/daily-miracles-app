@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-11-03 (PHX-COMMERCE-TICKET-001 READY — PR #143 병합 승인 대기)
+Last Updated: 2026-11-03 (PHX-COMMERCE-TICKET-003 PRODUCTION SAFETY GATE PASS — PR #143 MERGE READY)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,27 +23,30 @@ Last Updated: 2026-11-03 (PHX-COMMERCE-TICKET-001 READY — PR #143 병합 승�
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-11-03
 
-**PR #143 병합 승인 → Render 환경변수 등록 (FLOW_TICKET_SECRET, FLOW_TICKET_SOWON_ID)**
+**PR #143 병합 승인 → Production 배포 (수동) → Render env 등록 (순서 엄수)**
 
-#### PHX-COMMERCE-TICKET-002: SECURITY GATE PASS — MERGE READY ✅
+#### PHX-COMMERCE-TICKET-003: PRODUCTION SAFETY GATE PASS — **MERGE READY** ✅
 
 - **PR #143 OPEN** (feat/commerce-ticket-flow-v02 → main) — Founder 병합 승인 필요
-  - 최종 Commit: `4197669` (보안 게이트 수정 포함)
+  - 최종 Commit: `3dd0695` (Feature Flag 포함)
   - URL: https://github.com/ys6448761-hue/daily-miracles-app/pull/143
-  - FLOW tests: 77/77 PASS (기존 51 + 신규 26)
-- Security Gate 수정 완료 (3건):
-  1. **CRITICAL FIX** — 동시 중복 book: PG 23505 → 200 idempotent (false ops SMS 제거)
-  2. **IMPORTANT FIX** — HOLD_NOT_ACTIVE ops SMS 추가 (결제됐으나 Hold 실패 알림)
-  3. **MINOR FIX** — 서명 형식 검증을 computeSignature 전으로 이동
-- Security Gate Evidence: `docs/knowledge/COMMERCE-TICKET-SECURITY-GATE-V0_1.md`
-- 결제 검증: PARTIAL (PHP HMAC 신뢰 계약 MVP — §2 참조)
-- 병합 후 필요 조치:
-  1. Render 환경변수: `FLOW_TICKET_SECRET`, `FLOW_TICKET_SOWON_ID` (Founder Action)
-  2. 수동 배포 (Render Auto-Deploy: MANUAL)
-  3. PHP 담당자 확인 항목 (Security Gate §7) 처리 후 E2E 연동 테스트
+  - FLOW tests: **81/81 PASS** (기존 51 + 신규 30)
+  - CI: AIL Gate ✅ / Manifest ✅ / docker-smoke ✅ / Vercel FAIL (PRE-EXISTING)
+  - mergeable: MERGEABLE
+- Production Gate 완료:
+  1. 보안 수정 3건 commit `4197669` 포함 확인
+  2. **FLOW_TICKET_ENABLED Feature Flag** 구현 — 미설정 시 503 TICKET_API_DISABLED (fail-closed)
+  3. 기존 FLOW 라우트 영향 없음 확인 (81/81)
+  4. NicePay 검증: PARTIAL (PHP 신뢰 계약 MVP)
+- Evidence: `docs/knowledge/COMMERCE-TICKET-PROD-GATE-V0_1.md`
 
-**주의:** PR #141은 이미 main에 병합됨 (`b75aacd5`). PR #142 (docs 업데이트)도 병합 필요.
-PR #138 (SOUL 테마 docs CLOSED) OPEN 유지.
+**병합 후 Founder 활성화 순서 (순서 엄수):**
+1. PR #143 병합 → 수동 배포 (API는 503 DISABLED 상태)
+2. Render env: `FLOW_TICKET_SECRET`, `FLOW_TICKET_SOWON_ID`
+3. PHP 담당자 Security Gate §7 확인 + E2E 스테이징 테스트
+4. `FLOW_TICKET_ENABLED=true` (마지막 — API 활성화)
+
+**PR #141 이미 병합됨** (`b75aacd5`). PR #142/138 OPEN 유지.
 
 ---
 
