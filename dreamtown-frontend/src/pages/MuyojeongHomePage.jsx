@@ -513,7 +513,7 @@ export default function MuyojeongHomePage() {
           }}
         >
           <button
-            onClick={() => { window.location.href = 'https://hotel-kenny-yeosu-starlight-route.sejinlee.chatgpt.site/'; }}
+            onClick={() => { window.location.href = `https://hotel-kenny-yeosu-starlight-route.sejinlee.chatgpt.site/?lang=${kennyLang}`; }}
             style={{
               display:    'flex',
               alignItems: 'center',
