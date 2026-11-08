@@ -487,3 +487,69 @@ http://localhost:5100/muyojeong                    ← 일반 무여정 (케니 
 - docs/knowledge/screenshots/PHX011-H-mobile-en.png — 케니호텔 EN
 - docs/knowledge/screenshots/PHX011-muyojeong-ko.png — 무여정 KO (복귀 배너)
 - docs/knowledge/screenshots/PHX011-muyojeong-en.png — 무여정 EN (복귀 배너)
+
+---
+
+## §22 — PHX-KENNY-014 Production 배포 검증 (2026-11-08)
+
+### PR 병합 확인
+- **PR #146 MERGED** b5935c — 2026-11-08T03:02:47Z
+- **main HEAD**: b5935c (feat/phx-kenny-003-012-muyojeong-bilingual)
+
+### Render 배포 상태
+- **started_at**: 2026-11-02T23:18:16Z — PR merge 이전 버전 실행 중
+- **판정**: Render 자동 배포 미트리거 (Auto-Deploy 비활성화 추정)
+- **대기 시간**: 10분 polling 후 미완료
+
+### Production URL 실제 테스트
+
+| URL | HTTP | 실제 화면 |
+|-----|------|----------|
+| pp.dailymiracles.kr/kenny | 200 | ❌ DreamTown 인트로 (구 버전) |
+| pp.dailymiracles.kr/kenny?lang=en | 200 | ❌ DreamTown 인트로 (구 버전) |
+| pp.dailymiracles.kr/muyojeong?from=kenny&lang=ko | 200 | ✅ 한국어 무여정 (복귀배너 없음 — 구 버전) |
+| pp.dailymiracles.kr/muyojeong?from=kenny&lang=en | 200 | ✅ 무여정 로드 (영어 미적용 — 구 버전) |
+| /api/health | 200 | ✅ DB 연결됨 |
+| /api/dt/identity/bootstrap | 201 | ✅ 정상 |
+| /api/dt/travel/input/text (KO) | 200 | ✅ SOUL 응답 정상 |
+| /api/dt/travel/input/text (EN) | 200 | message_en 없음 (구 코드) |
+
+### 복구/배포 방법
+Render 대시보드 → 서비스 → "Manual Deploy" 또는 Auto-Deploy 활성화 (branch: main)
+
+### 스크린샷
+- docs/knowledge/screenshots/PHX014-kenny-ko.png — 구버전 DreamTown 인트로
+- docs/knowledge/screenshots/PHX014-muyojeong-plain.png — 무여정 한국어 (기존 정상)
+
+---
+
+## §23 — PHX-KENNY-016 복귀 버튼 lang 파라미터 추가 (2026-11-08)
+
+### 변경 내용
+
+- **파일**: `dreamtown-frontend/src/pages/MuyojeongHomePage.jsx` 1줄 수정
+- **Before**: `window.location.href = 'https://hotel-kenny-yeosu-starlight-route.sejinlee.chatgpt.site/'`
+- **After**: `window.location.href = \`https://hotel-kenny-yeosu-starlight-route.sejinlee.chatgpt.site/?lang=${kennyLang}\``
+
+### 근거
+
+Founder 검증 완료: 케니호텔 외부 사이트가 `?lang=en`/`?lang=ko` 파라미터를 지원하며 URL 언어가 저장 언어보다 우선.
+
+### 검증 결과
+
+| 시나리오 | 복귀 URL | 결과 |
+|---------|---------|------|
+| `/muyojeong?from=kenny&lang=ko` → 복귀 | `.../?lang=ko` | PASS ✅ |
+| `/muyojeong?from=kenny&lang=en` → 복귀 | `.../?lang=en` | PASS ✅ |
+| 빌드 (`npm run build`) | exit 0 | PASS ✅ |
+| KO 회귀 (기존 동작) | 무변경 | PASS ✅ |
+
+### Git
+
+- **Commit**: d88b997 (feat/phx-kenny-016-return-lang-param)
+- **PR**: #147 — OPEN, Founder 승인 대기
+- **main merge**: Founder 승인 후
+
+### 미검증 (알려진 한계)
+- Production 미배포 (Render Manual Deploy 필요 — PHX-KENNY-014 §22 참조)
+- `from=kenny` 없는 경우 복귀 버튼 미표시 (기존 동작, 변경 없음)
