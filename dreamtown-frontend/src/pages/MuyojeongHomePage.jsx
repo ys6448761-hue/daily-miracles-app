@@ -843,6 +843,7 @@ export default function MuyojeongHomePage() {
                   selectedPlaces={routePlaces}
                   onTogglePlace={toggleRoutePlace}
                   onClose={() => setMapMode(false)}
+                  lang={kennyLang}
                 />
               )}
 

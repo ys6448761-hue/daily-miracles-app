@@ -37,11 +37,68 @@ import {
 // objectFit:fill + SVG viewBox="0 0 1 1" + preserveAspectRatio="none" 조합으로 좌표 정합
 const OVERVIEW_IMG_RATIO_PCT = ((1304 / 1206) * 100).toFixed(2); // "108.13"
 
-// 상태별 배지 표시 정의
+// 상태별 배지 — 색상 베이스 (텍스트는 lang별 getStatusBadge()로 가져옴)
 const STATUS_BADGE = {
-  [MAP_STATUS.EXPLORER]:      { label: '탐색 가능', color: 'rgba(110,184,255,0.70)', bg: 'rgba(110,184,255,0.12)' },
-  [MAP_STATUS.VERIFY_NEEDED]: { label: '정보 수집 중', color: 'rgba(255,255,255,0.35)', bg: 'rgba(255,255,255,0.06)' },
-  [MAP_STATUS.FERRY]:         { label: '⛴ 배편 필요', color: 'rgba(200,200,220,0.70)', bg: 'rgba(200,200,220,0.08)' },
+  [MAP_STATUS.EXPLORER]:      { color: 'rgba(110,184,255,0.70)', bg: 'rgba(110,184,255,0.12)' },
+  [MAP_STATUS.VERIFY_NEEDED]: { color: 'rgba(255,255,255,0.35)', bg: 'rgba(255,255,255,0.06)' },
+  [MAP_STATUS.FERRY]:         { color: 'rgba(200,200,220,0.70)', bg: 'rgba(200,200,220,0.08)' },
+};
+const STATUS_BADGE_LABELS = {
+  ko: {
+    [MAP_STATUS.EXPLORER]:      '탐색 가능',
+    [MAP_STATUS.VERIFY_NEEDED]: '정보 수집 중',
+    [MAP_STATUS.FERRY]:         '⛴ 배편 필요',
+  },
+  en: {
+    [MAP_STATUS.EXPLORER]:      'Explorable',
+    [MAP_STATUS.VERIFY_NEEDED]: 'Info Pending',
+    [MAP_STATUS.FERRY]:         '⛴ Ferry Required',
+  },
+};
+function getStatusBadge(status, lang) {
+  const base = STATUS_BADGE[status];
+  if (!base) return null;
+  const label = (STATUS_BADGE_LABELS[lang] || STATUS_BADGE_LABELS.ko)[status] || '';
+  return { ...base, label };
+}
+
+// 권역 영문명
+const ZONE_NAME_EN = {
+  1: 'Old Town & Waterfront',
+  2: 'Odongdo & Expo',
+  3: 'Dolsan Area',
+  4: 'Hyangiram Area',
+  5: 'Soho & Jangdo',
+  6: 'Hwayang & Yeoja Bay',
+  7: 'Island Route (Ferry Required)',
+};
+
+// UI 번역 사전
+const MAP_TM = {
+  ko: {
+    sectionTitle:  '지역별 탐색',
+    backToList:    '목록으로 ↑',
+    backBtn:       '← 뒤로',
+    countLabel:    (n) => `코스 추천 ${n}곳`,
+    noPlaces:      '장소 정보를 수집 중이에요',
+    selectedLabel: (names) => `선택됨: ${names}`,
+    ferryNote:     '배편 운항 일정과 물때를 사전에 확인하세요. 현재 코스 추천에는 포함되지 않아요.',
+    offMapTitle:   '지도 범위 밖의 섬',
+    imgError:      '지도 이미지를 불러올 수 없어요 — 권역 카드로 탐색하세요',
+    checkMark:     '',
+  },
+  en: {
+    sectionTitle:  'Explore by Area',
+    backToList:    'Back to List ↑',
+    backBtn:       '← Back',
+    countLabel:    (n) => `${n} Recommended Places`,
+    noPlaces:      'Collecting place information…',
+    selectedLabel: (names) => `Selected: ${names}`,
+    ferryNote:     'Please check ferry schedules and tides in advance. Not included in current course recommendations.',
+    offMapTitle:   'Islands Beyond Map Coverage',
+    imgError:      'Map image unavailable — browse by zone cards',
+    checkMark:     '✓ ',
+  },
 };
 
 const OVERVIEW_IMG  = '/images/muyojeong/map/yeosu-overview-v01.png';
@@ -67,7 +124,8 @@ const OLDTOWN_ZONE_ZOOM_CENTERS = {
   2: { x: 0.63, y: 0.36 }, // Zone 2 Founder 마커 9곳 평균 (x: 0.630, y: 0.364)
 };
 
-function ZoneOverview({ onSelectZone, isQAPreview }) {
+function ZoneOverview({ onSelectZone, isQAPreview, lang = 'ko' }) {
+  const t = MAP_TM[lang] || MAP_TM.ko;
   const [imgError, setImgError] = useState(false);
   const [hoveredZoneId, setHoveredZoneId] = useState(null);
 
@@ -129,8 +187,8 @@ function ZoneOverview({ onSelectZone, isQAPreview }) {
           </svg>
         </div>
       ) : (
-        <p style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.28)', textAlign: 'center', padding: '4px 0 8px' }}>
-          지도 이미지를 불러올 수 없어요 — 권역 카드로 탐색하세요
+        <p style={{ fontSize: '0.6875rem', color: 'var(--soul-text-subtle)', textAlign: 'center', padding: '4px 0 8px' }}>
+          {t.imgError}
         </p>
       )}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
@@ -145,7 +203,9 @@ function ZoneOverview({ onSelectZone, isQAPreview }) {
               onMouseLeave={() => setHoveredZoneId(null)}
               onFocus={() => setHoveredZoneId(zone.id)}
               onBlur={() => setHoveredZoneId(null)}
-              aria-label={`${zone.name_ko} — 추천 가능 장소 ${count}곳`}
+              aria-label={lang === 'en'
+                ? `${ZONE_NAME_EN[zone.id] || zone.name_ko} — ${count} recommended places`
+                : `${zone.name_ko} — 추천 가능 장소 ${count}곳`}
               style={{
                 padding: '14px 12px',
                 borderRadius: '12px',
@@ -170,12 +230,12 @@ function ZoneOverview({ onSelectZone, isQAPreview }) {
                   flexShrink: 0,
                 }}
               />
-              <span style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.88)', fontWeight: 600, wordBreak: 'keep-all', lineHeight: 1.3 }}>
-                {zone.name_ko}
+              <span style={{ fontSize: '0.8125rem', color: 'var(--soul-text)', fontWeight: 600, wordBreak: 'keep-all', lineHeight: 1.3 }}>
+                {lang === 'en' ? (ZONE_NAME_EN[zone.id] || zone.name_ko) : zone.name_ko}
               </span>
               {count > 0 && (
-                <span style={{ fontSize: '0.6875rem', color: zone.color, opacity: 0.85 }}>
-                  코스 추천 {count}곳
+                <span style={{ fontSize: '0.6875rem', color: 'var(--soul-text-muted)' }}>
+                  {t.countLabel(count)}
                 </span>
               )}
             </button>
@@ -186,7 +246,8 @@ function ZoneOverview({ onSelectZone, isQAPreview }) {
   );
 }
 
-function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview }) {
+function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview, lang = 'ko' }) {
+  const t = MAP_TM[lang] || MAP_TM.ko;
   const zone        = YEOSU_ZONES.find(z => z.id === zoneId);
   const allPlaces   = getPlacesByZone(zoneId);
   const offMapPlaces = zoneId === 7 ? allPlaces.filter(p => p.offMap) : [];
@@ -378,13 +439,13 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <button
           onClick={onBack}
-          aria-label="권역 목록으로 돌아가기"
+          aria-label={lang === 'en' ? 'Back to zone list' : '권역 목록으로 돌아가기'}
           style={{
-            background: 'none', border: 'none', color: 'rgba(255,255,255,0.50)',
+            background: 'none', border: 'none', color: 'var(--soul-text-subtle)',
             cursor: 'pointer', fontSize: '0.875rem', padding: '4px 0',
           }}
         >
-          ← 뒤로
+          {t.backBtn}
         </button>
         <span
           style={{
@@ -392,13 +453,13 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
             borderRadius: '50%', background: zone.color,
           }}
         />
-        <span style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.88)', fontWeight: 600 }}>
-          {zone.name_ko}
+        <span style={{ fontSize: '0.875rem', color: 'var(--soul-text)', fontWeight: 600, wordBreak: 'keep-all' }}>
+          {lang === 'en' ? (ZONE_NAME_EN[zone.id] || zone.name_ko) : zone.name_ko}
         </span>
       </div>
 
       {zone.note && (
-        <p style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.35)', margin: 0, wordBreak: 'keep-all' }}>
+        <p style={{ fontSize: '0.6875rem', color: 'var(--soul-text-subtle)', margin: 0, wordBreak: 'keep-all' }}>
           {zone.note}
         </p>
       )}
@@ -1243,10 +1304,10 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
           style={{
             padding: '10px 12px', borderRadius: '10px',
             background: 'rgba(200,200,220,0.06)', border: '1px solid rgba(200,200,220,0.14)',
-            fontSize: '0.75rem', color: 'rgba(200,200,220,0.65)', wordBreak: 'keep-all', lineHeight: 1.5,
+            fontSize: '0.75rem', color: 'var(--soul-text-muted)', wordBreak: 'keep-all', lineHeight: 1.5,
           }}
         >
-          배편 운항 일정과 물때를 사전에 확인하세요. 현재 코스 추천에는 포함되지 않아요.
+          {t.ferryNote}
         </div>
       )}
 
@@ -1254,10 +1315,10 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
       {zoneId === 7 && offMapPlaces.length > 0 && (
         <div style={{ marginTop: '10px' }}>
           <p style={{
-            fontSize: '0.7rem', color: 'rgba(200,200,220,0.42)',
+            fontSize: '0.7rem', color: 'var(--soul-text-subtle)',
             marginBottom: '6px', letterSpacing: '0.03em',
           }}>
-            지도 범위 밖의 섬
+            {t.offMapTitle}
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
             {offMapPlaces.map(p => (
@@ -1281,15 +1342,15 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
       {/* 장소 목록 — 편집 모드 시 비활성화 */}
       <div style={{ opacity: placementMode ? 0.25 : 1, pointerEvents: placementMode ? 'none' : 'auto', transition: 'opacity 0.20s' }}>
       {places.length === 0 ? (
-        <p style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.35)', textAlign: 'center', padding: '16px 0' }}>
-          장소 정보를 수집 중이에요
+        <p style={{ fontSize: '0.8125rem', color: 'var(--soul-text-subtle)', textAlign: 'center', padding: '16px 0' }}>
+          {t.noPlaces}
         </p>
       ) : (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
           {places.map(place => {
             const selectable = isSelectablePlace(place);
             const selected   = selectedPlaces.some(p => p.code === place.code);
-            const badge      = STATUS_BADGE[place.status];
+            const badge      = getStatusBadge(place.status, lang);
 
             if (selectable) {
               return (
@@ -1312,7 +1373,7 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                     fontWeight:  selected ? 600 : 400,
                   }}
                 >
-                  {place.name_ko}
+                  {selected && t.checkMark}{place.name_ko}
                 </button>
               );
             }
@@ -1382,15 +1443,16 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
 
       {/* 선택된 장소 합계 */}
       {selectedPlaces.length > 0 && (
-        <p style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.38)', margin: 0 }}>
-          선택됨: {selectedPlaces.map(p => p.name).join(' · ')}
+        <p style={{ fontSize: '0.6875rem', color: 'var(--soul-text-subtle)', margin: 0 }}>
+          {t.selectedLabel(selectedPlaces.map(p => p.name).join(' · '))}
         </p>
       )}
     </div>
   );
 }
 
-export default function YeosuMapSelector({ selectedPlaces, onTogglePlace, onClose }) {
+export default function YeosuMapSelector({ selectedPlaces, onTogglePlace, onClose, lang = 'ko' }) {
+  const t = MAP_TM[lang] || MAP_TM.ko;
   const [activeZone, setActiveZone] = useState(null);
   // QA Preview — localhost에서만 활성화.
   // Production(app.dailymiracles.kr)는 hostname이 달라 절대 활성화되지 않음.
@@ -1411,20 +1473,20 @@ export default function YeosuMapSelector({ selectedPlaces, onTogglePlace, onClos
       {/* 헤더 */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <p style={{ fontSize: '0.6875rem', color: '#6EB8FF', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
-          지역별 탐색
+          {t.sectionTitle}
         </p>
         <button
           onClick={onClose}
-          aria-label="지역별 탐색 닫기"
-          style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.35)', cursor: 'pointer', fontSize: '0.75rem', padding: 0 }}
+          aria-label={lang === 'en' ? 'Close area explorer' : '지역별 탐색 닫기'}
+          style={{ background: 'none', border: 'none', color: 'var(--soul-text-subtle)', cursor: 'pointer', fontSize: '0.75rem', padding: 0 }}
         >
-          목록으로 ↑
+          {t.backToList}
         </button>
       </div>
 
       {/* 내용 — 권역 개요 or 권역 상세 */}
       {activeZone === null ? (
-        <ZoneOverview onSelectZone={setActiveZone} isQAPreview={isQAPreview} />
+        <ZoneOverview onSelectZone={setActiveZone} isQAPreview={isQAPreview} lang={lang} />
       ) : (
         <ZoneDetail
           zoneId={activeZone}
@@ -1432,6 +1494,7 @@ export default function YeosuMapSelector({ selectedPlaces, onTogglePlace, onClos
           onTogglePlace={onTogglePlace}
           onBack={() => setActiveZone(null)}
           isQAPreview={isQAPreview}
+          lang={lang}
         />
       )}
     </div>
