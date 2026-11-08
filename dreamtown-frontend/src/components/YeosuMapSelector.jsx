@@ -81,6 +81,7 @@ const MAP_TM = {
     backBtn:       '← 뒤로',
     countLabel:    (n) => `코스 추천 ${n}곳`,
     noPlaces:      '장소 정보를 수집 중이에요',
+    noZonePlaces:  '이 권역은 아직 코스 추천 장소를 준비 중이에요.\n원도심 해안권이나 오동도·엑스포권에서 먼저 시작해보세요.',
     selectedLabel: (names) => `선택됨: ${names}`,
     ferryNote:     '배편 운항 일정과 물때를 사전에 확인하세요. 현재 코스 추천에는 포함되지 않아요.',
     offMapTitle:   '지도 범위 밖의 섬',
@@ -93,6 +94,7 @@ const MAP_TM = {
     backBtn:       '← Back',
     countLabel:    (n) => `${n} Recommended Places`,
     noPlaces:      'Collecting place information…',
+    noZonePlaces:  'No places are ready for route planning in this zone yet.\nTry Old Town & Waterfront or Odongdo & Expo to get started.',
     selectedLabel: (names) => `Selected: ${names}`,
     ferryNote:     'Please check ferry schedules and tides in advance. Not included in current course recommendations.',
     offMapTitle:   'Islands Beyond Map Coverage',
@@ -1346,7 +1348,30 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
           {t.noPlaces}
         </p>
       ) : (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+        <>
+          {/* 선택 가능한 장소가 없는 권역 안내 (Zone 5 등) */}
+          {places.filter(isSelectablePlace).length === 0 && (
+            <div style={{
+              padding: '12px 14px',
+              borderRadius: '12px',
+              background: 'var(--soul-chip-bg)',
+              border: '1px solid var(--soul-chip-border)',
+              marginBottom: '8px',
+            }}>
+              {t.noZonePlaces.split('\n').map((line, i) => (
+                <p key={i} style={{
+                  fontSize: '0.8125rem',
+                  color: i === 0 ? 'var(--soul-text-muted)' : 'var(--soul-text-subtle)',
+                  margin: i === 0 ? '0 0 4px' : 0,
+                  wordBreak: 'keep-all',
+                  lineHeight: 1.5,
+                }}>
+                  {line}
+                </p>
+              ))}
+            </div>
+          )}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
           {places.map(place => {
             const selectable = isSelectablePlace(place);
             const selected   = selectedPlaces.some(p => p.code === place.code);
@@ -1367,9 +1392,9 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                     wordBreak: 'keep-all',
                     minHeight: '36px',
                     transition: 'background 0.15s, border-color 0.15s',
-                    color:       selected ? '#130b1e' : 'rgba(255,255,255,0.80)',
-                    background:  selected ? '#FFD67A' : 'rgba(255,255,255,0.06)',
-                    borderColor: selected ? '#FFD67A' : 'rgba(255,255,255,0.16)',
+                    color:       selected ? '#130b1e' : 'var(--soul-chip-text)',
+                    background:  selected ? '#FFD67A' : 'var(--soul-chip-bg)',
+                    borderColor: selected ? '#FFD67A' : 'var(--soul-chip-border)',
                     fontWeight:  selected ? 600 : 400,
                   }}
                 >
@@ -1389,14 +1414,14 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
                   style={{
                     padding: '8px 12px',
                     borderRadius: '20px',
-                    border: `1px solid ${isActive ? 'rgba(110,184,255,0.50)' : 'rgba(255,255,255,0.12)'}`,
-                    background: isActive ? 'rgba(110,184,255,0.18)' : (badge ? badge.bg : 'rgba(255,255,255,0.04)'),
+                    border: `1px solid ${isActive ? 'rgba(110,184,255,0.50)' : 'var(--soul-chip-border)'}`,
+                    background: isActive ? 'rgba(110,184,255,0.18)' : (badge ? badge.bg : 'var(--soul-chip-bg)'),
                     display: 'flex', alignItems: 'center', gap: '6px',
                     cursor: 'pointer',
                     transition: 'background 0.15s, border-color 0.15s',
                   }}
                 >
-                  <span style={{ fontSize: '0.8125rem', color: isActive ? 'rgba(110,184,255,0.95)' : 'rgba(255,255,255,0.60)', wordBreak: 'keep-all' }}>
+                  <span style={{ fontSize: '0.8125rem', color: isActive ? 'rgba(110,184,255,0.95)' : 'var(--soul-text-muted)', wordBreak: 'keep-all' }}>
                     {place.name_ko}
                   </span>
                   {badge && (
@@ -1438,6 +1463,7 @@ function ZoneDetail({ zoneId, selectedPlaces, onTogglePlace, onBack, isQAPreview
             );
           })}
         </div>
+        </>
       )}
       </div>{/* end 장소목록 편집모드 비활성화 래퍼 */}
 
