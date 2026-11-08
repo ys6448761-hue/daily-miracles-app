@@ -3713,6 +3713,8 @@ const DT_SPA_ROUTES = [
   '/voyage-reflect',
   // 여수 travel guide — PUBLIC 진입 + WISH_TRAVELER flow
   '/travel-guide',
+  // 케니호텔 전용 무여정 영업 시연판 (PHX-KENNY-003)
+  '/kenny',
 ];
 app.get(DT_SPA_ROUTES, (req, res) => {
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');

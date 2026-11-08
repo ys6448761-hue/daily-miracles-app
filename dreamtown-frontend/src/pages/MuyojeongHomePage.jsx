@@ -43,7 +43,7 @@
  */
 
 import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getOrEnsureGuestCredential } from '../api/dreamtown.js';
 import CourseDisplay from '../components/TravelGuide/CourseDisplay';
 import YeosuMapSelector from '../components/YeosuMapSelector';
@@ -81,29 +81,34 @@ const TIME_OPTIONS = [
 const TIME_QUESTION = '시간이 얼마나 남으셨어요?';
 
 // ── SOUL Answer Summary ────────────────────────────────────────────────────────
-function SoulAnswerSummary({ response, onNewQuestion, onTimeSelect, isLoading }) {
+function SoulAnswerSummary({ response, onNewQuestion, onTimeSelect, isLoading, lang }) {
   if (!response || !response.message_ko) return null;
+  const displayMessage = (lang === 'en' && response.message_en) ? response.message_en : response.message_ko;
 
   const navigate = useNavigate();
   const mode     = response.presentation_mode;
   const status   = response.status;
+  const t        = TM[lang] || TM.ko;
 
-  const resolvedCode   = response.resolved_code || null;
-  const isNavigable    = status === 'PLACE_LOOKUP' && NAVIGABLE_PLACE_CODES.includes(resolvedCode);
-  const placeNameForBtn = isNavigable ? (PLACE_NAME_KO[resolvedCode] || resolvedCode) : null;
+  const resolvedCode    = response.resolved_code || null;
+  const isNavigable     = status === 'PLACE_LOOKUP' && NAVIGABLE_PLACE_CODES.includes(resolvedCode);
+  const placeNameKo     = isNavigable ? (PLACE_NAME_KO[resolvedCode] || resolvedCode) : null;
+  const placeNameForBtn = isNavigable
+    ? (lang === 'en' ? (PLACE_NAME_EN[resolvedCode] || placeNameKo) : placeNameKo)
+    : null;
 
   let badge = null;
   if (status !== 'JOURNEY_CONTINUITY') {
     if (mode === 'DISCOVERING' || (status === 'PLACE_LOOKUP' && response.places?.length > 0)) {
-      badge = { label: '추천 가능', cls: 'text-green-300 bg-green-900 bg-opacity-40 border-green-700 border-opacity-40' };
+      badge = { label: t.badgeGood, cls: 'text-green-300 bg-green-900 bg-opacity-40 border-green-700 border-opacity-40' };
     } else if (mode === 'PARTIAL') {
-      badge = { label: '상황에 따라 달라요', cls: 'text-yellow-300 bg-yellow-900 bg-opacity-30 border-yellow-700 border-opacity-40' };
+      badge = { label: t.badgePartial, cls: 'text-yellow-300 bg-yellow-900 bg-opacity-30 border-yellow-700 border-opacity-40' };
     } else if (status === 'CLARIFICATION' || (mode === 'CLARIFICATION' && status !== 'JOURNEY_CONTINUITY')) {
-      badge = { label: '확인 필요', cls: 'text-blue-300 bg-blue-900 bg-opacity-30 border-blue-700 border-opacity-40' };
+      badge = { label: t.badgeClarify, cls: 'text-blue-300 bg-blue-900 bg-opacity-30 border-blue-700 border-opacity-40' };
     }
   }
 
-  const lines         = response.message_ko.split('\n');
+  const lines         = displayMessage.split('\n');
   const firstLine     = lines[0] || '';
   const sentenceEnd   = firstLine.search(/[.!?。]\s*/);
   const firstSentence = sentenceEnd >= 0 ? firstLine.slice(0, sentenceEnd + 1) : firstLine;
@@ -123,15 +128,22 @@ function SoulAnswerSummary({ response, onNewQuestion, onTimeSelect, isLoading })
       }}
     >
       <div className="flex items-center justify-between mb-2">
-        <p style={{ fontSize: '0.6875rem', color: 'var(--soul-accent)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-          SOUL의 답
-        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <p style={{ fontSize: '0.6875rem', color: 'var(--soul-accent)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            {t.soulLabel}
+          </p>
+          {t.langNote && !response.message_en && (
+            <span style={{ fontSize: '0.625rem', color: 'var(--soul-text-subtle)', opacity: 0.7 }}>
+              ({t.langNote})
+            </span>
+          )}
+        </div>
         {onNewQuestion && (
           <button
             onClick={onNewQuestion}
             style={{ fontSize: '0.75rem', color: 'var(--soul-text-subtle)', cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
           >
-            다시 물어보기
+            {t.askAgain}
           </button>
         )}
       </div>
@@ -159,7 +171,7 @@ function SoulAnswerSummary({ response, onNewQuestion, onTimeSelect, isLoading })
       )}
       {nextAction && (
         <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--soul-chip-border)' }}>
-          <p style={{ fontSize: '0.6875rem', color: 'var(--soul-text-subtle)', marginBottom: '6px' }}>다음에 알려주세요</p>
+          <p style={{ fontSize: '0.6875rem', color: 'var(--soul-text-subtle)', marginBottom: '6px' }}>{t.nextTell}</p>
           {nextAction === TIME_QUESTION && onTimeSelect ? (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
               {TIME_OPTIONS.map((opt) => (
@@ -209,7 +221,7 @@ function SoulAnswerSummary({ response, onNewQuestion, onTimeSelect, isLoading })
               wordBreak:    'keep-all',
             }}
           >
-            {placeNameForBtn} 자세히 보기 →
+            {t.viewDetail(placeNameForBtn)}
           </button>
         </div>
       )}
@@ -239,9 +251,9 @@ const ROUTE_PLACES_MORE = [
 ];
 // 빠른 시간 선택: 명확한 분 단위로 GPT 추출 오류 방지
 const ROUTE_TIME_QUICK = [
-  { label: '2시간', minutes: 120 },
-  { label: '반나절', minutes: 300 },
-  { label: '하루',  minutes: 480 },
+  { label: '2시간',  labelEn: '2 hrs',     minutes: 120 },
+  { label: '반나절', labelEn: 'Half day',  minutes: 300 },
+  { label: '하루',   labelEn: 'Full day',  minutes: 480 },
 ];
 
 function buildSoulMessage(selectedPlaces, minutes) {
@@ -249,13 +261,93 @@ function buildSoulMessage(selectedPlaces, minutes) {
   return `${names} 가고 싶어요. ${minutes}분 코스 짜줘.`;
 }
 
+// ── i18n — lang=en 진입 시 UI 텍스트 전환 (SOUL 응답 본문은 한국어 유지) ──────
+const TM = {
+  ko: {
+    freeTag:        '무료 여수여행정보',
+    headline:       '여수가 궁금하면, 그냥 물어보세요.',
+    subtext:        '여수를 잘 아는 여행친구 SOUL이 함께 찾아볼게요.',
+    placeholder:    '여수에서 궁금한 건 뭐든 물어보세요',
+    sectionPick:    '가고 싶은 곳 골라보기',
+    mapViewBtn:     '지역별 보기',
+    mapListBtn:     '목록으로 ↑',
+    timeSectionLbl: '얼마나 여행하실 건가요?',
+    timeInputPh:    '직접 입력',
+    timeUnit:       '분',
+    timeRange:      '60~540분',
+    selectedLbl:    '선택',
+    ctaBtn:         '소울이에게 코스 추천받기 →',
+    loading:        'SOUL이 여수 여행 정보를 찾고 있어요…',
+    errAuth:        '인증 정보를 가져오지 못했어요. 잠시 후 다시 시도해주세요.',
+    errGeneral:     '요청 처리에 실패했어요. 다시 시도해주세요.',
+    errFallback:    '일정을 확인하는 중 문제가 생겼어요. 다시 시도해주세요.',
+    retryBtn:       '다시 시도',
+    exploreLbl:     'SOUL과 먼저 둘러보기',
+    footer:         'SOUL은 현재 알고 있는 정보를 바탕으로 답해드려요.\n최신 운영 정보는 현장에서 확인을 권장해요.',
+    soulLabel:      'SOUL의 답',
+    askAgain:       '다시 물어보기',
+    nextTell:       '다음에 알려주세요',
+    badgeGood:      '추천 가능',
+    badgePartial:   '상황에 따라 달라요',
+    badgeClarify:   '확인 필요',
+    viewDetail:     (name) => `${name} 자세히 보기 →`,
+    langNote:       null,
+  },
+  en: {
+    freeTag:        'Free Yeosu Travel Info',
+    headline:       'Curious about Yeosu? Just ask.',
+    subtext:        'SOUL, your Yeosu travel guide, will help you explore.',
+    placeholder:    'Ask anything about Yeosu',
+    sectionPick:    'Pick Places to Visit',
+    mapViewBtn:     'By Area',
+    mapListBtn:     'List ↑',
+    timeSectionLbl: 'How long will you travel?',
+    timeInputPh:    'Enter minutes',
+    timeUnit:       'min',
+    timeRange:      '60–540 min',
+    selectedLbl:    'Selected',
+    ctaBtn:         'Get Route from SOUL →',
+    loading:        'SOUL is finding travel info for you…',
+    errAuth:        'Could not retrieve session. Please try again shortly.',
+    errGeneral:     'Request failed. Please try again.',
+    errFallback:    'Something went wrong. Please try again.',
+    retryBtn:       'Try Again',
+    exploreLbl:     'Explore with SOUL',
+    footer:         'SOUL answers based on current knowledge.\nPlease verify latest hours and fees on-site.',
+    soulLabel:      "SOUL's Answer",
+    askAgain:       'Ask Again',
+    nextTell:       'Tell us more',
+    badgeGood:      'Recommendable',
+    badgePartial:   'Depends on the situation',
+    badgeClarify:   'Needs clarification',
+    viewDetail:     (_name) => 'View Details →',
+    langNote:       'Response in Korean',
+  },
+};
+
+// ── PLACE_NAME_EN — 영문 진입 시 place 버튼 표시용 ──────────────────────────
+const PLACE_NAME_EN = {
+  cablecar:              'Cable Car',
+  odongdo:               'Odongdo Island',
+  hyangiram:             'Hyangiram Temple',
+  dolsan_nightscape:     'Dolsan Park',
+  dolsan_daegyo:         'Dolsan Bridge',
+  lee_soon_shin_plaza:   'Yi Sun-sin Plaza',
+  hamel_lighthouse:      'Hamel Lighthouse',
+  marine_park:           'Marine Park',
+  jaisan_park:           'Jaisan Park',
+  romantic_pojangmacha:  'Pojangmacha St.',
+  sky_tower:             'Sky Tower',
+  yeosu_expo_park:       'Expo Park',
+};
+
 // ── Suggestion chips — Founder directive canonical 4, 2-col grid ──────────────
-// label: 화면 표시 / query: SOUL API 전달 질문 / ec: optional explicit_context
+// label/labelEn: 화면 표시 / query: SOUL API 전달 질문 / ec: optional explicit_context
 const SUGGESTION_CHIPS = [
-  { label: '부모님과 함께', query: '부모님과 여수에서 어디 가면 좋을까?' },
-  { label: '아이와 함께',   query: '아이와 여수에서 어디 가면 좋을까?' },
-  { label: '차량으로',      query: '여수에서 차로 가기 좋은 곳과 주차 정보를 알려줘.', ec: { has_car: true } },
-  { label: '여행코스',      query: '여수 여행코스를 짜줘.' },
+  { label: '부모님과 함께', labelEn: 'With Parents', query: '부모님과 여수에서 어디 가면 좋을까?' },
+  { label: '아이와 함께',   labelEn: 'With Kids',    query: '아이와 여수에서 어디 가면 좋을까?' },
+  { label: '차량으로',      labelEn: 'By Car',        query: '여수에서 차로 가기 좋은 곳과 주차 정보를 알려줘.', ec: { has_car: true } },
+  { label: '여행코스',      labelEn: 'Travel Route',  query: '여수 여행코스를 짜줘.' },
 ];
 
 // ── Place entries — per-place routing via ?place= URL param ───────────────────
@@ -289,6 +381,12 @@ export default function MuyojeongHomePage() {
   const navigate = useNavigate();
   const inputRef = useRef(null);
   const { pref, resolvedTheme, setPref } = useSoulTheme();
+  const [searchParams] = useSearchParams();
+  // 케니호텔 전용 진입 감지 — ?from=kenny 파라미터
+  const fromKenny = searchParams.get('from') === 'kenny';
+  const kennyLang = (searchParams.get('lang') === 'en') ? 'en' : 'ko';
+
+  const t = TM[kennyLang] || TM.ko;
 
   const [inputValue,     setInputValue]     = useState('');
   const [sessionId,      setSessionId]      = useState(null);
@@ -308,7 +406,7 @@ export default function MuyojeongHomePage() {
     setIsLoading(true);
     try {
       const cred = await getOrEnsureGuestCredential();
-      if (!cred?.guest_token) throw new Error('인증 정보를 가져오지 못했어요. 잠시 후 다시 시도해주세요.');
+      if (!cred?.guest_token) throw new Error(t.errAuth);
 
       const res = await fetch('/api/dt/travel/input/text', {
         method: 'POST',
@@ -319,6 +417,7 @@ export default function MuyojeongHomePage() {
         body: JSON.stringify({
           message:    text,
           session_id: sessionId,
+          lang:       kennyLang,
           // NO place_code — main home is traveler context only
           ...(explicitCtx ? { explicit_context: explicitCtx } : {}),
         }),
@@ -326,14 +425,14 @@ export default function MuyojeongHomePage() {
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(typeof body?.error === 'string' ? body.error : '요청 처리에 실패했어요. 다시 시도해주세요.');
+        throw new Error(typeof body?.error === 'string' ? body.error : t.errGeneral);
       }
 
       const data = await res.json();
       if (data.session_id) setSessionId(data.session_id);
       setSoulResponse(data);
     } catch (err) {
-      setErrorMsg(err.message || '일정을 확인하는 중 문제가 생겼어요. 다시 시도해주세요.');
+      setErrorMsg(err.message || t.errFallback);
     } finally {
       setIsLoading(false);
       setInputValue('');
@@ -397,6 +496,42 @@ export default function MuyojeongHomePage() {
     >
 
       {/* ── HERO IMAGE ─────────────────────────────────────────────────────── */}
+      {/* ── 케니호텔 복귀 배너 — ?from=kenny 진입 시만 표시 ── */}
+      {fromKenny && (
+        <div
+          style={{
+            position:       'sticky',
+            top:            0,
+            zIndex:         20,
+            background:     'rgba(13,27,42,0.92)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            display:        'flex',
+            alignItems:     'center',
+            padding:        '8px 14px',
+            borderBottom:   '1px solid rgba(255,214,122,0.18)',
+          }}
+        >
+          <button
+            onClick={() => { window.location.href = 'https://hotel-kenny-yeosu-starlight-route.sejinlee.chatgpt.site/'; }}
+            style={{
+              display:    'flex',
+              alignItems: 'center',
+              gap:        '4px',
+              background: 'none',
+              border:     'none',
+              color:      '#FFD67A',
+              fontSize:   '0.8125rem',
+              fontWeight: 600,
+              cursor:     'pointer',
+              padding:    0,
+            }}
+          >
+            ← {kennyLang === 'en' ? 'Back to Hotel Kenny' : '케니호텔로 돌아가기'}
+          </button>
+        </div>
+      )}
+
       {/*
           Approved Founder artwork: MUYOJEONG_MOBILE_HOME_HERO_V1.png (941×1671px, ratio 1.776)
           Composition: Lumi viewpoint → Sowon-i (back, dark hair) + SOUL (blue character) → Yeosu sunset harbor
@@ -514,7 +649,7 @@ export default function MuyojeongHomePage() {
             marginBottom:  '0.25rem',
           }}
         >
-          무료 여수여행정보
+          {t.freeTag}
         </p>
         <h1
           style={{
@@ -538,7 +673,7 @@ export default function MuyojeongHomePage() {
             marginBottom:  '0.375rem',
           }}
         >
-          여수가 궁금하면, 그냥 물어보세요.
+          {t.headline}
         </h2>
         <p
           style={{
@@ -548,7 +683,7 @@ export default function MuyojeongHomePage() {
             wordBreak:  'keep-all',
           }}
         >
-          여수를 잘 아는 여행친구 SOUL이 함께 찾아볼게요.
+          {t.subtext}
         </p>
       </div>
 
@@ -575,7 +710,7 @@ export default function MuyojeongHomePage() {
               ref={inputRef}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="여수에서 궁금한 건 뭐든 물어보세요"
+              placeholder={t.placeholder}
               disabled={isLoading}
               // min-width:0 prevents flex child overflow in Samsung/Chrome mobile
               style={{
@@ -650,7 +785,7 @@ export default function MuyojeongHomePage() {
                   e.currentTarget.style.background  = 'var(--soul-chip-bg)';
                 }}
               >
-                {chip.label}
+                {kennyLang === 'en' ? chip.labelEn : chip.label}
               </button>
             ))}
           </div>
@@ -681,7 +816,7 @@ export default function MuyojeongHomePage() {
               {/* 헤더 */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <p style={{ fontSize: '0.6875rem', color: '#FFD67A', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
-                  가고 싶은 곳 골라보기
+                  {t.sectionPick}
                 </p>
                 <button
                   onClick={() => setMapMode(v => !v)}
@@ -698,7 +833,7 @@ export default function MuyojeongHomePage() {
                     transition: 'all 0.15s',
                   }}
                 >
-                  {mapMode ? '목록으로 ↑' : '지역별 보기'}
+                  {mapMode ? t.mapListBtn : t.mapViewBtn}
                 </button>
               </div>
 
@@ -717,6 +852,7 @@ export default function MuyojeongHomePage() {
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                   {ROUTE_PLACES_MAIN.map(place => {
                     const active = routePlaces.some(p => p.code === place.code);
+                    const chipLabel = (kennyLang === 'en' && PLACE_NAME_EN[place.code]) ? PLACE_NAME_EN[place.code] : place.name;
                     return (
                       <button
                         key={place.code}
@@ -730,7 +866,7 @@ export default function MuyojeongHomePage() {
                           fontWeight:  active ? 600 : 400,
                         }}
                       >
-                        {place.name}
+                        {chipLabel}
                       </button>
                     );
                   })}
@@ -744,7 +880,10 @@ export default function MuyojeongHomePage() {
                     color: 'var(--soul-text-subtle)', fontSize: '0.75rem', cursor: 'pointer',
                   }}
                 >
-                  {showMorePlaces ? '접기 ▲' : '+ 더 보기 ▼'}
+                  {showMorePlaces
+                    ? (kennyLang === 'en' ? 'Collapse ▲' : '접기 ▲')
+                    : (kennyLang === 'en' ? '+ Show More ▼' : '+ 더 보기 ▼')
+                  }
                 </button>
 
                 {/* 전체 장소 +4 */}
@@ -752,6 +891,7 @@ export default function MuyojeongHomePage() {
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
                     {ROUTE_PLACES_MORE.map(place => {
                       const active = routePlaces.some(p => p.code === place.code);
+                      const chipLabel = (kennyLang === 'en' && PLACE_NAME_EN[place.code]) ? PLACE_NAME_EN[place.code] : place.name;
                       return (
                         <button
                           key={place.code}
@@ -765,7 +905,7 @@ export default function MuyojeongHomePage() {
                             fontWeight:  active ? 600 : 400,
                           }}
                         >
-                          {place.name}
+                          {chipLabel}
                         </button>
                       );
                     })}
@@ -777,7 +917,7 @@ export default function MuyojeongHomePage() {
               {/* 시간 선택 */}
               <div>
                 <p style={{ fontSize: '0.75rem', color: 'var(--soul-text-subtle)', marginBottom: '8px', margin: '0 0 8px' }}>
-                  얼마나 여행하실 건가요?
+                  {t.timeSectionLbl}
                 </p>
                 {/* 빠른 선택 */}
                 <div style={{ display: 'flex', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
@@ -796,7 +936,7 @@ export default function MuyojeongHomePage() {
                           fontWeight:  active ? 600 : 400,
                         }}
                       >
-                        {opt.label}
+                        {kennyLang === 'en' ? opt.labelEn : opt.label}
                       </button>
                     );
                   })}
@@ -809,7 +949,7 @@ export default function MuyojeongHomePage() {
                     max={540}
                     value={routeMinutes}
                     onChange={handleRouteMinutesInput}
-                    placeholder="직접 입력"
+                    placeholder={t.timeInputPh}
                     disabled={isLoading}
                     aria-label="여행 시간 (분 단위)"
                     style={{
@@ -819,9 +959,9 @@ export default function MuyojeongHomePage() {
                       color: 'var(--soul-text)', fontSize: '0.875rem', outline: 'none',
                     }}
                   />
-                  <span style={{ fontSize: '0.875rem', color: 'var(--soul-text-subtle)' }}>분</span>
+                  <span style={{ fontSize: '0.875rem', color: 'var(--soul-text-subtle)' }}>{t.timeUnit}</span>
                   {routeMinutes && (parseInt(routeMinutes, 10) < 60 || parseInt(routeMinutes, 10) > 540) && (
-                    <span style={{ fontSize: '0.75rem', color: 'rgba(255,100,100,0.80)' }}>60~540분</span>
+                    <span style={{ fontSize: '0.75rem', color: 'rgba(255,100,100,0.80)' }}>{t.timeRange}</span>
                   )}
                 </div>
               </div>
@@ -829,8 +969,8 @@ export default function MuyojeongHomePage() {
               {/* 선택 요약 */}
               {routePlaces.length > 0 && (
                 <p style={{ fontSize: '0.75rem', color: 'var(--soul-text-subtle)', margin: 0, wordBreak: 'keep-all' }}>
-                  선택: {routePlaces.map(p => p.name).join(' · ')}
-                  {isValid && ` · ${routeMinutes}분`}
+                  {t.selectedLbl}: {routePlaces.map(p => p.name).join(' · ')}
+                  {isValid && ` · ${routeMinutes}${t.timeUnit}`}
                 </p>
               )}
 
@@ -847,7 +987,7 @@ export default function MuyojeongHomePage() {
                   transition: 'background 0.15s',
                 }}
               >
-                소울이에게 코스 추천받기 →
+                {t.ctaBtn}
               </button>
             </div>
           );
@@ -860,7 +1000,7 @@ export default function MuyojeongHomePage() {
             style={{ background: 'var(--soul-card-bg)', border: '1px solid var(--soul-card-border)' }}
           >
             <p style={{ fontSize: '0.875rem', color: 'var(--soul-text-muted)' }}>
-              SOUL이 여수 여행 정보를 찾고 있어요…
+              {t.loading}
             </p>
           </div>
         )}
@@ -878,7 +1018,7 @@ export default function MuyojeongHomePage() {
               onClick={handleReset}
               style={{ color: '#FFD67A', opacity: 0.72, fontSize: '0.8125rem', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
             >
-              다시 시도
+              {t.retryBtn}
             </button>
           </div>
         )}
@@ -890,13 +1030,14 @@ export default function MuyojeongHomePage() {
             onNewQuestion={handleReset}
             onTimeSelect={(msg) => _callSOUL(msg)}
             isLoading={isLoading}
+            lang={kennyLang}
           />
         )}
 
         {/* ── COURSE DISPLAY ── renders only when SOUL returns course.blocks */}
         {soulResponse?.course?.blocks?.length > 0 && !isLoading && (
           <div style={{ marginTop: '16px' }}>
-            <CourseDisplay course={soulResponse.course} />
+            <CourseDisplay course={soulResponse.course} lang={kennyLang} />
           </div>
         )}
 
@@ -912,7 +1053,7 @@ export default function MuyojeongHomePage() {
               marginBottom:  '10px',
             }}
           >
-            SOUL과 먼저 둘러보기
+            {t.exploreLbl}
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {PLACE_ENTRIES.map((place) => (
@@ -976,10 +1117,10 @@ export default function MuyojeongHomePage() {
               color:      'var(--soul-text-subtle)',
               lineHeight: 1.6,
               wordBreak:  'keep-all',
+              whiteSpace: 'pre-line',
             }}
           >
-            SOUL은 현재 알고 있는 정보를 바탕으로 답해드려요.<br />
-            최신 운영 정보는 현장에서 확인을 권장해요.
+            {t.footer}
           </p>
         </div>
 
