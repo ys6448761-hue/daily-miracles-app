@@ -89,6 +89,7 @@ import LocationAdmin from './pages/admin/LocationAdmin.jsx';
 import TravelGuidePage from './pages/TravelGuidePage.jsx';
 import SoulCableCarPage from './pages/SoulCableCarPage.jsx';
 import MuyojeongHomePage from './pages/MuyojeongHomePage.jsx';
+import KennyHotelPage from './pages/KennyHotelPage.jsx';
 import { SoulThemeProvider } from './contexts/SoulThemeContext.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
@@ -126,6 +127,8 @@ export default function App() {
           <Route path="/travel-guide" element={<TravelGuidePage />} />
           {/* SOUL 무여정 Main Home — 여수맘 파일럿 진입점 */}
           <Route path="/muyojeong" element={<MuyojeongHomePage />} />
+          {/* 케니호텔 전용 무여정 영업 시연판 (PHX-KENNY-003) — 로컬/시연 환경 한정 */}
+          <Route path="/kenny" element={<KennyHotelPage />} />
           {/* SOUL Living Detail Page — place-switching conversational experience */}
           <Route path="/soul/cable-car" element={<SoulCableCarPage />} />
           <Route path="/my-star"     element={<MyStarReturn />} />

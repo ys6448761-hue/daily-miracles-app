@@ -109,6 +109,14 @@ function nl2br(text) {
   ));
 }
 
+// ── SOUL/케니 경로 — JourneySceneEngine 비활성화 목록 ────────────────
+// 무여정, 케니호텔, SOUL Living Detail 경로에서는 DreamTown 여정 엔진 미작동
+const SOUL_PATH_PREFIXES = ['/muyojeong', '/soul/', '/kenny'];
+function isSoulPath() {
+  const p = window.location.pathname;
+  return SOUL_PATH_PREFIXES.some(prefix => p === prefix || p.startsWith(prefix + '?') || p.startsWith(prefix + '/'));
+}
+
 // ── 컴포넌트 ─────────────────────────────────────────────────────────
 export default function JourneySceneEngine() {
   // 'idle' | 'question' | 'scene' | 'coupon' | 'whisper' | 'done'
@@ -234,6 +242,8 @@ export default function JourneySceneEngine() {
   }
 
   // ── 렌더 가드 ────────────────────────────────────────────────
+  // SOUL/케니 경로 제외 — 무여정·케니호텔·SOUL Living Detail에서는 미노출
+  if (isSoulPath()) return null;
   if (phase === 'idle' || phase === 'done' || !currentScene) return null;
 
   const scene   = SCENES[currentScene];

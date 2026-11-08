@@ -1,7 +1,7 @@
 # DREAMTOWN_STATUS.md
 # 새 담당자/새 세션은 이 파일부터 읽을 것
 
-Last Updated: 2026-11-03 (PHX-COMMERCE-TICKET-004 MERGED — PR #143 MERGED `2e76281`, main 81/81 PASS)
+Last Updated: 2026-11-03 (PHX-COMMERCE-TICKET-005 PARTIAL — PHP Spec + E2E Harness 98/98 PASS, PR #145 OPEN)
 담당: Claude Code (Lumi / Code Master)
 
 ---
@@ -23,24 +23,35 @@ Last Updated: 2026-11-03 (PHX-COMMERCE-TICKET-004 MERGED — PR #143 MERGED `2e7
 
 ### ★ Current Next Action (exactly 1) — Updated: 2026-11-03
 
-**PHP E2E 연동 (PHX-COMMERCE-TICKET-005): PHP HMAC 구현 검증 → 스테이징 hold/book E2E → Render env 등록 → FLOW_TICKET_ENABLED=true**
+**PHP 담당자에게 명세 전달 → HMAC 벡터 4개 PHP 재현 확인 → 스테이징 E2E → FLOW_TICKET_ENABLED=true**
+
+#### PHX-COMMERCE-TICKET-005: PHP Integration Spec + E2E Harness — **PARTIAL** ⚠️
+
+- **PR #145 OPEN** (feat/commerce-ticket-005-e2e-harness → main)
+  - Commit `4f9ff98` (2026-11-03)
+  - PHP Repo: C:\DEV에 없음 — 명세 역방향 도출
+  - HMAC 테스트 벡터 4개 Node 검증 ✅
+  - E2E Harness 17/17 PASS (98/98 total) ✅
+  - Evidence: `docs/knowledge/COMMERCE-TICKET-005-EVIDENCE-V0_1.md`
+  - PHP 명세: `docs/knowledge/COMMERCE-TICKET-005-PHP-SPEC-V0_1.md`
+- **⚠️ Hold TTL 불일치**: 명세 45분 vs 실제 30분 → Founder 결정 필요
+- **PARTIAL → E2E READY 전환 조건:**
+  1. PHP 담당자 HMAC 벡터 4개 재현 성공
+  2. PHP 담당자 §7 체크리스트 이행
+  3. 스테이징 PostgreSQL + NicePay 환경 구성
+  4. Hold TTL Founder 결정
 
 #### PHX-COMMERCE-TICKET-004: CONTROLLED MERGE — **MERGED** ✅
 
-- **PR #143 MERGED** (feat/commerce-ticket-flow-v02 → main) — 2026-11-03T08:49:30Z
-  - Merge Commit: `2e76281fec99547ccfa7058d015a9e3ea35b6cf7`
-  - HEAD SHA (잠금): `ab7a3c8506bf0b4597e402db251df3600a9b9174`
-  - main 81/81 FLOW PASS ✅ / Feature Flag fail-closed ✅
-- Evidence: `docs/knowledge/COMMERCE-TICKET-MERGE-EVIDENCE-V0_1.md`
+- **PR #143 MERGED** `2e76281` (2026-11-03T08:49:30Z)
+- **⚠️ API 현재 상태: 503 TICKET_API_DISABLED** (FLOW_TICKET_ENABLED 미설정)
 
-**⚠️ API 현재 상태: 503 TICKET_API_DISABLED (FLOW_TICKET_ENABLED 미설정)**
-
-**활성화 순서 (PHP E2E 완료 후, 순서 엄수):**
+**활성화 순서 (PHP E2E READY 후, 순서 엄수):**
 1. Render env: `FLOW_TICKET_SECRET`, `FLOW_TICKET_SOWON_ID`
-2. PHP 담당자 Security Gate §7 확인 + E2E 스테이징 테스트
+2. PHP 담당자 E2E READY 확인
 3. `FLOW_TICKET_ENABLED=true` (마지막 — API 활성화)
 
-**PR #141 이미 병합됨** (`b75aacd5`). PR #142/138/139 OPEN 유지.
+**PR #141 이미 병합됨** (`b75aacd5`). PR #145/144/142/138/139 OPEN. PR #140 HOLD.
 
 ---
 

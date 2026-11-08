@@ -10,6 +10,7 @@ const express = require('express');
 const sessionService = require('../services/sessionService');
 const { requireAuthenticatedPrincipal } = require('../middleware/authenticatedPrincipal');
 const { handleTravelRequest } = require('../services/soyeowoolService');
+const { generateMessageEn } = require('../services/soulI18n');
 
 const router = express.Router();
 
@@ -43,7 +44,8 @@ function _sanitizeExplicitContext(raw) {
  */
 router.post('/input/text', requireAuthenticatedPrincipal, async (req, res) => {
   try {
-    const { message, session_id, hotel_id, explicit_context: rawExplicitContext } = req.body;
+    const { message, session_id, hotel_id, lang, explicit_context: rawExplicitContext } = req.body;
+    const reqLang = lang === 'en' ? 'en' : 'ko';
     const explicit_context = _sanitizeExplicitContext(rawExplicitContext);
 
     // Input validation
@@ -93,6 +95,12 @@ router.post('/input/text', requireAuthenticatedPrincipal, async (req, res) => {
 
     // Canonical session_id from route lifecycle
     const response = { ...soulResult.payload, session_id: finalSessionId };
+
+    // PHX-KENNY-010: add message_en when lang=en
+    if (reqLang === 'en') {
+      const msgEn = generateMessageEn(response);
+      if (msgEn) response.message_en = msgEn;
+    }
 
     logTravelInputEvent({
       session_id: finalSessionId,
