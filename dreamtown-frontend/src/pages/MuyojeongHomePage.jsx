@@ -277,6 +277,7 @@ const TM = {
     timeRange:      '60~540분',
     selectedLbl:    '선택',
     ctaBtn:         '소울이에게 코스 추천받기 →',
+    ctaHint:        '장소를 하나 이상 선택해주세요',
     loading:        'SOUL이 여수 여행 정보를 찾고 있어요…',
     errAuth:        '인증 정보를 가져오지 못했어요. 잠시 후 다시 시도해주세요.',
     errGeneral:     '요청 처리에 실패했어요. 다시 시도해주세요.',
@@ -307,6 +308,7 @@ const TM = {
     timeRange:      '60–540 min',
     selectedLbl:    'Selected',
     ctaBtn:         'Get Route from SOUL →',
+    ctaHint:        'Please select at least one place',
     loading:        'SOUL is finding travel info for you…',
     errAuth:        'Could not retrieve session. Please try again shortly.',
     errGeneral:     'Request failed. Please try again.',
@@ -990,6 +992,11 @@ export default function MuyojeongHomePage() {
               >
                 {t.ctaBtn}
               </button>
+              {!isValid && routePlaces.length === 0 && !isLoading && (
+                <p style={{ fontSize: '0.75rem', color: 'var(--soul-text-subtle)', textAlign: 'center', margin: '2px 0 0' }}>
+                  {t.ctaHint}
+                </p>
+              )}
             </div>
           );
         })()}
