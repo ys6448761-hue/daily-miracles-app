@@ -1405,3 +1405,50 @@ After:  "Do NOT alter the subject's race or gender. Do NOT alter age by more tha
 | 파일 | 변경 |
 |---|---|
 | `sowon-dreamtown/src/lib/wishart/build-prompt.ts` | VITALITY_RULE 재구조화 + NEGATIVE_RULE 완화 |
+
+---
+
+## §39 — PHX-STAR-015 /star-entry Express 라우트 충돌 수정 (2026-11-10)
+
+**Task:** PHX-STAR-015  
+**Branch:** `fix/phx-star-015-server-route`  
+**PR:** #154  
+**CI:** AIL Gate ✅ PASS / docker-smoke ✅ PASS / Vercel ❌ 비필수 기존 문제
+
+### 원인
+
+`server.js` 내 구 `app.get('/star-entry', ...)` 라우트(line ~1207)가
+`public/star-entry.html`(구 포스트카드 화면: '별 포스트카드 — 하루하루의 기적')을 직접 서빙.
+React SPA catch-all과 `StarEntry.jsx`(PHX-STAR-010)가 실행될 기회 없음.
+
+### 증거
+
+- `/star-entry` HTML 응답 타이틀: `<title>별 포스트카드 — 하루하루의 기적</title>`
+- `public/star-entry.html` 파일 존재 확인
+- `server.js:1207`: `app.get('/star-entry', (req, res) => { res.sendFile(...star-entry.html) })`
+- `StarEntry.jsx`는 React Router 내에만 존재 — Express가 가로채면 실행 불가
+
+### 수정
+
+| 항목 | 변경 |
+|---|---|
+| `server.js` 구 라우트 제거 | `app.get('/star-entry', ...)` 3줄 삭제 → 주석으로 대체 |
+| `DT_SPA_ROUTES` 추가 | `'/star-entry'` 명시 (no-cache 헤더 보장) |
+| `dreamtown-frontend` 재빌드 | `npm run build` ✅ exit 0 |
+| `public/star-entry.html` | 보존 — `/star-entry.html → /entry` 302 핸들러 유지 |
+
+### 수정 후 라우팅 흐름
+
+```
+GET /star-entry
+  → 구 Express 라우트 없음
+  → DT_SPA_ROUTES 매칭 → dist/index.html
+  → React Router → StarEntry.jsx
+  → localStorage dt_active_star_id?
+       있음 → /my-star/:id
+       없음 → /wish/input
+```
+
+### 대기
+
+PR #154 Founder 승인 → merge → Render 수동 배포 → Production 검증
