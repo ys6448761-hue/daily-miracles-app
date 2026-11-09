@@ -90,6 +90,8 @@ import TravelGuidePage from './pages/TravelGuidePage.jsx';
 import SoulCableCarPage from './pages/SoulCableCarPage.jsx';
 import MuyojeongHomePage from './pages/MuyojeongHomePage.jsx';
 import KennyHotelPage from './pages/KennyHotelPage.jsx';
+import StarlightCouponPage from './pages/StarlightCouponPage.jsx';
+import AdminStarlightCouponPage from './pages/AdminStarlightCouponPage.jsx';
 import { SoulThemeProvider } from './contexts/SoulThemeContext.jsx';
 
 // 중복 슬래시 정규화 (//dreamtown → /dreamtown)
@@ -199,6 +201,7 @@ export default function App() {
           <Route path="/admin/qr-center"           element={<AdminQRCenter />} />
           <Route path="/admin/cablecar"            element={<AdminCablecarPage />} />
           <Route path="/admin/location/:loc"       element={<LocationAdmin />} />
+          <Route path="/admin/starlight-coupons"    element={<AdminStarlightCouponPage />} />
           {/* /admin/* catch-all — catch-all → / → AppLaunch 경로 차단 */}
           <Route path="/admin/*"                   element={<VoyageAdmin />} />
           {/* 여수 소원여정 Soft Pay 랜딩 */}
@@ -229,6 +232,8 @@ export default function App() {
               <PartnerVerify />
             </Suspense>
           } />
+          {/* 별빛쿠폰 — 케니호텔 × DreamTown 제휴 모바일 쿠폰 */}
+          <Route path="/starlight-coupon"          element={<StarlightCouponPage />} />
           <Route path="*"                          element={<RouteMissDiagnostic />} />
         </Routes>
       </div>
