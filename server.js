@@ -852,6 +852,19 @@ try {
   console.error("❌ AI 비용 대시보드 라우터 로드 실패:", error.message);
 }
 
+// ── 별빛쿠폰 (PHX-COUPON-004) 라우터 로딩 ─────────────────────────────
+let starlightCouponRoutes = null;
+try {
+  starlightCouponRoutes = require('./routes/starlightCouponRoutes');
+  console.log('✅ starlightCoupon 라우터 로드 성공');
+} catch (e) { console.error('❌ starlightCoupon 라우터 로드 실패:', e.message); }
+
+let adminStarlightCouponRoutes = null;
+try {
+  adminStarlightCouponRoutes = require('./routes/adminStarlightCouponRoutes');
+  console.log('✅ adminStarlightCoupon 라우터 로드 성공');
+} catch (e) { console.error('❌ adminStarlightCoupon 라우터 로드 실패:', e.message); }
+
 // ── Core Journey Flow 라우터 로딩 ────────────────────────────────────
 let wishCoreRoutes = null;
 try {
@@ -2617,6 +2630,10 @@ if (rewardRoutes) {
 //       Journey system uses wishes table (not canonical dt_wishes)
 //       User identity: user_key (not canonical dt_user_id)
 //       Status: JourneyWishPage still depends on this
+// 별빛쿠폰 (PHX-COUPON-004)
+if (starlightCouponRoutes)      app.use('/api/starlight-coupon',           starlightCouponRoutes);
+if (adminStarlightCouponRoutes) app.use('/api/admin/starlight-coupons',    adminStarlightCouponRoutes);
+
 if (wishCoreRoutes)      app.use('/api/wishes',           wishCoreRoutes);
 if (journeyContextRoutes) app.use('/api/journey-contexts', journeyContextRoutes);
 if (recommendationRoutes) app.use('/api/recommendation',   recommendationRoutes);
