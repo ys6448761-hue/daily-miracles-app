@@ -1405,3 +1405,98 @@ After:  "Do NOT alter the subject's race or gender. Do NOT alter age by more tha
 | 파일 | 변경 |
 |---|---|
 | `sowon-dreamtown/src/lib/wishart/build-prompt.ts` | VITALITY_RULE 재구조화 + NEGATIVE_RULE 완화 |
+
+---
+
+## §39 — PHX-STAR-015 /star-entry Express 라우트 충돌 수정 (2026-11-10)
+
+**Task:** PHX-STAR-015  
+**Branch:** `fix/phx-star-015-server-route`  
+**PR:** #154  
+**CI:** AIL Gate ✅ PASS / docker-smoke ✅ PASS / Vercel ❌ 비필수 기존 문제
+
+### 원인
+
+`server.js` 내 구 `app.get('/star-entry', ...)` 라우트(line ~1207)가
+`public/star-entry.html`(구 포스트카드 화면: '별 포스트카드 — 하루하루의 기적')을 직접 서빙.
+React SPA catch-all과 `StarEntry.jsx`(PHX-STAR-010)가 실행될 기회 없음.
+
+### 증거
+
+- `/star-entry` HTML 응답 타이틀: `<title>별 포스트카드 — 하루하루의 기적</title>`
+- `public/star-entry.html` 파일 존재 확인
+- `server.js:1207`: `app.get('/star-entry', (req, res) => { res.sendFile(...star-entry.html) })`
+- `StarEntry.jsx`는 React Router 내에만 존재 — Express가 가로채면 실행 불가
+
+### 수정
+
+| 항목 | 변경 |
+|---|---|
+| `server.js` 구 라우트 제거 | `app.get('/star-entry', ...)` 3줄 삭제 → 주석으로 대체 |
+| `DT_SPA_ROUTES` 추가 | `'/star-entry'` 명시 (no-cache 헤더 보장) |
+| `dreamtown-frontend` 재빌드 | `npm run build` ✅ exit 0 |
+| `public/star-entry.html` | 보존 — `/star-entry.html → /entry` 302 핸들러 유지 |
+
+### 수정 후 라우팅 흐름
+
+```
+GET /star-entry
+  → 구 Express 라우트 없음
+  → DT_SPA_ROUTES 매칭 → dist/index.html
+  → React Router → StarEntry.jsx
+  → localStorage dt_active_star_id?
+       있음 → /my-star/:id
+       없음 → /wish/input
+```
+
+### 대기
+
+PR #154 Founder 승인 → merge → Render 수동 배포 → Production 검증
+
+---
+
+## §40 — PHX-STAR-016 localStorage 초기화 시 userId 기반 별 복원 (2026-11-10)
+
+**Task:** PHX-STAR-016  
+**Branch:** `fix/phx-star-015-server-route` (commit `8a47675`)  
+**PR:** #154 (PHX-STAR-015 + PHX-STAR-016 통합)  
+**CI:** AIL Gate ✅ / docker-smoke ✅
+
+### 원인
+
+KakaoTalk 인앱 브라우저(WKWebView / Android WebView)는 세션 간 localStorage가
+초기화될 수 있음. `dt_active_star_id` 소실 → `readSavedStar()` null →
+`StarEntry.jsx`가 `/wish/input`으로 보내 소원 입력 반복.
+
+**플랫폼 한계**: localStorage 양쪽 키(`dt_active_star_id`, `dt_user_id`) 모두 동일
+localStorage에 저장되므로, 완전 초기화 시 100% 복원 보장 불가. 단, `dt_user_id`는
+앱 첫 진입 시 생성되어 더 오래 남아 있을 가능성이 있음.
+
+### 수정 (`StarEntry.jsx`)
+
+복구 순서 3단계:
+
+```
+1차) localStorage dt_active_star_id → /my-star/:id (기존)
+2차) dt_user_id 존재 → GET /api/dt/stars?userId 조회
+     → stars[0].star_id 있음 → saveStarId() → /my-star/:id
+     → 오류/빈 배열 → 3차로
+3차) /wish/input (신규 생성)
+```
+
+### 사용 API
+
+`GET /api/dt/stars?userId=xxx` (dreamtownRoutes.js:807)
+- 반환: `{ stars: [{ star_id, star_name, galaxy_id }] }` (소원 텍스트 미포함)
+- 기존 엔드포인트 재사용 — 별도 API 없음
+
+### 보호 조건
+
+- 기존 별 삭제 금지 ✅
+- 별 ID DB 변경 없음 ✅
+- 개인 소원 텍스트 로그 미노출 ✅
+- 신규 생성 강제 없음 ✅
+
+### 대기
+
+PR #154 Founder 승인 → merge → Render 수동 배포 → 카카오톡 재검증

@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-09T21:05:09.785Z",
+  "generated_at": "2026-11-09T23:30:59.729Z",
   "generator": "generate-manifest.js",
-  "total_count": 578,
+  "total_count": 563,
   "documents": [
     {
       "id": "DOC-DECISIONS_LOG",
@@ -20,64 +20,6 @@
       "title": "📜 Aurora5 결정문 로그 (DECISIONS_LOG)",
       "created_at": "Status",
       "checksum": "32be1bf8"
-    },
-    {
-      "id": "DOC-SMARTSTORE-009-LAUNCH-READINES",
-      "path": "docs/knowledge/SMARTSTORE-009-LAUNCH-READINESS-V0_1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge",
-        "소원",
-        "가격",
-        "결제"
-      ],
-      "owner": "code",
-      "status": "설명",
-      "title": "PHX-SMARTSTORE-009 — 별빛항로 첫 상품 출시 준비 V0.1",
-      "created_at": "판매가",
-      "checksum": "d4ab6e25"
-    },
-    {
-      "id": "DOC-SMARTSTORE-008-SALES-MATERIALS",
-      "path": "docs/knowledge/SMARTSTORE-008-SALES-MATERIALS-V0_1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge",
-        "소원",
-        "aurora",
-        "가격",
-        "결제"
-      ],
-      "owner": "code",
-      "status": "|------",
-      "title": "PHX-SMARTSTORE-008 — 별빛항로 첫 판매자료 V0.1",
-      "created_at": "크루즈",
-      "checksum": "055f198f"
-    },
-    {
-      "id": "DOC-SMARTSTORE-008-SALES-MATERIALS",
-      "path": "docs/knowledge/SMARTSTORE-008-SALES-MATERIALS-V0_2.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge",
-        "소원",
-        "가격",
-        "결제"
-      ],
-      "owner": "code",
-      "status": "|------",
-      "title": "PHX-SMARTSTORE-008A — 별빛항로 첫 판매자료 V0.2",
-      "created_at": "크루즈",
-      "checksum": "cc2420f8"
     },
     {
       "id": "DOC-DreamTown_Frontend_Screen_Map_",
@@ -3176,7 +3118,7 @@
       "status": "|------",
       "title": "PHX-KENNY-003 — 케니호텔 전용 무여정 영업 시연판 Evidence V0.1",
       "created_at": "2026-11-09",
-      "checksum": "25bfa013"
+      "checksum": "248d86b2"
     },
     {
       "id": "DOC-MAP-V01-15-MARKER-PIPELINE-AUD",
@@ -4331,23 +4273,6 @@
       "checksum": "c8b32d4d"
     },
     {
-      "id": "DOC-PHX-STAR-001-WISH-STAR-AUDIT-V",
-      "path": "docs/knowledge/PHX-STAR-001-WISH-STAR-AUDIT-V0_1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge",
-        "소원"
-      ],
-      "owner": "code",
-      "status": "active",
-      "title": "PHX-STAR-001 — 소원별 최신 버전 및 정식 시작 URL 감사",
-      "created_at": "2026-11-09",
-      "checksum": "33b1b1d0"
-    },
-    {
       "id": "DOC-PILOT-INTENT-001_Traveler_Inte",
       "path": "docs/knowledge/PILOT-INTENT-001_Traveler_Intent_8Keywords.md",
       "type": "document",
@@ -4479,133 +4404,6 @@
       "title": "RELEASE-PREFLIGHT-B-001 — Phase B V0.1 Production Release Preflight",
       "created_at": "2026-11-09",
       "checksum": "398a083a"
-    },
-    {
-      "id": "DOC-SMARTSTORE-006-PRICING-PNL-V0_",
-      "path": "docs/knowledge/SMARTSTORE-006-PRICING-PNL-V0_1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge",
-        "소원",
-        "가격",
-        "결제"
-      ],
-      "owner": "team",
-      "status": "필요 조치",
-      "title": "PHX-SMARTSTORE-006 — 별빛항로 가격·손익 검증",
-      "created_at": "2026-11-09",
-      "checksum": "5acb4ea1"
-    },
-    {
-      "id": "DOC-SMARTSTORE-007-COST-SALESDATA-",
-      "path": "docs/knowledge/SMARTSTORE-007-COST-SALESDATA-V0_1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge",
-        "소원",
-        "가격",
-        "결제"
-      ],
-      "owner": "team",
-      "status": "근거",
-      "title": "PHX-SMARTSTORE-007 — 별빛항로 원가 분류 및 판매자료 제작 준비",
-      "created_at": "2026-11-09",
-      "checksum": "f4cfe612"
-    },
-    {
-      "id": "DOC-SMARTSTORE-009-IMAGE-PLAN-V0_1",
-      "path": "docs/knowledge/SMARTSTORE-009-IMAGE-PLAN-V0_1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge",
-        "소원"
-      ],
-      "owner": "team",
-      "status": "archived",
-      "title": "PHX-SMARTSTORE-009 — EP01 이미지 자산 조사 및 상세페이지 배치 계획 V0.1",
-      "created_at": "2026-11-09",
-      "checksum": "d958e31b"
-    },
-    {
-      "id": "DOC-SMARTSTORE-010-REFUND-POLICY-V",
-      "path": "docs/knowledge/SMARTSTORE-010-REFUND-POLICY-V0_1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge",
-        "소원",
-        "결제"
-      ],
-      "owner": "team",
-      "status": "필요 조치",
-      "title": "PHX-SMARTSTORE-010 — 환불정책 Founder 수정안 분석 V0.1",
-      "created_at": "2026-11-09",
-      "checksum": "a5e3862f"
-    },
-    {
-      "id": "DOC-SMARTSTORE-010-ROOM-OPTIONS-V0",
-      "path": "docs/knowledge/SMARTSTORE-010-ROOM-OPTIONS-V0_1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge",
-        "소원",
-        "가격"
-      ],
-      "owner": "team",
-      "status": "|------",
-      "title": "PHX-SMARTSTORE-010 — 객실·인원별 옵션 가격표 V0.1",
-      "created_at": "2026-11-09",
-      "checksum": "0e535be6"
-    },
-    {
-      "id": "DOC-SMARTSTORE-011-PRODUCT-INTEGRA",
-      "path": "docs/knowledge/SMARTSTORE-011-PRODUCT-INTEGRATION-V0_1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge",
-        "소원",
-        "가격",
-        "결제"
-      ],
-      "owner": "team",
-      "status": "조치",
-      "title": "PHX-SMARTSTORE-011 — 별빛항로 상품 통합 V0.1",
-      "created_at": "2026-11-09",
-      "checksum": "f9c7b726"
-    },
-    {
-      "id": "DOC-SMARTSTORE-INFRA-REVIEW-V0_1",
-      "path": "docs/knowledge/SMARTSTORE-INFRA-REVIEW-V0_1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge",
-        "가격"
-      ],
-      "owner": "code",
-      "status": "active",
-      "title": "PHX-SMARTSTORE-001 — SmartStore API Infrastructure Review",
-      "created_at": "2026-11-09",
-      "checksum": "a557f46f"
     },
     {
       "id": "DOC-SOUL-CAR-INTENT-UX-EVIDENCE",
@@ -8003,40 +7801,6 @@
       "checksum": "86623de8"
     },
     {
-      "id": "DOC-CEO-WEEKLY-2026-W45",
-      "path": "docs/reports/CEO-WEEKLY-2026-W45.md",
-      "type": "report",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "reports",
-      "tags": [
-        "reports",
-        "aurora"
-      ],
-      "owner": "comi",
-      "status": "active",
-      "title": "CEO-WEEKLY-2026-W45",
-      "created_at": "2026-11-08T19:47:05.098Z",
-      "checksum": "ec98c9ec"
-    },
-    {
-      "id": "DOC-CEO-WEEKLY-2026-W44",
-      "path": "docs/reports/CEO-WEEKLY-2026-W44.md",
-      "type": "report",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "reports",
-      "tags": [
-        "reports",
-        "aurora"
-      ],
-      "owner": "comi",
-      "status": "active",
-      "title": "CEO-WEEKLY-2026-W44",
-      "created_at": "2026-11-01T20:21:52.182Z",
-      "checksum": "0e69f2c0"
-    },
-    {
       "id": "DOC-REGISTRY_v1_verified_2026-0516",
       "path": "docs/ssot/air-engine/REGISTRY_v1_verified_2026-0516.md",
       "type": "document",
@@ -9963,42 +9727,6 @@
       "title": "호텔 예약 시스템 현황 Evidence",
       "created_at": "|------|------|",
       "checksum": "0834dc15"
-    },
-    {
-      "id": "DOC-SMARTSTORE-012-EP01-IMAGE-INDE",
-      "path": "docs/knowledge/SMARTSTORE-012-EP01-IMAGE-INDEX-V0_1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge",
-        "소원"
-      ],
-      "owner": "team",
-      "status": "archived",
-      "title": "PHX-SMARTSTORE-012 — EP01 판매용 이미지 인덱스 V0.1",
-      "created_at": "|------|-------|------|------|",
-      "checksum": "c1075b8d"
-    },
-    {
-      "id": "DOC-SMARTSTORE-004-SELLABLE-ASSET-",
-      "path": "docs/knowledge/SMARTSTORE-004-SELLABLE-ASSET-REVIEW-V0_1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge",
-        "소원",
-        "가격",
-        "결제"
-      ],
-      "owner": "code",
-      "status": "|------",
-      "title": "PHX-SMARTSTORE-004 — 별빛항로 판매 가능 자산 조사",
-      "created_at": "|------|--------|------|",
-      "checksum": "6d27d7de"
     },
     {
       "id": "DOC-DreamTown_Miracle_System_SSOT",
