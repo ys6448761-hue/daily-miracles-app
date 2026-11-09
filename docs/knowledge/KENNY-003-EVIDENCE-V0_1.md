@@ -1325,6 +1325,31 @@ button→a 태그로 교체하여 외부 도메인 이동. 나머지 `/my-star` 
 ### PHX-STAR-011 추가 (2026-11-10)
 - "내 소원별 만나기" href: `wish/input` → `star-entry` 공통 진입점으로 통일 (sowon-dreamtown PR #21 commit 93aaef8)
 
+### PHX-STAR-013 — PR #153 CI 차단 해결 (2026-11-10)
+
+**AIL Gate 실패 원인**: PR 본문에 `[AIL]` 섹션 누락 (PR #151과 동일 패턴).
+
+**조치**:
+1. PR #153 본문에 `[AIL]` 섹션 + Source ID 추가 → AIL Gate **PASS**
+2. `git merge origin/main` — merge commit 2개 반영 (`348b9aa`, `decf6ac`) — 충돌 없음
+3. `npm run build` ✅ exit 0 (703 modules)
+4. Push → CI 재트리거
+
+**최종 CI 결과** (HEAD `1dffeb6`):
+
+| 검사 | 결과 | 필수 |
+|---|---|---|
+| AIL Gate | ✅ PASS | ✅ Required |
+| Verify Manifest & Index | ✅ PASS | — |
+| docker-smoke | ✅ PASS | — |
+| Vercel Preview Comments | ✅ PASS | — |
+| Vercel – daily-miracles-app | ❌ FAIL | ✗ 비필수 (PR #152에서도 동일 실패 — 기존 문제) |
+| Vercel – daily-miracles-app-21z3 | ❌ FAIL | ✗ 비필수 |
+
+**브랜치 보호 필수 검사**: `AIL Gate`만 (`gh api` 확인).  
+**mergeStateStatus**: `UNSTABLE` (비필수 실패로 경고), **mergeable**: `MERGEABLE` ✅  
+**병합 가능 여부**: Founder 승인 시 즉시 가능.
+
 ---
 
 ## §36 — PHX-WISHART-002 소원그림 연령 보정 기준 점검 및 복구 (2026-11-09)
