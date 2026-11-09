@@ -687,7 +687,693 @@ Zone 5 (소호·장도권 / Soho & Jangdo) 소속 장소 전부 `status: 'verify
 - PR: #151 (body v2 갱신)
 - Build: `npm run build` ✅ exit 0
 
-### 미결 항목 (Founder 결정 필요)
+### 미결 항목 (해소됨)
 
-- **항목 7**: venue_id 허용목록 — Production 활성화 전 정책 결정 필요
-- **PHX-STAR-001**: 케니호텔 연결 URL 최종 결정 (`https://app.dailymiracles.kr/` 권장)
+- **항목 7**: PHX-COUPON-006에서 `COUPON_VENUE_ALLOWLIST` 구현으로 해소
+
+---
+
+## §27 — PHX-COUPON-006+007 venue 허용목록 + 최종 확인 (2026-11-09)
+
+### PHX-COUPON-006 — venue_id 허용목록
+
+**정책:**
+- `COUPON_VENUE_ALLOWLIST` env var (comma-separated, 미설정 = 빈 목록 = 전부 차단)
+- `test_*` prefix는 `NODE_ENV !== 'production'`에서만 허용
+- `kenny_001` 등 호텔 ID는 가맹점이 아니므로 허용목록에 추가하지 않음
+- 최초 운영 시 `COUPON_VENUE_ALLOWLIST` 비워둠 (제휴 식당·카페 0곳)
+
+**구현:** `routes/starlightCouponRoutes.js` `isVenueAllowed()` — POST /issue만 적용
+**단위 검증:** 8/8 PASS
+**Commit:** `23042ed`
+
+### PHX-COUPON-007 — 배포 준비 최종 확인
+
+| # | 항목 | 결과 | 근거 |
+|---|------|------|------|
+| 1 | 허용목록 비어 있을 때 발급 전부 차단 | ✅ PASS | `[]`.includes → false. test_* production 차단 |
+| 2 | Migration 215 미적용 시 기존 기능 정상 | ✅ PASS | try/catch 로드 + 조건부 등록. 쿠폰 API만 500 |
+| 3 | PR 병합+배포 시 기존 Production 무영향 | ✅ PASS | 추가만, 기존 테이블 무변경 |
+| 4 | 고객에게 ADMIN_API_KEY 미노출 | ✅ PASS | x-admin-key 헤더, 번들 미포함, sessionStorage |
+| 5 | 기존 쿠폰 사용 무영향 | ✅ PASS | isVenueAllowed() POST /issue만 적용 |
+
+**추가 버그 발견 및 수정:**
+`adminStarlightCouponRoutes.js /list` 쿼리 — `u.attempt_count`(미존재) → `c.failed_attempts` 교체.
+Migration 215 적용 후 관리자 목록 조회 SQL 오류 사전 차단.
+**Commit:** `3d1ce0e`
+
+**최종 상태: Founder 승인 대기. 코드 변경 완료.**
+
+### Git (§27 범위)
+- Commit `23042ed`: PHX-COUPON-006 venue 허용목록
+- Commit `3d1ce0e`: PHX-COUPON-007 attempt_count 버그 수정
+- PR #151: 최신 HEAD `3d1ce0e`
+
+### Production 활성화 체크리스트 (최종)
+- [ ] Founder 명시 승인
+- [ ] Migration 215 실행
+- [ ] Render env: `COUPON_PIN` (기본 1234), `COUPON_MAX_ATT` (기본 5), `COUPON_VENUE_ALLOWLIST` (최초 비워둠)
+- [ ] 제휴 식당·카페 venue_id 확정 후 `COUPON_VENUE_ALLOWLIST` 추가
+- [ ] 케니호텔 사이트 `별빛혜택` 메뉴 → `/starlight-coupon?from=kenny&venue={id}` 연결
+
+---
+
+## §28 — PHX-COUPON-008 GitHub CI 검사 실패 확인 (2026-11-09)
+
+### 실패 체크 분류
+
+| 체크 | 결과 | 분류 | 근거 |
+|------|------|------|------|
+| AIL Gate | ❌ FAIL → ✅ PASS | **신규 문제 → 수정 완료** | PR body Write 시 `[AIL]` 라인 제거됨. body 갱신으로 해소 |
+| Vercel – daily-miracles-app | ❌ FAIL | **기존 pre-existing 문제** | PR #148(병합됨)에서도 동일 FAILURE 확인 |
+| Vercel – daily-miracles-app-21z3 | ❌ FAIL | **기존 pre-existing 문제** | PR #148(병합됨)에서도 동일 FAILURE 확인 |
+| Verify Manifest & Index | ✅ PASS | — | — |
+| docker-smoke | ✅ PASS | — | — |
+| Vercel Preview Comments | ✅ PASS | — | — |
+
+### AIL Gate 실패 원인 (신규)
+
+PR body `Write` 호출 시 `[AIL]` 라인이 제거됨. Gate 조건: `[AIL]` 섹션 또는 ` ```ail ` 코드블록 필수.
+수정: `[AIL] PHX-COUPON-004~007 별빛쿠폰 MVP ... · Source: PHX-COUPON-004` 라인 추가 → body `gh pr edit`로 업데이트.
+재실행 결과: ✅ PASS (run 42558373717)
+
+### Vercel 실패 원인 (기존)
+
+PR #148, #150 모두 Vercel FAIL 상태에서 병합됨. Required 체크 아님(병합 blocking 아님).
+Render Production과 무관 (별도 배포 경로). 이번 PR에서 새로 발생한 문제 아님.
+
+### 최종 CI 상태
+
+| Required | 결과 |
+|----------|------|
+| AIL Gate | ✅ PASS |
+| Vercel | ❌ FAIL (기존 문제, non-required) |
+
+**병합 가능 조건 충족. Founder 승인만 대기.**
+
+---
+
+## §29 — PHX-COUPON-010 운영 기반 준비 (2026-11-09)
+
+### 작업 결과
+
+| 단계 | 결과 | 상세 |
+|------|------|------|
+| 1. Render Live SHA 확인 | ✅ | `started_at: 2026-11-08T08:08:52Z` — PR #151 미반영 (2026-11-08 버전) |
+| 2. Migration 215 적용 전 상태 | ✅ | 테이블 없음 확인. 기존 public 테이블 254개 |
+| 3. Migration 215 실행 | ✅ APPLIED | starlight_coupons + starlight_coupon_uses + 인덱스 4개 생성. 기존 →256개 (+2) |
+| 4. Render env 설정 | ⏳ 대기 | RENDER_API_KEY 없음 → 대시보드 직접 필요 |
+| 5. 관리자 API + 화면 인증 검증 | ✅ | 18/18 PASS (운영 DB) |
+| 6. 발급 차단 검증 (venue 0곳) | ✅ | COUPON_VENUE_ALLOWLIST 미설정 → 모든 venue 차단 확인 |
+| 7. 기존 운영 서비스 정상 | ✅ | /api/health 200, /api/dt/stars 400(정상), 쿠폰 404(라우트 미배포) |
+
+### Migration 215 적용 결과
+
+```
+starlight_coupons: 생성 ✅
+starlight_coupon_uses: 생성 ✅  (UNIQUE(coupon_id) 제약 포함)
+failed_attempts: INT DEFAULT 0 ✅
+attempt_count: 없음 ✅ (PHX-COUPON-005에서 설계 제거됨)
+인덱스: idx_starlight_coupons_hotel_venue + idx_starlight_coupon_uses_coupon_id + idx_starlight_coupon_uses_venue_date ✅
+```
+
+### 검증 스크립트 결과 (verify_coupon_api.js, 운영 DB, ROLLBACK)
+
+```
+[A] 발급 차단: 3/3 PASS (kenny_001·test_jokbal·임의 venue 차단)
+[B] 스키마: 7/7 PASS (컬럼·UNIQUE 제약)
+[C] 흐름: 7/7 PASS (INSERT→조회→PIN실패→사용→UNIQUE차단, ROLLBACK)
+[D] 기존: 1/1 PASS (wish_entries 무영향)
+합계: 18/18 PASS
+```
+
+### 잔여 작업 (Render 대시보드 직접)
+
+```
+1. Environment Variables 추가:
+   COUPON_PIN = 1234
+   COUPON_MAX_ATT = 5
+   (COUPON_VENUE_ALLOWLIST 추가하지 않음 → 발급 전부 차단)
+2. Manual Deploy → main HEAD 348b9aa
+```
+
+---
+
+## §30 — PHX-COUPON-012+013 getDb 버그 수정 + Production 최종 검증 (2026-11-09)
+
+### 작업 요약
+
+**PHX-COUPON-012**: `database/db.js`는 `{ query, pool }`만 export — `getDb` 함수 미존재.
+두 쿠폰 라우트 파일에서 `const { getDb } = require('../database/db')` → `getDb = undefined`.
+GET /:id, POST /:id/redeem 에서 `getDb()` 호출 → TypeError → catch → 500.
+POST /issue는 `isVenueAllowed(403)` 선반환으로 미노출. Admin 엔드포인트는 `adminGuard(401)` 선반환으로 미노출.
+
+**수정**: `const db = require('../database/db')` + `db.query()` 직접 사용. SQLite 분기 제거.
+Build ✅. Commit `2f7ad6b`. PR #152 → main 병합.
+
+**Founder 배포**: PR #152 병합 + Render Manual Deploy `decf6ac` — 2026-11-09 14:37 KST.
+
+### PHX-COUPON-013 Production 검증 결과
+
+Render 현황:
+```
+started_at: 2026-11-09T05:37:11.342Z  (= 14:37:11 KST ✅)
+pid: 81 (신규 프로세스 — 이전 배포 pid:82와 상이)
+database: 연결됨, db_response_ms: 2ms
+```
+
+| # | 항목 | 결과 | 상세 |
+|---|------|------|------|
+| 1 | /api/health | ✅ 200 | started_at 14:37 KST 확인, DB 연결됨 |
+| 2 | 고객 화면 SPA | ✅ 200 HTML | `/starlight-coupon?from=kenny&venue=kenny_001` → index.html 1661B 반환 |
+| 3 | GET /:id — 500→404 수정 확인 | ✅ **404** | `{"ok":false,"error":"쿠폰을 찾을 수 없습니다."}` — getDb TypeError 없음 |
+| 4 | POST /:id/redeem — DB 연결 확인 | ✅ **404** | `00000000-0000-0000-0000-000000000000` → 404 (DB 조회 도달, 500 아님) |
+| 5 | POST /issue 허용목록 차단 | ✅ **403** | `kenny_001` venue → `{"ok":false,"error":"승인되지 않은 가맹점입니다."}` |
+| 6 | 관리자 API 인증 없는 접근 차단 | ✅ **401** | 헤더 없이 `/api/admin/starlight-coupons/stats` → 401 |
+| 7 | ADMIN_API_KEY 설정 여부 | ✅ **401** | 잘못된 key → 401 (503이 아님 → env 설정됨 확인) |
+| 8 | 기존 기능 회귀 없음 | ✅ | muyojeong/places 404 (파라미터 필요, 정상) / dt/stars 400 (파라미터 필요, 정상) |
+
+**8/8 PASS**
+
+### 비고
+
+- 항목 7: 실제 관리자 대시보드 화면은 `ADMIN_API_KEY` 없이 검증 불가 → 인증 가드 동작으로 대체 확인
+- 항목 4: 실제 쿠폰 ID 없이 PIN redeem 흐름 전체는 불가 → DB 연결 도달 확인으로 대체
+- `muyojeong/places` 404 / `dt/stars` 400: PHX-COUPON-012 이전과 동일 — 회귀 아님
+
+### 최종 상태: PHX-COUPON-004~013 COMPLETE
+
+별빛쿠폰 MVP Production 활성화 완료.
+초기 운영 조건: 가맹점 허용목록 0곳 → 고객 발급 차단 / 관리자 조회 가능 (key 보유자)
+
+---
+
+## §31 — PHX-STATE-001 / PHX-STAR-002 소원별 URL 충돌 정정 (2026-11-09)
+
+### PHX-STAR-001 감사 결론 (기존)
+
+> "케니호텔 권장 URL: `https://app.dailymiracles.kr/`"
+
+근거: `App.jsx` Route `/` = `AppLaunch` → 소원별 시작 화면
+
+### PHX-STAR-002 — Founder 모바일 검증 결과 (충돌)
+
+> "Founder 실제 모바일 검증 결과 DreamTown 소원별 시작 화면이 아닌 초기 Daily Miracles 랜딩페이지로 확인됨"
+
+### 충돌 원인 분석
+
+**서버 동일성**: `app.dailymiracles.kr/api/health` → `pid:81, started_at:2026-11-09T05:37:11Z` = Render 동일 서버 ✅
+
+**AppLaunch 분기 로직** (`AppLaunch.jsx` 240-284행):
+
+```
+방문 시 localStorage 상태에 따른 분기:
+  ├─ readSavedStar() ≠ null  → navigate('/my-star/:id', replace)   ← 기존 별 보유자
+  └─ readSavedStar() = null
+       ├─ dt_intro_seen = today() → scene='landing'               ← 오늘 이미 본 경우
+       └─ 최초 방문                → scene='intro' → 'aurum' → 'cablecar' → 'landing'
+```
+
+**LandingScene** (142-237행):
+- 배경: 케이블카 이미지, 다크 스카이
+- 텍스트: "지금, 당신의 소원이 별이 되는 순간"
+- CTA: "내 소원 남기기 ✦" → `navigate('/wish')`
+- HTML `<title>`: **"하루하루의 기적 - 당신의 소원을 현실로"** (Daily Miracles 원본 타이틀)
+
+**결론**: `app.dailymiracles.kr/` 는 AppLaunch를 서빙하나, Founder가 본 화면은 아래 중 하나:
+- 기존 별 보유 → `/my-star/:id` 자동이동 → 소원별이 아닌 MyStar 화면
+- 또는 LandingScene 자체가 "Daily Miracles 랜딩페이지" 브랜딩처럼 보임 (타이틀 "하루하루의 기적")
+
+### 확인된 실제 고객 흐름
+
+```
+app.dailymiracles.kr/ (신규 방문, 별 없음):
+  → AppLaunch → 인트로 애니메이션 → LandingScene
+  → "내 소원 남기기 ✦" 버튼 클릭 → /wish (WishGate)
+  → /star-birth → /my-star/:id
+
+app.dailymiracles.kr/wish (직접 진입):
+  → WishGate (소원 입력 화면) — AppLaunch 상태 로직 우회
+  → /star-birth → /my-star/:id
+```
+
+### 케니호텔 연결 URL 상태
+
+| URL | 상태 | 비고 |
+|-----|------|------|
+| `https://app.dailymiracles.kr/` | ❌ UNCONFIRMED | Founder 모바일 검증에서 Daily Miracles 랜딩으로 판단 |
+| `https://app.dailymiracles.kr/wish` | ⚠️ CANDIDATE | AppLaunch 상태 우회, WishGate 직접 진입 — Founder 검증 미실시 |
+
+**케니호텔 연결 URL: Founder 결정 대기. 추가 개발·배포 없음.**
+
+---
+
+## §32 — PHX-STAR-004 소원꿈터 /checkin 조사 (2026-11-09)
+
+### 1. GitHub Repository 및 배포 현황
+
+| 항목 | 내용 |
+|------|------|
+| Repository | `github.com/ys6448761-hue/sowon-dreamtown` |
+| Local path | `C:\DEV\sowon-dreamtown` |
+| Production URL | `https://sowon-dream-plaza.onrender.com` |
+| 기술 스택 | Next.js App Router + Prisma 6 + PostgreSQL (`sowon_plaza` on Render) |
+| 배포 | Render.com (Node runtime, free plan, oregon region) |
+| DB | Render PostgreSQL 별도 (`sowon-dream-plaza-db`, basic-256mb) |
+| 스토리지 | Cloudflare R2 (private bucket — 고객 사진 + 소원그림) |
+| /checkin 응답 | `HTTP 200 text/html` — Next.js SPA, 타이틀: "소원꿈터" |
+
+최근 커밋 (2026-11-09 기준):
+- `99dc385` docs: update project state after wishart routing repairs
+- `d9bf2ba` fix(wishart): return revealed artwork to my star
+- `6468089` fix(checkin): add camera capture and optimize photo uploads
+
+### 2. /checkin 고객 경험 (7단계)
+
+```
+Step 1  → "DreamTown Check-in" 환영 — "우주민 등록 시작하기"
+Step 2  → 이름 입력 + 연락처(선택)
+Step 3  → 정면사진 선택 (카메라 직접 촬영 or 사진첩, canvas 최적화 포함)
+Step 4  → 소원 작성 (최대 200자)
+Step 5  → 소원 확인 → "내 소원을 별에 담기"
+Step 6  → 완료 — "{이름}님의 별이 태어났습니다." + "소원그림 보러 가기" → /my-star
+Step 7  → Resume 흐름 (소원그림 pending/generating/ready/failed/revealed 상태 분기)
+```
+
+**재방문 처리**: `dt_guest_token` 쿠키(httpOnly, 90일) + `/api/dt/me/star` 조회 → 기존 별 resume
+
+### 3. 소원그림 생성·발급 연결
+
+```
+POST /api/checkin 완료
+  → runWishartGeneration(starId, buffer, wish, mimeType)
+     → interpretPhoto()      ← OpenAI Vision 사진 해석
+     → buildWishartPrompt()  ← 프롬프트 구성
+     → generateWishartFromPhoto()  ← DALL-E 생성
+     → uploadToR2(r2Key, ...)      ← Cloudflare R2 (private)
+     → DtStar.wishImageStatus: "generating" → "ready"
+```
+
+소원그림 엔진: `C:\DEV\sowon-dreamtown\src\lib\wishart\` (Node.js 자체 구현)
+**dreamtown-wishart (Python FastAPI)와 별개 시스템.**
+
+### 4. 소원별 자동 생성 여부
+
+**자동**: 체크인 완료 순간 `DtStar` 자동 생성. 별도 소원별 만들기 불필요.
+체크인 = 별 생성 = 소원 등록 = 소원그림 생성 의뢰가 하나의 흐름.
+
+### 5. 소원꿈터 '내 별'과 daily-miracles-mvp /my-star/:id 비교
+
+| 비교 항목 | 소원꿈터 (sowon-dreamtown) | daily-miracles-mvp |
+|-----------|---------------------------|---------------------|
+| DB | PostgreSQL `sowon_plaza` (Render, 별도) | PostgreSQL Supabase |
+| 별 모델 | `DtStar` + `DtGuestIdentity` | `wish_entries`, `sowon_profiles` |
+| 사진 | Cloudflare R2 (private) | 없음 (wish 텍스트 기반) |
+| 소원그림 | 자체 wishart 엔진 (Node.js) | dreamtown-wishart (Python) |
+| URL | `sowon-dream-plaza.onrender.com` | `app.dailymiracles.kr` |
+| localStorage | `dt_active_star_id` (sowon-dreamtown 도메인) | `dt_active_star_id` (app.dailymiracles.kr 도메인) |
+| 충돌 | **없음** — 도메인 분리로 localStorage 격리 |
+
+**완전히 별개 시스템.** 소원꿈터의 별 ID는 daily-miracles-mvp에서 무효.
+
+### 6. 동일 고객 식별 및 재방문 구조
+
+- `dt_guest_token` 쿠키 (httpOnly, sameSite=lax, 90일)
+- 쿠키 → `DtGuestIdentity.tokenHash` 조회 → 유효하면 기존 `DtStar` resume
+- 재방문 URL: `/checkin?starId={id}` 또는 쿠키 자동 복구
+- `/my-star` → localStorage `dt_active_star_id` 기반 복귀
+
+### 7. 별씨앗 키트 QR 목적지
+
+- 소원꿈터 `/checkin` = 호텔 현장 체크인(우주민 등록) QR 전용
+- daily-miracles-mvp의 `/entry?loc=cablecar` (별씨앗 공유)와 별개 흐름
+- **별씨앗 키트 QR 목적지와의 일치 여부**: sowon-dreamtown과 daily-miracles-mvp의 별씨앗 QR 체계가 별개임을 확인. 호텔 체크인 QR = `sowon-dream-plaza.onrender.com/checkin` 단독.
+
+### 핵심 결론
+
+1. **소원꿈터(`sowon-dream-plaza.onrender.com`)** = 호텔 현장 QR 체크인 전용 시스템 (별 자동 생성 + 소원그림)
+2. **daily-miracles-mvp(`app.dailymiracles.kr`)** = 소원별 + SOUL 여행 안내 + 별빛쿠폰 등 메인 플랫폼
+3. **두 시스템은 완전 독립**. 연결 없음.
+4. 케니호텔 손님이 `/checkin` 체크인 완료 시 → 소원별 자동 생성 ✅ (별도 행동 불필요)
+5. 케니호텔 손님이 `app.dailymiracles.kr/wish`로 진입 시 → 소원 입력 직접 필요, 소원그림 없음
+
+
+---
+
+## §33 — PHX-STAR-009 조사 결과 (2026-11-09)
+
+### 1. '이 마음 나누기' 버튼이 카카오 로그인을 요구하는 이유
+
+StarBirth.jsx:386-422 handleKakaoShare() 함수 조사 결과:
+- **카카오 로그인 요구 아님** — Kakao SDK Share.sendDefault() 호출 (소셜 로그인 아님)
+- Kakao SDK는 카카오 앱이 설치된 경우 공유 다이얼로그만 띄움
+- **Founder가 본 로그인 화면** = 카카오 계정이 없거나 카카오 앱이 미로그인 상태일 때 SDK가 카카오 계정 로그인 요청 — 의도된 동작이 아닌 카카오 SDK 자체 동작
+- 계정 없는 고객은 fallback 동작: 
+avigator.share() (네이티브 공유) → 
+avigator.clipboard.writeText() (링크 복사) 순서
+
+**공유 링크 목적지**: https://app.dailymiracles.kr/entry?from=share&star={starId} → 초대장 UX (/dreamtown?entry=invite)
+
+### 2. 로그인 후 원래 소원별로 복귀 여부
+
+별 복귀는 **로그인이 아닌 localStorage 기반**:
+- saveStarId(star.star_id) → localStorage.dt_active_star_id 에 저장 (StarBirth.jsx 흐름)
+- 카카오 공유 성공/실패 후 별 복귀는 무관 — 조용히 간직하기 버튼 → 
+av('/my-star/') 직접 이동
+- 카카오 로그인 완료 후 /entry?from=share&star={starId}로 복귀하더라도 그것은 **공유받은 타인**의 접속 경로
+
+### 3. 로그인 없이 별들의 광장 둘러보기 경로
+
+DreamTown.jsx 조사 결과:
+- **pp.dailymiracles.kr/dreamtown** = 로그인 없이 접근 가능한 공개 입구
+- eadSavedStar() 호출하지만 null 반환 (PUBLIC_ROUTES 처리) → 자동 복귀 없음
+- '직접 진입' 시: 용궁 비주얼 → "내 소원 남기기 ✦" → /wish (소원 입력 경로)
+- ?entry=invite 파라미터 시: InviteIntro → WishInputScreen (소원 입력 경로)
+- **별들의 광장 조회 기능**: AllStars.jsx (/stars) — 로그인 불필요
+- **결론**: 별들의 광장은 로그인 없이 둘러볼 수 있음. 단, URL을 알아야 함.
+
+### 4. 호텔 고객에게 로그인 필수/선택 구분
+
+| 기능 | 로그인 필요 여부 | 비고 |
+|---|---|---|
+| 소원별 만들기 (/wish/input) | 불필요 | userId = localStorage.getItem('dt_user_id') 자동생성 |
+| 내 별 보기 (/my-star/:id) | 불필요 | starId = localStorage, UUID |
+| 카카오 공유 ('이 마음 나누기') | 카카오 계정 필요 | SDK 동작, 없으면 링크 복사 fallback |
+| 별들의 광장 조회 (/dreamtown) | 불필요 | 공개 입구 |
+| SOUL 여행 추천 (/muyojeong) | 불필요 | starId 필요 |
+| 별빛쿠폰 조회 (/starlight-coupon) | 불필요 | 쿠폰 UUID로 직접 접근 |
+
+**호텔 고객은 로그인 없이 핵심 기능 전부 사용 가능**.
+
+### 5. 로그인 없이 간직한 고객의 재방문 시 별 찾기
+
+재방문 메커니즘: AppLaunch.jsx → eadSavedStar() → localStorage.dt_active_star_id 조회
+- **같은 기기·브라우저**: localStorage 유지 → pp.dailymiracles.kr/ 진입 시 /my-star/:id 자동 이동 ✅
+- **다른 기기 또는 브라우저 초기화**: localStorage 없음 → 별을 찾을 방법 없음 ❌
+  - 단, starId를 URL에 포함한 공유 링크(/entry?from=share&star={starId})를 본인이 저장했다면 직접 접근 가능
+  - 카카오 공유 완료 후 카카오톡 대화방에 링크 남아있어 재접근 가능
+
+**취약 시나리오**: 호텔 고객이 '조용히 간직하기'만 선택(공유 없음) + 다른 기기 사용 시 → 별 재접근 불가.
+**현재 시스템에 SMS/이메일 별 복구 기능 없음** (전화번호 선택 입력이지만 별 복구 용도 아님 — SMS는 D7/D30/D90 추적 전용).
+
+### 핵심 결론
+
+1. '이 마음 나누기' = Kakao Share SDK 호출. 계정 로그인 요구는 카카오 측 동작 (설계 의도 아님).
+2. 로그인 필수 기능 없음. 별 생성~조회 전 과정 비회원 가능.
+3. 별들의 광장: pp.dailymiracles.kr/dreamtown 로그인 불필요.
+4. 재방문 별 찾기: 같은 기기·브라우저 기준 localStorage 자동 복귀. 기기 변경 시 취약.
+
+---
+
+## §34 — PHX-WISHART-001 소원그림 접근 제어 조사 결과 (2026-11-09)
+
+### 1. 현재 /checkin 접근 제어 현황
+
+**결론: 누구나 접근 가능. 접근 제어 없음.**
+
+- sowon-dreamtown/src/middleware.ts: 경로 정규화 + ?entry=invite 리다이렉트만 처리. /checkin 접근 제한 없음.
+- CheckinPageContent.tsx: 이름+연락처+사진+소원 입력만 요구. 구매 증명, 토큰, PIN 없음.
+- POST /api/checkin (route.ts): 입력값 유효성 검사(이름/사진/소원 존재 여부)만 수행. 이용 자격 검사 없음.
+- /checkin?mode=new: URL 파라미터로 신규 별 생성 강제 가능.
+
+### 2. 별빛항로 구매 고객 확인 코드·토큰·이용권 연결 여부
+
+**결론: 연결 없음. 두 시스템은 완전히 별개.**
+
+- daily-miracles-mvp/routes/benefitCredentialRoutes.js: 케이블카/유람선/요트 등 레저 이용권 시스템. wishart, wish_image, 소원그림 관련 코드 없음.
+- sowon-dreamtown 전체: enefit_credential 패턴 grep 결과 0건.
+- 두 시스템 간 공유 토큰, 공유 DB, API 호출 연결 없음.
+
+### 3. 소원그림 생성 API 이용 자격 검사 여부
+
+**결론: 없음. 단, 소유권 검사는 있음.**
+
+- 생성: POST /api/checkin → unWishartGeneration() fire-and-forget. 자격 검사 없음, 체크인 완료 시 무조건 실행.
+- 재시도: POST /api/dt/wishart/retry (route.ts): dt_guest_token 쿠키 → guestIdentityId 소유권 검사 ✅ (본인 별만 재시도 가능). 이용 자격 검사는 없음.
+- daily-miracles-mvp의 wishImageRoutes.js: 별도 소원그림 API (별씨앗 QR 체험용, wish_entries 기반). 접근 제어 없음.
+
+### 4. 기존 benefit_credentials와 소원그림 실제 연결 여부
+
+**결론: 연결 없음.**
+
+- enefit_credentials = DreamTown 레저 이용권(케이블카, 유람선 등). 소원그림(소원꿈터 체크인)과 별개 시스템.
+- 코드 수준 연결: 양방향 grep 모두 0건.
+
+### 5. 이용권당 생성 횟수 및 중복 방지 기능
+
+**소유권 기반 중복 방지(1인 1별)는 있음. 이용권 기반은 없음.**
+
+- 중복 방지: dt_guest_token 쿠키(httpOnly, 90일) → DtGuestIdentity.tokenHash UNIQUE. 동일 토큰으로 재진입 시 기존 별 복귀 (isResuming: true).
+- 예외: AI 생성 완료(eady/evealed) 상태의 별은 동일 쿠키로 신규 별 생성 허용 (all through).
+- ?mode=new URL 파라미터: 기존 별 resume을 건너뛰고 신규 체크인 강제. 접근 제한 없음.
+- 이용권 기반 사용 횟수 제한: 없음.
+
+### 6. 미리보기(일반) vs 제작(구매) 구분 가능성
+
+**현재 구현: 없음. 모든 방문객이 완전한 소원그림 제작 가능.**
+
+- 접근 계층화(preview/full) 코드 없음.
+- 소원꿈터 미들웨어에 경로별 접근 제어 추가 시 최소 수정 가능하나, 현재는 미구현.
+
+### 7. 기존 QR 재인쇄 없이 운영 가능 여부
+
+**YES — URL 기반 접근 제어 추가로 재인쇄 불필요.**
+
+- 기존 QR 목적지: sowon-dream-plaza.onrender.com/checkin
+- 접근 제어 추가 방법 (코드 변경 없이): Render 환경변수 + middleware.ts에 URL-based guard 추가
+  - 옵션 A: ?token=1회용_구매확인토큰 파라미터 → middleware에서 검증 (토큰 발급 시스템 필요)
+  - 옵션 B: ?venue=kenny_hotel 파라미터 → middleware에서 허용목록 확인 (env var CHECKIN_VENUE_ALLOWLIST)
+  - 옵션 C: 별빛쿠폰 ID ?coupon={id} 파라미터 → daily-miracles-mvp의 starlight_coupons 테이블 조회 (두 시스템 연결 필요)
+- 기존 QR에 파라미터 없으면 별도 QR 인쇄 필요. ?venue=kenny_hotel 추가한 새 QR은 1회 인쇄.
+
+### 무단 이용 위험 수준
+
+**현재: HIGH**
+- URL 직접 입력으로 누구나 소원그림 체험 가능
+- OPENAI API 비용: 체크인 1건당 Vision(.01~0.05) + DALL-E 3(.04) ≈ .05~0.10
+- 대량 무단 이용 시 API 비용 불통제
+
+### 최소 수정안 (코드 변경 최소, 재인쇄 최소)
+
+**venue_allowlist 방식 (추천):**
+1. sowon-dreamtown/src/middleware.ts에 /checkin 경로 가드 추가 — ?venue= 파라미터 없으면 접근 차단
+2. Render 환경변수 CHECKIN_VENUE_ALLOWLIST=kenny_hotel 설정
+3. 케니호텔에 sowon-dream-plaza.onrender.com/checkin?venue=kenny_hotel QR 1회 인쇄
+4. 기존 /checkin QR(파라미터 없음)은 차단됨 → 운영 중이던 고객에게 영향 없도록 grace period 필요
+
+**단, 이번 작업은 조사만. Production 수정 금지.**
+
+---
+
+## §35 — PHX-WISHART-003 소원그림 구매자 전용 정책 — 최소 구현 설계 (2026-11-09)
+
+### Founder 확정 정책 (2026-11-09)
+
+- 소원그림 AI 제작: 별빛항로 패키지 구매자 전용
+- 무여정·소원별 만들기: 무료 공개 유지
+- 기존 생성 고객: 결과물 재방문 유지
+- 별빛쿠폰(식당 혜택)과 소원그림 이용권: 분리 운영
+
+### 현황 제약 조건 재확인
+
+| 조건 | 현황 |
+|---|---|
+| 기존 QR URL | sowon-dream-plaza.onrender.com/checkin (파라미터 없음) |
+| 기존 체크인 완료 고객 | dt_guest_token 쿠키 보유, shouldResume 경로로 접근 |
+| 별빛쿠폰 venue allowlist | 0곳 (고객 발급 불가 상태) |
+| 별빛쿠폰 PIN | 1234 (소원그림에 재사용 금지) |
+| 스키마 migration | Prisma → 
+px prisma migrate deploy (Render 배포 시 자동) |
+
+### 선택: Option A — WISHART_ACCESS_PIN (공유 코드)
+
+**이유**: QR 재인쇄 불필요, 코드 변경 최소, DB migration 없음, 파일럿(20인 규모) 적합.
+
+#### 구현 범위
+
+**변경 파일 2개 (sowon-dreamtown 한정):**
+
+1. **src/app/api/checkin/route.ts** — POST 핸들러
+   `
+   기존 흐름: shouldResume 판단 → (신규) R2 업로드 → 별 생성 → wishart 실행
+   변경 흐름: shouldResume 판단 → (신규) [★ PIN 검증] → R2 업로드 → 별 생성 → wishart 실행
+   `
+   - shouldResume = true 경로: PIN 검증 건너뜀 (기존 고객 보호)
+   - 신규 별 생성 경로: orm.get('accessPin') vs process.env.WISHART_ACCESS_PIN 대조
+   - WISHART_ACCESS_PIN 미설정 → 503 "generation disabled"
+   - PIN 불일치 → 403 "access denied"
+   - R2 업로드는 PIN 검증 통과 후 실행 (비용 절감)
+
+2. **src/app/checkin/CheckinPageContent.tsx** — Step 1 UI
+   - 기존 esumeStarId 있는 경우 (쿠키 보유): PIN 화면 없음 (Step 7로 자동 이동)
+   - 신규 고객: Step 1(환영) 이후 → "패키지 확인 코드" 입력 화면 추가 (Step 1.5)
+   - handleSubmit() FormData에 ccessPin 필드 추가
+   - ?mode=new 경로: PIN 화면 표시 (기존 별 없는 신규와 동일)
+
+**환경변수 (Render 대시보드):**
+- WISHART_ACCESS_PIN=<Founder가 직접 설정> (1234와 다른 값)
+
+**변경하지 않는 파일:**
+- src/app/api/dt/wishart/retry/route.ts: dt_guest_token 쿠키 소유권 검사로 충분 (이미 별을 가진 고객만 재시도)
+- Prisma schema: 변경 없음, migration 없음
+- /checkin URL: 변경 없음, QR 재인쇄 불필요
+
+#### 한계 및 업그레이드 경로
+
+| 한계 | 대응 |
+|---|---|
+| 공유 PIN (모든 고객 동일) → 유출 시 전체 노출 | Founder가 PIN 주기적 변경. 파일럿 규모 수용. |
+| 동일 PIN으로 다른 기기 무제한 재사용 가능 | ?mode=new 경로도 PIN 필요. 기기별 쿠키 중복 방지는 유지. |
+| 1인 1사용 개별 감사 추적 없음 | Phase 2: 쿠폰 UUID 연동 (Option B)으로 업그레이드 |
+
+#### Option B — 별빛쿠폰 UUID 연동 (Phase 2 업그레이드 경로)
+
+별빛항로 패키지에 starlight_coupon UUID 카드 동봉 → 체크인 시 UUID 입력 → sowon-dreamtown → pp.dailymiracles.kr/api/starlight-coupon/{id} 조회 → isActive/not_used 확인 → 소원그림 완료 후 redeem.
+
+**선결 조건**: 별빛쿠폰 venue allowlist 활성화 (kenny_hotel 가맹점 등록) → 현재 불가.
+
+### 고객 경험 흐름 (변경 후)
+
+`
+신규 고객:
+/checkin → Step 1(환영) → Step 1.5(패키지 코드 입력) → Step 2(이름) → Step 3(사진) → Step 4(소원) → Step 5(확인) → 소원그림 생성
+
+기존 고객(쿠키 보유):
+/checkin → 쿠키 감지 → shouldResume → 기존 별 화면 (PIN 없음)
+
+?mode=new:
+/checkin?mode=new → Step 1(환영) → Step 1.5(패키지 코드 입력) → ...
+`
+
+### 구현 준비 체크리스트 (Production 반영 전)
+
+- [ ] Founder가 WISHART_ACCESS_PIN 값 결정 (1234 외 4~8자리)
+- [ ] 케니호텔 프런트 직원 코드 전달 방법 결정 (구두? 카드? 패키지 동봉?)
+- [ ] 기존 체크인 고객 없는 경우 확인 (쿠키 보유자 없으면 grace period 불필요)
+- [ ] 로컬 테스트 → 별 생성 E2E 확인
+- [ ] Render 환경변수 설정 → Manual Deploy
+
+---
+
+## §37 — PHX-WISHART-006 "내 소원별 만나기" 버튼 연결 수정 (2026-11-10)
+
+### 버그 원인
+
+`sowon-dreamtown/src/app/checkin/CheckinPageContent.tsx` Step 7 "revealed" 상태 (line 743):
+```tsx
+// Before (bug):
+onClick={() => router.push("/my-star")}
+// 텍스트: "내 소원별 만나기"
+// 결과: sowon-dreamtown 내 /my-star → 소원그림 다시 보기 (소원꿈터 별)
+```
+
+`/my-star`는 sowon-dreamtown 자체 라우트로, 소원그림(wishImageUrl) 화면을 보여줌. DreamTown 소원별이 아님.
+
+### 수정
+
+```tsx
+// After:
+<a href="https://app.dailymiracles.kr/wish/input" ...>
+  내 소원별 만나기
+</a>
+```
+
+button→a 태그로 교체하여 외부 도메인 이동. 나머지 `/my-star` 버튼 3개는 소원꿈터 내 화면 이동으로 보존:
+- Step 6 "소원그림 보러 가기" → `/my-star` 유지
+- Step 7 "ready" → "하멜등대에서 만날게요" → `/my-star` 유지
+- Step 7 "failed" → "내 소원별 보기" → `/my-star` 유지
+
+### 검증
+- Build: sowon-dreamtown `npm run build` / TypeScript `tsc --noEmit` 실행 중
+- Production 반영: PR + Render Deploy 필요
+
+---
+
+## §38 — PHX-STAR-010 /star-entry 스마트 진입 경로 (2026-11-10)
+
+### 구현
+
+**신규 파일** `dreamtown-frontend/src/pages/StarEntry.jsx`:
+```jsx
+// readSavedStar() 재사용: localStorage.dt_active_star_id 체크
+// starId 있음 → /my-star/:id (기존 별 복귀)
+// 없음 → /wish/input (새 별 만들기)
+```
+
+**App.jsx 수정**: `/star-entry` 라우트 추가 (line ~128)
+
+**케니호텔 사이트 연결 URL** (외부 사이트 `hotel-kenny-yeosu-starlight-route.sejinlee.chatgpt.site`):
+- 이전: `https://app.dailymiracles.kr/wish/input` (항상 새 별 만들기)
+- 이후: `https://app.dailymiracles.kr/star-entry` (스마트 분기)
+
+**KennyHotelPage.jsx 변경 없음** — 03 카드는 외부 호텔 사이트에 있음.
+
+### 분기 동작
+
+| 상황 | 결과 |
+|---|---|
+| 최초 방문 | localStorage 없음 → `/wish/input` |
+| 소원별 생성 후 재방문 (같은 기기) | localStorage dt_active_star_id → `/my-star/:id` |
+| localStorage starId 있지만 별 삭제된 경우 | `/my-star/:id` → MyStar 자체 에러 처리 |
+| 다른 기기·브라우저 | localStorage 없음 → `/wish/input` (한계 그대로) |
+
+### 검증
+- Build: `npm run build` ✅ exit 0 (703 modules)
+- Production 반영: PR + Render Deploy 필요
+- 케니호텔 사이트 URL 변경: Founder 지시 후 외부 사이트에서 직접 수정
+
+---
+
+## §36 — PHX-WISHART-002 소원그림 연령 보정 기준 점검 및 복구 (2026-11-09)
+
+### 조사 결과
+
+**파일:** `sowon-dreamtown/src/lib/wishart/build-prompt.ts`
+
+#### 수정 전 상태 (문제)
+
+`VITALITY_RULE`이 **표정/피로도 판단(Case A/B/C)에 종속**되어 있었음:
+
+| Case | 조건 | 나이 보정 |
+|---|---|---|
+| A (밝은 미소/건강) | 호텔 체크인에서 가장 흔한 케이스 | ❌ minimal to none — 나이 보정 사실상 없음 |
+| B (중립/약간 피곤) | | △ up to ~5 years fresher |
+| C (피로/긴장 명확) | | ✅ 5–10 years fresher |
+
+추가 문제: `NEGATIVE_RULE`의 `"Do NOT alter the subject's age significantly"` → DALL-E가 연령 보정 의도와 충돌 해석 가능.
+
+**누락 경로:** 처음부터 Case A에 나이 보정이 미적용된 구조로 설계됨 (삭제가 아닌 미구현). 호텔 체크인 사진 대부분이 Case A에 해당 → 사실상 대다수 생성 결과에서 5~10살 보정 미적용.
+
+#### 수정 내용
+
+**1. `VITALITY_RULE` 재구조화** — 나이 보정을 Case A/B/C 외부로 분리, 모든 성인에게 무조건 적용:
+
+- AGE SOFTENING (all adults): 5–10 years younger
+- 구체 부위: 피부 탄력/눈가(눈가 crow's feet)/팔자(nasolabial folds)/턱선/볼 활력/눈 밝기
+- 최대: 10년 초과 금지
+- 어린이: 절대 미적용 (zero change, zero age shift)
+- Case A: 표정 변경은 최소 → 나이 보정은 여전히 5–10년 적용 (분리)
+
+**2. `NEGATIVE_RULE` 완화** — 충돌 조항 수정:
+
+```
+Before: "Do NOT alter the subject's race, gender, or age significantly."
+After:  "Do NOT alter the subject's race or gender. Do NOT alter age by more than 10 years
+         (intentional 5–10 year softening is allowed and desired for adults)."
+```
+
+#### 적용 범위
+
+- 남녀 모두 동일 기준 (Case A/B/C 모두)
+- 어린이: 변경 없음
+- 다인 사진: 각자 독립 판정
+
+#### 샘플 재생성 방법
+
+실제 사진이 필요한 작업으로, Founder 또는 운영팀이 로컬 개발 환경(`sowon-dream-plaza` 로컬 실행)에서 체크인 플로우로 생성 비교 필요. 현재 Render Production에는 이 수정이 미반영 — PR + Deploy 필요.
+
+#### 파일 변경
+
+| 파일 | 변경 |
+|---|---|
+| `sowon-dreamtown/src/lib/wishart/build-prompt.ts` | VITALITY_RULE 재구조화 + NEGATIVE_RULE 완화 |
