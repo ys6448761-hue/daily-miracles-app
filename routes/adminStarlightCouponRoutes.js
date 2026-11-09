@@ -9,7 +9,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { getDb } = require('../database/db');
+const db = require('../database/db');
 
 function adminGuard(req, res, next) {
   const key = req.headers['x-admin-key'] || req.query.key;
@@ -23,31 +23,16 @@ function adminGuard(req, res, next) {
 // ── GET /api/admin/starlight-coupons/stats ───────────────────────────────────
 router.get('/stats', adminGuard, async (req, res) => {
   try {
-    const db = getDb();
-    let stats;
-
-    if (db.isPostgres) {
-      const r = await db.query(`
-        SELECT
-          COUNT(DISTINCT c.id)                            AS total_issued,
-          COUNT(DISTINCT u.coupon_id)                     AS total_used,
-          COUNT(DISTINCT CASE WHEN c.viewed_at IS NOT NULL THEN c.id END) AS total_viewed,
-          COUNT(DISTINCT CASE WHEN c.hotel_source = 'kenny' THEN c.id END) AS kenny_issued
-        FROM starlight_coupons c
-        LEFT JOIN starlight_coupon_uses u ON u.coupon_id = c.id
-      `);
-      stats = r.rows[0];
-    } else {
-      stats = await db.get(`
-        SELECT
-          COUNT(DISTINCT c.id)                                      AS total_issued,
-          COUNT(DISTINCT u.coupon_id)                               AS total_used,
-          COUNT(DISTINCT CASE WHEN c.viewed_at IS NOT NULL THEN c.id ELSE NULL END) AS total_viewed,
-          COUNT(DISTINCT CASE WHEN c.hotel_source = 'kenny' THEN c.id ELSE NULL END) AS kenny_issued
-        FROM starlight_coupons c
-        LEFT JOIN starlight_coupon_uses u ON u.coupon_id = c.id
-      `);
-    }
+    const r = await db.query(`
+      SELECT
+        COUNT(DISTINCT c.id)                            AS total_issued,
+        COUNT(DISTINCT u.coupon_id)                     AS total_used,
+        COUNT(DISTINCT CASE WHEN c.viewed_at IS NOT NULL THEN c.id END) AS total_viewed,
+        COUNT(DISTINCT CASE WHEN c.hotel_source = 'kenny' THEN c.id END) AS kenny_issued
+      FROM starlight_coupons c
+      LEFT JOIN starlight_coupon_uses u ON u.coupon_id = c.id
+    `);
+    const stats = r.rows[0];
 
     return res.json({
       ok: true,
@@ -73,38 +58,20 @@ router.get('/list', adminGuard, async (req, res) => {
   const venue = req.query.venue || null;
 
   try {
-    const db = getDb();
-    let rows;
-
-    if (db.isPostgres) {
-      const params = venue ? [venue, limit] : [limit];
-      const whereClause = venue ? 'WHERE c.venue_id = $1' : '';
-      const limitParam  = venue ? '$2' : '$1';
-      const r = await db.query(`
-        SELECT c.id, c.hotel_source, c.venue_id, c.issued_at, c.viewed_at, c.is_active,
-               c.failed_attempts,
-               u.confirmed_at AS used_at
-        FROM starlight_coupons c
-        LEFT JOIN starlight_coupon_uses u ON u.coupon_id = c.id
-        ${whereClause}
-        ORDER BY c.issued_at DESC
-        LIMIT ${limitParam}
-      `, params);
-      rows = r.rows;
-    } else {
-      const params = venue ? [venue, limit] : [limit];
-      const whereClause = venue ? 'WHERE c.venue_id = ?' : '';
-      rows = await db.all(`
-        SELECT c.id, c.hotel_source, c.venue_id, c.issued_at, c.viewed_at, c.is_active,
-               c.failed_attempts,
-               u.confirmed_at AS used_at
-        FROM starlight_coupons c
-        LEFT JOIN starlight_coupon_uses u ON u.coupon_id = c.id
-        ${whereClause}
-        ORDER BY c.issued_at DESC
-        LIMIT ?
-      `, params);
-    }
+    const params = venue ? [venue, limit] : [limit];
+    const whereClause = venue ? 'WHERE c.venue_id = $1' : '';
+    const limitParam  = venue ? '$2' : '$1';
+    const r = await db.query(`
+      SELECT c.id, c.hotel_source, c.venue_id, c.issued_at, c.viewed_at, c.is_active,
+             c.failed_attempts,
+             u.confirmed_at AS used_at
+      FROM starlight_coupons c
+      LEFT JOIN starlight_coupon_uses u ON u.coupon_id = c.id
+      ${whereClause}
+      ORDER BY c.issued_at DESC
+      LIMIT ${limitParam}
+    `, params);
+    const rows = r.rows;
 
     return res.json({
       ok: true,
