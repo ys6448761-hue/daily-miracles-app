@@ -16,14 +16,17 @@ export default function AdminStarlightCouponPage() {
   const [venue, setVenue]   = useState('');
   const [err, setErr]       = useState('');
 
+  // 관리자 키는 x-admin-key 헤더로 전송 (URL/로그 노출 방지)
+  const authHeaders = (adminKey) => ({ 'x-admin-key': adminKey });
+
   const fetchData = useCallback(async (adminKey) => {
     setLoading(true);
     setErr('');
     try {
-      const qs = venue ? `?venue=${encodeURIComponent(venue)}&key=${encodeURIComponent(adminKey)}` : `?key=${encodeURIComponent(adminKey)}`;
+      const listQs = venue ? `?venue=${encodeURIComponent(venue)}` : '';
       const [sRes, lRes] = await Promise.all([
-        fetch(`${API}/stats?key=${encodeURIComponent(adminKey)}`),
-        fetch(`${API}/list${qs}`),
+        fetch(`${API}/stats`, { headers: authHeaders(adminKey) }),
+        fetch(`${API}/list${listQs}`, { headers: authHeaders(adminKey) }),
       ]);
       const sData = await sRes.json();
       const lData = await lRes.json();
@@ -45,7 +48,7 @@ export default function AdminStarlightCouponPage() {
     if (!key) { setAuthErr('관리자 키를 입력하세요.'); return; }
     setLoading(true);
     try {
-      const r = await fetch(`${API}/stats?key=${encodeURIComponent(key)}`);
+      const r = await fetch(`${API}/stats`, { headers: authHeaders(key) });
       const data = await r.json();
       if (!data.ok) throw new Error(data.error);
       sessionStorage.setItem('admin_key', key);

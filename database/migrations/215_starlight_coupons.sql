@@ -7,20 +7,20 @@ BEGIN;
 
 -- 쿠폰 발급 원장 (append-only)
 CREATE TABLE IF NOT EXISTS starlight_coupons (
-  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  hotel_source VARCHAR(50)  NOT NULL,  -- 'kenny', 'ramada' 등
-  venue_id     VARCHAR(100) NOT NULL,  -- 가맹점 식별자 (테스트: 'test_*')
-  issued_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-  viewed_at    TIMESTAMPTZ,            -- 고객이 쿠폰 화면 최초 조회 시
-  is_active    BOOLEAN      NOT NULL DEFAULT TRUE
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  hotel_source     VARCHAR(50)  NOT NULL,  -- 'kenny', 'ramada' 등
+  venue_id         VARCHAR(100) NOT NULL,  -- 가맹점 식별자 (테스트: 'test_*')
+  issued_at        TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+  viewed_at        TIMESTAMPTZ,            -- 고객이 쿠폰 화면 최초 조회 시
+  is_active        BOOLEAN      NOT NULL DEFAULT TRUE,
+  failed_attempts  INT          NOT NULL DEFAULT 0  -- 잘못된 PIN 시도 횟수
 );
 
--- 쿠폰 사용 처리 로그 (append-only)
+-- 쿠폰 사용 처리 로그 (append-only, coupon_id UNIQUE → 중복 사용 DB 레벨 차단)
 CREATE TABLE IF NOT EXISTS starlight_coupon_uses (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  coupon_id     UUID         NOT NULL REFERENCES starlight_coupons(id),
+  coupon_id     UUID         NOT NULL UNIQUE REFERENCES starlight_coupons(id),
   venue_id      VARCHAR(100) NOT NULL,
-  attempt_count INT          NOT NULL DEFAULT 1,  -- PIN 시도 누적 횟수
   confirmed_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
   staff_note    TEXT                              -- 선택적 직원 메모
 );

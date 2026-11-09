@@ -62,9 +62,8 @@ router.get('/:id', async (req, res) => {
 
     if (db.isPostgres) {
       const result = await db.query(
-        `SELECT c.id, c.hotel_source, c.venue_id, c.issued_at, c.viewed_at, c.is_active,
-                u.confirmed_at AS used_at,
-                (SELECT COUNT(*) FROM starlight_coupon_uses u2 WHERE u2.coupon_id = c.id) AS attempt_count
+        `SELECT c.id, c.hotel_source, c.venue_id, c.issued_at, c.viewed_at, c.is_active, c.failed_attempts,
+                u.confirmed_at AS used_at
          FROM starlight_coupons c
          LEFT JOIN starlight_coupon_uses u ON u.coupon_id = c.id
          WHERE c.id = $1
@@ -74,9 +73,8 @@ router.get('/:id', async (req, res) => {
       coupon = result.rows[0];
     } else {
       coupon = await db.get(
-        `SELECT c.id, c.hotel_source, c.venue_id, c.issued_at, c.viewed_at, c.is_active,
-                u.confirmed_at AS used_at,
-                (SELECT COUNT(*) FROM starlight_coupon_uses u2 WHERE u2.coupon_id = c.id) AS attempt_count
+        `SELECT c.id, c.hotel_source, c.venue_id, c.issued_at, c.viewed_at, c.is_active, c.failed_attempts,
+                u.confirmed_at AS used_at
          FROM starlight_coupons c
          LEFT JOIN starlight_coupon_uses u ON u.coupon_id = c.id
          WHERE c.id = ?
@@ -109,8 +107,8 @@ router.get('/:id', async (req, res) => {
         is_active: Boolean(coupon.is_active),
         is_used: !!coupon.used_at,
         used_at: coupon.used_at || null,
-        attempt_count: Number(coupon.attempt_count),
-        locked: Number(coupon.attempt_count) >= MAX_ATT() && !coupon.used_at,
+        failed_attempts: Number(coupon.failed_attempts || 0),
+        locked: Number(coupon.failed_attempts || 0) >= MAX_ATT() && !coupon.used_at,
       },
     });
   } catch (err) {
@@ -171,23 +169,9 @@ router.post('/:id/redeem', async (req, res) => {
       });
     }
 
-    // 시도 횟수 확인
-    let attCount;
-    if (db.isPostgres) {
-      const r = await db.query(
-        `SELECT COALESCE(SUM(attempt_count), 0) AS total FROM starlight_coupon_uses WHERE coupon_id = $1`,
-        [id]
-      );
-      attCount = Number(r.rows[0].total);
-    } else {
-      const r = await db.get(
-        `SELECT COALESCE(SUM(attempt_count), 0) AS total FROM starlight_coupon_uses WHERE coupon_id = ?`,
-        [id]
-      );
-      attCount = Number(r.total);
-    }
-
-    if (attCount >= MAX_ATT()) {
+    // 시도 횟수 확인 — starlight_coupons.failed_attempts (서버 카운터)
+    const failedAtt = Number(coupon.failed_attempts || 0);
+    if (failedAtt >= MAX_ATT()) {
       return res.status(429).json({
         ok: false,
         error: `PIN 시도 횟수(${MAX_ATT()}회)를 초과했습니다. 호텔 프런트에 문의하세요.`,
@@ -196,28 +180,48 @@ router.post('/:id/redeem', async (req, res) => {
 
     // PIN 검증
     if (pin !== PIN()) {
+      // 실패 시도 카운터 증가 (atomic increment)
+      if (db.isPostgres) {
+        await db.query(
+          `UPDATE starlight_coupons SET failed_attempts = failed_attempts + 1 WHERE id = $1`,
+          [id]
+        );
+      } else {
+        await db.run(
+          `UPDATE starlight_coupons SET failed_attempts = failed_attempts + 1 WHERE id = ?`,
+          [id]
+        );
+      }
       return res.status(401).json({
         ok: false,
         error: '확인번호가 올바르지 않습니다.',
-        remaining: MAX_ATT() - attCount - 1,
+        remaining: MAX_ATT() - failedAtt - 1,
       });
     }
 
-    // 사용 완료 기록
+    // 사용 완료 기록 — UNIQUE(coupon_id) 제약으로 동시 중복 삽입 DB 레벨 차단
     const { v4: uuidv4 } = require('uuid');
     const useId = uuidv4();
-    if (db.isPostgres) {
-      await db.query(
-        `INSERT INTO starlight_coupon_uses (id, coupon_id, venue_id, attempt_count)
-         VALUES ($1, $2, $3, $4)`,
-        [useId, id, venue_id || coupon.venue_id, attCount + 1]
-      );
-    } else {
-      await db.run(
-        `INSERT INTO starlight_coupon_uses (id, coupon_id, venue_id, attempt_count, confirmed_at)
-         VALUES (?, ?, ?, ?, datetime('now'))`,
-        [useId, id, venue_id || coupon.venue_id, attCount + 1]
-      );
+    try {
+      if (db.isPostgres) {
+        await db.query(
+          `INSERT INTO starlight_coupon_uses (id, coupon_id, venue_id)
+           VALUES ($1, $2, $3)`,
+          [useId, id, venue_id || coupon.venue_id]
+        );
+      } else {
+        await db.run(
+          `INSERT INTO starlight_coupon_uses (id, coupon_id, venue_id, confirmed_at)
+           VALUES (?, ?, ?, datetime('now'))`,
+          [useId, id, venue_id || coupon.venue_id]
+        );
+      }
+    } catch (insertErr) {
+      // UNIQUE 제약 위반 = 동시 요청에서 이미 사용 처리됨
+      if (insertErr.code === '23505' || (insertErr.message || '').includes('UNIQUE')) {
+        return res.status(409).json({ ok: false, error: '이미 사용된 쿠폰입니다.' });
+      }
+      throw insertErr;
     }
 
     return res.json({ ok: true, confirmed_at: new Date().toISOString() });
