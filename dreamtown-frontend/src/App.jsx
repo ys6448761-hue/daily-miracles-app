@@ -90,6 +90,7 @@ import TravelGuidePage from './pages/TravelGuidePage.jsx';
 import SoulCableCarPage from './pages/SoulCableCarPage.jsx';
 import MuyojeongHomePage from './pages/MuyojeongHomePage.jsx';
 import KennyHotelPage from './pages/KennyHotelPage.jsx';
+import StarEntry from './pages/StarEntry.jsx';
 import StarlightCouponPage from './pages/StarlightCouponPage.jsx';
 import AdminStarlightCouponPage from './pages/AdminStarlightCouponPage.jsx';
 import { SoulThemeProvider } from './contexts/SoulThemeContext.jsx';
@@ -125,6 +126,8 @@ export default function App() {
           <Route path="/wish"        element={<WishGate />} />
           <Route path="/wish/select" element={<WishSelect />} />
           <Route path="/wish/input"  element={<WishInputScreen />} />
+          {/* PHX-STAR-010 — 소원별 스마트 진입: 기존별→my-star/:id / 없음→/wish/input */}
+          <Route path="/star-entry"  element={<StarEntry />} />
           <Route path="/star-birth"  element={<StarBirth />} />
           <Route path="/travel-guide" element={<TravelGuidePage />} />
           {/* SOUL 무여정 Main Home — 여수맘 파일럿 진입점 */}
