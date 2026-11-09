@@ -553,3 +553,141 @@ Founder 검증 완료: 케니호텔 외부 사이트가 `?lang=en`/`?lang=ko` �
 ### 미검증 (알려진 한계)
 - Production 미배포 (Render Manual Deploy 필요 — PHX-KENNY-014 §22 참조)
 - `from=kenny` 없는 경우 복귀 버튼 미표시 (기존 동작, 변경 없음)
+
+---
+
+## §24 — PHX-MUYOJEONG-020 Zone5 선택불가 안내 + CTA 힌트 (2026-11-08)
+
+### 실제 원인
+
+Zone 5 (소호·장도권 / Soho & Jangdo) 소속 장소 전부 `status: 'verify'`
+→ `isSelectablePlace() = false` → 장소 선택 불가 → `routePlaces.length === 0` → `isValid = false` → CTA 버튼 비활성
+
+**한국어·영어 동일 — EN 전용 버그 아님.** KO 테스트가 Zone 1(이순신광장·하멜등대 등 tg_ready) 사용으로 정상이었던 것.
+
+### 수정 내용
+
+| 파일 | 변경 |
+|------|------|
+| `YeosuMapSelector.jsx` | `MAP_TM.ko.noZonePlaces` + `en.noZonePlaces` 추가. ZoneDetail에 `places.filter(isSelectablePlace).length === 0` 안내 블록 추가. 선택 가능 칩 색상 CSS 변수화(`--soul-chip-text/bg/border`). |
+| `MuyojeongHomePage.jsx` | `TM.ko.ctaHint` + `en.ctaHint` 추가. CTA 버튼 아래 `routePlaces.length === 0` 시 힌트 텍스트 표시. |
+
+### 검증 결과 (Puppeteer)
+
+| 시나리오 | 결과 |
+|---------|------|
+| A: KO Zone5 "이 권역은 아직 코스 추천 장소를 준비 중이에요" 안내 | PASS ✅ |
+| B: EN Zone5 "No places are ready for route planning in this zone yet" 안내 | PASS ✅ |
+| C: KO CTA 힌트 "장소를 하나 이상 선택해주세요" + disabled | PASS ✅ |
+| D: EN CTA 힌트 "Please select at least one place" + disabled | PASS ✅ |
+| 빌드 (`npm run build`) | exit 0 ✅ |
+
+### Git
+
+- **Branch**: `feat/phx-muyojeong-020-v2` (main 기반 cherry-pick)
+- **Commit**: `3a968e4` (PR #150에서 cherry-pick된 `c253ee0`)
+- **PR**: #150 (base: main) — Founder 승인 대기
+- **이전 PR #149** (base: feat/phx-muyojeong-018-019-zone-card-i18n) — 020 단독 diff가 아님. PR #150이 clean replacement.
+
+### CI (PR #150)
+
+| 항목 | 결과 |
+|------|------|
+| AIL Gate | SUCCESS ✅ |
+| docker-smoke | SUCCESS ✅ |
+| Vercel Preview Comments | SUCCESS ✅ |
+| Vercel deploy | FAILURE (Render 프로젝트 기존 패턴, PHX-020 무관) |
+| mergeable | MERGEABLE ✅ |
+
+### 미검증 (알려진 한계)
+- Production 미배포 (Founder 승인 후 Render Deploy 필요)
+- Zone 5 장소 `tg_ready` 승격 미진행 — SSOT 별도 결정 필요
+
+---
+
+## §25 — PHX-COUPON-004 별빛쿠폰 MVP 로컬 구현 (2026-11-09)
+
+### Founder 결정사항
+
+| 항목 | 결정 |
+|------|------|
+| 공통 PIN | `1234` (env `COUPON_PIN`) |
+| 가맹점 seed | 없음 (테스트용 클라이언트 상수만) |
+| 고객 URL | `/starlight-coupon?from=kenny&venue={venueId}` |
+| 관리자 URL | `/admin/starlight-coupons` |
+| 진입점 | 케니호텔 사이트 「별빛혜택」 메뉴 → DreamTown 앱 |
+| Production 적용 | Founder 명시 승인 후 migration 215 실행 |
+
+### 구현 파일
+
+| 파일 | 역할 |
+|------|------|
+| `database/migrations/215_starlight_coupons.sql` | starlight_coupons + starlight_coupon_uses 테이블 (Production 적용 보류) |
+| `routes/starlightCouponRoutes.js` | 고객 API — issue/GET/redeem |
+| `routes/adminStarlightCouponRoutes.js` | 관리자 API — stats/list |
+| `dreamtown-frontend/src/pages/StarlightCouponPage.jsx` | 모바일 쿠폰 화면 |
+| `dreamtown-frontend/src/pages/AdminStarlightCouponPage.jsx` | 관리자 대시보드 |
+| `server.js` + `App.jsx` | 라우트 등록 |
+
+### Git
+
+- Branch: `feat/phx-coupon-004-starlight-coupon`
+- Commit: `74751da`
+- PR: #151 OPEN (Founder 검수 대기)
+
+### 빌드
+
+| 항목 | 결과 |
+|------|------|
+| `npm run build` | ✅ exit 0 (702 modules) |
+
+### Production 활성화 체크리스트
+
+- [ ] Founder 명시 승인
+- [ ] Migration 215 실행
+- [ ] Render env: `COUPON_PIN`, `COUPON_MAX_ATT`
+- [ ] 실제 가맹점 venue_id 확정 및 케니호텔 사이트 연결
+
+---
+
+## §26 — PHX-COUPON-005 보안 검수 수정 (2026-11-09)
+
+### 검수 결과표
+
+| # | 항목 | 결과 | 비고 |
+|---|------|------|------|
+| 1 | PR #151 최소 변경 (main 기준) | ✅ PASS | 7파일 추가만, 삭제 없음 |
+| 2 | PIN 서버 검증 | ✅ PASS | `pin !== PIN()` 서버 측 |
+| 3 | 동시 중복 사용 방지 | ✅ PASS (수정됨) | UNIQUE 제약 추가 + 409 처리 |
+| 4 | PIN 시도 횟수 제한 | ✅ PASS (수정됨) | failed_attempts 컬럼 재설계 |
+| 5 | 관리자 키 로그 노출 | ✅ PASS (수정됨) | x-admin-key 헤더 전환 |
+| 6 | 인증 없이 조회 불가 | ✅ PASS | adminGuard 양쪽 엔드포인트 |
+| 7 | 운영 쿠폰 발급 차단 | ⚠️ ADVISORY | venue 허용목록 미구현 — Founder 결정 필요 |
+| 8 | 테스트/운영 분리 | ✅ PASS | test_* prefix 관례 + 클라이언트 상수만 |
+| 9 | Migration 215 기존 데이터 무영향 | ✅ PASS | CREATE IF NOT EXISTS, 기존 테이블 무변경 |
+| 10 | 조회/사용 건수 구분 | ✅ PASS | viewed_at vs starlight_coupon_uses |
+
+### 수정 내용
+
+**항목 4 — failed_attempts 컬럼 추가 (Critical bug 수정)**
+- 기존 로직: `SUM(attempt_count) FROM starlight_coupon_uses` → 실패 시 아무것도 기록 안 해 항상 0 반환
+- 수정: `starlight_coupons.failed_attempts INT DEFAULT 0` 추가, 실패마다 atomic `UPDATE ... SET failed_attempts = failed_attempts + 1`
+
+**항목 3 — UNIQUE(coupon_id) 제약 추가**
+- `starlight_coupon_uses.coupon_id` UNIQUE 제약 추가 → DB 레벨에서 동시 중복 삽입 차단
+- INSERT 실패 시 `code=23505` 또는 UNIQUE 메시지 → 409 반환
+
+**항목 5 — x-admin-key 헤더 전환**
+- `AdminStarlightCouponPage.jsx`: `?key=` 쿼리 파라미터 → `x-admin-key` 헤더
+- Render access log 및 브라우저 URL에서 키 미노출
+
+### Git
+
+- Commit: `5fbc616`
+- PR: #151 (body v2 갱신)
+- Build: `npm run build` ✅ exit 0
+
+### 미결 항목 (Founder 결정 필요)
+
+- **항목 7**: venue_id 허용목록 — Production 활성화 전 정책 결정 필요
+- **PHX-STAR-001**: 케니호텔 연결 URL 최종 결정 (`https://app.dailymiracles.kr/` 권장)

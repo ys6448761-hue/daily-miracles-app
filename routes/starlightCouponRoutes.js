@@ -6,8 +6,11 @@
  * POST /api/starlight-coupon/:id/redeem PIN 입력 → 사용 확인
  *
  * 환경변수:
- *   COUPON_PIN      공통 확인번호 (기본값 '1234')
- *   COUPON_MAX_ATT  PIN 시도 최대 횟수 (기본값 5)
+ *   COUPON_PIN             공통 확인번호 (기본값 '1234')
+ *   COUPON_MAX_ATT         PIN 시도 최대 횟수 (기본값 5)
+ *   COUPON_VENUE_ALLOWLIST Founder 승인 가맹점 ID 목록 (comma-separated, 미설정 = 전부 차단)
+ *                          예: "kenny_001,ramada_001"
+ *                          test_* prefix는 NODE_ENV !== 'production' 환경에서만 허용
  */
 
 const express = require('express');
@@ -17,11 +20,31 @@ const { getDb } = require('../database/db');
 const PIN = () => process.env.COUPON_PIN || '1234';
 const MAX_ATT = () => parseInt(process.env.COUPON_MAX_ATT || '5', 10);
 
+// 허용된 가맹점 목록 (Founder 승인 목록, 미설정 = 빈 배열 = 전부 차단)
+const allowedVenues = () => {
+  const raw = process.env.COUPON_VENUE_ALLOWLIST || '';
+  return raw.split(',').map(v => v.trim()).filter(Boolean);
+};
+
+// venue_id 발급 허용 여부
+// - test_* : 비프로덕션 환경에서만 허용
+// - 그 외  : COUPON_VENUE_ALLOWLIST에 포함된 경우만 허용
+const isVenueAllowed = (venueId) => {
+  if (venueId.startsWith('test_')) {
+    return process.env.NODE_ENV !== 'production';
+  }
+  return allowedVenues().includes(venueId);
+};
+
 // ── POST /api/starlight-coupon/issue ─────────────────────────────────────────
 router.post('/issue', async (req, res) => {
   const { hotel_source, venue_id } = req.body || {};
   if (!hotel_source || !venue_id) {
     return res.status(400).json({ ok: false, error: 'hotel_source와 venue_id가 필요합니다.' });
+  }
+
+  if (!isVenueAllowed(venue_id)) {
+    return res.status(403).json({ ok: false, error: '승인되지 않은 가맹점입니다.' });
   }
 
   try {
