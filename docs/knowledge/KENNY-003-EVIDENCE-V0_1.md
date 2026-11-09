@@ -1319,8 +1319,11 @@ button→a 태그로 교체하여 외부 도메인 이동. 나머지 `/my-star` 
 
 ### 검증
 - Build: `npm run build` ✅ exit 0 (703 modules)
-- Production 반영: PR + Render Deploy 필요
-- 케니호텔 사이트 URL 변경: Founder 지시 후 외부 사이트에서 직접 수정
+- Production 반영: PR #153 + Render Deploy 필요
+- 케니호텔 사이트 URL 변경: Founder 승인+배포 후 외부 사이트에서 직접 수정
+
+### PHX-STAR-011 추가 (2026-11-10)
+- "내 소원별 만나기" href: `wish/input` → `star-entry` 공통 진입점으로 통일 (sowon-dreamtown PR #21 commit 93aaef8)
 
 ---
 
