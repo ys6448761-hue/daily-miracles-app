@@ -82,7 +82,8 @@ router.get('/list', adminGuard, async (req, res) => {
       const limitParam  = venue ? '$2' : '$1';
       const r = await db.query(`
         SELECT c.id, c.hotel_source, c.venue_id, c.issued_at, c.viewed_at, c.is_active,
-               u.confirmed_at AS used_at, u.attempt_count
+               c.failed_attempts,
+               u.confirmed_at AS used_at
         FROM starlight_coupons c
         LEFT JOIN starlight_coupon_uses u ON u.coupon_id = c.id
         ${whereClause}
@@ -95,7 +96,8 @@ router.get('/list', adminGuard, async (req, res) => {
       const whereClause = venue ? 'WHERE c.venue_id = ?' : '';
       rows = await db.all(`
         SELECT c.id, c.hotel_source, c.venue_id, c.issued_at, c.viewed_at, c.is_active,
-               u.confirmed_at AS used_at, u.attempt_count
+               c.failed_attempts,
+               u.confirmed_at AS used_at
         FROM starlight_coupons c
         LEFT JOIN starlight_coupon_uses u ON u.coupon_id = c.id
         ${whereClause}
@@ -108,15 +110,15 @@ router.get('/list', adminGuard, async (req, res) => {
       ok: true,
       count: rows.length,
       coupons: rows.map(r => ({
-        id:           r.id,
-        hotel_source: r.hotel_source,
-        venue_id:     r.venue_id,
-        issued_at:    r.issued_at,
-        viewed_at:    r.viewed_at || null,
-        is_active:    Boolean(r.is_active),
-        is_used:      !!r.used_at,
-        used_at:      r.used_at || null,
-        attempt_count: Number(r.attempt_count || 0),
+        id:              r.id,
+        hotel_source:    r.hotel_source,
+        venue_id:        r.venue_id,
+        issued_at:       r.issued_at,
+        viewed_at:       r.viewed_at || null,
+        is_active:       Boolean(r.is_active),
+        is_used:         !!r.used_at,
+        used_at:         r.used_at || null,
+        failed_attempts: Number(r.failed_attempts || 0),
       })),
     });
   } catch (err) {
