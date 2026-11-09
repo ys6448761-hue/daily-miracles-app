@@ -1203,10 +1203,9 @@ app.get('/growth-film', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'growth-film.html'));
 });
 
-// ---------- Star MVP 뷰 ----------
-app.get('/star-entry', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'star-entry.html'));
-});
+// PHX-STAR-015: /star-entry 는 React SPA(StarEntry.jsx) 가 처리.
+// 구 Express 라우트 제거 — catch-all이 index.html 을 서빙하면 React Router 가 분기.
+// public/star-entry.html 파일은 보존 (/star-entry.html → /entry 302 는 별도 유지).
 
 // ── /cablecar → /entry?loc=cablecar (React SPA) ──────────────────────
 // /entry, /entry?loc=cablecar 은 DT_SPA_ROUTES 화이트리스트에 포함되어 있으므로
@@ -3732,6 +3731,8 @@ const DT_SPA_ROUTES = [
   '/travel-guide',
   // 케니호텔 전용 무여정 영업 시연판 (PHX-KENNY-003)
   '/kenny',
+  // PHX-STAR-010: 소원별 스마트 진입 (기존별→/my-star/:id / 없음→/wish/input)
+  '/star-entry',
 ];
 app.get(DT_SPA_ROUTES, (req, res) => {
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
