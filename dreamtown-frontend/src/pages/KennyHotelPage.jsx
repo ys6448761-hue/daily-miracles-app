@@ -63,11 +63,13 @@ const T = {
     sowonpassEp:       'EP01 별빛혜택',
     sowonpassTabHotel: '호텔 케니 주변',
     sowonpassTabCity:  '여수 시내',
-    sowonpassNight:    '야간',
-    sowonpassEmpty:    '별빛혜택 준비 중이에요. 곧 여수의 멋진 혜택들을 소개할게요.',
-    sowonpassLoading:  '혜택 정보를 불러오는 중…',
-    sowonpassError:    '혜택 정보를 불러오지 못했어요.',
-    sowonpassMapLink:  '지도 보기',
+    sowonpassNight:      '야간',
+    sowonpassCoupon:     '제휴 혜택',
+    sowonpassIntro:      '소개',
+    sowonpassEmpty:      '별빛혜택 준비 중이에요. 곧 여수의 멋진 혜택들을 소개할게요.',
+    sowonpassLoading:    '혜택 정보를 불러오는 중…',
+    sowonpassError:      '혜택 정보를 불러오지 못했어요.',
+    sowonpassMapLink:    '지도 보기',
     // 별빛항로 카드 내용
     day1:        'Day 1 — 별빛을 따라서',
     day1desc:    '케이블카, 여수 크루즈, 케니호텔 숙박 — 도착 시간과 크루즈 운항 일정에 맞춰 이용하는 추천 여정이에요.',
@@ -118,11 +120,13 @@ const T = {
     sowonpassEp:       'EP01 Starlight Benefits',
     sowonpassTabHotel: 'Near Kenny Hotel',
     sowonpassTabCity:  'Downtown Yeosu',
-    sowonpassNight:    'Night',
-    sowonpassEmpty:    'Starlight benefits coming soon. We\'ll share great Yeosu perks shortly.',
-    sowonpassLoading:  'Loading benefits…',
-    sowonpassError:    'Could not load benefits.',
-    sowonpassMapLink:  'Map',
+    sowonpassNight:      'Night',
+    sowonpassCoupon:     'Partner Benefit',
+    sowonpassIntro:      'Info',
+    sowonpassEmpty:      'Starlight benefits coming soon. We\'ll share great Yeosu perks shortly.',
+    sowonpassLoading:    'Loading benefits…',
+    sowonpassError:      'Could not load benefits.',
+    sowonpassMapLink:    'Map',
     // 별빛항로 카드 내용
     day1:        'Day 1 — Follow the Starlight',
     day1desc:    'Cable car, Yeosu cruise, and Hotel Kenny stay — arranged around your arrival time and confirmed cruise schedule.',
@@ -330,6 +334,14 @@ function SowonPassPanel({ t, lang }) {
                       {t.sowonpassNight}
                     </span>
                   )}
+                  <span style={{
+                    fontSize: '0.625rem', fontWeight: 600, padding: '2px 7px', borderRadius: '12px',
+                    background: partner.has_coupon ? 'rgba(255,214,122,0.15)' : 'rgba(150,150,150,0.10)',
+                    color:      partner.has_coupon ? '#FFD67A' : 'var(--soul-text-subtle)',
+                    border:     `1px solid ${partner.has_coupon ? 'rgba(255,214,122,0.30)' : 'rgba(150,150,150,0.20)'}`,
+                  }}>
+                    {partner.has_coupon ? t.sowonpassCoupon : t.sowonpassIntro}
+                  </span>
                 </div>
                 {partner.naver_map_url && (
                   <a

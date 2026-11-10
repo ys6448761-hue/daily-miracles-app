@@ -5,7 +5,10 @@
  *   city_code     (default: yeosu)
  *   location_group (hotel_vicinity | yeosu_city — 없으면 전체)
  *
- * confirmed 파트너만 반환. candidate/negotiating은 고객에게 노출하지 않는다.
+ * 공개 정책:
+ *   info_status=verified              → 업체 소개 카드 반환
+ *   info_status=verified + affiliation_status=confirmed → has_coupon=true
+ *   info_status=unverified            → 반환하지 않음
  */
 
 'use strict';
@@ -41,6 +44,7 @@ router.get('/starlight', async (req, res) => {
          p.location_group,
          p.is_night,
          p.affiliation_status,
+         (p.affiliation_status = 'confirmed') AS has_coupon,
          p.naver_map_url,
          COALESCE(
            json_agg(
@@ -58,9 +62,9 @@ router.get('/starlight', async (req, res) => {
        FROM dt_partners p
        LEFT JOIN dt_benefits b
               ON b.partner_id = p.id AND b.is_active = true
-       WHERE p.city_code          = $1
-         AND p.is_active          = true
-         AND p.affiliation_status = 'confirmed'
+       WHERE p.city_code    = $1
+         AND p.is_active    = true
+         AND p.info_status  = 'verified'
          ${groupFilter}
        GROUP BY p.id
        ORDER BY p.name`,
