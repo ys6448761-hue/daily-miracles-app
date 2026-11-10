@@ -1248,7 +1248,7 @@ px prisma migrate deploy (Render 배포 시 자동) |
 ### 구현 준비 체크리스트 (Production 반영 전)
 
 - [ ] Founder가 WISHART_ACCESS_PIN 값 결정 (1234 외 4~8자리)
-- [ ] 케니호텔 프런트 직원 코드 전달 방법 결정 (구두? 카드? 패키지 동봉?)
+- [ ] DreamTown이 구매 고객에게 직접 확인번호 발송 (호텔 직원 경유 불필요) ← PHX-WISHART-010 정정
 - [ ] 기존 체크인 고객 없는 경우 확인 (쿠키 보유자 없으면 grace period 불필요)
 - [ ] 로컬 테스트 → 별 생성 E2E 확인
 - [ ] Render 환경변수 설정 → Manual Deploy
@@ -1535,3 +1535,161 @@ PR #154 Founder 승인 → merge → Render 수동 배포 → 카카오톡 재�
 
 - sowon-dreamtown Render 배포 SHA 확인 (Auto-Deploy 비활성화 가능성)
 - 소원꿈터 `https://sowon-dream-plaza.onrender.com/checkin` 완료 화면 → "내 소원별 만나기" → `app.dailymiracles.kr/star-entry` 이동 Founder 모바일 검증
+
+---
+
+## §42 — PHX-WISHART-008 /my-star 재방문 화면 소원별 만나기 버튼 추가 (2026-11-10)
+
+**Task:** PHX-WISHART-008  
+**Repository:** sowon-dreamtown  
+**Branch:** `fix/phx-wishart-008-mystar-star-entry`  
+**HEAD:** `ce5b5ac`  
+**PR:** sowon-dreamtown #22  
+**CI:** gate ✅ PASS
+
+### 원인
+
+`/my-star/page.tsx` `isRevealed` 블록에 DreamTown 링크 없음.
+사용자 경로: 체크인 완료 → "소원그림 보러 가기" → `/my-star` → "내 소원그림 다시 보기"만 표시.
+
+### 수정
+
+| 버튼 | 변경 |
+|---|---|
+| "내 소원별 만나기" | 신규 추가 → `https://app.dailymiracles.kr/star-entry` (주 버튼) |
+| "내 소원그림 다시 보기" | 보존 (보조 버튼으로 격하) |
+| "+ 새 별 만들기" | 보존 |
+
+### 다수 별 정책 현황 (별도 보고)
+
+`GET /api/dt/stars?userId` ORDER BY: `created_at DESC` (최신 별 우선).  
+Founder 목표 "먼저 만든 별 우선" = `ORDER BY created_at ASC` 변경 필요.  
+기존 고객 영향 있으므로 Founder 확인 후 별도 수정 예정.
+
+### PR 순서
+
+PR #21 (PHX-WISHART-006+002+STAR-011) + PR #22 (PHX-WISHART-008) 순서 무관 병합 가능.
+단, 소원꿈터 Render 배포는 두 PR 모두 머지 후 1회 수동 배포 권장.
+
+---
+
+## §43 — PHX-WISHART-009 별빛항로 구매자 전용 소원그림 접근 제어 (2026-11-10)
+
+**Task:** PHX-WISHART-009  
+**Repository:** sowon-dreamtown  
+**Branch:** `fix/phx-wishart-009-access-pin`  
+**HEAD:** `a31b71a`  
+**PR:** sowon-dreamtown #23  
+**CI:** gate ✅ PASS
+
+### 설계
+
+| 경로 | PIN 여부 | 근거 |
+|---|---|---|
+| `/checkin` 신규 첫 방문 | 필요 | AI 비용 발생 전 검증 |
+| `/checkin?mode=new` | 필요 | 신규 별 생성 경로 동일 |
+| 기존 고객 쿠키+`ready/revealed` | 불필요 | shouldResume 경로 무통과 |
+| retry `/api/dt/wishart/retry` | 불필요 | 쿠키 소유권 + failed 상태 조건으로 보호 |
+
+### 구현
+
+| 파일 | 변경 |
+|---|---|
+| `src/lib/utils/pin-guard.ts` | 신규: PIN 검증 + In-memory rate limit (10회/15분/IP) |
+| `src/app/api/checkin/route.ts` | 신규 생성 분기(shouldResume 이후)에 PIN gate 삽입 |
+| `src/app/checkin/CheckinPageContent.tsx` | Step 1.5 PIN 입력 UI, `type Step` 확장, `routeToCorrectStep` 조정 |
+
+### 운영 정책 (PHX-WISHART-010 정정 반영)
+
+- **판매 주체**: DreamTown (커머스/네이버 스마트스토어 등 직접 판매)
+- **확인번호 전달**: DreamTown이 구매 고객에게 직접 발송. 호텔 직원 경유 불필요.
+- **호텔 역할**: 숙박 및 합의된 현장 서비스만 제공. 코드 발급·인증 없음.
+- **공통 PIN**: 초기 시범 운영용. 향후 주문별 고유 코드 전환 별도 검토.
+- `WISHART_ACCESS_PIN`: Founder가 Render env에 직접 설정. 코드/로그/GitHub 미노출.
+- Rate limit: In-memory Map — Render 재시작 시 초기화.
+- DB 변경: 없음.
+
+### PHX-WISHART-010 최종 안전성 검증 결과
+
+| # | 항목 | 판정 | 근거 |
+|---|---|---|---|
+| 1 | 신규 생성·mode=new 서버 PIN 검증 | ✅ PASS | shouldResume 반환 이후 PIN gate 실행. mode=new는 UI 동작만 변경, 서버는 항상 PIN 검증 |
+| 2 | 프런트엔드 우회 직접 API 요청 차단 | ✅ PASS | PIN gate 서버사이드 위치. curl 직접 호출도 403 |
+| 3 | PIN 검증 전 R2·AI 비용 발생 여부 | ✅ PASS | 코드 순서: shouldResume → **PIN gate(line 174)** → photo.arrayBuffer()(line 206) → R2 upload(line 210) → AI(line 268) |
+| 4 | retry API 성공 그림 무제한 재생성 | ✅ PASS | `wishImageStatus !== "failed"` 시 409. ready/revealed/pending/generating 상태에서 차단 |
+| 5 | 실패 재시도 횟수·비용 제한 | ADVISORY | 재시도 횟수 하드 제한 없음. 단, 각 재시도는 sequential (pending 중 409 차단). 파일럿 20인 규모에서 수용 가능. 추가 제한 미적용 (scope 외) |
+| 6 | 기존 고객 그림 다시 보기 PIN 없이 유지 | ✅ PASS | "다시 보기"는 GET /api/dt/checkin-status 경로. POST /api/checkin 호출 없음 → PIN gate 무통과 |
+| 7 | 403/429/503 HTTP 응답 | ✅ PASS | 서버: not_configured→503, rate_limited→429, wrong→403. UI: 403/429→Step 1.5 복귀, 503→에러 표시 |
+| 8 | PIN·사진·소원 원문 로그·URL 미노출 | ✅ PASS | logCheckinEvent: starId/event/requestId만. checkPin: 에러 응답에 PIN 값 미포함. runWishartGeneration 에러 로그: err.message만 |
+| 9 | 메모리 rate limit 운영 한계 명시 | ✅ PASS | §43 운영 주의에 명시: Render 재시작 시 초기화 |
+
+**코드 수정: 불필요. 9개 항목 중 8개 PASS, 1개 ADVISORY(항목 5 — 파일럿 범위 수용)**
+
+### 테스트 체크리스트
+
+- [ ] 올바른 PIN → 체크인 완료
+- [ ] 틀린 PIN → 403 → Step 1.5 복귀 + "확인번호가 올바르지 않습니다."
+- [ ] PIN 미설정 → 503 → "서비스를 일시적으로 이용할 수 없습니다."
+- [ ] 기존 고객(쿠키+revealed) → Step 7 직행 (PIN 화면 없음)
+- [ ] `/checkin?mode=new` → Step 1.5 PIN 요구
+- [ ] 10회 초과 → 429 → Step 1.5 복귀
+- [ ] retry: failed 상태에서만 가능, ready/revealed/pending은 409
+
+---
+
+## §44 — PHX-WISHART-011 AI 소원그림 생성 총 3회 제한 (2026-11-10)
+
+**Branch:** `fix/phx-wishart-009-access-pin`  
+**Commit:** `a98e360`  
+**PR:** #23 (PHX-WISHART-009/010/011 통합)
+
+### Founder 결정사항
+
+| 항목 | 결정 |
+|------|------|
+| 총 허용 횟수 | 3회 (최초 생성 1회 + 재시도 최대 2회) |
+| 카운터 저장소 | DB 영속 (`wishImageAttempts`) |
+| 소진 안내 문구 | "소원그림을 완성하는 과정에서 확인이 필요해요. DreamTown 운영팀이 도와드릴게요." |
+| 고객에게 횟수 표시 | 없음 |
+| 1작품 정책 (동일 쿠키 완성 별 보유 → 신규 생성) | 차단 |
+
+### 구현 파일
+
+| 파일 | 변경 내용 |
+|------|-----------|
+| `prisma/schema.prisma` | `DtStar.wishImageAttempts Int @default(0)` 추가 |
+| `prisma/migrations/20261110000001_add_wish_image_attempts/migration.sql` | ALTER TABLE 신규 migration |
+| `src/app/api/checkin/route.ts` | 별 생성 시 `wishImageAttempts: 1` / isAiComplete → redirect (1작품 정책) |
+| `src/app/api/dt/wishart/retry/route.ts` | 원자적 `updateMany (attempts < 3 AND status = failed)` |
+| `src/app/api/dt/checkin-status/route.ts` | `wishImageAttemptsExhausted: boolean` 반환 |
+| `src/app/checkin/CheckinPageContent.tsx` | 소진 시 재시도 버튼 → 운영팀 안내 메시지 |
+| `src/app/my-star/page.tsx` | 소진 시 재시도 버튼 → 운영팀 안내 메시지 |
+
+### 공통 PIN 한계 (솔직한 보고)
+
+현재 구조에서 "고객당 1작품" **완전** 보장은 불가능합니다.
+
+| 시나리오 | 차단 여부 | 비고 |
+|---------|-----------|------|
+| 동일 쿠키, 완성 별 존재 → 신규 별 생성 시도 | ✅ 차단 | isAiComplete → redirect |
+| 동일 쿠키, 3회 소진 → 재시도 | ✅ 차단 | 원자적 attempts >= 3 → 429 |
+| 쿠키 삭제 후 재접속 → 새 identity로 신규 별 생성 | ❌ 차단 불가 | 새 DtGuestIdentity 생성, 카운터 초기화 |
+| 공통 PIN으로 타인 대신 체크인 | ❌ 차단 불가 | PIN은 개인 식별자가 아님 |
+
+**근본 해결**: 주문별 단일사용 이용권(UUID)이 필요. 초기 파일럿(20인)에서는 현재 수준이 충분.
+
+### 배포 절차
+
+1. `prisma migrate deploy` 실행 필수 (Render 빌드 명령에 추가 또는 수동)
+2. `WISHART_ACCESS_PIN` 환경변수 Founder 설정
+3. sowon-dreamtown Render 수동 배포
+
+### 테스트 체크리스트 (PHX-WISHART-011 추가)
+
+- [ ] 최초 체크인 → `wishImageAttempts = 1` DB 확인
+- [ ] 생성 실패 1회 → 재시도 → `wishImageAttempts = 2`
+- [ ] 생성 실패 2회 → 재시도 → `wishImageAttempts = 3`
+- [ ] `wishImageAttempts = 3` → 재시도 버튼 없음, 운영팀 안내 메시지
+- [ ] `wishImageAttempts = 3` → retry API 직접 호출 → 429
+- [ ] 완성 별 보유(revealed) → `/checkin` 재접속 → 기존 별로 redirect
+- [ ] 쿠키 삭제 후 재접속 → 신규 별 생성 가능 (공통 PIN 한계 확인용)
