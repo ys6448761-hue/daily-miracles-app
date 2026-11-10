@@ -701,6 +701,12 @@ try {
   console.error("❌ DreamTown 상품 라우터 로드 실패:", error.message);
 }
 
+let dtBenefitPublicRoutes = null;
+try {
+  dtBenefitPublicRoutes = require('./routes/dtBenefitPublicRoutes');
+  console.log('✅ DreamTown 소원패스 공개 혜택 라우터 로드 성공');
+} catch (e) { console.error('❌ dtBenefitPublic 라우터 로드 실패:', e.message); }
+
 let dtAdminBenefitRoutes = null;
 try {
   dtAdminBenefitRoutes = require("./routes/dtAdminBenefitRoutes");
@@ -2401,6 +2407,11 @@ if (dtSettlementRoutes) {
 if (dtProductRoutes) {
   app.use("/api/dt/products", dtProductRoutes);
   console.log("✅ DreamTown 상품 라우터 등록 완료 (/api/dt/products)");
+}
+
+if (dtBenefitPublicRoutes) {
+  app.use('/api/dt/benefits', dtBenefitPublicRoutes);
+  console.log('✅ DreamTown 소원패스 공개 혜택 라우터 등록 완료 (/api/dt/benefits)');
 }
 
 // ---------- Location 관리자 — dtAdminBenefitRoutes 보다 먼저 등록해야 401 방지 ----------
