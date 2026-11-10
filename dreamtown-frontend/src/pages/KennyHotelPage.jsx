@@ -58,6 +58,18 @@ const T = {
     comingSoon:  '준비 중이에요',
     comingDesc:  '더 완성된 서비스로 곧 찾아올게요.',
     goGuide:     'SOUL에게 물어보기 →',
+    // 소원패스 혜택 패널
+    sowonpassTitle:    '소원패스 별빛혜택',
+    sowonpassEp:       'EP01 별빛혜택',
+    sowonpassTabHotel: '호텔 케니 주변',
+    sowonpassTabCity:  '여수 시내',
+    sowonpassNight:      '야간',
+    sowonpassCoupon:     '제휴 혜택',
+    sowonpassIntro:      '소개',
+    sowonpassEmpty:      '별빛혜택 준비 중이에요. 곧 여수의 멋진 혜택들을 소개할게요.',
+    sowonpassLoading:    '혜택 정보를 불러오는 중…',
+    sowonpassError:      '혜택 정보를 불러오지 못했어요.',
+    sowonpassMapLink:    '지도 보기',
     // 별빛항로 카드 내용
     day1:        'Day 1 — 별빛을 따라서',
     day1desc:    '케이블카, 여수 크루즈, 케니호텔 숙박 — 도착 시간과 크루즈 운항 일정에 맞춰 이용하는 추천 여정이에요.',
@@ -103,6 +115,18 @@ const T = {
     comingSoon:  'Coming soon',
     comingDesc:  "We're preparing a more complete experience for you.",
     goGuide:     'Ask SOUL →',
+    // 소원패스 혜택 패널
+    sowonpassTitle:    'Sowon Pass Starlight Benefits',
+    sowonpassEp:       'EP01 Starlight Benefits',
+    sowonpassTabHotel: 'Near Kenny Hotel',
+    sowonpassTabCity:  'Downtown Yeosu',
+    sowonpassNight:      'Night',
+    sowonpassCoupon:     'Partner Benefit',
+    sowonpassIntro:      'Info',
+    sowonpassEmpty:      'Starlight benefits coming soon. We\'ll share great Yeosu perks shortly.',
+    sowonpassLoading:    'Loading benefits…',
+    sowonpassError:      'Could not load benefits.',
+    sowonpassMapLink:    'Map',
     // 별빛항로 카드 내용
     day1:        'Day 1 — Follow the Starlight',
     day1desc:    'Cable car, Yeosu cruise, and Hotel Kenny stay — arranged around your arrival time and confirmed cruise schedule.',
@@ -199,6 +223,164 @@ function DemoCard({ t, onGoGuide }) {
       >
         {t.goGuide}
       </button>
+    </div>
+  );
+}
+
+// ── 소원패스 별빛혜택 패널 ─────────────────────────────────────────────────────
+function SowonPassPanel({ t, lang }) {
+  const [activeTab, setActiveTab] = React.useState('hotel_vicinity');
+  const [data, setData] = React.useState({ hotel_vicinity: [], yeosu_city: [] });
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(false);
+
+  React.useEffect(() => {
+    setLoading(true);
+    setError(false);
+    fetch('/api/dt/benefits/starlight?city_code=yeosu')
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(d => { setData(d); setLoading(false); })
+      .catch(() => { setError(true); setLoading(false); });
+  }, []);
+
+  const list = data[activeTab] ?? [];
+
+  const CATEGORY_ICON = {
+    cafe:          '☕',
+    restaurant:    '🍽',
+    night:         '🌙',
+    activity:      '✦',
+    transport:     '🚢',
+    accommodation: '🏨',
+    etc:           '📍',
+  };
+
+  return (
+    <div
+      style={{
+        borderRadius: '14px',
+        border:       '1px solid rgba(255,214,122,0.25)',
+        background:   'rgba(255,214,122,0.03)',
+        padding:      '16px',
+      }}
+    >
+      {/* 헤더 */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+        <span style={{ fontSize: '0.6875rem', color: '#FFD67A', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          {t.sowonpassEp}
+        </span>
+      </div>
+
+      {/* 탭 */}
+      <div style={{ display: 'flex', gap: '6px', marginBottom: '14px' }}>
+        {(['hotel_vicinity', 'yeosu_city']).map(tab => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            style={{
+              padding:      '6px 14px',
+              borderRadius: '20px',
+              border:       activeTab === tab ? '1.5px solid #FFD67A' : '1px solid var(--soul-chip-border)',
+              background:   activeTab === tab ? 'rgba(255,214,122,0.12)' : 'var(--soul-chip-bg)',
+              color:        activeTab === tab ? '#FFD67A' : 'var(--soul-text-muted)',
+              fontSize:     '0.8125rem',
+              fontWeight:   activeTab === tab ? 600 : 400,
+              cursor:       'pointer',
+            }}
+          >
+            {tab === 'hotel_vicinity' ? t.sowonpassTabHotel : t.sowonpassTabCity}
+          </button>
+        ))}
+      </div>
+
+      {/* 콘텐츠 */}
+      {loading ? (
+        <p style={{ fontSize: '0.8125rem', color: 'var(--soul-text-muted)', textAlign: 'center', padding: '20px 0' }}>
+          {t.sowonpassLoading}
+        </p>
+      ) : error ? (
+        <p style={{ fontSize: '0.8125rem', color: 'var(--soul-text-muted)', textAlign: 'center', padding: '20px 0' }}>
+          {t.sowonpassError}
+        </p>
+      ) : list.length === 0 ? (
+        <p style={{ fontSize: '0.8125rem', color: 'var(--soul-text-muted)', textAlign: 'center', padding: '20px 0', lineHeight: 1.6, wordBreak: 'keep-all' }}>
+          {t.sowonpassEmpty}
+        </p>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {list.map(partner => (
+            <div
+              key={partner.id}
+              style={{
+                borderRadius: '12px',
+                border:       '1px solid var(--soul-chip-border)',
+                background:   'var(--soul-card-bg)',
+                padding:      '12px 14px',
+              }}
+            >
+              {/* 업체 헤더 */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontSize: '1rem' }}>{CATEGORY_ICON[partner.category] ?? '📍'}</span>
+                  <span style={{ fontSize: '0.9375rem', fontWeight: 600, color: 'var(--soul-text)', wordBreak: 'keep-all' }}>
+                    {partner.name}
+                  </span>
+                  {partner.is_night && (
+                    <span style={{
+                      fontSize: '0.625rem', fontWeight: 600, padding: '2px 7px', borderRadius: '12px',
+                      background: 'rgba(100,120,255,0.12)', color: '#8899ff',
+                      border: '1px solid rgba(100,120,255,0.25)',
+                    }}>
+                      {t.sowonpassNight}
+                    </span>
+                  )}
+                  <span style={{
+                    fontSize: '0.625rem', fontWeight: 600, padding: '2px 7px', borderRadius: '12px',
+                    background: partner.has_coupon ? 'rgba(255,214,122,0.15)' : 'rgba(150,150,150,0.10)',
+                    color:      partner.has_coupon ? '#FFD67A' : 'var(--soul-text-subtle)',
+                    border:     `1px solid ${partner.has_coupon ? 'rgba(255,214,122,0.30)' : 'rgba(150,150,150,0.20)'}`,
+                  }}>
+                    {partner.has_coupon ? t.sowonpassCoupon : t.sowonpassIntro}
+                  </span>
+                </div>
+                {partner.naver_map_url && (
+                  <a
+                    href={partner.naver_map_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ fontSize: '0.6875rem', color: '#FFD67A', textDecoration: 'none', whiteSpace: 'nowrap' }}
+                  >
+                    {t.sowonpassMapLink} →
+                  </a>
+                )}
+              </div>
+
+              {/* 혜택 목록 */}
+              {(partner.benefits ?? []).map(b => (
+                <div
+                  key={b.id}
+                  style={{
+                    marginTop:    '6px',
+                    padding:      '8px 10px',
+                    borderRadius: '8px',
+                    background:   'rgba(255,214,122,0.05)',
+                    border:       '1px solid rgba(255,214,122,0.15)',
+                  }}
+                >
+                  <p style={{ fontSize: '0.8125rem', color: 'var(--soul-text)', lineHeight: 1.45, wordBreak: 'keep-all', margin: 0 }}>
+                    {b.display_copy}
+                  </p>
+                  {b.location_hint && (
+                    <p style={{ fontSize: '0.6875rem', color: 'var(--soul-text-subtle)', marginTop: '3px', margin: '3px 0 0' }}>
+                      {b.location_hint}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -585,7 +767,8 @@ export default function KennyHotelPage() {
                     <DemoCard t={t} onGoGuide={goToGuide} />
                   </div>
                 )}
-                {(id === 'rooftop' || id === 'benefit' || id === 'food') && (
+                {id === 'benefit' && <SowonPassPanel t={t} lang={lang} />}
+                {(id === 'rooftop' || id === 'food') && (
                   <DemoCard t={t} onGoGuide={goToGuide} />
                 )}
               </div>

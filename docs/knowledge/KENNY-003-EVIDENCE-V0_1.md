@@ -1248,7 +1248,7 @@ px prisma migrate deploy (Render 배포 시 자동) |
 ### 구현 준비 체크리스트 (Production 반영 전)
 
 - [ ] Founder가 WISHART_ACCESS_PIN 값 결정 (1234 외 4~8자리)
-- [ ] 케니호텔 프런트 직원 코드 전달 방법 결정 (구두? 카드? 패키지 동봉?)
+- [ ] DreamTown이 구매 고객에게 직접 확인번호 발송 (호텔 직원 경유 불필요) ← PHX-WISHART-010 정정
 - [ ] 기존 체크인 고객 없는 경우 확인 (쿠키 보유자 없으면 grace period 불필요)
 - [ ] 로컬 테스트 → 별 생성 E2E 확인
 - [ ] Render 환경변수 설정 → Manual Deploy
@@ -1500,3 +1500,632 @@ localStorage에 저장되므로, 완전 초기화 시 100% 복원 보장 불가.
 ### 대기
 
 PR #154 Founder 승인 → merge → Render 수동 배포 → 카카오톡 재검증
+
+---
+
+## §41 — PHX-WISHART-007 PR #21 병합 준비 검증 (2026-11-10)
+
+**Task:** PHX-WISHART-007  
+**대상 PR:** sowon-dreamtown #21 (`feat/phx-wishart-006-star-link`)  
+**HEAD:** `93aaef8`  
+**CI:** gate ✅ PASS  
+**Mergeable:** ✅ MERGEABLE (충돌 없음)
+
+### 체크리스트
+
+| 항목 | 확인 결과 |
+|---|---|
+| "내 소원별 만나기" href | `https://app.dailymiracles.kr/star-entry` ✅ (line 743) |
+| 소원그림 다시 보기 (`/my-star`) 3곳 | 변경 없음 ✅ (677, 824, 857) |
+| VITALITY_RULE AGE SOFTENING | 모든 성인 5–10년 무조건 적용 ✅ |
+| NEGATIVE_RULE | 10년 초과 금지 완화 조항 ✅ |
+| WISHART_ACCESS_PIN | 미구현 (별도 작업) ✅ |
+| QR /checkin 경로 | 미변경 ✅ |
+| DB/별 API | 미변경 ✅ |
+| main 대비 충돌 | 없음 (merge base = main HEAD 99dc385) ✅ |
+
+### PR #21 포함 커밋
+
+| SHA | 내용 |
+|---|---|
+| `9f0d187` | PHX-WISHART-006+002 소원별 연결 수정 + 연령 보정 복구 |
+| `93aaef8` | PHX-STAR-011 "내 소원별 만나기" → /star-entry 통일 |
+
+### 병합 후 확인 필요
+
+- sowon-dreamtown Render 배포 SHA 확인 (Auto-Deploy 비활성화 가능성)
+- 소원꿈터 `https://sowon-dream-plaza.onrender.com/checkin` 완료 화면 → "내 소원별 만나기" → `app.dailymiracles.kr/star-entry` 이동 Founder 모바일 검증
+
+---
+
+## §42 — PHX-WISHART-008 /my-star 재방문 화면 소원별 만나기 버튼 추가 (2026-11-10)
+
+**Task:** PHX-WISHART-008  
+**Repository:** sowon-dreamtown  
+**Branch:** `fix/phx-wishart-008-mystar-star-entry`  
+**HEAD:** `ce5b5ac`  
+**PR:** sowon-dreamtown #22  
+**CI:** gate ✅ PASS
+
+### 원인
+
+`/my-star/page.tsx` `isRevealed` 블록에 DreamTown 링크 없음.
+사용자 경로: 체크인 완료 → "소원그림 보러 가기" → `/my-star` → "내 소원그림 다시 보기"만 표시.
+
+### 수정
+
+| 버튼 | 변경 |
+|---|---|
+| "내 소원별 만나기" | 신규 추가 → `https://app.dailymiracles.kr/star-entry` (주 버튼) |
+| "내 소원그림 다시 보기" | 보존 (보조 버튼으로 격하) |
+| "+ 새 별 만들기" | 보존 |
+
+### 다수 별 정책 현황 (별도 보고)
+
+`GET /api/dt/stars?userId` ORDER BY: `created_at DESC` (최신 별 우선).  
+Founder 목표 "먼저 만든 별 우선" = `ORDER BY created_at ASC` 변경 필요.  
+기존 고객 영향 있으므로 Founder 확인 후 별도 수정 예정.
+
+### PR 순서
+
+PR #21 (PHX-WISHART-006+002+STAR-011) + PR #22 (PHX-WISHART-008) 순서 무관 병합 가능.
+단, 소원꿈터 Render 배포는 두 PR 모두 머지 후 1회 수동 배포 권장.
+
+---
+
+## §43 — PHX-WISHART-009 별빛항로 구매자 전용 소원그림 접근 제어 (2026-11-10)
+
+**Task:** PHX-WISHART-009  
+**Repository:** sowon-dreamtown  
+**Branch:** `fix/phx-wishart-009-access-pin`  
+**HEAD:** `a31b71a`  
+**PR:** sowon-dreamtown #23  
+**CI:** gate ✅ PASS
+
+### 설계
+
+| 경로 | PIN 여부 | 근거 |
+|---|---|---|
+| `/checkin` 신규 첫 방문 | 필요 | AI 비용 발생 전 검증 |
+| `/checkin?mode=new` | 필요 | 신규 별 생성 경로 동일 |
+| 기존 고객 쿠키+`ready/revealed` | 불필요 | shouldResume 경로 무통과 |
+| retry `/api/dt/wishart/retry` | 불필요 | 쿠키 소유권 + failed 상태 조건으로 보호 |
+
+### 구현
+
+| 파일 | 변경 |
+|---|---|
+| `src/lib/utils/pin-guard.ts` | 신규: PIN 검증 + In-memory rate limit (10회/15분/IP) |
+| `src/app/api/checkin/route.ts` | 신규 생성 분기(shouldResume 이후)에 PIN gate 삽입 |
+| `src/app/checkin/CheckinPageContent.tsx` | Step 1.5 PIN 입력 UI, `type Step` 확장, `routeToCorrectStep` 조정 |
+
+### 운영 정책 (PHX-WISHART-010 정정 반영)
+
+- **판매 주체**: DreamTown (커머스/네이버 스마트스토어 등 직접 판매)
+- **확인번호 전달**: DreamTown이 구매 고객에게 직접 발송. 호텔 직원 경유 불필요.
+- **호텔 역할**: 숙박 및 합의된 현장 서비스만 제공. 코드 발급·인증 없음.
+- **공통 PIN**: 초기 시범 운영용. 향후 주문별 고유 코드 전환 별도 검토.
+- `WISHART_ACCESS_PIN`: Founder가 Render env에 직접 설정. 코드/로그/GitHub 미노출.
+- Rate limit: In-memory Map — Render 재시작 시 초기화.
+- DB 변경: 없음.
+
+### PHX-WISHART-010 최종 안전성 검증 결과
+
+| # | 항목 | 판정 | 근거 |
+|---|---|---|---|
+| 1 | 신규 생성·mode=new 서버 PIN 검증 | ✅ PASS | shouldResume 반환 이후 PIN gate 실행. mode=new는 UI 동작만 변경, 서버는 항상 PIN 검증 |
+| 2 | 프런트엔드 우회 직접 API 요청 차단 | ✅ PASS | PIN gate 서버사이드 위치. curl 직접 호출도 403 |
+| 3 | PIN 검증 전 R2·AI 비용 발생 여부 | ✅ PASS | 코드 순서: shouldResume → **PIN gate(line 174)** → photo.arrayBuffer()(line 206) → R2 upload(line 210) → AI(line 268) |
+| 4 | retry API 성공 그림 무제한 재생성 | ✅ PASS | `wishImageStatus !== "failed"` 시 409. ready/revealed/pending/generating 상태에서 차단 |
+| 5 | 실패 재시도 횟수·비용 제한 | ADVISORY | 재시도 횟수 하드 제한 없음. 단, 각 재시도는 sequential (pending 중 409 차단). 파일럿 20인 규모에서 수용 가능. 추가 제한 미적용 (scope 외) |
+| 6 | 기존 고객 그림 다시 보기 PIN 없이 유지 | ✅ PASS | "다시 보기"는 GET /api/dt/checkin-status 경로. POST /api/checkin 호출 없음 → PIN gate 무통과 |
+| 7 | 403/429/503 HTTP 응답 | ✅ PASS | 서버: not_configured→503, rate_limited→429, wrong→403. UI: 403/429→Step 1.5 복귀, 503→에러 표시 |
+| 8 | PIN·사진·소원 원문 로그·URL 미노출 | ✅ PASS | logCheckinEvent: starId/event/requestId만. checkPin: 에러 응답에 PIN 값 미포함. runWishartGeneration 에러 로그: err.message만 |
+| 9 | 메모리 rate limit 운영 한계 명시 | ✅ PASS | §43 운영 주의에 명시: Render 재시작 시 초기화 |
+
+**코드 수정: 불필요. 9개 항목 중 8개 PASS, 1개 ADVISORY(항목 5 — 파일럿 범위 수용)**
+
+### 테스트 체크리스트
+
+- [ ] 올바른 PIN → 체크인 완료
+- [ ] 틀린 PIN → 403 → Step 1.5 복귀 + "확인번호가 올바르지 않습니다."
+- [ ] PIN 미설정 → 503 → "서비스를 일시적으로 이용할 수 없습니다."
+- [ ] 기존 고객(쿠키+revealed) → Step 7 직행 (PIN 화면 없음)
+- [ ] `/checkin?mode=new` → Step 1.5 PIN 요구
+- [ ] 10회 초과 → 429 → Step 1.5 복귀
+- [ ] retry: failed 상태에서만 가능, ready/revealed/pending은 409
+
+---
+
+## §44 — PHX-WISHART-011 AI 소원그림 생성 총 3회 제한 (2026-11-10)
+
+**Branch:** `fix/phx-wishart-009-access-pin`  
+**Commit:** `a98e360`  
+**PR:** #23 (PHX-WISHART-009/010/011 통합)
+
+### Founder 결정사항
+
+| 항목 | 결정 |
+|------|------|
+| 총 허용 횟수 | 3회 (최초 생성 1회 + 재시도 최대 2회) |
+| 카운터 저장소 | DB 영속 (`wishImageAttempts`) |
+| 소진 안내 문구 | "소원그림을 완성하는 과정에서 확인이 필요해요. DreamTown 운영팀이 도와드릴게요." |
+| 고객에게 횟수 표시 | 없음 |
+| 1작품 정책 (동일 쿠키 완성 별 보유 → 신규 생성) | 차단 |
+
+### 구현 파일
+
+| 파일 | 변경 내용 |
+|------|-----------|
+| `prisma/schema.prisma` | `DtStar.wishImageAttempts Int @default(0)` 추가 |
+| `prisma/migrations/20261110000001_add_wish_image_attempts/migration.sql` | ALTER TABLE 신규 migration |
+| `src/app/api/checkin/route.ts` | 별 생성 시 `wishImageAttempts: 1` / isAiComplete → redirect (1작품 정책) |
+| `src/app/api/dt/wishart/retry/route.ts` | 원자적 `updateMany (attempts < 3 AND status = failed)` |
+| `src/app/api/dt/checkin-status/route.ts` | `wishImageAttemptsExhausted: boolean` 반환 |
+| `src/app/checkin/CheckinPageContent.tsx` | 소진 시 재시도 버튼 → 운영팀 안내 메시지 |
+| `src/app/my-star/page.tsx` | 소진 시 재시도 버튼 → 운영팀 안내 메시지 |
+
+### 공통 PIN 한계 (솔직한 보고)
+
+현재 구조에서 "고객당 1작품" **완전** 보장은 불가능합니다.
+
+| 시나리오 | 차단 여부 | 비고 |
+|---------|-----------|------|
+| 동일 쿠키, 완성 별 존재 → 신규 별 생성 시도 | ✅ 차단 | isAiComplete → redirect |
+| 동일 쿠키, 3회 소진 → 재시도 | ✅ 차단 | 원자적 attempts >= 3 → 429 |
+| 쿠키 삭제 후 재접속 → 새 identity로 신규 별 생성 | ❌ 차단 불가 | 새 DtGuestIdentity 생성, 카운터 초기화 |
+| 공통 PIN으로 타인 대신 체크인 | ❌ 차단 불가 | PIN은 개인 식별자가 아님 |
+
+**근본 해결**: 주문별 단일사용 이용권(UUID)이 필요. 초기 파일럿(20인)에서는 현재 수준이 충분.
+
+### 배포 절차
+
+1. `prisma migrate deploy` 실행 필수 (Render 빌드 명령에 추가 또는 수동)
+2. `WISHART_ACCESS_PIN` 환경변수 Founder 설정
+3. sowon-dreamtown Render 수동 배포
+
+### 테스트 체크리스트 (PHX-WISHART-011 추가)
+
+- [ ] 최초 체크인 → `wishImageAttempts = 1` DB 확인
+- [ ] 생성 실패 1회 → 재시도 → `wishImageAttempts = 2`
+- [ ] 생성 실패 2회 → 재시도 → `wishImageAttempts = 3`
+- [ ] `wishImageAttempts = 3` → 재시도 버튼 없음, 운영팀 안내 메시지
+- [ ] `wishImageAttempts = 3` → retry API 직접 호출 → 429
+- [ ] 완성 별 보유(revealed) → `/checkin` 재접속 → 기존 별로 redirect
+- [ ] 쿠키 삭제 후 재접속 → 신규 별 생성 가능 (공통 PIN 한계 확인용)
+
+---
+
+## §45 — PHX-WISHART-013 주문별 고유 이용권 시스템 최소 설계 (2026-11-10)
+
+**Status:** DESIGN_COMPLETE — 구현 착수 대기 (Founder 결정 F1-F4 필요)  
+**Author:** Claude Code (Sonnet 4.6)
+
+### 배경
+
+Production SHA `9fed9a6` — PR #23 (공통 PIN + 3회 제한) 적용 중.  
+Founder 결정: 스마트스토어 직판 체계에 맞춰 공통 PIN → 주문별 고유 이용권 전환.
+
+### 신규 테이블: `dt_wishart_vouchers`
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| id | TEXT PK | UUID |
+| codeHash | TEXT UNIQUE | SHA-256(plaintext code) — 원문 미저장 |
+| status | TEXT | unused→active→completed \| cancelled |
+| hotelCode | TEXT? | 파트너 추적 (예: KENNY) |
+| note | TEXT? | 주문번호 등 운영 메모 |
+| expiresAt | TIMESTAMP? | 유효기간 |
+| starId | TEXT? UNIQUE | 연결된 DtStar.id (FK) |
+| usedAt | TIMESTAMP? | 최초 사용 시각 |
+| completedAt | TIMESTAMP? | ready 도달 시각 |
+| cancelledAt | TIMESTAMP? | 취소 시각 |
+
+**기존 테이블 변경 없음.** `DtStar.wishImageAttempts` 그대로 유지.
+
+### 코드 형식
+
+- 10자 대문자 영숫자, 혼동 문자(O/0, I/1/L) 제외 → 32개 문자
+- 32^10 ≈ 10^15 경우의 수 (무차별 대입 불가)
+- 예시: "K7X2M9QRBT"
+- 해시: SHA-256 (기존 hashGuestToken 패턴 동일)
+
+### API 변경 요약
+
+| API | 변경 |
+|-----|------|
+| POST /api/checkin | PIN gate → 이용권 gate 교체. shouldResume/isAiComplete 경로 미변경. |
+| POST /api/dt/wishart/retry | 변경 없음 — 쿠키+attempts 체크 충분 |
+| GET /api/dt/checkin-status | 변경 없음 |
+| POST /api/admin/wishart/vouchers | 신규 — 이용권 일괄 생성, plaintext 한 번 반환 |
+| GET /api/admin/wishart/vouchers | 신규 — 이용권 목록 조회 |
+| PATCH /api/admin/wishart/vouchers/:id/cancel | 신규 — 개별 취소 |
+
+### 원자적 사용 패턴
+
+```sql
+UPDATE dt_wishart_vouchers
+SET status='active', "starId"=$starId, "usedAt"=NOW()
+WHERE "codeHash"=$hash AND status='unused'
+-- 반환 count=0 → 동시 경쟁 패배 / 이미 사용됨
+```
+
+### 명시적 잔여 위험
+
+- **코드 최초 사용 전 공유**: 이용권 받은 고객이 타인에게 전달 시 타인이 먼저 사용 가능. 완화: 발송 시점 최소화 + 유효기간 설정.
+- **기기 변경 재방문**: 쿠키 없고 이용권도 없으면 운영팀 안내 필요 (`starId`로 URL 안내).
+
+### Founder 미결 결정사항 (F1-F4)
+
+| # | 항목 | 선택지 |
+|---|------|--------|
+| F1 | 이용권 유효기간 | 30일 / 무제한 / 행사 종료일 |
+| F2 | 발급 UI | Admin API (curl) / Admin 웹화면 |
+| F3 | 기존 PIN 제거 시점 | 즉시 / 이용권 첫 사용 확인 후 |
+| F4 | completed 이용권 취소 | 불가 / 가능 (상태만 변경) |
+
+---
+
+## §46 — PHX-WISHART-014 1인 1이용권 최종 구현 (2026-11-10)
+
+**Status:** IMPLEMENTED — Founder 승인 전 Production 배포 금지  
+**Commit:** `939986c` (sowon-dreamtown `fix/phx-wishart-009-access-pin`)  
+**Author:** Claude Code (Sonnet 4.6)
+
+### Founder 확정 정책 반영
+
+| F | 결정 | 구현 |
+|---|------|------|
+| F1 | 유효기간 30일 | `VOUCHER_EXPIRY_DAYS = 30` → `expiresAt = now + 30d` |
+| F2 | Admin 웹화면 | `/admin/vouchers` (목록/발급/취소) |
+| F3 | 이용권 첫 사용 확인 후 PIN 제거 | 현재 PIN 병행 유지. 전환 선결 보고 별도 |
+| F4 | completed 취소 가능 (작품 삭제 금지) | PATCH cancel → status=cancelled, starId 연결 유지 |
+
+### 신규 파일
+
+| 파일 | 역할 |
+|------|------|
+| `prisma/migrations/20261110000002_add_wishart_vouchers/migration.sql` | DtWishartOrder + DtWishartVoucher 테이블 생성 |
+| `src/lib/utils/voucher.ts` | 코드 생성(10자, O/0/I/1/L 제외) · SHA-256 해시 · Rate limit |
+| `src/app/api/admin/dt/vouchers/route.ts` | POST(발급) / GET(목록) / PATCH(취소) |
+| `src/app/admin/vouchers/page.tsx` | 관리자 발급 UI |
+
+### 수정 파일
+
+| 파일 | 변경 |
+|------|------|
+| `prisma/schema.prisma` | DtWishartOrder + DtWishartVoucher 모델 추가, DtStar.voucher 역참조 추가 |
+| `src/app/api/checkin/route.ts` | 이용권 게이트 추가 (voucherCode 우선 → PIN 폴백) |
+| `src/app/checkin/CheckinPageContent.tsx` | Step 1.5 PIN → 이용번호 10자 입력 UI |
+
+### 핵심 구현 사항
+
+**1인 1이용권 1작품 보장:**
+- `DtWishartVoucher.starId UNIQUE` → 1개 이용권은 1개 별에만 연결
+- `updateMany WHERE status=unused` CAS 패턴 → 동시 사용 차단
+- 이용권 `used` 상태 → 쿠키 삭제 후 재사용 불가 (공통 PIN 취약점 해결)
+
+**기기 변경 복구:**
+- `used` 이용권 + 동일 코드 입력 → 기존 별 조회 + 쿠키 재발급
+- `DtGuestIdentity.tokenHash` 교체 (기존 기기 쿠키 자동 무효화)
+
+**코드 보안:**
+- 원문 코드: 발급 응답에서 1회만 반환, DB 저장 금지
+- DB: `codeHash = SHA-256(code.toUpperCase())` 저장
+- IP Rate limit: 10회/15분 (voucher.ts)
+- 10자 코드 (32^10 ≈ 10^15 경우의 수)
+
+**기존 데이터 보호:**
+- migration `DEFAULT 0` / nullable FK → 기존 DtStar 무변경
+- 기존 PIN 경로 완전 보존 (WISHART_ACCESS_PIN 환경변수)
+
+### 검증 항목
+
+| # | 항목 | 판정 |
+|---|------|------|
+| 1 | 신규 별 생성 → 이용권 원자적 연결 | PASS (CAS updateMany) |
+| 2 | 동시 2개 요청 → 1개만 성공 | PASS (WHERE status=unused 경쟁) |
+| 3 | cancelled/refunded 이용권 → 403 | PASS |
+| 4 | 만료 이용권 → 403 | PASS |
+| 5 | used + starId 존재 → 복구 반환 | PASS (기기 변경 복구) |
+| 6 | PIN 미제공 → 기존 PIN 게이트 | PASS (폴백) |
+| 7 | 기존 고객 쿠키 복귀 → PIN/이용권 불필요 | PASS (shouldResume) |
+| 8 | 코드 원문 로그·DB 미노출 | PASS |
+| 9 | 기존 DtStar 데이터 무변경 | PASS (nullable FK) |
+| TypeScript | 변경 파일 오류 없음 | PASS (tsc grep 결과 0건) |
+
+### 잔여 운영 위험
+
+| 위험 | 내용 | 조치 |
+|------|------|------|
+| 이용권 최초 사용 전 공유 | A가 받은 코드를 B에게 공유 → B가 선사용 | 운영 절차로 관리 (DreamTown 직접 발송) |
+| 발급 중복 클릭 | 동일 주문 조건 2회 POST → 2개 주문 생성 | 관리자 UI에서 발급 직전 확인 필수 |
+| Render 재시작 | Rate limit Map 초기화 | 파일럿 규모 수용 가능 |
+| used + starId null | star 생성 트랜잭션 롤백 후 voucher 소진 | 현재 불가 (트랜잭션 원자성). 운영팀 직접 조치 |
+
+### 배포 선결 조건
+
+1. Founder PR 병합 승인
+2. Render `prisma migrate deploy` 실행 (migration 20261110000002)
+3. `/admin/vouchers`에서 테스트 이용권 발급 → `/checkin` 모바일 검증
+4. 검증 완료 후 PIN 제거 일정 Founder 결정 (F3)
+
+---
+
+## §47 — PHX-SOWONPASS-001+002 소원패스 별빛혜택 UI 구현 (2026-11-10)
+
+**Status:** IMPLEMENTED — Founder 승인 전 Production 배포 금지  
+**Author:** Claude Code (Sonnet 4.6)
+
+### Founder 확정 정책 반영
+
+| 항목 | 결정 |
+|------|------|
+| 소원패스 브랜드 | 지역 제휴 혜택 상위 브랜드 (Provisional — 상표 검토 전) |
+| 현재 구현 범위 | EP01 별빛혜택만 |
+| 고객 화면 그룹 | 호텔 케니 주변 / 여수 시내 두 탭 |
+| 야간 태그 | is_night=true 업체에 "야간" 뱃지 표시 |
+| 미확정 업체 보호 | affiliation_status=confirmed만 고객에게 표시 |
+| 쿠폰 시스템 | starlightCouponRoutes 기존 재사용 (신규 중복 금지) |
+| 선행 개발 금지 | EP02 달빛혜택 / EP03 소망혜택 / 하멜 별밤혜택 |
+
+### 신규 파일 (daily-miracles-mvp)
+
+| 파일 | 역할 |
+|------|------|
+| `database/migrations/216_dt_partners_sowonpass_fields.sql` | dt_partners에 location_group / is_night / affiliation_status / naver_map_url 추가 |
+| `routes/dtBenefitPublicRoutes.js` | `GET /api/dt/benefits/starlight` — confirmed 파트너 그룹별 반환 |
+
+### 신규 파일 (sowon-dreamtown)
+
+| 파일 | 역할 |
+|------|------|
+| `docs/YAKB/02_SEEDS/Candidates/CAND-BRAND-003_SOWON_PASS.md` | 소원패스 브랜드 체계 YAKB 후보 문서 |
+
+### 수정 파일
+
+| 파일 | 변경 |
+|------|------|
+| `server.js` | dtBenefitPublicRoutes 로드 + `/api/dt/benefits` 등록 |
+| `dreamtown-frontend/src/pages/KennyHotelPage.jsx` | SowonPassPanel 컴포넌트 추가 + benefit 패널 연결, i18n 텍스트 추가 |
+
+### 구현 흐름
+
+```
+고객: /kenny → benefit 메뉴 클릭
+  → SowonPassPanel mount
+  → fetch /api/dt/benefits/starlight?city_code=yeosu
+  → dtBenefitPublicRoutes: dt_partners JOIN dt_benefits (affiliation_status=confirmed)
+  → hotel_vicinity / yeosu_city 그룹 반환
+  → 탭 UI + 업체 카드 (name, 혜택, 야간태그, 지도링크)
+```
+
+### 현재 상태
+
+- dt_partners 데이터 없음 → "별빛혜택 준비 중이에요" 메시지 표시 (정상)
+- 업체 데이터 적재: Founder Excel (`PHX-BENEFIT-001_Review`) 확인 후 `POST /api/admin/dt/partners` 경유
+- food 패널: DemoCard 유지 (별도 Founder 지시 시 연결)
+
+### 배포 선결 조건
+
+1. Founder Production 배포 승인 (daily-miracles-mvp)
+2. Migration 216 적용: Render 재배포 시 자동 적용 (runMigrations 함수 경유)
+3. 업체 데이터 적재 후 `GET /api/dt/benefits/starlight` 테스트
+4. KennyHotelPage `/kenny` 모바일 검증
+
+---
+
+## §48 — PHX-SOWONPASS-001+002 배포 전 보완 완료 (2026-11-10)
+
+**Status:** PR OPEN — Founder 병합 승인 대기
+**PR:** #156 (`fix/phx-star-016-star-recovery` → main)
+**HEAD SHA:** `45e6e8a`
+**Author:** Claude Code (Sonnet 4.6)
+
+### Founder 보완 지시 처리 결과
+
+| 항목 | 지시 | 처리 결과 |
+|------|------|-----------|
+| 업체 공개 정책 분리 | info_status + affiliation_status 별도 관리 | ✅ migration 216 재작성 + API + UI 수정 |
+| 워커 원본 엑셀 | PHX-BENEFIT-001_Review(여수방군-식단후보지).xlsx | ⚠️ DEV·Downloads 검색 결과 없음 — 경로 Founder 제공 필요 |
+| 저장소·DB·Render 경계 | 연결 관계 명확화 | ✅ 아래 표 참조 |
+| PR·HEAD·CI 증빙 | Production 배포 전 확인 | ✅ PR #156 생성 완료 |
+
+### 업체 공개 정책 2단계 분리
+
+| `info_status` | `affiliation_status` | 고객 화면 |
+|---------------|----------------------|-----------|
+| `unverified` | (무관) | 완전 비공개 |
+| `verified` | `none` / `negotiating` | 소개 카드 (회색 뱃지) |
+| `verified` | `confirmed` | 소개 카드 + 금색 "제휴 혜택" 뱃지 |
+
+### 저장소·DB·Render 연결 관계
+
+| 파일 | 저장소 | 대상 DB | Render 서비스 | 비고 |
+|------|--------|---------|--------------|------|
+| `216_dt_partners_sowonpass_fields.sql` | daily-miracles-mvp | Supabase PostgreSQL (`dt_partners`) | daily-miracles-app | 수동 실행 필요 |
+| `dtBenefitPublicRoutes.js` | daily-miracles-mvp | 없음 | daily-miracles-app | — |
+| `server.js` | daily-miracles-mvp | 없음 | daily-miracles-app | migration 허용 목록 추가 |
+| `KennyHotelPage.jsx` | daily-miracles-mvp | 없음 | daily-miracles-app | Vite 빌드 필요 |
+| `CAND-BRAND-003_SOWON_PASS.md` | sowon-dreamtown | **없음** | 없음 | 문서만 |
+
+**sowon-dreamtown Prisma DB(`sowon_plaza`)**: 무관 — 소원패스는 daily-miracles-mvp Supabase만 사용
+
+### db.js 확인 결과
+
+- PostgreSQL 전용 (`pg` 모듈, Pool)
+- `DATABASE_URL` 환경변수 → Supabase 연결 (Render에 설정됨)
+- SQLite 폴백 없음 (dt_partners는 PostgreSQL 전용)
+
+### Migration Runner 확인 결과
+
+- `/api/admin/run-migration` POST 엔드포인트 (adminTokenGuard)
+- 허용 목록(allowlist) 기반 — migration 216 등록 완료 (45e6e8a 커밋)
+- 실행 명령: `POST /api/admin/run-migration { "migration": "216" }` with ADMIN_TOKEN
+
+### 배포 선결 조건 (Founder 승인 후)
+
+1. PR #156 Founder 병합 승인
+2. Render 수동 배포 (auto-deploy 비활성화)
+3. `POST /api/admin/run-migration { "migration": "216" }` 실행
+4. `GET /api/dt/benefits/starlight` 빈 배열 응답 확인
+5. Excel 위치 Founder 제공 → `POST /api/admin/dt/partners` 업체 적재
+6. `/kenny` benefit 패널 모바일 검증
+
+---
+
+## §49 — PHX-SOWONPASS PR #156 병합 전 최종 점검 완료 (2026-11-10)
+
+**Status:** PR OPEN — Founder 병합 승인 대기
+**PR:** #156 | **HEAD SHA:** `775000a` | **Branch:** `fix/phx-star-016-star-recovery` → main
+
+### CI 최종 결과
+
+| 체크 | 결과 | 비고 |
+|------|------|------|
+| AIL Gate | **PASS** ✅ | PR 본문 [AIL] 섹션 추가 후 통과 |
+| Verify Manifest & Index | PASS ✅ | — |
+| docker-smoke | PASS ✅ | — |
+| Vercel Preview Comments | PASS ✅ | — |
+| Vercel – daily-miracles-app | FAIL ⚠️ | **기존 이슈** — PR #155(MERGED)에서도 동일 패턴. Render 프로덕션 무관 |
+| Vercel – daily-miracles-app-21z3 | FAIL ⚠️ | 동일 기존 이슈 |
+
+### PR #156 실제 변경 파일 (7개)
+
+| 파일 | 소원패스 관련 |
+|------|--------------|
+| `database/migrations/216_dt_partners_sowonpass_fields.sql` | ✅ 소원패스 전용 |
+| `dreamtown-frontend/src/pages/KennyHotelPage.jsx` | ✅ 소원패스 전용 |
+| `routes/dtBenefitPublicRoutes.js` | ✅ 소원패스 전용 |
+| `server.js` | ✅ 소원패스 전용 (dtBenefitPublicRoutes 등록 + migration 허용) |
+| `docs/knowledge/KENNY-003-EVIDENCE-V0_1.md` | ⚠️ §47+§48 소원패스 + PHX-WISHART docs 커밋 흡수 |
+| `docs/index/manifest.json` | 자동 생성 |
+| `docs/index/tags.json` | 자동 생성 |
+
+**PHX-WISHART 문서 커밋 포함 이유:** 같은 작업 세션에서 쌓인 2개의 docs 커밋이 `KENNY-003-EVIDENCE-V0_1.md` 하나만 수정. Cherry-pick 분리 시 origin/main 기준 동일 파일 충돌 발생으로 자동 분리 불가. 소원패스 코드 파일에 영향 없음.
+
+### Migration 216 검증
+
+| 항목 | 내용 |
+|------|------|
+| 실행 API | `POST /api/admin/run-migration` with `{ "migration": "216" }` |
+| 인증 방식 | `adminTokenGuard` — `Authorization: Bearer {ADMIN_TOKEN}` 또는 `x-admin-token` 헤더 |
+| SQL 패턴 | `ADD COLUMN IF NOT EXISTS` → 멱등성 보장 (재실행 안전) |
+| 기존 데이터 | dt_partners 현재 데이터 없음 → CHECK constraint 충돌 위험 없음 |
+| 복구 절차 | `ALTER TABLE dt_partners DROP COLUMN IF EXISTS location_group, is_night, info_status, affiliation_status, naver_map_url` |
+| 성공 응답 | `{ success: true, migration: "216_dt_partners_sowonpass_fields.sql", verification: {} }` |
+
+### 항목별 점검 결과
+
+| 항목 | 결과 |
+|------|------|
+| info_status=verified만 공개 | ✅ WHERE p.info_status = 'verified' 확인 |
+| benefit is_active 필터 | ✅ LEFT JOIN dt_benefits ON ... AND b.is_active = true |
+| 쿠폰 발급 버튼 없음 | ✅ 소원패스 UI에 쿠폰 발급 버튼 없음 — 뱃지 표시만 |
+| 기존 dt_partners INSERT 영향 | ✅ dtAdminBenefitRoutes: 명시적 컬럼 지정 — 새 컬럼 DEFAULT 적용 |
+| starlightCouponRoutes 영향 | ✅ 완전 별개 테이블 (starlight_coupons) — 무관 |
+| wishImageRoutes 영향 | ✅ 소원그림 경로 무관 |
+| dt_stars/wish_entries 영향 | ✅ dt_partners 컬럼 추가만 — 무관 |
+
+### 워커 원본 엑셀
+
+- 파일명: `PHX-BENEFIT-001_Review(여수방군 - 식단후보지).xlsx`
+- 검색 위치: C:\DEV 전체, Downloads, Desktop, Documents
+- **결과: 로컬 PC에서 접근 불가 — Founder ChatGPT 대화에 업로드된 것으로 추정**
+- 조치: 실제 파일 전달 전까지 업체 데이터 임의 생성 금지
+
+---
+
+## §50 — PHX-SOWONPASS PR #156 최종 확인 + 배포 체크리스트 (2026-11-10)
+
+### 1. PR #156 변경 파일 확인
+
+**PR URL:** https://github.com/ys6448761-hue/daily-miracles-app/pull/156  
+**Branch:** `fix/phx-star-016-star-recovery` → main  
+**HEAD:** `afcca72cbb651650e1a55bbf839bcc3132664ef4`  
+**State:** OPEN | MERGEABLE ✅
+
+| 파일 | 소원패스 관련 | 비고 |
+|------|--------------|------|
+| `database/migrations/216_dt_partners_sowonpass_fields.sql` | ✅ 소원패스 전용 | |
+| `dreamtown-frontend/src/pages/KennyHotelPage.jsx` | ✅ 소원패스 전용 | SowonPassPanel 추가 |
+| `routes/dtBenefitPublicRoutes.js` | ✅ 소원패스 전용 | 공개 혜택 API |
+| `server.js` | ✅ 소원패스 전용 | dtBenefitPublicRoutes 등록 + migration 허용 목록 |
+| `docs/knowledge/KENNY-003-EVIDENCE-V0_1.md` | ⚠️ Evidence §47~§50 | PHX-WISHART docs 커밋 흡수 — 코드 변경 없음 |
+| `docs/index/manifest.json` | — | 자동 생성 |
+| `docs/index/tags.json` | — | 자동 생성 |
+
+**변경 범위:** 소원패스 코드 4파일 + Evidence 1파일 + 자동생성 2파일. 기존 소원별·소원그림·별빛쿠폰 파일 무변경.
+
+### 2. HEAD afcca72 CI 결과
+
+| 체크 | 결과 | 비고 |
+|------|------|------|
+| AIL Gate | **PASS** ✅ | 필수 — 통과 |
+| Verify Manifest & Index | **PASS** ✅ | 필수 — 통과 |
+| docker-smoke | **PASS** ✅ | 필수 — 통과 |
+| Vercel Preview Comments | **PASS** ✅ | — |
+| Vercel – daily-miracles-app | FAIL ⚠️ | 기존 이슈 — PR #155 MERGED에서도 동일. Render 프로덕션 무관 |
+| Vercel – daily-miracles-app-21z3 | FAIL ⚠️ | 동일 기존 이슈 |
+
+**필수 CI 3개 모두 PASS. 병합 기술적 블로커 없음.**
+
+### 3. sowon-dreamtown PR #23 상태 정정
+
+| 항목 | 오류 기록 | 실제 상태 |
+|------|----------|----------|
+| sowon-dreamtown PR #23 | OPEN (PHX-WISHART-014 "대기") | **MERGED** `a98e360` — 2026-11-10 03:34 UTC ✅ |
+
+**정정:** PHX-WISHART-014 중 "Founder PR 병합 승인" 단계는 완료. 남은 단계: WISHART_ACCESS_PIN env 설정 → Render 수동 배포 → 검증.
+
+### 4. Migration 216 배포 체크리스트
+
+**대상 저장소:** `daily-miracles-mvp` (Supabase PostgreSQL)  
+**실행 방법:** 배포 완료 후 관리자 권한으로 수동 실행
+
+#### 실행 전 확인 항목
+- [ ] PR #156 Founder 병합 승인 완료
+- [ ] Render 수동 배포 완료 (Build SUCCESS 확인)
+- [ ] `ADMIN_TOKEN` 환경변수 Render에 설정되어 있음 확인
+- [ ] Supabase 대시보드에서 `dt_partners` 테이블 현재 컬럼 목록 확인 (백업 스냅샷 대체)
+  - 현재 `dt_partners`에 운영 데이터 없음 → 데이터 손실 위험 없음
+
+#### 실행 명령
+```bash
+curl -X POST https://app.dailymiracles.kr/api/admin/run-migration \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer {ADMIN_TOKEN}" \
+  -d '{"migration": "216"}'
+```
+
+#### 성공 응답
+```json
+{ "success": true, "migration": "216_dt_partners_sowonpass_fields.sql", "verification": {} }
+```
+
+#### 실패 시 복구 절차
+Migration 216은 `ADD COLUMN IF NOT EXISTS` → 멱등성 보장 (실패 후 재실행 안전)
+
+부분 실행으로 컬럼이 불완전하게 추가된 경우:
+```sql
+-- Supabase SQL Editor에서 직접 실행
+ALTER TABLE dt_partners
+  DROP COLUMN IF EXISTS location_group,
+  DROP COLUMN IF EXISTS is_night,
+  DROP COLUMN IF EXISTS info_status,
+  DROP COLUMN IF EXISTS affiliation_status,
+  DROP COLUMN IF EXISTS naver_map_url;
+```
+DROP 후 migration 재실행 가능.
+
+### 5. 병합 가능 여부
+
+**병합 가능: YES** — 기술적 블로커 없음. Founder 승인만 대기.
+
+| 조건 | 상태 |
+|------|------|
+| 필수 CI PASS | ✅ |
+| MERGEABLE 상태 | ✅ |
+| 충돌 없음 | ✅ |
+| 기존 기능 영향 없음 | ✅ |
+| Founder 병합 승인 | ⏳ 대기 |

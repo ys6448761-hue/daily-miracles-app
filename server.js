@@ -701,6 +701,12 @@ try {
   console.error("❌ DreamTown 상품 라우터 로드 실패:", error.message);
 }
 
+let dtBenefitPublicRoutes = null;
+try {
+  dtBenefitPublicRoutes = require('./routes/dtBenefitPublicRoutes');
+  console.log('✅ DreamTown 소원패스 공개 혜택 라우터 로드 성공');
+} catch (e) { console.error('❌ dtBenefitPublic 라우터 로드 실패:', e.message); }
+
 let dtAdminBenefitRoutes = null;
 try {
   dtAdminBenefitRoutes = require("./routes/dtAdminBenefitRoutes");
@@ -1691,6 +1697,10 @@ app.post("/api/admin/run-migration", adminTokenGuard, async (req, res) => {
     "146",
     // location_admins: 장소별 관리자 계정 (username/bcrypt)
     "147",
+    // 별빛쿠폰 MVP (starlight_coupons + starlight_coupon_uses)
+    "215",
+    // 소원패스 별빛혜택: dt_partners에 info_status/affiliation_status/location_group/is_night/naver_map_url 추가
+    "216",
   ];
 
   if (!migration || !allowed.includes(migration)) {
@@ -2401,6 +2411,11 @@ if (dtSettlementRoutes) {
 if (dtProductRoutes) {
   app.use("/api/dt/products", dtProductRoutes);
   console.log("✅ DreamTown 상품 라우터 등록 완료 (/api/dt/products)");
+}
+
+if (dtBenefitPublicRoutes) {
+  app.use('/api/dt/benefits', dtBenefitPublicRoutes);
+  console.log('✅ DreamTown 소원패스 공개 혜택 라우터 등록 완료 (/api/dt/benefits)');
 }
 
 // ---------- Location 관리자 — dtAdminBenefitRoutes 보다 먼저 등록해야 401 방지 ----------
