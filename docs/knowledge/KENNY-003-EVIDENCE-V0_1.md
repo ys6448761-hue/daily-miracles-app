@@ -1500,3 +1500,38 @@ localStorage에 저장되므로, 완전 초기화 시 100% 복원 보장 불가.
 ### 대기
 
 PR #154 Founder 승인 → merge → Render 수동 배포 → 카카오톡 재검증
+
+---
+
+## §41 — PHX-WISHART-007 PR #21 병합 준비 검증 (2026-11-10)
+
+**Task:** PHX-WISHART-007  
+**대상 PR:** sowon-dreamtown #21 (`feat/phx-wishart-006-star-link`)  
+**HEAD:** `93aaef8`  
+**CI:** gate ✅ PASS  
+**Mergeable:** ✅ MERGEABLE (충돌 없음)
+
+### 체크리스트
+
+| 항목 | 확인 결과 |
+|---|---|
+| "내 소원별 만나기" href | `https://app.dailymiracles.kr/star-entry` ✅ (line 743) |
+| 소원그림 다시 보기 (`/my-star`) 3곳 | 변경 없음 ✅ (677, 824, 857) |
+| VITALITY_RULE AGE SOFTENING | 모든 성인 5–10년 무조건 적용 ✅ |
+| NEGATIVE_RULE | 10년 초과 금지 완화 조항 ✅ |
+| WISHART_ACCESS_PIN | 미구현 (별도 작업) ✅ |
+| QR /checkin 경로 | 미변경 ✅ |
+| DB/별 API | 미변경 ✅ |
+| main 대비 충돌 | 없음 (merge base = main HEAD 99dc385) ✅ |
+
+### PR #21 포함 커밋
+
+| SHA | 내용 |
+|---|---|
+| `9f0d187` | PHX-WISHART-006+002 소원별 연결 수정 + 연령 보정 복구 |
+| `93aaef8` | PHX-STAR-011 "내 소원별 만나기" → /star-entry 통일 |
+
+### 병합 후 확인 필요
+
+- sowon-dreamtown Render 배포 SHA 확인 (Auto-Deploy 비활성화 가능성)
+- 소원꿈터 `https://sowon-dream-plaza.onrender.com/checkin` 완료 화면 → "내 소원별 만나기" → `app.dailymiracles.kr/star-entry` 이동 Founder 모바일 검증
