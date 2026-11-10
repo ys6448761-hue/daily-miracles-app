@@ -1971,3 +1971,65 @@ WHERE "codeHash"=$hash AND status='unused'
 4. `GET /api/dt/benefits/starlight` 빈 배열 응답 확인
 5. Excel 위치 Founder 제공 → `POST /api/admin/dt/partners` 업체 적재
 6. `/kenny` benefit 패널 모바일 검증
+
+---
+
+## §49 — PHX-SOWONPASS PR #156 병합 전 최종 점검 완료 (2026-11-10)
+
+**Status:** PR OPEN — Founder 병합 승인 대기
+**PR:** #156 | **HEAD SHA:** `775000a` | **Branch:** `fix/phx-star-016-star-recovery` → main
+
+### CI 최종 결과
+
+| 체크 | 결과 | 비고 |
+|------|------|------|
+| AIL Gate | **PASS** ✅ | PR 본문 [AIL] 섹션 추가 후 통과 |
+| Verify Manifest & Index | PASS ✅ | — |
+| docker-smoke | PASS ✅ | — |
+| Vercel Preview Comments | PASS ✅ | — |
+| Vercel – daily-miracles-app | FAIL ⚠️ | **기존 이슈** — PR #155(MERGED)에서도 동일 패턴. Render 프로덕션 무관 |
+| Vercel – daily-miracles-app-21z3 | FAIL ⚠️ | 동일 기존 이슈 |
+
+### PR #156 실제 변경 파일 (7개)
+
+| 파일 | 소원패스 관련 |
+|------|--------------|
+| `database/migrations/216_dt_partners_sowonpass_fields.sql` | ✅ 소원패스 전용 |
+| `dreamtown-frontend/src/pages/KennyHotelPage.jsx` | ✅ 소원패스 전용 |
+| `routes/dtBenefitPublicRoutes.js` | ✅ 소원패스 전용 |
+| `server.js` | ✅ 소원패스 전용 (dtBenefitPublicRoutes 등록 + migration 허용) |
+| `docs/knowledge/KENNY-003-EVIDENCE-V0_1.md` | ⚠️ §47+§48 소원패스 + PHX-WISHART docs 커밋 흡수 |
+| `docs/index/manifest.json` | 자동 생성 |
+| `docs/index/tags.json` | 자동 생성 |
+
+**PHX-WISHART 문서 커밋 포함 이유:** 같은 작업 세션에서 쌓인 2개의 docs 커밋이 `KENNY-003-EVIDENCE-V0_1.md` 하나만 수정. Cherry-pick 분리 시 origin/main 기준 동일 파일 충돌 발생으로 자동 분리 불가. 소원패스 코드 파일에 영향 없음.
+
+### Migration 216 검증
+
+| 항목 | 내용 |
+|------|------|
+| 실행 API | `POST /api/admin/run-migration` with `{ "migration": "216" }` |
+| 인증 방식 | `adminTokenGuard` — `Authorization: Bearer {ADMIN_TOKEN}` 또는 `x-admin-token` 헤더 |
+| SQL 패턴 | `ADD COLUMN IF NOT EXISTS` → 멱등성 보장 (재실행 안전) |
+| 기존 데이터 | dt_partners 현재 데이터 없음 → CHECK constraint 충돌 위험 없음 |
+| 복구 절차 | `ALTER TABLE dt_partners DROP COLUMN IF EXISTS location_group, is_night, info_status, affiliation_status, naver_map_url` |
+| 성공 응답 | `{ success: true, migration: "216_dt_partners_sowonpass_fields.sql", verification: {} }` |
+
+### 항목별 점검 결과
+
+| 항목 | 결과 |
+|------|------|
+| info_status=verified만 공개 | ✅ WHERE p.info_status = 'verified' 확인 |
+| benefit is_active 필터 | ✅ LEFT JOIN dt_benefits ON ... AND b.is_active = true |
+| 쿠폰 발급 버튼 없음 | ✅ 소원패스 UI에 쿠폰 발급 버튼 없음 — 뱃지 표시만 |
+| 기존 dt_partners INSERT 영향 | ✅ dtAdminBenefitRoutes: 명시적 컬럼 지정 — 새 컬럼 DEFAULT 적용 |
+| starlightCouponRoutes 영향 | ✅ 완전 별개 테이블 (starlight_coupons) — 무관 |
+| wishImageRoutes 영향 | ✅ 소원그림 경로 무관 |
+| dt_stars/wish_entries 영향 | ✅ dt_partners 컬럼 추가만 — 무관 |
+
+### 워커 원본 엑셀
+
+- 파일명: `PHX-BENEFIT-001_Review(여수방군 - 식단후보지).xlsx`
+- 검색 위치: C:\DEV 전체, Downloads, Desktop, Documents
+- **결과: 로컬 PC에서 접근 불가 — Founder ChatGPT 대화에 업로드된 것으로 추정**
+- 조치: 실제 파일 전달 전까지 업체 데이터 임의 생성 금지
