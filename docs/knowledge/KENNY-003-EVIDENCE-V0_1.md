@@ -2033,3 +2033,99 @@ WHERE "codeHash"=$hash AND status='unused'
 - 검색 위치: C:\DEV 전체, Downloads, Desktop, Documents
 - **결과: 로컬 PC에서 접근 불가 — Founder ChatGPT 대화에 업로드된 것으로 추정**
 - 조치: 실제 파일 전달 전까지 업체 데이터 임의 생성 금지
+
+---
+
+## §50 — PHX-SOWONPASS PR #156 최종 확인 + 배포 체크리스트 (2026-11-10)
+
+### 1. PR #156 변경 파일 확인
+
+**PR URL:** https://github.com/ys6448761-hue/daily-miracles-app/pull/156  
+**Branch:** `fix/phx-star-016-star-recovery` → main  
+**HEAD:** `afcca72cbb651650e1a55bbf839bcc3132664ef4`  
+**State:** OPEN | MERGEABLE ✅
+
+| 파일 | 소원패스 관련 | 비고 |
+|------|--------------|------|
+| `database/migrations/216_dt_partners_sowonpass_fields.sql` | ✅ 소원패스 전용 | |
+| `dreamtown-frontend/src/pages/KennyHotelPage.jsx` | ✅ 소원패스 전용 | SowonPassPanel 추가 |
+| `routes/dtBenefitPublicRoutes.js` | ✅ 소원패스 전용 | 공개 혜택 API |
+| `server.js` | ✅ 소원패스 전용 | dtBenefitPublicRoutes 등록 + migration 허용 목록 |
+| `docs/knowledge/KENNY-003-EVIDENCE-V0_1.md` | ⚠️ Evidence §47~§50 | PHX-WISHART docs 커밋 흡수 — 코드 변경 없음 |
+| `docs/index/manifest.json` | — | 자동 생성 |
+| `docs/index/tags.json` | — | 자동 생성 |
+
+**변경 범위:** 소원패스 코드 4파일 + Evidence 1파일 + 자동생성 2파일. 기존 소원별·소원그림·별빛쿠폰 파일 무변경.
+
+### 2. HEAD afcca72 CI 결과
+
+| 체크 | 결과 | 비고 |
+|------|------|------|
+| AIL Gate | **PASS** ✅ | 필수 — 통과 |
+| Verify Manifest & Index | **PASS** ✅ | 필수 — 통과 |
+| docker-smoke | **PASS** ✅ | 필수 — 통과 |
+| Vercel Preview Comments | **PASS** ✅ | — |
+| Vercel – daily-miracles-app | FAIL ⚠️ | 기존 이슈 — PR #155 MERGED에서도 동일. Render 프로덕션 무관 |
+| Vercel – daily-miracles-app-21z3 | FAIL ⚠️ | 동일 기존 이슈 |
+
+**필수 CI 3개 모두 PASS. 병합 기술적 블로커 없음.**
+
+### 3. sowon-dreamtown PR #23 상태 정정
+
+| 항목 | 오류 기록 | 실제 상태 |
+|------|----------|----------|
+| sowon-dreamtown PR #23 | OPEN (PHX-WISHART-014 "대기") | **MERGED** `a98e360` — 2026-11-10 03:34 UTC ✅ |
+
+**정정:** PHX-WISHART-014 중 "Founder PR 병합 승인" 단계는 완료. 남은 단계: WISHART_ACCESS_PIN env 설정 → Render 수동 배포 → 검증.
+
+### 4. Migration 216 배포 체크리스트
+
+**대상 저장소:** `daily-miracles-mvp` (Supabase PostgreSQL)  
+**실행 방법:** 배포 완료 후 관리자 권한으로 수동 실행
+
+#### 실행 전 확인 항목
+- [ ] PR #156 Founder 병합 승인 완료
+- [ ] Render 수동 배포 완료 (Build SUCCESS 확인)
+- [ ] `ADMIN_TOKEN` 환경변수 Render에 설정되어 있음 확인
+- [ ] Supabase 대시보드에서 `dt_partners` 테이블 현재 컬럼 목록 확인 (백업 스냅샷 대체)
+  - 현재 `dt_partners`에 운영 데이터 없음 → 데이터 손실 위험 없음
+
+#### 실행 명령
+```bash
+curl -X POST https://app.dailymiracles.kr/api/admin/run-migration \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer {ADMIN_TOKEN}" \
+  -d '{"migration": "216"}'
+```
+
+#### 성공 응답
+```json
+{ "success": true, "migration": "216_dt_partners_sowonpass_fields.sql", "verification": {} }
+```
+
+#### 실패 시 복구 절차
+Migration 216은 `ADD COLUMN IF NOT EXISTS` → 멱등성 보장 (실패 후 재실행 안전)
+
+부분 실행으로 컬럼이 불완전하게 추가된 경우:
+```sql
+-- Supabase SQL Editor에서 직접 실행
+ALTER TABLE dt_partners
+  DROP COLUMN IF EXISTS location_group,
+  DROP COLUMN IF EXISTS is_night,
+  DROP COLUMN IF EXISTS info_status,
+  DROP COLUMN IF EXISTS affiliation_status,
+  DROP COLUMN IF EXISTS naver_map_url;
+```
+DROP 후 migration 재실행 가능.
+
+### 5. 병합 가능 여부
+
+**병합 가능: YES** — 기술적 블로커 없음. Founder 승인만 대기.
+
+| 조건 | 상태 |
+|------|------|
+| 필수 CI PASS | ✅ |
+| MERGEABLE 상태 | ✅ |
+| 충돌 없음 | ✅ |
+| 기존 기능 영향 없음 | ✅ |
+| Founder 병합 승인 | ⏳ 대기 |
