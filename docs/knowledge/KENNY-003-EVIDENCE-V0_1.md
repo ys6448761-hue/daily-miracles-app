@@ -1912,3 +1912,62 @@ WHERE "codeHash"=$hash AND status='unused'
 2. Migration 216 적용: Render 재배포 시 자동 적용 (runMigrations 함수 경유)
 3. 업체 데이터 적재 후 `GET /api/dt/benefits/starlight` 테스트
 4. KennyHotelPage `/kenny` 모바일 검증
+
+---
+
+## §48 — PHX-SOWONPASS-001+002 배포 전 보완 완료 (2026-11-10)
+
+**Status:** PR OPEN — Founder 병합 승인 대기
+**PR:** #156 (`fix/phx-star-016-star-recovery` → main)
+**HEAD SHA:** `45e6e8a`
+**Author:** Claude Code (Sonnet 4.6)
+
+### Founder 보완 지시 처리 결과
+
+| 항목 | 지시 | 처리 결과 |
+|------|------|-----------|
+| 업체 공개 정책 분리 | info_status + affiliation_status 별도 관리 | ✅ migration 216 재작성 + API + UI 수정 |
+| 워커 원본 엑셀 | PHX-BENEFIT-001_Review(여수방군-식단후보지).xlsx | ⚠️ DEV·Downloads 검색 결과 없음 — 경로 Founder 제공 필요 |
+| 저장소·DB·Render 경계 | 연결 관계 명확화 | ✅ 아래 표 참조 |
+| PR·HEAD·CI 증빙 | Production 배포 전 확인 | ✅ PR #156 생성 완료 |
+
+### 업체 공개 정책 2단계 분리
+
+| `info_status` | `affiliation_status` | 고객 화면 |
+|---------------|----------------------|-----------|
+| `unverified` | (무관) | 완전 비공개 |
+| `verified` | `none` / `negotiating` | 소개 카드 (회색 뱃지) |
+| `verified` | `confirmed` | 소개 카드 + 금색 "제휴 혜택" 뱃지 |
+
+### 저장소·DB·Render 연결 관계
+
+| 파일 | 저장소 | 대상 DB | Render 서비스 | 비고 |
+|------|--------|---------|--------------|------|
+| `216_dt_partners_sowonpass_fields.sql` | daily-miracles-mvp | Supabase PostgreSQL (`dt_partners`) | daily-miracles-app | 수동 실행 필요 |
+| `dtBenefitPublicRoutes.js` | daily-miracles-mvp | 없음 | daily-miracles-app | — |
+| `server.js` | daily-miracles-mvp | 없음 | daily-miracles-app | migration 허용 목록 추가 |
+| `KennyHotelPage.jsx` | daily-miracles-mvp | 없음 | daily-miracles-app | Vite 빌드 필요 |
+| `CAND-BRAND-003_SOWON_PASS.md` | sowon-dreamtown | **없음** | 없음 | 문서만 |
+
+**sowon-dreamtown Prisma DB(`sowon_plaza`)**: 무관 — 소원패스는 daily-miracles-mvp Supabase만 사용
+
+### db.js 확인 결과
+
+- PostgreSQL 전용 (`pg` 모듈, Pool)
+- `DATABASE_URL` 환경변수 → Supabase 연결 (Render에 설정됨)
+- SQLite 폴백 없음 (dt_partners는 PostgreSQL 전용)
+
+### Migration Runner 확인 결과
+
+- `/api/admin/run-migration` POST 엔드포인트 (adminTokenGuard)
+- 허용 목록(allowlist) 기반 — migration 216 등록 완료 (45e6e8a 커밋)
+- 실행 명령: `POST /api/admin/run-migration { "migration": "216" }` with ADMIN_TOKEN
+
+### 배포 선결 조건 (Founder 승인 후)
+
+1. PR #156 Founder 병합 승인
+2. Render 수동 배포 (auto-deploy 비활성화)
+3. `POST /api/admin/run-migration { "migration": "216" }` 실행
+4. `GET /api/dt/benefits/starlight` 빈 배열 응답 확인
+5. Excel 위치 Founder 제공 → `POST /api/admin/dt/partners` 업체 적재
+6. `/kenny` benefit 패널 모바일 검증
