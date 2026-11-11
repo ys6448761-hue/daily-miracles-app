@@ -2385,3 +2385,43 @@ curl -s "https://app.dailymiracles.kr/api/admin/sens-result?requestId=test&token
 
 ### 보안 메모
 `[ADMIN CHECK]` 로그의 `token앞6:` 출력은 현재 이슈 해결 후 제거 권고 (server.js:1600-1602).
+
+---
+
+## §55 — Migration 216 forbidden 최종 원인 확정 (2026-11-12)
+
+### 원인: HTTP → HTTPS 301 리다이렉트 + Invoke-RestMethod 헤더 제거
+
+```
+http://app.dailymiracles.kr/api/admin/run-migration
+  → Cloudflare 301 Redirect
+  → https://app.dailymiracles.kr/api/admin/run-migration
+  
+Invoke-RestMethod 리다이렉트 추적 시:
+  Authorization / x-admin-token 헤더 자동 제거 (보안 정책)
+  → 헤더 없이 HTTPS 서버 도달 → [ADMIN CHECK] token앞6: NONE → 403
+```
+
+검증:
+```
+http://  HEAD → 301 Location: https:// (Cloudflare, Server: cloudflare 확인)
+https:// HEAD → 403 (리다이렉트 없이 서버 직접 도달 확인)
+```
+
+### 패턴
+Invoke-RestMethod는 301 리다이렉트 추적 시 RFC 7235 준수:
+Authorization 및 커스텀 인증 헤더를 다른 origin/scheme으로 전달하지 않음.
+http:// → https:// 스킴 변경 = 헤더 제거 발생.
+
+### 조치
+Founder가 사용한 URL에 http:// 가 포함되어 있다면:
+→ https:// 로 변경하면 리다이렉트 없이 헤더가 그대로 전달됨.
+
+### Migration 216 적용 여부 확인 (Supabase — 읽기 전용)
+```sql
+SELECT column_name FROM information_schema.columns
+WHERE table_name = 'dt_partners'
+  AND column_name IN ('info_status','affiliation_status','location_group','is_night','naver_map_url')
+ORDER BY column_name;
+```
+5행 = 적용 완료 / 0행 = 미적용
