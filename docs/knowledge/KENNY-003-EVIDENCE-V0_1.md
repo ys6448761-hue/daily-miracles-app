@@ -2425,3 +2425,49 @@ WHERE table_name = 'dt_partners'
 ORDER BY column_name;
 ```
 5행 = 적용 완료 / 0행 = 미적용
+
+---
+
+## §56 — Migration 216 forbidden 3차 진단 — /diag/echo 헤더 도달 테스트 (2026-11-12)
+
+### 소거된 가설
+
+| 가설 | 근거 |
+|------|------|
+| HTTP→HTTPS 리다이렉트 | Founder가 이미 HTTPS 사용 |
+| onrender.com 도메인 리다이렉트 | `/api/` 경로 코드 제외 (server.js 확인) |
+| gateMiddleware 차단 | APP_DISABLED만 체크 |
+| ADMIN_TOKEN 미설정 | Render 로그 `ADMIN_TOKEN set: true` 확인 |
+
+### 발견: /diag/echo 엔드포인트 (production)
+
+```javascript
+app.all("/diag/echo", (req, res) => {
+  res.json({ method, path, headers: req.headers, body, ts });  // 인증 없음
+});
+```
+
+토큰 미사용 헤더 도달 진단에 사용 가능.
+
+### Founder 진단 명령
+```powershell
+Invoke-RestMethod `
+    -Uri "https://app.dailymiracles.kr/diag/echo" `
+    -Method POST `
+    -Headers @{ "x-test-probe" = "hello-123"; "Content-Type" = "application/json" } `
+    -Body '{}' -ContentType "application/json"
+```
+
+판독:
+- `x-test-probe: hello-123` 응답에 있음 → 헤더 도달, ADMIN_TOKEN 값 비교 문제
+- 없음 → 커스텀 헤더 프록시 차단
+
+### Migration 216 읽기 전용 확인
+Supabase SQL Editor:
+```sql
+SELECT column_name FROM information_schema.columns
+WHERE table_name = 'dt_partners'
+  AND column_name IN ('info_status','affiliation_status','location_group','is_night','naver_map_url')
+ORDER BY column_name;
+```
+5행 = 적용완료 / 0행 = 미적용
