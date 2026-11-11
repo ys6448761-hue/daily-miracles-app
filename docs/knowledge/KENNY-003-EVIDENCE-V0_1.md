@@ -2593,3 +2593,44 @@ console.log('[ADMIN CHECK] tokenLen:', token?.length ?? 'NONE',
 4. 재시작 완료 후 migration 재실행
 
 영향: admin 운영 도구에서 사용하는 토큰 값도 동시에 갱신 필요.
+
+---
+
+## §59 — ADMIN_TOKEN 길이 일치 + Live 프로세스 적용 여부 진단 (2026-11-12)
+
+### 현황
+- Render ADMIN_TOKEN: 40자
+- PowerShell $token: 40자
+- 클립보드: 3자 (다른 내용 — $token 설정과 무관)
+- 길이 일치 → trailing space 가설 소거
+- 남은 가능성: Render 환경변수 변경이 Live 프로세스에 미반영
+
+### Render 배포 타임라인
+- 마지막 GitHub Production 배포: 2026-11-10 07:22 UTC (SHA 74a9a96)
+- ADMIN_TOKEN 설정 시각: 불명 — Render 자체 Logs에만 기록
+- Render는 환경변수 변경 시 자동 재시작하나, Auto-Deploy 비활성화 환경에서는 미확인
+
+### 인증 테스트 (코드 변경·Migration 없음)
+
+GET /api/admin/sens-result — adminTokenGuard를 거치는 읽기 전용 엔드포인트
+- 403 → $token ≠ Live 프로세스 ADMIN_TOKEN (Render 미반영 또는 값 불일치)
+- 400 → $token = Live 프로세스 ADMIN_TOKEN ✅ (Migration도 같은 값으로 성공)
+
+```powershell
+try {
+    Invoke-RestMethod `
+        -Uri "https://app.dailymiracles.kr/api/admin/sens-result?requestId=" `
+        -Method GET `
+        -Headers @{ "x-admin-token" = $token } `
+        -ErrorAction Stop
+} catch {
+    Write-Host "HTTP Status: $($_.Exception.Response.StatusCode.value__)"
+}
+```
+
+### [ADMIN CHECK] 로그 수정 계획 (Founder 승인 대기)
+server.js:1600-1602 console.log 1줄 변경:
+- 현재: token앞6 출력 (보안 위험)
+- 제안: tokenLen / expectedLen / match 출력
+- 적용 시: 다음 migration 로그에서 길이·일치 여부 즉시 판독
+- Status: BLOCKED — Founder 승인 필요
