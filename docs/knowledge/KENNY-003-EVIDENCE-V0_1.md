@@ -2129,3 +2129,90 @@ DROP 후 migration 재실행 가능.
 | 충돌 없음 | ✅ |
 | 기존 기능 영향 없음 | ✅ |
 | Founder 병합 승인 | ⏳ 대기 |
+
+---
+
+## §51 — Migration 216 forbidden 오류 진단 (2026-11-12)
+
+### 오류 현상
+```
+POST https://app.dailymiracles.kr/api/admin/run-migration
+Body: {"migration":"216"}
+Response: {"success":false,"error":"forbidden"}
+```
+
+### 코드 분석
+
+**`adminTokenGuard` (server.js:1594–1607)**:
+```javascript
+function adminTokenGuard(req, res, next) {
+  const bearerToken = req.headers.authorization?.startsWith('Bearer ')
+    ? req.headers.authorization.slice(7) : null;
+  const token    = req.headers['x-admin-token'] || bearerToken || req.query.token;
+  const expected = process.env.ADMIN_TOKEN;          // ← 환경변수명: ADMIN_TOKEN
+  console.log('[ADMIN CHECK] token앞6:', token?.slice(0,6) ?? 'NONE',
+              '| ADMIN_TOKEN set:', !!expected,       // ← 로그에 set: true/false 출력
+              '| ENV KEY: ADMIN_TOKEN');
+  if (!expected || token !== expected) {
+    return res.status(403).json({ success: false, error: 'forbidden' });  // ← 여기서 반환
+  }
+  next();
+}
+```
+
+**`"216"` allowlist 등재 확인**: server.js:1703 — ✅ 등재됨.  
+`forbidden`은 allowlist 체크 전 단계(1706행)에서 반환 → 인증 실패 원인.
+
+### forbidden 반환 조건 (둘 중 하나)
+
+| 조건 | 의미 |
+|------|------|
+| `process.env.ADMIN_TOKEN`이 undefined | Render에 `ADMIN_TOKEN` 환경변수가 **설정되지 않음** |
+| `token !== expected` | 전송한 토큰 값이 Render의 `ADMIN_TOKEN` 값과 **불일치** |
+
+### 인증 헤더 형식 (server.js 기준)
+
+서버는 아래 세 가지 중 하나를 허용:
+1. `Authorization: Bearer {ADMIN_TOKEN_값}` (슬라이스 후 `slice(7)`)
+2. `x-admin-token: {ADMIN_TOKEN_값}` 헤더
+3. `?token={ADMIN_TOKEN_값}` 쿼리 파라미터
+
+> ⚠️ 오래된 deploy 체크리스트(`docs/DEPLOY-CHECKLIST-STAR-SYSTEM-v1.md`)에 `x-admin-key: $ADMIN_API_KEY`로 기재되어 있으나 **실제 코드와 불일치**. 올바른 헤더는 `x-admin-token` 또는 `Authorization: Bearer`, 올바른 환경변수명은 `ADMIN_TOKEN`.
+
+### 진단 방법 (Render 로그 확인)
+
+Render 대시보드 → `daily-miracles-mvp` → **Logs** 탭에서 `[ADMIN CHECK]` 검색:
+
+| 로그 패턴 | 의미 |
+|-----------|------|
+| `ADMIN_TOKEN set: false` | Render에 `ADMIN_TOKEN` 환경변수 미설정 → 추가 필요 |
+| `ADMIN_TOKEN set: true` + `token앞6: NONE` | 헤더가 아예 전달되지 않음 |
+| `ADMIN_TOKEN set: true` + `token앞6: {값}` | 값 불일치 (오타/공백) |
+
+### 조치 체크리스트 (Founder 직접 수행)
+
+**Step 1 — Render 로그 확인**
+Render → daily-miracles-mvp → Logs → `[ADMIN CHECK]` 검색하여 `ADMIN_TOKEN set:` 값 확인
+
+**Step 2A — 환경변수 미설정인 경우**
+Render → daily-miracles-mvp → Environment → `Add Environment Variable`
+- Key: `ADMIN_TOKEN`
+- Value: 안전한 랜덤 문자열 (예: `openssl rand -hex 32`)
+- 저장 후 Render가 자동 재시작 → 재시작 완료 후 재실행
+
+**Step 2B — 환경변수 설정됐지만 불일치인 경우**
+Render → Environment → `ADMIN_TOKEN` 값 복사 → 그 값 그대로 헤더에 사용
+
+**Step 3 — 올바른 curl 형식**
+```bash
+curl -s -X POST https://app.dailymiracles.kr/api/admin/run-migration \
+  -H "Content-Type: application/json" \
+  -H "x-admin-token: {ADMIN_TOKEN_값}" \
+  -d '{"migration": "216"}'
+```
+
+### 현재 상태
+- Migration 216 미실행 (forbidden 차단됨)
+- allowlist 등재 확인 ✅ (server.js:1703)
+- `/api/dt/benefits/starlight` → DB 오류 (예상 — 컬럼 미생성 상태)
+- 인증 우회·코드 수정 금지
