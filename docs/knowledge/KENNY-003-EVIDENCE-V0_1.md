@@ -2471,3 +2471,66 @@ WHERE table_name = 'dt_partners'
 ORDER BY column_name;
 ```
 5행 = 적용완료 / 0행 = 미적용
+
+---
+
+## §57 — Migration 216 forbidden 최종 원인 확정 + 조치 계획 (2026-11-12)
+
+### 최종 확인 결과
+
+| 항목 | 결과 |
+|------|------|
+| /diag/echo x-test-probe 도달 | ✅ 헤더 전달 정상 |
+| Migration 216 적용 여부 (Supabase SQL) | ❌ 0행 — 미적용 |
+| ADMIN_TOKEN set | ✅ Render 환경변수 존재 |
+| 헤더→서버 경로 | ✅ PowerShell→Cloudflare→Render→Node.js 정상 |
+
+### 남은 원인: token !== expected (값 불일치)
+
+server.js:1603: `if (!expected || token !== expected)` — `.trim()` 없는 strict 비교
+
+가능한 불일치 패턴:
+1. **ADMIN_TOKEN 값에 보이지 않는 공백** — Render에서 복붙 시 trailing space·newline 혼입
+2. **[ADMIN CHECK] NONE 로그가 migration 요청과 다른 요청** — 로그 타이밍 미검증
+3. **값 자체 불일치** — Render 저장 값 ≠ Founder가 전송한 값
+
+### [ADMIN CHECK] 로그 보안 수정 계획 (Founder 승인 후 별도 PR)
+
+현재 코드 (server.js:1600-1602):
+```javascript
+console.log('[ADMIN CHECK] token앞6:', token?.slice(0, 6) ?? 'NONE',  // ← 보안 위험
+            '| ADMIN_TOKEN set:', !!expected,
+            '| ENV KEY: ADMIN_TOKEN');
+```
+
+제안 수정:
+```javascript
+console.log('[ADMIN CHECK] tokenLen:', token?.length ?? 'NONE',       // 길이만 출력 (안전)
+            '| expectedLen:', expected?.length ?? 'NONE',
+            '| match:', token === expected);                            // true/false만
+```
+
+효과:
+- 토큰 앞 6자 노출 제거 → 보안 개선
+- 길이 불일치로 공백 여부 즉시 판독 가능 → 진단 개선
+- 비교 결과(true/false)로 조건 직접 확인 가능
+
+### Founder 조작 1개 (코드 변경 없음)
+
+Render → daily-miracles-mvp → Environment → `ADMIN_TOKEN` 값을 새 값으로 교체:
+- 복붙 없이 키보드로 직접 입력 (공백·줄바꿈 혼입 방지)
+- 32자 이상 alphanumeric 권장
+- 저장 → Render 자동 재시작 대기
+
+재시작 완료 후:
+```powershell
+$token = "방금_직접_입력한_새_값"
+Invoke-RestMethod `
+    -Uri "https://app.dailymiracles.kr/api/admin/run-migration" `
+    -Method POST `
+    -Headers @{ "x-admin-token" = $token; "Content-Type" = "application/json" } `
+    -Body '{"migration":"216"}' `
+    -ContentType "application/json"
+```
+
+성공 응답: `{ success: true, migration: "216_dt_partners_sowonpass_fields.sql" }`
