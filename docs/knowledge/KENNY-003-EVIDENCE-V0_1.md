@@ -2634,3 +2634,31 @@ server.js:1600-1602 console.log 1줄 변경:
 - 제안: tokenLen / expectedLen / match 출력
 - 적용 시: 다음 migration 로그에서 길이·일치 여부 즉시 판독
 - Status: BLOCKED — Founder 승인 필요
+
+---
+
+## §60 — ADMIN_TOKEN 최종 진단: Render Manual Deploy 필요 (2026-11-12)
+
+### sens-result 테스트 결과
+GET /api/admin/sens-result?requestId= with x-admin-token=$token → **403**
+→ $token ≠ Live 프로세스 ADMIN_TOKEN 확정
+
+### 소거된 가설 최종 목록
+| 가설 | 소거 근거 |
+|------|-----------|
+| 헤더 전달 차단 | /diag/echo x-test-probe 도달 ✅ |
+| ADMIN_TOKEN 미설정 | Render 로그 set: true ✅ |
+| trailing whitespace | 양쪽 40자 일치 ✅ |
+| 헤더 형식 오류 | x-admin-token + Bearer 모두 시도 ✅ |
+| HTTP→HTTPS 리다이렉트 | Founder가 HTTPS 직접 사용 ✅ |
+
+### 남은 원인: Live 프로세스에 환경변수 미반영
+- 마지막 Render 재시작: 2026-11-10 07:22 UTC (SHA 74a9a96)
+- ADMIN_TOKEN 변경 후 Render Manual Deploy 미실행 가능성
+- Render Auto-Deploy 비활성화 환경 → 환경변수 변경 자동 재시작 미보장
+
+### 조치 1개: Render Manual Deploy
+Render → daily-miracles-mvp → Manual Deploy → Deploy latest commit
+→ 재시작 후 sens-result 재실행
+→ 400 = 인증 성공, migration 실행 가능
+→ 403 = $token 값 자체 불일치 → ADMIN CHECK 로그 수정 PR 필요
