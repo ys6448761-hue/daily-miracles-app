@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-11T21:14:38.407Z",
+  "generated_at": "2026-11-11T21:27:21.250Z",
   "generator": "generate-manifest.js",
   "total_count": 563,
   "documents": [
@@ -3120,7 +3120,7 @@
       "status": "|------",
       "title": "PHX-KENNY-003 — 케니호텔 전용 무여정 영업 시연판 Evidence V0.1",
       "created_at": "2026-11-11",
-      "checksum": "241ebbb8"
+      "checksum": "9f9faf05"
     },
     {
       "id": "DOC-MAP-V01-15-MARKER-PIPELINE-AUD",

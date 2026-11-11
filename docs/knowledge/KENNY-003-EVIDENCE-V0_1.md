@@ -2322,3 +2322,66 @@ ORDER BY column_name;
 ### [ADMIN CHECK] 로그 보안
 token앞6: 출력은 서버 사이드 로그 — 현재 위협 낮음.
 해결 후 console.log 제거 권고 (server.js:1600-1602).
+
+---
+
+## §54 — Migration 216 헤더 미도달 원인 분석 (2026-11-12)
+
+### 로그 판독 결과
+```
+[ADMIN CHECK] token앞6: NONE
+ADMIN_TOKEN set: true
+```
+- `ADMIN_TOKEN`은 운영 서버에 로드됨 ✅
+- 세 토큰 소스 모두 falsy: `x-admin-token` 헤더, `Authorization: Bearer`, `?token=` 쿼리 — **하나도 도달하지 않음**
+
+### DNS 체인 (Cloudflare 경유 확인)
+```
+app.dailymiracles.kr
+  → daily-miracles-app.onrender.com
+  → gcp-us-west1-1.origin.onrender.com
+  → gcp-us-west1-1.origin.onrender.com.cdn.cloudflare.net  ← Cloudflare (216.24.57.x)
+```
+Render가 Cloudflare CDN을 통해 트래픽을 라우팅. 커스텀 도메인 우회 불가.
+
+### CORS allowedHeaders 불일치
+- 현재 설정: `allowedHeaders: ["Content-Type", "Authorization"]`
+- `x-admin-token` 미포함 → 브라우저 기반 도구(Postman Web, fetch)에서 preflight 차단
+- `Authorization: Bearer` 는 포함 → 브라우저에서도 허용됨
+- curl(non-browser)은 CORS 미적용 → 헤더 직접 전송 가능
+
+### 가장 유력한 원인: Windows curl alias
+
+Windows PowerShell에서 `curl`은 `Invoke-WebRequest` alias.  
+`curl -H "x-admin-token: value" -d '{...}'` 구문은 PowerShell의 Invoke-WebRequest에서 작동하지 않음 → 헤더가 전달되지 않은 채 요청이 전송됨.
+
+| 환경 | `curl` 실체 | `-H` 헤더 지원 |
+|------|------------|----------------|
+| Windows PowerShell | `Invoke-WebRequest` alias | ❌ 미지원 |
+| Windows (curl.exe 명시) | 실제 curl 바이너리 | ✅ |
+| macOS / Linux | 실제 curl | ✅ |
+| Git Bash (Windows) | 실제 curl | ✅ |
+
+### ADMIN_TOKEN 전달 경로 (3개)
+server.js:1595-1598:
+```javascript
+const bearerToken = req.headers.authorization?.startsWith('Bearer ')
+  ? req.headers.authorization.slice(7) : null;
+const token = req.headers['x-admin-token'] || bearerToken || req.query.token;
+```
+세 번째 경로 `?token=` 쿼리 파라미터는 헤더 없이도 작동.
+
+### 안전한 진단 명령 (Founder 실행)
+Migration 미실행, 부작용 없는 GET 엔드포인트 사용:
+```bash
+# Windows Git Bash / macOS / Linux
+curl -s "https://app.dailymiracles.kr/api/admin/sens-result?requestId=test&token={ADMIN_TOKEN_값}"
+```
+- **403 반환** → ?token= 쿼리도 도달하지 않음 (더 깊은 프록시 차단)
+- **400 반환** → 토큰 수신 성공, 헤더만 차단됨
+- **200 반환** → 토큰 수신 성공, requestId만 없음
+
+이 결과에 따라 migration 실행 명령어를 확정함.
+
+### 보안 메모
+`[ADMIN CHECK]` 로그의 `token앞6:` 출력은 현재 이슈 해결 후 제거 권고 (server.js:1600-1602).
