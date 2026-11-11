@@ -2285,3 +2285,40 @@ curl -s -X POST https://app.dailymiracles.kr/api/admin/run-migration \
 - allowlist "216" 등재 ✅ (server.js:1703)
 - `ADMIN_TOKEN` Render 미설정 추정 → forbidden
 - Migration 216 미실행
+
+---
+
+## §53 — Migration 216 forbidden 2차 진단 — trim() 부재 + 로그 판독 가이드 (2026-11-12)
+
+### 추가 확인 사항
+
+**Production server.js (origin/main, 74a9a96) 비교 조건:**
+- `token !== expected` — `.trim()` 적용 없음
+- Render env var 값에 trailing whitespace(공백·줄바꿈) 포함 시 → 항상 false → forbidden
+- ADMIN_TOKEN이 설정되어 있고 헤더 형식도 맞는데 forbidden → 값 불일치 (공백 가능성 최고)
+
+**GitHub Production 배포 타임라인:**
+- 마지막 Production 배포: `74a9a96` — 2026-11-10 07:22 UTC (Render)
+- 이후 GitHub Deployment 기록: Vercel Preview만 존재 (Render 별도)
+
+### 로그 판독 매트릭스
+
+| `ADMIN_TOKEN set:` | `token앞6:` | 원인 | 조치 |
+|--------------------|-------------|------|------|
+| false | 무관 | env var 미반영 (배포 타이밍) | Render Manual Deploy |
+| true | NONE | 헤더 미전달 | 헤더 형식 재확인 |
+| true | {값 있음} | 값 불일치 → 공백 의심 | ADMIN_TOKEN 재입력 |
+
+### Migration 216 읽기 전용 확인법
+Supabase SQL Editor:
+```sql
+SELECT column_name FROM information_schema.columns
+WHERE table_name = 'dt_partners'
+  AND column_name IN ('info_status','affiliation_status','location_group','is_night','naver_map_url')
+ORDER BY column_name;
+```
+5행 = 적용 완료 / 0행 = 미적용
+
+### [ADMIN CHECK] 로그 보안
+token앞6: 출력은 서버 사이드 로그 — 현재 위협 낮음.
+해결 후 console.log 제거 권고 (server.js:1600-1602).
