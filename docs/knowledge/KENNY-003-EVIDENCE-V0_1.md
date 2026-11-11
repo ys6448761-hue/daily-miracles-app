@@ -2216,3 +2216,72 @@ curl -s -X POST https://app.dailymiracles.kr/api/admin/run-migration \
 - allowlist 등재 확인 ✅ (server.js:1703)
 - `/api/dt/benefits/starlight` → DB 오류 (예상 — 컬럼 미생성 상태)
 - 인증 우회·코드 수정 금지
+
+---
+
+## §52 — Migration 216 forbidden 최종 원인 특정 (2026-11-12)
+
+### 핵심 발견: 운영 서버에 인증 미들웨어가 2개 존재
+
+| 항목 | verifyAdmin | adminTokenGuard |
+|------|-------------|-----------------|
+| 위치 | `aurora5/middleware/auth.js` | `server.js:1594` (인라인) |
+| 사용 헤더 | `x-admin-key` / `Authorization: Basic` | **`x-admin-token`** / **`Authorization: Bearer`** |
+| 환경변수 | **`ADMIN_API_KEY`** | **`ADMIN_TOKEN`** |
+| 적용 라우트 | `/api/admin/health/full` 등 | **`/api/admin/run-migration`** ← 이 라우트 |
+| 실패 응답 | `401 Admin authentication required` | **`403 forbidden`** ← Founder가 받은 오류 |
+
+**`/api/admin/run-migration`은 `adminTokenGuard`를 사용 → `ADMIN_TOKEN` 환경변수 필요.**  
+`ADMIN_API_KEY`와 `ADMIN_TOKEN`은 완전히 별개의 환경변수.
+
+### forbidden 반환 위치 (server.js:1603)
+
+```
+server.js:1594  adminTokenGuard()
+server.js:1599    token = x-admin-token || Bearer || ?token
+server.js:1599    expected = process.env.ADMIN_TOKEN   ← 이 값이 undefined이면:
+server.js:1603    if (!expected || token !== expected)  ← !undefined = true
+server.js:1604      → 403 { success:false, error:'forbidden' }
+```
+
+### 가장 유력한 원인
+
+Render에 `ADMIN_TOKEN` 환경변수가 **설정되지 않음**.  
+(이전에 `ADMIN_API_KEY`를 설정했더라도 `ADMIN_TOKEN`은 별개 — 함께 설정해야 함)
+
+### 로그 확인법 (값 노출 없이)
+
+Render → daily-miracles-mvp → **Logs** → `[ADMIN CHECK]` 검색:
+
+| 로그 패턴 | 원인 |
+|-----------|------|
+| `ADMIN_TOKEN set: false` | `ADMIN_TOKEN` 환경변수 미설정 |
+| `ADMIN_TOKEN set: true` + `token앞6: NONE` | 헤더 미전달 |
+| `ADMIN_TOKEN set: true` + `token앞6: {X}` | 값 불일치 |
+
+> ⚠️ 보안 메모: `[ADMIN CHECK]` 로그가 토큰 앞 6자를 출력 — 서버 사이드 로그이므로 현재 문제는 아님. 추후 별도 수정 권고.
+
+### Founder 조작 1개
+
+**Render → daily-miracles-mvp → Environment → `ADMIN_TOKEN` 추가**
+
+| 항목 | 내용 |
+|------|------|
+| 경로 | Render 대시보드 → `daily-miracles-mvp` → **Environment** 탭 |
+| 추가 Key | `ADMIN_TOKEN` |
+| 추가 Value | 안전한 랜덤 문자열 (예: 32자 이상 alphanumeric) |
+| 저장 후 | Render 자동 재시작 → 재시작 완료 확인 후 migration 재실행 |
+
+저장 후 migration 실행:
+```bash
+curl -s -X POST https://app.dailymiracles.kr/api/admin/run-migration \
+  -H "Content-Type: application/json" \
+  -H "x-admin-token: {방금_설정한_ADMIN_TOKEN_값}" \
+  -d '{"migration": "216"}'
+```
+
+### 현재 상태
+- Production SHA `74a9a96` 배포 ✅
+- allowlist "216" 등재 ✅ (server.js:1703)
+- `ADMIN_TOKEN` Render 미설정 추정 → forbidden
+- Migration 216 미실행
