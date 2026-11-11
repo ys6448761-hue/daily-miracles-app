@@ -2534,3 +2534,62 @@ Invoke-RestMethod `
 ```
 
 성공 응답: `{ success: true, migration: "216_dt_partners_sowonpass_fields.sql" }`
+
+---
+
+## §58 — ADMIN_TOKEN 영향 범위 + 로그 수정 계획 (2026-11-12)
+
+### ADMIN_TOKEN 사용 파일 (12개)
+
+| 파일 | 용도 | 사용자 영향 |
+|------|------|------------|
+| `server.js` | run-migration, test-wish-entry, sens-result | 없음 (관리자 전용) |
+| `middleware/adminGuard.js` | requireAdmin, verifyAdminToken | 없음 |
+| `routes/adminAiCostRoutes.js` | AI 비용 조회 | 없음 |
+| `routes/adminCablecarRoutes.js` | 케이블카 관리 | 없음 |
+| `routes/adminLocationRoutes.js` | 장소 관리 | 없음 |
+| `routes/adminPartnerRoutes.js` | 파트너 관리 | 없음 |
+| `routes/dreamtownRoutes.js` | 별공방 현황 | 없음 |
+| `routes/hometownRoutes.js` | Hometown 관리 | 없음 |
+| `routes/voyageAdminRoutes.js` | 항로 관리 | 없음 |
+| `routes/wishTrackingRoutes.js` | 소원 추적 | 없음 |
+| `routes/yeosuOpsRoutes.js` | 운영 룰 갱신 | 없음 |
+| `routes/yeosuWishRoutes.js` | 소원 관리 | 없음 |
+
+**모두 관리자 전용 엔드포인트 — ADMIN_TOKEN 교체 시 사용자 기능 영향 없음.**
+단, ADMIN_TOKEN 변경 후 관리자 운영 도구(admin 대시보드 등) 사용 시 새 값으로 갱신 필요.
+
+### [ADMIN CHECK] 로그 수정 계획 (Guardian Preflight)
+
+Requested Change: server.js:1600-1602 console.log 1줄 수정
+Existing Assets: server.js adminTokenGuard 함수
+Change Classification: REPAIR (보안 개선 + 진단 개선)
+Duplication Risk: 없음
+Data Risk: 없음
+Questions Requiring Decision: Founder 승인 필요
+Implementation Status: BLOCKED — Founder "Production 코드 변경 금지" 명시
+
+```javascript
+// 현재 (보안 위험 — token앞6 노출)
+console.log('[ADMIN CHECK] token앞6:', token?.slice(0, 6) ?? 'NONE',
+            '| ADMIN_TOKEN set:', !!expected, '| ENV KEY: ADMIN_TOKEN');
+
+// 제안 (안전 — 길이·일치여부만)
+console.log('[ADMIN CHECK] tokenLen:', token?.length ?? 'NONE',
+            '| expectedLen:', expected?.length ?? 'NONE',
+            '| match:', token === expected);
+```
+
+이 변경이 적용되면 다음 migration 시도 시 로그에서 즉시 진단 가능:
+- `tokenLen: 32 | expectedLen: 33 | match: false` → Render env에 공백 1자 혼입
+- `tokenLen: 32 | expectedLen: 32 | match: false` → 값 자체 불일치
+- `tokenLen: 32 | expectedLen: 32 | match: true` → 인증 통과
+
+### ADMIN_TOKEN 교체 절차 (코드 변경 없음)
+
+1. Render → daily-miracles-mvp → Environment → ADMIN_TOKEN 값 편집
+2. 새 값: 32자 이상 alphanumeric (복붙 금지, 키보드 직접 입력)
+3. 저장 → Render 자동 재시작 대기 (보통 30-60초)
+4. 재시작 완료 후 migration 재실행
+
+영향: admin 운영 도구에서 사용하는 토큰 값도 동시에 갱신 필요.
