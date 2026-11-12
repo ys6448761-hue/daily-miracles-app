@@ -2129,3 +2129,629 @@ DROP 후 migration 재실행 가능.
 | 충돌 없음 | ✅ |
 | 기존 기능 영향 없음 | ✅ |
 | Founder 병합 승인 | ⏳ 대기 |
+
+---
+
+## §51 — Migration 216 forbidden 오류 진단 (2026-11-12)
+
+### 오류 현상
+```
+POST https://app.dailymiracles.kr/api/admin/run-migration
+Body: {"migration":"216"}
+Response: {"success":false,"error":"forbidden"}
+```
+
+### 코드 분석
+
+**`adminTokenGuard` (server.js:1594–1607)**:
+```javascript
+function adminTokenGuard(req, res, next) {
+  const bearerToken = req.headers.authorization?.startsWith('Bearer ')
+    ? req.headers.authorization.slice(7) : null;
+  const token    = req.headers['x-admin-token'] || bearerToken || req.query.token;
+  const expected = process.env.ADMIN_TOKEN;          // ← 환경변수명: ADMIN_TOKEN
+  console.log('[ADMIN CHECK] token앞6:', token?.slice(0,6) ?? 'NONE',
+              '| ADMIN_TOKEN set:', !!expected,       // ← 로그에 set: true/false 출력
+              '| ENV KEY: ADMIN_TOKEN');
+  if (!expected || token !== expected) {
+    return res.status(403).json({ success: false, error: 'forbidden' });  // ← 여기서 반환
+  }
+  next();
+}
+```
+
+**`"216"` allowlist 등재 확인**: server.js:1703 — ✅ 등재됨.  
+`forbidden`은 allowlist 체크 전 단계(1706행)에서 반환 → 인증 실패 원인.
+
+### forbidden 반환 조건 (둘 중 하나)
+
+| 조건 | 의미 |
+|------|------|
+| `process.env.ADMIN_TOKEN`이 undefined | Render에 `ADMIN_TOKEN` 환경변수가 **설정되지 않음** |
+| `token !== expected` | 전송한 토큰 값이 Render의 `ADMIN_TOKEN` 값과 **불일치** |
+
+### 인증 헤더 형식 (server.js 기준)
+
+서버는 아래 세 가지 중 하나를 허용:
+1. `Authorization: Bearer {ADMIN_TOKEN_값}` (슬라이스 후 `slice(7)`)
+2. `x-admin-token: {ADMIN_TOKEN_값}` 헤더
+3. `?token={ADMIN_TOKEN_값}` 쿼리 파라미터
+
+> ⚠️ 오래된 deploy 체크리스트(`docs/DEPLOY-CHECKLIST-STAR-SYSTEM-v1.md`)에 `x-admin-key: $ADMIN_API_KEY`로 기재되어 있으나 **실제 코드와 불일치**. 올바른 헤더는 `x-admin-token` 또는 `Authorization: Bearer`, 올바른 환경변수명은 `ADMIN_TOKEN`.
+
+### 진단 방법 (Render 로그 확인)
+
+Render 대시보드 → `daily-miracles-mvp` → **Logs** 탭에서 `[ADMIN CHECK]` 검색:
+
+| 로그 패턴 | 의미 |
+|-----------|------|
+| `ADMIN_TOKEN set: false` | Render에 `ADMIN_TOKEN` 환경변수 미설정 → 추가 필요 |
+| `ADMIN_TOKEN set: true` + `token앞6: NONE` | 헤더가 아예 전달되지 않음 |
+| `ADMIN_TOKEN set: true` + `token앞6: {값}` | 값 불일치 (오타/공백) |
+
+### 조치 체크리스트 (Founder 직접 수행)
+
+**Step 1 — Render 로그 확인**
+Render → daily-miracles-mvp → Logs → `[ADMIN CHECK]` 검색하여 `ADMIN_TOKEN set:` 값 확인
+
+**Step 2A — 환경변수 미설정인 경우**
+Render → daily-miracles-mvp → Environment → `Add Environment Variable`
+- Key: `ADMIN_TOKEN`
+- Value: 안전한 랜덤 문자열 (예: `openssl rand -hex 32`)
+- 저장 후 Render가 자동 재시작 → 재시작 완료 후 재실행
+
+**Step 2B — 환경변수 설정됐지만 불일치인 경우**
+Render → Environment → `ADMIN_TOKEN` 값 복사 → 그 값 그대로 헤더에 사용
+
+**Step 3 — 올바른 curl 형식**
+```bash
+curl -s -X POST https://app.dailymiracles.kr/api/admin/run-migration \
+  -H "Content-Type: application/json" \
+  -H "x-admin-token: {ADMIN_TOKEN_값}" \
+  -d '{"migration": "216"}'
+```
+
+### 현재 상태
+- Migration 216 미실행 (forbidden 차단됨)
+- allowlist 등재 확인 ✅ (server.js:1703)
+- `/api/dt/benefits/starlight` → DB 오류 (예상 — 컬럼 미생성 상태)
+- 인증 우회·코드 수정 금지
+
+---
+
+## §52 — Migration 216 forbidden 최종 원인 특정 (2026-11-12)
+
+### 핵심 발견: 운영 서버에 인증 미들웨어가 2개 존재
+
+| 항목 | verifyAdmin | adminTokenGuard |
+|------|-------------|-----------------|
+| 위치 | `aurora5/middleware/auth.js` | `server.js:1594` (인라인) |
+| 사용 헤더 | `x-admin-key` / `Authorization: Basic` | **`x-admin-token`** / **`Authorization: Bearer`** |
+| 환경변수 | **`ADMIN_API_KEY`** | **`ADMIN_TOKEN`** |
+| 적용 라우트 | `/api/admin/health/full` 등 | **`/api/admin/run-migration`** ← 이 라우트 |
+| 실패 응답 | `401 Admin authentication required` | **`403 forbidden`** ← Founder가 받은 오류 |
+
+**`/api/admin/run-migration`은 `adminTokenGuard`를 사용 → `ADMIN_TOKEN` 환경변수 필요.**  
+`ADMIN_API_KEY`와 `ADMIN_TOKEN`은 완전히 별개의 환경변수.
+
+### forbidden 반환 위치 (server.js:1603)
+
+```
+server.js:1594  adminTokenGuard()
+server.js:1599    token = x-admin-token || Bearer || ?token
+server.js:1599    expected = process.env.ADMIN_TOKEN   ← 이 값이 undefined이면:
+server.js:1603    if (!expected || token !== expected)  ← !undefined = true
+server.js:1604      → 403 { success:false, error:'forbidden' }
+```
+
+### 가장 유력한 원인
+
+Render에 `ADMIN_TOKEN` 환경변수가 **설정되지 않음**.  
+(이전에 `ADMIN_API_KEY`를 설정했더라도 `ADMIN_TOKEN`은 별개 — 함께 설정해야 함)
+
+### 로그 확인법 (값 노출 없이)
+
+Render → daily-miracles-mvp → **Logs** → `[ADMIN CHECK]` 검색:
+
+| 로그 패턴 | 원인 |
+|-----------|------|
+| `ADMIN_TOKEN set: false` | `ADMIN_TOKEN` 환경변수 미설정 |
+| `ADMIN_TOKEN set: true` + `token앞6: NONE` | 헤더 미전달 |
+| `ADMIN_TOKEN set: true` + `token앞6: {X}` | 값 불일치 |
+
+> ⚠️ 보안 메모: `[ADMIN CHECK]` 로그가 토큰 앞 6자를 출력 — 서버 사이드 로그이므로 현재 문제는 아님. 추후 별도 수정 권고.
+
+### Founder 조작 1개
+
+**Render → daily-miracles-mvp → Environment → `ADMIN_TOKEN` 추가**
+
+| 항목 | 내용 |
+|------|------|
+| 경로 | Render 대시보드 → `daily-miracles-mvp` → **Environment** 탭 |
+| 추가 Key | `ADMIN_TOKEN` |
+| 추가 Value | 안전한 랜덤 문자열 (예: 32자 이상 alphanumeric) |
+| 저장 후 | Render 자동 재시작 → 재시작 완료 확인 후 migration 재실행 |
+
+저장 후 migration 실행:
+```bash
+curl -s -X POST https://app.dailymiracles.kr/api/admin/run-migration \
+  -H "Content-Type: application/json" \
+  -H "x-admin-token: {방금_설정한_ADMIN_TOKEN_값}" \
+  -d '{"migration": "216"}'
+```
+
+### 현재 상태
+- Production SHA `74a9a96` 배포 ✅
+- allowlist "216" 등재 ✅ (server.js:1703)
+- `ADMIN_TOKEN` Render 미설정 추정 → forbidden
+- Migration 216 미실행
+
+---
+
+## §53 — Migration 216 forbidden 2차 진단 — trim() 부재 + 로그 판독 가이드 (2026-11-12)
+
+### 추가 확인 사항
+
+**Production server.js (origin/main, 74a9a96) 비교 조건:**
+- `token !== expected` — `.trim()` 적용 없음
+- Render env var 값에 trailing whitespace(공백·줄바꿈) 포함 시 → 항상 false → forbidden
+- ADMIN_TOKEN이 설정되어 있고 헤더 형식도 맞는데 forbidden → 값 불일치 (공백 가능성 최고)
+
+**GitHub Production 배포 타임라인:**
+- 마지막 Production 배포: `74a9a96` — 2026-11-10 07:22 UTC (Render)
+- 이후 GitHub Deployment 기록: Vercel Preview만 존재 (Render 별도)
+
+### 로그 판독 매트릭스
+
+| `ADMIN_TOKEN set:` | `token앞6:` | 원인 | 조치 |
+|--------------------|-------------|------|------|
+| false | 무관 | env var 미반영 (배포 타이밍) | Render Manual Deploy |
+| true | NONE | 헤더 미전달 | 헤더 형식 재확인 |
+| true | {값 있음} | 값 불일치 → 공백 의심 | ADMIN_TOKEN 재입력 |
+
+### Migration 216 읽기 전용 확인법
+Supabase SQL Editor:
+```sql
+SELECT column_name FROM information_schema.columns
+WHERE table_name = 'dt_partners'
+  AND column_name IN ('info_status','affiliation_status','location_group','is_night','naver_map_url')
+ORDER BY column_name;
+```
+5행 = 적용 완료 / 0행 = 미적용
+
+### [ADMIN CHECK] 로그 보안
+token앞6: 출력은 서버 사이드 로그 — 현재 위협 낮음.
+해결 후 console.log 제거 권고 (server.js:1600-1602).
+
+---
+
+## §54 — Migration 216 헤더 미도달 원인 분석 (2026-11-12)
+
+### 로그 판독 결과
+```
+[ADMIN CHECK] token앞6: NONE
+ADMIN_TOKEN set: true
+```
+- `ADMIN_TOKEN`은 운영 서버에 로드됨 ✅
+- 세 토큰 소스 모두 falsy: `x-admin-token` 헤더, `Authorization: Bearer`, `?token=` 쿼리 — **하나도 도달하지 않음**
+
+### DNS 체인 (Cloudflare 경유 확인)
+```
+app.dailymiracles.kr
+  → daily-miracles-app.onrender.com
+  → gcp-us-west1-1.origin.onrender.com
+  → gcp-us-west1-1.origin.onrender.com.cdn.cloudflare.net  ← Cloudflare (216.24.57.x)
+```
+Render가 Cloudflare CDN을 통해 트래픽을 라우팅. 커스텀 도메인 우회 불가.
+
+### CORS allowedHeaders 불일치
+- 현재 설정: `allowedHeaders: ["Content-Type", "Authorization"]`
+- `x-admin-token` 미포함 → 브라우저 기반 도구(Postman Web, fetch)에서 preflight 차단
+- `Authorization: Bearer` 는 포함 → 브라우저에서도 허용됨
+- curl(non-browser)은 CORS 미적용 → 헤더 직접 전송 가능
+
+### 가장 유력한 원인: Windows curl alias
+
+Windows PowerShell에서 `curl`은 `Invoke-WebRequest` alias.  
+`curl -H "x-admin-token: value" -d '{...}'` 구문은 PowerShell의 Invoke-WebRequest에서 작동하지 않음 → 헤더가 전달되지 않은 채 요청이 전송됨.
+
+| 환경 | `curl` 실체 | `-H` 헤더 지원 |
+|------|------------|----------------|
+| Windows PowerShell | `Invoke-WebRequest` alias | ❌ 미지원 |
+| Windows (curl.exe 명시) | 실제 curl 바이너리 | ✅ |
+| macOS / Linux | 실제 curl | ✅ |
+| Git Bash (Windows) | 실제 curl | ✅ |
+
+### ADMIN_TOKEN 전달 경로 (3개)
+server.js:1595-1598:
+```javascript
+const bearerToken = req.headers.authorization?.startsWith('Bearer ')
+  ? req.headers.authorization.slice(7) : null;
+const token = req.headers['x-admin-token'] || bearerToken || req.query.token;
+```
+세 번째 경로 `?token=` 쿼리 파라미터는 헤더 없이도 작동.
+
+### 안전한 진단 명령 (Founder 실행)
+Migration 미실행, 부작용 없는 GET 엔드포인트 사용:
+```bash
+# Windows Git Bash / macOS / Linux
+curl -s "https://app.dailymiracles.kr/api/admin/sens-result?requestId=test&token={ADMIN_TOKEN_값}"
+```
+- **403 반환** → ?token= 쿼리도 도달하지 않음 (더 깊은 프록시 차단)
+- **400 반환** → 토큰 수신 성공, 헤더만 차단됨
+- **200 반환** → 토큰 수신 성공, requestId만 없음
+
+이 결과에 따라 migration 실행 명령어를 확정함.
+
+### 보안 메모
+`[ADMIN CHECK]` 로그의 `token앞6:` 출력은 현재 이슈 해결 후 제거 권고 (server.js:1600-1602).
+
+---
+
+## §55 — Migration 216 forbidden 최종 원인 확정 (2026-11-12)
+
+### 원인: HTTP → HTTPS 301 리다이렉트 + Invoke-RestMethod 헤더 제거
+
+```
+http://app.dailymiracles.kr/api/admin/run-migration
+  → Cloudflare 301 Redirect
+  → https://app.dailymiracles.kr/api/admin/run-migration
+  
+Invoke-RestMethod 리다이렉트 추적 시:
+  Authorization / x-admin-token 헤더 자동 제거 (보안 정책)
+  → 헤더 없이 HTTPS 서버 도달 → [ADMIN CHECK] token앞6: NONE → 403
+```
+
+검증:
+```
+http://  HEAD → 301 Location: https:// (Cloudflare, Server: cloudflare 확인)
+https:// HEAD → 403 (리다이렉트 없이 서버 직접 도달 확인)
+```
+
+### 패턴
+Invoke-RestMethod는 301 리다이렉트 추적 시 RFC 7235 준수:
+Authorization 및 커스텀 인증 헤더를 다른 origin/scheme으로 전달하지 않음.
+http:// → https:// 스킴 변경 = 헤더 제거 발생.
+
+### 조치
+Founder가 사용한 URL에 http:// 가 포함되어 있다면:
+→ https:// 로 변경하면 리다이렉트 없이 헤더가 그대로 전달됨.
+
+### Migration 216 적용 여부 확인 (Supabase — 읽기 전용)
+```sql
+SELECT column_name FROM information_schema.columns
+WHERE table_name = 'dt_partners'
+  AND column_name IN ('info_status','affiliation_status','location_group','is_night','naver_map_url')
+ORDER BY column_name;
+```
+5행 = 적용 완료 / 0행 = 미적용
+
+---
+
+## §56 — Migration 216 forbidden 3차 진단 — /diag/echo 헤더 도달 테스트 (2026-11-12)
+
+### 소거된 가설
+
+| 가설 | 근거 |
+|------|------|
+| HTTP→HTTPS 리다이렉트 | Founder가 이미 HTTPS 사용 |
+| onrender.com 도메인 리다이렉트 | `/api/` 경로 코드 제외 (server.js 확인) |
+| gateMiddleware 차단 | APP_DISABLED만 체크 |
+| ADMIN_TOKEN 미설정 | Render 로그 `ADMIN_TOKEN set: true` 확인 |
+
+### 발견: /diag/echo 엔드포인트 (production)
+
+```javascript
+app.all("/diag/echo", (req, res) => {
+  res.json({ method, path, headers: req.headers, body, ts });  // 인증 없음
+});
+```
+
+토큰 미사용 헤더 도달 진단에 사용 가능.
+
+### Founder 진단 명령
+```powershell
+Invoke-RestMethod `
+    -Uri "https://app.dailymiracles.kr/diag/echo" `
+    -Method POST `
+    -Headers @{ "x-test-probe" = "hello-123"; "Content-Type" = "application/json" } `
+    -Body '{}' -ContentType "application/json"
+```
+
+판독:
+- `x-test-probe: hello-123` 응답에 있음 → 헤더 도달, ADMIN_TOKEN 값 비교 문제
+- 없음 → 커스텀 헤더 프록시 차단
+
+### Migration 216 읽기 전용 확인
+Supabase SQL Editor:
+```sql
+SELECT column_name FROM information_schema.columns
+WHERE table_name = 'dt_partners'
+  AND column_name IN ('info_status','affiliation_status','location_group','is_night','naver_map_url')
+ORDER BY column_name;
+```
+5행 = 적용완료 / 0행 = 미적용
+
+---
+
+## §57 — Migration 216 forbidden 최종 원인 확정 + 조치 계획 (2026-11-12)
+
+### 최종 확인 결과
+
+| 항목 | 결과 |
+|------|------|
+| /diag/echo x-test-probe 도달 | ✅ 헤더 전달 정상 |
+| Migration 216 적용 여부 (Supabase SQL) | ❌ 0행 — 미적용 |
+| ADMIN_TOKEN set | ✅ Render 환경변수 존재 |
+| 헤더→서버 경로 | ✅ PowerShell→Cloudflare→Render→Node.js 정상 |
+
+### 남은 원인: token !== expected (값 불일치)
+
+server.js:1603: `if (!expected || token !== expected)` — `.trim()` 없는 strict 비교
+
+가능한 불일치 패턴:
+1. **ADMIN_TOKEN 값에 보이지 않는 공백** — Render에서 복붙 시 trailing space·newline 혼입
+2. **[ADMIN CHECK] NONE 로그가 migration 요청과 다른 요청** — 로그 타이밍 미검증
+3. **값 자체 불일치** — Render 저장 값 ≠ Founder가 전송한 값
+
+### [ADMIN CHECK] 로그 보안 수정 계획 (Founder 승인 후 별도 PR)
+
+현재 코드 (server.js:1600-1602):
+```javascript
+console.log('[ADMIN CHECK] token앞6:', token?.slice(0, 6) ?? 'NONE',  // ← 보안 위험
+            '| ADMIN_TOKEN set:', !!expected,
+            '| ENV KEY: ADMIN_TOKEN');
+```
+
+제안 수정:
+```javascript
+console.log('[ADMIN CHECK] tokenLen:', token?.length ?? 'NONE',       // 길이만 출력 (안전)
+            '| expectedLen:', expected?.length ?? 'NONE',
+            '| match:', token === expected);                            // true/false만
+```
+
+효과:
+- 토큰 앞 6자 노출 제거 → 보안 개선
+- 길이 불일치로 공백 여부 즉시 판독 가능 → 진단 개선
+- 비교 결과(true/false)로 조건 직접 확인 가능
+
+### Founder 조작 1개 (코드 변경 없음)
+
+Render → daily-miracles-mvp → Environment → `ADMIN_TOKEN` 값을 새 값으로 교체:
+- 복붙 없이 키보드로 직접 입력 (공백·줄바꿈 혼입 방지)
+- 32자 이상 alphanumeric 권장
+- 저장 → Render 자동 재시작 대기
+
+재시작 완료 후:
+```powershell
+$token = "방금_직접_입력한_새_값"
+Invoke-RestMethod `
+    -Uri "https://app.dailymiracles.kr/api/admin/run-migration" `
+    -Method POST `
+    -Headers @{ "x-admin-token" = $token; "Content-Type" = "application/json" } `
+    -Body '{"migration":"216"}' `
+    -ContentType "application/json"
+```
+
+성공 응답: `{ success: true, migration: "216_dt_partners_sowonpass_fields.sql" }`
+
+---
+
+## §58 — ADMIN_TOKEN 영향 범위 + 로그 수정 계획 (2026-11-12)
+
+### ADMIN_TOKEN 사용 파일 (12개)
+
+| 파일 | 용도 | 사용자 영향 |
+|------|------|------------|
+| `server.js` | run-migration, test-wish-entry, sens-result | 없음 (관리자 전용) |
+| `middleware/adminGuard.js` | requireAdmin, verifyAdminToken | 없음 |
+| `routes/adminAiCostRoutes.js` | AI 비용 조회 | 없음 |
+| `routes/adminCablecarRoutes.js` | 케이블카 관리 | 없음 |
+| `routes/adminLocationRoutes.js` | 장소 관리 | 없음 |
+| `routes/adminPartnerRoutes.js` | 파트너 관리 | 없음 |
+| `routes/dreamtownRoutes.js` | 별공방 현황 | 없음 |
+| `routes/hometownRoutes.js` | Hometown 관리 | 없음 |
+| `routes/voyageAdminRoutes.js` | 항로 관리 | 없음 |
+| `routes/wishTrackingRoutes.js` | 소원 추적 | 없음 |
+| `routes/yeosuOpsRoutes.js` | 운영 룰 갱신 | 없음 |
+| `routes/yeosuWishRoutes.js` | 소원 관리 | 없음 |
+
+**모두 관리자 전용 엔드포인트 — ADMIN_TOKEN 교체 시 사용자 기능 영향 없음.**
+단, ADMIN_TOKEN 변경 후 관리자 운영 도구(admin 대시보드 등) 사용 시 새 값으로 갱신 필요.
+
+### [ADMIN CHECK] 로그 수정 계획 (Guardian Preflight)
+
+Requested Change: server.js:1600-1602 console.log 1줄 수정
+Existing Assets: server.js adminTokenGuard 함수
+Change Classification: REPAIR (보안 개선 + 진단 개선)
+Duplication Risk: 없음
+Data Risk: 없음
+Questions Requiring Decision: Founder 승인 필요
+Implementation Status: BLOCKED — Founder "Production 코드 변경 금지" 명시
+
+```javascript
+// 현재 (보안 위험 — token앞6 노출)
+console.log('[ADMIN CHECK] token앞6:', token?.slice(0, 6) ?? 'NONE',
+            '| ADMIN_TOKEN set:', !!expected, '| ENV KEY: ADMIN_TOKEN');
+
+// 제안 (안전 — 길이·일치여부만)
+console.log('[ADMIN CHECK] tokenLen:', token?.length ?? 'NONE',
+            '| expectedLen:', expected?.length ?? 'NONE',
+            '| match:', token === expected);
+```
+
+이 변경이 적용되면 다음 migration 시도 시 로그에서 즉시 진단 가능:
+- `tokenLen: 32 | expectedLen: 33 | match: false` → Render env에 공백 1자 혼입
+- `tokenLen: 32 | expectedLen: 32 | match: false` → 값 자체 불일치
+- `tokenLen: 32 | expectedLen: 32 | match: true` → 인증 통과
+
+### ADMIN_TOKEN 교체 절차 (코드 변경 없음)
+
+1. Render → daily-miracles-mvp → Environment → ADMIN_TOKEN 값 편집
+2. 새 값: 32자 이상 alphanumeric (복붙 금지, 키보드 직접 입력)
+3. 저장 → Render 자동 재시작 대기 (보통 30-60초)
+4. 재시작 완료 후 migration 재실행
+
+영향: admin 운영 도구에서 사용하는 토큰 값도 동시에 갱신 필요.
+
+---
+
+## §59 — ADMIN_TOKEN 길이 일치 + Live 프로세스 적용 여부 진단 (2026-11-12)
+
+### 현황
+- Render ADMIN_TOKEN: 40자
+- PowerShell $token: 40자
+- 클립보드: 3자 (다른 내용 — $token 설정과 무관)
+- 길이 일치 → trailing space 가설 소거
+- 남은 가능성: Render 환경변수 변경이 Live 프로세스에 미반영
+
+### Render 배포 타임라인
+- 마지막 GitHub Production 배포: 2026-11-10 07:22 UTC (SHA 74a9a96)
+- ADMIN_TOKEN 설정 시각: 불명 — Render 자체 Logs에만 기록
+- Render는 환경변수 변경 시 자동 재시작하나, Auto-Deploy 비활성화 환경에서는 미확인
+
+### 인증 테스트 (코드 변경·Migration 없음)
+
+GET /api/admin/sens-result — adminTokenGuard를 거치는 읽기 전용 엔드포인트
+- 403 → $token ≠ Live 프로세스 ADMIN_TOKEN (Render 미반영 또는 값 불일치)
+- 400 → $token = Live 프로세스 ADMIN_TOKEN ✅ (Migration도 같은 값으로 성공)
+
+```powershell
+try {
+    Invoke-RestMethod `
+        -Uri "https://app.dailymiracles.kr/api/admin/sens-result?requestId=" `
+        -Method GET `
+        -Headers @{ "x-admin-token" = $token } `
+        -ErrorAction Stop
+} catch {
+    Write-Host "HTTP Status: $($_.Exception.Response.StatusCode.value__)"
+}
+```
+
+### [ADMIN CHECK] 로그 수정 계획 (Founder 승인 대기)
+server.js:1600-1602 console.log 1줄 변경:
+- 현재: token앞6 출력 (보안 위험)
+- 제안: tokenLen / expectedLen / match 출력
+- 적용 시: 다음 migration 로그에서 길이·일치 여부 즉시 판독
+- Status: BLOCKED — Founder 승인 필요
+
+---
+
+## §60 — ADMIN_TOKEN 최종 진단: Render Manual Deploy 필요 (2026-11-12)
+
+### sens-result 테스트 결과
+GET /api/admin/sens-result?requestId= with x-admin-token=$token → **403**
+→ $token ≠ Live 프로세스 ADMIN_TOKEN 확정
+
+### 소거된 가설 최종 목록
+| 가설 | 소거 근거 |
+|------|-----------|
+| 헤더 전달 차단 | /diag/echo x-test-probe 도달 ✅ |
+| ADMIN_TOKEN 미설정 | Render 로그 set: true ✅ |
+| trailing whitespace | 양쪽 40자 일치 ✅ |
+| 헤더 형식 오류 | x-admin-token + Bearer 모두 시도 ✅ |
+| HTTP→HTTPS 리다이렉트 | Founder가 HTTPS 직접 사용 ✅ |
+
+### 남은 원인: Live 프로세스에 환경변수 미반영
+- 마지막 Render 재시작: 2026-11-10 07:22 UTC (SHA 74a9a96)
+- ADMIN_TOKEN 변경 후 Render Manual Deploy 미실행 가능성
+- Render Auto-Deploy 비활성화 환경 → 환경변수 변경 자동 재시작 미보장
+
+### 조치 1개: Render Manual Deploy
+Render → daily-miracles-mvp → Manual Deploy → Deploy latest commit
+→ 재시작 후 sens-result 재실행
+→ 400 = 인증 성공, migration 실행 가능
+→ 403 = $token 값 자체 불일치 → ADMIN CHECK 로그 수정 PR 필요
+
+---
+
+## §61 — Migration 216 컬럼 존재 확인 (2026-11-12, VERIFIED ✅)
+
+### 확인 방법
+- 엔드포인트: `GET https://app.dailymiracles.kr/api/dt/benefits/starlight`
+- 공개 엔드포인트 (인증 불필요), `dtBenefitPublicRoutes.js:36-70`
+- 해당 쿼리는 `info_status`, `affiliation_status`, `location_group`, `is_night`, `naver_map_url` 5개 컬럼을 SELECT
+
+### 결과
+- HTTP 200 OK 반환
+- 응답: `{"hotel_vicinity":[],"yeosu_city":[]}`
+- 판정: **5개 컬럼 모두 `public.dt_partners`에 존재 확인**
+
+### 근거
+- 컬럼이 하나라도 없으면 PostgreSQL `column does not exist` 오류 → 500 반환
+- 200 반환 = 모든 컬럼 존재 = Migration 216 `yeosu_miracle_travel` DB 정상 적용 확인
+- 빈 배열은 `info_status = 'verified'` 파트너 미적재 상태 — 정상
+
+### 운영 DB 최종 확인
+- Render PostgreSQL 서비스: `yeosu-miracle-db`
+- Database: `yeosu_miracle_travel`
+- Migration 216 API: `success: true` + 컬럼 존재 확인 ✅
+
+### 다음 단계
+1. Excel (`PHX-BENEFIT-001_Review`) 경로 Founder 제공 → 업체 데이터 Admin API로 적재
+2. 적재 후 `/kenny` benefit 패널 모바일 검증
+
+---
+
+## §62 — PHX-BENEFIT-001 엑셀 1차 분석 및 운영 결정 (2026-11-12)
+
+### 파일 위치
+`C:\DEV\daily-miracles-mvp\docs\research\sowonpass\PHX-BENEFIT-001_Review(여수방군 - 식당후보지).xlsx`
+
+### 조사 결과 (엑셀 직접 파싱)
+- 신규 발굴 업체: **30곳** (전체 "신규 발굴" 구분)
+- 완전 검증: **0곳** (전체 "부분 확인")
+- 네이버 상호·주소·번호 대조 완료: **3곳** (1번·4번·27번)
+- 호텔 1km 직선 거리 확인: **3곳** (공개 좌표 직선 계산)
+- 제휴 접촉: **전체 미접촉**
+
+### 분류
+| 분류 | 업체 | 우선순위 |
+|---|---|---|
+| hotel_vicinity 후보 (1km 확인) | 좌수영바게트버거(1) · 순이네밥상(27) · 낭만카페(4) | 1·2·6 |
+| yeosu_city 우선10 후보 | 통만두집·함남면옥·노랑고래찹쌀꽈배기·청수당여수·진남식당·복춘식당·바다김밥중앙점 | 3·4·5·7·8·9·10 |
+| 보완 후 검토 | 나머지 20곳 | - |
+
+### Founder 운영 결정 (7개)
+1. 본부장 추진 명단 대조 완료 전 연락 금지
+2. 30곳 모두 `info_status=unverified`, `affiliation_status=none` 유지
+3. 쿠폰·제휴 혜택 표시 금지
+4. Migration 216 + 소원패스 UI 유지
+5. 본부장 명단 대조용 업체별 체크리스트 준비
+6. 주소·영업시간·네이버 링크 미검증 → 검증 완료 표시 금지
+7. Founder 승인 전 Production 업체 적재 및 쿠폰 발행 금지
+
+### 현재 DB 상태
+- `dt_partners`: 0건 (업체 미적재)
+- `dt_benefits`: 미적재
+- Production `/api/dt/benefits/starlight`: 200 OK, 빈 배열 반환 (정상)
+
+---
+
+## §63 — 소원패스 개편 방향 결정 및 Preflight (2026-11-12, BLOCKED)
+
+### Founder 결정 (7개 운영 원칙)
+1. 소원패스(SOWON PASS) / EP01 별빛혜택 명칭 유지
+2. 호텔 주변·여수 전체·음식점·카페 탐색 구조로 개편
+3. 추천 장소(소개) ↔ 실제 제휴 쿠폰 명확히 구분
+4. 워커 발굴 30곳 후보군 보존, 우선10곳부터 단계적 공개
+5. hotel_vicinity 3곳 고정 아님 — 실제 보행경로 검증에 따라 확대
+6. 사랑도 19번·동우랑 충무점 = 첫 제휴 대상, 조건 확인 후 쿠폰 시스템 연결
+7. 미검증·미제휴 업체에 쿠폰 표시 금지
+
+### 기존 자산 (재사용 가능)
+- `dt_partners` + `dt_benefits` 스키마 완비 (migration 086 + 216)
+- `GET /api/dt/benefits/starlight` 공개 API — location_group 필터, has_coupon/is_night 반환
+- KennyHotelPage benefit 패널 — hotel_vicinity/yeosu_city 탭, has_coupon 배지, naver_map_url 지도 링크 완비
+- 미존재: category 필터, Admin 적재 라우트
+
+### Change Classification: EXTEND
+- 기존 스키마·API·UI가 새 방향 수용 가능
+- 추가 필요: category 필터(API+UI), Admin 적재 라우트 or seed SQL
+
+### BLOCKED 사유 (미결 5개)
+- Q1: 사랑도 19번 — 주소·전화·category·location_group·naver_map_url 미제공
+- Q2: 동우랑 충무점 — 동일 정보 미제공
+- Q3: 업체 적재 방법 미결정 (Admin API vs seed SQL)
+- Q4: category 탐색 UI 추가 여부 미결정
+- Q5: food 메뉴와 benefit 메뉴 통합 여부 미결정
