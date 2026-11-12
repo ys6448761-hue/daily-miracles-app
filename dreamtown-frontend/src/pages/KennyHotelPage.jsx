@@ -42,8 +42,8 @@ const T = {
     starlight:   '별빛항로·소원그림',
     starlightSub:'여수의 밤을 더 특별하게 만드는 1박 2일 별빛 경험.',
     starlightTag:'시연용',
-    benefit:     '여수 별빛혜택',
-    benefitSub:  '케니호텔 투숙객을 위한 여수 전체 혜택 모음.',
+    benefit:     '소원패스',
+    benefitSub:  '여수 추천 장소와 소원패스 제휴 혜택을 탐색하세요.',
     benefitTag:  '시연용',
     food:        '호텔 주변 맛집·쿠폰',
     foodSub:     '케니호텔 주변 추천 식당과 혜택 정보.',
@@ -59,14 +59,19 @@ const T = {
     comingDesc:  '더 완성된 서비스로 곧 찾아올게요.',
     goGuide:     'SOUL에게 물어보기 →',
     // 소원패스 혜택 패널
-    sowonpassTitle:    '소원패스 별빛혜택',
+    sowonpassTitle:    '소원패스 (SOWON PASS)',
     sowonpassEp:       'EP01 별빛혜택',
     sowonpassTabHotel: '호텔 케니 주변',
     sowonpassTabCity:  '여수 시내',
+    sowonpassTabAll:        '전체',
+    sowonpassTabRestaurant: '음식점',
+    sowonpassTabCafe:       '카페',
+    sowonpassTabCoupon:     '제휴 혜택',
     sowonpassNight:      '야간',
     sowonpassCoupon:     '제휴 혜택',
     sowonpassIntro:      '소개',
     sowonpassEmpty:      '별빛혜택 준비 중이에요. 곧 여수의 멋진 혜택들을 소개할게요.',
+    sowonpassCatEmpty:   '이 카테고리에 등록된 업체가 없어요.',
     sowonpassLoading:    '혜택 정보를 불러오는 중…',
     sowonpassError:      '혜택 정보를 불러오지 못했어요.',
     sowonpassMapLink:    '지도 보기',
@@ -99,8 +104,8 @@ const T = {
     starlight:   'Starlight Route · Wish Art',
     starlightSub:'A special 1-night-2-day starlight experience in Yeosu.',
     starlightTag:'Demo',
-    benefit:     'Yeosu Starlight Benefits',
-    benefitSub:  'Exclusive perks in Yeosu for Kenny Hotel guests.',
+    benefit:     'Sowon Pass',
+    benefitSub:  'Explore Yeosu\'s recommended spots and Sowon Pass partner benefits.',
     benefitTag:  'Demo',
     food:        'Nearby Restaurants & Coupons',
     foodSub:     'Recommended dining spots near Kenny Hotel.',
@@ -116,14 +121,19 @@ const T = {
     comingDesc:  "We're preparing a more complete experience for you.",
     goGuide:     'Ask SOUL →',
     // 소원패스 혜택 패널
-    sowonpassTitle:    'Sowon Pass Starlight Benefits',
+    sowonpassTitle:    'Sowon Pass',
     sowonpassEp:       'EP01 Starlight Benefits',
     sowonpassTabHotel: 'Near Kenny Hotel',
     sowonpassTabCity:  'Downtown Yeosu',
+    sowonpassTabAll:        'All',
+    sowonpassTabRestaurant: 'Restaurant',
+    sowonpassTabCafe:       'Café',
+    sowonpassTabCoupon:     'Partner Benefit',
     sowonpassNight:      'Night',
     sowonpassCoupon:     'Partner Benefit',
     sowonpassIntro:      'Info',
     sowonpassEmpty:      'Starlight benefits coming soon. We\'ll share great Yeosu perks shortly.',
+    sowonpassCatEmpty:   'No places in this category yet.',
     sowonpassLoading:    'Loading benefits…',
     sowonpassError:      'Could not load benefits.',
     sowonpassMapLink:    'Map',
@@ -230,6 +240,7 @@ function DemoCard({ t, onGoGuide }) {
 // ── 소원패스 별빛혜택 패널 ─────────────────────────────────────────────────────
 function SowonPassPanel({ t, lang }) {
   const [activeTab, setActiveTab] = React.useState('hotel_vicinity');
+  const [activeCategory, setActiveCategory] = React.useState('all');
   const [data, setData] = React.useState({ hotel_vicinity: [], yeosu_city: [] });
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(false);
@@ -243,7 +254,19 @@ function SowonPassPanel({ t, lang }) {
       .catch(() => { setError(true); setLoading(false); });
   }, []);
 
-  const list = data[activeTab] ?? [];
+  function handleAreaTab(tab) {
+    setActiveTab(tab);
+    setActiveCategory('all');
+  }
+
+  const rawList = data[activeTab] ?? [];
+  const list = rawList.filter(p => {
+    if (activeCategory === 'all')        return true;
+    if (activeCategory === 'coupon')     return p.has_coupon;
+    if (activeCategory === 'restaurant') return p.category === 'restaurant';
+    if (activeCategory === 'cafe')       return p.category === 'cafe';
+    return true;
+  });
 
   const CATEGORY_ICON = {
     cafe:          '☕',
@@ -255,6 +278,24 @@ function SowonPassPanel({ t, lang }) {
     etc:           '📍',
   };
 
+  const CAT_TABS = [
+    { key: 'all',        label: t.sowonpassTabAll },
+    { key: 'restaurant', label: t.sowonpassTabRestaurant },
+    { key: 'cafe',       label: t.sowonpassTabCafe },
+    { key: 'coupon',     label: t.sowonpassTabCoupon },
+  ];
+
+  const tabBtn = (active) => ({
+    padding:      '5px 12px',
+    borderRadius: '20px',
+    border:       active ? '1.5px solid #FFD67A' : '1px solid var(--soul-chip-border)',
+    background:   active ? 'rgba(255,214,122,0.12)' : 'var(--soul-chip-bg)',
+    color:        active ? '#FFD67A' : 'var(--soul-text-muted)',
+    fontSize:     '0.8125rem',
+    fontWeight:   active ? 600 : 400,
+    cursor:       'pointer',
+  });
+
   return (
     <div
       style={{
@@ -265,30 +306,41 @@ function SowonPassPanel({ t, lang }) {
       }}
     >
       {/* 헤더 */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-        <span style={{ fontSize: '0.6875rem', color: '#FFD67A', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+      <div style={{ marginBottom: '12px' }}>
+        <p style={{ fontSize: '0.75rem', color: '#FFD67A', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', margin: '0 0 2px' }}>
+          SOWON PASS
+        </p>
+        <p style={{ fontSize: '0.6875rem', color: 'rgba(255,214,122,0.7)', fontWeight: 500, margin: 0 }}>
           {t.sowonpassEp}
-        </span>
+        </p>
       </div>
 
-      {/* 탭 */}
-      <div style={{ display: 'flex', gap: '6px', marginBottom: '14px' }}>
+      {/* 지역 탭 */}
+      <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
         {(['hotel_vicinity', 'yeosu_city']).map(tab => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
-            style={{
-              padding:      '6px 14px',
-              borderRadius: '20px',
-              border:       activeTab === tab ? '1.5px solid #FFD67A' : '1px solid var(--soul-chip-border)',
-              background:   activeTab === tab ? 'rgba(255,214,122,0.12)' : 'var(--soul-chip-bg)',
-              color:        activeTab === tab ? '#FFD67A' : 'var(--soul-text-muted)',
-              fontSize:     '0.8125rem',
-              fontWeight:   activeTab === tab ? 600 : 400,
-              cursor:       'pointer',
-            }}
+            onClick={() => handleAreaTab(tab)}
+            style={tabBtn(activeTab === tab)}
           >
             {tab === 'hotel_vicinity' ? t.sowonpassTabHotel : t.sowonpassTabCity}
+          </button>
+        ))}
+      </div>
+
+      {/* 카테고리 탭 */}
+      <div style={{ display: 'flex', gap: '6px', marginBottom: '14px', flexWrap: 'wrap' }}>
+        {CAT_TABS.map(({ key, label }) => (
+          <button
+            key={key}
+            onClick={() => setActiveCategory(key)}
+            style={{
+              ...tabBtn(activeCategory === key),
+              fontSize: '0.75rem',
+              padding:  '4px 10px',
+            }}
+          >
+            {label}
           </button>
         ))}
       </div>
@@ -302,9 +354,13 @@ function SowonPassPanel({ t, lang }) {
         <p style={{ fontSize: '0.8125rem', color: 'var(--soul-text-muted)', textAlign: 'center', padding: '20px 0' }}>
           {t.sowonpassError}
         </p>
-      ) : list.length === 0 ? (
+      ) : rawList.length === 0 ? (
         <p style={{ fontSize: '0.8125rem', color: 'var(--soul-text-muted)', textAlign: 'center', padding: '20px 0', lineHeight: 1.6, wordBreak: 'keep-all' }}>
           {t.sowonpassEmpty}
+        </p>
+      ) : list.length === 0 ? (
+        <p style={{ fontSize: '0.8125rem', color: 'var(--soul-text-muted)', textAlign: 'center', padding: '20px 0', lineHeight: 1.6, wordBreak: 'keep-all' }}>
+          {t.sowonpassCatEmpty}
         </p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>

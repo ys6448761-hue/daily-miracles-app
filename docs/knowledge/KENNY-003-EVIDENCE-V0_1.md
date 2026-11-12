@@ -2662,3 +2662,96 @@ Render → daily-miracles-mvp → Manual Deploy → Deploy latest commit
 → 재시작 후 sens-result 재실행
 → 400 = 인증 성공, migration 실행 가능
 → 403 = $token 값 자체 불일치 → ADMIN CHECK 로그 수정 PR 필요
+
+---
+
+## §61 — Migration 216 컬럼 존재 확인 (2026-11-12, VERIFIED ✅)
+
+### 확인 방법
+- 엔드포인트: `GET https://app.dailymiracles.kr/api/dt/benefits/starlight`
+- 공개 엔드포인트 (인증 불필요), `dtBenefitPublicRoutes.js:36-70`
+- 해당 쿼리는 `info_status`, `affiliation_status`, `location_group`, `is_night`, `naver_map_url` 5개 컬럼을 SELECT
+
+### 결과
+- HTTP 200 OK 반환
+- 응답: `{"hotel_vicinity":[],"yeosu_city":[]}`
+- 판정: **5개 컬럼 모두 `public.dt_partners`에 존재 확인**
+
+### 근거
+- 컬럼이 하나라도 없으면 PostgreSQL `column does not exist` 오류 → 500 반환
+- 200 반환 = 모든 컬럼 존재 = Migration 216 `yeosu_miracle_travel` DB 정상 적용 확인
+- 빈 배열은 `info_status = 'verified'` 파트너 미적재 상태 — 정상
+
+### 운영 DB 최종 확인
+- Render PostgreSQL 서비스: `yeosu-miracle-db`
+- Database: `yeosu_miracle_travel`
+- Migration 216 API: `success: true` + 컬럼 존재 확인 ✅
+
+### 다음 단계
+1. Excel (`PHX-BENEFIT-001_Review`) 경로 Founder 제공 → 업체 데이터 Admin API로 적재
+2. 적재 후 `/kenny` benefit 패널 모바일 검증
+
+---
+
+## §62 — PHX-BENEFIT-001 엑셀 1차 분석 및 운영 결정 (2026-11-12)
+
+### 파일 위치
+`C:\DEV\daily-miracles-mvp\docs\research\sowonpass\PHX-BENEFIT-001_Review(여수방군 - 식당후보지).xlsx`
+
+### 조사 결과 (엑셀 직접 파싱)
+- 신규 발굴 업체: **30곳** (전체 "신규 발굴" 구분)
+- 완전 검증: **0곳** (전체 "부분 확인")
+- 네이버 상호·주소·번호 대조 완료: **3곳** (1번·4번·27번)
+- 호텔 1km 직선 거리 확인: **3곳** (공개 좌표 직선 계산)
+- 제휴 접촉: **전체 미접촉**
+
+### 분류
+| 분류 | 업체 | 우선순위 |
+|---|---|---|
+| hotel_vicinity 후보 (1km 확인) | 좌수영바게트버거(1) · 순이네밥상(27) · 낭만카페(4) | 1·2·6 |
+| yeosu_city 우선10 후보 | 통만두집·함남면옥·노랑고래찹쌀꽈배기·청수당여수·진남식당·복춘식당·바다김밥중앙점 | 3·4·5·7·8·9·10 |
+| 보완 후 검토 | 나머지 20곳 | - |
+
+### Founder 운영 결정 (7개)
+1. 본부장 추진 명단 대조 완료 전 연락 금지
+2. 30곳 모두 `info_status=unverified`, `affiliation_status=none` 유지
+3. 쿠폰·제휴 혜택 표시 금지
+4. Migration 216 + 소원패스 UI 유지
+5. 본부장 명단 대조용 업체별 체크리스트 준비
+6. 주소·영업시간·네이버 링크 미검증 → 검증 완료 표시 금지
+7. Founder 승인 전 Production 업체 적재 및 쿠폰 발행 금지
+
+### 현재 DB 상태
+- `dt_partners`: 0건 (업체 미적재)
+- `dt_benefits`: 미적재
+- Production `/api/dt/benefits/starlight`: 200 OK, 빈 배열 반환 (정상)
+
+---
+
+## §63 — 소원패스 개편 방향 결정 및 Preflight (2026-11-12, BLOCKED)
+
+### Founder 결정 (7개 운영 원칙)
+1. 소원패스(SOWON PASS) / EP01 별빛혜택 명칭 유지
+2. 호텔 주변·여수 전체·음식점·카페 탐색 구조로 개편
+3. 추천 장소(소개) ↔ 실제 제휴 쿠폰 명확히 구분
+4. 워커 발굴 30곳 후보군 보존, 우선10곳부터 단계적 공개
+5. hotel_vicinity 3곳 고정 아님 — 실제 보행경로 검증에 따라 확대
+6. 사랑도 19번·동우랑 충무점 = 첫 제휴 대상, 조건 확인 후 쿠폰 시스템 연결
+7. 미검증·미제휴 업체에 쿠폰 표시 금지
+
+### 기존 자산 (재사용 가능)
+- `dt_partners` + `dt_benefits` 스키마 완비 (migration 086 + 216)
+- `GET /api/dt/benefits/starlight` 공개 API — location_group 필터, has_coupon/is_night 반환
+- KennyHotelPage benefit 패널 — hotel_vicinity/yeosu_city 탭, has_coupon 배지, naver_map_url 지도 링크 완비
+- 미존재: category 필터, Admin 적재 라우트
+
+### Change Classification: EXTEND
+- 기존 스키마·API·UI가 새 방향 수용 가능
+- 추가 필요: category 필터(API+UI), Admin 적재 라우트 or seed SQL
+
+### BLOCKED 사유 (미결 5개)
+- Q1: 사랑도 19번 — 주소·전화·category·location_group·naver_map_url 미제공
+- Q2: 동우랑 충무점 — 동일 정보 미제공
+- Q3: 업체 적재 방법 미결정 (Admin API vs seed SQL)
+- Q4: category 탐색 UI 추가 여부 미결정
+- Q5: food 메뉴와 benefit 메뉴 통합 여부 미결정
