@@ -475,6 +475,171 @@ function _detectPlaceLookupIntent(message) {
   return { isPlaceLookup: false };
 }
 
+// ── PHX-SOUL-QA-001 Phase 1 (REPAIR): 장소 인식과 질문 Intent 분리 ──────────────
+// - _detectPlacesInMessage: 메시지에 등장한 장소 code 목록 (중복 제거, 긴 alias 우선 소비)
+// - 장소 정보 질문(체류/운영시간)·추천 요청·카페 요청·이전 질문 참조를 각각 판정한다.
+// - 기존 Discovery / Journey / PSQ 경로의 판정 함수는 변경하지 않는다.
+const _PLACE_NAME_KO_OVERRIDE = { marine_park: '종포해양공원' };
+function _placeNameKo(code) {
+  if (_PLACE_NAME_KO_OVERRIDE[code]) return _PLACE_NAME_KO_OVERRIDE[code];
+  let best = null;
+  for (const [alias, c] of Object.entries(PLACE_ALIAS_MAP)) {
+    if (c === code && (best === null || alias.length < best.length)) best = alias;
+  }
+  return best || code;
+}
+
+function _detectPlacesInMessage(message) {
+  if (!message) return [];
+  const found = [];
+  let rest = String(message);
+  const aliases = Object.keys(PLACE_ALIAS_MAP).sort((a, b) => b.length - a.length);
+  for (const alias of aliases) {
+    if (!rest.includes(alias)) continue;
+    const code = PLACE_ALIAS_MAP[alias];
+    if (!found.includes(code)) found.push(code);
+    rest = rest.split(alias).join(' '.repeat(alias.length));
+  }
+  return found;
+}
+
+// 관람/체류 소요시간 질문. 운영시간(hours_ko)과 구분하기 위해 별도 판정한다.
+const _STAY_QUESTION_RE = /(관람|체류|머무|둘러보는 데|얼마나 (봐|보|둘러|머물|있)|얼마 동안|몇 시간|몇 분|시간.{0,4}(잡|필요|얼마|정도))/;
+const _HOURS_QUESTION_RE = /(운영시간|운영 시간|영업시간|개방 시간|언제까지|몇 시에)/;
+const _RECOMMEND_RE = /(추천|어디 갈|어디가 좋|갈 만한|갈만한|가볼 만한|가볼만한|둘러볼 만한|좋은 곳|뭐 할까|뭐 하지)/;
+function _isStayTimeQuestion(message) { return _STAY_QUESTION_RE.test(message || ''); }
+function _isHoursQuestion(message) { return _HOURS_QUESTION_RE.test(message || ''); }
+function _isRecommendationRequest(message) { return _RECOMMEND_RE.test(message || ''); }
+function _isCafeQuestion(message) {
+  const m = message || '';
+  if (!/(카페|커피)/.test(m)) return false;
+  if (/(일정|코스|반나절|하루|\d박)/.test(m)) return false;
+  return /(추천|알려|어디|찾|있어|있나|있을까|좋은)/.test(m);
+}
+function _isPreviousTurnReference(message) {
+  return /(아까|방금|이전|앞서|조금 전|직전).{0,8}(질문|말|얘기|대답|답변)/.test(message || '');
+}
+
+// 아이 동반 표현이 메시지에 없으면 family_with_kids로 추론하지 않는다 (Founder Q2).
+const _CHILD_PHRASES = ['아이', '자녀', '애기', '아기', '어린이', '유아', '초등', '아들', '딸', '애들', '손주'];
+function _correctFamilyWithoutKids(message, soulContext) {
+  if (!soulContext || soulContext.people_type !== 'family_with_kids') return soulContext;
+  const msg = message || '';
+  if (_CHILD_PHRASES.some(p => msg.includes(p))) return soulContext;
+  return {
+    ...soulContext,
+    people_type: 'group',
+    has_kids: false,
+    companion_constraints: { ...(soulContext.companion_constraints || {}), has_kids: false },
+    _provenance: { ...(soulContext._provenance || {}), people_type: 'AI_INFERENCE' },
+  };
+}
+
+// 장소 정보 응답. 체류시간은 DB avg_stay_minutes만 사용하고, 없으면 미확인으로 안내한다.
+// 운영시간(hours_ko)은 운영시간으로만 표기하며 관람 소요시간으로 쓰지 않는다.
+function _buildPlaceInfoPayload(code, place, sessionId, kind) {
+  const name = _placeNameKo(code);
+  const knowledge = _PLACE_KNOWLEDGE[code] || {};
+  const lines = [];
+  if (kind === 'STAY') {
+    const stay = place && place.avg_stay_minutes;
+    if (stay != null) {
+      lines.push(`${name}은(는) 평균적으로 약 ${stay}분 정도 머무는 곳으로 안내하고 있어요.`);
+    } else {
+      lines.push(`${name}의 관람 소요시간 정보는 아직 확인되지 않았어요.`);
+    }
+    if (knowledge.hours_ko) lines.push(`운영시간은 ${knowledge.hours_ko}예요. (관람 소요시간이 아니라 운영시간이에요.)`);
+  } else {
+    if (knowledge.hours_ko) lines.push(`${name}의 운영시간은 ${knowledge.hours_ko}예요.`);
+    else lines.push(`${name}의 운영시간은 아직 확인되지 않았어요.`);
+  }
+  if (knowledge.hours_trust === 'NON_OFFICIAL') lines.push('운영 상황은 방문 전에 한 번 더 확인해 주세요.');
+  return {
+    session_id: sessionId,
+    understood_context: {},
+    places: [],
+    why_details: [],
+    message_ko: lines.join('\n'),
+    status: 'PLACE_LOOKUP',
+    intent: kind === 'STAY' ? 'PLACE_STAY_INFO' : 'PLACE_HOURS_INFO',
+    presentation_mode: 'PLACE_KNOWLEDGE',
+    resolved_code: code,
+    next_options: [],
+    timestamp: new Date().toISOString(),
+    shared_journey: null,
+    quote: null,
+    route: null,
+  };
+}
+
+// 복수 장소 요청: 두 장소를 모두 유지하고, 일정 구성은 아직 불가하다고 명시한다.
+function _buildMultiPlaceInfoPayload(codes, places, sessionId) {
+  const lines = codes.map((code, i) => {
+    const place = places[i];
+    const knowledge = _PLACE_KNOWLEDGE[code] || {};
+    const stay = place && place.avg_stay_minutes;
+    const stayText = stay != null ? `평균 약 ${stay}분 머무는 곳` : '관람 소요시간 미확인';
+    const hoursText = knowledge.hours_ko ? `, 운영시간 ${knowledge.hours_ko}` : '';
+    return `• ${_placeNameKo(code)}: ${stayText}${hoursText}`;
+  });
+  return {
+    session_id: sessionId,
+    understood_context: {},
+    places: [],
+    why_details: [],
+    message_ko: [
+      '말씀하신 장소들의 정보를 먼저 안내해 드릴게요.',
+      ...lines,
+      '두 장소를 묶은 반나절 일정은 아직 구성해 드릴 수 없어요.',
+    ].join('\n'),
+    status: 'MULTI_PLACE_INFO',
+    intent: 'MULTI_PLACE_INFO',
+    presentation_mode: 'PLACE_KNOWLEDGE',
+    resolved_codes: codes,
+    next_options: [],
+    timestamp: new Date().toISOString(),
+    shared_journey: null,
+    quote: null,
+    route: null,
+  };
+}
+
+function _buildCafeNotSupportedPayload(sessionId) {
+  return {
+    session_id: sessionId,
+    understood_context: {},
+    places: [],
+    why_details: [],
+    message_ko: '카페 추천 기능은 아직 준비 중이에요. 관광지 정보는 장소 이름을 말씀해 주시면 안내해 드릴게요.',
+    status: 'NOT_SUPPORTED_YET',
+    intent: 'CAFE_RECOMMENDATION',
+    presentation_mode: 'PLACE_KNOWLEDGE',
+    next_options: [],
+    timestamp: new Date().toISOString(),
+    shared_journey: null,
+    quote: null,
+    route: null,
+  };
+}
+
+function _buildContextUnavailablePayload(sessionId) {
+  return {
+    session_id: sessionId,
+    understood_context: {},
+    places: [],
+    why_details: [],
+    message_ko: '직전 질문 내용은 아직 기억하지 못해요. 질문을 다시 보내 주시면 바로 답변해 드릴게요.',
+    status: 'CONTEXT_NOT_AVAILABLE',
+    intent: 'PREVIOUS_TURN_REFERENCE',
+    presentation_mode: 'CLARIFICATION',
+    next_options: [],
+    timestamp: new Date().toISOString(),
+    shared_journey: null,
+    quote: null,
+    route: null,
+  };
+}
+
 // ── PLACE_IDENTITY_KO: verified identity descriptions per code ─────────────────
 // Derived from: place name, zone location (seed), emotion_tags (seed), verified public knowledge.
 // DATA GAP: description_short is NULL for all 12 places (seed 001 + migrations 1–216).
@@ -815,7 +980,7 @@ async function _understand(message, options = {}) {
     }
     return { ok: false, error: soulContext.error };
   }
-  return { ok: true, soulContext: _correctCoupleClassification(message, soulContext) };
+  return { ok: true, soulContext: _correctFamilyWithoutKids(message, _correctCoupleClassification(message, soulContext)) };
 }
 
 // ─── Traveler Profile Continuity V0.1 ────────────────────────────────────────
@@ -1683,7 +1848,9 @@ function _generateClarificationMessage(soulContext, message, journeyCtx) {
 
   // Cable car positive intent (or "일정에 넣어줘" reference)
   // Strong-intent verbs: explicit desire or future-plan ("탈거야" = will ride = intent, not curiosity)
-  if (/케이블카|케이블 카/.test(msg)) {
+  // PHX-SOUL-QA-001 RC2: 다른 장소가 함께 언급되면 케이블카 전용 clarification을 쓰지 않는다.
+  const _otherPlaces = _detectPlacesInMessage(msg).filter(c => c !== 'cablecar');
+  if (/케이블카|케이블 카/.test(msg) && _otherPlaces.length === 0) {
     if (/(꼭|반드시|타고 싶|타야|태워|일정에 넣|일정에 포함|일정에 추가|탈거야|탈 거야|탈거예요|탈려고|타러|탈 예정)/.test(msg)) {
       return _cableClar();
     }
@@ -1714,6 +1881,11 @@ function _generateClarificationMessage(soulContext, message, journeyCtx) {
   // Specific operational/photo question — do NOT replace with companion context.
   // These questions have a clear factual intent; companion framing would be confusing.
   if (/(운행|운영|열었|오픈|마감|비 오|날씨|기상|사진|찍어|찍을|포토|얼마나|걸려|요금|입장|가격)/.test(msg)) {
+    // PHX-SOUL-QA-001 RC1: 장소명이 메시지에 있으면 장소를 다시 묻지 않는다.
+    const _namedPlaces = _detectPlacesInMessage(msg);
+    if (_namedPlaces.length === 1) {
+      return `${_placeNameKo(_namedPlaces[0])}에 대해 어떤 게 궁금하신가요? 관람시간, 운영시간, 주차처럼 구체적으로 물어봐 주시면 답해 드릴게요.`;
+    }
     return '더 정확히 알아볼게요. 어느 장소에 대해 궁금하신가요?';
   }
 
@@ -1920,7 +2092,7 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPla
   } else {
     secondLine = curPlaceName && isDiscovery
       ? `${curPlaceName} 다음으로 갈 곳을 골라봤어요.`
-      : '이동 시간까지 생각해서 편하게 갈 수 있는 곳으로 골라봐요.';
+      : '장소 사이 이동시간은 아직 확인되지 않아 계산에 넣지 않았어요.';
   }
 
   return `${situationLine}\n${secondLine}`;
@@ -2374,6 +2546,27 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
     }
     if (cityIntent === 'MULTI_CITY_REQUEST') return _buildMultiCityPayload(sessionId);
     if (cityIntent === 'AMBIGUOUS')          return _buildAmbiguousCityPayload(sessionId);
+  }
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  // ─── PHX-SOUL-QA-001 Phase 1: 질문 Intent 분리 (REPAIR) ─────────────────────
+  // 기존 Discovery / Journey / PSQ 경로는 건드리지 않고, 명확한 경우만 먼저 분기한다.
+  if (_isPreviousTurnReference(message)) {
+    return { ok: true, payload: _buildContextUnavailablePayload(sessionId) };
+  }
+  // 카페 요청: 현재 장소 화면(place_code)의 PSQ 질문은 기존 PSQ 경로가 처리한다.
+  if (!(explicit_context && explicit_context.place_code) && _isCafeQuestion(message)) {
+    return { ok: true, payload: _buildCafeNotSupportedPayload(sessionId) };
+  }
+  {
+    const _qaCodes = _detectPlacesInMessage(message);
+    // 중앙시장은 Founder 정책 B에 따라 기존 경로에서만 처리한다.
+    const _qaBlocked = _qaCodes.includes('jungang_market') || _isJourneyPlanningIntent(message) || _isRecommendationRequest(message);
+    if (!_qaBlocked && _qaCodes.length === 1 && (_isStayTimeQuestion(message) || _isHoursQuestion(message))) {
+      const _qaPlace = await travelGuideService.getPlaceByCode(_qaCodes[0]).catch(() => null);
+      const _qaKind = _isStayTimeQuestion(message) ? 'STAY' : 'HOURS';
+      return { ok: true, payload: _buildPlaceInfoPayload(_qaCodes[0], _qaPlace, sessionId, _qaKind) };
+    }
   }
   // ─────────────────────────────────────────────────────────────────────────────
 
@@ -2959,6 +3152,15 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
       return { ok: true, payload: _buildNighttimeWalkPayload(sessionId, message) };
     }
 
+    // PHX-SOUL-QA-001 RC2: 복수 장소 요청은 기존 여정·PSQ 경로 이후, clarification 직전에 장소별 정보로 답한다.
+    // 중앙시장 정책 B 대상이면 이 분기를 건너뛴다.
+    {
+      const _mpCodes = _detectPlacesInMessage(message);
+      if (_mpCodes.length >= 2 && !_mpCodes.includes('jungang_market')) {
+        const _mpPlaces = await Promise.all(_mpCodes.map(c => travelGuideService.getPlaceByCode(c).catch(() => null)));
+        return { ok: true, payload: _buildMultiPlaceInfoPayload(_mpCodes, _mpPlaces, sessionId) };
+      }
+    }
     const clarificationMsg = _generateClarificationMessage(soulContext, message, journeyCtxForClar);
 
     // Persist explicit leisure preference BEFORE returning response.

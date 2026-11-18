@@ -21,6 +21,25 @@ Last Updated: 2026-11-03 (PHX-COMMERCE-TICKET-005 PARTIAL — PHP Spec + E2E Har
 5. docs/decisions/DECISION_PHOENIX_D2_LIVING_DETAIL_PAGE_V0_1.md  ← D2 결정
 ```
 
+### PHX-SOUL-QA-001 Phase 1 — 관광정보 응답 REPAIR 구현 (Updated: 2026-11-19)
+
+- **브랜치**: `fix/phx-soul-qa-001-response-routing` (origin/main 2659b2d 기준, 미병합, 미배포)
+- **Evidence**: `docs/knowledge/PHX-SOUL-QA-001_RESPONSE_ROUTING_INVESTIGATION.md`
+- **해결(오프라인 재현 + 테스트 확인)**
+  - RC1: 장소명 포함 체류·운영시간 질문을 장소 정보로 답변. 장소명 재질문 제거
+  - RC2: 복수 장소 요청은 케이블카 전용 clarification 대신 장소별 정보로 답변 (일정 구성 미구현 명시)
+  - 아이 동반 미명시 시 family_with_kids 보정 → group (실제 LLM 출력 형태 포함 테스트)
+  - 이동시간 문구를 실제 계산(미계산)과 일치하도록 수정
+  - 모이핀 미확인 혜택을 코스 블록·일반 혜택 조회 모두에서 제외 (DB 데이터는 변경 안 함)
+  - Kenny 페이지 2일차 설명의 모이핀 브랜드명 제거
+- **미해결 (Pending, 명시적 응답 또는 todo)**
+  - RC3 routeSkeletonService main 미포함 → 반나절 일정 구성 불가 (Founder Q1: Phase 2)
+  - RC4 이전 질문 문맥 저장 미구현 → "기억하지 못해요" 정직 응답만 제공
+  - RC5 카페 검색 미구현 → "준비 중" 명시
+  - T02 도보 관광 코스 품질 (routeSkeleton 의존)
+- **테스트**: SOUL 기준 595 통과, 1 실패(R20, 기준선과 동일), 2 todo, supertest 로드 실패(기준선과 동일)
+- **Production SHA**: 미확인 (Founder 확인 대기)
+
 ### ★ Current Next Action (exactly 1) — Updated: 2026-11-03
 
 **PHP 담당자에게 명세 전달 → HMAC 벡터 4개 PHP 재현 확인 → 스테이징 E2E → FLOW_TICKET_ENABLED=true**
