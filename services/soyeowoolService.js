@@ -21,6 +21,7 @@ const quoteEngine = require('./quoteEngine');
 const sessionService = require('./sessionService');
 const { isHybridV1Enabled } = require('./soulHybridFlag');
 const { classifyDirect, generateDirectReply } = require('./soulDirectResponse');
+const { classifyFastPath } = require('./soulFastPath');
 
 const CAPABILITY = 'TRAVEL_INTELLIGENCE';
 const SOURCE = 'travelGuideService/8-filter-cascade';
@@ -481,6 +482,25 @@ function _detectPlaceLookupIntent(message) {
 // - _detectPlacesInMessage: 메시지에 등장한 장소 code 목록 (중복 제거, 긴 alias 우선 소비)
 // - 장소 정보 질문(체류/운영시간)·추천 요청·카페 요청·이전 질문 참조를 각각 판정한다.
 // - 기존 Discovery / Journey / PSQ 경로의 판정 함수는 변경하지 않는다.
+// PHX-SOUL-QA-001 H2: 추출 없이 확정 응답을 만드는 공통 payload (기존 응답 스키마와 같은 키).
+function _buildFastPathPayload(sessionId, status, intent, text) {
+  return {
+    session_id: sessionId,
+    understood_context: {},
+    places: [],
+    why_details: [],
+    message_ko: text,
+    status,
+    intent,
+    presentation_mode: 'PLACE_KNOWLEDGE',
+    next_options: [],
+    timestamp: new Date().toISOString(),
+    shared_journey: null,
+    quote: null,
+    route: null,
+  };
+}
+
 const _PLACE_NAME_KO_OVERRIDE = { marine_park: '종포해양공원' };
 function _placeNameKo(code) {
   if (_PLACE_NAME_KO_OVERRIDE[code]) return _PLACE_NAME_KO_OVERRIDE[code];
@@ -2902,6 +2922,25 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
           }
         };
       }
+    }
+  }
+
+  // PHX-SOUL-QA-001 H2 (Hybrid V1, 기본 비활성): 혜택 문의와 실시간 운행 문의는 검증된 사실만 추출 없이 답한다.
+  if (isHybridV1Enabled()) {
+    const _fpCodes = _detectPlacesInMessage(message);
+    const _fp = classifyFastPath(message, _fpCodes.length);
+    if (_fp === 'BENEFIT') {
+      return { ok: true, payload: _buildFastPathPayload(sessionId, 'BENEFIT_NOT_CONFIRMED', 'BENEFIT_INQUIRY',
+        '확인된 공식 혜택 정보를 찾지 못했어요. 혜택 여부는 소원패스 공식 안내나 현장에서 확인해 주세요.') };
+    }
+    if (_fp === 'LIVE') {
+      const _lc = _fpCodes[0];
+      const _lk = _PLACE_KNOWLEDGE[_lc] || {};
+      const _lname = _placeNameKo(_lc);
+      const _lhours = _lk.hours_ko ? `운영시간은 ${_lk.hours_ko}예요.` : '운영시간은 확인되지 않았어요.';
+      const _lphone = _lk.phone ? ` 현장 운행 상황은 ${_lk.phone}으로 확인해 주세요.` : '';
+      return { ok: true, payload: _buildFastPathPayload(sessionId, 'LIVE_UNAVAILABLE', 'LIVE_STATUS_INQUIRY',
+        `${_lname}의 지금 운행 여부는 실시간 정보가 없어서 확인할 수 없어요. ${_lhours}${_lphone}`) };
     }
   }
 
