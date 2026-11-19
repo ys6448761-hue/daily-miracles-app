@@ -583,7 +583,7 @@ function _buildPlaceInfoPayload(code, place, sessionId, kind, message) {
     } else {
       lines.push(`${name}의 관람 소요시간 정보는 아직 확인되지 않았어요.`);
     }
-    if (knowledge.hours_ko) lines.push(`운영시간은 ${knowledge.hours_ko}예요. (관람 소요시간이 아니라 운영시간이에요.)`);
+    if (knowledge.hours_ko) lines.push(`운영시간은 ${knowledge.hours_ko}예요.`);
   } else {
     if (knowledge.hours_ko) lines.push(`${name}의 운영시간은 ${knowledge.hours_ko}예요.`);
     else lines.push(`${name}의 운영시간은 아직 확인되지 않았어요.`);
@@ -1400,6 +1400,12 @@ function _isJourneyPlanningIntent(message) {
   return false;
 }
 
+// RC3 M5 보강: 골격에 실제 장소 항목(추천 장소 또는 선택 레저)이 하나라도 있는지 확인. 표지·숙소만 있는 골격은 false.
+function _hasRoutePlaceItem(route) {
+  return (route.days || []).some(d => (d.items || []).some(i =>
+    i.source === 'SOUL_RECOMMENDED' || (i.commerce_code && i.type !== 'hotel')));
+}
+
 // Extract number of overnight stays from message.
 // "1박2일" → 1, "2박3일" → 2. Caps at 7.
 function _extractNights(message) {
@@ -1954,7 +1960,7 @@ function _generateClarificationMessage(soulContext, message, journeyCtx) {
   return `${CITY_DISPLAY_NAME} 여행을 더 잘 도와드릴 수 있도록, 어떤 여행을 계획하고 계신지 말씀해 주세요.`;
 }
 
-function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPlaceCode = null, effectiveMobility = null, allPlaceWarnings = new Set()) {
+function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPlaceCode = null, effectiveMobility = null, allPlaceWarnings = new Set(), messageOpts = {}) {
   const provenance = soulContext._provenance || {};
   const pt = soulContext.people_type;
   const timeMinutes = soulContext.time_available_minutes;
@@ -2060,6 +2066,10 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPla
 
   // D6 soft clarification for UNKNOWN time (PARTIAL)
   if (status === 'PARTIAL') {
+    // M4 (RC3 Q2): 실제 추천 후보가 없으면 "골라봤어요" 같은 추천 완료 표현을 쓰지 않는다 (장소 문맥 없는 일반 발견 요청만).
+    if (messageOpts.hasCandidates === false && !currentPlaceCode) {
+      return `${situationLine}\n아직 확인된 장소 후보가 없어요. 여행 지역이나 가고 싶은 분위기를 알려주시면 다시 찾아볼게요.`;
+    }
     // Multi-day first: "1박2일" makes time_available clarification contradictory.
     if (_isMultiDayTrip(message)) {
       return placePrefix
@@ -2095,6 +2105,11 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPla
       if (pt === 'family_with_kids') return `아이들과 함께 여행이시군요.\n아이와 함께 즐길 수 있는 곳을 골라봤어요.`;
       // Guard: USER_EXPLICIT only — backward-compat default (null→true) must not trigger car intro
       if (soulContext.has_car === true && (soulContext._provenance || {}).has_car === 'USER_EXPLICIT') return `차를 가져오셨군요. 이동이 한결 자유롭겠어요.\n자차로 다니기 좋은 곳을 골라봤어요.`;
+    }
+    // M4 (RC3 Q2): 일정 요청인데 일정이 없으면, 장소 후보는 연결 미검증 후보로만 구분해 안내한다.
+    if (messageOpts.hasRoute !== true && _isJourneyPlanningIntent(message)) {
+      const baseLine = placePrefix ? `${placePrefix}\n${situationLine}` : situationLine;
+      return `${baseLine}\n확인된 장소 후보를 알려드릴게요. 장소 사이의 도보 연결과 이동시간은 아직 확인되지 않았어요.\n시간이 얼마나 남으셨어요?`;
     }
     // Default PARTIAL — place-aware if current place known
     if (placePrefix) {
@@ -3548,8 +3563,10 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
     try {
       const { buildSkeleton } = require('./routeSkeletonService');
       const nights = _extractNights(message);
+      // M5 (RC3 Q2): 숙박 조건이 명시되지 않은 요청은 2일 일정을 만들지 않는다 (당일 일정 미지원 → 안전 처리).
+      const _hasExplicitNights = /\d박/.test(message || '');
       const _skeletonHotelCode = _hotelCodeForSkeleton(message, quoteCtx);
-      routeSkeleton = buildSkeleton({
+      routeSkeleton = _hasExplicitNights ? buildSkeleton({
         start_date:     quoteCtx.travel_date || null,
         hotel_code:     _skeletonHotelCode,
         leisure_code:   _resolvedLeisure,
@@ -3557,7 +3574,9 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
         guest_count:    quoteCtx.guest_count || domainContext.group_size || 2,
         candidates:     tgResult.places || [],
         nights,
-      });
+      }) : null;
+      // M5 보강 (RC3): 실제 장소 항목이 없는 골격(도착·마무리 표지뿐)은 코스로 제시하지 않는다.
+      if (routeSkeleton && !_hasRoutePlaceItem(routeSkeleton)) routeSkeleton = null;
 
       // Write-back: preserve existing journey_ctx fields + update route fields.
       // departure_origin / hotel_lodging stored as independent additive keys.
@@ -3565,8 +3584,8 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
       const _roles = _extractSemanticRoles(message);
       sessionService.updateJourneyContext(sessionId, {
         ...(journeyCtxForSkeleton || {}),
-        route_id:         routeSkeleton.route_id,
-        nights,
+        route_id:         routeSkeleton ? routeSkeleton.route_id : ((journeyCtxForSkeleton && journeyCtxForSkeleton.route_id) || null),
+        nights:           _hasExplicitNights ? nights : ((journeyCtxForSkeleton && journeyCtxForSkeleton.nights) || null),
         hotel_code:       _skeletonHotelCode,
         leisure_code:     _resolvedLeisure,
         guest_count:      quoteCtx.guest_count  || domainContext.group_size || null,
@@ -3596,7 +3615,10 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   const allPlaceWarnings = new Set(
     (tgResult && tgResult.places ? tgResult.places : []).flatMap(p => p.warnings || [])
   );
-  let soulMessage = _generateSoulMessage(enrichedSoulContext, status, message, quoteCtx, explicit_context.place_code || null, domainContext.mobility_constraint || null, allPlaceWarnings);
+  let soulMessage = _generateSoulMessage(enrichedSoulContext, status, message, quoteCtx, explicit_context.place_code || null, domainContext.mobility_constraint || null, allPlaceWarnings, {
+    hasCandidates: !!(tgResult && Array.isArray(tgResult.places) && tgResult.places.length > 0),
+    hasRoute: !!(routeSkeleton && Array.isArray(routeSkeleton.days) && routeSkeleton.days.length > 0),
+  });
 
   // Companion PARTIAL supplement: append place names in message for family_elderly/family_with_kids
   // so the UI shows actual recommendations.
