@@ -1,9 +1,73 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-19T08:59:39.720Z",
+  "generated_at": "2026-11-19T21:10:17.859Z",
   "generator": "generate-manifest.js",
-  "total_count": 571,
+  "total_count": 575,
   "documents": [
+    {
+      "id": "DOC-PHX-SOUL-QA-001_APPROVAL_AND_P",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_APPROVAL_AND_PRESERVATION_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "PHX-SOUL-QA-001 — Clarify 구현 승인 및 원격 보존 (V1, 2026-11-20)",
+      "created_at": "2026-11-20",
+      "checksum": "2a915455"
+    },
+    {
+      "id": "DOC-PHX-SOUL-QA-001_CLARIFY_IMPLEM",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_CLARIFY_IMPLEMENTATION_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "superseded",
+      "title": "PHX-SOUL-QA-001 — Clarify 정책 선별 구현 (V1, 2026-11-20)",
+      "created_at": "2026-11-20",
+      "checksum": "cebb1ba4"
+    },
+    {
+      "id": "DOC-PHX-SOUL-QA-001_CLARIFY_POLICY",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_CLARIFY_POLICY_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "superseded",
+      "title": "PHX-SOUL-QA-001 — Clarify 정책 조사 및 최소 수정 계획 (V1, 2026-11-20)",
+      "created_at": "2026-11-20",
+      "checksum": "bc8c4fb5"
+    },
+    {
+      "id": "DOC-PHX-SOUL-QA-001_REMOTE_PRESERV",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_REMOTE_PRESERVATION_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "항목",
+      "title": "PHX-SOUL-QA-001 — 원격 보존 실행 (V1, 2026-11-19)",
+      "created_at": "2026-11-20",
+      "checksum": "34cddf7e"
+    },
     {
       "id": "DOC-PHX-SOUL-QA-001_DEV_CHECKPOINT",
       "path": "docs/knowledge/PHX-SOUL-QA-001_DEV_CHECKPOINT_V1.md",
