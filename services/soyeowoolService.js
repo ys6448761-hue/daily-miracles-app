@@ -21,6 +21,7 @@ const quoteEngine = require('./quoteEngine');
 const sessionService = require('./sessionService');
 const { isHybridV1Enabled } = require('./soulHybridFlag');
 const { classifyDirect, generateDirectReply } = require('./soulDirectResponse');
+const { eligibleForAdaptive, adaptiveGeneralAnswer } = require('./soulAdaptive');
 const { classifyFastPath } = require('./soulFastPath');
 
 const CAPABILITY = 'TRAVEL_INTELLIGENCE';
@@ -2969,6 +2970,30 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
       } };
     }
     // LLM 실패 시 기존 흐름으로 되돌린다 (재질문을 새로 만들지 않음).
+  }
+
+  // PHX-SOUL-QA-001 Adaptive General Advice (Hybrid V1, 기본 비활성): 규칙이 놓친 일반 여행 조언만 LLM 1회로 분류·답변한다.
+  // GENERAL_ANSWER일 때만 직접 답하고, 그 외 route나 실패는 기존 흐름으로 넘긴다. 응답은 라우트에서 가드를 거친다.
+  if (isHybridV1Enabled() && !_isPreviousTurnReference(message)
+      && eligibleForAdaptive(message, _detectPlacesInMessage(message).length)) {
+    const _ad = await adaptiveGeneralAnswer(message);
+    if (_ad && _ad.route === 'GENERAL_ANSWER' && _ad.answer) {
+      return { ok: true, payload: {
+        session_id: sessionId,
+        understood_context: {},
+        places: [],
+        why_details: [],
+        message_ko: _ad.answer,
+        status: 'DIRECT_RESPONSE',
+        intent: 'GENERAL_ADVICE',
+        presentation_mode: 'DIRECT_RESPONSE',
+        next_options: [],
+        timestamp: new Date().toISOString(),
+        shared_journey: null,
+        quote: null,
+        route: null,
+      } };
+    }
   }
 
   // UNDERSTAND + SHARED JOURNEY EXTRACTION (parallel — independent AI calls)
