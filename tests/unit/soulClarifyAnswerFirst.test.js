@@ -97,7 +97,7 @@ describe('4-A — H06·H14: 명시적 걷기·동반 신호 → 검증된 장소
     expect(msg).not.toContain(CLARIFY_PHRASE);
     expect(msg).toContain('방파제 길');            // experience_ko (검증 텍스트)
     expect(msg).toContain('걷는 부담');            // walking_ok (검증 텍스트)
-    expect(msg).toContain('운영시간은 연중무휴');    // hours_ko
+    expect(msg).toContain('운영시간은 상시 개방 (연중무휴)'); // hours_ko (§64: 섬 개방시간)
     expect(msg).toContain('장소 사이의 도보 연결과 이동시간은 아직 확인되지 않았어요');
     expect(TIME_PATTERN.test(msg)).toBe(false);     // 이동시간 생성 금지
     expect(msg).not.toMatch(/\?\s*$/m);             // 필수 정보가 아니므로 추가 질문 없음

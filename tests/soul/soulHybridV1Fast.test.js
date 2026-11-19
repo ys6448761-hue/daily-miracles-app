@@ -93,7 +93,8 @@ describe('H2 플래그 활성 — Knowledge Fast Path', () => {
     const r = await req('여수 케이블카는 지금 운행하고 있어?');
     expect(r.payload.status).toBe('LIVE_UNAVAILABLE');
     expect(r.payload.message_ko).toMatch(/실시간 정보가 없어서 확인할 수 없어요/);
-    expect(r.payload.message_ko).toMatch(/09:30~21:30/);
+    expect(r.payload.message_ko).not.toMatch(/09:30~21:30/); // §64 Q63-2: 케이블카 운영시간 미확인
+    expect(r.payload.message_ko).toMatch(/운영시간은 확인되지 않았어요/);
     expect(r.payload.message_ko).not.toMatch(/현재 운행하고 있어요/);
     expect(contextSvc.parseUserMessage).not.toHaveBeenCalled();
   });

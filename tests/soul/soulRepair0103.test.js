@@ -60,7 +60,7 @@ describe('REPAIR-01 운영시간과 체류시간 구분', () => {
 
   test('관람 소요 질문은 체류시간을 답하고 운영시간을 체류로 바꾸지 않는다', async () => {
     const r = await req('오동도 관람시간은 얼마나 걸려?');
-    expect(r.payload.message_ko).toMatch(/평균적으로 약 120분/);
+    expect(r.payload.message_ko).toMatch(/일정에서 약 90분/); // §64 Q63-1
     expect(r.payload.intent).toBe('PLACE_STAY_INFO');
   });
 
@@ -85,7 +85,7 @@ describe('REPAIR-01 운영시간과 체류시간 구분', () => {
 describe('REPAIR-02 한국어 조사 선택 (기존 _koreanParticle 재사용)', () => {
   test('받침 없는 장소명은 "는", 받침 있는 장소명은 "은"을 쓴다 (체류 문구)', async () => {
     const odongdo = await req('오동도 관람시간은 얼마나 걸려?');
-    expect(odongdo.payload.message_ko).toMatch(/오동도는 평균적으로/);
+    expect(odongdo.payload.message_ko).toMatch(/오동도는 일정에서/); // §64 Q63-1
     expect(odongdo.payload.message_ko).not.toMatch(/은\(는\)/);
     const hyang = await req('향일암 관람시간은 얼마나 걸려?');
     expect(hyang.payload.message_ko).toMatch(/향일암은 평균적으로/);

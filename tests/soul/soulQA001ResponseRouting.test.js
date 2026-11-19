@@ -76,7 +76,7 @@ describe('T01 오동도 관람시간 질문', () => {
     expect(result.ok).toBe(true);
     expect(result.payload.message_ko).not.toMatch(/어느 장소에 대해/);
     expect(result.payload.message_ko).toMatch(/오동도/);
-    expect(result.payload.message_ko).toMatch(/120분/);
+    expect(result.payload.message_ko).toMatch(/일정에서 약 90분/); // §64 Q63-1: 오동도 체류는 일정 배정 90분 (DB 120 평균 미노출)
   });
 
   test('운영시간(hours_ko)을 관람 소요시간으로 표기하지 않는다', async () => {

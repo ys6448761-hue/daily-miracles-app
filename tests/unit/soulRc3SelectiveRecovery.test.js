@@ -93,7 +93,7 @@ describe('M3 — H04·H17 관람 소요시간과 운영시간 의미 구분', ()
     const r = await req('오동도 관람시간은 얼마나 걸려?');
     const msg = r.payload.message_ko || '';
     expect(msg).not.toContain('관람 소요시간이 아니라');
-    expect(msg).toContain('120분');
+    expect(msg).toContain('일정에서 약 90분'); // §64 Q63-1 (120분 평균 노출 금지)
   });
 
   test('H17: 한 바퀴 소요 질문도 같은 모순 문구가 없다', async () => {

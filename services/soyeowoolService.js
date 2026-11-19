@@ -331,12 +331,13 @@ function _buildPlaceContextClarificationPayload(keyword, sessionId) {
 const _PLACE_KNOWLEDGE = {
   cablecar: {
     phone: '061-664-7301',
-    ride_duration_ko: '편도 약 12~13분, 거리 1.5km',
+    ride_duration_ko: '편도 약 13분',
     ride_trust: 'NON_OFFICIAL',
     price_ko: '일반캐빈 왕복 약 17,000원/편도 약 14,000원. 크리스탈캐빈(유리바닥) 왕복 약 24,000원/편도 약 19,000원.',
     price_trust: 'NON_OFFICIAL',
-    hours_ko: '09:30~21:30 (토요일·성수기 연장)',
-    hours_trust: 'NON_OFFICIAL',
+    // §64 Q63-2: 운영시간 공식 출처 미확인 → 확정 표기 금지 (null = 미확인 안내)
+    hours_ko: null,
+    hours_trust: 'UNVERIFIED',
     roundtrip_ko: '왕복권과 편도권 모두 있어요. 차를 가져오셨다면 한쪽 역에 주차하고 편도로 타신 후 반대편에서 이동하는 방법도 있어요. 왕복은 타신 곳으로 돌아오는 방식이에요.',
     odongdo_connection_ko: '자산역(여수 쪽)에서 오동도 입구까지 버스 연계 동선으로 이어갈 수 있어요.',
     weather_ko: '실외 고공 구간이 있어서, 강풍이나 기상 악화 시 운행이 중단될 수 있어요. 당일 날씨를 미리 확인해보세요.',
@@ -347,12 +348,19 @@ const _PLACE_KNOWLEDGE = {
   odongdo: {
     phone: '061-659-1819',
     admission_ko: '무료',
-    hours_ko: '연중무휴 (동백열차 09:00~17:00)',
-    hours_trust: 'NON_OFFICIAL',
+    // §64 Q63-3: 섬 개방시간과 동백열차 시설시간을 분리. 09:00~17:00 는 섬 전체 운영시간으로 쓰지 않는다.
+    hours_ko: '상시 개방 (연중무휴)',
+    hours_trust: 'OFFICIAL',
+    facility_hours_ko: '09:30~18:00 (동절기 11~2월은 17:00까지, 12~13시 미운행)',
+    facility_trust: 'OFFICIAL',
+    // §64 Q63-1: 일정 배정 시간대 (섬 개방시간 아님). 검증 corpus 에 있어야 응답 가드가 통과시킨다.
+    schedule_slot_ko: '09:00~10:30',
     experience_ko: '오동도는 바다 풍경과 계절의 자연을 느끼며 산책할 수 있는 곳이에요. 방파제 길과 섬 안쪽의 산책 경험을 자신의 속도에 맞춰 즐겨보세요.',
     emotional_role: '재충전 / 자연 회복',
     fit_ko: '자연과 바다를 천천히 즐기고 싶은 분께 잘 어울려요. 부모님이나 아이와 함께라면 걷는 거리와 쉬는 시간을 고려해 동선을 정해보세요.',
-    walking_ok: '오동도는 산책을 즐기는 장소예요. 어느 구간까지 이동하느냐에 따라 걷는 부담이 달라질 수 있어요. 걷기가 부담스럽다면 이동 범위를 짧게 잡고 중간에 쉬어가는 편을 추천해요.',
+    // §64 F2: 출처 확인된 사실만 사용 (여수시 방파제·오동도 안내). 계단은 2019 열린관광 기록으로 날짜 표기.
+    walking_ok: '오동도 입구 주차장에서 방파제 길을 따라 약 15분 걸으면 도착해요. 방파제 길은 약 768m이며, 동백열차를 타거나 걸어서 들어갈 수 있어요. 섬 안에는 숲 산책로 2.5km가 있어요. 구간별로 걷는 부담은 확인되지 않았어요.',
+    stairs_ko: '2019년 한국관광공사 열린관광 기록에는 가파른 계단 구간이 있어 유모차 접근이 어려운 구간이 있다고 나와요. 현재 여부는 확인되지 않았어요.',
     parking_ko: null,
     parking_trust: 'UNKNOWN',
   },
@@ -571,23 +579,48 @@ function _correctFamilyWithoutKids(message, soulContext) {
   };
 }
 
-// 장소 정보 응답. 체류시간은 DB avg_stay_minutes만 사용하고, 없으면 미확인으로 안내한다.
-// 운영시간(hours_ko)은 운영시간으로만 표기하며 관람 소요시간으로 쓰지 않는다.
+// §64 stay_policy: 공식·검증 근거가 없는 체류시간은 안내하지 않는다.
+// - odongdo: DB 평균(120)은 근거 미확인 → 일정 배정 90분만 "일정 배정" 으로 표기 (Q63-1)
+// - cablecar: DB 평균(45)은 근거 미확인 → 평균 미확인 (Q63-2)
+// 그 외 장소는 기존 DB avg_stay_minutes 를 그대로 사용한다.
+const _STAY_POLICY = {
+  odongdo: {
+    kind: 'SCHEDULE',
+    label: '일정 배정 약 90분 (평균 체류 미확인)',
+    sentence: (n) => `${n}${_koreanParticle(n, '은', '는')} 일정에서 약 90분 (${_PLACE_KNOWLEDGE.odongdo.schedule_slot_ko})으로 배정되어 있어요. 평균 체류시간은 확인되지 않았어요.`,
+  },
+  cablecar: {
+    kind: 'UNCONFIRMED',
+    label: '평균 이용시간 미확인',
+    sentence: (n) => `${n}의 평균 이용시간은 확인되지 않았어요.`,
+  },
+};
+function _stayPolicyFor(code, place) {
+  if (code && Object.prototype.hasOwnProperty.call(_STAY_POLICY, code)) return _STAY_POLICY[code];
+  const m = place && place.avg_stay_minutes;
+  return m ? { kind: 'DB_AVG', minutes: m } : { kind: 'NONE' };
+}
+
+// 장소 정보 응답. 체류시간은 stay_policy 를 따르고, 운영시간(hours_ko)은 관람 소요시간으로 쓰지 않는다.
 function _buildPlaceInfoPayload(code, place, sessionId, kind, message) {
   const name = _placeNameKo(code);
   const knowledge = _PLACE_KNOWLEDGE[code] || {};
   const lines = [];
   if (kind === 'STAY') {
-    const stay = place && place.avg_stay_minutes;
-    if (stay != null) {
-      lines.push(`${name}${_koreanParticle(name, '은', '는')} 평균적으로 약 ${stay}분 정도 머무는 곳으로 안내하고 있어요.`);
+    const _sp = _stayPolicyFor(code, place);
+    if (_sp.kind === 'SCHEDULE' || _sp.kind === 'UNCONFIRMED') {
+      lines.push(_sp.sentence(name));
+    } else if (_sp.kind === 'DB_AVG') {
+      lines.push(`${name}${_koreanParticle(name, '은', '는')} 평균적으로 약 ${_sp.minutes}분 정도 머무는 곳으로 안내하고 있어요.`);
     } else {
       lines.push(`${name}의 관람 소요시간 정보는 아직 확인되지 않았어요.`);
     }
     if (knowledge.hours_ko) lines.push(`운영시간은 ${knowledge.hours_ko}예요.`);
+    if (knowledge.facility_hours_ko) lines.push(`동백열차 운행시간은 ${knowledge.facility_hours_ko}이에요.`);
   } else {
     if (knowledge.hours_ko) lines.push(`${name}의 운영시간은 ${knowledge.hours_ko}예요.`);
     else lines.push(`${name}의 운영시간은 아직 확인되지 않았어요.`);
+    if (knowledge.facility_hours_ko) lines.push(`동백열차 운행시간은 ${knowledge.facility_hours_ko}이에요.`);
     if (/(들어갈|몇 시부터|시작)/.test(message || '')) {
       lines.push('정확한 입장 시작 시간은 확인되지 않았어요. 위 운영시간을 참고해 주세요.');
     }
@@ -616,8 +649,9 @@ function _buildMultiPlaceInfoPayload(codes, places, sessionId) {
   const lines = codes.map((code, i) => {
     const place = places[i];
     const knowledge = _PLACE_KNOWLEDGE[code] || {};
-    const stay = place && place.avg_stay_minutes;
-    const stayText = stay != null ? `평균 약 ${stay}분 머무는 곳` : '관람 소요시간 미확인';
+    const _sp = _stayPolicyFor(code, place);
+    const stayText = _sp.kind === 'DB_AVG' ? `평균 약 ${_sp.minutes}분 머무는 곳`
+      : (_sp.label || '관람 소요시간 미확인');
     const hoursText = knowledge.hours_ko ? `, 운영시간 ${knowledge.hours_ko}` : '';
     return `• ${_placeNameKo(code)}: ${stayText}${hoursText}`;
   });
@@ -849,7 +883,7 @@ function _buildPlaceLookupMessage(place, judgedContext = null) {
     const fmtMin = min < 60 ? `${min}분` : `${Math.floor(min/60)}시간`;
     const fmtMax = max < 60 ? `${max}분` : (max % 60 === 0 ? `${max/60}시간` : `${Math.floor(max/60)}시간 ${max%60}분`);
     parts.push(`빠르면 ${fmtMin}, 여유 있게 ${fmtMax} 정도 머물 수 있어요.`);
-  } else if (place.avg_stay_minutes) {
+  } else if (_stayPolicyFor(place.code, place).kind === 'DB_AVG') {
     const t = place.avg_stay_minutes;
     // Exact hours+minutes display avoids Math.round() overstating non-round values (e.g. 90 min → 1h30m not 2h)
     const tHours = Math.floor(t / 60);
@@ -1340,7 +1374,7 @@ function _buildPlaceFeatures(place) {
     const translated = place.emotion_tags.slice(0, 2).map(t => PLACE_TAG_KO[t] || null).filter(Boolean);
     features.push(...translated);
   }
-  if (place.avg_stay_minutes) {
+  if (_stayPolicyFor(place.code, place).kind === 'DB_AVG') {
     features.push(`${place.avg_stay_minutes}분 체류`);
   }
   if (place.accessibility_wheelchair) features.push('휠체어 접근 가능');
@@ -1482,8 +1516,10 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
     if (knowledge.ride_duration_ko) {
       answer = `${name}은 ${knowledge.ride_duration_ko}예요.`;
       if (knowledge.ride_trust === 'NON_OFFICIAL') answer += '\n(블로그 참고값이에요. 현장 상황에 따라 다를 수 있어요.)';
-    } else if (place.avg_stay_minutes) {
-      answer = `${name} 평균 관람 시간은 약 ${place.avg_stay_minutes}분이에요.`;
+    } else {
+      const _sp = _stayPolicyFor(place.code, place);
+      if (_sp.kind === 'DB_AVG') answer = `${name} 평균 관람 시간은 약 ${_sp.minutes}분이에요.`;
+      else if (_sp.kind === 'SCHEDULE' || _sp.kind === 'UNCONFIRMED') answer = _sp.sentence(name);
     }
   }
 
@@ -1571,6 +1607,7 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
         ? `${name} 운영시간은 ${_h}`
         : `${name} 운영시간은 ${_h}예요.`;
       if (knowledge.hours_trust === 'NON_OFFICIAL') answer += '\n(참고값이에요.)';
+      if (knowledge.facility_hours_ko) answer += `\n동백열차 운행시간은 ${knowledge.facility_hours_ko}이에요.`;
       // If weather is also asked, surface weather policy inline rather than losing it to the else-if chain
       if (/(비|날씨|우천|기상|눈|바람|태풍)/.test(msg) && knowledge.weather_ko) {
         answer += `\n\n${knowledge.weather_ko}`;
@@ -1620,6 +1657,7 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
         ? `${name} 운영시간은 ${_h}`
         : `${name} 운영시간은 ${_h}예요.`;
       if (knowledge.hours_trust === 'NON_OFFICIAL') answer += '\n(참고값이에요.)';
+      if (knowledge.facility_hours_ko) answer += `\n동백열차 운행시간은 ${knowledge.facility_hours_ko}이에요.`;
       answer += verifyNote;
     } else {
       answer = `${name}의 운영시간 정보가 아직 없어요.${verifyNote}`;
@@ -1876,6 +1914,8 @@ function _buildPlaceAnswerFirstPayload(code, soulContext, sessionId) {
   if (k.experience_ko) lines.push(k.experience_ko);
   if (walk) lines.push(k.walking_ok || `${name}의 도보 적합성은 아직 확인되지 않았어요.`);
   if (companion && k.fit_ko) lines.push(k.fit_ko);
+  // §64 F2: 오동도 + 아이 동반 → 계단 구간은 2019 기록임을 날짜와 함께 표기 (현행 여부 미확인)
+  if (companion && pt === 'family_with_kids' && code === 'odongdo' && k.stairs_ko) lines.push(k.stairs_ko);
   if (k.hours_ko) {
     lines.push(`운영시간은 ${k.hours_ko}예요.` + (k.hours_trust === 'NON_OFFICIAL' ? ' 운영 상황은 방문 전에 한 번 더 확인해 주세요.' : ''));
   }
@@ -3307,7 +3347,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
               // Odongdo: "이동 부담이 적어요" 미노출 — walking_ok로 보행 부담 신중 안내 (Founder C5 guardrail)
               if (_ccKnowledge.walking_ok) _ccParts.push(_ccKnowledge.walking_ok);
             } else if (Array.isArray(_ccPlace.suitable_for) && _ccPlace.suitable_for.includes('elderly')) {
-              const _stayMin = _ccPlace.avg_stay_minutes;
+              const _stayMin = _stayPolicyFor(_ccPlace.code, _ccPlace).kind === 'DB_AVG' ? _ccPlace.avg_stay_minutes : null;
               const _isOutdoor = _ccPlace.venue_type === 'outdoor';
               if (_isOutdoor && _stayMin) _ccParts.push(`야외 장소라 이동 부담이 적어요. 보통 약 ${_stayMin}분 정도 머물러요.`);
               else if (_isOutdoor)        _ccParts.push('야외 장소라 이동 부담이 적어요.');
@@ -3320,7 +3360,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
             } else if (_ccPlace.code === 'hyangiram' && _ccPlace.physical_difficulty === 'high') {
               _ccParts.push('경사와 계단이 있어요. 아이와 함께라면 이동 여건을 미리 살펴보세요.');
             } else if (Array.isArray(_ccPlace.suitable_for) && _ccPlace.suitable_for.includes('kids_ok')) {
-              const _stayMin = _ccPlace.avg_stay_minutes;
+              const _stayMin = _stayPolicyFor(_ccPlace.code, _ccPlace).kind === 'DB_AVG' ? _ccPlace.avg_stay_minutes : null;
               const _isOutdoor = _ccPlace.venue_type === 'outdoor';
               if (_isOutdoor && _stayMin) _ccParts.push(`야외 장소라 아이와 자유롭게 둘러보기 좋아요. 보통 약 ${_stayMin}분 정도 머물러요.`);
               else if (_isOutdoor)        _ccParts.push('야외 장소라 아이와 자유롭게 둘러보기 좋아요.');
