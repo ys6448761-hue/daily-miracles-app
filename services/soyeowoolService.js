@@ -534,6 +534,8 @@ const _HOURS_QUESTION_RE = /(운영시간|운영 시간|영업시간|개방 시�
 function _timeIntentKind(message) {
   const m = message || '';
   if (_HOURS_QUESTION_RE.test(m)) return 'OPEN';
+  // "관람은 몇 시까지"처럼 체류 키워드와 함께 와도 종료 시각 질문은 운영시간이다.
+  if (/몇 시까지|몇 시부터/.test(m)) return 'OPEN';
   if (_STAY_QUESTION_RE.test(m)) return 'STAY';
   return 'FACT';
 }
