@@ -166,7 +166,7 @@ function _buildUnsupportedCityPayload(cityName, sessionId) {
       understood_context: {},
       places: [],
       why_details: [],
-      message_ko: `${cityName}은(는) 아직 제가 안내드릴 수 있는 지역이 아니에요.\n현재는 ${CITY_DISPLAY_NAME} 여행을 도와드릴 수 있어요.\n${CITY_DISPLAY_NAME}에서 비슷한 경험을 찾아드릴까요?`,
+      message_ko: `${cityName}${_koreanParticle(cityName, '은', '는')} 아직 제가 안내드릴 수 있는 지역이 아니에요.\n현재는 ${CITY_DISPLAY_NAME} 여행을 도와드릴 수 있어요.\n${CITY_DISPLAY_NAME}에서 비슷한 경험을 찾아드릴까요?`,
       status: 'CITY_UNSUPPORTED',
       presentation_mode: 'CLARIFICATION',
       resolved_code: null,
@@ -504,8 +504,17 @@ function _detectPlacesInMessage(message) {
 }
 
 // 관람/체류 소요시간 질문. 운영시간(hours_ko)과 구분하기 위해 별도 판정한다.
-const _STAY_QUESTION_RE = /(관람|체류|머무|둘러보는 데|얼마나 (봐|보|둘러|머물|있)|얼마 동안|몇 시간|몇 분|시간.{0,4}(잡|필요|얼마|정도))/;
-const _HOURS_QUESTION_RE = /(운영시간|운영 시간|영업시간|개방 시간|언제까지|몇 시에)/;
+// "얼마나 걸려"는 PSQ 이동시간 질문과 겹치므로 STAY 키워드에 넣지 않는다 (REPAIR-01 범위 제한).
+const _STAY_QUESTION_RE = /(관람|체류|머무|둘러보는 데|둘러보려면|한 바퀴|얼마나 (봐|보|둘러|머물|있)|얼마 동안|몇 시간|몇 분|시간.{0,4}(잡|필요|얼마|정도))/;
+const _HOURS_QUESTION_RE = /(운영시간|운영 시간|영업시간|개방 시간|언제까지|몇 시에|몇 시부터|들어갈 수|관람 가능|입장 (가능|시간|시작)|개장|언제부터)/;
+// PHX-SOUL-QA-001 REPAIR-01: 질문 의미 기준 분류.
+// OPEN(개장·입장·관람 가능 시간) > STAY(관람 소요·머무는 시간) > FACT. "관람 가능 시간"은 OPEN이다.
+function _timeIntentKind(message) {
+  const m = message || '';
+  if (_HOURS_QUESTION_RE.test(m)) return 'OPEN';
+  if (_STAY_QUESTION_RE.test(m)) return 'STAY';
+  return 'FACT';
+}
 const _RECOMMEND_RE = /(추천|어디 갈|어디가 좋|갈 만한|갈만한|가볼 만한|가볼만한|둘러볼 만한|좋은 곳|뭐 할까|뭐 하지)/;
 function _isStayTimeQuestion(message) { return _STAY_QUESTION_RE.test(message || ''); }
 function _isHoursQuestion(message) { return _HOURS_QUESTION_RE.test(message || ''); }
@@ -537,14 +546,14 @@ function _correctFamilyWithoutKids(message, soulContext) {
 
 // 장소 정보 응답. 체류시간은 DB avg_stay_minutes만 사용하고, 없으면 미확인으로 안내한다.
 // 운영시간(hours_ko)은 운영시간으로만 표기하며 관람 소요시간으로 쓰지 않는다.
-function _buildPlaceInfoPayload(code, place, sessionId, kind) {
+function _buildPlaceInfoPayload(code, place, sessionId, kind, message) {
   const name = _placeNameKo(code);
   const knowledge = _PLACE_KNOWLEDGE[code] || {};
   const lines = [];
   if (kind === 'STAY') {
     const stay = place && place.avg_stay_minutes;
     if (stay != null) {
-      lines.push(`${name}은(는) 평균적으로 약 ${stay}분 정도 머무는 곳으로 안내하고 있어요.`);
+      lines.push(`${name}${_koreanParticle(name, '은', '는')} 평균적으로 약 ${stay}분 정도 머무는 곳으로 안내하고 있어요.`);
     } else {
       lines.push(`${name}의 관람 소요시간 정보는 아직 확인되지 않았어요.`);
     }
@@ -552,6 +561,9 @@ function _buildPlaceInfoPayload(code, place, sessionId, kind) {
   } else {
     if (knowledge.hours_ko) lines.push(`${name}의 운영시간은 ${knowledge.hours_ko}예요.`);
     else lines.push(`${name}의 운영시간은 아직 확인되지 않았어요.`);
+    if (/(들어갈|몇 시부터|시작)/.test(message || '')) {
+      lines.push('정확한 입장 시작 시간은 확인되지 않았어요. 위 운영시간을 참고해 주세요.');
+    }
   }
   if (knowledge.hours_trust === 'NON_OFFICIAL') lines.push('운영 상황은 방문 전에 한 번 더 확인해 주세요.');
   return {
@@ -2564,8 +2576,8 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
     const _qaBlocked = _qaCodes.includes('jungang_market') || _isJourneyPlanningIntent(message) || _isRecommendationRequest(message);
     if (!_qaBlocked && _qaCodes.length === 1 && (_isStayTimeQuestion(message) || _isHoursQuestion(message))) {
       const _qaPlace = await travelGuideService.getPlaceByCode(_qaCodes[0]).catch(() => null);
-      const _qaKind = _isStayTimeQuestion(message) ? 'STAY' : 'HOURS';
-      return { ok: true, payload: _buildPlaceInfoPayload(_qaCodes[0], _qaPlace, sessionId, _qaKind) };
+      const _qaKind = _timeIntentKind(message) === 'STAY' ? 'STAY' : 'HOURS';
+      return { ok: true, payload: _buildPlaceInfoPayload(_qaCodes[0], _qaPlace, sessionId, _qaKind, message) };
     }
   }
   // ─────────────────────────────────────────────────────────────────────────────

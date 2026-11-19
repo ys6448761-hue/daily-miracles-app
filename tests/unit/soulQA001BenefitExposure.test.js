@@ -21,7 +21,9 @@ describe('미확인 파트너 혜택 노출 차단 (모이핀)', () => {
       ],
     });
     const rows = await travelGuideService._getBenefitsForCafes('KR', 'YEOSU');
-    expect(rows.map(r => r.partner_name)).toEqual(['카페하루']);
+    // REPAIR-03 (Founder 승인): 확인된 파트너 허용 목록이 비어 있어 모든 파트너 혜택을 제외한다.
+    // Phase 1 기대값 ['카페하루']는 "모이핀만 제외" 정책에 해당했으므로 정책 변경에 맞춰 갱신했다.
+    expect(rows).toEqual([]);
     expect(JSON.stringify(rows)).not.toMatch(/별빛항로/);
   });
 
@@ -33,7 +35,8 @@ describe('미확인 파트너 혜택 노출 차단 (모이핀)', () => {
       ],
     });
     const rows = await travelGuideService._getBenefits('KR', 'YEOSU');
-    expect(rows.map(r => r.partner_name)).toEqual(['카페하루']);
+    // REPAIR-03 (Founder 승인): 확인된 파트너 허용 목록이 비어 있어 모든 파트너 혜택을 제외한다.
+    expect(rows).toEqual([]);
   });
 });
 

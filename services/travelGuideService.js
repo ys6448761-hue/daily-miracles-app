@@ -8,9 +8,14 @@ const db = require('../database/db');
 const fallbackService = require('./fallbackService');
 const sessionService = require('./sessionService');
 
-// PHX-SOUL-QA-001 Phase 1: 계약·공식 혜택이 확인되지 않은 파트너는 고객 응답에서 혜택을 안내하지 않는다.
+// PHX-SOUL-QA-001 REPAIR-03: 고객 응답에 혜택을 노출하려면 "공식 확인된 파트너"여야 한다.
+// dt_benefits는 내부 파트너 데이터이며 소원패스 공식 운영 혜택 목록이 아니다.
+// 확인된 파트너 허용 목록은 현재 비어 있다 (Founder 승인 전까지 혜택 노출 없음).
 // 데이터(dt_benefits)는 삭제하거나 변경하지 않고, 노출 단계에서만 제외한다.
-const UNCONFIRMED_BENEFIT_PARTNERS = ['모이핀'];
+const CONFIRMED_BENEFIT_PARTNERS = [];
+function isConfirmedBenefitPartner(name) {
+  return CONFIRMED_BENEFIT_PARTNERS.includes(name);
+}
 
 // Experience cluster configuration
 // Prevents geographic monopoly in top-3 recommendations
@@ -1102,7 +1107,7 @@ class TravelGuideService {
     try {
       const result = await db.query(query, [cityCode]);
       // PHX-SOUL-QA-001: 미확인 파트너 혜택(display_copy 포함)은 코스 블록에도 싣지 않는다.
-      return (result.rows || []).filter(b => !UNCONFIRMED_BENEFIT_PARTNERS.includes(b.partner_name));
+      return (result.rows || []).filter(b => isConfirmedBenefitPartner(b.partner_name));
     } catch (error) {
       console.error("Failed to fetch cafe benefits:", error);
       return [];
@@ -1129,8 +1134,8 @@ class TravelGuideService {
 
       // Filter out unconfirmed benefits (Day-1 MVP business rules)
       const confirmedBenefits = (result.rows || []).filter(benefit => {
-        // Exclude: Moipin free Americano (not contracted for DreamTown)
-        if (UNCONFIRMED_BENEFIT_PARTNERS.includes(benefit.partner_name)) {
+        // REPAIR-03: exclude every partner benefit not on the confirmed allowlist
+        if (!isConfirmedBenefitPartner(benefit.partner_name)) {
           return false;
         }
         return true;
