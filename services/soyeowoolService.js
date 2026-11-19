@@ -20,6 +20,7 @@ const quoteContextService = require('./quoteContextService');
 const quoteEngine = require('./quoteEngine');
 const sessionService = require('./sessionService');
 const { isHybridV1Enabled } = require('./soulHybridFlag');
+const { isRouteSkeletonEnabled } = require('./routeSkeletonGate'); // §52 Route Exposure Gate (fail-closed)
 const { classifyDirect, generateDirectReply } = require('./soulDirectResponse');
 const { eligibleForAdaptive, adaptiveGeneralAnswer } = require('./soulAdaptive');
 const { sanitizeForExternal, BLOCKED_NOTICE } = require('./soulPrivacyGuard');
@@ -2821,7 +2822,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
 
         // Rebuild route skeleton with confirmed date — LOCKED items only (no fresh TG call)
         let routeSkeleton = null;
-        try {
+        if (isRouteSkeletonEnabled()) try { // §52 gate: OFF → skeleton not built (pre-RC3 path)
           const { buildSkeleton } = require('./routeSkeletonService');
           routeSkeleton = buildSkeleton({
             start_date:     extractedDate,
@@ -2906,7 +2907,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
 
         // Rebuild route skeleton with confirmed guest_count
         let routeSkeleton = null;
-        try {
+        if (isRouteSkeletonEnabled()) try { // §52 gate: OFF → skeleton not built (pre-RC3 path)
           const { buildSkeleton } = require('./routeSkeletonService');
           routeSkeleton = buildSkeleton({
             start_date:     mergedCtx.travel_date,
@@ -3549,7 +3550,8 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   let routeSkeleton = null;
   let _resolvedLeisure = null;
   let _leisureSource   = null;
-  if (_isJourneyPlanningIntent(message) && quoteCtx) {
+  // §52 gate: OFF → whole MY ROUTE block skipped (identical to pre-RC3 path where the module was absent)
+  if (_isJourneyPlanningIntent(message) && quoteCtx && isRouteSkeletonEnabled()) {
     // Reuse session context already loaded for Traveler Profile Continuity above.
     const journeyCtxForSkeleton = _sessionCtxForTurn;
 

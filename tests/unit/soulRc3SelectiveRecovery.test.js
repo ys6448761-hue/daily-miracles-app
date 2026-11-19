@@ -42,6 +42,17 @@ const { handleTravelRequest } = require('../../services/soyeowoolService');
 
 const PRINCIPAL = { principal_id: 'rc3-test-user', principal_type: 'GUEST' };
 
+// §52: 이 파일은 DB·세션이 mock 된 격리 테스트 하네스다. 여기서만 QA 식별자를 설정한다.
+const _ENV_KEYS = ['SOUL_ROUTE_SKELETON_ENABLED', 'SOUL_QA_ISOLATED'];
+const _savedEnv = {};
+beforeAll(() => { for (const k of _ENV_KEYS) { _savedEnv[k] = process.env[k]; } });
+afterAll(() => { for (const k of _ENV_KEYS) { if (_savedEnv[k] === undefined) delete process.env[k]; else process.env[k] = _savedEnv[k]; } });
+const setGate = (on) => {
+  if (on) { process.env.SOUL_ROUTE_SKELETON_ENABLED = '1'; process.env.SOUL_QA_ISOLATED = '1'; }
+  else { delete process.env.SOUL_ROUTE_SKELETON_ENABLED; delete process.env.SOUL_QA_ISOLATED; }
+};
+beforeEach(() => setGate(true));
+
 const ODONGDO = { code: 'odongdo', name_ko: '오동도', avg_stay_minutes: 120, type: 'attraction' };
 const CABLE   = { code: 'cablecar', name_ko: '여수 해상케이블카', avg_stay_minutes: 45, type: 'leisure' };
 const HAMEL   = { code: 'hamel_lighthouse', name_ko: '하멜등대', avg_stay_minutes: 30, type: 'attraction' };
