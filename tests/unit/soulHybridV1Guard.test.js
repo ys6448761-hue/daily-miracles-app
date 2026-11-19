@@ -41,6 +41,10 @@ describe('H3 검사 규칙', () => {
     expect(inspectPayload(payload('9시 30분에 도착하세요.'), '케이블카 시간', deps)).toContain('UNVERIFIED_CLOCK_TIME');
   });
 
+  test('"2시간" 같은 소요 표현은 시각으로 보지 않는다 (오탐 방지)', () => {
+    expect(inspectPayload(payload('오동도에 대해 알려드릴게요. 보통 약 2시간 정도 머물러요.'), '오동도는 어떤 곳이야?', deps)).toEqual([]);
+  });
+
   test('정상 응답은 문제 없이 그대로 통과한다', () => {
     const p = payload('오동도는 바다 풍경을 느끼며 산책할 수 있는 곳이에요.');
     expect(inspectPayload(p, '오동도는 어떤 곳이야?', deps)).toEqual([]);

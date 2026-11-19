@@ -20,7 +20,8 @@ const UNVERIFIED_BENEFIT_CLAIM = /(아메리카노\s*\d*\s*잔|음료\s*1\s*병|
 const DAY_STRUCTURE = /(\d+\s*일차|Day\s*\d)/i;
 const SCHEDULE_REQUEST = /(\d\s*박|일정|코스|일차|며칠|여행 계획)/;
 // 시각 표현 (오전·오후 n시, n시 m분, hh:mm). 소요 "분" 단위는 DB 값을 쓰므로 검사하지 않는다.
-const CLOCK_TOKEN = /(오전|오후)?\s*\d{1,2}\s*시(\s*\d{1,2}\s*분)?|\d{1,2}:\d{2}/g;
+// "2시간"처럼 "시간"으로 끝나는 소요 표현은 시각이 아니므로 제외한다 (시(?!간)).
+const CLOCK_TOKEN = /(오전|오후)?\s*\d{1,2}\s*시(?!간)(\s*\d{1,2}\s*분)?|\d{1,2}:\d{2}/g;
 
 function stripGeneric(text) {
   let t = String(text || '');

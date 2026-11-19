@@ -3646,7 +3646,11 @@ function buildFactFallback(message) {
   const code = codes[0];
   const k = _PLACE_KNOWLEDGE[code] || {};
   const name = _placeNameKo(code);
-  const parts = [`${name}${_koreanParticle(name, '은', '는')} ${k.experience_ko || '소개 정보가 아직 확인되지 않았어요.'}`];
+  // 지식 본문이 이미 장소명으로 시작하면 그대로 쓴다 (중복 방지).
+  const exp = k.experience_ko || '';
+  const intro = !exp ? `${name}${_koreanParticle(name, '은', '는')} 소개 정보가 아직 확인되지 않았어요.`
+    : (exp.startsWith(name) ? exp : `${name}${_koreanParticle(name, '은', '는')} ${exp}`);
+  const parts = [intro];
   if (k.hours_ko) parts.push(`운영시간은 ${k.hours_ko}예요.`);
   return parts.join(' ');
 }
