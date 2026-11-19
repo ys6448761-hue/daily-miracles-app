@@ -3777,6 +3777,10 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   if (_isCarInfoQuery) {
     result.next_options = result.next_options.filter(o => o !== '시간이 얼마나 남으셨어요?');
   }
+  // §61: 첫 방문 추천 응답 본문이 숙박 여부를 이미 묻는 경우, 같은 질문의 시간 Next Option 을 중복 제거한다.
+  if (typeof soulMessage === 'string' && soulMessage.includes('당일 여행이신가요, 아니면 숙박하시나요?')) {
+    result.next_options = result.next_options.filter(o => o !== '시간이 얼마나 남으셨어요?');
+  }
 
   // CLIENT PAYLOAD
   // §58 Q-K2: 첫 방문 추천은 후보 목록이다. 추천 결과의 course(일정형 구조)는 노출하지 않는다.

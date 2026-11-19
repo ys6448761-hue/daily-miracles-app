@@ -277,3 +277,23 @@ describe('Clarify 보호 유지', () => {
     expect(r.payload.message_ko).toContain(CLARIFY_PHRASE);
   });
 });
+
+describe('§61 — 첫 방문 응답의 중복 시간 질문 제거', () => {
+  const TIME_OPT = '시간이 얼마나 남으셨어요?';
+
+  test('H19: 숙박 여부 질문은 남고, 같은 응답의 시간 Next Option 은 제거된다', async () => {
+    contextSvc.parseUserMessage.mockResolvedValue(ctxH19Recorded());
+    const r = await req('처음 여수에 왔는데 어디부터 가면 좋을까?');
+    expect(r.payload.message_ko).toContain('당일 여행이신가요, 아니면 숙박하시나요?');
+    expect(r.payload.next_options).not.toContain(TIME_OPT);
+    expect(r.payload.places.length).toBeGreaterThan(0);
+    expect(r.payload.understood_context.people_type).toBeNull();
+  });
+
+  test('H10 (여정 요청): 숙박 질문이 없으므로 시간 Next Option 을 유지한다', async () => {
+    contextSvc.parseUserMessage.mockResolvedValue(mkCtx({ people: 'group', mobility: 'walk', mobilityProv: 'USER_EXPLICIT' }));
+    const r = await req('성인 가족 3명이 여행하는데 도보 코스를 알려줘.');
+    expect(r.payload.message_ko).not.toContain('숙박하시나요');
+    expect(r.payload.next_options).toContain(TIME_OPT);
+  });
+});
