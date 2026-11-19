@@ -6,6 +6,7 @@
 // 장소, 혜택, 운영 정보, 가격, 일정 관련 질문은 절대 이 경로로 보내지 않는다.
 
 const OpenAI = require('openai').OpenAI;
+const { sanitizeForExternal } = require('./soulPrivacyGuard');
 
 // 이 중 하나라도 있으면 Direct 대상이 아니다 (DreamTown 사실 또는 여행 조건과 연결된 질문).
 const TRAVEL_FACT_WORDS = /(여수|오동도|케이블카|하멜|향일암|돌산|이순신|카페|맛집|혜택|소원패스|할인|쿠폰|일정|코스|추천|운영|시간|가격|요금|주차|예약|숙박|호텔|라마다|케니|날씨|교통|버스|택시|도보|걸어|관람|얼마|몇|어디|언제|지금|운행|입장|체류|매장|식당)/;
@@ -35,6 +36,10 @@ const SYSTEM_PROMPT = [
 // generateDirectReply: 기존 LLM 방식과 동일(OpenAI chat completions, gpt-4o-mini).
 // 실패하면 null을 반환하여 기존 흐름으로 되돌린다. 예외를 던지지 않는다.
 async function generateDirectReply(message) {
+  // PHX-SOUL-QA-001 §29: 외부 전송 직전 개인정보 마스킹. 식별자·인증정보가 남으면 외부 호출을 생략한다.
+  const _privacy = sanitizeForExternal(message);
+  if (_privacy.blocked) return null;
+  message = _privacy.text;
   try {
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const r = await client.chat.completions.create({

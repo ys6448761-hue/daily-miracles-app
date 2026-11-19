@@ -22,6 +22,7 @@ const sessionService = require('./sessionService');
 const { isHybridV1Enabled } = require('./soulHybridFlag');
 const { classifyDirect, generateDirectReply } = require('./soulDirectResponse');
 const { eligibleForAdaptive, adaptiveGeneralAnswer } = require('./soulAdaptive');
+const { sanitizeForExternal, BLOCKED_NOTICE } = require('./soulPrivacyGuard');
 const { classifyFastPath } = require('./soulFastPath');
 
 const CAPABILITY = 'TRAVEL_INTELLIGENCE';
@@ -2557,6 +2558,15 @@ async function _handleJourneyDecision({ decisionType, message, soulContext, conv
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 async function handleTravelRequest({ message, sessionId, hotelId, principal, explicit_context = {} }) {
+  // PHX-SOUL-QA-001 §29 (Feature Flag와 무관): 식별자·인증정보가 제거되지 않으면 외부 LLM 호출 없이 안내만 반환한다.
+  if (sanitizeForExternal(message).blocked) {
+    return { ok: true, payload: {
+      session_id: sessionId, understood_context: {}, places: [], why_details: [],
+      message_ko: BLOCKED_NOTICE, status: 'PRIVACY_BLOCKED', intent: 'PRIVACY_BLOCKED',
+      presentation_mode: 'DIRECT_RESPONSE', next_options: [], timestamp: new Date().toISOString(),
+      shared_journey: null, quote: null, route: null,
+    } };
+  }
   // ─── G1 City Detection (runs before legacy Guard) ────────────────────────────
   let _skipLegacyGuard = false;
   {
@@ -2975,7 +2985,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   // PHX-SOUL-QA-001 Adaptive General Advice (Hybrid V1, 기본 비활성): 규칙이 놓친 일반 여행 조언만 LLM 1회로 분류·답변한다.
   // GENERAL_ANSWER일 때만 직접 답하고, 그 외 route나 실패는 기존 흐름으로 넘긴다. 응답은 라우트에서 가드를 거친다.
   if (isHybridV1Enabled() && !_isPreviousTurnReference(message)
-      && eligibleForAdaptive(message, _detectPlacesInMessage(message).length)) {
+      && eligibleForAdaptive(sanitizeForExternal(message).text, _detectPlacesInMessage(message).length)) {
     const _ad = await adaptiveGeneralAnswer(message);
     if (_ad && _ad.route === 'GENERAL_ANSWER' && _ad.answer) {
       return { ok: true, payload: {

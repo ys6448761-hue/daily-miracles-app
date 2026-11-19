@@ -6,6 +6,7 @@
 // 외부 전송: 질문 원문 한 줄만. 대화 기록, 세션, 토큰, 식별자는 보내지 않는다.
 
 const OpenAI = require('openai').OpenAI;
+const { sanitizeForExternal } = require('./soulPrivacyGuard');
 
 const ROUTES = ['GENERAL_ANSWER', 'NEED_PLACE', 'VERIFIED_FACT', 'REALTIME', 'RECOMMEND'];
 
@@ -56,7 +57,11 @@ const SYSTEM_PROMPT = [
 // adaptiveGeneralAnswer: 한 번의 LLM 호출로 route와 answer를 받는다.
 // 실패, 형식 오류, 허용되지 않은 route면 null을 반환하여 기존 흐름으로 돌린다. 예외를 던지지 않는다.
 async function adaptiveGeneralAnswer(message) {
-  if (!eligibleForAdaptive(message, 0) || containsPII(message)) return null;
+  // PHX-SOUL-QA-001 §29: 개인정보는 제거한 뒤 핵심 질문만 전달한다. 제거 후에도 식별자가 남으면 호출하지 않는다.
+  const _privacy = sanitizeForExternal(message);
+  if (_privacy.blocked) return null;
+  const safe = _privacy.text;
+  if (!eligibleForAdaptive(safe, 0) || containsPII(safe)) return null;
   try {
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const r = await client.chat.completions.create({
@@ -66,7 +71,7 @@ async function adaptiveGeneralAnswer(message) {
       response_format: { type: 'json_object' },
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: String(message) },
+        { role: 'user', content: safe },
       ],
     });
     const raw = r && r.choices && r.choices[0] && r.choices[0].message && r.choices[0].message.content;

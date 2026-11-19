@@ -6,6 +6,7 @@
 
 const { OpenAI } = require('openai');
 const { v4: uuidv4 } = require('uuid');
+const { sanitizeForExternal } = require('./soulPrivacyGuard');
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -124,7 +125,10 @@ class ContextExtractionService {
    */
   async _extractWithGPT4(message) {
     try {
-      const prompt = this._buildPrompt(message);
+      // PHX-SOUL-QA-001 §29: 외부 전송 직전 개인정보 마스킹. 식별자·인증정보가 남으면 외부 호출을 생략한다.
+      const _privacy = sanitizeForExternal(message);
+      if (_privacy.blocked) return null;
+      const prompt = this._buildPrompt(_privacy.text);
 
       const completion = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
