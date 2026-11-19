@@ -9,6 +9,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { execFileSync } = require('child_process');
 
 const DOCS_DIR = path.join(__dirname, '..', 'docs');
 const INDEX_DIR = path.join(DOCS_DIR, 'index');
@@ -321,6 +322,14 @@ function resolveCreatedAt(metaDate, relativePath, previousCreatedAt) {
 function createDocItem(filePath, previousCreatedAt) {
   const content = fs.readFileSync(filePath, 'utf-8');
   const relativePath = path.relative(DOCS_DIR, filePath).replace(/\\/g, '/');
+  return buildDocItemFromContent(relativePath, content, previousCreatedAt);
+}
+
+/**
+ * 문서 아이템 생성 — 콘텐츠 기준 (작업 트리 파일 또는 Git Index blob 공용)
+ */
+function buildDocItemFromContent(relativePath, content, previousCreatedAt) {
+  const filePath = path.join(DOCS_DIR, relativePath);
   const folder = relativePath.split('/')[0];
 
   // 메타데이터 파싱 시도
@@ -347,6 +356,172 @@ function createDocItem(filePath, previousCreatedAt) {
 }
 
 
+// ─── Git Index 기준 scan (PHX-SOUL-QA-001 Manifest stabilization, §54) ─────────
+// 미추적 파일, 백업 복사본(신규), 다른 추적 문서의 unstaged 수정은 색인에 반영하지 않는다.
+// 부분 staging 된 문서는 Index 에 저장된 콘텐츠를 사용한다.
+const REPO_ROOT = path.join(__dirname, '..');
+
+function gitOut(args, input) {
+  return execFileSync('git', args, {
+    cwd: REPO_ROOT,
+    input,
+    maxBuffer: 512 * 1024 * 1024,
+    stdio: [input ? 'pipe' : 'ignore', 'pipe', 'ignore'],
+  });
+}
+
+function tryGitOut(args, input) {
+  try {
+    return gitOut(args, input);
+  } catch (err) {
+    return null;
+  }
+}
+
+function md5Buf(buf) {
+  return crypto.createHash('md5').update(buf).digest('hex').substring(0, 8);
+}
+
+// 체크아웃 줄바꿈(LF→CRLF) 형태. 기존 checksum 과의 호환 판정에만 사용한다.
+function crlfBuf(buf) {
+  return Buffer.from(buf.toString('utf8').replace(/\r?\n/g, '\r\n'), 'utf8');
+}
+
+// 기록된 checksum 이 콘텐츠(LF 또는 CRLF 형태)와 일치하는지. 일치 판정만 하며 값은 바꾸지 않는다.
+function matchesRecordedChecksum(checksum, buf) {
+  return Boolean(buf) && (md5Buf(buf) === checksum || md5Buf(crlfBuf(buf)) === checksum);
+}
+
+function isIndexedDocRelPath(rel) {
+  const parts = rel.split('/');
+  if (parts.some(p => EXCLUDE_DIRS.includes(p))) return false;
+  const base = parts[parts.length - 1];
+  return base.endsWith('.md') && !base.startsWith('_');
+}
+
+// git cat-file --batch 로 blob 내용을 한 번에 읽는다.
+function readBlobs(shas) {
+  const map = new Map();
+  if (shas.length === 0) return map;
+  const out = tryGitOut(['cat-file', '--batch'], Buffer.from(shas.join('\n') + '\n', 'utf8'));
+  if (!out) return map;
+  let pos = 0;
+  for (const sha of shas) {
+    const nl = out.indexOf(0x0a, pos);
+    if (nl < 0) break;
+    const header = out.slice(pos, nl).toString('utf8').split(' ');
+    if (header[1] !== 'blob') {
+      pos = nl + 1;
+      continue;
+    }
+    const size = Number(header[2]);
+    map.set(sha, out.slice(nl + 1, nl + 1 + size));
+    pos = nl + 1 + size + 1;
+  }
+  return map;
+}
+
+/**
+ * Git Index 기준 문서 목록. 저장소가 아니면 null (기존 작업 트리 경로 사용).
+ * 반환: Map(rel(docs 기준) → { index: Buffer|null, head: Buffer|null, staged: boolean })
+ */
+function readIndexDocuments() {
+  if (!tryGitOut(['rev-parse', '--is-inside-work-tree'])) return null;
+
+  const indexOut = tryGitOut(['ls-files', '-s', '-z', '--', 'docs']);
+  if (!indexOut) return null;
+  const headOut = tryGitOut(['ls-tree', '-r', '-z', 'HEAD', '--', 'docs']); // 커밋이 없으면 null
+
+  const entries = [];
+  for (const item of indexOut.toString('utf8').split('\0')) {
+    const m = item.match(/^(\d+) ([0-9a-f]+) (\d)\t([\s\S]*)$/);
+    if (!m || m[3] !== '0' || m[1] === '120000' || m[1] === '160000') continue; // 충돌·심볼릭·서브모듈 제외
+    const rel = m[4];
+    if (!rel.startsWith('docs/')) continue;
+    const docRel = rel.slice('docs/'.length);
+    if (!isIndexedDocRelPath(docRel)) continue;
+    entries.push({ rel: docRel, sha: m[2] });
+  }
+
+  const headMap = new Map();
+  if (headOut) {
+    for (const item of headOut.toString('utf8').split('\0')) {
+      const m = item.match(/^\d+ blob ([0-9a-f]+)\t([\s\S]*)$/);
+      if (m && m[2].startsWith('docs/')) headMap.set(m[2].slice('docs/'.length), m[1]);
+    }
+  }
+
+  const shas = new Set();
+  for (const e of entries) {
+    shas.add(e.sha);
+    if (headMap.has(e.rel)) shas.add(headMap.get(e.rel));
+  }
+  const blobs = readBlobs([...shas]);
+
+  const docs = new Map();
+  for (const e of entries) {
+    const headSha = headMap.get(e.rel) || null;
+    docs.set(e.rel, {
+      index: blobs.get(e.sha) || null,
+      head: headSha ? (blobs.get(headSha) || null) : null,
+      staged: headSha !== e.sha, // 신규 stage 또는 stage 된 수정
+    });
+  }
+  return docs;
+}
+
+function readPreviousDocuments() {
+  if (!fs.existsSync(MANIFEST_PATH)) return [];
+  try {
+    const prev = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf-8'));
+    return Array.isArray(prev.documents) ? prev.documents : [];
+  } catch (err) {
+    console.warn(`⚠️ 이전 manifest 읽기 실패 — 기존 엔트리 없이 진행: ${err.message}`);
+    return [];
+  }
+}
+
+/**
+ * Index 기준 documents 구성 (점진적 Git Blob 기준 checksum)
+ *  - 기존 엔트리: 객체 그대로 보존. 단, stage 된 콘텐츠 변경이며 기록 checksum 이 HEAD 콘텐츠와 일치할 때만 checksum 을 Index 기준으로 갱신.
+ *    (체크아웃 줄바꿈 차이, 기록과 불일치하는 stale 값은 바꾸지 않는다)
+ *  - 기존 엔트리의 경로가 Index 에서 사라졌으면(stage 삭제 포함) 목록에서 제거.
+ *  - 신규: stage 된 문서만 등록. 백업 복사본(/backups/) 제외. checksum = Index blob 콘텐츠 md5.
+ */
+function buildDocumentsFromIndex(indexed) {
+  const previous = readPreviousDocuments();
+  const previousCreatedAt = loadPreviousCreatedAt();
+  const documents = [];
+  const seen = new Set();
+
+  for (const prev of previous) {
+    const rel = String(prev.path || '').replace(/^docs\//, '');
+    const doc = indexed.get(rel);
+    if (!doc || !doc.index) continue;
+    seen.add(rel);
+    let item = prev;
+    if (doc.staged && doc.head && matchesRecordedChecksum(prev.checksum, doc.head)
+        && !matchesRecordedChecksum(prev.checksum, doc.index)) {
+      item = { ...prev, checksum: md5Buf(doc.index) }; // 실제 staged 콘텐츠 변경만 갱신
+    }
+    documents.push(item);
+  }
+
+  const added = [];
+  for (const [rel, doc] of indexed) {
+    if (seen.has(rel) || !doc.index || !doc.staged) continue;
+    if (rel.split('/').includes('backups')) continue; // 작업용 백업 복사본은 신규 등록하지 않음
+    try {
+      added.push(buildDocItemFromContent(rel, doc.index.toString('utf8'), previousCreatedAt));
+    } catch (err) {
+      console.warn(`⚠️ 신규 문서 파싱 실패 (제외): docs/${rel} — ${err.message}`);
+    }
+  }
+  // 기존 엔트리는 기록 순서를 유지하고, 신규 등록은 앞에 둔다 (재실행 시 순서 churn 방지)
+  added.sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+  return [...added, ...documents];
+}
+
 /**
  * tags.json 생성
  */
@@ -354,7 +529,7 @@ function generateTagsJson(documents) {
   const tagMap = {};
 
   documents.forEach(doc => {
-    doc.tags.forEach(tag => {
+    (doc.tags || []).forEach(tag => { // 기존 엔트리는 필드가 부분적일 수 있다 (§54)
       if (!tagMap[tag]) tagMap[tag] = [];
       tagMap[tag].push(doc.id);
     });
@@ -366,7 +541,8 @@ function generateTagsJson(documents) {
 /**
  * 메인 실행
  */
-function main() {
+// git 저장소가 아닐 때의 기존 작업 트리 경로 (인터페이스·동작 유지)
+function mainWorkingTree() {
   console.log('📄 Manifest 생성 시작...\n');
 
   // index 폴더 확인
@@ -448,6 +624,63 @@ function main() {
   }
 
   console.log('\n✨ 완료!');
+}
+
+/**
+ * 진입점. git 저장소이면 Git Index 기준(§54), 아니면 작업 트리 기준.
+ * 훅과 수동 실행 모두 동일한 CLI 를 사용한다.
+ */
+function main() {
+  const indexed = readIndexDocuments();
+  if (!indexed) return mainWorkingTree();
+
+  console.log('📄 Manifest 생성 시작 (Git Index 기준)...\n');
+  if (!fs.existsSync(INDEX_DIR)) {
+    fs.mkdirSync(INDEX_DIR, { recursive: true });
+    console.log('✅ docs/index/ 폴더 생성');
+  }
+  const documents = buildDocumentsFromIndex(indexed);
+  console.log(`📁 Index 문서 후보: ${indexed.size}개 (추적·stage 기준)`);
+
+  const manifest = {
+    schema_version: '1.0',
+    generated_at: new Date().toISOString(),
+    generator: 'generate-manifest.js',
+    total_count: documents.length,
+    documents,
+  };
+  fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2), 'utf-8');
+  console.log(`✅ manifest.json 생성 완료 (${documents.length}개 문서)`);
+
+  const tags = stabilizeTags(readPreviousTags(), generateTagsJson(documents));
+  fs.writeFileSync(TAGS_PATH, JSON.stringify(tags, null, 2), 'utf-8');
+  console.log(`✅ tags.json 생성 완료 (${Object.keys(tags).length}개 태그)`);
+}
+
+// 이전 tags.json (없거나 손상되면 null)
+function readPreviousTags() {
+  try {
+    return JSON.parse(fs.readFileSync(TAGS_PATH, 'utf-8'));
+  } catch (err) {
+    return null;
+  }
+}
+
+// 태그별 id 집합이 같으면 이전 순서와 키 순서를 유지한다 (재실행 시 순서 churn 방지). 집합이 다르면 새 값을 쓴다.
+function stabilizeTags(prevTags, nextTags) {
+  const prev = prevTags && typeof prevTags === 'object' ? prevTags : {};
+  const keys = [
+    ...Object.keys(prev).filter(k => Object.prototype.hasOwnProperty.call(nextTags, k)),
+    ...Object.keys(nextTags).filter(k => !Object.prototype.hasOwnProperty.call(prev, k)),
+  ];
+  const sameSet = (a, b) => a.length === b.length
+    && [...a].sort().join('\0') === [...b].sort().join('\0');
+  const out = {};
+  for (const key of keys) {
+    const p = Array.isArray(prev[key]) ? prev[key] : null;
+    out[key] = p && sameSet(p, nextTags[key]) ? p : nextTags[key];
+  }
+  return out;
 }
 
 main();
