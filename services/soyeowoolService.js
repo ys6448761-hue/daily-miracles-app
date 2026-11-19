@@ -19,6 +19,8 @@ const sharedJourneyService = require('./sharedJourneyService');
 const quoteContextService = require('./quoteContextService');
 const quoteEngine = require('./quoteEngine');
 const sessionService = require('./sessionService');
+const { isHybridV1Enabled } = require('./soulHybridFlag');
+const { classifyDirect, generateDirectReply } = require('./soulDirectResponse');
 
 const CAPABILITY = 'TRAVEL_INTELLIGENCE';
 const SOURCE = 'travelGuideService/8-filter-cascade';
@@ -2901,6 +2903,31 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
         };
       }
     }
+  }
+
+  // PHX-SOUL-QA-001 H1 (Hybrid V1, 기본 비활성): 인사·공감·일반 상식은 조건 추출 없이 직접 답한다.
+  // 장소·도시·PSQ·여정 게이트를 통과한 뒤에만 도달하므로 기존 게이트 순서는 바뀌지 않는다.
+  if (isHybridV1Enabled() && !_isPreviousTurnReference(message)
+      && classifyDirect(message, _detectPlacesInMessage(message).length)) {
+    const directText = await generateDirectReply(message);
+    if (directText) {
+      return { ok: true, payload: {
+        session_id: sessionId,
+        understood_context: {},
+        places: [],
+        why_details: [],
+        message_ko: directText,
+        status: 'DIRECT_RESPONSE',
+        intent: 'DIRECT',
+        presentation_mode: 'DIRECT_RESPONSE',
+        next_options: [],
+        timestamp: new Date().toISOString(),
+        shared_journey: null,
+        quote: null,
+        route: null,
+      } };
+    }
+    // LLM 실패 시 기존 흐름으로 되돌린다 (재질문을 새로 만들지 않음).
   }
 
   // UNDERSTAND + SHARED JOURNEY EXTRACTION (parallel — independent AI calls)
