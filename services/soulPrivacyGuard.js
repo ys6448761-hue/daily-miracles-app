@@ -23,7 +23,16 @@ const ADDRESS = /[가-힣]{1,6}(?:특별시|광역시|특별자치시|특별자�
 // sanitizeForExternal(text) → { text, masked, blocked, blockReason }
 //   masked: 치환된 항목 유형 목록 (값은 포함하지 않는다)
 //   blocked: true면 외부 LLM 호출을 생략하고 내부 답변을 사용한다
+// 마스킹 중 예외가 나면 원문을 보내지 않도록 차단으로 처리한다 (fail-closed).
 function sanitizeForExternal(input) {
+  try {
+    return _sanitize(input);
+  } catch (_) {
+    return { text: '', masked: [], blocked: true, blockReason: 'SANITIZE_ERROR' };
+  }
+}
+
+function _sanitize(input) {
   const src = String(input == null ? '' : input);
   const masked = [];
   let blockReason = null;
