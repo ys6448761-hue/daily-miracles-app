@@ -1829,6 +1829,75 @@ function _isDiscoveryIntent(message) {
   return false;
 }
 
+// §58 Q-K1: 첫 여수 여행 추천 의도. 여수·여행 문맥 + 어디부터|어디서부터.
+// 장소 문맥(explicit place_code)이 있는 요청은 호출 측에서 제외한다.
+function _isFirstVisitTripIntent(message) {
+  if (!message) return false;
+  // 혜택·실시간 문의는 기존 분류기가 먼저 판정한다 (해당하면 첫 방문 추천이 아님)
+  if (classifyFastPath(message, _detectPlacesInMessage(message).length)) return false;
+  return /(어디부터|어디서부터)/.test(message) && /(여수|여행)/.test(message);
+}
+
+// §58 4-C: 고객이 혼자라고 명시하지 않았으면 추출된 solo 를 명시 값으로 두지 않는다 (UNKNOWN 강등).
+// 세션에 저장된 명시 동반 정보는 _applyPersistedTravelerProfile 병합이 그대로 적용한다 (USER_EXPLICIT 가 아닐 때만 덮어씀).
+function _guardUnconfirmedSolo(soulContext, message) {
+  const prov = soulContext._provenance || {};
+  if (soulContext.people_type !== 'solo' || prov.people_type !== 'USER_EXPLICIT') return soulContext;
+  if (/혼자|혼자서|홀로|단독|혼행|1인|솔로/.test(message || '')) return soulContext;
+  // 미확인 동반자: null (= 알 수 없음). travelGuideService 는 null 을 동반 적합도 0 으로 처리한다.
+  return { ...soulContext, people_type: null, _provenance: { ...prov, people_type: 'UNKNOWN' } };
+}
+
+// §58 4-A: 명시적 걷기 신호, 또는 추출(명시)과 어휘 감지가 일치하는 동반 신호가 있는지.
+function _hasAnswerFirstSignal(soulContext, message) {
+  const prov = soulContext._provenance || {};
+  if (soulContext.mobility_type === 'walk' && prov.mobility_type === 'USER_EXPLICIT') return true;
+  const pt = soulContext.people_type;
+  if (prov.people_type === 'USER_EXPLICIT' && (pt === 'family_with_kids' || pt === 'family_elderly')) {
+    return _extractPeopleLightweight(message).people_type === pt;
+  }
+  return false;
+}
+
+// §58 4-A: 검증된 장소 정보로 먼저 답한다. 도보·동반 신호가 있을 때만 해당 검증 문구를 덧붙인다.
+// 기존 Knowledge 에 없는 도보 정보는 만들지 않고 "확인되지 않았어요"로 명시한다 (Q-K3).
+function _buildPlaceAnswerFirstPayload(code, soulContext, sessionId) {
+  if (code === 'jungang_market') return null;
+  const k = _PLACE_KNOWLEDGE[code];
+  if (!k) return null;
+  const name = _placeNameKo(code);
+  const prov = soulContext._provenance || {};
+  const walk = soulContext.mobility_type === 'walk' && prov.mobility_type === 'USER_EXPLICIT';
+  const pt = soulContext.people_type;
+  const companion = prov.people_type === 'USER_EXPLICIT' && (pt === 'family_with_kids' || pt === 'family_elderly');
+  const lines = [];
+  if (companion && pt === 'family_with_kids') lines.push('아이와 함께하는 여행이시군요.');
+  else if (companion && pt === 'family_elderly') lines.push('부모님과 함께하는 여행이시군요.');
+  if (k.experience_ko) lines.push(k.experience_ko);
+  if (walk) lines.push(k.walking_ok || `${name}의 도보 적합성은 아직 확인되지 않았어요.`);
+  if (companion && k.fit_ko) lines.push(k.fit_ko);
+  if (k.hours_ko) {
+    lines.push(`운영시간은 ${k.hours_ko}예요.` + (k.hours_trust === 'NON_OFFICIAL' ? ' 운영 상황은 방문 전에 한 번 더 확인해 주세요.' : ''));
+  }
+  if (walk || companion) lines.push('장소 사이의 도보 연결과 이동시간은 아직 확인되지 않았어요.');
+  return {
+    session_id: sessionId,
+    understood_context: { people_type: companion ? pt : null, group_size: soulContext.group_size || null },
+    places: [],
+    why_details: [],
+    message_ko: lines.join('\n'),
+    status: 'PLACE_LOOKUP',
+    intent: 'PLACE_ANSWER_FIRST',
+    presentation_mode: 'PLACE_KNOWLEDGE',
+    resolved_code: code,
+    next_options: [],
+    timestamp: new Date().toISOString(),
+    shared_journey: null,
+    quote: null,
+    route: null,
+  };
+}
+
 // Phase B V0.1: 밤바다 산책/즐기기 feasibility 질문 감지.
 // D1: 호텔명 불필요. "밤바다" + 걷기/산책/즐기기/코스 결합 패턴으로 제한.
 // D1: 차량 접근 패턴("차로 가기 좋은") 제외 — 기존 _isCarInfoQuery 경로와 의도 분리.
@@ -2108,9 +2177,14 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPla
       if (soulContext.has_car === true && (soulContext._provenance || {}).has_car === 'USER_EXPLICIT') return `차를 가져오셨군요. 이동이 한결 자유롭겠어요.\n자차로 다니기 좋은 곳을 골라봤어요.`;
     }
     // M4 (RC3 Q2): 일정 요청인데 일정이 없으면, 장소 후보는 연결 미검증 후보로만 구분해 안내한다.
-    if (messageOpts.hasRoute !== true && _isJourneyPlanningIntent(message)) {
+    // §58 4-D: 여정 요청, 또는 장소 문맥 없는 첫 방문 추천(어디부터)일 때만 연결 미검증 안내를 쓴다.
+    const _firstVisitOnly = !currentPlaceCode && _isFirstVisitTripIntent(message) && !_isJourneyPlanningIntent(message);
+    if (messageOpts.hasRoute !== true && (_isJourneyPlanningIntent(message) || _firstVisitOnly)) {
       const baseLine = placePrefix ? `${placePrefix}\n${situationLine}` : situationLine;
-      return `${baseLine}\n확인된 장소 후보를 알려드릴게요. 장소 사이의 도보 연결과 이동시간은 아직 확인되지 않았어요.\n시간이 얼마나 남으셨어요?`;
+      const _askLine = _firstVisitOnly
+        ? '당일 여행이신가요, 아니면 숙박하시나요?'
+        : '시간이 얼마나 남으셨어요?';
+      return `${baseLine}\n확인된 장소 후보를 알려드릴게요. 장소 사이의 도보 연결과 이동시간은 아직 확인되지 않았어요.\n${_askLine}`;
     }
     // Default PARTIAL — place-aware if current place known
     if (placePrefix) {
@@ -3035,6 +3109,8 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   // Text (USER_EXPLICIT) always wins; chip fills only UNKNOWN/non-explicit fields.
   let { soulContext } = understandResult;
   soulContext = _applyExplicitContextChip(soulContext, explicit_context);
+  // §58 4-C: 명시되지 않은 solo 를 확정하지 않는다 (세션 명시 동반 정보는 아래 병합에서 보존)
+  soulContext = _guardUnconfirmedSolo(soulContext, message);
 
   // GROUP QUOTE ROUTING — 5+ people with cost/quote intent → human consultation
   if (_isGroupQuoteRequest(soulContext)) {
@@ -3069,7 +3145,9 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   //   EVERYTHING ELSE → clarification with meaningful message_ko
   //
   // DO NOT add negative exclusion patterns. Absence of positive evidence = no Discovery.
-  const needsTravelIntelligence = _isDiscoveryIntent(message) || _isJourneyPlanningIntent(message);
+  // §58 4-B: 여수·여행 문맥의 첫 방문 추천 (장소 문맥 없는 요청만)
+  const needsTravelIntelligence = _isDiscoveryIntent(message) || _isJourneyPlanningIntent(message)
+    || (!explicit_context.place_code && _isFirstVisitTripIntent(message));
 
   if (!needsTravelIntelligence) {
     // Issue B: Bypass DISCOVERY GATE for pending course time provisions.
@@ -3290,6 +3368,15 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
       if (_mpCodes.length >= 2 && !_mpCodes.includes('jungang_market')) {
         const _mpPlaces = await Promise.all(_mpCodes.map(c => travelGuideService.getPlaceByCode(c).catch(() => null)));
         return { ok: true, payload: _buildMultiPlaceInfoPayload(_mpCodes, _mpPlaces, sessionId) };
+      }
+    }
+    // §58 4-A: 단일 장소 + 명시적 걷기 또는 어휘로 확인된 동반 신호 → 검증된 장소 정보로 먼저 답한다.
+    // 페이지 장소 문맥(explicit place_code)이 있으면 기존 Living Detail 경로를 건드리지 않는다.
+    if (!explicit_context.place_code && _hasAnswerFirstSignal(soulContext, message)) {
+      const _apCodes = _detectPlacesInMessage(message);
+      if (_apCodes.length === 1 && !DISCOVERY_OVERRIDES.test(message)) {
+        const _apPayload = _buildPlaceAnswerFirstPayload(_apCodes[0], soulContext, sessionId);
+        if (_apPayload) return { ok: true, payload: _apPayload };
       }
     }
     const clarificationMsg = _generateClarificationMessage(soulContext, message, journeyCtxForClar);
@@ -3692,7 +3779,11 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   }
 
   // CLIENT PAYLOAD
-  const payload = _buildClientPayload(result, tgResult, whyDetails, soulMessage, sessionId, enrichedSoulContext, sharedJourney, quoteResult, routeSkeleton);
+  // §58 Q-K2: 첫 방문 추천은 후보 목록이다. 추천 결과의 course(일정형 구조)는 노출하지 않는다.
+  const _firstVisitCandidateOnly = !explicit_context.place_code
+    && _isFirstVisitTripIntent(message) && !_isJourneyPlanningIntent(message);
+  const _tgForPayload = (_firstVisitCandidateOnly && tgResult) ? { ...tgResult, course: null } : tgResult;
+  const payload = _buildClientPayload(result, _tgForPayload, whyDetails, soulMessage, sessionId, enrichedSoulContext, sharedJourney, quoteResult, routeSkeleton);
 
   // CAR_INFO: suppress course — parking info responses must not render CourseDisplay.
   if (_isCarInfoQuery) payload.course = null;
