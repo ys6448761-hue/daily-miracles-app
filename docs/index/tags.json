@@ -1,5 +1,7 @@
 {
   "소원": [
+    "DOC-PHX-SOUL-QA-001_RC3_ROUTE_GATE",
+    "DOC-PHX-SOUL-QA-001_REAL_LLM_FINAL",
     "DOC-DECISIONS_LOG",
     "DOC-DreamTown_Frontend_Screen_Map_",
     "DOC-DreamTown_MVP_Scope_Design",
@@ -272,8 +274,7 @@
     "DOC-MASTER-CONTROL",
     "DOC-DreamTown_Miracle_System_SSOT",
     "DOC-DreamTown_Wish_System_SSOT",
-    "DOC-inquiry-form-api",
-    "DOC-PHX-SOUL-QA-001_REAL_LLM_FINAL"
+    "DOC-inquiry-form-api"
   ],
   "aurora": [
     "DOC-DECISIONS_LOG",
@@ -890,6 +891,14 @@
     "DOC-DreamTown_Emotional_Translatio"
   ],
   "knowledge": [
+    "DOC-PHX-SOUL-QA-001_DEV_CHECKPOINT",
+    "DOC-PHX-SOUL-QA-001_MANIFEST_GENER",
+    "DOC-PHX-SOUL-QA-001_MANIFEST_SELEC",
+    "DOC-PHX-SOUL-QA-001_RC3_ROUTE_GATE",
+    "DOC-PHX-SOUL-QA-001_RC3_FINDINGS_S",
+    "DOC-PHX-SOUL-QA-001_RC3_RECOVERY_P",
+    "DOC-PHX-SOUL-QA-001_RC3_SELECTIVE_",
+    "DOC-PHX-SOUL-QA-001_REAL_LLM_FINAL",
     "DOC-SOUL-THEME-V01-EVIDENCE",
     "DOC-CI-DIAG-PR113-001",
     "DOC-COMMERCE-FLOW-CI-GATE-V0_1",
@@ -996,11 +1005,7 @@
     "DOC-SOUL-VEHICLE-GUIDANCE-REVIEW-V",
     "DOC-TRAVEL-PLACES-STAY-TIME-V01-EV",
     "DOC-YEOSU_FOUNDER_ROUTE_001_TIME_E",
-    "DOC-COMMERCE-HOTEL-SYSTEM-STATE-EV",
-    "DOC-PHX-SOUL-QA-001_RC3_FINDINGS_S",
-    "DOC-PHX-SOUL-QA-001_RC3_RECOVERY_P",
-    "DOC-PHX-SOUL-QA-001_RC3_SELECTIVE_",
-    "DOC-PHX-SOUL-QA-001_REAL_LLM_FINAL"
+    "DOC-COMMERCE-HOTEL-SYSTEM-STATE-EV"
   ],
   "00-master": [
     "DOC-aurora5-master-knowledge-v2"

@@ -1,9 +1,74 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-19T08:28:44.419Z",
+  "generated_at": "2026-11-19T08:59:39.720Z",
   "generator": "generate-manifest.js",
-  "total_count": 567,
+  "total_count": 571,
   "documents": [
+    {
+      "id": "DOC-PHX-SOUL-QA-001_DEV_CHECKPOINT",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_DEV_CHECKPOINT_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "분류",
+      "title": "PHX-SOUL-QA-001 — 개발 체크포인트 보존 준비 (V1, 2026-11-19)",
+      "created_at": "2026-11-19",
+      "checksum": "56c5dbf6"
+    },
+    {
+      "id": "DOC-PHX-SOUL-QA-001_MANIFEST_GENER",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_MANIFEST_GENERATOR_STABILIZATION_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "superseded",
+      "title": "PHX-SOUL-QA-001 — Manifest Generator Final Stabilization (V1, 2026-11-19)",
+      "created_at": "2026-11-19",
+      "checksum": "7a6aaa6c"
+    },
+    {
+      "id": "DOC-PHX-SOUL-QA-001_MANIFEST_SELEC",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_MANIFEST_SELECTIVE_RECOVERY_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "superseded",
+      "title": "PHX-SOUL-QA-001 — Manifest Selective Recovery (V1, 2026-11-19)",
+      "created_at": "2026-11-19",
+      "checksum": "74a2b5dc"
+    },
+    {
+      "id": "DOC-PHX-SOUL-QA-001_RC3_ROUTE_GATE",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_RC3_ROUTE_GATE_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "소원"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "PHX-SOUL-QA-001 — RC3 Route Exposure Gate 및 Manifest 변경 조사 (V1, 2026-11-19)",
+      "created_at": "2026-11-19",
+      "checksum": "c048bdd2"
+    },
     {
       "id": "DOC-PHX-SOUL-QA-001_RC3_FINDINGS_S",
       "path": "docs/knowledge/PHX-SOUL-QA-001_RC3_FINDINGS_S49_V1.md",
