@@ -9,7 +9,9 @@
 const express = require('express');
 const sessionService = require('../services/sessionService');
 const { requireAuthenticatedPrincipal } = require('../middleware/authenticatedPrincipal');
-const { handleTravelRequest } = require('../services/soyeowoolService');
+const { handleTravelRequest, buildFactFallback, verifiedKnowledgeText } = require('../services/soyeowoolService');
+const { isHybridV1Enabled } = require('../services/soulHybridFlag');
+const { guardPayload } = require('../services/soulQualityGuard');
 const { generateMessageEn } = require('../services/soulI18n');
 
 const router = express.Router();
@@ -93,8 +95,13 @@ router.post('/input/text', requireAuthenticatedPrincipal, async (req, res) => {
       });
     }
 
+    // PHX-SOUL-QA-001 H3 (Hybrid V1, 기본 비활성): 응답 직전 품질 가드. 플래그가 꺼지면 기존 payload 그대로.
+    const _payload = isHybridV1Enabled()
+      ? guardPayload(soulResult.payload, message, { buildFactFallback, knowledgeText: verifiedKnowledgeText })
+      : soulResult.payload;
+
     // Canonical session_id from route lifecycle
-    const response = { ...soulResult.payload, session_id: finalSessionId };
+    const response = { ..._payload, session_id: finalSessionId };
 
     // PHX-KENNY-010: add message_en when lang=en
     if (reqLang === 'en') {

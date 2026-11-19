@@ -3639,4 +3639,19 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   return { ok: true, payload };
 }
 
-module.exports = { handleTravelRequest };
+// PHX-SOUL-QA-001 H3: 품질 가드가 쓰는 검증된 사실 대체 답변 (엔진 생성 없이 Knowledge만 사용).
+function buildFactFallback(message) {
+  const codes = _detectPlacesInMessage(message);
+  if (!codes.length) return null;
+  const code = codes[0];
+  const k = _PLACE_KNOWLEDGE[code] || {};
+  const name = _placeNameKo(code);
+  const parts = [`${name}${_koreanParticle(name, '은', '는')} ${k.experience_ko || '소개 정보가 아직 확인되지 않았어요.'}`];
+  if (k.hours_ko) parts.push(`운영시간은 ${k.hours_ko}예요.`);
+  return parts.join(' ');
+}
+
+// 시각 검증용 지식 본문 (가드 전용, 응답에 포함되지 않음)
+const _VERIFIED_KNOWLEDGE_TEXT = JSON.stringify(_PLACE_KNOWLEDGE);
+
+module.exports = { handleTravelRequest, buildFactFallback, verifiedKnowledgeText: _VERIFIED_KNOWLEDGE_TEXT };
