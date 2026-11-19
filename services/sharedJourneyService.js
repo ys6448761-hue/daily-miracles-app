@@ -12,6 +12,7 @@
 'use strict';
 
 const { OpenAI } = require('openai');
+const { sanitizeForExternal } = require('./soulPrivacyGuard');
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -133,6 +134,10 @@ JSON 형식:
  */
 async function extractSharedJourney(message) {
   if (!message || !message.trim()) return _emptyJourney();
+  // PHX-SOUL-QA-001 §29: 외부 전송 직전 개인정보 마스킹. 식별자·인증정보가 남으면 외부 호출을 생략한다.
+  const _privacy = sanitizeForExternal(message);
+  if (_privacy.blocked) return _emptyJourney();
+  message = _privacy.text;
 
   try {
     const completion = await openai.chat.completions.create({
