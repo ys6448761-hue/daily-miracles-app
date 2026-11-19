@@ -76,8 +76,19 @@ describe('adaptiveGeneralAnswer', () => {
     await expect(adaptiveGeneralAnswer('준비물 알려줘')).resolves.toBeNull();
     spy.mockRestore();
   });
-  test('개인정보가 포함된 질문은 LLM을 호출하지 않는다', async () => {
+  // §29 정책 변경: 개인정보는 제거한 뒤 핵심 질문만 보낸다 (이전에는 생략). 원문 전화번호는 외부 payload에 없어야 한다.
+  test('개인정보는 마스킹 후 핵심 질문만 보내고 원문 번호는 보내지 않는다', async () => {
+    mockCreate.mockResolvedValueOnce({ choices: [{ message: { content: JSON.stringify({ route: 'GENERAL_ANSWER', answer: '준비물로 우산을 챙기세요.' }) } }] });
     const r = await adaptiveGeneralAnswer('010-1111-2222로 준비물 알려줘');
+    expect(r).toEqual({ route: 'GENERAL_ANSWER', answer: '준비물로 우산을 챙기세요.' });
+    expect(mockCreate).toHaveBeenCalledTimes(1);
+    const sent = JSON.stringify(mockCreate.mock.calls[0][0].messages);
+    expect(sent).not.toContain('010-1111-2222');
+    expect(sent).toContain('[전화번호]');
+    expect(sent).toContain('준비물');
+  });
+  test('차단 대상(카드번호)이면 LLM을 호출하지 않는다', async () => {
+    const r = await adaptiveGeneralAnswer('카드번호 1234-5678-9012-3456 로 준비물 알려줘');
     expect(r).toBeNull();
     expect(mockCreate).not.toHaveBeenCalled();
   });

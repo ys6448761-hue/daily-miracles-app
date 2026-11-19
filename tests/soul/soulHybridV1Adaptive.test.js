@@ -77,10 +77,23 @@ describe('Adaptive 연결 (SOUL_HYBRID_V1 on)', () => {
     expect(contextSvc.parseUserMessage).toHaveBeenCalled();
   });
 
-  test('개인정보가 포함된 질문은 어댑티브 LLM을 호출하지 않는다', async () => {
+  // §29 정책 변경: 전화번호는 마스킹 후 핵심 질문으로 어댑티브 경로를 탄다. 원문 번호는 외부로 나가지 않는다.
+  test('전화번호 포함 질문은 마스킹 후 어댑티브 경로로 처리되고 원문 번호는 외부로 나가지 않는다', async () => {
+    mockCreate.mockResolvedValueOnce(llmJson({ route: 'GENERAL_ANSWER', answer: '준비물로 모자를 챙기세요.' }));
     const r = await req('010-1234-5678로 여행 준비물 알려줘');
+    expect(r.payload.status).toBe('DIRECT_RESPONSE');
+    expect(r.payload.intent).toBe('GENERAL_ADVICE');
+    const sent = JSON.stringify(mockCreate.mock.calls.map(c => c[0].messages));
+    expect(sent).not.toContain('010-1234-5678');
+  });
+
+  test('식별자·인증정보(카드번호)는 엔진 진입에서 차단되고 외부 호출이 없다', async () => {
+    const r = await req('카드번호 1234-5678-9012-3456 로 여행 준비물 알려줘');
+    expect(r.ok).toBe(true);
+    expect(r.payload.status).toBe('PRIVACY_BLOCKED');
+    expect(r.payload.message_ko).toContain('외부로 전송하지 않았어요');
     expect(mockCreate).not.toHaveBeenCalled();
-    expect(r.payload.intent).not.toBe('GENERAL_ADVICE');
+    expect(contextSvc.parseUserMessage).not.toHaveBeenCalled();
   });
 
   test('사실 민감어 질문은 어댑티브 LLM을 호출하지 않는다', async () => {
@@ -97,5 +110,11 @@ describe('Adaptive 연결 (SOUL_HYBRID_V1 off)', () => {
     const r = await req('여수 갈 때 뭘 챙겨야 해?');
     expect(mockCreate).not.toHaveBeenCalled();
     expect(r.payload.intent).not.toBe('GENERAL_ADVICE');
+  });
+
+  test('플래그가 꺼져도 식별자·인증정보 차단은 적용된다 (§29)', async () => {
+    const r = await req('카드번호 1234-5678-9012-3456 로 여행 준비물 알려줘');
+    expect(r.payload.status).toBe('PRIVACY_BLOCKED');
+    expect(mockCreate).not.toHaveBeenCalled();
   });
 });
