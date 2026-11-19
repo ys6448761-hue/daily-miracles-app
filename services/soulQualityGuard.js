@@ -23,6 +23,13 @@ const SCHEDULE_REQUEST = /(\d\s*박|일정|코스|일차|며칠|여행 계획)/;
 // "2시간"처럼 "시간"으로 끝나는 소요 표현은 시각이 아니므로 제외한다 (시(?!간)).
 const CLOCK_TOKEN = /(오전|오후)?\s*\d{1,2}\s*시(?!간)(\s*\d{1,2}\s*분)?|\d{1,2}:\d{2}/g;
 
+// 무료 여부 주장 (검증된 지식에 '무료'가 없으면 미검증)
+const FREE_CLAIM = /(무료\s*(로\s*)?(이용|입장|관람|즐길|들어|탈|방문)|무료(입니다|예요|이에요|다)|입장료\s*(는\s*)?없)/;
+// 지역 전체 일반화 ("여수에는 ~ 많다" 류)
+const REGION_GENERALIZATION = /여수(에는|에서는|에는요|는)?\s*[^.。!?]{0,16}?(많아요|많습니다|많다|많이 있|다양해요|다양합니다|흔해요|흔합니다)/;
+// 금액 표현 (원, ₩)
+const PRICE_TOKEN = /₩\s*\d[\d,]*|\d[\d,]*\s*원/g;
+
 function stripGeneric(text) {
   let t = String(text || '');
   for (const g of GENERIC_LINES) t = t.split(g).join('');
@@ -45,6 +52,15 @@ function inspectPayload(payload, message, deps) {
   const unverifiedClock = clocks.some(c => !corpus.includes(c.replace(/\s+/g, '')) && !corpus.includes(c.trim()));
   if (unverifiedClock) reasons.push('UNVERIFIED_CLOCK_TIME');
 
+  if (FREE_CLAIM.test(text) && !corpus.includes('무료')) reasons.push('UNVERIFIED_FREE_CLAIM');
+  if (REGION_GENERALIZATION.test(text)) reasons.push('UNVERIFIED_REGION_GENERALIZATION');
+  const prices = text.match(PRICE_TOKEN) || [];
+  const unverifiedPrice = prices.some(p => {
+    const digits = p.replace(/[^\d]/g, '');
+    return !corpus.replace(/[^\d]/g, '').includes(digits);
+  });
+  if (unverifiedPrice) reasons.push('UNVERIFIED_PRICE');
+
   return reasons;
 }
 
@@ -58,7 +74,9 @@ function guardPayload(payload, message, deps) {
   const honest = '이 질문에 대해 지금 확인된 정보를 찾지 못했어요. 장소 이름을 알려주시면 확인된 정보로 답해 드릴게요.';
   const replacement = reasons.includes('UNVERIFIED_BENEFIT_CLAIM')
     ? '확인된 공식 혜택 정보를 찾지 못했어요. 혜택 여부는 소원패스 공식 안내나 현장에서 확인해 주세요.'
-    : (fact ? `${fact} 그 밖의 세부 정보는 확인되지 않았어요.` : honest);
+    : (reasons.some(r => r === 'UNVERIFIED_FREE_CLAIM' || r === 'UNVERIFIED_PRICE' || r === 'UNVERIFIED_REGION_GENERALIZATION')
+      ? (fact ? `${fact} 무료 여부, 요금, 지역 전체에 대한 내용은 확인된 정보가 없어 답하지 않았어요.` : honest)
+      : (fact ? `${fact} 그 밖의 세부 정보는 확인되지 않았어요.` : honest));
 
   return {
     ...payload,
