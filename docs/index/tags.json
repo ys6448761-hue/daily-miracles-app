@@ -1,5 +1,8 @@
 {
   "소원": [
+    "DOC-PHX-SOUL-QA-001_KNOWLEDGE_EVID",
+    "DOC-PHX-SOUL-QA-001_POST_CLARIFY_B",
+    "DOC-PHX-SOUL-QA-001_TOURISM_KNOWLE",
     "DOC-PHX-SOUL-QA-001_RC3_ROUTE_GATE",
     "DOC-PHX-SOUL-QA-001_REAL_LLM_FINAL",
     "DOC-DECISIONS_LOG",
@@ -277,6 +280,8 @@
     "DOC-inquiry-form-api"
   ],
   "aurora": [
+    "DOC-PHX-SOUL-QA-001_KNOWLEDGE_EVID",
+    "DOC-PHX-SOUL-QA-001_TOURISM_KNOWLE",
     "DOC-DECISIONS_LOG",
     "DOC-DreamTown_Frontend_Screen_Map_",
     "DOC-DreamTown_MVP_Scope_Design",
@@ -529,6 +534,8 @@
     "DOC-정산-v2-CEO-요약"
   ],
   "가격": [
+    "DOC-PHX-SOUL-QA-001_POST_CLARIFY_B",
+    "DOC-PHX-SOUL-QA-001_TOURISM_KNOWLE",
     "DOC-AIL-정산-v2-final",
     "DOC-상품유형별_가격표_v12",
     "DOC-전체상품_가격표_종합_v12",
@@ -891,6 +898,12 @@
     "DOC-DreamTown_Emotional_Translatio"
   ],
   "knowledge": [
+    "DOC-PHX-SOUL-QA-001_FIRST_VISIT_DU",
+    "DOC-PHX-SOUL-QA-001_KNOWLEDGE_EVID",
+    "DOC-PHX-SOUL-QA-001_POST_CLARIFY_B",
+    "DOC-PHX-SOUL-QA-001_TOURISM_KNOWLE",
+    "DOC-PHX-SOUL-QA-001_VERIFIED_KNOWL",
+    "DOC-PHX-SOUL-QA-001_VERIFIED_KNOWL",
     "DOC-PHX-SOUL-QA-001_APPROVAL_AND_P",
     "DOC-PHX-SOUL-QA-001_CLARIFY_IMPLEM",
     "DOC-PHX-SOUL-QA-001_CLARIFY_POLICY",
