@@ -242,9 +242,83 @@ function collectMarkdownFiles(dir, files = []) {
 }
 
 /**
+ * 날짜 검증 — 형식(YYYY-MM-DD)과 실제 존재 여부를 모두 확인한다.
+ * PHX-SOUL-QA-001 Manifest REPAIR: 일반 표 내용(예: "Status", "별")이 날짜로 쓰이지 않도록 한다.
+ */
+function isValidIsoDate(value) {
+  if (typeof value !== 'string') return false;
+  const m = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return false;
+  const y = Number(m[1]);
+  const mo = Number(m[2]);
+  const d = Number(m[3]);
+  const dt = new Date(Date.UTC(y, mo - 1, d));
+  return dt.getUTCFullYear() === y && dt.getUTCMonth() === mo - 1 && dt.getUTCDate() === d;
+}
+
+/**
+ * 오늘 날짜를 Asia/Seoul 기준 YYYY-MM-DD로 반환.
+ * 기존 toISOString() 방식은 UTC 날짜라 KST 오전에 하루 전 날짜가 들어갔다.
+ */
+function todayInSeoul(now = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit'
+  }).formatToParts(now);
+  const pick = type => parts.find(p => p.type === type).value;
+  return `${pick('year')}-${pick('month')}-${pick('day')}`;
+}
+
+/**
+ * 이전 manifest.json에서 path → created_at 맵을 읽는다.
+ * 이전 값은 유효 여부와 무관하게 그대로 보존 대상으로 쓰며, 여기서 수정하지 않는다.
+ */
+function loadPreviousCreatedAt() {
+  const map = new Map();
+  if (!fs.existsSync(MANIFEST_PATH)) return map;
+  try {
+    const prev = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf-8'));
+    for (const doc of prev.documents || []) {
+      if (doc && typeof doc.path === 'string' && typeof doc.created_at === 'string') {
+        map.set(doc.path, doc.created_at);
+      }
+    }
+  } catch (err) {
+    console.warn(`⚠️ 이전 manifest 읽기 실패 — created_at 보존 없이 진행: ${err.message}`);
+  }
+  return map;
+}
+
+/**
+ * created_at 결정 (PHX-SOUL-QA-001 Manifest REPAIR)
+ *  1. 문서 자체의 명시적 날짜 메타데이터 (유효한 ISO 날짜만)
+ *  2. 경로에 포함된 완전한 날짜 YYYY-MM-DD (유효한 날짜만)
+ *  3. 이전 manifest의 같은 path 값 — 재생성 때문에 바뀌지 않도록 그대로 보존
+ *  4. 경로의 연-월 YYYY-MM → YYYY-MM-01 (기존 정책, 신규 문서에만 적용)
+ *  5. 최초 색인 등록일: Asia/Seoul 기준 오늘 (근거 없는 값이며 실제 작성일로 확정하지 않음)
+ */
+function resolveCreatedAt(metaDate, relativePath, previousCreatedAt) {
+  const cleaned = typeof metaDate === 'string' ? metaDate.trim().replace(/^['"]|['"]$/g, '') : metaDate;
+  if (isValidIsoDate(cleaned)) return cleaned;
+
+  for (const candidate of relativePath.match(/\d{4}-\d{2}-\d{2}/g) || []) {
+    if (isValidIsoDate(candidate)) return candidate;
+  }
+
+  const docPath = `docs/${relativePath}`;
+  if (previousCreatedAt && previousCreatedAt.has(docPath)) {
+    return previousCreatedAt.get(docPath);
+  }
+
+  const ym = relativePath.match(/(\d{4})-(\d{2})/);
+  if (ym && Number(ym[2]) >= 1 && Number(ym[2]) <= 12) return `${ym[1]}-${ym[2]}-01`;
+
+  return todayInSeoul();
+}
+
+/**
  * 문서 아이템 생성
  */
-function createDocItem(filePath) {
+function createDocItem(filePath, previousCreatedAt) {
   const content = fs.readFileSync(filePath, 'utf-8');
   const relativePath = path.relative(DOCS_DIR, filePath).replace(/\\/g, '/');
   const folder = relativePath.split('/')[0];
@@ -267,23 +341,11 @@ function createDocItem(filePath) {
     owner: meta.owner || extractOwner(content),
     status: meta.status || extractStatus(content),
     title: extractTitle(content, path.basename(filePath)),
-    created_at: meta.created_at || extractDateFromPath(filePath),
+    created_at: resolveCreatedAt(meta.created_at, relativePath, previousCreatedAt),
     checksum: generateChecksum(content)
   };
 }
 
-/**
- * 경로에서 날짜 추출
- */
-function extractDateFromPath(filePath) {
-  const dateMatch = filePath.match(/(\d{4}-\d{2}-\d{2})/);
-  if (dateMatch) return dateMatch[1];
-
-  const yearMonthMatch = filePath.match(/(\d{4})-(\d{2})/);
-  if (yearMonthMatch) return `${yearMonthMatch[1]}-${yearMonthMatch[2]}-01`;
-
-  return new Date().toISOString().split('T')[0];
-}
 
 /**
  * tags.json 생성
@@ -317,13 +379,16 @@ function main() {
   const files = collectMarkdownFiles(DOCS_DIR);
   console.log(`📁 발견된 문서: ${files.length}개\n`);
 
+  // 이전 manifest의 created_at 보존 맵 (PHX-SOUL-QA-001 Manifest REPAIR)
+  const previousCreatedAt = loadPreviousCreatedAt();
+
   // 문서 아이템 생성
   const documents = [];
   const errors = [];
 
   files.forEach(file => {
     try {
-      const item = createDocItem(file);
+      const item = createDocItem(file, previousCreatedAt);
       documents.push(item);
     } catch (err) {
       errors.push({ file, error: err.message });
@@ -340,11 +405,16 @@ function main() {
         owner: 'team',
         status: 'active',
         title: path.basename(file, '.md'),
-        created_at: new Date().toISOString().split('T')[0],
+        created_at: resolveCreatedAt(null, relativePath, previousCreatedAt),
         checksum: 'error'
       });
     }
   });
+
+  // created_at 통계 (기존 값 보존 여부 구분용, 출력 전용)
+  const nonIsoCount = documents.filter(d => !isValidIsoDate(d.created_at)).length;
+  const preservedCount = documents.filter(d => previousCreatedAt.has(d.path) && previousCreatedAt.get(d.path) === d.created_at).length;
+  console.log(`🗓️ created_at: 이전 값 보존 ${preservedCount}건 / 비 ISO 값 ${nonIsoCount}건 (기존 값 그대로 유지)`);
 
   // manifest.json 생성
   const manifest = {

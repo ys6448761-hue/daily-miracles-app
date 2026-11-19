@@ -1,9 +1,77 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-19T08:03:23.642Z",
+  "generated_at": "2026-11-19T08:28:44.419Z",
   "generator": "generate-manifest.js",
-  "total_count": 578,
+  "total_count": 567,
   "documents": [
+    {
+      "id": "DOC-PHX-SOUL-QA-001_RC3_FINDINGS_S",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_RC3_FINDINGS_S49_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "storybook"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "PHX-SOUL-QA-001 — Evidence §49: RC3 Route Skeleton 복구 가능성 조사 결과 (2026-11-19, 조사만)",
+      "created_at": "2026-11-19",
+      "checksum": "8ebad9c8"
+    },
+    {
+      "id": "DOC-PHX-SOUL-QA-001_RC3_RECOVERY_P",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_RC3_RECOVERY_PLAN_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "storybook"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "PHX-SOUL-QA-001 — RC3 Route Skeleton 복구 가능성 조사 및 최소 복구 계획 (V1, 2026-11-19)",
+      "created_at": "2026-11-19",
+      "checksum": "e11ebf38"
+    },
+    {
+      "id": "DOC-PHX-SOUL-QA-001_RC3_SELECTIVE_",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_RC3_SELECTIVE_RECOVERY_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "storybook"
+      ],
+      "owner": "code",
+      "status": "내용",
+      "title": "PHX-SOUL-QA-001 — RC3 Selective Recovery (V1, 2026-11-19)",
+      "created_at": "2026-11-19",
+      "checksum": "050d6e34"
+    },
+    {
+      "id": "DOC-PHX-SOUL-QA-001_REAL_LLM_FINAL",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_REAL_LLM_FINAL_RETRY_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "소원"
+      ],
+      "owner": "code",
+      "status": "superseded",
+      "title": "PHX-SOUL-QA-001 — Real LLM Verification Final Retry (V1, 2026-11-19)",
+      "created_at": "2026-11-19",
+      "checksum": "a099821d"
+    },
     {
       "id": "DOC-DECISIONS_LOG",
       "path": "docs/DECISIONS_LOG.md",
@@ -109,7 +177,7 @@
       "status": "archived",
       "title": "주간 지식카드 승격 가이드",
       "created_at": "변경",
-      "checksum": "dd9fdc75"
+      "checksum": "916d8f2d"
     },
     {
       "id": "DOC-README",
@@ -212,7 +280,7 @@
       "status": "active",
       "title": "DreamTown Event SSOT v1",
       "created_at": "변경",
-      "checksum": "61ae28cc"
+      "checksum": "ac9d176d"
     },
     {
       "id": "DOC-DreamTown_Channel_Rendering_Ru",
@@ -232,7 +300,7 @@
       "status": "superseded",
       "title": "DreamTown Channel Rendering Rules SSOT",
       "created_at": "변경",
-      "checksum": "7b134490"
+      "checksum": "e9478bc1"
     },
     {
       "id": "DOC-DreamTown_Media_Architecture_S",
@@ -251,7 +319,7 @@
       "status": "superseded",
       "title": "DreamTown Media Architecture SSOT",
       "created_at": "변경",
-      "checksum": "152663f6"
+      "checksum": "55250632"
     },
     {
       "id": "DOC-tag_taxonomy",
@@ -268,7 +336,7 @@
       "status": "active",
       "title": "태그 체계 v1.0",
       "created_at": "변경",
-      "checksum": "98693796"
+      "checksum": "2ecccdc9"
     },
     {
       "id": "DOC-GATE_BidDoc_Compliance",
@@ -318,7 +386,7 @@
       "status": "active",
       "title": "지식카드 템플릿",
       "created_at": "변경",
-      "checksum": "cbeb834c"
+      "checksum": "786b7a88"
     },
     {
       "id": "DOC-WIX_INTEGRATION_GUIDE",
@@ -334,7 +402,7 @@
       "status": "active",
       "title": "Wix 폼 연동 가이드",
       "created_at": "버전",
-      "checksum": "86f6d0aa"
+      "checksum": "edc68ba7"
     },
     {
       "id": "DOC-AURORA-STATUS",
@@ -392,7 +460,7 @@
       "status": "active",
       "title": "DreamTown 포스트카드 감정 문장 SSOT v1",
       "created_at": "내용",
-      "checksum": "bafd5cc0"
+      "checksum": "97bdb81c"
     },
     {
       "id": "DOC-DreamTown_Emotional_Translatio",
@@ -410,7 +478,7 @@
       "status": "| 결심형",
       "title": "DreamTown Emotional Translation SSOT",
       "created_at": "내용",
-      "checksum": "a51892f0"
+      "checksum": "09227235"
     },
     {
       "id": "DOC-INDEX",
@@ -505,7 +573,7 @@
       "owner": "rumi",
       "status": "N",
       "title": "Aurora 5 마스터 통합 문서 v2.0",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "440ddf72"
     },
     {
@@ -521,8 +589,8 @@
       "owner": "team",
       "status": "active",
       "title": "Project Context — Daily Miracles MVP",
-      "created_at": "2026-11-19",
-      "checksum": "cb8c5826"
+      "created_at": "2026-11-12",
+      "checksum": "131b38ec"
     },
     {
       "id": "DOC-PROMOTION-RULES",
@@ -539,7 +607,7 @@
       "owner": "comi",
       "status": "active",
       "title": "문서 승격 규칙 (Promotion Rules)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "bb56759d"
     },
     {
@@ -555,8 +623,8 @@
       "owner": "team",
       "status": "active",
       "title": "Workflow — Daily Miracles Development",
-      "created_at": "2026-11-19",
-      "checksum": "a2ded856"
+      "created_at": "2026-11-12",
+      "checksum": "44a5854e"
     },
     {
       "id": "DOC-brand-bible",
@@ -573,7 +641,7 @@
       "owner": "rumi",
       "status": "superseded",
       "title": "하루하루의 기적 - 브랜드 보이스 가이드",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "8c342f8b"
     },
     {
@@ -591,7 +659,7 @@
       "owner": "code",
       "status": "active",
       "title": "Claude Code 작업 지침 v3.0",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "394b20ab"
     },
     {
@@ -607,7 +675,7 @@
       "owner": "team",
       "status": "active",
       "title": "Development Rules",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "0d3788a2"
     },
     {
@@ -625,7 +693,7 @@
       "owner": "rumi",
       "status": "MVP v0 개발 완료, Render 배포 예정",
       "title": "소원드림광장 홈페이지 재구성 — 루미 브리핑 문서",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "ac8be86a"
     },
     {
@@ -642,8 +710,8 @@
       "owner": "code",
       "status": "superseded",
       "title": "MIRACLE MASTER GUIDELINES v7.0",
-      "created_at": "2026-11-19",
-      "checksum": "e52309bd"
+      "created_at": "2026-11-12",
+      "checksum": "63b3e84a"
     },
     {
       "id": "DOC-ADR-001_Journey_Guide_Started_",
@@ -658,7 +726,7 @@
       "owner": "code",
       "status": "Proposed (구현됨, 승인 대기 — Freeze §11 절차에 따름)",
       "title": "ADR-001 — Journey Guide Started State",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "1542ed20"
     },
     {
@@ -677,7 +745,7 @@
       "owner": "team",
       "status": "active",
       "title": "소원놀이터 수익배분 정책",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "fb473670"
     },
     {
@@ -693,7 +761,7 @@
       "owner": "comi",
       "status": "| wishes_processed",
       "title": "Airtable 테이블 스키마 (ACT 관제탑)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "4976b285"
     },
     {
@@ -709,7 +777,7 @@
       "owner": "team",
       "status": "active",
       "title": "Airtable Wish Intake 스키마",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "a8baafc3"
     },
     {
@@ -725,7 +793,7 @@
       "owner": "jemi",
       "status": "NEW, ACK, IN_PROGRESS, APPROVED, STARTED, DONE, ESCALATED",
       "title": "Airtable Wishes Inbox 테이블 스키마",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "ca0bf766"
     },
     {
@@ -742,7 +810,7 @@
       "owner": "team",
       "status": "active",
       "title": "온라인 문제 해결 소원 API v0.1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "266802c0"
     },
     {
@@ -759,7 +827,7 @@
       "owner": "code",
       "status": "active",
       "title": "온라인 소원 실현 항해 API 설계안 v0.1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "ed723688"
     },
     {
@@ -775,7 +843,7 @@
       "owner": "team",
       "status": "|------",
       "title": "무여정 메인 4개 카테고리 칩 (C-3/C-4) — PR #42 Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "b2ce7f68"
     },
     {
@@ -791,8 +859,8 @@
       "owner": "team",
       "status": "active",
       "title": "SOUL 무여정 Main Home V1 — Evidence",
-      "created_at": "2026-11-19",
-      "checksum": "ab325374"
+      "created_at": "2026-11-12",
+      "checksum": "42543ef8"
     },
     {
       "id": "DOC-MUYOJEONG_MOBILE_HOME_HERO_V1_",
@@ -807,8 +875,8 @@
       "owner": "team",
       "status": "active",
       "title": "MUYOJEONG MOBILE HOME HERO V1 — Production Evidence",
-      "created_at": "2026-11-19",
-      "checksum": "59a772d8"
+      "created_at": "2026-11-12",
+      "checksum": "63eaf8dd"
     },
     {
       "id": "DOC-SOUL_BASIC_INFO_CONNECTION_TRA",
@@ -824,8 +892,8 @@
       "owner": "team",
       "status": "active",
       "title": "Basic Information UI Connection V0.1",
-      "created_at": "2026-11-19",
-      "checksum": "561d5941"
+      "created_at": "2026-11-12",
+      "checksum": "415cc8d0"
     },
     {
       "id": "DOC-SOUL_BASIC_INFO_PRODUCTION_DAT",
@@ -841,8 +909,8 @@
       "owner": "team",
       "status": "superseded",
       "title": "Basic Information — Production Data Conflict Resolution V0.1",
-      "created_at": "2026-11-19",
-      "checksum": "7ad88f9e"
+      "created_at": "2026-11-12",
+      "checksum": "89536048"
     },
     {
       "id": "DOC-SOUL_BASIC_INFO_SURFACE_CLOSUR",
@@ -857,8 +925,8 @@
       "owner": "team",
       "status": "active",
       "title": "Basic Information Surface Closure Review V0.1",
-      "created_at": "2026-11-19",
-      "checksum": "43c5da7b"
+      "created_at": "2026-11-12",
+      "checksum": "8c06f8cc"
     },
     {
       "id": "DOC-SOUL_BASIC_INFO_UI_CONNECTION_",
@@ -873,8 +941,8 @@
       "owner": "team",
       "status": "active",
       "title": "Basic Information UI Connection V0.1 — Implementation Evidence",
-      "created_at": "2026-11-19",
-      "checksum": "3698a5f5"
+      "created_at": "2026-11-12",
+      "checksum": "3c2bc786"
     },
     {
       "id": "DOC-SOUL_BASIC_INFO_UI_PRODUCTION_",
@@ -889,8 +957,8 @@
       "owner": "team",
       "status": "active",
       "title": "Basic Information UI Connection V0.1 — Production Promotion Evidence",
-      "created_at": "2026-11-19",
-      "checksum": "b7328af8"
+      "created_at": "2026-11-12",
+      "checksum": "15723073"
     },
     {
       "id": "DOC-SOUL_BASIC_INFO_V02_GAP_PRIORI",
@@ -905,8 +973,8 @@
       "owner": "team",
       "status": "active",
       "title": "Basic Information V0.2 Gap Prioritization — Parking / Address / Product Surface",
-      "created_at": "2026-11-19",
-      "checksum": "2d5da847"
+      "created_at": "2026-11-12",
+      "checksum": "3d168bb3"
     },
     {
       "id": "DOC-SOUL_BASIC_INFO_V02_PARKING_IM",
@@ -921,7 +989,7 @@
       "owner": "team",
       "status": "active",
       "title": "Basic Information V0.2 — Parking Connection Implementation Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "e90c6992"
     },
     {
@@ -937,8 +1005,8 @@
       "owner": "team",
       "status": "active",
       "title": "Basic Information V0.2 Parking — Production Promotion Evidence",
-      "created_at": "2026-11-19",
-      "checksum": "8565b4e4"
+      "created_at": "2026-11-12",
+      "checksum": "c26c8bc5"
     },
     {
       "id": "DOC-SOUL_CABLECAR_PORT_PRODUCTION_",
@@ -954,7 +1022,7 @@
       "owner": "team",
       "status": "active",
       "title": "SOUL CableCar Port Production Evidence V0.1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "5369ad69"
     },
     {
@@ -972,7 +1040,7 @@
       "owner": "team",
       "status": "active",
       "title": "SOUL Cable Car — Existing Work Restoration Audit V0.1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "58519a80"
     },
     {
@@ -988,7 +1056,7 @@
       "owner": "code",
       "status": "|---",
       "title": "SOUL_CABLE_CAR_LIVING_DETAIL_INFORMATION_HIERARCHY_V0_1_EVIDENCE",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "6e3dcd47"
     },
     {
@@ -1004,7 +1072,7 @@
       "owner": "team",
       "status": "|---",
       "title": "SOUL_CABLE_CAR_LIVING_DETAIL_PAGE_V1_FINAL_EVIDENCE",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "cab7dcc8"
     },
     {
@@ -1021,8 +1089,8 @@
       "owner": "team",
       "status": "|---",
       "title": "SOUL_CABLE_CAR_LIVING_DETAIL_PAGE_V1_PRODUCTION_EVIDENCE",
-      "created_at": "2026-11-19",
-      "checksum": "7fba6bc3"
+      "created_at": "2026-11-12",
+      "checksum": "ddfbd3b3"
     },
     {
       "id": "DOC-SOUL_CABLE_CAR_LIVING_DETAIL_V",
@@ -1037,8 +1105,8 @@
       "owner": "code",
       "status": "|---",
       "title": "SOUL_CABLE_CAR_LIVING_DETAIL_VISUAL_STORY_LAYER_V1_EVIDENCE",
-      "created_at": "2026-11-19",
-      "checksum": "2e9d0389"
+      "created_at": "2026-11-12",
+      "checksum": "5f3488b2"
     },
     {
       "id": "DOC-SOUL_CABLE_CAR_MORE_TO_KNOW_QU",
@@ -1053,7 +1121,7 @@
       "owner": "team",
       "status": "|---",
       "title": "SOUL_CABLE_CAR_MORE_TO_KNOW_QUESTION_DISCOVERY_V0_1_EVIDENCE",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "a1f7b5d8"
     },
     {
@@ -1070,8 +1138,8 @@
       "owner": "team",
       "status": "**삭제됨** — Founder 결정 2026-10-04 (`c7d1e38`)",
       "title": "SOUL_CABLE_CAR_PLACE_HERO_VISUAL_ENTRY_AUDIT_V0_1",
-      "created_at": "2026-11-19",
-      "checksum": "26ca250e"
+      "created_at": "2026-11-12",
+      "checksum": "0d4c5d26"
     },
     {
       "id": "DOC-SOUL_CABLE_CAR_PLACE_HERO_VISU",
@@ -1087,8 +1155,8 @@
       "owner": "team",
       "status": "|---",
       "title": "SOUL_CABLE_CAR_PLACE_HERO_VISUAL_TRUST_LAYER_V1_EVIDENCE",
-      "created_at": "2026-11-19",
-      "checksum": "62ed63be"
+      "created_at": "2026-11-12",
+      "checksum": "a0b2c6a9"
     },
     {
       "id": "DOC-SOUL_CABLE_CAR_V1_PRODUCTION_R",
@@ -1103,8 +1171,8 @@
       "owner": "team",
       "status": "|---",
       "title": "SOUL_CABLE_CAR_V1_PRODUCTION_RUNTIME_ACCEPTANCE",
-      "created_at": "2026-11-19",
-      "checksum": "858b391f"
+      "created_at": "2026-11-12",
+      "checksum": "ca3cb605"
     },
     {
       "id": "DOC-SOUL_CONVERSATION_LIVING_DETAI",
@@ -1119,8 +1187,8 @@
       "owner": "code",
       "status": "상세",
       "title": "SOUL_CONVERSATION_LIVING_DETAIL_V0_1_EVIDENCE",
-      "created_at": "2026-11-19",
-      "checksum": "391803dc"
+      "created_at": "2026-11-12",
+      "checksum": "e7264409"
     },
     {
       "id": "DOC-SOUL_COURSE_DISPLAY_MUYOJEONG_",
@@ -1135,7 +1203,7 @@
       "owner": "code",
       "status": "active",
       "title": "CourseDisplay × MuyojeongHomePage — Visual Review Evidence V1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "caacd264"
     },
     {
@@ -1151,7 +1219,7 @@
       "owner": "team",
       "status": "active",
       "title": "CourseDisplay Production Verification — Evidence V1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "a185038b"
     },
     {
@@ -1168,8 +1236,8 @@
       "owner": "team",
       "status": "active",
       "title": "SOUL Current Intent × Multi-Place × Context Precedence V0.1 — Evidence",
-      "created_at": "2026-11-19",
-      "checksum": "b7817cd2"
+      "created_at": "2026-11-12",
+      "checksum": "633c5dba"
     },
     {
       "id": "DOC-SOUL_CURRENT_PLACE_CONTEXT_ARC",
@@ -1184,8 +1252,8 @@
       "owner": "team",
       "status": "active",
       "title": "SOUL Current Place Context Architecture Review V0.1",
-      "created_at": "2026-11-19",
-      "checksum": "a62b3e60"
+      "created_at": "2026-11-12",
+      "checksum": "5feb759b"
     },
     {
       "id": "DOC-SOUL_DOLSAN_PARK_RUNTIME_QA_V1",
@@ -1200,8 +1268,8 @@
       "owner": "code",
       "status": "active",
       "title": "SOUL Dolsan Park Living Detail — Runtime QA V1 Evidence",
-      "created_at": "2026-11-19",
-      "checksum": "90c47cf6"
+      "created_at": "2026-11-12",
+      "checksum": "bb9c93ba"
     },
     {
       "id": "DOC-SOUL_G1_CITY_DETECTION_V0_1_CL",
@@ -1216,8 +1284,8 @@
       "owner": "team",
       "status": "active",
       "title": "G1 City Detection V0.1 — Closure Evidence",
-      "created_at": "2026-11-19",
-      "checksum": "807df5d0"
+      "created_at": "2026-11-12",
+      "checksum": "6a26e373"
     },
     {
       "id": "DOC-SOUL_JUDGMENT_V01_PRODUCTION_P",
@@ -1232,8 +1300,8 @@
       "owner": "team",
       "status": "active",
       "title": "SOUL Judgment V0.1 — Production Promotion Evidence",
-      "created_at": "2026-11-19",
-      "checksum": "45d950f4"
+      "created_at": "2026-11-12",
+      "checksum": "67b693ff"
     },
     {
       "id": "DOC-SOUL_LIVING_DETAIL_PAGE_REALIT",
@@ -1249,7 +1317,7 @@
       "owner": "team",
       "status": "active",
       "title": "SOUL Living Detail Page — Current Implementation Reality Audit V0.1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "2d92c797"
     },
     {
@@ -1266,7 +1334,7 @@
       "owner": "team",
       "status": "active",
       "title": "SOUL Minimal Stack Port — Implementation Record V0.1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "d50c8e75"
     },
     {
@@ -1282,8 +1350,8 @@
       "owner": "code",
       "status": "active",
       "title": "SOUL MINIMUM JOURNEY CONTINUITY V0.1 — Evidence",
-      "created_at": "2026-11-19",
-      "checksum": "be59903e"
+      "created_at": "2026-11-12",
+      "checksum": "ebb2b69c"
     },
     {
       "id": "DOC-SOUL_MOBILE_GOLDEN_CONVERSATIO",
@@ -1298,8 +1366,8 @@
       "owner": "team",
       "status": "active",
       "title": "SOUL MOBILE GOLDEN CONVERSATION — Production V1 Evidence",
-      "created_at": "2026-11-19",
-      "checksum": "6b87ad5e"
+      "created_at": "2026-11-12",
+      "checksum": "0c579b5e"
     },
     {
       "id": "DOC-SOUL_ODONGDO_LIVING_DETAIL_V1_",
@@ -1314,8 +1382,8 @@
       "owner": "team",
       "status": "Commit",
       "title": "SOUL_ODONGDO_LIVING_DETAIL_V1_FINAL_EVIDENCE",
-      "created_at": "2026-11-19",
-      "checksum": "f3142c43"
+      "created_at": "2026-11-12",
+      "checksum": "3c658ea5"
     },
     {
       "id": "DOC-SOUL_OPEN_ENDED_PLACE_QUESTION",
@@ -1331,8 +1399,8 @@
       "owner": "team",
       "status": "active",
       "title": "SOUL Open-Ended Place Question Trace V0.1",
-      "created_at": "2026-11-19",
-      "checksum": "9d582f8c"
+      "created_at": "2026-11-12",
+      "checksum": "caa133ea"
     },
     {
       "id": "DOC-SOUL_PARKING_ROUTE_REALITY_CHE",
@@ -1347,7 +1415,7 @@
       "owner": "code",
       "status": "NOT_IMPLEMENTED",
       "title": "SOUL Parking & Route Reality Check V0.1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "b5b277bd"
     },
     {
@@ -1363,7 +1431,7 @@
       "owner": "team",
       "status": "active",
       "title": "SOUL Place Knowledge Binding Repair V0.1 — Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "677b45d2"
     },
     {
@@ -1380,8 +1448,8 @@
       "owner": "team",
       "status": "active",
       "title": "SOUL Place-Specific Query V0.1 — Production Evidence",
-      "created_at": "2026-11-19",
-      "checksum": "d0a7164c"
+      "created_at": "2026-11-12",
+      "checksum": "96a0fcb6"
     },
     {
       "id": "DOC-SOUL_PRE_PILOT_READINESS_CHECK",
@@ -1396,8 +1464,8 @@
       "owner": "code",
       "status": "분류",
       "title": "SOUL Pre-Pilot Readiness Check V0.1",
-      "created_at": "2026-11-19",
-      "checksum": "ac2d6b1a"
+      "created_at": "2026-11-12",
+      "checksum": "cd310099"
     },
     {
       "id": "DOC-SOUL_PRODUCT_CONTINUITY_INCIDE",
@@ -1415,8 +1483,8 @@
       "owner": "team",
       "status": "active",
       "title": "SOUL Product Continuity Incident Audit V0.1",
-      "created_at": "2026-11-19",
-      "checksum": "057c1f91"
+      "created_at": "2026-11-12",
+      "checksum": "435cf4a6"
     },
     {
       "id": "DOC-SOUL_P_NEW_1_EXPLICIT_PLACE_PR",
@@ -1431,7 +1499,7 @@
       "owner": "team",
       "status": "active",
       "title": "P-NEW-1 Explicit Place Preservation — Production Deployment Evidence V1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "3a7f1e6d"
     },
     {
@@ -1447,8 +1515,8 @@
       "owner": "team",
       "status": "active",
       "title": "SOUL Runtime Repair V0.1 — Remaining Clarification Leak Evidence",
-      "created_at": "2026-11-19",
-      "checksum": "2fd0ea54"
+      "created_at": "2026-11-12",
+      "checksum": "ec6df58f"
     },
     {
       "id": "DOC-SOUL_SUITABLE_FOR_OPTION_C_EVI",
@@ -1463,7 +1531,7 @@
       "owner": "code",
       "status": "|------",
       "title": "SOUL suitable_for Option C — Evidence V0.1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "fac49844"
     },
     {
@@ -1481,7 +1549,7 @@
       "owner": "code",
       "status": "active",
       "title": "SOUL Taxonomy Provenance & Port Alignment Audit V0.1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "c99f4954"
     },
     {
@@ -1499,7 +1567,7 @@
       "owner": "yeoiboju",
       "status": "active",
       "title": "SOUL Taxonomy Provenance — Re-Audit V0.2",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "5bc09ee4"
     },
     {
@@ -1515,8 +1583,8 @@
       "owner": "team",
       "status": "active",
       "title": "UI-001 — Structured Explicit Context Contract Design V0.1",
-      "created_at": "2026-11-19",
-      "checksum": "8584ada7"
+      "created_at": "2026-11-12",
+      "checksum": "b13ed8c2"
     },
     {
       "id": "DOC-SOUL_UI_001_EXPLICIT_CONTEXT_I",
@@ -1532,7 +1600,7 @@
       "owner": "team",
       "status": "active",
       "title": "UI-001 — Structured Explicit Context Implementation Record V0.1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "3666b433"
     },
     {
@@ -1548,8 +1616,8 @@
       "owner": "team",
       "status": "active",
       "title": "UI-001 — Structured Explicit Context Production Promotion Evidence V0.1",
-      "created_at": "2026-11-19",
-      "checksum": "29e301d1"
+      "created_at": "2026-11-12",
+      "checksum": "dd61c0ac"
     },
     {
       "id": "DOC-SOUL_VISION_CONTINUITY_REPOSIT",
@@ -1567,8 +1635,8 @@
       "owner": "code",
       "status": "active",
       "title": "SOUL Vision Continuity — Current Repository State & Work Inventory V0.1",
-      "created_at": "2026-11-19",
-      "checksum": "4541d0f1"
+      "created_at": "2026-11-12",
+      "checksum": "d484aa77"
     },
     {
       "id": "DOC-SOUL_YISUNSIN_SQUARE_ASSET_DEC",
@@ -1583,8 +1651,8 @@
       "owner": "team",
       "status": "역할 설명",
       "title": "SOUL YiSunSin Square — Asset Inventory Decision V0.1",
-      "created_at": "2026-11-19",
-      "checksum": "bd8fb8c7"
+      "created_at": "2026-11-12",
+      "checksum": "168ae27a"
     },
     {
       "id": "DOC-CHANGELOG",
@@ -1600,8 +1668,8 @@
       "owner": "rumi",
       "status": "active",
       "title": "SSOT 변경 로그 (CHANGELOG)",
-      "created_at": "2026-11-19",
-      "checksum": "c99a2f47"
+      "created_at": "2026-11-12",
+      "checksum": "457ae6bf"
     },
     {
       "id": "DOC-DEC-OPS-001_Partner_Master_SSO",
@@ -1617,8 +1685,8 @@
       "owner": "Aurora5 / (주)여수여행센터",
       "status": "Confirmed",
       "title": "DEC-OPS-001 — Partner Master Single Source of Truth",
-      "created_at": "2026-11-19",
-      "checksum": "37881e1d"
+      "created_at": "2026-11-12",
+      "checksum": "f392e418"
     },
     {
       "id": "DOC-DEC_2026_0516_CANONICAL_RATIO_",
@@ -1634,8 +1702,8 @@
       "owner": "rumi",
       "status": "active",
       "title": "DEC_2026_0516_CANONICAL_RATIO_3x4",
-      "created_at": "2026-11-19",
-      "checksum": "230d633f"
+      "created_at": "2026-11-12",
+      "checksum": "c89358c7"
     },
     {
       "id": "DOC-DEC_2026_0516_OUTPUT_STRATEGY",
@@ -1651,8 +1719,8 @@
       "owner": "rumi",
       "status": "active",
       "title": "DEC_2026_0516_OUTPUT_STRATEGY",
-      "created_at": "2026-11-19",
-      "checksum": "61e40c74"
+      "created_at": "2026-11-12",
+      "checksum": "4c1408f7"
     },
     {
       "id": "DOC-NOTION_PROFILE_GATE",
@@ -1668,8 +1736,8 @@
       "owner": "team",
       "status": "|------",
       "title": "Notion DB Profile Gate 가이드",
-      "created_at": "2026-11-19",
-      "checksum": "303564a8"
+      "created_at": "2026-11-12",
+      "checksum": "5abf91a1"
     },
     {
       "id": "DOC-SOURCES_INDEX",
@@ -1685,8 +1753,8 @@
       "owner": "team",
       "status": "트랙",
       "title": "SSOT 원문→정본 반영 매핑표",
-      "created_at": "2026-11-19",
-      "checksum": "9c6970bb"
+      "created_at": "2026-11-12",
+      "checksum": "1e550c3e"
     },
     {
       "id": "DOC-HAMEL_ASSET_INVENTORY",
@@ -1702,8 +1770,8 @@
       "owner": "team",
       "status": "|---",
       "title": "HAMEL_ASSET_INVENTORY.md",
-      "created_at": "2026-11-19",
-      "checksum": "033d7d56"
+      "created_at": "2026-11-12",
+      "checksum": "9407f19a"
     },
     {
       "id": "DOC-HAMEL_MIGRATION_EXECUTION_REPO",
@@ -1719,8 +1787,8 @@
       "owner": "code",
       "status": "설명",
       "title": "HAMEL_MIGRATION_EXECUTION_REPORT.md",
-      "created_at": "2026-11-19",
-      "checksum": "78e75a30"
+      "created_at": "2026-11-12",
+      "checksum": "b8d8245b"
     },
     {
       "id": "DOC-HAMEL_MIGRATION_PLAN",
@@ -1736,8 +1804,8 @@
       "owner": "code",
       "status": "archived",
       "title": "HAMEL_MIGRATION_PLAN.md",
-      "created_at": "2026-11-19",
-      "checksum": "484d9e30"
+      "created_at": "2026-11-12",
+      "checksum": "4a645962"
     },
     {
       "id": "DOC-HAMEL_REFERENCE_AUDIT",
@@ -1754,8 +1822,8 @@
       "owner": "code",
       "status": "근거",
       "title": "HAMEL_REFERENCE_AUDIT.md",
-      "created_at": "2026-11-19",
-      "checksum": "ec5b7084"
+      "created_at": "2026-11-12",
+      "checksum": "d9446a43"
     },
     {
       "id": "DOC-AURORA5_CHARACTER_PROMPTS",
@@ -1770,8 +1838,8 @@
       "owner": "rumi",
       "status": "active",
       "title": "Aurora 5 캐릭터 생성 프롬프트 패키지 v2.1",
-      "created_at": "2026-11-19",
-      "checksum": "21f675dd"
+      "created_at": "2026-11-12",
+      "checksum": "64f0a2d2"
     },
     {
       "id": "DOC-AURORA_2D_EMOTION_ENGINE",
@@ -1784,7 +1852,7 @@
       "owner": "team",
       "status": "active",
       "title": "AURORA 2D EMOTION ENGINE",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "d41d8cd9"
     },
     {
@@ -1802,7 +1870,7 @@
       "owner": "team",
       "status": "active",
       "title": "최수민방식 치트시트",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "9f7529c4"
     },
     {
@@ -1820,8 +1888,8 @@
       "owner": "team",
       "status": "active",
       "title": "Claude Desktop MCP 서버 설정 가이드",
-      "created_at": "2026-11-19",
-      "checksum": "3e7446e2"
+      "created_at": "2026-11-12",
+      "checksum": "44ccac1b"
     },
     {
       "id": "DOC-CAND-CONSTITUTION-001_Geumo_Le",
@@ -1837,7 +1905,7 @@
       "owner": "DreamTown · Lumi",
       "status": "Candidate",
       "title": "CAND-CONSTITUTION-001 — Geumo Legend Heart Mirror",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "96212894"
     },
     {
@@ -1856,7 +1924,7 @@
       "owner": "대표(푸르미르) / Aurora5 / Claude Code",
       "status": "Candidate",
       "title": "CAND-CONSTITUTION-002 — DreamTown Experience Constitution: Companion Growth Platform",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "cfbf0979"
     },
     {
@@ -1874,7 +1942,7 @@
       "owner": "대표(푸르미르) / Aurora5 / Claude Code",
       "status": "Candidate",
       "title": "CAND-EXP-001 — DreamTown Experience Architecture (Candidate)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "c101cd98"
     },
     {
@@ -1892,7 +1960,7 @@
       "owner": "대표(푸르미르) / Aurora5 / Claude Code",
       "status": "Candidate",
       "title": "CAND-EXP-002 — DreamTown Orchestra: 소원이의 삶의 오케스트라",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "47554973"
     },
     {
@@ -1910,7 +1978,7 @@
       "owner": "대표(푸르미르) / Aurora5 / Claude Code",
       "status": "Candidate",
       "title": "CAND-EXP-002-B — 별빛항로 현지 경험: Starlight Route Local Experience",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "f9255b72"
     },
     {
@@ -1927,7 +1995,7 @@
       "owner": "대표 + Lumi / Claude Code",
       "status": "Candidate",
       "title": "CAND-WISH-001 — DreamTown Happy Memory First Principle",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "6e8ac4fd"
     },
     {
@@ -1944,7 +2012,7 @@
       "owner": "대표(푸르미르) / Aurora5 / Claude Code",
       "status": "Active",
       "title": "Constitution Governance",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "2472cc8f"
     },
     {
@@ -1961,7 +2029,7 @@
       "owner": "대표(푸르미르) / Aurora5 / Claude Code",
       "status": "Constitution (Active Operational Constitution — Pilot Only)",
       "title": "OP-CONSTITUTION-001 — Pilot Research Execution Rules",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "8a2f1dc3"
     },
     {
@@ -1977,7 +2045,7 @@
       "owner": "team",
       "status": "Pilot Study",
       "title": "RESEARCH-010 — Pilot Study EP01",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "6930686b"
     },
     {
@@ -1993,7 +2061,7 @@
       "owner": "team",
       "status": "Research",
       "title": "RESEARCH-011 — Evidence Collection Protocol",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "d29c8dd7"
     },
     {
@@ -2009,7 +2077,7 @@
       "owner": "team",
       "status": "Research",
       "title": "RESEARCH-012 — Participant Journey (파일럿 운영안)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "c41b9a69"
     },
     {
@@ -2025,7 +2093,7 @@
       "owner": "team",
       "status": "Experience Scenario",
       "title": "RESEARCH-013 — EP01 End-to-End User Journey",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "5d2e1cfd"
     },
     {
@@ -2041,7 +2109,7 @@
       "owner": "team",
       "status": "Draft",
       "title": "RESEARCH-016 — Observation Promotion Criteria",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "562044b2"
     },
     {
@@ -2057,7 +2125,7 @@
       "owner": "team",
       "status": "Draft",
       "title": "RESEARCH-017 — Evidence Promotion Criteria",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "26012536"
     },
     {
@@ -2073,7 +2141,7 @@
       "owner": "team",
       "status": "Draft",
       "title": "RESEARCH-018 — Candidate Promotion Criteria",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "503ac9a9"
     },
     {
@@ -2089,7 +2157,7 @@
       "owner": "team",
       "status": "Draft",
       "title": "RESEARCH-019 — Raw Interview Collection Protocol",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "6881a78d"
     },
     {
@@ -2105,7 +2173,7 @@
       "owner": "team",
       "status": "Research Note",
       "title": "RESEARCH-GEUMO-001 — Turtle Legend Symbol Interpretation",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "fe06f536"
     },
     {
@@ -2121,7 +2189,7 @@
       "owner": "team",
       "status": "superseded",
       "title": "Project Phoenix — Current Working State (Pilot Research)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "ebc9eb31"
     },
     {
@@ -2138,8 +2206,8 @@
       "owner": "rumi",
       "status": "active",
       "title": "DreamTown Constitution v1",
-      "created_at": "2026-11-19",
-      "checksum": "2debbabc"
+      "created_at": "2026-11-12",
+      "checksum": "049d3887"
     },
     {
       "id": "DOC-README",
@@ -2152,7 +2220,7 @@
       "owner": "team",
       "status": "active",
       "title": "README",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "60a0b4af"
     },
     {
@@ -2170,8 +2238,8 @@
       "owner": "rumi",
       "status": "archived",
       "title": "DEC-20260201 — 포인트/추천/예고편(Preview) 정책·구현 결정로그 v1",
-      "created_at": "2026-11-19",
-      "checksum": "4812baf2"
+      "created_at": "2026-11-12",
+      "checksum": "5e969ee6"
     },
     {
       "id": "DOC-DECISION_PHOENIX_D2_LIVING_DET",
@@ -2188,8 +2256,8 @@
       "owner": "ceo",
       "status": "active",
       "title": "Decision Record: D2 — Living Detail Page",
-      "created_at": "2026-11-19",
-      "checksum": "62f283fe"
+      "created_at": "2026-11-12",
+      "checksum": "5d6ac1e0"
     },
     {
       "id": "DOC-index",
@@ -2205,7 +2273,7 @@
       "owner": "ceo",
       "status": "active",
       "title": "Decisions Index",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "b355d262"
     },
     {
@@ -2219,8 +2287,8 @@
       "owner": "team",
       "status": "|-------",
       "title": "[실행 지시서] DreamTown Star System 배포 체크리스트 v1.0",
-      "created_at": "2026-11-19",
-      "checksum": "85875e4e"
+      "created_at": "2026-11-12",
+      "checksum": "37ccad79"
     },
     {
       "id": "DOC-deployment-checklist",
@@ -2235,7 +2303,7 @@
       "owner": "code",
       "status": "archived",
       "title": "Daily Miracles MVP 배포 체크리스트",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "0202a43e"
     },
     {
@@ -2251,7 +2319,7 @@
       "owner": "team",
       "status": "active",
       "title": "룰 파일 월간 업데이트 SOP",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "556f31c3"
     },
     {
@@ -2267,7 +2335,7 @@
       "owner": "code",
       "status": "active",
       "title": "딜 등록 및 보호 정책 (개발 참조용)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "9e550060"
     },
     {
@@ -2283,7 +2351,7 @@
       "owner": "team",
       "status": "active",
       "title": "통합 가이드 (Integration Guide)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "ebf6e247"
     },
     {
@@ -2300,7 +2368,7 @@
       "owner": "team",
       "status": "| `/api/ops-center/mice/report/generate/:eventId`",
       "title": "DEV Bundle (개발 전달용)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "e1f60009"
     },
     {
@@ -2318,7 +2386,7 @@
       "owner": "rumi",
       "status": "| Aurora (오로라)",
       "title": "DreamTown Knowledge Map",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "8b0a60e5"
     },
     {
@@ -2336,7 +2404,7 @@
       "owner": "code",
       "status": "active",
       "title": "DreamTown KPI 이벤트 스키마 SSOT",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "b6d4cd4a"
     },
     {
@@ -2353,8 +2421,8 @@
       "owner": "code",
       "status": "다음 목표",
       "title": "DreamTown 영상·세계관 SSOT 인덱스",
-      "created_at": "2026-11-19",
-      "checksum": "b27d53d2"
+      "created_at": "2026-11-12",
+      "checksum": "c42460b4"
     },
     {
       "id": "DOC-playground-events",
@@ -2370,7 +2438,7 @@
       "owner": "team",
       "status": "active",
       "title": "소원놀이터 이벤트 스키마",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "eee7162b"
     },
     {
@@ -2386,8 +2454,8 @@
       "owner": "code",
       "status": "active",
       "title": "Architecture Guard — Dual-Agent Continuity Verification H-01 ~ H-03",
-      "created_at": "2026-11-19",
-      "checksum": "37f55932"
+      "created_at": "2026-11-12",
+      "checksum": "91493d62"
     },
     {
       "id": "DOC-ARCH_GUARD_DUAL_AGENT_CONTINUI",
@@ -2402,8 +2470,8 @@
       "owner": "code",
       "status": "Approved, CLOSED",
       "title": "Architecture Guard — Dual-Agent Continuity Verification V0.1",
-      "created_at": "2026-11-19",
-      "checksum": "92d741a5"
+      "created_at": "2026-11-12",
+      "checksum": "30e4312c"
     },
     {
       "id": "DOC-ARCH_GUARD_SCENARIO_VERIFICATI",
@@ -2420,8 +2488,8 @@
       "owner": "code",
       "status": "active",
       "title": "Architecture Guard Protocol V0.1 — Scenario Verification",
-      "created_at": "2026-11-19",
-      "checksum": "0fff51f5"
+      "created_at": "2026-11-12",
+      "checksum": "e0605c65"
     },
     {
       "id": "DOC-LEGACY_YEOSU_ORIGIN_ASSETS_DEL",
@@ -2437,7 +2505,7 @@
       "owner": "ceo",
       "status": "superseded",
       "title": "LEGACY_YEOSU_ORIGIN_ASSETS_DELETED",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "4c9df8f8"
     },
     {
@@ -2453,8 +2521,8 @@
       "owner": "team",
       "status": "active",
       "title": "Phoenix Decision Meeting Record — Template",
-      "created_at": "2026-11-19",
-      "checksum": "1f05e692"
+      "created_at": "2026-11-12",
+      "checksum": "20111473"
     },
     {
       "id": "DOC-DreamTown_GPT_Knowledge_Pack",
@@ -2471,8 +2539,8 @@
       "owner": "code",
       "status": "시스템",
       "title": "DreamTown GPT Knowledge Pack",
-      "created_at": "2026-11-19",
-      "checksum": "783197db"
+      "created_at": "2026-11-12",
+      "checksum": "9210e7ce"
     },
     {
       "id": "DOC-DreamTown_SSOT_Core",
@@ -2489,8 +2557,8 @@
       "owner": "code",
       "status": "archived",
       "title": "DreamTown SSOT Core",
-      "created_at": "2026-11-19",
-      "checksum": "09484b85"
+      "created_at": "2026-11-12",
+      "checksum": "cfeafbaf"
     },
     {
       "id": "DOC-DreamTown_SSOT_Registry_Summar",
@@ -2507,8 +2575,8 @@
       "owner": "team",
       "status": "active",
       "title": "DreamTown SSOT Registry Summary",
-      "created_at": "2026-11-19",
-      "checksum": "fd049a61"
+      "created_at": "2026-11-12",
+      "checksum": "ffe3cee6"
     },
     {
       "id": "DOC-DreamTown_System_Map",
@@ -2525,8 +2593,8 @@
       "owner": "code",
       "status": "|-------",
       "title": "DreamTown System Map",
-      "created_at": "2026-11-19",
-      "checksum": "e595ff52"
+      "created_at": "2026-11-12",
+      "checksum": "7294998d"
     },
     {
       "id": "DOC-DT_API_Registry",
@@ -2545,7 +2613,7 @@
       "owner": "code",
       "status": "active",
       "title": "DreamTown API Registry",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "0b5c74a0"
     },
     {
@@ -2561,7 +2629,7 @@
       "owner": "rumi",
       "status": "|-------",
       "title": "DreamTown Claude Code Work Order Guide",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "1af13417"
     },
     {
@@ -2578,7 +2646,7 @@
       "owner": "team",
       "status": "active",
       "title": "DreamTown Codebase System Map",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "88590fc0"
     },
     {
@@ -2596,7 +2664,7 @@
       "owner": "team",
       "status": "active",
       "title": "DreamTown DB Schema Summary",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "7ce470b1"
     },
     {
@@ -2615,7 +2683,7 @@
       "owner": "team",
       "status": "active",
       "title": "DreamTown Express Architecture (daily-miracles-mvp)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "74780f73"
     },
     {
@@ -2634,7 +2702,7 @@
       "owner": "team",
       "status": "active",
       "title": "DreamTown Folder Responsibility Index",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "12c8b5d7"
     },
     {
@@ -2652,7 +2720,7 @@
       "owner": "team",
       "status": "active",
       "title": "DreamTown React Architecture (sowon-dreamtown)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "4b394e67"
     },
     {
@@ -2669,7 +2737,7 @@
       "owner": "comi",
       "status": "archived",
       "title": "하루하루의 기적 - 성장 로드맵",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "881f0936"
     },
     {
@@ -2685,8 +2753,8 @@
       "owner": "team",
       "status": "active",
       "title": "CHECKLIST — Vercel Serverless Crash Fix",
-      "created_at": "2026-11-19",
-      "checksum": "a753c519"
+      "created_at": "2026-11-12",
+      "checksum": "b7f29554"
     },
     {
       "id": "DOC-CONTEXT",
@@ -2701,8 +2769,8 @@
       "owner": "team",
       "status": "active",
       "title": "CONTEXT — Vercel Serverless Crash Fix",
-      "created_at": "2026-11-19",
-      "checksum": "80833d12"
+      "created_at": "2026-11-12",
+      "checksum": "4cf523f0"
     },
     {
       "id": "DOC-PLAN",
@@ -2717,8 +2785,8 @@
       "owner": "team",
       "status": "active",
       "title": "PLAN — Vercel Serverless Crash Fix",
-      "created_at": "2026-11-19",
-      "checksum": "0535bbd5"
+      "created_at": "2026-11-12",
+      "checksum": "34489117"
     },
     {
       "id": "DOC-JUDGE_PROMPTS",
@@ -2735,181 +2803,8 @@
       "owner": "rumi",
       "status": "active",
       "title": "📋 Aurora5 Judge 프롬프트 가이드",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "513de9dd"
-    },
-    {
-      "id": "DOC-DREAMTOWN_STATUSpost-PHX-SOUL",
-      "path": "docs/knowledge/backups/DREAMTOWN_STATUS.post-PHX-SOUL-QA-001-rc3-investigation-2026-11-19.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "backups",
-        "소원",
-        "storybook",
-        "aurora",
-        "가격",
-        "결제"
-      ],
-      "owner": "rumi",
-      "status": "CANDIDATE",
-      "title": "DREAMTOWN_STATUS.md",
-      "created_at": "2026-11-19",
-      "checksum": "35f644a2"
-    },
-    {
-      "id": "DOC-DREAMTOWN_STATUSpost-PHX-SOUL",
-      "path": "docs/knowledge/backups/DREAMTOWN_STATUS.post-PHX-SOUL-QA-001-rc3-selective-2026-11-19.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "backups",
-        "소원",
-        "storybook",
-        "aurora",
-        "가격",
-        "결제"
-      ],
-      "owner": "rumi",
-      "status": "CANDIDATE",
-      "title": "DREAMTOWN_STATUS.md",
-      "created_at": "2026-11-19",
-      "checksum": "10ab624c"
-    },
-    {
-      "id": "DOC-DREAMTOWN_STATUSpost-PHX-SOUL",
-      "path": "docs/knowledge/backups/DREAMTOWN_STATUS.post-PHX-SOUL-QA-001-real-run-2026-11-19.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "backups",
-        "소원",
-        "storybook",
-        "aurora",
-        "가격",
-        "결제"
-      ],
-      "owner": "rumi",
-      "status": "CANDIDATE",
-      "title": "DREAMTOWN_STATUS.md",
-      "created_at": "2026-11-19",
-      "checksum": "7b97c41b"
-    },
-    {
-      "id": "DOC-DREAMTOWN_STATUSpre-PHX-SOUL-",
-      "path": "docs/knowledge/backups/DREAMTOWN_STATUS.pre-PHX-SOUL-QA-001-preflight-2026-11-19.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "backups",
-        "소원",
-        "storybook",
-        "aurora",
-        "가격",
-        "결제"
-      ],
-      "owner": "rumi",
-      "status": "CANDIDATE",
-      "title": "DREAMTOWN_STATUS.md",
-      "created_at": "2026-11-19",
-      "checksum": "f12c89af"
-    },
-    {
-      "id": "DOC-DREAMTOWN_STATUSpre-PHX-SOUL-",
-      "path": "docs/knowledge/backups/DREAMTOWN_STATUS.pre-PHX-SOUL-QA-001-real-retry-2026-11-19.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "backups",
-        "소원",
-        "storybook",
-        "aurora",
-        "가격",
-        "결제"
-      ],
-      "owner": "rumi",
-      "status": "CANDIDATE",
-      "title": "DREAMTOWN_STATUS.md",
-      "created_at": "2026-11-19",
-      "checksum": "bf164c1c"
-    },
-    {
-      "id": "DOC-PHX-SOUL-QA-001_RC3_FINDINGS_S",
-      "path": "docs/knowledge/backups/PHX-SOUL-QA-001_RC3_FINDINGS_S49_V1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "backups",
-        "storybook"
-      ],
-      "owner": "code",
-      "status": "active",
-      "title": "PHX-SOUL-QA-001 — Evidence §49: RC3 Route Skeleton 복구 가능성 조사 결과 (2026-11-19, 조사만)",
-      "created_at": "2026-11-19",
-      "checksum": "8ebad9c8"
-    },
-    {
-      "id": "DOC-PHX-SOUL-QA-001_RC3_RECOVERY_P",
-      "path": "docs/knowledge/backups/PHX-SOUL-QA-001_RC3_RECOVERY_PLAN_V1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "backups",
-        "storybook"
-      ],
-      "owner": "code",
-      "status": "active",
-      "title": "PHX-SOUL-QA-001 — RC3 Route Skeleton 복구 가능성 조사 및 최소 복구 계획 (V1, 2026-11-19)",
-      "created_at": "2026-11-19",
-      "checksum": "e11ebf38"
-    },
-    {
-      "id": "DOC-PHX-SOUL-QA-001_RC3_SELECTIVE_",
-      "path": "docs/knowledge/backups/PHX-SOUL-QA-001_RC3_SELECTIVE_RECOVERY_V1_snapshot.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "backups",
-        "storybook"
-      ],
-      "owner": "code",
-      "status": "내용",
-      "title": "PHX-SOUL-QA-001 — RC3 Selective Recovery (V1, 2026-11-19)",
-      "created_at": "2026-11-19",
-      "checksum": "050d6e34"
-    },
-    {
-      "id": "DOC-PHX-SOUL-QA-001_REAL_LLM_FINAL",
-      "path": "docs/knowledge/backups/PHX-SOUL-QA-001_REAL_LLM_FINAL_RETRY_V1_snapshot.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "backups",
-        "소원"
-      ],
-      "owner": "code",
-      "status": "superseded",
-      "title": "PHX-SOUL-QA-001 — Real LLM Verification Final Retry (V1, 2026-11-19)",
-      "created_at": "2026-11-19",
-      "checksum": "a099821d"
     },
     {
       "id": "DOC-CI-DIAG-PR113-001",
@@ -2924,7 +2819,7 @@
       "owner": "code",
       "status": "active",
       "title": "CI-DIAG-PR113-001 — PR #113 AIL Gate & docker-smoke 미실행 진단",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "ffb65e2e"
     },
     {
@@ -2940,7 +2835,7 @@
       "owner": "code",
       "status": "비고",
       "title": "PHX-COMMERCE-FLOW-004 — PR #141 CI Gate Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "6cefb250"
     },
     {
@@ -2958,7 +2853,7 @@
       "owner": "team",
       "status": "처리",
       "title": "PHX-COMMERCE-FLOW-003 — FLOW Minimal Integration Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "62a3ab67"
     },
     {
@@ -2975,7 +2870,7 @@
       "owner": "code",
       "status": "해소 조건",
       "title": "커머스 Phase 1 — 복합상품 운영 코드 정합성 조사 Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "465c7b9e"
     },
     {
@@ -2993,7 +2888,7 @@
       "owner": "code",
       "status": "active",
       "title": "PIN 역할 및 적용 경로 확인 Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "6b787daa"
     },
     {
@@ -3010,7 +2905,7 @@
       "owner": "code",
       "status": "|------",
       "title": "PHX-COMMERCE-TICKET-001 — Ticket Hold & Book API Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "8a3ad557"
     },
     {
@@ -3027,8 +2922,8 @@
       "owner": "code",
       "status": "|---",
       "title": "PHX-COMMERCE-TICKET-004 — Controlled Merge Evidence",
-      "created_at": "2026-11-19",
-      "checksum": "a5e4f3a9"
+      "created_at": "2026-11-12",
+      "checksum": "b25204d7"
     },
     {
       "id": "DOC-COMMERCE-TICKET-PROD-GATE-V0_1",
@@ -3044,7 +2939,7 @@
       "owner": "code",
       "status": "필수",
       "title": "PHX-COMMERCE-TICKET-003 — Production Safety Gate Report",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "5ae5c532"
     },
     {
@@ -3061,7 +2956,7 @@
       "owner": "code",
       "status": "비고",
       "title": "PHX-COMMERCE-TICKET-002 — Security Gate Report",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "02bc2b89"
     },
     {
@@ -3077,7 +2972,7 @@
       "owner": "code",
       "status": "active",
       "title": "COURSE-PLANNING-8H-TRACE-V0_1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "93608aba"
     },
     {
@@ -3093,7 +2988,7 @@
       "owner": "code",
       "status": "내용",
       "title": "COURSE-PLANNING-FULLDAY-DESIGN-V0_1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "91f347f2"
     },
     {
@@ -3109,7 +3004,7 @@
       "owner": "team",
       "status": "active",
       "title": "COURSE-PLANNING-FULLDAY-IMPL-V0_1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "b762747f"
     },
     {
@@ -3125,7 +3020,7 @@
       "owner": "code",
       "status": "active",
       "title": "COURSE-PLANNING-TIME-FIT-DIAGNOSIS-V0_1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "053522d1"
     },
     {
@@ -3142,7 +3037,7 @@
       "owner": "code",
       "status": "disabled",
       "title": "CUSTOM-ROUTE-V01-DESIGN",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "167eef26"
     },
     {
@@ -3158,7 +3053,7 @@
       "owner": "team",
       "status": "active",
       "title": "맞춤 항로 V0.1 — HTTP Integration Gate Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "35c6c3eb"
     },
     {
@@ -3174,7 +3069,7 @@
       "owner": "team",
       "status": "|------",
       "title": "맞춤 항로 V0.1 — Production QA Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "c5dff0df"
     },
     {
@@ -3190,8 +3085,8 @@
       "owner": "code",
       "status": "근거",
       "title": "맞춤 항로 V0.1 — Runtime Integration Gate Evidence",
-      "created_at": "2026-11-19",
-      "checksum": "a2bd6b88"
+      "created_at": "2026-11-12",
+      "checksum": "26864fb8"
     },
     {
       "id": "DOC-DREAMTOWN-TIME-BUDGET-V0_1-CAN",
@@ -3206,7 +3101,7 @@
       "owner": "code",
       "status": "변경 근거",
       "title": "DREAMTOWN-TIME-BUDGET-V0_1-CANDIDATE",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "075cbc99"
     },
     {
@@ -3222,7 +3117,7 @@
       "owner": "code",
       "status": "|------",
       "title": "EVIDENCE-B-001 — Hotel-to-Starlight Nighttime Walk SOUL V0.1 구현 Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "82feb91a"
     },
     {
@@ -3238,7 +3133,7 @@
       "owner": "code",
       "status": "200 OK",
       "title": "EVIDENCE-B-002 — Phase B V0.1 Production QA",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "857d3ca5"
     },
     {
@@ -3254,7 +3149,7 @@
       "owner": "code",
       "status": "archived",
       "title": "하멜등대 Living Detail Page V0.1 — 구현 Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "1b1dcec3"
     },
     {
@@ -3271,7 +3166,7 @@
       "owner": "code",
       "status": "|------",
       "title": "IMPL-PLAN-B-001 — Hotel-to-Starlight Nighttime Walk SOUL Answer V0.1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "2354919b"
     },
     {
@@ -3292,7 +3187,7 @@
       "owner": "code",
       "status": "|------",
       "title": "PHX-KENNY-003 — 케니호텔 전용 무여정 영업 시연판 Evidence V0.1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "0f0acadd"
     },
     {
@@ -3308,7 +3203,7 @@
       "owner": "code",
       "status": "|------",
       "title": "MAP V0.1 — 15곳 마커 데이터 파이프라인 감사",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "b0095f98"
     },
     {
@@ -3324,7 +3219,7 @@
       "owner": "code",
       "status": "이후 상태",
       "title": "MAP V0.1 — All-Zone Marker Editor Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "f92e4d4f"
     },
     {
@@ -3340,7 +3235,7 @@
       "owner": "team",
       "status": "active",
       "title": "MAP V0.1 — Zone Boundary 설계 검토",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "3f52ea32"
     },
     {
@@ -3356,7 +3251,7 @@
       "owner": "code",
       "status": "active",
       "title": "MAP V0.1 — Boundary Founder QA View Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "9c76b942"
     },
     {
@@ -3372,7 +3267,7 @@
       "owner": "team",
       "status": "superseded",
       "title": "MAP V0.1 — Boundary Render Root Cause Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "f22ab13b"
     },
     {
@@ -3388,7 +3283,7 @@
       "owner": "code",
       "status": "active",
       "title": "MAP V0.1 — Zone Boundary Scaffold Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "3f11b2cb"
     },
     {
@@ -3404,7 +3299,7 @@
       "owner": "code",
       "status": "|------",
       "title": "MAP V0.1 — Marker Clean Restart Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "3512aaad"
     },
     {
@@ -3420,7 +3315,7 @@
       "owner": "code",
       "status": "|------",
       "title": "MAP V0.1 Completion Ledger",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "21fcdb70"
     },
     {
@@ -3436,7 +3331,7 @@
       "owner": "code",
       "status": "조건",
       "title": "MAP V0.1 — Coordinate Draft Persistence Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "5a1ce2aa"
     },
     {
@@ -3452,7 +3347,7 @@
       "owner": "team",
       "status": "수",
       "title": "Map V0.1 Design Decision Sheet",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "d2417e7c"
     },
     {
@@ -3468,7 +3363,7 @@
       "owner": "team",
       "status": "타입",
       "title": "MAP V0.1 Direct Marker Placement — Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "2fd64a68"
     },
     {
@@ -3484,7 +3379,7 @@
       "owner": "code",
       "status": "근거",
       "title": "MAP V0.1 — Discovery Click UX Fix Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "11d1843b"
     },
     {
@@ -3500,7 +3395,7 @@
       "owner": "code",
       "status": "|------",
       "title": "MAP V0.1 — Draft Persistence QA Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "9aafcddc"
     },
     {
@@ -3516,7 +3411,7 @@
       "owner": "code",
       "status": "|------",
       "title": "MAP V0.1 — Draft vs Source Reconciliation Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "54261a1c"
     },
     {
@@ -3532,7 +3427,7 @@
       "owner": "code",
       "status": "|------",
       "title": "MAP V0.1 Draggable Marker Editor — Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "18823787"
     },
     {
@@ -3548,7 +3443,7 @@
       "owner": "team",
       "status": "|------",
       "title": "MAP V0.1 — Duplicate Marker Rendering Fix Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "c965f249"
     },
     {
@@ -3564,7 +3459,7 @@
       "owner": "team",
       "status": "active",
       "title": "MAP V0.1 — Editor/Display Marker Alignment PASS Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "b374db9e"
     },
     {
@@ -3580,7 +3475,7 @@
       "owner": "code",
       "status": "식별 근거",
       "title": "MAP V0.1 Final Integration Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "b8a5249f"
     },
     {
@@ -3596,7 +3491,7 @@
       "owner": "code",
       "status": "active",
       "title": "MAP V0.1 — Final Inventory Audit Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "e6c96fb5"
     },
     {
@@ -3612,7 +3507,7 @@
       "owner": "code",
       "status": "|------",
       "title": "MAP V0.1 Final Marker Closeout — Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "9186c962"
     },
     {
@@ -3628,7 +3523,7 @@
       "owner": "code",
       "status": "active",
       "title": "MAP V0.1 — Five Zone Visual Reconciliation Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "dd7a7b30"
     },
     {
@@ -3644,7 +3539,7 @@
       "owner": "team",
       "status": "active",
       "title": "MAP V0.1 Founder Marker Alignment — Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "3dc414c9"
     },
     {
@@ -3660,7 +3555,7 @@
       "owner": "code",
       "status": "active",
       "title": "MAP V0.1 — Founder Visual Alignment Regression Investigation Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "ed9addfc"
     },
     {
@@ -3676,7 +3571,7 @@
       "owner": "team",
       "status": "Evidence",
       "title": "MAP V0.1 Geographic QA — 지리 충돌 보고",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "db5bde59"
     },
     {
@@ -3692,7 +3587,7 @@
       "owner": "code",
       "status": "원인",
       "title": "MAP V0.1 Marker Editor E2E — Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "38bea64c"
     },
     {
@@ -3708,7 +3603,7 @@
       "owner": "code",
       "status": "수",
       "title": "MAP V0.1 마커 설계 문서",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "f111fd43"
     },
     {
@@ -3724,7 +3619,7 @@
       "owner": "team",
       "status": "active",
       "title": "MAP V0.1 — markerPos 백업 (CLEAN RESTART 전)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "db67c985"
     },
     {
@@ -3740,7 +3635,7 @@
       "owner": "code",
       "status": "active",
       "title": "MAP V0.1 — Oldtown Boundary Overlay Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "0a7d99f1"
     },
     {
@@ -3756,7 +3651,7 @@
       "owner": "code",
       "status": "비고",
       "title": "MAP V0.1 — Oldtown Image Boundary Visual QA",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "58d7f07f"
     },
     {
@@ -3772,7 +3667,7 @@
       "owner": "code",
       "status": "active",
       "title": "MAP V0.1 — Overview Markers QA Visible Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "fda70ebe"
     },
     {
@@ -3788,7 +3683,7 @@
       "owner": "code",
       "status": "active",
       "title": "MAP V0.1 — Overview 2× Zoom Center Fix Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "d154f1d5"
     },
     {
@@ -3804,7 +3699,7 @@
       "owner": "code",
       "status": "|------",
       "title": "MAP V0.1 Placement UX Fix — Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "162300e6"
     },
     {
@@ -3820,7 +3715,7 @@
       "owner": "code",
       "status": "항목",
       "title": "MAP V0.1 Position & Category Check — Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "10480602"
     },
     {
@@ -3836,7 +3731,7 @@
       "owner": "code",
       "status": "경로",
       "title": "Map V0.1 Preparation Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "ec4f837e"
     },
     {
@@ -3852,7 +3747,7 @@
       "owner": "code",
       "status": "이번 검증",
       "title": "MAP V0.1 — Render/Click QA Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "47099264"
     },
     {
@@ -3868,7 +3763,7 @@
       "owner": "code",
       "status": "레이블",
       "title": "MAP V0.1 — First Marker Save Gate Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "9a1e01fa"
     },
     {
@@ -3884,7 +3779,7 @@
       "owner": "team",
       "status": "active",
       "title": "MAP V0.1 — Seven Zone Visual QA Recording",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "015701cd"
     },
     {
@@ -3900,7 +3795,7 @@
       "owner": "code",
       "status": "기능",
       "title": "MAP V0.1 — Toggle & Marker QA Fix Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "30ca6320"
     },
     {
@@ -3916,7 +3811,7 @@
       "owner": "code",
       "status": "|------",
       "title": "MAP V0.1 — Visual Closeout Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "40a6d5b3"
     },
     {
@@ -3932,7 +3827,7 @@
       "owner": "code",
       "status": "|------",
       "title": "MAP V0.1 Yacht Boarding Locations — Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "5713905b"
     },
     {
@@ -3948,7 +3843,7 @@
       "owner": "code",
       "status": "비고",
       "title": "여수 전역 관광지 Inventory — Map V0.1 설계 기초",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "9dfcc43b"
     },
     {
@@ -3964,7 +3859,7 @@
       "owner": "code",
       "status": "code",
       "title": "MAP V0.1 권역 재설계 비교 검토",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "f597b018"
     },
     {
@@ -3980,7 +3875,7 @@
       "owner": "code",
       "status": "기존 Zone",
       "title": "MAP V0.1 권역 설계 최종 제안",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "30db3b33"
     },
     {
@@ -3996,7 +3891,7 @@
       "owner": "code",
       "status": "판정",
       "title": "MAP V0.1 권역 정합성 확인 — Founder 15곳 ↔ Inventory 대조",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "6e1825b4"
     },
     {
@@ -4012,7 +3907,7 @@
       "owner": "code",
       "status": "이후 상태",
       "title": "MAP V0.1 — Zone Separation & Final Coordinate Alignment",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "15fb425d"
     },
     {
@@ -4028,7 +3923,7 @@
       "owner": "code",
       "status": "active",
       "title": "MAP V0.1 — Zone 1·2 QA 편집기 권역 분리 버그 수정 Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "4b87d1e8"
     },
     {
@@ -4044,7 +3939,7 @@
       "owner": "code",
       "status": "|------",
       "title": "MAP V0.1 — Zone 1 Boundary PROVISIONAL 시안",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "ce4c79ec"
     },
     {
@@ -4060,7 +3955,7 @@
       "owner": "team",
       "status": "active",
       "title": "MAP V0.1 — Zone 1 Founder Coordinates Source Saved Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "6b2cb07e"
     },
     {
@@ -4076,7 +3971,7 @@
       "owner": "code",
       "status": "|------",
       "title": "MAP V0.1 Zone 1·2 Final Completion — Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "b87277cf"
     },
     {
@@ -4092,7 +3987,7 @@
       "owner": "team",
       "status": "active",
       "title": "MAP V0.1 — Zone 2 Boundary Correction",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "83349c58"
     },
     {
@@ -4108,7 +4003,7 @@
       "owner": "code",
       "status": "active",
       "title": "MAP V0.1 — Zone 2 Boundary Expo Station Extension + Marker Toggle Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "8691ef65"
     },
     {
@@ -4124,7 +4019,7 @@
       "owner": "team",
       "status": "active",
       "title": "MAP V0.1 — Zone 2 낭만요트 SOURCE_ALIGNED Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "6b32b828"
     },
     {
@@ -4140,7 +4035,7 @@
       "owner": "team",
       "status": "active",
       "title": "MAP V0.1 — Zone 2 SOURCE_RENDER_ALIGNED Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "439986ba"
     },
     {
@@ -4156,7 +4051,7 @@
       "owner": "code",
       "status": "active",
       "title": "MAP V0.1 — Zone 3 Draft vs Source Reconciliation Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "51b5d607"
     },
     {
@@ -4172,7 +4067,7 @@
       "owner": "code",
       "status": "markerPos.oldtown",
       "title": "MAP V0.1 — Zone 3 지도 적용 결정 (overview 유지)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "825aff82"
     },
     {
@@ -4188,7 +4083,7 @@
       "owner": "code",
       "status": "active",
       "title": "MAP V0.1 — Zone 3 / Zone 4 Marker Scope Fix Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "d9f1d721"
     },
     {
@@ -4204,7 +4099,7 @@
       "owner": "code",
       "status": "stale 초안 좌표",
       "title": "MAP V0.1 — Zone 4~7 Coordinates Reconciliation Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "772b4ac8"
     },
     {
@@ -4220,7 +4115,7 @@
       "owner": "code",
       "status": "active",
       "title": "MAP V0.1 — Zone 4·5 Founder Coordinates Source Saved Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "192d656c"
     },
     {
@@ -4236,7 +4131,7 @@
       "owner": "code",
       "status": "active",
       "title": "MAP V0.1 — Zone 5·6·7 Visual Reconciliation Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "a1433a49"
     },
     {
@@ -4252,7 +4147,7 @@
       "owner": "team",
       "status": "의미",
       "title": "MAP V0.1 — Zone 5 Place & Coordinate Corrected Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "ef959b31"
     },
     {
@@ -4268,7 +4163,7 @@
       "owner": "code",
       "status": "active",
       "title": "MAP V0.1 — Zone 5 Visual QA Pending Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "0343b92e"
     },
     {
@@ -4284,7 +4179,7 @@
       "owner": "team",
       "status": "active",
       "title": "MAP V0.1 — Zone 6 Duplicate Place Cleanup Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "3b5e7e36"
     },
     {
@@ -4300,7 +4195,7 @@
       "owner": "team",
       "status": "active",
       "title": "MAP V0.1 — Zone 6 SOURCE_RENDER_ALIGNED Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "ba40086b"
     },
     {
@@ -4316,7 +4211,7 @@
       "owner": "code",
       "status": "이유",
       "title": "MAP V0.1 — Zone 7 섬섬길 Inventory Reconciliation Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "74b187e7"
     },
     {
@@ -4332,7 +4227,7 @@
       "owner": "code",
       "status": "의미",
       "title": "MAP V0.1 — Zone 7 섬섬길 Layout Source Saved Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "e7afd21f"
     },
     {
@@ -4348,7 +4243,7 @@
       "owner": "code",
       "status": "|------",
       "title": "MUYOJEONG_ASSET_AUDIT_AND_RELEASE_PARALLEL_PLAN Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "64db531b"
     },
     {
@@ -4364,7 +4259,7 @@
       "owner": "rumi",
       "status": "Zone",
       "title": "MUYOJEONG_PR134_RELEASE_APPROVAL_READY Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "335dd96d"
     },
     {
@@ -4380,7 +4275,7 @@
       "owner": "code",
       "status": "|------",
       "title": "MUYOJEONG_RELEASE_GATE_RECONCILED Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "2b597a02"
     },
     {
@@ -4396,7 +4291,7 @@
       "owner": "code",
       "status": "superseded",
       "title": "MUYOJEONG_V01_PRODUCTION_QA_PASSED Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "5e8f751d"
     },
     {
@@ -4412,7 +4307,7 @@
       "owner": "code",
       "status": "active",
       "title": "V1.1 → Data Handover 01 변경 내역",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "346f709c"
     },
     {
@@ -4428,7 +4323,7 @@
       "owner": "rumi",
       "status": "확인 조건",
       "title": "DreamTown Parking Hospitality V1 — Data Handover & Place Mapping",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "23738c8f"
     },
     {
@@ -4444,92 +4339,8 @@
       "owner": "rumi",
       "status": "superseded",
       "title": "Project State Update — DRAFT ONLY",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "c8b32d4d"
-    },
-    {
-      "id": "DOC-PHX-SOUL-QA-001_RC3_FINDINGS_S",
-      "path": "docs/knowledge/PHX-SOUL-QA-001_RC3_FINDINGS_S49_V1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge",
-        "storybook"
-      ],
-      "owner": "code",
-      "status": "active",
-      "title": "PHX-SOUL-QA-001 — Evidence §49: RC3 Route Skeleton 복구 가능성 조사 결과 (2026-11-19, 조사만)",
-      "created_at": "2026-11-19",
-      "checksum": "8ebad9c8"
-    },
-    {
-      "id": "DOC-PHX-SOUL-QA-001_RC3_RECOVERY_P",
-      "path": "docs/knowledge/PHX-SOUL-QA-001_RC3_RECOVERY_PLAN_V1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge",
-        "storybook"
-      ],
-      "owner": "code",
-      "status": "active",
-      "title": "PHX-SOUL-QA-001 — RC3 Route Skeleton 복구 가능성 조사 및 최소 복구 계획 (V1, 2026-11-19)",
-      "created_at": "2026-11-19",
-      "checksum": "e11ebf38"
-    },
-    {
-      "id": "DOC-PHX-SOUL-QA-001_RC3_SELECTIVE_",
-      "path": "docs/knowledge/PHX-SOUL-QA-001_RC3_SELECTIVE_RECOVERY_V1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge",
-        "storybook"
-      ],
-      "owner": "code",
-      "status": "내용",
-      "title": "PHX-SOUL-QA-001 — RC3 Selective Recovery (V1, 2026-11-19)",
-      "created_at": "2026-11-19",
-      "checksum": "050d6e34"
-    },
-    {
-      "id": "DOC-PHX-SOUL-QA-001_REAL_LLM_FINAL",
-      "path": "docs/knowledge/PHX-SOUL-QA-001_REAL_LLM_FINAL_RETRY_V1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge",
-        "소원"
-      ],
-      "owner": "code",
-      "status": "superseded",
-      "title": "PHX-SOUL-QA-001 — Real LLM Verification Final Retry (V1, 2026-11-19)",
-      "created_at": "2026-11-19",
-      "checksum": "a099821d"
-    },
-    {
-      "id": "DOC-PHX-SOUL-QA-001_TEST_ENV_PREFL",
-      "path": "docs/knowledge/PHX-SOUL-QA-001_TEST_ENV_PREFLIGHT_V1.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "knowledge",
-      "tags": [
-        "knowledge"
-      ],
-      "owner": "code",
-      "status": "superseded",
-      "title": "PHX-SOUL-QA-001 — Test Environment Preflight (V1, 2026-11-19)",
-      "created_at": "2026-11-19",
-      "checksum": "61f476fa"
     },
     {
       "id": "DOC-PILOT-INTENT-001_Traveler_Inte",
@@ -4546,7 +4357,7 @@
       "owner": "code",
       "status": "|------",
       "title": "PILOT-INTENT-001 — 여수 여행자 의도 조사 Pilot (8 키워드)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "340d12ae"
     },
     {
@@ -4563,7 +4374,7 @@
       "owner": "code",
       "status": "|----------",
       "title": "PILOT-INTENT-002 — Hotel-to-Starlight SOUL Answer Gap 분석",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "ee59987b"
     },
     {
@@ -4579,7 +4390,7 @@
       "owner": "code",
       "status": "근거",
       "title": "PR115-CI-DIAG-V0_1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "f1bcdf82"
     },
     {
@@ -4595,7 +4406,7 @@
       "owner": "code",
       "status": "판정",
       "title": "PR115-CI-RECOVERY-V0_1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "735bbeb1"
     },
     {
@@ -4611,7 +4422,7 @@
       "owner": "code",
       "status": "근거",
       "title": "PR115-PROD-QA-EVIDENCE-V0_1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "e6f74fbb"
     },
     {
@@ -4628,7 +4439,7 @@
       "owner": "code",
       "status": "출처",
       "title": "PREFLIGHT-PHASE-B-001 — Hotel-to-Starlight SOUL Answer Phase B",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "bac628b4"
     },
     {
@@ -4645,8 +4456,8 @@
       "owner": "team",
       "status": "active",
       "title": "Knowledge Cards (지식카드)",
-      "created_at": "2026-11-19",
-      "checksum": "d2eaa892"
+      "created_at": "2026-11-12",
+      "checksum": "a4d0a8e8"
     },
     {
       "id": "DOC-RELEASE-PREFLIGHT-B-001_Phase_",
@@ -4661,7 +4472,7 @@
       "owner": "code",
       "status": "MERGED ✓",
       "title": "RELEASE-PREFLIGHT-B-001 — Phase B V0.1 Production Release Preflight",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "398a083a"
     },
     {
@@ -4677,7 +4488,7 @@
       "owner": "team",
       "status": "|------",
       "title": "SOUL CAR INTENT RESPONSE UX Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "ba397e5e"
     },
     {
@@ -4693,7 +4504,7 @@
       "owner": "code",
       "status": "|------",
       "title": "SOUL Vehicle Guidance Minimal Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "c3cbd36b"
     },
     {
@@ -4709,7 +4520,7 @@
       "owner": "code",
       "status": "개선 방법",
       "title": "SOUL Vehicle Guidance Review V0.1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "711fda5d"
     },
     {
@@ -4726,7 +4537,7 @@
       "owner": "code",
       "status": "Founder 근거",
       "title": "TRAVEL-PLACES-STAY-TIME-V01-EVIDENCE",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "1f8cd532"
     },
     {
@@ -4742,7 +4553,7 @@
       "owner": "code",
       "status": "\"영업 안 함\" — CONFLICT_REQUIRES_RECHECK (Batch 01 공식 \"운영 중\"과 불일치)",
       "title": "Yeosu Founder Route #001 — Time Evidence",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "e4e5daa3"
     },
     {
@@ -4759,7 +4570,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "하루하루의 기적 - 출항 선언문",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "c6b4219e"
     },
     {
@@ -4780,7 +4591,7 @@
       "owner": "code",
       "status": "active",
       "title": "최수민님 방식 완전 정리",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "3722b629"
     },
     {
@@ -4799,8 +4610,8 @@
       "owner": "rumi",
       "status": "active",
       "title": "이야기가 책이 되는 설계 구조",
-      "created_at": "2026-11-19",
-      "checksum": "4754e520"
+      "created_at": "2026-11-12",
+      "checksum": "ca039a59"
     },
     {
       "id": "DOC-소원이야기-책-구조-설명",
@@ -4817,8 +4628,8 @@
       "owner": "rumi",
       "status": "active",
       "title": "소원이들의 이야기가 쌓이면 책이 된다",
-      "created_at": "2026-11-19",
-      "checksum": "ddb4501e"
+      "created_at": "2026-11-12",
+      "checksum": "6f9c797a"
     },
     {
       "id": "DOC-ad-creative-growth-high-v1",
@@ -4834,7 +4645,7 @@
       "owner": "team",
       "status": "|------",
       "title": "Ad Creative — Growth-Builder × High LTV (v1.0)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "24fb6ef7"
     },
     {
@@ -4851,7 +4662,7 @@
       "owner": "team",
       "status": "|------",
       "title": "Ad Creative — Growth-Builder × Mid LTV (v1.0)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "ada4099d"
     },
     {
@@ -4868,7 +4679,7 @@
       "owner": "team",
       "status": "|------",
       "title": "Ad Creative — Healing-Seeker × High LTV (v1.0)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "ed0ac91c"
     },
     {
@@ -4885,7 +4696,7 @@
       "owner": "team",
       "status": "|------",
       "title": "Ad Creative — Healing-Seeker × Mid LTV (v1.0)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "d308005c"
     },
     {
@@ -4903,7 +4714,7 @@
       "owner": "team",
       "status": "active",
       "title": "Ad Set ↔ Creative 매핑표 + A/B 테스트 설계 (v1.0)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "63d88dc8"
     },
     {
@@ -4921,7 +4732,7 @@
       "owner": "rumi",
       "status": "superseded",
       "title": "하루하루의 기적 — 마케팅 GPT 종합 참조 지침서",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "3c176676"
     },
     {
@@ -4939,7 +4750,7 @@
       "owner": "rumi",
       "status": "superseded",
       "title": "하루하루의 기적 — 카피라이팅 GPT 지침서",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "a87ad19b"
     },
     {
@@ -4957,7 +4768,7 @@
       "owner": "rumi",
       "status": "superseded",
       "title": "하루하루의 기적 — 마케팅 GPT 지침서",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "6d112872"
     },
     {
@@ -4975,7 +4786,7 @@
       "owner": "rumi",
       "status": "superseded",
       "title": "하루하루의 기적 — SNS 마케팅 GPT 지침서",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "7164352b"
     },
     {
@@ -4992,7 +4803,7 @@
       "owner": "code",
       "status": "superseded",
       "title": "하루하루의 기적 — 영상기획 GPT 지침서",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "de35d373"
     },
     {
@@ -5010,7 +4821,7 @@
       "owner": "team",
       "status": "유닛 간 감정 충돌",
       "title": "영상 제작 핸드오프 가이드 — 실수 방지 매뉴얼",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "80161640"
     },
     {
@@ -5028,7 +4839,7 @@
       "owner": "rumi",
       "status": "|------",
       "title": "재미 온보딩 가이드 v1.1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "00a62da9"
     },
     {
@@ -5047,8 +4858,8 @@
       "owner": "rumi",
       "status": "대응",
       "title": "재미 온보딩 가이드 v1.2",
-      "created_at": "2026-11-19",
-      "checksum": "3b4ce573"
+      "created_at": "2026-11-12",
+      "checksum": "1004a06f"
     },
     {
       "id": "DOC-AI_COST_CONTROL",
@@ -5063,8 +4874,8 @@
       "owner": "code",
       "status": "active",
       "title": "AI Cost Control — DreamTown 운영 모드",
-      "created_at": "2026-11-19",
-      "checksum": "691ac959"
+      "created_at": "2026-11-12",
+      "checksum": "f6b19b2b"
     },
     {
       "id": "DOC-DEC_OPERATIONS",
@@ -5079,7 +4890,7 @@
       "owner": "comi",
       "status": "archived",
       "title": "DEC 운영 매뉴얼",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "93d223c7"
     },
     {
@@ -5097,8 +4908,8 @@
       "owner": "rumi",
       "status": "조치",
       "title": "DreamTown KPI 일일 점검 체크리스트",
-      "created_at": "2026-11-19",
-      "checksum": "92521073"
+      "created_at": "2026-11-12",
+      "checksum": "ffbf638f"
     },
     {
       "id": "DOC-drive-github-sync-setup",
@@ -5115,8 +4926,8 @@
       "owner": "code",
       "status": "active",
       "title": "Drive → GitHub Sync Service 설치 가이드",
-      "created_at": "2026-11-19",
-      "checksum": "a165a1ca"
+      "created_at": "2026-11-12",
+      "checksum": "eb6394bc"
     },
     {
       "id": "DOC-sens-setup-guide",
@@ -5133,7 +4944,7 @@
       "owner": "comi",
       "status": "항목",
       "title": "SENS 설정 가이드 (Naver Cloud Platform)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "fea945f4"
     },
     {
@@ -5149,7 +4960,7 @@
       "owner": "code",
       "status": "active",
       "title": "Registry Rules 월간 업데이트 SOP",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "38fe059e"
     },
     {
@@ -5167,7 +4978,7 @@
       "owner": "code",
       "status": "active",
       "title": "운영 컨트롤타워 온보딩 체크리스트 (7일)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "df90ab06"
     },
     {
@@ -5184,7 +4995,7 @@
       "owner": "code",
       "status": "보호 기간",
       "title": "딜 등록 및 보호 정책",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "14520fbe"
     },
     {
@@ -5201,7 +5012,7 @@
       "owner": "team",
       "status": "https://app.dailymiracles.kr/api/ops-center/health",
       "title": "데모 운영 가이드",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "d42aba10"
     },
     {
@@ -5217,7 +5028,7 @@
       "owner": "team",
       "status": "archived",
       "title": "docs/originals — Original Archive",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "6f6f42b4"
     },
     {
@@ -5234,7 +5045,7 @@
       "owner": "team",
       "status": "superseded",
       "title": "DreamTown 소원그림 SSOT v3.7 (압축본)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "c9acc9ee"
     },
     {
@@ -5251,7 +5062,7 @@
       "owner": "code",
       "status": "active",
       "title": "Daily Miracles 온라인 소원 서비스 전체 흐름도",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "e28e803e"
     },
     {
@@ -5267,8 +5078,8 @@
       "owner": "team",
       "status": "active",
       "title": "CHECKLIST — P2.2 requestId + errorHandler + Wiring",
-      "created_at": "2026-11-19",
-      "checksum": "0dbbcb71"
+      "created_at": "2026-11-12",
+      "checksum": "ecf6981a"
     },
     {
       "id": "DOC-CONTEXT",
@@ -5283,8 +5094,8 @@
       "owner": "team",
       "status": "active",
       "title": "CONTEXT — P2.2 requestId + errorHandler + Wiring",
-      "created_at": "2026-11-19",
-      "checksum": "14ee1546"
+      "created_at": "2026-11-12",
+      "checksum": "88f20f68"
     },
     {
       "id": "DOC-PLAN",
@@ -5299,8 +5110,8 @@
       "owner": "team",
       "status": "active",
       "title": "PLAN — P2.2 requestId + errorHandler + Wiring",
-      "created_at": "2026-11-19",
-      "checksum": "ddf57e0e"
+      "created_at": "2026-11-12",
+      "checksum": "263d5e11"
     },
     {
       "id": "DOC-GATE2_Canonical_Asset_Verifica",
@@ -5317,8 +5128,8 @@
       "owner": "team",
       "status": "archived",
       "title": "GATE 2 — Canonical Asset Verification Report",
-      "created_at": "2026-11-19",
-      "checksum": "e5afaf8b"
+      "created_at": "2026-11-12",
+      "checksum": "8c50fdcc"
     },
     {
       "id": "DOC-phase3-quantum-walkthrough",
@@ -5333,7 +5144,7 @@
       "owner": "ceo",
       "status": "✅ 비활성화 정상",
       "title": "양자 기획서 - 기적 금고 Phase 3 증빙 발행 시스템",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "fe4f4df4"
     },
     {
@@ -5350,8 +5161,8 @@
       "owner": "team",
       "status": "|------",
       "title": "~~16:9~~ → 3:4 Canonical Master 변환 계획표",
-      "created_at": "2026-11-19",
-      "checksum": "04a85cb0"
+      "created_at": "2026-11-12",
+      "checksum": "1de21f90"
     },
     {
       "id": "DOC-가격표_퀵레퍼런스",
@@ -5368,7 +5179,7 @@
       "owner": "team",
       "status": "active",
       "title": "가격표 퀵 레퍼런스 (영업용)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "7ca0aa2e"
     },
     {
@@ -5385,7 +5196,7 @@
       "owner": "team",
       "status": "active",
       "title": "SOUL Practitioner Review Package V0.2",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "08773346"
     },
     {
@@ -5403,8 +5214,8 @@
       "owner": "team",
       "status": "active",
       "title": "SOUL Product Vision V0.1",
-      "created_at": "2026-11-19",
-      "checksum": "12aa28b7"
+      "created_at": "2026-11-12",
+      "checksum": "08d0a58e"
     },
     {
       "id": "DOC-README",
@@ -5420,8 +5231,8 @@
       "owner": "team",
       "status": "active",
       "title": "RAMADA Pilot V23 — Baseline Archive",
-      "created_at": "2026-11-19",
-      "checksum": "c7c106a1"
+      "created_at": "2026-11-12",
+      "checksum": "1ff25ed7"
     },
     {
       "id": "DOC-V23_ARCHIVE_MANIFEST",
@@ -5437,8 +5248,8 @@
       "owner": "team",
       "status": "archived",
       "title": "RAMADA Pilot V23 — Baseline Archive Manifest",
-      "created_at": "2026-11-19",
-      "checksum": "50180d03"
+      "created_at": "2026-11-12",
+      "checksum": "b255f5ef"
     },
     {
       "id": "DOC-V23_BACKUP_RECORD",
@@ -5453,8 +5264,8 @@
       "owner": "team",
       "status": "active",
       "title": "V23 Production D1 Backup Record",
-      "created_at": "2026-11-19",
-      "checksum": "e36597da"
+      "created_at": "2026-11-12",
+      "checksum": "4f495f29"
     },
     {
       "id": "DOC-V23_DEPENDENCIES",
@@ -5470,8 +5281,8 @@
       "owner": "team",
       "status": "active",
       "title": "V23 Sites-Specific Dependencies & Configuration",
-      "created_at": "2026-11-19",
-      "checksum": "e3f517a9"
+      "created_at": "2026-11-12",
+      "checksum": "22bca61b"
     },
     {
       "id": "DOC-V23_PRODUCTION_BASELINE",
@@ -5487,8 +5298,8 @@
       "owner": "team",
       "status": "active",
       "title": "RAMADA V23 Production Functional Baseline",
-      "created_at": "2026-11-19",
-      "checksum": "f8e5ba56"
+      "created_at": "2026-11-12",
+      "checksum": "973776f2"
     },
     {
       "id": "DOC-V23_SCHEMA_REFERENCE",
@@ -5503,8 +5314,8 @@
       "owner": "team",
       "status": "active",
       "title": "V23 D1 Schema Reference",
-      "created_at": "2026-11-19",
-      "checksum": "467e8233"
+      "created_at": "2026-11-12",
+      "checksum": "84eae3df"
     },
     {
       "id": "DOC-README",
@@ -5519,7 +5330,7 @@
       "owner": "code",
       "status": "active",
       "title": "하루하루의 기적 - 문서 센터",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "8a1b6b11"
     },
     {
@@ -5537,8 +5348,8 @@
       "owner": "code",
       "status": "archived",
       "title": "D2_D3_FUNCTIONAL_REVIEW.md",
-      "created_at": "2026-11-19",
-      "checksum": "8a42a05a"
+      "created_at": "2026-11-12",
+      "checksum": "1210abfe"
     },
     {
       "id": "DOC-DEFERRED_CHANGES_TRIAGE",
@@ -5555,8 +5366,8 @@
       "owner": "code",
       "status": "파일",
       "title": "DEFERRED_CHANGES_TRIAGE.md",
-      "created_at": "2026-11-19",
-      "checksum": "2681eed8"
+      "created_at": "2026-11-12",
+      "checksum": "98c26ea9"
     },
     {
       "id": "DOC-DISCARD_CLEANUP_PLAN",
@@ -5571,8 +5382,8 @@
       "owner": "team",
       "status": "archived",
       "title": "DISCARD_CLEANUP_PLAN.md",
-      "created_at": "2026-11-19",
-      "checksum": "682b17aa"
+      "created_at": "2026-11-12",
+      "checksum": "4baba8c0"
     },
     {
       "id": "DOC-DREAMTOWN_PLAN_ALIGNMENT_AUDIT",
@@ -5591,8 +5402,8 @@
       "owner": "rumi",
       "status": "|------",
       "title": "DREAMTOWN_PLAN_ALIGNMENT_AUDIT.md",
-      "created_at": "2026-11-19",
-      "checksum": "e097c975"
+      "created_at": "2026-11-12",
+      "checksum": "34082e5b"
     },
     {
       "id": "DOC-FIRST_RESONANCE_FLOW_PROTOTYPE",
@@ -5609,7 +5420,7 @@
       "owner": "team",
       "status": "| F2",
       "title": "FIRST_RESONANCE_FLOW_PROTOTYPE.md",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "011a986b"
     },
     {
@@ -5625,8 +5436,8 @@
       "owner": "team",
       "status": "|-----------",
       "title": "GATE 4 — Cafe Warmth Reduction 완료 보고서",
-      "created_at": "2026-11-19",
-      "checksum": "25aa32ed"
+      "created_at": "2026-11-12",
+      "checksum": "0113f4fd"
     },
     {
       "id": "DOC-GATE5_Hotel_Fragile_Hope_Star_",
@@ -5641,8 +5452,8 @@
       "owner": "team",
       "status": "|-----------",
       "title": "GATE 5 — Hotel Fragile Hope Star Reduction 완료 보고서",
-      "created_at": "2026-11-19",
-      "checksum": "5b214340"
+      "created_at": "2026-11-12",
+      "checksum": "c8b72ced"
     },
     {
       "id": "DOC-GATE6_Hamel_Full25_Result_Repo",
@@ -5658,8 +5469,8 @@
       "owner": "team",
       "status": "active",
       "title": "GATE 6 — Hamel Full25 Result Report",
-      "created_at": "2026-11-19",
-      "checksum": "b302f449"
+      "created_at": "2026-11-12",
+      "checksum": "284dc434"
     },
     {
       "id": "DOC-GATE6_Hamel_Regeneration_Promp",
@@ -5675,8 +5486,8 @@
       "owner": "team",
       "status": "active",
       "title": "GATE 6 — Hamel Continuity Regeneration Prompt Pack 보고서",
-      "created_at": "2026-11-19",
-      "checksum": "c3cdcbe8"
+      "created_at": "2026-11-12",
+      "checksum": "210ed8d9"
     },
     {
       "id": "DOC-PR-SOUL-BTN-CONTRAST-BODY",
@@ -5691,7 +5502,7 @@
       "owner": "team",
       "status": "active",
       "title": "PR-SOUL-BTN-CONTRAST-BODY",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "d969e1c9"
     },
     {
@@ -5708,7 +5519,7 @@
       "owner": "code",
       "status": "active",
       "title": "PR-SOUL-THEME-V01-BODY",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "95f3be6f"
     },
     {
@@ -5726,8 +5537,8 @@
       "owner": "code",
       "status": "### 테스트 요구사항",
       "title": "REMAINING_CHANGES_COMMIT_SCOPE.md",
-      "created_at": "2026-11-19",
-      "checksum": "e3b64788"
+      "created_at": "2026-11-12",
+      "checksum": "109cb01e"
     },
     {
       "id": "DOC-REPORT-Legacy_Video_Frame_Syst",
@@ -5743,7 +5554,7 @@
       "owner": "code",
       "status": "active",
       "title": "REPORT — Legacy Video Frame System (5-Frame, assemble-miracle-video.js)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "45810579"
     },
     {
@@ -5761,7 +5572,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "REPORT — Original Document Inventory",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "4de4b5a3"
     },
     {
@@ -5779,7 +5590,7 @@
       "owner": "code",
       "status": "superseded",
       "title": "REPORT — Route × Product Alignment",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "0965dd88"
     },
     {
@@ -5799,7 +5610,7 @@
       "owner": "code",
       "status": "superseded",
       "title": "REPORT — StoryBook Code Analysis",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "1b01631b"
     },
     {
@@ -5816,7 +5627,7 @@
       "owner": "code",
       "status": "superseded",
       "title": "REPORT — WishArt Platform Refactor Impact",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "5769e49c"
     },
     {
@@ -5833,7 +5644,7 @@
       "owner": "code",
       "status": "active",
       "title": "REPORT — WishArt V4 Architecture",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "c9f51130"
     },
     {
@@ -5850,7 +5661,7 @@
       "owner": "code",
       "status": "active",
       "title": "REPORT — WishArt V4 Gap Analysis",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "68bffecd"
     },
     {
@@ -5868,7 +5679,7 @@
       "owner": "comi",
       "status": "active",
       "title": "한국 세무회계 AI 도구 조사 및 연동 가능성 분석",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "5af76d35"
     },
     {
@@ -5885,24 +5696,8 @@
       "owner": "team",
       "status": "판단",
       "title": "WISH_IMAGE_HOLD_REVIEW.md",
-      "created_at": "2026-11-19",
-      "checksum": "c576e901"
-    },
-    {
-      "id": "DOC-PHX-BENEFIT-001_Checklist_본부장대",
-      "path": "docs/research/sowonpass/PHX-BENEFIT-001_Checklist_본부장대조.md",
-      "type": "document",
-      "project": "aurora5",
-      "priority": "P2",
-      "topic": "research",
-      "tags": [
-        "sowonpass"
-      ],
-      "owner": "team",
-      "status": "active",
-      "title": "PHX-BENEFIT-001 — 본부장 추진 명단 대조 체크리스트",
-      "created_at": "2026-11-19",
-      "checksum": "80c7502b"
+      "created_at": "2026-11-12",
+      "checksum": "5ca40d35"
     },
     {
       "id": "DOC-REVIEW_COLLECTION_SYSTEM",
@@ -5918,7 +5713,7 @@
       "owner": "comi",
       "status": "active",
       "title": "후기 수집 구조 설계서",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "bbd74711"
     },
     {
@@ -5935,7 +5730,7 @@
       "owner": "team",
       "status": "active",
       "title": "🎯 30일 기적 로드맵 시스템",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "a4207922"
     },
     {
@@ -5953,7 +5748,7 @@
       "owner": "team",
       "status": "active",
       "title": "30일 기적 로드맵 API 문서",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "4d39bd13"
     },
     {
@@ -5969,7 +5764,7 @@
       "owner": "team",
       "status": "active",
       "title": "Crash & Error Alert Response Runbook",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "0e925ce0"
     },
     {
@@ -5985,7 +5780,7 @@
       "owner": "ceo",
       "status": "archived",
       "title": "DB Backup & Restore Runbook",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "32100010"
     },
     {
@@ -6001,7 +5796,7 @@
       "owner": "code",
       "status": "active",
       "title": "Render Rollback Runbook",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "57e53002"
     },
     {
@@ -6018,7 +5813,7 @@
       "owner": "team",
       "status": "active",
       "title": "결재 요청서",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "65ab88ea"
     },
     {
@@ -6035,7 +5830,7 @@
       "owner": "team",
       "status": "active",
       "title": "파일럿 제안서",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "93bdfdc9"
     },
     {
@@ -6052,7 +5847,7 @@
       "owner": "code",
       "status": "superseded",
       "title": "외부 공유 가이드 및 리스크 관리",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "4f4cb77d"
     },
     {
@@ -6068,7 +5863,7 @@
       "owner": "team",
       "status": "superseded",
       "title": "세일즈 카드 문구 3종",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "6de9204c"
     },
     {
@@ -6087,8 +5882,8 @@
       "owner": "code",
       "status": "항목",
       "title": "GA4 설정 가이드",
-      "created_at": "2026-11-19",
-      "checksum": "bd60712a"
+      "created_at": "2026-11-12",
+      "checksum": "1c318f9b"
     },
     {
       "id": "DOC-VIDEO_MASTER",
@@ -6105,8 +5900,8 @@
       "owner": "team",
       "status": "active",
       "title": "Sora Video Master v1.1",
-      "created_at": "2026-11-19",
-      "checksum": "0ff3bab2"
+      "created_at": "2026-11-12",
+      "checksum": "f4a1b1d5"
     },
     {
       "id": "DOC-AIL-SSOT-001_Storage_Rules",
@@ -6122,7 +5917,7 @@
       "owner": "rumi",
       "status": "archived",
       "title": "AIL-SSOT-001: DreamTown SSOT 저장 규칙",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "a29fbeff"
     },
     {
@@ -6140,8 +5935,8 @@
       "owner": "code",
       "status": "active",
       "title": "DreamTown Air Constitution",
-      "created_at": "2026-11-19",
-      "checksum": "7ff7c823"
+      "created_at": "2026-11-12",
+      "checksum": "a12446ab"
     },
     {
       "id": "DOC-02_DreamTown_Echo_Physics",
@@ -6157,8 +5952,8 @@
       "owner": "code",
       "status": "active",
       "title": "DreamTown Echo Physics",
-      "created_at": "2026-11-19",
-      "checksum": "4bd09bdb"
+      "created_at": "2026-11-12",
+      "checksum": "bfe376fd"
     },
     {
       "id": "DOC-03_DreamTown_Air_Taxonomy",
@@ -6173,8 +5968,8 @@
       "owner": "code",
       "status": "active",
       "title": "DreamTown Air Taxonomy",
-      "created_at": "2026-11-19",
-      "checksum": "467f11be"
+      "created_at": "2026-11-12",
+      "checksum": "71c4c3bd"
     },
     {
       "id": "DOC-04_DreamTown_Canonical_Air_Reg",
@@ -6191,8 +5986,8 @@
       "owner": "code",
       "status": "|---",
       "title": "DreamTown Canonical Air Registry",
-      "created_at": "2026-11-19",
-      "checksum": "79ecf866"
+      "created_at": "2026-11-12",
+      "checksum": "f3260b30"
     },
     {
       "id": "DOC-05_DERIVATION_PIPELINE",
@@ -6208,8 +6003,8 @@
       "owner": "code",
       "status": "|------",
       "title": "DERIVATION_PIPELINE",
-      "created_at": "2026-11-19",
-      "checksum": "4324aac7"
+      "created_at": "2026-11-12",
+      "checksum": "b40831fd"
     },
     {
       "id": "DOC-06_OUTPUT_STRATEGY",
@@ -6226,8 +6021,8 @@
       "owner": "code",
       "status": "active",
       "title": "OUTPUT_STRATEGY",
-      "created_at": "2026-11-19",
-      "checksum": "bfd10c27"
+      "created_at": "2026-11-12",
+      "checksum": "b53caed8"
     },
     {
       "id": "DOC-CODE_TEST_01_CHANNEL_POLICY",
@@ -6244,8 +6039,8 @@
       "owner": "code",
       "status": "active",
       "title": "CODE_TEST_01 — Channel Policy",
-      "created_at": "2026-11-19",
-      "checksum": "7436a4d6"
+      "created_at": "2026-11-12",
+      "checksum": "f7435f08"
     },
     {
       "id": "DOC-CODE_TEST_01_CONTINUITY_GRAMMA",
@@ -6261,8 +6056,8 @@
       "owner": "code",
       "status": "active",
       "title": "CODE_TEST_01 — Continuity Grammar",
-      "created_at": "2026-11-19",
-      "checksum": "171ee929"
+      "created_at": "2026-11-12",
+      "checksum": "88871ea6"
     },
     {
       "id": "DOC-CODE_TEST_01_PROMPT_BUILDER",
@@ -6278,8 +6073,8 @@
       "owner": "code",
       "status": "active",
       "title": "CODE_TEST_01 — Prompt Builder",
-      "created_at": "2026-11-19",
-      "checksum": "4c45c715"
+      "created_at": "2026-11-12",
+      "checksum": "713b2853"
     },
     {
       "id": "DOC-CODE_TEST_01_REGISTRY_SCHEMA",
@@ -6296,8 +6091,8 @@
       "owner": "code",
       "status": "archived",
       "title": "CODE_TEST_01 — Registry Schema",
-      "created_at": "2026-11-19",
-      "checksum": "0adce7a8"
+      "created_at": "2026-11-12",
+      "checksum": "6a3cc2ae"
     },
     {
       "id": "DOC-DreamTown_Canonical_Foundation",
@@ -6314,8 +6109,8 @@
       "owner": "code",
       "status": "superseded",
       "title": "DreamTown Canonical Foundation v1.0",
-      "created_at": "2026-11-19",
-      "checksum": "bda3f97b"
+      "created_at": "2026-11-12",
+      "checksum": "e478c059"
     },
     {
       "id": "DOC-HUMAN_FIRST",
@@ -6331,8 +6126,8 @@
       "owner": "code",
       "status": "active",
       "title": "HUMAN_FIRST",
-      "created_at": "2026-11-19",
-      "checksum": "e6cab241"
+      "created_at": "2026-11-12",
+      "checksum": "15065872"
     },
     {
       "id": "DOC-NO_EMOTIONAL_ADDICTION",
@@ -6348,8 +6143,8 @@
       "owner": "code",
       "status": "active",
       "title": "NO_EMOTIONAL_ADDICTION",
-      "created_at": "2026-11-19",
-      "checksum": "059b2ee1"
+      "created_at": "2026-11-12",
+      "checksum": "2d9dd476"
     },
     {
       "id": "DOC-REALITY_RECONNECTION",
@@ -6365,8 +6160,8 @@
       "owner": "team",
       "status": "active",
       "title": "REALITY_RECONNECTION",
-      "created_at": "2026-11-19",
-      "checksum": "34a51251"
+      "created_at": "2026-11-12",
+      "checksum": "017572b4"
     },
     {
       "id": "DOC-UNFINISHED_TIME",
@@ -6382,8 +6177,8 @@
       "owner": "team",
       "status": "active",
       "title": "UNFINISHED_TIME",
-      "created_at": "2026-11-19",
-      "checksum": "a80f918b"
+      "created_at": "2026-11-12",
+      "checksum": "97052d47"
     },
     {
       "id": "DOC-DreamTown_Aurora5_System_SSOT",
@@ -6400,7 +6195,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "DreamTown Aurora5 System SSOT",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "ca983478"
     },
     {
@@ -6418,7 +6213,7 @@
       "owner": "code",
       "status": "사용 씬",
       "title": "DreamTown Character SSOT",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "397dd970"
     },
     {
@@ -6436,7 +6231,7 @@
       "owner": "rumi",
       "status": "archived",
       "title": "DreamTown Core Philosophy SSOT",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "0700063b"
     },
     {
@@ -6454,7 +6249,7 @@
       "owner": "code",
       "status": "active",
       "title": "DreamTown 팬덤 엔진 구조 SSOT v1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "25edb16f"
     },
     {
@@ -6472,7 +6267,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "DreamTown Full Loop SSOT v1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "0045c781"
     },
     {
@@ -6489,7 +6284,7 @@
       "owner": "code",
       "status": "의미",
       "title": "DreamTown 모바일 증명 & 항로 확장 시스템 SSOT v1.0",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "6a5fbccc"
     },
     {
@@ -6506,7 +6301,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "DreamTown_Mobile_Credential_System_P2_Snapshot_v1.md",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "f5534d3b"
     },
     {
@@ -6524,7 +6319,7 @@
       "owner": "code",
       "status": "active",
       "title": "DreamTown Naming System SSOT",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "d27e90a6"
     },
     {
@@ -6542,7 +6337,7 @@
       "owner": "team",
       "status": "archived",
       "title": "DreamTown Origin Myth SSOT",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "1134dbef"
     },
     {
@@ -6560,8 +6355,8 @@
       "owner": "rumi",
       "status": "active",
       "title": "DreamTown Product Core Loop SSOT",
-      "created_at": "2026-11-19",
-      "checksum": "cf181e2c"
+      "created_at": "2026-11-12",
+      "checksum": "a59170ab"
     },
     {
       "id": "DOC-DreamTown_Safety_Ethics_SSOT",
@@ -6578,7 +6373,7 @@
       "owner": "code",
       "status": "superseded",
       "title": "DreamTown Safety & Ethics SSOT",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "cad30bd9"
     },
     {
@@ -6596,8 +6391,8 @@
       "owner": "team",
       "status": "active",
       "title": "DreamTown Star Experience Principle SSOT",
-      "created_at": "2026-11-19",
-      "checksum": "4f303d4e"
+      "created_at": "2026-11-12",
+      "checksum": "9267b256"
     },
     {
       "id": "DOC-DreamTown_Universe_Bible",
@@ -6614,8 +6409,8 @@
       "owner": "rumi",
       "status": "archived",
       "title": "DreamTown Universe Bible",
-      "created_at": "2026-11-19",
-      "checksum": "804f038a"
+      "created_at": "2026-11-12",
+      "checksum": "30d848f4"
     },
     {
       "id": "DOC-DreamTown_Universe_Structure_v",
@@ -6632,8 +6427,8 @@
       "owner": "rumi",
       "status": "archived",
       "title": "DreamTown Universe Structure v2 SSOT",
-      "created_at": "2026-11-19",
-      "checksum": "3ad906a0"
+      "created_at": "2026-11-12",
+      "checksum": "3ed44781"
     },
     {
       "id": "DOC-DreamTown_Visual_Style_SSOT",
@@ -6650,7 +6445,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "DreamTown Visual Style SSOT",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "aafff583"
     },
     {
@@ -6668,7 +6463,7 @@
       "owner": "rumi",
       "status": "archived",
       "title": "DreamTown 세계 아키텍처 SSOT",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "c3eeb3f1"
     },
     {
@@ -6687,8 +6482,8 @@
       "owner": "Aurora5",
       "status": "Confirmed",
       "title": "SSOT-BIZ-001 — DreamTown 비즈니스 모델",
-      "created_at": "2026-11-19",
-      "checksum": "240d9afb"
+      "created_at": "2026-11-12",
+      "checksum": "7fa51508"
     },
     {
       "id": "DOC-SSOT-CHAR-001_Sowoni_Character",
@@ -6705,8 +6500,8 @@
       "owner": "Aurora5",
       "status": "Confirmed",
       "title": "SSOT-CHAR-001 — 소원이 캐릭터 바이블",
-      "created_at": "2026-11-19",
-      "checksum": "e77bd307"
+      "created_at": "2026-11-12",
+      "checksum": "d2a80bc7"
     },
     {
       "id": "DOC-SSOT-EXP-001_DreamTown_Expansi",
@@ -6723,8 +6518,8 @@
       "owner": "Aurora5",
       "status": "Confirmed",
       "title": "SSOT-EXP-001 — DreamTown 확장 가이드",
-      "created_at": "2026-11-19",
-      "checksum": "5b73d280"
+      "created_at": "2026-11-12",
+      "checksum": "24cbb5f3"
     },
     {
       "id": "DOC-SSOT-LOOP-001_Seal_Return_Unlo",
@@ -6743,8 +6538,8 @@
       "owner": "Aurora5 / (주)여수여행센터",
       "status": "Confirmed",
       "title": "SSOT-LOOP-001_Seal_Return_Unlock_Loop_Guide",
-      "created_at": "2026-11-19",
-      "checksum": "e2850639"
+      "created_at": "2026-11-12",
+      "checksum": "5becb5c1"
     },
     {
       "id": "DOC-SSOT-METRIC-001_Loop_Measureme",
@@ -6762,8 +6557,8 @@
       "owner": "Aurora5 / (주)여수여행센터",
       "status": "Confirmed",
       "title": "SSOT-METRIC-001_Loop_Measurement_Framework",
-      "created_at": "2026-11-19",
-      "checksum": "992d172e"
+      "created_at": "2026-11-12",
+      "checksum": "485b1be5"
     },
     {
       "id": "DOC-SSOT-WORLD-001_DreamTown_Philo",
@@ -6780,8 +6575,8 @@
       "owner": "Aurora5",
       "status": "Confirmed",
       "title": "SSOT-WORLD-001 — DreamTown 철학 선언",
-      "created_at": "2026-11-19",
-      "checksum": "c3eafff5"
+      "created_at": "2026-11-12",
+      "checksum": "382f069b"
     },
     {
       "id": "DOC-DreamTown_Intelligence_Agent_v",
@@ -6798,8 +6593,8 @@
       "owner": "comi",
       "status": "SSOT",
       "title": "🤖 DreamTown Intelligence Agent 설계서 v1.0",
-      "created_at": "2026-11-19",
-      "checksum": "8ca2d700"
+      "created_at": "2026-11-12",
+      "checksum": "83c67e5a"
     },
     {
       "id": "DOC-DreamTown_Master_Roadmap_v1",
@@ -6816,8 +6611,8 @@
       "owner": "rumi",
       "status": "SSOT",
       "title": "🌌 DreamTown 마스터 로드맵 v1.0",
-      "created_at": "2026-11-19",
-      "checksum": "b1b17a45"
+      "created_at": "2026-11-12",
+      "checksum": "0e99b357"
     },
     {
       "id": "DOC-DreamTown_MyStar_Visualization",
@@ -6834,8 +6629,8 @@
       "owner": "comi",
       "status": "SSOT",
       "title": "🌟 My Star 시각화 설계서 v1.0",
-      "created_at": "2026-11-19",
-      "checksum": "b35261e3"
+      "created_at": "2026-11-12",
+      "checksum": "e3c210b9"
     },
     {
       "id": "DOC-DreamTown_V1_Architecture_Free",
@@ -6854,7 +6649,7 @@
       "owner": "대표(푸르미르) / Aurora5 / Claude Code",
       "status": "APPROVED",
       "title": "DreamTown V1 Architecture Freeze",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "ff8d9747"
     },
     {
@@ -6873,7 +6668,7 @@
       "owner": "대표 / Aurora5 / Claude Code",
       "status": "Active (living document)",
       "title": "DreamTown V2 Backlog",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "a9b5a221"
     },
     {
@@ -6891,7 +6686,7 @@
       "owner": "Aurora5",
       "status": "Confirmed",
       "title": "SSOT-ROUTE-001 — EP01 영상 콘텐츠용 감정 항로",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "0666e624"
     },
     {
@@ -6910,8 +6705,8 @@
       "owner": "Aurora5",
       "status": "Confirmed",
       "title": "SSOT-ROUTE-002 — EP01 별빛항로 실제 체험 Route",
-      "created_at": "2026-11-19",
-      "checksum": "78e5426b"
+      "created_at": "2026-11-12",
+      "checksum": "5f8b23b0"
     },
     {
       "id": "DOC-SSOT-ROUTE-003_Starlight_Coast",
@@ -6928,7 +6723,7 @@
       "owner": "Aurora5",
       "status": "Draft",
       "title": "SSOT-ROUTE-003 — 별빛 해안길 FIT 도보 항로",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "69a51b8f"
     },
     {
@@ -6947,8 +6742,8 @@
       "owner": "Aurora5",
       "status": "Confirmed",
       "title": "SSOT-TIME-001 — EP01 별빛항로 타임플로우",
-      "created_at": "2026-11-19",
-      "checksum": "a3093565"
+      "created_at": "2026-11-12",
+      "checksum": "e3bdb0ef"
     },
     {
       "id": "DOC-STATE-EP01_Where_My_Heart_Beca",
@@ -6964,8 +6759,8 @@
       "owner": "team",
       "status": "Complete",
       "title": "STATE-EP01 — 내 마음이 별이 된 곳",
-      "created_at": "2026-11-19",
-      "checksum": "dfa359f9"
+      "created_at": "2026-11-12",
+      "checksum": "4ca499de"
     },
     {
       "id": "DOC-STATE-EP02_The_Heart_Begins_To",
@@ -6981,8 +6776,8 @@
       "owner": "team",
       "status": "In Production",
       "title": "STATE-EP02 — 마음이 열리기 시작하다",
-      "created_at": "2026-11-19",
-      "checksum": "f605834f"
+      "created_at": "2026-11-12",
+      "checksum": "c88ab665"
     },
     {
       "id": "DOC-SSOT-BG-001_Starlight_Route_Ba",
@@ -6999,7 +6794,7 @@
       "owner": "Aurora5",
       "status": "LOCKED",
       "title": "SSOT-BG-001 — DreamTown 별빛항로 배경 가이드",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "156e441d"
     },
     {
@@ -7017,8 +6812,8 @@
       "owner": "Aurora5",
       "status": "Confirmed",
       "title": "SSOT-DESIGN-001 — DreamTown 역순 감정 설계",
-      "created_at": "2026-11-19",
-      "checksum": "284c27ae"
+      "created_at": "2026-11-12",
+      "checksum": "ab83e21f"
     },
     {
       "id": "DOC-SSOT-IMG-001_DreamTown_Image_G",
@@ -7035,8 +6830,8 @@
       "owner": "Aurora5",
       "status": "Confirmed",
       "title": "SSOT-IMG-001 — DreamTown 이미지 생성 가이드",
-      "created_at": "2026-11-19",
-      "checksum": "ee2d6230"
+      "created_at": "2026-11-12",
+      "checksum": "2cd9bb86"
     },
     {
       "id": "DOC-SSOT-LOC-001_DreamTown_Yeosu_L",
@@ -7053,8 +6848,8 @@
       "owner": "Aurora5",
       "status": "Confirmed",
       "title": "SSOT-LOC-001 — DreamTown 여수 장소 SSOT",
-      "created_at": "2026-11-19",
-      "checksum": "39d02067"
+      "created_at": "2026-11-12",
+      "checksum": "fe5a3109"
     },
     {
       "id": "DOC-SSOT-OPS-001_DreamTown_Video_P",
@@ -7071,7 +6866,7 @@
       "owner": "Aurora5",
       "status": "Confirmed",
       "title": "SSOT-OPS-001 — DreamTown 영상 제작 운영 파이프라인",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "306c61cf"
     },
     {
@@ -7089,8 +6884,8 @@
       "owner": "Aurora5",
       "status": "Confirmed",
       "title": "SSOT-VID-002 — DreamTown 영상 생성 가이드",
-      "created_at": "2026-11-19",
-      "checksum": "b4ee36e6"
+      "created_at": "2026-11-12",
+      "checksum": "95ecd828"
     },
     {
       "id": "DOC-PARTNER_MASTER_V1",
@@ -7107,8 +6902,8 @@
       "owner": "Aurora5 / (주)여수여행센터",
       "status": "Template (데이터 미입력)",
       "title": "PARTNER-MASTER-V1 — DreamTown 제휴처 마스터 데이터 명세",
-      "created_at": "2026-11-19",
-      "checksum": "f2619d96"
+      "created_at": "2026-11-12",
+      "checksum": "75b9929b"
     },
     {
       "id": "DOC-SSOT-PRICE-001",
@@ -7126,8 +6921,8 @@
       "owner": "Aurora5 / (주)여수여행센터",
       "status": "Confirmed (일부 항목 검토 중 — §10 참조)",
       "title": "SSOT-PRICE-001 — DreamTown 별빛항로 가격 체계 v1.0",
-      "created_at": "2026-11-19",
-      "checksum": "53281bd9"
+      "created_at": "2026-11-12",
+      "checksum": "96e8722a"
     },
     {
       "id": "DOC-SOURCES_INDEX",
@@ -7143,7 +6938,7 @@
       "owner": "team",
       "status": "트랙",
       "title": "SOURCES_INDEX — DreamTown SSOT 원본 출처 인덱스",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "b6489f44"
     },
     {
@@ -7161,7 +6956,7 @@
       "owner": "Aurora5 / Claude Code",
       "status": "LOCKED",
       "title": "SSOT-PRODUCT-001 — DreamTown Product Architecture",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "15bf1471"
     },
     {
@@ -7180,7 +6975,7 @@
       "owner": "Aurora5 / Claude Code",
       "status": "LOCKED",
       "title": "SSOT-WISHART-001 — WishArt V4 Core Guide",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "bec5b99f"
     },
     {
@@ -7198,7 +6993,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "DreamTown API Specification Design",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "5fee6796"
     },
     {
@@ -7216,8 +7011,8 @@
       "owner": "rumi",
       "status": "active",
       "title": "DreamTown Aurum System Design",
-      "created_at": "2026-11-19",
-      "checksum": "3b81fc94"
+      "created_at": "2026-11-12",
+      "checksum": "0aa6fdeb"
     },
     {
       "id": "DOC-DreamTown_Character_Style_Guid",
@@ -7234,7 +7029,7 @@
       "owner": "code",
       "status": "| SA-02",
       "title": "DreamTown Character Style Guide SSOT",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "31174b04"
     },
     {
@@ -7253,7 +7048,7 @@
       "owner": "rumi",
       "status": "archived",
       "title": "DreamTown DB Schema Design",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "787f5ace"
     },
     {
@@ -7271,7 +7066,7 @@
       "owner": "code",
       "status": "active",
       "title": "DreamTown First User Journey SSOT",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "389d44d7"
     },
     {
@@ -7289,8 +7084,8 @@
       "owner": "rumi",
       "status": "active",
       "title": "DreamTown Galaxy Evolution System SSOT",
-      "created_at": "2026-11-19",
-      "checksum": "1eb5507a"
+      "created_at": "2026-11-12",
+      "checksum": "007942bf"
     },
     {
       "id": "DOC-DreamTown_Galaxy_Map_SSOT",
@@ -7307,7 +7102,7 @@
       "owner": "rumi",
       "status": "|------",
       "title": "DreamTown Galaxy Map SSOT",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "a9635b5f"
     },
     {
@@ -7325,7 +7120,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "DreamTown Galaxy Map UI Design v1",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "58979307"
     },
     {
@@ -7342,7 +7137,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "DreamTown Galaxy UI Architecture SSOT",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "f6884943"
     },
     {
@@ -7360,8 +7155,8 @@
       "owner": "rumi",
       "status": "active",
       "title": "DreamTown Golden Turtle Constellation System SSOT",
-      "created_at": "2026-11-19",
-      "checksum": "858728e7"
+      "created_at": "2026-11-12",
+      "checksum": "7294b7ac"
     },
     {
       "id": "DOC-DreamTown_Growth_Film_Architec",
@@ -7376,7 +7171,7 @@
       "owner": "team",
       "status": "active",
       "title": "Technical Implementation Log: Growth Film & Viral Loop (Referral Injection)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "a50cd327"
     },
     {
@@ -7394,7 +7189,7 @@
       "owner": "code",
       "status": "추가 프롬프트",
       "title": "DreamTown Image Prompts SSOT",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "6287474e"
     },
     {
@@ -7412,7 +7207,7 @@
       "owner": "yeoiboju",
       "status": "active",
       "title": "DreamTown Key Visuals SSOT",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "f51b0d91"
     },
     {
@@ -7430,8 +7225,8 @@
       "owner": "rumi",
       "status": "archived",
       "title": "DreamTown My Star UX Master Design",
-      "created_at": "2026-11-19",
-      "checksum": "659c5d26"
+      "created_at": "2026-11-12",
+      "checksum": "3dee2676"
     },
     {
       "id": "DOC-DreamTown_Onboarding_Experienc",
@@ -7448,8 +7243,8 @@
       "owner": "rumi",
       "status": "active",
       "title": "DreamTown Onboarding Experience v1",
-      "created_at": "2026-11-19",
-      "checksum": "31deef67"
+      "created_at": "2026-11-12",
+      "checksum": "c391623b"
     },
     {
       "id": "DOC-DreamTown_Pipeline_Design",
@@ -7466,7 +7261,7 @@
       "owner": "rumi",
       "status": "archived",
       "title": "DreamTown 온라인–오프라인 통합 파이프라인",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "20d83fa5"
     },
     {
@@ -7484,7 +7279,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "DreamTown Product Architecture Design",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "bfde40ab"
     },
     {
@@ -7503,7 +7298,7 @@
       "owner": "ceo",
       "status": "active",
       "title": "DreamTown Product Structure SSOT",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "42c15e21"
     },
     {
@@ -7520,8 +7315,8 @@
       "owner": "code",
       "status": "active",
       "title": "DreamTown Star Location Scalability SSOT",
-      "created_at": "2026-11-19",
-      "checksum": "6cde8538"
+      "created_at": "2026-11-12",
+      "checksum": "e21249f0"
     },
     {
       "id": "DOC-DreamTown_Star_Birth_Policy_De",
@@ -7538,7 +7333,7 @@
       "owner": "rumi",
       "status": "내용",
       "title": "DreamTown 별 탄생 정책",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "54c75e12"
     },
     {
@@ -7558,7 +7353,7 @@
       "owner": "code",
       "status": "|--------",
       "title": "시스템 아키텍처",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "10647947"
     },
     {
@@ -7577,8 +7372,8 @@
       "owner": "team",
       "status": "|------",
       "title": "DreamTown Travel System SSOT",
-      "created_at": "2026-11-19",
-      "checksum": "fad5b9d9"
+      "created_at": "2026-11-12",
+      "checksum": "71701edc"
     },
     {
       "id": "DOC-DreamTown_Video_Pipeline_Desig",
@@ -7595,7 +7390,7 @@
       "owner": "rumi",
       "status": "내용",
       "title": "DreamTown 영상 제작 파이프라인",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "67ca79a6"
     },
     {
@@ -7613,7 +7408,7 @@
       "owner": "code",
       "status": "---",
       "title": "DreamTown Yeosu Galaxy SSOT",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "fb61049e"
     },
     {
@@ -7631,7 +7426,7 @@
       "owner": "대표(푸르미르) / Aurora5 / Claude Code",
       "status": "Confirmed (구현 완료, 2026-07-13 대표 승인)",
       "title": "SSOT-APP-001 — DreamTown Mobile Journey Guide (Part 3)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "0967c121"
     },
     {
@@ -7648,7 +7443,7 @@
       "owner": "대표(푸르미르) / Aurora5 / Claude Code",
       "status": "Draft (다음 스프린트 설계 — 이번 턴에서 코드 구현하지 않음)",
       "title": "SSOT-APP-002 — DreamTown First Promise Flow (Part 2)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "1ba211bd"
     },
     {
@@ -7667,7 +7462,7 @@
       "owner": "Aurora5 / Claude Code",
       "status": "LOCKED",
       "title": "SSOT-ARCH-001 — WishArt Platform Architecture",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "b8ac40de"
     },
     {
@@ -7687,8 +7482,8 @@
       "owner": "Aurora5",
       "status": "Confirmed",
       "title": "SSOT-BIZ-004 — DreamTown 운영 모델",
-      "created_at": "2026-11-19",
-      "checksum": "3237895a"
+      "created_at": "2026-11-12",
+      "checksum": "ded79fcf"
     },
     {
       "id": "DOC-SSOT-DOC-001_Document_Governan",
@@ -7704,7 +7499,7 @@
       "owner": "Aurora5",
       "status": "LOCKED",
       "title": "SSOT-DOC-001 — Document Governance",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "07c21e7f"
     },
     {
@@ -7723,7 +7518,7 @@
       "owner": "Aurora5 / Claude Code",
       "status": "Draft (미승인 — 대표 확정 전까지 구현 적용 금지)",
       "title": "SSOT-ENGINE-001 — DreamTown Core Story Engine (Draft)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "7f0bf042"
     },
     {
@@ -7740,7 +7535,7 @@
       "owner": "Aurora5 / Claude Code",
       "status": "Draft (설계안 — 실제 통합/코드 연결은 아직 수행하지 않음)",
       "title": "SSOT-ENGINE-002 — WishArt Adapter Plan",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "94a532b6"
     },
     {
@@ -7758,7 +7553,7 @@
       "owner": "Aurora5 / Claude Code",
       "status": "LOCKED",
       "title": "SSOT-IDENTITY-001 — DreamTown Resident Identity",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "7ff8da0b"
     },
     {
@@ -7777,7 +7572,7 @@
       "owner": "Aurora5 / Claude Code",
       "status": "LOCKED",
       "title": "SSOT-WISHART-002 — WishArt Service Modes",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "92a96ae6"
     },
     {
@@ -7793,7 +7588,7 @@
       "owner": "comi",
       "status": "active",
       "title": "양자 기획법 (Quantum Planning Method) v1.0",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "b360b1b0"
     },
     {
@@ -7811,8 +7606,8 @@
       "owner": "code",
       "status": "|----",
       "title": "에이전트 인덱스",
-      "created_at": "2026-11-19",
-      "checksum": "7ce67d67"
+      "created_at": "2026-11-12",
+      "checksum": "92a49e80"
     },
     {
       "id": "DOC-conversation-workflow",
@@ -7827,8 +7622,8 @@
       "owner": "rumi",
       "status": "active",
       "title": "대화 저장소 워크플로우",
-      "created_at": "2026-11-19",
-      "checksum": "e37788e5"
+      "created_at": "2026-11-12",
+      "checksum": "55221cd3"
     },
     {
       "id": "DOC-manifest-system",
@@ -7847,7 +7642,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Manifest 자동 생성 시스템",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "d242fbfe"
     },
     {
@@ -7864,7 +7659,7 @@
       "owner": "team",
       "status": "active",
       "title": "소원놀이터 퀵 레퍼런스 (운영용)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "fc46316d"
     },
     {
@@ -7881,8 +7676,8 @@
       "owner": "code",
       "status": "active",
       "title": "TASK: Silent Response Layer v1 구현 지시서",
-      "created_at": "2026-11-19",
-      "checksum": "3a0c80c6"
+      "created_at": "2026-11-12",
+      "checksum": "cad9fc05"
     },
     {
       "id": "DOC-TODO-Core_Engine_Integration",
@@ -7898,7 +7693,7 @@
       "owner": "code",
       "status": "active",
       "title": "TODO — Core Engine Integration",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "71694f73"
     },
     {
@@ -7916,7 +7711,7 @@
       "owner": "code",
       "status": "superseded",
       "title": "TODO — DreamTown Route Service (V1 Implementation)",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "b9f4fb03"
     },
     {
@@ -7935,7 +7730,7 @@
       "owner": "code",
       "status": "active",
       "title": "TODO — StoryBook Refactor",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "ee2f778b"
     },
     {
@@ -7953,7 +7748,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Aurora 5 토론 시스템 안내문",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "49189a4d"
     },
     {
@@ -7969,7 +7764,7 @@
       "owner": "team",
       "status": "active",
       "title": "L3 Promote — PR #12: [P2.3] Ops Hardening: Stability Score + Alert Cooldown + Proactive Alert",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "7e4e425b"
     },
     {
@@ -7987,7 +7782,7 @@
       "owner": "code",
       "status": "분석 중 / 분석 완료",
       "title": "카카오 알림톡 템플릿 설계서",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "75c90dee"
     },
     {
@@ -8004,7 +7799,7 @@
       "owner": "ceo",
       "status": "active",
       "title": "30초 홍보영상 프롬프트 패키지 v1.0",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "840434d0"
     },
     {
@@ -8021,7 +7816,7 @@
       "owner": "rumi",
       "status": "active",
       "title": "Wix 팀 소개 페이지 콘텐츠",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "cb6751ba"
     },
     {
@@ -8039,8 +7834,8 @@
       "owner": "team",
       "status": "active",
       "title": "PHOENIX WORKER CONTEXT V0.1",
-      "created_at": "2026-11-19",
-      "checksum": "f38e75d2"
+      "created_at": "2026-11-12",
+      "checksum": "bb80c7b4"
     },
     {
       "id": "DOC-README",
@@ -8055,7 +7850,7 @@
       "owner": "comi",
       "status": "active",
       "title": "docs/_raw/ — CEO 빠른 적재 폴더",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "452d7c2e"
     },
     {
@@ -8072,7 +7867,7 @@
       "owner": "comi",
       "status": "archived",
       "title": "프로젝트 지식 수동 정리 가이드",
-      "created_at": "2026-11-19",
+      "created_at": "2026-11-12",
       "checksum": "86623de8"
     },
     {
@@ -8091,7 +7886,7 @@
       "status": "|------",
       "title": "Canonical Asset Registry v1 — Verified",
       "created_at": "2026-05-01",
-      "checksum": "b2d1b383"
+      "checksum": "b65d88ba"
     },
     {
       "id": "DOC-CEO-WEEKLY-2026-W17",
@@ -8108,7 +7903,7 @@
       "status": "active",
       "title": "CEO-WEEKLY-2026-W17",
       "created_at": "2026-04-26T19:42:42.796Z",
-      "checksum": "e83d70ab"
+      "checksum": "ef6d7ab3"
     },
     {
       "id": "DOC-CEO-WEEKLY-2026-W16",
@@ -8125,7 +7920,7 @@
       "status": "active",
       "title": "CEO-WEEKLY-2026-W16",
       "created_at": "2026-04-19T15:00:00.326Z",
-      "checksum": "1f626735"
+      "checksum": "74382eda"
     },
     {
       "id": "DOC-CEO-WEEKLY-2026-W15",
@@ -8142,7 +7937,7 @@
       "status": "active",
       "title": "CEO-WEEKLY-2026-W15",
       "created_at": "2026-04-12T15:38:34.700Z",
-      "checksum": "5de83a90"
+      "checksum": "2dc04d0e"
     },
     {
       "id": "DEC-2026-0413-001",
@@ -8158,7 +7953,7 @@
       "status": "active",
       "title": "DEC: 고향 부여 원칙",
       "created_at": "2026-04-01",
-      "checksum": "3e21d4a8"
+      "checksum": "f2957845"
     },
     {
       "id": "DEC-2026-0413-002",
@@ -8174,7 +7969,7 @@
       "status": "active",
       "title": "DEC: 탄생지·고향·로그 역할 분리 구조",
       "created_at": "2026-04-01",
-      "checksum": "9d805313"
+      "checksum": "cf787437"
     },
     {
       "id": "DEC-2026-0426-001",
@@ -8192,7 +7987,7 @@
       "status": "✅",
       "title": "DreamTown 4대 Sub-Agent 시스템 도입",
       "created_at": "2026-04-01",
-      "checksum": "e444ecf5"
+      "checksum": "9ec234bb"
     },
     {
       "id": "DOC-AIL-STORY-2026-0404-001_story-",
@@ -8211,7 +8006,7 @@
       "status": "active",
       "title": "AIL-STORY-2026-0404-001 — 나의 이야기 초안 MVP 검증",
       "created_at": "2026-04-01",
-      "checksum": "748793de"
+      "checksum": "f0b7e52f"
     },
     {
       "id": "DOC-SSOT-2026-0413-001_별_고향_로그_세계관",
@@ -8228,7 +8023,7 @@
       "status": "archived",
       "title": "DreamTown 세계관 SSOT",
       "created_at": "2026-04-01",
-      "checksum": "8492a65a"
+      "checksum": "c637a89b"
     },
     {
       "id": "DOC-SSOT-2026-0413-002_여수_재방문_엔진_및",
@@ -8244,7 +8039,7 @@
       "status": "active",
       "title": "DreamTown 사업 구조 SSOT",
       "created_at": "2026-04-01",
-      "checksum": "fd84dcc7"
+      "checksum": "a5963a74"
     },
     {
       "id": "DOC-SSOT-2026-0416-001_케이블카_상품_포인트",
@@ -8260,7 +8055,7 @@
       "status": "active",
       "title": "SSOT-2026-0416-001 — DreamTown 케이블카·포인트·여행 통합 구조",
       "created_at": "2026-04-01",
-      "checksum": "69b83ea7"
+      "checksum": "ebd860a3"
     },
     {
       "id": "DOC-TASK-2026-0413-001_SSOT_반영_MVP",
@@ -8276,7 +8071,7 @@
       "status": "active",
       "title": "TASK: SSOT 반영 및 MVP 재정렬",
       "created_at": "2026-04-01",
-      "checksum": "7fd96c0f"
+      "checksum": "0f174807"
     },
     {
       "id": "DOC-CEO-WEEKLY-2026-W12",
@@ -8293,7 +8088,7 @@
       "status": "active",
       "title": "CEO-WEEKLY-2026-W12",
       "created_at": "2026-03-22T19:43:55.265Z",
-      "checksum": "013f1d29"
+      "checksum": "146e7d96"
     },
     {
       "id": "DOC-CEO-WEEKLY-2026-W11",
@@ -8310,7 +8105,7 @@
       "status": "active",
       "title": "CEO-WEEKLY-2026-W11",
       "created_at": "2026-03-15T19:44:26.676Z",
-      "checksum": "7082fc95"
+      "checksum": "004e2ff4"
     },
     {
       "id": "DOC-DEPLOY-PACKET-2026-03-02",
@@ -8410,7 +8205,7 @@
       "status": "보강 내용",
       "title": "파크 2D 영상 기술지원",
       "created_at": "2026-02-01",
-      "checksum": "e52bc394"
+      "checksum": "a0d6b37a"
     },
     {
       "id": "DOC-20260201_노션_DB_구조_3DB",
@@ -8426,7 +8221,7 @@
       "status": "active",
       "title": "노션 DB 구조 (3DB) - 자동화 필수 속성",
       "created_at": "2026-02-01",
-      "checksum": "adb9266c"
+      "checksum": "b6b6f406"
     },
     {
       "id": "DOC-20260201_드라이브_공유폴더_마스터가이드",
@@ -8443,7 +8238,7 @@
       "status": "active",
       "title": "드라이브 공유폴더 마스터가이드 (MASTER GUIDELINES V7.0 포함)",
       "created_at": "2026-02-01",
-      "checksum": "35a34294"
+      "checksum": "351d05a9"
     },
     {
       "id": "DOC-AURORA5_SORA_FINAL_v10",
@@ -8461,7 +8256,7 @@
       "status": "active",
       "title": "Aurora5 Sora 영상 제작 최종 자료 v1.0",
       "created_at": "2026-02-01",
-      "checksum": "e17c9873"
+      "checksum": "d272a8bc"
     },
     {
       "id": "DOC-Code_종합지시서",
@@ -8478,7 +8273,7 @@
       "status": "active",
       "title": "Code 종합지시서",
       "created_at": "2026-02-01",
-      "checksum": "7fdab4f0"
+      "checksum": "e35ff97e"
     },
     {
       "id": "DOC-GitHub_저장소_활용_가이드",
@@ -8494,7 +8289,7 @@
       "status": "active",
       "title": "GitHub 저장소 활용 가이드",
       "created_at": "2026-02-01",
-      "checksum": "68d20264"
+      "checksum": "6ec89407"
     },
     {
       "id": "DOC-CEO-WEEKLY-2025-W52",
@@ -8511,7 +8306,7 @@
       "status": "active",
       "title": "CEO-WEEKLY-2025-W52",
       "created_at": "2026-01-02T15:23:35.865Z",
-      "checksum": "92d79daf"
+      "checksum": "bf34ae55"
     },
     {
       "id": "DEC-2026-0102-045",
@@ -8529,7 +8324,7 @@
       "status": "pending_approval",
       "title": "DEC-2026-0102-045",
       "created_at": "2026-01-02",
-      "checksum": "2b0949ee"
+      "checksum": "a3443715"
     },
     {
       "id": "DEC-2026-0102-121",
@@ -8547,7 +8342,7 @@
       "status": "pending_approval",
       "title": "���α� ������ ���� ����",
       "created_at": "2026-01-02",
-      "checksum": "62e40092"
+      "checksum": "cc9dca04"
     },
     {
       "id": "DEC-2026-0102-457",
@@ -8565,7 +8360,7 @@
       "status": "pending_approval",
       "title": "DEC-2026-0102-457",
       "created_at": "2026-01-02",
-      "checksum": "07a908b7"
+      "checksum": "5824be27"
     },
     {
       "id": "DEC-2026-0102-837",
@@ -8583,7 +8378,7 @@
       "status": "pending_approval",
       "title": "DEC-2026-0102-837",
       "created_at": "2026-01-02",
-      "checksum": "4993be79"
+      "checksum": "87865989"
     },
     {
       "id": "DEC-2026-0102-933",
@@ -8601,7 +8396,7 @@
       "status": "pending_approval",
       "title": "DEC-2026-0102-933",
       "created_at": "2026-01-02",
-      "checksum": "e415c58c"
+      "checksum": "2c55071b"
     },
     {
       "id": "DEC-2026-0102-937",
@@ -8619,7 +8414,7 @@
       "status": "pending_approval",
       "title": "�ν�Ÿ�׷� ���� ķ���� ���� ����",
       "created_at": "2026-01-02",
-      "checksum": "13b7b7ae"
+      "checksum": "2ac983a5"
     },
     {
       "id": "DEC-2026-0103-271",
@@ -8637,7 +8432,7 @@
       "status": "pending_approval",
       "title": "DEC-2026-0103-271",
       "created_at": "2026-01-02",
-      "checksum": "2be9441e"
+      "checksum": "89e9dcdd"
     },
     {
       "id": "DEC-2026-0103-316",
@@ -8655,7 +8450,7 @@
       "status": "pending_approval",
       "title": "DEC-2026-0103-316",
       "created_at": "2026-01-02",
-      "checksum": "d5efd392"
+      "checksum": "b23adde2"
     },
     {
       "id": "DEC-2026-0103-325",
@@ -8673,7 +8468,7 @@
       "status": "pending_approval",
       "title": "DEC-2026-0103-325",
       "created_at": "2026-01-02",
-      "checksum": "dc230dbc"
+      "checksum": "4514839e"
     },
     {
       "id": "DEC-2026-0103-371",
@@ -8691,7 +8486,7 @@
       "status": "pending_approval",
       "title": "DEC-2026-0103-371",
       "created_at": "2026-01-02",
-      "checksum": "d8d250eb"
+      "checksum": "c5abeaee"
     },
     {
       "id": "DEC-2026-0103-590",
@@ -8709,7 +8504,7 @@
       "status": "pending_approval",
       "title": "DEC-2026-0103-590",
       "created_at": "2026-01-02",
-      "checksum": "3f24ba6a"
+      "checksum": "e310684a"
     },
     {
       "id": "DEC-2026-0103-638",
@@ -8727,7 +8522,7 @@
       "status": "pending_approval",
       "title": "DEC-2026-0103-638",
       "created_at": "2026-01-02",
-      "checksum": "66c5725a"
+      "checksum": "ee58d7c2"
     },
     {
       "id": "DEC-2026-0103-858",
@@ -8745,7 +8540,7 @@
       "status": "pending_approval",
       "title": "DEC-2026-0103-858",
       "created_at": "2026-01-02",
-      "checksum": "c858127c"
+      "checksum": "326d05d7"
     },
     {
       "id": "EXP-2026-0103-158",
@@ -8763,7 +8558,7 @@
       "status": "active",
       "title": "EXP-2026-0103-158",
       "created_at": "2026-01-02",
-      "checksum": "efcc15c2"
+      "checksum": "2d8e5043"
     },
     {
       "id": "EXP-2026-0103-410",
@@ -8781,7 +8576,7 @@
       "status": "active",
       "title": "EXP-2026-0103-410",
       "created_at": "2026-01-02",
-      "checksum": "03e0a538"
+      "checksum": "0acb0973"
     },
     {
       "id": "EXP-2026-0103-452",
@@ -8799,7 +8594,7 @@
       "status": "active",
       "title": "EXP-2026-0103-452",
       "created_at": "2026-01-02",
-      "checksum": "dadf8969"
+      "checksum": "357d524c"
     },
     {
       "id": "DOC-20260101-MKI",
@@ -8819,7 +8614,7 @@
       "status": "active",
       "title": "� Aurora 5 UBOS - 완전 점검 및 설정 가이드",
       "created_at": "2026-01-01",
-      "checksum": "9236e762"
+      "checksum": "b8304cbd"
     },
     {
       "id": "DOC-20260101-VL5",
@@ -8838,7 +8633,7 @@
       "status": "active",
       "title": "🌌 Aurora 5 완전체 시스템 (최수민님 방법론 통합)",
       "created_at": "2026-01-01",
-      "checksum": "31f6d3d6"
+      "checksum": "a77bc29c"
     },
     {
       "id": "DOC-20260101-4PA",
@@ -8863,7 +8658,7 @@
       "status": "active",
       "title": "🌏 Aurora 5 Claude Code 종합 지시서",
       "created_at": "2026-01-01",
-      "checksum": "0abb899f"
+      "checksum": "2a8f5401"
     },
     {
       "id": "DOC-20260101-TRD",
@@ -8886,7 +8681,7 @@
       "status": "active",
       "title": "Aurora5운영표준_2026-01-03",
       "created_at": "2026-01-01",
-      "checksum": "7a1284f9"
+      "checksum": "d04f7b28"
     },
     {
       "id": "DOC-20260101-WG8",
@@ -8909,7 +8704,7 @@
       "status": "active",
       "title": "DEC-YYYYMMDD-XXX: [결정 주제]",
       "created_at": "2026-01-01",
-      "checksum": "e89f2db0"
+      "checksum": "2dc831a7"
     },
     {
       "id": "DOC-20260101-1YB",
@@ -8929,7 +8724,7 @@
       "status": "active",
       "title": "Aurora5팬덤OS구축결정회의록_2026-01-04",
       "created_at": "2026-01-01",
-      "checksum": "935c0fc3"
+      "checksum": "99441851"
     },
     {
       "id": "DOC-20260101-RS0",
@@ -8947,7 +8742,7 @@
       "status": "active",
       "title": "🎉 Aurora 5 UBOS - 2주 도그푸딩 시작 선언!",
       "created_at": "2026-01-01",
-      "checksum": "25c6db9c"
+      "checksum": "589e6d2d"
     },
     {
       "id": "DOC-20260101-H8E",
@@ -8965,7 +8760,7 @@
       "status": "active",
       "title": "🎊 Aurora 5 UBOS - 2주 도그푸딩 공식 시작!",
       "created_at": "2026-01-01",
-      "checksum": "ba3a2d57"
+      "checksum": "020170af"
     },
     {
       "id": "DOC-20260101-VG0",
@@ -8984,7 +8779,7 @@
       "status": "active",
       "title": "MCP Part 2-5 완성 지시서",
       "created_at": "2026-01-01",
-      "checksum": "3de1a40f"
+      "checksum": "f59c8ca7"
     },
     {
       "id": "DOC-20260101-UZX",
@@ -9004,7 +8799,7 @@
       "status": "active",
       "title": "� [오로라5 MICE·단체 자동견적 시스템 설계 보고]",
       "created_at": "2026-01-01",
-      "checksum": "1b3d5a22"
+      "checksum": "a6e3adb8"
     },
     {
       "id": "DOC-20260101-DZX",
@@ -9022,7 +8817,7 @@
       "status": "active",
       "title": "Aurora 5 UBOS - 30분 완성 체크리스트",
       "created_at": "2026-01-01",
-      "checksum": "402fe892"
+      "checksum": "2c03b058"
     },
     {
       "id": "DOC-20260101-L9Y",
@@ -9041,7 +8836,7 @@
       "status": "active",
       "title": "� 가격/정책 패치 v1.1 - 푸르미르 CEO 확정",
       "created_at": "2026-01-01",
-      "checksum": "b2c2b6de"
+      "checksum": "e79b6c2b"
     },
     {
       "id": "DOC-20260101-97N",
@@ -9060,7 +8855,7 @@
       "status": "active",
       "title": "MO 자동 출력 프롬프트 v1.0 (주간 대시보드 표 자동 채움)",
       "created_at": "2026-01-01",
-      "checksum": "9e8843a3"
+      "checksum": "b8235e7e"
     },
     {
       "id": "DOC-20260101-ICN",
@@ -9085,7 +8880,7 @@
       "status": "active",
       "title": "1) 가격 티어 확정 (v1)",
       "created_at": "2026-01-01",
-      "checksum": "771eb1c7"
+      "checksum": "d6222682"
     },
     {
       "id": "DOC-20260101-8VR",
@@ -9106,7 +8901,7 @@
       "status": "active",
       "title": "여수 소원항해 견적 시스템 v2.0",
       "created_at": "2026-01-01",
-      "checksum": "5173a21f"
+      "checksum": "f8d82957"
     },
     {
       "id": "DOC-20260101-K7C",
@@ -9129,7 +8924,7 @@
       "status": "active",
       "title": "1) 가격 티어 확정 (v1)",
       "created_at": "2026-01-01",
-      "checksum": "4321171a"
+      "checksum": "fab1c714"
     },
     {
       "id": "DOC-20260101-6M7",
@@ -9152,7 +8947,7 @@
       "status": "active",
       "title": "1) 가격 티어 확정 (v1)",
       "created_at": "2026-01-01",
-      "checksum": "7f779f60"
+      "checksum": "1379060b"
     },
     {
       "id": "DOC-20260101-GR0",
@@ -9176,7 +8971,7 @@
       "status": "active",
       "title": "여수 소원항해 견적 시스템 - Claude Code 개발 지시서",
       "created_at": "2026-01-01",
-      "checksum": "1cde238a"
+      "checksum": "b7639460"
     },
     {
       "id": "DOC-20260101-HP0",
@@ -9196,7 +8991,7 @@
       "status": "active",
       "title": "1) 🎯 4줄 결정 템플릿 (요청/이슈가 생길 때마다 이것만 쓰기)",
       "created_at": "2026-01-01",
-      "checksum": "42b207f6"
+      "checksum": "dcaeb348"
     },
     {
       "id": "DOC-20260101-D2L",
@@ -9219,7 +9014,7 @@
       "status": "active",
       "title": "오픈 패키지 v0.9 - 런칭 전 필수 체크리스트",
       "created_at": "2026-01-01",
-      "checksum": "05187417"
+      "checksum": "918dc498"
     },
     {
       "id": "DOC-20260101-XHZ",
@@ -9240,7 +9035,7 @@
       "status": "active",
       "title": "[Aurora5] Claude Code 실행 패킷 v1.0 (Week1~Week2)",
       "created_at": "2026-01-01",
-      "checksum": "ddaec709"
+      "checksum": "701e4c52"
     },
     {
       "id": "DOC-20260101-RET",
@@ -9263,7 +9058,7 @@
       "status": "active",
       "title": "� Aurora5 주간 성과 리포트",
       "created_at": "2026-01-01",
-      "checksum": "3b5f11b3"
+      "checksum": "6ef11484"
     },
     {
       "id": "DOC-20260101-YH9",
@@ -9285,7 +9080,7 @@
       "status": "active",
       "title": "지역상품권운영방법_2026-01-04",
       "created_at": "2026-01-01",
-      "checksum": "3db014e9"
+      "checksum": "482a4e0e"
     },
     {
       "id": "DOC-20260101-99J",
@@ -9310,7 +9105,7 @@
       "status": "active",
       "title": "문서명\t내용",
       "created_at": "2026-01-01",
-      "checksum": "6f23a12b"
+      "checksum": "8efe2ae9"
     },
     {
       "id": "DOC-20251231-GV1",
@@ -9331,7 +9126,7 @@
       "status": "active",
       "title": "🤖 **[DEC-2025-1231-001-v2] 가격 전략 최종 확정안**",
       "created_at": "2025-12-31",
-      "checksum": "50a438a6"
+      "checksum": "2b1ad097"
     },
     {
       "id": "DOC-2025-12-30_소원5문항_gem유지_결정서",
@@ -9434,7 +9229,7 @@
       "status": "active",
       "title": "� [YYYY-MM-DD] 루미 기술 작업 로그",
       "created_at": "2025-12-30",
-      "checksum": "d98e4dec"
+      "checksum": "931e4f5a"
     },
     {
       "id": "DOC-20251230-YKH",
@@ -9453,7 +9248,7 @@
       "status": "active",
       "title": "🎓 최수민님의 에이전틱 워크플로우 적용 사례",
       "created_at": "2025-12-30",
-      "checksum": "26db4b01"
+      "checksum": "7aab2f25"
     },
     {
       "id": "DOC-20251230-1CZ",
@@ -9473,7 +9268,7 @@
       "status": "active",
       "title": "코드와미래설계_2025-12-30",
       "created_at": "2025-12-30",
-      "checksum": "ae341956"
+      "checksum": "b3c8d7bd"
     },
     {
       "id": "DOC-SYS-2025-1230-LUMI-001_Airtabl",
@@ -9680,7 +9475,7 @@
       "status": "active",
       "title": "� GitHub 저장소 활용 가이드",
       "created_at": "2025-12-29",
-      "checksum": "f1b4299f"
+      "checksum": "a1f5635b"
     },
     {
       "id": "DOC-20251229-VPB",
@@ -9700,7 +9495,7 @@
       "status": "active",
       "title": "루미 에어테이블 교본_2025-12-29",
       "created_at": "2025-12-29",
-      "checksum": "7507481d"
+      "checksum": "82e5c442"
     },
     {
       "id": "DOC-20251229-ZF8",
@@ -9720,7 +9515,7 @@
       "status": "active",
       "title": "Aurora 5 완전체 시스템 구축 지시서",
       "created_at": "2025-12-29",
-      "checksum": "736efe91"
+      "checksum": "ef231144"
     },
     {
       "id": "DOC-20251229-A1Y",
@@ -9741,7 +9536,7 @@
       "status": "active",
       "title": "최수민님 원본 자료_2025-12-29",
       "created_at": "2025-12-29",
-      "checksum": "1560fb01"
+      "checksum": "1b422c75"
     },
     {
       "id": "DOC-20251229-SRH",
@@ -9765,7 +9560,7 @@
       "status": "active",
       "title": "uv 설치 확인",
       "created_at": "2025-12-29",
-      "checksum": "4d971bcc"
+      "checksum": "8500bfab"
     },
     {
       "id": "DOC-20251229-PFO",
@@ -9786,7 +9581,7 @@
       "status": "active",
       "title": "� Aurora 5 팀 공지",
       "created_at": "2025-12-29",
-      "checksum": "31dd952d"
+      "checksum": "b375bcab"
     },
     {
       "id": "DOC-MEET-20261010-001",
@@ -9802,7 +9597,7 @@
       "status": "active",
       "title": "Phoenix Decision Meeting Record",
       "created_at": "1010-00-01",
-      "checksum": "6f04dcfb"
+      "checksum": "b3e8139c"
     },
     {
       "id": "DOC-MEET-20261010-002",
@@ -9818,7 +9613,7 @@
       "status": "active",
       "title": "Phoenix Decision Meeting Record",
       "created_at": "1010-00-01",
-      "checksum": "ee2f6311"
+      "checksum": "1baf2112"
     },
     {
       "id": "DOC-MEET-20261010-003",
@@ -9851,7 +9646,7 @@
       "status": "active",
       "title": "Phoenix Decision Meeting Record",
       "created_at": "1009-00-01",
-      "checksum": "47a94deb"
+      "checksum": "2e096741"
     },
     {
       "id": "DOC-INCIDENT-20260302-001",
