@@ -123,8 +123,25 @@ Implementation Status: READY
 - `docs/knowledge/backups/`, `tests/fixtures/certificate/`, `tests/fixtures/postcard/` (미추적)
 - 실제 LLM 원본 (`C:\DEV\_phx_soul_test_harness\results\`), API Key
 
-비밀 스캔: §60 문서의 `FOUNDER-APPROVED-PHX-SOUL-QA-001-2026-11-19` 는 하네스 승인 토큰 문자열이며 API Key 가 아니다. 문서 원문은 변경하지 않는다.
+비밀 스캔: §60 문서에 하네스 승인 토큰 문자열이 있다 (API Key 아님, 로컬 하네스 상수). 본 문서에는 토큰 값을 기록하지 않는다. §60 문서 원문은 변경하지 않는다.
 
 ## 3. 실행 결과 (push 후 기록)
 
-(작성 중 — push 후 최종 SHA 와 manifest 검증 결과를 기록한다.)
+| 항목 | 결과 |
+|---|---|
+| 원격 HEAD (push 전) | `9ad729f` (확인 후 Fast-forward) |
+| push 결과 | `origin/feat/phx-soul-hybrid-v1`: `9ad729f..10f52dc` (force 없음) |
+| 최종 로컬 HEAD | `10f52dc` |
+| 최종 원격 HEAD | `10f52dc` (일치) |
+| 보존된 코드 커밋 | `dc175c2` (§61), `eb01d33` (§64) |
+| Evidence 커밋 | `10f52dc` (§60~§65 문서 6개 + Hook 갱신 manifest·tags) |
+| Manifest | 575 → 581 (추가 6, 제거 0, 기존 엔트리 created_at·checksum 불변) |
+| Tags | 107 key 유지, 제거 0 |
+| 동백열차 계절 범위 | 1-1 참조. 연중 고정값으로 안내하지 않음 (11~2월 단축 명시). 기본 시간의 월 범위는 공식 페이지에 없음 → 보고 |
+| 기존 테스트 변경 | 1-2 참조. 승인된 Knowledge 문구·수치 변경만 |
+| 미확인 정보 추가 | 없음 (1-3) |
+| 케이블카 편도 13분 | 비공식 참고값 유지, 신규 라우팅 없음 (1-4) |
+| 사실 충돌 | 없음. 범위 밖 변경 2건 (H03 제거, H16 줄 추가)은 보고 항목으로 남김 (1-5) |
+| 실제 LLM 호출 | 없음 |
+| 운영 DB·Render·PR·merge·Hybrid 활성화 | 없음 |
+| 운영 Release HOLD · 개인정보 법률 검토 | BLOCKED 유지 |

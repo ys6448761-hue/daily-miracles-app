@@ -1,9 +1,162 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-19T22:11:35.508Z",
+  "generated_at": "2026-11-20T00:51:44.908Z",
   "generator": "generate-manifest.js",
-  "total_count": 581,
+  "total_count": 590,
   "documents": [
+    {
+      "id": "DOC-CAND-EXP-005_Muyojeong_Unified",
+      "path": "docs/constitution/candidate/CAND-EXP-005_Muyojeong_Unified_Experience.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "Candidate (Founder 방향 기록, 정식 승인 전)",
+      "topic": "constitution",
+      "tags": [
+        "candidate",
+        "소원"
+      ],
+      "owner": "대표(푸르미르) / Claude Code",
+      "status": "Candidate",
+      "title": "CAND-EXP-005 — 무여정 통합 Experience (Candidate)",
+      "created_at": "2026-11-20",
+      "checksum": "2471e0cc"
+    },
+    {
+      "id": "DOC-PHX-SOUL-QA-001_CAFE_PARTNER_K",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_CAFE_PARTNER_KNOWLEDGE_VERIFICATION_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "소원",
+        "가격"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "PHX-SOUL-QA-001 — 바다 전망 카페 및 소원패스 파트너 Knowledge 검증 (V1, 2026-11-20)",
+      "created_at": "2026-11-20",
+      "checksum": "f26016dc"
+    },
+    {
+      "id": "DOC-PHX-SOUL-QA-001_FINAL_PRESERVA",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_FINAL_PRESERVATION_AND_TECHNICAL_CLOSURE_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "active",
+      "title": "PHX-SOUL-QA-001 — 최종 원격 보존 및 기술적 종료 (§73, V1, 2026-11-20)",
+      "created_at": "2026-11-20",
+      "checksum": "23dc7aa1"
+    },
+    {
+      "id": "DOC-PHX-SOUL-QA-001_FINAL_QUALITY_",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_FINAL_QUALITY_CLOSURE_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "소원"
+      ],
+      "owner": "code",
+      "status": "|---",
+      "title": "PHX-SOUL-QA-001 — 최종 품질 마무리 구현 및 H07·H15 검증 카페 연결 (§70, V1, 2026-11-20)",
+      "created_at": "2026-11-20",
+      "checksum": "1f71de0e"
+    },
+    {
+      "id": "DOC-PHX-SOUL-QA-001_FINAL_REAL_LLM",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_FINAL_REAL_LLM_BENCHMARK_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "소원"
+      ],
+      "owner": "code",
+      "status": "|---",
+      "title": "PHX-SOUL-QA-001 — 최종 실제 LLM Benchmark (§71, V1, 2026-11-20)",
+      "created_at": "2026-11-20",
+      "checksum": "8a6f2c5b"
+    },
+    {
+      "id": "DOC-PHX-SOUL-QA-001_FOUNDER_CONFIR",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_FOUNDER_CONFIRMATIONS_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "소원"
+      ],
+      "owner": "code",
+      "status": "|---",
+      "title": "PHX-SOUL-QA-001 — Founder 확정 사항 기록 (§67, V1, 2026-11-20)",
+      "created_at": "2026-11-20",
+      "checksum": "4166ff16"
+    },
+    {
+      "id": "DOC-PHX-SOUL-QA-001_PARTNER_BENEFI",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_PARTNER_BENEFIT_CONFIRMATION_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge"
+      ],
+      "owner": "code",
+      "status": "|---",
+      "title": "PHX-SOUL-QA-001 — Founder 제휴 혜택 확인 기록 및 데이터 정리 계획 (§68, V1, 2026-11-20)",
+      "created_at": "2026-11-20",
+      "checksum": "2c561182"
+    },
+    {
+      "id": "DOC-PHX-SOUL-QA-001_QUALITY_CLOSE_",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_QUALITY_CLOSE_AND_MUNMEOKJI_PLAN_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "소원",
+        "가격"
+      ],
+      "owner": "code",
+      "status": "|---",
+      "title": "PHX-SOUL-QA-001 — SOUL 품질 개선 마무리 계획 및 머먹지 준비 기록 (§68 후속 · V1, 2026-11-20)",
+      "created_at": "2026-11-20",
+      "checksum": "6a3a8244"
+    },
+    {
+      "id": "DOC-PHX-SOUL-QA-001_QUALITY_CLOSUR",
+      "path": "docs/knowledge/PHX-SOUL-QA-001_QUALITY_CLOSURE_FINAL_CHECK_V1.md",
+      "type": "document",
+      "project": "aurora5",
+      "priority": "P2",
+      "topic": "knowledge",
+      "tags": [
+        "knowledge",
+        "가격"
+      ],
+      "owner": "code",
+      "status": "내용",
+      "title": "PHX-SOUL-QA-001 — 품질 개선 기술적 종료 최종 점검 (§72, V1, 2026-11-20)",
+      "created_at": "2026-11-20",
+      "checksum": "a3dfe4a3"
+    },
     {
       "id": "DOC-PHX-SOUL-QA-001_FIRST_VISIT_DU",
       "path": "docs/knowledge/PHX-SOUL-QA-001_FIRST_VISIT_DUPLICATE_FIX_V1.md",
@@ -105,7 +258,7 @@
       "status": "active",
       "title": "PHX-SOUL-QA-001 — Verified Knowledge 보존 및 원격 Fast-forward Push (V1, 2026-11-20)",
       "created_at": "2026-11-20",
-      "checksum": "122c24b9"
+      "checksum": "072ae653"
     },
     {
       "id": "DOC-PHX-SOUL-QA-001_APPROVAL_AND_P",
