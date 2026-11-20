@@ -26,6 +26,7 @@ const { eligibleForAdaptive, adaptiveGeneralAnswer } = require('./soulAdaptive')
 const { sanitizeForExternal, BLOCKED_NOTICE } = require('./soulPrivacyGuard');
 const { classifyFastPath } = require('./soulFastPath');
 const munmeokjiIntent = require('./munmeokjiIntent'); // §81 머먹지 식당 질문 의도 (결정적 파싱)
+const { detectRainyIntent } = require('./travelWeatherIntent'); // §88 고객 메시지의 우천 신호 → 기존 _passesWeather 필터 연결
 const { buildMunmeokjiAnswer, isDevPreviewEnabled } = require('./munmeokjiRoute'); // §81
 
 const CAPABILITY = 'TRAVEL_INTELLIGENCE';
@@ -3569,6 +3570,10 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
 
   // D5 DOMAIN CONTEXT + DOMAIN_FALLBACK labeling
   const baseDomainContext = _buildDomainContext(enrichedSoulContext, sessionId, hotelId);
+  // §88: 고객이 직접 우천을 말한 경우에만 weather 를 설정한다 (추정·날씨 API 없음).
+  if (detectRainyIntent(message)) {
+    baseDomainContext.weather = { condition: 'rainy' };
+  }
 
   // V0.1: Place-aware Discovery — exclude current Living Detail place from recommendations.
   // Course requests anchor the current place as must-visit instead of excluding it.
