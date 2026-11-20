@@ -7,6 +7,7 @@
 
 const gate = require('./munmeokjiTimeGate');
 const intent = require('./munmeokjiIntent');
+const { naverDetailFromUrl } = gate;
 
 const RENDER_VARS = ['RENDER', 'RENDER_SERVICE_ID', 'RENDER_SERVICE_NAME', 'RENDER_EXTERNAL_URL', 'RENDER_GIT_COMMIT', 'RENDER_GIT_BRANCH'];
 
@@ -71,6 +72,11 @@ function sourceLine(visit) {
   return '식사 시점 기본 시각 (정확한 시각을 말씀해 주시면 다시 확인할게요)';
 }
 
+// 가격 문자열 (예: 16,000원) 도 응답 가드 corpus 에 들어가야 정상 응답이 대체되지 않는다 (응답이 원자료에서 만든 값).
+function priceTokens(text) {
+  return (String(text).match(/\d[\d,]*원/g) || []);
+}
+
 function clockTokens(text) {
   return (String(text).match(/\d{2}:\d{2}/g) || []);
 }
@@ -91,7 +97,7 @@ function payloadOf(sessionId, message_ko, extra = {}) {
     shared_journey: null,
     quote: null,
     route: null,
-    verified_clock_tokens: clockTokens(message_ko),
+    verified_clock_tokens: [...clockTokens(message_ko), ...priceTokens(message_ko)],
     ...extra,
   };
 }
@@ -194,21 +200,64 @@ function buildMunmeokjiAnswer({ sessionId, message, rows, now = new Date(), devP
   }
 
   const lines = [basis];
+  const cards = [];
   for (const r of g.kept) {
     const co = cutoffText(r, visit);
     const hrs = hoursText(r, visit);
+    const card = buildCard(r, visit, companion, co, hrs);
+    cards.push(card);
     lines.push(`• ${r.name} (${r.cuisine_type || '음식'}): 영업 ${hrs}, 추천 마감 ${co || '미확인'}. 이동 시간은 확인되지 않았어요.`);
-    if (companion === 'kids' && Array.isArray(r.menu)) {
-      const k = gate.kidsMenu(r.menu);
-      if (k.length) lines.push(`  어린이 메뉴: ${k.map((m) => `${m.name} ${m.price.toLocaleString('en-US')}원`).join(', ')}`);
-    }
+    for (const l of card.lines) lines.push(`  ${l}`);
   }
   const reasonLabels = { CLOSED_DAY: '정기휴무', OUT_OF_HOURS: '영업 외', BREAK_TIME: '브레이크타임', HOURS_UNKNOWN: '영업시간 미확인', LAST_ORDER_UNKNOWN: '라스트오더 미확인', AFTER_LAST_ORDER_CUTOFF: '추천 마감 지남', COMPANION_UNCONFIRMED: '동반 조건 미확인' };
   const parts = Object.entries(counts).map(([k, v]) => `${reasonLabels[k] || k} ${v}곳`);
   if (parts.length) lines.push(`제외: ${parts.join(', ')}.`);
   return payloadOf(sessionId, lines.join('\n'), {
+    cards,
     munmeokji: { visit, companion, cuisine, kept: g.kept.map((r) => r.code), excluded: counts },
   });
+}
+
+function fmtWon(n) { return `${Number(n).toLocaleString('en-US')}원`; }
+
+function fmtItem(m) {
+  const extra = [];
+  if (m.price_basis) extra.push(m.price_basis);
+  if (m.min_party && !m.price_basis) extra.push(`${m.min_party}인 이상 주문`);
+  if (m.limited) extra.push('한정 수량');
+  if (m.note) extra.push(m.note);
+  return `${m.name} ${fmtWon(m.price)}${extra.length ? ` (${extra.join(', ')})` : ''}`;
+}
+
+/**
+ * 고객 추천 카드 (확인된 값만). 네이버 링크는 상세 URL 이 검증된 경우에만.
+ * 혜택 문구는 넣지 않는다 (소원패스 노출은 별도 Gate).
+ */
+function buildCard(r, visit, companion, co, hrs) {
+  const menu = Array.isArray(r.menu) ? r.menu : [];
+  const main = menu.filter((m) => !m.addon);
+  const kids = gate.kidsMenu(menu);
+  const solo = main.filter((m) => m.solo);
+  const lines = [];
+  if (main.length && companion !== 'kids') {
+    const show = (companion === 'solo' && solo.length ? solo : main).slice(0, 6);
+    lines.push(`메뉴: ${show.map(fmtItem).join(' / ')}`);
+  }
+  if (companion === 'kids' && kids.length) lines.push(`어린이 메뉴: ${kids.map(fmtItem).join(' / ')}`);
+  if (companion === 'solo' && solo.length) lines.push(`1인 메뉴: ${solo.map(fmtItem).join(' / ')}`);
+  const link = naverDetailFromUrl(r.source_url);
+  if (link) lines.push(`네이버 지도: ${link.url}`);
+  return {
+    code: r.code,
+    name: r.name,
+    cuisine: r.cuisine_type || null,
+    hours: hrs,
+    cutoff: co,
+    menu_main: main.map((m) => ({ name: m.name, price: m.price, note: m.note || null, min_party: m.min_party || null, limited: !!m.limited })),
+    menu_kids: kids.map((m) => ({ name: m.name, price: m.price, note: m.note || null })),
+    naver_url: link ? link.url : null,
+    lines,
+  };
 }
 
 module.exports = { buildMunmeokjiAnswer, isDevPreviewEnabled, cutoffText, hoursText };

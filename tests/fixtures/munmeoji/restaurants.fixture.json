@@ -130,7 +130,133 @@
         "status": "공개 일정 (§78 04). 브레이크 없음 (Founder 확인 2026-11-20)"
       },
       "group_code": null,
-      "customer_public": false
+      "customer_public": false,
+      "menu": [
+        {
+          "name": "돌게장백반정식",
+          "price": 16000,
+          "price_basis": null,
+          "min_party": null,
+          "limited": false,
+          "kids": false,
+          "solo": false,
+          "addon": false,
+          "note": "돌게장 3회 리필"
+        },
+        {
+          "name": "1인혼밥돌게장정식",
+          "price": 18000,
+          "price_basis": null,
+          "min_party": null,
+          "limited": false,
+          "kids": false,
+          "solo": true,
+          "addon": false,
+          "note": "상차림비 포함 표시; 타 메뉴 1인 주문 +2천원 안내"
+        },
+        {
+          "name": "갈치조림+돌게장정식",
+          "price": 22000,
+          "price_basis": null,
+          "min_party": null,
+          "limited": false,
+          "kids": false,
+          "solo": false,
+          "addon": false,
+          "note": "1인; 돌게장 3회 리필"
+        },
+        {
+          "name": "모둠생선구이+돌게장정식",
+          "price": 25000,
+          "price_basis": null,
+          "min_party": null,
+          "limited": false,
+          "kids": false,
+          "solo": false,
+          "addon": false,
+          "note": "돌게장 3회 리필"
+        },
+        {
+          "name": "일반꽃게탕+돌게장정식",
+          "price": 25000,
+          "price_basis": null,
+          "min_party": null,
+          "limited": false,
+          "kids": false,
+          "solo": false,
+          "addon": false,
+          "note": "1인분"
+        },
+        {
+          "name": "모둠꽃게장+양념꽃게장정식",
+          "price": 35000,
+          "price_basis": null,
+          "min_party": null,
+          "limited": false,
+          "kids": false,
+          "solo": false,
+          "addon": false,
+          "note": "리필은 돌게장 3회"
+        },
+        {
+          "name": "모둠해물꽃게탕+돌게장정식",
+          "price": 39000,
+          "price_basis": null,
+          "min_party": null,
+          "limited": false,
+          "kids": false,
+          "solo": false,
+          "addon": false,
+          "note": "돌게장 3회 리필"
+        },
+        {
+          "name": "프리미엄정식",
+          "price": 59000,
+          "price_basis": null,
+          "min_party": null,
+          "limited": false,
+          "kids": false,
+          "solo": false,
+          "addon": false,
+          "note": null
+        },
+        {
+          "name": "초등학생 돌게장정식",
+          "price": 13000,
+          "price_basis": null,
+          "min_party": null,
+          "limited": false,
+          "kids": true,
+          "solo": false,
+          "addon": false,
+          "note": "초등 이상 1인1메뉴"
+        },
+        {
+          "name": "날치알밥",
+          "price": 3000,
+          "price_basis": null,
+          "min_party": null,
+          "limited": false,
+          "kids": false,
+          "solo": false,
+          "addon": true,
+          "note": "추가 메뉴"
+        },
+        {
+          "name": "갈치조림 단품추가",
+          "price": 15000,
+          "price_basis": null,
+          "min_party": null,
+          "limited": false,
+          "kids": false,
+          "solo": false,
+          "addon": true,
+          "note": "단독 주문 불가"
+        }
+      ],
+      "menu_source": "Founder 제공 네이버 메뉴 (통합 엑셀 03 시트 F009, 원본 11행, 중복 없음). §83 의 13개 표기는 정정 (원본 11행)",
+      "menu_updated_at": null,
+      "menu_note": "기준일 미확인. 본 메뉴 9 + 추가 2"
     },
     {
       "code": "F010",
