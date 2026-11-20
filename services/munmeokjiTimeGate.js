@@ -18,6 +18,8 @@
 const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const KO_DAY_CHAR = { mon: '월', tue: '화', wed: '수', thu: '목', fri: '금', sat: '토', sun: '일' };
 const LO_BUFFER_MIN = 30;
+// §81 Q81-2: 14:00 이후 점심 일반 추천 제외 정책은 임시 안전 제안. Founder 승인 전까지 적용하지 않는다.
+const LUNCH_CUTOFF_PROPOSAL = Object.freeze({ hhmm: '14:00', applied: false });
 const DAY_MIN = 24 * 60;
 
 const REASON = {
@@ -106,6 +108,12 @@ function finalizeWithSchedule(sched, v, governing, tRaw, tAbs, openAbs) {
   const lo = toMin(sched.last_order);
   if (lo === null) return { ok: false, reason: REASON.LAST_ORDER_UNKNOWN };
 
+  // §81: 저녁 라스트오더는 저녁 시간대 (dinner_from 이후) 에만 적용. 그 전 (아침·점심) 방문은 LO 미확인으로 처리.
+  if (sched.last_order_scope === 'dinner_only') {
+    const df = toMin(sched.dinner_from);
+    if (df === null || tRaw < df) return { ok: false, reason: REASON.LAST_ORDER_UNKNOWN };
+  }
+
   // 라스트오더가 자정 이후면 영업 시작 기준으로 날짜를 이어 붙인다
   const loAbs = lo < openAbs ? lo + DAY_MIN : lo;
   const travelAdj = v.travel !== null && v.travel >= LO_BUFFER_MIN ? v.travel : 0;
@@ -189,6 +197,7 @@ function kidsMenu(menu) {
 module.exports = {
   REASON,
   LO_BUFFER_MIN,
+  LUNCH_CUTOFF_PROPOSAL,
   statusAt,
   applyRestaurantTimeGate,
   dedupeByGroup,

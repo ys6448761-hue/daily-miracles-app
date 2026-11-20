@@ -25,6 +25,8 @@ const { classifyDirect, generateDirectReply } = require('./soulDirectResponse');
 const { eligibleForAdaptive, adaptiveGeneralAnswer } = require('./soulAdaptive');
 const { sanitizeForExternal, BLOCKED_NOTICE } = require('./soulPrivacyGuard');
 const { classifyFastPath } = require('./soulFastPath');
+const munmeokjiIntent = require('./munmeokjiIntent'); // §81 머먹지 식당 질문 의도 (결정적 파싱)
+const { buildMunmeokjiAnswer, isDevPreviewEnabled } = require('./munmeokjiRoute'); // §81
 
 const CAPABILITY = 'TRAVEL_INTELLIGENCE';
 const SOURCE = 'travelGuideService/8-filter-cascade';
@@ -2780,6 +2782,18 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
     return { ok: true, payload: _buildContextUnavailablePayload(sessionId) };
   }
   // 카페 요청: 현재 장소 화면(place_code)의 PSQ 질문은 기존 PSQ 경로가 처리한다.
+  // §81: 머먹지 식당 질문 (결정적 파싱, LLM 미사용). 관광지·코스·카페 질문은 기존 경로.
+  if (!(explicit_context && explicit_context.place_code)
+      && munmeokjiIntent.isMunmeokjiFoodQuestion(message)
+      && _detectPlacesInMessage(message).length === 0) {
+    const _mkNow = new Date();
+    const _mkVisit = munmeokjiIntent.parseVisit(message, _mkNow);
+    const _mkRows = await travelGuideService._getRestaurants('KR', 'YEOSU', _mkVisit.slot || 'lunch');
+    return {
+      ok: true,
+      payload: buildMunmeokjiAnswer({ sessionId, message, rows: _mkRows, now: _mkNow, devPreview: isDevPreviewEnabled() }),
+    };
+  }
   if (!(explicit_context && explicit_context.place_code) && _isCafeQuestion(message)) {
     if (_isSeaViewCafeQuestion(message)) {
       return { ok: true, payload: _buildSeaViewCafePayload(sessionId, message) };

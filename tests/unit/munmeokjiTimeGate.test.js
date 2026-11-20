@@ -189,8 +189,10 @@ describe('§80 풍산식당 F001 — 매장 전화 확인 (LO 18:50, 추천 마�
   test('월요일 추천 제외 (정기휴무)', () => {
     expect(reasonOf(FP, v('12:00', 'mon')).reason).toBe(gate.REASON.CLOSED_DAY);
   });
-  test('화요일 오전 8시 영업 시작: 추천 가능', () => {
-    expect(reasonOf(FP, v('08:00', 'tue')).ok).toBe(true);
+  test('화요일 오전 8시 영업 시작: 영업 시간 안이지만 저녁 LO 는 아침에 적용하지 않아 LO 미확인으로 제외 (§81)', () => {
+    const s = reasonOf(FP, v('08:00', 'tue'));
+    expect(s.ok).toBe(false);
+    expect(s.reason).toBe(gate.REASON.LAST_ORDER_UNKNOWN);
   });
   test('오전 7시 59분은 영업 전이라 제외', () => {
     expect(reasonOf(FP, v('07:59', 'tue')).reason).toBe(gate.REASON.OUT_OF_HOURS);

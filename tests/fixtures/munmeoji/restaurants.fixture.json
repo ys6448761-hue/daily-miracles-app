@@ -718,7 +718,9 @@
             "15:00",
             "17:00"
           ],
-          "last_order": "18:50"
+          "last_order": "18:50",
+          "last_order_scope": "dinner_only",
+          "dinner_from": "17:00"
         },
         "wed": {
           "open": "08:00",
@@ -727,7 +729,9 @@
             "15:00",
             "17:00"
           ],
-          "last_order": "18:50"
+          "last_order": "18:50",
+          "last_order_scope": "dinner_only",
+          "dinner_from": "17:00"
         },
         "thu": {
           "open": "08:00",
@@ -736,7 +740,9 @@
             "15:00",
             "17:00"
           ],
-          "last_order": "18:50"
+          "last_order": "18:50",
+          "last_order_scope": "dinner_only",
+          "dinner_from": "17:00"
         },
         "fri": {
           "open": "08:00",
@@ -745,7 +751,9 @@
             "15:00",
             "17:00"
           ],
-          "last_order": "18:50"
+          "last_order": "18:50",
+          "last_order_scope": "dinner_only",
+          "dinner_from": "17:00"
         },
         "sat": {
           "open": "08:00",
@@ -754,7 +762,9 @@
             "15:00",
             "17:00"
           ],
-          "last_order": "18:50"
+          "last_order": "18:50",
+          "last_order_scope": "dinner_only",
+          "dinner_from": "17:00"
         },
         "sun": {
           "open": "08:00",
@@ -763,7 +773,9 @@
             "15:00",
             "17:00"
           ],
-          "last_order": "18:50"
+          "last_order": "18:50",
+          "last_order_scope": "dinner_only",
+          "dinner_from": "17:00"
         },
         "mon": {
           "closed": true
@@ -773,7 +785,8 @@
       "group_code": null,
       "customer_public": false,
       "price_range_sheet": "14,000–36,000원 (통합 엑셀 01 시트, 출처 DiningCode, 세부 메뉴 미확인)",
-      "evidence": "2026-11-20 Founder 전화 확인. 과거 시트 시간 근거 (표본) 는 보존"
+      "evidence": "2026-11-20 Founder 전화 확인. 과거 시트 시간 근거 (표본) 는 보존",
+      "last_order_scope_note": "저녁 LO 18:50 은 17:00 이후에만 적용 (§81). 점심 LO 미확인."
     }
   ]
 }

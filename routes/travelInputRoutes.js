@@ -96,8 +96,10 @@ router.post('/input/text', requireAuthenticatedPrincipal, async (req, res) => {
     }
 
     // PHX-SOUL-QA-001 H3 (Hybrid V1, 기본 비활성): 응답 직전 품질 가드. 플래그가 꺼지면 기존 payload 그대로.
+    // §81: 식당 응답이 만든 검증 시각 토큰 (verified_clock_tokens) 만 corpus 에 추가. 정적 corpus 는 그대로.
+    const _mkTokens = ((soulResult.payload && soulResult.payload.verified_clock_tokens) || []).join(' ');
     const _payload = isHybridV1Enabled()
-      ? guardPayload(soulResult.payload, message, { buildFactFallback, knowledgeText: verifiedKnowledgeText })
+      ? guardPayload(soulResult.payload, message, { buildFactFallback, knowledgeText: verifiedKnowledgeText + ' ' + _mkTokens })
       : soulResult.payload;
 
     // Canonical session_id from route lifecycle
