@@ -269,3 +269,37 @@ describe('§80 꽃돌게장1번가 메뉴 — 최소 주문 인원·한정 메�
     expect(p('왕꽃게정식')).toBe(50000);
   });
 });
+
+// ── §82: 풍산식당 최종 정정 (Founder, 2026-11-20) 고정 테스트 ───────────────────
+describe('§82 풍산식당 F001 최종 정정 값 고정', () => {
+  const FP = byName('풍산식당');
+  const route = require('../../services/munmeokjiRoute');
+  test('영업 08:00~19:40, 브레이크 15:00~17:00, 저녁 LO 18:50, 정기휴무 월요일 (월요일 외 모든 요일 동일)', () => {
+    expect(FP.closed_day).toBe('월');
+    for (const d of ['tue', 'wed', 'thu', 'fri', 'sat', 'sun']) {
+      const s = FP.opening_hours_json[d];
+      expect(s.open).toBe('08:00');
+      expect(s.close).toBe('19:40');
+      expect(s.break).toEqual(['15:00', '17:00']);
+      expect(s.last_order).toBe('18:50');
+      expect(s.dinner_from).toBe('17:00');
+      expect(s.last_order_scope).toBe('dinner_only');
+    }
+    expect(FP.opening_hours_json.mon.closed).toBe(true);
+  });
+  test('SOUL 저녁 추천 마감 18:20 (LO − 30분)', () => {
+    expect(route.cutoffText(FP, { day: 'tue', time: '18:00' })).toBe('18:20');
+  });
+  test('브레이크타임 (15:00~17:00) 중 추천 제외, 17:00 부터 저녁 구간', () => {
+    expect(reasonOf(FP, v('15:00', 'tue')).reason).toBe(gate.REASON.BREAK_TIME);
+    expect(reasonOf(FP, v('16:59', 'tue')).reason).toBe(gate.REASON.BREAK_TIME);
+    expect(reasonOf(FP, v('17:00', 'tue')).ok).toBe(true);
+  });
+  test('저녁 LO 는 점심 시간에 적용하지 않는다: 점심 (12:00) 은 LO 미확인', () => {
+    expect(reasonOf(FP, v('12:00', 'tue')).reason).toBe(gate.REASON.LAST_ORDER_UNKNOWN);
+    expect(route.cutoffText(FP, { day: 'tue', time: '12:00' })).toBeNull();
+  });
+  test('정정 이전 "브레이크타임 없음" 지시는 풍산에 적용된 적이 없다 (풍산 break 는 항상 15–17)', () => {
+    expect(FP.opening_hours_json.tue.break).not.toBeNull();
+  });
+});
