@@ -8,18 +8,60 @@
       "address": "여수시 남산로 16",
       "phone": null,
       "source_url": "https://map.naver.com/p/entry/place/1231222553",
-      "meal_context": ["lunch", "late_lunch", "dinner"],
-      "suitable_for": ["couple", "family"],
+      "meal_context": [
+        "lunch",
+        "late_lunch",
+        "dinner"
+      ],
+      "suitable_for": [
+        "couple",
+        "family"
+      ],
       "closed_day": "",
       "opening_hours_json": {
-        "mon": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
-        "tue": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
-        "wed": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
-        "thu": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
-        "fri": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
-        "sat": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
-        "sun": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
-        "status": "공개 일정 (§78 04). 임시휴무 공지 있음"
+        "mon": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:30"
+        },
+        "tue": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:30"
+        },
+        "wed": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:30"
+        },
+        "thu": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:30"
+        },
+        "fri": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:30"
+        },
+        "sat": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:30"
+        },
+        "sun": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:30"
+        },
+        "status": "공개 일정 (§78 04). 브레이크 없음 (Founder 확인 2026-11-20). 임시휴무 공지 있음"
       },
       "group_code": null,
       "customer_public": false
@@ -31,18 +73,61 @@
       "address": "여수시 봉산남4길 23-26",
       "phone": null,
       "source_url": null,
-      "meal_context": ["breakfast", "lunch", "late_lunch", "dinner"],
-      "suitable_for": ["solo", "family"],
+      "meal_context": [
+        "breakfast",
+        "lunch",
+        "late_lunch",
+        "dinner"
+      ],
+      "suitable_for": [
+        "solo",
+        "family"
+      ],
       "closed_day": "",
       "opening_hours_json": {
-        "mon": { "open": "07:00", "close": "21:00", "break": null, "last_order": "20:20" },
-        "tue": { "open": "07:00", "close": "21:00", "break": null, "last_order": "20:20" },
-        "wed": { "open": "07:00", "close": "21:00", "break": null, "last_order": "20:20" },
-        "thu": { "open": "07:00", "close": "21:00", "break": null, "last_order": "20:20" },
-        "fri": { "open": "07:00", "close": "21:00", "break": null, "last_order": "20:20" },
-        "sat": { "open": "07:00", "close": "21:00", "break": null, "last_order": "20:20" },
-        "sun": { "open": "07:00", "close": "21:00", "break": null, "last_order": "20:20" },
-        "status": "공개 일정 (§78 04). 브레이크 별도 표기 없음"
+        "mon": {
+          "open": "07:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:20"
+        },
+        "tue": {
+          "open": "07:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:20"
+        },
+        "wed": {
+          "open": "07:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:20"
+        },
+        "thu": {
+          "open": "07:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:20"
+        },
+        "fri": {
+          "open": "07:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:20"
+        },
+        "sat": {
+          "open": "07:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:20"
+        },
+        "sun": {
+          "open": "07:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:20"
+        },
+        "status": "공개 일정 (§78 04). 브레이크 없음 (Founder 확인 2026-11-20)"
       },
       "group_code": null,
       "customer_public": false
@@ -54,21 +139,182 @@
       "address": "여수시 봉산2로 36",
       "phone": null,
       "source_url": null,
-      "meal_context": ["lunch", "late_lunch", "dinner"],
-      "suitable_for": ["family", "elderly"],
+      "meal_context": [
+        "lunch",
+        "late_lunch",
+        "dinner"
+      ],
+      "suitable_for": [
+        "family",
+        "elderly"
+      ],
       "closed_day": "",
       "opening_hours_json": {
-        "mon": { "open": "10:00", "close": "21:00", "break": ["15:00", "17:00"], "last_order": "20:00" },
-        "tue": { "open": "10:00", "close": "21:00", "break": ["15:00", "17:00"], "last_order": "20:00" },
-        "wed": { "open": "10:00", "close": "21:00", "break": ["15:00", "17:00"], "last_order": "20:00" },
-        "thu": { "open": "10:00", "close": "21:00", "break": ["15:00", "17:00"], "last_order": "20:00" },
-        "fri": { "open": "10:00", "close": "21:00", "break": ["15:00", "17:00"], "last_order": "20:00" },
-        "sat": { "open": "10:00", "close": "21:00", "break": ["15:00", "17:00"], "last_order": "20:00" },
-        "sun": { "open": "10:00", "close": "21:00", "break": ["15:00", "17:00"], "last_order": "20:00" },
-        "status": "공개 일정 (§78 04). 9/22~23 공사 공지 (연도 불명)"
+        "mon": {
+          "open": "10:00",
+          "close": "21:00",
+          "break": [
+            "15:00",
+            "17:00"
+          ],
+          "last_order": "20:00"
+        },
+        "tue": {
+          "open": "10:00",
+          "close": "21:00",
+          "break": [
+            "15:00",
+            "17:00"
+          ],
+          "last_order": "20:00"
+        },
+        "wed": {
+          "open": "10:00",
+          "close": "21:00",
+          "break": [
+            "15:00",
+            "17:00"
+          ],
+          "last_order": "20:00"
+        },
+        "thu": {
+          "open": "10:00",
+          "close": "21:00",
+          "break": [
+            "15:00",
+            "17:00"
+          ],
+          "last_order": "20:00"
+        },
+        "fri": {
+          "open": "10:00",
+          "close": "21:00",
+          "break": [
+            "15:00",
+            "17:00"
+          ],
+          "last_order": "20:00"
+        },
+        "sat": {
+          "open": "10:00",
+          "close": "21:00",
+          "break": [
+            "15:00",
+            "17:00"
+          ],
+          "last_order": "20:00"
+        },
+        "sun": {
+          "open": "10:00",
+          "close": "21:00",
+          "break": [
+            "15:00",
+            "17:00"
+          ],
+          "last_order": "20:00"
+        },
+        "status": "공개 일정 (§78 04). 9/22~23 공사 공지 (연도 불명). 메뉴 2026-11-02 Founder 보완"
       },
       "group_code": null,
-      "customer_public": false
+      "customer_public": false,
+      "menu_updated_at": "2026-11-02",
+      "menu_source": "Founder 제공 네이버 플레이스 메뉴 정보 및 Founder 확인",
+      "menu": [
+        {
+          "name": "꽃게정식",
+          "price": 39000,
+          "price_basis": "1인 기준",
+          "min_party": null,
+          "limited": false,
+          "kids": false,
+          "addon": false
+        },
+        {
+          "name": "꽃게탕",
+          "price": 39000,
+          "price_basis": "2인 이상 주문",
+          "min_party": 2,
+          "limited": false,
+          "kids": false,
+          "addon": false
+        },
+        {
+          "name": "왕꽃게정식",
+          "price": 50000,
+          "price_basis": "1인 기준",
+          "min_party": null,
+          "limited": true,
+          "limited_note": "한정 수량 (소진 가능)",
+          "kids": false,
+          "addon": false
+        },
+        {
+          "name": "갈치조림정식",
+          "price": 27000,
+          "price_basis": "2인 이상 주문",
+          "min_party": 2,
+          "limited": false,
+          "kids": false,
+          "addon": false
+        },
+        {
+          "name": "어린이 수제 돈가스",
+          "price": 8000,
+          "price_basis": "어린이 메뉴",
+          "min_party": null,
+          "limited": false,
+          "kids": true,
+          "addon": false
+        },
+        {
+          "name": "양념꽃게장 추가",
+          "price": 24000,
+          "addon": true,
+          "min_party": null,
+          "limited": false,
+          "kids": false
+        },
+        {
+          "name": "전복장 1마리 추가",
+          "price": 7000,
+          "addon": true,
+          "min_party": null,
+          "limited": false,
+          "kids": false
+        },
+        {
+          "name": "새우장 5마리 추가",
+          "price": 7000,
+          "addon": true,
+          "min_party": null,
+          "limited": false,
+          "kids": false
+        },
+        {
+          "name": "갈치조림 추가",
+          "price": 20000,
+          "addon": true,
+          "min_party": null,
+          "limited": false,
+          "kids": false
+        },
+        {
+          "name": "간장꽃게장 1마리 추가",
+          "price": 27000,
+          "addon": true,
+          "min_party": null,
+          "limited": false,
+          "kids": false
+        },
+        {
+          "name": "왕간장꽃게장 1마리 추가",
+          "price": 35000,
+          "addon": true,
+          "min_party": null,
+          "limited": false,
+          "kids": false
+        }
+      ]
     },
     {
       "code": "A001_UNKNOWN_HOURS",
@@ -77,8 +323,13 @@
       "address": "여수시 공화남2길 2",
       "phone": null,
       "source_url": "https://map.naver.com/p/entry/place/32677050",
-      "meal_context": ["lunch", "dinner"],
-      "suitable_for": ["family"],
+      "meal_context": [
+        "lunch",
+        "dinner"
+      ],
+      "suitable_for": [
+        "family"
+      ],
       "closed_day": "",
       "opening_hours_json": null,
       "group_code": null,
@@ -91,17 +342,52 @@
       "address": "여수시 서교3길 2-1",
       "phone": null,
       "source_url": null,
-      "meal_context": ["breakfast", "lunch"],
+      "meal_context": [
+        "breakfast",
+        "lunch"
+      ],
       "suitable_for": [],
       "closed_day": "수",
       "opening_hours_json": {
-        "mon": { "open": "08:00", "close": "18:00", "break": null, "last_order": null },
-        "tue": { "open": "08:00", "close": "18:00", "break": null, "last_order": null },
-        "wed": { "closed": true },
-        "thu": { "open": "08:00", "close": "18:00", "break": null, "last_order": null },
-        "fri": { "open": "08:00", "close": "18:00", "break": null, "last_order": null },
-        "sat": { "open": "08:00", "close": "18:00", "break": null, "last_order": null },
-        "sun": { "open": "08:00", "close": "18:00", "break": null, "last_order": null }
+        "mon": {
+          "open": "08:00",
+          "close": "18:00",
+          "break": null,
+          "last_order": null
+        },
+        "tue": {
+          "open": "08:00",
+          "close": "18:00",
+          "break": null,
+          "last_order": null
+        },
+        "wed": {
+          "closed": true
+        },
+        "thu": {
+          "open": "08:00",
+          "close": "18:00",
+          "break": null,
+          "last_order": null
+        },
+        "fri": {
+          "open": "08:00",
+          "close": "18:00",
+          "break": null,
+          "last_order": null
+        },
+        "sat": {
+          "open": "08:00",
+          "close": "18:00",
+          "break": null,
+          "last_order": null
+        },
+        "sun": {
+          "open": "08:00",
+          "close": "18:00",
+          "break": null,
+          "last_order": null
+        }
       },
       "group_code": null,
       "customer_public": false
@@ -113,17 +399,57 @@
       "address": "여수시 돌산읍 진두해안길 9",
       "phone": null,
       "source_url": "https://map.naver.com/p/entry/place/1678834518",
-      "meal_context": ["lunch", "dinner"],
-      "suitable_for": ["couple"],
+      "meal_context": [
+        "lunch",
+        "dinner"
+      ],
+      "suitable_for": [
+        "couple"
+      ],
       "closed_day": "",
       "opening_hours_json": {
-        "mon": { "open": "10:00", "close": "22:00", "break": null, "last_order": null },
-        "tue": { "open": "10:00", "close": "22:00", "break": null, "last_order": null },
-        "wed": { "open": "10:00", "close": "22:00", "break": null, "last_order": null },
-        "thu": { "open": "10:00", "close": "22:00", "break": null, "last_order": null },
-        "fri": { "open": "10:00", "close": "22:00", "break": null, "last_order": null },
-        "sat": { "open": "10:00", "close": "22:00", "break": null, "last_order": null },
-        "sun": { "open": "10:00", "close": "22:00", "break": null, "last_order": null }
+        "mon": {
+          "open": "10:00",
+          "close": "22:00",
+          "break": null,
+          "last_order": null
+        },
+        "tue": {
+          "open": "10:00",
+          "close": "22:00",
+          "break": null,
+          "last_order": null
+        },
+        "wed": {
+          "open": "10:00",
+          "close": "22:00",
+          "break": null,
+          "last_order": null
+        },
+        "thu": {
+          "open": "10:00",
+          "close": "22:00",
+          "break": null,
+          "last_order": null
+        },
+        "fri": {
+          "open": "10:00",
+          "close": "22:00",
+          "break": null,
+          "last_order": null
+        },
+        "sat": {
+          "open": "10:00",
+          "close": "22:00",
+          "break": null,
+          "last_order": null
+        },
+        "sun": {
+          "open": "10:00",
+          "close": "22:00",
+          "break": null,
+          "last_order": null
+        }
       },
       "group_code": null,
       "customer_public": false
@@ -135,17 +461,56 @@
       "address": "MOCK",
       "phone": null,
       "source_url": null,
-      "meal_context": ["late_night"],
-      "suitable_for": ["solo"],
+      "meal_context": [
+        "late_night"
+      ],
+      "suitable_for": [
+        "solo"
+      ],
       "closed_day": "",
       "opening_hours_json": {
-        "mon": { "open": "18:00", "close": "02:00", "break": null, "last_order": "01:30" },
-        "tue": { "open": "18:00", "close": "02:00", "break": null, "last_order": "01:30" },
-        "wed": { "open": "18:00", "close": "02:00", "break": null, "last_order": "01:30" },
-        "thu": { "open": "18:00", "close": "02:00", "break": null, "last_order": "01:30" },
-        "fri": { "open": "18:00", "close": "02:00", "break": null, "last_order": "01:30" },
-        "sat": { "open": "18:00", "close": "02:00", "break": null, "last_order": "01:30" },
-        "sun": { "open": "18:00", "close": "02:00", "break": null, "last_order": "01:30" }
+        "mon": {
+          "open": "18:00",
+          "close": "02:00",
+          "break": null,
+          "last_order": "01:30"
+        },
+        "tue": {
+          "open": "18:00",
+          "close": "02:00",
+          "break": null,
+          "last_order": "01:30"
+        },
+        "wed": {
+          "open": "18:00",
+          "close": "02:00",
+          "break": null,
+          "last_order": "01:30"
+        },
+        "thu": {
+          "open": "18:00",
+          "close": "02:00",
+          "break": null,
+          "last_order": "01:30"
+        },
+        "fri": {
+          "open": "18:00",
+          "close": "02:00",
+          "break": null,
+          "last_order": "01:30"
+        },
+        "sat": {
+          "open": "18:00",
+          "close": "02:00",
+          "break": null,
+          "last_order": "01:30"
+        },
+        "sun": {
+          "open": "18:00",
+          "close": "02:00",
+          "break": null,
+          "last_order": "01:30"
+        }
       },
       "group_code": null,
       "customer_public": false
@@ -157,17 +522,54 @@
       "address": "MOCK",
       "phone": null,
       "source_url": null,
-      "meal_context": ["lunch"],
+      "meal_context": [
+        "lunch"
+      ],
       "suitable_for": [],
       "closed_day": "수",
       "opening_hours_json": {
-        "mon": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
-        "tue": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
-        "wed": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
-        "thu": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
-        "fri": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
-        "sat": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
-        "sun": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" }
+        "mon": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:30"
+        },
+        "tue": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:30"
+        },
+        "wed": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:30"
+        },
+        "thu": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:30"
+        },
+        "fri": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:30"
+        },
+        "sat": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:30"
+        },
+        "sun": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:30"
+        }
       },
       "group_code": null,
       "customer_public": false
@@ -179,18 +581,55 @@
       "address": "MOCK",
       "phone": null,
       "source_url": null,
-      "meal_context": ["snack"],
+      "meal_context": [
+        "snack"
+      ],
       "suitable_for": [],
       "closed_day": "",
       "group_code": "F017",
       "opening_hours_json": {
-        "mon": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
-        "tue": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
-        "wed": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
-        "thu": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
-        "fri": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
-        "sat": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
-        "sun": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" }
+        "mon": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:00"
+        },
+        "tue": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:00"
+        },
+        "wed": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:00"
+        },
+        "thu": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:00"
+        },
+        "fri": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:00"
+        },
+        "sat": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:00"
+        },
+        "sun": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:00"
+        }
       },
       "customer_public": false
     },
@@ -201,20 +640,140 @@
       "address": "MOCK",
       "phone": null,
       "source_url": null,
-      "meal_context": ["snack"],
+      "meal_context": [
+        "snack"
+      ],
       "suitable_for": [],
       "closed_day": "",
       "group_code": "F017",
       "opening_hours_json": {
-        "mon": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
-        "tue": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
-        "wed": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
-        "thu": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
-        "fri": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
-        "sat": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
-        "sun": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" }
+        "mon": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:00"
+        },
+        "tue": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:00"
+        },
+        "wed": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:00"
+        },
+        "thu": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:00"
+        },
+        "fri": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:00"
+        },
+        "sat": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:00"
+        },
+        "sun": {
+          "open": "11:00",
+          "close": "21:00",
+          "break": null,
+          "last_order": "20:00"
+        }
       },
       "customer_public": false
+    },
+    {
+      "code": "F001",
+      "name": "풍산식당",
+      "cuisine_type": "여수 향토음식 (서대회·아귀찜)",
+      "address": "여수시 중앙로 72-26",
+      "phone": null,
+      "source_url": null,
+      "meal_context": [
+        "breakfast",
+        "lunch",
+        "dinner"
+      ],
+      "suitable_for": [],
+      "features": [
+        "experience:meal",
+        "food:향토음식·서대회·아귀찜"
+      ],
+      "closed_day": "월",
+      "opening_hours_json": {
+        "tue": {
+          "open": "08:00",
+          "close": "19:40",
+          "break": [
+            "15:00",
+            "17:00"
+          ],
+          "last_order": "18:50"
+        },
+        "wed": {
+          "open": "08:00",
+          "close": "19:40",
+          "break": [
+            "15:00",
+            "17:00"
+          ],
+          "last_order": "18:50"
+        },
+        "thu": {
+          "open": "08:00",
+          "close": "19:40",
+          "break": [
+            "15:00",
+            "17:00"
+          ],
+          "last_order": "18:50"
+        },
+        "fri": {
+          "open": "08:00",
+          "close": "19:40",
+          "break": [
+            "15:00",
+            "17:00"
+          ],
+          "last_order": "18:50"
+        },
+        "sat": {
+          "open": "08:00",
+          "close": "19:40",
+          "break": [
+            "15:00",
+            "17:00"
+          ],
+          "last_order": "18:50"
+        },
+        "sun": {
+          "open": "08:00",
+          "close": "19:40",
+          "break": [
+            "15:00",
+            "17:00"
+          ],
+          "last_order": "18:50"
+        },
+        "mon": {
+          "closed": true
+        },
+        "status": "Founder 매장 전화 확인 2026-11-20 (통화 전사본). 점심 라스트오더·세부 메뉴 가격·혼밥·Place ID 확인 대상"
+      },
+      "group_code": null,
+      "customer_public": false,
+      "price_range_sheet": "14,000–36,000원 (통합 엑셀 01 시트, 출처 DiningCode, 세부 메뉴 미확인)",
+      "evidence": "2026-11-20 Founder 전화 확인. 과거 시트 시간 근거 (표본) 는 보존"
     }
   ]
 }

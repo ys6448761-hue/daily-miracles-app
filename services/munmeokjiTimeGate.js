@@ -168,6 +168,24 @@ function benefitVisibleToCustomer(rec, benefit, allowlist) {
   return allowlist.includes(rec.name);
 }
 
+/**
+ * 메뉴 중 일행 수에 맞는 본 메뉴만 돌려준다 (추가 메뉴 제외).
+ * min_party 가 있는 메뉴는 일행 수를 모르면 제외 (확정하지 않음). 한정 메뉴는 limited_stock 표시.
+ */
+function menuForParty(menu, partySize) {
+  if (!Array.isArray(menu)) return [];
+  const n = Number.isInteger(partySize) && partySize > 0 ? partySize : null;
+  return menu
+    .filter((m) => !m.addon)
+    .filter((m) => m.min_party == null || (n !== null && n >= m.min_party))
+    .map((m) => ({ ...m, limited_stock: m.limited === true }));
+}
+
+/** 어린이 메뉴 목록 (어린이 동반 추천 근거). */
+function kidsMenu(menu) {
+  return Array.isArray(menu) ? menu.filter((m) => m.kids === true) : [];
+}
+
 module.exports = {
   REASON,
   LO_BUFFER_MIN,
@@ -176,4 +194,6 @@ module.exports = {
   dedupeByGroup,
   naverDetailFromUrl,
   benefitVisibleToCustomer,
+  menuForParty,
+  kidsMenu,
 };

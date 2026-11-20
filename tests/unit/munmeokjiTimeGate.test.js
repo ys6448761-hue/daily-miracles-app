@@ -182,3 +182,88 @@ describe('입력 검증 및 기존 동작 보존', () => {
     ].sort());
   });
 });
+
+// ── §80: Founder 추가 확인 (2026-11-20) ───────────────────────────────────────
+describe('§80 풍산식당 F001 — 매장 전화 확인 (LO 18:50, 추천 마감 18:20, 월요일 휴무)', () => {
+  const FP = byName('풍산식당');
+  test('월요일 추천 제외 (정기휴무)', () => {
+    expect(reasonOf(FP, v('12:00', 'mon')).reason).toBe(gate.REASON.CLOSED_DAY);
+  });
+  test('화요일 오전 8시 영업 시작: 추천 가능', () => {
+    expect(reasonOf(FP, v('08:00', 'tue')).ok).toBe(true);
+  });
+  test('오전 7시 59분은 영업 전이라 제외', () => {
+    expect(reasonOf(FP, v('07:59', 'tue')).reason).toBe(gate.REASON.OUT_OF_HOURS);
+  });
+  test('오후 3시 ~ 5시 미만 브레이크타임 제외, 5시(17:00) 재개', () => {
+    expect(reasonOf(FP, v('15:00', 'tue')).reason).toBe(gate.REASON.BREAK_TIME);
+    expect(reasonOf(FP, v('16:59', 'tue')).reason).toBe(gate.REASON.BREAK_TIME);
+    expect(reasonOf(FP, v('17:00', 'tue')).ok).toBe(true);
+  });
+  test('오후 6시 19분 추천 가능, 6시 20분 추천 마감 (LO 18:50 − 30분)', () => {
+    expect(reasonOf(FP, v('18:19', 'tue')).ok).toBe(true);
+    expect(reasonOf(FP, v('18:20', 'tue')).reason).toBe(gate.REASON.AFTER_LAST_ORDER_CUTOFF);
+  });
+  test('오후 6시 50분 주문 마감 이후 제외', () => {
+    expect(reasonOf(FP, v('18:50', 'tue')).reason).toBe(gate.REASON.AFTER_LAST_ORDER_CUTOFF);
+  });
+  test('오후 7시 40분 영업 종료 (종료 시각 포함 안 함) 이후 제외 (영업 종료 = OUT_OF_HOURS)', () => {
+    expect(reasonOf(FP, v('19:40', 'tue')).reason).toBe(gate.REASON.OUT_OF_HOURS);
+    expect(reasonOf(FP, v('19:41', 'tue')).reason).toBe(gate.REASON.OUT_OF_HOURS);
+  });
+  test('풍산식당 Founder 확인값에는 과거 표본 시간 근거가 남아 있지 않다 (phone_evidence 로 대체)', () => {
+    expect(FP.evidence).toMatch(/2026-11-20/);
+    expect(FP.opening_hours_json.status).toMatch(/전화 확인/);
+  });
+});
+
+describe('§80 명동게장본관·궁전횟집 — 브레이크 없음 (Founder 확인)', () => {
+  test('명동게장본관 오후 3시 추천 가능 (브레이크 규칙 미적용)', () => {
+    expect(reasonOf(MYEONG, v('15:00', 'mon')).ok).toBe(true);
+    expect(reasonOf(MYEONG, v('16:00', 'mon')).ok).toBe(true);
+  });
+  test('궁전횟집 오후 3시 추천 가능 (브레이크 규칙 미적용)', () => {
+    expect(reasonOf(JUNG, v('15:00', 'mon')).ok).toBe(true);
+    expect(reasonOf(JUNG, v('16:30', 'mon')).ok).toBe(true);
+  });
+});
+
+describe('§80 꽃돌게장1번가 메뉴 — 최소 주문 인원·한정 메뉴·어린이 메뉴', () => {
+  const menu = KKOT.menu;
+  test('메뉴 기준일 2026-11-02 및 Founder 출처 기록', () => {
+    expect(KKOT.menu_updated_at).toBe('2026-11-02');
+    expect(KKOT.menu_source).toMatch(/Founder/);
+  });
+  test('1인 방문: 꽃게탕·갈치조림정식 (2인 이상) 제외, 꽃게정식 포함', () => {
+    const names = gate.menuForParty(menu, 1).map((m) => m.name);
+    expect(names).toContain('꽃게정식');
+    expect(names).not.toContain('꽃게탕');
+    expect(names).not.toContain('갈치조림정식');
+  });
+  test('2인 방문: 꽃게탕·갈치조림정식 포함', () => {
+    const names = gate.menuForParty(menu, 2).map((m) => m.name);
+    expect(names).toEqual(expect.arrayContaining(['꽃게탕', '갈치조림정식']));
+  });
+  test('일행 수를 모르면 최소 인원 메뉴는 확정하지 않고 제외', () => {
+    const names = gate.menuForParty(menu, null).map((m) => m.name);
+    expect(names).not.toContain('꽃게탕');
+  });
+  test('추가 메뉴 (addon) 는 본 메뉴 목록에 들어가지 않는다', () => {
+    expect(gate.menuForParty(menu, 2).some((m) => m.addon)).toBe(false);
+  });
+  test('왕꽃게정식은 한정 수량으로 표시 (소진 가능성)', () => {
+    const m = gate.menuForParty(menu, 1).find((x) => x.name === '왕꽃게정식');
+    expect(m.limited_stock).toBe(true);
+  });
+  test('어린이 동반 추천 근거: 어린이 수제 돈가스 8,000원', () => {
+    const kids = gate.kidsMenu(menu);
+    expect(kids.map((m) => m.name)).toEqual(['어린이 수제 돈가스']);
+    expect(kids[0].price).toBe(8000);
+  });
+  test('가격 기준: 꽃게정식 39,000 (1인), 꽃게탕 39,000 (2인 이상), 왕꽃게정식 50,000', () => {
+    const p = (n) => menu.find((m) => m.name === n).price;
+    expect(p('꽃게정식')).toBe(39000);
+    expect(p('꽃게탕')).toBe(39000);
+    expect(p('왕꽃게정식')).toBe(50000);
+  });
+});
