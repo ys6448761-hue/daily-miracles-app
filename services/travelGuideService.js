@@ -7,6 +7,7 @@
 const db = require('../database/db');
 const fallbackService = require('./fallbackService');
 const sessionService = require('./sessionService');
+const { applyRestaurantTimeGate } = require('./munmeokjiTimeGate'); // §79
 
 // PHX-SOUL-QA-001 REPAIR-03: 고객 응답에 혜택을 노출하려면 "공식 확인된 파트너"여야 한다.
 // dt_benefits는 내부 파트너 데이터이며 소원패스 공식 운영 혜택 목록이 아니다.
@@ -834,11 +835,25 @@ class TravelGuideService {
     }
 
     // Fetch restaurants matching meal_context
-    const restaurants = await this._getRestaurants(
+    let restaurants = await this._getRestaurants(
       context.country_code,
       context.city_code,
       context.meal_context
     );
+
+    // §79: 방문 시각이 명시된 경우에만 영업·휴무·브레이크·라스트오더 기준을 적용한다 (없으면 기존 동작)
+    if (context.visit && restaurants.length > 0) {
+      const gated = applyRestaurantTimeGate(restaurants, context.visit);
+      restaurants = gated.kept;
+      if (restaurants.length === 0) {
+        return {
+          type: "none",
+          data_status: "unavailable",
+          message: "지금 시간에 확인된 음식점 정보가 없어요",
+          time_gate_excluded: gated.excluded,
+        };
+      }
+    }
 
     if (restaurants.length === 0) {
       return {

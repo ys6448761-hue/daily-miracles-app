@@ -1,0 +1,220 @@
+{
+  "_notice": "§79 격리 Mock Fixture. 운영 DB 데이터 아님. 실제 값은 §78 통합 엑셀(02·04·01 시트)에서 옮겼고, MOCK_ 접두 행은 경계 테스트용 가상 데이터다. 고객 공개 승인은 전부 false.",
+  "restaurants": [
+    {
+      "code": "F005",
+      "name": "궁전횟집",
+      "cuisine_type": "회·해산물",
+      "address": "여수시 남산로 16",
+      "phone": null,
+      "source_url": "https://map.naver.com/p/entry/place/1231222553",
+      "meal_context": ["lunch", "late_lunch", "dinner"],
+      "suitable_for": ["couple", "family"],
+      "closed_day": "",
+      "opening_hours_json": {
+        "mon": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
+        "tue": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
+        "wed": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
+        "thu": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
+        "fri": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
+        "sat": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
+        "sun": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
+        "status": "공개 일정 (§78 04). 임시휴무 공지 있음"
+      },
+      "group_code": null,
+      "customer_public": false
+    },
+    {
+      "code": "F009",
+      "name": "명동게장본관",
+      "cuisine_type": "게장·백반·생선구이",
+      "address": "여수시 봉산남4길 23-26",
+      "phone": null,
+      "source_url": null,
+      "meal_context": ["breakfast", "lunch", "late_lunch", "dinner"],
+      "suitable_for": ["solo", "family"],
+      "closed_day": "",
+      "opening_hours_json": {
+        "mon": { "open": "07:00", "close": "21:00", "break": null, "last_order": "20:20" },
+        "tue": { "open": "07:00", "close": "21:00", "break": null, "last_order": "20:20" },
+        "wed": { "open": "07:00", "close": "21:00", "break": null, "last_order": "20:20" },
+        "thu": { "open": "07:00", "close": "21:00", "break": null, "last_order": "20:20" },
+        "fri": { "open": "07:00", "close": "21:00", "break": null, "last_order": "20:20" },
+        "sat": { "open": "07:00", "close": "21:00", "break": null, "last_order": "20:20" },
+        "sun": { "open": "07:00", "close": "21:00", "break": null, "last_order": "20:20" },
+        "status": "공개 일정 (§78 04). 브레이크 별도 표기 없음"
+      },
+      "group_code": null,
+      "customer_public": false
+    },
+    {
+      "code": "F010",
+      "name": "꽃돌게장1번가",
+      "cuisine_type": "꽃게장 정식",
+      "address": "여수시 봉산2로 36",
+      "phone": null,
+      "source_url": null,
+      "meal_context": ["lunch", "late_lunch", "dinner"],
+      "suitable_for": ["family", "elderly"],
+      "closed_day": "",
+      "opening_hours_json": {
+        "mon": { "open": "10:00", "close": "21:00", "break": ["15:00", "17:00"], "last_order": "20:00" },
+        "tue": { "open": "10:00", "close": "21:00", "break": ["15:00", "17:00"], "last_order": "20:00" },
+        "wed": { "open": "10:00", "close": "21:00", "break": ["15:00", "17:00"], "last_order": "20:00" },
+        "thu": { "open": "10:00", "close": "21:00", "break": ["15:00", "17:00"], "last_order": "20:00" },
+        "fri": { "open": "10:00", "close": "21:00", "break": ["15:00", "17:00"], "last_order": "20:00" },
+        "sat": { "open": "10:00", "close": "21:00", "break": ["15:00", "17:00"], "last_order": "20:00" },
+        "sun": { "open": "10:00", "close": "21:00", "break": ["15:00", "17:00"], "last_order": "20:00" },
+        "status": "공개 일정 (§78 04). 9/22~23 공사 공지 (연도 불명)"
+      },
+      "group_code": null,
+      "customer_public": false
+    },
+    {
+      "code": "A001_UNKNOWN_HOURS",
+      "name": "백천선어마을",
+      "cuisine_type": "생선구이·게장·선어회",
+      "address": "여수시 공화남2길 2",
+      "phone": null,
+      "source_url": "https://map.naver.com/p/entry/place/32677050",
+      "meal_context": ["lunch", "dinner"],
+      "suitable_for": ["family"],
+      "closed_day": "",
+      "opening_hours_json": null,
+      "group_code": null,
+      "customer_public": false
+    },
+    {
+      "code": "A008",
+      "name": "로타리식당",
+      "cuisine_type": "백반",
+      "address": "여수시 서교3길 2-1",
+      "phone": null,
+      "source_url": null,
+      "meal_context": ["breakfast", "lunch"],
+      "suitable_for": [],
+      "closed_day": "수",
+      "opening_hours_json": {
+        "mon": { "open": "08:00", "close": "18:00", "break": null, "last_order": null },
+        "tue": { "open": "08:00", "close": "18:00", "break": null, "last_order": null },
+        "wed": { "closed": true },
+        "thu": { "open": "08:00", "close": "18:00", "break": null, "last_order": null },
+        "fri": { "open": "08:00", "close": "18:00", "break": null, "last_order": null },
+        "sat": { "open": "08:00", "close": "18:00", "break": null, "last_order": null },
+        "sun": { "open": "08:00", "close": "18:00", "break": null, "last_order": null }
+      },
+      "group_code": null,
+      "customer_public": false
+    },
+    {
+      "code": "A002_UNKNOWN_LO",
+      "name": "장군도횟집",
+      "cuisine_type": "활어회·해산물",
+      "address": "여수시 돌산읍 진두해안길 9",
+      "phone": null,
+      "source_url": "https://map.naver.com/p/entry/place/1678834518",
+      "meal_context": ["lunch", "dinner"],
+      "suitable_for": ["couple"],
+      "closed_day": "",
+      "opening_hours_json": {
+        "mon": { "open": "10:00", "close": "22:00", "break": null, "last_order": null },
+        "tue": { "open": "10:00", "close": "22:00", "break": null, "last_order": null },
+        "wed": { "open": "10:00", "close": "22:00", "break": null, "last_order": null },
+        "thu": { "open": "10:00", "close": "22:00", "break": null, "last_order": null },
+        "fri": { "open": "10:00", "close": "22:00", "break": null, "last_order": null },
+        "sat": { "open": "10:00", "close": "22:00", "break": null, "last_order": null },
+        "sun": { "open": "10:00", "close": "22:00", "break": null, "last_order": null }
+      },
+      "group_code": null,
+      "customer_public": false
+    },
+    {
+      "code": "MOCK_야식집",
+      "name": "MOCK 야식집 (자정 넘김)",
+      "_mock": true,
+      "address": "MOCK",
+      "phone": null,
+      "source_url": null,
+      "meal_context": ["late_night"],
+      "suitable_for": ["solo"],
+      "closed_day": "",
+      "opening_hours_json": {
+        "mon": { "open": "18:00", "close": "02:00", "break": null, "last_order": "01:30" },
+        "tue": { "open": "18:00", "close": "02:00", "break": null, "last_order": "01:30" },
+        "wed": { "open": "18:00", "close": "02:00", "break": null, "last_order": "01:30" },
+        "thu": { "open": "18:00", "close": "02:00", "break": null, "last_order": "01:30" },
+        "fri": { "open": "18:00", "close": "02:00", "break": null, "last_order": "01:30" },
+        "sat": { "open": "18:00", "close": "02:00", "break": null, "last_order": "01:30" },
+        "sun": { "open": "18:00", "close": "02:00", "break": null, "last_order": "01:30" }
+      },
+      "group_code": null,
+      "customer_public": false
+    },
+    {
+      "code": "MOCK_궁전_수휴",
+      "name": "MOCK 수요일휴무 식당",
+      "_mock": true,
+      "address": "MOCK",
+      "phone": null,
+      "source_url": null,
+      "meal_context": ["lunch"],
+      "suitable_for": [],
+      "closed_day": "수",
+      "opening_hours_json": {
+        "mon": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
+        "tue": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
+        "wed": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
+        "thu": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
+        "fri": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
+        "sat": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" },
+        "sun": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:30" }
+      },
+      "group_code": null,
+      "customer_public": false
+    },
+    {
+      "code": "F017_BEOMAT",
+      "name": "MOCK 범앗간 계열 A",
+      "_mock": true,
+      "address": "MOCK",
+      "phone": null,
+      "source_url": null,
+      "meal_context": ["snack"],
+      "suitable_for": [],
+      "closed_day": "",
+      "group_code": "F017",
+      "opening_hours_json": {
+        "mon": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
+        "tue": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
+        "wed": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
+        "thu": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
+        "fri": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
+        "sat": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
+        "sun": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" }
+      },
+      "customer_public": false
+    },
+    {
+      "code": "F017_KBAKSAK",
+      "name": "MOCK K바삭통닭 계열 B",
+      "_mock": true,
+      "address": "MOCK",
+      "phone": null,
+      "source_url": null,
+      "meal_context": ["snack"],
+      "suitable_for": [],
+      "closed_day": "",
+      "group_code": "F017",
+      "opening_hours_json": {
+        "mon": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
+        "tue": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
+        "wed": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
+        "thu": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
+        "fri": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
+        "sat": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" },
+        "sun": { "open": "11:00", "close": "21:00", "break": null, "last_order": "20:00" }
+      },
+      "customer_public": false
+    }
+  ]
+}
