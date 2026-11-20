@@ -98,6 +98,7 @@ function payloadOf(sessionId, message_ko, extra = {}) {
     quote: null,
     route: null,
     verified_clock_tokens: [...clockTokens(message_ko), ...priceTokens(message_ko)],
+    cards: [],
     ...extra,
   };
 }
@@ -218,6 +219,15 @@ function buildMunmeokjiAnswer({ sessionId, message, rows, now = new Date(), devP
   });
 }
 
+/**
+ * 메뉴 배열: 운영 DB 의 menu_json 우선, 없으면 Fixture 의 menu. 둘 다 없으면 빈 배열 (메뉴 미확인).
+ * 가격이 없는 항목은 표시하지 않는다 (임의 생성 금지).
+ */
+function menuOf(r) {
+  const src = r && (r.menu_json && Array.isArray(r.menu_json.items) ? r.menu_json.items : (Array.isArray(r.menu_json) ? r.menu_json : (Array.isArray(r.menu) ? r.menu : [])));
+  return src.filter((m) => m && m.name && Number.isFinite(Number(m.price)));
+}
+
 function fmtWon(n) { return `${Number(n).toLocaleString('en-US')}원`; }
 
 function fmtItem(m) {
@@ -234,13 +244,15 @@ function fmtItem(m) {
  * 혜택 문구는 넣지 않는다 (소원패스 노출은 별도 Gate).
  */
 function buildCard(r, visit, companion, co, hrs) {
-  const menu = Array.isArray(r.menu) ? r.menu : [];
+  const menu = menuOf(r);
   const main = menu.filter((m) => !m.addon);
   const kids = gate.kidsMenu(menu);
   const solo = main.filter((m) => m.solo);
+  // 혼밥(1인): 최소 주문 인원이 2 이상인 메뉴는 제외 (menuForParty 규칙 재사용)
+  const soloFit = gate.menuForParty(main, 1);
   const lines = [];
   if (main.length && companion !== 'kids') {
-    const show = (companion === 'solo' && solo.length ? solo : main).slice(0, 6);
+    const show = (companion === 'solo' ? (solo.length ? solo : soloFit) : main).slice(0, 6);
     lines.push(`메뉴: ${show.map(fmtItem).join(' / ')}`);
   }
   if (companion === 'kids' && kids.length) lines.push(`어린이 메뉴: ${kids.map(fmtItem).join(' / ')}`);

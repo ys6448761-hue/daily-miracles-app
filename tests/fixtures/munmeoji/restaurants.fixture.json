@@ -64,7 +64,10 @@
         "status": "공개 일정 (§78 04). 브레이크 없음 (Founder 확인 2026-11-20). 임시휴무 공지 있음"
       },
       "group_code": null,
-      "customer_public": false
+      "customer_public": false,
+      "fit_approved_for_recommendation": true,
+      "fit_approval_note": "추천 적합성 승인 (Founder 2026-11-20). Production 고객 공개는 별개 (HOLD)",
+      "production_public": false
     },
     {
       "code": "F009",
@@ -256,7 +259,10 @@
       ],
       "menu_source": "Founder 제공 네이버 메뉴 (통합 엑셀 03 시트 F009, 원본 11행, 중복 없음). §83 의 13개 표기는 정정 (원본 11행)",
       "menu_updated_at": null,
-      "menu_note": "기준일 미확인. 본 메뉴 9 + 추가 2"
+      "menu_note": "기준일 미확인. 본 메뉴 9 + 추가 2",
+      "fit_approved_for_recommendation": true,
+      "fit_approval_note": "추천 적합성 승인 (Founder 2026-11-20). Production 고객 공개는 별개 (HOLD)",
+      "production_public": false
     },
     {
       "code": "F010",
@@ -440,7 +446,10 @@
           "limited": false,
           "kids": false
         }
-      ]
+      ],
+      "fit_approved_for_recommendation": true,
+      "fit_approval_note": "추천 적합성 승인 (Founder 2026-11-20). Production 고객 공개는 별개 (HOLD)",
+      "production_public": false
     },
     {
       "code": "A001_UNKNOWN_HOURS",
@@ -912,7 +921,10 @@
       "customer_public": false,
       "price_range_sheet": "14,000–36,000원 (통합 엑셀 01 시트, 출처 DiningCode, 세부 메뉴 미확인)",
       "evidence": "2026-11-20 Founder 전화 확인. 과거 시트 시간 근거 (표본) 는 보존",
-      "last_order_scope_note": "저녁 LO 18:50 은 17:00 이후에만 적용 (§81). 점심 LO 미확인."
+      "last_order_scope_note": "저녁 LO 18:50 은 17:00 이후에만 적용 (§81). 점심 LO 미확인.",
+      "fit_approved_for_recommendation": true,
+      "fit_approval_note": "추천 적합성 승인 (Founder 2026-11-20). Production 고객 공개는 별개 (HOLD)",
+      "production_public": false
     }
   ]
 }

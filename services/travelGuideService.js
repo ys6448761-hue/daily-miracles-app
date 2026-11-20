@@ -1085,7 +1085,7 @@ class TravelGuideService {
    */
   async _getCafePartners(countryCode, cityCode) {
     const query = `
-      SELECT id, name, category, phone, address
+      SELECT id, name, category, phone, address, info_status
       FROM dt_partners
       WHERE LOWER(city_code) = LOWER($1)
       AND category IN ('cafe', 'beverage', 'coffee')
@@ -1096,7 +1096,11 @@ class TravelGuideService {
 
     try {
       const result = await db.query(query, [cityCode]);
-      return result.rows || [];
+      // §86 Q85-4: 일반 카페 이름은 유지. 주소·전화는 info_status=verified 인 경우에만 싣는다 (미확인·충돌 값 노출 차단)
+      return (result.rows || []).map((r) => {
+        const base = { id: r.id, name: r.name, category: r.category };
+        return r.info_status === 'verified' ? { ...base, phone: r.phone, address: r.address } : base;
+      });
     } catch (error) {
       console.error("Failed to fetch cafes:", error);
       return [];
