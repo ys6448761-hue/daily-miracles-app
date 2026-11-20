@@ -336,7 +336,8 @@ const _PLACE_KNOWLEDGE = {
     phone: '061-664-7301',
     ride_duration_ko: '편도 약 13분',
     ride_trust: 'NON_OFFICIAL',
-    price_ko: '일반캐빈 왕복 약 17,000원/편도 약 14,000원. 크리스탈캐빈(유리바닥) 왕복 약 24,000원/편도 약 19,000원.',
+    // §93 C4: 성인 요금 출처 충돌 — 단정하지 않고 두 값을 함께 안내한다.
+    price_ko: '성인 요금은 출처마다 달라요(여수시 안내 15,000원, 여수시 연휴 안내 왕복 17,000원). 캐빈 종류별 요금은 방문 전 확인해 주세요.',
     price_trust: 'NON_OFFICIAL',
     // §64 Q63-2: 운영시간 공식 출처 미확인 → 확정 표기 금지 (null = 미확인 안내)
     hours_ko: null,
@@ -355,6 +356,8 @@ const _PLACE_KNOWLEDGE = {
     hours_ko: '상시 개방 (연중무휴)',
     hours_trust: 'OFFICIAL',
     facility_hours_ko: '09:30~18:00 (동절기 11~2월은 17:00까지, 12~13시 미운행)',
+    // §93 C1: 동백열차 종료 시각 출처 충돌 (기존 기록 18:00 · 2026 추석 안내 18:00 · 여수시 하절기 안내 17:30). 확정하지 않는다.
+    facility_conflict_ko: '동백열차 운행 종료 시각은 출처마다 달라요(기존 기록 18:00, 11~2월 17:00 · 2026 추석 안내 18:00 · 여수시 하절기 안내 17:30). 기존 기록상 12~13시 미운행이에요. 방문일 시간표를 확인해 주세요.',
     facility_trust: 'OFFICIAL',
     // §64 Q63-1: 일정 배정 시간대 (섬 개방시간 아님). 검증 corpus 에 있어야 응답 가드가 통과시킨다.
     schedule_slot_ko: '09:00~10:30',
@@ -370,7 +373,8 @@ const _PLACE_KNOWLEDGE = {
   hyangiram: {
     phone: null,
     admission_ko: '무료',
-    hours_ko: '04:00~19:00',
+    // §93 C2: 개방 시작 시각 출처 충돌 (기존 04:00 · 관광공사·여수시 추석 05:00). 종료 19:00 은 양쪽 일치.
+    hours_ko: '개방 시작 04:00 또는 05:00 (출처마다 다름), 종료 19:00',
     hours_trust: 'NON_OFFICIAL',
     stairs_ko: '경내 계단 구간이 있어요. 거동이 불편하신 분은 주의가 필요해요.',
     routes_ko: '두 경로로 오를 수 있어요. 한 쪽은 가파른 편이고 (약 10분), 다른 쪽은 상대적으로 완만해요 (약 15분). 완만한 길도 계단이 없지는 않아요. 올라온 길 또는 다른 경로로 내려갈 수 있어요.',
@@ -436,10 +440,21 @@ const _PLACE_KNOWLEDGE = {
   // experience_ko: Founder-approved Q2 text (2026-10-19).
   hamel_lighthouse: {
     experience_ko: '하멜등대는 여수 바다를 바라보며 잠시 마음을 가다듬을 수 있는 장소예요. DreamTown에서는 소원을 품고 다시 희망을 바라보는 별빛 항로의 중요한 장소예요.',
-    emotional_role: '연결 / 공명',
+    // §93 C3: SSOT-LOC-001 (정본) 6. 하멜등대 — 역할 "전환", 감정 "소원 / 별". 이전 값 "연결 / 공명"은 Visual Style SSOT 의 시각 가이드 문구였다.
+    emotional_role: '전환 / 소원·별',
     unknown_boundary: '운영 및 접근 세부 정보는 현장에서 확인해주세요.',
   },
 };
+
+// §93 C1: 동백열차 운행시간 문장. 출처 충돌(facility_conflict_ko)이 있으면 충돌 문장만 출력한다.
+function _facilitySentence(knowledge) {
+  if (knowledge.facility_conflict_ko) return knowledge.facility_conflict_ko;
+  return `동백열차 운행시간은 ${knowledge.facility_hours_ko}이에요.`;
+}
+
+// §93 C5: SSOT-LOC-001 에 감정 역할이 정의된 장소만 고객 전환 문장에 역할을 출력한다.
+// 정의되지 않은 코드 전용 역할(오동도·돌산공원·돌산대교)은 데이터에 남기되 고객 안내에 확정 역할로 출력하지 않는다.
+const _SSOT_ROLE_PLACE = new Set(['cablecar', 'marine_park', 'hamel_lighthouse']);
 
 // Place-like noun suffixes — for unknown place detection
 const PLACE_SUFFIX_RE = /공원|시장|광장|대교|타워|암자|향일암|해변|마을|포차거리|케이블카|전망대|박물관|기념관|해수욕/;
@@ -619,11 +634,11 @@ function _buildPlaceInfoPayload(code, place, sessionId, kind, message) {
       lines.push(`${name}의 관람 소요시간 정보는 아직 확인되지 않았어요.`);
     }
     if (knowledge.hours_ko) lines.push(`운영시간은 ${knowledge.hours_ko}예요.`);
-    if (knowledge.facility_hours_ko) lines.push(`동백열차 운행시간은 ${knowledge.facility_hours_ko}이에요.`);
+    if (knowledge.facility_hours_ko) lines.push(_facilitySentence(knowledge));
   } else {
     if (knowledge.hours_ko) lines.push(`${name}의 운영시간은 ${knowledge.hours_ko}예요.`);
     else lines.push(`${name}의 운영시간은 아직 확인되지 않았어요.`);
-    if (knowledge.facility_hours_ko) lines.push(`동백열차 운행시간은 ${knowledge.facility_hours_ko}이에요.`);
+    if (knowledge.facility_hours_ko) lines.push(_facilitySentence(knowledge));
     if (/(들어갈|몇 시부터|시작)/.test(message || '')) {
       lines.push('정확한 입장 시작 시간은 확인되지 않았어요. 위 운영시간을 참고해 주세요.');
     }
@@ -1658,7 +1673,7 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
         ? `${name} 운영시간은 ${_h}`
         : `${name} 운영시간은 ${_h}예요.`;
       if (knowledge.hours_trust === 'NON_OFFICIAL') answer += '\n(참고값이에요.)';
-      if (knowledge.facility_hours_ko) answer += `\n동백열차 운행시간은 ${knowledge.facility_hours_ko}이에요.`;
+      if (knowledge.facility_hours_ko) answer += `\n${_facilitySentence(knowledge)}`;
       // If weather is also asked, surface weather policy inline rather than losing it to the else-if chain
       if (/(비|날씨|우천|기상|눈|바람|태풍)/.test(msg) && knowledge.weather_ko) {
         answer += `\n\n${knowledge.weather_ko}`;
@@ -1708,7 +1723,7 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
         ? `${name} 운영시간은 ${_h}`
         : `${name} 운영시간은 ${_h}예요.`;
       if (knowledge.hours_trust === 'NON_OFFICIAL') answer += '\n(참고값이에요.)';
-      if (knowledge.facility_hours_ko) answer += `\n동백열차 운행시간은 ${knowledge.facility_hours_ko}이에요.`;
+      if (knowledge.facility_hours_ko) answer += `\n${_facilitySentence(knowledge)}`;
       answer += verifyNote;
     } else {
       answer = `${name}의 운영시간 정보가 아직 없어요.${verifyNote}`;
@@ -2579,7 +2594,7 @@ async function _handleJourneyDecision({ decisionType, message, soulContext, conv
       const nextKnowledge = _PLACE_KNOWLEDGE[placeCode];
       const priorRole = priorKnowledge && priorKnowledge.emotional_role;
       const nextRole = nextKnowledge && nextKnowledge.emotional_role;
-      if (priorRole && nextRole) {
+      if (priorRole && nextRole && _SSOT_ROLE_PLACE.has(priorPlace.code) && _SSOT_ROLE_PLACE.has(placeCode)) {
         const priorKo = _CONV_GOLDEN_KO[priorPlace.code] || priorPlace.code;
         const priorShort = priorRole.split(/[\/·]/)[0].trim();
         const nextShort = nextRole.split(/[\/·]/)[0].trim();

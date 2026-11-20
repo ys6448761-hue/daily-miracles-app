@@ -26,7 +26,7 @@ const HAMEL_EXPERIENCE_KO =
 // ── _PLACE_KNOWLEDGE.hamel_lighthouse fixture ─────────────────────────────────
 const HAMEL_KNOWLEDGE = {
   experience_ko: HAMEL_EXPERIENCE_KO,
-  emotional_role: '연결 / 공명',
+  emotional_role: '전환 / 소원·별', // §93 C3: SSOT-LOC-001 정본
   unknown_boundary: '운영 및 접근 세부 정보는 현장에서 확인해주세요.',
   // No phone / hours / admission — UNVERIFIED
 };

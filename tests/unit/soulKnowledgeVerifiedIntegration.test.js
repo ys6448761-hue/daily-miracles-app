@@ -98,11 +98,15 @@ describe('Q63-1 — 오동도 체류: 일정 배정 90분만 안내, 120분 평�
 });
 
 describe('Q63-3 — 오동도 운영: 섬 개방시간과 동백열차 시설시간 분리 (H05)', () => {
-  test('H05: 상시 개방 (연중무휴) + 동백열차 09:30~18:00 을 분리해 안내한다', async () => {
+  test('H05: 상시 개방 (연중무휴) + 동백열차 시설시간을 분리하고, 종료 시각 충돌을 확정 없이 안내한다 (§93 C1)', async () => {
     const r = await req('오동도 몇 시에 열어?');
     const msg = r.payload.message_ko;
     expect(msg).toContain('상시 개방 (연중무휴)');
-    expect(msg).toContain('동백열차 운행시간은 09:30~18:00');
+    // §93 C1: 동백열차 종료 시각 18:00 / 17:30 충돌을 함께 안내하고 한쪽으로 확정하지 않는다.
+    expect(msg).toContain('운행 종료 시각은 출처마다 달라요');
+    expect(msg).toContain('17:30');
+    expect(msg).toContain('18:00');
+    expect(msg).not.toContain('동백열차 운행시간은 09:30~18:00');
     expect(msg).toContain('12~13시 미운행');
   });
 
@@ -164,5 +168,93 @@ describe('승인된 기존 값 유지 (하멜등대 30분, 향일암 120분)', (
   test('향일암 체류는 DB 120분을 그대로 안내한다', async () => {
     const r = await req('향일암 관람시간은 얼마나 걸려?');
     expect(r.payload.message_ko).toMatch(/약 120분/);
+  });
+});
+
+// ── §93 고객 안내 정확성 (C1·C2·C4 충돌 표기, C3 하멜 SSOT 정합, C5 미정의 역할 노출 차단) ──
+const fs93 = require('fs');
+const path93 = require('path');
+const SRC93 = fs93.readFileSync(path93.join(__dirname, '../../services/soyeowoolService.js'), 'utf8');
+const LOC93 = fs93.readFileSync(path93.join(__dirname, '../../docs/ssot/media/SSOT-LOC-001_DreamTown_Yeosu_Locations.md'), 'utf8');
+
+describe('§93 C1 — 동백열차 종료 시각 충돌은 확정 없이 두 출처를 함께 안내', () => {
+  test('오동도 운영 질문에 17:30 / 18:00 충돌과 방문일 확인 안내가 들어간다', async () => {
+    const r = await req('오동도 몇 시에 열어?');
+    const msg = r.payload.message_ko;
+    expect(msg).toContain('출처마다 달라요');
+    expect(msg).toContain('17:30');
+    expect(msg).toContain('18:00');
+    expect(msg).toContain('방문일 시간표를 확인');
+    expect(msg).not.toMatch(/동백열차 운행시간은 \d{2}:\d{2}~18:00이에요/);
+  });
+});
+
+describe('§93 C2 — 향일암 개방 시작 충돌 (04:00 / 05:00)', () => {
+  test('향일암 운영시간 질문은 개방 시작 04:00 또는 05:00 충돌을 표기하고 단일 04:00 기준값을 제시하지 않는다', async () => {
+    const r = await req('향일암 몇 시에 열어?');
+    const msg = r.payload.message_ko;
+    expect(msg).toContain('개방 시작 04:00 또는 05:00');
+    expect(msg).toContain('출처마다 다름');
+    expect(msg).toContain('종료 19:00');
+    expect(msg).not.toContain('04:00~19:00');
+    expect(msg).toMatch(/확인/);
+  });
+});
+
+describe('§93 C4 — 케이블카 성인 요금 충돌은 확정 요금으로 단정하지 않는다', () => {
+  test('케이블카 요금 질문은 15,000원과 17,000원을 함께 안내하고 확정 표현을 쓰지 않는다', async () => {
+    const r = await req('케이블카 입장료 어떻게 돼?', { place_code: 'cablecar' });
+    const msg = r.payload.message_ko;
+    expect(msg).toContain('출처마다 달라요');
+    expect(msg).toContain('15,000원');
+    expect(msg).toContain('17,000원');
+    expect(msg).not.toContain('일반캐빈 왕복 약 17,000원');
+  });
+
+  test('케이블카 운영시간은 UNVERIFIED 로 유지되어 시각을 단정하지 않는다', async () => {
+    const r = await req('케이블카 운영시간 알려줘');
+    const msg = r.payload.message_ko;
+    expect(msg).toContain('운영시간은 아직 확인되지 않았어요');
+    expect(msg).not.toMatch(/\d{2}:\d{2}~\d{2}:\d{2}/);
+  });
+});
+
+describe('§93 C3 — 하멜등대 감정 역할은 SSOT-LOC-001 정본과 일치한다', () => {
+  test('SSOT-LOC-001 "6. 하멜등대" 역할·감정과 코드 emotional_role 이 같다', () => {
+    const block = LOC93.slice(LOC93.indexOf('### 6. 하멜등대'), LOC93.indexOf('### 7. 호텔'));
+    const role = block.match(/\| 역할 \| (.+?) \|/)[1].trim();
+    const emo = block.match(/\| 감정 \| (.+?) \|/)[1].trim();
+    const code = SRC93.match(/hamel_lighthouse: \{[\s\S]*?emotional_role: '([^']+)'/)[1];
+    expect(role).toBe('전환');
+    expect(emo).toBe('소원 / 별');
+    expect(code.split(/[\/·]/)[0].trim()).toBe(role);
+    expect(code).toContain('소원');
+  });
+});
+
+describe('§93 C5 — SSOT 미정의 감정 역할은 고객 전환 문장에 출력하지 않는다', () => {
+  test('전환 문장 출력 허용 장소는 SSOT-LOC-001 에 역할이 정의된 장소(4·5·6번)만이다', () => {
+    const m = SRC93.match(/const _SSOT_ROLE_PLACE = new Set\(\[([^\]]+)\]\)/);
+    const codes = m[1].split(',').map((s) => s.trim().replace(/'/g, ''));
+    expect(codes.sort()).toEqual(['cablecar', 'hamel_lighthouse', 'marine_park'].sort());
+    // SSOT 정의 확인: 4 케이블카 상승 / 5 종포해양공원 쉼 / 6 하멜등대 전환
+    expect(LOC93).toMatch(/### 4\. 케이블카[\s\S]*?\| 역할 \| 상승 \|/);
+    expect(LOC93).toMatch(/### 5\. 종포해양공원[\s\S]*?\| 역할 \| 쉼 \|/);
+  });
+
+  test('코드 전용 역할(오동도·돌산공원·돌산대교)은 데이터에 보존되되 SSOT 허용 집합에 없다', () => {
+    expect(SRC93).toContain("emotional_role: '재충전 / 자연 회복'");
+    expect(SRC93).toContain("emotional_role: '여운·다짐·마무리'");
+    expect(SRC93).toContain("emotional_role: '흐름·전환'");
+    const allowed = ['cablecar', 'hamel_lighthouse', 'marine_park'];
+    for (const c of ['odongdo', 'dolsan_nightscape', 'dolsan_daegyo']) {
+      expect(allowed).not.toContain(c);
+    }
+  });
+
+  test('오동도 발 전환 문장에 미정의 역할 "재충전" 이 노출되지 않는다 (cablecar→odongdo)', async () => {
+    travelGuideSvc.getPlaceByCode.mockResolvedValue(ODONGDO);
+    const r = await req('오동도도 같이 갈래', { place_code: 'odongdo' });
+    expect(r.payload.message_ko).not.toMatch(/재충전/);
   });
 });

@@ -17,7 +17,7 @@
 const HYANGIRAM_KNOWLEDGE = {
   phone: null,
   admission_ko: '무료',
-  hours_ko: '04:00~19:00',
+  hours_ko: '개방 시작 04:00 또는 05:00 (출처마다 다름), 종료 19:00', // §93 C2
   hours_trust: 'NON_OFFICIAL',
   stairs_ko: '경내 계단 구간이 있어요. 거동이 불편하신 분은 주의가 필요해요.',
   routes_ko: '두 경로로 오를 수 있어요. 한 쪽은 가파른 편이고 (약 10분), 다른 쪽은 상대적으로 완만해요 (약 15분). 완만한 길도 계단이 없지는 않아요. 올라온 길 또는 다른 경로로 내려갈 수 있어요.',

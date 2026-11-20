@@ -85,7 +85,8 @@ beforeEach(() => {
 // Positive — Transition sentence generated
 // ═══════════════════════════════════════════════════════════
 
-test('LB-P1 — cablecar→odongdo: transition sentence with 상승/재충전 roles', async () => {
+// §93 C5: 오동도·돌산공원·돌산대교 역할은 SSOT-LOC-001 에 정의되지 않아 고객 전환 문장에 출력하지 않는다.
+test('LB-P1 — cablecar→odongdo: undefined SSOT role (오동도 재충전) is NOT printed in transition sentence (§93 C5)', async () => {
   travelGuideSvc.getPlaceByCode.mockImplementation(code =>
     code === 'odongdo' ? Promise.resolve(odongdoPlace) : Promise.resolve(null)
   );
@@ -101,13 +102,12 @@ test('LB-P1 — cablecar→odongdo: transition sentence with 상승/재충전 ro
   expect(result.payload.status).toBe('JOURNEY_CONTINUITY');
   expect(result.payload.message_ko).toMatch(/오동도도 함께 넣을게요/);
   expect(result.payload.message_ko).toMatch(/지금까지:/);
-  // Transition sentence must be present (케이블카의 상승에서, 오동도의 재충전으로 이어지는 여정이에요.)
-  expect(result.payload.message_ko).toMatch(/케이블카의 상승에서/);
-  expect(result.payload.message_ko).toMatch(/오동도의 재충전/);
-  expect(result.payload.message_ko).toMatch(/이어지는 여정이에요/);
+  // §93 C5: 오동도 역할이 SSOT 미정의이므로 전환 문장이 출력되지 않는다.
+  expect(result.payload.message_ko).not.toMatch(/재충전/);
+  expect(result.payload.message_ko).not.toMatch(/이어지는 여정이에요/);
 });
 
-test('LB-P2 — odongdo→dolsan_nightscape: transition with 재충전/여운 roles', async () => {
+test('LB-P2 — odongdo→dolsan_nightscape: undefined SSOT roles (재충전/여운) NOT printed (§93 C5)', async () => {
   travelGuideSvc.getPlaceByCode.mockImplementation(code =>
     code === 'dolsan_nightscape' ? Promise.resolve(dolsanNightPlace) : Promise.resolve(null)
   );
@@ -122,12 +122,12 @@ test('LB-P2 — odongdo→dolsan_nightscape: transition with 재충전/여운 ro
   expect(result.ok).toBe(true);
   expect(result.payload.status).toBe('JOURNEY_CONTINUITY');
   expect(result.payload.message_ko).toMatch(/돌산공원도 함께 넣을게요/);
-  expect(result.payload.message_ko).toMatch(/오동도의 재충전에서/);
-  expect(result.payload.message_ko).toMatch(/돌산공원의 여운/);
-  expect(result.payload.message_ko).toMatch(/이어지는 여정이에요/);
+  expect(result.payload.message_ko).not.toMatch(/재충전/);
+  expect(result.payload.message_ko).not.toMatch(/여운/);
+  expect(result.payload.message_ko).not.toMatch(/이어지는 여정이에요/);
 });
 
-test('LB-P3 — dolsan_daegyo→dolsan_nightscape: transition with 흐름/여운 roles', async () => {
+test('LB-P3 — dolsan_daegyo→dolsan_nightscape: undefined SSOT roles (흐름/여운) NOT printed (§93 C5)', async () => {
   travelGuideSvc.getPlaceByCode.mockImplementation(code =>
     code === 'dolsan_nightscape' ? Promise.resolve(dolsanNightPlace) : Promise.resolve(null)
   );
@@ -141,9 +141,9 @@ test('LB-P3 — dolsan_daegyo→dolsan_nightscape: transition with 흐름/여운
 
   expect(result.ok).toBe(true);
   expect(result.payload.status).toBe('JOURNEY_CONTINUITY');
-  expect(result.payload.message_ko).toMatch(/돌산대교의 흐름에서/);
-  expect(result.payload.message_ko).toMatch(/돌산공원의 여운/);
-  expect(result.payload.message_ko).toMatch(/이어지는 여정이에요/);
+  expect(result.payload.message_ko).not.toMatch(/흐름에서/);
+  expect(result.payload.message_ko).not.toMatch(/여운/);
+  expect(result.payload.message_ko).not.toMatch(/이어지는 여정이에요/);
 });
 
 test('LB-P4 — marine_park→cablecar: transition with 쉼/상승 roles', async () => {
