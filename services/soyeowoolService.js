@@ -677,6 +677,54 @@ function _buildMultiPlaceInfoPayload(codes, places, sessionId) {
   };
 }
 
+// ─── PHX-SOUL-QA-001 §70: 검증된 바다 전망 카페 (H07·H15) ───────────────────
+// Founder §70: 검증된 바다 전망 카페 정보만 추천. 충돌하는 주소·전화·영업시간은 싣지 않는다.
+// 제휴 혜택 (아메리카노 무료 등) 은 이 경로에서 다루지 않는다 (고객 노출은 별도 승인, §68).
+// 포트앤포트 (엘리스테이 여수 4층): 공식 사이트 "오션뷰" 소개 · 영업 11:00~21:00 (공식 페이지, 기준일 미표기).
+// 제외: 번지 (28-52 / 28-58), 전화 (CSV 0507-1371-2956 vs 공식 0507-1429-5241) — 자료 간 충돌.
+// 그 밖의 카페 (프롬나드, 더 포레스트랜드, 라또아, 카프아일랜드, 메리엘, 하루 한방카페, 모이핀) 는 바다 전망 미검증 → 추천 안 함.
+const _SEA_VIEW_CAFE_KNOWLEDGE = [
+  {
+    name_ko: '포트앤포트',
+    location_ko: '엘리스테이 여수 4층 (돌산 백초길)',
+    sea_view_ko: '공식 사이트에서 모든 자리가 창가인 오션뷰 레스토랑 & 카페로 소개하고 있어요.',
+    hours_ko: '매일 11:00~21:00 (브레이크타임 15:00~17:00)',
+    sea_view_status: 'VERIFIED',
+    hours_status: 'VERIFIED',
+  },
+];
+function _isSeaViewCafeQuestion(message) {
+  return /바다/.test(message || '') && _isCafeQuestion(message);
+}
+function _buildSeaViewCafePayload(sessionId, message) {
+  const cafes = _SEA_VIEW_CAFE_KNOWLEDGE.filter(c => c.sea_view_status === 'VERIFIED');
+  if (cafes.length === 0) return _buildCafeNotSupportedPayload(sessionId);
+  const c = cafes[0];
+  const lines = [`공식 자료에서 오션뷰 카페로 소개하는 곳은 ${c.name_ko}예요. ${c.location_ko}에 있어요.`, c.sea_view_ko];
+  if (c.hours_status === 'VERIFIED') lines.push(`영업시간은 ${c.hours_ko}이에요.`);
+  if (_detectPlacesInMessage(message).includes('odongdo')) {
+    lines.push('오동도와의 거리는 확인되지 않아서 오동도 근처라고 말할 수 없어요.');
+  }
+  lines.push('다른 카페의 바다 전망은 아직 확인되지 않아 추천하지 않았어요.');
+  return {
+    session_id: sessionId,
+    understood_context: {},
+    places: [],
+    why_details: [],
+    message_ko: lines.join('\n'),
+    status: 'PLACE_LOOKUP',
+    intent: 'CAFE_RECOMMENDATION',
+    presentation_mode: 'PLACE_KNOWLEDGE',
+    resolved_code: null,
+    next_options: [],
+    timestamp: new Date().toISOString(),
+    shared_journey: null,
+    quote: null,
+    route: null,
+  };
+}
+// ─────────────────────────────────────────────────────────────────────────
+
 function _buildCafeNotSupportedPayload(sessionId) {
   return {
     session_id: sessionId,
@@ -2733,6 +2781,9 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   }
   // 카페 요청: 현재 장소 화면(place_code)의 PSQ 질문은 기존 PSQ 경로가 처리한다.
   if (!(explicit_context && explicit_context.place_code) && _isCafeQuestion(message)) {
+    if (_isSeaViewCafeQuestion(message)) {
+      return { ok: true, payload: _buildSeaViewCafePayload(sessionId, message) };
+    }
     return { ok: true, payload: _buildCafeNotSupportedPayload(sessionId) };
   }
   {
@@ -3852,6 +3903,7 @@ function buildFactFallback(message) {
 }
 
 // 시각 검증용 지식 본문 (가드 전용, 응답에 포함되지 않음)
-const _VERIFIED_KNOWLEDGE_TEXT = JSON.stringify(_PLACE_KNOWLEDGE);
+// §70: 바다 전망 카페 Knowledge 도 검증 corpus 에 포함 (응답 가드가 카페 영업시간을 검증할 수 있도록).
+const _VERIFIED_KNOWLEDGE_TEXT = JSON.stringify({ ..._PLACE_KNOWLEDGE, _sea_view_cafes: _SEA_VIEW_CAFE_KNOWLEDGE });
 
 module.exports = { handleTravelRequest, buildFactFallback, verifiedKnowledgeText: _VERIFIED_KNOWLEDGE_TEXT };

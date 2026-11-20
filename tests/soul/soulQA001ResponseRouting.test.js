@@ -112,10 +112,11 @@ describe('T02 오동도 도보 관광 질문', () => {
 
 // ── T03: 카페 질문 — 일반 관광코스로 대체하지 않고 미지원을 명시한다 ───────────────
 describe('T03 카페 추천 질문', () => {
-  test('카페 요청에 관광코스를 답하지 않고 기능 준비 중임을 명시한다', async () => {
+  test('카페 요청에 관광코스를 답하지 않고 검증된 카페 정보만 안내한다 (§70)', async () => {
     const result = await makeRequest('바다가 보이는 여수 카페를 추천해 줘.');
-    expect(result.payload.status).toBe('NOT_SUPPORTED_YET');
-    expect(result.payload.message_ko).toMatch(/카페 추천 기능은 아직 준비 중/);
+    expect(result.payload.status).toBe('PLACE_LOOKUP');
+    expect(result.payload.message_ko).toMatch(/포트앤포트/);
+    expect(result.payload.message_ko).not.toMatch(/관광코스|코스/);
     expect(result.payload.places).toEqual([]);
   });
 });

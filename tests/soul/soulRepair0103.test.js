@@ -102,8 +102,10 @@ describe('REPAIR-02 한국어 조사 선택 (기존 _koreanParticle 재사용)',
 describe('REPAIR-03 미확인 제휴처·혜택 차단 (카페 목록 오인 방지)', () => {
   test('카페 질문은 제휴처 목록이나 오션뷰 추천처럼 보이는 응답을 하지 않는다', async () => {
     const r = await req('바다가 보이는 여수 카페를 추천해 줘.');
-    expect(r.payload.status).toBe('NOT_SUPPORTED_YET');
-    expect(r.payload.message_ko).not.toMatch(/제휴|오션뷰|추천 카페/);
+    // §70: 검증된 바다 전망 카페 (포트앤포트) 1곳만 안내. 제휴·혜택·미검증 카페는 없어야 한다.
+    expect(r.payload.status).toBe('PLACE_LOOKUP');
+    expect(r.payload.message_ko).toContain('포트앤포트');
+    expect(r.payload.message_ko).not.toMatch(/제휴|추천 카페|혜택|아메리카노/);
     expect(r.payload.places).toEqual([]);
   });
 

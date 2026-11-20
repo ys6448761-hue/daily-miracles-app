@@ -105,9 +105,9 @@ describe('H2 플래그 활성 — Knowledge Fast Path', () => {
     expect(contextSvc.parseUserMessage).not.toHaveBeenCalled();
   });
 
-  test('카페 질문은 추출 없이 미지원 응답을 한다', async () => {
+  test('카페 질문은 추출 없이 응답한다 (§70: 검증된 바다 전망 카페 안내)', async () => {
     const r = await req('바다가 보이는 여수 카페를 알려줘.');
-    expect(r.payload.status).toBe('NOT_SUPPORTED_YET');
+    expect(r.payload.status).toBe('PLACE_LOOKUP');
     expect(contextSvc.parseUserMessage).not.toHaveBeenCalled();
   });
 
