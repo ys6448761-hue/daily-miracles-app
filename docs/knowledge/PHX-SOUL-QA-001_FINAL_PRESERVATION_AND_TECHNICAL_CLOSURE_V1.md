@@ -117,4 +117,66 @@ Evidence (신규 스테이징):
 
 ## 3. 실행 결과
 
-(아래는 커밋·push 후 기록한다.)
+| 항목 | 결과 |
+|---|---|
+| 스테이징 전 Preflight | 본 문서 상단 (기록 후 실행) |
+| 로컬 커밋 (Evidence) | `391bdd6` — Evidence 9개 + CAND-EXP-005 + Hook 갱신 manifest·tags |
+| 코드 커밋 | `e2f1e8c` (§70, 5파일, 변경 없음) |
+| 원격 보존 | `origin/feat/phx-soul-hybrid-v1`: `10f52dc..391bdd6` (Fast-forward, force 없음) |
+| 최종 SHA | 로컬 `391bdd6…` = 원격 `391bdd6…` (일치) |
+| Manifest 검증 | 581 → 590. 추가 9 (지정 문서만), 제거 0, 기존 항목 created_at 불변. 변경 1 (§65 후속 기록 checksum, 실제 내용 수정에 따른 필연적 변경). tags 107 유지, 제거 0 |
+| 비밀·PII 스캔 | 키·개인정보 없음 (§1.3). 승인 토큰은 절차 식별자로 판정, §65 후속 기록에서 값 제거 |
+| 제외 확인 | DREAMTOWN_STATUS.md, §59 승인 문서, TEST_ENV_PREFLIGHT, backups/, fixtures 미포함 |
+| 실제 LLM 호출 | 없음 |
+| 운영 DB·Render·Hybrid | 변경 없음 |
+
+## 4. 기술적 종료 상태
+
+| 항목 | 상태 |
+|---|---|
+| SOUL Technical Quality Improvement | **CLOSED** (기술적 개선 Workstream 종료. 출시 승인 아님) |
+| Clarify Policy | **CLOSED** |
+| 최종 실제 Benchmark (§71) | **8 성공 / 12 부분 / 0 실패** |
+| 완전 성공 비율 | 8/20 (40%). 부분 12/20 (60%). 목표치 기록은 확인되지 않아 목표 대비 판정은 하지 않음 |
+| 기존 테스트 실패 (숨기지 않음) | flag unset: R20 1건 + 테스트 0개 suite·supertest 미설치 suite·privacyHotfix process.exit 등 suite 단위 실패 7개. flag 1: LB-I7, R4, R20 추가 |
+| 신규 회귀 실패 | 0 |
+| Production Release | **HOLD** |
+| 개인정보 법률 검토 | **BLOCKED** |
+| CAND-EXP-005 | 기존 Candidate 승인 상태 유지 (Candidate. 정식 승인은 Founder 별도 결정) |
+
+## 5. Release Gate 잔여 사항 (완료 처리하지 않음)
+
+| ID | 사항 | 상태 |
+|---|---|---|
+| R1 | 전화번호 (케이블카 061-664-7301 등) 출처 확인 또는 제거 | 미완료 |
+| R2 | 접근성 정보 (오동도 계단·유모차, 2019 기록) 현행 확인 | 미완료 |
+| R3 | 개인정보 법률 검토 | **BLOCKED** |
+| R4 | 혜택 Allowlist (7곳 아메리카노 무료, §68 Q68-3) | 승인 대기 |
+| R5 | 모이핀 10% 할인 매장 합의 및 활성화 | 합의 Pending, 노출 HOLD |
+| R6 | 모바일·브라우저 E2E (후보 카드 렌더링 포함) | 미실행 |
+| R7 | 실제 청구 비용 확인 (OpenAI 대시보드 대조) | 미확인 |
+| R8 | Hybrid 운영 정책 | 운영 활성화 금지 유지 |
+
+## 6. 다음 Workstream (인계)
+
+- 무여정 내부 **머먹지?** Knowledge 구축 준비. 품질 개선 종료 이후 개발 환경에서 진행.
+- 독립 서비스, 새 AI Engine, 신규 Architecture 를 만들지 않는다 (§69 §4 기준).
+- 식당·파트너 목록 정리부터 시작 (§69 Phase C 1단계).
+
+## 7. 원격 보존된 Evidence 위치
+
+| 문서 | 경로 (원격 `391bdd6`) |
+|---|---|
+| §66 카페·파트너 Knowledge 검증 | docs/knowledge/PHX-SOUL-QA-001_CAFE_PARTNER_KNOWLEDGE_VERIFICATION_V1.md |
+| §67 Founder 확정 | docs/knowledge/PHX-SOUL-QA-001_FOUNDER_CONFIRMATIONS_V1.md |
+| §68 제휴 혜택 확인 | docs/knowledge/PHX-SOUL-QA-001_PARTNER_BENEFIT_CONFIRMATION_V1.md |
+| §69 품질 마무리·머먹지 계획 | docs/knowledge/PHX-SOUL-QA-001_QUALITY_CLOSE_AND_MUNMEOKJI_PLAN_V1.md |
+| §70 최종 품질 마무리 구현 | docs/knowledge/PHX-SOUL-QA-001_FINAL_QUALITY_CLOSURE_V1.md |
+| §71 최종 실제 LLM Benchmark | docs/knowledge/PHX-SOUL-QA-001_FINAL_REAL_LLM_BENCHMARK_V1.md |
+| §72 기술 종료 최종 점검 | docs/knowledge/PHX-SOUL-QA-001_QUALITY_CLOSURE_FINAL_CHECK_V1.md |
+| §73 원격 보존·기술 종료 | docs/knowledge/PHX-SOUL-QA-001_FINAL_PRESERVATION_AND_TECHNICAL_CLOSURE_V1.md |
+| §65 후속 기록 | docs/knowledge/PHX-SOUL-QA-001_VERIFIED_KNOWLEDGE_PRESERVATION_V1.md |
+| CAND-EXP-005 | docs/constitution/candidate/CAND-EXP-005_Muyojeong_Unified_Experience.md |
+| §70 코드 | services/soyeowoolService.js 및 테스트 5파일 (커밋 `e2f1e8c`) |
+
+Raw 원본 (저장소 밖, 외부 백업 보존): 하네스 `results/` (§48, §60, §71, §72 replay).

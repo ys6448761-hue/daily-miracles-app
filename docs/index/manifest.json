@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-11-20T00:51:44.908Z",
+  "generated_at": "2026-11-20T00:52:47.677Z",
   "generator": "generate-manifest.js",
   "total_count": 590,
   "documents": [
@@ -53,7 +53,7 @@
       "status": "active",
       "title": "PHX-SOUL-QA-001 — 최종 원격 보존 및 기술적 종료 (§73, V1, 2026-11-20)",
       "created_at": "2026-11-20",
-      "checksum": "23dc7aa1"
+      "checksum": "de347c8a"
     },
     {
       "id": "DOC-PHX-SOUL-QA-001_FINAL_QUALITY_",
