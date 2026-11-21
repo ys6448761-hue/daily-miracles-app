@@ -1,0 +1,387 @@
+[
+  {
+    "code": "hyangiram",
+    "zone_code": "S-1",
+    "country_code": "KR",
+    "city_code": "YEOSU",
+    "name_ko": "향일암",
+    "name_en": "Hyangiram",
+    "address": "돌산읍 향일암로 1",
+    "lat": 34.5914162,
+    "lng": 127.8037534,
+    "indoor_outdoor": "outdoor",
+    "avg_stay_minutes": 120,
+    "suitable_for": [
+      "family",
+      "elderly",
+      "kids_ok",
+      "pilgrimage"
+    ],
+    "weather_suitable": [
+      "clear",
+      "sunrise",
+      "all_season"
+    ],
+    "emotion_primary": "serenity",
+    "emotion_tags": [
+      "dawn",
+      "faith",
+      "historical"
+    ],
+    "origin_seed_id": "ORIGIN-002",
+    "trust_level": "ORIGIN"
+  },
+  {
+    "code": "dolsan_daegyo",
+    "zone_code": "S-2",
+    "country_code": "KR",
+    "city_code": "YEOSU",
+    "name_ko": "돌산대교",
+    "name_en": "Dolsan Bridge",
+    "address": "돌산도 연육교",
+    "lat": 34.7395,
+    "lng": 127.7456,
+    "indoor_outdoor": "outdoor",
+    "avg_stay_minutes": 30,
+    "suitable_for": [
+      "family",
+      "kids_ok",
+      "young_adults"
+    ],
+    "weather_suitable": [
+      "clear",
+      "sunset",
+      "night"
+    ],
+    "emotion_primary": "wonder",
+    "emotion_tags": [
+      "architecture",
+      "night_view"
+    ],
+    "origin_seed_id": null,
+    "trust_level": "VERIFIED"
+  },
+  {
+    "code": "dolsan_nightscape",
+    "zone_code": "S-3",
+    "country_code": "KR",
+    "city_code": "YEOSU",
+    "name_ko": "돌산 야경",
+    "name_en": "Dolsan Night View Point",
+    "address": "돌산읍 해변",
+    "lat": 34.7289,
+    "lng": 127.7472,
+    "indoor_outdoor": "outdoor",
+    "avg_stay_minutes": 45,
+    "suitable_for": [
+      "young_adults",
+      "couples",
+      "groups"
+    ],
+    "weather_suitable": [
+      "clear",
+      "night"
+    ],
+    "emotion_primary": "nostalgia",
+    "emotion_tags": [
+      "night_view",
+      "date"
+    ],
+    "origin_seed_id": null,
+    "trust_level": "VERIFIED"
+  },
+  {
+    "code": "lee_soon_shin_plaza",
+    "zone_code": "W-1",
+    "country_code": "KR",
+    "city_code": "YEOSU",
+    "name_ko": "이순신광장",
+    "name_en": "Lee Soon Shin Plaza",
+    "address": "중앙동 385-6",
+    "lat": 34.7463,
+    "lng": 127.7356,
+    "indoor_outdoor": "outdoor",
+    "avg_stay_minutes": 45,
+    "suitable_for": [
+      "family",
+      "kids_ok",
+      "elderly",
+      "groups"
+    ],
+    "weather_suitable": [
+      "clear",
+      "all_season"
+    ],
+    "emotion_primary": "inspiration",
+    "emotion_tags": [
+      "history",
+      "education"
+    ],
+    "origin_seed_id": null,
+    "trust_level": "VERIFIED"
+  },
+  {
+    "code": "romantic_pojangmacha",
+    "zone_code": "W-2",
+    "country_code": "KR",
+    "city_code": "YEOSU",
+    "name_ko": "낭만포차거리",
+    "name_en": "Romantic Pojangmacha Alley",
+    "address": "동산동 포차거리",
+    "lat": 34.7421,
+    "lng": 127.7398,
+    "indoor_outdoor": "outdoor",
+    "avg_stay_minutes": 60,
+    "suitable_for": [
+      "young_adults",
+      "groups",
+      "friends"
+    ],
+    "weather_suitable": [
+      "clear",
+      "cool",
+      "evening"
+    ],
+    "emotion_primary": "warmth",
+    "emotion_tags": [
+      "food",
+      "social",
+      "street_culture"
+    ],
+    "origin_seed_id": null,
+    "trust_level": "VERIFIED"
+  },
+  {
+    "code": "jungang_market",
+    "zone_code": "W-3",
+    "country_code": "KR",
+    "city_code": "YEOSU",
+    "name_ko": "중앙시장",
+    "name_en": "Jungang Market",
+    "address": "서동 중앙시장",
+    "lat": 34.745,
+    "lng": 127.737,
+    "indoor_outdoor": "mixed",
+    "avg_stay_minutes": 75,
+    "suitable_for": [
+      "family",
+      "kids_ok",
+      "elderly",
+      "foodies"
+    ],
+    "weather_suitable": [
+      "all_season"
+    ],
+    "emotion_primary": "community",
+    "emotion_tags": [
+      "local_food",
+      "culture",
+      "everyday"
+    ],
+    "origin_seed_id": null,
+    "trust_level": "VERIFIED"
+  },
+  {
+    "code": "yeosu_expo_park",
+    "zone_code": "N-1",
+    "country_code": "KR",
+    "city_code": "YEOSU",
+    "name_ko": "여수엑스포장",
+    "name_en": "Yeosu Expo Park",
+    "address": "박람회장길",
+    "lat": 34.752,
+    "lng": 127.745,
+    "indoor_outdoor": "outdoor",
+    "avg_stay_minutes": 120,
+    "suitable_for": [
+      "family",
+      "kids_ok",
+      "groups"
+    ],
+    "weather_suitable": [
+      "clear",
+      "all_season"
+    ],
+    "emotion_primary": "aspiration",
+    "emotion_tags": [
+      "culture",
+      "event"
+    ],
+    "origin_seed_id": null,
+    "trust_level": "VERIFIED"
+  },
+  {
+    "code": "sky_tower",
+    "zone_code": "N-2",
+    "country_code": "KR",
+    "city_code": "YEOSU",
+    "name_ko": "스카이타워",
+    "name_en": "Sky Tower",
+    "address": "박람회장길 57",
+    "lat": 34.7512,
+    "lng": 127.7468,
+    "indoor_outdoor": "indoor_outdoor",
+    "avg_stay_minutes": 60,
+    "suitable_for": [
+      "family",
+      "kids_ok",
+      "young_adults"
+    ],
+    "weather_suitable": [
+      "clear",
+      "all_season"
+    ],
+    "emotion_primary": "achievement",
+    "emotion_tags": [
+      "view",
+      "landmark",
+      "modern"
+    ],
+    "origin_seed_id": null,
+    "trust_level": "VERIFIED"
+  },
+  {
+    "code": "marine_park",
+    "zone_code": "N-3",
+    "country_code": "KR",
+    "city_code": "YEOSU",
+    "name_ko": "해양공원",
+    "name_en": "Marine Park",
+    "address": "해양공원로",
+    "lat": 34.7488,
+    "lng": 127.7475,
+    "indoor_outdoor": "outdoor",
+    "avg_stay_minutes": 75,
+    "suitable_for": [
+      "family",
+      "kids_ok",
+      "elderly"
+    ],
+    "weather_suitable": [
+      "clear",
+      "all_season"
+    ],
+    "emotion_primary": "joy",
+    "emotion_tags": [
+      "nature",
+      "recreation"
+    ],
+    "origin_seed_id": null,
+    "trust_level": "VERIFIED"
+  },
+  {
+    "code": "odongdo",
+    "zone_code": "E-1",
+    "country_code": "KR",
+    "city_code": "YEOSU",
+    "name_ko": "오동도",
+    "name_en": "Odongdo Island",
+    "address": "오동도로 222",
+    "lat": 34.7602,
+    "lng": 127.7655,
+    "indoor_outdoor": "outdoor",
+    "avg_stay_minutes": 120,
+    "suitable_for": [
+      "family",
+      "kids_ok",
+      "elderly",
+      "groups"
+    ],
+    "weather_suitable": [
+      "clear",
+      "clear_dry",
+      "spring"
+    ],
+    "emotion_primary": "vitality",
+    "emotion_tags": [
+      "nature",
+      "seasonal",
+      "growth"
+    ],
+    "origin_seed_id": "ORIGIN-001",
+    "trust_level": "ORIGIN"
+  },
+  {
+    "code": "cablecar",
+    "zone_code": "E-2",
+    "country_code": "KR",
+    "city_code": "YEOSU",
+    "name_ko": "케이블카",
+    "name_en": "Sea Cable Car",
+    "address": "오동도로 61-11",
+    "lat": 34.7428,
+    "lng": 127.7562,
+    "indoor_outdoor": "outdoor",
+    "avg_stay_minutes": 45,
+    "suitable_for": [
+      "family",
+      "kids_ok",
+      "young_adults"
+    ],
+    "weather_suitable": [
+      "clear",
+      "all_season"
+    ],
+    "emotion_primary": "expansion",
+    "emotion_tags": [
+      "view",
+      "adventure",
+      "modern"
+    ],
+    "origin_seed_id": null,
+    "trust_level": "VERIFIED"
+  },
+  {
+    "code": "jaisan_park",
+    "zone_code": "E-3",
+    "country_code": "KR",
+    "city_code": "YEOSU",
+    "name_ko": "자산공원",
+    "name_en": "Jaisan Park",
+    "address": "오동도로 인근",
+    "lat": 34.748,
+    "lng": 127.754,
+    "indoor_outdoor": "outdoor",
+    "avg_stay_minutes": 30,
+    "suitable_for": [
+      "family",
+      "kids_ok",
+      "elderly"
+    ],
+    "weather_suitable": [
+      "clear",
+      "all_season"
+    ],
+    "emotion_primary": "insight",
+    "emotion_tags": [
+      "view",
+      "quiet",
+      "observation"
+    ],
+    "origin_seed_id": null,
+    "trust_level": "VERIFIED"
+  },
+  {
+    "code": "hamel_lighthouse",
+    "zone_code": null,
+    "country_code": "KR",
+    "city_code": "YEOSU",
+    "name_ko": "하멜등대",
+    "name_en": "Hamel Lighthouse",
+    "address": "전라남도 여수시 종화동 458-7",
+    "lat": 34.73644,
+    "lng": 127.7471,
+    "indoor_outdoor": "outdoor",
+    "avg_stay_minutes": 30,
+    "suitable_for": null,
+    "weather_suitable": null,
+    "emotion_primary": "connection",
+    "emotion_tags": [
+      "resonance",
+      "memory",
+      "wish"
+    ],
+    "origin_seed_id": null,
+    "trust_level": "VERIFIED"
+  }
+]

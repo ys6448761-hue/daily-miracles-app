@@ -8,6 +8,7 @@ const db = require('../database/db');
 const fallbackService = require('./fallbackService');
 const sessionService = require('./sessionService');
 const { applyRestaurantTimeGate } = require('./munmeokjiTimeGate'); // §79
+const { filterCustomerPublic } = require('./touristPublicGate'); // §105 고객 공개 허용 목록
 
 // PHX-SOUL-QA-001 REPAIR-03: 고객 응답에 혜택을 노출하려면 "공식 확인된 파트너"여야 한다.
 // dt_benefits는 내부 파트너 데이터이며 소원패스 공식 운영 혜택 목록이 아니다.
@@ -57,7 +58,11 @@ class TravelGuideService {
     const mustVisitPlaceIds = context.must_visit_place_ids || [];
 
     // Fetch all places
-    let places = await this._getPlaces(context.country_code, context.city_code);
+    // §105: 고객 추천은 명시 허용 목록 장소만 (일반·우천 공통 — 우천 필터보다 앞에서 적용).
+    const _rawPlaces = await this._getPlaces(context.country_code, context.city_code);
+    let places = filterCustomerPublic(_rawPlaces);
+    // §106: 공개 Gate 제외 개수 (고객 안내의 정보 부족 문구 판단에만 사용)
+    context._publicGateRemoved = _rawPlaces.length - places.length;
 
     // Apply user exclusions: filter out explicitly rejected places
     places = places.filter(p => !excludePlaceIds.includes(p.code));

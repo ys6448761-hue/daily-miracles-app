@@ -5,6 +5,7 @@
  */
 
 const db = require('../database/db');
+const { filterCustomerPublic } = require('./touristPublicGate'); // §105 고객 공개 허용 목록
 
 class FallbackService {
   /**
@@ -225,7 +226,8 @@ class FallbackService {
         context.city_code,
       ]);
       // Founder decision 2026-10-15: travelGuideService와 동일한 제외 정책 적용
-      return (result.rows || []).filter(r => r.code !== 'jungang_market');
+      // §105: 대체 추천도 명시 허용 목록 장소만 (미승인 장소 노출 금지).
+      return filterCustomerPublic(result.rows || []).filter(r => r.code !== 'jungang_market');
     } catch (error) {
       console.error("Failed to fetch fallback candidates:", error);
       return [];

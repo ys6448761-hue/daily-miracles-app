@@ -27,6 +27,13 @@ const { sanitizeForExternal, BLOCKED_NOTICE } = require('./soulPrivacyGuard');
 const { classifyFastPath } = require('./soulFastPath');
 const munmeokjiIntent = require('./munmeokjiIntent'); // §81 머먹지 식당 질문 의도 (결정적 파싱)
 const { detectRainyIntent } = require('./travelWeatherIntent'); // §88 고객 메시지의 우천 신호 → 기존 _passesWeather 필터 연결
+const { isCustomerPublicPlace } = require('./touristPublicGate'); // §106 고객 응답 조회 경로 공개 판단
+// §106: 고객 응답에 쓰는 장소 조회. 명시 허용 목록 밖 장소는 null 로 취급해 이름·상세를 노출하지 않는다.
+// 관리·내부 조회는 travelGuideService.getPlaceByCode 를 그대로 쓴다 (변경 없음).
+async function _getCustomerPlace(code) {
+  const p = await travelGuideService.getPlaceByCode(code);
+  return isCustomerPublicPlace(p) ? p : null;
+}
 const { buildMunmeokjiAnswer, isDevPreviewEnabled } = require('./munmeokjiRoute'); // §81
 
 const CAPABILITY = 'TRAVEL_INTELLIGENCE';
@@ -2668,7 +2675,7 @@ async function _handleJourneyDecision({ decisionType, message, soulContext, conv
   // C. FEASIBILITY
   else if (decisionType === 'FEASIBILITY' && placeCode) {
     const ko = _CONV_GOLDEN_KO[placeCode];
-    const placeData = await travelGuideService.getPlaceByCode(placeCode);
+    const placeData = await _getCustomerPlace(placeCode);
     const difficulty = placeData ? placeData.physical_difficulty : null;
 
     if (_hasNightOrTimeExpr(message)) {
@@ -2725,7 +2732,7 @@ async function _handleJourneyDecision({ decisionType, message, soulContext, conv
 
     const placeDetails = await Promise.all(
       includedPlaces.map(async p => {
-        const data = await travelGuideService.getPlaceByCode(p.code);
+        const data = await _getCustomerPlace(p.code);
         return { ...p, physical_difficulty: data ? data.physical_difficulty : null };
       })
     );
@@ -2889,7 +2896,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
     // 중앙시장은 Founder 정책 B에 따라 기존 경로에서만 처리한다.
     const _qaBlocked = _qaCodes.includes('jungang_market') || _isJourneyPlanningIntent(message) || _isRecommendationRequest(message);
     if (!_qaBlocked && _qaCodes.length === 1 && (_isStayTimeQuestion(message) || _isHoursQuestion(message))) {
-      const _qaPlace = await travelGuideService.getPlaceByCode(_qaCodes[0]).catch(() => null);
+      const _qaPlace = await _getCustomerPlace(_qaCodes[0]).catch(() => null);
       const _qaKind = _timeIntentKind(message) === 'STAY' ? 'STAY' : 'HOURS';
       return { ok: true, payload: _buildPlaceInfoPayload(_qaCodes[0], _qaPlace, sessionId, _qaKind, message) };
     }
@@ -2927,7 +2934,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
       if (placeLookup.resolvedCode === 'jungang_market') {
         return { ok: true, payload: _buildJungangPolicyNotice(sessionId) };
       }
-      const place = await travelGuideService.getPlaceByCode(placeLookup.resolvedCode);
+      const place = await _getCustomerPlace(placeLookup.resolvedCode);
       if (place) {
         // Judgment V0.1 — only for suitability queries (어때?/괜찮아? etc.), not informational (알려줘)
         let judgedContext = null;
@@ -3399,7 +3406,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
         return { ok: true, payload: _buildJungangPolicyNotice(sessionId) };
       }
       try {
-        const _psqPlace = await travelGuideService.getPlaceByCode(_psqPlaceCode);
+        const _psqPlace = await _getCustomerPlace(_psqPlaceCode);
         if (_psqPlace) {
           return _buildPlaceSpecificQueryPayload(message, _psqPlace, soulContext, sessionId);
         }
@@ -3470,7 +3477,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
       || _hyangiramVehicleBypass;
     if (_psqPlaceCode && !_ldGuardBypass) {
       try {
-        const _ldPlace = await travelGuideService.getPlaceByCode(_psqPlaceCode);
+        const _ldPlace = await _getCustomerPlace(_psqPlaceCode);
         if (_ldPlace) {
           return _buildPlaceSpecificQueryPayload(message, _ldPlace, soulContext, sessionId);
         }
@@ -3491,7 +3498,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
        /(이곳에서.*(즐기|어떻게)|어떻게.*즐기)/.test(message));
     if (_isCompanionChipQuery) {
       try {
-        const _ccPlace = await travelGuideService.getPlaceByCode(_psqPlaceCode);
+        const _ccPlace = await _getCustomerPlace(_psqPlaceCode);
         if (_ccPlace) {
           const _ccKnowledge = _PLACE_KNOWLEDGE[_ccPlace.code] || {};
           const _ccName = _ccPlace.name_ko || _ccPlace.code;
@@ -3564,7 +3571,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
     {
       const _mpCodes = _detectPlacesInMessage(message);
       if (_mpCodes.length >= 2 && !_mpCodes.includes('jungang_market')) {
-        const _mpPlaces = await Promise.all(_mpCodes.map(c => travelGuideService.getPlaceByCode(c).catch(() => null)));
+        const _mpPlaces = await Promise.all(_mpCodes.map(c => _getCustomerPlace(c).catch(() => null)));
         return { ok: true, payload: _buildMultiPlaceInfoPayload(_mpCodes, _mpPlaces, sessionId) };
       }
     }
@@ -3910,6 +3917,11 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
     hasCandidates: !!(tgResult && Array.isArray(tgResult.places) && tgResult.places.length > 0),
     hasRoute: !!(routeSkeleton && Array.isArray(routeSkeleton.days) && routeSkeleton.days.length > 0),
   });
+
+  // §106: 공개 Gate 로 승인 장소가 모두 제외된 일반 추천 → 미승인 장소를 대신 말하지 않고 정보 부족을 안내한다.
+  if (status === 'NO_RESULT' && (domainContext._publicGateRemoved || 0) > 0 && !detectRainyIntent(message)) {
+    soulMessage = '지금 고객님께 안내할 수 있도록 확인된 관광지 정보가 아직 부족해요. 추천 장소를 만들지 않았어요. 방문 전 현장 운영을 직접 확인해 주세요.';
+  }
 
   // Companion PARTIAL supplement: append place names in message for family_elderly/family_with_kids
   // so the UI shows actual recommendations.
