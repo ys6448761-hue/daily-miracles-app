@@ -137,14 +137,16 @@ test('R7 — "오동도 추천해줘" → NOT PLACE_LOOKUP (DISCOVERY_OVERRIDES:
   expect(result.payload.status).not.toBe('PLACE_LOOKUP');
 });
 
-test('R8 — "케이블카 요금 알려줘" → 기존 MEDIUM_LOOKUP 경로 유지 (PLACE_LOOKUP)', async () => {
+test('R8 — "케이블카 요금 알려줘" → 장소별 요금 경로 (PSQ, §97 M1)', async () => {
   travelGuideSvc.getPlaceByCode.mockImplementation(code =>
     code === 'cablecar' ? Promise.resolve(cablecarPlace) : Promise.resolve(null)
   );
   const result = await makeRequest('케이블카 요금 알려줘');
   expect(result.ok).toBe(true);
-  // "알려줘" is MEDIUM_LOOKUP → still routes to PLACE_LOOKUP (existing behavior preserved)
-  expect(result.payload.status).toBe('PLACE_LOOKUP');
+  // §97 M1 (승인): 장소명 + 요금 질문은 장소 소개(PLACE_LOOKUP)가 아니라 장소별 요금 경로(PLACE_SPECIFIC_QUERY)로 간다.
+  // 요금은 출처 충돌 표기 (확정 금지, §93 C4).
+  expect(result.payload.status).toBe('PLACE_SPECIFIC_QUERY');
+  expect(result.payload.message_ko).toContain('출처마다 달라요');
 });
 
 test('R9 — "오동도에 대해 알려줘" → 기존 STRONG_LOOKUP 경로 유지 (PLACE_LOOKUP)', async () => {

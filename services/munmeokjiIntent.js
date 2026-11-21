@@ -139,9 +139,12 @@ const FOOD_WORD_RE = /식당|맛집|먹을|먹고|먹자|먹어|밥|식사|게�
 const ASK_WORD_RE = /추천|알려|갈 수|갈까|가도|가자|갈 곳|먹을 곳|있어|있나|있을까|어디|될까|먹고 싶|먹고싶|먹을|먹고|어때|찾아|뭐 먹|갈 만/;
 
 /** 식당 질문인지 (결정적). 장소·코스·카페·이전 턴 참조는 제외. */
+const FACILITY_VISIT_RE = /음악분수|바닥분수|분수|야경|산책|막차|동백열차|연육교|숲길|주차|볼 수|보러|공연|운영|운행/;
+const STRONG_FOOD_RE = /먹|식당|맛집|밥|식사|메뉴|게장|횟집|꽃게|갈치|서대|아귀|본관|1번가|야식|간식|회|뭐 먹/;
 function isMunmeokjiFoodQuestion(message) {
   const m = String(message || '');
   if (!FOOD_WORD_RE.test(m)) return false;
+  if (FACILITY_VISIT_RE.test(m) && !STRONG_FOOD_RE.test(m)) return false; // §97 M6
   if (!ASK_WORD_RE.test(m)) return false;
   if (CAFE_RE.test(m)) return false;
   if (TOURISM_OR_JOURNEY_RE.test(m)) return false;

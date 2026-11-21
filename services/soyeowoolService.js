@@ -358,6 +358,12 @@ const _PLACE_KNOWLEDGE = {
     facility_hours_ko: '09:30~18:00 (동절기 11~2월은 17:00까지, 12~13시 미운행)',
     // §93 C1: 동백열차 종료 시각 출처 충돌 (기존 기록 18:00 · 2026 추석 안내 18:00 · 여수시 하절기 안내 17:30). 확정하지 않는다.
     facility_conflict_ko: '동백열차 운행 종료 시각은 출처마다 달라요(기존 기록 18:00, 11~2월 17:00 · 2026 추석 안내 18:00 · 여수시 하절기 안내 17:30). 기존 기록상 12~13시 미운행이에요. 방문일 시간표를 확인해 주세요.',
+    // §97 K1 (Founder 확정): 음악분수 정규 3~10월, 바닥분수 7~8월, 우천·강풍 시 미운영. 종료 시각(19:00/20:00)은 확인 대기.
+    fountain_regular_season_ko: '음악분수 정규 운영기간은 3~10월이에요.',
+    floor_fountain_season_ko: '바닥분수는 7~8월에 운영해요.',
+    fountain_weather_ko: '음악분수와 바닥분수는 우천·강풍 시 운영하지 않아요.',
+    ferry_last_train_ko: '동백열차 막차는 계절별·방향별로 달라요. 3~10월 들어가는 17:50, 나오는 17:40이고, 11~2월은 들어가는 17:00, 나오는 16:45예요.',
+    night_walk_ko: '연육교·방파제 야간 산책은 동백열차나 음악분수 운영과 별도 경험이에요. 기상·조명·현장 통제는 방문 전 확인해 주세요.',
     facility_trust: 'OFFICIAL',
     // §64 Q63-1: 일정 배정 시간대 (섬 개방시간 아님). 검증 corpus 에 있어야 응답 가드가 통과시킨다.
     schedule_slot_ko: '09:00~10:30',
@@ -446,6 +452,42 @@ const _PLACE_KNOWLEDGE = {
   },
 };
 
+// §97 M4: 시각·야간 표현이 있는 방문 가능 질문은 방문 가능을 단정하지 않는다.
+function _hasNightOrTimeExpr(message) { return /(새벽|아침|저녁|밤|야경|야간|오전|오후|\d{1,2}\s*시)/.test(message || ''); }
+function _timedFeasibilitySafeText(placeCode, ko) {
+  if (placeCode === 'hyangiram') return '향일암 개방 시작 시각은 출처마다 달라요(04:00 또는 05:00). 방문 가능 여부는 방문일 공식 확인 후 결정해 주세요.';
+  if (placeCode === 'odongdo') return '오동도 섬은 상시 개방이에요. 다만 동백열차 막차와 음악분수 운영은 계절과 시간에 따라 달라서 방문 가능 여부를 확정하지 않을게요. 방문일 시간표를 확인해 주세요.';
+  return ko + '의 해당 시각 운영 여부는 확인되지 않았어요. 방문 가능 여부는 방문일 공식 확인 후 결정해 주세요.';
+}
+
+// §97 K1/M6: 오동도 음악분수 질문 (관광지 시설 질문). 식사 단어가 있으면 식당 경로에 맡긴다.
+const _FOUNTAIN_RE = /음악분수|바닥분수|분수쇼|분수대|분수/;
+function _isOdongdoFountainQuestion(message) {
+  const m = message || '';
+  if (!_FOUNTAIN_RE.test(m)) return false;
+  if (/먹|식당|맛집|밥|식사/.test(m)) return false;
+  return /(볼 수|보러|볼까|갈 수|가도|있어\?|있나요|언제|몇 시|까지|운영|열어|해\?|해요\?|\?)/.test(m);
+}
+function _buildOdongdoFountainAnswer(message) {
+  const k = _PLACE_KNOWLEDGE.odongdo || {};
+  const m = message || '';
+  const lines = [];
+  const mo = m.match(/(\d{1,2})\s*월/);
+  if (mo) {
+    const month = Number(mo[1]);
+    if (month >= 3 && month <= 10) lines.push(month + '월은 음악분수 정규 운영기간 안이에요. 다만 그날 공연 여부와 시각은 확정하지 않아요.');
+    else lines.push(month + '월은 음악분수 정규 운영기간(3~10월) 밖이라 공연을 보장하지 않아요.');
+  } else if (/여름|한여름/.test(m)) {
+    lines.push('여름은 음악분수 정규 운영기간 안이에요. 다만 그날 공연 여부와 시각은 확정하지 않아요.');
+  }
+  if (/여름|7월|8월|바닥분수/.test(m)) lines.push(k.floor_fountain_season_ko);
+  if (/비|우천|강풍|바람/.test(m)) lines.push(k.fountain_weather_ko + ' 비가 오는 날에는 공연이 없어요.');
+  if (/(\d{1,2})\s*시|저녁|밤|야간|야경|몇 시|까지|언제까지|마감|종료/.test(m)) lines.push('공연 종료 시각은 공식 안내 간 차이가 있어 확정하지 않아요. 방문 전 여수시 공식 안내를 확인해 주세요.');
+  if (lines.length === 0) lines.push(k.fountain_regular_season_ko, k.floor_fountain_season_ko, k.fountain_weather_ko);
+  lines.push('정규 운영기간 밖의 공연은 보장하지 않아요. ' + k.night_walk_ko);
+  return lines.filter(Boolean).join('\n');
+}
+
 // §93 C1: 동백열차 운행시간 문장. 출처 충돌(facility_conflict_ko)이 있으면 충돌 문장만 출력한다.
 function _facilitySentence(knowledge) {
   if (knowledge.facility_conflict_ko) return knowledge.facility_conflict_ko;
@@ -475,7 +517,7 @@ function _detectPlaceLookupIntent(message) {
   if (!message) return { isPlaceLookup: false };
 
   // DISCOVERY override always wins
-  if (DISCOVERY_OVERRIDES.test(message)) return { isPlaceLookup: false };
+  if (DISCOVERY_OVERRIDES.test(message) || _isRainDiscoveryQuestion(message)) return { isPlaceLookup: false }; // §97 M5
 
   // Try to match a known alias (longest-first for specificity)
   const aliases = Object.keys(PLACE_ALIAS_MAP).sort((a, b) => b.length - a.length);
@@ -571,7 +613,12 @@ function _timeIntentKind(message) {
 const _RECOMMEND_RE = /(추천|어디 갈|어디가 좋|갈 만한|갈만한|가볼 만한|가볼만한|둘러볼 만한|좋은 곳|뭐 할까|뭐 하지)/;
 function _isStayTimeQuestion(message) { return _STAY_QUESTION_RE.test(message || ''); }
 function _isHoursQuestion(message) { return _HOURS_QUESTION_RE.test(message || ''); }
-function _isRecommendationRequest(message) { return _RECOMMEND_RE.test(message || ''); }
+function _isRecommendationRequest(message) { return _RECOMMEND_RE.test(message || '') || _isRainDiscoveryQuestion(message); }
+// §97 M5: 우천 신호 + 탐색 어휘 + 장소 없음 → 기존 추천 경로 (detectRainyIntent 재사용).
+function _isRainDiscoveryQuestion(message) {
+  const m = message || '';
+  return detectRainyIntent(m) && /(어디|갈 만|좋아|가볼|가자|갈까)/.test(m) && _detectPlacesInMessage(m).length === 0;
+}
 function _isCafeQuestion(message) {
   const m = message || '';
   if (!/(카페|커피)/.test(m)) return false;
@@ -1557,6 +1604,7 @@ function _isPlaceSpecificQuery(message) {
   if (/(오동도.*갔다가|오동도.*후에|오동도.*타도|오동도.*케이블|향일암.*갔다가|향일암.*후에)/.test(message)) return true;
   if (/(포토존|사진 어디|사진.*찍기|사진.*찍어|어디서.*찍|찍기 좋은 곳)/.test(message)) return true;
   if (/(알려 줘)/.test(message)) return true; // spaced form not in MEDIUM_LOOKUP
+  if (/(몇 시까지|언제까지|마감|몇 시에 (열|닫|시작)|닫나요|닫아요|막차)/.test(message)) return true; // §97 M3
   if (/(주차|주차장|주차비|주차요금|차 세우|차 대는)/.test(message)) return true;
   if (/(화장실|운영시간|운행시간)/.test(message)) return true; // short operational — need place context
   return false;
@@ -1576,6 +1624,10 @@ function _buildPlaceSpecificQueryPayload(message, place, soulContext, sessionId)
     : '\n\n현장에서 직원에게 문의해보세요.';
 
   let answer = null;
+  // §97 K1/M3: 동백열차 막차 (계절·방향별 확정 원문). 운영 요약과 분리해 안내한다.
+  if (/막차|동백열차|열차/.test(msg) && knowledge.ferry_last_train_ko) {
+    answer = knowledge.ferry_last_train_ko + ' 점심시간 12:00~13:00에는 운행하지 않아요. 막차 시각을 연육교 산책 종료 시각으로 쓰지는 않아요.';
+  }
 
   // Duration
   if (/(얼마나 걸|몇 분|소요시간|걸리나요|걸려요|걸려\??)/.test(msg)) {
@@ -1917,6 +1969,10 @@ function _buildClarificationPayload(sessionId, messageKo, sharedJourney) {
 // "추천해줘", "어디 갈까", "갈 만한 곳" → true
 // "케이블카 타고 싶어", "일정 괜찮아?", "안녕" → false
 function _isDiscoveryIntent(message) {
+  // §97 M1: 장소명 + 요금·입장료·운영 시각 질문은 탐색이 아니라 장소별 이용정보 (PSQ) 로 보낸다 (추천 어휘 없을 때).
+  if (message && /(요금|입장료|이용료|탑승료|가격|얼마|몇 시|언제까지|마감|운영시간|운행시간|막차)/.test(message) && !/추천|찾아|보여/.test(message) && _detectPlacesInMessage(message).length > 0) return false;
+  // §97 M5: 우천 신호 + 탐색 어휘 + 장소 없음 → 기존 추천 경로 (§88 신호 재사용).
+  if (_isRainDiscoveryQuestion(message)) return true;
   if (!message) return false;
   // Explicit recommendation verbs
   if (/(추천해|추천해줘|추천해주|추천좀|추천 좀|알려줘|알려주세요|보여줘|보여주세요|찾아줘|찾아주세요)/.test(message)) return true;
@@ -2233,6 +2289,10 @@ function _generateSoulMessage(soulContext, status, message, quoteCtx, currentPla
   }
 
   if (status === 'NO_RESULT') {
+    // §97 M5: 우천 탐색인데 검증된 실내 장소가 없으면 장소를 만들지 않고 정보 부족을 안내한다.
+    if (detectRainyIntent(message)) {
+      return '비 오는 날 갈 수 있는 실내 장소 정보가 아직 충분히 확인되지 않았어요. 추천 장소를 만들지 않았어요. 방문 전 날씨와 시설 운영을 직접 확인해 주세요.';
+    }
     return `${situationLine}\n조건에 맞는 장소를 찾지 못했어요. 시간이나 조건을 조정해보실래요?`;
   }
 
@@ -2480,7 +2540,7 @@ function _detectJourneyDecisionType(message) {
   const msg = message || '';
   if (/(하나 빼|빼줘|빼주세요|제외해줘|하나만 빼|뭐 빼)/.test(msg)) return 'JOURNEY_MODIFY';
   if (/(걷는 건 힘|걷기 힘|걸으면 힘|힘들어하|다리 아|무릎 아|걷기 많이|많이 걷는)/.test(msg)) return 'CONSTRAINT_UPDATE';
-  if (/(가능해|가능한가요|갈 수 있어|될까|가봐도 될|갈 수 있을까)/.test(msg)) return 'FEASIBILITY';
+  if (/(가능해|가능한가요|갈 수 있어|될까|가봐도 될|갈 수 있을까|가도 돼|가도 되|가도 될까|걸어도 돼|걸어도 되)/.test(msg)) return 'FEASIBILITY';
   if (/(도 탈래|도 갈래|도 넣어|탈래|도 타고|도 가볼까)/.test(msg)) return 'JOURNEY_ADD';
   if (/(먼저 가고 싶|가고 싶어|가고싶어)/.test(msg)) return 'JOURNEY_PREFERENCE';
   // Multi-place sequence: "케이블카 타고 향일암 갔다 올 거야" — user states an ordered visit plan
@@ -2611,7 +2671,11 @@ async function _handleJourneyDecision({ decisionType, message, soulContext, conv
     const placeData = await travelGuideService.getPlaceByCode(placeCode);
     const difficulty = placeData ? placeData.physical_difficulty : null;
 
-    if (placeCode === 'hyangiram') {
+    if (_hasNightOrTimeExpr(message)) {
+      // §97 M4: 시각·야간 표현이 있으면 방문 가능을 단정하지 않는다.
+      soulMsg = _timedFeasibilitySafeText(placeCode, ko);
+      nextOptions = ['방문일 확인 후 다시 물어볼게요'];
+    } else if (placeCode === 'hyangiram') {
       if (difficulty === 'high') {
         if (pt === 'family_elderly' && !hasLowWalking) {
           soulMsg = `향일암 자체는 갈 수 있어요. 다만 계단이 가파른 구간이 있어요.\n부모님이 계단 오르내리기 불편하신 편인가요?`;
@@ -2797,6 +2861,10 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   if (_isPreviousTurnReference(message)) {
     return { ok: true, payload: _buildContextUnavailablePayload(sessionId) };
   }
+  // §97 M6/K1: 오동도 음악분수 질문은 관광지 시설 질문이다 (식당 '저녁' 오인식 방지).
+  if (_isOdongdoFountainQuestion(message)) {
+    return { ok: true, payload: { session_id: sessionId, understood_context: {}, places: [], why_details: [], message_ko: _buildOdongdoFountainAnswer(message), status: 'PLACE_SPECIFIC_QUERY', presentation_mode: 'PLACE_KNOWLEDGE', quote: null, route: null, shared_journey: null, timestamp: new Date().toISOString(), next_options: [] } };
+  }
   // 카페 요청: 현재 장소 화면(place_code)의 PSQ 질문은 기존 PSQ 경로가 처리한다.
   // §81: 머먹지 식당 질문 (결정적 파싱, LLM 미사용). 관광지·코스·카페 질문은 기존 경로.
   if (!(explicit_context && explicit_context.place_code)
@@ -2833,6 +2901,10 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   // UI-001: chip place_code supplements when text has no alias but message has a lookup/suitability verb.
   // Text alias always wins over chip (Principle 1 of contract).
   let placeLookup = _detectPlaceLookupIntent(message);
+  // §97 M1: 장소명 + 요금·입장료·운영 시각 질문은 장소 소개가 아니라 장소별 이용정보 (PSQ) 경로로 보낸다.
+  if (placeLookup.isPlaceLookup && /(요금|입장료|이용료|탑승료|가격|얼마|몇 시|언제까지|마감|운영시간|운행시간|막차)/.test(message)) {
+    placeLookup = { isPlaceLookup: false };
+  }
   // PSQ guard: if message has specific operational intent (주차, 요금, 운영…), let PSQ handle it
   // rather than promoting to PLACE_LOOKUP. Prevents "주차와 이동 동선을 알려줘" from getting a
   // generic place-info response instead of the targeted parking guardrail.
@@ -2901,7 +2973,7 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
   // "이 정도면 얼마야?", "견적 보여줘" etc. — never routes to DISCOVERY.
   // Merges stored Journey with explicit message overrides (message wins on conflict).
   // Guard: explicit place_code means user is asking about current place price, not journey quote.
-  if (_isCommerceFollowUpIntent(message) && !explicit_context.place_code) {
+  if (_isCommerceFollowUpIntent(message) && !explicit_context.place_code && _detectPlacesInMessage(message).length === 0) {
     let journeyCtx = null;
     try {
       const sessionCtx = await sessionService.getSession(sessionId);
@@ -3309,6 +3381,11 @@ async function handleTravelRequest({ message, sessionId, hotelId, principal, exp
     // soulContext is already enriched with persisted traveler profile at this point.
     // Text alias wins over current page: "케이블카는 얼마야?" on Odongdo → cablecar PSQ.
     let _psqPlaceCode = explicit_context && explicit_context.place_code;
+    // §97 M1: 장소명 + 요금·운영 시각 질문은 텍스트 별칭으로도 PSQ 장소를 잡는다 (명시 place_code 없이).
+    if (!_psqPlaceCode && /(요금|입장료|이용료|탑승료|가격|얼마|몇 시|언제까지|마감|운영시간|운행시간|막차|닫)/.test(message)) {
+      const _psqAliasOnly = Object.keys(PLACE_ALIAS_MAP).sort((a, b) => b.length - a.length).find(alias => message.includes(alias));
+      if (_psqAliasOnly) _psqPlaceCode = PLACE_ALIAS_MAP[_psqAliasOnly];
+    }
     if (_psqPlaceCode) {
       const _psqTextAlias = Object.keys(PLACE_ALIAS_MAP)
         .sort((a, b) => b.length - a.length)
